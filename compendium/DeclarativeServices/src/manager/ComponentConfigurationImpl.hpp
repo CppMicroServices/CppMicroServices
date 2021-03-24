@@ -212,7 +212,7 @@ public:
   /**
    * Method called to modify the configuration properties for this component configuration. Subclasses
    * must implement this method. 
-    @return false if the component instance has not provided a Modified method.
+    @return boolean indicating whether or not the component instance has provided a Modified method.
    */
   virtual bool ModifyComponentInstanceProperties() = 0;
 

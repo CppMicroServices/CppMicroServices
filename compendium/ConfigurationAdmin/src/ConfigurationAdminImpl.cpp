@@ -187,14 +187,12 @@ namespace cppmicroservices {
     , futuresID{0u}
     , managedServiceTracker(cmContext, this)
     , managedServiceFactoryTracker(cmContext, this)
-    , configListenerTracker(
-        std::make_unique<cppmicroservices::ServiceTracker<
-          cppmicroservices::service::cm::ConfigurationListener>>(cmContext))
+    , configListenerTracker(cmContext)
     , randomGenerator(std::random_device{}())
     {
       managedServiceTracker.Open();
       managedServiceFactoryTracker.Open();
-      configListenerTracker->Open();
+      configListenerTracker.Open();
     }
 
     ConfigurationAdminImpl::~ConfigurationAdminImpl()
@@ -205,9 +203,8 @@ namespace cppmicroservices {
       try {
           managedServiceFactoryTracker.Close();
           managedServiceTracker.Close();
-          if (configListenerTracker) {
-            configListenerTracker->Close();
-          }
+          configListenerTracker.Close();
+          
       } catch (...) {
          auto thrownByMessage = "thrown by ConfiguratonAdminImpl destructor "
                                "while closing the service trackers.\n\t ";
@@ -326,7 +323,7 @@ namespace cppmicroservices {
             result.push_back(it.second);
           }
         } else {
-          LDAPFilter ldap(filter);
+          LDAPFilter ldap{filter};
           for (auto it : configurations) {
             auto props = it.second->GetProperties();
             if (ldap.Match(props)) {
@@ -510,7 +507,7 @@ namespace cppmicroservices {
           nonFPid = pid;
         }
         const auto configurationListeners =
-          configListenerTracker->GetServices();
+          configListenerTracker.GetServices();
         auto type =
           removed
             ? cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED

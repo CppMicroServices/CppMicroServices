@@ -40,6 +40,7 @@ namespace ComponentConstants {
  * object returned by the {@code Bundle.GetHeaders} method.
  */
 US_ServiceComponent_EXPORT extern const std::string SERVICE_COMPONENT;
+using cppmicroservices::service::component::ComponentConstants::SERVICE_COMPONENT;
 
 /**
  * A component property for a component configuration that contains the name
@@ -75,6 +76,14 @@ US_ServiceComponent_EXPORT extern const std::string REFERENCE_TARGET_SUFFIX;
  * instance receives a distinct service object.
  */
 US_ServiceComponent_EXPORT extern const std::string REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
+
+/**
+ * Constants used for ComponentMetadata configurationPolicy attribute.
+ */
+US_ServiceComponent_EXPORT extern const std::string CONFIG_POLICY_IGNORE;
+US_ServiceComponent_EXPORT extern const std::string CONFIG_POLICY_OPTIONAL;
+US_ServiceComponent_EXPORT extern const std::string CONFIG_POLICY_REQUIRE;
+
 }
 
 }}} // namespaces

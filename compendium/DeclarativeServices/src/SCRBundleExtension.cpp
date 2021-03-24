@@ -119,7 +119,7 @@ try {
         this->bundleContext
         .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
 
-    for (auto& oneCmMetadata : configurationMetadata) {
+    for (const auto& oneCmMetadata : configurationMetadata) {
       auto configuration = configAdmin->GetConfiguration(oneCmMetadata.pid);
       if (configuration != nullptr) {
             configuration->Update(oneCmMetadata.properties);

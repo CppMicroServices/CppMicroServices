@@ -97,8 +97,8 @@ public:
     
   void NotifyAllListeners(
     const std::string& pid,
-    const cppmicroservices::service::cm::ConfigurationEventType type,
-    const std::shared_ptr<cppmicroservices::AnyMap> properties);
+    cppmicroservices::service::cm::ConfigurationEventType type,
+    std::shared_ptr<cppmicroservices::AnyMap> properties);
 
 private:
   void CreateFactoryComponent(std::string factoryName, std::string pid, std::shared_ptr<ComponentConfigurationImpl> mgr);

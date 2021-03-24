@@ -21,6 +21,10 @@
   =============================================================================*/
 
 #include "ConfigurationManager.hpp"
+#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
+using cppmicroservices::service::component::ComponentConstants::CONFIG_POLICY_IGNORE;
+using cppmicroservices::service::component::ComponentConstants::CONFIG_POLICY_REQUIRE;
+
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -48,35 +52,35 @@ cppmicroservices::AnyMap ConfigurationManager::GetProperties() const noexcept
 
 void ConfigurationManager::Initialize() {
   if ((metadata->configurationPids.empty()) ||
-      (metadata->configurationPolicy == metadata::ComponentMetadata::CONFIG_POLICY_IGNORE))
+      (metadata->configurationPolicy == CONFIG_POLICY_IGNORE)) {  
     return;
-  try {
-  
-  auto sr =
-    this->bundleContext
-      .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
-  auto configAdmin =
-    this->bundleContext
-      .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
-
-  std::lock_guard<std::mutex> lock(propertiesMutex);
-
-  for (const auto& pid : metadata->configurationPids) {
-    if (configProperties.find(pid) == configProperties.end()) {
-      auto config = configAdmin->ListConfigurations("(pid = " + pid + ")");
-      if (config.size() > 0) {
-        auto properties = config.front()->GetProperties();
-        auto it = configProperties.find(pid);
-        if (it != configProperties.end()) {
-          configProperties.erase(it);
-        }
-        configProperties.emplace(pid, properties);
-        for (const auto item : properties) {
-          mergedProperties[item.first] = item.second;
-        }   
-      }      
-    } 
   }
+  try { 
+    auto sr =
+        this->bundleContext
+        .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+    auto configAdmin =
+        this->bundleContext
+        .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
+
+    std::lock_guard<std::mutex> lock(propertiesMutex);
+
+    for (const auto& pid : metadata->configurationPids) {
+      if (configProperties.find(pid) == configProperties.end()) {
+        auto config = configAdmin->ListConfigurations("(pid = " + pid + ")");
+        if (config.size() > 0) {
+          auto properties = config.front()->GetProperties();
+          auto it = configProperties.find(pid);
+          if (it != configProperties.end()) {
+            configProperties.erase(it);
+          }
+          configProperties.emplace(pid, properties);
+          for (const auto item : properties) {
+            mergedProperties[item.first] = item.second;
+          }   
+        }      
+      } 
+    }
   } catch (...) {
     // No ConfigAdmin available
                
@@ -143,8 +147,7 @@ bool ConfigurationManager::isConfigSatisfied(
   bool allConfigsAvailable =
     configProperties.size() >= metadata->configurationPids.size();
 
-  if ((metadata->configurationPolicy !=
-       metadata::ComponentMetadata::CONFIG_POLICY_REQUIRE) ||
+  if ((metadata->configurationPolicy != CONFIG_POLICY_REQUIRE) ||
       (allConfigsAvailable)) {
     return true;
   }

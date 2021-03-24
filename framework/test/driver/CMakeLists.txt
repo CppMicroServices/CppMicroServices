@@ -32,7 +32,6 @@ set(_tests
   FrameworkEventTest
   FrameworkListenerTest
   HelgrindTest
-  LDAPFilterTest
   LogTest
   BundleHooksTest
   BundleTest
@@ -44,7 +43,6 @@ set(_tests
   ServiceFactoryTest
   ServiceHooksTest
   ServiceRegistryPerformanceTest
-  ServiceRegistryTest
   ServiceTemplateTest
   StaticBundleResourceTest
   StaticBundleTest

@@ -42,6 +42,7 @@
 #include "BundleArchive.h"
 #include "BundleContextPrivate.h"
 #include "BundleResourceContainer.h"
+#include "BundleThread.h"
 #include "BundleUtils.h"
 #include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"

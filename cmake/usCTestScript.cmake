@@ -86,8 +86,8 @@ endif()
 
 #            SHARED THREADING TSAN
 
-set(config0     1       1      1 )
-set(config1     0       1      1 )
+set(config0     1       1      0 )
+set(config1     0       1      0 )
 set(config2     1       0      0 )
 set(config3     0       0      0 )
 

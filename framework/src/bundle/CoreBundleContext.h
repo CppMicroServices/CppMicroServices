@@ -98,6 +98,12 @@ public:
   */
   std::shared_ptr<detail::LogSink> sink;
 
+  struct : detail::MultiThreaded<>
+  {
+    std::list<std::shared_ptr<BundleThread>> value;
+    std::list<std::shared_ptr<BundleThread>> zombies;
+  } bundleThreads;
+
   /**
    * Bundle Storage
    */

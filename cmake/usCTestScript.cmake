@@ -47,7 +47,7 @@ macro(build_and_test)
 
 endmacro()
 
-function(create_initial_cache var _shared _threading _tsan)
+function(create_initial_cache var _shared _threading)
 
   set(_initial_cache "
       US_BUILD_TESTING:BOOL=ON

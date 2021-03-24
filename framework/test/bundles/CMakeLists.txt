@@ -30,8 +30,6 @@ if(BUILD_SHARED_LIBS)
   add_subdirectory(libStopFail)
 endif()
 
-add_subdirectory(libWaitOnBundleOperation)
-  
 add_subdirectory(libS)
 add_subdirectory(libSL1)
 add_subdirectory(libSL3)

@@ -62,7 +62,6 @@ void FrameworkPrivate::DoInit()
 void FrameworkPrivate::Init()
 {
   auto l = Lock();
-  WaitOnOperation(*this, l, "Framework::Init", true);
 
   switch (static_cast<Bundle::State>(state.load())) {
     case Bundle::STATE_INSTALLED:
@@ -167,7 +166,6 @@ void FrameworkPrivate::Start(uint32_t)
   std::vector<long> bundlesToStart;
   {
     auto l = Lock();
-    WaitOnOperation(*this, l, "Framework::Start", true);
 
     switch (state.load()) {
       case Bundle::STATE_INSTALLED:
@@ -253,11 +251,6 @@ void FrameworkPrivate::Shutdown0(bool restart, bool wasActive)
   try {
     {
       auto l = Lock();
-      WaitOnOperation(*this,
-                      l,
-                      std::string("Framework::") +
-                        (restart ? "Update" : "Stop"),
-                      true);
       operation = OP_DEACTIVATING;
       state = Bundle::STATE_STOPPING;
     }

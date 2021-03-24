@@ -59,10 +59,6 @@ if(BUILD_SHARED_LIBS)
       )
 endif()
 
-if(US_ENABLE_THREADING_SUPPORT)
-  list(APPEND _tests ConcurrencyTest)
-endif()
-
 set(_additional_srcs
   TestDriverActivator.cpp
   TestManager.cpp

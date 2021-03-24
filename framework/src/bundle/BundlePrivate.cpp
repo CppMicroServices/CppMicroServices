@@ -42,7 +42,6 @@
 #include "BundleArchive.h"
 #include "BundleContextPrivate.h"
 #include "BundleResourceContainer.h"
-#include "BundleThread.h"
 #include "BundleUtils.h"
 #include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"
@@ -71,6 +70,9 @@ void BundlePrivate::Stop(uint32_t options)
     if (state == Bundle::STATE_UNINSTALLED) {
       throw std::logic_error("Bundle is uninstalled");
     }
+
+    // 2: If an operation is in progress, wait a little
+    // Note: This step hass been removed with removal of BundleThread
 
     // 3:
     if ((options & Bundle::STOP_TRANSIENT) == 0) {
@@ -145,6 +147,7 @@ std::exception_ptr BundlePrivate::Stop1()
         aborted = static_cast<uint8_t>(
           Aborted::NO); // signal to other thread that BundleThread
                         // concludes stop
+                        // Note: BundleThread removed
         if (Bundle::STATE_STOPPING != state) {
           cause = "Bundle changed state because of refresh during Stop()";
         }
@@ -176,14 +179,6 @@ void BundlePrivate::Stop2()
     ctx->Invalidate();
     bundleContext.Store(std::shared_ptr<BundleContextPrivate>());
   }
-}
-
-void BundlePrivate::WaitOnOperation(WaitConditionType& /* wc */,
-                                    LockType& /* lock */,
-                                    const std::string& /* src */,
-                                    bool /* longWait */)
-{
-  // nop
 }
 
 Bundle::State BundlePrivate::GetUpdatedState(LockType& /* l */)
@@ -514,6 +509,7 @@ std::exception_ptr BundlePrivate::Start0()
       aborted = static_cast<uint8_t>(
         Aborted::NO); // signal to other thread that BundleThread
                       // concludes start/stop
+                      // Note: BundleThread removed
       if (Bundle::STATE_STARTING != state) {
         cause = "Bundle changed state because of refresh during Start()";
       }
@@ -553,26 +549,6 @@ void BundlePrivate::StartFailed()
     BundleEvent::BUNDLE_STOPPED, MakeBundle(this->shared_from_this())));
 }
 
-std::shared_ptr<BundleThread> BundlePrivate::GetBundleThread()
-{
-  return nullptr;
-}
-
-bool BundlePrivate::IsBundleThread(const std::thread::id& id) const
-{
-#ifdef US_ENABLE_THREADING_SUPPORT
-  return bundleThread != nullptr && *bundleThread == id;
-#else
-  US_UNUSED(id);
-  return true;
-#endif
-}
-
-void BundlePrivate::ResetBundleThread()
-{
-  bundleThread = nullptr;
-}
-
 BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx)
   : coreCtx(coreCtx)
   , id(0)
@@ -587,7 +563,6 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx)
   , resolveFailException()
   , wasStarted(false)
   , aborted(static_cast<uint8_t>(Aborted::NONE))
-  , bundleThread()
   , symbolicName(Constants::SYSTEM_BUNDLE_SYMBOLICNAME)
   , version(CppMicroServices_VERSION_MAJOR,
             CppMicroServices_VERSION_MINOR,
@@ -613,7 +588,6 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
   , resolveFailException()
   , wasStarted(false)
   , aborted(static_cast<uint8_t>(Aborted::NONE))
-  , bundleThread()
   , symbolicName(ba->GetResourcePrefix())
   , version()
   , timeStamp(ba->GetLastModified())

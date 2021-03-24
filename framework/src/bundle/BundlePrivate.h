@@ -42,7 +42,6 @@ namespace cppmicroservices {
 class CoreBundleContext;
 class Bundle;
 class BundleContextPrivate;
-class BundleThread;
 struct BundleActivator;
 
 /**
@@ -104,21 +103,6 @@ public:
   void Stop2();
 
   /**
-   * Wait for an ongoing operation to finish.
-   *
-   * @param wc Wait condition
-   * @param lock Object used for locking.
-   * @param src Caller to include in exception message.
-   * @param longWait True, if we should wait extra long before aborting.
-   * @throws std::runtime_error if the ongoing (de-)activation does not finish
-   *           within reasonable time.
-   */
-  void WaitOnOperation(WaitConditionType& wc,
-                       LockType& lock,
-                       const std::string& src,
-                       bool longWait);
-
-  /**
    * Get updated bundle state. That means check if an installed bundle has been
    * resolved.
    *
@@ -176,12 +160,6 @@ public:
   std::exception_ptr Start0();
 
   void StartFailed();
-
-  std::shared_ptr<BundleThread> GetBundleThread();
-
-  bool IsBundleThread(const std::thread::id& id) const;
-
-  void ResetBundleThread();
 
   /**
    * Framework context.
@@ -261,10 +239,8 @@ public:
   /** start/stop time-out/uninstall flag, see BundleThread */
   // GCC 4.6 atomics do not support custom trivially copyable types
   // like enums yet, so we use the underlying primitive type here.
+  // Note: BundleThread removed
   std::atomic<uint8_t> aborted;
-
-  /** current bundle thread */
-  std::shared_ptr<BundleThread> bundleThread;
 
   /**
    * Bundle symbolic name.

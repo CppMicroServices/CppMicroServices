@@ -31,7 +31,6 @@
 #include "BundleArchive.h"
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
-#include "BundleThread.h"
 #include "BundleUtils.h"
 #include "CoreBundleContext.h"
 #include "Resolver.h"

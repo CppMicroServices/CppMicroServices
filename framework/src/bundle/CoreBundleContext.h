@@ -60,7 +60,6 @@ as specified in the OSGi R4.2 specifications.
 namespace cppmicroservices {
 
 struct BundleStorage;
-class BundleThread;
 class FrameworkPrivate;
 
 /**
@@ -97,12 +96,6 @@ public:
   * to Framework clients.
   */
   std::shared_ptr<detail::LogSink> sink;
-
-  struct : detail::MultiThreaded<>
-  {
-    std::list<std::shared_ptr<BundleThread>> value;
-    std::list<std::shared_ptr<BundleThread>> zombies;
-  } bundleThreads;
 
   /**
    * Bundle Storage

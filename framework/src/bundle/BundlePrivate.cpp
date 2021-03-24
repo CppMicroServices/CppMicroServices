@@ -64,7 +64,7 @@ void BundlePrivate::Stop(uint32_t options)
   std::exception_ptr savedException;
 
   {
-    auto l = this->Lock();
+    auto l = coreCtx->resolver.Lock();
 
     // 1:
     if (state == Bundle::STATE_UNINSTALLED) {
@@ -557,9 +557,14 @@ std::shared_ptr<BundleThread> BundlePrivate::GetBundleThread()
   return nullptr;
 }
 
-bool BundlePrivate::IsBundleThread(const std::thread::id& /* id */) const
+bool BundlePrivate::IsBundleThread(const std::thread::id& id) const
 {
+#ifdef US_ENABLE_THREADING_SUPPORT
+  return bundleThread != nullptr && *bundleThread == id;
+#else
+  US_UNUSED(id);
   return true;
+#endif
 }
 
 void BundlePrivate::ResetBundleThread()

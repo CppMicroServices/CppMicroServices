@@ -65,6 +65,7 @@ void BundlePrivate::Stop(uint32_t options)
 
   {
     auto l = this->Lock();
+    US_UNUSED(l);
 
     // 1:
     if (state == Bundle::STATE_UNINSTALLED) {
@@ -87,7 +88,7 @@ void BundlePrivate::Stop(uint32_t options)
 
       case Bundle::STATE_ACTIVE:
       case Bundle::STATE_STARTING: // Lazy start...
-        savedException = Stop0(l);
+        savedException = Stop0();
         break;
     }
   }
@@ -97,7 +98,7 @@ void BundlePrivate::Stop(uint32_t options)
   }
 }
 
-std::exception_ptr BundlePrivate::Stop0(UniqueLock& /* resolveLock */)
+std::exception_ptr BundlePrivate::Stop0()
 {
   wasStarted = state == Bundle::STATE_ACTIVE;
   // 5:
@@ -177,7 +178,7 @@ void BundlePrivate::Stop2()
   }
 }
 
-Bundle::State BundlePrivate::GetUpdatedState(LockType& /* l */)
+Bundle::State BundlePrivate::GetUpdatedState()
 {
   if (state == Bundle::STATE_INSTALLED) {
     try {
@@ -201,8 +202,7 @@ Bundle::State BundlePrivate::GetUpdatedState(LockType& /* l */)
   return static_cast<Bundle::State>(state.load());
 }
 
-void BundlePrivate::SetStateInstalled(bool sendEvent,
-                                      UniqueLock& /* resolveLock */)
+void BundlePrivate::SetStateInstalled(bool sendEvent)
 {
   // Make sure that bundleContext is invalid
   std::shared_ptr<BundleContextPrivate> ctx;
@@ -219,10 +219,10 @@ void BundlePrivate::SetStateInstalled(bool sendEvent,
   operation = OP_IDLE;
 }
 
-void BundlePrivate::FinalizeActivation(LockType& l)
+void BundlePrivate::FinalizeActivation()
 {
   // 4: Resolve bundle (if needed)
-  switch (GetUpdatedState(l)) {
+  switch (GetUpdatedState()) {
     case Bundle::STATE_INSTALLED: {
       std::rethrow_exception(resolveFailException);
     }
@@ -278,11 +278,11 @@ void BundlePrivate::Uninstall()
         try {
           exception =
             (state & (Bundle::STATE_ACTIVE | Bundle::STATE_STARTING)) != 0
-              ? Stop0(l)
+              ? Stop0()
               : nullptr;
         } catch (...) {
           // Force to install
-          SetStateInstalled(false, l);
+          SetStateInstalled(false);
           exception = std::current_exception();
         }
         operation = BundlePrivate::OP_UNINSTALLING;
@@ -366,6 +366,7 @@ std::string BundlePrivate::GetLocation() const
 void BundlePrivate::Start(uint32_t options)
 {
   auto l = this->Lock();
+  US_UNUSED(l);
   if (state == Bundle::STATE_UNINSTALLED) {
     throw std::logic_error("Bundle is uninstalled");
   }
@@ -380,7 +381,7 @@ void BundlePrivate::Start(uint32_t options)
     SetAutostartSetting(options);
   }
 
-  FinalizeActivation(l);
+  FinalizeActivation();
   return;
 }
 

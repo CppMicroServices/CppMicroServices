@@ -92,7 +92,7 @@ public:
 
   virtual void Stop(uint32_t);
 
-  std::exception_ptr Stop0(UniqueLock& resolveLock);
+  std::exception_ptr Stop0();
 
   /**
    * Stop code that is executed without holding the packages
@@ -108,13 +108,13 @@ public:
    *
    * @return Bundles state
    */
-  Bundle::State GetUpdatedState(LockType& l);
+  Bundle::State GetUpdatedState();
 
   /**
    * Set state to BUNDLE_INSTALLED.
    * We assume that the bundle is resolved when entering this method.
    */
-  void SetStateInstalled(bool sendEvent, UniqueLock& resolveLock);
+  void SetStateInstalled(bool sendEvent);
 
   /**
    * Purge any old files and data associated with this bundle.
@@ -143,7 +143,7 @@ public:
   int32_t GetAutostartSetting() const;
 
   // Performs the actual activation.
-  void FinalizeActivation(LockType& l);
+  void FinalizeActivation();
 
   virtual void Uninstall();
 

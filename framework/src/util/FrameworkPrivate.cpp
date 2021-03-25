@@ -322,7 +322,8 @@ void FrameworkPrivate::StopAllBundles()
   for (auto b : allBundles) {
     if (b->id != 0) {
       auto l = coreCtx->resolver.Lock();
-      b->SetStateInstalled(false, l);
+      US_UNUSED(l);
+      b->SetStateInstalled(false);
     }
   }
 }

@@ -27,42 +27,39 @@
 
 namespace test {
 /**
-   * verify that a service's configuration can be updated after the service is activated 
+   * Verify that a service's configuration can be updated after the service is activated 
    * without deactivating and reactivating the service.
    */
 TEST_F(tServiceComponent, testUpdateConfig_Modified) //DS_CAI_FTC_1
 {
-  //start bundle
-  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCAI1");
+  //Start bundle
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA1");
 
-  // Use DS runtime service to validate the component description
+  //Use DS runtime service to get the component description
   scr::dto::ComponentDescriptionDTO compDescDTO =
     dsRuntimeService->GetComponentDescriptionDTO(testBundle,
-                                                 "sample::TestBundleDSCAI1");
-  EXPECT_EQ(compDescDTO.implementationClass, "sample::TestBundleDSCAI1")
-    << "Implementation class in the returned component description must be "
-       "sample::TestBundleDSCAI1";
+                                                 "sample::ServiceComponentCA1");
 
-  // Use DS runtime service to validate the component state.
+  //Use DS runtime service to validate the component state.
   //It should be in the SATISFIED state because the configuration policy is optional.
   //and component is delayed
   auto compConfigs =
     dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
-  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED);
+  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED);
 
-  //getservice to make component active
+  //GetService to make component active
   auto ctxt = framework.GetBundleContext();
-  auto sRef1 = ctxt.GetServiceReference<test::Interface4>();
-  EXPECT_TRUE(static_cast<bool>(sRef1)) << "Service must be available";
-  auto service = ctxt.GetService<test::Interface4>(sRef1);
+  auto sRef1 = ctxt.GetServiceReference<test::CAInterface>();
+  ASSERT_TRUE(static_cast<bool>(sRef1)) << "Service must be available";
+  auto service = ctxt.GetService<test::CAInterface>(sRef1);
   ASSERT_NE(service, nullptr);
 
   compConfigs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
-  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE);
+  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE);
 
-  // Get a service reference to ConfigAdmin to create the component instance.
+  //Get a service reference to ConfigAdmin to update configuration objects
   auto caRef =
     framework.GetBundleContext()
       .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
@@ -74,7 +71,7 @@ TEST_F(tServiceComponent, testUpdateConfig_Modified) //DS_CAI_FTC_1
 
   //Create configuration object
   auto configObject =
-    configAdminService->GetConfiguration("sample::TestBundleDSCAI1");
+    configAdminService->GetConfiguration("sample::ServiceComponentCA1");
   auto configObjInstance = configObject->GetPid();
 
   //Update property
@@ -107,11 +104,19 @@ TEST_F(tServiceComponent, testUpdateConfig_Modified) //DS_CAI_FTC_1
   ASSERT_TRUE(result) << "Timed out waiting for Update Configuration"
                          "to complete.";
 
+  //Validate that the correct properties were updated
+  auto serviceProps = service->GetProperties();
+  auto uniqueProp = serviceProps.find("uniqueProp");
+
+  ASSERT_TRUE(uniqueProp != serviceProps.end())
+    << "uniqueProp not found in constructed instance";
+  EXPECT_EQ(uniqueProp->second, instanceId);
+
   //Component should still be active as modified method is present.
   //The configuration is updated without deactivating and reactivating the service.
   compConfigs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
-  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE);
+  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE);
 }
 
 }

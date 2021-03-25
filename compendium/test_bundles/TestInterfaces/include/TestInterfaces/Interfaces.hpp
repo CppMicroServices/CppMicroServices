@@ -49,12 +49,6 @@ namespace test
       virtual ~Interface2();
     };
 
-    class US_TestInterfaces_EXPORT Interface4
-    {
-    public:
-        virtual ~Interface4();
-    };
-
     class US_TestInterfaces_EXPORT TestManagedServiceInterface {
       public:
         virtual ~TestManagedServiceInterface() = default;

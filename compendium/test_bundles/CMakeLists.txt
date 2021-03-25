@@ -39,5 +39,5 @@ add_subdirectory(TestBindUnbindThrows)
 
 add_subdirectory(ManagedServiceAndFactoryBundle)
 
-add_subdirectory(TestBundleDSCAI1)
+add_subdirectory(TestBundleDSCA1)
 

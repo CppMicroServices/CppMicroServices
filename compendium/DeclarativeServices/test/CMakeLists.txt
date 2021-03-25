@@ -168,7 +168,7 @@ set(_test_bundles
   TestBundleDSTOI9
   TestBundleDSTOICA20
   EnglishDictionary
-  TestBundleDSCAI1
+  TestBundleDSCA1
   )
 
 target_link_libraries(${us_declarativeservices_test_exe_name} 

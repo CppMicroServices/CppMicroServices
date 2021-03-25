@@ -61,7 +61,7 @@ public:
   void SetUp() override
   {
     framework.Start();
-    auto context = framework.GetBundleContext();
+    context = framework.GetBundleContext();
 
 #if defined(US_BUILD_SHARED_LIBS)
     auto dsPluginPath = test::GetDSRuntimePluginFilePath();
@@ -117,7 +117,6 @@ public:
 
   cppmicroservices::Bundle GetTestBundle(const std::string& symbolicName)
   {
-    auto context = framework.GetBundleContext();
     auto bundles = context.GetBundles();
 
     for (auto& bundle : bundles) {
@@ -139,9 +138,38 @@ public:
     return testBundle;
   }
 
+  template<class T>
+  std::shared_ptr<T> GetInstance()
+  {
+    cppmicroservices::ServiceReference<T> instanceRef;
+    std::shared_ptr<T> instance;
+    instanceRef = context.GetServiceReference<T>();
+    if (!instanceRef) {
+      return std::shared_ptr<T>();
+    }
+    return context.GetService<T>(instanceRef);
+  }
+
+  std::vector<scr::dto::ComponentConfigurationDTO> GetComponentConfigs(
+    const cppmicroservices::Bundle& testBundle,
+    const std::string& componentName,
+    scr::dto::ComponentDescriptionDTO compDescDTO)
+  {
+    compDescDTO =
+      dsRuntimeService->GetComponentDescriptionDTO(testBundle,
+                                                   componentName);
+    EXPECT_EQ(compDescDTO.implementationClass, componentName)
+      << "Implementation class in the returned component description must be "
+      << componentName;
+
+    return dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+  }
+
   std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
   //std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin>  configAdminService;
   cppmicroservices::Framework framework;
+  cppmicroservices::BundleContext context;
+
 };
 
 }

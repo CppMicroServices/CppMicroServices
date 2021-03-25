@@ -38,30 +38,18 @@ TEST_F(tServiceComponent, testFactoryPidConstruction)
   std::string factoryComponentName = "sample::ServiceComponentCA20";
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA20");
 
-  // Use DS runtime service to validate the component description
-  scr::dto::ComponentDescriptionDTO compDescDTO =
-    dsRuntimeService->GetComponentDescriptionDTO(testBundle,
-                                                 factoryComponentName);
-  EXPECT_EQ(compDescDTO.implementationClass, factoryComponentName)
-    << "Implementation class in the returned component description must be "
-    << factoryComponentName;
-  
+  // Use DS runtime service to validate the component description and 
   // Verify that DS is finished creating the component data structures. 
-  auto compConfigs =
-    dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+  scr::dto::ComponentDescriptionDTO compDescDTO;
+  auto compConfigs = GetComponentConfigs(testBundle, factoryComponentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::UNSATISFIED_REFERENCE) 
       << "factory component state should be UNSATISIFIED_REFERENCE";
   
  // Get a service reference to ConfigAdmin to create the factory component instance.
-   auto caRef =
-    framework.GetBundleContext()
-      .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
-  ASSERT_TRUE(caRef)  << "GetServiceReference failed for ConfigurationAdmin";
   auto configAdminService =
-    framework.GetBundleContext()
-      .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(caRef);
-  ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+   ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
  
   //Create factory configuration object
   auto factoryConfig =
@@ -112,14 +100,8 @@ TEST_F(tServiceComponent, testFactoryPidConstruction)
 
     //Request a service reference to the new component instance. This will
    //cause DS to construct the instance with the updated properties.
-
-   cppmicroservices::ServiceReference<test::CAInterface> instanceRef;
-   std::shared_ptr<test::CAInterface> instance;
-   instanceRef =
-         framework.GetBundleContext().GetServiceReference<test::CAInterface>();
-   ASSERT_TRUE(instanceRef) << "GetServiceReference failed for CAInterface";
-      instance = framework.GetBundleContext().GetService<test::CAInterface >(instanceRef);
-   ASSERT_TRUE(configAdminService) << "GetService failed for CAInterface";
+   auto instance = GetInstance<test::CAInterface>();
+   ASSERT_TRUE(instance) << "GetService failed for CAInterface";
 
   //Confirm factory instance was created with the correct properties
 
@@ -130,7 +112,6 @@ TEST_F(tServiceComponent, testFactoryPidConstruction)
     << "uniqueProp not found in constructed instance";
   EXPECT_EQ(uniqueProp->second, instanceId);
   
-  testBundle.Stop();
- 
+
 }
 }

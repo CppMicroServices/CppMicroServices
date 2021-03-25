@@ -67,14 +67,10 @@ void BundlePrivate::Stop(uint32_t options)
     auto l = this->Lock();
     US_UNUSED(l);
 
-    // 1:
     if (state == Bundle::STATE_UNINSTALLED) {
       throw std::logic_error("Bundle is uninstalled");
     }
 
-    // 2: If an operation is in progress, wait a little
-
-    // 3:
     if ((options & Bundle::STOP_TRANSIENT) == 0) {
       SetAutostartSetting(-1);
     }
@@ -83,7 +79,6 @@ void BundlePrivate::Stop(uint32_t options)
       case Bundle::STATE_RESOLVED:
       case Bundle::STATE_STOPPING:
       case Bundle::STATE_UNINSTALLED:
-        // 4:
         return;
 
       case Bundle::STATE_ACTIVE:
@@ -101,10 +96,9 @@ void BundlePrivate::Stop(uint32_t options)
 std::exception_ptr BundlePrivate::Stop0()
 {
   wasStarted = state == Bundle::STATE_ACTIVE;
-  // 5:
   state = Bundle::STATE_STOPPING;
   operation = OP_DEACTIVATING;
-  // 6-13:
+
   std::exception_ptr savedException = Stop1();
   if (state != Bundle::STATE_UNINSTALLED) {
     state = Bundle::STATE_RESOLVED;
@@ -119,11 +113,9 @@ std::exception_ptr BundlePrivate::Stop1()
 {
   std::exception_ptr res;
 
-  // 6:
   coreCtx->listeners.BundleChanged(BundleEvent(
     BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
 
-  // 7:
   if (wasStarted && bactivator != nullptr) {
     try {
       bactivator->Stop(MakeBundleContext(bundleContext.Load()));
@@ -171,7 +163,6 @@ void BundlePrivate::Stop2()
   std::shared_ptr<BundleContextPrivate> ctx = bundleContext.Load();
   if (ctx) {
     coreCtx->listeners.HooksBundleStopped(ctx);
-    // 8-10:
     RemoveBundleResources();
     ctx->Invalidate();
     bundleContext.Store(std::shared_ptr<BundleContextPrivate>());
@@ -221,7 +212,6 @@ void BundlePrivate::SetStateInstalled(bool sendEvent)
 
 void BundlePrivate::FinalizeActivation()
 {
-  // 4: Resolve bundle (if needed)
   switch (GetUpdatedState()) {
     case Bundle::STATE_INSTALLED: {
       std::rethrow_exception(resolveFailException);
@@ -234,11 +224,9 @@ void BundlePrivate::FinalizeActivation()
     }
     // INTENTIONALLY FALLS THROUGH - in case of lazy activation.
     case Bundle::STATE_RESOLVED: {
-      // 6:
       state = Bundle::STATE_STARTING;
       operation = OP_ACTIVATING;
 
-      // 7:
       std::shared_ptr<BundleContextPrivate> null_expected;
       std::shared_ptr<BundleContextPrivate> ctx(new BundleContextPrivate(this));
       bundleContext.CompareExchange(null_expected, ctx);
@@ -371,12 +359,10 @@ void BundlePrivate::Start(uint32_t options)
     throw std::logic_error("Bundle is uninstalled");
   }
 
-  // 2: Start() is idempotent, i.e., nothing to do when already started
   if (state == Bundle::STATE_ACTIVE) {
     return;
   }
 
-  // 3: Record non-transient start requests.
   if ((options & Bundle::START_TRANSIENT) == 0) {
     SetAutostartSetting(options);
   }
@@ -515,7 +501,6 @@ std::exception_ptr BundlePrivate::Start0()
   }
 
   if (res == nullptr) {
-    // 10:
     state = Bundle::STATE_ACTIVE;
     try {
       coreCtx->listeners.BundleChanged(BundleEvent(
@@ -524,7 +509,6 @@ std::exception_ptr BundlePrivate::Start0()
       res = std::make_exception_ptr(ex);
     }
   } else if (operation == OP_ACTIVATING) {
-    // 8:
     StartFailed();
   }
   return res;
@@ -532,7 +516,6 @@ std::exception_ptr BundlePrivate::Start0()
 
 void BundlePrivate::StartFailed()
 {
-  // 8:
   state = Bundle::STATE_STOPPING;
   coreCtx->listeners.BundleChanged(BundleEvent(
     BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));

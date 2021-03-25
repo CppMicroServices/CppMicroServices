@@ -1,13 +1,13 @@
 {
-    "bundle.symbolic_name" : "TestBundleDSTOICA20",
+    "bundle.symbolic_name" : "TestBundleDSCA20",
     "scr" : {
         "version" : 1,
          "components" : [{
             "enabled" : true,
             "immediate": false,
-            "implementation-class": "sample::ServiceComponent20",
+            "implementation-class": "sample::ServiceComponentCA20",
             "configuration-policy" : "require",
-            "configuration-pid" : ["sample::ServiceComponent20"],
+            "configuration-pid" : ["sample::ServiceComponentCA20"],
             "service": {
                 "interfaces": ["test::CAInterface"]
             }

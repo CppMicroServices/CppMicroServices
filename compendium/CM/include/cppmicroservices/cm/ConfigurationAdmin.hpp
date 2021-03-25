@@ -82,8 +82,6 @@ namespace cppmicroservices {
          * Used to list all of the available configurations. An LDAP filter expression can be used to filter
          * based on any property of the configuration, including service.pid and service.factoryPid
          *
-         * NOT IMPLEMENTED - Will throw std::invalid_argument until this is implemented.
-         *
          * @param filter An optional filter expression to limit the Configurations which are returned, or empty for all.
          * @return a vector of Configurations matching the filter.
          */

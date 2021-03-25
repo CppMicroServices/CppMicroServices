@@ -198,8 +198,8 @@ namespace cppmicroservices {
       cppmicroservices::ServiceTracker<cppmicroservices::service::cm::ManagedService, TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>> managedServiceTracker;
       cppmicroservices::ServiceTracker<cppmicroservices::service::cm::ManagedServiceFactory, TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>> managedServiceFactoryTracker;
       std::mt19937 randomGenerator;
-      std::unique_ptr<cppmicroservices::ServiceTracker<
-        cppmicroservices::service::cm::ConfigurationListener>>
+      cppmicroservices::ServiceTracker<
+        cppmicroservices::service::cm::ConfigurationListener>
         configListenerTracker;
     };
   } // cmimpl

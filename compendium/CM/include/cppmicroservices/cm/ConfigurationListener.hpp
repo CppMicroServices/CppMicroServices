@@ -54,14 +54,14 @@ enum class ConfigurationEventType
 class ConfigurationEvent
 {
 public:
-  ConfigurationEvent(const ServiceReference<ConfigurationAdmin> _configAdmin,
-                     const ConfigurationEventType _type,
-                     const std::string _factoryPid,
-                     const std::string _pid)
-    : configAdmin(std::move(_configAdmin))
-    , type(_type)
-    , factoryPid(std::move(_factoryPid))
-    , pid(std::move(_pid))
+  ConfigurationEvent(const ServiceReference<ConfigurationAdmin> configAdmin,
+                     const ConfigurationEventType type,
+                     const std::string factoryPid,
+                     const std::string pid)
+    : configAdmin(std::move(configAdmin))
+    , type(type)
+    , factoryPid(std::move(factoryPid))
+    , pid(std::move(pid))
   {}
 
   /**
@@ -84,9 +84,9 @@ public:
 
 private:
   const ServiceReference<ConfigurationAdmin> configAdmin;
-  const std::string pid;
-  const std::string factoryPid;
   const ConfigurationEventType type;
+  const std::string factoryPid;
+  const std::string pid;
 };
 /**
  * The ConfigurationListener interface is the interface that services should implement
@@ -102,6 +102,7 @@ public:
    * and when the ConfigurationListener is first registered with the Framework, to provide the initial Configuration.
    */
   virtual void configurationEvent(const ConfigurationEvent& event) = 0;
+  virtual ~ConfigurationListener() {};
 };
 } //cm namespace
 } //service namespace

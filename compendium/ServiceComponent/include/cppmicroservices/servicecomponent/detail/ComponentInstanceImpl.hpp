@@ -330,7 +330,11 @@ public:
             class THasNoConfigConstructor = typename std::enable_if<std::is_constructible<C, std::shared_ptr<cppmicroservices::AnyMap>>::value == false>::type >
       std::shared_ptr<T> DoCreate(bool, bool = true, bool = true)
   {
-    static_assert(std::is_default_constructible<C>::value, "Default Constructor or  Constructor with AnyMap parameter expected when injection is false");
+    static_assert(std::is_default_constructible<C>::value, 
+        "Default Constructor or Constructor with AnyMap input parameter "
+      "expected when injection is false. This error happens when an "
+      "appropriate constructor is not available or when the class being "
+      "validated is not a complete type.");
     return nullptr;
   }
   
@@ -342,7 +346,10 @@ public:
                                              const std::shared_ptr<CtorInjectedRefs>&...>::value == false>::type>
             std::shared_ptr<T> DoCreate(const bool&)
   {
-    static_assert(std::is_constructible<C, const std::shared_ptr<CtorInjectedRefs>&...>::value , "Suitable constructor not found for constructor injection");
+    static_assert(std::is_constructible<C, const std::shared_ptr<CtorInjectedRefs>&...>::value , 
+        "Suitable constructor not found for constructor injection. " 
+        "This error happens when an appropriate constructor is not available "
+        "or when the class being validated is not a complete type.");
     return nullptr;
   }
 

@@ -72,13 +72,14 @@ public:
   /**
    * Implementation must handle the transition from \c SATISFIED or \c ACTIVE to \c UNSATISFIED_REFERENCE
    *
-   * \param mgr is the {@link ComponentConfigurationImpl} object whose state needs to change
+   * @param mgr is the {@link ComponentConfigurationImpl} object whose state needs to change
    */
   virtual void Deactivate(ComponentConfigurationImpl& mgr) = 0;
 
   /**
    * Implementation must modify the properties of a component instance when a configuration
-   * object on which it is dependent changes. Returns 
+   * object on which it is dependent changes. 
+   * @return boolean 
    *    - true if the component has a Modified method.
    *    - false if the component does not have a Modified method. The 
    *      component has been Deactivated

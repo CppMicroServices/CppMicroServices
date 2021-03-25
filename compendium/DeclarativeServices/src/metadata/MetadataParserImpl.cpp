@@ -24,11 +24,12 @@
 #include "ComponentMetadata.hpp"
 #include "MetadataParserImpl.hpp"
 #include "Util.hpp"
-#include "cppmicroservices/util/FileSystem.h"
 
 #include <iterator>
+#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 
 using cppmicroservices::scrimpl::util::ObjectValidator;
+using cppmicroservices::service::component::ComponentConstants::CONFIG_POLICY_IGNORE;
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -121,7 +122,7 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
   ObjectValidator(metadata, "name", /*isOptional=*/true).AssignValueTo(compMetadata->name);
 
   // component.configuration-policy (Optional)
-  compMetadata->configurationPolicy = metadata::ComponentMetadata::CONFIG_POLICY_IGNORE;
+  compMetadata->configurationPolicy = CONFIG_POLICY_IGNORE;
   unsigned short configPolicy = 0;
   object =
     ObjectValidator(metadata, "configuration-policy", /*isOptional=*/true);
@@ -170,13 +171,17 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
      * a Warning message is logged.
      */
   if (configPolicy ^ configPid) {
-    compMetadata->configurationPolicy =
-      metadata::ComponentMetadata::CONFIG_POLICY_IGNORE;
+    compMetadata->configurationPolicy =  CONFIG_POLICY_IGNORE;
+    compMetadata->configurationPids.clear();
     std::string msg = "Warning: configuration-policy has been set to ignore.";
     msg.append(
       " Both configuration-policy and configuration-pid must be present");
     msg.append(" to participate in Configuration Admin. ");
     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, msg);
+  }
+
+  if (compMetadata->configurationPolicy == CONFIG_POLICY_IGNORE) {
+    compMetadata->configurationPids.clear();
   }
 
   // component.properties

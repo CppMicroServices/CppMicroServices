@@ -13,9 +13,9 @@ using cppmicroservices::scrimpl::metadata::ComponentMetadata;
 ConfigurationNotifier::ConfigurationNotifier(
    cppmicroservices::BundleContext context,
    std::shared_ptr<cppmicroservices::logservice::LogService> logger)
-  : bundleContext(std::move(context))
-  , logger(std::move(logger)) 
-  , tokenCounter(0)
+  : tokenCounter(0)
+  , bundleContext(std::move(context))
+  , logger(std::move(logger))
 {
   if (!bundleContext || !(this->logger)) {
     throw std::invalid_argument("ConfigurationNotifier Constructor "
@@ -163,11 +163,11 @@ void ConfigurationNotifier::CreateFactoryComponent(
 
 void ConfigurationNotifier::NotifyAllListeners(
   const std::string& pid,
-  const cppmicroservices::service::cm::ConfigurationEventType type,
-  const std::shared_ptr<cppmicroservices::AnyMap> properties )
+  cppmicroservices::service::cm::ConfigurationEventType type,
+  std::shared_ptr<cppmicroservices::AnyMap> properties )
   {
      ConfigChangeNotification notification =
-      ConfigChangeNotification(pid, properties, type);
+      ConfigChangeNotification(pid, std::move(properties), std::move(type));
    
     std::shared_ptr<TokenMap> listenersMapCopy;
     {

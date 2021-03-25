@@ -62,7 +62,7 @@ public:
     tracker->Open();
 
     std::promise<void> p;
-    std::shared_future<void> f = p.get_future();
+    std::shared_future<void> f = p.get_future().share();
 
     // Start ten threads, each registering ten services
     for (int c = 0; c < 10; ++c) {

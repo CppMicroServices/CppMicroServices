@@ -31,7 +31,6 @@
 #include "BundleArchive.h"
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
-#include "BundleThread.h"
 #include "BundleUtils.h"
 #include "CoreBundleContext.h"
 #include "Resolver.h"
@@ -316,18 +315,19 @@ Bundle::TimeStamp Bundle::GetLastModified() const
   return d->barchive ? d->barchive->GetLastModified() : d->timeStamp;
 }
 
-void* Bundle::GetSymbol(void * handle, const std::string& symname) const
+void* Bundle::GetSymbol(void* handle, const std::string& symname) const
 {
-  if(!d || !handle || symname.empty()) {
-      throw std::invalid_argument("Error : Either bundle or inputs supplied are invalid!");
+  if (!d || !handle || symname.empty()) {
+    throw std::invalid_argument(
+      "Error : Either bundle or inputs supplied are invalid!");
   }
 
-  if(STATE_ACTIVE != GetState()) {
+  if (STATE_ACTIVE != GetState()) {
     throw std::runtime_error("Bundle is not started and active!");
   }
 
   // Utility function that fetches the symbol or nullptr
-  return BundleUtils::GetSymbol(handle,symname.c_str());
+  return BundleUtils::GetSymbol(handle, symname.c_str());
 }
 
 std::ostream& operator<<(std::ostream& os, Bundle::State state)

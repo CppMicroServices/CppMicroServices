@@ -1,3 +1,0 @@
-
-usFunctionCreateTestBundleWithResources(TestBundleWaitOnOperation SOURCES TestBundleWaitOnOperation.cpp RESOURCES manifest.json)
-

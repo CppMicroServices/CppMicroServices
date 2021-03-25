@@ -27,6 +27,7 @@
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/BundleResource.h"
 #include "cppmicroservices/BundleResourceStream.h"
 #include "cppmicroservices/Framework.h"
@@ -41,7 +42,6 @@
 #include "BundleArchive.h"
 #include "BundleContextPrivate.h"
 #include "BundleResourceContainer.h"
-#include "BundleThread.h"
 #include "BundleUtils.h"
 #include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"
@@ -64,17 +64,13 @@ void BundlePrivate::Stop(uint32_t options)
   std::exception_ptr savedException;
 
   {
-    auto l = coreCtx->resolver.Lock();
+    auto l = this->Lock();
+    US_UNUSED(l);
 
-    // 1:
     if (state == Bundle::STATE_UNINSTALLED) {
       throw std::logic_error("Bundle is uninstalled");
     }
 
-    // 2: If an operation is in progress, wait a little
-    WaitOnOperation(coreCtx->resolver, l, "Bundle::Stop", false);
-
-    // 3:
     if ((options & Bundle::STOP_TRANSIENT) == 0) {
       SetAutostartSetting(-1);
     }
@@ -83,12 +79,11 @@ void BundlePrivate::Stop(uint32_t options)
       case Bundle::STATE_RESOLVED:
       case Bundle::STATE_STOPPING:
       case Bundle::STATE_UNINSTALLED:
-        // 4:
         return;
 
       case Bundle::STATE_ACTIVE:
       case Bundle::STATE_STARTING: // Lazy start...
-        savedException = Stop0(l);
+        savedException = Stop0();
         break;
     }
   }
@@ -98,20 +93,17 @@ void BundlePrivate::Stop(uint32_t options)
   }
 }
 
-std::exception_ptr BundlePrivate::Stop0(UniqueLock& resolveLock)
+std::exception_ptr BundlePrivate::Stop0()
 {
   wasStarted = state == Bundle::STATE_ACTIVE;
-  // 5:
   state = Bundle::STATE_STOPPING;
   operation = OP_DEACTIVATING;
-  // 6-13:
-  std::exception_ptr savedException =
-    GetBundleThread()->CallStop1(this, resolveLock);
+
+  std::exception_ptr savedException = Stop1();
   if (state != Bundle::STATE_UNINSTALLED) {
     state = Bundle::STATE_RESOLVED;
-    GetBundleThread()->BundleChanged(
-      { BundleEvent::BUNDLE_STOPPED, shared_from_this() }, resolveLock);
-    coreCtx->resolver.NotifyAll();
+    coreCtx->listeners.BundleChanged(
+      { BundleEvent::BUNDLE_STOPPED, MakeBundle(shared_from_this()) });
     operation = OP_IDLE;
   }
   return savedException;
@@ -121,11 +113,9 @@ std::exception_ptr BundlePrivate::Stop1()
 {
   std::exception_ptr res;
 
-  // 6:
   coreCtx->listeners.BundleChanged(BundleEvent(
     BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
 
-  // 7:
   if (wasStarted && bactivator != nullptr) {
     try {
       bactivator->Stop(MakeBundleContext(bundleContext.Load()));
@@ -138,8 +128,6 @@ std::exception_ptr BundlePrivate::Stop1()
     // if stop was aborted (uninstall or timeout), make sure
     // FinalizeActivation() has finished before checking aborted/state
     {
-      auto l = coreCtx->resolver.Lock();
-      US_UNUSED(l);
       std::string cause;
       if (aborted == static_cast<uint8_t>(Aborted::YES)) {
         if (Bundle::STATE_UNINSTALLED == state) {
@@ -148,9 +136,7 @@ std::exception_ptr BundlePrivate::Stop1()
           cause = "Bundle activator Stop() time-out";
         }
       } else {
-        aborted = static_cast<uint8_t>(
-          Aborted::NO); // signal to other thread that BundleThread
-                        // concludes stop
+        aborted = static_cast<uint8_t>(Aborted::NO);
         if (Bundle::STATE_STOPPING != state) {
           cause = "Bundle changed state because of refresh during Stop()";
         }
@@ -177,66 +163,22 @@ void BundlePrivate::Stop2()
   std::shared_ptr<BundleContextPrivate> ctx = bundleContext.Load();
   if (ctx) {
     coreCtx->listeners.HooksBundleStopped(ctx);
-    // 8-10:
     RemoveBundleResources();
     ctx->Invalidate();
     bundleContext.Store(std::shared_ptr<BundleContextPrivate>());
   }
 }
 
-void BundlePrivate::WaitOnOperation(WaitConditionType& wc,
-                                    LockType& lock,
-                                    const std::string& src,
-                                    bool longWait)
-{
-  if (operation.load() != OP_IDLE) {
-    std::chrono::milliseconds waitfor = longWait
-                                          ? std::chrono::milliseconds(20000)
-                                          : std::chrono::milliseconds(500);
-    if (wc.WaitFor(
-          lock, waitfor, [this] { return operation.load() == OP_IDLE; })) {
-      return;
-    }
-
-    std::string op;
-    switch (operation.load()) {
-      case OP_IDLE:
-        // Should not happen!
-        return;
-      case OP_ACTIVATING:
-        op = "start";
-        break;
-      case OP_DEACTIVATING:
-        op = "stop";
-        break;
-      case OP_RESOLVING:
-        op = "resolve";
-        break;
-      case OP_UNINSTALLING:
-        op = "uninstall";
-        break;
-      case OP_UNRESOLVING:
-        op = "unresolve";
-        break;
-      case OP_UPDATING:
-        op = "update";
-        break;
-    }
-    throw std::runtime_error(src + " called during " + op + " of Bundle#" +
-                             util::ToString(id));
-  }
-}
-
-Bundle::State BundlePrivate::GetUpdatedState(LockType& l)
+Bundle::State BundlePrivate::GetUpdatedState()
 {
   if (state == Bundle::STATE_INSTALLED) {
     try {
-      WaitOnOperation(coreCtx->resolver, l, "Bundle.resolve", true);
       if (state == Bundle::STATE_INSTALLED) {
         state = Bundle::STATE_RESOLVED;
         operation = OP_RESOLVING;
-        GetBundleThread()->BundleChanged(
-          { BundleEvent::BUNDLE_RESOLVED, this->shared_from_this() }, l);
+        coreCtx->listeners.BundleChanged(
+          { BundleEvent::BUNDLE_RESOLVED,
+            MakeBundle(this->shared_from_this()) });
         operation = OP_IDLE;
       }
     } catch (...) {
@@ -251,7 +193,7 @@ Bundle::State BundlePrivate::GetUpdatedState(LockType& l)
   return static_cast<Bundle::State>(state.load());
 }
 
-void BundlePrivate::SetStateInstalled(bool sendEvent, UniqueLock& resolveLock)
+void BundlePrivate::SetStateInstalled(bool sendEvent)
 {
   // Make sure that bundleContext is invalid
   std::shared_ptr<BundleContextPrivate> ctx;
@@ -262,17 +204,15 @@ void BundlePrivate::SetStateInstalled(bool sendEvent, UniqueLock& resolveLock)
   state = Bundle::STATE_INSTALLED;
   if (sendEvent) {
     operation = OP_UNRESOLVING;
-    GetBundleThread()->BundleChanged(
-      { BundleEvent::BUNDLE_UNRESOLVED, this->shared_from_this() },
-      resolveLock);
+    coreCtx->listeners.BundleChanged(
+      { BundleEvent::BUNDLE_RESOLVED, MakeBundle(this->shared_from_this()) });
   }
   operation = OP_IDLE;
 }
 
-void BundlePrivate::FinalizeActivation(LockType& l)
+void BundlePrivate::FinalizeActivation()
 {
-  // 4: Resolve bundle (if needed)
-  switch (GetUpdatedState(l)) {
+  switch (GetUpdatedState()) {
     case Bundle::STATE_INSTALLED: {
       std::rethrow_exception(resolveFailException);
     }
@@ -284,17 +224,14 @@ void BundlePrivate::FinalizeActivation(LockType& l)
     }
     // INTENTIONALLY FALLS THROUGH - in case of lazy activation.
     case Bundle::STATE_RESOLVED: {
-      // 6:
       state = Bundle::STATE_STARTING;
       operation = OP_ACTIVATING;
 
-      // 7:
       std::shared_ptr<BundleContextPrivate> null_expected;
       std::shared_ptr<BundleContextPrivate> ctx(new BundleContextPrivate(this));
       bundleContext.CompareExchange(null_expected, ctx);
-      auto e = GetBundleThread()->CallStart0(this, l);
+      auto e = Start0();
       operation = OP_IDLE;
-      coreCtx->resolver.NotifyAll();
       if (e) {
         std::rethrow_exception(e);
       }
@@ -316,7 +253,7 @@ void BundlePrivate::FinalizeActivation(LockType& l)
 void BundlePrivate::Uninstall()
 {
   {
-    auto l = coreCtx->resolver.Lock();
+    auto l = this->Lock();
     US_UNUSED(l);
 
     switch (static_cast<Bundle::State>(state.load())) {
@@ -327,15 +264,13 @@ void BundlePrivate::Uninstall()
       case Bundle::STATE_STOPPING: {
         std::exception_ptr exception;
         try {
-          WaitOnOperation(coreCtx->resolver, l, "Bundle::Uninstall", true);
           exception =
             (state & (Bundle::STATE_ACTIVE | Bundle::STATE_STARTING)) != 0
-              ? Stop0(l)
+              ? Stop0()
               : nullptr;
         } catch (...) {
           // Force to install
-          SetStateInstalled(false, l);
-          coreCtx->resolver.NotifyAll();
+          SetStateInstalled(false);
           exception = std::current_exception();
         }
         operation = BundlePrivate::OP_UNINSTALLING;
@@ -357,7 +292,6 @@ void BundlePrivate::Uninstall()
         coreCtx->bundleRegistry.Remove(location, id);
         if (operation != BundlePrivate::OP_UNINSTALLING) {
           try {
-            WaitOnOperation(coreCtx->resolver, l, "Bundle::Uninstall", true);
             operation = BundlePrivate::OP_UNINSTALLING;
           } catch (...) {
             // Make sure that bundleContext is invalid
@@ -379,8 +313,8 @@ void BundlePrivate::Uninstall()
         }
 
         state = Bundle::STATE_INSTALLED;
-        GetBundleThread()->BundleChanged(
-          { BundleEvent::BUNDLE_UNRESOLVED, shared_from_this() }, l);
+        coreCtx->listeners.BundleChanged(
+          { BundleEvent::BUNDLE_UNRESOLVED, MakeBundle(shared_from_this()) });
         bactivator = nullptr;
         state = Bundle::STATE_UNINSTALLED;
 
@@ -404,7 +338,6 @@ void BundlePrivate::Uninstall()
 
         // There might be bundle threads that are running start or stop
         // operation. This will wake them and give them an chance to terminate.
-        coreCtx->resolver.NotifyAll();
         break;
       }
     }
@@ -420,25 +353,21 @@ std::string BundlePrivate::GetLocation() const
 
 void BundlePrivate::Start(uint32_t options)
 {
-  auto l = coreCtx->resolver.Lock();
+  auto l = this->Lock();
+  US_UNUSED(l);
   if (state == Bundle::STATE_UNINSTALLED) {
     throw std::logic_error("Bundle is uninstalled");
   }
 
-  // 1: If an operation is in progress, wait a little
-  WaitOnOperation(coreCtx->resolver, l, "Bundle::Start", false);
-
-  // 2: Start() is idempotent, i.e., nothing to do when already started
   if (state == Bundle::STATE_ACTIVE) {
     return;
   }
 
-  // 3: Record non-transient start requests.
   if ((options & Bundle::START_TRANSIENT) == 0) {
     SetAutostartSetting(options);
   }
 
-  FinalizeActivation(l);
+  FinalizeActivation();
   return;
 }
 
@@ -552,14 +481,6 @@ std::exception_ptr BundlePrivate::Start0()
   // if start was aborted (uninstall or timeout), make sure
   // finalizeActivation() has finished before checking aborted/state
   {
-    auto l = coreCtx->resolver.Lock();
-    US_UNUSED(l);
-    if (!IsBundleThread(std::this_thread::get_id())) {
-      // newer BundleThread instance has been active for this BundleImpl,
-      // end thread execution
-      throw std::runtime_error("Aborted bundle thread ending execution");
-    }
-
     std::string cause;
     if (static_cast<Aborted>(aborted.load()) == Aborted::YES) {
       if (Bundle::STATE_UNINSTALLED == state) {
@@ -568,9 +489,7 @@ std::exception_ptr BundlePrivate::Start0()
         cause = "Bundle activator Start() time-out";
       }
     } else {
-      aborted = static_cast<uint8_t>(
-        Aborted::NO); // signal to other thread that BundleThread
-                      // concludes start/stop
+      aborted = static_cast<uint8_t>(Aborted::NO);
       if (Bundle::STATE_STARTING != state) {
         cause = "Bundle changed state because of refresh during Start()";
       }
@@ -582,7 +501,6 @@ std::exception_ptr BundlePrivate::Start0()
   }
 
   if (res == nullptr) {
-    // 10:
     state = Bundle::STATE_ACTIVE;
     try {
       coreCtx->listeners.BundleChanged(BundleEvent(
@@ -591,7 +509,6 @@ std::exception_ptr BundlePrivate::Start0()
       res = std::make_exception_ptr(ex);
     }
   } else if (operation == OP_ACTIVATING) {
-    // 8:
     StartFailed();
   }
   return res;
@@ -599,7 +516,6 @@ std::exception_ptr BundlePrivate::Start0()
 
 void BundlePrivate::StartFailed()
 {
-  // 8:
   state = Bundle::STATE_STOPPING;
   coreCtx->listeners.BundleChanged(BundleEvent(
     BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
@@ -608,50 +524,6 @@ void BundlePrivate::StartFailed()
   state = Bundle::STATE_RESOLVED;
   coreCtx->listeners.BundleChanged(BundleEvent(
     BundleEvent::BUNDLE_STOPPED, MakeBundle(this->shared_from_this())));
-}
-
-std::shared_ptr<BundleThread> BundlePrivate::GetBundleThread()
-{
-#ifdef US_ENABLE_THREADING_SUPPORT
-  auto l = coreCtx->bundleThreads.Lock();
-  US_UNUSED(l);
-
-  // clean up old zombies
-  for (auto bt : coreCtx->bundleThreads.zombies) {
-    bt->Join();
-  }
-  coreCtx->bundleThreads.zombies.clear();
-
-  if (coreCtx->bundleThreads.value.empty()) {
-    bundleThread = std::make_shared<BundleThread>(coreCtx);
-  } else {
-    bundleThread = coreCtx->bundleThreads.value.front();
-    coreCtx->bundleThreads.value.pop_front();
-  }
-
-  return bundleThread;
-#else
-  if (coreCtx->bundleThreads.value.empty()) {
-    coreCtx->bundleThreads.value.push_back(
-      std::make_shared<BundleThread>(coreCtx));
-  }
-  return coreCtx->bundleThreads.value.back();
-#endif
-}
-
-bool BundlePrivate::IsBundleThread(const std::thread::id& id) const
-{
-#ifdef US_ENABLE_THREADING_SUPPORT
-  return bundleThread != nullptr && *bundleThread == id;
-#else
-  US_UNUSED(id);
-  return true;
-#endif
-}
-
-void BundlePrivate::ResetBundleThread()
-{
-  bundleThread = nullptr;
 }
 
 BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx)
@@ -668,7 +540,6 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx)
   , resolveFailException()
   , wasStarted(false)
   , aborted(static_cast<uint8_t>(Aborted::NONE))
-  , bundleThread()
   , symbolicName(Constants::SYSTEM_BUNDLE_SYMBOLICNAME)
   , version(CppMicroServices_VERSION_MAJOR,
             CppMicroServices_VERSION_MINOR,
@@ -694,7 +565,6 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
   , resolveFailException()
   , wasStarted(false)
   , aborted(static_cast<uint8_t>(Aborted::NONE))
-  , bundleThread()
   , symbolicName(ba->GetResourcePrefix())
   , version()
   , timeStamp(ba->GetLastModified())

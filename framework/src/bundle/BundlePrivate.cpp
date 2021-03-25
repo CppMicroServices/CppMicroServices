@@ -72,7 +72,6 @@ void BundlePrivate::Stop(uint32_t options)
     }
 
     // 2: If an operation is in progress, wait a little
-    // Note: This step hass been removed with removal of BundleThread
 
     // 3:
     if ((options & Bundle::STOP_TRANSIENT) == 0) {
@@ -144,10 +143,7 @@ std::exception_ptr BundlePrivate::Stop1()
           cause = "Bundle activator Stop() time-out";
         }
       } else {
-        aborted = static_cast<uint8_t>(
-          Aborted::NO); // signal to other thread that BundleThread
-                        // concludes stop
-                        // Note: BundleThread removed
+        aborted = static_cast<uint8_t>(Aborted::NO);
         if (Bundle::STATE_STOPPING != state) {
           cause = "Bundle changed state because of refresh during Stop()";
         }
@@ -506,10 +502,7 @@ std::exception_ptr BundlePrivate::Start0()
         cause = "Bundle activator Start() time-out";
       }
     } else {
-      aborted = static_cast<uint8_t>(
-        Aborted::NO); // signal to other thread that BundleThread
-                      // concludes start/stop
-                      // Note: BundleThread removed
+      aborted = static_cast<uint8_t>(Aborted::NO);
       if (Bundle::STATE_STARTING != state) {
         cause = "Bundle changed state because of refresh during Start()";
       }

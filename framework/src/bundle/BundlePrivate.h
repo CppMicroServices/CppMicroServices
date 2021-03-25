@@ -95,7 +95,7 @@ public:
   std::exception_ptr Stop0(UniqueLock& resolveLock);
 
   /**
-   * Stop code that is executed in the bundleThread without holding the packages
+   * Stop code that is executed without holding the packages
    * lock.
    */
   std::exception_ptr Stop1();
@@ -154,7 +154,7 @@ public:
   virtual const AnyMap& GetHeaders() const;
 
   /**
-   * Start code that is executed in the bundleThread without holding the
+   * Start code that is executed without holding the
    * packages lock.
    */
   std::exception_ptr Start0();
@@ -236,10 +236,9 @@ public:
     NO
   };
 
-  /** start/stop time-out/uninstall flag, see BundleThread */
+  /** start/stop time-out/uninstall flag */
   // GCC 4.6 atomics do not support custom trivially copyable types
   // like enums yet, so we use the underlying primitive type here.
-  // Note: BundleThread removed
   std::atomic<uint8_t> aborted;
 
   /**

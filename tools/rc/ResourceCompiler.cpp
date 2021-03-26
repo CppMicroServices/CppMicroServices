@@ -179,8 +179,9 @@ void validateManifestInArchive(mz_zip_archive* zipArchive,
                                const std::string& archiveFile,
                                const std::string& archiveEntry)
 {
+  size_t length = 0;
   void* data = mz_zip_reader_extract_file_to_heap(
-    zipArchive, archiveEntry.c_str(), nullptr, 0);
+    zipArchive, archiveEntry.c_str(), &length, 0);
   std::unique_ptr<void, void (*)(void*)> manifestFileContents(data, ::free);
 
   if (!manifestFileContents) {
@@ -191,7 +192,7 @@ void validateManifestInArchive(mz_zip_archive* zipArchive,
   try {
     Json::Value root;
     std::istringstream json(
-      reinterpret_cast<const char*>(manifestFileContents.get()));
+      std::string(reinterpret_cast<const char *>(manifestFileContents.get()), length));
     parseAndValidateJson(json, root);
   } catch (const InvalidManifest& e) {
     std::string exceptionMsg(archiveFile);

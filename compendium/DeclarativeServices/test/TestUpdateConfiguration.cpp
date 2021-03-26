@@ -49,10 +49,9 @@ TEST_F(tServiceComponent, testUpdateConfig_Modified) //DS_CAI_FTC_1
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED);
 
   //GetService to make component active
-  auto ctxt = framework.GetBundleContext();
-  auto sRef1 = ctxt.GetServiceReference<test::CAInterface>();
+  auto sRef1 = context.GetServiceReference<test::CAInterface>();
   ASSERT_TRUE(static_cast<bool>(sRef1)) << "Service must be available";
-  auto service = ctxt.GetService<test::CAInterface>(sRef1);
+  auto service = context.GetService<test::CAInterface>(sRef1);
   ASSERT_NE(service, nullptr);
 
   compConfigs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);

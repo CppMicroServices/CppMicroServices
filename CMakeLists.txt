@@ -481,9 +481,18 @@ else()
     set(US_CXX_FLAGS_RELEASE "${US_CXX_FLAGS_RELEASE} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2")
   endif()
 
+  if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.8) OR
+      ((US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG) AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.1))
+    set(US_CXX_ASAN_FLAGS "-fsanitize=address -fno-omit-frame-pointer")
+  endif()
+
+  if(US_ENABLE_ASAN AND US_CXX_ASAN_FLAGS)
+    set(US_CXX_FLAGS "${US_CXX_ASAN_FLAGS} ${US_CXX_FLAGS}")
+  endif()
+
   set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
   set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=thread")
-  usFunctionCheckCompilerFlags("-O1 -fsanitize=thread" US_CXX_TSAN_FLAGS)
+  usFunctionCheckCompilerFlags("-01 -fsanitize=thread" US_CXX_TSAN_FLAGS)
   set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
   if(NOT US_CXX_TSAN_FLAGS AND US_ENABLE_TSAN)
     message(WARNING "TSAN requested, but compiler does not recognize it")

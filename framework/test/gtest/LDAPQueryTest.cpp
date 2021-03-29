@@ -22,35 +22,58 @@
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/LDAPFilter.h"
 
 #include "TestUtils.h"
-#include "TestingMacros.h"
+#include "cppmicroservices/LDAPFilter.h"
+#include "gtest/gtest.h"
 
 using namespace cppmicroservices;
 
-void TestLDAPFilterMatchBundle(const Bundle& bundle)
+class LDAPQueryTest : public ::testing::Test
+{
+protected:
+  Bundle testBundle;
+  Framework f;
+
+public:
+  LDAPQueryTest()
+    : f(FrameworkFactory().NewFramework()){};
+
+  ~LDAPQueryTest() override = default;
+
+  void SetUp() override
+  {
+    f.Start();
+    testBundle = cppmicroservices::testing::InstallLib(f.GetBundleContext(),
+                                                       "TestBundleLQ");
+  }
+
+  void TearDown() override
+  {
+    f.Stop();
+    f.WaitForStop(std::chrono::milliseconds::zero());
+  }
+};
+
+TEST_F(LDAPQueryTest, TestLDAPFilterMatchBundle)
 {
   LDAPFilter ldapMatchCase("(bundle.testproperty=YES)");
   LDAPFilter ldapKeyMismatchCase("(bundle.TestProperty=YES)");
   LDAPFilter ldapValueMismatchCase("(bundle.testproperty=Yes)");
 
   // Exact string match of both key and value
-  US_TEST_CONDITION(ldapMatchCase.Match(bundle),
-                    " Evaluating LDAP expr: " + ldapMatchCase.ToString());
+  ASSERT_TRUE(ldapMatchCase.Match(testBundle));
 
   // Testing case-insensitive key (should still pass)
-  US_TEST_CONDITION(ldapKeyMismatchCase.Match(bundle),
-                    " Evaluating LDAP expr: " + ldapKeyMismatchCase.ToString());
+  ASSERT_TRUE(ldapKeyMismatchCase.Match(testBundle));
 
   // Testing case-insensitive value (should fail)
-  US_TEST_CONDITION(!ldapValueMismatchCase.Match(bundle),
-                    " Evaluating LDAP expr: " +
-                      ldapValueMismatchCase.ToString());
+  ASSERT_FALSE(ldapValueMismatchCase.Match(testBundle));
 }
 
-void TestLDAPFilterMatchNoException(const Bundle& bundle)
+TEST_F(LDAPQueryTest, TestLDAPFilterMatchNoException)
 {
   LDAPFilter ldapMatch("(hosed=1)");
   AnyMap props(AnyMap::UNORDERED_MAP);
@@ -59,84 +82,52 @@ void TestLDAPFilterMatchNoException(const Bundle& bundle)
   props["hose"] = std::string("yum");
 
   // Testing no exception is thrown.
-  US_TEST_NO_EXCEPTION(ldapMatch.Match(props));
+  ASSERT_NO_THROW(ldapMatch.Match(props));
 
   // Testing key match
-  US_TEST_CONDITION(ldapMatch.Match(props) == true,
-                    "Evaluating LDAP expr: " + ldapMatch.ToString());
+  ASSERT_TRUE(ldapMatch.Match(props));
 
   // Testing no exception is thrown.
-  US_TEST_NO_EXCEPTION(ldapMatch.Match(bundle));
+  ASSERT_NO_THROW(ldapMatch.Match(testBundle));
 
   // Testing key match
-  US_TEST_CONDITION(ldapMatch.Match(bundle) == true,
-                    "Evaluating LDAP expr: " + ldapMatch.ToString());
+  ASSERT_TRUE(ldapMatch.Match(testBundle));
 
   AnyMap props1(AnyMap::UNORDERED_MAP);
   props1["hosed"] = std::string("1");
   props1["HOSED"] = std::string("yum");
 
   // Testing exception for case variants of the same key.
-  US_TEST_FOR_EXCEPTION(std::runtime_error, ldapMatch.Match(props1));
+  ASSERT_THROW(ldapMatch.Match(props1), std::runtime_error);
 }
 
-void TestLDAPFilterMatchServiceReferenceBase(Bundle bundle)
+TEST_F(LDAPQueryTest, TestLDAPFilterMatchServiceReferenceBase)
 {
   LDAPFilter ldapMatchCase("(service.testproperty=YES)");
   LDAPFilter ldapKeyMismatchCase("(service.TestProperty=YES)");
   LDAPFilter ldapValueMismatchCase("(service.testproperty=Yes)");
 
-  bundle.Start();
+  testBundle.Start();
 
-  auto thisBundleCtx = bundle.GetBundleContext();
+  auto thisBundleCtx = testBundle.GetBundleContext();
   ServiceReferenceU sr =
     thisBundleCtx.GetServiceReference("cppmicroservices::TestBundleLQService");
 
   // Make sure the obtained ServiceReferenceBase object is not null
-  US_TEST_CONDITION(sr, " Checking non-empty ServiceReferenceBase object");
+  ASSERT_TRUE(sr);
 
   // Exact string match of both key and value
-  US_TEST_CONDITION(ldapMatchCase.Match(sr),
-                    " Evaluating LDAP expr: " + ldapMatchCase.ToString());
+  ASSERT_TRUE(ldapMatchCase.Match(sr));
 
   // Testing case-insensitive key (should still pass)
-  US_TEST_CONDITION(ldapKeyMismatchCase.Match(sr),
-                    " Evaluating LDAP expr: " + ldapKeyMismatchCase.ToString());
+  ASSERT_TRUE(ldapKeyMismatchCase.Match(sr));
 
   // Testing case-insensitive value (should fail)
-  US_TEST_CONDITION(!ldapValueMismatchCase.Match(sr),
-                    " Evaluating LDAP expr: " +
-                      ldapValueMismatchCase.ToString());
+  ASSERT_FALSE(ldapValueMismatchCase.Match(sr));
 
-  bundle.Stop();
+  testBundle.Stop();
 
   // Testing the behavior after the bundle has stopped (service properties
   // should still be available for queries according to OSGi spec 5.2.1).
-  US_TEST_CONDITION(ldapMatchCase.Match(sr),
-                    " Evaluating LDAP expr: " + ldapMatchCase.ToString());
-}
-
-int LDAPQueryTest(int /*argc*/, char* /*argv*/ [])
-{
-  US_TEST_BEGIN("LDAPQueryTest");
-
-  FrameworkFactory factory;
-  auto framework = factory.NewFramework();
-  framework.Start();
-
-  auto bundle =
-    testing::InstallLib(framework.GetBundleContext(), "TestBundleLQ");
-
-  US_TEST_OUTPUT(<< "Testing LDAP query of bundle properties:")
-  TestLDAPFilterMatchBundle(bundle);
-
-  US_TEST_OUTPUT(<< "Testing LDAP query of service properties:")
-  TestLDAPFilterMatchServiceReferenceBase(bundle);
-
-  US_TEST_OUTPUT(<< "Testing LDAP queries that no longer throw exceptions:")
-  TestLDAPFilterMatchNoException(bundle);
-
-  framework.Stop();
-
-  US_TEST_END()
+  ASSERT_TRUE(ldapMatchCase.Match(sr));
 }

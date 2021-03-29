@@ -31,10 +31,7 @@ set(_tests
   BundleRegistryConcurrencyTest
   FrameworkEventTest
   FrameworkListenerTest
-  FrameworkFactoryTest
   HelgrindTest
-  LDAPFilterTest
-  LDAPQueryTest
   LogTest
   BundleHooksTest
   BundleTest
@@ -46,9 +43,7 @@ set(_tests
   ServiceFactoryTest
   ServiceHooksTest
   ServiceRegistryPerformanceTest
-  ServiceRegistryTest
   ServiceTemplateTest
-  ServiceTrackerTest
   StaticBundleResourceTest
   StaticBundleTest
 )
@@ -56,12 +51,7 @@ set(_tests
 if(BUILD_SHARED_LIBS)
   list(APPEND _tests
        ServiceListenerTest
-       SharedLibraryTest
       )
-endif()
-
-if(US_ENABLE_THREADING_SUPPORT)
-  list(APPEND _tests ConcurrencyTest)
 endif()
 
 set(_additional_srcs
@@ -122,7 +112,7 @@ endif()
 
 # Add resources
 usFunctionEmbedResources(TARGET ${_test_driver}
-                       FILES TestResource.txt manifest.json
+                       FILES TestResource.ptxt manifest.json
                        ZIP_ARCHIVES ${Framework_TARGET} ${_us_test_bundle_libs})
 
 # Register tests

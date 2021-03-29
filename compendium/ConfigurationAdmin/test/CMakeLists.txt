@@ -127,6 +127,11 @@ target_link_libraries(${us_configurationadmin_test_exe_name}
   gtest
   gmock
   util
+)
+
+add_dependencies(${us_configurationadmin_test_exe_name}
+  ConfigurationAdmin
+  DeclarativeServices
   ${_test_bundles}
 )
 

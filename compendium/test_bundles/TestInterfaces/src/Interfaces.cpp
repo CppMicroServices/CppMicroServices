@@ -4,6 +4,7 @@ namespace test
 {
     Interface1::~Interface1() = default;
     Interface2::~Interface2() = default;
+    Interface3::~Interface3() = default;
 
     DSGraph01::~DSGraph01() = default;
     DSGraph02::~DSGraph02() = default;

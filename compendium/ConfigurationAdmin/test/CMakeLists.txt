@@ -120,6 +120,7 @@ target_link_libraries(${us_configurationadmin_test_exe_name}
   CppMicroServices
   cm
   ConfigurationAdminObjs
+  ConfigurationAdmin
   usTestInterfaces
   usLogService
   usServiceComponent

@@ -102,7 +102,7 @@ public:
    * and when the ConfigurationListener is first registered with the Framework, to provide the initial Configuration.
    */
   virtual void configurationEvent(const ConfigurationEvent& event) = 0;
-  virtual ~ConfigurationListener() {};
+  virtual ~ConfigurationListener() = default;
 };
 } //cm namespace
 } //service namespace

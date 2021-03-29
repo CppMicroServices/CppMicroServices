@@ -74,6 +74,7 @@ set(_declarativeservices_tests
   TestSCRBundleExtension.cpp
   TestServiceComponentRuntimeImpl.cpp
   TestServiceMetadataParserV1.cpp
+  TestSetConfiguration.cpp
   TestSingletonComponentConfiguration.cpp
   TestBundleStartOrder.cpp
   TestComponentDescription.cpp
@@ -153,6 +154,13 @@ set(_test_bundles
   DSGraph06
   DSGraph07
   DSSpellChecker
+  TestBindUnbindThrows
+  TestBundleDSa
+  TestBundleDSb
+  TestBundleDSDGMU
+  TestBundleDSDGOU
+  TestBundleDSDRMU
+  TestBundleDSDROU
   TestBundleDSSLE1
   TestBundleDSSLE2
   TestBundleDSTOI1
@@ -165,7 +173,10 @@ set(_test_bundles
   TestBundleDSTOI3
   TestBundleDSTOI5
   TestBundleDSTOI6
+  TestBundleDSTOI7
+  TestBundleDSTOI8
   TestBundleDSTOI9
+  TestBundleDSCA08
   TestBundleDSCA20
   EnglishDictionary
   TestBundleDSCA1
@@ -176,6 +187,8 @@ target_link_libraries(${us_declarativeservices_test_exe_name}
   ${GTEST_BOTH_LIBRARIES}
   ${GMOCK_BOTH_LIBRARIES}
   ${${PROJECT_NAME}_LINK_LIBRARIES}
+  ConfigurationAdmin
+  DeclarativeServices
   DeclarativeServicesObjs
   usTestInterfaces
   usServiceComponent

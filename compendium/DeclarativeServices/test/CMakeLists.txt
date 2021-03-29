@@ -86,6 +86,7 @@ set(_declarativeservices_tests
   TestSharedLibraryException.cpp
   ImportTestBundles.cpp
   TestBindingPolicies.cpp
+  TestUpdateConfiguration
   main.cpp
 )
 
@@ -167,6 +168,7 @@ set(_test_bundles
   TestBundleDSTOI9
   TestBundleDSCA20
   EnglishDictionary
+  TestBundleDSCA1
   )
 
 target_link_libraries(${us_declarativeservices_test_exe_name} 

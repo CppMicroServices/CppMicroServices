@@ -42,8 +42,8 @@
 #include "TestingConfig.h"
 #include "TestingMacros.h"
 
-#include <thread>
 #include <chrono>
+#include <thread>
 
 using namespace cppmicroservices;
 
@@ -429,11 +429,10 @@ void TestBundleStates()
   auto bundles = frameworkCtx.GetBundles();
   for (auto& bundle : bundles) {
     // TestStartBundleA and TestStopBundleA start/stop TestBundleA for the purposes
-    // of a different test. Instead of complicating this test code, skip starting 
+    // of a different test. Instead of complicating this test code, skip starting
     // these bundles. In the future, refactor this test code to execute only for static
     // builds and to start and stop an explicit list of bundles instead of them all.
-    if (bundle != framework &&
-        "TestStartBundleA" != bundle.GetSymbolicName() &&
+    if (bundle != framework && "TestStartBundleA" != bundle.GetSymbolicName() &&
         "TestStopBundleA" != bundle.GetSymbolicName()) {
       US_TEST_CONDITION(bundle.GetState() & Bundle::STATE_INSTALLED,
                         "Test installed bundle state")
@@ -558,7 +557,8 @@ void TestBundleStates()
                     "Test uninstalled bundle state")
   US_TEST_CONDITION(lm < bundle.GetLastModified(),
                     "Last modified time changed after uninstall")
-  US_TEST_CONDITION(bundle.GetLastModified() <= std::chrono::steady_clock::now(),
+  US_TEST_CONDITION(bundle.GetLastModified() <=
+                      std::chrono::steady_clock::now(),
                     "Last modified time <= now")
   bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundle));
   bundleEvents.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundle));
@@ -585,7 +585,7 @@ void TestForInstallFailure()
 
   // Test that bogus bundle installs throw the appropriate exception
   try {
-    frameworkCtx.InstallBundles(std::string {});
+    frameworkCtx.InstallBundles(std::string{});
     US_TEST_FAILED_MSG(<< "Failed to throw a std::runtime_error")
   } catch (const std::runtime_error& ex) {
     US_TEST_OUTPUT(<< "Caught std::runtime_exception: " << ex.what())
@@ -640,10 +640,8 @@ void TestAutoInstallEmbeddedBundles()
   f.Start();
   auto frameworkCtx = f.GetBundleContext();
 
-  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::BIN_PATH
-                                                   + util::DIR_SEP
-                                                   + "usFrameworkTestDriver"
-                                                   + US_EXE_EXT));
+  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(
+    testing::BIN_PATH + util::DIR_SEP + "usFrameworkTestDriver" + US_EXE_EXT));
 
 #ifdef US_BUILD_SHARED_LIBS
   // 2 bundles - the framework(system_bundle) and the executable(main).
@@ -681,13 +679,10 @@ void TestNonStandardBundleExtension()
   auto frameworkCtx = f.GetBundleContext();
 
 #ifdef US_BUILD_SHARED_LIBS
-  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(testing::LIB_PATH
-                                                   + util::DIR_SEP
-                                                   + US_LIB_PREFIX
-                                                   + "TestBundleExt"
-                                                   + US_LIB_POSTFIX
-                                                   + ".cppms"));
-  
+  US_TEST_NO_EXCEPTION(frameworkCtx.InstallBundles(
+    testing::LIB_PATH + util::DIR_SEP + US_LIB_PREFIX + "TestBundleExt" +
+    US_LIB_POSTFIX + ".cppms"));
+
   // 3 bundles - the framework(system_bundle), the executable(main) and TextBundleExt
   US_TEST_CONDITION(3 == frameworkCtx.GetBundles().size(),
                     "Test # of installed bundles")
@@ -727,14 +722,10 @@ void TestUnicodePaths()
   f.Start();
   auto frameworkCtx = f.GetBundleContext();
   try {
-    std::string path_utf8 = testing::LIB_PATH
-                            + cppmicroservices::util::DIR_SEP
-                            + u8"くいりのまちとこしくそ"
-                            + cppmicroservices::util::DIR_SEP
-                            + US_LIB_PREFIX
-                            + "TestBundleU"
-                            + US_LIB_POSTFIX
-                            + US_LIB_EXT;
+    std::string path_utf8 =
+      testing::LIB_PATH + cppmicroservices::util::DIR_SEP +
+      u8"くいりのまちとこしくそ" + cppmicroservices::util::DIR_SEP +
+      US_LIB_PREFIX + "TestBundleU" + US_LIB_POSTFIX + US_LIB_EXT;
     auto bundles = frameworkCtx.InstallBundles(path_utf8);
     US_TEST_CONDITION(bundles.size() == 1, "Install bundle from unicode path");
     auto bundle = bundles.at(0);
@@ -1031,116 +1022,6 @@ void TestIllegalBundleStateChange()
   f.WaitForStop(std::chrono::seconds::zero());
 }
 
-// test failure on waiting for bundle operations.
-void TestWaitOnBundleOperation()
-{
-  US_TEST_OUTPUT(<< "=== Testing Wait on Bundle Operation Failures ===");
-
-  ///
-  /// Fail to wait on each bundle operation from the bundle activator start method.
-  ///
-  auto f1 = FrameworkFactory().NewFramework(FrameworkConfiguration{
-    { std::string(
-        "org.cppmicroservices.framework.testing.waitonoperation.start"),
-      Any{ std::string("start") } } });
-  US_TEST_NO_EXCEPTION(f1.Start());
-  auto bundleWaitOnOperation =
-    testing::InstallLib(f1.GetBundleContext(), "TestBundleWaitOnOperation");
-  US_TEST_FOR_EXCEPTION(std::runtime_error, bundleWaitOnOperation.Start());
-  US_TEST_CONDITION(Bundle::State::STATE_RESOLVED ==
-                      bundleWaitOnOperation.GetState(),
-                    "Test the bundle state after a failed bundle start.");
-
-  f1.Stop();
-  f1.WaitForStop(std::chrono::seconds::zero());
-
-  auto f2 = FrameworkFactory().NewFramework(FrameworkConfiguration{
-    { std::string(
-        "org.cppmicroservices.framework.testing.waitonoperation.start"),
-      Any{ std::string("stop") } } });
-  US_TEST_NO_EXCEPTION(f2.Start());
-  bundleWaitOnOperation =
-    testing::InstallLib(f2.GetBundleContext(), "TestBundleWaitOnOperation");
-  US_TEST_FOR_EXCEPTION(std::runtime_error, bundleWaitOnOperation.Start());
-  US_TEST_CONDITION(Bundle::State::STATE_RESOLVED ==
-                      bundleWaitOnOperation.GetState(),
-                    "Test the bundle state after a failed bundle start.");
-
-  f2.Stop();
-  f2.WaitForStop(std::chrono::seconds::zero());
-
-  auto f3 = FrameworkFactory().NewFramework(FrameworkConfiguration{
-    { std::string(
-        "org.cppmicroservices.framework.testing.waitonoperation.start"),
-      Any{ std::string("uninstall") } } });
-  US_TEST_NO_EXCEPTION(f3.Start());
-  bundleWaitOnOperation =
-    testing::InstallLib(f3.GetBundleContext(), "TestBundleWaitOnOperation");
-  // This call sometimes throws and sometimes doesn't. There may be a race lurking somewhere...
-  try {
-    bundleWaitOnOperation.Start();
-  } catch (...) {
-  }
-  US_TEST_CONDITION(Bundle::State::STATE_UNINSTALLED ==
-                      bundleWaitOnOperation.GetState(),
-                    "Test the bundle state after a failed bundle start.");
-
-  f3.Stop();
-  f3.WaitForStop(std::chrono::seconds::zero());
-
-  ///
-  /// Fail to wait on each bundle operation from the bundle activator stop method.
-  ///
-
-  auto f4 = FrameworkFactory().NewFramework(FrameworkConfiguration{
-    { std::string(
-        "org.cppmicroservices.framework.testing.waitonoperation.stop"),
-      Any{ std::string("start") } } });
-  US_TEST_NO_EXCEPTION(f4.Start());
-  bundleWaitOnOperation =
-    testing::InstallLib(f4.GetBundleContext(), "TestBundleWaitOnOperation");
-  US_TEST_NO_EXCEPTION(bundleWaitOnOperation.Start());
-  US_TEST_FOR_EXCEPTION(std::runtime_error, bundleWaitOnOperation.Stop());
-  US_TEST_CONDITION(Bundle::State::STATE_RESOLVED ==
-                      bundleWaitOnOperation.GetState(),
-                    "Test the bundle state after a failed bundle stop.");
-
-  f4.Stop();
-  f4.WaitForStop(std::chrono::seconds::zero());
-
-  auto f5 = FrameworkFactory().NewFramework(FrameworkConfiguration{
-    { std::string(
-        "org.cppmicroservices.framework.testing.waitonoperation.stop"),
-      Any{ std::string("stop") } } });
-  US_TEST_NO_EXCEPTION(f5.Start());
-  bundleWaitOnOperation =
-    testing::InstallLib(f5.GetBundleContext(), "TestBundleWaitOnOperation");
-  US_TEST_NO_EXCEPTION(bundleWaitOnOperation.Start());
-  US_TEST_FOR_EXCEPTION(std::runtime_error, bundleWaitOnOperation.Stop());
-  US_TEST_CONDITION(Bundle::State::STATE_RESOLVED ==
-                      bundleWaitOnOperation.GetState(),
-                    "Test the bundle state after a failed bundle stop.");
-
-  f5.Stop();
-  f5.WaitForStop(std::chrono::seconds::zero());
-
-  auto f6 = FrameworkFactory().NewFramework(FrameworkConfiguration{
-    { std::string(
-        "org.cppmicroservices.framework.testing.waitonoperation.stop"),
-      Any{ std::string("uninstall") } } });
-  US_TEST_NO_EXCEPTION(f6.Start());
-  bundleWaitOnOperation =
-    testing::InstallLib(f6.GetBundleContext(), "TestBundleWaitOnOperation");
-  US_TEST_NO_EXCEPTION(bundleWaitOnOperation.Start());
-  US_TEST_FOR_EXCEPTION(std::runtime_error, bundleWaitOnOperation.Stop());
-  US_TEST_CONDITION(Bundle::State::STATE_UNINSTALLED ==
-                      bundleWaitOnOperation.GetState(),
-                    "Test the bundle state after a failed bundle stop.");
-
-  f6.Stop();
-  f6.WaitForStop(std::chrono::seconds::zero());
-}
-
 #if defined(US_BUILD_SHARED_LIBS)
 // Test the behavior of a bundle activator which throws an exception.
 void TestBundleActivatorFailures()
@@ -1191,7 +1072,7 @@ void TestBundleActivatorFailures()
 
 } // end anonymous namespace
 
-int BundleTest(int /*argc*/, char* /*argv*/ [])
+int BundleTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("BundleTest");
 
@@ -1260,7 +1141,6 @@ int BundleTest(int /*argc*/, char* /*argv*/ [])
 #endif
 
   TestIllegalBundleStateChange();
-  TestWaitOnBundleOperation();
 
   US_TEST_END()
 }

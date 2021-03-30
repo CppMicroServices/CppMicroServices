@@ -80,7 +80,7 @@ namespace cppmicroservices {
 
     void CMActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
     {
-      auto headers = bundle.GetHeaders();
+      auto const& headers = bundle.GetHeaders();
       // bundle has no "cm" configuration
       if (headers.find(cppmicroservices::util::CMConstants::CM_KEY) ==
           std::end(headers))
@@ -119,7 +119,7 @@ namespace cppmicroservices {
 
     void CMActivator::RemoveExtension(const cppmicroservices::Bundle& bundle)
     {
-      auto headers = bundle.GetHeaders();
+      auto const& headers = bundle.GetHeaders();
       // bundle has no "cm" configuration
       if (headers.find(cppmicroservices::util::CMConstants::CM_KEY) == std::end(headers))
       {

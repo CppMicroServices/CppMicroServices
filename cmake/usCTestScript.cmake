@@ -37,7 +37,7 @@ macro(build_and_test)
 
   if(WITH_COVERAGE)
     if(CTEST_COVERAGE_COMMAND)
-      ctest_coverage(QUIET)
+      ctest_coverage(CAPTURE_CMAKE_ERROR err_result QUIET)
     else()
       message(FATAL_ERROR "CMake could not find coverage tool")
     endif()
@@ -54,6 +54,7 @@ function(create_initial_cache var _shared _threading)
       US_ENABLE_COVERAGE:BOOL=$ENV{WITH_COVERAGE}
       BUILD_SHARED_LIBS:BOOL=${_shared}
       US_ENABLE_THREADING_SUPPORT:BOOL=${_threading}
+      US_ENABLE_TSAN:BOOL=$ENV{WITH_TSAN}
       US_BUILD_EXAMPLES:BOOL=ON
       ")
 
@@ -85,10 +86,10 @@ endif()
 
 #            SHARED THREADING
 
-set(config0     1       1     )
-set(config1     0       1     )
-set(config2     1       0     )
-set(config3     0       0     )
+set(config0     1       1 )
+set(config1     0       1 )
+set(config2     1       0 )
+set(config3     0       0 )
 
 if(NOT US_CMAKE_GENERATOR)
   if(APPLE AND NOT WITH_COVERAGE)

@@ -74,6 +74,7 @@ set(_declarativeservices_tests
   TestSCRBundleExtension.cpp
   TestServiceComponentRuntimeImpl.cpp
   TestServiceMetadataParserV1.cpp
+  TestSetConfiguration.cpp
   TestSingletonComponentConfiguration.cpp
   TestBundleStartOrder.cpp
   TestComponentDescription.cpp
@@ -153,6 +154,13 @@ set(_test_bundles
   DSGraph06
   DSGraph07
   DSSpellChecker
+  TestBindUnbindThrows
+  TestBundleDSa
+  TestBundleDSb
+  TestBundleDSDGMU
+  TestBundleDSDGOU
+  TestBundleDSDRMU
+  TestBundleDSDROU
   TestBundleDSSLE1
   TestBundleDSSLE2
   TestBundleDSTOI1
@@ -161,14 +169,19 @@ set(_test_bundles
   TestBundleDSTOI14
   TestBundleDSTOI15
   TestBundleDSTOI16
+  TestBundleDSTOI18
   TestBundleDSTOI2
   TestBundleDSTOI3
   TestBundleDSTOI5
   TestBundleDSTOI6
+  TestBundleDSTOI7
+  TestBundleDSTOI8
   TestBundleDSTOI9
-  TestBundleDSCA20
-  EnglishDictionary
   TestBundleDSCA1
+  TestBundleDSCA08
+  TestBundleDSCA20
+  TestBundleDSTOI19
+  EnglishDictionary
   )
 
 target_link_libraries(${us_declarativeservices_test_exe_name} 
@@ -176,6 +189,8 @@ target_link_libraries(${us_declarativeservices_test_exe_name}
   ${GTEST_BOTH_LIBRARIES}
   ${GMOCK_BOTH_LIBRARIES}
   ${${PROJECT_NAME}_LINK_LIBRARIES}
+  ConfigurationAdmin
+  DeclarativeServices
   DeclarativeServicesObjs
   usTestInterfaces
   usServiceComponent
@@ -185,6 +200,10 @@ target_link_libraries(${us_declarativeservices_test_exe_name}
   gtest
   gmock
   util
+)
+
+add_dependencies(${us_declarativeservices_test_exe_name}
+  DeclarativeServices
   ${_test_bundles}
 )
 
@@ -193,6 +212,10 @@ if(UNIX AND NOT APPLE)
   target_link_libraries(${us_declarativeservices_test_exe_name} PRIVATE rt)
 endif()
 
+# Needed for 'TestComponentLifecycle' test 
+if(MINGW)
+  target_link_libraries(${us_declarativeservices_test_exe_name} PRIVATE -lpsapi)
+endif()
 
 # tests can be configured to run using add_test or GTEST_ADD_TEST (https://cmake.org/cmake/help/v3.0/module/FindGTest.html)
 # GTEST_ADD_TEST will run a seprate EXE for each test and test fixture in the EXE.

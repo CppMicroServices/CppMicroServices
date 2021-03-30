@@ -60,7 +60,6 @@ as specified in the OSGi R4.2 specifications.
 namespace cppmicroservices {
 
 struct BundleStorage;
-class BundleThread;
 class FrameworkPrivate;
 
 /**
@@ -97,15 +96,6 @@ public:
   * to Framework clients.
   */
   std::shared_ptr<detail::LogSink> sink;
-
-  /**
-   * Threads for running listeners and activators
-   */
-  struct : detail::MultiThreaded<>
-  {
-    std::list<std::shared_ptr<BundleThread>> value;
-    std::list<std::shared_ptr<BundleThread>> zombies;
-  } bundleThreads;
 
   /**
    * Bundle Storage
@@ -160,7 +150,7 @@ public:
    * Flags to use for dlopen calls on unix systems. Ignored on Windows.
    */
   int libraryLoadOptions;
-  
+
   ~CoreBundleContext();
 
   // thread-safe shared_from_this implementation

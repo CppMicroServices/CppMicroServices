@@ -177,6 +177,49 @@ TEST(AnyTest, AnyMapAny)
   EXPECT_EQ(anyMap.ToJSON(), "{\"1\" : 0.3, \"3\" : \"bonjour\"}");
 }
 
+
+TEST(AnyTest, AnyStringEscapeCharacters)
+{
+  Any anyString = std::string("\"\\\b\f\n\r\t\x1f");
+  EXPECT_EQ(anyString.ToJSON(), "\"\\\"\\\\\\b\\f\\n\\r\\t\\u001f\"");
+}
+
+TEST(AnyTest, AnyToJSONWithFormatting)
+{
+  std::map<int, Any> emptyMap;
+  std::vector<int> emptyVector;
+
+  std::map<int32_t, Any> mapToInsert = {
+    { 1, 0.3 }
+    , { 3, std::string("bonjour") }
+    , { 4, emptyMap }
+    , { 5, emptyVector }
+  };
+  std::vector<int32_t> numbers { 9, 8, 7 };
+  std::map<std::string, Any> map {
+    { "number", 5 }
+    , { "vector", numbers }
+    , { "map", mapToInsert }
+  };
+ 
+  Any anyMap = map;
+  std::string expected = R"({
+    "map" : {
+        "1" : 0.3, 
+        "3" : "bonjour", 
+        "4" : {}, 
+        "5" : []
+    }, 
+    "number" : 5, 
+    "vector" : [
+        9,
+        8,
+        7
+    ]
+})";
+  EXPECT_EQ(anyMap.ToJSON(true), expected);
+}
+
 TEST(AnyTest, AnyMapComplex)
 {
   std::map<int32_t, Any> mapToInsert = { { 1, 0.3 },

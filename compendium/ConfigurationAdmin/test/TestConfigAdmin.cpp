@@ -335,6 +335,8 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
 
   auto configuration = m_configAdmin->GetConfiguration("cm.testservice");
 
+  // Remove sends an asynchronous notification to the ManagedService so we 
+  // have to wait until it's finished before checking the result.
   configuration->Remove();
   expectedCount -= 1;
 
@@ -347,17 +349,11 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
   }
 
   // Should create a new configuration and call Updated()
+  // GetConfiguration doesn't send a notification to the ManagedService so
+  // we don't have to wait for the result. 
   configuration = m_configAdmin->GetConfiguration("cm.testservice");
   EXPECT_TRUE(configuration->GetProperties().empty());
-  expectedCount -= 1;
-
-  {
-    bool result = false;
-    std::string diagnostic;
-    std::tie(result, diagnostic) = pollOnCondition<PollingCondition::EQ>(
-      [&service] { return service->getCounter(); }, expectedCount);
-    EXPECT_TRUE(result) << diagnostic;
-  }
+  EXPECT_EQ(service->getCounter(), expectedCount);
 
   const int newIncrement{ 5 };
   cppmicroservices::AnyMap props(
@@ -508,21 +504,11 @@ TEST_F(ConfigAdminTests, testCreateFactoryConfiguration)
   EXPECT_NE(newConfigPid.find("cm.testfactory"), std::string::npos);
 
   EXPECT_TRUE(configuration->GetProperties().empty());
-
-  {
-    bool result = false;
-    std::string diagnostic;
-    std::tie(result, diagnostic) = pollOnCondition<PollingCondition::LT>(
-      [&serviceFactory, &newConfigPid]() {
-        return serviceFactory->getUpdatedCounter(newConfigPid);
-      },
-      0);
-    EXPECT_TRUE(result) << diagnostic;
-  }
+  EXPECT_EQ(serviceFactory->getUpdatedCounter(newConfigPid), 0);
 
   auto const service = serviceFactory->create(newConfigPid);
   ASSERT_NE(service, nullptr);
-  EXPECT_LT(service->getValue(), 0);
+  EXPECT_EQ(service->getValue(), 0);
 }
 
 TEST_F(ConfigAdminTests, testRemoveFactoryConfiguration)
@@ -565,19 +551,9 @@ TEST_F(ConfigAdminTests, testRemoveFactoryConfiguration)
   // Should create a new configuration
   configuration_config1 =
     m_configAdmin->GetFactoryConfiguration("cm.testfactory", "config1");
-  --expectedCount_config1;
 
   EXPECT_TRUE(configuration_config1->GetProperties().empty());
-  {
-    bool result = false;
-    std::string diagnostic;
-    std::tie(result, diagnostic) = pollOnCondition<PollingCondition::EQ>(
-      [&serviceFactory] {
-        return serviceFactory->getUpdatedCounter("cm.testfactory~config1");
-      },
-      expectedCount_config1);
-    EXPECT_TRUE(result) << diagnostic;
-  }
+  EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config1"), expectedCount_config1);
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config2"),
             expectedCount_config2);
 }

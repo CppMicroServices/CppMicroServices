@@ -65,6 +65,7 @@ set(_declarativeservices_tests
   TestComponentRegistry.cpp
   TestCounterLatch.cpp
   TestFactoryPid.cpp
+  TestConfigPolicies.cpp
   TestMetadataParserFactory.cpp
   TestMetadataParserImplV1.cpp
   TestReferenceManagerImpl.cpp
@@ -165,11 +166,13 @@ set(_test_bundles
   TestBundleDSTOI5
   TestBundleDSTOI6
   TestBundleDSTOI9
+  TestBundleDSCA5
+  TestBundleDSCA7
   TestBundleDSCA20
   EnglishDictionary
   )
 
-target_link_libraries(${us_declarativeservices_test_exe_name} 
+target_link_libraries(${us_declarativeservices_test_exe_name}
   PRIVATE
   ${GTEST_BOTH_LIBRARIES}
   ${GMOCK_BOTH_LIBRARIES}
@@ -244,7 +247,7 @@ if (WIN32 AND US_USE_SYSTEM_GTEST)
 endif()
 
 #-----------------------------------------------------------------------------
-# Add dependencies on test bundles if building shared libraries or 
+# Add dependencies on test bundles if building shared libraries or
 # link them if building static libraries
 #-----------------------------------------------------------------------------
 

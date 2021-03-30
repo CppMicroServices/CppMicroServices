@@ -1,0 +1,16 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSCA7",
+    "scr" : {
+        "version" : 1,
+         "components" : [{
+            "enabled" : true,
+            "immediate": false,
+            "implementation-class": "sample::ServiceComponentCA7",
+            "configuration-policy" : "ignore",
+            "configuration-pid" : ["sample::ServiceComponentCA7"],
+            "service": {
+              "interfaces": [ "test::CAInterface" ]
+            }
+        }]
+    }
+}

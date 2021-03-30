@@ -272,10 +272,7 @@ namespace cppmicroservices {
         }
         result = it->second;
       }
-      if (created)
-      {
-        NotifyConfigurationUpdated(pid);
-      }
+
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                   "GetConfiguration: returning " + (created ? std::string("new") : "existing") + " Configuration instance with PID " + pid);
       return result;
@@ -297,7 +294,6 @@ namespace cppmicroservices {
         it = configurations.emplace(pid, std::make_shared<ConfigurationImpl>(this, pid, factoryPid, AnyMap{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS})).first;
         result = it->second;
       }
-      NotifyConfigurationUpdated(pid);
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                   "CreateFactoryConfiguration: returning new Configuration instance with PID " + pid);
       return result;

@@ -252,3 +252,9 @@ TEST(AnyTest, AnyBadAnyCastException) {
   EXPECT_THROW(ref_any_cast<std::string>(uncastableAny),
                cppmicroservices::BadAnyCastException);
 }
+
+TEST(AnyTest, AnyEquality) {
+  Any lhs = std::string("VALUE");
+  Any rhs = std::string("VALUE");
+  EXPECT_EQ(lhs,rhs);
+}

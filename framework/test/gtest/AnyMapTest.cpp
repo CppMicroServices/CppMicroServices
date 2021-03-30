@@ -350,3 +350,41 @@ TEST(AnyMapTest, GeneralUsage)
     ASSERT_EQ(std::string(""), any_cast<std::string>(val1));
   });
 }
+
+
+cppmicroservices::AnyMap manifest_from_cache(const cppmicroservices::any_map::key_type& key, cppmicroservices::any_map& cache)
+{
+  using namespace cppmicroservices;
+  
+  AnyMap& bundles = ref_any_cast<AnyMap>(cache["bundles"]);
+  if (bundles.find(key) != std::end(bundles)) {
+    try {
+      AnyMap result = std::move(ref_any_cast<AnyMap>(bundles[key]));
+      bundles.erase(key);
+      return result;
+    } catch (...) {}
+  }
+  return AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+}
+
+TEST(AnyMapTest, ManifestFromCache)
+{
+  AnyMap cache(AnyMap::ORDERED_MAP);
+  AnyMap bundles(AnyMap::ORDERED_MAP);
+  AnyMap entry(AnyMap::ORDERED_MAP);
+
+  entry["a"] = std::string("A");
+  entry["b"] = std::string("B");
+  entry["c"] = std::string("C");
+  auto entry_copy = entry;
+  
+  bundles.emplace(std::string("entry"), std::move(entry));
+  cache["created"] = 1234567890;
+  cache["version"] = 1;
+  cache.emplace(std::string("bundles"),std::move(bundles));
+
+  ASSERT_EQ(3, cache.size());
+  auto fetch = manifest_from_cache(std::string("entry"), cache);
+  ASSERT_EQ(3, fetch.size());
+  ASSERT_EQ(entry_copy, fetch);
+}

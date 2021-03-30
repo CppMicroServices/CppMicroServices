@@ -275,6 +275,10 @@ public:
 
   const_iterator find(const key_type& key) const;
 
+  size_type erase(const key_type& key);
+
+  bool operator==(const any_map& rhs) const;
+  bool operator!=(const any_map& rhs) const { return !(operator==(rhs)); }
 protected:
   map_type type;
 
@@ -409,6 +413,11 @@ US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
                                                     const AnyMap& m,
                                                     const uint8_t increment,
                                                     const int32_t indent);
+
 }
+
+bool operator==(const cppmicroservices::any_map& lhs, const cppmicroservices::any_map& rhs);
+cppmicroservices::AnyMap US_Framework_EXPORT manifest_from_cache(const cppmicroservices::any_map::key_type& key, cppmicroservices::any_map& cache);
+
 
 #endif // CPPMICROSERVICES_ANYMAP_H

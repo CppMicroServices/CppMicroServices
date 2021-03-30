@@ -44,6 +44,35 @@ DEALINGS IN THE SOFTWARE.
 #include <typeinfo>
 #include <utility>
 #include <vector>
+#include <array>
+
+namespace {
+
+template <class T>
+struct has_op_eq
+{
+  template <class U>
+  static auto op_eq_test(const U* u) -> decltype(*u < *u, char(0))
+  { }
+
+  static std::array<char, 2> op_eq_test(...) { }
+
+  static const bool value = (sizeof(op_eq_test(static_cast<T*>(0))) == 1);
+};
+
+template<typename CmpT, std::enable_if_t<has_op_eq<CmpT>::value, bool> = true>
+bool compare(const CmpT& lhs, const CmpT& rhs)
+{
+  return lhs == rhs;
+}
+
+template<typename CmpT, std::enable_if_t<!has_op_eq<CmpT>::value, bool> = false>
+bool compare(const CmpT&, const CmpT&)
+{
+  return false;
+}
+
+}
 
 /**
 
@@ -243,9 +272,14 @@ public:
   {
     if (Type() != typeid(ValueType))
       return false;
-    return *any_cast<const ValueType>(this) == val;
+    return compare(*any_cast<const ValueType>(this),val);
   }
 
+  bool operator==(const Any& rhs) const
+  {
+    return rhs._content->compare(*this);
+  }
+  
   /**
    * Compares this Any with another value for inequality.
    *
@@ -376,6 +410,7 @@ private:
 
     virtual const std::type_info& Type() const = 0;
     virtual std::unique_ptr<Placeholder> Clone() const = 0;
+    virtual bool compare(const Any& lhs) const = 0;
   };
 
   template<typename ValueType>
@@ -413,6 +448,11 @@ private:
 
     ValueType _held;
 
+    bool compare(const Any& rhs) const override
+    {
+      return rhs == _held;
+    }
+    
   private: // intentionally left unimplemented
     Holder& operator=(const Holder&) = delete;
   };

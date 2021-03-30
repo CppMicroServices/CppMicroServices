@@ -118,4 +118,5 @@ std::string Any::ToStringNoExcept() const
 {
   return Empty() ? std::string() : _content->ToString();
 }
+
 }

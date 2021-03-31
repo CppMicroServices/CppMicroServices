@@ -288,7 +288,8 @@ TEST(AnyTest, AnyEquality) {
   rhs["int"] = 2;
   EXPECT_NE(lhs, rhs); // they should not be equal after modifying the rhs.
   rhs["int"] = 1;
-  EXPECT_EQ(lhs, rhs); // they should not be equal after modifying the rhs.
+  EXPECT_EQ(lhs, rhs); // now they should be equal again
   rhs.erase("int");
-  EXPECT_NE(lhs, rhs);
+  EXPECT_NE(lhs, rhs); // and finally, with the "int" element erased, they should not be equal
+                       // anymore. 
 }

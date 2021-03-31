@@ -266,11 +266,15 @@ TEST(AnyTest, AnyEquality) {
   EXPECT_NE(Any(1), Any(2));
   EXPECT_EQ(Any(true), Any(true));
   EXPECT_NE(Any(true), Any(false));
-  EXPECT_NE(Any(no_eq()), Any(no_eq()));
   EXPECT_NE(Any(1), Any(true)); // type mismatch should never be equal
   EXPECT_NE(Any(0), Any(false));
   EXPECT_EQ(Any(1.5), Any(1.5));
   EXPECT_NE(Any(1.5), Any(1.6));
+
+  Any no_eq_operator { no_eq() };
+  EXPECT_NE(no_eq_operator, no_eq_operator); // Since no_eq has the equality operator deleted, Any,
+                                             // by design, always returns FALSE when equality is
+                                             // checked.
 
   AnyMap lhs(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   lhs["int"] = 1;

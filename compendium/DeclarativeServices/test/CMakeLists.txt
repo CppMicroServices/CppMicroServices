@@ -180,6 +180,7 @@ set(_test_bundles
   TestBundleDSCA1
   TestBundleDSCA08
   TestBundleDSCA20
+  TestBundleDSCA02
   TestBundleDSTOI19
   EnglishDictionary
   )

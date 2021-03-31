@@ -75,7 +75,7 @@ void ConfigurationManager::Initialize() {
             configProperties.erase(it);
           }
           configProperties.emplace(pid, properties);
-          for (const auto item : properties) {
+          for (const auto &item : properties) {
             mergedProperties[item.first] = item.second;
           }   
         }      

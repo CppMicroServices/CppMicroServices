@@ -83,15 +83,19 @@ public:
     test::InstallLib(context, "TestBundleDSTOI14");
     test::InstallLib(context, "TestBundleDSTOI15");
     test::InstallLib(context, "TestBundleDSTOI16");
+    test::InstallLib(context, "TestBundleDSTOI18");
     test::InstallLib(context, "TestBundleDSTOI2");
     test::InstallLib(context, "TestBundleDSTOI3");
     test::InstallLib(context, "TestBundleDSTOI5");
     test::InstallLib(context, "TestBundleDSTOI6");
     test::InstallLib(context, "TestBundleDSTOI7");
     test::InstallLib(context, "TestBundleDSTOI9");
+    test::InstallLib(context, "TestBundleDSCA1");
     test::InstallLib(context, "TestBundleDSCA5");
     test::InstallLib(context, "TestBundleDSCA7");
+    test::InstallLib(context, "TestBundleDSCA08");
     test::InstallLib(context, "TestBundleDSCA20");
+    test::InstallLib(context, "TestBundleDSTOI19");
 #endif
 
 #ifndef US_BUILD_SHARED_LIBS

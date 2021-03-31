@@ -105,7 +105,7 @@ void ServiceTracker<S,T>::Open()
       /* Remove if already exists. No-op if it's an invalid (default) token */
       d->context.RemoveListener(std::move(d->listenerToken));
       d->listenerToken = d->context.AddServiceListener(std::bind(&_TrackedService::ServiceChanged,
-                                                                 t.get(), std::placeholders::_1),
+                                                                 t, std::placeholders::_1),
                                                        d->listenerFilter);
       std::vector<ServiceReference<S>> references;
       if (!d->trackClass.empty())
@@ -142,37 +142,30 @@ void ServiceTracker<S,T>::Open()
 template<class S, class T>
 void ServiceTracker<S,T>::Close()
 {
-  std::vector<ServiceReference<S>> references;
-  std::shared_ptr<_TrackedService> outgoing = d->trackedService.Exchange(std::shared_ptr<_TrackedService>());
-  if (outgoing == nullptr)
-  {
+  std::shared_ptr<_TrackedService> outgoing = d->trackedService.Load();
+  if (outgoing == nullptr) {
     return;
   }
 
   DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close:" << d->filter;
   outgoing->Close();
-  references = GetServiceReferences();
-  try
-  {
+  auto references = GetServiceReferences();
+
+  try {
     d->context.RemoveListener(std::move(d->listenerToken));
-  }
-  catch (const std::runtime_error& /*e*/)
-  {
+  } catch (const std::runtime_error& /*e*/) {
     /* In case the context was stopped or invalid. */
   }
 
   d->Modified(); /* clear the cache */
   outgoing->NotifyAll(); /* wake up any waiters */
-  for(auto& ref : references)
-  {
+  for(auto& ref : references) {
     outgoing->Untrack(ref, ServiceEvent());
   }
-
-  if (d->context.GetLogSink()->Enabled())
-  {
+  
+  if (d->context.GetLogSink()->Enabled()) {
     if (!d->cachedReference.Load().GetBundle() &&
-        d->cachedService.Load() == nullptr)
-    {
+        d->cachedService.Load() == nullptr) {
       DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close[cached cleared]:"
                     << d->filter;
     }
@@ -229,7 +222,7 @@ ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& re
       timeout = std::chrono::duration_cast<D>(endTime - std::chrono::steady_clock::now());
       if (timeout.count() <= 0) break; // timed out
     }
-  } while (!object);
+  } while (!object && !d->Tracked()->closed);
 
   return object;
 }

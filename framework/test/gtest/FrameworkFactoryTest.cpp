@@ -23,27 +23,17 @@ limitations under the License.
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Framework.h"
-
-#include "TestingConfig.h"
-#include "TestingMacros.h"
-
-#include <iostream>
-#include <map>
-#include <string>
+#include "gtest/gtest.h"
 
 using namespace cppmicroservices;
 
-int FrameworkFactoryTest(int /*argc*/, char* /*argv*/ [])
+TEST(FrameworkFactoryTest, FrameworkInstantiation)
 {
-  US_TEST_BEGIN("FrameworkFactoryTest");
-
   auto f = FrameworkFactory().NewFramework();
-
-  US_TEST_CONDITION(f, "Test Framework instantiation");
+  ASSERT_TRUE(f) << "Unique Test Framework must be instantiated";
 
   auto f1 = FrameworkFactory().NewFramework();
-
-  US_TEST_CONDITION(f != f1, "Test unique Framework instantiation");
+  ASSERT_NE(f, f1) << "Unique Test Framework must be instantiated";
 
   FrameworkConfiguration configuration;
   configuration["org.osgi.framework.security"] = std::string("osgi");
@@ -53,15 +43,11 @@ int FrameworkFactoryTest(int /*argc*/, char* /*argv*/ [])
   configuration["org.osgi.framework.custom2"] = std::string("bar");
 
   auto f2 = FrameworkFactory().NewFramework(configuration);
-
-  US_TEST_CONDITION(f2, "Test Framework instantiation with configuration");
+  ASSERT_TRUE(f2) << "Test Framework must be instantiated with configuration";
 
   auto f3 = FrameworkFactory().NewFramework(
     std::unordered_map<std::string, cppmicroservices::Any>(), &std::clog);
-
-  US_TEST_CONDITION(f3,
-                    "Test Framework instantiation with default configuration "
-                    "and custom logger");
-
-  US_TEST_END()
+  ASSERT_TRUE(f3)
+    << "Test Framework must instantiated with default configuration "
+       "and custom logger";
 }

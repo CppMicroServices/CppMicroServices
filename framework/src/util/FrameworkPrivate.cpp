@@ -62,7 +62,7 @@ void FrameworkPrivate::DoInit()
 void FrameworkPrivate::Init()
 {
   auto l = Lock();
-  WaitOnOperation(*this, l, "Framework::Init", true);
+  US_UNUSED(l);
 
   switch (static_cast<Bundle::State>(state.load())) {
     case Bundle::STATE_INSTALLED:
@@ -167,7 +167,7 @@ void FrameworkPrivate::Start(uint32_t)
   std::vector<long> bundlesToStart;
   {
     auto l = Lock();
-    WaitOnOperation(*this, l, "Framework::Start", true);
+    US_UNUSED(l);
 
     switch (state.load()) {
       case Bundle::STATE_INSTALLED:
@@ -211,10 +211,15 @@ void FrameworkPrivate::Start(uint32_t)
   {
     auto l = Lock();
     US_UNUSED(l);
+
+    if (state == Bundle::STATE_ACTIVE) {
+      return;
+    }
+
     state = Bundle::STATE_ACTIVE;
     operation = BundlePrivate::OP_IDLE;
   }
-  NotifyAll();
+
   coreCtx->listeners.SendFrameworkEvent(
     FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_STARTED,
                    MakeBundle(shared_from_this()),
@@ -248,11 +253,7 @@ void FrameworkPrivate::Shutdown0(bool restart, bool wasActive)
   try {
     {
       auto l = Lock();
-      WaitOnOperation(*this,
-                      l,
-                      std::string("Framework::") +
-                        (restart ? "Update" : "Stop"),
-                      true);
+      US_UNUSED(l);
       operation = OP_DEACTIVATING;
       state = Bundle::STATE_STOPPING;
     }
@@ -321,7 +322,8 @@ void FrameworkPrivate::StopAllBundles()
   for (auto b : allBundles) {
     if (b->id != 0) {
       auto l = coreCtx->resolver.Lock();
-      b->SetStateInstalled(false, l);
+      US_UNUSED(l);
+      b->SetStateInstalled(false);
     }
   }
 }

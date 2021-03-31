@@ -42,7 +42,6 @@ namespace cppmicroservices {
 class CoreBundleContext;
 class Bundle;
 class BundleContextPrivate;
-class BundleThread;
 struct BundleActivator;
 
 /**
@@ -93,10 +92,10 @@ public:
 
   virtual void Stop(uint32_t);
 
-  std::exception_ptr Stop0(UniqueLock& resolveLock);
+  std::exception_ptr Stop0();
 
   /**
-   * Stop code that is executed in the bundleThread without holding the packages
+   * Stop code that is executed without holding the packages
    * lock.
    */
   std::exception_ptr Stop1();
@@ -104,33 +103,18 @@ public:
   void Stop2();
 
   /**
-   * Wait for an ongoing operation to finish.
-   *
-   * @param wc Wait condition
-   * @param lock Object used for locking.
-   * @param src Caller to include in exception message.
-   * @param longWait True, if we should wait extra long before aborting.
-   * @throws std::runtime_error if the ongoing (de-)activation does not finish
-   *           within reasonable time.
-   */
-  void WaitOnOperation(WaitConditionType& wc,
-                       LockType& lock,
-                       const std::string& src,
-                       bool longWait);
-
-  /**
    * Get updated bundle state. That means check if an installed bundle has been
    * resolved.
    *
    * @return Bundles state
    */
-  Bundle::State GetUpdatedState(LockType& l);
+  Bundle::State GetUpdatedState();
 
   /**
    * Set state to BUNDLE_INSTALLED.
    * We assume that the bundle is resolved when entering this method.
    */
-  void SetStateInstalled(bool sendEvent, UniqueLock& resolveLock);
+  void SetStateInstalled(bool sendEvent);
 
   /**
    * Purge any old files and data associated with this bundle.
@@ -159,7 +143,7 @@ public:
   int32_t GetAutostartSetting() const;
 
   // Performs the actual activation.
-  void FinalizeActivation(LockType& l);
+  void FinalizeActivation();
 
   virtual void Uninstall();
 
@@ -170,18 +154,12 @@ public:
   virtual const AnyMap& GetHeaders() const;
 
   /**
-   * Start code that is executed in the bundleThread without holding the
+   * Start code that is executed without holding the
    * packages lock.
    */
   std::exception_ptr Start0();
 
   void StartFailed();
-
-  std::shared_ptr<BundleThread> GetBundleThread();
-
-  bool IsBundleThread(const std::thread::id& id) const;
-
-  void ResetBundleThread();
 
   /**
    * Framework context.
@@ -258,13 +236,10 @@ public:
     NO
   };
 
-  /** start/stop time-out/uninstall flag, see BundleThread */
+  /** start/stop time-out/uninstall flag */
   // GCC 4.6 atomics do not support custom trivially copyable types
   // like enums yet, so we use the underlying primitive type here.
   std::atomic<uint8_t> aborted;
-
-  /** current bundle thread */
-  std::shared_ptr<BundleThread> bundleThread;
 
   /**
    * Bundle symbolic name.

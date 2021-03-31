@@ -439,11 +439,17 @@ namespace cppmicroservices {
       // setup expectations.
       EXPECT_CALL(*mockManagedServiceFactory2, Updated(std::string{"factory2~instance1"}, AnyMapEquals(props)))
       .WillOnce(testing::InvokeWithoutArgs(f2));
-      EXPECT_CALL(*mockManagedServiceFactory, Updated(std::string{"factory~instance1"}, AnyMapEquals(emptyProps)))
-      .WillOnce(testing::InvokeWithoutArgs(f));
-      EXPECT_CALL(*mockManagedServiceFactory, Updated(std::string{"factory~instance2"}, AnyMapEquals(emptyProps)))
-      .WillOnce(testing::InvokeWithoutArgs(f));
-      EXPECT_CALL(*mockManagedServiceFactory2, Updated(std::string{"factory2~instance1"}, AnyMapEquals(newProps)))
+      EXPECT_CALL(
+        *mockManagedServiceFactory,
+        Updated(std::string{ "factory~instance1" }, AnyMapEquals(emptyProps)))
+        .Times(0);
+      EXPECT_CALL(
+        *mockManagedServiceFactory,
+        Updated(std::string{ "factory~instance2" }, AnyMapEquals(emptyProps)))
+        .Times(0);
+      EXPECT_CALL(
+        *mockManagedServiceFactory2,
+        Updated(std::string{ "factory2~instance1" }, AnyMapEquals(newProps)))
       .WillOnce(testing::InvokeWithoutArgs(f2));
       EXPECT_CALL(*mockManagedServiceFactory, Removed(std::string{"factory~instance1"}))
       .WillOnce(testing::InvokeWithoutArgs(f));
@@ -478,16 +484,20 @@ namespace cppmicroservices {
       ASSERT_TRUE(conf2);
       ASSERT_TRUE(conf3);
 
-      ul.lock();
-      auto factory1InvokedTwice = counterCV.wait_for(ul, std::chrono::seconds(10), [&msCounter] { return 2u == msCounter; });
+     ul.lock();
+      auto factory1InvokedZeroTimes = counterCV.wait_for(
+        ul, std::chrono::seconds(10), [&msCounter] { return 0u == msCounter; });
       ul.unlock();
 
-      EXPECT_TRUE(factory1InvokedTwice);
+      EXPECT_TRUE(factory1InvokedZeroTimes);
       EXPECT_NO_THROW(conf->Update(newProps));
       EXPECT_NO_THROW(conf2->Remove());
 
       ul.lock();
-      auto invokeComplete = counterCV.wait_for(ul, std::chrono::seconds(10), [&msCounter, &ms2Counter] { return 3u == msCounter && 2u == ms2Counter; });
+      auto invokeComplete = counterCV.wait_for(
+        ul, std::chrono::seconds(10), [&msCounter, &ms2Counter] {
+          return 1u == msCounter && 2u == ms2Counter;
+        });
       ul.unlock();
 
       EXPECT_TRUE(invokeComplete);
@@ -536,9 +546,12 @@ namespace cppmicroservices {
       // setup expectations.
       EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(emptyProps)))
       .Times(2).WillRepeatedly(testing::InvokeWithoutArgs(f));
-      EXPECT_CALL(*mockManagedServiceFactory, Updated(std::string{"factory~instance1"}, AnyMapEquals(emptyProps)))
-      .WillOnce(testing::InvokeWithoutArgs(f2));
-      EXPECT_CALL(*mockManagedServiceFactory, Removed(std::string{"factory~instance1"}))
+      EXPECT_CALL(
+        *mockManagedServiceFactory,
+        Updated(std::string{ "factory~instance1" }, AnyMapEquals(emptyProps)))
+        .Times(0);
+      EXPECT_CALL(*mockManagedServiceFactory,
+                  Removed(std::string{ "factory~instance1" }))
       .WillOnce(testing::InvokeWithoutArgs(f2));
       EXPECT_CALL(*mockManagedService2, Updated(testing::_))
       .Times(0);
@@ -569,14 +582,17 @@ namespace cppmicroservices {
         ASSERT_TRUE(conf);
 
         ul.lock();
-        auto factoryInvokedOnce = counterCV.wait_for(ul, std::chrono::seconds(10), [&msfCounter] { return 1u == msfCounter; });
+        auto factoryInvokedZeroTimes =
+          counterCV.wait_for(ul, std::chrono::seconds(10), [&msfCounter] {
+            return 0u == msfCounter;
+          });
         ul.unlock();
 
-        EXPECT_TRUE(factoryInvokedOnce);
+        EXPECT_TRUE(factoryInvokedZeroTimes);
       }
 
       std::unique_lock<std::mutex> ul{counterMutex};
-      auto invokeComplete = counterCV.wait_for(ul, std::chrono::seconds(10), [&msCounter, &msfCounter] { return 2u == msCounter && 2u == msfCounter; });
+      auto invokeComplete = counterCV.wait_for(ul, std::chrono::seconds(10), [&msCounter, &msfCounter] { return 2u == msCounter && 1u == msfCounter; });
       ul.unlock();
 
       EXPECT_TRUE(invokeComplete);
@@ -699,6 +715,9 @@ namespace cppmicroservices {
 
       auto factoryConf = configAdmin.CreateFactoryConfiguration("factory");
       auto factoryConf2 = configAdmin.CreateFactoryConfiguration("factory");
+
+      EXPECT_NO_THROW(factoryConf->Update(emptyProps));
+      EXPECT_NO_THROW(factoryConf2->Update(emptyProps));
 
       ul.lock();
       auto factoryInvokedTwice = counterCV.wait_for(ul, std::chrono::seconds(10), [&msfCounter] { return 2u == msfCounter; });

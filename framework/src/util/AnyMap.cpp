@@ -26,7 +26,6 @@
 #include "absl/strings/string_view.h"
 
 #include <stdexcept>
-#include <iostream>
 
 namespace cppmicroservices {
 

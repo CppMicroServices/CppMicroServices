@@ -48,11 +48,15 @@ DEALINGS IN THE SOFTWARE.
 
 namespace {
 
+/**
+ * Provide a compare function that will do the comparison if the operator is available, and always
+ * return false otherwise. Use SFINAE to pick the right implementation based on type.
+ */
 template <class T>
 struct has_op_eq
 {
   template <class U>
-  static auto op_eq_test(const U* u) -> decltype(*u < *u, char(0))
+  static auto op_eq_test(const U* u) -> decltype(*u == *u, char(0))
   { }
 
   static std::array<char, 2> op_eq_test(...) { }
@@ -60,12 +64,18 @@ struct has_op_eq
   static const bool value = (sizeof(op_eq_test(static_cast<T*>(0))) == 1);
 };
 
+/**
+ * If there's an operator==, use it and return the results of the comparison.
+ */
 template<typename CmpT, std::enable_if_t<has_op_eq<CmpT>::value, bool> = true>
 bool compare(const CmpT& lhs, const CmpT& rhs)
 {
   return lhs == rhs;
 }
 
+/**
+ * When CmpT does not have an operator==, return false.
+ */
 template<typename CmpT, std::enable_if_t<!has_op_eq<CmpT>::value, bool> = false>
 bool compare(const CmpT&, const CmpT&)
 {
@@ -275,6 +285,15 @@ public:
     return compare(*any_cast<const ValueType>(this),val);
   }
 
+  /**
+   * Compares this Any with another Any. We accomplish this by forwarding the call to a virtual
+   * compare function on the Holder of the value in the _content field. The Placeholder subclass of
+   * Holder provides an implementation that invokes the above operator== with the underlying value
+   * of ValueType.
+   * @param rhs an Any to compare against
+   * @return bool return true if rhs compares equal to *this AND the underlying ValueType has an
+   *              operator==, and return false otherwise.
+   */
   bool operator==(const Any& rhs) const
   {
     return rhs._content->compare(*this);
@@ -448,9 +467,14 @@ private:
 
     ValueType _held;
 
-    bool compare(const Any& rhs) const override
+    /**
+     * compare _held with lhs. This invokes the Any::operator==(ValueType) above. 
+     * @param lhs an Any containing a value to compare against _held
+     * @return bool return true if the value held in lhs is equal to _held.
+     */ 
+    bool compare(const Any& lhs) const override
     {
-      return rhs == _held;
+      return lhs == _held;
     }
     
   private: // intentionally left unimplemented

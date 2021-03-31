@@ -293,7 +293,7 @@ protected:
   map_type type;
 
 private:
-  ordered_any_mt& o_m() const;
+  ordered_any_map const& o_m() const;
   ordered_any_map& o_m();
   unordered_any_map const& uo_m() const;
   unordered_any_map& uo_m();
@@ -425,9 +425,5 @@ US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
                                                     const int32_t indent);
 
 }
-
-bool operator==(const cppmicroservices::any_map& lhs, const cppmicroservices::any_map& rhs);
-cppmicroservices::AnyMap US_Framework_EXPORT manifest_from_cache(const cppmicroservices::any_map::key_type& key, cppmicroservices::any_map& cache);
-
 
 #endif // CPPMICROSERVICES_ANYMAP_H

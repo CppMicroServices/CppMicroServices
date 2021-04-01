@@ -84,7 +84,7 @@ void checkResourceInfo(const BundleResource& res,
 {
     ASSERT_TRUE(res.IsValid());
     ASSERT_EQ(res.GetBaseName(), baseName);
-    ASSERT_TRUE(res.GetChildren().empty());
+    ASSERT_NE(res.GetChildren().empty(), children);
     ASSERT_EQ(res.GetCompleteBaseName(), completeBaseName);
     ASSERT_EQ(res.GetName(), completeBaseName + "." + suffix);
     ASSERT_EQ(res.GetResourcePath(),

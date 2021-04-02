@@ -1,8 +1,4 @@
 # sources and headers
-set(_srcs
-  src/LogService.cpp
-  )
-
 set(_public_headers
   include/cppmicroservices/logservice/LogService.hpp
   )
@@ -28,7 +24,7 @@ configure_file(${CppMicroServices_SOURCE_DIR}/cmake/Export.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices/logservice/LogServiceExport.h
   )
 
-add_library(usLogService ${_srcs} ${_public_headers})
+add_library(usLogService ${_public_headers})
 if (US_BUILD_TESTING)
   target_compile_definitions(usLogService PRIVATE USING_GTEST)
 endif()
@@ -42,6 +38,8 @@ target_include_directories(usLogService
     $<BUILD_INTERFACE:${CppMicroServices_BINARY_DIR}/framework/include>
     $<INSTALL_INTERFACE:${HEADER_INSTALL_DIR}>
   )
+
+set_target_properties(usLogService PROPERTIES LINKER_LANGUAGE CXX)
 
 # install support
 install(TARGETS ${${PROJECT_NAME}_TARGET}

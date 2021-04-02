@@ -40,4 +40,4 @@ target_include_directories(util
     ${PROJECT_BINARY_DIR}/include
 )
 
-target_link_libraries(util PUBLIC usLogService)
+#target_link_libraries(util PUBLIC usLogService)

@@ -355,7 +355,6 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
   EXPECT_TRUE(configuration->GetProperties().empty());
   EXPECT_EQ(service->getCounter(), expectedCount);
 
-
   const int newIncrement{ 5 };
   cppmicroservices::AnyMap props(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
@@ -506,7 +505,6 @@ TEST_F(ConfigAdminTests, testCreateFactoryConfiguration)
 
   EXPECT_TRUE(configuration->GetProperties().empty());
   EXPECT_EQ(serviceFactory->getUpdatedCounter(newConfigPid), 0);
-
 
   auto const service = serviceFactory->create(newConfigPid);
   ASSERT_NE(service, nullptr);

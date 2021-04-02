@@ -39,3 +39,5 @@ target_include_directories(util
     ${PROJECT_SOURCE_DIR}/third_party
     ${PROJECT_BINARY_DIR}/include
 )
+
+target_link_libraries(util PUBLIC usLogService)

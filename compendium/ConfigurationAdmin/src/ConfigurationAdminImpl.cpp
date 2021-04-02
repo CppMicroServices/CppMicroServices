@@ -272,7 +272,6 @@ namespace cppmicroservices {
         }
         result = it->second;
       }
-
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                   "GetConfiguration: returning " + (created ? std::string("new") : "existing") + " Configuration instance with PID " + pid);
       return result;

@@ -440,90 +440,97 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
 
   auto f2 = [&counterMutex, &counterCV, &ms2Counter] {
     {
-      {
-        std::lock_guard<std::mutex> lk{counterMutex};
-        ++ms2Counter;
-      }
-      counterCV.notify_one();
-    };
+      std::lock_guard<std::mutex> lk{counterMutex};
+      ++ms2Counter;
+    }
+    counterCV.notify_one();
+  };
 
-    auto newProps = props;
-    newProps["foo"] = std::string{"baz"};
+  auto newProps = props;
+  newProps["foo"] = std::string{"baz"};
 
-    auto mockManagedServiceFactory = std::make_shared<MockManagedServiceFactory>();
-    auto mockManagedServiceFactory2 = std::make_shared<MockManagedServiceFactory>();
-    auto mockManagedServiceFactory3 = std::make_shared<MockManagedServiceFactory>();
-    // setup expectations.
-    EXPECT_CALL(*mockManagedServiceFactory2, Updated(std::string{"factory2~instance1"}, AnyMapEquals(props)))
-      .WillOnce(testing::InvokeWithoutArgs(f2));
-    EXPECT_CALL(
-      *mockManagedServiceFactory,
-      Updated(std::string{ "factory~instance1" }, AnyMapEquals(emptyProps)))
-      .Times(0);
-    EXPECT_CALL(
-      *mockManagedServiceFactory,
-      Updated(std::string{ "factory~instance2" }, AnyMapEquals(emptyProps)))
-      .Times(0);
-    EXPECT_CALL(
-      *mockManagedServiceFactory2,
-      Updated(std::string{ "factory2~instance1" }, AnyMapEquals(newProps)))
-      .WillOnce(testing::InvokeWithoutArgs(f2));
-    EXPECT_CALL(*mockManagedServiceFactory, Removed(std::string{"factory~instance1"}))
-      .WillOnce(testing::InvokeWithoutArgs(f));
-    EXPECT_CALL(*mockManagedServiceFactory3, Updated(testing::_, testing::_))
-      .Times(0);
-    EXPECT_CALL(*mockManagedServiceFactory3, Removed(testing::_))
-      .Times(0);
+  auto mockManagedServiceFactory = std::make_shared<MockManagedServiceFactory>();
+  auto mockManagedServiceFactory2 = std::make_shared<MockManagedServiceFactory>();
+  auto mockManagedServiceFactory3 = std::make_shared<MockManagedServiceFactory>();
+  // setup expectations.
+  EXPECT_CALL(
+    *mockManagedServiceFactory2,
+    Updated(std::string{"factory2~instance1"}, AnyMapEquals(props)))
+    .WillOnce(testing::InvokeWithoutArgs(f2));
+  EXPECT_CALL(
+    *mockManagedServiceFactory,
+    Updated(std::string{ "factory~instance1" }, AnyMapEquals(emptyProps)))
+    .Times(0);
+  EXPECT_CALL(
+    *mockManagedServiceFactory,
+    Updated(std::string{ "factory~instance2" }, AnyMapEquals(emptyProps)))
+    .Times(0);
+  EXPECT_CALL(
+    *mockManagedServiceFactory2,
+    Updated(std::string{ "factory2~instance1" }, AnyMapEquals(newProps)))
+    .WillOnce(testing::InvokeWithoutArgs(f2));
+  EXPECT_CALL(
+    *mockManagedServiceFactory,
+    Removed(std::string{"factory~instance1"}))
+    .WillOnce(testing::InvokeWithoutArgs(f));
+  EXPECT_CALL(
+    *mockManagedServiceFactory3,
+    Updated(testing::_, testing::_))
+    .Times(0);
+  EXPECT_CALL(
+    *mockManagedServiceFactory3,
+    Removed(testing::_))
+    .Times(0);
 
-    // Ensure notification from original GetConfiguration has run.
-    configAdmin.WaitForAllAsync();
+  // Ensure notification from original GetConfiguration has run.
+  configAdmin.WaitForAllAsync();
 
-    AnyMap pidProp{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
-    pidProp["pid"] = std::string("factory");
-    AnyMap nameProp{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
-    nameProp["name"] = std::string("factory2");
-    cppmicroservices::ServiceProperties ms1Props{{std::string("service"), pidProp}};
-    cppmicroservices::ServiceProperties ms2Props{{std::string("component"), nameProp}};
+  AnyMap pidProp{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
+  pidProp["pid"] = std::string("factory");
+  AnyMap nameProp{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
+  nameProp["name"] = std::string("factory2");
+  cppmicroservices::ServiceProperties ms1Props{{std::string("service"), pidProp}};
+  cppmicroservices::ServiceProperties ms2Props{{std::string("component"), nameProp}};
 
-    auto reg1 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(mockManagedServiceFactory, ms1Props);
-    auto reg2 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(mockManagedServiceFactory2, ms2Props);
-    auto reg3 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(mockManagedServiceFactory3);
+  auto reg1 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(mockManagedServiceFactory, ms1Props);
+  auto reg2 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(mockManagedServiceFactory2, ms2Props);
+  auto reg3 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(mockManagedServiceFactory3);
 
-    std::unique_lock<std::mutex> ul{counterMutex};
-    auto factory2InvokedOnce = counterCV.wait_for(ul, std::chrono::seconds(10), [&ms2Counter] { return 1u == ms2Counter; });
-    ul.unlock();
+  std::unique_lock<std::mutex> ul{counterMutex};
+  auto factory2InvokedOnce = counterCV.wait_for(ul, std::chrono::seconds(10), [&ms2Counter] { return 1u == ms2Counter; });
+  ul.unlock();
 
-    EXPECT_TRUE(factory2InvokedOnce);
-    configAdmin.WaitForAllAsync();
+  EXPECT_TRUE(factory2InvokedOnce);
+  configAdmin.WaitForAllAsync();
 
-    auto conf2 = configAdmin.GetConfiguration("factory~instance1");
-    auto conf3 = configAdmin.GetConfiguration("factory~instance2");
-    ASSERT_TRUE(conf2);
-    ASSERT_TRUE(conf3);
+  auto conf2 = configAdmin.GetConfiguration("factory~instance1");
+  auto conf3 = configAdmin.GetConfiguration("factory~instance2");
+  ASSERT_TRUE(conf2);
+  ASSERT_TRUE(conf3);
 
-    ul.lock();
-    auto factory1InvokedZeroTimes = counterCV.wait_for(
-      ul, std::chrono::seconds(10), [&msCounter] { return 0u == msCounter; });
-    ul.unlock();
+  ul.lock();
+  auto factory1InvokedZeroTimes = counterCV.wait_for(
+    ul, std::chrono::seconds(10), [&msCounter] { return 0u == msCounter; });
+  ul.unlock();
 
-    EXPECT_TRUE(factory1InvokedZeroTimes);
-    EXPECT_NO_THROW(conf->Update(newProps));
-    EXPECT_NO_THROW(conf2->Remove());
+  EXPECT_TRUE(factory1InvokedZeroTimes);
+  EXPECT_NO_THROW(conf->Update(newProps));
+  EXPECT_NO_THROW(conf2->Remove());
 
-    ul.lock();
-    auto invokeComplete = counterCV.wait_for(
+  ul.lock();
+  auto invokeComplete = counterCV.wait_for(
       ul, std::chrono::seconds(10), [&msCounter, &ms2Counter] {
         return 1u == msCounter && 2u == ms2Counter;
       });
-    ul.unlock();
+  ul.unlock();
 
-    EXPECT_TRUE(invokeComplete);
+  EXPECT_TRUE(invokeComplete);
 
-    reg1.Unregister();
-    reg2.Unregister();
-    reg3.Unregister();
+  reg1.Unregister();
+  reg2.Unregister();
+  reg3.Unregister();
 
-    configAdmin.WaitForAllAsync();
+  configAdmin.WaitForAllAsync();
 }
 
 TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)

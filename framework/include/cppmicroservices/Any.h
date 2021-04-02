@@ -56,7 +56,7 @@ template <class T>
 struct has_op_eq
 {
   template <class U>
-  static auto op_eq_test(const U* u) -> decltype(*u == *u, char(0))
+  static auto op_eq_test(const U* u) -> decltype(char(*u == *u))
   { return char(0); }
 
   static std::array<char, 2> op_eq_test(...) { return std::array<char,2>{0,0}; }

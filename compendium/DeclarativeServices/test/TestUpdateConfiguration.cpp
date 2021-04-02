@@ -36,11 +36,7 @@ TEST_F(tServiceComponent, testUpdateConfig_Modified) //DS_CAI_FTC_1
     std::string componentName = "sample::ServiceComponentCA1";
     cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA1");
 
-  //Use DS runtime service to get the component description
-  scr::dto::ComponentDescriptionDTO compDescDTO =
-    dsRuntimeService->GetComponentDescriptionDTO(testBundle,componentName);
-
-  //Use DS runtime service to validate the component state.
+  //Use DS runtime service to get the component description and to validate the component state.
   //It should be in the SATISFIED state because the configuration policy is optional.
   //and component is delayed
   scr::dto::ComponentDescriptionDTO compDescDTO;
@@ -143,6 +139,9 @@ TEST_F(tServiceComponent, testUpdateConfig_Exception)
   auto configObject =
     configAdminService->GetConfiguration(componentName);
   auto configObjInstance = configObject->GetPid();
+  cppmicroservices::AnyMap props(
+      cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  configObject->Update(props);
 
   // wait for the asynchronous task to take effect
   auto result = RepeatTaskUntilOrTimeout(
@@ -171,8 +170,6 @@ TEST_F(tServiceComponent, testUpdateConfig_Exception)
     << "Factory instance state should be ACTIVE";
 
   //Update property
-  cppmicroservices::AnyMap props(
-    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
   configObject->Update(props);

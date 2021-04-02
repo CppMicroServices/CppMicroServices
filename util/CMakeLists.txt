@@ -25,7 +25,7 @@ add_library(util OBJECT
   src/MetadataParserImpl.cpp
 )
 
-#set_property(TARGET util PROPERTY POSITION_INDEPENDENT_CODE 1)
+set_property(TARGET util PROPERTY POSITION_INDEPENDENT_CODE 1)
 
 target_include_directories(util
   PUBLIC
@@ -40,4 +40,4 @@ target_include_directories(util
     ${PROJECT_BINARY_DIR}/include
 )
 
-#target_link_libraries(util PUBLIC usLogService)
+target_link_libraries(util PUBLIC usLogService)

@@ -273,6 +273,9 @@ public:
     }
   }
 
+  /**
+   * return the iterator to the value referenced by key
+   */
   const_iterator find(const key_type& key) const;
 
   /**

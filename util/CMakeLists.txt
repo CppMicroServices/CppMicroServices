@@ -16,6 +16,7 @@ add_library(util OBJECT
   include/cppmicroservices/util/MetadataParserFactory.hpp
   include/cppmicroservices/util/MetadataParserImpl.hpp
 
+
   src/BundleObjFactory.cpp
   src/BundleObjFile.cpp
   src/Error.cpp

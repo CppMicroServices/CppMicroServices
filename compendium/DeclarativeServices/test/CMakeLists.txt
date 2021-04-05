@@ -85,6 +85,7 @@ set(_declarativeservices_tests
   TestServiceComponentRuntime.cpp
   TestServiceProvider.cpp
   TestSharedLibraryException.cpp
+  TestUpdateConfigurationWithoutModified.cpp
   ImportTestBundles.cpp
   TestBindingPolicies.cpp
   TestUpdateConfiguration
@@ -178,6 +179,7 @@ set(_test_bundles
   TestBundleDSTOI8
   TestBundleDSTOI9
   TestBundleDSCA1
+  TestBundleDSCA03
   TestBundleDSCA08
   TestBundleDSCA20
   TestBundleDSTOI19

@@ -27,47 +27,40 @@
 
 namespace test {
 /**
-   * Verify that a service's configuration can be updated after the service is activated 
+   * Verify that a service's configuration can be updated after the service is activated
    * without deactivating and reactivating the service.
    */
 TEST_F(tServiceComponent, testUpdateConfig_Modified) //DS_CAI_FTC_1
 {
   //Start bundle
-    std::string componentName = "sample::ServiceComponentCA1";
-    cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA1");
+  std::string componentName = "sample::ServiceComponentCA1";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA1");
 
   //Use DS runtime service to get the component description and to validate the component state.
   //It should be in the SATISFIED state because the configuration policy is optional.
   //and component is delayed
   scr::dto::ComponentDescriptionDTO compDescDTO;
   auto compConfigs =
-      GetComponentConfigs(testBundle, componentName, compDescDTO);
+    GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED);
 
   //GetService to make component active
-  auto sRef1 = context.GetServiceReference<test::CAInterface>();
-  ASSERT_TRUE(static_cast<bool>(sRef1)) << "Service must be available";
-  auto service = context.GetService<test::CAInterface>(sRef1);
-  ASSERT_NE(service, nullptr);
+  auto service = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(service) << "GetService failed for CAInterface";
 
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE);
 
   //Get a service reference to ConfigAdmin to update configuration objects
-  auto caRef =
-    framework.GetBundleContext()
-      .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
-  ASSERT_TRUE(caRef) << "GetServiceReference failed for ConfigurationAdmin";
+  // Get a service reference to ConfigAdmin to create the component instance.
   auto configAdminService =
-    framework.GetBundleContext()
-      .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(caRef);
+    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
   ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
   //Create configuration object
-  auto configObject =
-    configAdminService->GetConfiguration(componentName);
+  auto configObject = configAdminService->GetConfiguration(componentName);
   auto configObjInstance = configObject->GetPid();
 
   //Update property
@@ -136,11 +129,10 @@ TEST_F(tServiceComponent, testUpdateConfig_Exception)
     GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
   ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
-  auto configObject =
-    configAdminService->GetConfiguration(componentName);
+  auto configObject = configAdminService->GetConfiguration(componentName);
   auto configObjInstance = configObject->GetPid();
   cppmicroservices::AnyMap props(
-      cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   configObject->Update(props);
 
   // wait for the asynchronous task to take effect
@@ -160,9 +152,9 @@ TEST_F(tServiceComponent, testUpdateConfig_Exception)
   ASSERT_TRUE(result)
     << "Timed out waiting for component state to become SATISFIED.";
 
-  //Request a service reference to the new component instance. 
-  auto instance = GetInstance<test::CAInterface>();
-  ASSERT_TRUE(instance) << "GetService failed for CAInterface";
+  //Request a service reference to the new component instance.
+  auto service = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(service) << "GetService failed for CAInterface";
 
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";

@@ -88,7 +88,7 @@ endif()
 
 target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${GMOCK_BOTH_LIBRARIES})
-target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET})
+target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET} usLogService)
 
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)

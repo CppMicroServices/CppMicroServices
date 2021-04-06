@@ -103,7 +103,7 @@ if(NOT BUILD_SHARED_LIBS)
   target_link_libraries(${_test_driver} ${_us_test_bundle_libs})
 endif()
 
-target_link_libraries(${_test_driver} ${Framework_TARGET})
+target_link_libraries(${_test_driver} ${Framework_TARGET} usLogService)
 
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)

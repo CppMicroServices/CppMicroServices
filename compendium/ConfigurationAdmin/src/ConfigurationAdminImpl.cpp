@@ -468,7 +468,7 @@ namespace cppmicroservices {
     void ConfigurationAdminImpl::NotifyConfigurationUpdated(const std::string& pid)
     {
       
-      PerformAsync([this, pid]
+      auto fut = PerformAsync([this, pid]
       {
         AnyMap properties{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
         std::string fPid = "";
@@ -564,6 +564,13 @@ namespace cppmicroservices {
           }
         }
       });
+      // wait until asynchronous processing completes before returning to the caller. 
+      try {
+          fut.get();
+      }
+      catch (...) {
+          logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Failed to update component with pid" + pid, std::current_exception());
+      }
     }
 
     void ConfigurationAdminImpl::NotifyConfigurationRemoved(const std::string &pid, std::uintptr_t configurationId)
@@ -594,11 +601,18 @@ namespace cppmicroservices {
         NotifyConfigurationUpdated(pid);
         // This functor will run on another thread. Just being overly cautious to guarantee that the
         // ConfigurationImpl which has called this method doesn't run its own destructor.
-        PerformAsync([this, pid, configuration = std::move(configurationToInvalidate)]
+        auto fut = PerformAsync([this, pid, configuration = std::move(configurationToInvalidate)]
         {
           logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                       "Configuration with PID " + pid + " has been removed.");
         });
+        // wait until asynchronous processing completes before returning to the caller. 
+        try {
+            fut.get();
+        }
+        catch (...) {
+            logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Failed to remove component with pid" + pid, std::current_exception());
+        }
       }
     }
 
@@ -738,24 +752,27 @@ namespace cppmicroservices {
     }
 
     template <typename Functor>
-    void ConfigurationAdminImpl::PerformAsync(Functor&& f)
+   std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
     {
        std::lock_guard<std::mutex> lk{futuresMutex};
        decltype(completeFutures){}.swap(completeFutures);
        auto id = ++futuresID;
-       incompleteFutures.emplace(id, std::async(std::launch::async, [this, func = std::forward<Functor>(f), id]
-       {
-         func();
-         std::lock_guard<std::mutex> lk{futuresMutex};
-         auto it = incompleteFutures.find(id);
-         assert(it != std::end(incompleteFutures) && "Invalid future iterator");
-         completeFutures.push_back(std::move(it->second));
-         incompleteFutures.erase(it);
-         if (incompleteFutures.empty())
-         {
-           futuresCV.notify_one();
-         }
-       }));
+       std::future<void> fut = std::async(std::launch::async, [this, func = std::forward<Functor>(f), id]()->void
+           {
+             func();
+             std::lock_guard<std::mutex> lk{futuresMutex};
+             auto it = incompleteFutures.find(id);
+             assert(it != std::end(incompleteFutures) && "Invalid future iterator");
+             completeFutures.push_back(std::move(it->second));
+             incompleteFutures.erase(it);
+             if (incompleteFutures.empty())
+             {
+               futuresCV.notify_one();
+             }
+           });
+       auto returnFut = fut.share();
+       incompleteFutures.emplace(id, std::move(fut));
+       return returnFut;
     }
 
     std::string ConfigurationAdminImpl::RandomInstanceName()

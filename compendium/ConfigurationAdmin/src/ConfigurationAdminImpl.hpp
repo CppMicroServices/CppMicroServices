@@ -176,7 +176,7 @@ namespace cppmicroservices {
 
     private:
       // Convenience wrapper which is used to perform asyncronous operations
-      template <typename Functor> void PerformAsync(Functor&& f);
+      template <typename Functor>  std::shared_future<void>  PerformAsync(Functor&& f);
 
       // Used to generate a random instance name for CreateFactoryConfiguration
       std::string RandomInstanceName();

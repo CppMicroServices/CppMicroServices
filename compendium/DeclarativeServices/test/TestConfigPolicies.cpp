@@ -25,15 +25,17 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 
-#include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
-
 namespace test {
 
-TEST_F(tServiceComponent, testOptionalConfigPolicyImmediateTrue) // DS_CAI_FTC_5
+/**
+* Test the component instance is constructed without the configuration object is
+* present and the component should be constructed with no properties.
+*/
+TEST_F(tServiceComponent, testOptionalConfigPolicyWithoutConfigObj) // DS_CAI_FTC_5
 {
   // Start the test bundle containing the component name.
-  std::string componentName           = "sample::ServiceComponentCA5";
-  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA5");
+  std::string componentName           = "sample::ServiceComponentCA05";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA05");
 
   // Use DS runtime service to validate the component state
   scr::dto::ComponentDescriptionDTO compDescDTO;
@@ -41,85 +43,26 @@ TEST_F(tServiceComponent, testOptionalConfigPolicyImmediateTrue) // DS_CAI_FTC_5
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
     << "The state should be active once the component instance is constructed.";
 
-  // Get a service reference to ConfigAdmin to create the component instance.
-  auto configAdminService =
-    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
-  ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+  // Request a service reference to the new component instance. This will
+  // cause DS to construct the instance with the updated properties.
+  auto instance = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(instance) << "GetService failed for CAInterface";
 
-  //Create configuration object
-  auto configuration  = configAdminService->GetConfiguration(componentName);
-  auto configInstance = configuration->GetPid();
+  // Confirm component instance was created with the properties has default value
+  auto instanceProps = instance->GetProperties();
+  EXPECT_TRUE(instanceProps.empty())
+    << "Property instance should be empty";
+} // end of testOptionalConfigPolicyWithoutConfigObj
 
-  // Created the configuration object on which the component is configured
-  // but it created it with no properties. Update the properties before
-  // instantiating the component instance.
-  std::string uniqueProp[3] = { "uniqueProp1", "uniqueProp2", "uniqueProp3" };
-  cppmicroservices::AnyMap props(
-    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  const std::string instance[3] = { "instance1", "instance2", "instance3" };
-  cppmicroservices::AnyMap instanceProps(
-    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-
-  // Repeat a few time to check the expected behavior
-  int i = 0;
-  while (i < 3)
-  {
-    // The Update properties sends an asynchronous request to DS to
-    // update the properties. Must wait until DS is finished before we can continue.
-    // Use DS runtime service to validate the component properties. May take more
-    // than one try.
-
-    props[uniqueProp[i]] = instance[i];
-    configuration->Update(props);
-    auto result = RepeatTaskUntilOrTimeout(
-      [&compDescDTO, &compConfigs, this, &testBundle, &configInstance]() {
-        compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
-          testBundle, configInstance);
-        if (compDescDTO.name != "") {
-          compConfigs =
-            this->dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-        }
-      },
-      [&compConfigs, &instance, &uniqueProp, &i]() -> bool {
-        if (compConfigs.size() == 1) {
-          auto properties = compConfigs.at(0).properties;
-          auto id = properties.find(uniqueProp[i]);
-          if (id != properties.end()) {
-            return (id->second == instance[i]);
-          }
-        }
-        return false;
-      });
-
-      ASSERT_TRUE(result) << "Timed out waiting for Update Configuration"
-                             "to complete.";
-      EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
-      EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
-        << "Component instance state should be ACTIVE";
-
-      //Request a service reference to the new component instance. This will
-      //cause DS to construct the instance with the updated properties.
-      auto instanceI = GetInstance<test::CAInterface>();
-      ASSERT_TRUE(instanceI) << "GetService failed for CAInterface";
-
-      //Confirm component instance was created with the correct properties
-      instanceProps = instanceI->GetProperties();
-      auto uniquePropI = instanceProps.find(uniqueProp[i]);
-
-      EXPECT_TRUE(uniquePropI != instanceProps.end())
-        << uniqueProp[i] << " not found in constructed instance";  //not found
-      EXPECT_EQ(uniquePropI->second, instance[i]);
-
-    ++i;
-  }
-}
-
-TEST_F(tServiceComponent, testOptionalConfigPolicyImmediateFalse) // DS_CAI_FTC_5
+/**
+* Test the component instance is constructed with the configuration object is present
+* and the component should be constructed with the correct properties.
+*/
+TEST_F(tServiceComponent, testOptionalConfigPolicyWithConfigObj) // DS_CAI_FTC_5
 {
-
   // Start the test bundle containing the component name.
-  std::string componentName           = "sample::ServiceComponentCA1";
-  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA1");
+  std::string componentName           = "sample::ServiceComponentCA05a";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA05a");
 
   // Use DS runtime service to validate the component description and
   // Verify that DS is finished creating the component data structures.
@@ -127,8 +70,8 @@ TEST_F(tServiceComponent, testOptionalConfigPolicyImmediateFalse) // DS_CAI_FTC_
   auto compConfigs =
     GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
-  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
-    << "Component state should be SATISFIED";
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "Component state should be ACTIVE";
 
   // Get a service reference to ConfigAdmin to create the component instance.
   auto configAdminService =
@@ -142,72 +85,29 @@ TEST_F(tServiceComponent, testOptionalConfigPolicyImmediateFalse) // DS_CAI_FTC_
   // Created the configuration object on which the component is configured
   // but it created it with no properties. Update the properties before
   // instantiating the component instance.
-  std::string uniqueProp[3] = { "uniqueProp1", "uniqueProp2", "uniqueProp3" };
   cppmicroservices::AnyMap props(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  const std::string instance[3] = { "instance1", "instance2", "instance3" };
-  cppmicroservices::AnyMap instanceProps(
-    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  // Repeat a few time to check the expected behavior
-  int i = 0;
-  while (i < 3) {
-    // The Update properties sends an asynchronous request to DS to
-    // update the properties. Must wait until DS is finished before we can continue.
-    // Use DS runtime service to validate the component properties. May take more
-    // than one try.
+  const std::string instanceId{ "instance" };
+  props["uniqueProp"] = instanceId;
+  configuration->Update(props);
 
-    props[uniqueProp[i]] = instance[i];
-    configuration->Update(props);
-    auto result = RepeatTaskUntilOrTimeout(
-      [&compDescDTO, &compConfigs, this, &testBundle, &configInstance]() {
-        compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
-          testBundle, configInstance);
-        if (compDescDTO.name != "") {
-          compConfigs =
-            this->dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-        }
-      },
-      [&compConfigs, &instance, &uniqueProp, &i]() -> bool {
-        if (compConfigs.size() == 1) {
-          auto properties = compConfigs.at(0).properties;
-          auto id = properties.find(uniqueProp[i]);
-          if (id != properties.end()) {
-            return (id->second == instance[i]);
-          }
-        }
-        return false;
-      });
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "Component instance state should be ACTIVE";
 
-    ASSERT_TRUE(result) << "Timed out waiting for Update Configuration"
-                           "to complete.";
-    EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
-    if (i == 0)
-    {
-      EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
-        << "Component instance state should be SATISFIED";
-    }
-    else
-    {
-      EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
-        << "Component instance state should be ACTIVE";
-    }
+  // Request a service reference to the new component instance. This will
+  // cause DS to construct the instance with the updated properties.
+  auto instance = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(instance) << "GetService failed for CAInterface";
 
-    //Request a service reference to the new component instance. This will
-    //cause DS to construct the instance with the updated properties.
-    auto instanceI = GetInstance<test::CAInterface>();
-    ASSERT_TRUE(instanceI) << "GetService failed for CAInterface";
+  //Confirm component instance was created with the correct properties
+  auto instanceProps = instance->GetProperties();
+  auto uniqueProp = instanceProps.find("uniqueProp");
 
-    //Confirm component instance was created with the correct properties
-    instanceProps = instanceI->GetProperties();
-    auto uniquePropI = instanceProps.find(uniqueProp[i]);
-
-    EXPECT_TRUE(uniquePropI != instanceProps.end())
-      << uniqueProp[i] << " not found in constructed instance"; //not found
-    EXPECT_EQ(uniquePropI->second, instance[i]);
-
-    ++i;
-  }
-}
+  ASSERT_TRUE(uniqueProp != instanceProps.end())
+    << " not found in constructed instance";
+  EXPECT_EQ(uniqueProp->second, instanceId);
+} // end of testOptionalConfigPolicyWithConfigObj
 
 TEST_F(tServiceComponent, testRequiredConfigPolicy) // DS_CAI_FTC_6
 {
@@ -239,102 +139,83 @@ TEST_F(tServiceComponent, testRequiredConfigPolicy) // DS_CAI_FTC_6
   props["uniqueProp"] = instanceId;
   configuration->Update(props);
 
-  // The Update properties sends an asynchronous request to DS to
-  // update the properties.
-  auto result = RepeatTaskUntilOrTimeout(
-    [&compDescDTO, &compConfigs, this, &testBundle, &configInstance]() {
-      compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
-        testBundle, configInstance);
-      if (compDescDTO.name != "") {
-        compConfigs =
-          this->dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-      }
-    },
-    [&compConfigs, &instanceId]() -> bool {
-      if (compConfigs.size() == 1) {
-        auto properties = compConfigs.at(0).properties;
-        auto id = properties.find("uniqueProp");
-        if (id != properties.end()) {
-          return (id->second == instanceId);
-        }
-      }
-      return false;
-    });
-
-  ASSERT_TRUE(result) << "Timed out waiting for Update Configuration"
-                         "to complete.";
-
   // Confirm configuration object presented and component is satisfied.
-  compConfigs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
     << "SATISFIED is exepected since configuration object is created.";
 
-  //Request a service reference to the new component instance. This will
-  //cause DS to construct the instance with the updated properties.
+  // Request a service reference to the new component instance. This will
+  // cause DS to construct the instance with the updated properties.
   auto instance = GetInstance<test::CAInterface>();
   ASSERT_TRUE(instance) << "GetService failed for CAInterface";
 
-  //Confirm component instance was created with the correct properties
-
+  // Confirm component instance was created with the correct properties
   auto instanceProps = instance->GetProperties();
   auto uniqueProp    = instanceProps.find("uniqueProp");
 
   ASSERT_TRUE(uniqueProp != instanceProps.end())
     << "uniqueProp not found in constructed instance";
   EXPECT_EQ(uniqueProp->second, instanceId);
-}
+} // end of testRequiredConfigPolicy
 
-TEST_F(tServiceComponent, testIgnoreConfigPolicy) // DS_CAI_FTC_7
+/**
+* Test the component instance is created with default properties without the configuration object.
+*/
+TEST_F(tServiceComponent, testIgnoreConfigPolicyWithoutConfigObj) // DS_CAI_FTC_7
 {
   // Start the test bundle containing the component name.
-  std::string           componentName = "sample::ServiceComponentCA7";
-  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA7");
+  std::string           componentName = "sample::ServiceComponentCA07";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA07");
 
   // Use DS runtime service to validate the component state
   scr::dto::ComponentDescriptionDTO compDescDTO;
   auto compConfigs =
     GetComponentConfigs(testBundle, componentName, compDescDTO);
-  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
-    << "Ignore policy always allow the component configuration to be satisfied";
+
+  // Confirm configuration object presented and component is ACTIVE
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "Ignore policy component state should be ACTIVE";
+
+  // Request a service reference to the new component instance. This will
+  // cause DS to construct the instance with the updated properties.
+  auto instance = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(instance) << "GetService failed for CAInterface";
+
+  // Confirm component instance was created with the properties has default value
+  auto instanceProps = instance->GetProperties();
+  EXPECT_TRUE(instanceProps.empty())
+    << "Property instance should be empty";
+} // end of testIgnoreConfigPolicyWithoutConfigObj
+
+/**
+* Test the component instance is created with default properties not from the configuration object.
+*/
+TEST_F(tServiceComponent, testIgnoreConfigPolicyWithConfigObj) // DS_CAI_FTC_7
+{
+  // Start the test bundle containing the component name.
+  std::string componentName = "sample::ServiceComponentCA07a";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA07a");
+
+  // Use DS runtime service to validate the component state
+  scr::dto::ComponentDescriptionDTO compDescDTO;
+  auto compConfigs =
+    GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "Ignore policy component state should be ACTIVE";
 
   // Get a service reference to ConfigAdmin to create the component instance.
   auto configAdminService =
     GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
   ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
-  // Create configuration object and try to update property
-  auto configuration  = configAdminService->GetConfiguration(componentName);
-  auto configInstance = configuration->GetPid();
+  // Request a service reference to the new component instance. This will
+  // cause DS to construct the instance with the updated properties.
+  auto instance = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(instance) << "GetService failed for CAInterface";
 
-  cppmicroservices::AnyMap props(
-    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  const std::string instanceId{ "instance1" };
-  props["uniqueProp"] = instanceId;
-  configuration->Update(props);
-
-  // Try to update properties sends an asynchronous request to DS.
-  auto result = RepeatTaskUntilOrTimeout(
-    [&compDescDTO, &compConfigs, this, &testBundle, &configInstance]() {
-      compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
-        testBundle, configInstance);
-      if (compDescDTO.name != "") {
-        compConfigs =
-          this->dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-      }
-    },
-    [&compConfigs, &instanceId]() -> bool {
-      if (compConfigs.size() == 1) {
-        auto properties = compConfigs.at(0).properties;
-        auto id = properties.find("uniqueProp");
-        if (id != properties.end()) {
-          return (id->second == instanceId);
-        }
-      }
-      return false;
-    });
-
-  // Property shouldn't be updated since the configuration object won't be used even if present
-  ASSERT_FALSE(result) << "Timed out is expected since configuration object is not being used.";
-}
+  // Confirm component instance was created with the properties has default value
+  auto instanceProps = instance->GetProperties();
+  EXPECT_TRUE(instanceProps.empty())
+    << "Property instance should be empty";
+} // end of testIgnoreConfigPolicyWithConfigObj
 
 } // end of test namespace

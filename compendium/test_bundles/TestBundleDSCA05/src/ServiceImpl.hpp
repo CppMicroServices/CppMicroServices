@@ -8,21 +8,23 @@
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
 namespace sample {
-class ServiceComponentCA7 : public test::CAInterface
+class ServiceComponentCA05 : public test::CAInterface
 {
 public:
-  ServiceComponentCA7(std::shared_ptr<cppmicroservices::AnyMap> props)
-    : properties(*props)
-  {}
+  ServiceComponentCA05() = default;
+
   void Modified(const std::shared_ptr<ComponentContext>& context,
                 const std::shared_ptr<cppmicroservices::AnyMap>& configuration);
   cppmicroservices::AnyMap GetProperties();
 
-  ~ServiceComponentCA7() = default;
+  ~ServiceComponentCA05() = default;
 
 private:
   std::mutex propertiesLock;
-  cppmicroservices::AnyMap properties;
+  cppmicroservices::AnyMap properties{
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS
+  };
+  
 };
 }
 

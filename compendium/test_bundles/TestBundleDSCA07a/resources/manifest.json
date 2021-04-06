@@ -1,13 +1,13 @@
 {
-    "bundle.symbolic_name" : "TestBundleDSCA7",
+    "bundle.symbolic_name" : "TestBundleDSCA07a",
     "scr" : {
         "version" : 1,
          "components" : [{
             "enabled" : true,
-            "immediate": false,
-            "implementation-class": "sample::ServiceComponentCA7",
+            "immediate": true,
+            "implementation-class": "sample::ServiceComponentCA07a",
             "configuration-policy" : "ignore",
-            "configuration-pid" : ["sample::ServiceComponentCA7"],
+            "configuration-pid" : ["sample::ServiceComponentCA07a"],
             "service": {
               "interfaces": [ "test::CAInterface" ]
             }

@@ -179,8 +179,10 @@ set(_test_bundles
   TestBundleDSTOI8
   TestBundleDSTOI9
   TestBundleDSCA1
-  TestBundleDSCA5
-  TestBundleDSCA7
+  TestBundleDSCA05
+  TestBundleDSCA05a
+  TestBundleDSCA07
+  TestBundleDSCA07a
   TestBundleDSCA08
   TestBundleDSCA20
   TestBundleDSTOI19

@@ -60,29 +60,6 @@ TEST_F(tServiceComponent, testSetConfig_AnyMap)
   props["uniqueProp"] = instanceId;
   configObject->Update(props);
   
-  auto result = RepeatTaskUntilOrTimeout(
-    [&compDescDTO, &compConfigs, this, &testBundle, &configObjInstance]() {
-      compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
-        testBundle, configObjInstance);
-      if (compDescDTO.name != "") {
-        compConfigs =
-          this->dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-      }
-    },
-    [&compConfigs, &instanceId]() -> bool {
-      if (compConfigs.size() == 1) {
-        auto properties = compConfigs.at(0).properties;
-        auto id = properties.find("uniqueProp");
-        if (id != properties.end()) {
-          return (id->second == instanceId);
-        }
-      }
-      return false;
-    });
-
-  ASSERT_TRUE(result) << "Timed out waiting for Update Configuration"
-                         "to complete.";
-  
   // GetService to make component active
   auto instance = GetInstance<test::CAInterface>();
   ASSERT_TRUE(instance) << "GetService failed for CAInterface";

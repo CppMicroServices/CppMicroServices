@@ -70,30 +70,7 @@ TEST_F(tServiceComponent, testUpdateConfig_Modified) //DS_CAI_FTC_1
   props["uniqueProp"] = instanceId;
   configObject->Update(props);
 
-  auto result = RepeatTaskUntilOrTimeout(
-    [&compDescDTO, &compConfigs, this, &testBundle, &configObjInstance]() {
-      compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
-        testBundle, configObjInstance);
-      if (compDescDTO.name != "") {
-        compConfigs =
-          this->dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-      }
-    },
-    [&compConfigs, &instanceId]() -> bool {
-      if (compConfigs.size() == 1) {
-        auto properties = compConfigs.at(0).properties;
-        auto id = properties.find("uniqueProp");
-        if (id != properties.end()) {
-          return (id->second == instanceId);
-        }
-      }
-      return false;
-    });
-
-  ASSERT_TRUE(result) << "Timed out waiting for Update Configuration"
-                         "to complete.";
-
-  //Validate that the correct properties were updated
+   //Validate that the correct properties were updated
   auto serviceProps = service->GetProperties();
   auto uniqueProp = serviceProps.find("uniqueProp");
 
@@ -135,23 +112,6 @@ TEST_F(tServiceComponent, testUpdateConfig_Exception)
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   configObject->Update(props);
 
-  // wait for the asynchronous task to take effect
-  auto result = RepeatTaskUntilOrTimeout(
-    [&compDescDTO, &compConfigs, this, &testBundle, &componentName]() {
-      compDescDTO =
-        dsRuntimeService->GetComponentDescriptionDTO(testBundle, componentName);
-      if (compDescDTO.name != "") {
-        compConfigs =
-          this->dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-      }
-    },
-    [&compConfigs]() -> bool {
-      return compConfigs.at(0).state == scr::dto::ComponentState::SATISFIED;
-    });
-
-  ASSERT_TRUE(result)
-    << "Timed out waiting for component state to become SATISFIED.";
-
   //Request a service reference to the new component instance.
   auto service = GetInstance<test::CAInterface>();
   ASSERT_TRUE(service) << "GetService failed for CAInterface";
@@ -165,29 +125,6 @@ TEST_F(tServiceComponent, testUpdateConfig_Exception)
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
   configObject->Update(props);
-
-  result = RepeatTaskUntilOrTimeout(
-    [&compDescDTO, &compConfigs, this, &testBundle, &configObjInstance]() {
-      compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
-        testBundle, configObjInstance);
-      if (compDescDTO.name != "") {
-        compConfigs =
-          this->dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-      }
-    },
-    [&compConfigs, &instanceId]() -> bool {
-      if (compConfigs.size() == 1) {
-        auto properties = compConfigs.at(0).properties;
-        auto id = properties.find("uniqueProp");
-        if (id != properties.end()) {
-          return (id->second == instanceId);
-        }
-      }
-      return false;
-    });
-
-  ASSERT_TRUE(result) << "Timed out waiting for Update Configuration"
-                         "to complete.";
 
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";

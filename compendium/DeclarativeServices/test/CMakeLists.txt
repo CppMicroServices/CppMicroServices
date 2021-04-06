@@ -86,6 +86,7 @@ set(_declarativeservices_tests
   TestServiceComponentRuntime.cpp
   TestServiceProvider.cpp
   TestSharedLibraryException.cpp
+  TestUpdateConfigurationWithoutModified.cpp
   ImportTestBundles.cpp
   TestBindingPolicies.cpp
   TestUpdateConfiguration
@@ -179,12 +180,14 @@ set(_test_bundles
   TestBundleDSTOI8
   TestBundleDSTOI9
   TestBundleDSCA1
+  TestBundleDSCA03
   TestBundleDSCA05
   TestBundleDSCA05a
   TestBundleDSCA07
   TestBundleDSCA07a
   TestBundleDSCA08
   TestBundleDSCA20
+  TestBundleDSCA02
   TestBundleDSTOI19
   EnglishDictionary
   )

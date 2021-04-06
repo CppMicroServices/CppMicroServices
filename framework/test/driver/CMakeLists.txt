@@ -29,7 +29,6 @@ include_directories(
 
 set(_tests
   BundleRegistryConcurrencyTest
-  FrameworkEventTest
   FrameworkListenerTest
   HelgrindTest
   LogTest

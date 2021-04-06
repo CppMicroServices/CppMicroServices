@@ -43,6 +43,7 @@ set(_gtest_tests
   ServiceRegistryTest.cpp
   LDAPQueryTest.cpp
   FrameworkFactoryTest.cpp
+  FrameworkEventTest.cpp
 )
 
 if(BUILD_SHARED_LIBS)

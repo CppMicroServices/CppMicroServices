@@ -179,7 +179,7 @@ set(_test_bundles
   TestBundleDSTOI7
   TestBundleDSTOI8
   TestBundleDSTOI9
-  TestBundleDSCA1
+  TestBundleDSCA01
   TestBundleDSCA03
   TestBundleDSCA05
   TestBundleDSCA05a

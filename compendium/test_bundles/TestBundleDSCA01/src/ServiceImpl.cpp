@@ -3,7 +3,7 @@
 
 namespace sample {
 
-void ServiceComponentCA1::Modified(
+void ServiceComponentCA01::Modified(
   const std::shared_ptr<ComponentContext>& /*context*/,
   const std::shared_ptr<cppmicroservices::AnyMap>& configuration)
 {
@@ -11,7 +11,7 @@ void ServiceComponentCA1::Modified(
   properties = *configuration;
 }
 
-cppmicroservices::AnyMap ServiceComponentCA1::GetProperties()
+cppmicroservices::AnyMap ServiceComponentCA01::GetProperties()
 {
   std::lock_guard<std::mutex> lock(propertiesLock);
   return properties;

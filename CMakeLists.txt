@@ -681,12 +681,12 @@ add_subdirectory(httpservice)
 add_subdirectory(webconsole)
 add_subdirectory(shellservice)
 
+add_subdirectory(compendium/LogService)
+
 # Declarative Services requires threading to function.
 # Static linkage is not yet supported for declarative services.
 if (US_ENABLE_THREADING_SUPPORT AND US_BUILD_SHARED_LIBS)
   add_subdirectory(compendium)
-else()
-  add_subdirectory(compendium/LogService)
 endif()
 
 add_subdirectory(tools/shell)

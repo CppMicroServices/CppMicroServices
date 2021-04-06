@@ -25,7 +25,7 @@
 namespace cppmicroservices {
 namespace logservice {
 
-//LogService::~LogService() = default;
+LogService::~LogService() = default;
 
 }
 }

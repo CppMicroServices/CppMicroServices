@@ -56,7 +56,7 @@ enum class SeverityLevel : uint8_t
 class US_usLogService_EXPORT LogService
 {
   public:
-  virtual ~LogService() = default;
+  virtual ~LogService();
 
   /**
    * Logs a message.

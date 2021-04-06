@@ -48,7 +48,7 @@ namespace scr = cppmicroservices::service::component::runtime;
  * Test Fixture used for several test points. The setup method installs and starts
  * all the bundles found in the compendium plugins folder and the installs all the
  * test bundles.
- * This class also provides convenience methods to start a specific test bundle 
+ * This class also provides convenience methods to start a specific test bundle
  */
 class tServiceComponent : public testing::Test
 {
@@ -69,7 +69,7 @@ public:
     for (auto& bundle : dsbundles) {
       bundle.Start();
     }
-    
+
     auto caPluginPath = test::GetConfigAdminRuntimePluginFilePath();
     auto cabundles = context.InstallBundles(caPluginPath);
     for (auto& bundle : cabundles) {
@@ -92,6 +92,10 @@ public:
     test::InstallLib(context, "TestBundleDSTOI9");
     test::InstallLib(context, "TestBundleDSCA1");
     test::InstallLib(context, "TestBundleDSCA03");
+    test::InstallLib(context, "TestBundleDSCA05");
+    test::InstallLib(context, "TestBundleDSCA05a");
+    test::InstallLib(context, "TestBundleDSCA07");
+    test::InstallLib(context, "TestBundleDSCA07a");
     test::InstallLib(context, "TestBundleDSCA08");
     test::InstallLib(context, "TestBundleDSCA20");
     test::InstallLib(context, "TestBundleDSTOI19");

@@ -33,6 +33,10 @@ add_subdirectory(TestBundleDSTOI18)
 add_subdirectory(TestBundleDSTOI19)
 add_subdirectory(TestBundleDSCA1)
 add_subdirectory(TestBundleDSCA03)
+add_subdirectory(TestBundleDSCA05)
+add_subdirectory(TestBundleDSCA05a)
+add_subdirectory(TestBundleDSCA07)
+add_subdirectory(TestBundleDSCA07a)
 add_subdirectory(TestBundleDSCA08)
 add_subdirectory(TestBundleDSCA20)
 add_subdirectory(TestBundleDSCA02)
@@ -43,5 +47,3 @@ add_subdirectory(DSFrenchDictionary)
 add_subdirectory(EnglishDictionary)
 
 add_subdirectory(ManagedServiceAndFactoryBundle)
-
-

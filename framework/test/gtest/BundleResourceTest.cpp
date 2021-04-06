@@ -28,9 +28,8 @@ limitations under the License.
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 
-#include <unordered_set>
-
 #include "gtest/gtest.h"
+#include <unordered_set>
 
 using namespace cppmicroservices;
 
@@ -74,25 +73,24 @@ public:
 };
 
 void checkResourceInfo(const BundleResource& res,
-    const std::string& path,
-    const std::string& baseName,
-    const std::string& completeBaseName,
-    const std::string& suffix,
-    const std::string& completeSuffix,
-    int size,
-    bool children = false)
+                       const std::string& path,
+                       const std::string& baseName,
+                       const std::string& completeBaseName,
+                       const std::string& suffix,
+                       const std::string& completeSuffix,
+                       int size,
+                       bool children = false)
 {
-    ASSERT_TRUE(res.IsValid());
-    ASSERT_EQ(res.GetBaseName(), baseName);
-    ASSERT_NE(res.GetChildren().empty(), children);
-    ASSERT_EQ(res.GetCompleteBaseName(), completeBaseName);
-    ASSERT_EQ(res.GetName(), completeBaseName + "." + suffix);
-    ASSERT_EQ(res.GetResourcePath(),
-        path + completeBaseName + "." + suffix);
-    ASSERT_EQ(res.GetPath(), path);
-    ASSERT_EQ(res.GetSize(), size);
-    ASSERT_EQ(res.GetSuffix(), suffix);
-    ASSERT_EQ(res.GetCompleteSuffix(), completeSuffix);
+  ASSERT_TRUE(res.IsValid());
+  ASSERT_EQ(res.GetBaseName(), baseName);
+  ASSERT_NE(res.GetChildren().empty(), children);
+  ASSERT_EQ(res.GetCompleteBaseName(), completeBaseName);
+  ASSERT_EQ(res.GetName(), completeBaseName + "." + suffix);
+  ASSERT_EQ(res.GetResourcePath(), path + completeBaseName + "." + suffix);
+  ASSERT_EQ(res.GetPath(), path);
+  ASSERT_EQ(res.GetSize(), size);
+  ASSERT_EQ(res.GetSuffix(), suffix);
+  ASSERT_EQ(res.GetCompleteSuffix(), completeSuffix);
 }
 
 TEST(BundleResourceTestNoBundleInstall, operatorEqualTo)
@@ -243,7 +241,7 @@ TEST_F(BundleResourceTest, testResourceOperators)
   ASSERT_TRUE(xml.IsValid() && xml);
   //Check inequality
   ASSERT_NE(foo, xml);
-  ASSERT_TRUE(foo < xml); 
+  ASSERT_TRUE(foo < xml);
 
   // check operator< by using a set
   std::set<BundleResource> resources;
@@ -268,58 +266,58 @@ TEST_F(BundleResourceTest, testResourceOperators)
 
 TEST_F(BundleResourceTest, testTextResource)
 {
-    BundleResource res = testBundle.GetResource("foo.ptxt");
-    checkResourceInfo(res, "/", "foo", "foo", "ptxt", "ptxt", 13, false);
+  BundleResource res = testBundle.GetResource("foo.ptxt");
+  checkResourceInfo(res, "/", "foo", "foo", "ptxt", "ptxt", 13, false);
 
 #ifdef US_PLATFORM_WINDOWS
-    const std::streampos ssize(13);
-    const std::string fileData = "foo and\nbar\n\n";
+  const std::streampos ssize(13);
+  const std::string fileData = "foo and\nbar\n\n";
 #else
-    const std::streampos ssize(12);
-    const std::string fileData = "foo and\nbar\n";
+  const std::streampos ssize(12);
+  const std::string fileData = "foo and\nbar\n";
 #endif
 
-    BundleResourceStream rs(res);
+  BundleResourceStream rs(res);
 
-    rs.seekg(0, std::ios::end);
-    // Check Stream content length
-    ASSERT_EQ(rs.tellg() , ssize);
-    rs.seekg(0, std::ios::beg);
+  rs.seekg(0, std::ios::end);
+  // Check Stream content length
+  ASSERT_EQ(rs.tellg(), ssize);
+  rs.seekg(0, std::ios::beg);
 
-    std::string content;
-    content.reserve(res.GetSize());
-    char buffer[1024];
-    while (rs.read(buffer, sizeof(buffer))) {
-        content.append(buffer, sizeof(buffer));
-    }
-    content.append(buffer, static_cast<std::size_t>(rs.gcount()));
+  std::string content;
+  content.reserve(res.GetSize());
+  char buffer[1024];
+  while (rs.read(buffer, sizeof(buffer))) {
+    content.append(buffer, sizeof(buffer));
+  }
+  content.append(buffer, static_cast<std::size_t>(rs.gcount()));
 
-    ASSERT_TRUE(rs.eof());
-    ASSERT_EQ(content , fileData);
+  ASSERT_TRUE(rs.eof());
+  ASSERT_EQ(content, fileData);
 
-    rs.clear();
-    rs.seekg(0);
+  rs.clear();
+  rs.seekg(0);
 
-    ASSERT_EQ(rs.tellg(), std::streampos(0));
-    ASSERT_TRUE(rs.good());
+  ASSERT_EQ(rs.tellg(), std::streampos(0));
+  ASSERT_TRUE(rs.good());
 
-    std::vector<std::string> lines;
-    std::string line;
-    while (std::getline(rs, line)) {
-        lines.push_back(line);
-    }
-    ASSERT_GT(lines.size(), 1);
-    ASSERT_EQ(lines[0], "foo and");
-    ASSERT_EQ(lines[1], "bar");
+  std::vector<std::string> lines;
+  std::string line;
+  while (std::getline(rs, line)) {
+    lines.push_back(line);
+  }
+  ASSERT_GT(static_cast<int>(lines.size()), 1);
+  ASSERT_EQ(lines[0], "foo and");
+  ASSERT_EQ(lines[1], "bar");
 }
 
 TEST_F(BundleResourceTest, testTextResourceAsBinary)
 {
-    BundleResource res = testBundle.GetResource("foo.ptxt");
+  BundleResource res = testBundle.GetResource("foo.ptxt");
 
-    checkResourceInfo(res, "/", "foo", "foo", "ptxt", "ptxt", 13, false);
+  checkResourceInfo(res, "/", "foo", "foo", "ptxt", "ptxt", 13, false);
 
-    /*
+  /*
       Note: there is no ifdef for platform in this test case because tellg()
       reports the byte offset from the beginning of the file since it is being
       read as binary. This is not the case for when the file is read as text.
@@ -329,149 +327,151 @@ TEST_F(BundleResourceTest, testTextResourceAsBinary)
       the data is being read as binary data, no ifdef is necessary
     */
 
-    const std::streampos ssize(13);
-    const std::string fileData = "foo and\nbar\n\n";
+  const std::streampos ssize(13);
+  const std::string fileData = "foo and\nbar\n\n";
 
-    BundleResourceStream rs(res, std::ios_base::binary);
+  BundleResourceStream rs(res, std::ios_base::binary);
 
-    rs.seekg(0, std::ios::end);
-    // Check Stream content length
-    ASSERT_EQ(rs.tellg() , ssize);
-    rs.seekg(0, std::ios::beg);
+  rs.seekg(0, std::ios::end);
+  // Check Stream content length
+  ASSERT_EQ(rs.tellg(), ssize);
+  rs.seekg(0, std::ios::beg);
 
-    std::string content;
-    content.reserve(res.GetSize());
-    char buffer[1024];
-    while (rs.read(buffer, sizeof(buffer))) {
-        content.append(buffer, sizeof(buffer));
-    }
-    content.append(buffer, static_cast<std::size_t>(rs.gcount()));
+  std::string content;
+  content.reserve(res.GetSize());
+  char buffer[1024];
+  while (rs.read(buffer, sizeof(buffer))) {
+    content.append(buffer, sizeof(buffer));
+  }
+  content.append(buffer, static_cast<std::size_t>(rs.gcount()));
 
-    ASSERT_TRUE(rs.eof());
-    ASSERT_EQ(content , fileData);
+  ASSERT_TRUE(rs.eof());
+  ASSERT_EQ(content, fileData);
 }
 
 TEST_F(BundleResourceTest, testBinaryResource)
 {
-    BundleResource res = testBundle.GetResource("/icons/cppmicroservices.png");
-    checkResourceInfo(res,
-        "/icons/",
-        "cppmicroservices",
-        "cppmicroservices",
-        "png",
-        "png",
-        2424,
-        false);
+  BundleResource res = testBundle.GetResource("/icons/cppmicroservices.png");
+  checkResourceInfo(res,
+                    "/icons/",
+                    "cppmicroservices",
+                    "cppmicroservices",
+                    "png",
+                    "png",
+                    2424,
+                    false);
 
-    BundleResourceStream rs(res, std::ios_base::binary);
-    rs.seekg(0, std::ios_base::end);
-    std::streampos resLength = rs.tellg();
-    rs.seekg(0);
+  BundleResourceStream rs(res, std::ios_base::binary);
+  rs.seekg(0, std::ios_base::end);
+  std::streampos resLength = rs.tellg();
+  rs.seekg(0);
 
-    std::ifstream png(
-        US_FRAMEWORK_SOURCE_DIR
-        "/test/bundles/libRWithResources/resources/icons/cppmicroservices.png",
-        std::ifstream::in | std::ifstream::binary);
+  std::ifstream png(
+    US_FRAMEWORK_SOURCE_DIR
+    "/test/bundles/libRWithResources/resources/icons/cppmicroservices.png",
+    std::ifstream::in | std::ifstream::binary);
 
-    ASSERT_TRUE(png.is_open());
+  ASSERT_TRUE(png.is_open());
 
-        png.seekg(0, std::ios_base::end);
-    std::streampos pngLength = png.tellg();
-    png.seekg(0);
-    ASSERT_EQ(res.GetSize(), resLength);
-    ASSERT_EQ(resLength, pngLength);
+  png.seekg(0, std::ios_base::end);
+  std::streampos pngLength = png.tellg();
+  png.seekg(0);
+  ASSERT_EQ(res.GetSize(), resLength);
+  ASSERT_EQ(resLength, pngLength);
 
-        char c1 = 0;
-    char c2 = 0;
-    bool isEqual = true;
-    int count = 0;
-    while (png.get(c1) && rs.get(c2)) {
-        ++count;
-        if (c1 != c2) {
-            isEqual = false;
-            break;
-        }
+  char c1 = 0;
+  char c2 = 0;
+  bool isEqual = true;
+  int count = 0;
+  while (png.get(c1) && rs.get(c2)) {
+    ++count;
+    if (c1 != c2) {
+      isEqual = false;
+      break;
     }
+  }
 
-    // Check if everything was read
-    ASSERT_EQ(count , pngLength);
-    ASSERT_TRUE(isEqual);
-    ASSERT_TRUE(png.eof());
+  // Check if everything was read
+  ASSERT_EQ(count, pngLength);
+  ASSERT_TRUE(isEqual);
+  ASSERT_TRUE(png.eof());
 }
 
 TEST_F(BundleResourceTest, testCompressedResource)
 {
-    BundleResource res = testBundle.GetResource("/icons/compressable.bmp");
-    checkResourceInfo(res,
-        "/icons/",
-        "compressable",
-        "compressable",
-        "bmp",
-        "bmp",
-        300122,
-        false);
+  BundleResource res = testBundle.GetResource("/icons/compressable.bmp");
+  checkResourceInfo(res,
+                    "/icons/",
+                    "compressable",
+                    "compressable",
+                    "bmp",
+                    "bmp",
+                    300122,
+                    false);
 
-    BundleResourceStream rs(res, std::ios_base::binary);
-    rs.seekg(0, std::ios_base::end);
-    std::streampos resLength = rs.tellg();
-    rs.seekg(0);
+  BundleResourceStream rs(res, std::ios_base::binary);
+  rs.seekg(0, std::ios_base::end);
+  std::streampos resLength = rs.tellg();
+  rs.seekg(0);
 
-    std::ifstream bmp(
-        US_FRAMEWORK_SOURCE_DIR
-        "/test/bundles/libRWithResources/resources/icons/compressable.bmp",
-        std::ifstream::in | std::ifstream::binary);
+  std::ifstream bmp(
+    US_FRAMEWORK_SOURCE_DIR
+    "/test/bundles/libRWithResources/resources/icons/compressable.bmp",
+    std::ifstream::in | std::ifstream::binary);
 
-    ASSERT_TRUE(bmp.is_open());
+  ASSERT_TRUE(bmp.is_open());
 
-        bmp.seekg(0, std::ios_base::end);
-    std::streampos bmpLength = bmp.tellg();
-    bmp.seekg(0);
-    // Check resource size
-    ASSERT_EQ(300122, resLength);
-    ASSERT_EQ(resLength, bmpLength);
+  bmp.seekg(0, std::ios_base::end);
+  std::streampos bmpLength = bmp.tellg();
+  bmp.seekg(0);
+  // Check resource size
+  ASSERT_EQ(300122, resLength);
+  ASSERT_EQ(resLength, bmpLength);
 
-        char c1 = 0;
-    char c2 = 0;
-    bool isEqual = true;
-    int count = 0;
-    while (bmp.get(c1) && rs.get(c2)) {
-        ++count;
-        if (c1 != c2) {
-            isEqual = false;
-            break;
-        }
+  char c1 = 0;
+  char c2 = 0;
+  bool isEqual = true;
+  int count = 0;
+  while (bmp.get(c1) && rs.get(c2)) {
+    ++count;
+    if (c1 != c2) {
+      isEqual = false;
+      break;
     }
+  }
 
-    ASSERT_EQ(count , bmpLength);
-    ASSERT_TRUE(isEqual);
-    ASSERT_TRUE(bmp.eof());
+  ASSERT_EQ(count, bmpLength);
+  ASSERT_TRUE(isEqual);
+  ASSERT_TRUE(bmp.eof());
 }
 
 TEST_F(BundleResourceTest, testResources)
 {
-    BundleResource foo = testBundle.GetResource("foo.ptxt");
-    ASSERT_TRUE(foo.IsValid());
+  BundleResource foo = testBundle.GetResource("foo.ptxt");
+  ASSERT_TRUE(foo.IsValid());
 
-    // Check resourse count
-    auto testBundleRL = cppmicroservices::testing::InstallLib(context, "TestBundleRL");
-    ASSERT_EQ(testBundleRL.FindResources("", "*.txt", true).size() , 2);
+  // Check resourse count
+  auto testBundleRL =
+    cppmicroservices::testing::InstallLib(context, "TestBundleRL");
+  ASSERT_EQ(testBundleRL.FindResources("", "*.txt", true).size(), 2);
 
-    auto testBundleRA = cppmicroservices::testing::InstallLib(context, "TestBundleRA");
-    ASSERT_EQ(testBundleRA.FindResources("", "*.txt", true).size(), 2);
+  auto testBundleRA =
+    cppmicroservices::testing::InstallLib(context, "TestBundleRA");
+  ASSERT_EQ(testBundleRA.FindResources("", "*.txt", true).size(), 2);
 }
 
-//TEST_F(BundleResourceTest, testResourceFromExecutable) // FIXXXX************************************
-//{
-//    BundleResource resource = executableBundle.GetResource("TestResource.ptxt");
-//    //ASSERT_TRUE(resource.IsValid());
-//
-//    std::string line;
-//    BundleResourceStream rs(resource);
-//    std::getline(rs, line);
-//    ASSERT_EQ(line, "meant to be compiled into the test driver");
-//}
-//
-//TEST_F(BundleResourceTest, testSpecialCharacters) // FIXXXX************************************
+TEST_F(BundleResourceTest, testResourceFromExecutable)
+{
+  BundleResource resource = executableBundle.GetResource("TestResource.ptxt");
+  ASSERT_TRUE(resource.IsValid());
+
+  std::string line;
+  BundleResourceStream rs(resource);
+  std::getline(rs, line);
+  ASSERT_EQ(line, "meant to be compiled into the test driver");
+}
+
+//TEST_F(BundleResourceTest, testSpecialCharacters) // FIXXXX***THIS*********************************
 //{
 //    BundleResource res = testBundle.GetResource("special_chars.dummy.ptxt");
 //    checkResourceInfo(res,
@@ -493,22 +493,22 @@ TEST_F(BundleResourceTest, testResources)
 //        "German Füße (feet)\nFrench garçon de café (waiter)";
 //#endif
 //
-//    BundleResourceStream rs(res);
+//  BundleResourceStream rs(res);
 //
-//    rs.seekg(0, std::ios_base::end);
-//    // Check Stream content length
-//    ASSERT_EQ(rs.tellg(), ssize);
-//    rs.seekg(0, std::ios_base::beg);
+//  rs.seekg(0, std::ios_base::end);
+//  // Check Stream content length
+//  ASSERT_EQ(rs.tellg(), ssize);
+//  rs.seekg(0, std::ios_base::beg);
 //
-//    std::string content;
-//    content.reserve(res.GetSize());
-//    char buffer[1024];
-//    while (rs.read(buffer, sizeof(buffer))) {
-//        content.append(buffer, sizeof(buffer));
-//    }
-//    content.append(buffer, static_cast<std::size_t>(rs.gcount()));
+//  std::string content;
+//  content.reserve(res.GetSize());
+//  char buffer[1024];
+//  while (rs.read(buffer, sizeof(buffer))) {
+//    content.append(buffer, sizeof(buffer));
+//  }
+//  content.append(buffer, static_cast<std::size_t>(rs.gcount()));
 //
-//    ASSERT_TRUE(rs.eof());
-//    //ASSERT_EQ(content , fileData); ************************************FIXXXXX**********
-//    //*************************************************************************************
+//  ASSERT_TRUE(rs.eof());
+//  //ASSERT_EQ(content , fileData); ************************************FIXXXXX**********
+//  //*************************************************************************************
 //}

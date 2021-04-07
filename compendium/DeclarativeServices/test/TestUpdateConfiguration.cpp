@@ -32,45 +32,46 @@ namespace test {
    */
 TEST_F(tServiceComponent, testUpdateConfig_Modified) //DS_CAI_FTC_1
 {
-  //Start bundle
-  std::string componentName = "sample::ServiceComponentCA1";
-  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA1");
+  // Start bundle
+  std::string componentName = "sample::ServiceComponentCA01";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA01");
 
-  //Use DS runtime service to get the component description and to validate the component state.
-  //It should be in the SATISFIED state because the configuration policy is optional.
-  //and component is delayed
+  // Use DS runtime service to get the component description and to validate the component state.
+  // It should be in the SATISFIED state because the configuration policy is optional.
+  // and component is delayed
   scr::dto::ComponentDescriptionDTO compDescDTO;
   auto compConfigs =
     GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
-  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED);
+  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
+    << "Component state should be SATISFIED";
 
-  //GetService to make component active
+  // GetService to make component active
   auto service = GetInstance<test::CAInterface>();
   ASSERT_TRUE(service) << "GetService failed for CAInterface";
 
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
-  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE);
+  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "Component state should be ACTIVE";
 
-  //Get a service reference to ConfigAdmin to update configuration objects
-  // Get a service reference to ConfigAdmin to create the component instance.
+  // Get a service reference to ConfigAdmin.
   auto configAdminService =
     GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
   ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
-  //Create configuration object
+  // Create configuration object
   auto configObject = configAdminService->GetConfiguration(componentName);
   auto configObjInstance = configObject->GetPid();
 
-  //Update property
+  // Update property
   cppmicroservices::AnyMap props(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
   configObject->Update(props);
 
-   //Validate that the correct properties were updated
+  // Validate that the correct properties were updated
   auto serviceProps = service->GetProperties();
   auto uniqueProp = serviceProps.find("uniqueProp");
 
@@ -78,16 +79,21 @@ TEST_F(tServiceComponent, testUpdateConfig_Modified) //DS_CAI_FTC_1
     << "uniqueProp not found in constructed instance";
   EXPECT_EQ(uniqueProp->second, instanceId);
 
-  //Component should still be active as modified method is present.
-  //The configuration is updated without deactivating and reactivating the service.
+  // Component should still be active as modified method is present.
+  // The configuration is updated without deactivating and reactivating the service.
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
-  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE);
+  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "Component state should be ACTIVE";
 }
 
+/**
+   * Verify that DS component is deactivated and reactivated with the new configuration, 
+   * when Modified method throws an exception, while updating a service's configuration.
+   */
 TEST_F(tServiceComponent, testUpdateConfig_Exception)
 {
-  // Start the test bundle containing the factory component name.
+  // Start the test bundle
   std::string componentName = "sample::ServiceComponentCA02";
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA02");
 
@@ -112,16 +118,16 @@ TEST_F(tServiceComponent, testUpdateConfig_Exception)
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   configObject->Update(props);
 
-  //Request a service reference to the new component instance.
+  // Request a service reference to the new component instance.
   auto service = GetInstance<test::CAInterface>();
   ASSERT_TRUE(service) << "GetService failed for CAInterface";
 
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
-    << "Factory instance state should be ACTIVE";
+    << "Component state should be ACTIVE";
 
-  //Update property
+  // Update property
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
   configObject->Update(props);
@@ -131,7 +137,7 @@ TEST_F(tServiceComponent, testUpdateConfig_Exception)
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
     << "Component state should be SATISFIED";
 
-  //This will cause DS to construct the instance with the updated properties.
+  // This will cause DS to construct the instance with the updated properties.
   auto newInstance = GetInstance<test::CAInterface>();
   ASSERT_TRUE(newInstance) << "GetService failed for CAInterface";
 

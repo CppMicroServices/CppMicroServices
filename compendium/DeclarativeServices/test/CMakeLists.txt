@@ -166,12 +166,6 @@ set(_test_bundles
   TestBundleDSSLE1
   TestBundleDSSLE2
   TestBundleDSTOI1
-  TestBundleDSTOI10
-  TestBundleDSTOI12
-  TestBundleDSTOI14
-  TestBundleDSTOI15
-  TestBundleDSTOI16
-  TestBundleDSTOI18
   TestBundleDSTOI2
   TestBundleDSTOI3
   TestBundleDSTOI5
@@ -179,16 +173,23 @@ set(_test_bundles
   TestBundleDSTOI7
   TestBundleDSTOI8
   TestBundleDSTOI9
+  TestBundleDSTOI10
+  TestBundleDSTOI12
+  TestBundleDSTOI14
+  TestBundleDSTOI15
+  TestBundleDSTOI16
+  TestBundleDSTOI18
+  TestBundleDSTOI19
   TestBundleDSCA1
+  TestBundleDSCA02
   TestBundleDSCA03
   TestBundleDSCA05
   TestBundleDSCA05a
   TestBundleDSCA07
   TestBundleDSCA07a
   TestBundleDSCA08
+  TestBundleDSCA09
   TestBundleDSCA20
-  TestBundleDSCA02
-  TestBundleDSTOI19
   EnglishDictionary
   )
 

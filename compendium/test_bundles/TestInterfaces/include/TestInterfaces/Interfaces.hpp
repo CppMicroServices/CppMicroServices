@@ -154,6 +154,17 @@ namespace test
       virtual cppmicroservices::AnyMap GetProperties() = 0;
       virtual ~CAInterface();
     };
+
+    //Use this interface in test bundles testing ConfigAdmin
+    //integration into DS to get information from the component instance
+    //and also information about dependency injection.
+    class US_TestInterfaces_EXPORT CAInterface1
+    {
+    public:
+      virtual cppmicroservices::AnyMap GetProperties() = 0;
+      virtual bool isDependencyInjected() = 0;
+      virtual ~CAInterface1();
+    };
     }
 
 #endif

@@ -5,7 +5,7 @@ namespace sample {
 
 void ServiceComponentCA02::Modified(
   const std::shared_ptr<ComponentContext>& /*context*/,
-  const std::shared_ptr<cppmicroservices::AnyMap>& configuration)
+  const std::shared_ptr<cppmicroservices::AnyMap>& /*configuration*/)
 {
 	throw std::runtime_error("Modified method exception");
 }

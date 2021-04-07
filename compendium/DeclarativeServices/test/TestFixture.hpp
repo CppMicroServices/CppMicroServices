@@ -78,28 +78,29 @@ public:
     test::InstallLib(context, "DSFrenchDictionary");
     test::InstallLib(context, "EnglishDictionary");
     test::InstallLib(context, "TestBundleDSTOI1");
-    test::InstallLib(context, "TestBundleDSTOI10");
-    test::InstallLib(context, "TestBundleDSTOI12");
-    test::InstallLib(context, "TestBundleDSTOI14");
-    test::InstallLib(context, "TestBundleDSTOI15");
-    test::InstallLib(context, "TestBundleDSTOI16");
-    test::InstallLib(context, "TestBundleDSTOI18");
     test::InstallLib(context, "TestBundleDSTOI2");
     test::InstallLib(context, "TestBundleDSTOI3");
     test::InstallLib(context, "TestBundleDSTOI5");
     test::InstallLib(context, "TestBundleDSTOI6");
     test::InstallLib(context, "TestBundleDSTOI7");
     test::InstallLib(context, "TestBundleDSTOI9");
+    test::InstallLib(context, "TestBundleDSTOI10");
+    test::InstallLib(context, "TestBundleDSTOI12");
+    test::InstallLib(context, "TestBundleDSTOI14");
+    test::InstallLib(context, "TestBundleDSTOI15");
+    test::InstallLib(context, "TestBundleDSTOI16");
+    test::InstallLib(context, "TestBundleDSTOI18");
+    test::InstallLib(context, "TestBundleDSTOI19");
     test::InstallLib(context, "TestBundleDSCA1");
+    test::InstallLib(context, "TestBundleDSCA02");
     test::InstallLib(context, "TestBundleDSCA03");
     test::InstallLib(context, "TestBundleDSCA05");
     test::InstallLib(context, "TestBundleDSCA05a");
     test::InstallLib(context, "TestBundleDSCA07");
     test::InstallLib(context, "TestBundleDSCA07a");
     test::InstallLib(context, "TestBundleDSCA08");
+    test::InstallLib(context, "TestBundleDSCA09");
     test::InstallLib(context, "TestBundleDSCA20");
-    test::InstallLib(context, "TestBundleDSTOI19");
-    test::InstallLib(context, "TestBundleDSCA02");
 #endif
 
 #ifndef US_BUILD_SHARED_LIBS

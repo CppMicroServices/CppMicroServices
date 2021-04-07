@@ -119,6 +119,7 @@ TEST_F(tServiceComponent, testRequiredConfigPolicy) // DS_CAI_FTC_6
   scr::dto::ComponentDescriptionDTO compDescDTO;
   auto compConfigs =
     GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   EXPECT_EQ(compConfigs.at(0).state,
             scr::dto::ComponentState::UNSATISFIED_REFERENCE)
     << "UNSATISFIED_REFERENCE is expected because configuration object is not "
@@ -140,6 +141,9 @@ TEST_F(tServiceComponent, testRequiredConfigPolicy) // DS_CAI_FTC_6
   configuration->Update(props);
 
   // Confirm configuration object presented and component is satisfied.
+  compConfigs =
+      GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
     << "SATISFIED is exepected since configuration object is created.";
 

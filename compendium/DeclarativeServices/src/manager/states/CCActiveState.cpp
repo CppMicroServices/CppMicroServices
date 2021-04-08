@@ -55,7 +55,9 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(
   // available but it won't be constructed until someone gets the service. In between those
   // two activities the configuration objects could change and the service registration properties
   // would be out of date.
-  mgr.SetRegistrationProperties();
+  if (instance) {
+      mgr.SetRegistrationProperties();
+  }
 
   if (!instance) {
     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,

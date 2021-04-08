@@ -86,10 +86,9 @@ set(_declarativeservices_tests
   TestServiceComponentRuntime.cpp
   TestServiceProvider.cpp
   TestSharedLibraryException.cpp
-  TestUpdateConfigurationWithoutModified.cpp
+  TestUpdateConfiguration.cpp
   ImportTestBundles.cpp
   TestBindingPolicies.cpp
-  TestUpdateConfiguration
   main.cpp
 )
 

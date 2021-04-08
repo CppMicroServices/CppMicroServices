@@ -11,9 +11,8 @@ namespace sample {
 class ServiceComponentCA07a : public test::CAInterface
 {
 public:
-  ServiceComponentCA07a(std::shared_ptr<cppmicroservices::AnyMap> props)
-    : properties(*props)
-  {}
+  ServiceComponentCA07a() = default;
+
   void Modified(const std::shared_ptr<ComponentContext>& context,
                 const std::shared_ptr<cppmicroservices::AnyMap>& configuration);
   cppmicroservices::AnyMap GetProperties();
@@ -22,7 +21,9 @@ public:
 
 private:
   std::mutex propertiesLock;
-  cppmicroservices::AnyMap properties;
+  cppmicroservices::AnyMap properties{
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS
+  };
 };
 }
 

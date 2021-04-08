@@ -15,8 +15,6 @@ public:
     : properties(*props)
     {}
 
-  void Modified(const std::shared_ptr<ComponentContext>& context,
-                const std::shared_ptr<cppmicroservices::AnyMap>& configuration);
   cppmicroservices::AnyMap GetProperties();
 
   ~ServiceComponentCA05a() = default;

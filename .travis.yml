@@ -89,22 +89,22 @@ jobs:
       - os: osx
         osx_image: xcode12.2
         compiler: clang
-        env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.15
+        env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=11.0
 
       - os: osx
         osx_image: xcode12.2
         compiler: clang
-        env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.15
+        env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=11.0
 
       - os: osx
         osx_image: xcode12.2
         compiler: clang
-        env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.15
+        env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=11.0
 
       - os: osx
         osx_image: xcode12.2
         compiler: clang
-        env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.15
+        env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=11.0
 
 # To generate codecov reports
 # pin xcode version back to 10.3 since 11.6 appears to break code coverage

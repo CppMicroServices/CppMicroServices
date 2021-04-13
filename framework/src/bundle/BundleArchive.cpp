@@ -55,6 +55,7 @@ const std::string BundleArchive::AUTOSTART_SETTING_ACTIVATION_POLICY =
 
 BundleArchive::BundleArchive()
   : storage(nullptr)
+  , numOpenResources(0)
   , bundleId(0)
   , manifest(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {}
@@ -69,6 +70,7 @@ BundleArchive::BundleArchive(
   : storage(storage)
   , resourceContainer(std::move(resourceContainer))
   , resourcePrefix(std::move(prefix))
+  , numOpenResources(0)
   , location(std::move(location))
   , bundleId(bundleId)
   , lastModified(now())
@@ -106,9 +108,11 @@ BundleResource BundleArchive::GetResource(const std::string& path) const
   if (!resourceContainer) {
     return BundleResource();
   }
+
   BundleResource result(path, this->shared_from_this());
-  if (result)
+  if (result) {
     return result;
+  }
   return BundleResource();
 }
 
@@ -135,6 +139,7 @@ std::vector<BundleResource> BundleArchive::FindResources(
                                filePattern.empty() ? "*" : filePattern,
                                recurse,
                                result);
+
   return result;
 }
 
@@ -167,9 +172,23 @@ std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
   return resourceContainer;
 }
 
+void BundleArchive::RegisterOpenedResource() const
+{
+  std::lock_guard<std::mutex> lock(numOpenResourcesMutex);
+  numOpenResources++;
+}
+
+void BundleArchive::UnregisterOpenedResource() const
+{
+  std::lock_guard<std::mutex> lock(numOpenResourcesMutex);
+  numOpenResources--;
+  if (numOpenResources == 0) {
+    resourceContainer->CloseContainer();
+  }
+}
+
 const AnyMap& BundleArchive::GetInjectedManifest() const
 {
   return manifest;
 }
-
 }

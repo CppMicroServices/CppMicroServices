@@ -1,4 +1,3 @@
-
 macro(build_and_test)
 
   set(CTEST_SOURCE_DIRECTORY ${US_SOURCE_DIR})

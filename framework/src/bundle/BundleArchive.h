@@ -25,6 +25,7 @@
 
 #include <chrono>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -153,6 +154,19 @@ struct BundleArchive : std::enable_shared_from_this<BundleArchive>
   std::shared_ptr<BundleResourceContainer> GetResourceContainer() const;
 
   /**
+   * Increment the number of open resources by one.
+   */
+  void RegisterOpenedResource() const;
+
+  /**
+   * Decrement the number of open resources by one.
+   *
+   * Note: If the number of opened resources is 0, then the ResourceContainer
+   *       associated with this BundleArchive object is closed.
+   */
+  void UnregisterOpenedResource() const;
+
+  /**
    * Return the manifest for the bundle in this bundlearchive.
    */
   const AnyMap& GetInjectedManifest() const;
@@ -161,6 +175,8 @@ private:
   BundleStorage* const storage;
   const std::shared_ptr<BundleResourceContainer> resourceContainer;
   const std::string resourcePrefix;
+  mutable uint32_t numOpenResources;
+  mutable std::mutex numOpenResourcesMutex;
   const std::string location;
 
   const long bundleId;

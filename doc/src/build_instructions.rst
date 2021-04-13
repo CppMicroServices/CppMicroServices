@@ -42,6 +42,23 @@ configuration options at hand.
    docs.cppmicroservices.org.
  - **US_BUILD_DOC_MAN** Build the man pages. This is typically only
    enabled on a Unix-like system.
+ - **US_ENABLE_ASAN** Enable the use of Address Sanitizer in builds of CppMicroServices.
+
+   .. note::
+
+      When this setting is enabled for a CppMicroServices build on Windows, the
+      US_ASAN_USER_DLL needs to be correctly set. This DLL is typically found at
+      the following location ($VS is the root Visual Studio install folder):
+      ``$VS\2019\Community\VC\Tools\MSVC\<version>\bin\Hostx64\x64\clang_rt.asan_dbg_dynamic-x86_64.dll``.
+
+      Additionally, ASAN for Visual Studio is only available in versions 16.9 or later. For
+      more information, please see
+      the `Microsoft documentation <https://docs.microsoft.com/en-us/cpp/sanitizers/asan?view=msvc-160>`.
+
+ - **US_ASAN_USER_DLL** The path to the ASAN DLL which Microsoft Visual Studio ships.
+   This value should only be set on Windows.
+ - **US_ENABLE_TSAN** Enable the use of Thread Sanitizer in builds of CppMicroServices.
+   This boolean should only be set on Linux or Mac.
  - **US_USE_SYSTEM_GTEST** Build using an existing installation of Google Test.
  - **GTEST_ROOT** Specify the root directory of the Google Test framework
    installation to use when building and running tests.

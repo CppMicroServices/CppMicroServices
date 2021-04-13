@@ -157,7 +157,7 @@ TEST_F(tServiceComponent, testUpdateConfig_Exception)
 TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodImmediate) // DS_CAI_FTC_3
 {
   // Start the test bundle containing the component name.
-  std::string componentName = "sample::ServiceComponentCA03";
+  std::string componentName           = "sample::ServiceComponentCA03";
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA03");
 
   // Use DS runtime service to validate the component state
@@ -189,10 +189,11 @@ TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodImmediate) // DS
     props[uniqueProp[i]] = instance[i];
     configuration->Update(props);
 
+    compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
     EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
     EXPECT_EQ(compConfigs.at(0).state,
-              scr::dto::ComponentState::UNSATISFIED_REFERENCE)
-      << "Component instance state should be UNSATISFIED_REFERENCE";
+              scr::dto::ComponentState::ACTIVE)
+      << "Component instance state should be ACTIVE";
 
     // Request a service reference to the new component instance. This will
     // cause DS to construct the instance with the updated properties.
@@ -210,6 +211,7 @@ TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodImmediate) // DS
     // Deactivation of the component
     configuration->Remove();
 
+    compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
     EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
     EXPECT_EQ(compConfigs.at(0).state,
               scr::dto::ComponentState::UNSATISFIED_REFERENCE)
@@ -218,5 +220,59 @@ TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodImmediate) // DS
     ++i;
   }
 } // end of testUpdateConfigWithoutModifiedMethodImmediate
+
+/**
+  *  Test component instance won't be constructed or activated until requested.
+  */
+TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodDelayed)  // DS_CAI_FTC_4
+{
+  // Start the test bundle containing the component name.
+  std::string componentName           = "sample::ServiceComponentCA04";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA04");
+
+  // Use DS runtime service to validate the component state
+  scr::dto::ComponentDescriptionDTO compDescDTO;
+  auto compConfigs =
+    GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
+  EXPECT_EQ(compConfigs.at(0).state,
+            scr::dto::ComponentState::UNSATISFIED_REFERENCE)
+    << "The state should be UNSATISFIED_REFERENCE.";
+
+  // Get a service reference to ConfigAdmin to create the component instance.
+  auto configAdminService =
+    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+  ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+
+  // Create configuration object and update property.
+  auto configuration  = configAdminService->GetConfiguration(componentName);
+  auto configInstance = configuration->GetPid();
+
+  cppmicroservices::AnyMap props(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  const std::string instanceId{ "instance1" };
+  props["uniqueProp"] = instanceId;
+  configuration->Update(props);
+
+  // GetService to make component active.
+  auto instance = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(instance) << "GetService failed for CAInterface.";
+
+  // Confirm configuration object presented and check component state.
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
+  EXPECT_EQ(compConfigs.at(0).state,
+            scr::dto::ComponentState::ACTIVE)
+    << "Component instance state should be ACTIVE.";
+
+  // Confirm component instance was created with the correct properties.
+  auto instanceProps = instance->GetProperties();
+  auto uniqueProp    = instanceProps.find("uniqueProp");
+
+  ASSERT_TRUE(uniqueProp != instanceProps.end())
+    << "uniqueProp not found in constructed instance.";
+  EXPECT_EQ(uniqueProp->second, instanceId);
+
+} // end of testUpdateConfig_WithoutModifiedMethodDelayed
 
 }

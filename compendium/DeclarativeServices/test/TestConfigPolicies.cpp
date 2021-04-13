@@ -87,6 +87,7 @@ TEST_F(tServiceComponent, testOptionalConfigPolicyWithConfigObj) // DS_CAI_FTC_5
   configuration->Update(props);
 
   // Confirm configuration object presented and  check component state.
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
     << "Component instance state should be SATISFIED.";
@@ -137,8 +138,9 @@ TEST_F(tServiceComponent, testRequiredConfigPolicy) // DS_CAI_FTC_6
   configuration->Update(props);
 
   // Confirm configuration object presented and  check component state.
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
-  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::UNSATISFIED_REFERENCE)
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
     << "SATISFIED is exepected since configuration object is created.";
 
   // GetService to make component active.
@@ -217,9 +219,10 @@ TEST_F(tServiceComponent, testIgnoreConfigPolicyWithConfigObj) // DS_CAI_FTC_7
   configuration->Update(props);
 
   // Confirm configuration object presented and  check component state.
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
-    << "SATISFIED is exepected since configuration object is created.";
+    << "ACTIVE is exepected since configuration object is created.";
 
   // GetService to make component active.
   auto instance = GetInstance<test::CAInterface>();

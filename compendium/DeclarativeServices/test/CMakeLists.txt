@@ -182,6 +182,7 @@ set(_test_bundles
   TestBundleDSCA01
   TestBundleDSCA02
   TestBundleDSCA03
+  TestBundleDSCA04
   TestBundleDSCA05
   TestBundleDSCA05a
   TestBundleDSCA07

@@ -221,7 +221,7 @@ us_cache_var(CMAKE_DEBUG_POSTFIX d STRING "Executable and library debug name pos
 us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
 us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)
 us_cache_var(US_ENABLE_ASAN OFF BOOL "Enable asan (address sanitizer)" ADVANCED)
-us_cache_var(US_ASAN_USER_DLL "" STRING "Path to asan dll" ADVANCED)
+us_cache_var(US_ASAN_USER_DLL "" STRING "Path to ASAN DLL (Windows only)" ADVANCED)
 us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")

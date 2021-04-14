@@ -1,0 +1,16 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSCA15",
+    "scr" : {
+        "version" : 1,
+         "components" : [{
+            "enabled" : true,
+            "immediate": true,
+            "implementation-class": "sample::ServiceComponentCA15",
+            "configuration-pid" : ["sample::ServiceComponentCA15"],
+            "inject-references" : false,
+            "service": {
+              "interfaces": [ "test::CAInterface" ]
+            }
+        }]
+    }
+}

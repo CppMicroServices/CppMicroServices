@@ -32,10 +32,10 @@
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
 
+#include "TestUtils.hpp"
+#include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
-#include "cppmicroservices/cm/ConfigurationAdmin.hpp"
-#include "TestUtils.hpp"
 #include <chrono>
 
 namespace test {
@@ -101,6 +101,8 @@ public:
     test::InstallLib(context, "TestBundleDSCA07a");
     test::InstallLib(context, "TestBundleDSCA08");
     test::InstallLib(context, "TestBundleDSCA09");
+    test::InstallLib(context, "TestBundleDSCA14");
+    test::InstallLib(context, "TestBundleDSCA15");
     test::InstallLib(context, "TestBundleDSCA20");
 #endif
 
@@ -168,8 +170,7 @@ public:
     scr::dto::ComponentDescriptionDTO compDescDTO)
   {
     compDescDTO =
-      dsRuntimeService->GetComponentDescriptionDTO(testBundle,
-                                                   componentName);
+      dsRuntimeService->GetComponentDescriptionDTO(testBundle, componentName);
     EXPECT_EQ(compDescDTO.implementationClass, componentName)
       << "Implementation class in the returned component description must be "
       << componentName;
@@ -181,7 +182,6 @@ public:
   //std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin>  configAdminService;
   cppmicroservices::Framework framework;
   cppmicroservices::BundleContext context;
-
 };
 
 }

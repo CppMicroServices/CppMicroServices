@@ -66,6 +66,7 @@ set(_declarativeservices_tests
   TestCounterLatch.cpp
   TestFactoryPid.cpp
   TestConfigPolicies.cpp
+  TestManifestWithInvalidConfiguration.cpp
   TestMetadataParserFactory.cpp
   TestMetadataParserImplV1.cpp
   TestReferenceManagerImpl.cpp
@@ -189,6 +190,8 @@ set(_test_bundles
   TestBundleDSCA07a
   TestBundleDSCA08
   TestBundleDSCA09
+  TestBundleDSCA14
+  TestBundleDSCA15
   TestBundleDSCA20
   EnglishDictionary
   )

@@ -109,8 +109,8 @@ TEST_F(tServiceComponent, testOptionalConfigPolicyWithConfigObj) // DS_CAI_FTC_5
 TEST_F(tServiceComponent, testRequiredConfigPolicy) // DS_CAI_FTC_6
 {
   // Start the test bundle containing the component name.
-  std::string componentName           = "sample::ServiceComponentCA20";
-  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA20");
+  std::string componentName           = "sample::ServiceComponentCA02";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA02");
 
   // Use DS runtime service to validate the component state.
   scr::dto::ComponentDescriptionDTO compDescDTO;

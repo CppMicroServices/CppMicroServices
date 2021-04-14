@@ -183,6 +183,19 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
   if (compMetadata->configurationPolicy == CONFIG_POLICY_IGNORE) {
     compMetadata->configurationPids.clear();
   }
+  // component.factory
+  ObjectValidator(metadata, "factory", /*isOptional=*/true).AssignValueTo(compMetadata->factory);
+
+  // component.factoryProperties
+  object = ObjectValidator(metadata, "factory-properties", /*isOptional=*/true);
+  if (object.KeyExists())
+  {
+      const auto props = object.GetValue<AnyMap>();
+      for (const auto& prop : props)
+      {
+          compMetadata->factoryProperties.insert(prop);
+      }
+  }
 
   // component.properties
   object = ObjectValidator(metadata, "properties", /*isOptional=*/true);

@@ -8,7 +8,11 @@
             "implementation-class": "sample::ServiceComponentCA20",
             "configuration-policy" : "require",
             "configuration-pid" : ["sample::ServiceComponentCA20"],
-            "service": {
+            "factory" : "factory id",
+             "factory-properties" : {
+                 "abc" : "123"
+            },
+             "service": {
                 "interfaces": ["test::CAInterface"]
             }
         }]

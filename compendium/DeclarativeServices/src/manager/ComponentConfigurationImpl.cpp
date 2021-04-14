@@ -39,6 +39,7 @@
 using cppmicroservices::scrimpl::ReferenceManagerImpl;
 using cppmicroservices::service::component::ComponentConstants::COMPONENT_ID;
 using cppmicroservices::service::component::ComponentConstants::COMPONENT_NAME;
+using cppmicroservices::service::component::ComponentConstants::COMPONENT_FACTORY;
 using cppmicroservices::service::component::ComponentConstants::CONFIG_POLICY_IGNORE;
 using cppmicroservices::service::component::ComponentConstants::CONFIG_POLICY_OPTIONAL;
 
@@ -126,21 +127,30 @@ void ComponentConfigurationImpl::Stop()
 std::unordered_map<std::string, cppmicroservices::Any>
 ComponentConfigurationImpl::GetProperties() const
 {
+    if (metadata->factory.empty()) {
+        // This is not a factory component
+        // Start with component properties
+        auto props = metadata->properties;
 
-  // Start with service properties
-  auto props = metadata->properties;
+        // If configuration object dependencies exist, use merged componente and configuration object properties.
+        if (configManager != nullptr) {
+            props.clear();
+            for (auto item : configManager->GetProperties()) {
+                props.emplace(item.first, item.second);
+            }
+        }
 
-  // If configuration object dependencies exist, use merged service and configuration properties.
-  if (configManager != nullptr) {
-    props.clear();
-    for (auto item : configManager->GetProperties()) {
-      props.emplace(item.first, item.second);
+        props.emplace(COMPONENT_NAME, Any(this->metadata->name));
+        props.emplace(COMPONENT_ID, Any(configID));
+        return props;
     }
-  }
-
-  props.emplace(COMPONENT_NAME, Any(this->metadata->name));
-  props.emplace(COMPONENT_ID, Any(configID));
-  return props;
+    else {
+        //This is  a factory component
+        auto props = metadata->factoryProperties;
+        props.emplace(COMPONENT_NAME, Any(this->metadata->name));
+        props.emplace(COMPONENT_FACTORY, Any(this->metadata->factory));
+        return props;
+    }
 }
 void ComponentConfigurationImpl::SetRegistrationProperties()
 {

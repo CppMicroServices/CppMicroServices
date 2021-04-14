@@ -62,7 +62,9 @@ struct ComponentMetadata
   static const std::string CONFIG_POLICY_REQUIRE;
   static const std::string CONFIG_POLICY_OPTIONAL;
   std::vector<std::string> configurationPids;
- 
+  std::string factory;
+  std::unordered_map<std::string, cppmicroservices::Any> factoryProperties;
+
 };
 }
 }

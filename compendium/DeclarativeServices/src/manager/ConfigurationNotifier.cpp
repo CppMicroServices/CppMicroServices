@@ -106,6 +106,10 @@ bool ConfigurationNotifier::AnyListenersForPid(const std::string& pid) noexcept
       auto listener = iter->second->begin();
 
       mgr = listener->second.mgr;
+      if (mgr->GetMetadata()->factory.empty()) {
+          // The component in our listener's map is not a factory component.
+          return false;
+      }
   } //release listenersMapHandle lock
     CreateFactoryComponent(factoryName, pid, mgr);
    return true;
@@ -119,6 +123,7 @@ void ConfigurationNotifier::CreateFactoryComponent(
   auto newMetadata = std::make_shared<ComponentMetadata>(*oldMetadata);
   
   newMetadata->name = pid;
+  newMetadata->factory = ""; // this is a factory instance not a factory component
 
   // Factory instance is dependent on the same configurationPids as the factory 
   // component except the factory component itself. 

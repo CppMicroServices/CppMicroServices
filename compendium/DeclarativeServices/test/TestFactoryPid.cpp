@@ -45,7 +45,14 @@ TEST_F(tServiceComponent, testFactoryPidConstruction)
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::UNSATISFIED_REFERENCE) 
       << "factory component state should be UNSATISIFIED_REFERENCE";
-  
+  auto factoryProps = compConfigs.at(0).properties;
+ 
+  auto factoryProp = factoryProps.find("component.factory");
+  ASSERT_TRUE(factoryProp != factoryProps.end())
+      << "factoryProp not found in factory properties";
+  const std::string factoryId{ "factory id" };
+  EXPECT_EQ(factoryProp->second, factoryId);
+
  // Get a service reference to ConfigAdmin to create the factory component instance.
   auto configAdminService =
     GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();

@@ -64,6 +64,13 @@ US_ServiceComponent_EXPORT extern const std::string COMPONENT_NAME;
 US_ServiceComponent_EXPORT extern const std::string COMPONENT_ID;
 
 /**
+ * A service registration property for a Component Factory that contains the
+ * value of the {@code factory} attribute. The value of this property must
+ * be of type {@code std::string}.
+ */
+US_ServiceComponent_EXPORT extern const std::string COMPONENT_FACTORY;
+
+/**
  * The suffix for reference target properties. These properties contain the
  * filter to select the target services for a reference. The value of this
  * property must be of type {@code std::string}.

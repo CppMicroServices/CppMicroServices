@@ -273,8 +273,25 @@ public:
     }
   }
 
+  /**
+   * return the iterator to the value referenced by key
+   */
   const_iterator find(const key_type& key) const;
 
+  /**
+   * Erase entry for value for 'key'
+   * @param key the key for the entry to Erase
+   * @return the number of elements erased.
+   */ 
+  size_type erase(const key_type& key);
+
+  /**
+   * Compare the content of this map with those of rhs
+   * @param rhs an any_map to compare
+   * @return bool true rhs contains the same content as this
+   */
+  bool operator==(const any_map& rhs) const;
+  bool operator!=(const any_map& rhs) const { return !(operator==(rhs)); }
 protected:
   map_type type;
 

@@ -252,3 +252,44 @@ TEST(AnyTest, AnyBadAnyCastException) {
   EXPECT_THROW(ref_any_cast<std::string>(uncastableAny),
                cppmicroservices::BadAnyCastException);
 }
+
+TEST(AnyTest, FromJSON) {
+
+  std::string str1 = R"({
+    "map" : {
+      "1" : 0.3, 
+      "3" : "bonjour", 
+      "4" : {}, 
+      "5" : []
+    }, 
+    "number" : 5, 
+    "vector" : [
+      9,
+      8,
+      7
+    ]
+  })";
+
+  std::string str2 = R"({
+    "number" : 5, 
+    "vector" : [
+      9,
+      8,
+      7
+    ],
+    "map" : {
+      "1" : 0.3, 
+      "3" : "bonjour", 
+      "4" : {}, 
+      "5" : []
+    }
+  })";
+
+  auto v1 = Any::FromJSON(str1);
+  auto v2 = Any::FromJSON(str2);
+
+  std::cout << "V1: " << v1.ToJSON() << std::endl;
+  std::cout << "V2: " << v2.ToJSON() << std::endl;
+  
+  EXPECT_EQ(v1,v2);
+}

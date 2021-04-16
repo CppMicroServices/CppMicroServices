@@ -26,9 +26,24 @@
 #include "BundleResourceContainer.h"
 #include "cppmicroservices/FrameworkExport.h"
 
+#include <rapidjson/document.h>
+
 #include <string>
 
 namespace cppmicroservices {
+
+namespace json {
+
+using AnyOrderedMap = std::map<std::string, Any>;
+using AnyVector = std::vector<Any>;
+
+void ParseObject(const rapidjson::Value& jsonObject, AnyMap& anyMap);
+void ParseObject(const rapidjson::Value& jsonObject, AnyOrderedMap& anyMap);
+void ParseArray(const rapidjson::Value& jsonArray, AnyVector& anyVector, bool ci);
+Any ParseValue(const rapidjson::Value& jsonValue, bool ci);
+
+}
+
 
 //-------------------------------------------------------------------
 // File type checking

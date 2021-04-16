@@ -31,6 +31,9 @@
 #include "BundleResourceContainer.h"
 #include "CoreBundleContext.h"
 
+#include <rapidjson/error/en.h>
+#include <rapidjson/istreamwrapper.h>
+
 #include <string>
 #include <typeinfo>
 #include <vector>
@@ -40,6 +43,78 @@
 #endif
 
 namespace cppmicroservices {
+
+namespace json {
+
+Any ParseValue(const rapidjson::Value& jsonValue, bool ci)
+{
+  if (jsonValue.IsObject()) {
+    if (ci) {
+      Any any = AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+      ParseObject(jsonValue, ref_any_cast<AnyMap>(any));
+      return any;
+    } else {
+      Any any = AnyOrderedMap();
+      ParseObject(jsonValue, ref_any_cast<AnyOrderedMap>(any));
+      return any;
+    }
+  } else if (jsonValue.IsArray()) {
+    Any any = AnyVector();
+    ParseArray(jsonValue, ref_any_cast<AnyVector>(any), ci);
+    return any;
+  } else if (jsonValue.IsString()) {
+    // We do not support attribute localization yet, so we just
+    // always remove the leading '%' character.
+    std::string val = jsonValue.GetString();
+    if (!val.empty() && val[0] == '%')
+      val = val.substr(1);
+
+    return Any(val);
+  } else if (jsonValue.IsBool()) {
+    return Any(jsonValue.GetBool());
+  } else if (jsonValue.IsInt()) {
+    return Any(jsonValue.GetInt());
+  } else if (jsonValue.IsUint64()) {
+    return Any(jsonValue.GetUint64());
+  } else if (jsonValue.IsDouble()) {
+    return Any(jsonValue.GetDouble());
+  }
+
+  return Any();
+}
+
+void ParseObject(const rapidjson::Value& jsonObject, AnyOrderedMap& anyMap)
+{
+  for (const auto& m : jsonObject.GetObject()) {
+    Any anyValue = ParseValue(m.value, false);
+    if (!anyValue.Empty()) {
+      anyMap.emplace(m.name.GetString(), std::move(anyValue));
+    }
+  }
+}
+
+void ParseObject(const rapidjson::Value& jsonObject, AnyMap& anyMap)
+{
+  for (const auto& m : jsonObject.GetObject()) {
+    Any anyValue = ParseValue(m.value, true);
+    if (!anyValue.Empty()) {
+      anyMap.emplace(m.name.GetString(), std::move(anyValue));
+    }
+  }
+}
+
+void ParseArray(const rapidjson::Value& jsonArray, AnyVector& anyVector, bool ci)
+{
+  for (const auto& jsonValue : jsonArray.GetArray()) {
+    Any anyValue = ParseValue(jsonValue, ci);
+    if (!anyValue.Empty()) {
+      anyVector.emplace_back(std::move(anyValue));
+    }
+  }
+}
+
+}
+
 
 //-------------------------------------------------------------------
 // Bundle name and location parsing

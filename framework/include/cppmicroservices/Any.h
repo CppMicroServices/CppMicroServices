@@ -365,6 +365,8 @@ public:
     return _content ? _content->Type() : typeid(void);
   }
 
+  static Any FromJSON(std::string const& json);
+  static Any FromJSON(std::istream& json);
 private:
   class Placeholder
   {

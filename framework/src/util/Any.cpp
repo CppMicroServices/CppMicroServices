@@ -22,6 +22,8 @@
 
 #include "cppmicroservices/Any.h"
 #include "Utils.h"
+#include <rapidjson/error/en.h>
+#include <rapidjson/istreamwrapper.h>
 
 #include <stdexcept>
 #include <iomanip>
@@ -118,4 +120,21 @@ std::string Any::ToStringNoExcept() const
 {
   return Empty() ? std::string() : _content->ToString();
 }
+
+Any Any::FromJSON(std::string const& json)
+{
+  std::stringstream jsonStream { json };
+  return FromJSON(jsonStream);
+}
+
+Any Any::FromJSON(std::istream& json)
+{
+  rapidjson::IStreamWrapper jsonStream(json);
+  rapidjson::Document root;
+  if (root.ParseStream(jsonStream).HasParseError()) {
+    throw std::runtime_error(rapidjson::GetParseError_En(root.GetParseError()));
+  }
+  return json::ParseValue(root, true);
+}
+
 }

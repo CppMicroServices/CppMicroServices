@@ -471,44 +471,44 @@ TEST_F(BundleResourceTest, testResourceFromExecutable)
   ASSERT_EQ(line, "meant to be compiled into the test driver");
 }
 
-//TEST_F(BundleResourceTest, testSpecialCharacters) // FIXXXX***THIS*********************************
-//{
-//    BundleResource res = testBundle.GetResource("special_chars.dummy.ptxt");
-//    checkResourceInfo(res,
-//        "/",
-//        "special_chars",
-//        "special_chars.dummy",
-//        "ptxt",
-//        "dummy.ptxt",
-//        54,
-//        false);
-//
-//#ifdef US_PLATFORM_WINDOWS
-//    const std::streampos ssize(54);
-//    const std::string fileData =
-//        "German Füße (feet)\nFrench garçon de café (waiter)\n";
-//#else
-//    const std::streampos ssize(53);
-//    const std::string fileData =
-//        "German Füße (feet)\nFrench garçon de café (waiter)";
-//#endif
-//
-//  BundleResourceStream rs(res);
-//
-//  rs.seekg(0, std::ios_base::end);
-//  // Check Stream content length
-//  ASSERT_EQ(rs.tellg(), ssize);
-//  rs.seekg(0, std::ios_base::beg);
-//
-//  std::string content;
-//  content.reserve(res.GetSize());
-//  char buffer[1024];
-//  while (rs.read(buffer, sizeof(buffer))) {
-//    content.append(buffer, sizeof(buffer));
-//  }
-//  content.append(buffer, static_cast<std::size_t>(rs.gcount()));
-//
-//  ASSERT_TRUE(rs.eof());
-//  //ASSERT_EQ(content , fileData); ************************************FIXXXXX**********
-//  //*************************************************************************************
-//}
+// Note: Following test has broken encoding 
+TEST_F(BundleResourceTest, testSpecialCharacters)
+{
+  BundleResource res = testBundle.GetResource("special_chars.dummy.ptxt");
+  checkResourceInfo(res,
+                    "/",
+                    "special_chars",
+                    "special_chars.dummy",
+                    "ptxt",
+                    "dummy.ptxt",
+                    54,
+                    false);
+
+#ifdef US_PLATFORM_WINDOWS
+  const std::streampos ssize(54);
+  const std::string fileData =
+    "German FÃ¼ÃŸe (feet)\nFrench garÃ§on de cafÃ© (waiter)\n";
+#else
+  const std::streampos ssize(53);
+  const std::string fileData =
+    "German FÃ¼ÃŸe (feet)\nFrench garÃ§on de cafÃ© (waiter)";
+#endif
+
+  BundleResourceStream rs(res);
+
+  rs.seekg(0, std::ios_base::end);
+  // Check Stream content length
+  ASSERT_EQ(rs.tellg(), ssize);
+  rs.seekg(0, std::ios_base::beg);
+
+  std::string content;
+  content.reserve(res.GetSize());
+  char buffer[1024];
+  while (rs.read(buffer, sizeof(buffer))) {
+    content.append(buffer, sizeof(buffer));
+  }
+  content.append(buffer, static_cast<std::size_t>(rs.gcount()));
+
+  ASSERT_TRUE(rs.eof());
+  ASSERT_EQ(content, fileData);
+}

@@ -34,7 +34,6 @@ set(_tests
   LogTest
   BundleHooksTest
   BundleTest
-  BundleResourceTest
   MemcheckTest
   MultipleListenersTest
   ResourceCompilerTest

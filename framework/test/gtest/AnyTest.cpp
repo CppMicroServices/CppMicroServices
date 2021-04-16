@@ -297,7 +297,6 @@ TEST(AnyTest, AnyEquality) {
   EXPECT_NE(lhs, rhs); // and finally, with the "int" element erased, they should not be equal
                        // anymore. 
 }
-
 TEST(AnyTest, FromJSON) {
 
   std::string str1 = R"({

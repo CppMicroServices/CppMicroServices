@@ -45,6 +45,8 @@
 namespace cppmicroservices {
 
 namespace json {
+// Functions to parse rapid json values and turn them into our internal representations. Moved from
+// BundleManifest.cpp to allow Any::FromJSON to call them.
 
 Any ParseValue(const rapidjson::Value& jsonValue, bool ci)
 {

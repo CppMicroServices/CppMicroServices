@@ -121,20 +121,25 @@ std::string Any::ToStringNoExcept() const
   return Empty() ? std::string() : _content->ToString();
 }
 
-Any Any::FromJSON(std::string const& json)
+Any Any::FromJSON(std::string const& json, bool use_ci_map_keys)
 {
   std::stringstream jsonStream { json };
-  return FromJSON(jsonStream);
+  return FromJSON(jsonStream, use_ci_map_keys);
 }
 
-Any Any::FromJSON(std::istream& json)
+Any Any::FromJSON(std::istream& json, bool use_ci_map_keys)
 {
+  // use RapidJSON to parse the input stream. 
   rapidjson::IStreamWrapper jsonStream(json);
   rapidjson::Document root;
   if (root.ParseStream(jsonStream).HasParseError()) {
+    // There was a parse error, so throw a runtime_error explaining the problem.
     throw std::runtime_error(rapidjson::GetParseError_En(root.GetParseError()));
   }
-  return json::ParseValue(root, true);
+
+  // Walk the resulting rapid json document tree converting it into our Any data structures and
+  // return the results.
+  return json::ParseValue(root, use_ci_map_keys);
 }
 
 }

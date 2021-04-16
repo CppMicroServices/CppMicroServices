@@ -33,6 +33,9 @@
 namespace cppmicroservices {
 
 namespace json {
+// Declarations for utility functions to convert rapidjson values to our internal
+// representation. These used to be implemented privately for BundleManifest, but are now used also
+// for Any::FromJSON.
 
 using AnyOrderedMap = std::map<std::string, Any>;
 using AnyVector = std::vector<Any>;

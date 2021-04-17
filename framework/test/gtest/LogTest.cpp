@@ -22,7 +22,7 @@
 
 #include "cppmicroservices/detail/Log.h"
 
-#include "TestingMacros.h"
+#include "gtest/gtest.h"
 
 #include <algorithm>
 #include <fstream>
@@ -34,7 +34,7 @@
 
 using namespace cppmicroservices;
 
-void testDefaultLogMessages()
+TEST(LogTest, testDefaultLogMessages)
 {
   std::stringstream temp_buf;
   auto clog_buf = std::clog.rdbuf();
@@ -46,38 +46,34 @@ void testDefaultLogMessages()
 
   std::clog.rdbuf(clog_buf);
 
-  US_TEST_CONDITION_REQUIRED(
-    std::string::npos !=
-      temp_buf.str().find(std::string("blaaaaaaaaaaaaaaaaaah\n")),
-    "Test default log sink");
-  US_TEST_CONDITION_REQUIRED(std::string::npos !=
-                               temp_buf.str().find(std::string(__FUNCTION__)),
-                             "Test default log sink macro");
-  US_TEST_CONDITION_REQUIRED(std::string::npos !=
-                               temp_buf.str().find(std::string(__FILE__)),
-                             "Test default log sink macro");
+  //Test default log sink
+  ASSERT_NE(std::string::npos,
+            temp_buf.str().find(std::string("blaaaaaaaaaaaaaaaaaah\n")));
+
+  //Test default log sink macro
+  ASSERT_NE(std::string::npos, temp_buf.str().find(std::string(__FUNCTION__)));
+  ASSERT_NE(std::string::npos, temp_buf.str().find(std::string(__FILE__)));
 }
 
-void testLogDisabled()
+TEST(LogTest, testLogDisabled)
 {
   // A null (i.e. disabled logger) shouldn't throw when used.
   detail::LogSink sink_null(nullptr);
-  try {
-    sink_null.Log(std::string("Don't log me"));
-    DIAG_LOG(sink_null) << "Shouldn't see this...";
-  } catch (...) {
-    US_TEST_FAILED_MSG(<< "Using a nullptr log sink threw an exception.");
-  }
+
+  EXPECT_NO_THROW(sink_null.Log(std::string("Don't log me")))
+    << "Using a nullptr log sink threw an exception.";
+  EXPECT_NO_THROW(DIAG_LOG(sink_null));
 
   std::ostringstream empty_stream;
   detail::LogSink sink_disabled(&empty_stream);
   DIAG_LOG(sink_disabled) << "Now you see me...";
   sink_disabled.Log(std::string("Now you don't"));
-  US_TEST_CONDITION_REQUIRED(empty_stream.str().empty(),
-                             "Test disabled log sink.");
+
+  //Test disabled log sink
+  ASSERT_TRUE(empty_stream.str().empty());
 }
 
-void testLogRedirection()
+TEST(LogTest, testLogRedirection)
 {
   const char* test_filename = "foo.txt";
   std::ofstream filestream(test_filename, std::ofstream::trunc);
@@ -87,11 +83,10 @@ void testLogRedirection()
 
   detail::LogSink sink_stringstream(&stringstream, true);
   DIAG_LOG(sink_stringstream) << test_log_output.str();
-  US_TEST_CONDITION_REQUIRED(!stringstream.str().empty(),
-                             "Test redirected stringstream log sink.");
-  US_TEST_CONDITION_REQUIRED(std::string::npos !=
-                               stringstream.str().find(test_log_output.str()),
-                             "Test redirected stringstream log sink.");
+
+  //Test redirected stringstream log sink
+  ASSERT_FALSE(stringstream.str().empty());
+  ASSERT_NE(std::string::npos, stringstream.str().find(test_log_output.str()));
 
   detail::LogSink sink_file(&filestream, true);
   DIAG_LOG(sink_file) << test_log_output.str();
@@ -101,30 +96,24 @@ void testLogRedirection()
   std::stringstream test_output_stream;
   test_file >> test_output_stream.rdbuf();
 
-  US_TEST_CONDITION_REQUIRED(!test_output_stream.str().empty(),
-                             "Test redirected filestream log sink.");
-  US_TEST_CONDITION_REQUIRED(
-    std::string::npos != test_output_stream.str().find(test_log_output.str()),
-    "Test redirected filestream log sink.");
+  //Test redirected filestream log sink
+  ASSERT_FALSE(test_output_stream.str().empty());
+  ASSERT_NE(std::string::npos,
+            test_output_stream.str().find(test_log_output.str()));
 
   test_file.close();
   if (std::remove(test_filename) != 0) {
     detail::LogSink sink_err(&std::cerr, true);
-    DIAG_LOG(sink_err) << "Failed to remove" << test_filename;
+    DIAG_LOG(sink_err)
+      << "Failed to remove " << test_filename
+      << "\nAbove message is as expected with 'DIAG_LOG(sink_err)'\n";
   }
 
   // A null (i.e. disabled logger) shouldn't throw when used.
   detail::LogSink sink_null(nullptr, true);
-  try {
-    DIAG_LOG(sink_null) << test_log_output.str();
-  } catch (...) {
-    US_TEST_FAILED_MSG(<< "Using a nullptr log sink threw an exception.");
-  }
+  EXPECT_NO_THROW(DIAG_LOG(sink_null))
+    << "Using a nullptr log sink threw an exception";
 
-  // redirect cerr instead of cout since cout is used by the US_TEST*
-  // macros to output test information.
-  // cout could be used as long as one remembers to restore the cout
-  // streambuf before using the US_TEST_CONDITION_REQUIRED marcos.
   std::ostringstream local_cerr_buffer;
   auto cerr_buffer = std::cerr.rdbuf();
   std::cerr.rdbuf(local_cerr_buffer.rdbuf());
@@ -132,18 +121,18 @@ void testLogRedirection()
   detail::LogSink sink_redirected_cerr(&std::cerr, true);
   DIAG_LOG(sink_redirected_cerr) << test_log_output.str();
   std::cerr.rdbuf(cerr_buffer);
-  US_TEST_CONDITION_REQUIRED(!local_cerr_buffer.str().empty(),
-                             "Test redirected std::cerr log sink.");
-  US_TEST_CONDITION_REQUIRED(
-    std::string::npos != local_cerr_buffer.str().find(test_log_output.str()),
-    "Test redirected std::cerr log sink.");
+
+  //Test redirected std::cerr log sink
+  ASSERT_FALSE(local_cerr_buffer.str().empty());
+  ASSERT_NE(std::string::npos,
+            local_cerr_buffer.str().find(test_log_output.str()));
 }
 
 #ifdef US_ENABLE_THREADING_SUPPORT
 // hammer the logger from multiple threads. A failure in
 // thread safety will most likely manifest as either a crash
 // or the output validation will see splicing of log lines.
-void testLogMultiThreaded()
+TEST(LogTest, testLogMultiThreaded)
 {
   std::stringstream stringstream;
   detail::LogSink sink(&stringstream, true);
@@ -184,20 +173,21 @@ void testLogMultiThreaded()
   auto regex_iter_begin =
     std::sregex_iterator(stream.begin(), stream.end(), reg_expr_start);
   std::ptrdiff_t num_found = std::distance(regex_iter_begin, regex_iter_end);
-  US_TEST_CONDITION_REQUIRED(num_found == expected_num_matches,
-                             "Test for expected number of matches");
+
+  //Test for expected number of matches
+  ASSERT_EQ(num_found, expected_num_matches);
 
   regex_iter_begin =
     std::sregex_iterator(stream.begin(), stream.end(), reg_expr_middle);
   num_found = std::distance(regex_iter_begin, regex_iter_end);
-  US_TEST_CONDITION_REQUIRED(num_found == expected_num_matches,
-                             "Test for expected number of matches");
+  //Test for expected number of matches
+  ASSERT_EQ(num_found, expected_num_matches);
 
   regex_iter_begin =
     std::sregex_iterator(stream.begin(), stream.end(), reg_expr_end);
   num_found = std::distance(regex_iter_begin, regex_iter_end);
-  US_TEST_CONDITION_REQUIRED(num_found == expected_num_matches,
-                             "Test for expected number of matches");
+  //Test for expected number of matches
+  ASSERT_EQ(num_found, expected_num_matches);
 
 #  else
   // support compilers w/o c++11 regex support...
@@ -209,43 +199,31 @@ void testLogMultiThreaded()
   while (std::getline(stringstream, line, '\n')) {
     log_lines.push_back(line);
   }
-  US_TEST_CONDITION_REQUIRED(static_cast<std::ptrdiff_t>(log_lines.size()) ==
-                               total_expected_matches,
-                             "Test for expected number of matches");
+  //Test for expected number of matches
+  ASSERT_EQ(static_cast<std::ptrdiff_t>(log_lines.size()),
+            total_expected_matches);
 
   std::ptrdiff_t count =
     std::count_if(log_lines.begin(), log_lines.end(), [](const std::string& s) {
       return (std::string::npos != s.find(std::string("MACRO: START foo")));
     });
-  US_TEST_CONDITION_REQUIRED(count == expected_num_matches,
-                             "Test for expected number of matches");
+  //Test for expected number of matches
+  ASSERT_EQ(count, expected_num_matches);
 
   count =
     std::count_if(log_lines.begin(), log_lines.end(), [](const std::string& s) {
       return (std::string::npos != s.find(std::string("MACRO: END foo")));
     });
-  US_TEST_CONDITION_REQUIRED(count == expected_num_matches,
-                             "Test for expected number of matches");
+  //Test for expected number of matches
+  ASSERT_EQ(count, expected_num_matches);
 
   count =
     std::count_if(log_lines.begin(), log_lines.end(), [](const std::string& s) {
       return (s == std::string("foo bar boo baz"));
     });
-  US_TEST_CONDITION_REQUIRED(count == expected_num_matches,
-                             "Test for expected number of matches");
+  //Test for expected number of matches
+  ASSERT_EQ(count, expected_num_matches);
 #  endif
 }
 #endif
 
-int LogTest(int /*argc*/, char* /*argv*/ [])
-{
-  US_TEST_BEGIN("usLogTest");
-
-  testDefaultLogMessages();
-  testLogDisabled();
-  testLogRedirection();
-#ifdef US_ENABLE_THREADING_SUPPORT
-  testLogMultiThreaded();
-#endif
-  US_TEST_END()
-}

@@ -32,7 +32,6 @@ set(_tests
   FrameworkEventTest
   FrameworkListenerTest
   HelgrindTest
-  LogTest
   BundleHooksTest
   BundleTest
   BundleResourceTest

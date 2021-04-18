@@ -43,7 +43,6 @@ set(_tests
   ServiceHooksTest
   ServiceRegistryPerformanceTest
   ServiceTemplateTest
-  StaticBundleResourceTest
   StaticBundleTest
 )
 

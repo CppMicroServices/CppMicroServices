@@ -44,6 +44,7 @@ set(_gtest_tests
   LDAPQueryTest.cpp
   FrameworkFactoryTest.cpp
   LogTest.cpp
+  StaticBundleResourceTest.cpp
 )
 
 if(BUILD_SHARED_LIBS)

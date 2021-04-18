@@ -24,13 +24,9 @@
 
 #include "gtest/gtest.h"
 
-#include <algorithm>
 #include <fstream>
-#include <iostream>
-#include <ostream>
 #include <regex>
 #include <thread>
-#include <vector>
 
 using namespace cppmicroservices;
 

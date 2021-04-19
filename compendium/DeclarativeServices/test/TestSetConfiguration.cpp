@@ -162,8 +162,8 @@ TEST_F(tServiceComponent, testNoAnyMapParameter) //DS_CAI_FTC_11
   scr::dto::ComponentDescriptionDTO compDescDTO;
   auto compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
-  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
-      << "component state should be SATISFIED";
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+      << "component state should be ACTIVE";
   
   // GetService to make component active
   auto instance = GetInstance<test::CAInterface>();

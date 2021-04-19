@@ -9,6 +9,9 @@
             "configuration-policy" : "optional",
             "configuration-pid" : ["sample::ServiceComponentCA08"],
             "inject-references" : false,
+            "properties": {
+              "ManifestProp": "abc"
+            },
             "service": {
                 "interfaces": ["test::CAInterface"]
             }

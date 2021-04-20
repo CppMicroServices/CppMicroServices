@@ -196,9 +196,7 @@ void ComponentConfigurationImpl::Initialize()
         
       }
       configManager->Initialize();
-      if (referenceManagers.empty() &&
-          metadata->configurationPolicy ==
-            CONFIG_POLICY_OPTIONAL) {
+      if (referenceManagers.empty() && configManager->IsConfigSatisfied(GetState()->GetValue())) {
         GetState()->Register(*this);
       }
     }

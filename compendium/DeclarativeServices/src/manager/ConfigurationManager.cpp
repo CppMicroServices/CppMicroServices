@@ -154,14 +154,6 @@ bool ConfigurationManager::isConfigSatisfied(
 
   return false;
 }
-void ConfigurationManager::SendModifiedPropertiesToComponent() {
-    // see sequence diagram ConfigurationListener::configurationEvent(CM_UPDATED)
-
-    // if component has a Modified method, call it with mergedProperties. For service components, update Service Registration object 
-    // once properties have been updated on the service component
-    // if component does not have a Modified method, Deactivate and Reactivate the component.
-}
-
-
 }
 }
+

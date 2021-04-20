@@ -122,7 +122,7 @@ try {
     for (const auto& oneCmMetadata : configurationMetadata) {
       auto configuration = configAdmin->GetConfiguration(oneCmMetadata.pid);
       if (configuration != nullptr) {
-            configuration->Update(oneCmMetadata.properties);
+            configuration->UpdateIfDifferent(oneCmMetadata.properties);
       }
     }
 }

@@ -86,8 +86,6 @@ public:
     bool& configWasSatisfied,
     bool& configIsNowSatisfied);
  
-  /* To be implemented. */
-   void SendModifiedPropertiesToComponent();
 
   /* Returns the merged properties for the component. These properties 
    * are a merged from the component properties and the properties for 

@@ -43,6 +43,7 @@ set(_gtest_tests
   ServiceRegistryTest.cpp
   LDAPQueryTest.cpp
   FrameworkFactoryTest.cpp
+  FrameworkEventTest.cpp
 )
 
 if(BUILD_SHARED_LIBS)
@@ -152,11 +153,11 @@ if(BUILD_SHARED_LIBS)
     add_dependencies(${us_gtest_test_exe_name} ${_us_test_bundle_libs})
     # Add resources
     usFunctionEmbedResources(TARGET ${us_gtest_test_exe_name}
-                             FILES manifest.json)
+                             FILES TestResource.ptxt manifest.json)
 else()
     target_link_libraries(${us_gtest_test_exe_name} ${_us_test_bundle_libs})
     # Add resources
     usFunctionEmbedResources(TARGET ${us_gtest_test_exe_name}
-                             FILES manifest.json
+                             FILES TestResource.ptxt manifest.json
                              ZIP_ARCHIVES ${Framework_TARGET} ${_us_test_bundle_libs})
 endif()

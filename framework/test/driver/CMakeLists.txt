@@ -29,12 +29,10 @@ include_directories(
 
 set(_tests
   BundleRegistryConcurrencyTest
-  FrameworkEventTest
   FrameworkListenerTest
   HelgrindTest
   BundleHooksTest
   BundleTest
-  BundleResourceTest
   MemcheckTest
   MultipleListenersTest
   ResourceCompilerTest

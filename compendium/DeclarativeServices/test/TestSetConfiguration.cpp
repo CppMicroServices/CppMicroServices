@@ -123,5 +123,60 @@ TEST_F(tServiceComponent, testSetConfig_AnyMap_References) //DS_CAI_FTC_9
   ASSERT_TRUE(instance->isDependencyInjected());
 }
 
+TEST_F(tServiceComponent, testGetConfig) //DS_CAI_FTC_10
+{
+  // Start the test bundle containing the component name.
+  std::string componentName = "sample::ServiceComponentCA08";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA08");
+
+  // Use DS runtime service to validate the component description and
+  // Verify that DS is finished creating the component data structures.
+  scr::dto::ComponentDescriptionDTO compDescDTO;
+  auto compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
+      << "component state should be SATISFIED";
+  
+  // GetService to make component active
+  auto instance = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(instance) << "GetService failed for CAInterface";
+  
+  //Confirm component instance was created with the correct properties defined in Manifest.json
+  auto instanceProps = instance->GetProperties();
+  auto manifestProp = instanceProps.find("ManifestProp");
+  
+  ASSERT_TRUE(manifestProp != instanceProps.end())
+    << "manifestProp not found in constructed instance";
+  const std::string manifestPropVal{ "abc" };
+  EXPECT_EQ(manifestProp->second, manifestPropVal);
+}
+
+TEST_F(tServiceComponent, testNoAnyMapParameter) //DS_CAI_FTC_11
+{
+  // Start the test bundle containing the component name.
+  std::string componentName = "sample::ServiceComponentCA05";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA05");
+
+  // Use DS runtime service to validate the component description and
+  // Verify that DS is finished creating the component data structures.
+  scr::dto::ComponentDescriptionDTO compDescDTO;
+  auto compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+      << "component state should be ACTIVE";
+  
+  // GetService to make component active
+  auto instance = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(instance) << "GetService failed for CAInterface";
+  
+  //Confirm component instance was created without properties defined in Manifest.json since
+  //only a default constructor (without AnyMap parameter) exists.
+  auto instanceProps = instance->GetProperties();
+  auto manifestProp = instanceProps.find("ManifestProp");
+  
+  ASSERT_TRUE(manifestProp == instanceProps.end())
+    << "manifestProp should not be found in constructed instance";
+}
+
 }
 

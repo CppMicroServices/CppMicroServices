@@ -20,7 +20,26 @@ macro(build_and_test)
   if (res)
     message(FATAL_ERROR "CMake configure error")
   endif()
-  ctest_build(RETURN_VALUE res)
+  
+  if(APPLE AND ${US_CMAKE_GENERATOR} STREQUAL "Xcode")
+    # When using Xcode on macOS, ctest -VV option generates compile log
+    # lines that are too verbose that some travis-ci builds exceed the 4MB
+    # log file size limit and terminate prematurely.
+    #
+    # Since "ctest_build" currently does not support piping outputs of the
+    # native tool builds, a shell script file is used to manually call "xcodebuild"
+    # (with the same options that ctest_build would have generated), piping the
+    # output through "xcpretty" (https://github.com/xcpretty/xcpretty).
+    #
+    # Instead of calling xcodebuild directly in "execute_process", a separate
+    # shell script file was created, so RESULT_VARIABLE can properly be captured
+    # by looking at PIPESTATUS[0].
+    execute_process( COMMAND bash ${CTEST_SOURCE_DIRECTORY}/cmake/travis_xcodebuild_pretty.sh ${CTEST_BINARY_DIRECTORY} ${CTEST_BUILD_CONFIGURATION}
+                     RESULT_VARIABLE res )
+  else()
+    ctest_build(RETURN_VALUE res)
+  endif()
+  
   if (res)
     message(FATAL_ERROR "CMake build error")
   endif()

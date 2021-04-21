@@ -193,6 +193,7 @@ set(_test_bundles
   TestBundleDSCA14
   TestBundleDSCA15
   TestBundleDSCA20
+  TestBundleDSCA26
   EnglishDictionary
   )
 

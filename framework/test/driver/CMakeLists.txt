@@ -31,7 +31,6 @@ set(_tests
   BundleRegistryConcurrencyTest
   FrameworkListenerTest
   HelgrindTest
-  LogTest
   BundleHooksTest
   BundleTest
   MemcheckTest
@@ -42,7 +41,6 @@ set(_tests
   ServiceHooksTest
   ServiceRegistryPerformanceTest
   ServiceTemplateTest
-  StaticBundleResourceTest
   StaticBundleTest
 )
 

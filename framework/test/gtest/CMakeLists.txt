@@ -43,6 +43,8 @@ set(_gtest_tests
   ServiceRegistryTest.cpp
   LDAPQueryTest.cpp
   FrameworkFactoryTest.cpp
+  LogTest.cpp
+  StaticBundleResourceTest.cpp
   FrameworkEventTest.cpp
 )
 

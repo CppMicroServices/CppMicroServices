@@ -1027,7 +1027,48 @@ bool any_map::operator==(const any_map& rhs) const
       case map_type::UNORDERED_MAP:
         return (*map.uo == *rhs.map.uo);
       case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-        return (*map.uoci == *rhs.map.uoci);
+      {
+        // In the case of our case insensitive keys map, there's an "oversight" in the
+        // std::unordered_map implementation such that if the 4th template argument is passed in
+        // (that is, the key-equality argument), it is only used when doing lookups in the map, not
+        // when std::unordered_map::operator== is used to check for equality between two
+        // maps. Inside the operator==, keys are compared with their own operator== rather than
+        // using the key equality template argument. In our case, this means that if I have a "key"
+        // in map1, and a "KEY" in map2, the maps will compare as inequal even though we have
+        // specified a case-insensitive comparator. So, we have to roll our own to make sure we get
+        // case-insensitive key comparisons.
+
+        // use the same comparator as is used by the map for lookups.
+        detail::any_map_ciequal equality;
+
+        for (auto const& i_lhs : *map.uoci) {
+          // loop through every entry in this map and compare with items in rhs.
+
+          auto const& i_rhs = rhs.map.uoci->find(i_lhs.first);
+          if (i_rhs == std::end(*rhs.map.uoci)) {
+            // if lhs is not found on rhs, return false.
+            return false;
+          }
+          if (!equality(i_lhs.first, i_rhs->first)) {
+            // if the keys for lhs and rhs are not case insensitive equal, return false.
+            return false;
+          }
+          if (i_lhs.second != i_rhs->second) {
+            // if the content doesn't match, return false;
+            return false;
+          }
+        }
+        for (auto const& i_rhs : *rhs.map.uoci) {
+          // now make sure that the keys from the rhs have data in the lhs also. If the key is found
+          // in the lhs, we've already compared the keys and values themselves so we don't need to
+          // do so again.
+          auto const& i_lhs = map.uoci->find(i_rhs.first);
+          if (i_lhs == std::end(*map.uoci)) {
+            return false;
+          }
+        }
+        return true;
+      }
     }
   }
   return false;

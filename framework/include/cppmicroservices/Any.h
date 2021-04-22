@@ -424,13 +424,10 @@ public:
    *
    * @throws std::runtime_error with invalid JSON input
    * @param  json a string containing JSON Data
-   * @param  use_ci_map_keys a bool which indicates whether or not the keys in any object maps should
-   *         be case insensitive. We use case insensitive keys in CppMicroServices, but there are
-   *         other uses of this static method that may not need them to be case insensitive.
    * @return an Any object containing the parsed data. 
    */
-  static Any FromJSON(std::string const& json, bool use_ci_map_keys = true);
-  static Any FromJSON(std::istream& json, bool use_ci_map_keys = true);
+  static Any FromJSON(const std::string& json);
+  static Any FromJSON(std::istream& json);
 private:
   class Placeholder
   {

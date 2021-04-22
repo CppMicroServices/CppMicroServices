@@ -121,13 +121,13 @@ std::string Any::ToStringNoExcept() const
   return Empty() ? std::string() : _content->ToString();
 }
 
-Any Any::FromJSON(std::string const& json, bool use_ci_map_keys)
+Any Any::FromJSON(const std::string& json)
 {
   std::stringstream jsonStream { json };
-  return FromJSON(jsonStream, use_ci_map_keys);
+  return FromJSON(jsonStream);
 }
 
-Any Any::FromJSON(std::istream& json, bool use_ci_map_keys)
+Any Any::FromJSON(std::istream& json)
 {
   // use RapidJSON to parse the input stream. 
   rapidjson::IStreamWrapper jsonStream(json);
@@ -139,7 +139,13 @@ Any Any::FromJSON(std::istream& json, bool use_ci_map_keys)
 
   // Walk the resulting rapid json document tree converting it into our Any data structures and
   // return the results.
-  return json::ParseValue(root, use_ci_map_keys);
+  //
+  // Note: The second argument here indicates that as the input string is parsed, any AnyMap that is
+  // created to hold JSON objects should use the case-insensitive, unordered option. A false makes
+  // the maps be case sensitive. Usage within CppMicroServices is always case insensitive, so don't
+  // expose this to our external customers. If we need to, we can simply allow the caller to specify
+  // the value of the bool in either the argument list, or as a template parameter.
+  return json::ParseValue(root, true);
 }
 
 }

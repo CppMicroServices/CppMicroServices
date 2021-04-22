@@ -315,18 +315,19 @@ TEST(AnyTest, FromJSON) {
   })";
 
   // This should produce the same AnyMap... only the order of the fields is different, which should
-  // make no difference in terms of the equality of the maps.
+  // make no difference in terms of the equality of the maps. Also, make the "keys" have different
+  // case so that we can ensure that our case-insensitive map is working properly.
   std::string str2 = R"({
-    "number" : 5, 
-    "vector" : [
+    "Number" : 5, 
+    "Vector" : [
       9,
       8,
       7
     ],
-    "map" : {
-      "1" : 0.3, 
+    "Map" : {
       "3" : "bonjour", 
       "4" : {}, 
+      "1" : 0.3, 
       "5" : []
     }
   })";

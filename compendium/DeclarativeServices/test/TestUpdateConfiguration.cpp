@@ -286,7 +286,7 @@ TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodDelayed) // DS_C
   * result in different instances of the service
   */
 
-TEST_F(tServiceComponent, testUpdateConfig_BundleScope_Modified)  //DS_CAI_FTC_26
+TEST_F(tServiceComponent, testUpdateConfig_BundleScope_Modified) //DS_CAI_FTC_26
 {
   // Start the test bundle containing the component name.
   std::string componentName = "sample::ServiceComponentCA26";
@@ -339,6 +339,11 @@ TEST_F(tServiceComponent, testUpdateConfig_BundleScope_Modified)  //DS_CAI_FTC_2
     instanceSet.emplace(serviceObjects.GetService());
   }
 
+  // Use DS runtime service to validate the component state
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "The state should be ACTIVE.";
+
   // Start helper testBundle
   std::string helperComponentName = "sample::ServiceComponentCA01";
   cppmicroservices::Bundle helperTestBundle =
@@ -377,6 +382,25 @@ TEST_F(tServiceComponent, testUpdateConfig_BundleScope_Modified)  //DS_CAI_FTC_2
       << "uniqueProp not found in constructed instance.";
     EXPECT_EQ(uniqueProp->second, instanceId);
   }
+
+  const std::string newInstanceId{ "newInstance" };
+  props["uniqueProp"] = newInstanceId;
+  configuration->Update(props);
+
+  for (std::shared_ptr<test::CAInterface> service : instanceSet) {
+    // Confirm component instances were updated with the correct properties.
+    auto instanceProps = service->GetProperties();
+    auto uniqueProp = instanceProps.find("uniqueProp");
+
+    ASSERT_TRUE(uniqueProp != instanceProps.end())
+      << "uniqueProp not found in constructed instance.";
+    EXPECT_EQ(uniqueProp->second, newInstanceId);
+  }
+
+  // Use DS runtime service to validate the component state
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "The state should be ACTIVE.";
 
   instanceSet.clear();
 }

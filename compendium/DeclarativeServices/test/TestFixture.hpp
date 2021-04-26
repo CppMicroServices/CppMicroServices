@@ -104,6 +104,7 @@ public:
     test::InstallLib(context, "TestBundleDSCA14");
     test::InstallLib(context, "TestBundleDSCA15");
     test::InstallLib(context, "TestBundleDSCA20");
+    test::InstallLib(context, "TestBundleDSCA26");
 #endif
 
 #ifndef US_BUILD_SHARED_LIBS

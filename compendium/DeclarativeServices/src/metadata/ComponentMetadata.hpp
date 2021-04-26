@@ -57,10 +57,6 @@ struct ComponentMetadata
   ServiceMetadata serviceMetadata;
   std::unordered_map<std::string, cppmicroservices::Any> properties;
   std::string configurationPolicy;
-  // constants for configurationPolicy
-  static const std::string CONFIG_POLICY_IGNORE;
-  static const std::string CONFIG_POLICY_REQUIRE;
-  static const std::string CONFIG_POLICY_OPTIONAL;
   std::vector<std::string> configurationPids;
   std::string factory;
   std::unordered_map<std::string, cppmicroservices::Any> factoryProperties;

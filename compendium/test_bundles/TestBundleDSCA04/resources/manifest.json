@@ -10,7 +10,8 @@
             "configuration-pid" : ["sample::ServiceComponentCA04"],
             "inject-references" : false,
             "service": {
-                "interfaces": ["test::CAInterface"]
+                "scope": "prototype",
+                "interfaces": [ "test::CAInterface" ]
             }
         }]
     }

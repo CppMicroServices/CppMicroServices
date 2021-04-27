@@ -277,6 +277,27 @@ TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodDelayed) // DS_C
     << "uniqueProp not found in constructed instance.";
   EXPECT_EQ(uniqueProp->second, instanceId);
 
+  // Update property
+  const std::string instanceId2{ "instance2" };
+  props["uniqueProp"] = instanceId2;
+  configuration->Update(props);
+
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
+    << "Component state should be SATISFIED";
+
+  // This will cause DS to construct the instance with the updated properties.
+  auto newInstance = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(newInstance) << "GetService failed for CAInterface";
+
+  // Validate that the correct properties were updated
+  auto serviceProps = newInstance->GetProperties();
+  auto uniqueProp2 = serviceProps.find("uniqueProp");
+
+  ASSERT_TRUE(uniqueProp2 != serviceProps.end())
+    << "uniqueProp not found in constructed instance";
+  EXPECT_EQ(uniqueProp2->second, instanceId2);
+
 } // end of testUpdateConfig_WithoutModifiedMethodDelayed
 
 /**
@@ -487,6 +508,11 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
   props["uniqueProp"] = newInstanceId;
   configuration->Update(props);
 
+  // Use DS runtime service to validate the component state
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "The state should be ACTIVE.";
+
   // Confirm component instances were updated with the correct properties.
   for (std::shared_ptr<test::CAInterface> service : instanceSet) {
     auto instanceProps = service->GetProperties();
@@ -497,10 +523,131 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
     EXPECT_EQ(uniqueProp->second, newInstanceId);
   }
 
+  instanceSet.clear();
+}
+
+TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_WithoutModified) //DS_CAI_FTC_25
+{
+  // Start the test bundle containing the component name.
+  std::string componentName = "sample::ServiceComponentCA04";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA04");
+
+  // Use DS runtime service to validate the component state
+  scr::dto::ComponentDescriptionDTO compDescDTO;
+  auto compConfigs =
+    GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.at(0).description.scope,
+            cppmicroservices::Constants::SCOPE_PROTOTYPE);
+  EXPECT_EQ(compConfigs.at(0).state,
+            scr::dto::ComponentState::UNSATISFIED_REFERENCE)
+    << "The state should be UNSATISFIED_REFERENCE.";
+
+  // Get a service reference to ConfigAdmin to create the component instance.
+  auto configAdminService =
+    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+  ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+
+  // Create configuration object and update property.
+  auto configuration = configAdminService->GetConfiguration(componentName);
+  auto configInstance = configuration->GetPid();
+
+  cppmicroservices::AnyMap props(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  const std::string instanceId{ "instance1" };
+  props["uniqueProp"] = instanceId;
+  configuration->Update(props);
+
+  // Use DS runtime service to validate the component state
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
+    << "The state should be SATISFIED.";
+
+  // Check Service scope
+  cppmicroservices::ServiceReference<test::CAInterface> sRef =
+    context.GetServiceReference<test::CAInterface>();
+  EXPECT_TRUE(static_cast<bool>(sRef));
+  auto serviceScope =
+    sRef.GetProperty(cppmicroservices::Constants::SERVICE_SCOPE);
+  EXPECT_EQ(compConfigs.at(0).description.scope,
+            serviceScope.ToStringNoExcept());
+
+  // Get Service Objects
+  cppmicroservices::ServiceObjects<test::CAInterface> serviceObjects =
+    context.GetServiceObjects(sRef);
+  std::set<std::shared_ptr<test::CAInterface>> instanceSet;
+  for (size_t i = 0; i < 5; i++) {
+    instanceSet.emplace(serviceObjects.GetService());
+  }
+
   // Use DS runtime service to validate the component state
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
     << "The state should be ACTIVE.";
+
+  EXPECT_TRUE(
+    std::none_of(instanceSet.begin(),
+                 instanceSet.end(),
+                 [](const std::shared_ptr<test::CAInterface>& service) {
+                   return service == nullptr;
+                 }));
+  EXPECT_EQ(instanceSet.size(), 5)
+    << "number of service instances returned must be equal to the number of "
+       "GetService calls";
+
+  // Confirm component instances were created with the same properties.
+  for (std::shared_ptr<test::CAInterface> service : instanceSet) {
+    auto instanceProps = service->GetProperties();
+    auto uniqueProp = instanceProps.find("uniqueProp");
+
+    ASSERT_TRUE(uniqueProp != instanceProps.end())
+      << "uniqueProp not found in constructed instance.";
+    EXPECT_EQ(uniqueProp->second, instanceId);
+  }
+
+  instanceSet.clear();
+
+  //Update Configuration
+  const std::string newInstanceId{ "newInstance" };
+  props["uniqueProp"] = newInstanceId;
+  configuration->Update(props);
+
+  // Validate that component deactivates and Reactivates
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
+    << "The state should be SATISFIED.";
+
+  // Get Service Objects
+  sRef = context.GetServiceReference<test::CAInterface>();
+  EXPECT_TRUE(static_cast<bool>(sRef));
+  serviceObjects = context.GetServiceObjects(sRef);
+  for (size_t i = 0; i < 5; i++) {
+    instanceSet.emplace(serviceObjects.GetService());
+  }
+
+  // Use DS runtime service to validate the component state
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "The state should be ACTIVE.";
+
+  EXPECT_TRUE(
+    std::none_of(instanceSet.begin(),
+                 instanceSet.end(),
+                 [](const std::shared_ptr<test::CAInterface>& service) {
+                   return service == nullptr;
+                 }));
+  EXPECT_EQ(instanceSet.size(), 5)
+    << "number of service instances returned must be equal to the number of "
+       "GetService calls";
+
+  // Confirm component instances were created with the same properties.
+  for (std::shared_ptr<test::CAInterface> service : instanceSet) {
+    auto instanceProps = service->GetProperties();
+    auto uniqueProp = instanceProps.find("uniqueProp");
+
+    ASSERT_TRUE(uniqueProp != instanceProps.end())
+      << "uniqueProp not found in constructed instance.";
+    EXPECT_EQ(uniqueProp->second, newInstanceId);
+  }
 
   instanceSet.clear();
 }

@@ -62,6 +62,7 @@ set(_declarativeservices_tests
   TestComponentManagerDisabledState.cpp
   TestComponentManagerEnabledState.cpp
   TestComponentManagerImpl.cpp
+  TestComponentNameWithPID.cpp
   TestComponentRegistry.cpp
   TestCounterLatch.cpp
   TestFactoryPid.cpp
@@ -192,6 +193,7 @@ set(_test_bundles
   TestBundleDSCA09
   TestBundleDSCA14
   TestBundleDSCA15
+  TestBundleDSCA16
   TestBundleDSCA20
   EnglishDictionary
   )

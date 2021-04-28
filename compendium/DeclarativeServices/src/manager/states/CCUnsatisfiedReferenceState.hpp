@@ -74,9 +74,7 @@ public:
    * Modifying properties while the component is in the UNSATISFIED_REFERENCE state is a no-op
    */
   bool Modified(ComponentConfigurationImpl& /*mgr*/) override { 
-      // A false return here causes ComponentConfigurationImpl::ConfigChangedState to begin
-      // the activation process. 
-      return false;
+       return true;
    };
   /**
    * Rebinding while in an UNSATISFIED_REFERENCE state is a no-op

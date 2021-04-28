@@ -132,7 +132,7 @@ ComponentConfigurationImpl::GetProperties() const
         // Start with component properties
         auto props = metadata->properties;
 
-        // If configuration object dependencies exist, use merged componente and configuration object properties.
+        // If configuration object dependencies exist, use merged component and configuration object properties.
         if (configManager != nullptr) {
             props.clear();
             for (auto item : configManager->GetProperties()) {

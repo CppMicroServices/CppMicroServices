@@ -70,10 +70,6 @@ void ConfigurationManager::Initialize() {
         auto config = configAdmin->ListConfigurations("(pid = " + pid + ")");
         if (config.size() > 0) {
           auto properties = config.front()->GetProperties();
-          auto it = configProperties.find(pid);
-          if (it != configProperties.end()) {
-            configProperties.erase(it);
-          }
           configProperties.emplace(pid, properties);
           for (const auto &item : properties) {
             mergedProperties[item.first] = item.second;
@@ -83,7 +79,11 @@ void ConfigurationManager::Initialize() {
     }
   } catch (...) {
     // No ConfigAdmin available
-               
+      logger->Log(
+          cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+          "Exception while initializing ConfigurationManager object",
+          std::current_exception());
+
     return;
   }
 }
@@ -111,7 +111,7 @@ void ConfigurationManager::UpdateMergedProperties(const std::string pid,
   }
   
   //  recalculate the merged properties maintaining precedence as follows:
-  //  lowest precedence service properties
+  //  lowest precedence properties from the metadata
   //  next precedence each pid in meta-data configuration-pids with first one
   //  in the list having lower precedence than the last one in the list. 
 

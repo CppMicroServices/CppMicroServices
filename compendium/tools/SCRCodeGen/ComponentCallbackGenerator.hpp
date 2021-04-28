@@ -118,7 +118,7 @@ private:
       }
       
       mStrStream << "  ComponentInstance* componentInstance = new (std::nothrow) ComponentInstanceImpl<"
-                 << componentInfo.implClassName 
+                 << componentInfo.implClassName
                  << ", std::tuple<"
                  << datamodel::GetServiceInterfacesStr(componentInfo.service)
                  << ">";

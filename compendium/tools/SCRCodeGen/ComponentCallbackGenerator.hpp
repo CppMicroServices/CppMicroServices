@@ -117,15 +117,15 @@ private:
         }
       }
       
-      mStrStream << "  ComponentInstance* componentInstance = new "
-                    "(std::nothrow) ComponentInstanceImpl<"
-                 << componentInfo.implClassName << ", std::tuple<"
+      mStrStream << "  ComponentInstance* componentInstance = new (std::nothrow) ComponentInstanceImpl<"
+                 << componentInfo.implClassName 
+                 << ", std::tuple<"
                  << datamodel::GetServiceInterfacesStr(componentInfo.service)
                  << ">";
 
       if (true == isReferencesEmpty)
       {
-        mStrStream  << ">();";
+        mStrStream << ">();";
       }
       else {
         mStrStream << datamodel::GetCtorInjectedRefTypes(componentInfo)

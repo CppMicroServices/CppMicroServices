@@ -74,7 +74,7 @@ public:
    * Returns the component registry object of this runtime. This method is used by
    * ComponentContextImpl objects to retrieve ComponentManager objects.
    */
-  virtual std::shared_ptr<const ComponentRegistry> GetRegistry() const = 0;
+  virtual std::shared_ptr<ComponentRegistry> GetRegistry() const = 0;
 
   /**
    * Returns a map with properties specific to this component configuration

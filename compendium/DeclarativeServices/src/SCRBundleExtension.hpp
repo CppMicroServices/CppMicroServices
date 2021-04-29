@@ -35,6 +35,7 @@
 #include "manager/ComponentManager.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "metadata/Util.hpp"
+#include "manager/ConfigurationNotifier.hpp"
 
 using cppmicroservices::logservice::LogService;
 
@@ -53,7 +54,9 @@ public:
                      const cppmicroservices::AnyMap& scrMetadata,
                      const std::shared_ptr<ComponentRegistry>& registry,
                      const std::shared_ptr<LogService>& logger,
-                     const std::shared_ptr<boost::asio::thread_pool>& threadpool);
+                     const std::shared_ptr<boost::asio::thread_pool>& threadpool,
+                     const std::shared_ptr<ConfigurationNotifier>& configNotifier);
+
   SCRBundleExtension(const SCRBundleExtension&) = delete;
   SCRBundleExtension(SCRBundleExtension&&) = delete;
   SCRBundleExtension& operator=(const SCRBundleExtension&) = delete;
@@ -65,7 +68,8 @@ private:
   cppmicroservices::BundleContext bundleContext;
   std::shared_ptr<ComponentRegistry> registry;
   std::shared_ptr<LogService> logger;
-  std::vector<std::shared_ptr<ComponentManager>> managers;
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
+  std::shared_ptr<ConfigurationNotifier> configNotifier;
 };
 } // scrimpl
 } // cppmicroservices

@@ -24,7 +24,6 @@
 #define CPPMICROSERVICES_UTIL_FILESYSTEM_H
 
 #include <string>
-#include <vector>
 
 namespace cppmicroservices {
 
@@ -40,11 +39,7 @@ extern const char DIR_SEP;
 // determined.
 std::string GetExecutablePath();
 
-//Separates a string into tokens according to the delimeter.
-std::vector<std::string> SplitString(const std::string& str,
-                                     const std::string& delim);
-
-  // Platform agnostic way to get the current working directory.
+// Platform agnostic way to get the current working directory.
 // Supports Linux, Mac, and Windows.
 std::string GetCurrentWorkingDirectory();
 bool Exists(const std::string& path);

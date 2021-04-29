@@ -188,7 +188,6 @@ set(_test_bundles
   TestBundleDSCA05
   TestBundleDSCA05a
   TestBundleDSCA07
-  TestBundleDSCA07a
   TestBundleDSCA08
   TestBundleDSCA09
   TestBundleDSCA14

@@ -34,18 +34,25 @@
 
 namespace cppmicroservices { namespace service { namespace component { namespace runtime {
 
+	/**
+	\defgroup gr_servicecomponentruntime ServiceComponentRuntime
+	\brief Groups ServiceComponentRuntime class related symbols.
+	*/
+
 /**
- * The {@code ServiceComponentRuntime} service represents the Declarative
+ * \ingroup gr_servicecomponentruntime
+ *
+ * The {@link ServiceComponentRuntime} service represents the Declarative
  * Services actor, known as Service Component Runtime (SCR), that manages the
- * service components and their life cycle. The {@code ServiceComponentRuntime}
+ * service components and their life cycle. The {@link ServiceComponentRuntime}
  * service allows introspection of the components managed by Service Component
  * Runtime.
  *
  * <p>
- * This service differentiates between a {@link ComponentDescriptionDTO} and a
- * {@link ComponentConfigurationDTO}. A {@link ComponentDescriptionDTO} is a
+ * This service differentiates between a {@link dto::ComponentDescriptionDTO ComponentDescriptionDTO} and a
+ * {@link dto::ComponentConfigurationDTO ComponentConfigurationDTO}. A {@link dto::ComponentDescriptionDTO ComponentDescriptionDTO} is a
  * representation of a declared component description. A
- * {@link ComponentConfigurationDTO} is a representation of an actual instance
+ * {@link dto::ComponentConfigurationDTO ComponentConfigurationDTO} is a representation of an actual instance
  * of a declared component description parameterized by component properties.
  */
 class US_ServiceComponent_EXPORT ServiceComponentRuntime {
@@ -63,22 +70,22 @@ class US_ServiceComponent_EXPORT ServiceComponentRuntime {
    *
    * @param bundles The bundles whose declared component descriptions are to
    *        be returned. Specifying no bundles, or the equivalent of an empty
-   *        {@code Bundle} vector, will return the declared component
+   *        \c Bundle vector, will return the declared component
    *        descriptions from all active bundles.
    * @return The declared component descriptions of the specified active
-   *         {@code bundles}. An empty collection is returned if there are no
+   *         bundles. An empty collection is returned if there are no
    *         component descriptions for the specified active bundles.
    */
   virtual std::vector<dto::ComponentDescriptionDTO> GetComponentDescriptionDTOs(const std::vector<cppmicroservices::Bundle>& bundles = {}) const = 0;
 
   /**
-   * Returns the {@link ComponentDescriptionDTO} declared with the specified name
+   * Returns the {@link dto::ComponentDescriptionDTO ComponentDescriptionDTO} declared with the specified name
    * by the specified bundle.
    *
    * <p>
    * Only component descriptions from active bundles are returned.
    * An empty object is returned if no such component is declared by the given
-   * {@code bundle} or the bundle is not active.
+   * bundle or the bundle is not active.
    *
    * @param bundle The bundle declaring the component description.
    * @param name The name of the component description.
@@ -104,14 +111,14 @@ class US_ServiceComponent_EXPORT ServiceComponentRuntime {
    *
    * <p>
    * The enabled state of a component description is initially set by the
-   * {@link ComponentDescriptionDTO#defaultEnabled enabled} attribute of the
+   * {@link dto::ComponentDescriptionDTO#defaultEnabled enabled} attribute of the
    * component description.
    *
    * @param description The component description.
-   * @return {@code true} if the specified component description is currently
-   *         enabled. Otherwise, {@code false}.
-   * @see #EnableComponent(ComponentDescriptionDTO)
-   * @see #DisableComponent(ComponentDescriptionDTO)
+   * @return \c true if the specified component description is currently
+   *         enabled. Otherwise, \c false.
+   * @see #EnableComponent
+   * @see #DisableComponent
    * @see ComponentContext#DisableComponent(std::string)
    * @see ComponentContext#EnableComponent(std::string)
    */
@@ -134,7 +141,7 @@ class US_ServiceComponent_EXPORT ServiceComponentRuntime {
    * @return A future that will be ready when the actions that result from
    *         changing the enabled state of the specified component have
    *         completed.
-   * @see #IsComponentEnabled(ComponentDescriptionDTO)
+   * @see #IsComponentEnabled
    */
   virtual std::shared_future<void> EnableComponent(const dto::ComponentDescriptionDTO& description) = 0;
 
@@ -155,7 +162,7 @@ class US_ServiceComponent_EXPORT ServiceComponentRuntime {
    * @return A future that will be ready when the actions that result from
    *         changing the enabled state of the specified component have
    *         completed.
-   * @see #IsComponentEnabled(ComponentDescriptionDTO)
+   * @see #IsComponentEnabled
    */
   virtual std::shared_future<void> DisableComponent(const dto::ComponentDescriptionDTO& description) = 0;
 };

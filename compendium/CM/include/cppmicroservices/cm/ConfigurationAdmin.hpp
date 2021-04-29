@@ -33,7 +33,13 @@ namespace cppmicroservices {
   namespace service {
     namespace cm {
 
+    /**
+    \defgroup gr_configurationadmin ConfigurationAdmin
+    \brief Groups ConfigurationAdmin class related symbols.
+    */
+
       /**
+       * \ingroup gr_configurationadmin 
        * The ConfigurationAdmin interface is the means by which applications and services can
        * interract with the Configuration objects at runtime. It can be used to create or obtain
        * Configuration objects, which can in turn be queried for their properties or be used to

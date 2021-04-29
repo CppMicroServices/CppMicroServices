@@ -34,7 +34,14 @@ namespace cppmicroservices {
 namespace framework {
 namespace dto {
 
+	/**
+	\defgroup gr_servicereferencedto ServiceReferenceDTO
+	\brief Groups ServiceReferenceDTO related symbols.
+	*/
+
 /**
+ * \ingroup gr_servicereferencedto
+ *
  * A representation of a satisfied reference.
  */
 struct US_ServiceComponent_EXPORT ServiceReferenceDTO

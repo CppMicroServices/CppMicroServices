@@ -31,7 +31,13 @@ namespace cppmicroservices {
   namespace service {
     namespace cm {
 
+     /**
+      \defgroup gr_managedservicefactory ManagedServiceFactory
+      \brief Groups ManagedServiceFactory class related symbols.
+      */
       /**
+       * \ingroup gr_managedservicefactory
+       *
        * The ManagedServiceFactory interface is the interface that service factories
        * should implement to receive updates from the ConfigurationAdmin implementation
        * with the Configurations for the services that the Factory will provide. The

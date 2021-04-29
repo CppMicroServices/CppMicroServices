@@ -37,7 +37,15 @@ namespace service {
 namespace component {
 namespace runtime {
 namespace dto {
+
+	/**
+	\defgroup gr_componentdescriptiondto ComponentDescriptionDTO
+	\brief Groups ComponentDescriptionDTO related symbols.
+	*/
+
 /**
+ * \ingroup gr_componentdescriptiondto
+ *
  * A representation of a declared component description.
  */
 struct US_ServiceComponent_EXPORT ComponentDescriptionDTO
@@ -46,7 +54,7 @@ struct US_ServiceComponent_EXPORT ComponentDescriptionDTO
    * The name of the component.
    *
    * <p>
-   * This is declared in the {@code name} attribute of the {@code component}
+   * This is declared in the \c name attribute of the \c component
    * element. This must be the default name if the component description does
    * not declare a name.
    */
@@ -61,7 +69,7 @@ struct US_ServiceComponent_EXPORT ComponentDescriptionDTO
    * The service scope.
    *
    * <p>
-   * This is declared in the {@code scope} attribute of the {@code service}
+   * This is declared in the \c scope attribute of the \c service
    * element. This must be empty string if the component description does not
    * declare any service interfaces.
    */
@@ -71,7 +79,7 @@ struct US_ServiceComponent_EXPORT ComponentDescriptionDTO
    * The fully qualified name of the implementation class.
    *
    * <p>
-   * This is declared in the {@code implementation-class} element.
+   * This is declared in the \c implementation-class element.
    */
   std::string implementationClass;
 
@@ -79,8 +87,8 @@ struct US_ServiceComponent_EXPORT ComponentDescriptionDTO
    * The initial enabled state.
    *
    * <p>
-   * This is declared in the {@code enabled} attribute of the
-   * {@code component} element.
+   * This is declared in the \c enabled attribute of the
+   * \c component element.
    */
   bool defaultEnabled;
 
@@ -88,8 +96,8 @@ struct US_ServiceComponent_EXPORT ComponentDescriptionDTO
    * The immediate state.
    *
    * <p>
-   * This is declared in the {@code immediate} attribute of the
-   * {@code component} element.
+   * This is declared in the \c immediate attribute of the
+   * \c component element.
    */
   bool immediate;
 
@@ -97,8 +105,8 @@ struct US_ServiceComponent_EXPORT ComponentDescriptionDTO
    * The fully qualified names of the service interfaces.
    *
    * <p>
-   * These are declared in the {@code interface} attribute of the
-   * {@code provide} elements. The vector must be empty if the component
+   * These are declared in the \c interface attribute of the
+   * \c provide elements. The vector must be empty if the component
    * description does not declare any service interfaces.
    */
   std::vector<std::string> serviceInterfaces;
@@ -107,7 +115,7 @@ struct US_ServiceComponent_EXPORT ComponentDescriptionDTO
    * The declared component properties.
    *
    * <p>
-   * These are declared in the {@code property} and {@code properties}
+   * These are declared in the \c property and \c properties
    * elements.
    */
   std::unordered_map<std::string, cppmicroservices::Any> properties;
@@ -116,7 +124,7 @@ struct US_ServiceComponent_EXPORT ComponentDescriptionDTO
    * The referenced services.
    *
    * <p>
-   * These are declared in the {@code reference} elements. The vector must be
+   * These are declared in the \c reference elements. The vector must be
    * empty if the component description does not declare references to any
    * services.
    */
@@ -126,8 +134,8 @@ struct US_ServiceComponent_EXPORT ComponentDescriptionDTO
    * The name of the activate method.
    *
    * <p>
-   * This is declared in the {@code activate} attribute of the
-   * {@code component} element. This must be the default value which is "Activate",
+   * This is declared in the \c activate attribute of the
+   * \c component element. This must be the default value which is "Activate",
    * if the component description does not declare an activate method name.
    */
   std::string activate;
@@ -136,8 +144,8 @@ struct US_ServiceComponent_EXPORT ComponentDescriptionDTO
    * The name of the deactivate method.
    *
    * <p>
-   * This is declared in the {@code deactivate} attribute of the
-   * {@code component} element. This must be the default value which is "Deactivate",
+   * This is declared in the \c deactivate attribute of the
+   * \c component element. This must be the default value which is "Deactivate",
    * if the component description does not declare a deactivate method name.
    */
   std::string deactivate;
@@ -146,8 +154,8 @@ struct US_ServiceComponent_EXPORT ComponentDescriptionDTO
    * The name of the modified method.
    *
    * <p>
-   * This is declared in the {@code modified} attribute of the
-   * {@code component} element. This must be the default value which is "Modified",
+   * This is declared in the \c modified attribute of the
+   * \c component element. This must be the default value which is "Modified",
    * if the component description does not declare a modified method name.
    */
   std::string modified;

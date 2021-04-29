@@ -29,29 +29,38 @@
 
 namespace cppmicroservices { namespace service { namespace component {
 
+	/**
+	\defgroup gr_componentconstants ComponentConstants
+	\brief Groups ComponentConstants related symbols.
+	*/
+
 /**
+ * \ingroup gr_componentconstants 
  * Defines standard names for Service Component constants.
  */
 namespace ComponentConstants {
 /**
+ * \ingroup gr_componentconstants 
  * Manifest key specifying the Service Component descriptions.
  * <p>
- * The attribute value may be retrieved from the {@code cppmicroservices::AnyMap}
- * object returned by the {@code Bundle.GetHeaders} method.
+ * The attribute value may be retrieved from the {@link cppmicroservices::AnyMap}
+ * object returned by the {@link Bundle::GetHeaders} method.
  */
 US_ServiceComponent_EXPORT extern const std::string SERVICE_COMPONENT;
 
 /**
+ * \ingroup gr_componentconstants 
  * A component property for a component configuration that contains the name
- * of the component as specified in the {@code name} attribute of the
- * {@code component} element. The value of this property must be of type
- * {@code std::string}.
+ * of the component as specified in the \c name attribute of the
+ * \c component element. The value of this property must be of type
+ * \c std::string.
  */
 US_ServiceComponent_EXPORT extern const std::string COMPONENT_NAME;
 
 /**
+ * \ingroup gr_componentconstants 
  * A component property that contains the generated id for a component
- * configuration. The value of this property must be of type {@code unsigned long}.
+ * configuration. The value of this property must be of type <tt> unsigned long</tt>.
  *
  * <p>
  * The value of this property is assigned by Service Component Runtime when
@@ -63,15 +72,17 @@ US_ServiceComponent_EXPORT extern const std::string COMPONENT_NAME;
 US_ServiceComponent_EXPORT extern const std::string COMPONENT_ID;
 
 /**
+ * \ingroup gr_componentconstants 
  * The suffix for reference target properties. These properties contain the
  * filter to select the target services for a reference. The value of this
- * property must be of type {@code std::string}.
+ * property must be of type \c std::string.
  */
 US_ServiceComponent_EXPORT extern const std::string REFERENCE_TARGET_SUFFIX;
 
 /**
- * Reference scope is "prototype_required". The reference is satisfied
- * only if the service is registered with PROTOTYPE scope. Each component
+ * \ingroup gr_componentconstants 
+ * Reference scope is \c prototype_required. The reference is satisfied
+ * only if the service is registered with \c PROTOTYPE scope. Each component
  * instance receives a distinct service object.
  */
 US_ServiceComponent_EXPORT extern const std::string REFERENCE_SCOPE_PROTOTYPE_REQUIRED;

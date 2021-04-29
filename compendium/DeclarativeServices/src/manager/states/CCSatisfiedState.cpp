@@ -24,7 +24,7 @@
 #include "CCUnsatisfiedReferenceState.hpp"
 #include "../ComponentConfigurationImpl.hpp"
 
-using cppmicroservices::service::component::runtime::dto::UNSATISFIED_REFERENCE;
+using cppmicroservices::service::component::runtime::dto::ComponentState;
 namespace cppmicroservices {
 namespace scrimpl {
 
@@ -38,7 +38,7 @@ void CCSatisfiedState::Deactivate(ComponentConfigurationImpl& mgr)
                                         mgr.DestroyComponentInstances();
                                       });
   auto unsatisfiedState = std::make_shared<CCUnsatisfiedReferenceState>(task.get_future().share());
-  while(currentState->GetValue() != service::component::runtime::dto::UNSATISFIED_REFERENCE)
+  while(currentState->GetValue() != service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE)
   {
     if(mgr.CompareAndSetState(&currentState, unsatisfiedState))
     {

@@ -177,7 +177,24 @@ TEST_F(TestConfigurationAdminImpl, VerifyListConfigurations)
   auto fakeLogger = std::make_shared<FakeLogger>();
   ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
 
-  EXPECT_THROW(configAdmin.ListConfigurations(""), std::invalid_argument);
+  const std::string pid1{"test.pid1"};
+  const std::string pid2{"test.pid2"};
+
+  const auto conf1 = configAdmin.GetConfiguration(pid1);
+  const auto conf2 = configAdmin.GetConfiguration(pid2);
+
+  auto props2 = conf2->GetProperties();
+  props2["foo"] = std::string{"bar"};
+  EXPECT_NO_THROW(conf2->Update(props2));
+
+  const auto res1 = configAdmin.ListConfigurations();
+  const auto res2 = configAdmin.ListConfigurations("(foo=bar)");
+  const auto res3 = configAdmin.ListConfigurations("(foobar=baz)");
+
+  EXPECT_EQ(res1.size(), 2);
+  EXPECT_EQ(res2.size(), 1);
+  EXPECT_EQ(res2[0]->GetPid(), pid2);
+  EXPECT_TRUE(res3.empty());
 }
 
 TEST_F(TestConfigurationAdminImpl, VerifyAddConfigurations)
@@ -194,19 +211,21 @@ TEST_F(TestConfigurationAdminImpl, VerifyAddConfigurations)
   auto props = conf2->GetProperties();
   props["foo"] = std::string{ "bar" };
   EXPECT_NO_THROW(conf2->Update(props));
+  
+  std::vector<cppmicroservices::util::ConfigurationMetadata> configs;
 
-  std::vector<metadata::ConfigurationMetadata> configs;
-
-  configs.push_back(metadata::ConfigurationMetadata(
+  configs.push_back(cppmicroservices::util::ConfigurationMetadata(
     "test.pid", AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
 
-  AnyMap props2{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
-  props2["foo"] = std::string{ "baz" };
-  configs.push_back(metadata::ConfigurationMetadata("test.pid2", props2));
+  AnyMap props2{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
+  props2["foo"] = std::string{"baz"};
+  configs.push_back(
+    cppmicroservices::util::ConfigurationMetadata("test.pid2", props2));
 
-  AnyMap props3{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
-  props3["bar"] = std::string{ "baz" };
-  configs.push_back(metadata::ConfigurationMetadata("test.pid3", props3));
+  AnyMap props3{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
+  props3["bar"] = std::string{"baz"};
+  configs.push_back(
+    cppmicroservices::util::ConfigurationMetadata("test.pid3", props3));
 
   auto result = configAdmin.AddConfigurations(std::move(configs));
 
@@ -245,26 +264,29 @@ TEST_F(TestConfigurationAdminImpl, VerifyRemoveConfigurations)
   const auto conf = configAdmin.GetConfiguration("test.pid");
   const auto conf2 = configAdmin.GetConfiguration("test.pid2");
 
-  std::vector<metadata::ConfigurationMetadata> configs;
+  std::vector<cppmicroservices::util::ConfigurationMetadata> configs;
 
-  configs.push_back(metadata::ConfigurationMetadata(
+  configs.push_back(cppmicroservices::util::ConfigurationMetadata(
     "test.pid", AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
 
-  AnyMap props2{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
-  props2["foo"] = std::string{ "baz" };
-  configs.push_back(metadata::ConfigurationMetadata("test.pid2", props2));
+  AnyMap props2{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
+  props2["foo"] = std::string{"baz"};
+  configs.push_back(
+    cppmicroservices::util::ConfigurationMetadata("test.pid2", props2));
 
-  AnyMap props3{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
-  props3["bar"] = std::string{ "baz" };
-  configs.push_back(metadata::ConfigurationMetadata("test.pid3", props3));
+  AnyMap props3{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
+  props3["bar"] = std::string{"baz"};
+  configs.push_back(
+    cppmicroservices::util::ConfigurationMetadata("test.pid3", props3));
 
-  AnyMap props4{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
-  props4["baz"] = std::string{ "foo" };
-  configs.push_back(metadata::ConfigurationMetadata("test.pid4", props4));
+  AnyMap props4{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
+  props4["baz"] = std::string{"foo"};
+  configs.push_back(
+    cppmicroservices::util::ConfigurationMetadata("test.pid4", props4));
 
-  configs.push_back(metadata::ConfigurationMetadata(
+  configs.push_back(cppmicroservices::util::ConfigurationMetadata(
     "test.pid5", AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
-
+  
   auto result = configAdmin.AddConfigurations(std::move(configs));
 
   // The test.pid Configuration shouldn't have been modified, so shouldn't be removed.
@@ -418,24 +440,22 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
 
   auto f2 = [&counterMutex, &counterCV, &ms2Counter] {
     {
-      std::lock_guard<std::mutex> lk{ counterMutex };
+      std::lock_guard<std::mutex> lk{counterMutex};
       ++ms2Counter;
     }
     counterCV.notify_one();
   };
 
   auto newProps = props;
-  newProps["foo"] = std::string{ "baz" };
+  newProps["foo"] = std::string{"baz"};
 
-  auto mockManagedServiceFactory =
-    std::make_shared<MockManagedServiceFactory>();
-  auto mockManagedServiceFactory2 =
-    std::make_shared<MockManagedServiceFactory>();
-  auto mockManagedServiceFactory3 =
-    std::make_shared<MockManagedServiceFactory>();
+  auto mockManagedServiceFactory = std::make_shared<MockManagedServiceFactory>();
+  auto mockManagedServiceFactory2 = std::make_shared<MockManagedServiceFactory>();
+  auto mockManagedServiceFactory3 = std::make_shared<MockManagedServiceFactory>();
   // setup expectations.
-  EXPECT_CALL(*mockManagedServiceFactory2,
-              Updated(std::string{ "factory2~instance1" }, AnyMapEquals(props)))
+  EXPECT_CALL(
+    *mockManagedServiceFactory2,
+    Updated(std::string{"factory2~instance1"}, AnyMapEquals(props)))
     .WillOnce(testing::InvokeWithoutArgs(f2));
   EXPECT_CALL(
     *mockManagedServiceFactory,
@@ -449,41 +469,35 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
     *mockManagedServiceFactory2,
     Updated(std::string{ "factory2~instance1" }, AnyMapEquals(newProps)))
     .WillOnce(testing::InvokeWithoutArgs(f2));
-  EXPECT_CALL(*mockManagedServiceFactory,
-              Removed(std::string{ "factory~instance1" }))
+  EXPECT_CALL(
+    *mockManagedServiceFactory,
+    Removed(std::string{"factory~instance1"}))
     .WillOnce(testing::InvokeWithoutArgs(f));
-  EXPECT_CALL(*mockManagedServiceFactory3, Updated(testing::_, testing::_))
+  EXPECT_CALL(
+    *mockManagedServiceFactory3,
+    Updated(testing::_, testing::_))
     .Times(0);
-  EXPECT_CALL(*mockManagedServiceFactory3, Removed(testing::_)).Times(0);
+  EXPECT_CALL(
+    *mockManagedServiceFactory3,
+    Removed(testing::_))
+    .Times(0);
 
   // Ensure notification from original GetConfiguration has run.
   configAdmin.WaitForAllAsync();
 
-  AnyMap pidProp{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
+  AnyMap pidProp{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
   pidProp["pid"] = std::string("factory");
-  AnyMap nameProp{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
+  AnyMap nameProp{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
   nameProp["name"] = std::string("factory2");
-  cppmicroservices::ServiceProperties ms1Props{ { std::string("service"),
-                                                  pidProp } };
-  cppmicroservices::ServiceProperties ms2Props{ { std::string("component"),
-                                                  nameProp } };
+  cppmicroservices::ServiceProperties ms1Props{{std::string("service"), pidProp}};
+  cppmicroservices::ServiceProperties ms2Props{{std::string("component"), nameProp}};
 
-  auto reg1 =
-    bundleContext
-      .RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(
-        mockManagedServiceFactory, ms1Props);
-  auto reg2 =
-    bundleContext
-      .RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(
-        mockManagedServiceFactory2, ms2Props);
-  auto reg3 =
-    bundleContext
-      .RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(
-        mockManagedServiceFactory3);
+  auto reg1 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(mockManagedServiceFactory, ms1Props);
+  auto reg2 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(mockManagedServiceFactory2, ms2Props);
+  auto reg3 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(mockManagedServiceFactory3);
 
-  std::unique_lock<std::mutex> ul{ counterMutex };
-  auto factory2InvokedOnce = counterCV.wait_for(
-    ul, std::chrono::seconds(10), [&ms2Counter] { return 1u == ms2Counter; });
+  std::unique_lock<std::mutex> ul{counterMutex};
+  auto factory2InvokedOnce = counterCV.wait_for(ul, std::chrono::seconds(10), [&ms2Counter] { return 1u == ms2Counter; });
   ul.unlock();
 
   EXPECT_TRUE(factory2InvokedOnce);
@@ -504,10 +518,10 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
   EXPECT_NO_THROW(conf2->Remove());
 
   ul.lock();
-  auto invokeComplete =
-    counterCV.wait_for(ul, std::chrono::seconds(10), [&msCounter, &ms2Counter] {
-      return 1u == msCounter && 2u == ms2Counter;
-    });
+  auto invokeComplete = counterCV.wait_for(
+      ul, std::chrono::seconds(10), [&msCounter, &ms2Counter] {
+        return 1u == msCounter && 2u == ms2Counter;
+      });
   ul.unlock();
 
   EXPECT_TRUE(invokeComplete);
@@ -531,17 +545,19 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
   auto msCounter = 0u;
   auto msfCounter = 0u;
 
-  auto f = [&counterMutex, &counterCV, &msCounter] {
+  auto f = [&counterMutex, &counterCV, &msCounter]
+  {
     {
-      std::lock_guard<std::mutex> lk{ counterMutex };
+      std::lock_guard<std::mutex> lk{counterMutex};
       ++msCounter;
     }
     counterCV.notify_one();
   };
 
-  auto f2 = [&counterMutex, &counterCV, &msfCounter] {
+  auto f2 = [&counterMutex, &counterCV, &msfCounter]
+  {
     {
-      std::lock_guard<std::mutex> lk{ counterMutex };
+      std::lock_guard<std::mutex> lk{counterMutex};
       ++msfCounter;
     }
     counterCV.notify_one();
@@ -549,52 +565,47 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
 
   auto mockManagedService = std::make_shared<MockManagedService>();
   auto mockManagedService2 = std::make_shared<MockManagedService>();
-  auto mockManagedServiceFactory =
-    std::make_shared<MockManagedServiceFactory>();
-  auto mockManagedServiceFactory2 =
-    std::make_shared<MockManagedServiceFactory>();
+  auto mockManagedServiceFactory = std::make_shared<MockManagedServiceFactory>();
+  auto mockManagedServiceFactory2 = std::make_shared<MockManagedServiceFactory>();
   // setup expectations.
-  EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(emptyProps)))
-    .Times(2)
-    .WillRepeatedly(testing::InvokeWithoutArgs(f));
+  EXPECT_CALL(
+    *mockManagedService,
+    Updated(AnyMapEquals(emptyProps)))
+    .Times(2).WillRepeatedly(testing::InvokeWithoutArgs(f));
   EXPECT_CALL(
     *mockManagedServiceFactory,
     Updated(std::string{ "factory~instance1" }, AnyMapEquals(emptyProps)))
     .Times(0);
-  EXPECT_CALL(*mockManagedServiceFactory,
-              Removed(std::string{ "factory~instance1" }))
+  EXPECT_CALL(
+    *mockManagedServiceFactory,
+    Removed(std::string{ "factory~instance1" }))
     .WillOnce(testing::InvokeWithoutArgs(f2));
-  EXPECT_CALL(*mockManagedService2, Updated(testing::_)).Times(0);
-  EXPECT_CALL(*mockManagedServiceFactory2, Updated(testing::_, testing::_))
+  EXPECT_CALL(
+    *mockManagedService2,
+    Updated(testing::_))
     .Times(0);
-  EXPECT_CALL(*mockManagedServiceFactory2, Removed(testing::_)).Times(0);
+  EXPECT_CALL(
+    *mockManagedServiceFactory2,
+    Updated(testing::_, testing::_))
+    .Times(0);
+  EXPECT_CALL(
+    *mockManagedServiceFactory2,
+    Removed(testing::_))
+    .Times(0);
 
-  cppmicroservices::ServiceProperties msProps{ { std::string("service.pid"),
-                                                 std::string("test.pid") } };
-  cppmicroservices::ServiceProperties msfProps{ { std::string("service.pid"),
-                                                  std::string("factory") } };
+  cppmicroservices::ServiceProperties msProps{{std::string("service.pid"), std::string("test.pid")}};
+  cppmicroservices::ServiceProperties msfProps{{std::string("service.pid"), std::string("factory")}};
 
-  auto reg1 =
-    bundleContext
-      .RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(
-        mockManagedServiceFactory, msfProps);
-  auto reg2 =
-    bundleContext
-      .RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(
-        mockManagedServiceFactory2);
-  auto reg3 = bundleContext
-                .RegisterService<cppmicroservices::service::cm::ManagedService>(
-                  mockManagedService, msProps);
-  auto reg4 = bundleContext
-                .RegisterService<cppmicroservices::service::cm::ManagedService>(
-                  mockManagedService2);
+  auto reg1 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(mockManagedServiceFactory, msfProps);
+  auto reg2 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(mockManagedServiceFactory2);
+  auto reg3 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedService>(mockManagedService, msProps);
+  auto reg4 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedService>(mockManagedService2);
 
   {
     ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
 
-    std::unique_lock<std::mutex> ul{ counterMutex };
-    auto invokedOnce = counterCV.wait_for(
-      ul, std::chrono::seconds(10), [&msCounter] { return 1u == msCounter; });
+    std::unique_lock<std::mutex> ul{counterMutex};
+    auto invokedOnce = counterCV.wait_for(ul, std::chrono::seconds(10), [&msCounter] { return 1u == msCounter; });
     ul.unlock();
 
     EXPECT_TRUE(invokedOnce);
@@ -604,18 +615,17 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
     ASSERT_TRUE(conf);
 
     ul.lock();
-    auto factoryInvokedZeroTimes = counterCV.wait_for(
-      ul, std::chrono::seconds(10), [&msfCounter] { return 0u == msfCounter; });
+    auto factoryInvokedZeroTimes =
+      counterCV.wait_for(ul, std::chrono::seconds(10), [&msfCounter] {
+        return 0u == msfCounter;
+      });
     ul.unlock();
 
     EXPECT_TRUE(factoryInvokedZeroTimes);
   }
 
-  std::unique_lock<std::mutex> ul{ counterMutex };
-  auto invokeComplete =
-    counterCV.wait_for(ul, std::chrono::seconds(10), [&msCounter, &msfCounter] {
-      return 2u == msCounter && 1u == msfCounter;
-    });
+  std::unique_lock<std::mutex> ul{counterMutex};
+  auto invokeComplete = counterCV.wait_for(ul, std::chrono::seconds(10), [&msCounter, &msfCounter] { return 2u == msCounter && 1u == msfCounter; });
   ul.unlock();
 
   EXPECT_TRUE(invokeComplete);

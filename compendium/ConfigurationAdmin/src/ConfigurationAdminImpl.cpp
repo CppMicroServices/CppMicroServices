@@ -27,7 +27,7 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/cm/ConfigurationException.hpp"
 
-#include "CMConstants.hpp"
+#include "cppmicroservices/util/CMConstants.hpp"
 #include "ConfigurationAdminImpl.hpp"
 
 using cppmicroservices::logservice::SeverityLevel;
@@ -80,6 +80,7 @@ namespace {
     }
   }
 
+  
   void notifyServiceUpdated(const std::string& pid,
                             cppmicroservices::service::cm::ManagedService& managedService,
                             const cppmicroservices::AnyMap& properties,
@@ -135,7 +136,7 @@ namespace {
   template <typename T>
   std::string getPidFromServiceReference(const T& reference)
   {
-    using namespace cppmicroservices::cmimpl::CMConstants;
+    using namespace cppmicroservices::util::CMConstants;
     try
     {
       const auto serviceProp = reference.GetProperty(CM_SERVICE_KEY);
@@ -187,9 +188,11 @@ namespace cppmicroservices {
     , managedServiceTracker(cmContext, this)
     , managedServiceFactoryTracker(cmContext, this)
     , randomGenerator(std::random_device{}())
+    , configListenerTracker(cmContext)
     {
       managedServiceTracker.Open();
       managedServiceFactoryTracker.Open();
+      configListenerTracker.Open();
     }
 
     ConfigurationAdminImpl::~ConfigurationAdminImpl()
@@ -197,8 +200,16 @@ namespace cppmicroservices {
       auto managedServiceWrappers = managedServiceTracker.GetServices();
       auto managedServiceFactoryWrappers = managedServiceFactoryTracker.GetServices();
 
-      managedServiceFactoryTracker.Close();
-      managedServiceTracker.Close();
+      try {
+          managedServiceFactoryTracker.Close();
+          managedServiceTracker.Close();
+          configListenerTracker.Close();
+          
+      } catch (...) {
+         auto thrownByMessage = "thrown by ConfiguratonAdminImpl destructor "
+                               "while closing the service trackers.\n\t ";
+         logger->Log(SeverityLevel::LOG_ERROR, thrownByMessage);
+      }
 
       decltype(factoryInstances) factoryInstancesCopy;
       decltype(configurations) configurationsToInvalidate;
@@ -261,7 +272,7 @@ namespace cppmicroservices {
         }
         result = it->second;
       }
-       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                   "GetConfiguration: returning " + (created ? std::string("new") : "existing") + " Configuration instance with PID " + pid);
       return result;
     }
@@ -295,12 +306,35 @@ namespace cppmicroservices {
       return GetConfiguration(pid);
     }
 
-    std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>> ConfigurationAdminImpl::ListConfigurations(const std::string& /* filter */)
+    std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>> ConfigurationAdminImpl::ListConfigurations(const std::string& filter)
     {
-      throw std::invalid_argument("Method not currently implemented");
+      std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>> result;
+      {
+        std::lock_guard<std::mutex> lk {configurationsMutex};
+
+        if (filter.empty()) {
+          result.reserve(configurations.size());
+          for (auto it : configurations) {
+            result.push_back(it.second);
+          }
+        } else {
+          LDAPFilter ldap{filter};
+          for (auto it : configurations) {
+            auto props = it.second->GetProperties();
+            if (ldap.Match(props)) {
+              result.push_back(it.second);
+            }
+          }
+        }
+      }
+
+      return result;
     }
 
-    std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(std::vector<metadata::ConfigurationMetadata> configurationMetadata)
+    std::vector<ConfigurationAddedInfo>
+    ConfigurationAdminImpl::AddConfigurations(
+      std::vector<cppmicroservices::util::ConfigurationMetadata>
+        configurationMetadata)
     {
       std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs;
       std::vector<bool> createdOrUpdated;
@@ -433,9 +467,12 @@ namespace cppmicroservices {
 
     void ConfigurationAdminImpl::NotifyConfigurationUpdated(const std::string& pid)
     {
-      PerformAsync([this, pid]
+      
+      auto fut = PerformAsync([this, pid]
       {
         AnyMap properties{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS};
+        std::string fPid = "";
+        std::string nonFPid = "";
         auto removed = false;
         {
           std::lock_guard<std::mutex> lk{configurationsMutex};
@@ -457,6 +494,37 @@ namespace cppmicroservices {
             }
           }
         }
+     
+        if (pid.find('~') != std::string::npos) {
+            //this is a factory pid
+          fPid = pid;
+        } else {
+          nonFPid = pid;
+        }
+        const auto configurationListeners =
+          configListenerTracker.GetServices();
+        auto type =
+          removed
+            ? cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED
+            : cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED;
+        
+        auto configAdminRef = cmContext.GetServiceReference<ConfigurationAdmin>();
+        for (auto it : configurationListeners) {
+
+            try {
+              auto configEvent = std::make_unique<
+                cppmicroservices::service::cm::ConfigurationEvent>(
+                configAdminRef, type, fPid, nonFPid);
+
+              it->configurationEvent((*configEvent));
+            } catch (...) {
+              auto thrownByMessage = "thrown by ConfigurationListener "
+                                     "configurationEvent method with PID " +
+                                     pid + "\n\t";
+              logger->Log(SeverityLevel::LOG_ERROR, thrownByMessage);           
+            }
+          }
+
         const auto managedServiceWrappers = managedServiceTracker.GetServices();
         const auto it = std::find_if(std::begin(managedServiceWrappers), std::end(managedServiceWrappers),
                                      [&pid](const auto& managedServiceWrapper)
@@ -496,6 +564,13 @@ namespace cppmicroservices {
           }
         }
       });
+      // wait until asynchronous processing completes before returning to the caller. 
+      try {
+          fut.get();
+      }
+      catch (...) {
+          logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Failed to update component with pid" + pid, std::current_exception());
+      }
     }
 
     void ConfigurationAdminImpl::NotifyConfigurationRemoved(const std::string &pid, std::uintptr_t configurationId)
@@ -526,11 +601,18 @@ namespace cppmicroservices {
         NotifyConfigurationUpdated(pid);
         // This functor will run on another thread. Just being overly cautious to guarantee that the
         // ConfigurationImpl which has called this method doesn't run its own destructor.
-        PerformAsync([this, pid, configuration = std::move(configurationToInvalidate)]
+        auto fut = PerformAsync([this, pid, configuration = std::move(configurationToInvalidate)]
         {
           logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                       "Configuration with PID " + pid + " has been removed.");
         });
+        // wait until asynchronous processing completes before returning to the caller. 
+        try {
+            fut.get();
+        }
+        catch (...) {
+            logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Failed to remove component with pid" + pid, std::current_exception());
+        }
       }
     }
 
@@ -670,24 +752,27 @@ namespace cppmicroservices {
     }
 
     template <typename Functor>
-    void ConfigurationAdminImpl::PerformAsync(Functor&& f)
+   std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
     {
        std::lock_guard<std::mutex> lk{futuresMutex};
        decltype(completeFutures){}.swap(completeFutures);
        auto id = ++futuresID;
-       incompleteFutures.emplace(id, std::async(std::launch::async, [this, func = std::forward<Functor>(f), id]
-       {
-         func();
-         std::lock_guard<std::mutex> lk{futuresMutex};
-         auto it = incompleteFutures.find(id);
-         assert(it != std::end(incompleteFutures) && "Invalid future iterator");
-         completeFutures.push_back(std::move(it->second));
-         incompleteFutures.erase(it);
-         if (incompleteFutures.empty())
-         {
-           futuresCV.notify_one();
-         }
-       }));
+       std::future<void> fut = std::async(std::launch::async, [this, func = std::forward<Functor>(f), id]()->void
+           {
+             func();
+             std::lock_guard<std::mutex> lk{futuresMutex};
+             auto it = incompleteFutures.find(id);
+             assert(it != std::end(incompleteFutures) && "Invalid future iterator");
+             completeFutures.push_back(std::move(it->second));
+             incompleteFutures.erase(it);
+             if (incompleteFutures.empty())
+             {
+               futuresCV.notify_one();
+             }
+           });
+       auto returnFut = fut.share();
+       incompleteFutures.emplace(id, std::move(fut));
+       return returnFut;
     }
 
     std::string ConfigurationAdminImpl::RandomInstanceName()

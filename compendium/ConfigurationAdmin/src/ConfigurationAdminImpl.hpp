@@ -36,6 +36,7 @@
 #include "cppmicroservices/cm/ManagedService.hpp"
 #include "cppmicroservices/cm/ManagedServiceFactory.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
+#include "cppmicroservices/cm/ConfigurationListener.hpp"
 
 #include "ConfigurationAdminPrivate.hpp"
 #include "ConfigurationImpl.hpp"
@@ -119,15 +120,16 @@ namespace cppmicroservices {
        *
        * See {@code ConfigurationAdmin#ListConfigurations}
        */
-      std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>> ListConfigurations(const std::string& filter) override;
+      std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>> ListConfigurations(const std::string& filter = std::string()) override;
 
       /**
        * Internal method used by {@code CMBundleExtension} to add new {@code Configuration} objects
        *
        * See {@code ConfigurationAdminPrivate#AddConfigurations}
        */
-       std::vector<ConfigurationAddedInfo>
-       AddConfigurations(std::vector<metadata::ConfigurationMetadata> configurationMetadata) override;
+       std::vector<ConfigurationAddedInfo> AddConfigurations(
+        std::vector<cppmicroservices::util::ConfigurationMetadata>
+          configurationMetadata) override;
 
       /**
        * Internal method used by {@code CMBundleExtension} to remove the {@code Configuration} objects that it created
@@ -136,13 +138,14 @@ namespace cppmicroservices {
        */
       void RemoveConfigurations(std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs) override;
 
-      /**
-       * Internal method used to notify any {@code ManagedService} or {@code ManagedServiceFactory} of an
-       * update to a {@code Configuration}. Performs the notifications asynchronously with the latest state
-       * of the properties at the time.
+       /**
+       * Internal method used to notify any {@code ManagedService} or {@code ManagedServiceFactory} or 
+       * {@code ConfigurationListener of an update to a {@code Configuration}. Performs the 
+       * notifications asynchronously with the latest state of the properties at the time.
        *
        * See {@code ConfigurationAdminPrivate#NotifyConfigurationUpdated}
        */
+
       void NotifyConfigurationUpdated(const std::string& pid) override;
 
       /**
@@ -173,7 +176,7 @@ namespace cppmicroservices {
 
     private:
       // Convenience wrapper which is used to perform asyncronous operations
-      template <typename Functor> void PerformAsync(Functor&& f);
+      template <typename Functor>  std::shared_future<void>  PerformAsync(Functor&& f);
 
       // Used to generate a random instance name for CreateFactoryConfiguration
       std::string RandomInstanceName();
@@ -195,6 +198,9 @@ namespace cppmicroservices {
       cppmicroservices::ServiceTracker<cppmicroservices::service::cm::ManagedService, TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>> managedServiceTracker;
       cppmicroservices::ServiceTracker<cppmicroservices::service::cm::ManagedServiceFactory, TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>> managedServiceFactoryTracker;
       std::mt19937 randomGenerator;
+      cppmicroservices::ServiceTracker<
+        cppmicroservices::service::cm::ConfigurationListener>
+        configListenerTracker;
     };
   } // cmimpl
 } // cppmicroservices

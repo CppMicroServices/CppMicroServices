@@ -88,7 +88,10 @@ namespace cppmicroservices {
      */
     class MockConfigurationAdminPrivate : public ConfigurationAdminPrivate {
     public:
-      MOCK_METHOD1(AddConfigurations, std::vector<ConfigurationAddedInfo>(std::vector<metadata::ConfigurationMetadata>));
+      MOCK_METHOD1(
+        AddConfigurations,
+        std::vector<ConfigurationAddedInfo>(
+          std::vector<cppmicroservices::util::ConfigurationMetadata>));
       MOCK_METHOD1(RemoveConfigurations, void(std::vector<ConfigurationAddedInfo>));
       MOCK_METHOD1(NotifyConfigurationUpdated, void(const std::string&));
       MOCK_METHOD2(NotifyConfigurationRemoved, void(const std::string&, std::uintptr_t));

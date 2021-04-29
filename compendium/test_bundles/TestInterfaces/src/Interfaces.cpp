@@ -15,4 +15,6 @@ namespace test
     DSGraph07::~DSGraph07() = default;
     
     LifeCycleValidation::~LifeCycleValidation() = default;
+    CAInterface::~CAInterface() = default;
+    CAInterface1::~CAInterface1() = default;
 }

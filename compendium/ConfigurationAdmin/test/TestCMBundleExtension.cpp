@@ -28,7 +28,7 @@
 #include <cppmicroservices/BundleContext.h>
 
 #include "../src/CMBundleExtension.hpp"
-#include "../src/CMConstants.hpp"
+#include "cppmicroservices/util/CMConstants.hpp"
 #include "Mocks.hpp"
 
 #define str(s) #s

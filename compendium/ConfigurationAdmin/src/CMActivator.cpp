@@ -24,7 +24,7 @@
 #include <stdexcept>
 
 #include "CMActivator.hpp"
-#include "CMConstants.hpp"
+#include "cppmicroservices/util/CMConstants.hpp"
 
 using cppmicroservices::logservice::SeverityLevel;
 
@@ -82,7 +82,8 @@ namespace cppmicroservices {
     {
       auto const& headers = bundle.GetHeaders();
       // bundle has no "cm" configuration
-      if (headers.find(CMConstants::CM_KEY) == std::end(headers))
+      if (headers.find(cppmicroservices::util::CMConstants::CM_KEY) ==
+          std::end(headers))
       {
         logger->Log(SeverityLevel::LOG_DEBUG, "No CM Configuration found in bundle " + bundle.GetSymbolicName());
         return;
@@ -103,7 +104,7 @@ namespace cppmicroservices {
       logger->Log(SeverityLevel::LOG_DEBUG, "Creating CMBundleExtension ... " + bundle.GetSymbolicName());
       try
       {
-        auto const& cmMetadata = cppmicroservices::ref_any_cast<cppmicroservices::AnyMap>(headers.at(CMConstants::CM_KEY));
+        auto const& cmMetadata = cppmicroservices::ref_any_cast<cppmicroservices::AnyMap>(headers.at(cppmicroservices::util::CMConstants::CM_KEY));
         auto be = std::make_unique<CMBundleExtension>(bundle.GetBundleContext(), cmMetadata, configAdminImpl, logger);
         {
           std::lock_guard<std::mutex> l(bundleRegMutex);
@@ -120,7 +121,7 @@ namespace cppmicroservices {
     {
       auto const& headers = bundle.GetHeaders();
       // bundle has no "cm" configuration
-      if (headers.find(CMConstants::CM_KEY) == std::end(headers))
+      if (headers.find(cppmicroservices::util::CMConstants::CM_KEY) == std::end(headers))
       {
         logger->Log(SeverityLevel::LOG_DEBUG, "No CM Configuration found in bundle " + bundle.GetSymbolicName());
         return;

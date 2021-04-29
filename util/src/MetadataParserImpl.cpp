@@ -24,13 +24,12 @@
 
 #include "cppmicroservices/Any.h"
 
-#include "ConfigurationMetadata.hpp"
-#include "MetadataParserImpl.hpp"
+#include "cppmicroservices/util/ConfigurationMetadata.hpp"
+#include "cppmicroservices/util/MetadataParserImpl.hpp"
 
 namespace cppmicroservices {
-  namespace cmimpl {
-    namespace metadata {
-
+  namespace util {
+ 
       MetadataParserImplV1::MetadataParserImplV1(std::shared_ptr<cppmicroservices::logservice::LogService> lggr)
       : logger(std::move(lggr))
       {
@@ -71,6 +70,5 @@ namespace cppmicroservices {
         }
         return configurationMetadata;
       }
-    } // metadata
-  } // cmimpl
+  } // util
 } // cppmicroservices

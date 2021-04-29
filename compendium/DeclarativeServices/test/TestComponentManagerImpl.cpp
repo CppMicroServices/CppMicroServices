@@ -50,6 +50,10 @@ TEST(ComponentManagerImplTest, Ctor)
   framework.Start();
   auto bc = framework.GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+   framework.GetBundleContext(), fakeLogger);
+  auto managers =
+    std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto pool = std::make_shared<boost::asio::thread_pool>(1);
@@ -57,7 +61,7 @@ TEST(ComponentManagerImplTest, Ctor)
     EXPECT_THROW(
       {
         US_UNUSED(std::make_shared<ComponentManagerImpl>(
-          nullptr, mockRegistry, bc, fakeLogger, pool));
+          nullptr, mockRegistry, bc, fakeLogger, pool, notifier, managers));
       },
       std::invalid_argument);
   }
@@ -65,7 +69,7 @@ TEST(ComponentManagerImplTest, Ctor)
     EXPECT_THROW(
       {
         US_UNUSED(std::make_shared<ComponentManagerImpl>(
-          mockMetadata, nullptr, bc, fakeLogger, pool));
+          mockMetadata, nullptr, bc, fakeLogger, pool, notifier, managers));
       },
       std::invalid_argument);
   }
@@ -73,7 +77,7 @@ TEST(ComponentManagerImplTest, Ctor)
     EXPECT_THROW(
       {
         US_UNUSED(std::make_shared<ComponentManagerImpl>(
-          mockMetadata, mockRegistry, BundleContext(), fakeLogger, pool));
+          mockMetadata, mockRegistry, BundleContext(), fakeLogger, pool, notifier, managers));
       },
       std::invalid_argument);
   }
@@ -81,14 +85,14 @@ TEST(ComponentManagerImplTest, Ctor)
     EXPECT_THROW(
       {
         US_UNUSED(std::make_shared<ComponentManagerImpl>(
-          mockMetadata, mockRegistry, bc, nullptr, pool));
+          mockMetadata, mockRegistry, bc, nullptr, pool, notifier, managers));
       },
       std::invalid_argument);
   }
   {
     EXPECT_NO_THROW({
       US_UNUSED(std::make_shared<ComponentManagerImpl>(
-        mockMetadata, mockRegistry, bc, fakeLogger, pool));
+        mockMetadata, mockRegistry, bc, fakeLogger, pool, notifier, managers));
     });
   }
 }
@@ -107,6 +111,10 @@ protected:
     framework.Start();
     fakeLogger = std::make_shared<FakeLogger>();
     mockRegistry = std::make_shared<MockComponentRegistry>();
+    notifier = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(), fakeLogger);
+    managers =
+      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+
   }
 
   virtual void TearDown() {
@@ -119,6 +127,8 @@ protected:
   cppmicroservices::Framework framework;
   std::shared_ptr<logservice::LogService> fakeLogger;
   std::shared_ptr<MockComponentRegistry> mockRegistry;
+  std::shared_ptr<ConfigurationNotifier> notifier;
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
 };
 
 TEST_P(ComponentManagerImplParameterizedTest, VerifyInitialize)
@@ -127,7 +137,10 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyInitialize)
   auto compMgr = std::make_shared<ComponentManagerImpl>(compDesc,
                                                         mockRegistry,
                                                         framework.GetBundleContext(),
-                                                        fakeLogger, std::make_shared<boost::asio::thread_pool>(1));
+                                                        fakeLogger, 
+                                                        std::make_shared<boost::asio::thread_pool>(1), 
+                                                        notifier, 
+                                                        managers);
   EXPECT_EQ(compMgr->IsEnabled(), false) << "Illegal state before Initialization";
   compMgr->Initialize();
   EXPECT_EQ(compMgr->IsEnabled(), compMgr->GetMetadata()->enabled) << "Illegal state after Initialization";
@@ -139,8 +152,10 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyEnable)
   auto compMgr = std::make_shared<ComponentManagerImpl>(compDesc,
                                                         mockRegistry,
                                                         framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1));
+                                                        fakeLogger,
+                                                        std::make_shared<boost::asio::thread_pool>(1), 
+                                                        notifier,
+                                                        managers);
   EXPECT_NO_THROW({
       compMgr->Initialize();
       compMgr->Enable();
@@ -156,8 +171,10 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyDisable)
   auto compMgr = std::make_shared<ComponentManagerImpl>(compDesc,
                                                         mockRegistry,
                                                         framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1));
+                                                        fakeLogger,
+                                                        std::make_shared<boost::asio::thread_pool>(1), 
+                                                        notifier,
+                                                        managers);
   EXPECT_NO_THROW({
       compMgr->Initialize();
       compMgr->Disable();
@@ -173,7 +190,10 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyStateChangeCount)
   auto compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                             mockRegistry,
                                                             framework.GetBundleContext(),
-                                                            fakeLogger, std::make_shared<boost::asio::thread_pool>(1));
+                                                            fakeLogger, 
+                                                            std::make_shared<boost::asio::thread_pool>(1), 
+                                                            notifier,
+                                                            managers);
   EXPECT_NO_THROW({
       compMgr->Initialize();
       compMgr->ResetCounter();
@@ -190,8 +210,10 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifySequentialStateChange)
   auto compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                             mockRegistry,
                                                             framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1));
+                                                            fakeLogger,
+                                                            std::make_shared<boost::asio::thread_pool>(1), 
+                                                            notifier,
+                                                            managers);
   EXPECT_NO_THROW({
 
       auto prevState = compMgr->IsEnabled();
@@ -219,8 +241,10 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentEnable)
   auto compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                             mockRegistry,
                                                             framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1));
+                                                            fakeLogger,
+                                                            std::make_shared<boost::asio::thread_pool>(1), 
+                                                            notifier, 
+                                                            managers);
 
   compMgr->Initialize();
   compMgr->Disable(); // ensure the component is in DISABLED state
@@ -248,8 +272,10 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentDisable)
   auto compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                             mockRegistry,
                                                             framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1));
+                                                            fakeLogger,
+                                                            std::make_shared<boost::asio::thread_pool>(1), 
+                                                            notifier, 
+                                                            managers);
 
   compMgr->Initialize();
   compMgr->Enable(); // ensure the component is in ENABLED state
@@ -277,8 +303,10 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentEnableDisable)
   auto compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                             mockRegistry,
                                                             framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1));
+                                                            fakeLogger,
+                                                            std::make_shared<boost::asio::thread_pool>(1), 
+                                                            notifier,
+                                                            managers);
   compMgr->Initialize();
   // test concurrent calls to enable and disable from multiple threads
   std::function<std::shared_future<void>()> func = [compMgr]() mutable {
@@ -308,8 +336,10 @@ TEST_P(ComponentManagerImplParameterizedTest, TestAccumulateFutures)
   auto compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                             mockRegistry,
                                                             framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1));
+                                                            fakeLogger,
+                                                            std::make_shared<boost::asio::thread_pool>(1), 
+                                                            notifier,
+                                                            managers);
 
   EXPECT_EQ(compMgr->disableFutures.size(), 0ul) << "Disabled futures list must be empty before any calls to AccumulateFuture method";
   std::promise<void> p1;

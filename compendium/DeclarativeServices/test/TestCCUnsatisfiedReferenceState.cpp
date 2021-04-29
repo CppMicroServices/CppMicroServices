@@ -49,10 +49,18 @@ protected:
     mockMetadata->serviceMetadata.interfaces.push_back("Service::Interface");
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
     auto fakeLogger = std::make_shared<FakeLogger>();
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      framework.GetBundleContext(), fakeLogger);
+    auto threadpool = std::make_shared<boost::asio::thread_pool>();
+    auto managers =
+      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
     mockCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                       framework,
                                                                       mockRegistry,
-                                                                      fakeLogger);
+                                                                      fakeLogger, 
+                                                                      threadpool,
+                                                                      notifier,
+                                                                      managers);
   }
 
   virtual void TearDown() {

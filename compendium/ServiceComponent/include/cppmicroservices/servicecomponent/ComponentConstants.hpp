@@ -40,6 +40,7 @@ namespace ComponentConstants {
  * object returned by the {@code Bundle.GetHeaders} method.
  */
 US_ServiceComponent_EXPORT extern const std::string SERVICE_COMPONENT;
+using cppmicroservices::service::component::ComponentConstants::SERVICE_COMPONENT;
 
 /**
  * A component property for a component configuration that contains the name
@@ -63,6 +64,13 @@ US_ServiceComponent_EXPORT extern const std::string COMPONENT_NAME;
 US_ServiceComponent_EXPORT extern const std::string COMPONENT_ID;
 
 /**
+ * A service registration property for a Component Factory that contains the
+ * value of the {@code factory} attribute. The value of this property must
+ * be of type {@code std::string}.
+ */
+US_ServiceComponent_EXPORT extern const std::string COMPONENT_FACTORY;
+
+/**
  * The suffix for reference target properties. These properties contain the
  * filter to select the target services for a reference. The value of this
  * property must be of type {@code std::string}.
@@ -75,6 +83,14 @@ US_ServiceComponent_EXPORT extern const std::string REFERENCE_TARGET_SUFFIX;
  * instance receives a distinct service object.
  */
 US_ServiceComponent_EXPORT extern const std::string REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
+
+/**
+ * Constants used for ComponentMetadata configurationPolicy attribute.
+ */
+US_ServiceComponent_EXPORT extern const std::string CONFIG_POLICY_IGNORE;
+US_ServiceComponent_EXPORT extern const std::string CONFIG_POLICY_OPTIONAL;
+US_ServiceComponent_EXPORT extern const std::string CONFIG_POLICY_REQUIRE;
+
 }
 
 }}} // namespaces

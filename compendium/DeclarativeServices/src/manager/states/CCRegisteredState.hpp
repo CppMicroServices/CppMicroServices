@@ -56,7 +56,12 @@ public:
    */
   std::shared_ptr<ComponentInstance> Activate(ComponentConfigurationImpl& mgr,
                                               const cppmicroservices::Bundle& clientBundle) override;
-
+  /**
+   * Modifying properties while the component is in the REGISTERED_STATE state is a no-op
+   */
+  bool  Modified(ComponentConfigurationImpl& /*mgr*/) override{ 
+      return true;
+  };
   /**
    * Method blocks the current thread until the stored future is ready
    */

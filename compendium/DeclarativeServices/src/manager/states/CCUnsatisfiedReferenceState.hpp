@@ -63,14 +63,19 @@ public:
 
   /**
    * This method does not result in a state change since the component configuration is already in
-   * UNSATISFIED_REFERENCE state. This method does wait for the state transition (possibly triggered
-   * by another thread) to finish. 
+   * UNSATISFIED_REFERENCE state. 
    */
   void Deactivate(ComponentConfigurationImpl& /*mgr*/) override {
     // wait for the transition to finish
     WaitForTransitionTask();
   };
 
+  /**
+   * Modifying properties while the component is in the UNSATISFIED_REFERENCE state is a no-op
+   */
+  bool Modified(ComponentConfigurationImpl& /*mgr*/) override { 
+       return true;
+   };
   /**
    * Rebinding while in an UNSATISFIED_REFERENCE state is a no-op
    */

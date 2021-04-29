@@ -22,6 +22,8 @@
 
 #include "cppmicroservices/Any.h"
 #include "Utils.h"
+#include <rapidjson/error/en.h>
+#include <rapidjson/istreamwrapper.h>
 
 #include <stdexcept>
 #include <iomanip>
@@ -118,4 +120,32 @@ std::string Any::ToStringNoExcept() const
 {
   return Empty() ? std::string() : _content->ToString();
 }
+
+Any Any::FromJSON(const std::string& json)
+{
+  std::stringstream jsonStream { json };
+  return FromJSON(jsonStream);
+}
+
+Any Any::FromJSON(std::istream& json)
+{
+  // use RapidJSON to parse the input stream. 
+  rapidjson::IStreamWrapper jsonStream(json);
+  rapidjson::Document root;
+  if (root.ParseStream(jsonStream).HasParseError()) {
+    // There was a parse error, so throw a runtime_error explaining the problem.
+    throw std::runtime_error(rapidjson::GetParseError_En(root.GetParseError()));
+  }
+
+  // Walk the resulting rapid json document tree converting it into our Any data structures and
+  // return the results.
+  //
+  // Note: The second argument here indicates that as the input string is parsed, any AnyMap that is
+  // created to hold JSON objects should use the case-insensitive, unordered option. A false makes
+  // the maps be case sensitive. Usage within CppMicroServices is always case insensitive, so don't
+  // expose this to our external customers. If we need to, we can simply allow the caller to specify
+  // the value of the bool in either the argument list, or as a template parameter.
+  return json::ParseValue(root, true);
+}
+
 }

@@ -418,6 +418,16 @@ public:
     return _content ? _content->Type() : typeid(void);
   }
 
+  /**
+   * Parse a JSON string and return the results in an Any object. Hierarchical data is stored in
+   * maps, and lists are stored in vectors.
+   *
+   * @throws std::runtime_error with invalid JSON input
+   * @param  json a string containing JSON Data
+   * @return an Any object containing the parsed data. 
+   */
+  static Any FromJSON(const std::string& json);
+  static Any FromJSON(std::istream& json);
 private:
   class Placeholder
   {

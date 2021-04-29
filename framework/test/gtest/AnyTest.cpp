@@ -297,3 +297,43 @@ TEST(AnyTest, AnyEquality) {
   EXPECT_NE(lhs, rhs); // and finally, with the "int" element erased, they should not be equal
                        // anymore. 
 }
+TEST(AnyTest, FromJSON) {
+
+  std::string str1 = R"({
+    "map" : {
+      "1" : 0.3, 
+      "3" : "bonjour", 
+      "4" : {}, 
+      "5" : []
+    }, 
+    "number" : 5, 
+    "vector" : [
+      9,
+      8,
+      7
+    ]
+  })";
+
+  // This should produce the same AnyMap... only the order of the fields is different, which should
+  // make no difference in terms of the equality of the maps. Also, make the "keys" have different
+  // case so that we can ensure that our case-insensitive map is working properly.
+  std::string str2 = R"({
+    "Number" : 5, 
+    "Vector" : [
+      9,
+      8,
+      7
+    ],
+    "Map" : {
+      "3" : "bonjour", 
+      "4" : {}, 
+      "1" : 0.3, 
+      "5" : []
+    }
+  })";
+
+  auto v1 = Any::FromJSON(str1);
+  auto v2 = Any::FromJSON(str2);
+
+  EXPECT_EQ(v1,v2);
+}

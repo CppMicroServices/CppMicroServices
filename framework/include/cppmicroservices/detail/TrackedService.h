@@ -27,6 +27,9 @@
 #include "cppmicroservices/detail/BundleAbstractTracked.h"
 #include "cppmicroservices/detail/TrackedServiceListener.h"
 
+#include "cppmicroservices/detail/CounterLatch.h"
+#include "cppmicroservices/detail/ScopeGuard.h"
+
 namespace cppmicroservices {
 
 namespace detail {
@@ -57,11 +60,15 @@ public:
    */
   void ServiceChanged(const ServiceEvent& event) override;
 
+  void WaitOnCustomizersToFinish();
+
 private:
   using Superclass = BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>;
 
   ServiceTracker<S, T>* serviceTracker;
   ServiceTrackerCustomizer<S, T>* customizer;
+
+  CounterLatch latch;
 
   /**
    * Increment the tracking count and tell the tracker there was a

@@ -21,11 +21,13 @@
   =============================================================================*/
 
 #include "gtest/gtest.h"
-#include "../src/manager/ConcurrencyUtil.hpp"
-#include "ConcurrencyTestUtil.hpp"
+#include "../util/ConcurrencyTestUtil.hpp"
+#include "cppmicroservices/detail/CounterLatch.h"
 
 namespace cppmicroservices{
-namespace scrimpl {
+namespace detail {
+
+using namespace test;
 
 TEST(CounterLatchTest, TestInitialState)
 {

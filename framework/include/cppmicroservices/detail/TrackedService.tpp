@@ -27,9 +27,17 @@ namespace detail {
 template<class S, class TTT>
 TrackedService<S,TTT>::TrackedService(ServiceTracker<S,T>* serviceTracker,
                   ServiceTrackerCustomizer<S,T>* customizer)
-  : Superclass(&serviceTracker->d->context), serviceTracker(serviceTracker), customizer(customizer)
+  : Superclass(serviceTracker->d->context)
+  , serviceTracker(serviceTracker)
+  , customizer(customizer)
+  , latch{}
 {
 
+}
+
+template<class S, class TTT>
+void TrackedService<S,TTT>::WaitOnCustomizersToFinish() {
+  latch.Wait();
 }
 
 template<class S, class TTT>
@@ -52,6 +60,15 @@ void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent& event)
   {
     return;
   }
+
+  (void)latch.CountUp();
+  ScopeGuard sg([this]() {
+    // By using try/catch here, we ensure that this lambda function doesn't
+    // throw inside ScopeGuard's dtor.
+    try {
+      latch.CountDown();
+    } catch (...) { }
+  });
 
   switch (event.GetType())
   {

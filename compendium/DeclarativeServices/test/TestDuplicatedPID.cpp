@@ -48,7 +48,7 @@ TEST_F(tServiceComponent, testDuplicatedPID) // DS_CAI_FTC_17
   ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
   // Create configuration object.
-  auto configuration = configAdminService->GetConfiguration(componentName);
+  auto configuration  = configAdminService->GetConfiguration(componentName);
   auto configInstance = configuration->GetPid();
 
   // GetService.

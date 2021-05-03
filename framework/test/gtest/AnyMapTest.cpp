@@ -198,12 +198,13 @@ TEST(AnyMapTest, AnyMap)
 
 TEST(AnyMapTest, MoveConstructor)
 {
+  testing::FLAGS_gtest_death_test_style = "threadsafe";
   AnyMap o(AnyMap::ORDERED_MAP);
   o["do"] = Any(1);
   o["re"] = Any(2);
   AnyMap o_anymap_move_ctor(std::move(o));
   ASSERT_EQ(any_cast<int>(o_anymap_move_ctor.at("do")), 1);
-  ASSERT_DEATH(o.size(), ".*") << "This call should result in a crash because "
+  ASSERT_DEATH({o.size();}, ".*") << "This call should result in a crash because "
                                   "the object has been moved from";
 
   AnyMap uo(AnyMap::UNORDERED_MAP);
@@ -218,6 +219,7 @@ TEST(AnyMapTest, MoveConstructor)
 
 TEST(AnyMapTest, MoveAssignment)
 {
+  testing::FLAGS_gtest_death_test_style = "threadsafe";
   AnyMap o(AnyMap::ORDERED_MAP);
   o["do"] = Any(1);
   o["re"] = Any(2);

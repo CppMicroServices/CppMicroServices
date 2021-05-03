@@ -31,7 +31,7 @@ namespace detail {
 
 template<class S, class TTT, class R>
 BundleAbstractTracked<S,TTT,R>::BundleAbstractTracked(BundleContext bc)
-  : closed(false), bc(bc)
+  : closed(false), trackingCount(0), bc(bc)
 {
 }
 

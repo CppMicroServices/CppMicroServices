@@ -24,7 +24,6 @@
 #include "CCUnsatisfiedReferenceState.hpp"
 #include "../ComponentConfigurationImpl.hpp"
 
-using cppmicroservices::service::component::runtime::dto::ComponentState;
 namespace cppmicroservices {
 namespace scrimpl {
 

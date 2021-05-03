@@ -28,11 +28,11 @@
 namespace test {
 
 /**
-* Test using custom component name
+* Negative test for duplicated PID
 */
 TEST_F(tServiceComponent, testDuplicatedPID) // DS_CAI_FTC_17
 {
-  // Start the test bundle containing the custom component name.
+  // Start the test bundle containing duplicate PID.
   std::string componentName           = "sample::ServiceComponentCA17";
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA17");
 
@@ -47,7 +47,7 @@ TEST_F(tServiceComponent, testDuplicatedPID) // DS_CAI_FTC_17
     GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
   ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
-  // Create configuration object and update property.
+  // Create configuration object.
   auto configuration = configAdminService->GetConfiguration(componentName);
   auto configInstance = configuration->GetPid();
 

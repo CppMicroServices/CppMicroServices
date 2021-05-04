@@ -6,7 +6,7 @@
 |             +---------------------------+--------------------------+------------------------+
 |             | Xcode 7.3 and 12.0.1      | Visual Studio 2017       |                        |
 |             +---------------------------+--------------------------+------------------------+
-|             | Clang 3.5 and 6.0         | Visual Studio 2019       |                        |
+|             | Clang 3.5                 | Visual Studio 2019       |                        |
 |             +---------------------------+--------------------------+------------------------+
 |             |                           | MinGW-w64                |                        |
 +=============+===========================+==========================+========================+
@@ -77,12 +77,11 @@ Recommended minimum required CMake version:
 
 Below is a list of tested compiler/OS combinations:
 
-- GCC 5.4 (Ubuntu 14.04) via Travis CI
-- GCC 8.0 (Ubuntu 14.04) via Travis CI
+- GCC 5.4 (Ubuntu 16.04) via Travis CI
+- GCC 8.0 (Ubuntu 16.04) via Travis CI
 - Clang 3.5 (Ubuntu 14.04) via Travis CI
-- Clang 6.0 (Ubuntu 14.04) via Travis CI
-- Clang Xcode 7.3 (OS X 10.11) via Travis CI
-- Clang Xcode 10.3 (OS X 10.14) via Travis CI
+- Apple Clang, Xcode 7.3 (OS X 10.11) via Travis CI
+- Apple Clang, Xcode 12.0.1 (OS X 10.15.7) via Travis CI
 - Visual Studio 2015 via Appveyor
 - Visual Studio 2017 via Appveyor
 - Visual Studio 2019 via Appveyor

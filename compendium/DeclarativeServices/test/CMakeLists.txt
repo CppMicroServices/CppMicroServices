@@ -64,9 +64,10 @@ set(_declarativeservices_tests
   TestComponentManagerImpl.cpp
   TestComponentNameWithPID.cpp
   TestComponentRegistry.cpp
-  TestCounterLatch.cpp
-  TestFactoryPid.cpp
   TestConfigPolicies.cpp
+  TestCounterLatch.cpp
+  TestDuplicatedPID.cpp
+  TestFactoryPid.cpp
   TestManifestWithInvalidConfiguration.cpp
   TestMetadataParserFactory.cpp
   TestMetadataParserImplV1.cpp

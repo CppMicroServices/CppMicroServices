@@ -38,6 +38,13 @@ namespace cppmicroservices {
     namespace cm {
 
       /**
+      \defgroup gr_configurationexception ConfigurationException
+      \brief Groups ConfigurationException class related symbols.
+      */
+
+      /**
+       * \ingroup gr_configurationexception
+       *
        * Exception which may be thrown by ManagedService or ManagedServiceFactory
        * subclasses to indicate to the ConfigurationAdmin implementation that the
        * Configuration they have been given is invalid. The ConfigurationAdmin
@@ -53,8 +60,8 @@ namespace cppmicroservices {
          * Construct a new ConfigurationException with the specified reason and
          * optionally specify which property caused the error.
          *
-         * @param reason The reason for the exception.
-         * @param property The property which caused the excpetion, if applicable.
+         * @param rsn The reason for the exception.
+         * @param prop The property which caused the excpetion, if applicable.
          */
         ConfigurationException(std::string rsn, std::string prop="")
           : std::runtime_error(makeMessage(rsn, prop).c_str())

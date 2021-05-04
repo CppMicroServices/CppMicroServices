@@ -32,6 +32,13 @@ namespace cppmicroservices {
     namespace cm {
 
       /**
+      \defgroup gr_configuration Configuration
+      \brief Groups Configuration class related symbols.
+      */
+
+      /**
+       * \ingroup gr_configuration
+       * 
        * The Configuration object (normally obtained as a std::shared_ptr<Configuration>)
        * is the principal means for clients of ConfigurationAdmin to inspect or update the
        * Configuration of a given service or service factory.

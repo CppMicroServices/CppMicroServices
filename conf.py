@@ -59,7 +59,7 @@ def setup(app):
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-# needs_sphinx = '1.0'
+needs_sphinx = '1.5'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -90,7 +90,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'C++ Micro Services'
-copyright = u'2017, CppMicroServices Contributors'
+copyright = u'2017-2021, CppMicroServices Contributors'
 author = u'CppMicroServices Team'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -373,6 +373,9 @@ man_pages = [
     ('doc/man/cppmicroservices-shellservice.7', 'cppmicroservices-shellservice', u'Shell Service', [author], 7),
     ('doc/man/cppmicroservices.3', 'cppmicroservices', u'CppMicroServices', [author], 3),
     ('doc/man/cppmicroservices-framework.3', 'cppmicroservices-framework', u'CppMicroServices Framework API', [author], 3),
+    ('doc/man/cppmicroservices-ds.3', 'cppmicroservices-ds', u'CppMicroServices Declarative Services API', [author], 3),
+    ('doc/man/cppmicroservices-configadmin.3', 'cppmicroservices-configadmin', u'CppMicroServices Configuration Admin API', [author], 3),
+    ('doc/man/cppmicroservices-logservice.3', 'cppmicroservices-logservice', u'CppMicroServices Log Service API', [author], 3),
     ('doc/man/cppmicroservices-httpservice.3', 'cppmicroservices-httpservice', u'CppMicroServices Http Service API', [author], 3),
     ('doc/man/cppmicroservices-webconsole.3', 'cppmicroservices-webconsole', u'CppMicroServices Web Console API', [author], 3),
     ('doc/man/cppmicroservices-shellservice.3', 'cppmicroservices-shellservice', u'CppMicroServices Shell Service API', [author], 3),

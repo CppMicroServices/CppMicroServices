@@ -29,7 +29,14 @@ namespace cppmicroservices {
   namespace service {
     namespace cm {
 
+     /**
+      \defgroup gr_managedservice ManagedService
+      \brief Groups ManagedService class related symbols.
+      */
+
       /**
+       * \ingroup gr_managedservice
+       *
        * The ManagedService interface is the interface that services should implement
        * to receive updates from the ConfigurationAdmin implementation with their
        * Configuration. The Configuration will be provided based on the service.pid

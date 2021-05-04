@@ -446,7 +446,7 @@ public:
    * @throws std::invalid_argument If the specified <code>filter</code>
    *         contains an invalid filter expression that cannot be parsed.
    * @throws std::logic_error If this BundleContext is no longer valid.
-   * @throws ServiceException If the service interface id of \c S is empty, see @gr_serviceinterface.
+   * @throws ServiceException If the service interface id of \c S is empty, see @ref gr_serviceinterface.
    *
    * @see GetServiceReferences(const std::string&, const std::string&)
    */
@@ -514,7 +514,7 @@ public:
    * @return A <code>ServiceReference</code> object, or an invalid <code>ServiceReference</code> if
    *         no services are registered which implement the type <code>S</code>.
    * @throws std::runtime_error If this BundleContext is no longer valid.
-   * @throws ServiceException If the service interface id of \c S is empty, see @gr_serviceinterface.
+   * @throws ServiceException If the service interface id of \c S is empty, see @ref gr_serviceinterface.
    * @see #GetServiceReference(const std::string&)
    * @see #GetServiceReferences(const std::string&)
    */

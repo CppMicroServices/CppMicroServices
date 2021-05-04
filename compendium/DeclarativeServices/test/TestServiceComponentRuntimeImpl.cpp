@@ -213,9 +213,9 @@ TEST_F(ServiceComponentRuntimeImplTest, GetComponentConfigurationDTOs)
   EXPECT_CALL(*config2, GetProperties())
     .WillRepeatedly(testing::Return(emptyProperties));
   EXPECT_CALL(*config1, GetConfigState())
-    .WillRepeatedly(testing::Return(service::component::runtime::dto::UNSATISFIED_REFERENCE));
+    .WillRepeatedly(testing::Return(service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE));
   EXPECT_CALL(*config2, GetConfigState())
-    .WillRepeatedly(testing::Return(service::component::runtime::dto::ACTIVE));
+    .WillRepeatedly(testing::Return(service::component::runtime::dto::ComponentState::ACTIVE));
   auto refMgr1 = std::make_shared<MockReferenceManager>();
   auto refMgr2 = std::make_shared<MockReferenceManager>();
   std::vector<std::shared_ptr<ReferenceManager>> refMgrs {refMgr1, refMgr2};
@@ -237,8 +237,8 @@ TEST_F(ServiceComponentRuntimeImplTest, GetComponentConfigurationDTOs)
   EXPECT_EQ(configDTOs.size(), configs.size());
   EXPECT_EQ(configDTOs.at(0).id, 100ul);
   EXPECT_EQ(configDTOs.at(1).id, 200ul);
-  EXPECT_EQ(configDTOs.at(0).state, service::component::runtime::dto::UNSATISFIED_REFERENCE);
-  EXPECT_EQ(configDTOs.at(1).state, service::component::runtime::dto::ACTIVE);
+  EXPECT_EQ(configDTOs.at(0).state, service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(configDTOs.at(1).state, service::component::runtime::dto::ComponentState::ACTIVE);
 
   // no matching component in the ComponentRegistry
   compDescDTO.name = "FooBar";

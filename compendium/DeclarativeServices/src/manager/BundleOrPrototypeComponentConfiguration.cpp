@@ -46,7 +46,7 @@ BundleOrPrototypeComponentConfigurationImpl::~BundleOrPrototypeComponentConfigur
 
 std::shared_ptr<ComponentInstance> BundleOrPrototypeComponentConfigurationImpl::CreateAndActivateComponentInstance(const cppmicroservices::Bundle& bundle)
 {
-  if(GetState()->GetValue() != service::component::runtime::dto::ACTIVE)
+  if(GetState()->GetValue() != service::component::runtime::dto::ComponentState::ACTIVE)
   {
     return nullptr;
   }

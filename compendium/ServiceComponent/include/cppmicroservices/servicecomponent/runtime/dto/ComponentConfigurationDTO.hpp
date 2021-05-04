@@ -35,7 +35,17 @@ namespace service {
 namespace component {
 namespace runtime {
 namespace dto {
-enum US_ServiceComponent_EXPORT ComponentState {
+
+/**
+\defgroup gr_componentconfigurationdto ComponentConfigurationDTO
+\brief Groups ComponentConfigurationDTO related symbols.
+*/
+
+/**
+ * \addtogroup gr_componentconfigurationdto
+ * @{
+ */
+enum class ComponentState : uint8_t {
   /**
    * The component configuration is unsatisfied due to an unsatisfied
    * reference.
@@ -57,8 +67,10 @@ enum US_ServiceComponent_EXPORT ComponentState {
    */
   ACTIVE
 };
+/** @}*/
 
 /**
+ * \ingroup gr_componentconfigurationdto
  * A representation of an actual instance of a declared component description
  * parameterized by component properties.
  */
@@ -67,14 +79,14 @@ struct US_ServiceComponent_EXPORT ComponentConfigurationDTO {
    * The representation of the component configuration's component
    * description.
    */
-  ComponentDescriptionDTO	description;
+  ComponentDescriptionDTO description;
 
   /**
    * The current state of the component configuration.
    *
    * <p>
    * This is one of
-   * {@link #UNSATISFIED_REFERENCE}, {@link #SATISFIED} or {@link #ACTIVE}.
+   * {@link #ComponentState::UNSATISFIED_REFERENCE}, {@link #ComponentState::SATISFIED} or {@link #ComponentState::ACTIVE}.
    */
   ComponentState state;
 
@@ -83,7 +95,7 @@ struct US_ServiceComponent_EXPORT ComponentConfigurationDTO {
    *
    * <p>
    * The id is a non-persistent, unique value assigned at runtime. The id is
-   * also available as the {@code component.id} component property. The value
+   * also available as the \c component.id component property. The value
    * of this field is unspecified if the state of this component configuration
    * is unsatisfied.
    */
@@ -94,7 +106,7 @@ struct US_ServiceComponent_EXPORT ComponentConfigurationDTO {
    *
    * @see ComponentContext#GetProperties()
    */
-  std::unordered_map<std::string, cppmicroservices::Any>	properties;
+  std::unordered_map<std::string, cppmicroservices::Any> properties;
 
   /**
    * The satisfied references.
@@ -104,7 +116,7 @@ struct US_ServiceComponent_EXPORT ComponentConfigurationDTO {
    * reference of the component configuration. The vector must be empty if the
    * component configuration has no satisfied references.
    */
-  std::vector<SatisfiedReferenceDTO>		satisfiedReferences;
+  std::vector<SatisfiedReferenceDTO> satisfiedReferences;
 
   /**
    * The unsatisfied references.
@@ -114,7 +126,7 @@ struct US_ServiceComponent_EXPORT ComponentConfigurationDTO {
    * unsatisfied reference of the component configuration. The vector must be
    * empty if the component configuration has no unsatisfied references.
    */
-  std::vector<UnsatisfiedReferenceDTO>	unsatisfiedReferences;
+  std::vector<UnsatisfiedReferenceDTO> unsatisfiedReferences;
 };
 }
 }

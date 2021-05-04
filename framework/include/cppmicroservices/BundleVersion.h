@@ -77,7 +77,6 @@ private:
   /**
    * Called by the BundleVersion constructors to validate the version components.
    *
-   * @return <code>true</code> if the validation was successfull, <code>false</code> otherwise.
    */
   void Validate();
 

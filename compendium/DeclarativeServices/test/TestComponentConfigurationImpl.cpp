@@ -182,7 +182,7 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefUnsatisfied)
   auto mockUnsatisfiedState = std::make_shared<MockComponentConfigurationState>();
   EXPECT_CALL(*mockStatisfiedState, GetValue())
     .Times(2)
-    .WillRepeatedly(testing::Return(service::component::runtime::dto::SATISFIED));
+    .WillRepeatedly(testing::Return(service::component::runtime::dto::ComponentState::SATISFIED));
   EXPECT_CALL(*mockStatisfiedState, Deactivate(testing::_))
     .Times(1)
     .WillRepeatedly(testing::Invoke([&](ComponentConfigurationImpl& config){
@@ -190,15 +190,15 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefUnsatisfied)
                                     }));
   EXPECT_CALL(*mockUnsatisfiedState, GetValue())
     .Times(1)
-    .WillRepeatedly(testing::Return(service::component::runtime::dto::UNSATISFIED_REFERENCE));
+    .WillRepeatedly(testing::Return(service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE));
   auto refMgr1 = std::make_shared<MockReferenceManager>();
   fakeCompConfig->referenceManagers.insert(std::make_pair("ref1", refMgr1));
   fakeCompConfig->state = mockStatisfiedState;
-  EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::SATISFIED);
+  EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::ComponentState::SATISFIED);
   fakeCompConfig->RefUnsatisfied("invalid_refname");
-  EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::SATISFIED);
+  EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::ComponentState::SATISFIED);
   fakeCompConfig->RefUnsatisfied("ref1");
-  EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE);
   fakeCompConfig->referenceManagers.clear(); // remove the mock reference managers
 }
 
@@ -221,7 +221,7 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefChangedState)
     std::make_shared<dummy::ServiceImpl>());
 
   EXPECT_EQ(fakeCompConfig->GetConfigState(),
-    service::component::runtime::dto::UNSATISFIED_REFERENCE);
+    service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE);
   reg.Unregister();
 }
 
@@ -386,16 +386,16 @@ bool ValidateStateSequence(const std::vector<std::pair<ComponentState,ComponentS
     auto nextState = stateArr[i].second;
     switch(currState)
     {
-      case service::component::runtime::dto::UNSATISFIED_REFERENCE:
-        if(nextState == service::component::runtime::dto::ACTIVE)
+      case service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE:
+        if(nextState == service::component::runtime::dto::ComponentState::ACTIVE)
         {
           foundInvalidTransition = true;
         }
         break;
-      case service::component::runtime::dto::SATISFIED:
+      case service::component::runtime::dto::ComponentState::SATISFIED:
         break;
-      case service::component::runtime::dto::ACTIVE:
-        if(nextState == service::component::runtime::dto::SATISFIED)
+      case service::component::runtime::dto::ComponentState::ACTIVE:
+        if(nextState == service::component::runtime::dto::ComponentState::SATISFIED)
         {
           foundInvalidTransition = true;
         }
@@ -444,11 +444,11 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentRegisterDeactivate)
 
   auto results = ConcurrentInvoke(func);
   EXPECT_TRUE(ValidateStateSequence(results));
-  if(fakeCompConfig->GetConfigState() == service::component::runtime::dto::SATISFIED)
+  if(fakeCompConfig->GetConfigState() == service::component::runtime::dto::ComponentState::SATISFIED)
   {
     EXPECT_EQ(GetFramework().GetBundleContext().GetServiceReferences("interface").size(), 1u);
   }
-  else if(fakeCompConfig->GetConfigState() == service::component::runtime::dto::UNSATISFIED_REFERENCE)
+  else if(fakeCompConfig->GetConfigState() == service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE)
   {
     EXPECT_EQ(GetFramework().GetBundleContext().GetServiceReferences("interface").size(), 0u);
   }

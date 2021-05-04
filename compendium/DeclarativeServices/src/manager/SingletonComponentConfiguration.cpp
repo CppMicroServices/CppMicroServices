@@ -59,7 +59,7 @@ SingletonComponentConfigurationImpl::~SingletonComponentConfigurationImpl()
 std::shared_ptr<ComponentInstance> SingletonComponentConfigurationImpl::CreateAndActivateComponentInstance(const cppmicroservices::Bundle& /*bundle*/)
 {
   auto instanceContextPair = data.lock();
-  if(GetState()->GetValue() != service::component::runtime::dto::ACTIVE)
+  if(GetState()->GetValue() != service::component::runtime::dto::ComponentState::ACTIVE)
   {
     return nullptr;
   }

@@ -49,14 +49,13 @@ namespace cppmicroservices {
  * <code>ServiceRegistration::Unregister</code>) a service while being
  * synchronized on any object.
  *
- * The <code>ServiceTracker</code> class is thread-safe. It does not call a
- * <code>ServiceTrackerCustomizer</code> while holding any locks.
- * <code>ServiceTrackerCustomizer</code> implementations must also be
- * thread-safe.
+ * \note The <code>ServiceTracker</code> class implementation of <code>ServiceTrackerCustomizer</code>
+ *       is thread-safe. It does not call a <code>ServiceTrackerCustomizer</code> while holding any locks.
+ *       <code>ServiceTrackerCustomizer</code> implementations must also be thread-safe.
  *
  * \tparam S The type of the service being tracked
  * \tparam T The type of the tracked object. The default is \c S.
- * \remarks This class is thread safe.
+ * \remarks <code>ServiceTrackerCustomizer</code> implementations must also be thread-safe.
  */
 template<class S, class T = S>
 struct ServiceTrackerCustomizer

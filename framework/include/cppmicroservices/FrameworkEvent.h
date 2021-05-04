@@ -225,7 +225,6 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
  */
 US_Framework_EXPORT bool operator==(const FrameworkEvent& rhs,
                                     const FrameworkEvent& lhs);
-/** @}*/
 }
 
 US_MSVC_POP_WARNING

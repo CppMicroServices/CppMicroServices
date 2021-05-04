@@ -33,15 +33,29 @@
 namespace cppmicroservices {
 namespace logservice {
 
-enum class SeverityLevel : uint8_t
-{
-  LOG_ERROR = 1,    // Indicates the bundle or service may not be functional. Action should be taken to correct this situation.
-  LOG_WARNING = 2,  // Indicates a bundle or service is still functioning but may experience problems in the future because of the warning condition.
-  LOG_INFO = 3,     // May be the result of any change in the bundle or service and does not indicate a problem.
-  LOG_DEBUG = 4     // Used for problem determination and may be irrelevant to anyone but the bundle developer.
-};
+/**
+\defgroup gr_logservice LogService
+
+\brief Groups LogService class related symbols.
+*/
 
 /**
+ * \addtogroup gr_logservice
+ * @{
+ */
+enum class SeverityLevel : uint8_t
+{
+  LOG_ERROR = 1,    ///< Indicates the bundle or service may not be functional. Action should be taken to correct this situation.
+  LOG_WARNING = 2,  ///< Indicates a bundle or service is still functioning but may experience problems in the future because of the warning condition.
+  LOG_INFO = 3,     ///< May be the result of any change in the bundle or service and does not indicate a problem.
+  LOG_DEBUG = 4     ///< Used for problem determination and may be irrelevant to anyone but the bundle developer.
+};
+/** @}*/
+
+/**
+ * \ingroup MicroService
+ * \ingroup gr_logservice
+ * 
  * Provides methods for bundles to write messages to the log. 
  * LogService methods are provided to log messages; optionally with a ServiceReference object or an exception.
  * Bundles must log messages in the OSGi environment with a severity level according to the following

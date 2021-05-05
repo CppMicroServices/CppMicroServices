@@ -43,32 +43,36 @@ void TrackedService<S,TTT>::WaitOnCustomizersToFinish() {
 template<class S, class TTT>
 void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent& event)
 {
-  /*
-   * Check if we had a delayed call (which could happen when we
-   * close).
-   */
-  if (this->closed)
-  {
-    return;
-  }
-
-  ServiceReference<S> reference = event.GetServiceReference<S>();
-
-  DIAG_LOG(*serviceTracker->d->context.GetLogSink()) << "TrackedService::ServiceChanged["
-                                                    << event.GetType() << "]: " << reference;
-  if (!reference)
-  {
-    return;
-  }
-
   (void)latch.CountUp();
   ScopeGuard sg([this]() {
     // By using try/catch here, we ensure that this lambda function doesn't
     // throw inside ScopeGuard's dtor.
     try {
       latch.CountDown();
-    } catch (...) { }
+    } catch (...) {
+    }
   });
+
+  ServiceReference<S> reference;
+  {
+    auto l = this->Lock();
+    /*
+   * Check if we had a delayed call (which could happen when we
+   * close).
+   */
+    if (this->closed) {
+      return;
+    }
+
+    reference = event.GetServiceReference<S>();
+
+    DIAG_LOG(*serviceTracker->d->context.GetLogSink())
+      << "TrackedService::ServiceChanged[" << event.GetType()
+      << "]: " << reference;
+    if (!reference) {
+      return;
+    }
+  }
 
   switch (event.GetType())
   {

@@ -142,6 +142,12 @@ void ServiceTracker<S,T>::Open()
 template<class S, class T>
 void ServiceTracker<S,T>::Close()
 {
+  try {
+    d->context.RemoveListener(std::move(d->listenerToken));
+  } catch (const std::runtime_error& /*e*/) {
+    /* In case the context was stopped or invalid. */
+  }
+
   std::shared_ptr<_TrackedService> outgoing = d->trackedService.Load();
   {
     auto l = d->Lock();
@@ -159,17 +165,11 @@ void ServiceTracker<S,T>::Close()
       << "ServiceTracker<S,TTT>::close:" << d->filter;
     outgoing->Close();
 
-    try {
-      d->context.RemoveListener(std::move(d->listenerToken));
-    } catch (const std::runtime_error& /*e*/) {
-      /* In case the context was stopped or invalid. */
-    }
-
     d->Modified();         /* clear the cache */
     outgoing->NotifyAll(); /* wake up any waiters */
-
-    outgoing->WaitOnCustomizersToFinish();
   }
+
+  outgoing->WaitOnCustomizersToFinish();
 
   auto references = GetServiceReferences();
   for(auto& ref : references) {

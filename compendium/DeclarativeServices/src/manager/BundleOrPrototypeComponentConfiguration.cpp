@@ -125,7 +125,11 @@ void BundleOrPrototypeComponentConfigurationImpl::BindReference(const std::strin
   {
     auto& instance = instancePair.first;
     auto& context = instancePair.second;
-    context->AddToBoundServicesCache(refName, ref);
+    if (!context->AddToBoundServicesCache(refName, ref)) {
+        GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+            "Failure while trying to add reference to BoundServices Cache ");
+        return;
+    }
     try {
       instance->InvokeBindMethod(refName, ref);
     } catch (const std::exception&) {
@@ -155,7 +159,10 @@ void BundleOrPrototypeComponentConfigurationImpl::UnbindReference(const std::str
                        std::current_exception());
     }
     
-    context->RemoveFromBoundServicesCache(refName, ref);
+    if (!context->RemoveFromBoundServicesCache(refName, ref)) {
+        GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+            "Failure when removing a reference from the BoundServices Cache");
+    }
   }
 }
 

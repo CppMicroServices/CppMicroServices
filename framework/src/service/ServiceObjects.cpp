@@ -159,8 +159,14 @@ InterfaceMapConstPtr ServiceObjectsBase::GetServiceInterfaceMap() const
     return result;
   }
   // copy construct a new map to be handed out to consumers
-  result =
-    std::make_shared<const InterfaceMap>(*(d->GetServiceInterfaceMap().get()));
+  auto interfaceMap = d->GetServiceInterfaceMap();
+  // There are some circumstances that will cause the interfaceMap to be empty
+  // like when another thread has unregistered the service.
+  if (!interfaceMap) {
+      return result;
+  }
+  result = std::make_shared<const InterfaceMap>(*(interfaceMap.get()));
+
   std::shared_ptr<UngetHelper> h(new UngetHelper{
     result, d->m_reference, d->m_context->bundle->shared_from_this() });
   return InterfaceMapConstPtr(h, h->interfaceMap.get());

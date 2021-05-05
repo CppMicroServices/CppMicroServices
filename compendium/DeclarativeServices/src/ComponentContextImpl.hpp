@@ -197,10 +197,10 @@ public:
    */
   void Invalidate();
 
-  void AddToBoundServicesCache(const std::string& refName
+  bool AddToBoundServicesCache(const std::string& refName
                              , const cppmicroservices::ServiceReferenceBase& sRef);
     
-  void RemoveFromBoundServicesCache(const std::string& refName
+  bool RemoveFromBoundServicesCache(const std::string& refName
                              , const cppmicroservices::ServiceReferenceBase& sRef);
 
 private:

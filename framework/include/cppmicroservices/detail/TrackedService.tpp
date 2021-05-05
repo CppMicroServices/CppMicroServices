@@ -56,6 +56,7 @@ void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent& event)
   ServiceReference<S> reference;
   {
     auto l = this->Lock();
+    US_UNUSED(l);
     /*
    * Check if we had a delayed call (which could happen when we
    * close).

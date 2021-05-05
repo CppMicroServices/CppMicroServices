@@ -65,6 +65,7 @@ set(_declarativeservices_tests
   TestComponentNameWithPID.cpp
   TestComponentRegistry.cpp
   TestConfigPolicies.cpp
+  TestConfigurationPropertiesWithMultipleConfigurations.cpp
   TestCounterLatch.cpp
   TestDuplicatedPID.cpp
   TestFactoryPid.cpp

@@ -83,8 +83,8 @@ TEST_F(tServiceComponent, testPrecedence)
 TEST_F(tServiceComponent, testMultipleConfig)
 {
   // Start the test bundle containing the component name.
-  std::string componentName = "sample::ServiceComponentCA13";
-  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA13");
+  std::string componentName = "sample::ServiceComponentCA12";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA12");
 
   // Use DS runtime service to validate the component state.
   scr::dto::ComponentDescriptionDTO compDescDTO;
@@ -111,23 +111,23 @@ TEST_F(tServiceComponent, testMultipleConfig)
 
   cppmicroservices::AnyMap props00(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  props00["UniqueProp1"] = cppmicroservices::Any(std::string("hola"));
+  props00["GreetingProp1"] = cppmicroservices::Any(std::string("hola"));
   configuration00->Update(props00);
 
   cppmicroservices::AnyMap props01(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  props01["UniqueProp2"] = cppmicroservices::Any(std::string("bonjour"));
+  props01["GreetingProp2"] = cppmicroservices::Any(std::string("bonjour"));
   configuration01->Update(props01);
 
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   ASSERT_EQ(cppmicroservices::any_cast<std::string>(
-              compConfigs[0].properties.find("UniqueProp0")->second),
+              compConfigs[0].properties.find("GreetingProp")->second),
             "hello");
   ASSERT_EQ(cppmicroservices::any_cast<std::string>(
-              compConfigs[0].properties.find("UniqueProp1")->second),
+              compConfigs[0].properties.find("GreetingProp1")->second),
             "hola");
   ASSERT_EQ(cppmicroservices::any_cast<std::string>(
-              compConfigs[0].properties.find("UniqueProp2")->second),
+              compConfigs[0].properties.find("GreetingProp2")->second),
             "bonjour");
 }
 

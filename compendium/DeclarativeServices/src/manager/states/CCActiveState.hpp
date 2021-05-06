@@ -26,6 +26,8 @@
 #include "CCSatisfiedState.hpp"
 #include "../ConcurrencyUtil.hpp"
 
+#include "cppmicroservices/detail/CounterLatch.h"
+
 using cppmicroservices::service::component::runtime::dto::ComponentState;
 
 namespace cppmicroservices {
@@ -77,7 +79,7 @@ public:
     latch.Wait();
   }
 private:
-  CounterLatch latch;
+  detail::CounterLatch latch;
 };
 }
 }

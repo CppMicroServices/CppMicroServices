@@ -20,11 +20,14 @@
 
   =============================================================================*/
 
+#ifndef CPPMICROSERVICES_DETAIL_SCOPEGUARD_H
+#  define CPPMICROSERVICES_DETAIL_SCOPEGUARD_H
+
 #include <functional>
 
 namespace cppmicroservices {
 
-namespace util {
+namespace detail {
 
 /**
  * A simple, single use scope guard using RAII
@@ -53,3 +56,4 @@ private:
 
 }
 }
+#endif

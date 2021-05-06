@@ -38,7 +38,7 @@
 #include "cppmicroservices/servicecomponent/runtime/dto/ComponentDescriptionDTO.hpp"
 #include "cppmicroservices/servicecomponent/runtime/dto/ReferenceDTO.hpp"
 
-#include "cppmicroservices/util/ScopeGuard.h"
+#include "cppmicroservices/detail/ScopeGuard.h"
 
 using cppmicroservices::logservice::SeverityLevel;
 using cppmicroservices::service::component::ComponentConstants::SERVICE_COMPONENT;
@@ -79,7 +79,7 @@ void SCRActivator::Stop(cppmicroservices::BundleContext context)
 {
   try
   {
-    cppmicroservices::util::ScopeGuard joinThreadPool{ [this]() {
+    cppmicroservices::detail::ScopeGuard joinThreadPool{ [this]() {
       if (threadpool) {
         try {
           threadpool->join();

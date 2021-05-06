@@ -58,6 +58,8 @@ public:
     , framework(cppmicroservices::FrameworkFactory().NewFramework())
   {}
 
+  void TestBody() override { }
+
   void SetUp() override
   {
     framework.Start();

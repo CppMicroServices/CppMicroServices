@@ -27,7 +27,7 @@
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/ServiceFactory.h"
 
-#include "TestingMacros.h"
+#include "gtest/gtest.h"
 
 struct Interface1
 {};
@@ -70,10 +70,9 @@ struct MyFactory1 : public cppmicroservices::ServiceFactory
   {
     auto iter = m_idToServiceMap.find(bundle.GetBundleId());
     if (iter != m_idToServiceMap.end()) {
-      US_TEST_CONDITION(
-        (iter->second) ==
-          cppmicroservices::ExtractInterface<Interface1>(service),
-        "Compare service pointer")
+      //Compare service pointer
+      EXPECT_EQ((iter->second),
+                cppmicroservices::ExtractInterface<Interface1>(service));
       m_idToServiceMap.erase(iter);
     }
   }
@@ -99,10 +98,9 @@ struct MyFactory2 : public cppmicroservices::ServiceFactory
   {
     auto iter = m_idToServiceMap.find(bundle.GetBundleId());
     if (iter != m_idToServiceMap.end()) {
-      US_TEST_CONDITION(
-        (iter->second) ==
-          cppmicroservices::ExtractInterface<Interface2>(service),
-        "Compare service pointer")
+      //Compare service pointer
+      EXPECT_EQ((iter->second),
+                cppmicroservices::ExtractInterface<Interface2>(service));
       m_idToServiceMap.erase(iter);
     }
   }
@@ -129,10 +127,9 @@ struct MyFactory3 : public cppmicroservices::ServiceFactory
   {
     auto iter = m_idToServiceMap.find(bundle.GetBundleId());
     if (iter != m_idToServiceMap.end()) {
-      US_TEST_CONDITION(
-        (iter->second) ==
-          cppmicroservices::ExtractInterface<Interface3>(service),
-        "Compare service pointer")
+      //Compare service pointer
+      EXPECT_EQ((iter->second),
+                cppmicroservices::ExtractInterface<Interface3>(service));
       m_idToServiceMap.erase(iter);
     }
   }
@@ -140,10 +137,8 @@ struct MyFactory3 : public cppmicroservices::ServiceFactory
 
 using namespace cppmicroservices;
 
-int ServiceTemplateTest(int /*argc*/, char* /*argv*/ [])
+TEST(ServiceTemplateTest, testServiceTemplate)
 {
-  US_TEST_BEGIN("ServiceTemplateTest");
-
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
   framework.Start();
@@ -170,80 +165,69 @@ int ServiceTemplateTest(int /*argc*/, char* /*argv*/ [])
     context.RegisterService<Interface1, Interface2, Interface3>(ToFactory(f3));
 
 #ifdef US_BUILD_SHARED_LIBS
-  US_TEST_CONDITION(context.GetBundle().GetRegisteredServices().size() == 6,
-                    "# of reg services")
+  ASSERT_EQ(context.GetBundle().GetRegisteredServices().size(), 6);
 #endif
 
   auto s1refs = context.GetServiceReferences<Interface1>();
-  US_TEST_CONDITION(s1refs.size() == 6, "# of interface1 regs")
+  //check # of interface1 regs
+  ASSERT_EQ(s1refs.size(), 6);
   auto s2refs = context.GetServiceReferences<Interface2>();
-  US_TEST_CONDITION(s2refs.size() == 4, "# of interface2 regs")
+  //Check # of interface2 regs
+  ASSERT_EQ(s2refs.size(), 4);
   auto s3refs = context.GetServiceReferences<Interface3>();
-  US_TEST_CONDITION(s3refs.size() == 2, "# of interface3 regs")
+  //Check # of interface3 regs
+  ASSERT_EQ(s3refs.size(), 2);
 
   auto i1 = context.GetService(sr1.GetReference());
-  US_TEST_CONDITION(i1 == s1, "interface1 ptr")
+  ASSERT_EQ(i1, s1);
   i1.reset();
 
   i1 = context.GetService(sfr1.GetReference());
-  US_TEST_CONDITION(i1 ==
-                      f1->m_idToServiceMap[context.GetBundle().GetBundleId()],
-                    "interface1 factory ptr")
+  //test interface1 factory ptr
+  ASSERT_EQ(i1, f1->m_idToServiceMap[context.GetBundle().GetBundleId()]);
   i1.reset();
 
   i1 = context.GetService(sr2.GetReference<Interface1>());
-  US_TEST_CONDITION(i1 == s2, "interface1 ptr")
+  ASSERT_EQ(i1, s2);
   i1.reset();
 
   i1 = context.GetService(sfr2.GetReference<Interface1>());
-  US_TEST_CONDITION(i1 ==
-                      f2->m_idToServiceMap[context.GetBundle().GetBundleId()],
-                    "interface1 factory ptr")
+  ASSERT_EQ(i1, f2->m_idToServiceMap[context.GetBundle().GetBundleId()]);
   i1.reset();
 
   auto i2 = context.GetService(sr2.GetReference<Interface2>());
-  US_TEST_CONDITION(i2 == s2, "interface2 ptr")
+  ASSERT_EQ(i2, s2);
   i2.reset();
 
   i2 = context.GetService(sfr2.GetReference<Interface2>());
-  US_TEST_CONDITION(i2 ==
-                      f2->m_idToServiceMap[context.GetBundle().GetBundleId()],
-                    "interface2 factory ptr")
+  ASSERT_EQ(i2, f2->m_idToServiceMap[context.GetBundle().GetBundleId()]);
   i2.reset();
 
   i1 = context.GetService(sr3.GetReference<Interface1>());
-  US_TEST_CONDITION(i1 == s3, "interface1 ptr")
+  ASSERT_EQ(i1, s3);
   i1.reset();
 
   i1 = context.GetService(sfr3.GetReference<Interface1>());
-  US_TEST_CONDITION(i1 ==
-                      f3->m_idToServiceMap[context.GetBundle().GetBundleId()],
-                    "interface1 factory ptr")
+  ASSERT_EQ(i1, f3->m_idToServiceMap[context.GetBundle().GetBundleId()]);
   i1.reset();
 
   i2 = context.GetService(sr3.GetReference<Interface2>());
-  US_TEST_CONDITION(i2 == s3, "interface2 ptr")
+  ASSERT_EQ(i2, s3);
   i2.reset();
 
   i2 = context.GetService(sfr3.GetReference<Interface2>());
-  US_TEST_CONDITION(i2 ==
-                      f3->m_idToServiceMap[context.GetBundle().GetBundleId()],
-                    "interface2 factory ptr")
+  ASSERT_EQ(i2, f3->m_idToServiceMap[context.GetBundle().GetBundleId()]);
   i2.reset();
 
   auto i3 = context.GetService(sr3.GetReference<Interface3>());
-  US_TEST_CONDITION(i3 == s3, "interface3 ptr")
+  ASSERT_EQ(i3, s3);
   i3.reset();
 
   i3 = context.GetService(sfr3.GetReference<Interface3>());
-  US_TEST_CONDITION(i3 ==
-                      f3->m_idToServiceMap[context.GetBundle().GetBundleId()],
-                    "interface3 factory ptr")
+  ASSERT_EQ(i3, f3->m_idToServiceMap[context.GetBundle().GetBundleId()]);
   i3.reset();
 
   sr1.Unregister();
   sr2.Unregister();
   sr3.Unregister();
-
-  US_TEST_END()
 }

@@ -40,7 +40,6 @@ set(_tests
   ServiceFactoryTest
   ServiceHooksTest
   ServiceRegistryPerformanceTest
-  ServiceTemplateTest
   StaticBundleTest
 )
 

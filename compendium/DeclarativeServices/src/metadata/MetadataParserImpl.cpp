@@ -159,7 +159,7 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
             if (duplicatePids.find(pid) != duplicatePids.end()) {
               std::string msg = "configuration-pid error in the manifest. Duplicate pid detected. ";
               msg.append(pid);
-              throw std::out_of_range(msg);
+              throw std::runtime_error(msg);
             }
             duplicatePids.emplace(pid, pid);       
         };

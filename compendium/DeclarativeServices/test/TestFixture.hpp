@@ -58,6 +58,8 @@ public:
     , framework(cppmicroservices::FrameworkFactory().NewFramework())
   {}
 
+  void TestBody() override { }
+
   void SetUp() override
   {
     framework.Start();
@@ -106,7 +108,9 @@ public:
     test::InstallLib(context, "TestBundleDSCA16");
     test::InstallLib(context, "TestBundleDSCA17");
     test::InstallLib(context, "TestBundleDSCA20");
+    test::InstallLib(context, "TestBundleDSCA24");
     test::InstallLib(context, "TestBundleDSCA26");
+    test::InstallLib(context, "TestBundleDSCA27");
 #endif
 
 #ifndef US_BUILD_SHARED_LIBS

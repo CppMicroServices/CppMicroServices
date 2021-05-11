@@ -81,6 +81,18 @@ namespace test
 
         virtual std::shared_ptr<TestManagedServiceFactoryServiceInterface> create(std::string const& config) = 0;
     };
+
+    class US_TestInterfaces_EXPORT TestBundleDSDependent
+    {
+      public:
+      virtual ~TestBundleDSDependent();
+    };
+
+    class US_TestInterfaces_EXPORT TestBundleDSUpstreamDependency
+    {
+      public:
+      virtual ~TestBundleDSUpstreamDependency();
+    };
     
     // Interfaces for declarative services dependency graph resolution benchmarks. The
     // implentations of these interfaces have dependencies that form a complete 3 level tree:

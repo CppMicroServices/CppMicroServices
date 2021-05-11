@@ -63,6 +63,7 @@ set(_declarativeservices_tests
   TestComponentManagerEnabledState.cpp
   TestComponentManagerImpl.cpp
   TestComponentRegistry.cpp
+  TestExceptionOnConstructionFailure.cpp
   TestMetadataParserFactory.cpp
   TestMetadataParserImplV1.cpp
   TestReferenceManagerImpl.cpp

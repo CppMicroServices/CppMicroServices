@@ -22,13 +22,14 @@ limitations under the License.
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/util/FileSystem.h"
 
 #include "TestUtils.h"
 #include "TestingConfig.h"
-#include "TestingMacros.h"
+#include "gtest/gtest.h"
 
 #include <mutex>
 #include <thread>
@@ -38,6 +39,7 @@ using namespace cppmicroservices;
 
 #ifdef US_BUILD_SHARED_LIBS
 namespace {
+
 std::mutex mutex_io = {};
 std::unique_lock<std::mutex> io_lock()
 {
@@ -49,28 +51,25 @@ std::unique_lock<std::mutex> io_lock()
 inline void InstallTestBundleNoErrorHandling(BundleContext frameworkCtx,
                                              const std::string& bundleName)
 {
-  auto bundles = frameworkCtx.InstallBundles(testing::LIB_PATH
-                              + util::DIR_SEP
-                              + US_LIB_PREFIX
-                              + bundleName
-                              + US_LIB_POSTFIX
-                              + US_LIB_EXT);
+  auto bundles = frameworkCtx.InstallBundles(
+    cppmicroservices::testing::LIB_PATH + util::DIR_SEP + US_LIB_PREFIX +
+    bundleName + US_LIB_POSTFIX + US_LIB_EXT);
 
   for (auto& b : bundles) {
     std::unique_lock<std::mutex> lock = io_lock();
-    US_TEST_CONDITION(false == !b,
-                      "Test to check if returned bundle is valid.");
+    //Test to check if returned bundle is valid.
+    ASSERT_TRUE(b);
   }
 }
 
-void TestSerial(const Framework& f)
+void TestSerialFunction(const Framework& f)
 {
   // Installing such a small set of bundles doesn't yield significant
   // data about performance. Consider increasing the number of bundles
   // used.
   auto bc = f.GetBundleContext();
 
-  testing::HighPrecisionTimer timer;
+  cppmicroservices::testing::HighPrecisionTimer timer;
   timer.Start();
   InstallTestBundleNoErrorHandling(bc, "TestBundleA");
   InstallTestBundleNoErrorHandling(bc, "TestBundleA2");
@@ -90,9 +89,10 @@ void TestSerial(const Framework& f)
   InstallTestBundleNoErrorHandling(bc, "TestBundleSL4");
 
   long long elapsedTimeInMilliSeconds = timer.ElapsedMilli();
-  io_lock(), US_TEST_OUTPUT(<< "[thread " << std::this_thread::get_id()
-                            << "] Time elapsed to install 12 new bundles: "
-                            << elapsedTimeInMilliSeconds << " milliseconds");
+  io_lock();
+  std::cout << "[thread " << std::this_thread::get_id()
+            << "] Time elapsed to install 12 new bundles: "
+            << elapsedTimeInMilliSeconds << " milliseconds\n";
 
   elapsedTimeInMilliSeconds = 0;
 
@@ -102,21 +102,43 @@ void TestSerial(const Framework& f)
     try {
       bundle.Start();
     } catch (const std::exception& e) {
-      io_lock(), US_TEST_OUTPUT(<< "[thread " << std::this_thread::get_id()
-                                << "] exception: " << e.what());
+      io_lock();
+      std::cout<< "[thread " << std::this_thread::get_id()
+                         << "] exception: " << e.what() << std::endl;
+      ASSERT_TRUE(false);
     }
 
     elapsedTimeInMilliSeconds += timer.ElapsedMilli();
   }
 
-  io_lock(), US_TEST_OUTPUT(<< "[thread " << std::this_thread::get_id()
-                            << "] Time elapsed to start 12 bundles: "
-                            << elapsedTimeInMilliSeconds << " milliseconds");
+  io_lock();
+  std::cout << "[thread " << std::this_thread::get_id()
+            << "] Time elapsed to start 12 bundles: "
+            << elapsedTimeInMilliSeconds << " milliseconds\n";
+}
+TEST(BundleRegistryConcurrencyTest, testSerial)
+{
+  FrameworkFactory factory;
+  auto framework = factory.NewFramework();
+  framework.Start();
+  TestSerialFunction(framework);
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
 }
 
-#  ifdef US_ENABLE_THREADING_SUPPORT
-void TestConcurrent(const Framework& f)
+#ifdef US_ENABLE_THREADING_SUPPORT
+TEST(BundleRegistryConcurrencyTest, testConcurrent)
 {
+  FrameworkFactory factory;
+  auto framework = factory.NewFramework();
+  framework.Start();
+
+  for (auto bundle : framework.GetBundleContext().GetBundles()) {
+    if (bundle.GetBundleId() != 0 && bundle.GetSymbolicName() != "main") {
+      bundle.Uninstall();
+    }
+  }
+
   // This is by no means a "real world" example. At best it is a simulation to test
   // the performance of concurrent access to the bundle registry.
   // At any point in which real customer usage in a concurrent way becomes known,
@@ -128,44 +150,22 @@ void TestConcurrent(const Framework& f)
   const int numTestThreads = 50;
   std::vector<std::thread> threads;
   for (int i = 0; i < numTestThreads; ++i) {
-    threads.emplace_back(TestSerial, f);
-    threads.emplace_back([f] { f.GetBundleContext().GetBundles(); });
+    threads.emplace_back(TestSerialFunction, framework);
+    threads.emplace_back(
+      [framework] { framework.GetBundleContext().GetBundles(); });
   }
 
   for (auto& th : threads) {
     th.join();
   }
 
-  io_lock(), US_TEST_CONDITION(numTestBundles == f.GetBundleContext().GetBundles().size(),
-                    "Test for correct number of installed bundles")
+  io_lock();
+  //Test for correct number of installed bundles
+  ASSERT_EQ(numTestBundles, framework.GetBundleContext().GetBundles().size());
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
 }
-#  endif
+#endif
 
 } // end anonymous namespace
 #endif
-
-int BundleRegistryConcurrencyTest(int /*argc*/, char* /*argv*/ [])
-{
-  US_TEST_BEGIN("BundleRegistryConcurrencyTest")
-
-  FrameworkFactory factory;
-  auto framework = factory.NewFramework();
-  framework.Start();
-#ifdef US_BUILD_SHARED_LIBS
-  US_TEST_OUTPUT(<< "Testing serial installation of bundles");
-  TestSerial(framework);
-
-  for (auto bundle : framework.GetBundleContext().GetBundles()) {
-    if (bundle.GetBundleId() != 0 && bundle.GetSymbolicName() != "main") {
-      bundle.Uninstall();
-    }
-  }
-#  ifdef US_ENABLE_THREADING_SUPPORT
-  US_TEST_OUTPUT(<< "Testing concurrent installation of bundles");
-  TestConcurrent(framework);
-#  endif
-#endif
-  framework.Stop();
-
-  US_TEST_END()
-}

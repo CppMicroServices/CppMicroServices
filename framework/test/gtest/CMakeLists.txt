@@ -47,6 +47,7 @@ set(_gtest_tests
   StaticBundleResourceTest.cpp
   FrameworkEventTest.cpp
   ServiceTemplateTest.cpp
+  BundleRegistryConcurrencyTest.cpp
 )
 
 if(BUILD_SHARED_LIBS)

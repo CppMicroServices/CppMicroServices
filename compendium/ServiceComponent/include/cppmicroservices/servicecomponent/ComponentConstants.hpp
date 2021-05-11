@@ -27,12 +27,14 @@
 
 #include <cppmicroservices/servicecomponent/ServiceComponentExport.h>
 
-namespace cppmicroservices { namespace service { namespace component {
+namespace cppmicroservices {
+namespace service {
+namespace component {
 
-	/**
-	\defgroup gr_componentconstants ComponentConstants
-	\brief Groups ComponentConstants related symbols.
-	*/
+/**
+ \defgroup gr_componentconstants ComponentConstants
+ \brief Groups ComponentConstants related symbols.
+ */
 
 /**
  * \ingroup gr_componentconstants 
@@ -85,9 +87,12 @@ US_ServiceComponent_EXPORT extern const std::string REFERENCE_TARGET_SUFFIX;
  * only if the service is registered with \c PROTOTYPE scope. Each component
  * instance receives a distinct service object.
  */
-US_ServiceComponent_EXPORT extern const std::string REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
+US_ServiceComponent_EXPORT extern const std::string
+  REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
 }
 
-}}} // namespaces
+}
+}
+} // namespaces
 
 #endif // ComponentConstants_hpp

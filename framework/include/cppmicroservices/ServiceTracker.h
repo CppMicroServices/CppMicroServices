@@ -97,7 +97,8 @@ public:
   using TrackedParamType =
     typename ServiceTrackerCustomizer<S, T>::TrackedParamType;
 
-  using TrackingMap = std::unordered_map<ServiceReference<S>, std::shared_ptr<TrackedParamType>>;
+  using TrackingMap =
+    std::unordered_map<ServiceReference<S>, std::shared_ptr<TrackedParamType>>;
 
   /**
    * Automatically closes the <code>ServiceTracker</code>
@@ -451,8 +452,9 @@ protected:
    * @param service The service object for the modified service.
    * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, TrackedArgType)
    */
-  void ModifiedService(const ServiceReference<S>& reference,
-                       const std::shared_ptr<TrackedParamType>& service) override;
+  void ModifiedService(
+    const ServiceReference<S>& reference,
+    const std::shared_ptr<TrackedParamType>& service) override;
 
   /**
    * Default implementation of the
@@ -470,8 +472,9 @@ protected:
    * @param service The service object for the removed service.
    * @see ServiceTrackerCustomizer::RemovedService(const ServiceReferenceType&, TrackedArgType)
    */
-  void RemovedService(const ServiceReference<S>& reference,
-                      const std::shared_ptr<TrackedParamType>& service) override;
+  void RemovedService(
+    const ServiceReference<S>& reference,
+    const std::shared_ptr<TrackedParamType>& service) override;
 
 private:
   using TypeTraits = typename ServiceTrackerCustomizer<S, T>::TypeTraits;

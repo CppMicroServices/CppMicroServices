@@ -28,14 +28,14 @@ namespace cppmicroservices {
 class TestBundleDeepActivator : public BundleActivator
 {
 public:
-
   TestBundleDeepActivator() {}
   ~TestBundleDeepActivator() {}
 
-  void Start(BundleContext) { }
-  void Stop(BundleContext) { }
+  void Start(BundleContext) {}
+  void Stop(BundleContext) {}
 };
 
 }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleDeepActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
+  cppmicroservices::TestBundleDeepActivator)

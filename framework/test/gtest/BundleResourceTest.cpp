@@ -471,7 +471,7 @@ TEST_F(BundleResourceTest, testResourceFromExecutable)
   ASSERT_EQ(line, "meant to be compiled into the test driver");
 }
 
-// Note: Following test has broken encoding 
+// Note: Following test has broken encoding
 TEST_F(BundleResourceTest, testSpecialCharacters)
 {
   BundleResource res = testBundle.GetResource("special_chars.dummy.ptxt");

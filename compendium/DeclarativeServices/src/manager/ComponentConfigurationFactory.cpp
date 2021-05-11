@@ -21,36 +21,30 @@
   =============================================================================*/
 
 #include "ComponentConfigurationFactory.hpp"
-#include "SingletonComponentConfiguration.hpp"
 #include "BundleOrPrototypeComponentConfiguration.hpp"
+#include "SingletonComponentConfiguration.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
 
-std::shared_ptr<ComponentConfigurationImpl> ComponentConfigurationFactory::CreateConfigurationManager(std::shared_ptr<const metadata::ComponentMetadata> compDesc,
-                                                                                                      const cppmicroservices::Bundle& bundle,
-                                                                                                      std::shared_ptr<const ComponentRegistry> registry,
-                                                                                                      std::shared_ptr<logservice::LogService> logger)
+std::shared_ptr<ComponentConfigurationImpl>
+ComponentConfigurationFactory::CreateConfigurationManager(
+  std::shared_ptr<const metadata::ComponentMetadata> compDesc,
+  const cppmicroservices::Bundle& bundle,
+  std::shared_ptr<const ComponentRegistry> registry,
+  std::shared_ptr<logservice::LogService> logger)
 {
   std::shared_ptr<ComponentConfigurationImpl> retVal;
   std::string scope = compDesc->serviceMetadata.scope;
-  if(scope == cppmicroservices::Constants::SCOPE_SINGLETON)
-  {
-    retVal = std::make_shared<SingletonComponentConfigurationImpl>(compDesc,
-                                                                   bundle,
-                                                                   registry,
-                                                                   logger);
+  if (scope == cppmicroservices::Constants::SCOPE_SINGLETON) {
+    retVal = std::make_shared<SingletonComponentConfigurationImpl>(
+      compDesc, bundle, registry, logger);
+  } else if (scope == cppmicroservices::Constants::SCOPE_BUNDLE ||
+             scope == cppmicroservices::Constants::SCOPE_PROTOTYPE) {
+    retVal = std::make_shared<BundleOrPrototypeComponentConfigurationImpl>(
+      compDesc, bundle, registry, logger);
   }
-  else if (scope == cppmicroservices::Constants::SCOPE_BUNDLE ||
-           scope == cppmicroservices::Constants::SCOPE_PROTOTYPE)
-  {
-    retVal = std::make_shared<BundleOrPrototypeComponentConfigurationImpl>(compDesc,
-                                                                           bundle,
-                                                                           registry,
-                                                                           logger);
-  }
-  if(retVal)
-  {
+  if (retVal) {
     retVal->Initialize();
   }
   return retVal;

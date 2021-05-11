@@ -45,7 +45,8 @@ void testStartStopFrameworkEvents()
 
   TestFrameworkListener l;
   f.Init();
-  f.GetBundleContext().AddFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
+  f.GetBundleContext().AddFrameworkListener(
+    &l, &TestFrameworkListener::frameworkEvent);
   f.Start();
   f.Stop();
 
@@ -55,7 +56,7 @@ void testStartStopFrameworkEvents()
   US_TEST_CONDITION_REQUIRED(
     l.CheckEvents(events),
     "Test for the correct number and order of Framework start/stop events.");
-  
+
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
@@ -148,7 +149,7 @@ void testAddRemoveFrameworkListener()
   US_TEST_CONDITION(
     count2 == 1,
     "Test that multiple framework listeners were NOT called after removal");
-  
+
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
@@ -176,7 +177,7 @@ void testFrameworkListenersAfterFrameworkStop()
   f.Start(); // generate framework event (started) with no listener to see it
   US_TEST_CONDITION(events == 1,
                     "Test that listeners were released on Framework Stop");
-  
+
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
@@ -277,7 +278,7 @@ void testFrameworkListenerThrowingInvariant()
     std::string::npos !=
       logstream.str().find("A Framework Listener threw an exception:"),
     "Test for internal log message from Framework event handler");
-  
+
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
@@ -319,7 +320,7 @@ void testDeadLock()
 
 } // end anonymous namespace
 
-int FrameworkListenerTest(int /*argc*/, char* /*argv*/ [])
+int FrameworkListenerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("FrameworkListenerTest");
 

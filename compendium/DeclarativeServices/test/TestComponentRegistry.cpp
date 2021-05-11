@@ -20,24 +20,24 @@
 
   =============================================================================*/
 
-#include <chrono>
-#include <algorithm>
-#include <vector>
-#include <memory>
-#include <random>
-#include "gmock/gmock.h"
-#include <cppmicroservices/Framework.h>
-#include <cppmicroservices/FrameworkFactory.h>
-#include <cppmicroservices/FrameworkEvent.h>
-#include <cppmicroservices/BundleContext.h>
 #include "../src/ComponentRegistry.hpp"
-#include "../src/manager/ComponentManager.hpp"
 #include "../src/manager/ComponentConfiguration.hpp"
+#include "../src/manager/ComponentManager.hpp"
 #include "../src/metadata/ComponentMetadata.hpp"
 #include "Mocks.hpp"
+#include "gmock/gmock.h"
+#include <algorithm>
+#include <chrono>
+#include <cppmicroservices/BundleContext.h>
+#include <cppmicroservices/Framework.h>
+#include <cppmicroservices/FrameworkEvent.h>
+#include <cppmicroservices/FrameworkFactory.h>
+#include <memory>
+#include <random>
+#include <vector>
 using cppmicroservices::Bundle;
-using cppmicroservices::scrimpl::ComponentManager;
 using cppmicroservices::scrimpl::ComponentConfiguration;
+using cppmicroservices::scrimpl::ComponentManager;
 using cppmicroservices::scrimpl::ComponentRegistry;
 using cppmicroservices::scrimpl::metadata::ComponentMetadata;
 
@@ -54,14 +54,15 @@ std::string GenRandomString()
   return tempName;
 }
 
-class FakeComponentManager
-  : public ComponentManager
+class FakeComponentManager : public ComponentManager
 {
 public:
-  FakeComponentManager() : ComponentManager()
-                         ,mBundleId(++id)
-                         ,mName(GenRandomString()) { }
-  ~FakeComponentManager() {};
+  FakeComponentManager()
+    : ComponentManager()
+    , mBundleId(++id)
+    , mName(GenRandomString())
+  {}
+  ~FakeComponentManager(){};
   unsigned long GetBundleId() const override { return mBundleId; }
   std::string GetName() const override { return mName; }
   MOCK_CONST_METHOD0(GetBundle, Bundle(void));
@@ -69,8 +70,12 @@ public:
   MOCK_CONST_METHOD0(IsEnabled, bool(void));
   MOCK_METHOD0(Enable, std::shared_future<void>(void));
   MOCK_METHOD0(Disable, std::shared_future<void>(void));
-  MOCK_CONST_METHOD0(GetComponentConfigurations,std::vector<std::shared_ptr<ComponentConfiguration>>(void));
-  MOCK_CONST_METHOD0(GetMetadata, std::shared_ptr<const ComponentMetadata>(void));
+  MOCK_CONST_METHOD0(
+    GetComponentConfigurations,
+    std::vector<std::shared_ptr<ComponentConfiguration>>(void));
+  MOCK_CONST_METHOD0(GetMetadata,
+                     std::shared_ptr<const ComponentMetadata>(void));
+
 private:
   long mBundleId;
   std::string mName;
@@ -80,14 +85,13 @@ private:
 std::atomic<long> FakeComponentManager::id(0);
 
 // The fixture for testing class ComponentRegistry.
-class ComponentRegistryTest
-  : public ::testing::Test
+class ComponentRegistryTest : public ::testing::Test
 {
 protected:
   ComponentRegistryTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
     , registry(std::make_shared<ComponentRegistry>())
-  { }
+  {}
   virtual ~ComponentRegistryTest() = default;
 
   virtual void SetUp()
@@ -106,6 +110,7 @@ protected:
 
   cppmicroservices::Framework& GetFramework() { return framework; }
   std::shared_ptr<ComponentRegistry> GetRegistry() { return registry; }
+
 private:
   cppmicroservices::Framework framework;
   std::shared_ptr<ComponentRegistry> registry;
@@ -115,8 +120,12 @@ TEST_F(ComponentRegistryTest, VerifyAddComponentManager)
 {
   auto registry = GetRegistry();
   auto mockCompMgr = std::make_shared<MockComponentManager>();
-  EXPECT_CALL(*mockCompMgr, GetBundleId()).Times(1).WillOnce(testing::Return(121));
-  EXPECT_CALL(*mockCompMgr, GetName()).Times(1).WillOnce(testing::Return(std::string("Foo")));
+  EXPECT_CALL(*mockCompMgr, GetBundleId())
+    .Times(1)
+    .WillOnce(testing::Return(121));
+  EXPECT_CALL(*mockCompMgr, GetName())
+    .Times(1)
+    .WillOnce(testing::Return(std::string("Foo")));
   EXPECT_EQ(registry->Count(), 0ul);
   registry->AddComponentManager(mockCompMgr);
   EXPECT_EQ(registry->Count(), 1ul);
@@ -126,14 +135,26 @@ TEST_F(ComponentRegistryTest, VerifyGetComponentManager)
 {
   auto registry = GetRegistry();
   auto mockCompMgr = std::make_shared<MockComponentManager>();
-  EXPECT_CALL(*mockCompMgr, GetBundleId()).Times(1).WillOnce(testing::Return(121));
-  EXPECT_CALL(*mockCompMgr, GetName()).Times(1).WillOnce(testing::Return(std::string("Foo")));
+  EXPECT_CALL(*mockCompMgr, GetBundleId())
+    .Times(1)
+    .WillOnce(testing::Return(121));
+  EXPECT_CALL(*mockCompMgr, GetName())
+    .Times(1)
+    .WillOnce(testing::Return(std::string("Foo")));
   auto mockCompMgr1 = std::make_shared<MockComponentManager>();
-  EXPECT_CALL(*mockCompMgr1, GetBundleId()).Times(1).WillOnce(testing::Return(121));
-  EXPECT_CALL(*mockCompMgr1, GetName()).Times(1).WillOnce(testing::Return(std::string("Bar")));
+  EXPECT_CALL(*mockCompMgr1, GetBundleId())
+    .Times(1)
+    .WillOnce(testing::Return(121));
+  EXPECT_CALL(*mockCompMgr1, GetName())
+    .Times(1)
+    .WillOnce(testing::Return(std::string("Bar")));
   auto mockCompMgr2 = std::make_shared<MockComponentManager>();
-  EXPECT_CALL(*mockCompMgr2, GetBundleId()).Times(1).WillOnce(testing::Return(122));
-  EXPECT_CALL(*mockCompMgr2, GetName()).Times(1).WillOnce(testing::Return(std::string("Foo")));
+  EXPECT_CALL(*mockCompMgr2, GetBundleId())
+    .Times(1)
+    .WillOnce(testing::Return(122));
+  EXPECT_CALL(*mockCompMgr2, GetName())
+    .Times(1)
+    .WillOnce(testing::Return(std::string("Foo")));
   EXPECT_EQ(registry->Count(), 0ul);
   registry->AddComponentManager(mockCompMgr);
   registry->AddComponentManager(mockCompMgr1);
@@ -148,8 +169,12 @@ TEST_F(ComponentRegistryTest, VerifyRemoveComponentManager)
 {
   auto registry = GetRegistry();
   auto mockCompMgr = std::make_shared<MockComponentManager>();
-  EXPECT_CALL(*mockCompMgr, GetBundleId()).Times(2).WillRepeatedly(testing::Return(121));
-  EXPECT_CALL(*mockCompMgr, GetName()).Times(2).WillRepeatedly(testing::Return(std::string("Foo")));
+  EXPECT_CALL(*mockCompMgr, GetBundleId())
+    .Times(2)
+    .WillRepeatedly(testing::Return(121));
+  EXPECT_CALL(*mockCompMgr, GetName())
+    .Times(2)
+    .WillRepeatedly(testing::Return(std::string("Foo")));
   registry->AddComponentManager(mockCompMgr);
   EXPECT_EQ(registry->Count(), 1ul);
   registry->RemoveComponentManager(mockCompMgr);
@@ -160,8 +185,12 @@ TEST_F(ComponentRegistryTest, VerifyRemoveComponentManagerByIdName)
 {
   auto registry = GetRegistry();
   auto mockCompMgr = std::make_shared<MockComponentManager>();
-  EXPECT_CALL(*mockCompMgr, GetBundleId()).Times(1).WillOnce(testing::Return(121));
-  EXPECT_CALL(*mockCompMgr, GetName()).Times(1).WillOnce(testing::Return(std::string("Foo")));
+  EXPECT_CALL(*mockCompMgr, GetBundleId())
+    .Times(1)
+    .WillOnce(testing::Return(121));
+  EXPECT_CALL(*mockCompMgr, GetName())
+    .Times(1)
+    .WillOnce(testing::Return(std::string("Foo")));
   registry->AddComponentManager(mockCompMgr);
   EXPECT_EQ(registry->Count(), 1ul);
   registry->RemoveComponentManager(121, "Foo");
@@ -174,84 +203,78 @@ TEST_F(ComponentRegistryTest, VerifyConcurrentAddsRemoves)
   size_t expected_count(0);
   std::set<std::pair<long, std::string>> randomComps;
   std::mutex compNameMutex; // protects changes to randomComps & expected_count
-      
+
   {
     std::promise<void> go;
-    try
-    { // Add Elements concurrently
+    try { // Add Elements concurrently
       std::shared_future<void> ready(go.get_future());
       std::size_t numCalls = 20;
       std::vector<std::promise<void>> readies(numCalls);
       std::vector<std::future<void>> registry_adds(numCalls);
-      for(std::size_t i =0; i<numCalls; i++)
-      {
-        registry_adds[i] = std::async(std::launch::async,
-                                      [registry, ready, &readies, i, &expected_count, &compNameMutex, &randomComps]()
-                                      {
-                                        readies[i].set_value();
-                                        std::shared_ptr<ComponentManager> cm(std::make_shared<FakeComponentManager>());
-                                        ready.wait();
-                                        if(registry->AddComponentManager(cm))
-                                        {
-                                          std::lock_guard<std::mutex> lock(compNameMutex);
-                                          randomComps.insert(std::make_pair(cm->GetBundleId(),cm->GetName()));
-                                          expected_count++;
-                                        }
-                                      });
+      for (std::size_t i = 0; i < numCalls; i++) {
+        registry_adds[i] =
+          std::async(std::launch::async,
+                     [registry,
+                      ready,
+                      &readies,
+                      i,
+                      &expected_count,
+                      &compNameMutex,
+                      &randomComps]() {
+                       readies[i].set_value();
+                       std::shared_ptr<ComponentManager> cm(
+                         std::make_shared<FakeComponentManager>());
+                       ready.wait();
+                       if (registry->AddComponentManager(cm)) {
+                         std::lock_guard<std::mutex> lock(compNameMutex);
+                         randomComps.insert(
+                           std::make_pair(cm->GetBundleId(), cm->GetName()));
+                         expected_count++;
+                       }
+                     });
       }
 
-      for(std::size_t i =0; i< numCalls; i++)
-      {
+      for (std::size_t i = 0; i < numCalls; i++) {
         readies[i].get_future().wait();
       }
 
       go.set_value();
 
-      for(std::size_t i =0; i< numCalls; i++)
-      {
+      for (std::size_t i = 0; i < numCalls; i++) {
         registry_adds[i].get();
       }
-    }
-    catch(...)
-    {
+    } catch (...) {
       go.set_value();
       throw;
     }
 
     std::promise<void> go2;
-    try
-    { // Remove elements concurrently
+    try { // Remove elements concurrently
       std::shared_future<void> ready2(go2.get_future());
       std::size_t numCalls = randomComps.size();
       std::vector<std::promise<void>> readies2(numCalls);
       std::vector<std::future<void>> registry_removes(numCalls);
-      std::size_t i =0;
-      for(auto pair : randomComps)
-      {
-        registry_removes[i] = std::async(std::launch::async,
-                                         [registry, ready2, &readies2, i, pair]()
-                                         {
-                                           readies2[i].set_value();
-                                           ready2.wait();
-                                           registry->RemoveComponentManager(pair.first, pair.second);
-                                         });
+      std::size_t i = 0;
+      for (auto pair : randomComps) {
+        registry_removes[i] = std::async(
+          std::launch::async, [registry, ready2, &readies2, i, pair]() {
+            readies2[i].set_value();
+            ready2.wait();
+            registry->RemoveComponentManager(pair.first, pair.second);
+          });
         i++;
       }
-      for(std::size_t i =0; i< numCalls; i++)
-      {
+      for (std::size_t i = 0; i < numCalls; i++) {
         readies2[i].get_future().wait();
       }
 
       go2.set_value();
 
-      for(std::size_t i =0; i< numCalls; i++)
-      {
+      for (std::size_t i = 0; i < numCalls; i++) {
         registry_removes[i].get();
       }
       EXPECT_EQ(registry->Count(), 0ul);
-    }
-    catch(...)
-    {
+    } catch (...) {
       go2.set_value();
       throw;
     }

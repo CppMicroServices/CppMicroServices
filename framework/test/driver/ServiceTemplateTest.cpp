@@ -140,7 +140,7 @@ struct MyFactory3 : public cppmicroservices::ServiceFactory
 
 using namespace cppmicroservices;
 
-int ServiceTemplateTest(int /*argc*/, char* /*argv*/ [])
+int ServiceTemplateTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceTemplateTest");
 

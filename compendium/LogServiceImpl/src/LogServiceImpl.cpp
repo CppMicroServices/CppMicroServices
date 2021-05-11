@@ -87,7 +87,8 @@ void LogServiceImpl::Log(const ServiceReferenceBase& sr,
                          const std::exception_ptr ex)
 {
   std::string full_message = message;
-  full_message = message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex);
+  full_message =
+    message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex);
   LogServiceImpl::Log(level, full_message);
 }
 

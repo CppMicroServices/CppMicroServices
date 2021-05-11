@@ -586,7 +586,8 @@ void TestListenerHookFailure(const Framework& framework)
   auto fwkListenerToken = framework.GetBundleContext().AddFrameworkListener(
     std::bind(&TestFrameworkListener::Event, &listener, std::placeholders::_1));
 
-  auto listenerToken = framework.GetBundleContext().AddServiceListener([](const ServiceEvent&) { });
+  auto listenerToken =
+    framework.GetBundleContext().AddServiceListener([](const ServiceEvent&) {});
 
   framework.GetBundleContext().RemoveListener(std::move(listenerToken));
 
@@ -614,7 +615,7 @@ void TestListenerHookFailure(const Framework& framework)
 
 } // end unnamed namespace
 
-int ServiceHooksTest(int /*argc*/, char* /*argv*/ [])
+int ServiceHooksTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceHooksTest");
 

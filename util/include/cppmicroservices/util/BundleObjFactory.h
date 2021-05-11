@@ -30,19 +30,19 @@ namespace cppmicroservices {
 class BundleObjFactory
 {
 public:
-    BundleObjFactory() = default;
-    
-    /// Return a BundleObjFile which represents data read from the binary at
-    /// the given location.
-    ///
-    /// @param location absolute path to a PE, ELF or Mach-O binary file.
-    /// @return A BundleObjFile object
-    /// @throws If location is not a valid PE, ELF or Mach-O binary file.
-    ///
-    /// @note The location must be a valid binary format for the host machine.
-    ///       i.e. PE file on Windows, Mach-O on macOS, ELF on Linux
-    std::unique_ptr<BundleObjFile> CreateBundleFileObj(const std::string& location);
-    
+  BundleObjFactory() = default;
+
+  /// Return a BundleObjFile which represents data read from the binary at
+  /// the given location.
+  ///
+  /// @param location absolute path to a PE, ELF or Mach-O binary file.
+  /// @return A BundleObjFile object
+  /// @throws If location is not a valid PE, ELF or Mach-O binary file.
+  ///
+  /// @note The location must be a valid binary format for the host machine.
+  ///       i.e. PE file on Windows, Mach-O on macOS, ELF on Linux
+  std::unique_ptr<BundleObjFile> CreateBundleFileObj(
+    const std::string& location);
 };
 
 }

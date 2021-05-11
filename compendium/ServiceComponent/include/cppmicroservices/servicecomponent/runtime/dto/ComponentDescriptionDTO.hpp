@@ -23,9 +23,9 @@
 #ifndef ComponentDescriptionDTO_hpp
 #define ComponentDescriptionDTO_hpp
 
-#include <vector>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "BundleDTO.hpp"
 #include "ReferenceDTO.hpp"
@@ -38,10 +38,10 @@ namespace component {
 namespace runtime {
 namespace dto {
 
-	/**
-	\defgroup gr_componentdescriptiondto ComponentDescriptionDTO
-	\brief Groups ComponentDescriptionDTO related symbols.
-	*/
+/**
+ \defgroup gr_componentdescriptiondto ComponentDescriptionDTO
+ \brief Groups ComponentDescriptionDTO related symbols.
+ */
 
 /**
  * \ingroup gr_componentdescriptiondto

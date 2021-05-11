@@ -27,9 +27,9 @@
 
 namespace test {
 
-class US_IDictionaryService_EXPORT  IDictionaryService
+class US_IDictionaryService_EXPORT IDictionaryService
 {
-  public:
+public:
   virtual ~IDictionaryService();
   /**
    * Check for the existence of a word.

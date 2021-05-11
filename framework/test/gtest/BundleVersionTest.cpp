@@ -139,9 +139,11 @@ TEST(BundleVersion, Comparison)
   ASSERT_TRUE(zeroVersion == BundleVersion::EmptyVersion());
   ASSERT_FALSE(zeroVersion == alphaVersion);
   ASSERT_FALSE(alphaVersion == betaVersion);
-  ASSERT_TRUE(BundleVersion::UndefinedVersion() == BundleVersion::UndefinedVersion());
-  ASSERT_THROW((void)(BundleVersion::UndefinedVersion() == zeroVersion.EmptyVersion()), 
-	           std::logic_error);
+  ASSERT_TRUE(BundleVersion::UndefinedVersion() ==
+              BundleVersion::UndefinedVersion());
+  ASSERT_THROW(
+    (void)(BundleVersion::UndefinedVersion() == zeroVersion.EmptyVersion()),
+    std::logic_error);
 }
 
 TEST(BundleVersion, ParseVersion)

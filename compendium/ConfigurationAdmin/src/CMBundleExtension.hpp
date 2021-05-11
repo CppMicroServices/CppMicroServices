@@ -36,32 +36,34 @@
 #include "ConfigurationAdminPrivate.hpp"
 
 namespace cppmicroservices {
-  namespace cmimpl {
-    /**
+namespace cmimpl {
+/**
      * The CMBundleExtension is a helper class to load and unload configurations from
      * a single bundle. It pushes the configurations it finds to the ConfigurationAdmin
      * implementation. On destruction, it removes the configurations created during
      * construction.
      */
-    class CMBundleExtension final
-    {
-    public:
-      CMBundleExtension(cppmicroservices::BundleContext bundleContext,
-                        const cppmicroservices::AnyMap &cmMetadata,
-                        std::shared_ptr<ConfigurationAdminPrivate> configAdminImpl,
-                        std::shared_ptr<cppmicroservices::logservice::LogService> logger);
-      CMBundleExtension(const CMBundleExtension&) = delete;
-      CMBundleExtension(CMBundleExtension&&) = delete;
-      CMBundleExtension& operator=(const CMBundleExtension&) = delete;
-      CMBundleExtension& operator=(CMBundleExtension&&) = delete;
-      ~CMBundleExtension();
-    private:
-      cppmicroservices::BundleContext bundleContext;
-      std::shared_ptr<ConfigurationAdminPrivate> configAdminImpl;
-      std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-      std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs;
-    };
-  } // cmimpl
+class CMBundleExtension final
+{
+public:
+  CMBundleExtension(
+    cppmicroservices::BundleContext bundleContext,
+    const cppmicroservices::AnyMap& cmMetadata,
+    std::shared_ptr<ConfigurationAdminPrivate> configAdminImpl,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+  CMBundleExtension(const CMBundleExtension&) = delete;
+  CMBundleExtension(CMBundleExtension&&) = delete;
+  CMBundleExtension& operator=(const CMBundleExtension&) = delete;
+  CMBundleExtension& operator=(CMBundleExtension&&) = delete;
+  ~CMBundleExtension();
+
+private:
+  cppmicroservices::BundleContext bundleContext;
+  std::shared_ptr<ConfigurationAdminPrivate> configAdminImpl;
+  std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+  std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs;
+};
+} // cmimpl
 } // cppmicroservices
 
 #endif // CMBUNDLEEXTENSION_HPP

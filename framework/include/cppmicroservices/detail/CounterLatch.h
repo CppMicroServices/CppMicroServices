@@ -21,7 +21,7 @@
   =============================================================================*/
 
 #ifndef CPPMICROSERVICES_DETAIL_COUNTERLATCH_H
-#  define CPPMICROSERVICES_DETAIL_COUNTERLATCH_H
+#define CPPMICROSERVICES_DETAIL_COUNTERLATCH_H
 
 #include <mutex>
 

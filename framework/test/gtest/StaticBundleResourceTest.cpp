@@ -152,4 +152,3 @@ TEST_F(StaticBundleResourceTest, testResources)
   //Check still valid static.txt resource
   ASSERT_TRUE(resource.IsValid());
 }
-

@@ -21,8 +21,8 @@
   =============================================================================*/
 
 #include "CCSatisfiedState.hpp"
-#include "CCUnsatisfiedReferenceState.hpp"
 #include "../ComponentConfigurationImpl.hpp"
+#include "CCUnsatisfiedReferenceState.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -32,16 +32,18 @@ CCSatisfiedState::CCSatisfiedState() = default;
 void CCSatisfiedState::Deactivate(ComponentConfigurationImpl& mgr)
 {
   auto currentState = shared_from_this();
-  std::packaged_task<void(void)> task([&mgr](){
-                                        mgr.UnregisterService();
-                                        mgr.DestroyComponentInstances();
-                                      });
-  auto unsatisfiedState = std::make_shared<CCUnsatisfiedReferenceState>(task.get_future().share());
-  while(currentState->GetValue() != service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE)
-  {
-    if(mgr.CompareAndSetState(&currentState, unsatisfiedState))
-    {
-      currentState->WaitForTransitionTask(); // wait for the previous transition to finish
+  std::packaged_task<void(void)> task([&mgr]() {
+    mgr.UnregisterService();
+    mgr.DestroyComponentInstances();
+  });
+  auto unsatisfiedState =
+    std::make_shared<CCUnsatisfiedReferenceState>(task.get_future().share());
+  while (
+    currentState->GetValue() !=
+    service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE) {
+    if (mgr.CompareAndSetState(&currentState, unsatisfiedState)) {
+      currentState
+        ->WaitForTransitionTask(); // wait for the previous transition to finish
       task();
       break;
     }

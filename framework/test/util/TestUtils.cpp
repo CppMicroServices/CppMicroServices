@@ -152,12 +152,9 @@ Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
   std::vector<Bundle> bundles;
 
 #if defined(US_BUILD_SHARED_LIBS)
-  bundles = frameworkCtx.InstallBundles(LIB_PATH
-                                        + util::DIR_SEP
-                                        + US_LIB_PREFIX
-                                        + libName
-                                        + US_LIB_POSTFIX
-                                        + US_LIB_EXT);
+  bundles =
+    frameworkCtx.InstallBundles(LIB_PATH + util::DIR_SEP + US_LIB_PREFIX +
+                                libName + US_LIB_POSTFIX + US_LIB_EXT);
 #else
   bundles = frameworkCtx.GetBundles();
 #endif

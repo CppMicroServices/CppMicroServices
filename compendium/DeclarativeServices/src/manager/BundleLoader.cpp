@@ -83,7 +83,8 @@ GetComponentCreatorDeletors(const std::string& compName,
     } catch (const std::system_error& ex) {
       // SharedLibrary::Load() will throw a std::system_error when a shared library
       // fails to load. Creating a SharedLibraryException here to throw with fromBundle information.
-      throw cppmicroservices::SharedLibraryException(ex.code(), ex.what(), std::move(fromBundle));
+      throw cppmicroservices::SharedLibraryException(
+        ex.code(), ex.what(), std::move(fromBundle));
     }
     handle = sh.GetHandle();
     bundleBinaries.lock()->emplace(bundleLoc, handle);
@@ -93,10 +94,10 @@ GetComponentCreatorDeletors(const std::string& compName,
     std::regex_replace(compName, std::regex("::"), "_");
   const std::string newInstanceFuncName("NewInstance_" + symbolName);
   const std::string deleteInstanceFuncName("DeleteInstance_" + symbolName);
-  
+
   void* newsym = fromBundle.GetSymbol(handle, newInstanceFuncName);
   void* delsym = fromBundle.GetSymbol(handle, deleteInstanceFuncName);
-  
+
   if (newsym == nullptr || delsym == nullptr) {
     std::string errMsg("Unable to find entry-point functions in bundle ");
     errMsg += fromBundle.GetLocation();

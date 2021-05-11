@@ -33,17 +33,18 @@ namespace component {
 namespace runtime {
 namespace dto {
 
-	/**
-	\defgroup gr_referencedto ReferenceDTO
-	\brief Groups ReferenceDTO related symbols.
-	*/
+/**
+ \defgroup gr_referencedto ReferenceDTO
+ \brief Groups ReferenceDTO related symbols.
+ */
 
 /**
  * \ingroup gr_referencedto 
  *
  * A representation of a declared reference to a service.
  */
-struct US_ServiceComponent_EXPORT ReferenceDTO {
+struct US_ServiceComponent_EXPORT ReferenceDTO
+{
   /**
    * The name of the reference.
    *

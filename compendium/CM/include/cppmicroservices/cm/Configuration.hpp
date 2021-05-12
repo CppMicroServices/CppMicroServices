@@ -24,7 +24,7 @@
 #define CppMicroServices_CM_Configuration_hpp
 
 #include <string>
-
+#include <future>
 #include "cppmicroservices/AnyMap.h"
 
 namespace cppmicroservices {
@@ -71,7 +71,7 @@ namespace cppmicroservices {
         /**
          * Update the properties of this Configuration. Invoking this method will trigger the
          * ConfigurationAdmin impl to push the updated properties to any ManagedService /
-         * ManagedServiceFactory which has a matching PID / Factory PID.
+         * ManagedServiceFactory / ConfigurationListener which has a matching PID / Factory PID.
          *
          * If the properties are empty, the Configuration will not be removed, but instead
          * updated with an empty properties map.
@@ -79,13 +79,17 @@ namespace cppmicroservices {
          * @throws std::runtime_error if this Configuration object has been Removed
          *
          * @param properties The properties to update this Configuration with.
+         * 
+         * @return a shared_future<void> to access the result of the asynchronous operation
+         * that pushed the update to a ManagedService, ManagedServiceFactory or ConfigurationListener
+         * 
          */
-        virtual void Update(AnyMap properties = AnyMap{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS}) = 0;
+        virtual std::shared_future<void> Update(AnyMap properties = AnyMap{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS}) = 0;
 
         /**
          * Update the properties of this Configuration if they differ from the current properties.
          * Invoking this method will trigger the ConfigurationAdmin impl to push the updated
-         * properties to any ManagedService / ManagedServiceFactory which has a matching PID /
+         * properties to any ManagedService / ManagedServiceFactory / ConfigurationListener which has a matching PID /
          * Factory PID, but only if the properties differ from the current properties. It will
          * return true in this case, and false otherwise.
          *
@@ -95,19 +99,28 @@ namespace cppmicroservices {
          * @throws std::runtime_error if this Configuration object has been Removed
          *
          * @param properties The properties to update this Configuration with (if they differ)
-         * @return boolean indicating whether the properties were updated or not.
+         * @return std::pair<boolean, std::shared_future<void>> The boolean indicates whether 
+         * the properties were updated or not. The shared_future<void> allows access to the result of the asynchronous 
+         * operationthat pushed the update operation a ManagedService, ManagedServiceFactory or 
+         * ConfigurationListener.
+         *
          */
-        virtual bool UpdateIfDifferent(AnyMap properties = AnyMap{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS}) = 0;
+        virtual  std::pair<bool, std::shared_future<void>> UpdateIfDifferent(AnyMap properties = AnyMap{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS}) = 0;
 
         /**
-         * Remove this Configuration from ConfigurationAdmin. This will trigger the ConfigurationAdmin
+         * Remove this Configuration from ConfigurationAdmin. This will trigger a push to any 
+         * ConfigurationListener. This will also trigger the ConfigurationAdmin
          * implementation to update any corresponding ManagedService with an empty AnyMap. Any
          * corresponding ManagedServiceFactory will have its Removed method invoked with the
          * corresponding PID.
          *
          * @throws std::runtime_error if this Configuration object has been Removed already
+         *
+         * @return a shared_future<void> to access the result of the asynchronous operation
+         * that pushed the remove operation to a ManagedService, ManagedServiceFactory or 
+         * ConfigurationListener.
          */
-        virtual void Remove() = 0;
+        virtual std::shared_future<void> Remove() = 0;
       };
     }
   }

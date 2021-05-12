@@ -25,7 +25,7 @@
 
 #include <cstdint>
 #include <vector>
-
+#include <future>
 #include "cppmicroservices/util/ConfigurationMetadata.hpp"
 
 namespace cppmicroservices {
@@ -94,7 +94,7 @@ namespace cppmicroservices {
        *
        * @param pid The PID of the {@code Configuration} which has been updated
        */
-      virtual void NotifyConfigurationUpdated(const std::string& pid)  = 0;
+      virtual std::shared_future<void> NotifyConfigurationUpdated(const std::string& pid)  = 0;
 
       /**
        * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
@@ -104,7 +104,7 @@ namespace cppmicroservices {
        * @param pid The PID of the {@code Configuration} which has been removed.
        * @param configurationId The unique id of the configuration which has been removed. Used to avoid race conditions.
        */
-      virtual void NotifyConfigurationRemoved(const std::string& pid, std::uintptr_t configurationId) = 0;
+      virtual  std::shared_future<void> NotifyConfigurationRemoved(const std::string& pid, std::uintptr_t configurationId) = 0;
     };
   } // cmimpl
 } // cppmicroservices

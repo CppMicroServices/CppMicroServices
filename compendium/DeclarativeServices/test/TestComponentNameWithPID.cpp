@@ -65,8 +65,8 @@ TEST_F(tServiceComponent, testComponentNameWithPID) // DS_CAI_FTC_16
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
-  configuration->Update(props);
-
+  auto fut = configuration->Update(props);
+  fut.get();
   // GetService to make component active.
   auto instance = GetInstance<test::CAInterface>();
   ASSERT_TRUE(instance) << "GetService failed for CAInterface.";

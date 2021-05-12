@@ -71,8 +71,8 @@ TEST_F(tServiceComponent, testFactoryPidConstruction)
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
-  factoryConfig->Update(props);
-
+  auto fut = factoryConfig->Update(props);
+  fut.get();
   // Confirm the properties have been updated in DS.
   compDescDTO =
       dsRuntimeService->GetComponentDescriptionDTO(testBundle,factoryInstance);

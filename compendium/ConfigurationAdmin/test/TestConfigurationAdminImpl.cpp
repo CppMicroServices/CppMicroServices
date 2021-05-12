@@ -185,8 +185,9 @@ TEST_F(TestConfigurationAdminImpl, VerifyListConfigurations)
 
   auto props2 = conf2->GetProperties();
   props2["foo"] = std::string{"bar"};
-  EXPECT_NO_THROW(conf2->Update(props2));
-
+  std::shared_future<void> fut;
+  EXPECT_NO_THROW(fut = conf2->Update(props2));
+  fut.get();
   const auto res1 = configAdmin.ListConfigurations();
   const auto res2 = configAdmin.ListConfigurations("(foo=bar)");
   const auto res3 = configAdmin.ListConfigurations("(foobar=baz)");
@@ -210,8 +211,9 @@ TEST_F(TestConfigurationAdminImpl, VerifyAddConfigurations)
   ASSERT_TRUE(conf2);
   auto props = conf2->GetProperties();
   props["foo"] = std::string{ "bar" };
-  EXPECT_NO_THROW(conf2->Update(props));
-  
+  std::shared_future<void> fut;
+  EXPECT_NO_THROW(fut = conf2->Update(props));
+  fut.get();
   std::vector<cppmicroservices::util::ConfigurationMetadata> configs;
 
   configs.push_back(cppmicroservices::util::ConfigurationMetadata(

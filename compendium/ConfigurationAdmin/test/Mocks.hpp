@@ -93,8 +93,8 @@ namespace cppmicroservices {
         std::vector<ConfigurationAddedInfo>(
           std::vector<cppmicroservices::util::ConfigurationMetadata>));
       MOCK_METHOD1(RemoveConfigurations, void(std::vector<ConfigurationAddedInfo>));
-      MOCK_METHOD1(NotifyConfigurationUpdated, void(const std::string&));
-      MOCK_METHOD2(NotifyConfigurationRemoved, void(const std::string&, std::uintptr_t));
+      MOCK_METHOD1(NotifyConfigurationUpdated, std::shared_future<void>(const std::string&));
+      MOCK_METHOD2(NotifyConfigurationRemoved, std::shared_future<void>(const std::string&, std::uintptr_t));
     };
   }
 }

@@ -57,8 +57,8 @@ TEST_F(tServiceComponent, testSetConfig_AnyMap) //DS_CAI_FTC_8
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
-  configObject->Update(props);
-  
+  auto fut = configObject->Update(props);
+  fut.get();
   // GetService to make component active
   auto instance = GetInstance<test::CAInterface>();
   ASSERT_TRUE(instance) << "GetService failed for CAInterface";
@@ -101,8 +101,8 @@ TEST_F(tServiceComponent, testSetConfig_AnyMap_References) //DS_CAI_FTC_9
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
-  configObject->Update(props);
-  
+  auto fut = configObject->Update(props);
+  fut.get();
   // Start dependent bundle
   auto depBundle = StartTestBundle("TestBundleDSTOI1");
   

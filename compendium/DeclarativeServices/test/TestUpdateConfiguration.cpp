@@ -72,8 +72,8 @@ TEST_F(tServiceComponent, testUpdateConfig_Modified) //DS_CAI_FTC_1
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
-  configObject->Update(props);
-
+  auto fut = configObject->Update(props);
+  fut.get();
   // Validate that the correct properties were updated
   auto serviceProps = service->GetProperties();
   auto uniqueProp = serviceProps.find("uniqueProp");
@@ -119,8 +119,8 @@ TEST_F(tServiceComponent, testUpdateConfig_Exception)
   auto configObjInstance = configObject->GetPid();
   cppmicroservices::AnyMap props(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  configObject->Update(props);
-
+  auto fut = configObject->Update(props);
+  fut.get();
   // Request a service reference to the new component instance.
   auto service = GetInstance<test::CAInterface>();
   ASSERT_TRUE(service) << "GetService failed for CAInterface";
@@ -133,8 +133,8 @@ TEST_F(tServiceComponent, testUpdateConfig_Exception)
   // Update property
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
-  configObject->Update(props);
-
+  fut = configObject->Update(props);
+  fut.get();
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
@@ -193,8 +193,8 @@ TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodImmediate) // DS
     // Activation of the component
     configuration = configAdminService->GetConfiguration(componentName);
     props[uniqueProp[i]] = instance[i];
-    configuration->Update(props);
-
+    auto fut = configuration->Update(props);
+    fut.get();
     compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
     EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
     EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
@@ -214,8 +214,8 @@ TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodImmediate) // DS
     EXPECT_EQ(uniquePropI->second, instance[i]);
 
     // Deactivation of the component
-    configuration->Remove();
-
+    fut = configuration->Remove();
+    fut.get();
     compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
     EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
     EXPECT_EQ(compConfigs.at(0).state,
@@ -257,8 +257,8 @@ TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodDelayed) // DS_C
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
-  configuration->Update(props);
-
+  auto fut = configuration->Update(props);
+  fut.get();
   // GetService to make component active.
   auto instance = GetInstance<test::CAInterface>();
   ASSERT_TRUE(instance) << "GetService failed for CAInterface.";
@@ -280,8 +280,8 @@ TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodDelayed) // DS_C
   // Update property
   const std::string instanceId2{ "instance2" };
   props["uniqueProp"] = instanceId2;
-  configuration->Update(props);
-
+  fut = configuration->Update(props);
+  fut.get();
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
     << "Component state should be SATISFIED";
@@ -334,8 +334,8 @@ void scopeValidation(std::string componentName,
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
-  configuration->Update(props);
-
+  auto fut = configuration->Update(props);
+  fut.get();
   // Use DS runtime service to validate the component state
   compConfigs = t->GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
@@ -406,8 +406,8 @@ void scopeValidation(std::string componentName,
 
   const std::string newInstanceId{ "newInstance" };
   props["uniqueProp"] = newInstanceId;
-  configuration->Update(props);
-
+  fut = configuration->Update(props);
+  fut.get();
   // Use DS runtime service to validate the component state
   compConfigs = t->GetComponentConfigs(testBundle, componentName, compDescDTO);
   if (withModified) {

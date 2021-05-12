@@ -146,7 +146,7 @@ namespace cppmicroservices {
        * See {@code ConfigurationAdminPrivate#NotifyConfigurationUpdated}
        */
 
-      void NotifyConfigurationUpdated(const std::string& pid) override;
+      std::shared_future<void> NotifyConfigurationUpdated(const std::string& pid) override;
 
       /**
        * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
@@ -155,7 +155,7 @@ namespace cppmicroservices {
        *
        * See {@code ConfigurationAdminPrivate#NotifyConfigurationRemoved}
        */
-      void NotifyConfigurationRemoved(const std::string& pid, std::uintptr_t configurationId) override;
+      std::shared_future<void> NotifyConfigurationRemoved(const std::string& pid, std::uintptr_t configurationId) override;
 
       // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedService
       std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>> AddingService(const ServiceReference<cppmicroservices::service::cm::ManagedService>& reference) override;

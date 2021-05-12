@@ -70,8 +70,8 @@ TEST_F(tServiceComponent, testWithoutPID) // DS_CAI_FTC_14
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
-  configuration->Update(props);
-
+  auto fut = configuration->Update(props);
+  fut.get();
   // Confirm component instance was created with the properties has default value.
   EXPECT_TRUE(instance->GetProperties().empty())
     << "Property instance should only have default value.";
@@ -110,8 +110,8 @@ TEST_F(tServiceComponent, testWithoutConfigPolicy) // DS_CAI_FTC_15
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
-  configuration->Update(props);
-
+  auto fut = configuration->Update(props);
+  fut.get();
   // Confirm configuratino object presented and check component state.
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";

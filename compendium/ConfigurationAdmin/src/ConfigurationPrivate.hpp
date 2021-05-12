@@ -44,7 +44,8 @@ namespace cppmicroservices {
        * care of by {@code ConfigurationAdminImpl} instead.
        *
        * @param properties The properties to update this Configuration with (if they differ)
-       * @return boolean indicating whether this Configuration has been updated or not, and the value of
+       * @return std::pair<boolean, long> where boolean indicates whether this 
+       * Configuration has been updated or not, and long is the value of the change count
        */
       virtual std::pair<bool, unsigned long> UpdateWithoutNotificationIfDifferent(AnyMap properties) = 0;
 

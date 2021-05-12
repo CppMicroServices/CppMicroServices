@@ -357,8 +357,8 @@ namespace cppmicroservices {
           // else Configuration already exists
           try {
             const auto updatedAndChangeCount = it->second->UpdateWithoutNotificationIfDifferent(configMetadata.properties);
-            pidsAndChangeCountsAndIDs.emplace_back(pid, updatedAndChangeCount.second, reinterpret_cast<std::uintptr_t>(it->second.get()));
-            createdOrUpdated.push_back(updatedAndChangeCount.first);
+            pidsAndChangeCountsAndIDs.emplace_back(pid, std::get<1>(updatedAndChangeCount), reinterpret_cast<std::uintptr_t>(it->second.get()));
+            createdOrUpdated.push_back(std::get<0>(updatedAndChangeCount));
           }
           catch (const std::runtime_error&) // Configuration has been Removed by someone else, but we've won the race to handle that.
           {
@@ -465,7 +465,7 @@ namespace cppmicroservices {
       }
     }
 
-    void ConfigurationAdminImpl::NotifyConfigurationUpdated(const std::string& pid)
+    std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(const std::string& pid)
     {
       
       auto fut = PerformAsync([this, pid]
@@ -564,17 +564,13 @@ namespace cppmicroservices {
           }
         }
       });
-      // wait until asynchronous processing completes before returning to the caller. 
-      try {
-          fut.get();
-      }
-      catch (...) {
-          logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Failed to update component with pid" + pid, std::current_exception());
-      }
+      return fut;
     }
 
-    void ConfigurationAdminImpl::NotifyConfigurationRemoved(const std::string &pid, std::uintptr_t configurationId)
+    std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(const std::string &pid, std::uintptr_t configurationId)
     {
+      std::promise<void> ready;
+      std::shared_future<void>  alreadyRemoved = ready.get_future();
       std::shared_ptr<ConfigurationImpl> configurationToInvalidate;
       {
         std::lock_guard<std::mutex> lk{configurationsMutex};
@@ -583,14 +579,16 @@ namespace cppmicroservices {
         {
           // This Configuration has already been removed. The thread which removed it will have triggered
           // the notification of any ManagedService or ManagedServiceFactory, so nothing more to do.
-          return;
+          ready.set_value();
+          return alreadyRemoved;
         }
         if (configurationId != reinterpret_cast<std::uintptr_t>(it->second.get()))
         {
           // The Configuration with this PID has already been removed and replaced by a new one, and the thread
           // which did that will have triggered the notification of any ManagedService or ManagedServiceFactory,
           // so nothing more to do.
-          return;
+          ready.set_value();
+          return alreadyRemoved;
         }
         configurationToInvalidate = it->second;
         configurations.erase(it);
@@ -598,7 +596,7 @@ namespace cppmicroservices {
       }
       if (configurationToInvalidate)
       {
-        NotifyConfigurationUpdated(pid);
+        auto removeFuture =  NotifyConfigurationUpdated(pid);
         // This functor will run on another thread. Just being overly cautious to guarantee that the
         // ConfigurationImpl which has called this method doesn't run its own destructor.
         auto fut = PerformAsync([this, pid, configuration = std::move(configurationToInvalidate)]
@@ -613,7 +611,10 @@ namespace cppmicroservices {
         catch (...) {
             logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Failed to remove component with pid" + pid, std::current_exception());
         }
+        return removeFuture;
       }
+      ready.set_value();
+      return alreadyRemoved;
     }
 
     std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>

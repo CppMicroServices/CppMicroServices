@@ -280,15 +280,18 @@ TEST_F(ConfigAdminTests, testServiceUpdated)
 
   // props differs from the initial configuration (anInt = 2) of the pid in the manifest file,
   // so the service should get an Updated() notification.
-  configuration->UpdateIfDifferent(props);
+  auto result = configuration->UpdateIfDifferent(props);
+  result.second.get();
   EXPECT_EQ(service->getCounter(), expectedCount);
   
   // UpdateIfDifferent with the same properties shouldn't call Updated()
-  configuration->UpdateIfDifferent(props);
+  result = configuration->UpdateIfDifferent(props);
+  result.second.get();
   EXPECT_EQ(service->getCounter(), expectedCount);
 
   // Update should call Updated() even if the properties are unchanged
-  configuration->Update(props);
+  auto fut = configuration->Update(props);
+  fut.get();
   expectedCount += newIncrement;
   EXPECT_EQ(service->getCounter(), expectedCount);
 }
@@ -312,7 +315,9 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
 
   EXPECT_EQ(service->getCounter(), expectedCount);
 
-  configuration->Remove();
+  auto fut = configuration->Remove();
+  fut.get();
+
   expectedCount -= 1;
   EXPECT_EQ(service->getCounter(), expectedCount);
 
@@ -331,7 +336,8 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
 
   // props differs from the latest configuration for the recreated configuration, which is empty.
   // The service should therefore get an Updated() notification.
-  configuration->UpdateIfDifferent(props);
+  auto result = configuration->UpdateIfDifferent(props);
+  result.second.get();
   EXPECT_EQ(service->getCounter(), expectedCount);
 }
 
@@ -381,21 +387,24 @@ TEST_F(ConfigAdminTests, testServiceFactoryUpdated)
 
   // props differs from the initial configuration (anInt = 2) of the pid in the manifest file,
   // so the service should get an Updated() notification.
-  configuration_config1->UpdateIfDifferent(props);
+  auto fut = configuration_config1->UpdateIfDifferent(props);
+  fut.second.get();
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config1"),
       expectedCount_config1);
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config2"),
             expectedCount_config2);
 
   // UpdateIfDifferent with the same properties shouldn't call Updated()
-  configuration_config1->UpdateIfDifferent(props);
+  fut = configuration_config1->UpdateIfDifferent(props);
+  fut.second.get();
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config1"),
             expectedCount_config1);
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config2"),
             expectedCount_config2);
 
   // Update should call Updated() even if the properties are unchanged
-  configuration_config1->Update(props);
+  auto fut1 = configuration_config1->Update(props);
+  fut1.get();
   expectedCount_config1 += newIncrement;
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config1"),
       expectedCount_config1);
@@ -405,7 +414,8 @@ TEST_F(ConfigAdminTests, testServiceFactoryUpdated)
   // Update config 2 now.
   auto configuration_config2 =
     m_configAdmin->GetFactoryConfiguration("cm.testfactory", "config2");
-  configuration_config2->UpdateIfDifferent(props);
+  fut = configuration_config2->UpdateIfDifferent(props);
+  fut.second.get();
   expectedCount_config2 += newIncrement;
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config2"),
       expectedCount_config2);

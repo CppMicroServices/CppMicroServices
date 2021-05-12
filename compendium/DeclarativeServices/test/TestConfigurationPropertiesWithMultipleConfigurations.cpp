@@ -63,13 +63,13 @@ TEST_F(tServiceComponent, testPrecedence)
   cppmicroservices::AnyMap props00(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   props00["GreetingProp"] = cppmicroservices::Any(std::string("hola"));
-  configuration00->Update(props00);
-
+  auto fut = configuration00->Update(props00);
+  fut.get();
   cppmicroservices::AnyMap props01(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   props01["GreetingProp"] = cppmicroservices::Any(std::string("bonjour"));
-  configuration01->Update(props01);
-
+  fut = configuration01->Update(props01);
+  fut.get();
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   ASSERT_EQ(cppmicroservices::any_cast<std::string>(
               compConfigs[0].properties.find("GreetingProp")->second),
@@ -112,13 +112,13 @@ TEST_F(tServiceComponent, testMultipleConfig)
   cppmicroservices::AnyMap props00(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   props00["GreetingProp1"] = cppmicroservices::Any(std::string("hola"));
-  configuration00->Update(props00);
-
+  auto fut = configuration00->Update(props00);
+  fut.get();
   cppmicroservices::AnyMap props01(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   props01["GreetingProp2"] = cppmicroservices::Any(std::string("bonjour"));
-  configuration01->Update(props01);
-
+  fut = configuration01->Update(props01);
+  fut.get();
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   ASSERT_EQ(cppmicroservices::any_cast<std::string>(
               compConfigs[0].properties.find("GreetingProp")->second),

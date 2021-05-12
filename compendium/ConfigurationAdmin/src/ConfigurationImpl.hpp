@@ -74,22 +74,23 @@ namespace cppmicroservices {
        * Update the properties of this Configuration.
        *
        * See {@code Configuration#Update}
+       *
        */
-      void Update(AnyMap properties) override;
+      std::shared_future<void> Update(AnyMap properties) override;
 
       /**
        * Update the properties of this Configuration if they differ from the current properties.
        *
        * See {@code Configuration#UpdateIfDifferent}
        */
-      bool UpdateIfDifferent(AnyMap properties) override;
+      std::pair<bool, std::shared_future<void>> UpdateIfDifferent(AnyMap properties) override;
 
       /**
        * Remove this Configuration from ConfigurationAdmin.
        *
        * See {@code Configuration#Remove}
        */
-      void Remove() override;
+      std::shared_future<void> Remove() override;
 
       /**
        * Internal method used by {@code ConfigurationAdminImpl} to update the properties without triggering

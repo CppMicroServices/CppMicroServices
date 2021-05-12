@@ -229,7 +229,7 @@ bool ComponentContextImpl::AddToBoundServicesCache(
   return true;
 }
 
-bool ComponentContextImpl::RemoveFromBoundServicesCache(
+void ComponentContextImpl::RemoveFromBoundServicesCache(
   const std::string& refName,
   const cppmicroservices::ServiceReferenceBase& sRef)
 {
@@ -238,9 +238,6 @@ bool ComponentContextImpl::RemoveFromBoundServicesCache(
     bc.GetServiceObjects(ServiceReferenceU(sRef));
 
   const auto removedService = sObjs.GetService();
-  if (!removedService) {
-      return false;
-  }
   const auto& serviceInterface = removedService->begin()->first;
   auto boundServicesCacheHandle = boundServicesCache.lock();
   auto& services = boundServicesCacheHandle->at(refName);
@@ -261,7 +258,7 @@ bool ComponentContextImpl::RemoveFromBoundServicesCache(
                 servicesMap->at(serviceInterface));
       }),
     services.end());
-  return true;
+  return;
 }
 
 }

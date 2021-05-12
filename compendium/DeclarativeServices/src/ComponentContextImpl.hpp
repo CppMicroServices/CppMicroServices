@@ -200,7 +200,7 @@ public:
   bool AddToBoundServicesCache(const std::string& refName
                              , const cppmicroservices::ServiceReferenceBase& sRef);
     
-  bool RemoveFromBoundServicesCache(const std::string& refName
+  void RemoveFromBoundServicesCache(const std::string& refName
                              , const cppmicroservices::ServiceReferenceBase& sRef);
 
 private:

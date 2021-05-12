@@ -146,23 +146,21 @@ void BundleOrPrototypeComponentConfigurationImpl::UnbindReference(const std::str
                                                                  )
 {
   auto instancePairs = compInstanceMap.lock();
-  for (auto const& instancePair: *instancePairs)
+  for (auto const& instancePair : *instancePairs)
   {
-    auto& instance = instancePair.first;
-    auto& context = instancePair.second;
-    try {
-      instance->InvokeUnbindMethod(refName, ref);
-    } catch (const std::exception&) {
-      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                       "Exception received from user code while unbinding a "
-                       "service reference.",
-                       std::current_exception());
-    }
-    
-    if (!context->RemoveFromBoundServicesCache(refName, ref)) {
-        GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-            "Failure when removing a reference from the BoundServices Cache");
-    }
+      auto& instance = instancePair.first;
+      auto& context = instancePair.second;
+      try {
+          instance->InvokeUnbindMethod(refName, ref);
+      }
+      catch (const std::exception&) {
+          GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+              "Exception received from user code while unbinding a "
+              "service reference.",
+              std::current_exception());
+      }
+
+      context->RemoveFromBoundServicesCache(refName, ref);
   }
 }
 

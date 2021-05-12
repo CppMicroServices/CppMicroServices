@@ -156,11 +156,7 @@ void SingletonComponentConfigurationImpl::UnbindReference(const std::string& ref
                      std::current_exception());
   }
   auto context = GetComponentContext();
-  if (!context->RemoveFromBoundServicesCache(refName, ref)) {
-      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-          "Failure when removing a reference from the BoundServices Cache");
-  }
-
+  context->RemoveFromBoundServicesCache(refName, ref);
 }
 
 void SingletonComponentConfigurationImpl::SetComponentInstancePair(InstanceContextPair instCtxtPair)

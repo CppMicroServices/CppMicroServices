@@ -31,100 +31,104 @@
 #include "ConfigurationPrivate.hpp"
 
 namespace cppmicroservices {
-  namespace cmimpl {
+namespace cmimpl {
 
-    /**
-     * This class implements the {@code cppmicroservices::service::cm::Configuration} interface.
-     */
-    class ConfigurationImpl final : public cppmicroservices::service::cm::Configuration, public ConfigurationPrivate
-    {
-    public:
-      ConfigurationImpl(ConfigurationAdminPrivate* configAdminImpl,
-                        std::string pid,
-                        std::string factoryPid,
-                        AnyMap properties);
-      ~ConfigurationImpl() override = default;
-      ConfigurationImpl(const ConfigurationImpl&) = delete;
-      ConfigurationImpl& operator=(const ConfigurationImpl&) = delete;
-      ConfigurationImpl(ConfigurationImpl&&) = delete;
-      ConfigurationImpl& operator=(ConfigurationImpl&&) = delete;
+/**
+ * This class implements the {@code cppmicroservices::service::cm::Configuration} interface.
+ */
+class ConfigurationImpl final
+  : public cppmicroservices::service::cm::Configuration
+  , public ConfigurationPrivate
+{
+public:
+  ConfigurationImpl(ConfigurationAdminPrivate* configAdminImpl,
+                    std::string pid,
+                    std::string factoryPid,
+                    AnyMap properties);
+  ~ConfigurationImpl() override = default;
+  ConfigurationImpl(const ConfigurationImpl&) = delete;
+  ConfigurationImpl& operator=(const ConfigurationImpl&) = delete;
+  ConfigurationImpl(ConfigurationImpl&&) = delete;
+  ConfigurationImpl& operator=(ConfigurationImpl&&) = delete;
 
-      /**
-       * Get the PID of this Configuration.
-       *
-       * See {@code Configuration#GetPid}
-       */
-      std::string GetPid() const override;
+  /**
+   * Get the PID of this Configuration.
+   *
+   * See {@code Configuration#GetPid}
+   */
+  std::string GetPid() const override;
 
-      /**
-       * Get the Factory PID which is responsible for this Configuration.
-       *
-       * See {@code Configuration#GetFactoryPid}
-       */
-      std::string GetFactoryPid() const override;
+  /**
+   * Get the Factory PID which is responsible for this Configuration.
+   *
+   * See {@code Configuration#GetFactoryPid}
+   */
+  std::string GetFactoryPid() const override;
 
-      /**
-       * Get the properties of this Configuration.
-       *
-       * See {@code Configuration#GetProperties}
-       */
-      AnyMap GetProperties() const override;
+  /**
+   * Get the properties of this Configuration.
+   *
+   * See {@code Configuration#GetProperties}
+   */
+  AnyMap GetProperties() const override;
 
-      /**
-       * Update the properties of this Configuration.
-       *
-       * See {@code Configuration#Update}
-       */
-      void Update(AnyMap properties) override;
+  /**
+   * Update the properties of this Configuration.
+   *
+   * See {@code Configuration#Update}
+   */
+  void Update(AnyMap properties) override;
 
-      /**
-       * Update the properties of this Configuration if they differ from the current properties.
-       *
-       * See {@code Configuration#UpdateIfDifferent}
-       */
-      bool UpdateIfDifferent(AnyMap properties) override;
+  /**
+   * Update the properties of this Configuration if they differ from the current properties.
+   *
+   * See {@code Configuration#UpdateIfDifferent}
+   */
+  bool UpdateIfDifferent(AnyMap properties) override;
 
-      /**
-       * Remove this Configuration from ConfigurationAdmin.
-       *
-       * See {@code Configuration#Remove}
-       */
-      void Remove() override;
+  /**
+   * Remove this Configuration from ConfigurationAdmin.
+   *
+   * See {@code Configuration#Remove}
+   */
+  void Remove() override;
 
-      /**
-       * Internal method used by {@code ConfigurationAdminImpl} to update the properties without triggering
-       * the notification to the corresponding ManagedService / ManagedServiceFactory.
-       *
-       * See {@code ConfigurationPrivate#UpdateWithoutNotificationIfDifferent}
-       */
-      std::pair<bool, unsigned long> UpdateWithoutNotificationIfDifferent(AnyMap properties) override;
+  /**
+   * Internal method used by {@code ConfigurationAdminImpl} to update the properties without triggering
+   * the notification to the corresponding ManagedService / ManagedServiceFactory.
+   *
+   * See {@code ConfigurationPrivate#UpdateWithoutNotificationIfDifferent}
+   */
+  std::pair<bool, unsigned long> UpdateWithoutNotificationIfDifferent(
+    AnyMap properties) override;
 
-      /**
-       * Internal method used by {@code ConfigurationAdminImpl} to Remove the Configuration without triggering
-       * the notification to the corresponding ManagedService / ManagedServiceFactory.
-       *
-       * See {@code ConfigurationPrivate#RemoveWithoutNotificationIfChangeCountEquals}
-       */
-      bool RemoveWithoutNotificationIfChangeCountEquals(unsigned long expectedChangeCount) override;
+  /**
+   * Internal method used by {@code ConfigurationAdminImpl} to Remove the Configuration without triggering
+   * the notification to the corresponding ManagedService / ManagedServiceFactory.
+   *
+   * See {@code ConfigurationPrivate#RemoveWithoutNotificationIfChangeCountEquals}
+   */
+  bool RemoveWithoutNotificationIfChangeCountEquals(
+    unsigned long expectedChangeCount) override;
 
-      /**
-       * Internal method used by {@code ConfigurationAdminImpl} to invalidate the Configuration.
-       *
-       * See {@code ConfigurationPrivate#Invalidate}
-       */
-      void Invalidate() override;
+  /**
+   * Internal method used by {@code ConfigurationAdminImpl} to invalidate the Configuration.
+   *
+   * See {@code ConfigurationPrivate#Invalidate}
+   */
+  void Invalidate() override;
 
-    private:
-      std::mutex configAdminMutex;
-      ConfigurationAdminPrivate* configAdminImpl;
-      mutable std::mutex propertiesMutex;
-      std::string pid;
-      std::string factoryPid;
-      AnyMap properties;
-      unsigned long changeCount;
-      bool removed;
-    };
-  } // cmimpl
+private:
+  std::mutex configAdminMutex;
+  ConfigurationAdminPrivate* configAdminImpl;
+  mutable std::mutex propertiesMutex;
+  std::string pid;
+  std::string factoryPid;
+  AnyMap properties;
+  unsigned long changeCount;
+  bool removed;
+};
+} // cmimpl
 } // cppmicroservices
 
 #endif // CONFIGURATIONIMPL_HPP

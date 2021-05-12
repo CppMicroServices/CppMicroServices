@@ -20,115 +20,120 @@
 
   =============================================================================*/
 
-#include <chrono>
-#include <cppmicroservices/Framework.h>
-#include <cppmicroservices/FrameworkFactory.h>
-#include <cppmicroservices/FrameworkEvent.h>
-#include <cppmicroservices/BundleContext.h>
-#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "../src/SCRBundleExtension.hpp"
-#include "Mocks.hpp"
 #include "../src/metadata/Util.hpp"
+#include "Mocks.hpp"
+#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
+#include <chrono>
+#include <cppmicroservices/BundleContext.h>
+#include <cppmicroservices/Framework.h>
+#include <cppmicroservices/FrameworkEvent.h>
+#include <cppmicroservices/FrameworkFactory.h>
 
 #define str(s) #s
 #define xstr(s) str(s)
 
 using cppmicroservices::Any;
-using cppmicroservices::service::component::ComponentConstants::SERVICE_COMPONENT;
+using cppmicroservices::service::component::ComponentConstants::
+  SERVICE_COMPONENT;
 
-namespace cppmicroservices{
+namespace cppmicroservices {
 namespace scrimpl {
 
 using cppmicroservices::AnyMap;
 // The fixture for testing class SCRActivator.
-class SCRBundleExtensionTest
-  : public ::testing::Test
+class SCRBundleExtensionTest : public ::testing::Test
 {
 protected:
-  SCRBundleExtensionTest() : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  { }
+  SCRBundleExtensionTest()
+    : framework(cppmicroservices::FrameworkFactory().NewFramework())
+  {}
   ~SCRBundleExtensionTest() = default;
 
-  void SetUp() override {
-    framework.Start();
-  }
+  void SetUp() override { framework.Start(); }
 
-  void TearDown() override {
+  void TearDown() override
+  {
     framework.Stop();
     framework.WaitForStop(std::chrono::milliseconds::zero());
   }
 
   cppmicroservices::Framework& GetFramework() { return framework; }
+
 private:
   cppmicroservices::Framework framework;
 };
 
 TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
 {
-  cppmicroservices::AnyMap headers(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  cppmicroservices::AnyMap headers(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto pool = std::make_shared<boost::asio::thread_pool>(1);
-  EXPECT_THROW({
-      SCRBundleExtension bundleExt(BundleContext(),
-                                   headers,
-                                   mockRegistry,
-                                   fakeLogger, pool);
-    }, std::invalid_argument);
-  EXPECT_THROW({
-      SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
-                                   headers,
-                                   nullptr, fakeLogger, pool);
-    }, std::invalid_argument);
-  EXPECT_THROW({
+  EXPECT_THROW(
+    {
+      SCRBundleExtension bundleExt(
+        BundleContext(), headers, mockRegistry, fakeLogger, pool);
+    },
+    std::invalid_argument);
+  EXPECT_THROW(
+    {
+      SCRBundleExtension bundleExt(
+        GetFramework().GetBundleContext(), headers, nullptr, fakeLogger, pool);
+    },
+    std::invalid_argument);
+  EXPECT_THROW(
+    {
       SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                    headers,
                                    mockRegistry,
                                    nullptr,
                                    pool);
-    }, std::invalid_argument);
-  EXPECT_THROW({
+    },
+    std::invalid_argument);
+  EXPECT_THROW(
+    {
       SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                    headers,
                                    mockRegistry,
                                    fakeLogger,
                                    pool);
-    }, std::invalid_argument);
+    },
+    std::invalid_argument);
 }
 
 TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
 {
   auto bundles = GetFramework().GetBundleContext().GetBundles();
-  auto thisBundleItr = std::find_if(bundles.begin(), bundles.end(), [](const cppmicroservices::Bundle& bundle){
-                                                                      return (bundle.GetSymbolicName() == xstr(US_BUNDLE_NAME));
-                                                                    });
-  auto thisBundle = thisBundleItr != bundles.end() ? *thisBundleItr : cppmicroservices::Bundle();
+  auto thisBundleItr = std::find_if(
+    bundles.begin(), bundles.end(), [](const cppmicroservices::Bundle& bundle) {
+      return (bundle.GetSymbolicName() == xstr(US_BUNDLE_NAME));
+    });
+  auto thisBundle = thisBundleItr != bundles.end() ? *thisBundleItr
+                                                   : cppmicroservices::Bundle();
   ASSERT_TRUE(static_cast<bool>(thisBundle));
-  auto const& scr = ref_any_cast<cppmicroservices::AnyMap>(thisBundle.GetHeaders().at("scr_test_0"));
+  auto const& scr = ref_any_cast<cppmicroservices::AnyMap>(
+    thisBundle.GetHeaders().at("scr_test_0"));
 
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   EXPECT_CALL(*mockRegistry, AddComponentManager(testing::_))
     .Times(2)
     .WillOnce(testing::Throw(std::runtime_error("Failed to add component")))
     .WillOnce(testing::Return(true));
-  EXPECT_CALL(*mockRegistry, RemoveComponentManager(testing::_))
-    .Times(1);
+  EXPECT_CALL(*mockRegistry, RemoveComponentManager(testing::_)).Times(1);
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto pool = std::make_shared<boost::asio::thread_pool>(1);
   EXPECT_NO_THROW({
-      SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
-                                   scr,
-                                   mockRegistry,
-                                   fakeLogger, pool);
-      EXPECT_EQ(bundleExt.managers.size(), 0u);
-    });
+    SCRBundleExtension bundleExt(
+      GetFramework().GetBundleContext(), scr, mockRegistry, fakeLogger, pool);
+    EXPECT_EQ(bundleExt.managers.size(), 0u);
+  });
   EXPECT_NO_THROW({
-      SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
-                                   scr,
-                                   mockRegistry,
-                                   fakeLogger, pool);
-      EXPECT_EQ(bundleExt.managers.size(), 1u);
-    });
+    SCRBundleExtension bundleExt(
+      GetFramework().GetBundleContext(), scr, mockRegistry, fakeLogger, pool);
+    EXPECT_EQ(bundleExt.managers.size(), 1u);
+  });
 }
 }
 }

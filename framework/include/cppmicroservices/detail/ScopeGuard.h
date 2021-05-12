@@ -21,7 +21,7 @@
   =============================================================================*/
 
 #ifndef CPPMICROSERVICES_DETAIL_SCOPEGUARD_H
-#  define CPPMICROSERVICES_DETAIL_SCOPEGUARD_H
+#define CPPMICROSERVICES_DETAIL_SCOPEGUARD_H
 
 #include <functional>
 
@@ -34,24 +34,26 @@ namespace detail {
  * to guarantee operations are executed when 
  * the ScopeGuard object goes out of scope.
  */
-class ScopeGuard {
+class ScopeGuard
+{
 public:
-    template <typename Callable>
-    ScopeGuard(Callable&& func)
-        : f(func) {
-    }
+  template<typename Callable>
+  ScopeGuard(Callable&& func)
+    : f(func)
+  {}
 
-    ScopeGuard(const ScopeGuard&) = delete;
-    ScopeGuard& operator=(const ScopeGuard&) = delete;
-    ScopeGuard(ScopeGuard&&) = delete;
-    ScopeGuard& operator=(ScopeGuard&&) = delete;
+  ScopeGuard(const ScopeGuard&) = delete;
+  ScopeGuard& operator=(const ScopeGuard&) = delete;
+  ScopeGuard(ScopeGuard&&) = delete;
+  ScopeGuard& operator=(ScopeGuard&&) = delete;
 
-    ~ScopeGuard() noexcept {
-        f(); // must not throw
-    }
+  ~ScopeGuard() noexcept
+  {
+    f(); // must not throw
+  }
 
 private:
-    std::function<void()> f;
+  std::function<void()> f;
 };
 
 }

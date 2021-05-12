@@ -32,14 +32,13 @@ namespace metadata {
 /*
  * Represents a concrete implementation (Version 1) of the MetadataParser
  */
-class MetadataParserImplV1
-  : public MetadataParser
+class MetadataParserImplV1 : public MetadataParser
 {
 public:
-  MetadataParserImplV1(std::shared_ptr<cppmicroservices::logservice::LogService> logger)
+  MetadataParserImplV1(
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger)
     : logger(std::move(logger))
-  {
-  }
+  {}
 
   MetadataParserImplV1(const MetadataParserImplV1&) = delete;
   MetadataParserImplV1& operator=(const MetadataParserImplV1&) = delete;
@@ -61,8 +60,8 @@ public:
    *             key @c "references" in the manifest)
    * @returns a vector of @c ReferenceMetadata objects
    */
-  std::vector<ReferenceMetadata>
-  CreateReferenceMetadatas(const std::vector<cppmicroservices::Any>& refs) const;
+  std::vector<ReferenceMetadata> CreateReferenceMetadatas(
+    const std::vector<cppmicroservices::Any>& refs) const;
 
   /*
    * @brief Parse and return the ReferenceMetadata object
@@ -76,14 +75,16 @@ public:
    * @param metadata An element in the array of the key "components" in the manifest
    * @returns the shared_ptr to a @c ComponentMetadata object
    */
-  std::shared_ptr<ComponentMetadata> CreateComponentMetadata(const AnyMap& metadata) const;
+  std::shared_ptr<ComponentMetadata> CreateComponentMetadata(
+    const AnyMap& metadata) const;
 
   /*
    * @brief Parse and return the vector of ComponentMetadata's
    * @param metadata The value of the key "scr" in the manifest
    * @returns the vector of shared_ptrs to the created @ComponentMetadata objects
    */
-  std::vector<std::shared_ptr<ComponentMetadata>> ParseAndGetComponentsMetadata(const AnyMap& scrmap) const override;
+  std::vector<std::shared_ptr<ComponentMetadata>> ParseAndGetComponentsMetadata(
+    const AnyMap& scrmap) const override;
 
 private:
   std::shared_ptr<cppmicroservices::logservice::LogService> logger;

@@ -116,6 +116,7 @@ public:
    * The thread that performs shutdown of this framework instance.
    */
   std::thread shutdownThread;
+
 private:
   AnyMap headers;
 };

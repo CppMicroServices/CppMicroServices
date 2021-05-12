@@ -23,10 +23,10 @@
 #ifndef __CONCURRENCYUTIL_HPP__
 #define __CONCURRENCYUTIL_HPP__
 
+#include <chrono>
+#include <future>
 #include <memory>
 #include <mutex>
-#include <future>
-#include <chrono>
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -37,7 +37,8 @@ namespace scrimpl {
 template<typename T>
 bool is_ready(T&& futObj)
 {
-  return (futObj.wait_for(std::chrono::seconds::zero()) == std::future_status::ready);
+  return (futObj.wait_for(std::chrono::seconds::zero()) ==
+          std::future_status::ready);
 }
 
 /**
@@ -53,20 +54,21 @@ class Guarded
   class Handle
   {
     std::unique_lock<std::mutex> lk;
-    Data *ptr;
+    Data* ptr;
+
   public:
-    Handle(std::unique_lock<std::mutex> lk, Data *p) :
-      lk(std::move(lk)),
-    ptr(p)
-    { }
+    Handle(std::unique_lock<std::mutex> lk, Data* p)
+      : lk(std::move(lk))
+      , ptr(p)
+    {}
 
     Handle(const Handle&) = delete;
     Handle& operator=(const Handle&) = delete;
 
-    Handle(Handle&& rhs) :
-      lk(std::move(rhs.lk)),
-    ptr(std::move(rhs.ptr))
-    { }
+    Handle(Handle&& rhs)
+      : lk(std::move(rhs.lk))
+      , ptr(std::move(rhs.ptr))
+    {}
 
     Handle& operator=(Handle&& rhs)
     {
@@ -79,6 +81,7 @@ class Guarded
     Data* operator->() const { return ptr; }
     Data& operator*() const { return *ptr; }
   };
+
 public:
   /**
    * Locks the member mutex and returns an RAII object responsible for
@@ -89,7 +92,7 @@ public:
   Handle lock()
   {
     std::unique_lock<std::mutex> lock(mtx);
-    return Handle{std::move(lock), &data};
+    return Handle{ std::move(lock), &data };
   }
 };
 

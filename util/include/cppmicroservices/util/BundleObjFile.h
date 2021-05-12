@@ -37,9 +37,10 @@ namespace cppmicroservices {
 struct InvalidObjFileException : public std::exception
 {
   ~InvalidObjFileException() throw() {}
-  InvalidObjFileException(std::string  what, int errorNumber = 0);
+  InvalidObjFileException(std::string what, int errorNumber = 0);
 
   virtual const char* what() const throw();
+
 private:
   std::string m_What;
 };
@@ -52,7 +53,7 @@ class RawBundleResources
 public:
   RawBundleResources(std::unique_ptr<DataContainer> data)
     : m_Data(std::move(data))
-  { }
+  {}
 
   operator bool() const
   {
@@ -61,7 +62,7 @@ public:
 
   void* GetData() const { return m_Data->GetData(); }
   std::size_t GetSize() const { return m_Data->GetSize(); }
-    
+
 private:
   std::unique_ptr<DataContainer> m_Data;
 };
@@ -69,11 +70,11 @@ private:
 class BundleObjFile
 {
 public:
-
   virtual ~BundleObjFile() {}
 
   /// Return the raw bundle resource container bits.
-  virtual std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const = 0;
+  virtual std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer()
+    const = 0;
 };
 
 }

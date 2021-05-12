@@ -104,8 +104,7 @@ public:
 class TestBundleEventHookFailure : public BundleEventHook
 {
 public:
-  void Event(const BundleEvent&,
-             ShrinkableVector<BundleContext>& )
+  void Event(const BundleEvent&, ShrinkableVector<BundleContext>&)
   {
     throw std::runtime_error("TestBundleEventHookFailure Event exception");
   }
@@ -214,19 +213,19 @@ void TestEventHookFailure(const Framework& framework)
                              "Test for expected number of framework events");
 
   std::for_each(
-      listener.events.begin(),
-      listener.events.end(),
-      [](const FrameworkEvent& evt) {
-        US_TEST_CONDITION_REQUIRED(evt.GetThrowable() != nullptr,
-                                    "Test for the existence of an exception");
-        US_TEST_CONDITION_REQUIRED(evt.GetType() ==
-                                    FrameworkEvent::Type::FRAMEWORK_WARNING,
-                                    "Test for the correct framework event type");
-        std::string msg(evt.GetMessage());
-        US_TEST_CONDITION_REQUIRED(
+    listener.events.begin(),
+    listener.events.end(),
+    [](const FrameworkEvent& evt) {
+      US_TEST_CONDITION_REQUIRED(evt.GetThrowable() != nullptr,
+                                 "Test for the existence of an exception");
+      US_TEST_CONDITION_REQUIRED(evt.GetType() ==
+                                   FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                 "Test for the correct framework event type");
+      std::string msg(evt.GetMessage());
+      US_TEST_CONDITION_REQUIRED(
         std::string::npos != msg.find("Failed to call Bundle EventHook #"),
         "Test for the correct event message");
-      });
+    });
 
   bundleA.Stop();
   eventHookReg.Unregister();
@@ -274,7 +273,7 @@ void TestFindHookFailure(const Framework& framework)
 
 } // end unnamed namespace
 
-int BundleHooksTest(int /*argc*/, char* /*argv*/ [])
+int BundleHooksTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("BundleHooksTest");
 

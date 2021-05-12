@@ -22,24 +22,23 @@
 
 #ifndef SCRACTIVATOR_HPP
 #define SCRACTIVATOR_HPP
-#include <map>
-#include <vector>
-#include "boost/asio/thread_pool.hpp"
-#include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/BundleActivator.h"
-#include "cppmicroservices/BundleEvent.h"
-#include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 #include "ComponentRegistry.hpp"
 #include "SCRBundleExtension.hpp"
 #include "SCRLogger.hpp"
+#include "boost/asio/thread_pool.hpp"
+#include "cppmicroservices/BundleActivator.h"
+#include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/BundleEvent.h"
+#include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
+#include <map>
+#include <vector>
 
 using cppmicroservices::service::component::runtime::ServiceComponentRuntime;
 
 namespace cppmicroservices {
 namespace scrimpl {
 
-class SCRActivator
-  : public cppmicroservices::BundleActivator
+class SCRActivator : public cppmicroservices::BundleActivator
 {
 public:
   SCRActivator() = default;
@@ -52,6 +51,7 @@ public:
   // callback methods for bundle lifecycle
   void Start(cppmicroservices::BundleContext context) override;
   void Stop(cppmicroservices::BundleContext context) override;
+
 protected:
   /**
    * bundle listener callback
@@ -67,6 +67,7 @@ protected:
    * with declarative services metadata
    */
   void DisposeExtension(const cppmicroservices::Bundle& bundle);
+
 private:
   cppmicroservices::BundleContext runtimeContext;
   cppmicroservices::ServiceRegistration<ServiceComponentRuntime> scrServiceReg;

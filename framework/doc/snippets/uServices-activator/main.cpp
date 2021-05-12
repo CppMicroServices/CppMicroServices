@@ -21,7 +21,7 @@ public:
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(MyActivator)
 //![0]
 
-int main(int /*argc*/, char* /*argv*/ [])
+int main(int /*argc*/, char* /*argv*/[])
 {
   std::cout
     << "This snippet is not meant to be executed.\n"

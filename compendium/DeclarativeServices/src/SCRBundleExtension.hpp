@@ -23,17 +23,17 @@
 #ifndef __SCRBUNDLEEXTENSION_HPP__
 #define __SCRBUNDLEEXTENSION_HPP__
 
-#include <memory>
 #include "boost/asio/thread_pool.hpp"
+#include <memory>
 #if defined(USING_GTEST)
-#include "gtest/gtest_prod.h"
+#  include "gtest/gtest_prod.h"
 #else
-#define FRIEND_TEST(x, y)
+#  define FRIEND_TEST(x, y)
 #endif
-#include "cppmicroservices/BundleContext.h"
 #include "ComponentRegistry.hpp"
-#include "manager/ComponentManager.hpp"
+#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/logservice/LogService.hpp"
+#include "manager/ComponentManager.hpp"
 #include "metadata/Util.hpp"
 
 using cppmicroservices::logservice::LogService;
@@ -49,16 +49,18 @@ namespace scrimpl {
 class SCRBundleExtension
 {
 public:
-  SCRBundleExtension(const cppmicroservices::BundleContext& bundleContext,
-                     const cppmicroservices::AnyMap& scrMetadata,
-                     const std::shared_ptr<ComponentRegistry>& registry,
-                     const std::shared_ptr<LogService>& logger,
-                     const std::shared_ptr<boost::asio::thread_pool>& threadpool);
+  SCRBundleExtension(
+    const cppmicroservices::BundleContext& bundleContext,
+    const cppmicroservices::AnyMap& scrMetadata,
+    const std::shared_ptr<ComponentRegistry>& registry,
+    const std::shared_ptr<LogService>& logger,
+    const std::shared_ptr<boost::asio::thread_pool>& threadpool);
   SCRBundleExtension(const SCRBundleExtension&) = delete;
   SCRBundleExtension(SCRBundleExtension&&) = delete;
   SCRBundleExtension& operator=(const SCRBundleExtension&) = delete;
   SCRBundleExtension& operator=(SCRBundleExtension&&) = delete;
   ~SCRBundleExtension();
+
 private:
   FRIEND_TEST(SCRBundleExtensionTest, CtorWithValidArgs);
 

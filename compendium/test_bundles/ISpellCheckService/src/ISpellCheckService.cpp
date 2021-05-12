@@ -21,7 +21,6 @@
 =============================================================================*/
 #include "ISpellCheckService/ISpellCheckService.hpp"
 
-namespace test
-{
-  ISpellCheckService::~ISpellCheckService() {}
+namespace test {
+ISpellCheckService::~ISpellCheckService() {}
 }

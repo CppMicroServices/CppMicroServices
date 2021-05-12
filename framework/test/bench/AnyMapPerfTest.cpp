@@ -1,15 +1,15 @@
 #include "benchmark/benchmark.h"
 
-#include <cppmicroservices/Bundle.h>
 #include <cppmicroservices/AnyMap.h>
-#include <cppmicroservices/BundleEvent.h>
+#include <cppmicroservices/Bundle.h>
 #include <cppmicroservices/BundleContext.h>
+#include <cppmicroservices/BundleEvent.h>
 #include <cppmicroservices/Framework.h>
-#include <cppmicroservices/FrameworkFactory.h>
 #include <cppmicroservices/FrameworkEvent.h>
+#include <cppmicroservices/FrameworkFactory.h>
 
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
 #include "TestUtils.h"
 
@@ -23,17 +23,17 @@ public:
 
   void SetUp(const ::benchmark::State&)
   {
-    framework      = std::make_shared<Framework>(FrameworkFactory().NewFramework());
+    framework = std::make_shared<Framework>(FrameworkFactory().NewFramework());
     framework->Start();
-    auto context   = framework->GetBundleContext();
-    testBundle     = testing::InstallLib(context, "DataOnlyTestBundle");
+    auto context = framework->GetBundleContext();
+    testBundle = testing::InstallLib(context, "DataOnlyTestBundle");
     testBundle.Start();
   }
 
   void TearDown(const ::benchmark::State&)
   {
     using namespace std::chrono;
-    
+
     if (testBundle) {
       testBundle.Stop();
     }
@@ -53,9 +53,9 @@ public:
 // constructNestedKey(2, "foo", "bar")  --> "foo.bar"
 // constructNestedKey(3, "foo", "bar")  --> "foo.foo.bar"
 // constructNestedKey(4, "foo", "bar")  --> "foo.foo.foo.bar"
-std::string constructNestedKey(unsigned int depth
-                               , const std::string& mapname
-                               , const std::string& lastkeyname)
+std::string constructNestedKey(unsigned int depth,
+                               const std::string& mapname,
+                               const std::string& lastkeyname)
 {
   switch (depth) {
     case 0:
@@ -65,25 +65,26 @@ std::string constructNestedKey(unsigned int depth
       return lastkeyname;
       break;
     default:
-      return mapname + "." + constructNestedKey(depth - 1, mapname, lastkeyname);
+      return mapname + "." +
+             constructNestedKey(depth - 1, mapname, lastkeyname);
       break;
   }
 }
 
 BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, HappyPath)(benchmark::State& state)
 {
-  const auto&  bundleProps = testBundle.GetHeaders();
-  const Any&         testData    = bundleProps.at("Test_AtCompoundKey");
+  const auto& bundleProps = testBundle.GetHeaders();
+  const Any& testData = bundleProps.at("Test_AtCompoundKey");
   assert(!testData.Empty());
-  const AnyMap&      testAnyMap  = ref_any_cast<AnyMap>(testData);
-  unsigned int depth       = static_cast<unsigned int>(state.range(0));
-  std::string  key(constructNestedKey(depth, "relativelylongkeyname_map", "relativelylongkeyname_element"));
+  const AnyMap& testAnyMap = ref_any_cast<AnyMap>(testData);
+  unsigned int depth = static_cast<unsigned int>(state.range(0));
+  std::string key(constructNestedKey(
+    depth, "relativelylongkeyname_map", "relativelylongkeyname_element"));
 
   for (auto _ : state) {
     try {
       (void)testAnyMap.AtCompoundKey(key);
-    }
-    catch (...) {
+    } catch (...) {
       state.SkipWithError("Exception thrown from AtCompoundKey");
       break;
     }
@@ -92,97 +93,102 @@ BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, HappyPath)(benchmark::State& state)
 
 BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, ErrorPath)(benchmark::State& state)
 {
-  const auto&  bundleProps = testBundle.GetHeaders();
-  const Any&         testData    = bundleProps.at("Test_AtCompoundKey");
+  const auto& bundleProps = testBundle.GetHeaders();
+  const Any& testData = bundleProps.at("Test_AtCompoundKey");
   assert(!testData.Empty());
-  const AnyMap&      testAnyMap  = ref_any_cast<AnyMap>(testData);
-  unsigned int depth       = static_cast<unsigned int>(state.range(0));
-  std::string  key(constructNestedKey(depth, "relativelylongkeyname_map", "relativelylongkeyname_unknown"));
+  const AnyMap& testAnyMap = ref_any_cast<AnyMap>(testData);
+  unsigned int depth = static_cast<unsigned int>(state.range(0));
+  std::string key(constructNestedKey(
+    depth, "relativelylongkeyname_map", "relativelylongkeyname_unknown"));
 
   for (auto _ : state) {
     try {
       (void)testAnyMap.AtCompoundKey(key);
-      state.SkipWithError("Exception not thrown from AtCompoundKey for error path");
+      state.SkipWithError(
+        "Exception not thrown from AtCompoundKey for error path");
       break;
-    }
-    catch (...) {
+    } catch (...) {
       // exception is expected
     }
   }
 }
 
-BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, HappyPath_NoThrowOverload)(benchmark::State& state)
+BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, HappyPath_NoThrowOverload)
+(benchmark::State& state)
 {
-  const auto&  bundleProps = testBundle.GetHeaders();
-  const Any&         testData    = bundleProps.at("Test_AtCompoundKey");
+  const auto& bundleProps = testBundle.GetHeaders();
+  const Any& testData = bundleProps.at("Test_AtCompoundKey");
   assert(!testData.Empty());
-  const AnyMap&      testAnyMap  = ref_any_cast<AnyMap>(testData);
-  unsigned int depth       = static_cast<unsigned int>(state.range(0));
-  std::string  key(constructNestedKey(depth, "relativelylongkeyname_map", "relativelylongkeyname_element"));
+  const AnyMap& testAnyMap = ref_any_cast<AnyMap>(testData);
+  unsigned int depth = static_cast<unsigned int>(state.range(0));
+  std::string key(constructNestedKey(
+    depth, "relativelylongkeyname_map", "relativelylongkeyname_element"));
 
   Any a;
   for (auto _ : state) {
     try {
       auto value = testAnyMap.AtCompoundKey(key, a);
-    }
-    catch (...) {
-      state.SkipWithError("Exception not expected from AtCompoundKey with default value");
+    } catch (...) {
+      state.SkipWithError(
+        "Exception not expected from AtCompoundKey with default value");
       break;
     }
   }
 }
 
-BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, ErrorPath_NoThrowOverload)(benchmark::State& state)
+BENCHMARK_DEFINE_F(AnyMapPerfTestFixture, ErrorPath_NoThrowOverload)
+(benchmark::State& state)
 {
-  const auto&  bundleProps = testBundle.GetHeaders();
-  const Any&         testData    = bundleProps.at("Test_AtCompoundKey");
+  const auto& bundleProps = testBundle.GetHeaders();
+  const Any& testData = bundleProps.at("Test_AtCompoundKey");
   assert(!testData.Empty());
-  const AnyMap&      testAnyMap  = ref_any_cast<AnyMap>(testData);
-  unsigned int depth       = static_cast<unsigned int>(state.range(0));
-  std::string  key(constructNestedKey(depth
-                                      , "relativelylongkeyname_map"
-                                      , "relativelylongkeyname_unknown"));
+  const AnyMap& testAnyMap = ref_any_cast<AnyMap>(testData);
+  unsigned int depth = static_cast<unsigned int>(state.range(0));
+  std::string key(constructNestedKey(
+    depth, "relativelylongkeyname_map", "relativelylongkeyname_unknown"));
 
   Any a;
   for (auto _ : state) {
     try {
       auto value = testAnyMap.AtCompoundKey(key, a);
-    }
-    catch (...) {
-      state.SkipWithError("Exception not expected from AtCompoundKey with default value");
+    } catch (...) {
+      state.SkipWithError(
+        "Exception not expected from AtCompoundKey with default value");
       break;
     }
   }
 }
-
-
 
 // Register functions as benchmarrk
-BENCHMARK_REGISTER_F(AnyMapPerfTestFixture, HappyPath)->Arg(1)
-                                                      ->Arg(3)
-                                                      ->Arg(7)
-                                                      ->Arg(11)
-                                                      ->Arg(15)
-                                                      ->Arg(18)
-                                                      ->Arg(20);
-BENCHMARK_REGISTER_F(AnyMapPerfTestFixture, ErrorPath)->Arg(1)
-                                                      ->Arg(3)
-                                                      ->Arg(7)
-                                                      ->Arg(11)
-                                                      ->Arg(15)
-                                                      ->Arg(18)
-                                                      ->Arg(20);
-BENCHMARK_REGISTER_F(AnyMapPerfTestFixture, HappyPath_NoThrowOverload)->Arg(1)
-                                                                      ->Arg(3)
-                                                                      ->Arg(7)
-                                                                      ->Arg(11)
-                                                                      ->Arg(15)
-                                                                      ->Arg(18)
-                                                                      ->Arg(20);
-BENCHMARK_REGISTER_F(AnyMapPerfTestFixture, ErrorPath_NoThrowOverload)->Arg(1)
-                                                                      ->Arg(3)
-                                                                      ->Arg(7)
-                                                                      ->Arg(11)
-                                                                      ->Arg(15)
-                                                                      ->Arg(18)
-                                                                      ->Arg(20);
+BENCHMARK_REGISTER_F(AnyMapPerfTestFixture, HappyPath)
+  ->Arg(1)
+  ->Arg(3)
+  ->Arg(7)
+  ->Arg(11)
+  ->Arg(15)
+  ->Arg(18)
+  ->Arg(20);
+BENCHMARK_REGISTER_F(AnyMapPerfTestFixture, ErrorPath)
+  ->Arg(1)
+  ->Arg(3)
+  ->Arg(7)
+  ->Arg(11)
+  ->Arg(15)
+  ->Arg(18)
+  ->Arg(20);
+BENCHMARK_REGISTER_F(AnyMapPerfTestFixture, HappyPath_NoThrowOverload)
+  ->Arg(1)
+  ->Arg(3)
+  ->Arg(7)
+  ->Arg(11)
+  ->Arg(15)
+  ->Arg(18)
+  ->Arg(20);
+BENCHMARK_REGISTER_F(AnyMapPerfTestFixture, ErrorPath_NoThrowOverload)
+  ->Arg(1)
+  ->Arg(3)
+  ->Arg(7)
+  ->Arg(11)
+  ->Arg(15)
+  ->Arg(18)
+  ->Arg(20);

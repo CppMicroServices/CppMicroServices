@@ -20,15 +20,15 @@
 
   =============================================================================*/
 #if NEVER
-#include <cstdio>
-#include <iostream>
-#include <algorithm>
-#include <chrono>
+#  include <algorithm>
+#  include <chrono>
+#  include <cstdio>
+#  include <iostream>
 
-#include "gtest/gtest.h"
+#  include "gtest/gtest.h"
 
-#include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
-#include <cppmicroservices/ServiceInterface.h>
+#  include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#  include <cppmicroservices/ServiceInterface.h>
 
 using cppmicroservices::service::component::detail::ComponentInstanceImpl;
 
@@ -55,7 +55,8 @@ TEST(ComponentInstance, CheckNoDefaultCtor)
 }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv)
+{
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

@@ -25,8 +25,8 @@
 
 #include "cppmicroservices/Constants.h"
 
-using cppmicroservices::Constants::SERVICE_RANKING;
 using cppmicroservices::Constants::SERVICE_ID;
+using cppmicroservices::Constants::SERVICE_RANKING;
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -40,27 +40,22 @@ namespace scrimpl {
 class ServiceReferenceComparator
 {
 public:
-  bool operator() (const ServiceReferenceU& lhs,
-                   const ServiceReferenceU& rhs)
+  bool operator()(const ServiceReferenceU& lhs, const ServiceReferenceU& rhs)
   {
     auto lRankAny = lhs.GetProperty(SERVICE_RANKING);
     auto rRankAny = rhs.GetProperty(SERVICE_RANKING);
     int lRank = lRankAny.Empty() ? 0 : any_cast<int>(lRankAny);
     int rRank = rRankAny.Empty() ? 0 : any_cast<int>(rRankAny);
-    if(lRank == rRank)
-    {
+    if (lRank == rRank) {
       auto lId = any_cast<long>(lhs.GetProperty(SERVICE_ID));
       auto rId = any_cast<long>(rhs.GetProperty(SERVICE_ID));
       return lId > rId;
-    }
-    else
-    {
+    } else {
       return lRank < rRank;
     }
   };
 };
 }
 }
-
 
 #endif /* __SERVICEREFERENCECOMPARATOR_HPP__ */

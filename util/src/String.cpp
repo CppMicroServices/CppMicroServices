@@ -23,8 +23,8 @@
 #include "cppmicroservices/util/String.h"
 #include "cppmicroservices/util/Error.h"
 #include <cppmicroservices/GlobalConfig.h>
-#include <stdexcept>
 #include <memory>
+#include <stdexcept>
 
 #ifdef US_PLATFORM_WINDOWS
 #  include <windows.h>

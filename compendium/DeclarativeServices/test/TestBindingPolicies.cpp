@@ -33,14 +33,13 @@
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 
+#include "../src/SCRLogger.hpp"
 #include "ConcurrencyTestUtil.hpp"
 #include "Mocks.hpp"
-#include "../src/SCRLogger.hpp"
 #include "TestInterfaces/Interfaces.hpp"
 #include "TestUtils.hpp"
 
 namespace scr = cppmicroservices::service::component::runtime;
-
 
 namespace {
 // convenience function to get the SCR service
@@ -70,8 +69,7 @@ void CheckComponentConfigurationState(
 }
 
 namespace test {
-class InterfaceImpl
-  : public Interface1
+class InterfaceImpl : public Interface1
 {
 public:
   InterfaceImpl(std::string str)
@@ -195,18 +193,17 @@ INSTANTIATE_TEST_SUITE_P(
   BindingPolicyTest,
   testing::Values(
     Policy{ "static",
-               "greedy",
-               typeid(ReferenceManagerBaseImpl::BindingPolicyStaticGreedy) },
+            "greedy",
+            typeid(ReferenceManagerBaseImpl::BindingPolicyStaticGreedy) },
     Policy{ "static",
-               "reluctant",
-               typeid(ReferenceManagerBaseImpl::BindingPolicyStaticReluctant) },
+            "reluctant",
+            typeid(ReferenceManagerBaseImpl::BindingPolicyStaticReluctant) },
     Policy{ "dynamic",
-               "greedy",
-               typeid(ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy) },
-    Policy{
-      "dynamic",
-      "reluctant",
-      typeid(ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant) }));
+            "greedy",
+            typeid(ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy) },
+    Policy{ "dynamic",
+            "reluctant",
+            typeid(ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant) }));
 
 TEST_P(BindingPolicyTest, TestPolicyCreation)
 {
@@ -240,9 +237,9 @@ TEST_P(BindingPolicyTest, InvalidServiceReference)
   auto bindingPolicy = ReferenceManagerBaseImpl::CreateBindingPolicy(
     *mgr, fakeMetadata.policy, fakeMetadata.policyOption);
 
-  EXPECT_CALL(*mockLogger.get(),
-              Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                  testing::_))
+  EXPECT_CALL(
+    *mockLogger.get(),
+    Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, testing::_))
     .Times(1);
 
   EXPECT_NO_THROW(bindingPolicy->ServiceAdded(ServiceReferenceU()));
@@ -254,32 +251,40 @@ INSTANTIATE_TEST_SUITE_P(
   testing::Values(
     DynamicRefPolicy{
       "TestBundleDSDRMU",
-      "ServiceComponentDynamicReluctantMandatoryUnary depends on ServiceComponentDynamicReluctantMandatoryUnary Interface1",
+      "ServiceComponentDynamicReluctantMandatoryUnary depends on "
+      "ServiceComponentDynamicReluctantMandatoryUnary Interface1",
       "",
       "sample::ServiceComponentDynamicReluctantMandatoryUnary",
       false,
-      MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>("ServiceComponentDynamicReluctantMandatoryUnary Interface1")) },
+      MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
+        "ServiceComponentDynamicReluctantMandatoryUnary Interface1")) },
     DynamicRefPolicy{
       "TestBundleDSDGMU",
-      "ServiceComponentDynamicGreedyMandatoryUnary depends on ServiceComponentDynamicGreedyMandatoryUnary Interface1",
+      "ServiceComponentDynamicGreedyMandatoryUnary depends on "
+      "ServiceComponentDynamicGreedyMandatoryUnary Interface1",
       "",
       "sample::ServiceComponentDynamicGreedyMandatoryUnary",
       false,
-      MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>("ServiceComponentDynamicGreedyMandatoryUnary Interface1")) },
+      MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
+        "ServiceComponentDynamicGreedyMandatoryUnary Interface1")) },
     DynamicRefPolicy{
       "TestBundleDSDROU",
-      "ServiceComponentDynamicReluctantOptionalUnary depends on ServiceComponentDynamicReluctantOptionalUnary Interface1",
+      "ServiceComponentDynamicReluctantOptionalUnary depends on "
+      "ServiceComponentDynamicReluctantOptionalUnary Interface1",
       "ServiceComponentDynamicReluctantOptionalUnary depends on ",
       "sample::ServiceComponentDynamicReluctantOptionalUnary",
       true,
-      MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>("ServiceComponentDynamicReluctantOptionalUnary Interface1")) },
+      MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
+        "ServiceComponentDynamicReluctantOptionalUnary Interface1")) },
     DynamicRefPolicy{
       "TestBundleDSDGOU",
-      "ServiceComponentDynamicGreedyOptionalUnary depends on ServiceComponentDynamicGreedyOptionalUnary Interface1",
+      "ServiceComponentDynamicGreedyOptionalUnary depends on "
+      "ServiceComponentDynamicGreedyOptionalUnary Interface1",
       "ServiceComponentDynamicGreedyOptionalUnary depends on ",
       "sample::ServiceComponentDynamicGreedyOptionalUnary",
       true,
-      MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>("ServiceComponentDynamicGreedyOptionalUnary Interface1")) }));
+      MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
+        "ServiceComponentDynamicGreedyOptionalUnary Interface1")) }));
 
 // test binding a service under the following reference policy, reference policy options and cardinality
 // Cardinality: 0..1, 1..1
@@ -298,7 +303,8 @@ TEST_P(DynamicRefPolicyTest, TestBindingWithDynamicPolicyOptions)
 
   if (param.optional) {
     EXPECT_TRUE(bc.GetServiceReference<test::Interface2>())
-      << "Service must be available before it's dependency because the dependency is optional";
+      << "Service must be available before it's dependency because the "
+         "dependency is optional";
   } else {
     EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
       << "Service must not be available before it's dependency";
@@ -310,25 +316,22 @@ TEST_P(DynamicRefPolicyTest, TestBindingWithDynamicPolicyOptions)
     param.implClassName,
     ((param.optional) ? scr::dto::ComponentState::ACTIVE
                       : scr::dto::ComponentState::UNSATISFIED_REFERENCE));
- 
+
   // register the dependent service to trigger the bind
   auto depSvcReg = bc.RegisterService(param.interfaceMap);
   ASSERT_TRUE(depSvcReg);
 
-  CheckComponentConfigurationState(
-    dsRuntimeService,
-    testBundle,
-    param.implClassName,
-    scr::dto::ComponentState::ACTIVE);
-  
+  CheckComponentConfigurationState(dsRuntimeService,
+                                   testBundle,
+                                   param.implClassName,
+                                   scr::dto::ComponentState::ACTIVE);
+
   auto svcRef = bc.GetServiceReference<test::Interface2>();
   ASSERT_TRUE(svcRef);
   auto svc = bc.GetService<test::Interface2>(svcRef);
   ASSERT_TRUE(svc);
   EXPECT_NO_THROW(svc->ExtendedDescription());
-  EXPECT_STREQ(
-    param.verificationMessage,
-    svc->ExtendedDescription().c_str())
+  EXPECT_STREQ(param.verificationMessage, svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
@@ -352,7 +355,7 @@ TEST_P(DynamicRefPolicyTest, TestBindingWithDynamicPolicyOptions)
 }
 
 // test error handling and logging when the bind and unbind methods throw an exception
-// this test ensures that exception handling when binding and unbinding for both 
+// this test ensures that exception handling when binding and unbinding for both
 // 0..1 and 1..1 cardinalities works.
 //
 // According to OSGi Compendium Release 7 Sections 112.5.10 and 112.5.18, if a
@@ -382,7 +385,7 @@ TEST_F(BindingPolicyTest, TestDynamicBindUnBindExceptionHandling)
   auto testBundle = test::InstallAndStartBundle(bc, "TestBindUnbindThrows");
   EXPECT_TRUE(bc.GetServiceReference<test::Interface2>())
     << "Service must be available before it's dependency";
-  
+
   auto dsRuntimeService = GetServiceComponentRuntime(bc);
 
   CheckComponentConfigurationState(
@@ -437,7 +440,7 @@ TEST_F(BindingPolicyTest, TestDynamicGreedyMandatoryUnaryReBind)
   auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSDGMU");
   EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
     << "Service must not be available before it's dependency";
-  
+
   auto dsRuntimeService = GetServiceComponentRuntime(bc);
 
   CheckComponentConfigurationState(
@@ -447,7 +450,9 @@ TEST_F(BindingPolicyTest, TestDynamicGreedyMandatoryUnaryReBind)
     scr::dto::ComponentState::UNSATISFIED_REFERENCE);
 
   // register the dependent service to trigger a bind
-  auto depSvcReg = bc.RegisterService<test::Interface1>(std::make_shared<test::InterfaceImpl>("ServiceComponentDynamicGreedyMandatoryUnary Interface1"));
+  auto depSvcReg =
+    bc.RegisterService<test::Interface1>(std::make_shared<test::InterfaceImpl>(
+      "ServiceComponentDynamicGreedyMandatoryUnary Interface1"));
   ASSERT_TRUE(depSvcReg);
 
   CheckComponentConfigurationState(
@@ -460,8 +465,10 @@ TEST_F(BindingPolicyTest, TestDynamicGreedyMandatoryUnaryReBind)
   ASSERT_TRUE(svcRef);
   auto svc = bc.GetService<test::Interface2>(svcRef);
   ASSERT_TRUE(svc);
-  EXPECT_NO_THROW(svc->ExtendedDescription()); 
-  EXPECT_STREQ("ServiceComponentDynamicGreedyMandatoryUnary depends on ServiceComponentDynamicGreedyMandatoryUnary Interface1", svc->ExtendedDescription().c_str())
+  EXPECT_NO_THROW(svc->ExtendedDescription());
+  EXPECT_STREQ("ServiceComponentDynamicGreedyMandatoryUnary depends on "
+               "ServiceComponentDynamicGreedyMandatoryUnary Interface1",
+               svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
@@ -471,9 +478,9 @@ TEST_F(BindingPolicyTest, TestDynamicGreedyMandatoryUnaryReBind)
     { { Constants::SERVICE_RANKING, Any(10000) } });
   ASSERT_TRUE(higherRankedSvc);
   EXPECT_NO_THROW(svc->ExtendedDescription());
-  EXPECT_STREQ(
-    "ServiceComponentDynamicGreedyMandatoryUnary depends on higher ranked Interface1",
-    svc->ExtendedDescription().c_str())
+  EXPECT_STREQ("ServiceComponentDynamicGreedyMandatoryUnary depends on higher "
+               "ranked Interface1",
+               svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
@@ -483,25 +490,26 @@ TEST_F(BindingPolicyTest, TestDynamicGreedyMandatoryUnaryReBind)
     { { Constants::SERVICE_RANKING, Any(1) } });
   ASSERT_TRUE(lowerRankedSvc);
   EXPECT_NO_THROW(svc->ExtendedDescription());
-  EXPECT_STREQ(
-    "ServiceComponentDynamicGreedyMandatoryUnary depends on higher ranked Interface1",
-    svc->ExtendedDescription().c_str())
+  EXPECT_STREQ("ServiceComponentDynamicGreedyMandatoryUnary depends on higher "
+               "ranked Interface1",
+               svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
   // unregistering the higher ranked service should cause a re-bind to the lower ranked service.
   higherRankedSvc.Unregister();
   EXPECT_NO_THROW(svc->ExtendedDescription());
-  EXPECT_STREQ(
-    "ServiceComponentDynamicGreedyMandatoryUnary depends on lower ranked Interface1",
-    svc->ExtendedDescription().c_str())
+  EXPECT_STREQ("ServiceComponentDynamicGreedyMandatoryUnary depends on lower "
+               "ranked Interface1",
+               svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
   // unregistering the lower ranked service should cause a re-bind to the last registered service.
   lowerRankedSvc.Unregister();
   EXPECT_NO_THROW(svc->ExtendedDescription());
-  EXPECT_STREQ("ServiceComponentDynamicGreedyMandatoryUnary depends on ServiceComponentDynamicGreedyMandatoryUnary Interface1",
+  EXPECT_STREQ("ServiceComponentDynamicGreedyMandatoryUnary depends on "
+               "ServiceComponentDynamicGreedyMandatoryUnary Interface1",
                svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
@@ -526,10 +534,10 @@ TEST_F(BindingPolicyTest, TestDynamicGreedyOptionalUnaryReBind)
   auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSDGOU");
   EXPECT_TRUE(bc.GetServiceReference<test::Interface2>())
     << "Service should be available before it's dependency";
-  
+
   auto dsRuntimeService = GetServiceComponentRuntime(bc);
 
-   CheckComponentConfigurationState(
+  CheckComponentConfigurationState(
     dsRuntimeService,
     testBundle,
     "sample::ServiceComponentDynamicGreedyOptionalUnary",
@@ -631,7 +639,7 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantMandatoryUnaryReBind)
   auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSDRMU");
   EXPECT_FALSE(bc.GetServiceReference<test::Interface2>())
     << "Service must not be available before it's dependency";
-  
+
   auto dsRuntimeService = GetServiceComponentRuntime(bc);
 
   CheckComponentConfigurationState(
@@ -641,8 +649,9 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantMandatoryUnaryReBind)
     scr::dto::ComponentState::UNSATISFIED_REFERENCE);
 
   // register the dependent service to trigger the bind
-  auto depSvcReg = bc.RegisterService<test::Interface1>(
-    std::make_shared<test::InterfaceImpl>("ServiceComponentDynamicReluctantMandatoryUnary Interface1"));
+  auto depSvcReg =
+    bc.RegisterService<test::Interface1>(std::make_shared<test::InterfaceImpl>(
+      "ServiceComponentDynamicReluctantMandatoryUnary Interface1"));
   ASSERT_TRUE(depSvcReg);
 
   CheckComponentConfigurationState(
@@ -656,9 +665,9 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantMandatoryUnaryReBind)
   auto svc = bc.GetService<test::Interface2>(svcRef);
   ASSERT_TRUE(svc);
   EXPECT_NO_THROW(svc->ExtendedDescription());
-  EXPECT_STREQ(
-    "ServiceComponentDynamicReluctantMandatoryUnary depends on ServiceComponentDynamicReluctantMandatoryUnary Interface1",
-    svc->ExtendedDescription().c_str())
+  EXPECT_STREQ("ServiceComponentDynamicReluctantMandatoryUnary depends on "
+               "ServiceComponentDynamicReluctantMandatoryUnary Interface1",
+               svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
@@ -668,7 +677,8 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantMandatoryUnaryReBind)
     { { Constants::SERVICE_RANKING, Any(10000) } });
   ASSERT_TRUE(higherRankedSvc);
   EXPECT_NO_THROW(svc->ExtendedDescription());
-  EXPECT_STREQ("ServiceComponentDynamicReluctantMandatoryUnary depends on ServiceComponentDynamicReluctantMandatoryUnary Interface1",
+  EXPECT_STREQ("ServiceComponentDynamicReluctantMandatoryUnary depends on "
+               "ServiceComponentDynamicReluctantMandatoryUnary Interface1",
                svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
@@ -679,27 +689,28 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantMandatoryUnaryReBind)
     { { Constants::SERVICE_RANKING, Any(1) } });
   ASSERT_TRUE(lowerRankedSvc);
   EXPECT_NO_THROW(svc->ExtendedDescription());
-  EXPECT_STREQ(
-    "ServiceComponentDynamicReluctantMandatoryUnary depends on ServiceComponentDynamicReluctantMandatoryUnary Interface1",
-    svc->ExtendedDescription().c_str())
+  EXPECT_STREQ("ServiceComponentDynamicReluctantMandatoryUnary depends on "
+               "ServiceComponentDynamicReluctantMandatoryUnary Interface1",
+               svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
   // unregistering the bound service should cause a re-bind to the higher ranked service.
   depSvcReg.Unregister();
   EXPECT_NO_THROW(svc->ExtendedDescription());
-  EXPECT_STREQ("ServiceComponentDynamicReluctantMandatoryUnary depends on higher "
-               "ranked Interface1",
-               svc->ExtendedDescription().c_str())
+  EXPECT_STREQ(
+    "ServiceComponentDynamicReluctantMandatoryUnary depends on higher "
+    "ranked Interface1",
+    svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
   // unregistering the higher ranked service should cause a re-bind to the lower ranked service.
   higherRankedSvc.Unregister();
   EXPECT_NO_THROW(svc->ExtendedDescription());
-  EXPECT_STREQ(
-    "ServiceComponentDynamicReluctantMandatoryUnary depends on lower ranked Interface1",
-    svc->ExtendedDescription().c_str())
+  EXPECT_STREQ("ServiceComponentDynamicReluctantMandatoryUnary depends on "
+               "lower ranked Interface1",
+               svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
@@ -720,7 +731,7 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantOptionalUnaryReBind)
   auto testBundle = test::InstallAndStartBundle(bc, "TestBundleDSDROU");
   EXPECT_TRUE(bc.GetServiceReference<test::Interface2>())
     << "Service should be available before it's dependency";
-  
+
   auto dsRuntimeService = GetServiceComponentRuntime(bc);
 
   CheckComponentConfigurationState(
@@ -790,10 +801,9 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantOptionalUnaryReBind)
   // since the lower ranked service wasn't bound.
   higherRankedSvc.Unregister();
   EXPECT_NO_THROW(svc->ExtendedDescription());
-  EXPECT_STREQ(
-    "ServiceComponentDynamicReluctantOptionalUnary depends on "
-    "ServiceComponentDynamicReluctantOptionalUnary Interface1",
-    svc->ExtendedDescription().c_str())
+  EXPECT_STREQ("ServiceComponentDynamicReluctantOptionalUnary depends on "
+               "ServiceComponentDynamicReluctantOptionalUnary Interface1",
+               svc->ExtendedDescription().c_str())
     << "String value returned was not expected. Was the correct service "
        "dependency bound?";
 
@@ -860,7 +870,6 @@ TEST_F(BindingPolicyTest, TestConcurrentBindUnbind)
   EXPECT_TRUE(std::all_of(
     results.cbegin(), results.cend(), [](bool result) { return result; }));
   testBundle.Stop();
-  
 }
 
 }

@@ -4,7 +4,7 @@ namespace sample {
 
 bool ServiceComponent18::isDependencyInjected()
 {
-    return constructorHit;
+  return constructorHit;
 }
 
 }

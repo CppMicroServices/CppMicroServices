@@ -32,10 +32,10 @@ namespace cppmicroservices {
 namespace service {
 namespace component {
 
-	/**
-	\defgroup gr_componentexception ComponentException
-	\brief Groups ComponentException class related symbols.
-	*/
+/**
+ \defgroup gr_componentexception ComponentException
+ \brief Groups ComponentException class related symbols.
+ */
 
 #ifdef _MSC_VER
 // C4275 can be ignored in Visual C++ if you are deriving from a type in the C++ Standard Library
@@ -47,17 +47,16 @@ namespace component {
  *
  * Exception which may be thrown by Service Component Runtime.
  */
-class US_ServiceComponent_EXPORT ComponentException final
-  : std::runtime_error
+class US_ServiceComponent_EXPORT ComponentException final : std::runtime_error
 {
-  public:
+public:
   /**
    * Construct a new ComponentException with the specified message.
    *
    * @param message The message for the exception.
    */
-  explicit ComponentException( const std::string& message );
-  explicit ComponentException( const char* message );
+  explicit ComponentException(const std::string& message);
+  explicit ComponentException(const char* message);
 
   virtual ~ComponentException() noexcept;
 };

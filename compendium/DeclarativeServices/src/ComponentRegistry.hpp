@@ -23,9 +23,9 @@
 #ifndef __COMPONENT_REGISTRY_HPP__
 #define __COMPONENT_REGISTRY_HPP__
 
+#include "manager/ComponentManager.hpp"
 #include <memory>
 #include <vector>
-#include "manager/ComponentManager.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -49,7 +49,8 @@ public:
    * \return a vector of {@link ComponentManager} objects that are stored in
    * the registry
    */
-  virtual std::vector<std::shared_ptr<ComponentManager>> GetComponentManagers() const;
+  virtual std::vector<std::shared_ptr<ComponentManager>> GetComponentManagers()
+    const;
 
   /**
    * Method returns all the component manager objects from a bundle, stored
@@ -61,7 +62,8 @@ public:
    *         the registry and which belong to the {@link Bundle} with the
    *         given id.
    */
-  virtual std::vector<std::shared_ptr<ComponentManager>> GetComponentManagers(unsigned long bundleId) const;
+  virtual std::vector<std::shared_ptr<ComponentManager>> GetComponentManagers(
+    unsigned long bundleId) const;
 
   /**
    * Method returns a component manager object with the given name and from the given bundle
@@ -74,8 +76,9 @@ public:
    *         the registry and which belong to the {@link Bundle} with the
    *         given id.
    */
-  virtual std::shared_ptr<ComponentManager> GetComponentManager(unsigned long bundleId,
-                                                                const std::string& compName) const;
+  virtual std::shared_ptr<ComponentManager> GetComponentManager(
+    unsigned long bundleId,
+    const std::string& compName) const;
 
   /**
    * Method removes a component manager object from the component registry
@@ -109,7 +112,8 @@ public:
    * \param cm is the {@link ComponentManager} object which will be removed
    *        from the registry
    */
-  virtual void RemoveComponentManager(const std::shared_ptr<ComponentManager>& cm);
+  virtual void RemoveComponentManager(
+    const std::shared_ptr<ComponentManager>& cm);
 
   /**
    * Removes all entries from the component registry
@@ -120,8 +124,11 @@ public:
    * Returns the number of elements in the component regsitry
    */
   size_t Count() const;
+
 private:
-  std::map<std::pair<unsigned long,std::string>,std::shared_ptr<ComponentManager>> mComponentsByName;
+  std::map<std::pair<unsigned long, std::string>,
+           std::shared_ptr<ComponentManager>>
+    mComponentsByName;
   mutable std::mutex mMapsMutex;
 };
 } // scrimpl

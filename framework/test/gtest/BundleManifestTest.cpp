@@ -265,14 +265,14 @@ TEST_F(BundleManifestTest, DirectManifestInstallNoSymbolicName)
     // We need to have at least one entry in the manifest to check and make sure it has what's
     // required. This is because if the manifest is empty, it is assumed that we are NOT injecting a
     // manifest and we go through the standard install by reading the manifest from the bundle
-    // itself. 
-    { "foo" , std::string("bar") }
+    // itself.
+    { "foo", std::string("bar") }
   };
   manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);
 
   auto const libPath = fullLibPath("TestBundleA");
 
-  EXPECT_THROW( { ctx.InstallBundles(libPath, manifests); }, std::runtime_error);
+  EXPECT_THROW({ ctx.InstallBundles(libPath, manifests); }, std::runtime_error);
 }
 
 TEST_F(BundleManifestTest, DirectManifestInstallBadLocation)

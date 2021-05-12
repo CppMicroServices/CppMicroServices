@@ -85,9 +85,9 @@ void CCActiveState::Rebind(ComponentConfigurationImpl& mgr,
       } catch (const std::exception&) {
         mgr.GetLogger()->Log(
           cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-          "Exception while dynamically binding a reference. ", std::current_exception());
+          "Exception while dynamically binding a reference. ",
+          std::current_exception());
       }
-      
     }
 
     if (svcRefToUnbind) {

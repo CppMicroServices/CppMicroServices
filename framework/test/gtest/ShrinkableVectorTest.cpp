@@ -28,8 +28,7 @@ using namespace cppmicroservices;
 
 // Fake a BundleHooks class so we can create
 // ShrinkableVector instances
-namespace cppmicroservices 
-{
+namespace cppmicroservices {
 class BundleHooks
 {
 
@@ -44,7 +43,7 @@ public:
 
 TEST(ShrinkableVectorTest, ShrinkableVector)
 {
-  ShrinkableVector<int32_t>::container_type vec({1, 2, 3});
+  ShrinkableVector<int32_t>::container_type vec({ 1, 2, 3 });
   auto shrinkable = BundleHooks::MakeVector(vec);
 
   EXPECT_EQ(vec.size(), 3);

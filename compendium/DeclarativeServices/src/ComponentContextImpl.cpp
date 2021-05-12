@@ -216,8 +216,7 @@ void ComponentContextImpl::AddToBoundServicesCache(
   cppmicroservices::ServiceObjects<void> sObjs =
     bc.GetServiceObjects(ServiceReferenceU(sRef));
   auto boundServicesCacheHandle = boundServicesCache.lock();
-  (*boundServicesCacheHandle)[refName].emplace_back(
-    sObjs.GetService());
+  (*boundServicesCacheHandle)[refName].emplace_back(sObjs.GetService());
 }
 
 void ComponentContextImpl::RemoveFromBoundServicesCache(

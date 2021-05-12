@@ -23,10 +23,10 @@
 #ifndef ComponentManagerState_hpp
 #define ComponentManagerState_hpp
 
+#include <future>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
-#include <future>
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -67,7 +67,8 @@ public:
    * Implementation returns a \c std::vector of configurations created for
    * the component passed as parameter
    */
-  virtual std::vector<std::shared_ptr<ComponentConfiguration>> GetConfigurations(const ComponentManagerImpl& cm) const = 0;
+  virtual std::vector<std::shared_ptr<ComponentConfiguration>>
+  GetConfigurations(const ComponentManagerImpl& cm) const = 0;
 
   /**
    * Implementation returns a \c std::shared_future object representing the async

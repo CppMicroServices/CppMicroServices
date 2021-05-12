@@ -20,17 +20,17 @@
  
  =============================================================================*/
 
-#if defined (US_PLATFORM_APPLE) || defined (US_PLATFORM_POSIX)
+#if defined(US_PLATFORM_APPLE) || defined(US_PLATFORM_POSIX)
 
-#ifndef CPPMICROSERVICES_MAPPEDFILE_H
-#define CPPMICROSERVICES_MAPPEDFILE_H
+#  ifndef CPPMICROSERVICES_MAPPEDFILE_H
+#    define CPPMICROSERVICES_MAPPEDFILE_H
 
-#include "DataContainer.h"
+#    include "DataContainer.h"
 
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#    include <fcntl.h>
+#    include <sys/mman.h>
+#    include <sys/stat.h>
+#    include <unistd.h>
 
 namespace cppmicroservices {
 
@@ -40,32 +40,34 @@ public:
   MappedFile()
     : fileDesc(-1)
     , mappedAddress(nullptr)
-    , mapSize(0) {}
+    , mapSize(0)
+  {}
   MappedFile(const std::string& fileLocation, size_t mapLength, off_t offset)
     : fileDesc(-1)
     , mappedAddress(nullptr)
     , mapSize(mapLength)
   {
     fileDesc = open(fileLocation.c_str(), O_RDONLY);
-    if(fileDesc >= 0) {
-      mappedAddress = mmap(0, mapLength, PROT_READ, MAP_PRIVATE, fileDesc, offset);
+    if (fileDesc >= 0) {
+      mappedAddress =
+        mmap(0, mapLength, PROT_READ, MAP_PRIVATE, fileDesc, offset);
       if (MAP_FAILED == mappedAddress) {
         mappedAddress = nullptr;
         mapSize = 0;
       }
     }
   }
-    
+
   ~MappedFile()
   {
-    if(mappedAddress && mapSize) {
+    if (mappedAddress && mapSize) {
       munmap(mappedAddress, mapSize);
     }
-    if(0 <= fileDesc) {
+    if (0 <= fileDesc) {
       close(fileDesc);
     }
   }
-  
+
   void* GetData() const override { return mappedAddress; }
   std::size_t GetSize() const override { return mapSize; }
 
@@ -76,6 +78,6 @@ private:
 };
 
 }
-#endif // CPPMICROSERVICES_MAPPEDFILE_H
+#  endif // CPPMICROSERVICES_MAPPEDFILE_H
 
 #endif // defined (US_PLATFORM_APPLE) || defined (US_PLATFORM_POSIX)

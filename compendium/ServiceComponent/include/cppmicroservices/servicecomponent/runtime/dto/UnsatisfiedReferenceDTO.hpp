@@ -23,8 +23,8 @@
 #ifndef UnsatisfiedReferenceDTO_hpp
 #define UnsatisfiedReferenceDTO_hpp
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "ServiceReferenceDTO.hpp"
 
@@ -34,10 +34,10 @@ namespace component {
 namespace runtime {
 namespace dto {
 
-	/**
-	\defgroup gr_unsatisfiedreferencedto UnsatisfiedReferenceDTO
-	\brief Groups UnsatisfiedReferenceDTO related symbols.
-	*/
+/**
+ \defgroup gr_unsatisfiedreferencedto UnsatisfiedReferenceDTO
+ \brief Groups UnsatisfiedReferenceDTO related symbols.
+ */
 
 /**
  * \ingroup gr_unsatisfiedreferencedto
@@ -79,7 +79,8 @@ struct UnsatisfiedReferenceDTO
    * is the upper bound on the {@link ReferenceDTO#cardinality cardinality} of
    * the reference.
    */
-  std::vector<cppmicroservices::framework::dto::ServiceReferenceDTO> targetServices;
+  std::vector<cppmicroservices::framework::dto::ServiceReferenceDTO>
+    targetServices;
 };
 }
 }

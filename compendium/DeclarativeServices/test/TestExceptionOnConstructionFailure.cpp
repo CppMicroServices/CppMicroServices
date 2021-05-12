@@ -47,25 +47,8 @@ public:
     framework.Start();
     auto context = framework.GetBundleContext();
 
-#if defined(US_BUILD_SHARED_LIBS)
-    auto dsPluginPath = test::GetDSRuntimePluginFilePath();
-    auto dsbundles = context.InstallBundles(dsPluginPath);
-    for (auto& bundle : dsbundles) {
-      bundle.Start();
-    }
-#endif
+    ::test::InstallAndStartDS(context);
 
-#ifndef US_BUILD_SHARED_LIBS
-    auto dsbundles = context.GetBundles();
-    for (auto& bundle : dsbundles) {
-      try {
-        bundle.Start();
-      } catch (std::exception& e) {
-        std::cerr << "    " << e.what();
-      }
-      std::cerr << std::endl;
-    }
-#endif
     auto sRef = context.GetServiceReference<scr::ServiceComponentRuntime>();
     ASSERT_TRUE(sRef);
     dsRuntimeService = context.GetService<scr::ServiceComponentRuntime>(sRef);
@@ -76,30 +59,6 @@ public:
   {
     framework.Stop();
     framework.WaitForStop(std::chrono::milliseconds::zero());
-  }
-
-  cppmicroservices::Bundle GetTestBundle(const std::string& symbolicName)
-  {
-    auto context = framework.GetBundleContext();
-    auto bundles = context.GetBundles();
-
-    for (auto& bundle : bundles) {
-      auto bundleSymbolicName = bundle.GetSymbolicName();
-      if (symbolicName == bundleSymbolicName) {
-        return bundle;
-      }
-    }
-    return cppmicroservices::Bundle();
-  }
-
-  cppmicroservices::Bundle StartTestBundle(const std::string& symName)
-  {
-    cppmicroservices::Bundle testBundle = GetTestBundle(symName);
-    EXPECT_EQ(static_cast<bool>(testBundle), true);
-    testBundle.Start();
-    EXPECT_EQ(testBundle.GetState(), cppmicroservices::Bundle::STATE_ACTIVE)
-      << " failed to start bundle with symbolic name" + symName;
-    return testBundle;
   }
 
   std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
@@ -144,12 +103,12 @@ TEST_P(FailedBoundServiceActivationTest, TestExceptionOnConstructionFailure)
 
   // The number of unsatisfied references should be 1 since the upstream reference
   // failed to construct
-  auto unsatisfiedRefs = configDTO[0].unsatisfiedReferences;
+  const auto& unsatisfiedRefs = configDTO[0].unsatisfiedReferences;
   EXPECT_EQ(unsatisfiedRefs.size(), 1);
 
   // The number of satisfied references should be 0 since the upstream reference failed
   // to construct
-  auto satisfiedRefs = configDTO[0].satisfiedReferences;
+  const auto& satisfiedRefs = configDTO[0].satisfiedReferences;
   EXPECT_EQ(satisfiedRefs.size(), 0);
 
   // The state of the bundle should be UNSATISFIED_REFERENCE since the sole dependency

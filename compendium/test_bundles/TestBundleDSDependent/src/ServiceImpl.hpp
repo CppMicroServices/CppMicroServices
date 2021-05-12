@@ -16,9 +16,8 @@ public:
 
   void Activate(const std::shared_ptr<ComponentContext>& context)
   {
-    auto service = context->LocateService<test::TestBundleDSUpstreamDependency>(
+    (void)context->LocateService<test::TestBundleDSUpstreamDependency>(
       "testbundledsupstreamdependency");
-    (void)(service);
   }
 
   void Deactivate(const std::shared_ptr<ComponentContext>& context)

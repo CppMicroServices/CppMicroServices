@@ -31,16 +31,16 @@ namespace cppmicroservices {
 namespace framework {
 namespace dto {
 
-	/**
-	\defgroup gr_bundledto BundleDTO
-	\brief Groups BundleDTO related symbols.
-	*/
+/**
+ \defgroup gr_bundledto BundleDTO
+ \brief Groups BundleDTO related symbols.
+ */
 
-	/**
-	 * \ingroup gr_bundledto 
-	 * 
-	 * A representation of a bundle.
-	 */
+/**
+ * \ingroup gr_bundledto 
+ * 
+ * A representation of a bundle.
+ */
 struct US_ServiceComponent_EXPORT BundleDTO
 {
   /**

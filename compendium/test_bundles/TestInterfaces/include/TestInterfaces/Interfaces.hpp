@@ -24,8 +24,8 @@
 
 #include "TestInterfaces/TestInterfacesExport.h"
 
-#include <string>
 #include <memory>
+#include <string>
 
 /* This file contains interface declarations for the test bundles
    used in Declarative Services Tests */
@@ -33,118 +33,121 @@
 #define STRINGIZE(s) STR_HELPER(s)
 #define STR_HELPER(s) #s
 
-namespace test
+namespace test {
+class US_TestInterfaces_EXPORT Interface1
 {
-    class US_TestInterfaces_EXPORT Interface1
-    {
-      public:
-      virtual std::string Description() = 0;
-      virtual ~Interface1();
-    };
+public:
+  virtual std::string Description() = 0;
+  virtual ~Interface1();
+};
 
-    class US_TestInterfaces_EXPORT Interface2
-    {
-      public:
-      virtual std::string ExtendedDescription() = 0;
-      virtual ~Interface2();
-    };
+class US_TestInterfaces_EXPORT Interface2
+{
+public:
+  virtual std::string ExtendedDescription() = 0;
+  virtual ~Interface2();
+};
 
-    class US_TestInterfaces_EXPORT Interface3
-    {
-      public:
-      virtual bool isDependencyInjected() = 0;
-      virtual ~Interface3();
-    };
+class US_TestInterfaces_EXPORT Interface3
+{
+public:
+  virtual bool isDependencyInjected() = 0;
+  virtual ~Interface3();
+};
 
-    class US_TestInterfaces_EXPORT TestManagedServiceInterface {
-      public:
-        virtual ~TestManagedServiceInterface() = default;
+class US_TestInterfaces_EXPORT TestManagedServiceInterface
+{
+public:
+  virtual ~TestManagedServiceInterface() = default;
 
-        virtual int getCounter() = 0;
-    };
+  virtual int getCounter() = 0;
+};
 
-    class US_TestInterfaces_EXPORT TestManagedServiceFactoryServiceInterface {
-      public:
-        virtual ~TestManagedServiceFactoryServiceInterface() = default;
+class US_TestInterfaces_EXPORT TestManagedServiceFactoryServiceInterface
+{
+public:
+  virtual ~TestManagedServiceFactoryServiceInterface() = default;
 
-        virtual int getValue() = 0;
-    };
+  virtual int getValue() = 0;
+};
 
-    class US_TestInterfaces_EXPORT TestManagedServiceFactory {
-      public:
-        TestManagedServiceFactory() = default;
-        virtual ~TestManagedServiceFactory() = default;
+class US_TestInterfaces_EXPORT TestManagedServiceFactory
+{
+public:
+  TestManagedServiceFactory() = default;
+  virtual ~TestManagedServiceFactory() = default;
 
-        virtual int getUpdatedCounter(std::string const& pid) = 0;
+  virtual int getUpdatedCounter(std::string const& pid) = 0;
 
-        virtual int getRemovedCounter(std::string const& pid) = 0;
+  virtual int getRemovedCounter(std::string const& pid) = 0;
 
-        virtual std::shared_ptr<TestManagedServiceFactoryServiceInterface> create(std::string const& config) = 0;
-    };
-    
-    // Interfaces for declarative services dependency graph resolution benchmarks. The
-    // implentations of these interfaces have dependencies that form a complete 3 level tree:
-    // DSGraph01 : DSGraph02, DSGraph03
-    // DSGraph02 : DSGraph04, DSGraph05
-    // DSGraph03 : DSGraph06, DSGraph07
-    class US_TestInterfaces_EXPORT DSGraph01
-    {
-      public:
-      virtual std::string Description() = 0;
-      virtual ~DSGraph01();
-    };
+  virtual std::shared_ptr<TestManagedServiceFactoryServiceInterface> create(
+    std::string const& config) = 0;
+};
 
-    class US_TestInterfaces_EXPORT DSGraph02
-    {
-      public:
-      virtual std::string Description() = 0;
-      virtual ~DSGraph02();
-    };
+// Interfaces for declarative services dependency graph resolution benchmarks. The
+// implentations of these interfaces have dependencies that form a complete 3 level tree:
+// DSGraph01 : DSGraph02, DSGraph03
+// DSGraph02 : DSGraph04, DSGraph05
+// DSGraph03 : DSGraph06, DSGraph07
+class US_TestInterfaces_EXPORT DSGraph01
+{
+public:
+  virtual std::string Description() = 0;
+  virtual ~DSGraph01();
+};
 
-    class US_TestInterfaces_EXPORT DSGraph03
-    {
-      public:
-      virtual std::string Description() = 0;
-      virtual ~DSGraph03();
-    };
+class US_TestInterfaces_EXPORT DSGraph02
+{
+public:
+  virtual std::string Description() = 0;
+  virtual ~DSGraph02();
+};
 
-    class US_TestInterfaces_EXPORT DSGraph04
-    {
-      public:
-      virtual std::string Description() = 0;
-      virtual ~DSGraph04();
-    };
+class US_TestInterfaces_EXPORT DSGraph03
+{
+public:
+  virtual std::string Description() = 0;
+  virtual ~DSGraph03();
+};
 
-    class US_TestInterfaces_EXPORT DSGraph05
-    {
-      public:
-      virtual std::string Description() = 0;
-      virtual ~DSGraph05();
-    };
+class US_TestInterfaces_EXPORT DSGraph04
+{
+public:
+  virtual std::string Description() = 0;
+  virtual ~DSGraph04();
+};
 
-    class US_TestInterfaces_EXPORT DSGraph06
-    {
-      public:
-      virtual std::string Description() = 0;
-      virtual ~DSGraph06();
-    };
+class US_TestInterfaces_EXPORT DSGraph05
+{
+public:
+  virtual std::string Description() = 0;
+  virtual ~DSGraph05();
+};
 
-    class US_TestInterfaces_EXPORT DSGraph07
-    {
-      public:
-      virtual std::string Description() = 0;
-      virtual ~DSGraph07();
-    };
+class US_TestInterfaces_EXPORT DSGraph06
+{
+public:
+  virtual std::string Description() = 0;
+  virtual ~DSGraph06();
+};
 
-    // Use this interface in test bundles & test points to validate if the
-    // service component receives the life cycle callbacks from the DS runtime
-    class US_TestInterfaces_EXPORT LifeCycleValidation
-    {
-      public:
-      virtual bool IsActivated() = 0;
-      virtual bool IsDeactivated() = 0;
-      virtual ~LifeCycleValidation();
-    };
+class US_TestInterfaces_EXPORT DSGraph07
+{
+public:
+  virtual std::string Description() = 0;
+  virtual ~DSGraph07();
+};
+
+// Use this interface in test bundles & test points to validate if the
+// service component receives the life cycle callbacks from the DS runtime
+class US_TestInterfaces_EXPORT LifeCycleValidation
+{
+public:
+  virtual bool IsActivated() = 0;
+  virtual bool IsDeactivated() = 0;
+  virtual ~LifeCycleValidation();
+};
 }
 
 #endif

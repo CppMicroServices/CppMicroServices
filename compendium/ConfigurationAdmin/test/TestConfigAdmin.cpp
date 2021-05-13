@@ -187,7 +187,8 @@ public:
     // since installing an already installed bundle is a no-op.
     auto installedBundles = m_framework.GetBundleContext().InstallBundles(
       GetConfigAdminRuntimePluginFilePath());
-    ASSERT_EQ(installedBundles.size(), 1ul) << "Only one configadmin bundle should be installed";
+    ASSERT_EQ(installedBundles.size(), 1ul)
+      << "Only one configadmin bundle should be installed";
     m_bundle = installedBundles.at(0);
 
     auto const numBundles =
@@ -217,17 +218,15 @@ protected:
 
 private:
   cppmicroservices::Framework m_framework;
-  cppmicroservices::Bundle m_bundle;  ///< The ConfigAdmin bundle object
+  cppmicroservices::Bundle m_bundle; ///< The ConfigAdmin bundle object
 };
 
 TEST_F(ConfigAdminTests, testProperties)
 {
   // Test that the build system correctly generated the config admin bundle properties.
   auto b = GetConfigAdminBundle();
-  ASSERT_EQ(
-    b.GetSymbolicName(), US_ConfigurationAdmin_SYMBOLIC_NAME);
-  ASSERT_EQ(
-    b.GetVersion().ToString(), US_ConfigurationAdmin_VERSION_STR);
+  ASSERT_EQ(b.GetSymbolicName(), US_ConfigurationAdmin_SYMBOLIC_NAME);
+  ASSERT_EQ(b.GetVersion().ToString(), US_ConfigurationAdmin_VERSION_STR);
 }
 
 TEST_F(ConfigAdminTests, testInstallAndStart)
@@ -335,7 +334,7 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
 
   auto configuration = m_configAdmin->GetConfiguration("cm.testservice");
 
-  // Remove sends an asynchronous notification to the ManagedService so we 
+  // Remove sends an asynchronous notification to the ManagedService so we
   // have to wait until it's finished before checking the result.
   configuration->Remove();
   expectedCount -= 1;
@@ -350,7 +349,7 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
 
   // Should create a new configuration and call Updated()
   // GetConfiguration doesn't send a notification to the ManagedService so
-  // we don't have to wait for the result. 
+  // we don't have to wait for the result.
   configuration = m_configAdmin->GetConfiguration("cm.testservice");
   EXPECT_TRUE(configuration->GetProperties().empty());
   EXPECT_EQ(service->getCounter(), expectedCount);
@@ -553,7 +552,8 @@ TEST_F(ConfigAdminTests, testRemoveFactoryConfiguration)
     m_configAdmin->GetFactoryConfiguration("cm.testfactory", "config1");
 
   EXPECT_TRUE(configuration_config1->GetProperties().empty());
-  EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config1"), expectedCount_config1);
+  EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config1"),
+            expectedCount_config1);
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config2"),
             expectedCount_config2);
 }

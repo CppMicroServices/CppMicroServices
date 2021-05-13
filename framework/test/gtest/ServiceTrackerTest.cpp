@@ -28,6 +28,7 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/ServiceInterface.h"
+#include "cppmicroservices/ServiceReference.h"
 
 #include "ServiceControlInterface.h"
 #include "TestUtils.h"
@@ -36,6 +37,7 @@
 #include <chrono>
 #include <future>
 #include <memory>
+#include <unordered_map>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -108,12 +110,24 @@ private:
 };
 
 template<typename Interface>
-class MockCustomizedServiceTracker : public cppmicroservices::ServiceTrackerCustomizer<Interface>
+class MockCustomizedServiceTracker
+  : public cppmicroservices::ServiceTrackerCustomizer<Interface>
 {
 public:
-    MOCK_METHOD(std::shared_ptr<Interface>, AddingService,(const ServiceReference<Interface>& reference), (override));
-    MOCK_METHOD(void, ModifiedService, (const ServiceReference<Interface>& reference, const std::shared_ptr<Interface>& service), (override));
-    MOCK_METHOD(void, RemovedService, (const ServiceReference<Interface>& reference, const std::shared_ptr<Interface>& service), (override));
+  MOCK_METHOD(std::shared_ptr<Interface>,
+              AddingService,
+              (const ServiceReference<Interface>& reference),
+              (override));
+  MOCK_METHOD(void,
+              ModifiedService,
+              (const ServiceReference<Interface>& reference,
+               const std::shared_ptr<Interface>& service),
+              (override));
+  MOCK_METHOD(void,
+              RemovedService,
+              (const ServiceReference<Interface>& reference,
+               const std::shared_ptr<Interface>& service),
+              (override));
 };
 
 class ServiceTrackerTestFixture : public ::testing::Test
@@ -122,7 +136,7 @@ public:
   ServiceTrackerTestFixture()
     : framework(FrameworkFactory().NewFramework()){};
   ~ServiceTrackerTestFixture() override = default;
-  
+
   void SetUp() override { framework.Start(); }
   void TearDown() override
   {
@@ -155,8 +169,7 @@ TEST_F(ServiceTrackerTestFixture, TestFilterString)
   context.RegisterService<MyInterfaceOne>(serviceOne);
   context.RegisterService<MyInterfaceTwo>(serviceTwo);
 
-  EXPECT_EQ(tracker.GetServiceReferences().size(), 1) <<
-                    "tracking count";
+  EXPECT_EQ(tracker.GetServiceReferences().size(), 1) << "tracking count";
 }
 
 TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
@@ -171,9 +184,8 @@ TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
   std::string s1("cppmicroservices::TestBundleSService");
   ServiceReferenceU servref = context.GetServiceReference(s1 + "0");
 
-  ASSERT_TRUE(
-    servref) <<
-    "Test if registered service of id cppmicroservices::TestBundleSService0";
+  ASSERT_TRUE(servref)
+    << "Test if registered service of id cppmicroservices::TestBundleSService0";
 
   ServiceReference<ServiceControlInterface> servCtrlRef =
     context.GetServiceReference<ServiceControlInterface>();
@@ -197,7 +209,8 @@ TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
   std::vector<ServiceReferenceU> sa2 = st1->GetServiceReferences();
 
   ASSERT_EQ(sa2.size(), 1) << "Checking ServiceTracker size";
-  ASSERT_EQ(s1 + "0", sa2[0].GetInterfaceId()) << "Checking service implementation name";
+  ASSERT_EQ(s1 + "0", sa2[0].GetInterfaceId())
+    << "Checking service implementation name";
 
 #ifdef US_ENABLE_THREADING_SUPPORT
   // 4. Test notifications via closing the tracker
@@ -214,22 +227,20 @@ TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
     });
 
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ASSERT_EQ(fut1.wait_for(std::chrono::milliseconds(1)),
-                                 US_FUTURE_TIMEOUT) <<
-                               "Waiter not notified yet";
-    ASSERT_EQ(fut2.wait_for(std::chrono::milliseconds(1)),
-                                 US_FUTURE_TIMEOUT) <<
-                               "Waiter not notified yet";
+    ASSERT_EQ(fut1.wait_for(std::chrono::milliseconds(1)), US_FUTURE_TIMEOUT)
+      << "Waiter not notified yet";
+    ASSERT_EQ(fut2.wait_for(std::chrono::milliseconds(1)), US_FUTURE_TIMEOUT)
+      << "Waiter not notified yet";
 
     st2.Close();
 
     // Closing the tracker should notify the waiters
     auto wait_until =
       std::chrono::steady_clock::now() + std::chrono::seconds(3);
-    ASSERT_EQ(fut1.wait_until(wait_until), US_FUTURE_READY) <<
-                               "Closed service tracker notifies waiters";
-    ASSERT_EQ(fut2.wait_until(wait_until), US_FUTURE_READY) <<
-                               "Closed service tracker notifies waiters";
+    ASSERT_EQ(fut1.wait_until(wait_until), US_FUTURE_READY)
+      << "Closed service tracker notifies waiters";
+    ASSERT_EQ(fut2.wait_until(wait_until), US_FUTURE_READY)
+      << "Closed service tracker notifies waiters";
   }
 #endif
 
@@ -265,9 +276,8 @@ TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
   st1->Open();
   sa2 = st1->GetServiceReferences();
   ASSERT_EQ(sa2.size(), 2) << "Checking service reference count";
-  ASSERT_TRUE(
-    CheckConvertibility(sa2, ids.cbegin(), ids.cbegin() + 2)) <<
-    "Check for 2 expected interface ids";
+  ASSERT_TRUE(CheckConvertibility(sa2, ids.cbegin(), ids.cbegin() + 2))
+    << "Check for 2 expected interface ids";
 
   // 10. Get libTestBundleS to register one more service and see if it appears
   serviceController->ServiceControl(2, "register", 1);
@@ -275,16 +285,15 @@ TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
 
   ASSERT_EQ(sa2.size(), 3) << "Checking service reference count";
 
-  ASSERT_TRUE(
-    CheckConvertibility(sa2, ids.cbegin(), ids.cbegin() + 3)) <<
-    "Check for 3 expected interface ids";
+  ASSERT_TRUE(CheckConvertibility(sa2, ids.cbegin(), ids.cbegin() + 3))
+    << "Check for 3 expected interface ids";
 
   // 11. Get libTestBundleS to register one more service and see if it appears
   serviceController->ServiceControl(3, "register", 2);
   sa2 = st1->GetServiceReferences();
   ASSERT_EQ(sa2.size(), 4) << "Checking service reference count";
-  ASSERT_TRUE(CheckConvertibility(sa2, ids.cbegin(), ids.cend())) <<
-                             "Check for 4 expected interface ids";
+  ASSERT_TRUE(CheckConvertibility(sa2, ids.cbegin(), ids.cend()))
+    << "Check for 4 expected interface ids";
 
   // 12. Get libTestBundleS to unregister one service and see if it disappears
   serviceController->ServiceControl(3, "unregister", 0);
@@ -299,12 +308,13 @@ TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
   // 14. Get the service of the highest ranked service reference
 
   auto o1 = st1->GetService(h1);
-  ASSERT_TRUE(o1.get() != nullptr && !o1->empty()) << "Check for non-null service";
+  ASSERT_TRUE(o1.get() != nullptr && !o1->empty())
+    << "Check for non-null service";
 
   // 14a Get the highest ranked service, directly this time
   auto o3 = st1->GetService();
-  ASSERT_TRUE(o3.get() != nullptr && !o3->empty()) <<
-                             "Check for non-null service";
+  ASSERT_TRUE(o3.get() != nullptr && !o3->empty())
+    << "Check for non-null service";
   ASSERT_EQ(o1, o3) << "Check for equal service instances";
 
   // 15. Now release the tracking of that service and then try to get it
@@ -323,9 +333,8 @@ TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
   h1 = st1->GetServiceReference();
   auto sa3 = st1->GetServiceReferences();
   ASSERT_EQ(sa3.size(), 3) << "Check service reference count";
-  ASSERT_TRUE(
-    CheckConvertibility(sa3, ids.cbegin(), ids.cbegin() + 3)) <<
-    "Check for 3 expected interface ids";
+  ASSERT_TRUE(CheckConvertibility(sa3, ids.cbegin(), ids.cbegin() + 3))
+    << "Check for 3 expected interface ids";
 
   st1->Remove(h1); // remove tracking on one servref
   sa2 = st1->GetServiceReferences();
@@ -339,21 +348,100 @@ TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
   auto o9 = st1->WaitForService(std::chrono::milliseconds(50));
   ASSERT_TRUE(o9 && !o9->empty()) << "Checking WaitForService method";
 
-  // Test that there is no RemovedService callback triggered when closing a service tracker
+  // Test that the RemovedService callback is triggered when closing a service tracker
   MockCustomizedServiceTracker<MyInterfaceOne> customizer;
 
   // expect that closing the tracker results in RemovedService being called.
-  ON_CALL(customizer, AddingService(::testing::_)).WillByDefault(::testing::Return(std::make_shared<MyInterfaceOne>()));
-  EXPECT_CALL(customizer, AddingService(::testing::_)).Times(::testing::Exactly(1));
-  EXPECT_CALL(customizer, ModifiedService(::testing::_, ::testing::_)).Times(::testing::Exactly(0));
-  EXPECT_CALL(customizer, RemovedService(::testing::_, ::testing::_)).Times(::testing::Exactly(1));
+  ON_CALL(customizer, AddingService(::testing::_))
+    .WillByDefault(::testing::Return(std::make_shared<MyInterfaceOne>()));
+  EXPECT_CALL(customizer, AddingService(::testing::_))
+    .Times(::testing::Exactly(1));
+  EXPECT_CALL(customizer, ModifiedService(::testing::_, ::testing::_))
+    .Times(::testing::Exactly(0));
+  EXPECT_CALL(customizer, RemovedService(::testing::_, ::testing::_))
+    .Times(::testing::Exactly(1));
 
-  auto tracker = std::make_unique<cppmicroservices::ServiceTracker<MyInterfaceOne>>(context, &customizer);
+  auto tracker =
+    std::make_unique<cppmicroservices::ServiceTracker<MyInterfaceOne>>(
+      context, &customizer);
   tracker->Open();
   struct MyServiceOne : public MyInterfaceOne
   {};
-  auto svcReg = context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+  auto svcReg =
+    context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
   tracker->Close();
+}
+
+TEST_F(ServiceTrackerTestFixture, GetTrackingCount)
+{
+  BundleContext context = framework.GetBundleContext();
+
+  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context);
+  ASSERT_EQ(tracker.GetTrackingCount(), -1);
+  tracker.Open();
+  ASSERT_EQ(tracker.GetTrackingCount(), 0);
+
+  struct MyServiceOne : public MyInterfaceOne
+  {};
+  auto svcReg =
+    context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+  ASSERT_EQ(tracker.GetTrackingCount(), 1);
+
+  svcReg.SetProperties({ { "foo", Any{ 1 } } });
+  ASSERT_EQ(tracker.GetTrackingCount(), 2);
+
+  (void)context.RegisterService<MyInterfaceOne>(
+    std::make_shared<MyServiceOne>());
+  ASSERT_EQ(tracker.GetTrackingCount(), 3);
+
+  svcReg.Unregister();
+  ASSERT_EQ(tracker.GetTrackingCount(), 4);
+
+  tracker.Close();
+  ASSERT_EQ(tracker.GetTrackingCount(), 5);
+}
+
+TEST_F(ServiceTrackerTestFixture, GetTracked)
+{
+  BundleContext context = framework.GetBundleContext();
+  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context);
+  std::unordered_map<ServiceReference<MyInterfaceOne>,
+                     std::shared_ptr<MyInterfaceOne>>
+    tracked;
+  tracker.GetTracked(tracked);
+  ASSERT_TRUE(tracked.empty());
+  tracker.Open();
+  ASSERT_TRUE(tracked.empty());
+
+  struct MyServiceOne : public MyInterfaceOne
+  {};
+  auto svcReg =
+    context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+  tracker.GetTracked(tracked);
+  ASSERT_EQ(tracked.size(), 1ul);
+
+  tracked.clear();
+  tracker.Close();
+  tracker.GetTracked(tracked);
+  ASSERT_TRUE(tracked.empty());
+}
+
+TEST_F(ServiceTrackerTestFixture, IsEmpty)
+{
+  BundleContext context = framework.GetBundleContext();
+  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context);
+  ASSERT_TRUE(tracker.IsEmpty());
+  tracker.Open();
+  ASSERT_TRUE(tracker.IsEmpty());
+
+  struct MyServiceOne : public MyInterfaceOne
+  {};
+  auto svcReg =
+    context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+  ASSERT_FALSE(tracker.IsEmpty());
+
+  tracker.Close();
+  ASSERT_TRUE(tracker.IsEmpty());
 }
 
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -393,9 +481,8 @@ class CustomFooTracker final
   /**
      * Called when a service is removed.
      */
-  void RemovedService(
-    ::cppmicroservices::ServiceReference<FooService> const& ,
-    std::shared_ptr<FooService> const& ) override
+  void RemovedService(::cppmicroservices::ServiceReference<FooService> const&,
+                      std::shared_ptr<FooService> const&) override
   {}
 };
 }
@@ -425,6 +512,38 @@ TEST_F(ServiceTrackerTestFixture, ServiceTrackerCloseRace)
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   tracker->Close();
 
+  fut.get();
+}
+
+TEST_F(ServiceTrackerTestFixture, DefaultCustomizerServiceTrackerCloseRace)
+{
+  BundleContext context = framework.GetBundleContext();
+  // test for a race in SerivceTracker<T>::Close when no user provided
+  // customizer is specified and a service event is being processed by
+  // the service tracker while it is being destroyed.
+  std::promise<void> gate;
+  auto gateFuture = gate.get_future();
+
+  std::atomic_bool keepRegisteringServices{ true };
+
+  auto fut = std::async(std::launch::async,
+                        [&context, &gateFuture, &keepRegisteringServices]() {
+                          gateFuture.get();
+                          while (keepRegisteringServices) {
+                            (void)context.RegisterService<FooService>(
+                              std::make_shared<FooServiceImpl>());
+                          }
+                        });
+
+  gate.set_value();
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  {
+    ServiceTracker<FooService> scopedTracker(context);
+    scopedTracker.Open();
+  } // destroy scopedTracker
+
+  keepRegisteringServices.store(false);
   fut.get();
 }
 

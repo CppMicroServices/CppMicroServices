@@ -23,8 +23,8 @@
 #ifndef SPELLCHECKIMPL_HPP
 #define SPELLCHECKIMPL_HPP
 
-#include "ISpellCheckService/ISpellCheckService.hpp"
 #include "IDictionaryService/IDictionaryService.hpp"
+#include "ISpellCheckService/ISpellCheckService.hpp"
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 
@@ -42,7 +42,9 @@ private:
   std::shared_ptr<test::IDictionaryService> mDictionary;
 
 public:
-  SpellCheckImpl(const std::shared_ptr<test::IDictionaryService>& dict) : mDictionary(dict) {}
+  SpellCheckImpl(const std::shared_ptr<test::IDictionaryService>& dict)
+    : mDictionary(dict)
+  {}
   ~SpellCheckImpl() override = default;
   std::vector<std::string> Check(const std::string& passage) override;
 };

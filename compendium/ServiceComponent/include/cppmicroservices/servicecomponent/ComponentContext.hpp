@@ -23,21 +23,23 @@
 #ifndef ComponentContext_hpp
 #define ComponentContext_hpp
 
-#include <unordered_map>
-#include <vector>
 #include <memory>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/ServiceInterface.h"
+#include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/servicecomponent/ServiceComponentExport.h"
 
-namespace cppmicroservices { namespace service { namespace component {
+namespace cppmicroservices {
+namespace service {
+namespace component {
 
-    /**
+/**
 	\defgroup gr_componentcontext ComponentContext
 	\brief Groups ComponentContext class related symbols.
 	*/
@@ -55,7 +57,7 @@ namespace cppmicroservices { namespace service { namespace component {
  */
 class US_ServiceComponent_EXPORT ComponentContext
 {
-  public:
+public:
   virtual ~ComponentContext() noexcept;
 
   /**
@@ -63,7 +65,8 @@ class US_ServiceComponent_EXPORT ComponentContext
    *
    * @return The properties for this Component Context.
    */
-  virtual std::unordered_map<std::string, cppmicroservices::Any> GetProperties() const = 0;
+  virtual std::unordered_map<std::string, cppmicroservices::Any> GetProperties()
+    const = 0;
 
   /**
    * Returns the {@link BundleContext} of the bundle which contains this
@@ -138,7 +141,8 @@ class US_ServiceComponent_EXPORT ComponentContext
    *         invalid object if the component instance is not registered as a
    *         service.
    */
-  virtual cppmicroservices::ServiceReferenceBase GetServiceReference() const = 0;
+  virtual cppmicroservices::ServiceReferenceBase GetServiceReference()
+    const = 0;
 
   /**
    * Returns the service object for the specified reference name and type.
@@ -160,9 +164,10 @@ class US_ServiceComponent_EXPORT ComponentContext
    *         exception while activating the bound service.
    */
   template<class T>
-  std::shared_ptr<T>  LocateService(const std::string& refName) const
+  std::shared_ptr<T> LocateService(const std::string& refName) const
   {
-    std::shared_ptr<void> sObj = LocateService(refName, us_service_interface_iid<T>());
+    std::shared_ptr<void> sObj =
+      LocateService(refName, us_service_interface_iid<T>());
     return std::static_pointer_cast<T>(sObj);
   }
 
@@ -180,18 +185,18 @@ class US_ServiceComponent_EXPORT ComponentContext
    *         exception while activating a bound service.
    */
   template<class T>
-  std::vector<std::shared_ptr<T>>  LocateServices(const std::string& refName) const
+  std::vector<std::shared_ptr<T>> LocateServices(
+    const std::string& refName) const
   {
     auto sObjs = LocateServices(refName, us_service_interface_iid<T>());
     std::vector<std::shared_ptr<T>> objs;
-    for(auto obj : sObjs)
-    {
+    for (auto obj : sObjs) {
       objs.push_back(std::static_pointer_cast<T>(obj));
     }
     return objs;
   }
 
-  protected:
+protected:
   /**
    * Returns the service object for the specified reference name and type.
    *
@@ -212,7 +217,9 @@ class US_ServiceComponent_EXPORT ComponentContext
    * @throws ComponentException If Service Component Runtime catches an
    *         exception while activating the bound service.
    */
-  virtual std::shared_ptr<void> LocateService(const std::string& name, const std::string& type) const = 0;
+  virtual std::shared_ptr<void> LocateService(
+    const std::string& name,
+    const std::string& type) const = 0;
 
   /**
    * Returns the service objects for the specified reference name and type.
@@ -228,9 +235,13 @@ class US_ServiceComponent_EXPORT ComponentContext
    * @throws ComponentException If Service Component Runtime catches an
    *         exception while activating a bound service.
    */
-  virtual  std::vector<std::shared_ptr<void>> LocateServices(const std::string& name, const std::string& type) const = 0;
+  virtual std::vector<std::shared_ptr<void>> LocateServices(
+    const std::string& name,
+    const std::string& type) const = 0;
 };
 
-}}} // namespaces
+}
+}
+} // namespaces
 
 #endif /* ComponentContext_hpp */

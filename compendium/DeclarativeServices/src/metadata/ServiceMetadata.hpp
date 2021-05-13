@@ -28,9 +28,9 @@
 
 #include <iostream>
 
+#include "Util.hpp"
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Constants.h"
-#include "Util.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {

@@ -667,8 +667,9 @@ INSTANTIATE_TEST_SUITE_P(
       manifest_illegal_ref_name,
       "Invalid value for the name 'name'. Expected non-empty string"),
     CodegenInvalidManifestState(
-        manifest_duplicate_ref_name,
-        "Duplicate service reference names found. Reference names must be unique. Duplicate names: foo "),
+      manifest_duplicate_ref_name,
+      "Duplicate service reference names found. Reference names must be "
+      "unique. Duplicate names: foo "),
     CodegenInvalidManifestState(
       manifest_no_ref_interface,
       "Mandatory name 'interface' missing from the manifest"),

@@ -24,16 +24,16 @@
 
 #include <gtest/gtest.h>
 
+#include <TestInterfaces/Interfaces.hpp>
 #include <cppmicroservices/Bundle.h>
-#include <cppmicroservices/BundleEvent.h>
 #include <cppmicroservices/BundleContext.h>
+#include <cppmicroservices/BundleEvent.h>
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
 #include <cppmicroservices/ServiceTracker.h>
-#include <cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp>
 #include <cppmicroservices/servicecomponent/ComponentConstants.hpp>
-#include <TestInterfaces/Interfaces.hpp>
+#include <cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp>
 
 #include "TestUtils.hpp"
 
@@ -46,11 +46,12 @@ namespace test {
  *
  * A failure will result in a deadlock.
  */
-TEST(tServiceComponentRuntime, testReferenceSelfSatisfyDeadlock) {
+TEST(tServiceComponentRuntime, testReferenceSelfSatisfyDeadlock)
+{
   auto framework = cppmicroservices::FrameworkFactory().NewFramework();
   framework.Start();
   EXPECT_TRUE(framework);
-    
+
   auto dsPluginPath = test::GetDSRuntimePluginFilePath();
   auto dsbundles = framework.GetBundleContext().InstallBundles(dsPluginPath);
   for (auto& bundle : dsbundles) {
@@ -60,10 +61,12 @@ TEST(tServiceComponentRuntime, testReferenceSelfSatisfyDeadlock) {
   // The names of the bundles do matter here. The bundle containing the dependency MUST
   // be stopped after the one providing the dependency. CppMicroServices stores bundles
   // in sorted order by path.
-  auto bundleB = test::InstallAndStartBundle(framework.GetBundleContext(), "TestBundleDSb");
+  auto bundleB =
+    test::InstallAndStartBundle(framework.GetBundleContext(), "TestBundleDSb");
   ASSERT_TRUE(bundleB);
   bundleB.Start();
-  auto bundleA = test::InstallAndStartBundle(framework.GetBundleContext(), "TestBundleDSa");
+  auto bundleA =
+    test::InstallAndStartBundle(framework.GetBundleContext(), "TestBundleDSa");
   ASSERT_TRUE(bundleA);
   bundleA.Start();
 

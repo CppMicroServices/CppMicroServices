@@ -27,6 +27,9 @@
 #include "cppmicroservices/detail/BundleAbstractTracked.h"
 #include "cppmicroservices/detail/TrackedServiceListener.h"
 
+#include "cppmicroservices/detail/CounterLatch.h"
+#include "cppmicroservices/detail/ScopeGuard.h"
+
 namespace cppmicroservices {
 
 namespace detail {
@@ -57,11 +60,16 @@ public:
    */
   void ServiceChanged(const ServiceEvent& event) override;
 
+  void WaitOnCustomizersToFinish();
+
 private:
-  using Superclass = BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>;
+  using Superclass =
+    BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>;
 
   ServiceTracker<S, T>* serviceTracker;
   ServiceTrackerCustomizer<S, T>* customizer;
+
+  CounterLatch latch;
 
   /**
    * Increment the tracking count and tell the tracker there was a
@@ -92,9 +100,10 @@ private:
    * @param related Action related object.
    * @param object Customized object for the tracked item.
    */
-  void CustomizerModified(ServiceReference<S> item,
-                          const ServiceEvent& related,
-                          const std::shared_ptr<TrackedParamType>& object) override;
+  void CustomizerModified(
+    ServiceReference<S> item,
+    const ServiceEvent& related,
+    const std::shared_ptr<TrackedParamType>& object) override;
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -104,9 +113,10 @@ private:
    * @param related Action related object.
    * @param object Customized object for the tracked item.
    */
-  void CustomizerRemoved(ServiceReference<S> item,
-                         const ServiceEvent& related,
-                         const std::shared_ptr<TrackedParamType>& object) override;
+  void CustomizerRemoved(
+    ServiceReference<S> item,
+    const ServiceEvent& related,
+    const std::shared_ptr<TrackedParamType>& object) override;
 };
 
 } // namespace detail

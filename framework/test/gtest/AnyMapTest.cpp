@@ -351,18 +351,20 @@ TEST(AnyMapTest, GeneralUsage)
   });
 }
 
-
-cppmicroservices::AnyMap manifest_from_cache(const cppmicroservices::any_map::key_type& key, cppmicroservices::any_map& cache)
+cppmicroservices::AnyMap manifest_from_cache(
+  const cppmicroservices::any_map::key_type& key,
+  cppmicroservices::any_map& cache)
 {
   using namespace cppmicroservices;
-  
+
   AnyMap& bundles = ref_any_cast<AnyMap>(cache["bundles"]);
   if (bundles.find(key) != std::end(bundles)) {
     try {
       AnyMap result = std::move(ref_any_cast<AnyMap>(bundles[key]));
       bundles.erase(key);
       return result;
-    } catch (...) {}
+    } catch (...) {
+    }
   }
   return AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
 }
@@ -383,17 +385,17 @@ TEST(AnyMapTest, ManifestFromCache)
   cache_bundle2["e"] = std::string("E");
   cache_bundle2["f"] = std::string("F");
   auto cache_bundle2_copy = cache_bundle2;
-  
+
   cache_bundles.emplace(std::string("bundle1"), std::move(cache_bundle1));
   cache_bundles.emplace(std::string("bundle2"), std::move(cache_bundle2));
   cache["created"] = 1234567890;
   cache["version"] = 1;
-  cache.emplace(std::string("bundles"),std::move(cache_bundles));
+  cache.emplace(std::string("bundles"), std::move(cache_bundles));
   EXPECT_EQ(3, cache.size()); // created, version, bundles
 
   auto const& bundles = ref_any_cast<AnyMap>(cache.at("bundles"));
   EXPECT_EQ(2, bundles.size()); // bundle1, bundle2
-  
+
   auto bundle1 = manifest_from_cache(std::string("bundle1"), cache);
   EXPECT_EQ(cache_bundle1_copy, bundle1);
   EXPECT_EQ(1, bundles.size());

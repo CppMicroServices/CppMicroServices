@@ -1,5 +1,5 @@
-#include <cppmicroservices/cm/ManagedService.hpp>
 #include <cppmicroservices/AnyMap.h>
+#include <cppmicroservices/cm/ManagedService.hpp>
 
 #include "TestInterfaces/Interfaces.hpp"
 
@@ -10,19 +10,22 @@ namespace service {
 namespace cm {
 namespace test {
 
-class TestManagedServiceImpl : public ::test::TestManagedServiceInterface, public cppmicroservices::service::cm::ManagedService {
-  public:
-    TestManagedServiceImpl();
+class TestManagedServiceImpl
+  : public ::test::TestManagedServiceInterface
+  , public cppmicroservices::service::cm::ManagedService
+{
+public:
+  TestManagedServiceImpl();
 
-    virtual ~TestManagedServiceImpl();
+  virtual ~TestManagedServiceImpl();
 
-    void Updated(AnyMap const& properties) override;
+  void Updated(AnyMap const& properties) override;
 
-    int getCounter() override;
+  int getCounter() override;
 
-  private:
-    int m_counter;
-    std::mutex m_counterMtx;
+private:
+  int m_counter;
+  std::mutex m_counterMtx;
 };
 
 } // namespace test

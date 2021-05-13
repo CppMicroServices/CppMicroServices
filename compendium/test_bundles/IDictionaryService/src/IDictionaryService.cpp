@@ -21,8 +21,6 @@
 =============================================================================*/
 #include "IDictionaryService/IDictionaryService.hpp"
 
-namespace test
-{
-  IDictionaryService::~IDictionaryService()
-  {}
+namespace test {
+IDictionaryService::~IDictionaryService() {}
 }

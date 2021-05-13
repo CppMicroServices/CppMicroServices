@@ -222,7 +222,7 @@ bool ComponentContextImpl::AddToBoundServicesCache(
   auto boundServicesCacheHandle = boundServicesCache.lock();
   auto interfaceMap = sObjs.GetService();
   if (!interfaceMap) {
-      return false;
+    return false;
   }
   (*boundServicesCacheHandle)[refName].emplace_back(
     interfaceMap);

@@ -27,7 +27,7 @@
 
 namespace cppmicroservices {
 
-InvalidObjFileException::InvalidObjFileException(std::string  what,
+InvalidObjFileException::InvalidObjFileException(std::string what,
                                                  int errorNumber)
   : m_What(std::move(what))
 {

@@ -59,4 +59,6 @@ set(_public_headers
   cppmicroservices/detail/BundleAbstractTracked.h
   cppmicroservices/detail/BundleAbstractTracked.tpp
   cppmicroservices/detail/BundleResourceBuffer.h
+  cppmicroservices/detail/ScopeGuard.h
+  cppmicroservices/detail/CounterLatch.h
 )

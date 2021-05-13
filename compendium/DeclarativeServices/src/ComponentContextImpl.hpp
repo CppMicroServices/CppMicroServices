@@ -23,13 +23,13 @@
 #ifndef __COMPONENT_CONTEXT_IMPL_HPP__
 #define __COMPONENT_CONTEXT_IMPL_HPP__
 
-#include <string>
 #include <memory>
+#include <string>
 #include <unordered_map>
 
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4503)
+#  pragma warning(push)
+#  pragma warning(disable : 4503)
 #endif
 
 #include "cppmicroservices/Any.h"
@@ -68,7 +68,8 @@ public:
    * \return a map of string and cppmicroservices::Any key-value pairs
    * \throws {@link ComponentException} if this {@link ComponentContext} is invalid
    */
-  std::unordered_map<std::string, cppmicroservices::Any> GetProperties() const override;
+  std::unordered_map<std::string, cppmicroservices::Any> GetProperties()
+    const override;
 
   /**
    * Returns the service object for the specified reference name.
@@ -91,7 +92,8 @@ public:
    *         exception while activating the bound service or if this
    *         {@link ComponentContext} is invalid
    */
-  std::shared_ptr<void>  LocateService(const std::string& name, const std::string& type) const override;
+  std::shared_ptr<void> LocateService(const std::string& name,
+                                      const std::string& type) const override;
 
   /**
    * Returns the service objects for the specified reference name.
@@ -108,7 +110,9 @@ public:
    *         exception while activating a bound service or if this
    *         {@link ComponentContext} is invalid
    */
-  std::vector<std::shared_ptr<void>> LocateServices(const std::string& name, const std::string& type) const override;
+  std::vector<std::shared_ptr<void>> LocateServices(
+    const std::string& name,
+    const std::string& type) const override;
 
   /**
    * Returns the {@link BundleContext} of the bundle which contains this
@@ -197,11 +201,13 @@ public:
    */
   void Invalidate();
 
-  bool AddToBoundServicesCache(const std::string& refName
-                             , const cppmicroservices::ServiceReferenceBase& sRef);
-    
-  void RemoveFromBoundServicesCache(const std::string& refName
-                             , const cppmicroservices::ServiceReferenceBase& sRef);
+  bool AddToBoundServicesCache(
+    const std::string& refName,
+    const cppmicroservices::ServiceReferenceBase& sRef);
+ 
+  void RemoveFromBoundServicesCache(
+    const std::string& refName,
+    const cppmicroservices::ServiceReferenceBase& sRef);
 
 private:
   /**
@@ -215,7 +221,10 @@ private:
 
   std::weak_ptr<ComponentConfiguration> configManager;
   cppmicroservices::Bundle usingBundle;
-  mutable Guarded<std::unordered_map<std::string, std::vector<cppmicroservices::InterfaceMapConstPtr>>> boundServicesCache;
+  mutable Guarded<
+    std::unordered_map<std::string,
+                       std::vector<cppmicroservices::InterfaceMapConstPtr>>>
+    boundServicesCache;
 };
 }
 }

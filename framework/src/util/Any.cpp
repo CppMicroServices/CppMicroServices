@@ -23,8 +23,8 @@
 #include "cppmicroservices/Any.h"
 #include "Utils.h"
 
-#include <stdexcept>
 #include <iomanip>
+#include <stdexcept>
 
 namespace cppmicroservices {
 
@@ -43,7 +43,9 @@ void ThrowBadAnyCastException(const std::string& funcName,
 }
 }
 
-std::ostream& newline_and_indent(std::ostream& os, const uint8_t increment, const int32_t indent)
+std::ostream& newline_and_indent(std::ostream& os,
+                                 const uint8_t increment,
+                                 const int32_t indent)
 {
   if (increment > 0) {
     // We only do formatting if increment > 0, because if increment was actually zero everything
@@ -65,28 +67,48 @@ std::ostream& any_value_to_string(std::ostream& os, const Any& any)
   return os;
 }
 
-std::ostream& any_value_to_json(std::ostream& os, const Any& val, const uint8_t increment, const int32_t indent)
+std::ostream& any_value_to_json(std::ostream& os,
+                                const Any& val,
+                                const uint8_t increment,
+                                const int32_t indent)
 {
   os << val.ToJSON(increment, indent);
   return os;
 }
 
-std::ostream& any_value_to_json(std::ostream& o, const std::string& s, const uint8_t, const int32_t)
+std::ostream& any_value_to_json(std::ostream& o,
+                                const std::string& s,
+                                const uint8_t,
+                                const int32_t)
 {
   o << '"';
   for (auto c = s.cbegin(); c != s.cend(); c++) {
     switch (*c) {
-      case '"' : o << "\\\""; break;
-      case '\\': o << "\\\\"; break;
-      case '\b': o << "\\b";  break;
-      case '\f': o << "\\f";  break;
-      case '\n': o << "\\n";  break;
-      case '\r': o << "\\r";  break;
-      case '\t': o << "\\t";  break;
+      case '"':
+        o << "\\\"";
+        break;
+      case '\\':
+        o << "\\\\";
+        break;
+      case '\b':
+        o << "\\b";
+        break;
+      case '\f':
+        o << "\\f";
+        break;
+      case '\n':
+        o << "\\n";
+        break;
+      case '\r':
+        o << "\\r";
+        break;
+      case '\t':
+        o << "\\t";
+        break;
       default:
         if ('\x00' <= *c && *c <= '\x1f') {
-          o << "\\u"
-            << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(*c);
+          o << "\\u" << std::hex << std::setw(4) << std::setfill('0')
+            << static_cast<int>(*c);
         } else {
           o << *c;
         }
@@ -95,7 +117,10 @@ std::ostream& any_value_to_json(std::ostream& o, const std::string& s, const uin
   return o << '"';
 }
 
-std::ostream& any_value_to_json(std::ostream& os, bool val, const uint8_t, const int32_t)
+std::ostream& any_value_to_json(std::ostream& os,
+                                bool val,
+                                const uint8_t,
+                                const int32_t)
 {
   return os << std::boolalpha << val;
 }
@@ -105,7 +130,7 @@ std::ostream& any_value_to_json(std::ostream& os, bool val, const uint8_t, const
 // "default initialization of an object of const type 'const cppmicroservices::Any' without
 // a user-provided default constructor"
 Any::Any() = default;
-    
+
 std::string Any::ToString() const
 {
   if (Empty()) {

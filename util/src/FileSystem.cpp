@@ -30,10 +30,10 @@
 #include <vector>
 
 #ifdef US_PLATFORM_POSIX
-#  include <dirent.h>
-#  include <dlfcn.h>
 #  include <cerrno>
 #  include <cstring>
+#  include <dirent.h>
+#  include <dlfcn.h>
 #  include <unistd.h> // getcwd
 
 #  define US_STAT struct stat
@@ -77,11 +77,11 @@ namespace util {
 #ifdef US_PLATFORM_WINDOWS
 bool not_found_win32_error(int errval)
 {
-  return (errval == ERROR_FILE_NOT_FOUND
-          || errval == ERROR_PATH_NOT_FOUND
-          || errval == ERROR_INVALID_NAME      // "//foo"
-          || errval == ERROR_INVALID_DRIVE     // USB card reader with no card inserted
-          || errval == ERROR_NOT_READY         // CD/DVD drive with no disc inserted
+  return (errval == ERROR_FILE_NOT_FOUND || errval == ERROR_PATH_NOT_FOUND ||
+          errval == ERROR_INVALID_NAME // "//foo"
+          ||
+          errval == ERROR_INVALID_DRIVE // USB card reader with no card inserted
+          || errval == ERROR_NOT_READY  // CD/DVD drive with no disc inserted
           || errval == ERROR_INVALID_PARAMETER // ":sys:stat.h"
           || errval == ERROR_BAD_PATHNAME      // "//nosuch" on Win64
           || errval == ERROR_BAD_NETPATH);     // "//nosuch" on Win32
@@ -154,11 +154,10 @@ std::string GetExecutablePath()
 #endif
 }
 
-
 namespace {
 
 // no reason to export this function... only used to initialize static local variable in
-// GetCurrentWorkingDirectory. 
+// GetCurrentWorkingDirectory.
 std::string InitCurrentWorkingDirectory()
 {
 #ifdef US_PLATFORM_WINDOWS
@@ -170,14 +169,14 @@ std::string InitCurrentWorkingDirectory()
     return util::ToUTF8String(buf.data());
   }
 #else
-  errno = 0;                    // reset errno to zero in case it was set to some other
-                                // value before this call.
+  errno = 0; // reset errno to zero in case it was set to some other
+             // value before this call.
   for (std::size_t bufSize = PATH_MAX;
-       (0 == errno) || (ERANGE == errno); // break out of the loop if any error other than
-                                          // ERANGE occurs. In the case of ERANGE, we
-                                          // double the bufSize and try again.
-       bufSize *= 2)
-  {
+       (0 == errno) ||
+       (ERANGE == errno); // break out of the loop if any error other than
+                          // ERANGE occurs. In the case of ERANGE, we
+                          // double the bufSize and try again.
+       bufSize *= 2) {
     std::vector<char> buf(bufSize, '\0');
     const char* rval = getcwd(buf.data(), bufSize);
     if (rval != nullptr) {

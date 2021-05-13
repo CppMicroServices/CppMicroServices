@@ -5,15 +5,17 @@ namespace service {
 namespace cm {
 namespace test {
 
-class TestManagedServiceFactoryServiceImpl : public ::test::TestManagedServiceFactoryServiceInterface {
-  public:
-    TestManagedServiceFactoryServiceImpl(int initialValue);
-    ~TestManagedServiceFactoryServiceImpl();
+class TestManagedServiceFactoryServiceImpl
+  : public ::test::TestManagedServiceFactoryServiceInterface
+{
+public:
+  TestManagedServiceFactoryServiceImpl(int initialValue);
+  ~TestManagedServiceFactoryServiceImpl();
 
-    int getValue() override;
+  int getValue() override;
 
-  private:
-    int value;
+private:
+  int value;
 };
 
 } // namespace test

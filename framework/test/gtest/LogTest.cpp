@@ -222,4 +222,3 @@ TEST(LogTest, testLogMultiThreaded)
 #  endif
 }
 #endif
-

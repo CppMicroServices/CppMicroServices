@@ -34,11 +34,11 @@ namespace cppmicroservices {
 ServiceListenerHook::~ServiceListenerHook() = default;
 
 ServiceListenerHook::ListenerInfoData::ListenerInfoData(
-  std::shared_ptr<BundleContextPrivate>  context,
-  ServiceListener  l,
+  std::shared_ptr<BundleContextPrivate> context,
+  ServiceListener l,
   void* data,
   ListenerTokenId tokenId,
-  std::string  filter)
+  std::string filter)
   : context(std::move(context))
   , listener(std::move(l))
   , data(data)
@@ -61,7 +61,8 @@ ServiceListenerHook::ListenerInfo::ListenerInfo(const ListenerInfo&) = default;
 
 ServiceListenerHook::ListenerInfo::~ListenerInfo() = default;
 
-ServiceListenerHook::ListenerInfo& ServiceListenerHook::ListenerInfo::operator=(const ListenerInfo&) = default;
+ServiceListenerHook::ListenerInfo& ServiceListenerHook::ListenerInfo::operator=(
+  const ListenerInfo&) = default;
 
 bool ServiceListenerHook::ListenerInfo::IsNull() const
 {

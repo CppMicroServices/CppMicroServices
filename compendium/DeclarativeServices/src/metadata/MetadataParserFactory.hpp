@@ -41,14 +41,16 @@ public:
    * @returns an unique_ptr to the created @c MetadataParser object
    * @throws std::runtime_error if the version isn't supported
    */
-  static std::unique_ptr<MetadataParser> Create(uint64_t version, std::shared_ptr<cppmicroservices::logservice::LogService> logger)
+  static std::unique_ptr<MetadataParser> Create(
+    uint64_t version,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger)
   {
-    switch (version)
-    {
+    switch (version) {
       case 1:
         return std::make_unique<MetadataParserImplV1>(logger);
       default:
-        throw std::runtime_error("Unsupported manifest file version '" + std::to_string(version) + "'");
+        throw std::runtime_error("Unsupported manifest file version '" +
+                                 std::to_string(version) + "'");
         return nullptr;
     }
   }
@@ -58,4 +60,3 @@ public:
 }
 }
 #endif //METADATAPARSERFACTORY_HPP
-

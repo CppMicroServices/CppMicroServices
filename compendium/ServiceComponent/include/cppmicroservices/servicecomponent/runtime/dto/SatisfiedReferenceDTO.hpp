@@ -34,10 +34,10 @@ namespace component {
 namespace runtime {
 namespace dto {
 
-	/**
-	\defgroup gr_satisfiedreferencedto SatisfiedReferenceDTO
-	\brief Groups SatisfiedReferenceDTO related symbols.
-	*/
+/**
+ \defgroup gr_satisfiedreferencedto SatisfiedReferenceDTO
+ \brief Groups SatisfiedReferenceDTO related symbols.
+ */
 
 /**
  * \ingroup gr_satisfiedreferencedto
@@ -77,7 +77,8 @@ struct SatisfiedReferenceDTO
    * to the satisfied reference. The vector must be empty if there are no bound
    * services.
    */
-  std::vector<cppmicroservices::framework::dto::ServiceReferenceDTO> boundServices;
+  std::vector<cppmicroservices::framework::dto::ServiceReferenceDTO>
+    boundServices;
 };
 }
 }

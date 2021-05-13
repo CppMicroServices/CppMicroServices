@@ -37,50 +37,51 @@ std::shared_future<void> CMEnabledState::Enable(ComponentManagerImpl&)
 
 std::shared_future<void> CMEnabledState::Disable(ComponentManagerImpl& cm)
 {
-  auto currentState = shared_from_this(); // assume this object is the current state object
+  auto currentState =
+    shared_from_this(); // assume this object is the current state object
   return cm.PostAsyncEnabledToDisabled(currentState);
 }
 
-void CMEnabledState::CreateConfigurations(std::shared_ptr<const metadata::ComponentMetadata> compDesc,
-                                          const cppmicroservices::Bundle& bundle,
-                                          std::shared_ptr<const ComponentRegistry> registry,
-                                          std::shared_ptr<logservice::LogService> logger)
+void CMEnabledState::CreateConfigurations(
+  std::shared_ptr<const metadata::ComponentMetadata> compDesc,
+  const cppmicroservices::Bundle& bundle,
+  std::shared_ptr<const ComponentRegistry> registry,
+  std::shared_ptr<logservice::LogService> logger)
 {
-  try
-  {
-    auto cc = ComponentConfigurationFactory::CreateConfigurationManager(compDesc,
-                                                                        bundle,
-                                                                        registry,
-                                                                        logger);
+  try {
+    auto cc = ComponentConfigurationFactory::CreateConfigurationManager(
+      compDesc, bundle, registry, logger);
     configurations.push_back(cc);
   } catch (const cppmicroservices::SharedLibraryException&) {
     throw;
   } catch (...) {
-    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Failed to create component configuration", std::current_exception());
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                "Failed to create component configuration",
+                std::current_exception());
   }
 }
 
 // wait for the task to finish creating configurations and return them
-std::vector<std::shared_ptr<ComponentConfiguration>> CMEnabledState::GetConfigurations(const ComponentManagerImpl& /*cm*/) const
+std::vector<std::shared_ptr<ComponentConfiguration>>
+CMEnabledState::GetConfigurations(const ComponentManagerImpl& /*cm*/) const
 {
   GetFuture().get(); // wait for the task created in #CreateConfigurationsAsync
   // Note: Exceptions from the task associated with the future are captured and
   // logged on the other thread. See #CreateConfigurations.
-  std::vector<std::shared_ptr<ComponentConfiguration>> retVec(configurations.begin(), configurations.end());
+  std::vector<std::shared_ptr<ComponentConfiguration>> retVec(
+    configurations.begin(), configurations.end());
   return retVec;
 }
 
 void CMEnabledState::DeleteConfigurations()
 {
   auto fut = GetFuture();
-  if(fut.valid())
-  {
+  if (fut.valid()) {
     fut.get(); // wait for the configurations to become available
     // No exceptions are expected from the future. Exceptions are
     // logged on the otherside of the thread boundary. See #CreateConfigurations
     auto configs = std::move(configurations);
-    for(auto& config : configs)
-    {
+    for (auto& config : configs) {
       config->Deactivate();
       config->Stop();
     }

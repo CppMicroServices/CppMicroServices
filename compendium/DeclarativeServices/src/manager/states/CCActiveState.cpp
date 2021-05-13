@@ -25,20 +25,10 @@
 #include "CCUnsatisfiedReferenceState.hpp"
 #include "cppmicroservices/SharedLibraryException.h"
 
+#include "cppmicroservices/detail/ScopeGuard.h"
+
 namespace cppmicroservices {
 namespace scrimpl {
-
-class LatchScopeGuard
-{
-public:
-  LatchScopeGuard(std::function<void()> cleanupFcn)
-    : _cleanupFcn(std::move(cleanupFcn))
-  {}
-  ~LatchScopeGuard() { _cleanupFcn(); }
-
-private:
-  std::function<void()> _cleanupFcn;
-};
 
 CCActiveState::CCActiveState() = default;
 
@@ -51,7 +41,7 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(
   auto logger = mgr.GetLogger();
   if (latch.CountUp()) {
     {
-      LatchScopeGuard sg([this, logger]() {
+      detail::ScopeGuard sg([this, logger]() {
         // By using try/catch here, we ensure that this lambda function doesn't
         // throw inside LatchScopeGuard's dtor.
         try {
@@ -95,9 +85,9 @@ void CCActiveState::Rebind(ComponentConfigurationImpl& mgr,
       } catch (const std::exception&) {
         mgr.GetLogger()->Log(
           cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-          "Exception while dynamically binding a reference. ", std::current_exception());
+          "Exception while dynamically binding a reference. ",
+          std::current_exception());
       }
-      
     }
 
     if (svcRefToUnbind) {

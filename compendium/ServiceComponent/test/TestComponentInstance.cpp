@@ -20,77 +20,76 @@
 
   =============================================================================*/
 
-#include <cstdio>
-#include <iostream>
 #include <algorithm>
 #include <chrono>
+#include <cstdio>
+#include <iostream>
 
 #include "gmock/gmock.h"
 
-#include <cppmicroservices/Framework.h>
-#include <cppmicroservices/FrameworkFactory.h>
-#include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/BundleContext.h>
 #include <cppmicroservices/BundleImport.h>
 #include <cppmicroservices/Constants.h>
+#include <cppmicroservices/Framework.h>
+#include <cppmicroservices/FrameworkEvent.h>
+#include <cppmicroservices/FrameworkFactory.h>
 
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
 #include <cppmicroservices/ServiceInterface.h>
 
 using cppmicroservices::service::component::ComponentContext;
-using cppmicroservices::service::component::detail::ComponentInstanceImpl;
 using cppmicroservices::service::component::detail::Binder;
-using cppmicroservices::service::component::detail::StaticBinder;
+using cppmicroservices::service::component::detail::ComponentInstanceImpl;
 using cppmicroservices::service::component::detail::DynamicBinder;
+using cppmicroservices::service::component::detail::StaticBinder;
 
 namespace {
 
 // dummy types used for testing
-struct ServiceDependency1 {};
-struct ServiceDependency2 {};
-struct TestServiceInterface1 {};
-struct TestServiceInterface2 {};
-struct TestServiceInterface3 {};
+struct ServiceDependency1
+{};
+struct ServiceDependency2
+{};
+struct TestServiceInterface1
+{};
+struct TestServiceInterface2
+{};
+struct TestServiceInterface3
+{};
 
 // Test class to simulate a servcie component
 // TODO: Use Mock to add more behavior verification
 class TestServiceImpl1 final
-  : public TestServiceInterface1, public TestServiceInterface2
+  : public TestServiceInterface1
+  , public TestServiceInterface2
 {
 public:
   TestServiceImpl1()
     : foo(nullptr)
     , bar(nullptr)
     , activated(false)
-  {
-  }
+  {}
 
   TestServiceImpl1(const std::shared_ptr<ServiceDependency1>& f,
                    const std::shared_ptr<ServiceDependency2>& b)
     : foo(f)
     , bar(b)
     , activated(false)
-  {
-  }
+  {}
 
   TestServiceImpl1(const std::shared_ptr<ServiceDependency2>& b)
     : foo(nullptr)
     , bar(b)
     , activated(false)
-  {
-  }
+  {}
 
   virtual ~TestServiceImpl1() {}
 
-  void BindFoo(const std::shared_ptr<ServiceDependency1>& f)
-  {
-    foo = f;
-  }
+  void BindFoo(const std::shared_ptr<ServiceDependency1>& f) { foo = f; }
 
   void UnbindFoo(const std::shared_ptr<ServiceDependency1>& f)
   {
-    if(foo == f)
-    {
+    if (foo == f) {
       foo = nullptr;
     }
   }
@@ -100,10 +99,7 @@ public:
     // this is the wrong signature method.
   }
 
-  void Activate(const std::shared_ptr<ComponentContext>&)
-  {
-    activated = true;
-  }
+  void Activate(const std::shared_ptr<ComponentContext>&) { activated = true; }
 
   void Deactivate(const std::shared_ptr<ComponentContext>&)
   {
@@ -119,9 +115,12 @@ public:
 
   std::shared_ptr<ServiceDependency1> GetFoo() const { return foo; }
   std::shared_ptr<ServiceDependency2> GetBar() const { return bar; }
+
 private:
-  std::shared_ptr<ServiceDependency1> foo;        // dynamic dependency - can change during the lifetime of this object
-  const std::shared_ptr<ServiceDependency2> bar;  // static dependency - does not change during the lifetime of this object
+  std::shared_ptr<ServiceDependency1>
+    foo; // dynamic dependency - can change during the lifetime of this object
+  const std::shared_ptr<ServiceDependency2>
+    bar; // static dependency - does not change during the lifetime of this object
   bool activated;
 };
 
@@ -132,14 +131,21 @@ private:
 class MockComponentContext : public ComponentContext
 {
 public:
-  MOCK_CONST_METHOD0(GetProperties, std::unordered_map<std::string, cppmicroservices::Any>(void));
+  MOCK_CONST_METHOD0(
+    GetProperties,
+    std::unordered_map<std::string, cppmicroservices::Any>(void));
   MOCK_CONST_METHOD0(GetBundleContext, cppmicroservices::BundleContext(void));
   MOCK_CONST_METHOD0(GetUsingBundle, cppmicroservices::Bundle(void));
-  MOCK_CONST_METHOD0(GetServiceReference, cppmicroservices::ServiceReferenceBase(void));
+  MOCK_CONST_METHOD0(GetServiceReference,
+                     cppmicroservices::ServiceReferenceBase(void));
   MOCK_METHOD1(EnableComponent, void(const std::string&));
   MOCK_METHOD1(DisableComponent, void(const std::string&));
-  MOCK_CONST_METHOD2(LocateServices, std::vector<std::shared_ptr<void>>(const std::string&, const std::string&));
-  MOCK_CONST_METHOD2(LocateService, std::shared_ptr<void>(const std::string&, const std::string&));
+  MOCK_CONST_METHOD2(LocateServices,
+                     std::vector<std::shared_ptr<void>>(const std::string&,
+                                                        const std::string&));
+  MOCK_CONST_METHOD2(LocateService,
+                     std::shared_ptr<void>(const std::string&,
+                                           const std::string&));
 };
 
 /**
@@ -155,7 +161,8 @@ TEST(ComponentInstance, VerifyZeroServicesZeroDependencies)
   auto compObj = compInstance.GetInstance();
   ASSERT_FALSE(compObj);
   auto mockContext = std::make_shared<MockComponentContext>();
-  EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_)).Times(0); // ensure the mock context never gets a call to LocateService
+  EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
+    .Times(0); // ensure the mock context never gets a call to LocateService
   compInstance.CreateInstanceAndBindReferences(mockContext);
   compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
@@ -172,7 +179,8 @@ TEST(ComponentInstanceImpl, VerifyZeroServicesZeroDependencies)
   auto compObj = compInstance.GetInstance();
   ASSERT_FALSE(compObj);
   auto mockContext = std::make_shared<MockComponentContext>();
-  EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_)).Times(0); // ensure the mock context never gets a call to LocateService
+  EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
+    .Times(0); // ensure the mock context never gets a call to LocateService
   compInstance.CreateInstanceAndBindReferences(mockContext);
   compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
@@ -188,13 +196,16 @@ TEST(ComponentInstanceImpl, VerifyZeroServicesZeroDependencies)
  */
 TEST(ComponentInstance, VerifyWithSingleServiceZeroDependencies)
 {
-  ComponentInstanceImpl<TestServiceImpl1, std::tuple<TestServiceInterface1>> compInstance;
+  ComponentInstanceImpl<TestServiceImpl1, std::tuple<TestServiceInterface1>>
+    compInstance;
   auto iMap = compInstance.GetInterfaceMap();
   ASSERT_TRUE(iMap);
   ASSERT_EQ(iMap->size(), size_t(1));
-  ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()), size_t(1));
+  ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()),
+            size_t(1));
   auto mockContext = std::make_shared<MockComponentContext>();
-  EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_)).Times(0); // ensure the mock context never gets a call to LocateService
+  EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
+    .Times(0); // ensure the mock context never gets a call to LocateService
   compInstance.CreateInstanceAndBindReferences(mockContext);
   auto compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
@@ -205,13 +216,16 @@ TEST(ComponentInstance, VerifyWithSingleServiceZeroDependencies)
 
 TEST(ComponentInstanceImpl, VerifyWithSingleServiceZeroDependencies)
 {
-  ComponentInstanceImpl<TestServiceImpl1, std::tuple<TestServiceInterface1>> compInstance;
+  ComponentInstanceImpl<TestServiceImpl1, std::tuple<TestServiceInterface1>>
+    compInstance;
   auto iMap = compInstance.GetInterfaceMap();
   ASSERT_TRUE(iMap);
   ASSERT_EQ(iMap->size(), size_t(1));
-  ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()), size_t(1));
+  ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()),
+            size_t(1));
   auto mockContext = std::make_shared<MockComponentContext>();
-  EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_)).Times(0); // ensure the mock context never gets a call to LocateService
+  EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
+    .Times(0); // ensure the mock context never gets a call to LocateService
   compInstance.CreateInstanceAndBindReferences(mockContext);
   auto compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
@@ -227,14 +241,20 @@ TEST(ComponentInstanceImpl, VerifyWithSingleServiceZeroDependencies)
  */
 TEST(ComponentInstance, VerifyWithMultipleServiceZeroDependencies)
 {
-  ComponentInstanceImpl<TestServiceImpl1, std::tuple<TestServiceInterface1, TestServiceInterface2>> compInstance;
+  ComponentInstanceImpl<
+    TestServiceImpl1,
+    std::tuple<TestServiceInterface1, TestServiceInterface2>>
+    compInstance;
   auto iMap = compInstance.GetInterfaceMap();
   ASSERT_TRUE(iMap);
   ASSERT_EQ(iMap->size(), size_t(2));
-  ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()), size_t(1));
-  ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface2>()), size_t(1));
+  ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()),
+            size_t(1));
+  ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface2>()),
+            size_t(1));
   auto mockContext = std::make_shared<MockComponentContext>();
-  EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_)).Times(0); // ensure the mock context never gets a call to LocateService
+  EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
+    .Times(0); // ensure the mock context never gets a call to LocateService
   compInstance.CreateInstanceAndBindReferences(mockContext);
   auto compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
@@ -245,14 +265,20 @@ TEST(ComponentInstance, VerifyWithMultipleServiceZeroDependencies)
 
 TEST(ComponentInstanceImpl, VerifyWithMultipleServiceZeroDependencies)
 {
-  ComponentInstanceImpl<TestServiceImpl1, std::tuple<TestServiceInterface1, TestServiceInterface2>> compInstance;
+  ComponentInstanceImpl<
+    TestServiceImpl1,
+    std::tuple<TestServiceInterface1, TestServiceInterface2>>
+    compInstance;
   auto iMap = compInstance.GetInterfaceMap();
   ASSERT_TRUE(iMap);
   ASSERT_EQ(iMap->size(), size_t(2));
-  ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()), size_t(1));
-  ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface2>()), size_t(1));
+  ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface1>()),
+            size_t(1));
+  ASSERT_EQ(iMap->count(us_service_interface_iid<TestServiceInterface2>()),
+            size_t(1));
   auto mockContext = std::make_shared<MockComponentContext>();
-  EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_)).Times(0); // ensure the mock context never gets a call to LocateService
+  EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
+    .Times(0); // ensure the mock context never gets a call to LocateService
   compInstance.CreateInstanceAndBindReferences(mockContext);
   auto compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
@@ -266,36 +292,46 @@ TEST(ComponentInstanceImpl, VerifyWithStaticDependencies)
   auto f = cppmicroservices::FrameworkFactory().NewFramework();
   f.Start();
   auto fc = f.GetBundleContext();
-  auto reg = fc.RegisterService<ServiceDependency1>(std::make_shared<ServiceDependency1>());
-  auto reg1 = fc.RegisterService<ServiceDependency2>(std::make_shared<ServiceDependency2>());
+  auto reg = fc.RegisterService<ServiceDependency1>(
+    std::make_shared<ServiceDependency1>());
+  auto reg1 = fc.RegisterService<ServiceDependency2>(
+    std::make_shared<ServiceDependency2>());
 
-  ComponentInstanceImpl<TestServiceImpl1, std::tuple<>, ServiceDependency1, ServiceDependency2> compInstance({("foo"), ("bar")}, {});
+  ComponentInstanceImpl<TestServiceImpl1,
+                        std::tuple<>,
+                        ServiceDependency1,
+                        ServiceDependency2>
+    compInstance({ ("foo"), ("bar") }, {});
   auto iMap = compInstance.GetInterfaceMap();
   ASSERT_FALSE(iMap);
 
   auto mockContext = std::make_shared<MockComponentContext>();
   auto locateService = [&fc](const std::string& type) -> std::shared_ptr<void> {
     auto sRef = fc.GetServiceReference(type);
-    if(sRef)
-    {
+    if (sRef) {
       auto serv = fc.GetService(sRef);
       return serv->at(type);
-    }
-    else
-    {
+    } else {
       return nullptr;
     }
   };
 
-  EXPECT_CALL(*(mockContext.get()), GetBundleContext()).WillRepeatedly(testing::Invoke([&fc]() { return fc;}));
+  EXPECT_CALL(*(mockContext.get()), GetBundleContext())
+    .WillRepeatedly(testing::Invoke([&fc]() { return fc; }));
 
-  EXPECT_CALL(*(mockContext.get()), LocateService("foo", us_service_interface_iid<ServiceDependency1>()))
+  EXPECT_CALL(
+    *(mockContext.get()),
+    LocateService("foo", us_service_interface_iid<ServiceDependency1>()))
     .Times(1)
-    .WillRepeatedly(testing::WithArg<1>(testing::Invoke(locateService))); // ensure the mock context received a call to LocateService for dependency foo
+    .WillRepeatedly(testing::WithArg<1>(testing::Invoke(
+      locateService))); // ensure the mock context received a call to LocateService for dependency foo
 
-  EXPECT_CALL(*(mockContext.get()), LocateService("bar", us_service_interface_iid<ServiceDependency2>()))
+  EXPECT_CALL(
+    *(mockContext.get()),
+    LocateService("bar", us_service_interface_iid<ServiceDependency2>()))
     .Times(1)
-    .WillRepeatedly(testing::WithArg<1>(testing::Invoke(locateService))); // ensure the mock context received a call to LocateService for dependency bar
+    .WillRepeatedly(testing::WithArg<1>(testing::Invoke(
+      locateService))); // ensure the mock context received a call to LocateService for dependency bar
 
   compInstance.CreateInstanceAndBindReferences(mockContext);
   auto compObj = compInstance.GetInstance();
@@ -304,57 +340,72 @@ TEST(ComponentInstanceImpl, VerifyWithStaticDependencies)
   ASSERT_TRUE(compObj->GetFoo());
   ASSERT_TRUE(compObj->GetBar());
 
-  EXPECT_THROW(compInstance.InvokeBindMethod("foo", fc.GetServiceReference<ServiceDependency1>()), std::out_of_range);
-  EXPECT_THROW(compInstance.InvokeBindMethod("bar", fc.GetServiceReference<ServiceDependency2>()), std::out_of_range);
-  EXPECT_THROW(compInstance.InvokeUnbindMethod("foo", fc.GetServiceReference<ServiceDependency1>()), std::out_of_range);
-  EXPECT_THROW(compInstance.InvokeUnbindMethod("bar", fc.GetServiceReference<ServiceDependency2>()), std::out_of_range);
+  EXPECT_THROW(compInstance.InvokeBindMethod(
+                 "foo", fc.GetServiceReference<ServiceDependency1>()),
+               std::out_of_range);
+  EXPECT_THROW(compInstance.InvokeBindMethod(
+                 "bar", fc.GetServiceReference<ServiceDependency2>()),
+               std::out_of_range);
+  EXPECT_THROW(compInstance.InvokeUnbindMethod(
+                 "foo", fc.GetServiceReference<ServiceDependency1>()),
+               std::out_of_range);
+  EXPECT_THROW(compInstance.InvokeUnbindMethod(
+                 "bar", fc.GetServiceReference<ServiceDependency2>()),
+               std::out_of_range);
 
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
-
 
 TEST(ComponentInstanceImpl, VerifyWithDynamicDependencies)
 {
   auto f = cppmicroservices::FrameworkFactory().NewFramework();
   f.Start();
   auto fc = f.GetBundleContext();
-  auto reg = fc.RegisterService<ServiceDependency1>(std::make_shared<ServiceDependency1>());
-  auto reg1 = fc.RegisterService<ServiceDependency2>(std::make_shared<ServiceDependency2>());
+  auto reg = fc.RegisterService<ServiceDependency1>(
+    std::make_shared<ServiceDependency1>());
+  auto reg1 = fc.RegisterService<ServiceDependency2>(
+    std::make_shared<ServiceDependency2>());
 
   std::vector<std::shared_ptr<Binder<TestServiceImpl1>>> binders;
-  binders.push_back(std::make_shared<DynamicBinder<TestServiceImpl1, ServiceDependency1>>("foo", &TestServiceImpl1::BindFoo, &TestServiceImpl1::UnbindFoo));
+  binders.push_back(
+    std::make_shared<DynamicBinder<TestServiceImpl1, ServiceDependency1>>(
+      "foo", &TestServiceImpl1::BindFoo, &TestServiceImpl1::UnbindFoo));
 
-  ComponentInstanceImpl<TestServiceImpl1, std::tuple<>, ServiceDependency2> compInstance({("bar")}, binders);
+  ComponentInstanceImpl<TestServiceImpl1, std::tuple<>, ServiceDependency2>
+    compInstance({ ("bar") }, binders);
   auto iMap = compInstance.GetInterfaceMap();
   ASSERT_FALSE(iMap);
   ASSERT_EQ(compInstance.GetInstance(), nullptr);
 
   // create a mock context and setup expectations on the context
   auto mockContext = std::make_shared<MockComponentContext>();
-  auto locateService = [&fc](const std::string& type) -> std::shared_ptr<void>
-                       {
-                         auto sRef = fc.GetServiceReference(type);
-                         if(sRef)
-                         {
-                           auto serv = fc.GetService(sRef);
-                           return serv->at(type);
-                         }
-                         else
-                         {
-                           return nullptr;
-                         }
-                       };
+  auto locateService = [&fc](const std::string& type) -> std::shared_ptr<void> {
+    auto sRef = fc.GetServiceReference(type);
+    if (sRef) {
+      auto serv = fc.GetService(sRef);
+      return serv->at(type);
+    } else {
+      return nullptr;
+    }
+  };
 
-  EXPECT_CALL(*(mockContext.get()), GetBundleContext()).WillRepeatedly(testing::Invoke([&fc]() { return fc;}));
+  EXPECT_CALL(*(mockContext.get()), GetBundleContext())
+    .WillRepeatedly(testing::Invoke([&fc]() { return fc; }));
 
-  EXPECT_CALL(*(mockContext.get()), LocateService("foo", us_service_interface_iid<ServiceDependency1>()))
+  EXPECT_CALL(
+    *(mockContext.get()),
+    LocateService("foo", us_service_interface_iid<ServiceDependency1>()))
     .Times(1)
-    .WillRepeatedly(testing::WithArg<1>(testing::Invoke(locateService))); // ensure the mock context received a call to LocateService for dependency foo
+    .WillRepeatedly(testing::WithArg<1>(testing::Invoke(
+      locateService))); // ensure the mock context received a call to LocateService for dependency foo
 
-  EXPECT_CALL(*(mockContext.get()), LocateService("bar", us_service_interface_iid<ServiceDependency2>()))
+  EXPECT_CALL(
+    *(mockContext.get()),
+    LocateService("bar", us_service_interface_iid<ServiceDependency2>()))
     .Times(1)
-    .WillRepeatedly(testing::WithArg<1>(testing::Invoke(locateService))); // ensure the mock context received a call to LocateService for dependency bar
+    .WillRepeatedly(testing::WithArg<1>(testing::Invoke(
+      locateService))); // ensure the mock context received a call to LocateService for dependency bar
 
   // use mock context to create an instance of the component implementation class.
   compInstance.CreateInstanceAndBindReferences(mockContext);
@@ -366,11 +417,17 @@ TEST(ComponentInstanceImpl, VerifyWithDynamicDependencies)
 
   // ensure only dynamic dependencies can be re-bound.
   // The runtime calls the wrapper object with the name of the reference and the ServiceReference object to use for binding.
-  EXPECT_THROW(compInstance.InvokeUnbindMethod("bar", fc.GetServiceReference<ServiceDependency2>()), std::out_of_range);
-  EXPECT_THROW(compInstance.InvokeBindMethod("bar", fc.GetServiceReference<ServiceDependency2>()), std::out_of_range);
-  EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("foo", fc.GetServiceReference<ServiceDependency1>()));
+  EXPECT_THROW(compInstance.InvokeUnbindMethod(
+                 "bar", fc.GetServiceReference<ServiceDependency2>()),
+               std::out_of_range);
+  EXPECT_THROW(compInstance.InvokeBindMethod(
+                 "bar", fc.GetServiceReference<ServiceDependency2>()),
+               std::out_of_range);
+  EXPECT_NO_THROW(compInstance.InvokeUnbindMethod(
+    "foo", fc.GetServiceReference<ServiceDependency1>()));
   ASSERT_EQ(compObj->GetFoo(), nullptr);
-  EXPECT_NO_THROW(compInstance.InvokeBindMethod("foo", fc.GetServiceReference<ServiceDependency1>()));
+  EXPECT_NO_THROW(compInstance.InvokeBindMethod(
+    "foo", fc.GetServiceReference<ServiceDependency1>()));
   ASSERT_NE(compObj->GetFoo(), nullptr);
 
   f.Stop();
@@ -389,7 +446,8 @@ TEST(ComponentInstance, VerifyLifeCycleHooks)
   ASSERT_FALSE(iMap);
   auto compObj = compInstance.GetInstance();
   ASSERT_FALSE(compObj);
-  compInstance.CreateInstanceAndBindReferences(std::make_shared<MockComponentContext>());
+  compInstance.CreateInstanceAndBindReferences(
+    std::make_shared<MockComponentContext>());
   compObj = compInstance.GetInstance();
   ASSERT_FALSE(compObj->IsActivated());
   compInstance.Activate();
@@ -405,7 +463,8 @@ TEST(ComponentInstanceImpl, VerifyLifeCycleHooks)
   ASSERT_FALSE(iMap);
   auto compObj = compInstance.GetInstance();
   ASSERT_FALSE(compObj);
-  compInstance.CreateInstanceAndBindReferences(std::make_shared<MockComponentContext>());
+  compInstance.CreateInstanceAndBindReferences(
+    std::make_shared<MockComponentContext>());
   compObj = compInstance.GetInstance();
   ASSERT_FALSE(compObj->IsActivated());
   compInstance.Activate();

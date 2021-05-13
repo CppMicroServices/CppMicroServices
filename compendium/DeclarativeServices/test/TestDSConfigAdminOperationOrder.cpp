@@ -23,9 +23,6 @@
 #include "TestFixture.hpp"
 #include "gtest/gtest.h"
 
-#include "cppmicroservices/Constants.h"
-#include "cppmicroservices/ServiceObjects.h"
-
 #include "TestInterfaces/Interfaces.hpp"
 
 namespace test {
@@ -101,7 +98,7 @@ TEST_F(tServiceComponent, testModificationBeforeDeactivation) //DS_CAI_FTC_21
 /**
    * Verify that DS must complete modification before another modification can be applied.
    */
-TEST_F(tServiceComponent, testModificationSequence) //DS_CAI_FTC_22
+TEST_F(tServiceComponent, testModificationOrder) //DS_CAI_FTC_22
 {
   // Start the test bundle containing the component name.
   std::string componentName = "sample::ServiceComponentCA24";

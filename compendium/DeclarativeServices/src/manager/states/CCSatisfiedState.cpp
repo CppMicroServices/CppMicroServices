@@ -36,6 +36,12 @@ namespace scrimpl {
 
 void CCSatisfiedState::Deactivate(ComponentConfigurationImpl& mgr)
 {
+  std::lock_guard<std::mutex> lock(oneAtATimeMutex);
+
+  // Make sure the state didn't change while we were waiting
+  if (mgr.GetConfigState() != service::component::runtime::dto::UNSATISFIED_REFERENCE) {
+    return;
+  }
   auto currentState = shared_from_this();
   std::packaged_task<void(void)> task([&mgr](){
                                         mgr.UnregisterService();

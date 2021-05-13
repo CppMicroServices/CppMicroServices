@@ -86,9 +86,6 @@ public:
 
  
 private:
-  // Mutex to make sure that one operation (Activate, Rebind, Modified, etc) completes before another
-  // operation begins. 
-  mutable std::mutex oneAtATimeMutex; 
   void DoDeactivateWork(ComponentConfigurationImpl& mgr);
 };
 }

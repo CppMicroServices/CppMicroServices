@@ -26,20 +26,20 @@
 
 #include "gtest/gtest.h"
 
-#include "cppmicroservices/util/CMConstants.hpp"
-#include "cppmicroservices/util/ConfigurationMetadata.hpp"
-#include "cppmicroservices/util/MetadataParserImpl.hpp"
-#include "cppmicroservices/util/MetadataParserFactory.hpp"
+#include "../src/CMConstants.hpp"
+#include "../src/metadata/ConfigurationMetadata.hpp"
+#include "../src/metadata/MetadataParserImpl.hpp"
+#include "../src/metadata/MetadataParserFactory.hpp"
 #include "Mocks.hpp"
 
 using cppmicroservices::AnyMap;
 using cppmicroservices::cmimpl::FakeLogger;
-using cppmicroservices::util::ConfigurationMetadata;
-using cppmicroservices::util::MetadataParserFactory;
-using cppmicroservices::util::MetadataParserImplV1;
+using cppmicroservices::cmimpl::metadata::ConfigurationMetadata;
+using cppmicroservices::cmimpl::metadata::MetadataParserFactory;
+using cppmicroservices::cmimpl::metadata::MetadataParserImplV1;
 using cppmicroservices::cmimpl::MockLogger;
-using cppmicroservices::util::CMConstants::CM_KEY;
-using cppmicroservices::util::CMConstants::CM_VERSION;
+using cppmicroservices::cmimpl::CMConstants::CM_KEY;
+using cppmicroservices::cmimpl::CMConstants::CM_VERSION;
 
 #define str(s) #s
 #define xstr(s) str(s)

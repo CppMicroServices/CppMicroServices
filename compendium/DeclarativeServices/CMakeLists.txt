@@ -56,9 +56,7 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_BINARY_DIR}/compendium/ServiceComponent/include
   ${CppMicroServices_BINARY_DIR}/compendium/LogService/include
   ${CppMicroServices_BINARY_DIR}/compendium/CM/include
-  ${CppMicroServices_BINARY_DIR}/cppmicroservices/cm/include
-  ${CppMicroServices_BINARY_DIR}/util/include
-  ${CppMicroServices_SOURCE_DIR}/util/include
+  ${CppMicroServices_BINARY_DIR}/compendium/cppmicroservices/cm/include
   ${CppMicroServices_SOURCE_DIR}/compendium/ServiceComponent/include
   ${CppMicroServices_SOURCE_DIR}/compendium/LogService/include
   ${CppMicroServices_SOURCE_DIR}/compendium/CM/include

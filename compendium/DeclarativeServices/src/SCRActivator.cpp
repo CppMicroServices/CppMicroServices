@@ -40,7 +40,6 @@
 #include "ConfigurationListenerImpl.hpp"
 
 #include "cppmicroservices/util/ScopeGuard.h"
-#include "cppmicroservices/util/CMConstants.hpp"
 
 using cppmicroservices::logservice::SeverityLevel;
 using cppmicroservices::service::component::ComponentConstants::SERVICE_COMPONENT;

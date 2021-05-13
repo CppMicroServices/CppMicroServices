@@ -10,19 +10,12 @@ add_library(util OBJECT
   include/cppmicroservices/util/MappedFile.h
   include/cppmicroservices/util/ScopeGuard.h
   include/cppmicroservices/util/String.h
-  include/cppmicroservices/util/CMConstants.hpp
-  include/cppmicroservices/util/ConfigurationMetadata.hpp
-  include/cppmicroservices/util/MetadataParser.hpp
-  include/cppmicroservices/util/MetadataParserFactory.hpp
-  include/cppmicroservices/util/MetadataParserImpl.hpp
-
+  
   src/BundleObjFactory.cpp
   src/BundleObjFile.cpp
   src/Error.cpp
   src/FileSystem.cpp
   src/String.cpp
-  src/CMConstants.cpp
-  src/MetadataParserImpl.cpp
 )
 
 set_property(TARGET util PROPERTY POSITION_INDEPENDENT_CODE 1)

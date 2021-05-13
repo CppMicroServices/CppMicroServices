@@ -26,7 +26,7 @@
 #include <cstdint>
 #include <vector>
 #include <future>
-#include "cppmicroservices/util/ConfigurationMetadata.hpp"
+#include "metadata/ConfigurationMetadata.hpp"
 
 namespace cppmicroservices {
   namespace cmimpl {
@@ -73,7 +73,7 @@ namespace cppmicroservices {
        *         Configurations that have been created/updated by this method.
        */
        virtual std::vector<ConfigurationAddedInfo> AddConfigurations(
-        std::vector<cppmicroservices::util::ConfigurationMetadata>
+        std::vector<metadata::ConfigurationMetadata>
           configurationMetadata) = 0;
 
       /**

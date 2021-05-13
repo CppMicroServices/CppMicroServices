@@ -27,7 +27,7 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/cm/ConfigurationException.hpp"
 
-#include "cppmicroservices/util/CMConstants.hpp"
+#include "CMConstants.hpp"
 #include "ConfigurationAdminImpl.hpp"
 
 using cppmicroservices::logservice::SeverityLevel;
@@ -136,7 +136,7 @@ namespace {
   template <typename T>
   std::string getPidFromServiceReference(const T& reference)
   {
-    using namespace cppmicroservices::util::CMConstants;
+    using namespace cppmicroservices::cmimpl::CMConstants;
     try
     {
       const auto serviceProp = reference.GetProperty(CM_SERVICE_KEY);
@@ -333,7 +333,7 @@ namespace cppmicroservices {
 
     std::vector<ConfigurationAddedInfo>
     ConfigurationAdminImpl::AddConfigurations(
-      std::vector<cppmicroservices::util::ConfigurationMetadata>
+      std::vector<metadata::ConfigurationMetadata>
         configurationMetadata)
     {
       std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs;

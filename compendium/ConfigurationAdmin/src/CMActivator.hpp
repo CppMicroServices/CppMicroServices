@@ -33,7 +33,7 @@
 #include "cppmicroservices/ListenerToken.h"
 
 #include "CMBundleExtension.hpp"
-#include "cppmicroservices/util/CMConstants.hpp"
+#include "CMConstants.hpp"
 #include "CMLogger.hpp"
 #include "ConfigurationAdminImpl.hpp"
 

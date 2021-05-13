@@ -128,7 +128,7 @@ namespace cppmicroservices {
        * See {@code ConfigurationAdminPrivate#AddConfigurations}
        */
        std::vector<ConfigurationAddedInfo> AddConfigurations(
-        std::vector<cppmicroservices::util::ConfigurationMetadata>
+        std::vector<metadata::ConfigurationMetadata>
           configurationMetadata) override;
 
       /**

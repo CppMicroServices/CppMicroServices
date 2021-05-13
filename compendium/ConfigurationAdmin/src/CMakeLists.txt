@@ -1,18 +1,25 @@
 set(_srcs
   CMBundleExtension.cpp
+  CMConstants.cpp
   CMLogger.cpp
   ConfigurationAdminImpl.cpp
   ConfigurationImpl.cpp
+  metadata/MetadataParserImpl.cpp
   )
 
 set(_private_headers
   CMActivator.hpp
   CMBundleExtension.hpp
+  CMConstants.hpp
   CMLogger.hpp
   ConfigurationAdminImpl.hpp
   ConfigurationAdminPrivate.hpp
   ConfigurationImpl.hpp
   ConfigurationPrivate.hpp
+  metadata/ConfigurationMetadata.hpp
+  metadata/MetadataParser.hpp
+  metadata/MetadataParserFactory.hpp
+  metadata/MetadataParserImpl.hpp
   )
 
 add_library(ConfigurationAdminObjs OBJECT ${_srcs} ${_private_headers})
@@ -31,8 +38,6 @@ target_include_directories(ConfigurationAdminObjs PRIVATE
   ${CppMicroServices_BINARY_DIR}/compendium/LogService/include
   ${CppMicroServices_SOURCE_DIR}/compendium/CM/include
   ${CppMicroServices_BINARY_DIR}/compendium/CM/include
-  ${CppMicroServices_SOURCE_DIR}/util/include
-  ${CppMicroServices_BINARY_DIR}/util/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )

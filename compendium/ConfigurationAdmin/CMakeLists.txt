@@ -53,8 +53,6 @@ target_include_directories(ConfigurationAdmin PRIVATE
   ${CppMicroServices_BINARY_DIR}/compendium/LogService/include
   ${CppMicroServices_SOURCE_DIR}/compendium/CM/include
   ${CppMicroServices_BINARY_DIR}/compendium/CM/include
-  ${CppMicroServices_SOURCE_DIR}/cppmicroservices/util/include
-  ${CppMicroServices_BINARY_DIR}/cppmicroservices/util/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )

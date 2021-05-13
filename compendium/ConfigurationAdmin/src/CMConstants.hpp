@@ -26,7 +26,7 @@
 #include <string>
 
 namespace cppmicroservices {
-  namespace util {
+  namespace cmimpl {
 
     /**
      * Defines standard names for CM Constants.
@@ -73,7 +73,7 @@ namespace cppmicroservices {
        extern const std::string CM_COMPONENT_SUBKEY;
 
     } // CMConstants
-  } // util
+  } // cmimpl
 } // cppmicroservices
 
 #endif // CMCONSTANTS_HPP

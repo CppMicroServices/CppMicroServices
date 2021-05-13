@@ -93,6 +93,7 @@ set(_declarativeservices_tests
   TestUpdateConfiguration.cpp
   ImportTestBundles.cpp
   TestBindingPolicies.cpp
+  TestDSConfigAdminOperationOrder.cpp
   main.cpp
 )
 
@@ -192,9 +193,11 @@ set(_test_bundles
   TestBundleDSCA07
   TestBundleDSCA08
   TestBundleDSCA09
+  TestBundleDSCA12
   TestBundleDSCA14
   TestBundleDSCA15
   TestBundleDSCA16
+  TestBundleDSCA17
   TestBundleDSCA20
   TestBundleDSCA24
   TestBundleDSCA26

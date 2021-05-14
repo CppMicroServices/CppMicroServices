@@ -133,7 +133,11 @@ void SingletonComponentConfigurationImpl::BindReference(
   const ServiceReferenceBase& ref)
 {
   auto context = GetComponentContext();
-  context->AddToBoundServicesCache(refName, ref);
+  if (!context->AddToBoundServicesCache(refName, ref)) {
+      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+          "Failure while trying to add reference to BoundServices Cache ");
+      return;
+  }
   try {
     GetComponentInstance()->InvokeBindMethod(refName, ref);
   } catch (const std::exception&) {

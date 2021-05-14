@@ -201,10 +201,10 @@ public:
    */
   void Invalidate();
 
-  void AddToBoundServicesCache(
+  bool AddToBoundServicesCache(
     const std::string& refName,
     const cppmicroservices::ServiceReferenceBase& sRef);
-
+ 
   void RemoveFromBoundServicesCache(
     const std::string& refName,
     const cppmicroservices::ServiceReferenceBase& sRef);

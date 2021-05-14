@@ -132,7 +132,11 @@ void BundleOrPrototypeComponentConfigurationImpl::BindReference(
   for (auto const& instancePair : *instancePairs) {
     auto& instance = instancePair.first;
     auto& context = instancePair.second;
-    context->AddToBoundServicesCache(refName, ref);
+    if (!context->AddToBoundServicesCache(refName, ref)) {
+        GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+            "Failure while trying to add reference to BoundServices Cache ");
+        return;
+    }
     try {
       instance->InvokeBindMethod(refName, ref);
     } catch (const std::exception&) {

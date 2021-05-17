@@ -69,7 +69,6 @@ set(_declarativeservices_tests
   TestCounterLatch.cpp
   TestDuplicatedPID.cpp
   TestFactoryPid.cpp
-  TestManifestWithInvalidConfiguration.cpp
   TestMetadataParserFactory.cpp
   TestMetadataParserImplV1.cpp
   TestReferenceManagerImpl.cpp
@@ -194,8 +193,6 @@ set(_test_bundles
   TestBundleDSCA08
   TestBundleDSCA09
   TestBundleDSCA12
-  TestBundleDSCA14
-  TestBundleDSCA15
   TestBundleDSCA16
   TestBundleDSCA17
   TestBundleDSCA20

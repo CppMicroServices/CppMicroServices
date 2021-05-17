@@ -74,12 +74,9 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
     // Both configuration-policy and configuration-pid must be present in the manifest.json
     // file to participate in Configuration Admin. 
     if (policy ^ pid) {
-      componentInfo.configurationPolicy =
-        codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE;
-      std::cerr << "Warning: configuration-policy has been set to ignore." 
-                << " Both configuration-policy and configuration-pid must be present"
-                << " in the manifest.json file to participate in Configuration Admin."
-                << std::endl; 
+        componentInfo.configurationPolicy =
+            codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE;
+        throw std::runtime_error("Error: Both configuration-policy and configuration-pid must be present in the manifest.json file to participate in Configuration Admin.");
     }
  
     // service

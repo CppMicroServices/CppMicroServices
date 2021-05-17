@@ -26,6 +26,7 @@
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/ServiceEvent.h"
@@ -34,7 +35,7 @@
 #include "TestUtilListenerHelpers.h"
 #include "TestUtils.h"
 #include "TestingConfig.h"
-#include "TestingMacros.h"
+#include "gtest/gtest.h"
 
 using namespace cppmicroservices;
 
@@ -44,19 +45,18 @@ namespace {
 // also check that the expected events occur
 void frame020a(BundleContext context, TestBundleListener& listener)
 {
-  auto bundleB = testing::InstallLib(context, "TestBundleB");
+  auto bundleB = cppmicroservices::testing::InstallLib(context, "TestBundleB");
 
-  US_TEST_CONDITION_REQUIRED(bundleB, "Test for existing bundle TestBundleB")
+  //Test for existing bundle TestBundleB
+  ASSERT_TRUE(bundleB);
 
-  auto bundleImportedByB = testing::GetBundle("TestBundleImportedByB", context);
-  US_TEST_CONDITION_REQUIRED(bundleImportedByB,
-                             "Test for existing bundle TestBundleImportedByB")
+  auto bundleImportedByB =
+    cppmicroservices::testing::GetBundle("TestBundleImportedByB", context);
+  //Test for existing bundle TestBundleImportedByB
+  ASSERT_TRUE(bundleImportedByB);
 
-  US_TEST_CONDITION(bundleB.GetSymbolicName() == "TestBundleB",
-                    "Test bundle name")
-  US_TEST_CONDITION(bundleImportedByB.GetSymbolicName() ==
-                      "TestBundleImportedByB",
-                    "Test bundle name")
+  ASSERT_EQ(bundleB.GetSymbolicName(), "TestBundleB");
+  ASSERT_EQ(bundleImportedByB.GetSymbolicName(), "TestBundleImportedByB");
 
   bundleB.Start();
   bundleImportedByB.Start();
@@ -64,16 +64,16 @@ void frame020a(BundleContext context, TestBundleListener& listener)
   try {
     std::vector<ServiceReferenceU> refs =
       context.GetServiceReferences("cppmicroservices::TestBundleBService");
-    US_TEST_CONDITION_REQUIRED(refs.size() == 2,
-                               "Test that both the service from the shared and "
-                               "imported library are regsitered");
+    //Test that both the service from the shared and imported library are regsitered
+    ASSERT_EQ(refs.size(), 2);
 
     auto o1 = context.GetService(refs.front());
-    US_TEST_CONDITION(o1 && !o1->empty(), "Test if first service object found");
+    //Test if first service object found
+    ASSERT_TRUE(o1 && !o1->empty());
 
     auto o2 = context.GetService(refs.back());
-    US_TEST_CONDITION(o2 && !o2->empty(),
-                      "Test if second service object found");
+    //Test if second service object found
+    ASSERT_TRUE(o2 && !o2->empty());
 
     // check the listeners for events
     std::vector<BundleEvent> pEvts;
@@ -102,46 +102,42 @@ void frame020a(BundleContext context, TestBundleListener& listener)
 #ifndef US_BUILD_SHARED_LIBS
     relaxed = true;
 #endif
-    US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts, relaxed),
-                      "Test for unexpected events");
+    //Test for unexpected events
+    ASSERT_TRUE(listener.CheckListenerEvents(pEvts, seEvts, relaxed));
 
   } catch (const ServiceException& /*se*/) {
-    US_TEST_FAILED_MSG(<< "test bundle, expected service not found");
+    ASSERT_TRUE(false) << "test bundle, expected service not found";
   }
-
-  US_TEST_CONDITION(bundleB.GetState() == Bundle::STATE_ACTIVE,
-                    "Test if started correctly");
+  //Test if started correctly
+  ASSERT_EQ(bundleB.GetState(), Bundle::STATE_ACTIVE);
 }
 
 // Stop libB and check for correct events
 void frame030b(BundleContext context, TestBundleListener& listener)
 {
-  auto bundleB = testing::GetBundle("TestBundleB", context);
-  US_TEST_CONDITION_REQUIRED(bundleB, "Test for non-null bundle")
+  auto bundleB = cppmicroservices::testing::GetBundle("TestBundleB", context);
+  //Test for non-null bundle
+  ASSERT_TRUE(bundleB);
 
-  auto bundleImportedByB = testing::GetBundle("TestBundleImportedByB", context);
-  US_TEST_CONDITION_REQUIRED(bundleImportedByB, "Test for non-null bundle")
+  auto bundleImportedByB =
+    cppmicroservices::testing::GetBundle("TestBundleImportedByB", context);
+  //Test for non-null bundle
+  ASSERT_TRUE(bundleImportedByB);
 
   std::vector<ServiceReferenceU> refs =
     context.GetServiceReferences("cppmicroservices::TestBundleBService");
-  US_TEST_CONDITION(refs.front(), "Test for first valid service reference")
-  US_TEST_CONDITION(refs.back(), "Test for second valid service reference")
+  //Test for first valid service reference
+  ASSERT_TRUE(refs.front());
+  //Test for second valid service reference
+  ASSERT_TRUE(refs.back());
 
-  try {
-    bundleB.Stop();
-    US_TEST_CONDITION(bundleB.GetState() == Bundle::STATE_RESOLVED,
-                      "Test for stopped state")
-  } catch (const std::exception& e) {
-    US_TEST_FAILED_MSG(<< "Stop bundle exception: " << e.what())
-  }
+  EXPECT_NO_THROW(bundleB.Stop()) << "Stop bundle exception";
+  //Test for stopped state
+  ASSERT_EQ(bundleB.GetState(), Bundle::STATE_RESOLVED);
 
-  try {
-    bundleImportedByB.Stop();
-    US_TEST_CONDITION(bundleImportedByB.GetState() == Bundle::STATE_RESOLVED,
-                      "Test for stopped state")
-  } catch (const std::exception& e) {
-    US_TEST_FAILED_MSG(<< "Stop bundle exception: " << e.what())
-  }
+  EXPECT_NO_THROW(bundleImportedByB.Stop()) << "Stop bundle exception";
+  //Test for stopped state
+  ASSERT_EQ(bundleImportedByB.GetState(), Bundle::STATE_RESOLVED);
 
   std::vector<BundleEvent> pEvts;
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STOPPING, bundleB));
@@ -159,8 +155,8 @@ void frame030b(BundleContext context, TestBundleListener& listener)
 #ifndef US_BUILD_SHARED_LIBS
   relaxed = true;
 #endif
-  US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, seEvts, relaxed),
-                    "Test for unexpected events");
+  //Test for unexpected events
+  ASSERT_TRUE(listener.CheckListenerEvents(pEvts, seEvts, relaxed));
 }
 
 // Uninstall libB and check for correct events
@@ -169,46 +165,52 @@ void frame040c(BundleContext context, TestBundleListener& listener)
 {
   bool relaxed = false;
 
-  auto bundleB = testing::GetBundle("TestBundleB", context);
-  US_TEST_CONDITION_REQUIRED(bundleB, "Test for non-null bundle")
+  auto bundleB = cppmicroservices::testing::GetBundle("TestBundleB", context);
+  //Test for non-null bundle
+  ASSERT_TRUE(bundleB);
 
-  auto bundleImportedByB = testing::GetBundle("TestBundleImportedByB", context);
-  US_TEST_CONDITION_REQUIRED(bundleImportedByB, "Test for non-null bundle")
+  auto bundleImportedByB =
+    cppmicroservices::testing::GetBundle("TestBundleImportedByB", context);
+  //Test for non-null bundle
+  ASSERT_TRUE(bundleImportedByB);
 
   auto const bundleCount = context.GetBundles().size();
-  US_TEST_CONDITION_REQUIRED(bundleCount > 0, "Test for bundle count > 0")
+  //Test for bundle count > 0
+  EXPECT_GT(bundleCount, 0);
   bundleB.Uninstall();
-  US_TEST_CONDITION(context.GetBundles().size() == bundleCount - 1,
-                    "Test for uninstall of TestBundleB")
+  //Test for uninstall of TestBundleB
+  ASSERT_EQ(context.GetBundles().size(), bundleCount - 1);
 
   std::vector<BundleEvent> pEvts;
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, bundleB));
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundleB));
 
-  US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, relaxed),
-                    "Test for unexpected events");
+  //Test for unexpected events
+  ASSERT_TRUE(listener.CheckListenerEvents(pEvts, relaxed));
 
   // Install the same lib again, we should get TestBundleB again
   auto bundles = context.InstallBundles(bundleImportedByB.GetLocation());
 
   std::size_t installCount = 2;
-  US_TEST_CONDITION(bundles.size() == installCount,
-                    "Test for re-install of TestBundleB")
+  //Test for re-install of TestBundleB
+  ASSERT_EQ(bundles.size(), installCount);
 
   long oldId = bundleB.GetBundleId();
-  bundleB = testing::GetBundle("TestBundleB", context);
-  US_TEST_CONDITION_REQUIRED(bundleB, "Test for non-null bundle")
-  US_TEST_CONDITION(oldId != bundleB.GetBundleId(), "Test for new bundle id")
+  bundleB =cppmicroservices::testing::GetBundle("TestBundleB", context);
+  //Test for non-null bundle
+  ASSERT_TRUE(bundleB);
+  //Test for new bundle id
+  ASSERT_NE(oldId , bundleB.GetBundleId());
 
   pEvts.clear();
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleB));
-  US_TEST_CONDITION(listener.CheckListenerEvents(pEvts),
-                    "Test for unexpected events");
+  //Test for unexpected events
+  ASSERT_TRUE(listener.CheckListenerEvents(pEvts));
 
   bundleB.Uninstall();
   bundleImportedByB.Uninstall();
-  US_TEST_CONDITION(context.GetBundles().size() == bundleCount - 2,
-                    "Test for uninstall of TestBundleImportedByB")
+  //Test for uninstall of TestBundleImportedByB
+  ASSERT_EQ(context.GetBundles().size(), bundleCount - 2);
 
   pEvts.clear();
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_UNRESOLVED, bundleB));
@@ -218,17 +220,13 @@ void frame040c(BundleContext context, TestBundleListener& listener)
   pEvts.push_back(
     BundleEvent(BundleEvent::BUNDLE_UNINSTALLED, bundleImportedByB));
 
-  US_TEST_CONDITION(listener.CheckListenerEvents(pEvts, relaxed),
-                    "Test for unexpected events");
+  //Test for unexpected events
+  ASSERT_TRUE(listener.CheckListenerEvents(pEvts, relaxed));
 }
 #endif
 
-} // end unnamed namespace
-
-int StaticBundleTest(int /*argc*/, char* /*argv*/[])
+TEST(StaticBundleTest, testStaticBundle)
 {
-  US_TEST_BEGIN("StaticBundleTest");
-
   FrameworkFactory factory;
   FrameworkConfiguration frameworkConfig;
   auto framework = factory.NewFramework(frameworkConfig);
@@ -255,6 +253,5 @@ int StaticBundleTest(int /*argc*/, char* /*argv*/[])
     frame040c(context, listener);
 #endif
   }
-
-  US_TEST_END()
+}
 }

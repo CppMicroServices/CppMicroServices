@@ -39,7 +39,6 @@ set(_tests
   ServiceFactoryTest
   ServiceHooksTest
   ServiceRegistryPerformanceTest
-  StaticBundleTest
 )
 
 if(BUILD_SHARED_LIBS)

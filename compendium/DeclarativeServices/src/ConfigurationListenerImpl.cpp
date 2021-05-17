@@ -21,35 +21,43 @@ ConfigurationListenerImpl::ConfigurationListenerImpl(
   }
 }
 
-void ConfigurationListenerImpl::configurationEvent(const ConfigurationEvent& event)
+void ConfigurationListenerImpl::configurationEvent(const ConfigurationEvent& event) noexcept
 {
-  auto pid = (event.getPid() != "") ? event.getPid() : event.getFactoryPid();
-  if (pid.empty()) {
-    return;
-  }
-  if (!configNotifier->AnyListenersForPid(pid)){
-      return;
-  }
-  
-  auto configAdminRef = event.getReference();
-  if (!configAdminRef) {
-    return;
-  }
-   auto configAdmin = bundleContext
-      .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(configAdminRef);
+  try {
+        auto pid = (event.getPid() != "") ? event.getPid() : event.getFactoryPid();
+        if (pid.empty()) {
+            return;
+        }
+        if (!configNotifier->AnyListenersForPid(pid)) {
+            return;
+        }
 
-  auto properties = cppmicroservices::AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  auto type = event.getType();
+        auto configAdminRef = event.getReference();
+        if (!configAdminRef) {
+            return;
+        }
+        auto configAdmin = bundleContext
+            .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(configAdminRef);
+
+        auto properties = cppmicroservices::AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+        auto type = event.getType();
 
 
-  if (type == ConfigurationEventType::CM_UPDATED) {
-    auto configObject = configAdmin->GetConfiguration(pid);
-    if (configObject) {
-      properties = configObject->GetProperties();
+        if (type == ConfigurationEventType::CM_UPDATED) {
+            auto configObject = configAdmin->GetConfiguration(pid);
+            if (configObject) {
+                properties = configObject->GetProperties();
+            }
+        }
+        auto ptr = std::make_shared<cppmicroservices::AnyMap>(properties);
+        configNotifier->NotifyAllListeners(pid, type, ptr);
     }
-  }
-  auto ptr = std::make_shared<cppmicroservices::AnyMap>(properties);
-  configNotifier->NotifyAllListeners(pid, type, ptr);
+    catch (...) {
+        logger->Log(
+            cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+            "Exception while executing ConfigurationListener::configEvent method.",
+            std::current_exception());
+    }
 }
 } // namespace cm
 } // namespace service

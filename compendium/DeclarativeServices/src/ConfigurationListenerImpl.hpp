@@ -73,15 +73,8 @@ public:
    * configurationEvent is the method called by Configuration Admin whenever a 
    * a configuraton object is updated or removed.
    *
-   * @throws std::runtime_error If this BundleContext is no
-   *         longer valid.
-   * @throws std::invalid_argument If the config admin service reference
-   *         specified in the event is no longer valid.
-   * @throws std::logic_error If this component has already been
-   *         unregistered or if it is invalid.
-   * @throws std::exception if the component's Modified method throws an exception
    */
-  void configurationEvent(const ConfigurationEvent& event) override;
+  void configurationEvent(const ConfigurationEvent& event) noexcept override;
 
 
  private:

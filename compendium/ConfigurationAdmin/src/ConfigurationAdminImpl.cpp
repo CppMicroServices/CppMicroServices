@@ -510,19 +510,12 @@ namespace cppmicroservices {
         
         auto configAdminRef = cmContext.GetServiceReference<ConfigurationAdmin>();
         for (auto it : configurationListeners) {
+            auto configEvent = std::make_unique<
+            cppmicroservices::service::cm::ConfigurationEvent>(
+            configAdminRef, type, fPid, nonFPid);
 
-            try {
-              auto configEvent = std::make_unique<
-                cppmicroservices::service::cm::ConfigurationEvent>(
-                configAdminRef, type, fPid, nonFPid);
-
-              it->configurationEvent((*configEvent));
-            } catch (...) {
-              auto thrownByMessage = "thrown by ConfigurationListener "
-                                     "configurationEvent method with PID " +
-                                     pid + "\n\t";
-              logger->Log(SeverityLevel::LOG_ERROR, thrownByMessage);           
-            }
+            it->configurationEvent((*configEvent));
+ 
           }
 
         const auto managedServiceWrappers = managedServiceTracker.GetServices();

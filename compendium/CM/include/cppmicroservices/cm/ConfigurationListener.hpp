@@ -101,7 +101,7 @@ public:
    * Called whenever the Configuration for any service is updated or removed from ConfigurationAdmin,
    * and when the ConfigurationListener is first registered with the Framework, to provide the initial Configuration.
    */
-  virtual void configurationEvent(const ConfigurationEvent& event) = 0;
+  virtual void configurationEvent(const ConfigurationEvent& event) noexcept = 0;
   virtual ~ConfigurationListener() = default;
 };
 } //cm namespace

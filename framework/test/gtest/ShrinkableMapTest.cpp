@@ -24,7 +24,7 @@
 
 #include "TestUtils.h"
 #include "TestingConfig.h"
-#include "TestingMacros.h"
+#include "gtest/gtest.h"
 
 namespace cppmicroservices {
 
@@ -44,24 +44,25 @@ public:
 
 using namespace cppmicroservices;
 
-int ShrinkableMapTest(int /*argc*/, char* /*argv*/ [])
+TEST(ShrinkableMapTest, testShrinkableMapOperations)
 {
-  US_TEST_BEGIN("ShrinkableMapTest");
-
   ShrinkableMap<int, std::string>::container_type m{ { 1, "one" },
                                                      { 2, "two" },
                                                      { 3, "three" } };
 
   auto shrinkable = ServiceHooks::MakeMap(m);
 
-  US_TEST_CONDITION(m.size() == 3, "Original size")
-  US_TEST_CONDITION(m.size() == shrinkable.size(), "Equal size")
-  US_TEST_CONDITION(shrinkable.at(1) == "one", "At access")
+  //Original size
+  ASSERT_EQ(m.size(), 3);
+  //Equal size
+  ASSERT_EQ(m.size(), shrinkable.size());
+  //At access
+  ASSERT_EQ(shrinkable.at(1), "one");
 
   shrinkable.erase(shrinkable.find(1));
-  US_TEST_CONDITION(m.size() == 2, "New size")
-  US_TEST_FOR_EXCEPTION(std::out_of_range, shrinkable.at(1))
-  US_TEST_CONDITION(shrinkable.at(2) == "two", "back() access")
-
-  US_TEST_END()
+  //New size
+  ASSERT_EQ(m.size(), 2);
+  EXPECT_THROW(shrinkable.at(1),std::out_of_range);
+  //back() access
+  ASSERT_EQ(shrinkable.at(2), "two");
 }

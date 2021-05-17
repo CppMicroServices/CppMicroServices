@@ -35,7 +35,6 @@ set(_tests
   MemcheckTest
   MultipleListenersTest
   ResourceCompilerTest
-  ShrinkableMapTest
   ServiceFactoryTest
   ServiceHooksTest
   ServiceRegistryPerformanceTest

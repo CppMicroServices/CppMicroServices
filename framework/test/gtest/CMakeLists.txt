@@ -49,6 +49,7 @@ set(_gtest_tests
   ServiceTemplateTest.cpp
   BundleRegistryConcurrencyTest.cpp
   StaticBundleTest.cpp
+  ShrinkableMapTest.cpp
 )
 
 if(BUILD_SHARED_LIBS)

@@ -176,7 +176,7 @@ void frame040c(BundleContext context, TestBundleListener& listener)
 
   auto const bundleCount = context.GetBundles().size();
   //Test for bundle count > 0
-  EXPECT_GT(bundleCount, 0);
+  EXPECT_GT(static_cast<int>(bundleCount), 0);
   bundleB.Uninstall();
   //Test for uninstall of TestBundleB
   ASSERT_EQ(context.GetBundles().size(), bundleCount - 1);

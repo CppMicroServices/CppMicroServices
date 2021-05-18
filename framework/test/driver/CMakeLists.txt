@@ -29,7 +29,6 @@ include_directories(
 
 set(_tests
   HelgrindTest
-  BundleHooksTest
   BundleTest
   MemcheckTest
   MultipleListenersTest

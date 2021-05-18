@@ -51,6 +51,7 @@ set(_gtest_tests
   StaticBundleTest.cpp
   ShrinkableMapTest.cpp
   FrameworkListenerTest.cpp
+  BundleHooksTest
 )
 
 if(BUILD_SHARED_LIBS)

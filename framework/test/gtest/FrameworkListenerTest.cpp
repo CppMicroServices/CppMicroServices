@@ -152,7 +152,7 @@ TEST(FrameworkListenerTest, testFrameworkListenersAfterFrameworkStop)
   //    6. All resources held by this Framework are released.
   // The assumption is that framework listeners are one such resource described in step #6.
   int events(0);
-  auto listener = [&events](const FrameworkEvent& evt) { ++events; };
+  auto listener = [&events](const FrameworkEvent& /*evt*/) { ++events; };
   f.GetBundleContext().AddFrameworkListener(listener);
   f.Start(); // generate framework event (started)
   f.Stop();  // resources (such as framework listeners) are released

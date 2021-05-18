@@ -3,7 +3,7 @@
 
 namespace sample {
 
-ServiceComponentCA08::ServiceComponentCA08(std::shared_ptr<cppmicroservices::AnyMap> props)
+ServiceComponentCA08::ServiceComponentCA08(const std::shared_ptr<cppmicroservices::AnyMap>& props)
     : properties(*props)
 {
 }

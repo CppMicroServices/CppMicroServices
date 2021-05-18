@@ -12,7 +12,7 @@ namespace sample
   class ServiceComponentCA16 : public test::CAInterface
     {
     public:
-      ServiceComponentCA16(std::shared_ptr<cppmicroservices::AnyMap> props) 
+      ServiceComponentCA16(const std::shared_ptr<cppmicroservices::AnyMap>& props) 
           : properties(*props)
       {
       }

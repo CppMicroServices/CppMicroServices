@@ -3,7 +3,7 @@
 
 namespace sample {
 
-ServiceComponentCA09::ServiceComponentCA09(std::shared_ptr<cppmicroservices::AnyMap> props,
+ServiceComponentCA09::ServiceComponentCA09(const std::shared_ptr<cppmicroservices::AnyMap>& props,
                                            const std::shared_ptr<test::Interface1> interface1)
 : properties(*props), constructorHit{false}
 {

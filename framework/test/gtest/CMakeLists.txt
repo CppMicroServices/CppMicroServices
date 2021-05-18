@@ -50,6 +50,7 @@ set(_gtest_tests
   BundleRegistryConcurrencyTest.cpp
   StaticBundleTest.cpp
   ShrinkableMapTest.cpp
+  FrameworkListenerTest.cpp
 )
 
 if(BUILD_SHARED_LIBS)
@@ -60,6 +61,7 @@ endif()
 
 set(_additional_srcs
   ../util/TestUtilBundleListener.cpp
+  ../util/TestUtilFrameworkListener.cpp
   ../util/TestUtils.cpp
   ../util/ImportTestBundles.cpp
   $<TARGET_OBJECTS:util>

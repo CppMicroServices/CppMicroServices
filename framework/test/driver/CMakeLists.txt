@@ -28,7 +28,6 @@ include_directories(
 #-----------------------------------------------------------------------------
 
 set(_tests
-  FrameworkListenerTest
   HelgrindTest
   BundleHooksTest
   BundleTest

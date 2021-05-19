@@ -23,8 +23,8 @@
 #ifndef UnsatisfiedReferenceDTO_hpp
 #define UnsatisfiedReferenceDTO_hpp
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "ServiceReferenceDTO.hpp"
 
@@ -35,6 +35,13 @@ namespace runtime {
 namespace dto {
 
 /**
+ \defgroup gr_unsatisfiedreferencedto UnsatisfiedReferenceDTO
+ \brief Groups UnsatisfiedReferenceDTO related symbols.
+ */
+
+/**
+ * \ingroup gr_unsatisfiedreferencedto
+ * 
  * A representation of an unsatisfied reference.
  */
 struct UnsatisfiedReferenceDTO
@@ -43,7 +50,7 @@ struct UnsatisfiedReferenceDTO
    * The name of the declared reference.
    *
    * <p>
-   * This is declared in the {@code name} attribute of the {@code reference}
+   * This is declared in the \c name attribute of the \c reference
    * element of the component description.
    *
    * @see ReferenceDTO#name
@@ -66,13 +73,14 @@ struct UnsatisfiedReferenceDTO
    * The target services.
    *
    * <p>
-   * Each {@link ServiceReferenceDTO} in the vector represents a target service
+   * Each {@link cppmicroservices::framework::dto::ServiceReferenceDTO ServiceReferenceDTO} in the vector represents a target service
    * for the reference. The vector must be empty if there are no target
    * services. The upper bound on the number of target services in the vector
    * is the upper bound on the {@link ReferenceDTO#cardinality cardinality} of
    * the reference.
    */
-  std::vector<cppmicroservices::framework::dto::ServiceReferenceDTO> targetServices;
+  std::vector<cppmicroservices::framework::dto::ServiceReferenceDTO>
+    targetServices;
 };
 }
 }

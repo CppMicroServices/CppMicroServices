@@ -31,8 +31,7 @@ Json::Value ParseManifestOrThrow(std::istream& jsonStream)
   rbuilder["rejectDupKeys"] = true;
   std::string errs;
 
-  if (!Json::parseFromStream(rbuilder, jsonStream, &root, &errs))
-  {
+  if (!Json::parseFromStream(rbuilder, jsonStream, &root, &errs)) {
     throw std::runtime_error(errs);
   }
   return root;
@@ -40,9 +39,9 @@ Json::Value ParseManifestOrThrow(std::istream& jsonStream)
 
 void WriteToFile(const std::string& filePath, const std::string& content)
 {
-  auto fileStream = std::ofstream(filePath, std::ofstream::binary | std::ofstream::out);
-  if(!fileStream.is_open())
-  {
+  auto fileStream =
+    std::ofstream(filePath, std::ofstream::binary | std::ofstream::out);
+  if (!fileStream.is_open()) {
     throw std::runtime_error("Could not open out file at " + filePath);
   }
   fileStream << content;

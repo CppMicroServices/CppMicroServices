@@ -20,29 +20,29 @@
 
   =============================================================================*/
 
-#include <memory>
 #include <future>
 #include <iostream>
+#include <memory>
 #include <random>
 
-#include "Mocks.hpp"
-#include "ConcurrencyTestUtil.hpp"
-#include "cppmicroservices/Framework.h"
-#include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/FrameworkEvent.h"
 #include "../src/manager/states/CCActiveState.hpp"
+#include "ConcurrencyTestUtil.hpp"
+#include "Mocks.hpp"
+#include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkEvent.h"
+#include "cppmicroservices/FrameworkFactory.h"
 
 typedef std::chrono::time_point<std::chrono::system_clock> TimePoint;
 
 namespace cppmicroservices {
 namespace scrimpl {
 
-class CCActiveStateTest
-  : public ::testing::Test
+class CCActiveStateTest : public ::testing::Test
 {
 protected:
-  CCActiveStateTest() : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  { }
+  CCActiveStateTest()
+    : framework(cppmicroservices::FrameworkFactory().NewFramework())
+  {}
   virtual ~CCActiveStateTest() = default;
 
   virtual void SetUp()
@@ -88,9 +88,7 @@ TEST_F(CCActiveStateTest, TestRegister)
   auto state = std::make_shared<CCActiveState>();
   mockCompConfig->SetState(state);
   EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::ACTIVE);
-  EXPECT_NO_THROW({
-      state->Register(*mockCompConfig);
-    });
+  EXPECT_NO_THROW({ state->Register(*mockCompConfig); });
   EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::ACTIVE);
   EXPECT_EQ(mockCompConfig->GetState(), state);
 }
@@ -104,9 +102,9 @@ TEST_F(CCActiveStateTest, TestActivate)
     .Times(1)
     .WillOnce(testing::Return(std::make_shared<MockComponentInstance>()));
   EXPECT_NO_THROW({
-      auto inst = state->Activate(*mockCompConfig, framework);
-      EXPECT_NE(inst, nullptr);
-    });
+    auto inst = state->Activate(*mockCompConfig, framework);
+    EXPECT_NE(inst, nullptr);
+  });
   EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::ACTIVE);
   EXPECT_EQ(mockCompConfig->GetState(), state);
 }
@@ -119,10 +117,10 @@ TEST_F(CCActiveStateTest, TestActivateWithInvalidLatch)
   EXPECT_CALL(*mockCompConfig, CreateAndActivateComponentInstance(testing::_))
     .WillOnce(testing::Return(nullptr));
   EXPECT_NO_THROW({
-      state->WaitForTransitionTask();
-      auto inst = state->Activate(*mockCompConfig, framework);
-      EXPECT_EQ(inst, nullptr);
-    });
+    state->WaitForTransitionTask();
+    auto inst = state->Activate(*mockCompConfig, framework);
+    EXPECT_EQ(inst, nullptr);
+  });
   EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::ACTIVE);
   EXPECT_EQ(mockCompConfig->GetState(), state);
 }
@@ -133,17 +131,16 @@ TEST_F(CCActiveStateTest, TestConcurrentActivate)
   mockCompConfig->SetState(state);
   EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::ACTIVE);
   EXPECT_CALL(*mockCompConfig, CreateAndActivateComponentInstance(testing::_))
-    .WillRepeatedly(testing::Invoke([](const Bundle&) {
-                                      return std::make_shared<MockComponentInstance>();
-                                    }));
-  std::function<std::shared_ptr<ComponentInstance>()> func = [&](){
-                                                               return state->Activate(*mockCompConfig, framework);
-                                                             };
+    .WillRepeatedly(testing::Invoke(
+      [](const Bundle&) { return std::make_shared<MockComponentInstance>(); }));
+  std::function<std::shared_ptr<ComponentInstance>()> func = [&]() {
+    return state->Activate(*mockCompConfig, framework);
+  };
   auto results = ConcurrentInvoke(func);
   auto resultSize = results.size();
   // eliminate duplicates
-  auto it = std::unique (results.begin(), results.end());
-  results.resize(std::distance(results.begin(),it));
+  auto it = std::unique(results.begin(), results.end());
+  results.resize(std::distance(results.begin(), it));
   EXPECT_EQ(resultSize, results.size());
 
   EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::ACTIVE);
@@ -154,13 +151,11 @@ TEST_F(CCActiveStateTest, TestDeactivate)
 {
   auto state = std::make_shared<CCActiveState>();
   mockCompConfig->SetState(state);
-  EXPECT_CALL(*mockCompConfig, DestroyComponentInstances())
-    .Times(1);
+  EXPECT_CALL(*mockCompConfig, DestroyComponentInstances()).Times(1);
   EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::ACTIVE);
-  EXPECT_NO_THROW({
-      state->Deactivate(*mockCompConfig);
-    });
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_NO_THROW({ state->Deactivate(*mockCompConfig); });
+  EXPECT_EQ(mockCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
   EXPECT_NE(mockCompConfig->GetState(), state);
 }
 
@@ -168,15 +163,15 @@ TEST_F(CCActiveStateTest, TestConcurrentDeactivate)
 {
   auto state = std::make_shared<CCActiveState>();
   mockCompConfig->SetState(state);
-  EXPECT_CALL(*mockCompConfig, DestroyComponentInstances())
-    .Times(1);
+  EXPECT_CALL(*mockCompConfig, DestroyComponentInstances()).Times(1);
   EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::ACTIVE);
-  std::function<bool()> func = [&](){
-                                 state->Deactivate(*mockCompConfig);
-                                 return true;
-                               };
+  std::function<bool()> func = [&]() {
+    state->Deactivate(*mockCompConfig);
+    return true;
+  };
   auto results = ConcurrentInvoke(func);
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(mockCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
   EXPECT_NE(mockCompConfig->GetState(), state);
 }
 
@@ -187,33 +182,30 @@ TEST_F(CCActiveStateTest, TestConcurrentActivateDeactivate)
   std::atomic<int> activeInstanceCount;
   EXPECT_CALL(*mockCompConfig, DestroyComponentInstances())
     .Times(1)
-    .WillOnce(testing::Invoke([&]() {
-                                activeInstanceCount = 0;
-                              }));
+    .WillOnce(testing::Invoke([&]() { activeInstanceCount = 0; }));
   EXPECT_CALL(*mockCompConfig, CreateAndActivateComponentInstance(testing::_))
     .WillRepeatedly(testing::Invoke([&](const Bundle&) {
-                                      activeInstanceCount++;
-                                      return std::make_shared<MockComponentInstance>();
-                                    }));
+      activeInstanceCount++;
+      return std::make_shared<MockComponentInstance>();
+    }));
   EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::ACTIVE);
-  std::function<std::pair<TimePoint,bool>()> func = [&](){
-                                                      std::random_device rd;
-                                                      std::mt19937 gen(rd());
-                                                      std::uniform_int_distribution<unsigned int> dis;
-                                                      int randVal = dis(gen);
-                                                      if(randVal & 0x1)
-                                                      {
-                                                        auto inst = state->Activate(*mockCompConfig, Bundle());
-                                                        return std::make_pair(std::chrono::system_clock::now(), inst ? true : false);
-                                                      }
-                                                      else
-                                                      {
-                                                        state->Deactivate(*mockCompConfig);
-                                                        return std::make_pair(std::chrono::system_clock::now(),false);
-                                                      }
-                                                    };
+  std::function<std::pair<TimePoint, bool>()> func = [&]() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<unsigned int> dis;
+    int randVal = dis(gen);
+    if (randVal & 0x1) {
+      auto inst = state->Activate(*mockCompConfig, Bundle());
+      return std::make_pair(std::chrono::system_clock::now(),
+                            inst ? true : false);
+    } else {
+      state->Deactivate(*mockCompConfig);
+      return std::make_pair(std::chrono::system_clock::now(), false);
+    }
+  };
   auto results = ConcurrentInvoke(func);
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(mockCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
   EXPECT_NE(mockCompConfig->GetState(), state);
   EXPECT_EQ(activeInstanceCount, 0);
 }

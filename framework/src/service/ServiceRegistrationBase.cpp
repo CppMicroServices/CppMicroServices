@@ -90,7 +90,8 @@ ServiceRegistrationBase::~ServiceRegistrationBase()
     delete d;
 }
 
-ServiceReferenceBase ServiceRegistrationBase::GetReference(const std::string& interfaceId) const
+ServiceReferenceBase ServiceRegistrationBase::GetReference(
+  const std::string& interfaceId) const
 {
   if (!d)
     throw std::logic_error("ServiceRegistrationBase object invalid");
@@ -254,12 +255,12 @@ void ServiceRegistrationBase::Unregister()
         } catch (const std::exception& ex) {
           std::string message(
             "ServiceFactory UngetService implementation threw an exception");
-          d->bundle->coreCtx->listeners.SendFrameworkEvent(
-            FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                           MakeBundle(d->bundle->shared_from_this()),
-                           message,
-                           std::make_exception_ptr(ServiceException(ex.what(), 
-                             ServiceException::Type::FACTORY_EXCEPTION))));
+          d->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
+            FrameworkEvent::Type::FRAMEWORK_ERROR,
+            MakeBundle(d->bundle->shared_from_this()),
+            message,
+            std::make_exception_ptr(ServiceException(
+              ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
         }
       }
     }
@@ -272,12 +273,12 @@ void ServiceRegistrationBase::Unregister()
       } catch (const std::exception& ex) {
         std::string message(
           "ServiceFactory UngetService implementation threw an exception");
-        d->bundle->coreCtx->listeners.SendFrameworkEvent(
-          FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                         MakeBundle(d->bundle->shared_from_this()),
-                         message,
-                         std::make_exception_ptr(ServiceException(ex.what(), 
-                           ServiceException::Type::FACTORY_EXCEPTION))));
+        d->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
+          FrameworkEvent::Type::FRAMEWORK_ERROR,
+          MakeBundle(d->bundle->shared_from_this()),
+          message,
+          std::make_exception_ptr(ServiceException(
+            ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
       }
     }
   }

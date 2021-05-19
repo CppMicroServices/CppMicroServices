@@ -20,23 +20,23 @@
 
   =============================================================================*/
 
+#include <algorithm>
 #include <cstdio>
 #include <iostream>
-#include <algorithm>
 #include <random>
 
 #include "cppmicroservices/Any.h"
+#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/BundleContext.h"
 
 #include "../src/manager/ComponentManagerImpl.hpp"
 #include "../src/manager/states/ComponentManagerState.hpp"
 #include "../src/metadata/ComponentMetadata.hpp"
 
-#include "Mocks.hpp"
 #include "ConcurrencyTestUtil.hpp"
+#include "Mocks.hpp"
 
 using cppmicroservices::Any;
 using cppmicroservices::Bundle;
@@ -98,16 +98,19 @@ TEST(ComponentManagerImplTest, Ctor)
 }
 
 // The fixture for testing class ComponentManagerImpl.
-class ComponentManagerImplParameterizedTest : public ::testing::TestWithParam<std::shared_ptr<metadata::ComponentMetadata>> {
+class ComponentManagerImplParameterizedTest
+  : public ::testing::TestWithParam<
+      std::shared_ptr<metadata::ComponentMetadata>>
+{
 protected:
   ComponentManagerImplParameterizedTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {
-  }
+  {}
 
   virtual ~ComponentManagerImplParameterizedTest() = default;
 
-  virtual void SetUp() {
+  virtual void SetUp()
+  {
     framework.Start();
     fakeLogger = std::make_shared<FakeLogger>();
     mockRegistry = std::make_shared<MockComponentRegistry>();
@@ -117,7 +120,8 @@ protected:
 
   }
 
-  virtual void TearDown() {
+  virtual void TearDown()
+  {
     fakeLogger.reset();
     mockRegistry.reset();
     framework.Stop();
@@ -133,7 +137,6 @@ protected:
 
 TEST_P(ComponentManagerImplParameterizedTest, VerifyInitialize)
 {
-  auto compDesc = GetParam();
   auto compMgr = std::make_shared<ComponentManagerImpl>(compDesc,
                                                         mockRegistry,
                                                         framework.GetBundleContext(),
@@ -143,7 +146,8 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyInitialize)
                                                         managers);
   EXPECT_EQ(compMgr->IsEnabled(), false) << "Illegal state before Initialization";
   compMgr->Initialize();
-  EXPECT_EQ(compMgr->IsEnabled(), compMgr->GetMetadata()->enabled) << "Illegal state after Initialization";
+  EXPECT_EQ(compMgr->IsEnabled(), compMgr->GetMetadata()->enabled)
+    << "Illegal state after Initialization";
 }
 
 TEST_P(ComponentManagerImplParameterizedTest, VerifyEnable)
@@ -157,12 +161,14 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyEnable)
                                                         notifier,
                                                         managers);
   EXPECT_NO_THROW({
-      compMgr->Initialize();
-      compMgr->Enable();
-      EXPECT_EQ(compMgr->IsEnabled(), true) << "State expected to be ENABLED";
-      compMgr->Enable(); // enabling an already enabled component results in no state change
-      EXPECT_EQ(compMgr->IsEnabled(), true) << "State expected to stay as ENABLED";
-    });
+    compMgr->Initialize();
+    compMgr->Enable();
+    EXPECT_EQ(compMgr->IsEnabled(), true) << "State expected to be ENABLED";
+    compMgr
+      ->Enable(); // enabling an already enabled component results in no state change
+    EXPECT_EQ(compMgr->IsEnabled(), true)
+      << "State expected to stay as ENABLED";
+  });
 }
 
 TEST_P(ComponentManagerImplParameterizedTest, VerifyDisable)
@@ -176,12 +182,14 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyDisable)
                                                         notifier,
                                                         managers);
   EXPECT_NO_THROW({
-      compMgr->Initialize();
-      compMgr->Disable();
-      EXPECT_EQ(compMgr->IsEnabled(), false) << "State expected to be DISABLED";
-      compMgr->Disable(); // Disabling an already disabled component results in no state change
-      EXPECT_EQ(compMgr->IsEnabled(), false) << "State expected to stay as DISABLED";
-    });
+    compMgr->Initialize();
+    compMgr->Disable();
+    EXPECT_EQ(compMgr->IsEnabled(), false) << "State expected to be DISABLED";
+    compMgr
+      ->Disable(); // Disabling an already disabled component results in no state change
+    EXPECT_EQ(compMgr->IsEnabled(), false)
+      << "State expected to stay as DISABLED";
+  });
 }
 
 TEST_P(ComponentManagerImplParameterizedTest, VerifyStateChangeCount)
@@ -195,13 +203,16 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyStateChangeCount)
                                                             notifier,
                                                             managers);
   EXPECT_NO_THROW({
-      compMgr->Initialize();
-      compMgr->ResetCounter();
-      auto wasEnabled = compMgr->IsEnabled();
-      compMgr->Disable();
-      EXPECT_EQ(compMgr->statechangecount, wasEnabled ? 1 : 0) << "Unexpected number of state changes during a call to Disable a ComponentManager";
-      EXPECT_EQ(compMgr->IsEnabled(), false) << "ComponentManager must be in DISABLED state after a call to Disable";
-    });
+    compMgr->Initialize();
+    compMgr->ResetCounter();
+    auto wasEnabled = compMgr->IsEnabled();
+    compMgr->Disable();
+    EXPECT_EQ(compMgr->statechangecount, wasEnabled ? 1 : 0)
+      << "Unexpected number of state changes during a call to Disable a "
+         "ComponentManager";
+    EXPECT_EQ(compMgr->IsEnabled(), false)
+      << "ComponentManager must be in DISABLED state after a call to Disable";
+  });
 }
 
 TEST_P(ComponentManagerImplParameterizedTest, VerifySequentialStateChange)
@@ -215,24 +226,32 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifySequentialStateChange)
                                                             notifier,
                                                             managers);
   EXPECT_NO_THROW({
-
-      auto prevState = compMgr->IsEnabled();
-      compMgr->Initialize();
-      // Initialize will swicth to enabled only if "enabled" is set in the comp description
-      // two atomic swaps per state change.
-      EXPECT_EQ(compMgr->statechangecount, compMgr->GetMetadata()->enabled ? 1 : 0) << "Unexpected number of state changes during a call to Initialize a ComponentManager";
-      prevState = compMgr->IsEnabled();
-      compMgr->ResetCounter();
-      compMgr->Disable();
-      EXPECT_EQ(compMgr->IsEnabled(), false) << "ComponentManager must be in DISABLED state after a call to Disable";
-      EXPECT_EQ(compMgr->statechangecount, prevState ? 1 : 0) << "Unexpected number of state changes during a call to Disable a ComponentManager";
-      compMgr->ResetCounter();
-      prevState = compMgr->IsEnabled();
-      compMgr->Enable();
-      EXPECT_EQ(compMgr->statechangecount, !prevState ? 1 : 0) << "Unexpected number of state changes during a call to Enable a ComponentManager";
-      EXPECT_EQ(compMgr->IsEnabled(), true) << "ComponentManager must be in ENABLED state after a call to Enable";
-      compMgr->ResetCounter();
-    });
+    auto prevState = compMgr->IsEnabled();
+    compMgr->Initialize();
+    // Initialize will swicth to enabled only if "enabled" is set in the comp description
+    // two atomic swaps per state change.
+    EXPECT_EQ(compMgr->statechangecount,
+              compMgr->GetMetadata()->enabled ? 1 : 0)
+      << "Unexpected number of state changes during a call to Initialize a "
+         "ComponentManager";
+    prevState = compMgr->IsEnabled();
+    compMgr->ResetCounter();
+    compMgr->Disable();
+    EXPECT_EQ(compMgr->IsEnabled(), false)
+      << "ComponentManager must be in DISABLED state after a call to Disable";
+    EXPECT_EQ(compMgr->statechangecount, prevState ? 1 : 0)
+      << "Unexpected number of state changes during a call to Disable a "
+         "ComponentManager";
+    compMgr->ResetCounter();
+    prevState = compMgr->IsEnabled();
+    compMgr->Enable();
+    EXPECT_EQ(compMgr->statechangecount, !prevState ? 1 : 0)
+      << "Unexpected number of state changes during a call to Enable a "
+         "ComponentManager";
+    EXPECT_EQ(compMgr->IsEnabled(), true)
+      << "ComponentManager must be in ENABLED state after a call to Enable";
+    compMgr->ResetCounter();
+  });
 }
 
 TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentEnable)
@@ -252,16 +271,19 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentEnable)
 
   // test concurrent calls to "enable" from multiple threads
   std::function<std::shared_future<void>()> func = [compMgr]() {
-                                                     return compMgr->Enable();
-                                                   };
+    return compMgr->Enable();
+  };
   std::vector<std::shared_future<void>> results = ConcurrentInvoke(func);
 
   // verify component manager is disabled and the manager has performed two atomic state change operations for the disable operation.
-  EXPECT_EQ(compMgr->IsEnabled(), true) << "ComponentManager must be in ENABLED state after a call to Enable";
-  EXPECT_EQ(compMgr->statechangecount, 1) << "Unexpected number of state changes after concurrent calls to Enable a ComponentManager";
-  for(auto& fut : results)
-  {
-    EXPECT_EQ(fut.valid(), true) << "A valid future is expected as a return value from ComponentManager::Enable";
+  EXPECT_EQ(compMgr->IsEnabled(), true)
+    << "ComponentManager must be in ENABLED state after a call to Enable";
+  EXPECT_EQ(compMgr->statechangecount, 1)
+    << "Unexpected number of state changes after concurrent calls to Enable a "
+       "ComponentManager";
+  for (auto& fut : results) {
+    EXPECT_EQ(fut.valid(), true) << "A valid future is expected as a return "
+                                    "value from ComponentManager::Enable";
     fut.wait();
   }
 }
@@ -283,16 +305,19 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentDisable)
 
   // test concurrent calls to "disable" from multiple threads
   std::function<std::shared_future<void>()> func = [compMgr]() {
-                                                     return compMgr->Disable();
-                                                   };
+    return compMgr->Disable();
+  };
   std::vector<std::shared_future<void>> results = ConcurrentInvoke(func);
 
   // verify component manager is disabled and the manager has performed two atomic state change operations for the disable operation.
-  EXPECT_EQ(compMgr->IsEnabled(), false) << "ComponentManager must be in DISABLED state after a call to Disable";
-  EXPECT_EQ(compMgr->statechangecount, 1) << "Unexpected number of state changes after concurrent calls to Disable a ComponentManager";
-  for(auto& fut : results)
-  {
-    EXPECT_EQ(fut.valid(), true) << "A valid future is expected as a return value from ComponentManager::Disable";
+  EXPECT_EQ(compMgr->IsEnabled(), false)
+    << "ComponentManager must be in DISABLED state after a call to Disable";
+  EXPECT_EQ(compMgr->statechangecount, 1)
+    << "Unexpected number of state changes after concurrent calls to Disable a "
+       "ComponentManager";
+  for (auto& fut : results) {
+    EXPECT_EQ(fut.valid(), true) << "A valid future is expected as a return "
+                                    "value from ComponentManager::Disable";
     fut.wait();
   }
 }
@@ -310,21 +335,19 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentEnableDisable)
   compMgr->Initialize();
   // test concurrent calls to enable and disable from multiple threads
   std::function<std::shared_future<void>()> func = [compMgr]() mutable {
-                                                     std::vector<std::shared_future<void>> futVec;
-                                                     std::random_device rd;
-                                                     std::mt19937 gen(rd());
-                                                     std::uniform_int_distribution<unsigned int> dis(20,50);
-                                                     int randVal = dis(gen); // random number in range [20, 50)
-                                                     for(int i =0; i < randVal; ++i)
-                                                     {
-                                                       futVec.push_back(((i & 0x1) ? compMgr->Disable() : compMgr->Enable()));
-                                                     }
-                                                     return futVec.back();
-                                                   };
+    std::vector<std::shared_future<void>> futVec;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<unsigned int> dis(20, 50);
+    int randVal = dis(gen); // random number in range [20, 50)
+    for (int i = 0; i < randVal; ++i) {
+      futVec.push_back(((i & 0x1) ? compMgr->Disable() : compMgr->Enable()));
+    }
+    return futVec.back();
+  };
   std::vector<std::shared_future<void>> results = ConcurrentInvoke(func);
 
-  for(auto& fut : results)
-  {
+  for (auto& fut : results) {
     EXPECT_EQ(fut.valid(), true);
     fut.get();
   }
@@ -341,7 +364,9 @@ TEST_P(ComponentManagerImplParameterizedTest, TestAccumulateFutures)
                                                             notifier,
                                                             managers);
 
-  EXPECT_EQ(compMgr->disableFutures.size(), 0ul) << "Disabled futures list must be empty before any calls to AccumulateFuture method";
+  EXPECT_EQ(compMgr->disableFutures.size(), 0ul)
+    << "Disabled futures list must be empty before any calls to "
+       "AccumulateFuture method";
   std::promise<void> p1;
   compMgr->AccumulateFuture(p1.get_future().share());
   EXPECT_EQ(compMgr->disableFutures.size(), 1ul);
@@ -367,8 +392,9 @@ TEST_P(ComponentManagerImplParameterizedTest, TestAccumulateFutures)
 /**
  * Util method to create component descriptions used for parametrized tests for ComponentManagerImpl
  */
-std::shared_ptr<metadata::ComponentMetadata> CreateComponentMetadata(const std::string& implClassName,
-                                                                     bool defaultEnabled)
+std::shared_ptr<metadata::ComponentMetadata> CreateComponentMetadata(
+  const std::string& implClassName,
+  bool defaultEnabled)
 {
   auto compDesc = std::make_shared<metadata::ComponentMetadata>();
   compDesc->name = compDesc->implClassName = implClassName;
@@ -377,9 +403,10 @@ std::shared_ptr<metadata::ComponentMetadata> CreateComponentMetadata(const std::
   return compDesc;
 }
 
-INSTANTIATE_TEST_SUITE_P(ComponentManagerParameterized, ComponentManagerImplParameterizedTest,
-                        testing::Values(CreateComponentMetadata("foo", false)/* default disabled */,
-                                        CreateComponentMetadata("bar", true) /* default enabled */));
+INSTANTIATE_TEST_SUITE_P(
+  ComponentManagerParameterized,
+  ComponentManagerImplParameterizedTest,
+  testing::Values(CreateComponentMetadata("foo", false) /* default disabled */,
+                  CreateComponentMetadata("bar", true) /* default enabled */));
 }
 }
-

@@ -64,7 +64,8 @@ std::string GetComponentNameStr(const ComponentInfo& compInfo);
 std::string GetServiceInterfacesStr(const ServiceInfo& compInfo);
 std::string GetCtorInjectedRefTypes(const ComponentInfo& compInfo);
 std::string GetCtorInjectedRefNames(const ComponentInfo& compInfo);
-std::string GetReferenceBinderStr(const ReferenceInfo& ref, bool injectReferences);
+std::string GetReferenceBinderStr(const ReferenceInfo& ref,
+                                  bool injectReferences);
 
 } // namespace datamodel
 } // namespace codegen

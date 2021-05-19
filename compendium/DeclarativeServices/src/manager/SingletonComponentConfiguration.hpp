@@ -65,7 +65,8 @@ public:
    *
    * \param the bundle making the service request
    */
-  std::shared_ptr<ComponentInstance> CreateAndActivateComponentInstance(const cppmicroservices::Bundle& bundle) /* noexcept */ override;
+  std::shared_ptr<ComponentInstance> CreateAndActivateComponentInstance(
+    const cppmicroservices::Bundle& bundle) /* noexcept */ override;
 
   /**
    * Method called to modify the configuration properties for this component configuration. 
@@ -84,16 +85,18 @@ public:
    * This method always returns the same service implementation object.
    * A nullptr is returned if a service instance cannot be created or activated.
    */
-  cppmicroservices::InterfaceMapConstPtr GetService(const cppmicroservices::Bundle& bundle,
-                                                    const cppmicroservices::ServiceRegistrationBase& registration) override;
+  cppmicroservices::InterfaceMapConstPtr GetService(
+    const cppmicroservices::Bundle& bundle,
+    const cppmicroservices::ServiceRegistrationBase& registration) override;
 
   /**
    * Implements the {@link ServiceFactory#UngetService} interface. No-op since the
    * service is a \c shared_ptr
    */
-  void UngetService(const cppmicroservices::Bundle& bundle,
-                    const cppmicroservices::ServiceRegistrationBase& registration,
-                    const cppmicroservices::InterfaceMapConstPtr& service) override;
+  void UngetService(
+    const cppmicroservices::Bundle& bundle,
+    const cppmicroservices::ServiceRegistrationBase& registration,
+    const cppmicroservices::InterfaceMapConstPtr& service) override;
 
   /**
    * Calls the service component's bind method while performing a dynamic rebind.
@@ -102,7 +105,8 @@ public:
    * \param ref is the service reference to the target service to bind. A default
    *  constructed \c ServiceReferenceBase denotes that there is no service to bind.
    */
-  void BindReference(const std::string& refName, const ServiceReferenceBase& ref) override;
+  void BindReference(const std::string& refName,
+                     const ServiceReferenceBase& ref) override;
 
   /**
    * Calls the service component's unbind method while performing a dynamic rebind.
@@ -110,15 +114,20 @@ public:
    * \param refName is the name of the reference as defined in the SCR JSON
    * \param ref is the service reference to the target service to unbind. A default
    *  constructed \c ServiceReferenceBase denotes that there is no service to unbind.
-   */  
-  void UnbindReference(const std::string& refName, const ServiceReferenceBase& ref) override;
+   */
+  void UnbindReference(const std::string& refName,
+                       const ServiceReferenceBase& ref) override;
 
 private:
-  FRIEND_TEST(SingletonComponentConfigurationTest, TestConcurrentCreateAndActivateComponentInstance);
-  FRIEND_TEST(SingletonComponentConfigurationTest, TestCreateAndActivateComponentInstance);
-  FRIEND_TEST(SingletonComponentConfigurationTest, TestDestroyComponentInstances);
+  FRIEND_TEST(SingletonComponentConfigurationTest,
+              TestConcurrentCreateAndActivateComponentInstance);
+  FRIEND_TEST(SingletonComponentConfigurationTest,
+              TestCreateAndActivateComponentInstance);
+  FRIEND_TEST(SingletonComponentConfigurationTest,
+              TestDestroyComponentInstances);
   FRIEND_TEST(SingletonComponentConfigurationTest, TestGetService);
-  FRIEND_TEST(SingletonComponentConfigurationTest, TestDestroyComponentInstances_DeactivateFailure);
+  FRIEND_TEST(SingletonComponentConfigurationTest,
+              TestDestroyComponentInstances_DeactivateFailure);
 
   /**
    * Set the member data, only used in tests
@@ -135,7 +144,8 @@ private:
    */
   std::shared_ptr<ComponentInstance> GetComponentInstance();
 
-  Guarded<InstanceContextPair> data; ///< singleton pair of component instance and context associated with this configuration
+  Guarded<InstanceContextPair>
+    data; ///< singleton pair of component instance and context associated with this configuration
 };
 }
 }

@@ -24,11 +24,11 @@
 #define COMPONENTMETADATA_HPP
 
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
-#include "ServiceMetadata.hpp"
 #include "ReferenceMetadata.hpp"
+#include "ServiceMetadata.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -47,8 +47,8 @@ struct ComponentMetadata
   {}
 
   std::string name;
-  bool enabled{true};
-  bool immediate{false};
+  bool enabled{ true };
+  bool immediate{ false };
   std::string implClassName;
   std::string activateMethodName;
   std::string deactivateMethodName;

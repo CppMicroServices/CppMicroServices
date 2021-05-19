@@ -42,9 +42,11 @@ public:
   explicit CCUnsatisfiedReferenceState(std::shared_future<void> blockUntil);
   ~CCUnsatisfiedReferenceState() override = default;
   CCUnsatisfiedReferenceState(const CCUnsatisfiedReferenceState&) = delete;
-  CCUnsatisfiedReferenceState& operator=(const CCUnsatisfiedReferenceState&) = delete;
+  CCUnsatisfiedReferenceState& operator=(const CCUnsatisfiedReferenceState&) =
+    delete;
   CCUnsatisfiedReferenceState(CCUnsatisfiedReferenceState&&) = delete;
-  CCUnsatisfiedReferenceState& operator=(CCUnsatisfiedReferenceState&&) = delete;
+  CCUnsatisfiedReferenceState& operator=(CCUnsatisfiedReferenceState&&) =
+    delete;
 
   /**
    * This method will set handle the operations for transitioning the state
@@ -55,8 +57,9 @@ public:
   /**
    * Calling an Activate transition on UNSATISFIED_REFERENCE state is a no-op
    */
-  std::shared_ptr<ComponentInstance> Activate(ComponentConfigurationImpl& /*mgr*/,
-                                              const cppmicroservices::Bundle& /*clientBundle*/) override
+  std::shared_ptr<ComponentInstance> Activate(
+    ComponentConfigurationImpl& /*mgr*/,
+    const cppmicroservices::Bundle& /*clientBundle*/) override
   {
     return nullptr;
   };
@@ -65,7 +68,8 @@ public:
    * This method does not result in a state change since the component configuration is already in
    * UNSATISFIED_REFERENCE state. 
    */
-  void Deactivate(ComponentConfigurationImpl& /*mgr*/) override {
+  void Deactivate(ComponentConfigurationImpl& /*mgr*/) override
+  {
     // wait for the transition to finish
     WaitForTransitionTask();
   };
@@ -89,9 +93,13 @@ public:
    * Returns {\code ComponentState::UNSATISFIED_REFERENCE} to indicate the
    * state represented by this object
    */
-  ComponentState GetValue() const override { return ComponentState::UNSATISFIED_REFERENCE; }
+  ComponentState GetValue() const override
+  {
+    return ComponentState::UNSATISFIED_REFERENCE;
+  }
 
   void WaitForTransitionTask() override { ready.get(); }
+
 private:
   std::shared_future<void> ready;
 };

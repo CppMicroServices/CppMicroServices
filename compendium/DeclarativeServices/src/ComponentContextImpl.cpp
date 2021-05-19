@@ -82,10 +82,14 @@ void ComponentContextImpl::InitializeServicesCache()
                 .ToStringNoExcept();
             cppmicroservices::ServiceObjects<void> sObjs =
               bc.GetServiceObjects(sRefU);
-            serviceMap.push_back(sObjs.GetService());
+            auto interfaceMap = sObjs.GetService();
+            if (interfaceMap) {
+                serviceMap.push_back(interfaceMap);
+            }
           }
         }
       });
+ 
   }
 }
 
@@ -208,7 +212,7 @@ void ComponentContextImpl::Invalidate()
   boundServicesCacheHandle->clear();
 }
 
-void ComponentContextImpl::AddToBoundServicesCache(
+bool ComponentContextImpl::AddToBoundServicesCache(
   const std::string& refName,
   const cppmicroservices::ServiceReferenceBase& sRef)
 {
@@ -216,8 +220,13 @@ void ComponentContextImpl::AddToBoundServicesCache(
   cppmicroservices::ServiceObjects<void> sObjs =
     bc.GetServiceObjects(ServiceReferenceU(sRef));
   auto boundServicesCacheHandle = boundServicesCache.lock();
+  auto interfaceMap = sObjs.GetService();
+  if (!interfaceMap) {
+    return false;
+  }
   (*boundServicesCacheHandle)[refName].emplace_back(
-    sObjs.GetService());
+    interfaceMap);
+  return true;
 }
 
 void ComponentContextImpl::RemoveFromBoundServicesCache(
@@ -249,6 +258,7 @@ void ComponentContextImpl::RemoveFromBoundServicesCache(
                 servicesMap->at(serviceInterface));
       }),
     services.end());
+  return;
 }
 
 }

@@ -27,9 +27,7 @@ namespace service {
 namespace component {
 namespace runtime {
 
-ServiceComponentRuntime::~ServiceComponentRuntime() noexcept
-{
-}
+ServiceComponentRuntime::~ServiceComponentRuntime() noexcept {}
 
 }
 }

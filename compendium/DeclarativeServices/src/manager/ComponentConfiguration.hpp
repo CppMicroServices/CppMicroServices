@@ -22,10 +22,10 @@
 
 #ifndef __COMPONENTCONFIGURATION_HPP__
 #define __COMPONENTCONFIGURATION_HPP__
-#include <unordered_map>
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/servicecomponent/runtime/dto/ComponentConfigurationDTO.hpp"
+#include <unordered_map>
 
 using cppmicroservices::service::component::runtime::dto::ComponentState;
 
@@ -56,13 +56,15 @@ public:
    * Returns a list of all the reference manager objects used to track
    * this configuration's dependencies
    */
-  virtual std::vector<std::shared_ptr<ReferenceManager>> GetAllDependencyManagers() const = 0;
+  virtual std::vector<std::shared_ptr<ReferenceManager>>
+  GetAllDependencyManagers() const = 0;
 
   /**
    * Returns the reference manager object used to track a service dependency
    * with a specific name
    */
-  virtual std::shared_ptr<ReferenceManager> GetDependencyManager(const std::string& refName) const = 0;
+  virtual std::shared_ptr<ReferenceManager> GetDependencyManager(
+    const std::string& refName) const = 0;
 
   /**
    * Returns a valid ServiceReference object if this component is registered in
@@ -79,7 +81,8 @@ public:
   /**
    * Returns a map with properties specific to this component configuration
    */
-  virtual std::unordered_map<std::string, cppmicroservices::Any> GetProperties() const = 0;
+  virtual std::unordered_map<std::string, cppmicroservices::Any> GetProperties()
+    const = 0;
 
   /**
    * Returns the bundle that contains this component

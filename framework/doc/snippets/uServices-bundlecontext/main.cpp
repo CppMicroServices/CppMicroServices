@@ -23,7 +23,7 @@ void RetrieveBundleContext()
 CPPMICROSERVICES_INITIALIZE_BUNDLE
 //! [InitializeBundle]
 
-int main(int /*argc*/, char* /*argv*/ [])
+int main(int /*argc*/, char* /*argv*/[])
 {
   std::cout
     << "This snippet is not meant to be executed.\n"

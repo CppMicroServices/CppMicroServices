@@ -23,8 +23,8 @@
 #ifndef CPPMICROSERVICES_BUNDLERESOURCE_H
 #define CPPMICROSERVICES_BUNDLERESOURCE_H
 
-#include <functional>
 #include "cppmicroservices/FrameworkExport.h"
+#include <functional>
 
 #include <cstdint>
 #include <memory>

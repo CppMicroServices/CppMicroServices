@@ -32,15 +32,24 @@ namespace service {
 namespace component {
 namespace runtime {
 namespace dto {
+
 /**
+ \defgroup gr_referencedto ReferenceDTO
+ \brief Groups ReferenceDTO related symbols.
+ */
+
+/**
+ * \ingroup gr_referencedto 
+ *
  * A representation of a declared reference to a service.
  */
-struct US_ServiceComponent_EXPORT ReferenceDTO {
+struct US_ServiceComponent_EXPORT ReferenceDTO
+{
   /**
    * The name of the reference.
    *
    * <p>
-   * This is declared in the {@code name} attribute of the {@code reference}
+   * This is declared in the \c name attribute of the \c reference
    * element. This must be the default name if the component description does
    * not declare a name for the reference.
    */
@@ -50,8 +59,8 @@ struct US_ServiceComponent_EXPORT ReferenceDTO {
    * The service interface of the reference.
    *
    * <p>
-   * This is declared in the {@code interface} attribute of the
-   * {@code reference} element.
+   * This is declared in the \c interface attribute of the
+   * \c reference element.
    */
   std::string interfaceName;
 
@@ -59,8 +68,8 @@ struct US_ServiceComponent_EXPORT ReferenceDTO {
    * The cardinality of the reference.
    *
    * <p>
-   * This is declared in the {@code cardinality} attribute of the
-   * {@code reference} element. This must be the default cardinality if the
+   * This is declared in the \c cardinality attribute of the
+   * \c reference element. This must be the default cardinality if the
    * component description does not declare a cardinality for the reference.
    */
   std::string cardinality;
@@ -69,7 +78,7 @@ struct US_ServiceComponent_EXPORT ReferenceDTO {
    * The policy of the reference.
    *
    * <p>
-   * This is declared in the {@code policy} attribute of the {@code reference}
+   * This is declared in the \c policy attribute of the \c reference
    * element. This must be the default policy if the component description
    * does not declare a policy for the reference.
    */
@@ -79,8 +88,8 @@ struct US_ServiceComponent_EXPORT ReferenceDTO {
    * The policy option of the reference.
    *
    * <p>
-   * This is declared in the {@code policy-option} attribute of the
-   * {@code reference} element. This must be the default policy option if the
+   * This is declared in the \c policy-option attribute of the
+   * \c reference element. This must be the default policy option if the
    * component description does not declare a policy option for the reference.
    */
   std::string policyOption;
@@ -89,7 +98,7 @@ struct US_ServiceComponent_EXPORT ReferenceDTO {
    * The target of the reference.
    *
    * <p>
-   * This is declared in the {@code target} attribute of the {@code reference}
+   * This is declared in the \c target attribute of the \c reference
    * element. This must be an empty string if the component description does not
    * declare a target for the reference.
    */
@@ -99,7 +108,7 @@ struct US_ServiceComponent_EXPORT ReferenceDTO {
    * The name of the bind method of the reference.
    *
    * <p>
-   * This is declared in the {@code bind} attribute of the {@code reference}
+   * This is declared in the \c bind attribute of the \c reference
    * element. This must be an empty string if the component description does not
    * declare a bind method for the reference.
    */
@@ -109,7 +118,7 @@ struct US_ServiceComponent_EXPORT ReferenceDTO {
    * The name of the unbind method of the reference.
    *
    * <p>
-   * This is declared in the {@code unbind} attribute of the {@code reference}
+   * This is declared in the \c unbind attribute of the \c reference
    * element. This must be an empty string if the component description does not
    * declare an unbind method for the reference.
    */
@@ -119,8 +128,8 @@ struct US_ServiceComponent_EXPORT ReferenceDTO {
    * The name of the updated method of the reference.
    *
    * <p>
-   * This is declared in the {@code updated} attribute of the
-   * {@code reference} element. This must be an empty string if the component
+   * This is declared in the \c updated attribute of the
+   * \c reference element. This must be an empty string if the component
    * description does not declare an updated method for the reference.
    */
   std::string updated;
@@ -129,7 +138,7 @@ struct US_ServiceComponent_EXPORT ReferenceDTO {
    * The scope of the reference.
    *
    * <p>
-   * This is declared in the {@code scope} attribute of the {@code reference}
+   * This is declared in the \c scope attribute of the \c reference
    * element. This must be the default scope if the component description does
    * not declare a scope for the reference.
    */

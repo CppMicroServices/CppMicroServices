@@ -28,46 +28,47 @@
 #include "ConfigurationAdminPrivate.hpp"
 
 namespace cppmicroservices {
-  namespace cmimpl {
+namespace cmimpl {
 
-    /**
-     * This class declares the internal methods of Configuration
-     */
-    class ConfigurationPrivate
-    {
-    public:
-      virtual ~ConfigurationPrivate() = default;
+/**
+ * This class declares the internal methods of Configuration
+ */
+class ConfigurationPrivate
+{
+public:
+  virtual ~ConfigurationPrivate() = default;
 
-      /**
-       * Internal method used by {@code ConfigurationAdminImpl} to update the properties without triggering
-       * the notification to the corresponding ManagedService / ManagedServiceFactory. That will be taken
-       * care of by {@code ConfigurationAdminImpl} instead.
-       *
-       * @param properties The properties to update this Configuration with (if they differ)
-       * @return std::pair<boolean, long> where boolean indicates whether this 
-       * Configuration has been updated or not, and long is the value of the change count
-       */
-      virtual std::pair<bool, unsigned long> UpdateWithoutNotificationIfDifferent(AnyMap properties) = 0;
+  /**
+   * Internal method used by {@code ConfigurationAdminImpl} to update the properties without triggering
+   * the notification to the corresponding ManagedService / ManagedServiceFactory. That will be taken
+   * care of by {@code ConfigurationAdminImpl} instead.
+   *
+   * @param properties The properties to update this Configuration with (if they differ)
+   * @return boolean indicating whether this Configuration has been updated or not, and the value of
+   */
+  virtual std::pair<bool, unsigned long> UpdateWithoutNotificationIfDifferent(
+    AnyMap properties) = 0;
 
-      /**
-       * Internal method used by {@code ConfigurationAdminImpl} to Remove the Configuration without triggering
-       * the notification to the corresponding ManagedService / ManagedServiceFactory. That will be taken
-       * care of by {@code ConfigurationAdminImpl} instead.
-       *
-       * @param expectedChangeCount the expected value of the changeCount. The Configuration will only be
-       *        removed if this equals the actual change count.
-       * @return boolean indicating whether the change count was correct, and therefore whether this
-       *         configuration has been Removed or not.
-       */
-      virtual bool RemoveWithoutNotificationIfChangeCountEquals(unsigned long expectedChangeCount) = 0;
+  /**
+   * Internal method used by {@code ConfigurationAdminImpl} to Remove the Configuration without triggering
+   * the notification to the corresponding ManagedService / ManagedServiceFactory. That will be taken
+   * care of by {@code ConfigurationAdminImpl} instead.
+   *
+   * @param expectedChangeCount the expected value of the changeCount. The Configuration will only be
+   *        removed if this equals the actual change count.
+   * @return boolean indicating whether the change count was correct, and therefore whether this
+   *         configuration has been Removed or not.
+   */
+  virtual bool RemoveWithoutNotificationIfChangeCountEquals(
+    unsigned long expectedChangeCount) = 0;
 
-      /**
-       * Internal method used by {@code ConfigurationAdminImpl} to invalidate the Configuration. Used when
-       * ConfigurationAdminImpl is shutting down or when it is deleting a Configuration.
-       */
-      virtual void Invalidate() = 0;
-    };
-  } // cmimpl
+  /**
+   * Internal method used by {@code ConfigurationAdminImpl} to invalidate the Configuration. Used when
+   * ConfigurationAdminImpl is shutting down or when it is deleting a Configuration.
+   */
+  virtual void Invalidate() = 0;
+};
+} // cmimpl
 } // cppmicroservices
 
 #endif // CONFIGURATIONPRIVATE_HPP

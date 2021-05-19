@@ -21,10 +21,10 @@ Library: CppMicroServices
 =============================================================================*/
 
 #include "cppmicroservices/util/BundleObjFactory.h"
-#include "cppmicroservices/util/BundleObjFile.h"
-#include "cppmicroservices/util/BundlePEFile.h"
 #include "cppmicroservices/util/BundleElfFile.h"
 #include "cppmicroservices/util/BundleMachOFile.h"
+#include "cppmicroservices/util/BundleObjFile.h"
+#include "cppmicroservices/util/BundlePEFile.h"
 
 namespace cppmicroservices {
 
@@ -37,7 +37,8 @@ namespace cppmicroservices {
 ///
 /// @note The location must be a valid binary format for the host machine.
 ///       i.e. PE file on Windows, Mach-O on macOS, ELF on Linux
-std::unique_ptr<BundleObjFile> BundleObjFactory::CreateBundleFileObj(const std::string& location)
+std::unique_ptr<BundleObjFile> BundleObjFactory::CreateBundleFileObj(
+  const std::string& location)
 {
 #if defined(US_PLATFORM_WINDOWS)
   return CreateBundlePEFile(location);
@@ -46,8 +47,8 @@ std::unique_ptr<BundleObjFile> BundleObjFactory::CreateBundleFileObj(const std::
 #elif defined(US_PLATFORM_LINUX)
   return CreateBundleElfFile(location);
 #else
-  #error "Unknown OS platform";
+#  error "Unknown OS platform";
 #endif
   return {};
-}   
+}
 };

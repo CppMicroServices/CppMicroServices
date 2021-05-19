@@ -24,8 +24,8 @@
 #define ServiceReferenceDTO_hpp
 
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/servicecomponent/ServiceComponentExport.h"
@@ -35,6 +35,13 @@ namespace framework {
 namespace dto {
 
 /**
+ \defgroup gr_servicereferencedto ServiceReferenceDTO
+ \brief Groups ServiceReferenceDTO related symbols.
+ */
+
+/**
+ * \ingroup gr_servicereferencedto
+ *
  * A representation of a satisfied reference.
  */
 struct US_ServiceComponent_EXPORT ServiceReferenceDTO

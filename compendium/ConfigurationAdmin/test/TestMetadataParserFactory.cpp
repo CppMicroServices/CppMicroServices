@@ -21,23 +21,20 @@
  =============================================================================*/
 #include "gtest/gtest.h"
 
-#include "../src/metadata/MetadataParserFactory.hpp"
 #include "../src/metadata/MetadataParser.hpp"
+#include "../src/metadata/MetadataParserFactory.hpp"
 #include "Mocks.hpp"
 
 namespace cppmicroservices {
-  namespace cmimpl {
-    namespace metadata {
+namespace cmimpl {
+namespace metadata {
 
-      TEST(TestMetadataParserFactory, ManifestVersionInvalid) {
-        auto logger = std::make_shared<FakeLogger>();
-        EXPECT_THROW(
-        MetadataParserFactory::Create(0, logger);,
-        std::runtime_error);
-        EXPECT_THROW(
-        MetadataParserFactory::Create(2, logger);
-          , std::runtime_error);
-      }
-    }
-  }
+TEST(TestMetadataParserFactory, ManifestVersionInvalid)
+{
+  auto logger = std::make_shared<FakeLogger>();
+  EXPECT_THROW(MetadataParserFactory::Create(0, logger);, std::runtime_error);
+  EXPECT_THROW(MetadataParserFactory::Create(2, logger);, std::runtime_error);
+}
+}
+}
 }

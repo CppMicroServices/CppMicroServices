@@ -35,6 +35,13 @@ namespace runtime {
 namespace dto {
 
 /**
+ \defgroup gr_satisfiedreferencedto SatisfiedReferenceDTO
+ \brief Groups SatisfiedReferenceDTO related symbols.
+ */
+
+/**
+ * \ingroup gr_satisfiedreferencedto
+ *
  * A representation of a satisfied reference.
  */
 struct SatisfiedReferenceDTO
@@ -43,7 +50,7 @@ struct SatisfiedReferenceDTO
    * The name of the declared reference.
    *
    * <p>
-   * This is declared in the {@code name} attribute of the {@code reference}
+   * This is declared in the \c name attribute of the \c reference
    * element of the component description.
    *
    * @see ReferenceDTO#name
@@ -66,11 +73,12 @@ struct SatisfiedReferenceDTO
    * The bound services.
    *
    * <p>
-   * Each {@link ServiceReferenceDTO} in the vector represents a service bound
+   * Each {@link cppmicroservices::framework::dto::ServiceReferenceDTO ServiceReferenceDTO} in the vector represents a service bound
    * to the satisfied reference. The vector must be empty if there are no bound
    * services.
    */
-  std::vector<cppmicroservices::framework::dto::ServiceReferenceDTO> boundServices;
+  std::vector<cppmicroservices::framework::dto::ServiceReferenceDTO>
+    boundServices;
 };
 }
 }

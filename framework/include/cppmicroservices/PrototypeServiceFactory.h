@@ -96,8 +96,8 @@ struct PrototypeServiceFactory : public ServiceFactory
    * @see ServiceObjects::UngetService()
    */
   void UngetService(const Bundle& bundle,
-                            const ServiceRegistrationBase& registration,
-                            const InterfaceMapConstPtr& service) override = 0;
+                    const ServiceRegistrationBase& registration,
+                    const InterfaceMapConstPtr& service) override = 0;
 };
 }
 

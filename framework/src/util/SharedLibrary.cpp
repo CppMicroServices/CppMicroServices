@@ -56,7 +56,7 @@ public:
     , m_Prefix(US_LIB_PREFIX)
   {}
 
-  void * m_Handle{ nullptr };
+  void* m_Handle{ nullptr };
 
   std::string m_Name;
   std::string m_Path;
@@ -105,7 +105,6 @@ void SharedLibrary::Load(int flags)
     if (err) {
       err_msg += " " + std::string(err);
     }
-
 
     d->m_Handle = nullptr;
 

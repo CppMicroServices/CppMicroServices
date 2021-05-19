@@ -22,17 +22,17 @@
 
 #include <chrono>
 
-#include <gtest/gtest.h>
+#include <TestInterfaces/Interfaces.hpp>
+#include <cppmicroservices/BundleContext.h>
+#include <cppmicroservices/BundleEvent.h>
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
-#include <cppmicroservices/BundleEvent.h>
-#include <cppmicroservices/BundleContext.h>
 #include <cppmicroservices/ServiceInterface.h>
 #include <cppmicroservices/ServiceTracker.h>
-#include <cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp>
 #include <cppmicroservices/servicecomponent/ComponentConstants.hpp>
-#include <TestInterfaces/Interfaces.hpp>
+#include <cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp>
+#include <gtest/gtest.h>
 
 #include "TestFixture.hpp"
 #include "TestUtils.hpp"
@@ -41,20 +41,16 @@ namespace scr = cppmicroservices::service::component::runtime;
 
 namespace test {
 
-class TestBundleStartOrder
-  : public ::testing::Test
+class TestBundleStartOrder : public ::testing::Test
 {
 protected:
   TestBundleStartOrder()
     : ::testing::Test()
     , framework(cppmicroservices::FrameworkFactory().NewFramework())
-  { }
+  {}
   virtual ~TestBundleStartOrder() = default;
 
-  virtual void SetUp()
-  {
-    framework.Start();
-  }
+  virtual void SetUp() { framework.Start(); }
 
   virtual void TearDown()
   {
@@ -73,16 +69,16 @@ public:
   {}
 
   ~BundleName() = default;
-  
+
   bool operator()(const cppmicroservices::Bundle& b)
   {
     auto symbolicName = b.GetSymbolicName();
     return (lookingFor == symbolicName);
   }
+
 private:
   std::string lookingFor;
 };
-  
 
 /**
  * Test if DS detects already active bundles with component descriptions
@@ -90,41 +86,51 @@ private:
 TEST_F(TestBundleStartOrder, testRuntimeWithAlreadyStartedBundles) // DS_TOI_55
 {
   auto context = framework.GetBundleContext();
-  ASSERT_EQ(context.GetBundles().size(), 2ul) << "Framework+executable must be the only bundles in the installed bundles list";
+  ASSERT_EQ(context.GetBundles().size(), 2ul)
+    << "Framework+executable must be the only bundles in the installed bundles "
+       "list";
   // install & start some test bundles
   test::InstallLib(context, "TestBundleDSTOI1");
   test::InstallLib(context, "TestBundleDSTOI10");
   auto bundles = context.GetBundles();
-  EXPECT_EQ(bundles.size(), 4ul) << "Test bundles must be in installed bundles list";
-  
-  auto bundle1 = std::find_if(std::begin(bundles), std::end(bundles), BundleName("TestBundleDSTOI1"));
+  EXPECT_EQ(bundles.size(), 4ul)
+    << "Test bundles must be in installed bundles list";
+
+  auto bundle1 = std::find_if(
+    std::begin(bundles), std::end(bundles), BundleName("TestBundleDSTOI1"));
   ASSERT_NE(bundle1, bundles.end()) << "TestBundleDSTOI1 not found";
   bundle1->Start();
-  EXPECT_TRUE(bundle1->GetRegisteredServices().empty()) << "Service from TestBundleDS_TOI_1 must not be available since the DS runtime is not active yet";
-  
-  auto bundle2 = std::find_if(std::begin(bundles), std::end(bundles), BundleName("TestBundleDSTOI10"));
+  EXPECT_TRUE(bundle1->GetRegisteredServices().empty())
+    << "Service from TestBundleDS_TOI_1 must not be available since the DS "
+       "runtime is not active yet";
+
+  auto bundle2 = std::find_if(
+    std::begin(bundles), std::end(bundles), BundleName("TestBundleDSTOI10"));
   ASSERT_NE(bundle2, bundles.end()) << "TestBundleDSTOI10 not found";
   bundle2->Start();
-  EXPECT_TRUE(bundle2->GetRegisteredServices().empty()) << "Service from TestBundleDS_TOI_10 must not be available since the DS runtime is not actiev yet";
+  EXPECT_TRUE(bundle2->GetRegisteredServices().empty())
+    << "Service from TestBundleDS_TOI_10 must not be available since the DS "
+       "runtime is not actiev yet";
 
   auto dsPluginPath = test::GetDSRuntimePluginFilePath();
   auto dsbundles = context.InstallBundles(dsPluginPath);
-  for (auto& bundle : dsbundles)
-  {
+  for (auto& bundle : dsbundles) {
     bundle.Start();
   }
 
   // Verify that already started DS bundles are recognized by DS Runtime
   auto sRef = context.GetServiceReference<scr::ServiceComponentRuntime>();
-  if (sRef)
-  {
+  if (sRef) {
     auto service = context.GetService<scr::ServiceComponentRuntime>(sRef);
     ASSERT_NE(service, nullptr);
-    EXPECT_EQ(service->GetComponentDescriptionDTOs().size(), 2ul) << "Components from active bundles must be loaded by DS";
+    EXPECT_EQ(service->GetComponentDescriptionDTOs().size(), 2ul)
+      << "Components from active bundles must be loaded by DS";
   }
-  
-  EXPECT_EQ(bundle1->GetRegisteredServices().size(), 1ul) << "Service from TestBundleDS_TOI_1 must be registered by DS runtime";
-  EXPECT_EQ(bundle2->GetRegisteredServices().size(), 1ul) << "Service from TestBundleDS_TOI_10 must be registered by DS runtime";
+
+  EXPECT_EQ(bundle1->GetRegisteredServices().size(), 1ul)
+    << "Service from TestBundleDS_TOI_1 must be registered by DS runtime";
+  EXPECT_EQ(bundle2->GetRegisteredServices().size(), 1ul)
+    << "Service from TestBundleDS_TOI_10 must be registered by DS runtime";
 }
 
 /**
@@ -136,8 +142,7 @@ TEST_F(TestBundleStartOrder, testRuntimeWithNewlyStartedBundles) // DS_TOI_56
   auto context = framework.GetBundleContext();
   auto dsPluginPath = test::GetDSRuntimePluginFilePath();
   auto dsbundles = context.InstallBundles(dsPluginPath);
-  for (auto& bundle : dsbundles)
-  {
+  for (auto& bundle : dsbundles) {
     bundle.Start();
   }
 
@@ -145,30 +150,37 @@ TEST_F(TestBundleStartOrder, testRuntimeWithNewlyStartedBundles) // DS_TOI_56
   test::InstallLib(context, "TestBundleDSTOI10");
   auto bundles = context.GetBundles();
   EXPECT_NE(bundles.size(), 0ul) << "No bundles installed";
-  
-  auto bundle1 = std::find_if(std::begin(bundles), std::end(bundles), BundleName("TestBundleDSTOI1"));
+
+  auto bundle1 = std::find_if(
+    std::begin(bundles), std::end(bundles), BundleName("TestBundleDSTOI1"));
   ASSERT_NE(bundle1, bundles.end()) << "TestBundleDSTOI1 not found";
   bundle1->Start();
-  EXPECT_EQ(bundle1->GetRegisteredServices().size(), 1ul) << "Service from TestBundleDS_TOI_1 must be registered by DS runtime";
-  
-  auto bundle2 = std::find_if(std::begin(bundles), std::end(bundles), BundleName("TestBundleDSTOI10"));
+  EXPECT_EQ(bundle1->GetRegisteredServices().size(), 1ul)
+    << "Service from TestBundleDS_TOI_1 must be registered by DS runtime";
+
+  auto bundle2 = std::find_if(
+    std::begin(bundles), std::end(bundles), BundleName("TestBundleDSTOI10"));
   ASSERT_NE(bundle2, bundles.end()) << "TestBundleDSTOI10 not found";
   bundle2->Start();
-  EXPECT_EQ(bundle2->GetRegisteredServices().size(), 1ul) << "Service from TestBundleDS_TOI_10 must be registered by DS runtime";
+  EXPECT_EQ(bundle2->GetRegisteredServices().size(), 1ul)
+    << "Service from TestBundleDS_TOI_10 must be registered by DS runtime";
 
   // Verify that already started DS bundles are recognized by DS Runtime
   auto sRef = context.GetServiceReference<scr::ServiceComponentRuntime>();
   ASSERT_TRUE(sRef) << "No ServiceComponentRuntime found";
   auto service = context.GetService<scr::ServiceComponentRuntime>(sRef);
   ASSERT_NE(service, nullptr);
-  EXPECT_EQ(service->GetComponentDescriptionDTOs().size(), 2ul) << "Components from active bundles must be loaded by DS";
+  EXPECT_EQ(service->GetComponentDescriptionDTOs().size(), 2ul)
+    << "Components from active bundles must be loaded by DS";
 }
 
 TEST_F(TestBundleStartOrder, testDSBundleResolution)
 {
   auto context = framework.GetBundleContext();
-  ASSERT_EQ(context.GetBundles().size(), 2ul) << "Framework+executable must be the only bundles in the installed bundles list";
-  
+  ASSERT_EQ(context.GetBundles().size(), 2ul)
+    << "Framework+executable must be the only bundles in the installed bundles "
+       "list";
+
   // install & start some test bundles
   test::InstallLib(context, "DSGraph01");
   test::InstallLib(context, "DSGraph02");
@@ -177,18 +189,22 @@ TEST_F(TestBundleStartOrder, testDSBundleResolution)
   test::InstallLib(context, "DSGraph05");
   test::InstallLib(context, "DSGraph06");
   test::InstallLib(context, "DSGraph07");
-  ASSERT_EQ(context.GetBundles().size(), 9ul) << "Framework+executable must be the only bundles in the installed bundles list";
+  ASSERT_EQ(context.GetBundles().size(), 9ul)
+    << "Framework+executable must be the only bundles in the installed bundles "
+       "list";
   auto dsPluginPath = test::GetDSRuntimePluginFilePath();
   context.InstallBundles(dsPluginPath);
-  ASSERT_EQ(context.GetBundles().size(), 10ul) << "Framework+executable must be the only bundles in the installed bundles list";
+  ASSERT_EQ(context.GetBundles().size(), 10ul)
+    << "Framework+executable must be the only bundles in the installed bundles "
+       "list";
 
   auto bundles = context.GetBundles();
-  for (auto& bundle : bundles)
-  {
+  for (auto& bundle : bundles) {
     bundle.Start();
   }
 
-  auto bundle = std::find_if(std::begin(bundles), std::end(bundles), BundleName("DSGraph01"));
+  auto bundle = std::find_if(
+    std::begin(bundles), std::end(bundles), BundleName("DSGraph01"));
   ASSERT_NE(bundle, bundles.end()) << "DSGraph01 not found";
 
   auto const ref = context.GetServiceReference<test::DSGraph01>();

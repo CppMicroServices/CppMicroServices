@@ -23,20 +23,21 @@
 #ifndef CCActiveState_hpp
 #define CCActiveState_hpp
 
-#include "CCSatisfiedState.hpp"
 #include "../ConcurrencyUtil.hpp"
+#include "CCSatisfiedState.hpp"
+
+#include "cppmicroservices/detail/CounterLatch.h"
 
 using cppmicroservices::service::component::runtime::dto::ComponentState;
 
 namespace cppmicroservices {
 namespace scrimpl {
-    
+
 /**
  * This class represents the {\code ComponentState::ACTIVE} state of a
  * component configuration.
  */
-class CCActiveState final
-  : public CCSatisfiedState
+class CCActiveState final : public CCSatisfiedState
 {
 public:
   CCActiveState();
@@ -46,12 +47,12 @@ public:
   CCActiveState(CCActiveState&&) = delete;
   CCActiveState& operator=(CCActiveState&&) = delete;
 
-  void Register(ComponentConfigurationImpl&) override
-  {
+  void Register(ComponentConfigurationImpl&) override{
     // no-op, already resolved
   };
-  std::shared_ptr<ComponentInstance> Activate(ComponentConfigurationImpl& mgr,
-                                              const cppmicroservices::Bundle& clientBundle) override;
+  std::shared_ptr<ComponentInstance> Activate(
+    ComponentConfigurationImpl& mgr,
+    const cppmicroservices::Bundle& clientBundle) override;
 
   void Deactivate(ComponentConfigurationImpl& mgr) override;
 

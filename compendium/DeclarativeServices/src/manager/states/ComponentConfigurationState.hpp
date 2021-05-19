@@ -23,18 +23,18 @@
 #ifndef ComponentConfigurationState_hpp
 #define ComponentConfigurationState_hpp
 
-#include <string>
-#include <vector>
-#include <memory>
-#include <future>
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/ServiceReference.h"
+#include <future>
+#include <memory>
+#include <string>
+#include <vector>
 
-#include "cppmicroservices/servicecomponent/runtime/dto/ComponentConfigurationDTO.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"
+#include "cppmicroservices/servicecomponent/runtime/dto/ComponentConfigurationDTO.hpp"
 
-using cppmicroservices::service::component::runtime::dto::ComponentState;
 using cppmicroservices::service::component::detail::ComponentInstance;
+using cppmicroservices::service::component::runtime::dto::ComponentState;
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -43,15 +43,18 @@ class ComponentConfigurationImpl;
 /**
  * Interface for state objects used in {@link ComponentConfigurationImpl} class
  */
-class ComponentConfigurationState : public std::enable_shared_from_this<ComponentConfigurationState>
+class ComponentConfigurationState
+  : public std::enable_shared_from_this<ComponentConfigurationState>
 {
 public:
   ComponentConfigurationState() = default;
   virtual ~ComponentConfigurationState() = default;
   ComponentConfigurationState(const ComponentConfigurationState&) = delete;
-  ComponentConfigurationState& operator=(const ComponentConfigurationState&) = delete;
+  ComponentConfigurationState& operator=(const ComponentConfigurationState&) =
+    delete;
   ComponentConfigurationState(ComponentConfigurationState&&) = delete;
-  ComponentConfigurationState& operator=(ComponentConfigurationState&&) = delete;
+  ComponentConfigurationState& operator=(ComponentConfigurationState&&) =
+    delete;
 
   /**
    * Implementation must handle the transition from \c UNSATISFIED_REFERENCE to \c SATISFIED
@@ -66,8 +69,9 @@ public:
    * \param mgr is the {@link ComponentConfigurationImpl} object whose state needs to change
    * \param clientBundle is the bundle responsible for triggering the state change
    */
-  virtual std::shared_ptr<ComponentInstance> Activate(ComponentConfigurationImpl& mgr,
-                                                      const cppmicroservices::Bundle& clientBundle) = 0;
+  virtual std::shared_ptr<ComponentInstance> Activate(
+    ComponentConfigurationImpl& mgr,
+    const cppmicroservices::Bundle& clientBundle) = 0;
 
   /**
    * Implementation must handle the transition from \c SATISFIED or \c ACTIVE to \c UNSATISFIED_REFERENCE

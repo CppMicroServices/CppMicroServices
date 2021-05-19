@@ -28,101 +28,111 @@
 #include "cppmicroservices/AnyMap.h"
 
 namespace cppmicroservices {
-  namespace service {
-    namespace cm {
+namespace service {
+namespace cm {
 
-      /**
-       * The Configuration object (normally obtained as a std::shared_ptr<Configuration>)
-       * is the principal means for clients of ConfigurationAdmin to inspect or update the
-       * Configuration of a given service or service factory.
-       */
-      class Configuration {
-      public:
-        virtual ~Configuration() noexcept = default;
+/**
+ \defgroup gr_configuration Configuration
+ \brief Groups Configuration class related symbols.
+ */
 
-        /**
-         * Get the PID of this Configuration.
-         *
-         * @throws std::runtime_error if this Configuration object has been Removed
-         *
-         * @return the PID of this Configuration
-         */
-        virtual std::string GetPid() const = 0;
+/**
+ * \ingroup gr_configuration
+ * 
+ * The Configuration object (normally obtained as a std::shared_ptr<Configuration>)
+ * is the principal means for clients of ConfigurationAdmin to inspect or update the
+ * Configuration of a given service or service factory.
+ */
+class Configuration
+{
+public:
+  virtual ~Configuration() noexcept = default;
 
-        /**
-         * Get the Factory PID which is responsible for this Configuration. If this
-         * Configuration does not belong to any Factory, returns an empty string.
-         *
-         * @throws std::runtime_error if this Configuration object has been Removed
-         *
-         * @return the Factory PID associated with this Configuration, if applicable
-         */
-        virtual std::string GetFactoryPid() const = 0;
+  /**
+   * Get the PID of this Configuration.
+   *
+   * @throws std::runtime_error if this Configuration object has been Removed
+   *
+   * @return the PID of this Configuration
+   */
+  virtual std::string GetPid() const = 0;
 
-        /**
-         * Get the properties of this Configuration. Returns a copy.
-         *
-         * @throws std::runtime_error if this Configuration object has been Removed
-         *
-         * @return the properties of this Configuration
-         */
-        virtual AnyMap GetProperties() const = 0;
+  /**
+   * Get the Factory PID which is responsible for this Configuration. If this
+   * Configuration does not belong to any Factory, returns an empty string.
+   *
+   * @throws std::runtime_error if this Configuration object has been Removed
+   *
+   * @return the Factory PID associated with this Configuration, if applicable
+   */
+  virtual std::string GetFactoryPid() const = 0;
 
-        /**
-         * Update the properties of this Configuration. Invoking this method will trigger the
-         * ConfigurationAdmin impl to push the updated properties to any ManagedService /
-         * ManagedServiceFactory / ConfigurationListener which has a matching PID / Factory PID.
-         *
-         * If the properties are empty, the Configuration will not be removed, but instead
-         * updated with an empty properties map.
-         *
-         * @throws std::runtime_error if this Configuration object has been Removed
-         *
-         * @param properties The properties to update this Configuration with.
-         * 
-         * @return a shared_future<void> to access the result of the asynchronous operation
-         * that pushed the update to a ManagedService, ManagedServiceFactory or ConfigurationListener
-         * 
-         */
-        virtual std::shared_future<void> Update(AnyMap properties = AnyMap{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS}) = 0;
+  /**
+   * Get the properties of this Configuration. Returns a copy.
+   *
+   * @throws std::runtime_error if this Configuration object has been Removed
+   *
+   * @return the properties of this Configuration
+   */
+  virtual AnyMap GetProperties() const = 0;
 
-        /**
-         * Update the properties of this Configuration if they differ from the current properties.
-         * Invoking this method will trigger the ConfigurationAdmin impl to push the updated
-         * properties to any ManagedService / ManagedServiceFactory / ConfigurationListener which has a matching PID /
-         * Factory PID, but only if the properties differ from the current properties. It will
-         * return true in this case, and false otherwise.
-         *
-         * If the properties are empty, the Configuration will not be removed, but instead
-         * updated with an empty properties map, unless it already had empty properties.
-         *
-         * @throws std::runtime_error if this Configuration object has been Removed
-         *
-         * @param properties The properties to update this Configuration with (if they differ)
-         * @return std::pair<boolean, std::shared_future<void>> The boolean indicates whether 
-         * the properties were updated or not. The shared_future<void> allows access to the result of the asynchronous 
-         * operationthat pushed the update operation a ManagedService, ManagedServiceFactory or 
-         * ConfigurationListener.
-         *
-         */
-        virtual  std::pair<bool, std::shared_future<void>> UpdateIfDifferent(AnyMap properties = AnyMap{AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS}) = 0;
+  /**
+   * Update the properties of this Configuration. Invoking this method will trigger the
+   * ConfigurationAdmin impl to push the updated properties to any ManagedService /
+   * ManagedServiceFactory / ConfigurationListener which has a matching PID / Factory PID.
+   *
+   * If the properties are empty, the Configuration will not be removed, but instead
+   * updated with an empty properties map.
+   *
+   * @throws std::runtime_error if this Configuration object has been Removed
+   *
+   * @param properties The properties to update this Configuration with.
+   *
+   * @returns a shared_future<void> which can be used to wait for the asynchronous
+   * operation that pushed the update to a ManagedService, ManagedServiceFactory or
+   * ConfigurationListener to complete.
+   */
+  virtual std::shared_future<void> Update(AnyMap properties = AnyMap{
+                        AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }) = 0;
 
-        /**
-         * Remove this Configuration from ConfigurationAdmin. This will trigger a push to any 
-         * ConfigurationListener. This will also trigger the ConfigurationAdmin
-         * implementation to update any corresponding ManagedService with an empty AnyMap. Any
-         * corresponding ManagedServiceFactory will have its Removed method invoked with the
-         * corresponding PID.
-         *
-         * @throws std::runtime_error if this Configuration object has been Removed already
-         *
-         * @return a shared_future<void> to access the result of the asynchronous operation
-         * that pushed the remove operation to a ManagedService, ManagedServiceFactory or 
-         * ConfigurationListener.
-         */
-        virtual std::shared_future<void> Remove() = 0;
-      };
-    }
-  }
+  /**
+   * Update the properties of this Configuration if they differ from the current properties.
+   * Invoking this method will trigger the ConfigurationAdmin impl to push the updated
+   * properties to any ManagedService / ManagedServiceFactory / ConfigurationListener which has a matching PID /
+   * Factory PID, but only if the properties differ from the current properties. It will
+   * return true in this case, and false otherwise.
+   *
+   * If the properties are empty, the Configuration will not be removed, but instead
+   * updated with an empty properties map, unless it already had empty properties.
+   *
+   * @throws std::runtime_error if this Configuration object has been Removed
+   *
+   * @param properties The properties to update this Configuration with (if they differ)
+   * @return std::pair<boolean, std::shared_future<void>> The boolean indicates whether 
+   * the properties were updated or not. The shared_future<void> allows access to the result of the asynchronous 
+   * operation that pushed the update operation to a ManagedService, ManagedServiceFactory or 
+   * ConfigurationListener.
+   */
+  virtual std::pair<bool, std::shared_future<void>> UpdateIfDifferent(
+    AnyMap properties = AnyMap{
+      AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }) = 0;
+
+  /**
+   * Remove this Configuration from ConfigurationAdmin. This will trigger a push to any 
+   * ConfigurationListener. This will also trigger the ConfigurationAdmin
+   * implementation to update any corresponding ManagedService with an empty AnyMap. Any
+   * corresponding ManagedServiceFactory will have its Removed method invoked with the
+   * corresponding PID.
+   *
+   * @throws std::runtime_error if this Configuration object has been Removed already
+   * 
+   * @return a shared_future<void> to access the result of the asynchronous operation
+   * that pushed the remove operation to a ManagedService, ManagedServiceFactory or 
+   * ConfigurationListener.
+   */
+  virtual std::shared_future<void> Remove() = 0;
+};
+}
+}
 }
 #endif // Configuration_hpp

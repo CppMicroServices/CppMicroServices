@@ -39,7 +39,7 @@
 namespace cppmicroservices {
 
 HttpServletRequestPrivate::HttpServletRequestPrivate(
-  std::shared_ptr<ServletContext>  servletContext,
+  std::shared_ptr<ServletContext> servletContext,
   CivetServer* server,
   mg_connection* conn)
   : m_ServletContext(std::move(servletContext))
@@ -94,7 +94,8 @@ HttpServletRequestPrivate::HttpServletRequestPrivate(
 
 HttpServletRequest::~HttpServletRequest() = default;
 HttpServletRequest::HttpServletRequest(const HttpServletRequest&) = default;
-HttpServletRequest& HttpServletRequest::operator=(const HttpServletRequest&) = default;
+HttpServletRequest& HttpServletRequest::operator=(const HttpServletRequest&) =
+  default;
 
 std::shared_ptr<ServletContext> HttpServletRequest::GetServletContext() const
 {
@@ -282,7 +283,8 @@ std::vector<std::string> HttpServletRequest::GetHeaderNames() const
 {
   std::vector<std::string> names;
   for (int i = 0; i < mg_get_request_info(d->m_Connection)->num_headers; ++i) {
-    names.emplace_back(mg_get_request_info(d->m_Connection)->http_headers[i].name);
+    names.emplace_back(
+      mg_get_request_info(d->m_Connection)->http_headers[i].name);
   }
   return names;
 }

@@ -31,7 +31,8 @@
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 #include "manager/ConfigurationNotifier.hpp"
 
-using cppmicroservices::service::component::ComponentConstants::SERVICE_COMPONENT;
+using cppmicroservices::service::component::ComponentConstants::
+  SERVICE_COMPONENT;
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -58,7 +59,8 @@ SCRBundleExtension::SCRBundleExtension(const cppmicroservices::BundleContext& bu
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
   auto version = ObjectValidator(scrMetadata, "version").GetValue<int>();
-  auto metadataparser = metadata::MetadataParserFactory::Create(version, logger);
+  auto metadataparser =
+    metadata::MetadataParserFactory::Create(version, logger);
   std::vector<std::shared_ptr<ComponentMetadata>> componentsMetadata;
   componentsMetadata = metadataparser->ParseAndGetComponentsMetadata(scrMetadata);
   for (auto& oneCompMetadata : componentsMetadata)
@@ -81,14 +83,15 @@ SCRBundleExtension::SCRBundleExtension(const cppmicroservices::BundleContext& bu
       throw;
     } catch (const std::exception&) {
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                  "Failed to create ComponentManager with name " + oneCompMetadata->name + " from bundle with Id " + std::to_string(bundleContext.GetBundle().GetBundleId()),
+                  "Failed to create ComponentManager with name " +
+                    oneCompMetadata->name + " from bundle with Id " +
+                    std::to_string(bundleContext.GetBundle().GetBundleId()),
                   std::current_exception());
     }
   }
-logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-            "Created instance of SCRBundleExtension for " +
+  logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+              "Created instance of SCRBundleExtension for " +
                 bundleContext.GetBundle().GetSymbolicName());
-
 }
 
 SCRBundleExtension::~SCRBundleExtension()
@@ -99,11 +102,11 @@ SCRBundleExtension::~SCRBundleExtension()
   {
     auto fut = compManager->Disable();
     registry->RemoveComponentManager(compManager);
-    fut.get(); // since this happens when the bundle is stopped. Wait until the disable is finished on the other thread.
+    fut
+      .get(); // since this happens when the bundle is stopped. Wait until the disable is finished on the other thread.
   }
   managers->clear();
   registry.reset();
 };
 } // scrimpl
 } // cppmicroservices
-

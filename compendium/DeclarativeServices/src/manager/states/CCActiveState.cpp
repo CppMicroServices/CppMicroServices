@@ -25,6 +25,8 @@
 #include "CCUnsatisfiedReferenceState.hpp"
 #include "cppmicroservices/SharedLibraryException.h"
 
+#include "cppmicroservices/detail/ScopeGuard.h"
+
 namespace cppmicroservices {
 namespace scrimpl {
 
@@ -45,7 +47,6 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(
    }
   // no state change, already in active state. create and return a ComponentInstance object
   std::shared_ptr<ComponentInstance> instance;
-
   instance = mgr.CreateAndActivateComponentInstance(clientBundle);
 
   // Just in case the configuration properties changed between Registration and
@@ -143,9 +144,9 @@ void CCActiveState::Rebind(ComponentConfigurationImpl& mgr,
       } catch (const std::exception&) {
         mgr.GetLogger()->Log(
           cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-          "Exception while dynamically binding a reference. ", std::current_exception());
+          "Exception while dynamically binding a reference. ",
+          std::current_exception());
       }
-      
   }
 
   if (svcRefToUnbind) {

@@ -23,36 +23,43 @@
 #ifndef ComponentWrapperImpl_hpp
 #define ComponentWrapperImpl_hpp
 
+#include <array>
 #include <cassert>
 #include <memory>
-#include <vector>
-#include <array>
 #include <tuple>
+#include <vector>
 
-#include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 #include "ComponentInstance.hpp"
+#include "cppmicroservices/servicecomponent/ComponentContext.hpp"
+
 #include "Binders.hpp"
 #include "cppmicroservices/AnyMap.h"
 
-namespace cppmicroservices { namespace service { namespace component { namespace detail {
+namespace cppmicroservices {
+namespace service {
+namespace component {
+namespace detail {
 
 /**
  * Util class to detect if a class has a method named Activate
  * Member Detector Idiom - https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Member_Detector
  */
-template <class T, class ReturnT, class... ArgsT>
+template<class T, class ReturnT, class... ArgsT>
 class HasActivate
 {
 public:
-  struct BadType {};
-  
-  template <class U>
-  static decltype(std::declval<U>().Activate(std::declval<ArgsT>()...)) Test(int);
-  
-  template <class U>
+  struct BadType
+  {};
+
+  template<class U>
+  static decltype(std::declval<U>().Activate(std::declval<ArgsT>()...)) Test(
+    int);
+
+  template<class U>
   static BadType Test(...);
-  
-  static constexpr bool value = std::is_same<decltype(Test<T>(0)), ReturnT>::value;
+
+  static constexpr bool value =
+    std::is_same<decltype(Test<T>(0)), ReturnT>::value;
 };
 
 /**
@@ -81,19 +88,22 @@ public:
  * Util class to detect if a class has a method named Deactivate
  * Member Detector Idiom - https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Member_Detector
  */
-template <class T, class ReturnT, class... ArgsT>
+template<class T, class ReturnT, class... ArgsT>
 class HasDeactivate
 {
 public:
-  struct BadType {};
-  
-  template <class U>
-  static decltype(std::declval<U>().Deactivate(std::declval<ArgsT>()...)) Test(int);
-  
-  template <class U>
+  struct BadType
+  {};
+
+  template<class U>
+  static decltype(std::declval<U>().Deactivate(std::declval<ArgsT>()...)) Test(
+    int);
+
+  template<class U>
   static BadType Test(...);
-  
-  static constexpr bool value = std::is_same<decltype(Test<T>(0)), ReturnT>::value;
+
+  static constexpr bool value =
+    std::is_same<decltype(Test<T>(0)), ReturnT>::value;
 };
 
 namespace util {
@@ -105,11 +115,11 @@ template<typename T, typename FUNC, std::size_t... Is>
 void for_each(T&& t, FUNC f, std::index_sequence<Is...>)
 {
   // we use the comma operator to execute the function after the parameters are unpacked.
-  int dummy[] = {0, (f(std::get<Is>(t), Is), 0)...};
+  int dummy[] = { 0, (f(std::get<Is>(t), Is), 0)... };
   static_cast<void>(dummy); // silence unused varible warning
 }
 
-template <std::size_t I, class T>
+template<std::size_t I, class T>
 using tuple_element_t = typename std::tuple_element<I, T>::type;
 
 } // namespace util
@@ -117,52 +127,53 @@ using tuple_element_t = typename std::tuple_element<I, T>::type;
 template<typename... Ts, typename FUNC>
 void for_each_in_tuple(std::tuple<Ts...> const& t, FUNC f)
 {
-  util::for_each(t, f, std::make_index_sequence<std::tuple_size<std::tuple<Ts...>>::value>{});
+  util::for_each(
+    t,
+    f,
+    std::make_index_sequence<std::tuple_size<std::tuple<Ts...>>::value>{});
 }
 
-template <class T, class InterfaceTuple = std::tuple<>>
-class ComponentInstanceImplBase
-  : public ComponentInstance
+template<class T, class InterfaceTuple = std::tuple<>>
+class ComponentInstanceImplBase : public ComponentInstance
 {
 public:
-
-  ComponentInstanceImplBase(const std::vector<std::shared_ptr<Binder<T>>>& binders = {})
+  ComponentInstanceImplBase(
+    const std::vector<std::shared_ptr<Binder<T>>>& binders = {})
     : mContext(nullptr)
     , refBinders(binders)
   {
     // move all binders into a map
-    for(size_t i = 0; i < refBinders.size(); i++) {
+    for (size_t i = 0; i < refBinders.size(); i++) {
       refBinderMap[refBinders.at(i)->GetReferenceName()] = i;
     }
   }
 
   virtual ~ComponentInstanceImplBase() = default;
-   void Activate() override
-  {
-    DoActivate(mContext);
-  };
 
-  void Deactivate() override
-  {
-    DoDeactivate(mContext);
-  };
+  void Activate() override { DoActivate(mContext); };
+
+  void Deactivate() override { DoDeactivate(mContext); };
 
   bool InvokeModifiedMethod() override { 
       return DoModified(mContext); 
   };
 
-  void InvokeBindMethod(const std::string& refName
-                        , const cppmicroservices::ServiceReferenceBase& sRef) override
+  void InvokeBindMethod(
+    const std::string& refName,
+    const cppmicroservices::ServiceReferenceBase& sRef) override
   {
     size_t index = refBinderMap.at(refName);
-    refBinders.at(index)->Bind(mContext->GetBundleContext(), sRef, mServiceImpl);
+    refBinders.at(index)->Bind(
+      mContext->GetBundleContext(), sRef, mServiceImpl);
   };
 
-  void InvokeUnbindMethod(const std::string& refName
-                          , const cppmicroservices::ServiceReferenceBase& sRef) override
+  void InvokeUnbindMethod(
+    const std::string& refName,
+    const cppmicroservices::ServiceReferenceBase& sRef) override
   {
     size_t index = refBinderMap.at(refName);
-    refBinders.at(index)->UnBind(mContext->GetBundleContext(), sRef, mServiceImpl);
+    refBinders.at(index)->UnBind(
+      mContext->GetBundleContext(), sRef, mServiceImpl);
   };
 
   virtual std::shared_ptr<T> GetInstance() const { return mServiceImpl; };
@@ -173,31 +184,37 @@ public:
   }
 
   template<class C = T, class I = InterfaceTuple, std::size_t... Is>
-  cppmicroservices::InterfaceMapPtr MakeInterfaceMapWithTuple(const std::shared_ptr<T>& sObj
-                                                              , std::index_sequence<Is...>)
+  cppmicroservices::InterfaceMapPtr MakeInterfaceMapWithTuple(
+    const std::shared_ptr<T>& sObj,
+    std::index_sequence<Is...>)
   {
     // The static_ptr_cast inside MakeInterfaceMap will fail if the sObj does not implement any of the interfaces in I.
-    InterfaceMapPtr iMap = MakeInterfaceMap<util::tuple_element_t<Is, I>...>(sObj);
+    InterfaceMapPtr iMap =
+      MakeInterfaceMap<util::tuple_element_t<Is, I>...>(sObj);
     assert(iMap->size() == std::tuple_size<I>::value);
     return iMap;
   }
 
-  template <class ...Args>
+  template<class... Args>
   cppmicroservices::InterfaceMapPtr GetInterfaceMapHelper(Args...)
   {
     return nullptr;
   }
 
-  template <class I = InterfaceTuple, typename std::enable_if<std::tuple_size<I>::value != 0, int>::type = 0>
-  cppmicroservices::InterfaceMapPtr GetInterfaceMapHelper(const std::shared_ptr<T>& sObj)
+  template<
+    class I = InterfaceTuple,
+    typename std::enable_if<std::tuple_size<I>::value != 0, int>::type = 0>
+  cppmicroservices::InterfaceMapPtr GetInterfaceMapHelper(
+    const std::shared_ptr<T>& sObj)
   {
-    return MakeInterfaceMapWithTuple(sObj, std::make_index_sequence<std::tuple_size<I>::value>{});
+    return MakeInterfaceMapWithTuple(
+      sObj, std::make_index_sequence<std::tuple_size<I>::value>{});
   }
 
   /**
    * This method is used if the component implementation class does not provide an Activate method.
    */
-  template <typename ...A>
+  template<typename... A>
   void DoActivate(A...)
   {
     // no-op
@@ -234,7 +251,7 @@ public:
   /**
    * This method is used if the component implementation class does not provide a Deactivate method.
    */
-  template <typename ...A>
+  template<typename... A>
   void DoDeactivate(A...)
   {
     // no-op
@@ -250,52 +267,59 @@ public:
     mServiceImpl->Deactivate(ctxt);
   }
 
-  std::shared_ptr<ComponentContext> mContext;          // The context object associated with the component instance
-  std::shared_ptr<T> mServiceImpl;                     // Instance of the implementation class
-  std::vector<std::shared_ptr<Binder<T>>> refBinders;  // Helpers used for bind and unbind calls on the instance
-  std::map<std::string, size_t> refBinderMap;          // a map to retrieve binders based on reference name
+  std::shared_ptr<ComponentContext>
+    mContext; // The context object associated with the component instance
+  std::shared_ptr<T> mServiceImpl; // Instance of the implementation class
+  std::vector<std::shared_ptr<Binder<T>>>
+    refBinders; // Helpers used for bind and unbind calls on the instance
+  std::map<std::string, size_t>
+    refBinderMap; // a map to retrieve binders based on reference name
 };
 
-
-template <class T, class InterfaceTuple = std::tuple<>, class... CtorInjectedRefs>
+template<class T,
+         class InterfaceTuple = std::tuple<>,
+         class... CtorInjectedRefs>
 class ComponentInstanceImpl final
   : public ComponentInstanceImplBase<T, InterfaceTuple>
 {
 public:
-  ComponentInstanceImpl(const std::array<std::string, sizeof...(CtorInjectedRefs)> staticRefNames = {}
-                          , const std::vector<std::shared_ptr<Binder<T>>>& binders = {})
+  ComponentInstanceImpl(
+    const std::array<std::string, sizeof...(CtorInjectedRefs)>
+      staticRefNames = {},
+    const std::vector<std::shared_ptr<Binder<T>>>& binders = {})
     : ComponentInstanceImplBase<T, InterfaceTuple>(binders)
     , mStaticRefNames(staticRefNames)
-  {
-  }
+  {}
 
   virtual ~ComponentInstanceImpl() = default;
 
-  using Injection = std::integral_constant<bool, sizeof...(CtorInjectedRefs)!=0>;
+  using Injection =
+    std::integral_constant<bool, sizeof...(CtorInjectedRefs) != 0>;
 
-  void CreateInstanceAndBindReferences(const std::shared_ptr<ComponentContext>& ctxt) override
+  void CreateInstanceAndBindReferences(
+    const std::shared_ptr<ComponentContext>& ctxt) override
   {
     this->mContext = ctxt;
     bool isConstructorInjected = Injection::value;
     std::shared_ptr<T> implObj = DoCreate(isConstructorInjected); // appropriate
     this->mServiceImpl = implObj;
-    for(auto& binder : this->refBinders) {
+    for (auto& binder : this->refBinders) {
       binder->Bind(ctxt, this->mServiceImpl);
     }
   }
 
   void UnbindReferences() override
   {
-    for(auto& binder : this->refBinders) {
+    for (auto& binder : this->refBinders) {
       binder->Unbind(this->mContext, this->mServiceImpl);
     }
   }
-  
+
   /**
    * DoCreate is a helper function used to invoke the appropriate constructor on the Implementation class.
    * SFINAE is used to determine which overload of DoCreate is used by the runtime.
    */
-  template <typename ...A>
+  template<typename... A>
   std::shared_ptr<T> DoCreate(A...)
   {
     // no-op fallback to mute the compiler.
@@ -311,6 +335,7 @@ public:
   {
     return std::make_shared<T>();
   }
+
 
    // this method is used when injection is false and a constructor with Configuration properties input parameter is provided by the implementation class
   template <class C = T, class I = Injection,
@@ -359,8 +384,14 @@ public:
             class THasConstructorWithReferences = typename std::enable_if<std::is_constructible<C, const std::shared_ptr<CtorInjectedRefs>&...>::value>::type>
   std::shared_ptr<T> DoCreate(bool& injected)
   {
-    std::tuple<std::shared_ptr<CtorInjectedRefs> ...> depObjs = GetAllDependencies(std::make_index_sequence<std::tuple_size<std::tuple<CtorInjectedRefs...>>::value>{});
-    std::shared_ptr<T> implObj = call_make_shared_with_tuple(depObjs, std::make_index_sequence<std::tuple_size<std::tuple<std::shared_ptr<CtorInjectedRefs>...>>::value>{});
+    std::tuple<std::shared_ptr<CtorInjectedRefs>...> depObjs =
+      GetAllDependencies(
+        std::make_index_sequence<
+          std::tuple_size<std::tuple<CtorInjectedRefs...>>::value>{});
+    std::shared_ptr<T> implObj = call_make_shared_with_tuple(
+      depObjs,
+      std::make_index_sequence<std::tuple_size<
+        std::tuple<std::shared_ptr<CtorInjectedRefs>...>>::value>{});
     injected = (implObj != nullptr);
     return implObj;
   }
@@ -383,8 +414,9 @@ public:
   }
 
   template<std::size_t... Is>
-  std::shared_ptr<T> call_make_shared_with_tuple(const std::tuple<const std::shared_ptr<CtorInjectedRefs>&...>& tuple,
-                                                 std::index_sequence<Is...>)
+  std::shared_ptr<T> call_make_shared_with_tuple(
+    const std::tuple<const std::shared_ptr<CtorInjectedRefs>&...>& tuple,
+    std::index_sequence<Is...>)
   {
     return std::make_shared<T>(std::get<Is>(tuple)...);
   }
@@ -400,18 +432,25 @@ public:
   template<std::size_t... Is>
   std::tuple<std::shared_ptr<CtorInjectedRefs>...> GetAllDependencies(std::index_sequence<Is...>)
   {
-    return std::make_tuple(GetDependency<typename std::tuple_element<Is, std::tuple<CtorInjectedRefs...>>::type>(std::get<Is>(mStaticRefNames))...);
+    return std::make_tuple(
+      GetDependency<
+        typename std::tuple_element<Is, std::tuple<CtorInjectedRefs...>>::type>(
+        std::get<Is>(mStaticRefNames))...);
   }
 
-  template <class R>
+  template<class R>
   std::shared_ptr<R> GetDependency(const std::string& name)
   {
     return this->mContext->template LocateService<R>(name);
   }
+
 private:
   std::array<std::string, sizeof...(CtorInjectedRefs)> mStaticRefNames;
 };
 
-}}}} // namespaces
+}
+}
+}
+} // namespaces
 
 #endif /* ComponentInstance_hpp */

@@ -35,8 +35,7 @@ namespace scrimpl {
  * component configuration. This state indicates that the component's service
  * is registered with the framework
  */
-class CCRegisteredState final
-  : public CCSatisfiedState
+class CCRegisteredState final : public CCSatisfiedState
 {
 public:
   CCRegisteredState();
@@ -47,7 +46,7 @@ public:
   CCRegisteredState(CCRegisteredState&&) = delete;
   CCRegisteredState& operator=(CCRegisteredState&&) = delete;
 
-  void Register(ComponentConfigurationImpl& /*mgr*/) override {
+  void Register(ComponentConfigurationImpl& /*mgr*/) override{
     // no-op, already resolved
   };
 
@@ -66,6 +65,7 @@ public:
    * Method blocks the current thread until the stored future is ready
    */
   void WaitForTransitionTask() override { ready.get(); }
+
 private:
   std::future<void> ready;
 };

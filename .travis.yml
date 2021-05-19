@@ -35,16 +35,6 @@ jobs:
             # Install a newer version of valgrind
             - ./install_valgrind.sh
 
-      # Test one build configuration with the latest available Clang
-      - os: linux
-        dist: xenial
-        compiler: clang
-        addons: { apt: { packages: ["valgrind", "libc++-dev", "libc++abi-dev"], sources: ["ubuntu-toolchain-r-test"] } }
-        env: MY_CC=clang MY_CXX=clang++ PATH=/usr/bin:$PATH
-        before_install:
-            # Install a newer version of valgrind
-            - ./install_valgrind.sh
-
       # Test all build configuration with the latest available GCC
       - os: linux
         addons: &gcc8-valgrind { apt: { packages: ["valgrind", "gcc-8", "g++-8"], sources: ["ubuntu-toolchain-r-test"] } }
@@ -87,24 +77,24 @@ jobs:
 
       # latest compiler on OS X
       - os: osx
-        osx_image: xcode11.6
+        osx_image: xcode12
         compiler: clang
-        env: BUILD_CONFIGURATION=0 MACOSX_DEPLOYMENT_TARGET=10.15
+        env: BUILD_CONFIGURATION=0
 
       - os: osx
-        osx_image: xcode11.6
+        osx_image: xcode12
         compiler: clang
-        env: BUILD_CONFIGURATION=1 MACOSX_DEPLOYMENT_TARGET=10.15
+        env: BUILD_CONFIGURATION=1
 
       - os: osx
-        osx_image: xcode11.6
+        osx_image: xcode12
         compiler: clang
-        env: BUILD_CONFIGURATION=2 MACOSX_DEPLOYMENT_TARGET=10.15
+        env: BUILD_CONFIGURATION=2
 
       - os: osx
-        osx_image: xcode11.6
+        osx_image: xcode12
         compiler: clang
-        env: BUILD_CONFIGURATION=3 MACOSX_DEPLOYMENT_TARGET=10.15
+        env: BUILD_CONFIGURATION=3
 
 # To generate codecov reports
 # pin xcode version back to 10.3 since 11.6 appears to break code coverage

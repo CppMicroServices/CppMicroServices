@@ -44,12 +44,12 @@ public:
   using TrackedParamType = typename TTT::TrackedParamType;
 
   ServiceTrackerPrivate(ServiceTracker<S, T>* st,
-                        BundleContext  context,
+                        BundleContext context,
                         const ServiceReference<S>& reference,
                         ServiceTrackerCustomizer<S, T>* customizer);
 
   ServiceTrackerPrivate(ServiceTracker<S, T>* st,
-                        BundleContext  context,
+                        BundleContext context,
                         const std::string& clazz,
                         ServiceTrackerCustomizer<S, T>* customizer);
 

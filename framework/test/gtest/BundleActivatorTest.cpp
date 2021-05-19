@@ -44,7 +44,8 @@ protected:
     ctx = f.GetBundleContext();
   }
 
-  ~BundleActivatorTest() { 
+  ~BundleActivatorTest()
+  {
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
   }

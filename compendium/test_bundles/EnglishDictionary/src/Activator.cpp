@@ -25,33 +25,29 @@
 
 #include "EnglishDictionary.hpp"
 
-namespace EnglishDictionary
+namespace EnglishDictionary {
+
+class Activator : public cppmicroservices::BundleActivator
 {
-  
-  class Activator : public cppmicroservices::BundleActivator
+public:
+  Activator() = default;
+  ~Activator() = default;
+
+  void Start(cppmicroservices::BundleContext context)
   {
-  public:
-    
-    Activator() = default;
-    ~Activator() = default;
-    
-    void Start(cppmicroservices::BundleContext context)
-    {
-      std::shared_ptr<EnglishDictionary::DictionaryImpl> s = std::make_shared<EnglishDictionary::DictionaryImpl>();
-      cppmicroservices::ServiceProperties props;
-      props["Language"] = std::string("English");
-      sr = context.RegisterService<test::IDictionaryService>(s, props);
-    }
-    
-    void Stop(cppmicroservices::BundleContext /*context*/)
-    {
-      sr.Unregister();
-    }
-    
-  private:
-    cppmicroservices::ServiceRegistration<test::IDictionaryService> sr;
-  };
-  
+    std::shared_ptr<EnglishDictionary::DictionaryImpl> s =
+      std::make_shared<EnglishDictionary::DictionaryImpl>();
+    cppmicroservices::ServiceProperties props;
+    props["Language"] = std::string("English");
+    sr = context.RegisterService<test::IDictionaryService>(s, props);
+  }
+
+  void Stop(cppmicroservices::BundleContext /*context*/) { sr.Unregister(); }
+
+private:
+  cppmicroservices::ServiceRegistration<test::IDictionaryService> sr;
+};
+
 }
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(EnglishDictionary::Activator)

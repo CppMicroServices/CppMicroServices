@@ -29,84 +29,83 @@
 #include "metadata/ConfigurationMetadata.hpp"
 
 namespace cppmicroservices {
-  namespace cmimpl {
+namespace cmimpl {
 
-    /**
-     * This class is a convenience container for tracking added Configurations.
-     */
-    struct ConfigurationAddedInfo final
-    {
-      ConfigurationAddedInfo(std::string pidAdded,
-                             unsigned long changeCountAdded,
-                             std::uintptr_t configurationIdAdded)
-      : pid(std::move(pidAdded))
-      , changeCount(std::move(changeCountAdded))
-      , configurationId(std::move(configurationIdAdded))
-      {
-      }
+/**
+ * This class is a convenience container for tracking added Configurations.
+ */
+struct ConfigurationAddedInfo final
+{
+  ConfigurationAddedInfo(std::string pidAdded,
+                         unsigned long changeCountAdded,
+                         std::uintptr_t configurationIdAdded)
+    : pid(std::move(pidAdded))
+    , changeCount(std::move(changeCountAdded))
+    , configurationId(std::move(configurationIdAdded))
+  {}
 
-      bool operator==(const ConfigurationAddedInfo& other) const
-      {
-        return ((pid == other.pid) &&
-                (changeCount == other.changeCount) &&
-                (configurationId == other.configurationId));
-      }
+  bool operator==(const ConfigurationAddedInfo& other) const
+  {
+    return ((pid == other.pid) && (changeCount == other.changeCount) &&
+            (configurationId == other.configurationId));
+  }
 
-      std::string pid;
-      unsigned long changeCount;
-      std::uintptr_t configurationId;
-    };
+  std::string pid;
+  unsigned long changeCount;
+  std::uintptr_t configurationId;
+};
 
-    /**
-     * This class declares the internal methods of ConfigurationAdmin.
-     */
-    class ConfigurationAdminPrivate
-    {
-    public:
-      virtual ~ConfigurationAdminPrivate() = default;
+/**
+ * This class declares the internal methods of ConfigurationAdmin.
+ */
+class ConfigurationAdminPrivate
+{
+public:
+  virtual ~ConfigurationAdminPrivate() = default;
 
-      /**
-       * Internal method used by {@code CMBundleExtension} to add new {@code Configuration} objects
-       *
-       * @param configurationMetadata A vector of {@code ConfigurationMetadata} to create {@code Configuration} objects for
-       * @return A vector of ConfigurationAddedInfos, which store the PIDs, changeCounts, and configurationIds of the
-       *         Configurations that have been created/updated by this method.
-       */
-       virtual std::vector<ConfigurationAddedInfo> AddConfigurations(
-        std::vector<metadata::ConfigurationMetadata>
-          configurationMetadata) = 0;
+  /**
+   * Internal method used by {@code CMBundleExtension} to add new {@code Configuration} objects
+   *
+   * @param configurationMetadata A vector of {@code ConfigurationMetadata} to create {@code Configuration} objects for
+   * @return A vector of ConfigurationAddedInfos, which store the PIDs, changeCounts, and configurationIds of the
+   *         Configurations that have been created/updated by this method.
+   */
+  virtual std::vector<ConfigurationAddedInfo> AddConfigurations(
+    std::vector<metadata::ConfigurationMetadata> configurationMetadata) = 0;
 
-      /**
-       * Internal method used by {@code CMBundleExtension} to remove the {@code Configuration} objects that it created
-       *
-       * @param pidsAndChangeCountsAndIDs A vector of ConfigurationAddedInfos which contain the PIDs to remove,
-       *        the changeCount that was associated with adding them, and the IDs of the Configuration objects
-       *        when they were added. The combination of these three values is used to prevent the removal of
-       *        any  {@code Configuration} which has subsequently been updated by other services since the
-       *        {@code CMBundleExtension} added them.
-       */
-      virtual void RemoveConfigurations(std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs) = 0;
+  /**
+   * Internal method used by {@code CMBundleExtension} to remove the {@code Configuration} objects that it created
+   *
+   * @param pidsAndChangeCountsAndIDs A vector of ConfigurationAddedInfos which contain the PIDs to remove,
+   *        the changeCount that was associated with adding them, and the IDs of the Configuration objects
+   *        when they were added. The combination of these three values is used to prevent the removal of
+   *        any  {@code Configuration} which has subsequently been updated by other services since the
+   *        {@code CMBundleExtension} added them.
+   */
+  virtual void RemoveConfigurations(
+    std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs) = 0;
 
-      /**
-       * Internal method used to notify any {@code ManagedService} or {@code ManagedServiceFactory} of an
-       * update to a {@code Configuration}. Performs the notifications asynchronously with the latest state
-       * of the properties at the time.
-       *
-       * @param pid The PID of the {@code Configuration} which has been updated
-       */
-      virtual std::shared_future<void> NotifyConfigurationUpdated(const std::string& pid)  = 0;
+  /**
+   * Internal method used to notify any {@code ManagedService} or {@code ManagedServiceFactory} of an
+   * update to a {@code Configuration}. Performs the notifications asynchronously with the latest state
+   * of the properties at the time.
+   *
+   * @param pid The PID of the {@code Configuration} which has been updated
+   */
+  virtual std::shared_future<void> NotifyConfigurationUpdated(const std::string& pid) = 0;
 
-      /**
-       * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
-       * {@code ManagedServiceFactory} of the removal of a {@code Configuration}. Performs the notifications
-       * asynchronously.
-       *
-       * @param pid The PID of the {@code Configuration} which has been removed.
-       * @param configurationId The unique id of the configuration which has been removed. Used to avoid race conditions.
-       */
-      virtual  std::shared_future<void> NotifyConfigurationRemoved(const std::string& pid, std::uintptr_t configurationId) = 0;
-    };
-  } // cmimpl
+  /**
+   * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
+   * {@code ManagedServiceFactory} of the removal of a {@code Configuration}. Performs the notifications
+   * asynchronously.
+   *
+   * @param pid The PID of the {@code Configuration} which has been removed.
+   * @param configurationId The unique id of the configuration which has been removed. Used to avoid race conditions.
+   */
+  virtual std::shared_future<void> NotifyConfigurationRemoved(const std::string& pid,
+                                          std::uintptr_t configurationId) = 0;
+};
+} // cmimpl
 } // cppmicroservices
 
 #endif /* CONFIGURATIONADMINPRIVATE_HPP */

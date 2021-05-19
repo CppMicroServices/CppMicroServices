@@ -25,13 +25,13 @@
 
 #include "boost/asio/thread_pool.hpp"
 #if defined(USING_GTEST)
-#include "gtest/gtest_prod.h"
+#  include "gtest/gtest_prod.h"
 #else
-#define FRIEND_TEST(x, y)
+#  define FRIEND_TEST(x, y)
 #endif
+#include "ComponentManager.hpp"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/logservice/LogService.hpp"
-#include "ComponentManager.hpp"
 #include "ConfigurationNotifier.hpp"
 
 namespace cppmicroservices {
@@ -45,8 +45,7 @@ class ComponentManagerState;
  * service component. It implements a thread safe state design pattern to
  * handle requests for enabling and disabling a component.
  */
-class ComponentManagerImpl
-  : public ComponentManager
+class ComponentManagerImpl : public ComponentManager
 {
 public:
   ComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
@@ -85,12 +84,17 @@ public:
   /** @copydoc ComponentManager::GetComponentConfigurations()
    * Delegates the call to the current state object
    */
-  std::vector<std::shared_ptr<ComponentConfiguration>> GetComponentConfigurations() const override;
+  std::vector<std::shared_ptr<ComponentConfiguration>>
+  GetComponentConfigurations() const override;
 
   /** @copydoc ComponentManager::GetMetadata()
    * Returns the stored component description
    */
-  std::shared_ptr<const metadata::ComponentMetadata> GetMetadata() const override { return compDesc; }
+  std::shared_ptr<const metadata::ComponentMetadata> GetMetadata()
+    const override
+  {
+    return compDesc;
+  }
 
   /** @copydoc ComponentManager::GetName()
    * Returns the names from the stored component description
@@ -100,18 +104,26 @@ public:
   /** @copydoc ComponentManager::GetBundleId()
    * Returns the id of the {@link Bundle} which contains the component managed by this object
    */
-  unsigned long GetBundleId() const override { return GetBundle().GetBundleId(); }
+  unsigned long GetBundleId() const override
+  {
+    return GetBundle().GetBundleId();
+  }
 
   /**
    * This method returns the {@link Bundle} which contains the component managed by this object.
    */
-  Bundle GetBundle() const { return bundleContext ? bundleContext.GetBundle() : Bundle(); }
+  Bundle GetBundle() const
+  {
+    return bundleContext ? bundleContext.GetBundle() : Bundle();
+  }
 
   /**
    * Returns the logger object associated with this ComponentManager
    */
   std::shared_ptr<cppmicroservices::logservice::LogService> GetLogger() const
-  { return logger; }
+  {
+    return logger;
+  }
 
   /**
    * Returns the configNotifier object associated with this ComponentManager
@@ -150,8 +162,9 @@ public:
    * \param expectedState is the pointer to the current state object
    * \param desiredState is the state the caller wishes to set on this object
    */
-  virtual bool CompareAndSetState(std::shared_ptr<ComponentManagerState>* expectedState,
-                                  std::shared_ptr<ComponentManagerState> desiredState);
+  virtual bool CompareAndSetState(
+    std::shared_ptr<ComponentManagerState>* expectedState,
+    std::shared_ptr<ComponentManagerState> desiredState);
 
   /**
    * This method returns the current state object of this object.
@@ -162,7 +175,11 @@ public:
    * Returns the {@link ComponentRegistry} object associated with this
    * runtime instance
    */
-  virtual std::shared_ptr<ComponentRegistry> GetRegistry() const { return registry; }
+
+  virtual std::shared_ptr<ComponentRegistry> GetRegistry() const 
+  { 
+    return registry;
+  }
 
   /**
    * Attempts to change the state from disabled to enabled and posts asynchronous work
@@ -185,7 +202,6 @@ public:
   std::shared_future<void> PostAsyncEnabledToDisabled(
     std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>&
       currentState);
-
 
 private:
   FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);

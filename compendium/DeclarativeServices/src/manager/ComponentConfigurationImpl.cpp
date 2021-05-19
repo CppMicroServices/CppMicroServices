@@ -21,6 +21,11 @@
   =============================================================================*/
 
 #include "ComponentConfigurationImpl.hpp"
+#include <cassert>
+#include <iostream>
+#include <memory>
+#include "boost/asio/post.hpp"
+#include "ComponentManager.hpp"
 #include "../ConfigurationListenerImpl.hpp"
 #include "BundleLoader.hpp"
 #include "ConfigurationManager.hpp"
@@ -30,11 +35,6 @@
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "states/CCUnsatisfiedReferenceState.hpp"
 #include "states/ComponentConfigurationState.hpp"
-#include <cassert>
-#include <iostream>
-#include <memory>
-#include "boost/asio/post.hpp"
-#include "ComponentManager.hpp"
 
 using cppmicroservices::scrimpl::ReferenceManagerImpl;
 using cppmicroservices::service::component::ComponentConstants::COMPONENT_ID;
@@ -415,7 +415,6 @@ ComponentConfigurationImpl::GetState() const
 void ComponentConfigurationImpl::LoadComponentCreatorDestructor()
 {
   if (newCompInstanceFunc == nullptr || deleteCompInstanceFunc == nullptr) {
-
     auto compName = GetMetadata()->name;
     auto position = compName.find("~");
  

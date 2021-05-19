@@ -21,35 +21,32 @@
 =============================================================================*/
 
 #include "TestUtils.hpp"
+#include "DSTestingConfig.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Constants.h"
+#include "cppmicroservices/util/Error.h"
 #include "cppmicroservices/util/FileSystem.h"
 #include <iostream>
-#include "DSTestingConfig.h"
-#include "cppmicroservices/util/Error.h"
 
 #if defined(US_PLATFORM_WINDOWS)
-  #include <Windows.h>
-  #include <psapi.h>
+#  include <Windows.h>
+#  include <psapi.h>
 #else
-  #include <fstream>
-  #include <unistd.h>
+#  include <fstream>
+#  include <unistd.h>
 #endif
 
 #if defined(US_PLATFORM_LINUX)
-  #include <linux/limits.h>
+#  include <linux/limits.h>
 #endif
 
 namespace {
 
 std::string PathToLib(const std::string& libName)
 {
-  return (cppmicroservices::testing::LIB_PATH
-          + cppmicroservices::util::DIR_SEP
-          + US_LIB_PREFIX
-          + libName
-          + US_LIB_POSTFIX
-          + US_LIB_EXT);
+  return (cppmicroservices::testing::LIB_PATH +
+          cppmicroservices::util::DIR_SEP + US_LIB_PREFIX + libName +
+          US_LIB_POSTFIX + US_LIB_EXT);
 }
 
 }
@@ -58,38 +55,37 @@ namespace test {
 
 void InstallLib(
 #if defined(US_BUILD_SHARED_LIBS)
-  ::cppmicroservices::BundleContext frameworkCtx
-  , const std::string& libName
+  ::cppmicroservices::BundleContext frameworkCtx,
+  const std::string& libName
 #else
-  ::cppmicroservices::BundleContext
-  , const std::string&
+  ::cppmicroservices::BundleContext,
+  const std::string&
 #endif
-  )
+)
 {
 #if defined(US_BUILD_SHARED_LIBS)
   frameworkCtx.InstallBundles(PathToLib(libName));
 #endif
 }
 
-cppmicroservices::Bundle InstallAndStartBundle(::cppmicroservices::BundleContext frameworkCtx, const std::string& libName)
+cppmicroservices::Bundle InstallAndStartBundle(
+  ::cppmicroservices::BundleContext frameworkCtx,
+  const std::string& libName)
 {
   std::vector<cppmicroservices::Bundle> bundles;
 
 #if defined(US_BUILD_SHARED_LIBS)
-  bundles = frameworkCtx.InstallBundles(cppmicroservices::testing::LIB_PATH
-        + cppmicroservices::util::DIR_SEP
-        + US_LIB_PREFIX
-        + libName
-        + US_LIB_POSTFIX
-        + US_LIB_EXT);
+  bundles = frameworkCtx.InstallBundles(
+    cppmicroservices::testing::LIB_PATH + cppmicroservices::util::DIR_SEP +
+    US_LIB_PREFIX + libName + US_LIB_POSTFIX + US_LIB_EXT);
 #else
   bundles = frameworkCtx.GetBundles();
 #endif
 
   for (auto b : bundles) {
     if (b.GetSymbolicName() == libName) {
-        b.Start();
-        return b;
+      b.Start();
+      return b;
     }
   }
   return {};
@@ -98,15 +94,12 @@ cppmicroservices::Bundle InstallAndStartBundle(::cppmicroservices::BundleContext
 long GetServiceId(const ::cppmicroservices::ServiceReferenceBase& sRef)
 {
   long serviceId = 0;
-  try 
-  {
-    if(sRef)
-    {
-      serviceId = cppmicroservices::any_cast<long int>(sRef.GetProperty(::cppmicroservices::Constants::SERVICE_ID));
+  try {
+    if (sRef) {
+      serviceId = cppmicroservices::any_cast<long int>(
+        sRef.GetProperty(::cppmicroservices::Constants::SERVICE_ID));
     }
-  }
-  catch (const std::exception& e)
-  {
+  } catch (const std::exception& e) {
     std::cout << "Exception: " << e.what() << std::endl;
     throw;
   }
@@ -115,7 +108,7 @@ long GetServiceId(const ::cppmicroservices::ServiceReferenceBase& sRef)
 
 std::string GetDSRuntimePluginFilePath()
 {
-  std::string libName { "DeclarativeServices" };
+  std::string libName{ "DeclarativeServices" };
 #if defined(US_PLATFORM_WINDOWS)
   libName += US_DeclarativeServices_VERSION_MAJOR;
 #endif
@@ -124,8 +117,8 @@ std::string GetDSRuntimePluginFilePath()
 
 std::string GetTestPluginsPath()
 {
-  return (cppmicroservices::testing::LIB_PATH
-          + cppmicroservices::util::DIR_SEP);
+  return (cppmicroservices::testing::LIB_PATH +
+          cppmicroservices::util::DIR_SEP);
 }
 
 void InstallAndStartDS(::cppmicroservices::BundleContext frameworkCtx)
@@ -160,72 +153,73 @@ bool isBundleLoadedInThisProcess(std::string bundleName)
 {
 #if defined(US_PLATFORM_WINDOWS)
 
-    HMODULE hMods[1024];
-    DWORD cbNeeded;
+  HMODULE hMods[1024];
+  DWORD cbNeeded;
 
-    HANDLE hProcess = GetCurrentProcess();
+  HANDLE hProcess = GetCurrentProcess();
 
-    if (!EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
-    {
-        std::cout << "FAILURE:\n" << "EnumProcessModules failed : " << cppmicroservices::util::GetLastWin32ErrorStr() << std::endl;
-        SetLastError(0);
-        return false;
-    }
-
-    if ((sizeof(hMods) < cbNeeded))
-    {
-        std::cout << "WARNING:\n" << "EnumProcessModules : Size of array is too small to hold all module handles" << std::endl;
-    }
-
-    TCHAR szModName[MAX_PATH * 2];
-    std::size_t found;
-
-    for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
-    {
-        if (!GetModuleFileNameA(hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR)))
-        {
-            std::cout << "WARNING:\n" << "GetModuleFileNameA failed :" << cppmicroservices::util::GetLastWin32ErrorStr() << std::endl;
-            SetLastError(0);
-        }
-
-        found = std::string(szModName).find(bundleName);
-        if (found != std::string::npos)
-        {
-            return true;
-        }
-    }
-
+  if (!EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded)) {
+    std::cout << "FAILURE:\n"
+              << "EnumProcessModules failed : "
+              << cppmicroservices::util::GetLastWin32ErrorStr() << std::endl;
+    SetLastError(0);
     return false;
+  }
+
+  if ((sizeof(hMods) < cbNeeded)) {
+    std::cout << "WARNING:\n"
+              << "EnumProcessModules : Size of array is too small to hold all "
+                 "module handles"
+              << std::endl;
+  }
+
+  TCHAR szModName[MAX_PATH * 2];
+  std::size_t found;
+
+  for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++) {
+    if (!GetModuleFileNameA(
+          hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR))) {
+      std::cout << "WARNING:\n"
+                << "GetModuleFileNameA failed :"
+                << cppmicroservices::util::GetLastWin32ErrorStr() << std::endl;
+      SetLastError(0);
+    }
+
+    found = std::string(szModName).find(bundleName);
+    if (found != std::string::npos) {
+      return true;
+    }
+  }
+
+  return false;
 #else
-    auto pid_t = getpid();
-    std::string command("lsof -p " + std::to_string(pid_t));
-    FILE* fd = popen(command.c_str(), "r");
-    if (nullptr == fd)
-    {
-        std::cout << "FAILURE:\n" << "popen failed" << std::endl;
-        return false;
-    }
-
-    std::size_t found;
-    char buf[PATH_MAX];
-    while (nullptr != fgets(buf, PATH_MAX, fd))
-    {
-        found = std::string(buf).find(bundleName);
-        if (found != std::string::npos)
-        {
-            if(-1 == pclose(fd))
-            {
-                std::cout << "WARNING:\n" << "pclose failed"<< std::endl;
-            }
-            return true;
-        }
-    }
-
-    if(-1 == pclose(fd))
-    {
-        std::cout << "WARNING:\n" << "pclose failed"<< std::endl;
-    }
+  auto pid_t = getpid();
+  std::string command("lsof -p " + std::to_string(pid_t));
+  FILE* fd = popen(command.c_str(), "r");
+  if (nullptr == fd) {
+    std::cout << "FAILURE:\n"
+              << "popen failed" << std::endl;
     return false;
+  }
+
+  std::size_t found;
+  char buf[PATH_MAX];
+  while (nullptr != fgets(buf, PATH_MAX, fd)) {
+    found = std::string(buf).find(bundleName);
+    if (found != std::string::npos) {
+      if (-1 == pclose(fd)) {
+        std::cout << "WARNING:\n"
+                  << "pclose failed" << std::endl;
+      }
+      return true;
+    }
+  }
+
+  if (-1 == pclose(fd)) {
+    std::cout << "WARNING:\n"
+              << "pclose failed" << std::endl;
+  }
+  return false;
 #endif
 }
 

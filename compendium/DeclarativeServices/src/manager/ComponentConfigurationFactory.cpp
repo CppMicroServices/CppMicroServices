@@ -21,10 +21,10 @@
   =============================================================================*/
 
 #include "ComponentConfigurationFactory.hpp"
-#include "SingletonComponentConfiguration.hpp"
 #include "BundleOrPrototypeComponentConfiguration.hpp"
 #include "boost/asio/thread_pool.hpp"
 #include "ComponentManager.hpp"
+#include "SingletonComponentConfiguration.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -40,8 +40,7 @@ std::shared_ptr<ComponentConfigurationImpl> ComponentConfigurationFactory::Creat
 {
   std::shared_ptr<ComponentConfigurationImpl> retVal;
   std::string scope = compDesc->serviceMetadata.scope;
-  if(scope == cppmicroservices::Constants::SCOPE_SINGLETON)
-  {
+  if(scope == cppmicroservices::Constants::SCOPE_SINGLETON){
     retVal = std::make_shared<SingletonComponentConfigurationImpl>(compDesc,
                                                                    bundle,
                                                                    registry,
@@ -61,8 +60,7 @@ std::shared_ptr<ComponentConfigurationImpl> ComponentConfigurationFactory::Creat
                                                                            configNotifier,
                                                                            managers);
   }
-  if(retVal)
-  {
+  if (retVal) {
     retVal->Initialize();
   }
   return retVal;

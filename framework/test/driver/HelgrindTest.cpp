@@ -44,7 +44,7 @@ void WrongLockOrder()
   std::unique_lock<std::mutex> l2(m1);
 }
 
-int HelgrindTest(int /*argc*/, char* /*argv*/ [])
+int HelgrindTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("HelgrindTest");
 

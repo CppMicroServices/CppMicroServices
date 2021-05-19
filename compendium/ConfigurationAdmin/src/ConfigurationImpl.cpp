@@ -26,78 +26,75 @@
 #include "ConfigurationImpl.hpp"
 
 namespace {
-  constexpr auto REMOVED_EXCEPTION_MESSAGE = "This Configuration has been Removed";
+constexpr auto REMOVED_EXCEPTION_MESSAGE =
+  "This Configuration has been Removed";
 }
 
 namespace cppmicroservices {
-  namespace cmimpl {
+namespace cmimpl {
 
-    ConfigurationImpl::ConfigurationImpl(ConfigurationAdminPrivate* configAdmin,
-                                         std::string thePid,
-                                         std::string theFactoryPid,
-                                         AnyMap props)
-    : configAdminImpl(configAdmin)
-    , pid(std::move(thePid))
-    , factoryPid(std::move(theFactoryPid))
-    , properties(std::move(props))
-    , changeCount{1u}
-    , removed{false}
-    {
-      assert(configAdminImpl != nullptr && "Invalid ConfigurationAdminPrivate pointer");
-    }
+ConfigurationImpl::ConfigurationImpl(ConfigurationAdminPrivate* configAdmin,
+                                     std::string thePid,
+                                     std::string theFactoryPid,
+                                     AnyMap props)
+  : configAdminImpl(configAdmin)
+  , pid(std::move(thePid))
+  , factoryPid(std::move(theFactoryPid))
+  , properties(std::move(props))
+  , changeCount{ 1u }
+  , removed{ false }
+{
+  assert(configAdminImpl != nullptr &&
+         "Invalid ConfigurationAdminPrivate pointer");
+}
 
-    std::string ConfigurationImpl::GetPid() const
-    {
-      std::lock_guard<std::mutex> lk{propertiesMutex};
-      if (removed)
-      {
-        throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
-      }
-      return pid;
-    }
+std::string ConfigurationImpl::GetPid() const
+{
+  std::lock_guard<std::mutex> lk{ propertiesMutex };
+  if (removed) {
+    throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
+  }
+  return pid;
+}
 
-    std::string ConfigurationImpl::GetFactoryPid() const
-    {
-      std::lock_guard<std::mutex> lk{propertiesMutex};
-      if (removed)
-      {
-        throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
-      }
-      return factoryPid;
-    }
+std::string ConfigurationImpl::GetFactoryPid() const
+{
+  std::lock_guard<std::mutex> lk{ propertiesMutex };
+  if (removed) {
+    throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
+  }
+  return factoryPid;
+}
 
-    AnyMap ConfigurationImpl::GetProperties() const
-    {
-      std::lock_guard<std::mutex> lk{propertiesMutex};
-      if (removed)
-      {
-        throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
-      }
-      return properties;
-    }
+AnyMap ConfigurationImpl::GetProperties() const
+{
+  std::lock_guard<std::mutex> lk{ propertiesMutex };
+  if (removed) {
+    throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
+  }
+  return properties;
+}
 
-    std::shared_future<void> ConfigurationImpl::Update(AnyMap newProperties)
-    {
-      {
-        std::lock_guard<std::mutex> lk{propertiesMutex};
-        if (removed)
-        {
-          throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
-        }
-        properties = std::move(newProperties);
-        ++changeCount;
-      }
-      std::lock_guard<std::mutex> lk{configAdminMutex};
-      if (configAdminImpl)
-      {
-        std::shared_future<void> fut = configAdminImpl->NotifyConfigurationUpdated(pid);
-        return fut;
-      }
-      std::promise<void> ready;
-      std::shared_future<void> fut = ready.get_future();
-      ready.set_value();
-      return fut;
+std::shared_future<void> ConfigurationImpl::Update(AnyMap newProperties)
+{
+  {
+    std::lock_guard<std::mutex> lk{ propertiesMutex };
+    if (removed) {
+      throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
     }
+    properties = std::move(newProperties);
+    ++changeCount;
+  }
+  std::lock_guard<std::mutex> lk{ configAdminMutex };
+  if (configAdminImpl) {
+    std::shared_future<void> fut = configAdminImpl->NotifyConfigurationUpdated(pid);
+	return fut;
+  }
+  std::promise<void> ready;
+  std::shared_future<void> fut = ready.get_future();
+  ready.set_value();
+  return fut;
+}
 
     std::pair<bool, std::shared_future<void>> ConfigurationImpl::UpdateIfDifferent(AnyMap newProperties)
     {
@@ -142,45 +139,43 @@ namespace cppmicroservices {
       ready.set_value();
       return fut;
     }
+ 
+std::pair<bool, unsigned long>
+ConfigurationImpl::UpdateWithoutNotificationIfDifferent(AnyMap newProperties)
+{
+  std::lock_guard<std::mutex> lk{ propertiesMutex };
+  if (removed) {
+    throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
+  }
+  std::ostringstream existingProps;
+  std::ostringstream newProps;
+  cppmicroservices::any_value_to_string(existingProps, properties);
+  cppmicroservices::any_value_to_string(newProps, newProperties);
+  if (existingProps.str() == newProps.str()) {
+    return std::pair<bool, unsigned long>{ false, 0u };
+  }
+  properties = std::move(newProperties);
+  return std::pair<bool, unsigned long>{ true, ++changeCount };
+}
 
-    std::pair<bool, unsigned long> ConfigurationImpl::UpdateWithoutNotificationIfDifferent(AnyMap newProperties)
-    {
-      std::lock_guard<std::mutex> lk{propertiesMutex};
-      if (removed)
-      {
-        throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
-      }
-      std::ostringstream existingProps;
-      std::ostringstream newProps;
-      cppmicroservices::any_value_to_string(existingProps, properties);
-      cppmicroservices::any_value_to_string(newProps, newProperties);
-      if (existingProps.str() == newProps.str())
-      {
-        return std::pair<bool, unsigned long>{false, 0u};
-      }
-      properties = std::move(newProperties);
-      return std::pair<bool, unsigned long>{true, ++changeCount};
-    }
+bool ConfigurationImpl::RemoveWithoutNotificationIfChangeCountEquals(
+  unsigned long expectedChangeCount)
+{
+  std::lock_guard<std::mutex> lk{ propertiesMutex };
+  if (removed) {
+    throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
+  }
+  if (expectedChangeCount == changeCount) {
+    removed = true;
+    return true;
+  }
+  return false;
+}
 
-    bool ConfigurationImpl::RemoveWithoutNotificationIfChangeCountEquals(unsigned long expectedChangeCount)
-    {
-      std::lock_guard<std::mutex> lk{propertiesMutex};
-      if (removed)
-      {
-        throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
-      }
-      if (expectedChangeCount == changeCount)
-      {
-        removed = true;
-        return true;
-      }
-      return false;
-    }
-
-    void ConfigurationImpl::Invalidate()
-    {
-      std::lock_guard<std::mutex> lk{configAdminMutex};
-      configAdminImpl = nullptr;
-    }
-  } // cmimpl
+void ConfigurationImpl::Invalidate()
+{
+  std::lock_guard<std::mutex> lk{ configAdminMutex };
+  configAdminImpl = nullptr;
+}
+} // cmimpl
 } // cppmicroservices

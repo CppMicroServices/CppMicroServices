@@ -3,18 +3,18 @@
 
 namespace sample {
 
-void ServiceComponentDynamicGreedyMandatoryUnary::Activate(const std::shared_ptr<ComponentContext>& /*ctxt*/)
-{
-}
-  
-void ServiceComponentDynamicGreedyMandatoryUnary::Deactivate(const std::shared_ptr<ComponentContext>&)
-{
-}
+void ServiceComponentDynamicGreedyMandatoryUnary::Activate(
+  const std::shared_ptr<ComponentContext>& /*ctxt*/)
+{}
+
+void ServiceComponentDynamicGreedyMandatoryUnary::Deactivate(
+  const std::shared_ptr<ComponentContext>&)
+{}
 
 std::string ServiceComponentDynamicGreedyMandatoryUnary::ExtendedDescription()
 {
   std::lock_guard<std::mutex> lock(fooMutex);
-  if(!foo) {
+  if (!foo) {
     throw std::runtime_error("Dependency not available");
   }
   std::string result("ServiceComponentDynamicGreedyMandatoryUnary ");
@@ -23,7 +23,8 @@ std::string ServiceComponentDynamicGreedyMandatoryUnary::ExtendedDescription()
   return result;
 }
 
-void ServiceComponentDynamicGreedyMandatoryUnary::Bindfoo(const std::shared_ptr<test::Interface1>& theFoo)
+void ServiceComponentDynamicGreedyMandatoryUnary::Bindfoo(
+  const std::shared_ptr<test::Interface1>& theFoo)
 {
   std::lock_guard<std::mutex> lock(fooMutex);
   if (foo != theFoo) {
@@ -31,7 +32,8 @@ void ServiceComponentDynamicGreedyMandatoryUnary::Bindfoo(const std::shared_ptr<
   }
 }
 
-void ServiceComponentDynamicGreedyMandatoryUnary::Unbindfoo(const std::shared_ptr<test::Interface1>& theFoo)
+void ServiceComponentDynamicGreedyMandatoryUnary::Unbindfoo(
+  const std::shared_ptr<test::Interface1>& theFoo)
 {
   std::lock_guard<std::mutex> lock(fooMutex);
   if (foo == theFoo) {

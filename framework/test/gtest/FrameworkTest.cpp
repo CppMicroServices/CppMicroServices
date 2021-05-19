@@ -371,7 +371,9 @@ TEST(FrameworkTest, Properties)
     f.GetSymbolicName(),
     Constants::SYSTEM_BUNDLE_SYMBOLICNAME); // "Test Framework Bundle Name"
   ASSERT_EQ(f.GetBundleId(), 0);            // "Test Framework Bundle Id"
-  ASSERT_EQ(f.GetVersion().ToString(), US_FRAMEWORK_VERSION_STR); // Test that the build correctly generated the version
+  ASSERT_EQ(
+    f.GetVersion().ToString(),
+    US_FRAMEWORK_VERSION_STR); // Test that the build correctly generated the version
 }
 
 TEST(Framework, LifeCycle)

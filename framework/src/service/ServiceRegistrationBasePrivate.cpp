@@ -33,7 +33,7 @@ namespace cppmicroservices {
 
 ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
   BundlePrivate* bundle,
-  InterfaceMapConstPtr  service,
+  InterfaceMapConstPtr service,
   Properties&& props)
   : ref(0)
   , service(std::move(service))

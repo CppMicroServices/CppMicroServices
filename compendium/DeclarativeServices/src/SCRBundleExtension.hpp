@@ -23,17 +23,17 @@
 #ifndef __SCRBUNDLEEXTENSION_HPP__
 #define __SCRBUNDLEEXTENSION_HPP__
 
-#include <memory>
 #include "boost/asio/thread_pool.hpp"
+#include <memory>
 #if defined(USING_GTEST)
-#include "gtest/gtest_prod.h"
+#  include "gtest/gtest_prod.h"
 #else
-#define FRIEND_TEST(x, y)
+#  define FRIEND_TEST(x, y)
 #endif
-#include "cppmicroservices/BundleContext.h"
 #include "ComponentRegistry.hpp"
-#include "manager/ComponentManager.hpp"
+#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/logservice/LogService.hpp"
+#include "manager/ComponentManager.hpp"
 #include "metadata/Util.hpp"
 #include "manager/ConfigurationNotifier.hpp"
 
@@ -62,6 +62,7 @@ public:
   SCRBundleExtension& operator=(const SCRBundleExtension&) = delete;
   SCRBundleExtension& operator=(SCRBundleExtension&&) = delete;
   ~SCRBundleExtension();
+
 private:
   FRIEND_TEST(SCRBundleExtensionTest, CtorWithValidArgs);
 

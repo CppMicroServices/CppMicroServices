@@ -22,17 +22,17 @@
 
 #include <random>
 
-#include "cppmicroservices/Framework.h"
-#include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/FrameworkEvent.h"
-#include "cppmicroservices/ServiceInterface.h"
 #include "../src/manager/ComponentConfigurationImpl.hpp"
-#include "Mocks.hpp"
-#include "ConcurrencyTestUtil.hpp"
-#include "../src/manager/states/CCUnsatisfiedReferenceState.hpp"
-#include "../src/manager/states/CCRegisteredState.hpp"
-#include "../src/manager/states/CCActiveState.hpp"
 #include "../src/manager/ReferenceManager.hpp"
+#include "../src/manager/states/CCActiveState.hpp"
+#include "../src/manager/states/CCRegisteredState.hpp"
+#include "../src/manager/states/CCUnsatisfiedReferenceState.hpp"
+#include "ConcurrencyTestUtil.hpp"
+#include "Mocks.hpp"
+#include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkEvent.h"
+#include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/ServiceInterface.h"
 
 #include "TestUtils.hpp"
 #include <TestInterfaces/Interfaces.hpp>
@@ -42,25 +42,25 @@ using cppmicroservices::service::component::ComponentContext;
 namespace cppmicroservices {
 namespace scrimpl {
 
-class ComponentConfigurationImplTest
-  : public ::testing::Test
+class ComponentConfigurationImplTest : public ::testing::Test
 {
 protected:
-  ComponentConfigurationImplTest() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {
-  }
+  ComponentConfigurationImplTest()
+    : framework(cppmicroservices::FrameworkFactory().NewFramework())
+  {}
 
   virtual ~ComponentConfigurationImplTest() = default;
 
-  virtual void SetUp() {
-    framework.Start();
-  }
+  virtual void SetUp() { framework.Start(); }
 
-  virtual void TearDown() {
+  virtual void TearDown()
+  {
     framework.Stop();
     framework.WaitForStop(std::chrono::milliseconds::zero());
   }
 
   cppmicroservices::Framework& GetFramework() { return framework; }
+
 private:
   cppmicroservices::Framework framework;
 };
@@ -131,8 +131,7 @@ TEST_F(ComponentConfigurationImplTest, VerifyUniqueId)
 
   std::set<unsigned long> idSet;
   const size_t iterCount = 10;
-  for(size_t i =0; i < iterCount; ++i)
-  {
+  for (size_t i = 0; i < iterCount; ++i) {
     EXPECT_NO_THROW({
         auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                 GetFramework(),
@@ -168,10 +167,12 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefSatisfied)
     .WillRepeatedly(testing::Return(true)); // simulate pre-existing reference
   EXPECT_CALL(*refMgr2, IsSatisfied())
     .Times(1)
-    .WillOnce(testing::Return(true));       // simulate reference that becomes available
+    .WillOnce(
+      testing::Return(true)); // simulate reference that becomes available
   EXPECT_CALL(*refMgr3, IsSatisfied())
     .Times(1)
-    .WillOnce(testing::Return(false));      // simulate reference that is unavailable when ref2 is satisfied
+    .WillOnce(testing::Return(
+      false)); // simulate reference that is unavailable when ref2 is satisfied
   auto mockFactory = std::make_shared<MockFactory>();
   auto mockCompInstance = std::make_shared<MockComponentInstance>();
   auto bc = GetFramework().GetBundleContext();
@@ -191,16 +192,21 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefSatisfied)
   fakeCompConfig->referenceManagers.insert(std::make_pair("ref1", refMgr1));
   fakeCompConfig->referenceManagers.insert(std::make_pair("ref2", refMgr2));
   fakeCompConfig->referenceManagers.insert(std::make_pair("ref3", refMgr3));
-  EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(fakeCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
   // callback from refMgr2
   fakeCompConfig->RefSatisfied("ref2");
-  EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(fakeCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
   // callback from refMgr3
   fakeCompConfig->RefSatisfied("ref3");
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::SATISFIED);
   EXPECT_EQ(fakeCompConfig->GetServiceReference().operator bool(), true);
-  EXPECT_EQ(fakeCompConfig->GetServiceReference().IsConvertibleTo(mockMetadata->serviceMetadata.interfaces.at(0)), true);
-  fakeCompConfig->referenceManagers.clear(); // remove the mock reference managers
+  EXPECT_EQ(fakeCompConfig->GetServiceReference().IsConvertibleTo(
+              mockMetadata->serviceMetadata.interfaces.at(0)),
+            true);
+  fakeCompConfig->referenceManagers
+    .clear(); // remove the mock reference managers
 }
 
 TEST_F(ComponentConfigurationImplTest, VerifyRefUnsatisfied)
@@ -225,24 +231,31 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefUnsatisfied)
   auto mockUnsatisfiedState = std::make_shared<MockComponentConfigurationState>();
   EXPECT_CALL(*mockStatisfiedState, GetValue())
     .Times(2)
-    .WillRepeatedly(testing::Return(service::component::runtime::dto::SATISFIED));
+    .WillRepeatedly(testing::Return(
+      service::component::runtime::dto::ComponentState::SATISFIED));
   EXPECT_CALL(*mockStatisfiedState, Deactivate(testing::_))
     .Times(1)
-    .WillRepeatedly(testing::Invoke([&](ComponentConfigurationImpl& config){
-                                      config.state = mockUnsatisfiedState;
-                                    }));
+    .WillRepeatedly(testing::Invoke([&](ComponentConfigurationImpl& config) {
+      config.state = mockUnsatisfiedState;
+    }));
   EXPECT_CALL(*mockUnsatisfiedState, GetValue())
     .Times(1)
-    .WillRepeatedly(testing::Return(service::component::runtime::dto::UNSATISFIED_REFERENCE));
+    .WillRepeatedly(testing::Return(
+      service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE));
   auto refMgr1 = std::make_shared<MockReferenceManager>();
   fakeCompConfig->referenceManagers.insert(std::make_pair("ref1", refMgr1));
   fakeCompConfig->state = mockStatisfiedState;
-  EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::SATISFIED);
+  EXPECT_EQ(fakeCompConfig->GetConfigState(),
+            service::component::runtime::dto::ComponentState::SATISFIED);
   fakeCompConfig->RefUnsatisfied("invalid_refname");
-  EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::SATISFIED);
+  EXPECT_EQ(fakeCompConfig->GetConfigState(),
+            service::component::runtime::dto::ComponentState::SATISFIED);
   fakeCompConfig->RefUnsatisfied("ref1");
-  EXPECT_EQ(fakeCompConfig->GetConfigState(), service::component::runtime::dto::UNSATISFIED_REFERENCE);
-  fakeCompConfig->referenceManagers.clear(); // remove the mock reference managers
+  EXPECT_EQ(
+    fakeCompConfig->GetConfigState(),
+    service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE);
+  fakeCompConfig->referenceManagers
+    .clear(); // remove the mock reference managers
 }
 
 TEST_F(ComponentConfigurationImplTest, VerifyRefChangedState)
@@ -257,7 +270,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefChangedState)
   // and a reference to the same service interface will not cause a state change.
   scrimpl::metadata::ReferenceMetadata refMetadata{};
   refMetadata.interfaceName = "dummy::ServiceImpl";
-  mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
+  mockMetadata->serviceMetadata.interfaces = {
+    us_service_interface_iid<dummy::ServiceImpl>()
+  };
   mockMetadata->refsMetadata.push_back(refMetadata);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger);
@@ -266,11 +281,13 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefChangedState)
   auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(
     mockMetadata, GetFramework(), mockRegistry, fakeLogger, threadpool, notifier, managers);
 
-  auto reg = GetFramework().GetBundleContext().RegisterService<dummy::ServiceImpl>(
-    std::make_shared<dummy::ServiceImpl>());
+  auto reg =
+    GetFramework().GetBundleContext().RegisterService<dummy::ServiceImpl>(
+      std::make_shared<dummy::ServiceImpl>());
 
-  EXPECT_EQ(fakeCompConfig->GetConfigState(),
-    service::component::runtime::dto::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(
+    fakeCompConfig->GetConfigState(),
+    service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE);
   reg.Unregister();
 }
 
@@ -305,7 +322,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
   // Test if a call to Register will change the state when the component
   // provides a service.
   {
-    mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
+    mockMetadata->serviceMetadata.interfaces = {
+      us_service_interface_iid<dummy::ServiceImpl>()
+    };
     auto mockFactory = std::make_shared<MockFactory>();
     auto notifier = std::make_shared<ConfigurationNotifier>(
       GetFramework().GetBundleContext(), fakeLogger);
@@ -323,19 +342,24 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
     EXPECT_CALL(*fakeCompConfig, GetFactory())
       .Times(1)
       .WillRepeatedly(testing::Return(mockFactory));
-    EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+    EXPECT_EQ(fakeCompConfig->GetConfigState(),
+              ComponentState::UNSATISFIED_REFERENCE);
     EXPECT_NE(fakeCompConfig->regManager, nullptr);
     EXPECT_EQ(fakeCompConfig->referenceManagers.size(), static_cast<size_t>(0));
     EXPECT_NO_THROW(fakeCompConfig->Register());
     EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::SATISFIED);
     EXPECT_EQ(fakeCompConfig->GetServiceReference().operator bool(), true);
-    EXPECT_EQ(fakeCompConfig->GetServiceReference().IsConvertibleTo(us_service_interface_iid<dummy::ServiceImpl>()), true);
+    EXPECT_EQ(fakeCompConfig->GetServiceReference().IsConvertibleTo(
+                us_service_interface_iid<dummy::ServiceImpl>()),
+              true);
   }
   // Test if a call to Register will change the state when the component
   // provides a service and component is immediate type.
   // For immediate component, a call to Register will result in immediate activation
   {
-    mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
+    mockMetadata->serviceMetadata.interfaces = {
+      us_service_interface_iid<dummy::ServiceImpl>()
+    };
     mockMetadata->immediate = true;
     auto mockFactory = std::make_shared<MockFactory>();
     auto mockCompInstance = std::make_shared<MockComponentInstance>();
@@ -358,13 +382,16 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
     EXPECT_CALL(*fakeCompConfig, CreateAndActivateComponentInstance(testing::_))
       .Times(1)
       .WillRepeatedly(testing::Return(mockCompInstance));
-    EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+    EXPECT_EQ(fakeCompConfig->GetConfigState(),
+              ComponentState::UNSATISFIED_REFERENCE);
     EXPECT_NE(fakeCompConfig->regManager, nullptr);
     EXPECT_EQ(fakeCompConfig->referenceManagers.size(), static_cast<size_t>(0));
     EXPECT_NO_THROW(fakeCompConfig->Register());
     EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
     EXPECT_EQ(fakeCompConfig->GetServiceReference().operator bool(), true);
-    EXPECT_EQ(fakeCompConfig->GetServiceReference().IsConvertibleTo(us_service_interface_iid<dummy::ServiceImpl>()), true);
+    EXPECT_EQ(fakeCompConfig->GetServiceReference().IsConvertibleTo(
+                us_service_interface_iid<dummy::ServiceImpl>()),
+              true);
   }
 }
 
@@ -389,15 +416,15 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeDelegation)
                                                                           managers);
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
   fakeCompConfig->state = mockState;
-  ComponentConfigurationImpl& fakeCompConfigBase = *(std::dynamic_pointer_cast<ComponentConfigurationImpl>(fakeCompConfig));
-  EXPECT_CALL(*mockState, Register(testing::Ref(fakeCompConfigBase)))
-    .Times(1);
-  EXPECT_CALL(*mockState, Activate(testing::Ref(fakeCompConfigBase), GetFramework()))
+  ComponentConfigurationImpl& fakeCompConfigBase =
+    *(std::dynamic_pointer_cast<ComponentConfigurationImpl>(fakeCompConfig));
+  EXPECT_CALL(*mockState, Register(testing::Ref(fakeCompConfigBase))).Times(1);
+  EXPECT_CALL(*mockState,
+              Activate(testing::Ref(fakeCompConfigBase), GetFramework()))
     .Times(1);
   EXPECT_CALL(*mockState, Deactivate(testing::Ref(fakeCompConfigBase)))
     .Times(1);
-  EXPECT_CALL(*mockState, GetValue())
-    .Times(1);
+  EXPECT_CALL(*mockState, GetValue()).Times(1);
   fakeCompConfig->Register();
   fakeCompConfig->Activate(GetFramework());
   fakeCompConfig->Deactivate();
@@ -481,34 +508,33 @@ TEST_F(ComponentConfigurationImplTest, VerifyDeactivate)
   auto activeState = std::make_shared<CCActiveState>();
   fakeCompConfig->state = activeState;
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
-  EXPECT_CALL(*fakeCompConfig, DestroyComponentInstances())
-    .Times(1);
+  EXPECT_CALL(*fakeCompConfig, DestroyComponentInstances()).Times(1);
   EXPECT_NO_THROW(fakeCompConfig->Deactivate());
-  EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(fakeCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
 }
 
-bool ValidateStateSequence(const std::vector<std::pair<ComponentState,ComponentState>>& stateArr
-                          )
+bool ValidateStateSequence(
+  const std::vector<std::pair<ComponentState, ComponentState>>& stateArr)
 {
   bool foundInvalidTransition = false;
   auto vecSize = stateArr.size();
-  for(size_t i = 0; i < vecSize && !foundInvalidTransition; ++i)
-  {
+  for (size_t i = 0; i < vecSize && !foundInvalidTransition; ++i) {
     auto currState = stateArr[i].first;
     auto nextState = stateArr[i].second;
-    switch(currState)
-    {
-      case service::component::runtime::dto::UNSATISFIED_REFERENCE:
-        if(nextState == service::component::runtime::dto::ACTIVE)
-        {
+    switch (currState) {
+      case service::component::runtime::dto::ComponentState::
+        UNSATISFIED_REFERENCE:
+        if (nextState ==
+            service::component::runtime::dto::ComponentState::ACTIVE) {
           foundInvalidTransition = true;
         }
         break;
-      case service::component::runtime::dto::SATISFIED:
+      case service::component::runtime::dto::ComponentState::SATISFIED:
         break;
-      case service::component::runtime::dto::ACTIVE:
-        if(nextState == service::component::runtime::dto::SATISFIED)
-        {
+      case service::component::runtime::dto::ComponentState::ACTIVE:
+        if (nextState ==
+            service::component::runtime::dto::ComponentState::SATISFIED) {
           foundInvalidTransition = true;
         }
         break;
@@ -525,7 +551,8 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentRegisterDeactivate)
   // - zero registrations if the current state is UNSATISFIED_REFERENCE
   // ensure there are zero objects of ComponentInstance
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
-  mockMetadata->serviceMetadata.interfaces = { "ServiceInterface", "interface" };
+  mockMetadata->serviceMetadata.interfaces = { "ServiceInterface",
+                                               "interface" };
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto notifier = std::make_shared<ConfigurationNotifier>(
@@ -543,35 +570,42 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentRegisterDeactivate)
                                                                           managers);
   EXPECT_CALL(*fakeCompConfig, GetFactory())
     .WillRepeatedly(testing::Return(std::make_shared<MockFactory>()));
-  EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(fakeCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
   EXPECT_NE(fakeCompConfig->regManager, nullptr);
-  std::function<std::pair<ComponentState, ComponentState>()> func = [&fakeCompConfig]() {
-                                                                      std::random_device rd;
-                                                                      std::mt19937 gen(rd());
-                                                                      std::uniform_int_distribution<unsigned int> dis;
-                                                                      int randVal = dis(gen);
-                                                                      auto prevState = fakeCompConfig->GetConfigState();
-                                                                      if(randVal & 0x1)
-                                                                      {
-                                                                        fakeCompConfig->Register();
-                                                                      }
-                                                                      else
-                                                                      {
-                                                                        fakeCompConfig->Deactivate();
-                                                                      }
-                                                                      auto currentState = fakeCompConfig->GetConfigState();
-                                                                      return std::make_pair(prevState, currentState);
-                                                                    };
+  std::function<std::pair<ComponentState, ComponentState>()> func =
+    [&fakeCompConfig]() {
+      std::random_device rd;
+      std::mt19937 gen(rd());
+      std::uniform_int_distribution<unsigned int> dis;
+      int randVal = dis(gen);
+      auto prevState = fakeCompConfig->GetConfigState();
+      if (randVal & 0x1) {
+        fakeCompConfig->Register();
+      } else {
+        fakeCompConfig->Deactivate();
+      }
+      auto currentState = fakeCompConfig->GetConfigState();
+      return std::make_pair(prevState, currentState);
+    };
 
   auto results = ConcurrentInvoke(func);
   EXPECT_TRUE(ValidateStateSequence(results));
-  if(fakeCompConfig->GetConfigState() == service::component::runtime::dto::SATISFIED)
-  {
-    EXPECT_EQ(GetFramework().GetBundleContext().GetServiceReferences("interface").size(), 1u);
-  }
-  else if(fakeCompConfig->GetConfigState() == service::component::runtime::dto::UNSATISFIED_REFERENCE)
-  {
-    EXPECT_EQ(GetFramework().GetBundleContext().GetServiceReferences("interface").size(), 0u);
+  if (fakeCompConfig->GetConfigState() ==
+      service::component::runtime::dto::ComponentState::SATISFIED) {
+    EXPECT_EQ(GetFramework()
+                .GetBundleContext()
+                .GetServiceReferences("interface")
+                .size(),
+              1u);
+  } else if (fakeCompConfig->GetConfigState() ==
+             service::component::runtime::dto::ComponentState::
+               UNSATISFIED_REFERENCE) {
+    EXPECT_EQ(GetFramework()
+                .GetBundleContext()
+                .GetServiceReferences("interface")
+                .size(),
+              0u);
   }
 }
 
@@ -581,7 +615,8 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentActivateDeactivate)
   // ensure there the current state is UNSATISFIED_REFERENCE
   // ensure there are zero objects of ComponentInstance
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
-  mockMetadata->serviceMetadata.interfaces = { "ServiceInterface", "interface" };
+  mockMetadata->serviceMetadata.interfaces = { "ServiceInterface",
+                                               "interface" };
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto mockCompInstance = std::make_shared<MockComponentInstance>();
@@ -605,23 +640,21 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentActivateDeactivate)
   fakeCompConfig->Register();
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::SATISFIED);
   auto clientBundle = GetFramework();
-  std::function<std::pair<ComponentState,ComponentState>()> func = [&fakeCompConfig, &clientBundle]() {
-                                                                     std::random_device rd;
-                                                                     std::mt19937 gen(rd());
-                                                                     std::uniform_int_distribution<unsigned int> dis;
-                                                                     int randVal = dis(gen);
-                                                                     auto prevState = fakeCompConfig->GetConfigState();
-                                                                     if(randVal & 0x1)
-                                                                     {
-                                                                       fakeCompConfig->Activate(clientBundle);
-                                                                     }
-                                                                     else
-                                                                     {
-                                                                       fakeCompConfig->Deactivate();
-                                                                     }
-                                                                     auto currentState = fakeCompConfig->GetConfigState();
-                                                                     return std::make_pair(prevState, currentState);
-                                                                   };
+  std::function<std::pair<ComponentState, ComponentState>()> func =
+    [&fakeCompConfig, &clientBundle]() {
+      std::random_device rd;
+      std::mt19937 gen(rd());
+      std::uniform_int_distribution<unsigned int> dis;
+      int randVal = dis(gen);
+      auto prevState = fakeCompConfig->GetConfigState();
+      if (randVal & 0x1) {
+        fakeCompConfig->Activate(clientBundle);
+      } else {
+        fakeCompConfig->Deactivate();
+      }
+      auto currentState = fakeCompConfig->GetConfigState();
+      return std::make_pair(prevState, currentState);
+    };
   auto results = ConcurrentInvoke(func);
   EXPECT_TRUE(ValidateStateSequence(results));
 }
@@ -659,7 +692,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyImmediateComponent)
       fakeCompConfig->Register();
       // since its an immediate component, it gets activated on call to Register.
       EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
-    });
 }
 
 TEST_F(ComponentConfigurationImplTest, VerifyDelayedComponent)
@@ -734,7 +766,9 @@ TEST_F(ComponentConfigurationImplTest, TestGetDependencyManagers)
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-  mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
+  mockMetadata->serviceMetadata.interfaces = {
+    us_service_interface_iid<dummy::ServiceImpl>()
+  };
   mockMetadata->immediate = false;
   metadata::ReferenceMetadata rm1;
   rm1.name = "Foo";
@@ -760,7 +794,8 @@ TEST_F(ComponentConfigurationImplTest, TestComponentWithUniqueName)
 {
 #if defined(US_BUILD_SHARED_LIBS)
   auto dsPluginPath = test::GetDSRuntimePluginFilePath();
-  auto dsbundles = GetFramework().GetBundleContext().InstallBundles(dsPluginPath);
+  auto dsbundles =
+    GetFramework().GetBundleContext().InstallBundles(dsPluginPath);
   ASSERT_EQ(dsbundles.size(), 1);
   for (auto& bundle : dsbundles) {
     ASSERT_TRUE(bundle);
@@ -768,11 +803,13 @@ TEST_F(ComponentConfigurationImplTest, TestComponentWithUniqueName)
   }
 #endif
 
-  auto testBundle = test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSTOI8");
+  auto testBundle = test::InstallAndStartBundle(
+    GetFramework().GetBundleContext(), "TestBundleDSTOI8");
   ASSERT_TRUE(testBundle);
   ASSERT_EQ(testBundle.GetSymbolicName(), "TestBundleDSTOI8");
 
-  auto svcRef = testBundle.GetBundleContext().GetServiceReference<test::Interface1>();
+  auto svcRef =
+    testBundle.GetBundleContext().GetServiceReference<test::Interface1>();
   ASSERT_TRUE(svcRef);
   auto svc = testBundle.GetBundleContext().GetService<test::Interface1>(svcRef);
   EXPECT_NE(svc, nullptr);

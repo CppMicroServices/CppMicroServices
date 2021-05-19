@@ -23,9 +23,9 @@
 #ifndef __REGISTRATION_MANAGER_HPP__
 #define __REGISTRATION_MANAGER_HPP__
 #if defined(USING_GTEST)
-#include "gtest/gtest_prod.h"
+#  include "gtest/gtest_prod.h"
 #else
-#define FRIEND_TEST(x, y)
+#  define FRIEND_TEST(x, y)
 #endif
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceFactory.h"
@@ -57,10 +57,11 @@ public:
    *             \c scope is not one of "singleton", "bundle" or "prototype"
    *             \c logger is nullptr
    */
-  RegistrationManager(const cppmicroservices::BundleContext& bc,
-                      const std::vector<std::string>& services,
-                      const std::string& scope,
-                      const std::shared_ptr<cppmicroservices::logservice::LogService>& logger);
+  RegistrationManager(
+    const cppmicroservices::BundleContext& bc,
+    const std::vector<std::string>& services,
+    const std::string& scope,
+    const std::shared_ptr<cppmicroservices::logservice::LogService>& logger);
   RegistrationManager(const RegistrationManager&) = delete;
   RegistrationManager(RegistrationManager&&) = delete;
   RegistrationManager& operator=(const RegistrationManager&) = delete;
@@ -90,8 +91,9 @@ public:
    * \param props - a map with properties used for service registration
    * \return \c true if registration succeeded, \c false otherwise
    */
-  bool RegisterService(const std::shared_ptr<cppmicroservices::ServiceFactory>& factory,
-                       const cppmicroservices::ServiceProperties& props);
+  bool RegisterService(
+    const std::shared_ptr<cppmicroservices::ServiceFactory>& factory,
+    const cppmicroservices::ServiceProperties& props);
 
    /**
    * SetRegistrationProperties. Sets component properties in registration object. 
@@ -117,6 +119,7 @@ public:
    * \throws std::logic_error if the service was never registered or has already been unregistered
    */
   void UnregisterService();
+
 private:
   FRIEND_TEST(RegistrationManagerTest, VerifyUnregister);
 

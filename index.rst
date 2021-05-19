@@ -45,6 +45,9 @@ Start reading at the top for a quick start.
 
    /doc/man/cppmicroservices.3
    /doc/man/cppmicroservices-framework.3
+   /doc/man/cppmicroservices-ds.3
+   /doc/man/cppmicroservices-configadmin.3
+   /doc/man/cppmicroservices-logservice.3
    /doc/man/cppmicroservices-httpservice.3
    /doc/man/cppmicroservices-webconsole.3
    /doc/man/cppmicroservices-shellservice.3

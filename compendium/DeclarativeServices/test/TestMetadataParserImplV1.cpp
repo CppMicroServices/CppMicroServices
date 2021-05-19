@@ -19,12 +19,12 @@
   limitations under the License.
 
   =============================================================================*/
-#include "Mocks.hpp"
-#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "../src/metadata/MetadataParserFactory.hpp"
 #include "../src/metadata/MetadataParserImpl.hpp"
 #include "../src/metadata/ReferenceMetadata.hpp"
 #include "../src/metadata/Util.hpp"
+#include "Mocks.hpp"
+#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "gtest/gtest.h"
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkEvent.h>

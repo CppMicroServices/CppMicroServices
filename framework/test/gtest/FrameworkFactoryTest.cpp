@@ -27,7 +27,7 @@ limitations under the License.
 
 using namespace cppmicroservices;
 
-TEST(FrameworkFactoryTest, FrameworkInstantiation)
+TEST(FrameworkFactoryTest, testFrameworkInstantiation)
 {
   auto f = FrameworkFactory().NewFramework();
   ASSERT_TRUE(f) << "Unique Test Framework must be instantiated";

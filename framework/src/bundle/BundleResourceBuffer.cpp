@@ -24,9 +24,9 @@
 
 #include <cassert>
 #include <cstdint>
+#include <cstdlib>
 #include <limits>
 #include <memory>
-#include <cstdlib>
 
 #ifdef US_PLATFORM_WINDOWS
 #  define DATA_NEEDS_NEWLINE_CONVERSION 1
@@ -98,7 +98,8 @@ BundleResourceBuffer::BundleResourceBuffer(
   }
 #endif
 
-  d = std::make_unique<BundleResourceBufferPrivate>(std::move(data), size, begin, mode);
+  d = std::make_unique<BundleResourceBufferPrivate>(
+    std::move(data), size, begin, mode);
 }
 
 BundleResourceBuffer::~BundleResourceBuffer() = default;

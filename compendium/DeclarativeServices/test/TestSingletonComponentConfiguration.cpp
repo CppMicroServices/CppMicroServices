@@ -20,24 +20,24 @@
 
   =============================================================================*/
 
-#include "cppmicroservices/Framework.h"
-#include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/FrameworkEvent.h"
-#include "Mocks.hpp"
 #include "../src/manager/SingletonComponentConfiguration.hpp"
-#include "ConcurrencyTestUtil.hpp"
-#include "../src/manager/states/CCRegisteredState.hpp"
 #include "../src/manager/states/CCActiveState.hpp"
+#include "../src/manager/states/CCRegisteredState.hpp"
+#include "ConcurrencyTestUtil.hpp"
+#include "Mocks.hpp"
+#include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkEvent.h"
+#include "cppmicroservices/FrameworkFactory.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
 
-class SingletonComponentConfigurationTest
-  : public ::testing::Test
+class SingletonComponentConfigurationTest : public ::testing::Test
 {
 protected:
-  SingletonComponentConfigurationTest() : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  { }
+  SingletonComponentConfigurationTest()
+    : framework(cppmicroservices::FrameworkFactory().NewFramework())
+  {}
 
   virtual ~SingletonComponentConfigurationTest() = default;
 
@@ -78,39 +78,49 @@ TEST_F(SingletonComponentConfigurationTest, TestGetFactory)
   EXPECT_NE(obj->GetFactory(), nullptr);
 }
 
-class MockComponentInstanceFactory {
+class MockComponentInstanceFactory
+{
 public:
   MOCK_METHOD0(CreateComponentInstance, ComponentInstance*());
   MOCK_METHOD1(DeleteComponentInstance, void(ComponentInstance*));
 };
 
-TEST_F(SingletonComponentConfigurationTest, TestCreateAndActivateComponentInstance)
+TEST_F(SingletonComponentConfigurationTest,
+       TestCreateAndActivateComponentInstance)
 {
   // calling CreateAndActivateComponentInstance multiple times must return the same instance
   MockComponentInstanceFactory mockCompFactory;
   auto mockInstance = new MockComponentInstance();
   obj->SetState(std::make_shared<CCRegisteredState>());
   auto nullInstance = obj->CreateAndActivateComponentInstance(framework);
-  EXPECT_EQ(nullInstance, nullptr) << "Return value must be nullptr when state is not ACTIVE";
+  EXPECT_EQ(nullInstance, nullptr)
+    << "Return value must be nullptr when state is not ACTIVE";
   obj->SetState(std::make_shared<CCActiveState>());
-  obj->SetComponentInstanceCreateDeleteMethods(std::bind(&MockComponentInstanceFactory::CreateComponentInstance, &mockCompFactory), std::bind(&MockComponentInstanceFactory::DeleteComponentInstance, &mockCompFactory, std::placeholders::_1));
+  obj->SetComponentInstanceCreateDeleteMethods(
+    std::bind(&MockComponentInstanceFactory::CreateComponentInstance,
+              &mockCompFactory),
+    std::bind(&MockComponentInstanceFactory::DeleteComponentInstance,
+              &mockCompFactory,
+              std::placeholders::_1));
   EXPECT_CALL(mockCompFactory, CreateComponentInstance())
     .Times(2)
     .WillOnce(testing::Throw(std::runtime_error("Some error in user code")))
     .WillOnce(testing::Return(mockInstance));
   EXPECT_CALL(mockCompFactory, DeleteComponentInstance(testing::_))
     .Times(1)
-    .WillOnce(testing::Invoke([](ComponentInstance* obj) {
-                                delete obj;
-                              }));
-  EXPECT_CALL(*mockInstance, CreateInstanceAndBindReferences(testing::_)).Times(1);
+    .WillOnce(testing::Invoke([](ComponentInstance* obj) { delete obj; }));
+  EXPECT_CALL(*mockInstance, CreateInstanceAndBindReferences(testing::_))
+    .Times(1);
   EXPECT_CALL(*mockInstance, Activate()).Times(1);
   auto instance0 = obj->CreateAndActivateComponentInstance(framework);
-  EXPECT_EQ(instance0, nullptr) << "Return value must be nullptr when an exception is thrown from user code";
+  EXPECT_EQ(instance0, nullptr) << "Return value must be nullptr when an "
+                                   "exception is thrown from user code";
   auto instance = obj->CreateAndActivateComponentInstance(framework);
-  EXPECT_NE(instance, nullptr) << "Return value must be non-null in ACTIVE state";
+  EXPECT_NE(instance, nullptr)
+    << "Return value must be non-null in ACTIVE state";
   auto instance1 = obj->CreateAndActivateComponentInstance(framework);
-  EXPECT_EQ(instance, instance1) << "Return values for repeated calls must be the same";
+  EXPECT_EQ(instance, instance1)
+    << "Return values for repeated calls must be the same";
 
   //clean-up injected mock objects
   {
@@ -120,34 +130,39 @@ TEST_F(SingletonComponentConfigurationTest, TestCreateAndActivateComponentInstan
   }
 }
 
-TEST_F(SingletonComponentConfigurationTest, TestConcurrentCreateAndActivateComponentInstance)
+TEST_F(SingletonComponentConfigurationTest,
+       TestConcurrentCreateAndActivateComponentInstance)
 {
   // calling CreateAndActivateComponentInstance from multiple threads must return the same instance
   MockComponentInstanceFactory mockCompFactory;
   auto mockInstance = new MockComponentInstance();
   obj->SetState(std::make_shared<CCActiveState>());
-  obj->SetComponentInstanceCreateDeleteMethods(std::bind(&MockComponentInstanceFactory::CreateComponentInstance, &mockCompFactory), std::bind(&MockComponentInstanceFactory::DeleteComponentInstance, &mockCompFactory, std::placeholders::_1));
+  obj->SetComponentInstanceCreateDeleteMethods(
+    std::bind(&MockComponentInstanceFactory::CreateComponentInstance,
+              &mockCompFactory),
+    std::bind(&MockComponentInstanceFactory::DeleteComponentInstance,
+              &mockCompFactory,
+              std::placeholders::_1));
   EXPECT_CALL(mockCompFactory, CreateComponentInstance())
     .Times(1)
     .WillOnce(testing::Return(mockInstance));
   EXPECT_CALL(mockCompFactory, DeleteComponentInstance(testing::_))
     .Times(1)
-    .WillOnce(testing::Invoke([](ComponentInstance* obj) {
-                                delete obj;
-                              }));
-  EXPECT_CALL(*mockInstance, CreateInstanceAndBindReferences(testing::_)).Times(1);
+    .WillOnce(testing::Invoke([](ComponentInstance* obj) { delete obj; }));
+  EXPECT_CALL(*mockInstance, CreateInstanceAndBindReferences(testing::_))
+    .Times(1);
   EXPECT_CALL(*mockInstance, Activate()).Times(1);
 
   std::function<std::shared_ptr<ComponentInstance>(void)> func = [&]() {
-                                                                   return obj->CreateAndActivateComponentInstance(framework);
-                                                                 };
+    return obj->CreateAndActivateComponentInstance(framework);
+  };
   auto results = ConcurrentInvoke(func);
-  if(!results.empty())
-  {
+  if (!results.empty()) {
     auto firstElement = results[0];
-    EXPECT_TRUE(std::all_of(results.begin(), results.end(), [&](auto const& elem) {
-                                                              return elem == firstElement;
-                                                            }));
+    EXPECT_TRUE(
+      std::all_of(results.begin(), results.end(), [&](auto const& elem) {
+        return elem == firstElement;
+      }));
   }
 
   // clean up injected mock objects
@@ -163,16 +178,23 @@ TEST_F(SingletonComponentConfigurationTest, TestGetService)
   MockComponentInstanceFactory mockCompFactory;
   auto mockInstance = std::make_shared<MockComponentInstance>();
   obj->SetState(std::make_shared<CCRegisteredState>());
-  obj->SetComponentInstanceCreateDeleteMethods(std::bind(&MockComponentInstanceFactory::CreateComponentInstance, &mockCompFactory), std::bind(&MockComponentInstanceFactory::DeleteComponentInstance, &mockCompFactory, std::placeholders::_1));
+  obj->SetComponentInstanceCreateDeleteMethods(
+    std::bind(&MockComponentInstanceFactory::CreateComponentInstance,
+              &mockCompFactory),
+    std::bind(&MockComponentInstanceFactory::DeleteComponentInstance,
+              &mockCompFactory,
+              std::placeholders::_1));
   EXPECT_CALL(mockCompFactory, CreateComponentInstance())
     .Times(1)
     .WillOnce(testing::Return(mockInstance.get()));
-  EXPECT_CALL(mockCompFactory, DeleteComponentInstance(testing::_))
-    .Times(1);
+  EXPECT_CALL(mockCompFactory, DeleteComponentInstance(testing::_)).Times(1);
   cppmicroservices::InterfaceMapPtr iMap;
-  EXPECT_CALL(*mockInstance, CreateInstanceAndBindReferences(testing::_)).Times(1);
+  EXPECT_CALL(*mockInstance, CreateInstanceAndBindReferences(testing::_))
+    .Times(1);
   EXPECT_CALL(*mockInstance, Activate()).Times(1);
-  EXPECT_CALL(*mockInstance, GetInterfaceMap()).Times(1).WillOnce(testing::Return(iMap));
+  EXPECT_CALL(*mockInstance, GetInterfaceMap())
+    .Times(1)
+    .WillOnce(testing::Return(iMap));
   auto service = obj->GetService(Bundle(), ServiceRegistrationU());
   EXPECT_EQ(obj->GetState()->GetValue(), ComponentState::ACTIVE);
   EXPECT_EQ(service, iMap);
@@ -189,7 +211,8 @@ TEST_F(SingletonComponentConfigurationTest, TestDestroyComponentInstances)
 {
   auto mockCompContext = std::make_shared<MockComponentContextImpl>(obj);
   auto mockCompInstance = std::make_shared<MockComponentInstance>();
-  obj->SetComponentInstancePair(InstanceContextPair(mockCompInstance,mockCompContext));
+  obj->SetComponentInstancePair(
+    InstanceContextPair(mockCompInstance, mockCompContext));
   EXPECT_CALL(*mockCompInstance, Deactivate()).Times(1);
   EXPECT_NE(obj->GetComponentInstance(), nullptr);
   EXPECT_NE(obj->GetComponentContext(), nullptr);
@@ -199,11 +222,13 @@ TEST_F(SingletonComponentConfigurationTest, TestDestroyComponentInstances)
   EXPECT_EQ(obj->GetState()->GetValue(), ComponentState::UNSATISFIED_REFERENCE);
 }
 
-TEST_F(SingletonComponentConfigurationTest, TestDestroyComponentInstances_DeactivateFailure)
+TEST_F(SingletonComponentConfigurationTest,
+       TestDestroyComponentInstances_DeactivateFailure)
 {
   auto mockCompContext = std::make_shared<MockComponentContextImpl>(obj);
   auto mockCompInstance = std::make_shared<MockComponentInstance>();
-  obj->SetComponentInstancePair(InstanceContextPair(mockCompInstance,mockCompContext));
+  obj->SetComponentInstancePair(
+    InstanceContextPair(mockCompInstance, mockCompContext));
   std::string exceptionMsg("Deactivation failed with exception");
   EXPECT_CALL(*mockCompInstance, Deactivate())
     .Times(1)
@@ -217,4 +242,3 @@ TEST_F(SingletonComponentConfigurationTest, TestDestroyComponentInstances_Deacti
 }
 }
 }
-

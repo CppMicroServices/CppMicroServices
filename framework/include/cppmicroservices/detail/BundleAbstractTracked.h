@@ -64,7 +64,7 @@ public:
   /**
    * BundleAbstractTracked constructor.
    */
-  BundleAbstractTracked(BundleContext* bc);
+  BundleAbstractTracked(BundleContext bc);
 
   virtual ~BundleAbstractTracked();
 
@@ -284,7 +284,7 @@ private:
    */
   std::atomic<int> trackingCount;
 
-  BundleContext* const bc;
+  BundleContext bc;
 
   bool CustomizerAddingFinal(S item,
                              const std::shared_ptr<TrackedParamType>& custom);

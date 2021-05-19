@@ -142,23 +142,36 @@ void ServiceTracker<S,T>::Open()
 template<class S, class T>
 void ServiceTracker<S,T>::Close()
 {
-  std::shared_ptr<_TrackedService> outgoing = d->trackedService.Load();
-  if (outgoing == nullptr) {
-    return;
-  }
-
-  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close:" << d->filter;
-  outgoing->Close();
-  auto references = GetServiceReferences();
-
   try {
     d->context.RemoveListener(std::move(d->listenerToken));
   } catch (const std::runtime_error& /*e*/) {
     /* In case the context was stopped or invalid. */
   }
 
-  d->Modified(); /* clear the cache */
-  outgoing->NotifyAll(); /* wake up any waiters */
+  std::shared_ptr<_TrackedService> outgoing = d->trackedService.Load();
+  {
+    auto l = d->Lock();
+    US_UNUSED(l);
+
+    if (outgoing == nullptr) {
+      return;
+    }
+
+    if (d->Tracked()->closed) {
+      return;
+    }
+
+    DIAG_LOG(*d->context.GetLogSink())
+      << "ServiceTracker<S,TTT>::close:" << d->filter;
+    outgoing->Close();
+
+    d->Modified();         /* clear the cache */
+    outgoing->NotifyAll(); /* wake up any waiters */
+  }
+
+  outgoing->WaitOnCustomizersToFinish();
+
+  auto references = GetServiceReferences();
   for(auto& ref : references) {
     outgoing->Untrack(ref, ServiceEvent());
   }

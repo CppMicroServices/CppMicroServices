@@ -23,9 +23,9 @@
 #ifndef CPPMICROSERVICES_SERVICEREGISTRATIONBASE_H
 #define CPPMICROSERVICES_SERVICEREGISTRATIONBASE_H
 
-#include <functional>
 #include "cppmicroservices/ServiceProperties.h"
 #include "cppmicroservices/ServiceReference.h"
+#include <functional>
 
 namespace cppmicroservices {
 
@@ -202,7 +202,7 @@ private:
                           const InterfaceMapConstPtr& service,
                           Properties&& props);
 
-  ServiceRegistrationBasePrivate* d{nullptr};
+  ServiceRegistrationBasePrivate* d{ nullptr };
 };
 
 /**

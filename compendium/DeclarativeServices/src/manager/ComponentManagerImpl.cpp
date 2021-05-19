@@ -20,11 +20,11 @@
 
   =============================================================================*/
 
+#include "ComponentManagerImpl.hpp"
+#include "ConcurrencyUtil.hpp"
 #include "boost/asio/async_result.hpp"
 #include "boost/asio/packaged_task.hpp"
 #include "boost/asio/post.hpp"
-#include "ComponentManagerImpl.hpp"
-#include "ConcurrencyUtil.hpp"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "states/CMDisabledState.hpp"
 #include "states/CMEnabledState.hpp"
@@ -63,31 +63,29 @@ ComponentManagerImpl::ComponentManagerImpl(
 ComponentManagerImpl::~ComponentManagerImpl()
 {
   GetState()->Disable(*this);
-  for(auto& fut : disableFutures)
-  {
-    try
-    {
+  for (auto& fut : disableFutures) {
+    try {
       fut.get();
-    }
-    catch(...)
-    {
-      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Exception while disabling component with name" + GetName(), std::current_exception());
+    } catch (...) {
+      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                  "Exception while disabling component with name" + GetName(),
+                  std::current_exception());
     }
   }
 }
 
 void ComponentManagerImpl::Initialize()
 {
-  if(compDesc->enabled)
-  {
+  if (compDesc->enabled) {
     auto fut = Enable();
-    try
-    {
+    try {
       fut.get();
     } catch (const cppmicroservices::SharedLibraryException&) {
       throw;
     } catch (...) {
-      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Failed to enable component with name" + GetName(), std::current_exception());
+      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                  "Failed to enable component with name" + GetName(),
+                  std::current_exception());
     }
   }
 }
@@ -107,7 +105,8 @@ std::shared_future<void> ComponentManagerImpl::Disable()
   return GetState()->Disable(*this);
 }
 
-std::vector<std::shared_ptr<ComponentConfiguration>> ComponentManagerImpl::GetComponentConfigurations() const
+std::vector<std::shared_ptr<ComponentConfiguration>>
+ComponentManagerImpl::GetComponentConfigurations() const
 {
   return GetState()->GetConfigurations(*this);
 }
@@ -117,20 +116,23 @@ std::shared_ptr<ComponentManagerState> ComponentManagerImpl::GetState() const
   return std::atomic_load(&state);
 }
 
-bool ComponentManagerImpl::CompareAndSetState(std::shared_ptr<ComponentManagerState>* expectedState, std::shared_ptr<ComponentManagerState> desiredState)
+bool ComponentManagerImpl::CompareAndSetState(
+  std::shared_ptr<ComponentManagerState>* expectedState,
+  std::shared_ptr<ComponentManagerState> desiredState)
 {
-  return std::atomic_compare_exchange_strong(&state, expectedState, desiredState);
+  return std::atomic_compare_exchange_strong(
+    &state, expectedState, desiredState);
 }
 
 void ComponentManagerImpl::AccumulateFuture(std::shared_future<void> fObj)
 {
   std::lock_guard<std::mutex> lk(futuresMutex);
-  auto iterator = std::find_if(disableFutures.begin(), disableFutures.end(), is_ready<std::shared_future<void>&>);
-  if(iterator == disableFutures.end())
-  {
+  auto iterator = std::find_if(disableFutures.begin(),
+                               disableFutures.end(),
+                               is_ready<std::shared_future<void>&>);
+  if (iterator == disableFutures.end()) {
     disableFutures.push_back(fObj);
-  }
-  else // swap the ready future with the new one
+  } else // swap the ready future with the new one
   {
     std::swap(*iterator, fObj);
   }
@@ -185,7 +187,7 @@ std::shared_future<void> ComponentManagerImpl::PostAsyncDisabledToEnabled(
 }
 
 std::shared_future<void> ComponentManagerImpl::PostAsyncEnabledToDisabled(
-    std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>&
+  std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>&
     currentState)
 {
   std::packaged_task<void(std::shared_ptr<CMEnabledState>)> task(

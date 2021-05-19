@@ -30,31 +30,32 @@ using cppmicroservices::service::cm::ConfigurationException;
 
 namespace {
 
-  constexpr auto REASON = "A reason";
-  constexpr auto PROPERTY = "Foo";
+constexpr auto REASON = "A reason";
+constexpr auto PROPERTY = "Foo";
 
-  /**
-   * This test point is used to verify that the ConfigurationException
-   * behaves as expected.
-   */
-  TEST(ConfigurationException, VerifyConstructorAndGetters)
-  {
-    ConfigurationException e{REASON, PROPERTY};
-    ASSERT_EQ(REASON, e.GetReason());
-    ASSERT_EQ(PROPERTY, e.GetProperty());
+/**
+ * This test point is used to verify that the ConfigurationException
+ * behaves as expected.
+ */
+TEST(ConfigurationException, VerifyConstructorAndGetters)
+{
+  ConfigurationException e{ REASON, PROPERTY };
+  ASSERT_EQ(REASON, e.GetReason());
+  ASSERT_EQ(PROPERTY, e.GetProperty());
 
-    ConfigurationException e2{REASON};
-    ASSERT_EQ(REASON, e2.GetReason());
-    ASSERT_EQ("", e2.GetProperty());
-  }
+  ConfigurationException e2{ REASON };
+  ASSERT_EQ(REASON, e2.GetReason());
+  ASSERT_EQ("", e2.GetProperty());
+}
 
-  /**
-   * This test point is used to verify that the ConfigurationException
-   * can be thrown and caught as expected.
-   */
-  TEST(ConfigurationException, VerifyThrowAndCatch)
-  {
-    ASSERT_THROW({
+/**
+ * This test point is used to verify that the ConfigurationException
+ * can be thrown and caught as expected.
+ */
+TEST(ConfigurationException, VerifyThrowAndCatch)
+{
+  ASSERT_THROW(
+    {
       try {
         throw ConfigurationException(REASON, PROPERTY);
       } catch (const ConfigurationException& e) {
@@ -62,28 +63,33 @@ namespace {
         ASSERT_EQ(PROPERTY, e.GetProperty());
         throw;
       }
-    }, ConfigurationException);
-    ASSERT_THROW({
+    },
+    ConfigurationException);
+  ASSERT_THROW(
+    {
       try {
         throw ConfigurationException(REASON, PROPERTY);
       } catch (const std::runtime_error& e) {
-        auto what = std::string{e.what()};
+        auto what = std::string{ e.what() };
         ASSERT_NE("", what);
         ASSERT_NE(std::string::npos, what.find(REASON));
         ASSERT_NE(std::string::npos, what.find(PROPERTY));
         throw;
       }
-    }, std::runtime_error);
-    ASSERT_THROW({
+    },
+    std::runtime_error);
+  ASSERT_THROW(
+    {
       try {
         throw ConfigurationException(REASON);
       } catch (const std::exception& e) {
-        auto what = std::string{e.what()};
+        auto what = std::string{ e.what() };
         ASSERT_NE("", what);
         ASSERT_NE(std::string::npos, what.find(REASON));
         ASSERT_EQ(std::string::npos, what.find("property"));
         throw;
       }
-    }, std::exception);
-  }
+    },
+    std::exception);
+}
 }

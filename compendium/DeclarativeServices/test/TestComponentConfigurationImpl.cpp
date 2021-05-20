@@ -76,46 +76,57 @@ TEST_F(ComponentConfigurationImplTest, VerifyCtor)
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-  EXPECT_THROW({
-      auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(nullptr,
-                                                                              GetFramework(),
-                                                                              mockRegistry,
-                                                                              fakeLogger, 
-                                                                              threadpool, 
-                                                                              notifier, 
-                                                                              managers);
-    }, std::invalid_argument);
-  EXPECT_THROW({
-      auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                              GetFramework(),
-                                                                              nullptr,
-                                                                              fakeLogger, 
-                                                                              threadpool, 
-                                                                              notifier, 
-                                                                              managers);
-    }, std::invalid_argument);
-  EXPECT_THROW({
-      auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                              GetFramework(),
-                                                                              mockRegistry,
-                                                                              nullptr, 
-                                                                              threadpool, 
-                                                                              notifier,
-                                                                              managers);
-    }, std::invalid_argument);
+  EXPECT_THROW(
+    {
+      auto fakeCompConfig =
+        std::make_shared<MockComponentConfigurationImpl>(nullptr,
+                                                         GetFramework(),
+                                                         mockRegistry,
+                                                         fakeLogger,
+                                                         threadpool,
+                                                         notifier,
+                                                         managers);
+    },
+    std::invalid_argument);
+  EXPECT_THROW(
+    {
+      auto fakeCompConfig =
+        std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                         GetFramework(),
+                                                         nullptr,
+                                                         fakeLogger,
+                                                         threadpool,
+                                                         notifier,
+                                                         managers);
+    },
+    std::invalid_argument);
+  EXPECT_THROW(
+    {
+      auto fakeCompConfig =
+        std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                         GetFramework(),
+                                                         mockRegistry,
+                                                         nullptr,
+                                                         threadpool,
+                                                         notifier,
+                                                         managers);
+    },
+    std::invalid_argument);
 
   EXPECT_NO_THROW({
-      auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                              GetFramework(),
-                                                                              mockRegistry,
-                                                                              fakeLogger, 
-                                                                              threadpool, 
-                                                                              notifier, 
-                                                                              managers);
-      EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
-      EXPECT_EQ(fakeCompConfig->regManager, nullptr);
-      EXPECT_EQ(fakeCompConfig->referenceManagers.size(), static_cast<size_t>(0));
-    });
+    auto fakeCompConfig =
+      std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                       GetFramework(),
+                                                       mockRegistry,
+                                                       fakeLogger,
+                                                       threadpool,
+                                                       notifier,
+                                                       managers);
+    EXPECT_EQ(fakeCompConfig->GetConfigState(),
+              ComponentState::UNSATISFIED_REFERENCE);
+    EXPECT_EQ(fakeCompConfig->regManager, nullptr);
+    EXPECT_EQ(fakeCompConfig->referenceManagers.size(), static_cast<size_t>(0));
+  });
 }
 
 TEST_F(ComponentConfigurationImplTest, VerifyUniqueId)
@@ -133,15 +144,16 @@ TEST_F(ComponentConfigurationImplTest, VerifyUniqueId)
   const size_t iterCount = 10;
   for (size_t i = 0; i < iterCount; ++i) {
     EXPECT_NO_THROW({
-        auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                                GetFramework(),
-                                                                                mockRegistry,
-                                                                                fakeLogger, 
-                                                                                threadpool, 
-                                                                                notifier,
-                                                                                managers);
-        idSet.insert(fakeCompConfig->GetId());
-      });
+      auto fakeCompConfig =
+        std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                         GetFramework(),
+                                                         mockRegistry,
+                                                         fakeLogger,
+                                                         threadpool,
+                                                         notifier,
+                                                         managers);
+      idSet.insert(fakeCompConfig->GetId());
+    });
   }
   EXPECT_EQ(idSet.size(), iterCount);
 }
@@ -159,7 +171,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefSatisfied)
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-  mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
+  mockMetadata->serviceMetadata.interfaces = {
+    us_service_interface_iid<dummy::ServiceImpl>()
+  };
   auto refMgr1 = std::make_shared<MockReferenceManager>();
   auto refMgr2 = std::make_shared<MockReferenceManager>();
   auto refMgr3 = std::make_shared<MockReferenceManager>();
@@ -178,13 +192,14 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefSatisfied)
   auto bc = GetFramework().GetBundleContext();
   auto notifier = std::make_shared<ConfigurationNotifier>(bc, fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
-  auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                          GetFramework(),
-                                                                          mockRegistry,
-                                                                          fakeLogger, 
-                                                                          threadpool, 
-                                                                          notifier, 
-                                                                          managers);
+  auto fakeCompConfig =
+    std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                     GetFramework(),
+                                                     mockRegistry,
+                                                     fakeLogger,
+                                                     threadpool,
+                                                     notifier,
+                                                     managers);
   EXPECT_CALL(*fakeCompConfig, GetFactory())
     .Times(1)
     .WillOnce(testing::Return(mockFactory));
@@ -220,15 +235,18 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefUnsatisfied)
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
-  auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                          GetFramework(),
-                                                                          mockRegistry,
-                                                                          fakeLogger, 
-                                                                          threadpool, 
-                                                                          notifier, 
-                                                                          managers);
-  auto mockStatisfiedState = std::make_shared<MockComponentConfigurationState>();
-  auto mockUnsatisfiedState = std::make_shared<MockComponentConfigurationState>();
+  auto fakeCompConfig =
+    std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                     GetFramework(),
+                                                     mockRegistry,
+                                                     fakeLogger,
+                                                     threadpool,
+                                                     notifier,
+                                                     managers);
+  auto mockStatisfiedState =
+    std::make_shared<MockComponentConfigurationState>();
+  auto mockUnsatisfiedState =
+    std::make_shared<MockComponentConfigurationState>();
   EXPECT_CALL(*mockStatisfiedState, GetValue())
     .Times(2)
     .WillRepeatedly(testing::Return(
@@ -277,9 +295,15 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefChangedState)
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
- 
-  auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(
-    mockMetadata, GetFramework(), mockRegistry, fakeLogger, threadpool, notifier, managers);
+
+  auto fakeCompConfig =
+    std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                     GetFramework(),
+                                                     mockRegistry,
+                                                     fakeLogger,
+                                                     threadpool,
+                                                     notifier,
+                                                     managers);
 
   auto reg =
     GetFramework().GetBundleContext().RegisterService<dummy::ServiceImpl>(
@@ -305,14 +329,16 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
   // Test if a call to Register will change the state when the component
   // does not provide a service.
   {
-    auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                           GetFramework(),
-                                                                           mockRegistry,
-                                                                           fakeLogger, 
-                                                                           threadpool, 
-                                                                           notifier,
-                                                                           managers);
-    EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+    auto fakeCompConfig =
+      std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                       GetFramework(),
+                                                       mockRegistry,
+                                                       fakeLogger,
+                                                       threadpool,
+                                                       notifier,
+                                                       managers);
+    EXPECT_EQ(fakeCompConfig->GetConfigState(),
+              ComponentState::UNSATISFIED_REFERENCE);
     EXPECT_EQ(fakeCompConfig->regManager, nullptr);
     EXPECT_EQ(fakeCompConfig->referenceManagers.size(), static_cast<size_t>(0));
     EXPECT_NO_THROW(fakeCompConfig->Register());
@@ -332,13 +358,14 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
     auto managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-    auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                            GetFramework(),
-                                                                            mockRegistry,
-                                                                            fakeLogger, 
-                                                                            threadpool, 
-                                                                            notifier, 
-                                                                            managers);
+    auto fakeCompConfig =
+      std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                       GetFramework(),
+                                                       mockRegistry,
+                                                       fakeLogger,
+                                                       threadpool,
+                                                       notifier,
+                                                       managers);
     EXPECT_CALL(*fakeCompConfig, GetFactory())
       .Times(1)
       .WillRepeatedly(testing::Return(mockFactory));
@@ -369,13 +396,14 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
     auto managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-    auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                            GetFramework(),
-                                                                            mockRegistry,
-                                                                            fakeLogger, 
-                                                                            threadpool, 
-                                                                            notifier, 
-                                                                            managers);
+    auto fakeCompConfig =
+      std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                       GetFramework(),
+                                                       mockRegistry,
+                                                       fakeLogger,
+                                                       threadpool,
+                                                       notifier,
+                                                       managers);
     EXPECT_CALL(*fakeCompConfig, GetFactory())
       .Times(1)
       .WillRepeatedly(testing::Return(mockFactory));
@@ -407,14 +435,16 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeDelegation)
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-  auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                          GetFramework(),
-                                                                          mockRegistry,
-                                                                          fakeLogger, 
-                                                                          threadpool, 
-                                                                          notifier, 
-                                                                          managers);
-  EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+  auto fakeCompConfig =
+    std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                     GetFramework(),
+                                                     mockRegistry,
+                                                     fakeLogger,
+                                                     threadpool,
+                                                     notifier,
+                                                     managers);
+  EXPECT_EQ(fakeCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
   fakeCompConfig->state = mockState;
   ComponentConfigurationImpl& fakeCompConfigBase =
     *(std::dynamic_pointer_cast<ComponentConfigurationImpl>(fakeCompConfig));
@@ -442,13 +472,14 @@ TEST_F(ComponentConfigurationImplTest, VerifyActivate_Success)
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-  auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                          GetFramework(),
-                                                                          mockRegistry,
-                                                                          fakeLogger, 
-                                                                          threadpool, 
-                                                                          notifier, 
-                                                                          managers);
+  auto fakeCompConfig =
+    std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                     GetFramework(),
+                                                     mockRegistry,
+                                                     fakeLogger,
+                                                     threadpool,
+                                                     notifier,
+                                                     managers);
   fakeCompConfig->state = std::make_shared<CCRegisteredState>();
   auto mockCompInstance = std::make_shared<MockComponentInstance>();
   EXPECT_CALL(*fakeCompConfig, CreateAndActivateComponentInstance(testing::_))
@@ -471,13 +502,14 @@ TEST_F(ComponentConfigurationImplTest, VerifyActivate_Failure)
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
   // Test for exception from user code
-  auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                          GetFramework(),
-                                                                          mockRegistry,
-                                                                          fakeLogger, 
-                                                                          threadpool,
-                                                                          notifier, 
-                                                                          managers);
+  auto fakeCompConfig =
+    std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                     GetFramework(),
+                                                     mockRegistry,
+                                                     fakeLogger,
+                                                     threadpool,
+                                                     notifier,
+                                                     managers);
   fakeCompConfig->state = std::make_shared<CCRegisteredState>();
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::SATISFIED);
   EXPECT_CALL(*fakeCompConfig, CreateAndActivateComponentInstance(testing::_))
@@ -498,13 +530,14 @@ TEST_F(ComponentConfigurationImplTest, VerifyDeactivate)
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-  auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                          GetFramework(),
-                                                                          mockRegistry,
-                                                                          fakeLogger, 
-                                                                          threadpool, 
-                                                                          notifier, 
-                                                                          managers);
+  auto fakeCompConfig =
+    std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                     GetFramework(),
+                                                     mockRegistry,
+                                                     fakeLogger,
+                                                     threadpool,
+                                                     notifier,
+                                                     managers);
   auto activeState = std::make_shared<CCActiveState>();
   fakeCompConfig->state = activeState;
   EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
@@ -561,13 +594,14 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentRegisterDeactivate)
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-  auto  fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                          GetFramework(),
-                                                                          mockRegistry,
-                                                                          fakeLogger, 
-                                                                          threadpool, 
-                                                                          notifier, 
-                                                                          managers);
+  auto fakeCompConfig =
+    std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                     GetFramework(),
+                                                     mockRegistry,
+                                                     fakeLogger,
+                                                     threadpool,
+                                                     notifier,
+                                                     managers);
   EXPECT_CALL(*fakeCompConfig, GetFactory())
     .WillRepeatedly(testing::Return(std::make_shared<MockFactory>()));
   EXPECT_EQ(fakeCompConfig->GetConfigState(),
@@ -626,13 +660,14 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentActivateDeactivate)
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-  auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                          GetFramework(),
-                                                                          mockRegistry,
-                                                                          fakeLogger, 
-                                                                          threadpool, 
-                                                                          notifier, 
-                                                                          managers);
+  auto fakeCompConfig =
+    std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                     GetFramework(),
+                                                     mockRegistry,
+                                                     fakeLogger,
+                                                     threadpool,
+                                                     notifier,
+                                                     managers);
   EXPECT_CALL(*fakeCompConfig, CreateAndActivateComponentInstance(testing::_))
     .WillRepeatedly(testing::Return(mockCompInstance));
   EXPECT_CALL(*fakeCompConfig, GetFactory())
@@ -661,97 +696,103 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentActivateDeactivate)
 
 TEST_F(ComponentConfigurationImplTest, VerifyImmediateComponent)
 {
-    EXPECT_NO_THROW({
-        auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
-        mockMetadata->immediate = true;
-        auto mockRegistry = std::make_shared<MockComponentRegistry>();
-        auto fakeLogger = std::make_shared<FakeLogger>();
-        auto notifier = std::make_shared<ConfigurationNotifier>(
-          GetFramework().GetBundleContext(), fakeLogger);
-        auto threadpool = std::make_shared<boost::asio::thread_pool>();
-        auto managers =
-          std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+  EXPECT_NO_THROW({
+    auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
+    mockMetadata->immediate = true;
+    auto mockRegistry = std::make_shared<MockComponentRegistry>();
+    auto fakeLogger = std::make_shared<FakeLogger>();
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      GetFramework().GetBundleContext(), fakeLogger);
+    auto threadpool = std::make_shared<boost::asio::thread_pool>();
+    auto managers =
+      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-        auto mockCompInstance = std::make_shared<MockComponentInstance>();
-        auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                               GetFramework(),
-                                                                               mockRegistry,
-                                                                               fakeLogger,
-                                                                               threadpool,
-                                                                               notifier,
-                                                                               managers);
-        EXPECT_CALL(*fakeCompConfig, CreateAndActivateComponentInstance(testing::_))
-          .Times(2)
-          .WillRepeatedly(testing::Return(mockCompInstance));
-        fakeCompConfig->Initialize();
-        EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
-        EXPECT_CALL(*fakeCompConfig, DestroyComponentInstances())
-          .Times(1);
-        fakeCompConfig->Deactivate();
-        EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
-        fakeCompConfig->Register();
-        // since its an immediate component, it gets activated on call to Register.
-        EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
-    });
+    auto mockCompInstance = std::make_shared<MockComponentInstance>();
+    auto fakeCompConfig =
+      std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                       GetFramework(),
+                                                       mockRegistry,
+                                                       fakeLogger,
+                                                       threadpool,
+                                                       notifier,
+                                                       managers);
+    EXPECT_CALL(*fakeCompConfig, CreateAndActivateComponentInstance(testing::_))
+      .Times(2)
+      .WillRepeatedly(testing::Return(mockCompInstance));
+    fakeCompConfig->Initialize();
+    EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
+    EXPECT_CALL(*fakeCompConfig, DestroyComponentInstances()).Times(1);
+    fakeCompConfig->Deactivate();
+    EXPECT_EQ(fakeCompConfig->GetConfigState(),
+              ComponentState::UNSATISFIED_REFERENCE);
+    fakeCompConfig->Register();
+    // since its an immediate component, it gets activated on call to Register.
+    EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
+  });
 }
 
 TEST_F(ComponentConfigurationImplTest, VerifyDelayedComponent)
 {
   EXPECT_NO_THROW({
-      auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
-      auto mockRegistry = std::make_shared<MockComponentRegistry>();
-      auto fakeLogger = std::make_shared<FakeLogger>();
-      auto mockCompInstance = std::make_shared<MockComponentInstance>();
-      auto mockFactory = std::make_shared<MockFactory>();
-      auto notifier = std::make_shared<ConfigurationNotifier>(
-        GetFramework().GetBundleContext(), fakeLogger);
-      auto threadpool = std::make_shared<boost::asio::thread_pool>();
-      auto managers =
-        std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+    auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
+    auto mockRegistry = std::make_shared<MockComponentRegistry>();
+    auto fakeLogger = std::make_shared<FakeLogger>();
+    auto mockCompInstance = std::make_shared<MockComponentInstance>();
+    auto mockFactory = std::make_shared<MockFactory>();
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      GetFramework().GetBundleContext(), fakeLogger);
+    auto threadpool = std::make_shared<boost::asio::thread_pool>();
+    auto managers =
+      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-      mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
-      mockMetadata->immediate = false;
-      auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                             GetFramework(),
-                                                                             mockRegistry,
-                                                                             fakeLogger, 
-                                                                             threadpool, 
-                                                                             notifier, 
-                                                                             managers);
-      EXPECT_CALL(*fakeCompConfig, GetFactory())
-        .Times(testing::AtLeast(1)) // 2
-        .WillRepeatedly(testing::Return(mockFactory));
-      fakeCompConfig->Initialize();
-      EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::SATISFIED);
-      EXPECT_CALL(*fakeCompConfig, CreateAndActivateComponentInstance(testing::_))
-        .Times(testing::AtLeast(1)) // 2
-        .WillRepeatedly(testing::Return(mockCompInstance));
-      fakeCompConfig->Activate(GetFramework());
-      EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
-      EXPECT_CALL(*fakeCompConfig, DestroyComponentInstances())
-        .Times(1);
-      fakeCompConfig->Deactivate();
-      EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
-      fakeCompConfig->Register();
-      EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::SATISFIED);
-      auto bc = GetFramework().GetBundleContext();
-      auto sRef = bc.GetServiceReference<dummy::ServiceImpl>();
-      ASSERT_EQ(sRef.operator bool(), true);
-      ASSERT_EQ(sRef, fakeCompConfig->GetServiceReference());
-      auto mockServiceImpl = std::make_shared<dummy::ServiceImpl>();
-      InterfaceMapPtr instanceMap = MakeInterfaceMap<dummy::ServiceImpl>(mockServiceImpl);
-      EXPECT_CALL(*mockFactory, GetService(testing::_, testing::_))
-        .Times(1)
-        .WillRepeatedly(testing::Invoke([&](const cppmicroservices::Bundle &b,
-                                            const cppmicroservices::ServiceRegistrationBase&){
-                                          fakeCompConfig->Activate(b);
-                                          return instanceMap;
-                                        }));
-      EXPECT_CALL(*mockFactory, UngetService(testing::_, testing::_, testing::_));
-      auto service = bc.GetService<dummy::ServiceImpl>(sRef);
-      EXPECT_NE(service, nullptr);
-      EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
-    });
+    mockMetadata->serviceMetadata.interfaces = {
+      us_service_interface_iid<dummy::ServiceImpl>()
+    };
+    mockMetadata->immediate = false;
+    auto fakeCompConfig =
+      std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                       GetFramework(),
+                                                       mockRegistry,
+                                                       fakeLogger,
+                                                       threadpool,
+                                                       notifier,
+                                                       managers);
+    EXPECT_CALL(*fakeCompConfig, GetFactory())
+      .Times(testing::AtLeast(1)) // 2
+      .WillRepeatedly(testing::Return(mockFactory));
+    fakeCompConfig->Initialize();
+    EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::SATISFIED);
+    EXPECT_CALL(*fakeCompConfig, CreateAndActivateComponentInstance(testing::_))
+      .Times(testing::AtLeast(1)) // 2
+      .WillRepeatedly(testing::Return(mockCompInstance));
+    fakeCompConfig->Activate(GetFramework());
+    EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
+    EXPECT_CALL(*fakeCompConfig, DestroyComponentInstances()).Times(1);
+    fakeCompConfig->Deactivate();
+    EXPECT_EQ(fakeCompConfig->GetConfigState(),
+              ComponentState::UNSATISFIED_REFERENCE);
+    fakeCompConfig->Register();
+    EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::SATISFIED);
+    auto bc = GetFramework().GetBundleContext();
+    auto sRef = bc.GetServiceReference<dummy::ServiceImpl>();
+    ASSERT_EQ(sRef.operator bool(), true);
+    ASSERT_EQ(sRef, fakeCompConfig->GetServiceReference());
+    auto mockServiceImpl = std::make_shared<dummy::ServiceImpl>();
+    InterfaceMapPtr instanceMap =
+      MakeInterfaceMap<dummy::ServiceImpl>(mockServiceImpl);
+    EXPECT_CALL(*mockFactory, GetService(testing::_, testing::_))
+      .Times(1)
+      .WillRepeatedly(
+        testing::Invoke([&](const cppmicroservices::Bundle& b,
+                            const cppmicroservices::ServiceRegistrationBase&) {
+          fakeCompConfig->Activate(b);
+          return instanceMap;
+        }));
+    EXPECT_CALL(*mockFactory, UngetService(testing::_, testing::_, testing::_));
+    auto service = bc.GetService<dummy::ServiceImpl>(sRef);
+    EXPECT_NE(service, nullptr);
+    EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
+  });
 }
 
 TEST_F(ComponentConfigurationImplTest, TestGetDependencyManagers)
@@ -779,14 +820,16 @@ TEST_F(ComponentConfigurationImplTest, TestGetDependencyManagers)
   rm2.interfaceName = "sample::Bar";
   mockMetadata->refsMetadata.push_back(rm1);
   mockMetadata->refsMetadata.push_back(rm2);
-  auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                         GetFramework(),
-                                                                         mockRegistry,
-                                                                         fakeLogger, 
-                                                                         threadpool, 
-                                                                         notifier, 
-                                                                         managers);
-  EXPECT_EQ(fakeCompConfig->GetAllDependencyManagers().size(), mockMetadata->refsMetadata.size());
+  auto fakeCompConfig =
+    std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                     GetFramework(),
+                                                     mockRegistry,
+                                                     fakeLogger,
+                                                     threadpool,
+                                                     notifier,
+                                                     managers);
+  EXPECT_EQ(fakeCompConfig->GetAllDependencyManagers().size(),
+            mockMetadata->refsMetadata.size());
   EXPECT_NE(fakeCompConfig->GetDependencyManager("Foo"), nullptr);
   EXPECT_NE(fakeCompConfig->GetDependencyManager("Bar"), nullptr);
 }

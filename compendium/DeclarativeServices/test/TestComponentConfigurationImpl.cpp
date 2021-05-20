@@ -661,37 +661,38 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentActivateDeactivate)
 
 TEST_F(ComponentConfigurationImplTest, VerifyImmediateComponent)
 {
-  EXPECT_NO_THROW({
-      auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
-      mockMetadata->immediate = true;
-      auto mockRegistry = std::make_shared<MockComponentRegistry>();
-      auto fakeLogger = std::make_shared<FakeLogger>();
-      auto notifier = std::make_shared<ConfigurationNotifier>(
-        GetFramework().GetBundleContext(), fakeLogger);
-      auto threadpool = std::make_shared<boost::asio::thread_pool>();
-      auto managers =
-        std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+    EXPECT_NO_THROW({
+        auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
+        mockMetadata->immediate = true;
+        auto mockRegistry = std::make_shared<MockComponentRegistry>();
+        auto fakeLogger = std::make_shared<FakeLogger>();
+        auto notifier = std::make_shared<ConfigurationNotifier>(
+          GetFramework().GetBundleContext(), fakeLogger);
+        auto threadpool = std::make_shared<boost::asio::thread_pool>();
+        auto managers =
+          std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-      auto mockCompInstance = std::make_shared<MockComponentInstance>();
-      auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                             GetFramework(),
-                                                                             mockRegistry,
-                                                                             fakeLogger, 
-                                                                             threadpool, 
-                                                                             notifier, 
-                                                                             managers);
-      EXPECT_CALL(*fakeCompConfig, CreateAndActivateComponentInstance(testing::_))
-        .Times(2)
-        .WillRepeatedly(testing::Return(mockCompInstance));
-      fakeCompConfig->Initialize();
-      EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
-      EXPECT_CALL(*fakeCompConfig, DestroyComponentInstances())
-        .Times(1);
-      fakeCompConfig->Deactivate();
-      EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
-      fakeCompConfig->Register();
-      // since its an immediate component, it gets activated on call to Register.
-      EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
+        auto mockCompInstance = std::make_shared<MockComponentInstance>();
+        auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                                               GetFramework(),
+                                                                               mockRegistry,
+                                                                               fakeLogger,
+                                                                               threadpool,
+                                                                               notifier,
+                                                                               managers);
+        EXPECT_CALL(*fakeCompConfig, CreateAndActivateComponentInstance(testing::_))
+          .Times(2)
+          .WillRepeatedly(testing::Return(mockCompInstance));
+        fakeCompConfig->Initialize();
+        EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
+        EXPECT_CALL(*fakeCompConfig, DestroyComponentInstances())
+          .Times(1);
+        fakeCompConfig->Deactivate();
+        EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+        fakeCompConfig->Register();
+        // since its an immediate component, it gets activated on call to Register.
+        EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::ACTIVE);
+    });
 }
 
 TEST_F(ComponentConfigurationImplTest, VerifyDelayedComponent)

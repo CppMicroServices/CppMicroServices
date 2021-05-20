@@ -50,7 +50,7 @@ namespace cppmicroservices {
 namespace scrimpl {
 
 typedef std::pair<std::shared_ptr<ComponentInstance>, 
-                  std::shared_ptr<ComponentContextImpl>
+                  std::shared_ptr<ComponentContextImpl>>
   InstanceContextPair;
 struct ListenerToken final
 {

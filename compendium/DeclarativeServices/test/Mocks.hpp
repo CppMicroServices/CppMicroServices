@@ -212,7 +212,7 @@ public:
   MOCK_CONST_METHOD0(GetServiceReference,
                      cppmicroservices::ServiceReferenceBase(void));
   MOCK_CONST_METHOD0(GetRegistry,
-                     std::shared_ptr<const ComponentRegistry>(void));
+                     std::shared_ptr<ComponentRegistry>(void));
   MOCK_CONST_METHOD0(GetBundle, cppmicroservices::Bundle(void));
   MOCK_CONST_METHOD0(GetId, unsigned long(void));
   MOCK_CONST_METHOD0(GetConfigState, ComponentState(void));

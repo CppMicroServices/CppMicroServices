@@ -84,7 +84,7 @@ public:
    *
    * See {@code Configuration#UpdateIfDifferent}
    */
-  std::shared_future<void> UpdateIfDifferent(AnyMap properties) override;
+  std::pair<bool, std::shared_future<void>> UpdateIfDifferent(AnyMap properties) override;
 
   /**
    * Remove this Configuration from ConfigurationAdmin.

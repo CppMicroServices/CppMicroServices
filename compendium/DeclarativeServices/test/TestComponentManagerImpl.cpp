@@ -137,7 +137,8 @@ protected:
 
 TEST_P(ComponentManagerImplParameterizedTest, VerifyInitialize)
 {
-  auto compMgr = std::make_shared<ComponentManagerImpl>(compDesc,
+    auto compDesc = GetParam();
+    auto compMgr = std::make_shared<ComponentManagerImpl>(compDesc,
                                                         mockRegistry,
                                                         framework.GetBundleContext(),
                                                         fakeLogger, 

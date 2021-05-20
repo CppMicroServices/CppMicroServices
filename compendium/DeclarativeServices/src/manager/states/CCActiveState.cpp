@@ -25,8 +25,6 @@
 #include "CCUnsatisfiedReferenceState.hpp"
 #include "cppmicroservices/SharedLibraryException.h"
 
-#include "cppmicroservices/detail/ScopeGuard.h"
-
 namespace cppmicroservices {
 namespace scrimpl {
 

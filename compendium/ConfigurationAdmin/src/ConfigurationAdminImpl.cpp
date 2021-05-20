@@ -312,7 +312,7 @@ ConfigurationAdminImpl::GetFactoryConfiguration(const std::string& factoryPid,
 }
 
 std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
-ConfigurationAdminImpl::ListConfigurations(const std::string& /* filter */)
+ConfigurationAdminImpl::ListConfigurations(const std::string& filter/* filter */)
 {
    std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>> result;
    {
@@ -611,8 +611,6 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(cons
       ready.set_value();
       return alreadyRemoved;
     }
-  });
-}
 
 std::shared_ptr<
   TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>

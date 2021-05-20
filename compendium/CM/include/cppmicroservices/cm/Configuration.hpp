@@ -88,7 +88,7 @@ public:
    *
    * @param properties The properties to update this Configuration with.
    *
-   * @returns a shared_future<void> which can be used to wait for the asynchronous
+   * @return a shared_future<void> which can be used to wait for the asynchronous
    * operation that pushed the update to a ManagedService, ManagedServiceFactory or
    * ConfigurationListener to complete.
    */

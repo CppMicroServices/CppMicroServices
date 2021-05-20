@@ -101,6 +101,7 @@ US_ServiceComponent_EXPORT extern const std::string
   REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
 
 /**
+ * \ingroup gr_componentconstants
  * Constants used for ComponentMetadata configurationPolicy attribute.
  */
 US_ServiceComponent_EXPORT extern const std::string CONFIG_POLICY_IGNORE;

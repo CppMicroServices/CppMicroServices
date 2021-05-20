@@ -29,15 +29,11 @@
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleEvent.h"
-#include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
-#include "ComponentRegistry.hpp"
-#include "SCRBundleExtension.hpp"
-#include "SCRLogger.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
+#include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 #include "manager/ConfigurationNotifier.hpp"
 #include <map>
 #include <vector>
-
 
 using cppmicroservices::service::component::runtime::ServiceComponentRuntime;
 

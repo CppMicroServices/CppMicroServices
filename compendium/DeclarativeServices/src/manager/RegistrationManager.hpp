@@ -95,7 +95,7 @@ public:
     const std::shared_ptr<cppmicroservices::ServiceFactory>& factory,
     const cppmicroservices::ServiceProperties& props);
 
-   /**
+  /**
    * SetRegistrationProperties. Sets component properties in registration object. 
    * @param properties The properties for this service. See {@link ServiceProperties}
    *        for a list of standard service property keys. Changes should not

@@ -22,9 +22,10 @@
 
 #include "ConfigurationManager.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
-using cppmicroservices::service::component::ComponentConstants::CONFIG_POLICY_IGNORE;
-using cppmicroservices::service::component::ComponentConstants::CONFIG_POLICY_REQUIRE;
-
+using cppmicroservices::service::component::ComponentConstants::
+  CONFIG_POLICY_IGNORE;
+using cppmicroservices::service::component::ComponentConstants::
+  CONFIG_POLICY_REQUIRE;
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -35,7 +36,7 @@ ConfigurationManager::ConfigurationManager(
   : logger(std::move(logger))
   , metadata(metadata)
   , bundleContext(bc)
-  , mergedProperties (metadata->properties)
+  , mergedProperties(metadata->properties)
 {
   if (!this->metadata || !this->bundleContext || !this->logger) {
     throw std::invalid_argument(
@@ -50,17 +51,17 @@ cppmicroservices::AnyMap ConfigurationManager::GetProperties() const noexcept
   return mergedProperties;
 }
 
-void ConfigurationManager::Initialize() {
+void ConfigurationManager::Initialize()
+{
   if ((metadata->configurationPids.empty()) ||
-      (metadata->configurationPolicy == CONFIG_POLICY_IGNORE)) {  
+      (metadata->configurationPolicy == CONFIG_POLICY_IGNORE)) {
     return;
   }
-  try { 
-    auto sr =
-        this->bundleContext
-        .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+  try {
+    auto sr = this->bundleContext.GetServiceReference<
+      cppmicroservices::service::cm::ConfigurationAdmin>();
     auto configAdmin =
-        this->bundleContext
+      this->bundleContext
         .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
 
     std::lock_guard<std::mutex> lock(propertiesMutex);
@@ -71,24 +72,24 @@ void ConfigurationManager::Initialize() {
         if (config.size() > 0) {
           auto properties = config.front()->GetProperties();
           configProperties.emplace(pid, properties);
-          for (const auto &item : properties) {
+          for (const auto& item : properties) {
             mergedProperties[item.first] = item.second;
-          }   
-        }      
-      } 
+          }
+        }
+      }
     }
   } catch (...) {
     // No ConfigAdmin available
-      logger->Log(
-          cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-          "Exception while initializing ConfigurationManager object",
-          std::current_exception());
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                "Exception while initializing ConfigurationManager object",
+                std::current_exception());
 
     return;
   }
 }
 
-void ConfigurationManager::UpdateMergedProperties(const std::string pid, 
+void ConfigurationManager::UpdateMergedProperties(
+  const std::string pid,
   std::shared_ptr<cppmicroservices::AnyMap> props,
   const cppmicroservices::service::cm::ConfigurationEventType type,
   const ComponentState currentState,
@@ -98,35 +99,34 @@ void ConfigurationManager::UpdateMergedProperties(const std::string pid,
   std::lock_guard<std::mutex> lock(propertiesMutex);
   configWasSatisfied = isConfigSatisfied(currentState);
 
- 
-
   // delete properties for this pid or replace with new properties in configProperties
-  
+
   auto it = configProperties.find(pid);
   if (it != configProperties.end()) {
     configProperties.erase(it);
   }
-  if (type == cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED) {
-      configProperties.emplace(pid, *props);
+  if (type ==
+      cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED) {
+    configProperties.emplace(pid, *props);
   }
-  
+
   //  recalculate the merged properties maintaining precedence as follows:
   //  lowest precedence properties from the metadata
   //  next precedence each pid in meta-data configuration-pids with first one
-  //  in the list having lower precedence than the last one in the list. 
+  //  in the list having lower precedence than the last one in the list.
 
   mergedProperties = metadata->properties;
 
   for (const auto& pid : metadata->configurationPids) {
     auto it = configProperties.find(pid);
-    if (it != configProperties.end()) { 
-      for (const auto &item : it->second) {
-          mergedProperties[item.first] = item.second;
-        }
+    if (it != configProperties.end()) {
+      for (const auto& item : it->second) {
+        mergedProperties[item.first] = item.second;
       }
-  } 
+    }
+  }
 
-   configNowSatisfied = isConfigSatisfied(currentState);
+  configNowSatisfied = isConfigSatisfied(currentState);
 }
 
 /**
@@ -138,7 +138,6 @@ bool ConfigurationManager::IsConfigSatisfied(
   std::lock_guard<std::mutex> lock(propertiesMutex);
 
   return isConfigSatisfied(currentState);
-  
 }
 
 bool ConfigurationManager::isConfigSatisfied(
@@ -156,4 +155,3 @@ bool ConfigurationManager::isConfigSatisfied(
 }
 }
 }
-

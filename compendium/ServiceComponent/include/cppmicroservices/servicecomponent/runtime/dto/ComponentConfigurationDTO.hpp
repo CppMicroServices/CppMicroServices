@@ -45,7 +45,8 @@ namespace dto {
  * \addtogroup gr_componentconfigurationdto
  * @{
  */
-enum US_ServiceComponent_EXPORT ComponentState {
+enum US_ServiceComponent_EXPORT ComponentState
+{
   /**
    * The component configuration is unsatisfied due to an unsatisfied
    * reference.

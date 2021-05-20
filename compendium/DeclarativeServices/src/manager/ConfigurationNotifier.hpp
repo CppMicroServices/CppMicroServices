@@ -24,8 +24,8 @@
 #define __CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP__
 
 #include "../SCRLogger.hpp"
-#include "cppmicroservices/cm/ConfigurationListener.hpp"
 #include "ConcurrencyUtil.hpp"
+#include "cppmicroservices/cm/ConfigurationListener.hpp"
 //#include "ComponentConfigurationImpl.hpp"
 
 namespace cppmicroservices {
@@ -53,19 +53,18 @@ struct ConfigChangeNotification final
 };
 
 struct Listener final
-{ 
+{
   Listener(std::function<void(const ConfigChangeNotification&)> notify,
            std::shared_ptr<ComponentConfigurationImpl> mgr)
-     : notify(std::move(notify)), 
-    mgr(std::move(mgr))
-    {}
-      
-  std::function < void(const ConfigChangeNotification&)> notify;
+    : notify(std::move(notify))
+    , mgr(std::move(mgr))
+  {}
+
+  std::function<void(const ConfigChangeNotification&)> notify;
   std::shared_ptr<ComponentConfigurationImpl> mgr;
-  
 };
 
-class ConfigurationNotifier final 
+class ConfigurationNotifier final
 {
 
 public:
@@ -75,7 +74,7 @@ public:
   ConfigurationNotifier(
     const cppmicroservices::BundleContext context,
     std::shared_ptr<cppmicroservices::logservice::LogService> logger);
-  
+
   ConfigurationNotifier(const ConfigurationNotifier&) = delete;
   ConfigurationNotifier(ConfigurationNotifier&&) = delete;
   ConfigurationNotifier& operator=(const ConfigurationNotifier&) = delete;
@@ -90,18 +89,21 @@ public:
     std::function<void(const ConfigChangeNotification&)> notify,
     std::shared_ptr<ComponentConfigurationImpl> mgr);
 
-  void UnregisterListener(const std::string& pid,
+  void UnregisterListener(
+    const std::string& pid,
     const cppmicroservices::ListenerTokenId token) noexcept;
-  
+
   bool AnyListenersForPid(const std::string& pid) noexcept;
-    
+
   void NotifyAllListeners(
     const std::string& pid,
     cppmicroservices::service::cm::ConfigurationEventType type,
     std::shared_ptr<cppmicroservices::AnyMap> properties);
 
 private:
-  void CreateFactoryComponent(std::string factoryName, std::string pid, std::shared_ptr<ComponentConfigurationImpl> mgr);
+  void CreateFactoryComponent(std::string factoryName,
+                              std::string pid,
+                              std::shared_ptr<ComponentConfigurationImpl> mgr);
 
   using TokenMap = std::unordered_map<ListenerTokenId, Listener>;
 
@@ -109,11 +111,10 @@ private:
     std::unordered_map<std::string, std::shared_ptr<TokenMap>>>
     listenersMap;
 
-  std::atomic<cppmicroservices::ListenerTokenId>
-    tokenCounter; ///< used to
-                  ///generate unique
-                  ///tokens for
-                  ///listeners
+  std::atomic<cppmicroservices::ListenerTokenId> tokenCounter; ///< used to
+    ///generate unique
+    ///tokens for
+    ///listeners
 
   cppmicroservices::BundleContext bundleContext;
   std::shared_ptr<cppmicroservices::logservice::LogService> logger;

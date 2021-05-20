@@ -24,7 +24,7 @@ std::vector<R> ConcurrentInvoke(std::function<R(Args...)> func)
   // TODO: use std::barrier when available
   std::vector<std::future<R>> enable_async_futs(numCalls);
   for (size_t i = 0; i < numCalls; ++i) {
-      enable_async_futs[i] =
+    enable_async_futs[i] =
       std::async(std::launch::async, [&readies, i, &ready, &func]() {
         readies[i].set_value();
         ready.wait();

@@ -96,16 +96,18 @@ bool RegistrationManager::RegisterService(
   }
   return IsServiceRegistered();
 }
-void RegistrationManager::SetProperties( const cppmicroservices::ServiceProperties& properties)
+void RegistrationManager::SetProperties(
+  const cppmicroservices::ServiceProperties& properties)
 {
-    try {
-        if (IsServiceRegistered() && serviceReg) {
-            serviceReg.SetProperties(properties);
-        }
+  try {
+    if (IsServiceRegistered() && serviceReg) {
+      serviceReg.SetProperties(properties);
     }
-    catch (...) {
-        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Service SetProperties failed with exception", std::current_exception());
-    }
+  } catch (...) {
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                "Service SetProperties failed with exception",
+                std::current_exception());
+  }
 }
 
 void RegistrationManager::UnregisterService()

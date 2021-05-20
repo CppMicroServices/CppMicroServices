@@ -33,10 +33,10 @@
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
+#include "cppmicroservices/cm/ConfigurationListener.hpp"
 #include "cppmicroservices/cm/ManagedService.hpp"
 #include "cppmicroservices/cm/ManagedServiceFactory.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
-#include "cppmicroservices/cm/ConfigurationListener.hpp"
 
 #include "ConfigurationAdminPrivate.hpp"
 #include "ConfigurationImpl.hpp"
@@ -152,7 +152,8 @@ public:
    *
    * See {@code ConfigurationAdminPrivate#NotifyConfigurationUpdated}
    */
-  std::shared_future<void> NotifyConfigurationUpdated(const std::string& pid) override;
+  std::shared_future<void> NotifyConfigurationUpdated(
+    const std::string& pid) override;
 
   /**
    * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
@@ -161,8 +162,9 @@ public:
    *
    * See {@code ConfigurationAdminPrivate#NotifyConfigurationRemoved}
    */
-  std::shared_future<void> NotifyConfigurationRemoved(const std::string& pid,
-                                  std::uintptr_t configurationId) override;
+  std::shared_future<void> NotifyConfigurationRemoved(
+    const std::string& pid,
+    std::uintptr_t configurationId) override;
 
   // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedService
   std::shared_ptr<

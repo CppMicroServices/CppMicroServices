@@ -23,12 +23,12 @@
 #ifndef __CONFIGURATIONMANAGER_HPP__
 #define __CONFIGURATIONMANAGER_HPP__
 
+#include "../metadata/ComponentMetadata.hpp"
 #include "ConcurrencyUtil.hpp"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"
-#include "../metadata/ComponentMetadata.hpp"
 #include "states/ComponentConfigurationState.hpp"
 
 namespace cppmicroservices {
@@ -48,8 +48,7 @@ public:
   ConfigurationManager(
     std::shared_ptr<const metadata::ComponentMetadata> metadata,
     const cppmicroservices::BundleContext& bc,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger
-    );
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger);
   ConfigurationManager(const ConfigurationManager&) = delete;
   ConfigurationManager(ConfigurationManager&&) = delete;
   ConfigurationManager& operator=(const ConfigurationManager&) = delete;
@@ -64,7 +63,7 @@ public:
   */
   void Initialize();
 
-   /**
+  /**
    * Returns \c true if the configuration dependencies are satisfied, \c false otherwise. 
    * Whether or not configuration objects are satisfied is determined by whether or not 
    * the configuration object is available and on the configuration-policy (ignore, optional,
@@ -79,28 +78,31 @@ public:
    * @throws std::bad_alloc exception if memory cannot be allocated
    */
   void UpdateMergedProperties(
-      const std::string pid,
-      std::shared_ptr<cppmicroservices::AnyMap> props,
+    const std::string pid,
+    std::shared_ptr<cppmicroservices::AnyMap> props,
     const cppmicroservices::service::cm::ConfigurationEventType type,
     const ComponentState currentState,
     bool& configWasSatisfied,
     bool& configIsNowSatisfied);
- 
 
   /* Returns the merged properties for the component. These properties 
    * are a merged from the component properties and the properties for 
    * all of the configuration objects on which this component is dependent. 
    */
-   cppmicroservices::AnyMap GetProperties() const noexcept;
+  cppmicroservices::AnyMap GetProperties() const noexcept;
 
- private:
-   bool isConfigSatisfied(const ComponentState currentState) const noexcept;
+private:
+  bool isConfigSatisfied(const ComponentState currentState) const noexcept;
 
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger; ///< logger for this runtime
+  std::shared_ptr<cppmicroservices::logservice::LogService>
+    logger; ///< logger for this runtime
   const std::shared_ptr<const metadata::ComponentMetadata> metadata;
-  cppmicroservices::BundleContext bundleContext; ///< context of the bundle which contains the component
-  mutable std::mutex propertiesMutex; // mutex to protect the configProperties and mergedProperties members
-  std::unordered_map<std::string, cppmicroservices::AnyMap> configProperties; //properties for available configuration objects.
+  cppmicroservices::BundleContext
+    bundleContext; ///< context of the bundle which contains the component
+  mutable std::mutex
+    propertiesMutex; // mutex to protect the configProperties and mergedProperties members
+  std::unordered_map<std::string, cppmicroservices::AnyMap>
+    configProperties; //properties for available configuration objects.
   cppmicroservices::AnyMap mergedProperties;
 };
 }

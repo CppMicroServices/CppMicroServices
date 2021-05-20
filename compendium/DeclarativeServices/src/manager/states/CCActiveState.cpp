@@ -34,15 +34,15 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(
   ComponentConfigurationImpl& mgr,
   const cppmicroservices::Bundle& clientBundle)
 {
-   std::lock_guard<std::mutex> lock(oneAtATimeMutex);
-   auto logger = mgr.GetLogger();
+  std::lock_guard<std::mutex> lock(oneAtATimeMutex);
+  auto logger = mgr.GetLogger();
 
-   // Make sure the state didn't change while we were waiting
-   if (mgr.GetConfigState() != service::component::runtime::dto::ACTIVE) {
-     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                 "Activate failed. Component no longer in Active State.");
-     return nullptr;
-   }
+  // Make sure the state didn't change while we were waiting
+  if (mgr.GetConfigState() != service::component::runtime::dto::ACTIVE) {
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                "Activate failed. Component no longer in Active State.");
+    return nullptr;
+  }
   // no state change, already in active state. create and return a ComponentInstance object
   std::shared_ptr<ComponentInstance> instance;
   instance = mgr.CreateAndActivateComponentInstance(clientBundle);
@@ -55,7 +55,7 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(
   // two activities the configuration objects could change and the service registration properties
   // would be out of date.
   if (instance) {
-      mgr.SetRegistrationProperties();
+    mgr.SetRegistrationProperties();
   }
 
   if (!instance) {
@@ -79,47 +79,46 @@ void CCActiveState::Deactivate(ComponentConfigurationImpl& mgr)
   DoDeactivateWork(mgr);
 }
 
- void CCActiveState::DoDeactivateWork(ComponentConfigurationImpl& mgr)
- {
-    auto currentState = shared_from_this();
-    std::promise<void> transitionAction;
-    auto fut = transitionAction.get_future();
-    auto unsatisfiedState =
-        std::make_shared<CCUnsatisfiedReferenceState>(std::move(fut));
-    while (currentState->GetValue() !=
-             service::component::runtime::dto::UNSATISFIED_REFERENCE) {
-        if (mgr.CompareAndSetState(&currentState, unsatisfiedState)) {
-          currentState
-            ->WaitForTransitionTask(); // wait for the previous transition to finish
-          mgr.UnregisterService();
-          mgr.DestroyComponentInstances();
-          transitionAction.set_value();
-        }
+void CCActiveState::DoDeactivateWork(ComponentConfigurationImpl& mgr)
+{
+  auto currentState = shared_from_this();
+  std::promise<void> transitionAction;
+  auto fut = transitionAction.get_future();
+  auto unsatisfiedState =
+    std::make_shared<CCUnsatisfiedReferenceState>(std::move(fut));
+  while (currentState->GetValue() !=
+         service::component::runtime::dto::UNSATISFIED_REFERENCE) {
+    if (mgr.CompareAndSetState(&currentState, unsatisfiedState)) {
+      currentState
+        ->WaitForTransitionTask(); // wait for the previous transition to finish
+      mgr.UnregisterService();
+      mgr.DestroyComponentInstances();
+      transitionAction.set_value();
     }
   }
-  
+}
 
- bool CCActiveState::Modified(ComponentConfigurationImpl& mgr)
+bool CCActiveState::Modified(ComponentConfigurationImpl& mgr)
 {
-   std::lock_guard<std::mutex> lock(oneAtATimeMutex);
+  std::lock_guard<std::mutex> lock(oneAtATimeMutex);
   // Make sure the state didn't change while we were waiting
   if (mgr.GetConfigState() != service::component::runtime::dto::ACTIVE) {
-     auto logger = mgr.GetLogger();
-     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                 "Modified failed. Component no longer in Active State.");
+    auto logger = mgr.GetLogger();
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                "Modified failed. Component no longer in Active State.");
     return false;
   }
   if (!mgr.ModifyComponentInstanceProperties()) {
-      // Component instance does not have a Modified method. Deactivate
-      // and reactivate
-      DoDeactivateWork(mgr);
-      // Service registration properties will be updated when the service is
-      // registered. Don't need to do it here. 
-      return false;
+    // Component instance does not have a Modified method. Deactivate
+    // and reactivate
+    DoDeactivateWork(mgr);
+    // Service registration properties will be updated when the service is
+    // registered. Don't need to do it here.
+    return false;
   }
   // Update service registration properties
   mgr.SetRegistrationProperties();
-  
+
   return true;
 };
 
@@ -137,27 +136,26 @@ void CCActiveState::Rebind(ComponentConfigurationImpl& mgr,
     return;
   }
   if (svcRefToBind) {
-      try {
-        mgr.BindReference(refName, svcRefToBind);
-      } catch (const std::exception&) {
-        mgr.GetLogger()->Log(
-          cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-          "Exception while dynamically binding a reference. ",
-          std::current_exception());
-      }
+    try {
+      mgr.BindReference(refName, svcRefToBind);
+    } catch (const std::exception&) {
+      mgr.GetLogger()->Log(
+        cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+        "Exception while dynamically binding a reference. ",
+        std::current_exception());
+    }
   }
 
   if (svcRefToUnbind) {
     try {
-    mgr.UnbindReference(refName, svcRefToUnbind);
+      mgr.UnbindReference(refName, svcRefToUnbind);
     } catch (const std::exception&) {
-    mgr.GetLogger()->Log(
+      mgr.GetLogger()->Log(
         cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
         "Exception while dynamically unbinding a reference. ",
         std::current_exception());
     }
+  }
 }
 }
 }
-}
-

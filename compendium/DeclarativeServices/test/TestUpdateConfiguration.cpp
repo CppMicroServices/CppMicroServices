@@ -157,7 +157,8 @@ TEST_F(tServiceComponent, testUpdateConfig_Exception)
   * Test that all changes to the configuration objects on which the component 
   * is dependent result in a deactivation and reactivation of the component.
   */
-TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodImmediate) // DS_CAI_FTC_3
+TEST_F(tServiceComponent,
+       testUpdateConfig_WithoutModifiedMethodImmediate) // DS_CAI_FTC_3
 {
   // Start the test bundle containing the component name.
   std::string componentName = "sample::ServiceComponentCA03";
@@ -229,7 +230,8 @@ TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodImmediate) // DS
 /**
   *  Test component instance won't be constructed or activated until requested.
   */
-TEST_F(tServiceComponent, testUpdateConfig_WithoutModifiedMethodDelayed) // DS_CAI_FTC_4
+TEST_F(tServiceComponent,
+       testUpdateConfig_WithoutModifiedMethodDelayed) // DS_CAI_FTC_4
 {
   // Start the test bundle containing the component name.
   std::string componentName = "sample::ServiceComponentCA04";
@@ -476,7 +478,8 @@ TEST_F(tServiceComponent, testUpdateConfig_BundleScope_Modified) //DS_CAI_FTC_26
                   2);
 }
 
-TEST_F(tServiceComponent, testUpdateConfig_BundleScope_WithoutModified) //DS_CAI_FTC_27
+TEST_F(tServiceComponent,
+       testUpdateConfig_BundleScope_WithoutModified) //DS_CAI_FTC_27
 {
   std::string componentName = "sample::ServiceComponentCA27";
   std::string testBundleName = "TestBundleDSCA27";
@@ -487,7 +490,8 @@ TEST_F(tServiceComponent, testUpdateConfig_BundleScope_WithoutModified) //DS_CAI
                   2);
 }
 
-TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC_24
+TEST_F(tServiceComponent,
+       testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC_24
 {
   std::string componentName = "sample::ServiceComponentCA24";
   std::string testBundleName = "TestBundleDSCA24";
@@ -498,7 +502,8 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
                   5);
 }
 
-TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_WithoutModified) //DS_CAI_FTC_25
+TEST_F(tServiceComponent,
+       testUpdateConfig_PrototypeScope_WithoutModified) //DS_CAI_FTC_25
 {
   std::string componentName = "sample::ServiceComponentCA04";
   std::string testBundleName = "TestBundleDSCA04";

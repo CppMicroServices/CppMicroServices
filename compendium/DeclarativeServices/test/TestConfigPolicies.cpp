@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#include "gtest/gtest.h"
 #include "TestFixture.hpp"
+#include "gtest/gtest.h"
 
 #include "TestInterfaces/Interfaces.hpp"
 
@@ -31,15 +31,17 @@ namespace test {
 * Test the component instance is constructed without the configuration object is
 * present and the component should be constructed with no properties.
 */
-TEST_F(tServiceComponent, testOptionalConfigPolicyWithoutConfigObj) // DS_CAI_FTC_5
+TEST_F(tServiceComponent,
+       testOptionalConfigPolicyWithoutConfigObj) // DS_CAI_FTC_5
 {
   // Start the test bundle containing the component name.
-  std::string componentName           = "sample::ServiceComponentCA05";
+  std::string componentName = "sample::ServiceComponentCA05";
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA05");
 
   // Use DS runtime service to validate the component state.
   scr::dto::ComponentDescriptionDTO compDescDTO;
-  auto compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  auto compConfigs =
+    GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
     << "The state should be active once the component instance is constructed.";
@@ -60,7 +62,7 @@ TEST_F(tServiceComponent, testOptionalConfigPolicyWithoutConfigObj) // DS_CAI_FT
 TEST_F(tServiceComponent, testOptionalConfigPolicyWithConfigObj) // DS_CAI_FTC_5
 {
   // Start the test bundle containing the component name.
-  std::string componentName           = "sample::ServiceComponentCA05a";
+  std::string componentName = "sample::ServiceComponentCA05a";
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA05a");
 
   // Use DS runtime service to validate the component state.
@@ -74,17 +76,18 @@ TEST_F(tServiceComponent, testOptionalConfigPolicyWithConfigObj) // DS_CAI_FTC_5
   // Get a service reference to ConfigAdmin to create the component instance.
   auto configAdminService =
     GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
-  ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin.";
+  ASSERT_TRUE(configAdminService)
+    << "GetService failed for ConfigurationAdmin.";
 
   // Create configuration object and update property.
-  auto configuration  = configAdminService->GetConfiguration(componentName);
+  auto configuration = configAdminService->GetConfiguration(componentName);
   auto configInstance = configuration->GetPid();
 
   cppmicroservices::AnyMap props(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string instanceId{ "instance1" };
   props["uniqueProp"] = instanceId;
-  auto fut= configuration->Update(props);
+  auto fut = configuration->Update(props);
   fut.get();
 
   // Confirm configuration object presented and check component state.
@@ -99,7 +102,7 @@ TEST_F(tServiceComponent, testOptionalConfigPolicyWithConfigObj) // DS_CAI_FTC_5
 
   // Confirm component instance was created with the correct properties.
   auto instanceProps = instance->GetProperties();
-  auto uniqueProp    = instanceProps.find("uniqueProp");
+  auto uniqueProp = instanceProps.find("uniqueProp");
 
   ASSERT_TRUE(uniqueProp != instanceProps.end())
     << "uniqueProp not found in constructed instance.";
@@ -110,7 +113,7 @@ TEST_F(tServiceComponent, testOptionalConfigPolicyWithConfigObj) // DS_CAI_FTC_5
 TEST_F(tServiceComponent, testRequiredConfigPolicy) // DS_CAI_FTC_6
 {
   // Start the test bundle containing the component name.
-  std::string componentName           = "sample::ServiceComponentCA02";
+  std::string componentName = "sample::ServiceComponentCA02";
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA02");
 
   // Use DS runtime service to validate the component state.
@@ -126,10 +129,11 @@ TEST_F(tServiceComponent, testRequiredConfigPolicy) // DS_CAI_FTC_6
   // Get a service reference to ConfigAdmin to create the component instance.
   auto configAdminService =
     GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
-  ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin.";
+  ASSERT_TRUE(configAdminService)
+    << "GetService failed for ConfigurationAdmin.";
 
   // Create configuration object and update property.
-  auto configuration  = configAdminService->GetConfiguration(componentName);
+  auto configuration = configAdminService->GetConfiguration(componentName);
   auto configInstance = configuration->GetPid();
 
   cppmicroservices::AnyMap props(
@@ -150,7 +154,7 @@ TEST_F(tServiceComponent, testRequiredConfigPolicy) // DS_CAI_FTC_6
 
   // Confirm component instance was created with the correct properties.
   auto instanceProps = instance->GetProperties();
-  auto uniqueProp    = instanceProps.find("uniqueProp");
+  auto uniqueProp = instanceProps.find("uniqueProp");
 
   ASSERT_TRUE(uniqueProp != instanceProps.end())
     << "uniqueProp not found in constructed instance.";
@@ -160,10 +164,11 @@ TEST_F(tServiceComponent, testRequiredConfigPolicy) // DS_CAI_FTC_6
 /**
 * Test the component instance is created with default properties without the configuration object.
 */
-TEST_F(tServiceComponent, testIgnoreConfigPolicyWithoutConfigObj) // DS_CAI_FTC_7
+TEST_F(tServiceComponent,
+       testIgnoreConfigPolicyWithoutConfigObj) // DS_CAI_FTC_7
 {
   // Start the test bundle containing the component name.
-  std::string componentName           = "sample::ServiceComponentCA07";
+  std::string componentName = "sample::ServiceComponentCA07";
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA07");
 
   // Use DS runtime service to validate the component state.
@@ -182,8 +187,7 @@ TEST_F(tServiceComponent, testIgnoreConfigPolicyWithoutConfigObj) // DS_CAI_FTC_
 
   // Confirm component instance was created with the properties has default value.
   auto instanceProps = instance->GetProperties();
-  EXPECT_TRUE(instanceProps.empty())
-    << "Property instance should be empty.";
+  EXPECT_TRUE(instanceProps.empty()) << "Property instance should be empty.";
 } // end of testIgnoreConfigPolicyWithoutConfigObj
 
 /**
@@ -192,7 +196,7 @@ TEST_F(tServiceComponent, testIgnoreConfigPolicyWithoutConfigObj) // DS_CAI_FTC_
 TEST_F(tServiceComponent, testIgnoreConfigPolicyWithConfigObj) // DS_CAI_FTC_7
 {
   // Start the test bundle containing the component name.
-  std::string componentName           = "sample::ServiceComponentCA07";
+  std::string componentName = "sample::ServiceComponentCA07";
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA07");
 
   // Use DS runtime service to validate the component state.
@@ -206,11 +210,12 @@ TEST_F(tServiceComponent, testIgnoreConfigPolicyWithConfigObj) // DS_CAI_FTC_7
   // Get a service reference to ConfigAdmin to create the component instance.
   auto configAdminService =
     GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
-  ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin.";
+  ASSERT_TRUE(configAdminService)
+    << "GetService failed for ConfigurationAdmin.";
 
   // Create configuration object, try to update property
   // and property update should be ignored.
-  auto configuration  = configAdminService->GetConfiguration(componentName);
+  auto configuration = configAdminService->GetConfiguration(componentName);
   auto configInstance = configuration->GetPid();
 
   cppmicroservices::AnyMap props(

@@ -61,24 +61,29 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
     // configuration-policy and configuration-pid
     unsigned short policy = 0;
     unsigned short pid = 0;
-    componentInfo.configurationPolicy = 
-        codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE;
+    componentInfo.configurationPolicy =
+      codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE;
     if (jsonComponent.isMember("configuration-policy")) {
       policy = 1;
-      componentInfo.configurationPolicy = JsonValueValidator(
-        jsonComponent, "configuration-policy", Json::ValueType::stringValue).GetString();
+      componentInfo.configurationPolicy =
+        JsonValueValidator(
+          jsonComponent, "configuration-policy", Json::ValueType::stringValue)
+          .GetString();
     }
     if (jsonComponent.isMember("configuration-pid")) {
-        pid = 1;
-    } 
-    // Both configuration-policy and configuration-pid must be present in the manifest.json
-    // file to participate in Configuration Admin. 
-    if (policy ^ pid) {
-        componentInfo.configurationPolicy =
-            codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE;
-        throw std::runtime_error("Error: Both configuration-policy and configuration-pid must be present in the manifest.json file to participate in Configuration Admin.");
+      pid = 1;
     }
- 
+    // Both configuration-policy and configuration-pid must be present in the manifest.json
+    // file to participate in Configuration Admin.
+    if (policy ^ pid) {
+      componentInfo.configurationPolicy =
+        codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE;
+      throw std::runtime_error(
+        "Error: Both configuration-policy and configuration-pid must be "
+        "present in the manifest.json file to participate in Configuration "
+        "Admin.");
+    }
+
     // service
     if (jsonComponent.isMember("service")) {
       const auto jsonServiceInfo = JsonValueValidator(

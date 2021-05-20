@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#include "gtest/gtest.h"
 #include "TestFixture.hpp"
+#include "gtest/gtest.h"
 
 #include "TestInterfaces/Interfaces.hpp"
 
@@ -33,8 +33,8 @@ namespace test {
 TEST_F(tServiceComponent, testComponentNameWithPID) // DS_CAI_FTC_16
 {
   // Start the test bundle containing the custom component name.
-  std::string componentName           = "sampleServiceComponentCA16";
-  std::string implementationClass     = "sample::ServiceComponentCA16";
+  std::string componentName = "sampleServiceComponentCA16";
+  std::string implementationClass = "sample::ServiceComponentCA16";
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA16");
 
   // Use DS runtime service to validate the component state
@@ -45,7 +45,8 @@ TEST_F(tServiceComponent, testComponentNameWithPID) // DS_CAI_FTC_16
   EXPECT_EQ(compDescDTO.implementationClass, implementationClass)
     << "Implementation class must be " << implementationClass;
 
-  auto compConfigs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+  auto compConfigs =
+    dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   EXPECT_EQ(compConfigs.at(0).state,
             scr::dto::ComponentState::UNSATISFIED_REFERENCE)
@@ -84,6 +85,6 @@ TEST_F(tServiceComponent, testComponentNameWithPID) // DS_CAI_FTC_16
   ASSERT_TRUE(uniqueProp != instanceProps.end())
     << "uniqueProp not found in constructed instance.";
   EXPECT_EQ(uniqueProp->second, instanceId);
-}  // end of testComponentNameWithPID
+} // end of testComponentNameWithPID
 
 } // end of test namespace

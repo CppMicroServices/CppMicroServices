@@ -23,10 +23,10 @@
 #ifndef CONFIGURATIONADMINPRIVATE_HPP
 #define CONFIGURATIONADMINPRIVATE_HPP
 
-#include <cstdint>
-#include <vector>
-#include <future>
 #include "metadata/ConfigurationMetadata.hpp"
+#include <cstdint>
+#include <future>
+#include <vector>
 
 namespace cppmicroservices {
 namespace cmimpl {
@@ -92,7 +92,8 @@ public:
    *
    * @param pid The PID of the {@code Configuration} which has been updated
    */
-  virtual std::shared_future<void> NotifyConfigurationUpdated(const std::string& pid) = 0;
+  virtual std::shared_future<void> NotifyConfigurationUpdated(
+    const std::string& pid) = 0;
 
   /**
    * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
@@ -102,8 +103,9 @@ public:
    * @param pid The PID of the {@code Configuration} which has been removed.
    * @param configurationId The unique id of the configuration which has been removed. Used to avoid race conditions.
    */
-  virtual std::shared_future<void> NotifyConfigurationRemoved(const std::string& pid,
-                                          std::uintptr_t configurationId) = 0;
+  virtual std::shared_future<void> NotifyConfigurationRemoved(
+    const std::string& pid,
+    std::uintptr_t configurationId) = 0;
 };
 } // cmimpl
 } // cppmicroservices

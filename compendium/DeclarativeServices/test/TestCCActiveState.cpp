@@ -57,13 +57,14 @@ protected:
     auto managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-    mockCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                      framework,
-                                                                      mockRegistry,
-                                                                      fakeLogger, 
-                                                                      threadpool, 
-                                                                      notifier, 
-                                                                      managers);
+    mockCompConfig =
+      std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                       framework,
+                                                       mockRegistry,
+                                                       fakeLogger,
+                                                       threadpool,
+                                                       notifier,
+                                                       managers);
   }
 
   virtual void TearDown()

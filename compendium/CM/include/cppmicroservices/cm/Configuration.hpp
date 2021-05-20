@@ -23,9 +23,9 @@
 #ifndef CppMicroServices_CM_Configuration_hpp
 #define CppMicroServices_CM_Configuration_hpp
 
-#include <string>
-#include <future>
 #include "cppmicroservices/AnyMap.h"
+#include <future>
+#include <string>
 
 namespace cppmicroservices {
 namespace service {
@@ -92,8 +92,9 @@ public:
    * operation that pushed the update to a ManagedService, ManagedServiceFactory or
    * ConfigurationListener to complete.
    */
-  virtual std::shared_future<void> Update(AnyMap properties = AnyMap{
-                        AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }) = 0;
+  virtual std::shared_future<void> Update(
+    AnyMap properties = AnyMap{
+      AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }) = 0;
 
   /**
    * Update the properties of this Configuration if they differ from the current properties.

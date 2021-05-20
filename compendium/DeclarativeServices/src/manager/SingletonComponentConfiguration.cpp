@@ -21,6 +21,7 @@
   =============================================================================*/
 
 #include "SingletonComponentConfiguration.hpp"
+#include "ComponentManager.hpp"
 #include "ReferenceManager.hpp"
 #include "ReferenceManagerImpl.hpp"
 #include "RegistrationManager.hpp"
@@ -29,7 +30,6 @@
 #include "states/CCUnsatisfiedReferenceState.hpp"
 #include "states/ComponentConfigurationState.hpp"
 #include <iostream>
-#include "ComponentManager.hpp"
 
 using cppmicroservices::scrimpl::ReferenceManagerImpl;
 using cppmicroservices::service::component::ComponentConstants::COMPONENT_ID;
@@ -39,14 +39,20 @@ namespace cppmicroservices {
 namespace scrimpl {
 
 SingletonComponentConfigurationImpl::SingletonComponentConfigurationImpl(
-    std::shared_ptr<const metadata::ComponentMetadata> metadata,                                                                       
-    const Bundle& bundle,
-    std::shared_ptr<ComponentRegistry> registry,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-    std::shared_ptr<boost::asio::thread_pool> threadpool,
-    std::shared_ptr<ConfigurationNotifier> configNotifier,
-    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
-  : ComponentConfigurationImpl(metadata, bundle, registry, logger, threadpool, configNotifier, managers)
+  std::shared_ptr<const metadata::ComponentMetadata> metadata,
+  const Bundle& bundle,
+  std::shared_ptr<ComponentRegistry> registry,
+  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+  std::shared_ptr<boost::asio::thread_pool> threadpool,
+  std::shared_ptr<ConfigurationNotifier> configNotifier,
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
+  : ComponentConfigurationImpl(metadata,
+                               bundle,
+                               registry,
+                               logger,
+                               threadpool,
+                               configNotifier,
+                               managers)
 {}
 
 std::shared_ptr<ServiceFactory>
@@ -154,9 +160,10 @@ void SingletonComponentConfigurationImpl::BindReference(
 {
   auto context = GetComponentContext();
   if (!context->AddToBoundServicesCache(refName, ref)) {
-      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-          "Failure while trying to add reference to BoundServices Cache ");
-      return;
+    GetLogger()->Log(
+      cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+      "Failure while trying to add reference to BoundServices Cache ");
+    return;
   }
   try {
     GetComponentInstance()->InvokeBindMethod(refName, ref);

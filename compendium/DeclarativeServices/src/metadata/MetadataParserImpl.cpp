@@ -25,11 +25,12 @@
 #include "Util.hpp"
 #include "cppmicroservices/Bundle.h"
 
-#include <iterator>
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
+#include <iterator>
 
 using cppmicroservices::scrimpl::util::ObjectValidator;
-using cppmicroservices::service::component::ComponentConstants::CONFIG_POLICY_IGNORE;
+using cppmicroservices::service::component::ComponentConstants::
+  CONFIG_POLICY_IGNORE;
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -149,37 +150,37 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
 
   // component.configuration-pid (Optional)
   unsigned short configPid = 0;
-  object =
-    ObjectValidator(metadata, "configuration-pid", /*isOptional=*/true);
+  object = ObjectValidator(metadata, "configuration-pid", /*isOptional=*/true);
   if (object.KeyExists()) {
     configPid = 1;
     if (configPolicy == 1) {
-        const auto configPids = 
-          object.GetValue<std::vector<cppmicroservices::Any>>();
-        std::transform(std::begin(configPids),
-                       std::end(configPids),
-                       std::back_inserter(compMetadata->configurationPids),
-                       [](const auto& configPid) {
-                         return ObjectValidator(configPid).GetValue<std::string>();
-                       });
-      
-        //search for a configuration pid equal to $. If present replace with component name. 
-        // Also search for duplicates pids. These are errors. 
-        std::unordered_map<std::string, std::string> duplicatePids;
-        for(auto& pid : compMetadata->configurationPids)
-        {  
-            if (pid == "$") {
-              pid = compMetadata->name;
-            }
+      const auto configPids =
+        object.GetValue<std::vector<cppmicroservices::Any>>();
+      std::transform(
+        std::begin(configPids),
+        std::end(configPids),
+        std::back_inserter(compMetadata->configurationPids),
+        [](const auto& configPid) {
+          return ObjectValidator(configPid).GetValue<std::string>();
+        });
 
-            if (duplicatePids.find(pid) != duplicatePids.end()) {
-              std::string msg = "configuration-pid error in the manifest. Duplicate pid detected. ";
-              msg.append(pid);
-              throw std::runtime_error(msg);
-            }
-            duplicatePids.emplace(pid, pid);       
-        };
-    }  
+      //search for a configuration pid equal to $. If present replace with component name.
+      // Also search for duplicates pids. These are errors.
+      std::unordered_map<std::string, std::string> duplicatePids;
+      for (auto& pid : compMetadata->configurationPids) {
+        if (pid == "$") {
+          pid = compMetadata->name;
+        }
+
+        if (duplicatePids.find(pid) != duplicatePids.end()) {
+          std::string msg =
+            "configuration-pid error in the manifest. Duplicate pid detected. ";
+          msg.append(pid);
+          throw std::runtime_error(msg);
+        }
+        duplicatePids.emplace(pid, pid);
+      };
+    }
   }
   /* In order to participate in ConfigurationAdmin both the configuration-policy
      * and the configuration-pid must be present in the manifest.json file. 
@@ -187,7 +188,7 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
      * a Warning message is logged.
      */
   if (configPolicy ^ configPid) {
-    compMetadata->configurationPolicy =  CONFIG_POLICY_IGNORE;
+    compMetadata->configurationPolicy = CONFIG_POLICY_IGNORE;
     compMetadata->configurationPids.clear();
     std::string msg = "Warning: configuration-policy has been set to ignore.";
     msg.append(
@@ -200,17 +201,16 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
     compMetadata->configurationPids.clear();
   }
   // component.factory
-  ObjectValidator(metadata, "factory", /*isOptional=*/true).AssignValueTo(compMetadata->factory);
+  ObjectValidator(metadata, "factory", /*isOptional=*/true)
+    .AssignValueTo(compMetadata->factory);
 
   // component.factoryProperties
   object = ObjectValidator(metadata, "factory-properties", /*isOptional=*/true);
-  if (object.KeyExists())
-  {
-      const auto props = object.GetValue<AnyMap>();
-      for (const auto& prop : props)
-      {
-          compMetadata->factoryProperties.insert(prop);
-      }
+  if (object.KeyExists()) {
+    const auto props = object.GetValue<AnyMap>();
+    for (const auto& prop : props) {
+      compMetadata->factoryProperties.insert(prop);
+    }
   }
 
   // component.properties

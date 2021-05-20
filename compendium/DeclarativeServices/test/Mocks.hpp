@@ -211,8 +211,7 @@ public:
                      std::shared_ptr<ReferenceManager>(const std::string&));
   MOCK_CONST_METHOD0(GetServiceReference,
                      cppmicroservices::ServiceReferenceBase(void));
-  MOCK_CONST_METHOD0(GetRegistry,
-                     std::shared_ptr<ComponentRegistry>(void));
+  MOCK_CONST_METHOD0(GetRegistry, std::shared_ptr<ComponentRegistry>(void));
   MOCK_CONST_METHOD0(GetBundle, cppmicroservices::Bundle(void));
   MOCK_CONST_METHOD0(GetId, unsigned long(void));
   MOCK_CONST_METHOD0(GetConfigState, ComponentState(void));
@@ -261,8 +260,12 @@ public:
   MOCK_METHOD0(Activate, void(void));
   MOCK_METHOD0(Deactivate, void(void));
   MOCK_METHOD0(InvokeModifiedMethod, bool(void));
-  MOCK_METHOD2(InvokeUnbindMethod, void(const std::string &, const cppmicroservices::ServiceReferenceBase&));
-  MOCK_METHOD2(InvokeBindMethod, void(const std::string &, const cppmicroservices::ServiceReferenceBase &));
+  MOCK_METHOD2(InvokeUnbindMethod,
+               void(const std::string&,
+                    const cppmicroservices::ServiceReferenceBase&));
+  MOCK_METHOD2(InvokeBindMethod,
+               void(const std::string&,
+                    const cppmicroservices::ServiceReferenceBase&));
   MOCK_METHOD0(GetInterfaceMap, cppmicroservices::InterfaceMapPtr(void));
 };
 
@@ -292,14 +295,21 @@ public:
 class MockComponentManagerImpl : public ComponentManagerImpl
 {
 public:
-  MockComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
-                           std::shared_ptr<ComponentRegistry> registry,
-                           BundleContext bundleContext,
-                           std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-      std::shared_ptr<boost::asio::thread_pool> pool,
-      std::shared_ptr<ConfigurationNotifier> notifier,
-      std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
-    : ComponentManagerImpl(metadata, registry, bundleContext, logger, pool, notifier, managers)
+  MockComponentManagerImpl(
+    std::shared_ptr<const metadata::ComponentMetadata> metadata,
+    std::shared_ptr<ComponentRegistry> registry,
+    BundleContext bundleContext,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    std::shared_ptr<boost::asio::thread_pool> pool,
+    std::shared_ptr<ConfigurationNotifier> notifier,
+    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
+    : ComponentManagerImpl(metadata,
+                           registry,
+                           bundleContext,
+                           logger,
+                           pool,
+                           notifier,
+                           managers)
     , statechangecount(0)
   {}
   virtual ~MockComponentManagerImpl() = default;
@@ -330,14 +340,21 @@ public:
 class MockComponentConfigurationImpl : public ComponentConfigurationImpl
 {
 public:
-  MockComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
-                                 const Bundle& bundle,
-                                 std::shared_ptr<ComponentRegistry> registry,
-                                 std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-                                 std::shared_ptr<boost::asio::thread_pool> threadpool,
-                                 std::shared_ptr<ConfigurationNotifier> notifier,
-                                 std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
-    : ComponentConfigurationImpl(metadata, bundle, registry, logger, threadpool, notifier, managers)
+  MockComponentConfigurationImpl(
+    std::shared_ptr<const metadata::ComponentMetadata> metadata,
+    const Bundle& bundle,
+    std::shared_ptr<ComponentRegistry> registry,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    std::shared_ptr<boost::asio::thread_pool> threadpool,
+    std::shared_ptr<ConfigurationNotifier> notifier,
+    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
+    : ComponentConfigurationImpl(metadata,
+                                 bundle,
+                                 registry,
+                                 logger,
+                                 threadpool,
+                                 notifier,
+                                 managers)
     , statechangecount(0)
   {}
   virtual ~MockComponentConfigurationImpl() = default;
@@ -348,8 +365,10 @@ public:
   MOCK_METHOD1(UnbindAndDeactivateComponentInstance,
                void(std::shared_ptr<ComponentInstance>));
   MOCK_METHOD0(DestroyComponentInstances, void());
-  MOCK_METHOD2(BindReference, void(const std::string&, const ServiceReferenceBase&));
-  MOCK_METHOD2(UnbindReference, void(const std::string&, const ServiceReferenceBase&));
+  MOCK_METHOD2(BindReference,
+               void(const std::string&, const ServiceReferenceBase&));
+  MOCK_METHOD2(UnbindReference,
+               void(const std::string&, const ServiceReferenceBase&));
   MOCK_METHOD0(ModifyComponentInstanceProperties, bool());
   void SetState(const std::shared_ptr<ComponentConfigurationState>& newState)
   {

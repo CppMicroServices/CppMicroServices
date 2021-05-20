@@ -193,7 +193,7 @@ ConfigurationAdminImpl::~ConfigurationAdminImpl()
     configListenerTracker.Close();
   } catch (...) {
     auto thrownByMessage = "thrown by ConfiguratonAdminImpl destructor "
-                               "while closing the service trackers.\n\t ";
+                           "while closing the service trackers.\n\t ";
     logger->Log(SeverityLevel::LOG_ERROR, thrownByMessage);
   }
 
@@ -312,29 +312,31 @@ ConfigurationAdminImpl::GetFactoryConfiguration(const std::string& factoryPid,
 }
 
 std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
-ConfigurationAdminImpl::ListConfigurations(const std::string& filter/* filter */)
+ConfigurationAdminImpl::ListConfigurations(
+  const std::string& filter /* filter */)
 {
-   std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>> result;
-   {
-     std::lock_guard<std::mutex> lk {configurationsMutex};
+  std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
+    result;
+  {
+    std::lock_guard<std::mutex> lk{ configurationsMutex };
 
-     if (filter.empty()) {
-       result.reserve(configurations.size());
-       for (auto it : configurations) {
-         result.push_back(it.second);
-       }
-     } else {
-       LDAPFilter ldap{filter};
-       for (auto it : configurations) {
-         auto props = it.second->GetProperties();
-         if (ldap.Match(props)) {
-           result.push_back(it.second);
-         }
-       }
-     }
-   }
+    if (filter.empty()) {
+      result.reserve(configurations.size());
+      for (auto it : configurations) {
+        result.push_back(it.second);
+      }
+    } else {
+      LDAPFilter ldap{ filter };
+      for (auto it : configurations) {
+        auto props = it.second->GetProperties();
+        if (ldap.Match(props)) {
+          result.push_back(it.second);
+        }
+      }
+    }
+  }
 
-   return result;
+  return result;
 }
 
 std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
@@ -402,7 +404,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
                     pid);
     } else {
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                   "AddConfigurations: Configuration already existed with "
+                  "AddConfigurations: Configuration already existed with "
                   "identical properties with PID " +
                     pid);
     }
@@ -478,7 +480,8 @@ void ConfigurationAdminImpl::RemoveConfigurations(
   }
 }
 
-std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(const std::string& pid)
+std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
+  const std::string& pid)
 {
   auto fut = PerformAsync([this, pid] {
     AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
@@ -498,119 +501,123 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(cons
           removed = true;
         }
       }
-    }    
+    }
     if (pid.find('~') != std::string::npos) {
-        //this is a factory pid
+      //this is a factory pid
       fPid = pid;
     } else {
       nonFPid = pid;
     }
-    const auto configurationListeners =
-      configListenerTracker.GetServices();
+    const auto configurationListeners = configListenerTracker.GetServices();
     auto type =
       removed
-            ? cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED
-            : cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED;
-        
+        ? cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED
+        : cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED;
+
     auto configAdminRef = cmContext.GetServiceReference<ConfigurationAdmin>();
     for (auto it : configurationListeners) {
-      auto configEvent = std::make_unique<
-      cppmicroservices::service::cm::ConfigurationEvent>(
-      configAdminRef, type, fPid, nonFPid);
+      auto configEvent =
+        std::make_unique<cppmicroservices::service::cm::ConfigurationEvent>(
+          configAdminRef, type, fPid, nonFPid);
       it->configurationEvent((*configEvent));
     }
 
     const auto managedServiceWrappers = managedServiceTracker.GetServices();
-    const auto it = std::find_if(std::begin(managedServiceWrappers), std::end(managedServiceWrappers),
-                                     [&pid](const auto& managedServiceWrapper)
-                                     {
-                                       // The ServiceTracker will return a default constructed shared_ptr for each ManagedService
-                                       // that we aren't tracking. We must be careful not to dereference these!
-                                       return (managedServiceWrapper ? (pid == managedServiceWrapper->pid) : false);
-                                     });
-    if (it != std::end(managedServiceWrappers))
-    {
-      const auto &managedServiceWrapper = *it;
-      notifyServiceUpdated(pid, *(managedServiceWrapper->trackedService), properties, *logger);
+    const auto it = std::find_if(
+      std::begin(managedServiceWrappers),
+      std::end(managedServiceWrappers),
+      [&pid](const auto& managedServiceWrapper) {
+        // The ServiceTracker will return a default constructed shared_ptr for each ManagedService
+        // that we aren't tracking. We must be careful not to dereference these!
+        return (managedServiceWrapper ? (pid == managedServiceWrapper->pid)
+                                      : false);
+      });
+    if (it != std::end(managedServiceWrappers)) {
+      const auto& managedServiceWrapper = *it;
+      notifyServiceUpdated(
+        pid, *(managedServiceWrapper->trackedService), properties, *logger);
     }
     const auto factoryPid = getFactoryPid(pid);
-    if (factoryPid.empty())
-    {
+    if (factoryPid.empty()) {
       return;
     }
-    const auto managedServiceFactoryWrappers = managedServiceFactoryTracker.GetServices();
-    const auto factoryIt = std::find_if(std::begin(managedServiceFactoryWrappers), std::end(managedServiceFactoryWrappers),
-                                            [&factoryPid](const auto& managedServiceFactoryWrapper)
-                                            {
-                                              // The ServiceTracker will return a default constructed shared_ptr for each ManagedServiceFactory
-                                              // that we aren't tracking. We must be careful not to dereference these!
-                                              return (managedServiceFactoryWrapper ? (factoryPid == managedServiceFactoryWrapper->pid) : false);
-                                            });
-    if (factoryIt != std::end(managedServiceFactoryWrappers))
-    {
-      const auto &managedServiceFactoryWrapper = *factoryIt;
-      if (removed)
-      {
-        notifyServiceRemoved(pid, *(managedServiceFactoryWrapper->trackedService), *logger);
-      }
-      else
-      {
-        notifyServiceUpdated(pid, *(managedServiceFactoryWrapper->trackedService), properties, *logger);
+    const auto managedServiceFactoryWrappers =
+      managedServiceFactoryTracker.GetServices();
+    const auto factoryIt = std::find_if(
+      std::begin(managedServiceFactoryWrappers),
+      std::end(managedServiceFactoryWrappers),
+      [&factoryPid](const auto& managedServiceFactoryWrapper) {
+        // The ServiceTracker will return a default constructed shared_ptr for each ManagedServiceFactory
+        // that we aren't tracking. We must be careful not to dereference these!
+        return (managedServiceFactoryWrapper
+                  ? (factoryPid == managedServiceFactoryWrapper->pid)
+                  : false);
+      });
+    if (factoryIt != std::end(managedServiceFactoryWrappers)) {
+      const auto& managedServiceFactoryWrapper = *factoryIt;
+      if (removed) {
+        notifyServiceRemoved(
+          pid, *(managedServiceFactoryWrapper->trackedService), *logger);
+      } else {
+        notifyServiceUpdated(pid,
+                             *(managedServiceFactoryWrapper->trackedService),
+                             properties,
+                             *logger);
       }
     }
-    });
-    return fut;
-  }
+  });
+  return fut;
+}
 
-    std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(const std::string &pid, std::uintptr_t configurationId)
-    {
-      std::promise<void> ready;
-      std::shared_future<void>  alreadyRemoved = ready.get_future();
-      std::shared_ptr<ConfigurationImpl> configurationToInvalidate;
-      {
-        std::lock_guard<std::mutex> lk{configurationsMutex};
-        auto it = configurations.find(pid);
-        if (it == std::end(configurations))
-        {
-          // This Configuration has already been removed. The thread which removed it will have triggered
-          // the notification of any ManagedService or ManagedServiceFactory, so nothing more to do.
-          ready.set_value();
-          return alreadyRemoved;
-        }
-        if (configurationId != reinterpret_cast<std::uintptr_t>(it->second.get()))
-        {
-          // The Configuration with this PID has already been removed and replaced by a new one, and the thread
-          // which did that will have triggered the notification of any ManagedService or ManagedServiceFactory,
-          // so nothing more to do.
-          ready.set_value();
-          return alreadyRemoved;
-        }
-        configurationToInvalidate = it->second;
-        configurations.erase(it);
-        RemoveFactoryInstanceIfRequired(pid);
-      }
-      if (configurationToInvalidate)
-      {
-        auto removeFuture =  NotifyConfigurationUpdated(pid);
-        // This functor will run on another thread. Just being overly cautious to guarantee that the
-        // ConfigurationImpl which has called this method doesn't run its own destructor.
-        auto fut = PerformAsync([this, pid, configuration = std::move(configurationToInvalidate)]
-        {
-          logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                      "Configuration with PID " + pid + " has been removed.");
-        });
-        // wait until asynchronous processing completes before returning to the caller. 
-        try {
-            fut.get();
-        }
-        catch (...) {
-            logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, "Failed to remove component with pid" + pid, std::current_exception());
-        }
-        return removeFuture;
-      }
+std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(
+  const std::string& pid,
+  std::uintptr_t configurationId)
+{
+  std::promise<void> ready;
+  std::shared_future<void> alreadyRemoved = ready.get_future();
+  std::shared_ptr<ConfigurationImpl> configurationToInvalidate;
+  {
+    std::lock_guard<std::mutex> lk{ configurationsMutex };
+    auto it = configurations.find(pid);
+    if (it == std::end(configurations)) {
+      // This Configuration has already been removed. The thread which removed it will have triggered
+      // the notification of any ManagedService or ManagedServiceFactory, so nothing more to do.
       ready.set_value();
       return alreadyRemoved;
     }
+    if (configurationId != reinterpret_cast<std::uintptr_t>(it->second.get())) {
+      // The Configuration with this PID has already been removed and replaced by a new one, and the thread
+      // which did that will have triggered the notification of any ManagedService or ManagedServiceFactory,
+      // so nothing more to do.
+      ready.set_value();
+      return alreadyRemoved;
+    }
+    configurationToInvalidate = it->second;
+    configurations.erase(it);
+    RemoveFactoryInstanceIfRequired(pid);
+  }
+  if (configurationToInvalidate) {
+    auto removeFuture = NotifyConfigurationUpdated(pid);
+    // This functor will run on another thread. Just being overly cautious to guarantee that the
+    // ConfigurationImpl which has called this method doesn't run its own destructor.
+    auto fut = PerformAsync(
+      [this, pid, configuration = std::move(configurationToInvalidate)] {
+        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+                    "Configuration with PID " + pid + " has been removed.");
+      });
+    // wait until asynchronous processing completes before returning to the caller.
+    try {
+      fut.get();
+    } catch (...) {
+      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                  "Failed to remove component with pid" + pid,
+                  std::current_exception());
+    }
+    return removeFuture;
+  }
+  ready.set_value();
+  return alreadyRemoved;
+}
 
 std::shared_ptr<
   TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>
@@ -784,19 +791,18 @@ std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
   std::lock_guard<std::mutex> lk{ futuresMutex };
   decltype(completeFutures){}.swap(completeFutures);
   auto id = ++futuresID;
-  std::future<void> fut = std::async(std::launch::async, [this, func = std::forward<Functor>(f), id]()->void
-           {
-             func();
-             std::lock_guard<std::mutex> lk{futuresMutex};
-             auto it = incompleteFutures.find(id);
-             assert(it != std::end(incompleteFutures) && "Invalid future iterator");
-             completeFutures.push_back(std::move(it->second));
-             incompleteFutures.erase(it);
-             if (incompleteFutures.empty())
-             {
-               futuresCV.notify_one();
-             }
-           });
+  std::future<void> fut = std::async(
+    std::launch::async, [this, func = std::forward<Functor>(f), id]() -> void {
+      func();
+      std::lock_guard<std::mutex> lk{ futuresMutex };
+      auto it = incompleteFutures.find(id);
+      assert(it != std::end(incompleteFutures) && "Invalid future iterator");
+      completeFutures.push_back(std::move(it->second));
+      incompleteFutures.erase(it);
+      if (incompleteFutures.empty()) {
+        futuresCV.notify_one();
+      }
+    });
   auto returnFut = fut.share();
   incompleteFutures.emplace(id, std::move(fut));
   return returnFut;

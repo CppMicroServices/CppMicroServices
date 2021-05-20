@@ -83,7 +83,6 @@ public:
    */
   ComponentState GetValue() const override { return ComponentState::ACTIVE; }
 
- 
 private:
   void DoDeactivateWork(ComponentConfigurationImpl& mgr);
 };

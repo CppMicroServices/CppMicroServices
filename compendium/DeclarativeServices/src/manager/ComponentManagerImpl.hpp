@@ -30,9 +30,9 @@
 #  define FRIEND_TEST(x, y)
 #endif
 #include "ComponentManager.hpp"
+#include "ConfigurationNotifier.hpp"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/logservice/LogService.hpp"
-#include "ConfigurationNotifier.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -48,13 +48,14 @@ class ComponentManagerState;
 class ComponentManagerImpl : public ComponentManager
 {
 public:
-  ComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
-                       std::shared_ptr<ComponentRegistry> registry,
-                       cppmicroservices::BundleContext bundleContext,
-                       std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-                       std::shared_ptr<boost::asio::thread_pool> threadpool,
-                       std::shared_ptr<ConfigurationNotifier> configNotifier,
-                       std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
+  ComponentManagerImpl(
+    std::shared_ptr<const metadata::ComponentMetadata> metadata,
+    std::shared_ptr<ComponentRegistry> registry,
+    cppmicroservices::BundleContext bundleContext,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    std::shared_ptr<boost::asio::thread_pool> threadpool,
+    std::shared_ptr<ConfigurationNotifier> configNotifier,
+    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
   ComponentManagerImpl(const ComponentManagerImpl&) = delete;
   ComponentManagerImpl(ComponentManagerImpl&&) = delete;
   ComponentManagerImpl& operator=(const ComponentManagerImpl&) = delete;
@@ -143,7 +144,8 @@ public:
   /**
    * Returns the managers object associated with this ComponentManager
    */
-  std::shared_ptr < std::vector<std::shared_ptr<ComponentManager>>> GetManagers() const
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> GetManagers()
+    const
   {
     return managers;
   }
@@ -176,8 +178,8 @@ public:
    * runtime instance
    */
 
-  virtual std::shared_ptr<ComponentRegistry> GetRegistry() const 
-  { 
+  virtual std::shared_ptr<ComponentRegistry> GetRegistry() const
+  {
     return registry;
   }
 
@@ -206,15 +208,23 @@ public:
 private:
   FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
 
-  const std::shared_ptr<ComponentRegistry> registry; ///< component registry associated with the current runtime
-  const std::shared_ptr<const metadata::ComponentMetadata> compDesc; ///< the component description
-  cppmicroservices::BundleContext bundleContext; ///< context of the bundle which contains the component
-  const std::shared_ptr<cppmicroservices::logservice::LogService> logger; ///< logger associated with the current runtime
-  std::shared_ptr<ComponentManagerState> state; ///< This member is always accessed using atomic operations
-  std::vector<std::shared_future<void>> disableFutures; ///< futures created when the component transitioned to \c DISABLED state
+  const std::shared_ptr<ComponentRegistry>
+    registry; ///< component registry associated with the current runtime
+  const std::shared_ptr<const metadata::ComponentMetadata>
+    compDesc; ///< the component description
+  cppmicroservices::BundleContext
+    bundleContext; ///< context of the bundle which contains the component
+  const std::shared_ptr<cppmicroservices::logservice::LogService>
+    logger; ///< logger associated with the current runtime
+  std::shared_ptr<ComponentManagerState>
+    state; ///< This member is always accessed using atomic operations
+  std::vector<std::shared_future<void>>
+    disableFutures; ///< futures created when the component transitioned to \c DISABLED state
   std::mutex futuresMutex; ///< mutex to protect the #disableFutures member
-  std::shared_ptr<boost::asio::thread_pool> threadpool; ///< thread pool used to execute async work
-  std::mutex transitionMutex; ///< mutex to make the state transition and posting of the async operations atomic
+  std::shared_ptr<boost::asio::thread_pool>
+    threadpool; ///< thread pool used to execute async work
+  std::mutex
+    transitionMutex; ///< mutex to make the state transition and posting of the async operations atomic
   std::shared_ptr<ConfigurationNotifier> configNotifier;
   std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
 };

@@ -86,7 +86,7 @@ std::string GetDSRuntimePluginFilePath();
 
 std::string GetConfigAdminRuntimePluginFilePath();
 
-  /**
+/**
  * Returns the path to the test bundles folder
  */
 std::string GetTestPluginsPath();

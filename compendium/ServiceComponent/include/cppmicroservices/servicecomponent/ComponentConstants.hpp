@@ -49,7 +49,8 @@ namespace ComponentConstants {
  * object returned by the {@link Bundle::GetHeaders} method.
  */
 US_ServiceComponent_EXPORT extern const std::string SERVICE_COMPONENT;
-using cppmicroservices::service::component::ComponentConstants::SERVICE_COMPONENT;
+using cppmicroservices::service::component::ComponentConstants::
+  SERVICE_COMPONENT;
 
 /**
  * \ingroup gr_componentconstants 
@@ -96,7 +97,8 @@ US_ServiceComponent_EXPORT extern const std::string REFERENCE_TARGET_SUFFIX;
  * only if the service is registered with \c PROTOTYPE scope. Each component
  * instance receives a distinct service object.
  */
-US_ServiceComponent_EXPORT extern const std::string REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
+US_ServiceComponent_EXPORT extern const std::string
+  REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
 
 /**
  * Constants used for ComponentMetadata configurationPolicy attribute.

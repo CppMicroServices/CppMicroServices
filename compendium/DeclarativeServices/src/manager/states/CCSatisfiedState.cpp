@@ -27,11 +27,12 @@
 namespace cppmicroservices {
 namespace scrimpl {
 
-    CCSatisfiedState::CCSatisfiedState() {
-      std::promise<void> prom;
-      ready = prom.get_future();
-      prom.set_value();
-    }
+CCSatisfiedState::CCSatisfiedState()
+{
+  std::promise<void> prom;
+  ready = prom.get_future();
+  prom.set_value();
+}
 
 void CCSatisfiedState::Deactivate(ComponentConfigurationImpl& mgr)
 {

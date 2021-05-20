@@ -47,7 +47,7 @@ std::shared_ptr<ComponentInstance> CCRegisteredState::Activate(
 
   // Make sure the state didn't change while we were waiting
   if (mgr.GetConfigState() != service::component::runtime::dto::SATISFIED) {
-     return std::shared_ptr<ComponentInstance>(nullptr);
+    return std::shared_ptr<ComponentInstance>(nullptr);
   }
 
   auto activeState = std::make_shared<CCActiveState>();

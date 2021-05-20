@@ -37,13 +37,13 @@ namespace cppmicroservices {
 namespace scrimpl {
 
 ComponentManagerImpl::ComponentManagerImpl(
-          std::shared_ptr<const metadata::ComponentMetadata> metadata,                                       
-          std::shared_ptr<ComponentRegistry> registry,
-          BundleContext bundleContext,
-          std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-          std::shared_ptr<boost::asio::thread_pool> threadpool,
-          std::shared_ptr<ConfigurationNotifier> configNotifier,
-          std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
+  std::shared_ptr<const metadata::ComponentMetadata> metadata,
+  std::shared_ptr<ComponentRegistry> registry,
+  BundleContext bundleContext,
+  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+  std::shared_ptr<boost::asio::thread_pool> threadpool,
+  std::shared_ptr<ConfigurationNotifier> configNotifier,
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
   : registry(std::move(registry))
   , compDesc(std::move(metadata))
   , bundleContext(std::move(bundleContext))
@@ -53,10 +53,10 @@ ComponentManagerImpl::ComponentManagerImpl(
   , configNotifier(std::move(configNotifier))
   , managers(std::move(managers))
 {
-  if(!compDesc || !this->registry || !this->bundleContext || !this->logger ||
-      !this->threadpool || !this->configNotifier || !this->managers)
-  {
-    throw std::invalid_argument("Invalid arguments to ComponentManagerImpl constructor");
+  if (!compDesc || !this->registry || !this->bundleContext || !this->logger ||
+      !this->threadpool || !this->configNotifier || !this->managers) {
+    throw std::invalid_argument(
+      "Invalid arguments to ComponentManagerImpl constructor");
   }
 }
 
@@ -149,10 +149,11 @@ std::shared_future<void> ComponentManagerImpl::PostAsyncDisabledToEnabled(
   auto threadpool = GetThreadPool();
   auto configNotifier = GetConfigNotifier();
   auto managers = GetManagers();
- 
+
   std::packaged_task<void(std::shared_ptr<CMEnabledState>)> task(
-    [metadata, bundle, reg, logger, threadpool, configNotifier,managers](
-      std::shared_ptr<CMEnabledState> eState) { eState->CreateConfigurations(
+    [metadata, bundle, reg, logger, threadpool, configNotifier, managers](
+      std::shared_ptr<CMEnabledState> eState) {
+      eState->CreateConfigurations(
         metadata, bundle, reg, logger, threadpool, configNotifier, managers);
     });
 

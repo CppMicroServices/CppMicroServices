@@ -51,12 +51,17 @@ protected:
     auto pool = std::make_shared<boost::asio::thread_pool>(1);
     auto notifier = std::make_shared<ConfigurationNotifier>(
       framework.GetBundleContext(), fakeLogger);
-    auto managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+    auto managers =
+      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-    compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
-                                                         mockRegistry,
-                                                         framework.GetBundleContext(),
-                                                         fakeLogger, pool, notifier, managers);
+    compMgr =
+      std::make_shared<MockComponentManagerImpl>(compDesc,
+                                                 mockRegistry,
+                                                 framework.GetBundleContext(),
+                                                 fakeLogger,
+                                                 pool,
+                                                 notifier,
+                                                 managers);
   }
 
   virtual void TearDown()
@@ -99,18 +104,24 @@ TEST_F(CMEnabledStateTest, TestIsEnabled)
 TEST_F(CMEnabledStateTest, TestGetConfigurations)
 {
   std::promise<void> prom;
-  auto enabledState = std::make_shared<CMEnabledState>(prom.get_future().share());
-  enabledState->configurations = { std::make_shared<MockComponentConfigurationImpl>(compMgr->GetMetadata(),
-                                                                                    framework,
-                                                                                    compMgr->GetRegistry(),
-                                                                                    compMgr->GetLogger(), 
-                                                                                    compMgr->GetThreadPool(), 
-                                                                                    compMgr->GetConfigNotifier(),
-                                                                                    compMgr->GetManagers()) };
-  auto fut = std::async(std::launch::async, [&](){
-                                              return enabledState->GetConfigurations(*compMgr);
-                                            });
-  EXPECT_NE(fut.wait_for(std::chrono::milliseconds::zero()), std::future_status::ready) << "The call to GetConfigurations must not return until the promise is set";
+  auto enabledState =
+    std::make_shared<CMEnabledState>(prom.get_future().share());
+  enabledState->configurations = {
+    std::make_shared<MockComponentConfigurationImpl>(
+      compMgr->GetMetadata(),
+      framework,
+      compMgr->GetRegistry(),
+      compMgr->GetLogger(),
+      compMgr->GetThreadPool(),
+      compMgr->GetConfigNotifier(),
+      compMgr->GetManagers())
+  };
+  auto fut = std::async(std::launch::async, [&]() {
+    return enabledState->GetConfigurations(*compMgr);
+  });
+  EXPECT_NE(fut.wait_for(std::chrono::milliseconds::zero()),
+            std::future_status::ready)
+    << "The call to GetConfigurations must not return until the promise is set";
   prom.set_value();
   auto configs = fut.get();
   EXPECT_EQ(configs.size(), 1ul)
@@ -211,16 +222,18 @@ TEST_F(CMEnabledStateTest, TestCreateConfigurations)
   EXPECT_EQ(enabledState->configurations.size(), 0ul)
     << "Initial number of configurations is zero";
   EXPECT_NO_THROW({
-      enabledState->CreateConfigurations(compMgr->GetMetadata(),
-                                         compMgr->GetBundle(),
-                                         compMgr->GetRegistry(),
-                                         compMgr->GetLogger(), 
-                                         compMgr->GetThreadPool(), 
-                                         compMgr->GetConfigNotifier(),
-                                         compMgr->GetManagers());
-    });
-  EXPECT_EQ(enabledState->configurations.size(), 1ul) << "Must have a configuration created after call to CreateConfigurations";
-  enabledState->configurations.clear(); // remove configs due to the call to the private method.
+    enabledState->CreateConfigurations(compMgr->GetMetadata(),
+                                       compMgr->GetBundle(),
+                                       compMgr->GetRegistry(),
+                                       compMgr->GetLogger(),
+                                       compMgr->GetThreadPool(),
+                                       compMgr->GetConfigNotifier(),
+                                       compMgr->GetManagers());
+  });
+  EXPECT_EQ(enabledState->configurations.size(), 1ul)
+    << "Must have a configuration created after call to CreateConfigurations";
+  enabledState->configurations
+    .clear(); // remove configs due to the call to the private method.
 }
 }
 }

@@ -90,25 +90,30 @@ TEST_F(SharedLibraryExceptionTest, testDSBundleLoaderFailure)
 TEST_F(SharedLibraryExceptionTest, testDSBundleImmediateTrue)
 {
   testing::FLAGS_gtest_death_test_style = "threadsafe";
-  ASSERT_DEATH({
+  ASSERT_DEATH(
+    {
       auto context = GetFramework().GetBundleContext();
       test::InstallLib(context, "TestBundleDSSLE1");
 
       auto bundles = context.GetBundles();
-      auto bundle = std::find_if(
-                                 bundles.begin(), bundles.end(), [](const cppmicroservices::Bundle& bundle) {
-                                                                   return (bundle.GetSymbolicName() == "TestBundleDSSLE1");
-                                                                 });
+      auto bundle =
+        std::find_if(bundles.begin(),
+                     bundles.end(),
+                     [](const cppmicroservices::Bundle& bundle) {
+                       return (bundle.GetSymbolicName() == "TestBundleDSSLE1");
+                     });
 
       ASSERT_NE(bundle, bundles.end()) << "TestBundleDSSLE1 not found";
 
       try {
-        bundle->Start(); // should throw cppmicroservices::SharedLibraryException
+        bundle
+          ->Start(); // should throw cppmicroservices::SharedLibraryException
       } catch (...) {
         std::cerr << "Success" << std::endl;
         std::exit(-1);
       }
-    }, "Success");
+    },
+    "Success");
 }
 
 TEST_F(SharedLibraryExceptionTest, testDSBundleImmediateFalse)

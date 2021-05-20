@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#include "gtest/gtest.h"
 #include "TestFixture.hpp"
+#include "gtest/gtest.h"
 
 #include "TestInterfaces/Interfaces.hpp"
 
@@ -33,7 +33,7 @@ namespace test {
 TEST_F(tServiceComponent, testDuplicatedPID) // DS_CAI_FTC_17
 {
   // Start the test bundle containing duplicate PID.
-  std::string componentName           = "sample::ServiceComponentCA17";
+  std::string componentName = "sample::ServiceComponentCA17";
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA17");
 
   // Use DS runtime service to validate the component description
@@ -48,12 +48,12 @@ TEST_F(tServiceComponent, testDuplicatedPID) // DS_CAI_FTC_17
   ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
   // Create configuration object.
-  auto configuration  = configAdminService->GetConfiguration(componentName);
+  auto configuration = configAdminService->GetConfiguration(componentName);
   auto configInstance = configuration->GetPid();
 
   // GetService.
   auto instance = GetInstance<test::CAInterface>();
   ASSERT_FALSE(instance) << "GetService should fail for CAInterface.";
-}  // end of testDuplicatedPID
+} // end of testDuplicatedPID
 
 } // end of test namespace

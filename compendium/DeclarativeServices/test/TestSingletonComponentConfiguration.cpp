@@ -56,8 +56,8 @@ protected:
     obj = std::make_shared<SingletonComponentConfigurationImpl>(mockMetadata,
                                                                 framework,
                                                                 mockRegistry,
-                                                                fakeLogger, 
-                                                                threadpool, 
+                                                                fakeLogger,
+                                                                threadpool,
                                                                 notifier,
                                                                 managers);
   }

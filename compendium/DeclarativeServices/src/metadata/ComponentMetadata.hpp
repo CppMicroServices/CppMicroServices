@@ -60,7 +60,6 @@ struct ComponentMetadata
   std::vector<std::string> configurationPids;
   std::string factory;
   std::unordered_map<std::string, cppmicroservices::Any> factoryProperties;
-
 };
 }
 }

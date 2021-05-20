@@ -32,7 +32,7 @@ namespace cppmicroservices {
 namespace service {
 namespace cm {
 
-  /**
+/**
    * ConfigChangeNotification
    * This class is used by ConfigurationListener to notify ComponentConfigurationImpl
    * about changes to Configuration Objects.
@@ -61,13 +61,14 @@ public:
   ConfigurationListenerImpl(
     cppmicroservices::BundleContext context,
     std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-    std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier> configNotifier
-  );
+    std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier>
+      configNotifier);
   ConfigurationListenerImpl(const ConfigurationListenerImpl&) = delete;
   ConfigurationListenerImpl(ConfigurationListenerImpl&&) = delete;
-  ConfigurationListenerImpl& operator=(const ConfigurationListenerImpl&) =    delete;
+  ConfigurationListenerImpl& operator=(const ConfigurationListenerImpl&) =
+    delete;
   ConfigurationListenerImpl& operator=(ConfigurationListenerImpl&&) = delete;
-  ~ConfigurationListenerImpl()  = default;
+  ~ConfigurationListenerImpl() = default;
 
   /*
    * configurationEvent is the method called by Configuration Admin whenever a 
@@ -76,9 +77,7 @@ public:
    */
   void configurationEvent(const ConfigurationEvent& event) noexcept override;
 
-
- private:
-
+private:
   cppmicroservices::BundleContext bundleContext;
   std::shared_ptr<cppmicroservices::logservice::LogService> logger;
   std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier>

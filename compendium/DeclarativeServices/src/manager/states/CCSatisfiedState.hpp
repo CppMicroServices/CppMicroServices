@@ -51,9 +51,7 @@ public:
   /**
    * Modifying properties while the component is in the SATISFIED state is a no-op
    */
-  bool Modified(ComponentConfigurationImpl&) override { 
-      return true;
-  };
+  bool Modified(ComponentConfigurationImpl&) override { return true; };
   /**
    * Rebinding while in a \c SATISFIED state is a no-op
    */
@@ -69,13 +67,12 @@ public:
    */
   ComponentState GetValue() const override { return ComponentState::SATISFIED; }
 
-  void WaitForTransitionTask() override { 
-      ready.get(); 
-  }
+  void WaitForTransitionTask() override { ready.get(); }
+
 protected:
-// Mutex to make sure that one operation (Activate, Rebind, Modified, Deactivate) completes before another
-// operation begins. 
-    mutable std::mutex oneAtATimeMutex;
+  // Mutex to make sure that one operation (Activate, Rebind, Modified, Deactivate) completes before another
+  // operation begins.
+  mutable std::mutex oneAtATimeMutex;
 
 private:
   std::shared_future<void> ready;

@@ -77,9 +77,7 @@ public:
   /**
    * Modifying properties while the component is in the UNSATISFIED_REFERENCE state is a no-op
    */
-  bool Modified(ComponentConfigurationImpl& /*mgr*/) override { 
-       return true;
-   };
+  bool Modified(ComponentConfigurationImpl& /*mgr*/) override { return true; };
   /**
    * Rebinding while in an UNSATISFIED_REFERENCE state is a no-op
    */

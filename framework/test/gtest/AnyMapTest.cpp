@@ -204,8 +204,9 @@ TEST(AnyMapTest, MoveConstructor)
   o["re"] = Any(2);
   AnyMap o_anymap_move_ctor(std::move(o));
   ASSERT_EQ(any_cast<int>(o_anymap_move_ctor.at("do")), 1);
-  ASSERT_DEATH({o.size();}, ".*") << "This call should result in a crash because "
-                                  "the object has been moved from";
+  ASSERT_DEATH({ o.size(); }, ".*")
+    << "This call should result in a crash because "
+       "the object has been moved from";
 
   AnyMap uo(AnyMap::UNORDERED_MAP);
   AnyMap uo_move(std::move(uo));

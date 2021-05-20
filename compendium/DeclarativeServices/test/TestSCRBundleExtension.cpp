@@ -74,31 +74,42 @@ TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
   auto bundleContext = GetFramework().GetBundleContext();
   auto notifier =
     std::make_shared<ConfigurationNotifier>(bundleContext, fakeLogger);
-  EXPECT_THROW({
-      SCRBundleExtension bundleExt(BundleContext(),
-                                   headers,
-                                   mockRegistry,
-                                   fakeLogger, pool, notifier);
-    }, std::invalid_argument);
-  EXPECT_THROW({
+  EXPECT_THROW(
+    {
+      SCRBundleExtension bundleExt(
+        BundleContext(), headers, mockRegistry, fakeLogger, pool, notifier);
+    },
+    std::invalid_argument);
+  EXPECT_THROW(
+    {
       SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                    headers,
-                                   nullptr, fakeLogger, pool, notifier);
-    }, std::invalid_argument);
-  EXPECT_THROW({
+                                   nullptr,
+                                   fakeLogger,
+                                   pool,
+                                   notifier);
+    },
+    std::invalid_argument);
+  EXPECT_THROW(
+    {
       SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                    headers,
                                    mockRegistry,
                                    nullptr,
-                                   pool, notifier);
-    }, std::invalid_argument);
-  EXPECT_THROW({
+                                   pool,
+                                   notifier);
+    },
+    std::invalid_argument);
+  EXPECT_THROW(
+    {
       SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                    headers,
                                    mockRegistry,
                                    fakeLogger,
-                                   pool, notifier);
-    }, std::invalid_argument);
+                                   pool,
+                                   notifier);
+    },
+    std::invalid_argument);
 }
 
 TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
@@ -125,19 +136,23 @@ TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger);
   EXPECT_NO_THROW({
-      SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
-                                   scr,
-                                   mockRegistry,
-                                   fakeLogger, pool, notifier);
-      EXPECT_EQ(bundleExt.managers->size(), 0u);
-    });
+    SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
+                                 scr,
+                                 mockRegistry,
+                                 fakeLogger,
+                                 pool,
+                                 notifier);
+    EXPECT_EQ(bundleExt.managers->size(), 0u);
+  });
   EXPECT_NO_THROW({
-      SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
-                                   scr,
-                                   mockRegistry,
-                                   fakeLogger, pool, notifier);
-      EXPECT_EQ(bundleExt.managers->size(), 1u);
-    });
+    SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
+                                 scr,
+                                 mockRegistry,
+                                 fakeLogger,
+                                 pool,
+                                 notifier);
+    EXPECT_EQ(bundleExt.managers->size(), 1u);
+  });
 }
 }
 }

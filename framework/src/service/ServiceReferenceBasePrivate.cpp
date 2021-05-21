@@ -40,8 +40,9 @@ US_MSVC_DISABLE_WARNING(
 
 namespace cppmicroservices {
 
-using ThreadMarksMapType = std::unordered_map<BundlePrivate*,
-                           std::unordered_set<ServiceRegistrationBasePrivate*>>;
+using ThreadMarksMapType =
+  std::unordered_map<BundlePrivate*,
+                     std::unordered_set<ServiceRegistrationBasePrivate*>>;
 
 ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(
   ServiceRegistrationBasePrivate* reg)
@@ -73,13 +74,11 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       std::string message =
         "ServiceFactory returned an empty or nullptr interface map.";
       registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-        FrameworkEvent(
-          FrameworkEvent::Type::FRAMEWORK_ERROR,
-          MakeBundle(bundle->shared_from_this()),
-          message,
-          std::make_exception_ptr(ServiceException(message, 
-            ServiceException::Type::FACTORY_ERROR)
-          )));
+        FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                       MakeBundle(bundle->shared_from_this()),
+                       message,
+                       std::make_exception_ptr(ServiceException(
+                         message, ServiceException::Type::FACTORY_ERROR))));
       return smap;
     }
     std::vector<std::string> classes =
@@ -115,8 +114,8 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                      MakeBundle(bundle->shared_from_this()),
                      message,
-                     std::make_exception_ptr(ServiceException(ex.what(),
-                       ServiceException::Type::FACTORY_EXCEPTION))));
+                     std::make_exception_ptr(ServiceException(
+                       ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
   }
   return s;
 }
@@ -281,7 +280,7 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(
   if (!sf)
     return false;
 
-  for (auto & prototypeServiceMap : prototypeServiceMaps) {
+  for (auto& prototypeServiceMap : prototypeServiceMaps) {
     // compare the contents of the map
     if (*service.get() == *prototypeServiceMap.get()) {
       try {
@@ -290,11 +289,12 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(
       } catch (const std::exception& ex) {
         std::string message("ServiceFactory threw an exception");
         registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-          FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                         MakeBundle(bundle->shared_from_this()),
-                         message,
-                         std::make_exception_ptr(ServiceException(ex.what(),
-                           ServiceException::Type::FACTORY_EXCEPTION))));
+          FrameworkEvent(
+            FrameworkEvent::Type::FRAMEWORK_ERROR,
+            MakeBundle(bundle->shared_from_this()),
+            message,
+            std::make_exception_ptr(ServiceException(
+              ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
       }
 
       auto l = registration->Lock();
@@ -371,11 +371,12 @@ bool ServiceReferenceBasePrivate::UngetService(
     } catch (const std::exception& ex) {
       std::string message("ServiceFactory threw an exception");
       registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-        FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                       MakeBundle(bundle->shared_from_this()),
-                       message,
-                       std::make_exception_ptr(ServiceException(ex.what(), 
-                         ServiceException::Type::FACTORY_EXCEPTION))));
+        FrameworkEvent(
+          FrameworkEvent::Type::FRAMEWORK_ERROR,
+          MakeBundle(bundle->shared_from_this()),
+          message,
+          std::make_exception_ptr(ServiceException(
+            ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
     }
   }
 

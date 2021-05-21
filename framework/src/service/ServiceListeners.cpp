@@ -318,8 +318,7 @@ void ServiceListeners::RemoveAllListeners(
   {
     auto l = this->Lock();
     US_UNUSED(l);
-    for (auto it = serviceSet.begin();
-         it != serviceSet.end();) {
+    for (auto it = serviceSet.begin(); it != serviceSet.end();) {
 
       if (GetPrivate(it->GetBundleContext()) == context) {
         RemoveFromCache_unlocked(*it);

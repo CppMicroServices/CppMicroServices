@@ -26,9 +26,9 @@
 
 #include "cppmicroservices/ServiceReferenceBase.h"
 
+#include <cstdint>
 #include <exception>
 #include <string>
-#include <cstdint>
 
 namespace cppmicroservices {
 namespace logservice {
@@ -45,10 +45,14 @@ namespace logservice {
  */
 enum class SeverityLevel : uint8_t
 {
-  LOG_ERROR = 1,    ///< Indicates the bundle or service may not be functional. Action should be taken to correct this situation.
-  LOG_WARNING = 2,  ///< Indicates a bundle or service is still functioning but may experience problems in the future because of the warning condition.
-  LOG_INFO = 3,     ///< May be the result of any change in the bundle or service and does not indicate a problem.
-  LOG_DEBUG = 4     ///< Used for problem determination and may be irrelevant to anyone but the bundle developer.
+  LOG_ERROR =
+    1, ///< Indicates the bundle or service may not be functional. Action should be taken to correct this situation.
+  LOG_WARNING =
+    2, ///< Indicates a bundle or service is still functioning but may experience problems in the future because of the warning condition.
+  LOG_INFO =
+    3, ///< May be the result of any change in the bundle or service and does not indicate a problem.
+  LOG_DEBUG =
+    4 ///< Used for problem determination and may be irrelevant to anyone but the bundle developer.
 };
 /** @}*/
 
@@ -69,7 +73,7 @@ enum class SeverityLevel : uint8_t
  */
 class US_usLogService_EXPORT LogService
 {
-  public:
+public:
   virtual ~LogService();
 
   /**
@@ -85,7 +89,9 @@ class US_usLogService_EXPORT LogService
    * @param message Human readable string describing the condition or empty string.
    * @param ex The exception that reflects the condition or nullptr.
    */
-  virtual void Log(SeverityLevel level, const std::string& message, const std::exception_ptr ex) = 0;
+  virtual void Log(SeverityLevel level,
+                   const std::string& message,
+                   const std::exception_ptr ex) = 0;
 
   /**
    * Logs a message.
@@ -93,7 +99,9 @@ class US_usLogService_EXPORT LogService
    * @param level The severity of the message. This should be one of the defined log levels but may be any integer that is interpreted in a user defined way.
    * @param message Human readable string describing the condition or empty string.
    */
-  virtual void Log(const ServiceReferenceBase& sr, SeverityLevel level, const std::string& message) = 0;
+  virtual void Log(const ServiceReferenceBase& sr,
+                   SeverityLevel level,
+                   const std::string& message) = 0;
 
   /**
    * Logs a message with an exception associated and a ServiceReference object.
@@ -102,7 +110,10 @@ class US_usLogService_EXPORT LogService
    * @param message Human readable string describing the condition or empty string.
    * @param ex The exception that reflects the condition or nullptr.
    */
-  virtual void Log(const ServiceReferenceBase& sr, SeverityLevel level, const std::string& message, const std::exception_ptr ex) = 0;
+  virtual void Log(const ServiceReferenceBase& sr,
+                   SeverityLevel level,
+                   const std::string& message,
+                   const std::exception_ptr ex) = 0;
 };
 
 } // namespace logservice

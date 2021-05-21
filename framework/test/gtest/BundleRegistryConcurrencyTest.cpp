@@ -164,8 +164,11 @@ TEST(BundleRegistryConcurrencyTest, testConcurrent)
   ASSERT_EQ(numTestBundles, framework.GetBundleContext().GetBundles().size());
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());
+
 }
 #endif
 
+
 } // end anonymous namespace
+
 #endif

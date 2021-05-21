@@ -23,55 +23,56 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
-#include <string>
+#include "cppmicroservices/Any.h"
+#include "cppmicroservices/AnyMap.h"
+#include <algorithm>
+#include <cctype>
+#include <locale>
 #include <map>
 #include <string>
-#include <algorithm>
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <locale>
-#include <cctype>
-#include "cppmicroservices/Any.h"
-#include "cppmicroservices/AnyMap.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
 namespace util {
 
-template <typename T>
+template<typename T>
 void ThrowIfEmpty(const T&, const std::string&)
-{
-}
+{}
 
-template <typename T>
+template<typename T>
 void ThrowIfEmptyHelper(const T& value, const std::string& key)
 {
-  if (value.empty())
-  {
+  if (value.empty()) {
     std::string msg;
-    if (key.empty())
-    {
+    if (key.empty()) {
       msg = "Value cannot be empty.";
-    }
-    else
-    {
+    } else {
       msg = "Value for the name '" + key + "' cannot be empty.";
     }
     throw std::runtime_error(msg);
   }
 }
-  
-// @brief Throws if the container T is of type @c Any or @c string or @c AnyMap and it's empty
-template <typename TargetType>
-void ThrowIfValueAbsentInChoices(const TargetType&, const std::vector<TargetType>&)
-{
-}
 
-template <> void ThrowIfEmpty(const std::vector<cppmicroservices::Any>& value, const std::string& key);
-template <> void ThrowIfEmpty(const std::string& value, const std::string& key);
-template <> void ThrowIfEmpty(const cppmicroservices::AnyMap& value, const std::string& key);
-template <> void ThrowIfValueAbsentInChoices(const std::string& value, const std::vector<std::string>& choices);
+// @brief Throws if the container T is of type @c Any or @c string or @c AnyMap and it's empty
+template<typename TargetType>
+void ThrowIfValueAbsentInChoices(const TargetType&,
+                                 const std::vector<TargetType>&)
+{}
+
+template<>
+void ThrowIfEmpty(const std::vector<cppmicroservices::Any>& value,
+                  const std::string& key);
+template<>
+void ThrowIfEmpty(const std::string& value, const std::string& key);
+template<>
+void ThrowIfEmpty(const cppmicroservices::AnyMap& value,
+                  const std::string& key);
+template<>
+void ThrowIfValueAbsentInChoices(const std::string& value,
+                                 const std::vector<std::string>& choices);
 /*
  * @brief This class is used to validate the objects of the service
  *        description.
@@ -83,7 +84,6 @@ template <> void ThrowIfValueAbsentInChoices(const std::string& value, const std
 class ObjectValidator
 {
 public:
-
   /*
    * @param scrmap A @c MapType object that has a @c std::string key
    *        and an @c Any value
@@ -100,8 +100,10 @@ public:
    * ObjectValidator(scrmap, "name"); // throws out_of_range exception
    * @endcode
    */
-  template <typename MapType>
-  ObjectValidator(const MapType& scrmap, std::string _key, bool isOptional=false)
+  template<typename MapType>
+  ObjectValidator(const MapType& scrmap,
+                  std::string _key,
+                  bool isOptional = false)
     : key(std::move(_key))
     , keyExists(true)
   {
@@ -128,8 +130,7 @@ public:
   ObjectValidator(cppmicroservices::Any _value)
     : keyExists(true)
     , value(std::move(_value))
-  {
-  }
+  {}
 
   /*
    * @returns false if @c isOptional is @c true and
@@ -148,10 +149,7 @@ public:
    * For the above statement, @c object.KeyExists() returns @c true if the key
    * @c name exists in the map and returns @c false if it doesn't exist.
    */
-  bool KeyExists() const
-  {
-    return keyExists;
-  }
+  bool KeyExists() const { return keyExists; }
 
   /*
    * @returns @c scrmap[key] after casting the value to @c ReturnType
@@ -189,12 +187,12 @@ public:
    * object.GetValue<std::string>(); // throws runtime_error because the value is empty
    * @endcode
    */
-  template <typename ReturnType>
+  template<typename ReturnType>
   ReturnType GetValue() const
   {
-    if (!KeyExists())
-    {
-      throw std::runtime_error("ObjectValidator::GetValue() is called on a object that doesn't exist.");
+    if (!KeyExists()) {
+      throw std::runtime_error("ObjectValidator::GetValue() is called on a "
+                               "object that doesn't exist.");
     }
     return CheckAndGetValue<ReturnType>();
   }
@@ -223,11 +221,11 @@ public:
    * This code segment throws if the value scrmap[a] is not one of
    * "foo", "bar" or "baz".
    */
-  template <typename TargetType>
-  void AssignValueTo(TargetType& target, const std::vector<TargetType>& choices = {}) const
+  template<typename TargetType>
+  void AssignValueTo(TargetType& target,
+                     const std::vector<TargetType>& choices = {}) const
   {
-    if (KeyExists())
-    {
+    if (KeyExists()) {
       TargetType value = CheckAndGetValue<TargetType>();
       ThrowIfValueAbsentInChoices(value, choices);
       target = std::move(value);
@@ -235,51 +233,42 @@ public:
   }
 
 private:
-  template <typename ReturnType>
+  template<typename ReturnType>
   ReturnType CheckAndGetValue() const
   {
-    try
-    {
+    try {
       ReturnType retval = cppmicroservices::any_cast<ReturnType>(value);
       ThrowIfEmpty(retval, key);
       return retval;
-    }
-    catch (const cppmicroservices::BadAnyCastException& exp)
-    {
+    } catch (const cppmicroservices::BadAnyCastException& exp) {
       std::string msg;
-      if (!key.empty())
-      {
+      if (!key.empty()) {
         msg += "Unexpected type for the name '" + key + "'. ";
       }
-      msg += "Exception: " + std::string(exp.what()) + ". Actual type is " + value.Type().name();
+      msg += "Exception: " + std::string(exp.what()) + ". Actual type is " +
+             value.Type().name();
       throw cppmicroservices::BadAnyCastException(msg);
     }
   }
 
-  template <typename MapType>
+  template<typename MapType>
   void HandleMandatoryObject(const MapType& scrmap)
   {
-    try
-    {
+    try {
       value = scrmap.at(key);
-    }
-    catch (const std::out_of_range&)
-    {
+    } catch (const std::out_of_range&) {
       std::string msg = "Missing key '" + key + "' in the manifest.";
       throw std::out_of_range(msg);
     }
   }
 
-  template <typename MapType>
+  template<typename MapType>
   void HandleOptionalObject(const MapType& scrmap)
   {
     auto iter = scrmap.find(key);
-    if (iter == scrmap.end())
-    {
+    if (iter == scrmap.end()) {
       keyExists = false;
-    }
-    else
-    {
+    } else {
       value = scrmap.at(key);
     }
   }
@@ -290,8 +279,9 @@ private:
 };
 
 // @brief If the client simply wants the Any data, return it.
-template <>
-inline cppmicroservices::Any ObjectValidator::GetValue<cppmicroservices::Any>() const
+template<>
+inline cppmicroservices::Any ObjectValidator::GetValue<cppmicroservices::Any>()
+  const
 {
   return value;
 }

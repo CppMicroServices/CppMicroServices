@@ -26,7 +26,9 @@ namespace cppmicroservices {
 namespace scrimpl {
 namespace metadata {
 
-const std::vector<std::string> ServiceMetadata::Scopes = {"bundle", "prototype", "singleton"};
+const std::vector<std::string> ServiceMetadata::Scopes = { "bundle",
+                                                           "prototype",
+                                                           "singleton" };
 
 }
 }

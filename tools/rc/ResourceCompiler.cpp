@@ -191,8 +191,8 @@ void validateManifestInArchive(mz_zip_archive* zipArchive,
 
   try {
     Json::Value root;
-    std::istringstream json(
-      std::string(reinterpret_cast<const char *>(manifestFileContents.get()), length));
+    std::istringstream json(std::string(
+      reinterpret_cast<const char*>(manifestFileContents.get()), length));
     parseAndValidateJson(json, root);
   } catch (const InvalidManifest& e) {
     std::string exceptionMsg(archiveFile);

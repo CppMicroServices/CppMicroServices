@@ -125,7 +125,7 @@ public:
    *
    * @param property The name of the LDAP property.
    */
-  LDAPProp(std::string  property);
+  LDAPProp(std::string property);
 
   /**
    * \addtogroup gr_ldap

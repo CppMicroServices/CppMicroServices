@@ -5,13 +5,17 @@ namespace service {
 namespace cm {
 namespace test {
 
-TestManagedServiceFactoryServiceImpl::TestManagedServiceFactoryServiceImpl(int initialValue)
-    : value{initialValue} {}
+TestManagedServiceFactoryServiceImpl::TestManagedServiceFactoryServiceImpl(
+  int initialValue)
+  : value{ initialValue }
+{}
 
-TestManagedServiceFactoryServiceImpl::~TestManagedServiceFactoryServiceImpl() = default;
+TestManagedServiceFactoryServiceImpl::~TestManagedServiceFactoryServiceImpl() =
+  default;
 
-int TestManagedServiceFactoryServiceImpl::getValue() {
-    return value;
+int TestManagedServiceFactoryServiceImpl::getValue()
+{
+  return value;
 }
 
 } // namespace test

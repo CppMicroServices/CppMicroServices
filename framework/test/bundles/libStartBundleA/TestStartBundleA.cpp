@@ -38,20 +38,21 @@ public:
 
   void Start(BundleContext context)
   {
-      auto bundles = context.GetBundles();
-      auto bundleA = std::find_if(bundles.begin(),
-                                    bundles.end(),
-                                    [](const cppmicroservices::Bundle& b) { return "TestBundleA" == b.GetSymbolicName(); });
+    auto bundles = context.GetBundles();
+    auto bundleA = std::find_if(
+      bundles.begin(), bundles.end(), [](const cppmicroservices::Bundle& b) {
+        return "TestBundleA" == b.GetSymbolicName();
+      });
 
-      if (std::end(bundles) != bundleA)
-      {
-        (*bundleA).Start();
-      }
+    if (std::end(bundles) != bundleA) {
+      (*bundleA).Start();
+    }
   }
 
-  void Stop(BundleContext) { }
+  void Stop(BundleContext) {}
 };
 
 }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestStartBundleAActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
+  cppmicroservices::TestStartBundleAActivator)

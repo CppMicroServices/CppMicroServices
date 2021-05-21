@@ -3,16 +3,14 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 
-namespace sample
+namespace sample {
+class DSBenchmarkComponent : public test::Interface1
 {
-    class DSBenchmarkComponent
-      : public test::Interface1
-    {
-      public:
-        DSBenchmarkComponent() = default;
-        ~DSBenchmarkComponent() override = default;
-        std::string Description() override;
-    };
+public:
+  DSBenchmarkComponent() = default;
+  ~DSBenchmarkComponent() override = default;
+  std::string Description() override;
+};
 }
 
 #endif // _SERVICE_IMPL_HPP_

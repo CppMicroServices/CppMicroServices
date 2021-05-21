@@ -135,6 +135,7 @@ TEST(FrameworkListenerTest, testAddRemoveFrameworkListener)
   fCtx.RemoveListener(std::move(t3));
 
   f.Start(); // generate framework event (started)
+
   //Test that multiple framework listeners were NOT called after removal
   ASSERT_EQ(count1, 1);
   ASSERT_EQ(count2, 1);
@@ -161,6 +162,7 @@ TEST(FrameworkListenerTest, testFrameworkListenersAfterFrameworkStop)
   // a framework event before the listener is disabled and cleaned up.
   f.WaitForStop(std::chrono::milliseconds::zero());
   f.Start(); // generate framework event (started) with no listener to see it
+
   //Test that listeners were released on Framework Stop
   ASSERT_EQ(events, 1);
 

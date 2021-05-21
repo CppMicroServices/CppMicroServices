@@ -87,9 +87,10 @@ public:
 
     // The cast is to help the compiler resolve the correct overload.
     // Refer: https://stackoverflow.com/questions/7131858/stdtransform-and-toupper-no-matching-function/7131881
-    std::transform(
-      value.begin(), value.end(), value.begin(), [](unsigned char c) {
-      return std::tolower(c); });
+    std::transform(value.begin(),
+                   value.end(),
+                   value.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
 
     // Return true if string value == string b in a case-insensitive way.
     auto isCaseInsensitiveEqual = [&value](const std::string& b) {

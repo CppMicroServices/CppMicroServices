@@ -33,14 +33,15 @@ CMDisabledState::CMDisabledState()
 {
   // Initialization with a valid future is required to facilitate a request
   // to DISABLE a ComponentManager whose initial state is DISABLED
-  std::packaged_task<void()> task([](){ /*empty task*/ });
+  std::packaged_task<void()> task([]() { /*empty task*/ });
   fut = task.get_future().share();
   task();
 }
 
 std::shared_future<void> CMDisabledState::Enable(ComponentManagerImpl& cm)
 {
-  auto currentState = shared_from_this(); // assume this object is the current state object.
+  auto currentState =
+    shared_from_this(); // assume this object is the current state object.
   return cm.PostAsyncDisabledToEnabled(currentState);
 }
 
@@ -51,7 +52,8 @@ std::shared_future<void> CMDisabledState::Disable(ComponentManagerImpl& /*cm*/)
 }
 
 // There are no configurations for a disabled state. Equivalent to a no-op.
-std::vector<std::shared_ptr<ComponentConfiguration>> CMDisabledState::GetConfigurations(const ComponentManagerImpl&) const
+std::vector<std::shared_ptr<ComponentConfiguration>>
+CMDisabledState::GetConfigurations(const ComponentManagerImpl&) const
 {
   return {};
 }

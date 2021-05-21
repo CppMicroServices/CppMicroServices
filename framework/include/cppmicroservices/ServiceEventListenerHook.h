@@ -49,8 +49,9 @@ struct US_Framework_EXPORT ServiceEventListenerHook
   /**
    * ShrinkableMap type for filtering event listeners.
    */
-  using ShrinkableMapType = ShrinkableMap<BundleContext,
-                                          ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
+  using ShrinkableMapType =
+    ShrinkableMap<BundleContext,
+                  ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
 
   virtual ~ServiceEventListenerHook();
 

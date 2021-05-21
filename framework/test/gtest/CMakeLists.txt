@@ -53,6 +53,7 @@ set(_gtest_tests
   FrameworkListenerTest.cpp
   BundleHooksTest.cpp
   ServiceHooksTest.cpp
+  TestCounterLatch.cpp
 )
 
 if(BUILD_SHARED_LIBS)

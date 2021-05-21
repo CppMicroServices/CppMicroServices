@@ -5,8 +5,7 @@ namespace sample {
 
 std::string ServiceComponentDGMU::ExtendedDescription()
 {
-  if(!foo)
-  {
+  if (!foo) {
     throw std::runtime_error("Dependency not available");
   }
   std::string result(STRINGIZE(US_BUNDLE_NAME));
@@ -15,14 +14,12 @@ std::string ServiceComponentDGMU::ExtendedDescription()
   return result;
 }
 
-void ServiceComponentDGMU::Bindfoo(
-  const std::shared_ptr<test::Interface1>& )
+void ServiceComponentDGMU::Bindfoo(const std::shared_ptr<test::Interface1>&)
 {
   throw std::runtime_error("throw from bind method");
 }
 
-void ServiceComponentDGMU::Unbindfoo(
-  const std::shared_ptr<test::Interface1>& )
+void ServiceComponentDGMU::Unbindfoo(const std::shared_ptr<test::Interface1>&)
 {
   throw std::runtime_error("throw from unbind method");
 }
@@ -38,14 +35,12 @@ std::string ServiceComponentDGOU::ExtendedDescription()
   return result;
 }
 
-void ServiceComponentDGOU::Bindbar(
-  const std::shared_ptr<test::Interface1>& )
+void ServiceComponentDGOU::Bindbar(const std::shared_ptr<test::Interface1>&)
 {
   throw std::runtime_error("throw from bind method");
 }
 
-void ServiceComponentDGOU::Unbindbar(
-  const std::shared_ptr<test::Interface1>& )
+void ServiceComponentDGOU::Unbindbar(const std::shared_ptr<test::Interface1>&)
 {
 
   throw std::runtime_error("throw from unbind method");
@@ -63,13 +58,13 @@ std::string ServiceComponentFactory::ExtendedDescription()
 }
 
 void ServiceComponentFactory::Bindfactory(
-  const std::shared_ptr<test::Interface1>& )
+  const std::shared_ptr<test::Interface1>&)
 {
   throw std::runtime_error("throw from bind method");
 }
 
 void ServiceComponentFactory::Unbindfactory(
-  const std::shared_ptr<test::Interface1>& )
+  const std::shared_ptr<test::Interface1>&)
 {
 
   throw std::runtime_error("throw from unbind method");

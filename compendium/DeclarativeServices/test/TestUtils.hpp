@@ -23,9 +23,9 @@
 #ifndef TestUtils_hpp
 #define TestUtils_hpp
 
-#include <cppmicroservices/ServiceReference.h>
 #include <cppmicroservices/Bundle.h>
 #include <cppmicroservices/BundleContext.h>
+#include <cppmicroservices/ServiceReference.h>
 
 #include <random>
 #include <string>
@@ -50,12 +50,15 @@ bool RepeatTaskUntilOrTimeout(Task&& t, Predicate&& p)
 /**
  * Convenience Method to install but not start a bundle given the bundle's symbolic name.
  */
-void InstallLib(::cppmicroservices::BundleContext frameworkCtx, const std::string& libName);
+void InstallLib(::cppmicroservices::BundleContext frameworkCtx,
+                const std::string& libName);
 
 /**
  * Convenience Method to install and start a bundle given the bundle's symbolic name.
  */
-cppmicroservices::Bundle InstallAndStartBundle(::cppmicroservices::BundleContext frameworkCtx, const std::string& libName);
+cppmicroservices::Bundle InstallAndStartBundle(
+  ::cppmicroservices::BundleContext frameworkCtx,
+  const std::string& libName);
 
 /**
  * Convenience Method to install and start DS.

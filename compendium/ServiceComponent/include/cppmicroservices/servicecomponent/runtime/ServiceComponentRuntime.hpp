@@ -23,21 +23,24 @@
 #ifndef ServiceComponentRuntime_hpp
 #define ServiceComponentRuntime_hpp
 
-#include <vector>
 #include <future>
+#include <vector>
 
 #include <cppmicroservices/Bundle.h>
 
-#include "dto/ComponentDescriptionDTO.hpp"
-#include "dto/ComponentConfigurationDTO.hpp"
 #include "cppmicroservices/servicecomponent/ServiceComponentExport.h"
+#include "dto/ComponentConfigurationDTO.hpp"
+#include "dto/ComponentDescriptionDTO.hpp"
 
-namespace cppmicroservices { namespace service { namespace component { namespace runtime {
+namespace cppmicroservices {
+namespace service {
+namespace component {
+namespace runtime {
 
-	/**
-	\defgroup gr_servicecomponentruntime ServiceComponentRuntime
-	\brief Groups ServiceComponentRuntime class related symbols.
-	*/
+/**
+ \defgroup gr_servicecomponentruntime ServiceComponentRuntime
+ \brief Groups ServiceComponentRuntime class related symbols.
+ */
 
 /**
  * \ingroup gr_servicecomponentruntime
@@ -55,8 +58,9 @@ namespace cppmicroservices { namespace service { namespace component { namespace
  * {@link dto::ComponentConfigurationDTO ComponentConfigurationDTO} is a representation of an actual instance
  * of a declared component description parameterized by component properties.
  */
-class US_ServiceComponent_EXPORT ServiceComponentRuntime {
-  public:
+class US_ServiceComponent_EXPORT ServiceComponentRuntime
+{
+public:
   virtual ~ServiceComponentRuntime() noexcept;
 
   /**
@@ -76,7 +80,8 @@ class US_ServiceComponent_EXPORT ServiceComponentRuntime {
    *         bundles. An empty collection is returned if there are no
    *         component descriptions for the specified active bundles.
    */
-  virtual std::vector<dto::ComponentDescriptionDTO> GetComponentDescriptionDTOs(const std::vector<cppmicroservices::Bundle>& bundles = {}) const = 0;
+  virtual std::vector<dto::ComponentDescriptionDTO> GetComponentDescriptionDTOs(
+    const std::vector<cppmicroservices::Bundle>& bundles = {}) const = 0;
 
   /**
    * Returns the {@link dto::ComponentDescriptionDTO ComponentDescriptionDTO} declared with the specified name
@@ -93,7 +98,9 @@ class US_ServiceComponent_EXPORT ServiceComponentRuntime {
    *         specified bundle is not active or does not declare a component
    *         description with the specified name.
    */
-  virtual dto::ComponentDescriptionDTO GetComponentDescriptionDTO(const cppmicroservices::Bundle& bundle, const std::string& name) const = 0;
+  virtual dto::ComponentDescriptionDTO GetComponentDescriptionDTO(
+    const cppmicroservices::Bundle& bundle,
+    const std::string& name) const = 0;
 
   /**
    * Returns the component configurations for the specified component
@@ -104,7 +111,9 @@ class US_ServiceComponent_EXPORT ServiceComponentRuntime {
    *         configurations for the specified component description. An empty
    *         vector is returned if there are none.
    */
-  virtual std::vector<dto::ComponentConfigurationDTO> GetComponentConfigurationDTOs(const dto::ComponentDescriptionDTO& description) const = 0;
+  virtual std::vector<dto::ComponentConfigurationDTO>
+  GetComponentConfigurationDTOs(
+    const dto::ComponentDescriptionDTO& description) const = 0;
 
   /**
    * Returns whether the specified component description is currently enabled.
@@ -122,7 +131,8 @@ class US_ServiceComponent_EXPORT ServiceComponentRuntime {
    * @see ComponentContext#DisableComponent(std::string)
    * @see ComponentContext#EnableComponent(std::string)
    */
-  virtual bool IsComponentEnabled(const dto::ComponentDescriptionDTO& description) const = 0;
+  virtual bool IsComponentEnabled(
+    const dto::ComponentDescriptionDTO& description) const = 0;
 
   /**
    * Enables the specified component description.
@@ -143,7 +153,8 @@ class US_ServiceComponent_EXPORT ServiceComponentRuntime {
    *         completed.
    * @see #IsComponentEnabled
    */
-  virtual std::shared_future<void> EnableComponent(const dto::ComponentDescriptionDTO& description) = 0;
+  virtual std::shared_future<void> EnableComponent(
+    const dto::ComponentDescriptionDTO& description) = 0;
 
   /**
    * Disables the specified component description.
@@ -164,10 +175,13 @@ class US_ServiceComponent_EXPORT ServiceComponentRuntime {
    *         completed.
    * @see #IsComponentEnabled
    */
-  virtual std::shared_future<void> DisableComponent(const dto::ComponentDescriptionDTO& description) = 0;
+  virtual std::shared_future<void> DisableComponent(
+    const dto::ComponentDescriptionDTO& description) = 0;
 };
 
-}}}} // namespaces
-
+}
+}
+}
+} // namespaces
 
 #endif /* ServiceComponentRuntime_hpp */

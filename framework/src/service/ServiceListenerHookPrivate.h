@@ -32,11 +32,11 @@ namespace cppmicroservices {
 class ServiceListenerHook::ListenerInfoData
 {
 public:
-  ListenerInfoData(std::shared_ptr<BundleContextPrivate>  context,
-                   ServiceListener  l,
+  ListenerInfoData(std::shared_ptr<BundleContextPrivate> context,
+                   ServiceListener l,
                    void* data,
                    ListenerTokenId tokenId,
-                   std::string  filter);
+                   std::string filter);
 
   virtual ~ListenerInfoData();
 

@@ -504,7 +504,7 @@ void testConcurrentAddRemove(std::string listenerStr)
 #endif // US_ENABLE_THREADING_SUPPORT
 }
 
-int MultipleListenersTest(int /*argc*/, char* /*argv*/ [])
+int MultipleListenersTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("MultipleListenersTest");
   testMultipleListeners();

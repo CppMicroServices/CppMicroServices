@@ -42,7 +42,7 @@ private:
   static std::map<Key, T> emptyContainer;
 
 public:
-  using  container_type = std::map<Key, T>;
+  using container_type = std::map<Key, T>;
   using iterator = typename container_type::iterator;
   using const_iterator = typename container_type::const_iterator;
   using size_type = typename container_type::size_type;

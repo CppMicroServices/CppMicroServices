@@ -43,9 +43,8 @@ public:
   std::shared_ptr<BundleContextPrivate> m_context;
   ServiceReferenceBase m_reference;
 
-  ServiceObjectsBasePrivate(
-    std::shared_ptr<BundleContextPrivate>  context,
-    const ServiceReferenceBase& reference)
+  ServiceObjectsBasePrivate(std::shared_ptr<BundleContextPrivate> context,
+                            const ServiceReferenceBase& reference)
     : m_context(std::move(context))
     , m_reference(reference)
   {}
@@ -95,7 +94,7 @@ struct UngetHelper
   const ServiceReferenceBase sref;
   const std::weak_ptr<BundlePrivate> b;
 
-  UngetHelper(InterfaceMapConstPtr  im,
+  UngetHelper(InterfaceMapConstPtr im,
               const ServiceReferenceBase& sr,
               const std::shared_ptr<BundlePrivate>& b)
     : interfaceMap(std::move(im))
@@ -144,11 +143,11 @@ std::shared_ptr<void> ServiceObjectsBase::GetService() const
   if (!interfaceMap) {
     return nullptr;
   }
-  
-  auto h = std::make_shared<UngetHelper>(interfaceMap
-                                         , d->m_reference
-                                         , d->m_context->bundle->shared_from_this());
-  auto deleter = h->interfaceMap->find(d->m_reference.GetInterfaceId())->second.get();
+
+  auto h = std::make_shared<UngetHelper>(
+    interfaceMap, d->m_reference, d->m_context->bundle->shared_from_this());
+  auto deleter =
+    h->interfaceMap->find(d->m_reference.GetInterfaceId())->second.get();
   return std::shared_ptr<void>(h, deleter);
 }
 
@@ -159,8 +158,14 @@ InterfaceMapConstPtr ServiceObjectsBase::GetServiceInterfaceMap() const
     return result;
   }
   // copy construct a new map to be handed out to consumers
-  result =
-    std::make_shared<const InterfaceMap>(*(d->GetServiceInterfaceMap().get()));
+  auto interfaceMap = d->GetServiceInterfaceMap();
+  // There are some circumstances that will cause the interfaceMap to be empty
+  // like when another thread has unregistered the service.
+  if (!interfaceMap) {
+      return result;
+  }
+  result = std::make_shared<const InterfaceMap>(*(interfaceMap.get()));
+
   std::shared_ptr<UngetHelper> h(new UngetHelper{
     result, d->m_reference, d->m_context->bundle->shared_from_this() });
   return InterfaceMapConstPtr(h, h->interfaceMap.get());

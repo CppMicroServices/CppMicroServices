@@ -1321,7 +1321,7 @@ void testManifestWithNullTerminator(const std::string& rcbinpath,
 }
 }
 
-int ResourceCompilerTest(int /*argc*/, char* /*argv*/ [])
+int ResourceCompilerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ResourceCompilerTest");
 
@@ -1329,9 +1329,9 @@ int ResourceCompilerTest(int /*argc*/, char* /*argv*/ [])
 
   auto rcbinpath = testing::RCC_PATH;
   /*
-  * If ResourceCompiler executable is not found, we can't run the tests, we
-  * mark it as a failure and exit
-  */
+   * If ResourceCompiler executable is not found, we can't run the tests, we
+   * mark it as a failure and exit
+   */
   std::ifstream binf(rcbinpath.c_str());
   if (!binf.good()) {
     US_TEST_FAILED_MSG(<< "Cannot find usResourceCompiler executable:"

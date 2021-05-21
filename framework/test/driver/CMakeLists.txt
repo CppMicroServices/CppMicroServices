@@ -34,7 +34,6 @@ set(_tests
   MultipleListenersTest
   ResourceCompilerTest
   ServiceFactoryTest
-  ServiceHooksTest
   ServiceRegistryPerformanceTest
 )
 

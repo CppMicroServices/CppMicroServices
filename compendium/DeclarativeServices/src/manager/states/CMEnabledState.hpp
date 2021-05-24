@@ -30,7 +30,9 @@
 #endif
 #include "../../ComponentRegistry.hpp"
 #include "../../metadata/ComponentMetadata.hpp"
+#include "../ConfigurationNotifier.hpp"
 #include "ComponentManagerState.hpp"
+#include "boost/asio/thread_pool.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
 
 namespace cppmicroservices {
@@ -111,8 +113,11 @@ public:
   void CreateConfigurations(
     std::shared_ptr<const metadata::ComponentMetadata> compDesc,
     const cppmicroservices::Bundle& bundle,
-    std::shared_ptr<const ComponentRegistry> registry,
-    std::shared_ptr<logservice::LogService> logger);
+    std::shared_ptr<ComponentRegistry> registry,
+    std::shared_ptr<logservice::LogService> logger,
+    std::shared_ptr<boost::asio::thread_pool> threadpool,
+    std::shared_ptr<ConfigurationNotifier> configNotifier,
+    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
 
   /**
    * Helper function used to remove all the configuration objects created by this state.

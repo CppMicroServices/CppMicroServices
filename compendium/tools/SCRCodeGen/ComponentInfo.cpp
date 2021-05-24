@@ -27,6 +27,9 @@
 
 namespace codegen {
 namespace datamodel {
+const std::string ComponentInfo::CONFIG_POLICY_IGNORE = "ignore";
+const std::string ComponentInfo::CONFIG_POLICY_REQUIRE = "require";
+const std::string ComponentInfo::CONFIG_POLICY_OPTIONAL = "optional";
 
 std::string GetComponentNameStr(const ComponentInfo& compInfo)
 {

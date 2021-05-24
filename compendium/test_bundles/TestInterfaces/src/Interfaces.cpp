@@ -14,4 +14,7 @@ DSGraph06::~DSGraph06() = default;
 DSGraph07::~DSGraph07() = default;
 
 LifeCycleValidation::~LifeCycleValidation() = default;
+CAInterface::~CAInterface() = default;
+CAInterface1::~CAInterface1() = default;
+
 }

@@ -25,6 +25,7 @@
 
 #include "ComponentConfigurationImpl.hpp"
 #include "ConcurrencyUtil.hpp"
+#include "boost/asio/thread_pool.hpp"
 #include <cppmicroservices/ServiceFactory.h>
 
 namespace cppmicroservices {
@@ -42,8 +43,11 @@ public:
   explicit BundleOrPrototypeComponentConfigurationImpl(
     std::shared_ptr<const metadata::ComponentMetadata> metadata,
     const cppmicroservices::Bundle& bundle,
-    std::shared_ptr<const ComponentRegistry> registry,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+    std::shared_ptr<ComponentRegistry> registry,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    std::shared_ptr<boost::asio::thread_pool> threadpool,
+    std::shared_ptr<ConfigurationNotifier> configNotifier,
+    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
   BundleOrPrototypeComponentConfigurationImpl(
     const BundleOrPrototypeComponentConfigurationImpl&) = delete;
   BundleOrPrototypeComponentConfigurationImpl(
@@ -66,6 +70,12 @@ public:
    */
   std::shared_ptr<ComponentInstance> CreateAndActivateComponentInstance(
     const cppmicroservices::Bundle& bundle) override;
+
+  /**
+   * Method called to modify the configuration properties for this component configuration. 
+   * @return false if the component instance has not provided a Modified method.
+   */
+  bool ModifyComponentInstanceProperties() override;
 
   /**
    * Method removes all instances of {@link ComponentInstance} object created by this object.

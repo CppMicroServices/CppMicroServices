@@ -68,10 +68,11 @@ public:
   virtual void Deactivate() = 0;
 
   /**
-   * This method is called by the runtime while the component configuration is active and if
-   * the configuration properties are modified.
+   * This method is called by the runtime while the component configuration is active when
+   * the configuration properties are modified. Returns false if the component instance has not 
+   * provided a Modified method.
    */
-  virtual void Modified() = 0;
+  virtual bool InvokeModifiedMethod() = 0;
 
   /**
    * This method is called by the runtime to bind a reference with dynamic policy

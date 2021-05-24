@@ -79,7 +79,15 @@ const std::string REFERENCE_TARGET_SUFFIX = ".target";
 /**
  * Scope to indicate the reference must be a servcie registered with PROTOTYPE scope.
  */
+
 const std::string REFERENCE_SCOPE_PROTOTYPE_REQUIRED = "prototype_required";
+
+/**
+ * Constants used for ComponentMetadata Configuration Policy.
+ */
+const std::string CONFIG_POLICY_IGNORE = "ignore";
+const std::string CONFIG_POLICY_REQUIRE = "require";
+const std::string CONFIG_POLICY_OPTIONAL = "optional";
 }
 }
 }

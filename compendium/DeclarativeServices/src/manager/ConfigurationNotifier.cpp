@@ -30,6 +30,7 @@
 
 namespace cppmicroservices {
 namespace scrimpl {
+
 using cppmicroservices::scrimpl::metadata::ComponentMetadata;
 
 ConfigurationNotifier::ConfigurationNotifier(

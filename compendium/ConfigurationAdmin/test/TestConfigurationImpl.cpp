@@ -102,7 +102,8 @@ TEST(TestConfigurationImpl, NoCallbacksAfterInvalidate)
   EXPECT_NO_THROW(conf.Invalidate());
   EXPECT_NO_THROW(conf.Update(props));
   props["bar"] = std::string("foo");
-  EXPECT_TRUE(conf.UpdateIfDifferent(props));
+  auto result = conf.UpdateIfDifferent(props);
+  EXPECT_TRUE(result.first);
   EXPECT_NO_THROW(conf.Remove());
 }
 
@@ -129,9 +130,11 @@ TEST(TestConfigurationImpl, VerifyUpdateIfDifferent)
   std::string factoryPid{ "test" };
   ConfigurationImpl conf{ mockConfigAdmin.get(), pid, factoryPid, props };
   EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid)).Times(1);
-  EXPECT_FALSE(conf.UpdateIfDifferent(props));
+  auto result = conf.UpdateIfDifferent(props);
+  EXPECT_FALSE(result.first);
   props["bar"] = std::string("baz");
-  EXPECT_TRUE(conf.UpdateIfDifferent(props));
+  result = conf.UpdateIfDifferent(props);
+  EXPECT_TRUE(result.first);
 }
 
 TEST(TestConfigurationImpl, VerifyUpdateWithoutNotificationIfDifferent)

@@ -177,7 +177,25 @@ TEST_F(TestConfigurationAdminImpl, VerifyListConfigurations)
   auto fakeLogger = std::make_shared<FakeLogger>();
   ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
 
-  EXPECT_THROW(configAdmin.ListConfigurations(""), std::invalid_argument);
+  const std::string pid1{ "test.pid1" };
+  const std::string pid2{ "test.pid2" };
+
+  const auto conf1 = configAdmin.GetConfiguration(pid1);
+  const auto conf2 = configAdmin.GetConfiguration(pid2);
+
+  auto props2 = conf2->GetProperties();
+  props2["foo"] = std::string{ "bar" };
+  std::shared_future<void> fut;
+  EXPECT_NO_THROW(fut = conf2->Update(props2));
+  fut.get();
+  const auto res1 = configAdmin.ListConfigurations();
+  const auto res2 = configAdmin.ListConfigurations("(foo=bar)");
+  const auto res3 = configAdmin.ListConfigurations("(foobar=baz)");
+
+  EXPECT_EQ(res1.size(), 2);
+  EXPECT_EQ(res2.size(), 1);
+  EXPECT_EQ(res2[0]->GetPid(), pid2);
+  EXPECT_TRUE(res3.empty());
 }
 
 TEST_F(TestConfigurationAdminImpl, VerifyAddConfigurations)
@@ -193,8 +211,9 @@ TEST_F(TestConfigurationAdminImpl, VerifyAddConfigurations)
   ASSERT_TRUE(conf2);
   auto props = conf2->GetProperties();
   props["foo"] = std::string{ "bar" };
-  EXPECT_NO_THROW(conf2->Update(props));
-
+  std::shared_future<void> fut;
+  EXPECT_NO_THROW(fut = conf2->Update(props));
+  fut.get();
   std::vector<metadata::ConfigurationMetadata> configs;
 
   configs.push_back(metadata::ConfigurationMetadata(

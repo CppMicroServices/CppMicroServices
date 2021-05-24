@@ -20,10 +20,10 @@
 
  =============================================================================*/
 
-#include <cassert>
-#include <sstream>
-
 #include "ConfigurationImpl.hpp"
+#include <cassert>
+#include <future>
+#include <sstream>
 
 namespace {
 constexpr auto REMOVED_EXCEPTION_MESSAGE =
@@ -75,7 +75,7 @@ AnyMap ConfigurationImpl::GetProperties() const
   return properties;
 }
 
-void ConfigurationImpl::Update(AnyMap newProperties)
+std::shared_future<void> ConfigurationImpl::Update(AnyMap newProperties)
 {
   {
     std::lock_guard<std::mutex> lk{ propertiesMutex };
@@ -87,25 +87,38 @@ void ConfigurationImpl::Update(AnyMap newProperties)
   }
   std::lock_guard<std::mutex> lk{ configAdminMutex };
   if (configAdminImpl) {
-    configAdminImpl->NotifyConfigurationUpdated(pid);
+    std::shared_future<void> fut =
+      configAdminImpl->NotifyConfigurationUpdated(pid);
+    return fut;
   }
+  std::promise<void> ready;
+  std::shared_future<void> fut = ready.get_future();
+  ready.set_value();
+  return fut;
 }
 
-bool ConfigurationImpl::UpdateIfDifferent(AnyMap newProperties)
+std::pair<bool, std::shared_future<void>> ConfigurationImpl::UpdateIfDifferent(
+  AnyMap newProperties)
 {
+  std::promise<void> ready;
+  std::shared_future<void> fut = ready.get_future();
   const auto updated =
-    UpdateWithoutNotificationIfDifferent(std::move(newProperties)).first;
-  if (!updated) {
-    return false;
+    UpdateWithoutNotificationIfDifferent(std::move(newProperties));
+  if (!updated.first) {
+    ready.set_value();
+    return std::pair<bool, std::shared_future<void>>(updated.first, fut);
   }
   std::lock_guard<std::mutex> lk{ configAdminMutex };
   if (configAdminImpl) {
-    configAdminImpl->NotifyConfigurationUpdated(pid);
+    auto fut = configAdminImpl->NotifyConfigurationUpdated(pid);
+    return std::pair<bool, std::shared_future<void>>(true, fut);
   }
-  return true;
+
+  ready.set_value();
+  return std::pair<bool, std::shared_future<void>>(true, fut);
 }
 
-void ConfigurationImpl::Remove()
+std::shared_future<void> ConfigurationImpl::Remove()
 {
   {
     std::lock_guard<std::mutex> lk{ propertiesMutex };
@@ -116,10 +129,15 @@ void ConfigurationImpl::Remove()
   }
   std::lock_guard<std::mutex> lk{ configAdminMutex };
   if (configAdminImpl) {
-    configAdminImpl->NotifyConfigurationRemoved(
+    auto fut = configAdminImpl->NotifyConfigurationRemoved(
       pid, reinterpret_cast<std::uintptr_t>(this));
     configAdminImpl = nullptr;
+    return fut;
   }
+  std::promise<void> ready;
+  std::shared_future<void> fut = ready.get_future();
+  ready.set_value();
+  return fut;
 }
 
 std::pair<bool, unsigned long>

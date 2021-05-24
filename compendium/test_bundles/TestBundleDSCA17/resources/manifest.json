@@ -1,0 +1,17 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSCA17",
+    "scr" : {
+        "version" : 1,
+         "components" : [{
+            "enabled" : true,
+            "immediate": true,
+            "implementation-class": "sample::ServiceComponentCA17",
+            "configuration-policy" : "require",
+            "configuration-pid": [ "sample::DuplicatedPID", "sample::DuplicatedPID" ],
+            "inject-references" : false,
+            "service": {
+                "interfaces": ["test::CAInterface"]
+            }
+        }]
+    }
+}

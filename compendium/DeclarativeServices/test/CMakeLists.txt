@@ -62,7 +62,12 @@ set(_declarativeservices_tests
   TestComponentManagerDisabledState.cpp
   TestComponentManagerEnabledState.cpp
   TestComponentManagerImpl.cpp
+  TestComponentNameWithPID.cpp
   TestComponentRegistry.cpp
+  TestConfigPolicies.cpp
+  TestConfigurationPropertiesWithMultipleConfigurations.cpp
+  TestDuplicatedPID.cpp
+  TestFactoryPid.cpp
   TestMetadataParserFactory.cpp
   TestMetadataParserImplV1.cpp
   TestReferenceManagerImpl.cpp
@@ -72,6 +77,7 @@ set(_declarativeservices_tests
   TestSCRBundleExtension.cpp
   TestServiceComponentRuntimeImpl.cpp
   TestServiceMetadataParserV1.cpp
+  TestSetConfiguration.cpp
   TestSingletonComponentConfiguration.cpp
   TestBundleStartOrder.cpp
   TestComponentDescription.cpp
@@ -82,12 +88,17 @@ set(_declarativeservices_tests
   TestServiceComponentRuntime.cpp
   TestServiceProvider.cpp
   TestSharedLibraryException.cpp
+  TestUpdateConfiguration.cpp
   ImportTestBundles.cpp
   TestBindingPolicies.cpp
+  TestDSConfigAdminOperationOrder.cpp
   main.cpp
 )
 
-include_directories(${PROJECT_BINARY_DIR}/include)
+include_directories(${PROJECT_BINARY_DIR}/include
+  ${CppMicroServices_SOURCE_DIR}/compendium/CM/include
+  ${CppMicroServices_BINARY_DIR}/compendium/CM/include
+  )
 
 set(_additional_srcs
   TestUtils.cpp
@@ -150,15 +161,13 @@ set(_test_bundles
   TestBindUnbindThrows
   TestBundleDSa
   TestBundleDSb
+  TestBundleDSDGMU
+  TestBundleDSDGOU
+  TestBundleDSDRMU
+  TestBundleDSDROU
   TestBundleDSSLE1
   TestBundleDSSLE2
   TestBundleDSTOI1
-  TestBundleDSTOI10
-  TestBundleDSTOI12
-  TestBundleDSTOI14
-  TestBundleDSTOI15
-  TestBundleDSTOI16
-  TestBundleDSTOI18
   TestBundleDSTOI2
   TestBundleDSTOI3
   TestBundleDSTOI5
@@ -166,19 +175,39 @@ set(_test_bundles
   TestBundleDSTOI7
   TestBundleDSTOI8
   TestBundleDSTOI9
+  TestBundleDSTOI10
+  TestBundleDSTOI12
+  TestBundleDSTOI14
+  TestBundleDSTOI15
+  TestBundleDSTOI16
+  TestBundleDSTOI18
   TestBundleDSTOI19
-  TestBundleDSDGMU
-  TestBundleDSDGOU
-  TestBundleDSDRMU
-  TestBundleDSDROU
+  TestBundleDSCA01
+  TestBundleDSCA02
+  TestBundleDSCA03
+  TestBundleDSCA04
+  TestBundleDSCA05
+  TestBundleDSCA05a
+  TestBundleDSCA07
+  TestBundleDSCA08
+  TestBundleDSCA09
+  TestBundleDSCA12
+  TestBundleDSCA16
+  TestBundleDSCA17
+  TestBundleDSCA20
+  TestBundleDSCA24
+  TestBundleDSCA26
+  TestBundleDSCA27
   EnglishDictionary
   )
 
-target_link_libraries(${us_declarativeservices_test_exe_name} 
+target_link_libraries(${us_declarativeservices_test_exe_name}
   PRIVATE
   ${GTEST_BOTH_LIBRARIES}
   ${GMOCK_BOTH_LIBRARIES}
   ${${PROJECT_NAME}_LINK_LIBRARIES}
+  ConfigurationAdmin
+  DeclarativeServices
   DeclarativeServicesObjs
   usTestInterfaces
   usServiceComponent
@@ -257,7 +286,7 @@ if (WIN32 AND US_USE_SYSTEM_GTEST)
 endif()
 
 #-----------------------------------------------------------------------------
-# Add dependencies on test bundles if building shared libraries or 
+# Add dependencies on test bundles if building shared libraries or
 # link them if building static libraries
 #-----------------------------------------------------------------------------
 

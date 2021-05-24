@@ -51,8 +51,20 @@ protected:
     auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
     auto fakeLogger = std::make_shared<FakeLogger>();
-    mockCompConfig = std::make_shared<MockComponentConfigurationImpl>(
-      mockMetadata, framework, mockRegistry, fakeLogger);
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      framework.GetBundleContext(), fakeLogger);
+    auto threadpool = std::make_shared<boost::asio::thread_pool>();
+    auto managers =
+      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+
+    mockCompConfig =
+      std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                       framework,
+                                                       mockRegistry,
+                                                       fakeLogger,
+                                                       threadpool,
+                                                       notifier,
+                                                       managers);
   }
 
   virtual void TearDown()
@@ -103,6 +115,8 @@ TEST_F(CCActiveStateTest, TestActivateWithInvalidLatch)
   auto state = std::make_shared<CCActiveState>();
   mockCompConfig->SetState(state);
   EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::ACTIVE);
+  EXPECT_CALL(*mockCompConfig, CreateAndActivateComponentInstance(testing::_))
+    .WillOnce(testing::Return(nullptr));
   EXPECT_NO_THROW({
     state->WaitForTransitionTask();
     auto inst = state->Activate(*mockCompConfig, framework);

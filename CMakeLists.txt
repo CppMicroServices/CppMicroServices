@@ -724,6 +724,8 @@ add_subdirectory(shellservice)
 # Static linkage is not yet supported for declarative services.
 if (US_ENABLE_THREADING_SUPPORT AND US_BUILD_SHARED_LIBS)
   add_subdirectory(compendium)
+else()
+  add_subdirectory(compendium/LogService)
 endif()
 
 add_subdirectory(tools/shell)

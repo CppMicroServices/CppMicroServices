@@ -204,11 +204,11 @@ ConfigurationAdminImpl::~ConfigurationAdminImpl()
     factoryInstancesCopy.swap(factoryInstances);
     configurationsToInvalidate.swap(configurations);
   }
-  for (auto& configuration : configurationsToInvalidate) {
+  for (const auto& configuration : configurationsToInvalidate) {
     configuration.second->Invalidate();
   }
   AnyMap emptyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
-  for (auto& managedService : managedServiceWrappers) {
+  for (const auto& managedService : managedServiceWrappers) {
     // The ServiceTracker will return a default constructed shared_ptr for each ManagedService
     // that we aren't tracking. We must be careful not to dereference these!
     if (managedService) {
@@ -218,7 +218,7 @@ ConfigurationAdminImpl::~ConfigurationAdminImpl()
                            *logger);
     }
   }
-  for (auto& managedServiceFactory : managedServiceFactoryWrappers) {
+  for (const auto& managedServiceFactory : managedServiceFactoryWrappers) {
     // The ServiceTracker will return a default constructed shared_ptr for each ManagedServiceFactory
     // that we aren't tracking. We must be careful not to dereference these!
     if (!managedServiceFactory) {
@@ -313,7 +313,7 @@ ConfigurationAdminImpl::GetFactoryConfiguration(const std::string& factoryPid,
 
 std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
 ConfigurationAdminImpl::ListConfigurations(
-  const std::string& filter /* filter */)
+  const std::string& filter)
 {
   std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
     result;
@@ -322,12 +322,12 @@ ConfigurationAdminImpl::ListConfigurations(
 
     if (filter.empty()) {
       result.reserve(configurations.size());
-      for (auto it : configurations) {
+      for (const auto& it : configurations) {
         result.push_back(it.second);
       }
     } else {
       LDAPFilter ldap{ filter };
-      for (auto it : configurations) {
+      for (const auto& it : configurations) {
         auto props = it.second->GetProperties();
         if (ldap.Match(props)) {
           result.push_back(it.second);
@@ -347,7 +347,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
   std::vector<std::shared_ptr<ConfigurationImpl>> configurationsToInvalidate;
   {
     std::lock_guard<std::mutex> lk{ configurationsMutex };
-    for (auto& configMetadata : configurationMetadata) {
+    for (const auto& configMetadata : configurationMetadata) {
       auto& pid = configMetadata.pid;
       auto it = configurations.find(pid);
       if (it == std::end(configurations)) {
@@ -390,7 +390,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
     }
   }
   // This cannot be called whilst holding the configurationsMutex as it could cause a deadlock.
-  for (auto& configurationToInvalidate : configurationsToInvalidate) {
+  for (const auto& configurationToInvalidate : configurationsToInvalidate) {
     configurationToInvalidate->Invalidate();
   }
   auto idx = 0u;
@@ -458,7 +458,7 @@ void ConfigurationAdminImpl::RemoveConfigurations(
     }
   }
   // This cannot be called whilst holding the configurationsMutex as it could cause a deadlock.
-  for (auto& configurationToInvalidate : configurationsToInvalidate) {
+  for (const auto& configurationToInvalidate : configurationsToInvalidate) {
     configurationToInvalidate->Invalidate();
   }
   auto idx = 0u;
@@ -483,10 +483,10 @@ void ConfigurationAdminImpl::RemoveConfigurations(
 std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
   const std::string& pid)
 {
-  auto fut = PerformAsync([this, pid] {
+  return PerformAsync([this, pid] {
     AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
-    std::string fPid = "";
-    std::string nonFPid = "";
+    std::string fPid;
+    std::string nonFPid;
     auto removed = false;
     {
       std::lock_guard<std::mutex> lk{ configurationsMutex };
@@ -515,11 +515,10 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
         : cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED;
 
     auto configAdminRef = cmContext.GetServiceReference<ConfigurationAdmin>();
-    for (auto it : configurationListeners) {
-      auto configEvent =
-        std::make_unique<cppmicroservices::service::cm::ConfigurationEvent>(
+    for (const auto& it : configurationListeners) {
+      auto configEvent = cppmicroservices::service::cm::ConfigurationEvent(
           configAdminRef, type, fPid, nonFPid);
-      it->configurationEvent((*configEvent));
+      it->configurationEvent((configEvent));
     }
 
     const auto managedServiceWrappers = managedServiceTracker.GetServices();
@@ -566,7 +565,6 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
       }
     }
   });
-  return fut;
 }
 
 std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(
@@ -600,19 +598,12 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(
     auto removeFuture = NotifyConfigurationUpdated(pid);
     // This functor will run on another thread. Just being overly cautious to guarantee that the
     // ConfigurationImpl which has called this method doesn't run its own destructor.
-    auto fut = PerformAsync(
+    PerformAsync(
       [this, pid, configuration = std::move(configurationToInvalidate)] {
         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                     "Configuration with PID " + pid + " has been removed.");
       });
-    // wait until asynchronous processing completes before returning to the caller.
-    try {
-      fut.get();
-    } catch (...) {
-      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                  "Failed to remove component with pid" + pid,
-                  std::current_exception());
-    }
+  
     return removeFuture;
   }
   ready.set_value();

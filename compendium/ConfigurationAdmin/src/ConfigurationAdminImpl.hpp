@@ -126,7 +126,7 @@ public:
    * See {@code ConfigurationAdmin#ListConfigurations}
    */
   std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
-  ListConfigurations(const std::string& filter = std::string()) override;
+  ListConfigurations(const std::string& filter = std::string{}) override;
 
   /**
    * Internal method used by {@code CMBundleExtension} to add new {@code Configuration} objects

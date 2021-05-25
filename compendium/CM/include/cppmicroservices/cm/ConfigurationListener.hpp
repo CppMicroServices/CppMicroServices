@@ -126,7 +126,7 @@ public:
    * @remarks This class is threadsafe
    */
   virtual void configurationEvent(const ConfigurationEvent& event) noexcept = 0;
-  virtual ~ConfigurationListener() = default;
+  virtual ~ConfigurationListener() noexcept = default;
 };
 } //cm namespace
 } //service namespace

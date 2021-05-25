@@ -90,7 +90,9 @@ public:
    *
    * @return a shared_future<void> which can be used to wait for the asynchronous
    * operation that pushed the update to a ManagedService, ManagedServiceFactory or
-   * ConfigurationListener to complete.
+   * ConfigurationListener to complete. If an exception occurs during the execution
+   * of the service component's Modified method, this exception is intercepted and 
+   * logged by Declarative Services. This exception is not returned in the shared_future.
    */
   virtual std::shared_future<void> Update(
     AnyMap properties = AnyMap{
@@ -112,7 +114,9 @@ public:
    * @return std::pair<boolean, std::shared_future<void>> The boolean indicates whether 
    * the properties were updated or not. The shared_future<void> allows access to the result of the asynchronous 
    * operation that pushed the update operation to a ManagedService, ManagedServiceFactory or 
-   * ConfigurationListener.
+   * ConfigurationListener. If an exception occurs during the execution
+   * of the service component's Modified method, this exception is intercepted and 
+   * logged by Declarative Services. This exception is not returned in the shared_future.
    */
   virtual std::pair<bool, std::shared_future<void>> UpdateIfDifferent(
     AnyMap properties = AnyMap{
@@ -129,7 +133,9 @@ public:
    * 
    * @return a shared_future<void> to access the result of the asynchronous operation
    * that pushed the remove operation to a ManagedService, ManagedServiceFactory or 
-   * ConfigurationListener.
+   * ConfigurationListener. If an exception occurs during the execution
+   * of the service component's Modified method, this exception is intercepted and 
+   * logged by Declarative Services. This exception is not returned in the shared_future.
    */
   virtual std::shared_future<void> Remove() = 0;
 };

@@ -88,8 +88,8 @@ public:
   void Event(const ServiceEvent& /*event*/, MapType& listeners)
   {
     //Check listener content
-    ASSERT_TRUE(listeners.size() > 0 &&
-                listeners.find(bundleCtx) != listeners.end());
+    ASSERT_TRUE(listeners.find(bundleCtx) != listeners.end());
+    ASSERT_GT(static_cast<int>(listeners.size()), 0);
     ShrinkableVector<ServiceListenerHook::ListenerInfo>& listenerInfos =
       listeners[bundleCtx];
 
@@ -271,6 +271,7 @@ class ServiceHooksTest : public ::testing::Test
 {
 protected:
   Framework framework;
+  BundleContext context;
 
 public:
   ServiceHooksTest()
@@ -289,6 +290,9 @@ public:
         break;
       }
     }
+    context =
+      cppmicroservices::testing::GetBundle("main", framework.GetBundleContext())
+        .GetBundleContext();
   }
 
   void TearDown() override
@@ -302,10 +306,6 @@ public:
 
 TEST_F(ServiceHooksTest, TestListenerHook)
 {
-  auto context =
-    cppmicroservices::testing::GetBundle("main", framework.GetBundleContext())
-      .GetBundleContext();
-
   TestServiceListener serviceListener1;
   TestServiceListener serviceListener2;
   context.AddServiceListener(&serviceListener1,
@@ -393,10 +393,6 @@ TEST_F(ServiceHooksTest, TestListenerHook)
 
 TEST_F(ServiceHooksTest, TestFindHook)
 {
-  auto context =
-    cppmicroservices::testing::GetBundle("main", framework.GetBundleContext())
-      .GetBundleContext();
-
   auto serviceFindHook1 = std::make_shared<TestServiceFindHook>(1, context);
   ServiceProperties hookProps1;
   hookProps1[Constants::SERVICE_RANKING] = 0;
@@ -457,10 +453,6 @@ TEST_F(ServiceHooksTest, TestFindHook)
 
 TEST_F(ServiceHooksTest, TestEventListenerHook)
 {
-  auto context =
-    cppmicroservices::testing::GetBundle("main", framework.GetBundleContext())
-      .GetBundleContext();
-
   TestServiceListener serviceListener1;
   TestServiceListener serviceListener2;
   context.AddServiceListener(&serviceListener1,
@@ -601,7 +593,7 @@ TEST_F(ServiceHooksTest, TestEventListenerHookFailure)
   framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
 }
 
-void TestListenerHookFailure(const Framework& framework)
+TEST_F(ServiceHooksTest, TestListenerHookFailure)
 {
   auto listenerHookReg =
     framework.GetBundleContext().RegisterService<ServiceListenerHook>(

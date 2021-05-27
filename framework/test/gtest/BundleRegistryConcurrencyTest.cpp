@@ -62,7 +62,7 @@ inline void InstallTestBundleNoErrorHandling(BundleContext frameworkCtx,
   }
 }
 
-void TestSerialFunction(const Framework& f)
+void TestSerialBundleInstall(const Framework& f)
 {
   // Installing such a small set of bundles doesn't yield significant
   // data about performance. Consider increasing the number of bundles
@@ -88,45 +88,23 @@ void TestSerialFunction(const Framework& f)
   InstallTestBundleNoErrorHandling(bc, "TestBundleSL3");
   InstallTestBundleNoErrorHandling(bc, "TestBundleSL4");
 
-  long long elapsedTimeInMilliSeconds = timer.ElapsedMilli();
-  io_lock();
-  std::cout << "[thread " << std::this_thread::get_id()
-            << "] Time elapsed to install 12 new bundles: "
-            << elapsedTimeInMilliSeconds << " milliseconds\n";
-
-  elapsedTimeInMilliSeconds = 0;
-
   auto bundles = bc.GetBundles();
   for (auto& bundle : bundles) {
-    timer.Start();
-    try {
-      bundle.Start();
-    } catch (const std::exception& e) {
-      io_lock();
-      std::cout<< "[thread " << std::this_thread::get_id()
-                         << "] exception: " << e.what() << std::endl;
-      ASSERT_TRUE(false);
-    }
-
-    elapsedTimeInMilliSeconds += timer.ElapsedMilli();
+    EXPECT_NO_THROW(bundle.Start());
   }
-
-  io_lock();
-  std::cout << "[thread " << std::this_thread::get_id()
-            << "] Time elapsed to start 12 bundles: "
-            << elapsedTimeInMilliSeconds << " milliseconds\n";
 }
+
 TEST(BundleRegistryConcurrencyTest, testSerial)
 {
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
   framework.Start();
-  TestSerialFunction(framework);
+  TestSerialBundleInstall(framework);
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());
 }
 
-#ifdef US_ENABLE_THREADING_SUPPORT
+#  ifdef US_ENABLE_THREADING_SUPPORT
 TEST(BundleRegistryConcurrencyTest, testConcurrent)
 {
   FrameworkFactory factory;
@@ -150,7 +128,7 @@ TEST(BundleRegistryConcurrencyTest, testConcurrent)
   const int numTestThreads = 50;
   std::vector<std::thread> threads;
   for (int i = 0; i < numTestThreads; ++i) {
-    threads.emplace_back(TestSerialFunction, framework);
+    threads.emplace_back(TestSerialBundleInstall, framework);
     threads.emplace_back(
       [framework] { framework.GetBundleContext().GetBundles(); });
   }
@@ -164,11 +142,8 @@ TEST(BundleRegistryConcurrencyTest, testConcurrent)
   ASSERT_EQ(numTestBundles, framework.GetBundleContext().GetBundles().size());
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());
-
 }
-#endif
-
-
+#  endif
 } // end anonymous namespace
 
 #endif

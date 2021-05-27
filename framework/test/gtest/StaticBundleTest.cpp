@@ -61,53 +61,46 @@ void frame020a(BundleContext context, TestBundleListener& listener)
   bundleB.Start();
   bundleImportedByB.Start();
   // Check if libB registered the expected service
-  try {
-    std::vector<ServiceReferenceU> refs =
-      context.GetServiceReferences("cppmicroservices::TestBundleBService");
-    //Test that both the service from the shared and imported library are regsitered
-    ASSERT_EQ(refs.size(), 2);
 
-    auto o1 = context.GetService(refs.front());
-    //Test if first service object found
-    ASSERT_TRUE(o1 && !o1->empty());
+  std::vector<ServiceReferenceU> refs =
+    context.GetServiceReferences("cppmicroservices::TestBundleBService");
+  //Test that both the service from the shared and imported library are regsitered
+  ASSERT_EQ(refs.size(), 2);
 
-    auto o2 = context.GetService(refs.back());
-    //Test if second service object found
-    ASSERT_TRUE(o2 && !o2->empty());
+  auto o1 = context.GetService(refs.front());
+  //Test if first service object found
+  ASSERT_TRUE(o1 && !o1->empty());
 
-    // check the listeners for events
-    std::vector<BundleEvent> pEvts;
+  auto o2 = context.GetService(refs.back());
+  //Test if second service object found
+  ASSERT_TRUE(o2 && !o2->empty());
+
+  // check the listeners for events
+  std::vector<BundleEvent> pEvts;
 #ifdef US_BUILD_SHARED_LIBS
-    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleB));
-    pEvts.push_back(
-      BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleImportedByB));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleB));
+  pEvts.push_back(
+    BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleImportedByB));
 #endif
-    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundleB));
-    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundleB));
-    pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundleB));
-    pEvts.push_back(
-      BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundleImportedByB));
-    pEvts.push_back(
-      BundleEvent(BundleEvent::BUNDLE_STARTING, bundleImportedByB));
-    pEvts.push_back(
-      BundleEvent(BundleEvent::BUNDLE_STARTED, bundleImportedByB));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundleB));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundleB));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundleB));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_RESOLVED, bundleImportedByB));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTING, bundleImportedByB));
+  pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_STARTED, bundleImportedByB));
 
-    std::vector<ServiceEvent> seEvts;
-    seEvts.push_back(
-      ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.front()));
-    seEvts.push_back(
-      ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.back()));
+  std::vector<ServiceEvent> seEvts;
+  seEvts.push_back(
+    ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.front()));
+  seEvts.push_back(ServiceEvent(ServiceEvent::SERVICE_REGISTERED, refs.back()));
 
-    bool relaxed = false;
+  bool relaxed = false;
 #ifndef US_BUILD_SHARED_LIBS
-    relaxed = true;
+  relaxed = true;
 #endif
-    //Test for unexpected events
-    ASSERT_TRUE(listener.CheckListenerEvents(pEvts, seEvts, relaxed));
+  //Test for unexpected events
+  ASSERT_TRUE(listener.CheckListenerEvents(pEvts, seEvts, relaxed));
 
-  } catch (const ServiceException& /*se*/) {
-    ASSERT_TRUE(false) << "test bundle, expected service not found";
-  }
   //Test if started correctly
   ASSERT_EQ(bundleB.GetState(), Bundle::STATE_ACTIVE);
 }
@@ -196,11 +189,11 @@ void frame040c(BundleContext context, TestBundleListener& listener)
   ASSERT_EQ(bundles.size(), installCount);
 
   long oldId = bundleB.GetBundleId();
-  bundleB =cppmicroservices::testing::GetBundle("TestBundleB", context);
+  bundleB = cppmicroservices::testing::GetBundle("TestBundleB", context);
   //Test for non-null bundle
   ASSERT_TRUE(bundleB);
   //Test for new bundle id
-  ASSERT_NE(oldId , bundleB.GetBundleId());
+  ASSERT_NE(oldId, bundleB.GetBundleId());
 
   pEvts.clear();
   pEvts.push_back(BundleEvent(BundleEvent::BUNDLE_INSTALLED, bundleB));

@@ -39,8 +39,6 @@
 
 using namespace cppmicroservices;
 
-namespace {
-
 class TestBundleListener
 {
 public:
@@ -110,7 +108,28 @@ public:
   }
 };
 
-void TestFindHook(const Framework& framework)
+class BundleHooksTest : public ::testing::Test
+{
+protected:
+  Bundle testBundle;
+  Framework framework;
+
+public:
+  BundleHooksTest()
+    : framework(FrameworkFactory().NewFramework()){};
+
+  ~BundleHooksTest() override = default;
+
+  void SetUp() override { framework.Start(); }
+
+  void TearDown() override
+  {
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+  }
+};
+
+TEST_F(BundleHooksTest, TestFindHook)
 {
   auto bundleA = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
@@ -147,7 +166,7 @@ void TestFindHook(const Framework& framework)
   bundleA.Stop();
 }
 
-void TestEventHook(const Framework& framework)
+TEST_F(BundleHooksTest, TestEventHook)
 {
   TestBundleListener bundleListener;
   framework.GetBundleContext().AddBundleListener(
@@ -159,11 +178,11 @@ void TestEventHook(const Framework& framework)
 
   bundleA.Start();
   //Test for received load bundle events"
-  ASSERT_EQ(bundleListener.events.size(), 2);
+  ASSERT_EQ(bundleListener.events.size(), 4);
 
   bundleA.Stop();
   //Test for received unload bundle events
-  ASSERT_EQ(bundleListener.events.size(), 4);
+  ASSERT_EQ(bundleListener.events.size(), 6);
 
   auto eventHookReg =
     framework.GetBundleContext().RegisterService<BundleEventHook>(
@@ -188,7 +207,7 @@ void TestEventHook(const Framework& framework)
     &bundleListener, &TestBundleListener::BundleChanged);
 }
 
-void TestEventHookFailure(const Framework& framework)
+TEST_F(BundleHooksTest, TestEventHookFailure)
 {
   auto bundleA = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
@@ -205,7 +224,7 @@ void TestEventHookFailure(const Framework& framework)
   bundleA.Start();
 
   // bundle starting and bundle started events
-  ASSERT_EQ(listener.events.size(), 2);
+  ASSERT_EQ(listener.events.size(), 3);
 
   std::for_each(listener.events.begin(),
                 listener.events.end(),
@@ -226,7 +245,7 @@ void TestEventHookFailure(const Framework& framework)
   framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
 }
 
-void TestFindHookFailure(const Framework& framework)
+TEST_F(BundleHooksTest, TestFindHookFailure)
 {
   auto eventHookReg =
     framework.GetBundleContext().RegisterService<BundleFindHook>(
@@ -240,6 +259,8 @@ void TestFindHookFailure(const Framework& framework)
     framework.GetBundleContext(), "TestBundleA");
   ASSERT_TRUE(bundleA);
   bundleA.Start();
+
+  framework.GetBundleContext().GetBundle(bundleA.GetBundleId());
 
   // bundle starting and bundle started events
   //Test for expected number of framework events
@@ -262,22 +283,4 @@ void TestFindHookFailure(const Framework& framework)
   bundleA.Stop();
   eventHookReg.Unregister();
   framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
-}
-
-} // end unnamed namespace
-
-TEST(BundleHooksTest, testHooks)
-{
-  FrameworkFactory factory;
-  auto framework = factory.NewFramework();
-  framework.Start();
-
-  TestFindHook(framework);
-  TestEventHook(framework);
-
-  TestEventHookFailure(framework);
-  TestFindHookFailure(framework);
-
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
 }

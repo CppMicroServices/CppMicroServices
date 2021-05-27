@@ -26,6 +26,7 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/ServiceEvent.h"
+#include "gtest/gtest.h"
 
 namespace cppmicroservices {
 
@@ -43,12 +44,8 @@ public:
     , receiver(receiver)
     , callback(callback)
   {
-    try {
-      this->context.AddBundleListener(receiver, callback);
-    } catch (const std::logic_error& ise) {
-      std::cout<<"bundle listener registration failed " << ise.what();
-      throw;
-    }
+    EXPECT_NO_THROW(this->context.AddBundleListener(receiver, callback))
+      << "bundle listener registration failed";
   }
 
   ~BundleListenerRegistrationHelper()
@@ -76,12 +73,8 @@ public:
     , receiver(receiver)
     , callback(callback)
   {
-    try {
-      this->context.AddServiceListener(receiver, callback);
-    } catch (const std::logic_error& ise) {
-      std::cout<< "service listener registration failed " << ise.what();
-      throw;
-    }
+    EXPECT_NO_THROW(this->context.AddServiceListener(receiver, callback))
+      << "service listener registration failed";
   }
 
   ~ServiceListenerRegistrationHelper()

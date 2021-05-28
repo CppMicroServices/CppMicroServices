@@ -66,7 +66,6 @@ set(_declarativeservices_tests
   TestComponentRegistry.cpp
   TestConfigPolicies.cpp
   TestConfigurationPropertiesWithMultipleConfigurations.cpp
-  TestDuplicatedPID.cpp
   TestFactoryPid.cpp
   TestMetadataParserFactory.cpp
   TestMetadataParserImplV1.cpp
@@ -193,7 +192,6 @@ set(_test_bundles
   TestBundleDSCA09
   TestBundleDSCA12
   TestBundleDSCA16
-  TestBundleDSCA17
   TestBundleDSCA20
   TestBundleDSCA24
   TestBundleDSCA26

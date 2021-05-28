@@ -104,7 +104,6 @@ public:
     test::InstallLib(context, "TestBundleDSCA09");
     test::InstallLib(context, "TestBundleDSCA12");
     test::InstallLib(context, "TestBundleDSCA16");
-    test::InstallLib(context, "TestBundleDSCA17");
     test::InstallLib(context, "TestBundleDSCA20");
     test::InstallLib(context, "TestBundleDSCA24");
     test::InstallLib(context, "TestBundleDSCA26");

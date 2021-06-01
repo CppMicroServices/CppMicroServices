@@ -39,9 +39,9 @@ namespace cm {
    */
 struct ConfigChangeNotification final
 {
-  ConfigChangeNotification(const std::string pid,
+  ConfigChangeNotification(std::string pid,
                            std::shared_ptr<cppmicroservices::AnyMap> properties,
-                           const ConfigurationEventType evt)
+                           ConfigurationEventType evt)
     : pid(std::move(pid))
     , event(std::move(evt))
     , newProperties(std::move(properties))
@@ -59,7 +59,7 @@ public:
   *@throws std::invalid_argument exception if any of the params is a nullptr 
   */
   ConfigurationListenerImpl(
-    cppmicroservices::BundleContext context,
+    const cppmicroservices::BundleContext& context,
     std::shared_ptr<cppmicroservices::logservice::LogService> logger,
     std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier>
       configNotifier);

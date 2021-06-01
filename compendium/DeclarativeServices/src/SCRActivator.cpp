@@ -32,8 +32,6 @@
 #include <memory>
 #include <stdexcept>
 #include <vector>
-
-#include "ConfigurationListenerImpl.hpp"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/dto/ComponentConfigurationDTO.hpp"

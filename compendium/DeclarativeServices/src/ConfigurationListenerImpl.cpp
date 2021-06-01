@@ -6,11 +6,11 @@ namespace service {
 namespace cm {
 
 ConfigurationListenerImpl::ConfigurationListenerImpl(
-  cppmicroservices::BundleContext context,
+  const cppmicroservices::BundleContext& context,
   std::shared_ptr<cppmicroservices::logservice::LogService> logger,
   std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier>
     configNotifier)
-  : bundleContext(std::move(context))
+  : bundleContext(context)
   , logger(std::move(logger))
   , configNotifier(std::move(configNotifier))
 {
@@ -24,7 +24,7 @@ void ConfigurationListenerImpl::configurationEvent(
   const ConfigurationEvent& event) noexcept
 {
   try {
-    auto pid = (event.getPid() != "") ? event.getPid() : event.getFactoryPid();
+    auto pid = (!event.getPid().empty()) ? event.getPid() : event.getFactoryPid();
     if (pid.empty()) {
       return;
     }
@@ -34,13 +34,21 @@ void ConfigurationListenerImpl::configurationEvent(
 
     auto configAdminRef = event.getReference();
     if (!configAdminRef) {
+      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                  "configurationEvent error. ConfigurationAdmin service "
+                  "reference is no longer valid");
       return;
     }
     auto configAdmin =
       bundleContext
         .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(
           configAdminRef);
-
+    if (!configAdmin) {
+      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                  "configurationEvent error. ConfigurationAdmin service "
+                  "reference is no longer valid");
+      return;
+    }
     auto properties =
       cppmicroservices::AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
     auto type = event.getType();

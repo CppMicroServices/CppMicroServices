@@ -39,7 +39,7 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(
 
   // Make sure the state didn't change while we were waiting
   if (mgr.GetConfigState() != service::component::runtime::dto::ACTIVE) {
-    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                 "Activate failed. Component no longer in Active State.");
     return nullptr;
   }
@@ -104,7 +104,7 @@ bool CCActiveState::Modified(ComponentConfigurationImpl& mgr)
   // Make sure the state didn't change while we were waiting
   if (mgr.GetConfigState() != service::component::runtime::dto::ACTIVE) {
     auto logger = mgr.GetLogger();
-    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                 "Modified failed. Component no longer in Active State.");
     return false;
   }
@@ -131,7 +131,7 @@ void CCActiveState::Rebind(ComponentConfigurationImpl& mgr,
   // Make sure the state didn't change while we were waiting
   if (mgr.GetConfigState() != service::component::runtime::dto::ACTIVE) {
     auto logger = mgr.GetLogger();
-    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                 "Rebind failed. Component no longer in Active State.");
     return;
   }

@@ -161,7 +161,7 @@ void SingletonComponentConfigurationImpl::BindReference(
   auto context = GetComponentContext();
   if (!context->AddToBoundServicesCache(refName, ref)) {
     GetLogger()->Log(
-      cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+      cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
       "Failure while trying to add reference to BoundServices Cache ");
     return;
   }

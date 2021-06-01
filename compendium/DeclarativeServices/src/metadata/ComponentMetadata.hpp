@@ -58,8 +58,8 @@ struct ComponentMetadata
   std::unordered_map<std::string, cppmicroservices::Any> properties;
   std::string configurationPolicy;
   std::vector<std::string> configurationPids;
-  std::string factory;
-  std::unordered_map<std::string, cppmicroservices::Any> factoryProperties;
+  std::string factoryComponentID;
+  std::unordered_map<std::string, cppmicroservices::Any> factoryComponentProperties;
 };
 }
 }

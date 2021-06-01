@@ -33,10 +33,10 @@ namespace scrimpl {
 using cppmicroservices::scrimpl::metadata::ComponentMetadata;
 
 ConfigurationNotifier::ConfigurationNotifier(
-  cppmicroservices::BundleContext context,
+  const cppmicroservices::BundleContext& context,
   std::shared_ptr<cppmicroservices::logservice::LogService> logger)
   : tokenCounter(0)
-  , bundleContext(std::move(context))
+  , bundleContext(context)
   , logger(std::move(logger))
 {
   if (!bundleContext || !(this->logger)) {
@@ -97,7 +97,7 @@ void ConfigurationNotifier::UnregisterListener(
 bool ConfigurationNotifier::AnyListenersForPid(const std::string& pid) noexcept
 {
   std::string factoryName;
-  auto mgr = std::shared_ptr<ComponentConfigurationImpl>();
+  std::shared_ptr<ComponentConfigurationImpl> mgr;
   {
     auto listenersMapHandle = listenersMap.lock();
     if (listenersMapHandle->empty() || pid.empty()) {
@@ -127,7 +127,7 @@ bool ConfigurationNotifier::AnyListenersForPid(const std::string& pid) noexcept
     auto listener = iter->second->begin();
 
     mgr = listener->second.mgr;
-    if (mgr->GetMetadata()->factory.empty()) {
+    if (mgr->GetMetadata()->factoryComponentID.empty()) {
       // The component in our listener's map is not a factory component.
       return false;
     }
@@ -144,7 +144,7 @@ void ConfigurationNotifier::CreateFactoryComponent(
   auto newMetadata = std::make_shared<ComponentMetadata>(*oldMetadata);
 
   newMetadata->name = pid;
-  newMetadata->factory =
+  newMetadata->factoryComponentID =
     ""; // this is a factory instance not a factory component
 
   // Factory instance is dependent on the same configurationPids as the factory

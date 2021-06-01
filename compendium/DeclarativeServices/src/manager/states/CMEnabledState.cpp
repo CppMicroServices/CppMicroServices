@@ -84,7 +84,7 @@ void CMEnabledState::DeleteConfigurations()
     // No exceptions are expected from the future. Exceptions are
     // logged on the otherside of the thread boundary. See #CreateConfigurations
     auto configs = std::move(configurations);
-    for (auto& config : configs) {
+    for (const auto& config : configs) {
       config->Deactivate();
       config->Stop();
     }

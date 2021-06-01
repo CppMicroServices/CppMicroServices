@@ -120,7 +120,7 @@ void ComponentConfigurationImpl::Stop()
     refMgr.second->StopTracking();
   }
 
-  for (auto listener : configListenerTokens) {
+  for (const auto& listener : configListenerTokens) {
     configNotifier->UnregisterListener(listener->pid, listener->tokenId);
   }
   configListenerTokens.clear();
@@ -129,7 +129,7 @@ void ComponentConfigurationImpl::Stop()
 std::unordered_map<std::string, cppmicroservices::Any>
 ComponentConfigurationImpl::GetProperties() const
 {
-  if (metadata->factory.empty()) {
+  if (metadata->factoryComponentID.empty()) {
     // This is not a factory component
     // Start with component properties
     auto props = metadata->properties;
@@ -137,7 +137,7 @@ ComponentConfigurationImpl::GetProperties() const
     // If configuration object dependencies exist, use merged component and configuration object properties.
     if (configManager != nullptr) {
       props.clear();
-      for (auto item : configManager->GetProperties()) {
+      for (const auto& item : configManager->GetProperties()) {
         props.emplace(item.first, item.second);
       }
     }
@@ -147,9 +147,9 @@ ComponentConfigurationImpl::GetProperties() const
     return props;
   } else {
     //This is  a factory component
-    auto props = metadata->factoryProperties;
+    auto props = metadata->factoryComponentProperties;
     props.emplace(COMPONENT_NAME, Any(this->metadata->name));
-    props.emplace(COMPONENT_FACTORY, Any(this->metadata->factory));
+    props.emplace(COMPONENT_FACTORY, Any(this->metadata->factoryComponentID));
     return props;
   }
 }
@@ -184,7 +184,7 @@ void ComponentConfigurationImpl::Initialize()
       // Call RegisterListener to register listeners to listen for changes to configuration objects
       // before calling configManager->Initialize. The Initialize method will get the configuration object
       // from ConfigAdmin if it exists and a notification will be sent to the listeners.
-      for (auto pid : metadata->configurationPids) {
+      for (const auto& pid : metadata->configurationPids) {
 
         auto token = configNotifier->RegisterListener(
           pid,

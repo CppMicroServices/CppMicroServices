@@ -140,20 +140,20 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
 
   // component.configuration-policy (Optional)
   compMetadata->configurationPolicy = CONFIG_POLICY_IGNORE;
-  unsigned short configPolicy = 0;
+  bool configPolicy = false;
   object =
     ObjectValidator(metadata, "configuration-policy", /*isOptional=*/true);
   if (object.KeyExists()) {
     object.AssignValueTo(compMetadata->configurationPolicy);
-    configPolicy = 1;
+    configPolicy = true;
   }
 
   // component.configuration-pid (Optional)
-  unsigned short configPid = 0;
+  bool configPid = false;
   object = ObjectValidator(metadata, "configuration-pid", /*isOptional=*/true);
   if (object.KeyExists()) {
-    configPid = 1;
-    if (configPolicy == 1) {
+    configPid = true;
+    if (configPolicy ) {
       const auto configPids =
         object.GetValue<std::vector<cppmicroservices::Any>>();
       std::transform(
@@ -187,14 +187,14 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
      * Otherwise the configuration-policy is set to ignore. If only one is present
      * a Warning message is logged.
      */
-  if (configPolicy ^ configPid) {
+  if ((configPolicy && !configPid) || (!configPolicy && configPid)) {
     compMetadata->configurationPolicy = CONFIG_POLICY_IGNORE;
     compMetadata->configurationPids.clear();
     std::string msg = "Warning: configuration-policy has been set to ignore.";
     msg.append(
       " Both configuration-policy and configuration-pid must be present");
     msg.append(" to participate in Configuration Admin. ");
-    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, msg);
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING, msg);
   }
 
   if (compMetadata->configurationPolicy == CONFIG_POLICY_IGNORE) {
@@ -202,14 +202,14 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
   }
   // component.factory
   ObjectValidator(metadata, "factory", /*isOptional=*/true)
-    .AssignValueTo(compMetadata->factory);
+    .AssignValueTo(compMetadata->factoryComponentID);
 
   // component.factoryProperties
   object = ObjectValidator(metadata, "factory-properties", /*isOptional=*/true);
   if (object.KeyExists()) {
     const auto props = object.GetValue<AnyMap>();
     for (const auto& prop : props) {
-      compMetadata->factoryProperties.insert(prop);
+      compMetadata->factoryComponentProperties.insert(prop);
     }
   }
 

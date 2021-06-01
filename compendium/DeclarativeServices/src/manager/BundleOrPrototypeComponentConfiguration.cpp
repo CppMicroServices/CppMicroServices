@@ -166,7 +166,7 @@ void BundleOrPrototypeComponentConfigurationImpl::BindReference(
     auto& context = instancePair.second;
     if (!context->AddToBoundServicesCache(refName, ref)) {
       GetLogger()->Log(
-        cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+        cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
         "Failure while trying to add reference to BoundServices Cache ");
       return;
     }

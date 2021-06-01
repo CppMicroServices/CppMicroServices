@@ -98,7 +98,7 @@ SCRBundleExtension::~SCRBundleExtension()
   logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
               "Deleting instance of SCRBundleExtension for " +
                 bundleContext.GetBundle().GetSymbolicName());
-  for (auto compManager : *managers) {
+  for (auto& compManager : *managers) {
     auto fut = compManager->Disable();
     registry->RemoveComponentManager(compManager);
     fut

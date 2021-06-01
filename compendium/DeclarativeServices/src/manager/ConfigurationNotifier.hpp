@@ -72,7 +72,7 @@ public:
    * @throws std::invalid_argument exception if any of the params is a nullptr 
    */
   ConfigurationNotifier(
-    const cppmicroservices::BundleContext context,
+    const cppmicroservices::BundleContext& context,
     std::shared_ptr<cppmicroservices::logservice::LogService> logger);
 
   ConfigurationNotifier(const ConfigurationNotifier&) = delete;

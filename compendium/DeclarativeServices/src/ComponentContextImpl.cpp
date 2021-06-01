@@ -113,9 +113,23 @@ std::shared_ptr<void> ComponentContextImpl::LocateService(
   if (serviceMapItr != boundServicesCacheHandle->end()) {
     auto& serviceMaps = serviceMapItr->second;
     if (!serviceMaps.empty()) {
-      service = ExtractInterface(serviceMaps.at(0), type);
+      bool nullDueToFailure = false;
+      service = ExtractInterface(serviceMaps.at(0), type, nullDueToFailure);
+
+      // In the case of service being a nullptr, we throw because this implies
+      // that the construction or activation of the service failed.
+      if (!service && nullDueToFailure) {
+        std::string errMsg = "Service ";
+        errMsg += name;
+        errMsg += " with type ";
+        errMsg += type;
+        errMsg += " failed to construct or activate.";
+
+        throw ComponentException(errMsg);
+      }
     }
   }
+
   return service;
 }
 

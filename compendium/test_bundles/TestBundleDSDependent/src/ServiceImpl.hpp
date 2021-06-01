@@ -14,17 +14,6 @@ public:
     const std::shared_ptr<test::TestBundleDSUpstreamDependency>&);
   ~TestBundleDSDependentImpl() override;
 
-  void Activate(const std::shared_ptr<ComponentContext>& context)
-  {
-    (void)context->LocateService<test::TestBundleDSUpstreamDependency>(
-      "testbundledsupstreamdependency");
-  }
-
-  void Deactivate(const std::shared_ptr<ComponentContext>& context)
-  {
-    //
-  }
-
 private:
   std::shared_ptr<test::TestBundleDSUpstreamDependency> ref;
 };

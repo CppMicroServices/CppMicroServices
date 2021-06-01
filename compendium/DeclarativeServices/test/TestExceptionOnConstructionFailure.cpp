@@ -35,7 +35,7 @@ using ComponentContext = cppmicroservices::service::component::ComponentContext;
 namespace test {
 
 class FailedBoundServiceActivationTest
-  : public testing::TestWithParam<std::string>
+  : public testing::TestWithParam<std::pair<std::string, std::string>>
 {
 public:
   FailedBoundServiceActivationTest()
@@ -68,17 +68,25 @@ public:
 INSTANTIATE_TEST_SUITE_P(
   BoundServices,
   FailedBoundServiceActivationTest,
-  testing::Values(std::string("TestBundleDSUpstreamDependencyA"),
-                  std::string("TestBundleDSUpstreamDependencyB")));
+  testing::Values(
+    std::make_pair(std::string("TestBundleDSDependent"),
+                   std::string("TestBundleDSUpstreamDependencyA")),
+    std::make_pair(std::string("TestBundleDSDependentNoInject"),
+                   std::string("TestBundleDSUpstreamDependencyA")),
+    std::make_pair(std::string("TestBundleDSDependent"),
+                   std::string("TestBundleDSUpstreamDependencyB")),
+    std::make_pair(std::string("TestBundleDSDependentNoInject"),
+                   std::string("TestBundleDSUpstreamDependencyB"))));
 
-TEST_P(FailedBoundServiceActivationTest, TestExceptionOnConstructionFailure)
+TEST_P(FailedBoundServiceActivationTest,
+       TestExceptionOnConstructionOrActivationFailure)
 {
-  auto const& param = GetParam();
+  auto const& params = GetParam();
 
   auto ctx = framework.GetBundleContext();
 
-  auto dependency = ::test::InstallAndStartBundle(ctx, param);
-  auto bundle = ::test::InstallAndStartBundle(ctx, "TestBundleDSDependent");
+  auto bundle = ::test::InstallAndStartBundle(ctx, params.first);
+  auto dependency = ::test::InstallAndStartBundle(ctx, params.second);
 
   auto sDepRef = ctx.GetServiceReference<test::TestBundleDSDependent>();
   auto depService = ctx.GetService<test::TestBundleDSDependent>(sDepRef);
@@ -96,26 +104,27 @@ TEST_P(FailedBoundServiceActivationTest, TestExceptionOnConstructionFailure)
   EXPECT_EQ(upstreamService, nullptr);
 
   auto bundleDescriptionDTO = dsRuntimeService->GetComponentDescriptionDTO(
-    bundle, "dependent::TestBundleDSDependentImpl");
+    bundle, "dependent::" + params.first + "Impl");
+
   auto configDTO =
     dsRuntimeService->GetComponentConfigurationDTOs(bundleDescriptionDTO);
+
   EXPECT_EQ(configDTO.size(), 1);
 
   // The number of unsatisfied references should be 1 since the upstream reference
   // failed to construct
   const auto& unsatisfiedRefs = configDTO[0].unsatisfiedReferences;
-  EXPECT_EQ(unsatisfiedRefs.size(), 1);
+  EXPECT_EQ(unsatisfiedRefs.size(), 0);
 
   // The number of satisfied references should be 0 since the upstream reference failed
   // to construct
   const auto& satisfiedRefs = configDTO[0].satisfiedReferences;
-  EXPECT_EQ(satisfiedRefs.size(), 0);
+  EXPECT_EQ(satisfiedRefs.size(), 1);
 
   // The state of the bundle should be UNSATISFIED_REFERENCE since the sole dependency
   // of the service failed to construct
   EXPECT_EQ(configDTO[0].state,
             cppmicroservices::service::component::runtime::dto::ComponentState::
-              UNSATISFIED_REFERENCE);
+              SATISFIED);
 }
-
 }

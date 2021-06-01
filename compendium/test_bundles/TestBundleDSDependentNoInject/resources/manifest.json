@@ -1,11 +1,12 @@
 {
-    "bundle.symbolic_name": "TestBundleDSDependent",
-    "bundle.name": "TestBundleDSDependent",
+    "bundle.symbolic_name": "TestBundleDSDependentNoInject",
+    "bundle.name": "TestBundleDSDependentNoInject",
     "scr": {
         "version": 1,
         "components": [
             {
-                "implementation-class": "dependent::TestBundleDSDependentImpl",
+                "inject-references": false,
+                "implementation-class": "dependent::TestBundleDSDependentNoInjectImpl",
                 "service": {
                     "interfaces": [
                         "test::TestBundleDSDependent"

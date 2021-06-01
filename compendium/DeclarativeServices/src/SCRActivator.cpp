@@ -62,7 +62,7 @@ void SCRActivator::Start(BundleContext context)
   logger->Log(SeverityLevel::LOG_DEBUG, "Starting SCR bundle");
 
   // Create configuration object notifier
-  configNotifier = std::make_shared<ConfigurationNotifier>(context, logger);
+  configNotifier = std::make_shared<ConfigurationNotifier>(context, logger, threadpool);
 
   // Add bundle listener
   bundleListenerToken = context.AddBundleListener(

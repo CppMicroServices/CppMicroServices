@@ -24,7 +24,6 @@
 #include "BundleOrPrototypeComponentConfiguration.hpp"
 #include "ComponentManager.hpp"
 #include "SingletonComponentConfiguration.hpp"
-#include "boost/asio/thread_pool.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -35,7 +34,6 @@ ComponentConfigurationFactory::CreateConfigurationManager(
   const cppmicroservices::Bundle& bundle,
   std::shared_ptr<ComponentRegistry> registry,
   std::shared_ptr<logservice::LogService> logger,
-  std::shared_ptr<boost::asio::thread_pool> threadpool,
   std::shared_ptr<ConfigurationNotifier> configNotifier,
   std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
 {
@@ -43,11 +41,11 @@ ComponentConfigurationFactory::CreateConfigurationManager(
   std::string scope = compDesc->serviceMetadata.scope;
   if (scope == cppmicroservices::Constants::SCOPE_SINGLETON) {
     retVal = std::make_shared<SingletonComponentConfigurationImpl>(
-      compDesc, bundle, registry, logger, threadpool, configNotifier, managers);
+      compDesc, bundle, registry, logger, configNotifier, managers);
   } else if (scope == cppmicroservices::Constants::SCOPE_BUNDLE ||
              scope == cppmicroservices::Constants::SCOPE_PROTOTYPE) {
     retVal = std::make_shared<BundleOrPrototypeComponentConfigurationImpl>(
-      compDesc, bundle, registry, logger, threadpool, configNotifier, managers);
+      compDesc, bundle, registry, logger, configNotifier, managers);
   }
   if (retVal) {
     retVal->Initialize();

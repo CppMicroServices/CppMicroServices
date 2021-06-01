@@ -23,10 +23,10 @@
 #ifndef __CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP__
 #define __CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP__
 
+#include "boost/asio/thread_pool.hpp"
 #include "../SCRLogger.hpp"
 #include "ConcurrencyUtil.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
-//#include "ComponentConfigurationImpl.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -73,7 +73,8 @@ public:
    */
   ConfigurationNotifier(
     const cppmicroservices::BundleContext& context,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    std::shared_ptr<boost::asio::thread_pool> threadpool);
 
   ConfigurationNotifier(const ConfigurationNotifier&) = delete;
   ConfigurationNotifier(ConfigurationNotifier&&) = delete;
@@ -118,6 +119,7 @@ private:
 
   cppmicroservices::BundleContext bundleContext;
   std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+  std::shared_ptr<boost::asio::thread_pool> threadpool;
 };
 
 } // namespace scrimpl

@@ -56,7 +56,6 @@ ComponentConfigurationImpl::ComponentConfigurationImpl(
   const Bundle& bundle,
   std::shared_ptr<ComponentRegistry> registry,
   std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-  std::shared_ptr<boost::asio::thread_pool> threadpool,
   std::shared_ptr<ConfigurationNotifier> configNotifier,
   std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
   : configID(++idCounter)
@@ -64,7 +63,6 @@ ComponentConfigurationImpl::ComponentConfigurationImpl(
   , bundle(bundle)
   , registry(std::move(registry))
   , logger(std::move(logger))
-  , threadpool(std::move(threadpool))
   , configManager()
   , configNotifier(std::move(configNotifier))
   , managers(std::move(managers))

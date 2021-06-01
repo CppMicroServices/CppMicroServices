@@ -51,9 +51,9 @@ protected:
     auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
     auto fakeLogger = std::make_shared<FakeLogger>();
-    auto notifier = std::make_shared<ConfigurationNotifier>(
-      framework.GetBundleContext(), fakeLogger);
     auto threadpool = std::make_shared<boost::asio::thread_pool>();
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      framework.GetBundleContext(), fakeLogger,threadpool);
     auto managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -62,7 +62,6 @@ protected:
                                                        framework,
                                                        mockRegistry,
                                                        fakeLogger,
-                                                       threadpool,
                                                        notifier,
                                                        managers);
   }

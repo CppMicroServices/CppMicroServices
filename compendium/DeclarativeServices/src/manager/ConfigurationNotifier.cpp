@@ -34,12 +34,14 @@ using cppmicroservices::scrimpl::metadata::ComponentMetadata;
 
 ConfigurationNotifier::ConfigurationNotifier(
   const cppmicroservices::BundleContext& context,
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger)
+  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+  std::shared_ptr<boost::asio::thread_pool> threadpool)
   : tokenCounter(0)
   , bundleContext(context)
   , logger(std::move(logger))
+  , threadpool(std::move(threadpool))
 {
-  if (!bundleContext || !(this->logger)) {
+  if (!bundleContext || !(this->logger) || (!this->threadpool )) {
     throw std::invalid_argument("ConfigurationNotifier Constructor "
                                 "provided with invalid arguments");
   }
@@ -160,7 +162,6 @@ void ConfigurationNotifier::CreateFactoryComponent(
   auto bundle = mgr->GetBundle();
   auto registry = mgr->GetRegistry();
   auto logger = mgr->GetLogger();
-  auto threadpool = mgr->GetThreadpool();
   auto configNotifier = mgr->GetConfigNotifier();
   auto managers = mgr->GetManagers();
 

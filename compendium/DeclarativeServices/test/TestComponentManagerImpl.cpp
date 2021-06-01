@@ -50,13 +50,13 @@ TEST(ComponentManagerImplTest, Ctor)
   framework.Start();
   auto bc = framework.GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    framework.GetBundleContext(), fakeLogger);
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto pool = std::make_shared<boost::asio::thread_pool>(1);
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    framework.GetBundleContext(), fakeLogger, pool);
   {
     EXPECT_THROW(
       {
@@ -119,8 +119,9 @@ protected:
     framework.Start();
     fakeLogger = std::make_shared<FakeLogger>();
     mockRegistry = std::make_shared<MockComponentRegistry>();
+    auto threadpool = std::make_shared<boost::asio::thread_pool>();
     notifier = std::make_shared<ConfigurationNotifier>(
-      framework.GetBundleContext(), fakeLogger);
+      framework.GetBundleContext(), fakeLogger, threadpool);
     managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
   }

@@ -37,7 +37,6 @@
 #include "ConfigurationManager.hpp"
 #include "ConfigurationNotifier.hpp"
 #include "ReferenceManager.hpp"
-#include "boost/asio/thread_pool.hpp"
 #include "cppmicroservices/ServiceFactory.h"
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"
@@ -81,7 +80,6 @@ public:
     const Bundle& bundle,
     std::shared_ptr<ComponentRegistry> registry,
     std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-    std::shared_ptr<boost::asio::thread_pool> threadpool,
     std::shared_ptr<ConfigurationNotifier> configNotifier,
     std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
   ComponentConfigurationImpl(const ComponentConfigurationImpl&) = delete;
@@ -142,15 +140,7 @@ public:
    */
   ComponentState GetConfigState() const override;
 
-  /**
-   * This method returns the {@link boost::asio::thread_pool} object 
-   */
-  std::shared_ptr<boost::asio::thread_pool> GetThreadpool() const
-  {
-    return threadpool;
-  };
-
-  /**
+   /**
    * This method returns the {@link ConfigurationNotifier} object 
    */
   std::shared_ptr<ConfigurationNotifier> GetConfigNotifier() const
@@ -438,7 +428,6 @@ private:
     referenceManagers; ///< map of all the reference managers
   std::unordered_map<std::shared_ptr<ReferenceManager>, ListenerTokenId>
     referenceManagerTokens; ///< map of the listener tokens received from the reference managers
-  std::shared_ptr<boost::asio::thread_pool> threadpool;
   std::shared_ptr<ConfigurationManager>
     configManager; ///< manages configuration objects
   std::shared_ptr<ConfigurationNotifier>

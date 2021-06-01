@@ -146,15 +146,14 @@ std::shared_future<void> ComponentManagerImpl::PostAsyncDisabledToEnabled(
   auto bundle = GetBundle();
   auto reg = GetRegistry();
   auto logger = GetLogger();
-  auto threadpool = GetThreadPool();
   auto configNotifier = GetConfigNotifier();
   auto managers = GetManagers();
 
   std::packaged_task<void(std::shared_ptr<CMEnabledState>)> task(
-    [metadata, bundle, reg, logger, threadpool, configNotifier, managers](
+    [metadata, bundle, reg, logger,  configNotifier, managers](
       std::shared_ptr<CMEnabledState> eState) {
       eState->CreateConfigurations(
-        metadata, bundle, reg, logger, threadpool, configNotifier, managers);
+        metadata, bundle, reg, logger, configNotifier, managers);
     });
 
   using Sig = void(std::shared_ptr<CMEnabledState>);

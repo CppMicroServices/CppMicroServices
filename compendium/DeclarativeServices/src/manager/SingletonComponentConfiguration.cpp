@@ -43,14 +43,12 @@ SingletonComponentConfigurationImpl::SingletonComponentConfigurationImpl(
   const Bundle& bundle,
   std::shared_ptr<ComponentRegistry> registry,
   std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-  std::shared_ptr<boost::asio::thread_pool> threadpool,
   std::shared_ptr<ConfigurationNotifier> configNotifier,
   std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
   : ComponentConfigurationImpl(metadata,
                                bundle,
                                registry,
                                logger,
-                               threadpool,
                                configNotifier,
                                managers)
 {}

@@ -73,7 +73,7 @@ TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
   auto pool = std::make_shared<boost::asio::thread_pool>(1);
   auto bundleContext = GetFramework().GetBundleContext();
   auto notifier =
-    std::make_shared<ConfigurationNotifier>(bundleContext, fakeLogger);
+    std::make_shared<ConfigurationNotifier>(bundleContext, fakeLogger, pool);
   EXPECT_THROW(
     {
       SCRBundleExtension bundleExt(
@@ -134,7 +134,7 @@ TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto pool = std::make_shared<boost::asio::thread_pool>(1);
   auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger);
+    GetFramework().GetBundleContext(), fakeLogger, pool);
   EXPECT_NO_THROW({
     SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                  scr,

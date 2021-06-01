@@ -70,9 +70,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyCtor)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger, threadpool);
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -83,7 +83,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyCtor)
                                                          GetFramework(),
                                                          mockRegistry,
                                                          fakeLogger,
-                                                         threadpool,
                                                          notifier,
                                                          managers);
     },
@@ -95,7 +94,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyCtor)
                                                          GetFramework(),
                                                          nullptr,
                                                          fakeLogger,
-                                                         threadpool,
                                                          notifier,
                                                          managers);
     },
@@ -107,7 +105,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyCtor)
                                                          GetFramework(),
                                                          mockRegistry,
                                                          nullptr,
-                                                         threadpool,
                                                          notifier,
                                                          managers);
     },
@@ -119,7 +116,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyCtor)
                                                        GetFramework(),
                                                        mockRegistry,
                                                        fakeLogger,
-                                                       threadpool,
                                                        notifier,
                                                        managers);
     EXPECT_EQ(fakeCompConfig->GetConfigState(),
@@ -134,9 +130,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyUniqueId)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger, threadpool);
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -149,7 +145,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyUniqueId)
                                                          GetFramework(),
                                                          mockRegistry,
                                                          fakeLogger,
-                                                         threadpool,
                                                          notifier,
                                                          managers);
       idSet.insert(fakeCompConfig->GetId());
@@ -190,14 +185,14 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefSatisfied)
   auto mockFactory = std::make_shared<MockFactory>();
   auto mockCompInstance = std::make_shared<MockComponentInstance>();
   auto bc = GetFramework().GetBundleContext();
-  auto notifier = std::make_shared<ConfigurationNotifier>(bc, fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
+  auto notifier =
+    std::make_shared<ConfigurationNotifier>(bc, fakeLogger, threadpool);
   auto fakeCompConfig =
     std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                      GetFramework(),
                                                      mockRegistry,
                                                      fakeLogger,
-                                                     threadpool,
                                                      notifier,
                                                      managers);
   EXPECT_CALL(*fakeCompConfig, GetFactory())
@@ -229,18 +224,17 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefUnsatisfied)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger);
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger, threadpool);
   auto fakeCompConfig =
     std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                      GetFramework(),
                                                      mockRegistry,
                                                      fakeLogger,
-                                                     threadpool,
                                                      notifier,
                                                      managers);
   auto mockStatisfiedState =
@@ -292,16 +286,15 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefChangedState)
     us_service_interface_iid<dummy::ServiceImpl>()
   };
   mockMetadata->refsMetadata.push_back(refMetadata);
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger, threadpool);
 
   auto fakeCompConfig =
     std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                      GetFramework(),
                                                      mockRegistry,
                                                      fakeLogger,
-                                                     threadpool,
                                                      notifier,
                                                      managers);
 
@@ -320,9 +313,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger, threadpool);
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -334,7 +327,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
                                                        GetFramework(),
                                                        mockRegistry,
                                                        fakeLogger,
-                                                       threadpool,
                                                        notifier,
                                                        managers);
     EXPECT_EQ(fakeCompConfig->GetConfigState(),
@@ -352,9 +344,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
       us_service_interface_iid<dummy::ServiceImpl>()
     };
     auto mockFactory = std::make_shared<MockFactory>();
-    auto notifier = std::make_shared<ConfigurationNotifier>(
-      GetFramework().GetBundleContext(), fakeLogger);
     auto threadpool = std::make_shared<boost::asio::thread_pool>();
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      GetFramework().GetBundleContext(), fakeLogger, threadpool);
     auto managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -363,7 +355,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
                                                        GetFramework(),
                                                        mockRegistry,
                                                        fakeLogger,
-                                                       threadpool,
                                                        notifier,
                                                        managers);
     EXPECT_CALL(*fakeCompConfig, GetFactory())
@@ -390,9 +381,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
     mockMetadata->immediate = true;
     auto mockFactory = std::make_shared<MockFactory>();
     auto mockCompInstance = std::make_shared<MockComponentInstance>();
-    auto notifier = std::make_shared<ConfigurationNotifier>(
-      GetFramework().GetBundleContext(), fakeLogger);
     auto threadpool = std::make_shared<boost::asio::thread_pool>();
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      GetFramework().GetBundleContext(), fakeLogger, threadpool);
     auto managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -401,7 +392,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
                                                        GetFramework(),
                                                        mockRegistry,
                                                        fakeLogger,
-                                                       threadpool,
                                                        notifier,
                                                        managers);
     EXPECT_CALL(*fakeCompConfig, GetFactory())
@@ -429,9 +419,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeDelegation)
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto mockState = std::make_shared<MockComponentConfigurationState>();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger, threadpool);
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -440,7 +430,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeDelegation)
                                                      GetFramework(),
                                                      mockRegistry,
                                                      fakeLogger,
-                                                     threadpool,
                                                      notifier,
                                                      managers);
   EXPECT_EQ(fakeCompConfig->GetConfigState(),
@@ -466,9 +455,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyActivate_Success)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger, threadpool);
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -477,7 +466,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyActivate_Success)
                                                      GetFramework(),
                                                      mockRegistry,
                                                      fakeLogger,
-                                                     threadpool,
                                                      notifier,
                                                      managers);
   fakeCompConfig->state = std::make_shared<CCRegisteredState>();
@@ -495,9 +483,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyActivate_Failure)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger, threadpool);
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -507,7 +495,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyActivate_Failure)
                                                      GetFramework(),
                                                      mockRegistry,
                                                      fakeLogger,
-                                                     threadpool,
                                                      notifier,
                                                      managers);
   fakeCompConfig->state = std::make_shared<CCRegisteredState>();
@@ -524,9 +511,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyDeactivate)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger, threadpool);
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -535,7 +522,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyDeactivate)
                                                      GetFramework(),
                                                      mockRegistry,
                                                      fakeLogger,
-                                                     threadpool,
                                                      notifier,
                                                      managers);
   auto activeState = std::make_shared<CCActiveState>();
@@ -588,9 +574,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentRegisterDeactivate)
                                                "interface" };
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger, threadpool);
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -599,7 +585,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentRegisterDeactivate)
                                                      GetFramework(),
                                                      mockRegistry,
                                                      fakeLogger,
-                                                     threadpool,
                                                      notifier,
                                                      managers);
   EXPECT_CALL(*fakeCompConfig, GetFactory())
@@ -654,9 +639,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentActivateDeactivate)
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto mockCompInstance = std::make_shared<MockComponentInstance>();
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger, threadpool);
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -665,7 +650,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentActivateDeactivate)
                                                      GetFramework(),
                                                      mockRegistry,
                                                      fakeLogger,
-                                                     threadpool,
                                                      notifier,
                                                      managers);
   EXPECT_CALL(*fakeCompConfig, CreateAndActivateComponentInstance(testing::_))
@@ -701,9 +685,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyImmediateComponent)
     mockMetadata->immediate = true;
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
     auto fakeLogger = std::make_shared<FakeLogger>();
-    auto notifier = std::make_shared<ConfigurationNotifier>(
-      GetFramework().GetBundleContext(), fakeLogger);
     auto threadpool = std::make_shared<boost::asio::thread_pool>();
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      GetFramework().GetBundleContext(), fakeLogger, threadpool);
     auto managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -713,7 +697,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyImmediateComponent)
                                                        GetFramework(),
                                                        mockRegistry,
                                                        fakeLogger,
-                                                       threadpool,
                                                        notifier,
                                                        managers);
     EXPECT_CALL(*fakeCompConfig, CreateAndActivateComponentInstance(testing::_))
@@ -739,9 +722,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyDelayedComponent)
     auto fakeLogger = std::make_shared<FakeLogger>();
     auto mockCompInstance = std::make_shared<MockComponentInstance>();
     auto mockFactory = std::make_shared<MockFactory>();
-    auto notifier = std::make_shared<ConfigurationNotifier>(
-      GetFramework().GetBundleContext(), fakeLogger);
     auto threadpool = std::make_shared<boost::asio::thread_pool>();
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      GetFramework().GetBundleContext(), fakeLogger, threadpool);
     auto managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -754,7 +737,6 @@ TEST_F(ComponentConfigurationImplTest, VerifyDelayedComponent)
                                                        GetFramework(),
                                                        mockRegistry,
                                                        fakeLogger,
-                                                       threadpool,
                                                        notifier,
                                                        managers);
     EXPECT_CALL(*fakeCompConfig, GetFactory())
@@ -802,9 +784,9 @@ TEST_F(ComponentConfigurationImplTest, TestGetDependencyManagers)
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto mockCompInstance = std::make_shared<MockComponentInstance>();
   auto mockFactory = std::make_shared<MockFactory>();
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger);
   auto threadpool = std::make_shared<boost::asio::thread_pool>();
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger, threadpool);
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -825,7 +807,6 @@ TEST_F(ComponentConfigurationImplTest, TestGetDependencyManagers)
                                                      GetFramework(),
                                                      mockRegistry,
                                                      fakeLogger,
-                                                     threadpool,
                                                      notifier,
                                                      managers);
   EXPECT_EQ(fakeCompConfig->GetAllDependencyManagers().size(),

@@ -30,24 +30,25 @@
 
 namespace cppmicroservices {
 namespace scrimpl {
-
 using cppmicroservices::scrimpl::metadata::ComponentMetadata;
 
 ConfigurationNotifier::ConfigurationNotifier(
-  cppmicroservices::BundleContext context,
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger)
+  const cppmicroservices::BundleContext& context,
+  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+  std::shared_ptr<boost::asio::thread_pool> threadpool)
   : tokenCounter(0)
-  , bundleContext(std::move(context))
+  , bundleContext(context)
   , logger(std::move(logger))
+  , threadpool(std::move(threadpool))
 {
-  if (!bundleContext || !(this->logger)) {
+  if (!bundleContext || !(this->logger) || (!this->threadpool )) {
     throw std::invalid_argument("ConfigurationNotifier Constructor "
                                 "provided with invalid arguments");
   }
 }
 
 cppmicroservices::ListenerTokenId ConfigurationNotifier::RegisterListener(
-  const std::string& pid,
+  std::string pid,
   std::function<void(const ConfigChangeNotification&)> notify,
   std::shared_ptr<ComponentConfigurationImpl> mgr)
 {
@@ -71,7 +72,7 @@ cppmicroservices::ListenerTokenId ConfigurationNotifier::RegisterListener(
 }
 
 void ConfigurationNotifier::UnregisterListener(
-  const std::string& pid,
+  std::string pid,
   const cppmicroservices::ListenerTokenId token) noexcept
 {
   auto listenersMapHandle = listenersMap.lock();
@@ -95,10 +96,10 @@ void ConfigurationNotifier::UnregisterListener(
     }
   }
 }
-bool ConfigurationNotifier::AnyListenersForPid(const std::string& pid) noexcept
+bool ConfigurationNotifier::AnyListenersForPid(std::string pid) noexcept
 {
   std::string factoryName;
-  auto mgr = std::shared_ptr<ComponentConfigurationImpl>();
+  std::shared_ptr<ComponentConfigurationImpl> mgr;
   {
     auto listenersMapHandle = listenersMap.lock();
     if (listenersMapHandle->empty() || pid.empty()) {
@@ -128,7 +129,7 @@ bool ConfigurationNotifier::AnyListenersForPid(const std::string& pid) noexcept
     auto listener = iter->second->begin();
 
     mgr = listener->second.mgr;
-    if (mgr->GetMetadata()->factory.empty()) {
+    if (mgr->GetMetadata()->factoryComponentID.empty()) {
       // The component in our listener's map is not a factory component.
       return false;
     }
@@ -138,14 +139,14 @@ bool ConfigurationNotifier::AnyListenersForPid(const std::string& pid) noexcept
 }
 void ConfigurationNotifier::CreateFactoryComponent(
   const std::string factoryName,
-  const std::string pid,
+  std::string pid,
   const std::shared_ptr<ComponentConfigurationImpl> mgr)
 {
   auto oldMetadata = mgr->GetMetadata();
   auto newMetadata = std::make_shared<ComponentMetadata>(*oldMetadata);
 
   newMetadata->name = pid;
-  newMetadata->factory =
+  newMetadata->factoryComponentID =
     ""; // this is a factory instance not a factory component
 
   // Factory instance is dependent on the same configurationPids as the factory
@@ -161,7 +162,6 @@ void ConfigurationNotifier::CreateFactoryComponent(
   auto bundle = mgr->GetBundle();
   auto registry = mgr->GetRegistry();
   auto logger = mgr->GetLogger();
-  auto threadpool = mgr->GetThreadpool();
   auto configNotifier = mgr->GetConfigNotifier();
   auto managers = mgr->GetManagers();
 
@@ -190,7 +190,7 @@ void ConfigurationNotifier::CreateFactoryComponent(
 }
 
 void ConfigurationNotifier::NotifyAllListeners(
-  const std::string& pid,
+  std::string pid,
   cppmicroservices::service::cm::ConfigurationEventType type,
   std::shared_ptr<cppmicroservices::AnyMap> properties)
 {

@@ -59,23 +59,36 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
     }
 
     // configuration-policy and configuration-pid
-    unsigned short policy = 0;
-    unsigned short pid = 0;
+    bool configPolicy = false;
+    bool configPid = false;
     componentInfo.configurationPolicy =
       codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE;
     if (jsonComponent.isMember("configuration-policy")) {
-      policy = 1;
+      configPolicy = true;
       componentInfo.configurationPolicy =
         JsonValueValidator(
           jsonComponent, "configuration-policy", Json::ValueType::stringValue)
           .GetString();
     }
     if (jsonComponent.isMember("configuration-pid")) {
-      pid = 1;
+      configPid = true;
+      // make sure there are no duplicates in the configuration-pid array.
+      const auto configurationPids = JsonValueValidator(
+        jsonComponent, "configuration-pid", Json::ValueType::arrayValue)();
+      std::unordered_map<std::string, std::string> duplicatePids;
+      for (const auto& pid : configurationPids) {
+        if (duplicatePids.find(pid.asString()) != duplicatePids.end()) {
+          std::string msg = "configuration-pid error in the manifest. "
+                            "Duplicate pid detected. ";
+          msg.append(pid.asString());
+          throw std::runtime_error(msg);
+        }
+        duplicatePids.emplace(pid.asString(), pid.asString());
+      }
     }
     // Both configuration-policy and configuration-pid must be present in the manifest.json
     // file to participate in Configuration Admin.
-    if (policy ^ pid) {
+    if ((configPolicy && !configPid) || (!configPolicy && configPid)) {
       componentInfo.configurationPolicy =
         codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE;
       throw std::runtime_error(

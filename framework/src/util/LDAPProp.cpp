@@ -66,7 +66,7 @@ LDAPPropExpr& LDAPPropExpr::operator&=(const LDAPPropExpr& right)
   return *this;
 }
 
-LDAPProp::LDAPProp(std::string  property)
+LDAPProp::LDAPProp(std::string property)
   : m_property(std::move(property))
 {
   if (m_property.empty())

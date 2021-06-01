@@ -30,9 +30,9 @@ namespace test {
 
 class US_ISpellCheckService_EXPORT ISpellCheckService
 {
-  public:
+public:
   virtual ~ISpellCheckService();
-    
+
   /**
    * Checks a given passage for spelling errors. A passage is any number of
    * words separated by a space and any of the following punctuation marks:

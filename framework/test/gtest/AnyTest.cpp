@@ -178,7 +178,6 @@ TEST(AnyTest, AnyMapAny)
   EXPECT_EQ(anyMap.ToJSON(), "{\"1\" : 0.3, \"3\" : \"bonjour\"}");
 }
 
-
 TEST(AnyTest, AnyStringEscapeCharacters)
 {
   Any anyString = std::string("\"\\\b\f\n\r\t\x1f");
@@ -190,19 +189,15 @@ TEST(AnyTest, AnyToJSONWithFormatting)
   std::map<int, Any> emptyMap;
   std::vector<int> emptyVector;
 
-  std::map<int32_t, Any> mapToInsert = {
-    { 1, 0.3 }
-    , { 3, std::string("bonjour") }
-    , { 4, emptyMap }
-    , { 5, emptyVector }
-  };
-  std::vector<int32_t> numbers { 9, 8, 7 };
-  std::map<std::string, Any> map {
-    { "number", 5 }
-    , { "vector", numbers }
-    , { "map", mapToInsert }
-  };
- 
+  std::map<int32_t, Any> mapToInsert = { { 1, 0.3 },
+                                         { 3, std::string("bonjour") },
+                                         { 4, emptyMap },
+                                         { 5, emptyVector } };
+  std::vector<int32_t> numbers{ 9, 8, 7 };
+  std::map<std::string, Any> map{ { "number", 5 },
+                                  { "vector", numbers },
+                                  { "map", mapToInsert } };
+
   Any anyMap = map;
   std::string expected = R"({
     "map" : {
@@ -241,11 +236,13 @@ TEST(AnyTest, AnyMapComplex)
   EXPECT_EQ(anyMap.ToJSON(), toJSONRes);
 }
 
-TEST(AnyTest, AnyBadAnyCastException) {
+TEST(AnyTest, AnyBadAnyCastException)
+{
   const Any uncastableConstAny(0.0);
   Any uncastableAny(0.0);
 
-  EXPECT_THROW(any_cast<std::string>(uncastableConstAny), cppmicroservices::BadAnyCastException);
+  EXPECT_THROW(any_cast<std::string>(uncastableConstAny),
+               cppmicroservices::BadAnyCastException);
   EXPECT_THROW(any_cast<std::string>(uncastableAny),
                cppmicroservices::BadAnyCastException);
   EXPECT_THROW(ref_any_cast<std::string>(uncastableConstAny),
@@ -254,11 +251,17 @@ TEST(AnyTest, AnyBadAnyCastException) {
                cppmicroservices::BadAnyCastException);
 }
 
-struct no_eq {
+struct no_eq
+{
   bool operator==(const no_eq&) const = delete;
-  friend std::ostream& operator<<(std::ostream& os, no_eq const&) { os << "OOPS"; return os; }
+  friend std::ostream& operator<<(std::ostream& os, no_eq const&)
+  {
+    os << "OOPS";
+    return os;
+  }
 };
-TEST(AnyTest, AnyEquality) {
+TEST(AnyTest, AnyEquality)
+{
   EXPECT_EQ(Any(std::string("A")), Any(std::string("A")));
   EXPECT_NE(Any(std::string("A")), Any(std::string("B")));
   EXPECT_NE(Any(1), Any(std::string("A")));
@@ -271,10 +274,12 @@ TEST(AnyTest, AnyEquality) {
   EXPECT_EQ(Any(1.5), Any(1.5));
   EXPECT_NE(Any(1.5), Any(1.6));
 
-  Any no_eq_operator { no_eq() };
-  EXPECT_NE(no_eq_operator, no_eq_operator); // Since no_eq has the equality operator deleted, Any,
-                                             // by design, always returns FALSE when equality is
-                                             // checked.
+  Any no_eq_operator{ no_eq() };
+  EXPECT_NE(
+    no_eq_operator,
+    no_eq_operator); // Since no_eq has the equality operator deleted, Any,
+                     // by design, always returns FALSE when equality is
+                     // checked.
 
   AnyMap lhs(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   lhs["int"] = 1;
@@ -286,7 +291,7 @@ TEST(AnyTest, AnyEquality) {
   submap["b"] = std::string("b");
   lhs["submap"] = submap;
 
-  AnyMap rhs = lhs; // make a copy of lhs
+  AnyMap rhs = lhs;    // make a copy of lhs
   EXPECT_EQ(lhs, rhs); // they should be equal
 
   rhs["int"] = 2;
@@ -294,6 +299,8 @@ TEST(AnyTest, AnyEquality) {
   rhs["int"] = 1;
   EXPECT_EQ(lhs, rhs); // now they should be equal again
   rhs.erase("int");
-  EXPECT_NE(lhs, rhs); // and finally, with the "int" element erased, they should not be equal
-                       // anymore. 
+  EXPECT_NE(
+    lhs,
+    rhs); // and finally, with the "int" element erased, they should not be equal
+          // anymore.
 }

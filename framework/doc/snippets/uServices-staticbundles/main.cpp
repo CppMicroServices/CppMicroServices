@@ -59,7 +59,7 @@ CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(main)
 #endif
 //! [ImportStaticBundleIntoMain2]
 
-int main(int /*argc*/, char* /*argv*/ [])
+int main(int /*argc*/, char* /*argv*/[])
 {
   std::cout
     << "This snippet is not meant to be executed.\n"

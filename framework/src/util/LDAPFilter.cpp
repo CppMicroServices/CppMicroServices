@@ -110,8 +110,7 @@ bool LDAPFilter::operator==(const LDAPFilter& other) const
   return (this->ToString() == other.ToString());
 }
 
-LDAPFilter& LDAPFilter::operator=(const LDAPFilter& filter)
-= default;
+LDAPFilter& LDAPFilter::operator=(const LDAPFilter& filter) = default;
 
 std::ostream& operator<<(std::ostream& os, const LDAPFilter& filter)
 {

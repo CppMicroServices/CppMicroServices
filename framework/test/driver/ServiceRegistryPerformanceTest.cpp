@@ -261,7 +261,7 @@ void ServiceRegistryPerformanceTest::UnregisterServices()
   regs.clear();
 }
 
-int ServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/ [])
+int ServiceRegistryPerformanceTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceRegistryPerformanceTest")
 

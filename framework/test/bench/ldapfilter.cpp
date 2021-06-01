@@ -1,14 +1,14 @@
 #include <cppmicroservices/AnyMap.h>
-#include <cppmicroservices/LDAPFilter.h>
-#include <cppmicroservices/LDAPProp.h>
 #include <cppmicroservices/BundleContext.h>
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
+#include <cppmicroservices/LDAPFilter.h>
+#include <cppmicroservices/LDAPProp.h>
 
+#include "TestUtils.h"
 #include "benchmark/benchmark.h"
 #include "fooservice.h"
-#include "TestUtils.h"
 
 using namespace cppmicroservices;
 
@@ -28,7 +28,7 @@ static void ConstructNonTrivialFilterFromString(benchmark::State& state)
 
 LDAPFilter GetSimpleLDAPFilter()
 {
-  return LDAPFilter ("(bundle_priority=high)");
+  return LDAPFilter("(bundle_priority=high)");
 }
 
 LDAPFilter GetComplexLDAPFilter()
@@ -39,8 +39,7 @@ LDAPFilter GetComplexLDAPFilter()
   return LDAPFilter(expr);
 }
 
-
-template <class Filter>
+template<class Filter>
 static void MatchFilterWithAnyMap(benchmark::State& state, Filter filter)
 {
   AnyMap props(AnyMap::UNORDERED_MAP);
@@ -72,15 +71,16 @@ struct ScopedFramework
   Framework framework;
 };
 
-template <class Filter>
+template<class Filter>
 static void MatchFilterWithBundle(benchmark::State& state, Filter filter)
 {
   auto framework = FrameworkFactory().NewFramework();
   framework.Start();
   auto context = framework.GetBundleContext();
-  auto bundle  = testing::InstallLib(context, "dummyService");
+  auto bundle = testing::InstallLib(context, "dummyService");
   if (bundle.GetSymbolicName() != "dummyService") {
-    state.SkipWithError("Error: Couldn't find installed bundle with symbolic name 'dummyService'");
+    state.SkipWithError("Error: Couldn't find installed bundle with symbolic "
+                        "name 'dummyService'");
   }
 
   for (auto _ : state) {
@@ -88,25 +88,27 @@ static void MatchFilterWithBundle(benchmark::State& state, Filter filter)
   }
 }
 
-template <class Filter>
-static void MatchFilterWithServiceReference(benchmark::State& state, Filter filter)
+template<class Filter>
+static void MatchFilterWithServiceReference(benchmark::State& state,
+                                            Filter filter)
 {
   using namespace benchmark::test;
-  
+
   // register service with custom properties
   ScopedFramework scopedFramework;
   ServiceProperties props;
-  auto framework           = scopedFramework.framework;
+  auto framework = scopedFramework.framework;
   props["bundle_priority"] = std::string("high");
-  props["bundle_start"]    = std::string("greedy");
-  props["Status"]          = false;
-  auto s1                  = std::make_shared<FooImpl>();
+  props["bundle_start"] = std::string("greedy");
+  props["Status"] = false;
+  auto s1 = std::make_shared<FooImpl>();
   (void)framework.GetBundleContext().RegisterService<Foo>(s1, props);
 
   auto sr = framework.GetBundleContext().GetServiceReference<Foo>();
   // match service reference
   if (!sr) {
-    state.SkipWithError("Error: Couldn't find service reference for interface 'Foo' in the framework.");
+    state.SkipWithError("Error: Couldn't find service reference for interface "
+                        "'Foo' in the framework.");
   }
 
   for (auto _ : state) {
@@ -121,5 +123,9 @@ BENCHMARK_CAPTURE(MatchFilterWithAnyMap, Simple, GetSimpleLDAPFilter());
 BENCHMARK_CAPTURE(MatchFilterWithAnyMap, Complex, GetComplexLDAPFilter());
 BENCHMARK_CAPTURE(MatchFilterWithBundle, Simple, GetSimpleLDAPFilter());
 BENCHMARK_CAPTURE(MatchFilterWithBundle, Complex, GetComplexLDAPFilter());
-BENCHMARK_CAPTURE(MatchFilterWithServiceReference, Simple, GetSimpleLDAPFilter());
-BENCHMARK_CAPTURE(MatchFilterWithServiceReference, Complex, GetComplexLDAPFilter());
+BENCHMARK_CAPTURE(MatchFilterWithServiceReference,
+                  Simple,
+                  GetSimpleLDAPFilter());
+BENCHMARK_CAPTURE(MatchFilterWithServiceReference,
+                  Complex,
+                  GetComplexLDAPFilter());

@@ -44,7 +44,8 @@ TEST(ServiceEventStreamOperatorTest, serviceEventTypeModified)
 
 TEST(ServiceEventStreamOperatorTest, serviceEventTypeModifiedEndMatch)
 {
-  serviceEventOperatorTest(ServiceEvent::SERVICE_MODIFIED_ENDMATCH, "MODIFIED_ENDMATCH");
+  serviceEventOperatorTest(ServiceEvent::SERVICE_MODIFIED_ENDMATCH,
+                           "MODIFIED_ENDMATCH");
 }
 
 TEST(ServiceEventStreamOperatorTest, serviceEventTypeDefault)

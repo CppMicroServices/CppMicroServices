@@ -27,7 +27,7 @@ limitations under the License.
  * sanitizer (using Clang or GCC) or memcheck.
  */
 
-int MemcheckTest(int /*argc*/, char* /*argv*/ [])
+int MemcheckTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("MemcheckTest");
 

@@ -293,14 +293,15 @@ void TestServiceFactoryBundleScopeErrorConditions()
                              "Test for correct framwork event type");
   US_TEST_CONDITION_REQUIRED(fwEvents[0].GetBundle() == context.GetBundle(),
                              "Test for correct framwork event bundle");
-  US_TEST_NO_EXCEPTION_REQUIRED(try {
-    std::rethrow_exception(fwEvents[0].GetThrowable());
-    US_TEST_FAILED_MSG(<< "Exception not thrown");
-  } catch (const ServiceException& exc) {
-    US_TEST_CONDITION_REQUIRED(
-      exc.GetType() == ServiceException::FACTORY_RECURSION,
-      "Test for correct service exception type (recursion)");
-  });
+  US_TEST_NO_EXCEPTION_REQUIRED(
+    try {
+      std::rethrow_exception(fwEvents[0].GetThrowable());
+      US_TEST_FAILED_MSG(<< "Exception not thrown");
+    } catch (const ServiceException& exc) {
+      US_TEST_CONDITION_REQUIRED(
+        exc.GetType() == ServiceException::FACTORY_RECURSION,
+        "Test for correct service exception type (recursion)");
+    });
 #endif
 
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -475,7 +476,7 @@ void TestConcurrentServiceFactory()
 }
 #endif
 
-int ServiceFactoryTest(int /*argc*/, char* /*argv*/ [])
+int ServiceFactoryTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceFactoryTest");
 

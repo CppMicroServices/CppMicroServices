@@ -3,13 +3,13 @@
 
 namespace sample {
 
-void ServiceComponentDynamicGreedyOptionalUnary::Activate(const std::shared_ptr<ComponentContext>& /*ctxt*/)
-{
-}
-  
-void ServiceComponentDynamicGreedyOptionalUnary::Deactivate(const std::shared_ptr<ComponentContext>&)
-{
-}
+void ServiceComponentDynamicGreedyOptionalUnary::Activate(
+  const std::shared_ptr<ComponentContext>& /*ctxt*/)
+{}
+
+void ServiceComponentDynamicGreedyOptionalUnary::Deactivate(
+  const std::shared_ptr<ComponentContext>&)
+{}
 
 std::string ServiceComponentDynamicGreedyOptionalUnary::ExtendedDescription()
 {
@@ -22,7 +22,8 @@ std::string ServiceComponentDynamicGreedyOptionalUnary::ExtendedDescription()
   return result;
 }
 
-void ServiceComponentDynamicGreedyOptionalUnary::Bindfoo(const std::shared_ptr<test::Interface1>& theFoo)
+void ServiceComponentDynamicGreedyOptionalUnary::Bindfoo(
+  const std::shared_ptr<test::Interface1>& theFoo)
 {
   std::lock_guard<std::mutex> lock(fooMutex);
   if (foo != theFoo) {
@@ -30,7 +31,8 @@ void ServiceComponentDynamicGreedyOptionalUnary::Bindfoo(const std::shared_ptr<t
   }
 }
 
-void ServiceComponentDynamicGreedyOptionalUnary::Unbindfoo(const std::shared_ptr<test::Interface1>& theFoo)
+void ServiceComponentDynamicGreedyOptionalUnary::Unbindfoo(
+  const std::shared_ptr<test::Interface1>& theFoo)
 {
   std::lock_guard<std::mutex> lock(fooMutex);
   if (foo == theFoo) {

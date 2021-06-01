@@ -515,7 +515,7 @@ void frameSL25a(const Framework& framework)
   }
 }
 
-int ServiceListenerTest(int /*argc*/, char* /*argv*/ [])
+int ServiceListenerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceListenerTest");
 

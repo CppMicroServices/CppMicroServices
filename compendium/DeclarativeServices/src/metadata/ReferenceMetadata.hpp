@@ -23,16 +23,16 @@
 #ifndef REFERENCEMETADATA_HPP
 #define REFERENCEMETADATA_HPP
 
-#include <string>
-#include <map>
-#include <vector>
 #include <iostream>
+#include <map>
+#include <string>
 #include <tuple>
+#include <vector>
 
+#include "Util.hpp"
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/LDAPFilter.h"
-#include "Util.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -59,8 +59,8 @@ struct ReferenceMetadata
   std::string policy;
   std::string policyOption;
   std::string scope;
-  std::size_t minCardinality{1};
-  std::size_t maxCardinality{1};
+  std::size_t minCardinality{ 1 };
+  std::size_t maxCardinality{ 1 };
 
   static const std::vector<std::string> Cardinalities;
   static const std::vector<std::string> Policies;
@@ -78,7 +78,8 @@ struct ReferenceMetadata
  * @throws std::out_of_range error if @p cardinality is not found in the
  *         global @c ReferenceMetadata::Cardinalities
  */
-std::tuple<std::size_t, std::size_t> GetReferenceCardinalityExtents(const std::string& cardinality);
+std::tuple<std::size_t, std::size_t> GetReferenceCardinalityExtents(
+  const std::string& cardinality);
 
 }
 }

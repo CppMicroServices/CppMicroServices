@@ -36,22 +36,23 @@ public:
   TestStopBundleAActivator() {}
   ~TestStopBundleAActivator() {}
 
-  void Start(BundleContext) { }
+  void Start(BundleContext) {}
 
-  void Stop(BundleContext context) 
+  void Stop(BundleContext context)
   {
     auto bundles = context.GetBundles();
-    auto bundleA = std::find_if(bundles.begin(),
-                                bundles.end(),
-                                [](const cppmicroservices::Bundle& b) { return "TestBundleA" == b.GetSymbolicName(); });
+    auto bundleA = std::find_if(
+      bundles.begin(), bundles.end(), [](const cppmicroservices::Bundle& b) {
+        return "TestBundleA" == b.GetSymbolicName();
+      });
 
-    if (std::end(bundles) != bundleA)
-    {
+    if (std::end(bundles) != bundleA) {
       (*bundleA).Stop();
-    }      
+    }
   }
 };
 
 }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestStopBundleAActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
+  cppmicroservices::TestStopBundleAActivator)

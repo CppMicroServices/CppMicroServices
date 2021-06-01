@@ -23,11 +23,11 @@
 #ifndef __COMPONENTMANAGER_HPP__
 #define __COMPONENTMANAGER_HPP__
 
-#include <memory>
-#include <future>
+#include "../metadata/ComponentMetadata.hpp"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/ServiceFactory.h"
-#include "../metadata/ComponentMetadata.hpp"
+#include <future>
+#include <memory>
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -81,13 +81,15 @@ public:
    * Returns a vector of ComponentConfiguration objects representing each of the configurations
    * created for the component.
    */
-  virtual std::vector<std::shared_ptr<ComponentConfiguration>> GetComponentConfigurations() const = 0;
+  virtual std::vector<std::shared_ptr<ComponentConfiguration>>
+  GetComponentConfigurations() const = 0;
 
   /**
    * Returns the metadata object representing the component description for the
    * component managed by this object.
    */
-  virtual std::shared_ptr<const metadata::ComponentMetadata> GetMetadata() const = 0;
+  virtual std::shared_ptr<const metadata::ComponentMetadata> GetMetadata()
+    const = 0;
 };
 } // scrimpl
 } // cppmicroservices

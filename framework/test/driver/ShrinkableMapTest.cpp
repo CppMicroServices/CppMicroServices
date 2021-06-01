@@ -44,7 +44,7 @@ public:
 
 using namespace cppmicroservices;
 
-int ShrinkableMapTest(int /*argc*/, char* /*argv*/ [])
+int ShrinkableMapTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ShrinkableMapTest");
 

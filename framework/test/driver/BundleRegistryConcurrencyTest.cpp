@@ -49,12 +49,9 @@ std::unique_lock<std::mutex> io_lock()
 inline void InstallTestBundleNoErrorHandling(BundleContext frameworkCtx,
                                              const std::string& bundleName)
 {
-  auto bundles = frameworkCtx.InstallBundles(testing::LIB_PATH
-                              + util::DIR_SEP
-                              + US_LIB_PREFIX
-                              + bundleName
-                              + US_LIB_POSTFIX
-                              + US_LIB_EXT);
+  auto bundles = frameworkCtx.InstallBundles(testing::LIB_PATH + util::DIR_SEP +
+                                             US_LIB_PREFIX + bundleName +
+                                             US_LIB_POSTFIX + US_LIB_EXT);
 
   for (auto& b : bundles) {
     std::unique_lock<std::mutex> lock = io_lock();
@@ -136,15 +133,16 @@ void TestConcurrent(const Framework& f)
     th.join();
   }
 
-  io_lock(), US_TEST_CONDITION(numTestBundles == f.GetBundleContext().GetBundles().size(),
-                    "Test for correct number of installed bundles")
+  io_lock(), US_TEST_CONDITION(numTestBundles ==
+                                 f.GetBundleContext().GetBundles().size(),
+                               "Test for correct number of installed bundles")
 }
 #  endif
 
 } // end anonymous namespace
 #endif
 
-int BundleRegistryConcurrencyTest(int /*argc*/, char* /*argv*/ [])
+int BundleRegistryConcurrencyTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("BundleRegistryConcurrencyTest")
 

@@ -86,7 +86,7 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
     if (jsonComponent.isMember("references")) {
       const auto jsonRefInfos = JsonValueValidator(
         jsonComponent, "references", Json::ValueType::arrayValue)();
-        
+
       std::unordered_map<std::string, std::size_t> duplicateRefs;
       duplicateRefs.reserve(jsonRefInfos.size());
       for (const auto& jsonRefInfo : jsonRefInfos) {
@@ -125,15 +125,16 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
         }
         componentInfo.references.push_back(refInfo);
       }
-        
+
       std::string listOfDuplicateRefNames;
-      for(auto const& dupRef : duplicateRefs) {
-        if(dupRef.second > 1) {
+      for (auto const& dupRef : duplicateRefs) {
+        if (dupRef.second > 1) {
           listOfDuplicateRefNames += dupRef.first + " ";
         }
       }
-      if(!listOfDuplicateRefNames.empty()) {
-        std::string exceptionMessage("Duplicate service reference names found. Reference names must be unique. ");
+      if (!listOfDuplicateRefNames.empty()) {
+        std::string exceptionMessage("Duplicate service reference names found. "
+                                     "Reference names must be unique. ");
         exceptionMessage += "Duplicate names: ";
         exceptionMessage += listOfDuplicateRefNames;
         throw std::invalid_argument(exceptionMessage);

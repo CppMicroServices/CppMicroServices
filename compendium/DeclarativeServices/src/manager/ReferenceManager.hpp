@@ -27,8 +27,8 @@
 #include "cppmicroservices/ServiceTracker.h"
 
 #include "../metadata/ReferenceMetadata.hpp"
-#include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
+#include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -37,11 +37,11 @@ namespace scrimpl {
  */
 enum class RefEvent
 {
-  BECAME_SATISFIED,  /* used to notify the listener that the reference has
+  BECAME_SATISFIED,   /* used to notify the listener that the reference has
                         become satisfied */
-  BECAME_UNSATISFIED,/* used to notify the listener that the reference has
+  BECAME_UNSATISFIED, /* used to notify the listener that the reference has
                         become unsatisfied */
-  REBIND,            /* used to notify the listener that dynamic rebinding
+  REBIND,             /* used to notify the listener that dynamic rebinding
                         needs to happen */
 };
 
@@ -114,18 +114,21 @@ public:
   /**
    * Returns a set of ServiceReferences that are bound to the component.
    */
-  virtual std::set<cppmicroservices::ServiceReferenceBase> GetBoundReferences() const = 0;
+  virtual std::set<cppmicroservices::ServiceReferenceBase> GetBoundReferences()
+    const = 0;
 
   /**
    * Returns a set of ServiceReferences that match the reference criteria but
    * are not bound to the component because the cardinality is not satisfied yet.
    */
-  virtual std::set<cppmicroservices::ServiceReferenceBase> GetTargetReferences() const = 0;
+  virtual std::set<cppmicroservices::ServiceReferenceBase> GetTargetReferences()
+    const = 0;
 
   /**
    * Method is used to receive callbacks when the dependency is satisfied
    */
-  virtual cppmicroservices::ListenerTokenId RegisterListener(std::function<void(const RefChangeNotification&)> notify) = 0;
+  virtual cppmicroservices::ListenerTokenId RegisterListener(
+    std::function<void(const RefChangeNotification&)> notify) = 0;
 
   /**
    * Method is used to remove the callbacks registered using RegisterListener
@@ -136,6 +139,7 @@ public:
    * Method to stop tracking the reference service.
    */
   virtual void StopTracking() = 0;
+
 protected:
   ReferenceManager() = default;
 };

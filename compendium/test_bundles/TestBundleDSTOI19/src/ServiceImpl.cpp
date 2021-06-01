@@ -5,8 +5,7 @@ namespace sample {
 
 std::string ServiceComponent19::ExtendedDescription()
 {
-  if(!foo)
-  {
+  if (!foo) {
     throw std::runtime_error("Dependency not available");
   }
   std::string result(STRINGIZE(US_BUNDLE_NAME));
@@ -15,18 +14,18 @@ std::string ServiceComponent19::ExtendedDescription()
   return result;
 }
 
-void ServiceComponent19::Bindfoo(const std::shared_ptr<test::Interface1>& theFoo)
+void ServiceComponent19::Bindfoo(
+  const std::shared_ptr<test::Interface1>& theFoo)
 {
-  if (foo != theFoo)
-  {
+  if (foo != theFoo) {
     foo = theFoo;
   }
 }
 
-void ServiceComponent19::Unbindfoo(const std::shared_ptr<test::Interface1>& theFoo)
+void ServiceComponent19::Unbindfoo(
+  const std::shared_ptr<test::Interface1>& theFoo)
 {
-  if (foo == theFoo)
-  {
+  if (foo == theFoo) {
     foo = nullptr;
   }
 }

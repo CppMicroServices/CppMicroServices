@@ -53,7 +53,7 @@ typedef std::pair<std::shared_ptr<ComponentInstance>,
   InstanceContextPair;
 struct ListenerToken final
 {
-  ListenerToken(const std::string pid, const ListenerTokenId tokenId)
+  ListenerToken(std::string pid, const ListenerTokenId tokenId)
     : pid(std::move(pid))
     , tokenId(std::move(tokenId))
   {}

@@ -78,7 +78,7 @@ public:
    * @throws std::bad_alloc exception if memory cannot be allocated
    */
   void UpdateMergedProperties(
-    const std::string pid,
+    std::string pid,
     std::shared_ptr<cppmicroservices::AnyMap> props,
     const cppmicroservices::service::cm::ConfigurationEventType type,
     const ComponentState currentState,

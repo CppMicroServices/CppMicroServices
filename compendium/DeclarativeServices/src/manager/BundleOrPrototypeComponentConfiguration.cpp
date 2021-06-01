@@ -86,7 +86,7 @@ bool BundleOrPrototypeComponentConfigurationImpl::
   bool retValue = false;
   for (const auto& valPair : *compInstCtxtPairList) {
     try {
-      retValue = valPair.first->InvokeModifiedMethod();
+      retValue = valPair.first->Modified();
     } catch (...) {
       GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                        "Exception received from user code while modifying "
@@ -95,7 +95,7 @@ bool BundleOrPrototypeComponentConfigurationImpl::
       return false;
     }
   }
-  // InvokeModifiedMethod returns true if the component instance has a Modified method.
+  // Modified returns true if the component instance has a Modified method.
   // Only need to return the value for the last instance because if one of the instances
   // has a Modified method, they all do.
   return retValue;

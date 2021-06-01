@@ -39,16 +39,16 @@ class ComponentConfigurationImpl;
 struct ConfigChangeNotification final
 {
   ConfigChangeNotification(
-    const std::string pid,
+    std::string pid,
     std::shared_ptr<cppmicroservices::AnyMap> properties,
-    const cppmicroservices::service::cm::ConfigurationEventType evt)
+    cppmicroservices::service::cm::ConfigurationEventType evt)
     : pid(std::move(pid))
     , event(std::move(evt))
     , newProperties(properties)
   {}
 
-  const std::string pid;
-  const cppmicroservices::service::cm::ConfigurationEventType event;
+  std::string pid;
+  cppmicroservices::service::cm::ConfigurationEventType event;
   std::shared_ptr<cppmicroservices::AnyMap> newProperties;
 };
 
@@ -86,18 +86,18 @@ public:
    * @throws std::bad_alloc exception if memory cannot be allocated
    */
   cppmicroservices::ListenerTokenId RegisterListener(
-    const std::string& pid,
+    std::string pid,
     std::function<void(const ConfigChangeNotification&)> notify,
     std::shared_ptr<ComponentConfigurationImpl> mgr);
 
   void UnregisterListener(
-    const std::string& pid,
+    std::string pid,
     const cppmicroservices::ListenerTokenId token) noexcept;
 
-  bool AnyListenersForPid(const std::string& pid) noexcept;
+  bool AnyListenersForPid(std::string pid) noexcept;
 
   void NotifyAllListeners(
-    const std::string& pid,
+    std::string pid,
     cppmicroservices::service::cm::ConfigurationEventType type,
     std::shared_ptr<cppmicroservices::AnyMap> properties);
 

@@ -48,7 +48,7 @@ ConfigurationNotifier::ConfigurationNotifier(
 }
 
 cppmicroservices::ListenerTokenId ConfigurationNotifier::RegisterListener(
-  const std::string& pid,
+  std::string pid,
   std::function<void(const ConfigChangeNotification&)> notify,
   std::shared_ptr<ComponentConfigurationImpl> mgr)
 {
@@ -72,7 +72,7 @@ cppmicroservices::ListenerTokenId ConfigurationNotifier::RegisterListener(
 }
 
 void ConfigurationNotifier::UnregisterListener(
-  const std::string& pid,
+  std::string pid,
   const cppmicroservices::ListenerTokenId token) noexcept
 {
   auto listenersMapHandle = listenersMap.lock();
@@ -96,7 +96,7 @@ void ConfigurationNotifier::UnregisterListener(
     }
   }
 }
-bool ConfigurationNotifier::AnyListenersForPid(const std::string& pid) noexcept
+bool ConfigurationNotifier::AnyListenersForPid(std::string pid) noexcept
 {
   std::string factoryName;
   std::shared_ptr<ComponentConfigurationImpl> mgr;
@@ -139,7 +139,7 @@ bool ConfigurationNotifier::AnyListenersForPid(const std::string& pid) noexcept
 }
 void ConfigurationNotifier::CreateFactoryComponent(
   const std::string factoryName,
-  const std::string pid,
+  std::string pid,
   const std::shared_ptr<ComponentConfigurationImpl> mgr)
 {
   auto oldMetadata = mgr->GetMetadata();
@@ -190,7 +190,7 @@ void ConfigurationNotifier::CreateFactoryComponent(
 }
 
 void ConfigurationNotifier::NotifyAllListeners(
-  const std::string& pid,
+  std::string pid,
   cppmicroservices::service::cm::ConfigurationEventType type,
   std::shared_ptr<cppmicroservices::AnyMap> properties)
 {

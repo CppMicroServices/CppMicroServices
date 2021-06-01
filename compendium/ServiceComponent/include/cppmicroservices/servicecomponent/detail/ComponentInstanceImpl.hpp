@@ -153,8 +153,13 @@ public:
   void Activate() override { DoActivate(mContext); };
 
   void Deactivate() override { DoDeactivate(mContext); };
-
-  bool InvokeModifiedMethod() override { return DoModified(mContext); };
+  
+  /**
+   * This method is called by the runtime while the component configuration is active when
+   * the configuration properties are modified. Returns false if the component instance has not 
+   * provided a Modified method.
+   */
+  bool Modified() override { return DoModified(mContext); };
 
   void InvokeBindMethod(
     const std::string& refName,
@@ -222,7 +227,7 @@ public:
    * This method is used if the component implementation class provides an Activate method.
    */
   template<class Impl = T,
-           class THasActivateMethod = typename std::enable_if<
+           class HasActivateMethod = typename std::enable_if<
              HasActivate<Impl, void, const std::shared_ptr<ComponentContext>&>::
                value>::type>
   void DoActivate(const std::shared_ptr<ComponentContext>& ctxt)
@@ -240,7 +245,7 @@ public:
    * This method is used if the component implementation class provides a Modified method.
    */
   template<class Impl = T,
-           class THasModifiedMethod = typename std::enable_if<HasModified<
+           class HasModifiedMethod = typename std::enable_if<HasModified<
              Impl,
              void,
              const std::shared_ptr<ComponentContext>&,
@@ -266,7 +271,7 @@ public:
    */
   template<
     class Impl = T,
-    class THasDeactivateMethod = typename std::enable_if<
+    class HasDeactivateMethod = typename std::enable_if<
       HasDeactivate<Impl, void, const std::shared_ptr<ComponentContext>&>::
         value>::type>
   void DoDeactivate(const std::shared_ptr<ComponentContext>& ctxt)
@@ -339,7 +344,7 @@ public:
     class C = T,
     class I = Injection,
     class InjectionFalse = typename std::enable_if<I::value == false>::type,
-    class TIsDefaultConstructible = typename std::enable_if<
+    class IsDefaultConstructible = typename std::enable_if<
       std::is_default_constructible<C>::value == true>::type>
   std::shared_ptr<T> DoCreate(bool)
   {
@@ -351,7 +356,7 @@ public:
     class C = T,
     class I = Injection,
     class InjectionFalse = typename std::enable_if<I::value == false>::type,
-    class THasConfigConstructor = typename std::enable_if<
+    class HasConfigConstructor = typename std::enable_if<
       std::is_constructible<
         C,
         const std::shared_ptr<cppmicroservices::AnyMap>&>::value == true>::type>
@@ -367,9 +372,9 @@ public:
     class C = T,
     class I = Injection,
     class InjectionFalse = typename std::enable_if<I::value == false>::type,
-    class THasNoDefaultConstructor = typename std::enable_if<
+    class HasNoDefaultConstructor = typename std::enable_if<
       std::is_default_constructible<C>::value == false>::type,
-    class THasNoConfigConstructor = typename std::enable_if<
+    class HasNoConfigConstructor = typename std::enable_if<
       std::is_constructible<C,
                             const std::shared_ptr<cppmicroservices::AnyMap>&>::
         value == false>::type>
@@ -389,10 +394,10 @@ public:
     class C = T,
     class I = Injection,
     class InjectionTrue = typename std::enable_if<I::value == true>::type,
-    class THasNoConstructorWithReferences = typename std::enable_if<
+    class HasNoConstructorWithReferences = typename std::enable_if<
       std::is_constructible<C, const std::shared_ptr<CtorInjectedRefs>&...>::
         value == false>::type,
-    class THasNoConstructorWithRefAndConfig = typename std::enable_if<
+    class HasNoConstructorWithRefAndConfig = typename std::enable_if<
       std::is_constructible<
         C,
         const std::shared_ptr<cppmicroservices::AnyMap>&,
@@ -413,7 +418,7 @@ public:
     class C = T,
     class I = Injection,
     class InjectionTrue = typename std::enable_if<I::value == true>::type,
-    class THasConstructorWithReferences = typename std::enable_if<
+    class HasConstructorWithReferences = typename std::enable_if<
       std::is_constructible<C, const std::shared_ptr<CtorInjectedRefs>&...>::
         value>::type>
   std::shared_ptr<T> DoCreate(bool& injected)
@@ -436,7 +441,7 @@ public:
     class C = T,
     class I = Injection,
     class InjectionTrue = typename std::enable_if<I::value == true>::type,
-    class THasConstructorWithRefAndConfig =
+    class HasConstructorWithRefAndConfig =
       typename std::enable_if<std::is_constructible<
         C,
         const std::shared_ptr<cppmicroservices::AnyMap>&,

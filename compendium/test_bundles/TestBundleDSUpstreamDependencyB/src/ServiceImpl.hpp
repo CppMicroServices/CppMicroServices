@@ -15,7 +15,7 @@ public:
   TestBundleDSUpstreamDependencyImpl();
   ~TestBundleDSUpstreamDependencyImpl() override;
 
-  void Activate(const std::shared_ptr<ComponentContext>& context)
+  void Activate(const std::shared_ptr<ComponentContext>&)
   {
     throw std::runtime_error(
       "Failed to create TestBundleDSUpstreamDepdencyImpl");

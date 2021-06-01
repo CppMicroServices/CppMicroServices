@@ -19,13 +19,14 @@ public:
       "testbundledsupstreamdependency");
   }
 
-  void Deactivate(const std::shared_ptr<ComponentContext>& context) {}
+  void Deactivate(const std::shared_ptr<ComponentContext>&) {}
 
   void Bindtestbundledsupstreamdependency(
-    const std::shared_ptr<test::TestBundleDSUpstreamDependency>& obj)
+    const std::shared_ptr<test::TestBundleDSUpstreamDependency>&)
   {}
+
   void Unbindtestbundledsupstreamdependency(
-    const std::shared_ptr<test::TestBundleDSUpstreamDependency>& obj)
+    const std::shared_ptr<test::TestBundleDSUpstreamDependency>&)
   {}
 
 private:

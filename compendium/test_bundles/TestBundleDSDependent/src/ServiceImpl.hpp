@@ -14,6 +14,10 @@ public:
     const std::shared_ptr<test::TestBundleDSUpstreamDependency>&);
   ~TestBundleDSDependentImpl() override;
 
+  void Activate(const std::shared_ptr<ComponentContext>&) {}
+
+  void Deactivate(const std::shared_ptr<ComponentContext>&) {}
+
 private:
   std::shared_ptr<test::TestBundleDSUpstreamDependency> ref;
 };

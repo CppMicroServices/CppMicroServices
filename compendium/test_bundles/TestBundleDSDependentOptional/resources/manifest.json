@@ -1,12 +1,11 @@
 {
-    "bundle.symbolic_name": "TestBundleDSDependentNoInject",
-    "bundle.name": "TestBundleDSDependentNoInject",
+    "bundle.symbolic_name": "TestBundleDSDependentOptional",
+    "bundle.name": "TestBundleDSDependentOptional",
     "scr": {
         "version": 1,
         "components": [
             {
-                "inject-references": false,
-                "implementation-class": "dependent::TestBundleDSDependentNoInjectImpl",
+                "implementation-class": "dependent::TestBundleDSDependentOptionalImpl",
                 "service": {
                     "interfaces": [
                         "test::TestBundleDSDependent"
@@ -14,7 +13,7 @@
                 },
                 "references": [
                     {
-                        "cardinality": "1..1",
+                        "cardinality": "0..1",
                         "name": "testbundledsupstreamdependency",
                         "interface": "test::TestBundleDSUpstreamDependency"
                     }

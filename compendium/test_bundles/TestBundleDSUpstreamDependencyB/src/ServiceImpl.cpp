@@ -3,7 +3,8 @@
 #include <stdexcept>
 
 namespace dependent {
-TestBundleDSUpstreamDependencyImpl::TestBundleDSUpstreamDependencyImpl() {}
+TestBundleDSUpstreamDependencyImpl::TestBundleDSUpstreamDependencyImpl() =
+  default;
 
 TestBundleDSUpstreamDependencyImpl::~TestBundleDSUpstreamDependencyImpl() =
   default;

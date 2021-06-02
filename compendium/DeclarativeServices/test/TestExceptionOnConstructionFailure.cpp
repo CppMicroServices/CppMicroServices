@@ -76,6 +76,10 @@ INSTANTIATE_TEST_SUITE_P(
     std::make_pair(std::string("TestBundleDSDependent"),
                    std::string("TestBundleDSUpstreamDependencyB")),
     std::make_pair(std::string("TestBundleDSDependentNoInject"),
+                   std::string("TestBundleDSUpstreamDependencyB")),
+    std::make_pair(std::string("TestBundleDSDependentOptional"),
+                   std::string("TestBundleDSUpstreamDependencyA")),
+    std::make_pair(std::string("TestBundleDSDependentOptional"),
                    std::string("TestBundleDSUpstreamDependencyB"))));
 
 TEST_P(FailedBoundServiceActivationTest,
@@ -91,9 +95,15 @@ TEST_P(FailedBoundServiceActivationTest,
   auto sDepRef = ctx.GetServiceReference<test::TestBundleDSDependent>();
   auto depService = ctx.GetService<test::TestBundleDSDependent>(sDepRef);
 
-  // The dependent service should be null since the upstream dependency failed
-  // to construct
-  EXPECT_EQ(depService, nullptr);
+  if (params.first == "TestBundleDSDependentOptional") {
+    // The dependent service should not be null since the cardinality of
+    // TestBundleDSDependentOptional's cardinality for its reference is 0..1
+    EXPECT_NE(depService, nullptr);
+  } else {
+    // The dependent service should be null since the upstream dependency failed
+    // to construct
+    EXPECT_EQ(depService, nullptr);
+  }
 
   auto sUpstreamRef =
     ctx.GetServiceReference<test::TestBundleDSUpstreamDependency>();
@@ -121,10 +131,18 @@ TEST_P(FailedBoundServiceActivationTest,
   const auto& satisfiedRefs = configDTO[0].satisfiedReferences;
   EXPECT_EQ(satisfiedRefs.size(), 1);
 
-  // The state of the bundle should be UNSATISFIED_REFERENCE since the sole dependency
-  // of the service failed to construct
-  EXPECT_EQ(configDTO[0].state,
-            cppmicroservices::service::component::runtime::dto::ComponentState::
-              SATISFIED);
+  if (params.first == "TestBundleDSDependentOptional") {
+    // The state of the bundle should be ACTIVE since the sole dependency
+    // of the service failed to construct but the cardinality is 0..1
+    EXPECT_EQ(configDTO[0].state,
+              cppmicroservices::service::component::runtime::dto::
+                ComponentState::ACTIVE);
+  } else {
+    // The state of the bundle should be SATISFIED since the sole dependency
+    // of the service failed to construct and the cardinality is 1..1
+    EXPECT_EQ(configDTO[0].state,
+              cppmicroservices::service::component::runtime::dto::
+                ComponentState::SATISFIED);
+  }
 }
 }

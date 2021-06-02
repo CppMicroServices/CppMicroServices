@@ -354,42 +354,6 @@ inline std::shared_ptr<void> ExtractInterface(const InterfaceMapConstPtr& map,
   return nullptr;
 }
 
-/**
- * @ingroup MicroServices
- * @ingroup gr_serviceinterface
- *
- * Extract a service interface pointer from a given InterfaceMap instance.
- *
- * @param map a InterfaceMap instance.
- * @param interfaceId The interface id string.
- * @param nullDueToFailure a boolean which represents if the return value was in or not in the map
- * @return The service interface pointer for the service interface id or
- *         \c nullptr if \c map does not contain an entry for the given type.
- *
- * @see ExtractInterface(const InterfaceMapConstPtr&)
- */
-inline std::shared_ptr<void> ExtractInterface(const InterfaceMapConstPtr& map,
-                                              const std::string& interfaceId,
-                                              bool& nullDueToFailure)
-{
-  if (!map) {
-    nullDueToFailure = true;
-    return nullptr;
-  }
-
-  if (interfaceId.empty() && map && !map->empty()) {
-    nullDueToFailure = true;
-    return map->begin()->second;
-  }
-
-  auto iter = map->find(interfaceId);
-  if (iter != map->end()) {
-    nullDueToFailure = true;
-    return iter->second;
-  }
-  return nullptr;
-}
-
 ///@{
 /**
  * @ingroup MicroServices

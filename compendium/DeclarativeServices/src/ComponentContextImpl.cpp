@@ -173,7 +173,6 @@ std::string ExtractCardinalityForComponent(const std::string& name,
       auto componentMap = cppmicroservices::ref_any_cast<AnyMap>(comp);
       auto references = cppmicroservices::ref_any_cast<std::vector<Any>>(
         componentMap.AtCompoundKey("references"));
-      bool foundReference = false;
       // Loop over all reference objects in the references array
       for (auto ref : references) {
         auto referenceMap = cppmicroservices::ref_any_cast<AnyMap>(ref);

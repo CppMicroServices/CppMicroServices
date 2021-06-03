@@ -208,8 +208,12 @@ public:
   void RemoveFromBoundServicesCache(
     const std::string& refName,
     const cppmicroservices::ServiceReferenceBase& sRef);
+  
+  void SetModifiedMethodExists() { modifiedMethodExists = true; }
 
-private:
+  bool DoesModifiedMethodExist() { return modifiedMethodExists; }
+
+  private:
   /**
    * Returns the Id of the bundle containing the component
    *
@@ -225,6 +229,7 @@ private:
     std::unordered_map<std::string,
                        std::vector<cppmicroservices::InterfaceMapConstPtr>>>
     boundServicesCache;
+  bool modifiedMethodExists;
 };
 }
 }

@@ -71,7 +71,7 @@ public:
    * This method is called by the runtime when configuration objects change to 
    * notify the component instance of the configuration changes. .
    */
-  virtual bool Modified() = 0;
+  virtual void Modified() = 0;
   /**
    * This method is called by the runtime to bind a reference with dynamic policy
    */

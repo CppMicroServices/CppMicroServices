@@ -259,7 +259,7 @@ public:
   MOCK_METHOD0(UnbindReferences, void(void));
   MOCK_METHOD0(Activate, void(void));
   MOCK_METHOD0(Deactivate, void(void));
-  MOCK_METHOD0(Modified, bool(void));
+  MOCK_METHOD0(Modified, void(void));
   MOCK_METHOD2(InvokeUnbindMethod,
                void(const std::string&,
                     const cppmicroservices::ServiceReferenceBase&));

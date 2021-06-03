@@ -31,6 +31,7 @@
 
 #include "ComponentInstance.hpp"
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
+#include "../../../../../DeclarativeServices/src/ComponentContextImpl.hpp"
 
 #include "Binders.hpp"
 #include "cppmicroservices/AnyMap.h"
@@ -39,6 +40,7 @@ namespace cppmicroservices {
 namespace service {
 namespace component {
 namespace detail {
+using cppmicroservices::scrimpl::ComponentContextImpl;
 
 /**
  * Util class to detect if a class has a method named Activate
@@ -159,7 +161,7 @@ public:
    * the configuration properties are modified. Returns false if the component instance has not 
    * provided a Modified method.
    */
-  bool Modified() override { return DoModified(mContext); };
+  void Modified() override { DoModified(mContext); };
 
   void InvokeBindMethod(
     const std::string& refName,
@@ -235,6 +237,26 @@ public:
     mServiceImpl->Activate(ctxt);
   }
 
+  template<typename... A>
+  bool DoesModifiedMethodExist(A...)
+  {
+    return false; // no modified method available
+  }
+
+  /**
+   */
+  template<class Impl = T,
+           class HasModifiedMethod = typename std::enable_if<HasModified<
+             Impl,
+             void,
+             const std::shared_ptr<ComponentContext>&,
+             const std::shared_ptr<cppmicroservices::AnyMap>&>::value>::type>
+  bool DoesModifiedMethodExist(const std::shared_ptr<ComponentContext>& ctxt)
+  {
+    auto ctxtImpl = std::dynamic_pointer_cast<ComponentContextImpl>(ctxt);
+    ctxtImpl->SetModifiedMethodExists();
+    return true;
+  }
   template<typename... A>
   bool DoModified(A...)
   {
@@ -318,6 +340,10 @@ public:
     for (auto& binder : this->refBinders) {
       binder->Bind(ctxt, this->mServiceImpl);
     }
+    // Check to see if the component instance has a Modified method. If 
+    // so it will set the modifiedMethodExists member variable in the 
+    // ComponentContext to true.
+    DoesModifiedMethodExist(ctxt);
   }
 
   void UnbindReferences() override

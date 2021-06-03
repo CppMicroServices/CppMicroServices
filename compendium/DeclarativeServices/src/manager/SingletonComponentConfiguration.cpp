@@ -101,7 +101,12 @@ bool SingletonComponentConfigurationImpl::ModifyComponentInstanceProperties()
   auto instanceContextPair = data.lock();
   if (instanceContextPair->first) {
     try {
-      return instanceContextPair->first->Modified();
+      auto ctxt = instanceContextPair->second;
+      if (ctxt->DoesModifiedMethodExist()) {
+        instanceContextPair->first->Modified();
+        return true;
+      }
+      return false;
     } catch (...) {
       GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                        "Exception received from user code while modifying "

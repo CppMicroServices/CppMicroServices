@@ -86,7 +86,10 @@ bool BundleOrPrototypeComponentConfigurationImpl::
   bool retValue = false;
   for (const auto& valPair : *compInstCtxtPairList) {
     try {
-      retValue = valPair.first->Modified();
+      if (valPair.second->DoesModifiedMethodExist()) {
+        valPair.first->Modified();
+        retValue = true;
+      }
     } catch (...) {
       GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                        "Exception received from user code while modifying "

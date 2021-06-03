@@ -195,7 +195,7 @@ void ComponentConfigurationImpl::Initialize()
       }
       configManager->Initialize();
       if (referenceManagers.empty() &&
-          configManager->IsConfigSatisfied(GetState()->GetValue())) {
+          configManager->IsConfigSatisfied()) {
         GetState()->Register(*this);
       }
     }
@@ -234,7 +234,6 @@ void ComponentConfigurationImpl::ConfigChangedState(
   configManager->UpdateMergedProperties(notification.pid,
                                         notification.newProperties,
                                         notification.event,
-                                        GetState()->GetValue(),
                                         configWasSatisfied,
                                         configNowSatisfied);
 
@@ -243,7 +242,7 @@ void ComponentConfigurationImpl::ConfigChangedState(
     if (!Modified()) {
       //The Component does not have a Modified method so the component instance
       //has been deactivated.
-      if (configManager->IsConfigSatisfied(GetState()->GetValue()) &&
+      if (configManager->IsConfigSatisfied() &&
           AreReferencesSatisfied()) {
         Register();
         return;
@@ -339,7 +338,7 @@ void ComponentConfigurationImpl::RefSatisfied(const std::string& refName)
                                      referenceManagers.end(),
                                      SatisfiedFunctor(refName));
   if (configManager != nullptr) {
-    if (!configManager->IsConfigSatisfied(GetState()->GetValue())) {
+    if (!configManager->IsConfigSatisfied()) {
       return;
     }
   }

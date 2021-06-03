@@ -46,7 +46,7 @@ public:
    * @throws std::invalid_argument exception if any of the params is a nullptr 
    */
   ConfigurationManager(
-    std::shared_ptr<const metadata::ComponentMetadata> metadata,
+    const std::shared_ptr<const metadata::ComponentMetadata>& metadata,
     const cppmicroservices::BundleContext& bc,
     std::shared_ptr<cppmicroservices::logservice::LogService> logger);
   ConfigurationManager(const ConfigurationManager&) = delete;
@@ -69,7 +69,7 @@ public:
    * the configuration object is available and on the configuration-policy (ignore, optional,
    * require)
    */
-  bool IsConfigSatisfied(const ComponentState currentState) const noexcept;
+  bool IsConfigSatisfied() const noexcept;
 
   /**
    * If the component has configuration object dependencies then the properties for
@@ -78,10 +78,9 @@ public:
    * @throws std::bad_alloc exception if memory cannot be allocated
    */
   void UpdateMergedProperties(
-    std::string pid,
+    const std::string& pid,
     std::shared_ptr<cppmicroservices::AnyMap> props,
-    const cppmicroservices::service::cm::ConfigurationEventType type,
-    const ComponentState currentState,
+    const cppmicroservices::service::cm::ConfigurationEventType& type,
     bool& configWasSatisfied,
     bool& configIsNowSatisfied);
 
@@ -92,7 +91,7 @@ public:
   cppmicroservices::AnyMap GetProperties() const noexcept;
 
 private:
-  bool isConfigSatisfied(const ComponentState currentState) const noexcept;
+  bool isConfigSatisfied() const noexcept;
 
   std::shared_ptr<cppmicroservices::logservice::LogService>
     logger; ///< logger for this runtime

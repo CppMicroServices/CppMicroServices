@@ -86,25 +86,25 @@ public:
    * @throws std::bad_alloc exception if memory cannot be allocated
    */
   cppmicroservices::ListenerTokenId RegisterListener(
-    std::string pid,
+    const std::string& pid,
     std::function<void(const ConfigChangeNotification&)> notify,
-    std::shared_ptr<ComponentConfigurationImpl> mgr);
+    std::shared_ptr<ComponentConfigurationImpl>& mgr);
 
   void UnregisterListener(
-    std::string pid,
+    const std::string& pid,
     const cppmicroservices::ListenerTokenId token) noexcept;
 
-  bool AnyListenersForPid(std::string pid) noexcept;
+  bool AnyListenersForPid(const std::string& pid) noexcept;
 
   void NotifyAllListeners(
-    std::string pid,
+    const std::string& pid,
     cppmicroservices::service::cm::ConfigurationEventType type,
     std::shared_ptr<cppmicroservices::AnyMap> properties);
 
 private:
-  void CreateFactoryComponent(std::string factoryName,
-                              std::string pid,
-                              std::shared_ptr<ComponentConfigurationImpl> mgr);
+  void CreateFactoryComponent(const std::string& factoryName,
+                              const std::string& pid,
+                              std::shared_ptr<ComponentConfigurationImpl>& mgr);
 
   using TokenMap = std::unordered_map<ListenerTokenId, Listener>;
 

@@ -21,7 +21,6 @@
 =============================================================================*/
 #include "ManifestParserImpl.hpp"
 #include "Util.hpp"
-#include <iostream>
 
 #include <unordered_map>
 

@@ -30,7 +30,7 @@ using cppmicroservices::service::component::ComponentConstants::
 namespace cppmicroservices {
 namespace scrimpl {
 ConfigurationManager::ConfigurationManager(
-  const std::shared_ptr<const metadata::ComponentMetadata> metadata,
+  const std::shared_ptr<const metadata::ComponentMetadata>& metadata,
   const cppmicroservices::BundleContext& bc,
   std::shared_ptr<cppmicroservices::logservice::LogService> logger)
   : logger(std::move(logger))
@@ -89,15 +89,14 @@ void ConfigurationManager::Initialize()
 }
 
 void ConfigurationManager::UpdateMergedProperties(
-  std::string pid,
+  const std::string& pid,
   std::shared_ptr<cppmicroservices::AnyMap> props,
-  const cppmicroservices::service::cm::ConfigurationEventType type,
-  const ComponentState currentState,
+  const cppmicroservices::service::cm::ConfigurationEventType& type,
   bool& configWasSatisfied,
   bool& configNowSatisfied)
 {
   std::lock_guard<std::mutex> lock(propertiesMutex);
-  configWasSatisfied = isConfigSatisfied(currentState);
+  configWasSatisfied = isConfigSatisfied();
 
   // delete properties for this pid or replace with new properties in configProperties
 
@@ -126,22 +125,20 @@ void ConfigurationManager::UpdateMergedProperties(
     }
   }
 
-  configNowSatisfied = isConfigSatisfied(currentState);
+  configNowSatisfied = isConfigSatisfied();
 }
 
 /**
    * Returns \c true if the configuration dependencies are satisfied, \c false otherwise
    */
-bool ConfigurationManager::IsConfigSatisfied(
-  const ComponentState currentState) const noexcept
+bool ConfigurationManager::IsConfigSatisfied() const noexcept
 {
   std::lock_guard<std::mutex> lock(propertiesMutex);
 
-  return isConfigSatisfied(currentState);
+  return isConfigSatisfied();
 }
 
-bool ConfigurationManager::isConfigSatisfied(
-  const ComponentState /*currentState*/) const noexcept
+bool ConfigurationManager::isConfigSatisfied() const noexcept
 {
   bool allConfigsAvailable =
     configProperties.size() >= metadata->configurationPids.size();

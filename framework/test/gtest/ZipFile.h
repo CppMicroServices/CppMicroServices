@@ -24,6 +24,8 @@ limitations under the License.
 
 #include <cstring>
 #include <vector>
+#include <string>
+#include "gtest/gtest.h"
 
 /*
 * @brief Struct which represents an entry in the zip archive.

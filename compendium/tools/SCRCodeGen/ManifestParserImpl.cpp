@@ -64,10 +64,12 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
       codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE;
     if (jsonComponent.isMember("configuration-policy")) {
       configPolicy = true;
+      JsonValueValidator::ValidChoices<3> policyChoices = {
+        { "require", "optional", "ignore" }
+      };
       componentInfo.configurationPolicy =
-        JsonValueValidator(
-          jsonComponent, "configuration-policy", Json::ValueType::stringValue)
-          .GetString();
+       JsonValueValidator(
+          jsonComponent, "configuration-policy", policyChoices).GetString();
     }
     if (jsonComponent.isMember("configuration-pid")) {
       configPid = true;
@@ -78,7 +80,7 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
       for (const auto& pid : configurationPids) {
         if (duplicatePids.find(pid.asString()) != duplicatePids.end()) {
           std::string msg = "configuration-pid error in the manifest. "
-                            "Duplicate pid detected. ";
+                            "Duplicate pid detected.";
           msg.append(pid.asString());
           throw std::runtime_error(msg);
         }
@@ -95,6 +97,13 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
         "present in the manifest.json file to participate in Configuration "
         "Admin.");
     }
+    // factory
+     if (jsonComponent.isMember("factory")) {
+      auto factoryComponentID =
+        JsonValueValidator(
+          jsonComponent, "factory", Json::ValueType::stringValue)
+          .GetString();
+     }
 
     // service
     if (jsonComponent.isMember("service")) {

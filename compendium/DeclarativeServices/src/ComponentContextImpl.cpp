@@ -29,8 +29,6 @@
 #include "manager/RegistrationManager.hpp"
 
 #include <cassert>
-#include <cppmicroservices/Any.h>
-#include <cppmicroservices/AnyMap.h>
 #include <cppmicroservices/ServiceObjects.h>
 #include <cppmicroservices/servicecomponent/ComponentException.hpp>
 
@@ -107,122 +105,116 @@ ComponentContextImpl::GetProperties() const
 }
 
 /**
- * Returns a service interface pointer from a given InterfaceMap instance.
+ * The ServiceInterfacePointerLookupInfo struct is used to pass back
+ * the shared_ptr from GetInterfacePointer in addition to a boolean
+ * which is used to determine whether or not the pointer was retrieved
+ * from the map or if the map is null.
  * 
- * This function uses a reference parameter (boolean) to determine whether or not
- * a nullptr returned from ExtractInterface is due to a construction/activation
- * failure or because the information passed to the function is garbage.
+ * wasFoundInMapOrMapEmpty:
+ *   - true, if the service pointer was in the map
+ *       or if the map if null (service can be either
+ *       valid or a nullptr)
+*    - false if the service pointer was not found
+ *       in the map (implies service is nullptr)
+ */
+struct ServiceInterfacePointerLookupInfo
+{
+  std::shared_ptr<void> service;
+  bool wasFoundInMapOrMapEmpty;
+};
+
+/**
+ * Returns a struct with the service interface pointer and a boolean which
+ * represents whether or not the pointer was found in the map or if the map is null.
+ * 
+ * The boolean will be true if a valid entry in the map was found or if the map is null.
+ * 
+ * The boolean will be false if no valid entry was found in the map.
  * 
  * This function has a similar implementation to ExtractService except it uses
- * a boolean to keep track of whether or not the returned service interface
- * pointer is null due to an error during construction or activation
+ * a struct return value to pass back the service pointer and the boolean described above.
  *
  * - map, a InterfaceMap instance.
  * - interfaceId, The interface id string.
- * - isSIPointerFoundOrMapEmpty, a boolean which represents if the return value was in the map
- *     or the map is nullptr
- * - return value: The service interface pointer for the service interface id or
- *                 nullptr if "map" does not contain an entry for the given type.
+ * - return value: The struct containing the service interface pointer and a boolean
+ *                 (as described above).
  */
-static std::shared_ptr<void> GetInterfacePointerAndCheckError(
+static ServiceInterfacePointerLookupInfo GetInterfacePointer(
   const InterfaceMapConstPtr& map,
-  const std::string& interfaceId,
-  bool& isSIPointerFoundOrMapEmpty)
+  const std::string& interfaceId)
 {
-  isSIPointerFoundOrMapEmpty = false;
+  ServiceInterfacePointerLookupInfo lookupInfo{};
 
   if (!map) {
-    isSIPointerFoundOrMapEmpty = true;
-    return nullptr;
+    lookupInfo.wasFoundInMapOrMapEmpty = true;
+    lookupInfo.service = nullptr;
+    return lookupInfo;
   }
 
   if (interfaceId.empty() && map && !map->empty()) {
-    isSIPointerFoundOrMapEmpty = true;
-    return map->begin()->second;
+    lookupInfo.wasFoundInMapOrMapEmpty = true;
+    lookupInfo.service = map->begin()->second;
+    return lookupInfo;
   }
 
   auto iter = map->find(interfaceId);
   if (iter != map->end()) {
-    isSIPointerFoundOrMapEmpty = true;
-    return iter->second;
+    lookupInfo.wasFoundInMapOrMapEmpty = true;
+    lookupInfo.service = iter->second;
+    return lookupInfo;
   }
 
-  return nullptr;
+  return lookupInfo;
 }
 
-/*
-  This function gets the cardinality of the specified component name from
-  the headers in the manifest file.
-
-  If the headers of the manifest from the client bundle does not have a "scr"
-  component or any of the required sub-components, an empty string is returned.
-
-  If the specific component name is found in the references section, it returns
-  the cardinality.
-
-  If the specific component name cannot be found, it returns an empty string.
-*/
-std::string ExtractCardinalityForComponent(const std::string& name,
-                                           const AnyMap& headers)
+/**
+ * This function gets the cardinality of the specified component name.
+ * 
+ * If the specific component name cannot be found, it returns an empty string. 
+ */
+std::string ExtractCardinalityForComponent(
+  const std::string& name,
+  const std::shared_ptr<ComponentConfiguration> configManagerPtr)
 {
-  try {
-    auto components = cppmicroservices::ref_any_cast<std::vector<Any>>(
-      headers.AtCompoundKey("scr.components"));
-    // Loop over all component objects in the components array
-    for (auto comp : components) {
-      auto componentMap = cppmicroservices::ref_any_cast<AnyMap>(comp);
-      auto references = cppmicroservices::ref_any_cast<std::vector<Any>>(
-        componentMap.AtCompoundKey("references"));
-      // Loop over all reference objects in the references array
-      for (auto ref : references) {
-        auto referenceMap = cppmicroservices::ref_any_cast<AnyMap>(ref);
-        // Get the name of the component
-        auto refName = cppmicroservices::ref_any_cast<std::string>(
-          referenceMap.AtCompoundKey("name"));
-        // If the name passed to LocateService (and indirectly ExtractCardinalityForComponent)
-        // matches the reference name, return the cardinality string
-        if (refName == name) {
-          return cppmicroservices::ref_any_cast<std::string>(
-            referenceMap.AtCompoundKey("cardinality"));
-        }
-      }
+  auto configManagerImplPtr =
+    std::reinterpret_pointer_cast<ComponentConfigurationImpl>(configManagerPtr);
+
+  auto metadata = configManagerImplPtr->GetMetadata();
+  for (const auto& _data : metadata->refsMetadata) {
+    if (_data.name == name) {
+      return _data.cardinality;
     }
-  } catch (...) { // Catch all if any of the keys cannot be found in the map
-    return "";
   }
 
-  return "";
+  return {};
 }
 
-/*
-  ValidateExtractedService is the error-checking mechanism for LocateService and LocateServices.
-
-  ValidateExtractedService is ran if a nullptr was returned from GetInterfacePointerAndCheckError and
-  it was a nullptr that was found in the map.
-
-  If the cardinality of the service is mandatory (1..1, 1..n), a ComponentException
-  is thrown.
-*/
+/**
+ * ValidateExtractedService is the error-checking mechanism for LocateService and LocateServices. 
+ * 
+ * ValidateExtractedService is ran if a nullptr was returned from GetInterfacePointer and 
+ * it was a nullptr that was found in the map.
+ * 
+ * If the cardinality of the service is mandatory (1..1, 1..n), a ComponentException
+ * is thrown, otherwise nothing occurs.
+ */
 void ValidateExtractedService(
-  const std::shared_ptr<cppmicroservices::scrimpl::ComponentConfiguration>
-    configManagerPtr,
+  const std::shared_ptr<ComponentConfiguration> configManagerPtr,
   const std::string& name,
   const std::string& type,
-  const std::shared_ptr<void>& service,
-  bool isSIPointerFoundOrMapEmpty)
+  const ServiceInterfacePointerLookupInfo& lookupInfo)
 {
-  auto bundle = configManagerPtr->GetBundle();
-  const auto& headers = bundle.GetHeaders();
-
-  std::string cardinality = ExtractCardinalityForComponent(name, headers);
-  bool mandatoryCardinality = cardinality.find("1..") != std::string::npos;
-  if (cardinality == "") {
-    mandatoryCardinality = true;
+  std::string cardinality =
+    ExtractCardinalityForComponent(name, configManagerPtr);
+  bool isMandatory = cardinality.find("1..") != std::string::npos;
+  if (cardinality.empty()) {
+    isMandatory = true;
   }
 
   // In the case of service being a nullptr, we throw because this implies
   // that the construction or activation of the service failed.
-  if (!service && isSIPointerFoundOrMapEmpty && mandatoryCardinality) {
+  if (!lookupInfo.service && lookupInfo.wasFoundInMapOrMapEmpty &&
+      isMandatory) {
     std::string errMsg = "Service ";
     errMsg += name;
     errMsg += " with type ";
@@ -241,34 +233,27 @@ std::shared_ptr<void> ComponentContextImpl::LocateService(
   if (!configManagerPtr) {
     throw ComponentException("Context is invalid");
   }
-  std::shared_ptr<void> service;
   auto boundServicesCacheHandle = boundServicesCache.lock();
   auto serviceMapItr = boundServicesCacheHandle->find(name);
   if (serviceMapItr != boundServicesCacheHandle->end()) {
     auto& serviceMaps = serviceMapItr->second;
     if (!serviceMaps.empty()) {
-      bool isSIPointerFoundOrMapEmpty = false;
-      service = GetInterfacePointerAndCheckError(
-        serviceMaps.at(0), type, isSIPointerFoundOrMapEmpty);
+      ServiceInterfacePointerLookupInfo lookupInfo =
+        GetInterfacePointer(serviceMaps.at(0), type);
 
-      /* If a valid pointer was returned from GetInterfacePointerAndCheckError and
-         the pointer was found in the map or a nullptr was returned from
-         GetInterfacePointerAndCheckError and it was because it wasn't in the map,
-         just return service (whatever it may be).
-
-         The case where service != nullptr and isSIPointerFoundOrMapEmpty = false
-         is not possible.
-      
-         If a nullptr was returned AND it was found in the map, then something
-         went wrong during the service's construction or activation and proceed
-         with error handling.
-      */
-      bool isValid = (static_cast<bool>(service) == isSIPointerFoundOrMapEmpty);
+      /* The returned service and boolean in the ServiceInterfacePointerLookupInfo struct
+       * are valid if the service pointer is null because it was not found in the map or if the
+       * service pointer is not null and it was found in the map.
+       * 
+       * If this condition is not true, then we proceed with error checking and throw
+       * a ComponentException if necessary.
+       */
+      bool isValid = (static_cast<bool>(lookupInfo.service) ==
+                      lookupInfo.wasFoundInMapOrMapEmpty);
       if (isValid) {
-        return service;
+        return lookupInfo.service;
       } else { // Checking for error condition and throwing if necessary
-        ValidateExtractedService(
-          configManagerPtr, name, type, service, isSIPointerFoundOrMapEmpty);
+        ValidateExtractedService(configManagerPtr, name, type, lookupInfo);
       }
     }
   }
@@ -294,17 +279,15 @@ std::vector<std::shared_ptr<void>> ComponentContextImpl::LocateServices(
       serviceMaps.end(),
       [&configManagerPtr, &services, &name, &type](
         const InterfaceMapConstPtr& iMap) {
-        bool isSIPointerFoundOrMapEmpty = false;
-        std::shared_ptr<void> service = GetInterfacePointerAndCheckError(
-          iMap, type, isSIPointerFoundOrMapEmpty);
+        ServiceInterfacePointerLookupInfo lookupInfo =
+          GetInterfacePointer(iMap, type);
 
-        bool isValid =
-          (static_cast<bool>(service) == isSIPointerFoundOrMapEmpty);
+        bool isValid = (static_cast<bool>(lookupInfo.service) ==
+                        lookupInfo.wasFoundInMapOrMapEmpty);
         if (isValid) {
-          services.push_back(service);
+          services.push_back(lookupInfo.service);
         } else { // Checking for error condition and throwing if necessary
-          ValidateExtractedService(
-            configManagerPtr, name, type, service, isSIPointerFoundOrMapEmpty);
+          ValidateExtractedService(configManagerPtr, name, type, lookupInfo);
         }
       });
   }

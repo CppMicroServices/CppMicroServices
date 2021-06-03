@@ -244,6 +244,7 @@ public:
   }
 
   /**
+   * This method is used to determine if the component implementation class provides a Modified method.
    */
   template<class Impl = T,
            class HasModifiedMethod = typename std::enable_if<HasModified<

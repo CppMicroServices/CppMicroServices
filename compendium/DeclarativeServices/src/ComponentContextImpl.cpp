@@ -177,7 +177,7 @@ std::string ExtractCardinalityForComponent(
   const std::shared_ptr<ComponentConfiguration> configManagerPtr)
 {
   auto configManagerImplPtr =
-    std::reinterpret_pointer_cast<ComponentConfigurationImpl>(configManagerPtr);
+    std::dynamic_pointer_cast<ComponentConfigurationImpl>(configManagerPtr);
 
   auto metadata = configManagerImplPtr->GetMetadata();
   for (const auto& _data : metadata->refsMetadata) {

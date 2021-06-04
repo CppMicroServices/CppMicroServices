@@ -151,7 +151,7 @@ public:
 
 }; // end of class ServiceListener
 
-bool runStartStopTest(const std::string& name,
+bool runStartStopTest(const std::string& /*name*/,
                       int cnt,
                       Bundle& bundle,
                       BundleContext context,
@@ -200,7 +200,7 @@ bool runStartStopTest(const std::string& name,
 
 TEST_F(ServiceListenerTest, frameSL02a)
 {
-  auto context = framework.GetBundleContext(); // can be moved
+  auto context = framework.GetBundleContext();
 
   TestServiceListener listener1(context);
   TestServiceListener listener2(context);

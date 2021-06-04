@@ -213,7 +213,7 @@ int runExecutable(const std::string& executable)
 
   // WEXITSTATUS uses an old c-sytle cast
   // clang-format off
-    US_GCC_PUSH_DISABLE_WARNING(old - style - cast)
+  US_GCC_PUSH_DISABLE_WARNING(all)
   // clang-format on
   return WEXITSTATUS(ret);
   US_GCC_POP_WARNING

@@ -24,8 +24,6 @@ limitations under the License.
 
 #include "TestUtilFrameworkListener.h"
 
-#include "TestingMacros.h"
-
 #include <stdexcept>
 
 namespace cppmicroservices {
@@ -46,9 +44,9 @@ bool TestFrameworkListener::CheckEvents(
   bool listenState = true; // assume success
   if (events.size() != _events.size()) {
     listenState = false;
-    US_TEST_OUTPUT(<< "*** Framework event mismatch ***\n expected "
+    std::cout<< "*** Framework event mismatch ***\n expected "
                    << events.size() << " event(s)\n found " << _events.size()
-                   << " event(s).");
+                   << " event(s).";
 
     const std::size_t max =
       events.size() > _events.size() ? events.size() : _events.size();
@@ -57,7 +55,7 @@ bool TestFrameworkListener::CheckEvents(
         i < events.size() ? events[i] : FrameworkEvent();
       const FrameworkEvent& pR =
         i < _events.size() ? _events[i] : FrameworkEvent();
-      US_TEST_OUTPUT(<< " - " << pE << " - " << pR);
+      std::cout<< " - " << pE << " - " << pR;
     }
   } else {
     for (std::size_t i = 0; i < events.size(); ++i) {
@@ -65,8 +63,8 @@ bool TestFrameworkListener::CheckEvents(
       const FrameworkEvent& pR = _events[i];
       if (pE.GetType() != pR.GetType() || pE.GetBundle() != pR.GetBundle()) {
         listenState = false;
-        US_TEST_OUTPUT(<< "*** Wrong framework event ***\n found " << pR
-                       << "\n expected " << pE);
+        std::cout<< "*** Wrong framework event ***\n found " << pR
+                       << "\n expected " << pE;
       }
     }
   }

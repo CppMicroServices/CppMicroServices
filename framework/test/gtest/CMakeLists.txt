@@ -8,6 +8,7 @@ include_directories(
   ${GTEST_INCLUDE_DIRS}
   ${GMOCK_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/../util
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../third_party
   )
 
 #-----------------------------------------------------------------------------
@@ -53,11 +54,13 @@ set(_gtest_tests
 if(BUILD_SHARED_LIBS)
   list(APPEND _gtest_tests
        SharedLibraryTest.cpp
+	   ServiceListenerTest
       )
 endif()
 
 set(_additional_srcs
   ../util/TestUtilBundleListener.cpp
+  ../util/TestUtilFrameworkListener.cpp
   ../util/TestUtils.cpp
   ../util/ImportTestBundles.cpp
   $<TARGET_OBJECTS:util>

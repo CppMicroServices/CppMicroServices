@@ -43,12 +43,6 @@ set(_tests
   StaticBundleTest
 )
 
-if(BUILD_SHARED_LIBS)
-  list(APPEND _tests
-       ServiceListenerTest
-      )
-endif()
-
 set(_additional_srcs
   TestDriverActivator.cpp
   TestManager.cpp

@@ -832,7 +832,7 @@ TEST_F(BindingPolicyTest, TestDynamicReluctantOptionalUnaryReBind)
 
 // test that concurrent service registrations and unregistrations
 // do not cause crashes.
-TEST_F(BindingPolicyTest, TestConcurrentBindUnbind)
+TEST_F(BindingPolicyTest, DISABLED_TestConcurrentBindUnbind)
 {
   auto bc = GetFramework().GetBundleContext();
   test::InstallAndStartDS(bc);

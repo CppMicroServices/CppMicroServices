@@ -45,7 +45,7 @@ namespace dto {
  * \addtogroup gr_componentconfigurationdto
  * @{
  */
-enum US_ServiceComponent_EXPORT ComponentState
+enum class ComponentState : uint8_t
 {
   /**
    * The component configuration is unsatisfied due to an unsatisfied

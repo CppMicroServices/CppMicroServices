@@ -292,6 +292,12 @@ TEST_F(tServiceComponent,
   auto newInstance = GetInstance<test::CAInterface>();
   ASSERT_TRUE(newInstance) << "GetService failed for CAInterface";
 
+  // Confirm configuration object presented and check component state.
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "Component instance state should be ACTIVE.";
+
   // Validate that the correct properties were updated
   auto serviceProps = newInstance->GetProperties();
   auto uniqueProp2 = serviceProps.find("uniqueProp");

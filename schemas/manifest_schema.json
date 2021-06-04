@@ -55,7 +55,8 @@
               },
               "name": {
                 "id": "/properties/scr/properties/components/items/properties/name",
-                "type": "string"
+                "type": "string",
+                "pattern": "[_a-zA-Z][_a-zA-Z0-9]{0,64}"
               },
               "properties": {
                 "id": "/properties/scr/properties/components/items/properties/properties",

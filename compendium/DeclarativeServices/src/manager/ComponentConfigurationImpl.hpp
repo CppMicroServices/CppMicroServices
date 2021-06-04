@@ -128,7 +128,8 @@ public:
    * This method returns the {@link ComponentMetadata} object created by
    * parsing the component description.
    */
-  std::shared_ptr<const metadata::ComponentMetadata> GetMetadata() const
+  std::shared_ptr<const metadata::ComponentMetadata> GetMetadata()
+    const override
   {
     return metadata;
   };

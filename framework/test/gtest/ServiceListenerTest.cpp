@@ -292,17 +292,16 @@ TEST_F(ServiceListenerTest, frameSL25a)
 #endif
 
   // Start libBundleTestSL1 to ensure that the Service interface is available.
-  EXPECT_NO_THROW(libSL1.Start()) << "Failed to load bundle";
+  libSL1.Start();
 
   // Start libBundleTestSL4 that will require the serivce interface and publish
   // cppmicroservices::FooService
-  EXPECT_NO_THROW(libSL4.Start()) << "Failed to load bundle";
+  libSL4.Start();
 
   // Start libBundleTestSL3 that will require the serivce interface and get the service
-  EXPECT_NO_THROW(libSL3.Start()) << "Failed to load bundle";
+  libSL3.Start();
 
   // Check that libSL3 has been notified about the FooService.
-
   ServiceReferenceU libSL3SR = context.GetServiceReference("ActivatorSL3");
   InterfaceMapConstPtr libSL3Activator = context.GetService(libSL3SR);
   //Validate that ActivatorSL3 service != 0
@@ -340,7 +339,7 @@ TEST_F(ServiceListenerTest, frameSL25a)
   ASSERT_TRUE(any_cast<bool>(serviceAddedField1));
 
   // Stop the service provider: libSL4
-  EXPECT_NO_THROW(libSL4.Stop()) << "Failed to unload bundle";
+  libSL4.Stop();
 
   // Check that libSL3 has been notified about the removal of FooService.
   libSL3SR = context.GetServiceReference("ActivatorSL3");
@@ -360,10 +359,10 @@ TEST_F(ServiceListenerTest, frameSL25a)
   ASSERT_TRUE(any_cast<bool>(serviceRemovedField3));
 
   // Stop libSL1
-  EXPECT_NO_THROW(libSL1.Stop()) << "Failed to unload bundle";
+  libSL1.Stop();
 
   // Stop pSL3
-  EXPECT_NO_THROW(libSL3.Stop()) << "Failed to unload bundle";
+  libSL3.Stop();
 
   // Check service events seen by this class
   ASSERT_TRUE(sListen.checkEvents(expectedServiceEventTypes))
@@ -372,8 +371,6 @@ TEST_F(ServiceListenerTest, frameSL25a)
   //Service listener checks
   ASSERT_TRUE(sListen.getTestStatus());
 
-  EXPECT_NO_THROW(context.RemoveServiceListener(
-    &sListen, &TestServiceListener::serviceChanged));
-  EXPECT_NO_THROW(sListen.clearEvents()) << "service listener removal failed";
+  context.RemoveServiceListener(&sListen, &TestServiceListener::serviceChanged);
+  sListen.clearEvents();
 }
-

@@ -48,13 +48,13 @@ set(_gtest_tests
   StaticBundleResourceTest.cpp
   FrameworkEventTest.cpp
   TestCounterLatch.cpp
-  ResourceCompilerTest
+  ResourceCompilerTest.cpp
 )
 
 if(BUILD_SHARED_LIBS)
   list(APPEND _gtest_tests
        SharedLibraryTest.cpp
-	   ServiceListenerTest
+       ServiceListenerTest.cpp
       )
 endif()
 

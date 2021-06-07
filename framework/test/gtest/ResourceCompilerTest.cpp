@@ -41,7 +41,10 @@ using namespace cppmicroservices::util;
 using namespace cppmicroservices::testing;
 namespace {
 
+//MakeUniqueTempDirectory provides a temp dir with unique alphanumeric name
+//uniqueTempdir is global as it needs to be a constant for all the tests
 TempDir uniqueTempdir = MakeUniqueTempDirectory();
+
 // The value returned by the resource compiler when manifest validation failed
 static const int BUNDLE_MANIFEST_VALIDATION_ERROR_CODE(2);
 
@@ -55,17 +58,15 @@ public:
   {
     rcbinpath = RCC_PATH;
     /*
-           * If ResourceCompiler executable is not found, we can't run the tests, we
-           * mark it as a failure and exit
-           */
+     * If ResourceCompiler executable is not found, we can't run the tests, we
+     * mark it as a failure and exit
+     */
     std::ifstream binf(rcbinpath.c_str());
     ASSERT_TRUE(binf.good())
       << "Cannot find usResourceCompiler executable:" << rcbinpath;
 
     tempdir = uniqueTempdir.Path + DIR_SEP;
   }
-
-  void TearDown() override {}
 
 protected:
   std::string rcbinpath;

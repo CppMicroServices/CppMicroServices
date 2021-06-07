@@ -85,32 +85,32 @@ public:
 TEST_F(StaticBundleResourceTest, testResourceOperators)
 {
   std::vector<BundleResource> resources =
-    testBundle.FindResources("", "res.txt", false);
+    testBundle.FindResources("", "res.ptxt", false);
   //Check resource count
   ASSERT_EQ(resources.size(), 1);
 }
 
 TEST_F(StaticBundleResourceTest, testResourcesWithStaticImport)
 {
-  BundleResource resource = testBundle.GetResource("res.txt");
+  BundleResource resource = testBundle.GetResource("res.ptxt");
   //Check valid res.txt resource
   ASSERT_TRUE(resource.IsValid());
   std::string line = GetResourceContent(resource);
   //Check dynamic resource content
   ASSERT_EQ(line, "dynamic resource");
 
-  resource = testBundle.GetResource("dynamic.txt");
+  resource = testBundle.GetResource("dynamic.ptxt");
   //Check valid dynamic.txt resource
   ASSERT_TRUE(resource.IsValid());
   line = GetResourceContent(resource);
   //Check dynamic resource content
   ASSERT_EQ(line, "dynamic");
 
-  resource = testBundle.GetResource("static.txt");
+  resource = testBundle.GetResource("static.ptxt");
   //Check in-valid static.txt resource
   ASSERT_FALSE(resource.IsValid());
 
-  resource = importedBundle.GetResource("static.txt");
+  resource = importedBundle.GetResource("static.ptxt");
   //Check valid static.txt resource
   ASSERT_TRUE(resource.IsValid());
   line = GetResourceContent(resource);
@@ -118,10 +118,10 @@ TEST_F(StaticBundleResourceTest, testResourcesWithStaticImport)
   ASSERT_EQ(line, "static");
 
   std::vector<BundleResource> resources =
-    testBundle.FindResources("", "*.txt", false);
+    testBundle.FindResources("", "*.ptxt", false);
   std::stable_sort(resources.begin(), resources.end(), ResourceComparator());
   std::vector<BundleResource> importedResources =
-    importedBundle.FindResources("", "*.txt", false);
+    importedBundle.FindResources("", "*.ptxt", false);
   std::stable_sort(
     importedResources.begin(), importedResources.end(), ResourceComparator());
 
@@ -143,7 +143,7 @@ TEST_F(StaticBundleResourceTest, testResourcesWithStaticImport)
 
 TEST_F(StaticBundleResourceTest, testResources)
 {
-  BundleResource resource = importedBundle.GetResource("static.txt");
+  BundleResource resource = importedBundle.GetResource("static.ptxt");
   testBundle.Start();
   //Check valid static.txt resource
   ASSERT_TRUE(resource.IsValid());

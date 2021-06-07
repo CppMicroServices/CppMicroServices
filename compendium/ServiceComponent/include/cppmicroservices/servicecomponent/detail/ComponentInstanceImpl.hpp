@@ -238,27 +238,6 @@ public:
   }
 
   template<typename... A>
-  bool DoesModifiedMethodExist(A...)
-  {
-    return false; // no modified method available
-  }
-
-  /**
-   * This method is used to determine if the component implementation class provides a Modified method.
-   */
-  template<class Impl = T,
-           class HasModifiedMethod = typename std::enable_if<HasModified<
-             Impl,
-             void,
-             const std::shared_ptr<ComponentContext>&,
-             const std::shared_ptr<cppmicroservices::AnyMap>&>::value>::type>
-  bool DoesModifiedMethodExist(const std::shared_ptr<ComponentContext>& ctxt)
-  {
-    auto ctxtImpl = std::dynamic_pointer_cast<ComponentContextImpl>(ctxt);
-    ctxtImpl->SetModifiedMethodExists();
-    return true;
-  }
-  template<typename... A>
   bool DoModified(A...)
   {
     return false; // no modified method available
@@ -354,6 +333,32 @@ public:
     }
   }
 
+  /**
+   * This method is used to determine if the component implementation class provides a Modified method.
+   * This is used when no Modified method exists.
+   */
+  template<typename... A>
+  bool DoesModifiedMethodExist(A...)
+  {
+    return false; // no modified method available
+  }
+
+  /**
+   * This method is used to determine if the component implementation class provides a Modified method.
+   * This method is used when a Modified method does exist.
+   */
+  template<class Impl = T,
+           class HasModifiedMethod = typename std::enable_if<HasModified<
+             Impl,
+             void,
+             const std::shared_ptr<ComponentContext>&,
+             const std::shared_ptr<cppmicroservices::AnyMap>&>::value>::type>
+  bool DoesModifiedMethodExist(const std::shared_ptr<ComponentContext>& ctxt)
+  {
+    auto ctxtImpl = std::dynamic_pointer_cast<ComponentContextImpl>(ctxt);
+    ctxtImpl->SetModifiedMethodExists();
+    return true;
+  }
   /**
    * DoCreate is a helper function used to invoke the appropriate constructor on the Implementation class.
    * SFINAE is used to determine which overload of DoCreate is used by the runtime.

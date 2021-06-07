@@ -50,7 +50,7 @@ ConfigurationNotifier::ConfigurationNotifier(
 cppmicroservices::ListenerTokenId ConfigurationNotifier::RegisterListener(
   const std::string& pid,
   std::function<void(const ConfigChangeNotification&)> notify,
-  std::shared_ptr<ComponentConfigurationImpl>& mgr)
+  std::shared_ptr<ComponentConfigurationImpl> mgr)
 {
   cppmicroservices::ListenerTokenId retToken = ++tokenCounter;
 

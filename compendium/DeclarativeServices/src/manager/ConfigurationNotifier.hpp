@@ -88,7 +88,7 @@ public:
   cppmicroservices::ListenerTokenId RegisterListener(
     const std::string& pid,
     std::function<void(const ConfigChangeNotification&)> notify,
-    std::shared_ptr<ComponentConfigurationImpl>& mgr);
+    std::shared_ptr<ComponentConfigurationImpl> mgr);
 
   void UnregisterListener(
     const std::string& pid,

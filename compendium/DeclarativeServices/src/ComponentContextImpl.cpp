@@ -119,8 +119,8 @@ ComponentContextImpl::GetProperties() const
  */
 struct ServiceInterfacePointerLookupInfo
 {
-  std::shared_ptr<void> service;
-  bool wasFoundInMapOrMapEmpty;
+  std::shared_ptr<void> service = nullptr;
+  bool wasFoundInMapOrMapEmpty = false;
 
   bool IsValid() const
   {
@@ -140,7 +140,7 @@ struct ServiceInterfacePointerLookupInfo
  * - interfaceId, The interface id string.
  * - return value: ServiceInterfacePointerLookupInfo
  */
-static ServiceInterfacePointerLookupInfo GetInterfacePointer(
+ServiceInterfacePointerLookupInfo GetInterfacePointer(
   const InterfaceMapConstPtr& map,
   const std::string& interfaceId)
 {
@@ -169,55 +169,14 @@ static ServiceInterfacePointerLookupInfo GetInterfacePointer(
 }
 
 /**
- * ValidateExtractedService is the error-checking mechanism for LocateService and LocateServices. 
- * 
- * ValidateExtractedService is ran if a nullptr was returned from GetInterfacePointer and 
- * it was a nullptr that was found in the map.
- * 
- * If the cardinality of the service is mandatory (1..1, 1..n), a ComponentException
- * is thrown, otherwise nothing occurs.
- */
-void ValidateExtractedService(
-  const std::shared_ptr<ComponentConfiguration>& configManagerPtr,
-  const std::string& name,
-  const std::string& type,
-  const ServiceInterfacePointerLookupInfo& lookupInfo)
-{
-  std::string cardinality{};
-  auto metadata = configManagerPtr->GetMetadata();
-  for (const auto& _data : metadata->refsMetadata) {
-    if (_data.name == name) {
-      cardinality = _data.cardinality;
-    }
-  }
-
-  bool isMandatory = false;
-  if (cardinality.empty()) {
-    isMandatory = true;
-  } else {
-    isMandatory = cardinality.find("1..") != std::string::npos;
-  }
-
-  // In the case of service being a nullptr, we throw because this implies
-  // that the construction or activation of the service failed.
-  if (!lookupInfo.IsValid() && isMandatory) {
-    std::string errMsg = "Service ";
-    errMsg += name;
-    errMsg += " with type ";
-    errMsg += type;
-    errMsg += " failed to construct or activate.";
-
-    throw ComponentException(errMsg);
-  }
-}
-
-/**
  * This function returns the service interface pointer from the InterfaceMap.
  * 
- * If the returned pointer is not valid, then ValidateExtractedService is called
- * which provides the required error-handling functionality.
+ * If the returned pointer is not valid, then error checking is done to ensure
+ * that if this failure of construction/activation of the searched service
+ * violates the service's cardinality conditions, an exception is thrown.
  * 
- * This function could throw a ComponentException.
+ * This function throws an exception when the service pointer was found in the map
+ * and the value of that service pointer is nullptr.
  */
 std::shared_ptr<void> GetServicePointer(
   const std::shared_ptr<ComponentConfiguration>& configManagerPtr,
@@ -232,13 +191,38 @@ std::shared_ptr<void> GetServicePointer(
    * service pointer is not null and it was found in the map.
    * 
    * If this condition is not true, then we proceed with error checking and throw
-   * a ComponentException if necessary.
+   * a ComponentException if the service's cardinality conditions were violated.
    */
   bool isValid = lookupInfo.IsValid();
   if (isValid) {
     return lookupInfo.service;
   } else { // Checking for error condition and throwing if necessary
-    ValidateExtractedService(configManagerPtr, name, type, lookupInfo);
+    std::string cardinality{};
+    auto metadata = configManagerPtr->GetMetadata();
+    for (const auto& _data : metadata->refsMetadata) {
+      if (_data.name == name) {
+        cardinality = _data.cardinality;
+      }
+    }
+
+    bool isMandatory = false;
+    if (cardinality.empty()) {
+      isMandatory = true;
+    } else {
+      isMandatory = cardinality.find("1..") != std::string::npos;
+    }
+
+    // In the case of service being a nullptr, we throw because this implies
+    // that the construction or activation of the service failed.
+    if (!lookupInfo.IsValid() && isMandatory) {
+      std::string errMsg = "Service ";
+      errMsg += name;
+      errMsg += " with type ";
+      errMsg += type;
+      errMsg += " failed to construct or activate.";
+
+      throw ComponentException(errMsg);
+    }
   }
 
   return nullptr;

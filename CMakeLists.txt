@@ -492,7 +492,7 @@ else()
 
   set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
   set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=thread")
-  usFunctionCheckCompilerFlags("-01 -fsanitize=thread" US_CXX_TSAN_FLAGS)
+  usFunctionCheckCompilerFlags("-O1 -fsanitize=thread" US_CXX_TSAN_FLAGS)
   set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
   if(NOT US_CXX_TSAN_FLAGS AND US_ENABLE_TSAN)
     message(WARNING "TSAN requested, but compiler does not recognize it")

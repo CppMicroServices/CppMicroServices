@@ -35,7 +35,7 @@ namespace scrimpl {
  * singleton instance of the {@link ComponentInstance}. It also implements the ServiceFactory pattern
  * to handle {@link ServiceFactory#GetService} calls from the user.
  */
-class SingletonComponentConfigurationImpl final
+class SingletonComponentConfigurationImpl 
   : public ComponentConfigurationImpl
   , public cppmicroservices::ServiceFactory
 {
@@ -128,6 +128,8 @@ private:
               TestCreateAndActivateComponentInstance);
   FRIEND_TEST(SingletonComponentConfigurationTest,
               TestDestroyComponentInstances);
+  FRIEND_TEST(SingletonComponentConfigurationTest,
+              TestModifiedMethodExceptionLogging);
   FRIEND_TEST(SingletonComponentConfigurationTest, TestGetService);
   FRIEND_TEST(SingletonComponentConfigurationTest,
               TestDestroyComponentInstances_DeactivateFailure);

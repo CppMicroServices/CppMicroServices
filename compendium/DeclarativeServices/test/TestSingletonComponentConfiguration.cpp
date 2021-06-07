@@ -28,6 +28,7 @@
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/logservice/LogService.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -46,17 +47,17 @@ protected:
     framework.Start();
     auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
-    auto fakeLogger = std::make_shared<FakeLogger>();
+    mockLogger = std::make_shared<MockLogger>();
     auto threadpool = std::make_shared<boost::asio::thread_pool>();
     auto notifier = std::make_shared<ConfigurationNotifier>(
-      framework.GetBundleContext(), fakeLogger, threadpool);
+      framework.GetBundleContext(), mockLogger, threadpool);
     auto managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
     obj = std::make_shared<SingletonComponentConfigurationImpl>(mockMetadata,
                                                                 framework,
                                                                 mockRegistry,
-                                                                fakeLogger,
+                                                                mockLogger,
                                                                 notifier,
                                                                 managers);
   }
@@ -69,8 +70,14 @@ protected:
   }
 
   cppmicroservices::Framework framework;
+  std::shared_ptr<MockLogger> mockLogger;
   std::shared_ptr<SingletonComponentConfigurationImpl> obj;
 };
+
+ACTION(ModifiedMethodException)
+{
+  throw "Component Instance Modified method exception";
+}
 
 TEST_F(SingletonComponentConfigurationTest, TestGetFactory)
 {
@@ -204,6 +211,43 @@ TEST_F(SingletonComponentConfigurationTest, TestGetService)
     instCtxtPair->first.reset();
     instCtxtPair->second.reset();
   }
+}
+/* This test verifies that if the Modified method of a component instance throws an 
+ * exception DS intercepts the exception and logs it. 
+ */
+TEST_F(SingletonComponentConfigurationTest,
+       TestModifiedMethodExceptionLogging)
+{
+  using cppmicroservices::logservice::SeverityLevel;
+
+  auto mockCompContext = std::make_shared<MockComponentContextImpl>(obj);
+  auto mockCompInstance = std::make_shared<MockComponentInstance>();
+  obj->SetComponentInstancePair(InstanceContextPair(
+    mockCompInstance,
+    mockCompContext)); 
+  EXPECT_NE(obj->GetComponentInstance(), nullptr);
+  EXPECT_NE(obj->GetComponentContext(), nullptr);
+
+  // set logging expectations
+  auto ExceptionThrownByModifiedMethod =
+    testing::AllOf(
+      testing::HasSubstr("Exception received from user code while modifying "),
+      testing::HasSubstr("component configuration"));
+  EXPECT_CALL(*mockLogger,
+              Log(SeverityLevel::LOG_ERROR, ExceptionThrownByModifiedMethod, testing::_))
+    .Times(1);
+
+  // When the mock Modified method is called it will throw the ModifiedMethodException
+  EXPECT_CALL(*mockCompInstance,Modified()).Times(1).WillRepeatedly(ModifiedMethodException());
+
+  // Tell component context that a Modified Method exists so ModifyComponentInstanceProperties 
+  // will call it. 
+  EXPECT_NO_THROW(mockCompContext->SetModifiedMethodExists());
+
+  // ModifyComponentInstanceProperties will call the mock Modified method
+  // which will throw an exception. DS will catch the exception and log it.
+  EXPECT_NO_THROW(obj->ModifyComponentInstanceProperties());
+
 }
 
 TEST_F(SingletonComponentConfigurationTest, TestDestroyComponentInstances)

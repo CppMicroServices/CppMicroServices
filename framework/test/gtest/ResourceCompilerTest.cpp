@@ -582,8 +582,7 @@ TEST_F(ResourceCompilerTest, testCompressionLevel)
   testExists(entryNames, "mybundle/resource2/resource2.txt");
   testExists(entryNames, "mybundle/resource2/");
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --bundle-name mybundle ";
   cmd << " --manifest-add manifest.json ";
@@ -658,8 +657,7 @@ TEST_F(ResourceCompilerTest, testFailureModes)
   //Test Failure mode: Empty --manifest-add option
   ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --bundle-name foo";
   cmd << " --manifest-add file_does_not_exist.json";
@@ -667,24 +665,21 @@ TEST_F(ResourceCompilerTest, testFailureModes)
   //Test Failure mode: Manifest file does not exist
   ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --bundle-file test1.dll ";
   cmd << " --bundle-file test2.dll";
   //test Failure mode: Multiple bundle-file args
   ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --out-file test1.zip ";
   cmd << " --out-file test2.zip";
   //Test Failure mode: Multiple out-file args
   ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --bundle-name foo ";
   cmd << " --bundle-name bar ";
@@ -692,30 +687,26 @@ TEST_F(ResourceCompilerTest, testFailureModes)
   //Test Failure mode: Multiple bundle-name args
   ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --manifest-add manifest.json";
   cmd << " --bundle-name foobundle";
   //Test Failure mode: --bundle-file or --out-file required
   ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --manifest-add manifest.json";
   //Test Failure mode: --bundle-name required
   ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --res-add manifest.json";
   //Test Failure mode: --bundle-name required
   ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --manifest-add manifest.json";
   cmd << " --bundle-name foo ";
@@ -723,8 +714,7 @@ TEST_F(ResourceCompilerTest, testFailureModes)
   //Test Failure mode: invalid --compression-level argument (11)
   ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --manifest-add manifest.json";
   cmd << " --bundle-name foo ";
@@ -732,8 +722,7 @@ TEST_F(ResourceCompilerTest, testFailureModes)
   //Test Failure mode: invalid --compression-level argument (-1)
   ASSERT_EQ(EXIT_FAILURE, runExecutable(cmd.str()));
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --bundle-name mybundle ";
   cmd << " --bundle-file " << tempdir << DIR_SEP << "sample1.dll ";
@@ -745,8 +734,7 @@ TEST_F(ResourceCompilerTest, testFailureModes)
   // Example.zip already contains mybundle/manifest.json
   // Should get an error when we are trying to manifest-add
   // mybundle/manifest.json
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --bundle-name "
       << "mybundle";
@@ -1090,8 +1078,7 @@ TEST_F(ResourceCompilerTest, testMultipleManifestAdd)
 
   createManifestFile(tempdir, invalidManifestPart, "invalid_manifest.json");
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --bundle-name "
       << "main";
@@ -1128,8 +1115,7 @@ TEST_F(ResourceCompilerTest, testMultipleManifestAdd)
   createManifestFile(
     tempdir, manifest_json_part_3_duplicate, "duplicate_manifest.json");
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --bundle-name "
       << "main";
@@ -1277,8 +1263,7 @@ TEST_F(ResourceCompilerTest, testManifestWithNullTerminator)
 
   const std::string mergedZipFile("merged_null_terminator.zip");
 
-  cmd.str("");
-  cmd.clear();
+  cmd.str(std::string());
   cmd << rcbinpath;
   cmd << " --out-file " << tempdir << mergedZipFile;
   cmd << " --zip-add " << tempdir << zipFile;

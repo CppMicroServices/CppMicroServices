@@ -161,7 +161,7 @@ public:
    */
   void Modified() override { DoModified(mContext); };
 
-  bool DoesModifiedMethodExist (){ return DoDoesModifiedMethodExist(mContext); }
+  bool DoesModifiedMethodExist (){ return DoDoesModifiedMethodExist(); }
 
   void InvokeBindMethod(
     const std::string& refName,
@@ -279,7 +279,7 @@ public:
              void,
              const std::shared_ptr<ComponentContext>&,
              const std::shared_ptr<cppmicroservices::AnyMap>&>::value>::type>
-  bool DoDoesModifiedMethodExist(const std::shared_ptr<ComponentContext>& ctxt)
+  bool DoDoesModifiedMethodExist()
   {
     return true;
   }

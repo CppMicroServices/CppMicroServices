@@ -267,6 +267,7 @@ public:
                void(const std::string&,
                     const cppmicroservices::ServiceReferenceBase&));
   MOCK_METHOD0(GetInterfaceMap, cppmicroservices::InterfaceMapPtr(void));
+  MOCK_METHOD0(DoesModifiedMethodExist, bool(void));
 };
 
 class MockComponentContextImpl : public ComponentContextImpl

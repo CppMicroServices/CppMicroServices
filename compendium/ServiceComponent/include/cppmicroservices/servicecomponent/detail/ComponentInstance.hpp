@@ -90,6 +90,7 @@ public:
    * This method is called when a call to @{code ServiceFactory#GetService} is received by the runtime.
    */
   virtual cppmicroservices::InterfaceMapPtr GetInterfaceMap() = 0;
+  virtual bool DoesModifiedMethodExist() = 0;
 };
 
 }

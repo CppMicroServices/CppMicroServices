@@ -209,10 +209,6 @@ public:
     const std::string& refName,
     const cppmicroservices::ServiceReferenceBase& sRef);
   
-  void SetModifiedMethodExists() { modifiedMethodExists = true; }
-
-  bool DoesModifiedMethodExist() { return modifiedMethodExists; }
-
   private:
   /**
    * Returns the Id of the bundle containing the component
@@ -229,7 +225,6 @@ public:
     std::unordered_map<std::string,
                        std::vector<cppmicroservices::InterfaceMapConstPtr>>>
     boundServicesCache;
-  bool modifiedMethodExists;
 };
 }
 }

@@ -40,7 +40,6 @@ ComponentContextImpl::ComponentContextImpl(
   std::weak_ptr<ComponentConfiguration> cm)
   : configManager(std::move(cm))
   , usingBundle(Bundle())
-  , modifiedMethodExists(false)
 {
   InitializeServicesCache();
 }
@@ -50,7 +49,6 @@ ComponentContextImpl::ComponentContextImpl(
   cppmicroservices::Bundle usingBundle)
   : configManager(std::move(cm))
   , usingBundle(std::move(usingBundle))
-  , modifiedMethodExists(false)
 {
   InitializeServicesCache();
 }

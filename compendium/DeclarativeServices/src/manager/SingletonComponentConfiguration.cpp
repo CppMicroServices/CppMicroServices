@@ -101,8 +101,7 @@ bool SingletonComponentConfigurationImpl::ModifyComponentInstanceProperties()
   auto instanceContextPair = data.lock();
   if (instanceContextPair->first) {
     try {
-      auto ctxt = instanceContextPair->second;
-      if (ctxt->DoesModifiedMethodExist()) {
+      if (instanceContextPair->first->DoesModifiedMethodExist()) {
         instanceContextPair->first->Modified();
         return true;
       }

@@ -86,7 +86,7 @@ bool BundleOrPrototypeComponentConfigurationImpl::
   bool retValue = false;
   for (const auto& valPair : *compInstCtxtPairList) {
     try {
-      if (valPair.second->DoesModifiedMethodExist()) {
+      if (valPair.first->DoesModifiedMethodExist()) {
         valPair.first->Modified();
         retValue = true;
       }

@@ -78,7 +78,10 @@ ACTION(ModifiedMethodException)
 {
   throw "Component Instance Modified method exception";
 }
-
+ACTION(ModifiedMethodExists)
+{
+  return true;
+}
 TEST_F(SingletonComponentConfigurationTest, TestGetFactory)
 {
   EXPECT_NE(obj->GetFactory(), nullptr);
@@ -240,9 +243,17 @@ TEST_F(SingletonComponentConfigurationTest,
   // When the mock Modified method is called it will throw the ModifiedMethodException
   EXPECT_CALL(*mockCompInstance,Modified()).Times(1).WillRepeatedly(ModifiedMethodException());
 
-  // Tell component context that a Modified Method exists so ModifyComponentInstanceProperties 
-  // will call it. 
-  EXPECT_NO_THROW(mockCompContext->SetModifiedMethodExists());
+  // When the mock DoesModifiedMethodExist method is called it will return true;
+  EXPECT_CALL(*mockCompInstance, DoesModifiedMethodExist())
+    .Times(1)
+    .WillRepeatedly(ModifiedMethodExists());
+
+  // Deactivate and Unbindreference will also be called. EXPECT_CALL added
+  // to avoid GMOCK Warning. 
+   // When the mock Modified method is called it will throw the ModifiedMethodException
+  EXPECT_CALL(*mockCompInstance, Deactivate()).Times(1);
+  EXPECT_CALL(*mockCompInstance, UnbindReferences()).Times(1);
+
 
   // ModifyComponentInstanceProperties will call the mock Modified method
   // which will throw an exception. DS will catch the exception and log it.

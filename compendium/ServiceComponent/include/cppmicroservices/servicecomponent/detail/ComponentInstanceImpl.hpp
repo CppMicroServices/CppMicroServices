@@ -31,7 +31,6 @@
 
 #include "ComponentInstance.hpp"
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
-#include "../../../../../DeclarativeServices/src/ComponentContextImpl.hpp"
 
 #include "Binders.hpp"
 #include "cppmicroservices/AnyMap.h"
@@ -40,7 +39,6 @@ namespace cppmicroservices {
 namespace service {
 namespace component {
 namespace detail {
-using cppmicroservices::scrimpl::ComponentContextImpl;
 
 /**
  * Util class to detect if a class has a method named Activate
@@ -163,6 +161,8 @@ public:
    */
   void Modified() override { DoModified(mContext); };
 
+  bool DoesModifiedMethodExist (){ return DoDoesModifiedMethodExist(mContext); }
+
   void InvokeBindMethod(
     const std::string& refName,
     const cppmicroservices::ServiceReferenceBase& sRef) override
@@ -260,6 +260,30 @@ public:
     return true;
   }
   /**
+   * This method is used to determine if the component implementation class provides a Modified method.
+   * This is used when no Modified method exists.
+   */
+  template<typename... A>
+  bool DoDoesModifiedMethodExist(A...)
+  {
+    return false; // no modified method available
+  }
+
+  /**
+   * This method is used to determine if the component implementation class provides a Modified method.
+   * This method is used when a Modified method does exist.
+   */
+  template<class Impl = T,
+           class HasModifiedMethod = typename std::enable_if<HasModified<
+             Impl,
+             void,
+             const std::shared_ptr<ComponentContext>&,
+             const std::shared_ptr<cppmicroservices::AnyMap>&>::value>::type>
+  bool DoDoesModifiedMethodExist(const std::shared_ptr<ComponentContext>& ctxt)
+  {
+    return true;
+  }
+  /**
    * This method is used if the component implementation class does not provide a Deactivate method.
    */
   template<typename... A>
@@ -320,10 +344,7 @@ public:
     for (auto& binder : this->refBinders) {
       binder->Bind(ctxt, this->mServiceImpl);
     }
-    // Check to see if the component instance has a Modified method. If 
-    // so it will set the modifiedMethodExists member variable in the 
-    // ComponentContext to true.
-    DoesModifiedMethodExist(ctxt);
+
   }
 
   void UnbindReferences() override
@@ -333,33 +354,7 @@ public:
     }
   }
 
-  /**
-   * This method is used to determine if the component implementation class provides a Modified method.
-   * This is used when no Modified method exists.
-   */
-  template<typename... A>
-  bool DoesModifiedMethodExist(A...)
-  {
-    return false; // no modified method available
-  }
-
-  /**
-   * This method is used to determine if the component implementation class provides a Modified method.
-   * This method is used when a Modified method does exist.
-   */
-  template<class Impl = T,
-           class HasModifiedMethod = typename std::enable_if<HasModified<
-             Impl,
-             void,
-             const std::shared_ptr<ComponentContext>&,
-             const std::shared_ptr<cppmicroservices::AnyMap>&>::value>::type>
-  bool DoesModifiedMethodExist(const std::shared_ptr<ComponentContext>& ctxt)
-  {
-    auto ctxtImpl = std::dynamic_pointer_cast<ComponentContextImpl>(ctxt);
-    ctxtImpl->SetModifiedMethodExists();
-    return true;
-  }
-  /**
+    /**
    * DoCreate is a helper function used to invoke the appropriate constructor on the Implementation class.
    * SFINAE is used to determine which overload of DoCreate is used by the runtime.
    */

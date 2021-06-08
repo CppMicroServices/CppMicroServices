@@ -401,6 +401,15 @@ set(US_TSAN_LINK_FLAGS )
 set(US_CXX_COVERAGE_FLAGS )
 
 if(MSVC)
+  # Since we are compiling with boost, there exists some code which looks
+  # at the value of this define. Since we previously did not specify the
+  # define, boost assumed a value (0x0601, meaning Windows 7). We will
+  # now explicitly include this define to remove the compiler messages
+  # it generates.
+  set(msvc_version_define
+    "_WIN32_WINNT=0x0601"
+  )
+
   set(disabled_warnings
     4251 # 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
   )
@@ -428,7 +437,7 @@ if(MSVC)
     set(US_ENABLE_ASAN OFF)
   endif()
 
-  set(US_CXX_FLAGS "/MP /WX ${US_CXX_FLAGS}")
+  set(US_CXX_FLAGS "/MP /WX /D${msvc_version_define} ${US_CXX_FLAGS}")
 else()
 
   # If not cross-compiling, turn on Stack Smashing Protection.

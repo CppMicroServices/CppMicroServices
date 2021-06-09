@@ -67,6 +67,7 @@ set(_declarativeservices_tests
   TestConfigPolicies.cpp
   TestConfigurationPropertiesWithMultipleConfigurations.cpp
   TestFactoryPid.cpp
+  TestFailedBoundServiceActivation.cpp
   TestMetadataParserFactory.cpp
   TestMetadataParserImplV1.cpp
   TestReferenceManagerImpl.cpp

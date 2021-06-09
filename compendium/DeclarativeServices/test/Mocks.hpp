@@ -215,6 +215,8 @@ public:
   MOCK_CONST_METHOD0(GetBundle, cppmicroservices::Bundle(void));
   MOCK_CONST_METHOD0(GetId, unsigned long(void));
   MOCK_CONST_METHOD0(GetConfigState, ComponentState(void));
+  MOCK_CONST_METHOD0(GetMetadata,
+                     std::shared_ptr<const metadata::ComponentMetadata>(void));
 };
 
 class MockFactory : public cppmicroservices::ServiceFactory

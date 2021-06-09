@@ -27,6 +27,8 @@
 #include "cppmicroservices/servicecomponent/runtime/dto/ComponentConfigurationDTO.hpp"
 #include <unordered_map>
 
+#include "../metadata/ComponentMetadata.hpp"
+
 using cppmicroservices::service::component::runtime::dto::ComponentState;
 
 namespace cppmicroservices {
@@ -98,6 +100,14 @@ public:
    * Returns the current {@code ComponentState} of this component configuration
    */
   virtual ComponentState GetConfigState() const = 0;
+
+  /**
+   * Returns the {@link ComponentMetadata} object created by parsing the
+   * component description.
+   */
+  virtual std::shared_ptr<
+    const cppmicroservices::scrimpl::metadata::ComponentMetadata>
+  GetMetadata() const = 0;
 };
 } // scrimpl
 } // cppmicroservices

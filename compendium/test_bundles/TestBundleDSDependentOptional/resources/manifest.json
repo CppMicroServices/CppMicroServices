@@ -1,0 +1,24 @@
+{
+    "bundle.symbolic_name": "TestBundleDSDependentOptional",
+    "bundle.name": "TestBundleDSDependentOptional",
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "implementation-class": "dependent::TestBundleDSDependentOptionalImpl",
+                "service": {
+                    "interfaces": [
+                        "test::TestBundleDSDependent"
+                    ]
+                },
+                "references": [
+                    {
+                        "cardinality": "0..1",
+                        "name": "testbundledsupstreamdependency",
+                        "interface": "test::TestBundleDSUpstreamDependency"
+                    }
+                ]
+            }
+        ]
+    }
+}

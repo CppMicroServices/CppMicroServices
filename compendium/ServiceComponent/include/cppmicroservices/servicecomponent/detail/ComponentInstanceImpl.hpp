@@ -161,7 +161,7 @@ public:
    */
   void Modified() override { DoModified(mContext); };
 
-  bool DoesModifiedMethodExist (){ return DoDoesModifiedMethodExist(); }
+  bool DoesModifiedMethodExist () override { return DoDoesModifiedMethodExist(); }
 
   void InvokeBindMethod(
     const std::string& refName,

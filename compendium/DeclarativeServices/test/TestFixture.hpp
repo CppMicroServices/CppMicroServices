@@ -107,7 +107,6 @@ public:
     test::InstallLib(context, "TestBundleDSCA20");
     test::InstallLib(context, "TestBundleDSCA24");
     test::InstallLib(context, "TestBundleDSCA26");
-    test::InstallLib(context, "TestBundleDSCA27");
 #endif
 
 #ifndef US_BUILD_SHARED_LIBS
@@ -171,7 +170,7 @@ public:
   std::vector<scr::dto::ComponentConfigurationDTO> GetComponentConfigs(
     const cppmicroservices::Bundle& testBundle,
     const std::string& componentName,
-    scr::dto::ComponentDescriptionDTO compDescDTO)
+    scr::dto::ComponentDescriptionDTO& compDescDTO)
   {
     compDescDTO =
       dsRuntimeService->GetComponentDescriptionDTO(testBundle, componentName);

@@ -6,11 +6,12 @@
     "components": [
       {
         "enabled": true,
+        "immediate" : true,
         "implementation-class": "sample::ServiceComponentCA26",
-        "configuration-policy": "require",
+        "configuration-policy": "optional",
         "configuration-pid": [ "sample::ServiceComponentCA26" ],
         "service": {
-          "scope": "bundle",
+          "scope": "prototype",
           "interfaces": [ "test::CAInterface" ]
         }
       }

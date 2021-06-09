@@ -121,6 +121,18 @@ TEST_F(SingletonComponentConfigurationTest,
   EXPECT_CALL(*mockInstance, CreateInstanceAndBindReferences(testing::_))
     .Times(1);
   EXPECT_CALL(*mockInstance, Activate()).Times(1);
+
+  // set logging expectations
+  auto ExceptionThrownByCreateComponentInstance = 
+    testing::AllOf(
+    testing::HasSubstr("Exception received from user code while activating "),
+    testing::HasSubstr("the component configuration"));
+  EXPECT_CALL(
+    *mockLogger,
+              Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                  ExceptionThrownByCreateComponentInstance,
+                  testing::_))
+    .Times(1);
   auto instance0 = obj->CreateAndActivateComponentInstance(framework);
   EXPECT_EQ(instance0, nullptr) << "Return value must be nullptr when an "
                                    "exception is thrown from user code";
@@ -268,6 +280,7 @@ TEST_F(SingletonComponentConfigurationTest, TestDestroyComponentInstances)
   obj->SetComponentInstancePair(
     InstanceContextPair(mockCompInstance, mockCompContext));
   EXPECT_CALL(*mockCompInstance, Deactivate()).Times(1);
+  EXPECT_CALL(*mockCompInstance, UnbindReferences()).Times(1);
   EXPECT_NE(obj->GetComponentInstance(), nullptr);
   EXPECT_NE(obj->GetComponentContext(), nullptr);
   EXPECT_NO_THROW(obj->DestroyComponentInstances());
@@ -284,6 +297,17 @@ TEST_F(SingletonComponentConfigurationTest,
   obj->SetComponentInstancePair(
     InstanceContextPair(mockCompInstance, mockCompContext));
   std::string exceptionMsg("Deactivation failed with exception");
+ 
+  // set logging expectations
+  auto ExceptionThrownByDeactivateMethod = testing::AllOf(
+    testing::HasSubstr("Exception received from user code while deactivating "),
+    testing::HasSubstr("the component configuration"));
+  EXPECT_CALL(
+    *mockLogger,
+              Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                  ExceptionThrownByDeactivateMethod,
+                  testing::_))
+    .Times(1);
   EXPECT_CALL(*mockCompInstance, Deactivate())
     .Times(1)
     .WillOnce(testing::Throw(std::runtime_error(exceptionMsg)));

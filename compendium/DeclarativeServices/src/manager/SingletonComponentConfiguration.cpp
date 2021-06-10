@@ -105,7 +105,6 @@ bool SingletonComponentConfigurationImpl::ModifyComponentInstanceProperties()
         instanceContextPair->first->Modified();
         return true;
       }
-      return false;
     } catch (...) {
       GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                        "Exception received from user code while modifying "

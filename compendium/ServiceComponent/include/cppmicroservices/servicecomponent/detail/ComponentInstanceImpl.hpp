@@ -156,8 +156,7 @@ public:
   
   /**
    * This method is called by the runtime while the component configuration is active when
-   * the configuration properties are modified. Returns false if the component instance has not 
-   * provided a Modified method.
+   * the configuration properties are modified. 
    */
   void Modified() override { DoModified(mContext); };
 
@@ -354,7 +353,7 @@ public:
     }
   }
 
-    /**
+   /**
    * DoCreate is a helper function used to invoke the appropriate constructor on the Implementation class.
    * SFINAE is used to determine which overload of DoCreate is used by the runtime.
    */

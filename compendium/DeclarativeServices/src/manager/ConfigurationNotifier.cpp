@@ -156,7 +156,6 @@ void ConfigurationNotifier::CreateFactoryComponent(
     if (basePid != factoryName) {
       newMetadata->configurationPids.emplace_back(basePid);
     }
-
   }
   newMetadata->configurationPids.emplace_back(pid);
   auto bundle = mgr->GetBundle();

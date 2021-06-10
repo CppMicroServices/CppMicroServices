@@ -98,7 +98,7 @@ bool BundleOrPrototypeComponentConfigurationImpl::
       return false;
     }
   }
-  // Modified returns true if the component instance has a Modified method.
+  // ModifyComponentInstanceProperties returns true if the component instance has a Modified method.
   // Only need to return the value for the last instance because if one of the instances
   // has a Modified method, they all do.
   return retValue;

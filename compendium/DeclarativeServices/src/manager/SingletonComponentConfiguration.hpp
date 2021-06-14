@@ -35,7 +35,7 @@ namespace scrimpl {
  * singleton instance of the {@link ComponentInstance}. It also implements the ServiceFactory pattern
  * to handle {@link ServiceFactory#GetService} calls from the user.
  */
-class SingletonComponentConfigurationImpl 
+class SingletonComponentConfigurationImpl final
   : public ComponentConfigurationImpl
   , public cppmicroservices::ServiceFactory
 {

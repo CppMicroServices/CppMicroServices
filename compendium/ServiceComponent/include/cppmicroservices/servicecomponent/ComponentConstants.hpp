@@ -49,6 +49,8 @@ namespace ComponentConstants {
  * object returned by the {@link Bundle::GetHeaders} method.
  */
 US_ServiceComponent_EXPORT extern const std::string SERVICE_COMPONENT;
+using cppmicroservices::service::component::ComponentConstants::
+  SERVICE_COMPONENT;
 
 /**
  * \ingroup gr_componentconstants 
@@ -75,6 +77,14 @@ US_ServiceComponent_EXPORT extern const std::string COMPONENT_ID;
 
 /**
  * \ingroup gr_componentconstants 
+ * A service registration property for a Component Factory that contains the
+ * value of the {@code factory} attribute. The value of this property must
+ * be of type {@code std::string}.
+ */
+US_ServiceComponent_EXPORT extern const std::string COMPONENT_FACTORY;
+
+/**
+ * \ingroup gr_componentconstants 
  * The suffix for reference target properties. These properties contain the
  * filter to select the target services for a reference. The value of this
  * property must be of type \c std::string.
@@ -89,6 +99,15 @@ US_ServiceComponent_EXPORT extern const std::string REFERENCE_TARGET_SUFFIX;
  */
 US_ServiceComponent_EXPORT extern const std::string
   REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
+
+/**
+ * \ingroup gr_componentconstants
+ * Constants used for ComponentMetadata configurationPolicy attribute.
+ */
+US_ServiceComponent_EXPORT extern const std::string CONFIG_POLICY_IGNORE;
+US_ServiceComponent_EXPORT extern const std::string CONFIG_POLICY_OPTIONAL;
+US_ServiceComponent_EXPORT extern const std::string CONFIG_POLICY_REQUIRE;
+
 }
 
 }

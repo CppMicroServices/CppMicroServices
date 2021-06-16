@@ -25,6 +25,7 @@
 
 #include "ComponentConfigurationImpl.hpp"
 #include "ConcurrencyUtil.hpp"
+#include "ConfigurationNotifier.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -42,8 +43,10 @@ public:
   explicit SingletonComponentConfigurationImpl(
     std::shared_ptr<const metadata::ComponentMetadata> metadata,
     const cppmicroservices::Bundle& bundle,
-    std::shared_ptr<const ComponentRegistry> registry,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+    std::shared_ptr<ComponentRegistry> registry,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    std::shared_ptr<ConfigurationNotifier> configNotifier,
+    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
   SingletonComponentConfigurationImpl(
     const SingletonComponentConfigurationImpl&) = delete;
   SingletonComponentConfigurationImpl(SingletonComponentConfigurationImpl&&) =
@@ -67,6 +70,12 @@ public:
    */
   std::shared_ptr<ComponentInstance> CreateAndActivateComponentInstance(
     const cppmicroservices::Bundle& bundle) /* noexcept */ override;
+
+  /**
+   * Method called to modify the configuration properties for this component configuration. 
+   * @return false if the component instance has not provided a Modified method.
+   */
+  bool ModifyComponentInstanceProperties() override;
 
   /**
    * Method removes the singleton {@link ComponentInstance} object created by this object.
@@ -119,6 +128,8 @@ private:
               TestCreateAndActivateComponentInstance);
   FRIEND_TEST(SingletonComponentConfigurationTest,
               TestDestroyComponentInstances);
+  FRIEND_TEST(SingletonComponentConfigurationTest,
+              TestModifiedMethodExceptionLogging);
   FRIEND_TEST(SingletonComponentConfigurationTest, TestGetService);
   FRIEND_TEST(SingletonComponentConfigurationTest,
               TestDestroyComponentInstances_DeactivateFailure);

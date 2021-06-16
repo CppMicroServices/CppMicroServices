@@ -4,7 +4,6 @@ set(_srcs
   CMLogger.cpp
   ConfigurationAdminImpl.cpp
   ConfigurationImpl.cpp
-
   metadata/MetadataParserImpl.cpp
   )
 
@@ -17,7 +16,6 @@ set(_private_headers
   ConfigurationAdminPrivate.hpp
   ConfigurationImpl.hpp
   ConfigurationPrivate.hpp
-
   metadata/ConfigurationMetadata.hpp
   metadata/MetadataParser.hpp
   metadata/MetadataParserFactory.hpp

@@ -21,6 +21,7 @@
   =============================================================================*/
 
 #include "SingletonComponentConfiguration.hpp"
+#include "ComponentManager.hpp"
 #include "ReferenceManager.hpp"
 #include "ReferenceManagerImpl.hpp"
 #include "RegistrationManager.hpp"
@@ -40,9 +41,16 @@ namespace scrimpl {
 SingletonComponentConfigurationImpl::SingletonComponentConfigurationImpl(
   std::shared_ptr<const metadata::ComponentMetadata> metadata,
   const Bundle& bundle,
-  std::shared_ptr<const ComponentRegistry> registry,
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger)
-  : ComponentConfigurationImpl(metadata, bundle, registry, logger)
+  std::shared_ptr<ComponentRegistry> registry,
+  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+  std::shared_ptr<ConfigurationNotifier> configNotifier,
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
+  : ComponentConfigurationImpl(metadata,
+                               bundle,
+                               registry,
+                               logger,
+                               configNotifier,
+                               managers)
 {}
 
 std::shared_ptr<ServiceFactory>
@@ -87,6 +95,25 @@ SingletonComponentConfigurationImpl::CreateAndActivateComponentInstance(
     }
   }
   return instanceContextPair->first;
+}
+bool SingletonComponentConfigurationImpl::ModifyComponentInstanceProperties()
+{
+  auto instanceContextPair = data.lock();
+  if (instanceContextPair->first) {
+    try {
+      if (instanceContextPair->first->DoesModifiedMethodExist()) {
+        instanceContextPair->first->Modified();
+        return true;
+      }
+    } catch (...) {
+      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                       "Exception received from user code while modifying "
+                       "component configuration",
+                       std::current_exception());
+      return false;
+    }
+  }
+  return false;
 }
 
 void SingletonComponentConfigurationImpl::DestroyComponentInstances()
@@ -134,9 +161,10 @@ void SingletonComponentConfigurationImpl::BindReference(
 {
   auto context = GetComponentContext();
   if (!context->AddToBoundServicesCache(refName, ref)) {
-      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-          "Failure while trying to add reference to BoundServices Cache ");
-      return;
+    GetLogger()->Log(
+      cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+      "Failure while trying to add reference to BoundServices Cache ");
+    return;
   }
   try {
     GetComponentInstance()->InvokeBindMethod(refName, ref);

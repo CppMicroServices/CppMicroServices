@@ -23,7 +23,7 @@
 #define _TEST_SAMPLE_HPP_
 
 #include "TestInterfaces/TestInterfacesExport.h"
-
+#include "cppmicroservices/AnyMap.h"
 #include <memory>
 #include <string>
 
@@ -159,6 +159,26 @@ public:
   virtual bool IsActivated() = 0;
   virtual bool IsDeactivated() = 0;
   virtual ~LifeCycleValidation();
+};
+
+//Use this interface in test bundles testing ConfigAdmin
+//integration into DS to get information from the component instance.
+class US_TestInterfaces_EXPORT CAInterface
+{
+public:
+  virtual cppmicroservices::AnyMap GetProperties() = 0;
+  virtual ~CAInterface();
+};
+
+//Use this interface in test bundles testing ConfigAdmin
+//integration into DS to get information from the component instance
+//and also information about dependency injection.
+class US_TestInterfaces_EXPORT CAInterface1
+{
+public:
+  virtual cppmicroservices::AnyMap GetProperties() = 0;
+  virtual bool isDependencyInjected() = 0;
+  virtual ~CAInterface1();
 };
 }
 

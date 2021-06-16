@@ -26,8 +26,6 @@
 #include "../ConcurrencyUtil.hpp"
 #include "CCSatisfiedState.hpp"
 
-#include "cppmicroservices/detail/CounterLatch.h"
-
 using cppmicroservices::service::component::runtime::dto::ComponentState;
 
 namespace cppmicroservices {
@@ -54,6 +52,18 @@ public:
     ComponentConfigurationImpl& mgr,
     const cppmicroservices::Bundle& clientBundle) override;
 
+  void Deactivate(ComponentConfigurationImpl& mgr) override;
+
+  /**
+   * Modifies the properties of the component instance when a configuration object on 
+   * which it is dependent changes. No state change. R
+   * @return
+   *    - true if the component has a Modified method.
+   *    - false if the component does not have a Modified method. The 
+   *      component has been Deactivated
+   */
+  bool Modified(ComponentConfigurationImpl&) override;
+
   /**
    * Rebind to a target service. This operation does not transition to another state.
    *
@@ -73,10 +83,8 @@ public:
    */
   ComponentState GetValue() const override { return ComponentState::ACTIVE; }
 
-  void WaitForTransitionTask() override { latch.Wait(); }
-
 private:
-  detail::CounterLatch latch;
+  void DoDeactivateWork(ComponentConfigurationImpl& mgr);
 };
 }
 }

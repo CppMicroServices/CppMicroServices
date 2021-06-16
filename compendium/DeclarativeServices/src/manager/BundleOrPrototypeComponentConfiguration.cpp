@@ -21,6 +21,7 @@
   =============================================================================*/
 
 #include "BundleOrPrototypeComponentConfiguration.hpp"
+#include "ComponentManager.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -29,9 +30,16 @@ BundleOrPrototypeComponentConfigurationImpl::
   BundleOrPrototypeComponentConfigurationImpl(
     std::shared_ptr<const metadata::ComponentMetadata> metadata,
     const cppmicroservices::Bundle& bundle,
-    std::shared_ptr<const ComponentRegistry> registry,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger)
-  : ComponentConfigurationImpl(metadata, bundle, registry, logger)
+    std::shared_ptr<ComponentRegistry> registry,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    std::shared_ptr<ConfigurationNotifier> configNotifier,
+    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
+  : ComponentConfigurationImpl(metadata,
+                               bundle,
+                               registry,
+                               logger,
+                               configNotifier,
+                               managers)
 {}
 
 std::shared_ptr<ServiceFactory>
@@ -69,6 +77,31 @@ BundleOrPrototypeComponentConfigurationImpl::CreateAndActivateComponentInstance(
                      std::current_exception());
   }
   return nullptr;
+}
+
+bool BundleOrPrototypeComponentConfigurationImpl::
+  ModifyComponentInstanceProperties()
+{
+  auto compInstCtxtPairList = compInstanceMap.lock();
+  bool retValue = false;
+  for (const auto& valPair : *compInstCtxtPairList) {
+    try {
+      if (valPair.first->DoesModifiedMethodExist()) {
+        valPair.first->Modified();
+        retValue = true;
+      }
+    } catch (...) {
+      GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                       "Exception received from user code while modifying "
+                       "component configuration",
+                       std::current_exception());
+      return false;
+    }
+  }
+  // ModifyComponentInstanceProperties returns true if the component instance has a Modified method.
+  // Only need to return the value for the last instance because if one of the instances
+  // has a Modified method, they all do.
+  return retValue;
 }
 
 void BundleOrPrototypeComponentConfigurationImpl::DestroyComponentInstances()
@@ -133,9 +166,10 @@ void BundleOrPrototypeComponentConfigurationImpl::BindReference(
     auto& instance = instancePair.first;
     auto& context = instancePair.second;
     if (!context->AddToBoundServicesCache(refName, ref)) {
-        GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-            "Failure while trying to add reference to BoundServices Cache ");
-        return;
+      GetLogger()->Log(
+        cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+        "Failure while trying to add reference to BoundServices Cache ");
+      return;
     }
     try {
       instance->InvokeBindMethod(refName, ref);

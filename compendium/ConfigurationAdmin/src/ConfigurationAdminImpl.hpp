@@ -33,6 +33,7 @@
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
+#include "cppmicroservices/cm/ConfigurationListener.hpp"
 #include "cppmicroservices/cm/ManagedService.hpp"
 #include "cppmicroservices/cm/ManagedServiceFactory.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
@@ -125,7 +126,7 @@ public:
    * See {@code ConfigurationAdmin#ListConfigurations}
    */
   std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
-  ListConfigurations(const std::string& filter) override;
+  ListConfigurations(const std::string& filter = std::string{}) override;
 
   /**
    * Internal method used by {@code CMBundleExtension} to add new {@code Configuration} objects
@@ -145,13 +146,14 @@ public:
     std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs) override;
 
   /**
-   * Internal method used to notify any {@code ManagedService} or {@code ManagedServiceFactory} of an
-   * update to a {@code Configuration}. Performs the notifications asynchronously with the latest state
-   * of the properties at the time.
+   * Internal method used to notify any {@code ManagedService} or {@code ManagedServiceFactory} or 
+   * {@code ConfigurationListener} of an update to a {@code Configuration}. Performs the 
+   * notifications asynchronously with the latest state of the properties at the time.
    *
    * See {@code ConfigurationAdminPrivate#NotifyConfigurationUpdated}
    */
-  void NotifyConfigurationUpdated(const std::string& pid) override;
+  std::shared_future<void> NotifyConfigurationUpdated(
+    const std::string& pid) override;
 
   /**
    * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
@@ -160,8 +162,9 @@ public:
    *
    * See {@code ConfigurationAdminPrivate#NotifyConfigurationRemoved}
    */
-  void NotifyConfigurationRemoved(const std::string& pid,
-                                  std::uintptr_t configurationId) override;
+  std::shared_future<void> NotifyConfigurationRemoved(
+    const std::string& pid,
+    std::uintptr_t configurationId) override;
 
   // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedService
   std::shared_ptr<
@@ -205,7 +208,7 @@ public:
 private:
   // Convenience wrapper which is used to perform asyncronous operations
   template<typename Functor>
-  void PerformAsync(Functor&& f);
+  std::shared_future<void> PerformAsync(Functor&& f);
 
   // Used to generate a random instance name for CreateFactoryConfiguration
   std::string RandomInstanceName();
@@ -235,6 +238,9 @@ private:
     TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>>
     managedServiceFactoryTracker;
   std::mt19937 randomGenerator;
+  cppmicroservices::ServiceTracker<
+    cppmicroservices::service::cm::ConfigurationListener>
+    configListenerTracker;
 };
 } // cmimpl
 } // cppmicroservices

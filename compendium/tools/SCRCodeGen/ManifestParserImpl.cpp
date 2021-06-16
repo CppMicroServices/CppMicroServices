@@ -57,6 +57,54 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
       componentInfo.injectReferences = injectReferences.asBool();
     }
 
+    // configuration-policy and configuration-pid
+    bool configPolicy = false;
+    bool configPid = false;
+    componentInfo.configurationPolicy =
+      codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE;
+    if (jsonComponent.isMember("configuration-policy")) {
+      configPolicy = true;
+      JsonValueValidator::ValidChoices<3> policyChoices = {
+        { "require", "optional", "ignore" }
+      };
+      componentInfo.configurationPolicy =
+       JsonValueValidator(
+          jsonComponent, "configuration-policy", policyChoices).GetString();
+    }
+    if (jsonComponent.isMember("configuration-pid")) {
+      configPid = true;
+      // make sure there are no duplicates in the configuration-pid array.
+      const auto configurationPids = JsonValueValidator(
+        jsonComponent, "configuration-pid", Json::ValueType::arrayValue)();
+      std::unordered_map<std::string, std::string> duplicatePids;
+      for (const auto& pid : configurationPids) {
+        if (duplicatePids.find(pid.asString()) != duplicatePids.end()) {
+          std::string msg = "configuration-pid error in the manifest. "
+                            "Duplicate pid detected.";
+          msg.append(pid.asString());
+          throw std::runtime_error(msg);
+        }
+        duplicatePids.emplace(pid.asString(), pid.asString());
+      }
+    }
+    // Both configuration-policy and configuration-pid must be present in the manifest.json
+    // file to participate in Configuration Admin.
+    if ((configPolicy && !configPid) || (!configPolicy && configPid)) {
+      componentInfo.configurationPolicy =
+        codegen::datamodel::ComponentInfo::CONFIG_POLICY_IGNORE;
+      throw std::runtime_error(
+        "Error: Both configuration-policy and configuration-pid must be "
+        "present in the manifest.json file to participate in Configuration "
+        "Admin.");
+    }
+    // factory
+     if (jsonComponent.isMember("factory")) {
+      auto factoryComponentID =
+        JsonValueValidator(
+          jsonComponent, "factory", Json::ValueType::stringValue)
+          .GetString();
+     }
+
     // service
     if (jsonComponent.isMember("service")) {
       const auto jsonServiceInfo = JsonValueValidator(

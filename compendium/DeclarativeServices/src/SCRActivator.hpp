@@ -29,7 +29,9 @@
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleEvent.h"
+#include "cppmicroservices/cm/ConfigurationListener.hpp"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
+#include "manager/ConfigurationNotifier.hpp"
 #include <map>
 #include <vector>
 
@@ -77,6 +79,10 @@ private:
   std::shared_ptr<SCRLogger> logger;
   ListenerToken bundleListenerToken;
   std::shared_ptr<boost::asio::thread_pool> threadpool;
+  cppmicroservices::ServiceRegistration<
+    cppmicroservices::service::cm::ConfigurationListener>
+    configListenerReg;
+  std::shared_ptr<ConfigurationNotifier> configNotifier;
 };
 } // scrimpl
 } // cppmicroservices

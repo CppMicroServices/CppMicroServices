@@ -279,42 +279,20 @@ TEST_F(ConfigAdminTests, testServiceUpdated)
 
   // props differs from the initial configuration (anInt = 2) of the pid in the manifest file,
   // so the service should get an Updated() notification.
-  configuration->UpdateIfDifferent(props);
-
-  // Poll on the service having been updated with the new configuration. The asynchronous
-  // nature of configuration admin means that we may get an additional Updated() call, which
-  // could have either anInt=2 or anInt=5 depending on relative thread timings.
-  {
-    bool result = false;
-    std::string diagnostic;
-    std::tie(result, diagnostic) = pollOnCondition<PollingCondition::GE>(
-      [&service] { return service->getCounter(); }, expectedCount);
-    EXPECT_TRUE(result) << diagnostic;
-  }
-
-  // Wait for long enough for any superfluous Updated() calls to wash out
-  std::this_thread::sleep_for(DEFAULT_POLL_PERIOD);
-  // At most, Updated() should have been called three times (one "excess"). If the excess
-  // call were made with the updated properties, this would give us a maximum counter value
-  // of 2 + 2*newIncrement. Update expectedCount to the current value of the counter.
-  EXPECT_LE(service->getCounter(), expectedCount + newIncrement);
-  expectedCount = service->getCounter();
+  auto result = configuration->UpdateIfDifferent(props);
+  result.second.get();
+  EXPECT_EQ(service->getCounter(), expectedCount);
 
   // UpdateIfDifferent with the same properties shouldn't call Updated()
-  configuration->UpdateIfDifferent(props);
-  std::this_thread::sleep_for(DEFAULT_POLL_PERIOD);
+  result = configuration->UpdateIfDifferent(props);
+  result.second.get();
   EXPECT_EQ(service->getCounter(), expectedCount);
 
   // Update should call Updated() even if the properties are unchanged
-  configuration->Update(props);
+  auto fut = configuration->Update(props);
+  fut.get();
   expectedCount += newIncrement;
-  {
-    bool result = false;
-    std::string diagnostic;
-    std::tie(result, diagnostic) = pollOnCondition<PollingCondition::EQ>(
-      [&service] { return service->getCounter(); }, expectedCount);
-    EXPECT_TRUE(result) << diagnostic;
-  }
+  EXPECT_EQ(service->getCounter(), expectedCount);
 }
 
 TEST_F(ConfigAdminTests, testServiceRemoved)
@@ -334,18 +312,15 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
 
   auto configuration = m_configAdmin->GetConfiguration("cm.testservice");
 
+  EXPECT_EQ(service->getCounter(), expectedCount);
+
   // Remove sends an asynchronous notification to the ManagedService so we
   // have to wait until it's finished before checking the result.
-  configuration->Remove();
-  expectedCount -= 1;
+  auto fut = configuration->Remove();
+  fut.get();
 
-  {
-    bool result = false;
-    std::string diagnostic;
-    std::tie(result, diagnostic) = pollOnCondition<PollingCondition::EQ>(
-      [&service] { return service->getCounter(); }, expectedCount);
-    EXPECT_TRUE(result) << diagnostic;
-  }
+  expectedCount -= 1;
+  EXPECT_EQ(service->getCounter(), expectedCount);
 
   // Should create a new configuration and call Updated()
   // GetConfiguration doesn't send a notification to the ManagedService so
@@ -362,14 +337,9 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
 
   // props differs from the latest configuration for the recreated configuration, which is empty.
   // The service should therefore get an Updated() notification.
-  configuration->UpdateIfDifferent(props);
-  {
-    bool result = false;
-    std::string diagnostic;
-    std::tie(result, diagnostic) = pollOnCondition<PollingCondition::EQ>(
-      [&service] { return service->getCounter(); }, expectedCount);
-    EXPECT_TRUE(result) << diagnostic;
-  }
+  auto result = configuration->UpdateIfDifferent(props);
+  result.second.get();
+  EXPECT_EQ(service->getCounter(), expectedCount);
 }
 
 /*
@@ -418,60 +388,38 @@ TEST_F(ConfigAdminTests, testServiceFactoryUpdated)
 
   // props differs from the initial configuration (anInt = 2) of the pid in the manifest file,
   // so the service should get an Updated() notification.
-  configuration_config1->UpdateIfDifferent(props);
-  {
-    bool result = false;
-    std::string diagnostic;
-    std::tie(result, diagnostic) = pollOnCondition<PollingCondition::EQ>(
-      [&serviceFactory] {
-        return serviceFactory->getUpdatedCounter("cm.testfactory~config1");
-      },
-      expectedCount_config1);
-    EXPECT_TRUE(result) << diagnostic;
-  }
+  auto fut = configuration_config1->UpdateIfDifferent(props);
+  fut.second.get();
+  EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config1"),
+            expectedCount_config1);
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config2"),
             expectedCount_config2);
 
   // UpdateIfDifferent with the same properties shouldn't call Updated()
-  configuration_config1->UpdateIfDifferent(props);
-  std::this_thread::sleep_for(DEFAULT_POLL_PERIOD);
+  fut = configuration_config1->UpdateIfDifferent(props);
+  fut.second.get();
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config1"),
             expectedCount_config1);
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config2"),
             expectedCount_config2);
 
   // Update should call Updated() even if the properties are unchanged
-  configuration_config1->Update(props);
+  auto fut1 = configuration_config1->Update(props);
+  fut1.get();
   expectedCount_config1 += newIncrement;
-  {
-    bool result = false;
-    std::string diagnostic;
-    std::tie(result, diagnostic) = pollOnCondition<PollingCondition::EQ>(
-      [&serviceFactory] {
-        return serviceFactory->getUpdatedCounter("cm.testfactory~config1");
-      },
-      expectedCount_config1);
-    EXPECT_TRUE(result) << diagnostic;
-  }
+  EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config1"),
+            expectedCount_config1);
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config2"),
             expectedCount_config2);
 
   // Update config 2 now.
   auto configuration_config2 =
     m_configAdmin->GetFactoryConfiguration("cm.testfactory", "config2");
-  configuration_config2->UpdateIfDifferent(props);
+  fut = configuration_config2->UpdateIfDifferent(props);
+  fut.second.get();
   expectedCount_config2 += newIncrement;
-
-  {
-    bool result = false;
-    std::string diagnostic;
-    std::tie(result, diagnostic) = pollOnCondition<PollingCondition::EQ>(
-      [&serviceFactory] {
-        return serviceFactory->getUpdatedCounter("cm.testfactory~config2");
-      },
-      expectedCount_config2);
-    EXPECT_TRUE(result) << diagnostic;
-  }
+  EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config2"),
+            expectedCount_config2);
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config1"),
             expectedCount_config1);
 
@@ -535,16 +483,7 @@ TEST_F(ConfigAdminTests, testRemoveFactoryConfiguration)
 
   configuration_config1->Remove();
 
-  {
-    bool result = false;
-    std::string diagnostic;
-    std::tie(result, diagnostic) = pollOnCondition<PollingCondition::EQ>(
-      [&serviceFactory] {
-        return serviceFactory->getRemovedCounter("cm.testfactory~config1");
-      },
-      1);
-    EXPECT_TRUE(result) << diagnostic;
-  }
+  EXPECT_NE(serviceFactory->getRemovedCounter("cm.testfactory~config1"), 0);
   EXPECT_EQ(serviceFactory->getRemovedCounter("cm.testfactory~config2"), 0);
 
   // Should create a new configuration

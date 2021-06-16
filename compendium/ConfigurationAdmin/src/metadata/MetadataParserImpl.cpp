@@ -52,7 +52,7 @@ MetadataParserImplV1::ParseAndGetConfigurationMetadata(
       cmMap.at("configurations"));
 
   std::size_t index = 0;
-  for (auto& configurationAny : configurations) {
+  for (const auto& configurationAny : configurations) {
     // Allow exception to escape if any Configuration isn't an AnyMap
     auto& config = cppmicroservices::ref_any_cast<cppmicroservices::AnyMap>(
       configurationAny);

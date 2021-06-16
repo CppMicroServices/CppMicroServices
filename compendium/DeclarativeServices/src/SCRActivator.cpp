@@ -21,6 +21,7 @@
   =============================================================================*/
 
 #include "SCRActivator.hpp"
+#include "ConfigurationListenerImpl.hpp"
 #include "SCRLogger.hpp"
 #include "ServiceComponentRuntimeImpl.hpp"
 #include "manager/ComponentManager.hpp"
@@ -31,7 +32,6 @@
 #include <memory>
 #include <stdexcept>
 #include <vector>
-
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/dto/ComponentConfigurationDTO.hpp"
@@ -60,6 +60,10 @@ void SCRActivator::Start(BundleContext context)
   // Create the Logger object used by this runtime
   logger = std::make_shared<SCRLogger>(context);
   logger->Log(SeverityLevel::LOG_DEBUG, "Starting SCR bundle");
+
+  // Create configuration object notifier
+  configNotifier = std::make_shared<ConfigurationNotifier>(context, logger, threadpool);
+
   // Add bundle listener
   bundleListenerToken = context.AddBundleListener(
     std::bind(&SCRActivator::BundleChanged, this, std::placeholders::_1));
@@ -76,6 +80,15 @@ void SCRActivator::Start(BundleContext context)
     runtimeContext, componentRegistry, logger);
   scrServiceReg =
     context.RegisterService<ServiceComponentRuntime>(std::move(service));
+
+  // Publish ConfigurationListener
+  auto configListener =
+    std::make_shared<cppmicroservices::service::cm::ConfigurationListenerImpl>(
+      runtimeContext, logger, configNotifier);
+  configListenerReg =
+    context
+      .RegisterService<cppmicroservices::service::cm::ConfigurationListener>(
+        std::move(configListener));
 }
 
 void SCRActivator::Stop(cppmicroservices::BundleContext context)
@@ -96,6 +109,9 @@ void SCRActivator::Stop(cppmicroservices::BundleContext context)
     context.RemoveListener(std::move(bundleListenerToken));
     // remove the runtime service from the framework
     scrServiceReg.Unregister();
+    // remove the configuration listener service from the framework
+    configListenerReg.Unregister();
+
     // dispose all components created by SCR
     const auto bundles = context.GetBundles();
     for (auto const& bundle : bundles) {
@@ -136,6 +152,7 @@ void SCRActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
     std::lock_guard<std::mutex> l(bundleRegMutex);
     extensionFound = (bundleRegistry.count(bundle.GetBundleId()) != 0u);
   }
+
   // bundle components have not been loaded, so create the extension which will load the components
   if (!extensionFound) {
     logger->Log(SeverityLevel::LOG_DEBUG,
@@ -147,7 +164,8 @@ void SCRActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
                                                      scrMap,
                                                      componentRegistry,
                                                      logger,
-                                                     threadpool);
+                                                     threadpool,
+                                                     configNotifier);
       {
         std::lock_guard<std::mutex> l(bundleRegMutex);
         bundleRegistry.insert(

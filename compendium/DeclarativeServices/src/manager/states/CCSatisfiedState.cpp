@@ -27,10 +27,22 @@
 namespace cppmicroservices {
 namespace scrimpl {
 
-CCSatisfiedState::CCSatisfiedState() = default;
+CCSatisfiedState::CCSatisfiedState()
+{
+  std::promise<void> prom;
+  ready = prom.get_future();
+  prom.set_value();
+}
 
 void CCSatisfiedState::Deactivate(ComponentConfigurationImpl& mgr)
 {
+  std::lock_guard<std::mutex> lock(oneAtATimeMutex);
+
+  // Make sure the state didn't change while we were waiting
+  if (mgr.GetConfigState() !=
+      service::component::runtime::dto::ComponentState::SATISFIED) {
+    return;
+  }
   auto currentState = shared_from_this();
   std::packaged_task<void(void)> task([&mgr]() {
     mgr.UnregisterService();

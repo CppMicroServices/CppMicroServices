@@ -208,8 +208,8 @@ public:
   void RemoveFromBoundServicesCache(
     const std::string& refName,
     const cppmicroservices::ServiceReferenceBase& sRef);
-
-private:
+  
+  private:
   /**
    * Returns the Id of the bundle containing the component
    *

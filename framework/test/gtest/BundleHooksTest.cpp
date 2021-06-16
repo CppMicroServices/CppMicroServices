@@ -178,14 +178,19 @@ TEST_F(BundleHooksTest, TestEventHook)
   bundleA.Start();
 
   //Test for received load bundle events
-  ASSERT_TRUE(bundleListener.events.size() == 4 ||
-              bundleListener.events.size() == 3);
+#ifdef US_BUILD_SHARED_LIBS
+  ASSERT_EQ(bundleListener.events.size(), 4);
+#else
+  ASSERT_GE(static_cast<int>(bundleListener.events.size()), 3);
+#endif
 
   bundleA.Stop();
   //Test for received unload bundle events
-  ASSERT_TRUE(bundleListener.events.size() == 5 ||
-              bundleListener.events.size() == 6);
-  ;
+#ifdef US_BUILD_SHARED_LIBS
+  ASSERT_EQ(bundleListener.events.size(), 6);
+#else
+  ASSERT_GE(static_cast<int>(bundleListener.events.size()), 5);
+#endif
 
   auto eventHookReg =
     framework.GetBundleContext().RegisterService<BundleEventHook>(
@@ -227,7 +232,11 @@ TEST_F(BundleHooksTest, TestEventHookFailure)
   bundleA.Start();
 
   // bundle starting and bundle started events
-  EXPECT_TRUE(listener.events.size() == 3 || listener.events.size() == 2);
+#ifdef US_BUILD_SHARED_LIBS
+  ASSERT_EQ(listener.events.size(), 2);
+#else
+  ASSERT_GE(static_cast<int>(listener.events.size()), 2);
+#endif
 
   std::for_each(listener.events.begin(),
                 listener.events.end(),
@@ -267,7 +276,11 @@ TEST_F(BundleHooksTest, TestFindHookFailure)
 
   // bundle starting and bundle started events
   //Test for expected number of framework events
-  EXPECT_TRUE(listener.events.size() == 1 || listener.events.size() == 2);
+#ifdef US_BUILD_SHARED_LIBS
+  ASSERT_EQ(listener.events.size(), 1);
+#else
+  ASSERT_GE(static_cast<int>(listener.events.size()), 1);
+#endif
 
   std::for_each(listener.events.begin(),
                 listener.events.end(),

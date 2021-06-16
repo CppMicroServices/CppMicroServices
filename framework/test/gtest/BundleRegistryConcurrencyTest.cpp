@@ -69,8 +69,6 @@ void TestSerialBundleInstall(const Framework& f)
   // used.
   auto bc = f.GetBundleContext();
 
-  cppmicroservices::testing::HighPrecisionTimer timer;
-  timer.Start();
   InstallTestBundleNoErrorHandling(bc, "TestBundleA");
   InstallTestBundleNoErrorHandling(bc, "TestBundleA2");
   InstallTestBundleNoErrorHandling(bc, "TestBundleB");

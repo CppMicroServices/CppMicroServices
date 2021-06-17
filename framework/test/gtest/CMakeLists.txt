@@ -8,6 +8,7 @@ include_directories(
   ${GTEST_INCLUDE_DIRS}
   ${GMOCK_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/../util
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../third_party
   )
 
 #-----------------------------------------------------------------------------
@@ -47,16 +48,19 @@ set(_gtest_tests
   StaticBundleResourceTest.cpp
   FrameworkEventTest.cpp
   TestCounterLatch.cpp
+  ResourceCompilerTest.cpp
 )
 
 if(BUILD_SHARED_LIBS)
   list(APPEND _gtest_tests
        SharedLibraryTest.cpp
+       ServiceListenerTest.cpp
       )
 endif()
 
 set(_additional_srcs
   ../util/TestUtilBundleListener.cpp
+  ../util/TestUtilFrameworkListener.cpp
   ../util/TestUtils.cpp
   ../util/ImportTestBundles.cpp
   $<TARGET_OBJECTS:util>
@@ -66,12 +70,17 @@ set(_additional_srcs
 # Build the main test driver executable
 #-----------------------------------------------------------------------------
 
+set(_third_party_srcs 
+  ../../../third_party/miniz.c
+  ../../../third_party/jsoncpp.cpp
+)
+
 # Generate a custom "bundle init" file for the test driver executable
 usFunctionGenerateBundleInit(TARGET ${us_gtest_test_exe_name} OUT _additional_srcs)
 
 usFunctionGetResourceSource(TARGET ${us_gtest_test_exe_name} OUT _additional_srcs)
 
-add_executable(${us_gtest_test_exe_name} ${_gtest_tests} ${_additional_srcs})
+add_executable(${us_gtest_test_exe_name} ${_gtest_tests} ${_additional_srcs} ${_third_party_srcs})
 
 # Needed for ResourceCompilerTest
 add_dependencies(${us_gtest_test_exe_name} ${US_RCC_EXECUTABLE_TARGET})

@@ -35,7 +35,6 @@ set(_tests
   BundleTest
   MemcheckTest
   MultipleListenersTest
-  ResourceCompilerTest
   ShrinkableMapTest
   ServiceFactoryTest
   ServiceHooksTest
@@ -43,12 +42,6 @@ set(_tests
   ServiceTemplateTest
   StaticBundleTest
 )
-
-if(BUILD_SHARED_LIBS)
-  list(APPEND _tests
-       ServiceListenerTest
-      )
-endif()
 
 set(_additional_srcs
   TestDriverActivator.cpp

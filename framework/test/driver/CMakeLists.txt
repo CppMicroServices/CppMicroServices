@@ -32,7 +32,6 @@ set(_tests
   FrameworkListenerTest
   HelgrindTest
   BundleHooksTest
-  BundleTest
   MemcheckTest
   MultipleListenersTest
   ShrinkableMapTest

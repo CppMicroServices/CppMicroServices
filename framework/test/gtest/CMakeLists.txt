@@ -49,6 +49,7 @@ set(_gtest_tests
   FrameworkEventTest.cpp
   TestCounterLatch.cpp
   ResourceCompilerTest.cpp
+  BundleTest.cpp
 )
 
 if(BUILD_SHARED_LIBS)

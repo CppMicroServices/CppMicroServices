@@ -66,6 +66,11 @@ cppmicroservices::Bundle InstallAndStartBundle(
 void InstallAndStartDS(::cppmicroservices::BundleContext frameworkCtx);
 
 /**
+ * Convenience Method to install and start ConfigurationAdmin.
+ */
+void InstallAndStartConfigAdmin(::cppmicroservices::BundleContext frameworkCtx);
+
+/**
  * Convenience Method to extract service-id from a service reference
  */
 long GetServiceId(const ::cppmicroservices::ServiceReferenceBase& sRef);
@@ -74,6 +79,12 @@ long GetServiceId(const ::cppmicroservices::ServiceReferenceBase& sRef);
  * Returns the file path of declarative services runtime plugin
  */
 std::string GetDSRuntimePluginFilePath();
+
+/**
+ * Returns the file path of Configuration Admin runtime plugin
+ */
+
+std::string GetConfigAdminRuntimePluginFilePath();
 
 /**
  * Returns the path to the test bundles folder

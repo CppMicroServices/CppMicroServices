@@ -4,6 +4,9 @@ namespace test {
 Interface1::~Interface1() = default;
 Interface2::~Interface2() = default;
 Interface3::~Interface3() = default;
+  
+TestBundleDSDependent::~TestBundleDSDependent() = default;
+TestBundleDSUpstreamDependency::~TestBundleDSUpstreamDependency() = default;
 
 DSGraph01::~DSGraph01() = default;
 DSGraph02::~DSGraph02() = default;
@@ -14,4 +17,7 @@ DSGraph06::~DSGraph06() = default;
 DSGraph07::~DSGraph07() = default;
 
 LifeCycleValidation::~LifeCycleValidation() = default;
+CAInterface::~CAInterface() = default;
+CAInterface1::~CAInterface1() = default;
+
 }

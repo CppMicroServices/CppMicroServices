@@ -61,11 +61,15 @@ class BundleContextPrivate;
       US_BUNDLE_NAME){};                                                       \
                                                                                \
     extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(        \
+      US_BUNDLE_NAME)();                                                       \
+    extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(        \
       US_BUNDLE_NAME)()                                                        \
     {                                                                          \
       return US_CTX_INS(US_BUNDLE_NAME).load();                                \
     }                                                                          \
                                                                                \
+    extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(             \
+      cppmicroservices::BundleContextPrivate * ctx);                           \
     extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(             \
       cppmicroservices::BundleContextPrivate * ctx)                            \
     {                                                                          \

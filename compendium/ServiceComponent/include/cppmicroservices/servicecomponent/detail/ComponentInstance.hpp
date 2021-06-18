@@ -67,12 +67,11 @@ public:
    */
   virtual void Deactivate() = 0;
 
-  /**
-   * This method is called by the runtime while the component configuration is active and if
-   * the configuration properties are modified.
+/**
+   * This method is called by the runtime when configuration objects change to 
+   * notify the component instance of the configuration changes. .
    */
   virtual void Modified() = 0;
-
   /**
    * This method is called by the runtime to bind a reference with dynamic policy
    */
@@ -91,6 +90,7 @@ public:
    * This method is called when a call to @{code ServiceFactory#GetService} is received by the runtime.
    */
   virtual cppmicroservices::InterfaceMapPtr GetInterfaceMap() = 0;
+  virtual bool DoesModifiedMethodExist() = 0;
 };
 
 }

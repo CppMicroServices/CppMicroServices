@@ -128,10 +128,14 @@ struct BundleActivator
  */
 #define CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(_activator_type)              \
   extern "C" US_ABI_EXPORT cppmicroservices::BundleActivator*                  \
+    US_CREATE_ACTIVATOR_FUNC(US_BUNDLE_NAME)();                                \
+  extern "C" US_ABI_EXPORT cppmicroservices::BundleActivator*                  \
     US_CREATE_ACTIVATOR_FUNC(US_BUNDLE_NAME)()                                 \
   {                                                                            \
     return new _activator_type();                                              \
   }                                                                            \
+  extern "C" US_ABI_EXPORT void US_DESTROY_ACTIVATOR_FUNC(US_BUNDLE_NAME)(     \
+    cppmicroservices::BundleActivator * activator);                            \
   extern "C" US_ABI_EXPORT void US_DESTROY_ACTIVATOR_FUNC(US_BUNDLE_NAME)(     \
     cppmicroservices::BundleActivator * activator)                             \
   {                                                                            \

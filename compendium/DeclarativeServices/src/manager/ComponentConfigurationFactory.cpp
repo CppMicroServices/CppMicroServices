@@ -22,6 +22,7 @@
 
 #include "ComponentConfigurationFactory.hpp"
 #include "BundleOrPrototypeComponentConfiguration.hpp"
+#include "ComponentManager.hpp"
 #include "SingletonComponentConfiguration.hpp"
 
 namespace cppmicroservices {
@@ -31,18 +32,20 @@ std::shared_ptr<ComponentConfigurationImpl>
 ComponentConfigurationFactory::CreateConfigurationManager(
   std::shared_ptr<const metadata::ComponentMetadata> compDesc,
   const cppmicroservices::Bundle& bundle,
-  std::shared_ptr<const ComponentRegistry> registry,
-  std::shared_ptr<logservice::LogService> logger)
+  std::shared_ptr<ComponentRegistry> registry,
+  std::shared_ptr<logservice::LogService> logger,
+  std::shared_ptr<ConfigurationNotifier> configNotifier,
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
 {
   std::shared_ptr<ComponentConfigurationImpl> retVal;
   std::string scope = compDesc->serviceMetadata.scope;
   if (scope == cppmicroservices::Constants::SCOPE_SINGLETON) {
     retVal = std::make_shared<SingletonComponentConfigurationImpl>(
-      compDesc, bundle, registry, logger);
+      compDesc, bundle, registry, logger, configNotifier, managers);
   } else if (scope == cppmicroservices::Constants::SCOPE_BUNDLE ||
              scope == cppmicroservices::Constants::SCOPE_PROTOTYPE) {
     retVal = std::make_shared<BundleOrPrototypeComponentConfigurationImpl>(
-      compDesc, bundle, registry, logger);
+      compDesc, bundle, registry, logger, configNotifier, managers);
   }
   if (retVal) {
     retVal->Initialize();

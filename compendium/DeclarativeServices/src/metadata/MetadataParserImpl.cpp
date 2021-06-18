@@ -25,9 +25,12 @@
 #include "Util.hpp"
 #include "cppmicroservices/Bundle.h"
 
+#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include <iterator>
 
 using cppmicroservices::scrimpl::util::ObjectValidator;
+using cppmicroservices::service::component::ComponentConstants::
+  CONFIG_POLICY_IGNORE;
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -134,6 +137,81 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
   compMetadata->name = compMetadata->implClassName;
   ObjectValidator(metadata, "name", /*isOptional=*/true)
     .AssignValueTo(compMetadata->name);
+
+  // component.configuration-policy (Optional)
+  compMetadata->configurationPolicy = CONFIG_POLICY_IGNORE;
+  bool configPolicy = false;
+  object =
+    ObjectValidator(metadata, "configuration-policy", /*isOptional=*/true);
+  if (object.KeyExists()) {
+    object.AssignValueTo(compMetadata->configurationPolicy);
+    configPolicy = true;
+  }
+
+  // component.configuration-pid (Optional)
+  bool configPid = false;
+  object = ObjectValidator(metadata, "configuration-pid", /*isOptional=*/true);
+  if (object.KeyExists()) {
+    configPid = true;
+    if (configPolicy ) {
+      const auto configPids =
+        object.GetValue<std::vector<cppmicroservices::Any>>();
+      std::transform(
+        std::begin(configPids),
+        std::end(configPids),
+        std::back_inserter(compMetadata->configurationPids),
+        [](const auto& configPid) {
+          return ObjectValidator(configPid).GetValue<std::string>();
+        });
+
+      //search for a configuration pid equal to $. If present replace with component name.
+      // Also search for duplicates pids. These are errors.
+      std::unordered_map<std::string, std::string> duplicatePids;
+      for (auto& pid : compMetadata->configurationPids) {
+        if (pid == "$") {
+          pid = compMetadata->name;
+        }
+
+        if (duplicatePids.find(pid) != duplicatePids.end()) {
+          std::string msg =
+            "configuration-pid error in the manifest. Duplicate pid detected. ";
+          msg.append(pid);
+          throw std::runtime_error(msg);
+        }
+        duplicatePids.emplace(pid, pid);
+      };
+    }
+  }
+  /* In order to participate in ConfigurationAdmin both the configuration-policy
+     * and the configuration-pid must be present in the manifest.json file. 
+     * Otherwise the configuration-policy is set to ignore. If only one is present
+     * a Warning message is logged.
+     */
+  if ((configPolicy && !configPid) || (!configPolicy && configPid)) {
+    compMetadata->configurationPolicy = CONFIG_POLICY_IGNORE;
+    compMetadata->configurationPids.clear();
+    std::string msg = "Warning: configuration-policy has been set to ignore.";
+    msg.append(
+      " Both configuration-policy and configuration-pid must be present");
+    msg.append(" to participate in Configuration Admin. ");
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING, msg);
+  }
+
+  if (compMetadata->configurationPolicy == CONFIG_POLICY_IGNORE) {
+    compMetadata->configurationPids.clear();
+  }
+  // component.factory
+  ObjectValidator(metadata, "factory", /*isOptional=*/true)
+    .AssignValueTo(compMetadata->factoryComponentID);
+
+  // component.factoryProperties
+  object = ObjectValidator(metadata, "factory-properties", /*isOptional=*/true);
+  if (object.KeyExists()) {
+    const auto props = object.GetValue<AnyMap>();
+    for (const auto& prop : props) {
+      compMetadata->factoryComponentProperties.insert(prop);
+    }
+  }
 
   // component.properties
   object = ObjectValidator(metadata, "properties", /*isOptional=*/true);

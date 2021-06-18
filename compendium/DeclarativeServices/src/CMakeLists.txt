@@ -1,5 +1,6 @@
 
 set(_srcs
+  ConfigurationListenerImpl.cpp
   ComponentContextImpl.cpp
   ComponentRegistry.cpp
   SCRBundleExtension.cpp
@@ -11,6 +12,8 @@ set(_srcs
   manager/ComponentConfigurationFactory.cpp
   manager/ComponentConfigurationImpl.cpp
   manager/ComponentManagerImpl.cpp
+  manager/ConfigurationManager.cpp
+  manager/ConfigurationNotifier.cpp
   manager/ReferenceManagerImpl.cpp
   manager/RegistrationManager.cpp
   manager/SingletonComponentConfiguration.cpp
@@ -29,9 +32,10 @@ set(_srcs
   metadata/ReferenceMetadata.cpp
   metadata/ServiceMetadata.cpp
   metadata/Util.cpp
-  )
+ )
 
 set(_private_headers
+  ConfigurationListenerImpl.hpp
   ComponentContextImpl.hpp
   ComponentRegistry.hpp
   SCRActivator.hpp
@@ -46,6 +50,8 @@ set(_private_headers
   manager/ComponentConfigurationImpl.hpp
   manager/ComponentManager.hpp
   manager/ComponentManagerImpl.hpp
+  manager/ConfigurationManager.hpp
+  manager/ConfigurationNotifier.hpp
   manager/ConcurrencyUtil.hpp
   manager/ReferenceManager.hpp
   manager/ReferenceManagerImpl.hpp
@@ -83,8 +89,10 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_BINARY_DIR}/framework/include
   ${CppMicroServices_BINARY_DIR}/compendium/ServiceComponent/include
   ${CppMicroServices_BINARY_DIR}/compendium/LogService/include
+  ${CppMicroServices_BINARY_DIR}/compendium/CM/include
   ${CppMicroServices_SOURCE_DIR}/compendium/ServiceComponent/include
   ${CppMicroServices_SOURCE_DIR}/compendium/LogService/include
+  ${CppMicroServices_SOURCE_DIR}/compendium/CM/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )

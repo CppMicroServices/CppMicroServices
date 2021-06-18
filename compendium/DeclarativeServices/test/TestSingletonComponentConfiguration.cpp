@@ -28,6 +28,7 @@
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/logservice/LogService.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -46,9 +47,19 @@ protected:
     framework.Start();
     auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
-    auto fakeLogger = std::make_shared<FakeLogger>();
-    obj = std::make_shared<SingletonComponentConfigurationImpl>(
-      mockMetadata, framework, mockRegistry, fakeLogger);
+    mockLogger = std::make_shared<MockLogger>();
+    auto threadpool = std::make_shared<boost::asio::thread_pool>();
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      framework.GetBundleContext(), mockLogger, threadpool);
+    auto managers =
+      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+
+    obj = std::make_shared<SingletonComponentConfigurationImpl>(mockMetadata,
+                                                                framework,
+                                                                mockRegistry,
+                                                                mockLogger,
+                                                                notifier,
+                                                                managers);
   }
 
   virtual void TearDown()
@@ -59,9 +70,18 @@ protected:
   }
 
   cppmicroservices::Framework framework;
+  std::shared_ptr<MockLogger> mockLogger;
   std::shared_ptr<SingletonComponentConfigurationImpl> obj;
 };
 
+ACTION(ModifiedMethodException)
+{
+  throw "Component Instance Modified method exception";
+}
+ACTION(ModifiedMethodExists)
+{
+  return true;
+}
 TEST_F(SingletonComponentConfigurationTest, TestGetFactory)
 {
   EXPECT_NE(obj->GetFactory(), nullptr);
@@ -101,6 +121,18 @@ TEST_F(SingletonComponentConfigurationTest,
   EXPECT_CALL(*mockInstance, CreateInstanceAndBindReferences(testing::_))
     .Times(1);
   EXPECT_CALL(*mockInstance, Activate()).Times(1);
+
+  // set logging expectations
+  auto ExceptionThrownByCreateComponentInstance = 
+    testing::AllOf(
+    testing::HasSubstr("Exception received from user code while activating "),
+    testing::HasSubstr("the component configuration"));
+  EXPECT_CALL(
+    *mockLogger,
+              Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                  ExceptionThrownByCreateComponentInstance,
+                  testing::_))
+    .Times(1);
   auto instance0 = obj->CreateAndActivateComponentInstance(framework);
   EXPECT_EQ(instance0, nullptr) << "Return value must be nullptr when an "
                                    "exception is thrown from user code";
@@ -195,6 +227,51 @@ TEST_F(SingletonComponentConfigurationTest, TestGetService)
     instCtxtPair->second.reset();
   }
 }
+/* This test verifies that if the Modified method of a component instance throws an 
+ * exception DS intercepts the exception and logs it. 
+ */
+TEST_F(SingletonComponentConfigurationTest,
+       TestModifiedMethodExceptionLogging)
+{
+  using cppmicroservices::logservice::SeverityLevel;
+
+  auto mockCompContext = std::make_shared<MockComponentContextImpl>(obj);
+  auto mockCompInstance = std::make_shared<MockComponentInstance>();
+  obj->SetComponentInstancePair(InstanceContextPair(
+    mockCompInstance,
+    mockCompContext)); 
+  EXPECT_NE(obj->GetComponentInstance(), nullptr);
+  EXPECT_NE(obj->GetComponentContext(), nullptr);
+
+  // set logging expectations
+  auto ExceptionThrownByModifiedMethod =
+    testing::AllOf(
+      testing::HasSubstr("Exception received from user code while modifying "),
+      testing::HasSubstr("component configuration"));
+  EXPECT_CALL(*mockLogger,
+              Log(SeverityLevel::LOG_ERROR, ExceptionThrownByModifiedMethod, testing::_))
+    .Times(1);
+
+  // When the mock Modified method is called it will throw the ModifiedMethodException
+  EXPECT_CALL(*mockCompInstance,Modified()).Times(1).WillRepeatedly(ModifiedMethodException());
+
+  // When the mock DoesModifiedMethodExist method is called it will return true;
+  EXPECT_CALL(*mockCompInstance, DoesModifiedMethodExist())
+    .Times(1)
+    .WillRepeatedly(ModifiedMethodExists());
+
+  // Deactivate and Unbindreference will also be called. EXPECT_CALL added
+  // to avoid GMOCK Warning. 
+   // When the mock Modified method is called it will throw the ModifiedMethodException
+  EXPECT_CALL(*mockCompInstance, Deactivate()).Times(1);
+  EXPECT_CALL(*mockCompInstance, UnbindReferences()).Times(1);
+
+
+  // ModifyComponentInstanceProperties will call the mock Modified method
+  // which will throw an exception. DS will catch the exception and log it.
+  EXPECT_NO_THROW(obj->ModifyComponentInstanceProperties());
+
+}
 
 TEST_F(SingletonComponentConfigurationTest, TestDestroyComponentInstances)
 {
@@ -203,6 +280,7 @@ TEST_F(SingletonComponentConfigurationTest, TestDestroyComponentInstances)
   obj->SetComponentInstancePair(
     InstanceContextPair(mockCompInstance, mockCompContext));
   EXPECT_CALL(*mockCompInstance, Deactivate()).Times(1);
+  EXPECT_CALL(*mockCompInstance, UnbindReferences()).Times(1);
   EXPECT_NE(obj->GetComponentInstance(), nullptr);
   EXPECT_NE(obj->GetComponentContext(), nullptr);
   EXPECT_NO_THROW(obj->DestroyComponentInstances());
@@ -219,6 +297,17 @@ TEST_F(SingletonComponentConfigurationTest,
   obj->SetComponentInstancePair(
     InstanceContextPair(mockCompInstance, mockCompContext));
   std::string exceptionMsg("Deactivation failed with exception");
+ 
+  // set logging expectations
+  auto ExceptionThrownByDeactivateMethod = testing::AllOf(
+    testing::HasSubstr("Exception received from user code while deactivating "),
+    testing::HasSubstr("the component configuration"));
+  EXPECT_CALL(
+    *mockLogger,
+              Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                  ExceptionThrownByDeactivateMethod,
+                  testing::_))
+    .Times(1);
   EXPECT_CALL(*mockCompInstance, Deactivate())
     .Times(1)
     .WillOnce(testing::Throw(std::runtime_error(exceptionMsg)));

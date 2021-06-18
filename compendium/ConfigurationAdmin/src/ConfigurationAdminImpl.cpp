@@ -174,9 +174,11 @@ ConfigurationAdminImpl::ConfigurationAdminImpl(
   , managedServiceTracker(cmContext, this)
   , managedServiceFactoryTracker(cmContext, this)
   , randomGenerator(std::random_device{}())
+  , configListenerTracker(cmContext)
 {
   managedServiceTracker.Open();
   managedServiceFactoryTracker.Open();
+  configListenerTracker.Open();
 }
 
 ConfigurationAdminImpl::~ConfigurationAdminImpl()
@@ -185,8 +187,15 @@ ConfigurationAdminImpl::~ConfigurationAdminImpl()
   auto managedServiceFactoryWrappers =
     managedServiceFactoryTracker.GetServices();
 
-  managedServiceFactoryTracker.Close();
-  managedServiceTracker.Close();
+  try {
+    managedServiceFactoryTracker.Close();
+    managedServiceTracker.Close();
+    configListenerTracker.Close();
+  } catch (...) {
+    auto thrownByMessage = "thrown by ConfiguratonAdminImpl destructor "
+                           "while closing the service trackers.\n\t ";
+    logger->Log(SeverityLevel::LOG_ERROR, thrownByMessage);
+  }
 
   decltype(factoryInstances) factoryInstancesCopy;
   decltype(configurations) configurationsToInvalidate;
@@ -195,11 +204,11 @@ ConfigurationAdminImpl::~ConfigurationAdminImpl()
     factoryInstancesCopy.swap(factoryInstances);
     configurationsToInvalidate.swap(configurations);
   }
-  for (auto& configuration : configurationsToInvalidate) {
+  for (const auto& configuration : configurationsToInvalidate) {
     configuration.second->Invalidate();
   }
   AnyMap emptyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
-  for (auto& managedService : managedServiceWrappers) {
+  for (const auto& managedService : managedServiceWrappers) {
     // The ServiceTracker will return a default constructed shared_ptr for each ManagedService
     // that we aren't tracking. We must be careful not to dereference these!
     if (managedService) {
@@ -209,7 +218,7 @@ ConfigurationAdminImpl::~ConfigurationAdminImpl()
                            *logger);
     }
   }
-  for (auto& managedServiceFactory : managedServiceFactoryWrappers) {
+  for (const auto& managedServiceFactory : managedServiceFactoryWrappers) {
     // The ServiceTracker will return a default constructed shared_ptr for each ManagedServiceFactory
     // that we aren't tracking. We must be careful not to dereference these!
     if (!managedServiceFactory) {
@@ -303,9 +312,31 @@ ConfigurationAdminImpl::GetFactoryConfiguration(const std::string& factoryPid,
 }
 
 std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
-ConfigurationAdminImpl::ListConfigurations(const std::string& /* filter */)
+ConfigurationAdminImpl::ListConfigurations(
+  const std::string& filter)
 {
-  throw std::invalid_argument("Method not currently implemented");
+  std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
+    result;
+  {
+    std::lock_guard<std::mutex> lk{ configurationsMutex };
+
+    if (filter.empty()) {
+      result.reserve(configurations.size());
+      for (const auto& it : configurations) {
+        result.push_back(it.second);
+      }
+    } else {
+      LDAPFilter ldap{ filter };
+      for (const auto& it : configurations) {
+        auto props = it.second->GetProperties();
+        if (ldap.Match(props)) {
+          result.push_back(it.second);
+        }
+      }
+    }
+  }
+
+  return result;
 }
 
 std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
@@ -316,7 +347,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
   std::vector<std::shared_ptr<ConfigurationImpl>> configurationsToInvalidate;
   {
     std::lock_guard<std::mutex> lk{ configurationsMutex };
-    for (auto& configMetadata : configurationMetadata) {
+    for (const auto& configMetadata : configurationMetadata) {
       auto& pid = configMetadata.pid;
       auto it = configurations.find(pid);
       if (it == std::end(configurations)) {
@@ -342,9 +373,9 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
             configMetadata.properties);
         pidsAndChangeCountsAndIDs.emplace_back(
           pid,
-          updatedAndChangeCount.second,
+          std::get<1>(updatedAndChangeCount),
           reinterpret_cast<std::uintptr_t>(it->second.get()));
-        createdOrUpdated.push_back(updatedAndChangeCount.first);
+        createdOrUpdated.push_back(std::get<0>(updatedAndChangeCount));
       } catch (
         const std::
           runtime_error&) // Configuration has been Removed by someone else, but we've won the race to handle that.
@@ -359,7 +390,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
     }
   }
   // This cannot be called whilst holding the configurationsMutex as it could cause a deadlock.
-  for (auto& configurationToInvalidate : configurationsToInvalidate) {
+  for (const auto& configurationToInvalidate : configurationsToInvalidate) {
     configurationToInvalidate->Invalidate();
   }
   auto idx = 0u;
@@ -427,7 +458,7 @@ void ConfigurationAdminImpl::RemoveConfigurations(
     }
   }
   // This cannot be called whilst holding the configurationsMutex as it could cause a deadlock.
-  for (auto& configurationToInvalidate : configurationsToInvalidate) {
+  for (const auto& configurationToInvalidate : configurationsToInvalidate) {
     configurationToInvalidate->Invalidate();
   }
   auto idx = 0u;
@@ -449,10 +480,13 @@ void ConfigurationAdminImpl::RemoveConfigurations(
   }
 }
 
-void ConfigurationAdminImpl::NotifyConfigurationUpdated(const std::string& pid)
+std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
+  const std::string& pid)
 {
-  PerformAsync([this, pid] {
+  return PerformAsync([this, pid] {
     AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
+    std::string fPid;
+    std::string nonFPid;
     auto removed = false;
     {
       std::lock_guard<std::mutex> lk{ configurationsMutex };
@@ -468,6 +502,25 @@ void ConfigurationAdminImpl::NotifyConfigurationUpdated(const std::string& pid)
         }
       }
     }
+    if (pid.find('~') != std::string::npos) {
+      //this is a factory pid
+      fPid = pid;
+    } else {
+      nonFPid = pid;
+    }
+    const auto configurationListeners = configListenerTracker.GetServices();
+    auto type =
+      removed
+        ? cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED
+        : cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED;
+
+    auto configAdminRef = cmContext.GetServiceReference<ConfigurationAdmin>();
+    for (const auto& it : configurationListeners) {
+      auto configEvent = cppmicroservices::service::cm::ConfigurationEvent(
+          configAdminRef, type, fPid, nonFPid);
+      it->configurationEvent((configEvent));
+    }
+
     const auto managedServiceWrappers = managedServiceTracker.GetServices();
     const auto it = std::find_if(
       std::begin(managedServiceWrappers),
@@ -514,10 +567,12 @@ void ConfigurationAdminImpl::NotifyConfigurationUpdated(const std::string& pid)
   });
 }
 
-void ConfigurationAdminImpl::NotifyConfigurationRemoved(
+std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(
   const std::string& pid,
   std::uintptr_t configurationId)
 {
+  std::promise<void> ready;
+  std::shared_future<void> alreadyRemoved = ready.get_future();
   std::shared_ptr<ConfigurationImpl> configurationToInvalidate;
   {
     std::lock_guard<std::mutex> lk{ configurationsMutex };
@@ -525,20 +580,22 @@ void ConfigurationAdminImpl::NotifyConfigurationRemoved(
     if (it == std::end(configurations)) {
       // This Configuration has already been removed. The thread which removed it will have triggered
       // the notification of any ManagedService or ManagedServiceFactory, so nothing more to do.
-      return;
+      ready.set_value();
+      return alreadyRemoved;
     }
     if (configurationId != reinterpret_cast<std::uintptr_t>(it->second.get())) {
       // The Configuration with this PID has already been removed and replaced by a new one, and the thread
       // which did that will have triggered the notification of any ManagedService or ManagedServiceFactory,
       // so nothing more to do.
-      return;
+      ready.set_value();
+      return alreadyRemoved;
     }
     configurationToInvalidate = it->second;
     configurations.erase(it);
     RemoveFactoryInstanceIfRequired(pid);
   }
   if (configurationToInvalidate) {
-    NotifyConfigurationUpdated(pid);
+    auto removeFuture = NotifyConfigurationUpdated(pid);
     // This functor will run on another thread. Just being overly cautious to guarantee that the
     // ConfigurationImpl which has called this method doesn't run its own destructor.
     PerformAsync(
@@ -546,7 +603,11 @@ void ConfigurationAdminImpl::NotifyConfigurationRemoved(
         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                     "Configuration with PID " + pid + " has been removed.");
       });
+  
+    return removeFuture;
   }
+  ready.set_value();
+  return alreadyRemoved;
 }
 
 std::shared_ptr<
@@ -716,14 +777,13 @@ void ConfigurationAdminImpl::RemovedService(
 }
 
 template<typename Functor>
-void ConfigurationAdminImpl::PerformAsync(Functor&& f)
+std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
 {
   std::lock_guard<std::mutex> lk{ futuresMutex };
   decltype(completeFutures){}.swap(completeFutures);
   auto id = ++futuresID;
-  incompleteFutures.emplace(
-    id,
-    std::async(std::launch::async, [this, func = std::forward<Functor>(f), id] {
+  std::future<void> fut = std::async(
+    std::launch::async, [this, func = std::forward<Functor>(f), id]() -> void {
       func();
       std::lock_guard<std::mutex> lk{ futuresMutex };
       auto it = incompleteFutures.find(id);
@@ -733,7 +793,10 @@ void ConfigurationAdminImpl::PerformAsync(Functor&& f)
       if (incompleteFutures.empty()) {
         futuresCV.notify_one();
       }
-    }));
+    });
+  auto returnFut = fut.share();
+  incompleteFutures.emplace(id, std::move(fut));
+  return returnFut;
 }
 
 std::string ConfigurationAdminImpl::RandomInstanceName()

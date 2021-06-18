@@ -21,20 +21,30 @@
   =============================================================================*/
 
 #include "ComponentConfigurationImpl.hpp"
-#include <cassert>
-#include <iostream>
-
+#include "../ConfigurationListenerImpl.hpp"
 #include "BundleLoader.hpp"
+#include "ComponentManager.hpp"
+#include "ConfigurationManager.hpp"
 #include "ReferenceManager.hpp"
 #include "ReferenceManagerImpl.hpp"
 #include "RegistrationManager.hpp"
+#include "boost/asio/post.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "states/CCUnsatisfiedReferenceState.hpp"
 #include "states/ComponentConfigurationState.hpp"
+#include <cassert>
+#include <iostream>
+#include <memory>
 
 using cppmicroservices::scrimpl::ReferenceManagerImpl;
+using cppmicroservices::service::component::ComponentConstants::
+  COMPONENT_FACTORY;
 using cppmicroservices::service::component::ComponentConstants::COMPONENT_ID;
 using cppmicroservices::service::component::ComponentConstants::COMPONENT_NAME;
+using cppmicroservices::service::component::ComponentConstants::
+  CONFIG_POLICY_IGNORE;
+using cppmicroservices::service::component::ComponentConstants::
+  CONFIG_POLICY_OPTIONAL;
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -44,18 +54,24 @@ std::atomic<unsigned long> ComponentConfigurationImpl::idCounter(0);
 ComponentConfigurationImpl::ComponentConfigurationImpl(
   std::shared_ptr<const metadata::ComponentMetadata> metadata,
   const Bundle& bundle,
-  std::shared_ptr<const ComponentRegistry> registry,
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger)
+  std::shared_ptr<ComponentRegistry> registry,
+  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+  std::shared_ptr<ConfigurationNotifier> configNotifier,
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
   : configID(++idCounter)
   , metadata(std::move(metadata))
   , bundle(bundle)
   , registry(std::move(registry))
   , logger(std::move(logger))
+  , configManager()
+  , configNotifier(std::move(configNotifier))
+  , managers(std::move(managers))
   , state(std::make_shared<CCUnsatisfiedReferenceState>())
   , newCompInstanceFunc(nullptr)
   , deleteCompInstanceFunc(nullptr)
 {
-  if (!this->metadata || !this->bundle || !this->registry || !this->logger) {
+  if (!this->metadata || !this->bundle || !this->registry || !this->logger ||
+      !this->configNotifier || !this->managers) {
     throw std::invalid_argument(
       "ComponentConfigurationImpl - Invalid arguments passed to constructor");
   }
@@ -77,6 +93,12 @@ ComponentConfigurationImpl::ComponentConfigurationImpl(
                                              this->metadata->name);
     referenceManagers.emplace(refMetadata.name, refManager);
   }
+  if ((this->metadata->configurationPids.size() > 0) &&
+      (this->metadata->configurationPolicy != CONFIG_POLICY_IGNORE)) {
+    cppmicroservices::BundleContext bundleContext = bundle.GetBundleContext();
+    configManager = std::make_shared<ConfigurationManager>(
+      this->metadata, bundleContext, this->logger);
+  }
 }
 
 ComponentConfigurationImpl::~ComponentConfigurationImpl() {}
@@ -95,22 +117,55 @@ void ComponentConfigurationImpl::Stop()
   for (auto& refMgr : referenceManagers) {
     refMgr.second->StopTracking();
   }
+
+  for (const auto& listener : configListenerTokens) {
+    configNotifier->UnregisterListener(listener->pid, listener->tokenId);
+  }
+  configListenerTokens.clear();
 }
 
 std::unordered_map<std::string, cppmicroservices::Any>
 ComponentConfigurationImpl::GetProperties() const
 {
-  auto props = metadata->properties;
-  props.emplace(COMPONENT_NAME, Any(this->metadata->name));
-  props.emplace(COMPONENT_ID, Any(configID));
-  return props;
+  if (metadata->factoryComponentID.empty()) {
+    // This is not a factory component
+    // Start with component properties
+    auto props = metadata->properties;
+
+    // If configuration object dependencies exist, use merged component and configuration object properties.
+    if (configManager != nullptr) {
+      props.clear();
+      for (const auto& item : configManager->GetProperties()) {
+        props.emplace(item.first, item.second);
+      }
+    }
+
+    props.emplace(COMPONENT_NAME, Any(this->metadata->name));
+    props.emplace(COMPONENT_ID, Any(configID));
+    return props;
+  } else {
+    //This is  a factory component
+    auto props = metadata->factoryComponentProperties;
+    props.emplace(COMPONENT_NAME, Any(this->metadata->name));
+    props.emplace(COMPONENT_FACTORY, Any(this->metadata->factoryComponentID));
+    return props;
+  }
+}
+void ComponentConfigurationImpl::SetRegistrationProperties()
+{
+  auto properties = GetProperties();
+  if (regManager) {
+    regManager->SetProperties(properties);
+  }
 }
 
 void ComponentConfigurationImpl::Initialize()
 {
   // Call Register if no dependencies exist
   // If dependencies exist, the dependency tracker mechanism will trigger the call to Register at the appropriate time.
-  if (referenceManagers.empty()) {
+  if (referenceManagers.empty() &&
+      ((metadata->configurationPids.empty()) ||
+       (metadata->configurationPolicy == CONFIG_POLICY_IGNORE))) {
     GetState()->Register(*this);
   } else {
     for (auto& kv : referenceManagers) {
@@ -120,6 +175,29 @@ void ComponentConfigurationImpl::Initialize()
                   this,
                   std::placeholders::_1));
       referenceManagerTokens.emplace(refManager, token);
+    }
+    if (!metadata->configurationPids.empty() &&
+        (metadata->configurationPolicy != CONFIG_POLICY_IGNORE)) {
+
+      // Call RegisterListener to register listeners to listen for changes to configuration objects
+      // before calling configManager->Initialize. The Initialize method will get the configuration object
+      // from ConfigAdmin if it exists and a notification will be sent to the listeners.
+      for (const auto& pid : metadata->configurationPids) {
+
+        auto token = configNotifier->RegisterListener(
+          pid,
+          std::bind(&ComponentConfigurationImpl::ConfigChangedState,
+                    this,
+                    std::placeholders::_1),
+          shared_from_this());
+        auto listenerToken = std::make_shared<ListenerToken>(pid, token);
+        configListenerTokens.emplace_back(listenerToken);
+      }
+      configManager->Initialize();
+      if (referenceManagers.empty() &&
+          configManager->IsConfigSatisfied()) {
+        GetState()->Register(*this);
+      }
     }
   }
 }
@@ -139,6 +217,51 @@ void ComponentConfigurationImpl::RefChangedState(
                          notification.senderName,
                          notification.serviceRefToBind,
                          notification.serviceRefToUnbind);
+      break;
+    default:
+      break;
+  }
+}
+void ComponentConfigurationImpl::ConfigChangedState(
+  const ConfigChangeNotification& notification)
+{
+  if (configManager == nullptr) {
+    return;
+  }
+  bool configWasSatisfied = false;
+  bool configNowSatisfied = false;
+
+  configManager->UpdateMergedProperties(notification.pid,
+                                        notification.newProperties,
+                                        notification.event,
+                                        configWasSatisfied,
+                                        configNowSatisfied);
+  SetRegistrationProperties();
+
+  if (configWasSatisfied && configNowSatisfied &&
+      (metadata->configurationPolicy != CONFIG_POLICY_IGNORE)) {
+    if (!Modified()) {
+      //The Component does not have a Modified method so the component instance
+      //has been deactivated.
+      if (configManager->IsConfigSatisfied() &&
+          AreReferencesSatisfied()) {
+        Register();
+        return;
+      }
+    }
+  }
+
+  switch (notification.event) {
+    case cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED:
+      if (!configWasSatisfied && configNowSatisfied &&
+          AreReferencesSatisfied()) {
+        Register();
+      }
+      break;
+    case cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED:
+      if (configWasSatisfied && !configNowSatisfied) {
+        Deactivate();
+      }
       break;
     default:
       break;
@@ -215,6 +338,11 @@ void ComponentConfigurationImpl::RefSatisfied(const std::string& refName)
   SatisfiedFunctor f = std::for_each(referenceManagers.begin(),
                                      referenceManagers.end(),
                                      SatisfiedFunctor(refName));
+  if (configManager != nullptr) {
+    if (!configManager->IsConfigSatisfied()) {
+      return;
+    }
+  }
   if (f.IsSatisfied()) {
     GetState()->Register(*this);
   }
@@ -227,6 +355,19 @@ void ComponentConfigurationImpl::RefUnsatisfied(const std::string& refName)
     // deactivate the configuration
     GetState()->Deactivate(*this);
   }
+}
+bool ComponentConfigurationImpl::AreReferencesSatisfied() const noexcept
+{
+  bool isSatisfied = true;
+
+  for (const auto& mgr : referenceManagers) {
+    if (!mgr.second->IsSatisfied()) {
+      isSatisfied = false;
+      break;
+    }
+  }
+
+  return isSatisfied;
 }
 
 void ComponentConfigurationImpl::Register()
@@ -243,6 +384,11 @@ std::shared_ptr<ComponentInstance> ComponentConfigurationImpl::Activate(
 void ComponentConfigurationImpl::Deactivate()
 {
   GetState()->Deactivate(*this);
+}
+
+bool ComponentConfigurationImpl::Modified()
+{
+  return GetState()->Modified(*this);
 }
 
 ComponentState ComponentConfigurationImpl::GetConfigState() const
@@ -267,9 +413,18 @@ ComponentConfigurationImpl::GetState() const
 void ComponentConfigurationImpl::LoadComponentCreatorDestructor()
 {
   if (newCompInstanceFunc == nullptr || deleteCompInstanceFunc == nullptr) {
-    const auto compName = GetMetadata()->name.empty()
-                            ? GetMetadata()->implClassName
-                            : GetMetadata()->name;
+    auto compName = GetMetadata()->name;
+    auto position = compName.find("~");
+
+    if ((position != std::string::npos)) {
+      // this is a factory pid. Use implementation class
+      // instead of name to construct the instance.
+      compName = GetMetadata()->implClassName;
+    } else {
+      compName = GetMetadata()->name.empty() ? GetMetadata()->implClassName
+                                             : GetMetadata()->name;
+    }
+
     std::tie(newCompInstanceFunc, deleteCompInstanceFunc) =
       GetComponentCreatorDeletors(compName, GetBundle());
   }
@@ -301,6 +456,5 @@ ComponentConfigurationImpl::CreateAndActivateComponentInstanceHelper(
   componentInstance->Activate();
   return std::make_pair(componentInstance, ctxt);
 }
-
 }
 } // namespaces

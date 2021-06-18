@@ -49,8 +49,19 @@ protected:
     auto compDesc = std::make_shared<metadata::ComponentMetadata>();
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
     auto pool = std::make_shared<boost::asio::thread_pool>(1);
-    compMgr = std::make_shared<MockComponentManagerImpl>(
-      compDesc, mockRegistry, framework.GetBundleContext(), fakeLogger, pool);
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      framework.GetBundleContext(), fakeLogger, pool);
+    auto managers =
+      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+
+    compMgr =
+      std::make_shared<MockComponentManagerImpl>(compDesc,
+                                                 mockRegistry,
+                                                 framework.GetBundleContext(),
+                                                 fakeLogger,
+                                                 pool,
+                                                 notifier,
+                                                 managers);
   }
 
   virtual void TearDown()
@@ -96,10 +107,13 @@ TEST_F(CMEnabledStateTest, TestGetConfigurations)
   auto enabledState =
     std::make_shared<CMEnabledState>(prom.get_future().share());
   enabledState->configurations = {
-    std::make_shared<MockComponentConfigurationImpl>(compMgr->GetMetadata(),
-                                                     framework,
-                                                     compMgr->GetRegistry(),
-                                                     compMgr->GetLogger())
+    std::make_shared<MockComponentConfigurationImpl>(
+      compMgr->GetMetadata(),
+      framework,
+      compMgr->GetRegistry(),
+      compMgr->GetLogger(),
+      compMgr->GetConfigNotifier(),
+      compMgr->GetManagers())
   };
   auto fut = std::async(std::launch::async, [&]() {
     return enabledState->GetConfigurations(*compMgr);
@@ -210,7 +224,9 @@ TEST_F(CMEnabledStateTest, TestCreateConfigurations)
     enabledState->CreateConfigurations(compMgr->GetMetadata(),
                                        compMgr->GetBundle(),
                                        compMgr->GetRegistry(),
-                                       compMgr->GetLogger());
+                                       compMgr->GetLogger(),
+                                       compMgr->GetConfigNotifier(),
+                                       compMgr->GetManagers());
   });
   EXPECT_EQ(enabledState->configurations.size(), 1ul)
     << "Must have a configuration created after call to CreateConfigurations";

@@ -45,12 +45,14 @@ std::shared_future<void> CMEnabledState::Disable(ComponentManagerImpl& cm)
 void CMEnabledState::CreateConfigurations(
   std::shared_ptr<const metadata::ComponentMetadata> compDesc,
   const cppmicroservices::Bundle& bundle,
-  std::shared_ptr<const ComponentRegistry> registry,
-  std::shared_ptr<logservice::LogService> logger)
+  std::shared_ptr<ComponentRegistry> registry,
+  std::shared_ptr<logservice::LogService> logger,
+  std::shared_ptr<ConfigurationNotifier> configNotifier,
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
 {
   try {
     auto cc = ComponentConfigurationFactory::CreateConfigurationManager(
-      compDesc, bundle, registry, logger);
+      compDesc, bundle, registry, logger, configNotifier, managers);
     configurations.push_back(cc);
   } catch (const cppmicroservices::SharedLibraryException&) {
     throw;
@@ -81,7 +83,7 @@ void CMEnabledState::DeleteConfigurations()
     // No exceptions are expected from the future. Exceptions are
     // logged on the otherside of the thread boundary. See #CreateConfigurations
     auto configs = std::move(configurations);
-    for (auto& config : configs) {
+    for (const auto& config : configs) {
       config->Deactivate();
       config->Stop();
     }

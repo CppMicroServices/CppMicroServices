@@ -22,8 +22,10 @@
 
 #include "SCRBundleExtension.hpp"
 #include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "manager/ComponentManagerImpl.hpp"
+#include "manager/ConfigurationNotifier.hpp"
 #include "metadata/ComponentMetadata.hpp"
 #include "metadata/MetadataParser.hpp"
 #include "metadata/MetadataParserFactory.hpp"
@@ -37,21 +39,25 @@ namespace scrimpl {
 
 using metadata::ComponentMetadata;
 using util::ObjectValidator;
+
 SCRBundleExtension::SCRBundleExtension(
   const cppmicroservices::BundleContext& bundleContext,
   const cppmicroservices::AnyMap& scrMetadata,
   const std::shared_ptr<ComponentRegistry>& registry,
   const std::shared_ptr<LogService>& logger,
-  const std::shared_ptr<boost::asio::thread_pool>& threadpool)
+  const std::shared_ptr<boost::asio::thread_pool>& threadpool,
+  const std::shared_ptr<ConfigurationNotifier>& configNotifier)
   : bundleContext(bundleContext)
   , registry(registry)
   , logger(logger)
+  , configNotifier(configNotifier)
 {
   if (!bundleContext || !registry || !logger || scrMetadata.empty() ||
-      !threadpool) {
+      !threadpool || !configNotifier) {
     throw std::invalid_argument(
       "Invalid parameters passed to SCRBundleExtension constructor");
   }
+  managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
   auto version = ObjectValidator(scrMetadata, "version").GetValue<int>();
   auto metadataparser =
@@ -61,10 +67,15 @@ SCRBundleExtension::SCRBundleExtension(
     metadataparser->ParseAndGetComponentsMetadata(scrMetadata);
   for (auto& oneCompMetadata : componentsMetadata) {
     try {
-      auto compManager = std::make_shared<ComponentManagerImpl>(
-        oneCompMetadata, registry, bundleContext, logger, threadpool);
+      auto compManager = std::make_shared<ComponentManagerImpl>(oneCompMetadata,
+                                                                registry,
+                                                                bundleContext,
+                                                                logger,
+                                                                threadpool,
+                                                                configNotifier,
+                                                                managers);
       if (registry->AddComponentManager(compManager)) {
-        managers.push_back(compManager);
+        managers->push_back(compManager);
         compManager->Initialize();
       }
     } catch (const cppmicroservices::SharedLibraryException&) {
@@ -87,13 +98,13 @@ SCRBundleExtension::~SCRBundleExtension()
   logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
               "Deleting instance of SCRBundleExtension for " +
                 bundleContext.GetBundle().GetSymbolicName());
-  for (auto compManager : managers) {
+  for (auto& compManager : *managers) {
     auto fut = compManager->Disable();
     registry->RemoveComponentManager(compManager);
     fut
       .get(); // since this happens when the bundle is stopped. Wait until the disable is finished on the other thread.
   }
-  managers.clear();
+  managers->clear();
   registry.reset();
 };
 } // scrimpl

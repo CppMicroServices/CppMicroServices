@@ -181,7 +181,7 @@ TEST_F(BundleHooksTest, TestEventHook)
 #ifdef US_BUILD_SHARED_LIBS
   ASSERT_EQ(bundleListener.events.size(), 4);
 #else
-  ASSERT_GE(static_cast<int>(bundleListener.events.size()), 3);
+  ASSERT_EQ(bundleListener.events.size(), 3);
 #endif
 
   bundleA.Stop();
@@ -189,7 +189,7 @@ TEST_F(BundleHooksTest, TestEventHook)
 #ifdef US_BUILD_SHARED_LIBS
   ASSERT_EQ(bundleListener.events.size(), 6);
 #else
-  ASSERT_GE(static_cast<int>(bundleListener.events.size()), 5);
+  ASSERT_EQ(bundleListener.events.size(), 5);
 #endif
 
   auto eventHookReg =
@@ -232,11 +232,7 @@ TEST_F(BundleHooksTest, TestEventHookFailure)
   bundleA.Start();
 
   // bundle starting and bundle started events
-#ifdef US_BUILD_SHARED_LIBS
-  ASSERT_EQ(listener.events.size(), 2);
-#else
-  ASSERT_GE(static_cast<int>(listener.events.size()), 2);
-#endif
+  ASSERT_EQ(listener.events.size(), 3);
 
   std::for_each(listener.events.begin(),
                 listener.events.end(),
@@ -279,7 +275,7 @@ TEST_F(BundleHooksTest, TestFindHookFailure)
 #ifdef US_BUILD_SHARED_LIBS
   ASSERT_EQ(listener.events.size(), 1);
 #else
-  ASSERT_GE(static_cast<int>(listener.events.size()), 1);
+  ASSERT_EQ(listener.events.size(), 2);
 #endif
 
   std::for_each(listener.events.begin(),

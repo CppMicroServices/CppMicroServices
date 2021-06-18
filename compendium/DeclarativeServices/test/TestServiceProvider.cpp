@@ -290,4 +290,35 @@ TEST_F(tServiceComponent, testMultipleInterfaces) //DS_TOI_16
   EXPECT_NE(serv2, nullptr);
 }
 
+/**
+ * Verify that a DS service class constructor which throws doesn't segfault
+ * and that the condition from OSGi section 112.3.4 is met:
+ *  If the constructor throws an exception, SCR must log an error message
+ *  containing the exception with the Log Service, if present, and the
+ *  component configuration is not activated.
+ */
+TEST_F(tServiceComponent, testServiceCtorThrow) {
+  auto bundle = test::InstallAndStartBundle(framework.GetBundleContext(),
+                              "TestBundleDSUpstreamDependencyA");
+  auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
+    bundle, "dependent::TestBundleDSUpstreamDependencyImpl");
+
+  auto compConfigDTO = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+  EXPECT_EQ(compConfigDTO.size(), 1);
+  EXPECT_EQ(compConfigDTO[0].state, cppmicroservices::service::component::runtime::
+                                 dto::ComponentState::SATISFIED);
+
+  auto ctxt = framework.GetBundleContext();
+  auto sRef = ctxt.GetServiceReference<test::TestBundleDSUpstreamDependency>();
+  EXPECT_TRUE(sRef);
+  auto svc = ctxt.GetService(sRef);
+  EXPECT_EQ(svc, nullptr);
+
+  // the component configuration must not be active.
+  compConfigDTO = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+  EXPECT_EQ(compConfigDTO.size(), 1);
+  EXPECT_EQ(compConfigDTO[0].state, cppmicroservices::service::component::runtime::
+                                 dto::ComponentState::SATISFIED);
+}
+
 }

@@ -47,6 +47,13 @@ set(_gtest_tests
   LogTest.cpp
   StaticBundleResourceTest.cpp
   FrameworkEventTest.cpp
+  ServiceTemplateTest.cpp
+  BundleRegistryConcurrencyTest.cpp
+  StaticBundleTest.cpp
+  ShrinkableMapTest.cpp
+  FrameworkListenerTest.cpp
+  BundleHooksTest.cpp
+  ServiceHooksTest.cpp
   TestCounterLatch.cpp
   ResourceCompilerTest.cpp
 )

@@ -28,19 +28,12 @@ include_directories(
 #-----------------------------------------------------------------------------
 
 set(_tests
-  BundleRegistryConcurrencyTest
-  FrameworkListenerTest
   HelgrindTest
-  BundleHooksTest
   BundleTest
   MemcheckTest
   MultipleListenersTest
-  ShrinkableMapTest
   ServiceFactoryTest
-  ServiceHooksTest
   ServiceRegistryPerformanceTest
-  ServiceTemplateTest
-  StaticBundleTest
 )
 
 set(_additional_srcs

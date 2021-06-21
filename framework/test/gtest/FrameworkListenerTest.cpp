@@ -29,7 +29,7 @@
 #include "TestUtilFrameworkListener.h"
 #include "TestUtils.h"
 #include "TestingConfig.h"
-#include "TestingMacros.h"
+#include "gtest/gtest.h"
 
 #include <chrono>
 #include <thread>
@@ -37,12 +37,9 @@
 
 using namespace cppmicroservices;
 
-namespace {
-
-void testStartStopFrameworkEvents()
+TEST(FrameworkListenerTest, testStartStopFrameworkEvents)
 {
   auto f = FrameworkFactory().NewFramework();
-
   TestFrameworkListener l;
   f.Init();
   f.GetBundleContext().AddFrameworkListener(
@@ -53,14 +50,13 @@ void testStartStopFrameworkEvents()
   std::vector<FrameworkEvent> events;
   events.push_back(FrameworkEvent(
     FrameworkEvent::Type::FRAMEWORK_STARTED, f, "Framework Started"));
-  US_TEST_CONDITION_REQUIRED(
-    l.CheckEvents(events),
-    "Test for the correct number and order of Framework start/stop events.");
+  //Test for the correct number and order of Framework start/stop events.
+  ASSERT_TRUE(l.CheckEvents(events));
 
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
-void testAddRemoveFrameworkListener()
+TEST(FrameworkListenerTest, testAddRemoveFrameworkListener)
 {
   auto f = FrameworkFactory().NewFramework();
   f.Init();
@@ -78,9 +74,9 @@ void testAddRemoveFrameworkListener()
   fCtx.RemoveFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
 
   f.Start(); // generate framework event
-  US_TEST_CONDITION(l.CheckEvents(std::vector<FrameworkEvent>()),
-                    "Test listener removal");
-  US_TEST_CONDITION(count == 0, "Test listener removal");
+  //Test listener removal
+  ASSERT_TRUE(l.CheckEvents(std::vector<FrameworkEvent>()));
+  ASSERT_EQ(count, 0);
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 
@@ -91,7 +87,8 @@ void testAddRemoveFrameworkListener()
   fCtx.AddFrameworkListener(fl);
 
   f.Start();
-  US_TEST_CONDITION(count == 1, "Test listener addition");
+  //Test listener addition
+  ASSERT_EQ(count, 1);
 
   fCtx.RemoveFrameworkListener(fl);
   // note: The Framework STARTED event is only sent once. Stop and Start the framework to generate another one.
@@ -102,11 +99,11 @@ void testAddRemoveFrameworkListener()
   fCtx = f.GetBundleContext();
   fCtx.AddFrameworkListener(&l, &TestFrameworkListener::frameworkEvent);
   f.Start();
-  US_TEST_CONDITION(
-    l.CheckEvents(std::vector<FrameworkEvent>{ FrameworkEvent(
-      FrameworkEvent::Type::FRAMEWORK_STARTED, f, "Framework Started") }),
-    "Test listener addition");
-  US_TEST_CONDITION(count == 1, "Test listener was successfully removed");
+  //Test listener addition
+  ASSERT_TRUE(l.CheckEvents(std::vector<FrameworkEvent>{ FrameworkEvent(
+    FrameworkEvent::Type::FRAMEWORK_STARTED, f, "Framework Started") }));
+  //Test listener was successfully removed
+  ASSERT_EQ(count, 1);
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 
@@ -114,13 +111,9 @@ void testAddRemoveFrameworkListener()
   int count2(0);
   auto listener_callback_counter1 = [&count1](const FrameworkEvent&) {
     ++count1;
-    std::cout << "listener_callback_counter1: call count " << count1
-              << std::endl;
   };
   auto listener_callback_counter2 = [&count2](const FrameworkEvent&) {
     ++count2;
-    std::cout << "listener_callback_counter2: call count " << count2
-              << std::endl;
   };
   auto listener_callback_throw = [](const FrameworkEvent&) {
     throw std::runtime_error("boo");
@@ -133,28 +126,25 @@ void testAddRemoveFrameworkListener()
   auto t3 = fCtx.AddFrameworkListener(listener_callback_throw);
 
   f.Start(); // generate framework event (started)
-  US_TEST_CONDITION(count1 == 1,
-                    "Test that multiple framework listeners were called");
-  US_TEST_CONDITION(count2 == 1,
-                    "Test that multiple framework listeners were called");
+  //Test that multiple framework listeners were called
+  ASSERT_EQ(count1, 1);
+  ASSERT_EQ(count2, 1);
 
   fCtx.RemoveListener(std::move(t1));
   fCtx.RemoveListener(std::move(t2));
   fCtx.RemoveListener(std::move(t3));
 
   f.Start(); // generate framework event (started)
-  US_TEST_CONDITION(
-    count1 == 1,
-    "Test that multiple framework listeners were NOT called after removal");
-  US_TEST_CONDITION(
-    count2 == 1,
-    "Test that multiple framework listeners were NOT called after removal");
+
+  //Test that multiple framework listeners were NOT called after removal
+  ASSERT_EQ(count1, 1);
+  ASSERT_EQ(count2, 1);
 
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
-void testFrameworkListenersAfterFrameworkStop()
+TEST(FrameworkListenerTest, testFrameworkListenersAfterFrameworkStop)
 {
   auto f = FrameworkFactory().NewFramework();
   f.Init();
@@ -163,10 +153,7 @@ void testFrameworkListenersAfterFrameworkStop()
   //    6. All resources held by this Framework are released.
   // The assumption is that framework listeners are one such resource described in step #6.
   int events(0);
-  auto listener = [&events](const FrameworkEvent& evt) {
-    ++events;
-    std::cout << evt << std::endl;
-  };
+  auto listener = [&events](const FrameworkEvent& /*evt*/) { ++events; };
   f.GetBundleContext().AddFrameworkListener(listener);
   f.Start(); // generate framework event (started)
   f.Stop();  // resources (such as framework listeners) are released
@@ -175,24 +162,25 @@ void testFrameworkListenersAfterFrameworkStop()
   // a framework event before the listener is disabled and cleaned up.
   f.WaitForStop(std::chrono::milliseconds::zero());
   f.Start(); // generate framework event (started) with no listener to see it
-  US_TEST_CONDITION(events == 1,
-                    "Test that listeners were released on Framework Stop");
+
+  //Test that listeners were released on Framework Stop
+  ASSERT_EQ(events, 1);
 
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
-void testFrameworkListenerThrowingInvariant()
+TEST(FrameworkListenerTest, testFrameworkListenerThrowingInvariant)
 {
   /*
-    The Framework must publish a FrameworkEvent.ERROR if a callback to an event listener generates an exception - except
-    when the callback happens while delivering a FrameworkEvent.ERROR (to prevent an infinite loop).
+      The Framework must publish a FrameworkEvent.ERROR if a callback to an event listener generates an exception - except
+      when the callback happens while delivering a FrameworkEvent.ERROR (to prevent an infinite loop).
 
-    Tests:
-    1. Given a bundle listener which throws -> verfiy a FrameworkEvent ERROR is received with the correct event info.
-    2. Given a service listener which throws -> verfiy a FrameworkEvent ERROR is received with the correct event info.
-    3. Given a framework listener which throws -> No FrameworkEvent is received, instead an internal log message is sent.
-  */
+      Tests:
+      1. Given a bundle listener which throws -> verfiy a FrameworkEvent ERROR is received with the correct event info.
+      2. Given a service listener which throws -> verfiy a FrameworkEvent ERROR is received with the correct event info.
+      3. Given a framework listener which throws -> No FrameworkEvent is received, instead an internal log message is sent.
+    */
   std::stringstream logstream;
   std::ostream sink(logstream.rdbuf());
   // Use a redirected logger to verify that the framework listener logged an
@@ -229,17 +217,16 @@ void testFrameworkListenerThrowingInvariant()
     throw std::runtime_error("bad callback");
   };
   f.GetBundleContext().AddBundleListener(bl);
-  auto bundleA2 = testing::InstallLib(
+  auto bundleA2 = cppmicroservices::testing::InstallLib(
     f.GetBundleContext(),
     "TestBundleA2"); // generate a bundle event for shared libs
 #ifndef US_BUILD_SHARED_LIBS
-  US_TEST_CONDITION(bundleA2, "TestBundleA2 bundle not found");
+  ASSERT_TRUE(bundleA2);
   bundleA2
     .Start(); // since bundles are auto-installed, start the bundle to generate a bundle event
 #endif
-  US_TEST_CONDITION(fwk_error_received,
-                    "Test that a Framework ERROR event was received from a "
-                    "throwing bundle listener");
+  //"Test that a Framework ERROR event was received from a throwing bundle listener"
+  ASSERT_TRUE(fwk_error_received);
   f.GetBundleContext().RemoveBundleListener(bl);
 
   // Test #2 - test service event listener
@@ -249,11 +236,11 @@ void testFrameworkListenerThrowingInvariant()
     throw std::runtime_error("you sunk my battleship");
   };
   f.GetBundleContext().AddServiceListener(sl);
-  auto bundleA = testing::InstallLib(f.GetBundleContext(), "TestBundleA");
+  auto bundleA =
+    cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleA");
   bundleA.Start(); // generate a service event
-  US_TEST_CONDITION(fwk_error_received,
-                    "Test that a Framework ERROR event was received from a "
-                    "throwing service listener");
+  //Test that a Framework ERROR event was received from a throwing service listener"
+  ASSERT_TRUE(fwk_error_received);
   f.GetBundleContext().RemoveServiceListener(sl);
 
   // note: The Framework STARTED event is only sent once. Stop and Start the framework to generate another one.
@@ -271,20 +258,18 @@ void testFrameworkListenerThrowingInvariant()
     &l, &TestFrameworkListener::throwOnFrameworkEvent);
   // This will cause a deadlock if this test fails.
   f.Start(); // generates a framework event
-  US_TEST_CONDITION(false == fwk_error_received,
-                    "Test that a Framework ERROR event was NOT received from a "
-                    "throwing framework listener");
-  US_TEST_CONDITION(
-    std::string::npos !=
-      logstream.str().find("A Framework Listener threw an exception:"),
-    "Test for internal log message from Framework event handler");
+  //Test that a Framework ERROR event was NOT received from a throwing framework listener
+  ASSERT_FALSE(fwk_error_received);
+  //Test for internal log message from Framework event handler
+  ASSERT_NE(std::string::npos,
+            logstream.str().find("A Framework Listener threw an exception:"));
 
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
 #ifdef US_ENABLE_THREADING_SUPPORT
-void testDeadLock()
+TEST(FrameworkListenerTest, testDeadLock)
 {
   // test for deadlocks during Framework API re-entry from a Framework Listener callback
   auto f = FrameworkFactory().NewFramework();
@@ -309,7 +294,7 @@ void testDeadLock()
   f.GetBundleContext().AddBundleListener(
     [](const BundleEvent&) { throw std::runtime_error("bad bundle"); });
   f.GetBundleContext().AddFrameworkListener(listener);
-  auto bundleA = testing::InstallLib(
+  auto bundleA = cppmicroservices::testing::InstallLib(
     f.GetBundleContext(),
     "TestBundleA"); // trigger the bundle listener to be called
 
@@ -317,26 +302,3 @@ void testDeadLock()
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
 #endif
-
-} // end anonymous namespace
-
-int FrameworkListenerTest(int /*argc*/, char* /*argv*/[])
-{
-  US_TEST_BEGIN("FrameworkListenerTest");
-
-  /*
-    @note Framework events will be sent like service events; synchronously.
-          Framework events SHOULD be delivered asynchronously (see OSGi spec), however that's not yet supported.
-    @todo test asynchronous event delivery once its supported.
-  */
-
-  testStartStopFrameworkEvents();
-  testAddRemoveFrameworkListener();
-  testFrameworkListenersAfterFrameworkStop();
-  testFrameworkListenerThrowingInvariant();
-#ifdef US_ENABLE_THREADING_SUPPORT
-  testDeadLock();
-#endif
-
-  US_TEST_END()
-}

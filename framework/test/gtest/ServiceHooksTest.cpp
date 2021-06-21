@@ -36,7 +36,7 @@
 
 #include "TestUtils.h"
 #include "TestingConfig.h"
-#include "TestingMacros.h"
+#include "gtest/gtest.h"
 
 #include <unordered_set>
 
@@ -87,9 +87,9 @@ public:
 
   void Event(const ServiceEvent& /*event*/, MapType& listeners)
   {
-    US_TEST_CONDITION_REQUIRED(listeners.size() > 0 &&
-                                 listeners.find(bundleCtx) != listeners.end(),
-                               "Check listener content");
+    //Check listener content
+    ASSERT_TRUE(listeners.find(bundleCtx) != listeners.end());
+    ASSERT_GT(static_cast<int>(listeners.size()), 0);
     ShrinkableVector<ServiceListenerHook::ListenerInfo>& listenerInfos =
       listeners[bundleCtx];
 
@@ -97,35 +97,30 @@ public:
     // the list of listeners before filtering them according to ther LDAP filter
     if (id == 1) {
 #ifdef US_BUILD_SHARED_LIBS
-      US_TEST_CONDITION(listenerInfos.size() == 2,
-                        "2 service listeners expected");
+      //2 service listeners expected
+      ASSERT_EQ(listenerInfos.size(), 2);
 #else
-      US_TEST_CONDITION(listenerInfos.size() >= 2,
-                        "2 service listeners expected");
+      ASSERT_GE(static_cast<int>(listenerInfos.size()), 2);
 #endif
-      US_TEST_CONDITION(listenerInfos[0].IsRemoved() == false,
-                        "Listener is not removed");
-      US_TEST_CONDITION(listenerInfos[1].IsRemoved() == false,
-                        "Listener is not removed");
-      US_TEST_CONDITION(!(listenerInfos[0] == listenerInfos[1]),
-                        "listener info inequality");
+      //test that Listener is not removed
+      ASSERT_FALSE(listenerInfos[0].IsRemoved());
+      ASSERT_FALSE(listenerInfos[1].IsRemoved());
+      ASSERT_FALSE(listenerInfos[0] == listenerInfos[1]);
     } else {
       // there is already one listener filtered out
 #ifdef US_BUILD_SHARED_LIBS
-      US_TEST_CONDITION(listenerInfos.size() == 1,
-                        "1 service listener expected");
+      //1 service listener expected
+      ASSERT_EQ(listenerInfos.size(), 1);
 #else
-      US_TEST_CONDITION(listenerInfos.size() >= 1,
-                        "1 service listener expected");
+      ASSERT_GE(static_cast<int>(listenerInfos.size()), 1);
 #endif
-      US_TEST_CONDITION(listenerInfos[0].IsRemoved() == false,
-                        "Listener is not removed");
+      ASSERT_FALSE(listenerInfos[0].IsRemoved());
     }
     if (listenerInfo.IsNull()) {
       listenerInfo = listenerInfos[0];
     } else {
-      US_TEST_CONDITION(listenerInfo == listenerInfos[0],
-                        "Equal listener info objects");
+      //Check Equal listener info objects
+      ASSERT_EQ(listenerInfo, listenerInfos[0]);
     }
 
     // Remove the listener without a filter from the list
@@ -139,11 +134,11 @@ public:
       }
     }
 #ifdef US_BUILD_SHARED_LIBS
-    US_TEST_CONDITION(listenerInfos.size() == 1,
-                      "One listener with LDAP filter should remain");
+    //One listener with LDAP filter should remain
+    ASSERT_EQ(listenerInfos.size(), 1);
 #else
-    US_TEST_CONDITION(listenerInfos.size() >= 1,
-                      "One listener with LDAP filter should remain");
+    //One listener with LDAP filter should remain
+    ASSERT_GE(static_cast<int>(listenerInfos.size()), 1);
 #endif
 
     ordering.push_back(id);
@@ -187,7 +182,7 @@ public:
             const std::string& /*filter*/,
             ShrinkableVector<ServiceReferenceBase>& references)
   {
-    US_TEST_CONDITION(context == bundleCtx, "Bundle context");
+    ASSERT_EQ(context, bundleCtx);
 
     references.clear();
     ordering.push_back(id);
@@ -272,11 +267,192 @@ public:
   }
 };
 
-void TestEventListenerHook(const Framework& framework)
+class ServiceHooksTest : public ::testing::Test
 {
-  auto context =
-    testing::GetBundle("main", framework.GetBundleContext()).GetBundleContext();
+protected:
+  Framework framework;
+  BundleContext context;
 
+public:
+  ServiceHooksTest()
+    : framework(FrameworkFactory().NewFramework()){};
+
+  ~ServiceHooksTest() override = default;
+
+  void SetUp() override
+  {
+    framework.Start();
+    auto bundles = framework.GetBundleContext().GetBundles();
+    ASSERT_FALSE(bundles.empty());
+    for (auto& b : bundles) {
+      if (b.GetSymbolicName() == "main") {
+        b.Start();
+        break;
+      }
+    }
+    context =
+      cppmicroservices::testing::GetBundle("main", framework.GetBundleContext())
+        .GetBundleContext();
+  }
+
+  void TearDown() override
+  {
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+  }
+};
+
+} // end unnamed namespace
+
+TEST_F(ServiceHooksTest, TestListenerHook)
+{
+  TestServiceListener serviceListener1;
+  TestServiceListener serviceListener2;
+  context.AddServiceListener(&serviceListener1,
+                             &TestServiceListener::ServiceChanged);
+  context.AddServiceListener(&serviceListener2,
+                             &TestServiceListener::ServiceChanged,
+                             LDAPProp(Constants::OBJECTCLASS) == "bla");
+
+  auto serviceListenerHook1 =
+    std::make_shared<TestServiceListenerHook>(1, context);
+  ServiceProperties hookProps1;
+  hookProps1[Constants::SERVICE_RANKING] = 0;
+  ServiceRegistration<ServiceListenerHook> listenerHookReg1 =
+    context.RegisterService<ServiceListenerHook>(serviceListenerHook1,
+                                                 hookProps1);
+
+  auto serviceListenerHook2 =
+    std::make_shared<TestServiceListenerHook>(2, context);
+  ServiceProperties hookProps2;
+  hookProps2[Constants::SERVICE_RANKING] = 10;
+  ServiceRegistration<ServiceListenerHook> listenerHookReg2 =
+    context.RegisterService<ServiceListenerHook>(serviceListenerHook2,
+                                                 hookProps2);
+
+#ifdef US_BUILD_SHARED_LIBS
+  // check if hooks got notified about the existing listeners
+  ASSERT_EQ(serviceListenerHook1->listenerInfos.size(), 2);
+#endif
+  const std::size_t listenerInfoSizeOld =
+    serviceListenerHook1->listenerInfos.size() - 2;
+
+  context.AddServiceListener(&serviceListener1,
+                             &TestServiceListener::ServiceChanged);
+  auto lastAdded = serviceListenerHook1->lastAdded;
+
+#ifdef US_BUILD_SHARED_LIBS
+  std::vector<int> expectedOrdering;
+  expectedOrdering.push_back(1);
+  expectedOrdering.push_back(1);
+  expectedOrdering.push_back(2);
+  expectedOrdering.push_back(2);
+  expectedOrdering.push_back(20);
+  expectedOrdering.push_back(10);
+  expectedOrdering.push_back(2);
+  expectedOrdering.push_back(1);
+  //Check Listener hook call order
+  ASSERT_EQ(serviceListenerHook1->ordering, expectedOrdering);
+#endif
+
+  context.AddServiceListener(&serviceListener1,
+                             &TestServiceListener::ServiceChanged,
+                             LDAPProp(Constants::OBJECTCLASS) == "blub");
+  //Test same ListenerInfo object
+  ASSERT_EQ(lastAdded, serviceListenerHook1->lastRemoved);
+  ASSERT_FALSE(lastAdded == serviceListenerHook1->lastAdded);
+
+#ifdef US_BUILD_SHARED_LIBS
+  expectedOrdering.push_back(20);
+  expectedOrdering.push_back(10);
+  expectedOrdering.push_back(2);
+  expectedOrdering.push_back(1);
+  //Check Listener hook call order
+  ASSERT_EQ(serviceListenerHook1->ordering, expectedOrdering);
+#endif
+
+  context.RemoveServiceListener(&serviceListener1,
+                                &TestServiceListener::ServiceChanged);
+  context.RemoveServiceListener(&serviceListener2,
+                                &TestServiceListener::ServiceChanged);
+
+#ifdef US_BUILD_SHARED_LIBS
+  expectedOrdering.push_back(20);
+  expectedOrdering.push_back(10);
+  expectedOrdering.push_back(20);
+  expectedOrdering.push_back(10);
+  ASSERT_EQ(serviceListenerHook1->ordering, expectedOrdering);
+#endif
+
+  //Removed listener infos
+  ASSERT_EQ(serviceListenerHook1->listenerInfos.size(), listenerInfoSizeOld);
+
+  listenerHookReg2.Unregister();
+  listenerHookReg1.Unregister();
+}
+
+TEST_F(ServiceHooksTest, TestFindHook)
+{
+  auto serviceFindHook1 = std::make_shared<TestServiceFindHook>(1, context);
+  ServiceProperties hookProps1;
+  hookProps1[Constants::SERVICE_RANKING] = 0;
+  ServiceRegistration<ServiceFindHook> findHookReg1 =
+    context.RegisterService<ServiceFindHook>(serviceFindHook1, hookProps1);
+
+  auto serviceFindHook2 = std::make_shared<TestServiceFindHook>(2, context);
+  ServiceProperties hookProps2;
+  hookProps2[Constants::SERVICE_RANKING] = 10;
+  ServiceRegistration<ServiceFindHook> findHookReg2 =
+    context.RegisterService<ServiceFindHook>(serviceFindHook2, hookProps2);
+
+  std::vector<int> expectedOrdering;
+  //Find hook call order
+  ASSERT_EQ(serviceFindHook1->ordering, expectedOrdering);
+
+  TestServiceListener serviceListener;
+  context.AddServiceListener(&serviceListener,
+                             &TestServiceListener::ServiceChanged);
+
+  auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleA");
+  ASSERT_TRUE(bundle);
+
+  bundle.Start();
+
+  ASSERT_EQ(serviceListener.events.size(), 1);
+
+  std::vector<ServiceReferenceU> refs =
+    context.GetServiceReferences("cppmicroservices::TestBundleAService");
+  ASSERT_TRUE(refs.empty());
+  ServiceReferenceU ref =
+    context.GetServiceReference("cppmicroservices::TestBundleAService");
+  //Invalid reference (filtered out)
+  ASSERT_FALSE(ref);
+
+  expectedOrdering.push_back(2);
+  expectedOrdering.push_back(1);
+  expectedOrdering.push_back(2);
+  expectedOrdering.push_back(1);
+
+  //Find hook call order
+  ASSERT_EQ(serviceFindHook1->ordering, expectedOrdering);
+
+  findHookReg2.Unregister();
+  findHookReg1.Unregister();
+
+  refs = context.GetServiceReferences("cppmicroservices::TestBundleAService");
+  //Non-empty references
+  ASSERT_FALSE(refs.empty());
+  ref = context.GetServiceReference("cppmicroservices::TestBundleAService");
+  ASSERT_TRUE(ref);
+
+  bundle.Stop();
+
+  context.RemoveServiceListener(&serviceListener,
+                                &TestServiceListener::ServiceChanged);
+}
+
+TEST_F(ServiceHooksTest, TestEventListenerHook)
+{
   TestServiceListener serviceListener1;
   TestServiceListener serviceListener2;
   context.AddServiceListener(&serviceListener1,
@@ -305,30 +481,30 @@ void TestEventListenerHook(const Framework& framework)
   expectedOrdering.push_back(1);
   expectedOrdering.push_back(1);
   expectedOrdering.push_back(2);
-  US_TEST_CONDITION(serviceEventListenerHook1->ordering == expectedOrdering,
-                    "Event listener hook call order");
+  //Event listener hook call order
+  ASSERT_EQ(serviceEventListenerHook1->ordering, expectedOrdering);
 
-  US_TEST_CONDITION(serviceListener1.events.empty(),
-                    "service event of service event listener hook");
-  US_TEST_CONDITION(serviceListener2.events.empty(),
-                    "no service event for filtered listener");
+  //service event of service event listener hook
+  ASSERT_TRUE(serviceListener1.events.empty());
+  //no service event for filtered listener
+  ASSERT_TRUE(serviceListener2.events.empty());
 
-  auto bundle = testing::InstallLib(context, "TestBundleA");
-  US_TEST_CONDITION_REQUIRED(bundle, "non-null installed bundle");
+  auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleA");
+  ASSERT_TRUE(bundle);
   bundle.Start();
 
   expectedOrdering.push_back(1);
   expectedOrdering.push_back(2);
-  US_TEST_CONDITION(serviceEventListenerHook1->ordering == expectedOrdering,
-                    "Event listener hook call order");
+  //Test Event listener hook call order
+  ASSERT_EQ(serviceEventListenerHook1->ordering, expectedOrdering);
 
   bundle.Stop();
 
-  US_TEST_CONDITION(serviceListener1.events.empty(),
-                    "no service event due to service event listener hook");
-  US_TEST_CONDITION(serviceListener2.events.empty(),
-                    "no service event for filtered listener due to service "
-                    "event listener hook");
+  // Check that there is no service event due to service event listener hook
+  ASSERT_TRUE(serviceListener1.events.empty());
+  // Test that there is no service event for filtered listener
+  //due to service event listener hook
+  ASSERT_TRUE(serviceListener2.events.empty());
 
   eventListenerHookReg2.Unregister();
   eventListenerHookReg1.Unregister();
@@ -339,170 +515,15 @@ void TestEventListenerHook(const Framework& framework)
                                 &TestServiceListener::ServiceChanged);
 }
 
-void TestListenerHook(const Framework& framework)
-{
-  auto context =
-    testing::GetBundle("main", framework.GetBundleContext()).GetBundleContext();
-
-  TestServiceListener serviceListener1;
-  TestServiceListener serviceListener2;
-  context.AddServiceListener(&serviceListener1,
-                             &TestServiceListener::ServiceChanged);
-  context.AddServiceListener(&serviceListener2,
-                             &TestServiceListener::ServiceChanged,
-                             LDAPProp(Constants::OBJECTCLASS) == "bla");
-
-  auto serviceListenerHook1 =
-    std::make_shared<TestServiceListenerHook>(1, context);
-  ServiceProperties hookProps1;
-  hookProps1[Constants::SERVICE_RANKING] = 0;
-  ServiceRegistration<ServiceListenerHook> listenerHookReg1 =
-    context.RegisterService<ServiceListenerHook>(serviceListenerHook1,
-                                                 hookProps1);
-
-  auto serviceListenerHook2 =
-    std::make_shared<TestServiceListenerHook>(2, context);
-  ServiceProperties hookProps2;
-  hookProps2[Constants::SERVICE_RANKING] = 10;
-  ServiceRegistration<ServiceListenerHook> listenerHookReg2 =
-    context.RegisterService<ServiceListenerHook>(serviceListenerHook2,
-                                                 hookProps2);
-
-#ifdef US_BUILD_SHARED_LIBS
-  // check if hooks got notified about the existing listeners
-  US_TEST_CONDITION_REQUIRED(serviceListenerHook1->listenerInfos.size() == 2,
-                             "Notification about existing listeners")
-#endif
-  const std::size_t listenerInfoSizeOld =
-    serviceListenerHook1->listenerInfos.size() - 2;
-
-  context.AddServiceListener(&serviceListener1,
-                             &TestServiceListener::ServiceChanged);
-  auto lastAdded = serviceListenerHook1->lastAdded;
-
-#ifdef US_BUILD_SHARED_LIBS
-  std::vector<int> expectedOrdering;
-  expectedOrdering.push_back(1);
-  expectedOrdering.push_back(1);
-  expectedOrdering.push_back(2);
-  expectedOrdering.push_back(2);
-  expectedOrdering.push_back(20);
-  expectedOrdering.push_back(10);
-  expectedOrdering.push_back(2);
-  expectedOrdering.push_back(1);
-  US_TEST_CONDITION(serviceListenerHook1->ordering == expectedOrdering,
-                    "Listener hook call order");
-#endif
-
-  context.AddServiceListener(&serviceListener1,
-                             &TestServiceListener::ServiceChanged,
-                             LDAPProp(Constants::OBJECTCLASS) == "blub");
-  US_TEST_CONDITION(lastAdded == serviceListenerHook1->lastRemoved,
-                    "Same ListenerInfo object)");
-  US_TEST_CONDITION(!(lastAdded == serviceListenerHook1->lastAdded),
-                    "New ListenerInfo object)");
-
-#ifdef US_BUILD_SHARED_LIBS
-  expectedOrdering.push_back(20);
-  expectedOrdering.push_back(10);
-  expectedOrdering.push_back(2);
-  expectedOrdering.push_back(1);
-  US_TEST_CONDITION(serviceListenerHook1->ordering == expectedOrdering,
-                    "Listener hook call order");
-#endif
-
-  context.RemoveServiceListener(&serviceListener1,
-                                &TestServiceListener::ServiceChanged);
-  context.RemoveServiceListener(&serviceListener2,
-                                &TestServiceListener::ServiceChanged);
-
-#ifdef US_BUILD_SHARED_LIBS
-  expectedOrdering.push_back(20);
-  expectedOrdering.push_back(10);
-  expectedOrdering.push_back(20);
-  expectedOrdering.push_back(10);
-  US_TEST_CONDITION(serviceListenerHook1->ordering == expectedOrdering,
-                    "Listener hook call order");
-#endif
-
-  US_TEST_CONDITION_REQUIRED(serviceListenerHook1->listenerInfos.size() ==
-                               listenerInfoSizeOld,
-                             "Removed listener infos")
-
-  listenerHookReg2.Unregister();
-  listenerHookReg1.Unregister();
-}
-
-void TestFindHook(const Framework& framework)
-{
-  auto context =
-    testing::GetBundle("main", framework.GetBundleContext()).GetBundleContext();
-
-  auto serviceFindHook1 = std::make_shared<TestServiceFindHook>(1, context);
-  ServiceProperties hookProps1;
-  hookProps1[Constants::SERVICE_RANKING] = 0;
-  ServiceRegistration<ServiceFindHook> findHookReg1 =
-    context.RegisterService<ServiceFindHook>(serviceFindHook1, hookProps1);
-
-  auto serviceFindHook2 = std::make_shared<TestServiceFindHook>(2, context);
-  ServiceProperties hookProps2;
-  hookProps2[Constants::SERVICE_RANKING] = 10;
-  ServiceRegistration<ServiceFindHook> findHookReg2 =
-    context.RegisterService<ServiceFindHook>(serviceFindHook2, hookProps2);
-
-  std::vector<int> expectedOrdering;
-  US_TEST_CONDITION(serviceFindHook1->ordering == expectedOrdering,
-                    "Find hook call order");
-
-  TestServiceListener serviceListener;
-  context.AddServiceListener(&serviceListener,
-                             &TestServiceListener::ServiceChanged);
-
-  auto bundle = testing::InstallLib(context, "TestBundleA");
-  US_TEST_CONDITION_REQUIRED(bundle, "non-null installed bundle");
-
-  bundle.Start();
-
-  US_TEST_CONDITION(serviceListener.events.size() == 1, "Service registered");
-
-  std::vector<ServiceReferenceU> refs =
-    context.GetServiceReferences("cppmicroservices::TestBundleAService");
-  US_TEST_CONDITION(refs.empty(), "Empty references");
-  ServiceReferenceU ref =
-    context.GetServiceReference("cppmicroservices::TestBundleAService");
-  US_TEST_CONDITION(!ref, "Invalid reference (filtered out)");
-
-  expectedOrdering.push_back(2);
-  expectedOrdering.push_back(1);
-  expectedOrdering.push_back(2);
-  expectedOrdering.push_back(1);
-
-  US_TEST_CONDITION(serviceFindHook1->ordering == expectedOrdering,
-                    "Find hook call order");
-
-  findHookReg2.Unregister();
-  findHookReg1.Unregister();
-
-  refs = context.GetServiceReferences("cppmicroservices::TestBundleAService");
-  US_TEST_CONDITION(!refs.empty(), "Non-empty references");
-  ref = context.GetServiceReference("cppmicroservices::TestBundleAService");
-  US_TEST_CONDITION(ref, "Valid reference");
-
-  bundle.Stop();
-
-  context.RemoveServiceListener(&serviceListener,
-                                &TestServiceListener::ServiceChanged);
-}
-
-void TestFindHookFailure(const Framework& framework)
+TEST_F(ServiceHooksTest, TestFindHookFailure)
 {
   auto findHookReg =
     framework.GetBundleContext().RegisterService<ServiceFindHook>(
       std::make_shared<TestServiceFindHookFailure>());
 
-  auto bundle =
-    testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
-  US_TEST_CONDITION_REQUIRED(bundle, "non-null installed bundle");
+  auto bundle = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+  ASSERT_TRUE(bundle);
 
   TestFrameworkListener listener;
   auto fwkListenerToken = framework.GetBundleContext().AddFrameworkListener(
@@ -514,22 +535,20 @@ void TestFindHookFailure(const Framework& framework)
     framework.GetBundleContext().GetServiceReferences(
       "cppmicroservices::TestBundleAService");
 
-  US_TEST_CONDITION_REQUIRED(1 == listener.events.size(),
-                             "Test for correct number of Framework events");
+  //Test for correct number of Framework events
+  ASSERT_EQ(1, listener.events.size());
 
   std::for_each(
     listener.events.begin(),
     listener.events.end(),
     [](const FrameworkEvent& evt) {
-      US_TEST_CONDITION_REQUIRED(evt.GetThrowable() != nullptr,
-                                 "Test for the existence of an exception");
-      US_TEST_CONDITION_REQUIRED(evt.GetType() ==
-                                   FrameworkEvent::Type::FRAMEWORK_WARNING,
-                                 "Test for the correct framework event type");
+      //Test for the existence of an exception
+      ASSERT_NE(evt.GetThrowable(), nullptr);
+      //Test for the correct framework event type
+      ASSERT_EQ(evt.GetType(), FrameworkEvent::Type::FRAMEWORK_WARNING);
       std::string msg(evt.GetMessage());
-      US_TEST_CONDITION_REQUIRED(std::string::npos !=
-                                   msg.find("Failed to call find hook #"),
-                                 "Test for the correct event message");
+      //Test for the correct event message
+      ASSERT_NE(std::string::npos, msg.find("Failed to call find hook #"));
     });
 
   bundle.Stop();
@@ -537,15 +556,15 @@ void TestFindHookFailure(const Framework& framework)
   framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
 }
 
-void TestEventListenerHookFailure(const Framework& framework)
+TEST_F(ServiceHooksTest, TestEventListenerHookFailure)
 {
   auto eventListenerHookReg =
     framework.GetBundleContext().RegisterService<ServiceEventListenerHook>(
       std::make_shared<TestServiceEventListenerHookFailure>());
 
-  auto bundle =
-    testing::InstallLib(framework.GetBundleContext(), "TestBundleA");
-  US_TEST_CONDITION_REQUIRED(bundle, "non-null installed bundle");
+  auto bundle = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+  ASSERT_TRUE(bundle);
 
   TestFrameworkListener listener;
   auto fwkListenerToken = framework.GetBundleContext().AddFrameworkListener(
@@ -553,22 +572,20 @@ void TestEventListenerHookFailure(const Framework& framework)
 
   bundle.Start();
 
-  US_TEST_CONDITION_REQUIRED(1 == listener.events.size(),
-                             "Test for correct number of Framework events");
+  //Test for correct number of Framework events
+  ASSERT_EQ(1, listener.events.size());
 
   std::for_each(
     listener.events.begin(),
     listener.events.end(),
     [](const FrameworkEvent& evt) {
-      US_TEST_CONDITION_REQUIRED(evt.GetThrowable() != nullptr,
-                                 "Test for the existence of an exception");
-      US_TEST_CONDITION_REQUIRED(evt.GetType() ==
-                                   FrameworkEvent::Type::FRAMEWORK_WARNING,
-                                 "Test for the correct framework event type");
+      //Test for the existence of an exception
+      ASSERT_NE(evt.GetThrowable(), nullptr);
+      //Test for the correct framework event type
+      ASSERT_EQ(evt.GetType(), FrameworkEvent::Type::FRAMEWORK_WARNING);
       std::string msg(evt.GetMessage());
-      US_TEST_CONDITION_REQUIRED(std::string::npos !=
-                                   msg.find("Failed to call event hook  #"),
-                                 "Test for the correct event message");
+      //Test for the correct event message
+      ASSERT_NE(std::string::npos, msg.find("Failed to call event hook  #"));
     });
 
   bundle.Stop();
@@ -576,7 +593,7 @@ void TestEventListenerHookFailure(const Framework& framework)
   framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
 }
 
-void TestListenerHookFailure(const Framework& framework)
+TEST_F(ServiceHooksTest, TestListenerHookFailure)
 {
   auto listenerHookReg =
     framework.GetBundleContext().RegisterService<ServiceListenerHook>(
@@ -591,61 +608,22 @@ void TestListenerHookFailure(const Framework& framework)
 
   framework.GetBundleContext().RemoveListener(std::move(listenerToken));
 
-  US_TEST_CONDITION_REQUIRED(2 == listener.events.size(),
-                             "Test for correct number of Framework events");
+  //Test for correct number of Framework events
+  ASSERT_EQ(2, listener.events.size());
 
   std::for_each(
     listener.events.begin(),
     listener.events.end(),
     [](const FrameworkEvent& evt) {
-      US_TEST_CONDITION_REQUIRED(evt.GetThrowable() != nullptr,
-                                 "Test for the existence of an exception");
-      US_TEST_CONDITION_REQUIRED(evt.GetType() ==
-                                   FrameworkEvent::Type::FRAMEWORK_WARNING,
-                                 "Test for the correct framework event type");
+      //Test for the existence of an exception
+      ASSERT_NE(evt.GetThrowable(), nullptr);
+      //Test for the correct framework event type
+      ASSERT_EQ(evt.GetType(), FrameworkEvent::Type::FRAMEWORK_WARNING);
       std::string msg(evt.GetMessage());
-      US_TEST_CONDITION_REQUIRED(std::string::npos !=
-                                   msg.find("Failed to call listener hook #"),
-                                 "Test for the correct event message");
+      //Test for the correct event message
+      ASSERT_NE(std::string::npos, msg.find("Failed to call listener hook #"));
     });
 
   listenerHookReg.Unregister();
   framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
-}
-
-} // end unnamed namespace
-
-int ServiceHooksTest(int /*argc*/, char* /*argv*/[])
-{
-  US_TEST_BEGIN("ServiceHooksTest");
-
-  FrameworkFactory factory;
-  auto framework = factory.NewFramework();
-  framework.Start();
-
-  try {
-    auto bundles = framework.GetBundleContext().GetBundles();
-    US_TEST_CONDITION_REQUIRED(!bundles.empty(),
-                               "Test installation of bundle main")
-    for (auto& b : bundles) {
-      if (b.GetSymbolicName() == "main") {
-        b.Start();
-        break;
-      }
-    }
-  } catch (const std::exception& e) {
-    US_TEST_FAILED_MSG(<< "Install bundle exception: " << e.what())
-  }
-
-  TestListenerHook(framework);
-  TestFindHook(framework);
-  TestEventListenerHook(framework);
-  TestFindHookFailure(framework);
-  TestEventListenerHookFailure(framework);
-  TestListenerHookFailure(framework);
-
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
-
-  US_TEST_END()
 }

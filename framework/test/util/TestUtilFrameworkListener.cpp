@@ -76,7 +76,6 @@ bool TestFrameworkListener::CheckEvents(
 void TestFrameworkListener::frameworkEvent(const FrameworkEvent& evt)
 {
   _events.push_back(evt);
-  std::cout << evt << std::endl;
 }
 
 void TestFrameworkListener::throwOnFrameworkEvent(const FrameworkEvent&)

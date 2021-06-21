@@ -240,7 +240,6 @@
    fun:mz_zip_writer_add_mem_ex
    fun:mz_zip_writer_add_mem
    ...
-   fun:main
 }
 
 
@@ -252,7 +251,6 @@
    fun:mz_zip_writer_add_mem_ex
    fun:mz_zip_writer_add_mem
    ...
-   fun:main
 }
 
 
@@ -263,7 +261,6 @@
    ...
    fun:mz_zip_writer_add_mem
    ...
-   fun:main
 }
 
 {

@@ -51,7 +51,9 @@ public:
    *
    * @param ctxt The {@code ComponentContext} object associated with the component instance.
    */
-  virtual void CreateInstanceAndBindReferences(
+  virtual void CreateInstance(
+    const std::shared_ptr<ComponentContext>& ctxt) = 0;
+  virtual void BindReferences(
     const std::shared_ptr<ComponentContext>& ctxt) = 0;
   virtual void UnbindReferences() = 0;
 

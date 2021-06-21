@@ -163,7 +163,8 @@ TEST(ComponentInstance, VerifyZeroServicesZeroDependencies)
   auto mockContext = std::make_shared<MockComponentContext>();
   EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
     .Times(0); // ensure the mock context never gets a call to LocateService
-  compInstance.CreateInstanceAndBindReferences(mockContext);
+  compInstance.CreateInstance(mockContext);
+  compInstance.BindReferences(mockContext);
   compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
   // ensure none of the dependencies are bound. Dependencies are only bound if they are declared.
@@ -181,7 +182,8 @@ TEST(ComponentInstanceImpl, VerifyZeroServicesZeroDependencies)
   auto mockContext = std::make_shared<MockComponentContext>();
   EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
     .Times(0); // ensure the mock context never gets a call to LocateService
-  compInstance.CreateInstanceAndBindReferences(mockContext);
+  compInstance.CreateInstance(mockContext);
+  compInstance.BindReferences(mockContext);
   compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
   // ensure none of the dependencies are bound. Dependencies are only bound if they are declared.
@@ -206,7 +208,8 @@ TEST(ComponentInstance, VerifyWithSingleServiceZeroDependencies)
   auto mockContext = std::make_shared<MockComponentContext>();
   EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
     .Times(0); // ensure the mock context never gets a call to LocateService
-  compInstance.CreateInstanceAndBindReferences(mockContext);
+  compInstance.CreateInstance(mockContext);
+  compInstance.BindReferences(mockContext);
   auto compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
   // ensure none of the dependencies are bound. Dependencies are only bound if they are declared.
@@ -226,7 +229,8 @@ TEST(ComponentInstanceImpl, VerifyWithSingleServiceZeroDependencies)
   auto mockContext = std::make_shared<MockComponentContext>();
   EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
     .Times(0); // ensure the mock context never gets a call to LocateService
-  compInstance.CreateInstanceAndBindReferences(mockContext);
+  compInstance.CreateInstance(mockContext);
+  compInstance.BindReferences(mockContext);
   auto compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
   // ensure none of the dependencies are bound. Dependencies are only bound if they are declared.
@@ -255,7 +259,8 @@ TEST(ComponentInstance, VerifyWithMultipleServiceZeroDependencies)
   auto mockContext = std::make_shared<MockComponentContext>();
   EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
     .Times(0); // ensure the mock context never gets a call to LocateService
-  compInstance.CreateInstanceAndBindReferences(mockContext);
+  compInstance.CreateInstance(mockContext);
+  compInstance.BindReferences(mockContext);
   auto compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
   // ensure none of the dependencies are bound. Dependencies are only bound if they are declared.
@@ -279,7 +284,8 @@ TEST(ComponentInstanceImpl, VerifyWithMultipleServiceZeroDependencies)
   auto mockContext = std::make_shared<MockComponentContext>();
   EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
     .Times(0); // ensure the mock context never gets a call to LocateService
-  compInstance.CreateInstanceAndBindReferences(mockContext);
+  compInstance.CreateInstance(mockContext);
+  compInstance.BindReferences(mockContext);
   auto compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
   // ensure none of the dependencies are bound. Dependencies are only bound if they are declared.
@@ -333,7 +339,8 @@ TEST(ComponentInstanceImpl, VerifyWithStaticDependencies)
     .WillRepeatedly(testing::WithArg<1>(testing::Invoke(
       locateService))); // ensure the mock context received a call to LocateService for dependency bar
 
-  compInstance.CreateInstanceAndBindReferences(mockContext);
+  compInstance.CreateInstance(mockContext);
+  compInstance.BindReferences(mockContext);
   auto compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
   // ensure the dependencies are bound when the object is constructed
@@ -408,7 +415,8 @@ TEST(ComponentInstanceImpl, VerifyWithDynamicDependencies)
       locateService))); // ensure the mock context received a call to LocateService for dependency bar
 
   // use mock context to create an instance of the component implementation class.
-  compInstance.CreateInstanceAndBindReferences(mockContext);
+  compInstance.CreateInstance(mockContext);
+  compInstance.BindReferences(mockContext);
   auto compObj = compInstance.GetInstance();
   ASSERT_TRUE(compObj);
   // ensure the dependencies are bound when the object is constructed
@@ -446,8 +454,9 @@ TEST(ComponentInstance, VerifyLifeCycleHooks)
   ASSERT_FALSE(iMap);
   auto compObj = compInstance.GetInstance();
   ASSERT_FALSE(compObj);
-  compInstance.CreateInstanceAndBindReferences(
-    std::make_shared<MockComponentContext>());
+  auto mockContext = std::make_shared<MockComponentContext>();
+  compInstance.CreateInstance(mockContext);
+  compInstance.BindReferences(mockContext);
   compObj = compInstance.GetInstance();
   ASSERT_FALSE(compObj->IsActivated());
   compInstance.Activate();
@@ -463,8 +472,9 @@ TEST(ComponentInstanceImpl, VerifyLifeCycleHooks)
   ASSERT_FALSE(iMap);
   auto compObj = compInstance.GetInstance();
   ASSERT_FALSE(compObj);
-  compInstance.CreateInstanceAndBindReferences(
-    std::make_shared<MockComponentContext>());
+  auto mockContext = std::make_shared<MockComponentContext>();
+  compInstance.CreateInstance(mockContext);
+  compInstance.BindReferences(mockContext);
   compObj = compInstance.GetInstance();
   ASSERT_FALSE(compObj->IsActivated());
   compInstance.Activate();

@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-18.04, windows-latest, macOS-latest]
         sharedlib: [ON, OFF]
         threading: [ON, OFF]
         

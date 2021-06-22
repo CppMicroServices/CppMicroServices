@@ -9,7 +9,6 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
-  CPPMS_BUILD_CONFIGURATION: 0
 
 jobs:
   build:
@@ -21,6 +20,9 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
+        sharedlib: [ON, OFF]
+        threading: [ON, OFF]
+        
 
     steps:
     - uses: actions/checkout@v2
@@ -30,7 +32,7 @@ jobs:
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUS_BUILD_TESTING:BOOL=ON -DUS_BUILD_EXAMPLES:BOOL=ON -DUS_ENABLE_THREADING_SUPPORT:BOOL=ON
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUS_BUILD_TESTING:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=$${{matrix.sharedlib}} -DUS_BUILD_EXAMPLES:BOOL=ON -DUS_ENABLE_THREADING_SUPPORT:BOOL=${{matrix.threading}}
 
     - name: Build
       # Build your program with the given configuration

@@ -1,10 +1,38 @@
 {
-    "bundle.symbolic_name" : "dummyService",
-    "bundle_priority" : "high",
-    "bundle_start" : "greedy",
-    "bundle_configuration" : [{
-        "mode": "cloud",
-        "minProgLevel": "Dynamic",
-        "run_during_start" : "false"
+  "bundle.symbolic_name" : "dummyService",
+  "bundle_priority" : "high",
+  "bundle_start" : "greedy",
+  "bundle_configuration" : [{
+      "mode": "cloud",
+      "minProgLevel": "Dynamic",
+      "run_during_start" : "false"
+  }],
+  "scr": {
+    "version": 1,
+    "components": [{
+      "implementation-class": "StartupFolder::Plugin",
+      "properties": {
+        "mw" : {
+          "startup_plugins" : {
+            "priority" : "required",
+            "configuration" : [{"presetMode" : "Desktop MATLAB",
+                                "minJavaLevel"  : "None"}]
+            
+          }
+        }
+      },
+      "service": {
+        "interfaces": ["startup_plugins::StartupPlugin"]
+      }
     }]
+  },
+  "a" : {
+    "b" : {
+      "c" : {
+        "d" : {
+          "e" : "found"
+        }
+      }
+    }
+  }
 }

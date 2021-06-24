@@ -56,6 +56,7 @@ set(_gtest_tests
   ServiceHooksTest.cpp
   TestCounterLatch.cpp
   ResourceCompilerTest.cpp
+  MultipleListenersTest.cpp
 )
 
 if(BUILD_SHARED_LIBS)

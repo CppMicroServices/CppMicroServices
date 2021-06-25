@@ -9,10 +9,13 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
+  BUILD_DIR: ${{github.workspace}}/build
+  BUILD_CONFIGURATION: 0
+  WITH_COVERAGE: 1
 
 jobs:
   build:
-    name: Build and test on ${{matrix.os}} with threading ${{matrix.threading}} and sharedlib $${{matrix.sharedlib}} 
+    name: Build and test on ${{matrix.os}} with threading ${{matrix.threading}} and sharedlib ${{matrix.sharedlib}} 
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
@@ -21,9 +24,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, windows-latest, macOS-latest]
+        #  add back windows-latest and macOS-latest; save compute time on PRs while testing this workflow
+        os: [ubuntu-18.04]
         sharedlib: [ON, OFF]
         threading: [ON, OFF]
+        buildconfiguration: [0,1,2,3]
         
 
     steps:
@@ -35,18 +40,26 @@ jobs:
       run: sudo apt-get install -y valgrind
       if: ${{matrix.os == 'ubuntu-18.04'}}
 
-    - name: Configure CMake
+    - name: Configure Build And Test
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_travis.cmake
+      env: 
+         BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+      
+    #- name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUS_BUILD_TESTING:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=$${{matrix.sharedlib}} -DUS_BUILD_EXAMPLES:BOOL=ON -DUS_ENABLE_THREADING_SUPPORT:BOOL=${{matrix.threading}}
+    #  run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUS_BUILD_TESTING:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=${{matrix.sharedlib}} -DUS_BUILD_EXAMPLES:BOOL=ON -DUS_ENABLE_THREADING_SUPPORT:BOOL=${{matrix.threading}} -DUS_ENABLE_COVERAGE:BOOL=ON
 
-    - name: Build
+    #- name: Build
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+    #  run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
+    #- name: Test
+    #  working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
+    #  run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
+      
+    - name: Code Coverage
+      run: bash <(curl -s https://codecov.io/bash) -X gcov -s ${{github.workspace}}/build
       

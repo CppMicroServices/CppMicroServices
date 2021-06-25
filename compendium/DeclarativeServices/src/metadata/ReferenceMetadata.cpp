@@ -20,6 +20,8 @@
 
   =============================================================================*/
 
+#include <limits>
+
 #include "ReferenceMetadata.hpp"
 #include "Util.hpp"
 

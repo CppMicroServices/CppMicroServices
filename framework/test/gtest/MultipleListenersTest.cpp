@@ -455,6 +455,13 @@ TEST_F(MultipleListenersTest, testListenerTypes)
   EXPECT_GT(static_cast<int>(tListen.bundle_count), 0);
   //Test for number of times framework listeners got triggered
   ASSERT_EQ(tListen.framework_count, 1);
+
+#ifdef US_ENABLE_THREADING_SUPPORT
+  testConcurrentAddRemove<FrameworkListener, FrameworkEvent>(
+      "framework listener");
+  testConcurrentAddRemove<BundleListener, BundleEvent>("bundle listener");
+  testConcurrentAddRemove<ServiceListener, ServiceEvent>("service listener");
+#endif
 }
 
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -488,11 +495,4 @@ TEST_F(MultipleListenersTest, testConcurrentAdd)
   ASSERT_EQ(count, 0);
 }
 
-TEST_F(MultipleListenersTest, testTypesOfListeners)
-{
-  testConcurrentAddRemove<FrameworkListener, FrameworkEvent>(
-    "framework listener");
-  testConcurrentAddRemove<BundleListener, BundleEvent>("bundle listener");
-  testConcurrentAddRemove<ServiceListener, ServiceEvent>("service listener");
-}
 #endif

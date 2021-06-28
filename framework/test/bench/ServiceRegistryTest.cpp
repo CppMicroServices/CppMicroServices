@@ -1,4 +1,5 @@
 #include "benchmark/benchmark.h"
+#include "cppmicroservices/ServiceEvent.h"
 #include <cppmicroservices/Bundle.h>
 #include <cppmicroservices/BundleContext.h>
 #include <cppmicroservices/BundleEvent.h>
@@ -11,6 +12,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <vector>
 
 using namespace cppmicroservices;
 
@@ -43,6 +45,20 @@ public:
 
   std::shared_ptr<Framework> framework;
 };
+
+class TestServiceListener
+{
+public:
+  void ServiceChanged(const ServiceEvent& serviceEvent)
+  {
+    if (serviceEvent.GetType() == ServiceEvent::SERVICE_MODIFIED) {
+      this->events.push_back(serviceEvent);
+    }
+  }
+
+  std::vector<ServiceEvent> events;
+};
+
 }
 
 /**
@@ -184,3 +200,51 @@ BENCHMARK_REGISTER_F(ServiceRegistryFixture, UnregisterServices)
   ->RangeMultiplier(4)
   ->Ranges({ { 1, 1000 }, { 1, 1000 } })
   ->UseManualTime();
+
+BENCHMARK_DEFINE_F(ServiceRegistryFixture, ModifyServices)
+(benchmark::State& state)
+{
+    using namespace std::chrono;
+
+    auto fc = framework->GetBundleContext();
+    auto regCount = state.range(0);
+    auto interfaceCount = state.range(1);
+    auto interfaceMap = MakeInterfaceMapWithNInterfaces(interfaceCount);
+
+    std::vector<ServiceRegistrationBase> regs;
+    for (auto i = regCount; i > 0; --i) {
+        InterfaceMapPtr iMapCopy(std::make_shared<InterfaceMap>(*interfaceMap));
+        auto reg =
+            fc.RegisterService(iMapCopy); // benchmark the call to RegisterService
+        regs.push_back(reg);
+    }
+
+    for (auto _ : state) {
+
+        TestServiceListener serviceListener1;
+        fc.AddServiceListener(&serviceListener1,
+            &TestServiceListener::ServiceChanged);
+
+        auto start = high_resolution_clock::now();
+
+        for (std::size_t i = 0; i < regs.size(); i++) {
+            ServiceProperties props;
+            props["perf.service.value"] = i * 2;
+            regs[i].SetProperties(props);
+        }
+
+        auto end = high_resolution_clock::now();
+        auto elapsed_seconds = duration_cast<duration<double>>(end - start);
+        state.SetIterationTime(elapsed_seconds.count());
+
+        if (serviceListener1.events.size() != regCount) {
+            state.SkipWithError("# of SERVICE_MODIFIED events must be same as # of "
+                "modified services  * # of listeners");
+        }
+    }
+}
+
+BENCHMARK_REGISTER_F(ServiceRegistryFixture, ModifyServices)
+->RangeMultiplier(4)
+->Ranges({ { 1, 1000 }, { 1, 1000 } })
+->UseManualTime();

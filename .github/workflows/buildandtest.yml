@@ -15,6 +15,27 @@ env:
   MY_COVERAGE: gcov
 
 jobs:
+  minimum_supported_gcc_build:
+    name: Build and test on minimum supported gcc compiler
+    runs-on: ubuntu-latest
+    env:
+       BUILD_CONFIGURATION: 0
+       WITH_COVERAGE: 0
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    
+    - name: Install dependencies
+      run: sudo apt-get install -y gcc-5 g++-5 valgrind
+      
+    - name: Configure Build and Test
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_travis.cmake
+      env:
+         MY_CC: gcc-5
+         MY_CXX: g++-5
+    
   build:
     name: Build and test on ${{matrix.os}} with build configuration ${{matrix.buildconfiguration}} #threading ${{matrix.threading}} and sharedlib ${{matrix.sharedlib}} 
     # The CMake configure and build commands are platform agnostic and should work equally
@@ -25,8 +46,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        #  add back windows-latest and macOS-latest; save compute time on PRs while testing this workflow
-        os: [ubuntu-18.04]
+        #  add back windows-latest and ubuntu-18.04; save compute time on PRs while testing this workflow
+        os: [macOS-latest]
         #sharedlib: [ON, OFF]
         #threading: [ON, OFF]
         buildconfiguration: [0,1,2,3]

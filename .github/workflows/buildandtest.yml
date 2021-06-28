@@ -28,7 +28,10 @@ jobs:
         submodules: true
     
     - name: Install dependencies
-      run: sudo apt-get install -y gcc-5 g++-5 valgrind
+      run: |
+        sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+        sudo apt-get update
+        sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-5 g++-5 valgrind
       
     - name: Configure Build and Test
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_travis.cmake
@@ -46,8 +49,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        #  add back windows-latest and ubuntu-18.04; save compute time on PRs while testing this workflow
-        os: [macOS-latest]
+        #  add back windows-latest and macOS-latest ; save compute time on PRs while testing this workflow
+        os: [ubuntu-18.04]
         #sharedlib: [ON, OFF]
         #threading: [ON, OFF]
         buildconfiguration: [0,1,2,3]

@@ -15,8 +15,32 @@ env:
   MY_COVERAGE: gcov
 
 jobs:
-  minimum_supported_gcc_build:
-    name: Build and test on minimum supported gcc compiler
+  #minimum_supported_gcc_build:
+  #  name: Build and test on minimum supported gcc compiler
+  #  runs-on: ubuntu-18.04
+  #  env:
+  #     BUILD_CONFIGURATION: 0
+  #     WITH_COVERAGE: 0
+
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #    with:
+  #      submodules: true
+    
+  #  - name: Install dependencies
+  #    run: |
+  #      sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+  #      sudo apt-get update
+  #      sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-5 g++-5 valgrind
+      
+  #  - name: Configure Build and Test
+  #    run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_travis.cmake
+  #    env:
+  #       CC: gcc-5
+  #       CXX: g++-5
+  
+  linux_clang_build:
+    name: Build and test on supported clang compiler
     runs-on: ubuntu-18.04
     env:
        BUILD_CONFIGURATION: 0
@@ -28,50 +52,44 @@ jobs:
         submodules: true
     
     - name: Install dependencies
-      run: |
-        sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
-        sudo apt-get update
-        sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-5 g++-5 valgrind
+      run: sudo apt-get -yq --no-install-suggests --no-install-recommends install valgrind
       
     - name: Configure Build and Test
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_travis.cmake
       env:
-         CC: gcc-5
-         CXX: g++-5
-    
-  build:
-    name: Build and test on ${{matrix.os}} with build configuration ${{matrix.buildconfiguration}} #threading ${{matrix.threading}} and sharedlib ${{matrix.sharedlib}} 
-    # The CMake configure and build commands are platform agnostic and should work equally
-    # well on Windows or Mac.  You can convert this to a matrix build if you need
-    # cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ${{matrix.os}}
-    strategy:
-      fail-fast: false
-      matrix:
-        #  add back windows-latest and macOS-latest and ubuntu-18.04; save compute time on PRs while testing this workflow
-        os: [ubuntu-latest]
+         CC: clang
+         CXX: clang++
+  
+  #build:
+  #  name: Build and test on ${{matrix.os}} with build configuration ${{matrix.buildconfiguration}} #threading ${{matrix.threading}} and sharedlib ${{matrix.sharedlib}} 
+  #  runs-on: ${{matrix.os}}
+  #  strategy:
+  #    fail-fast: false
+  #    matrix:
+        #  windows will continue to use appveyor for now.
+        # TODO: look into pros/cons of migrating windows builds to github workflows
+  #      os: [ubuntu-18.04 macOS-latest]
         # build configurations:
         # 0 = threading ON / shared lib ON
         # 1 = threading ON / shared lib OFF
         # 2 = threading OFF / shared lib ON
         # 3 = threading OFF/ shared lib OFF
-        buildconfiguration: [0,1,2,3]
+  #      buildconfiguration: [0,1,2,3]
 
-    steps:
-    - uses: actions/checkout@v2
-      with:
-         submodules: true
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #    with:
+  #       submodules: true
 
-    - name: Install valgrind
-      run: sudo apt-get install -y valgrind
-      if: ${{matrix.os == 'ubuntu-latest'}}
+  #  - name: Install valgrind
+  #    run: sudo apt-get install -y valgrind
+  #    if: ${{matrix.os == 'ubuntu-18.04'}}
 
-    - name: Configure Build And Test
-      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_travis.cmake
-      env: 
-         BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+  #  - name: Configure Build And Test
+  #    run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_travis.cmake
+  #    env: 
+  #       BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
       
-    - name: Code Coverage
-      run: bash <(curl -s https://codecov.io/bash) -X gcov -s ${{github.workspace}}/build
-      
+  #  - name: Code Coverage
+  #    run: bash <(curl -s https://codecov.io/bash) -X gcov -s ${{github.workspace}}/build
+  

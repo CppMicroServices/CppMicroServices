@@ -12,10 +12,11 @@ env:
   BUILD_DIR: ${{github.workspace}}/build
   BUILD_CONFIGURATION: 0
   WITH_COVERAGE: 1
+  MY_COVERAGE: gcov
 
 jobs:
   build:
-    name: Build and test on ${{matrix.os}} with threading ${{matrix.threading}} and sharedlib ${{matrix.sharedlib}} 
+    name: Build and test on ${{matrix.os}} with build configuration ${{matrix.buildconfiguration}} #threading ${{matrix.threading}} and sharedlib ${{matrix.sharedlib}} 
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
@@ -26,10 +27,9 @@ jobs:
       matrix:
         #  add back windows-latest and macOS-latest; save compute time on PRs while testing this workflow
         os: [ubuntu-18.04]
-        sharedlib: [ON, OFF]
-        threading: [ON, OFF]
+        #sharedlib: [ON, OFF]
+        #threading: [ON, OFF]
         buildconfiguration: [0,1,2,3]
-        
 
     steps:
     - uses: actions/checkout@v2

@@ -36,8 +36,8 @@ jobs:
     - name: Configure Build and Test
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_travis.cmake
       env:
-         MY_CC: gcc-5
-         MY_CXX: g++-5
+         CC: gcc-5
+         CXX: g++-5
     
   build:
     name: Build and test on ${{matrix.os}} with build configuration ${{matrix.buildconfiguration}} #threading ${{matrix.threading}} and sharedlib ${{matrix.sharedlib}} 
@@ -49,10 +49,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        #  add back windows-latest and macOS-latest ; save compute time on PRs while testing this workflow
-        os: [ubuntu-18.04]
-        #sharedlib: [ON, OFF]
-        #threading: [ON, OFF]
+        #  add back windows-latest and macOS-latest and ubuntu-18.04; save compute time on PRs while testing this workflow
+        os: [ubuntu-latest]
+        # build configurations:
+        # 0 = threading ON / shared lib ON
+        # 1 = threading ON / shared lib OFF
+        # 2 = threading OFF / shared lib ON
+        # 3 = threading OFF/ shared lib OFF
         buildconfiguration: [0,1,2,3]
 
     steps:
@@ -62,27 +65,12 @@ jobs:
 
     - name: Install valgrind
       run: sudo apt-get install -y valgrind
-      if: ${{matrix.os == 'ubuntu-18.04'}}
+      if: ${{matrix.os == 'ubuntu-latest'}}
 
     - name: Configure Build And Test
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_travis.cmake
       env: 
          BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
-      
-    #- name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-    #  run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DUS_BUILD_TESTING:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=${{matrix.sharedlib}} -DUS_BUILD_EXAMPLES:BOOL=ON -DUS_ENABLE_THREADING_SUPPORT:BOOL=${{matrix.threading}} -DUS_ENABLE_COVERAGE:BOOL=ON
-
-    #- name: Build
-      # Build your program with the given configuration
-    #  run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-
-    #- name: Test
-    #  working-directory: ${{github.workspace}}/build
-      # Execute tests defined by the CMake configuration.  
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-    #  run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
       
     - name: Code Coverage
       run: bash <(curl -s https://codecov.io/bash) -X gcov -s ${{github.workspace}}/build

@@ -68,7 +68,7 @@ jobs:
       matrix:
         #  windows will continue to use appveyor for now.
         # TODO: look into pros/cons of migrating windows builds to github workflows
-        os: [ubuntu-18.04 macOS-latest]
+        os: [ubuntu-18.04, macOS-latest]
         # build configurations:
         # 0 = threading ON / shared lib ON
         # 1 = threading ON / shared lib OFF

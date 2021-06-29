@@ -12,8 +12,8 @@
 +=============+===========================+==========================+========================+
 | master      | |Linux Build Status|      | |Windows Build status|   | |Code Coverage Status| |
 +-------------+---------------------------+--------------------------+------------------------+
-| development | |Linux Build Status       | |Windows Build status    | |Code Coverage Status  |
-|             | (development)|            | (development)|           | (development)|         |
+| development | |BuildAndTest|            | |Windows Build status    | |Code Coverage Status  |
+|             |                           | (development)|           | (development)|         |
 +-------------+---------------------------+--------------------------+------------------------+
 
 |Coverity Scan Build Status|
@@ -193,6 +193,8 @@ file for details about the contribution process.
 
 .. |Linux Build Status| image:: https://img.shields.io/travis/CppMicroServices/CppMicroServices/master.svg?style=flat-square&label=Linux%20%26%20OS%20X
    :target: http://travis-ci.org/CppMicroServices/CppMicroServices
+.. |BuildAndTest| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/buildandtest.yml/badge.svg?branch=development&event=push
+   :target: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/buildandtest.yml
 .. |Windows Build status| image:: https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/master.svg?style=flat-square&label=Windows
    :target: https://ci.appveyor.com/project/cppmicroservices/cppmicroservices/branch/master
 .. |Linux Build Status (development)| image:: https://img.shields.io/travis/CppMicroServices/CppMicroServices/development.svg?style=flat-square&label=Linux%20%26%20OS%20X

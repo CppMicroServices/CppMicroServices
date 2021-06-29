@@ -46,8 +46,9 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 #include <vector>
 
-namespace {
-
+namespace cppmicroservices {
+namespace any {
+namespace detail {
 /**
  * Provide a compare function that will do the comparison if the operator is available, and always
  * return false otherwise. Use SFINAE to pick the right implementation based on type.
@@ -88,6 +89,7 @@ bool compare(const CmpT&, const CmpT&)
 }
 
 }
+}
 
 /**
 
@@ -96,9 +98,6 @@ bool compare(const CmpT&, const CmpT&)
 \brief The Any class and related functions.
 
 */
-
-namespace cppmicroservices {
-
 class Any;
 
 US_Framework_EXPORT std::ostream& newline_and_indent(std::ostream& os,
@@ -324,7 +323,7 @@ public:
   {
     if (Type() != typeid(ValueType))
       return false;
-    return compare(*any_cast<const ValueType>(this), val);
+    return cppmicroservices::any::detail::compare(*any_cast<const ValueType>(this), val);
   }
 
   /**

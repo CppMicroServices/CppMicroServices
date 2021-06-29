@@ -807,6 +807,9 @@ void TestBundleAssignmentOperator()
                              "Test bundle object assignment.");
   US_TEST_CONDITION_REQUIRED(bundleB == bundleA,
                              "Test that the bundle objects are equivalent.");
+
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
 void TestBundleStreamOperator()

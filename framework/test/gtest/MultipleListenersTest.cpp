@@ -132,7 +132,7 @@ ListenerToken AddListener(BundleContext& fCtx, BundleListener listener)
 // calls that add listeners or remove listeners are executed at the same time,
 // and not other boilerplate code.
 template<typename ListenerType, typename EventType>
-void testConcurrentAddRemove(std::string listenerStr)
+void testConcurrentAddRemove()
 {
   FrameworkFactory factory;
   auto framework = factory.NewFramework();
@@ -457,10 +457,9 @@ TEST_F(MultipleListenersTest, testListenerTypes)
   ASSERT_EQ(tListen.framework_count, 1);
 
 #ifdef US_ENABLE_THREADING_SUPPORT
-  testConcurrentAddRemove<FrameworkListener, FrameworkEvent>(
-      "framework listener");
-  testConcurrentAddRemove<BundleListener, BundleEvent>("bundle listener");
-  testConcurrentAddRemove<ServiceListener, ServiceEvent>("service listener");
+  //testConcurrentAddRemove<FrameworkListener, FrameworkEvent>();
+  //testConcurrentAddRemove<BundleListener, BundleEvent>();
+  //testConcurrentAddRemove<ServiceListener, ServiceEvent>();
 #endif
 }
 

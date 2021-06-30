@@ -110,8 +110,8 @@ public:
       throw std::runtime_error("CounterLatch is in invalid state.");
     }
     cond.wait(lock, [&]() { return count == 0; });
-    count = std::numeric_limits<
-      long>::min(); // makes the latch unusable for other threads
+    count = (std::numeric_limits<
+      long>::min)(); // makes the latch unusable for other threads
   }
 
   /**

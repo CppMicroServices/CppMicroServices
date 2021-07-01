@@ -53,7 +53,7 @@ static void LDAPNested(benchmark::State& state)
 //      res = res || filt.Match(ref_any_cast<const AnyMap>(ref_any_cast<const AnyMap>(anAny).AtCompoundKey("properties.mw.startup_plugins")));
 //    }
 //  };
-  
+
 // case 2: index of array known
 //  LDAPFilter filt("(priority=required)");
 //  std::string key {"scr.components.0.properties.mw.startup_plugins"};
@@ -79,7 +79,7 @@ static void JMESPathNested(benchmark::State& state)
 {
   std::string path(US_FRAMEWORK_SOURCE_DIR);
   path += "/test/bundles/dummyService/resources/manifest.json";
-    
+
   //std::string filter_str = "bundle_configuration[?mode=='cloud']";
   //std::string filter_str = "[a.b.c.d][?e=='found'].e";
   //std::string filter_str = "[@][?bundle_start=='greedy'].bundle_start";
@@ -143,7 +143,6 @@ static void JMESPathNested(benchmark::State& state)
 //
 ////  std::cout << pretty_print(result) << std::endl;
 //}
-
 
 BENCHMARK(LDAPNested);
 //BENCHMARK(JsonPathNested);

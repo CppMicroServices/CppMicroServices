@@ -445,12 +445,32 @@ ComponentConfigurationImpl::CreateAndActivateComponentInstanceHelper(
   auto componentInstance = CreateComponentInstance();
   auto ctxt =
     std::make_shared<ComponentContextImpl>(shared_from_this(), bundle);
+  /*
+   * Failing to construct the servce object is an unrecoverable 
+   * failure which will cause the service configuration to not
+   * be active.
+   */
   try {
-    componentInstance->CreateInstanceAndBindReferences(ctxt);
+    componentInstance->CreateInstance(ctxt);
   } catch (const std::exception&) {
     logger->Log(
       cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-      "Exception while creating component instance and binding references.",
+      "Exception while creating component instance.",
+      std::current_exception());
+    throw;
+  }
+
+  /*
+   * Binding service references can fail and if it does. per
+   * the OSGi standard, the failure should be logged and the
+   * activation should proceed.
+   */
+  try {
+    componentInstance->BindReferences(ctxt);
+  } catch (const std::exception&) {
+    logger->Log(
+      cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+      "Exception while binding references.",
       std::current_exception());
   }
   componentInstance->Activate();

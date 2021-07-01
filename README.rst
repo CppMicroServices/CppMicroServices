@@ -2,18 +2,18 @@
 .. rubric:: Continuous Integration Status
 
 +-------------+---------------------------+--------------------------+------------------------+
-| Branch      | GCC 5.4 and 8.0           | Visual Studio 2015       |                        |
+| Branch      | GCC 5.4 and 7.5.0         | Visual Studio 2015       |                        |
 |             +---------------------------+--------------------------+------------------------+
-|             | Xcode 7.3 and 12.0.1      | Visual Studio 2017       |                        |
+|             | Xcode 12.4                | Visual Studio 2017       |                        |
 |             +---------------------------+--------------------------+------------------------+
-|             | Clang 3.5                 | Visual Studio 2019       |                        |
+|             | Clang 9.0                 | Visual Studio 2019       |                        |
 |             +---------------------------+--------------------------+------------------------+
 |             |                           | MinGW-w64                |                        |
 +=============+===========================+==========================+========================+
 | master      | |Linux Build Status|      | |Windows Build status|   | |Code Coverage Status| |
 +-------------+---------------------------+--------------------------+------------------------+
-| development | |Linux Build Status       | |Windows Build status    | |Code Coverage Status  |
-|             | (development)|            | (development)|           | (development)|         |
+| development | |BuildAndTest|            | |Windows Build status    | |Code Coverage Status  |
+|             |                           | (development)|           | (development)|         |
 +-------------+---------------------------+--------------------------+------------------------+
 
 |Coverity Scan Build Status|
@@ -58,8 +58,8 @@ on many different platforms.
 Recommended minimum required compiler versions:
 
 - GCC 5.4
-- Clang 3.5
-- Clang from Xcode 8.0
+- Clang 9.0
+- Clang from Xcode 12.0
 - Visual Studio 2015
 
 You may use older compilers, but certain functionality may not be
@@ -67,8 +67,8 @@ available. Check the warnings printed during configuration of
 your build tree. The following are the absolute minimum requirements:
 
 - GCC 5.1
-- Clang 3.5
-- Clang from Xcode 7.3
+- Clang 9.0
+- Clang from Xcode 12.0
 - Visual Studio 2015 (MSVC++ 14.0)
 
 Recommended minimum required CMake version:
@@ -77,11 +77,10 @@ Recommended minimum required CMake version:
 
 Below is a list of tested compiler/OS combinations:
 
-- GCC 5.4 (Ubuntu 16.04) via Travis CI
-- GCC 8.0 (Ubuntu 16.04) via Travis CI
-- Clang 3.5 (Ubuntu 14.04) via Travis CI
-- Apple Clang, Xcode 7.3 (OS X 10.11) via Travis CI
-- Apple Clang, Xcode 12.0.1 (OS X 10.15.7) via Travis CI
+- GCC 5.4 (Ubuntu 18.04)
+- GCC 7.5.0 (Ubuntu 18.04)
+- Clang 9.0 (Ubuntu 18.04)
+- Apple Clang, Xcode 12.0.1 (OS X 10.15.7)
 - Visual Studio 2015 via Appveyor
 - Visual Studio 2017 via Appveyor
 - Visual Studio 2019 via Appveyor
@@ -194,6 +193,8 @@ file for details about the contribution process.
 
 .. |Linux Build Status| image:: https://img.shields.io/travis/CppMicroServices/CppMicroServices/master.svg?style=flat-square&label=Linux%20%26%20OS%20X
    :target: http://travis-ci.org/CppMicroServices/CppMicroServices
+.. |BuildAndTest| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/buildandtest.yml/badge.svg?branch=development&event=push
+   :target: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/buildandtest.yml
 .. |Windows Build status| image:: https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/master.svg?style=flat-square&label=Windows
    :target: https://ci.appveyor.com/project/cppmicroservices/cppmicroservices/branch/master
 .. |Linux Build Status (development)| image:: https://img.shields.io/travis/CppMicroServices/CppMicroServices/development.svg?style=flat-square&label=Linux%20%26%20OS%20X

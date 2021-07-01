@@ -118,7 +118,9 @@ TEST_F(SingletonComponentConfigurationTest,
   EXPECT_CALL(mockCompFactory, DeleteComponentInstance(testing::_))
     .Times(1)
     .WillOnce(testing::Invoke([](ComponentInstance* obj) { delete obj; }));
-  EXPECT_CALL(*mockInstance, CreateInstanceAndBindReferences(testing::_))
+  EXPECT_CALL(*mockInstance, CreateInstance(testing::_))
+    .Times(1);
+  EXPECT_CALL(*mockInstance, BindReferences(testing::_))
     .Times(1);
   EXPECT_CALL(*mockInstance, Activate()).Times(1);
 
@@ -170,7 +172,9 @@ TEST_F(SingletonComponentConfigurationTest,
   EXPECT_CALL(mockCompFactory, DeleteComponentInstance(testing::_))
     .Times(1)
     .WillOnce(testing::Invoke([](ComponentInstance* obj) { delete obj; }));
-  EXPECT_CALL(*mockInstance, CreateInstanceAndBindReferences(testing::_))
+  EXPECT_CALL(*mockInstance, CreateInstance(testing::_))
+    .Times(1);
+  EXPECT_CALL(*mockInstance, BindReferences(testing::_))
     .Times(1);
   EXPECT_CALL(*mockInstance, Activate()).Times(1);
 
@@ -210,7 +214,9 @@ TEST_F(SingletonComponentConfigurationTest, TestGetService)
     .WillOnce(testing::Return(mockInstance.get()));
   EXPECT_CALL(mockCompFactory, DeleteComponentInstance(testing::_)).Times(1);
   cppmicroservices::InterfaceMapPtr iMap;
-  EXPECT_CALL(*mockInstance, CreateInstanceAndBindReferences(testing::_))
+  EXPECT_CALL(*mockInstance, CreateInstance(testing::_))
+    .Times(1);
+  EXPECT_CALL(*mockInstance, BindReferences(testing::_))
     .Times(1);
   EXPECT_CALL(*mockInstance, Activate()).Times(1);
   EXPECT_CALL(*mockInstance, GetInterfaceMap())

@@ -256,7 +256,10 @@ class MockComponentInstance
 {
 public:
   MOCK_METHOD1(
-    CreateInstanceAndBindReferences,
+    CreateInstance,
+    void(const std::shared_ptr<service::component::ComponentContext>&));
+  MOCK_METHOD1(
+    BindReferences,
     void(const std::shared_ptr<service::component::ComponentContext>&));
   MOCK_METHOD0(UnbindReferences, void(void));
   MOCK_METHOD0(Activate, void(void));

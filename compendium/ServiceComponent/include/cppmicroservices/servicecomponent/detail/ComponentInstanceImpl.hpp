@@ -233,7 +233,9 @@ public:
                value>::type>
   void DoActivate(const std::shared_ptr<ComponentContext>& ctxt)
   {
-    mServiceImpl->Activate(ctxt);
+    if (mServiceImpl) {
+      mServiceImpl->Activate(ctxt);
+    }
   }
 
   template<typename... A>
@@ -253,6 +255,9 @@ public:
              const std::shared_ptr<cppmicroservices::AnyMap>&>::value>::type>
   bool DoModified(const std::shared_ptr<ComponentContext>& ctxt)
   {
+    if (!mServiceImpl) {
+      return false;
+    }
     auto properties =
       std::make_shared<cppmicroservices::AnyMap>(ctxt->GetProperties());
     mServiceImpl->Modified(ctxt, properties);
@@ -301,7 +306,9 @@ public:
         value>::type>
   void DoDeactivate(const std::shared_ptr<ComponentContext>& ctxt)
   {
-    mServiceImpl->Deactivate(ctxt);
+    if (mServiceImpl) {
+      mServiceImpl->Deactivate(ctxt);
+    }
   }
 
   std::shared_ptr<ComponentContext>
@@ -333,17 +340,19 @@ public:
   using Injection =
     std::integral_constant<bool, sizeof...(CtorInjectedRefs) != 0>;
 
-  void CreateInstanceAndBindReferences(
-    const std::shared_ptr<ComponentContext>& ctxt) override
+  void CreateInstance(const std::shared_ptr<ComponentContext>& ctxt) override
   {
     this->mContext = ctxt;
     bool isConstructorInjected = Injection::value;
     std::shared_ptr<T> implObj = DoCreate(isConstructorInjected); // appropriate
     this->mServiceImpl = implObj;
+  }
+
+  void BindReferences(const std::shared_ptr<ComponentContext>& ctxt) override 
+  {
     for (auto& binder : this->refBinders) {
       binder->Bind(ctxt, this->mServiceImpl);
     }
-
   }
 
   void UnbindReferences() override

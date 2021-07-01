@@ -67,6 +67,7 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 set(_additional_srcs
+  FrameworkTestActivator.cpp
   ../util/TestUtilBundleListener.cpp
   ../util/TestUtilFrameworkListener.cpp
   ../util/TestUtils.cpp

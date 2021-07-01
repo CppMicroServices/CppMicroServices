@@ -424,6 +424,11 @@ TEST_F(MultipleListenersTest, testListenerTypes)
     int framework_count;
   };
 
+  auto framework2 = FrameworkFactory().NewFramework();
+
+  framework2.Init();
+  auto fCtx = framework2.GetBundleContext();
+
   TestListener tListen;
 
   tListen.tokens.push_back(
@@ -442,7 +447,7 @@ TEST_F(MultipleListenersTest, testListenerTypes)
   fCtx.RemoveListener(std::move(tListen.tokens[0]));
   fCtx.RemoveListener(std::move(tListen.tokens[2]));
   fCtx.RemoveListener(std::move(tListen.tokens[4]));
-  framework.Start();
+  framework2.Start();
 
   auto bundleA = cppmicroservices::testing::InstallLib(fCtx, "TestBundleA");
   //Test for existing bundle TestBundleA
@@ -456,10 +461,13 @@ TEST_F(MultipleListenersTest, testListenerTypes)
   //Test for number of times framework listeners got triggered
   ASSERT_EQ(tListen.framework_count, 1);
 
+  framework2.Stop();
+  framework2.WaitForStop(std::chrono::milliseconds::zero());
+
 #ifdef US_ENABLE_THREADING_SUPPORT
-  //testConcurrentAddRemove<FrameworkListener, FrameworkEvent>();
-  //testConcurrentAddRemove<BundleListener, BundleEvent>();
-  //testConcurrentAddRemove<ServiceListener, ServiceEvent>();
+  testConcurrentAddRemove<FrameworkListener, FrameworkEvent>();
+  testConcurrentAddRemove<BundleListener, BundleEvent>();
+  testConcurrentAddRemove<ServiceListener, ServiceEvent>();
 #endif
 }
 

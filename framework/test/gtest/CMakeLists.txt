@@ -2,6 +2,19 @@
 # Build and run the GTest Suite of tests
 #-----------------------------------------------------------------------------
 
+# Make sure that the correct paths separators are used on each platform
+if(WIN32)
+  set(DIR_SEP "\\\\")
+  string(REPLACE "/" "\\\\" CMAKE_LIBRARY_OUTPUT_DIRECTORY_NATIVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+  string(REPLACE "/" "\\\\" CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+else()
+  set(DIR_SEP "/")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_NATIVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endif()
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/TestingConfig.h")
+
 set(us_gtest_test_exe_name usFrameworkTests)
 
 include_directories(

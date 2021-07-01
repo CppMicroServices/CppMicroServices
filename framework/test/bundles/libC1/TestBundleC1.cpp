@@ -28,8 +28,6 @@
 
 #include "cppmicroservices/util/String.h"
 
-#include "TestingMacros.h"
-
 #include <condition_variable>
 #include <future>
 #include <queue>

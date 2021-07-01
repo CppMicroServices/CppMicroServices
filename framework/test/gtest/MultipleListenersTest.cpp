@@ -414,9 +414,9 @@ TEST_F(MultipleListenersTest, testListenerTypes)
       , framework_count(0)
     {}
 
-    void serviceChanged(const ServiceEvent& evt) { ++service_count; }
-    void bundleChanged(const BundleEvent& evt) { ++bundle_count; }
-    void frameworkChanged(const FrameworkEvent& evt) { ++framework_count; }
+    void serviceChanged(const ServiceEvent& /*evt*/) { ++service_count; }
+    void bundleChanged(const BundleEvent& /*evt*/) { ++bundle_count; }
+    void frameworkChanged(const FrameworkEvent& /*evt*/) { ++framework_count; }
 
     std::vector<ListenerToken> tokens;
     int service_count;

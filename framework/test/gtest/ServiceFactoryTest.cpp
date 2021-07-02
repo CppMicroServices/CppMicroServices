@@ -579,6 +579,13 @@ TEST_F(ServiceFactoryTest, TestServiceFactoryBundleScopeErrorConditions)
   ASSERT_EQ(fwEvents[0].GetBundle(), context.GetBundle());
 
   //Test for correct service exception type (recursion)
+  EXPECT_NO_THROW(
+    try {
+      std::rethrow_exception(fwEvents[0].GetThrowable());
+    } catch (const ServiceException& exc) {
+      ASSERT_EQ(exc.GetType(), ServiceException::FACTORY_RECURSION);
+    });
+
   EXPECT_THROW(std::rethrow_exception(fwEvents[0].GetThrowable()),
                cppmicroservices::ServiceException);
 #endif

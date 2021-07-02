@@ -35,6 +35,7 @@
 #include "cppmicroservices/util/FileSystem.h"
 #include "cppmicroservices/util/String.h"
 
+#include "FrameworkTestActivator.h"
 #include "TestUtilBundleListener.h"
 #include "TestUtilFrameworkListener.h"
 #include "TestUtils.h"
@@ -257,6 +258,9 @@ public:
     buExec = cppmicroservices::testing::GetBundle("main", bc);
     ASSERT_TRUE(buExec);
     buExec.Start();
+
+    //Test FrameworkTestActivator::Start() called for executable
+    ASSERT_TRUE(FrameworkTestActivator::StartCalled());
 
     long systemId = 0;
     // check expected meta-data
@@ -581,7 +585,7 @@ TEST_F(BundleTest, TestForInstallFailure)
   ASSERT_EQ(2, context.GetBundles().size());
 #else
   // There are atleast 2 bundles, maybe more depending on how the executable is created
-  ASSERT_GE(static_cast<int>(frameworkCtx.GetBundles().size()), 2);
+  ASSERT_GE(static_cast<int>(context.GetBundles().size()), 2);
 #endif
 }
 
@@ -635,7 +639,7 @@ TEST_F(BundleTest, TestNonStandardBundleExtension)
   ASSERT_EQ(3, context.GetBundles().size());
 #else
   // There are atleast 3 bundles, maybe more depending on how the executable is created
-  EXPECT_GE(static_cast<int>(context.GetBundles().size()));
+  EXPECT_GE(static_cast<int>(context.GetBundles().size()),3);
 #endif
 
   // Test the non-standard file extension bundle's lifecycle
@@ -883,7 +887,6 @@ TEST_F(BundleTest, TestBundleActivatorFailures)
   //Test that the bundle is active prior to uninstall.
   ASSERT_EQ(Bundle::State::STATE_ACTIVE, bundleStopFail.GetState());
   // Test that bundle stop throws an exception and is sent as a FrameworkEvent during uninstall
-  std::cout << "Following Exception is expected in this test: " << std::endl;
   bundleStopFail.Uninstall();
   //Test that one FrameworkEvent was received.
   ASSERT_EQ(1, listener.events_received());
@@ -904,3 +907,10 @@ TEST_F(BundleTest, TestBundleActivatorFailures)
   ASSERT_EQ(Bundle::State::STATE_RESOLVED, bundleStartFail.GetState());
 }
 #endif
+
+TEST_F(BundleTest, TestBundleStreamOperator)
+{
+    const auto bundle = InstallLib(context, "TestBundleA");
+    ASSERT_TRUE(bundle);
+    std::cout<< &bundle;
+}

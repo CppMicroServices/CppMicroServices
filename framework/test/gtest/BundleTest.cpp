@@ -656,11 +656,13 @@ TEST_F(BundleTest, TestNonStandardBundleExtension)
 
 TEST_F(BundleTest, TestUnicodePaths)
 {
-// 1. building static libraries (test bundle is included in the executable)
-// 2. using MINGW evironment (MinGW linker fails to link DLL with unicode path)
-// 3. using a compiler with no support for C++11 unicode string literals
-#if defined(US_BUILD_SHARED_LIBS) || !defined(__MINGW32__) ||                  \
-  defined(US_CXX_UNICODE_LITERALS)
+  // 1. building static libraries (test bundle is included in the executable)
+  // 2. using MINGW evironment (MinGW linker fails to link DLL with unicode path)
+  // 3. using a compiler with no support for C++11 unicode string literals
+#if !defined(US_BUILD_SHARED_LIBS) || defined(__MINGW32__) ||                  \
+  !defined(US_CXX_UNICODE_LITERALS)
+  std::cout << "Skipping test point for unicode path";
+#else
   std::string path_utf8 = LIB_PATH + cppmicroservices::util::DIR_SEP +
                           u8"くいりのまちとこしくそ" +
                           cppmicroservices::util::DIR_SEP + US_LIB_PREFIX +
@@ -674,7 +676,6 @@ TEST_F(BundleTest, TestUnicodePaths)
   //Bundle check start state
   ASSERT_EQ(bundle.GetState(), Bundle::State::STATE_ACTIVE);
   bundle.Stop();
-
 #endif
 }
 
@@ -910,7 +911,7 @@ TEST_F(BundleTest, TestBundleActivatorFailures)
 
 TEST_F(BundleTest, TestBundleStreamOperator)
 {
-    const auto bundle = InstallLib(context, "TestBundleA");
-    ASSERT_TRUE(bundle);
-    std::cout<< &bundle;
+  const auto bundle = InstallLib(context, "TestBundleA");
+  ASSERT_TRUE(bundle);
+  std::cout << &bundle;
 }

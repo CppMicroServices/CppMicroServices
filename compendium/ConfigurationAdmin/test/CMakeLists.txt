@@ -123,6 +123,7 @@ target_link_libraries(${us_configurationadmin_test_exe_name}
   ConfigurationAdmin
   usTestInterfaces
   usLogService
+  usAsyncWorkService
   usServiceComponent
   gtest
   gmock

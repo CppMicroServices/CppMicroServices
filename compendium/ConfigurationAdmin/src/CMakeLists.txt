@@ -36,6 +36,8 @@ target_include_directories(ConfigurationAdminObjs PRIVATE
   ${CppMicroServices_BINARY_DIR}/framework/include
   ${CppMicroServices_SOURCE_DIR}/compendium/LogService/include
   ${CppMicroServices_BINARY_DIR}/compendium/LogService/include
+  ${CppMicroServices_SOURCE_DIR}/compendium/AsyncWorkService/include
+  ${CppMicroServices_BINARY_DIR}/compendium/AsyncWorkService/include
   ${CppMicroServices_SOURCE_DIR}/compendium/CM/include
   ${CppMicroServices_BINARY_DIR}/compendium/CM/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include

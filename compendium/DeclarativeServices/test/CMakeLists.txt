@@ -210,6 +210,7 @@ target_link_libraries(${us_declarativeservices_test_exe_name}
   usTestInterfaces
   usServiceComponent
   usLogService
+  usAsyncWorkService
   usIDictionaryService
   usISpellCheckService
   gtest
@@ -298,4 +299,3 @@ else()
                            FILES manifest.json
                            ZIP_ARCHIVES ${Framework_TARGET} ${_test_bundles})
 endif()
-

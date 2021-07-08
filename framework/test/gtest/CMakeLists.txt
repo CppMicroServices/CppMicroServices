@@ -56,6 +56,7 @@ set(_gtest_tests
   ServiceHooksTest.cpp
   TestCounterLatch.cpp
   ResourceCompilerTest.cpp
+  BundleTest.cpp
 )
 
 if(BUILD_SHARED_LIBS)
@@ -66,6 +67,7 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 set(_additional_srcs
+  FrameworkTestActivator.cpp
   ../util/TestUtilBundleListener.cpp
   ../util/TestUtilFrameworkListener.cpp
   ../util/TestUtils.cpp

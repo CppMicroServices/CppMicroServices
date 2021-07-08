@@ -29,10 +29,8 @@ include_directories(
 
 set(_tests
   HelgrindTest
-  BundleTest
   MemcheckTest
   MultipleListenersTest
-  ServiceFactoryTest
   ServiceRegistryPerformanceTest
 )
 

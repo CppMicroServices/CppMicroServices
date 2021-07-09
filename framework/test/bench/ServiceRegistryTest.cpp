@@ -46,19 +46,6 @@ public:
   std::shared_ptr<Framework> framework;
 };
 
-class TestServiceListener
-{
-public:
-  void ServiceChanged(const ServiceEvent& serviceEvent)
-  {
-    if (serviceEvent.GetType() == ServiceEvent::SERVICE_MODIFIED) {
-      this->events.push_back(serviceEvent);
-    }
-  }
-
-  std::vector<ServiceEvent> events;
-};
-
 }
 
 /**
@@ -215,15 +202,11 @@ BENCHMARK_DEFINE_F(ServiceRegistryFixture, ModifyServices)
     for (auto i = regCount; i > 0; --i) {
         InterfaceMapPtr iMapCopy(std::make_shared<InterfaceMap>(*interfaceMap));
         auto reg =
-            fc.RegisterService(iMapCopy); // benchmark the call to RegisterService
+            fc.RegisterService(iMapCopy); 
         regs.push_back(reg);
     }
 
     for (auto _ : state) {
-
-        TestServiceListener serviceListener1;
-        fc.AddServiceListener(&serviceListener1,
-            &TestServiceListener::ServiceChanged);
 
         auto start = high_resolution_clock::now();
 
@@ -237,10 +220,6 @@ BENCHMARK_DEFINE_F(ServiceRegistryFixture, ModifyServices)
         auto elapsed_seconds = duration_cast<duration<double>>(end - start);
         state.SetIterationTime(elapsed_seconds.count());
 
-        if (serviceListener1.events.size() != regCount) {
-            state.SkipWithError("# of SERVICE_MODIFIED events must be same as # of "
-                "modified services  * # of listeners");
-        }
     }
 }
 

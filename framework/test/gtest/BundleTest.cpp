@@ -639,7 +639,7 @@ TEST_F(BundleTest, TestNonStandardBundleExtension)
   ASSERT_EQ(3, context.GetBundles().size());
 #else
   // There are atleast 3 bundles, maybe more depending on how the executable is created
-  EXPECT_GE(static_cast<int>(context.GetBundles().size()),3);
+  EXPECT_GE(static_cast<int>(context.GetBundles().size()), 3);
 #endif
 
   // Test the non-standard file extension bundle's lifecycle
@@ -661,7 +661,7 @@ TEST_F(BundleTest, TestUnicodePaths)
   // 3. using a compiler with no support for C++11 unicode string literals
 #if !defined(US_BUILD_SHARED_LIBS) || defined(__MINGW32__) ||                  \
   !defined(US_CXX_UNICODE_LITERALS)
-  std::cout << "Skipping test point for unicode path";
+  std::cout << "Skipping test point for unicode path" << std::endl;
 #else
   std::string path_utf8 = LIB_PATH + cppmicroservices::util::DIR_SEP +
                           u8"くいりのまちとこしくそ" +

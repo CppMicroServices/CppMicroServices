@@ -23,7 +23,6 @@
 #include "TestUtilBundleListener.h"
 
 #include "cppmicroservices/Bundle.h"
-#include "gtest/gtest.h"
 
 namespace cppmicroservices {
 
@@ -84,7 +83,7 @@ bool TestBundleListener::CheckListenerEvents(
 
   if (pEvts.size() != bundleEvents.size() && !relaxed) {
     listenState = false;
-    ADD_FAILURE() << "*** Bundle event mismatch: \nexpected " << pEvts.size()
+    std::cerr << "*** Bundle event mismatch: \nexpected " << pEvts.size()
               << " event(s), found " << bundleEvents.size() << " event(s).";
 
     const std::size_t max =
@@ -93,7 +92,7 @@ bool TestBundleListener::CheckListenerEvents(
       const BundleEvent& pE = i < pEvts.size() ? pEvts[i] : BundleEvent();
       const BundleEvent& pR =
         i < bundleEvents.size() ? bundleEvents[i] : BundleEvent();
-      ADD_FAILURE() << "    " << pE << " - " << pR;
+      std::cerr << "    " << pE << " - " << pR;
     }
   } else {
     if (relaxed) {
@@ -102,7 +101,7 @@ bool TestBundleListener::CheckListenerEvents(
         if (std::find(bundleEvents.begin(), bundleEvents.end(), e) ==
             bundleEvents.end()) {
           listenState = false;
-          ADD_FAILURE() << "*** Expected event not found: " << e;
+          std::cerr << "*** Expected event not found: " << e;
           break;
         }
       }
@@ -113,7 +112,7 @@ bool TestBundleListener::CheckListenerEvents(
         const BundleEvent& pR = bundleEvents[i];
         if (pE.GetType() != pR.GetType() || pE.GetBundle() != pR.GetBundle()) {
           listenState = false;
-          ADD_FAILURE() << "*** Wrong bundle event: " << pR << "\nexpected " << pE;
+          std::cerr << "*** Wrong bundle event: " << pR << "\nexpected " << pE;
         }
       }
     }
@@ -130,7 +129,7 @@ bool TestBundleListener::CheckListenerEvents(
 
   if (seEvts.size() != serviceEvents.size()) {
     listenState = false;
-    ADD_FAILURE() << "*** Service event mismatch: \nexpected " << seEvts.size()
+    std::cerr << "*** Service event mismatch: \nexpected " << seEvts.size()
               << " event(s), found " << serviceEvents.size() << " event(s).";
 
     const std::size_t max = seEvts.size() > serviceEvents.size()
@@ -149,7 +148,7 @@ bool TestBundleListener::CheckListenerEvents(
       if (seE.GetType() != seR.GetType() ||
           (!(seE.GetServiceReference() == seR.GetServiceReference()))) {
         listenState = false;
-        ADD_FAILURE() << "*** Wrong service event: " << seR << "\nexpected " << seE;
+        std::cerr << "*** Wrong service event: " << seR << "\nexpected " << seE;
       }
     }
   }

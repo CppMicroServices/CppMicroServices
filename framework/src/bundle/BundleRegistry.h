@@ -68,7 +68,7 @@ public:
   std::vector<Bundle> Install(
     const std::string& location,
     BundlePrivate* caller,
-    const cppmicroservices::AnyMap& bundleManifest = cppmicroservices::AnyMap(
+    cppmicroservices::AnyMap bundleManifest = cppmicroservices::AnyMap(
       cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
 
   /**
@@ -142,7 +142,7 @@ private:
     const std::string& location,
     const std::shared_ptr<BundleResourceContainer>& resCont,
     const std::vector<std::string>& alreadyInstalled,
-    const cppmicroservices::AnyMap& bundleManifest);
+    cppmicroservices::AnyMap bundleManifest);
 
   void CheckIllegalState() const;
 

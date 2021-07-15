@@ -35,11 +35,9 @@ BundleStorageFile::BundleStorageFile()
 }
 
 std::shared_ptr<BundleArchive> BundleStorageFile::CreateAndInsertArchive(
-  const std::shared_ptr<BundleResourceContainer>& /*resCont*/
-  ,
-  const std::string& /*topLevelEntries*/
-  ,
-  const ManifestT&)
+  const std::shared_ptr<BundleResourceContainer>&, /*resCont*/
+  const std::string&, /*topLevelEntries*/
+  ManifestT /* bundleManifest */)
 {
   throw std::logic_error("not implemented");
 }

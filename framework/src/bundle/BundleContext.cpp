@@ -472,7 +472,7 @@ std::string BundleContext::GetDataFile(const std::string& filename) const
 
 std::vector<Bundle> BundleContext::InstallBundles(
   const std::string& location,
-  const cppmicroservices::AnyMap& bundleManifest)
+  cppmicroservices::AnyMap bundleManifest)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -480,7 +480,7 @@ std::vector<Bundle> BundleContext::InstallBundles(
   // but we ignore it since the time window is small and
   // the result is the same as if the calling thread had
   // won the race condition.
-  return b->coreCtx->bundleRegistry.Install(location, b, bundleManifest);
+  return b->coreCtx->bundleRegistry.Install(location, b, std::move(bundleManifest));
 }
 
 }

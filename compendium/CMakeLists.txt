@@ -1,6 +1,7 @@
 if(US_BUILD_TESTING)
   add_subdirectory(test_bundles)
 endif()
+add_subdirectory(AsyncWorkService)
 add_subdirectory(LogService)
 add_subdirectory(LogServiceImpl)
 add_subdirectory(ServiceComponent)

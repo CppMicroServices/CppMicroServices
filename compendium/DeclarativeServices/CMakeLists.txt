@@ -44,7 +44,7 @@ usMacroCreateBundle(DeclarativeServices
   TARGET DeclarativeServices
   SYMBOLIC_NAME declarative_services
   EMBED_RESOURCE_METHOD LINK
-  LINK_LIBRARIES ${_link_libraries} usLogService usServiceComponent
+  LINK_LIBRARIES ${_link_libraries} usLogService usServiceComponent usAsyncWorkService
   PRIVATE_HEADERS ${_ds_private_headers}
   SOURCES $<TARGET_OBJECTS:DeclarativeServicesObjs> src/SCRActivator.cpp
   BINARY_RESOURCES manifest.json
@@ -55,10 +55,12 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_BINARY_DIR}/framework/include
   ${CppMicroServices_BINARY_DIR}/compendium/ServiceComponent/include
   ${CppMicroServices_BINARY_DIR}/compendium/LogService/include
+  ${CppMicroServices_BINARY_DIR}/compendium/AsyncWorkService/include
   ${CppMicroServices_BINARY_DIR}/compendium/CM/include
   ${CppMicroServices_BINARY_DIR}/compendium/cppmicroservices/cm/include
   ${CppMicroServices_SOURCE_DIR}/compendium/ServiceComponent/include
   ${CppMicroServices_SOURCE_DIR}/compendium/LogService/include
+  ${CppMicroServices_SOURCE_DIR}/compendium/AsyncWorkService/include
   ${CppMicroServices_SOURCE_DIR}/compendium/CM/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include

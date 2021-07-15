@@ -31,7 +31,7 @@
 
 #include "TestUtils.h"
 #include "TestingConfig.h"
-#include "TestingMacros.h"
+#include "gtest/gtest.h"
 
 #include <array>
 #include <bitset>
@@ -101,7 +101,157 @@ public:
   }
 };
 
-void testMultipleListeners()
+#ifdef US_ENABLE_THREADING_SUPPORT
+
+template<typename ListenerType>
+ListenerToken AddListener(BundleContext&, ListenerType)
+{
+  return ListenerToken();
+}
+
+template<>
+ListenerToken AddListener(BundleContext& fCtx, FrameworkListener listener)
+{
+  return fCtx.AddFrameworkListener(listener);
+}
+
+template<>
+ListenerToken AddListener(BundleContext& fCtx, ServiceListener listener)
+{
+  return fCtx.AddServiceListener(listener);
+}
+
+template<>
+ListenerToken AddListener(BundleContext& fCtx, BundleListener listener)
+{
+  return fCtx.AddBundleListener(listener);
+}
+
+// Test true concurrent addition and removal of listeners.
+// This is a better simulation of what we want to test - that only the API
+// calls that add listeners or remove listeners are executed at the same time,
+// and not other boilerplate code.
+template<typename ListenerType, typename EventType>
+void testConcurrentAddRemove()
+{
+  FrameworkFactory factory;
+  auto framework = factory.NewFramework();
+  framework.Init();
+  BundleContext fCtx = framework.GetBundleContext();
+
+  const int numAdditions = 50;
+  const int numRemovals = 30;
+  std::vector<uint8_t> listenerFlags(numAdditions, 0);
+  std::vector<ListenerToken> tokens;
+
+  // Test concurrent addition
+  // All threads wait at the 'ready.wait()' point inside the lambdas,
+  // until the time when the promise 'go' is set by the main thread.
+  {
+    std::vector<std::future<ListenerToken>> futures;
+    std::promise<void> go;
+    std::shared_future<void> ready(go.get_future());
+    std::vector<std::promise<void>> readies(numAdditions);
+
+    auto addListener = [&fCtx, &readies, ready](std::vector<uint8_t>& flags,
+                                                int i) -> ListenerToken {
+      auto listener = [&flags, i](const EventType&) { flags[i] = 1; };
+      readies[i].set_value();
+      ready.wait();
+      auto token = AddListener<ListenerType>(fCtx, listener);
+      return token;
+    };
+
+    for (int i = 0; i < numAdditions; i++) {
+      futures.push_back(std::async(
+        std::launch::async, addListener, std::ref(listenerFlags), i));
+    }
+    for (auto& r : readies) {
+      r.get_future().wait();
+    }
+
+    go.set_value();
+
+    for (auto& future : futures) {
+      tokens.push_back(future.get());
+    }
+  }
+
+  // Test concurrent removal
+  // All threads wait at the 'ready.wait()' point inside the lambdas,
+  // until the time when the promise 'go' is set by the main thread.
+  {
+    std::vector<std::future<void>> futures;
+    std::promise<void> go;
+    std::shared_future<void> ready(go.get_future());
+    std::vector<std::promise<void>> readies(numRemovals);
+
+    // Using ListenerToken& because of VS2013 compiler bug
+    // https://connect.microsoft.com/VisualStudio/feedback/details/884836
+    auto removeListener = [&fCtx, &readies, ready](int i,
+                                                   ListenerToken& token) {
+      readies[i].set_value();
+      ready.wait();
+      fCtx.RemoveListener(std::move(token));
+    };
+
+    for (int i = 0; i < numRemovals; i++) {
+      futures.push_back(
+        std::async(std::launch::async, removeListener, i, std::ref(tokens[i])));
+    }
+    for (auto& r : readies) {
+      r.get_future().wait();
+    }
+
+    go.set_value();
+
+    for (auto& future : futures) {
+      future.get();
+    }
+  }
+
+  framework.Start();
+  auto bundleA = cppmicroservices::testing::InstallLib(fCtx, "TestBundleA");
+  bundleA.Start();
+
+  auto countOnes = std::count(listenerFlags.begin(), listenerFlags.end(), 1);
+
+  ASSERT_EQ(countOnes, (numAdditions - numRemovals));
+  bundleA.Stop();
+  framework.Stop();
+  framework.WaitForStop(std::chrono::seconds(0));
+}
+#endif // US_ENABLE_THREADING_SUPPORT
+
+class MultipleListenersTest : public ::testing::Test
+{
+public:
+  MultipleListenersTest()
+    : framework(FrameworkFactory().NewFramework())
+  {}
+
+  ~MultipleListenersTest() override = default;
+
+  void SetUp() override
+  {
+    framework.Init();
+    fCtx = framework.GetBundleContext();
+  }
+
+  void TearDown() override
+  {
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+  }
+
+protected:
+  Framework framework;
+  BundleContext fCtx;
+};
+
+}
+
+TEST_F(MultipleListenersTest, testMultipleListeners)
 {
   auto lambda1 = [](const FrameworkEvent&) {
     bitfield.set(LAMBDA1);
@@ -115,11 +265,7 @@ void testMultipleListeners()
   Listener l1;
   Listener l2;
 
-  auto f = FrameworkFactory().NewFramework();
-
   // 1. Add all listeners
-  f.Init();
-  BundleContext fCtx{ f.GetBundleContext() };
   fCtx.AddFrameworkListener(callback_function_1);
   fCtx.AddFrameworkListener(&callback_function_2);
   fCtx.AddFrameworkListener(&l1, &Listener::memfn1);
@@ -130,18 +276,19 @@ void testMultipleListeners()
   fCtx.AddFrameworkListener(CallbackFunctor());
   fCtx.AddFrameworkListener(
     std::bind(callback_function_3, 42, std::placeholders::_1));
-  f.Start(); // generate framework event (started)
-  US_TEST_CONDITION(bitfield.all(), "Test if all the listeners are triggered.");
-  US_TEST_CONDITION(count == 9, "Test the listeners count.")
-  f.Stop();
-  f.WaitForStop(std::chrono::milliseconds::zero());
-  US_TEST_OUTPUT(<< "-- End of testing addition of multiple listeners"
-                 << "\n\n");
+  framework.Start(); // generate framework event (started)
+
+  //Test if all the listeners are triggered.
+  ASSERT_TRUE(bitfield.all());
+  //Test the listeners count.
+  ASSERT_EQ(count, 9);
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
 
   // 2. Add all listeners and try removing listeners using their name
   // This removal using the names is deprecated and will be removed in the next major release.
-  f.Init();
-  fCtx = f.GetBundleContext();
+  framework.Init();
+  fCtx = framework.GetBundleContext();
   bitfield.reset();
   count = 0;
   // Add listeners of each variety
@@ -171,19 +318,18 @@ void testMultipleListeners()
   fCtx.RemoveFrameworkListener(&l2, &Listener::memfn2);
   fCtx.RemoveFrameworkListener(cb);
   fCtx.RemoveFrameworkListener(bind1);
-  f.Start(); // generate framework event (started)
-  US_TEST_CONDITION(bitfield.none(),
-                    "Test if none of the listeners are registered.");
-  US_TEST_CONDITION(count == 0, "Test the listeners count.")
-  f.Stop();
-  f.WaitForStop(std::chrono::milliseconds::zero());
-  US_TEST_OUTPUT(
-    << "-- End of testing removing listeners using the name of the callable"
-    << "\n\n");
+  framework.Start(); // generate framework event (started)
+
+  //Test if none of the listeners are registered.
+  ASSERT_TRUE(bitfield.none());
+  //Test the listeners count.
+  ASSERT_EQ(count, 0);
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
 
   // 3. Add all listeners and remove them using tokens
-  f.Init();
-  fCtx = f.GetBundleContext();
+  framework.Init();
+  fCtx = framework.GetBundleContext();
   auto token1 = fCtx.AddFrameworkListener(callback_function_1);
   auto token2 = fCtx.AddFrameworkListener(&callback_function_2);
   auto token3 = fCtx.AddFrameworkListener(&l1, &Listener::memfn1);
@@ -220,45 +366,44 @@ void testMultipleListeners()
   fCtx.RemoveListener(std::move(token10));
   fCtx.RemoveListener(std::move(token11));
   // This should result in no output because all the listeners were successfully removed
-  f.Start(); // generate framework event (started)
-  US_TEST_CONDITION(bitfield.none(),
-                    "Test if none of the listeners are registered.");
-  US_TEST_CONDITION(count == 0, "Test the listeners count.")
-  f.Stop();
-  f.WaitForStop(std::chrono::milliseconds::zero());
-  US_TEST_OUTPUT(
-    << "-- End of testing addition and removing listeners using tokens"
-    << "\n\n");
+  framework.Start(); // generate framework event (started)
+
+  //Test if none of the listeners are registered.
+  ASSERT_TRUE(bitfield.none());
+  //Test the listeners count.
+  ASSERT_EQ(count, 0);
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
 
   // 4. Test the move ability
-  f.Init();
-  fCtx = f.GetBundleContext();
+  framework.Init();
+  fCtx = framework.GetBundleContext();
   token1 = fCtx.AddFrameworkListener(callback_function_1);
-  US_TEST_CONDITION(token1, "Check validity of a token1");
+  //Check validity of a token1
+  ASSERT_TRUE(token1);
   token2 = fCtx.AddFrameworkListener(&callback_function_2);
   token3 = fCtx.AddFrameworkListener(&l1, &Listener::memfn1);
   token3 = fCtx.AddFrameworkListener(&l2, &Listener::memfn2);
   token4 = std::move(token1); // move assignment
-  US_TEST_CONDITION(!token1, "Check invalidity of a moved-from token1");
+  //Check invalidity of a moved - from token1
+  ASSERT_FALSE(token1);
   auto token2_(std::move(token2)); // move construction
-  US_TEST_CONDITION(!token2, "Check invalidity of a moved-from token2");
+  //Check invalidity of a moved-from token2
+  ASSERT_FALSE(token2);
   ListenerToken emptytoken; // default construction
-  US_TEST_CONDITION(!emptytoken,
-                    "Check invalidity of a newly constructed token");
+  //Check invalidity of a newly constructed token
+  ASSERT_FALSE(emptytoken);
   fCtx.RemoveListener(std::move(token4));
   fCtx.RemoveListener(std::move(token2_));
   fCtx.RemoveListener(std::move(emptytoken)); // This should do nothing.
-  f.Start(); // generate framework event (started)
-  US_TEST_CONDITION(bitfield.to_string() == "00110000",
-                    "Test if only member functions 1 & 2 are registered.");
-  US_TEST_CONDITION(count == 2, "Test the listeners count.")
-  f.Stop();
-  f.WaitForStop(std::chrono::milliseconds::zero());
-  US_TEST_OUTPUT(<< "-- End of testing move ability"
-                 << "\n\n");
+  framework.Start(); // generate framework event (started)
+  //Test if only member functions 1 & 2 are registered.
+  ASSERT_EQ(bitfield.to_string(), "00110000");
+  //Test the listeners count.
+  ASSERT_EQ(count, 2);
 }
 
-void testListenerTypes()
+TEST_F(MultipleListenersTest, testListenerTypes)
 {
   class TestListener
   {
@@ -269,21 +414,9 @@ void testListenerTypes()
       , framework_count(0)
     {}
 
-    void serviceChanged(const ServiceEvent& evt)
-    {
-      US_TEST_OUTPUT(<< "ServiceEvent: " << evt);
-      ++service_count;
-    }
-    void bundleChanged(const BundleEvent& evt)
-    {
-      US_TEST_OUTPUT(<< "BundleEvent: " << evt);
-      ++bundle_count;
-    }
-    void frameworkChanged(const FrameworkEvent& evt)
-    {
-      US_TEST_OUTPUT(<< "FrameworkEvent: " << evt);
-      ++framework_count;
-    }
+    void serviceChanged(const ServiceEvent& /*evt*/) { ++service_count; }
+    void bundleChanged(const BundleEvent& /*evt*/) { ++bundle_count; }
+    void frameworkChanged(const FrameworkEvent& /*evt*/) { ++framework_count; }
 
     std::vector<ListenerToken> tokens;
     int service_count;
@@ -291,10 +424,11 @@ void testListenerTypes()
     int framework_count;
   };
 
-  auto f = FrameworkFactory().NewFramework();
+  auto framework2 = FrameworkFactory().NewFramework();
 
-  f.Init();
-  auto fCtx = f.GetBundleContext();
+  framework2.Init();
+  auto fCtx = framework2.GetBundleContext();
+
   TestListener tListen;
 
   tListen.tokens.push_back(
@@ -313,32 +447,34 @@ void testListenerTypes()
   fCtx.RemoveListener(std::move(tListen.tokens[0]));
   fCtx.RemoveListener(std::move(tListen.tokens[2]));
   fCtx.RemoveListener(std::move(tListen.tokens[4]));
-  f.Start();
+  framework2.Start();
 
-  auto bundleA = testing::InstallLib(fCtx, "TestBundleA");
-  US_TEST_CONDITION_REQUIRED(bundleA, "Test for existing bundle TestBundleA")
+  auto bundleA = cppmicroservices::testing::InstallLib(fCtx, "TestBundleA");
+  //Test for existing bundle TestBundleA
+  ASSERT_TRUE(bundleA);
   bundleA.Start();
 
-  US_TEST_CONDITION(tListen.service_count == 1,
-                    "Test for number of times service listeners got triggered")
-  US_TEST_CONDITION(tListen.bundle_count > 0,
-                    "Test for number of times bundle listeners got triggered")
-  US_TEST_CONDITION(
-    tListen.framework_count == 1,
-    "Test for number of times framework listeners got triggered")
+  //Test for number of times service listeners got triggered
+  ASSERT_EQ(tListen.service_count, 1);
+  //Test for number of times bundle listeners got triggered
+  EXPECT_GT(static_cast<int>(tListen.bundle_count), 0);
+  //Test for number of times framework listeners got triggered
+  ASSERT_EQ(tListen.framework_count, 1);
 
-  bundleA.Stop();
-  f.Stop();
-  f.WaitForStop(std::chrono::milliseconds::zero());
+  framework2.Stop();
+  framework2.WaitForStop(std::chrono::milliseconds::zero());
+
+#ifdef US_ENABLE_THREADING_SUPPORT
+  testConcurrentAddRemove<FrameworkListener, FrameworkEvent>();
+  testConcurrentAddRemove<BundleListener, BundleEvent>();
+  testConcurrentAddRemove<ServiceListener, ServiceEvent>();
+#endif
 }
 
 #ifdef US_ENABLE_THREADING_SUPPORT
 // Test the addition of thousand listeners asynchronously.
-void testConcurrentAdd()
+TEST_F(MultipleListenersTest, testConcurrentAdd)
 {
-  FrameworkFactory factory;
-  auto framework = factory.NewFramework();
-  framework.Init();
   BundleContext fCtx = framework.GetBundleContext();
 
   const int numAdditions = 1001;
@@ -363,161 +499,7 @@ void testConcurrentAdd()
   }
 
   framework.Start();
-  US_TEST_CONDITION(
-    count == 0, "Testing concurrent listener addition and sequential removal.")
-  framework.Stop();
-  framework.WaitForStop(std::chrono::seconds(0));
+  ASSERT_EQ(count, 0);
 }
 
-// NOTE: These should be replaced with template lambdas and moved inside
-// testConcurrectAddRemove() when we support only C++14 and beyond.
-template<typename ListenerType>
-ListenerToken AddListener(BundleContext&, ListenerType)
-{
-  return ListenerToken();
-}
-
-template<>
-ListenerToken AddListener(BundleContext& fCtx, FrameworkListener listener)
-{
-  return fCtx.AddFrameworkListener(listener);
-}
-
-template<>
-ListenerToken AddListener(BundleContext& fCtx, ServiceListener listener)
-{
-  return fCtx.AddServiceListener(listener);
-}
-
-template<>
-ListenerToken AddListener(BundleContext& fCtx, BundleListener listener)
-{
-  return fCtx.AddBundleListener(listener);
-}
-
-// Test true concurrent addition and removal of listeners.
-// This is a better simulation of what we want to test - that only the API
-// calls that add listeners or remove listeners are executed at the same time,
-// and not other boilerplate code.
-template<typename ListenerType, typename EventType>
-void testConcurrentAddRemove(std::string listenerStr)
-{
-  FrameworkFactory factory;
-  auto framework = factory.NewFramework();
-  framework.Init();
-  BundleContext fCtx = framework.GetBundleContext();
-
-  const int numAdditions = 50;
-  const int numRemovals = 30;
-  std::vector<uint8_t> listenerFlags(numAdditions, 0);
-  std::vector<ListenerToken> tokens;
-
-  // Test concurrent addition
-  // All threads wait at the 'ready.wait()' point inside the lambdas,
-  // until the time when the promise 'go' is set by the main thread.
-  {
-    std::vector<std::future<ListenerToken>> futures;
-    std::promise<void> go;
-    std::shared_future<void> ready(go.get_future());
-    std::vector<std::promise<void>> readies(numAdditions);
-
-    auto addListener = [&fCtx, &readies, ready](std::vector<uint8_t>& flags,
-                                                int i) -> ListenerToken {
-      auto listener = [&flags, i](const EventType&) { flags[i] = 1; };
-      readies[i].set_value();
-      ready.wait();
-      auto token = AddListener<ListenerType>(fCtx, listener);
-      return token;
-    };
-
-    try {
-      for (int i = 0; i < numAdditions; i++) {
-        futures.push_back(std::async(
-          std::launch::async, addListener, std::ref(listenerFlags), i));
-      }
-      for (auto& r : readies) {
-        r.get_future().wait();
-      }
-
-      go.set_value();
-
-      for (auto& future : futures) {
-        tokens.push_back(future.get());
-      }
-    } catch (...) {
-      go.set_value();
-      throw;
-    }
-  }
-
-  // Test concurrent removal
-  // All threads wait at the 'ready.wait()' point inside the lambdas,
-  // until the time when the promise 'go' is set by the main thread.
-  {
-    std::vector<std::future<void>> futures;
-    std::promise<void> go;
-    std::shared_future<void> ready(go.get_future());
-    std::vector<std::promise<void>> readies(numRemovals);
-
-    // Using ListenerToken& because of VS2013 compiler bug
-    // https://connect.microsoft.com/VisualStudio/feedback/details/884836
-    auto removeListener = [&fCtx, &readies, ready](int i,
-                                                   ListenerToken& token) {
-      readies[i].set_value();
-      ready.wait();
-      fCtx.RemoveListener(std::move(token));
-    };
-
-    try {
-      for (int i = 0; i < numRemovals; i++) {
-        futures.push_back(std::async(
-          std::launch::async, removeListener, i, std::ref(tokens[i])));
-      }
-      for (auto& r : readies) {
-        r.get_future().wait();
-      }
-
-      go.set_value();
-
-      for (auto& future : futures) {
-        future.get();
-      }
-    } catch (...) {
-      go.set_value();
-      throw;
-    }
-  }
-
-  framework.Start();
-  auto bundleA = testing::InstallLib(fCtx, "TestBundleA");
-  bundleA.Start();
-
-  auto countOnes = std::count(listenerFlags.begin(), listenerFlags.end(), 1);
-  US_TEST_OUTPUT(<< "");
-  std::string message("Testing concurrent " + listenerStr +
-                      " addition and removal");
-  US_TEST_CONDITION(countOnes == numAdditions - numRemovals, message)
-  bundleA.Stop();
-  framework.Stop();
-  framework.WaitForStop(std::chrono::seconds(0));
-}
-#endif // US_ENABLE_THREADING_SUPPORT
-}
-
-int MultipleListenersTest(int /*argc*/, char* /*argv*/[])
-{
-  US_TEST_BEGIN("MultipleListenersTest");
-  testMultipleListeners();
-  testListenerTypes();
-
-#ifdef US_ENABLE_THREADING_SUPPORT
-  testConcurrentAdd();
-  // Test all the three types of listeners.
-  testConcurrentAddRemove<FrameworkListener, FrameworkEvent>(
-    "framework listener");
-  testConcurrentAddRemove<BundleListener, BundleEvent>("bundle listener");
-  testConcurrentAddRemove<ServiceListener, ServiceEvent>("service listener");
 #endif
-
-  US_TEST_END()
-}

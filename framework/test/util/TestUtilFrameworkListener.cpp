@@ -23,6 +23,7 @@ limitations under the License.
 #include "cppmicroservices/Bundle.h"
 
 #include "TestUtilFrameworkListener.h"
+#include "gtest/gtest.h"
 
 #include <stdexcept>
 
@@ -44,7 +45,7 @@ bool TestFrameworkListener::CheckEvents(
   bool listenState = true; // assume success
   if (events.size() != _events.size()) {
     listenState = false;
-    std::cout<< "*** Framework event mismatch ***\n expected "
+    ADD_FAILURE()<< "*** Framework event mismatch ***\n expected "
                    << events.size() << " event(s)\n found " << _events.size()
                    << " event(s).";
 
@@ -63,7 +64,7 @@ bool TestFrameworkListener::CheckEvents(
       const FrameworkEvent& pR = _events[i];
       if (pE.GetType() != pR.GetType() || pE.GetBundle() != pR.GetBundle()) {
         listenState = false;
-        std::cout<< "*** Wrong framework event ***\n found " << pR
+        ADD_FAILURE()<< "*** Wrong framework event ***\n found " << pR
                        << "\n expected " << pE;
       }
     }

@@ -2,6 +2,19 @@
 # Build and run the GTest Suite of tests
 #-----------------------------------------------------------------------------
 
+# Make sure that the correct paths separators are used on each platform
+if(WIN32)
+  set(DIR_SEP "\\\\")
+  string(REPLACE "/" "\\\\" CMAKE_LIBRARY_OUTPUT_DIRECTORY_NATIVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+  string(REPLACE "/" "\\\\" CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+else()
+  set(DIR_SEP "/")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_NATIVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endif()
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/TestingConfig.h")
+
 set(us_gtest_test_exe_name usFrameworkTests)
 
 include_directories(
@@ -56,6 +69,7 @@ set(_gtest_tests
   ServiceHooksTest.cpp
   TestCounterLatch.cpp
   ResourceCompilerTest.cpp
+  MultipleListenersTest.cpp
   BundleTest.cpp
 )
 
@@ -103,9 +117,9 @@ if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
   set_source_files_properties(${_gtest_tests}
-								PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations
-											COMPILE_FLAGS -Wno-deprecated
-											COMPILE_FLAGS -Wno-deprecated-declarations)
+                                PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations
+                                            COMPILE_FLAGS -Wno-deprecated
+                                            COMPILE_FLAGS -Wno-deprecated-declarations)
 endif()
 
 target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})

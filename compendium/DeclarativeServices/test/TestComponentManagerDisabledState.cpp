@@ -20,6 +20,7 @@
 
   =============================================================================*/
 
+#include "../src/SCRAsyncWorkService.hpp"
 #include "../src/manager/states/CMDisabledState.hpp"
 #include "ConcurrencyTestUtil.hpp"
 #include "Mocks.hpp"
@@ -44,9 +45,11 @@ protected:
     auto fakeLogger = std::make_shared<FakeLogger>();
     auto compDesc = std::make_shared<metadata::ComponentMetadata>();
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
-    auto pool = std::make_shared<boost::asio::thread_pool>(1);
+    auto asyncWorkService =
+      std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+        framework.GetBundleContext());
     auto notifier = std::make_shared<ConfigurationNotifier>(
-      framework.GetBundleContext(), fakeLogger, pool);
+      framework.GetBundleContext(), fakeLogger, asyncWorkService);
     auto managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -55,7 +58,7 @@ protected:
                                                  mockRegistry,
                                                  framework.GetBundleContext(),
                                                  fakeLogger,
-                                                 pool,
+                                                 asyncWorkService,
                                                  notifier,
                                                  managers);
   }

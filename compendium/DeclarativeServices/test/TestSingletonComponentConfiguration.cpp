@@ -20,6 +20,7 @@
 
   =============================================================================*/
 
+#include "../src/SCRAsyncWorkService.hpp"
 #include "../src/manager/SingletonComponentConfiguration.hpp"
 #include "../src/manager/states/CCActiveState.hpp"
 #include "../src/manager/states/CCRegisteredState.hpp"
@@ -48,18 +49,16 @@ protected:
     auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
     mockLogger = std::make_shared<MockLogger>();
-    auto threadpool = std::make_shared<boost::asio::thread_pool>();
+    auto asyncWorkService =
+      std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+        framework.GetBundleContext());
     auto notifier = std::make_shared<ConfigurationNotifier>(
-      framework.GetBundleContext(), mockLogger, threadpool);
+      framework.GetBundleContext(), mockLogger, asyncWorkService);
     auto managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-    obj = std::make_shared<SingletonComponentConfigurationImpl>(mockMetadata,
-                                                                framework,
-                                                                mockRegistry,
-                                                                mockLogger,
-                                                                notifier,
-                                                                managers);
+    obj = std::make_shared<SingletonComponentConfigurationImpl>(
+      mockMetadata, framework, mockRegistry, mockLogger, notifier, managers);
   }
 
   virtual void TearDown()
@@ -118,19 +117,15 @@ TEST_F(SingletonComponentConfigurationTest,
   EXPECT_CALL(mockCompFactory, DeleteComponentInstance(testing::_))
     .Times(1)
     .WillOnce(testing::Invoke([](ComponentInstance* obj) { delete obj; }));
-  EXPECT_CALL(*mockInstance, CreateInstance(testing::_))
-    .Times(1);
-  EXPECT_CALL(*mockInstance, BindReferences(testing::_))
-    .Times(1);
+  EXPECT_CALL(*mockInstance, CreateInstance(testing::_)).Times(1);
+  EXPECT_CALL(*mockInstance, BindReferences(testing::_)).Times(1);
   EXPECT_CALL(*mockInstance, Activate()).Times(1);
 
   // set logging expectations
-  auto ExceptionThrownByCreateComponentInstance = 
-    testing::AllOf(
+  auto ExceptionThrownByCreateComponentInstance = testing::AllOf(
     testing::HasSubstr("Exception received from user code while activating "),
     testing::HasSubstr("the component configuration"));
-  EXPECT_CALL(
-    *mockLogger,
+  EXPECT_CALL(*mockLogger,
               Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                   ExceptionThrownByCreateComponentInstance,
                   testing::_))
@@ -172,10 +167,8 @@ TEST_F(SingletonComponentConfigurationTest,
   EXPECT_CALL(mockCompFactory, DeleteComponentInstance(testing::_))
     .Times(1)
     .WillOnce(testing::Invoke([](ComponentInstance* obj) { delete obj; }));
-  EXPECT_CALL(*mockInstance, CreateInstance(testing::_))
-    .Times(1);
-  EXPECT_CALL(*mockInstance, BindReferences(testing::_))
-    .Times(1);
+  EXPECT_CALL(*mockInstance, CreateInstance(testing::_)).Times(1);
+  EXPECT_CALL(*mockInstance, BindReferences(testing::_)).Times(1);
   EXPECT_CALL(*mockInstance, Activate()).Times(1);
 
   std::function<std::shared_ptr<ComponentInstance>(void)> func = [&]() {
@@ -214,10 +207,8 @@ TEST_F(SingletonComponentConfigurationTest, TestGetService)
     .WillOnce(testing::Return(mockInstance.get()));
   EXPECT_CALL(mockCompFactory, DeleteComponentInstance(testing::_)).Times(1);
   cppmicroservices::InterfaceMapPtr iMap;
-  EXPECT_CALL(*mockInstance, CreateInstance(testing::_))
-    .Times(1);
-  EXPECT_CALL(*mockInstance, BindReferences(testing::_))
-    .Times(1);
+  EXPECT_CALL(*mockInstance, CreateInstance(testing::_)).Times(1);
+  EXPECT_CALL(*mockInstance, BindReferences(testing::_)).Times(1);
   EXPECT_CALL(*mockInstance, Activate()).Times(1);
   EXPECT_CALL(*mockInstance, GetInterfaceMap())
     .Times(1)
@@ -236,30 +227,30 @@ TEST_F(SingletonComponentConfigurationTest, TestGetService)
 /* This test verifies that if the Modified method of a component instance throws an 
  * exception DS intercepts the exception and logs it. 
  */
-TEST_F(SingletonComponentConfigurationTest,
-       TestModifiedMethodExceptionLogging)
+TEST_F(SingletonComponentConfigurationTest, TestModifiedMethodExceptionLogging)
 {
   using cppmicroservices::logservice::SeverityLevel;
 
   auto mockCompContext = std::make_shared<MockComponentContextImpl>(obj);
   auto mockCompInstance = std::make_shared<MockComponentInstance>();
-  obj->SetComponentInstancePair(InstanceContextPair(
-    mockCompInstance,
-    mockCompContext)); 
+  obj->SetComponentInstancePair(
+    InstanceContextPair(mockCompInstance, mockCompContext));
   EXPECT_NE(obj->GetComponentInstance(), nullptr);
   EXPECT_NE(obj->GetComponentContext(), nullptr);
 
   // set logging expectations
-  auto ExceptionThrownByModifiedMethod =
-    testing::AllOf(
-      testing::HasSubstr("Exception received from user code while modifying "),
-      testing::HasSubstr("component configuration"));
-  EXPECT_CALL(*mockLogger,
-              Log(SeverityLevel::LOG_ERROR, ExceptionThrownByModifiedMethod, testing::_))
+  auto ExceptionThrownByModifiedMethod = testing::AllOf(
+    testing::HasSubstr("Exception received from user code while modifying "),
+    testing::HasSubstr("component configuration"));
+  EXPECT_CALL(
+    *mockLogger,
+    Log(SeverityLevel::LOG_ERROR, ExceptionThrownByModifiedMethod, testing::_))
     .Times(1);
 
   // When the mock Modified method is called it will throw the ModifiedMethodException
-  EXPECT_CALL(*mockCompInstance,Modified()).Times(1).WillRepeatedly(ModifiedMethodException());
+  EXPECT_CALL(*mockCompInstance, Modified())
+    .Times(1)
+    .WillRepeatedly(ModifiedMethodException());
 
   // When the mock DoesModifiedMethodExist method is called it will return true;
   EXPECT_CALL(*mockCompInstance, DoesModifiedMethodExist())
@@ -267,16 +258,14 @@ TEST_F(SingletonComponentConfigurationTest,
     .WillRepeatedly(ModifiedMethodExists());
 
   // Deactivate and Unbindreference will also be called. EXPECT_CALL added
-  // to avoid GMOCK Warning. 
-   // When the mock Modified method is called it will throw the ModifiedMethodException
+  // to avoid GMOCK Warning.
+  // When the mock Modified method is called it will throw the ModifiedMethodException
   EXPECT_CALL(*mockCompInstance, Deactivate()).Times(1);
   EXPECT_CALL(*mockCompInstance, UnbindReferences()).Times(1);
-
 
   // ModifyComponentInstanceProperties will call the mock Modified method
   // which will throw an exception. DS will catch the exception and log it.
   EXPECT_NO_THROW(obj->ModifyComponentInstanceProperties());
-
 }
 
 TEST_F(SingletonComponentConfigurationTest, TestDestroyComponentInstances)
@@ -303,13 +292,12 @@ TEST_F(SingletonComponentConfigurationTest,
   obj->SetComponentInstancePair(
     InstanceContextPair(mockCompInstance, mockCompContext));
   std::string exceptionMsg("Deactivation failed with exception");
- 
+
   // set logging expectations
   auto ExceptionThrownByDeactivateMethod = testing::AllOf(
     testing::HasSubstr("Exception received from user code while deactivating "),
     testing::HasSubstr("the component configuration"));
-  EXPECT_CALL(
-    *mockLogger,
+  EXPECT_CALL(*mockLogger,
               Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                   ExceptionThrownByDeactivateMethod,
                   testing::_))

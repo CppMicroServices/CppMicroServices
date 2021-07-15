@@ -22,8 +22,14 @@
 
 #include "SCRActivator.hpp"
 #include "ConfigurationListenerImpl.hpp"
+#include "SCRAsyncWorkService.hpp"
 #include "SCRLogger.hpp"
 #include "ServiceComponentRuntimeImpl.hpp"
+#include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
+#include "cppmicroservices/servicecomponent/runtime/dto/ComponentConfigurationDTO.hpp"
+#include "cppmicroservices/servicecomponent/runtime/dto/ComponentDescriptionDTO.hpp"
+#include "cppmicroservices/servicecomponent/runtime/dto/ReferenceDTO.hpp"
 #include "manager/ComponentManager.hpp"
 #include "manager/ReferenceManager.hpp"
 #include <functional>
@@ -32,11 +38,6 @@
 #include <memory>
 #include <stdexcept>
 #include <vector>
-#include "cppmicroservices/SharedLibraryException.h"
-#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
-#include "cppmicroservices/servicecomponent/runtime/dto/ComponentConfigurationDTO.hpp"
-#include "cppmicroservices/servicecomponent/runtime/dto/ComponentDescriptionDTO.hpp"
-#include "cppmicroservices/servicecomponent/runtime/dto/ReferenceDTO.hpp"
 
 #include "cppmicroservices/detail/ScopeGuard.h"
 
@@ -51,8 +52,10 @@ void SCRActivator::Start(BundleContext context)
 {
   runtimeContext = context;
 
+  asyncWorkService = std::make_shared<SCRAsyncWorkService>(context);
+
   // limit the number of threads to 2. There is currently no use case to warrant increasing it.
-  threadpool = std::make_shared<boost::asio::thread_pool>(2);
+  //threadpool = std::make_shared<boost::asio::thread_pool>(2);
 
   // Create the component registry
   componentRegistry = std::make_shared<ComponentRegistry>();
@@ -62,7 +65,8 @@ void SCRActivator::Start(BundleContext context)
   logger->Log(SeverityLevel::LOG_DEBUG, "Starting SCR bundle");
 
   // Create configuration object notifier
-  configNotifier = std::make_shared<ConfigurationNotifier>(context, logger, threadpool);
+  configNotifier =
+    std::make_shared<ConfigurationNotifier>(context, logger, asyncWorkService);
 
   // Add bundle listener
   bundleListenerToken = context.AddBundleListener(
@@ -94,17 +98,6 @@ void SCRActivator::Start(BundleContext context)
 void SCRActivator::Stop(cppmicroservices::BundleContext context)
 {
   try {
-    cppmicroservices::detail::ScopeGuard joinThreadPool{ [this]() {
-      if (threadpool) {
-        try {
-          threadpool->join();
-        } catch (...) {
-          logger->Log(SeverityLevel::LOG_WARNING,
-                      "Exception while joining the threadpool",
-                      std::current_exception());
-        }
-      }
-    } };
     // remove the bundle listener
     context.RemoveListener(std::move(bundleListenerToken));
     // remove the runtime service from the framework
@@ -134,6 +127,7 @@ void SCRActivator::Stop(cppmicroservices::BundleContext context)
       std::current_exception());
   }
   logger->StopTracking();
+  asyncWorkService->StopTracking();
 }
 
 void SCRActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
@@ -164,7 +158,7 @@ void SCRActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
                                                      scrMap,
                                                      componentRegistry,
                                                      logger,
-                                                     threadpool,
+                                                     asyncWorkService,
                                                      configNotifier);
       {
         std::lock_guard<std::mutex> l(bundleRegMutex);

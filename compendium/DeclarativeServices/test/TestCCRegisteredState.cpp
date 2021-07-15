@@ -24,6 +24,7 @@
 #include <iostream>
 #include <memory>
 
+#include "../src/SCRAsyncWorkService.hpp"
 #include "../src/manager/states/CCRegisteredState.hpp"
 #include "ConcurrencyTestUtil.hpp"
 #include "Mocks.hpp"
@@ -48,19 +49,16 @@ protected:
     auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
     auto fakeLogger = std::make_shared<FakeLogger>();
-    auto threadpool = std::make_shared<boost::asio::thread_pool>();
+    auto asyncWorkService =
+      std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+        framework.GetBundleContext());
     auto notifier = std::make_shared<ConfigurationNotifier>(
-      framework.GetBundleContext(), fakeLogger, threadpool);
+      framework.GetBundleContext(), fakeLogger, asyncWorkService);
     auto managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-    mockCompConfig =
-      std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                       framework,
-                                                       mockRegistry,
-                                                       fakeLogger,
-                                                       notifier,
-                                                       managers);
+    mockCompConfig = std::make_shared<MockComponentConfigurationImpl>(
+      mockMetadata, framework, mockRegistry, fakeLogger, notifier, managers);
   }
 
   virtual void TearDown()

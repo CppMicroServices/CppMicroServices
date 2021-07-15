@@ -31,6 +31,7 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 
+#include "../src/SCRAsyncWorkService.hpp"
 #include "../src/manager/ComponentManagerImpl.hpp"
 #include "../src/manager/states/ComponentManagerState.hpp"
 #include "../src/metadata/ComponentMetadata.hpp"
@@ -54,22 +55,33 @@ TEST(ComponentManagerImplTest, Ctor)
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
-  auto pool = std::make_shared<boost::asio::thread_pool>(1);
+  auto asyncWorkService =
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(bc);
   auto notifier = std::make_shared<ConfigurationNotifier>(
-    framework.GetBundleContext(), fakeLogger, pool);
+    framework.GetBundleContext(), fakeLogger, asyncWorkService);
   {
     EXPECT_THROW(
       {
-        US_UNUSED(std::make_shared<ComponentManagerImpl>(
-          nullptr, mockRegistry, bc, fakeLogger, pool, notifier, managers));
+        US_UNUSED(std::make_shared<ComponentManagerImpl>(nullptr,
+                                                         mockRegistry,
+                                                         bc,
+                                                         fakeLogger,
+                                                         asyncWorkService,
+                                                         notifier,
+                                                         managers));
       },
       std::invalid_argument);
   }
   {
     EXPECT_THROW(
       {
-        US_UNUSED(std::make_shared<ComponentManagerImpl>(
-          mockMetadata, nullptr, bc, fakeLogger, pool, notifier, managers));
+        US_UNUSED(std::make_shared<ComponentManagerImpl>(mockMetadata,
+                                                         nullptr,
+                                                         bc,
+                                                         fakeLogger,
+                                                         asyncWorkService,
+                                                         notifier,
+                                                         managers));
       },
       std::invalid_argument);
   }
@@ -80,7 +92,7 @@ TEST(ComponentManagerImplTest, Ctor)
                                                          mockRegistry,
                                                          BundleContext(),
                                                          fakeLogger,
-                                                         pool,
+                                                         asyncWorkService,
                                                          notifier,
                                                          managers));
       },
@@ -89,15 +101,25 @@ TEST(ComponentManagerImplTest, Ctor)
   {
     EXPECT_THROW(
       {
-        US_UNUSED(std::make_shared<ComponentManagerImpl>(
-          mockMetadata, mockRegistry, bc, nullptr, pool, notifier, managers));
+        US_UNUSED(std::make_shared<ComponentManagerImpl>(mockMetadata,
+                                                         mockRegistry,
+                                                         bc,
+                                                         nullptr,
+                                                         asyncWorkService,
+                                                         notifier,
+                                                         managers));
       },
       std::invalid_argument);
   }
   {
     EXPECT_NO_THROW({
-      US_UNUSED(std::make_shared<ComponentManagerImpl>(
-        mockMetadata, mockRegistry, bc, fakeLogger, pool, notifier, managers));
+      US_UNUSED(std::make_shared<ComponentManagerImpl>(mockMetadata,
+                                                       mockRegistry,
+                                                       bc,
+                                                       fakeLogger,
+                                                       asyncWorkService,
+                                                       notifier,
+                                                       managers));
     });
   }
 }
@@ -119,9 +141,11 @@ protected:
     framework.Start();
     fakeLogger = std::make_shared<FakeLogger>();
     mockRegistry = std::make_shared<MockComponentRegistry>();
-    auto threadpool = std::make_shared<boost::asio::thread_pool>();
+    auto asyncWorkService =
+      std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+        framework.GetBundleContext());
     notifier = std::make_shared<ConfigurationNotifier>(
-      framework.GetBundleContext(), fakeLogger, threadpool);
+      framework.GetBundleContext(), fakeLogger, asyncWorkService);
     managers =
       std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
   }
@@ -149,7 +173,8 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyInitialize)
     mockRegistry,
     framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1),
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+      framework.GetBundleContext()),
     notifier,
     managers);
   EXPECT_EQ(compMgr->IsEnabled(), false)
@@ -167,7 +192,8 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyEnable)
     mockRegistry,
     framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1),
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+      framework.GetBundleContext()),
     notifier,
     managers);
   EXPECT_NO_THROW({
@@ -189,7 +215,8 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyDisable)
     mockRegistry,
     framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1),
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+      framework.GetBundleContext()),
     notifier,
     managers);
   EXPECT_NO_THROW({
@@ -211,7 +238,8 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyStateChangeCount)
     mockRegistry,
     framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1),
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+      framework.GetBundleContext()),
     notifier,
     managers);
   EXPECT_NO_THROW({
@@ -235,7 +263,8 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifySequentialStateChange)
     mockRegistry,
     framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1),
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+      framework.GetBundleContext()),
     notifier,
     managers);
   EXPECT_NO_THROW({
@@ -275,7 +304,8 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentEnable)
     mockRegistry,
     framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1),
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+      framework.GetBundleContext()),
     notifier,
     managers);
 
@@ -310,7 +340,8 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentDisable)
     mockRegistry,
     framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1),
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+      framework.GetBundleContext()),
     notifier,
     managers);
 
@@ -345,7 +376,8 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentEnableDisable)
     mockRegistry,
     framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1),
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+      framework.GetBundleContext()),
     notifier,
     managers);
   compMgr->Initialize();
@@ -377,7 +409,8 @@ TEST_P(ComponentManagerImplParameterizedTest, TestAccumulateFutures)
     mockRegistry,
     framework.GetBundleContext(),
     fakeLogger,
-    std::make_shared<boost::asio::thread_pool>(1),
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+      framework.GetBundleContext()),
     notifier,
     managers);
 

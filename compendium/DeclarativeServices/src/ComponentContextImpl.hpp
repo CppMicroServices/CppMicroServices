@@ -204,12 +204,12 @@ public:
   bool AddToBoundServicesCache(
     const std::string& refName,
     const cppmicroservices::ServiceReferenceBase& sRef);
- 
+
   void RemoveFromBoundServicesCache(
     const std::string& refName,
     const cppmicroservices::ServiceReferenceBase& sRef);
-  
-  private:
+
+private:
   /**
    * Returns the Id of the bundle containing the component
    *

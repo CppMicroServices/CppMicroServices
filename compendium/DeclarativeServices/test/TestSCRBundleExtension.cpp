@@ -20,6 +20,7 @@
 
   =============================================================================*/
 
+#include "../src/SCRAsyncWorkService.hpp"
 #include "../src/SCRBundleExtension.hpp"
 #include "../src/metadata/Util.hpp"
 #include "Mocks.hpp"
@@ -29,6 +30,7 @@
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
+
 
 #define str(s) #s
 #define xstr(s) str(s)
@@ -70,14 +72,20 @@ TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto pool = std::make_shared<boost::asio::thread_pool>(1);
+  auto asyncWorkService =
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+      GetFramework().GetBundleContext());
   auto bundleContext = GetFramework().GetBundleContext();
-  auto notifier =
-    std::make_shared<ConfigurationNotifier>(bundleContext, fakeLogger, pool);
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    bundleContext, fakeLogger, asyncWorkService);
   EXPECT_THROW(
     {
-      SCRBundleExtension bundleExt(
-        BundleContext(), headers, mockRegistry, fakeLogger, pool, notifier);
+      SCRBundleExtension bundleExt(BundleContext(),
+                                   headers,
+                                   mockRegistry,
+                                   fakeLogger,
+                                   asyncWorkService,
+                                   notifier);
     },
     std::invalid_argument);
   EXPECT_THROW(
@@ -86,7 +94,7 @@ TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
                                    headers,
                                    nullptr,
                                    fakeLogger,
-                                   pool,
+                                   asyncWorkService,
                                    notifier);
     },
     std::invalid_argument);
@@ -96,7 +104,7 @@ TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
                                    headers,
                                    mockRegistry,
                                    nullptr,
-                                   pool,
+                                   asyncWorkService,
                                    notifier);
     },
     std::invalid_argument);
@@ -106,7 +114,7 @@ TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
                                    headers,
                                    mockRegistry,
                                    fakeLogger,
-                                   pool,
+                                   asyncWorkService,
                                    notifier);
     },
     std::invalid_argument);
@@ -132,15 +140,17 @@ TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
     .WillOnce(testing::Return(true));
   EXPECT_CALL(*mockRegistry, RemoveComponentManager(testing::_)).Times(1);
   auto fakeLogger = std::make_shared<FakeLogger>();
-  auto pool = std::make_shared<boost::asio::thread_pool>(1);
+  auto asyncWorkService =
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+      GetFramework().GetBundleContext());
   auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger, pool);
+    GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   EXPECT_NO_THROW({
     SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
                                  scr,
                                  mockRegistry,
                                  fakeLogger,
-                                 pool,
+                                 asyncWorkService,
                                  notifier);
     EXPECT_EQ(bundleExt.managers->size(), 0u);
   });
@@ -149,7 +159,7 @@ TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
                                  scr,
                                  mockRegistry,
                                  fakeLogger,
-                                 pool,
+                                 asyncWorkService,
                                  notifier);
     EXPECT_EQ(bundleExt.managers->size(), 1u);
   });

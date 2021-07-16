@@ -23,7 +23,6 @@
 #ifndef __COMPONENTMANAGERIMPL_HPP__
 #define __COMPONENTMANAGERIMPL_HPP__
 
-#include "boost/asio/thread_pool.hpp"
 #if defined(USING_GTEST)
 #  include "gtest/gtest_prod.h"
 #else

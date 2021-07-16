@@ -80,7 +80,7 @@ private:
     cppmicroservices::ServiceTracker<cppmsasync::AsyncWorkService>>
     serviceTracker;
   std::shared_ptr<cppmsasync::AsyncWorkService> asyncWorkService;
-  SCRAsyncWorkServiceDetail* detail;
+  std::unique_ptr<SCRAsyncWorkServiceDetail> detail;
 };
 }
 }

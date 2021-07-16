@@ -88,7 +88,7 @@ SCRAsyncWorkService::SCRAsyncWorkService(
         cppmicroservices::ServiceTracker<cppmsasync::AsyncWorkService>>(
         context))
   , asyncWorkService(nullptr)
-  , detail(new SCRAsyncWorkServiceDetail())
+  , detail(std::make_unique<SCRAsyncWorkServiceDetail>())
 {
   serviceTracker->Open();
   detail->Enable();
@@ -98,7 +98,6 @@ SCRAsyncWorkService::~SCRAsyncWorkService()
 {
   asyncWorkService.reset();
   if (detail) {
-    delete detail;
     detail = nullptr;
   }
 }
@@ -118,9 +117,17 @@ SCRAsyncWorkService::AddingService(
   auto currAsync = std::atomic_load(&asyncWorkService);
   std::shared_ptr<cppmsasync::AsyncWorkService> newService;
   if (!currAsync && reference) {
-    detail->Disable();
-    newService = scrContext.GetService<cppmsasync::AsyncWorkService>(reference);
-    std::atomic_store(&asyncWorkService, newService);
+    try {
+      newService =
+        scrContext.GetService<cppmsasync::AsyncWorkService>(reference);
+      if (newService) {
+        std::atomic_store(&asyncWorkService, newService);
+        detail->Disable();
+      }
+    } catch (...) {
+      newService = nullptr;
+      std::atomic_store(&asyncWorkService, newService);
+    }
   }
   return newService;
 }

@@ -22,9 +22,6 @@
 
 #include "ComponentManagerImpl.hpp"
 #include "ConcurrencyUtil.hpp"
-#include "boost/asio/async_result.hpp"
-#include "boost/asio/packaged_task.hpp"
-#include "boost/asio/post.hpp"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "states/CMDisabledState.hpp"
 #include "states/CMEnabledState.hpp"

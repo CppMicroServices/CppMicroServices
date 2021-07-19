@@ -54,9 +54,6 @@ void SCRActivator::Start(BundleContext context)
 
   asyncWorkService = std::make_shared<SCRAsyncWorkService>(context);
 
-  // limit the number of threads to 2. There is currently no use case to warrant increasing it.
-  //threadpool = std::make_shared<boost::asio::thread_pool>(2);
-
   // Create the component registry
   componentRegistry = std::make_shared<ComponentRegistry>();
 

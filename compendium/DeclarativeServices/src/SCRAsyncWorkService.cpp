@@ -42,9 +42,14 @@ namespace scrimpl {
 class SCRAsyncWorkServiceDetail
 {
 public:
-  SCRAsyncWorkServiceDetail() { Enable(); }
+  SCRAsyncWorkServiceDetail() = default;
 
-  void Enable() { threadpool = std::make_shared<boost::asio::thread_pool>(2); }
+  void Enable()
+  {
+    if (!threadpool) {
+      threadpool = std::make_shared<boost::asio::thread_pool>(2);
+    }
+  }
 
   void Disable()
   {
@@ -52,6 +57,7 @@ public:
       if (threadpool) {
         try {
           threadpool->join();
+          threadpool = nullptr;
         } catch (...) {
           //
         }
@@ -98,6 +104,7 @@ SCRAsyncWorkService::~SCRAsyncWorkService()
 {
   asyncWorkService.reset();
   if (detail) {
+    detail->Disable();
     detail = nullptr;
   }
 }

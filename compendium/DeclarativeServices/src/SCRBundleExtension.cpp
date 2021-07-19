@@ -45,7 +45,8 @@ SCRBundleExtension::SCRBundleExtension(
   const cppmicroservices::AnyMap& scrMetadata,
   const std::shared_ptr<ComponentRegistry>& registry,
   const std::shared_ptr<LogService>& logger,
-  const std::shared_ptr<boost::asio::thread_pool>& threadpool,
+  const std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>&
+    asyncWorkService,
   const std::shared_ptr<ConfigurationNotifier>& configNotifier)
   : bundleContext(bundleContext)
   , registry(registry)
@@ -53,7 +54,7 @@ SCRBundleExtension::SCRBundleExtension(
   , configNotifier(configNotifier)
 {
   if (!bundleContext || !registry || !logger || scrMetadata.empty() ||
-      !threadpool || !configNotifier) {
+      !asyncWorkService || !configNotifier) {
     throw std::invalid_argument(
       "Invalid parameters passed to SCRBundleExtension constructor");
   }
@@ -67,13 +68,14 @@ SCRBundleExtension::SCRBundleExtension(
     metadataparser->ParseAndGetComponentsMetadata(scrMetadata);
   for (auto& oneCompMetadata : componentsMetadata) {
     try {
-      auto compManager = std::make_shared<ComponentManagerImpl>(oneCompMetadata,
-                                                                registry,
-                                                                bundleContext,
-                                                                logger,
-                                                                threadpool,
-                                                                configNotifier,
-                                                                managers);
+      auto compManager =
+        std::make_shared<ComponentManagerImpl>(oneCompMetadata,
+                                               registry,
+                                               bundleContext,
+                                               logger,
+                                               asyncWorkService,
+                                               configNotifier,
+                                               managers);
       if (registry->AddComponentManager(compManager)) {
         managers->push_back(compManager);
         compManager->Initialize();

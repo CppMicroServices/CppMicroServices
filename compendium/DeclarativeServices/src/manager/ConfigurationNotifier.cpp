@@ -37,11 +37,11 @@ ConfigurationNotifier::ConfigurationNotifier(
   const cppmicroservices::BundleContext& context,
   std::shared_ptr<cppmicroservices::logservice::LogService> logger,
   std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
-    asyncWorkService)
+    asyncWorkService_)
   : tokenCounter(0)
   , bundleContext(context)
   , logger(std::move(logger))
-  , asyncWorkService(std::move(asyncWorkService))
+  , asyncWorkService(asyncWorkService_)
 {
   if (!bundleContext || !(this->logger) || (!this->asyncWorkService)) {
     throw std::invalid_argument("ConfigurationNotifier Constructor "

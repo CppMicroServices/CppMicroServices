@@ -76,7 +76,7 @@ public:
     const cppmicroservices::BundleContext& context,
     std::shared_ptr<cppmicroservices::logservice::LogService> logger,
     std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
-      asyncWorkService);
+      asyncWorkService_);
 
   ConfigurationNotifier(const ConfigurationNotifier&) = delete;
   ConfigurationNotifier(ConfigurationNotifier&&) = delete;

@@ -42,7 +42,7 @@ namespace scrimpl {
 class SCRAsyncWorkServiceDetail
 {
 public:
-  SCRAsyncWorkServiceDetail() = default;
+  SCRAsyncWorkServiceDetail() { Enable(); }
 
   void Enable()
   {
@@ -97,7 +97,6 @@ SCRAsyncWorkService::SCRAsyncWorkService(
   , detail(std::make_unique<SCRAsyncWorkServiceDetail>())
 {
   serviceTracker->Open();
-  detail->Enable();
 }
 
 SCRAsyncWorkService::~SCRAsyncWorkService()

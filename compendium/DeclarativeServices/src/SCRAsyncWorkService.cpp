@@ -57,6 +57,7 @@ public:
       if (threadpool) {
         try {
           threadpool->join();
+          threadpool.reset();
           threadpool = nullptr;
         } catch (...) {
           //
@@ -104,7 +105,6 @@ SCRAsyncWorkService::~SCRAsyncWorkService()
   asyncWorkService.reset();
   if (detail) {
     detail->Disable();
-    detail = nullptr;
   }
 }
 

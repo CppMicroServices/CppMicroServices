@@ -15,10 +15,18 @@ function(usFunctionCheckResourceLinking)
       set(_linking_available 1)
       set(_suffix .rc)
     elseif(UNIX)
+      if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       execute_process(
-        COMMAND ${CMAKE_CXX_LINKER} -r -b binary -o "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o" "${CMAKE_COMMAND}"
+        COMMAND ${CMAKE_CXX_COMPILER} -r -b binary -o "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o" "${CMAKE_COMMAND}"
         RESULT_VARIABLE _result
       )
+      else()
+      execute_process(
+        COMMAND ${CMAKE_LINKER} -r -b binary -o "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o" "${CMAKE_COMMAND}"
+        RESULT_VARIABLE _result
+      )
+      endif()
+      
       if(_result EQUAL 0)
         set(_linking_available 1)
       endif()

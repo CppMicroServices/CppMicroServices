@@ -46,6 +46,8 @@ public:
 
   void Enable()
   {
+    std::lock_guard<std::mutex> lock(poolOperationMutex);
+    US_UNUSED(lock);
     if (!threadpool) {
       threadpool = std::make_shared<boost::asio::thread_pool>(2);
     }
@@ -53,10 +55,13 @@ public:
 
   void Disable()
   {
+    std::lock_guard<std::mutex> lock(poolOperationMutex);
+    US_UNUSED(lock);
     try {
       if (threadpool) {
         try {
           threadpool->join();
+          threadpool->stop();
           threadpool.reset();
           threadpool = nullptr;
         } catch (...) {
@@ -72,19 +77,25 @@ public:
 
   void post(std::packaged_task<void()>&& task)
   {
-    using Sig = void();
-    using Result = boost::asio::async_result<decltype(task), Sig>;
-    using Handler = typename Result::completion_handler_type;
+    std::lock_guard<std::mutex> lock(poolOperationMutex);
+    US_UNUSED(lock);
+    if (threadpool) {
+      using Sig = void();
+      using Result = boost::asio::async_result<decltype(task), Sig>;
+      using Handler = typename Result::completion_handler_type;
 
-    Handler handler(std::forward<decltype(task)>(task));
-    Result result(handler);
+      Handler handler(std::forward<decltype(task)>(task));
+      Result result(handler);
 
-    boost::asio::post(threadpool->get_executor(),
-                      [handler = std::move(handler)]() mutable { handler(); });
+      boost::asio::post(
+        threadpool->get_executor(),
+        [handler = std::move(handler)]() mutable { handler(); });
+    }
   }
 
 private:
   std::shared_ptr<boost::asio::thread_pool> threadpool;
+  std::mutex poolOperationMutex;
 };
 
 SCRAsyncWorkService::SCRAsyncWorkService(

@@ -227,7 +227,10 @@ TEST_F(TestAsyncWorkService, TestAsyncWorkServiceWithoutUserService)
   cppmicroservices::scrimpl::SCRAsyncWorkService scrAsyncWorkService(
     framework.GetBundleContext());
   EXPECT_NO_THROW({
-    std::packaged_task<void()> myTask([]() { 1 + 2; });
+    std::packaged_task<void()> myTask([]() {
+      int v = 1 + 2;
+      US_UNUSED(v);
+    });
     std::future<void> f = myTask.get_future();
     scrAsyncWorkService.post(std::move(myTask));
     f.get();
@@ -249,7 +252,10 @@ TEST_F(TestAsyncWorkService, TestUserServiceUsedAfterInstall)
     cppmicroservices::scrimpl::SCRAsyncWorkService scrAsyncWorkService(
       bundleContext);
 
-    std::packaged_task<void()> myTask([]() { 1 + 2; });
+    std::packaged_task<void()> myTask([]() {
+      int v = 1 + 2;
+      US_UNUSED(v);
+    });
     // We don't manage the future and wait because post is mocked and has no default behavior.
     scrAsyncWorkService.post(std::move(myTask));
   });
@@ -271,7 +277,10 @@ TEST_F(TestAsyncWorkService, TestFallbackUsedAfterUnregister)
     cppmicroservices::scrimpl::SCRAsyncWorkService scrAsyncWorkService(
       bundleContext);
 
-    std::packaged_task<void()> myTask([]() { 1 + 2; });
+    std::packaged_task<void()> myTask([]() {
+      int v = 1 + 2;
+      US_UNUSED(v);
+    });
     // We don't manage the future and wait because post is mocked and has no default behavior.
     scrAsyncWorkService.post(std::move(myTask));
 
@@ -279,7 +288,10 @@ TEST_F(TestAsyncWorkService, TestFallbackUsedAfterUnregister)
 
     EXPECT_CALL(*mockAsyncWorkService, post(::testing::_)).Times(0);
 
-    std::packaged_task<void()> myTask2([]() { 1 + 2; });
+    std::packaged_task<void()> myTask2([]() {
+      int v = 1 + 2;
+      US_UNUSED(v);
+    });
     scrAsyncWorkService.post(std::move(myTask2));
   });
 }
@@ -306,7 +318,10 @@ TEST_F(TestAsyncWorkService,
                        readies[i].set_value();
                        start.wait();
                        do {
-                         std::packaged_task<void()> task([]() { 1 + 2; });
+                         std::packaged_task<void()> task([]() {
+                           int v = 1 + 2;
+                           US_UNUSED(v);
+                         });
                          scrAsyncWorkService.post(std::move(task));
                        } while (stop.wait_for(std::chrono::milliseconds(1)) !=
                                 std::future_status::ready);
@@ -382,14 +397,5 @@ TEST_P(TestAsyncWorkServiceEndToEnd, TestEndToEndBehaviorWithAsyncWorkService)
     }
   });
 }
-
-/**
- * End to end tests:
- * - Bundle operations work without providing a service
- * - Bundle operations work when providing a service (inline, all work on 1 thread (boost),
- *   all work on multiple threads (async))
- * - For each test, install and start them with all their dependencies and stop
- *   all of them
- */
 
 };

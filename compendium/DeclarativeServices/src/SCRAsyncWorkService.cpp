@@ -92,8 +92,8 @@ SCRAsyncWorkService::SCRAsyncWorkService(
   : scrContext(context)
   , serviceTracker(
       std::make_unique<
-        cppmicroservices::ServiceTracker<cppmsasync::AsyncWorkService>>(
-        context))
+        cppmicroservices::ServiceTracker<cppmsasync::AsyncWorkService>>(context,
+                                                                        this))
   , asyncWorkService(nullptr)
   , detail(std::make_unique<SCRAsyncWorkServiceDetail>())
 {

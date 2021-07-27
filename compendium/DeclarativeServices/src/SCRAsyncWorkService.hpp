@@ -37,7 +37,7 @@ class SCRAsyncWorkServiceDetail;
 
 /**
  * This class is used to track the availability of AsyncWorkService in the
- * framework. If a LogService is available, the calls to "post" are forwarded
+ * framework. If a AsyncWorkService is available, the calls to "post" are forwarded
  * to the AsyncWorkService. Otherwise, the calls to "post" use the pre-defined,
  * default behavior for post. This class implements the AsyncWorkService interface
  * so that other classes within the runtime can easily use a mock async work service for

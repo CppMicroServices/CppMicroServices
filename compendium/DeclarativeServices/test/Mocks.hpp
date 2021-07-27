@@ -23,6 +23,7 @@
 #ifndef __MOCKS_HPP__
 #define __MOCKS_HPP__
 #include "../src/ComponentRegistry.hpp"
+#include "../src/SCRAsyncWorkService.hpp"
 #include "../src/manager/ComponentConfiguration.hpp"
 #include "../src/manager/ComponentConfigurationImpl.hpp"
 #include "../src/manager/ComponentManager.hpp"
@@ -33,6 +34,7 @@
 #include "../src/manager/states/ComponentManagerState.hpp"
 #include "gmock/gmock.h"
 #include <cppmicroservices/ServiceFactory.h>
+#include <cppmicroservices/asyncworkservice/AsyncWorkService.hpp>
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -394,6 +396,19 @@ public:
   std::atomic<int> statechangecount;
 };
 
+}
+
+namespace async {
+class MockAsyncWorkService
+  : public cppmicroservices::async::detail::AsyncWorkService
+{
+public:
+  MockAsyncWorkService()
+    : cppmicroservices::async::detail::AsyncWorkService()
+  {}
+
+  MOCK_METHOD1(post, void(std::packaged_task<void()>&&));
+};
 }
 }
 

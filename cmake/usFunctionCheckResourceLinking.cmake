@@ -23,6 +23,9 @@ function(usFunctionCheckResourceLinking)
         set(_linking_available 1)
       endif()
       set(_suffix .o)
+
+      message(STATUS "Return value: " ${_result})
+      message(STATUS "COMMAND: " "${CMAKE_COMMAND}")
     endif()
 
     set(US_RESOURCE_SOURCE_SUFFIX_LINK ${_suffix} CACHE INTERNAL "CppMicroServices resource source suffix (link)" FORCE)
@@ -38,6 +41,9 @@ function(usFunctionCheckResourceLinking)
     endif()
 
     message("Checking for CppMicroServices resource linking capability...${_success}")
+    message(STATUS ${CMAKE_LINKER})
+    
+
 
     set(US_RESOURCE_LINKING_AVAILABLE ${_linking_available} CACHE INTERNAL "CppMicroServices resource linking" FORCE)
     set(US_DEFAULT_RESOURCE_MODE ${_default_mode} CACHE INTERNAL "CppMicroServices default resource mode" FORCE)

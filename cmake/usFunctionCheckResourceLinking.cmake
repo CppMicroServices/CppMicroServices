@@ -46,6 +46,8 @@ function(usFunctionCheckResourceLinking)
        endif()
     endif()
 
+    message(STATUS "---${CMAKE_CXX_COMPILER}---")
+    message(STATUS "---${CMAKE_CURRENT_BINARY_DIR}---")
     message(STATUS "---${CMAKE_LINKER}---")
     message(STATUS "---${CMAKE_CXX_LINK_EXECUTABLE}---")
     message("Checking for CppMicroServices resource linking capability...${_success}")

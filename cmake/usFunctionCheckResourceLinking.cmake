@@ -15,20 +15,10 @@ function(usFunctionCheckResourceLinking)
       set(_linking_available 1)
       set(_suffix .rc)
     elseif(UNIX)
-      # CMAKE_COMMAND is included at the end for testing purposes. We are checking to see if we can add resources
-      # during link time to an existing binary.
-      if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-      execute_process(
-        COMMAND ${CMAKE_CXX_COMPILER} -r -o "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o" "-Wl,-bbinary" "-fuse-ld=lld" "${CMAKE_COMMAND}"
-        RESULT_VARIABLE _result
-      )
-      else()
       execute_process(
         COMMAND ${CMAKE_LINKER} -r -b binary -o "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o" "${CMAKE_COMMAND}"
         RESULT_VARIABLE _result
       )
-      endif()
-      
       
       if(_result EQUAL 0)
         set(_linking_available 1)
@@ -48,27 +38,6 @@ function(usFunctionCheckResourceLinking)
        endif()
     endif()
 
-    message(STATUS "---${CMAKE_CXX_COMPILER}---")
-    message(STATUS "BinaryDir---${CMAKE_CURRENT_BINARY_DIR}---")
-    message(STATUS "SrcDir---${CMAKE_CURRENT_SOURCE_DIR}")
-    message(STATUS "---${CMAKE_LINKER}---")
-    message(STATUS "---${CMAKE_CXX_LINK_EXECUTABLE}---")
-    message(STATUS "---" ${CMAKE_CXX_COMPILER} "-o ${CMAKE_CURRENT_SOURCE_DIR}/us_resource_link.o -Wl,-r -Wl,-bbinary" "${CMAKE_COMMAND}" "---")
-    execute_process(
-        COMMAND pwd
-        RESULT_VARIABLE _resultabc3
-      )
-    message(STATUS "---${_resultabc3}")
-    execute_process(
-        COMMAND ls -las ..
-        RESULT_VARIABLE _resultabc2
-      )
-    message(STATUS "---${_resultabc2}")
-    execute_process(
-        COMMAND ls -las "${CMAKE_CURRENT_BINARY_DIR}"
-        RESULT_VARIABLE _resultabc
-      )
-    message(STATUS "---${_resultabc}")
     message("Checking for CppMicroServices resource linking capability...${_success}")
 
     set(US_RESOURCE_LINKING_AVAILABLE ${_linking_available} CACHE INTERNAL "CppMicroServices resource linking" FORCE)

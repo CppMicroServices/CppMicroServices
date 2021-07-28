@@ -31,8 +31,6 @@
 namespace cppmicroservices {
 namespace scrimpl {
 
-namespace cppmsasync = cppmicroservices::async::detail;
-
 class SCRAsyncWorkServiceDetail;
 
 /**
@@ -44,9 +42,9 @@ class SCRAsyncWorkServiceDetail;
  * testing purposes.
  */
 class SCRAsyncWorkService
-  : public cppmsasync::AsyncWorkService
+  : public cppmicroservices::async::detail::AsyncWorkService
   , public cppmicroservices::ServiceTrackerCustomizer<
-      cppmsasync::AsyncWorkService>
+      cppmicroservices::async::detail::AsyncWorkService>
 {
 public:
   explicit SCRAsyncWorkService(cppmicroservices::BundleContext context);
@@ -61,13 +59,18 @@ public:
 
   // methods from the cppmicroservices::ServiceTrackerCustomizer interface
   std::shared_ptr<TrackedParamType> AddingService(
-    const ServiceReference<cppmsasync::AsyncWorkService>& reference) override;
+    const ServiceReference<cppmicroservices::async::detail::AsyncWorkService>&
+      reference) override;
   void ModifiedService(
-    const ServiceReference<cppmsasync::AsyncWorkService>& reference,
-    const std::shared_ptr<cppmsasync::AsyncWorkService>& service) override;
+    const ServiceReference<cppmicroservices::async::detail::AsyncWorkService>&
+      reference,
+    const std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>&
+      service) override;
   void RemovedService(
-    const ServiceReference<cppmsasync::AsyncWorkService>& reference,
-    const std::shared_ptr<cppmsasync::AsyncWorkService>& service) override;
+    const ServiceReference<cppmicroservices::async::detail::AsyncWorkService>&
+      reference,
+    const std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>&
+      service) override;
 
   // method to stop tracking the AsyncWorkService. This must be called from the SCR
   // BundleActivate's Stop method. Not thread-safe. Must not be called simultaneously from
@@ -76,11 +79,11 @@ public:
 
 private:
   cppmicroservices::BundleContext scrContext;
-  std::unique_ptr<
-    cppmicroservices::ServiceTracker<cppmsasync::AsyncWorkService>>
+  std::unique_ptr<cppmicroservices::ServiceTracker<
+    cppmicroservices::async::detail::AsyncWorkService>>
     serviceTracker;
-  std::shared_ptr<cppmsasync::AsyncWorkService> asyncWorkService;
-  std::unique_ptr<SCRAsyncWorkServiceDetail> detail;
+  std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
+    asyncWorkService;
 };
 }
 }

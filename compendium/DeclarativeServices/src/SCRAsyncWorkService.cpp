@@ -40,30 +40,28 @@ namespace scrimpl {
  * threading operations will use the fallback strategy.
  */
 class SCRAsyncWorkServiceDetail
+  : public cppmicroservices::async::detail::AsyncWorkService
 {
 public:
-  SCRAsyncWorkServiceDetail() { Enable(); }
+  SCRAsyncWorkServiceDetail() { Initialize(); }
 
-  void Enable()
+  void Initialize()
   {
-    std::lock_guard<std::mutex> lock(poolOperationMutex);
-    US_UNUSED(lock);
-    if (!threadpool) {
-      threadpool = std::make_shared<boost::asio::thread_pool>(2);
-    }
+    //std::lock_guard<std::mutex> lock(poolOperationMutex);
+    //US_UNUSED(lock);
+    threadpool = std::make_shared<boost::asio::thread_pool>(2);
   }
 
-  void Disable()
+  void Shutdown()
   {
-    std::lock_guard<std::mutex> lock(poolOperationMutex);
-    US_UNUSED(lock);
+    //std::lock_guard<std::mutex> lock(poolOperationMutex);
+    //US_UNUSED(lock);
     try {
       if (threadpool) {
         try {
           threadpool->join();
           threadpool->stop();
           threadpool.reset();
-          threadpool = nullptr;
         } catch (...) {
           //
         }
@@ -73,12 +71,12 @@ public:
     }
   }
 
-  ~SCRAsyncWorkServiceDetail() { Disable(); }
+  ~SCRAsyncWorkServiceDetail() { Shutdown(); }
 
-  void post(std::packaged_task<void()>&& task)
+  void post(std::packaged_task<void()>&& task) override
   {
-    std::lock_guard<std::mutex> lock(poolOperationMutex);
-    US_UNUSED(lock);
+    //std::lock_guard<std::mutex> lock(poolOperationMutex);
+    //US_UNUSED(lock);
     if (threadpool) {
       using Sig = void();
       using Result = boost::asio::async_result<decltype(task), Sig>;
@@ -102,11 +100,9 @@ SCRAsyncWorkService::SCRAsyncWorkService(
   cppmicroservices::BundleContext context)
   : scrContext(context)
   , serviceTracker(
-      std::make_unique<
-        cppmicroservices::ServiceTracker<cppmsasync::AsyncWorkService>>(context,
-                                                                        this))
-  , asyncWorkService(nullptr)
-  , detail(std::make_unique<SCRAsyncWorkServiceDetail>())
+      std::make_unique<cppmicroservices::ServiceTracker<
+        cppmicroservices::async::detail::AsyncWorkService>>(context, this))
+  , asyncWorkService(std::make_shared<SCRAsyncWorkServiceDetail>())
 {
   serviceTracker->Open();
 }
@@ -114,9 +110,6 @@ SCRAsyncWorkService::SCRAsyncWorkService(
 SCRAsyncWorkService::~SCRAsyncWorkService()
 {
   asyncWorkService.reset();
-  if (detail) {
-    detail->Disable();
-  }
 }
 
 void SCRAsyncWorkService::StopTracking()
@@ -127,57 +120,57 @@ void SCRAsyncWorkService::StopTracking()
   }
 }
 
-std::shared_ptr<cppmsasync::AsyncWorkService>
+std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
 SCRAsyncWorkService::AddingService(
-  const ServiceReference<cppmsasync::AsyncWorkService>& reference)
+  const ServiceReference<cppmicroservices::async::detail::AsyncWorkService>&
+    reference)
 {
   auto currAsync = std::atomic_load(&asyncWorkService);
-  std::shared_ptr<cppmsasync::AsyncWorkService> newService;
-  if (!currAsync && reference) {
+  std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService> newService;
+  if (reference) {
     try {
       newService =
-        scrContext.GetService<cppmsasync::AsyncWorkService>(reference);
+        scrContext
+          .GetService<cppmicroservices::async::detail::AsyncWorkService>(
+            reference);
       if (newService) {
         std::atomic_store(&asyncWorkService, newService);
-        detail->Disable();
       }
     } catch (...) {
-      newService = nullptr;
-      std::atomic_store(&asyncWorkService, newService);
+      //
     }
   }
   return newService;
 }
 
 void SCRAsyncWorkService::ModifiedService(
-  const ServiceReference<cppmsasync::AsyncWorkService>& /* reference */,
-  const std::shared_ptr<cppmsasync::AsyncWorkService>& /* service */)
+  const ServiceReference<
+    cppmicroservices::async::detail::AsyncWorkService>& /* reference */,
+  const std::shared_ptr<
+    cppmicroservices::async::detail::AsyncWorkService>& /* service */)
 {
   // no-op
 }
 
 void SCRAsyncWorkService::RemovedService(
-  const ServiceReference<cppmsasync::AsyncWorkService>& /* reference */,
-  const std::shared_ptr<cppmsasync::AsyncWorkService>& service)
+  const ServiceReference<
+    cppmicroservices::async::detail::AsyncWorkService>& /* reference */,
+  const std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>&
+    service)
 {
   auto currAsync = std::atomic_load(&asyncWorkService);
   if (service == currAsync) {
     // replace existing asyncWorkService with a nullptr asyncWorkService
-    std::shared_ptr<cppmsasync::AsyncWorkService> newService(nullptr);
+    std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
+      newService = std::make_shared<SCRAsyncWorkServiceDetail>();
     std::atomic_store(&asyncWorkService, newService);
-    detail->Enable();
   }
 }
 
 void SCRAsyncWorkService::post(std::packaged_task<void()>&& task)
 {
   auto currAsync = std::atomic_load(&asyncWorkService);
-  if (currAsync) {
-    currAsync->post(std::move(task));
-  } else {
-    // The default threading solution should be enabled here.
-    detail->post(std::move(task));
-  }
+  currAsync->post(std::move(task));
 }
 
 }

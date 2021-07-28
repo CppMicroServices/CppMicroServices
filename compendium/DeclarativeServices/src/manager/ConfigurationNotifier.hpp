@@ -25,7 +25,6 @@
 
 #include "../SCRLogger.hpp"
 #include "ConcurrencyUtil.hpp"
-#include "boost/asio/thread_pool.hpp"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 

@@ -36,6 +36,7 @@
 #include "boost/asio/async_result.hpp"
 #include "boost/asio/packaged_task.hpp"
 #include "boost/asio/post.hpp"
+#include "boost/asio/thread_pool.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 

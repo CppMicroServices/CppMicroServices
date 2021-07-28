@@ -17,7 +17,7 @@ function(usFunctionCheckResourceLinking)
     elseif(UNIX)
       if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       execute_process(
-        COMMAND ${CMAKE_CXX_COMPILER} "-Wl,-r -Wl,-b binary -o" "/tmp/us_resource_link.o" "${CMAKE_COMMAND}"
+        COMMAND ${CMAKE_CXX_COMPILER} "-Wl,-r -Wl,-bbinary -o" "/tmp/us_resource_link.o" "${CMAKE_COMMAND}"
         RESULT_VARIABLE _result
       )
       else()

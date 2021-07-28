@@ -16,7 +16,7 @@ function(usFunctionCheckResourceLinking)
       set(_suffix .rc)
     elseif(UNIX)
       execute_process(
-        COMMAND ${CMAKE_CXX_LINK_EXECUTABLE} -r -b binary -o "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o" "${CMAKE_COMMAND}"
+        COMMAND ${CMAKE_LINKER} -r -b binary -o "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o" "${CMAKE_COMMAND}"
         RESULT_VARIABLE _result
       )
       
@@ -38,6 +38,8 @@ function(usFunctionCheckResourceLinking)
        endif()
     endif()
 
+    message(STATUS "---${CMAKE_LINKER}---")
+    message(STATUS "---${CMAKE_CXX_LINK_EXECUTABLE}---")
     message("Checking for CppMicroServices resource linking capability...${_success}")
 
     set(US_RESOURCE_LINKING_AVAILABLE ${_linking_available} CACHE INTERNAL "CppMicroServices resource linking" FORCE)

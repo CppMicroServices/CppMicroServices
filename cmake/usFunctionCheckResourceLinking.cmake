@@ -25,6 +25,19 @@ function(usFunctionCheckResourceLinking)
       set(_suffix .o)
     endif()
 
+
+
+
+
+
+
+
+
+
+
+
+    
+
     set(US_RESOURCE_SOURCE_SUFFIX_LINK ${_suffix} CACHE INTERNAL "CppMicroServices resource source suffix (link)" FORCE)
     set(US_RESOURCE_SOURCE_SUFFIX_APPEND ".cpp" CACHE INTERNAL "CppMicroServices resource source suffix (append)" FORCE)
 

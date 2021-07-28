@@ -19,7 +19,7 @@ function(usFunctionCheckResourceLinking)
       # during link time to an existing binary.
       if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       execute_process(
-        COMMAND ${CMAKE_CXX_COMPILER} -o "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o" "-fuse-ld=lld" "-Wl,-r" "-Wl,-bbinary" "${CMAKE_COMMAND}"
+        COMMAND ${CMAKE_CXX_COMPILER} -r -o "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o" "-Wl,-b binary" "${CMAKE_COMMAND}"
         RESULT_VARIABLE _result
       )
       else()

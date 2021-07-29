@@ -395,3 +395,26 @@
    ...
 }
 
+{
+   <usDeclarativeServicesTestsSuppression0>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:_ZNSt12__shared_ptrIN16cppmicroservices7scrimpl25SCRAsyncWorkServiceDetailELN9__gnu_cxx12_Lock_policyE2EEC1ISaIS2_EIEEESt19_Sp_make_shared_tagRKT_DpOT0_
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression1>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:_Znwm
+   fun:_ZNK5boost4asio11thread_pool13executor_type4postINS0_6detail15work_dispatcherIZN16cppmicroservices7scrimpl25SCRAsyncWorkServiceDetail4postEOSt13packaged_taskIFvvEEEUlvE_EESaIvEEEvOT_RKT0_
+   fun:_ZN16cppmicroservices7scrimpl25SCRAsyncWorkServiceDetail4postEOSt13packaged_taskIFvvEE
+   fun:_ZN16cppmicroservices7scrimpl19SCRAsyncWorkService4postEOSt13packaged_taskIFvvEE
+   ...
+}

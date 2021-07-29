@@ -15,7 +15,7 @@ function(usFunctionCheckResourceLinking)
       set(_linking_available 1)
       set(_suffix .rc)
     elseif(UNIX)
-      set(_linking_available 1)
+      set(_linking_available 1) 
       set(_suffix .o)
     endif()
 

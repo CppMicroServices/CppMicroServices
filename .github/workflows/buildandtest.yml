@@ -41,7 +41,7 @@ jobs:
   
   linux_clang_build:
     name: Build and test on supported clang compiler
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-16.04
     env:
        BUILD_CONFIGURATION: 0
        WITH_COVERAGE: 0

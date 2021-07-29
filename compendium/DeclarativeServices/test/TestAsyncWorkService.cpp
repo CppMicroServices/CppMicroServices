@@ -31,6 +31,7 @@
 
 #include "ConcurrencyTestUtil.hpp"
 #include "Mocks.hpp"
+#include "TestFixture.hpp"
 #include "TestInterfaces/Interfaces.hpp"
 #include "TestUtils.hpp"
 #include "boost/asio/async_result.hpp"
@@ -46,80 +47,6 @@ namespace test {
 
 namespace async = cppmicroservices::async::detail;
 namespace scr = cppmicroservices::service::component::runtime;
-
-class TestAsyncWorkService : public testing::Test
-{
-public:
-  TestAsyncWorkService()
-    : ::testing::Test()
-    , framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
-
-  //void TestBody() override {}
-
-  void SetUp() override
-  {
-    framework.Start();
-    context = framework.GetBundleContext();
-
-#if defined(US_BUILD_SHARED_LIBS)
-    auto dsPluginPath = test::GetDSRuntimePluginFilePath();
-    auto dsbundles = context.InstallBundles(dsPluginPath);
-    for (auto& bundle : dsbundles) {
-      bundle.Start();
-    }
-#endif
-
-#ifndef US_BUILD_SHARED_LIBS
-    auto dsbundles = context.GetBundles();
-    for (auto& bundle : dsbundles) {
-      try {
-        bundle.Start();
-      } catch (std::exception& e) {
-        std::cerr << "    " << e.what();
-      }
-      std::cerr << std::endl;
-    }
-#endif
-    auto sRef = context.GetServiceReference<scr::ServiceComponentRuntime>();
-    ASSERT_TRUE(sRef);
-    dsRuntimeService = context.GetService<scr::ServiceComponentRuntime>(sRef);
-    ASSERT_TRUE(dsRuntimeService);
-  }
-
-  void TearDown() override
-  {
-    framework.Stop();
-    framework.WaitForStop(std::chrono::milliseconds::zero());
-  }
-
-  cppmicroservices::Bundle GetTestBundle(const std::string& symbolicName)
-  {
-    auto bundles = context.GetBundles();
-
-    for (auto& bundle : bundles) {
-      auto bundleSymbolicName = bundle.GetSymbolicName();
-      if (symbolicName == bundleSymbolicName) {
-        return bundle;
-      }
-    }
-    return cppmicroservices::Bundle();
-  }
-
-  cppmicroservices::Bundle StartTestBundle(const std::string& symName)
-  {
-    cppmicroservices::Bundle testBundle = GetTestBundle(symName);
-    EXPECT_EQ(static_cast<bool>(testBundle), true);
-    testBundle.Start();
-    EXPECT_EQ(testBundle.GetState(), cppmicroservices::Bundle::STATE_ACTIVE)
-      << " failed to start bundle with symbolic name" + symName;
-    return testBundle;
-  }
-
-  std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
-  cppmicroservices::Framework framework;
-  cppmicroservices::BundleContext context;
-};
 
 class TestAsyncWorkServiceEndToEnd
   : public ::testing::TestWithParam<
@@ -221,12 +148,16 @@ private:
   std::shared_ptr<boost::asio::thread_pool> threadpool;
 };
 
-TEST_F(TestAsyncWorkService, TestAsyncWorkServiceWithoutUserService)
+TEST_F(tGenericDSSuite, TestAsyncWorkServiceWithoutUserService)
 {
+  std::shared_ptr<cppmicroservices::scrimpl::SCRLogger> logger =
+    std::make_shared<cppmicroservices::scrimpl::SCRLogger>(
+      framework.GetBundleContext());
+
   // Create SCRAsyncWorkService, just make sure Adding service isn't called, look
   // at SCRLoggerTest for example
   cppmicroservices::scrimpl::SCRAsyncWorkService scrAsyncWorkService(
-    framework.GetBundleContext());
+    framework.GetBundleContext(), logger);
   EXPECT_NO_THROW({
     std::packaged_task<void()> myTask([]() {
       int v = 1 + 2;
@@ -238,7 +169,7 @@ TEST_F(TestAsyncWorkService, TestAsyncWorkServiceWithoutUserService)
   });
 }
 
-TEST_F(TestAsyncWorkService, TestUserServiceUsedAfterInstall)
+TEST_F(tGenericDSSuite, TestUserServiceUsedAfterInstall)
 {
   EXPECT_NO_THROW({
     auto mockAsyncWorkService =
@@ -250,8 +181,12 @@ TEST_F(TestAsyncWorkService, TestUserServiceUsedAfterInstall)
           mockAsyncWorkService);
     EXPECT_CALL(*mockAsyncWorkService, post(::testing::_)).Times(1);
 
+    std::shared_ptr<cppmicroservices::scrimpl::SCRLogger> logger =
+      std::make_shared<cppmicroservices::scrimpl::SCRLogger>(
+        framework.GetBundleContext());
+
     cppmicroservices::scrimpl::SCRAsyncWorkService scrAsyncWorkService(
-      bundleContext);
+      bundleContext, logger);
 
     std::packaged_task<void()> myTask([]() {
       int v = 1 + 2;
@@ -262,7 +197,7 @@ TEST_F(TestAsyncWorkService, TestUserServiceUsedAfterInstall)
   });
 }
 
-TEST_F(TestAsyncWorkService, TestFallbackUsedAfterUnregister)
+TEST_F(tGenericDSSuite, TestFallbackUsedAfterUnregister)
 {
   // don't hold onto the shared pointer to the service object, unregister, reset(), ...
   EXPECT_NO_THROW({
@@ -275,8 +210,12 @@ TEST_F(TestAsyncWorkService, TestFallbackUsedAfterUnregister)
           mockAsyncWorkService);
     EXPECT_CALL(*mockAsyncWorkService, post(::testing::_)).Times(1);
 
+    std::shared_ptr<cppmicroservices::scrimpl::SCRLogger> logger =
+      std::make_shared<cppmicroservices::scrimpl::SCRLogger>(
+        framework.GetBundleContext());
+
     cppmicroservices::scrimpl::SCRAsyncWorkService scrAsyncWorkService(
-      bundleContext);
+      bundleContext, logger);
 
     std::packaged_task<void()> myTask([]() {
       int v = 1 + 2;
@@ -297,13 +236,16 @@ TEST_F(TestAsyncWorkService, TestFallbackUsedAfterUnregister)
   });
 }
 
-TEST_F(TestAsyncWorkService,
-       TestUseAsyncWorkServiceDuringConcurrentBundleOperations)
+TEST_F(tGenericDSSuite, TestUseAsyncWorkServiceDuringConcurrentBundleOperations)
 {
   EXPECT_NO_THROW({
     auto bundleContext = framework.GetBundleContext();
+
+    std::shared_ptr<cppmicroservices::scrimpl::SCRLogger> logger =
+      std::make_shared<cppmicroservices::scrimpl::SCRLogger>(bundleContext);
+
     cppmicroservices::scrimpl::SCRAsyncWorkService scrAsyncWorkService(
-      bundleContext);
+      bundleContext, logger);
     std::promise<void> startPromise;
     std::shared_future<void> start(startPromise.get_future());
     std::promise<void> stopPromise;

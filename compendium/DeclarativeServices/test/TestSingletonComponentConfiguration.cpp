@@ -49,9 +49,11 @@ protected:
     auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
     mockLogger = std::make_shared<MockLogger>();
+    auto logger = std::make_shared<cppmicroservices::scrimpl::SCRLogger>(
+      framework.GetBundleContext());
     auto asyncWorkService =
       std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-        framework.GetBundleContext());
+        framework.GetBundleContext(), logger);
     auto notifier = std::make_shared<ConfigurationNotifier>(
       framework.GetBundleContext(), mockLogger, asyncWorkService);
     auto managers =

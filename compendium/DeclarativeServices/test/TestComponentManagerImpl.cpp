@@ -55,8 +55,10 @@ TEST(ComponentManagerImplTest, Ctor)
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
+  auto logger = std::make_shared<SCRLogger>(bc);
   auto asyncWorkService =
-    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(bc);
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(bc,
+                                                                     logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     framework.GetBundleContext(), fakeLogger, asyncWorkService);
   {
@@ -141,9 +143,10 @@ protected:
     framework.Start();
     fakeLogger = std::make_shared<FakeLogger>();
     mockRegistry = std::make_shared<MockComponentRegistry>();
-    auto asyncWorkService =
+    auto logger = std::make_shared<SCRLogger>(framework.GetBundleContext());
+    asyncWorkService =
       std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-        framework.GetBundleContext());
+        framework.GetBundleContext(), logger);
     notifier = std::make_shared<ConfigurationNotifier>(
       framework.GetBundleContext(), fakeLogger, asyncWorkService);
     managers =
@@ -163,20 +166,21 @@ protected:
   std::shared_ptr<MockComponentRegistry> mockRegistry;
   std::shared_ptr<ConfigurationNotifier> notifier;
   std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
+  std::shared_ptr<cppmicroservices::scrimpl::SCRAsyncWorkService>
+    asyncWorkService;
 };
 
 TEST_P(ComponentManagerImplParameterizedTest, VerifyInitialize)
 {
   auto compDesc = GetParam();
-  auto compMgr = std::make_shared<ComponentManagerImpl>(
-    compDesc,
-    mockRegistry,
-    framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      framework.GetBundleContext()),
-    notifier,
-    managers);
+  auto compMgr =
+    std::make_shared<ComponentManagerImpl>(compDesc,
+                                           mockRegistry,
+                                           framework.GetBundleContext(),
+                                           fakeLogger,
+                                           asyncWorkService,
+                                           notifier,
+                                           managers);
   EXPECT_EQ(compMgr->IsEnabled(), false)
     << "Illegal state before Initialization";
   compMgr->Initialize();
@@ -187,15 +191,14 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyInitialize)
 TEST_P(ComponentManagerImplParameterizedTest, VerifyEnable)
 {
   auto compDesc = GetParam();
-  auto compMgr = std::make_shared<ComponentManagerImpl>(
-    compDesc,
-    mockRegistry,
-    framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      framework.GetBundleContext()),
-    notifier,
-    managers);
+  auto compMgr =
+    std::make_shared<ComponentManagerImpl>(compDesc,
+                                           mockRegistry,
+                                           framework.GetBundleContext(),
+                                           fakeLogger,
+                                           asyncWorkService,
+                                           notifier,
+                                           managers);
   EXPECT_NO_THROW({
     compMgr->Initialize();
     compMgr->Enable();
@@ -210,15 +213,14 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyEnable)
 TEST_P(ComponentManagerImplParameterizedTest, VerifyDisable)
 {
   auto compDesc = GetParam();
-  auto compMgr = std::make_shared<ComponentManagerImpl>(
-    compDesc,
-    mockRegistry,
-    framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      framework.GetBundleContext()),
-    notifier,
-    managers);
+  auto compMgr =
+    std::make_shared<ComponentManagerImpl>(compDesc,
+                                           mockRegistry,
+                                           framework.GetBundleContext(),
+                                           fakeLogger,
+                                           asyncWorkService,
+                                           notifier,
+                                           managers);
   EXPECT_NO_THROW({
     compMgr->Initialize();
     compMgr->Disable();
@@ -233,15 +235,14 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyDisable)
 TEST_P(ComponentManagerImplParameterizedTest, VerifyStateChangeCount)
 {
   auto compDesc = GetParam();
-  auto compMgr = std::make_shared<MockComponentManagerImpl>(
-    compDesc,
-    mockRegistry,
-    framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      framework.GetBundleContext()),
-    notifier,
-    managers);
+  auto compMgr =
+    std::make_shared<MockComponentManagerImpl>(compDesc,
+                                               mockRegistry,
+                                               framework.GetBundleContext(),
+                                               fakeLogger,
+                                               asyncWorkService,
+                                               notifier,
+                                               managers);
   EXPECT_NO_THROW({
     compMgr->Initialize();
     compMgr->ResetCounter();
@@ -258,15 +259,14 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyStateChangeCount)
 TEST_P(ComponentManagerImplParameterizedTest, VerifySequentialStateChange)
 {
   auto compDesc = GetParam();
-  auto compMgr = std::make_shared<MockComponentManagerImpl>(
-    compDesc,
-    mockRegistry,
-    framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      framework.GetBundleContext()),
-    notifier,
-    managers);
+  auto compMgr =
+    std::make_shared<MockComponentManagerImpl>(compDesc,
+                                               mockRegistry,
+                                               framework.GetBundleContext(),
+                                               fakeLogger,
+                                               asyncWorkService,
+                                               notifier,
+                                               managers);
   EXPECT_NO_THROW({
     auto prevState = compMgr->IsEnabled();
     compMgr->Initialize();
@@ -299,15 +299,14 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifySequentialStateChange)
 TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentEnable)
 {
   auto compDesc = GetParam();
-  auto compMgr = std::make_shared<MockComponentManagerImpl>(
-    compDesc,
-    mockRegistry,
-    framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      framework.GetBundleContext()),
-    notifier,
-    managers);
+  auto compMgr =
+    std::make_shared<MockComponentManagerImpl>(compDesc,
+                                               mockRegistry,
+                                               framework.GetBundleContext(),
+                                               fakeLogger,
+                                               asyncWorkService,
+                                               notifier,
+                                               managers);
 
   compMgr->Initialize();
   compMgr->Disable(); // ensure the component is in DISABLED state
@@ -335,15 +334,14 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentEnable)
 TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentDisable)
 {
   auto compDesc = GetParam();
-  auto compMgr = std::make_shared<MockComponentManagerImpl>(
-    compDesc,
-    mockRegistry,
-    framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      framework.GetBundleContext()),
-    notifier,
-    managers);
+  auto compMgr =
+    std::make_shared<MockComponentManagerImpl>(compDesc,
+                                               mockRegistry,
+                                               framework.GetBundleContext(),
+                                               fakeLogger,
+                                               asyncWorkService,
+                                               notifier,
+                                               managers);
 
   compMgr->Initialize();
   compMgr->Enable(); // ensure the component is in ENABLED state
@@ -371,15 +369,14 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentDisable)
 TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentEnableDisable)
 {
   auto compDesc = GetParam();
-  auto compMgr = std::make_shared<MockComponentManagerImpl>(
-    compDesc,
-    mockRegistry,
-    framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      framework.GetBundleContext()),
-    notifier,
-    managers);
+  auto compMgr =
+    std::make_shared<MockComponentManagerImpl>(compDesc,
+                                               mockRegistry,
+                                               framework.GetBundleContext(),
+                                               fakeLogger,
+                                               asyncWorkService,
+                                               notifier,
+                                               managers);
   compMgr->Initialize();
   // test concurrent calls to enable and disable from multiple threads
   std::function<std::shared_future<void>()> func = [compMgr]() mutable {
@@ -404,15 +401,14 @@ TEST_P(ComponentManagerImplParameterizedTest, VerifyConcurrentEnableDisable)
 TEST_P(ComponentManagerImplParameterizedTest, TestAccumulateFutures)
 {
   auto compDesc = GetParam();
-  auto compMgr = std::make_shared<MockComponentManagerImpl>(
-    compDesc,
-    mockRegistry,
-    framework.GetBundleContext(),
-    fakeLogger,
-    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      framework.GetBundleContext()),
-    notifier,
-    managers);
+  auto compMgr =
+    std::make_shared<MockComponentManagerImpl>(compDesc,
+                                               mockRegistry,
+                                               framework.GetBundleContext(),
+                                               fakeLogger,
+                                               asyncWorkService,
+                                               notifier,
+                                               managers);
 
   EXPECT_EQ(compMgr->disableFutures.size(), 0ul)
     << "Disabled futures list must be empty before any calls to "

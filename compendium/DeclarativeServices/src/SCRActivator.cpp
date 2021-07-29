@@ -52,14 +52,14 @@ void SCRActivator::Start(BundleContext context)
 {
   runtimeContext = context;
 
-  asyncWorkService = std::make_shared<SCRAsyncWorkService>(context);
-
   // Create the component registry
   componentRegistry = std::make_shared<ComponentRegistry>();
 
   // Create the Logger object used by this runtime
   logger = std::make_shared<SCRLogger>(context);
   logger->Log(SeverityLevel::LOG_DEBUG, "Starting SCR bundle");
+
+  asyncWorkService = std::make_shared<SCRAsyncWorkService>(context, logger);
 
   // Create configuration object notifier
   configNotifier =

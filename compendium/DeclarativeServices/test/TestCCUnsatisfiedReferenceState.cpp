@@ -32,7 +32,6 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 
-
 namespace cppmicroservices {
 namespace scrimpl {
 
@@ -51,9 +50,10 @@ protected:
     mockMetadata->serviceMetadata.interfaces.push_back("Service::Interface");
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
     auto fakeLogger = std::make_shared<FakeLogger>();
+    auto logger = std::make_shared<SCRLogger>(framework.GetBundleContext());
     auto asyncWorkService =
       std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-        framework.GetBundleContext());
+        framework.GetBundleContext(), logger);
     auto notifier = std::make_shared<ConfigurationNotifier>(
       framework.GetBundleContext(), fakeLogger, asyncWorkService);
     auto managers =

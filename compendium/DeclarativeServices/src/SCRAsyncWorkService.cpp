@@ -32,12 +32,10 @@ namespace scrimpl {
 
 /**
  * SCRAsyncWorkServiceDetail represents the fallback strategy in the event
- * that a AsyncWorkService is not present within the framework. It starts
- * in an "enabled" state when the SCRAsyncWorkService is initially created
- * and enters a disabled state once a valid service has been found (allowing 
- * threaded operations to be handled by the registered service). If that service
- * is then removed, the SCRAsyncWorkServiceDetail class becoems "enabled" and
- * threading operations will use the fallback strategy.
+ * that a AsyncWorkService is not present within the framework. It implements
+ * the public interface for AsyncWorkService and is created in the event that
+ * a user-provided service was not given or if the user-provided service
+ * which implements the AsyncWorkService interface was unregistered.
  */
 class SCRAsyncWorkServiceDetail
   : public cppmicroservices::async::detail::AsyncWorkService
@@ -47,15 +45,11 @@ public:
 
   void Initialize()
   {
-    //std::lock_guard<std::mutex> lock(poolOperationMutex);
-    //US_UNUSED(lock);
     threadpool = std::make_shared<boost::asio::thread_pool>(2);
   }
 
   void Shutdown()
   {
-    //std::lock_guard<std::mutex> lock(poolOperationMutex);
-    //US_UNUSED(lock);
     try {
       if (threadpool) {
         try {
@@ -75,8 +69,6 @@ public:
 
   void post(std::packaged_task<void()>&& task) override
   {
-    //std::lock_guard<std::mutex> lock(poolOperationMutex);
-    //US_UNUSED(lock);
     if (threadpool) {
       using Sig = void();
       using Result = boost::asio::async_result<decltype(task), Sig>;
@@ -93,16 +85,17 @@ public:
 
 private:
   std::shared_ptr<boost::asio::thread_pool> threadpool;
-  std::mutex poolOperationMutex;
 };
 
 SCRAsyncWorkService::SCRAsyncWorkService(
-  cppmicroservices::BundleContext context)
+  cppmicroservices::BundleContext context,
+  std::shared_ptr<SCRLogger>& logger_)
   : scrContext(context)
   , serviceTracker(
       std::make_unique<cppmicroservices::ServiceTracker<
         cppmicroservices::async::detail::AsyncWorkService>>(context, this))
   , asyncWorkService(std::make_shared<SCRAsyncWorkServiceDetail>())
+  , logger(logger_)
 {
   serviceTracker->Open();
 }
@@ -137,7 +130,12 @@ SCRAsyncWorkService::AddingService(
         std::atomic_store(&asyncWorkService, newService);
       }
     } catch (...) {
-      //
+      std::string msg = "An exception occured while trying to get the "
+                        "user-provided implement of AsyncWorkService. "
+                        "Defaulting to the provided fallback "
+                        "solution";
+      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                  msg);
     }
   }
   return newService;

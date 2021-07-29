@@ -31,7 +31,6 @@
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
 
-
 #define str(s) #s
 #define xstr(s) str(s)
 
@@ -72,9 +71,11 @@ TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
+  auto logger = std::make_shared<cppmicroservices::scrimpl::SCRLogger>(
+    GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto bundleContext = GetFramework().GetBundleContext();
   auto notifier = std::make_shared<ConfigurationNotifier>(
     bundleContext, fakeLogger, asyncWorkService);
@@ -140,9 +141,11 @@ TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
     .WillOnce(testing::Return(true));
   EXPECT_CALL(*mockRegistry, RemoveComponentManager(testing::_)).Times(1);
   auto fakeLogger = std::make_shared<FakeLogger>();
+  auto logger = std::make_shared<cppmicroservices::scrimpl::SCRLogger>(
+    GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   EXPECT_NO_THROW({

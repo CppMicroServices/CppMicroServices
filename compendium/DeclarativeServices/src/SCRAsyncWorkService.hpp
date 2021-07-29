@@ -23,6 +23,7 @@
 #ifndef __SCRASYNCWORKSERVICE_HPP__
 #define __SCRASYNCWORKSERVICE_HPP__
 
+#include "SCRLogger.hpp"
 #include <cppmicroservices/ServiceTracker.h>
 #include <cppmicroservices/asyncworkservice/AsyncWorkService.hpp>
 
@@ -47,7 +48,8 @@ class SCRAsyncWorkService
       cppmicroservices::async::detail::AsyncWorkService>
 {
 public:
-  explicit SCRAsyncWorkService(cppmicroservices::BundleContext context);
+  explicit SCRAsyncWorkService(cppmicroservices::BundleContext context,
+                               std::shared_ptr<SCRLogger>& logger_);
   SCRAsyncWorkService(const SCRAsyncWorkService&) = delete;
   SCRAsyncWorkService(SCRAsyncWorkService&&) = delete;
   SCRAsyncWorkService& operator=(const SCRAsyncWorkService&) = delete;
@@ -84,6 +86,7 @@ private:
     serviceTracker;
   std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
     asyncWorkService;
+  std::shared_ptr<SCRLogger> logger;
 };
 }
 }

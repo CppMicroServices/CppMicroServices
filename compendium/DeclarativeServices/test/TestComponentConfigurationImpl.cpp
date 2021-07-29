@@ -71,9 +71,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyCtor)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   auto managers =
@@ -123,9 +124,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyUniqueId)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   auto managers =
@@ -180,9 +182,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefSatisfied)
   auto mockFactory = std::make_shared<MockFactory>();
   auto mockCompInstance = std::make_shared<MockComponentInstance>();
   auto bc = GetFramework().GetBundleContext();
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier =
     std::make_shared<ConfigurationNotifier>(bc, fakeLogger, asyncWorkService);
   auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(
@@ -219,9 +222,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefUnsatisfied)
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(
@@ -275,9 +279,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyRefChangedState)
     us_service_interface_iid<dummy::ServiceImpl>()
   };
   mockMetadata->refsMetadata.push_back(refMetadata);
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
 
@@ -299,9 +304,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   auto managers =
@@ -332,9 +338,11 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
       us_service_interface_iid<dummy::ServiceImpl>()
     };
     auto mockFactory = std::make_shared<MockFactory>();
+    auto logger =
+      std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
     auto asyncWorkService =
       std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-        GetFramework().GetBundleContext());
+        GetFramework().GetBundleContext(), logger);
     auto notifier = std::make_shared<ConfigurationNotifier>(
       GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
     auto managers =
@@ -371,9 +379,11 @@ TEST_F(ComponentConfigurationImplTest, VerifyRegister)
     mockMetadata->immediate = true;
     auto mockFactory = std::make_shared<MockFactory>();
     auto mockCompInstance = std::make_shared<MockComponentInstance>();
+    auto logger =
+      std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
     auto asyncWorkService =
       std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-        GetFramework().GetBundleContext());
+        GetFramework().GetBundleContext(), logger);
     auto notifier = std::make_shared<ConfigurationNotifier>(
       GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
     auto managers =
@@ -411,9 +421,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeDelegation)
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto mockState = std::make_shared<MockComponentConfigurationState>();
   auto fakeLogger = std::make_shared<FakeLogger>();
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   auto managers =
@@ -444,9 +455,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyActivate_Success)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   auto managers =
@@ -469,9 +481,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyActivate_Failure)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   auto managers =
@@ -494,9 +507,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyDeactivate)
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   auto managers =
@@ -554,9 +568,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentRegisterDeactivate)
                                                "interface" };
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   auto managers =
@@ -616,9 +631,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyConcurrentActivateDeactivate)
   auto mockRegistry = std::make_shared<MockComponentRegistry>();
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto mockCompInstance = std::make_shared<MockComponentInstance>();
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   auto managers =
@@ -659,9 +675,11 @@ TEST_F(ComponentConfigurationImplTest, VerifyImmediateComponent)
     mockMetadata->immediate = true;
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
     auto fakeLogger = std::make_shared<FakeLogger>();
+    auto logger =
+      std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
     auto asyncWorkService =
       std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-        GetFramework().GetBundleContext());
+        GetFramework().GetBundleContext(), logger);
     auto notifier = std::make_shared<ConfigurationNotifier>(
       GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
     auto managers =
@@ -698,9 +716,11 @@ TEST_F(ComponentConfigurationImplTest, VerifyDelayedComponent)
     auto fakeLogger = std::make_shared<FakeLogger>();
     auto mockCompInstance = std::make_shared<MockComponentInstance>();
     auto mockFactory = std::make_shared<MockFactory>();
+    auto logger =
+      std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
     auto asyncWorkService =
       std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-        GetFramework().GetBundleContext());
+        GetFramework().GetBundleContext(), logger);
     auto notifier = std::make_shared<ConfigurationNotifier>(
       GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
     auto managers =
@@ -762,9 +782,10 @@ TEST_F(ComponentConfigurationImplTest, TestGetDependencyManagers)
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto mockCompInstance = std::make_shared<MockComponentInstance>();
   auto mockFactory = std::make_shared<MockFactory>();
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext());
+      GetFramework().GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   auto managers =

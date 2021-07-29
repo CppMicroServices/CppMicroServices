@@ -403,8 +403,6 @@
    fun:allocate_dtv
    fun:_dl_allocate_tls
    fun:allocate_stack
-   fun:pthread_create@@GLIBC_2.2.5
-   fun:_ZNSt12__shared_ptrIN16cppmicroservices7scrimpl25SCRAsyncWorkServiceDetailELN9__gnu_cxx12_Lock_policyE2EEC1ISaIS2_EIEEESt19_Sp_make_shared_tagRKT_DpOT0_
    ...
 }
 

@@ -198,8 +198,8 @@ function(usFunctionEmbedResources)
     elseif(UNIX)
       add_custom_command(
         OUTPUT ${_source_output}
-        COMMAND ${CMAKE_CXX_COMPILER} -Wl,--format=binary -Wl,${_zip_archive_name} -Wl,--format=default ${_source_output}
-        #COMMAND ${CMAKE_OBJCOPY} --rename-section .data=.us_resources,alloc,load,readonly,data,contents ${_source_output} ${_source_output}
+        COMMAND ${CMAKE_CXX_COMPILER} -r -b binary -o ${_source_output} ${_zip_archive_name}
+        COMMAND ${CMAKE_OBJCOPY} --rename-section .data=.us_resources,alloc,load,readonly,data,contents ${_source_output} ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}
         COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"

@@ -42,19 +42,19 @@ class SCRAsyncWorkServiceDetail;
  * so that other classes within the runtime can easily use a mock async work service for
  * testing purposes.
  */
-class SCRAsyncWorkService
+class SCRAsyncWorkService final
   : public cppmicroservices::async::detail::AsyncWorkService
   , public cppmicroservices::ServiceTrackerCustomizer<
       cppmicroservices::async::detail::AsyncWorkService>
 {
 public:
   explicit SCRAsyncWorkService(cppmicroservices::BundleContext context,
-                               std::shared_ptr<SCRLogger>& logger_);
-  SCRAsyncWorkService(const SCRAsyncWorkService&) = delete;
-  SCRAsyncWorkService(SCRAsyncWorkService&&) = delete;
-  SCRAsyncWorkService& operator=(const SCRAsyncWorkService&) = delete;
-  SCRAsyncWorkService& operator=(SCRAsyncWorkService&&) = delete;
-  ~SCRAsyncWorkService() override;
+                               const std::shared_ptr<SCRLogger>& logger_);
+  SCRAsyncWorkService(const SCRAsyncWorkService&) noexcept = delete;
+  SCRAsyncWorkService(SCRAsyncWorkService&&) noexcept = delete;
+  SCRAsyncWorkService& operator=(const SCRAsyncWorkService&) noexcept = delete;
+  SCRAsyncWorkService& operator=(SCRAsyncWorkService&&) noexcept = delete;
+  ~SCRAsyncWorkService() noexcept override;
 
   // methods from the cppmicroservices::async::detail::AsyncWorkService interface
   void post(std::packaged_task<void()>&& task) override;

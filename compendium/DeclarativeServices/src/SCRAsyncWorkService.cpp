@@ -31,17 +31,22 @@ namespace cppmicroservices {
 namespace scrimpl {
 
 /**
- * SCRAsyncWorkServiceDetail represents the fallback strategy in the event
+ * FallbackAsyncWorkService represents the fallback strategy in the event
  * that a AsyncWorkService is not present within the framework. It implements
  * the public interface for AsyncWorkService and is created in the event that
  * a user-provided service was not given or if the user-provided service
  * which implements the AsyncWorkService interface was unregistered.
  */
-class SCRAsyncWorkServiceDetail
+class FallbackAsyncWorkService final
   : public cppmicroservices::async::detail::AsyncWorkService
 {
 public:
-  SCRAsyncWorkServiceDetail() { Initialize(); }
+  FallbackAsyncWorkService(
+    const std::shared_ptr<cppmicroservices::logservice::LogService>& logger_)
+    : logger(logger_)
+  {
+    Initialize();
+  }
 
   void Initialize()
   {
@@ -50,22 +55,23 @@ public:
 
   void Shutdown()
   {
-    try {
-      if (threadpool) {
-        try {
-          threadpool->join();
-          threadpool->stop();
-          threadpool.reset();
-        } catch (...) {
-          //
-        }
+    if (threadpool) {
+      try {
+        threadpool->join();
+        threadpool->stop();
+        threadpool.reset();
+      } catch (...) {
+        std::string msg =
+          "An exception has occured while trying to shutdown "
+          "the fallback cppmicroservices::async::detail::AsyncWorkService "
+          "instance.";
+        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                    msg);
       }
-    } catch (...) {
-      //
     }
   }
 
-  ~SCRAsyncWorkServiceDetail() { Shutdown(); }
+  ~FallbackAsyncWorkService() { Shutdown(); }
 
   void post(std::packaged_task<void()>&& task) override
   {
@@ -85,16 +91,17 @@ public:
 
 private:
   std::shared_ptr<boost::asio::thread_pool> threadpool;
+  std::shared_ptr<cppmicroservices::logservice::LogService> logger;
 };
 
 SCRAsyncWorkService::SCRAsyncWorkService(
   cppmicroservices::BundleContext context,
-  std::shared_ptr<SCRLogger>& logger_)
+  const std::shared_ptr<SCRLogger>& logger_)
   : scrContext(context)
   , serviceTracker(
       std::make_unique<cppmicroservices::ServiceTracker<
         cppmicroservices::async::detail::AsyncWorkService>>(context, this))
-  , asyncWorkService(std::make_shared<SCRAsyncWorkServiceDetail>())
+  , asyncWorkService(std::make_shared<FallbackAsyncWorkService>(logger_))
   , logger(logger_)
 {
   serviceTracker->Open();
@@ -129,11 +136,12 @@ SCRAsyncWorkService::AddingService(
       if (newService) {
         std::atomic_store(&asyncWorkService, newService);
       }
-    } catch (...) {
-      std::string msg = "An exception occured while trying to get the "
-                        "user-provided implement of AsyncWorkService. "
-                        "Defaulting to the provided fallback "
-                        "solution";
+    } catch (const std::exception& ex) {
+      std::string msg = "An exception with the message \"";
+      msg += ex.what();
+      msg += "\" was caught while retrieving an instance of "
+             "cppmicroservices::async::detail::AsyncWorkService. Falling "
+             "back to the default.";
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                   msg);
     }
@@ -160,7 +168,7 @@ void SCRAsyncWorkService::RemovedService(
   if (service == currAsync) {
     // replace existing asyncWorkService with a nullptr asyncWorkService
     std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
-      newService = std::make_shared<SCRAsyncWorkServiceDetail>();
+      newService = std::make_shared<FallbackAsyncWorkService>(logger);
     std::atomic_store(&asyncWorkService, newService);
   }
 }

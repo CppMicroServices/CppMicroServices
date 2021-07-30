@@ -26,7 +26,6 @@
 #include "SCRAsyncWorkService.hpp"
 #include "SCRBundleExtension.hpp"
 #include "SCRLogger.hpp"
-#include "boost/asio/thread_pool.hpp"
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleEvent.h"

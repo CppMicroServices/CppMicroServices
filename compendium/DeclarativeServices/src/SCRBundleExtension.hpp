@@ -23,7 +23,6 @@
 #ifndef __SCRBUNDLEEXTENSION_HPP__
 #define __SCRBUNDLEEXTENSION_HPP__
 
-#include "boost/asio/thread_pool.hpp"
 #include <memory>
 #if defined(USING_GTEST)
 #  include "gtest/gtest_prod.h"
@@ -37,7 +36,6 @@
 #include "manager/ComponentManager.hpp"
 #include "manager/ConfigurationNotifier.hpp"
 #include "metadata/Util.hpp"
-
 
 using cppmicroservices::logservice::LogService;
 

@@ -19,7 +19,6 @@ function(usFunctionCheckResourceLinking)
         COMMAND ${CMAKE_LINKER} -r -b binary -o "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o" "${CMAKE_COMMAND}"
         RESULT_VARIABLE _result
       )
-      
       if(_result EQUAL 0)
         set(_linking_available 1)
       endif()

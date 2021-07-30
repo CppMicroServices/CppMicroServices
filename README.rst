@@ -197,8 +197,6 @@ file for details about the contribution process.
    :target: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/buildandtest.yml
 .. |Windows Build status| image:: https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/master.svg?style=flat-square&label=Windows
    :target: https://ci.appveyor.com/project/cppmicroservices/cppmicroservices/branch/master
-.. |Linux Build Status (development)| image:: https://img.shields.io/travis/CppMicroServices/CppMicroServices/development.svg?style=flat-square&label=Linux%20%26%20OS%20X
-   :target: https://travis-ci.org/CppMicroServices/CppMicroServices
 .. |Windows Build status (development)| image:: https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/development.svg?style=flat-square&label=Windows
    :target: https://ci.appveyor.com/project/cppmicroservices/cppmicroservices/branch/development
 .. |Coverity Scan Build Status| image:: https://img.shields.io/coverity/scan/1329.svg?style=flat-square

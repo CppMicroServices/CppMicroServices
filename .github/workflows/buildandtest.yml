@@ -34,7 +34,7 @@ jobs:
         sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-5 g++-5 valgrind
       
     - name: Configure Build and Test
-      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_travis.cmake
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
       env:
          CC: gcc-5
          CXX: g++-5
@@ -55,7 +55,7 @@ jobs:
       run: sudo apt-get -yq --no-install-suggests --no-install-recommends install valgrind
       
     - name: Configure Build and Test
-      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_travis.cmake
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
       env:
          CC: clang
          CXX: clang++
@@ -86,7 +86,7 @@ jobs:
       if: ${{matrix.os == 'ubuntu-18.04'}}
 
     - name: Configure Build And Test
-      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_travis.cmake
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
       env: 
          BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
       

@@ -5,9 +5,9 @@ pull_requests:
   do_not_increment_build_number: true
 
 branches:
-  except:
-  - coverity_scan
-  - gh_pages
+  only:
+  - master
+  - development
 
 skip_tags: true
 
@@ -171,4 +171,3 @@ after_test:
 test_script:
 - cd %APPVEYOR_BUILD_FOLDER%/build
 - ctest -j2 -C %CONFIGURATION% --output-on-failure
-

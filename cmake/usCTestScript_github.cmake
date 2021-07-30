@@ -13,7 +13,12 @@ else()
   set(CTEST_DASHBOARD_ROOT "/tmp/us_builds")
 endif()
 
+if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+  # gcc in combination with gcov seems to consume a lot of memory
+  # and may lead to errors when building in CI. Hence we compile
+  # with -j for non-GNU compilers only.
 set(CTEST_BUILD_FLAGS "-j")
+endif()
 
 set(CTEST_CONFIGURATION_TYPE Release)
 set(CTEST_BUILD_CONFIGURATION Release)

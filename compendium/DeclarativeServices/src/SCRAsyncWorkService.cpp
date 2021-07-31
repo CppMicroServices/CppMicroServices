@@ -107,7 +107,7 @@ SCRAsyncWorkService::SCRAsyncWorkService(
   serviceTracker->Open();
 }
 
-SCRAsyncWorkService::~SCRAsyncWorkService()
+SCRAsyncWorkService::~SCRAsyncWorkService() noexcept
 {
   asyncWorkService.reset();
 }

@@ -38,6 +38,24 @@ jobs:
       env:
          CC: gcc-5
          CXX: g++-5
+
+  gcc_tsan_build:
+    name: Build and test with gcc and tsan (no memcheck)
+    runs-on: ubuntu-18.04
+    env:
+       BUILD_CONFIGURATION: 0
+       WITH_COVERAGE: 0
+       WITH_MEMCHECK: 0
+       WITH_TSAN: 1
+       TSAN_OPTIONS: "suppressions=${{github.workspace}}/tsan_suppressions.txt"
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Configure Build and Test
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_travis.cmake
   
   # linux_clang_build:
   #   name: Build and test on supported clang compiler

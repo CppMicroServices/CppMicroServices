@@ -47,6 +47,7 @@ jobs:
        WITH_COVERAGE: 0
        WITH_MEMCHECK: 0
        WITH_TSAN: 1
+       TSAN_OPTIONS: "suppressions=${{github.workspace}}/tsan_suppressions.txt"
 
     steps:
     - uses: actions/checkout@v2

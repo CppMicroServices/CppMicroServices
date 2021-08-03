@@ -1,0 +1,6 @@
+# ServiceTracker/ServiceListener races
+race:cppmicroservices::ServiceListeners::RemoveServiceListener
+race:cppmicroservices::ServiceTracker*
+
+# Potential Deadlock in CCACtiveState
+deadlock:cppmicroservices::scrimpl::CCActiveState::Activate

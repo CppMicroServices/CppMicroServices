@@ -61,12 +61,14 @@ public:
         threadpool->stop();
         threadpool.reset();
       } catch (...) {
+        auto exceptionPtr = std::current_exception();
         std::string msg =
           "An exception has occured while trying to shutdown "
           "the fallback cppmicroservices::async::detail::AsyncWorkService "
           "instance.";
         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
-                    msg);
+                    msg,
+                    exceptionPtr);
       }
     }
   }
@@ -136,14 +138,15 @@ SCRAsyncWorkService::AddingService(
       if (newService) {
         std::atomic_store(&asyncWorkService, newService);
       }
-    } catch (const std::exception& ex) {
-      std::string msg = "An exception with the message \"";
-      msg += ex.what();
-      msg += "\" was caught while retrieving an instance of "
-             "cppmicroservices::async::detail::AsyncWorkService. Falling "
-             "back to the default.";
+    } catch (...) {
+      auto exceptionPtr = std::current_exception();
+      std::string msg =
+        "An exception was caught while retrieving an instance of "
+        "cppmicroservices::async::detail::AsyncWorkService. Falling "
+        "back to the default.";
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
-                  msg);
+                  msg,
+                  exceptionPtr);
     }
   }
   return newService;

@@ -38,27 +38,45 @@ jobs:
       env:
          CC: gcc-5
          CXX: g++-5
-  
-  linux_clang_build:
-    name: Build and test on supported clang compiler
+
+  gcc_tsan_build:
+    name: Build and test with gcc and tsan (no memcheck)
     runs-on: ubuntu-18.04
     env:
        BUILD_CONFIGURATION: 0
        WITH_COVERAGE: 0
+       WITH_MEMCHECK: 0
+       WITH_TSAN: 1
+       TSAN_OPTIONS: "suppressions=${{github.workspace}}/tsan_suppressions.txt"
 
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: true
-    
-    - name: Install dependencies
-      run: sudo apt-get -yq --no-install-suggests --no-install-recommends install valgrind
-      
+
     - name: Configure Build and Test
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
-      env:
-         CC: clang
-         CXX: clang++
+  
+  # linux_clang_build:
+  #   name: Build and test on supported clang compiler
+  #   runs-on: ubuntu-18.04
+  #   env:
+  #      BUILD_CONFIGURATION: 0
+  #      WITH_COVERAGE: 0
+
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       submodules: true
+    
+  #   - name: Install dependencies
+  #     run: sudo apt-get -yq --no-install-suggests --no-install-recommends install valgrind
+      
+  #   - name: Configure Build and Test
+  #     run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
+  #     env:
+  #        CC: clang
+  #        CXX: clang++
   
   build:
     name: Build and test on ${{matrix.os}} with build configuration ${{matrix.buildconfiguration}} 

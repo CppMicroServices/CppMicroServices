@@ -1,6 +1,5 @@
 
 macro(build_and_test)
-
   set(CTEST_SOURCE_DIRECTORY ${US_SOURCE_DIR})
   set(CTEST_BINARY_DIRECTORY "${CTEST_DASHBOARD_ROOT}/${CTEST_PROJECT_NAME}_${CTEST_DASHBOARD_NAME}")
 
@@ -14,6 +13,10 @@ macro(build_and_test)
 
   if(NOT EXISTS "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt")
     file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" "${CTEST_INITIAL_CACHE}")
+  endif()
+
+  if (WITH_TSAN)
+    set(US_ENABLE_TSAN ON)
   endif()
 
   ctest_configure(RETURN_VALUE res)

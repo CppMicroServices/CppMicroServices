@@ -327,12 +327,12 @@ TEST_F(ResourceCompilerTest, testEscapePath)
   //Test escapePath #2
   ASSERT_EQ(path2, "/tmp/foo/bar");
 
-  std::string path3("/home/travis/CppMicroServices/us builds (Unix "
+  std::string path3("/home/runner/CppMicroServices/us builds (Unix "
                     "make)/bin/usResourceCompiler");
   escapePath(path3);
   //Test escapePath #3
   ASSERT_EQ(path3,
-            "/home/travis/CppMicroServices/us\\ builds\\ "
+            "/home/runner/CppMicroServices/us\\ builds\\ "
             "\\(Unix\\ make\\)/bin/usResourceCompiler");
 
 #ifndef US_PLATFORM_WINDOWS

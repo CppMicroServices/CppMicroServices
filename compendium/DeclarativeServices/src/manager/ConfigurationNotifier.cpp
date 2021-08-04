@@ -26,6 +26,7 @@
 #include "ComponentConfigurationImpl.hpp"
 #include "ComponentManagerImpl.hpp"
 #include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 
 namespace cppmicroservices {
@@ -35,13 +36,14 @@ using cppmicroservices::scrimpl::metadata::ComponentMetadata;
 ConfigurationNotifier::ConfigurationNotifier(
   const cppmicroservices::BundleContext& context,
   std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-  std::shared_ptr<boost::asio::thread_pool> threadpool)
+  std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
+    asyncWorkService_)
   : tokenCounter(0)
   , bundleContext(context)
   , logger(std::move(logger))
-  , threadpool(std::move(threadpool))
+  , asyncWorkService(asyncWorkService_)
 {
-  if (!bundleContext || !(this->logger) || (!this->threadpool )) {
+  if (!bundleContext || !(this->logger) || (!this->asyncWorkService)) {
     throw std::invalid_argument("ConfigurationNotifier Constructor "
                                 "provided with invalid arguments");
   }
@@ -147,7 +149,7 @@ void ConfigurationNotifier::CreateFactoryComponent(
 
   newMetadata->name = pid;
   // this is a factory instance not a factory component
-  newMetadata->factoryComponentID = ""; 
+  newMetadata->factoryComponentID = "";
 
   // Factory instance is dependent on the same configurationPids as the factory
   // component except the factory component itself.
@@ -170,7 +172,7 @@ void ConfigurationNotifier::CreateFactoryComponent(
                                              registry,
                                              bundle.GetBundleContext(),
                                              logger,
-                                             threadpool,
+                                             asyncWorkService,
                                              configNotifier,
                                              managers);
     if (registry->AddComponentManager(compManager)) {

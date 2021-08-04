@@ -54,6 +54,7 @@ add_compile_definitions(BOOST_REGEX_NO_LIB)
 set(_declarativeservices_tests
   ActivatorTest.cpp
   SCRLoggerTest.cpp
+  TestAsyncWorkService.cpp
   TestCCActiveState.cpp
   TestCCRegisteredState.cpp
   TestCCUnsatisfiedReferenceState.cpp

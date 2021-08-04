@@ -187,6 +187,94 @@ public:
   cppmicroservices::BundleContext context;
 };
 
+/**
+ * This test fixture is a generic test fixture which only installs and starts
+ * DeclarativeServices. It provides helper functions, similar to tServiceComponent,
+ * which help the user get and start test bundles.
+ */
+class tGenericDSSuite : public testing::Test
+{
+public:
+  tGenericDSSuite()
+    : ::testing::Test()
+    , framework(cppmicroservices::FrameworkFactory().NewFramework())
+  {}
+
+  void TestBody() override {}
+
+  void SetUp() override
+  {
+    framework.Start();
+    context = framework.GetBundleContext();
+
+    ::test::InstallAndStartDS(context);
+
+    auto sRef = context.GetServiceReference<scr::ServiceComponentRuntime>();
+    ASSERT_TRUE(sRef);
+    dsRuntimeService = context.GetService<scr::ServiceComponentRuntime>(sRef);
+    ASSERT_TRUE(dsRuntimeService);
+  }
+
+  void TearDown() override
+  {
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+  }
+
+  cppmicroservices::Bundle GetTestBundle(const std::string& symbolicName)
+  {
+    auto bundles = context.GetBundles();
+
+    for (auto& bundle : bundles) {
+      auto bundleSymbolicName = bundle.GetSymbolicName();
+      if (symbolicName == bundleSymbolicName) {
+        return bundle;
+      }
+    }
+    return cppmicroservices::Bundle();
+  }
+
+  cppmicroservices::Bundle StartTestBundle(const std::string& symName)
+  {
+    cppmicroservices::Bundle testBundle = GetTestBundle(symName);
+    EXPECT_EQ(static_cast<bool>(testBundle), true);
+    testBundle.Start();
+    EXPECT_EQ(testBundle.GetState(), cppmicroservices::Bundle::STATE_ACTIVE)
+      << " failed to start bundle with symbolic name" + symName;
+    return testBundle;
+  }
+
+  template<class T>
+  std::shared_ptr<T> GetInstance()
+  {
+    cppmicroservices::ServiceReference<T> instanceRef;
+    std::shared_ptr<T> instance;
+    instanceRef = context.GetServiceReference<T>();
+    if (!instanceRef) {
+      return std::shared_ptr<T>();
+    }
+    return context.GetService<T>(instanceRef);
+  }
+
+  std::vector<scr::dto::ComponentConfigurationDTO> GetComponentConfigs(
+    const cppmicroservices::Bundle& testBundle,
+    const std::string& componentName,
+    scr::dto::ComponentDescriptionDTO& compDescDTO)
+  {
+    compDescDTO =
+      dsRuntimeService->GetComponentDescriptionDTO(testBundle, componentName);
+    EXPECT_EQ(compDescDTO.implementationClass, componentName)
+      << "Implementation class in the returned component description must be "
+      << componentName;
+
+    return dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+  }
+
+  std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
+  cppmicroservices::Framework framework;
+  cppmicroservices::BundleContext context;
+};
+
 }
 
 #endif /* TestFixture_h */

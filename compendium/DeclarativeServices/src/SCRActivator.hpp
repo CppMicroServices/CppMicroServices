@@ -23,9 +23,9 @@
 #ifndef SCRACTIVATOR_HPP
 #define SCRACTIVATOR_HPP
 #include "ComponentRegistry.hpp"
+#include "SCRAsyncWorkService.hpp"
 #include "SCRBundleExtension.hpp"
 #include "SCRLogger.hpp"
-#include "boost/asio/thread_pool.hpp"
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleEvent.h"
@@ -78,7 +78,7 @@ private:
   std::unordered_map<long, std::unique_ptr<SCRBundleExtension>> bundleRegistry;
   std::shared_ptr<SCRLogger> logger;
   ListenerToken bundleListenerToken;
-  std::shared_ptr<boost::asio::thread_pool> threadpool;
+  std::shared_ptr<SCRAsyncWorkService> asyncWorkService;
   cppmicroservices::ServiceRegistration<
     cppmicroservices::service::cm::ConfigurationListener>
     configListenerReg;

@@ -3,6 +3,7 @@ set(_srcs
   ConfigurationListenerImpl.cpp
   ComponentContextImpl.cpp
   ComponentRegistry.cpp
+  SCRAsyncWorkService.cpp
   SCRBundleExtension.cpp
   SCRLogger.cpp
   ServiceComponentRuntimeImpl.cpp
@@ -39,6 +40,7 @@ set(_private_headers
   ComponentContextImpl.hpp
   ComponentRegistry.hpp
   SCRActivator.hpp
+  SCRAsyncWorkService.hpp
   SCRBundleExtension.hpp
   SCRLogger.hpp
   ServiceComponentRuntimeImpl.hpp

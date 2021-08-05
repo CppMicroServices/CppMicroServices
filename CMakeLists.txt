@@ -289,7 +289,7 @@ if(NOT APPLE AND US_COMPILER_CLANG)
   # the target emulator for ld.lld to use.
   string(REGEX MATCH ".*(ld\.lld)$" _matches_lld "${CMAKE_LINKER}")
   if (NOT _matches_lld STREQUAL "")
-    set(_ADDITIONAL_LINKER_FLAGS -m elf_amd64_fbsd)
+    set(_ADDITIONAL_LINKER_FLAGS -m elf_x86_64)
   endif()
 
   # use libc++ instead of libstdc++ when using the clang/llvm toolchain

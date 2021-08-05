@@ -283,6 +283,15 @@ set(IMPORT_EXECUTABLES "${CMAKE_BINARY_DIR}/ImportExecutables.cmake" CACHE FILEP
 
 # global options based on compiler
 if(NOT APPLE AND US_COMPILER_CLANG)
+  # If we are using ld.lld instead of ld, which we will do from now on
+  # when building with clang on Linux because of a bug in CMake 3.21.1 (and possibly
+  # other version), we need to specify additional linker flags which specify
+  # the target emulator for ld.lld to use.
+  string(REGEX MATCH ".*(ld\.lld)$" _matches_lld "${CMAKE_LINKER}")
+  if (NOT _matches_lld STREQUAL "")
+    set(_ADDITIONAL_LINKER_FLAGS -m elf_amd64_fbsd)
+  endif()
+
   # use libc++ instead of libstdc++ when using the clang/llvm toolchain
   # libstdc++ shipped with GCC 4.9 does not support std::atomic operations on std::shared_ptr
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")

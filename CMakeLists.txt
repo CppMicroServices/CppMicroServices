@@ -116,6 +116,9 @@ else()
   set(US_USING_LLD OFF)
 endif()
 
+message(STATUS "Detected Linker: ${CMAKE_LINKER}")
+message(STATUS "Linker command: ${CMAKE_CXX_LINK_EXECUTABLE}")
+
 if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_VERSION})
   message(FATAL_ERROR "${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_VERSION_PRODUCT} or higher required (you are using ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}).")
 endif()
@@ -255,6 +258,10 @@ foreach(_xsan US_ENABLE_TSAN;US_ENABLE_ASAN;US_ENABLE_MSAN;US_ENABLE_UBSAN)
     set(selected_sanitizer ${_sanitizer_name})
   endif()
 endforeach()
+
+if (US_ENABLE_MSAN AND US_COMPILER_CLANG)
+  set(CMAKE_LINKER "${CMAKE_C_COMPILER}")
+endif()
 
 # If more than one sanitizer is turned on, print an error stating that only one
 # sanitizer can be turned on at any given point
@@ -637,7 +644,8 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${US_C_FLAGS_RELEASE}")
 # US Link Flags
 #-----------------------------------------------------------------------------
 
-set(US_LINK_FLAGS )
+set(US_LINK_FLAGS)
+
 if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
   foreach(_linkflag -Wl,--no-undefined)
     set(_add_flag)
@@ -653,6 +661,11 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 endif()
 
 if(NOT MSVC)
+  # If clang is used and lld is the linker, specify -fuse-ld=lld
+  if (US_COMPILER_CLANG AND US_USING_LLD)
+    set(US_LINK_FLAGS "${US_LINK_FLAGS} -fuse-ld=lld")
+  endif()
+  
   if (US_ENABLE_ASAN AND US_CXX_ASAN_FLAGS)
     set(US_ASAN_LINK_FLAGS "-fsanitize=address")
   endif()

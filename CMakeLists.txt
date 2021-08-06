@@ -230,7 +230,6 @@ us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
 us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer, Linux only)" ADVANCED)
 us_cache_var(US_ENABLE_ASAN OFF BOOL "Enable asan (address sanitizer)" ADVANCED)
 us_cache_var(US_ASAN_USER_DLL "" STRING "Path to ASAN DLL (Windows only)" ADVANCED)
-us_cache_var(US_ENABLE_LSAN OFF BOOL "Enable lsan (leak sanitizer, Linux only)" ADVANCED)
 us_cache_var(US_ENABLE_MSAN OFF BOOL "Enable msan (memory sanitizer, Clang only)" ADVANCED)
 us_cache_var(US_ENABLE_UBSAN OFF BOOL "Enable ubsan (undefined behavior sanitizer, Clang only)" ADVANCED)
 us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
@@ -245,7 +244,7 @@ endif()
 
 # Count number of sanitizers that are enabled
 set(xsan_enabled_count 0)
-foreach(_xsan US_ENABLE_TSAN;US_ENABLE_ASAN;US_ENABLE_LSAN;US_ENABLE_MSAN;US_ENABLE_UBSAN)
+foreach(_xsan US_ENABLE_TSAN;US_ENABLE_ASAN;US_ENABLE_MSAN;US_ENABLE_UBSAN)
   if (${_xsan})
     math(EXPR xsan_enabled_count "${xsan_enabled_count}+1")
     
@@ -266,7 +265,7 @@ endif()
 # If MSAN or UBSAN are turned on, make sure clang is being used. If not,
 # print an error stating that those sanitizers are only available if compiling
 # with clang and lld
-if ($<NOT:US_COMPILER_CLANG> OR $<NOT:US_USING_LLD> AND $<OR:US_ENABLE_MSAN,US_ENABLE_UBSAN>)
+if ((NOT(US_COMPILER_CLANG) OR NOT(US_USING_LLD)) AND (US_ENABLE_MSAN OR US_ENABLE_UBSAN))
   message(FATAL_ERROR "You are trying to use msan or ubsan either without clang as your compiler or \
                        lld as your linker. Please use clang and lld if you wish to use msan or ubsan")
 endif()
@@ -442,11 +441,17 @@ endif()
 
 set(US_HAVE_VISIBILITY_ATTRIBUTE 0)
 set(US_CXX11_FLAGS )
-set(US_CXX_ASAN_FLAGS)
-set(US_ASAN_LINK_FLAGS)
-set(US_CXX_TSAN_FLAGS )
-set(US_TSAN_LINK_FLAGS )
 set(US_CXX_COVERAGE_FLAGS )
+
+# Flags for all supported sanitizers
+set(US_CXX_ASAN_FLAGS "")
+set(US_ASAN_LINK_FLAGS "")
+set(US_CXX_TSAN_FLAGS "")
+set(US_TSAN_LINK_FLAGS "")
+set(US_CXX_MSAN_FLAGS "")
+set(US_MSAN_LINK_FLAGS "")
+set(US_CXX_UBSAN_FLAGS "")
+set(US_UBSAN_LINK_FLAGS "")
 
 if(MSVC)
   # Since we are compiling with boost, there exists some code which looks
@@ -538,13 +543,15 @@ else()
     set(US_CXX_FLAGS_RELEASE "${US_CXX_FLAGS_RELEASE} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2")
   endif()
 
-  if ((CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.8) OR
-      ((US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG) AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.1))
-    set(US_CXX_ASAN_FLAGS "-fsanitize=address -fno-omit-frame-pointer")
-  endif()
-
-  if(US_ENABLE_ASAN AND US_CXX_ASAN_FLAGS)
-    set(US_CXX_FLAGS "${US_CXX_ASAN_FLAGS} ${US_CXX_FLAGS}")
+  # ================================================================================
+  # Check compiler flag availability for all supported sanitizers
+  # ================================================================================
+  set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
+  set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=address")
+  usFunctionCheckCompilerFlags("-fsanitize=address -fno-omit-frame-pointer" US_CXX_ASAN_FLAGS)
+  set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
+  if(NOT US_CXX_ASAN_FLAGS AND US_ENABLE_ASAN)
+    message(WARNING "ASAN requested, but compiler does not recognize it")
   endif()
 
   set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
@@ -554,6 +561,23 @@ else()
   if(NOT US_CXX_TSAN_FLAGS AND US_ENABLE_TSAN)
     message(WARNING "TSAN requested, but compiler does not recognize it")
   endif()
+
+  set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
+  set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=memory -fsanitize-memory-track-origins -fPIE -fno-omit-frame-pointer")
+  usFunctionCheckCompilerFlags("-fsanitize=memory -fsanitize-memory-track-origins -fPIE -fno-omit-frame-pointer" US_CXX_MSAN_FLAGS)
+  set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
+  if(NOT US_CXX_MSAN_FLAGS AND US_ENABLE_MSAN)
+    message(WARNING "MSAN requested, but compiler does not recognize it")
+  endif()
+
+  set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
+  set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=undefined -fno-omit-frame-pointer")
+  usFunctionCheckCompilerFlags("-fsanitize=undefined -fno-omit-frame-pointer" US_CXX_UBSAN_FLAGS)
+  set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
+  if(NOT US_CXX_UBSAN_FLAGS AND US_ENABLE_UBSAN)
+    message(WARNING "UBSAN requested, but compiler does not recognize it")
+  endif()
+  # ================================================================================
 
   set(CMAKE_REQUIRED_LIBRARIES "-fprofile-arcs -ftest-coverage")
   usFunctionCheckCompilerFlags("-fprofile-arcs -ftest-coverage" US_CXX_COVERAGE_FLAGS)
@@ -572,12 +596,22 @@ if(MINGW)
   add_compile_options(-Wno-attributes)
 endif()
 
+# Include the selected sanitizer's flags in US_CXX_FLAGS if the compiler supports the required flags
+# Note: TSAN not included here because TSAN should only be included if US_ENABLE_THREADING_SUPPORT
+#       is turned on
+foreach(_sanitizer_short_name ASAN;MSAN;UBSAN)
+  if (US_ENABLE_${_sanitizer_short_name} AND US_CXX_${_sanitizer_short_name}_FLAGS)
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_${_sanitizer_short_name}_FLAGS}")
+  endif()
+endforeach()
+
 if(US_ENABLE_THREADING_SUPPORT)
   if(NOT MINGW)
     set(THREADS_PREFER_PTHREAD_FLAG 1)
   endif()
   find_package(Threads REQUIRED)
 
+  # Include TSAN flags in US_CXX_FLAGS if TSAN was requested and the compiler supports the flags
   if(US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_TSAN_FLAGS}")
   endif()
@@ -619,22 +653,35 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 endif()
 
 if(NOT MSVC)
+  if (US_ENABLE_ASAN AND US_CXX_ASAN_FLAGS)
+    set(US_ASAN_LINK_FLAGS "-fsanitize=address")
+  endif()
+
   if (US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
     set(US_TSAN_LINK_FLAGS "-fsanitize=thread")
   endif()
-else()
-  if (US_ENABLE_ASAN AND US_CXX_ASAN_FLAGS)
-    set(US_ASAN_LINK_FLAGS)
+
+  if (US_ENABLE_MSAN AND US_CXX_MSAN_FLAGS)
+    set(US_MSAN_LINK_FLAGS "-fsanitize=memory -pie")
+  endif()
+
+  if (US_ENABLE_UBSAN AND US_CXX_UBSAN_FLAGS)
+    set(US_UBSAN_LINK_FLAGS "-fsanitize=undefined")
   endif()
 endif()
 
+
+# Update US_LINK_FLAGS with sanitizer link flags if one was requested
+# Note: TSAN is individually checked because it should only be included
+#       if US_ENABLE_THREADING_SUPPORT is turned on
 if(US_ENABLE_THREADING_SUPPORT AND US_TSAN_LINK_FLAGS)
   set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_TSAN_LINK_FLAGS}")
 endif()
-
-if (US_ENABLE_ASAN AND US_ASAN_LINK_FLAGS)
-  set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_ASAN_LINK_FLAGS}")
-endif()
+foreach(_sanitizer_short_name ASAN;MSAN;UBSAN)
+  if (US_${_sanitizer_short_name}_LINK_FLAGS)
+    set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_${_sanitizer_short_name}_LINK_FLAGS}")
+  endif()
+endforeach()
 
 if(US_ENABLE_COVERAGE AND US_CXX_COVERAGE_FLAGS)
   # US_CXX_COVERAGE_FLAGS is used for both the compiler and the linker
@@ -699,26 +746,6 @@ endif()
 
 if(NOT US_HAVE_THREAD_LOCAL AND US_ENABLE_THREADING_SUPPORT)
   set(disabled_func "${disabled_func}thread_local support unavailable. Recursive service factory calls will not be detected. See also https://github.com/CppMicroServices/CppMicroServices/issues/213\n")
-endif()
-
-#-----------------------------------------------------------------------------
-# C++ library support
-#-----------------------------------------------------------------------------
-
-# c++11 regular expressions are used in the unit tests.
-# Currently the default C++ library for gcc < 4.9 doesn't
-# fully support c++11 regex.
-# Generalize the detection of regex and make its availability
-# conditional of whether the compiler's C++ library supports it
-# or not.
-# This can be removed once the minimum supported gcc version is 4.9
-if(NOT US_HAVE_REGEX AND US_BUILD_TESTING)
-  set(disabled_func "${disabled_func}regular expression support unavailable. Some tests will be disabled.\n")
-endif()
-
-# Print a warning summary
-if (disabled_func)
-  message(WARNING "${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_RECOMMENDED_VERSION_PRODUCT} or higher recommended (you are using ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}). The following functionality will not be available:\n${disabled_func}")
 endif()
 
 #-----------------------------------------------------------------------------

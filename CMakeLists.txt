@@ -108,6 +108,14 @@ else()
   message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")
 endif()
 
+# Detect if we are using lld, if so, set US_USING_LLD to ON, OFF otherwise
+string(REGEX MATCH ".*(ld\.lld)$" _matches_lld "${CMAKE_LINKER}")
+if (NOT _matches_lld STREQUAL "")
+  set(US_USING_LLD ON)
+else()
+  set(US_USING_LLD OFF)
+endif()
+
 if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_VERSION})
   message(FATAL_ERROR "${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_VERSION_PRODUCT} or higher required (you are using ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}).")
 endif()
@@ -219,9 +227,12 @@ us_cache_var(BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(CMAKE_DEBUG_POSTFIX d STRING "Executable and library debug name postfix" ADVANCED)
 
 us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
-us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)
+us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer, Linux only)" ADVANCED)
 us_cache_var(US_ENABLE_ASAN OFF BOOL "Enable asan (address sanitizer)" ADVANCED)
 us_cache_var(US_ASAN_USER_DLL "" STRING "Path to ASAN DLL (Windows only)" ADVANCED)
+us_cache_var(US_ENABLE_LSAN OFF BOOL "Enable lsan (leak sanitizer, Linux only)" ADVANCED)
+us_cache_var(US_ENABLE_MSAN OFF BOOL "Enable msan (memory sanitizer, Clang only)" ADVANCED)
+us_cache_var(US_ENABLE_UBSAN OFF BOOL "Enable ubsan (undefined behavior sanitizer, Clang only)" ADVANCED)
 us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
@@ -232,8 +243,37 @@ if(NOT US_ENABLE_THREADING_SUPPORT AND US_ENABLE_TSAN)
   set(US_ENABLE_TSAN OFF)
 endif()
 
-if (US_ENABLE_TSAN AND US_ENABLE_ASAN)
-  message(FATAL_ERROR "US_ENABLE_TSAN and US_ENABLE_ASAN cannot be both turned on. Please select one or the other and rerun CMake")
+# Count number of sanitizers that are enabled
+set(xsan_enabled_count 0)
+foreach(_xsan US_ENABLE_TSAN;US_ENABLE_ASAN;US_ENABLE_LSAN;US_ENABLE_MSAN;US_ENABLE_UBSAN)
+  if (${_xsan})
+    math(EXPR xsan_enabled_count "${xsan_enabled_count}+1")
+    
+    # Extract name of the enabled sanitizer and store it in selected_sanitizer
+    string(FIND "${_xsan}" "_" _sanitizer_name_start REVERSE)
+    math(EXPR _sanitizer_name_start "${_sanitizer_name_start}+1")
+    string(SUBSTRING "${_xsan}" ${_sanitizer_name_start} -1 _sanitizer_name)
+    set(selected_sanitizer ${_sanitizer_name})
+  endif()
+endforeach()
+
+# If more than one sanitizer is turned on, print an error stating that only one
+# sanitizer can be turned on at any given point
+if (xsan_enabled_count GREATER 1)
+  message(FATAL_ERROR "More than one sanitizer is enabled. Please only have one sanitizer enabled at a time.")
+endif()
+
+# If MSAN or UBSAN are turned on, make sure clang is being used. If not,
+# print an error stating that those sanitizers are only available if compiling
+# with clang and lld
+if ($<NOT:US_COMPILER_CLANG> OR $<NOT:US_USING_LLD> AND $<OR:US_ENABLE_MSAN,US_ENABLE_UBSAN>)
+  message(FATAL_ERROR "You are trying to use msan or ubsan either without clang as your compiler or \
+                       lld as your linker. Please use clang and lld if you wish to use msan or ubsan")
+endif()
+
+# Display the selected sanitizer if one was enabled
+if (NOT ${selected_sanitizer} STREQUAL "")
+  message(STATUS "Selected sanitizer: ${selected_sanitizer}")
 endif()
 
 if(WIN32 AND NOT CYGWIN)
@@ -287,8 +327,7 @@ if(NOT APPLE AND US_COMPILER_CLANG)
   # when building with clang on Linux because of a bug in CMake 3.21.1 (and possibly
   # other version), we need to specify additional linker flags which specify
   # the target emulator for ld.lld to use.
-  string(REGEX MATCH ".*(ld\.lld)$" _matches_lld "${CMAKE_LINKER}")
-  if (NOT _matches_lld STREQUAL "")
+  if (US_USING_LLD)
     set(_ADDITIONAL_LINKER_FLAGS -m elf_x86_64)
   endif()
 

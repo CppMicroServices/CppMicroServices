@@ -430,7 +430,7 @@ if(US_BUILD_TESTING)
     # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a
     # static library even if CppMicroServices is a shared library.
     set(_us_build_shared ${BUILD_SHARED_LIBS})
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    #set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     add_subdirectory(third_party/googletest)
 
     set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
@@ -555,7 +555,7 @@ else()
   # ================================================================================
   set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
   set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=address")
-  usFunctionCheckCompilerFlags("-fsanitize=address -fno-omit-frame-pointer" US_CXX_ASAN_FLAGS)
+  usFunctionCheckCompilerFlags("-O1 -fsanitize=address -fno-omit-frame-pointer" US_CXX_ASAN_FLAGS)
   set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
   if(NOT US_CXX_ASAN_FLAGS AND US_ENABLE_ASAN)
     message(WARNING "ASAN requested, but compiler does not recognize it")

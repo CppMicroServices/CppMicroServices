@@ -336,16 +336,6 @@ if(NOT APPLE AND US_COMPILER_CLANG)
   if (US_USING_LLD)
     set(_ADDITIONAL_LINKER_FLAGS -m elf_x86_64)
   endif()
-
-  # use libc++ instead of libstdc++ when using the clang/llvm toolchain
-  # libstdc++ shipped with GCC 4.9 does not support std::atomic operations on std::shared_ptr
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
-  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
-endif()
-
-if(US_COMPILER_APPLE_CLANG OR US_COMPILER_CLANG)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -620,6 +610,7 @@ if(US_ENABLE_THREADING_SUPPORT)
 
   # Include TSAN flags in US_CXX_FLAGS if TSAN was requested and the compiler supports the flags
   if(US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_TSAN_FLAGS}")
   endif()
 endif()

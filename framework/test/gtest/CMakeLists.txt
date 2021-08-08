@@ -127,13 +127,13 @@ if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
                                             COMPILE_FLAGS -Wno-deprecated-declarations)
 endif()
 
-target_link_libraries(${us_gtest_test_exe_name} PRIVATE gtest)
-target_link_libraries(${us_gtest_test_exe_name} PRIVATE gmock)
+target_link_libraries(${us_gtest_test_exe_name} PRIVATE ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(${us_gtest_test_exe_name} PRIVATE ${GMOCK_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} PRIVATE ${Framework_TARGET} usLogService)
 
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)
-  target_link_libraries(${us_gtest_test_exe_name} rt)
+  target_link_libraries(${us_gtest_test_exe_name} PRIVATE rt)
 endif()
 
 

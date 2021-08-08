@@ -71,6 +71,7 @@ set(_gtest_tests
   ResourceCompilerTest.cpp
   MultipleListenersTest.cpp
   BundleTest.cpp
+  main.cpp
 )
 
 if(BUILD_SHARED_LIBS)
@@ -105,6 +106,10 @@ usFunctionGetResourceSource(TARGET ${us_gtest_test_exe_name} OUT _additional_src
 
 add_executable(${us_gtest_test_exe_name} ${_gtest_tests} ${_additional_srcs} ${_third_party_srcs})
 
+if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
+  target_compile_options(${us_gtest_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
+endif()
+
 # Needed for ResourceCompilerTest
 add_dependencies(${us_gtest_test_exe_name} ${US_RCC_EXECUTABLE_TARGET})
 set_property(TARGET ${us_gtest_test_exe_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
@@ -122,9 +127,9 @@ if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
                                             COMPILE_FLAGS -Wno-deprecated-declarations)
 endif()
 
-target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
-target_link_libraries(${us_gtest_test_exe_name} ${GMOCK_BOTH_LIBRARIES})
-target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET} usLogService)
+target_link_libraries(${us_gtest_test_exe_name} PRIVATE gtest)
+target_link_libraries(${us_gtest_test_exe_name} PRIVATE gmock)
+target_link_libraries(${us_gtest_test_exe_name} PRIVATE ${Framework_TARGET} usLogService)
 
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)

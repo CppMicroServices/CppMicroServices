@@ -43,6 +43,10 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
 
 add_executable(${us_servicecomponent_test_exe_name} ${_servicecomponent_tests})
 
+if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
+  target_compile_options(${us_servicecomponent_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
+endif()
+
 # Disable deprecation warnings.
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR
@@ -108,4 +112,3 @@ if (WIN32 AND US_USE_SYSTEM_GTEST)
         $<TARGET_FILE_DIR:${us_servicecomponent_test_exe_name}>)
   endforeach(lib_fullpath)
 endif()
-

@@ -58,6 +58,10 @@ set(_logservice_additional_hdrs
 add_executable(${us_logservice_test_exe_name}
   ${_logservice_tests} ${_logservice_additional_srcs} ${_logservice_additional_hdrs})
 
+if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
+  target_compile_options(${us_logservice_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
+endif()
+
 if(APPLE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0.0")
     target_compile_definitions(${us_logservice_test_exe_name} PRIVATE SPDLOG_NO_TLS)

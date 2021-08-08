@@ -418,11 +418,16 @@ if(US_BUILD_TESTING)
     set(GTEST_NO_INSTALL 1)
     set(GMOCK_NO_INSTALL 1)
 
+    # This project also sets BUILD_SHARED_LIBS. We want to save what we initially
+    # set.
+    set(_us_build_shared ${BUILD_SHARED_LIBS})
     add_subdirectory(third_party/googletest)
 
     set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
     set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
     add_subdirectory(third_party/benchmark)
+
+    set(BUILD_SHARED_LIBS ${_us_build_shared} CACHE BOOL "Build shared libraries" FORCE)
   endif()
 endif()
 

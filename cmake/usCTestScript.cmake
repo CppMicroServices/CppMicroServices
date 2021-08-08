@@ -15,8 +15,16 @@ macro(build_and_test)
     file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" "${CTEST_INITIAL_CACHE}")
   endif()
 
+  if (WITH_ASAN)
+    set(US_ENABLE_ASAN ON)
+  endif()
+
   if (WITH_TSAN)
     set(US_ENABLE_TSAN ON)
+  endif()
+
+  if (WITH_UBSAN)
+    set(US_ENABLE_UBSAN ON)
   endif()
 
   ctest_configure(RETURN_VALUE res)

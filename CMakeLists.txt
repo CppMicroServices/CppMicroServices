@@ -117,7 +117,6 @@ else()
 endif()
 
 message(STATUS "Detected Linker: ${CMAKE_LINKER}")
-message(STATUS "Linker command: ${CMAKE_CXX_LINK_EXECUTABLE}")
 
 if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_VERSION})
   message(FATAL_ERROR "${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_VERSION_PRODUCT} or higher required (you are using ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}).")
@@ -568,8 +567,8 @@ else()
   endif()
 
   set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
-  set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=undefined -fno-omit-frame-pointer")
-  usFunctionCheckCompilerFlags("-fsanitize=undefined -fno-omit-frame-pointer" US_CXX_UBSAN_FLAGS)
+  set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer")
+  usFunctionCheckCompilerFlags("-fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer" US_CXX_UBSAN_FLAGS)
   set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
   if(NOT US_CXX_UBSAN_FLAGS AND US_ENABLE_UBSAN)
     message(WARNING "UBSAN requested, but compiler does not recognize it")

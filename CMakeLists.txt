@@ -193,7 +193,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 
   # Set the possible values of build type for cmake-gui
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
-               STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+	       STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -255,7 +255,7 @@ set(xsan_enabled_count 0)
 foreach(_xsan US_ENABLE_TSAN;US_ENABLE_ASAN;US_ENABLE_MSAN;US_ENABLE_UBSAN)
   if (${_xsan})
     math(EXPR xsan_enabled_count "${xsan_enabled_count}+1")
-    
+
     # Extract name of the enabled sanitizer and store it in selected_sanitizer
     string(FIND "${_xsan}" "_" _sanitizer_name_start REVERSE)
     math(EXPR _sanitizer_name_start "${_sanitizer_name_start}+1")
@@ -275,7 +275,7 @@ endif()
 # with clang and lld
 if ((NOT(US_COMPILER_CLANG) OR NOT(US_USING_LLD)) AND (US_ENABLE_MSAN OR US_ENABLE_UBSAN))
   message(FATAL_ERROR "You are trying to use msan or ubsan either without clang as your compiler or \
-                       lld as your linker. Please use clang and lld if you wish to use msan or ubsan")
+		       lld as your linker. Please use clang and lld if you wish to use msan or ubsan")
 endif()
 
 # Display the selected sanitizer if one was enabled
@@ -339,6 +339,13 @@ if(NOT APPLE AND US_COMPILER_CLANG)
   endif()
 endif()
 
+if (APPLE AND US_COMPILER_APPLE_CLANG)
+  message(WARNING "HERE")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+endif()
+
 #-----------------------------------------------------------------------------
 # Testing configuration
 #-----------------------------------------------------------------------------
@@ -356,7 +363,7 @@ function(us_add_tests test_driver)
       # By default, these tests are not active until the concurrent bundle
       # start / stop mechanism has been properly implemented (GitHub Issue #25)
       add_test(NAME helgrind_${test} COMMAND ${US_MEMCHECK_COMMAND} --tool=helgrind --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
-        WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
+	WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
       set_property(TEST helgrind_${test} PROPERTY LABELS valgrind helgrind)
     endif()
   endif()
@@ -365,8 +372,8 @@ function(us_add_tests test_driver)
     file(TO_NATIVE_PATH ${US_RUNTIME_OUTPUT_DIRECTORY} US_RUNTIME_OUTPUT_NATIVE_DIRECTORY)
     # skip the unicode test bundle because opencppcoverage tool fails if a module is located in a path with unicode characters
     add_test(NAME coverage_${test}
-             COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception --excluded_modules *TestBundleU*.dll -- $<TARGET_FILE:${test_driver}> ${test}
-             WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
+	     COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception --excluded_modules *TestBundleU*.dll -- $<TARGET_FILE:${test_driver}> ${test}
+	     WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
     set_property(TEST coverage_${test} PROPERTY LABELS opencppcoverage)
   endif()
   endforeach()
@@ -500,8 +507,8 @@ else()
   endif()
 
   foreach(_cxxflag  -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
-                    -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
-                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option )
+		    -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
+		    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option )
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 
@@ -656,7 +663,7 @@ if(NOT MSVC)
   if (US_COMPILER_CLANG AND US_USING_LLD)
     set(US_LINK_FLAGS "${US_LINK_FLAGS} -fuse-ld=lld")
   endif()
-  
+
   if (US_ENABLE_ASAN AND US_CXX_ASAN_FLAGS)
     set(US_ASAN_LINK_FLAGS "-fsanitize=address")
   endif()
@@ -831,8 +838,8 @@ add_subdirectory(doc)
 if(NOT US_NO_INSTALL)
 
 install(EXPORT ${PROJECT_NAME}Targets
-        FILE ${PROJECT_NAME}Targets.cmake
-        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+	FILE ${PROJECT_NAME}Targets.cmake
+	DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
 
   set(_install_cmake_scripts
     ${US_BUNDLE_INIT_TEMPLATE}
@@ -846,10 +853,10 @@ install(EXPORT ${PROJECT_NAME}Targets
     )
 
   install(FILES ${_install_cmake_scripts}
-          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+	  DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
 
   install(FILES ${global_config_h_file}
-          DESTINATION ${HEADER_INSTALL_DIR}/${PROJECT_NAME_LOWER})
+	  DESTINATION ${HEADER_INSTALL_DIR}/${PROJECT_NAME_LOWER})
 
   # Configure CppMicroServicesConfig.cmake for the install tree
   set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})
@@ -865,9 +872,9 @@ install(EXPORT ${PROJECT_NAME}Targets
     )
 
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
-                ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
-          ${US_SDK_INSTALL_COMPONENT}
+		${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+	  DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
+	  ${US_SDK_INSTALL_COMPONENT}
     )
 
 endif()

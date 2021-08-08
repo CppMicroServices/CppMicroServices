@@ -244,6 +244,12 @@ if(NOT US_ENABLE_THREADING_SUPPORT AND US_ENABLE_TSAN)
   set(US_ENABLE_TSAN OFF)
 endif()
 
+if (US_ENABLE_MSAN)
+  message(FATAL_ERROR "Currently MSAN is not supported for CppMicroServices. Enabling \
+it requires that we link against a msan-instrumented libc++ or libstdc++. The CMake infrasture \
+still exists in the event we decide to fully implement it later")
+endif()
+
 # Count number of sanitizers that are enabled
 set(xsan_enabled_count 0)
 foreach(_xsan US_ENABLE_TSAN;US_ENABLE_ASAN;US_ENABLE_MSAN;US_ENABLE_UBSAN)
@@ -257,10 +263,6 @@ foreach(_xsan US_ENABLE_TSAN;US_ENABLE_ASAN;US_ENABLE_MSAN;US_ENABLE_UBSAN)
     set(selected_sanitizer ${_sanitizer_name})
   endif()
 endforeach()
-
-if (US_ENABLE_MSAN AND US_COMPILER_CLANG)
-  set(CMAKE_LINKER "${CMAKE_C_COMPILER}")
-endif()
 
 # If more than one sanitizer is turned on, print an error stating that only one
 # sanitizer can be turned on at any given point
@@ -559,8 +561,8 @@ else()
   endif()
 
   set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
-  set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=memory -fsanitize-memory-track-origins -fPIE -fno-omit-frame-pointer")
-  usFunctionCheckCompilerFlags("-fsanitize=memory -fsanitize-memory-track-origins -fPIE -fno-omit-frame-pointer" US_CXX_MSAN_FLAGS)
+  set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=memory -fsanitize-memory-track-origins=2 -fPIE -fno-omit-frame-pointer")
+  usFunctionCheckCompilerFlags("-fsanitize=memory -fsanitize-memory-track-origins=2 -fPIE -fno-omit-frame-pointer" US_CXX_MSAN_FLAGS)
   set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
   if(NOT US_CXX_MSAN_FLAGS AND US_ENABLE_MSAN)
     message(WARNING "MSAN requested, but compiler does not recognize it")
@@ -665,7 +667,7 @@ if(NOT MSVC)
   endif()
 
   if (US_ENABLE_MSAN AND US_CXX_MSAN_FLAGS)
-    set(US_MSAN_LINK_FLAGS "-fsanitize=memory -pie")
+    set(US_MSAN_LINK_FLAGS "-fsanitize=memory")
   endif()
 
   if (US_ENABLE_UBSAN AND US_CXX_UBSAN_FLAGS)

@@ -15,17 +15,10 @@ function(usFunctionCheckResourceLinking)
       set(_linking_available 1)
       set(_suffix .rc)
     elseif(UNIX)
-      if (US_COMPILER_CLANG AND US_ENABLE_MSAN)
-        execute_process(
-          COMMAND ${CMAKE_C_COMPILER} -r -o "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o" -Wl,--format=binary "${CMAKE_COMMAND}"
-          RESULT_VARIABLE _result
-          )
-      else()
-        execute_process(
-          COMMAND ${CMAKE_LINKER} -r -o "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o" ${_ADDITIONAL_LINKER_FLAGS} --format=binary "${CMAKE_COMMAND}"
-          RESULT_VARIABLE _result
-          )
-      endif()
+      execute_process(
+        COMMAND ${CMAKE_LINKER} -r -o "${CMAKE_CURRENT_BINARY_DIR}/us_resource_link.o" ${_ADDITIONAL_LINKER_FLAGS} --format=binary "${CMAKE_COMMAND}"
+        RESULT_VARIABLE _result
+        )
       
       if(_result EQUAL 0)
         set(_linking_available 1)

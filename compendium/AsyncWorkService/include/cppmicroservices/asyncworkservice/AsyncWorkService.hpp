@@ -67,4 +67,4 @@ public:
 }
 }
 
-#endif
+#endif // CPPMICROSERVICES_ASYNC_WORK_SERVICE_H__

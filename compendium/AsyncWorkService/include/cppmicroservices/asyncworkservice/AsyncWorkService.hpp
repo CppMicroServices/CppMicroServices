@@ -41,7 +41,7 @@ public:
   virtual ~AsyncWorkService();
 
   /**
-   * Run a std::packaged_task<void()> asynchronously on another thread.
+   * Run a std::packaged_task<void()> (optionally on another thread asynchronously).
    * The std::future<void> associated with the std::packaged_task<void()> task
    * object will contain the result from the task object.
    * 
@@ -50,6 +50,7 @@ public:
    * 
    * @note The caller is required to manage the std::future<void> associated
    * with the std::packaged_task<void()> in order to wait on the async task.
+   * 
    */
   virtual void post(std::packaged_task<void()>&& task) = 0;
 };

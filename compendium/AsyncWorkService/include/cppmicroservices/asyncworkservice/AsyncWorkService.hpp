@@ -65,8 +65,8 @@ public:
    */
   virtual void post(std::packaged_task<void()>&& task) = 0;
 };
-}
-}
-}
+} // namespace detail
+} // namespace async
+} // namespace cppmicroservices
 
-#endif
+#endif // CPPMICROSERVICES_ASYNC_WORK_SERVICE_H__

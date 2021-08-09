@@ -129,6 +129,8 @@ exclude_patterns = [
     'Thumbs.db',
     '.DS_Store',
     'CODE_OF_CONDUCT.rst',
+    '.venv',
+    'third_party'
     ]
 
 # The reST default role (used for this markup: `text`) to use for all

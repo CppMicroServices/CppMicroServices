@@ -417,19 +417,3 @@
    ...
 }
 
-{
-   <usDeclarativeServicesTestsSuppression2>
-   Memcheck:Value8
-   ...
-   fun:_ZN7testing8internal20PrintBytesInObjectToEPKhmPSo
-   ...
-}
-
-{
-   <usDeclarativeServicesTestsSuppression3>
-   Memcheck:Cond
-   ...
-   fun:_ZN7testing8internal20PrintBytesInObjectToEPKhmPSo
-   ...
-}
-

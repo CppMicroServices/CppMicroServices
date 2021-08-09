@@ -32,7 +32,19 @@ namespace cppmicroservices {
 namespace async {
 
 /**
+\defgroup gr_asyncworkservice AsyncWorkService
+
+\brief Groups AsyncWorkService class related symbols
+*/
+
+/**
+ * \ingroup MicroService
+ * \ingroup gr_asyncworkservice
  * 
+ * Provides a method which controls how DeclarativeServices internally schedules asynchronous work.
+ * Creating an AsyncWorkService implementation is not required; this is intended to be used in specialty situations where the client application has requirements that the default asynchronous work scheduling mechanism does not conform to.
+ *
+ * @remarks This class is thread safe.
  */
 class US_usAsyncWorkService_EXPORT AsyncWorkService
 {
@@ -49,7 +61,6 @@ public:
    * 
    * @note The caller is required to manage the std::future<void> associated
    * with the std::packaged_task<void()> in order to wait on the async task.
-   * 
    */
   virtual void post(std::packaged_task<void()>&& task) = 0;
 };

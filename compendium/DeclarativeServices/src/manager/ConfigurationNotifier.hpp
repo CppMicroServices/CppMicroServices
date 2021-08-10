@@ -74,7 +74,7 @@ public:
   ConfigurationNotifier(
     const cppmicroservices::BundleContext& context,
     std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-    std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
+    std::shared_ptr<cppmicroservices::async::AsyncWorkService>
       asyncWorkService_);
 
   ConfigurationNotifier(const ConfigurationNotifier&) = delete;
@@ -120,8 +120,7 @@ private:
 
   cppmicroservices::BundleContext bundleContext;
   std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-  std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
-    asyncWorkService;
+  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
 };
 
 } // namespace scrimpl

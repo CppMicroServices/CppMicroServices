@@ -53,8 +53,7 @@ public:
     std::shared_ptr<ComponentRegistry> registry,
     cppmicroservices::BundleContext bundleContext,
     std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-    std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
-      asyncWorkService,
+    std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
     std::shared_ptr<ConfigurationNotifier> configNotifier,
     std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
   ComponentManagerImpl(const ComponentManagerImpl&) = delete;
@@ -137,7 +136,7 @@ public:
   /**
    * Returns the threadpool object associated with this ComponentManager
    */
-  std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
+  std::shared_ptr<cppmicroservices::async::AsyncWorkService>
   GetAsyncWorkService() const
   {
     return asyncWorkService;
@@ -223,7 +222,7 @@ private:
   std::vector<std::shared_future<void>>
     disableFutures; ///< futures created when the component transitioned to \c DISABLED state
   std::mutex futuresMutex; ///< mutex to protect the #disableFutures member
-  std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
+  std::shared_ptr<cppmicroservices::async::AsyncWorkService>
     asyncWorkService; ///< work service to execute async work
   std::mutex
     transitionMutex; ///< mutex to make the state transition and posting of the async operations atomic

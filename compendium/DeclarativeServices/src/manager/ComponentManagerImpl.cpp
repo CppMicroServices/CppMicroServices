@@ -38,8 +38,7 @@ ComponentManagerImpl::ComponentManagerImpl(
   std::shared_ptr<ComponentRegistry> registry,
   BundleContext bundleContext,
   std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-  std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
-    asyncWorkService,
+  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
   std::shared_ptr<ConfigurationNotifier> configNotifier,
   std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
   : registry(std::move(registry))

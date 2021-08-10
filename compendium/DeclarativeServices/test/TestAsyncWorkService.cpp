@@ -45,12 +45,12 @@
 
 namespace test {
 
-namespace async = cppmicroservices::async::detail;
+namespace async = cppmicroservices::async;
 namespace scr = cppmicroservices::service::component::runtime;
 
 class TestAsyncWorkServiceEndToEnd
   : public ::testing::TestWithParam<
-      std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>>
+      std::shared_ptr<cppmicroservices::async::AsyncWorkService>>
 {
 public:
   TestAsyncWorkServiceEndToEnd()
@@ -80,23 +80,22 @@ public:
   cppmicroservices::Framework framework;
 };
 
-class AsyncWorkServiceInline
-  : public cppmicroservices::async::detail::AsyncWorkService
+class AsyncWorkServiceInline : public cppmicroservices::async::AsyncWorkService
 {
 public:
   AsyncWorkServiceInline()
-    : cppmicroservices::async::detail::AsyncWorkService()
+    : cppmicroservices::async::AsyncWorkService()
   {}
 
   void post(std::packaged_task<void()>&& task) override { task(); }
 };
 
 class AsyncWorkServiceStdAsync
-  : public cppmicroservices::async::detail::AsyncWorkService
+  : public cppmicroservices::async::AsyncWorkService
 {
 public:
   AsyncWorkServiceStdAsync()
-    : cppmicroservices::async::detail::AsyncWorkService()
+    : cppmicroservices::async::AsyncWorkService()
   {}
 
   void post(std::packaged_task<void()>&& task) override
@@ -107,11 +106,11 @@ public:
 };
 
 class AsyncWorkServiceThreadPool
-  : public cppmicroservices::async::detail::AsyncWorkService
+  : public cppmicroservices::async::AsyncWorkService
 {
 public:
   AsyncWorkServiceThreadPool(int nThreads)
-    : cppmicroservices::async::detail::AsyncWorkService()
+    : cppmicroservices::async::AsyncWorkService()
   {
     threadpool = std::make_shared<boost::asio::thread_pool>(nThreads);
   }
@@ -176,9 +175,8 @@ TEST_F(tGenericDSSuite, TestUserServiceUsedAfterInstall)
       std::make_shared<cppmicroservices::async::MockAsyncWorkService>();
     auto bundleContext = framework.GetBundleContext();
     auto reg =
-      bundleContext
-        .RegisterService<cppmicroservices::async::detail::AsyncWorkService>(
-          mockAsyncWorkService);
+      bundleContext.RegisterService<cppmicroservices::async::AsyncWorkService>(
+        mockAsyncWorkService);
     EXPECT_CALL(*mockAsyncWorkService, post(::testing::_)).Times(1);
 
     std::shared_ptr<cppmicroservices::scrimpl::SCRLogger> logger =
@@ -205,9 +203,8 @@ TEST_F(tGenericDSSuite, TestFallbackUsedAfterUnregister)
       std::make_shared<cppmicroservices::async::MockAsyncWorkService>();
     auto bundleContext = framework.GetBundleContext();
     auto reg =
-      bundleContext
-        .RegisterService<cppmicroservices::async::detail::AsyncWorkService>(
-          mockAsyncWorkService);
+      bundleContext.RegisterService<cppmicroservices::async::AsyncWorkService>(
+        mockAsyncWorkService);
     EXPECT_CALL(*mockAsyncWorkService, post(::testing::_)).Times(1);
 
     std::shared_ptr<cppmicroservices::scrimpl::SCRLogger> logger =
@@ -283,9 +280,10 @@ TEST_F(tGenericDSSuite, TestUseAsyncWorkServiceDuringConcurrentBundleOperations)
           EXPECT_CALL(*mockAsyncWorkService, post(::testing::_))
             .Times(::testing::AtLeast(1));
           do {
-            auto reg1 = bundleContext.RegisterService<
-              cppmicroservices::async::detail::AsyncWorkService>(
-              mockAsyncWorkService);
+            auto reg1 =
+              bundleContext
+                .RegisterService<cppmicroservices::async::AsyncWorkService>(
+                  mockAsyncWorkService);
             std::this_thread::sleep_for(std::chrono::seconds(1));
             reg1.Unregister();
           } while (stop.wait_for(std::chrono::milliseconds(1)) !=
@@ -327,8 +325,7 @@ TEST_P(TestAsyncWorkServiceEndToEnd, TestEndToEndBehaviorWithAsyncWorkService)
     auto ctx = framework.GetBundleContext();
 
     auto reg =
-      ctx.RegisterService<cppmicroservices::async::detail::AsyncWorkService>(
-        param);
+      ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
 
     for (const auto& bundleName : bundlesToInstall) {
       installedBundles.emplace_back(

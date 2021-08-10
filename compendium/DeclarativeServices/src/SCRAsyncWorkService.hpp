@@ -43,9 +43,9 @@ class SCRAsyncWorkServiceDetail;
  * testing purposes.
  */
 class SCRAsyncWorkService final
-  : public cppmicroservices::async::detail::AsyncWorkService
+  : public cppmicroservices::async::AsyncWorkService
   , public cppmicroservices::ServiceTrackerCustomizer<
-      cppmicroservices::async::detail::AsyncWorkService>
+      cppmicroservices::async::AsyncWorkService>
 {
 public:
   explicit SCRAsyncWorkService(cppmicroservices::BundleContext context,
@@ -56,23 +56,23 @@ public:
   SCRAsyncWorkService& operator=(SCRAsyncWorkService&&) noexcept = delete;
   ~SCRAsyncWorkService() noexcept override;
 
-  // methods from the cppmicroservices::async::detail::AsyncWorkService interface
+  // methods from the cppmicroservices::async::AsyncWorkService interface
   void post(std::packaged_task<void()>&& task) override;
 
   // methods from the cppmicroservices::ServiceTrackerCustomizer interface
   std::shared_ptr<TrackedParamType> AddingService(
-    const ServiceReference<cppmicroservices::async::detail::AsyncWorkService>&
+    const ServiceReference<cppmicroservices::async::AsyncWorkService>&
       reference) override;
   void ModifiedService(
-    const ServiceReference<cppmicroservices::async::detail::AsyncWorkService>&
+    const ServiceReference<cppmicroservices::async::AsyncWorkService>&
       reference,
-    const std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>&
-      service) override;
+    const std::shared_ptr<cppmicroservices::async::AsyncWorkService>& service)
+    override;
   void RemovedService(
-    const ServiceReference<cppmicroservices::async::detail::AsyncWorkService>&
+    const ServiceReference<cppmicroservices::async::AsyncWorkService>&
       reference,
-    const std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>&
-      service) override;
+    const std::shared_ptr<cppmicroservices::async::AsyncWorkService>& service)
+    override;
 
   // method to stop tracking the AsyncWorkService. This must be called from the SCR
   // BundleActivate's Stop method. Not thread-safe. Must not be called simultaneously from
@@ -81,11 +81,10 @@ public:
 
 private:
   cppmicroservices::BundleContext scrContext;
-  std::unique_ptr<cppmicroservices::ServiceTracker<
-    cppmicroservices::async::detail::AsyncWorkService>>
+  std::unique_ptr<
+    cppmicroservices::ServiceTracker<cppmicroservices::async::AsyncWorkService>>
     serviceTracker;
-  std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
-    asyncWorkService;
+  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
   std::shared_ptr<SCRLogger> logger;
 };
 }

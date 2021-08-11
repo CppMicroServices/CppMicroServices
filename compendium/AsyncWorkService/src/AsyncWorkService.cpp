@@ -24,10 +24,8 @@
 
 namespace cppmicroservices {
 namespace async {
-namespace detail {
 
 AsyncWorkService::~AsyncWorkService() = default;
 
-}
 }
 }

@@ -30,7 +30,6 @@
 
 namespace cppmicroservices {
 namespace async {
-namespace detail {
 
 /**
  * 
@@ -53,7 +52,6 @@ public:
    */
   virtual void post(std::packaged_task<void()>&& task) = 0;
 };
-}
 }
 }
 

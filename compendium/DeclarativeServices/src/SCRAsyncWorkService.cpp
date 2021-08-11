@@ -38,7 +38,7 @@ namespace scrimpl {
  * which implements the AsyncWorkService interface was unregistered.
  */
 class FallbackAsyncWorkService final
-  : public cppmicroservices::async::detail::AsyncWorkService
+  : public cppmicroservices::async::AsyncWorkService
 {
 public:
   FallbackAsyncWorkService(
@@ -64,7 +64,7 @@ public:
         auto exceptionPtr = std::current_exception();
         std::string msg =
           "An exception has occured while trying to shutdown "
-          "the fallback cppmicroservices::async::detail::AsyncWorkService "
+          "the fallback cppmicroservices::async::AsyncWorkService "
           "instance.";
         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                     msg,
@@ -100,9 +100,8 @@ SCRAsyncWorkService::SCRAsyncWorkService(
   cppmicroservices::BundleContext context,
   const std::shared_ptr<SCRLogger>& logger_)
   : scrContext(context)
-  , serviceTracker(
-      std::make_unique<cppmicroservices::ServiceTracker<
-        cppmicroservices::async::detail::AsyncWorkService>>(context, this))
+  , serviceTracker(std::make_unique<cppmicroservices::ServiceTracker<
+                     cppmicroservices::async::AsyncWorkService>>(context, this))
   , asyncWorkService(std::make_shared<FallbackAsyncWorkService>(logger_))
   , logger(logger_)
 {
@@ -122,19 +121,17 @@ void SCRAsyncWorkService::StopTracking()
   }
 }
 
-std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
+std::shared_ptr<cppmicroservices::async::AsyncWorkService>
 SCRAsyncWorkService::AddingService(
-  const ServiceReference<cppmicroservices::async::detail::AsyncWorkService>&
-    reference)
+  const ServiceReference<cppmicroservices::async::AsyncWorkService>& reference)
 {
   auto currAsync = std::atomic_load(&asyncWorkService);
-  std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService> newService;
+  std::shared_ptr<cppmicroservices::async::AsyncWorkService> newService;
   if (reference) {
     try {
       newService =
-        scrContext
-          .GetService<cppmicroservices::async::detail::AsyncWorkService>(
-            reference);
+        scrContext.GetService<cppmicroservices::async::AsyncWorkService>(
+          reference);
       if (newService) {
         std::atomic_store(&asyncWorkService, newService);
       }
@@ -142,7 +139,7 @@ SCRAsyncWorkService::AddingService(
       auto exceptionPtr = std::current_exception();
       std::string msg =
         "An exception was caught while retrieving an instance of "
-        "cppmicroservices::async::detail::AsyncWorkService. Falling "
+        "cppmicroservices::async::AsyncWorkService. Falling "
         "back to the default.";
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                   msg,
@@ -154,24 +151,23 @@ SCRAsyncWorkService::AddingService(
 
 void SCRAsyncWorkService::ModifiedService(
   const ServiceReference<
-    cppmicroservices::async::detail::AsyncWorkService>& /* reference */,
+    cppmicroservices::async::AsyncWorkService>& /* reference */,
   const std::shared_ptr<
-    cppmicroservices::async::detail::AsyncWorkService>& /* service */)
+    cppmicroservices::async::AsyncWorkService>& /* service */)
 {
   // no-op
 }
 
 void SCRAsyncWorkService::RemovedService(
   const ServiceReference<
-    cppmicroservices::async::detail::AsyncWorkService>& /* reference */,
-  const std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>&
-    service)
+    cppmicroservices::async::AsyncWorkService>& /* reference */,
+  const std::shared_ptr<cppmicroservices::async::AsyncWorkService>& service)
 {
   auto currAsync = std::atomic_load(&asyncWorkService);
   if (service == currAsync) {
     // replace existing asyncWorkService with a nullptr asyncWorkService
-    std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
-      newService = std::make_shared<FallbackAsyncWorkService>(logger);
+    std::shared_ptr<cppmicroservices::async::AsyncWorkService> newService =
+      std::make_shared<FallbackAsyncWorkService>(logger);
     std::atomic_store(&asyncWorkService, newService);
   }
 }

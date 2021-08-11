@@ -55,7 +55,7 @@ public:
     const cppmicroservices::AnyMap& scrMetadata,
     const std::shared_ptr<ComponentRegistry>& registry,
     const std::shared_ptr<LogService>& logger,
-    const std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>&
+    const std::shared_ptr<cppmicroservices::async::AsyncWorkService>&
       asyncWorkService,
     const std::shared_ptr<ConfigurationNotifier>& configNotifier);
 

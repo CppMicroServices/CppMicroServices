@@ -36,8 +36,7 @@ using cppmicroservices::scrimpl::metadata::ComponentMetadata;
 ConfigurationNotifier::ConfigurationNotifier(
   const cppmicroservices::BundleContext& context,
   std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-  std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
-    asyncWorkService_)
+  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService_)
   : tokenCounter(0)
   , bundleContext(context)
   , logger(std::move(logger))

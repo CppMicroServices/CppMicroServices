@@ -308,8 +308,7 @@ public:
     std::shared_ptr<ComponentRegistry> registry,
     BundleContext bundleContext,
     std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-    std::shared_ptr<cppmicroservices::async::detail::AsyncWorkService>
-      asyncWorkService,
+    std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
     std::shared_ptr<ConfigurationNotifier> notifier,
     std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
     : ComponentManagerImpl(metadata,
@@ -399,12 +398,11 @@ public:
 }
 
 namespace async {
-class MockAsyncWorkService
-  : public cppmicroservices::async::detail::AsyncWorkService
+class MockAsyncWorkService : public cppmicroservices::async::AsyncWorkService
 {
 public:
   MockAsyncWorkService()
-    : cppmicroservices::async::detail::AsyncWorkService()
+    : cppmicroservices::async::AsyncWorkService()
   {}
 
   MOCK_METHOD1(post, void(std::packaged_task<void()>&&));

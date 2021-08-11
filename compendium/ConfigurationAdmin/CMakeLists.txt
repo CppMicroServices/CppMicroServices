@@ -31,7 +31,7 @@ if(MINGW)
 endif()
 
 usMacroCreateBundle(ConfigurationAdmin
-  VERSION "1.0.0"
+  VERSION "1.1.1"
   DEPENDS Framework
   TARGET ConfigurationAdmin
   SYMBOLIC_NAME configuration_admin

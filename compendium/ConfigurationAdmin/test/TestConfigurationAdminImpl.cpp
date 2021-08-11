@@ -41,6 +41,40 @@ MATCHER_P(AnyMapEquals, value, "")
   cppmicroservices::any_value_to_string(valueString, value);
   return (argString.str() == valueString.str());
 }
+/* This is a ConfigurationListener that blocks on a mutex. It is used by the TestConfigurationAdminImpl
+ * VerifyNoUpdateDeadlock test to recreate the blocking condition that caused a deadlock for the 
+ * Update, UpdateIfDifferent and Remove Configuration methods
+ */
+struct BlockingConfigurationListener final
+  : public cppmicroservices::service::cm::ConfigurationListener
+{
+
+  BlockingConfigurationListener() = default;
+  BlockingConfigurationListener(const BlockingConfigurationListener&) = delete;
+  BlockingConfigurationListener(BlockingConfigurationListener&&) = delete;
+  BlockingConfigurationListener& operator=(
+    const BlockingConfigurationListener&) = delete;
+  BlockingConfigurationListener& operator=(BlockingConfigurationListener&&) =
+    delete;
+  ~BlockingConfigurationListener() = default;
+
+  /*
+   * configurationEvent is the method called by Configuration Admin whenever a 
+   * a configuraton object is updated or removed.
+   *
+   */
+  void configurationEvent(
+    const cppmicroservices::service::cm::ConfigurationEvent& event) noexcept
+  {
+    {
+      std::lock_guard<std::mutex> lg{ mutex_ };
+    }
+    promise_.set_value();
+  }
+
+  std::mutex mutex_;
+  std::promise<void> promise_;
+};
 
 // The fixture for testing class ConfigurationAdminImpl.
 class TestConfigurationAdminImpl : public ::testing::Test
@@ -62,9 +96,56 @@ protected:
 
   cppmicroservices::Framework& GetFramework() { return framework; }
 
-private:
+protected:
   cppmicroservices::Framework framework;
 };
+
+/* The Update, UpdateIfDifferent and Remove methods on Configuration objects send
+ * an asynchronous notification to all services that have published a ConfigurationListener
+ * interface. The asynchronous thread creates a std::future and saves it in a vector (incompleteFutures). 
+ * A ConfigurationAdminImpl non-public method (WaitForAllAsync) can be used to wait for all futures 
+ * in the vector to complete. The future created by the asynchronous notification thread is 
+ * also shared (std::shared_future) and is returned to the 
+ * caller of the Update, UpdateIfDifferent or Remove method so they can wait for
+ * the operation to complete. There was a bug in the initial version of ConfigurationAdmin
+ * that resulted in a deadlock under some circumstances because a std::future was being saved
+ * in the incompleteFutures vector instead of a std::shared_future. When the std::shared_future
+ * went out of scope, the destructor would stall because the std::future would still exist. This test confirms that
+ * this deadlock no longer exists. 
+ */
+TEST_F(TestConfigurationAdminImpl, VerifyNoUpdateDeadlock)
+{
+  auto blockingConfigurationListener =
+    std::make_shared<BlockingConfigurationListener>();
+  auto callCompletedFut = blockingConfigurationListener->promise_.get_future();
+  auto bundleContext = GetFramework().GetBundleContext();
+
+  auto configListenerReg =
+    bundleContext
+      .RegisterService<cppmicroservices::service::cm::ConfigurationListener>(
+        blockingConfigurationListener);
+  auto fakeLogger = std::make_shared<FakeLogger>();
+  ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
+
+  auto configuration = configAdmin.GetConfiguration("testPid");
+  cppmicroservices::AnyMap props(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  const std::string instanceId{ "instance1" };
+  props["uniqueProp"] = instanceId;
+
+  {
+    std::lock_guard<std::mutex> lg{ blockingConfigurationListener->mutex_ };
+
+    {
+      auto fut = configuration->Update(props);
+      EXPECT_EQ(std::future_status::timeout,
+                fut.wait_for(std::chrono::milliseconds(10)));
+    }
+    //fut goes out of scope here. If the destructor incorrectly blocks, the test would stall now.
+  }
+  // Lock is out of scope here, so configurationEvent should be unblocked, and the promise should be set.
+  callCompletedFut.get();
+}
 
 TEST_F(TestConfigurationAdminImpl, VerifyGetConfiguration)
 {

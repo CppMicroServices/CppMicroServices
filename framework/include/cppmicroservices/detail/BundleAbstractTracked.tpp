@@ -119,7 +119,7 @@ void BundleAbstractTracked<S,TTT,R>::Track(S item, R related)
     }
     auto trackedItemIter = tracked.find(item);
     if (trackedItemIter != tracked.end()) {
-      object = (*trackedItemIter).second;
+      object = trackedItemIter->second;
     }
     if (!object)
     { /* we are not tracking the item */
@@ -192,7 +192,7 @@ void BundleAbstractTracked<S,TTT,R>::Untrack(S item, R related)
      * must remove from tracker before
      * calling customizer callback
      */
-    object = (*trackedItemIter).second;
+    object = trackedItemIter->second;
     tracked.erase(item);
     Modified(); /* increment modification count */
   }

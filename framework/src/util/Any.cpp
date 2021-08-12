@@ -106,7 +106,7 @@ std::ostream& any_value_to_json(std::ostream& o,
         o << "\\t";
         break;
       default:
-// suppress type-limits error on linux arm 64 build
+// suppress type-limits warning on linux arm 64 build
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wtype-limits"

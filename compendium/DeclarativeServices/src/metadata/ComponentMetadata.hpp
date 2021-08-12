@@ -23,6 +23,7 @@
 #ifndef COMPONENTMETADATA_HPP
 #define COMPONENTMETADATA_HPP
 
+#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>

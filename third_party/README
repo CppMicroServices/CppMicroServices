@@ -132,7 +132,7 @@ Google Test and Google Mock
 See https://github.com/google/googletest/blob/master/LICENSE for license information.
 
 https://github.com/google/googletest
-ba33a8876c3eda4cb8def8e0e90f45930ef8c54f
+aefb45469ee7e6bde0cd1d2c18412046c30e7bb6
 
 RapidJSON
 ---------
@@ -147,8 +147,8 @@ Google benchmark
 
 See https://github.com/google/benchmark/blob/master/LICENSE for license information
 
-https://github.com/google/benchmark/releases
-1.4.1
+https://github.com/google/benchmark
+4124223bf5303d1d65fe2c40f33e28372bbb986c
 
 Abseil (absl)
 -------------

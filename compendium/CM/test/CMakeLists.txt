@@ -37,6 +37,10 @@ include_directories(
 
 add_executable(${us_cm_test_exe_name} ${_cm_tests})
 
+if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
+  target_compile_options(${us_cm_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
+endif()
+
 # Disable deprecation warnings.
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR

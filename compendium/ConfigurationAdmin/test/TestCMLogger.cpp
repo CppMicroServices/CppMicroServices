@@ -73,13 +73,13 @@ TEST_F(TestCMLogger, VerifyWithoutLoggerService)
     logger.Log(
       SeverityLevel::LOG_DEBUG,
       "sample log message",
-      std::make_exception_ptr(new std::runtime_error("error occured")));
+      std::make_exception_ptr(std::runtime_error("error occured")));
     logger.Log(dummyRef, SeverityLevel::LOG_DEBUG, "sample log message");
     logger.Log(
       dummyRef,
       SeverityLevel::LOG_DEBUG,
       "sample log message",
-      std::make_exception_ptr(new std::runtime_error("error occured")));
+      std::make_exception_ptr(std::runtime_error("error occured")));
   });
 }
 
@@ -109,7 +109,7 @@ TEST_F(TestCMLogger, VerifyWithLoggerService)
     logger.Log(
       SeverityLevel::LOG_ERROR,
       "some sample error message",
-      std::make_exception_ptr(new std::runtime_error("error occured")));
+      std::make_exception_ptr(std::runtime_error("error occured")));
     cppmicroservices::ServiceReferenceU dummyRef;
     logger.Log(
       dummyRef, SeverityLevel::LOG_WARNING, "some sample warning message");
@@ -117,7 +117,7 @@ TEST_F(TestCMLogger, VerifyWithLoggerService)
       dummyRef,
       SeverityLevel::LOG_ERROR,
       "some sample error message with service reference",
-      std::make_exception_ptr(new std::runtime_error("error occured")));
+      std::make_exception_ptr(std::runtime_error("error occured")));
     reg.Unregister();
   });
 }

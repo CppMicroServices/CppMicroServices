@@ -71,6 +71,7 @@ set(_gtest_tests
   ResourceCompilerTest.cpp
   MultipleListenersTest.cpp
   BundleTest.cpp
+  main.cpp
 )
 
 if(BUILD_SHARED_LIBS)
@@ -104,6 +105,10 @@ usFunctionGenerateBundleInit(TARGET ${us_gtest_test_exe_name} OUT _additional_sr
 usFunctionGetResourceSource(TARGET ${us_gtest_test_exe_name} OUT _additional_srcs)
 
 add_executable(${us_gtest_test_exe_name} ${_gtest_tests} ${_additional_srcs} ${_third_party_srcs})
+
+if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
+  target_compile_options(${us_gtest_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
+endif()
 
 # Needed for ResourceCompilerTest
 add_dependencies(${us_gtest_test_exe_name} ${US_RCC_EXECUTABLE_TARGET})

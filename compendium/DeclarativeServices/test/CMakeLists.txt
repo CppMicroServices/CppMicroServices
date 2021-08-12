@@ -124,6 +124,10 @@ add_executable(${us_declarativeservices_test_exe_name}
   ${_declarativeservices_tests}
   ${_additional_srcs})
 
+if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
+  target_compile_options(${us_declarativeservices_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
+endif()
+
 set_property(
   TARGET ${us_declarativeservices_test_exe_name}
   APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main

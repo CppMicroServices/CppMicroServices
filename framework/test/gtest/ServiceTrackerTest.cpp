@@ -580,3 +580,57 @@ TEST_F(ServiceTrackerTestFixture, ServiceTrackerConcurrentOpenClose)
   }
 }
 #endif
+
+namespace {
+
+class MyNullPtrCustomizer final
+  : public cppmicroservices::ServiceTrackerCustomizer<MyInterfaceOne>
+{
+
+public:
+  MyNullPtrCustomizer(const BundleContext& context)
+    : m_context(context)
+  {}
+
+  virtual std::shared_ptr<MyInterfaceOne> AddingService(
+    const ServiceReference<MyInterfaceOne>&)
+  {
+    return nullptr;
+  }
+
+  virtual void ModifiedService(const ServiceReference<MyInterfaceOne>&,
+                               const std::shared_ptr<MyInterfaceOne>&)
+  {}
+
+  virtual void RemovedService(const ServiceReference<MyInterfaceOne>&,
+                              const std::shared_ptr<MyInterfaceOne>&)
+  {}
+
+private:
+  BundleContext m_context;
+};
+}
+
+TEST_F(ServiceTrackerTestFixture, TestNullPtrServiceTrackerCustomizer)
+{
+  auto context = framework.GetBundleContext();
+  MyNullPtrCustomizer customizer(context);
+
+  cppmicroservices::LDAPFilter filter(
+    "(" + cppmicroservices::Constants::SERVICE_ID + ">=0)");
+  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(
+    context, filter, &customizer);
+  tracker.Open();
+
+  struct MyServiceOne : public MyInterfaceOne
+  {};
+
+  auto serviceOne = std::make_shared<MyServiceOne>();
+
+  context.RegisterService<MyInterfaceOne>(serviceOne);
+
+  ASSERT_EQ(tracker.GetServiceReferences().size(), 0) << "tracking count should be 0";
+
+  auto trackedObj = tracker.WaitForService(std::chrono::seconds(1));
+  ASSERT_EQ(nullptr, trackedObj) << "tracked object should be nullptr";
+}

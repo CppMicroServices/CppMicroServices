@@ -75,7 +75,7 @@ void BundleAbstractTracked<S,TTT,R>::TrackInitial()
        */
       item = initial.front();
       initial.pop_front();
-      if (tracked[item])
+      if (tracked.end() != tracked.find(item))
       {
         /* if we are already tracking this item */
         DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::trackInitial[already tracked]: " << item;
@@ -117,10 +117,13 @@ void BundleAbstractTracked<S,TTT,R>::Track(S item, R related)
     {
       return;
     }
-    object = tracked[item];
+    auto trackedItemIter = tracked.find(item);
+    if (trackedItemIter != tracked.end()) {
+      object = trackedItemIter->second;
+    }
     if (!object)
     { /* we are not tracking the item */
-      if (std::find(adding.begin(), adding.end(),item) != adding.end())
+      if (std::find(adding.begin(), adding.end(), item) != adding.end())
       {
         /* if this item is already in the process of being added. */
         DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::track[already adding]: " << item;
@@ -180,16 +183,17 @@ void BundleAbstractTracked<S,TTT,R>::Untrack(S item, R related)
            * adding
            */
     }
-    object = tracked[item];
+    auto trackedItemIter = tracked.find(item);
+    // nothing to do, no item is being tracked.
+    if (trackedItemIter == tracked.end()) {
+      return;
+    }
     /*
      * must remove from tracker before
      * calling customizer callback
      */
+    object = trackedItemIter->second;
     tracked.erase(item);
-    if (!object)
-    { /* are we actually tracking the item */
-      return;
-    }
     Modified(); /* increment modification count */
   }
   DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::untrack[removed]: " << item;

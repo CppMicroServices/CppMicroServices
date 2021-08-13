@@ -40,3 +40,4 @@ doc/src/examples/makefile/main
 *.pyc
 /build*
 .vscode/
+.venv/

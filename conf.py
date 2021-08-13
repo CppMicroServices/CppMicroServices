@@ -129,6 +129,8 @@ exclude_patterns = [
     'Thumbs.db',
     '.DS_Store',
     'CODE_OF_CONDUCT.rst',
+    '.venv',
+    'third_party'
     ]
 
 # The reST default role (used for this markup: `text`) to use for all
@@ -376,6 +378,7 @@ man_pages = [
     ('doc/man/cppmicroservices-ds.3', 'cppmicroservices-ds', u'CppMicroServices Declarative Services API', [author], 3),
     ('doc/man/cppmicroservices-configadmin.3', 'cppmicroservices-configadmin', u'CppMicroServices Configuration Admin API', [author], 3),
     ('doc/man/cppmicroservices-logservice.3', 'cppmicroservices-logservice', u'CppMicroServices Log Service API', [author], 3),
+    ('doc/man/cppmicroservices-asyncworkservice.3', 'cppmicroservices-asyncworkservice', u'CppMicroServices Asynchronous Work Service API', [author], 3),
     ('doc/man/cppmicroservices-httpservice.3', 'cppmicroservices-httpservice', u'CppMicroServices Http Service API', [author], 3),
     ('doc/man/cppmicroservices-webconsole.3', 'cppmicroservices-webconsole', u'CppMicroServices Web Console API', [author], 3),
     ('doc/man/cppmicroservices-shellservice.3', 'cppmicroservices-shellservice', u'CppMicroServices Shell Service API', [author], 3),

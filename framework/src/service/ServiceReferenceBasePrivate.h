@@ -25,6 +25,8 @@
 
 #include "cppmicroservices/ServiceInterface.h"
 
+#include <jsoncons/json.hpp>
+
 #include <atomic>
 #include <string>
 

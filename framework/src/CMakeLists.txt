@@ -9,6 +9,7 @@ set(_srcs
   util/FrameworkEvent.cpp
   util/FrameworkFactory.cpp
   util/FrameworkPrivate.cpp
+  Util/JSONFilter.cpp
   util/LDAPExpr.cpp
   util/LDAPFilter.cpp
   util/LDAPProp.cpp

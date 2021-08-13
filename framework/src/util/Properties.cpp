@@ -54,17 +54,22 @@ Properties::Properties(const AnyMap& p)
     keys.push_back(iter.first);
     values.push_back(iter.second);
   }
+  
+  // jsoncons
+  json_props = jsoncons::json::parse(Any(p).ToJSON());
 }
 
 Properties::Properties(Properties&& o)
   : keys(std::move(o.keys))
   , values(std::move(o.values))
+  , json_props(std::move(o.json_props))
 {}
 
 Properties& Properties::operator=(Properties&& o)
 {
   keys = std::move(o.keys);
   values = std::move(o.values);
+  json_props = std::move(o.json_props);
   return *this;
 }
 
@@ -109,6 +114,11 @@ int Properties::FindCaseSensitive_unlocked(const std::string& key) const
 std::vector<std::string> Properties::Keys_unlocked() const
 {
   return keys;
+}
+
+jsoncons::json Properties::JSON_unlocked() const
+{
+  return json_props;
 }
 
 void Properties::Clear_unlocked()

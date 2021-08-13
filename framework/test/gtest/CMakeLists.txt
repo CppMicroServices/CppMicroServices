@@ -56,6 +56,8 @@ set(_gtest_tests
   ServiceHooksTest.cpp
   TestCounterLatch.cpp
   ResourceCompilerTest.cpp
+  #JSONFilterTest.cpp
+  JSONQueryTest.cpp
 )
 
 if(BUILD_SHARED_LIBS)

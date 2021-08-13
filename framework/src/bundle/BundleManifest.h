@@ -27,6 +27,8 @@
 #include "cppmicroservices/AnyMap.h"
 #include <mutex>
 
+#include <jsoncons/json.hpp>
+
 namespace cppmicroservices {
 
 class BundleManifest
@@ -55,6 +57,7 @@ private:
   mutable std::map<std::string, Any> m_PropertiesDeprecated;
   mutable std::once_flag m_DidCopyDeprecatedProperties;
   AnyMap m_Headers;
+  jsoncons::json m_JsonProps;
 
   /** copies m_Headers to m_PropertiesDeprecated exactly once per BundleManifest using
    * std::call_once. Needs to be a const method because it's called from other const

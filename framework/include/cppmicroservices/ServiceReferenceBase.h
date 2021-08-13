@@ -214,6 +214,7 @@ private:
   friend class ServiceListeners;
   friend class ServiceRegistry;
   friend class LDAPFilter;
+  friend class JSONFilter;
 
   template<class S>
   friend struct ServiceHolder;

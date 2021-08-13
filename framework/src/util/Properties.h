@@ -27,6 +27,8 @@
 #include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/detail/Threads.h"
 
+#include <jsoncons/json.hpp>
+
 #include <string>
 #include <vector>
 
@@ -48,12 +50,14 @@ public:
   int FindCaseSensitive_unlocked(const std::string& key) const;
 
   std::vector<std::string> Keys_unlocked() const;
+  jsoncons::json JSON_unlocked() const;
 
   void Clear_unlocked();
 
 private:
   std::vector<std::string> keys;
   std::vector<Any> values;
+  jsoncons::json json_props;
 
   static const Any emptyAny;
 };

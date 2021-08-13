@@ -8,6 +8,7 @@ set(_public_headers
   cppmicroservices/Framework.h
   cppmicroservices/FrameworkEvent.h
   cppmicroservices/FrameworkFactory.h
+  cppmicroservices/JSONFilter.h
   cppmicroservices/LDAPFilter.h
   cppmicroservices/LDAPProp.h
   cppmicroservices/ListenerToken.h

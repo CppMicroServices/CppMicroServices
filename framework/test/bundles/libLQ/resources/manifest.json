@@ -1,6 +1,9 @@
 {
   "bundle.symbolic_name" : "TestBundleLQ",
   "bundle.testproperty" : "YES",
+  "bundle.nestedproperty" : {
+    "foo" : "bar"
+  },
   "bundle.activator" : true,
   "hosed" : "1",
   "hosedd" : "2",

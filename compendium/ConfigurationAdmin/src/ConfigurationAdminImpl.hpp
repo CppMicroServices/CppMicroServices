@@ -32,6 +32,7 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
+#include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 #include "cppmicroservices/cm/ManagedService.hpp"
@@ -88,7 +89,9 @@ class ConfigurationAdminImpl final
 public:
   ConfigurationAdminImpl(
     cppmicroservices::BundleContext cmContext,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    std::shared_ptr<cppmicroservices::async::AsyncWorkService>
+      asyncWorkService);
   ~ConfigurationAdminImpl() override;
   ConfigurationAdminImpl(const ConfigurationAdminImpl&) = delete;
   ConfigurationAdminImpl& operator=(const ConfigurationAdminImpl&) = delete;
@@ -220,6 +223,7 @@ private:
 
   cppmicroservices::BundleContext cmContext;
   std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
   std::mutex configurationsMutex;
   std::unordered_map<std::string, std::shared_ptr<ConfigurationImpl>>
     configurations;

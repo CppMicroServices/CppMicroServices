@@ -28,6 +28,8 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/cm/ConfigurationException.hpp"
 
+#include "../src/CMAsyncWorkService.hpp"
+
 #include "../src/ConfigurationAdminImpl.hpp"
 #include "Mocks.hpp"
 
@@ -70,7 +72,12 @@ TEST_F(TestConfigurationAdminImpl, VerifyGetConfiguration)
 {
   auto bundleContext = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
+  std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService>
+    asyncWorkService =
+      std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(
+        bundleContext, fakeLogger);
+  ConfigurationAdminImpl configAdmin(
+    bundleContext, fakeLogger, asyncWorkService);
 
   {
     const auto conf = configAdmin.GetConfiguration("test.pid");
@@ -115,7 +122,12 @@ TEST_F(TestConfigurationAdminImpl, VerifyCreateFactoryConfiguration)
 {
   auto bundleContext = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
+  std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService>
+    asyncWorkService =
+      std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(
+        bundleContext, fakeLogger);
+  ConfigurationAdminImpl configAdmin(
+    bundleContext, fakeLogger, asyncWorkService);
 
   const auto conf = configAdmin.CreateFactoryConfiguration("factory");
   ASSERT_TRUE(conf);
@@ -138,7 +150,12 @@ TEST_F(TestConfigurationAdminImpl, VerifyGetFactoryConfiguration)
 {
   auto bundleContext = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
+  std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService>
+    asyncWorkService =
+      std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(
+        bundleContext, fakeLogger);
+  ConfigurationAdminImpl configAdmin(
+    bundleContext, fakeLogger, asyncWorkService);
 
   {
     const auto conf =
@@ -175,7 +192,12 @@ TEST_F(TestConfigurationAdminImpl, VerifyListConfigurations)
 {
   auto bundleContext = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
+  std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService>
+    asyncWorkService =
+      std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(
+        bundleContext, fakeLogger);
+  ConfigurationAdminImpl configAdmin(
+    bundleContext, fakeLogger, asyncWorkService);
 
   const std::string pid1{ "test.pid1" };
   const std::string pid2{ "test.pid2" };
@@ -202,7 +224,12 @@ TEST_F(TestConfigurationAdminImpl, VerifyAddConfigurations)
 {
   auto bundleContext = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
+  std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService>
+    asyncWorkService =
+      std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(
+        bundleContext, fakeLogger);
+  ConfigurationAdminImpl configAdmin(
+    bundleContext, fakeLogger, asyncWorkService);
 
   // Set up some existing Configurations
   const auto conf = configAdmin.GetConfiguration("test.pid");
@@ -258,7 +285,12 @@ TEST_F(TestConfigurationAdminImpl, VerifyRemoveConfigurations)
 {
   auto bundleContext = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
+  std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService>
+    asyncWorkService =
+      std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(
+        bundleContext, fakeLogger);
+  ConfigurationAdminImpl configAdmin(
+    bundleContext, fakeLogger, asyncWorkService);
 
   // Set up some existing Configurations
   const auto conf = configAdmin.GetConfiguration("test.pid");
@@ -318,7 +350,12 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceNotification)
 {
   auto bundleContext = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
+  std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService>
+    asyncWorkService =
+      std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(
+        bundleContext, fakeLogger);
+  ConfigurationAdminImpl configAdmin(
+    bundleContext, fakeLogger, asyncWorkService);
 
   // Set up an existing Configuration
   const auto conf = configAdmin.GetConfiguration("test.pid");
@@ -411,7 +448,12 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
 {
   auto bundleContext = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
-  ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
+  std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService>
+    asyncWorkService =
+      std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(
+        bundleContext, fakeLogger);
+  ConfigurationAdminImpl configAdmin(
+    bundleContext, fakeLogger, asyncWorkService);
 
   // Set up an existing Configuration
   const auto conf = configAdmin.GetConfiguration("factory2~instance1");
@@ -609,7 +651,12 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
                   mockManagedService2);
 
   {
-    ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
+    std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService>
+      asyncWorkService =
+        std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(
+          bundleContext, fakeLogger);
+    ConfigurationAdminImpl configAdmin(
+      bundleContext, fakeLogger, asyncWorkService);
 
     std::unique_lock<std::mutex> ul{ counterMutex };
     auto invokedOnce = counterCV.wait_for(
@@ -719,7 +766,12 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceExceptionsAreLogged)
                   UnknownExceptionThrownByManagedServiceFactoryDuringRemoval))
     .Times(1);
 
-  ConfigurationAdminImpl configAdmin(bundleContext, mockLogger);
+  std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService>
+    asyncWorkService =
+      std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(
+        bundleContext, mockLogger);
+  ConfigurationAdminImpl configAdmin(
+    bundleContext, mockLogger, asyncWorkService);
 
   // Set up an existing Configuration
   const auto conf = configAdmin.GetConfiguration("test.pid");

@@ -167,9 +167,11 @@ namespace cmimpl {
 
 ConfigurationAdminImpl::ConfigurationAdminImpl(
   cppmicroservices::BundleContext context,
-  std::shared_ptr<cppmicroservices::logservice::LogService> lggr)
+  std::shared_ptr<cppmicroservices::logservice::LogService> lggr,
+  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWS)
   : cmContext(std::move(context))
   , logger(std::move(lggr))
+  , asyncWorkService(std::move(asyncWS))
   , futuresID{ 0u }
   , managedServiceTracker(cmContext, this)
   , managedServiceFactoryTracker(cmContext, this)
@@ -312,8 +314,7 @@ ConfigurationAdminImpl::GetFactoryConfiguration(const std::string& factoryPid,
 }
 
 std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
-ConfigurationAdminImpl::ListConfigurations(
-  const std::string& filter)
+ConfigurationAdminImpl::ListConfigurations(const std::string& filter)
 {
   std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
     result;
@@ -517,7 +518,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
     auto configAdminRef = cmContext.GetServiceReference<ConfigurationAdmin>();
     for (const auto& it : configurationListeners) {
       auto configEvent = cppmicroservices::service::cm::ConfigurationEvent(
-          configAdminRef, type, fPid, nonFPid);
+        configAdminRef, type, fPid, nonFPid);
       it->configurationEvent((configEvent));
     }
 
@@ -603,7 +604,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(
         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                     "Configuration with PID " + pid + " has been removed.");
       });
-  
+
     return removeFuture;
   }
   ready.set_value();
@@ -782,8 +783,9 @@ std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
   std::lock_guard<std::mutex> lk{ futuresMutex };
   decltype(completeFutures){}.swap(completeFutures);
   auto id = ++futuresID;
-  std::future<void> fut = std::async(
-    std::launch::async, [this, func = std::forward<Functor>(f), id]() -> void {
+
+  std::packaged_task<void()> task(
+    [this, func = std::forward<Functor>(f), id]() -> void {
       func();
       std::lock_guard<std::mutex> lk{ futuresMutex };
       auto it = incompleteFutures.find(id);
@@ -794,6 +796,11 @@ std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
         futuresCV.notify_one();
       }
     });
+
+  std::future<void> fut = task.get_future();
+
+  asyncWorkService->post(std::move(task));
+
   auto returnFut = fut.share();
   incompleteFutures.emplace(id, std::move(fut));
   return returnFut;

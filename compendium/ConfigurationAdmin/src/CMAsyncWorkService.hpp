@@ -46,8 +46,9 @@ class CMAsyncWorkService final
       cppmicroservices::async::AsyncWorkService>
 {
 public:
-  explicit CMAsyncWorkService(cppmicroservices::BundleContext context,
-                              const std::shared_ptr<CMLogger>& logger_);
+  explicit CMAsyncWorkService(
+    cppmicroservices::BundleContext context,
+    const std::shared_ptr<cppmicroservices::logservice::LogService>& logger_);
   CMAsyncWorkService(const CMAsyncWorkService&) noexcept = delete;
   CMAsyncWorkService(CMAsyncWorkService&&) noexcept = delete;
   CMAsyncWorkService& operator=(const CMAsyncWorkService&) noexcept = delete;
@@ -83,7 +84,7 @@ private:
     cppmicroservices::ServiceTracker<cppmicroservices::async::AsyncWorkService>>
     serviceTracker;
   std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
-  std::shared_ptr<CMLogger> logger;
+  std::shared_ptr<cppmicroservices::logservice::LogService> logger;
 };
 }
 }

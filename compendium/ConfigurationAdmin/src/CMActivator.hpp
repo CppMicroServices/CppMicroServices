@@ -32,6 +32,7 @@
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/ListenerToken.h"
 
+#include "CMAsyncWorkService.hpp"
 #include "CMBundleExtension.hpp"
 #include "CMConstants.hpp"
 #include "CMLogger.hpp"
@@ -73,6 +74,7 @@ protected:
 private:
   cppmicroservices::BundleContext runtimeContext;
   std::shared_ptr<CMLogger> logger;
+  std::shared_ptr<CMAsyncWorkService> asyncWorkService;
   std::shared_ptr<ConfigurationAdminImpl> configAdminImpl;
   std::mutex bundleRegMutex;
   std::unordered_map<long, std::unique_ptr<CMBundleExtension>> bundleRegistry;

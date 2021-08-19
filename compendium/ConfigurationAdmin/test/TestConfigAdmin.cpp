@@ -22,7 +22,7 @@ namespace cm = cppmicroservices::service::cm;
 
 namespace {
 
-auto const DEFAULT_POLL_PERIOD = std::chrono::milliseconds(2000);
+auto const DEFAULT_POLL_PERIOD = std::chrono::milliseconds(3000);
 
 std::string PathToLib(const std::string& libName)
 {
@@ -481,7 +481,8 @@ TEST_F(ConfigAdminTests, testRemoveFactoryConfiguration)
   auto configuration_config1 =
     m_configAdmin->GetFactoryConfiguration("cm.testfactory", "config1");
 
-  configuration_config1->Remove();
+  auto fut = configuration_config1->Remove();
+  fut.get();
 
   EXPECT_NE(serviceFactory->getRemovedCounter("cm.testfactory~config1"), 0);
   EXPECT_EQ(serviceFactory->getRemovedCounter("cm.testfactory~config2"), 0);

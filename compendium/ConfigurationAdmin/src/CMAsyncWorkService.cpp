@@ -96,8 +96,9 @@ private:
   std::shared_ptr<cppmicroservices::logservice::LogService> logger;
 };
 
-CMAsyncWorkService::CMAsyncWorkService(cppmicroservices::BundleContext context,
-                                       const std::shared_ptr<CMLogger>& logger_)
+CMAsyncWorkService::CMAsyncWorkService(
+  cppmicroservices::BundleContext context,
+  const std::shared_ptr<cppmicroservices::logservice::LogService>& logger_)
   : scrContext(context)
   , serviceTracker(std::make_unique<cppmicroservices::ServiceTracker<
                      cppmicroservices::async::AsyncWorkService>>(context, this))

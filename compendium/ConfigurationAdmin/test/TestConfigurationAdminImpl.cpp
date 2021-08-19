@@ -141,7 +141,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyNoUpdateDeadlock)
       EXPECT_EQ(std::future_status::timeout,
                 fut.wait_for(std::chrono::milliseconds(10)));
     }
-    //fut goes out of scope here. If the destructor incorrectly blocks, the test would stall now.
+    //fut goes out of scope here. If the destructor blocks, the test would stall now.
   }
   // Lock is out of scope here, so configurationEvent should be unblocked, and the promise should be set.
   callCompletedFut.get();

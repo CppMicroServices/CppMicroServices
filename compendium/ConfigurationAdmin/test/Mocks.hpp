@@ -25,6 +25,7 @@
 
 #include "gmock/gmock.h"
 
+#include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ManagedService.hpp"
 #include "cppmicroservices/cm/ManagedServiceFactory.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
@@ -125,6 +126,18 @@ public:
   MOCK_METHOD2(NotifyConfigurationRemoved,
                std::shared_future<void>(const std::string&, std::uintptr_t));
 };
+
+namespace async {
+class MockAsyncWorkService : public cppmicroservices::async::AsyncWorkService
+{
+public:
+  MockAsyncWorkService()
+    : cppmicroservices::async::AsyncWorkService()
+  {}
+
+  MOCK_METHOD1(post, void(std::packaged_task<void()>&&));
+};
+}
 }
 }
 

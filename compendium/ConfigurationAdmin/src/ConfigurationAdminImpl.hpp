@@ -89,8 +89,8 @@ class ConfigurationAdminImpl final
 public:
   ConfigurationAdminImpl(
     cppmicroservices::BundleContext cmContext,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-    std::shared_ptr<cppmicroservices::async::AsyncWorkService>
+    const std::shared_ptr<cppmicroservices::logservice::LogService>& logger,
+    const std::shared_ptr<cppmicroservices::async::AsyncWorkService>&
       asyncWorkService);
   ~ConfigurationAdminImpl() override;
   ConfigurationAdminImpl(const ConfigurationAdminImpl&) = delete;

@@ -167,11 +167,11 @@ namespace cmimpl {
 
 ConfigurationAdminImpl::ConfigurationAdminImpl(
   cppmicroservices::BundleContext context,
-  std::shared_ptr<cppmicroservices::logservice::LogService> lggr,
-  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWS)
+  const std::shared_ptr<cppmicroservices::logservice::LogService>& lggr,
+  const std::shared_ptr<cppmicroservices::async::AsyncWorkService>& asyncWS)
   : cmContext(std::move(context))
-  , logger(std::move(lggr))
-  , asyncWorkService(std::move(asyncWS))
+  , logger(lggr)
+  , asyncWorkService(asyncWS)
   , futuresID{ 0u }
   , managedServiceTracker(cmContext, this)
   , managedServiceFactoryTracker(cmContext, this)
@@ -780,12 +780,15 @@ void ConfigurationAdminImpl::RemovedService(
 template<typename Functor>
 std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
 {
-  std::lock_guard<std::mutex> lk{ futuresMutex };
-  decltype(completeFutures){}.swap(completeFutures);
-  auto id = ++futuresID;
+  uint64_t id{};
+  {
+    std::lock_guard<std::mutex> lk{ futuresMutex };
+    decltype(completeFutures){}.swap(completeFutures);
+    id = ++futuresID;
+  }
 
   std::packaged_task<void()> task(
-    [this, func = std::forward<Functor>(f), id]() -> void {
+    [this, func = std::forward<Functor>(f), id]() mutable {
       func();
       std::lock_guard<std::mutex> lk{ futuresMutex };
       auto it = incompleteFutures.find(id);
@@ -798,11 +801,14 @@ std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
     });
 
   std::future<void> fut = task.get_future();
+  std::shared_future<void> returnFut = fut.share();
+  {
+    std::lock_guard<std::mutex> lk{ futuresMutex };
+    incompleteFutures.emplace(id, std::move(fut));
+  }
 
   asyncWorkService->post(std::move(task));
 
-  auto returnFut = fut.share();
-  incompleteFutures.emplace(id, std::move(fut));
   return returnFut;
 }
 

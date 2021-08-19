@@ -22,6 +22,10 @@ include_directories(
   ${GMOCK_INCLUDE_DIRS}
   )
 
+# There are warnings in the boost asio headers which are flagged as errors. Include the boost
+# asio headers as system headers to ignore these warnings and not treat them as errors.
+include_directories(SYSTEM ${CppMicroServices_SOURCE_DIR}/third_party/boost/include)
+
 if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   check_cxx_compiler_flag(-Wno-inconsistent-missing-override HAS_MISSING_OVERRIDE_FLAG)
   if (HAS_MISSING_OVERRIDE_FLAG)
@@ -40,6 +44,7 @@ if(MSVC)
 endif()
 
 set(_configurationadmin_tests
+  TestAsyncWorkService.cpp
   TestCMActivator.cpp
   TestCMBundleExtension.cpp
   TestCMLogger.cpp
@@ -49,6 +54,7 @@ set(_configurationadmin_tests
   TestMetadataParserFactory.cpp
   TestMetadataParserImplV1.cpp
   main.cpp
+  TestFixtures.hpp
   )
 
 include_directories(${PROJECT_BINARY_DIR}/include

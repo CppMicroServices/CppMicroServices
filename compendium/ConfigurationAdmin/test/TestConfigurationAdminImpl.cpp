@@ -66,6 +66,7 @@ struct BlockingConfigurationListener final
   void configurationEvent(
     const cppmicroservices::service::cm::ConfigurationEvent& event) noexcept
   {
+    auto type = event.type;  //just to avoid the unused parameter error on some platforms.
     {
       std::lock_guard<std::mutex> lg{ mutex_ };
     }

@@ -782,7 +782,7 @@ std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
   std::lock_guard<std::mutex> lk{ futuresMutex };
   decltype(completeFutures){}.swap(completeFutures);
   auto id = ++futuresID;
-  std::future<void> fut = std::async(
+  std::shared_future<void> fut = std::async(
     std::launch::async, [this, func = std::forward<Functor>(f), id]() -> void {
       func();
       std::lock_guard<std::mutex> lk{ futuresMutex };
@@ -794,9 +794,8 @@ std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
         futuresCV.notify_one();
       }
     });
-  auto returnFut = fut.share();
-  incompleteFutures.emplace(id, std::move(fut));
-  return returnFut;
+  incompleteFutures.emplace(id, fut);
+  return fut;
 }
 
 std::string ConfigurationAdminImpl::RandomInstanceName()

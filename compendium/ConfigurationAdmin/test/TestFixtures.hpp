@@ -73,18 +73,6 @@ void InstallAndStartDSAndConfigAdmin(::cppmicroservices::BundleContext& ctx)
     b.Start();
   }
 }
-
-size_t installAndStartTestBundles(cppmicroservices::BundleContext& ctx,
-                                  const std::string& bundleName)
-{
-  std::string path = PathToLib(bundleName);
-  auto bundles = ctx.InstallBundles(path);
-  for (auto& b : bundles) {
-    b.Start();
-  }
-
-  return bundles.size();
-}
 }
 
 /**

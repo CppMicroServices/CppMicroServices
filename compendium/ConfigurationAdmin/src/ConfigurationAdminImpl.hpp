@@ -231,8 +231,8 @@ private:
   std::mutex futuresMutex;
   std::uint64_t futuresID;
   std::condition_variable futuresCV;
-  std::vector<std::future<void>> completeFutures;
-  std::unordered_map<std::uint64_t, std::future<void>> incompleteFutures;
+  std::vector<std::shared_future<void>> completeFutures;
+  std::unordered_map<std::uint64_t, std::shared_future<void>> incompleteFutures;
   cppmicroservices::ServiceTracker<
     cppmicroservices::service::cm::ManagedService,
     TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>

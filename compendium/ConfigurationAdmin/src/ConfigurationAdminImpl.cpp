@@ -780,12 +780,9 @@ void ConfigurationAdminImpl::RemovedService(
 template<typename Functor>
 std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
 {
-  uint64_t id{};
-  {
-    std::lock_guard<std::mutex> lk{ futuresMutex };
-    decltype(completeFutures){}.swap(completeFutures);
-    id = ++futuresID;
-  }
+  std::lock_guard<std::mutex> lk{ futuresMutex };
+  decltype(completeFutures){}.swap(completeFutures);
+  auto id = ++futuresID;
 
   std::packaged_task<void()> task(
     [this, func = std::forward<Functor>(f), id]() mutable {
@@ -800,16 +797,12 @@ std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
       }
     });
 
-  std::future<void> fut = task.get_future();
-  std::shared_future<void> returnFut = fut.share();
-  {
-    std::lock_guard<std::mutex> lk{ futuresMutex };
-    incompleteFutures.emplace(id, std::move(fut));
-  }
+  std::shared_future<void> fut = task.get_future().share();
+  incompleteFutures.emplace(id, fut);
 
   asyncWorkService->post(std::move(task));
 
-  return returnFut;
+  return fut;
 }
 
 std::string ConfigurationAdminImpl::RandomInstanceName()

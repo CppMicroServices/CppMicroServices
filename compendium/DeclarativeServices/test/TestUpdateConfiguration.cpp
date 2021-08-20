@@ -83,7 +83,7 @@ TEST_F(tServiceComponent, testUpdateConfig_Modified) //DS_CAI_FTC_1
   EXPECT_EQ(uniqueProp->second, instanceId);
 
   // Component should still be active as modified method is present.
-  // The configuration is updated without deactivating and reactivating the service.
+  // The configuration is updated without deactivating and reactivating theÂ service.
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)

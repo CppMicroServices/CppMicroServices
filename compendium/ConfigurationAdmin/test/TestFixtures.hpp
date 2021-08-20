@@ -52,24 +52,22 @@ std::string GetConfigAdminRuntimePluginFilePath()
 
 void InstallAndStartDSAndConfigAdmin(::cppmicroservices::BundleContext& ctx)
 {
-  //std::vector<cppmicroservices::Bundle> DSBundles;
+  std::vector<cppmicroservices::Bundle> DSBundles;
   std::vector<cppmicroservices::Bundle> CMBundles;
-  //auto dsPluginPath = GetDSRuntimePluginFilePath();
+  auto dsPluginPath = GetDSRuntimePluginFilePath();
   auto cmPluginPath = GetConfigAdminRuntimePluginFilePath();
 
 #if defined(US_BUILD_SHARED_LIBS)
-  //DSBundles = ctx.InstallBundles(dsPluginPath);
+  DSBundles = ctx.InstallBundles(dsPluginPath);
   CMBundles = ctx.InstallBundles(cmPluginPath);
 #else
   DSBundles = ctx.GetBundles();
   CMBundles = ctx.GetBundles();
 #endif
 
-  /*
   for (auto b : DSBundles) {
     b.Start();
   }
-  */
 
   for (auto b : CMBundles) {
     b.Start();
@@ -110,12 +108,10 @@ public:
 
     InstallAndStartDSAndConfigAdmin(context);
 
-    /*
     auto sRef = context.GetServiceReference<scr::ServiceComponentRuntime>();
     ASSERT_TRUE(sRef);
     dsRuntimeService = context.GetService<scr::ServiceComponentRuntime>(sRef);
     ASSERT_TRUE(dsRuntimeService);
-    */
 
     auto sr = context.GetServiceReference<
       cppmicroservices::service::cm::ConfigurationAdmin>();

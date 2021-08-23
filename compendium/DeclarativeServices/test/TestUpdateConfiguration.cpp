@@ -29,6 +29,78 @@
 #include "TestInterfaces/Interfaces.hpp"
 
 namespace test {
+
+TEST_F(tServiceComponent, testUpdatePropsBeforeInstallResolvesService)
+{
+  cppmicroservices::BundleContext ctx = framework.GetBundleContext();
+
+  // Get a service reference to ConfigAdmin to create the component instance.
+  auto configAdminService =
+    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+  ASSERT_TRUE(configAdminService)
+    << "GetService failed for ConfigurationAdmin.";
+
+  // Create configuration object and update properties BEFORE installing and
+  // starting the bundle which defines the service.
+  auto configuration = configAdminService->GetConfiguration("sample::ServiceComponentCA02");
+  configuration->UpdateIfDifferent(
+    std::unordered_map<std::string, cppmicroservices::Any>{ { "foo", true} });
+
+  // Install and start the bundle which has the server
+  auto testBundle = ::test::InstallAndStartBundle(ctx, "TestBundleDSCA02");
+  ASSERT_TRUE(testBundle);
+  const std::string componentName{ "sample::ServiceComponentCA02" };
+
+  // Confirm configuration object presented and check component state.
+  scr::dto::ComponentDescriptionDTO compDescDTO;
+  auto compConfigs =
+    GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
+    << "SATISFIED is exepected since configuration object is created.";
+
+  // Get an instance of the service
+  auto instance = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(instance) << "GetService failed for CAInterface";
+
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
+  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "Component state should be ACTIVE";
+
+}
+TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
+{
+  const std::string configObject = "mw.dependency";
+
+  // Install and start the bundle containing the configuration object and the 
+  // service which is dependent on the configuration object.
+  std::string componentName = "sample::ServiceComponentCA27";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA27");
+  ASSERT_TRUE(testBundle);
+
+  auto configAdminService =
+      GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+  ASSERT_TRUE(configAdminService)
+    << "GetService failed for ConfigurationAdmin.";
+
+  // Confirm that the configuration object has been added to the Configuration
+  // Admin repository.
+  auto configObjects =
+    configAdminService->ListConfigurations("(pid=" + configObject + ")");
+  EXPECT_EQ(configObjects.size(), 1ul)
+      << "One configuration object expected.";
+
+  // Since the configuration object is present the state of the 
+  scr::dto::ComponentDescriptionDTO compDescDTO;
+  auto compConfigs =
+    GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
+    << "SATISFIED is exepected since configuration object is created.";
+
+}
+
 /**
    * Verify that a service's configuration can be updated after the service is activated
    * without deactivating and reactivating the service.

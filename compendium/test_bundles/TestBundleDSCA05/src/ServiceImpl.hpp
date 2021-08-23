@@ -11,7 +11,10 @@ namespace sample {
 class ServiceComponentCA05 : public test::CAInterface
 {
 public:
-  ServiceComponentCA05() = default;
+  ServiceComponentCA05()
+    : properties(std::make_shared<cppmicroservices::AnyMap>(
+        cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS))
+  {}
 
   void Modified(const std::shared_ptr<ComponentContext>& context,
                 const std::shared_ptr<cppmicroservices::AnyMap>& configuration);
@@ -21,10 +24,7 @@ public:
 
 private:
   std::mutex propertiesLock;
-  cppmicroservices::AnyMap properties{
-    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS
-  };
-  
+  std::shared_ptr<cppmicroservices::AnyMap> properties;
 };
 }
 

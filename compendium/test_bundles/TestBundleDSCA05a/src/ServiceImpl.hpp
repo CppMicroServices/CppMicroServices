@@ -12,8 +12,8 @@ class ServiceComponentCA05a : public test::CAInterface
 {
 public:
   ServiceComponentCA05a(const std::shared_ptr<cppmicroservices::AnyMap>& props)
-    : properties(*props)
-    {}
+    : properties(props)
+  {}
 
   cppmicroservices::AnyMap GetProperties();
 
@@ -21,7 +21,7 @@ public:
 
 private:
   std::mutex propertiesLock;
-  cppmicroservices::AnyMap properties;
+  std::shared_ptr<cppmicroservices::AnyMap> properties;
 };
 }
 

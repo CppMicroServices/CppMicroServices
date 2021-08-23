@@ -87,13 +87,13 @@ public:
 
 class US_TestInterfaces_EXPORT TestBundleDSDependent
 {
-  public:
+public:
   virtual ~TestBundleDSDependent();
 };
 
 class US_TestInterfaces_EXPORT TestBundleDSUpstreamDependency
 {
-  public:
+public:
   virtual ~TestBundleDSUpstreamDependency();
 };
 

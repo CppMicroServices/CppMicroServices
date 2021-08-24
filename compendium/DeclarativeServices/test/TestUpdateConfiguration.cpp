@@ -30,7 +30,7 @@
 
 namespace test {
 
-TEST_F(tServiceComponent, testUpdatePropsBeforeInstallResolvesService)
+TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleResolvesService)
 {
   cppmicroservices::BundleContext ctx = framework.GetBundleContext();
 
@@ -46,7 +46,7 @@ TEST_F(tServiceComponent, testUpdatePropsBeforeInstallResolvesService)
   configuration->UpdateIfDifferent(
     std::unordered_map<std::string, cppmicroservices::Any>{ { "foo", true} });
 
-  // Install and start the bundle which has the server
+  // Install and start the bundle which has the service
   auto testBundle = ::test::InstallAndStartBundle(ctx, "TestBundleDSCA02");
   ASSERT_TRUE(testBundle);
   const std::string componentName{ "sample::ServiceComponentCA02" };
@@ -91,14 +91,23 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
   EXPECT_EQ(configObjects.size(), 1ul)
       << "One configuration object expected.";
 
-  // Since the configuration object is present the state of the 
+  // Since the configuration object is present the state of the component
+  // should be SATISFIED.
   scr::dto::ComponentDescriptionDTO compDescDTO;
   auto compConfigs =
     GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
   EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
-    << "SATISFIED is exepected since configuration object is created.";
+    << "SATISFIED is expected since configuration object is created.";
 
+  // GetService to make component active
+  auto service = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(service) << "GetService failed for CAInterface";
+
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
+  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "Component state should be ACTIVE";
 }
 
 /**

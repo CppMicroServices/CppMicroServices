@@ -12,7 +12,7 @@ class ServiceComponentCA27 : public test::CAInterface
 {
 public:
   ServiceComponentCA27(const std::shared_ptr<cppmicroservices::AnyMap>& props)
-    : properties(*props)
+    : properties(props)
   {}
   void Modified(const std::shared_ptr<ComponentContext>& context,
                 const std::shared_ptr<cppmicroservices::AnyMap>& configuration);
@@ -21,7 +21,7 @@ public:
 
 private:
   std::mutex propertiesLock;
-  cppmicroservices::AnyMap properties;
+  std::shared_ptr<cppmicroservices::AnyMap> properties;
 };
 }
 

@@ -118,6 +118,15 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
     << "Component state should be ACTIVE";
+
+  // Confirm that the properties match the properties provided in the
+  // manifest.json file.
+  auto serviceProps = service->GetProperties();
+  auto foo = serviceProps.find("foo");
+  ASSERT_TRUE(foo != serviceProps.end())
+    << "foo not found in constructed instance";
+  const std::string bar{ "bar" };
+  EXPECT_EQ(foo->second, bar);
 }
 /*
  * Tests that if a configuration object is defined in the manifest.json file

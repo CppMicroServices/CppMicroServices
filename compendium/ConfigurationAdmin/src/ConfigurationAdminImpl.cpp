@@ -352,12 +352,12 @@ ConfigurationAdminImpl::ListConfigurations(const std::string& filter)
 
       if (ldap.Match(pidMap)) {
         // This configuration object has a matching pid.
-        result.push_back(it.second);
+        result.emplace_back(it.second);
       } else {
         // The pid wasn't a match but the properties might be. Check those.
         auto props = it.second->GetProperties();
         if (ldap.Match(props)) {
-          result.push_back(it.second);
+          result.emplace_back(it.second);
         }
       }
     } // end for

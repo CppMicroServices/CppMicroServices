@@ -236,7 +236,6 @@ void ComponentConfigurationImpl::ConfigChangedState(
                                         notification.event,
                                         configWasSatisfied,
                                         configNowSatisfied);
-  SetRegistrationProperties();
 
   if (configWasSatisfied && configNowSatisfied &&
       (metadata->configurationPolicy != CONFIG_POLICY_IGNORE)) {

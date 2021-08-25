@@ -95,11 +95,11 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
   ASSERT_TRUE(configAdminService)
     << "GetService failed for ConfigurationAdmin.";
 
-  //// Confirm that the configuration object has been added to the Configuration
-  //// Admin repository.
-  //auto configObjects =
-  //  configAdminService->ListConfigurations("(pid=" + configObject + ")");
-  //EXPECT_EQ(configObjects.size(), 1ul) << "One configuration object expected.";
+  // Confirm that the configuration object has been added to the Configuration
+  // Admin repository.
+  auto configObjects =
+    configAdminService->ListConfigurations("(pid=" + configObject + ")");
+  EXPECT_EQ(configObjects.size(), 1ul) << "One configuration object expected.";
 
   // Since the configuration object is present the state of the component
   // should be SATISFIED.
@@ -112,6 +112,9 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
 
   // GetService to make component active
   auto service = GetInstance<test::CAInterface>();
+  if (!service) {
+    auto a = 1;
+  }
   ASSERT_TRUE(service) << "GetService failed for CAInterface";
 
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
@@ -119,14 +122,15 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
     << "Component state should be ACTIVE";
 
-  //// Confirm that the properties match the properties provided in the
-  //// manifest.json file.
-  //const std::string bar{ "bar" };
-  //auto serviceProps = service->GetProperties();
-  //auto foo = serviceProps.find("foo");
-  //ASSERT_TRUE(foo != serviceProps.end())
-  //  << "foo not found in constructed instance";
-  //EXPECT_EQ(foo->second, bar);
+  // Confirm that the properties match the properties provided in the
+  // manifest.json file.
+  const std::string bar{ "bar" };
+  auto serviceProps = service->GetProperties();
+  auto foo = serviceProps.find("foo");
+  ASSERT_TRUE(foo != serviceProps.end())
+    << "foo not found in constructed instance";
+  EXPECT_EQ(foo->second, bar);
+
 }
 /*
  * Tests that if a configuration object is defined in the manifest.json file

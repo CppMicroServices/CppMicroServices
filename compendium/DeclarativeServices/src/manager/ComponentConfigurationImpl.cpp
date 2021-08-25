@@ -392,7 +392,9 @@ bool ComponentConfigurationImpl::Modified()
 
 ComponentState ComponentConfigurationImpl::GetConfigState() const
 {
-  return GetState()->GetValue();
+  auto currentState = GetState();
+  currentState->WaitForTransitionTask();
+  return currentState->GetValue();
 }
 
 bool ComponentConfigurationImpl::CompareAndSetState(

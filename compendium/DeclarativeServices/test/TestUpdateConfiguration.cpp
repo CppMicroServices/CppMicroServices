@@ -165,6 +165,7 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
 TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
 {
   std::string componentName = "sample::ServiceComponentCA27";
+  std::string configObjectName = "mw.dependency";
 
   // Get a service reference to ConfigAdmin to create the configuration object.
   auto configAdminService =
@@ -174,7 +175,7 @@ TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
 
   // Create configuration object and update properties BEFORE installing and
   // starting the bundle which defines the service.
-  auto configuration = configAdminService->GetConfiguration(componentName);
+  auto configuration = configAdminService->GetConfiguration(configObjectName);
   cppmicroservices::AnyMap props(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string fooProp{ "notbar" };
@@ -214,11 +215,14 @@ TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
     << "Component state should be ACTIVE";
 
-  // Note: Because ConfigurationAdmin was responsible for adding the configuration object
-  // to the repository (because it found it in the manifest.json file), it is also
-  // responsible for removing it. Stopping the testBundle will cause ConfigurationAdmin to
-  // remove the configuration object that was found in the manifest.json file and send a
-  // remove notification to DS. 
+  // Remove this configuration object. 
+  // HACK. If we don't remove this configuration object then ConfigurationAdmin will try to remove it while
+  // it is shutting down. It does this because this is a configuration object that it is responsible for because
+  // it found it in the manifest.json file and added it. This creates a race condition because DS is also shutting down.
+  // Need to fix this but until then we will handle the shutdown like this.
+  auto fut = configuration->Remove();
+  fut.get();
+    
   testBundle.Stop();
 }
 /**

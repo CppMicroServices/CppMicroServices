@@ -148,6 +148,8 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
   ASSERT_TRUE(foo != serviceProps.end())
     << "foo not found in constructed instance";
   EXPECT_EQ(foo->second, bar);
+
+  testBundle.Stop();
 }
 /*
  * Tests that if a configuration object is defined in the manifest.json file
@@ -216,6 +218,8 @@ TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
     << "foo not found in constructed instance";
   const std::string bar{ "bar" };
   EXPECT_EQ(foo->second, bar);
+
+  testBundle.Stop();
 }
 /**
    * Verify that a service's configuration can be updated after the service is activated

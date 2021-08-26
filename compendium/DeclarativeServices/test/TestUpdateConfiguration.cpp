@@ -30,6 +30,8 @@
 
 namespace test {
 
+auto const TIMEOUT = std::chrono::milliseconds(2000);
+
 /*
  * Tests that if a configuration object is created programmatically before
  * the service that is dependent on the configuration object is installed
@@ -97,20 +99,29 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
 
   // Confirm that the configuration object has been added to the Configuration
   // Admin repository.
-  auto configObjects =
-    configAdminService->ListConfigurations("(pid=" + configObject + ")");
-  EXPECT_EQ(configObjects.size(), 1ul) << "One configuration object expected.";
-
-  // The state of the component might start in the UNSATISFIED_REFERENCE state but should
-  // eventually end up in the SATISFIED state once ConfigurationAdmin notifies DS of the configuration
-  // object. DS then changes the state to SATISFIED.
-  scr::dto::ComponentDescriptionDTO compDescDTO;
-  auto const startTime = std::chrono::steady_clock::now();
-  auto timeout = std::chrono::milliseconds(2000);
+  auto startTime = std::chrono::steady_clock::now();
   bool result = false;
   while (!result &&
          std::chrono::duration_cast<std::chrono::milliseconds>(
-           std::chrono::steady_clock::now() - startTime) <= timeout) {
+           std::chrono::steady_clock::now() - startTime) <= TIMEOUT) {
+
+    auto configObjects =
+      configAdminService->ListConfigurations("(pid=" + configObject + ")");
+    if (configObjects.size() >= 1) {
+      result = true;
+    }
+  }
+  ASSERT_TRUE(result);
+
+  // The state of the component might start in the UNSATISFIED_REFERENCE state but should
+  // quickly end up in the SATISFIED state once ConfigurationAdmin notifies DS of the configuration
+  // object. DS then changes the state to SATISFIED.
+  scr::dto::ComponentDescriptionDTO compDescDTO;
+  startTime = std::chrono::steady_clock::now();
+  result = false;
+  while (!result &&
+         std::chrono::duration_cast<std::chrono::milliseconds>(
+           std::chrono::steady_clock::now() - startTime) <= TIMEOUT) {
     auto compConfigs =
       GetComponentConfigs(testBundle, componentName, compDescDTO);
     if (compConfigs.size() == 1) {
@@ -123,7 +134,8 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
   auto service = GetInstance<test::CAInterface>();
   ASSERT_TRUE(service) << "GetService failed for CAInterface";
 
-  auto compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  auto compConfigs =
+    GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
     << "Component state should be ACTIVE";
@@ -168,19 +180,30 @@ TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA27");
   ASSERT_TRUE(testBundle);
 
-  // Confirm configuration object is available and component state is SATISFIED.
+  // The state of the component might start in the UNSATISFIED_REFERENCE state but should
+  // quickly end up in the SATISFIED state once ConfigurationAdmin notifies DS of the configuration
+  // object. DS then changes the state to SATISFIED.
   scr::dto::ComponentDescriptionDTO compDescDTO;
-  auto compConfigs =
-    GetComponentConfigs(testBundle, componentName, compDescDTO);
-  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
-  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
-    << "SATISFIED is expected since configuration object is created.";
+  auto const startTime = std::chrono::steady_clock::now();
+  auto timeout = std::chrono::milliseconds(2000);
+  bool result = false;
+  while (!result &&
+         std::chrono::duration_cast<std::chrono::milliseconds>(
+           std::chrono::steady_clock::now() - startTime) <= timeout) {
+    auto compConfigs =
+      GetComponentConfigs(testBundle, componentName, compDescDTO);
+    if (compConfigs.size() == 1) {
+      result = compConfigs.at(0).state == scr::dto::ComponentState::SATISFIED;
+    }
+  }
+  ASSERT_TRUE(result);
 
   // Get an instance of the service
   auto instance = GetInstance<test::CAInterface>();
   ASSERT_TRUE(instance) << "GetService failed for CAInterface";
 
-  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  auto compConfigs =
+    GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
     << "Component state should be ACTIVE";

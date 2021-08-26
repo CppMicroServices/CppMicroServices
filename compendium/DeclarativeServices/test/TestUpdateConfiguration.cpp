@@ -121,9 +121,6 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
 
   // GetService to make component active
   auto service = GetInstance<test::CAInterface>();
-  if (!service) {
-    auto a = 1;
-  }
   ASSERT_TRUE(service) << "GetService failed for CAInterface";
 
   auto compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);

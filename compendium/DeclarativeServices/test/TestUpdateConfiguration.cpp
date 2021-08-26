@@ -149,11 +149,15 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
     << "foo not found in constructed instance";
   EXPECT_EQ(foo->second, bar);
 
-  // Note: Because ConfigurationAdmin was responsible for adding the configuration object
-  // to the repository (because it found it in the manifest.json file), it is also 
-  // responsible for removing it. Stopping the testBundle will cause ConfigurationAdmin to 
-  // remove the configuration object that was found in the manifest.json file and send a 
-  // remove notification to DS. 
+   // Remove this configuration object.
+  // HACK. If we don't remove this configuration object then ConfigurationAdmin will try to remove it while
+  // it is shutting down. It does this because this is a configuration object that it is responsible for because
+  // it found it in the manifest.json file and added it. This creates a race condition because DS is also shutting down.
+  // Need to fix this but until then we will handle the shutdown like this.
+  auto configuration = configAdminService->GetConfiguration(configObject);
+  auto fut = configuration->Remove();
+  fut.get();
+
   testBundle.Stop();
 }
 /*

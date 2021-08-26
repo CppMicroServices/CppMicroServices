@@ -101,14 +101,23 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
     configAdminService->ListConfigurations("(pid=" + configObject + ")");
   EXPECT_EQ(configObjects.size(), 1ul) << "One configuration object expected.";
 
-  // Since the configuration object is present the state of the component
-  // should be SATISFIED.
+  // The state of the component might start in the UNSATISFIED_REFERENCE state but should
+  // eventually end up in the SATISFIED state once ConfigurationAdmin notifies DS of the configuration
+  // object. DS then changes the state to SATISFIED.
   scr::dto::ComponentDescriptionDTO compDescDTO;
-  auto compConfigs =
-    GetComponentConfigs(testBundle, componentName, compDescDTO);
-  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
-  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
-    << "SATISFIED is expected since configuration object is created.";
+  auto const startTime = std::chrono::steady_clock::now();
+  auto timeout = std::chrono::milliseconds(2000);
+  bool result = false;
+  while (!result &&
+         std::chrono::duration_cast<std::chrono::milliseconds>(
+           std::chrono::steady_clock::now() - startTime) <= timeout) {
+    auto compConfigs =
+      GetComponentConfigs(testBundle, componentName, compDescDTO);
+    if (compConfigs.size() == 1) {
+      result = compConfigs.at(0).state == scr::dto::ComponentState::SATISFIED;
+    }
+  }
+  ASSERT_TRUE(result);
 
   // GetService to make component active
   auto service = GetInstance<test::CAInterface>();
@@ -117,7 +126,7 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
   }
   ASSERT_TRUE(service) << "GetService failed for CAInterface";
 
-  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  auto compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
     << "Component state should be ACTIVE";
@@ -130,7 +139,6 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
   ASSERT_TRUE(foo != serviceProps.end())
     << "foo not found in constructed instance";
   EXPECT_EQ(foo->second, bar);
-
 }
 /*
  * Tests that if a configuration object is defined in the manifest.json file
@@ -151,8 +159,7 @@ TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
 
   // Create configuration object and update properties BEFORE installing and
   // starting the bundle which defines the service.
-  auto configuration =
-    configAdminService->GetConfiguration(componentName);
+  auto configuration = configAdminService->GetConfiguration(componentName);
   cppmicroservices::AnyMap props(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   const std::string fooProp{ "notbar" };
@@ -181,8 +188,8 @@ TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
     << "Component state should be ACTIVE";
 
-  // Confirm that the properties match the properties provided in the 
-  // manifest.json file. 
+  // Confirm that the properties match the properties provided in the
+  // manifest.json file.
   auto serviceProps = instance->GetProperties();
   auto foo = serviceProps.find("foo");
   ASSERT_TRUE(foo != serviceProps.end())

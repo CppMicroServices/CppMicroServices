@@ -149,14 +149,18 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
     << "foo not found in constructed instance";
   EXPECT_EQ(foo->second, bar);
 
+  // Note: Because ConfigurationAdmin was responsible for adding the configuration object
+  // to the repository (because it found it in the manifest.json file), it is also 
+  // responsible for removing it. Stopping the testBundle will cause ConfigurationAdmin to 
+  // remove the configuration object that was found in the manifest.json file and send a 
+  // remove notification to DS. 
   testBundle.Stop();
 }
 /*
  * Tests that if a configuration object is defined in the manifest.json file
  * and the same configuration object is also defined programmatically before the service 
  * that is dependent on that configuration object is installed and started, that service 
- * is resolved as soon as it is started. The resulting properties will be those provided by the 
- * configuration object defined in the manifest.json file. 
+ * is resolved as soon as it is started.  
 */
 TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
 {
@@ -210,15 +214,11 @@ TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
     << "Component state should be ACTIVE";
 
-  // Confirm that the properties match the properties provided in the
-  // manifest.json file.
-  auto serviceProps = instance->GetProperties();
-  auto foo = serviceProps.find("foo");
-  ASSERT_TRUE(foo != serviceProps.end())
-    << "foo not found in constructed instance";
-  const std::string bar{ "bar" };
-  EXPECT_EQ(foo->second, bar);
-
+  // Note: Because ConfigurationAdmin was responsible for adding the configuration object
+  // to the repository (because it found it in the manifest.json file), it is also
+  // responsible for removing it. Stopping the testBundle will cause ConfigurationAdmin to
+  // remove the configuration object that was found in the manifest.json file and send a
+  // remove notification to DS. 
   testBundle.Stop();
 }
 /**

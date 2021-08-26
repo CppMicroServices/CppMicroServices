@@ -218,6 +218,5 @@ std::shared_future<void> ComponentManagerImpl::PostAsyncEnabledToDisabled(
   // return the stored future in the current disabled state object
   return currentState->GetFuture();
 }
-
 }
 }

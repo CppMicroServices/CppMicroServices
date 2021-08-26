@@ -194,8 +194,7 @@ void ComponentConfigurationImpl::Initialize()
         configListenerTokens.emplace_back(listenerToken);
       }
       configManager->Initialize();
-      if (referenceManagers.empty() &&
-          configManager->IsConfigSatisfied()) {
+      if (referenceManagers.empty() && configManager->IsConfigSatisfied()) {
         GetState()->Register(*this);
       }
     }
@@ -242,8 +241,7 @@ void ComponentConfigurationImpl::ConfigChangedState(
     if (!Modified()) {
       //The Component does not have a Modified method so the component instance
       //has been deactivated.
-      if (configManager->IsConfigSatisfied() &&
-          AreReferencesSatisfied()) {
+      if (configManager->IsConfigSatisfied() && AreReferencesSatisfied()) {
         Register();
         return;
       }
@@ -392,6 +390,16 @@ bool ComponentConfigurationImpl::Modified()
 
 ComponentState ComponentConfigurationImpl::GetConfigState() const
 {
+  // When DS is performing a state transition, it changes the state,
+  // performs the action for the state transition, then signals that
+  // the state transition is complete. Before returning the current
+  // state to the caller, wait for the action associated with the
+  // state to complete. For example, when registering a service,
+  // DS changes the state to SATISFIED, registers the service and signals
+  // that the state transition is complete. If the state of SATISFIED is
+  // returned to the caller, it's important that the registration already
+  // has taken place. Waiting for the transition to be signalled accomplishes
+  // this.
   auto currentState = GetState();
   currentState->WaitForTransitionTask();
   return currentState->GetValue();
@@ -454,10 +462,9 @@ ComponentConfigurationImpl::CreateAndActivateComponentInstanceHelper(
   try {
     componentInstance->CreateInstance(ctxt);
   } catch (const std::exception&) {
-    logger->Log(
-      cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-      "Exception while creating component instance.",
-      std::current_exception());
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                "Exception while creating component instance.",
+                std::current_exception());
     throw;
   }
 
@@ -469,10 +476,9 @@ ComponentConfigurationImpl::CreateAndActivateComponentInstanceHelper(
   try {
     componentInstance->BindReferences(ctxt);
   } catch (const std::exception&) {
-    logger->Log(
-      cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-      "Exception while binding references.",
-      std::current_exception());
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                "Exception while binding references.",
+                std::current_exception());
   }
   componentInstance->Activate();
   return std::make_pair(componentInstance, ctxt);

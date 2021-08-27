@@ -68,7 +68,7 @@ void ConfigurationManager::Initialize()
 
     for (const auto& pid : metadata->configurationPids) {
       if (configProperties.find(pid) == configProperties.end()) {
-        auto config = configAdmin->ListConfigurations("(pid = " + pid + ")");
+        auto config = configAdmin->ListConfigurations("(pid=" + pid + ")");
         if (config.size() > 0) {
           auto properties = config.front()->GetProperties();
           configProperties.emplace(pid, properties);

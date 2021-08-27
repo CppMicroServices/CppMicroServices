@@ -1,0 +1,27 @@
+{
+  "bundle.symbolic_name": "TestBundleDSCA27",
+  "bundle.activator": false,
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "enabled": true,
+        "immediate" : false,
+        "implementation-class": "sample::ServiceComponentCA27",
+        "configuration-policy": "require",
+        "configuration-pid": [ "mw.dependency" ],
+        "service": {
+          "interfaces": [ "test::CAInterface" ]
+        }
+      }
+    ]
+  }, "cm": {
+        "version": 1,
+        "configurations": [{
+            "pid": "mw.dependency",
+            "properties": {
+                "foo" : "bar"
+            }
+        }]
+    }
+}

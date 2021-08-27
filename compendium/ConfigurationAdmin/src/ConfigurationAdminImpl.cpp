@@ -310,32 +310,58 @@ ConfigurationAdminImpl::GetFactoryConfiguration(const std::string& factoryPid,
     "GetFactoryConfiguration: deferring to GetConfiguration for PID " + pid);
   return GetConfiguration(pid);
 }
-
+/* ListConfigurations looks for configuration objects in the repository that match the 
+ * input parameter. An LDAP filter expression can be used to filter based on any property of the 
+ * configuration, including the pid or factory pid. Typical inputs for a filter string might 
+ * be "pid=startup.options", (to search for a configuration object with a matching pid)
+ * "pid=virtualfilesystem~user1", (to search for a configuration object with a matching factory pid)
+ *  "key1=abc" (to search for a configuration object containing a property with key "key1" with a value "abc".
+ * Regular expressions are allowed. 
+ */
 std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
-ConfigurationAdminImpl::ListConfigurations(
-  const std::string& filter)
+ConfigurationAdminImpl::ListConfigurations(const std::string& filter)
 {
   std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
     result;
   {
     std::lock_guard<std::mutex> lk{ configurationsMutex };
 
+    // return all configuration objects if the filter is empty
     if (filter.empty()) {
       result.reserve(configurations.size());
       for (const auto& it : configurations) {
         result.push_back(it.second);
       }
-    } else {
-      LDAPFilter ldap{ filter };
-      for (const auto& it : configurations) {
+      return result;
+    }
+
+    // filter is not empty so look for pid and property matches
+    LDAPFilter ldap{ filter };
+    cppmicroservices::AnyMap pidMap{
+      cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS
+    };
+
+    for (const auto& it : configurations) {
+      /* Create an AnyMap containing the pid or factoryPid so that the ldap filter 
+	 * functionality can be used to match the pid to the 
+	 * input parameter. Easy way to do the comparison since input parameter could 
+	 * contain a regular expression 
+	 */
+
+      pidMap["pid"] = it.first;
+
+      if (ldap.Match(pidMap)) {
+        // This configuration object has a matching pid.
+        result.emplace_back(it.second);
+      } else {
+        // The pid wasn't a match but the properties might be. Check those.
         auto props = it.second->GetProperties();
         if (ldap.Match(props)) {
-          result.push_back(it.second);
+          result.emplace_back(it.second);
         }
       }
-    }
+    } // end for
   }
-
   return result;
 }
 
@@ -517,7 +543,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
     auto configAdminRef = cmContext.GetServiceReference<ConfigurationAdmin>();
     for (const auto& it : configurationListeners) {
       auto configEvent = cppmicroservices::service::cm::ConfigurationEvent(
-          configAdminRef, type, fPid, nonFPid);
+        configAdminRef, type, fPid, nonFPid);
       it->configurationEvent((configEvent));
     }
 
@@ -603,7 +629,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(
         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                     "Configuration with PID " + pid + " has been removed.");
       });
-  
+
     return removeFuture;
   }
   ready.set_value();

@@ -154,9 +154,9 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
   // it is shutting down. It does this because this is a configuration object that it is responsible for because
   // it found it in the manifest.json file and added it. This creates a race condition because DS is also shutting down.
   // Need to fix this but until then we will handle the shutdown like this.
-  auto configuration = configAdminService->GetConfiguration(configObject);
-  auto fut = configuration->Remove();
-  fut.get();
+  //auto configuration = configAdminService->GetConfiguration(configObject);
+  //auto fut = configuration->Remove();
+  //fut.get();
 
   testBundle.Stop();
 }

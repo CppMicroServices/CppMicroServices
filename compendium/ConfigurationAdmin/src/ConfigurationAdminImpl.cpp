@@ -676,8 +676,18 @@ ConfigurationAdminImpl::AddingService(
           pid,
           std::move(factoryPid),
           AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
+	  // According to OSGI, no notification should be sent to a ManagedService when  
+	  // a blank Configuration object is created. 
+      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+                  "New ManagedService with PID " + pid);
+      return std::make_shared<
+        TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>(
+        pid, std::move(managedService));
     }
   }
+  // Send a notification in case a valid configuration object 
+  // was created before the service was active. The service's properties
+  // need to be updated. 
   PerformAsync([this, pid, managedService] {
     AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
     {

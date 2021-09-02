@@ -440,10 +440,9 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceNotification)
   // setup expectations.
   EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(props)))
     .WillOnce(testing::InvokeWithoutArgs(f));
-  EXPECT_CALL(*mockManagedService2, Updated(AnyMapEquals(emptyProps)))
-    .WillOnce(testing::InvokeWithoutArgs(f2));
   EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(newProps)))
     .WillOnce(testing::InvokeWithoutArgs(f));
+  EXPECT_CALL(*mockManagedService2, Updated(testing::_)).Times(0);
   EXPECT_CALL(*mockManagedService3, Updated(testing::_)).Times(0);
 
   // Ensure notification from original GetConfiguration has run.
@@ -475,7 +474,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceNotification)
   ul.lock();
   auto invokeComplete =
     counterCV.wait_for(ul, std::chrono::seconds(10), [&msCounter, &ms2Counter] {
-      return 2u == msCounter && 1u == ms2Counter;
+      return 2u == msCounter && 0u == ms2Counter;
     });
   ul.unlock();
 
@@ -654,9 +653,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
   auto mockManagedServiceFactory2 =
     std::make_shared<MockManagedServiceFactory>();
   // setup expectations.
-  EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(emptyProps)))
-    .Times(2)
-    .WillRepeatedly(testing::InvokeWithoutArgs(f));
+  EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(emptyProps))).Times(1);
   EXPECT_CALL(
     *mockManagedServiceFactory,
     Updated(std::string{ "factory~instance1" }, AnyMapEquals(emptyProps)))
@@ -693,11 +690,11 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
     ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger);
 
     std::unique_lock<std::mutex> ul{ counterMutex };
-    auto invokedOnce = counterCV.wait_for(
-      ul, std::chrono::seconds(10), [&msCounter] { return 1u == msCounter; });
+    auto invokedZeroTimes = counterCV.wait_for(
+      ul, std::chrono::seconds(10), [&msCounter] { return 0u == msCounter; });
     ul.unlock();
 
-    EXPECT_TRUE(invokedOnce);
+    EXPECT_TRUE(invokedZeroTimes);
     configAdmin.WaitForAllAsync();
 
     auto conf = configAdmin.GetConfiguration("factory~instance1");
@@ -714,7 +711,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
   std::unique_lock<std::mutex> ul{ counterMutex };
   auto invokeComplete =
     counterCV.wait_for(ul, std::chrono::seconds(10), [&msCounter, &msfCounter] {
-      return 2u == msCounter && 1u == msfCounter;
+      return 0u == msCounter && 1u == msfCounter;
     });
   ul.unlock();
 

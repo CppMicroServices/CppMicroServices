@@ -676,8 +676,9 @@ ConfigurationAdminImpl::AddingService(
           pid,
           std::move(factoryPid),
           AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
-	  // According to OSGI, no notification should be sent to a ManagedService when  
-	  // a blank Configuration object is created. 
+	  // According to OSGI, creating a new Configuration object must not initiate a callback to the 
+	  // Managed Service updated method until the properties are set in the Configuration with the 
+	  // update method. Return here without sending notification.
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                   "New ManagedService with PID " + pid);
       return std::make_shared<

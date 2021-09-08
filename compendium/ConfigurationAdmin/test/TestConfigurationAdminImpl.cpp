@@ -395,7 +395,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyRemoveConfigurations)
   EXPECT_NE(conf5, configAdmin.GetConfiguration("test.pid5"));
 }
 
-TEST_F(TestConfigurationAdminImpl, DISABLED_VerifyManagedServiceNotification)
+TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceNotification)
 {
   auto bundleContext = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
@@ -419,14 +419,6 @@ TEST_F(TestConfigurationAdminImpl, DISABLED_VerifyManagedServiceNotification)
     {
       std::lock_guard<std::mutex> lk{ counterMutex };
       ++msCounter;
-    }
-    counterCV.notify_one();
-  };
-
-  auto f2 = [&counterMutex, &counterCV, &ms2Counter] {
-    {
-      std::lock_guard<std::mutex> lk{ counterMutex };
-      ++ms2Counter;
     }
     counterCV.notify_one();
   };
@@ -618,7 +610,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
   configAdmin.WaitForAllAsync();
 }
 
-TEST_F(TestConfigurationAdminImpl, DISABLED_VerifyConfigAdminStartupShutdownNotification)
+TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
 {
   auto bundleContext = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
@@ -629,14 +621,6 @@ TEST_F(TestConfigurationAdminImpl, DISABLED_VerifyConfigAdminStartupShutdownNoti
   std::condition_variable counterCV;
   auto msCounter = 0u;
   auto msfCounter = 0u;
-
-  auto f = [&counterMutex, &counterCV, &msCounter] {
-    {
-      std::lock_guard<std::mutex> lk{ counterMutex };
-      ++msCounter;
-    }
-    counterCV.notify_one();
-  };
 
   auto f2 = [&counterMutex, &counterCV, &msfCounter] {
     {

@@ -395,7 +395,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyRemoveConfigurations)
   EXPECT_NE(conf5, configAdmin.GetConfiguration("test.pid5"));
 }
 
-TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceNotification)
+TEST_F(TestConfigurationAdminImpl, DISABLED_VerifyManagedServiceNotification)
 {
   auto bundleContext = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
@@ -618,7 +618,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
   configAdmin.WaitForAllAsync();
 }
 
-TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
+TEST_F(TestConfigurationAdminImpl, DISABLED_VerifyConfigAdminStartupShutdownNotification)
 {
   auto bundleContext = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();

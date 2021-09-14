@@ -11,8 +11,8 @@ namespace sample {
 class ServiceComponentCA02 : public test::CAInterface
 {
 public:
-    ServiceComponentCA02(const std::shared_ptr<cppmicroservices::AnyMap>& props)
-    : properties(*props)
+  ServiceComponentCA02(const std::shared_ptr<cppmicroservices::AnyMap>& props)
+    : properties(props)
   {}
   void Modified(const std::shared_ptr<ComponentContext>& context,
                 const std::shared_ptr<cppmicroservices::AnyMap>& configuration);
@@ -21,7 +21,7 @@ public:
 
 private:
   std::mutex propertiesLock;
-  cppmicroservices::AnyMap properties;
+  std::shared_ptr<cppmicroservices::AnyMap> properties;
 };
 }
 

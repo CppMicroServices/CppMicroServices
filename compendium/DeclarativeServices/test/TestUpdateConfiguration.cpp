@@ -29,6 +29,206 @@
 #include "TestInterfaces/Interfaces.hpp"
 
 namespace test {
+
+auto const TIMEOUT = std::chrono::milliseconds(2000);
+
+/*
+ * Tests that if a configuration object is created programmatically before
+ * the service that is dependent on the configuration object is installed
+ * and started, the service is resolved as soon as it is started.
+*/
+TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleResolvesService)
+{
+  cppmicroservices::BundleContext ctx = framework.GetBundleContext();
+
+  // Get a service reference to ConfigAdmin to create the configuration object.
+  auto configAdminService =
+    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+  ASSERT_TRUE(configAdminService)
+    << "GetService failed for ConfigurationAdmin.";
+
+  // Create configuration object and update properties BEFORE installing and
+  // starting the bundle which defines the service.
+  auto configuration =
+    configAdminService->GetConfiguration("sample::ServiceComponentCA02");
+  configuration->UpdateIfDifferent(
+    std::unordered_map<std::string, cppmicroservices::Any>{ { "foo", true } });
+
+  // Install and start the bundle which has the service
+  auto testBundle = ::test::InstallAndStartBundle(ctx, "TestBundleDSCA02");
+  ASSERT_TRUE(testBundle);
+  const std::string componentName{ "sample::ServiceComponentCA02" };
+
+  // Confirm configuration object is available and service is resolved.
+  scr::dto::ComponentDescriptionDTO compDescDTO;
+  auto compConfigs =
+    GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
+    << "SATISFIED is exepected since configuration object is created.";
+
+  // Get an instance of the service
+  auto instance = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(instance) << "GetService failed for CAInterface";
+
+  //Confirm component state is active.
+  compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
+  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "Component state should be ACTIVE";
+}
+/*
+ * Tests that if a configuration object is defined in the manifest.json file
+ * the service that is dependent on the configuration object is resolved as soon
+ * as it is started.
+*/
+TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
+{
+  const std::string configObject = "mw.dependency";
+
+  // Install and start the bundle containing the configuration object and the
+  // service which is dependent on the configuration object.
+  std::string componentName = "sample::ServiceComponentCA27";
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA27");
+  ASSERT_TRUE(testBundle);
+
+  auto configAdminService =
+    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+  ASSERT_TRUE(configAdminService)
+    << "GetService failed for ConfigurationAdmin.";
+
+  // Confirm that the configuration object has been added to the Configuration
+  // Admin repository.
+  auto startTime = std::chrono::steady_clock::now();
+  bool result = false;
+  while (!result &&
+         std::chrono::duration_cast<std::chrono::milliseconds>(
+           std::chrono::steady_clock::now() - startTime) <= TIMEOUT) {
+
+    auto configObjects =
+      configAdminService->ListConfigurations("(pid=" + configObject + ")");
+    if (configObjects.size() >= 1) {
+      result = true;
+    }
+  }
+  ASSERT_TRUE(result);
+
+  // The state of the component might start in the UNSATISFIED_REFERENCE state but should
+  // quickly end up in the SATISFIED state once ConfigurationAdmin notifies DS of the configuration
+  // object. DS then changes the state to SATISFIED.
+  scr::dto::ComponentDescriptionDTO compDescDTO;
+  startTime = std::chrono::steady_clock::now();
+  result = false;
+  while (!result &&
+         std::chrono::duration_cast<std::chrono::milliseconds>(
+           std::chrono::steady_clock::now() - startTime) <= TIMEOUT) {
+    auto compConfigs =
+      GetComponentConfigs(testBundle, componentName, compDescDTO);
+    if (compConfigs.size() == 1) {
+      result = compConfigs.at(0).state == scr::dto::ComponentState::SATISFIED;
+    }
+  }
+  ASSERT_TRUE(result);
+
+  // GetService to make component active
+  auto service = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(service) << "GetService failed for CAInterface";
+
+  auto compConfigs =
+    GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
+  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "Component state should be ACTIVE";
+
+  // Confirm that the properties match the properties provided in the
+  // manifest.json file.
+  const std::string bar{ "bar" };
+  auto serviceProps = service->GetProperties();
+  auto foo = serviceProps.find("foo");
+  ASSERT_TRUE(foo != serviceProps.end())
+    << "foo not found in constructed instance";
+  EXPECT_EQ(foo->second, bar);
+
+   // Remove this configuration object.
+  // HACK. If we don't remove this configuration object then ConfigurationAdmin will try to remove it while
+  // it is shutting down. It does this because this is a configuration object that it is responsible for because
+  // it found it in the manifest.json file and added it. This creates a race condition because DS is also shutting down.
+  // Need to fix this but until then we will handle the shutdown like this.
+  auto configuration = configAdminService->GetConfiguration(configObject);
+  auto fut = configuration->Remove();
+  fut.get();
+
+  testBundle.Stop();
+}
+/*
+ * Tests that if a configuration object is defined in the manifest.json file
+ * and the same configuration object is also defined programmatically before the service 
+ * that is dependent on that configuration object is installed and started, that service 
+ * is resolved as soon as it is started.  
+*/
+TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
+{
+  std::string componentName = "sample::ServiceComponentCA27";
+  std::string configObjectName = "mw.dependency";
+
+  // Get a service reference to ConfigAdmin to create the configuration object.
+  auto configAdminService =
+    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+  ASSERT_TRUE(configAdminService)
+    << "GetService failed for ConfigurationAdmin.";
+
+  // Create configuration object and update properties BEFORE installing and
+  // starting the bundle which defines the service.
+  auto configuration = configAdminService->GetConfiguration(configObjectName);
+  cppmicroservices::AnyMap props(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  const std::string fooProp{ "notbar" };
+  props["foo"] = fooProp;
+  configuration->UpdateIfDifferent(props);
+
+  // Install and start the bundle containing the configuration object and the
+  // service which is dependent on the configuration object.
+  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA27");
+  ASSERT_TRUE(testBundle);
+
+  // The state of the component might start in the UNSATISFIED_REFERENCE state but should
+  // quickly end up in the SATISFIED state once ConfigurationAdmin notifies DS of the configuration
+  // object. DS then changes the state to SATISFIED.
+  scr::dto::ComponentDescriptionDTO compDescDTO;
+  auto const startTime = std::chrono::steady_clock::now();
+  auto timeout = std::chrono::milliseconds(2000);
+  bool result = false;
+  while (!result &&
+         std::chrono::duration_cast<std::chrono::milliseconds>(
+           std::chrono::steady_clock::now() - startTime) <= timeout) {
+    auto compConfigs =
+      GetComponentConfigs(testBundle, componentName, compDescDTO);
+    if (compConfigs.size() == 1) {
+      result = compConfigs.at(0).state == scr::dto::ComponentState::SATISFIED;
+    }
+  }
+  ASSERT_TRUE(result);
+
+  // Get an instance of the service
+  auto instance = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(instance) << "GetService failed for CAInterface";
+
+  auto compConfigs =
+    GetComponentConfigs(testBundle, componentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
+  ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "Component state should be ACTIVE";
+
+  // Remove this configuration object. 
+  // HACK. If we don't remove this configuration object then ConfigurationAdmin will try to remove it while
+  // it is shutting down. It does this because this is a configuration object that it is responsible for because
+  // it found it in the manifest.json file and added it. This creates a race condition because DS is also shutting down.
+  // Need to fix this but until then we will handle the shutdown like this.
+  auto fut = configuration->Remove();
+  fut.get();
+    
+  testBundle.Stop();
+}
 /**
    * Verify that a service's configuration can be updated after the service is activated
    * without deactivating and reactivating the service.
@@ -308,22 +508,22 @@ TEST_F(tServiceComponent,
 
 } // end of testUpdateConfig_WithoutModifiedMethodDelayed
 
-
 /**
   * Verify a service specified with scope as PROTOTYPE in component description
   * returns different instances to GetService calls. When the configuration object is
   * updated verify that the properties for all instances are updated. 
   */
-TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC_26
+TEST_F(tServiceComponent,
+       testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC_26
 {
   std::string componentName = "sample::ServiceComponentCA26";
 
   // Start the test bundle containing the component name.
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA26");
- 
-  // Use DS runtime service to validate the component state and scope. 
-  // This is a bundle with immediate = true (not a delayed component) 
-  // and configuration-policy = "optional" so it should be activated 
+
+  // Use DS runtime service to validate the component state and scope.
+  // This is a bundle with immediate = true (not a delayed component)
+  // and configuration-policy = "optional" so it should be activated
   // immediately.
   scr::dto::ComponentDescriptionDTO compDescDTO;
   auto compConfigs =
@@ -332,7 +532,7 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
     << "The state should be ACTIVE.";
   EXPECT_EQ(compDescDTO.scope, "prototype");
 
-   // Create three instances of the service component.
+  // Create three instances of the service component.
   cppmicroservices::ServiceReference<test::CAInterface> sRef =
     context.GetServiceReference<test::CAInterface>();
   EXPECT_TRUE(static_cast<bool>(sRef));
@@ -342,7 +542,7 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
   for (size_t i = 0; i < 3; i++) {
     instanceSet.emplace(serviceObjects.GetService());
   }
-  // Each GetService call should have returned a valid ptr (not nullptr) 
+  // Each GetService call should have returned a valid ptr (not nullptr)
   // and each call should have returned a different instance. Verify that instanceSet
   // contains 3 valid instances.
   EXPECT_TRUE(
@@ -355,9 +555,8 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
     << "number of service instances returned must be equal to the number of "
        "GetService calls";
 
-
-  // Create configuration object and update property. This will send an 
-  // Update notification to DS that should result in DS modifying all of the 
+  // Create configuration object and update property. This will send an
+  // Update notification to DS that should result in DS modifying all of the
   // instances. Since this service component has a Modified method, it should
   // remain ACTIVE.
   auto configAdminService =
@@ -372,7 +571,7 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
   props["uniqueProp"] = newProp;
   auto fut = configuration->Update(props);
   fut.get();
-  
+
   // Confirm component instances were updated with the new property.
   for (std::shared_ptr<test::CAInterface> service : instanceSet) {
     auto instanceProps = service->GetProperties();
@@ -381,8 +580,7 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
       << "uniqueProp not found in constructed instance.";
     EXPECT_EQ(uniqueProp->second, newProp);
   }
-
- }
+}
 
 /**
   * Verify a service specified with scope as PROTOTYPE in component description
@@ -393,7 +591,7 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
   * Since this service component does not have a Modified method, verify that after an
   * update the component is deactivated and reactivated with the correct properties. 
   */
- TEST_F(tServiceComponent,
+TEST_F(tServiceComponent,
        testUpdateConfig_PrototypeScope_WithoutModified) //DS_CAI_FTC_25
 {
   // Start the test bundle containing the component name.
@@ -401,7 +599,7 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA04");
 
   // Use DS runtime service to validate the component state and scope.
-  // since this component has a configuration-policy = "require" and 
+  // since this component has a configuration-policy = "require" and
   // the configuration object is not yet available, the state should
   // be UNSATISFIED_REFERENCE.
   scr::dto::ComponentDescriptionDTO compDescDTO;
@@ -419,7 +617,7 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
   ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
   // Create configuration object and update property. This will satisfy
-  // the component but because this is a delayed component (immediate= false) 
+  // the component but because this is a delayed component (immediate= false)
   // it will not yet be activated. A GetService call is required in order
   // for DS to activate the component.
   auto configuration = configAdminService->GetConfiguration(componentName);
@@ -432,7 +630,7 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
   auto fut = configuration->Update(props);
   fut.get();
 
-  // Call GetService to make the component active. Call it more than once to 
+  // Call GetService to make the component active. Call it more than once to
   // Get more than one instance.
   cppmicroservices::ServiceReference<test::CAInterface> sRef =
     context.GetServiceReference<test::CAInterface>();
@@ -469,9 +667,9 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
       << "uniqueProp not found in constructed instance.";
     EXPECT_EQ(uniqueProp->second, initialProp);
   }
- 
+
   // Update the configuration object. Since no Modified method exists and since
-  // this is a delayed component(immediate = false). The update call 
+  // this is a delayed component(immediate = false). The update call
   // should result in the component begin deactivated. Verify that the
   // state is SATISFIED.
   const std::string updatedProp{ "updatedProp" };
@@ -483,7 +681,7 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
     << "Component state should be SATISFIED";
 
   instanceSet.clear();
-  // Call GetService to make the component active again. 
+  // Call GetService to make the component active again.
   sRef = context.GetServiceReference<test::CAInterface>();
   EXPECT_TRUE(static_cast<bool>(sRef));
   serviceObjects = context.GetServiceObjects(sRef);
@@ -491,7 +689,7 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
     instanceSet.emplace(serviceObjects.GetService());
   }
 
-  // Confirm component state is ACTIVE and all of the instances have the 
+  // Confirm component state is ACTIVE and all of the instances have the
   // updated property.
   compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
@@ -506,5 +704,4 @@ TEST_F(tServiceComponent, testUpdateConfig_PrototypeScope_Modified) //DS_CAI_FTC
     EXPECT_EQ(uniqueProp->second, updatedProp);
   }
 }
-
 }

@@ -38,7 +38,7 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(
   auto logger = mgr.GetLogger();
 
   // Make sure the state didn't change while we were waiting
-  if (mgr.GetConfigState() !=
+  if (mgr.GetState()->GetValue() !=
       service::component::runtime::dto::ComponentState::ACTIVE) {
     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                 "Activate failed. Component no longer in Active State.");
@@ -71,7 +71,7 @@ void CCActiveState::Deactivate(ComponentConfigurationImpl& mgr)
   std::lock_guard<std::mutex> lock(oneAtATimeMutex);
 
   // Make sure the state didn't change while we were waiting
-  if (mgr.GetConfigState() !=
+  if (mgr.GetState()->GetValue() !=
       service::component::runtime::dto::ComponentState::ACTIVE) {
     auto logger = mgr.GetLogger();
     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
@@ -104,7 +104,7 @@ bool CCActiveState::Modified(ComponentConfigurationImpl& mgr)
 {
   std::lock_guard<std::mutex> lock(oneAtATimeMutex);
   // Make sure the state didn't change while we were waiting
-  if (mgr.GetConfigState() !=
+  if (mgr.GetState()->GetValue() !=
       service::component::runtime::dto::ComponentState::ACTIVE) {
     auto logger = mgr.GetLogger();
     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
@@ -132,7 +132,7 @@ void CCActiveState::Rebind(ComponentConfigurationImpl& mgr,
 {
   std::lock_guard<std::mutex> lock(oneAtATimeMutex);
   // Make sure the state didn't change while we were waiting
-  if (mgr.GetConfigState() !=
+  if (mgr.GetState()->GetValue() !=
       service::component::runtime::dto::ComponentState::ACTIVE) {
     auto logger = mgr.GetLogger();
     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,

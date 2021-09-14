@@ -39,7 +39,7 @@ class CCRegisteredState final : public CCSatisfiedState
 {
 public:
   CCRegisteredState();
-  CCRegisteredState(std::future<void> blockUntil);
+  CCRegisteredState(std::shared_future<void> blockUntil);
   ~CCRegisteredState() override = default;
   CCRegisteredState(const CCRegisteredState&) = delete;
   CCRegisteredState& operator=(const CCRegisteredState&) = delete;
@@ -66,7 +66,7 @@ public:
   void WaitForTransitionTask() override { ready.get(); }
 
 private:
-  std::future<void> ready;
+  std::shared_future<void> ready;
 };
 }
 }

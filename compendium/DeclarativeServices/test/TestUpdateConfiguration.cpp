@@ -149,15 +149,6 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
     << "foo not found in constructed instance";
   EXPECT_EQ(foo->second, bar);
 
-   // Remove this configuration object.
-  // HACK. If we don't remove this configuration object then ConfigurationAdmin will try to remove it while
-  // it is shutting down. It does this because this is a configuration object that it is responsible for because
-  // it found it in the manifest.json file and added it. This creates a race condition because DS is also shutting down.
-  // Need to fix this but until then we will handle the shutdown like this.
-  auto configuration = configAdminService->GetConfiguration(configObject);
-  auto fut = configuration->Remove();
-  fut.get();
-
   testBundle.Stop();
 }
 /*
@@ -218,15 +209,7 @@ TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
   EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
     << "Component state should be ACTIVE";
-
-  // Remove this configuration object. 
-  // HACK. If we don't remove this configuration object then ConfigurationAdmin will try to remove it while
-  // it is shutting down. It does this because this is a configuration object that it is responsible for because
-  // it found it in the manifest.json file and added it. This creates a race condition because DS is also shutting down.
-  // Need to fix this but until then we will handle the shutdown like this.
-  auto fut = configuration->Remove();
-  fut.get();
-    
+  
   testBundle.Stop();
 }
 /**

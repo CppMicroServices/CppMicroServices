@@ -202,7 +202,8 @@ public:
     const std::shared_ptr<TrackedServiceWrapper<
       cppmicroservices::service::cm::ManagedServiceFactory>>& service) override;
 
-  // Only used by pkgtest to avoid race conditions.
+  // Used by tests to avoid race conditions and CMBundleExtension destructor to make sure all asynchronous 
+  // threads have completed. 
   void WaitForAllAsync();
 
 private:

@@ -251,11 +251,9 @@ TEST_F(ConfigAdminTests, testServiceUpdated)
   auto const service = getManagedService(ctx);
   ASSERT_NE(service, nullptr);
 
-  // We should get at least one Updated() call with the initial configuration from
+  // We should get an Updated() call with the initial configuration from
   // the test bundle's manifest.json file (anInt=2). The asynchronous nature of
-  // ConfigAdmin means that we may get more than one call to Updated(). This is also
-  // why we check the counter is >= 1: we may get an initial Updated() call with empty
-  // properties if the service is configured before the initial configuration has loaded.
+  // ConfigAdmin means that we may have to wait until the Updated call is received.
   {
     bool result = false;
     std::string diagnostic;

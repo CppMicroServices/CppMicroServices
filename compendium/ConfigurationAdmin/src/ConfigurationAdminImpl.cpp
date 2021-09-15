@@ -504,6 +504,7 @@ void ConfigurationAdminImpl::RemoveConfigurations(
     }
     ++idx;
   }
+  WaitForAllAsync();
 }
 
 std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
@@ -675,8 +676,19 @@ ConfigurationAdminImpl::AddingService(
           pid,
           std::move(factoryPid),
           AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
+	  // According to OSGI, creating a new Configuration object must not initiate a callback to the 
+	  // Managed Service updated method until the properties are set in the Configuration with the 
+	  // update method. Return here without sending notification.
+      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+                  "New ManagedService with PID " + pid);
+      return std::make_shared<
+        TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>(
+        pid, std::move(managedService));
     }
   }
+  // Send a notification in case a valid configuration object 
+  // was created before the service was active. The service's properties
+  // need to be updated. 
   PerformAsync([this, pid, managedService] {
     AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
     {

@@ -213,15 +213,15 @@ TEST_F(tGenericDSAndCASuite, TestAsyncWorkServiceWithoutUserService)
   // at SCRLoggerTest for example
   cppmicroservices::cmimpl::CMAsyncWorkService cmAsyncWorkService(
     context, std::make_shared<cppmicroservices::cmimpl::FakeLogger>());
-  //EXPECT_NO_THROW({
-  std::packaged_task<void()> myTask([]() {
-    int v = 1 + 2;
-    US_UNUSED(v);
+  EXPECT_NO_THROW({
+    std::packaged_task<void()> myTask([]() {
+      int v = 1 + 2;
+      US_UNUSED(v);
+    });
+    std::future<void> f = myTask.get_future();
+    cmAsyncWorkService.post(std::move(myTask));
+    f.get();
   });
-  std::future<void> f = myTask.get_future();
-  cmAsyncWorkService.post(std::move(myTask));
-  f.get();
-  //});
 }
 
 TEST_F(tGenericDSAndCASuite, TestUserServiceUsedAfterInstall)

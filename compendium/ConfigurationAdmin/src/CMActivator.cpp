@@ -78,6 +78,7 @@ void CMActivator::Stop(cppmicroservices::BundleContext context)
                 "Exception while stopping the CM bundle",
                 std::current_exception());
   }
+  asyncWorkService->StopTracking();
   logger = nullptr;
   runtimeContext = nullptr;
 }

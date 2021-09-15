@@ -22,7 +22,7 @@ namespace cm = cppmicroservices::service::cm;
 
 namespace {
 
-auto const DEFAULT_POLL_PERIOD = std::chrono::milliseconds(3000);
+auto const DEFAULT_POLL_PERIOD = std::chrono::milliseconds(2000);
 
 std::string PathToLib(const std::string& libName)
 {

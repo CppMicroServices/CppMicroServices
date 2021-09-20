@@ -145,11 +145,7 @@ ConfigurationImpl::UpdateWithoutNotificationIfDifferent(AnyMap newProperties)
   if (removed) {
     throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
   }
-  std::ostringstream existingProps;
-  std::ostringstream newProps;
-  cppmicroservices::any_value_to_string(existingProps, properties);
-  cppmicroservices::any_value_to_string(newProps, newProperties);
-  if (existingProps.str() == newProps.str()) {
+  if (properties == newProperties) {
     return std::pair<bool, unsigned long>{ false, 0u };
   }
   properties = std::move(newProperties);

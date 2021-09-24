@@ -101,8 +101,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2016, windows-2019]
-        us_shared: [1, 0]
-        us_threaded: [1, 0]
+        # build configurations:
+        # 0 = threading ON / shared lib ON
+        # 1 = threading ON / shared lib OFF
+        buildconfiguration: [0,1]
 
     steps:
     - name: Initialization

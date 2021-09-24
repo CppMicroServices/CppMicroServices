@@ -1,7 +1,7 @@
 
 if(APPLE)
   find_program(CTEST_COVERAGE_COMMAND NAMES gcov)
-else()
+elseif(NOT WIN32)
   find_program(CTEST_COVERAGE_COMMAND NAMES $ENV{MY_COVERAGE})
 endif()
 find_program(CTEST_MEMORYCHECK_COMMAND NAMES valgrind)
@@ -13,7 +13,7 @@ else()
   set(CTEST_DASHBOARD_ROOT "/tmp/us_builds")
 endif()
 
-if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" AND NOT WIN32)
   # gcc in combination with gcov seems to consume a lot of memory
   # and may lead to errors when building in CI. Hence we compile
   # with -j for non-GNU compilers only.

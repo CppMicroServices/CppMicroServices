@@ -135,7 +135,12 @@ if(NOT US_CMAKE_GENERATOR AND NOT WIN32)
   elseif (NOT WIN32)
     set(US_CMAKE_GENERATOR "Unix Makefiles")
   else()
-    set(US_CMAKE_GENERATOR "$ENV{BUILD_GENERATOR}")
+    if ("$ENV{GITHUB_BUILD_OS}" STREQUAL "windows-2016")
+      set(US_CMAKE_GENERATOR "Visual Studio 15 2017")
+    elseif ("$ENV{GITHUB_BUILD_OS}" STREQUAL "windows-2019")
+      set(US_CMAKE_GENERATOR "Visual Studio 16 2019")
+    endif()
+    
   endif()
 endif()
 

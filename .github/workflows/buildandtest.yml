@@ -126,6 +126,7 @@ jobs:
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
       env: 
         BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+        BUILD_GENERATOR: "${{matrix.os == 'windows-2016'}} && 'Visual Studio 15 2017' || 'Visual Studio 16 2019'"
 
     - name: Generate code coverage data
       run: |

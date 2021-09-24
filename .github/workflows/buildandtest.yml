@@ -129,6 +129,7 @@ jobs:
         GITHUB_BUILD_OS: ${{matrix.os}}
 
     - name: Generate code coverage data
+      shell: cmd
       run: |
         ${{env.BUILD_DIR}}/opencppcoverage_mergereports.bat
         python ${{env.BUILD_DIR}}/fixcoveragefilepaths.py -i coverage.xml -s ${{env.BUILD_DIR}} -o coverage_pathsfixed.xml

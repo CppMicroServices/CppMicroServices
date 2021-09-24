@@ -128,11 +128,11 @@ jobs:
         BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
         GITHUB_BUILD_OS: ${{matrix.os}}
 
-    - name: Generate code coverage data
+    - name: Code coverage preprocessing
       shell: cmd
       run: |
-        ${{env.BUILD_DIR}}/opencppcoverage_mergereports.bat
-        python ${{env.BUILD_DIR}}/fixcoveragefilepaths.py -i coverage.xml -s ${{env.BUILD_DIR}} -o coverage_pathsfixed.xml
+        ${{github.workspace}}\build\opencppcoverage_mergereports.bat
+        python ${{github.workspace}}\build\fixcoveragefilepaths.py -i coverage.xml -s ${{env.BUILD_DIR}} -o coverage_pathsfixed.xml
 
     - name: Submit code coverage data
       shell: pwsh

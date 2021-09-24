@@ -104,37 +104,37 @@ jobs:
         us_shared: [1, 0]
         us_threaded: [1, 0]
 
-      steps:
-      - name: Initialization
-        run: |
-          cmake -version
-          git config --global core.autocrlf true
+    steps:
+    - name: Initialization
+      run: |
+        cmake -version
+        git config --global core.autocrlf true
 
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
 
-      - name: Install OpenCppCoverage and setup PATH environment variable
-        run: |
-          choco install opencppcoverage
-          set PATH=%PATH%;C:\Program Files\OpenCppCoverage
-          echo %PATH%
+    - name: Install OpenCppCoverage and setup PATH environment variable
+      run: |
+        choco install opencppcoverage
+        set PATH=%PATH%;C:\Program Files\OpenCppCoverage
+        echo %PATH%
 
-      - name: Configure Build And Test
-        run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
-        env: 
-          BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+    - name: Configure Build And Test
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
+      env: 
+        BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
 
-      - name: Generate code coverage data
-        run: |
-          ${{env.BUILD_DIR}}/opencppcoverage_mergereports.bat
-          python ${{env.BUILD_DIR}}/fixcoveragefilepaths.py -i coverage.xml -s ${{env.BUILD_DIR}} -o coverage_pathsfixed.xml
+    - name: Generate code coverage data
+      run: |
+        ${{env.BUILD_DIR}}/opencppcoverage_mergereports.bat
+        python ${{env.BUILD_DIR}}/fixcoveragefilepaths.py -i coverage.xml -s ${{env.BUILD_DIR}} -o coverage_pathsfixed.xml
 
-      - name: Submit code coverage data
-        shell: pwsh
-        run: |
-          if($env:WITH_COVERAGE -eq 1){
-            $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
-            Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-            bash codecov.sh -f "./coverage_pathsfixed.xml" -U "-s" -A "-s"
-          }
+    - name: Submit code coverage data
+      shell: pwsh
+      run: |
+        if($env:WITH_COVERAGE -eq 1){
+          $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
+          Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
+          bash codecov.sh -f "./coverage_pathsfixed.xml" -U "-s" -A "-s"
+        }

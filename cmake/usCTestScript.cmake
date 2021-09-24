@@ -129,7 +129,7 @@ set(config1     0       1 )
 set(config2     1       0 )
 set(config3     0       0 )
 
-if(NOT US_CMAKE_GENERATOR AND NOT WIN32)
+if(NOT US_CMAKE_GENERATOR)
   if(APPLE AND NOT WITH_COVERAGE)
     set(US_CMAKE_GENERATOR "Xcode")
   elseif (NOT WIN32)
@@ -140,7 +140,6 @@ if(NOT US_CMAKE_GENERATOR AND NOT WIN32)
     elseif ("$ENV{GITHUB_BUILD_OS}" STREQUAL "windows-2019")
       set(US_CMAKE_GENERATOR "Visual Studio 16 2019")
     endif()
-    
   endif()
 endif()
 

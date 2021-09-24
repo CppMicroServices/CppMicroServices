@@ -119,7 +119,7 @@ jobs:
     - name: Install OpenCppCoverage and setup PATH environment variable
       run: |
         choco install opencppcoverage
-        set PATH=%PATH%;C:\Program Files\OpenCppCoverage
+        set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
         echo %PATH%
 
     - name: Configure Build And Test

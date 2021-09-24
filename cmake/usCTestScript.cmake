@@ -104,7 +104,11 @@ function(create_initial_cache var _shared _threading)
     set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-threading")
   endif()
 
-  string(REPLACE " " "-" _fixedGenerator ${_generator})
+  if (NOT WIN32)
+    string(REPLACE " " "-" _fixedGenerator ${_generator})
+  else()
+    string(REPLACE " " "-" _fixedGenerator ${CMAKE_GENERATOR})
+  endif()
   set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-${_fixedGenerator}" PARENT_SCOPE)
 
 endfunction()

@@ -92,8 +92,6 @@ jobs:
     - name: Code Coverage
       run: bash <(curl -s https://codecov.io/bash) -X gcov -s ${{github.workspace}}/build
   
-  # Code coverage win builds are ran for build configurations 0 and 1 for MSVC 2017 and 2019
-  # and are only built in the Debug configuration
   build_win:
     name: Build and test on ${{matrix.os}} with build configuration ${{matrix.buildconfiguration}}
     runs-on: ${{matrix.os}}
@@ -104,23 +102,30 @@ jobs:
         # build configurations:
         # 0 = threading ON / shared lib ON
         # 1 = threading ON / shared lib OFF
+        # 2 = threading OFF / shared lib ON
+        # 3 = threading OFF/ shared lib OFF
         buildconfiguration: [0,1,2,3]
 
     steps:
+    # Enable long paths. This is turned off by default on windows-2016 and is on by default on windows-2019. Turning it
+    # on again for windows-2019 isn't an issue.
+    #
+    # Addition, tell git to always do the crlf translation
     - name: Initialization
       run: |
-        cmake -version
+        Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -name "LongPathsEnabled" -Type DWord -Value 1
         git config --global core.autocrlf true
 
     - uses: actions/checkout@v2
       with:
         submodules: true
 
+    # Install OpenCppCoverage for windows builds and add it to the path so CMake and CTest can find it and use
+    # it for generation of code coverage files
     - name: Install OpenCppCoverage and setup PATH environment variable
       run: |
         choco install opencppcoverage
         set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
-        echo %PATH%
 
     - name: Configure Build And Test
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
@@ -128,15 +133,20 @@ jobs:
         BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
         GITHUB_BUILD_OS: ${{matrix.os}}
 
+    # Merge the generated code coverage reports and fix the file paths using the script files we have in our
+    # repo
     - name: Code coverage preprocessing
       shell: cmd
       run: |
-        ${{github.workspace}}\build\opencppcoverage_mergereports.bat
-        python ${{github.workspace}}\build\fixcoveragefilepaths.py -i coverage.xml -s ${{env.BUILD_DIR}} -o coverage_pathsfixed.xml
+        cd ${{github.workspace}}
+        opencppcoverage_mergereports.bat
+        python fixcoveragefilepaths.py -i coverage.xml -s ${{github.workspace}} -o coverage_pathsfixed.xml
 
+    # Actually send the fixed coverage information to CodeCov.
     - name: Submit code coverage data
       shell: pwsh
       run: |
+        cd ${{github.workspace}}
         if($env:WITH_COVERAGE -eq 1){
           $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
           Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh

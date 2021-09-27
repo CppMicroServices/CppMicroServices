@@ -92,6 +92,61 @@ jobs:
     - name: Code Coverage
       run: bash <(curl -s https://codecov.io/bash) -X gcov -s ${{github.workspace}}/build
   
+  build_win_coverage:
+    name: Build and test on ${{matrix.os}} with build configuration ${{matrix.buildconfiguration}} with code coverage
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2016, windows-2019]
+        # build configurations:
+        # 0 = threading ON / shared lib ON
+        # 1 = threading ON / shared lib OFF
+        buildconfiguration: [0,1]
+
+    steps:
+      - name: Initialization
+        run: |
+          git config --global core.autocrlf true
+          subst Z: ${{github.workspace}}
+
+      # Install OpenCppCoverage for windows builds and add it to the path so CMake and CTest can find it and use
+      # it for generation of code coverage files
+      - name: Install OpenCppCoverage
+        run: |
+          choco install opencppcoverage
+          set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
+
+      - name: Configure Build And Test
+        run: |
+          Z:
+          ctest -VV -S cmake\usCTestScript_github.cmake
+        env:
+          BUILD_DIR: Z:\build
+          BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+          GITHUB_BUILD_OS: ${{matrix.os}}
+
+      # Merge the generated code coverage reports and fix the file paths using the script files we have in our
+      # repo
+      - name: Code Coverage Preprocessing
+        shell: cmd
+        run: |
+          set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
+          Z:
+          cd build
+          Z:\opencppcoverage_mergereports.bat
+          python Z:\fixcoveragefilepaths.py -i coverage.xml -s Z:\ -o coverage_pathsfixed.xml
+
+      # Actually send the fixed coverage information to CodeCov.
+      - name: Submit Code Coverage Data
+        shell: pwsh
+        run: |
+          Z:
+          cd build
+          $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
+          Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
+          bash codecov.sh -f "./coverage_pathsfixed.xml" -U "-s" -A "-s"
+
   build_win:
     name: Build and test on ${{matrix.os}} with build configuration ${{matrix.buildconfiguration}}
     runs-on: ${{matrix.os}}
@@ -107,10 +162,6 @@ jobs:
         buildconfiguration: [0,1,2,3]
 
     steps:
-    # Enable long paths. This is turned off by default on windows-2016 and is on by default on windows-2019. Turning it
-    # on again for windows-2019 isn't an issue.
-    #
-    # Addition, tell git to always do the crlf translation
     - name: Initialization
       run: |
         git config --global core.autocrlf true
@@ -120,45 +171,12 @@ jobs:
       with:
         submodules: true
 
-    # Install OpenCppCoverage for windows builds and add it to the path so CMake and CTest can find it and use
-    # it for generation of code coverage files
-    - name: Install OpenCppCoverage and setup PATH environment variable
-      shell: cmd
-      run: |
-        choco install opencppcoverage
-        set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
-        echo %PATH%
-
     - name: Configure Build And Test
       run: |
         Z:
         ctest -VV -S cmake\usCTestScript_github.cmake
-
       env:
         BUILD_DIR: Z:\build
         BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
         GITHUB_BUILD_OS: ${{matrix.os}}
-
-    # Merge the generated code coverage reports and fix the file paths using the script files we have in our
-    # repo
-    - name: Code coverage preprocessing
-      shell: cmd
-      run: |
-        set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
-        echo %PATH%
-        Z:
-        cd build
-        Z:\opencppcoverage_mergereports.bat
-        python Z:\fixcoveragefilepaths.py -i coverage.xml -s Z:\ -o coverage_pathsfixed.xml
-
-    # Actually send the fixed coverage information to CodeCov.
-    - name: Submit code coverage data
-      shell: pwsh
-      run: |
-        Z:
-        cd build
-        if($env:WITH_COVERAGE -eq 1){
-          $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
-          Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-          bash codecov.sh -f "./coverage_pathsfixed.xml" -U "-s" -A "-s"
-        }
+        WITH_COVERAGE: 0

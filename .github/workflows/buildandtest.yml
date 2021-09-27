@@ -44,8 +44,8 @@ jobs:
     name: Build and test on supported clang compiler
     runs-on: ubuntu-18.04
     env:
-       BUILD_CONFIGURATION: 0
-       WITH_COVERAGE: 0
+      BUILD_CONFIGURATION: 0
+      WITH_COVERAGE: 0
 
     steps:
     - uses: actions/checkout@v2
@@ -113,8 +113,8 @@ jobs:
     # Addition, tell git to always do the crlf translation
     - name: Initialization
       run: |
-        Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -name "LongPathsEnabled" -Type DWord -Value 1
         git config --global core.autocrlf true
+        subst Z: ${{github.workspace}}
 
     - uses: actions/checkout@v2
       with:
@@ -126,10 +126,15 @@ jobs:
       run: |
         choco install opencppcoverage
         set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
+        echo %PATH%
 
     - name: Configure Build And Test
-      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
-      env: 
+      run: |
+        Z:
+        ctest -VV -S cmake\usCTestScript_github.cmake
+
+      env:
+        BUILD_DIR: Z:\build
         BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
         GITHUB_BUILD_OS: ${{matrix.os}}
 
@@ -138,15 +143,15 @@ jobs:
     - name: Code coverage preprocessing
       shell: cmd
       run: |
-        cd ${{github.workspace}}
+        Z:
         opencppcoverage_mergereports.bat
-        python fixcoveragefilepaths.py -i coverage.xml -s ${{github.workspace}} -o coverage_pathsfixed.xml
+        python fixcoveragefilepaths.py -i coverage.xml -s Z:\ -o coverage_pathsfixed.xml
 
     # Actually send the fixed coverage information to CodeCov.
     - name: Submit code coverage data
       shell: pwsh
       run: |
-        cd ${{github.workspace}}
+        Z:
         if($env:WITH_COVERAGE -eq 1){
           $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
           Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh

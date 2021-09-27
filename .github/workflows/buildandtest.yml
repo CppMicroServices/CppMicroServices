@@ -123,6 +123,7 @@ jobs:
     # Install OpenCppCoverage for windows builds and add it to the path so CMake and CTest can find it and use
     # it for generation of code coverage files
     - name: Install OpenCppCoverage and setup PATH environment variable
+      shell: cmd
       run: |
         choco install opencppcoverage
         set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"

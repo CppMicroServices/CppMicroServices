@@ -126,8 +126,6 @@ jobs:
       shell: cmd
       run: |
         choco install opencppcoverage
-        set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
-        echo %PATH%
 
     - name: Configure Build And Test
       run: |
@@ -144,6 +142,8 @@ jobs:
     - name: Code coverage preprocessing
       shell: cmd
       run: |
+        set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
+        echo %PATH%
         Z:
         opencppcoverage_mergereports.bat
         python fixcoveragefilepaths.py -i coverage.xml -s Z:\ -o coverage_pathsfixed.xml

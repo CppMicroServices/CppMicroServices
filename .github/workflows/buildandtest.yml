@@ -126,6 +126,8 @@ jobs:
       shell: cmd
       run: |
         choco install opencppcoverage
+        set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
+        echo %PATH%
 
     - name: Configure Build And Test
       run: |

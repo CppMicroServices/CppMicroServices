@@ -1,11 +1,7 @@
 
 macro(build_and_test)
   set(CTEST_SOURCE_DIRECTORY ${US_SOURCE_DIR})
-  set(CTEST_BINARY_DIRECTORY "${CTEST_DASHBOARD_ROOT}/${CTEST_PROJECT_NAME}_${CTEST_DASHBOARD_NAME}")
-
-  #if(NOT CTEST_BUILD_NAME)
-  #  set(CTEST_BUILD_NAME "${CMAKE_SYSTEM}_${CTEST_COMPILER}_${CTEST_DASHBOARD_NAME}")
-  #endif()
+  set(CTEST_BINARY_DIRECTORY "${CTEST_DASHBOARD_ROOT}/$ENV{US_BUILD_CONFIGURATION}")
 
   ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 
@@ -96,20 +92,6 @@ function(create_initial_cache var _shared _threading)
       ")
 
   set(${var} ${_initial_cache} PARENT_SCOPE)
-
-  if(_shared)
-    set(CTEST_DASHBOARD_NAME "shared")
-  else()
-    set(CTEST_DASHBOARD_NAME "static")
-  endif()
-
-  if(_threading)
-    set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-threading")
-  endif()
-
-  string(REPLACE " " "-" _fixedGenerator ${_generator})
-  set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-${_fixedGenerator}" PARENT_SCOPE)
-
 endfunction()
 
 #=========================================================

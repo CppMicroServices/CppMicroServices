@@ -147,14 +147,16 @@ jobs:
         set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
         echo %PATH%
         Z:
-        opencppcoverage_mergereports.bat
-        python fixcoveragefilepaths.py -i coverage.xml -s Z:\ -o coverage_pathsfixed.xml
+        cd build
+        Z:\opencppcoverage_mergereports.bat
+        python Z:\fixcoveragefilepaths.py -i coverage.xml -s Z:\ -o coverage_pathsfixed.xml
 
     # Actually send the fixed coverage information to CodeCov.
     - name: Submit code coverage data
       shell: pwsh
       run: |
         Z:
+        cd build
         if($env:WITH_COVERAGE -eq 1){
           $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
           Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh

@@ -110,6 +110,10 @@ jobs:
           git config --global core.autocrlf true
           subst Z: ${{github.workspace}}
 
+       - uses: actions/checkout@v2
+        with:
+          submodules: true
+
       # Install OpenCppCoverage for windows builds and add it to the path so CMake and CTest can find it and use
       # it for generation of code coverage files
       - name: Install OpenCppCoverage
@@ -124,6 +128,7 @@ jobs:
         env:
           BUILD_DIR: Z:\build
           BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+          BUILD_TYPE: Debug
           GITHUB_BUILD_OS: ${{matrix.os}}
 
       # Merge the generated code coverage reports and fix the file paths using the script files we have in our

@@ -110,7 +110,7 @@ jobs:
           git config --global core.autocrlf true
           subst Z: ${{github.workspace}}
 
-       - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
           submodules: true
 

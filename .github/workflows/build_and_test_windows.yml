@@ -101,7 +101,7 @@ jobs:
           working-directory: ${{env.BUILD_DIR}}
 
   build_win_mingw:
-    name: Build and Test [windows-2019,Configuration=${{matrix.buildconfiguration}}]
+    name: Build and Test [mingw-w64,Configuration=${{matrix.buildconfiguration}}]
     runs-on: windows-2019
     env:
       BUILD_DIR: Z:\build\config_${{matrix.buildconfiguration}}

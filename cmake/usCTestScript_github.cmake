@@ -22,7 +22,7 @@ if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" AND NOT WIN32)
   # and may lead to errors when building in CI. Hence we compile
   # with -j for non-GNU compilers only.
   set(CTEST_BUILD_FLAGS "-j")
-elseif(WIN32)
+elseif(WIN32 AND NOT "$ENV{BUILD_OS}" STREQUAL "mingw-w64")
   set(CTEST_BUILD_FLAGS "/maxcpucount")
 endif()
 

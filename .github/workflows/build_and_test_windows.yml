@@ -77,12 +77,7 @@ jobs:
       # Install OpenCppCoverage for windows builds and add it to the path so CMake and CTest can find it and use
       # it for generation of code coverage files
       - name: Install OpenCppCoverage
-        run: |
-          choco install opencppcoverage
-          echo "C:\Program Files\OpenCppCoverage" >> $GITHUB_PATH
-
-      - name: Testing Step
-        run: echo "$PATH"
+        run: ${{github.workspace}}/install_opencppcoverage.ps1
 
       - name: Build And Test
         working-directory: Z:\

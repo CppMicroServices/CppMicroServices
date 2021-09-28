@@ -137,6 +137,7 @@ jobs:
       - name: Code Coverage Preprocessing
         shell: cmd
         run: |
+          set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
           Z:
           cd build\config_${{matrix.buildconfiguration}}
           Z:\opencppcoverage_mergereports.bat

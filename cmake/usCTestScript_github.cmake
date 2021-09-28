@@ -10,23 +10,24 @@ find_program(CTEST_GIT_COMMAND NAMES git)
 if(DEFINED ENV{BUILD_DIR})
   set(CTEST_DASHBOARD_ROOT $ENV{BUILD_DIR})
 else()
-  set(CTEST_DASHBOARD_ROOT "/tmp/us_builds")
+  if (NOT WIN32)
+    set(CTEST_DASHBOARD_ROOT "/tmp/us_builds")
+  else()
+    set(CTEST_DASHBOARD_ROOT "C:\\tmp\\us_builds")
+  endif()
 endif()
 
 if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" AND NOT WIN32)
   # gcc in combination with gcov seems to consume a lot of memory
   # and may lead to errors when building in CI. Hence we compile
   # with -j for non-GNU compilers only.
-set(CTEST_BUILD_FLAGS "-j")
+  set(CTEST_BUILD_FLAGS "-j")
+elseif(WIN32)
+  set(CTEST_BUILD_FLAGS "/maxcpucount")
 endif()
 
-if (WIN32 AND $ENV{WITH_COVERAGE})
-  set(CTEST_CONFIGURATION_TYPE Debug)
-  set(CTEST_BUILD_CONFIGURATION Debug)
-else()
-  set(CTEST_CONFIGURATION_TYPE Release)
-  set(CTEST_BUILD_CONFIGURATION Release)
-endif()
+set(CTEST_CONFIGURATION_TYPE $ENV{BUILD_TYPE})
+set(CTEST_BUILD_CONFIGURATION $ENV{BUILD_TYPE})
 
 set(US_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../")
 

@@ -132,26 +132,10 @@ jobs:
           BUILD_TYPE: Debug
           GITHUB_BUILD_OS: ${{matrix.os}}
 
-      # Merge the generated code coverage reports and fix the file paths using the script files we have in our
-      # repo
-      - name: Code Coverage Preprocessing
-        shell: cmd
-        run: |
-          set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
-          Z:
-          cd build\config_${{matrix.buildconfiguration}}
-          Z:\opencppcoverage_mergereports.bat
-          python Z:\fixcoveragefilepaths.py -i coverage.xml -s Z:\ -o coverage_pathsfixed.xml
-
-      # Actually send the fixed coverage information to CodeCov.
-      - name: Submit Code Coverage Data
-        shell: pwsh
-        run: |
-          Z:
-          cd build\config_${{matrix.buildconfiguration}}
-          $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
-          Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-          bash codecov.sh -f "./coverage_pathsfixed.xml" -U "-s" -A "-s"
+      - name: Code Coverage
+        uses: codecov/codecov-action@v2.1.0
+        with:
+          directory: Z:\build\config_${{matrix.buildconfiguration}}
 
   build_win:
     name: Build and test on ${{matrix.os}} with build configuration ${{matrix.buildconfiguration}}

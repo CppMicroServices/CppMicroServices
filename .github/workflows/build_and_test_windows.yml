@@ -43,9 +43,8 @@ jobs:
         submodules: true
 
     - name: Build And Test
-      run: |
-        Z:
-        ctest -VV -S cmake\usCTestScript_github.cmake
+      working-directory: Z:\
+      run: ctest -VV -S cmake\usCTestScript_github.cmake
 
   build_win_msvc_coverage:
     name: Build and Test with Code Coverage [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
@@ -83,22 +82,23 @@ jobs:
           echo "C:\Program Files\OpenCppCoverage" >> $GITHUB_PATH
 
       - name: Build And Test
-        run: ctest -VV -S cmake\usCTestScript_github.cmake
         working-directory: Z:\
+        run: ctest -VV -S cmake\usCTestScript_github.cmake
 
       - name: Merge Code Coverage Reports
+        working-directory: ${{env.BUILD_DIR}}      
         run: Z:\opencppcoverage_mergereports.bat
-        working-directory: ${{env.BUILD_DIR}}
 
       - name: Fix Filepaths for Coverage Report
+        working-directory: ${{env.BUILD_DIR}}      
         run: Z:\fixcoveragefilepaths.py -i coverage.xml -s Z:\ -o coverage_pathsfixed.xml
 
       - name: Submit Code Coverage
         uses: codecov/codecov-action@v2.1.0
-        working-directory: ${{env.BUILD_DIR}}
         with:
           directory: Z:\build\config_${{matrix.buildconfiguration}}
           files: ./coverage_pathsfixed.xml
+          working-directory: ${{env.BUILD_DIR}}
 
   build_win_mingw:
     name: Build and Test [windows-2019,Configuration=${{matrix.buildconfiguration}}]
@@ -130,8 +130,5 @@ jobs:
         submodules: true
 
     - name: Build And Test
-      run: |
-        Z:
-        ctest -VV -S cmake\usCTestScript_github.cmake
-
-  
+      working-directory: Z:\
+      run: ctest -VV -S cmake\usCTestScript_github.cmake

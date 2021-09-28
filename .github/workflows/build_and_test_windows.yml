@@ -92,12 +92,12 @@ jobs:
         run: Z:\fixcoveragefilepaths.py -i coverage.xml -s Z:\ -o coverage_pathsfixed.xml
 
       - name: Submit Code Coverage
-        uses: codecov/codecov-action@v2.1.0
-        with:
-          directory: Z:\build\config_${{matrix.buildconfiguration}}
-          files: ./coverage_pathsfixed.xml
-          working-directory: ${{env.BUILD_DIR}}
-        working-directory: ${{env.BUILD_DIR}}
+        shell: pwsh
+        working-directory: Z:\build\config_${{matrix.buildconfiguration}}
+        run: |
+          $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
+          Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
+          bash codecov.sh -f "./coverage_pathsfixed.xml" -U "-s" -A "-s"
 
   build_win_mingw:
     name: Build and Test [mingw-w64,Configuration=${{matrix.buildconfiguration}}]

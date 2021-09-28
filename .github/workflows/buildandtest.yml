@@ -119,14 +119,15 @@ jobs:
       - name: Install OpenCppCoverage
         run: |
           choco install opencppcoverage
-          set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
 
       - name: Configure Build And Test
+        shell: cmd
         run: |
+          set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
           Z:
           ctest -VV -S cmake\usCTestScript_github.cmake
         env:
-          BUILD_DIR: Z:\build
+          BUILD_DIR: Z:\build\config_${{matrix.buildconfiguration}}
           BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
           BUILD_TYPE: Debug
           GITHUB_BUILD_OS: ${{matrix.os}}
@@ -136,9 +137,8 @@ jobs:
       - name: Code Coverage Preprocessing
         shell: cmd
         run: |
-          set PATH=%PATH%;"C:\Program Files\OpenCppCoverage"
           Z:
-          cd build\${{matrix.buildconfiguration}}
+          cd build\config_${{matrix.buildconfiguration}}
           Z:\opencppcoverage_mergereports.bat
           python Z:\fixcoveragefilepaths.py -i coverage.xml -s Z:\ -o coverage_pathsfixed.xml
 
@@ -147,7 +147,7 @@ jobs:
         shell: pwsh
         run: |
           Z:
-          cd build
+          cd build\config_${{matrix.buildconfiguration}}
           $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
           Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
           bash codecov.sh -f "./coverage_pathsfixed.xml" -U "-s" -A "-s"

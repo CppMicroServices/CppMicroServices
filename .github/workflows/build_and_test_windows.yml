@@ -81,6 +81,9 @@ jobs:
           choco install opencppcoverage
           echo "C:\Program Files\OpenCppCoverage" >> $GITHUB_PATH
 
+      - name: Testing Step
+        run: echo "$PATH"
+
       - name: Build And Test
         working-directory: Z:\
         run: ctest -VV -S cmake\usCTestScript_github.cmake

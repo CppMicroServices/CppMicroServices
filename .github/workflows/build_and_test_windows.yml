@@ -97,6 +97,7 @@ jobs:
           directory: Z:\build\config_${{matrix.buildconfiguration}}
           files: ./coverage_pathsfixed.xml
           working-directory: ${{env.BUILD_DIR}}
+        working-directory: ${{env.BUILD_DIR}}
 
   build_win_mingw:
     name: Build and Test [mingw-w64,Configuration=${{matrix.buildconfiguration}}]

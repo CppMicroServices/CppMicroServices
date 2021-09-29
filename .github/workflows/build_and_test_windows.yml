@@ -50,7 +50,7 @@ jobs:
     name: Build and Test with Code Coverage [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
     runs-on: ${{matrix.os}}
     env:
-      BUILD_DIR: Z:\build\config_${{matrix.buildconfiguration}}
+      BUILD_DIR: Z:/build/config_${{matrix.buildconfiguration}}
       BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
       BUILD_TYPE: Debug
       BUILD_OS: ${{matrix.os}}
@@ -78,22 +78,19 @@ jobs:
       # Install OpenCppCoverage for windows builds and add it to the path so CMake and CTest can find it and use
       # it for generation of code coverage files
       - name: Install OpenCppCoverage
-        run: ${{github.workspace}}/install_opencppcoverage.ps1
+        run: ${{github.workspace}}\install_opencppcoverage.ps1
 
       - name: Build And Test
         working-directory: Z:\
         run: ctest -VV -S cmake\usCTestScript_github.cmake
 
       - name: Merge Code Coverage Reports
-        working-directory: ${{env.BUILD_DIR}}      
-        run: Z:\opencppcoverage_mergereports.bat
+        working-directory: ${{github.workspace}}\build\config_${{matrix.buildconfiguration}}
+        run: ${{github.workspace}}\opencppcoverage_mergereports.bat
 
       - name: Fix Filepaths for Coverage Report
-        working-directory: ${{env.BUILD_DIR}}      
-        run: Z:\fixcoveragefilepaths.py -i coverage.xml -s Z:\ -o coverage_pathsfixed.xml
-
-      - name: Move Coverage Report
-        run: cp ${{env.BUILD_DIR}}/coverage_pathsfixed.xml ${{github.workspace}}/coverage_pathsfixed.xml
+        working-directory: ${{github.workspace}}
+        run: python ${{github.workspace}}\fixcoveragefilepaths.py -i build\config_${{matrix.buildconfiguration}}\coverage.xml -s Z:\ -o ${{github.workspace}}\coverage_pathsfixed.xml
 
       - uses: codecov/codecov-action@v2
         with:

@@ -15,7 +15,7 @@ def remove_prefix(line, prefix):
 
 #----------- Convert case-insensitive path to case-sensitive path -----------
 def casedpath_unc(path):
-    unc, p = os.path.splitunc(path)
+    unc, p = os.path.splitdrive(path)
     r = glob.glob(unc + re.sub(r'([^:/\\])(?=[/\\]|$)', r'[\1]', p))
     return r and r[0] or path
 

@@ -1,4 +1,4 @@
-name: BuildAndTest
+name: BuildAndTestNix
 
 on:
   push:
@@ -16,60 +16,58 @@ env:
   MY_COVERAGE: gcov
 
 jobs:
-  minimum_supported_gcc_build:
-    name: Build and test on minimum supported gcc compiler
+  linux_minimum_supported_gcc_build:
+    name: Build and Test [ubuntu-18.04, Minimum GCC]
     runs-on: ubuntu-18.04
     env:
-       BUILD_CONFIGURATION: 0
-       WITH_COVERAGE: 0
+      BUILD_CONFIGURATION: 0
+      WITH_COVERAGE: 0
 
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: true
     
-    - name: Install dependencies
+    - name: Install Dependencies
       run: |
         sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
         sudo apt-get update
         sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-5 g++-5 valgrind
       
-    - name: Configure Build and Test
+    - name: Build and Test
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
       env:
-         CC: gcc-5
-         CXX: g++-5
+        CC: gcc-5
+        CXX: g++-5
 
   linux_clang_build:
-    name: Build and test on supported clang compiler
+    name: Build and Test [ubuntu-18.04, Supported Clang]
     runs-on: ubuntu-18.04
     env:
-       BUILD_CONFIGURATION: 0
-       WITH_COVERAGE: 0
+      BUILD_CONFIGURATION: 0
+      WITH_COVERAGE: 0
 
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: true
     
-    - name: Install dependencies
+    - name: Install Dependencies
       run: sudo apt-get -yq --no-install-suggests --no-install-recommends install valgrind lld
       
-    - name: Configure Build and Test
+    - name: Build and Test
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
       env:
          CC: clang
          CXX: clang++
   
-  build:
-    name: Build and test on ${{matrix.os}} with build configuration ${{matrix.buildconfiguration}} 
+  build_nix:
+    name: Build and Test [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
       matrix:
-        #  windows will continue to use appveyor for now.
-        # TODO: look into pros/cons of migrating windows builds to github workflows
-        os: [ubuntu-18.04, macOS-latest]
+        os: [ubuntu-18.04, macOS-10.15]
         # build configurations:
         # 0 = threading ON / shared lib ON
         # 1 = threading ON / shared lib OFF
@@ -82,15 +80,14 @@ jobs:
       with:
          submodules: true
 
-    - name: Install valgrind
+    - name: Install Dependencies
       run: sudo apt-get install -y valgrind
       if: ${{matrix.os == 'ubuntu-18.04'}}
 
-    - name: Configure Build And Test
+    - name: Build And Test
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
       env: 
          BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
       
     - name: Code Coverage
       run: bash <(curl -s https://codecov.io/bash) -X gcov -s ${{github.workspace}}/build
-  

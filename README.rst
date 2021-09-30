@@ -1,20 +1,20 @@
 
 .. rubric:: Continuous Integration Status
 
-+-------------+---------------------------+--------------------------+------------------------+
-| Branch      | GCC 5.4 and 7.5.0         | Visual Studio 2015       |                        |
-|             +---------------------------+--------------------------+------------------------+
-|             | Xcode 12.4                | Visual Studio 2017       |                        |
-|             +---------------------------+--------------------------+------------------------+
-|             | Clang 9.0                 | Visual Studio 2019       |                        |
-|             +---------------------------+--------------------------+------------------------+
-|             |                           | MinGW-w64                |                        |
-+=============+===========================+==========================+========================+
-| master      | |Linux Build Status|      | |Windows Build status|   | |Code Coverage Status| |
-+-------------+---------------------------+--------------------------+------------------------+
-| development | |BuildAndTest|            | |Windows Build status    | |Code Coverage Status  |
-|             |                           | (development)|           | (development)|         |
-+-------------+---------------------------+--------------------------+------------------------+
++-------------+---------------------------+--------------------------------------+----------------------------------------+
+| Branch      | GCC 5.5 and 7.5.0         | Visual Studio 2015                   |                                        |
+|             +---------------------------+--------------------------------------+----------------------------------------+
+|             | Xcode 12.4                | Visual Studio 2017                   |                                        |
+|             +---------------------------+--------------------------------------+----------------------------------------+
+|             | Clang 9.0                 | Visual Studio 2019                   |                                        |
+|             +---------------------------+--------------------------------------+----------------------------------------+
+|             |                           | MinGW-w64                            |                                        |
++=============+===========================+======================================+========================================+
+| master      | |Linux Build Status|      | |Windows Build status|               | |Code Coverage Status|                 |
++-------------+---------------------------+--------------------------------------+----------------------------------------+
+| development | |BuildAndTestNix|         | |BuildAndTestWindows|                | |Code Coverage Status (development)|   |
+|             |                           | |Windows Build status (development)| |                                        |
++-------------+---------------------------+--------------------------------------+----------------------------------------+
 
 |Coverity Scan Build Status|
 
@@ -57,7 +57,7 @@ on many different platforms.
 
 Recommended minimum required compiler versions:
 
-- GCC 5.4
+- GCC 5.5
 - Clang 9.0
 - Clang from Xcode 12.0
 - Visual Studio 2015
@@ -75,16 +75,28 @@ Recommended minimum required CMake version:
 
 - CMake 3.12.4 
 
+For all CI builds through GitHub Actions, the CMake version (and
+version of other provided software) we use is determined by the 
+software provided on the GitHub-hosted runners.
+
+For information about the specific versions of software the runners
+use, please see the following resources:
+
+- `ubuntu-18.04 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu1804-README.md>`
+- `macos-10.15 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md>`
+- `windows-2016 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/win/Windows2016-Readme.md>`
+- `windows-2019 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/win/Windows2019-Readme.md>`
+
 Below is a list of tested compiler/OS combinations:
 
-- GCC 5.4 (Ubuntu 18.04)
-- GCC 7.5.0 (Ubuntu 18.04)
-- Clang 9.0 (Ubuntu 18.04)
-- Apple Clang, Xcode 12.0.1 (OS X 10.15.7)
+- GCC 5.5 (Ubuntu 18.04) via GitHub Actions
+- GCC 7.5.0 (Ubuntu 18.04) via GitHub Actions
+- Clang 9.0 (Ubuntu 18.04) via GitHub Actions
+- Apple Clang, Xcode 12.0.1 (OS X 10.15.7) via GitHub Actions
 - Visual Studio 2015 via Appveyor
-- Visual Studio 2017 via Appveyor
-- Visual Studio 2019 via Appveyor
-- MinGW-w64 via Appveyor
+- Visual Studio 2017 via GitHub Actions
+- Visual Studio 2019 via GitHub Actions
+- MinGW-w64 via GitHub Actions
 
 Legal
 -----
@@ -193,8 +205,10 @@ file for details about the contribution process.
 
 .. |Linux Build Status| image:: https://img.shields.io/travis/CppMicroServices/CppMicroServices/master.svg?style=flat-square&label=Linux%20%26%20OS%20X
    :target: http://travis-ci.org/CppMicroServices/CppMicroServices
-.. |BuildAndTest| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/buildandtest.yml/badge.svg?branch=development&event=push
-   :target: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/buildandtest.yml
+.. |BuildAndTestNix| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_nix.yml/badge.svg?branch=development&event=push
+   :target: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_nix.yml
+.. |BuildAndTestWindows| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_windows.yml/badge.svg?branch=development&event=push
+   :target: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_windows.yml
 .. |Windows Build status| image:: https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/master.svg?style=flat-square&label=Windows
    :target: https://ci.appveyor.com/project/cppmicroservices/cppmicroservices/branch/master
 .. |Windows Build status (development)| image:: https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/development.svg?style=flat-square&label=Windows

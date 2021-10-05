@@ -35,6 +35,9 @@
 #include <utility>
 #include <vector>
 
+#include <nowide/args.hpp>
+#include <nowide/fstream.hpp>
+
 #include "optionparser.h"
 #include "json/json.h"
 
@@ -789,6 +792,8 @@ static int checkSanity(option::Parser& parse, option::Option* options)
 
 int main(int argc, char** argv)
 {
+  nowide::args _(argc, argv);
+
   const int BUNDLE_MANIFEST_VALIDATION_ERROR_CODE(2);
 
   int compressionLevel = MZ_DEFAULT_LEVEL; //default compression level;
@@ -889,7 +894,7 @@ int main(int argc, char** argv)
     if (bundleFileOpt) {
       validateManifestsInArchive(zipFile);
       std::string bundleBinaryFile(bundleFileOpt->arg);
-      std::ofstream outFileStream(
+      nowide::ofstream outFileStream(
         bundleBinaryFile, std::ios::ate | std::ios::binary | std::ios::app);
       std::ifstream zipFileStream(zipFile, std::ios::in | std::ios::binary);
       if (outFileStream.is_open() && zipFileStream.is_open()) {

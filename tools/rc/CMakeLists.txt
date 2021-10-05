@@ -13,6 +13,9 @@ if(WIN32)
     target_link_libraries(${US_RCC_EXECUTABLE_TARGET} Shlwapi)
 endif()
 
+target_link_libraries(${US_RCC_EXECUTABLE_TARGET} nowide::nowide)
+target_include_directories(${US_RCC_EXECUTABLE_TARGET} PRIVATE ${CppMicroServices_SOURCE_DIR}/third_party/boost/nowide/include)
+
 set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} APPEND PROPERTY
              COMPILE_DEFINITIONS "MINIZ_NO_ARCHIVE_READING_API;MINIZ_NO_ZLIB_COMPATIBLE_NAMES")
 

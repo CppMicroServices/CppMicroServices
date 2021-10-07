@@ -896,7 +896,7 @@ int main(int argc, char** argv)
       std::string bundleBinaryFile(bundleFileOpt->arg);
       nowide::ofstream outFileStream(
         bundleBinaryFile, std::ios::ate | std::ios::binary | std::ios::app);
-      std::ifstream zipFileStream(zipFile, std::ios::in | std::ios::binary);
+      nowide::ifstream zipFileStream(zipFile, std::ios::in | std::ios::binary);
       if (outFileStream.is_open() && zipFileStream.is_open()) {
         std::clog << "Appending file " << bundleBinaryFile
                   << " with contents of resources zip file at " << zipFile

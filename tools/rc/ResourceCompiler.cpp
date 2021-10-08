@@ -159,7 +159,7 @@ void parseAndValidateJsonFromFile(const std::string& jsonFile,
                                   Json::Value& root)
 {
   try {
-    std::ifstream json(jsonFile);
+    nowide::ifstream json(jsonFile);
     if (!json.is_open()) {
       throw std::runtime_error("Could not open file " + jsonFile);
     }
@@ -373,7 +373,7 @@ ZipArchive::ZipArchive(const std::string& archiveFileName,
 {
   std::clog << "Initializing zip archive " << fileName << " ..." << std::endl;
   // clear the contents of a outFile if it exists
-  std::ofstream ofile(fileName, std::ofstream::trunc);
+  nowide::ofstream ofile(fileName, nowide::ofstream::trunc);
   ofile.close();
   if (!mz_zip_writer_init_file(writeArchive.get(), fileName.c_str(), 0)) {
     throw std::runtime_error("Internal error, could not init new zip archive");
@@ -909,7 +909,7 @@ int main(int argc, char** argv)
         // Depending on the ofstream destructor to close the file may result in a silent
         // file write error. Hence the explicit call to close.
         outFileStream.close();
-        if (outFileStream.rdstate() & std::ofstream::failbit) {
+        if (outFileStream.rdstate() & nowide::ofstream::failbit) {
           std::cerr << "Failed to write file : " << bundleBinaryFile
                     << std::endl;
           return_code = EXIT_FAILURE;

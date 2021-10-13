@@ -35,6 +35,9 @@
 #include <utility>
 #include <vector>
 
+#include <nowide/args.hpp>
+#include <nowide/fstream.hpp>
+
 #include "optionparser.h"
 #include "json/json.h"
 
@@ -156,7 +159,7 @@ void parseAndValidateJsonFromFile(const std::string& jsonFile,
                                   Json::Value& root)
 {
   try {
-    std::ifstream json(jsonFile);
+    nowide::ifstream json(jsonFile);
     if (!json.is_open()) {
       throw std::runtime_error("Could not open file " + jsonFile);
     }
@@ -370,7 +373,7 @@ ZipArchive::ZipArchive(const std::string& archiveFileName,
 {
   std::clog << "Initializing zip archive " << fileName << " ..." << std::endl;
   // clear the contents of a outFile if it exists
-  std::ofstream ofile(fileName, std::ofstream::trunc);
+  nowide::ofstream ofile(fileName, nowide::ofstream::trunc);
   ofile.close();
   if (!mz_zip_writer_init_file(writeArchive.get(), fileName.c_str(), 0)) {
     throw std::runtime_error("Internal error, could not init new zip archive");
@@ -789,6 +792,8 @@ static int checkSanity(option::Parser& parse, option::Option* options)
 
 int main(int argc, char** argv)
 {
+  nowide::args _(argc, argv);
+
   const int BUNDLE_MANIFEST_VALIDATION_ERROR_CODE(2);
 
   int compressionLevel = MZ_DEFAULT_LEVEL; //default compression level;
@@ -889,9 +894,9 @@ int main(int argc, char** argv)
     if (bundleFileOpt) {
       validateManifestsInArchive(zipFile);
       std::string bundleBinaryFile(bundleFileOpt->arg);
-      std::ofstream outFileStream(
+      nowide::ofstream outFileStream(
         bundleBinaryFile, std::ios::ate | std::ios::binary | std::ios::app);
-      std::ifstream zipFileStream(zipFile, std::ios::in | std::ios::binary);
+      nowide::ifstream zipFileStream(zipFile, std::ios::in | std::ios::binary);
       if (outFileStream.is_open() && zipFileStream.is_open()) {
         std::clog << "Appending file " << bundleBinaryFile
                   << " with contents of resources zip file at " << zipFile
@@ -904,7 +909,7 @@ int main(int argc, char** argv)
         // Depending on the ofstream destructor to close the file may result in a silent
         // file write error. Hence the explicit call to close.
         outFileStream.close();
-        if (outFileStream.rdstate() & std::ofstream::failbit) {
+        if (outFileStream.rdstate() & nowide::ofstream::failbit) {
           std::cerr << "Failed to write file : " << bundleBinaryFile
                     << std::endl;
           return_code = EXIT_FAILURE;

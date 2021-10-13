@@ -145,6 +145,8 @@ void createDirHierarchy(const std::string& tempdir,
      *    |____ manifest.json
      *    |____ sample.dll
      *    |____ sample1.dll
+     *    |____ ｆｏｏｂａｒ
+     *              |______ myArchive.zip
      *    |____ resource1/
      *    |         |______ resource1.txt
      *    |____ resource2/
@@ -162,6 +164,14 @@ void createDirHierarchy(const std::string& tempdir,
   ASSERT_TRUE(manifest.is_open()) << "Couldn't open " << manifest_fpath;
   manifest << manifest_json << std::endl;
   manifest.close();
+
+  std::string unicodePath(tempdir + u8"ｆｏｏｂａｒ");
+  MakePath(unicodePath);
+  std::ifstream manifest_src(manifest_fpath, std::ios::binary);
+  std::ofstream manifest_dst(unicodePath + "/manifest.json", std::ios::binary);
+  manifest_dst << manifest_src.rdbuf();
+  manifest_src.close();
+  manifest_dst.close();
 
   std::string rc1dir_path(tempdir + "resource1");
   std::string rc2dir_path(tempdir + "resource2");
@@ -828,6 +838,81 @@ TEST_F(ResourceCompilerTest, testManifestAddWithInvalidJSON)
   //Test that the invalid manifest.json file was not added
   ASSERT_FALSE(
     containsBundleZipFile(tempdir + invalid_syntax_res_add_bundle_name));
+}
+
+TEST_F(ResourceCompilerTest, testUnicodeBundleFile)
+{
+  std::ostringstream cmd;
+  cmd << rcbinpath;
+  cmd << " --bundle-file " << tempdir << u8"ｆｏｏｂａｒ/myArchive00.zip";
+
+  ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
+}
+
+TEST_F(ResourceCompilerTest, testUnicodeBundleName)
+{
+  std::ostringstream cmd;
+  cmd << rcbinpath;
+  cmd << " --bundle-file " << tempdir << u8"ｆｏｏｂａｒ/myArchive01.zip";
+  cmd << " --bundle-name ｆｏｏｂａｒ";
+
+  ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
+}
+
+TEST_F(ResourceCompilerTest, testUnicodeOutFile)
+{
+  std::ostringstream cmd;
+  cmd << rcbinpath;
+  cmd << " --bundle-file " << tempdir << u8"ｆｏｏｂａｒ/myArchive02.zip";
+  cmd << " --out-file " << tempdir << u8"ｆｏｏｂａｒ123";
+
+  ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
+}
+
+TEST_F(ResourceCompilerTest, testUnicodeResAdd)
+{
+  auto origdir = util::GetCurrentWorkingDirectory();
+  ChangeDirectory(tempdir);
+  std::ostringstream cmd;
+  cmd << rcbinpath;
+  cmd << " --bundle-file " << u8"ｆｏｏｂａｒ/myArchive03.zip";
+  cmd << " --out-file unicodeResAdd00.zip";
+  cmd << " --res-add " << u8"ｆｏｏｂａｒ/manifest.json";
+  cmd << " --bundle-name myunicodebundle00";
+  cmd << " -V";
+
+  ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
+
+  ChangeDirectory(origdir);
+}
+
+TEST_F(ResourceCompilerTest, testUnicodeZipAdd)
+{
+  std::ostringstream cmd;
+  cmd << rcbinpath;
+  cmd << " --bundle-file " << tempdir << u8"ｆｏｏｂａｒ/myArchive04.zip";
+  cmd << " --out-file " << tempdir << "unicodeResAdd01.zip";
+  cmd << " --zip-add " << tempdir << "tomerge.zip";
+  cmd << " --bundle-name myunicodebundle01";
+
+  ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
+}
+
+TEST_F(ResourceCompilerTest, testUnicodeManifestAdd)
+{
+  auto origdir = util::GetCurrentWorkingDirectory();
+  ChangeDirectory(tempdir);
+  std::ostringstream cmd;
+  cmd << rcbinpath;
+  cmd << " --bundle-file " << u8"ｆｏｏｂａｒ/myArchive05.zip";
+  cmd << " --out-file unicodeResAdd02.zip";
+  cmd << " --manifest-add " << u8"ｆｏｏｂａｒ/manifest.json";
+  cmd << " --bundle-name myunicodebundle02";
+  cmd << "-V";
+
+  ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmd.str()));
+
+  ChangeDirectory(origdir);
 }
 
 // In jsoncpp 0.10.6 not allowing comments does NOT result in a parse failure for a JSON file with comments.

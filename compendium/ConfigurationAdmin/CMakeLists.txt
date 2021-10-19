@@ -28,7 +28,13 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
 if(MINGW)
   # silence ignored attributes warnings
   add_compile_options(-Wno-attributes)
+
+  # needed for boost::asio::thread_pool
+  list(APPEND _link_libraries ws2_32.lib)
 endif()
+
+add_compile_definitions(BOOST_DATE_TIME_NO_LIB)
+add_compile_definitions(BOOST_REGEX_NO_LIB)
 
 usMacroCreateBundle(ConfigurationAdmin
   VERSION "1.1.2"
@@ -58,3 +64,7 @@ target_include_directories(ConfigurationAdmin PRIVATE
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )
+
+# There are warnings in the boost asio headers which are flagged as errors. Include the boost
+# asio headers as system headers to ignore these warnings and not treat them as errors.
+include_directories(SYSTEM ${CppMicroServices_SOURCE_DIR}/third_party/boost/include)

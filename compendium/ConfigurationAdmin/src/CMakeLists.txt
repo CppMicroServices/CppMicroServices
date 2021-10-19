@@ -1,4 +1,5 @@
 set(_srcs
+  CMAsyncWorkService.cpp
   CMBundleExtension.cpp
   CMConstants.cpp
   CMLogger.cpp
@@ -9,6 +10,7 @@ set(_srcs
 
 set(_private_headers
   CMActivator.hpp
+  CMAsyncWorkService.hpp
   CMBundleExtension.hpp
   CMConstants.hpp
   CMLogger.hpp
@@ -43,3 +45,7 @@ target_include_directories(ConfigurationAdminObjs PRIVATE
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )
+
+# There are warnings in the boost asio headers which are flagged as errors. Include the boost
+# asio headers as system headers to ignore these warnings and not treat them as errors.
+include_directories(SYSTEM ${CppMicroServices_SOURCE_DIR}/third_party/boost/include)

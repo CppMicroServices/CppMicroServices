@@ -36,9 +36,11 @@ void CMActivator::Start(BundleContext context)
   // Create the Logger object used by this runtime
   logger = std::make_shared<CMLogger>(context);
   logger->Log(SeverityLevel::LOG_DEBUG, "Starting CM bundle");
+  // Create the AsyncWorkService object used by this runtime
+  asyncWorkService = std::make_shared<CMAsyncWorkService>(context, logger);
   // Create ConfigurationAdminImpl
-  configAdminImpl =
-    std::make_shared<ConfigurationAdminImpl>(runtimeContext, logger);
+  configAdminImpl = std::make_shared<ConfigurationAdminImpl>(
+    runtimeContext, logger, asyncWorkService);
   // Add bundle listener
   bundleListenerToken = context.AddBundleListener(
     std::bind(&CMActivator::BundleChanged, this, std::placeholders::_1));
@@ -76,6 +78,7 @@ void CMActivator::Stop(cppmicroservices::BundleContext context)
                 "Exception while stopping the CM bundle",
                 std::current_exception());
   }
+  asyncWorkService->StopTracking();
   logger = nullptr;
   runtimeContext = nullptr;
 }

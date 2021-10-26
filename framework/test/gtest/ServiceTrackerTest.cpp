@@ -634,3 +634,55 @@ TEST_F(ServiceTrackerTestFixture, TestNullPtrServiceTrackerCustomizer)
   auto trackedObj = tracker.WaitForService(std::chrono::seconds(1));
   ASSERT_EQ(nullptr, trackedObj) << "tracked object should be nullptr";
 }
+
+TEST(ServiceTrackerTest, CloseServiceTrackerPerf) {
+  auto framework =
+    std::make_shared<Framework>(FrameworkFactory().NewFramework());
+  framework->Start();
+
+  for (size_t i = 0; i < 1000000; ++i) {
+    framework->GetBundleContext().AddServiceListener(
+      [](const ServiceEvent&) {});
+  }
+  auto fc = framework->GetBundleContext();
+  struct Foo
+  {
+    virtual ~Foo() = default;
+  };
+
+  ServiceTracker<Foo> fooTracker(fc, std::string("benchmark::test::Foo"));
+  for (size_t i = 0; i < 10000; ++i) {
+    fooTracker.Open();
+    fooTracker.Close();
+  }
+
+  framework->Stop();
+  framework->WaitForStop(std::chrono::milliseconds::zero());
+}
+
+TEST(ServiceTrackerTest, CloseServiceTrackerPerf_NewSTObject)
+{
+  auto framework =
+    std::make_shared<Framework>(FrameworkFactory().NewFramework());
+  framework->Start();
+
+  for (size_t i = 0; i < 1000000; ++i) {
+    framework->GetBundleContext().AddServiceListener(
+      [](const ServiceEvent&) {});
+  }
+  auto fc = framework->GetBundleContext();
+  struct Foo
+  {
+    virtual ~Foo() = default;
+  };
+
+  for (size_t i = 0; i < 10000; ++i) {
+    ServiceTracker<Foo> fooTracker(fc, std::string("benchmark::test::Foo"));
+    fooTracker.Open();
+    fooTracker.Close();
+  }
+
+  framework->Stop();
+  framework->WaitForStop(std::chrono::milliseconds::zero());
+}
+

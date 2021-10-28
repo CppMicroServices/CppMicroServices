@@ -161,7 +161,7 @@ void ServiceHooks::FilterServiceEventReceivers(
     std::map<BundleContext, std::vector<ServiceListenerHook::ListenerInfo>>
       listeners;
     for (auto& sle : receivers) {
-      listeners[sle.GetBundleContext()].push_back(sle);
+      listeners[sle.second.GetBundleContext()].push_back(sle.second);
     }
 
     std::map<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>
@@ -199,8 +199,11 @@ void ServiceHooks::FilterServiceEventReceivers(
       }
     }
     receivers.clear();
-    for (auto l : listeners) {
-      receivers.insert(l.second.begin(), l.second.end());
+    for (auto& l : listeners) {
+      for (auto const& i : l.second) {
+        receivers.insert(
+          std::make_pair(0, ServiceListenerEntry{ i }));
+      }
     }
   }
 }

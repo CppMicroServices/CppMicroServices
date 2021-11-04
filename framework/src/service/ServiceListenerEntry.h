@@ -69,9 +69,6 @@ public:
   bool operator<(const ServiceListenerEntry& other) const;
 
   bool Contains(const std::shared_ptr<BundleContextPrivate>& context,
-                ListenerTokenId tokenId) const;
-
-  bool Contains(const std::shared_ptr<BundleContextPrivate>& context,
                 const ServiceListener& listener,
                 void* data) const;
 

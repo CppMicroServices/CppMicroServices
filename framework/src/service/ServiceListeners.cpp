@@ -133,6 +133,7 @@ void ServiceListeners::RemoveLegacyServiceListenerAndNotifyHooks(
   ServiceListenerEntry sle;
   {
     auto l = this->Lock();
+    US_UNUSED(l);
     auto it = std::find_if(
       serviceSet.begin(),
       serviceSet.end(),

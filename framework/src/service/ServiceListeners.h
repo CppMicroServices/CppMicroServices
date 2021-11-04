@@ -61,7 +61,7 @@ public:
 
   using CacheType =
     std::unordered_map<std::string, std::set<ServiceListenerEntry>>;
-  using ServiceListenerEntries = std::unordered_map<ListenerTokenId, ServiceListenerEntry>;
+  using ServiceListenerEntries = std::unordered_set<ServiceListenerEntry>;
 
   using FrameworkListenerEntry = std::tuple<FrameworkListener, void*>;
   using FrameworkListenerMap = std::unordered_map<

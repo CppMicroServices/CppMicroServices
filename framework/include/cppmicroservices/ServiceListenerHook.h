@@ -135,7 +135,7 @@ struct US_Framework_EXPORT ServiceListenerHook
   private:
     friend class ServiceListenerEntry;
 
-    //friend struct ::std::hash<ServiceListenerHook::ListenerInfo>;
+    friend struct ::std::hash<ServiceListenerHook::ListenerInfo>;
 
     ListenerInfo(ListenerInfoData* data);
 
@@ -179,9 +179,9 @@ struct US_Framework_EXPORT ServiceListenerHook
  * Hash functor specialization for \link cppmicroservices#ServiceListenerHook::ListenerInfo ServiceListenerHook::ListenerInfo\endlink objects.
  */
 
-/*US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListenerHook::ListenerInfo)
+US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListenerHook::ListenerInfo)
 return hash<const cppmicroservices::ServiceListenerHook::ListenerInfoData*>()(
   arg.d.get());
-US_HASH_FUNCTION_END*/
+US_HASH_FUNCTION_END
 
 #endif // CPPMICROSERVICES_SERVICELISTENERHOOK_H

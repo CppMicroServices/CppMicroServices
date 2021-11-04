@@ -199,7 +199,7 @@ void ServiceHooks::FilterServiceEventReceivers(
       }
     }
     receivers.clear();
-    for (auto l : listeners) {
+    for (auto& l : listeners) {
       receivers.insert(l.second.begin(), l.second.end());
     }
   }

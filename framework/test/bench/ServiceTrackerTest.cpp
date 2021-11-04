@@ -7,6 +7,7 @@
 #include <cppmicroservices/ServiceTracker.h>
 
 #include <chrono>
+#include <unordered_set>
 
 #include "benchmark/benchmark.h"
 #include "fooservice.h"
@@ -198,7 +199,7 @@ static void CloseServiceTracker(benchmark::State& state)
   auto framework = std::make_shared<Framework>(FrameworkFactory().NewFramework());
   framework->Start();
 
-  for (size_t i = 0; i < 1000000; ++i) {
+  for (int64_t i = 0; i < state.range(0); ++i) {
     framework->GetBundleContext().AddServiceListener(
       [](const ServiceEvent&) {});
   }
@@ -209,11 +210,11 @@ static void CloseServiceTracker(benchmark::State& state)
   for (auto _ : state) {
     fooTracker.Open();
     
-   // auto start = high_resolution_clock::now();
+    auto start = high_resolution_clock::now();
     fooTracker.Close();
-    /*auto end = high_resolution_clock::now();
+    auto end = high_resolution_clock::now();
     auto elapsed_seconds = duration_cast<duration<double>>(end - start);
-    state.SetIterationTime(elapsed_seconds.count());*/
+    state.SetIterationTime(elapsed_seconds.count());
   }
 
   framework->Stop();
@@ -230,7 +231,7 @@ static void CloseServiceTracker_NewSTObject(benchmark::State& state)
     std::make_shared<Framework>(FrameworkFactory().NewFramework());
   framework->Start();
 
-  for (size_t i = 0; i < 1000000; ++i) {
+  for (int64_t i = 0; i < state.range(0); ++i) {
     framework->GetBundleContext().AddServiceListener(
       [](const ServiceEvent&) {});
   }
@@ -240,15 +241,54 @@ static void CloseServiceTracker_NewSTObject(benchmark::State& state)
     ServiceTracker<Foo> fooTracker(fc, std::string("benchmark::test::Foo"));
     fooTracker.Open();
 
-    // auto start = high_resolution_clock::now();
+    auto start = high_resolution_clock::now();
     fooTracker.Close();
-    /*auto end = high_resolution_clock::now();
+    auto end = high_resolution_clock::now();
     auto elapsed_seconds = duration_cast<duration<double>>(end - start);
-    state.SetIterationTime(elapsed_seconds.count());*/
+    state.SetIterationTime(elapsed_seconds.count());
   }
 
   framework->Stop();
   framework->WaitForStop(milliseconds::zero());
+}
+
+static void UnorderedSetInsertPerf(benchmark::State& state) {
+    using namespace std::chrono;
+    using namespace benchmark::test;
+
+    std::unordered_set<int64_t> s;
+    for (int64_t i = 0; i < 1000000; ++i) {
+      s.insert(i);
+    }
+    for (auto _ : state) {
+        auto start = high_resolution_clock::now();
+        s.insert(1000001);
+        auto end = high_resolution_clock::now();
+        auto elapsed_seconds = duration_cast<duration<double>>(end - start);
+        state.SetIterationTime(elapsed_seconds.count());
+        s.erase(1000001);
+    }
+}
+
+static void UnorderedSetErasePerf(benchmark::State& state)
+{
+  using namespace std::chrono;
+  using namespace benchmark::test;
+
+  std::unordered_set<int64_t> s;
+  for (int64_t i = 0; i < 1000000; ++i) {
+    s.insert(i);
+  }
+
+  for (auto _ : state) {
+    s.insert(1000001);
+    auto start = high_resolution_clock::now();
+    (void)s.find(1000001);
+    auto end = high_resolution_clock::now();
+    auto elapsed_seconds = duration_cast<duration<double>>(end - start);
+    state.SetIterationTime(elapsed_seconds.count());
+    s.erase(1000001);
+  }
 }
 
 // Register benchmark functions
@@ -258,8 +298,14 @@ BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithBundleContext)
   ->UseManualTime();
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithInterfaceName)
   ->UseManualTime();
-BENCHMARK(CloseServiceTracker);
-BENCHMARK(CloseServiceTracker_NewSTObject);
+BENCHMARK(CloseServiceTracker)
+  ->RangeMultiplier(2)
+  ->Range(1000, 1000000);
+BENCHMARK(CloseServiceTracker_NewSTObject)
+  ->RangeMultiplier(2)
+  ->Range(1000, 1000000);
+BENCHMARK(UnorderedSetInsertPerf)->UseManualTime();
+BENCHMARK(UnorderedSetErasePerf)->UseManualTime();
 
 // Run this benchmark for each Arg(...) call, passing in the parameter value to the benchmark.
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, ServiceTrackerScalability)

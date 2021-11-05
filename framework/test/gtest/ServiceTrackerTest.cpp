@@ -634,3 +634,39 @@ TEST_F(ServiceTrackerTestFixture, TestNullPtrServiceTrackerCustomizer)
   auto trackedObj = tracker.WaitForService(std::chrono::seconds(1));
   ASSERT_EQ(nullptr, trackedObj) << "tracked object should be nullptr";
 }
+
+/// <summary>
+/// opening a closed tracker should have it receive adding, modified and removed service events.
+/// </summary>
+TEST_F(ServiceTrackerTestFixture, TestReOpenServiceTrackerWithCustomizer)
+{
+  auto context = framework.GetBundleContext();
+  MockCustomizedServiceTracker<MyInterfaceOne> customizer;
+
+  // expect that closing the tracker results in RemovedService being called.
+  ON_CALL(customizer, AddingService(::testing::_))
+    .WillByDefault(::testing::Return(std::make_shared<MyInterfaceOne>()));
+  EXPECT_CALL(customizer, AddingService(::testing::_))
+    .Times(::testing::Exactly(3));
+  EXPECT_CALL(customizer, ModifiedService(::testing::_, ::testing::_))
+    .Times(::testing::Exactly(1));
+  EXPECT_CALL(customizer, RemovedService(::testing::_, ::testing::_))
+    .Times(::testing::Exactly(3));
+
+  auto tracker =
+    std::make_unique<cppmicroservices::ServiceTracker<MyInterfaceOne>>(
+      context, &customizer);
+  tracker->Open();
+  struct MyServiceOne : public MyInterfaceOne
+  {};
+  auto svcReg =
+    context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+  tracker->Close();
+
+  tracker->Open();
+  auto svcReg2 =
+    context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+  svcReg2.SetProperties({ { "test", Any(std::string("foo")) } });
+  tracker->Close();
+  
+}

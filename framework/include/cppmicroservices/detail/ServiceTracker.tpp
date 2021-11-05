@@ -92,7 +92,7 @@ void ServiceTracker<S,T>::Open()
   std::shared_ptr<_TrackedService> t;
   {
     auto l = d->Lock(); US_UNUSED(l);
-    if (d->trackedService.Load())
+    if (d->trackedService.Load() && !d->Tracked()->closed)
     {
       return;
     }

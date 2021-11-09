@@ -169,7 +169,16 @@ void ServiceTracker<S,T>::Close()
     outgoing->NotifyAll(); /* wake up any waiters */
   }
 
-  outgoing->WaitOnCustomizersToFinish();
+  try {
+    outgoing->WaitOnCustomizersToFinish();
+  } catch (const std::exception&) {
+      // this can throw if the latch's count
+      // is negative, which means the latch
+      // cannot be used anymore. This can occur
+      // when multiple threads are opening
+      // and closing the same service tracker
+      // repeatedly.
+  }
 
   auto references = GetServiceReferences();
   for(auto& ref : references) {

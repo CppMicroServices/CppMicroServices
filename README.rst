@@ -6,7 +6,9 @@
 |             +---------------------------+--------------------------------------+----------------------------------------+
 |             | Xcode 12.4                | Visual Studio 2017                   |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
-|             | Clang 9.0                 | Visual Studio 2019                   |                                        |
+|             | Xcode 13.0                | Visual Studio 2019                   |                                        |
+|             +---------------------------+--------------------------------------+----------------------------------------+
+|             | Clang 9.0                 | Visual Studio 2022                   |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
 |             |                           | MinGW-w64                            |                                        |
 +=============+===========================+======================================+========================================+
@@ -84,8 +86,10 @@ use, please see the following resources:
 
 - `ubuntu-18.04 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu1804-README.md>`
 - `macos-10.15 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md>`
+- `macos-11 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-11-Readme.md>`
 - `windows-2016 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/win/Windows2016-Readme.md>`
 - `windows-2019 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/win/Windows2019-Readme.md>`
+- `windows-2022 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/win/Windows2022-Readme.md>`
 
 Below is a list of tested compiler/OS combinations:
 
@@ -93,9 +97,11 @@ Below is a list of tested compiler/OS combinations:
 - GCC 7.5.0 (Ubuntu 18.04) via GitHub Actions
 - Clang 9.0 (Ubuntu 18.04) via GitHub Actions
 - Apple Clang, Xcode 12.0.1 (OS X 10.15.7) via GitHub Actions
+- Apple Clang, Xcode 13.0.0 (OS X 11.0) via GitHub Actions
 - Visual Studio 2015 via Appveyor
 - Visual Studio 2017 via GitHub Actions
 - Visual Studio 2019 via GitHub Actions
+- Visual Studio 2022 via GitHub Actions
 - MinGW-w64 via GitHub Actions
 
 Legal

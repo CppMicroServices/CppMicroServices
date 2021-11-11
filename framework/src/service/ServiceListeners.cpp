@@ -40,6 +40,7 @@ US_MSVC_PUSH_DISABLE_WARNING(
 #include "ServiceReferenceBasePrivate.h"
 
 #include <cassert>
+#include <utility>
 
 namespace cppmicroservices {
 
@@ -81,7 +82,7 @@ ListenerToken ServiceListeners::AddServiceListener(
   // The following condition is true only if the listener is a non-static member function.
   // If so, the existing listener is replaced with the new listener.
   if (data != nullptr) {
-    RemoveServiceListener(context, ListenerTokenId(0), listener, data);
+    RemoveLegacyServiceListenerAndNotifyHooks(context, listener, data);
   }
 
   auto token = MakeListenerToken();
@@ -102,26 +103,43 @@ void ServiceListeners::RemoveServiceListener(
   const ServiceListener& listener,
   void* data)
 {
+  if (0 == tokenId) {
+    RemoveLegacyServiceListenerAndNotifyHooks(context, listener, data);
+  } else {
+    ServiceListenerEntry sle;
+    {
+      auto l = this->Lock();
+      US_UNUSED(l);
+      auto it = serviceSet.find(
+        ServiceListenerEntry{ context, listener, data, tokenId });
+      if (it != serviceSet.end()) {
+        sle = *it;
+        it->SetRemoved(true);
+        RemoveFromCache_unlocked(*it);
+        serviceSet.erase(it);
+      }
+    }
+    if (!sle.IsNull()) {
+      coreCtx->serviceHooks.HandleServiceListenerUnreg(sle);
+    }
+  }
+}
+
+void ServiceListeners::RemoveLegacyServiceListenerAndNotifyHooks(
+  const std::shared_ptr<BundleContextPrivate>& context,
+  const ServiceListener& listener,
+  void* data)
+{
   ServiceListenerEntry sle;
   {
     auto l = this->Lock();
     US_UNUSED(l);
-    std::function<bool(const ServiceListenerEntry&)> entryExists;
-    if (tokenId) {
-      assert(!listener);
-      assert(data == nullptr);
-      entryExists = [&context,
-                     &tokenId](const ServiceListenerEntry& entry) -> bool {
-        return entry.Contains(context, tokenId);
-      };
-    } else {
-      entryExists = [&context, &listener, &data](
-                      const ServiceListenerEntry& entry) -> bool {
+    auto it = std::find_if(
+      serviceSet.begin(),
+      serviceSet.end(),
+      [&context, &listener, &data](const ServiceListenerEntry& entry) -> bool {
         return entry.Contains(context, listener, data);
-      };
-    }
-
-    auto it = std::find_if(serviceSet.begin(), serviceSet.end(), entryExists);
+      });
     if (it != serviceSet.end()) {
       sle = *it;
       it->SetRemoved(true);
@@ -319,7 +337,6 @@ void ServiceListeners::RemoveAllListeners(
     auto l = this->Lock();
     US_UNUSED(l);
     for (auto it = serviceSet.begin(); it != serviceSet.end();) {
-
       if (GetPrivate(it->GetBundleContext()) == context) {
         RemoveFromCache_unlocked(*it);
         serviceSet.erase(it++);
@@ -377,7 +394,7 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
     }
   }
 
-  for (auto& l : receivers) {
+  for (auto const& l : receivers) {
     if (!l.IsRemoved()) {
       try {
         ++n;
@@ -444,7 +461,7 @@ ServiceListeners::GetListenerInfoCollection() const
   US_UNUSED(l);
   std::vector<ServiceListenerHook::ListenerInfo> result;
   result.reserve(serviceSet.size());
-  for (auto info : serviceSet) {
+  for (const auto& info : serviceSet) {
     result.push_back(info);
   }
   return result;

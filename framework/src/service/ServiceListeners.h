@@ -253,6 +253,19 @@ private:
                          const ServiceListenerEntries& receivers,
                          int cache_ix,
                          const std::string& val);
+
+  /**
+   * Removes service listeners registered using the legacy
+   * service listener registration mechanism. This 
+   * removal algorithm is specific to service listeners 
+   * that are not removed using the listener tokens and
+   * is much less efficient than the algorithm to remove
+   * service listeners using tokens.
+   */
+  void RemoveLegacyServiceListenerAndNotifyHooks(
+    const std::shared_ptr<BundleContextPrivate>& context,
+    const ServiceListener& listener,
+    void* data);
 };
 }
 

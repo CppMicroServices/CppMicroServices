@@ -7,6 +7,7 @@
 #include <cppmicroservices/ServiceTracker.h>
 
 #include <chrono>
+#include <unordered_set>
 
 #include "benchmark/benchmark.h"
 #include "fooservice.h"
@@ -189,6 +190,37 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture,
   }
 }
 
+static void CloseServiceTracker(benchmark::State& state)
+{
+  using namespace std::chrono;
+  using namespace benchmark::test;
+  using namespace cppmicroservices;
+
+  auto framework =
+    std::make_shared<Framework>(FrameworkFactory().NewFramework());
+  framework->Start();
+
+  for (int64_t i = 0; i < state.range(0); ++i) {
+    framework->GetBundleContext().AddServiceListener(
+      [](const ServiceEvent&) {});
+  }
+  auto fc = framework->GetBundleContext();
+
+  for (auto _ : state) {
+    ServiceTracker<Foo> fooTracker(fc, std::string("benchmark::test::Foo"));
+    fooTracker.Open();
+
+    auto start = high_resolution_clock::now();
+    fooTracker.Close();
+    auto end = high_resolution_clock::now();
+    auto elapsed_seconds = duration_cast<duration<double>>(end - start);
+    state.SetIterationTime(elapsed_seconds.count());
+  }
+
+  framework->Stop();
+  framework->WaitForStop(milliseconds::zero());
+}
+
 // Register benchmark functions
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithSvcRef)
   ->UseManualTime();
@@ -196,6 +228,9 @@ BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithBundleContext)
   ->UseManualTime();
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithInterfaceName)
   ->UseManualTime();
+BENCHMARK(CloseServiceTracker)
+  ->RangeMultiplier(2)
+  ->Range(1000, 1000000);
 
 // Run this benchmark for each Arg(...) call, passing in the parameter value to the benchmark.
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, ServiceTrackerScalability)

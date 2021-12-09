@@ -27,6 +27,7 @@
 
 #include "cppmicroservices/Any.h"
 
+#include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -85,6 +86,13 @@ public:
   NewFramework(const std::map<std::string, Any>& configuration,
                std::ostream* logger = nullptr);
 };
+
+/**
+ * \ingroup MicroServices
+ */
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, 
+    std::function<bool(const std::string&)>);
+
 }
 
 #endif // CPPMICROSERVICES_FRAMEWORKFACTORY_H

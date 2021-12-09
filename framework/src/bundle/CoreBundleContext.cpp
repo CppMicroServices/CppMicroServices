@@ -28,6 +28,7 @@ US_MSVC_DISABLE_WARNING(4355)
 
 #include "cppmicroservices/BundleInitialization.h"
 #include "cppmicroservices/Constants.h"
+#include "cppmicroservices/FrameworkFactory.h"
 
 #include "cppmicroservices/util/FileSystem.h"
 #include "cppmicroservices/util/String.h"
@@ -156,6 +157,12 @@ void CoreBundleContext::Init()
   } catch (const std::exception& e) {
     DIAG_LOG(*sink) << "Ignored runtime exception with message'" << e.what()
                     << "' from the GetPersistentStoragePath function.\n";
+  }
+
+  auto bundleValidationFunc =
+    frameworkProperties.find(Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
+  if (bundleValidationFunc != frameworkProperties.end()) {
+    validationFunc = any_cast<std::function<bool(const std::string&)>>(bundleValidationFunc->second);
   }
 
   systemBundle->InitSystemBundle();

@@ -20,6 +20,9 @@
 
   =============================================================================*/
 
+#include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/SecurityException.h"
+
 #include "ComponentConfigurationImpl.hpp"
 #include "../ConfigurationListenerImpl.hpp"
 #include "BundleLoader.hpp"
@@ -451,6 +454,21 @@ InstanceContextPair
 ComponentConfigurationImpl::CreateAndActivateComponentInstanceHelper(
   const cppmicroservices::Bundle& bundle)
 {
+  Any func = this->bundle.GetBundleContext().GetProperty(
+    cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
+  
+  try {
+    if (!func.Empty() && !any_cast<std::function<bool(const std::string&)>>(
+                           func)(this->bundle.GetLocation())) {
+      throw SecurityException{ "Bundle failed validation.", bundle };
+    }
+  } catch (const cppmicroservices::SecurityException&) {
+    throw;
+  } catch (...) {
+    throw SecurityException{ "bundle validation threw an exception",
+                             this->bundle };
+  }
+
   auto componentInstance = CreateComponentInstance();
   auto ctxt =
     std::make_shared<ComponentContextImpl>(shared_from_this(), bundle);

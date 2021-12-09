@@ -26,6 +26,7 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ServiceException.h"
 #include "cppmicroservices/ServiceFactory.h"
+#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 
 #include "BundlePrivate.h"
@@ -100,12 +101,19 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       }
     }
     s = smap;
-  } catch (const cppmicroservices::SharedLibraryException&) {
+  } catch (const cppmicroservices::SharedLibraryException& ex) {
     registration->bundle->coreCtx->listeners.SendFrameworkEvent(
       FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                     MakeBundle(bundle->shared_from_this()),
+                     ex.GetBundle(),
                      "Failed to load shared library",
                      std::current_exception()));
+    throw;
+  } catch (const cppmicroservices::SecurityException& ex) {
+    bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent{
+      FrameworkEvent::Type::FRAMEWORK_ERROR,
+      ex.GetBundle(),
+      std::string("Failed to load shared library due to a security exception"),
+      std::current_exception() });
     throw;
   } catch (const std::exception& ex) {
     s.reset();

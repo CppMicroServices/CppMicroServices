@@ -27,13 +27,16 @@ US_MSVC_PUSH_DISABLE_WARNING(
 
 #include "ServiceListeners.h"
 
+#include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ListenerFunctors.h"
+#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/util/Error.h"
 #include "cppmicroservices/util/String.h"
 
 #include "BundleContextPrivate.h"
+
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
 #include "Properties.h"
@@ -318,6 +321,13 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
           MakeBundle(bundleListeners.first->bundle->shared_from_this()),
           std::string("Bundle listener threw an exception"),
           std::current_exception()));
+        throw;
+      } catch(const cppmicroservices::SecurityException&) {
+        SendFrameworkEvent(FrameworkEvent{
+          FrameworkEvent::Type::FRAMEWORK_ERROR,
+          evt.GetOrigin(),
+          std::string("Bundle listener threw a security exception"),
+          std::current_exception() });
         throw;
       } catch (...) {
         SendFrameworkEvent(FrameworkEvent(

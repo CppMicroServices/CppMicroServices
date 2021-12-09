@@ -35,6 +35,7 @@ limitations under the License.
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/util/FileSystem.h"
 #include "gtest/gtest.h"
 
@@ -756,4 +757,40 @@ TEST(FrameworkTest, ShutdownAndStart)
   ASSERT_EQ(fwBundle.GetState(), Bundle::STATE_ACTIVE); // "Active framework"
 
   ASSERT_EQ(startCount, 1); // "One framework start notification"
+}
+
+TEST(FrameworkTest, ConfigurationWithBundleValidation){
+
+  using validationFuncType = std::function<bool(const std::string&)>;
+  
+  validationFuncType validationFunc = [](const std::string&) -> bool {
+    return false;
+  };
+  cppmicroservices::FrameworkConfiguration configuration{ {
+          cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, 
+          validationFunc 
+      }
+  };
+
+  Any callableFunction = validationFunc;
+
+  ASSERT_TRUE(!any_cast<validationFuncType>(callableFunction)("foo"));
+  ASSERT_TRUE(!
+    any_cast<std::function<bool(const std::string&)>>(callableFunction)("foo"));
+  ASSERT_FALSE(callableFunction.Empty());
+
+  auto f = FrameworkFactory().NewFramework(std::move(configuration));
+  ASSERT_NO_THROW(f.Start());
+
+  Any func = f.GetBundleContext().GetProperty(
+    cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
+
+  ASSERT_TRUE(!func.Empty());
+
+  // call the bundle validation function
+  auto isBundleValid = any_cast<validationFuncType>(func)(std::string{});
+  ASSERT_TRUE(!isBundleValid);
+
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
 }

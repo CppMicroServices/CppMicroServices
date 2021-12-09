@@ -20,6 +20,9 @@
 
   =============================================================================*/
 
+#include "cppmicroservices/SecurityException.h"
+#include "cppmicroservices/SharedLibraryException.h"
+
 #include "BundleOrPrototypeComponentConfiguration.hpp"
 #include "ComponentManager.hpp"
 
@@ -70,6 +73,16 @@ BundleOrPrototypeComponentConfigurationImpl::CreateAndActivateComponentInstance(
     auto instCtxtTuple = CreateAndActivateComponentInstanceHelper(bundle);
     compInstCtxtPairList->emplace_back(instCtxtTuple);
     return instCtxtTuple.first;
+  } catch (const cppmicroservices::SharedLibraryException&) {
+    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                     "Exception thrown while trying to load a shared library",
+                     std::current_exception());
+    throw;
+  } catch (const cppmicroservices::SecurityException&) {
+    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                     "Exception thrown while trying to validate a bundle",
+                     std::current_exception());
+    throw;
   } catch (...) {
     GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                      "Exception received from user code while activating the "

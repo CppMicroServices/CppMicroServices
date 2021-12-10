@@ -430,7 +430,7 @@ std::exception_ptr BundlePrivate::Start0()
                        "The bundle validation function threw an exception",
                        std::current_exception()));
       StartFailed();
-      throw SecurityException{ std::move(util::GetLastExceptionStr()), thisBundle };
+      throw SecurityException{ util::GetLastExceptionStr(), thisBundle };
     }
 
     try {

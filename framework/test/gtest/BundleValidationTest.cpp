@@ -32,6 +32,8 @@ limitations under the License.
 
 #include "gtest/gtest.h"
 
+#ifdef US_BUILD_SHARED_LIBS
+
 TEST(BundleValidationTest, BundleValidationFailure)
 {
   using validationFuncType = std::function<bool(const std::string&)>;
@@ -135,3 +137,4 @@ TEST(BundleValidationTest, BundleValidationFunctionException) {
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
+#endif

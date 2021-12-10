@@ -87,12 +87,6 @@ public:
                std::ostream* logger = nullptr);
 };
 
-/**
- * \ingroup MicroServices
- */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, 
-    std::function<bool(const std::string&)>);
-
 }
 
 #endif // CPPMICROSERVICES_FRAMEWORKFACTORY_H

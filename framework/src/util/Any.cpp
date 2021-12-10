@@ -26,6 +26,14 @@
 #include <iomanip>
 #include <stdexcept>
 
+namespace std {
+std::ostream& operator<<(std::ostream& os,
+    std::function<bool(const std::string&)>)
+{
+    return os;
+}
+}
+
 namespace cppmicroservices {
 
 namespace detail {

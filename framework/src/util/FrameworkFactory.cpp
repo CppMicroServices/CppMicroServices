@@ -91,9 +91,4 @@ Framework FrameworkFactory::NewFramework(
   return NewFramework(fwConfig, logger);
 }
 
-std::ostream& operator<<(std::ostream& os,
-    std::function<bool(const std::string&)>)
-{
-  return os;
-}
 }

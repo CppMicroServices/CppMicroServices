@@ -46,9 +46,18 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 #include <vector>
 
+namespace std {
+/**
+ * \ingroup MicroServices
+ */
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
+                                             std::function<bool(const std::string&)>);
+}
+
 namespace cppmicroservices {
 namespace any {
 namespace detail {
+
 /**
  * Provide a compare function that will do the comparison if the operator is available, and always
  * return false otherwise. Use SFINAE to pick the right implementation based on type.

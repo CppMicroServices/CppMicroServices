@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <algorithm>
 #include <array>
+#include <functional>
 #include <list>
 #include <map>
 #include <memory>

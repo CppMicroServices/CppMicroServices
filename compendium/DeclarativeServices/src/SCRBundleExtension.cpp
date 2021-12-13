@@ -112,7 +112,10 @@ void SCRBundleExtension::DisableAndRemoveAllComponentManagers()
   for (auto& compManager : *managers) {
     auto fut = compManager->Disable();
     registry->RemoveComponentManager(compManager);
-    fut.get(); // since this happens when the bundle is stopped. Wait until the disable is finished on the other thread.
+    try {
+      fut.get(); // since this happens when the bundle is stopped. Wait until the disable is finished on the other thread.
+    } catch (...) {
+    }
   }
   managers->clear();
   registry.reset();

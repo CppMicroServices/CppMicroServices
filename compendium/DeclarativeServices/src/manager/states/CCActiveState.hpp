@@ -83,10 +83,10 @@ public:
    * state represented by this object
    */
   ComponentState GetValue() const override { return ComponentState::ACTIVE; }
-  void WaitForTransitionTask() {
+  void WaitForTransitionTask() override {
       latch.Wait(); 
   }
-  void WaitForStateChangeCompletion() { return; }
+  void WaitForStateChangeCompletion() override { return; }
 
 private:
   void DoDeactivateWork(ComponentConfigurationImpl& mgr);

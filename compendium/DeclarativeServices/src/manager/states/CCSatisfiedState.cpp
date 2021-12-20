@@ -39,7 +39,8 @@ void CCSatisfiedState::Deactivate(ComponentConfigurationImpl& mgr)
   std::lock_guard<std::mutex> lock(oneAtATimeMutex);
 
   // Make sure the state didn't change while we were waiting
-  if (mgr.GetState()->GetValue() !=
+  auto currState = mgr.GetState();
+  if (currState->GetValue() !=
       service::component::runtime::dto::ComponentState::SATISFIED) {
     return;
   }

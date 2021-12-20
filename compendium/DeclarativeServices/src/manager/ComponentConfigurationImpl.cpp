@@ -400,8 +400,9 @@ ComponentState ComponentConfigurationImpl::GetConfigState() const
   // returned to the caller, it's important that the registration already
   // has taken place. Waiting for the transition to be signalled accomplishes
   // this.
+ 
   auto currentState = GetState();
-  currentState->WaitForTransitionTask();
+  currentState->WaitForStateChangeCompletion();
   return currentState->GetValue();
 }
 

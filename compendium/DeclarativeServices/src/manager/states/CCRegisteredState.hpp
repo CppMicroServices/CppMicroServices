@@ -64,6 +64,7 @@ public:
    * Method blocks the current thread until the stored future is ready
    */
   void WaitForTransitionTask() override { ready.get(); }
+  void WaitForStateChangeCompletion() { WaitForTransitionTask(); }
 
 private:
   std::shared_future<void> ready;

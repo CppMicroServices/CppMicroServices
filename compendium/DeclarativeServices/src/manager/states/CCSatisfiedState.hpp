@@ -66,8 +66,6 @@ public:
    * state represented by this object
    */
   ComponentState GetValue() const override { return ComponentState::SATISFIED; }
-  void WaitForTransitionTask() override { ready.get(); }
-  void WaitForStateChangeCompletion() override { WaitForTransitionTask(); }
 
 protected:
   // Mutex to make sure that one operation (Activate, Rebind, Modified) completes before another

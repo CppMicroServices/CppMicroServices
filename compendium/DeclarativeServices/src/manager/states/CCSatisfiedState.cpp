@@ -36,14 +36,7 @@ CCSatisfiedState::CCSatisfiedState()
 
 void CCSatisfiedState::Deactivate(ComponentConfigurationImpl& mgr)
 {
-  std::lock_guard<std::mutex> lock(oneAtATimeMutex);
-
-  // Make sure the state didn't change while we were waiting
-  auto currState = mgr.GetState();
-  if (currState->GetValue() !=
-      service::component::runtime::dto::ComponentState::SATISFIED) {
-    return;
-  }
+  
   auto currentState = shared_from_this();
   std::packaged_task<void(void)> task([&mgr]() {
     mgr.UnregisterService();

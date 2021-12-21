@@ -97,7 +97,6 @@ public:
   }
 
   void WaitForTransitionTask() override { ready.get(); }
-  void WaitForStateChangeCompletion() override { WaitForTransitionTask(); }
 
 private:
   std::shared_future<void> ready;

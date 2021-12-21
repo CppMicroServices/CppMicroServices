@@ -114,7 +114,6 @@ public:
    * Implementation must wait until the transition task is finished
    */
   virtual void WaitForTransitionTask() = 0;
-  virtual void WaitForStateChangeCompletion() = 0;
 };
 }
 }

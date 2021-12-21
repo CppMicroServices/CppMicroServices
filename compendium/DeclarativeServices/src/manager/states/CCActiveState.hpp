@@ -86,7 +86,6 @@ public:
   void WaitForTransitionTask() override {
       latch.Wait(); 
   }
-  void WaitForStateChangeCompletion() override { return; }
 
 private:
   void DoDeactivateWork(ComponentConfigurationImpl& mgr);

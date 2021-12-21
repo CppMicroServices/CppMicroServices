@@ -302,7 +302,6 @@ public:
                     const ServiceReference<void>&));
   MOCK_CONST_METHOD0(GetValue, ComponentState(void));
   MOCK_METHOD0(WaitForTransitionTask, void());
-  MOCK_METHOD0(WaitForStateChangeCompletion, void());
 };
 
 class MockComponentInstance

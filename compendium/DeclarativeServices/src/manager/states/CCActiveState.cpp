@@ -161,13 +161,25 @@ void CCActiveState::Rebind(ComponentConfigurationImpl & mgr,
                              const ServiceReference<void>& svcRefToBind,
                              const ServiceReference<void>& svcRefToUnbind)
   {
+    auto logger = mgr.GetLogger();
     if (latch.CountUp()) {
+      detail::ScopeGuard sg([this, logger]() {
+        // By using try/catch here, we ensure that this lambda function doesn't
+        // throw inside LatchScopeGuard's dtor.
+        try {
+          latch.CountDown();
+        } catch (...) {
+          logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                      "latch.CountDown() threw an exception during "
+                      "LatchScopeGuard cleanup in CCActiveState::Modified.",
+                      std::current_exception());
+        }
+      });
       std::lock_guard<std::mutex> lock(oneAtATimeMutex);
       // Make sure the state didn't change while we were waiting
       auto currentState = mgr.GetState();
       if (currentState->GetValue() !=
           service::component::runtime::dto::ComponentState::ACTIVE) {
-        auto logger = mgr.GetLogger();
         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                     "Rebind failed. Component no longer in Active State.");
         return;
@@ -193,7 +205,6 @@ void CCActiveState::Rebind(ComponentConfigurationImpl & mgr,
             std::current_exception());
         }
       }
-      latch.CountDown();
     }
   }
 }

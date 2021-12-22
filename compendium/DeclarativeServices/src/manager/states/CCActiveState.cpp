@@ -87,27 +87,22 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(
               "not in active state");
   return nullptr;
 }
-  void CCActiveState::Deactivate(ComponentConfigurationImpl& mgr)
-{
-   DoDeactivateWork(mgr);
-}
-
-void CCActiveState::DoDeactivateWork(ComponentConfigurationImpl& mgr)
+void CCActiveState::Deactivate(ComponentConfigurationImpl& mgr)
 {
   auto currentState = shared_from_this();
   std::promise<void> transitionAction;
   auto fut = transitionAction.get_future();
   auto unsatisfiedState =
-    std::make_shared<CCUnsatisfiedReferenceState>(std::move(fut));
-  while (currentState->GetValue() !=
+  std::make_shared<CCUnsatisfiedReferenceState>(std::move(fut));
+  while (
+    currentState->GetValue() !=
     service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE) {
     if (mgr.CompareAndSetState(&currentState, unsatisfiedState)) {
       // The currentState is CCActiveState so the WaitForTransitionTask is the version
       // that waits for the latch. The Deactivate function won't continue until
       // the latch counts down to 0, thereby allowing all Activate, Rebind and Modified
-      // activities to complete. 
-      currentState
-        ->WaitForTransitionTask(); // wait for the previous transition to finish
+      // activities to complete.
+      currentState->WaitForTransitionTask(); // wait for the previous transition to finish
       mgr.UnregisterService();
       mgr.DestroyComponentInstances();
       transitionAction.set_value();
@@ -145,7 +140,7 @@ bool CCActiveState::Modified(ComponentConfigurationImpl& mgr)
       // Component instance does not have a Modified method. Deactivate
       // and reactivate
       latch.CountDown();
-      DoDeactivateWork(mgr);
+      Deactivate(mgr);
       // Service registration properties will be updated when the service is
       // registered. Don't need to do it here.
       return false;

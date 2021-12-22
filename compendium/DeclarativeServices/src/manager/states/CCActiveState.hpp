@@ -88,7 +88,6 @@ public:
   }
 
 private:
-  void DoDeactivateWork(ComponentConfigurationImpl& mgr);
   detail::CounterLatch latch;
   
 };

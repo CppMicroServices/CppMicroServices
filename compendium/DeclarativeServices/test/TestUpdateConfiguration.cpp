@@ -192,7 +192,7 @@ TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
   // quickly end up in the SATISFIED state once ConfigurationAdmin notifies DS of the configuration
   // object. DS then changes the state to SATISFIED.
   scr::dto::ComponentDescriptionDTO compDescDTO;
-  auto const startTime = std::chrono::steady_clock::now();
+  auto startTime = std::chrono::steady_clock::now();
   auto timeout = std::chrono::milliseconds(2000);
   bool result = false;
   while (!result &&
@@ -206,8 +206,15 @@ TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
   }
   ASSERT_TRUE(result);
 
-  // Get an instance of the service
-  auto instance = GetInstance<test::CAInterface>();
+  // GetService to make component active
+  std::shared_ptr<test::CAInterface> instance;
+  startTime = std::chrono::steady_clock::now();
+  while (!instance &&
+         std::chrono::duration_cast<std::chrono::milliseconds>(
+           std::chrono::steady_clock::now() - startTime) <= TIMEOUT) {
+    instance = GetInstance<test::CAInterface>();
+  }
+ 
   ASSERT_TRUE(instance) << "GetService failed for CAInterface";
 
   auto compConfigs =

@@ -131,8 +131,14 @@ TEST_F(tServiceComponent, testConfigObjectInManifestResolvesService)
   ASSERT_TRUE(result);
 
   // GetService to make component active
-  auto service = GetInstance<test::CAInterface>();
-  ASSERT_TRUE(service) << "GetService failed for CAInterface";
+  std::shared_ptr<test::CAInterface> service;
+  startTime = std::chrono::steady_clock::now();
+  while (!service &&
+         std::chrono::duration_cast<std::chrono::milliseconds>(
+           std::chrono::steady_clock::now() - startTime) <= TIMEOUT) {
+    service = GetInstance<test::CAInterface>();
+  }
+   ASSERT_TRUE(service) << "GetService failed for CAInterface";
 
   auto compConfigs =
     GetComponentConfigs(testBundle, componentName, compDescDTO);

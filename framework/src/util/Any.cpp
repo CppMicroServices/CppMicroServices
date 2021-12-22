@@ -26,14 +26,6 @@
 #include <iomanip>
 #include <stdexcept>
 
-namespace std {
-std::ostream& operator<<(std::ostream& os,
-    std::function<bool(const std::string&)>)
-{
-    return os;
-}
-}
-
 namespace cppmicroservices {
 
 namespace detail {
@@ -72,6 +64,21 @@ std::ostream& newline_and_indent(std::ostream& os,
 std::ostream& any_value_to_string(std::ostream& os, const Any& any)
 {
   os << any.ToString();
+  return os;
+}
+
+std::ostream& any_value_to_string(
+  std::ostream& os,
+  const std::function<bool(const std::string&)>&)
+{
+  return os;
+}
+
+std::ostream& any_value_to_json(std::ostream& os,
+                                const std::function<bool(const std::string&)>&,
+                                const uint8_t,
+                                const int32_t)
+{
   return os;
 }
 

@@ -47,14 +47,6 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 #include <vector>
 
-namespace std {
-/**
- * \ingroup MicroServices
- */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
-                                             std::function<bool(const std::string&)>);
-}
-
 namespace cppmicroservices {
 namespace any {
 namespace detail {
@@ -125,6 +117,13 @@ US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
                                                     const int32_t);
 US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
                                                     bool val,
+                                                    const uint8_t,
+                                                    const int32_t);
+
+US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os,
+  const std::function<bool(const std::string&)>&);
+US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
+    const std::function<bool(const std::string&)>&,
                                                     const uint8_t,
                                                     const int32_t);
 

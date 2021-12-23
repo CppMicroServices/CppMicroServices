@@ -33,9 +33,6 @@
 #include <map>
 #include <memory>
 
-// This is to disable warning 4996 on MSVC 2015. The below warning
-// suppression does not work when compiling with MSVC 2015
-US_MSVC_PUSH_DISABLE_WARNING(34996)
 US_MSVC_PUSH_DISABLE_WARNING(4996)
 
 using namespace cppmicroservices;

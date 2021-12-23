@@ -121,7 +121,7 @@ _Pragma ("GCC diagnostic pop")
 #endif
 
 // Do not warn about the usage of deprecated unsafe functions
-US_MSVC_DISABLE_WARNING(4996)
+// US_MSVC_DISABLE_WARNING(4996)
 
 // Mark a variable or expression result as unused
 #define US_UNUSED(x) (void)(x)

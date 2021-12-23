@@ -35,6 +35,8 @@
 #include <thread>
 #include <vector>
 
+US_MSVC_PUSH_DISABLE_WARNING(4996)
+
 using namespace cppmicroservices;
 
 TEST(FrameworkListenerTest, testStartStopFrameworkEvents)
@@ -302,3 +304,5 @@ TEST(FrameworkListenerTest, testDeadLock)
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
 #endif
+
+US_MSVC_POP_WARNING

@@ -99,7 +99,7 @@ TEST(TestBundleValidation, BundleValidationFailure)
   {
     std::string Description() override { return "foo"; }
   };
-  f.GetBundleContext().RegisterService<test::Interface1>(std::make_shared<Interface1Impl>());
+  auto Interface1SvcReg = f.GetBundleContext().RegisterService<test::Interface1>(std::make_shared<Interface1Impl>());
 
   auto svcRef = f.GetBundleContext().GetServiceReference<test::Interface2>();
   ASSERT_TRUE(svcRef);
@@ -108,6 +108,44 @@ TEST(TestBundleValidation, BundleValidationFailure)
   // a bundle validation function which returns false must cause the
   // service component not to be enabled
   auto compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponent6");
+  ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
+
+  // delayed components won't through when enabled. they should throw on first
+  // request of the service
+  auto enabledFuture = dsRuntimeService->EnableComponent(compDesc);
+  ASSERT_NO_THROW(enabledFuture.get());
+
+  svcRef = f.GetBundleContext().GetServiceReference<test::Interface2>();
+  ASSERT_TRUE(svcRef);
+  ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef),
+               cppmicroservices::SecurityException);
+
+  compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponent6");
+  ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
+  Interface1SvcReg.Unregister();
+
+  // test starting an immediate activation ds component with a service reference
+  test::InstallLib(f.GetBundleContext(), "TestBundleDSTOI7");
+  bundles = f.GetBundleContext().GetBundles();
+  bundleIter = std::find_if(
+    bundles.begin(), bundles.end(), [](const cppmicroservices::Bundle& b) {
+      return (b.GetSymbolicName() == "TestBundleDSTOI7");
+    });
+
+  // on bundle start, the ds component will not be activated immediately since
+  // it's service reference is unsatisfied. Registering a service which satisfies
+  // the reference should cause an exception and no service should be registered.
+  ASSERT_NO_THROW(bundleIter->Start());
+  compDesc = dsRuntimeService->GetComponentDescriptionDTO(
+    *bundleIter, "sample::ServiceComponent7");
+  ASSERT_TRUE(dsRuntimeService->IsComponentEnabled(compDesc));
+  // trying to enable the component will result in an exception from
+  // the future since the ds component was immediately activated
+  Interface1SvcReg = f.GetBundleContext().RegisterService<test::Interface1>(
+    std::make_shared<Interface1Impl>());
+  svcRef = f.GetBundleContext().GetServiceReference<test::Interface2>();
+  ASSERT_TRUE(svcRef);
+  ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef), cppmicroservices::SecurityException);
   ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
 
   f.Stop();

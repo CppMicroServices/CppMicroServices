@@ -32,8 +32,6 @@
 
 #include "gtest/gtest.h"
 
-US_MSVC_PUSH_DISABLE_WARNING(4996)
-
 using namespace cppmicroservices;
 
 class BundleActivatorTest : public ::testing::Test
@@ -150,5 +148,3 @@ TEST_F(BundleActivatorTest, PropertyTrueWithClass)
     "cppmicroservices::TestBundleAService");
   EXPECT_TRUE(ref);
 }
-
-US_MSVC_POP_WARNING

@@ -28,8 +28,6 @@
 #include "cppmicroservices/ServiceEvent.h"
 #include "gtest/gtest.h"
 
-US_MSVC_PUSH_DISABLE_WARNING(4996)
-
 namespace cppmicroservices {
 
 template<class Receiver>
@@ -90,7 +88,5 @@ private:
   CallbackType callback;
 };
 }
-
-US_MSVC_POP_WARNING
 
 #endif // CPPMICROSERVICES_TESTUTILBUNDLELISTENER_H

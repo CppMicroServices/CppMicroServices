@@ -46,8 +46,6 @@
 
 #include "gtest/gtest.h"
 
-US_MSVC_PUSH_DISABLE_WARNING(4996)
-
 using namespace cppmicroservices;
 using namespace cppmicroservices::testing;
 
@@ -917,5 +915,3 @@ TEST_F(BundleTest, TestBundleStreamOperator)
   ASSERT_TRUE(bundle);
   std::cout << &bundle;
 }
-
-US_MSVC_POP_WARNING

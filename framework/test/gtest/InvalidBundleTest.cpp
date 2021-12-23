@@ -27,8 +27,6 @@
 #include "gtest/gtest.h"
 #include <stdexcept>
 
-US_MSVC_PUSH_DISABLE_WARNING(4996)
-
 using namespace cppmicroservices;
 
 TEST(InvalidBundle, GetBundleIdFromInvalidBundle)
@@ -144,5 +142,3 @@ TEST(InvalidBundle, GetBundleVersionFromInvalidBundle)
   Bundle b;
   EXPECT_THROW(b.GetVersion(), std::invalid_argument);
 }
-
-US_MSVC_POP_WARNING

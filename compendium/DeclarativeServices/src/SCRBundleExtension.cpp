@@ -84,6 +84,7 @@ SCRBundleExtension::SCRBundleExtension(
     } catch (const cppmicroservices::SharedLibraryException&) {
       throw;
     } catch (const cppmicroservices::SecurityException&) {
+      DisableAndRemoveAllComponentManagers();
       throw;
     } catch (const std::exception&) {
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,

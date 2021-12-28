@@ -139,7 +139,14 @@ bool CCActiveState::Modified(ComponentConfigurationImpl& mgr)
     if (!mgr.ModifyComponentInstanceProperties()) {
       // Component instance does not have a Modified method. Deactivate
       // and reactivate
-      latch.CountDown();
+      try {
+        latch.CountDown();
+      } catch (...) {
+        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                    "latch.CountDown() threw an exception following "
+                    "ModifyComponentInstanceProperties.",
+                    std::current_exception());
+      }
       Deactivate(mgr);
       // Service registration properties will be updated when the service is
       // registered. Don't need to do it here.

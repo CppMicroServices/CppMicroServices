@@ -136,26 +136,17 @@ bool CCActiveState::Modified(ComponentConfigurationImpl& mgr)
                   "Modified failed. Component no longer in Active State.");
       return false;
     }
-    if (!mgr.ModifyComponentInstanceProperties()) {
-      // Component instance does not have a Modified method. Deactivate
-      // and reactivate
-      try {
-        latch.CountDown();
-      } catch (...) {
-        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                    "latch.CountDown() threw an exception following "
-                    "ModifyComponentInstanceProperties.",
-                    std::current_exception());
-      }
-      Deactivate(mgr);
-      // Service registration properties will be updated when the service is
-      // registered. Don't need to do it here.
-      return false;
+    bool result = mgr.ModifyComponentInstanceProperties();
+    if (result) {
+      // Update service registration properties
+      mgr.SetRegistrationProperties();
+      return true;
     }
-    // Update service registration properties
-    mgr.SetRegistrationProperties();
-  }
-  return true;
+  } // count down the latch and release the lock
+  Deactivate(mgr);
+  // Service registration properties will be updated when the service is
+  // registered. Don't need to do it here.
+  return false;
 };
 
 void CCActiveState::Rebind(ComponentConfigurationImpl & mgr,

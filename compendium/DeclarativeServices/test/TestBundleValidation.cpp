@@ -21,12 +21,16 @@ limitations under the License.
 =============================================================================*/
 
 #include "cppmicroservices/Any.h"
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/SecurityException.h"
+
+#include "cppmicroservices/cm/ConfigurationAdmin.hpp"
+#include "cppmicroservices/cm/Configuration.hpp"
 
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
@@ -41,7 +45,8 @@ TEST(TestBundleValidation, BundleValidationFailure)
   using validationFuncType = std::function<bool(const std::string&)>;
 
   validationFuncType validationFunc = [](const std::string& path) -> bool {
-    if (std::string::npos != path.find("DeclarativeServices")) {
+    if (std::string::npos != path.find("DeclarativeServices") ||
+        std::string::npos != path.find("ConfigurationAdmin")) {
       return true;
     }
     return false;
@@ -110,7 +115,7 @@ TEST(TestBundleValidation, BundleValidationFailure)
   auto compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponent6");
   ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
 
-  // delayed components won't through when enabled. they should throw on first
+  // delayed components won't throw when enabled. they should throw on first
   // request of the service
   auto enabledFuture = dsRuntimeService->EnableComponent(compDesc);
   ASSERT_NO_THROW(enabledFuture.get());
@@ -147,6 +152,105 @@ TEST(TestBundleValidation, BundleValidationFailure)
   ASSERT_TRUE(svcRef);
   ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef), cppmicroservices::SecurityException);
   ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
+  auto enableCompFuture = dsRuntimeService->EnableComponent(compDesc);
+  ASSERT_THROW(enableCompFuture.get(),
+               cppmicroservices::SecurityException);
+  Interface1SvcReg.Unregister();
+
+  // test starting a prototype scope service component
+  test::InstallLib(f.GetBundleContext(), "TestBundleDSTOI15");
+  bundles = f.GetBundleContext().GetBundles();
+  bundleIter = std::find_if(
+    bundles.begin(), bundles.end(), [](const cppmicroservices::Bundle& b) {
+      return (b.GetSymbolicName() == "TestBundleDSTOI15");
+    });
+  ASSERT_NO_THROW(bundleIter->Start());
+  compDesc = dsRuntimeService->GetComponentDescriptionDTO(
+    *bundleIter, "sample::ServiceComponent15");
+  ASSERT_TRUE(dsRuntimeService->IsComponentEnabled(compDesc));
+  svcRef = f.GetBundleContext().GetServiceReference<test::Interface1>();
+  ASSERT_TRUE(svcRef);
+  ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef),
+               cppmicroservices::SecurityException);
+  ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
+
+  // test starting a delayed activation ds component with a required configuration policy
+  test::InstallLib(f.GetBundleContext(), "TestBundleDSCA02");
+  bundles = f.GetBundleContext().GetBundles();
+  bundleIter = std::find_if(
+    bundles.begin(), bundles.end(), [](const cppmicroservices::Bundle& b) {
+      return (b.GetSymbolicName() == "TestBundleDSCA02");
+    });
+  ASSERT_NO_THROW(bundleIter->Start());
+  compDesc = dsRuntimeService->GetComponentDescriptionDTO(
+    *bundleIter, "sample::ServiceComponentCA02");
+  ASSERT_TRUE(dsRuntimeService->IsComponentEnabled(compDesc));
+
+  auto cmBundlePath = test::GetConfigAdminRuntimePluginFilePath();
+  auto cmBundle = f.GetBundleContext().InstallBundles(cmBundlePath);
+  ASSERT_TRUE(cmBundle[0]);
+  ASSERT_NO_THROW(cmBundle[0].Start());
+
+  auto sCMSvcRef =
+    f.GetBundleContext()
+                     .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+  ASSERT_TRUE(sCMSvcRef);
+  auto cmRuntimeService =
+    f.GetBundleContext()
+      .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sCMSvcRef);
+  ASSERT_TRUE(cmRuntimeService);
+
+  auto config = cmRuntimeService->GetConfiguration("sample::ServiceComponentCA02");
+  cppmicroservices::AnyMap configObj(cppmicroservices::AnyMap::UNORDERED_MAP);
+  configObj["foo"] = std::string("bar");
+  auto updateFuture = config->Update(configObj);
+  ASSERT_NO_THROW(updateFuture.get());
+
+  configObj["foo"] = std::string("baz");
+  auto updateIfDifferentFuture = config->UpdateIfDifferent(configObj);
+  ASSERT_NO_THROW(updateIfDifferentFuture.second.get());
+
+  svcRef = f.GetBundleContext().GetServiceReference<test::CAInterface>();
+  ASSERT_TRUE(svcRef);
+  ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef),
+               cppmicroservices::SecurityException);
+
+  compDesc = dsRuntimeService->GetComponentDescriptionDTO(
+    *bundleIter, "sample::ServiceComponentCA02");
+  ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
+  config->Remove().get();
+
+
+  // test starting an immediate activation ds component with a required configuration policy
+  test::InstallLib(f.GetBundleContext(), "TestBundleDSCA03");
+  bundles = f.GetBundleContext().GetBundles();
+  bundleIter = std::find_if(
+    bundles.begin(), bundles.end(), [](const cppmicroservices::Bundle& b) {
+      return (b.GetSymbolicName() == "TestBundleDSCA03");
+    });
+  ASSERT_NO_THROW(bundleIter->Start());
+  compDesc = dsRuntimeService->GetComponentDescriptionDTO(
+    *bundleIter, "sample::ServiceComponentCA03");
+  ASSERT_TRUE(dsRuntimeService->IsComponentEnabled(compDesc));
+  config = cmRuntimeService->GetConfiguration("sample::ServiceComponentCA03");
+  configObj.clear();
+  configObj["foo"] = std::string("bar");
+  ASSERT_THROW(config->Update(configObj).get(),
+               cppmicroservices::SecurityException);
+
+  configObj["foo"] = std::string("baz");
+  ASSERT_THROW(config->UpdateIfDifferent(configObj).second.get(),
+               cppmicroservices::SecurityException);
+
+  svcRef = f.GetBundleContext().GetServiceReference<test::CAInterface>();
+  ASSERT_TRUE(svcRef);
+  ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef),
+               cppmicroservices::SecurityException);
+
+  compDesc = dsRuntimeService->GetComponentDescriptionDTO(
+    *bundleIter, "sample::ServiceComponentCA03");
+  ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
+
 
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());

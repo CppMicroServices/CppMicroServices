@@ -43,14 +43,7 @@ std::shared_ptr<ComponentInstance> CCRegisteredState::Activate(
   ComponentConfigurationImpl& mgr,
   const cppmicroservices::Bundle& clientBundle)
 {
-  std::lock_guard<std::mutex> lock(oneAtATimeMutex);
-
-  // Make sure the state didn't change while we were waiting
-  if (mgr.GetState()->GetValue() !=
-      service::component::runtime::dto::ComponentState::SATISFIED) {
-    return std::shared_ptr<ComponentInstance>(nullptr);
-  }
-
+ 
   auto activeState = std::make_shared<CCActiveState>();
   auto currState = shared_from_this();
   bool success = false;

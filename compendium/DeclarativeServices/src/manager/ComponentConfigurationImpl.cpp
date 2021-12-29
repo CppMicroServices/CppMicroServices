@@ -390,19 +390,7 @@ bool ComponentConfigurationImpl::Modified()
 
 ComponentState ComponentConfigurationImpl::GetConfigState() const
 {
-  // When DS is performing a state transition, it changes the state,
-  // performs the action for the state transition, then signals that
-  // the state transition is complete. Before returning the current
-  // state to the caller, wait for the action associated with the
-  // state to complete. For example, when registering a service,
-  // DS changes the state to SATISFIED, registers the service and signals
-  // that the state transition is complete. If the state of SATISFIED is
-  // returned to the caller, it's important that the registration already
-  // has taken place. Waiting for the transition to be signalled accomplishes
-  // this.
-  auto currentState = GetState();
-  currentState->WaitForTransitionTask();
-  return currentState->GetValue();
+   return GetState()->GetValue();
 }
 
 bool ComponentConfigurationImpl::CompareAndSetState(

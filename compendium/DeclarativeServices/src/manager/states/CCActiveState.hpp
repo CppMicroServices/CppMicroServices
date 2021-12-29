@@ -25,6 +25,7 @@
 
 #include "../ConcurrencyUtil.hpp"
 #include "CCSatisfiedState.hpp"
+#include "cppmicroservices/detail/CounterLatch.h"
 
 using cppmicroservices::service::component::runtime::dto::ComponentState;
 
@@ -82,9 +83,13 @@ public:
    * state represented by this object
    */
   ComponentState GetValue() const override { return ComponentState::ACTIVE; }
+  void WaitForTransitionTask() override {
+      latch.Wait(); 
+  }
 
 private:
-  void DoDeactivateWork(ComponentConfigurationImpl& mgr);
+  detail::CounterLatch latch;
+  
 };
 }
 }

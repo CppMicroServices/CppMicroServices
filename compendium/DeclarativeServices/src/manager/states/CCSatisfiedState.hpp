@@ -70,7 +70,7 @@ public:
   void WaitForTransitionTask() override { ready.get(); }
 
 protected:
-  // Mutex to make sure that one operation (Activate, Rebind, Modified, Deactivate) completes before another
+  // Mutex to make sure that one operation (Activate, Rebind, Modified) completes before another
   // operation begins.
   mutable std::mutex oneAtATimeMutex;
 

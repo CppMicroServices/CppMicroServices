@@ -474,7 +474,7 @@ if(MSVC)
     # For googletest on MSVC versions less than MSVC 2017
     # - (4503) 'identifier' : decorated name length exceeded, name was truncated
     # Additionally, on MSVC versions less than MSVC 2015
-    # - (4996) all deprecation warnings (pragma push/pop for disablign the warning does not work)
+    # - (4996) all deprecation warnings (pragma push/pop for disabling the warning does not work)
     set(disabled_warnings ${disabled_warnings} 4503 4996)
   endif()
 

@@ -23,6 +23,8 @@
 #include "cppmicroservices/BundleContext.h"
 #include <map>
 
+US_MSVC_PUSH_DISABLE_WARNING(4996)
+
 using namespace cppmicroservices;
 namespace DSSpellCheck {
 /**
@@ -73,3 +75,5 @@ std::vector<std::string> SpellCheckImpl::Check(const std::string& passage)
   return errorList;
 }
 }
+
+US_MSVC_POP_WARNING

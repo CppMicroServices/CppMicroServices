@@ -36,6 +36,8 @@
 #  define timegm(x) (_mkgmtime(x))
 #endif
 
+US_MSVC_PUSH_DISABLE_WARNING(4996)
+
 namespace cppmicroservices {
 
 HttpServletRequestPrivate::HttpServletRequestPrivate(
@@ -329,3 +331,5 @@ HttpServletRequest::HttpServletRequest(HttpServletRequestPrivate* d)
   : d(d)
 {}
 }
+
+US_MSVC_POP_WARNING

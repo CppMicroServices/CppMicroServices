@@ -34,6 +34,8 @@
 #include <stdexcept>
 #include <vector>
 
+US_MSVC_PUSH_DISABLE_WARNING(4996)
+
 namespace cppmicroservices {
 
 HttpServletResponsePrivate::HttpServletResponsePrivate(
@@ -421,3 +423,5 @@ HttpServletResponse::HttpServletResponse(HttpServletResponsePrivate* d)
   : d(d)
 {}
 }
+
+US_MSVC_POP_WARNING

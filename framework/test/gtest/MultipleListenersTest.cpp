@@ -37,6 +37,8 @@
 #include <bitset>
 #include <future>
 
+US_MSVC_PUSH_DISABLE_WARNING(4996)
+
 using namespace cppmicroservices;
 
 namespace {
@@ -503,3 +505,5 @@ TEST_F(MultipleListenersTest, testConcurrentAdd)
 }
 
 #endif
+
+US_MSVC_POP_WARNING

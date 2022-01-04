@@ -113,8 +113,6 @@ TEST_F(CCActiveStateTest, TestActivateWithInvalidLatch)
   auto state = std::make_shared<CCActiveState>();
   mockCompConfig->SetState(state);
   EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::ACTIVE);
-  EXPECT_CALL(*mockCompConfig, CreateAndActivateComponentInstance(testing::_))
-    .WillOnce(testing::Return(nullptr));
   EXPECT_NO_THROW({
     state->WaitForTransitionTask();
     auto inst = state->Activate(*mockCompConfig, framework);

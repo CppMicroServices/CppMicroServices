@@ -61,6 +61,8 @@ using cppmicroservices::testing::TempDir;
 #  define US_TYPE_OPERATIONS_AVAILABLE 1
 #endif
 
+US_MSVC_PUSH_DISABLE_WARNING(4996)
+
 TEST(FrameworkTest, Ctor)
 {
 #if US_TYPE_OPERATIONS_AVAILABLE
@@ -757,3 +759,5 @@ TEST(FrameworkTest, ShutdownAndStart)
 
   ASSERT_EQ(startCount, 1); // "One framework start notification"
 }
+
+US_MSVC_POP_WARNING

@@ -164,7 +164,7 @@ void CCActiveState::Rebind(ComponentConfigurationImpl & mgr,
         } catch (...) {
           logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                       "latch.CountDown() threw an exception during "
-                      "LatchScopeGuard cleanup in CCActiveState::Modified.",
+                      "LatchScopeGuard cleanup in CCActiveState::Rebind.",
                       std::current_exception());
         }
       });

@@ -417,7 +417,7 @@ std::exception_ptr BundlePrivate::Start0()
     try {
       if (coreCtx->validationFunc &&
           (lib.GetFilePath() != util::GetExecutablePath()) &&
-          !coreCtx->validationFunc(lib.GetFilePath())) {
+          !coreCtx->validationFunc(thisBundle)) {
         StartFailed();
         return std::make_exception_ptr(SecurityException{
           "Bundle #" + util::ToString(id) + " failed bundle validation.",

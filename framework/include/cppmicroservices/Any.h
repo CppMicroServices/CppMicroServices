@@ -120,12 +120,21 @@ US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
                                                     const uint8_t,
                                                     const int32_t);
 
-US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os,
-  const std::function<bool(const std::string&)>&);
-US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
-    const std::function<bool(const std::string&)>&,
-                                                    const uint8_t,
-                                                    const int32_t);
+template <typename T>
+std::ostream& any_value_to_string(std::ostream& os,
+    const std::function<bool(const T&)>&)
+{
+  return os;
+}
+
+template<typename T>
+std::ostream& any_value_to_json(std::ostream& os,
+    const std::function<bool(const T&)>&,
+    const uint8_t,
+    const int32_t)
+{
+  return os;
+}
 
 template<typename ValueType>
 ValueType* any_cast(Any* operand);

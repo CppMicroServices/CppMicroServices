@@ -42,11 +42,11 @@ limitations under the License.
 
 TEST(TestBundleValidation, BundleValidationFailure)
 {
-  using validationFuncType = std::function<bool(const std::string&)>;
+  using validationFuncType = std::function<bool(const cppmicroservices::Bundle&)>;
 
-  validationFuncType validationFunc = [](const std::string& path) -> bool {
-    if (std::string::npos != path.find("DeclarativeServices") ||
-        std::string::npos != path.find("ConfigurationAdmin")) {
+  validationFuncType validationFunc = [](const cppmicroservices::Bundle& b) -> bool {
+    if (b.GetSymbolicName() == "declarative_services" || 
+        b.GetSymbolicName() == "configuration_admin") {
       return true;
     }
     return false;
@@ -258,9 +258,9 @@ TEST(TestBundleValidation, BundleValidationFailure)
 
 TEST(TestBundleValidation, BundleValidationSuccess)
 {
-  using validationFuncType = std::function<bool(const std::string&)>;
+  using validationFuncType = std::function<bool(const cppmicroservices::Bundle&)>;
 
-  validationFuncType validationFunc = [](const std::string&) -> bool {
+  validationFuncType validationFunc = [](const cppmicroservices::Bundle&) -> bool {
     return true;
   };
   cppmicroservices::FrameworkConfiguration configuration{
@@ -293,10 +293,10 @@ TEST(TestBundleValidation, BundleValidationSuccess)
 
 TEST(TestBundleValidation, BundleValidationFunctionException)
 {
-  using validationFuncType = std::function<bool(const std::string&)>;
+  using validationFuncType = std::function<bool(const cppmicroservices::Bundle&)>;
 
-  validationFuncType validationFunc = [](const std::string& path) -> bool {
-    if (std::string::npos != path.find("DeclarativeServices")) {
+  validationFuncType validationFunc = [](const cppmicroservices::Bundle& b) -> bool {
+    if (b.GetSymbolicName() == "declarative_services") {
       return true;
     }
     throw std::runtime_error("foobar");

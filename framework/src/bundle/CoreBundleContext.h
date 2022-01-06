@@ -151,7 +151,7 @@ public:
    */
   int libraryLoadOptions;
 
-  std::function<bool(const std::string&)> validationFunc;
+  std::function<bool(const cppmicroservices::Bundle&)> validationFunc;
 
   ~CoreBundleContext();
 

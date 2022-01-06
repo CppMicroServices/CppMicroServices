@@ -763,9 +763,9 @@ TEST(FrameworkTest, ShutdownAndStart)
 
 TEST(FrameworkTest, ConfigurationWithBundleValidation){
 
-  using validationFuncType = std::function<bool(const std::string&)>;
+  using validationFuncType = std::function<bool(const cppmicroservices::Bundle&)>;
   
-  validationFuncType validationFunc = [](const std::string&) -> bool {
+  validationFuncType validationFunc = [](const cppmicroservices::Bundle&) -> bool {
     return false;
   };
   cppmicroservices::FrameworkConfiguration configuration{ {
@@ -776,9 +776,10 @@ TEST(FrameworkTest, ConfigurationWithBundleValidation){
 
   Any callableFunction = validationFunc;
 
-  ASSERT_TRUE(!any_cast<validationFuncType>(callableFunction)("foo"));
-  ASSERT_TRUE(!
-    any_cast<std::function<bool(const std::string&)>>(callableFunction)("foo"));
+  ASSERT_TRUE(!any_cast<validationFuncType>(callableFunction)(
+    cppmicroservices::Bundle{}));
+  ASSERT_TRUE(!any_cast<std::function<bool(const cppmicroservices::Bundle&)>>(
+    callableFunction)(cppmicroservices::Bundle{}));
   ASSERT_FALSE(callableFunction.Empty());
 
   auto f = FrameworkFactory().NewFramework(std::move(configuration));
@@ -790,8 +791,13 @@ TEST(FrameworkTest, ConfigurationWithBundleValidation){
   ASSERT_TRUE(!func.Empty());
 
   // call the bundle validation function
-  auto isBundleValid = any_cast<validationFuncType>(func)(std::string{});
+  auto isBundleValid = any_cast<validationFuncType>(func)(cppmicroservices::Bundle{});
   ASSERT_TRUE(!isBundleValid);
+
+  // exercise cppmicroservices::Any partial template specializations for std::function<bool(const cppmicroservices::Bundle&)>
+  // There is no string/json representation of a std::function, so these should be empty strings.
+  ASSERT_TRUE(func.ToStringNoExcept().empty());
+  ASSERT_TRUE(func.ToJSON().empty());
 
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());

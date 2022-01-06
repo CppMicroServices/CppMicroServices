@@ -162,7 +162,7 @@ void CoreBundleContext::Init()
   auto bundleValidationFunc =
     frameworkProperties.find(Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
   if (bundleValidationFunc != frameworkProperties.end()) {
-    validationFunc = any_cast<std::function<bool(const std::string&)>>(bundleValidationFunc->second);
+    validationFunc = any_cast<std::function<bool(const cppmicroservices::Bundle&)>>(bundleValidationFunc->second);
   }
 
   systemBundle->InitSystemBundle();

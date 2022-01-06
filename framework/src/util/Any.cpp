@@ -67,21 +67,6 @@ std::ostream& any_value_to_string(std::ostream& os, const Any& any)
   return os;
 }
 
-std::ostream& any_value_to_string(
-  std::ostream& os,
-  const std::function<bool(const std::string&)>&)
-{
-  return os;
-}
-
-std::ostream& any_value_to_json(std::ostream& os,
-                                const std::function<bool(const std::string&)>&,
-                                const uint8_t,
-                                const int32_t)
-{
-  return os;
-}
-
 std::ostream& any_value_to_json(std::ostream& os,
                                 const Any& val,
                                 const uint8_t increment,

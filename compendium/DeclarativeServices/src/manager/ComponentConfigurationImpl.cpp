@@ -446,8 +446,8 @@ ComponentConfigurationImpl::CreateAndActivateComponentInstanceHelper(
     cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
   
   try {
-    if (!func.Empty() && !any_cast<std::function<bool(const std::string&)>>(
-                           func)(this->bundle.GetLocation())) {
+    if (!func.Empty() && !any_cast<std::function<bool(const cppmicroservices::Bundle&)>>(
+                           func)(this->bundle)) {
       throw SecurityException{ "Bundle failed validation.", bundle };
     }
   } catch (const cppmicroservices::SecurityException&) {

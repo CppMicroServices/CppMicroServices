@@ -829,7 +829,7 @@ std::ostream& any_value_to_json(std::ostream& os,
     newline_and_indent(os, increment, indent);
     os << "\"" << i1->first << "\" : " << i1->second;
   }
-  newline_and_indent(os, increment, std::max(0, indent - increment));
+  newline_and_indent(os, increment, (std::max)(0, indent - increment));
   os << "}";
   return os;
 }

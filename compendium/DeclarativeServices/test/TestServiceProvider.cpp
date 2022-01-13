@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include "TestFixture.hpp"
+#include "ConcurrencyTestUtil.hpp"
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/ServiceObjects.h"
@@ -319,6 +320,24 @@ TEST_F(tServiceComponent, testServiceCtorThrow) {
   EXPECT_EQ(compConfigDTO.size(), 1);
   EXPECT_EQ(compConfigDTO[0].state, cppmicroservices::service::component::runtime::
                                  dto::ComponentState::SATISFIED);
+}
+
+TEST_F(tServiceComponent, testConcurrentGetServiceOnLazilyLoadedService) {
+  auto bundle = test::InstallAndStartBundle(framework.GetBundleContext(),
+                                            "TestBundleDSTOI16");
+  ASSERT_TRUE(bundle);
+
+  std::function<cppmicroservices::InterfaceMapConstPtr()> func = [&bundle]() { 
+      auto context = bundle.GetBundleContext();
+      std::vector<cppmicroservices::ServiceReferenceU> serviceReferences = bundle.GetRegisteredServices();
+      return context.GetService(serviceReferences.front());
+  };
+  auto results = ConcurrentInvoke(func);
+  ASSERT_TRUE(std::all_of(results.begin(),
+                          results.end(),
+                [](cppmicroservices::InterfaceMapConstPtr& p) { return !!p; }));
+
+  bundle.Uninstall();
 }
 
 }

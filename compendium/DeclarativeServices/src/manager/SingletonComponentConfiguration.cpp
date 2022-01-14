@@ -76,6 +76,8 @@ SingletonComponentConfigurationImpl::CreateAndActivateComponentInstance(
   auto instanceContextPair = data.lock();
   if (GetState()->GetValue() !=
       service::component::runtime::dto::ComponentState::ACTIVE) {
+    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                     "Activate failed. Component no longer in Active State.");
     return nullptr;
   }
 

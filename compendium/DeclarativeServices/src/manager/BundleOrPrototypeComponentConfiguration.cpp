@@ -157,10 +157,19 @@ InterfaceMapConstPtr BundleOrPrototypeComponentConfigurationImpl::GetService(
     std::for_each(
       compMgrs.begin(),
       compMgrs.end(),
-      [](std::shared_ptr<cppmicroservices::scrimpl::ComponentManager> compMgr) {
+      [this](const std::shared_ptr<cppmicroservices::scrimpl::ComponentManager>& compMgr) {
         try {
           compMgr->Disable().get();
         } catch (...) {
+          std::string errMsg(
+            "A security exception handler caused a component manager "
+            "to disable, leading to an exception disabling "
+            "component manager: ");
+          errMsg += compMgr->GetName();
+          GetLogger()->Log(
+            cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+            errMsg,
+            std::current_exception());
         }
       });
     throw;

@@ -115,6 +115,12 @@ void SCRBundleExtension::DisableAndRemoveAllComponentManagers()
     try {
       fut.get(); // since this happens when the bundle is stopped. Wait until the disable is finished on the other thread.
     } catch (...) {
+      std::string errMsg("An exception occurred while disabling "
+                         "component manager: ");
+      errMsg += compManager->GetName();
+      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                  errMsg,
+                  std::current_exception());
     }
   }
   managers->clear();

@@ -448,12 +448,15 @@ ComponentConfigurationImpl::CreateAndActivateComponentInstanceHelper(
   try {
     if (!func.Empty() && !any_cast<std::function<bool(const cppmicroservices::Bundle&)>>(
                            func)(this->bundle)) {
-      throw SecurityException{ "Bundle failed validation.", bundle };
+      std::string errMsg("Bundle at location ");
+      errMsg += this->bundle.GetLocation();
+      errMsg += " failed bundle validation.";
+      throw SecurityException{ std::move(errMsg), this->bundle };
     }
   } catch (const cppmicroservices::SecurityException&) {
     throw;
   } catch (...) {
-    throw SecurityException{ "bundle validation threw an exception",
+    throw SecurityException{ "The bundle validation callback threw an exception",
                              this->bundle };
   }
 

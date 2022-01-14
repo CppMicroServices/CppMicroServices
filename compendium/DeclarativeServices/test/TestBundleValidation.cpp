@@ -88,7 +88,7 @@ TEST(TestBundleValidation, BundleValidationFailure)
   EXPECT_EQ(bundleIter->GetState(),
             cppmicroservices::Bundle::State::STATE_RESOLVED);
 
-  // test starting a delayed activation ds component
+  // test starting a delayed activation ds component with a service dependency
   // in this case, starting the bundle does not cause the shared library to load
   // the shared library is loaded on the first call to "GetService"
   test::InstallLib(f.GetBundleContext(), "TestBundleDSTOI6");

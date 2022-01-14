@@ -515,7 +515,7 @@ void ServiceListeners::AddToSet_unlocked(
   int cache_ix,
   const std::string& val)
 {
-  auto cacheItr = cache[cache_ix].find(val);
+  const auto cacheItr = cache[cache_ix].find(val);
   if (cacheItr != cache[cache_ix].end()) {
     std::set<ServiceListenerEntry>& l = cache[cache_ix][val];
     if (!l.empty()) {

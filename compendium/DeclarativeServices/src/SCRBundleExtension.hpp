@@ -68,6 +68,8 @@ public:
 private:
   FRIEND_TEST(SCRBundleExtensionTest, CtorWithValidArgs);
 
+  void DisableAndRemoveAllComponentManagers();
+
   cppmicroservices::BundleContext bundleContext;
   std::shared_ptr<ComponentRegistry> registry;
   std::shared_ptr<LogService> logger;

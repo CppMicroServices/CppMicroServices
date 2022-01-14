@@ -66,7 +66,6 @@ GetComponentCreatorDeletors(const std::string& compName,
   // cannot use bundle id as key because id is reused when the framework is restarted.
   // strings are not optimal but will work fine as long as a binary is not unloaded
   // from the process.
-  // Note: This code is a temporary hack until the core framework supports Bundle#load API.
   static Guarded<std::map<std::string, void*>>
     bundleBinaries; ///< map of bundle location and handle pairs
   const auto bundleLoc = fromBundle.GetLocation();
@@ -84,7 +83,7 @@ GetComponentCreatorDeletors(const std::string& compName,
       // SharedLibrary::Load() will throw a std::system_error when a shared library
       // fails to load. Creating a SharedLibraryException here to throw with fromBundle information.
       throw cppmicroservices::SharedLibraryException(
-        ex.code(), ex.what(), std::move(fromBundle));
+        ex.code(), ex.what(), fromBundle);
     }
     handle = sh.GetHandle();
     bundleBinaries.lock()->emplace(bundleLoc, handle);

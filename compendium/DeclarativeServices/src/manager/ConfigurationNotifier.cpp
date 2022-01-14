@@ -28,6 +28,7 @@
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
+#include "cppmicroservices/SecurityException.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -179,6 +180,8 @@ void ConfigurationNotifier::CreateFactoryComponent(
       compManager->Initialize();
     }
   } catch (const cppmicroservices::SharedLibraryException&) {
+    throw;
+  } catch (const cppmicroservices::SecurityException&) {
     throw;
   } catch (const std::exception&) {
     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,

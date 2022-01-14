@@ -579,6 +579,9 @@ public:
    * @throws std::runtime_error If this BundleContext is no longer valid.
    * @throws std::invalid_argument If the specified
    *         <code>ServiceReferenceBase</code> is invalid (default constructed).
+   * @throws cppmicroservices::SecurityException if retrieving a service caused a 
+   *         bundle's shared library to be loaded and the bundle failed a security check.
+   * 
    * @see ServiceFactory
    * @see ServiceObjects
    */
@@ -602,6 +605,9 @@ public:
    *         longer valid.
    * @throws std::invalid_argument If the specified
    *         <code>ServiceReference</code> is invalid (default constructed).
+   * @throws cppmicroservices::SecurityException if retrieving a service caused a 
+   *         bundle's shared library to be loaded and the bundle failed a security check.
+   * 
    * @see #GetService(const ServiceReferenceBase&)
    * @see ServiceFactory
    */
@@ -626,7 +632,9 @@ public:
    * reference or an invalid instance if the service is not registered.
    * @throws std::runtime_error If this BundleContext is no longer valid.
    * @throws std::invalid_argument If the specified ServiceReference is invalid
-   * (default constructed or the service has been unregistered)
+   *        (default constructed or the service has been unregistered)
+   * @throws cppmicroservices::SecurityException if retrieving a service caused a 
+   *         bundle's shared library to be loaded and the bundle failed a security check.
    *
    * @see PrototypeServiceFactory
    */

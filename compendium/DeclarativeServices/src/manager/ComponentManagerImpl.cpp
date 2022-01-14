@@ -23,6 +23,7 @@
 #include "ComponentManagerImpl.hpp"
 #include "ConcurrencyUtil.hpp"
 #include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/SecurityException.h"
 #include "states/CMDisabledState.hpp"
 #include "states/CMEnabledState.hpp"
 #include "states/ComponentManagerState.hpp"
@@ -78,6 +79,8 @@ void ComponentManagerImpl::Initialize()
     try {
       fut.get();
     } catch (const cppmicroservices::SharedLibraryException&) {
+      throw;
+    } catch (const cppmicroservices::SecurityException&) {
       throw;
     } catch (...) {
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,

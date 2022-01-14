@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <algorithm>
 #include <array>
+#include <functional>
 #include <list>
 #include <map>
 #include <memory>
@@ -49,6 +50,7 @@ DEALINGS IN THE SOFTWARE.
 namespace cppmicroservices {
 namespace any {
 namespace detail {
+
 /**
  * Provide a compare function that will do the comparison if the operator is available, and always
  * return false otherwise. Use SFINAE to pick the right implementation based on type.
@@ -117,6 +119,22 @@ US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
                                                     bool val,
                                                     const uint8_t,
                                                     const int32_t);
+
+template <typename T>
+std::ostream& any_value_to_string(std::ostream& os,
+    const std::function<bool(const T&)>&)
+{
+  return os;
+}
+
+template<typename T>
+std::ostream& any_value_to_json(std::ostream& os,
+    const std::function<bool(const T&)>&,
+    const uint8_t,
+    const int32_t)
+{
+  return os;
+}
 
 template<typename ValueType>
 ValueType* any_cast(Any* operand);

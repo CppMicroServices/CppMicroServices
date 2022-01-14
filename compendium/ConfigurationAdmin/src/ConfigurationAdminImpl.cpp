@@ -26,6 +26,7 @@
 
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/cm/ConfigurationException.hpp"
+#include "cppmicroservices/detail/ScopeGuard.h"
 
 #include "CMConstants.hpp"
 #include "ConfigurationAdminImpl.hpp"
@@ -825,15 +826,19 @@ std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
 
   std::packaged_task<void()> task(
     [this, func = std::forward<Functor>(f), id]() mutable {
+      // func() can throw, make sure that the futures
+      // are correctly cleaned up if an exception occurs.
+      detail::ScopeGuard cleanupFutures([this, &id]() {
+        std::lock_guard<std::mutex> lk{ futuresMutex };
+        auto it = incompleteFutures.find(id);
+        assert(it != std::end(incompleteFutures) && "Invalid future iterator");
+        completeFutures.push_back(std::move(it->second));
+        incompleteFutures.erase(it);
+        if (incompleteFutures.empty()) {
+          futuresCV.notify_one();
+        }
+      });
       func();
-      std::lock_guard<std::mutex> lk{ futuresMutex };
-      auto it = incompleteFutures.find(id);
-      assert(it != std::end(incompleteFutures) && "Invalid future iterator");
-      completeFutures.push_back(std::move(it->second));
-      incompleteFutures.erase(it);
-      if (incompleteFutures.empty()) {
-        futuresCV.notify_one();
-      }
     });
 
   std::shared_future<void> fut = task.get_future().share();

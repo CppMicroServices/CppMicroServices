@@ -55,7 +55,7 @@ struct BundleStorage
   virtual std::shared_ptr<BundleArchive> CreateAndInsertArchive(
     const std::shared_ptr<BundleResourceContainer>& resCont,
     const std::string& topLevelEntry,
-    const ManifestT&) = 0;
+    ManifestT = AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS)) = 0;
 
   /**
    * Get all bundle archive objects.

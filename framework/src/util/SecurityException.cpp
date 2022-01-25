@@ -20,39 +20,18 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_SHAREDLIBRARYEXCEPTION_H
-#define CPPMICROSERVICES_SHAREDLIBRARYEXCEPTION_H
-
-#include "cppmicroservices/Bundle.h"
-#include "cppmicroservices/FrameworkConfig.h"
-
-#include <stdexcept>
-
-// ignore warning c4275 per MS documentation
-// https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-2-c4275
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4275)
-#endif
+#include "cppmicroservices/SecurityException.h"
 
 namespace cppmicroservices {
+SecurityException::SecurityException(std::string what,
+                                     cppmicroservices::Bundle origin)
+  : std::runtime_error(std::move(what)),
+    origin(std::move(origin))
+{}
 
-class US_Framework_EXPORT SharedLibraryException final
-  : public std::system_error
+Bundle SecurityException::GetBundle() const
 {
-public:
-  explicit SharedLibraryException(std::error_code ec,
-                                  std::string what,
-                                  cppmicroservices::Bundle origin);
-  ~SharedLibraryException() override;
-  Bundle GetBundle() const;
-
-private:
-  Bundle origin; ///< The bundle of the shared library which failed to load.
-};
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#endif
+  return origin;
 }
 
-#endif /* CPPMICROSERVICES_SHAREDLIBRARYEXCEPTION_H */
+}

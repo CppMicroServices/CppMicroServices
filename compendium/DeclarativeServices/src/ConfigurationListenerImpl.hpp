@@ -75,7 +75,7 @@ public:
    * a configuraton object is updated or removed.
    *
    */
-  void configurationEvent(const ConfigurationEvent& event) noexcept override;
+  void configurationEvent(const ConfigurationEvent& event) override;
 
 private:
   cppmicroservices::BundleContext bundleContext;

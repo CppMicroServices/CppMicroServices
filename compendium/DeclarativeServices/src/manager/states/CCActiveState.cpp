@@ -52,14 +52,7 @@ std::shared_ptr<ComponentInstance> CCActiveState::Activate(
         }
       });
       std::lock_guard<std::mutex> lock(oneAtATimeMutex);
-      // Make sure the state didn't change while we were waiting
-      auto currentState = mgr.GetState();
-      if (currentState->GetValue() !=
-          service::component::runtime::dto::ComponentState::ACTIVE) {
-        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
-                    "Activate failed. Component no longer in Active State.");
-        return nullptr;
-      }
+
       // no state change, already in active state. create and return a ComponentInstance object
       // This could throw; a scope guard is put in place to call latch.CountDown().
       instance = mgr.CreateAndActivateComponentInstance(clientBundle);

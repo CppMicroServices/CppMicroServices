@@ -36,8 +36,11 @@ CMLogger::CMLogger(cppmicroservices::BundleContext context)
 
 CMLogger::~CMLogger()
 {
-  if (serviceTracker) {
-    serviceTracker->Close();
+  try {
+    if (serviceTracker) {
+      serviceTracker->Close();
+    }
+  } catch (...) {
   }
 }
 

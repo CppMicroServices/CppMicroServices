@@ -272,7 +272,14 @@ void ReferenceManagerBaseImpl::BatchNotifyAllListeners(
 
   for (auto& listenerPair : listenersMapCopy) {
     for (auto const& notification : notifications) {
-      listenerPair.second(notification);
+      try {
+        listenerPair.second(notification);
+      } catch (...) {
+        logger->Log(SeverityLevel::LOG_ERROR,
+                    "Exception caught while notifying service reference listeners for reference name " +
+                      notification.senderName,
+                    std::current_exception());
+      }
     }
   }
 }

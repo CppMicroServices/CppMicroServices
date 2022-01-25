@@ -63,7 +63,7 @@ public:
       } catch (...) {
         auto exceptionPtr = std::current_exception();
         std::string msg =
-          "An exception has occured while trying to shutdown "
+          "An exception has occurred while trying to shutdown "
           "the fallback cppmicroservices::async::AsyncWorkService "
           "instance.";
         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,

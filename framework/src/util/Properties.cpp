@@ -32,6 +32,8 @@
 #  define ci_compare strncasecmp
 #endif
 
+US_MSVC_PUSH_DISABLE_WARNING(4996)
+
 namespace cppmicroservices {
 
 const Any Properties::emptyAny;
@@ -117,3 +119,5 @@ void Properties::Clear_unlocked()
   values.clear();
 }
 }
+
+US_MSVC_POP_WARNING

@@ -25,6 +25,8 @@
 #include <cstring>
 #include <utility>
 
+US_MSVC_PUSH_DISABLE_WARNING(4996)
+
 namespace cppmicroservices {
 
 InvalidObjFileException::InvalidObjFileException(std::string what,
@@ -41,3 +43,5 @@ const char* InvalidObjFileException::what() const noexcept
   return m_What.c_str();
 }
 }
+
+US_MSVC_POP_WARNING

@@ -87,6 +87,10 @@ public:
    * @throws std::runtime_error if this Configuration object has been Removed
    *
    * @param properties The properties to update this Configuration with.
+   * 
+   * @remarks The shared_future<void> returned can contain a cppmicroservices::SecurityException
+   *  if the Configuration caused a bundle's shared library to be loaded and the bundle failed
+   *  a security check.
    *
    * @return a shared_future<void> which can be used to wait for the asynchronous
    * operation that pushed the update to a ManagedService, ManagedServiceFactory or
@@ -111,6 +115,11 @@ public:
    * @throws std::runtime_error if this Configuration object has been Removed
    *
    * @param properties The properties to update this Configuration with (if they differ)
+   * 
+   * @remarks The shared_future<void> returned can contain a cppmicroservices::SecurityException
+   *  if the Configuration caused a bundle's shared library to be loaded and the bundle failed
+   *  a security check.
+   * 
    * @return std::pair<boolean, std::shared_future<void>> The boolean indicates whether 
    * the properties were updated or not. The shared_future<void> allows access to the result of the asynchronous 
    * operation that pushed the update operation to a ManagedService, ManagedServiceFactory or 

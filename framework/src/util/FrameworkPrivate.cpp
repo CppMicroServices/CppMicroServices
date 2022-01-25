@@ -122,8 +122,9 @@ FrameworkEvent FrameworkPrivate::WaitForStop(
                                         std::string(),
                                         std::exception_ptr() };
   }
-  if (shutdownThread.joinable())
+  if (shutdownThread.joinable()) {
     shutdownThread.join();
+  }
   return FrameworkEvent(stopEvent.type,
                         MakeBundle(this->shared_from_this()),
                         stopEvent.msg,

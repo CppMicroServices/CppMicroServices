@@ -191,14 +191,9 @@ public:
       << "Only one configadmin bundle should be installed";
     m_bundle = installedBundles.at(0);
 
-    auto const numBundles =
-      installAndStartTestBundles(bc, "ManagedServiceAndFactoryBundle");
-
     auto sr = bc.GetServiceReference<
       cppmicroservices::service::cm::ConfigurationAdmin>();
     m_configAdmin = bc.GetService<cm::ConfigurationAdmin>(sr);
-
-    ASSERT_EQ(numBundles, 1ul);
   }
 
   void TearDown() override
@@ -234,6 +229,10 @@ TEST_F(ConfigAdminTests, testInstallAndStart)
   auto f = GetFramework();
   auto ctx = f.GetBundleContext();
 
+  auto const numBundles =
+    installAndStartTestBundles(ctx, "ManagedServiceAndFactoryBundle");
+  ASSERT_EQ(numBundles, 1ul);
+
   auto const service = getManagedService(ctx);
   EXPECT_NE(service, nullptr)
     << "Couldn't obtain test managed service implementation";
@@ -247,6 +246,10 @@ TEST_F(ConfigAdminTests, testServiceUpdated)
 {
   auto f = GetFramework();
   auto ctx = f.GetBundleContext();
+
+  auto const numBundles =
+    installAndStartTestBundles(ctx, "ManagedServiceAndFactoryBundle");
+  ASSERT_EQ(numBundles, 1ul);
 
   auto const service = getManagedService(ctx);
   ASSERT_NE(service, nullptr);
@@ -298,6 +301,10 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
   auto f = GetFramework();
   auto ctx = f.GetBundleContext();
 
+  auto const numBundles =
+    installAndStartTestBundles(ctx, "ManagedServiceAndFactoryBundle");
+    ASSERT_EQ(numBundles, 1ul);
+
   auto const service = getManagedService(ctx);
   ASSERT_NE(service, nullptr);
 
@@ -326,7 +333,7 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
   configuration = m_configAdmin->GetConfiguration("cm.testservice");
   EXPECT_TRUE(configuration->GetProperties().empty());
   EXPECT_EQ(service->getCounter(), expectedCount);
-
+ 
   const int newIncrement{ 5 };
   cppmicroservices::AnyMap props(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
@@ -347,6 +354,10 @@ TEST_F(ConfigAdminTests, testServiceFactoryUpdated)
 {
   auto f = GetFramework();
   auto ctx = f.GetBundleContext();
+
+  auto const numBundles =
+    installAndStartTestBundles(ctx, "ManagedServiceAndFactoryBundle");
+  ASSERT_EQ(numBundles, 1ul);
 
   auto const serviceFactory = getManagedServiceFactory(ctx);
   ASSERT_NE(serviceFactory, nullptr);
@@ -436,6 +447,10 @@ TEST_F(ConfigAdminTests, testCreateFactoryConfiguration)
 {
   auto f = GetFramework();
   auto ctx = f.GetBundleContext();
+ 
+  auto const numBundles =
+    installAndStartTestBundles(ctx, "ManagedServiceAndFactoryBundle");
+  ASSERT_EQ(numBundles, 1ul);
 
   auto const serviceFactory = getManagedServiceFactory(ctx);
   ASSERT_NE(serviceFactory, nullptr);
@@ -460,6 +475,10 @@ TEST_F(ConfigAdminTests, testRemoveFactoryConfiguration)
 {
   auto f = GetFramework();
   auto ctx = f.GetBundleContext();
+
+  auto const numBundles =
+    installAndStartTestBundles(ctx, "ManagedServiceAndFactoryBundle");
+  ASSERT_EQ(numBundles, 1ul);
 
   auto const serviceFactory = getManagedServiceFactory(ctx);
   ASSERT_NE(serviceFactory, nullptr);
@@ -495,3 +514,34 @@ TEST_F(ConfigAdminTests, testRemoveFactoryConfiguration)
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config2"),
             expectedCount_config2);
 }
+// This test confirms that if an object exists in the configuration repository 
+// but has not yet been Updated prior to the start of the ManagedServiceFactory
+// then no Updated notification will be sent. 
+TEST_F(ConfigAdminTests, testDuplicateUpdated)
+{
+  auto f = GetFramework();
+  auto ctx = f.GetBundleContext();
+
+  // Add cm.testfactory~0 configuration object to the configuration repository
+  auto configuration = m_configAdmin->GetFactoryConfiguration("cm.testfactory","0");
+
+  auto configurationMap =
+      std::unordered_map<std::string, cppmicroservices::Any>{
+        { "emgrid", std::to_string(0) }
+      };
+ 
+  // Start the ManagedServiceFactory for cm.testfactory. Since the 
+  // cm.testfactory~0 instance has not yet been updated, no Update 
+  // notification will be sent to the ManagedServiceFactory.
+  installAndStartTestBundles(ctx, "TestBundleManagedServiceFactory");
+
+  // Update the cm.testfactory~0 configuration object. An Update 
+  // notification will be sent to the ManagedServiceFactory.
+  auto result = configuration->UpdateIfDifferent(configurationMap);
+  result.second.get();
+
+  auto const serviceFactory = getManagedServiceFactory(ctx);
+  ASSERT_NE(serviceFactory, nullptr);
+
+  EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~0"), 1);
+ }

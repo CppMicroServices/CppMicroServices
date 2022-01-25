@@ -156,7 +156,7 @@ public:
    * See {@code ConfigurationAdminPrivate#NotifyConfigurationUpdated}
    */
   std::shared_future<void> NotifyConfigurationUpdated(
-    const std::string& pid) override;
+    const std::string& pid, bool removeUpdate) override;
 
   /**
    * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or

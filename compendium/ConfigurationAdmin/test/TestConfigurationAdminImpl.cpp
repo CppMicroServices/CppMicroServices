@@ -536,7 +536,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
   ASSERT_TRUE(conf);
   auto props = conf->GetProperties();
   props["foo"] = std::string{ "bar" };
-  EXPECT_NO_THROW(conf->Update(props));
+  EXPECT_NO_THROW(auto fut = conf->Update(props); fut.get());
 
   AnyMap emptyProps{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
 
@@ -571,6 +571,13 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
   auto mockManagedServiceFactory3 =
     std::make_shared<MockManagedServiceFactory>();
   // setup expectations.
+  // mockManagedServiceFactory will receive one Updated notification
+  // and one Removed Notification. 
+  // mockManagedServiceFactory2 will receive two Updated notifications.
+  // mockManagedServiceFactory3 will receive no notifications.
+  EXPECT_CALL(*mockManagedServiceFactory,
+              Updated(std::string{ "factory~instance1" }, AnyMapEquals(props)))
+    .Times(1);
   EXPECT_CALL(*mockManagedServiceFactory2,
               Updated(std::string{ "factory2~instance1" }, AnyMapEquals(props)))
     .WillOnce(testing::InvokeWithoutArgs(f2));
@@ -592,9 +599,6 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
   EXPECT_CALL(*mockManagedServiceFactory3, Updated(testing::_, testing::_))
     .Times(0);
   EXPECT_CALL(*mockManagedServiceFactory3, Removed(testing::_)).Times(0);
-
-  // Ensure notification from original GetConfiguration has run.
-  configAdmin.WaitForAllAsync();
 
   AnyMap pidProp{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
   pidProp["pid"] = std::string("factory");
@@ -637,8 +641,9 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
   ul.unlock();
 
   EXPECT_TRUE(factory1InvokedZeroTimes);
-  EXPECT_NO_THROW(conf->Update(newProps));
-  EXPECT_NO_THROW(conf2->Remove());
+  EXPECT_NO_THROW(auto result = conf->Update(newProps); result.get(););
+  EXPECT_NO_THROW(auto result1 = conf2->Update(props); result1.get(););
+  EXPECT_NO_THROW(auto result2 = conf2->Remove(); result2.get(););
 
   ul.lock();
   auto invokeComplete =
@@ -655,7 +660,11 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
 
   configAdmin.WaitForAllAsync();
 }
-
+// This test confirms that when ConfigurationAdmin shuts down the appropriate 
+// Removed notifications should be sent to the ManagedService and ManagedFactoryServices.
+// Configuration objects will be added to the repository but never updated so when 
+// ConfigurationAdmin shuts down no Remove notifications should be sent to the 
+// ManagedServices or ManagedServiceFactorys
 TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
 {
   auto bundleContext = GetFramework().GetBundleContext();
@@ -683,14 +692,21 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
   auto mockManagedServiceFactory2 =
     std::make_shared<MockManagedServiceFactory>();
   // setup expectations.
-  EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(emptyProps))).Times(1);
+  // Test registers two mockManagedServices and two mockManagedFactoryServices 
+  // Configuration objects are created but never updated so no Updated or Removed
+  // notifications should be sent to the services when ConfigurationAdmin 
+  // shuts down.
+
+  // ManagedServices do not have a Removed method. Updated is called with empty
+  // properties for a Removed notification.
+  EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(emptyProps))).Times(0);
   EXPECT_CALL(
     *mockManagedServiceFactory,
     Updated(std::string{ "factory~instance1" }, AnyMapEquals(emptyProps)))
     .Times(0);
   EXPECT_CALL(*mockManagedServiceFactory,
               Removed(std::string{ "factory~instance1" }))
-    .WillOnce(testing::InvokeWithoutArgs(f2));
+    .Times(0);
   EXPECT_CALL(*mockManagedService2, Updated(testing::_)).Times(0);
   EXPECT_CALL(*mockManagedServiceFactory2, Updated(testing::_, testing::_))
     .Times(0);
@@ -741,12 +757,18 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
     ul.unlock();
 
     EXPECT_TRUE(factoryInvokedZeroTimes);
+    // ConfigurationAdminImpl was constructed in this scope so the next statement will
+    // cause it to be shut down. 
+    // The configuration objects that were added to the repository were never updated 
+    // so no Removed notifications will be sent to the ManagedServices or the 
+    // ManagedFactoryServices. Removed notifications can only be sent if an Updated 
+    // notification has been previously sent. 
   }
 
   std::unique_lock<std::mutex> ul{ counterMutex };
   auto invokeComplete =
     counterCV.wait_for(ul, std::chrono::seconds(10), [&msCounter, &msfCounter] {
-      return 0u == msCounter && 1u == msfCounter;
+      return 0u == msCounter && 0u == msfCounter;
     });
   ul.unlock();
 
@@ -757,7 +779,128 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
   reg3.Unregister();
   reg4.Unregister();
 }
+// This test confirms that when ConfigurationAdmin shuts down the appropriate
+// Removed notifications are sent to the ManagedService and ManagedServiceFactories
+// Configuration objects will be added to the repository and updated so when
+// ConfigurationAdmin shuts down  Remove notifications should be sent to the
+// ManagedServices and ManagedServiceFactories
+TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotificationWithUpdate)
+{
+  auto bundleContext = GetFramework().GetBundleContext();
+  auto fakeLogger = std::make_shared<FakeLogger>();
 
+  AnyMap emptyProps{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
+  cppmicroservices::AnyMap props(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  const std::string instanceId{ "instance1" };
+  props["uniqueProp"] = instanceId;
+
+  std::mutex counterMutex;
+  std::condition_variable counterCV;
+  auto msCounter = 0u;
+  auto msfCounter = 0u;
+ 
+  auto f = [&counterMutex, &counterCV, &msCounter] {
+    {
+      std::lock_guard<std::mutex> lk{ counterMutex };
+      ++msCounter;
+    }
+    counterCV.notify_one();
+  };
+  auto f2 = [&counterMutex, &counterCV, &msfCounter] {
+    {
+      std::lock_guard<std::mutex> lk{ counterMutex };
+      ++msfCounter;
+    }
+    counterCV.notify_one();
+  };
+
+  auto mockManagedService = std::make_shared<MockManagedService>();
+  auto mockManagedServiceFactory =
+    std::make_shared<MockManagedServiceFactory>();
+  // setup expectations.
+  // The test registers a mockManagedService and a mockManagedFactoryService.
+  // Configuration objects are created and updated so each of the services 
+  // should receive one Updated notification and one Removed notification. 
+
+  // For the mockManagedService the Updated method is used for both Updated 
+  // and Removed. The Removed notification calls Updated with empty properties.
+  EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(props))).Times(1);
+  EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(emptyProps)))
+    .WillOnce(testing::InvokeWithoutArgs(f)); 
+  EXPECT_CALL(
+    *mockManagedServiceFactory,
+    Updated(std::string{ "factory~instance1" }, AnyMapEquals(props)))
+    .Times(1);
+  EXPECT_CALL(*mockManagedServiceFactory,
+              Removed(std::string{ "factory~instance1" }))
+    .WillOnce(testing::InvokeWithoutArgs(f2));
+
+  cppmicroservices::ServiceProperties msProps{ { std::string("service.pid"),
+                                                 std::string("test.pid") } };
+  cppmicroservices::ServiceProperties msfProps{ { std::string("service.pid"),
+                                                  std::string("factory") } };
+
+  auto reg1 =
+    bundleContext
+      .RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(
+        mockManagedServiceFactory, msfProps);
+  auto reg2 = bundleContext
+                .RegisterService<cppmicroservices::service::cm::ManagedService>(
+                  mockManagedService, msProps);
+
+  {
+    std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService>
+      asyncWorkService =
+        std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(
+          bundleContext, fakeLogger);
+    ConfigurationAdminImpl configAdmin(
+      bundleContext, fakeLogger, asyncWorkService);
+
+    auto config = configAdmin.GetConfiguration("test.pid");
+    ASSERT_TRUE(config);
+    auto fut = config->Update(props);
+    fut.get();
+
+    std::unique_lock<std::mutex> ul{ counterMutex };
+    auto invokedZeroTimes = counterCV.wait_for(
+      ul, std::chrono::seconds(10), [&msCounter] { return 0u == msCounter; });
+    ul.unlock();
+
+    EXPECT_TRUE(invokedZeroTimes);
+
+    auto conf = configAdmin.GetConfiguration("factory~instance1");
+    ASSERT_TRUE(conf);
+    fut = conf->Update(props);
+    fut.get();
+
+    ul.lock();
+    auto factoryInvokedZeroTimes = counterCV.wait_for(
+      ul, std::chrono::seconds(10), [&msfCounter] { return 0u == msfCounter; });
+    ul.unlock();
+
+    EXPECT_TRUE(factoryInvokedZeroTimes);
+    // ConfigurationAdminImpl was constructed in this scope so the next statement will
+    // cause it to be shut down.
+    // The configuration objects that were added to the repository were updated
+    // so Removed notifications will be sent to the ManagedServices and the
+    // ManagedFactoryServices. Removed notifications must be sent if an Updated
+    // notification has been previously sent. 
+  }
+
+  std::unique_lock<std::mutex> ul{ counterMutex };
+  auto invokeComplete =
+    counterCV.wait_for(ul, std::chrono::seconds(10), [&msCounter, &msfCounter] {
+      return 1u == msCounter && 1u == msfCounter;
+    });
+  ul.unlock();
+
+  EXPECT_TRUE(invokeComplete);
+
+  reg1.Unregister();
+  reg2.Unregister();
+
+}
 TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceExceptionsAreLogged)
 {
   using cppmicroservices::logservice::SeverityLevel;
@@ -842,6 +985,11 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceExceptionsAreLogged)
   // Set up an existing Configuration
   const auto conf = configAdmin.GetConfiguration("test.pid");
   ASSERT_TRUE(conf);
+  cppmicroservices::AnyMap props(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  const std::string instanceId{ "instance1" };
+  props["uniqueProp"] = instanceId;
+  conf->Update(props);
 
   AnyMap emptyProps{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
 
@@ -870,18 +1018,23 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceExceptionsAreLogged)
   auto mockManagedServiceFactory =
     std::make_shared<MockManagedServiceFactory>();
   // setup expectations.
-  EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(emptyProps)))
+  // Updated will be called once when the service is registered and once
+  // when Update is called after the service is registered.
+  EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(props)))
     .WillOnce(
       testing::DoAll(testing::InvokeWithoutArgs(f),
                      testing::Throw(ConfigurationException("A reason", "foo"))))
     .WillOnce(
       testing::DoAll(testing::InvokeWithoutArgs(f),
-                     testing::Throw(std::runtime_error("An exception"))))
+                     testing::Throw(std::runtime_error("An exception"))));
+  
+  // Update is called without any properties for a Remove operation
+  EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(emptyProps)))
     .WillOnce(
       testing::DoAll(testing::InvokeWithoutArgs(f), testing::Throw(42)));
 
   EXPECT_CALL(*mockManagedServiceFactory,
-              Updated(testing::HasSubstr("factory~"), AnyMapEquals(emptyProps)))
+              Updated(testing::HasSubstr("factory~"), AnyMapEquals(props)))
     .WillOnce(
       testing::DoAll(testing::InvokeWithoutArgs(f2),
                      testing::Throw(std::runtime_error("An exception"))))
@@ -920,14 +1073,17 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceExceptionsAreLogged)
   EXPECT_TRUE(invokedOnce);
   configAdmin.WaitForAllAsync();
 
-  EXPECT_NO_THROW(conf->Update(emptyProps));
+  EXPECT_NO_THROW({
+    auto fut = conf->Update(props);
+    fut.get();
+  });
   EXPECT_NO_THROW(conf->Remove());
 
   auto factoryConf = configAdmin.CreateFactoryConfiguration("factory");
   auto factoryConf2 = configAdmin.CreateFactoryConfiguration("factory");
 
-  EXPECT_NO_THROW(factoryConf->Update(emptyProps));
-  EXPECT_NO_THROW(factoryConf2->Update(emptyProps));
+  EXPECT_NO_THROW(auto result = factoryConf->Update(props); result.get(););
+  EXPECT_NO_THROW(auto result2 = factoryConf2->Update(props); result2.get(););
 
   ul.lock();
   auto factoryInvokedTwice = counterCV.wait_for(
@@ -935,8 +1091,8 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceExceptionsAreLogged)
   US_UNUSED(factoryInvokedTwice);
   ul.unlock();
 
-  EXPECT_NO_THROW(factoryConf->Remove());
-  EXPECT_NO_THROW(factoryConf2->Remove());
+  EXPECT_NO_THROW(auto result = factoryConf->Remove(); result.get(););
+  EXPECT_NO_THROW(auto result2 = factoryConf2->Remove(); result2.get(););
 
   ul.lock();
   auto invokeComplete =

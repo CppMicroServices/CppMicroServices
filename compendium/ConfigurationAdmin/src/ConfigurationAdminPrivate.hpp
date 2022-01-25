@@ -91,9 +91,11 @@ public:
    * of the properties at the time.
    *
    * @param pid The PID of the {@code Configuration} which has been updated
+   * @param removeUpdate true if the configuration object has been removed from the configuration 
+   * repository and the configuration object had been updated at least once prior to removal.
    */
   virtual std::shared_future<void> NotifyConfigurationUpdated(
-    const std::string& pid) = 0;
+    const std::string& pid, bool removeUpdate) = 0;
 
   /**
    * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or

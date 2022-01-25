@@ -67,6 +67,13 @@ public:
    * ConfigurationAdminImpl is shutting down or when it is deleting a Configuration.
    */
   virtual void Invalidate() = 0;
+
+  /** Internal method used by {@code ConfigurationAdminImpl} to determine if a configuration
+   * object has been updated. 
+   *
+   * See {@code ConfigurationPrivate#Invalidate}
+   */
+  virtual bool IsUpdated() = 0;
 };
 } // cmimpl
 } // cppmicroservices

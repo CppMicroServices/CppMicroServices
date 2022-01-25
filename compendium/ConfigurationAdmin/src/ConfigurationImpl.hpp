@@ -118,6 +118,19 @@ public:
    */
   void Invalidate() override;
 
+  /** Internal method used by {@code ConfigurationAdminImpl} to determine if a configuration
+   * object has been updated. 
+   *
+   * See {@code ConfigurationPrivate#Invalidate}
+   */
+  bool IsUpdated() override { 
+    if (changeCount > 1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 private:
   std::mutex configAdminMutex;
   ConfigurationAdminPrivate* configAdminImpl;

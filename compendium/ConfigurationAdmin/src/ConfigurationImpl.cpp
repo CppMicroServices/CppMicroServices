@@ -46,6 +46,11 @@ ConfigurationImpl::ConfigurationImpl(ConfigurationAdminPrivate* configAdmin,
 {
   assert(configAdminImpl != nullptr &&
          "Invalid ConfigurationAdminPrivate pointer");
+  // constructing a configuration object with properties is the equivalent
+  // of a Create and an Update operation.
+  if (properties.size() > 0) {
+    changeCount = 2u;
+  }
 }
 
 std::string ConfigurationImpl::GetPid() const
@@ -87,7 +92,7 @@ std::shared_future<void> ConfigurationImpl::Update(AnyMap newProperties)
   }
   std::lock_guard<std::mutex> lk{ configAdminMutex };
   if (configAdminImpl) {
-   return configAdminImpl->NotifyConfigurationUpdated(pid);
+   return configAdminImpl->NotifyConfigurationUpdated(pid, false);
   }
   std::promise<void> ready;
   std::shared_future<void> fut = ready.get_future();
@@ -108,7 +113,7 @@ std::pair<bool, std::shared_future<void>> ConfigurationImpl::UpdateIfDifferent(
   }
   std::lock_guard<std::mutex> lk{ configAdminMutex };
   if (configAdminImpl) {
-    auto fut = configAdminImpl->NotifyConfigurationUpdated(pid);
+    auto fut = configAdminImpl->NotifyConfigurationUpdated(pid, false);
     return std::pair<bool, std::shared_future<void>>(true, fut);
   }
 

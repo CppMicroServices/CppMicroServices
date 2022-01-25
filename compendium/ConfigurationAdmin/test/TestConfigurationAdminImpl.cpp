@@ -677,14 +677,6 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
   auto msCounter = 0u;
   auto msfCounter = 0u;
 
-  auto f2 = [&counterMutex, &counterCV, &msfCounter] {
-    {
-      std::lock_guard<std::mutex> lk{ counterMutex };
-      ++msfCounter;
-    }
-    counterCV.notify_one();
-  };
-
   auto mockManagedService = std::make_shared<MockManagedService>();
   auto mockManagedService2 = std::make_shared<MockManagedService>();
   auto mockManagedServiceFactory =

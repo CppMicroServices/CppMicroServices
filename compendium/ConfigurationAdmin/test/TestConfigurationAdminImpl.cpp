@@ -424,6 +424,8 @@ TEST_F(TestConfigurationAdminImpl, VerifyRemoveConfigurations)
 
   EXPECT_NO_THROW(configAdmin.RemoveConfigurations(std::move(result)));
 
+  configAdmin.WaitForAllAsync();
+
   EXPECT_EQ(conf, configAdmin.GetConfiguration("test.pid"));
   EXPECT_NE(conf2, configAdmin.GetConfiguration("test.pid2"));
   EXPECT_EQ(conf3, configAdmin.GetConfiguration("test.pid3"));

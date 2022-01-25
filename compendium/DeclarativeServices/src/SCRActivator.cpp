@@ -25,6 +25,7 @@
 #include "SCRAsyncWorkService.hpp"
 #include "SCRLogger.hpp"
 #include "ServiceComponentRuntimeImpl.hpp"
+#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/dto/ComponentConfigurationDTO.hpp"
@@ -163,6 +164,8 @@ void SCRActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
           std::make_pair(bundle.GetBundleId(), std::move(ba)));
       }
     } catch (const cppmicroservices::SharedLibraryException&) {
+      throw;
+    } catch (const cppmicroservices::SecurityException&) {
       throw;
     } catch (const std::exception&) {
       logger->Log(SeverityLevel::LOG_DEBUG,

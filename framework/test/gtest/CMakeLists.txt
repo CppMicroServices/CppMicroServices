@@ -33,6 +33,7 @@ set(_gtest_tests
   BundleActivatorTest.cpp
   BundleDeadLockTest.cpp
   BundleManifestTest.cpp
+  BundleValidationTest.cpp
   BundleVersionTest.cpp
   InvalidBundleTest.cpp
   GlobalServiceTrackerTest.cpp
@@ -43,6 +44,7 @@ set(_gtest_tests
   FrameworkTest.cpp
   BundleObjFileTest.cpp
   BundleGetSymbolTest.cpp
+  SecurityExceptionTest.cpp
   ServiceExceptionTest.cpp
   ServiceObjectsTest.cpp
   ServiceReferenceTest.cpp

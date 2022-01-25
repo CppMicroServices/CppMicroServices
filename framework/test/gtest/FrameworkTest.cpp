@@ -35,6 +35,7 @@ limitations under the License.
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/util/FileSystem.h"
 #include "gtest/gtest.h"
 
@@ -60,6 +61,8 @@ using cppmicroservices::testing::TempDir;
 #else
 #  define US_TYPE_OPERATIONS_AVAILABLE 1
 #endif
+
+US_MSVC_PUSH_DISABLE_WARNING(4996)
 
 TEST(FrameworkTest, Ctor)
 {
@@ -757,3 +760,47 @@ TEST(FrameworkTest, ShutdownAndStart)
 
   ASSERT_EQ(startCount, 1); // "One framework start notification"
 }
+
+TEST(FrameworkTest, ConfigurationWithBundleValidation){
+
+  using validationFuncType = std::function<bool(const cppmicroservices::Bundle&)>;
+  
+  validationFuncType validationFunc = [](const cppmicroservices::Bundle&) -> bool {
+    return false;
+  };
+  cppmicroservices::FrameworkConfiguration configuration{ {
+          cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, 
+          validationFunc 
+      }
+  };
+
+  Any callableFunction = validationFunc;
+
+  ASSERT_TRUE(!any_cast<validationFuncType>(callableFunction)(
+    cppmicroservices::Bundle{}));
+  ASSERT_TRUE(!any_cast<std::function<bool(const cppmicroservices::Bundle&)>>(
+    callableFunction)(cppmicroservices::Bundle{}));
+  ASSERT_FALSE(callableFunction.Empty());
+
+  auto f = FrameworkFactory().NewFramework(std::move(configuration));
+  ASSERT_NO_THROW(f.Start());
+
+  Any func = f.GetBundleContext().GetProperty(
+    cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
+
+  ASSERT_TRUE(!func.Empty());
+
+  // call the bundle validation function
+  auto isBundleValid = any_cast<validationFuncType>(func)(cppmicroservices::Bundle{});
+  ASSERT_TRUE(!isBundleValid);
+
+  // exercise cppmicroservices::Any partial template specializations for std::function<bool(const cppmicroservices::Bundle&)>
+  // There is no string/json representation of a std::function, so these should be empty strings.
+  ASSERT_TRUE(func.ToStringNoExcept().empty());
+  ASSERT_TRUE(func.ToJSON().empty());
+
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
+}
+
+US_MSVC_POP_WARNING

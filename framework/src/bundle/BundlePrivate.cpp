@@ -32,6 +32,8 @@
 #include "cppmicroservices/BundleResourceStream.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
+#include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/ServiceRegistration.h"
 #include "cppmicroservices/SharedLibraryException.h"
 
@@ -413,6 +415,25 @@ std::exception_ptr BundlePrivate::Start0()
   // the actiavtor inside the bundle is called.
   if (useActivator) {
     try {
+      if (coreCtx->validationFunc &&
+          (lib.GetFilePath() != util::GetExecutablePath()) &&
+          !coreCtx->validationFunc(thisBundle)) {
+        StartFailed();
+        return std::make_exception_ptr(SecurityException{
+          "Bundle #" + util::ToString(id) + " failed bundle validation.",
+          thisBundle });
+      }
+    } catch (...) {
+      coreCtx->listeners.SendFrameworkEvent(
+        FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+                       thisBundle,
+                       "The bundle validation function threw an exception",
+                       std::current_exception()));
+      StartFailed();
+      throw SecurityException{ util::GetLastExceptionStr(), thisBundle };
+    }
+
+    try {
       void* libHandle = nullptr;
       if ((lib.GetFilePath() == util::GetExecutablePath())) {
         libHandle = BundleUtils::GetExecutableHandle();
@@ -459,14 +480,14 @@ std::exception_ptr BundlePrivate::Start0()
       bactivator = std::unique_ptr<BundleActivator, DestroyActivatorHook>(
         createActivatorHook(), destroyActivatorHook);
       bactivator->Start(MakeBundleContext(ctx));
-    } catch (std::system_error& ex) {
+    } catch (const std::system_error& ex) {
       // SharedLibrary::Load(int flags) will throw a std::system_error when a shared library
       //fails to load. Creating a SharedLibraryException here to throw.
       res = std::make_exception_ptr(cppmicroservices::SharedLibraryException(
-        ex.code(), ex.what(), std::move(thisBundle)));
+        ex.code(), ex.what(), thisBundle));
     } catch (...) {
       res = std::make_exception_ptr(
-        std::runtime_error("Bundle#" + util::ToString(id) +
+        std::runtime_error("Bundle #" + util::ToString(id) +
                            " start failed: " + util::GetLastExceptionStr()));
     }
   }
@@ -506,6 +527,9 @@ std::exception_ptr BundlePrivate::Start0()
       coreCtx->listeners.BundleChanged(BundleEvent(
         BundleEvent::BUNDLE_STARTED, MakeBundle(this->shared_from_this())));
     } catch (const cppmicroservices::SharedLibraryException& ex) {
+      res = std::make_exception_ptr(ex);
+    } catch (const cppmicroservices::SecurityException& ex) {
+      StartFailed();
       res = std::make_exception_ptr(ex);
     }
   } else if (operation == OP_ACTIVATING) {

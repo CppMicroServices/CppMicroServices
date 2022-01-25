@@ -20,11 +20,10 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_SHAREDLIBRARYEXCEPTION_H
-#define CPPMICROSERVICES_SHAREDLIBRARYEXCEPTION_H
+#ifndef CPPMICROSERVICES_SECURITYEXCEPTION_H
+#define CPPMICROSERVICES_SECURITYEXCEPTION_H
 
 #include "cppmicroservices/Bundle.h"
-#include "cppmicroservices/FrameworkConfig.h"
 
 #include <stdexcept>
 
@@ -36,23 +35,18 @@
 #endif
 
 namespace cppmicroservices {
-
-class US_Framework_EXPORT SharedLibraryException final
-  : public std::system_error
+class US_Framework_EXPORT SecurityException final : public std::runtime_error
 {
 public:
-  explicit SharedLibraryException(std::error_code ec,
-                                  std::string what,
-                                  cppmicroservices::Bundle origin);
-  ~SharedLibraryException() override;
+  explicit SecurityException(std::string what, cppmicroservices::Bundle origin);
   Bundle GetBundle() const;
 
 private:
-  Bundle origin; ///< The bundle of the shared library which failed to load.
+  Bundle origin; ///< The bundle from which the exception originated.
 };
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #endif
 }
 
-#endif /* CPPMICROSERVICES_SHAREDLIBRARYEXCEPTION_H */
+#endif // CPPMICROSERVICES_SECURITYEXCEPTION_H

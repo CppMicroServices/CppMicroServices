@@ -148,6 +148,12 @@ public:
    * asynchronously to this method call.
    *
    * @param description The component description to enable.
+   * 
+   * @remarks The shared_future<void> returned can contain a 
+   *{         cppmicroservices::SecurityException if enabling the component
+   *          caused the bundle's shared library to be loaded and the bundle
+   *          failed a security check.
+   * 
    * @return A future that will be ready when the actions that result from
    *         changing the enabled state of the specified component have
    *         completed.

@@ -151,6 +151,8 @@ public:
    */
   int libraryLoadOptions;
 
+  std::function<bool(const cppmicroservices::Bundle&)> validationFunc;
+
   ~CoreBundleContext();
 
   // thread-safe shared_from_this implementation

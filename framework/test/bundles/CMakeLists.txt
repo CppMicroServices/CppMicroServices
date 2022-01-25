@@ -3,7 +3,6 @@
 #-----------------------------------------------------------------------------
 
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/../driver
   ${CMAKE_CURRENT_SOURCE_DIR}/../gtest
   ${CMAKE_CURRENT_SOURCE_DIR}/../util
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../third_party

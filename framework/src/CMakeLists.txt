@@ -13,6 +13,7 @@ set(_srcs
   util/LDAPFilter.cpp
   util/LDAPProp.cpp
   util/Properties.cpp
+  util/SecurityException.cpp
   util/SharedLibrary.cpp
   util/SharedLibraryException.cpp
   util/Utils.cpp

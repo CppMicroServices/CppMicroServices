@@ -27,13 +27,16 @@ US_MSVC_PUSH_DISABLE_WARNING(
 
 #include "ServiceListeners.h"
 
+#include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ListenerFunctors.h"
+#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/util/Error.h"
 #include "cppmicroservices/util/String.h"
 
 #include "BundleContextPrivate.h"
+
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
 #include "Properties.h"
@@ -319,6 +322,13 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
           std::string("Bundle listener threw an exception"),
           std::current_exception()));
         throw;
+      } catch(const cppmicroservices::SecurityException&) {
+        SendFrameworkEvent(FrameworkEvent{
+          FrameworkEvent::Type::FRAMEWORK_ERROR,
+          evt.GetOrigin(),
+          std::string("Bundle listener threw a security exception"),
+          std::current_exception() });
+        throw;
       } catch (...) {
         SendFrameworkEvent(FrameworkEvent(
           FrameworkEvent::Type::FRAMEWORK_ERROR,
@@ -515,11 +525,14 @@ void ServiceListeners::AddToSet_unlocked(
   int cache_ix,
   const std::string& val)
 {
-  std::set<ServiceListenerEntry>& l = cache[cache_ix][val];
-  if (!l.empty()) {
-    for (const ServiceListenerEntry& entry : l) {
-      if (receivers.count(entry)) {
-        set.insert(entry);
+  const auto cacheItr = cache[cache_ix].find(val);
+  if (cacheItr != cache[cache_ix].end()) {
+    std::set<ServiceListenerEntry>& l = cache[cache_ix][val];
+    if (!l.empty()) {
+      for (const ServiceListenerEntry& entry : l) {
+        if (receivers.count(entry)) {
+          set.insert(entry);
+        }
       }
     }
   }

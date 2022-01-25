@@ -25,6 +25,7 @@
 #include "../ComponentManagerImpl.hpp"
 #include "CMDisabledState.hpp"
 #include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/SecurityException.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -55,6 +56,8 @@ void CMEnabledState::CreateConfigurations(
       compDesc, bundle, registry, logger, configNotifier, managers);
     configurations.push_back(cc);
   } catch (const cppmicroservices::SharedLibraryException&) {
+    throw;
+  } catch (const cppmicroservices::SecurityException&) {
     throw;
   } catch (...) {
     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,

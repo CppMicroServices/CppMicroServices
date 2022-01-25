@@ -55,6 +55,7 @@ set(_declarativeservices_tests
   ActivatorTest.cpp
   SCRLoggerTest.cpp
   TestAsyncWorkService.cpp
+  TestBundleValidation.cpp
   TestCCActiveState.cpp
   TestCCRegisteredState.cpp
   TestCCUnsatisfiedReferenceState.cpp

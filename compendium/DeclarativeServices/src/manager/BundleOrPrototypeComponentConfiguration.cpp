@@ -20,7 +20,11 @@
 
   =============================================================================*/
 
+#include "cppmicroservices/SecurityException.h"
+#include "cppmicroservices/SharedLibraryException.h"
+
 #include "BundleOrPrototypeComponentConfiguration.hpp"
+#include "../ComponentRegistry.hpp"
 #include "ComponentManager.hpp"
 
 namespace cppmicroservices {
@@ -63,6 +67,8 @@ BundleOrPrototypeComponentConfigurationImpl::CreateAndActivateComponentInstance(
 {
   if (GetState()->GetValue() !=
       service::component::runtime::dto::ComponentState::ACTIVE) {
+    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                     "Activate failed. Component no longer in Active State.");
     return nullptr;
   }
   auto compInstCtxtPairList = compInstanceMap.lock();
@@ -70,6 +76,16 @@ BundleOrPrototypeComponentConfigurationImpl::CreateAndActivateComponentInstance(
     auto instCtxtTuple = CreateAndActivateComponentInstanceHelper(bundle);
     compInstCtxtPairList->emplace_back(instCtxtTuple);
     return instCtxtTuple.first;
+  } catch (const cppmicroservices::SharedLibraryException&) {
+    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                     "Exception thrown while trying to load a shared library",
+                     std::current_exception());
+    throw;
+  } catch (const cppmicroservices::SecurityException&) {
+    GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                     "Exception thrown while trying to validate a bundle",
+                     std::current_exception());
+    throw;
   } catch (...) {
     GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                      "Exception received from user code while activating the "
@@ -130,10 +146,36 @@ void BundleOrPrototypeComponentConfigurationImpl::DeactivateComponentInstance(
 
 InterfaceMapConstPtr BundleOrPrototypeComponentConfigurationImpl::GetService(
   const cppmicroservices::Bundle& bundle,
-  const cppmicroservices::ServiceRegistrationBase& /*registration*/)
+  const cppmicroservices::ServiceRegistrationBase& registration)
 {
   // if activation passed, return the interface map from the instance
-  auto compInstance = Activate(bundle);
+  std::shared_ptr<cppmicroservices::service::component::detail::ComponentInstance> compInstance;
+  try {
+    compInstance = Activate(bundle);
+  } catch (const cppmicroservices::SecurityException&) {
+    auto compManagerRegistry = GetRegistry();
+    auto compMgrs = compManagerRegistry->GetComponentManagers(
+      registration.GetReference().GetBundle().GetBundleId());
+    std::for_each(
+      compMgrs.begin(),
+      compMgrs.end(),
+      [this](const std::shared_ptr<cppmicroservices::scrimpl::ComponentManager>& compMgr) {
+        try {
+          compMgr->Disable().get();
+        } catch (...) {
+          std::string errMsg(
+            "A security exception handler caused a component manager "
+            "to disable, leading to an exception disabling "
+            "component manager: ");
+          errMsg += compMgr->GetName();
+          GetLogger()->Log(
+            cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+            errMsg,
+            std::current_exception());
+        }
+      });
+    throw;
+  }
   return compInstance ? compInstance->GetInterfaceMap() : nullptr;
 }
 

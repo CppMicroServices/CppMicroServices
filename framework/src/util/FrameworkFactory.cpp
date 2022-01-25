@@ -90,4 +90,5 @@ Framework FrameworkFactory::NewFramework(
 
   return NewFramework(fwConfig, logger);
 }
+
 }

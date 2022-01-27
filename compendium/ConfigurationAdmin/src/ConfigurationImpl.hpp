@@ -121,14 +121,25 @@ public:
   /** Internal method used by {@code ConfigurationAdminImpl} to determine if a configuration
    * object has been updated. 
    *
-   * See {@code ConfigurationPrivate#Invalidate}
+   * See {@code ConfigurationPrivate#HasBeenUpdatedAtLeastOnce}
    */
-  bool IsUpdated() override { 
-    if (changeCount > 1) {
+  bool HasBeenUpdatedAtLeastOnce() override { 
+    std::lock_guard<std::mutex> lk{ propertiesMutex };
+    if (changeCount > 0) {
       return true;
     } else {
       return false;
     }
+  }
+  /** Internal method used by {@code ConfigurationAdminImpl} to get the value of the 
+   *  changeCount
+   *
+   * See {@code ConfigurationPrivate#GetChangeCount}
+   */
+  unsigned long GetChangeCount() override
+  {
+    std::lock_guard<std::mutex> lk{ propertiesMutex };
+    return changeCount;
   }
 
 private:

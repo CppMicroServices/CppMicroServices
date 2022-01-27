@@ -343,7 +343,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyAddConfigurations)
 
   decltype(result) expected{
     { "test.pid", 0ul, reinterpret_cast<std::uintptr_t>(conf.get()) },
-    { "test.pid2", 3ul, reinterpret_cast<std::uintptr_t>(conf2.get()) }
+    { "test.pid2", 2ul, reinterpret_cast<std::uintptr_t>(conf2.get()) }
   };
 
   ASSERT_THAT(result, testing::SizeIs(3));
@@ -394,6 +394,10 @@ TEST_F(TestConfigurationAdminImpl, VerifyRemoveConfigurations)
   props3["bar"] = std::string{ "baz" };
   configs.push_back(metadata::ConfigurationMetadata("test.pid3", props3));
 
+  // The test.pid Configuration shouldn't have been modified, so should be removed.
+  // Remove pid2, Update pid3, Remove & re-add pid4, so they too should be left alone.
+  // Leave pid5 unchanged, so it should be Removed.
+
   AnyMap props4{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
   props4["baz"] = std::string{ "foo" };
   configs.push_back(metadata::ConfigurationMetadata("test.pid4", props4));
@@ -402,10 +406,6 @@ TEST_F(TestConfigurationAdminImpl, VerifyRemoveConfigurations)
     "test.pid5", AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
 
   auto result = configAdmin.AddConfigurations(std::move(configs));
-
-  // The test.pid Configuration shouldn't have been modified, so shouldn't be removed.
-  // Remove pid2, Update pid3, Remove & re-add pid4, so they too should be left alone.
-  // Leave pid5 unchanged, and it alone should be Removed.
   const auto conf3 = configAdmin.GetConfiguration("test.pid3");
   auto conf4 = configAdmin.GetConfiguration("test.pid4");
   const auto conf5 = configAdmin.GetConfiguration("test.pid5");
@@ -426,7 +426,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyRemoveConfigurations)
 
   configAdmin.WaitForAllAsync();
 
-  EXPECT_EQ(conf, configAdmin.GetConfiguration("test.pid"));
+  EXPECT_NE(conf, configAdmin.GetConfiguration("test.pid"));
   EXPECT_NE(conf2, configAdmin.GetConfiguration("test.pid2"));
   EXPECT_EQ(conf3, configAdmin.GetConfiguration("test.pid3"));
   EXPECT_EQ(conf4, configAdmin.GetConfiguration("test.pid4"));
@@ -538,7 +538,10 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
   ASSERT_TRUE(conf);
   auto props = conf->GetProperties();
   props["foo"] = std::string{ "bar" };
-  EXPECT_NO_THROW(auto fut = conf->Update(props); fut.get());
+  EXPECT_NO_THROW({
+    auto fut = conf->Update(props);
+    fut.get();
+  });
 
   AnyMap emptyProps{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
 
@@ -643,9 +646,18 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
   ul.unlock();
 
   EXPECT_TRUE(factory1InvokedZeroTimes);
-  EXPECT_NO_THROW(auto result = conf->Update(newProps); result.get(););
-  EXPECT_NO_THROW(auto result1 = conf2->Update(props); result1.get(););
-  EXPECT_NO_THROW(auto result2 = conf2->Remove(); result2.get(););
+  EXPECT_NO_THROW({
+    auto result = conf->Update(newProps);
+    result.get();
+  });
+  EXPECT_NO_THROW({
+    auto result1 = conf2->Update(props);
+    result1.get();
+  });
+  EXPECT_NO_THROW({
+    auto result2 = conf2->Remove();
+    result2.get();
+  });
 
   ul.lock();
   auto invokeComplete =
@@ -1076,8 +1088,14 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceExceptionsAreLogged)
   auto factoryConf = configAdmin.CreateFactoryConfiguration("factory");
   auto factoryConf2 = configAdmin.CreateFactoryConfiguration("factory");
 
-  EXPECT_NO_THROW(auto result = factoryConf->Update(props); result.get(););
-  EXPECT_NO_THROW(auto result2 = factoryConf2->Update(props); result2.get(););
+  EXPECT_NO_THROW({
+    auto result = factoryConf->Update(props);
+    result.get();
+  });
+  EXPECT_NO_THROW({
+    auto result2 = factoryConf2->Update(props);
+    result2.get();
+  });
 
   ul.lock();
   auto factoryInvokedTwice = counterCV.wait_for(
@@ -1085,8 +1103,14 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceExceptionsAreLogged)
   US_UNUSED(factoryInvokedTwice);
   ul.unlock();
 
-  EXPECT_NO_THROW(auto result = factoryConf->Remove(); result.get(););
-  EXPECT_NO_THROW(auto result2 = factoryConf2->Remove(); result2.get(););
+  EXPECT_NO_THROW({
+    auto result = factoryConf->Remove();
+    result.get();
+  });
+  EXPECT_NO_THROW({
+    auto result2 = factoryConf2->Remove();
+    result2.get();
+  });
 
   ul.lock();
   auto invokeComplete =

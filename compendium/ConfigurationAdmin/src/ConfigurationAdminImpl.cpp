@@ -219,7 +219,7 @@ ConfigurationAdminImpl::~ConfigurationAdminImpl()
       // received an Updated notification.
       const auto it = configurationsToInvalidate.find(managedService->pid);
       if (it != std::end(configurationsToInvalidate) &&
-          it->second->IsUpdated()) {
+          it->second->HasBeenUpdatedAtLeastOnce()) {
           notifyServiceUpdated(managedService->pid,
                                *(managedService->trackedService),
                                emptyMap,
@@ -242,7 +242,7 @@ ConfigurationAdminImpl::~ConfigurationAdminImpl()
       // received an Updated notification.
    
       const auto it = configurationsToInvalidate.find(pid);
-      if (it != std::end(configurationsToInvalidate) && (it->second->IsUpdated())) {
+      if (it != std::end(configurationsToInvalidate) && (it->second->HasBeenUpdatedAtLeastOnce())) {
            notifyServiceRemoved(
             pid, *(managedServiceFactory->trackedService), *logger);
       }
@@ -403,7 +403,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
                           std::move(configMetadata.properties)))
                .first;
         pidsAndChangeCountsAndIDs.emplace_back(
-          pid, 1u, reinterpret_cast<std::uintptr_t>(it->second.get()));
+          pid, it->second->GetChangeCount(), reinterpret_cast<std::uintptr_t>(it->second.get()));
         createdOrUpdated.push_back(true);
         continue;
       }
@@ -425,7 +425,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
         it->second = std::make_shared<ConfigurationImpl>(
           this, pid, getFactoryPid(pid), std::move(configMetadata.properties));
         pidsAndChangeCountsAndIDs.emplace_back(
-          pid, 1u, reinterpret_cast<std::uintptr_t>(it->second.get()));
+          pid, it->second->GetChangeCount(), reinterpret_cast<std::uintptr_t>(it->second.get()));
         createdOrUpdated.push_back(true);
       }
     }
@@ -438,7 +438,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
   for (const auto& pidAndChangeCountAndID : pidsAndChangeCountsAndIDs) {
     const auto& pid = pidAndChangeCountAndID.pid;
     if (createdOrUpdated[idx]) {
-      NotifyConfigurationUpdated(pid, false);
+      NotifyConfigurationUpdated(pid);
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                   "AddConfigurations: Created or Updated Configuration "
                   "instance with PID " +
@@ -457,15 +457,16 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
 void ConfigurationAdminImpl::RemoveConfigurations(
   std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs)
 {
-  std::vector<bool> removed;
+  std::vector<std::pair<bool, bool>> removedAndUpdated;
   std::vector<std::shared_ptr<ConfigurationImpl>> configurationsToInvalidate;
+  bool hasBeenUpdated = false;
   {
     std::lock_guard<std::mutex> lk{ configurationsMutex };
     for (const auto& pidAndChangeCountAndID : pidsAndChangeCountsAndIDs) {
       const auto& pid = pidAndChangeCountAndID.pid;
       const auto it = configurations.find(pid);
       if (it == std::end(configurations)) {
-        removed.push_back(false);
+        removedAndUpdated.emplace_back(false, false);
         continue;
       }
       // else Configuration still exists
@@ -473,26 +474,27 @@ void ConfigurationAdminImpl::RemoveConfigurations(
           pidAndChangeCountAndID.configurationId) {
         // This Configuration is not the same one that was originally created by the CMBundleExtension. It must have been
         // removed and re-added by someone else in the interim.
-        removed.push_back(false);
+        removedAndUpdated.emplace_back(false, false);
         continue;
       }
       try {
+        hasBeenUpdated = it->second->HasBeenUpdatedAtLeastOnce();
         const auto configurationWasRemoved =
           it->second->RemoveWithoutNotificationIfChangeCountEquals(
             pidAndChangeCountAndID.changeCount);
         if (configurationWasRemoved) {
           configurationsToInvalidate.push_back(std::move(it->second));
-          removed.push_back(true);
+          removedAndUpdated.emplace_back(true, hasBeenUpdated);
           configurations.erase(it);
           RemoveFactoryInstanceIfRequired(pid);
           continue;
         }
         // else Configuration now differs from the one the CMBundleExtension added. Do not remove it.
-        removed.push_back(false);
+        removedAndUpdated.emplace_back(false, false);
       } catch (const std::runtime_error&) {
         // Configuration already Removed by someone else, but we've won the race to handle that in ComponentAdminImpl
         configurationsToInvalidate.push_back(std::move(it->second));
-        removed.push_back(true);
+        removedAndUpdated.emplace_back(true, hasBeenUpdated);
         configurations.erase(it);
         RemoveFactoryInstanceIfRequired(pid);
       }
@@ -505,8 +507,10 @@ void ConfigurationAdminImpl::RemoveConfigurations(
   auto idx = 0u;
   for (const auto& pidAndChangeCountAndID : pidsAndChangeCountsAndIDs) {
     const auto& pid = pidAndChangeCountAndID.pid;
-    if (removed[idx]) {
-      NotifyConfigurationUpdated(pid, false);
+    if (removedAndUpdated[idx].first) {
+      if (removedAndUpdated[idx].second) {
+        NotifyConfigurationUpdated(pid);
+      }
       logger->Log(
         cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
         "RemoveConfigurations: Removed Configuration instance with PID " + pid);
@@ -523,27 +527,32 @@ void ConfigurationAdminImpl::RemoveConfigurations(
 }
 
 std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
-  const std::string& pid, bool removeUpdate)
+  const std::string& pid)
 {
-  return PerformAsync([this, pid, removeUpdate] {
+  // NotifyConfigurationUpdated will only send a notification to the service if 
+  // the configuration object has been updated at least once. In order to determine whether or not
+  // a configuration object has been updated, it calls the HasBeenUpdatedAtLeastOnce method for
+  // the configuration object. For a remove operation the configuration object 
+  // is not available and that method cannot be called. For this reason, NotifyConfigurationUpdated
+  // should not be called for Remove operations unless the caller has already confirmed
+  // the configuration object has been updated at least once. 
+  return PerformAsync([this, pid] {
     AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
     std::string fPid;
     std::string nonFPid;
     auto removed = false;
-    auto isUpdated = false;
+    auto hasBeenUpdated = false;
     {
       std::lock_guard<std::mutex> lk{ configurationsMutex };
       const auto it = configurations.find(pid);
       if (it == std::end(configurations)) {
         removed = true;
-        if (removeUpdate) {
-          isUpdated = true;
-        }
-      } else {
+        hasBeenUpdated = true;
+       } else {
         try {
-          properties = it->second->GetProperties();
-          isUpdated = it->second->IsUpdated();
-        } catch (const std::runtime_error&) {
+           hasBeenUpdated = it->second->HasBeenUpdatedAtLeastOnce();
+           properties = it->second->GetProperties();
+       } catch (const std::runtime_error&) {
           // Configuration is being removed
           removed = true;
         }
@@ -552,7 +561,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
     // We can only send update notifications for configuration objects that have
     // been updated. Just return without sending the notification for objects
     // that have not yet been updated. 
-    if (!isUpdated) {
+    if (!hasBeenUpdated) {
       return;
     }
     if (pid.find('~') != std::string::npos) {
@@ -627,7 +636,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(
   std::promise<void> ready;
   std::shared_future<void> alreadyRemoved = ready.get_future();
   std::shared_ptr<ConfigurationImpl> configurationToInvalidate;
-  bool removeUpdate = false;
+  bool hasBeenUpdated = false;
   {
     std::lock_guard<std::mutex> lk{ configurationsMutex };
     auto it = configurations.find(pid);
@@ -645,12 +654,12 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(
       return alreadyRemoved;
     }
     configurationToInvalidate = it->second;
-    removeUpdate = it->second->IsUpdated();
+    hasBeenUpdated = it->second->HasBeenUpdatedAtLeastOnce();
     configurations.erase(it);
     RemoveFactoryInstanceIfRequired(pid);
   }
-  if (configurationToInvalidate) {
-    auto removeFuture = NotifyConfigurationUpdated(pid, removeUpdate);
+  if (configurationToInvalidate && hasBeenUpdated) {
+    auto removeFuture = NotifyConfigurationUpdated(pid);
     // This functor will run on another thread. Just being overly cautious to guarantee that the
     // ConfigurationImpl which has called this method doesn't run its own destructor.
     PerformAsync(
@@ -729,7 +738,7 @@ ConfigurationAdminImpl::AddingService(
     }
     // Only send notifications for configuration objects that have been
     // Updated. 
-    if (it->second->IsUpdated()) {
+    if (it->second->HasBeenUpdatedAtLeastOnce()) {
       PerformAsync([this, pid, managedService, properties] {
         notifyServiceUpdated(pid, *managedService, properties, *logger);
       });
@@ -805,7 +814,7 @@ ConfigurationAdminImpl::AddingService(
         // Notifications can only be sent for configuration objects that 
         // been Updated. Only add it to the notification list if it has
         // been Updated.
-        if (configurationIt->second->IsUpdated()) {
+        if (configurationIt->second->HasBeenUpdatedAtLeastOnce()) {
           pidsAndProperties.emplace_back(instance, std::move(properties));
         }
       } catch (const std::runtime_error&) {

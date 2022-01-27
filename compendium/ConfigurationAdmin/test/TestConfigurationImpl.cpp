@@ -80,7 +80,7 @@ TEST(TestConfigurationImpl, ThrowsWhenRemoved)
   EXPECT_THROW(conf.Remove(), std::runtime_error);
   EXPECT_THROW(conf.UpdateWithoutNotificationIfDifferent(props),
                std::runtime_error);
-  EXPECT_THROW(conf.RemoveWithoutNotificationIfChangeCountEquals(1u),
+  EXPECT_THROW(conf.RemoveWithoutNotificationIfChangeCountEquals(0u),
                std::runtime_error);
   EXPECT_NO_THROW(conf.Invalidate());
 }
@@ -97,7 +97,7 @@ TEST(TestConfigurationImpl, NoCallbacksAfterInvalidate)
   EXPECT_CALL(*mockConfigAdmin,
               NotifyConfigurationRemoved(testing::_, testing::_))
     .Times(0);
-  EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(testing::_, false))
+  EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(testing::_))
     .Times(0);
   EXPECT_NO_THROW(conf.Invalidate());
   EXPECT_NO_THROW(conf.Update(props));
@@ -116,7 +116,7 @@ TEST(TestConfigurationImpl, VerifyUpdate)
   std::string pid{ "test~instance" };
   std::string factoryPid{ "test" };
   ConfigurationImpl conf{ mockConfigAdmin.get(), pid, factoryPid, props };
-  EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, false)).Times(1);
+  EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid)).Times(1);
   EXPECT_NO_THROW(conf.Update(props));
 }
 
@@ -129,7 +129,7 @@ TEST(TestConfigurationImpl, VerifyUpdateIfDifferent)
   std::string pid{ "test~instance" };
   std::string factoryPid{ "test" };
   ConfigurationImpl conf{ mockConfigAdmin.get(), pid, factoryPid, props };
-  EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, false)).Times(1);
+  EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid)).Times(1);
   auto result = conf.UpdateIfDifferent(props);
   EXPECT_FALSE(result.first);
   props["bar"] = std::string("baz");
@@ -146,12 +146,12 @@ TEST(TestConfigurationImpl, VerifyUpdateWithoutNotificationIfDifferent)
   std::string pid{ "test~instance" };
   std::string factoryPid{ "test" };
   ConfigurationImpl conf{ mockConfigAdmin.get(), pid, factoryPid, props };
-  EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid, false)).Times(0);
+  EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(pid)).Times(0);
   EXPECT_EQ(conf.UpdateWithoutNotificationIfDifferent(props),
             std::make_pair(false, 0ul));
   props["bar"] = std::string("baz");
   EXPECT_EQ(conf.UpdateWithoutNotificationIfDifferent(props),
-            std::make_pair(true, 3ul));
+            std::make_pair(true, 2ul));
 }
 
 TEST(TestConfigurationImpl, VerifyRemoveWithoutNotificationIfChangeCountEquals)
@@ -166,8 +166,8 @@ TEST(TestConfigurationImpl, VerifyRemoveWithoutNotificationIfChangeCountEquals)
   EXPECT_CALL(*mockConfigAdmin,
               NotifyConfigurationRemoved(testing::_, testing::_))
     .Times(0);
-  EXPECT_FALSE(conf.RemoveWithoutNotificationIfChangeCountEquals(1ul));
-  EXPECT_TRUE(conf.RemoveWithoutNotificationIfChangeCountEquals(2ul));
+  EXPECT_FALSE(conf.RemoveWithoutNotificationIfChangeCountEquals(0ul));
+  EXPECT_TRUE(conf.RemoveWithoutNotificationIfChangeCountEquals(1ul));
 }
 }
 }

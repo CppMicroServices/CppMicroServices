@@ -73,6 +73,13 @@ public:
   AnyMap GetProperties() const override;
 
   /**
+   * Get the value of the changeCount
+   *
+   * See {@code Configuration#GetChangeCount}
+   */
+  unsigned long GetChangeCount() override;
+ 
+  /**
    * Update the properties of this Configuration.
    *
    * See {@code Configuration#Update}
@@ -131,16 +138,7 @@ public:
       return false;
     }
   }
-  /** Internal method used by {@code ConfigurationAdminImpl} to get the value of the 
-   *  changeCount
-   *
-   * See {@code ConfigurationPrivate#GetChangeCount}
-   */
-  unsigned long GetChangeCount() override
-  {
-    std::lock_guard<std::mutex> lk{ propertiesMutex };
-    return changeCount;
-  }
+ 
 
 private:
   std::mutex configAdminMutex;

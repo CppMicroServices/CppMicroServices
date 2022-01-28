@@ -386,6 +386,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
   std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs;
   std::vector<bool> createdOrUpdated;
   std::vector<std::shared_ptr<ConfigurationImpl>> configurationsToInvalidate;
+  unsigned long changeCount{ 0u };
   {
     std::lock_guard<std::mutex> lk{ configurationsMutex };
     for (const auto& configMetadata : configurationMetadata) {
@@ -394,16 +395,21 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
       if (it == std::end(configurations)) {
         auto factoryPid = getFactoryPid(pid);
         AddFactoryInstanceIfRequired(pid, factoryPid);
+        auto newConfig = std::make_shared<ConfigurationImpl>(
+                           this,
+                           pid,
+                           std::move(factoryPid),
+                           std::move(configMetadata.properties));
+        // GetChangeCount can throw an exception if the configuration has
+        // been removed from the repository. No exception is possible here
+        // because the configuration object has not yet been added to the repository.
+        changeCount = newConfig->GetChangeCount();
         it = configurations
                .emplace(pid,
-                        std::make_shared<ConfigurationImpl>(
-                          this,
-                          pid,
-                          std::move(factoryPid),
-                          std::move(configMetadata.properties)))
+                        newConfig)
                .first;
         pidsAndChangeCountsAndIDs.emplace_back(
-          pid, it->second->GetChangeCount(), reinterpret_cast<std::uintptr_t>(it->second.get()));
+          pid, changeCount, reinterpret_cast<std::uintptr_t>(it->second.get()));
         createdOrUpdated.push_back(true);
         continue;
       }
@@ -412,6 +418,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
         const auto updatedAndChangeCount =
           it->second->UpdateWithoutNotificationIfDifferent(
             configMetadata.properties);
+        changeCount = updatedAndChangeCount.second;
         pidsAndChangeCountsAndIDs.emplace_back(
           pid,
           std::get<1>(updatedAndChangeCount),
@@ -425,7 +432,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
         it->second = std::make_shared<ConfigurationImpl>(
           this, pid, getFactoryPid(pid), std::move(configMetadata.properties));
         pidsAndChangeCountsAndIDs.emplace_back(
-          pid, it->second->GetChangeCount(), reinterpret_cast<std::uintptr_t>(it->second.get()));
+          pid, changeCount, reinterpret_cast<std::uintptr_t>(it->second.get()));
         createdOrUpdated.push_back(true);
       }
     }

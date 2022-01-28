@@ -77,6 +77,15 @@ public:
   virtual AnyMap GetProperties() const = 0;
 
   /**
+   * Get the change count of this Configuration. Returns a copy.
+   *
+   * @throws std::runtime_error if this Configuration object has been Removed
+   *
+   * @return the properties of this Configuration
+   */ 
+  virtual unsigned long GetChangeCount() = 0;
+
+  /**
    * Update the properties of this Configuration. Invoking this method will trigger the
    * ConfigurationAdmin impl to push the updated properties to any ManagedService /
    * ManagedServiceFactory / ConfigurationListener which has a matching PID / Factory PID.

@@ -75,12 +75,7 @@ public:
    */
   virtual bool HasBeenUpdatedAtLeastOnce() = 0;
 
-  /** Internal method used by {@code ConfigurationAdminImpl} to get the value of the change count
-   *
-   * See {@code ConfigurationPrivate#Invalidate}
-   */
-  virtual unsigned long GetChangeCount() = 0;
-};
+ };
 } // cmimpl
 } // cppmicroservices
 

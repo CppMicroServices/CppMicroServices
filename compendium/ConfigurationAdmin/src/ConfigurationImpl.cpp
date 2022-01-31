@@ -80,7 +80,7 @@ AnyMap ConfigurationImpl::GetProperties() const
   return properties;
 }
 
-unsigned long ConfigurationImpl::GetChangeCount()
+unsigned long ConfigurationImpl::GetChangeCount() const
 {
   std::lock_guard<std::mutex> lk{ propertiesMutex };
   if (removed) {

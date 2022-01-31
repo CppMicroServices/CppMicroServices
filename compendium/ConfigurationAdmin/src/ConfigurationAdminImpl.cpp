@@ -400,13 +400,10 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
                            pid,
                            std::move(factoryPid),
                            std::move(configMetadata.properties));
-        // GetChangeCount can throw an exception if the configuration has
-        // been removed from the repository. No exception is possible here
-        // because the configuration object has not yet been added to the repository.
         changeCount = newConfig->GetChangeCount();
         it = configurations
                .emplace(pid,
-                        newConfig)
+                        std::move(newConfig))
                .first;
         pidsAndChangeCountsAndIDs.emplace_back(
           pid, changeCount, reinterpret_cast<std::uintptr_t>(it->second.get()));

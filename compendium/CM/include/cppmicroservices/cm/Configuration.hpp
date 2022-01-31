@@ -77,13 +77,16 @@ public:
   virtual AnyMap GetProperties() const = 0;
 
   /**
-   * Get the change count of this Configuration. Returns a copy.
+   * Get the change count. Each Configuration must maintain a change counter that 
+   * is incremented with a positive value every time the configuration is updated 
+   * and its properties are stored. The counter must be incremented before the targets 
+   * are updated and events are sent out.
    *
    * @throws std::runtime_error if this Configuration object has been Removed
    *
-   * @return the properties of this Configuration
+   * @return A monotonically increasing value reflecting changes in this Configuration.
    */ 
-  virtual unsigned long GetChangeCount() = 0;
+  virtual unsigned long GetChangeCount() const = 0;
 
   /**
    * Update the properties of this Configuration. Invoking this method will trigger the

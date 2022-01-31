@@ -77,7 +77,7 @@ public:
    *
    * See {@code Configuration#GetChangeCount}
    */
-  unsigned long GetChangeCount() override;
+  unsigned long GetChangeCount() const override;
  
   /**
    * Update the properties of this Configuration.

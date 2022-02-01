@@ -254,16 +254,11 @@ TEST_F(ConfigAdminTests, testServiceUpdated)
   auto const service = getManagedService(ctx);
   ASSERT_NE(service, nullptr);
 
-  // We should get an Updated() call with the initial configuration from
+  // We should get one or two Updated() calls with the initial configuration from
   // the test bundle's manifest.json file (anInt=2). The asynchronous nature of
   // ConfigAdmin means that we may have to wait until the Updated call is received.
-  {
-    bool result = false;
-    std::string diagnostic;
-    std::tie(result, diagnostic) = pollOnCondition<PollingCondition::GE>(
-      [&service] { return service->getCounter(); }, 1);
-    EXPECT_TRUE(result) << diagnostic;
-  }
+   std::this_thread::sleep_for(DEFAULT_POLL_PERIOD);
+  EXPECT_GE(service->getCounter(), 1);
 
   auto const initConfiguredCount = service->getCounter();
   int expectedCount = initConfiguredCount;

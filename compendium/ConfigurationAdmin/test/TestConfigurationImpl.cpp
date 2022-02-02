@@ -80,7 +80,7 @@ TEST(TestConfigurationImpl, ThrowsWhenRemoved)
   EXPECT_THROW(conf.Remove(), std::runtime_error);
   EXPECT_THROW(conf.UpdateWithoutNotificationIfDifferent(props),
                std::runtime_error);
-  EXPECT_THROW(conf.RemoveWithoutNotificationIfChangeCountEquals(1u),
+  EXPECT_THROW(conf.RemoveWithoutNotificationIfChangeCountEquals(0u),
                std::runtime_error);
   EXPECT_NO_THROW(conf.Invalidate());
 }
@@ -166,7 +166,7 @@ TEST(TestConfigurationImpl, VerifyRemoveWithoutNotificationIfChangeCountEquals)
   EXPECT_CALL(*mockConfigAdmin,
               NotifyConfigurationRemoved(testing::_, testing::_))
     .Times(0);
-  EXPECT_FALSE(conf.RemoveWithoutNotificationIfChangeCountEquals(2ul));
+  EXPECT_FALSE(conf.RemoveWithoutNotificationIfChangeCountEquals(0ul));
   EXPECT_TRUE(conf.RemoveWithoutNotificationIfChangeCountEquals(1ul));
 }
 }

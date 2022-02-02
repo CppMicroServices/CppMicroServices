@@ -73,6 +73,13 @@ public:
   AnyMap GetProperties() const override;
 
   /**
+   * Get the value of the changeCount
+   *
+   * See {@code Configuration#GetChangeCount}
+   */
+  unsigned long GetChangeCount() const override;
+ 
+  /**
    * Update the properties of this Configuration.
    *
    * See {@code Configuration#Update}
@@ -117,6 +124,21 @@ public:
    * See {@code ConfigurationPrivate#Invalidate}
    */
   void Invalidate() override;
+
+  /** Internal method used by {@code ConfigurationAdminImpl} to determine if a configuration
+   * object has been updated. 
+   *
+   * See {@code ConfigurationPrivate#HasBeenUpdatedAtLeastOnce}
+   */
+  bool HasBeenUpdatedAtLeastOnce() override { 
+    std::lock_guard<std::mutex> lk{ propertiesMutex };
+    if (changeCount > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+ 
 
 private:
   std::mutex configAdminMutex;

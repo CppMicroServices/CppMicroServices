@@ -41,11 +41,16 @@ ConfigurationImpl::ConfigurationImpl(ConfigurationAdminPrivate* configAdmin,
   , pid(std::move(thePid))
   , factoryPid(std::move(theFactoryPid))
   , properties(std::move(props))
-  , changeCount{ 1u }
+  , changeCount{ 0u }
   , removed{ false }
 {
   assert(configAdminImpl != nullptr &&
          "Invalid ConfigurationAdminPrivate pointer");
+  // constructing a configuration object with properties is the equivalent
+  // of a Create and an Update operation.
+  if (properties.size() > 0) {
+    changeCount++;
+  }
 }
 
 std::string ConfigurationImpl::GetPid() const
@@ -73,6 +78,15 @@ AnyMap ConfigurationImpl::GetProperties() const
     throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
   }
   return properties;
+}
+
+unsigned long ConfigurationImpl::GetChangeCount() const
+{
+  std::lock_guard<std::mutex> lk{ propertiesMutex };
+  if (removed) {
+    throw std::runtime_error(REMOVED_EXCEPTION_MESSAGE);
+  }
+  return changeCount;
 }
 
 std::shared_future<void> ConfigurationImpl::Update(AnyMap newProperties)

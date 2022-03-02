@@ -126,12 +126,8 @@ std::ostream& operator<<(std::ostream& out, PollingCondition condition)
 }
 
 template<PollingCondition condition, typename Func>
-std::pair<bool, std::string> pollOnCondition(
-  Func&& func,
-  int compareTo,
-  std::chrono::milliseconds const& timeout = DEFAULT_POLL_PERIOD)
+std::pair<bool, std::string> pollOnCondition(Func&& func, int compareTo)
 {
-
   std::function<bool()> pollingFunc;
   if (condition == PollingCondition::GT) {
     pollingFunc = [&func, compareTo]() { return func() > compareTo; };
@@ -145,14 +141,15 @@ std::pair<bool, std::string> pollOnCondition(
     pollingFunc = [&func, compareTo]() { return func() < compareTo; };
   }
 
-  auto const startTime = std::chrono::steady_clock::now();
   auto result = pollingFunc();
-
-  while (!result &&
-         std::chrono::duration_cast<std::chrono::milliseconds>(
-           std::chrono::steady_clock::now() - startTime) <= timeout) {
+  // HACK: Changing the CA threadpool to only use one thread causes the timing
+  //       to change for how long it takes to get the Updated() notification.
+  //       Rather than waiting for a certain amount of time, we wait indefinitely
+  //       and run a hot loop until the condition is satisfied.
+  while (!result) {
     result = pollingFunc();
   }
+
   std::string diagnostic("");
   if (!result) {
     std::stringstream ss;

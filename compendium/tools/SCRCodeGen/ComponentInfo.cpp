@@ -86,7 +86,7 @@ std::string GetReferenceBinderStr(const ReferenceInfo& ref,
   auto isStatic = (ref.policy == "static");
   std::stringstream binderObjStr;
   if (!isStatic || !injectReferences) {
-    binderObjStr << "std::make_shared<DynamicBinder<{0}, "
+    binderObjStr << "std::make_shared<scd::DynamicBinder<{0}, "
                  << ref.interface << ">>(\"" + ref.name + "\""
                  << ", &{0}::Bind" << ref.name << ", &{0}::Unbind" << ref.name
                  << ")";

@@ -205,8 +205,6 @@ file for details about the contribution process.
 .. _GitHub Project: https://github.com/CppMicroServices/CppMicroServices
 .. _Apache License v2.0: http://www.apache.org/licenses/LICENSE-2.0
 
-.. |Linux Build Status| image:: https://img.shields.io/travis/CppMicroServices/CppMicroServices/master.svg?style=flat-square&label=Linux%20%26%20OS%20X
-   :target: http://travis-ci.org/CppMicroServices/CppMicroServices
 .. |BuildAndTestNix| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_nix.yml/badge.svg?branch=development&event=push
    :target: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_nix.yml
 .. |BuildAndTestNix(master)| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_nix.yml/badge.svg?branch=master&event=push

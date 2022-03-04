@@ -13,7 +13,6 @@
 | master      | |BuildAndTestNix(master)| | |BuildAndTestWindows(master)|        | |Code Coverage Status|                 |
 +-------------+---------------------------+--------------------------------------+----------------------------------------+
 | development | |BuildAndTestNix|         | |BuildAndTestWindows|                | |Code Coverage Status (development)|   |
-|             |                           |                                      |                                        |
 +-------------+---------------------------+--------------------------------------+----------------------------------------+
 
 |Coverity Scan Build Status|

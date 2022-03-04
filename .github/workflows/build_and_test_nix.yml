@@ -53,7 +53,9 @@ jobs:
         submodules: true
     
     - name: Install Dependencies
-      run: sudo apt-get -yq --no-install-suggests --no-install-recommends install valgrind lld
+      run: |
+        sudo apt-get update
+        sudo apt-get -yq --no-install-suggests --no-install-recommends install valgrind lld
       
     - name: Build and Test
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
@@ -81,7 +83,9 @@ jobs:
          submodules: true
 
     - name: Install Dependencies
-      run: sudo apt-get install -y valgrind
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y valgrind
       if: ${{matrix.os == 'ubuntu-18.04'}}
 
     - name: Build And Test

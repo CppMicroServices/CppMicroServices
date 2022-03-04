@@ -2,20 +2,18 @@
 .. rubric:: Continuous Integration Status
 
 +-------------+---------------------------+--------------------------------------+----------------------------------------+
-| Branch      | GCC 5.5 and 7.5.0         | Visual Studio 2015                   |                                        |
+| Branch      | GCC 5.5 and 7.5.0         | Visual Studio 2017                   |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
-|             | Xcode 12.4                | Visual Studio 2017                   |                                        |
+|             | Xcode 12.4                | Visual Studio 2019                   |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
-|             | Xcode 13.0                | Visual Studio 2019                   |                                        |
+|             | Xcode 13.0                | Visual Studio 2022                   |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
-|             | Clang 9.0                 | Visual Studio 2022                   |                                        |
-|             +---------------------------+--------------------------------------+----------------------------------------+
-|             |                           | MinGW-w64                            |                                        |
+|             | Clang 9.0                 | MinGW-w64                            |                                        |
 +=============+===========================+======================================+========================================+
-| master      | |Linux Build Status|      | |Windows Build status|               | |Code Coverage Status|                 |
+| master      | |BuildAndTestNix(master)| | |BuildAndTestWindows(master)|        | |Code Coverage Status|                 |
 +-------------+---------------------------+--------------------------------------+----------------------------------------+
 | development | |BuildAndTestNix|         | |BuildAndTestWindows|                | |Code Coverage Status (development)|   |
-|             |                           | |Windows Build status (development)| |                                        |
+|             |                           |                                      |                                        |
 +-------------+---------------------------+--------------------------------------+----------------------------------------+
 
 |Coverity Scan Build Status|
@@ -62,7 +60,7 @@ Recommended minimum required compiler versions:
 - GCC 5.5
 - Clang 9.0
 - Clang from Xcode 12.0
-- Visual Studio 2015
+- Visual Studio 2017
 
 You may use older compilers, but certain functionality may not be
 available. Check the warnings printed during configuration of
@@ -71,7 +69,7 @@ your build tree. The following are the absolute minimum requirements:
 - GCC 5.1
 - Clang 9.0
 - Clang from Xcode 12.0
-- Visual Studio 2015 (MSVC++ 14.0)
+- Visual Studio 2017 (MSVC++ 15.0)
 
 Recommended minimum required CMake version:
 
@@ -98,7 +96,6 @@ Below is a list of tested compiler/OS combinations:
 - Clang 9.0 (Ubuntu 18.04) via GitHub Actions
 - Apple Clang, Xcode 12.0.1 (OS X 10.15.7) via GitHub Actions
 - Apple Clang, Xcode 13.0.0 (OS X 11.0) via GitHub Actions
-- Visual Studio 2015 via Appveyor
 - Visual Studio 2017 via GitHub Actions
 - Visual Studio 2019 via GitHub Actions
 - Visual Studio 2022 via GitHub Actions
@@ -213,12 +210,12 @@ file for details about the contribution process.
    :target: http://travis-ci.org/CppMicroServices/CppMicroServices
 .. |BuildAndTestNix| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_nix.yml/badge.svg?branch=development&event=push
    :target: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_nix.yml
+.. |BuildAndTestNix(master)| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_nix.yml/badge.svg?branch=master&event=push
+   :target: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_nix.yml
 .. |BuildAndTestWindows| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_windows.yml/badge.svg?branch=development&event=push
    :target: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_windows.yml
-.. |Windows Build status| image:: https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/master.svg?style=flat-square&label=Windows
-   :target: https://ci.appveyor.com/project/cppmicroservices/cppmicroservices/branch/master
-.. |Windows Build status (development)| image:: https://img.shields.io/appveyor/ci/cppmicroservices/cppmicroservices/development.svg?style=flat-square&label=Windows
-   :target: https://ci.appveyor.com/project/cppmicroservices/cppmicroservices/branch/development
+.. |BuildAndTestWindows(master)| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_windows.yml/badge.svg?branch=master&event=push
+   :target: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/build_and_test_windows.yml   
 .. |Coverity Scan Build Status| image:: https://img.shields.io/coverity/scan/1329.svg?style=flat-square
    :target: https://scan.coverity.com/projects/1329
 .. |RTD Build Status (stable)| image:: https://readthedocs.org/projects/cppmicroservices/badge/?version=stable&style=flat-square

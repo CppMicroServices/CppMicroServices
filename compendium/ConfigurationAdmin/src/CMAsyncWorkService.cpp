@@ -50,7 +50,7 @@ public:
 
   void Initialize()
   {
-    threadpool = std::make_shared<boost::asio::thread_pool>(2);
+    threadpool = std::make_shared<boost::asio::thread_pool>(1);
   }
 
   void Shutdown()

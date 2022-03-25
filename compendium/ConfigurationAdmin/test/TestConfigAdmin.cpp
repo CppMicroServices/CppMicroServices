@@ -541,4 +541,26 @@ TEST_F(ConfigAdminTests, testDuplicateUpdated)
   ASSERT_NE(serviceFactory, nullptr);
 
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~0"), 1);
- }
+}
+
+/// Tests a DS bundle with a ManagedService service which starts another
+/// DS bundle with a ManagedService service within its Activate method. This test
+/// is meant to simulate nested calls to Configuration Admin's service trackers
+/// and test for deadlocks.
+TEST_F(ConfigAdminTests, testNestedBundleInstallAndStart) {
+  auto f = GetFramework();
+  auto ctx = f.GetBundleContext();
+
+  // install, but don't start, the managed service test bundle. Start will
+  // happen within the Activate of TestBundleNestedBundleStartManagedService
+  // It is done this way so that the test bundles don't have to have knowledge
+  // about the paths to test bundles.
+  auto bundles = ctx.InstallBundles(PathToLib("ManagedServiceAndFactoryBundle"));
+  ASSERT_EQ(1ul, bundles.size());
+
+  // This bundle's Activate method has a call to start TestBundleManagedService, which will trigger
+  // a call to Config Admin's service tracker.
+  auto const numBundles =
+    installAndStartTestBundles(ctx, "TestBundleNestedBundleStartManagedService");
+  ASSERT_EQ(numBundles, 1ul);
+}

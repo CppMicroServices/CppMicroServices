@@ -690,21 +690,24 @@ ConfigurationAdminImpl::AddingService(
   const ServiceReference<cppmicroservices::service::cm::ManagedService>&
     reference)
 {
-  // Lock the configurations repository so no configuration objects can be
-  // added or removed while AddingService is processing the new service.
-  std::lock_guard<std::mutex> lk{ configurationsMutex };
- 
-  const auto pid = getPidFromServiceReference(reference);
-  if (pid.empty()) {
-    const auto bundle = reference.GetBundle();
-    const auto serviceID = std::to_string(cppmicroservices::any_cast<long>(
-      reference.GetProperty(Constants::SERVICE_ID)));
-    logger->Log(
-      SeverityLevel::LOG_WARNING,
-      "Ignoring ManagedService with ID " + serviceID + " from bundle " +
-        (bundle ? bundle.GetSymbolicName() : "Unknown") +
-        " as it does not have a service.pid or component.name property");
-    return nullptr;
+  std::string pid;
+  {
+    // Lock the configurations repository so no configuration objects can be
+    // added or removed while AddingService is processing the new service.
+    std::lock_guard<std::mutex> lk{ configurationsMutex };
+
+    pid = getPidFromServiceReference(reference);
+    if (pid.empty()) {
+      const auto bundle = reference.GetBundle();
+      const auto serviceID = std::to_string(cppmicroservices::any_cast<long>(
+        reference.GetProperty(Constants::SERVICE_ID)));
+      logger->Log(
+        SeverityLevel::LOG_WARNING,
+        "Ignoring ManagedService with ID " + serviceID + " from bundle " +
+          (bundle ? bundle.GetSymbolicName() : "Unknown") +
+          " as it does not have a service.pid or component.name property");
+      return nullptr;
+    }
   }
   auto managedService = cmContext.GetService(reference);
   if (!managedService) {
@@ -713,8 +716,11 @@ ConfigurationAdminImpl::AddingService(
                 "obtained from the BundleContext");
     return nullptr;
   }
-  // Ensure there's a Configuration for this PID if one doesn't exist already.
+  // Lock the configurations repository so no configuration objects can be
+  // added or removed while AddingService is processing the new service.
+  std::lock_guard<std::mutex> lk{ configurationsMutex };
 
+  // Ensure there's a Configuration for this PID if one doesn't exist already.
   const auto it = configurations.find(pid);
   if (it == std::end(configurations)) {
     auto factoryPid = getFactoryPid(pid);
@@ -789,20 +795,22 @@ ConfigurationAdminImpl::AddingService(
   const ServiceReference<cppmicroservices::service::cm::ManagedServiceFactory>&
     reference)
 {
+  std::string pid;
+  {
+    std::lock_guard<std::mutex> lk{ configurationsMutex };
 
-  std::lock_guard<std::mutex> lk{ configurationsMutex };
-
-  const auto pid = getPidFromServiceReference(reference);
-  if (pid.empty()) {
-    const auto bundle = reference.GetBundle();
-    const auto serviceID = std::to_string(cppmicroservices::any_cast<long>(
-      reference.GetProperty(Constants::SERVICE_ID)));
-    logger->Log(
-      SeverityLevel::LOG_WARNING,
-      "Ignoring ManagedServiceFactory with ID " + serviceID + " from bundle " +
-        (bundle ? bundle.GetSymbolicName() : "Unknown") +
-        " as it does not have a service.pid or component.name property");
-    return nullptr;
+    pid = getPidFromServiceReference(reference);
+    if (pid.empty()) {
+      const auto bundle = reference.GetBundle();
+      const auto serviceID = std::to_string(cppmicroservices::any_cast<long>(
+        reference.GetProperty(Constants::SERVICE_ID)));
+      logger->Log(
+        SeverityLevel::LOG_WARNING,
+        "Ignoring ManagedServiceFactory with ID " + serviceID +
+          " from bundle " + (bundle ? bundle.GetSymbolicName() : "Unknown") +
+          " as it does not have a service.pid or component.name property");
+      return nullptr;
+    }
   }
   auto managedServiceFactory = cmContext.GetService(reference);
   if (!managedServiceFactory) {
@@ -811,6 +819,8 @@ ConfigurationAdminImpl::AddingService(
                 "be obtained from the BundleContext");
     return nullptr;
   }
+
+  std::lock_guard<std::mutex> lk{ configurationsMutex };
   std::vector<std::pair<std::string, AnyMap>> pidsAndProperties;
 
   const auto it = factoryInstances.find(pid);

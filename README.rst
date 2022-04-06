@@ -2,7 +2,7 @@
 .. rubric:: Continuous Integration Status
 
 +-------------+---------------------------+--------------------------------------+----------------------------------------+
-| Branch      | GCC 5.5 and 7.5.0         | Visual Studio 2019                   |                                        |
+| Branch      | GCC 7.5.0 and 9.4.0       | Visual Studio 2019                   |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
 |             | Xcode 12.4                | Visual Studio 2022                   |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
@@ -51,24 +51,23 @@ dependencies are included and mostly used for implementation details.
 Supported Platforms
 -------------------
 
-The library makes use of C++14 language and library features and compiles
+The library makes use of C++17 language and library features and compiles
 on many different platforms.
 
-Recommended minimum required compiler versions:
+Recommended absolute minimum required compiler versions:
 
-- GCC 5.5
+- GCC 7.5.0
 - Clang 9.0
-- Clang from Xcode 12.0
-- Visual Studio 2019
+- Clang from Xcode 10.0 (not tested)
+- Visual Studio 2017 (MSVC++ 15.0) (not tested)
 
-You may use older compilers, but certain functionality may not be
-available. Check the warnings printed during configuration of
-your build tree. The following are the absolute minimum requirements:
+Not all of the absolute minimum compiler versions are tested (as noted). We test and recommend
+the following compilers:
 
-- GCC 5.1
+- GCC 9.4.0
 - Clang 9.0
-- Clang from Xcode 12.0
-- Visual Studio 2017 (MSVC++ 15.0) (no longer tested in CI)
+- Clang from Xcode 12.0 and 13.0
+- Visual Studio 2019 and 2022
 
 Recommended minimum required CMake version:
 
@@ -82,6 +81,7 @@ For information about the specific versions of software the runners
 use, please see the following resources:
 
 - `ubuntu-18.04 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu1804-README.md>`
+- `ubuntu-20.04 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-Readme.md>`
 - `macos-10.15 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md>`
 - `macos-11 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-11-Readme.md>`
 - `windows-2019 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/win/Windows2019-Readme.md>`
@@ -89,14 +89,14 @@ use, please see the following resources:
 
 Below is a list of tested compiler/OS combinations:
 
-- GCC 5.5 (Ubuntu 18.04) via GitHub Actions
-- GCC 7.5.0 (Ubuntu 18.04) via GitHub Actions
-- Clang 9.0 (Ubuntu 18.04) via GitHub Actions
-- Apple Clang, Xcode 12.0.1 (OS X 10.15.7) via GitHub Actions
-- Apple Clang, Xcode 13.0.0 (OS X 11.0) via GitHub Actions
-- Visual Studio 2019 via GitHub Actions
-- Visual Studio 2022 via GitHub Actions
-- MinGW-w64 via GitHub Actions
+- GCC 7.5.0 (Ubuntu 18.04)
+- GCC 9.4.0 (Ubuntu 20.04)
+- Clang 9.0 (Ubuntu 18.04)
+- Apple Clang, Xcode 12.0.1 (OS X 10.15.7)
+- Apple Clang, Xcode 13.0.0 (OS X 11.0)
+- Visual Studio 2019
+- Visual Studio 2022
+- MinGW-w64
 
 Legal
 -----

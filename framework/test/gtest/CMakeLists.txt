@@ -31,6 +31,7 @@ set(_gtest_tests
   AnyTest.cpp
   AnyMapTest.cpp
   BundleActivatorTest.cpp
+  BundleContextTest.cpp
   BundleDeadLockTest.cpp
   BundleManifestTest.cpp
   BundleValidationTest.cpp

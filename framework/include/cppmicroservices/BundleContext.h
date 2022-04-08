@@ -641,6 +641,9 @@ public:
   template<class S>
   ServiceObjects<S> GetServiceObjects(const ServiceReference<S>& reference)
   {
+    if (!d) {
+      throw std::runtime_error("The bundle context is no longer valid");
+    }
     return ServiceObjects<S>(d, reference);
   }
 

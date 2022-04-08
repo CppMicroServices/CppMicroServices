@@ -22,9 +22,6 @@
 
 #include "cppmicroservices/AnyMap.h"
 
-#include "absl/strings/numbers.h"
-#include "absl/strings/string_view.h"
-
 #include <stdexcept>
 
 namespace cppmicroservices {
@@ -48,9 +45,9 @@ bool any_map_ciequal::operator()(const std::string& l,
 }
 
 const Any& AtCompoundKey(const std::vector<Any>& v,
-                         const absl::string_view& key);
+                         const std::string_view& key);
 
-const Any& AtCompoundKey(const AnyMap& m, const absl::string_view& key)
+const Any& AtCompoundKey(const AnyMap& m, const std::string_view& key)
 {
   auto pos = key.find(".");
   if (pos != AnyMap::key_type::npos) {
@@ -70,8 +67,7 @@ const Any& AtCompoundKey(const AnyMap& m, const absl::string_view& key)
   }
 }
 
-const Any& AtCompoundKey(const std::vector<Any>& v,
-                         const absl::string_view& key)
+const Any& AtCompoundKey(const std::vector<Any>& v, const std::string_view& key)
 {
   auto pos = key.find(".");
   if (pos != AnyMap::key_type::npos) {
@@ -94,11 +90,11 @@ const Any& AtCompoundKey(const std::vector<Any>& v,
   }
 }
 Any AtCompoundKey(const std::vector<Any>& v,
-                  const absl::string_view& key,
+                  const std::string_view& key,
                   Any&& defaultVal);
 
 Any AtCompoundKey(const AnyMap& m,
-                  const absl::string_view& key,
+                  const std::string_view& key,
                   Any&& defaultVal)
 {
   auto pos = key.find(".");
@@ -126,7 +122,7 @@ Any AtCompoundKey(const AnyMap& m,
 }
 
 Any AtCompoundKey(const std::vector<Any>& v,
-                  const absl::string_view& key,
+                  const std::string_view& key,
                   Any&& defaultval)
 {
   auto pos = key.find(".");

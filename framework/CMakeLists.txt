@@ -37,9 +37,9 @@ usMacroCreateBundle(Framework
   EMBED_RESOURCE_METHOD LINK
   PRIVATE_INCLUDE_DIRS src/util src/service src/bundle ../third_party ../third_party/absl
   LINK_LIBRARIES ${_link_libraries}
-  SOURCES ${_framework_srcs}
+  SOURCES $<TARGET_OBJECTS:absl> ${_framework_srcs}
   PUBLIC_HEADERS ${_framework_public_headers}
-  PRIVATE_HEADERS ${_framework_private_headers}
+  PRIVATE_HEADERS $<TARGET_PROPERTY:absl,INCLUDE_DIRECTORIES> ${_framework_private_headers}
   BINARY_RESOURCES manifest.json
 )
 

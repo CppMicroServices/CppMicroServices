@@ -25,6 +25,8 @@
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Constants.h"
 
+#include "absl/strings/str_cat.h"
+
 #include "Properties.h"
 
 #include <cctype>
@@ -34,7 +36,6 @@
 #include <iterator>
 #include <limits>
 #include <stdexcept>
-#include <string_view>
 #include <utility>
 
 namespace cppmicroservices {
@@ -167,7 +168,8 @@ LDAPExpr::LDAPExpr(const std::string& filter)
     LDAPExpr expr = ParseExpr(ps);
 
     if (!Trim(ps.rest()).empty()) {
-      ps.error(LDAPExprConstants::GARBAGE() + " '" + ps.rest() + "'");
+      ps.error(
+        absl::StrCat(LDAPExprConstants::GARBAGE(), " '", ps.rest(), "'"));
     }
 
     d = expr.d;
@@ -467,9 +469,9 @@ bool LDAPExpr::CompareIntegralType(const Any& obj,
   }
 }
 
-bool LDAPExpr::CompareString(const std::string_view s1,
+bool LDAPExpr::CompareString(const absl::string_view s1,
                              int op,
-                             const std::string_view s2)
+                             const absl::string_view s2)
 {
   switch (op) {
     case LE:
@@ -485,7 +487,7 @@ bool LDAPExpr::CompareString(const std::string_view s1,
   }
 }
 
-std::string LDAPExpr::FixupString(const std::string_view s)
+std::string LDAPExpr::FixupString(const absl::string_view s)
 {
   std::string sb;
   sb.reserve(s.size());
@@ -501,9 +503,9 @@ std::string LDAPExpr::FixupString(const std::string_view s)
   return sb;
 }
 
-bool LDAPExpr::PatSubstr(const std::string_view s,
+bool LDAPExpr::PatSubstr(const absl::string_view s,
                          int si,
-                         const std::string_view pat,
+                         const absl::string_view pat,
                          int pi)
 {
   if (pat.size() - pi == 0)
@@ -528,7 +530,7 @@ bool LDAPExpr::PatSubstr(const std::string_view s,
   }
 }
 
-bool LDAPExpr::PatSubstr(const std::string_view s, const std::string_view pat)
+bool LDAPExpr::PatSubstr(const absl::string_view s, const absl::string_view pat)
 {
   return PatSubstr(s, 0, pat, 0);
 }
@@ -744,7 +746,8 @@ std::string LDAPExpr::ParseState::getAttributeValue()
 
 void LDAPExpr::ParseState::error(const std::string& m) const
 {
-  std::string errorStr = m + ": " + (m_str.empty() ? "" : m_str.substr(m_pos));
+  std::string errorStr =
+    absl::StrCat(m, ": ", (m_str.empty() ? "" : m_str.substr(m_pos)));
   throw std::invalid_argument(errorStr);
 }
 }

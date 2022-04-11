@@ -188,6 +188,7 @@ public:
   /**
    * Returns all known properties.
    *
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @return A map of all framework properties.
    */
   AnyMap GetProperties() const;
@@ -445,7 +446,7 @@ public:
    *         search.
    * @throws std::invalid_argument If the specified <code>filter</code>
    *         contains an invalid filter expression that cannot be parsed.
-   * @throws std::logic_error If this BundleContext is no longer valid.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @throws ServiceException If the service interface id of \c S is empty, see @ref gr_serviceinterface.
    *
    * @see GetServiceReferences(const std::string&, const std::string&)

@@ -180,6 +180,7 @@ public:
    * the Framework properties, the method returns an empty \c Any.
    *
    * @param key The name of the requested property.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @return The value of the requested property, or an empty \c Any if the
    *         property is undefined.
    */

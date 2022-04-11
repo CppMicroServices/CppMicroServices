@@ -25,8 +25,6 @@
 
 #include "cppmicroservices/FrameworkConfig.h"
 
-#include "absl/strings/string_view.h"
-
 #include <memory>
 #include <string>
 #include <unordered_set>
@@ -154,20 +152,20 @@ private:
                            const std::string& s) const;
 
   //!
-  static bool CompareString(const absl::string_view s1,
+  static bool CompareString(const std::string_view s1,
                             int op,
-                            const absl::string_view s2);
+                            const std::string_view s2);
 
   //!
-  static std::string FixupString(const absl::string_view s);
+  static std::string FixupString(const std::string_view s);
 
   //!
-  static bool PatSubstr(const absl::string_view s, const absl::string_view pat);
+  static bool PatSubstr(const std::string_view s, const std::string_view pat);
 
   //!
-  static bool PatSubstr(const absl::string_view s,
+  static bool PatSubstr(const std::string_view s,
                         int si,
-                        const absl::string_view pat,
+                        const std::string_view pat,
                         int pi);
 
   //! Shared pointer

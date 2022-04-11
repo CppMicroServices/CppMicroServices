@@ -469,9 +469,9 @@ bool LDAPExpr::CompareIntegralType(const Any& obj,
   }
 }
 
-bool LDAPExpr::CompareString(const absl::string_view s1,
+bool LDAPExpr::CompareString(const std::string_view s1,
                              int op,
-                             const absl::string_view s2)
+                             const std::string_view s2)
 {
   switch (op) {
     case LE:
@@ -487,7 +487,7 @@ bool LDAPExpr::CompareString(const absl::string_view s1,
   }
 }
 
-std::string LDAPExpr::FixupString(const absl::string_view s)
+std::string LDAPExpr::FixupString(const std::string_view s)
 {
   std::string sb;
   sb.reserve(s.size());
@@ -503,9 +503,9 @@ std::string LDAPExpr::FixupString(const absl::string_view s)
   return sb;
 }
 
-bool LDAPExpr::PatSubstr(const absl::string_view s,
+bool LDAPExpr::PatSubstr(const std::string_view s,
                          int si,
-                         const absl::string_view pat,
+                         const std::string_view pat,
                          int pi)
 {
   if (pat.size() - pi == 0)
@@ -530,7 +530,7 @@ bool LDAPExpr::PatSubstr(const absl::string_view s,
   }
 }
 
-bool LDAPExpr::PatSubstr(const absl::string_view s, const absl::string_view pat)
+bool LDAPExpr::PatSubstr(const std::string_view s, const std::string_view pat)
 {
   return PatSubstr(s, 0, pat, 0);
 }

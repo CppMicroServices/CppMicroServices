@@ -36,7 +36,7 @@ namespace em {
  * event being published which matches the filter criteria, the HandleEvent() function will be
  * invoked.
  */
-class US_em_EXPORT EventHandler
+class EventHandler
 {
 public:
   /**

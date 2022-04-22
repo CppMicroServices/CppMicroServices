@@ -23,8 +23,6 @@
 #ifndef CppMicroServices_EM_EventAdmin_hpp
 #define CppMicroServices_EM_EventAdmin_hpp
 
-#include "cppmicroservices/em/EMExport.h"
-
 #include "cppmicroservices/em/EMEvent.hpp"
 
 namespace cppmicroservices {
@@ -40,7 +38,7 @@ namespace em {
  * send a published event asynchronously and returns back to the caller before delivery has
  * completed while SendEvent() will only return once the event delivery has completed.
  */
-class US_em_EXPORT EventAdmin
+class EventAdmin
 {
 public:
   /**

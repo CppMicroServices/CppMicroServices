@@ -39,6 +39,8 @@ namespace em {
 class EventHandler
 {
 public:
+  virtual ~EventHandler() = default;
+  
   /**
    * @brief The function that \c EventAdmin service calls to notify the listener that an event
    * matching their desired criteria (topic + (optionally filter)) was sent.

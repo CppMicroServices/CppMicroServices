@@ -19,7 +19,7 @@ if(NOT ${PROJECT_NAME}_TARGET)
 endif()
 set(PROJECT_TARGET ${${PROJECT_NAME}_TARGET})
 
-# link libraries for the ServiceComponent lib
+# link libraries for the EM lib
 set(_link_libraries )
 if(UNIX)
   list(APPEND _link_libraries dl)
@@ -30,10 +30,10 @@ if(CMAKE_THREAD_LIBS_INIT)
 endif()
 
 configure_file(${CppMicroServices_SOURCE_DIR}/cmake/Export.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices/servicecomponent/ServiceComponentExport.h
+  ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices/em/EMExport.h
   )
 
-add_library(${PROJECT_TARGET} ${_srcs} ${_public_headers} ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices/servicecomponent/ServiceComponentExport.h)
+add_library(${PROJECT_TARGET} ${_srcs} ${_public_headers} ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices/em/EMExport.h)
 if (US_BUILD_TESTING)
   target_compile_definitions(${PROJECT_TARGET} PRIVATE USING_GTEST)
 endif()

@@ -41,6 +41,8 @@ namespace em {
 class EventAdmin
 {
 public:
+  virtual ~EventAdmin() = default;
+  
   /**
    * @brief Initiates the asynchronous delivery of an event. If the \c DELIVERY_ASYNC_UNORDERED
    * event property is specified, it will not guaranteed that the event will be delivered in the

@@ -126,7 +126,7 @@ US_em_EXPORT extern const std::string EVENT_FILTER;
  * All \c EventHandler services must be registered with this property.
  * 
  * Topics take the following form:
- *   topic-description := '*' | topic ( '/*' )?
+ *   topic-description := '*' | topic ( '/\*' )?
  *   topic := token ( '/' token )*
  * 
  * If no topic is provided, the associated \c EventHandler will not receive any events.

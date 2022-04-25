@@ -20,8 +20,8 @@
 
  =============================================================================*/
 
-#ifndef CppMicroServices_EM_EMEvent_hpp
-#define CppMicroServices_EM_EMEvent_hpp
+#ifndef CppMicroServices_EM_Event_hpp
+#define CppMicroServices_EM_Event_hpp
 
 #include "cppmicroservices/em/EMExport.h"
 
@@ -35,8 +35,8 @@ namespace em {
 using EventProperties = std::unordered_map<std::string, Any>;
 
 /**
- * \defgroup gr_emevent EMEvent
- * \brief Groups cppmicroservices::service::em::EMEvent related symbols. 
+ * \defgroup gr_emevent Event
+ * \brief Groups cppmicroservices::service::em::Event related symbols. 
  */
 
 /**

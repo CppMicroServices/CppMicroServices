@@ -23,7 +23,7 @@
 #ifndef CppMicroServices_EM_EventAdmin_hpp
 #define CppMicroServices_EM_EventAdmin_hpp
 
-#include "cppmicroservices/em/EMEvent.hpp"
+#include "cppmicroservices/em/Event.hpp"
 
 namespace cppmicroservices {
 namespace service {
@@ -60,7 +60,7 @@ public:
    *
    * @param evt The event to deliver to all handlers which subscribe to the topic of the event
    */
-  virtual void PostEvent(const EMEvent& evt) noexcept = 0;
+  virtual void PostEvent(const Event& evt) noexcept = 0;
 
   /**
    * @brief Initiates the synchronous delivery of an event.
@@ -69,7 +69,7 @@ public:
    *
    * @param evt The event to delvier to all handlers which subscribe to the topic of the event
    */
-  virtual void SendEvent(const EMEvent& evt) noexcept = 0;
+  virtual void SendEvent(const Event& evt) noexcept = 0;
 };
 }
 }

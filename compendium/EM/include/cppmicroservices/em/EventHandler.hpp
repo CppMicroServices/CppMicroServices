@@ -23,7 +23,7 @@
 #ifndef CppMicroServices_EM_EventHandler_hpp
 #define CppMicroServices_EM_EventHandler_hpp
 
-#include "cppmicroservices/em/EMEvent.hpp"
+#include "cppmicroservices/em/Event.hpp"
 
 namespace cppmicroservices {
 namespace service {
@@ -57,8 +57,7 @@ public:
    * 
    * @param evt The received event
    */
-  virtual void HandleEvent(
-    const cppmicroservices::service::em::EMEvent& evt) = 0;
+  virtual void HandleEvent(const cppmicroservices::service::em::Event& evt) = 0;
 };
 }
 }

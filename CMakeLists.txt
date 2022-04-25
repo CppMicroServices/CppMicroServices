@@ -240,6 +240,8 @@ us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
 
+set(_us_build_shared ${BUILD_SHARED_LIBS})
+
 if(NOT US_ENABLE_THREADING_SUPPORT AND US_ENABLE_TSAN)
   message(SEND_WARN "Thread-sanitizer enabled without threading support. Forcing US_ENABLE_TSAN to OFF")
   set(US_ENABLE_TSAN OFF)

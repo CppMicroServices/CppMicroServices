@@ -44,8 +44,8 @@ using EventProperties = std::unordered_map<std::string, Any>;
  *
  * An implementation of the OSGi EventAdmin Event specification.
  *
- * The EMEvent is the event object that is both published and subscribed to. Any published events
- * are of type EMEvent. The event can contain various properties that allow consumers to filter out
+ * The Event is the event object that is both published and subscribed to. Any published events
+ * are of type Event. The event can contain various properties that allow consumers to filter out
  * specific events and perform certain operations when specific events are received.
  * 
  * Event properties are read-only and only allow for consumers to observe them. This is to prevent
@@ -55,19 +55,19 @@ using EventProperties = std::unordered_map<std::string, Any>;
  * Interactions with events occurs through the EMEvent object directly. See
  * \c cppmicroservices::em::Constants for information regarding what properties an event can have.
  */
-class US_em_EXPORT EMEvent
+class US_em_EXPORT Event
 {
 public:
-  EMEvent() = delete;
-  EMEvent(EMEvent&&) = delete;
-  EMEvent(const EMEvent&&) = delete;
+  Event() = delete;
+  Event(Event&&) = delete;
+  Event(const Event&&) = delete;
 
-  EMEvent(const EMEvent&) = default;
+  Event(const Event&) = default;
 
-  virtual ~EMEvent() = default;
+  virtual ~Event() = default;
 
   /**
-   * @brief Construct a new EMEvent object with the provided topic and event properties.
+   * @brief Construct a new Event object with the provided topic and event properties.
    * 
    * Topics take the following form:
    *   topic-description := '*' | topic ( '/\*' )?
@@ -80,31 +80,31 @@ public:
    * 
    * @throws std::logic_error If the topic format is invalid
    */
-  EMEvent(const std::string& topic,
-          const EventProperties properties = EventProperties());
+  Event(const std::string& topic,
+        const EventProperties properties = EventProperties());
 
   /**
-   * @brief Compares whether or not two EMEvents are equal to each other
+   * @brief Compares whether or not two Events are equal to each other
    * 
-   * EMEvents are euqal iff their topics match and their properties exactly match.
+   * Events are euqal iff their topics match and their properties exactly match.
    * 
-   * @param other The other EMEvent to compare against
+   * @param other The other Event to compare against
    * @return true if the events are equal
    * @return false otherwise
    */
-  bool operator==(const EMEvent& other) const;
+  bool operator==(const Event& other) const;
 
   /**
-   * @brief Compares whether or not two EMEvents are not equal to each other
+   * @brief Compares whether or not two Events are not equal to each other
    *
-   * EMEvents are not equal if their topics do not match and/or their properties do not exactly
+   * Events are not equal if their topics do not match and/or their properties do not exactly
    * match.
    *
-   * @param other The other EMEvent to compare against
+   * @param other The other Event to compare against
    * @return true if the events are not equal
    * @return false otherwise
    */
-  bool operator!=(const EMEvent& other) const;
+  bool operator!=(const Event& other) const;
 
   /**
    * @brief Returns whether or not the provided property is specified in the event properties.
@@ -145,7 +145,7 @@ public:
   std::string GetTopic() const;
 
   /**
-   * @brief Returns whether or not the EMEvent matches against the provided \c LDAPFilter .
+   * @brief Returns whether or not the Event matches against the provided \c LDAPFilter .
    *
    * @param filter The filter to match the event against
    * @return bool true if the specified filter matches this event, false otherwise

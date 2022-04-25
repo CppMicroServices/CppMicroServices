@@ -19,7 +19,7 @@ endif()
 #-----------------------------------------------------------------------------
 set(_em_tests
   suite_registration.cpp
-  TestEMEvent.cpp
+  TestEvent.cpp
   )
 
 include_directories(

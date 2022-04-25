@@ -1,12 +1,12 @@
 # sources and headers
 set(_srcs
 src/EMConstants.cpp
-src/EMEvent.cpp
+src/Event.cpp
 )
 
 set(_public_headers
 include/cppmicroservices/em/EMConstants.hpp
-include/cppmicroservices/em/EMEvent.hpp
+include/cppmicroservices/em/Event.hpp
 include/cppmicroservices/em/EventAdmin.hpp
 include/cppmicroservices/em/EventHandler.hpp
 )

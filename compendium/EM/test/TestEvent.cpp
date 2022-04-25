@@ -23,7 +23,7 @@
 #include <string>
 
 #include "cppmicroservices/em/EMConstants.hpp"
-#include "cppmicroservices/em/EMEvent.hpp"
+#include "cppmicroservices/em/Event.hpp"
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/AnyMap.h"
@@ -31,70 +31,70 @@
 
 #include "gtest/gtest.h"
 
-using cppmicroservices::service::em::EMEvent;
+using cppmicroservices::service::em::Event;
 using cppmicroservices::service::em::EventProperties;
 namespace emc = cppmicroservices::em::Constants;
 
 namespace {
-TEST(EMEventTest, TestConstructionValidTopic)
+TEST(EventTest, TestConstructionValidTopic)
 {
-  EXPECT_NO_THROW({ EMEvent("some/valid/topic"); });
+  EXPECT_NO_THROW({ Event("some/valid/topic"); });
 }
 
-TEST(EMEventTest, TestInvalidConstructionInvalidTopic)
+TEST(EventTest, TestInvalidConstructionInvalidTopic)
 {
-  EXPECT_THROW({ EMEvent("/not/a/valid/topic"); }, std::logic_error);
+  EXPECT_THROW({ Event("/not/a/valid/topic"); }, std::logic_error);
 }
 
-TEST(EMEventTest, TestConstructionValidTopicWithProps)
+TEST(EventTest, TestConstructionValidTopicWithProps)
 {
   EXPECT_NO_THROW({
     EventProperties props({ { "tProp1", std::string("hi") } });
 
-    EMEvent("some/valid/topic", props);
+    Event("some/valid/topic", props);
   });
 }
 
-TEST(EMEventTest, TestConstructionInvalidTopicWithProps)
+TEST(EventTest, TestConstructionInvalidTopicWithProps)
 {
   EXPECT_THROW(
     {
       EventProperties props({ { "tProp1", std::string("hi") } });
 
-      EMEvent("/not/a/valid/topic", props);
+      Event("/not/a/valid/topic", props);
     },
     std::logic_error);
 }
 
-TEST(EMEventTest, TestCopyConstruction)
+TEST(EventTest, TestCopyConstruction)
 {
   EXPECT_NO_THROW({
     EventProperties props({ { "tProp1", std::string("hi") } });
-    EMEvent evt1("some/valid/topic", props);
-    EMEvent evt2(evt1);
+    Event evt1("some/valid/topic", props);
+    Event evt2(evt1);
 
     EXPECT_EQ(evt1, evt2);
   });
 }
 
-TEST(EMEventTest, TestEquality)
+TEST(EventTest, TestEquality)
 {
   // Same topic, no props
-  EMEvent evt_0a("evt_0/1");
-  EMEvent evt_0b("evt_0/1");
+  Event evt_0a("evt_0/1");
+  Event evt_0b("evt_0/1");
 
   ASSERT_EQ(evt_0a, evt_0b);
 
   // Different topic, no props
-  EMEvent evt_1a("evt_1/a");
-  EMEvent evt_1b("evt_1/b");
+  Event evt_1a("evt_1/a");
+  Event evt_1b("evt_1/b");
 
   ASSERT_NE(evt_1a, evt_1b);
 
   // Same topic, same props
   EventProperties props_2({ { "tProp1", std::string("bonjour") } });
-  EMEvent evt_2a("evt_2", props_2);
-  EMEvent evt_2b("evt_2", props_2);
+  Event evt_2a("evt_2", props_2);
+  Event evt_2b("evt_2", props_2);
 
   ASSERT_EQ(evt_2a, evt_2b);
 
@@ -102,36 +102,36 @@ TEST(EMEventTest, TestEquality)
   EventProperties props_3a(props_2);
   EventProperties props_3b({ { "tProp1", std::string("bonjour") },
                              { "tProp2", std::string("hello") } });
-  EMEvent evt_3a("evt_3", props_3a);
-  EMEvent evt_3b("evt_3", props_3b);
+  Event evt_3a("evt_3", props_3a);
+  Event evt_3b("evt_3", props_3b);
 
   ASSERT_NE(evt_3a, evt_3b);
 
   // Same topic, same props size but different keys
   EventProperties props_4a({ { "tProp1", std::string("bonjour") } });
   EventProperties props_4b({ { "tPropDiff", std::string("bonjour") } });
-  EMEvent evt_4a("evt_4", props_4a);
-  EMEvent evt_4b("evt_4", props_4b);
+  Event evt_4a("evt_4", props_4a);
+  Event evt_4b("evt_4", props_4b);
 
   ASSERT_NE(evt_4a, evt_4b);
 
   // Same topic, same props size, same prop keys but different values
   EventProperties props_5a({ { "tProp1", std::string("bonjour") } });
   EventProperties props_5b({ { "tProp1", std::string("hello") } });
-  EMEvent evt_5a("evt_5", props_5a);
-  EMEvent evt_5b("evt_5", props_5b);
+  Event evt_5a("evt_5", props_5a);
+  Event evt_5b("evt_5", props_5b);
 
   ASSERT_NE(evt_5a, evt_5b);
 }
 
-TEST(EMEventTest, TestProperties)
+TEST(EventTest, TestProperties)
 {
   EventProperties props(
     { { emc::SERVICE_ID, 1 },
       { emc::OBJECTCLASS, std::string("testobjclass") },
       { emc::EXCEPTION, std::string("std::runtime_error") } });
 
-  EMEvent evt("my/event/topic", props);
+  Event evt("my/event/topic", props);
 
   // ContainsProperty()
   ASSERT_TRUE(evt.ContainsProperty(emc::SERVICE_ID));
@@ -157,25 +157,25 @@ TEST(EMEventTest, TestProperties)
             propNames.end());
 }
 
-TEST(EMEventTest, TestGetTopic)
+TEST(EventTest, TestGetTopic)
 {
-  EMEvent evt("my/event/topic");
+  Event evt("my/event/topic");
   ASSERT_EQ(evt.GetTopic(), "my/event/topic");
 }
 
-TEST(EMEventTest, TestFilterMatches)
+TEST(EventTest, TestFilterMatches)
 {
   EventProperties props_1({
     { emc::BUNDLE_SYMBOLICNAME, std::string("my_cool_bundle") },
   });
-  EMEvent evt1("my/event/topic", props_1);
+  Event evt1("my/event/topic", props_1);
 
   cppmicroservices::LDAPFilter filter("(bundle.symbolicName=my_cool_bundle)");
   ASSERT_TRUE(evt1.Matches(filter));
 
   EventProperties props_2(
     { { emc::BUNDLE_SYMBOLICNAME, std::string("my_not_cool_bundle") } });
-  EMEvent evt2("my/event/topic", props_2);
+  Event evt2("my/event/topic", props_2);
 
   ASSERT_FALSE(evt2.Matches(filter));
 }

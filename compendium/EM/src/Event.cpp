@@ -20,9 +20,10 @@
 
 =============================================================================*/
 
-#include "cppmicroservices/em/EMEvent.hpp"
+#include "cppmicroservices/em/Event.hpp"
 
 #include <regex>
+#include <utility>
 
 namespace cppmicroservices {
 namespace service {
@@ -43,7 +44,7 @@ bool PropsAreEqual(const AnyMap& props1, const AnyMap& props2)
 }
 }
 
-EMEvent::EMEvent(const std::string& topic, const EventProperties properties)
+Event::Event(const std::string& topic, const EventProperties properties)
   : topic(topic)
   , properties(properties)
 {
@@ -52,22 +53,22 @@ EMEvent::EMEvent(const std::string& topic, const EventProperties properties)
   }
 }
 
-bool EMEvent::operator==(const EMEvent& other) const
+bool Event::operator==(const Event& other) const
 {
   return (topic == other.topic) && PropsAreEqual(properties, other.properties);
 }
 
-bool EMEvent::operator!=(const EMEvent& other) const
+bool Event::operator!=(const Event& other) const
 {
   return !(operator==(other));
 }
 
-bool EMEvent::ContainsProperty(const std::string& propName) const
+bool Event::ContainsProperty(const std::string& propName) const
 {
   return properties.find(propName) != properties.end();
 }
 
-const Any EMEvent::GetProperty(const std::string& propName) const
+const Any Event::GetProperty(const std::string& propName) const
 {
   auto itr = properties.find(propName);
   if (itr == properties.end()) {
@@ -77,29 +78,30 @@ const Any EMEvent::GetProperty(const std::string& propName) const
   return itr->second;
 }
 
-const AnyMap EMEvent::GetProperties() const
+const AnyMap Event::GetProperties() const
 {
   return properties;
 }
 
-std::vector<std::string> EMEvent::GetPropertyNames() const
+std::vector<std::string> Event::GetPropertyNames() const
 {
   std::vector<std::string> props(properties.size());
 
   size_t index = 0;
-  for (const auto& [key, _] : properties) {
+  for (const auto& [key, value] : properties) {
+    US_UNUSED(value);
     props[index++] = key;
   }
 
   return props;
 }
 
-std::string EMEvent::GetTopic() const
+std::string Event::GetTopic() const
 {
   return topic;
 }
 
-bool EMEvent::Matches(const LDAPFilter& filter) const
+bool Event::Matches(const LDAPFilter& filter) const
 {
   return filter.Match(properties);
 }

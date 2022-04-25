@@ -98,13 +98,23 @@ private:
 
 SCRAsyncWorkService::SCRAsyncWorkService(
   cppmicroservices::BundleContext context,
-  const std::shared_ptr<SCRLogger>& logger_)
+  const std::shared_ptr<cppmicroservices::logservice::LogService>& logger_)
   : scrContext(context)
   , serviceTracker(std::make_unique<cppmicroservices::ServiceTracker<
                      cppmicroservices::async::AsyncWorkService>>(context, this))
-  , asyncWorkService(std::make_shared<FallbackAsyncWorkService>(logger_))
+  , asyncWorkService(nullptr)
   , logger(logger_)
 {
+  auto asyncWSSRef =
+    context.GetServiceReference<cppmicroservices::async::AsyncWorkService>();
+  if (asyncWSSRef) {
+    asyncWorkService =
+      context.GetService<cppmicroservices::async::AsyncWorkService>(
+        asyncWSSRef);
+  } else {
+    asyncWorkService = std::make_shared<FallbackAsyncWorkService>(logger_);
+  }
+
   serviceTracker->Open();
 }
 

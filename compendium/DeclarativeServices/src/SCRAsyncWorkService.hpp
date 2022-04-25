@@ -48,8 +48,9 @@ class SCRAsyncWorkService final
       cppmicroservices::async::AsyncWorkService>
 {
 public:
-  explicit SCRAsyncWorkService(cppmicroservices::BundleContext context,
-                               const std::shared_ptr<SCRLogger>& logger_);
+  explicit SCRAsyncWorkService(
+    cppmicroservices::BundleContext context,
+    const std::shared_ptr<cppmicroservices::logservice::LogService>& logger_);
   SCRAsyncWorkService(const SCRAsyncWorkService&) noexcept = delete;
   SCRAsyncWorkService(SCRAsyncWorkService&&) noexcept = delete;
   SCRAsyncWorkService& operator=(const SCRAsyncWorkService&) noexcept = delete;
@@ -85,7 +86,7 @@ private:
     cppmicroservices::ServiceTracker<cppmicroservices::async::AsyncWorkService>>
     serviceTracker;
   std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
-  std::shared_ptr<SCRLogger> logger;
+  std::shared_ptr<cppmicroservices::logservice::LogService> logger;
 };
 }
 }

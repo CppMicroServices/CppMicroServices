@@ -10,10 +10,6 @@ include(GenerateExportHeader)
 
 # Detect "local" build (build from getting started directory)
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-  set(IS_LOCAL_BUILD ON)
-endif()
-
-if (IS_LOCAL_BUILD)
   # Set binary and library output directories
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")

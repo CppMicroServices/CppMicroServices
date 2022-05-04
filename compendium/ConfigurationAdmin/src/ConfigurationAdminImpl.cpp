@@ -345,7 +345,9 @@ ConfigurationAdminImpl::ListConfigurations(const std::string& filter)
     if (filter.empty()) {
       result.reserve(configurations.size());
       for (const auto& it : configurations) {
-        result.push_back(it.second);
+        if (!it.second->GetProperties().empty()) {
+          result.push_back(it.second);
+        }
       }
       return result;
     }
@@ -357,12 +359,16 @@ ConfigurationAdminImpl::ListConfigurations(const std::string& filter)
     };
 
     for (const auto& it : configurations) {
+      // empty configurations (those with an empty set of properties) cannot be
+      // returned.
+      if (it.second->GetProperties().empty()) {
+        continue;
+      }
       /* Create an AnyMap containing the pid or factoryPid so that the ldap filter 
-	 * functionality can be used to match the pid to the 
-	 * input parameter. Easy way to do the comparison since input parameter could 
-	 * contain a regular expression 
-	 */
-
+	   * functionality can be used to match the pid to the 
+	   * input parameter. Easy way to do the comparison since input parameter could 
+	   * contain a regular expression 
+	   */
       pidMap["pid"] = it.first;
 
       if (ldap.Match(pidMap)) {

@@ -303,6 +303,18 @@ TEST_F(TestConfigurationAdminImpl, VerifyListConfigurations)
   EXPECT_EQ(res2.size(), 1);
   EXPECT_EQ(res2[0]->GetPid(), pid2);
   EXPECT_TRUE(res3.empty());
+
+  // ListConfigurations should not return empty config objects (i.e. those with no properties)
+  const auto emptyConfig = configAdmin.GetConfiguration("test.pid.emptyconfig");
+  const auto emptyConfigResult =
+    configAdmin.ListConfigurations("(pid=test.pid.emptyconfig)");
+  EXPECT_TRUE(emptyConfigResult.empty());
+
+  // ListConfigurations should not return empty config objects when returning
+  // all available configs
+  const auto allConfigsResult =
+    configAdmin.ListConfigurations();
+  EXPECT_EQ(allConfigsResult.size(), 2ul);
 }
 
 TEST_F(TestConfigurationAdminImpl, VerifyAddConfigurations)

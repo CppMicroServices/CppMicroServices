@@ -22,19 +22,71 @@
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/Constants.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/LDAPFilter.h"
+#include "cppmicroservices/LDAPProp.h"
+#include "cppmicroservices/ServiceFactory.h"
 #include "cppmicroservices/ServiceObjects.h"
 #include "cppmicroservices/ServiceReference.h"
 
+#include "TestUtils.h"
+#include "TestingConfig.h"
+
 #include <chrono>
+#include <future>
+#include <thread>
+
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
+using namespace cppmicroservices;
+using namespace cppmicroservices::testing;
 
 namespace bc_tests {
 struct TestService
 {
   virtual ~TestService() {}
+};
+// Service interfaces
+struct ITestServiceA
+{
+  virtual ~ITestServiceA() {}
+};
+
+struct ITestServiceB
+{
+  virtual ~ITestServiceB() {}
+};
+
+// Service implementations
+struct TestServiceAImpl : public ITestServiceA
+{};
+}
+
+namespace cppmicroservices {
+struct TestBundleH
+{
+  virtual ~TestBundleH() {}
+};
+
+struct TestBundleH2
+{
+  virtual ~TestBundleH2() {}
+};
+// Mocks
+class MockFactory : public ServiceFactory
+{
+public:
+  MOCK_METHOD2(GetService,
+               InterfaceMapConstPtr(const Bundle&,
+                                    const ServiceRegistrationBase&));
+  MOCK_METHOD3(UngetService,
+               void(const Bundle&,
+                    const ServiceRegistrationBase&,
+                    const InterfaceMapConstPtr&));
 };
 }
 
@@ -136,4 +188,60 @@ TEST(BundleContextTest, BundleContextThrowWhenInvalid)
   EXPECT_THROW({ (void)context2.InstallBundles("this/doesnt/matter"); },
                std::runtime_error)
     << "InstallBundles() on invalid BundleContext did not throw.";
+}
+
+TEST(BundleContextTest, NoSegfaultWithGetServiceShutdownRace)
+{
+  cppmicroservices::Framework framework =
+    cppmicroservices::FrameworkFactory().NewFramework();
+  ASSERT_TRUE(framework) << "The framework was not created successfully.";
+  framework.Start();
+
+  auto context = framework.GetBundleContext();
+  ASSERT_TRUE(context) << "The bundle context is not valid.";
+
+  std::thread thread([&framework]() {
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+  });
+
+  // Register a service and get a service reference for testing
+  // GetService() later.
+  (void)context.RegisterService<bc_tests::TestService>(
+    std::make_shared<bc_tests::TestService>());
+
+  thread.join();
+}
+
+TEST(BundleContextTest, NoSegfaultWithServiceFactory)
+{
+  // Install and start test bundle H, a service factory and test that the methods
+  // in that interface works.
+  cppmicroservices::Framework framework = FrameworkFactory().NewFramework();
+  framework.Start();
+  auto context = framework.GetBundleContext();
+
+  InstallLib(context, "TestBundleH").Start();
+
+  // Test getting a service object from a service factory which throws an exception
+  std::string getServiceThrowsFilter(LDAPProp("getservice_exception") == true);
+  auto svcGetServiceThrowsRefs(context.GetServiceReferences(
+    "cppmicroservices::TestBundleH", getServiceThrowsFilter));
+  //Test that Number of service references returned is 1.
+  ASSERT_EQ(svcGetServiceThrowsRefs.size(), 1);
+  //Test that 'getservice_exception' service property is 'true'
+  ASSERT_EQ("1",
+            svcGetServiceThrowsRefs[0]
+              .GetProperty(std::string("getservice_exception"))
+              .ToString());
+
+  std::thread thread([&framework]() {
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+  });
+
+  //Test that the service object returned is a nullptr
+  ASSERT_EQ(nullptr, context.GetService(svcGetServiceThrowsRefs[0]));
+
+  thread.join();
 }

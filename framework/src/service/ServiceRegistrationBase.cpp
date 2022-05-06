@@ -243,8 +243,10 @@ void ServiceRegistrationBase::Unregister()
     d->available = false;
     auto factoryIter = d->service->find("org.cppmicroservices.factory");
     if (auto bundle = d->bundle.lock() && factoryIter != d->service->end()) {
-      serviceFactory =
-        std::static_pointer_cast<ServiceFactory>(factoryIter->second);
+      if (bundle) {
+        serviceFactory =
+          std::static_pointer_cast<ServiceFactory>(factoryIter->second);
+      }
     }
     if (serviceFactory) {
       prototypeServiceInstances = d->prototypeServiceInstances;

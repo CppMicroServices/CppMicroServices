@@ -50,43 +50,12 @@ struct TestService
 {
   virtual ~TestService() {}
 };
-// Service interfaces
-struct ITestServiceA
-{
-  virtual ~ITestServiceA() {}
-};
-
-struct ITestServiceB
-{
-  virtual ~ITestServiceB() {}
-};
-
-// Service implementations
-struct TestServiceAImpl : public ITestServiceA
-{};
 }
 
 namespace cppmicroservices {
 struct TestBundleH
 {
   virtual ~TestBundleH() {}
-};
-
-struct TestBundleH2
-{
-  virtual ~TestBundleH2() {}
-};
-// Mocks
-class MockFactory : public ServiceFactory
-{
-public:
-  MOCK_METHOD2(GetService,
-               InterfaceMapConstPtr(const Bundle&,
-                                    const ServiceRegistrationBase&));
-  MOCK_METHOD3(UngetService,
-               void(const Bundle&,
-                    const ServiceRegistrationBase&,
-                    const InterfaceMapConstPtr&));
 };
 }
 

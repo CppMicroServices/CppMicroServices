@@ -190,7 +190,7 @@ TEST(BundleContextTest, BundleContextThrowWhenInvalid)
     << "InstallBundles() on invalid BundleContext did not throw.";
 }
 
-TEST(BundleContextTest, NoSegfaultWithGetServiceShutdownRace)
+TEST(BundleContextTest, NoSegfaultWithRegisterServiceShutdownRace)
 {
   cppmicroservices::Framework framework =
     cppmicroservices::FrameworkFactory().NewFramework();
@@ -205,8 +205,6 @@ TEST(BundleContextTest, NoSegfaultWithGetServiceShutdownRace)
     framework.WaitForStop(std::chrono::milliseconds::zero());
   });
 
-  // Register a service and get a service reference for testing
-  // GetService() later.
   (void)context.RegisterService<bc_tests::TestService>(
     std::make_shared<bc_tests::TestService>());
 
@@ -215,21 +213,17 @@ TEST(BundleContextTest, NoSegfaultWithGetServiceShutdownRace)
 
 TEST(BundleContextTest, NoSegfaultWithServiceFactory)
 {
-  // Install and start test bundle H, a service factory and test that the methods
-  // in that interface works.
   cppmicroservices::Framework framework = FrameworkFactory().NewFramework();
   framework.Start();
   auto context = framework.GetBundleContext();
 
   InstallLib(context, "TestBundleH").Start();
 
-  // Test getting a service object from a service factory which throws an exception
   std::string getServiceThrowsFilter(LDAPProp("getservice_exception") == true);
   auto svcGetServiceThrowsRefs(context.GetServiceReferences(
     "cppmicroservices::TestBundleH", getServiceThrowsFilter));
-  //Test that Number of service references returned is 1.
+
   ASSERT_EQ(svcGetServiceThrowsRefs.size(), 1);
-  //Test that 'getservice_exception' service property is 'true'
   ASSERT_EQ("1",
             svcGetServiceThrowsRefs[0]
               .GetProperty(std::string("getservice_exception"))
@@ -240,7 +234,6 @@ TEST(BundleContextTest, NoSegfaultWithServiceFactory)
     framework.WaitForStop(std::chrono::milliseconds::zero());
   });
 
-  //Test that the service object returned is a nullptr
   ASSERT_EQ(nullptr, context.GetService(svcGetServiceThrowsRefs[0]));
 
   thread.join();

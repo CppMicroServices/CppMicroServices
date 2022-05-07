@@ -313,16 +313,17 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
 
   for (auto& bundleListeners : filteredBundleListeners) {
     for (auto& bundleListener : bundleListeners.second) {
+      auto bundle_ = bundleListeners.first->bundle.lock();
       try {
         std::get<0>(bundleListener.second)(evt);
       } catch (const cppmicroservices::SharedLibraryException&) {
-        SendFrameworkEvent(FrameworkEvent(
-          FrameworkEvent::Type::FRAMEWORK_ERROR,
-          MakeBundle(bundleListeners.first->bundle->shared_from_this()),
-          std::string("Bundle listener threw an exception"),
-          std::current_exception()));
+        SendFrameworkEvent(
+          FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                         MakeBundle(bundle_),
+                         std::string("Bundle listener threw an exception"),
+                         std::current_exception()));
         throw;
-      } catch(const cppmicroservices::SecurityException&) {
+      } catch (const cppmicroservices::SecurityException&) {
         SendFrameworkEvent(FrameworkEvent{
           FrameworkEvent::Type::FRAMEWORK_ERROR,
           evt.GetOrigin(),
@@ -330,11 +331,11 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
           std::current_exception() });
         throw;
       } catch (...) {
-        SendFrameworkEvent(FrameworkEvent(
-          FrameworkEvent::Type::FRAMEWORK_ERROR,
-          MakeBundle(bundleListeners.first->bundle->shared_from_this()),
-          std::string("Bundle listener threw an exception"),
-          std::current_exception()));
+        SendFrameworkEvent(
+          FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                         MakeBundle(bundle_),
+                         std::string("Bundle listener threw an exception"),
+                         std::current_exception()));
       }
     }
   }

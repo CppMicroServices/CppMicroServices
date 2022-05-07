@@ -54,8 +54,8 @@ std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext& c)
   return c.d;
 }
 
-BundleContextPrivate::BundleContextPrivate(BundlePrivate* bundle)
-  : bundle(bundle)
+BundleContextPrivate::BundleContextPrivate(BundlePrivate* bundle_)
+  : bundle(bundle_->shared_from_this())
   , valid(true)
 {}
 
@@ -74,7 +74,10 @@ void BundleContextPrivate::CheckValid() const
 void BundleContextPrivate::Invalidate()
 {
   valid = false;
-  if (bundle->SetBundleContext)
-    bundle->SetBundleContext(nullptr);
+  if (auto bundle_ = bundle.lock()) {
+    if (bundle_->SetBundleContext) {
+      bundle_->SetBundleContext(nullptr);
+    }
+  }
 }
 }

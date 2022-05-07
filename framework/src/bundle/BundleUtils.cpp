@@ -80,8 +80,9 @@ namespace cppmicroservices {
 // Private util function to return system bundle's log sink
 std::shared_ptr<detail::LogSink> GetFrameworkLogSink()
 {
+  auto bundle_ = GetPrivate(GetBundleContext())->bundle.lock();
   // The following is a hack, we need a cleaner solution in the future
-  return GetPrivate(GetBundleContext())->bundle->coreCtx->sink;
+  return bundle_->coreCtx->sink;
 }
 
 namespace BundleUtils {

@@ -875,7 +875,7 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
     notifier,
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>());
 
-  (void)GetFramework().GetBundleContext().RegisterService<dummy::ServiceImpl>(std::make_shared<dummy::ServiceImpl>());
+  auto svcReg = GetFramework().GetBundleContext().RegisterService<dummy::ServiceImpl>(std::make_shared<dummy::ServiceImpl>());
   
   // update config object to satisfy component configuration
   test::InstallAndStartConfigAdmin(GetFramework().GetBundleContext());
@@ -897,6 +897,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
   fakeBundleProtoCompConfig->Initialize();
   EXPECT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::SATISFIED,
       fakeBundleProtoCompConfig->GetConfigState());
+
+  svcReg.Unregister();
+  svcReg = nullptr;
 }
 }
 }

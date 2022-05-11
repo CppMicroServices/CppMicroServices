@@ -40,6 +40,19 @@
 
 namespace cppmicroservices {
 
+namespace {
+std::shared_ptr<BundlePrivate> GetAndCheckBundlePrivate(
+  const std::shared_ptr<BundleContextPrivate>& d)
+{
+  auto b = (d->Lock(), d->bundle.lock());
+  if (!b) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
+
+  return b;
+}
+}
+
 BundleContext::BundleContext(std::shared_ptr<BundleContextPrivate> ctx)
   : d(std::move(ctx))
 {}
@@ -94,10 +107,7 @@ Any BundleContext::GetProperty(const std::string& key) const
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   auto iter = b->coreCtx->frameworkProperties.find(key);
   return iter == b->coreCtx->frameworkProperties.end() ? Any() : iter->second;
@@ -110,10 +120,7 @@ AnyMap BundleContext::GetProperties() const
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->frameworkProperties;
 }
@@ -125,10 +132,7 @@ Bundle BundleContext::GetBundle() const
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   return MakeBundle(b);
 }
@@ -140,10 +144,7 @@ Bundle BundleContext::GetBundle(long id) const
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->bundleHooks.FilterBundle(
     *this, MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id)));
@@ -156,10 +157,7 @@ std::vector<Bundle> BundleContext::GetBundles(const std::string& location) const
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   std::vector<Bundle> res;
   for (auto bu : b->coreCtx->bundleRegistry.GetBundles(location)) {
@@ -175,10 +173,7 @@ std::vector<Bundle> BundleContext::GetBundles() const
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   std::vector<Bundle> bus;
   for (auto bu : b->coreCtx->bundleRegistry.GetBundles()) {
@@ -197,10 +192,7 @@ ServiceRegistrationU BundleContext::RegisterService(
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->services.RegisterService(b.get(), service, properties);
 }
@@ -214,10 +206,7 @@ std::vector<ServiceReferenceU> BundleContext::GetServiceReferences(
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   std::vector<ServiceReferenceBase> refs;
   b->coreCtx->services.Get(clazz, filter, b.get(), refs);
@@ -231,10 +220,7 @@ ServiceReferenceU BundleContext::GetServiceReference(const std::string& clazz)
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->services.Get(b.get(), clazz);
 }
@@ -295,10 +281,7 @@ std::shared_ptr<void> BundleContext::GetService(
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>(
     b, reference, reference.d.load()->GetService(b.get())));
@@ -318,10 +301,7 @@ InterfaceMapConstPtr BundleContext::GetService(
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   auto serviceInterfaceMap =
     reference.d.load()->GetServiceInterfaceMap(b.get());
@@ -338,10 +318,7 @@ ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->listeners.AddServiceListener(d, delegate, nullptr, filter);
 }
@@ -353,10 +330,7 @@ void BundleContext::RemoveServiceListener(const ServiceListener& delegate)
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   b->coreCtx->listeners.RemoveServiceListener(
     d, ListenerTokenId(0), delegate, nullptr);
@@ -369,10 +343,7 @@ ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate)
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->listeners.AddBundleListener(d, delegate, nullptr);
 }
@@ -384,10 +355,7 @@ void BundleContext::RemoveBundleListener(const BundleListener& delegate)
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   b->coreCtx->listeners.RemoveBundleListener(d, delegate, nullptr);
 }
@@ -400,10 +368,7 @@ ListenerToken BundleContext::AddFrameworkListener(
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->listeners.AddFrameworkListener(d, listener, nullptr);
 }
@@ -415,10 +380,7 @@ void BundleContext::RemoveFrameworkListener(const FrameworkListener& listener)
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   b->coreCtx->listeners.RemoveFrameworkListener(d, listener, nullptr);
 }
@@ -432,10 +394,7 @@ ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->listeners.AddServiceListener(d, delegate, data, filter);
 }
@@ -448,10 +407,7 @@ void BundleContext::RemoveServiceListener(const ServiceListener& delegate,
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   b->coreCtx->listeners.RemoveServiceListener(
     d, ListenerTokenId(0), delegate, data);
@@ -465,10 +421,7 @@ ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate,
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->listeners.AddBundleListener(d, delegate, data);
 }
@@ -481,10 +434,7 @@ void BundleContext::RemoveBundleListener(const BundleListener& delegate,
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   b->coreCtx->listeners.RemoveBundleListener(d, delegate, data);
 }
@@ -496,10 +446,7 @@ void BundleContext::RemoveListener(ListenerToken token)
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   b->coreCtx->listeners.RemoveListener(d, std::move(token));
 }
@@ -511,10 +458,7 @@ std::string BundleContext::GetDataFile(const std::string& filename) const
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   std::string dataRoot = b->bundleDir;
   if (!dataRoot.empty()) {
@@ -535,10 +479,7 @@ std::vector<Bundle> BundleContext::InstallBundles(
   }
 
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle.lock());
-  if (!b) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->bundleRegistry.Install(location, b.get(), bundleManifest);
 }

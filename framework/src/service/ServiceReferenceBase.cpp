@@ -98,13 +98,15 @@ std::vector<std::string> ServiceReferenceBase::GetPropertyKeys() const
 Bundle ServiceReferenceBase::GetBundle() const
 {
   auto p = d.load();
-  if (p->registration == nullptr)
+  if (p->registration == nullptr) {
     return Bundle();
+  }
 
   auto l = p->registration->Lock();
   US_UNUSED(l);
-  if (p->registration->bundle.lock() == nullptr)
+  if (p->registration->bundle.lock() == nullptr) {
     return Bundle();
+  }
   return MakeBundle(p->registration->bundle.lock()->shared_from_this());
 }
 

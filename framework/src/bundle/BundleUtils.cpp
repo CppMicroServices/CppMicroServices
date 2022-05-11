@@ -81,8 +81,12 @@ namespace cppmicroservices {
 std::shared_ptr<detail::LogSink> GetFrameworkLogSink()
 {
   auto bundle_ = GetPrivate(GetBundleContext())->bundle.lock();
-  // The following is a hack, we need a cleaner solution in the future
-  return bundle_->coreCtx->sink;
+  if (bundle_) {
+    // The following is a hack, we need a cleaner solution in the future
+    return bundle_->coreCtx->sink;
+  } else {
+    return nullptr;
+  }
 }
 
 namespace BundleUtils {

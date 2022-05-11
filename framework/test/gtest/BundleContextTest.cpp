@@ -22,19 +22,40 @@
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/Constants.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/LDAPFilter.h"
+#include "cppmicroservices/LDAPProp.h"
+#include "cppmicroservices/ServiceFactory.h"
 #include "cppmicroservices/ServiceObjects.h"
 #include "cppmicroservices/ServiceReference.h"
 
+#include "TestUtils.h"
+#include "TestingConfig.h"
+
 #include <chrono>
+#include <future>
+#include <thread>
+
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
+using namespace cppmicroservices;
+using namespace cppmicroservices::testing;
 
 namespace bc_tests {
 struct TestService
 {
   virtual ~TestService() {}
+};
+}
+
+namespace cppmicroservices {
+struct TestBundleH
+{
+  virtual ~TestBundleH() {}
 };
 }
 
@@ -136,4 +157,53 @@ TEST(BundleContextTest, BundleContextThrowWhenInvalid)
   EXPECT_THROW({ (void)context2.InstallBundles("this/doesnt/matter"); },
                std::runtime_error)
     << "InstallBundles() on invalid BundleContext did not throw.";
+}
+
+TEST(BundleContextTest, NoSegfaultWithRegisterServiceShutdownRace)
+{
+  cppmicroservices::Framework framework =
+    cppmicroservices::FrameworkFactory().NewFramework();
+  ASSERT_TRUE(framework) << "The framework was not created successfully.";
+  framework.Start();
+
+  auto context = framework.GetBundleContext();
+  ASSERT_TRUE(context) << "The bundle context is not valid.";
+
+  std::thread thread([&framework]() {
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+  });
+
+  (void)context.RegisterService<bc_tests::TestService>(
+    std::make_shared<bc_tests::TestService>());
+
+  thread.join();
+}
+
+TEST(BundleContextTest, NoSegfaultWithServiceFactory)
+{
+  cppmicroservices::Framework framework = FrameworkFactory().NewFramework();
+  framework.Start();
+  auto context = framework.GetBundleContext();
+
+  InstallLib(context, "TestBundleH").Start();
+
+  std::string getServiceThrowsFilter(LDAPProp("getservice_exception") == true);
+  auto svcGetServiceThrowsRefs(context.GetServiceReferences(
+    "cppmicroservices::TestBundleH", getServiceThrowsFilter));
+
+  ASSERT_EQ(svcGetServiceThrowsRefs.size(), 1);
+  ASSERT_EQ("1",
+            svcGetServiceThrowsRefs[0]
+              .GetProperty(std::string("getservice_exception"))
+              .ToString());
+
+  std::thread thread([&framework]() {
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+  });
+
+  ASSERT_EQ(nullptr, context.GetService(svcGetServiceThrowsRefs[0]));
+
+  thread.join();
 }

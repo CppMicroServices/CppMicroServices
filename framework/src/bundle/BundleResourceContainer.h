@@ -118,7 +118,7 @@ private:
   /// Opens the zip file so that data can be accessed.
   /// This function is thread-safe.
   /// Throws std::runtime_error if the underlying zip file cannot be opened.
-  void OpenContainer() const;
+  void OpenAndInitializeContainer() const;
 
   const std::string m_Location;
   mutable mz_zip_archive m_ZipArchive;

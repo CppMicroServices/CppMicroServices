@@ -159,6 +159,7 @@ TEST(BundleContextTest, BundleContextThrowWhenInvalid)
     << "InstallBundles() on invalid BundleContext did not throw.";
 }
 
+#if defined(US_ENABLE_THREADING_SUPPORT)
 TEST(BundleContextTest, NoSegfaultWithRegisterServiceShutdownRace)
 {
   cppmicroservices::Framework framework =
@@ -213,3 +214,4 @@ TEST(BundleContextTest, NoSegfaultWithServiceFactory)
 
   thread.join();
 }
+#endif

@@ -65,14 +65,7 @@ BundleResourceContainer::BundleResourceContainer(
       m_SortedToplevelDirs.insert(b.first);
     }
   } else {
-    InitMiniz();
-
-    InitSortedEntries();
-    if (m_SortedToplevelDirs.empty()) {
-      throw std::runtime_error("Invalid zip archive layout for bundle at " +
-                               m_Location);
-    }
-    m_IsContainerOpen = true;
+    OpenAndInitializeContainer();
   }
 }
 
@@ -97,7 +90,7 @@ std::vector<std::string> BundleResourceContainer::GetTopLevelDirs() const
 
 bool BundleResourceContainer::GetStat(BundleResourceContainer::Stat& stat)
 {
-  OpenContainer();
+  OpenAndInitializeContainer();
   int fileIndex =
     mz_zip_reader_locate_file(const_cast<mz_zip_archive*>(&m_ZipArchive),
                               stat.filePath.c_str(),
@@ -112,7 +105,7 @@ bool BundleResourceContainer::GetStat(BundleResourceContainer::Stat& stat)
 bool BundleResourceContainer::GetStat(int index,
                                       BundleResourceContainer::Stat& stat)
 {
-  OpenContainer();
+  OpenAndInitializeContainer();
   if (index >= 0) {
     mz_zip_archive_file_stat zipStat;
     if (!mz_zip_reader_file_stat(
@@ -142,7 +135,7 @@ bool BundleResourceContainer::GetStat(int index,
 std::unique_ptr<void, void (*)(void*)> BundleResourceContainer::GetData(
   int index)
 {
-  OpenContainer();
+  OpenAndInitializeContainer();
   std::unique_lock<std::mutex> l(m_ZipFileStreamMutex);
   void* data = mz_zip_reader_extract_to_heap(
     const_cast<mz_zip_archive*>(&m_ZipArchive), index, nullptr, 0);
@@ -186,6 +179,8 @@ void BundleResourceContainer::FindNodes(
   std::vector<std::string> names;
   std::vector<uint32_t> indices;
 
+  OpenAndInitializeContainer();
+
   this->GetChildren(path, true, names, indices);
 
   for (std::size_t i = 0, s = names.size(); i < s; ++i) {
@@ -199,7 +194,7 @@ void BundleResourceContainer::FindNodes(
   }
 }
 
-void BundleResourceContainer::InitMiniz()
+void BundleResourceContainer::InitMiniz() const
 {
   // Assume that the bundle had its meta-data linked into a data section.
   // If this assumption is false, fall back to reading the meta-data in a
@@ -226,7 +221,7 @@ void BundleResourceContainer::InitMiniz()
   }
 }
 
-void BundleResourceContainer::InitSortedEntries()
+void BundleResourceContainer::InitSortedEntries() const
 {
   mz_uint numFiles =
     mz_zip_reader_get_num_files(const_cast<mz_zip_archive*>(&m_ZipArchive));
@@ -265,11 +260,17 @@ bool BundleResourceContainer::Matches(const std::string& name,
   return true;
 }
 
-void BundleResourceContainer::OpenContainer()
+void BundleResourceContainer::OpenAndInitializeContainer() const
 {
   std::lock_guard<std::mutex> lock(m_ZipFileMutex);
   if (!m_IsContainerOpen) {
     InitMiniz();
+
+    InitSortedEntries();
+    if (m_SortedToplevelDirs.empty()) {
+      throw std::runtime_error("Invalid zip archive layout for bundle at " +
+                               m_Location);
+    }
     m_IsContainerOpen = true;
   }
 }

@@ -98,8 +98,9 @@ std::vector<std::string> ServiceReferenceBase::GetPropertyKeys() const
 Bundle ServiceReferenceBase::GetBundle() const
 {
   auto p = d.load();
-  if (p->registration == nullptr)
+  if (p->registration == nullptr) {
     return Bundle();
+  }
 
   auto l = p->registration->Lock();
   US_UNUSED(l);

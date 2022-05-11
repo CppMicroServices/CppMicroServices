@@ -174,8 +174,14 @@ TEST(BundleContextTest, NoSegfaultWithRegisterServiceShutdownRace)
     framework.WaitForStop(std::chrono::milliseconds::zero());
   });
 
-  (void)context.RegisterService<bc_tests::TestService>(
-    std::make_shared<bc_tests::TestService>());
+  try {
+    (void)context.RegisterService<bc_tests::TestService>(
+      std::make_shared<bc_tests::TestService>());
+  } catch (...) {
+    // The above can throw, and should, in the case where it would previously segfault
+    // due to the check-then-act race. In the event it throws, we will ignore it as this
+    // is desired.
+  }
 
   thread.join();
 }

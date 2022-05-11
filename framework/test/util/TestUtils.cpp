@@ -161,6 +161,7 @@ Bundle InstallLib(BundleContext frameworkCtx,
                                   libName + US_LIB_POSTFIX + US_LIB_EXT,
                                 bundleManifest);
 #else
+  US_UNUSED(bundleManifest);
   bundles = frameworkCtx.GetBundles();
 #endif
 

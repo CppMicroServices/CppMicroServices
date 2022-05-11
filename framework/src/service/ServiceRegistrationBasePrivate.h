@@ -93,7 +93,7 @@ public:
   /**
    * Bundle registering this service.
    */
-  BundlePrivate* bundle;
+  std::weak_ptr<BundlePrivate> bundle;
 
   /**
    * Reference object to this service registration.

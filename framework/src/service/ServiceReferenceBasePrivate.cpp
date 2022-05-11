@@ -24,9 +24,9 @@
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/FrameworkEvent.h"
+#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/ServiceException.h"
 #include "cppmicroservices/ServiceFactory.h"
-#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 
 #include "BundlePrivate.h"
@@ -72,15 +72,17 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
       factory->GetService(MakeBundle(bundle->shared_from_this()),
                           ServiceRegistrationBase(registration));
     if (!smap || smap->empty()) {
-      std::string message =
-        "ServiceFactory returned an empty or nullptr interface map.";
-      registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-        FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                       MakeBundle(bundle->shared_from_this()),
-                       message,
-                       std::make_exception_ptr(ServiceException(
-                         message, ServiceException::Type::FACTORY_ERROR))));
-      return smap;
+      if (auto bundle_ = registration->bundle.lock()) {
+        std::string message =
+          "ServiceFactory returned an empty or nullptr interface map.";
+        bundle_->coreCtx->listeners.SendFrameworkEvent(
+          FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                         MakeBundle(bundle->shared_from_this()),
+                         message,
+                         std::make_exception_ptr(ServiceException(
+                           message, ServiceException::Type::FACTORY_ERROR))));
+        return smap;
+      }
     }
     std::vector<std::string> classes =
       (registration->properties.Lock(),
@@ -89,41 +91,50 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
     for (auto clazz : classes) {
       if (smap->find(clazz) == smap->end() &&
           clazz != "org.cppmicroservices.factory") {
-        std::string message(
-          "ServiceFactory produced an object that did not implement: " + clazz);
-        registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-          FrameworkEvent(
+        if (auto bundle_ = registration->bundle.lock()) {
+          std::string message(
+            "ServiceFactory produced an object that did not implement: " +
+            clazz);
+          bundle_->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
             FrameworkEvent::Type::FRAMEWORK_WARNING,
             MakeBundle(bundle->shared_from_this()),
             message,
             std::make_exception_ptr(std::logic_error(message.c_str()))));
+        }
         return nullptr;
       }
     }
     s = smap;
   } catch (const cppmicroservices::SharedLibraryException& ex) {
-    registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-      FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                     ex.GetBundle(),
-                     "Failed to load shared library",
-                     std::current_exception()));
+    if (auto bundle = registration->bundle.lock()) {
+      bundle->coreCtx->listeners.SendFrameworkEvent(
+        FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                       ex.GetBundle(),
+                       "Failed to load shared library",
+                       std::current_exception()));
+    }
     throw;
   } catch (const cppmicroservices::SecurityException& ex) {
-    bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent{
-      FrameworkEvent::Type::FRAMEWORK_ERROR,
-      ex.GetBundle(),
-      std::string("Failed to load shared library due to a security exception"),
-      std::current_exception() });
+    if (bundle) {
+      bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent{
+        FrameworkEvent::Type::FRAMEWORK_ERROR,
+        ex.GetBundle(),
+        std::string(
+          "Failed to load shared library due to a security exception"),
+        std::current_exception() });
+    }
     throw;
   } catch (const std::exception& ex) {
     s.reset();
     std::string message = "ServiceFactory threw an unknown exception.";
-    registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-      FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
-                     MakeBundle(bundle->shared_from_this()),
-                     message,
-                     std::make_exception_ptr(ServiceException(
-                       ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
+    if (auto bundle_ = registration->bundle.lock()) {
+      bundle_->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
+        FrameworkEvent::Type::FRAMEWORK_ERROR,
+        MakeBundle(bundle->shared_from_this()),
+        message,
+        std::make_exception_ptr(ServiceException(
+          ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
+    }
   }
   return s;
 }
@@ -226,7 +237,10 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceInterfaceMap(
                        std::make_exception_ptr(ServiceException(
                          msg, ServiceException::FACTORY_RECURSION)));
 
-      registration->bundle->coreCtx->listeners.SendFrameworkEvent(fwEvent);
+      if (auto bundle = registration->bundle.lock()) {
+        bundle->coreCtx->listeners.SendFrameworkEvent(fwEvent);
+      }
+
       return nullptr;
     }
 
@@ -295,14 +309,15 @@ bool ServiceReferenceBasePrivate::UngetPrototypeService(
         sf->UngetService(
           MakeBundle(bundle), ServiceRegistrationBase(registration), service);
       } catch (const std::exception& ex) {
-        std::string message("ServiceFactory threw an exception");
-        registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-          FrameworkEvent(
+        if (auto bundle_ = registration->bundle.lock()) {
+          std::string message("ServiceFactory threw an exception");
+          bundle_->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
             FrameworkEvent::Type::FRAMEWORK_ERROR,
             MakeBundle(bundle->shared_from_this()),
             message,
             std::make_exception_ptr(ServiceException(
               ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
+        }
       }
 
       auto l = registration->Lock();
@@ -377,14 +392,15 @@ bool ServiceReferenceBasePrivate::UngetService(
       sf->UngetService(
         MakeBundle(bundle), ServiceRegistrationBase(registration), sfi);
     } catch (const std::exception& ex) {
-      std::string message("ServiceFactory threw an exception");
-      registration->bundle->coreCtx->listeners.SendFrameworkEvent(
-        FrameworkEvent(
+      if (auto bundle_ = registration->bundle.lock()) {
+        std::string message("ServiceFactory threw an exception");
+        bundle_->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
           FrameworkEvent::Type::FRAMEWORK_ERROR,
           MakeBundle(bundle->shared_from_this()),
           message,
           std::make_exception_ptr(ServiceException(
             ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
+      }
     }
   }
 

@@ -103,9 +103,10 @@ Bundle ServiceReferenceBase::GetBundle() const
 
   auto l = p->registration->Lock();
   US_UNUSED(l);
-  if (p->registration->bundle == nullptr)
+  if (p->registration->bundle.lock() == nullptr) {
     return Bundle();
-  return MakeBundle(p->registration->bundle->shared_from_this());
+  }
+  return MakeBundle(p->registration->bundle.lock()->shared_from_this());
 }
 
 std::vector<Bundle> ServiceReferenceBase::GetUsingBundles() const

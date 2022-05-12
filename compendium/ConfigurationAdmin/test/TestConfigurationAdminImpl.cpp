@@ -290,19 +290,34 @@ TEST_F(TestConfigurationAdminImpl, VerifyListConfigurations)
   const auto conf1 = configAdmin.GetConfiguration(pid1);
   const auto conf2 = configAdmin.GetConfiguration(pid2);
 
+  auto props1 = conf1->GetProperties();
+  props1["foo"] = std::string{ "baz" };
+  EXPECT_NO_THROW(conf1->Update(props1).get());
+
   auto props2 = conf2->GetProperties();
   props2["foo"] = std::string{ "bar" };
-  std::shared_future<void> fut;
-  EXPECT_NO_THROW(fut = conf2->Update(props2));
-  fut.get();
+  EXPECT_NO_THROW(conf2->Update(props2).get());
+
   const auto res1 = configAdmin.ListConfigurations();
   const auto res2 = configAdmin.ListConfigurations("(foo=bar)");
   const auto res3 = configAdmin.ListConfigurations("(foobar=baz)");
 
-  EXPECT_EQ(res1.size(), 2);
-  EXPECT_EQ(res2.size(), 1);
+  EXPECT_EQ(res1.size(), 2ul);
+  EXPECT_EQ(res2.size(), 1ul);
   EXPECT_EQ(res2[0]->GetPid(), pid2);
   EXPECT_TRUE(res3.empty());
+
+  // ListConfigurations should not return empty config objects (i.e. those with no properties)
+  const auto emptyConfig = configAdmin.GetConfiguration("test.pid.emptyconfig");
+  const auto emptyConfigResult =
+    configAdmin.ListConfigurations("(pid=test.pid.emptyconfig)");
+  EXPECT_TRUE(emptyConfigResult.empty());
+
+  // ListConfigurations should not return empty config objects when returning
+  // all available configs
+  const auto allConfigsResult =
+    configAdmin.ListConfigurations();
+  EXPECT_EQ(allConfigsResult.size(), 2ul);
 }
 
 TEST_F(TestConfigurationAdminImpl, VerifyAddConfigurations)

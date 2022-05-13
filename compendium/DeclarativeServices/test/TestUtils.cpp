@@ -149,6 +149,22 @@ std::string GetConfigAdminRuntimePluginFilePath()
   return PathToLib(libName);
 }
 
+void InstallAndStartConfigAdmin(::cppmicroservices::BundleContext frameworkCtx)
+{
+  std::vector<cppmicroservices::Bundle> bundles;
+  auto cmPluginPath = test::GetConfigAdminRuntimePluginFilePath();
+
+  #if defined(US_BUILD_SHARED_LIBS)
+  bundles = frameworkCtx.InstallBundles(cmPluginPath);
+#else
+  bundles = frameworkCtx.GetBundles();
+#endif
+
+  for (auto b : bundles) {
+    b.Start();
+  }
+}
+
 bool isBundleLoadedInThisProcess(std::string bundleName)
 {
 #if defined(US_PLATFORM_WINDOWS)

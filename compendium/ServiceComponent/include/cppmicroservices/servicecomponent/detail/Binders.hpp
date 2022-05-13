@@ -27,6 +27,9 @@
 #include <vector>
 
 #include <cppmicroservices/ServiceReference.h>
+#include "cppmicroservices/servicecomponent/ComponentContext.hpp"
+
+using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
 namespace cppmicroservices {
 namespace service {

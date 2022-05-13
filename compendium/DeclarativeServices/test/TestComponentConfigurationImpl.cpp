@@ -880,7 +880,9 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
   // update config object to satisfy component configuration
   test::InstallAndStartConfigAdmin(GetFramework().GetBundleContext());
   auto svcRef = GetFramework().GetBundleContext().GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+  ASSERT_TRUE(svcRef);
   auto configAdminSvc = GetFramework().GetBundleContext().GetService(svcRef);
+  ASSERT_TRUE(configAdminSvc);
   auto fooConfig = configAdminSvc->GetConfiguration("foo");
   cppmicroservices::AnyMap configData(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   configData["bar"] = std::string{"baz"};
@@ -898,6 +900,10 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
   EXPECT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::SATISFIED,
       fakeBundleProtoCompConfig->GetConfigState());
 
+  fakeCompConfig->Deactivate();
+  fakeCompConfig->Stop();
+  fakeBundleProtoCompConfig->Deactivate();
+  fakeBundleProtoCompConfig->Stop();
   svcReg.Unregister();
   svcReg = nullptr;
 }

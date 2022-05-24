@@ -47,7 +47,7 @@ namespace component {
  *
  * Exception which may be thrown by Service Component Runtime.
  */
-class US_ServiceComponent_EXPORT ComponentException final : std::runtime_error
+class US_ServiceComponent_EXPORT ComponentException final : public std::runtime_error
 {
 public:
   /**

@@ -511,6 +511,7 @@ TEST_F(ConfigAdminTests, testRemoveFactoryConfiguration)
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config2"),
             expectedCount_config2);
 }
+
 // This test confirms that if an object exists in the configuration repository 
 // but has not yet been Updated prior to the start of the ManagedServiceFactory
 // then no Updated notification will be sent. 
@@ -536,6 +537,61 @@ TEST_F(ConfigAdminTests, testDuplicateUpdated)
   // notification will be sent to the ManagedServiceFactory.
   auto result = configuration->UpdateIfDifferent(configurationMap);
   result.second.get();
+
+  auto const serviceFactory = getManagedServiceFactory(ctx);
+  ASSERT_NE(serviceFactory, nullptr);
+
+  EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~0"), 1);
+}
+
+// This test simulates installing and starting a bundle and updating a
+// configuration object used by that bundle on different threads. This 
+// is the same test case as testDuplicateUpdated, except it is meant 
+// to be run in a loop to detect race conditions.
+TEST_F(ConfigAdminTests, testConcurrentDuplicateUpdated)
+{
+  auto f = GetFramework();
+  auto ctx = f.GetBundleContext();
+
+  std::promise<void> go;
+  std::shared_future<void> ready(go.get_future());
+  std::vector<std::promise<void>> readies(2);
+
+  auto installAndStartBundleFuture =
+    std::async(std::launch::async, [&ready, &readies, &ctx]() {
+      readies[0].set_value();
+      ready.wait();
+      // Start the ManagedServiceFactory for cm.testfactory. Since the
+      // cm.testfactory~0 instance has not yet been updated, no Update
+      // notification will be sent to the ManagedServiceFactory.
+      installAndStartTestBundles(ctx, "TestBundleManagedServiceFactory");
+    });
+
+  auto updateConfigFuture =
+    std::async(std::launch::async, [this, &ready, &readies]() {
+      readies[1].set_value();
+      ready.wait();
+
+      // Add cm.testfactory~0 configuration object to the configuration repository
+      auto configuration =
+        m_configAdmin->GetFactoryConfiguration("cm.testfactory", "0");
+
+      auto configurationMap =
+        std::unordered_map<std::string, cppmicroservices::Any>{
+          { "emgrid", std::to_string(0) }
+        };
+      // Update the cm.testfactory~0 configuration object. An Update
+      // notification will be sent to the ManagedServiceFactory.
+      auto result = configuration->UpdateIfDifferent(configurationMap);
+      result.second.get();
+    });
+
+  readies[0].get_future().wait();
+  readies[1].get_future().wait();
+  go.set_value();
+
+  ASSERT_NO_THROW(installAndStartBundleFuture.get());
+  ASSERT_NO_THROW(updateConfigFuture.get());
 
   auto const serviceFactory = getManagedServiceFactory(ctx);
   ASSERT_NE(serviceFactory, nullptr);

@@ -29,6 +29,7 @@
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleEvent.h"
+#include "cppmicroservices/BundleTracker.h"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 #include "manager/ConfigurationNotifier.hpp"

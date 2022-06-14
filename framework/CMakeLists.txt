@@ -36,7 +36,7 @@ usMacroCreateBundle(Framework
   SKIP_INIT # we do it manually
   EMBED_RESOURCE_METHOD LINK
   PRIVATE_INCLUDE_DIRS src/util src/service src/bundle ../third_party ../third_party/absl
-  LINK_LIBRARIES ${_link_libraries}
+  LINK_LIBRARIES ${_link_libraries} usLogService
   SOURCES $<TARGET_OBJECTS:absl> ${_framework_srcs}
   PUBLIC_HEADERS ${_framework_public_headers}
   PRIVATE_HEADERS $<TARGET_PROPERTY:absl,INCLUDE_DIRECTORIES> ${_framework_private_headers}

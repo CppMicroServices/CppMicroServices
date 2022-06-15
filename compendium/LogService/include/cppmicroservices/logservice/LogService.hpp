@@ -22,8 +22,6 @@
 #ifndef CPPMICROSERVICES_LOG_SERVICE_H__
 #define CPPMICROSERVICES_LOG_SERVICE_H__
 
-#include "cppmicroservices/logservice/LogServiceExport.h"
-
 #include "cppmicroservices/ServiceReferenceBase.h"
 
 #include <cstdint>
@@ -71,10 +69,10 @@ enum class SeverityLevel : uint8_t
  *
  * @remarks This class is thread safe.
  */
-class US_usLogService_EXPORT LogService
+class LogService
 {
 public:
-  virtual ~LogService();
+  virtual ~LogService() = default;
 
   /**
    * Logs a message.

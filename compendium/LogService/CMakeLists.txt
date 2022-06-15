@@ -1,11 +1,6 @@
-# sources and headers
-set(_srcs
-  src/LogService.cpp
-  )
-
 set(_public_headers
   include/cppmicroservices/logservice/LogService.hpp
-  )
+)
 
 set(_version "1.0.0")
 project(usLogService VERSION ${_version})
@@ -15,41 +10,14 @@ if(NOT ${PROJECT_NAME}_TARGET)
 endif()
 set(PROJECT_TARGET ${${PROJECT_NAME}_TARGET})
 
-# link libraries for the LogService lib
-set(_link_libraries )
-if(UNIX)
-  list(APPEND _link_libraries dl)
-endif()
-if(CMAKE_THREAD_LIBS_INIT)
-  list(APPEND _link_libraries ${CMAKE_THREAD_LIBS_INIT})
-endif()
-
 configure_file(${CppMicroServices_SOURCE_DIR}/cmake/Export.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices/logservice/LogServiceExport.h
   )
 
-add_library(usLogService ${_srcs} ${_public_headers})
-if (US_BUILD_TESTING)
-  target_compile_definitions(usLogService PRIVATE USING_GTEST)
-endif()
-
-target_include_directories(usLogService
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-    $<BUILD_INTERFACE:${CppMicroServices_SOURCE_DIR}/framework/include>
-    $<BUILD_INTERFACE:${CppMicroServices_BINARY_DIR}/include>
-    $<BUILD_INTERFACE:${CppMicroServices_BINARY_DIR}/framework/include>
-    $<INSTALL_INTERFACE:${HEADER_INSTALL_DIR}>
-  )
+add_library(usLogService INTERFACE)
+target_include_directories(usLogService INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 
 # install support
-install(TARGETS ${${PROJECT_NAME}_TARGET}
-	  EXPORT us${PROJECT_NAME}Targets
-	  RUNTIME DESTINATION ${RUNTIME_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
-	  LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
-	  ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
-
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/cppmicroservices
 	DESTINATION ${HEADER_INSTALL_DIR}
 	OPTIONAL)
@@ -64,15 +32,6 @@ configure_file(
   ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}ConfigVersion.cmake
   @ONLY
   )
-
-export(TARGETS ${${PROJECT_NAME}_TARGET}
-       FILE ${CppMicroServices_BINARY_DIR}/us${PROJECT_NAME}Targets.cmake)
-
-if(NOT US_NO_INSTALL)
-  install(EXPORT us${PROJECT_NAME}Targets
-	  FILE us${PROJECT_NAME}Targets.cmake
-	  DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
-endif()
 
 # Configure config file for the build tree
 

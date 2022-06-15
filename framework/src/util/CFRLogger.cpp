@@ -24,30 +24,6 @@
 
 namespace cppmicroservices {
 namespace cfrimpl {
-namespace {
-class FallbackLogServiceImpl final : public cppmicroservices::logservice::LogService
-{
-public:
-  FallbackLogServiceImpl() = default;
-  ~FallbackLogServiceImpl() = default;
-
-  void Log(logservice::SeverityLevel, const std::string&) override {}
-
-  void Log(logservice::SeverityLevel,
-           const std::string&,
-           const std::exception_ptr) override {}
-
-  void Log(const ServiceReferenceBase&,
-           logservice::SeverityLevel,
-           const std::string&) override {}
-
-  void Log(const ServiceReferenceBase&,
-           logservice::SeverityLevel,
-           const std::string&,
-           const std::exception_ptr) override {}
-};
-}
-
 CFRLogger::CFRLogger(cppmicroservices::BundleContext context)
   : cfrContext(std::move(context))
   , serviceTracker(
@@ -75,8 +51,8 @@ CFRLogger::AddingService(
   auto currLogger = std::atomic_load(&logService);
   std::shared_ptr<cppmicroservices::logservice::LogService> logger;
   if (!currLogger && reference) {
-    logger =
-      cfrContext.GetService<cppmicroservices::logservice::LogService>(reference);
+    logger = cfrContext.GetService<cppmicroservices::logservice::LogService>(
+      reference);
     std::atomic_store(&logService, logger);
   }
   return logger;
@@ -112,8 +88,8 @@ void CFRLogger::Log(logservice::SeverityLevel level, const std::string& message)
 }
 
 void CFRLogger::Log(logservice::SeverityLevel level,
-                   const std::string& message,
-                   const std::exception_ptr ex)
+                    const std::string& message,
+                    const std::exception_ptr ex)
 {
   auto currLogger = std::atomic_load(&logService);
   if (currLogger) {
@@ -122,8 +98,8 @@ void CFRLogger::Log(logservice::SeverityLevel level,
 }
 
 void CFRLogger::Log(const cppmicroservices::ServiceReferenceBase& sr,
-                   logservice::SeverityLevel level,
-                   const std::string& message)
+                    logservice::SeverityLevel level,
+                    const std::string& message)
 {
   auto currLogger = std::atomic_load(&logService);
   if (currLogger) {
@@ -132,9 +108,9 @@ void CFRLogger::Log(const cppmicroservices::ServiceReferenceBase& sr,
 }
 
 void CFRLogger::Log(const cppmicroservices::ServiceReferenceBase& sr,
-                   logservice::SeverityLevel level,
-                   const std::string& message,
-                   const std::exception_ptr ex)
+                    logservice::SeverityLevel level,
+                    const std::string& message,
+                    const std::exception_ptr ex)
 {
   auto currLogger = std::atomic_load(&logService);
   if (currLogger) {
@@ -143,4 +119,3 @@ void CFRLogger::Log(const cppmicroservices::ServiceReferenceBase& sr,
 }
 } // cfrimpl
 } // cppmicroservices
-

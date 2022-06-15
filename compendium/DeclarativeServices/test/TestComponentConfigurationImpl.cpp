@@ -921,27 +921,83 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
   svcReg = nullptr;
 }
 
-TEST_F(ComponentConfigurationImplTest, LoadLibraryLogsMessagesTest)
+// Note: This is different than the other tests in this suite as Declarative Services is actually
+TEST_F(ComponentConfigurationImplTest, LoadLibraryLogsMessagesImmediateTest)
 {
   auto framework = GetFramework();
   ASSERT_TRUE(framework);
 
-  framework.Start();
-
   auto context = framework.GetBundleContext();
   ASSERT_TRUE(context);
 
-  auto testBundle = test::InstallAndStartBundle(context, "TestBundleDSTOI1");
+  test::InstallAndStartDS(context);
 
+  // The logger should receive 2 Log() calls from creating the SCRBundleExtension and 2 from the
+  // code which actually calls SharedLibrary::Load()
+  //
+  // The logger is created and registered before InstallAndStartBundle since it done after, it would
+  // miss the log messages.
   auto logger = std::make_shared<MockLogger>();
-  // The logger should receive 2 Log() calls from GetComponentCreatorDeletors() as
-  // that is the function which actually calls dlopen()/LoadLibrary() in DS.
+
+  // Because we are actually installing DS and creating the logger before installing and starting
+  // the bundle (since it is immediate), there are 2 other log messages that are sent. They pertain
+  // to creating and having created the SCRBundleExtension. If that expectation is not set, the test
+  // fails.
+  EXPECT_CALL(*logger, Log(logservice::SeverityLevel::LOG_DEBUG, ::testing::_))
+    .Times(2);
+  // This expectation is for the actual info log messages pertaining to loading of the shared
+  // library.
   EXPECT_CALL(*logger, Log(logservice::SeverityLevel::LOG_INFO, ::testing::_))
     .Times(2);
 
   auto loggerReg = context.RegisterService<logservice::LogService>(logger);
 
-  GetComponentCreatorDeletors("sample::ServiceComponent", testBundle, logger);
+  // TestBundleDSTOI1 is immediate=true so the call to InstallAndStart should cause the shared
+  // library for the bundle to be loaded. This should in turn log 4 (2 regarding shared library
+  // loading) messages with the log service.
+  test::InstallAndStartBundle(context, "TestBundleDSTOI1");
+
+  loggerReg.Unregister();
+}
+
+// Note: This is different than the other tests in this suite as Declarative Services is actually
+TEST_F(ComponentConfigurationImplTest, LoadLibraryLogsMessagesNotImmediateTest)
+{
+  auto framework = GetFramework();
+  ASSERT_TRUE(framework);
+
+  auto context = framework.GetBundleContext();
+  ASSERT_TRUE(context);
+
+  test::InstallAndStartDS(context);
+
+  // TestBundleDSTOI14 is immediate=false so this InstallAndStart should not
+  // load the library until GetService is called. The logger is created after
+  // this InstallAndStart so in the event that the log messages for loading the
+  // shared library are sent when the library is loaded, the test will fail.
+  test::InstallAndStartBundle(context, "TestBundleDSTOI14");
+
+  // The logger should receive 2 Log() calls from the code which actually invokes
+  // SharedLibrary::Load()
+  //
+  // The logger is registered after InstallAndStartBundle in this case to prove that
+  // for non-immediate DS bundles, the log messages are sent when the library is actually
+  // loaded (i.e., when a call to GetService is made for an interface implemented by
+  // the bundle).
+  auto logger = std::make_shared<MockLogger>();
+
+  // This expectation is for the actual info log messages pertaining to loading of
+  // the shared library.
+  EXPECT_CALL(*logger, Log(logservice::SeverityLevel::LOG_INFO, ::testing::_))
+    .Times(2);
+
+  auto loggerReg = context.RegisterService<logservice::LogService>(logger);
+
+  // The call to GetService should cause the library to be loaded, thus sending
+  // the 2 expected log messages.
+  auto sRef = context.GetServiceReference<test::Interface1>();
+  ASSERT_TRUE(sRef);
+  (void)context.GetService<test::Interface1>(sRef);
 
   loggerReg.Unregister();
 }

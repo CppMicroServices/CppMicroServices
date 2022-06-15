@@ -922,6 +922,7 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
 }
 
 // Note: This is different than the other tests in this suite as Declarative Services is actually
+// installed and started rather than using mocks.
 TEST_F(ComponentConfigurationImplTest, LoadLibraryLogsMessagesImmediateTest)
 {
   auto framework = GetFramework();
@@ -961,6 +962,7 @@ TEST_F(ComponentConfigurationImplTest, LoadLibraryLogsMessagesImmediateTest)
 }
 
 // Note: This is different than the other tests in this suite as Declarative Services is actually
+// installed and started rather than using mocks.
 TEST_F(ComponentConfigurationImplTest, LoadLibraryLogsMessagesNotImmediateTest)
 {
   auto framework = GetFramework();

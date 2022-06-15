@@ -307,17 +307,28 @@ TEST_F(TestConfigurationAdminImpl, VerifyListConfigurations)
   EXPECT_EQ(res2[0]->GetPid(), pid2);
   EXPECT_TRUE(res3.empty());
 
-  // ListConfigurations should not return empty config objects (i.e. those with no properties)
+  // ListConfigurations should not return empty config objects (i.e. those with no 
+  // properties) unless the configuration object has been updated.
   const auto emptyConfig = configAdmin.GetConfiguration("test.pid.emptyconfig");
   const auto emptyConfigResult =
     configAdmin.ListConfigurations("(pid=test.pid.emptyconfig)");
   EXPECT_TRUE(emptyConfigResult.empty());
 
   // ListConfigurations should not return empty config objects when returning
-  // all available configs
+  // all available configs unless the configuration object has been updated.
   const auto allConfigsResult =
     configAdmin.ListConfigurations();
   EXPECT_EQ(allConfigsResult.size(), 2ul);
+
+  //ListConfigurations should return empty config objects if the config
+  //object was defined in a manifest.json file and added using AddConfigurations.
+  //Adding a configuration object this way counts as a create and update operation.
+  std::vector<metadata::ConfigurationMetadata> configs;
+  configs.push_back(metadata::ConfigurationMetadata(
+    "test.pid3", AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
+  auto result = configAdmin.AddConfigurations(std::move(configs));
+  const auto allConfigs = configAdmin.ListConfigurations();
+  EXPECT_EQ(allConfigs.size(), 3ul);
 }
 
 TEST_F(TestConfigurationAdminImpl, VerifyAddConfigurations)

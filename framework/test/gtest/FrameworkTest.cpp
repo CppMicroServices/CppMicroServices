@@ -834,6 +834,7 @@ TEST(FrameworkTest, ConfigurationWithBundleValidation)
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
+#if defined(US_BUILD_SHARED_LIBS)
 TEST(FrameworkTest, LoadLibraryLogsMessagesTest)
 {
   auto f = FrameworkFactory().NewFramework();
@@ -858,5 +859,6 @@ TEST(FrameworkTest, LoadLibraryLogsMessagesTest)
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
+#endif
 
 US_MSVC_POP_WARNING

@@ -23,6 +23,8 @@
 #include <random>
 
 #include "../src/SCRAsyncWorkService.hpp"
+#include "../src/SCRLogger.hpp"
+#include "../src/manager/BundleLoader.hpp"
 #include "../src/manager/BundleOrPrototypeComponentConfiguration.hpp"
 #include "../src/manager/ComponentConfigurationImpl.hpp"
 #include "../src/manager/ReferenceManager.hpp"
@@ -845,13 +847,15 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
   // a service reference and a config object dependency will trigger a state change
   // when the config object is satisfied before the config object change listener is
   // registered.
-  mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::Reference1>() };
+  mockMetadata->serviceMetadata.interfaces = {
+    us_service_interface_iid<dummy::Reference1>()
+  };
   scrimpl::metadata::ReferenceMetadata refMetadata{};
   refMetadata.interfaceName = "cppmicroservices::scrimpl::dummy::ServiceImpl";
   mockMetadata->refsMetadata.push_back(refMetadata);
   mockMetadata->configurationPolicy = "require";
-  mockMetadata->configurationPids = {"foo"};
-  
+  mockMetadata->configurationPids = { "foo" };
+
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
@@ -867,25 +871,32 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
     notifier,
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>());
 
-  auto fakeBundleProtoCompConfig = std::make_shared<BundleOrPrototypeComponentConfigurationImpl>(
-    mockMetadata,
-    GetFramework(),
-    std::make_shared<MockComponentRegistry>(),
-    fakeLogger,
-    notifier,
-    std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>());
+  auto fakeBundleProtoCompConfig =
+    std::make_shared<BundleOrPrototypeComponentConfigurationImpl>(
+      mockMetadata,
+      GetFramework(),
+      std::make_shared<MockComponentRegistry>(),
+      fakeLogger,
+      notifier,
+      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>());
 
-  auto svcReg = GetFramework().GetBundleContext().RegisterService<dummy::ServiceImpl>(std::make_shared<dummy::ServiceImpl>());
-  
+  auto svcReg =
+    GetFramework().GetBundleContext().RegisterService<dummy::ServiceImpl>(
+      std::make_shared<dummy::ServiceImpl>());
+
   // update config object to satisfy component configuration
   test::InstallAndStartConfigAdmin(GetFramework().GetBundleContext());
-  auto svcRef = GetFramework().GetBundleContext().GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+  auto svcRef =
+    GetFramework()
+      .GetBundleContext()
+      .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
   ASSERT_TRUE(svcRef);
   auto configAdminSvc = GetFramework().GetBundleContext().GetService(svcRef);
   ASSERT_TRUE(configAdminSvc);
   auto fooConfig = configAdminSvc->GetConfiguration("foo");
-  cppmicroservices::AnyMap configData(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  configData["bar"] = std::string{"baz"};
+  cppmicroservices::AnyMap configData(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  configData["bar"] = std::string{ "baz" };
   // update the config object before calling fakeCompConfig->Initialize(), which simulates the config object
   // being updated before the ComponentConfigurationImpl has a chance to setup config change listeners.
   ASSERT_NO_THROW(fooConfig->UpdateIfDifferent(configData).second.get());
@@ -893,12 +904,14 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
   // Initialize should set the component state to Satisfied, even if the config object update was missed
   // by the config object change listener.
   fakeCompConfig->Initialize();
-  EXPECT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::SATISFIED,
-      fakeCompConfig->GetConfigState());
+  EXPECT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::
+              SATISFIED,
+            fakeCompConfig->GetConfigState());
 
   fakeBundleProtoCompConfig->Initialize();
-  EXPECT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::SATISFIED,
-      fakeBundleProtoCompConfig->GetConfigState());
+  EXPECT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::
+              SATISFIED,
+            fakeBundleProtoCompConfig->GetConfigState());
 
   fakeCompConfig->Deactivate();
   fakeCompConfig->Stop();
@@ -906,6 +919,31 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
   fakeBundleProtoCompConfig->Stop();
   svcReg.Unregister();
   svcReg = nullptr;
+}
+
+TEST_F(ComponentConfigurationImplTest, LoadLibraryLogsMessagesTest)
+{
+  auto framework = GetFramework();
+  ASSERT_TRUE(framework);
+
+  framework.Start();
+
+  auto context = framework.GetBundleContext();
+  ASSERT_TRUE(context);
+
+  auto testBundle = test::InstallAndStartBundle(context, "TestBundleDSTOI1");
+
+  auto logger = std::make_shared<MockLogger>();
+  // The logger should receive 2 Log() calls from GetComponentCreatorDeletors() as
+  // that is the function which actually calls dlopen()/LoadLibrary() in DS.
+  EXPECT_CALL(*logger, Log(logservice::SeverityLevel::LOG_INFO, ::testing::_))
+    .Times(2);
+
+  auto loggerReg = context.RegisterService<logservice::LogService>(logger);
+
+  GetComponentCreatorDeletors("sample::ServiceComponent", testBundle, logger);
+
+  loggerReg.Unregister();
 }
 }
 }

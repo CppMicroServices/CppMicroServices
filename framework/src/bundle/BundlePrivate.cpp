@@ -70,8 +70,8 @@ void BundlePrivate::Stop(uint32_t options)
     US_UNUSED(l);
 
     if (state == Bundle::STATE_UNINSTALLED) {
-      throw std::logic_error("Bundle #" + util::ToString(id)
-                               + " (location=" + location + ") is uninstalled");
+      throw std::logic_error("Bundle #" + util::ToString(id) +
+                             " (location=" + location + ") is uninstalled");
     }
 
     if ((options & Bundle::STOP_TRANSIENT) == 0) {
@@ -145,8 +145,9 @@ std::exception_ptr BundlePrivate::Stop1()
         }
       }
       if (!cause.empty()) {
-        res = std::make_exception_ptr(
-          std::runtime_error("Bundle #" + util::ToString(id) + " (location=" + location + ") stop failed: " + cause));
+        res = std::make_exception_ptr(std::runtime_error(
+          "Bundle #" + util::ToString(id) + " (location=" + location +
+          ") stop failed: " + cause));
       }
     }
     bactivator = nullptr;
@@ -246,10 +247,12 @@ void BundlePrivate::FinalizeActivation()
       // This happens if call start from inside the BundleActivator.stop
       // method.
       // Don't allow it.
-      throw std::runtime_error("Bundle #" + util::ToString(id) + " (location=" + location +
+      throw std::runtime_error("Bundle #" + util::ToString(id) +
+                               " (location=" + location +
                                "), start called from BundleActivator::Stop");
     case Bundle::STATE_UNINSTALLED:
-      throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" + location + ") is in UNINSTALLED state");
+      throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" +
+                             location + ") is in UNINSTALLED state");
   }
 }
 
@@ -261,7 +264,8 @@ void BundlePrivate::Uninstall()
 
     switch (static_cast<Bundle::State>(state.load())) {
       case Bundle::STATE_UNINSTALLED:
-        throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" + location + ") is in BUNDLE_UNINSTALLED state");
+        throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" +
+                               location + ") is in BUNDLE_UNINSTALLED state");
       case Bundle::STATE_STARTING: // Lazy start
       case Bundle::STATE_ACTIVE:
       case Bundle::STATE_STOPPING: {
@@ -312,7 +316,9 @@ void BundlePrivate::Uninstall()
         }
         if (state == Bundle::STATE_UNINSTALLED) {
           operation = BundlePrivate::OP_IDLE;
-          throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" + location + ") is in BUNDLE_UNINSTALLED state");
+          throw std::logic_error("Bundle #" + util::ToString(id) +
+                                 " (location=" + location +
+                                 ") is in BUNDLE_UNINSTALLED state");
         }
 
         state = Bundle::STATE_INSTALLED;
@@ -359,7 +365,8 @@ void BundlePrivate::Start(uint32_t options)
   auto l = this->Lock();
   US_UNUSED(l);
   if (state == Bundle::STATE_UNINSTALLED) {
-    throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" + location + ") is uninstalled");
+    throw std::logic_error("Bundle #" + util::ToString(id) +
+                           " (location=" + location + ") is uninstalled");
   }
 
   if (state == Bundle::STATE_ACTIVE) {
@@ -421,7 +428,8 @@ std::exception_ptr BundlePrivate::Start0()
           !coreCtx->validationFunc(thisBundle)) {
         StartFailed();
         return std::make_exception_ptr(SecurityException{
-          "Bundle #" + util::ToString(id) + " (location=" + location + ") failed bundle validation.",
+          "Bundle #" + util::ToString(id) + " (location=" + location +
+            ") failed bundle validation.",
           thisBundle });
       }
     } catch (...) {
@@ -440,7 +448,15 @@ std::exception_ptr BundlePrivate::Start0()
         libHandle = BundleUtils::GetExecutableHandle();
       } else {
         if (!lib.IsLoaded()) {
+          coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
+                               "Loading shared library for Bundle #" +
+                                 util::ToString(id) + " (location=" + location +
+                                 ")");
           lib.Load(coreCtx->libraryLoadOptions);
+          coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
+                               "Finished loading shared library for Bundle #" +
+                                 util::ToString(id) + " (location=" + location +
+                                 ")");
         }
         libHandle = lib.GetHandle();
       }
@@ -471,10 +487,14 @@ std::exception_ptr BundlePrivate::Start0()
         destroyActivatorHook, libHandle, destroy_activator_func);
 
       if (!createActivatorHook) {
-        throw std::runtime_error("Bundle #" + util::ToString(id) + " (location=" + location + ") activator constructor not found");
+        throw std::runtime_error("Bundle #" + util::ToString(id) +
+                                 " (location=" + location +
+                                 ") activator constructor not found");
       }
       if (!destroyActivatorHook) {
-        throw std::runtime_error("Bundle #" + util::ToString(id) + " (location=" + location + ") activator destructor not found");
+        throw std::runtime_error("Bundle #" + util::ToString(id) +
+                                 " (location=" + location +
+                                 ") activator destructor not found");
       }
 
       // get a BundleActivator instance
@@ -487,9 +507,9 @@ std::exception_ptr BundlePrivate::Start0()
       res = std::make_exception_ptr(cppmicroservices::SharedLibraryException(
         ex.code(), ex.what(), thisBundle));
     } catch (...) {
-      res = std::make_exception_ptr(
-        std::runtime_error("Bundle #" + util::ToString(id) +
-                           " (location= " + location + ") start failed: " + util::GetLastExceptionStr()));
+      res = std::make_exception_ptr(std::runtime_error(
+        "Bundle #" + util::ToString(id) + " (location= " + location +
+        ") start failed: " + util::GetLastExceptionStr()));
     }
   }
 
@@ -518,7 +538,8 @@ std::exception_ptr BundlePrivate::Start0()
     }
     if (!cause.empty()) {
       res = std::make_exception_ptr(std::runtime_error(
-        "Bundle #" + util::ToString(id) + " (location= " + location + ") start failed: " + cause));
+        "Bundle #" + util::ToString(id) + " (location= " + location +
+        ") start failed: " + cause));
     }
   }
 
@@ -641,15 +662,16 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
     if (!errMsg.empty()) {
       throw std::invalid_argument(std::string("The Json value for ") +
                                   Constants::BUNDLE_VERSION + " for bundle " +
-                                  symbolicName + " (location=" + location + ") is not valid: " + errMsg);
+                                  symbolicName + " (location=" + location +
+                                  ") is not valid: " + errMsg);
     }
   }
 
   if (!bundleManifest.Contains(Constants::BUNDLE_SYMBOLICNAME)) {
     throw std::invalid_argument(
       Constants::BUNDLE_SYMBOLICNAME +
-      " is not defined in the bundle manifest for bundle " + symbolicName + " (location=" + location +
-      ").");
+      " is not defined in the bundle manifest for bundle " + symbolicName +
+      " (location=" + location + ").");
   }
 
   Any bsn(bundleManifest.GetValue(Constants::BUNDLE_SYMBOLICNAME));
@@ -674,7 +696,8 @@ BundlePrivate::~BundlePrivate() = default;
 void BundlePrivate::CheckUninstalled() const
 {
   if (state == Bundle::STATE_UNINSTALLED) {
-      throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" + location + ") is in UNINSTALLED state");
+    throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" +
+                           location + ") is in UNINSTALLED state");
   }
 }
 

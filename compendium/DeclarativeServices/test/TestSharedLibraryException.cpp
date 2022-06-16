@@ -34,6 +34,7 @@ limitations under the License.
 
 #include "../src/manager/BundleLoader.hpp"
 
+#include "Mocks.hpp"
 #include "TestInterfaces/Interfaces.hpp"
 #include "TestUtils.hpp"
 
@@ -83,7 +84,9 @@ TEST_F(SharedLibraryExceptionTest, testDSBundleLoaderFailure)
   // Using the framework bundle here, as it passes the GetLocation validity test,
   // but fails at dlopen.
   ASSERT_THROW(cppmicroservices::scrimpl::GetComponentCreatorDeletors(
-                 "invalid::name", GetFramework()),
+                 "invalid::name",
+                 GetFramework(),
+                 std::make_shared<cppmicroservices::scrimpl::FakeLogger>()),
                cppmicroservices::SharedLibraryException);
 }
 

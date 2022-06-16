@@ -5,6 +5,7 @@
 set(_srcs
   util/Any.cpp
   util/AnyMap.cpp
+  util/CFRLogger.cpp
   util/Framework.cpp
   util/FrameworkEvent.cpp
   util/FrameworkFactory.cpp
@@ -61,6 +62,7 @@ set(_srcs
 
 set(_private_headers
   util/FrameworkPrivate.h
+  util/CFRLogger.h
   util/LDAPExpr.h
   util/Properties.h
   util/Utils.h

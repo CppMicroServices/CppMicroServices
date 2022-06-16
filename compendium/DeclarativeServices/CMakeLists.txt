@@ -44,7 +44,7 @@ usMacroCreateBundle(DeclarativeServices
   TARGET DeclarativeServices
   SYMBOLIC_NAME declarative_services
   EMBED_RESOURCE_METHOD LINK
-  LINK_LIBRARIES ${_link_libraries} usLogService usServiceComponent usAsyncWorkService
+  LINK_LIBRARIES ${_link_libraries} usServiceComponent usAsyncWorkService
   PRIVATE_HEADERS ${_ds_private_headers}
   SOURCES $<TARGET_OBJECTS:DeclarativeServicesObjs> src/SCRActivator.cpp
   BINARY_RESOURCES manifest.json

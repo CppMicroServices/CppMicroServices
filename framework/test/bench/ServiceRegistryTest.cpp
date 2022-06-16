@@ -1,4 +1,5 @@
 #include "benchmark/benchmark.h"
+#include "cppmicroservices/ServiceEvent.h"
 #include <cppmicroservices/Bundle.h>
 #include <cppmicroservices/BundleContext.h>
 #include <cppmicroservices/BundleEvent.h>
@@ -11,6 +12,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <vector>
 
 using namespace cppmicroservices;
 
@@ -43,6 +45,7 @@ public:
 
   std::shared_ptr<Framework> framework;
 };
+
 }
 
 /**
@@ -184,3 +187,44 @@ BENCHMARK_REGISTER_F(ServiceRegistryFixture, UnregisterServices)
   ->RangeMultiplier(4)
   ->Ranges({ { 1, 1000 }, { 1, 1000 } })
   ->UseManualTime();
+
+BENCHMARK_DEFINE_F(ServiceRegistryFixture, ModifyServices)
+(benchmark::State& state)
+{
+    using namespace std::chrono;
+
+    auto fc = framework->GetBundleContext();
+    auto regCount = state.range(0);
+    auto interfaceCount = state.range(1);
+    auto interfaceMap = MakeInterfaceMapWithNInterfaces(interfaceCount);
+
+    std::vector<ServiceRegistrationBase> regs;
+    for (auto i = regCount; i > 0; --i) {
+        InterfaceMapPtr iMapCopy(std::make_shared<InterfaceMap>(*interfaceMap));
+        auto reg =
+            fc.RegisterService(iMapCopy); 
+        regs.push_back(reg);
+    }
+
+    for (auto _ : state) {
+
+        ServiceProperties props;
+        props["perf.service.value"] = rand() % 100;
+
+        auto start = high_resolution_clock::now();
+
+        for (std::size_t i = 0; i < regs.size(); i++) {
+            regs[i].SetProperties(props);
+        }
+
+        auto end = high_resolution_clock::now();
+        auto elapsed_seconds = duration_cast<duration<double>>(end - start);
+        state.SetIterationTime(elapsed_seconds.count());
+
+    }
+}
+
+BENCHMARK_REGISTER_F(ServiceRegistryFixture, ModifyServices)
+->RangeMultiplier(4)
+->Ranges({ { 1, 1000 }, { 1, 1000 } })
+->UseManualTime();

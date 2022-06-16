@@ -1,0 +1,223 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {},
+  "id": "http://example.com/example.json",
+  "properties": {
+    "bundle.symbolic_name": {
+      "id": "/properties/bundle.symbolic_name",
+      "type": "string",
+      "pattern": "^([a-zA-Z0-9_]+)$"
+    },
+    "bundle.activator": {
+      "id": "/properties/bundle.activator",
+      "type": "boolean"
+    },
+    "bundle.description": {
+      "id": "/properties/bundle.description",
+      "type": "string"
+    },
+    "bundle.vendor": {
+      "id": "/properties/bundle.vendor",
+      "type": "string",
+      "pattern": "^(.*)$"
+    },
+    "bundle.version": {
+      "id": "/properties/bundle.version",
+      "type": "string",
+      "pattern": "^([0-9]+)(\\.([0-9]+(\\.([0-9]+(\\.([0-9a-zA-Z-_]+){1})?){1})?){1})?"
+    },
+    "scr": {
+      "id": "/properties/scr",
+      "properties": {
+        "components": {
+          "id": "/properties/scr/properties/components",
+          "items": {
+            "id": "/properties/scr/properties/components/items",
+            "properties": {
+              "enabled": {
+                "default": true,
+                "id": "/properties/scr/properties/components/items/properties/enabled",
+                "type": "boolean"
+              },
+              "immediate": {
+                "default": true,
+                "id": "/properties/scr/properties/components/items/properties/immediate",
+                "type": "boolean"
+              },
+              "implementation-class": {
+                "id": "/properties/scr/properties/components/items/properties/implementation-class",
+                "type": "string"
+              },
+              "inject-references": {
+                "default": false,
+                "id": "/properties/scr/properties/components/items/properties/inject-references",
+                "type": "boolean"
+              },
+              "name": {
+                "id": "/properties/scr/properties/components/items/properties/name",
+                "type": "string",
+                "pattern": "[_a-zA-Z][_a-zA-Z0-9]{0,64}"
+              },
+              "properties": {
+                "id": "/properties/scr/properties/components/items/properties/properties",
+                "properties": {},
+                "type": "object"
+              },
+              "configuration-policy": {
+                "default": "ignore",
+                "id": "/properties/scr/properties/components/items/properties/configuration-policy",
+                "type": "string"
+              },
+              "configuration-pid": {
+                "id": "/properties/scr/properties/components/items/properties/configuration-pid",
+                "items": {
+                  "id": "/properties/scr/properties/components/items/properties/configuration-pid/items",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "factory": {
+                "default": "",
+                "id": "/properties/scr/properties/components/items/properties/factory",
+                "type": "string"
+              },
+              "factory-properties": {
+                "id": "/properties/scr/properties/components/items/properties/factory-properties",
+                "factory-properties": {},
+                "type": "object"
+              },
+              "references": {
+                "id": "/properties/scr/properties/components/items/properties/references",
+                "items": {
+                  "id": "/properties/scr/properties/components/items/properties/references/items",
+                  "properties": {
+                    "cardinality": {
+                      "default": "1..1",
+                      "id": "/properties/scr/properties/components/items/properties/references/items/properties/cardinality",
+                      "type": "string"
+                    },
+                    "interface": {
+                      "id": "/properties/scr/properties/components/items/properties/references/items/properties/interface",
+                      "type": "string"
+                    },
+                    "name": {
+                      "id": "/properties/scr/properties/components/items/properties/references/items/properties/name",
+                      "type": "string"
+                    },
+                    "policy": {
+                      "default": "static",
+                      "id": "/properties/scr/properties/components/items/properties/references/items/properties/policy",
+                      "type": "string"
+                    },
+                    "policy-option": {
+                      "default": "reluctant",
+                      "id": "/properties/scr/properties/components/items/properties/references/items/properties/policy-option",
+                      "type": "string"
+                    },
+                    "scope": {
+                      "default": "singleton",
+                      "id": "/properties/scr/properties/components/items/properties/references/items/properties/scope",
+                      "type": "string"
+                    },
+                    "target": {
+                      "id": "/properties/scr/properties/components/items/properties/references/items/properties/target",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "interface",
+                    "name"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "service": {
+                "id": "/properties/scr/properties/components/items/properties/service",
+                "properties": {
+                  "interfaces": {
+                    "id": "/properties/scr/properties/components/items/properties/service/properties/interfaces",
+                    "items": {
+                      "id": "/properties/scr/properties/components/items/properties/service/properties/interfaces/items",
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "scope": {
+                    "default": "singleton",
+                    "id": "/properties/scr/properties/components/items/properties/service/properties/scope",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "interfaces"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "implementation-class"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "version": {
+          "id": "/properties/scr/properties/version",
+          "maximum": 1,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version",
+        "components"
+      ],
+      "type": "object"
+    },
+    "cm": {
+      "id": "/properties/cm",
+      "properties": {
+        "configurations": {
+          "id": "/properties/cm/properties/configurations",
+          "items": {
+            "id": "/properties/cm/properties/configurations/items",
+            "properties": {
+              "pid": {
+                "id": "/properties/cm/properties/configurations/items/properties/pid",
+                "type": "string"
+              },
+              "properties": {
+                "id": "/properties/cm/properties/configurations/items/properties/properties",
+                "properties": {},
+                "type": "object"
+              }
+            },
+            "required": [
+              "pid"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "version": {
+          "id": "/properties/cm/properties/version",
+          "maximum": 1,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version",
+        "configurations"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "bundle.symbolic_name"
+  ],
+  "type": "object"
+}

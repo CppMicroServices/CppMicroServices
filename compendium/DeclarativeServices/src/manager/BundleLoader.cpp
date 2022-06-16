@@ -36,6 +36,26 @@
 
 namespace cppmicroservices {
 namespace scrimpl {
+namespace {
+/**
+ * @brief Convert parameter to string
+ * 
+ * @tparam T type of the value to convert to a string
+ * @param val value to convert to a string
+ * @return std::string the value converted to a string
+ */
+template<typename T>
+std::string ToString(T val)
+{
+#if defined(__ANDROID__)
+  std::ostringstream os;
+  os << val;
+  return os.str();
+#else
+  return std::to_string(val);
+#endif
+}
+}
 
 #if defined(_WIN32)
 /**
@@ -60,13 +80,14 @@ std::wstring UTF8StrToWStr(const std::string& inStr)
 
 std::tuple<std::function<ComponentInstance*(void)>,
            std::function<void(ComponentInstance*)>>
-GetComponentCreatorDeletors(const std::string& compName,
-                            const cppmicroservices::Bundle& fromBundle)
+GetComponentCreatorDeletors(
+  const std::string& compName,
+  const cppmicroservices::Bundle& fromBundle,
+  const std::shared_ptr<cppmicroservices::logservice::LogService>& logger)
 {
   // cannot use bundle id as key because id is reused when the framework is restarted.
   // strings are not optimal but will work fine as long as a binary is not unloaded
   // from the process.
-  // Note: This code is a temporary hack until the core framework supports Bundle#load API.
   static Guarded<std::map<std::string, void*>>
     bundleBinaries; ///< map of bundle location and handle pairs
   const auto bundleLoc = fromBundle.GetLocation();
@@ -79,11 +100,20 @@ GetComponentCreatorDeletors(const std::string& compName,
     try {
       auto ctx = fromBundle.GetBundleContext();
       auto opts = ctx.GetProperty(Constants::LIBRARY_LOAD_OPTIONS);
+      logger->Log(logservice::SeverityLevel::LOG_INFO,
+                  "Loading shared library for Bundle #" +
+                    ToString(fromBundle.GetBundleId()) +
+                    " (location=" + bundleLoc + ")");
       sh.Load(any_cast<int>(opts));
+      logger->Log(logservice::SeverityLevel::LOG_INFO,
+                  "Finished loading shared library for Bundle #" +
+                    ToString(fromBundle.GetBundleId()) +
+                    " (location=" + bundleLoc + ")");
     } catch (const std::system_error& ex) {
       // SharedLibrary::Load() will throw a std::system_error when a shared library
       // fails to load. Creating a SharedLibraryException here to throw with fromBundle information.
-      throw cppmicroservices::SharedLibraryException(ex.code(), ex.what(), std::move(fromBundle));
+      throw cppmicroservices::SharedLibraryException(
+        ex.code(), ex.what(), fromBundle);
     }
     handle = sh.GetHandle();
     bundleBinaries.lock()->emplace(bundleLoc, handle);
@@ -93,10 +123,10 @@ GetComponentCreatorDeletors(const std::string& compName,
     std::regex_replace(compName, std::regex("::"), "_");
   const std::string newInstanceFuncName("NewInstance_" + symbolName);
   const std::string deleteInstanceFuncName("DeleteInstance_" + symbolName);
-  
+
   void* newsym = fromBundle.GetSymbol(handle, newInstanceFuncName);
   void* delsym = fromBundle.GetSymbol(handle, deleteInstanceFuncName);
-  
+
   if (newsym == nullptr || delsym == nullptr) {
     std::string errMsg("Unable to find entry-point functions in bundle ");
     errMsg += fromBundle.GetLocation();

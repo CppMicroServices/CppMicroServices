@@ -39,14 +39,21 @@ class BundleOrPrototypeComponentConfigurationImpl final
   , public cppmicroservices::ServiceFactory
 {
 public:
-  explicit BundleOrPrototypeComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
-                                                       const cppmicroservices::Bundle& bundle,
-                                                       std::shared_ptr<const ComponentRegistry> registry,
-                                                       std::shared_ptr<cppmicroservices::logservice::LogService> logger);
-  BundleOrPrototypeComponentConfigurationImpl(const BundleOrPrototypeComponentConfigurationImpl&) = delete;
-  BundleOrPrototypeComponentConfigurationImpl(BundleOrPrototypeComponentConfigurationImpl&&) = delete;
-  BundleOrPrototypeComponentConfigurationImpl& operator=(const BundleOrPrototypeComponentConfigurationImpl&) = delete;
-  BundleOrPrototypeComponentConfigurationImpl& operator=(BundleOrPrototypeComponentConfigurationImpl&&) = delete;
+  explicit BundleOrPrototypeComponentConfigurationImpl(
+    std::shared_ptr<const metadata::ComponentMetadata> metadata,
+    const cppmicroservices::Bundle& bundle,
+    std::shared_ptr<ComponentRegistry> registry,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    std::shared_ptr<ConfigurationNotifier> configNotifier,
+    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
+  BundleOrPrototypeComponentConfigurationImpl(
+    const BundleOrPrototypeComponentConfigurationImpl&) = delete;
+  BundleOrPrototypeComponentConfigurationImpl(
+    BundleOrPrototypeComponentConfigurationImpl&&) = delete;
+  BundleOrPrototypeComponentConfigurationImpl& operator=(
+    const BundleOrPrototypeComponentConfigurationImpl&) = delete;
+  BundleOrPrototypeComponentConfigurationImpl& operator=(
+    BundleOrPrototypeComponentConfigurationImpl&&) = delete;
   ~BundleOrPrototypeComponentConfigurationImpl() override;
 
   /**
@@ -59,8 +66,14 @@ public:
    *
    * \param the bundle making the service request
    */
-  std::shared_ptr<ComponentInstance> CreateAndActivateComponentInstance(const cppmicroservices::Bundle& bundle) override;
+  std::shared_ptr<ComponentInstance> CreateAndActivateComponentInstance(
+    const cppmicroservices::Bundle& bundle) override;
 
+  /**
+   * Method called to modify the configuration properties for this component configuration. 
+   * @return false if the component instance has not provided a Modified method.
+   */
+  bool ModifyComponentInstanceProperties() override;
 
   /**
    * Method removes all instances of {@link ComponentInstance} object created by this object.
@@ -73,15 +86,17 @@ public:
    * This method always returns the same service implementation object.
    * A nullptr is returned if a service instance cannot be created or activated.
    */
-  cppmicroservices::InterfaceMapConstPtr GetService(const cppmicroservices::Bundle& bundle,
-                                                    const cppmicroservices::ServiceRegistrationBase& registration) override;
+  cppmicroservices::InterfaceMapConstPtr GetService(
+    const cppmicroservices::Bundle& bundle,
+    const cppmicroservices::ServiceRegistrationBase& registration) override;
 
   /**
    * Implements the {@link ServiceFactory#UngetService} interface.
    */
-  void UngetService(const cppmicroservices::Bundle& bundle,
-                    const cppmicroservices::ServiceRegistrationBase& registration,
-                    const cppmicroservices::InterfaceMapConstPtr& service) override;
+  void UngetService(
+    const cppmicroservices::Bundle& bundle,
+    const cppmicroservices::ServiceRegistrationBase& registration,
+    const cppmicroservices::InterfaceMapConstPtr& service) override;
 
   /**
    * Calls the service component's bind method while performing a dynamic rebind.
@@ -90,7 +105,8 @@ public:
    * \param ref is the service reference to the target service to bind. A default
    *  constructed \c ServiceReferenceBase denotes that there is no service to bind.
    */
-  void BindReference(const std::string& refName, const ServiceReferenceBase& ref) override;
+  void BindReference(const std::string& refName,
+                     const ServiceReferenceBase& ref) override;
 
   /**
    * Calls the service component's unbind method while performing a dynamic rebind.
@@ -98,18 +114,19 @@ public:
    * \param refName is the name of the reference as defined in the SCR JSON
    * \param ref is the service reference to the target service to unbind. A default
    *  constructed \c ServiceReferenceBase denotes that there is no service to unbind.
-   */  
-  void UnbindReference(const std::string& refName, const ServiceReferenceBase& ref) override;
+   */
+  void UnbindReference(const std::string& refName,
+                       const ServiceReferenceBase& ref) override;
 
 private:
-
   /**
    * Helper method to deactivate the component instance and invalidate the
    * associated context object
    */
   void DeactivateComponentInstance(const InstanceContextPair& instCtxt);
 
-  Guarded<std::vector<InstanceContextPair>> compInstanceMap; ///< map of component instance and context objects associated with this configuration
+  Guarded<std::vector<InstanceContextPair>>
+    compInstanceMap; ///< map of component instance and context objects associated with this configuration
 };
 }
 }

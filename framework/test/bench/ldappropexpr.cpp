@@ -1,10 +1,10 @@
-#include <cppmicroservices/LDAPProp.h>
 #include "benchmark/benchmark.h"
+#include <cppmicroservices/LDAPProp.h>
 
 static void ConstructFilterIncremental(benchmark::State& state)
 {
   using namespace cppmicroservices;
-  
+
   LDAPPropExpr expr;
   LDAPPropExpr secondaryExpr;
   for (auto _ : state) {
@@ -18,11 +18,11 @@ static void ConstructFilterIncremental(benchmark::State& state)
 static void ConstructFilterNotOperator(benchmark::State& state)
 {
   using namespace cppmicroservices;
-  
+
   LDAPPropExpr expr;
   for (auto _ : state) {
-    expr  = !LDAPProp("IsDynamic");
-    expr |=  LDAPProp("IsDynamic") != "false";
+    expr = !LDAPProp("IsDynamic");
+    expr |= LDAPProp("IsDynamic") != "false";
   };
 }
 

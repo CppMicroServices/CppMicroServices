@@ -273,7 +273,25 @@ public:
     }
   }
 
+  /**
+   * return the iterator to the value referenced by key
+   */
   const_iterator find(const key_type& key) const;
+
+  /**
+   * Erase entry for value for 'key'
+   * @param key the key for the entry to Erase
+   * @return the number of elements erased.
+   */
+  size_type erase(const key_type& key);
+
+  /**
+   * Compare the content of this map with those of rhs
+   * @param rhs an any_map to compare
+   * @return bool true rhs contains the same content as this
+   */
+  bool operator==(const any_map& rhs) const;
+  bool operator!=(const any_map& rhs) const { return !(operator==(rhs)); }
 
 protected:
   map_type type;
@@ -396,8 +414,8 @@ public:
    * @param defaultValue is the value to be returned if the key is not found
    * @return A copy of the key's value.
    */
-  mapped_type AtCompoundKey(const key_type& key, mapped_type defaultValue) const
-    noexcept;
+  mapped_type AtCompoundKey(const key_type& key,
+                            mapped_type defaultValue) const noexcept;
 };
 
 template<>
@@ -406,7 +424,9 @@ US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os,
 
 template<>
 US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
-                                                    const AnyMap& m);
+                                                    const AnyMap& m,
+                                                    const uint8_t increment,
+                                                    const int32_t indent);
 }
 
 #endif // CPPMICROSERVICES_ANYMAP_H

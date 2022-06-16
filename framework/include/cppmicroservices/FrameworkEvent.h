@@ -79,11 +79,10 @@ public:
     FRAMEWORK_STARTED = 0x00000001,
 
     /**
-     * The Framework has been started.
+     * An error has occurred.
+     * 
      * <p>
-     * The Framework's
-     * \link BundleActivator::Start(BundleContext) BundleActivator Start\endlink method
-     * has been executed.
+     * There was an error associated with a bundle.
      */
     FRAMEWORK_ERROR = 0x00000002,
 
@@ -225,7 +224,6 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
  */
 US_Framework_EXPORT bool operator==(const FrameworkEvent& rhs,
                                     const FrameworkEvent& lhs);
-/** @}*/
 }
 
 US_MSVC_POP_WARNING

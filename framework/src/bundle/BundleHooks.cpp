@@ -153,9 +153,7 @@ void BundleHooks::FilterBundleEventReceivers(
     }
 
     if (unfilteredSize != bundleContexts.size()) {
-      for (auto le =
-             bundleListeners.begin();
-           le != bundleListeners.end();) {
+      for (auto le = bundleListeners.begin(); le != bundleListeners.end();) {
         if (std::find_if(bundleContexts.begin(),
                          bundleContexts.end(),
                          [&le](const BundleContext& bc) {

@@ -25,42 +25,46 @@
 namespace cppmicroservices {
 namespace scrimpl {
 
-std::vector<std::shared_ptr<ComponentManager>> ComponentRegistry::GetComponentManagers() const
+std::vector<std::shared_ptr<ComponentManager>>
+ComponentRegistry::GetComponentManagers() const
 {
-  std::lock_guard<std::mutex> lock(mMapsMutex); 
+  std::lock_guard<std::mutex> lock(mMapsMutex);
   std::vector<std::shared_ptr<ComponentManager>> managers;
-  for (const auto& kv : mComponentsByName)
-  {
+  for (const auto& kv : mComponentsByName) {
     managers.push_back(kv.second);
   }
   return managers;
 }
 
-std::vector<std::shared_ptr<ComponentManager>> ComponentRegistry::GetComponentManagers(unsigned long bundleId) const
+std::vector<std::shared_ptr<ComponentManager>>
+ComponentRegistry::GetComponentManagers(unsigned long bundleId) const
 {
   std::lock_guard<std::mutex> lock(mMapsMutex);
   std::vector<std::shared_ptr<ComponentManager>> managers;
-  for (const auto& kv : mComponentsByName)
-  {
-    if(kv.first.first == bundleId)
-    {
+  for (const auto& kv : mComponentsByName) {
+    if (kv.first.first == bundleId) {
       managers.push_back(kv.second);
     }
   }
   return managers;
 }
 
-std::shared_ptr<ComponentManager> ComponentRegistry::GetComponentManager(unsigned long bundleId,
-                                                                         const std::string& compName) const
+std::shared_ptr<ComponentManager> ComponentRegistry::GetComponentManager(
+  unsigned long bundleId,
+  const std::string& compName) const
 {
   std::lock_guard<std::mutex> lock(mMapsMutex);
   return mComponentsByName.at(std::make_pair(bundleId, compName));
 }
 
-bool ComponentRegistry::AddComponentManager(const std::shared_ptr<ComponentManager>& cm)
+bool ComponentRegistry::AddComponentManager(
+  const std::shared_ptr<ComponentManager>& cm)
 {
   std::lock_guard<std::mutex> lock(mMapsMutex);
-  auto result = mComponentsByName.insert(std::make_pair(std::make_pair(static_cast<unsigned long>(cm->GetBundleId()), cm->GetName()), cm));
+  auto result = mComponentsByName.insert(
+    std::make_pair(std::make_pair(static_cast<unsigned long>(cm->GetBundleId()),
+                                  cm->GetName()),
+                   cm));
   return result.second;
 }
 
@@ -71,10 +75,10 @@ void ComponentRegistry::RemoveComponentManager(unsigned long bundleId,
   mComponentsByName.erase(std::make_pair(bundleId, compName));
 }
 
-void ComponentRegistry::RemoveComponentManager(const std::shared_ptr<ComponentManager>& cm)
+void ComponentRegistry::RemoveComponentManager(
+  const std::shared_ptr<ComponentManager>& cm)
 {
-  RemoveComponentManager(cm->GetBundleId(),
-                         cm->GetName());
+  RemoveComponentManager(cm->GetBundleId(), cm->GetName());
 }
 
 void ComponentRegistry::Clear()

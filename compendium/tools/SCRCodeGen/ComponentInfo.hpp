@@ -49,9 +49,13 @@ struct ComponentInfo
 {
   std::string name;
   std::string implClassName;
+  std::string configurationPolicy;
   bool injectReferences;
   ServiceInfo service;
   std::vector<ReferenceInfo> references;
+  static const std::string CONFIG_POLICY_IGNORE;
+  static const std::string CONFIG_POLICY_REQUIRE;
+  static const std::string CONFIG_POLICY_OPTIONAL;
 };
 
 // These functions return the string representations for the data model
@@ -60,7 +64,8 @@ std::string GetComponentNameStr(const ComponentInfo& compInfo);
 std::string GetServiceInterfacesStr(const ServiceInfo& compInfo);
 std::string GetCtorInjectedRefTypes(const ComponentInfo& compInfo);
 std::string GetCtorInjectedRefNames(const ComponentInfo& compInfo);
-std::string GetReferenceBinderStr(const ReferenceInfo& ref, bool injectReferences);
+std::string GetReferenceBinderStr(const ReferenceInfo& ref,
+                                  bool injectReferences);
 
 } // namespace datamodel
 } // namespace codegen

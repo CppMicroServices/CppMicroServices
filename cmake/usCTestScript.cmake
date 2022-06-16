@@ -1,12 +1,7 @@
 
 macro(build_and_test)
-
   set(CTEST_SOURCE_DIRECTORY ${US_SOURCE_DIR})
-  set(CTEST_BINARY_DIRECTORY "${CTEST_DASHBOARD_ROOT}/${CTEST_PROJECT_NAME}_${CTEST_DASHBOARD_NAME}")
-
-  #if(NOT CTEST_BUILD_NAME)
-  #  set(CTEST_BUILD_NAME "${CMAKE_SYSTEM}_${CTEST_COMPILER}_${CTEST_DASHBOARD_NAME}")
-  #endif()
+  set(CTEST_BINARY_DIRECTORY "${CTEST_DASHBOARD_ROOT}/$ENV{US_BUILD_CONFIGURATION}")
 
   ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 
@@ -16,11 +11,46 @@ macro(build_and_test)
     file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" "${CTEST_INITIAL_CACHE}")
   endif()
 
+  if (NOT WIN32)
+    if (WITH_ASAN)
+      set(US_ENABLE_ASAN ON)
+    endif()
+
+    if (WITH_TSAN)
+      set(US_ENABLE_TSAN ON)
+    endif()
+
+    if (WITH_UBSAN)
+      set(US_ENABLE_UBSAN ON)
+    endif()
+  endif()
+
   ctest_configure(RETURN_VALUE res)
   if (res)
     message(FATAL_ERROR "CMake configure error")
   endif()
-  ctest_build(RETURN_VALUE res)
+  
+  if(APPLE AND ${US_CMAKE_GENERATOR} STREQUAL "Xcode")
+    # When using Xcode on macOS, ctest -VV option generates compile log
+    # lines that are too verbose that some travis-ci builds exceed the 4MB
+    # log file size limit and terminate prematurely.
+    #
+    # Note: we no longer use travis-ci
+    #
+    # Since "ctest_build" currently does not support piping outputs of the
+    # native tool builds, a shell script file is used to manually call "xcodebuild"
+    # (with the same options that ctest_build would have generated), piping the
+    # output through "xcpretty" (https://github.com/xcpretty/xcpretty).
+    #
+    # Instead of calling xcodebuild directly in "execute_process", a separate
+    # shell script file was created, so RESULT_VARIABLE can properly be captured
+    # by looking at PIPESTATUS[0].
+    execute_process( COMMAND bash ${CTEST_SOURCE_DIRECTORY}/cmake/xcodebuild_pretty.sh ${CTEST_BINARY_DIRECTORY} ${CTEST_BUILD_CONFIGURATION}
+                     RESULT_VARIABLE res )
+  else()
+    ctest_build(RETURN_VALUE res)
+  endif()
+  
   if (res)
     message(FATAL_ERROR "CMake build error")
   endif()
@@ -30,16 +60,19 @@ macro(build_and_test)
    message(FATAL_ERROR "CMake test error")
   endif()
 
-
-  if(WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
-    ctest_memcheck()
+  if (NOT WIN32)
+    if(WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
+      ctest_memcheck()
+    endif()
   endif()
 
-  if(WITH_COVERAGE)
-    if(CTEST_COVERAGE_COMMAND)
-      ctest_coverage(CAPTURE_CMAKE_ERROR err_result QUIET)
-    else()
-      message(FATAL_ERROR "CMake could not find coverage tool")
+  if (NOT WIN32)
+    if(WITH_COVERAGE)
+      if(CTEST_COVERAGE_COMMAND)
+        ctest_coverage(CAPTURE_CMAKE_ERROR err_result QUIET)
+      else()
+        message(FATAL_ERROR "CMake could not find coverage tool")
+      endif()
     endif()
   endif()
 
@@ -54,24 +87,11 @@ function(create_initial_cache var _shared _threading)
       US_ENABLE_COVERAGE:BOOL=$ENV{WITH_COVERAGE}
       BUILD_SHARED_LIBS:BOOL=${_shared}
       US_ENABLE_THREADING_SUPPORT:BOOL=${_threading}
+      US_ENABLE_TSAN:BOOL=$ENV{WITH_TSAN}
       US_BUILD_EXAMPLES:BOOL=ON
       ")
 
   set(${var} ${_initial_cache} PARENT_SCOPE)
-
-  if(_shared)
-    set(CTEST_DASHBOARD_NAME "shared")
-  else()
-    set(CTEST_DASHBOARD_NAME "static")
-  endif()
-
-  if(_threading)
-    set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-threading")
-  endif()
-
-  string(REPLACE " " "-" _fixedGenerator ${_generator})
-  set(CTEST_DASHBOARD_NAME "${CTEST_DASHBOARD_NAME}-${_fixedGenerator}" PARENT_SCOPE)
-
 endfunction()
 
 #=========================================================
@@ -85,16 +105,28 @@ endif()
 
 #            SHARED THREADING
 
-set(config0     1       1     )
-set(config1     0       1     )
-set(config2     1       0     )
-set(config3     0       0     )
+set(config0     1       1 )
+set(config1     0       1 )
+set(config2     1       0 )
+set(config3     0       0 )
 
 if(NOT US_CMAKE_GENERATOR)
   if(APPLE AND NOT WITH_COVERAGE)
     set(US_CMAKE_GENERATOR "Xcode")
-  else()
+  elseif (NOT WIN32)
     set(US_CMAKE_GENERATOR "Unix Makefiles")
+  else()
+    if ("$ENV{BUILD_OS}" STREQUAL "windows-2019")
+      set(US_CMAKE_GENERATOR "Visual Studio 16 2019")
+      set(CMAKE_GENERATOR_PLATFORM "x64")
+    elseif ("$ENV{BUILD_OS}" STREQUAL "windows-2022")
+      set(US_CMAKE_GENERATOR "Visual Studio 17 2022")
+      set(CMAKE_GENERATOR_PLATFORM "x64")
+    elseif ("$ENV{BUILD_OS}" STREQUAL "mingw-w64")
+      set(US_CMAKE_GENERATOR "MinGW Makefiles")
+    else()
+      message(FATAL_ERROR "Unknown BUILD_OS $ENV{BUILD_OS} specified. Exiting.")
+    endif()
   endif()
 endif()
 

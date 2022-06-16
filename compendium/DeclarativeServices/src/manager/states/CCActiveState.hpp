@@ -23,20 +23,20 @@
 #ifndef CCActiveState_hpp
 #define CCActiveState_hpp
 
-#include "CCSatisfiedState.hpp"
 #include "../ConcurrencyUtil.hpp"
+#include "CCSatisfiedState.hpp"
+#include "cppmicroservices/detail/CounterLatch.h"
 
 using cppmicroservices::service::component::runtime::dto::ComponentState;
 
 namespace cppmicroservices {
 namespace scrimpl {
-    
+
 /**
  * This class represents the {\code ComponentState::ACTIVE} state of a
  * component configuration.
  */
-class CCActiveState final
-  : public CCSatisfiedState
+class CCActiveState final : public CCSatisfiedState
 {
 public:
   CCActiveState();
@@ -46,12 +46,24 @@ public:
   CCActiveState(CCActiveState&&) = delete;
   CCActiveState& operator=(CCActiveState&&) = delete;
 
-  void Register(ComponentConfigurationImpl&) override
-  {
+  void Register(ComponentConfigurationImpl&) override{
     // no-op, already resolved
   };
-  std::shared_ptr<ComponentInstance> Activate(ComponentConfigurationImpl& mgr,
-                                              const cppmicroservices::Bundle& clientBundle) override;
+  std::shared_ptr<ComponentInstance> Activate(
+    ComponentConfigurationImpl& mgr,
+    const cppmicroservices::Bundle& clientBundle) override;
+
+  void Deactivate(ComponentConfigurationImpl& mgr) override;
+
+  /**
+   * Modifies the properties of the component instance when a configuration object on 
+   * which it is dependent changes. No state change. R
+   * @return
+   *    - true if the component has a Modified method.
+   *    - false if the component does not have a Modified method. The 
+   *      component has been Deactivated
+   */
+  bool Modified(ComponentConfigurationImpl&) override;
 
   /**
    * Rebind to a target service. This operation does not transition to another state.
@@ -71,13 +83,13 @@ public:
    * state represented by this object
    */
   ComponentState GetValue() const override { return ComponentState::ACTIVE; }
-
-  void WaitForTransitionTask() override
-  {
-    latch.Wait();
+  void WaitForTransitionTask() override {
+      latch.Wait(); 
   }
+
 private:
-  CounterLatch latch;
+  detail::CounterLatch latch;
+  
 };
 }
 }

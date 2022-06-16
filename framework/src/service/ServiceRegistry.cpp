@@ -79,9 +79,10 @@ ServiceRegistry::ServiceRegistry(CoreBundleContext* coreCtx)
   : core(coreCtx)
 {}
 
-ServiceRegistrationBase ServiceRegistry::RegisterService(BundlePrivate* bundle
-                                                         , const InterfaceMapConstPtr& service
-                                                         , const ServiceProperties& properties)
+ServiceRegistrationBase ServiceRegistry::RegisterService(
+  BundlePrivate* bundle,
+  const InterfaceMapConstPtr& service,
+  const ServiceProperties& properties)
 {
   if (!service || service->empty()) {
     throw std::invalid_argument(
@@ -106,12 +107,11 @@ ServiceRegistrationBase ServiceRegistry::RegisterService(BundlePrivate* bundle
     classes.push_back(i.first);
   }
 
-  ServiceRegistrationBase res(bundle
-                              , service
-                              , CreateServiceProperties(properties
-                                                        , classes
-                                                        , isFactory
-                                                        , isPrototypeFactory));
+  ServiceRegistrationBase res(
+    bundle,
+    service,
+    CreateServiceProperties(
+      properties, classes, isFactory, isPrototypeFactory));
   {
     auto l = this->Lock();
     US_UNUSED(l);
@@ -300,8 +300,10 @@ void ServiceRegistry::GetRegisteredByBundle(
   US_UNUSED(l);
 
   for (auto& sr : serviceRegistrations) {
-    if (sr.d->bundle == p) {
-      res.push_back(sr);
+    if (auto bundle_ = sr.d->bundle.lock()) {
+      if (bundle_.get() == p) {
+        res.push_back(sr);
+      }
     }
   }
 }

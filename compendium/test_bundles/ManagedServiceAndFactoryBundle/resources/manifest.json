@@ -1,0 +1,57 @@
+{
+  "bundle.symbolic_name": "ManagedServiceAndFactoryBundle",
+  "bundle.name": "ManagedServiceAndFactoryBundle",
+  "bundle.activator": false,
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "name": "cppmicroservices::service::cm::test::TestManagedServiceImpl",
+        "implementation-class": "cppmicroservices::service::cm::test::TestManagedServiceImpl",
+        "properties" : {
+          "service.pid" : "cm.testservice"
+        },
+        "service": {
+          "interfaces": [
+             "test::TestManagedServiceInterface", "cppmicroservices::service::cm::ManagedService"
+          ]
+        }
+      },
+      {
+        "name": "cppmicroservices::service::cm::test::TestManagedServiceFactoryImpl",
+        "implementation-class": "cppmicroservices::service::cm::test::TestManagedServiceFactoryImpl",
+        "properties" : {
+          "service.pid" : "cm.testfactory"
+        },
+        "service": {
+          "interfaces": [
+            "test::TestManagedServiceFactory", "cppmicroservices::service::cm::ManagedServiceFactory"
+          ]
+        }
+      }
+    ]
+  },
+  "cm": {
+    "version": 1,
+    "configurations": [
+      {
+        "pid": "cm.testservice",
+        "properties": {
+          "anInt": 2
+        }
+      },
+      {
+        "pid": "cm.testfactory~config1",
+        "properties": {
+          "anInt": 2
+        }
+      },
+      {
+        "pid": "cm.testfactory~config2",
+        "properties": {
+          "anInt": 2
+        }
+      }
+    ]
+  }
+}

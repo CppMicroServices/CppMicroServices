@@ -25,14 +25,16 @@
 
 #include <memory>
 #if defined(USING_GTEST)
-#include "gtest/gtest_prod.h"
+#  include "gtest/gtest_prod.h"
 #else
-#define FRIEND_TEST(x, y)
+#  define FRIEND_TEST(x, y)
 #endif
-#include "cppmicroservices/BundleContext.h"
 #include "ComponentRegistry.hpp"
-#include "manager/ComponentManager.hpp"
+#include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
+#include "manager/ComponentManager.hpp"
+#include "manager/ConfigurationNotifier.hpp"
 #include "metadata/Util.hpp"
 
 using cppmicroservices::logservice::LogService;
@@ -48,22 +50,31 @@ namespace scrimpl {
 class SCRBundleExtension
 {
 public:
-  SCRBundleExtension(const cppmicroservices::BundleContext& bundleContext,
-                     const cppmicroservices::AnyMap& scrMetadata,
-                     const std::shared_ptr<ComponentRegistry>& registry,
-                     const std::shared_ptr<LogService>& logger);
+  SCRBundleExtension(
+    const cppmicroservices::BundleContext& bundleContext,
+    const cppmicroservices::AnyMap& scrMetadata,
+    const std::shared_ptr<ComponentRegistry>& registry,
+    const std::shared_ptr<LogService>& logger,
+    const std::shared_ptr<cppmicroservices::async::AsyncWorkService>&
+      asyncWorkService,
+    const std::shared_ptr<ConfigurationNotifier>& configNotifier);
+
   SCRBundleExtension(const SCRBundleExtension&) = delete;
   SCRBundleExtension(SCRBundleExtension&&) = delete;
   SCRBundleExtension& operator=(const SCRBundleExtension&) = delete;
   SCRBundleExtension& operator=(SCRBundleExtension&&) = delete;
   ~SCRBundleExtension();
+
 private:
   FRIEND_TEST(SCRBundleExtensionTest, CtorWithValidArgs);
+
+  void DisableAndRemoveAllComponentManagers();
 
   cppmicroservices::BundleContext bundleContext;
   std::shared_ptr<ComponentRegistry> registry;
   std::shared_ptr<LogService> logger;
-  std::vector<std::shared_ptr<ComponentManager>> managers;
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
+  std::shared_ptr<ConfigurationNotifier> configNotifier;
 };
 } // scrimpl
 } // cppmicroservices

@@ -40,8 +40,8 @@
 #include "civetweb/CivetServer.h"
 
 #include <cassert>
-#include <utility>
 #include <memory>
+#include <utility>
 
 namespace cppmicroservices {
 
@@ -50,8 +50,7 @@ using Lock = std::unique_lock<std::mutex>;
 class ServletHandler : public CivetHandler
 {
 public:
-  ServletHandler(std::shared_ptr<HttpServlet>  servlet,
-                 std::string  servletPath)
+  ServletHandler(std::shared_ptr<HttpServlet> servlet, std::string servletPath)
     : m_Servlet(std::move(servlet))
     , m_ServletPath(std::move(servletPath))
   {}
@@ -279,7 +278,9 @@ void ServletContainer::SetContextPath(const std::string& path)
 
 std::string ServletContainer::GetContextPath() const
 {
-  return Lock(d->m_Mutex), d->m_ContextPath;
+  Lock l(d->m_Mutex);
+  US_UNUSED(l);
+  return d->m_ContextPath;
 }
 
 void ServletContainer::Start()
@@ -306,6 +307,8 @@ std::shared_ptr<ServletContext> ServletContainer::GetContext(
 std::string ServletContainer::GetContextPath(
   const ServletContext* /*context*/) const
 {
-  return Lock(d->m_Mutex), d->m_ContextPath;
+  Lock l(d->m_Mutex);
+  US_UNUSED(l);
+  return d->m_ContextPath;
 }
 }

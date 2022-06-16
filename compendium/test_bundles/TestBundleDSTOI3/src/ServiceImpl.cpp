@@ -22,10 +22,10 @@
 #include "ServiceImpl.hpp"
 
 namespace sample {
-  ServiceComponent3::~ServiceComponent3() = default;
+ServiceComponent3::~ServiceComponent3() = default;
 
-  std::string ServiceComponent3::Description()
-  {
-    return STRINGIZE(US_BUNDLE_NAME);
-  }
+std::string ServiceComponent3::Description()
+{
+  return STRINGIZE(US_BUNDLE_NAME);
+}
 }

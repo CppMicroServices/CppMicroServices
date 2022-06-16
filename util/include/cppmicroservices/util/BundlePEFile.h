@@ -20,20 +20,21 @@
 
 =============================================================================*/
 
-#if defined (US_PLATFORM_WINDOWS)
+#if defined(US_PLATFORM_WINDOWS)
 
-#include "BundleObjFile.h"
-#include "DataContainer.h"
-#include "Error.h"
-#include "cppmicroservices_pe.h"
+#  include "BundleObjFile.h"
+#  include "DataContainer.h"
+#  include "Error.h"
+#  include "String.h"
+#  include "cppmicroservices_pe.h"
 
-#include <cerrno>
-#include <fstream>
-#include <memory>
+#  include <cerrno>
+#  include <fstream>
+#  include <memory>
 
-#include <sys/stat.h>
+#  include <sys/stat.h>
 
-#include <Windows.h>
+#  include <Windows.h>
 
 namespace cppmicroservices {
 
@@ -44,7 +45,8 @@ struct hModuleDeleter
   // pointer instead of T*.
   typedef HMODULE pointer;
 
-  void operator()(HMODULE handle) const {
+  void operator()(HMODULE handle) const
+  {
     if (handle) {
       FreeLibrary(handle);
     }
@@ -87,25 +89,35 @@ public:
   BundlePEFile(std::string location)
     : m_rawData(nullptr)
   {
-    HMODULE hBundleResources = LoadLibraryEx(location.c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
+    std::wstring wpath(cppmicroservices::util::ToWString(location));
+    HMODULE hBundleResources =
+      LoadLibraryExW(wpath.c_str(),
+                     nullptr,
+                     LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
     if (hBundleResources) {
       // RAII - automatically free the library handle on object destruction
-      auto loadLibraryHandle = std::unique_ptr<HMODULE, hModuleDeleter>(hBundleResources, hModuleDeleter{});
-      HRSRC hResource = FindResource(hBundleResources, "US_RESOURCES", MAKEINTRESOURCE(300));
+      auto loadLibraryHandle = std::unique_ptr<HMODULE, hModuleDeleter>(
+        hBundleResources, hModuleDeleter{});
+      HRSRC hResource =
+        FindResourceA(hBundleResources, "US_RESOURCES", MAKEINTRESOURCEA(300));
       HGLOBAL hRes = LoadResource(hBundleResources, hResource);
       const LPVOID res = LockResource(hRes);
       const DWORD zipSizeInBytes = SizeofResource(hBundleResources, hResource);
       if (0 < zipSizeInBytes) {
-        m_rawData = std::make_shared<RawBundleResources>(std::make_unique<ResDataContainer>(std::move(loadLibraryHandle), res, zipSizeInBytes));
+        m_rawData = std::make_shared<RawBundleResources>(
+          std::make_unique<ResDataContainer>(
+            std::move(loadLibraryHandle), res, zipSizeInBytes));
       }
-    }
-    else {
-      throw InvalidPEException("LoadLibrary failed for path " + location + " with error " + cppmicroservices::util::GetLastWin32ErrorStr());
+    } else {
+      throw InvalidPEException("LoadLibrary failed for path " + location +
+                               " with error " +
+                               cppmicroservices::util::GetLastWin32ErrorStr());
     }
   };
   ~BundlePEFile() = default;
 
-  std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const override
+  std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer()
+    const override
   {
     return m_rawData;
   }

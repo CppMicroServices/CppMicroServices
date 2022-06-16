@@ -132,7 +132,7 @@ Google Test and Google Mock
 See https://github.com/google/googletest/blob/master/LICENSE for license information.
 
 https://github.com/google/googletest
-ba33a8876c3eda4cb8def8e0e90f45930ef8c54f
+aefb45469ee7e6bde0cd1d2c18412046c30e7bb6
 
 RapidJSON
 ---------
@@ -147,8 +147,8 @@ Google benchmark
 
 See https://github.com/google/benchmark/blob/master/LICENSE for license information
 
-https://github.com/google/benchmark/releases
-1.4.1
+https://github.com/google/benchmark
+4124223bf5303d1d65fe2c40f33e28372bbb986c
 
 Abseil (absl)
 -------------
@@ -158,3 +158,23 @@ See https://github.com/abseil/abseil-cpp/blob/master/LICENSE for license informa
 https://github.com/abseil/abseil-cpp
 6ec136281086b71da32b5fb068bd6e46b78a5c79
 
+spdlog
+------
+
+See https://github.com/gabime/spdlog/blob/v1.x/LICENSE for license information
+
+https://github.com/gabime/spdlog
+83b40b8cdac0253a147fbda6d6a7dbc2c836c380
+
+* We only use the include folder since we aren't statically linking to the library
+* Commit reflects the commit when we copied the include folder
+
+Patches:
+
+ * Replaced old-style-cast to long int with static_cast<long int>
+
+Boost
+------
+
+See https://www.boost.org/users/license.html for license information
+1.73.0

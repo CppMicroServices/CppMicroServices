@@ -36,6 +36,8 @@ DEALINGS IN THE SOFTWARE.
 #include "cppmicroservices/FrameworkConfig.h"
 
 #include <algorithm>
+#include <array>
+#include <functional>
 #include <list>
 #include <map>
 #include <memory>
@@ -45,6 +47,52 @@ DEALINGS IN THE SOFTWARE.
 #include <utility>
 #include <vector>
 
+namespace cppmicroservices {
+namespace any {
+namespace detail {
+
+/**
+ * Provide a compare function that will do the comparison if the operator is available, and always
+ * return false otherwise. Use SFINAE to pick the right implementation based on type.
+ */
+template<class T>
+struct has_op_eq
+{
+  template<class U>
+  static auto op_eq_test(const U* u) -> decltype(char(*u == *u))
+  {
+    return char(0);
+  }
+
+  static std::array<char, 2> op_eq_test(...)
+  {
+    return std::array<char, 2>{ { 0, 0 } };
+  }
+
+  static const bool value = (sizeof(op_eq_test(static_cast<T*>(0))) == 1);
+};
+
+/**
+ * If there's an operator==, use it and return the results of the comparison.
+ */
+template<typename CmpT, std::enable_if_t<has_op_eq<CmpT>::value, bool> = true>
+bool compare(const CmpT& lhs, const CmpT& rhs)
+{
+  return lhs == rhs;
+}
+
+/**
+ * When CmpT does not have an operator==, return false.
+ */
+template<typename CmpT, std::enable_if_t<!has_op_eq<CmpT>::value, bool> = false>
+bool compare(const CmpT&, const CmpT&)
+{
+  return false;
+}
+
+}
+}
+
 /**
 
 \defgroup gr_any Any
@@ -52,19 +100,41 @@ DEALINGS IN THE SOFTWARE.
 \brief The Any class and related functions.
 
 */
-
-namespace cppmicroservices {
-
 class Any;
 
+US_Framework_EXPORT std::ostream& newline_and_indent(std::ostream& os,
+                                                     const uint8_t increment,
+                                                     const int32_t indent);
 US_Framework_EXPORT std::ostream& any_value_to_string(std::ostream& os,
                                                       const Any& any);
+US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
+                                                    const Any& val,
+                                                    const uint8_t,
+                                                    const int32_t);
+US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
+                                                    const std::string& val,
+                                                    const uint8_t,
+                                                    const int32_t);
+US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
+                                                    bool val,
+                                                    const uint8_t,
+                                                    const int32_t);
 
-US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
-                                                    const Any& val);
-US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
-                                                    const std::string& val);
-US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os, bool val);
+template <typename T>
+std::ostream& any_value_to_string(std::ostream& os,
+    const std::function<bool(const T&)>&)
+{
+  return os;
+}
+
+template<typename T>
+std::ostream& any_value_to_json(std::ostream& os,
+    const std::function<bool(const T&)>&,
+    const uint8_t,
+    const int32_t)
+{
+  return os;
+}
 
 template<typename ValueType>
 ValueType* any_cast(Any* operand);
@@ -77,7 +147,10 @@ std::ostream& any_value_to_string(std::ostream& os, const T& val)
 }
 
 template<class T>
-std::ostream& any_value_to_json(std::ostream& os, const T& val)
+std::ostream& any_value_to_json(std::ostream& os,
+                                const T& val,
+                                const uint8_t = 0,
+                                const int32_t = 0)
 {
   return os << val;
 }
@@ -106,18 +179,27 @@ std::ostream& container_to_string(std::ostream& os, Iterator i1, Iterator i2)
  * \internal
  */
 template<typename Iterator>
-std::ostream& container_to_json(std::ostream& os, Iterator i1, Iterator i2)
+std::ostream& container_to_json(std::ostream& os,
+                                Iterator i1,
+                                Iterator i2,
+                                const uint8_t increment = 0,
+                                const int32_t indent = 0)
 {
+  if (i1 == i2) {
+    os << "[]";
+    return os;
+  }
+
   os << "[";
   const Iterator begin = i1;
   for (; i1 != i2; ++i1) {
-    if (i1 == begin) {
-      any_value_to_json(os, *i1);
-    } else {
+    if (i1 != begin) {
       os << ",";
-      any_value_to_json(os, *i1);
     }
+    newline_and_indent(os, increment, indent);
+    any_value_to_json(os, *i1, increment, indent + increment);
   }
+  newline_and_indent(os, increment, indent - increment);
   os << "]";
   return os;
 }
@@ -129,9 +211,12 @@ std::ostream& any_value_to_string(std::ostream& os, const std::vector<E>& vec)
 }
 
 template<class E>
-std::ostream& any_value_to_json(std::ostream& os, const std::vector<E>& vec)
+std::ostream& any_value_to_json(std::ostream& os,
+                                const std::vector<E>& vec,
+                                const uint8_t increment,
+                                const int32_t indent)
 {
-  return container_to_json(os, vec.begin(), vec.end());
+  return container_to_json(os, vec.begin(), vec.end(), increment, indent);
 }
 
 template<class E>
@@ -141,9 +226,12 @@ std::ostream& any_value_to_string(std::ostream& os, const std::list<E>& l)
 }
 
 template<class E>
-std::ostream& any_value_to_json(std::ostream& os, const std::list<E>& l)
+std::ostream& any_value_to_json(std::ostream& os,
+                                const std::list<E>& l,
+                                const uint8_t increment,
+                                const int32_t indent)
 {
-  return container_to_json(os, l.begin(), l.end());
+  return container_to_json(os, l.begin(), l.end(), increment, indent);
 }
 
 template<class E>
@@ -153,9 +241,12 @@ std::ostream& any_value_to_string(std::ostream& os, const std::set<E>& s)
 }
 
 template<class E>
-std::ostream& any_value_to_json(std::ostream& os, const std::set<E>& s)
+std::ostream& any_value_to_json(std::ostream& os,
+                                const std::set<E>& s,
+                                const uint8_t increment,
+                                const int32_t indent)
 {
-  return container_to_json(os, s.begin(), s.end());
+  return container_to_json(os, s.begin(), s.end(), increment, indent);
 }
 
 template<class M>
@@ -165,10 +256,16 @@ template<class K, class V>
 std::ostream& any_value_to_string(std::ostream& os, const std::map<K, V>& m);
 
 template<class M>
-std::ostream& any_value_to_json(std::ostream& os, const std::map<M, Any>& m);
+std::ostream& any_value_to_json(std::ostream& os,
+                                const std::map<M, Any>& m,
+                                const uint8_t increment,
+                                const int32_t indent);
 
 template<class K, class V>
-std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m);
+std::ostream& any_value_to_json(std::ostream& os,
+                                const std::map<K, V>& m,
+                                const uint8_t increment,
+                                const int32_t indent);
 
 /**
  * \ingroup gr_any
@@ -184,7 +281,7 @@ public:
   /**
    * Creates an empty any type.
    */
-    Any();
+  Any();
 
   /**
    * Creates an Any which stores the init parameter inside.
@@ -244,8 +341,19 @@ public:
   {
     if (Type() != typeid(ValueType))
       return false;
-    return *any_cast<const ValueType>(this) == val;
+    return cppmicroservices::any::detail::compare(*any_cast<const ValueType>(this), val);
   }
+
+  /**
+   * Compares this Any with another Any. We accomplish this by forwarding the call to a virtual
+   * compare function on the Holder of the value in the _content field. The Placeholder subclass of
+   * Holder provides an implementation that invokes the above operator== with the underlying value
+   * of ValueType.
+   * @param rhs an Any to compare against
+   * @return bool return true if rhs compares equal to *this AND the underlying ValueType has an
+   *              operator==, and return false otherwise.
+   */
+  bool operator==(const Any& rhs) const { return rhs._content->compare(*this); }
 
   /**
    * Compares this Any with another value for inequality.
@@ -333,9 +441,28 @@ public:
    * Returns a JSON representation for the content.
    *
    * Custom types should specialize the any_value_to_json template function for meaningful output.
+   * The values of increment and indent are passed around to be able to be used for nicer
+   * formatting. The code that makes use of this is in the any_value_to_json specializations for the
+   * various containers.
+   *
+   * To get pretty output, simply pass a value greater than zero in as the first argument of ToJSON
+   * and the rest of the code will take care of things.
+   *
+   * @param increment The amount of extra indentation to add for each level of JSON. An increment of
+   *                  zero indicates no special formatting
+   * @param indent    The current amount of indent to apply to the current line. 
    */
-  std::string ToJSON() const { return Empty() ? "null" : _content->ToJSON(); }
-
+  std::string ToJSON(const uint8_t increment, const int32_t indent) const
+  {
+    return Empty() ? "null" : _content->ToJSON(increment, indent);
+  }
+  std::string ToJSON(bool prettyPrint = false) const
+  {
+    // Standard indent by 4 spaces if pretty printing. If you want something else, call the general
+    // interface directly.
+    uint8_t increment = prettyPrint ? 4 : 0;
+    return ToJSON(increment, increment);
+  }
   /**
    * Returns the type information of the stored content.
    * If the Any is empty typeid(void) is returned.
@@ -354,10 +481,12 @@ private:
     virtual ~Placeholder() = default;
 
     virtual std::string ToString() const = 0;
-    virtual std::string ToJSON() const = 0;
+    virtual std::string ToJSON(const uint8_t increment = 0,
+                               const int32_t indent = 0) const = 0;
 
     virtual const std::type_info& Type() const = 0;
     virtual std::unique_ptr<Placeholder> Clone() const = 0;
+    virtual bool compare(const Any& lhs) const = 0;
   };
 
   template<typename ValueType>
@@ -368,7 +497,7 @@ private:
       : _held(value)
     {}
 
-    Holder(ValueType&&  value)
+    Holder(ValueType&& value)
       : _held(std::move(value))
     {}
 
@@ -379,10 +508,11 @@ private:
       return ss.str();
     }
 
-    std::string ToJSON() const override
+    std::string ToJSON(const uint8_t increment,
+                       const int32_t indent) const override
     {
       std::stringstream ss;
-      any_value_to_json(ss, _held);
+      any_value_to_json(ss, _held, increment, indent);
       return ss.str();
     }
 
@@ -394,6 +524,13 @@ private:
     }
 
     ValueType _held;
+
+    /**
+     * compare _held with lhs. This invokes the Any::operator==(ValueType) above. 
+     * @param lhs an Any containing a value to compare against _held
+     * @return bool return true if the value held in lhs is equal to _held.
+     */
+    bool compare(const Any& lhs) const override { return lhs == _held; }
 
   private: // intentionally left unimplemented
     Holder& operator=(const Holder&) = delete;
@@ -418,7 +555,7 @@ private:
 class BadAnyCastException : public std::bad_cast
 {
 public:
-  BadAnyCastException(std::string  msg = "")
+  BadAnyCastException(std::string msg = "")
     : std::bad_cast()
     , _msg(std::move(msg))
   {}
@@ -659,39 +796,58 @@ std::ostream& any_value_to_string(std::ostream& os, const std::map<K, V>& m)
 }
 
 template<class K>
-std::ostream& any_value_to_json(std::ostream& os, const std::map<K, Any>& m)
+std::ostream& any_value_to_json(std::ostream& os,
+                                const std::map<K, Any>& m,
+                                const uint8_t increment,
+                                const int32_t indent)
 {
+  if (m.empty()) {
+    os << "{}";
+    return os;
+  }
+
   os << "{";
   using Iterator = typename std::map<K, Any>::const_iterator;
   auto i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
   for (; i1 != end; ++i1) {
-    if (i1 == begin)
-      os << "\"" << i1->first << "\" : " << i1->second.ToJSON();
-    else
-      os << ", "
-         << "\"" << i1->first << "\" : " << i1->second.ToJSON();
+    if (i1 != begin) {
+      os << ", ";
+    }
+    newline_and_indent(os, increment, indent);
+    os << "\"" << i1->first
+       << "\" : " << i1->second.ToJSON(increment, indent + increment);
   }
+  newline_and_indent(os, increment, indent - increment);
   os << "}";
   return os;
 }
 
 template<class K, class V>
-std::ostream& any_value_to_json(std::ostream& os, const std::map<K, V>& m)
+std::ostream& any_value_to_json(std::ostream& os,
+                                const std::map<K, V>& m,
+                                const uint8_t increment,
+                                const int32_t indent)
 {
+  if (m.empty()) {
+    os << "{}";
+    return os;
+  }
+
   os << "{";
   using Iterator = typename std::map<K, V>::const_iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
   for (; i1 != end; ++i1) {
-    if (i1 == begin)
-      os << "\"" << i1->first << "\" : " << i1->second;
-    else
-      os << ", "
-         << "\"" << i1->first << "\" : " << i1->second;
+    if (i1 != begin) {
+      os << ", ";
+    }
+    newline_and_indent(os, increment, indent);
+    os << "\"" << i1->first << "\" : " << i1->second;
   }
+  newline_and_indent(os, increment, (std::max)(0, indent - increment));
   os << "}";
   return os;
 }

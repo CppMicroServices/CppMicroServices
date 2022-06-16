@@ -42,7 +42,7 @@ void extenderPattern(const BundleContext& bundleCtx)
   // Check if a bundle defines a "service-component" property
   // and use its value to retrieve an embedded resource containing
   // a component description.
-  for (auto const bundle : bundleCtx.GetBundles()) {
+  for (auto const& bundle : bundleCtx.GetBundles()) {
     if (bundle.GetState() == Bundle::STATE_UNINSTALLED)
       continue;
     auto headers = bundle.GetHeaders();
@@ -63,7 +63,7 @@ void extenderPattern(const BundleContext& bundleCtx)
   //! [2]
 }
 
-int main(int /*argc*/, char* /*argv*/ [])
+int main(int /*argc*/, char* /*argv*/[])
 {
   std::cout
     << "This snippet is not meant to be executed.\n"

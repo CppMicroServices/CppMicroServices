@@ -23,9 +23,8 @@
 #ifndef METADATAPARSER_HPP
 #define METADATAPARSER_HPP
 
-#include "Util.hpp"
 #include "ComponentMetadata.hpp"
-
+#include "Util.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -59,7 +58,10 @@ public:
    * @param anymap An @c AnyMap representation of the service description
    * @returns a vector of shared_ptrs to each parsed @c ComponentMetadata
    */
-  virtual std::vector<std::shared_ptr<ComponentMetadata>> ParseAndGetComponentsMetadata(const cppmicroservices::AnyMap& anymap) const = 0;
+  virtual std::vector<std::shared_ptr<ComponentMetadata>>
+  ParseAndGetComponentsMetadata(
+    const cppmicroservices::AnyMap& anymap) const = 0;
+
 protected:
   MetadataParser() = default;
 };

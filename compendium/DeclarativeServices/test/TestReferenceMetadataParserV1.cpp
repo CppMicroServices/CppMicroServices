@@ -300,16 +300,17 @@ INSTANTIATE_TEST_SUITE_P(
                                       "",
                                       1,
                                       1),
-    ReferenceMetadataParserValidState(9,
-                                      "com.bar.foo",
-                                      "foo",
-                                      "0..n",
-                                      "dynamic",
-                                      "greedy",
-                                      "bundle",
-                                      "LDAP",
-                                      0,
-                                      std::numeric_limits<std::size_t>::max())));
+    ReferenceMetadataParserValidState(
+      9,
+      "com.bar.foo",
+      "foo",
+      "0..n",
+      "dynamic",
+      "greedy",
+      "bundle",
+      "LDAP",
+      0,
+      std::numeric_limits<std::size_t>::max())));
 
 // For the metadata in InvalidInputs corresponding to metadataIndex,
 // we expect the exception message output by the Metadata Parser to be

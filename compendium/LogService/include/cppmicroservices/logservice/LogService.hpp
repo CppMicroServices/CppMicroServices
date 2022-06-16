@@ -22,26 +22,42 @@
 #ifndef CPPMICROSERVICES_LOG_SERVICE_H__
 #define CPPMICROSERVICES_LOG_SERVICE_H__
 
-#include "cppmicroservices/logservice/LogServiceExport.h"
-
 #include "cppmicroservices/ServiceReferenceBase.h"
 
+#include <cstdint>
 #include <exception>
 #include <string>
-#include <cstdint>
 
 namespace cppmicroservices {
 namespace logservice {
 
-enum class SeverityLevel : uint8_t
-{
-  LOG_ERROR = 1,    // Indicates the bundle or service may not be functional. Action should be taken to correct this situation.
-  LOG_WARNING = 2,  // Indicates a bundle or service is still functioning but may experience problems in the future because of the warning condition.
-  LOG_INFO = 3,     // May be the result of any change in the bundle or service and does not indicate a problem.
-  LOG_DEBUG = 4     // Used for problem determination and may be irrelevant to anyone but the bundle developer.
-};
+/**
+\defgroup gr_logservice LogService
+
+\brief Groups LogService class related symbols.
+*/
 
 /**
+ * \addtogroup gr_logservice
+ * @{
+ */
+enum class SeverityLevel : uint8_t
+{
+  LOG_ERROR =
+    1, ///< Indicates the bundle or service may not be functional. Action should be taken to correct this situation.
+  LOG_WARNING =
+    2, ///< Indicates a bundle or service is still functioning but may experience problems in the future because of the warning condition.
+  LOG_INFO =
+    3, ///< May be the result of any change in the bundle or service and does not indicate a problem.
+  LOG_DEBUG =
+    4 ///< Used for problem determination and may be irrelevant to anyone but the bundle developer.
+};
+/** @}*/
+
+/**
+ * \ingroup MicroService
+ * \ingroup gr_logservice
+ * 
  * Provides methods for bundles to write messages to the log. 
  * LogService methods are provided to log messages; optionally with a ServiceReference object or an exception.
  * Bundles must log messages in the OSGi environment with a severity level according to the following
@@ -53,10 +69,10 @@ enum class SeverityLevel : uint8_t
  *
  * @remarks This class is thread safe.
  */
-class US_LogService_EXPORT LogService
+class LogService
 {
-  public:
-  virtual ~LogService();
+public:
+  virtual ~LogService() = default;
 
   /**
    * Logs a message.
@@ -71,7 +87,9 @@ class US_LogService_EXPORT LogService
    * @param message Human readable string describing the condition or empty string.
    * @param ex The exception that reflects the condition or nullptr.
    */
-  virtual void Log(SeverityLevel level, const std::string& message, const std::exception_ptr ex) = 0;
+  virtual void Log(SeverityLevel level,
+                   const std::string& message,
+                   const std::exception_ptr ex) = 0;
 
   /**
    * Logs a message.
@@ -79,7 +97,9 @@ class US_LogService_EXPORT LogService
    * @param level The severity of the message. This should be one of the defined log levels but may be any integer that is interpreted in a user defined way.
    * @param message Human readable string describing the condition or empty string.
    */
-  virtual void Log(const ServiceReferenceBase& sr, SeverityLevel level, const std::string& message) = 0;
+  virtual void Log(const ServiceReferenceBase& sr,
+                   SeverityLevel level,
+                   const std::string& message) = 0;
 
   /**
    * Logs a message with an exception associated and a ServiceReference object.
@@ -88,7 +108,10 @@ class US_LogService_EXPORT LogService
    * @param message Human readable string describing the condition or empty string.
    * @param ex The exception that reflects the condition or nullptr.
    */
-  virtual void Log(const ServiceReferenceBase& sr, SeverityLevel level, const std::string& message, const std::exception_ptr ex) = 0;
+  virtual void Log(const ServiceReferenceBase& sr,
+                   SeverityLevel level,
+                   const std::string& message,
+                   const std::exception_ptr ex) = 0;
 };
 
 } // namespace logservice

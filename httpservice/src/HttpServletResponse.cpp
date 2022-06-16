@@ -28,11 +28,13 @@
 
 #include "civetweb/civetweb.h"
 
+#include <ctime>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
-#include <ctime>
 #include <vector>
+
+US_MSVC_PUSH_DISABLE_WARNING(4996)
 
 namespace cppmicroservices {
 
@@ -67,7 +69,7 @@ bool HttpServletResponsePrivate::Commit()
 
   std::stringstream ss;
   ss << "HTTP/1.1 " << m_StatusCode << "\r\n";
-  for (auto & m_Header : m_Headers) {
+  for (auto& m_Header : m_Headers) {
     ss << m_Header.first << ": " << m_Header.second << "\r\n";
   }
   ss << "\r\n";
@@ -138,7 +140,8 @@ std::string HttpServletResponsePrivate::LexicalCastHex(long value)
 
 HttpServletResponse::~HttpServletResponse() = default;
 HttpServletResponse::HttpServletResponse(const HttpServletResponse&) = default;
-HttpServletResponse& HttpServletResponse::operator=(const HttpServletResponse&) = default;
+HttpServletResponse& HttpServletResponse::operator=(
+  const HttpServletResponse&) = default;
 
 void HttpServletResponse::FlushBuffer()
 {
@@ -161,8 +164,7 @@ std::size_t HttpServletResponse::GetBufferSize() const
 
 std::string HttpServletResponse::GetContentType() const
 {
-  auto iter =
-    d->m_Headers.find("Content-Type");
+  auto iter = d->m_Headers.find("Content-Type");
   if (iter != d->m_Headers.end()) {
     return iter->second;
   }
@@ -421,3 +423,5 @@ HttpServletResponse::HttpServletResponse(HttpServletResponsePrivate* d)
   : d(d)
 {}
 }
+
+US_MSVC_POP_WARNING

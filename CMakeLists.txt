@@ -1,7 +1,7 @@
 # Extract the current version from the VERSION file
 file(STRINGS VERSION _version LIMIT_COUNT 1)
 
-set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.2)
+set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.17)
 
 cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 
@@ -33,7 +33,8 @@ endforeach()
 
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_ENABLE_EXPORTS ON)
 
 # Since version 3.1, CMake pulls in implicit link libraries when compiling
 # source files in C mode. Because we mix C and C++ code in the test driver
@@ -76,20 +77,20 @@ set(CMAKE_C_IMPLICIT_LINK_LIBRARIES "")
 # wait_condition
 # exception_ptr
 
-set(US_COMPILER_GNU_MINIMUM_VERSION          5.1         )
-set(US_COMPILER_Clang_MINIMUM_VERSION        3.5         )
-set(US_COMPILER_AppleClang_MINIMUM_VERSION   7.3         )
-set(US_COMPILER_MSVC_MINIMUM_VERSION         19.00.23026 )
+set(US_COMPILER_GNU_MINIMUM_VERSION          7.5.0         )
+set(US_COMPILER_Clang_MINIMUM_VERSION        9.0.0         )
+set(US_COMPILER_AppleClang_MINIMUM_VERSION   10.0.0        )
+set(US_COMPILER_MSVC_MINIMUM_VERSION         19.10         )
 
 set(US_COMPILER_GNU_MINIMUM_VERSION_PRODUCT        "GCC ${US_COMPILER_GNU_MINIMUM_VERSION}")
 set(US_COMPILER_Clang_MINIMUM_VERSION_PRODUCT      "Clang ${US_COMPILER_CLANG_MINIMUM_VERSION}")
 set(US_COMPILER_AppleClang_MINIMUM_VERSION_PRODUCT "Xcode 7.3 (Clang ${US_COMPILER_AppleClang_MINIMUM_VERSION})")
 set(US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT       "Visual Studio 2015 (MSVC ${US_COMPILER_MSVC_MINIMUM_VERSION})")
 
-set(US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION         5.4   )
-set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION       3.5   )
-set(US_COMPILER_AppleClang_MINIMUM_RECOMMENDED_VERSION  8.0   )
-set(US_COMPILER_MSVC_MINIMUM_RECOMMENDED_VERSION        19.00 )
+set(US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION         9.4.0   )
+set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION       9.0     )
+set(US_COMPILER_AppleClang_MINIMUM_RECOMMENDED_VERSION  12.0.1  )
+set(US_COMPILER_MSVC_MINIMUM_RECOMMENDED_VERSION        19.20   )
 
 set(US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION_PRODUCT        "GCC ${US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION}")
 set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION_PRODUCT      "Clang ${US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION}")
@@ -107,6 +108,16 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 else()
   message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")
 endif()
+
+# Detect if we are using lld, if so, set US_USING_LLD to ON, OFF otherwise
+string(REGEX MATCH ".*(ld\.lld)$" _matches_lld "${CMAKE_LINKER}")
+if (NOT _matches_lld STREQUAL "")
+  set(US_USING_LLD ON)
+else()
+  set(US_USING_LLD OFF)
+endif()
+
+message(STATUS "Detected Linker: ${CMAKE_LINKER}")
 
 if (CMAKE_CXX_COMPILER_VERSION AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_VERSION})
   message(FATAL_ERROR "${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_VERSION_PRODUCT} or higher required (you are using ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}).")
@@ -183,7 +194,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 
   # Set the possible values of build type for cmake-gui
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
-               STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+	       STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -219,15 +230,60 @@ us_cache_var(BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(CMAKE_DEBUG_POSTFIX d STRING "Executable and library debug name postfix" ADVANCED)
 
 us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
-us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)
+us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer, Linux only)" ADVANCED)
+us_cache_var(US_ENABLE_ASAN OFF BOOL "Enable asan (address sanitizer)" ADVANCED)
+us_cache_var(US_ASAN_USER_DLL "" STRING "Path to ASAN DLL (Windows only)" ADVANCED)
+us_cache_var(US_ENABLE_MSAN OFF BOOL "Enable msan (memory sanitizer, Clang only)" ADVANCED)
+us_cache_var(US_ENABLE_UBSAN OFF BOOL "Enable ubsan (undefined behavior sanitizer, Clang only)" ADVANCED)
 us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
 
+set(_us_build_shared ${BUILD_SHARED_LIBS})
+
 if(NOT US_ENABLE_THREADING_SUPPORT AND US_ENABLE_TSAN)
   message(SEND_WARN "Thread-sanitizer enabled without threading support. Forcing US_ENABLE_TSAN to OFF")
   set(US_ENABLE_TSAN OFF)
+endif()
+
+if (US_ENABLE_MSAN)
+  message(FATAL_ERROR "Currently MSAN is not supported for CppMicroServices. Enabling \
+it requires that we link against a msan-instrumented libc++ or libstdc++. The CMake infrasture \
+still exists in the event we decide to fully implement it later")
+endif()
+
+# Count number of sanitizers that are enabled
+set(xsan_enabled_count 0)
+foreach(_xsan US_ENABLE_TSAN;US_ENABLE_ASAN;US_ENABLE_MSAN;US_ENABLE_UBSAN)
+  if (${_xsan})
+    math(EXPR xsan_enabled_count "${xsan_enabled_count}+1")
+
+    # Extract name of the enabled sanitizer and store it in selected_sanitizer
+    string(FIND "${_xsan}" "_" _sanitizer_name_start REVERSE)
+    math(EXPR _sanitizer_name_start "${_sanitizer_name_start}+1")
+    string(SUBSTRING "${_xsan}" ${_sanitizer_name_start} -1 _sanitizer_name)
+    set(selected_sanitizer ${_sanitizer_name})
+  endif()
+endforeach()
+
+# If more than one sanitizer is turned on, print an error stating that only one
+# sanitizer can be turned on at any given point
+if (xsan_enabled_count GREATER 1)
+  message(FATAL_ERROR "More than one sanitizer is enabled. Please only have one sanitizer enabled at a time.")
+endif()
+
+# If MSAN or UBSAN are turned on, make sure clang is being used. If not,
+# print an error stating that those sanitizers are only available if compiling
+# with clang and lld
+if ((NOT(US_COMPILER_CLANG) OR NOT(US_USING_LLD)) AND (US_ENABLE_MSAN OR US_ENABLE_UBSAN))
+  message(FATAL_ERROR "You are trying to use msan or ubsan either without clang as your compiler or \
+		       lld as your linker. Please use clang and lld if you wish to use msan or ubsan")
+endif()
+
+# Display the selected sanitizer if one was enabled
+if (NOT ${selected_sanitizer} STREQUAL "")
+  message(STATUS "Selected sanitizer: ${selected_sanitizer}")
 endif()
 
 if(WIN32 AND NOT CYGWIN)
@@ -277,15 +333,19 @@ set(IMPORT_EXECUTABLES "${CMAKE_BINARY_DIR}/ImportExecutables.cmake" CACHE FILEP
 
 # global options based on compiler
 if(NOT APPLE AND US_COMPILER_CLANG)
-  # use libc++ instead of libstdc++ when using the clang/llvm toolchain
-  # libstdc++ shipped with GCC 4.9 does not support std::atomic operations on std::shared_ptr
+  # If we are using ld.lld instead of ld, which we will do from now on
+  # when building with clang on Linux because of a bug in CMake 3.21.1 (and possibly
+  # other version), we need to specify additional linker flags which specify
+  # the target emulator for ld.lld to use.
+  if (US_USING_LLD)
+    set(_ADDITIONAL_LINKER_FLAGS -m elf_x86_64)
+  endif()
+endif()
+
+if (APPLE AND US_COMPILER_APPLE_CLANG)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
-endif()
-
-if(US_COMPILER_APPLE_CLANG OR US_COMPILER_CLANG)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -305,7 +365,7 @@ function(us_add_tests test_driver)
       # By default, these tests are not active until the concurrent bundle
       # start / stop mechanism has been properly implemented (GitHub Issue #25)
       add_test(NAME helgrind_${test} COMMAND ${US_MEMCHECK_COMMAND} --tool=helgrind --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
-        WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
+	WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
       set_property(TEST helgrind_${test} PROPERTY LABELS valgrind helgrind)
     endif()
   endif()
@@ -314,8 +374,8 @@ function(us_add_tests test_driver)
     file(TO_NATIVE_PATH ${US_RUNTIME_OUTPUT_DIRECTORY} US_RUNTIME_OUTPUT_NATIVE_DIRECTORY)
     # skip the unicode test bundle because opencppcoverage tool fails if a module is located in a path with unicode characters
     add_test(NAME coverage_${test}
-             COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception --excluded_modules *TestBundleU*.dll -- $<TARGET_FILE:${test_driver}> ${test}
-             WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
+	     COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception --excluded_modules *TestBundleU*.dll -- $<TARGET_FILE:${test_driver}> ${test}
+	     WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
     set_property(TEST coverage_${test} PROPERTY LABELS opencppcoverage)
   endif()
   endforeach()
@@ -367,10 +427,9 @@ if(US_BUILD_TESTING)
     set(GTEST_NO_INSTALL 1)
     set(GMOCK_NO_INSTALL 1)
 
-    # This project also sets BUILD_SHARED_LIBS. We want to guarantee that GTest is always built as a
-    # static library even if CppMicroServices is a shared library.
+    # This project also sets BUILD_SHARED_LIBS. We want to save what we initially
+    # set.
     set(_us_build_shared ${BUILD_SHARED_LIBS})
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     add_subdirectory(third_party/googletest)
 
     set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
@@ -388,25 +447,58 @@ endif()
 
 set(US_HAVE_VISIBILITY_ATTRIBUTE 0)
 set(US_CXX11_FLAGS )
-set(US_CXX_TSAN_FLAGS )
-set(US_TSAN_LINK_FLAGS )
 set(US_CXX_COVERAGE_FLAGS )
 
+# Flags for all supported sanitizers
+set(US_CXX_ASAN_FLAGS "")
+set(US_ASAN_LINK_FLAGS "")
+set(US_CXX_TSAN_FLAGS "")
+set(US_TSAN_LINK_FLAGS "")
+set(US_CXX_MSAN_FLAGS "")
+set(US_MSAN_LINK_FLAGS "")
+set(US_CXX_UBSAN_FLAGS "")
+set(US_UBSAN_LINK_FLAGS "")
+
 if(MSVC)
+  # Since we are compiling with boost, there exists some code which looks
+  # at the value of this define. Since we previously did not specify the
+  # define, boost assumed a value (0x0601, meaning Windows 7). We will
+  # now explicitly include this define to remove the compiler messages
+  # it generates.
+  set(msvc_version_define
+    "_WIN32_WINNT=0x0601"
+  )
+
   set(disabled_warnings
     4251 # 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
   )
 
   if (${MSVC_VERSION} LESS 1910)
     # For googletest on MSVC versions less than MSVC 2017
-    # 'identifier' : decorated name length exceeded, name was truncated
-    set(disabled_warnings ${disabled_warnings} 4503)
+    # - (4503) 'identifier' : decorated name length exceeded, name was truncated
+    # Additionally, on MSVC versions less than MSVC 2015
+    # - (4996) all deprecation warnings (pragma push/pop for disabling the warning does not work)
+    set(disabled_warnings ${disabled_warnings} 4503 4996)
   endif()
 
   foreach(wd ${disabled_warnings})
     set(US_CXX_FLAGS "/wd${wd} ${US_CXX_FLAGS}")
   endforeach()
-  set(US_CXX_FLAGS "/MP /WX ${US_CXX_FLAGS}")
+
+  if (${US_ENABLE_ASAN} AND NOT "${US_ASAN_USER_DLL}" STREQUAL "")
+    usFunctionCheckCompilerFlags("/fsanitize=address" US_CXX_ASAN_FLAGS)
+    if(NOT US_CXX_ASAN_FLAGS)
+      message(WARNING "ASAN requested, but compiler does not recognize it")
+      set(US_ENABLE_ASAN OFF)
+    else()
+      set(US_CXX_FLAGS "${US_CXX_ASAN_FLAGS} ${US_CXX_FLAGS}")
+    endif()
+  elseif (${US_ENABLE_ASAN} AND "${US_ASAN_USER_DLL}" STREQUAL "")
+    message(WARNING "ASAN requested, but user DLL was not specified")
+    set(US_ENABLE_ASAN OFF)
+  endif()
+
+  set(US_CXX_FLAGS "/MP /WX /D${msvc_version_define} ${US_CXX_FLAGS}")
 else()
 
   # If not cross-compiling, turn on Stack Smashing Protection.
@@ -419,8 +511,8 @@ else()
   endif()
 
   foreach(_cxxflag  -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
-                    -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
-                    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option )
+		    -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
+		    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option )
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 
@@ -459,6 +551,17 @@ else()
     set(US_CXX_FLAGS_RELEASE "${US_CXX_FLAGS_RELEASE} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2")
   endif()
 
+  # ================================================================================
+  # Check compiler flag availability for all supported sanitizers
+  # ================================================================================
+  set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
+  set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=address")
+  usFunctionCheckCompilerFlags("-O1 -fsanitize=address -fno-omit-frame-pointer" US_CXX_ASAN_FLAGS)
+  set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
+  if(NOT US_CXX_ASAN_FLAGS AND US_ENABLE_ASAN)
+    message(WARNING "ASAN requested, but compiler does not recognize it")
+  endif()
+
   set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
   set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=thread")
   usFunctionCheckCompilerFlags("-O1 -fsanitize=thread" US_CXX_TSAN_FLAGS)
@@ -466,6 +569,23 @@ else()
   if(NOT US_CXX_TSAN_FLAGS AND US_ENABLE_TSAN)
     message(WARNING "TSAN requested, but compiler does not recognize it")
   endif()
+
+  set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
+  set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=memory -fsanitize-memory-track-origins=2 -fPIE -fno-omit-frame-pointer")
+  usFunctionCheckCompilerFlags("-fsanitize=memory -fsanitize-memory-track-origins=2 -fPIE -fno-omit-frame-pointer" US_CXX_MSAN_FLAGS)
+  set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
+  if(NOT US_CXX_MSAN_FLAGS AND US_ENABLE_MSAN)
+    message(WARNING "MSAN requested, but compiler does not recognize it")
+  endif()
+
+  set(_orig_req_libs ${CMAKE_REQUIRED_LIBRARIES})
+  set(CMAKE_REQUIRED_LIBRARIES "-fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer")
+  usFunctionCheckCompilerFlags("-fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer" US_CXX_UBSAN_FLAGS)
+  set(CMAKE_REQUIRED_LIBRARIES "${_orig_req_libs}")
+  if(NOT US_CXX_UBSAN_FLAGS AND US_ENABLE_UBSAN)
+    message(WARNING "UBSAN requested, but compiler does not recognize it")
+  endif()
+  # ================================================================================
 
   set(CMAKE_REQUIRED_LIBRARIES "-fprofile-arcs -ftest-coverage")
   usFunctionCheckCompilerFlags("-fprofile-arcs -ftest-coverage" US_CXX_COVERAGE_FLAGS)
@@ -484,13 +604,24 @@ if(MINGW)
   add_compile_options(-Wno-attributes)
 endif()
 
+# Include the selected sanitizer's flags in US_CXX_FLAGS if the compiler supports the required flags
+# Note: TSAN not included here because TSAN should only be included if US_ENABLE_THREADING_SUPPORT
+#       is turned on
+foreach(_sanitizer_short_name ASAN;MSAN;UBSAN)
+  if (US_ENABLE_${_sanitizer_short_name} AND US_CXX_${_sanitizer_short_name}_FLAGS)
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_${_sanitizer_short_name}_FLAGS}")
+  endif()
+endforeach()
+
 if(US_ENABLE_THREADING_SUPPORT)
   if(NOT MINGW)
     set(THREADS_PREFER_PTHREAD_FLAG 1)
   endif()
   find_package(Threads REQUIRED)
 
+  # Include TSAN flags in US_CXX_FLAGS if TSAN was requested and the compiler supports the flags
   if(US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${US_CXX_TSAN_FLAGS}")
   endif()
 endif()
@@ -504,6 +635,9 @@ endif()
 # Compile libraries here if you do not want -Werror or /WX on
 #-----------------------------------------------------------------------------
 add_subdirectory(third_party/absl)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
+add_subdirectory(third_party/boost/nowide)
+set(BUILD_SHARED_LIBS ${_us_build_shared} CACHE BOOL "Build shared libraries" FORCE)
 #-----------------------------------------------------------------------------
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
@@ -515,7 +649,8 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${US_C_FLAGS_RELEASE}")
 # US Link Flags
 #-----------------------------------------------------------------------------
 
-set(US_LINK_FLAGS )
+set(US_LINK_FLAGS)
+
 if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
   foreach(_linkflag -Wl,--no-undefined)
     set(_add_flag)
@@ -531,14 +666,40 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 endif()
 
 if(NOT MSVC)
+  # If clang is used and lld is the linker, specify -fuse-ld=lld
+  if (US_COMPILER_CLANG AND US_USING_LLD)
+    set(US_LINK_FLAGS "${US_LINK_FLAGS} -fuse-ld=lld")
+  endif()
+
+  if (US_ENABLE_ASAN AND US_CXX_ASAN_FLAGS)
+    set(US_ASAN_LINK_FLAGS "-fsanitize=address")
+  endif()
+
   if (US_ENABLE_TSAN AND US_CXX_TSAN_FLAGS)
     set(US_TSAN_LINK_FLAGS "-fsanitize=thread")
   endif()
+
+  if (US_ENABLE_MSAN AND US_CXX_MSAN_FLAGS)
+    set(US_MSAN_LINK_FLAGS "-fsanitize=memory")
+  endif()
+
+  if (US_ENABLE_UBSAN AND US_CXX_UBSAN_FLAGS)
+    set(US_UBSAN_LINK_FLAGS "-fsanitize=undefined")
+  endif()
 endif()
 
+
+# Update US_LINK_FLAGS with sanitizer link flags if one was requested
+# Note: TSAN is individually checked because it should only be included
+#       if US_ENABLE_THREADING_SUPPORT is turned on
 if(US_ENABLE_THREADING_SUPPORT AND US_TSAN_LINK_FLAGS)
   set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_TSAN_LINK_FLAGS}")
 endif()
+foreach(_sanitizer_short_name ASAN;MSAN;UBSAN)
+  if (US_${_sanitizer_short_name}_LINK_FLAGS)
+    set(US_LINK_FLAGS "${US_LINK_FLAGS} ${US_${_sanitizer_short_name}_LINK_FLAGS}")
+  endif()
+endforeach()
 
 if(US_ENABLE_COVERAGE AND US_CXX_COVERAGE_FLAGS)
   # US_CXX_COVERAGE_FLAGS is used for both the compiler and the linker
@@ -606,26 +767,6 @@ if(NOT US_HAVE_THREAD_LOCAL AND US_ENABLE_THREADING_SUPPORT)
 endif()
 
 #-----------------------------------------------------------------------------
-# C++ library support
-#-----------------------------------------------------------------------------
-
-# c++11 regular expressions are used in the unit tests.
-# Currently the default C++ library for gcc < 4.9 doesn't
-# fully support c++11 regex.
-# Generalize the detection of regex and make its availability
-# conditional of whether the compiler's C++ library supports it
-# or not.
-# This can be removed once the minimum supported gcc version is 4.9
-if(NOT US_HAVE_REGEX AND US_BUILD_TESTING)
-  set(disabled_func "${disabled_func}regular expression support unavailable. Some tests will be disabled.\n")
-endif()
-
-# Print a warning summary
-if (disabled_func)
-  message(WARNING "${US_COMPILER_${CMAKE_CXX_COMPILER_ID}_MINIMUM_RECOMMENDED_VERSION_PRODUCT} or higher recommended (you are using ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}). The following functionality will not be available:\n${disabled_func}")
-endif()
-
-#-----------------------------------------------------------------------------
 # System Information
 #-----------------------------------------------------------------------------
 
@@ -685,6 +826,8 @@ add_subdirectory(shellservice)
 # Static linkage is not yet supported for declarative services.
 if (US_ENABLE_THREADING_SUPPORT AND US_BUILD_SHARED_LIBS)
   add_subdirectory(compendium)
+else()
+  add_subdirectory(compendium/LogService)
 endif()
 
 add_subdirectory(tools/shell)
@@ -702,8 +845,8 @@ add_subdirectory(doc)
 if(NOT US_NO_INSTALL)
 
 install(EXPORT ${PROJECT_NAME}Targets
-        FILE ${PROJECT_NAME}Targets.cmake
-        DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+	FILE ${PROJECT_NAME}Targets.cmake
+	DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
 
   set(_install_cmake_scripts
     ${US_BUNDLE_INIT_TEMPLATE}
@@ -717,10 +860,10 @@ install(EXPORT ${PROJECT_NAME}Targets
     )
 
   install(FILES ${_install_cmake_scripts}
-          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
+	  DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR})
 
   install(FILES ${global_config_h_file}
-          DESTINATION ${HEADER_INSTALL_DIR}/${PROJECT_NAME_LOWER})
+	  DESTINATION ${HEADER_INSTALL_DIR}/${PROJECT_NAME_LOWER})
 
   # Configure CppMicroServicesConfig.cmake for the install tree
   set(CONFIG_INCLUDE_DIR ${HEADER_INSTALL_DIR})
@@ -736,9 +879,9 @@ install(EXPORT ${PROJECT_NAME}Targets
     )
 
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake
-                ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-          DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
-          ${US_SDK_INSTALL_COMPONENT}
+		${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+	  DESTINATION ${AUXILIARY_CMAKE_INSTALL_DIR}
+	  ${US_SDK_INSTALL_COMPONENT}
     )
 
 endif()

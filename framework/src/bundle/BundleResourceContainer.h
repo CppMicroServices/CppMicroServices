@@ -107,25 +107,25 @@ private:
     }
   };
 
-  void InitSortedEntries();
+  void InitSortedEntries() const;
 
   bool Matches(const std::string& name, const std::string& filePattern) const;
 
   /// Initialize miniz with the resource zip file information.
   /// throws std::runtime_error if the underlying zip file cannot be opened or read.
-  void InitMiniz();
+  void InitMiniz() const;
 
   /// Opens the zip file so that data can be accessed.
   /// This function is thread-safe.
   /// Throws std::runtime_error if the underlying zip file cannot be opened.
-  void OpenContainer();
+  void OpenAndInitializeContainer() const;
 
   const std::string m_Location;
-  mz_zip_archive m_ZipArchive;
-  std::unique_ptr<BundleObjFile> m_ObjFile;
+  mutable mz_zip_archive m_ZipArchive;
+  mutable std::unique_ptr<BundleObjFile> m_ObjFile;
 
-  std::set<NameIndexPair, PairComp> m_SortedEntries;
-  std::set<std::string> m_SortedToplevelDirs;
+  mutable std::set<NameIndexPair, PairComp> m_SortedEntries;
+  mutable std::set<std::string> m_SortedToplevelDirs;
 
   // This is used to synchronize miniz file stream API calls.
   // Working with file streams is stateful (e.g. current read position)
@@ -134,8 +134,8 @@ private:
 
   // Synchronize opening/closing the underlying zip file. Only one thread
   // should open the underlying zip file.
-  std::mutex m_ZipFileMutex;
-  bool m_IsContainerOpen;
+  mutable std::mutex m_ZipFileMutex;
+  mutable bool m_IsContainerOpen;
 };
 }
 

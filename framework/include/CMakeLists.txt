@@ -12,6 +12,7 @@ set(_public_headers
   cppmicroservices/LDAPProp.h
   cppmicroservices/ListenerToken.h
   cppmicroservices/ListenerFunctors.h
+  cppmicroservices/SecurityException.h
   cppmicroservices/SharedLibrary.h
   cppmicroservices/SharedLibraryException.h
   cppmicroservices/ShrinkableMap.h
@@ -59,4 +60,6 @@ set(_public_headers
   cppmicroservices/detail/BundleAbstractTracked.h
   cppmicroservices/detail/BundleAbstractTracked.tpp
   cppmicroservices/detail/BundleResourceBuffer.h
+  cppmicroservices/detail/ScopeGuard.h
+  cppmicroservices/detail/CounterLatch.h
 )

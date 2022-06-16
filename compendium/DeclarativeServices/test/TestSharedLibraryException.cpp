@@ -34,6 +34,7 @@ limitations under the License.
 
 #include "../src/manager/BundleLoader.hpp"
 
+#include "Mocks.hpp"
 #include "TestInterfaces/Interfaces.hpp"
 #include "TestUtils.hpp"
 
@@ -83,34 +84,39 @@ TEST_F(SharedLibraryExceptionTest, testDSBundleLoaderFailure)
   // Using the framework bundle here, as it passes the GetLocation validity test,
   // but fails at dlopen.
   ASSERT_THROW(cppmicroservices::scrimpl::GetComponentCreatorDeletors(
-                 "invalid::name", GetFramework()),
+                 "invalid::name",
+                 GetFramework(),
+                 std::make_shared<cppmicroservices::scrimpl::FakeLogger>()),
                cppmicroservices::SharedLibraryException);
 }
 
 TEST_F(SharedLibraryExceptionTest, testDSBundleImmediateTrue)
 {
-  auto context = GetFramework().GetBundleContext();
-  test::InstallLib(context, "TestBundleDSSLE1");
+  testing::FLAGS_gtest_death_test_style = "threadsafe";
+  ASSERT_DEATH(
+    {
+      auto context = GetFramework().GetBundleContext();
+      test::InstallLib(context, "TestBundleDSSLE1");
 
-  auto bundles = context.GetBundles();
-  auto bundle = std::find_if(
-    bundles.begin(), bundles.end(), [](const cppmicroservices::Bundle& bundle) {
-      return (bundle.GetSymbolicName() == "TestBundleDSSLE1");
-    });
+      auto bundles = context.GetBundles();
+      auto bundle =
+        std::find_if(bundles.begin(),
+                     bundles.end(),
+                     [](const cppmicroservices::Bundle& bundle) {
+                       return (bundle.GetSymbolicName() == "TestBundleDSSLE1");
+                     });
 
-  ASSERT_NE(bundle, bundles.end()) << "TestBundleDSSLE1 not found";
+      ASSERT_NE(bundle, bundles.end()) << "TestBundleDSSLE1 not found";
 
-  try {
-    bundle->Start(); // should throw cppmicroservices::SharedLibraryException
-    FAIL() << "Exception should have been caught from bundle->Start()";
-  } catch (cppmicroservices::SharedLibraryException& ex) {
-    // origin bundle captured by SharedLibraryException should
-    // point to the bundle that threw during Start()
-    ASSERT_TRUE(*bundle == ex.GetBundle());
-  } catch (...) {
-    FAIL()
-      << "SharedLibraryException expected, but a different exception caught.";
-  }
+      try {
+        bundle
+          ->Start(); // should throw cppmicroservices::SharedLibraryException
+      } catch (...) {
+        std::cerr << "Success" << std::endl;
+        std::exit(-1);
+      }
+    },
+    "Success");
 }
 
 TEST_F(SharedLibraryExceptionTest, testDSBundleImmediateFalse)

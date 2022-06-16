@@ -78,12 +78,7 @@ private:
     }
     mStrStream << std::endl
                << "namespace sc = cppmicroservices::service::component;" << std::endl
-               << "namespace scd = cppmicroservices::service::component::detail;" << std::endl
-               << "using scd::ComponentInstance;" << std::endl
-               << "using scd::ComponentInstanceImpl;" << std::endl
-               << "using scd::Binder;" << std::endl
-               << "using scd::StaticBinder;" << std::endl
-               << "using scd::DynamicBinder;" << std::endl;
+               << "namespace scd = cppmicroservices::service::component::detail;" << std::endl;
   }
 
   void SubstituteBody()
@@ -92,14 +87,14 @@ private:
     {
       // Generate the factory function for creating each component
       mStrStream << std::endl
-                 << util::Substitute(R"(extern "C" US_ABI_EXPORT ComponentInstance* NewInstance_{0}())"
+                 << util::Substitute(R"(extern "C" US_ABI_EXPORT scd::ComponentInstance* NewInstance_{0}())"
                                      , datamodel::GetComponentNameStr(componentInfo)) << std::endl
                  << "{" << std::endl;
 
       auto isReferencesEmpty = componentInfo.references.empty();
       if(false == isReferencesEmpty)
       {
-        mStrStream << util::Substitute("  std::vector<std::shared_ptr<Binder<{0}>>> binders;"
+        mStrStream << util::Substitute("  std::vector<std::shared_ptr<scd::Binder<{0}>>> binders;"
                                        , componentInfo.implClassName)
                    << std::endl;
       }
@@ -117,7 +112,7 @@ private:
         }
       }
       
-      mStrStream << "  ComponentInstance* componentInstance = new (std::nothrow) ComponentInstanceImpl<"
+      mStrStream << "  scd::ComponentInstance* componentInstance = new (std::nothrow) scd::ComponentInstanceImpl<"
                  << componentInfo.implClassName
                  << ", std::tuple<"
                  << datamodel::GetServiceInterfacesStr(componentInfo.service)
@@ -142,7 +137,7 @@ private:
 
       // Create deleter function for each component.
       mStrStream << std::endl
-                 << util::Substitute(R"(extern "C" US_ABI_EXPORT void DeleteInstance_{0}(ComponentInstance* componentInstance))"
+                 << util::Substitute(R"(extern "C" US_ABI_EXPORT void DeleteInstance_{0}(scd::ComponentInstance* componentInstance))"
                                      , datamodel::GetComponentNameStr(componentInfo)) << std::endl
                  << "{" << std::endl
                  << "  delete componentInstance;" << std::endl

@@ -22,9 +22,6 @@
 
 #include "cppmicroservices/AnyMap.h"
 
-#include "absl/strings/numbers.h"
-#include "absl/strings/string_view.h"
-
 #include <stdexcept>
 
 namespace cppmicroservices {
@@ -48,9 +45,9 @@ bool any_map_ciequal::operator()(const std::string& l,
 }
 
 const Any& AtCompoundKey(const std::vector<Any>& v,
-                         const absl::string_view& key);
+                         const std::string_view& key);
 
-const Any& AtCompoundKey(const AnyMap& m, const absl::string_view& key)
+const Any& AtCompoundKey(const AnyMap& m, const std::string_view& key)
 {
   auto pos = key.find(".");
   if (pos != AnyMap::key_type::npos) {
@@ -70,8 +67,7 @@ const Any& AtCompoundKey(const AnyMap& m, const absl::string_view& key)
   }
 }
 
-const Any& AtCompoundKey(const std::vector<Any>& v,
-                         const absl::string_view& key)
+const Any& AtCompoundKey(const std::vector<Any>& v, const std::string_view& key)
 {
   auto pos = key.find(".");
   if (pos != AnyMap::key_type::npos) {
@@ -94,11 +90,11 @@ const Any& AtCompoundKey(const std::vector<Any>& v,
   }
 }
 Any AtCompoundKey(const std::vector<Any>& v,
-                  const absl::string_view& key,
+                  const std::string_view& key,
                   Any&& defaultVal);
 
 Any AtCompoundKey(const AnyMap& m,
-                  const absl::string_view& key,
+                  const std::string_view& key,
                   Any&& defaultVal)
 {
   auto pos = key.find(".");
@@ -126,7 +122,7 @@ Any AtCompoundKey(const AnyMap& m,
 }
 
 Any AtCompoundKey(const std::vector<Any>& v,
-                  const absl::string_view& key,
+                  const std::string_view& key,
                   Any&& defaultval)
 {
   auto pos = key.find(".");
@@ -839,6 +835,20 @@ any_map::const_iterator any_map::find(const key_type& key) const
   }
 }
 
+any_map::size_type any_map::erase(const key_type& key)
+{
+  switch (type) {
+    case map_type::ORDERED_MAP:
+      return o_m().erase(key);
+    case map_type::UNORDERED_MAP:
+      return uo_m().erase(key);
+    case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+      return uoci_m().erase(key);
+    default:
+      throw std::logic_error("invalid map type");
+  }
+}
+
 any_map::ordered_any_map const& any_map::o_m() const
 {
   return *map.o;
@@ -986,21 +996,47 @@ std::ostream& any_value_to_string(std::ostream& os, const AnyMap& m)
 }
 
 template<>
-std::ostream& any_value_to_json(std::ostream& os, const AnyMap& m)
+std::ostream& any_value_to_json(std::ostream& os,
+                                const AnyMap& m,
+                                const uint8_t increment,
+                                const int32_t indent)
 {
+  if (m.empty()) {
+    os << "{}";
+    return os;
+  }
+
   os << "{";
   using Iterator = any_map::const_iterator;
   Iterator i1 = m.begin();
   const Iterator begin = i1;
   const Iterator end = m.end();
   for (; i1 != end; ++i1) {
-    if (i1 == begin)
-      os << "\"" << i1->first << "\" : " << i1->second.ToJSON();
-    else
-      os << ", "
-         << "\"" << i1->first << "\" : " << i1->second.ToJSON();
+    if (i1 != begin) {
+      os << ", ";
+    }
+    newline_and_indent(os, increment, indent);
+    os << "\"" << i1->first
+       << "\" : " << i1->second.ToJSON(increment, indent + increment);
   }
+  newline_and_indent(os, increment, indent - increment);
   os << "}";
   return os;
 }
+
+bool any_map::operator==(const any_map& rhs) const
+{
+  if (type == rhs.type) {
+    switch (type) {
+      case map_type::ORDERED_MAP:
+        return (*map.o == *rhs.map.o);
+      case map_type::UNORDERED_MAP:
+        return (*map.uo == *rhs.map.uo);
+      case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+        return (*map.uoci == *rhs.map.uoci);
+    }
+  }
+  return false;
+}
+
 }

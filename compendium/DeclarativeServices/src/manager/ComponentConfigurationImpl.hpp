@@ -25,26 +25,42 @@
 
 #include <memory>
 #if defined(USING_GTEST)
-#include "gtest/gtest_prod.h"
+#  include "gtest/gtest_prod.h"
 #else
-#define FRIEND_TEST(x, y)
+#  define FRIEND_TEST(x, y)
 #endif
+#include "../ComponentContextImpl.hpp"
+#include "../ConfigurationListenerImpl.hpp"
+#include "../metadata/ComponentMetadata.hpp"
+#include "ComponentConfiguration.hpp"
+#include "ComponentManager.hpp"
+#include "ConfigurationManager.hpp"
+#include "ConfigurationNotifier.hpp"
+#include "ReferenceManager.hpp"
 #include "cppmicroservices/ServiceFactory.h"
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"
-#include "ComponentConfiguration.hpp"
-#include "../ComponentContextImpl.hpp"
-#include "../metadata/ComponentMetadata.hpp"
-#include "ReferenceManager.hpp"
 #include "states/ComponentConfigurationState.hpp"
 
-using cppmicroservices::service::component::detail::ComponentInstance;
 using cppmicroservices::scrimpl::ReferenceManager;
+using cppmicroservices::service::component::detail::ComponentInstance;
 
 namespace cppmicroservices {
 namespace scrimpl {
 
-typedef std::pair<std::shared_ptr<ComponentInstance>, std::shared_ptr<ComponentContextImpl>> InstanceContextPair;
+typedef std::pair<std::shared_ptr<ComponentInstance>,
+                  std::shared_ptr<ComponentContextImpl>>
+  InstanceContextPair;
+struct ListenerToken final
+{
+  ListenerToken(std::string pid, const ListenerTokenId tokenId)
+    : pid(std::move(pid))
+    , tokenId(std::move(tokenId))
+  {}
+  std::string pid;
+  ListenerTokenId tokenId;
+};
+
 /**
  * Abstract class responsible for implementing the state machine
  * for component configurations and some utility methods to create and
@@ -59,20 +75,25 @@ public:
   /**
    * \throws std::invalid_argument exception if any of the params is a nullptr 
    */
-  explicit ComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata
-                                      , const Bundle& bundle
-                                      , std::shared_ptr<const ComponentRegistry> registry
-                                      , std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+  explicit ComponentConfigurationImpl(
+    std::shared_ptr<const metadata::ComponentMetadata> metadata,
+    const Bundle& bundle,
+    std::shared_ptr<ComponentRegistry> registry,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    std::shared_ptr<ConfigurationNotifier> configNotifier,
+    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
   ComponentConfigurationImpl(const ComponentConfigurationImpl&) = delete;
   ComponentConfigurationImpl(ComponentConfigurationImpl&&) = delete;
-  ComponentConfigurationImpl& operator=(const ComponentConfigurationImpl&) = delete;
+  ComponentConfigurationImpl& operator=(const ComponentConfigurationImpl&) =
+    delete;
   ComponentConfigurationImpl& operator=(ComponentConfigurationImpl&&) = delete;
   virtual ~ComponentConfigurationImpl();
 
   /**
    * Returns all the dependency manager objects associated with this component configuration
    */
-  std::vector<std::shared_ptr<ReferenceManager>> GetAllDependencyManagers() const override;
+  std::vector<std::shared_ptr<ReferenceManager>> GetAllDependencyManagers()
+    const override;
 
   /**
    * Returns the dependency manager associated with a particular reference
@@ -81,7 +102,8 @@ public:
    * \return The {@link ReferenceManager} associated with \c refName.
    *         nullptr if no reference manager exists with \c refName
    */
-  std::shared_ptr<ReferenceManager> GetDependencyManager(const std::string& refName) const override;
+  std::shared_ptr<ReferenceManager> GetDependencyManager(
+    const std::string& refName) const override;
 
   /** @copydoc ComponentConfiguration::GetServiceReference()
    *
@@ -91,13 +113,17 @@ public:
   /** @copydoc ComponentConfiguration::GetRegistry()
    *
    */
-  std::shared_ptr<const ComponentRegistry> GetRegistry() const override { return registry; } ;
+  std::shared_ptr<ComponentRegistry> GetRegistry() const override
+  {
+    return registry;
+  };
 
   /** @copydoc ComponentConfiguration::GetProperties()
    * These properties must include \c ComponentConstants::COMPONENT_NAME and
    * \c ComponentConstants::COMPONENT_ID
    */
-  std::unordered_map<std::string, cppmicroservices::Any> GetProperties() const override;
+  std::unordered_map<std::string, cppmicroservices::Any> GetProperties()
+    const override;
 
   /** @copydoc ComponentConfiguration::GetBundle()
    *
@@ -114,18 +140,43 @@ public:
    */
   ComponentState GetConfigState() const override;
 
+   /**
+   * This method returns the {@link ConfigurationNotifier} object 
+   */
+  std::shared_ptr<ConfigurationNotifier> GetConfigNotifier() const
+  {
+    return configNotifier;
+  };
+
   /**
    * This method returns the {@link ComponentMetadata} object created by
    * parsing the component description.
    */
-  std::shared_ptr<const metadata::ComponentMetadata> GetMetadata() const { return metadata; };
+  std::shared_ptr<const metadata::ComponentMetadata> GetMetadata()
+    const override
+  {
+    return metadata;
+  };
+
+  /**
+   * This method returns the {@link ComponentManager} vector which holds
+   * the ComponentManagerImpl objects.
+   */
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> GetManagers()
+    const
+  {
+    return managers;
+  };
 
   /**
    * Method to check if this component provides a service
    *
    * \return \c true if this component implements a service interface, \c false otherwise
    */
-  bool IsServiceProvider() { return !(metadata->serviceMetadata.interfaces.empty()); }
+  bool IsServiceProvider()
+  {
+    return !(metadata->serviceMetadata.interfaces.empty());
+  }
 
   /**
    * Method used to register this component configuration's service. This
@@ -159,7 +210,15 @@ public:
    * \note This function is noexcept. It is not marked as such because gmock does
    *  not support mocking methods with the noexcept keyword.
    */
-  virtual std::shared_ptr<ComponentInstance> CreateAndActivateComponentInstance(const cppmicroservices::Bundle& bundle) = 0;
+  virtual std::shared_ptr<ComponentInstance> CreateAndActivateComponentInstance(
+    const cppmicroservices::Bundle& bundle) = 0;
+
+  /**
+   * Method called to modify the configuration properties for this component configuration. Subclasses
+   * must implement this method. 
+    @return boolean indicating whether or not the component instance has provided a Modified method.
+   */
+  virtual bool ModifyComponentInstanceProperties() = 0;
 
   /**
    * Method called while \c DEACTIVATING this component configuration. Subclasses
@@ -180,8 +239,9 @@ public:
    *
    * Note: This method is virtual only for testing purposes
    */
-  bool virtual CompareAndSetState(std::shared_ptr<ComponentConfigurationState>* expectedState,
-                                  std::shared_ptr<ComponentConfigurationState> desiredState);
+  bool virtual CompareAndSetState(
+    std::shared_ptr<ComponentConfigurationState>* expectedState,
+    std::shared_ptr<ComponentConfigurationState> desiredState);
 
   /**
    * Accessor method that returns the state object associated with this object
@@ -207,6 +267,22 @@ public:
    * The call is delegated to the current \c state object
    */
   void Deactivate();
+
+  /**
+   * Method used to update the properties of a component instance when a configuration
+   * object on which it is dependent changes. 
+   * @return
+   *    - true if the component has a Modified method and is still in the 
+   *      active state.
+   *    - false if the component does not have a Modified method. The 
+   *      component has been Deactivated
+   */
+  bool Modified();
+
+  /**
+   * SetRegistrationProperties. Sets component properties in registration object. 
+   */
+  void SetRegistrationProperties();
 
   /**
    * Method called to stop the service trackers associated with this configuration's reference managers
@@ -247,13 +323,15 @@ protected:
   /**
    * Helper function used by sub-classes to create and activate a {@link ComponentInstance} object
    */
-  InstanceContextPair CreateAndActivateComponentInstanceHelper(const cppmicroservices::Bundle& bundle);
+  InstanceContextPair CreateAndActivateComponentInstanceHelper(
+    const cppmicroservices::Bundle& bundle);
 
   /**
    * Sets the function pointers used to create and delete a {@link ComponentInstance} object
    */
-  void SetComponentInstanceCreateDeleteMethods(std::function<ComponentInstance*(void)> newFunc,
-                                               std::function<void(ComponentInstance*)> deleteFunc)
+  void SetComponentInstanceCreateDeleteMethods(
+    std::function<ComponentInstance*(void)> newFunc,
+    std::function<void(ComponentInstance*)> deleteFunc)
   {
     newCompInstanceFunc = newFunc;
     deleteCompInstanceFunc = deleteFunc;
@@ -268,7 +346,7 @@ protected:
     auto oldState = ComponentConfigurationImpl::GetState();
     ComponentConfigurationImpl::CompareAndSetState(&oldState, newState);
   }
-  
+
 private:
   /**
    * Observer callback method. This method is registered with the dependency
@@ -292,6 +370,22 @@ private:
   void RefUnsatisfied(const std::string& refName);
 
   /**
+   * Utility method called to determine if all references for the component
+   * are satisfied. This method is called from {@link #ConfigChangedState} when
+   * Configuration objects are satisfied.
+   */
+  bool AreReferencesSatisfied() const noexcept;
+
+  /**
+   * Observer callback method. This method is registered with the ConfigurationListener.
+   * When a configuration object is \c updated or \c deleted, this
+   * method is called by the ConfigurationListener to process the change to the 
+   * configuration object.
+   */
+
+  void ConfigChangedState(const ConfigChangeNotification& notification);
+
+  /**
    * Method is responsible for loading the bundle and populating the function
    * objects \c newCompInstanceFunc & \c deleteCompInstanceFunc used to create
    * and destroy the {@link ComponentInstance} objects from a bundle.
@@ -302,32 +396,52 @@ private:
    * Friends used in unittests
    */
   FRIEND_TEST(ComponentConfigurationImplTest, VerifyCtor);
-  FRIEND_TEST(ComponentConfigurationImplTest, VerifyInitializeForImmediateComponent);
-  FRIEND_TEST(ComponentConfigurationImplTest, VerifyInitializeForDelayedComponent);
+  FRIEND_TEST(ComponentConfigurationImplTest,
+              VerifyInitializeForImmediateComponent);
+  FRIEND_TEST(ComponentConfigurationImplTest,
+              VerifyInitializeForDelayedComponent);
   FRIEND_TEST(ComponentConfigurationImplTest, VerifyRegister);
   FRIEND_TEST(ComponentConfigurationImplTest, VerifyActivate_Success);
   FRIEND_TEST(ComponentConfigurationImplTest, VerifyActivate_Failure);
   FRIEND_TEST(ComponentConfigurationImplTest, VerifyDeactivate);
-  FRIEND_TEST(ComponentConfigurationImplTest, VerifyConcurrentRegisterDeactivate);
-  FRIEND_TEST(ComponentConfigurationImplTest, VerifyConcurrentActivateDeactivate);
+  FRIEND_TEST(ComponentConfigurationImplTest,
+              VerifyConcurrentRegisterDeactivate);
+  FRIEND_TEST(ComponentConfigurationImplTest,
+              VerifyConcurrentActivateDeactivate);
   FRIEND_TEST(ComponentConfigurationImplTest, VerifyRefSatisfied);
   FRIEND_TEST(ComponentConfigurationImplTest, VerifyRefUnsatisfied);
   FRIEND_TEST(ComponentConfigurationImplTest, VerifyStateChangeDelegation);
   FRIEND_TEST(ComponentConfigurationImplTest, TestGetDependencyManagers);
 
   unsigned long configID; ///< unique Id for the component configuration
-  static std::atomic<unsigned long> idCounter; ///< used to assign unique identifiers to component configurations
-  const std::shared_ptr<const metadata::ComponentMetadata> metadata; ///< component description
+  static std::atomic<unsigned long>
+    idCounter; ///< used to assign unique identifiers to component configurations
+  const std::shared_ptr<const metadata::ComponentMetadata>
+    metadata;    ///< component description
   Bundle bundle; ///< bundle this component configuration belongs to
-  const std::shared_ptr<const ComponentRegistry> registry; ///< component registry of the runtime
-  const std::shared_ptr<cppmicroservices::logservice::LogService> logger; ///< logger used for reporting errors/execptions
-  std::unique_ptr<RegistrationManager> regManager; ///< registration manager used to manage registration/unregistration of the service provided by this component
-  std::unordered_map<std::string, std::shared_ptr<ReferenceManager>> referenceManagers; ///< map of all the reference managers
-  std::unordered_map<std::shared_ptr<ReferenceManager>, ListenerTokenId> referenceManagerTokens; ///< map of the listener tokens received from the reference managers
-  std::shared_ptr<ComponentConfigurationState> state; ///< only modified using std::atomic operations
-
-  std::function<ComponentInstance*(void)> newCompInstanceFunc; ///< extern C function to create a new instance {@link ComponentInstance} class from the component's bundle
-  std::function<void(ComponentInstance*)> deleteCompInstanceFunc; ///< extern C function to delete an instance of the {@link ComponentInstance} class from the component's bundle
+  const std::shared_ptr<ComponentRegistry>
+    registry; ///< component registry of the runtime
+  const std::shared_ptr<cppmicroservices::logservice::LogService>
+    logger; ///< logger used for reporting errors/execptions
+  std::unique_ptr<RegistrationManager>
+    regManager; ///< registration manager used to manage registration/unregistration of the service provided by this component
+  std::unordered_map<std::string, std::shared_ptr<ReferenceManager>>
+    referenceManagers; ///< map of all the reference managers
+  std::unordered_map<std::shared_ptr<ReferenceManager>, ListenerTokenId>
+    referenceManagerTokens; ///< map of the listener tokens received from the reference managers
+  std::shared_ptr<ConfigurationManager>
+    configManager; ///< manages configuration objects
+  std::shared_ptr<ConfigurationNotifier>
+    configNotifier; // to get updates for configuration objects
+  std::vector<std::shared_ptr<ListenerToken>>
+    configListenerTokens; ///< vector of the listener tokens received from the config manager
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
+  std::shared_ptr<ComponentConfigurationState>
+    state; ///< only modified using std::atomic operations
+  std::function<ComponentInstance*(void)>
+    newCompInstanceFunc; ///< extern C function to create a new instance {@link ComponentInstance} class from the component's bundle
+  std::function<void(ComponentInstance*)>
+    deleteCompInstanceFunc; ///< extern C function to delete an instance of the {@link ComponentInstance} class from the component's bundle
 };
 }
 }

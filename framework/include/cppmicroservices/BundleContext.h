@@ -180,6 +180,7 @@ public:
    * the Framework properties, the method returns an empty \c Any.
    *
    * @param key The name of the requested property.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @return The value of the requested property, or an empty \c Any if the
    *         property is undefined.
    */
@@ -188,6 +189,7 @@ public:
   /**
    * Returns all known properties.
    *
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @return A map of all framework properties.
    */
   AnyMap GetProperties() const;
@@ -445,8 +447,8 @@ public:
    *         search.
    * @throws std::invalid_argument If the specified <code>filter</code>
    *         contains an invalid filter expression that cannot be parsed.
-   * @throws std::logic_error If this BundleContext is no longer valid.
-   * @throws ServiceException If the service interface id of \c S is empty, see @gr_serviceinterface.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
+   * @throws ServiceException If the service interface id of \c S is empty, see @ref gr_serviceinterface.
    *
    * @see GetServiceReferences(const std::string&, const std::string&)
    */
@@ -514,7 +516,7 @@ public:
    * @return A <code>ServiceReference</code> object, or an invalid <code>ServiceReference</code> if
    *         no services are registered which implement the type <code>S</code>.
    * @throws std::runtime_error If this BundleContext is no longer valid.
-   * @throws ServiceException If the service interface id of \c S is empty, see @gr_serviceinterface.
+   * @throws ServiceException If the service interface id of \c S is empty, see @ref gr_serviceinterface.
    * @see #GetServiceReference(const std::string&)
    * @see #GetServiceReferences(const std::string&)
    */
@@ -579,6 +581,9 @@ public:
    * @throws std::runtime_error If this BundleContext is no longer valid.
    * @throws std::invalid_argument If the specified
    *         <code>ServiceReferenceBase</code> is invalid (default constructed).
+   * @throws cppmicroservices::SecurityException if retrieving a service caused a 
+   *         bundle's shared library to be loaded and the bundle failed a security check.
+   * 
    * @see ServiceFactory
    * @see ServiceObjects
    */
@@ -602,6 +607,9 @@ public:
    *         longer valid.
    * @throws std::invalid_argument If the specified
    *         <code>ServiceReference</code> is invalid (default constructed).
+   * @throws cppmicroservices::SecurityException if retrieving a service caused a 
+   *         bundle's shared library to be loaded and the bundle failed a security check.
+   * 
    * @see #GetService(const ServiceReferenceBase&)
    * @see ServiceFactory
    */
@@ -626,13 +634,18 @@ public:
    * reference or an invalid instance if the service is not registered.
    * @throws std::runtime_error If this BundleContext is no longer valid.
    * @throws std::invalid_argument If the specified ServiceReference is invalid
-   * (default constructed or the service has been unregistered)
+   *        (default constructed or the service has been unregistered)
+   * @throws cppmicroservices::SecurityException if retrieving a service caused a 
+   *         bundle's shared library to be loaded and the bundle failed a security check.
    *
    * @see PrototypeServiceFactory
    */
   template<class S>
   ServiceObjects<S> GetServiceObjects(const ServiceReference<S>& reference)
   {
+    if (!d) {
+      throw std::runtime_error("The bundle context is no longer valid");
+    }
     return ServiceObjects<S>(d, reference);
   }
 

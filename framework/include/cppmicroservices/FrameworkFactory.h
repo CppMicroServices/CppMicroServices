@@ -27,6 +27,7 @@
 
 #include "cppmicroservices/Any.h"
 
+#include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -85,6 +86,7 @@ public:
   NewFramework(const std::map<std::string, Any>& configuration,
                std::ostream* logger = nullptr);
 };
+
 }
 
 #endif // CPPMICROSERVICES_FRAMEWORKFACTORY_H

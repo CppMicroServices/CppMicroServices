@@ -34,8 +34,8 @@ class FrameworkEventData
 {
 public:
   FrameworkEventData(FrameworkEvent::Type type,
-                     Bundle  bundle,
-                     std::string  message,
+                     Bundle bundle,
+                     std::string message,
                      const std::exception_ptr exception)
     : type(type)
     , bundle(std::move(bundle))
@@ -44,8 +44,8 @@ public:
   {}
 
   FrameworkEventData(const FrameworkEventData& other)
-     
-  = default;
+
+    = default;
 
   const FrameworkEvent::Type type;
   const Bundle bundle;

@@ -92,7 +92,7 @@ void ServiceTracker<S,T>::Open()
   std::shared_ptr<_TrackedService> t;
   {
     auto l = d->Lock(); US_UNUSED(l);
-    if (d->trackedService.Load())
+    if (d->trackedService.Load() && !d->Tracked()->closed)
     {
       return;
     }
@@ -105,7 +105,7 @@ void ServiceTracker<S,T>::Open()
       /* Remove if already exists. No-op if it's an invalid (default) token */
       d->context.RemoveListener(std::move(d->listenerToken));
       d->listenerToken = d->context.AddServiceListener(std::bind(&_TrackedService::ServiceChanged,
-                                                                 t.get(), std::placeholders::_1),
+                                                                 t, std::placeholders::_1),
                                                        d->listenerFilter);
       std::vector<ServiceReference<S>> references;
       if (!d->trackClass.empty())
@@ -142,37 +142,52 @@ void ServiceTracker<S,T>::Open()
 template<class S, class T>
 void ServiceTracker<S,T>::Close()
 {
-  std::vector<ServiceReference<S>> references;
-  std::shared_ptr<_TrackedService> outgoing = d->trackedService.Exchange(std::shared_ptr<_TrackedService>());
-  if (outgoing == nullptr)
-  {
-    return;
-  }
-
-  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close:" << d->filter;
-  outgoing->Close();
-  references = GetServiceReferences();
-  try
-  {
+  try {
     d->context.RemoveListener(std::move(d->listenerToken));
-  }
-  catch (const std::runtime_error& /*e*/)
-  {
+  } catch (const std::runtime_error& /*e*/) {
     /* In case the context was stopped or invalid. */
   }
 
-  d->Modified(); /* clear the cache */
-  outgoing->NotifyAll(); /* wake up any waiters */
-  for(auto& ref : references)
+  std::shared_ptr<_TrackedService> outgoing = d->trackedService.Load();
   {
-    outgoing->Untrack(ref, ServiceEvent());
+    auto l = d->Lock();
+    US_UNUSED(l);
+
+    if (outgoing == nullptr) {
+      return;
+    }
+
+    if (d->Tracked()->closed) {
+      return;
+    }
+
+    DIAG_LOG(*d->context.GetLogSink())
+      << "ServiceTracker<S,TTT>::close:" << d->filter;
+    outgoing->Close();
+
+    d->Modified();         /* clear the cache */
+    outgoing->NotifyAll(); /* wake up any waiters */
   }
 
-  if (d->context.GetLogSink()->Enabled())
-  {
+  try {
+    outgoing->WaitOnCustomizersToFinish();
+  } catch (const std::exception&) {
+      // this can throw if the latch's count
+      // is negative, which means the latch
+      // cannot be used anymore. This can occur
+      // when multiple threads are opening
+      // and closing the same service tracker
+      // repeatedly.
+  }
+
+  auto references = GetServiceReferences();
+  for(auto& ref : references) {
+    outgoing->Untrack(ref, ServiceEvent());
+  }
+  
+  if (d->context.GetLogSink()->Enabled()) {
     if (!d->cachedReference.Load().GetBundle() &&
-        d->cachedService.Load() == nullptr)
-    {
+        d->cachedService.Load() == nullptr) {
       DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close[cached cleared]:"
                     << d->filter;
     }
@@ -229,7 +244,7 @@ ServiceTracker<S,T>::WaitForService(const std::chrono::duration<Rep, Period>& re
       timeout = std::chrono::duration_cast<D>(endTime - std::chrono::steady_clock::now());
       if (timeout.count() <= 0) break; // timed out
     }
-  } while (!object);
+  } while (!object && !d->Tracked()->closed);
 
   return object;
 }

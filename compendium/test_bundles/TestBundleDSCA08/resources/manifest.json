@@ -1,0 +1,20 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSCA08",
+    "scr" : {
+        "version" : 1,
+         "components" : [{
+            "enabled" : true,
+            "immediate": false,
+            "implementation-class": "sample::ServiceComponentCA08",
+            "configuration-policy" : "optional",
+            "configuration-pid" : ["sample::ServiceComponentCA08"],
+            "inject-references" : false,
+            "properties": {
+              "ManifestProp": "abc"
+            },
+            "service": {
+                "interfaces": ["test::CAInterface"]
+            }
+        }]
+    }
+}

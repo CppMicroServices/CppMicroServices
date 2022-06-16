@@ -921,6 +921,7 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
   svcReg = nullptr;
 }
 
+#if !defined(__MINGW32__)
 // Note: This is different than the other tests in this suite as Declarative Services is actually
 // installed and started rather than using mocks.
 TEST(ComponentConfigurationImplLogTest, LoadLibraryLogsMessagesImmediateTest)
@@ -1017,5 +1018,6 @@ TEST(ComponentConfigurationImplLogTest, LoadLibraryLogsMessagesNotImmediateTest)
   framework.Stop();
   framework.WaitForStop(std::chrono::milliseconds::zero());
 }
+#endif
 }
 }

@@ -7,6 +7,7 @@ The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 `(UNRELEASED) vX.X.X <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (20XX-XX-XX)
+---------------------------------------------------------------------------------------------------------
 
 `Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...development>`_
 
@@ -137,7 +138,7 @@ Fixed
 - `Removed gtest dependency when not building the tests <https://github.com/CppMicroServices/CppMicroServices/pull/486>`_
 
 
-v3.5.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.5.0>`_ (2020-07-04)
+`v3.5.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.5.0>`_ (2020-07-04)
 ---------------------------------------------------------------------------------------------------------
 
 `Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.4.0...v3.5.0>`_

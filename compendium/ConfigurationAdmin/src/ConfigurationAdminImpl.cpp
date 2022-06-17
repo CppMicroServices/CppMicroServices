@@ -345,7 +345,7 @@ ConfigurationAdminImpl::ListConfigurations(const std::string& filter)
     if (filter.empty()) {
       result.reserve(configurations.size());
       for (const auto& it : configurations) {
-        if (!it.second->GetProperties().empty()) {
+        if (it.second->HasBeenUpdatedAtLeastOnce()) {
           result.push_back(it.second);
         }
       }
@@ -359,9 +359,9 @@ ConfigurationAdminImpl::ListConfigurations(const std::string& filter)
     };
 
     for (const auto& it : configurations) {
-      // empty configurations (those with an empty set of properties) cannot be
+      // configurations that have not yet been updated cannot be
       // returned.
-      if (it.second->GetProperties().empty()) {
+      if (!it.second->HasBeenUpdatedAtLeastOnce()) {
         continue;
       }
       /* Create an AnyMap containing the pid or factoryPid so that the ldap filter 
@@ -401,11 +401,16 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
       if (it == std::end(configurations)) {
         auto factoryPid = getFactoryPid(pid);
         AddFactoryInstanceIfRequired(pid, factoryPid);
+        // construct the Configuration Object with a changeCount of 1 
+        // since configuration objects created from metadata already
+        // have their properties (if any) present. The create operation
+        // counts as a create and an update operation.
         auto newConfig = std::make_shared<ConfigurationImpl>(
                            this,
                            pid,
                            std::move(factoryPid),
-                           std::move(configMetadata.properties));
+                           configMetadata.properties,
+                           1u);
         changeCount = newConfig->GetChangeCount();
         it = configurations
                .emplace(pid,
@@ -433,7 +438,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
       {
         configurationsToInvalidate.push_back(std::move(it->second));
         it->second = std::make_shared<ConfigurationImpl>(
-          this, pid, getFactoryPid(pid), std::move(configMetadata.properties));
+          this, pid, getFactoryPid(pid), configMetadata.properties);
         pidsAndChangeCountsAndIDs.emplace_back(
           pid, changeCount, reinterpret_cast<std::uintptr_t>(it->second.get()));
         createdOrUpdated.push_back(true);

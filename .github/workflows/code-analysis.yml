@@ -1,0 +1,104 @@
+# For most projects, this workflow file will not need changing; you simply need
+# to commit it to your repository.
+#
+# You may wish to alter this file to override the set of languages analyzed,
+# or to provide custom queries or build logic.
+#
+# ******** NOTE ********
+# We have attempted to detect the languages in your repository. Please check
+# the `language` matrix defined below to confirm you have the correct set of
+# supported CodeQL languages.
+#
+name: "CodeQL/MSVC Code Analysis"
+
+on:
+  push:
+    branches: [ development ]
+  pull_request:
+    branches: [ development ]
+  schedule:
+    - cron: '28 10 * * 0'
+
+jobs:
+  analyze_codeql:
+    name: Analyze (CodeQL)
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+
+    # ℹ️ Command-line programs to run using the OS shell.
+    # 📚 https://git.io/JvXDl
+
+    # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
+    #    and modify them (or add more) to build your code if your project
+    #    uses a compiled language
+
+    #- run: |
+    #   make bootstrap
+    #   make release
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+
+  analyze_msvc:
+    name: Analyze (MSVC Code Analysis)
+    runs-on: windows-latest
+    env:
+      build: '${{ github.workspace }}/build'
+      config: 'Debug'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Configure CMake
+      run: cmake -B ${{ env.build }} -DCMAKE_BUILD_TYPE=${{ env.config }} -DUS_BUILD_TESTING=ON -DUS_ENABLE_THREADING_SUPPORT=ON -DUS_BUILD_EXAMPLES=ON
+
+    - name: Run MSVC Code Analysis
+      uses: microsoft/msvc-code-analysis-action@v0.1.0
+      # Provide a unique ID to access the sarif output path
+      id: run-msvc-analysis
+      with:
+        cmakeBuildDirectory: ${{ env.build }}
+        buildConfiguration: ${{ env.config }}
+        # Ruleset file that will determine what checks will be run
+        ruleset: NativeRecommendedRules.ruleset
+        # Paths to ignore analysis of CMake targets and includes
+        # ignoredPaths: ${{ github.workspace }}/dependencies;${{ github.workspace }}/test
+
+    # Upload SARIF file to GitHub Code Scanning Alerts
+    - name: Upload SARIF to GitHub
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: ${{ steps.run-msvc-analysis.outputs.sarif }}
+
+    # Upload SARIF file as an Artifact to download and view
+    - name: Upload SARIF as an Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: sarif-file
+        path: ${{ steps.run-msvc-analysis.outputs.sarif }}

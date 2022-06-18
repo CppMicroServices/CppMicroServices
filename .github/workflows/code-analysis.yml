@@ -75,8 +75,13 @@ jobs:
       with:
         submodules: true
 
-    - name: Configure CMake
+    # We won't do the analysis on any test-related code (test bundles, unittest files, etc.)
+    - name: Configure with CMake
       run: cmake -B ${{ env.build }} -DCMAKE_BUILD_TYPE=${{ env.config }} -DUS_ENABLE_THREADING_SUPPORT=ON
+
+    # Because certain files are auto-generated during the build, we need to build
+    - name: Build with CMake
+      run: cmake --build ${{ env.build }} --config ${{ env.config }}
 
     - name: Run MSVC Code Analysis
       uses: microsoft/msvc-code-analysis-action@v0.1.0

@@ -76,7 +76,7 @@ jobs:
         submodules: true
 
     - name: Configure CMake
-      run: cmake -B ${{ env.build }} -DCMAKE_BUILD_TYPE=${{ env.config }} -DUS_BUILD_TESTING=ON -DUS_ENABLE_THREADING_SUPPORT=ON -DUS_BUILD_EXAMPLES=ON
+      run: cmake -B ${{ env.build }} -DCMAKE_BUILD_TYPE=${{ env.config }} -DUS_ENABLE_THREADING_SUPPORT=ON
 
     - name: Run MSVC Code Analysis
       uses: microsoft/msvc-code-analysis-action@v0.1.0
@@ -88,7 +88,7 @@ jobs:
         # Ruleset file that will determine what checks will be run
         ruleset: NativeRecommendedRules.ruleset
         # Paths to ignore analysis of CMake targets and includes
-        ignoredPaths: ${{ github.workspace }}/build/framework/test/bundles;${{ github.workspace }}/build/compendium/test_bundles
+        #ignoredPaths: ${{ github.workspace }}/build/framework/test/bundles;${{ github.workspace }}/build/compendium/test_bundles
 
     # Upload SARIF file to GitHub Code Scanning Alerts
     - name: Upload SARIF to GitHub

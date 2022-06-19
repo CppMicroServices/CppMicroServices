@@ -40,8 +40,13 @@ miniz
 
 MIT License (GitHub) or Public Domain
 
-https://github.com/richgel999/miniz (formerly https://code.google.com/p/miniz/)
-v2.2
+https://github.com/richgel999/miniz
+(formerly https://code.google.com/p/miniz/)
+76b3a872855388c735c564905da030f26334f3b3
+
+Note: miniz.c and miniz.h created by downloading the source code
+      and building it using CMake. This was necessary as a v3.0
+      release of miniz has not occurred yet.
 
 Patches
 

@@ -1063,6 +1063,7 @@ typedef enum {
 typedef struct
 {
     mz_uint64 m_archive_size;
+    mz_uint64 m_archive_file_ofs;
     mz_uint64 m_central_directory_file_ofs;
 
     /* We only support up to UINT32_MAX files in zip64 mode. */

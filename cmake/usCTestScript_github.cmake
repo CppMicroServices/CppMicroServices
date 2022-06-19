@@ -12,7 +12,7 @@ if(DEFINED ENV{BUILD_DIR})
 else()
   message(FATAL_ERROR "The BUILD_DIR environment variable is not set. Please set BUILD_DIR to a valid, writeable path.")
 endif()
-  set(CTEST_BUILD_FLAGS "-j4")
+
 if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" AND NOT WIN32)
   # gcc in combination with gcov seems to consume a lot of memory
   # and may lead to errors when building in CI. Hence we compile

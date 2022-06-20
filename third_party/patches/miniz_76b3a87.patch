@@ -9,7 +9,7 @@
  
      /* We only support up to UINT32_MAX files in zip64 mode. */
 
---- miniz_76b3a87miniz.c	2022-06-19 23:44:50.000000000 -0400
+--- miniz_76b3a87/miniz.c	2022-06-19 23:44:50.000000000 -0400
 +++ third_party/miniz.c	    2022-06-20 00:06:13.000000000 -0400
 @@ -3598,6 +3598,7 @@
      mz_int64 cur_file_ofs;
@@ -112,4 +112,3 @@
      cur_dst_file_ofs = pZip->m_archive_size;
  
      /* Read the source archive's local dir header */
-

@@ -74,7 +74,7 @@ jobs:
         # Ruleset file that will determine what checks will be run
         ruleset: NativeRecommendedRules.ruleset
         # Paths to ignore analysis of CMake targets and includes
-        #ignoredPaths: ${{ github.workspace }}/build/framework/test/bundles;${{ github.workspace }}/build/compendium/test_bundles
+        ignoredPaths: ${{ github.workspace }}/framework/test/bundles;${{ github.workspace }}/compendium/test_bundles;${{ github.workspace }}/third_party
 
     # Upload SARIF file to GitHub Code Scanning Alerts
     - name: Upload SARIF to GitHub

@@ -1,3 +1,4 @@
+#include "miniz.h"
 /**************************************************************************
  *
  * Copyright 2013-2014 RAD Game Tools and Valve Software
@@ -24,7 +25,7 @@
  *
  **************************************************************************/
 
-#include "miniz.h"
+
 
 typedef unsigned char mz_validate_uint16[sizeof(mz_uint16) == 2 ? 1 : -1];
 typedef unsigned char mz_validate_uint32[sizeof(mz_uint32) == 4 ? 1 : -1];
@@ -671,7 +672,7 @@ const char *mz_error(int err)
  *
  **************************************************************************/
 
-#include "miniz.h"
+
 
 #ifndef MINIZ_NO_DEFLATE_APIS
 
@@ -2274,7 +2275,7 @@ void tdefl_compressor_free(tdefl_compressor *pComp)
  *
  **************************************************************************/
 
-#include "miniz.h"
+
 
 #ifndef MINIZ_NO_INFLATE_APIS
 
@@ -3043,7 +3044,7 @@ void tinfl_decompressor_free(tinfl_decompressor *pDecomp)
  * THE SOFTWARE.
  *
  **************************************************************************/
-#include "miniz.h"
+
 
 #ifndef MINIZ_NO_ARCHIVE_APIS
 
@@ -3614,14 +3615,16 @@ static mz_bool mz_zip_reader_locate_header_sig(mz_zip_archive *pZip, mz_uint32 r
 
         for (i = n - 4; i >= 0; --i)
         {
-            // Read and verify the end of central directory record
-            if (pZip->m_pRead(pZip->m_pIO_opaque, cur_file_ofs + i, pBuf, MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIZE) != MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIZE)
-                continue;
-            if ((MZ_READ_LE32(pBuf + MZ_ZIP_ECDH_SIG_OFS) != MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIG) ||
-                ((pZip->m_total_files = MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_CDIR_TOTAL_ENTRIES_OFS)) != MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_CDIR_NUM_ENTRIES_ON_DISK_OFS)))
-                continue;
-            zip_signature_found = 1;
-            break;
+            if (MZ_READ_LE32(pBuf + i) == MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIG) {
+                // Read and verify the end of central directory record
+                if (pZip->m_pRead(pZip->m_pIO_opaque, cur_file_ofs + i, pBuf, MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIZE) != MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIZE)
+                    continue;
+                if ((MZ_READ_LE32(pBuf + MZ_ZIP_ECDH_SIG_OFS) != MZ_ZIP_END_OF_CENTRAL_DIR_HEADER_SIG) ||
+                    ((pZip->m_total_files = MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_CDIR_TOTAL_ENTRIES_OFS)) != MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_CDIR_NUM_ENTRIES_ON_DISK_OFS)))
+                    continue;
+                zip_signature_found = 1;
+                break;
+            }
         }
 
         if (zip_signature_found) {
@@ -4964,7 +4967,7 @@ mz_zip_reader_extract_iter_state* mz_zip_reader_extract_iter_new(mz_zip_archive 
     pState->out_blk_remain = 0;
 
     /* Read and parse the local directory entry. */
-    pState->cur_file_ofs = pZip->m_archive_file_ofs + pState->file_stat.m_local_header_ofs;
+    pState->cur_file_ofs = pState->file_stat.m_local_header_ofs;
     if (pZip->m_pRead(pZip->m_pIO_opaque, pState->cur_file_ofs, pLocal_header, MZ_ZIP_LOCAL_DIR_HEADER_SIZE) != MZ_ZIP_LOCAL_DIR_HEADER_SIZE)
     {
         mz_zip_set_error(pZip, MZ_ZIP_FILE_READ_FAILED);
@@ -7040,7 +7043,7 @@ mz_bool mz_zip_writer_add_from_zip_reader(mz_zip_archive *pZip, mz_zip_archive *
     if (!mz_zip_file_stat_internal(pSource_zip, src_file_index, pSrc_central_header, &src_file_stat, NULL))
         return MZ_FALSE;
 
-    cur_src_file_ofs = pSource_zip->m_archive_file_ofs + MZ_READ_LE32(pSrc_central_header + MZ_ZIP_CDH_LOCAL_HEADER_OFS);
+    cur_src_file_ofs = pSource_zip->m_archive_file_ofs + src_file_stat.m_local_header_ofs;
     cur_dst_file_ofs = pZip->m_archive_size;
 
     /* Read the source archive's local dir header */

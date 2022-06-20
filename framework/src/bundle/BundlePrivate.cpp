@@ -509,7 +509,8 @@ std::exception_ptr BundlePrivate::Start0()
     } catch (...) {
       coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
                            "Failed to start Bundle #" + util::ToString(id) +
-                             " (location=" + location + ")");
+                             " (location=" + location + ")",
+                           std::current_exception());
       res = std::make_exception_ptr(std::runtime_error(
         "Bundle #" + util::ToString(id) + " (location= " + location +
         ") start failed: " + util::GetLastExceptionStr()));

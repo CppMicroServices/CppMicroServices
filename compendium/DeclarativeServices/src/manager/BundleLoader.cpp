@@ -110,6 +110,10 @@ GetComponentCreatorDeletors(
                     ToString(fromBundle.GetBundleId()) +
                     " (location=" + bundleLoc + ")");
     } catch (const std::system_error& ex) {
+      logger->Log(logservice::SeverityLevel::LOG_INFO,
+                  "Failed loading shared library for Bundle #" +
+                    ToString(fromBundle.GetBundleId()) +
+                    " (location=" + bundleLoc + ")");
       // SharedLibrary::Load() will throw a std::system_error when a shared library
       // fails to load. Creating a SharedLibraryException here to throw with fromBundle information.
       throw cppmicroservices::SharedLibraryException(

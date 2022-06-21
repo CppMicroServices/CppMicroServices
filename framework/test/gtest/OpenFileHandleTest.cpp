@@ -134,19 +134,21 @@ TEST(OpenFileHandleTest, InstallBundleFailure)
 
   // Using miniz APIs to qualify that the test module has the correct
   // embedded zip file.
-  mz_zip_archive m_ZipArchive{ 0 };
+  mz_zip_archive zipArchive{ 0 };
+  memset(&zipArchive, 0, sizeof(mz_zip_archive));
+
   std::string testModulePath =
     cppmicroservices::testing::LIB_PATH + util::DIR_SEP + US_LIB_PREFIX +
     "TestModuleWithEmbeddedZip" + US_LIB_POSTFIX + US_LIB_EXT;
   EXPECT_TRUE(
-    mz_zip_reader_init_file(&m_ZipArchive, testModulePath.c_str(), 0));
+    mz_zip_reader_init_file(&zipArchive, testModulePath.c_str(), 0));
 
   mz_uint numFiles =
-    mz_zip_reader_get_num_files(const_cast<mz_zip_archive*>(&m_ZipArchive));
+    mz_zip_reader_get_num_files(const_cast<mz_zip_archive*>(&zipArchive));
   EXPECT_EQ(numFiles, 1) << "Wrong # of files in the zip found.";
   for (mz_uint fileIndex = 0; fileIndex < numFiles; ++fileIndex) {
     char fileName[MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
-    if (mz_zip_reader_get_filename(&m_ZipArchive,
+    if (mz_zip_reader_get_filename(&zipArchive,
                                    fileIndex,
                                    fileName,
                                    MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE)) {
@@ -157,7 +159,7 @@ TEST(OpenFileHandleTest, InstallBundleFailure)
     }
   }
 
-  mz_zip_reader_end(&m_ZipArchive);
+  mz_zip_reader_end(&zipArchive);
 
   // Test that a shared library which contains zip formatted data not in
   // the format CppMicroServices expects fails correctly and does not leak

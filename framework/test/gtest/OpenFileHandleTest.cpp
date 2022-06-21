@@ -134,7 +134,7 @@ TEST(OpenFileHandleTest, InstallBundleFailure)
 
   // Using miniz APIs to qualify that the test module has the correct
   // embedded zip file.
-  mz_zip_archive zipArchive{ 0 };
+  mz_zip_archive zipArchive;
   memset(&zipArchive, 0, sizeof(mz_zip_archive));
 
   std::string testModulePath =

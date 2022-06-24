@@ -24,6 +24,7 @@ limitations under the License.
 
 #include "TestUtilBundleListener.h"
 #include "TestUtils.h"
+#include "TestingConfig.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleEvent.h"
@@ -33,6 +34,8 @@ limitations under the License.
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/util/FileSystem.h"
 #include "gtest/gtest.h"
+
+#include "miniz.h"
 
 #if defined(US_PLATFORM_WINDOWS)
 #  include "windows.h"
@@ -99,6 +102,77 @@ TEST(OpenFileHandleTest, InstallBundle)
     << "The handle counts before and after installing a bundle should not "
        "differ.";
 
+  f.Stop(); 
+  f.WaitForStop(std::chrono::seconds::zero());
+}
+
+// Test that file handles do not leak when a bundle fails to install.
+TEST(OpenFileHandleTest, InstallBundleFailure)
+{
+  auto f = FrameworkFactory().NewFramework();
+  ASSERT_TRUE(f);
+  ASSERT_NO_THROW(f.Start());
+  auto context = f.GetBundleContext();
+
+  auto baselineHandleCount = GetHandleCountForCurrentProcess();
+
+  // Test that bogus bundle installs throw the appropriate exception and don't
+  // leak file handles.
+  EXPECT_THROW(context.InstallBundles(std::string{}), std::runtime_error);
+
+  auto newHandleCounter = GetHandleCountForCurrentProcess();
+  EXPECT_EQ(baselineHandleCount, newHandleCounter);
+
+  EXPECT_THROW(context.InstallBundles(
+                 std::string("\\path\\which\\won't\\exist\\phantom_bundle")),
+               std::runtime_error);
+
+  newHandleCounter = GetHandleCountForCurrentProcess();
+  EXPECT_EQ(baselineHandleCount, newHandleCounter);
+
+#if defined(US_BUILD_SHARED_LIBS)
+
+  // Using miniz APIs to qualify that the test module has the correct
+  // embedded zip file.
+  mz_zip_archive zipArchive;
+  memset(&zipArchive, 0, sizeof(mz_zip_archive));
+
+  std::string testModulePath =
+    cppmicroservices::testing::LIB_PATH + util::DIR_SEP + US_LIB_PREFIX +
+    "TestModuleWithEmbeddedZip" + US_LIB_POSTFIX + US_LIB_EXT;
+  EXPECT_TRUE(
+    mz_zip_reader_init_file(&zipArchive, testModulePath.c_str(), 0));
+
+  mz_uint numFiles =
+    mz_zip_reader_get_num_files(const_cast<mz_zip_archive*>(&zipArchive));
+  EXPECT_EQ(numFiles, 1) << "Wrong # of files in the zip found.";
+  for (mz_uint fileIndex = 0; fileIndex < numFiles; ++fileIndex) {
+    char fileName[MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
+    if (mz_zip_reader_get_filename(&zipArchive,
+                                   fileIndex,
+                                   fileName,
+                                   MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE)) {
+      std::string strFileName{ fileName };
+      std::size_t pos = strFileName.find_first_of('/');
+      EXPECT_EQ(pos, std::string::npos)
+        << "Found a directory in the zip file where one should not exist.";
+    }
+  }
+
+  mz_zip_reader_end(&zipArchive);
+
+  // Test that a shared library which contains zip formatted data not in
+  // the format CppMicroServices expects fails correctly and does not leak
+  // file handles.
+  EXPECT_THROW(cppmicroservices::testing::InstallLib(
+                 f.GetBundleContext(), "TestModuleWithEmbeddedZip");
+               , std::runtime_error);
+
+  newHandleCounter = GetHandleCountForCurrentProcess();
+  EXPECT_EQ(baselineHandleCount, newHandleCounter);
+#endif
+
   f.Stop();
   f.WaitForStop(std::chrono::seconds::zero());
 }
+

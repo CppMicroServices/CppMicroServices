@@ -36,7 +36,7 @@ namespace cppmicroservices {
   struct NullValue
   {
     std::string ToString() { return ""; };
-    friend std::ostream& operator<<(std::ostream& os, const NullValue& nv)
+    friend std::ostream& operator<<(std::ostream& os, const NullValue&)
     {
       return os << ""
                 << "\n";

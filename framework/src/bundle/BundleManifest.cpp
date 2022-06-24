@@ -98,6 +98,8 @@ Any ParseJsonValue(const rapidjson::Value& jsonValue, bool ci)
     return Any(jsonValue.GetInt());
   } else if (jsonValue.IsDouble()) {
     return Any(jsonValue.GetDouble());
+  } else if (jsonValue.IsNull()) {
+    return Any(cppmicroservices::NullValue());
   }
 
   return Any();

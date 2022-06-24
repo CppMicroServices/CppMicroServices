@@ -121,6 +121,16 @@ TEST_F(TestMetadataParserImplV1, ParseValidManifest)
   ASSERT_THAT(configuration.properties, ::testing::SizeIs(3));
 }
 
+TEST_F(TestMetadataParserImplV1, ParseManifestNullValue)
+{
+  auto metadataParser = MetadataParserFactory::Create(1, GetLogger());
+  auto configurations = metadataParser->ParseAndGetConfigurationMetadata(
+    ManifestHelper::GetTestManifest("manifest_null_value"));
+  ASSERT_THAT(configurations, ::testing::SizeIs(1));
+  const auto& configuration = configurations[0];
+  ASSERT_EQ(configuration.pid, std::string("test"));
+  ASSERT_THAT(configuration.properties, ::testing::SizeIs(1));
+}
 TEST_F(TestMetadataParserImplV1, ParseManifestEmptyProps)
 {
   auto metadataParser = MetadataParserFactory::Create(1, GetLogger());

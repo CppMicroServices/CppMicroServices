@@ -130,6 +130,13 @@ TEST_F(TestMetadataParserImplV1, ParseManifestNullValue)
   const auto& configuration = configurations[0];
   ASSERT_EQ(configuration.pid, std::string("test"));
   ASSERT_THAT(configuration.properties, ::testing::SizeIs(1));
+ 
+  const auto prop = configuration.properties.at("optional 'license_type' property");
+  ASSERT_FALSE(prop.Empty());
+  const auto prop2 = prop;
+  ASSERT_TRUE(prop == prop2);
+  ASSERT_TRUE(prop.ToJSON() == prop2.ToJSON());
+  ASSERT_TRUE(prop.ToString() == prop2.ToString());
 }
 TEST_F(TestMetadataParserImplV1, ParseManifestEmptyProps)
 {

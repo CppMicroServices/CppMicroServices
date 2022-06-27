@@ -36,10 +36,14 @@ namespace cppmicroservices {
   struct NullValue
   {
     std::string ToString() { return ""; };
-    friend std::ostream& operator<<(std::ostream& os, const NullValue&)
+    bool operator==(const NullValue& nv) const
     {
-      return os << ""
-                << "\n";
+      bool check = typeid(nv) == typeid(NullValue);
+      return typeid(nv) == typeid(NullValue);
+    }
+    friend std::ostream& operator<<(std::ostream& os, const NullValue& )
+    {
+      return os << "null";
     }
   };
 }

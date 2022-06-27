@@ -80,7 +80,7 @@ public:
    */
   BundleResource(const BundleResource& resource);
 
-  ~BundleResource();
+  ~BundleResource() = default;
 
   /**
    * Assignment operator.
@@ -318,7 +318,7 @@ private:
 
   std::unique_ptr<void, void (*)(void*)> GetData() const;
 
-  BundleResourcePrivate* d;
+  std::shared_ptr<BundleResourcePrivate> d;
 };
 
 /**

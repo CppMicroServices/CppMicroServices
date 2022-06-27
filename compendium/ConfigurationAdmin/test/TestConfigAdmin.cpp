@@ -101,6 +101,19 @@ std::shared_ptr<::test::TestManagedServiceFactory> getManagedServiceFactory(
   return ctx.GetService<::test::TestManagedServiceFactory>(sr);
 }
 
+std::vector<std::shared_ptr<::test::TestManagedServiceFactory>>
+getManagedServiceFactories(cppmicroservices::BundleContext& ctx)
+{
+  auto srs = ctx.GetServiceReferences<::test::TestManagedServiceFactory>();
+  std::vector<std::shared_ptr<::test::TestManagedServiceFactory>> factories(
+    srs.size());
+  for (uint32_t i = 0; i < factories.size(); ++i) {
+    factories[i] = ctx.GetService<::test::TestManagedServiceFactory>(srs[i]);
+  }
+
+  return factories;
+}
+
 enum class PollingCondition
 {
   GT,
@@ -300,7 +313,7 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
 
   auto const numBundles =
     installAndStartTestBundles(ctx, "ManagedServiceAndFactoryBundle");
-    ASSERT_EQ(numBundles, 1ul);
+  ASSERT_EQ(numBundles, 1ul);
 
   auto const service = getManagedService(ctx);
   ASSERT_NE(service, nullptr);
@@ -330,7 +343,7 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
   configuration = m_configAdmin->GetConfiguration("cm.testservice");
   EXPECT_TRUE(configuration->GetProperties().empty());
   EXPECT_EQ(service->getCounter(), expectedCount);
- 
+
   const int newIncrement{ 5 };
   cppmicroservices::AnyMap props(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
@@ -444,7 +457,7 @@ TEST_F(ConfigAdminTests, testCreateFactoryConfiguration)
 {
   auto f = GetFramework();
   auto ctx = f.GetBundleContext();
- 
+
   auto const numBundles =
     installAndStartTestBundles(ctx, "ManagedServiceAndFactoryBundle");
   ASSERT_EQ(numBundles, 1ul);
@@ -511,28 +524,29 @@ TEST_F(ConfigAdminTests, testRemoveFactoryConfiguration)
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config2"),
             expectedCount_config2);
 }
-// This test confirms that if an object exists in the configuration repository 
+// This test confirms that if an object exists in the configuration repository
 // but has not yet been Updated prior to the start of the ManagedServiceFactory
-// then no Updated notification will be sent. 
+// then no Updated notification will be sent.
 TEST_F(ConfigAdminTests, testDuplicateUpdated)
 {
   auto f = GetFramework();
   auto ctx = f.GetBundleContext();
 
   // Add cm.testfactory~0 configuration object to the configuration repository
-  auto configuration = m_configAdmin->GetFactoryConfiguration("cm.testfactory","0");
+  auto configuration =
+    m_configAdmin->GetFactoryConfiguration("cm.testfactory", "0");
 
   auto configurationMap =
-      std::unordered_map<std::string, cppmicroservices::Any>{
-        { "emgrid", std::to_string(0) }
-      };
- 
-  // Start the ManagedServiceFactory for cm.testfactory. Since the 
-  // cm.testfactory~0 instance has not yet been updated, no Update 
+    std::unordered_map<std::string, cppmicroservices::Any>{
+      { "emgrid", std::to_string(0) }
+    };
+
+  // Start the ManagedServiceFactory for cm.testfactory. Since the
+  // cm.testfactory~0 instance has not yet been updated, no Update
   // notification will be sent to the ManagedServiceFactory.
   installAndStartTestBundles(ctx, "TestBundleManagedServiceFactory");
 
-  // Update the cm.testfactory~0 configuration object. An Update 
+  // Update the cm.testfactory~0 configuration object. An Update
   // notification will be sent to the ManagedServiceFactory.
   auto result = configuration->UpdateIfDifferent(configurationMap);
   result.second.get();
@@ -541,4 +555,49 @@ TEST_F(ConfigAdminTests, testDuplicateUpdated)
   ASSERT_NE(serviceFactory, nullptr);
 
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~0"), 1);
- }
+}
+
+TEST_F(ConfigAdminTests, testMultipleManagedFactoriesInBundleGetUpdate)
+{
+  auto f = GetFramework();
+  auto ctx = f.GetBundleContext();
+
+  auto const numBundles =
+    installAndStartTestBundles(ctx, "TestBundleMultipleManagedServiceFactory");
+  ASSERT_EQ(numBundles, 1);
+
+  // Sleep rather than poll to allow superfluous Updated() calls to flush through
+  std::this_thread::sleep_for(DEFAULT_POLL_PERIOD);
+
+  auto serviceFactories = getManagedServiceFactories(ctx);
+  ASSERT_EQ(serviceFactories.size(), 2ul);
+  std::for_each(std::begin(serviceFactories),
+                std::end(serviceFactories),
+                [](auto& factory) { ASSERT_NE(factory, nullptr); });
+
+  auto sharedConfiguration =
+    m_configAdmin->GetFactoryConfiguration("cm.testfactory", "ver1");
+  ASSERT_EQ(sharedConfiguration->GetFactoryPid(), "cm.testfactory");
+  ASSERT_TRUE(sharedConfiguration->GetProperties().empty());
+
+  std::for_each(std::begin(serviceFactories),
+                std::end(serviceFactories),
+                [](auto& factory) {
+                  ASSERT_EQ(factory->getUpdatedCounter("cm.testfactory~ver1"),
+                            0);
+                });
+
+  cppmicroservices::AnyMap props(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  props["myProp"] = 0;
+
+  auto fut = sharedConfiguration->Update(props);
+  fut.get();
+
+  std::for_each(std::begin(serviceFactories),
+                std::end(serviceFactories),
+                [](auto& factory) {
+                  ASSERT_EQ(factory->getUpdatedCounter("cm.testfactory~ver1"),
+                            1);
+                });
+}

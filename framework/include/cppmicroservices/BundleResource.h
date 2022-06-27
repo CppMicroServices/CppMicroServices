@@ -88,7 +88,7 @@ public:
    * @param resource The %BundleResource object which is assigned to this instance.
    * @return A reference to this %BundleResource instance.
    */
-  BundleResource& operator=(const BundleResource& resource);
+  BundleResource& operator=(const BundleResource& resource) = default;
 
   /**
    * A less then operator using the full resource path as returned by

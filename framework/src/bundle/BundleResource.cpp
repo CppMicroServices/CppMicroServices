@@ -129,13 +129,6 @@ void BundleResource::InitializeChildren()
   }
 }
 
-BundleResource& BundleResource::operator=(const BundleResource& resource)
-{
-  d = resource.d;
-
-  return *this;
-}
-
 bool BundleResource::operator<(const BundleResource& resource) const
 {
   return this->GetResourcePath() < resource.GetResourcePath();

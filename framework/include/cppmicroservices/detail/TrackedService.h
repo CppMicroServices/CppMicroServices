@@ -34,6 +34,17 @@ namespace cppmicroservices {
 
 namespace detail {
 
+// Struct to add shared ptr wrapper to TrackedParamType
+// Keeps BundleAbstractTracked generic for BT and ST
+template<class TTT>
+struct SharedPtrTypeTraits
+{
+  using ServiceType = typename TTT::ServiceType;
+  using TrackedType = typename TTT::TrackedType;
+  using TrackedParamType =
+    typename std::shared_ptr<typename TTT::TrackedParamType>;
+};
+
 /**
  * This class is not intended to be used directly. It is exported to support
  * the CppMicroServices bundle system.
@@ -41,7 +52,9 @@ namespace detail {
 template<class S, class TTT>
 class TrackedService
   : public TrackedServiceListener
-  , public BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>
+  , public BundleAbstractTracked<ServiceReference<S>,
+                                 SharedPtrTypeTraits<TTT>,
+                                 ServiceEvent>
 {
 
 public:
@@ -63,8 +76,9 @@ public:
   void WaitOnCustomizersToFinish();
 
 private:
-  using Superclass =
-    BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>;
+  using Superclass = BundleAbstractTracked<ServiceReference<S>,
+                                           SharedPtrTypeTraits<TTT>,
+                                           ServiceEvent>;
 
   ServiceTracker<S, T>* serviceTracker;
   ServiceTrackerCustomizer<S, T>* customizer;

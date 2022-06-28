@@ -38,7 +38,6 @@ namespace cppmicroservices {
     std::string ToString() { return ""; };
     bool operator==(const NullValue& nv) const
     {
-      bool check = typeid(nv) == typeid(NullValue);
       return typeid(nv) == typeid(NullValue);
     }
     friend std::ostream& operator<<(std::ostream& os, const NullValue& )

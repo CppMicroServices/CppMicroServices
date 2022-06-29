@@ -45,18 +45,20 @@ Properties::Properties(AnyMap& p)
     throw std::runtime_error("Properties contain too many keys");
   }
 
-  std::vector<std::string> keys;
-  for (auto& [key, _] : p) {
-    keys.emplace_back(key);
-  }
+  if (p.size() > 1) {
+    std::vector<std::string> keys;
+    for (auto& [key, _] : p) {
+      keys.emplace_back(key);
+    }
 
-  for (uint32_t i = 0; i < keys.size() - 1; ++i) {
-    for (uint32_t j = i + 1; j < keys.size(); ++j) {
-      if (keys[i].size() == keys[j].size() &&
-          ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) == 0) {
-        std::string msg("Properties contain case variants of the key: ");
-        msg += keys[i];
-        throw std::runtime_error(msg.c_str());
+    for (uint32_t i = 0; i < keys.size() - 1; ++i) {
+      for (uint32_t j = i + 1; j < keys.size(); ++j) {
+        if (keys[i].size() == keys[j].size() &&
+            ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) == 0) {
+          std::string msg("Properties contain case variants of the key: ");
+          msg += keys[i];
+          throw std::runtime_error(msg.c_str());
+        }
       }
     }
   }
@@ -81,18 +83,20 @@ Properties::Properties(const AnyMap& p)
     throw std::runtime_error("Properties contain too many keys");
   }
 
-  std::vector<std::string> keys;
-  for (auto& [key, _] : p) {
-    keys.emplace_back(key);
-  }
+  if (p.size() > 1) {
+    std::vector<std::string> keys;
+    for (auto& [key, _] : p) {
+      keys.emplace_back(key);
+    }
 
-  for (uint32_t i = 0; i < keys.size() - 1; ++i) {
-    for (uint32_t j = i + 1; j < keys.size(); ++j) {
-      if (keys[i].size() == keys[j].size() &&
-          ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) == 0) {
-        std::string msg("Properties contain case variants of the key: ");
-        msg += keys[i];
-        throw std::runtime_error(msg.c_str());
+    for (uint32_t i = 0; i < keys.size() - 1; ++i) {
+      for (uint32_t j = i + 1; j < keys.size(); ++j) {
+        if (keys[i].size() == keys[j].size() &&
+            ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) == 0) {
+          std::string msg("Properties contain case variants of the key: ");
+          msg += keys[i];
+          throw std::runtime_error(msg.c_str());
+        }
       }
     }
   }

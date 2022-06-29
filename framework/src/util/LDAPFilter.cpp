@@ -94,7 +94,7 @@ bool LDAPFilter::Match(const Bundle& bundle) const
     keys.emplace_back(key);
   }
 
-  if (headers.size() > 0) {
+  if (headers.size() > 1) {
     for (uint32_t i = 0; i < keys.size() - 1; ++i) {
       for (uint32_t j = i + 1; j < keys.size(); ++j) {
         if (keys[i].size() == keys[j].size() &&
@@ -118,7 +118,7 @@ bool LDAPFilter::Match(const AnyMap& dictionary) const
     keys.emplace_back(key);
   }
 
-  if (headers.size() > 0) {
+  if (headers.size() > 1) {
     for (uint32_t i = 0; i < keys.size() - 1; ++i) {
       for (uint32_t j = i + 1; j < keys.size(); ++j) {
         if (keys[i].size() == keys[j].size() &&
@@ -142,7 +142,7 @@ bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
     keys.emplace_back(key);
   }
 
-  if (headers.size() > 0) {
+  if (headers.size() > 1) {
     for (uint32_t i = 0; i < keys.size() - 1; ++i) {
       for (uint32_t j = i + 1; j < keys.size(); ++j) {
         if (keys[i].size() == keys[j].size() &&

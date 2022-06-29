@@ -25,6 +25,7 @@
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/AnyMap.h"
+#include "cppmicroservices/ServiceProperties.h"
 #include "cppmicroservices/detail/Threads.h"
 
 #include <string>
@@ -36,24 +37,26 @@ class Properties : public detail::MultiThreaded<>
 {
 
 public:
+  explicit Properties(AnyMap& props);
   explicit Properties(const AnyMap& props);
 
   Properties(Properties&& o);
   Properties& operator=(Properties&& o);
 
   Any Value_unlocked(const std::string& key) const;
-  Any Value_unlocked(int index) const;
+  //Any Value_unlocked(int index) const;
 
-  int Find_unlocked(const std::string& key) const;
-  int FindCaseSensitive_unlocked(const std::string& key) const;
+  //int Find_unlocked(const std::string& key) const;
+  //int FindCaseSensitive_unlocked(const std::string& key) const;
 
   std::vector<std::string> Keys_unlocked() const;
 
   void Clear_unlocked();
 
+  const AnyMap& GetProps() const { return props; };
+
 private:
-  std::vector<std::string> keys;
-  std::vector<Any> values;
+  AnyMap props;
 
   static const Any emptyAny;
 };

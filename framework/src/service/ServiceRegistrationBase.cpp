@@ -148,6 +148,7 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 
     auto l2 = d->properties.Lock();
     US_UNUSED(l2);
+
     auto propsCopy(props);
     propsCopy[Constants::SERVICE_ID] =
       d->properties.Value_unlocked(Constants::SERVICE_ID);
@@ -174,7 +175,7 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
       // stored in the service registry, no need to type check before casting
       old_rank = any_cast<int>(oldRankAny);
     }
-    d->properties = Properties(std::move(propsCopy));
+    d->properties = Properties(std::move(AnyMap(std::move(propsCopy))));
   }
   if (old_rank != new_rank) {
     auto classes = any_cast<std::vector<std::string>>(objectClasses);

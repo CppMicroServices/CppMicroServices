@@ -29,6 +29,7 @@
 #include <unordered_map>
 
 namespace cppmicroservices {
+class LDAPExpr;
 
 namespace detail {
 
@@ -297,6 +298,8 @@ protected:
   map_type type;
 
 private:
+  friend class LDAPExpr;
+
   ordered_any_map const& o_m() const;
   ordered_any_map& o_m();
   unordered_any_map const& uo_m() const;

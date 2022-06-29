@@ -25,6 +25,8 @@
 
 #include "cppmicroservices/FrameworkConfig.h"
 
+#include "cppmicroservices/AnyMap.h"
+
 #include <memory>
 #include <string>
 #include <unordered_set>
@@ -119,6 +121,8 @@ public:
 
   //! Evaluate this LDAP filter.
   bool Evaluate(const PropertiesHandle& p, bool matchCase) const;
+
+  bool Evaluate(const AnyMap& p, bool matchCase) const;
 
   //!
   const std::string ToString() const;

@@ -38,15 +38,30 @@ namespace cppmicroservices {
 
 const Any Properties::emptyAny;
 
-Properties::Properties(const AnyMap& p)
+Properties::Properties(AnyMap& p)
+  : props(p)
 {
   if (p.size() > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
     throw std::runtime_error("Properties contain too many keys");
   }
 
-  keys.reserve(p.size());
-  values.reserve(p.size());
+  std::vector<std::string> keys;
+  for (auto& [key, _] : p) {
+    keys.emplace_back(key);
+  }
 
+  for (uint32_t i = 0; i < keys.size() - 1; ++i) {
+    for (uint32_t j = i + 1; j < keys.size(); ++j) {
+      if (keys[i].size() == keys[j].size() &&
+          ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) == 0) {
+        std::string msg("Properties contain case variants of the key: ");
+        msg += keys[i];
+        throw std::runtime_error(msg.c_str());
+      }
+    }
+  }
+
+  /*
   for (auto& iter : p) {
     if (Find_unlocked(iter.first) > -1) {
       std::string msg("Properties contain case variants of the key: ");
@@ -56,29 +71,61 @@ Properties::Properties(const AnyMap& p)
     keys.push_back(iter.first);
     values.push_back(iter.second);
   }
+  */
+}
+
+Properties::Properties(const AnyMap& p)
+  : props(const_cast<AnyMap&>(p))
+{
+  if (p.size() > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
+    throw std::runtime_error("Properties contain too many keys");
+  }
+
+  std::vector<std::string> keys;
+  for (auto& [key, _] : p) {
+    keys.emplace_back(key);
+  }
+
+  for (uint32_t i = 0; i < keys.size() - 1; ++i) {
+    for (uint32_t j = i + 1; j < keys.size(); ++j) {
+      if (keys[i].size() == keys[j].size() &&
+          ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) == 0) {
+        std::string msg("Properties contain case variants of the key: ");
+        msg += keys[i];
+        throw std::runtime_error(msg.c_str());
+      }
+    }
+  }
 }
 
 Properties::Properties(Properties&& o)
-  : keys(std::move(o.keys))
-  , values(std::move(o.values))
+  : props(std::move(o.props))
 {}
 
 Properties& Properties::operator=(Properties&& o)
 {
-  keys = std::move(o.keys);
-  values = std::move(o.values);
+  props = std::move(o.props);
   return *this;
 }
 
 Any Properties::Value_unlocked(const std::string& key) const
 {
+  auto itr = props.find(key);
+  if (itr == props.end()) {
+    return emptyAny;
+  }
+
+  return itr->second;
+  /*
   int i = Find_unlocked(key);
   if (i < 0) {
     return emptyAny;
   }
   return values[i];
+  */
 }
 
+/*
 Any Properties::Value_unlocked(int index) const
 {
   if (index < 0 || static_cast<std::size_t>(index) >= values.size()) {
@@ -86,7 +133,9 @@ Any Properties::Value_unlocked(int index) const
   }
   return values[static_cast<std::size_t>(index)];
 }
+*/
 
+/*
 int Properties::Find_unlocked(const std::string& key) const
 {
   for (std::size_t i = 0; i < keys.size(); ++i) {
@@ -97,7 +146,9 @@ int Properties::Find_unlocked(const std::string& key) const
   }
   return -1;
 }
+*/
 
+/*
 int Properties::FindCaseSensitive_unlocked(const std::string& key) const
 {
   for (std::size_t i = 0; i < keys.size(); ++i) {
@@ -107,16 +158,27 @@ int Properties::FindCaseSensitive_unlocked(const std::string& key) const
   }
   return -1;
 }
+*/
 
 std::vector<std::string> Properties::Keys_unlocked() const
 {
+  std::vector<std::string> result{};
+  for (auto& [key, _] : props) {
+    result.push_back(key);
+  }
+  return result;
+  /*
   return keys;
+  */
 }
 
 void Properties::Clear_unlocked()
 {
+  props.clear();
+  /*
   keys.clear();
   values.clear();
+  */
 }
 }
 

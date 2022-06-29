@@ -30,6 +30,7 @@
 
 namespace cppmicroservices {
 class LDAPExpr;
+class Properties;
 
 namespace detail {
 
@@ -299,6 +300,7 @@ protected:
 
 private:
   friend class LDAPExpr;
+  friend class Properties;
 
   ordered_any_map const& o_m() const;
   ordered_any_map& o_m();

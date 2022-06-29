@@ -306,8 +306,9 @@ bool LDAPExpr::IsNull() const
 bool LDAPExpr::Evaluate(const PropertiesHandle& p, bool matchCase) const
 {
   if ((d->m_operator & SIMPLE) != 0) {
-    auto v = p->Value_unlocked(d->m_attrName);
-    return (v.Empty()) ? false : Compare(v, d->m_operator, d->m_attrValue);
+    bool found = false;
+    auto v = p->Value_unlocked(d->m_attrName, &found);
+    return (!found) ? false : Compare(v, d->m_operator, d->m_attrValue);
     /*
     // try case sensitive match first
     int index = p->FindCaseSensitive_unlocked(d->m_attrName);

@@ -43,7 +43,7 @@ public:
   Properties(Properties&& o);
   Properties& operator=(Properties&& o);
 
-  Any Value_unlocked(const std::string& key) const;
+  Any Value_unlocked(const std::string& key, bool* found = nullptr) const;
   //Any Value_unlocked(int index) const;
 
   //int Find_unlocked(const std::string& key) const;

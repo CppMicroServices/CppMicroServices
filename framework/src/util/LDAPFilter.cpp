@@ -88,74 +88,89 @@ bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
 
 bool LDAPFilter::Match(const Bundle& bundle) const
 {
-  auto& headers = bundle.GetHeaders();
-  std::vector<std::string> keys;
-  for (auto& [key, _] : headers) {
-    keys.emplace_back(key);
-  }
+  if (d) {
+    auto& headers = bundle.GetHeaders();
+    std::vector<std::string> keys;
+    for (auto& [key, _] : headers) {
+      keys.emplace_back(key);
+    }
 
-  if (headers.size() > 1) {
-    for (uint32_t i = 0; i < keys.size() - 1; ++i) {
-      for (uint32_t j = i + 1; j < keys.size(); ++j) {
-        if (keys[i].size() == keys[j].size() &&
-            ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) == 0) {
-          std::string msg("Properties contain case variants of the key: ");
-          msg += keys[i];
-          throw std::runtime_error(msg.c_str());
+    if (headers.size() > 1) {
+      for (uint32_t i = 0; i < keys.size() - 1; ++i) {
+        for (uint32_t j = i + 1; j < keys.size(); ++j) {
+          if (keys[i].size() == keys[j].size() &&
+              ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) ==
+                0) {
+            std::string msg("Properties contain case variants of the key: ");
+            msg += keys[i];
+            throw std::runtime_error(msg.c_str());
+          }
         }
       }
     }
-  }
 
-  return ((d) ? d->ldapExpr.Evaluate(bundle.GetHeaders(), false) : false);
+    return d->ldapExpr.Evaluate(bundle.GetHeaders(), false);
+  } else {
+    return false;
+  }
 }
 
 bool LDAPFilter::Match(const AnyMap& dictionary) const
 {
-  auto& headers = dictionary;
-  std::vector<std::string> keys;
-  for (auto& [key, _] : headers) {
-    keys.emplace_back(key);
-  }
+  if (d) {
+    auto& headers = dictionary;
+    std::vector<std::string> keys;
+    for (auto& [key, _] : headers) {
+      keys.emplace_back(key);
+    }
 
-  if (headers.size() > 1) {
-    for (uint32_t i = 0; i < keys.size() - 1; ++i) {
-      for (uint32_t j = i + 1; j < keys.size(); ++j) {
-        if (keys[i].size() == keys[j].size() &&
-            ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) == 0) {
-          std::string msg("Properties contain case variants of the key: ");
-          msg += keys[i];
-          throw std::runtime_error(msg.c_str());
+    if (headers.size() > 1) {
+      for (uint32_t i = 0; i < keys.size() - 1; ++i) {
+        for (uint32_t j = i + 1; j < keys.size(); ++j) {
+          if (keys[i].size() == keys[j].size() &&
+              ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) ==
+                0) {
+            std::string msg("Properties contain case variants of the key: ");
+            msg += keys[i];
+            throw std::runtime_error(msg.c_str());
+          }
         }
       }
     }
-  }
 
-  return ((d) ? d->ldapExpr.Evaluate(dictionary, false) : false);
+    return d->ldapExpr.Evaluate(dictionary, false);
+  } else {
+    return false;
+  }
 }
 
 bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
 {
-  auto& headers = dictionary;
-  std::vector<std::string> keys;
-  for (auto& [key, _] : headers) {
-    keys.emplace_back(key);
-  }
+  if (d) {
+    auto& headers = dictionary;
+    std::vector<std::string> keys;
+    for (auto& [key, _] : headers) {
+      keys.emplace_back(key);
+    }
 
-  if (headers.size() > 1) {
-    for (uint32_t i = 0; i < keys.size() - 1; ++i) {
-      for (uint32_t j = i + 1; j < keys.size(); ++j) {
-        if (keys[i].size() == keys[j].size() &&
-            ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) == 0) {
-          std::string msg("Properties contain case variants of the key: ");
-          msg += keys[i];
-          throw std::runtime_error(msg.c_str());
+    if (headers.size() > 1) {
+      for (uint32_t i = 0; i < keys.size() - 1; ++i) {
+        for (uint32_t j = i + 1; j < keys.size(); ++j) {
+          if (keys[i].size() == keys[j].size() &&
+              ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) ==
+                0) {
+            std::string msg("Properties contain case variants of the key: ");
+            msg += keys[i];
+            throw std::runtime_error(msg.c_str());
+          }
         }
       }
     }
-  }
 
-  return ((d) ? d->ldapExpr.Evaluate(dictionary, true) : false);
+    return d->ldapExpr.Evaluate(dictionary, true);
+  } else {
+    return false;
+  }
 }
 
 std::string LDAPFilter::ToString() const

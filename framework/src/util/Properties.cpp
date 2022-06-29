@@ -112,13 +112,19 @@ Properties& Properties::operator=(Properties&& o)
   return *this;
 }
 
-Any Properties::Value_unlocked(const std::string& key) const
+Any Properties::Value_unlocked(const std::string& key, bool* found) const
 {
-  auto itr = props.find(key);
-  if (itr == props.end()) {
+  auto itr = props.uoci_m().find(key);
+  if (itr == props.uoci_m().end()) {
+    if (found) {
+      *found = false;
+    }
     return emptyAny;
   }
 
+  if (found) {
+    *found = true;
+  }
   return itr->second;
   /*
   int i = Find_unlocked(key);

@@ -28,8 +28,10 @@
 #include "cppmicroservices/GlobalConfig.h"
 
 #include <chrono>
+#include <functional>
 #include <map>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 namespace cppmicroservices {
@@ -864,6 +866,18 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
  */
 US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
                                              Bundle::State state);
+}
+
+namespace std {
+
+template<>
+struct hash<cppmicroservices::Bundle>
+{
+  std::size_t operator()(const cppmicroservices::Bundle& arg) const
+  {
+    return hash<std::string>()(arg.GetSymbolicName());
+  }
+};
 }
 
 #endif // CPPMICROSERVICES_BUNDLE_H

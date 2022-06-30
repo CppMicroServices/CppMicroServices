@@ -23,9 +23,11 @@
 #ifndef CPPMICROSERVICES_BUNDLETRACKERPRIVATE_H
 #define CPPMICROSERVICES_BUNDLETRACKERPRIVATE_H
 
-#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/detail/Threads.h"
+
+#include <memory>
 
 namespace cppmicroservices {
 
@@ -42,13 +44,93 @@ public:
   using T = typename TTT::TrackedType;
   using TrackedParamType = typename TTT::TrackedParamType;
 
-  BundleTrackerPrivate(std::weak_ptr<BundleTracker<T>>,
+  using StateType = std::underlying_type_t<Bundle::State>;
+
+  BundleTrackerPrivate(BundleTracker<T>*,
                        const BundleContext& context,
-                       std::weak_ptr<BundleTrackerCustomizer<T>> customizer);
+                       StateType stateMask,
+                       BundleTrackerCustomizer<T>* customizer);
   ~BundleTrackerPrivate();
+
+  /**
+   * Returns the list of initial <code>Bundle</code>s that will be
+   * tracked by the <code>BundleTracker</code>.
+   * 
+   * @param stateMask The mask of states to filter bundles
+   * 
+   * @return The list of initial <code>Bundle</code>s.
+   */
+  std::vector<Bundle> GetInitialBundles(StateType stateMask);
+
+  void GetBundles_unlocked(std::vector<Bundle>& refs,
+                           TrackedBundle<TTT>* t) const;
+
+  /**
+   * The Bundle Context used by this <code>BundleTracker</code>.
+   */
+  BundleContext context;
+
+  /**
+   * The <code>BundleTrackerCustomizer</code> for this tracker.
+   */
+  BundleTrackerCustomizer<T>* customizer;
+
+  /**
+   * This token corresponds to the BundleListener, whenever it is added.
+   * Otherwise, it represents an invalid token.
+   */
+  ListenerToken listenerToken;
+
+  /**
+   * State mask for tracked bundles.
+   */
+  StateType stateMask;
+
+  /**
+   * Tracked bundles: <code>Bundle</code> -> custom Object
+   */
+  Atomic<std::shared_ptr<TrackedBundle<TTT>>> trackedBundle;
+
+  /**
+   * Accessor method for the current TrackedBundle object. This method is only
+   * intended to be used by the unsynchronized methods which do not modify the
+   * trackedBundle field.
+   *
+   * @return The current Tracked object.
+   */
+  std::shared_ptr<TrackedBundle<TTT>> Tracked() const;
+
+  /**
+   * Called by the TrackedBundle object whenever the set of tracked bundles is
+   * modified.
+   */
+  /*
+   * This method must not be synchronized since it is called by TrackedBundle while
+   * TrackedBundle is synchronized. We don't want synchronization interactions
+   * between the listener thread and the user thread.
+   */
+  void Modified();
+
+private:
+  inline BundleTracker<T>* q_func()
+  {
+    return static_cast<BundleTracker<T>*>(q_ptr);
+  }
+
+  inline const BundleTracker<T>* q_func() const
+  {
+    return static_cast<BundleTracker<T>*>(q_ptr);
+  }
+
+  friend class BundleTracker<T>;
+
+  BundleTracker<T>* const q_ptr;
 };
 
-}
-}
+} // namespace detail
+
+} // namespace cppmicroservices
+
+#include "cppmicroservices/detail/BundleTrackerPrivate.tpp"
 
 #endif // CPPMICROSERVICES_BUNDLETRACKERPRIVATE_H

@@ -224,9 +224,8 @@ BundleAbstractTracked<S, TTT, R>::GetCustomizedObject_unlocked(S item) const
   typename TrackingMap::const_iterator i = tracked.find(item);
   if (i != tracked.end())
     return i->second;
-  // TODO: Figure out what to do here
-  // return std::shared_ptr<TrackedParamType>();
-  return NULL;
+
+  return TrackedParamType();
 }
 
 template<class S, class TTT, class R>

@@ -54,8 +54,7 @@ struct BundleTrackerCustomizer
     using TrackedType = T;
     using TrackedParamType = T;
 
-    static std::shared_ptr<T> ConvertToTrackedType(
-      const std::shared_ptr<Bundle>&)
+    static T ConvertToTrackedType(const Bundle)
     {
       throw std::runtime_error("A custom BundleTrackerCustomizer instance is "
                                "required for custom tracked objects.");
@@ -83,9 +82,8 @@ struct BundleTrackerCustomizer
    *
    * @see BundleTrackerCustomizer:AddingBundle(Bundle, BundleEvent)
    */
-  virtual std::shared_ptr<TrackedParamType> AddingBundle(
-    const Bundle& bundle,
-    const BundleEvent& event) = 0;
+  virtual TrackedParamType AddingBundle(const Bundle& bundle,
+                                        const BundleEvent& event) = 0;
 
   /**
    * Called when a <code>Bundle</code> is modified that is being tracked by this <code>BundleTracker</code>.
@@ -98,10 +96,9 @@ struct BundleTrackerCustomizer
    *
    * @see BundleTrackerCustomizer:ModifiedBundle(Bundle, BundleEvent, std::shared_ptr<T>)
    */
-  virtual void ModifiedBundle(
-    const Bundle& bundle,
-    const BundleEvent& event,
-    std::shared_ptr<TrackedParamType> object) = 0;
+  virtual void ModifiedBundle(const Bundle& bundle,
+                              const BundleEvent& event,
+                              TrackedParamType object) = 0;
 
   /**
    * Called when a <code>Bundle</code> is removed that is being tracked by this <code>BundleTracker</code>.
@@ -112,10 +109,9 @@ struct BundleTrackerCustomizer
    *
    * @see BundleTrackerCustomizer:RemovedBundle(Bundle, BundleEvent, std::shared_ptr<T>)
    */
-  virtual void RemovedBundle(
-    const Bundle& bundle,
-    const BundleEvent& event,
-    std::shared_ptr<TrackedParamType> object) = 0;
+  virtual void RemovedBundle(const Bundle& bundle,
+                             const BundleEvent& event,
+                             TrackedParamType object) = 0;
 };
 }
 

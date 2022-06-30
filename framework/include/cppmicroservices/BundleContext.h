@@ -47,6 +47,10 @@ template<class S, class TTT>
 class ServiceTrackerPrivate;
 template<class S, class TTT>
 class TrackedService;
+template<class TTT>
+class BundleTrackerPrivate;
+template<class TTT>
+class TrackedBundle;
 }
 
 template<class S>
@@ -1139,6 +1143,12 @@ private:
   friend class detail::ServiceTrackerPrivate;
   template<class S, class TTT>
   friend class detail::TrackedService;
+  template<class T>
+  friend class BundleTracker;
+  template<class TTT>
+  friend class detail::BundleTrackerPrivate;
+  template<class TTT>
+  friend class detail::TrackedBundle;
   friend class BundleResource;
   friend class BundleResourceContainer;
 

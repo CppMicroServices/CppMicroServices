@@ -56,10 +56,10 @@ class BundleAbstractTracked
 {
 
 public:
-  using T = typename TTT::TrackedType;
+  // using T = typename TTT::TrackedType;
   using TrackedParamType = typename TTT::TrackedParamType;
 
-  using TrackingMap = std::unordered_map<S, std::shared_ptr<TrackedParamType>>;
+  using TrackingMap = std::unordered_map<S, TrackedParamType>;
 
   /**
    * BundleAbstractTracked constructor.
@@ -138,7 +138,7 @@ public:
    *
    * @GuardedBy this
    */
-  std::shared_ptr<TrackedParamType> GetCustomizedObject_unlocked(S item) const;
+  TrackedParamType GetCustomizedObject_unlocked(S item) const;
 
   /**
    * Return the list of tracked items.
@@ -188,9 +188,7 @@ public:
    * @return Customized object for the tracked item or <code>null</code> if
    *         the item is not to be tracked.
    */
-  virtual std::shared_ptr<TrackedParamType> CustomizerAdding(
-    S item,
-    const R& related) = 0;
+  virtual TrackedParamType CustomizerAdding(S item, const R& related) = 0;
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -200,10 +198,9 @@ public:
    * @param related Action related object.
    * @param object Customized object for the tracked item.
    */
-  virtual void CustomizerModified(
-    S item,
-    const R& related,
-    const std::shared_ptr<TrackedParamType>& object) = 0;
+  virtual void CustomizerModified(S item,
+                                  const R& related,
+                                  const TrackedParamType& object) = 0;
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -213,10 +210,9 @@ public:
    * @param related Action related object.
    * @param object Customized object for the tracked item.
    */
-  virtual void CustomizerRemoved(
-    S item,
-    const R& related,
-    const std::shared_ptr<TrackedParamType>& object) = 0;
+  virtual void CustomizerRemoved(S item,
+                                 const R& related,
+                                 const TrackedParamType& object) = 0;
 
   /**
    * List of items in the process of being added. This is used to deal with
@@ -286,8 +282,7 @@ private:
 
   BundleContext bc;
 
-  bool CustomizerAddingFinal(S item,
-                             const std::shared_ptr<TrackedParamType>& custom);
+  bool CustomizerAddingFinal(S item, const TrackedParamType& custom);
 };
 
 } // namespace detail

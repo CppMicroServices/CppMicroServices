@@ -24,131 +24,107 @@ namespace cppmicroservices {
 
 namespace detail {
 
-template<class S, class TTT>
-TrackedService<S,TTT>::TrackedService(ServiceTracker<S,T>* serviceTracker,
-                  ServiceTrackerCustomizer<S,T>* customizer)
-  : Superclass(serviceTracker->d->context)
-  , serviceTracker(serviceTracker)
+template<class TTT>
+TrackedBundle<TTT>::TrackedBundle(BundleTracker<T>* bundleTracker,
+                                  BundleTrackerCustomizer<T>* customizer)
+  : Superclass(bundleTracker->d->context)
+  , bundleTracker(bundleTracker)
   , customizer(customizer)
   , latch{}
 {
-
 }
 
-template<class S, class TTT>
-void TrackedService<S,TTT>::WaitOnCustomizersToFinish() {
+template<class TTT>
+void TrackedBundle<TTT>::WaitOnCustomizersToFinish()
+{
+  // TODO: Checkimp
   latch.Wait();
 }
 
-template<class S, class TTT>
-void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent& event)
+template<class TTT>
+void TrackedBundle<TTT>::BundleChanged(const BundleEvent& event)
 {
+  // Perform the business logic
+  // Call track or untrack based on appropriate behavior
+
   (void)latch.CountUp();
   ScopeGuard sg([this]() {
     // By using try/catch here, we ensure that this lambda function doesn't
-    // throw inside ScopeGuard's dtor.
+    // throw inside ScopeGuard
     try {
       latch.CountDown();
     } catch (...) {
     }
   });
 
-  ServiceReference<S> reference;
+  Bundle bundle;
+  Bundle::State state;
   {
     auto l = this->Lock();
     US_UNUSED(l);
-    /*
-   * Check if we had a delayed call (which could happen when we
-   * close).
-   */
+
+    // Check for delayed call
     if (this->closed) {
       return;
     }
 
-    reference = event.GetServiceReference<S>();
-
-    DIAG_LOG(*serviceTracker->d->context.GetLogSink())
-      << "TrackedService::ServiceChanged[" << event.GetType()
-      << "]: " << reference;
-    if (!reference) {
+    bundle = event.GetBundle();
+    if (!bundle) {
       return;
     }
+    state = bundle.GetState();
+    if (!state) {
+      return;
+    }
+
+    DIAG_LOG(*bundleTracker->d->context.GetLogSink())
+      << "TrackedService::BundleChanged[" << state << "]: " << bundle;
   }
 
-  switch (event.GetType())
-  {
-  case ServiceEvent::SERVICE_REGISTERED :
-  case ServiceEvent::SERVICE_MODIFIED :
-    {
-      if (!serviceTracker->d->listenerFilter.empty())
-      { // service listener added with filter
-        this->Track(reference, event);
-        /*
-       * If the customizer throws an unchecked exception, it
-       * is safe to let it propagate
-       */
-      }
-      else
-      { // service listener added without filter
-        if (serviceTracker->d->filter.Match(reference))
-        {
-          this->Track(reference, event);
-          /*
-         * If the customizer throws an unchecked exception,
-         * it is safe to let it propagate
-         */
-        }
-        else
-        {
-          this->Untrack(reference, event);
-          /*
-         * If the customizer throws an unchecked exception,
-         * it is safe to let it propagate
-         */
-        }
-      }
-      break;
-    }
-  case ServiceEvent::SERVICE_MODIFIED_ENDMATCH :
-  case ServiceEvent::SERVICE_UNREGISTERING :
-    this->Untrack(reference, event);
+  // Track iff state in mask
+  if (state & bundleTracker->d->stateMask != 0) {
+    this->Track(bundle, event);
     /*
      * If the customizer throws an unchecked exception, it is
      * safe to let it propagate
      */
-    break;
+  } else {
+    this->Untrack(bundle, event);
+    /*
+     * If the customizer throws an unchecked exception, it is
+     * safe to let it propagate
+     */
   }
 }
 
-template<class S, class TTT>
-void TrackedService<S,TTT>::Modified()
+template<class TTT>
+void TrackedBundle<TTT>::Modified()
 {
   Superclass::Modified(); /* increment the modification count */
-  serviceTracker->d->Modified();
+  bundleTracker->d->Modified();
 }
 
-template<class S, class TTT>
-std::shared_ptr<typename TrackedService<S,TTT>::TrackedParamType>
-TrackedService<S,TTT>::CustomizerAdding(ServiceReference<S> item,
-                                        const ServiceEvent& /*related*/)
+template<class TTT>
+typename TrackedBundle<TTT>::TrackedParamType
+TrackedBundle<TTT>::CustomizerAdding(Bundle bundle, const BundleEvent& event)
 {
-  return customizer->AddingService(item);
+  return customizer->AddingBundle(bundle, event);
 }
 
-template<class S, class TTT>
-void TrackedService<S,TTT>::CustomizerModified(ServiceReference<S> item,
-                                               const ServiceEvent& /*related*/,
-                                               const std::shared_ptr<TrackedParamType>& object)
+template<class TTT>
+void TrackedBundle<TTT>::CustomizerModified(Bundle bundle,
+                                            const BundleEvent& event,
+                                            const TrackedParamType& object)
 {
-  customizer->ModifiedService(item, object);
+  customizer->ModifiedBundle(bundle, event, object);
 }
 
-template<class S, class TTT>
-void TrackedService<S,TTT>::CustomizerRemoved(ServiceReference<S> item,
-                                              const ServiceEvent& /*related*/,
-                                              const std::shared_ptr<TrackedParamType>& object)
+template<class TTT>
+void TrackedBundle<TTT>::CustomizerRemoved(Bundle bundle,
+                                           const BundleEvent& event,
+                                           const TrackedParamType& object)
 {
-  customizer->RemovedService(item, object);
+  customizer->RemovedBundle(bundle, event, object);
 }
 
 } // namespace detail

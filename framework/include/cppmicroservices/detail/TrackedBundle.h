@@ -63,8 +63,7 @@ public:
   void WaitOnCustomizersToFinish();
 
 private:
-  using Superclass =
-    BundleAbstractTracked<Bundle, TTT, BundleEvent>;
+  using Superclass = BundleAbstractTracked<Bundle, TTT, BundleEvent>;
 
   BundleTracker<T>* bundleTracker;
   BundleTrackerCustomizer<T>* customizer;
@@ -88,9 +87,8 @@ private:
    * @return Customized object for the tracked bundle or <code>null</code>
    *         if the bundle is not to be tracked.
    */
-  std::shared_ptr<TrackedParamType> CustomizerAdding(
-    Bundle bundle,
-    const BundleEvent& related) override;
+  TrackedParamType CustomizerAdding(Bundle bundle,
+                                    const BundleEvent& related) override;
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -100,10 +98,9 @@ private:
    * @param related Action related object.
    * @param object Customized object for the tracked bundle.
    */
-  void CustomizerModified(
-    Bundle bundle,
-    const BundleEvent& related,
-    const std::shared_ptr<TrackedParamType>& object) override;
+  void CustomizerModified(Bundle bundle,
+                          const BundleEvent& related,
+                          const TrackedParamType& object) override;
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -113,10 +110,9 @@ private:
    * @param related Action related object.
    * @param object Customized object for the tracked bundle.
    */
-  void CustomizerRemoved(
-    Bundle bundle,
-    const BundleEvent& related,
-    const std::shared_ptr<TrackedParamType>& object) override;
+  void CustomizerRemoved(Bundle bundle,
+                         const BundleEvent& related,
+                         const TrackedParamType& object) override;
 };
 
 } // namespace detail

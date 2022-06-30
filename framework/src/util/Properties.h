@@ -39,6 +39,7 @@ class Properties : public detail::MultiThreaded<>
 public:
   explicit Properties(AnyMap& props);
   explicit Properties(const AnyMap& props);
+  explicit Properties(AnyMap&& props);
 
   Properties(Properties&& o);
   Properties& operator=(Properties&& o);

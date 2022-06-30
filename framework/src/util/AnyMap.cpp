@@ -309,6 +309,48 @@ any_map::const_iter::iterator any_map::const_iter::operator++(int)
   return tmp;
 }
 
+any_map::const_iter::iterator& any_map::const_iter::operator--()
+{
+  switch (type) {
+    case ORDERED:
+      --o_it();
+      break;
+    case UNORDERED:
+      --uo_it();
+      break;
+    case UNORDERED_CI:
+      --uoci_it();
+      break;
+    case NONE:
+      throw std::logic_error("cannot decrement an invalid iterator");
+    default:
+      throw std::logic_error("invalid iterator type");
+  }
+
+  return *this;
+}
+
+any_map::const_iter::iterator any_map::const_iter::operator--(int)
+{
+  iterator tmp = *this;
+  switch (type) {
+    case ORDERED:
+      o_it()--;
+      break;
+    case UNORDERED:
+      uo_it()--;
+      break;
+    case UNORDERED_CI:
+      uoci_it()--;
+      break;
+    case NONE:
+      throw std::logic_error("cannot increment an invalid iterator");
+    default:
+      throw std::logic_error("invalid iterator type");
+  }
+  return tmp;
+}
+
 bool any_map::const_iter::operator==(const iterator& x) const
 {
   switch (type) {

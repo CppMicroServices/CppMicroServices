@@ -151,6 +151,8 @@ public:
 
     iterator& operator++();
     iterator operator++(int);
+    iterator& operator--();
+    iterator operator--(int);
 
     bool operator==(const iterator& x) const;
     bool operator!=(const iterator& x) const;

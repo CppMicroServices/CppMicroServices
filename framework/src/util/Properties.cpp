@@ -102,6 +102,33 @@ Properties::Properties(const AnyMap& p)
   }
 }
 
+Properties::Properties(AnyMap&& p)
+  : props(std::move(p))
+{
+  if (props.size() >
+      static_cast<std::size_t>(std::numeric_limits<int>::max())) {
+    throw std::runtime_error("Properties contain too many keys");
+  }
+
+  if (props.size() > 1) {
+    std::vector<std::string> keys;
+    for (auto& [key, _] : props) {
+      keys.emplace_back(key);
+    }
+
+    for (uint32_t i = 0; i < keys.size() - 1; ++i) {
+      for (uint32_t j = i + 1; j < keys.size(); ++j) {
+        if (keys[i].size() == keys[j].size() &&
+            ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) == 0) {
+          std::string msg("Properties contain case variants of the key: ");
+          msg += keys[i];
+          throw std::runtime_error(msg.c_str());
+        }
+      }
+    }
+  }
+}
+
 Properties::Properties(Properties&& o)
   : props(std::move(o.props))
 {}

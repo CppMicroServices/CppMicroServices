@@ -86,27 +86,44 @@ bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
               : false);
 }
 
+namespace {
+struct InvalidEntry
+{
+  bool invalid;
+  std::string_view invalidKey;
+};
+
+inline InvalidEntry IsInvalid(const AnyMap& am)
+{
+  std::vector<std::string_view> keys(am.size());
+  uint32_t currIndex = 0;
+  for (auto& [key, _] : am) {
+    keys[currIndex++] = key;
+  }
+
+  if (am.size() > 1) {
+    for (uint32_t i = 0; i < keys.size() - 1; ++i) {
+      for (uint32_t j = i + 1; j < keys.size(); ++j) {
+        if (keys[i].size() == keys[j].size() &&
+            ci_compare(keys[i].data(), keys[j].data(), keys[i].size()) == 0) {
+          return { true, keys[i] };
+        }
+      }
+    }
+  }
+
+  return { false };
+}
+}
+
 bool LDAPFilter::Match(const Bundle& bundle) const
 {
   if (d) {
     auto& headers = bundle.GetHeaders();
-    std::vector<std::string_view> keys(headers.size());
-    uint32_t currIndex = 0;
-    for (auto& [key, _] : headers) {
-      keys[currIndex++] = key;
-    }
-
-    if (headers.size() > 1) {
-      for (uint32_t i = 0; i < keys.size() - 1; ++i) {
-        for (uint32_t j = i + 1; j < keys.size(); ++j) {
-          if (keys[i].size() == keys[j].size() &&
-              ci_compare(keys[i].data(), keys[j].data(), keys[i].size()) == 0) {
-            std::string msg("Properties contain case variants of the key: ");
-            msg += keys[i];
-            throw std::runtime_error(msg.c_str());
-          }
-        }
-      }
+    if (auto result = IsInvalid(headers); result.invalid) {
+      std::string msg("Properties contain case variants of the key: ");
+      msg += result.invalidKey;
+      throw std::runtime_error(msg.c_str());
     }
 
     return d->ldapExpr.Evaluate(headers, false);
@@ -118,23 +135,10 @@ bool LDAPFilter::Match(const Bundle& bundle) const
 bool LDAPFilter::Match(const AnyMap& dictionary) const
 {
   if (d) {
-    std::vector<std::string_view> keys(dictionary.size());
-    uint32_t currIndex = 0;
-    for (auto& [key, _] : dictionary) {
-      keys[currIndex++] = key;
-    }
-
-    if (dictionary.size() > 1) {
-      for (uint32_t i = 0; i < keys.size() - 1; ++i) {
-        for (uint32_t j = i + 1; j < keys.size(); ++j) {
-          if (keys[i].size() == keys[j].size() &&
-              ci_compare(keys[i].data(), keys[j].data(), keys[i].size()) == 0) {
-            std::string msg("Properties contain case variants of the key: ");
-            msg += keys[i];
-            throw std::runtime_error(msg.c_str());
-          }
-        }
-      }
+    if (auto result = IsInvalid(dictionary); result.invalid) {
+      std::string msg("Properties contain case variants of the key: ");
+      msg += result.invalidKey;
+      throw std::runtime_error(msg.c_str());
     }
 
     return d->ldapExpr.Evaluate(dictionary, false);
@@ -146,23 +150,10 @@ bool LDAPFilter::Match(const AnyMap& dictionary) const
 bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
 {
   if (d) {
-    std::vector<std::string_view> keys(dictionary.size());
-    uint32_t currIndex = 0;
-    for (auto& [key, _] : dictionary) {
-      keys[currIndex++] = key;
-    }
-
-    if (dictionary.size() > 1) {
-      for (uint32_t i = 0; i < keys.size() - 1; ++i) {
-        for (uint32_t j = i + 1; j < keys.size(); ++j) {
-          if (keys[i].size() == keys[j].size() &&
-              ci_compare(keys[i].data(), keys[j].data(), keys[i].size()) == 0) {
-            std::string msg("Properties contain case variants of the key: ");
-            msg += keys[i];
-            throw std::runtime_error(msg.c_str());
-          }
-        }
-      }
+    if (auto result = IsInvalid(dictionary); result.invalid) {
+      std::string msg("Properties contain case variants of the key: ");
+      msg += result.invalidKey;
+      throw std::runtime_error(msg.c_str());
     }
 
     return d->ldapExpr.Evaluate(dictionary, true);

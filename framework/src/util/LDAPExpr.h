@@ -147,13 +147,13 @@ private:
   static std::string ToLower(const std::string& str);
 
   //!
-  bool Compare(const Any& obj, int op, const std::string& s) const;
+  bool Compare(const Any& obj, int op, const std::string_view s) const;
 
   //!
   template<typename T>
   bool CompareIntegralType(const Any& obj,
                            const int op,
-                           const std::string& s) const;
+                           const std::string_view s) const;
 
   //!
   static bool CompareString(const std::string_view s1,

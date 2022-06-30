@@ -395,7 +395,7 @@ bool LDAPExpr::Evaluate(const AnyMap& p, bool matchCase) const
   }
 }
 
-bool LDAPExpr::Compare(const Any& obj, int op, const std::string& s) const
+bool LDAPExpr::Compare(const Any& obj, int op, const std::string_view s) const
 {
   if (obj.Empty())
     return false;
@@ -447,10 +447,10 @@ bool LDAPExpr::Compare(const Any& obj, int op, const std::string& s) const
     } else if (objType == typeid(float)) {
       errno = 0;
       char* endptr = nullptr;
-      double sFloat = strtod(s.c_str(), &endptr);
+      double sFloat = strtod(s.data(), &endptr);
       if ((errno == ERANGE &&
            (sFloat == 0 || sFloat == HUGE_VAL || sFloat == -HUGE_VAL)) ||
-          (errno != 0 && sFloat == 0) || endptr == s.c_str()) {
+          (errno != 0 && sFloat == 0) || endptr == s.data()) {
         return false;
       }
 
@@ -469,10 +469,10 @@ bool LDAPExpr::Compare(const Any& obj, int op, const std::string& s) const
     } else if (objType == typeid(double)) {
       errno = 0;
       char* endptr = nullptr;
-      double sDouble = strtod(s.c_str(), &endptr);
+      double sDouble = strtod(s.data(), &endptr);
       if ((errno == ERANGE &&
            (sDouble == 0 || sDouble == HUGE_VAL || sDouble == -HUGE_VAL)) ||
-          (errno != 0 && sDouble == 0) || endptr == s.c_str()) {
+          (errno != 0 && sDouble == 0) || endptr == s.data()) {
         return false;
       }
 
@@ -505,14 +505,14 @@ bool LDAPExpr::Compare(const Any& obj, int op, const std::string& s) const
 template<typename T>
 bool LDAPExpr::CompareIntegralType(const Any& obj,
                                    const int op,
-                                   const std::string& s) const
+                                   const std::string_view s) const
 {
   errno = 0;
   char* endptr = nullptr;
-  long longInt = strtol(s.c_str(), &endptr, 10);
+  long longInt = strtol(s.data(), &endptr, 10);
   if ((errno == ERANGE && (longInt == std::numeric_limits<long>::max() ||
                            longInt == std::numeric_limits<long>::min())) ||
-      (errno != 0 && longInt == 0) || endptr == s.c_str()) {
+      (errno != 0 && longInt == 0) || endptr == s.data()) {
     return false;
   }
 

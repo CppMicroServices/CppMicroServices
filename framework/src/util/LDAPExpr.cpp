@@ -344,8 +344,9 @@ bool LDAPExpr::Evaluate(const AnyMap& p, bool matchCase) const
 {
   if ((d->m_operator & SIMPLE) != 0) {
     if (!matchCase) {
-      auto v = p.uoci_m().find(d->m_attrName);
-      if (v == p.uoci_m().end() || v->second.Empty()) {
+      auto& m = p.uoci_m();
+      auto v = m.find(d->m_attrName);
+      if (v == m.end() || v->second.Empty()) {
         return false;
       } else {
         return Compare(v->second, d->m_operator, d->m_attrValue);

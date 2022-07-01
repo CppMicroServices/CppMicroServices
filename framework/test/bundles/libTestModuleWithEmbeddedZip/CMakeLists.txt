@@ -12,6 +12,11 @@ set(_srcs foo.cpp)
 
 add_library(${PROJECT_NAME} ${_srcs})
 
+set_target_properties(${PROJECT_NAME}
+  PROPERTIES
+  XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
+)
+
 if(CMAKE_CROSSCOMPILING)
     # Cross-compiled builds need to use the imported host version of usResourceCompiler
     include(${IMPORT_EXECUTABLES})

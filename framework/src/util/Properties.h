@@ -44,17 +44,12 @@ public:
   Properties(Properties&& o);
   Properties& operator=(Properties&& o);
 
-  Any Value_unlocked(const std::string& key, bool* found = nullptr) const;
-  //Any Value_unlocked(int index) const;
-
-  //int Find_unlocked(const std::string& key) const;
-  //int FindCaseSensitive_unlocked(const std::string& key) const;
+  std::pair<Any, bool> Value_unlocked(const std::string& key,
+                                      bool matchCase = false) const;
 
   std::vector<std::string> Keys_unlocked() const;
 
   void Clear_unlocked();
-
-  const AnyMap& GetProps() const { return props; };
 
 private:
   AnyMap props;

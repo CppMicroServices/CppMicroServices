@@ -24,13 +24,8 @@
 
 #include <limits>
 #include <stdexcept>
-#ifdef US_PLATFORM_WINDOWS
-#  include <string.h>
-#  define ci_compare strnicmp
-#else
-#  include <strings.h>
-#  define ci_compare strncasecmp
-#endif
+
+#include "PropsCheck.h"
 
 US_MSVC_PUSH_DISABLE_WARNING(4996)
 
@@ -45,60 +40,24 @@ Properties::Properties(AnyMap& p)
     throw std::runtime_error("Properties contain too many keys");
   }
 
-  if (p.size() > 1) {
-    std::vector<std::string> keys;
-    for (auto& [key, _] : p) {
-      keys.emplace_back(key);
-    }
-
-    for (uint32_t i = 0; i < keys.size() - 1; ++i) {
-      for (uint32_t j = i + 1; j < keys.size(); ++j) {
-        if (keys[i].size() == keys[j].size() &&
-            ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) == 0) {
-          std::string msg("Properties contain case variants of the key: ");
-          msg += keys[i];
-          throw std::runtime_error(msg.c_str());
-        }
-      }
-    }
+  if (auto result = props_check::IsInvalid(props); result.first) {
+    std::string msg("Properties contain case variants of the key: ");
+    msg += result.second;
+    throw std::runtime_error(msg.c_str());
   }
-
-  /*
-  for (auto& iter : p) {
-    if (Find_unlocked(iter.first) > -1) {
-      std::string msg("Properties contain case variants of the key: ");
-      msg += iter.first;
-      throw std::runtime_error(msg.c_str());
-    }
-    keys.push_back(iter.first);
-    values.push_back(iter.second);
-  }
-  */
 }
 
 Properties::Properties(const AnyMap& p)
-  : props(const_cast<AnyMap&>(p))
+  : props(p)
 {
   if (p.size() > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
     throw std::runtime_error("Properties contain too many keys");
   }
 
-  if (p.size() > 1) {
-    std::vector<std::string> keys;
-    for (auto& [key, _] : p) {
-      keys.emplace_back(key);
-    }
-
-    for (uint32_t i = 0; i < keys.size() - 1; ++i) {
-      for (uint32_t j = i + 1; j < keys.size(); ++j) {
-        if (keys[i].size() == keys[j].size() &&
-            ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) == 0) {
-          std::string msg("Properties contain case variants of the key: ");
-          msg += keys[i];
-          throw std::runtime_error(msg.c_str());
-        }
-      }
-    }
+  if (auto result = props_check::IsInvalid(props); result.first) {
+    std::string msg("Properties contain case variants of the key: ");
+    msg += result.second;
+    throw std::runtime_error(msg.c_str());
   }
 }
 
@@ -110,22 +69,10 @@ Properties::Properties(AnyMap&& p)
     throw std::runtime_error("Properties contain too many keys");
   }
 
-  if (props.size() > 1) {
-    std::vector<std::string> keys;
-    for (auto& [key, _] : props) {
-      keys.emplace_back(key);
-    }
-
-    for (uint32_t i = 0; i < keys.size() - 1; ++i) {
-      for (uint32_t j = i + 1; j < keys.size(); ++j) {
-        if (keys[i].size() == keys[j].size() &&
-            ci_compare(keys[i].c_str(), keys[j].c_str(), keys[i].size()) == 0) {
-          std::string msg("Properties contain case variants of the key: ");
-          msg += keys[i];
-          throw std::runtime_error(msg.c_str());
-        }
-      }
-    }
+  if (auto result = props_check::IsInvalid(props); result.first) {
+    std::string msg("Properties contain case variants of the key: ");
+    msg += result.second;
+    throw std::runtime_error(msg.c_str());
   }
 }
 
@@ -139,63 +86,27 @@ Properties& Properties::operator=(Properties&& o)
   return *this;
 }
 
-Any Properties::Value_unlocked(const std::string& key, bool* found) const
+std::pair<Any, bool> Properties::Value_unlocked(const std::string& key,
+                                                bool matchCase) const
 {
-  auto itr = props.uoci_m().find(key);
-  if (itr == props.uoci_m().end()) {
-    if (found) {
-      *found = false;
-    }
-    return emptyAny;
+  // Case-sensitive search first
+  auto& uo = props.uo_m();
+  auto csItr = uo.find(key);
+  if (csItr != uo.end()) {
+    return std::make_pair(csItr->second, true);
   }
 
-  if (found) {
-    *found = true;
-  }
-  return itr->second;
-  /*
-  int i = Find_unlocked(key);
-  if (i < 0) {
-    return emptyAny;
-  }
-  return values[i];
-  */
-}
-
-/*
-Any Properties::Value_unlocked(int index) const
-{
-  if (index < 0 || static_cast<std::size_t>(index) >= values.size()) {
-    return emptyAny;
-  }
-  return values[static_cast<std::size_t>(index)];
-}
-*/
-
-/*
-int Properties::Find_unlocked(const std::string& key) const
-{
-  for (std::size_t i = 0; i < keys.size(); ++i) {
-    if (key.size() == keys[i].size() &&
-        ci_compare(key.c_str(), keys[i].c_str(), key.size()) == 0) {
-      return static_cast<int>(i);
+  if (!matchCase) {
+    // Case-insensitive search after
+    auto& uoci = props.uoci_m();
+    auto ciItr = uoci.find(key);
+    if (ciItr != uoci.end()) {
+      return std::make_pair(ciItr->second, true);
     }
   }
-  return -1;
-}
-*/
 
-/*
-int Properties::FindCaseSensitive_unlocked(const std::string& key) const
-{
-  for (std::size_t i = 0; i < keys.size(); ++i) {
-    if (key == keys[i]) {
-      return static_cast<int>(i);
-    }
-  }
-  return -1;
+  return std::make_pair(emptyAny, false);
 }
-*/
 
 std::vector<std::string> Properties::Keys_unlocked() const
 {
@@ -204,19 +115,13 @@ std::vector<std::string> Properties::Keys_unlocked() const
     result.push_back(key);
   }
   return result;
-  /*
-  return keys;
-  */
 }
 
 void Properties::Clear_unlocked()
 {
   props.clear();
-  /*
-  keys.clear();
-  values.clear();
-  */
 }
+
 }
 
 US_MSVC_POP_WARNING

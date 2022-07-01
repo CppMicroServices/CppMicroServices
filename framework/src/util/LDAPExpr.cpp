@@ -306,18 +306,9 @@ bool LDAPExpr::IsNull() const
 bool LDAPExpr::Evaluate(const PropertiesHandle& p, bool matchCase) const
 {
   if ((d->m_operator & SIMPLE) != 0) {
-    bool found = false;
-    auto v = p->Value_unlocked(d->m_attrName, &found);
-    return (!found) ? false : Compare(v, d->m_operator, d->m_attrValue);
-    /*
-    // try case sensitive match first
-    int index = p->FindCaseSensitive_unlocked(d->m_attrName);
-    if (index < 0 && !matchCase)
-      index = p->Find_unlocked(d->m_attrName);
-    return index < 0
-             ? false
-             : Compare(p->Value_unlocked(index), d->m_operator, d->m_attrValue);
-    */
+    auto v = p->Value_unlocked(d->m_attrName, matchCase);
+    return (!v.second) ? false
+                       : Compare(v.first, d->m_operator, d->m_attrValue);
   } else { // (d->m_operator & COMPLEX) != 0
     switch (d->m_operator) {
       case AND:
@@ -352,28 +343,13 @@ bool LDAPExpr::Evaluate(const AnyMap& p, bool matchCase) const
         return Compare(v->second, d->m_operator, d->m_attrValue);
       }
     } else {
-      auto v = p.find(d->m_attrName); //->Value_unlocked(d->m_attrName);
+      auto v = p.find(d->m_attrName);
       if (v == p.end() || v->second.Empty()) {
         return false;
       } else {
         return Compare(v->second, d->m_operator, d->m_attrValue);
       }
     }
-
-    /*
-    return (v != p.end() && v->second.Empty())
-             ? false
-             : Compare(v->second, d->m_operator, d->m_attrValue);
-             */
-    /*
-    // try case sensitive match first
-    int index = p->FindCaseSensitive_unlocked(d->m_attrName);
-    if (index < 0 && !matchCase)
-      index = p->Find_unlocked(d->m_attrName);
-    return index < 0
-             ? false
-             : Compare(p->Value_unlocked(index), d->m_operator, d->m_attrValue);
-    */
   } else { // (d->m_operator & COMPLEX) != 0
     switch (d->m_operator) {
       case AND:

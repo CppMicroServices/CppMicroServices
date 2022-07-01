@@ -65,6 +65,7 @@ set(_private_headers
   util/CFRLogger.h
   util/LDAPExpr.h
   util/Properties.h
+  util/PropsCheck.h
   util/Utils.h
 
   service/ServiceHooks.h
@@ -90,4 +91,3 @@ set(_private_headers
   bundle/CoreBundleContext.h
   bundle/Resolver.h
 )
-

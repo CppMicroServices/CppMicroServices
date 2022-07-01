@@ -27,17 +27,10 @@
 
 #include "LDAPExpr.h"
 #include "Properties.h"
+#include "PropsCheck.h"
 #include "ServiceReferenceBasePrivate.h"
 
 #include <stdexcept>
-
-#ifdef US_PLATFORM_WINDOWS
-#  include <string.h>
-#  define ci_compare strnicmp
-#else
-#  include <strings.h>
-#  define ci_compare strncasecmp
-#endif
 
 namespace cppmicroservices {
 
@@ -86,43 +79,13 @@ bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
               : false);
 }
 
-namespace {
-struct InvalidEntry
-{
-  bool invalid;
-  std::string_view invalidKey;
-};
-
-inline InvalidEntry IsInvalid(const AnyMap& am)
-{
-  std::vector<std::string_view> keys(am.size());
-  uint32_t currIndex = 0;
-  for (auto& [key, _] : am) {
-    keys[currIndex++] = key;
-  }
-
-  if (am.size() > 1) {
-    for (uint32_t i = 0; i < keys.size() - 1; ++i) {
-      for (uint32_t j = i + 1; j < keys.size(); ++j) {
-        if (keys[i].size() == keys[j].size() &&
-            ci_compare(keys[i].data(), keys[j].data(), keys[i].size()) == 0) {
-          return { true, keys[i] };
-        }
-      }
-    }
-  }
-
-  return { false };
-}
-}
-
 bool LDAPFilter::Match(const Bundle& bundle) const
 {
   if (d) {
     auto& headers = bundle.GetHeaders();
-    if (auto result = IsInvalid(headers); result.invalid) {
+    if (auto result = props_check::IsInvalid(headers); result.first) {
       std::string msg("Properties contain case variants of the key: ");
-      msg += result.invalidKey;
+      msg += result.second;
       throw std::runtime_error(msg.c_str());
     }
 
@@ -135,9 +98,9 @@ bool LDAPFilter::Match(const Bundle& bundle) const
 bool LDAPFilter::Match(const AnyMap& dictionary) const
 {
   if (d) {
-    if (auto result = IsInvalid(dictionary); result.invalid) {
+    if (auto result = props_check::IsInvalid(dictionary); result.first) {
       std::string msg("Properties contain case variants of the key: ");
-      msg += result.invalidKey;
+      msg += result.second;
       throw std::runtime_error(msg.c_str());
     }
 
@@ -150,9 +113,9 @@ bool LDAPFilter::Match(const AnyMap& dictionary) const
 bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
 {
   if (d) {
-    if (auto result = IsInvalid(dictionary); result.invalid) {
+    if (auto result = props_check::IsInvalid(dictionary); result.first) {
       std::string msg("Properties contain case variants of the key: ");
-      msg += result.invalidKey;
+      msg += result.second;
       throw std::runtime_error(msg.c_str());
     }
 

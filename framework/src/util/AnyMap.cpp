@@ -309,48 +309,6 @@ any_map::const_iter::iterator any_map::const_iter::operator++(int)
   return tmp;
 }
 
-any_map::const_iter::iterator& any_map::const_iter::operator--()
-{
-  switch (type) {
-    case ORDERED:
-      --o_it();
-      break;
-    case UNORDERED:
-      --uo_it();
-      break;
-    case UNORDERED_CI:
-      --uoci_it();
-      break;
-    case NONE:
-      throw std::logic_error("cannot decrement an invalid iterator");
-    default:
-      throw std::logic_error("invalid iterator type");
-  }
-
-  return *this;
-}
-
-any_map::const_iter::iterator any_map::const_iter::operator--(int)
-{
-  iterator tmp = *this;
-  switch (type) {
-    case ORDERED:
-      o_it()--;
-      break;
-    case UNORDERED:
-      uo_it()--;
-      break;
-    case UNORDERED_CI:
-      uoci_it()--;
-      break;
-    case NONE:
-      throw std::logic_error("cannot increment an invalid iterator");
-    default:
-      throw std::logic_error("invalid iterator type");
-  }
-  return tmp;
-}
-
 bool any_map::const_iter::operator==(const iterator& x) const
 {
   switch (type) {
@@ -617,16 +575,34 @@ any_map::any_map(const ordered_any_map& m)
   map.o = new ordered_any_map(m);
 }
 
+any_map::any_map(ordered_any_map&& m)
+  : type(map_type::ORDERED_MAP)
+{
+  map.o = new ordered_any_map(std::move(m));
+}
+
 any_map::any_map(const unordered_any_map& m)
   : type(map_type::UNORDERED_MAP)
 {
   map.uo = new unordered_any_map(m);
 }
 
+any_map::any_map(unordered_any_map&& m)
+  : type(map_type::UNORDERED_MAP)
+{
+  map.uo = new unordered_any_map(std::move(m));
+}
+
 any_map::any_map(const unordered_any_cimap& m)
   : type(map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {
   map.uoci = new unordered_any_cimap(m);
+}
+
+any_map::any_map(unordered_any_cimap&& m)
+  : type(map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+{
+  map.uoci = new unordered_any_cimap(std::move(m));
 }
 
 any_map::any_map(const any_map& m)

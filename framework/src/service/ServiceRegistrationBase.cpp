@@ -151,11 +151,11 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 
     auto propsCopy(props);
     propsCopy[Constants::SERVICE_ID] =
-      d->properties.Value_unlocked(Constants::SERVICE_ID);
-    objectClasses = d->properties.Value_unlocked(Constants::OBJECTCLASS);
+      d->properties.Value_unlocked(Constants::SERVICE_ID).first;
+    objectClasses = d->properties.Value_unlocked(Constants::OBJECTCLASS).first;
     propsCopy[Constants::OBJECTCLASS] = objectClasses;
     propsCopy[Constants::SERVICE_SCOPE] =
-      d->properties.Value_unlocked(Constants::SERVICE_SCOPE);
+      d->properties.Value_unlocked(Constants::SERVICE_SCOPE).first;
 
     auto itr = propsCopy.find(Constants::SERVICE_RANKING);
     if (itr != propsCopy.end()) {
@@ -169,13 +169,14 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
       }
     }
 
-    auto oldRankAny = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
+    auto oldRankAny =
+      d->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
     if (!oldRankAny.Empty()) {
       // since the old ranking is extracted from existing service properties
       // stored in the service registry, no need to type check before casting
       old_rank = any_cast<int>(oldRankAny);
     }
-    d->properties = Properties(std::move(AnyMap(std::move(propsCopy))));
+    d->properties = Properties(AnyMap(std::move(propsCopy)));
   }
   if (old_rank != new_rank) {
     auto classes = any_cast<std::vector<std::string>>(objectClasses);

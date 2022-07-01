@@ -12,10 +12,13 @@ set(_srcs foo.cpp)
 
 add_library(${PROJECT_NAME} ${_srcs})
 
-set_target_properties(${PROJECT_NAME}
-  PROPERTIES
-  XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
-)
+# Disable code-signing on macOS if appending resources.
+if (APPLE)
+  set_target_properties(${PROJECT_NAME}
+    PROPERTIES
+    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
+  )
+endif()
 
 if(CMAKE_CROSSCOMPILING)
     # Cross-compiled builds need to use the imported host version of usResourceCompiler

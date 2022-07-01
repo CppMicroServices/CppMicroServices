@@ -599,28 +599,33 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
     }
 
     const auto managedServiceWrappers = managedServiceTracker.GetServices();
-    const auto it = std::find_if(
-      std::begin(managedServiceWrappers),
-      std::end(managedServiceWrappers),
-      [&pid](const auto& managedServiceWrapper) {
-        // The ServiceTracker will return a default constructed shared_ptr for each ManagedService
-        // that we aren't tracking. We must be careful not to dereference these!
-        return (managedServiceWrapper ? (pid == managedServiceWrapper->pid)
-                                      : false);
-      });
-    if (it != std::end(managedServiceWrappers)) {
+    auto it = managedServiceWrappers.begin();
+    while (
+      (it = std::find_if(
+         it,
+         std::end(managedServiceWrappers),
+         [&pid](const auto& managedServiceWrapper) {
+           // The ServiceTracker will return a default constructed shared_ptr for each ManagedService
+           // that we aren't tracking. We must be careful not to dereference these!
+           return (managedServiceWrapper ? (pid == managedServiceWrapper->pid)
+                                         : false);
+         })) != managedServiceWrappers.end()) {
       const auto& managedServiceWrapper = *it;
       notifyServiceUpdated(
-        pid, *(managedServiceWrapper->trackedService), properties, *logger);
+          pid, *(managedServiceWrapper->trackedService), properties, *logger);
+       it++;
     }
+
     const auto factoryPid = getFactoryPid(pid);
     if (factoryPid.empty()) {
       return;
     }
+    
     const auto managedServiceFactoryWrappers =
       managedServiceFactoryTracker.GetServices();
-    const auto factoryIt = std::find_if(
-      std::begin(managedServiceFactoryWrappers),
+    auto factoryIt = managedServiceFactoryWrappers.begin();
+    while ((factoryIt = std::find_if(
+      factoryIt,
       std::end(managedServiceFactoryWrappers),
       [&factoryPid](const auto& managedServiceFactoryWrapper) {
         // The ServiceTracker will return a default constructed shared_ptr for each ManagedServiceFactory
@@ -628,8 +633,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
         return (managedServiceFactoryWrapper
                   ? (factoryPid == managedServiceFactoryWrapper->pid)
                   : false);
-      });
-    if (factoryIt != std::end(managedServiceFactoryWrappers)) {
+      })) != managedServiceFactoryWrappers.end()) {
       const auto& managedServiceFactoryWrapper = *factoryIt;
       if (removed) {
         notifyServiceRemoved(
@@ -640,6 +644,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
                              properties,
                              *logger);
       }
+      factoryIt++;
     }
   });
 }

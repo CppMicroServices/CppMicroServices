@@ -94,6 +94,19 @@ std::shared_ptr<::test::TestManagedServiceInterface> getManagedService(
   return ctx.GetService<::test::TestManagedServiceInterface>(sr);
 }
 
+std::vector<std::shared_ptr<::test::TestManagedServiceInterface>>
+getManagedServices(cppmicroservices::BundleContext& ctx)
+{
+  auto srs = ctx.GetServiceReferences<::test::TestManagedServiceInterface>();
+  std::vector<std::shared_ptr<::test::TestManagedServiceInterface>> services(
+    srs.size());
+  for (uint32_t i = 0; i < services.size(); ++i) {
+    services[i] = ctx.GetService<::test::TestManagedServiceInterface>(srs[i]);
+  }
+
+  return services;
+}
+
 std::shared_ptr<::test::TestManagedServiceFactory> getManagedServiceFactory(
   cppmicroservices::BundleContext& ctx)
 {
@@ -557,6 +570,47 @@ TEST_F(ConfigAdminTests, testDuplicateUpdated)
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~0"), 1);
 }
 
+TEST_F(ConfigAdminTests, testMultipleManagedServicesInBundleGetUpdate)
+{
+  auto f = GetFramework();
+  auto ctx = f.GetBundleContext();
+
+  auto const numBundles =
+    installAndStartTestBundles(ctx, "TestBundleMultipleManagedService");
+  ASSERT_EQ(numBundles, 1);
+
+  auto services = getManagedServices(ctx);
+  ASSERT_EQ(services.size(), 2ul);
+  std::for_each(std::begin(services),
+                std::end(services),
+                [](auto& service) { ASSERT_NE(service, nullptr); });
+
+  auto sharedConfiguration =
+    m_configAdmin->GetConfiguration("cm.testservice");
+  ASSERT_EQ(sharedConfiguration->GetPid(), "cm.testservice");
+  ASSERT_TRUE(sharedConfiguration->GetProperties().empty());
+
+  std::for_each(std::begin(services),
+                std::end(services),
+                [](auto& service) {
+                  ASSERT_EQ(service->getCounter(),
+                            0);
+                });
+
+  cppmicroservices::AnyMap props(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  props["myProp"] = 0;
+
+  auto fut = sharedConfiguration->Update(props);
+  fut.get();
+
+  std::for_each(std::begin(services),
+                std::end(services),
+                [](auto& service) {
+                  ASSERT_EQ(service->getCounter(),
+                            1);
+                });
+}
 TEST_F(ConfigAdminTests, testMultipleManagedFactoriesInBundleGetUpdate)
 {
   auto f = GetFramework();
@@ -565,9 +619,6 @@ TEST_F(ConfigAdminTests, testMultipleManagedFactoriesInBundleGetUpdate)
   auto const numBundles =
     installAndStartTestBundles(ctx, "TestBundleMultipleManagedServiceFactory");
   ASSERT_EQ(numBundles, 1);
-
-  // Sleep rather than poll to allow superfluous Updated() calls to flush through
-  std::this_thread::sleep_for(DEFAULT_POLL_PERIOD);
 
   auto serviceFactories = getManagedServiceFactories(ctx);
   ASSERT_EQ(serviceFactories.size(), 2ul);

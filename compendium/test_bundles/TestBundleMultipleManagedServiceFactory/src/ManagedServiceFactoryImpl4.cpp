@@ -20,11 +20,7 @@ void TestManagedServiceFactoryImpl4::Updated(std::string const& pid,
                                              AnyMap const& properties)
 {
   std::lock_guard<std::mutex> lk(m_updatedMtx);
-  if (properties.empty()) {
-    m_updatedCallCount[pid] -= 1;
-  } else {
-    m_updatedCallCount[pid] += 1;
-  }
+  m_updatedCallCount[pid] += 1;
 }
 
 void TestManagedServiceFactoryImpl4::Removed(std::string const& pid)
@@ -52,7 +48,7 @@ TestManagedServiceFactoryImpl4::create(std::string const& config)
   std::lock_guard<std::mutex> lk(m_updatedMtx);
   try {
     return std::make_shared<TestManagedServiceFactoryServiceImpl4>(
-      m_updatedCallCount.at(config));
+    m_updatedCallCount.at(config));
   } catch (...) {
     return nullptr;
   }

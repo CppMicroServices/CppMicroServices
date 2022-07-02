@@ -45,6 +45,7 @@ inline std::pair<bool, std::string_view> IsInvalid(
   std::vector<std::string_view> keys(am.size());
   uint32_t currIndex = 0;
   for (auto& [key, _] : am) {
+    US_UNUSED(_);
     keys[currIndex++] = key;
   }
 

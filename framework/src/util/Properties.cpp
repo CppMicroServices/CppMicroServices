@@ -112,6 +112,7 @@ std::vector<std::string> Properties::Keys_unlocked() const
 {
   std::vector<std::string> result{};
   for (auto& [key, _] : props) {
+    US_UNUSED(_);
     result.push_back(key);
   }
   return result;

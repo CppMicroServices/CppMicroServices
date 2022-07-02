@@ -24,7 +24,6 @@
 #define CPPMICROSERVICES_SERVICEPROPERTIES_H
 
 #include "cppmicroservices/Any.h"
-#include "cppmicroservices/AnyMap.h"
 
 #include <string>
 #include <unordered_map>

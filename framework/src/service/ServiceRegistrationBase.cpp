@@ -49,7 +49,7 @@ ServiceRegistrationBase::ServiceRegistrationBase(
     ++d->ref;
 }
 
-ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBase&& reg)
+ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBase&& reg) noexcept
   : d(nullptr)
 {
   std::swap(d, reg.d);
@@ -353,7 +353,7 @@ ServiceRegistrationBase& ServiceRegistrationBase::operator=(
 }
 
 ServiceRegistrationBase& ServiceRegistrationBase::operator=(
-  ServiceRegistrationBase&& registration)
+  ServiceRegistrationBase&& registration) noexcept
 {
   if (d && !--d->ref)
     delete d;

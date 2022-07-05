@@ -44,14 +44,14 @@ namespace cppmicroservices {
 
 Bundle::Bundle(const Bundle&) = default;
 
-Bundle::Bundle(Bundle&& b)
+Bundle::Bundle(Bundle&& b) noexcept
   : d(std::move(b.d))
   , c(std::move(b.c))
 {}
 
 Bundle& Bundle::operator=(const Bundle&) = default;
 
-Bundle& Bundle::operator=(Bundle&& b)
+Bundle& Bundle::operator=(Bundle&& b) noexcept
 {
   this->d = std::move(b.d);
   this->c = std::move(b.c);

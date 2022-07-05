@@ -73,10 +73,10 @@ public:
      */
   explicit Framework(Bundle b);
 
-  Framework(const Framework& fw);            // = default
-  Framework(Framework&& fw);                 // = default
-  Framework& operator=(const Framework& fw); // = default
-  Framework& operator=(Framework&& fw);      // = default
+  Framework(const Framework& fw);                // = default
+  Framework(Framework&& fw) noexcept;            // = default
+  Framework& operator=(const Framework& fw);     // = default
+  Framework& operator=(Framework&& fw) noexcept; // = default
 
   /**
      * Initialize this Framework. After calling this method, this Framework

@@ -98,10 +98,9 @@ std::vector<std::shared_ptr<::test::TestManagedServiceInterface>>
 getManagedServices(cppmicroservices::BundleContext& ctx)
 {
   auto srs = ctx.GetServiceReferences<::test::TestManagedServiceInterface>();
-  std::vector<std::shared_ptr<::test::TestManagedServiceInterface>> services(
-    srs.size());
-  for (uint32_t i = 0; i < services.size(); ++i) {
-    services[i] = ctx.GetService<::test::TestManagedServiceInterface>(srs[i]);
+  std::vector<std::shared_ptr<::test::TestManagedServiceInterface>> services;
+  for (const auto& sr: srs) {
+    services.push_back( ctx.GetService<::test::TestManagedServiceInterface>(sr));
   }
 
   return services;
@@ -118,10 +117,9 @@ std::vector<std::shared_ptr<::test::TestManagedServiceFactory>>
 getManagedServiceFactories(cppmicroservices::BundleContext& ctx)
 {
   auto srs = ctx.GetServiceReferences<::test::TestManagedServiceFactory>();
-  std::vector<std::shared_ptr<::test::TestManagedServiceFactory>> factories(
-    srs.size());
-  for (uint32_t i = 0; i < factories.size(); ++i) {
-    factories[i] = ctx.GetService<::test::TestManagedServiceFactory>(srs[i]);
+  std::vector<std::shared_ptr<::test::TestManagedServiceFactory>> factories;
+  for (const auto& sr : srs) {
+    factories.push_back(ctx.GetService<::test::TestManagedServiceFactory>(sr));
   }
 
   return factories;

@@ -544,13 +544,13 @@ void ConfigurationAdminImpl::RemoveConfigurations(
 std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
   const std::string& pid)
 {
-  // NotifyConfigurationUpdated will only send a notification to the service if 
+  // NotifyConfigurationUpdated will only send a notification to the service if
   // the configuration object has been updated at least once. In order to determine whether or not
   // a configuration object has been updated, it calls the HasBeenUpdatedAtLeastOnce method for
-  // the configuration object. For a remove operation the configuration object 
+  // the configuration object. For a remove operation the configuration object
   // is not available and that method cannot be called. For this reason, NotifyConfigurationUpdated
   // should not be called for Remove operations unless the caller has already confirmed
-  // the configuration object has been updated at least once. 
+  // the configuration object has been updated at least once.
   return PerformAsync([this, pid] {
     AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
     std::string fPid;
@@ -563,11 +563,11 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
       if (it == std::end(configurations)) {
         removed = true;
         hasBeenUpdated = true;
-       } else {
+      } else {
         try {
-           hasBeenUpdated = it->second->HasBeenUpdatedAtLeastOnce();
-           properties = it->second->GetProperties();
-       } catch (const std::runtime_error&) {
+          hasBeenUpdated = it->second->HasBeenUpdatedAtLeastOnce();
+          properties = it->second->GetProperties();
+        } catch (const std::runtime_error&) {
           // Configuration is being removed
           removed = true;
         }
@@ -575,7 +575,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
     }
     // We can only send update notifications for configuration objects that have
     // been updated. Just return without sending the notification for objects
-    // that have not yet been updated. 
+    // that have not yet been updated.
     if (!hasBeenUpdated) {
       return;
     }
@@ -599,56 +599,41 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
     }
 
     const auto managedServiceWrappers = managedServiceTracker.GetServices();
-    auto it = managedServiceWrappers.begin();
-    while (
-      (it = std::find_if(
-         it,
-         std::end(managedServiceWrappers),
-         [&pid](const auto& managedServiceWrapper) {
-           // The ServiceTracker will return a default constructed shared_ptr for each ManagedService
-           // that we aren't tracking. We must be careful not to dereference these!
-           return (managedServiceWrapper ? (pid == managedServiceWrapper->pid)
-                                         : false);
-         })) != managedServiceWrappers.end()) {
-      const auto& managedServiceWrapper = *it;
-      notifyServiceUpdated(
-          pid, *(managedServiceWrapper->trackedService), properties, *logger);
-       it++;
-    }
+    std::for_each(managedServiceWrappers.begin(),
+                  managedServiceWrappers.end(),
+                  [&](auto& managedServiceWrapper) {
+                  if (managedServiceWrapper->pid == pid) {
+                    notifyServiceUpdated(pid,
+                                      *(managedServiceWrapper->trackedService),
+                                      properties,
+                                      *logger);
+                  }
+                  });
 
     const auto factoryPid = getFactoryPid(pid);
     if (factoryPid.empty()) {
       return;
     }
-    
+
     const auto managedServiceFactoryWrappers =
       managedServiceFactoryTracker.GetServices();
-    auto factoryIt = managedServiceFactoryWrappers.begin();
-    while ((factoryIt = std::find_if(
-      factoryIt,
-      std::end(managedServiceFactoryWrappers),
-      [&factoryPid](const auto& managedServiceFactoryWrapper) {
-        // The ServiceTracker will return a default constructed shared_ptr for each ManagedServiceFactory
-        // that we aren't tracking. We must be careful not to dereference these!
-        return (managedServiceFactoryWrapper
-                  ? (factoryPid == managedServiceFactoryWrapper->pid)
-                  : false);
-      })) != managedServiceFactoryWrappers.end()) {
-      const auto& managedServiceFactoryWrapper = *factoryIt;
-      if (removed) {
-        notifyServiceRemoved(
-          pid, *(managedServiceFactoryWrapper->trackedService), *logger);
-      } else {
-        notifyServiceUpdated(pid,
-                             *(managedServiceFactoryWrapper->trackedService),
-                             properties,
-                             *logger);
-      }
-      factoryIt++;
-    }
+      std::for_each(managedServiceFactoryWrappers.begin(),
+                    managedServiceFactoryWrappers.end(),
+                    [&](auto& managedServiceFactoryWrapper) {
+                    if (managedServiceFactoryWrapper->pid == factoryPid) {
+                      if (removed) {
+                        notifyServiceRemoved(pid,
+                            *(managedServiceFactoryWrapper->trackedService), *logger);
+                      } else {
+                        notifyServiceUpdated(pid,
+                            *(managedServiceFactoryWrapper->trackedService),
+                            properties,
+                            *logger);
+                      }
+                    }
+                    });
   });
 }
-
 std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(
   const std::string& pid,
   std::uintptr_t configurationId)

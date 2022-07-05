@@ -17,7 +17,7 @@ void TestManagedServiceFactoryImpl4::Activate(
 }
 
 void TestManagedServiceFactoryImpl4::Updated(std::string const& pid,
-                                             AnyMap const& properties)
+                                             AnyMap const& )
 {
   std::lock_guard<std::mutex> lk(m_updatedMtx);
   m_updatedCallCount[pid] += 1;

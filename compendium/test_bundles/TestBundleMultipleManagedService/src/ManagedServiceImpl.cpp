@@ -14,7 +14,7 @@ TestManagedServiceImpl3::TestManagedServiceImpl3()
 
 TestManagedServiceImpl3::~TestManagedServiceImpl3() = default;
 
-void TestManagedServiceImpl3::Updated(AnyMap const& properties)
+void TestManagedServiceImpl3::Updated(AnyMap const& )
 {
   std::lock_guard<std::mutex> lk(m_counterMtx);
   m_counter++;
@@ -32,7 +32,7 @@ TestManagedServiceImpl4::TestManagedServiceImpl4()
 
 TestManagedServiceImpl4::~TestManagedServiceImpl4() = default;
 
-void TestManagedServiceImpl4::Updated(AnyMap const& properties)
+void TestManagedServiceImpl4::Updated(AnyMap const&)
 {
   std::lock_guard<std::mutex> lk(m_counterMtx);
   m_counter++;

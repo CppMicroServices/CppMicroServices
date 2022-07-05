@@ -20,6 +20,19 @@
 
  =============================================================================*/
 
+/*
+  File: PropsCheck.h
+
+  This file contains shared utility functions for validating that maps provided to
+  the Property class are indeed valid (e.g., no pairs of keys which differ in case only).
+  The code contained in this file has been extracted from other individual files to promote
+  code reusability while reducing the amount of code duplication that exists so that maintenance
+  is easier.
+  
+  Functions defined here are intended for internal use; no external clients of the core
+  framework should be capable/allowed of calling these functions.
+ */
+
 #ifndef PROPSCHECK_H
 #define PROPSCHECK_H
 
@@ -39,8 +52,18 @@
 #include "cppmicroservices/LDAPFilter.h"
 
 namespace cppmicroservices::props_check {
-inline std::pair<bool, std::string_view> IsInvalid(
-  const cppmicroservices::AnyMap& am)
+/**
+ * @brief Validates that the provided AnyMap conforms to the same constraints that
+ * those stored in Property objects have.
+ * 
+ * The provided AnyMap is said to be valid if there exists no pairs of two keys
+ * which differ in case only (e.g., "service.feature", "Service.feature"). If this
+ * condition is not true, this function throws as defined below.
+ * 
+ * @param am The AnyMap to validate
+ * @throws std::runtime_error Thrown when `am` is invalid (described above)
+ */
+inline void ValidateAnyMap(const cppmicroservices::AnyMap& am)
 {
   std::vector<std::string_view> keys(am.size());
   uint32_t currIndex = 0;
@@ -50,17 +73,19 @@ inline std::pair<bool, std::string_view> IsInvalid(
   }
 
   if (am.size() > 1) {
+    // NOTE: A solution involving iterations rather than "raw for-loops" was previously
+    // tested but ended up being slower than the solution below.
     for (uint32_t i = 0; i < keys.size() - 1; ++i) {
       for (uint32_t j = i + 1; j < keys.size(); ++j) {
         if (keys[i].size() == keys[j].size() &&
             ci_compare(keys[i].data(), keys[j].data(), keys[i].size()) == 0) {
-          return std::make_pair(true, keys[i]);
+          std::string msg("Properties contain case variants of the key: ");
+          msg += keys[i];
+          throw std::runtime_error(msg.c_str());
         }
       }
     }
   }
-
-  return std::make_pair(false, "");
 }
 }
 

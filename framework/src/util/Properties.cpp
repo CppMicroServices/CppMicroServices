@@ -33,47 +33,16 @@ namespace cppmicroservices {
 
 const Any Properties::emptyAny;
 
-Properties::Properties(AnyMap& p)
-  : props(p)
-{
-  if (p.size() > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
-    throw std::runtime_error("Properties contain too many keys");
-  }
-
-  if (auto result = props_check::IsInvalid(props); result.first) {
-    std::string msg("Properties contain case variants of the key: ");
-    msg += result.second;
-    throw std::runtime_error(msg.c_str());
-  }
-}
-
 Properties::Properties(const AnyMap& p)
   : props(p)
 {
-  if (p.size() > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
-    throw std::runtime_error("Properties contain too many keys");
-  }
-
-  if (auto result = props_check::IsInvalid(props); result.first) {
-    std::string msg("Properties contain case variants of the key: ");
-    msg += result.second;
-    throw std::runtime_error(msg.c_str());
-  }
+  props_check::ValidateAnyMap(props);
 }
 
 Properties::Properties(AnyMap&& p)
   : props(std::move(p))
 {
-  if (props.size() >
-      static_cast<std::size_t>(std::numeric_limits<int>::max())) {
-    throw std::runtime_error("Properties contain too many keys");
-  }
-
-  if (auto result = props_check::IsInvalid(props); result.first) {
-    std::string msg("Properties contain case variants of the key: ");
-    msg += result.second;
-    throw std::runtime_error(msg.c_str());
-  }
+  props_check::ValidateAnyMap(props);
 }
 
 Properties::Properties(Properties&& o)

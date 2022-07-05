@@ -83,11 +83,8 @@ bool LDAPFilter::Match(const Bundle& bundle) const
 {
   if (d) {
     auto& headers = bundle.GetHeaders();
-    if (auto result = props_check::IsInvalid(headers); result.first) {
-      std::string msg("Properties contain case variants of the key: ");
-      msg += result.second;
-      throw std::runtime_error(msg.c_str());
-    }
+
+    props_check::ValidateAnyMap(headers);
 
     return d->ldapExpr.Evaluate(headers, false);
   } else {
@@ -98,11 +95,7 @@ bool LDAPFilter::Match(const Bundle& bundle) const
 bool LDAPFilter::Match(const AnyMap& dictionary) const
 {
   if (d) {
-    if (auto result = props_check::IsInvalid(dictionary); result.first) {
-      std::string msg("Properties contain case variants of the key: ");
-      msg += result.second;
-      throw std::runtime_error(msg.c_str());
-    }
+    props_check::ValidateAnyMap(dictionary);
 
     return d->ldapExpr.Evaluate(dictionary, false);
   } else {
@@ -113,11 +106,7 @@ bool LDAPFilter::Match(const AnyMap& dictionary) const
 bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
 {
   if (d) {
-    if (auto result = props_check::IsInvalid(dictionary); result.first) {
-      std::string msg("Properties contain case variants of the key: ");
-      msg += result.second;
-      throw std::runtime_error(msg.c_str());
-    }
+    props_check::ValidateAnyMap(dictionary);
 
     return d->ldapExpr.Evaluate(dictionary, true);
   } else {

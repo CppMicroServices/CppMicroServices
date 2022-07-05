@@ -30,6 +30,7 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/BundleTracker.h"
+#include "cppmicroservices/BundleTrackerCustomizer.h"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 #include "manager/ConfigurationNotifier.hpp"
@@ -41,7 +42,9 @@ using cppmicroservices::service::component::runtime::ServiceComponentRuntime;
 namespace cppmicroservices {
 namespace scrimpl {
 
-class SCRActivator : public cppmicroservices::BundleActivator
+class SCRActivator
+  : public cppmicroservices::BundleActivator
+  , public cppmicroservices::BundleTrackerCustomizer<>
 {
 public:
   SCRActivator() = default;
@@ -50,6 +53,11 @@ public:
   SCRActivator& operator=(const SCRActivator&) = delete;
   SCRActivator& operator=(SCRActivator&&) = delete;
   ~SCRActivator() override = default;
+
+  // Customizer methods
+  Bundle AddingBundle(const Bundle&, const BundleEvent&) override;
+  void ModifiedBundle(const Bundle&, const BundleEvent&, Bundle) override;
+  void RemovedBundle(const Bundle&, const BundleEvent&, Bundle) override;
 
   // callback methods for bundle lifecycle
   void Start(cppmicroservices::BundleContext context) override;
@@ -78,12 +86,13 @@ private:
   std::mutex bundleRegMutex;
   std::unordered_map<long, std::unique_ptr<SCRBundleExtension>> bundleRegistry;
   std::shared_ptr<SCRLogger> logger;
-  ListenerToken bundleListenerToken;
+  // ListenerToken bundleListenerToken;
   std::shared_ptr<SCRAsyncWorkService> asyncWorkService;
   cppmicroservices::ServiceRegistration<
     cppmicroservices::service::cm::ConfigurationListener>
     configListenerReg;
   std::shared_ptr<ConfigurationNotifier> configNotifier;
+  std::shared_ptr<cppmicroservices::BundleTracker<>> bundleTracker;
 };
 } // scrimpl
 } // cppmicroservices

@@ -82,7 +82,7 @@ void TrackedBundle<TTT>::BundleChanged(const BundleEvent& event)
   }
 
   // Track iff state in mask
-  if (state & bundleTracker->d->stateMask != 0) {
+  if (state & bundleTracker->d->stateMask) {
     this->Track(bundle, event);
     /*
      * If the customizer throws an unchecked exception, it is

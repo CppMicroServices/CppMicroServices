@@ -25,6 +25,7 @@
 #include "SCRAsyncWorkService.hpp"
 #include "SCRLogger.hpp"
 #include "ServiceComponentRuntimeImpl.hpp"
+#include "cppmicroservices/BundleTracker.h"
 #include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
@@ -52,6 +53,8 @@ namespace scrimpl {
 void SCRActivator::Start(BundleContext context)
 {
   runtimeContext = context;
+  auto stateMask = Bundle::State::STATE_ACTIVE;
+  bundleTracker = std::make_shared<BundleTracker<>>(context, stateMask, this);
 
   // Create the component registry
   componentRegistry = std::make_shared<ComponentRegistry>();
@@ -66,17 +69,34 @@ void SCRActivator::Start(BundleContext context)
   configNotifier =
     std::make_shared<ConfigurationNotifier>(context, logger, asyncWorkService);
 
+  // typename BundleTracker<>::StateType stateMask =
+  //   Bundle::State::STATE_ACTIVE | Bundle::State::STATE_STARTING;
+
+  // BundleTracker<> bt = BundleTracker<>(context, stateMask);
+  // bt.Open();
+  // bt.GetTrackingCount();
+  // bt.IsEmpty();
+  // bt.Size();
+  // bt.GetTracked();
+  // bt.GetBundles();
+  // bt.GetObject(Bundle());
+  // bt.Remove(Bundle());
+  // bt.Close();
+
+  bundleTracker->Open();
+
   // Add bundle listener
-  bundleListenerToken = context.AddBundleListener(
-    std::bind(&SCRActivator::BundleChanged, this, std::placeholders::_1));
-  // HACK: Workaround for lack of Bundle Tracker. Iterate over all bundles and call the tracker method manually
-  for (const auto& bundle : context.GetBundles()) {
-    if (bundle.GetState() == cppmicroservices::Bundle::State::STATE_ACTIVE) {
-      cppmicroservices::BundleEvent evt(
-        cppmicroservices::BundleEvent::BUNDLE_STARTED, bundle);
-      BundleChanged(evt);
-    }
-  }
+  // bundleListenerToken = context.AddBundleListener(
+  //   std::bind(&SCRActivator::BundleChanged, this, std::placeholders::_1));
+  // // HACK: Workaround for lack of Bundle Tracker. Iterate over all bundles and call the tracker method manually
+  // for (const auto& bundle : context.GetBundles()) {
+  //   if (bundle.GetState() == cppmicroservices::Bundle::State::STATE_ACTIVE) {
+  //     cppmicroservices::BundleEvent evt(
+  //       cppmicroservices::BundleEvent::BUNDLE_STARTED, bundle);
+  //     BundleChanged(evt);
+  //   }
+  // }
+
   // Publish ServiceComponentRuntimeService
   auto service = std::make_shared<ServiceComponentRuntimeImpl>(
     runtimeContext, componentRegistry, logger);
@@ -97,17 +117,19 @@ void SCRActivator::Stop(cppmicroservices::BundleContext context)
 {
   try {
     // remove the bundle listener
-    context.RemoveListener(std::move(bundleListenerToken));
+    //context.RemoveListener(std::move(bundleListenerToken));
     // remove the runtime service from the framework
     scrServiceReg.Unregister();
     // remove the configuration listener service from the framework
     configListenerReg.Unregister();
 
     // dispose all components created by SCR
-    const auto bundles = context.GetBundles();
-    for (auto const& bundle : bundles) {
-      DisposeExtension(bundle);
-    }
+
+    bundleTracker->Close();
+    // const auto bundles = context.GetBundles();
+    // for (auto const& bundle : bundles) {
+    //   DisposeExtension(bundle);
+    // }
 
     // clear bundle registry
     {
@@ -227,6 +249,33 @@ void SCRActivator::BundleChanged(const cppmicroservices::BundleEvent& evt)
   }
   // else ignore
 }
+
+Bundle SCRActivator::AddingBundle(const Bundle& bundle, const BundleEvent&)
+{
+  logger->Log(SeverityLevel::LOG_DEBUG,
+              "Adding Bundle: " + bundle.GetSymbolicName());
+  if (bundle != runtimeContext.GetBundle()) {
+    CreateExtension(bundle);
+  }
+  return bundle;
+}
+
+void SCRActivator::ModifiedBundle(const Bundle&, const BundleEvent&, Bundle)
+{
+  /* no-op */
+}
+
+void SCRActivator::RemovedBundle(const Bundle& bundle,
+                                 const BundleEvent&,
+                                 Bundle)
+{
+  logger->Log(SeverityLevel::LOG_DEBUG,
+              "Removing Bundle: " + bundle.GetSymbolicName());
+  if (bundle != runtimeContext.GetBundle()) {
+    DisposeExtension(bundle);
+  }
+}
+
 } // scrimpl
 } // cppmicroservices
 

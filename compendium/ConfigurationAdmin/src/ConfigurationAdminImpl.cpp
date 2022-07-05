@@ -601,7 +601,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
     const auto managedServiceWrappers = managedServiceTracker.GetServices();
     std::for_each(managedServiceWrappers.begin(),
                   managedServiceWrappers.end(),
-                  [&](auto& managedServiceWrapper) {
+                  [&](const auto& managedServiceWrapper) {
                   if (managedServiceWrapper->pid == pid) {
                     notifyServiceUpdated(pid,
                                       *(managedServiceWrapper->trackedService),
@@ -619,7 +619,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
       managedServiceFactoryTracker.GetServices();
       std::for_each(managedServiceFactoryWrappers.begin(),
                     managedServiceFactoryWrappers.end(),
-                    [&](auto& managedServiceFactoryWrapper) {
+                    [&](const auto& managedServiceFactoryWrapper) {
                     if (managedServiceFactoryWrapper->pid == factoryPid) {
                       if (removed) {
                         notifyServiceRemoved(pid,

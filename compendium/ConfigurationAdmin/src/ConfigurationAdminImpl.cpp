@@ -602,12 +602,15 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
     std::for_each(managedServiceWrappers.begin(),
                   managedServiceWrappers.end(),
                   [&](const auto& managedServiceWrapper) {
-                  if (managedServiceWrapper->pid == pid) {
-                    notifyServiceUpdated(pid,
-                                      *(managedServiceWrapper->trackedService),
-                                      properties,
-                                      *logger);
-                  }
+                    // The ServiceTracker will return a default constructed shared_ptr for each ManagedService
+                    // that we aren't tracking. We must be careful not to dereference these!
+                    if ((managedServiceWrapper) && (managedServiceWrapper->pid == pid)) {
+                        notifyServiceUpdated(
+                          pid,
+                          *(managedServiceWrapper->trackedService),
+                          properties,
+                          *logger);
+                    }
                   });
 
     const auto factoryPid = getFactoryPid(pid);
@@ -620,17 +623,22 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
       std::for_each(managedServiceFactoryWrappers.begin(),
                     managedServiceFactoryWrappers.end(),
                     [&](const auto& managedServiceFactoryWrapper) {
-                    if (managedServiceFactoryWrapper->pid == factoryPid) {
-                      if (removed) {
-                        notifyServiceRemoved(pid,
-                            *(managedServiceFactoryWrapper->trackedService), *logger);
-                      } else {
-                        notifyServiceUpdated(pid,
-                            *(managedServiceFactoryWrapper->trackedService),
-                            properties,
-                            *logger);
-                      }
-                    }
+                    // The ServiceTracker will return a default constructed shared_ptr for each ManagedServiceFactory
+                    // that we aren't tracking. We must be careful not to dereference these!
+                       if ((managedServiceFactoryWrapper) && (managedServiceFactoryWrapper->pid == factoryPid)) {
+                         if (removed) {
+                            notifyServiceRemoved(
+                              pid,
+                              *(managedServiceFactoryWrapper->trackedService),
+                              *logger);
+                         } else {
+                            notifyServiceUpdated(
+                              pid,
+                              *(managedServiceFactoryWrapper->trackedService),
+                              properties,
+                              *logger);
+                         }
+                       }
                     });
   });
 }

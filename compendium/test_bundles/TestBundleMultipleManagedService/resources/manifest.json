@@ -1,0 +1,34 @@
+{
+  "bundle.symbolic_name": "TestBundleMultipleManagedService",
+  "bundle.name": "TestBundleMultipleManagedService",
+  "bundle.activator": false,
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "implementation-class": "cppmicroservices::service::cm::test::TestManagedServiceImpl3",
+        "properties": {
+          "service.pid": "cm.testservice"
+        },
+        "service": {
+          "interfaces": [
+            "test::TestManagedServiceInterface",
+            "cppmicroservices::service::cm::ManagedService"
+          ]
+        }
+      },
+      {
+        "implementation-class": "cppmicroservices::service::cm::test::TestManagedServiceImpl4",
+        "properties": {
+          "service.pid": "cm.testservice"
+        },
+        "service": {
+          "interfaces": [
+            "test::TestManagedServiceInterface",
+            "cppmicroservices::service::cm::ManagedService"
+          ]
+        }
+      }
+    ]
+  }
+}

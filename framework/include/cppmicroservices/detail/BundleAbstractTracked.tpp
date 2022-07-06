@@ -261,7 +261,7 @@ void BundleAbstractTracked<S, TTT, R>::CopyEntries_unlocked(
 template<class S, class TTT, class R>
 bool BundleAbstractTracked<S, TTT, R>::CustomizerAddingFinal(
   S item,
-  const TrackedParamType& custom)
+  const std::optional<TrackedParamType>& custom)
 {
   auto l = this->Lock();
   US_UNUSED(l);
@@ -273,7 +273,7 @@ bool BundleAbstractTracked<S, TTT, R>::CustomizerAddingFinal(
      * callback
      */
     if (custom) {
-      tracked[item] = custom;
+      tracked[item] = custom.value();
       Modified();        /* increment modification count */
       this->NotifyAll(); /* notify any waiters */
     }
@@ -287,7 +287,7 @@ template<class S, class TTT, class R>
 void BundleAbstractTracked<S, TTT, R>::TrackAdding(S item, R related)
 {
   DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::trackAdding:" << item;
-  TrackedParamType object;
+  std::optional<TrackedParamType> object;
   bool becameUntracked = false;
   /* Call customizer outside of synchronized region */
   try {
@@ -309,7 +309,7 @@ void BundleAbstractTracked<S, TTT, R>::TrackAdding(S item, R related)
     DIAG_LOG(*bc.GetLogSink())
       << "BundleAbstractTracked::trackAdding[removed]: " << item;
     /* Call customizer outside of synchronized region */
-    CustomizerRemoved(item, related, object);
+    CustomizerRemoved(item, related, object.value());
     /*
      * If the customizer throws an unchecked exception, it is safe to
      * let it propagate

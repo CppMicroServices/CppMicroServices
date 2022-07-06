@@ -26,6 +26,7 @@
 #include "cppmicroservices/detail/BundleTrackerPrivate.h"
 #include "cppmicroservices/detail/TrackedBundle.h"
 
+#include <optional>
 #include <vector>
 
 namespace cppmicroservices {
@@ -63,7 +64,6 @@ void BundleTracker<T>::Open()
     DIAG_LOG(*d->context.GetLogSink())
       << "BundleTracker<T>::Open: " << d->stateMask;
 
-    // TODO: Assess this line
     t.reset(new _TrackedBundle(this, d->customizer));
     try {
       // Attempt to drop old listener
@@ -236,9 +236,8 @@ size_t BundleTracker<T>::Size()
 }
 
 template<class T>
-typename BundleTracker<T>::TrackedParamType BundleTracker<T>::AddingBundle(
-  const Bundle& bundle,
-  const BundleEvent& event)
+std::optional<typename BundleTracker<T>::TrackedParamType>
+BundleTracker<T>::AddingBundle(const Bundle& bundle, const BundleEvent& event)
 {
   // TODO: Make this SFINAE
   return TypeTraits::ConvertToTrackedType(bundle);

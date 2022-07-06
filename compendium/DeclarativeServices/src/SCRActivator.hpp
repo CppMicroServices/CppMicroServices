@@ -55,7 +55,8 @@ public:
   ~SCRActivator() override = default;
 
   // Customizer methods
-  Bundle AddingBundle(const Bundle&, const BundleEvent&) override;
+  std::optional<Bundle> AddingBundle(const Bundle&,
+                                     const BundleEvent&) override;
   void ModifiedBundle(const Bundle&, const BundleEvent&, Bundle) override;
   void RemovedBundle(const Bundle&, const BundleEvent&, Bundle) override;
 

@@ -25,6 +25,7 @@
 
 #include <chrono>
 #include <map>
+#include <optional>
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleTrackerCustomizer.h"
@@ -120,8 +121,9 @@ public:
    *
    * @see BundleTrackerCustomizer:AddingBundle(Bundle, BundleEvent)
    */
-  typename TrackedParamType AddingBundle(const Bundle& bundle,
-                                         const BundleEvent& event);
+  std::optional<typename TrackedParamType> AddingBundle(
+    const Bundle& bundle,
+    const BundleEvent& event);
 
   /**
    * Close this <code>BundleTracker</code>.

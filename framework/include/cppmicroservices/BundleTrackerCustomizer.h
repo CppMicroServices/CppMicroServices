@@ -24,6 +24,7 @@
 #define CPPMICROSERVICES_BUNDLETRACKERCUSTOMIZER_H
 
 #include "cppmicroservices/Bundle.h"
+#include <optional>
 
 namespace cppmicroservices {
 
@@ -82,8 +83,9 @@ struct BundleTrackerCustomizer
    *
    * @see BundleTrackerCustomizer:AddingBundle(Bundle, BundleEvent)
    */
-  virtual TrackedParamType AddingBundle(const Bundle& bundle,
-                                        const BundleEvent& event) = 0;
+  virtual std::optional<TrackedParamType> AddingBundle(
+    const Bundle& bundle,
+    const BundleEvent& event) = 0;
 
   /**
    * Called when a <code>Bundle</code> is modified that is being tracked by this <code>BundleTracker</code>.

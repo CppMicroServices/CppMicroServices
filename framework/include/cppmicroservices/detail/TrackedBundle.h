@@ -87,8 +87,9 @@ private:
    * @return Customized object for the tracked bundle or <code>null</code>
    *         if the bundle is not to be tracked.
    */
-  TrackedParamType CustomizerAdding(Bundle bundle,
-                                    const BundleEvent& related) override;
+  std::optional<TrackedParamType> CustomizerAdding(
+    Bundle bundle,
+    const BundleEvent& related) override;
 
   /**
    * Call the specific customizer modified method. This method must not be

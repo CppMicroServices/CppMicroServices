@@ -38,6 +38,7 @@
 #include <future>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <vector>
 
@@ -69,33 +70,8 @@ void SCRActivator::Start(BundleContext context)
   configNotifier =
     std::make_shared<ConfigurationNotifier>(context, logger, asyncWorkService);
 
-  // typename BundleTracker<>::StateType stateMask =
-  //   Bundle::State::STATE_ACTIVE | Bundle::State::STATE_STARTING;
-
-  // BundleTracker<> bt = BundleTracker<>(context, stateMask);
-  // bt.Open();
-  // bt.GetTrackingCount();
-  // bt.IsEmpty();
-  // bt.Size();
-  // bt.GetTracked();
-  // bt.GetBundles();
-  // bt.GetObject(Bundle());
-  // bt.Remove(Bundle());
-  // bt.Close();
-
+  // Open the tracker
   bundleTracker->Open();
-
-  // Add bundle listener
-  // bundleListenerToken = context.AddBundleListener(
-  //   std::bind(&SCRActivator::BundleChanged, this, std::placeholders::_1));
-  // // HACK: Workaround for lack of Bundle Tracker. Iterate over all bundles and call the tracker method manually
-  // for (const auto& bundle : context.GetBundles()) {
-  //   if (bundle.GetState() == cppmicroservices::Bundle::State::STATE_ACTIVE) {
-  //     cppmicroservices::BundleEvent evt(
-  //       cppmicroservices::BundleEvent::BUNDLE_STARTED, bundle);
-  //     BundleChanged(evt);
-  //   }
-  // }
 
   // Publish ServiceComponentRuntimeService
   auto service = std::make_shared<ServiceComponentRuntimeImpl>(
@@ -250,14 +226,15 @@ void SCRActivator::BundleChanged(const cppmicroservices::BundleEvent& evt)
   // else ignore
 }
 
-Bundle SCRActivator::AddingBundle(const Bundle& bundle, const BundleEvent&)
+std::optional<Bundle> SCRActivator::AddingBundle(const Bundle& bundle,
+                                                 const BundleEvent&)
 {
   logger->Log(SeverityLevel::LOG_DEBUG,
               "Adding Bundle: " + bundle.GetSymbolicName());
   if (bundle != runtimeContext.GetBundle()) {
     CreateExtension(bundle);
   }
-  return bundle;
+  return std::optional<Bundle>{ bundle };
 }
 
 void SCRActivator::ModifiedBundle(const Bundle&, const BundleEvent&, Bundle)

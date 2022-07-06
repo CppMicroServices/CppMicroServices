@@ -37,7 +37,6 @@ TrackedBundle<TTT>::TrackedBundle(BundleTracker<T>* bundleTracker,
 template<class TTT>
 void TrackedBundle<TTT>::WaitOnCustomizersToFinish()
 {
-  // TODO: Checkimp
   latch.Wait();
 }
 
@@ -105,7 +104,7 @@ void TrackedBundle<TTT>::Modified()
 }
 
 template<class TTT>
-typename TrackedBundle<TTT>::TrackedParamType
+std::optional<typename TrackedBundle<TTT>::TrackedParamType>
 TrackedBundle<TTT>::CustomizerAdding(Bundle bundle, const BundleEvent& event)
 {
   return customizer->AddingBundle(bundle, event);

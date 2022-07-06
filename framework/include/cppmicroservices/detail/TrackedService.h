@@ -30,6 +30,8 @@
 #include "cppmicroservices/detail/CounterLatch.h"
 #include "cppmicroservices/detail/ScopeGuard.h"
 
+#include <optional>
+
 namespace cppmicroservices {
 
 namespace detail {
@@ -102,7 +104,7 @@ private:
    * @return Customized object for the tracked item or <code>null</code>
    *         if the item is not to be tracked.
    */
-  std::shared_ptr<TrackedParamType> CustomizerAdding(
+  std::optional<std::shared_ptr<TrackedParamType>> CustomizerAdding(
     ServiceReference<S> item,
     const ServiceEvent& related) override;
 

@@ -28,6 +28,7 @@
 #include "cppmicroservices/detail/WaitCondition.h"
 
 #include <atomic>
+#include <optional>
 #include <vector>
 
 namespace cppmicroservices {
@@ -188,7 +189,9 @@ public:
    * @return Customized object for the tracked item or <code>null</code> if
    *         the item is not to be tracked.
    */
-  virtual TrackedParamType CustomizerAdding(S item, const R& related) = 0;
+  virtual std::optional<TrackedParamType> CustomizerAdding(
+    S item,
+    const R& related) = 0;
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -282,7 +285,8 @@ private:
 
   BundleContext bc;
 
-  bool CustomizerAddingFinal(S item, const TrackedParamType& custom);
+  bool CustomizerAddingFinal(S item,
+                             const std::optional<TrackedParamType>& custom);
 };
 
 } // namespace detail

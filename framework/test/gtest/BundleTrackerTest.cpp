@@ -64,21 +64,38 @@ auto all_states =
 TEST_F(BundleTrackerTest, CreateTracker)
 {
   BundleTracker bt(context, all_states);
-  ASSERT_TRUE(bt.IsEmpty());
-  ASSERT_EQ(0, bt.Size());
+  EXPECT_TRUE(bt.IsEmpty());
+  EXPECT_EQ(0, bt.Size());
 }
 
 TEST_F(BundleTrackerTest, TestIsEmpty)
 {
-  auto bt =
-    std::make_shared<cppmicroservices::BundleTracker<>>(context, all_states);
-  ASSERT_TRUE(bt->IsEmpty());
+  auto bt = std::make_shared<BundleTracker<>>(context, all_states);
+  EXPECT_TRUE(bt->IsEmpty());
 
   bt->Open();
-  ASSERT_FALSE(bt->IsEmpty());
+  EXPECT_FALSE(bt->IsEmpty());
 
   bt->Close();
-  ASSERT_TRUE(bt->IsEmpty());
+  EXPECT_TRUE(bt->IsEmpty());
+}
+
+TEST_F(BundleTrackerTest, TestGetTrackingCountOpened)
+{
+  auto bt = std::make_shared<BundleTracker<>>(context,
+                                              Bundle::State::STATE_UNINSTALLED);
+  bt->Open();
+  //EXPECT_EQ(0, bt->GetTrackingCount()); TODO clarify expected value
+  bt->Close();
+}
+
+TEST_F(BundleTrackerTest, TestGetTrackingCountClosed)
+{
+  auto bt = std::make_shared<BundleTracker<>>(context, all_states);
+  EXPECT_EQ(-1, bt->GetTrackingCount());
+  bt->Open();
+  bt->Close();
+  EXPECT_EQ(-1, bt->GetTrackingCount());
 }
 
 TEST_F(BundleTrackerTest, DemoTest)

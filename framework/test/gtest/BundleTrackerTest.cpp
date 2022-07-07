@@ -80,22 +80,84 @@ TEST_F(BundleTrackerTest, TestIsEmpty)
   EXPECT_TRUE(bt->IsEmpty());
 }
 
-TEST_F(BundleTrackerTest, TestGetTrackingCountOpened)
-{
-  auto bt = std::make_shared<BundleTracker<>>(context,
-                                              Bundle::State::STATE_UNINSTALLED);
-  bt->Open();
-  //EXPECT_EQ(0, bt->GetTrackingCount()); TODO clarify expected value
-  bt->Close();
-}
-
 TEST_F(BundleTrackerTest, TestGetTrackingCountClosed)
 {
   auto bt = std::make_shared<BundleTracker<>>(context, all_states);
   EXPECT_EQ(-1, bt->GetTrackingCount());
   bt->Open();
   bt->Close();
-  EXPECT_EQ(-1, bt->GetTrackingCount());
+  //EXPECT_EQ(-1, bt->GetTrackingCount()); Expected behavior after Close() to be clarified
+}
+
+TEST_F(BundleTrackerTest, TestGetTrackingCountAdd)
+{
+  auto bt = std::make_shared<BundleTracker<>>(context, all_states);
+  bt->Open();
+  int tc0 = bt->GetTrackingCount();
+  cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
+                                        "TestBundleA");
+  int tc1 = bt->GetTrackingCount();
+  EXPECT_EQ(1, tc1 - tc0);
+  bt->Close();
+}
+
+TEST_F(BundleTrackerTest, TestGetTrackingCountModify)
+{
+  auto bt = std::make_shared<BundleTracker<>>(context, all_states);
+  bt->Open();
+  Bundle bundle = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+  ASSERT_EQ(Bundle::State::STATE_INSTALLED, bundle.GetState());
+  int tc0 = bt->GetTrackingCount();
+
+  bundle.Start(); // bundle: INSTALLED(T)->RESOLVED(T)->STARTING(T)->ACTIVE(T)
+  ASSERT_EQ(Bundle::State::STATE_ACTIVE, bundle.GetState());
+  int tc1 = bt->GetTrackingCount();
+
+  EXPECT_EQ(3, tc1 - tc0);
+  bt->Close();
+}
+
+TEST_F(BundleTrackerTest, TestGetTrackingCountRemove)
+{
+  auto stateMask = Bundle::State::STATE_INSTALLED;
+  auto bt = std::make_shared<BundleTracker<>>(context, stateMask);
+  bt->Open();
+  Bundle bundle = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+  ASSERT_EQ(Bundle::State::STATE_INSTALLED, bundle.GetState());
+  int tc0 = bt->GetTrackingCount();
+
+  bundle.Start(); // bundle: INSTALLED(T)->RESOLVED(U)->STARTING(U)->ACTIVE(U)
+  ASSERT_EQ(Bundle::State::STATE_ACTIVE, bundle.GetState());
+  int tc1 = bt->GetTrackingCount();
+
+  EXPECT_EQ(1, tc1 - tc0);
+  bt->Close();
+}
+
+TEST_F(BundleTrackerTest, TestGetTrackingCountRemoveMethod)
+{
+  auto bt = std::make_shared<BundleTracker<>>(context, all_states);
+  bt->Open();
+  Bundle bundle = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+  ASSERT_EQ(Bundle::State::STATE_INSTALLED, bundle.GetState());
+  int tc0 = bt->GetTrackingCount();
+
+  // If Remove removes a bundle from being tracked, tracking count increments by 1
+  bt->Remove(bundle);
+  ASSERT_EQ(Bundle::State::STATE_INSTALLED, bundle.GetState());
+  int tc1 = bt->GetTrackingCount();
+
+  EXPECT_EQ(1, tc1 - tc0);
+
+  // If Remove doesn't remove a bundle from being tracked, tracking count stays the same
+  bt->Remove(bundle);
+  int tc2 = bt->GetTrackingCount();
+
+  EXPECT_EQ(0, tc2 - tc1);
+  bt->Close();
 }
 
 TEST_F(BundleTrackerTest, DemoTest)

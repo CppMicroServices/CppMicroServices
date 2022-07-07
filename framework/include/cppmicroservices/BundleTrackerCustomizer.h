@@ -25,6 +25,7 @@
 
 #include "cppmicroservices/Bundle.h"
 #include <optional>
+#include <type_traits>
 
 namespace cppmicroservices {
 
@@ -55,10 +56,14 @@ struct BundleTrackerCustomizer
     using TrackedType = T;
     using TrackedParamType = T;
 
-    static T ConvertToTrackedType(const Bundle)
+    static T ConvertToTrackedType(const Bundle& b)
     {
-      throw std::runtime_error("A custom BundleTrackerCustomizer instance is "
-                               "required for custom tracked objects.");
+      if constexpr (std::is_same_v<T, Bundle>) {
+        return b;
+      } else {
+        throw std::runtime_error("A custom BundleTrackerCustomizer instance is "
+                                 "required for custom tracked objects.");
+      }
     }
   };
 
@@ -115,6 +120,73 @@ struct BundleTrackerCustomizer
                              const BundleEvent& event,
                              TrackedParamType object) = 0;
 };
+
+// template<>
+// struct BundleTrackerCustomizer<void>
+// {
+
+//   struct TypeTraits
+//   {
+//     using TrackedType = Bundle;
+//     using TrackedParamType = Bundle;
+
+//     static Bundle ConvertToTrackedType(const Bundle& b) { return b; }
+//   };
+
+//   using TrackedParamType = typename TypeTraits::TrackedParamType;
+
+//   virtual ~BundleTrackerCustomizer() = default;
+
+//   /**
+//    * Called when a <code>Bundle</code> is being added to the <code>BundleTracker</code>
+//    * and the customizer constructor argument was nullptr.
+//    *
+//    * When the <code>BundleTracker</code> detects a Bundle that should be added to the tracker
+//    * based on the search parameters (state mask, context, etc.),
+//    * this method is called. This method should return the object to be tracked
+//    * for the specified <code>Bundle</code> if the <code>BundleTracker</code> is being extended.
+//    * Otherwise, return the <code>Bundle</code> itself. If the return is nullptr, the Bundle is not tracked.
+//    *
+//    * @param bundle The <code>Bundle</code> being added to the <code>BundleTracker</code>.
+//    * @param event the <code>BundleEvent</code> which was caught by the <code>BundleTracker</code>.
+//    *
+//    * @return The object to be tracked for the specified <code>Bundle</code> object or nullptr to avoid tracking the <code>Bundle</code>.
+//    *
+//    * @see BundleTrackerCustomizer:AddingBundle(Bundle, BundleEvent)
+//    */
+//   virtual std::optional<TrackedParamType> AddingBundle(
+//     const Bundle& bundle,
+//     const BundleEvent& event) = 0;
+
+//   /**
+//    * Called when a <code>Bundle</code> is modified that is being tracked by this <code>BundleTracker</code>.
+//    *
+//    * When a tracked bundle changes states, this method is called.
+//    *
+//    * @param bundle The tracked <code>Bundle</code> whose state has changed.
+//    * @param event The <code>BundleEvent</code> which was caught by the <code>BundleTracker</code>. Can be null.
+//    * @param object The tracked object corresponding to the tracked <code>Bundle</code> (returned from <code>AddingBundle</code>).
+//    *
+//    * @see BundleTrackerCustomizer:ModifiedBundle(Bundle, BundleEvent, std::shared_ptr<T>)
+//    */
+//   virtual void ModifiedBundle(const Bundle& bundle,
+//                               const BundleEvent& event,
+//                               TrackedParamType object) = 0;
+
+//   /**
+//    * Called when a <code>Bundle</code> is removed that is being tracked by this <code>BundleTracker</code>.
+//    *
+//    * @param bundle The tracked <code>Bundle</code> whose state has changed.
+//    * @param event The <code>BundleEvent</code> which was caught by the <code>BundleTracker</code>. Can be null.
+//    * @param object The tracked object corresponding to the tracked <code>Bundle</code> (returned from <code>AddingBundle</code>).
+//    *
+//    * @see BundleTrackerCustomizer:RemovedBundle(Bundle, BundleEvent, std::shared_ptr<T>)
+//    */
+//   virtual void RemovedBundle(const Bundle& bundle,
+//                              const BundleEvent& event,
+//                              TrackedParamType object) = 0;
+// };
+
 }
 
 #endif // CPPMICROSERVICES_BUNDLETRACKERCUSTOMIZER_H

@@ -19,13 +19,12 @@
  limitations under the License.
 
  =============================================================================*/
-//#include "cppmicroservices/BundleTracker.h"
+#include "cppmicroservices/BundleTracker.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/BundleTracker.h"
 
 #include "TestUtils.h"
 #include "gtest/gtest.h"
@@ -72,20 +71,14 @@ TEST_F(BundleTrackerTest, CreateTracker)
 TEST_F(BundleTrackerTest, TestIsEmpty)
 {
   auto bt =
-    std::make_shared<cppmicroservices::BundleTracker<>>(
-      context, all_states);
+    std::make_shared<cppmicroservices::BundleTracker<>>(context, all_states);
   ASSERT_TRUE(bt->IsEmpty());
 
   bt->Open();
-  //ASSERT_TRUE(bt.IsEmpty());
+  ASSERT_FALSE(bt->IsEmpty());
 
-  //Bundle bundleA =
-  //  cppmicroservices::testing::InstallLib(context, "TestBundleA");
-  //ASSERT_FALSE(bt.IsEmpty());
-//
-//  bt.Remove(bundleA);
-//  ASSERT_TRUE(bt.IsEmpty());
   bt->Close();
+  ASSERT_TRUE(bt->IsEmpty());
 }
 
 TEST_F(BundleTrackerTest, DemoTest)

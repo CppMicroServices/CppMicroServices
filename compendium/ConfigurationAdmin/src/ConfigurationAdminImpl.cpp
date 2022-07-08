@@ -696,7 +696,7 @@ ConfigurationAdminImpl::AddingService(
   // GetService can cause entry into user code, so don't hold a lock.
   auto managedService = cmContext.GetService(reference);
   if (!managedService) {
-    logger->Log(SeverityLevel::LOG_DEBUG,
+    logger->Log(SeverityLevel::LOG_WARNING,
                 "Ignoring ManagedService as a valid service could not be "
                 "obtained from the BundleContext");
     return nullptr;
@@ -750,6 +750,9 @@ ConfigurationAdminImpl::AddingService(
       properties = it->second->GetProperties();
     } catch (const std::runtime_error&) {
       // Configuration is being removed
+      logger->Log(SeverityLevel::LOG_WARNING,
+                  "Attempted to update a configuration which has been removed.",
+                  std::current_exception());
     }
     // Only send notifications for configuration objects that have been
     // Updated. 
@@ -757,11 +760,18 @@ ConfigurationAdminImpl::AddingService(
       PerformAsync([this, pid, managedService, properties] {
         notifyServiceUpdated(pid, *managedService, properties, *logger);
       });
+
+      logger->Log(
+        cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+        "Async configuration update queued for new ManagedService with PID " +
+          pid + ".");
     }
   }
+
   logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
               "New ManagedService with PID " + pid +
-                " has been added, and async Update has been queued.");
+                " has been added.");
+
   return std::make_shared<
     TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>(
     pid, std::move(managedService));
@@ -836,6 +846,10 @@ ConfigurationAdminImpl::AddingService(
         }
       } catch (const std::runtime_error&) {
         // Configuration is being removed
+        logger->Log(
+          SeverityLevel::LOG_WARNING,
+          "Attempted to update a configuration which has been removed.",
+          std::current_exception());
       }
     }
   }

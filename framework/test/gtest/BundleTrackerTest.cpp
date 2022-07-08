@@ -21,7 +21,6 @@
  =============================================================================*/
 #include "cppmicroservices/BundleTracker.h"
 #include "cppmicroservices/Bundle.h"
-#include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
@@ -123,25 +122,29 @@ TEST_F(BundleTrackerTest, TestGetTracked)
   EXPECT_EQ(3, tracked.size());
 
   bundleTracker->Close();
+  tracked = bundleTracker->GetTracked();
   EXPECT_EQ(0, tracked.size()) << "No objects should be tracked after Close()";
 }
 
 TEST_F(BundleTrackerTest, TestIsEmpty)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
-  EXPECT_TRUE(bundleTracker->IsEmpty()) << "Unopened BundleTracker should be empty";
+  EXPECT_TRUE(bundleTracker->IsEmpty())
+    << "Unopened BundleTracker should be empty";
 
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
   EXPECT_FALSE(bundleTracker->IsEmpty());
 
   bundleTracker->Close();
-  EXPECT_TRUE(bundleTracker->IsEmpty()) << "Closed BundleTracker should be empty";
+  EXPECT_TRUE(bundleTracker->IsEmpty())
+    << "Closed BundleTracker should be empty";
 }
 
 TEST_F(BundleTrackerTest, TestSize)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
-  EXPECT_EQ(0, bundleTracker->Size()) << "Size of unopened BundleTracker was not 0";
+  EXPECT_EQ(0, bundleTracker->Size())
+    << "Size of unopened BundleTracker was not 0";
 
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
   EXPECT_EQ(2, bundleTracker->Size());
@@ -151,13 +154,15 @@ TEST_F(BundleTrackerTest, TestSize)
   EXPECT_EQ(3, bundleTracker->Size());
 
   bundleTracker->Close();
-  EXPECT_EQ(0, bundleTracker->Size()) << "Size of closed BundleTracker was not 0";
+  EXPECT_EQ(0, bundleTracker->Size())
+    << "Size of closed BundleTracker was not 0";
 }
 
 TEST_F(BundleTrackerTest, TestGetTrackingCountClosed)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
-  EXPECT_EQ(-1, bundleTracker->GetTrackingCount()) << "Tracking count of unopened BundleTracker was not -1";
+  EXPECT_EQ(-1, bundleTracker->GetTrackingCount())
+    << "Tracking count of unopened BundleTracker was not -1";
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
   bundleTracker->Close();
   //EXPECT_EQ(-1, bundleTracker->GetTrackingCount()); Expected behavior after Close() to be clarified
@@ -182,11 +187,13 @@ TEST_F(BundleTrackerTest, TestGetTrackingCountModify)
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
   Bundle bundle = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
-  ASSERT_EQ(Bundle::State::STATE_INSTALLED, bundle.GetState()) << "Test bundle failed to install";
+  ASSERT_EQ(Bundle::State::STATE_INSTALLED, bundle.GetState())
+    << "Test bundle failed to install";
   int trackingCount0 = bundleTracker->GetTrackingCount();
 
   bundle.Start(); // bundle: INSTALLED(T)->RESOLVED(T)->STARTING(T)->ACTIVE(T)
-  ASSERT_EQ(Bundle::State::STATE_ACTIVE, bundle.GetState()) << "Test bundle failed to start";
+  ASSERT_EQ(Bundle::State::STATE_ACTIVE, bundle.GetState())
+    << "Test bundle failed to start";
   int trackingCount1 = bundleTracker->GetTrackingCount();
 
   EXPECT_EQ(3, trackingCount1 - trackingCount0)

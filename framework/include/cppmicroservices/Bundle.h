@@ -240,10 +240,10 @@ public:
     STOP_TRANSIENT = 0x00000001
   };
 
-  Bundle(const Bundle&);            // = default
-  Bundle(Bundle&&);                 // = default
-  Bundle& operator=(const Bundle&); // = default
-  Bundle& operator=(Bundle&&);      // = default
+  Bundle(const Bundle&);                // = default
+  Bundle(Bundle&&) noexcept;            // = default
+  Bundle& operator=(const Bundle&);     // = default
+  Bundle& operator=(Bundle&&) noexcept; // = default
 
   /**
    * Constructs an invalid %Bundle object.

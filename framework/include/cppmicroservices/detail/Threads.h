@@ -62,7 +62,7 @@ public:
 
 #ifdef US_ENABLE_THREADING_SUPPORT
 
-    UniqueLock(UniqueLock&& o)
+    UniqueLock(UniqueLock&& o) noexcept
       : m_Lock(std::move(o.m_Lock))
     {}
 

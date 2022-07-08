@@ -38,8 +38,8 @@ class Properties : public detail::MultiThreaded<>
 public:
   explicit Properties(const AnyMap& props);
 
-  Properties(Properties&& o);
-  Properties& operator=(Properties&& o);
+  Properties(Properties&& o) noexcept;
+  Properties& operator=(Properties&& o) noexcept;
 
   Any Value_unlocked(const std::string& key) const;
   Any Value_unlocked(int index) const;
@@ -66,7 +66,7 @@ public:
     , l(lock ? props.Lock() : Properties::UniqueLock())
   {}
 
-  PropertiesHandle(PropertiesHandle&& o)
+  PropertiesHandle(PropertiesHandle&& o) noexcept
     : props(o.props)
     , l(std::move(o.l))
   {}

@@ -61,7 +61,7 @@ class US_Framework_EXPORT ServiceRegistrationBase
 public:
   ServiceRegistrationBase(const ServiceRegistrationBase& reg);
 
-  ServiceRegistrationBase(ServiceRegistrationBase&& reg);
+  ServiceRegistrationBase(ServiceRegistrationBase&& reg) noexcept;
 
   /**
    * A boolean conversion operator converting this ServiceRegistrationBase object
@@ -178,7 +178,7 @@ public:
 
   ServiceRegistrationBase& operator=(
     const ServiceRegistrationBase& registration);
-  ServiceRegistrationBase& operator=(ServiceRegistrationBase&& registration);
+  ServiceRegistrationBase& operator=(ServiceRegistrationBase&& registration) noexcept;
 
 private:
   friend class ServiceRegistry;

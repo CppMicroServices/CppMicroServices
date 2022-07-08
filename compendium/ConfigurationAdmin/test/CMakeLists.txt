@@ -121,6 +121,7 @@ endif()
 set(_test_bundles
   ManagedServiceAndFactoryBundle
   TestBundleManagedServiceFactory
+  TestBundleMultipleManagedServiceFactory
   )
 
 target_link_libraries(${us_configurationadmin_test_exe_name}

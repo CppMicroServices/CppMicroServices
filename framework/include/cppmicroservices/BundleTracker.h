@@ -26,8 +26,10 @@
 #include <chrono>
 #include <map>
 #include <optional>
+#include <type_traits>
 
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/BundleTrackerCustomizer.h"
 
 namespace cppmicroservices {

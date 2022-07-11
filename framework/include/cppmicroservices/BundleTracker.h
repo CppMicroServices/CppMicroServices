@@ -95,9 +95,10 @@ public:
    *                   If the customizer is nullptr, then the callbacks in this <code>BundleTracker</code> will 
    *                   be used instead (default or can be overridden).
    */
-  BundleTracker(const BundleContext& context,
-                StateType stateMask,
-                BundleTrackerCustomizer<T>* customizer = nullptr);
+  BundleTracker(
+    const BundleContext& context,
+    StateType stateMask,
+    std::shared_ptr<BundleTrackerCustomizer<T>> customizer = nullptr);
 
   /**
    * Automatically closes the <code>BundleTracker</code>

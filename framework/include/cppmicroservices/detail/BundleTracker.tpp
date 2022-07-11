@@ -42,9 +42,10 @@ BundleTracker<T>::~BundleTracker()
 }
 
 template<class T>
-BundleTracker<T>::BundleTracker(const BundleContext& context,
-                                StateType stateMask,
-                                _BundleTrackerCustomizer* customizer)
+BundleTracker<T>::BundleTracker(
+  const BundleContext& context,
+  StateType stateMask,
+  std::shared_ptr<_BundleTrackerCustomizer> customizer)
   : d(new _BundleTrackerPrivate(this, context, stateMask, customizer))
 {
 }
@@ -64,7 +65,8 @@ void BundleTracker<T>::Open()
     DIAG_LOG(*d->context.GetLogSink())
       << "BundleTracker<T>::Open: " << d->stateMask;
 
-    t.reset(new _TrackedBundle(this, d->customizer));
+    t.reset(new _TrackedBundle(
+      this, d->customizer ? d->customizer.get() : d->q_func()));
     try {
       // Attempt to drop old listener
       d->context.RemoveListener(std::move(d->listenerToken));

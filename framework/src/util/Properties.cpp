@@ -45,11 +45,11 @@ Properties::Properties(AnyMap&& p)
   props_check::ValidateAnyMap(props);
 }
 
-Properties::Properties(Properties&& o)
+Properties::Properties(Properties&& o) noexcept
   : props(std::move(o.props))
 {}
 
-Properties& Properties::operator=(Properties&& o)
+Properties& Properties::operator=(Properties&& o) noexcept
 {
   props = std::move(o.props);
   return *this;

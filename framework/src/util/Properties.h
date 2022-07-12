@@ -39,8 +39,8 @@ public:
   explicit Properties(const AnyMap& props);
   explicit Properties(AnyMap&& props);
 
-  Properties(Properties&& o);
-  Properties& operator=(Properties&& o);
+  Properties(Properties&& o) noexcept;
+  Properties& operator=(Properties&& o) noexcept;
 
   std::pair<Any, bool> Value_unlocked(const std::string& key,
                                       bool matchCase = false) const;
@@ -63,7 +63,7 @@ public:
     , l(lock ? props.Lock() : Properties::UniqueLock())
   {}
 
-  PropertiesHandle(PropertiesHandle&& o)
+  PropertiesHandle(PropertiesHandle&& o) noexcept
     : props(o.props)
     , l(std::move(o.l))
   {}

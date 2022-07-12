@@ -51,9 +51,9 @@ public:
 
   ListenerToken& operator=(const ListenerToken&) = delete;
 
-  ListenerToken(ListenerToken&& other);
+  ListenerToken(ListenerToken&& other) noexcept;
 
-  ListenerToken& operator=(ListenerToken&& other);
+  ListenerToken& operator=(ListenerToken&& other) noexcept;
 
   /**
      * Tests this %ListenerToken object for validity.

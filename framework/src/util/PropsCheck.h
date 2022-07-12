@@ -67,9 +67,8 @@ inline void ValidateAnyMap(const cppmicroservices::AnyMap& am)
 {
   std::vector<std::string_view> keys(am.size());
   uint32_t currIndex = 0;
-  for (auto& [key, _] : am) {
-    US_UNUSED(_);
-    keys[currIndex++] = key;
+  for (auto& kv_pair : am) {
+    keys[currIndex++] = kv_pair.first;
   }
 
   if (am.size() > 1) {

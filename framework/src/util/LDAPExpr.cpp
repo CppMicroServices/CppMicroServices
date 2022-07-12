@@ -290,8 +290,9 @@ bool LDAPExpr::IsSimple(const StringList& keywords,
     }
   } else if (d->m_operator == OR) {
     for (const auto& m_arg : d->m_args) {
-      if (!m_arg.IsSimple(keywords, cache, matchCase))
+      if (!m_arg.IsSimple(keywords, cache, matchCase)) {
         return false;
+      }
     }
     return true;
   }
@@ -313,14 +314,16 @@ bool LDAPExpr::Evaluate(const PropertiesHandle& p, bool matchCase) const
     switch (d->m_operator) {
       case AND:
         for (const auto& m_arg : d->m_args) {
-          if (!m_arg.Evaluate(p, matchCase))
+          if (!m_arg.Evaluate(p, matchCase)) {
             return false;
+          }
         }
         return true;
       case OR:
         for (const auto& m_arg : d->m_args) {
-          if (m_arg.Evaluate(p, matchCase))
+          if (m_arg.Evaluate(p, matchCase)) {
             return true;
+          }
         }
         return false;
       case NOT:
@@ -354,14 +357,16 @@ bool LDAPExpr::Evaluate(const AnyMap& p, bool matchCase) const
     switch (d->m_operator) {
       case AND:
         for (const auto& m_arg : d->m_args) {
-          if (!m_arg.Evaluate(p, matchCase))
+          if (!m_arg.Evaluate(p, matchCase)) {
             return false;
+          }
         }
         return true;
       case OR:
         for (const auto& m_arg : d->m_args) {
-          if (m_arg.Evaluate(p, matchCase))
+          if (m_arg.Evaluate(p, matchCase)) {
             return true;
+          }
         }
         return false;
       case NOT:
@@ -374,10 +379,13 @@ bool LDAPExpr::Evaluate(const AnyMap& p, bool matchCase) const
 
 bool LDAPExpr::Compare(const Any& obj, int op, const std::string_view s) const
 {
-  if (obj.Empty())
+  if (obj.Empty()) {
     return false;
-  if (op == EQ && s == LDAPExprConstants::WILDCARD_STRING())
+  }
+
+  if (op == EQ && s == LDAPExprConstants::WILDCARD_STRING()) {
     return true;
+  }
 
   try {
     const std::type_info& objType = obj.Type();
@@ -386,20 +394,23 @@ bool LDAPExpr::Compare(const Any& obj, int op, const std::string_view s) const
     } else if (objType == typeid(std::vector<std::string>)) {
       const auto& list = ref_any_cast<std::vector<std::string>>(obj);
       for (std::size_t it = 0; it != list.size(); it++) {
-        if (CompareString(list[it], op, s))
+        if (CompareString(list[it], op, s)) {
           return true;
+        }
       }
     } else if (objType == typeid(std::list<std::string>)) {
       const auto& list = ref_any_cast<std::list<std::string>>(obj);
       for (const auto& it : list) {
-        if (CompareString(it, op, s))
+        if (CompareString(it, op, s)) {
           return true;
+        }
       }
     } else if (objType == typeid(char)) {
       return CompareString(std::string(1, ref_any_cast<char>(obj)), op, s);
     } else if (objType == typeid(bool)) {
-      if (op == LE || op == GE)
+      if (op == LE || op == GE) {
         return false;
+      }
 
       std::string boolVal = any_cast<bool>(obj) ? "true" : "false";
       return std::equal(s.begin(), s.end(), boolVal.begin(), stricomp);
@@ -468,8 +479,9 @@ bool LDAPExpr::Compare(const Any& obj, int op, const std::string_view s) const
     } else if (objType == typeid(std::vector<Any>)) {
       const auto& list = ref_any_cast<std::vector<Any>>(obj);
       for (std::size_t it = 0; it != list.size(); it++) {
-        if (Compare(list[it], op, s))
+        if (Compare(list[it], op, s)) {
           return true;
+        }
       }
     }
   } catch (...) {
@@ -532,8 +544,9 @@ std::string LDAPExpr::FixupString(const std::string_view s)
   for (std::size_t i = 0; i < len; i++) {
     char c = s.at(i);
     if (!std::isspace(c)) {
-      if (std::isupper(c))
+      if (std::isupper(c)) {
         c = std::tolower(c);
+      }
       sb.append(1, c);
     }
   }
@@ -545,15 +558,21 @@ bool LDAPExpr::PatSubstr(const std::string_view s,
                          const std::string_view pat,
                          int pi)
 {
-  if (pat.size() - pi == 0)
+  if (pat.size() - pi == 0) {
     return s.size() - si == 0;
+  }
+
   if (pat[pi] == LDAPExprConstants::WILDCARD()) {
     pi++;
     for (;;) {
-      if (PatSubstr(s, si, pat, pi))
+      if (PatSubstr(s, si, pat, pi)) {
         return true;
-      if (s.size() - si == 0)
+      }
+
+      if (s.size() - si == 0) {
         return false;
+      }
+
       si++;
     }
   } else {
@@ -575,8 +594,9 @@ bool LDAPExpr::PatSubstr(const std::string_view s, const std::string_view pat)
 LDAPExpr LDAPExpr::ParseExpr(ParseState& ps)
 {
   ps.skipWhite();
-  if (!ps.prefix("("))
+  if (!ps.prefix("(")) {
     ps.error(LDAPExprConstants::MALFORMED());
+  }
 
   int op;
   ps.skipWhite();
@@ -599,8 +619,9 @@ LDAPExpr LDAPExpr::ParseExpr(ParseState& ps)
   } while (ps.peek() == '(');
 
   std::size_t n = v.size();
-  if (!ps.prefix(")") || n == 0 || (op == NOT && n > 1))
+  if (!ps.prefix(")") || n == 0 || (op == NOT && n > 1)) {
     ps.error(LDAPExprConstants::MALFORMED());
+  }
 
   return LDAPExpr(op, v);
 }
@@ -608,24 +629,28 @@ LDAPExpr LDAPExpr::ParseExpr(ParseState& ps)
 LDAPExpr LDAPExpr::ParseSimple(ParseState& ps)
 {
   std::string attrName = ps.getAttributeName();
-  if (attrName.empty())
+  if (attrName.empty()) {
     ps.error(LDAPExprConstants::MALFORMED());
+  }
+
   int op = 0;
-  if (ps.prefix("="))
+  if (ps.prefix("=")) {
     op = EQ;
-  else if (ps.prefix("<="))
+  } else if (ps.prefix("<=")) {
     op = LE;
-  else if (ps.prefix(">="))
+  } else if (ps.prefix(">=")) {
     op = GE;
-  else if (ps.prefix("~="))
+  } else if (ps.prefix("~=")) {
     op = APPROX;
-  else {
+  } else {
     //      System.out.println("undef op='" + ps.peek() + "'");
     ps.error(LDAPExprConstants::OPERATOR()); // Does not return
   }
   std::string attrValue = ps.getAttributeValue();
-  if (!ps.prefix(")"))
+  if (!ps.prefix(")")) {
     ps.error(LDAPExprConstants::MALFORMED());
+  }
+
   return LDAPExpr(op, attrName, attrValue);
 }
 
@@ -692,8 +717,9 @@ LDAPExpr::ParseState::ParseState(const std::string& str)
 bool LDAPExpr::ParseState::prefix(const std::string& pre)
 {
   std::string::iterator startIter = m_str.begin() + m_pos;
-  if (!std::equal(pre.begin(), pre.end(), startIter))
+  if (!std::equal(pre.begin(), pre.end(), startIter)) {
     return false;
+  }
   m_pos += pre.size();
   return true;
 }

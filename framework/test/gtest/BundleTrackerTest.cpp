@@ -28,6 +28,10 @@
 #include "TestUtils.h"
 #include "gtest/gtest.h"
 
+#ifdef GetObject
+#  undef GetObject
+#endif
+
 using namespace cppmicroservices;
 
 class BundleTrackerTest : public ::testing::Test
@@ -35,6 +39,10 @@ class BundleTrackerTest : public ::testing::Test
 protected:
   Framework framework;
   BundleContext context;
+  BundleTracker<>::StateType all_states =
+    Bundle::State::STATE_ACTIVE | Bundle::State::STATE_INSTALLED |
+    Bundle::State::STATE_RESOLVED | Bundle::State::STATE_STARTING |
+    Bundle::State::STATE_STOPPING | Bundle::State::STATE_UNINSTALLED;
 
 public:
   BundleTrackerTest()
@@ -55,25 +63,20 @@ public:
   }
 };
 
-auto all_states =
-  Bundle::State::STATE_ACTIVE | Bundle::State::STATE_INSTALLED |
-  Bundle::State::STATE_RESOLVED | Bundle::State::STATE_STARTING |
-  Bundle::State::STATE_STOPPING | Bundle::State::STATE_UNINSTALLED;
-
 TEST_F(BundleTrackerTest, CreateTracker)
 {
-  BundleTracker bundleTracker(context, all_states);
-  EXPECT_TRUE(bundleTracker.IsEmpty());
-  EXPECT_EQ(0, bundleTracker.Size());
+  ASSERT_NO_THROW(BundleTracker bundleTracker(context, all_states))
+    << "Creation of BundleTracker failed";
 }
 
-TEST_F(BundleTrackerTest, TestGetBundles)
+TEST_F(BundleTrackerTest, TestGetBundlesMethod)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   std::vector<Bundle> bundles = bundleTracker->GetBundles();
-  EXPECT_EQ(0, bundles.size()) << "No bundles should be tracked before Open()";
-  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
+  EXPECT_EQ(0, bundles.size())
+    << "GetBundles() should return an empty vector before Open()";
 
+  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
   Bundle bundleMain = cppmicroservices::testing::GetBundle("main", context);
   Bundle bundleSys =
     cppmicroservices::testing::GetBundle("system_bundle", context);
@@ -88,23 +91,36 @@ TEST_F(BundleTrackerTest, TestGetBundles)
   bool bundleATracked =
     std::find(bundles.begin(), bundles.end(), bundleA) != bundles.end();
 
-  EXPECT_TRUE(mainTracked);
-  EXPECT_TRUE(sysTracked);
-  EXPECT_TRUE(bundleATracked);
-  EXPECT_EQ(3, bundles.size());
+  EXPECT_TRUE(mainTracked) << "GetBundles() should include the main bundle";
+  EXPECT_TRUE(sysTracked) << "GetBundles() should include the system bundle";
+  EXPECT_TRUE(bundleATracked) << "GetBundles() should include the test bundle";
+  EXPECT_EQ(3, bundles.size())
+    << "GetBundles() should include exactly 3 bundles";
 
   bundleTracker->Close();
   bundles = bundleTracker->GetBundles();
-  EXPECT_EQ(0, bundles.size()) << "No bundles should be tracked after Close()";
+  EXPECT_EQ(0, bundles.size())
+    << "GetBundles() should return an empty vector after Close()";
 }
 
-TEST_F(BundleTrackerTest, TestGetTracked)
+TEST_F(BundleTrackerTest, TestGetObjectMethod) {
+  auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
+  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
+  Bundle bundleA = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+  
+  EXPECT_EQ(bundleA, bundleTracker->GetObject(bundleA));
+  // TODO: test a case where GetObject returns null
+}
+
+
+TEST_F(BundleTrackerTest, TestGetTrackedMethod)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   auto tracked = bundleTracker->GetTracked();
   EXPECT_EQ(0, tracked.size()) << "No objects should be tracked before Open()";
-  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
 
+  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
   Bundle bundleMain = cppmicroservices::testing::GetBundle("main", context);
   Bundle bundleSys =
     cppmicroservices::testing::GetBundle("system_bundle", context);
@@ -126,7 +142,7 @@ TEST_F(BundleTrackerTest, TestGetTracked)
   EXPECT_EQ(0, tracked.size()) << "No objects should be tracked after Close()";
 }
 
-TEST_F(BundleTrackerTest, TestIsEmpty)
+TEST_F(BundleTrackerTest, TestIsEmptyMethod)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   EXPECT_TRUE(bundleTracker->IsEmpty())
@@ -140,7 +156,7 @@ TEST_F(BundleTrackerTest, TestIsEmpty)
     << "Closed BundleTracker should be empty";
 }
 
-TEST_F(BundleTrackerTest, TestSize)
+TEST_F(BundleTrackerTest, TestSizeMethod)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   EXPECT_EQ(0, bundleTracker->Size())
@@ -158,7 +174,7 @@ TEST_F(BundleTrackerTest, TestSize)
     << "Size of closed BundleTracker was not 0";
 }
 
-TEST_F(BundleTrackerTest, TestGetTrackingCountClosed)
+TEST_F(BundleTrackerTest, TestGetTrackingCountMethodWhenClosed)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   EXPECT_EQ(-1, bundleTracker->GetTrackingCount())
@@ -168,20 +184,22 @@ TEST_F(BundleTrackerTest, TestGetTrackingCountClosed)
   //EXPECT_EQ(-1, bundleTracker->GetTrackingCount()); Expected behavior after Close() to be clarified
 }
 
-TEST_F(BundleTrackerTest, TestGetTrackingCountAdd)
+TEST_F(BundleTrackerTest, TestGetTrackingCountMethodAfterBundleAdded)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
   int trackingCount0 = bundleTracker->GetTrackingCount();
+
   cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
                                         "TestBundleA");
   int trackingCount1 = bundleTracker->GetTrackingCount();
+
   EXPECT_EQ(1, trackingCount1 - trackingCount0)
     << "Tracking count didn't increment by 1 after a bundle was added";
   bundleTracker->Close();
 }
 
-TEST_F(BundleTrackerTest, TestGetTrackingCountModify)
+TEST_F(BundleTrackerTest, TestGetTrackingCountMethodAfterBundleModified)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
@@ -197,11 +215,12 @@ TEST_F(BundleTrackerTest, TestGetTrackingCountModify)
   int trackingCount1 = bundleTracker->GetTrackingCount();
 
   EXPECT_EQ(3, trackingCount1 - trackingCount0)
-    << "Tracking count didn't increment by 1 after a bundle was modified";
+    << "Tracking count didn't increment by 3 after a bundle was modified 3 "
+       "times";
   bundleTracker->Close();
 }
 
-TEST_F(BundleTrackerTest, TestGetTrackingCountRemove)
+TEST_F(BundleTrackerTest, TestGetTrackingCountMethodAfterBundleRemoved)
 {
   auto stateMask = Bundle::State::STATE_INSTALLED;
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, stateMask);
@@ -222,7 +241,7 @@ TEST_F(BundleTrackerTest, TestGetTrackingCountRemove)
   bundleTracker->Close();
 }
 
-TEST_F(BundleTrackerTest, TestGetTrackingCountRemoveMethod)
+TEST_F(BundleTrackerTest, TestGetTrackingCountMethodAfterRemoveMethod)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
@@ -250,9 +269,26 @@ TEST_F(BundleTrackerTest, TestGetTrackingCountRemoveMethod)
   bundleTracker->Close();
 }
 
-TEST_F(BundleTrackerTest, TestRemove)
+TEST_F(BundleTrackerTest, TestRemoveMethod)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
+  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
+  Bundle bundle = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+  auto bundlesTracked = bundleTracker->GetBundles();
+  bool mainTracked =
+    std::find(bundlesTracked.begin(), bundlesTracked.end(), bundle) !=
+    bundlesTracked.end();
+  ASSERT_TRUE(mainTracked) << "BundleTracker failed to track a bundle";
+
+  bundleTracker->Remove(bundle);
+  bundlesTracked = bundleTracker->GetBundles();
+  bool mainStillTracked =
+    std::find(bundlesTracked.begin(), bundlesTracked.end(), bundle) !=
+    bundlesTracked.end();
+
+  EXPECT_FALSE(mainStillTracked)
+    << "Calling Remove() didn't removed tracked bundle from being tracked";
 }
 
 TEST_F(BundleTrackerTest, TestOpenOpened)
@@ -275,28 +311,9 @@ TEST_F(BundleTrackerTest, TestOpenOpened)
   bundleTracker->Close();
 }
 
-TEST_F(BundleTrackerTest, DemoTest)
+TEST_F(BundleTrackerTest, TestAddingBundleMethod)
 {
-  Bundle bundle;
-  ASSERT_FALSE(bundle);
-
-  bundle = cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
-                                                 "TestBundleA");
-  ASSERT_NO_THROW(
-    BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, bundle, bundle));
-  ASSERT_TRUE(bundle);
-  ASSERT_EQ(bundle.GetSymbolicName(), "TestBundleA");
-  ASSERT_EQ(cppmicroservices::Bundle::State::STATE_INSTALLED,
-            bundle.GetState());
-
-  bundle.Start();
-  ASSERT_EQ(cppmicroservices::Bundle::State::STATE_ACTIVE, bundle.GetState());
-
-  bundle.Stop();
-  ASSERT_EQ(cppmicroservices::Bundle::State::STATE_RESOLVED, bundle.GetState());
-
-  bundle.Uninstall();
-  ASSERT_EQ(cppmicroservices::Bundle::State::STATE_UNINSTALLED,
-            bundle.GetState());
-  ASSERT_THROW(bundle.Start(), std::logic_error);
+  auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
+  Bundle bundle = Bundle();
+  EXPECT_EQ(bundle, bundleTracker->AddingBundle(bundle, BundleEvent()));
 }

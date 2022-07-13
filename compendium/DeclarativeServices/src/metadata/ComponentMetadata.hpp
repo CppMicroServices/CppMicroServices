@@ -28,6 +28,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <cppmicroservices/ServiceProperties.h>
+
 #include "ReferenceMetadata.hpp"
 #include "ServiceMetadata.hpp"
 
@@ -45,7 +47,8 @@ struct ComponentMetadata
     : activateMethodName("Activate")
     , deactivateMethodName("Deactivate")
     , modifiedMethodName("Modified")
-  {}
+  {
+  }
 
   std::string name;
   bool enabled{ true };
@@ -56,11 +59,11 @@ struct ComponentMetadata
   std::string modifiedMethodName;
   std::vector<ReferenceMetadata> refsMetadata;
   ServiceMetadata serviceMetadata;
-  std::unordered_map<std::string, cppmicroservices::Any> properties;
+  ServiceProperties properties;
   std::string configurationPolicy;
   std::vector<std::string> configurationPids;
   std::string factoryComponentID;
-  std::unordered_map<std::string, cppmicroservices::Any> factoryComponentProperties;
+  ServiceProperties factoryComponentProperties;
 };
 }
 }

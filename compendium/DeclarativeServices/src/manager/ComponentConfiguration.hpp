@@ -83,8 +83,7 @@ public:
   /**
    * Returns a map with properties specific to this component configuration
    */
-  virtual std::unordered_map<std::string, cppmicroservices::Any> GetProperties()
-    const = 0;
+  virtual ServiceProperties GetProperties() const = 0;
 
   /**
    * Returns the bundle that contains this component

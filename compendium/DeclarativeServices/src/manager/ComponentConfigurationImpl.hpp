@@ -56,7 +56,8 @@ struct ListenerToken final
   ListenerToken(std::string pid, const ListenerTokenId tokenId)
     : pid(std::move(pid))
     , tokenId(std::move(tokenId))
-  {}
+  {
+  }
   std::string pid;
   ListenerTokenId tokenId;
 };
@@ -122,8 +123,7 @@ public:
    * These properties must include \c ComponentConstants::COMPONENT_NAME and
    * \c ComponentConstants::COMPONENT_ID
    */
-  std::unordered_map<std::string, cppmicroservices::Any> GetProperties()
-    const override;
+  ServiceProperties GetProperties() const override;
 
   /** @copydoc ComponentConfiguration::GetBundle()
    *
@@ -140,7 +140,7 @@ public:
    */
   ComponentState GetConfigState() const override;
 
-   /**
+  /**
    * This method returns the {@link ConfigurationNotifier} object 
    */
   std::shared_ptr<ConfigurationNotifier> GetConfigNotifier() const

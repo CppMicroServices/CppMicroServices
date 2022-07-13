@@ -127,8 +127,7 @@ void ComponentConfigurationImpl::Stop()
   configListenerTokens.clear();
 }
 
-std::unordered_map<std::string, cppmicroservices::Any>
-ComponentConfigurationImpl::GetProperties() const
+ServiceProperties ComponentConfigurationImpl::GetProperties() const
 {
   if (metadata->factoryComponentID.empty()) {
     // This is not a factory component
@@ -311,7 +310,8 @@ public:
   SatisfiedFunctor(std::string skipKeyName)
     : state(true)
     , skipKey(std::move(skipKeyName))
-  {}
+  {
+  }
   SatisfiedFunctor(const SatisfiedFunctor& cpy) = default;
   SatisfiedFunctor(SatisfiedFunctor&& cpy) = default;
   SatisfiedFunctor& operator=(const SatisfiedFunctor& cpy) = default;

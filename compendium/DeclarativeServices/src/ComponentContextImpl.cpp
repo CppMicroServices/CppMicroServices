@@ -94,8 +94,7 @@ void ComponentContextImpl::InitializeServicesCache()
   }
 }
 
-std::unordered_map<std::string, cppmicroservices::Any>
-ComponentContextImpl::GetProperties() const
+ServiceProperties ComponentContextImpl::GetProperties() const
 {
   const auto configManagerPtr = configManager.lock();
   if (!configManagerPtr) {

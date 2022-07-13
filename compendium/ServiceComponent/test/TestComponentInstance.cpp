@@ -68,20 +68,23 @@ public:
     : foo(nullptr)
     , bar(nullptr)
     , activated(false)
-  {}
+  {
+  }
 
   TestServiceImpl1(const std::shared_ptr<ServiceDependency1>& f,
                    const std::shared_ptr<ServiceDependency2>& b)
     : foo(f)
     , bar(b)
     , activated(false)
-  {}
+  {
+  }
 
   TestServiceImpl1(const std::shared_ptr<ServiceDependency2>& b)
     : foo(nullptr)
     , bar(b)
     , activated(false)
-  {}
+  {
+  }
 
   virtual ~TestServiceImpl1() {}
 
@@ -131,9 +134,7 @@ private:
 class MockComponentContext : public ComponentContext
 {
 public:
-  MOCK_CONST_METHOD0(
-    GetProperties,
-    std::unordered_map<std::string, cppmicroservices::Any>(void));
+  MOCK_CONST_METHOD0(GetProperties, cppmicroservices::ServiceProperties(void));
   MOCK_CONST_METHOD0(GetBundleContext, cppmicroservices::BundleContext(void));
   MOCK_CONST_METHOD0(GetUsingBundle, cppmicroservices::Bundle(void));
   MOCK_CONST_METHOD0(GetServiceReference,

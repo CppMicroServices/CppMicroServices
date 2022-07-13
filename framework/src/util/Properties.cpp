@@ -22,6 +22,7 @@
 
 #include "Properties.h"
 
+#include <iostream>
 #include <limits>
 #include <stdexcept>
 
@@ -36,18 +37,29 @@ const Any Properties::emptyAny;
 Properties::Properties(const AnyMap& p)
   : props(p)
 {
+  if (p.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    throw std::runtime_error(
+      "The provided AnyMap does not have case-insensitive keys.");
+  }
+
   props_check::ValidateAnyMap(props);
 }
 
 Properties::Properties(AnyMap&& p)
   : props(std::move(p))
 {
+  if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    throw std::runtime_error(
+      "The provided AnyMap does not have case-insensitive keys.");
+  }
+
   props_check::ValidateAnyMap(props);
 }
 
 Properties::Properties(Properties&& o) noexcept
   : props(std::move(o.props))
-{}
+{
+}
 
 Properties& Properties::operator=(Properties&& o) noexcept
 {
@@ -58,23 +70,20 @@ Properties& Properties::operator=(Properties&& o) noexcept
 std::pair<Any, bool> Properties::Value_unlocked(const std::string& key,
                                                 bool matchCase) const
 {
-  // Case-sensitive search first
-  auto& uo = props.uo_m();
-  auto csItr = uo.find(key);
-  if (csItr != uo.end()) {
-    return std::make_pair(csItr->second, true);
+  auto ciItr = props.find(key);
+  if (ciItr == props.end()) {
+    return std::make_pair(emptyAny, false);
   }
 
-  if (!matchCase) {
-    // Case-insensitive search after
-    auto& uoci = props.uoci_m();
-    auto ciItr = uoci.find(key);
-    if (ciItr != uoci.end()) {
+  if (matchCase) {
+    if (ciItr->first == key) {
       return std::make_pair(ciItr->second, true);
+    } else {
+      return std::make_pair(emptyAny, false);
     }
   }
 
-  return std::make_pair(emptyAny, false);
+  return std::make_pair(ciItr->second, true);
 }
 
 std::vector<std::string> Properties::Keys_unlocked() const

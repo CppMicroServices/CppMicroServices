@@ -65,8 +65,7 @@ public:
    *
    * @return The properties for this Component Context.
    */
-  virtual std::unordered_map<std::string, cppmicroservices::Any> GetProperties()
-    const = 0;
+  virtual ServiceProperties GetProperties() const = 0;
 
   /**
    * Returns the {@link BundleContext} of the bundle which contains this

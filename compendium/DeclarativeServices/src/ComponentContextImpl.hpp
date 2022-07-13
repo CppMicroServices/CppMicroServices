@@ -68,8 +68,7 @@ public:
    * \return a map of string and cppmicroservices::Any key-value pairs
    * \throws {@link ComponentException} if this {@link ComponentContext} is invalid
    */
-  std::unordered_map<std::string, cppmicroservices::Any> GetProperties()
-    const override;
+  ServiceProperties GetProperties() const override;
 
   /**
    * Returns the service object for the specified reference name.

@@ -25,6 +25,8 @@
 
 #include <iostream>
 
+#include <cppmicroservices/ServiceProperties.h>
+
 #include "ComponentDescriptionDTO.hpp"
 #include "SatisfiedReferenceDTO.hpp"
 #include "UnsatisfiedReferenceDTO.hpp"
@@ -108,7 +110,7 @@ struct US_ServiceComponent_EXPORT ComponentConfigurationDTO
    *
    * @see ComponentContext#GetProperties()
    */
-  std::unordered_map<std::string, cppmicroservices::Any> properties;
+  ServiceProperties properties;
 
   /**
    * The satisfied references.

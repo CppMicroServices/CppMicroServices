@@ -113,7 +113,8 @@ private:
 
     iterator_base(iter_type type)
       : type(type)
-    {}
+    {
+    }
 
   public:
     using value_type = any_map::value_type;

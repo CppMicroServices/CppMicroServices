@@ -55,7 +55,8 @@ class ComponentContextImplTest : public ::testing::Test
 protected:
   ComponentContextImplTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   virtual ~ComponentContextImplTest() = default;
 
   virtual void SetUp() { framework.Start(); }
@@ -111,7 +112,7 @@ TEST_F(ComponentContextImplTest, VerifyComponentProperties)
     std::make_shared<testing::NiceMock<MockComponentConfiguration>>();
   std::shared_ptr<ComponentContext> ctxt =
     std::make_shared<ComponentContextImpl>(mockConfig);
-  std::unordered_map<std::string, cppmicroservices::Any> fakeProps;
+  ServiceProperties fakeProps;
   fakeProps["foo"] = std::string("bar");
   EXPECT_CALL(*mockConfig, GetProperties())
     .Times(1)

@@ -24,6 +24,7 @@
 #define CPPMICROSERVICES_SERVICEPROPERTIES_H
 
 #include "cppmicroservices/Any.h"
+#include "cppmicroservices/AnyMap.h"
 
 #include <string>
 #include <unordered_map>
@@ -39,7 +40,7 @@ namespace cppmicroservices {
  *
  * Deprecated. Use AnyMap instead.
  */
-using ServiceProperties = std::unordered_map<std::string, Any>;
+using ServiceProperties = AnyMap::unordered_any_cimap;
 }
 
 #endif // CPPMICROSERVICES_SERVICEPROPERTIES_H

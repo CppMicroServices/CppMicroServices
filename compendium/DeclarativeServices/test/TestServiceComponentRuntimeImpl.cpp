@@ -36,7 +36,8 @@ class ServiceComponentRuntimeImplTest : public ::testing::Test
 protected:
   ServiceComponentRuntimeImplTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   virtual ~ServiceComponentRuntimeImplTest() = default;
 
@@ -209,7 +210,7 @@ TEST_F(ServiceComponentRuntimeImplTest, GetComponentConfigurationDTOs)
     .WillRepeatedly(testing::Return(nullptr));
   EXPECT_CALL(*config1, GetId()).WillRepeatedly(testing::Return(100));
   EXPECT_CALL(*config2, GetId()).WillRepeatedly(testing::Return(200));
-  std::unordered_map<std::string, cppmicroservices::Any> emptyProperties;
+  ServiceProperties emptyProperties;
   EXPECT_CALL(*config1, GetProperties())
     .WillRepeatedly(testing::Return(emptyProperties));
   EXPECT_CALL(*config2, GetProperties())

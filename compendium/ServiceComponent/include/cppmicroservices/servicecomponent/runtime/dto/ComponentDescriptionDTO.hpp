@@ -27,6 +27,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <cppmicroservices/ServiceProperties.h>
+
 #include "BundleDTO.hpp"
 #include "ReferenceDTO.hpp"
 #include "cppmicroservices/Any.h"
@@ -118,7 +120,7 @@ struct US_ServiceComponent_EXPORT ComponentDescriptionDTO
    * These are declared in the \c property and \c properties
    * elements.
    */
-  std::unordered_map<std::string, cppmicroservices::Any> properties;
+  ServiceProperties properties;
 
   /**
    * The referenced services.

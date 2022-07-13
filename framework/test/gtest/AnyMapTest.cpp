@@ -133,45 +133,6 @@ TEST(AnyMapTest, IteratorTest)
   EXPECT_THROW(niter++, std::logic_error);
 }
 
-TEST(AnyMapTest, AnyMapNewTest)
-{
-  AnyMap uoci_1(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  uoci_1["Service.pid"] = Any(1);
-
-  AnyMap uo_1(AnyMap::UNORDERED_MAP);
-  uo_1["Service.pid"] = Any(1);
-
-  // Case-sensitive search first
-  auto& uoci_om = uoci_1.uo_m();
-  auto csItr = uoci_om.find("service.pid");
-  if (csItr != uoci_om.end()) {
-    std::clog << "Found key 'service.pid' in uoci_om." << std::endl;
-  }
-
-  // Case-insensitive search after
-  auto& uoci_uoci = uoci_1.uoci_m();
-  auto ciItr = uoci_uoci.find("service.pid");
-  if (ciItr != uoci_uoci.end()) {
-    std::clog << "Found key 'service.pid' in uoci_uoci." << std::endl;
-  }
-
-  // Case-sensitive search first
-  auto& uo_om = uo_1.uo_m();
-  auto csItr2 = uo_om.find("service.pid");
-  if (csItr2 != uo_om.end()) {
-    std::clog << "Found key 'service.pid' in uo_om." << std::endl;
-  }
-
-  // Case-insensitive search after
-  auto& uo_uoci = uo_1.uoci_m();
-  auto ciItr2 = uo_uoci.find("service.pid");
-  if (ciItr2 != uo_uoci.end()) {
-    std::clog << "Found key 'service.pid' in uo_uoci." << std::endl;
-  }
-
-  ASSERT_TRUE(1 + 2 == 3);
-}
-
 TEST(AnyMapTest, AnyMap)
 {
   AnyMap::ordered_any_map o;

@@ -37,6 +37,7 @@
 #include <chrono>
 #include <future>
 #include <memory>
+#include <thread>
 #include <unordered_map>
 
 #include "gmock/gmock.h"

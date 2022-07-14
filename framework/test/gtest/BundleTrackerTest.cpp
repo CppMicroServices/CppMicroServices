@@ -103,16 +103,16 @@ TEST_F(BundleTrackerTest, TestGetBundlesMethod)
     << "GetBundles() should return an empty vector after Close()";
 }
 
-TEST_F(BundleTrackerTest, TestGetObjectMethod) {
+TEST_F(BundleTrackerTest, TestGetObjectMethod)
+{
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
   Bundle bundleA = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
-  
+
   EXPECT_EQ(bundleA, bundleTracker->GetObject(bundleA));
   // TODO: test a case where GetObject returns null
 }
-
 
 TEST_F(BundleTrackerTest, TestGetTrackedMethod)
 {
@@ -291,6 +291,22 @@ TEST_F(BundleTrackerTest, TestRemoveMethod)
     << "Calling Remove() didn't removed tracked bundle from being tracked";
 }
 
+TEST_F(BundleTrackerTest, TestRemoveMethodAfterRemovedBundleAdded)
+{
+  auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
+  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
+  Bundle testBundle = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+
+  bundleTracker->Remove(testBundle);
+  testBundle.Start();
+
+  bool testBundleTracked = bundleTracker->GetObject(testBundle) == testBundle;
+  EXPECT_TRUE(testBundleTracked)
+    << "Remove() was called on a tracked bundle, then later entered a tracked "
+       "state. The bundle should be tracked but wasn't ";
+}
+
 TEST_F(BundleTrackerTest, TestOpenOpened)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
@@ -300,6 +316,7 @@ TEST_F(BundleTrackerTest, TestOpenOpened)
   bundle.Start();
   int trackingCount0 = bundleTracker->GetTrackingCount();
   int s0 = bundleTracker->Size();
+
   ASSERT_NO_THROW(bundleTracker->Open())
     << "Open() on opened BundleTracker threw an error";
 

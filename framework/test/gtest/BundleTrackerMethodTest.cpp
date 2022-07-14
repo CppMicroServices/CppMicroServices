@@ -19,8 +19,8 @@
  limitations under the License.
 
  =============================================================================*/
-#include "cppmicroservices/BundleTracker.h"
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/BundleTracker.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
@@ -63,13 +63,13 @@ public:
   }
 };
 
-TEST_F(BundleTrackerMethodTest, CreateTracker)
+TEST_F(BundleTrackerMethodTest, CanCreateTracker)
 {
   ASSERT_NO_THROW(BundleTracker bundleTracker(context, all_states))
     << "Creation of BundleTracker failed";
 }
 
-TEST_F(BundleTrackerMethodTest, TestGetBundlesMethod)
+TEST_F(BundleTrackerMethodTest, GetBundlesWorks)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   std::vector<Bundle> bundles = bundleTracker->GetBundles();
@@ -103,7 +103,7 @@ TEST_F(BundleTrackerMethodTest, TestGetBundlesMethod)
     << "GetBundles() should return an empty vector after Close()";
 }
 
-TEST_F(BundleTrackerMethodTest, TestGetObjectMethod)
+TEST_F(BundleTrackerMethodTest, GetObjectWorks)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
@@ -114,7 +114,7 @@ TEST_F(BundleTrackerMethodTest, TestGetObjectMethod)
   // TODO: test a case where GetObject returns null
 }
 
-TEST_F(BundleTrackerMethodTest, TestGetTrackedMethod)
+TEST_F(BundleTrackerMethodTest, GetTrackedWorks)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   auto tracked = bundleTracker->GetTracked();
@@ -142,7 +142,7 @@ TEST_F(BundleTrackerMethodTest, TestGetTrackedMethod)
   EXPECT_EQ(0, tracked.size()) << "No objects should be tracked after Close()";
 }
 
-TEST_F(BundleTrackerMethodTest, TestIsEmptyMethod)
+TEST_F(BundleTrackerMethodTest, IsEmptyWorks)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   EXPECT_TRUE(bundleTracker->IsEmpty())
@@ -156,7 +156,7 @@ TEST_F(BundleTrackerMethodTest, TestIsEmptyMethod)
     << "Closed BundleTracker should be empty";
 }
 
-TEST_F(BundleTrackerMethodTest, TestSizeMethod)
+TEST_F(BundleTrackerMethodTest, SizeWorks)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   EXPECT_EQ(0, bundleTracker->Size())
@@ -174,17 +174,7 @@ TEST_F(BundleTrackerMethodTest, TestSizeMethod)
     << "Size of closed BundleTracker was not 0";
 }
 
-TEST_F(BundleTrackerMethodTest, TestGetTrackingCountMethodWhenClosed)
-{
-  auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
-  EXPECT_EQ(-1, bundleTracker->GetTrackingCount())
-    << "Tracking count of unopened BundleTracker was not -1";
-  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
-  bundleTracker->Close();
-  //EXPECT_EQ(-1, bundleTracker->GetTrackingCount()); Expected behavior after Close() to be clarified
-}
-
-TEST_F(BundleTrackerMethodTest, TestGetTrackingCountMethodAfterBundleAdded)
+TEST_F(BundleTrackerMethodTest, GetTrackingCountWorksAfterBundleAdded)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
@@ -199,7 +189,7 @@ TEST_F(BundleTrackerMethodTest, TestGetTrackingCountMethodAfterBundleAdded)
   bundleTracker->Close();
 }
 
-TEST_F(BundleTrackerMethodTest, TestGetTrackingCountMethodAfterBundleModified)
+TEST_F(BundleTrackerMethodTest, GetTrackingCountWorksAfterBundleModified)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
@@ -220,7 +210,8 @@ TEST_F(BundleTrackerMethodTest, TestGetTrackingCountMethodAfterBundleModified)
   bundleTracker->Close();
 }
 
-TEST_F(BundleTrackerMethodTest, TestGetTrackingCountMethodAfterBundleRemoved)
+TEST_F(BundleTrackerMethodTest,
+       GetTrackingCountWorksAfterBundleRemovedByStateChange)
 {
   auto stateMask = Bundle::State::STATE_INSTALLED;
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, stateMask);
@@ -241,7 +232,7 @@ TEST_F(BundleTrackerMethodTest, TestGetTrackingCountMethodAfterBundleRemoved)
   bundleTracker->Close();
 }
 
-TEST_F(BundleTrackerMethodTest, TestGetTrackingCountMethodAfterRemoveMethod)
+TEST_F(BundleTrackerMethodTest, GetTrackingCountWorksAfterRemoveMethod)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
@@ -269,7 +260,17 @@ TEST_F(BundleTrackerMethodTest, TestGetTrackingCountMethodAfterRemoveMethod)
   bundleTracker->Close();
 }
 
-TEST_F(BundleTrackerMethodTest, TestRemoveMethod)
+TEST_F(BundleTrackerMethodTest, GetTrackingCountWorksWhenClosed)
+{
+  auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
+  EXPECT_EQ(-1, bundleTracker->GetTrackingCount())
+    << "Tracking count of unopened BundleTracker was not -1";
+  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
+  bundleTracker->Close();
+  //EXPECT_EQ(-1, bundleTracker->GetTrackingCount()); Expected behavior after Close() to be clarified
+}
+
+TEST_F(BundleTrackerMethodTest, RemoveWorks)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
@@ -291,7 +292,7 @@ TEST_F(BundleTrackerMethodTest, TestRemoveMethod)
     << "Calling Remove() didn't removed tracked bundle from being tracked";
 }
 
-TEST_F(BundleTrackerMethodTest, TestRemoveMethodAfterRemovedBundleAdded)
+TEST_F(BundleTrackerMethodTest, BundleRemovedByRemoveTrackable)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
@@ -307,7 +308,14 @@ TEST_F(BundleTrackerMethodTest, TestRemoveMethodAfterRemovedBundleAdded)
        "state. The bundle should be tracked but wasn't ";
 }
 
-TEST_F(BundleTrackerMethodTest, TestOpenOpened)
+TEST_F(BundleTrackerMethodTest, DefaultAddingBundleReturnsCorrectValue)
+{
+  auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
+  Bundle bundle = Bundle();
+  EXPECT_EQ(bundle, bundleTracker->AddingBundle(bundle, BundleEvent()));
+}
+
+TEST_F(BundleTrackerMethodTest, OpeningOpenTrackerDoesNothing)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
@@ -326,11 +334,4 @@ TEST_F(BundleTrackerMethodTest, TestOpenOpened)
     << "Open() on opened BundleTracker increased the tracking count";
   EXPECT_EQ(0, s1 - s0) << "Open() on opened BundleTracker changed the size";
   bundleTracker->Close();
-}
-
-TEST_F(BundleTrackerMethodTest, TestAddingBundleMethod)
-{
-  auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
-  Bundle bundle = Bundle();
-  EXPECT_EQ(bundle, bundleTracker->AddingBundle(bundle, BundleEvent()));
 }

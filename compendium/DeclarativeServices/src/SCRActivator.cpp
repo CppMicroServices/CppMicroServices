@@ -55,7 +55,9 @@ void SCRActivator::Start(BundleContext context)
 {
   runtimeContext = context;
   auto stateMask = Bundle::State::STATE_ACTIVE;
-  bundleTracker = std::make_shared<BundleTracker<>>(context, stateMask, this);
+  customizer = std::make_shared<ActivatorCustomizer>(this);
+  bundleTracker =
+    std::make_shared<BundleTracker<>>(context, stateMask, customizer);
 
   // Create the component registry
   componentRegistry = std::make_shared<ComponentRegistry>();
@@ -100,12 +102,7 @@ void SCRActivator::Stop(cppmicroservices::BundleContext context)
     configListenerReg.Unregister();
 
     // dispose all components created by SCR
-
     bundleTracker->Close();
-    // const auto bundles = context.GetBundles();
-    // for (auto const& bundle : bundles) {
-    //   DisposeExtension(bundle);
-    // }
 
     // clear bundle registry
     {
@@ -207,49 +204,33 @@ void SCRActivator::DisposeExtension(const cppmicroservices::Bundle& bundle)
   }
 }
 
-void SCRActivator::BundleChanged(const cppmicroservices::BundleEvent& evt)
+std::optional<Bundle> SCRActivator::ActivatorCustomizer::AddingBundle(
+  const Bundle& bundle,
+  const BundleEvent&)
 {
-  auto bundle = evt.GetBundle();
-  const auto eventType = evt.GetType();
-  if (bundle ==
-      runtimeContext.GetBundle()) // skip events for this (runtime) bundle
-  {
-    return;
-  }
-
-  // TODO: revisit to include LAZY_ACTIVATION when supported by the framework
-  if (eventType == cppmicroservices::BundleEvent::BUNDLE_STARTED) {
-    CreateExtension(bundle);
-  } else if (eventType == cppmicroservices::BundleEvent::BUNDLE_STOPPING) {
-    DisposeExtension(bundle);
-  }
-  // else ignore
-}
-
-std::optional<Bundle> SCRActivator::AddingBundle(const Bundle& bundle,
-                                                 const BundleEvent&)
-{
-  logger->Log(SeverityLevel::LOG_DEBUG,
-              "Adding Bundle: " + bundle.GetSymbolicName());
-  if (bundle != runtimeContext.GetBundle()) {
-    CreateExtension(bundle);
+  q_ptr->logger->Log(SeverityLevel::LOG_DEBUG,
+                     "Adding Bundle: " + bundle.GetSymbolicName());
+  if (bundle != q_ptr->runtimeContext.GetBundle()) {
+    q_ptr->CreateExtension(bundle);
   }
   return std::optional<Bundle>{ bundle };
 }
 
-void SCRActivator::ModifiedBundle(const Bundle&, const BundleEvent&, Bundle)
+void SCRActivator::ActivatorCustomizer::ModifiedBundle(const Bundle&,
+                                                       const BundleEvent&,
+                                                       Bundle)
 {
   /* no-op */
 }
 
-void SCRActivator::RemovedBundle(const Bundle& bundle,
-                                 const BundleEvent&,
-                                 Bundle)
+void SCRActivator::ActivatorCustomizer::RemovedBundle(const Bundle& bundle,
+                                                      const BundleEvent&,
+                                                      Bundle)
 {
-  logger->Log(SeverityLevel::LOG_DEBUG,
-              "Removing Bundle: " + bundle.GetSymbolicName());
-  if (bundle != runtimeContext.GetBundle()) {
-    DisposeExtension(bundle);
+  q_ptr->logger->Log(SeverityLevel::LOG_DEBUG,
+                     "Removing Bundle: " + bundle.GetSymbolicName());
+  if (bundle != q_ptr->runtimeContext.GetBundle()) {
+    q_ptr->DisposeExtension(bundle);
   }
 }
 

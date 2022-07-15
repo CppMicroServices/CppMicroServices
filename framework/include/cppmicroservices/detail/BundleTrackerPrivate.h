@@ -49,7 +49,7 @@ public:
   BundleTrackerPrivate(BundleTracker<T>*,
                        const BundleContext& context,
                        StateType stateMask,
-                       BundleTrackerCustomizer<T>* customizer);
+                       std::shared_ptr<BundleTrackerCustomizer<T>> customizer);
   ~BundleTrackerPrivate();
 
   /**
@@ -73,7 +73,7 @@ public:
   /**
    * The <code>BundleTrackerCustomizer</code> for this tracker.
    */
-  BundleTrackerCustomizer<T>* customizer;
+  std::shared_ptr<BundleTrackerCustomizer<T>> customizer;
 
   /**
    * This token corresponds to the BundleListener, whenever it is added.

@@ -315,6 +315,11 @@ TEST_F(BundleTrackerMethodTest, DefaultAddingBundleReturnsCorrectValue)
   EXPECT_EQ(bundle, bundleTracker->AddingBundle(bundle, BundleEvent()));
 }
 
+TEST_F(BundleTrackerMethodTest, RemoveUntrackedBundleDoesNothing)
+{
+  //TODO
+}
+
 TEST_F(BundleTrackerMethodTest, OpeningOpenTrackerDoesNothing)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
@@ -334,4 +339,19 @@ TEST_F(BundleTrackerMethodTest, OpeningOpenTrackerDoesNothing)
     << "Open() on opened BundleTracker increased the tracking count";
   EXPECT_EQ(0, s1 - s0) << "Open() on opened BundleTracker changed the size";
   bundleTracker->Close();
+}
+
+TEST_F(BundleTrackerMethodTest, OpenWithInvalidContextThrowsError)
+{
+  //TODO
+}
+
+TEST_F(BundleTrackerMethodTest, ClosingClosedTrackerDoesNothing)
+{
+  //TODO
+}
+
+TEST_F(BundleTrackerMethodTest, ClosingUnopenTrackerDoesNothing)
+{
+  //TODO
 }

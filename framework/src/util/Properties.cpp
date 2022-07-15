@@ -58,12 +58,12 @@ Properties::Properties(const AnyMap& p)
   }
 }
 
-Properties::Properties(Properties&& o)
+Properties::Properties(Properties&& o) noexcept
   : keys(std::move(o.keys))
   , values(std::move(o.values))
 {}
 
-Properties& Properties::operator=(Properties&& o)
+Properties& Properties::operator=(Properties&& o) noexcept
 {
   keys = std::move(o.keys);
   values = std::move(o.values);

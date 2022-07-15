@@ -40,7 +40,6 @@ class BundleResourcePrivate
 public:
   BundleResourcePrivate(std::shared_ptr<const BundleArchive> archive)
     : archive(std::move(archive))
-    , ref(1)
   {}
 
   void InitFilePath(const std::string& file);
@@ -54,11 +53,6 @@ public:
 
   mutable std::vector<std::string> children;
   mutable std::vector<uint32_t> childNodes;
-
-  /**
-   * Reference count for implicitly shared private implementation.
-   */
-  std::atomic<int> ref;
 };
 
 void BundleResourcePrivate::InitFilePath(const std::string& file)
@@ -94,19 +88,17 @@ void BundleResourcePrivate::InitFilePath(const std::string& file)
 }
 
 BundleResource::BundleResource()
-  : d(new BundleResourcePrivate(nullptr))
+  : d(std::make_shared<BundleResourcePrivate>(nullptr))
 {}
 
 BundleResource::BundleResource(const BundleResource& resource)
   : d(resource.d)
-{
-  ++d->ref;
-}
+{}
 
 BundleResource::BundleResource(
   const std::string& file,
   const std::shared_ptr<const BundleArchive>& archive)
-  : d(new BundleResourcePrivate(archive))
+  : d(std::make_shared<BundleResourcePrivate>(archive))
 {
   d->InitFilePath(file);
 
@@ -120,7 +112,7 @@ BundleResource::BundleResource(
 BundleResource::BundleResource(
   int index,
   const std::shared_ptr<const BundleArchive>& archive)
-  : d(new BundleResourcePrivate(archive))
+  : d(std::make_shared<BundleResourcePrivate>(archive))
 {
   d->archive->GetResourceContainer()->GetStat(index, d->stat);
   d->InitFilePath(
@@ -137,24 +129,6 @@ void BundleResource::InitializeChildren()
   }
 }
 
-BundleResource::~BundleResource()
-{
-  if (!--d->ref)
-    delete d;
-}
-
-BundleResource& BundleResource::operator=(const BundleResource& resource)
-{
-  BundleResourcePrivate* curr_d = d;
-  d = resource.d;
-  ++d->ref;
-
-  if (!--curr_d->ref)
-    delete curr_d;
-
-  return *this;
-}
-
 bool BundleResource::operator<(const BundleResource& resource) const
 {
   return this->GetResourcePath() < resource.GetResourcePath();
@@ -162,10 +136,14 @@ bool BundleResource::operator<(const BundleResource& resource) const
 
 bool BundleResource::operator==(const BundleResource& resource) const
 {
-  if (!this->IsValid())
+  if (!this->IsValid()) {
     return !resource.IsValid();
-  if (!resource.IsValid())
+  }
+
+  if (!resource.IsValid()) {
     return false;
+  }
+
   return d->archive->GetResourceContainer() ==
            resource.d->archive->GetResourceContainer() &&
          d->archive->GetResourcePrefix() ==
@@ -290,8 +268,9 @@ std::size_t BundleResource::Hash() const
 
 std::unique_ptr<void, void (*)(void*)> BundleResource::GetData() const
 {
-  if (!IsValid())
+  if (!IsValid()) {
     return { nullptr, ::free };
+  }
 
   auto data = d->archive->GetResourceContainer()->GetData(d->stat.index);
   if (!data) {

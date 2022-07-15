@@ -185,23 +185,23 @@ ServiceReferenceBase ServiceObjectsBase::GetReference() const
   return d->m_reference;
 }
 
-ServiceObjectsBase::ServiceObjectsBase(ServiceObjectsBase&& other)
+ServiceObjectsBase::ServiceObjectsBase(ServiceObjectsBase&& other) noexcept
   : d(std::move(other.d))
 {}
 
 ServiceObjectsBase::~ServiceObjectsBase() = default;
 
-ServiceObjectsBase& ServiceObjectsBase::operator=(ServiceObjectsBase&& other)
+ServiceObjectsBase& ServiceObjectsBase::operator=(ServiceObjectsBase&& other) noexcept
 {
   d = std::move(other.d);
   return *this;
 }
 
-ServiceObjects<void>::ServiceObjects(ServiceObjects&& other)
+ServiceObjects<void>::ServiceObjects(ServiceObjects&& other) noexcept
   : ServiceObjectsBase(std::move(other))
 {}
 
-ServiceObjects<void>& ServiceObjects<void>::operator=(ServiceObjects&& other)
+ServiceObjects<void>& ServiceObjects<void>::operator=(ServiceObjects&& other) noexcept
 {
   ServiceObjectsBase::operator=(std::move(other));
   return *this;

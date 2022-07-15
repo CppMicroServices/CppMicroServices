@@ -23,6 +23,8 @@
 #include <random>
 
 #include "../src/SCRAsyncWorkService.hpp"
+#include "../src/SCRLogger.hpp"
+#include "../src/manager/BundleLoader.hpp"
 #include "../src/manager/BundleOrPrototypeComponentConfiguration.hpp"
 #include "../src/manager/ComponentConfigurationImpl.hpp"
 #include "../src/manager/ReferenceManager.hpp"
@@ -845,13 +847,15 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
   // a service reference and a config object dependency will trigger a state change
   // when the config object is satisfied before the config object change listener is
   // registered.
-  mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::Reference1>() };
+  mockMetadata->serviceMetadata.interfaces = {
+    us_service_interface_iid<dummy::Reference1>()
+  };
   scrimpl::metadata::ReferenceMetadata refMetadata{};
   refMetadata.interfaceName = "cppmicroservices::scrimpl::dummy::ServiceImpl";
   mockMetadata->refsMetadata.push_back(refMetadata);
   mockMetadata->configurationPolicy = "require";
-  mockMetadata->configurationPids = {"foo"};
-  
+  mockMetadata->configurationPids = { "foo" };
+
   auto fakeLogger = std::make_shared<FakeLogger>();
   auto asyncWorkService =
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
@@ -867,25 +871,32 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
     notifier,
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>());
 
-  auto fakeBundleProtoCompConfig = std::make_shared<BundleOrPrototypeComponentConfigurationImpl>(
-    mockMetadata,
-    GetFramework(),
-    std::make_shared<MockComponentRegistry>(),
-    fakeLogger,
-    notifier,
-    std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>());
+  auto fakeBundleProtoCompConfig =
+    std::make_shared<BundleOrPrototypeComponentConfigurationImpl>(
+      mockMetadata,
+      GetFramework(),
+      std::make_shared<MockComponentRegistry>(),
+      fakeLogger,
+      notifier,
+      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>());
 
-  auto svcReg = GetFramework().GetBundleContext().RegisterService<dummy::ServiceImpl>(std::make_shared<dummy::ServiceImpl>());
-  
+  auto svcReg =
+    GetFramework().GetBundleContext().RegisterService<dummy::ServiceImpl>(
+      std::make_shared<dummy::ServiceImpl>());
+
   // update config object to satisfy component configuration
   test::InstallAndStartConfigAdmin(GetFramework().GetBundleContext());
-  auto svcRef = GetFramework().GetBundleContext().GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+  auto svcRef =
+    GetFramework()
+      .GetBundleContext()
+      .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
   ASSERT_TRUE(svcRef);
   auto configAdminSvc = GetFramework().GetBundleContext().GetService(svcRef);
   ASSERT_TRUE(configAdminSvc);
   auto fooConfig = configAdminSvc->GetConfiguration("foo");
-  cppmicroservices::AnyMap configData(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  configData["bar"] = std::string{"baz"};
+  cppmicroservices::AnyMap configData(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  configData["bar"] = std::string{ "baz" };
   // update the config object before calling fakeCompConfig->Initialize(), which simulates the config object
   // being updated before the ComponentConfigurationImpl has a chance to setup config change listeners.
   ASSERT_NO_THROW(fooConfig->UpdateIfDifferent(configData).second.get());
@@ -893,12 +904,14 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
   // Initialize should set the component state to Satisfied, even if the config object update was missed
   // by the config object change listener.
   fakeCompConfig->Initialize();
-  EXPECT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::SATISFIED,
-      fakeCompConfig->GetConfigState());
+  EXPECT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::
+              SATISFIED,
+            fakeCompConfig->GetConfigState());
 
   fakeBundleProtoCompConfig->Initialize();
-  EXPECT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::SATISFIED,
-      fakeBundleProtoCompConfig->GetConfigState());
+  EXPECT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::
+              SATISFIED,
+            fakeBundleProtoCompConfig->GetConfigState());
 
   fakeCompConfig->Deactivate();
   fakeCompConfig->Stop();
@@ -907,5 +920,104 @@ TEST_F(ComponentConfigurationImplTest, VerifyStateChangeWithSvcRefAndConfig)
   svcReg.Unregister();
   svcReg = nullptr;
 }
+
+#if !defined(__MINGW32__)
+// Note: This is different than the other tests in this suite as Declarative Services is actually
+// installed and started rather than using mocks.
+TEST(ComponentConfigurationImplLogTest, LoadLibraryLogsMessagesImmediateTest)
+{
+  auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+  framework.Start();
+  ASSERT_TRUE(framework);
+
+  auto context = framework.GetBundleContext();
+  ASSERT_TRUE(context);
+
+  test::InstallAndStartDS(context);
+
+  // The logger should receive 2 Log() calls from creating the SCRBundleExtension and 2 from the
+  // code which actually calls SharedLibrary::Load()
+  //
+  // The logger is created and registered before InstallAndStartBundle since it done after, it would
+  // miss the log messages.
+  auto logger = std::make_shared<MockLogger>();
+
+  // Because we are actually installing DS and creating the logger before installing and starting
+  // the bundle (since it is immediate), there are 2 other log messages that are sent. They pertain
+  // to creating and having created the SCRBundleExtension. If that expectation is not set, the test
+  // fails.
+  EXPECT_CALL(*logger, Log(logservice::SeverityLevel::LOG_DEBUG, ::testing::_))
+    .Times(2);
+  // This expectation is for the actual info log messages pertaining to loading of the shared
+  // library.
+  EXPECT_CALL(*logger, Log(logservice::SeverityLevel::LOG_INFO, ::testing::_))
+    .Times(2);
+
+  auto loggerReg = context.RegisterService<logservice::LogService>(logger);
+
+  // TestBundleDSTOI1 is immediate=true so the call to InstallAndStart should cause the shared
+  // library for the bundle to be loaded. This should in turn log 4 (2 regarding shared library
+  // loading) messages with the log service.
+  //
+  // NOTE: TestBundleDSTOI1 cannot be used in the test since a previously ran test already installed
+  // it. The DS runtime service is a singleton so even though a new framework is used, DS remembers
+  // which bundles were already installed. This means that when this test tried to load
+  // TestBundleDSTOI1, it did not actually call SharedLibrary::Load(), hence the test failed.
+  // TestBundleDSTOI3 is now used as it has not been previously installed.
+  test::InstallAndStartBundle(context, "TestBundleDSTOI3");
+
+  loggerReg.Unregister();
+
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
+}
+
+// Note: This is different than the other tests in this suite as Declarative Services is actually
+// installed and started rather than using mocks.
+TEST(ComponentConfigurationImplLogTest, LoadLibraryLogsMessagesNotImmediateTest)
+{
+  auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+  framework.Start();
+  ASSERT_TRUE(framework);
+
+  auto context = framework.GetBundleContext();
+  ASSERT_TRUE(context);
+
+  test::InstallAndStartDS(context);
+
+  // TestBundleDSTOI14 is immediate=false so this InstallAndStart should not
+  // load the library until GetService is called. The logger is created after
+  // this InstallAndStart so in the event that the log messages for loading the
+  // shared library are sent when the library is loaded, the test will fail.
+  test::InstallAndStartBundle(context, "TestBundleDSTOI14");
+
+  // The logger should receive 2 Log() calls from the code which actually invokes
+  // SharedLibrary::Load()
+  //
+  // The logger is registered after InstallAndStartBundle in this case to prove that
+  // for non-immediate DS bundles, the log messages are sent when the library is actually
+  // loaded (i.e., when a call to GetService is made for an interface implemented by
+  // the bundle).
+  auto logger = std::make_shared<MockLogger>();
+
+  // This expectation is for the actual info log messages pertaining to loading of
+  // the shared library.
+  EXPECT_CALL(*logger, Log(logservice::SeverityLevel::LOG_INFO, ::testing::_))
+    .Times(2);
+
+  auto loggerReg = context.RegisterService<logservice::LogService>(logger);
+
+  // The call to GetService should cause the library to be loaded, thus sending
+  // the 2 expected log messages.
+  auto sRef = context.GetServiceReference<test::Interface1>();
+  ASSERT_TRUE(sRef);
+  (void)context.GetService<test::Interface1>(sRef);
+
+  loggerReg.Unregister();
+
+  framework.Stop();
+  framework.WaitForStop(std::chrono::milliseconds::zero());
+}
+#endif
 }
 }

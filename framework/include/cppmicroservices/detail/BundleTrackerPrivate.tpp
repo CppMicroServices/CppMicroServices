@@ -37,7 +37,7 @@ BundleTrackerPrivate<TTT>::BundleTrackerPrivate(
   BundleTracker<T>* bt,
   const BundleContext& context,
   StateType stateMask,
-  BundleTrackerCustomizer<T>* customizer)
+  std::shared_ptr<BundleTrackerCustomizer<T>> customizer)
   : context(std::move(context))
   , customizer(customizer)
   , stateMask(stateMask)
@@ -45,7 +45,7 @@ BundleTrackerPrivate<TTT>::BundleTrackerPrivate(
   , trackedBundle()
   , q_ptr(bt)
 {
-  this->customizer = customizer ? customizer : q_func();
+  this->customizer = customizer; // customizer ? customizer : q_func();
 }
 
 template<class TTT>

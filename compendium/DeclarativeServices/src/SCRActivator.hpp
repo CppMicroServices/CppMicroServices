@@ -42,9 +42,7 @@ using cppmicroservices::service::component::runtime::ServiceComponentRuntime;
 namespace cppmicroservices {
 namespace scrimpl {
 
-class SCRActivator
-  : public cppmicroservices::BundleActivator
-  , public cppmicroservices::BundleTrackerCustomizer<>
+class SCRActivator : public cppmicroservices::BundleActivator
 {
 public:
   SCRActivator() = default;
@@ -54,21 +52,30 @@ public:
   SCRActivator& operator=(SCRActivator&&) = delete;
   ~SCRActivator() override = default;
 
-  // Customizer methods
-  std::optional<Bundle> AddingBundle(const Bundle&,
-                                     const BundleEvent&) override;
-  void ModifiedBundle(const Bundle&, const BundleEvent&, Bundle) override;
-  void RemovedBundle(const Bundle&, const BundleEvent&, Bundle) override;
+  class ActivatorCustomizer : public cppmicroservices::BundleTrackerCustomizer<>
+  {
+  public:
+    // Constructor
+    ActivatorCustomizer(SCRActivator* q_ptr)
+      : q_ptr(q_ptr)
+    {
+    }
+
+    // Customizer methods
+    std::optional<Bundle> AddingBundle(const Bundle&,
+                                       const BundleEvent&) override;
+    void ModifiedBundle(const Bundle&, const BundleEvent&, Bundle) override;
+    void RemovedBundle(const Bundle&, const BundleEvent&, Bundle) override;
+
+  private:
+    SCRActivator* q_ptr;
+  };
 
   // callback methods for bundle lifecycle
   void Start(cppmicroservices::BundleContext context) override;
   void Stop(cppmicroservices::BundleContext context) override;
 
 protected:
-  /**
-   * bundle listener callback
-   */
-  void BundleChanged(const cppmicroservices::BundleEvent&);
   /*
    * This method creates the BundleExtension object for a bundle
    * with declarative services metadata
@@ -94,6 +101,7 @@ private:
     configListenerReg;
   std::shared_ptr<ConfigurationNotifier> configNotifier;
   std::shared_ptr<cppmicroservices::BundleTracker<>> bundleTracker;
+  std::shared_ptr<ActivatorCustomizer> customizer;
 };
 } // scrimpl
 } // cppmicroservices

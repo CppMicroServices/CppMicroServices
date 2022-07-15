@@ -23,9 +23,9 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/SecurityException.h"
 
-#include "ComponentConfigurationImpl.hpp"
 #include "../ConfigurationListenerImpl.hpp"
 #include "BundleLoader.hpp"
+#include "ComponentConfigurationImpl.hpp"
 #include "ComponentManager.hpp"
 #include "ConfigurationManager.hpp"
 #include "ReferenceManager.hpp"
@@ -393,7 +393,7 @@ bool ComponentConfigurationImpl::Modified()
 
 ComponentState ComponentConfigurationImpl::GetConfigState() const
 {
-   return GetState()->GetValue();
+  return GetState()->GetValue();
 }
 
 bool ComponentConfigurationImpl::CompareAndSetState(
@@ -426,7 +426,7 @@ void ComponentConfigurationImpl::LoadComponentCreatorDestructor()
     }
 
     std::tie(newCompInstanceFunc, deleteCompInstanceFunc) =
-      GetComponentCreatorDeletors(compName, GetBundle());
+      GetComponentCreatorDeletors(compName, GetBundle(), logger);
   }
 }
 
@@ -444,10 +444,11 @@ ComponentConfigurationImpl::CreateAndActivateComponentInstanceHelper(
 {
   Any func = this->bundle.GetBundleContext().GetProperty(
     cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
-  
+
   try {
-    if (!func.Empty() && !any_cast<std::function<bool(const cppmicroservices::Bundle&)>>(
-                           func)(this->bundle)) {
+    if (!func.Empty() &&
+        !any_cast<std::function<bool(const cppmicroservices::Bundle&)>>(func)(
+          this->bundle)) {
       std::string errMsg("Bundle at location ");
       errMsg += this->bundle.GetLocation();
       errMsg += " failed bundle validation.";
@@ -456,8 +457,9 @@ ComponentConfigurationImpl::CreateAndActivateComponentInstanceHelper(
   } catch (const cppmicroservices::SecurityException&) {
     throw;
   } catch (...) {
-    throw SecurityException{ "The bundle validation callback threw an exception",
-                             this->bundle };
+    throw SecurityException{
+      "The bundle validation callback threw an exception", this->bundle
+    };
   }
 
   auto componentInstance = CreateComponentInstance();

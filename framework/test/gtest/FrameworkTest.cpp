@@ -36,7 +36,10 @@ limitations under the License.
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/SecurityException.h"
+#include "cppmicroservices/logservice/LogService.hpp"
 #include "cppmicroservices/util/FileSystem.h"
+
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 #ifdef US_PLATFORM_POSIX
@@ -63,6 +66,33 @@ using cppmicroservices::testing::TempDir;
 #endif
 
 US_MSVC_PUSH_DISABLE_WARNING(4996)
+
+namespace {
+/**
+ * This class is used in tests where the logger is required and the test
+ * needs to verify what is sent to the logger
+ */
+class MockLogger : public cppmicroservices::logservice::LogService
+{
+public:
+  MOCK_METHOD2(Log,
+               void(cppmicroservices::logservice::SeverityLevel,
+                    const std::string&));
+  MOCK_METHOD3(Log,
+               void(cppmicroservices::logservice::SeverityLevel,
+                    const std::string&,
+                    const std::exception_ptr));
+  MOCK_METHOD3(Log,
+               void(const cppmicroservices::ServiceReferenceBase&,
+                    cppmicroservices::logservice::SeverityLevel,
+                    const std::string&));
+  MOCK_METHOD4(Log,
+               void(const cppmicroservices::ServiceReferenceBase&,
+                    cppmicroservices::logservice::SeverityLevel,
+                    const std::string&,
+                    const std::exception_ptr));
+};
+}
 
 TEST(FrameworkTest, Ctor)
 {
@@ -761,17 +791,17 @@ TEST(FrameworkTest, ShutdownAndStart)
   ASSERT_EQ(startCount, 1); // "One framework start notification"
 }
 
-TEST(FrameworkTest, ConfigurationWithBundleValidation){
+TEST(FrameworkTest, ConfigurationWithBundleValidation)
+{
 
-  using validationFuncType = std::function<bool(const cppmicroservices::Bundle&)>;
-  
-  validationFuncType validationFunc = [](const cppmicroservices::Bundle&) -> bool {
-    return false;
-  };
-  cppmicroservices::FrameworkConfiguration configuration{ {
-          cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, 
-          validationFunc 
-      }
+  using validationFuncType =
+    std::function<bool(const cppmicroservices::Bundle&)>;
+
+  validationFuncType validationFunc =
+    [](const cppmicroservices::Bundle&) -> bool { return false; };
+  cppmicroservices::FrameworkConfiguration configuration{
+    { cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC,
+      validationFunc }
   };
 
   Any callableFunction = validationFunc;
@@ -791,7 +821,8 @@ TEST(FrameworkTest, ConfigurationWithBundleValidation){
   ASSERT_TRUE(!func.Empty());
 
   // call the bundle validation function
-  auto isBundleValid = any_cast<validationFuncType>(func)(cppmicroservices::Bundle{});
+  auto isBundleValid =
+    any_cast<validationFuncType>(func)(cppmicroservices::Bundle{});
   ASSERT_TRUE(!isBundleValid);
 
   // exercise cppmicroservices::Any partial template specializations for std::function<bool(const cppmicroservices::Bundle&)>
@@ -802,5 +833,32 @@ TEST(FrameworkTest, ConfigurationWithBundleValidation){
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
+
+#if defined(US_BUILD_SHARED_LIBS)
+TEST(FrameworkTest, LoadLibraryLogsMessagesTest)
+{
+  auto f = FrameworkFactory().NewFramework();
+  ASSERT_TRUE(f);
+  f.Start();
+
+  auto context = f.GetBundleContext();
+  ASSERT_TRUE(context);
+
+  auto logger = std::make_shared<MockLogger>();
+  // The logger should receive 2 Log() calls as a result of the bundle being started.
+  EXPECT_CALL(*logger, Log(logservice::SeverityLevel::LOG_INFO, ::testing::_))
+    .Times(2);
+
+  auto loggerReg = context.RegisterService<logservice::LogService>(logger);
+
+  auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleA");
+  bundle.Start();
+
+  loggerReg.Unregister();
+
+  f.Stop();
+  f.WaitForStop(std::chrono::milliseconds::zero());
+}
+#endif
 
 US_MSVC_POP_WARNING

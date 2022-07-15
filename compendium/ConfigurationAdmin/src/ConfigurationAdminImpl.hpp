@@ -124,7 +124,11 @@ public:
                           const std::string& instanceName) override;
 
   /**
-   * Used to list all of the available {@code Configuration} objects.
+   * Used to list all of the {@code Configuration} objects that exist in the
+   * ConfigurationAdmin repository with a pid that matches the filter expression 
+   * (if provided).
+   * All of the {@code Configuration} objects returned have been updated at least
+   * once by ConfigurationAdmin.
    *
    * See {@code ConfigurationAdmin#ListConfigurations}
    */

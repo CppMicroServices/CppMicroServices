@@ -307,17 +307,37 @@ TEST_F(TestConfigurationAdminImpl, VerifyListConfigurations)
   EXPECT_EQ(res2[0]->GetPid(), pid2);
   EXPECT_TRUE(res3.empty());
 
-  // ListConfigurations should not return empty config objects (i.e. those with no properties)
+  // ListConfigurations can return empty config objects (those with no properties) but
+  // only if the configuration has been updated at least once. Nothing should
+  // be returned here because the configuration object has not been updated.
   const auto emptyConfig = configAdmin.GetConfiguration("test.pid.emptyconfig");
   const auto emptyConfigResult =
     configAdmin.ListConfigurations("(pid=test.pid.emptyconfig)");
   EXPECT_TRUE(emptyConfigResult.empty());
 
-  // ListConfigurations should not return empty config objects when returning
-  // all available configs
-  const auto allConfigsResult =
-    configAdmin.ListConfigurations();
+  // ListConfigurations can return empty config objects (those with no properties) but
+  // only if the configuration has been updated at least once. In this example,
+  // only two configurations have been updated at least once.
+  const auto allConfigsResult = configAdmin.ListConfigurations();
   EXPECT_EQ(allConfigsResult.size(), 2ul);
+
+  //ListConfigurations should return empty config objects if the config
+  //object was defined in a manifest.json file and added using AddConfigurations.
+  //Adding a configuration object this way counts as a create and update operation.
+  std::vector<metadata::ConfigurationMetadata> configs;
+  configs.push_back(metadata::ConfigurationMetadata(
+    "test.pid3", AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
+  auto result = configAdmin.AddConfigurations(std::move(configs));
+  auto allConfigs = configAdmin.ListConfigurations();
+  EXPECT_EQ(allConfigs.size(), 3ul);
+
+  //If the properties for a configuration object are removed, ListConfigurations
+  //should still include that configuration object in the result list.
+  cppmicroservices::AnyMap props(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  EXPECT_NO_THROW(conf1->Update(props).get());
+  allConfigs = configAdmin.ListConfigurations();
+  EXPECT_EQ(allConfigs.size(), 3ul);
 }
 
 TEST_F(TestConfigurationAdminImpl, VerifyAddConfigurations)

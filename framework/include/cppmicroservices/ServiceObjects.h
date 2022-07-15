@@ -42,8 +42,8 @@ public:
   ServiceObjectsBase(const ServiceObjectsBase& other) = delete;
   ServiceObjectsBase& operator=(const ServiceObjectsBase& other) = delete;
 
-  ServiceObjectsBase(ServiceObjectsBase&& other);
-  ServiceObjectsBase& operator=(ServiceObjectsBase&& other);
+  ServiceObjectsBase(ServiceObjectsBase&& other) noexcept;
+  ServiceObjectsBase& operator=(ServiceObjectsBase&& other) noexcept;
 
 protected:
   ServiceObjectsBase(const std::shared_ptr<BundleContextPrivate>& context,
@@ -177,8 +177,8 @@ public:
   ServiceObjects(const ServiceObjects& other) = delete;
   ServiceObjects& operator=(const ServiceObjects& other) = delete;
 
-  ServiceObjects(ServiceObjects&& other);
-  ServiceObjects& operator=(ServiceObjects&& other);
+  ServiceObjects(ServiceObjects&& other) noexcept;
+  ServiceObjects& operator=(ServiceObjects&& other) noexcept;
 
   /**
    * Returns a service object as a InterfaceMap instance for the referenced service.

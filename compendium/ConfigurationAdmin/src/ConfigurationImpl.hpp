@@ -44,7 +44,8 @@ public:
   ConfigurationImpl(ConfigurationAdminPrivate* configAdminImpl,
                     std::string pid,
                     std::string factoryPid,
-                    AnyMap properties);
+                    AnyMap properties,
+                    const unsigned long cCount = 0);
   ~ConfigurationImpl() override = default;
   ConfigurationImpl(const ConfigurationImpl&) = delete;
   ConfigurationImpl& operator=(const ConfigurationImpl&) = delete;

@@ -78,6 +78,7 @@ set(_declarativeservices_tests
   TestRegistrationManager.cpp
   TestSCRBundleExtension.cpp
   TestServiceComponentRuntimeImpl.cpp
+  TestServiceDependencyErrorLogging.cpp
   TestServiceMetadataParserV1.cpp
   TestSetConfiguration.cpp
   TestSingletonComponentConfiguration.cpp
@@ -102,6 +103,14 @@ include_directories(${PROJECT_BINARY_DIR}/include
   ${CppMicroServices_BINARY_DIR}/compendium/CM/include
   )
 
+set(_logservice_additional_srcs
+  ${CppMicroServices_SOURCE_DIR}/compendium/LogServiceImpl/src/LogServiceImpl.cpp
+  )
+
+set(_logservice_additional_hdrs
+  ${CppMicroServices_SOURCE_DIR}/compendium/LogServiceImpl/src/LogServiceImpl.hpp
+  )
+
 set(_additional_srcs
   TestUtils.cpp
   ../src/SCRActivator.cpp
@@ -123,7 +132,9 @@ usFunctionGetResourceSource(
 
 add_executable(${us_declarativeservices_test_exe_name}
   ${_declarativeservices_tests}
-  ${_additional_srcs})
+  ${_additional_srcs}
+  ${_logservice_additional_srcs}
+  ${_logservice_additional_hdrs})
 
 if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
   target_compile_options(${us_declarativeservices_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
@@ -140,7 +151,9 @@ set_property(
   )
 
 target_include_directories(${us_declarativeservices_test_exe_name}
-  PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
+  PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>
+  ${CppMicroServices_SOURCE_DIR}/compendium/LogServiceImpl/src
+  ${CppMicroServices_SOURCE_DIR}/third_party/spdlog/include)
 
 # Disable deprecation warnings.
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR

@@ -56,7 +56,7 @@ const std::string BundleArchive::AUTOSTART_SETTING_ACTIVATION_POLICY =
 BundleArchive::BundleArchive()
   : storage(nullptr)
   , bundleId(0)
-  , manifest(any_map::UNORDERED_MAP)
+  , manifest(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {}
 
 BundleArchive::BundleArchive(

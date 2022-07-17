@@ -72,7 +72,7 @@ Any ParseJsonValue(const rapidjson::Value& jsonValue, bool ci)
 {
   if (jsonValue.IsObject()) {
     if (ci) {
-      Any any = AnyMap(AnyMap::UNORDERED_MAP);
+      Any any = AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
       ParseJsonObject(jsonValue, ref_any_cast<AnyMap>(any));
       return any;
     } else {
@@ -138,7 +138,7 @@ void ParseJsonArray(const rapidjson::Value& jsonArray,
 }
 
 BundleManifest::BundleManifest()
-  : m_Headers(AnyMap::UNORDERED_MAP)
+  : m_Headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {}
 
 BundleManifest::BundleManifest(const AnyMap& m)

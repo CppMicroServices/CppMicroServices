@@ -52,7 +52,7 @@ public:
 private:
   AnyMap props;
   std::unordered_map<std::string,
-                     std::string,
+                     std::string_view,
                      detail::any_map_cihash,
                      detail::any_map_ciequal>
     caseInsensitiveLookup;

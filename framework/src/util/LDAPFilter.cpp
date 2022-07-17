@@ -84,7 +84,9 @@ bool LDAPFilter::Match(const Bundle& bundle) const
   if (d) {
     const auto& headers = bundle.GetHeaders();
 
-    props_check::ValidateAnyMap(headers);
+    if (headers.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+      props_check::ValidateAnyMap(headers);
+    }
 
     return d->ldapExpr.Evaluate(headers, false);
   } else {
@@ -95,7 +97,9 @@ bool LDAPFilter::Match(const Bundle& bundle) const
 bool LDAPFilter::Match(const AnyMap& dictionary) const
 {
   if (d) {
-    props_check::ValidateAnyMap(dictionary);
+    if (dictionary.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+      props_check::ValidateAnyMap(dictionary);
+    }
 
     return d->ldapExpr.Evaluate(dictionary, false);
   } else {
@@ -106,7 +110,9 @@ bool LDAPFilter::Match(const AnyMap& dictionary) const
 bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
 {
   if (d) {
-    props_check::ValidateAnyMap(dictionary);
+    if (dictionary.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+      props_check::ValidateAnyMap(dictionary);
+    }
 
     return d->ldapExpr.Evaluate(dictionary, true);
   } else {

@@ -109,7 +109,7 @@ std::pair<Any, bool> Properties::Value_unlocked(const std::string& key,
     if (!matchCase) {
       auto ciItr = caseInsensitiveLookup.find(key);
       if (ciItr != caseInsensitiveLookup.end()) {
-        return std::make_pair(props.find(ciItr->second)->second, true);
+        return std::make_pair(props.find(ciItr->second.data())->second, true);
       } else {
         return std::make_pair(emptyAny, false);
       }

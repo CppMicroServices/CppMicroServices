@@ -354,11 +354,6 @@ bool LDAPExpr::Evaluate(const AnyMap& p, bool matchCase) const
 
       // If searching insensitively...
       if (!matchCase) {
-        std::unordered_map<std::string,
-                           std::string,
-                           detail::any_map_cihash,
-                           detail::any_map_ciequal>
-          caseInsensitiveLookup;
         for (const auto& kv_pair : p) {
           if (std::string lower = props_check::ToLower(d->m_attrName);
               kv_pair.first == lower) {

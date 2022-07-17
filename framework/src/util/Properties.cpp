@@ -37,7 +37,9 @@ const Any Properties::emptyAny;
 Properties::Properties(const AnyMap& p)
   : props(p)
 {
-  props_check::ValidateAnyMap(p);
+  if (p.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    props_check::ValidateAnyMap(p);
+  }
 
   if (p.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
     for (const auto& kv_pair : p) {
@@ -50,7 +52,9 @@ Properties::Properties(const AnyMap& p)
 Properties::Properties(AnyMap&& p)
   : props(std::move(p))
 {
-  props_check::ValidateAnyMap(props);
+  if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    props_check::ValidateAnyMap(props);
+  }
 
   if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
     for (const auto& kv_pair : props) {

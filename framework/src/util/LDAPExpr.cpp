@@ -346,16 +346,14 @@ bool LDAPExpr::Evaluate(const AnyMap& p, bool matchCase) const
         return false;
       }
     } else {
-      // First do case-sensitive search...
       auto itr = p.find(d->m_attrName);
       if (itr != p.end()) {
         return Compare(itr->second, d->m_operator, d->m_attrValue);
       }
 
-      // If searching insensitively...
       if (!matchCase) {
         for (const auto& kv_pair : p) {
-          if (std::string lower = props_check::ToLower(d->m_attrName);
+          if (std::string lower = LDAPExpr::ToLower(d->m_attrName);
               kv_pair.first == lower) {
             return Compare(
               p.find(lower)->second, d->m_operator, d->m_attrValue);
@@ -366,7 +364,6 @@ bool LDAPExpr::Evaluate(const AnyMap& p, bool matchCase) const
 
       return false;
     }
-
   } else { // (d->m_operator & COMPLEX) != 0
     switch (d->m_operator) {
       case AND:

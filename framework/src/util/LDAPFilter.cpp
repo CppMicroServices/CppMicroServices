@@ -86,7 +86,7 @@ bool LDAPFilter::Match(const Bundle& bundle) const
 
     props_check::ValidateAnyMap(headers);
 
-    return d->ldapExpr.Evaluate(bundle.GetHeaders(), false);
+    return d->ldapExpr.Evaluate(headers, false);
   } else {
     return false;
   }

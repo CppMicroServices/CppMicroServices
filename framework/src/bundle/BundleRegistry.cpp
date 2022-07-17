@@ -334,10 +334,9 @@ std::vector<Bundle> BundleRegistry::Install0(
 
         // Either use the manifest found in the passed in bundleManifest list for the current entry,
         // or construct an empty one
-        auto manifest =
-          (0 != bundleManifest.count(symbolicName)
-             ? any_cast<AnyMap>(bundleManifest.at(symbolicName))
-             : AnyMap(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
+        auto manifest = (0 != bundleManifest.count(symbolicName)
+                           ? any_cast<AnyMap>(bundleManifest.at(symbolicName))
+                           : AnyMap(any_map::UNORDERED_MAP));
 
         // Now, create a BundleArchive with the given manifest at 'entry' in the
         // BundleResourceContainer, and remember the created BundleArchive here for later

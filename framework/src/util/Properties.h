@@ -37,23 +37,25 @@ class Properties : public detail::MultiThreaded<>
 
 public:
   explicit Properties(const AnyMap& props);
+  explicit Properties(AnyMap&& props);
 
   Properties(Properties&& o) noexcept;
   Properties& operator=(Properties&& o) noexcept;
 
-  Any Value_unlocked(const std::string& key) const;
-  Any Value_unlocked(int index) const;
-
-  int Find_unlocked(const std::string& key) const;
-  int FindCaseSensitive_unlocked(const std::string& key) const;
+  std::pair<Any, bool> Value_unlocked(const std::string& key,
+                                      bool matchCase = false) const;
 
   std::vector<std::string> Keys_unlocked() const;
 
   void Clear_unlocked();
 
 private:
-  std::vector<std::string> keys;
-  std::vector<Any> values;
+  AnyMap props;
+  std::unordered_map<std::string,
+                     std::string,
+                     detail::any_map_cihash,
+                     detail::any_map_ciequal>
+    caseInsensitiveLookup;
 
   static const Any emptyAny;
 };

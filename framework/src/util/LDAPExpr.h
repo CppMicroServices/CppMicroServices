@@ -30,6 +30,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include "cppmicroservices/AnyMap.h"
+
 namespace cppmicroservices {
 
 class Any;
@@ -119,6 +121,8 @@ public:
 
   //! Evaluate this LDAP filter.
   bool Evaluate(const PropertiesHandle& p, bool matchCase) const;
+
+  bool Evaluate(const AnyMap& p, bool matchCase) const;
 
   //!
   const std::string ToString() const;

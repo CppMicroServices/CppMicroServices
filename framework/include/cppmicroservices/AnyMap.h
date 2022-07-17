@@ -221,8 +221,11 @@ public:
 
   any_map(map_type type);
   any_map(const ordered_any_map& m);
+  any_map(ordered_any_map&& m);
   any_map(const unordered_any_map& m);
+  any_map(unordered_any_map&& m);
   any_map(const unordered_any_cimap& m);
+  any_map(unordered_any_cimap&& m);
 
   any_map(const any_map& m);
   any_map& operator=(const any_map& m);

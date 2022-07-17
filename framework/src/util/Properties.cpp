@@ -24,13 +24,9 @@
 
 #include <limits>
 #include <stdexcept>
-#ifdef US_PLATFORM_WINDOWS
-#  include <string.h>
-#  define ci_compare strnicmp
-#else
-#  include <strings.h>
-#  define ci_compare strncasecmp
-#endif
+#include <utility>
+
+#include "PropsCheck.h"
 
 US_MSVC_PUSH_DISABLE_WARNING(4996)
 
@@ -39,84 +35,103 @@ namespace cppmicroservices {
 const Any Properties::emptyAny;
 
 Properties::Properties(const AnyMap& p)
+  : props(p)
 {
-  if (p.size() > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
-    throw std::runtime_error("Properties contain too many keys");
-  }
+  props_check::ValidateAnyMap(p);
 
-  keys.reserve(p.size());
-  values.reserve(p.size());
-
-  for (auto& iter : p) {
-    if (Find_unlocked(iter.first) > -1) {
-      std::string msg("Properties contain case variants of the key: ");
-      msg += iter.first;
-      throw std::runtime_error(msg.c_str());
+  if (p.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    for (const auto& kv_pair : p) {
+      caseInsensitiveLookup[props_check::ToLower(kv_pair.first)] =
+        kv_pair.first;
     }
-    keys.push_back(iter.first);
-    values.push_back(iter.second);
+  }
+}
+
+Properties::Properties(AnyMap&& p)
+  : props(std::move(p))
+{
+  props_check::ValidateAnyMap(props);
+
+  if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    for (const auto& kv_pair : props) {
+      caseInsensitiveLookup[props_check::ToLower(kv_pair.first)] =
+        kv_pair.first;
+    }
   }
 }
 
 Properties::Properties(Properties&& o) noexcept
-  : keys(std::move(o.keys))
-  , values(std::move(o.values))
-{}
+  : props(std::move(o.props))
+{
+  if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    for (const auto& kv_pair : props) {
+      caseInsensitiveLookup[props_check::ToLower(kv_pair.first)] =
+        kv_pair.first;
+    }
+  }
+}
 
 Properties& Properties::operator=(Properties&& o) noexcept
 {
-  keys = std::move(o.keys);
-  values = std::move(o.values);
+  props = std::move(o.props);
+  if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    for (const auto& kv_pair : props) {
+      caseInsensitiveLookup[props_check::ToLower(kv_pair.first)] =
+        kv_pair.first;
+    }
+  }
   return *this;
 }
 
-Any Properties::Value_unlocked(const std::string& key) const
+std::pair<Any, bool> Properties::Value_unlocked(const std::string& key,
+                                                bool matchCase) const
 {
-  int i = Find_unlocked(key);
-  if (i < 0) {
-    return emptyAny;
-  }
-  return values[i];
-}
-
-Any Properties::Value_unlocked(int index) const
-{
-  if (index < 0 || static_cast<std::size_t>(index) >= values.size()) {
-    return emptyAny;
-  }
-  return values[static_cast<std::size_t>(index)];
-}
-
-int Properties::Find_unlocked(const std::string& key) const
-{
-  for (std::size_t i = 0; i < keys.size(); ++i) {
-    if (key.size() == keys[i].size() &&
-        ci_compare(key.c_str(), keys[i].c_str(), key.size()) == 0) {
-      return static_cast<int>(i);
+  if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    if (auto itr = props.find(key); itr != props.end()) {
+      if (!matchCase) {
+        return std::make_pair(itr->second, true);
+      } else if (matchCase && itr->first == key) {
+        return std::make_pair(itr->second, true);
+      } else {
+        return std::make_pair(emptyAny, false);
+      }
+    } else {
+      return std::make_pair(emptyAny, false);
     }
-  }
-  return -1;
-}
-
-int Properties::FindCaseSensitive_unlocked(const std::string& key) const
-{
-  for (std::size_t i = 0; i < keys.size(); ++i) {
-    if (key == keys[i]) {
-      return static_cast<int>(i);
+  } else { // map is not case-insensitive (std::map or std::unordered_map (NOT CI))
+    // First do case-sensitive search...
+    auto itr = props.find(key);
+    if (itr != props.end()) {
+      return std::make_pair(itr->second, true);
     }
+
+    // If searching insensitively...
+    if (!matchCase) {
+      auto ciItr = caseInsensitiveLookup.find(key);
+      if (ciItr != caseInsensitiveLookup.end()) {
+        return std::make_pair(props.find(ciItr->second)->second, true);
+      } else {
+        return std::make_pair(emptyAny, false);
+      }
+    }
+
+    return std::make_pair(emptyAny, false);
   }
-  return -1;
 }
 
 std::vector<std::string> Properties::Keys_unlocked() const
 {
-  return keys;
+  std::vector<std::string> result{};
+  for (const auto& kv_pair : props) {
+    result.push_back(kv_pair.first);
+  }
+
+  return result;
 }
 
 void Properties::Clear_unlocked()
 {
-  keys.clear();
-  values.clear();
+  props.clear();
 }
 }
 

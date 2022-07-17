@@ -575,16 +575,34 @@ any_map::any_map(const ordered_any_map& m)
   map.o = new ordered_any_map(m);
 }
 
+any_map::any_map(ordered_any_map&& m)
+  : type(map_type::ORDERED_MAP)
+{
+  map.o = new ordered_any_map(std::move(m));
+}
+
 any_map::any_map(const unordered_any_map& m)
   : type(map_type::UNORDERED_MAP)
 {
   map.uo = new unordered_any_map(m);
 }
 
+any_map::any_map(unordered_any_map&& m)
+  : type(map_type::UNORDERED_MAP)
+{
+  map.uo = new unordered_any_map(std::move(m));
+}
+
 any_map::any_map(const unordered_any_cimap& m)
   : type(map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {
   map.uoci = new unordered_any_cimap(m);
+}
+
+any_map::any_map(unordered_any_cimap&& m)
+  : type(map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+{
+  map.uoci = new unordered_any_cimap(std::move(m));
 }
 
 any_map::any_map(const any_map& m)

@@ -27,6 +27,7 @@
 
 #include "LDAPExpr.h"
 #include "Properties.h"
+#include "PropsCheck.h"
 #include "ServiceReferenceBasePrivate.h"
 
 #include <stdexcept>
@@ -80,24 +81,37 @@ bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
 
 bool LDAPFilter::Match(const Bundle& bundle) const
 {
-  return ((d)
-            ? d->ldapExpr.Evaluate(
-                PropertiesHandle(Properties(bundle.GetHeaders()), false), false)
-            : false);
+  if (d) {
+    const auto& headers = bundle.GetHeaders();
+
+    props_check::ValidateAnyMap(headers);
+
+    return d->ldapExpr.Evaluate(bundle.GetHeaders(), false);
+  } else {
+    return false;
+  }
 }
 
 bool LDAPFilter::Match(const AnyMap& dictionary) const
 {
-  return ((d) ? d->ldapExpr.Evaluate(
-                  PropertiesHandle(Properties(dictionary), false), false)
-              : false);
+  if (d) {
+    props_check::ValidateAnyMap(dictionary);
+
+    return d->ldapExpr.Evaluate(dictionary, false);
+  } else {
+    return false;
+  }
 }
 
 bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
 {
-  return ((d) ? d->ldapExpr.Evaluate(
-                  PropertiesHandle(Properties(dictionary), false), true)
-              : false);
+  if (d) {
+    props_check::ValidateAnyMap(dictionary);
+
+    return d->ldapExpr.Evaluate(dictionary, true);
+  } else {
+    return false;
+  }
 }
 
 std::string LDAPFilter::ToString() const

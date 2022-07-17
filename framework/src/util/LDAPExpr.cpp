@@ -29,6 +29,8 @@
 
 #include "Properties.h"
 
+#include "PropsCheck.h"
+
 #include <cctype>
 #include <cerrno>
 #include <cmath>
@@ -306,13 +308,78 @@ bool LDAPExpr::IsNull() const
 bool LDAPExpr::Evaluate(const PropertiesHandle& p, bool matchCase) const
 {
   if ((d->m_operator & SIMPLE) != 0) {
-    // try case sensitive match first
-    int index = p->FindCaseSensitive_unlocked(d->m_attrName);
-    if (index < 0 && !matchCase)
-      index = p->Find_unlocked(d->m_attrName);
-    return index < 0
-             ? false
-             : Compare(p->Value_unlocked(index), d->m_operator, d->m_attrValue);
+    auto v = p->Value_unlocked(d->m_attrName, matchCase);
+    return (!v.second) ? false
+                       : Compare(v.first, d->m_operator, d->m_attrValue);
+  } else { // (d->m_operator & COMPLEX) != 0
+    switch (d->m_operator) {
+      case AND:
+        for (const auto& m_arg : d->m_args) {
+          if (!m_arg.Evaluate(p, matchCase))
+            return false;
+        }
+        return true;
+      case OR:
+        for (const auto& m_arg : d->m_args) {
+          if (m_arg.Evaluate(p, matchCase))
+            return true;
+        }
+        return false;
+      case NOT:
+        return !d->m_args[0].Evaluate(p, matchCase);
+      default:
+        return false; // Cannot happen
+    }
+  }
+}
+
+bool LDAPExpr::Evaluate(const AnyMap& p, bool matchCase) const
+{
+  if ((d->m_operator & SIMPLE) != 0) {
+    if (p.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+      if (auto itr = p.find(d->m_attrName); itr != p.end()) {
+        if (!matchCase) {
+          return Compare(itr->second, d->m_operator, d->m_attrValue);
+        } else if (matchCase && itr->first == d->m_attrName) {
+          return Compare(itr->second, d->m_operator, d->m_attrValue);
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } else { // map is not case-insensitive (std::map or std::unordered_map (NOT CI))
+      std::unordered_map<std::string,
+                         std::string,
+                         detail::any_map_cihash,
+                         detail::any_map_ciequal>
+        caseInsensitiveLookup;
+      if (p.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+        for (const auto& kv_pair : p) {
+          caseInsensitiveLookup[props_check::ToLower(kv_pair.first)] =
+            kv_pair.first;
+        }
+      }
+
+      // First do case-sensitive search...
+      auto itr = p.find(d->m_attrName);
+      if (itr != p.end()) {
+        return Compare(itr->second, d->m_operator, d->m_attrValue);
+      }
+
+      // If searching insensitively...
+      if (!matchCase) {
+        auto ciItr = caseInsensitiveLookup.find(d->m_attrName);
+        if (ciItr != caseInsensitiveLookup.end()) {
+          return Compare(
+            p.find(ciItr->second)->second, d->m_operator, d->m_attrValue);
+        } else {
+          return false;
+        }
+      }
+
+      return false;
+    }
   } else { // (d->m_operator & COMPLEX) != 0
     switch (d->m_operator) {
       case AND:

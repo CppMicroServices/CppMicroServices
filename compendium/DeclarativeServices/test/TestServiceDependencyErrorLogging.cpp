@@ -169,6 +169,10 @@ TEST_F(ServiceDependencyErrorLoggingTest, TestServiceDependencyLDAPFilter)
                                                             managers);
     serviceRefFakeCompConfig->Initialize();
     EXPECT_TRUE(ContainsRegex("reference LDAP filter doesn't match"));
+    fakeCompConfig->Deactivate();
+    fakeCompConfig->Stop();
+    serviceRefFakeCompConfig->Deactivate();
+    serviceRefFakeCompConfig->Stop();
   }
 
   {
@@ -198,6 +202,10 @@ TEST_F(ServiceDependencyErrorLoggingTest, TestServiceDependencyLDAPFilter)
                                                             managers);
     serviceRefFakeCompConfig->Initialize();
     EXPECT_FALSE(ContainsRegex("reference LDAP filter doesn't match"));
+    fakeCompConfig->Deactivate();
+    fakeCompConfig->Stop();
+    serviceRefFakeCompConfig->Deactivate();
+    serviceRefFakeCompConfig->Stop();
   }
 }
 }

@@ -337,31 +337,56 @@ bool LDAPExpr::Evaluate(const AnyMap& p, bool matchCase) const
 {
   if ((d->m_operator & SIMPLE) != 0) {
     if (p.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-      auto itr = p.find(d->m_attrName);
-      if (!matchCase && itr != p.end()) {
+      auto itr = p.findUOCI_TypeChecked(d->m_attrName);
+      if (!matchCase && itr != p.endUOCI_TypeChecked()) {
         return Compare(itr->second, d->m_operator, d->m_attrValue);
-      } else if (matchCase && itr != p.end() && itr->first == d->m_attrName) {
+      } else if (matchCase && itr != p.endUOCI_TypeChecked() &&
+                 itr->first == d->m_attrName) {
         return Compare(itr->second, d->m_operator, d->m_attrValue);
       } else {
         return false;
       }
-    } else {
-      auto itr = p.find(d->m_attrName);
-      if (itr != p.end()) {
+    } else if (p.GetType() == AnyMap::UNORDERED_MAP) {
+      auto itr = p.findUO_TypeChecked(d->m_attrName);
+      if (itr != p.endUO_TypeChecked()) {
         return Compare(itr->second, d->m_operator, d->m_attrValue);
       }
 
       if (!matchCase) {
-        for (const auto& kv_pair : p) {
+        for (auto itr = p.beginUO_TypeChecked(); itr != p.endUO_TypeChecked();
+             ++itr) {
           if (std::string lower = LDAPExpr::ToLower(d->m_attrName);
-              kv_pair.first == lower) {
-            return Compare(
-              p.find(lower)->second, d->m_operator, d->m_attrValue);
+              itr->first == lower) {
+            return Compare(p.findUO_TypeChecked(lower)->second,
+                           d->m_operator,
+                           d->m_attrValue);
           }
         }
         return false;
       }
 
+      return false;
+    } else if (p.GetType() == AnyMap::ORDERED_MAP) {
+      auto itr = p.findOM_TypeChecked(d->m_attrName);
+      if (itr != p.endOM_TypeChecked()) {
+        return Compare(itr->second, d->m_operator, d->m_attrValue);
+      }
+
+      if (!matchCase) {
+        for (auto itr = p.beginOM_TypeChecked(); itr != p.endOM_TypeChecked();
+             ++itr) {
+          if (std::string lower = LDAPExpr::ToLower(d->m_attrName);
+              itr->first == lower) {
+            return Compare(p.findOM_TypeChecked(lower)->second,
+                           d->m_operator,
+                           d->m_attrValue);
+          }
+        }
+        return false;
+      }
+
+      return false;
+    } else {
       return false;
     }
   } else { // (d->m_operator & COMPLEX) != 0

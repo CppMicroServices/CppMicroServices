@@ -29,6 +29,8 @@
 #include <unordered_map>
 
 namespace cppmicroservices {
+class Properties;
+class LDAPExpr;
 
 namespace detail {
 
@@ -300,6 +302,25 @@ protected:
   map_type type;
 
 private:
+  friend class Properties;
+  friend class LDAPExpr;
+
+  // Private "fast" and type-checked functions for working with map iterators
+  // and finding elements (these functions should only be called in a context)
+  // where the type of the map is guaranteed
+  ordered_any_map::const_iterator beginOM_TypeChecked() const;
+  ordered_any_map::const_iterator endOM_TypeChecked() const;
+  ordered_any_map::const_iterator findOM_TypeChecked(const key_type& key) const;
+  unordered_any_map::const_iterator beginUO_TypeChecked() const;
+  unordered_any_map::const_iterator endUO_TypeChecked() const;
+  unordered_any_map::const_iterator findUO_TypeChecked(
+    const key_type& key) const;
+  unordered_any_cimap::const_iterator beginUOCI_TypeChecked() const;
+  unordered_any_cimap::const_iterator endUOCI_TypeChecked() const;
+  unordered_any_cimap::const_iterator findUOCI_TypeChecked(
+    const key_type& key) const;
+  // =========================================================================
+
   ordered_any_map const& o_m() const;
   ordered_any_map& o_m();
   unordered_any_map const& uo_m() const;

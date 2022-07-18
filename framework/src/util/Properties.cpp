@@ -34,18 +34,32 @@ namespace cppmicroservices {
 
 const Any Properties::emptyAny;
 
+void Properties::PopulateCaseInsensitiveLookupMap()
+{
+  if (props.GetType() == AnyMap::ORDERED_MAP) {
+    for (auto itr = props.beginOM_TypeChecked();
+         itr != props.endOM_TypeChecked();
+         ++itr) {
+      caseInsensitiveLookup[props_check::ToLower(itr->first)] = itr->first;
+    }
+  } else if (props.GetType() == AnyMap::UNORDERED_MAP) {
+    for (auto itr = props.beginUO_TypeChecked();
+         itr != props.endUO_TypeChecked();
+         ++itr) {
+      caseInsensitiveLookup[props_check::ToLower(itr->first)] = itr->first;
+    }
+  } else {
+    throw std::runtime_error("Unsupported map type.");
+  }
+}
+
 Properties::Properties(const AnyMap& p)
   : props(p)
 {
   if (p.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
     props_check::ValidateAnyMap(p);
-  }
 
-  if (p.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-    for (const auto& kv_pair : p) {
-      caseInsensitiveLookup[props_check::ToLower(kv_pair.first)] =
-        kv_pair.first;
-    }
+    PopulateCaseInsensitiveLookupMap();
   }
 }
 
@@ -54,13 +68,8 @@ Properties::Properties(AnyMap&& p)
 {
   if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
     props_check::ValidateAnyMap(props);
-  }
 
-  if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-    for (const auto& kv_pair : props) {
-      caseInsensitiveLookup[props_check::ToLower(kv_pair.first)] =
-        kv_pair.first;
-    }
+    PopulateCaseInsensitiveLookupMap();
   }
 }
 
@@ -68,10 +77,7 @@ Properties::Properties(Properties&& o) noexcept
   : props(std::move(o.props))
 {
   if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-    for (const auto& kv_pair : props) {
-      caseInsensitiveLookup[props_check::ToLower(kv_pair.first)] =
-        kv_pair.first;
-    }
+    PopulateCaseInsensitiveLookupMap();
   }
 }
 
@@ -79,10 +85,7 @@ Properties& Properties::operator=(Properties&& o) noexcept
 {
   props = std::move(o.props);
   if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-    for (const auto& kv_pair : props) {
-      caseInsensitiveLookup[props_check::ToLower(kv_pair.first)] =
-        kv_pair.first;
-    }
+    PopulateCaseInsensitiveLookupMap();
   }
   return *this;
 }
@@ -90,8 +93,9 @@ Properties& Properties::operator=(Properties&& o) noexcept
 std::pair<Any, bool> Properties::Value_unlocked(const std::string& key,
                                                 bool matchCase) const
 {
-  if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-    if (auto itr = props.find(key); itr != props.end()) {
+  if (props.GetType() == AnyMap::ORDERED_MAP) {
+    if (auto itr = props.findOM_TypeChecked(key);
+        itr != props.endOM_TypeChecked()) {
       if (!matchCase) {
         return std::make_pair(itr->second, true);
       } else if (matchCase && itr->first == key) {
@@ -102,24 +106,42 @@ std::pair<Any, bool> Properties::Value_unlocked(const std::string& key,
     } else {
       return std::make_pair(emptyAny, false);
     }
-  } else { // map is not case-insensitive (std::map or std::unordered_map (NOT CI))
-    // First do case-sensitive search...
-    auto itr = props.find(key);
-    if (itr != props.end()) {
+  } else if (props.GetType() == AnyMap::UNORDERED_MAP) {
+    auto itr = props.findUO_TypeChecked(key);
+    if (itr != props.endUO_TypeChecked()) {
       return std::make_pair(itr->second, true);
     }
 
-    // If searching insensitively...
     if (!matchCase) {
       auto ciItr = caseInsensitiveLookup.find(key);
       if (ciItr != caseInsensitiveLookup.end()) {
-        return std::make_pair(props.find(ciItr->second.data())->second, true);
+        return std::make_pair(
+          props.findUO_TypeChecked(ciItr->second.data())->second, true);
       } else {
         return std::make_pair(emptyAny, false);
       }
     }
 
     return std::make_pair(emptyAny, false);
+  } else if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    auto itr = props.findUOCI_TypeChecked(key);
+    if (itr != props.endUOCI_TypeChecked()) {
+      return std::make_pair(itr->second, true);
+    }
+
+    if (!matchCase) {
+      auto ciItr = caseInsensitiveLookup.find(key);
+      if (ciItr != caseInsensitiveLookup.end()) {
+        return std::make_pair(
+          props.findUOCI_TypeChecked(ciItr->second.data())->second, true);
+      } else {
+        return std::make_pair(emptyAny, false);
+      }
+    }
+
+    return std::make_pair(emptyAny, false);
+  } else {
+    throw std::runtime_error("Unknown AnyMap type.");
   }
 }
 

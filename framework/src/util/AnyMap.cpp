@@ -853,6 +853,109 @@ any_map::const_iterator any_map::find(const key_type& key) const
   }
 }
 
+any_map::ordered_any_map::const_iterator any_map::beginOM_TypeChecked() const
+{
+  if (type == ORDERED_MAP) {
+    return o_m().begin();
+  } else {
+    throw std::runtime_error(
+      "Calling beginOM_TypeChecked() on a non-ordered_map "
+      "is not allowed.");
+  }
+}
+
+any_map::ordered_any_map::const_iterator any_map::endOM_TypeChecked() const
+{
+  if (type == ORDERED_MAP) {
+    return o_m().end();
+  } else {
+    throw std::runtime_error("Calling endOM_TypeChecked() on a non-ordered_map "
+                             "is not allowed.");
+  }
+}
+
+any_map::ordered_any_map::const_iterator any_map::findOM_TypeChecked(
+  const key_type& key) const
+{
+  if (type == ORDERED_MAP) {
+    return map.o->find(key);
+  } else {
+    throw std::runtime_error(
+      "Calling findOM_TypeChecked() on a non-ordered_map "
+      "is not allowed.");
+  }
+}
+
+any_map::unordered_any_map::const_iterator any_map::beginUO_TypeChecked() const
+{
+  if (type == UNORDERED_MAP) {
+    return uo_m().begin();
+  } else {
+    throw std::runtime_error(
+      "Calling beginUO_TypeChecked() on a non-unordered_map (case-sensitive) "
+      "is not allowed.");
+  }
+}
+
+any_map::unordered_any_map::const_iterator any_map::endUO_TypeChecked() const
+{
+  if (type == UNORDERED_MAP) {
+    return uo_m().end();
+  } else {
+    throw std::runtime_error(
+      "Calling endUO_TypeChecked() on a non-unordered_map "
+      "is not allowed.");
+  }
+}
+
+any_map::unordered_any_map::const_iterator any_map::findUO_TypeChecked(
+  const key_type& key) const
+{
+  if (type == UNORDERED_MAP) {
+    return map.uo->find(key);
+  } else {
+    throw std::runtime_error(
+      "Calling findUO_TypeChecked() on a non-unordered_map "
+      "is not allowed.");
+  }
+}
+
+any_map::unordered_any_cimap::const_iterator any_map::beginUOCI_TypeChecked()
+  const
+{
+  if (type == UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    return uoci_m().begin();
+  } else {
+    throw std::runtime_error(
+      "Calling beginUOCI_TypeChecked() on a non-caseinsensitive "
+      "unordered_map is not allowed.");
+  }
+}
+
+any_map::unordered_any_cimap::const_iterator any_map::endUOCI_TypeChecked()
+  const
+{
+  if (type == UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    return uoci_m().end();
+  } else {
+    throw std::runtime_error(
+      "Calling endUOCI_TypeChecked() on a non-caseinsensitive "
+      "unordered_map is not allowed.");
+  }
+}
+
+any_map::unordered_any_cimap::const_iterator any_map::findUOCI_TypeChecked(
+  const key_type& key) const
+{
+  if (type == UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    return map.uoci->find(key);
+  } else {
+    throw std::runtime_error(
+      "Calling findUOCI_TypeChecked() on a non-caseinsensitive "
+      "unordered_map is not allowed.");
+  }
+}
+
 any_map::size_type any_map::erase(const key_type& key)
 {
   switch (type) {

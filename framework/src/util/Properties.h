@@ -58,6 +58,8 @@ private:
     caseInsensitiveLookup;
 
   static const Any emptyAny;
+
+  void PopulateCaseInsensitiveLookupMap();
 };
 
 class PropertiesHandle

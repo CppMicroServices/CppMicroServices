@@ -29,26 +29,6 @@ const Any emptyAny;
 }
 
 /**
- * @brief Returns the caller a case-insensitive unordered container containing
- * the case-insensitive keys of the provided AnyMap
- * 
- * @param am The AnyMap to validate
- */
-/*
-unordered_set_cikeys GetCIKeys(const AnyMap& am)
-{
-  unordered_set_cikeys keys;
-  for (auto& kv_pair : am) {
-    std::string tempKey = kv_pair.first;
-    std::transform(tempKey.begin(), tempKey.end(), tempKey.begin(), ::tolower);
-    keys.emplace(tempKey);
-  }
-
-  return keys;
-}
-*/
-
-/**
  * @brief Validates that the provided AnyMap conforms to the same constraints that
  * those stored in Property objects have.
  * 
@@ -91,43 +71,5 @@ std::string ToLower(const std::string& s)
   });
   return sNew;
 }
-
-std::pair<Any, bool> FindAnyMapValue(const AnyMap& am,
-                                     const std::string& key,
-                                     bool matchCase)
-{
-  if (am.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-    if (auto itr = am.find(key); itr != am.end()) {
-      if (!matchCase) {
-        return std::make_pair(itr->second, true);
-      } else if (matchCase && itr->first == key) {
-        return std::make_pair(itr->second, true);
-      } else {
-        return std::make_pair(emptyAny, false);
-      }
-    } else {
-      return std::make_pair(emptyAny, false);
-    }
-  } else {
-    auto itr = am.find(key);
-    if (itr != am.end()) {
-      return std::make_pair(itr->second, true);
-    }
-
-    if (!matchCase) {
-      for (const auto& kv_pair : am) {
-        if (kv_pair.first.size() == key.size() &&
-            ci_compare(
-              kv_pair.first.c_str(), key.c_str(), kv_pair.first.size()) == 0) {
-          return std::make_pair(itr->second, true);
-        }
-      }
-      return std::make_pair(emptyAny, false);
-    } else {
-      return std::make_pair(emptyAny, false);
-    }
-  }
-}
-
 }
 }

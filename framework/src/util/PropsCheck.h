@@ -54,18 +54,8 @@
 #endif
 
 namespace cppmicroservices {
-//using unordered_set_cikeys = std::unordered_set<std::string, cppmicroservices::detail::any_map_cihash, cppmicroservices::detail::any_map_ciequal>;
 
 namespace props_check {
-
-/**
- * @brief Returns the caller a case-insensitive unordered container containing
- * the case-insensitive keys of the provided AnyMap
- * 
- * @param am The AnyMap to validate
- */
-//unordered_set_cikeys GetCIKeys(const AnyMap& am);
-
 /**
  * @brief Validates that the provided AnyMap conforms to the same constraints that
  * those stored in Property objects have.
@@ -78,10 +68,6 @@ namespace props_check {
  * @throws std::runtime_error Thrown when `am` is invalid (described above)
  */
 void ValidateAnyMap(const cppmicroservices::AnyMap& am);
-
-std::pair<Any, bool> FindAnyMapValue(const AnyMap& am,
-                                     const std::string& key,
-                                     bool matchCase);
 
 std::string ToLower(const std::string& s);
 }

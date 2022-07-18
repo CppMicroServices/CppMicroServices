@@ -48,6 +48,7 @@ as specified in the OSGi R4.2 specifications.
 
 #include "BundleHooks.h"
 #include "BundleRegistry.h"
+#include "CFRLogger.h"
 #include "Resolver.h"
 #include "ServiceHooks.h"
 #include "ServiceListeners.h"
@@ -96,6 +97,13 @@ public:
   * to Framework clients.
   */
   std::shared_ptr<detail::LogSink> sink;
+
+  /**
+   * A LogService for logging framework messages via
+   * a default or user-provided LogService that are intended to be
+   * visible outside of the framework.
+   */
+  std::shared_ptr<cppmicroservices::cfrimpl::CFRLogger> logger;
 
   /**
    * Bundle Storage

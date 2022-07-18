@@ -33,6 +33,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "cppmicroservices/util/FileSystem.h"
 #include "cppmicroservices/util/String.h"
 
+#include "BundleContextPrivate.h"
 #include "BundleStorageMemory.h"
 #include "BundleUtils.h"
 #include "FrameworkPrivate.h"
@@ -91,6 +92,7 @@ CoreBundleContext::CoreBundleContext(
   , frameworkProperties(InitProperties(props))
   , workingDir(ref_any_cast<std::string>(
       frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
+  , logger(nullptr)
   , listeners(this)
   , services(this)
   , serviceHooks(this)
@@ -174,6 +176,10 @@ void CoreBundleContext::Init()
   serviceHooks.Open();
 
   bundleRegistry.Load();
+
+  // Initialize the CFRLogger. This is done here rather than in the constructor since
+  // we do not have access to a bundle context until this point.
+  logger = std::make_shared<cppmicroservices::cfrimpl::CFRLogger>(MakeBundleContext(systemBundle->bundleContext.Load().get()));
 
   std::string execPath;
   try {

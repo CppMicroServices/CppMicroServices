@@ -93,9 +93,9 @@ Properties& Properties::operator=(Properties&& o) noexcept
 std::pair<Any, bool> Properties::Value_unlocked(const std::string& key,
                                                 bool matchCase) const
 {
-  if (props.GetType() == AnyMap::ORDERED_MAP) {
-    if (auto itr = props.findOM_TypeChecked(key);
-        itr != props.endOM_TypeChecked()) {
+  if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    if (auto itr = props.findUOCI_TypeChecked(key);
+        itr != props.endUOCI_TypeChecked()) {
       if (!matchCase) {
         return std::make_pair(itr->second, true);
       } else if (matchCase && itr->first == key) {
@@ -123,9 +123,9 @@ std::pair<Any, bool> Properties::Value_unlocked(const std::string& key,
     }
 
     return std::make_pair(emptyAny, false);
-  } else if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-    auto itr = props.findUOCI_TypeChecked(key);
-    if (itr != props.endUOCI_TypeChecked()) {
+  } else if (props.GetType() == AnyMap::ORDERED_MAP) {
+    auto itr = props.findOM_TypeChecked(key);
+    if (itr != props.endOM_TypeChecked()) {
       return std::make_pair(itr->second, true);
     }
 
@@ -133,7 +133,7 @@ std::pair<Any, bool> Properties::Value_unlocked(const std::string& key,
       auto ciItr = caseInsensitiveLookup.find(key);
       if (ciItr != caseInsensitiveLookup.end()) {
         return std::make_pair(
-          props.findUOCI_TypeChecked(ciItr->second.data())->second, true);
+          props.findOM_TypeChecked(ciItr->second.data())->second, true);
       } else {
         return std::make_pair(emptyAny, false);
       }

@@ -26,9 +26,8 @@
 
 namespace cppmicroservices {
 namespace cfrimpl {
-CFRLogger::CFRLogger(cppmicroservices::CoreBundleContext* context)
-  : cfrContext(context)
-  , serviceTracker()
+CFRLogger::CFRLogger(cppmicroservices::CoreBundleContext*)
+  : serviceTracker()
   , logService(nullptr)
   , bOpen(false)
 {

@@ -87,7 +87,7 @@ std::unordered_map<std::string, Any> InitProperties(
 
 CoreBundleContext::CoreBundleContext(
   const std::unordered_map<std::string, Any>& props,
-  std::ostream* logger)
+  std::ostream* diagLogger)
   : id(globalId++)
   , frameworkProperties(InitProperties(props))
   , workingDir(ref_any_cast<std::string>(
@@ -104,7 +104,7 @@ CoreBundleContext::CoreBundleContext(
 {
   auto enableDiagLog =
     any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
-  std::ostream* diagnosticLogger = (logger) ? logger : &std::clog;
+  std::ostream* diagnosticLogger = (diagLogger) ? diagLogger : &std::clog;
   sink = std::make_shared<detail::LogSink>(diagnosticLogger, enableDiagLog);
   systemBundle = std::shared_ptr<FrameworkPrivate>(new FrameworkPrivate(this));
   DIAG_LOG(*sink) << "created";

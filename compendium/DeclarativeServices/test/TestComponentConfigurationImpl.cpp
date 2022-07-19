@@ -52,7 +52,8 @@ class ComponentConfigurationImplTest : public ::testing::Test
 protected:
   ComponentConfigurationImplTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   virtual ~ComponentConfigurationImplTest() = default;
 
@@ -947,7 +948,7 @@ TEST(ComponentConfigurationImplLogTest, LoadLibraryLogsMessagesImmediateTest)
   // to creating and having created the SCRBundleExtension. If that expectation is not set, the test
   // fails.
   EXPECT_CALL(*logger, Log(logservice::SeverityLevel::LOG_DEBUG, ::testing::_))
-    .Times(2);
+    .Times(3);
   // This expectation is for the actual info log messages pertaining to loading of the shared
   // library.
   EXPECT_CALL(*logger, Log(logservice::SeverityLevel::LOG_INFO, ::testing::_))

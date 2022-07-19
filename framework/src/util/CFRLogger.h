@@ -46,11 +46,12 @@ namespace cfrimpl {
  */
 class CFRLogger final
   : public cppmicroservices::logservice::LogService
+  , public detail::MultiThreaded<>
   , public cppmicroservices::ServiceTrackerCustomizer<
       cppmicroservices::logservice::LogService>
 {
 public:
-  explicit CFRLogger(cppmicroservices::BundleContext context);
+  CFRLogger(cppmicroservices::CoreBundleContext* context);
   CFRLogger(const CFRLogger&) = delete;
   CFRLogger(CFRLogger&&) = delete;
   CFRLogger& operator=(const CFRLogger&) = delete;
@@ -83,13 +84,19 @@ public:
     const ServiceReference<cppmicroservices::logservice::LogService>& reference,
     const std::shared_ptr<cppmicroservices::logservice::LogService>& service)
     override;
+  
+  // methods for the CFRLogger class
+  void Open();
+  void Close();
+  bool IsOpen() const;
 
 private:
-  cppmicroservices::BundleContext cfrContext;
+  cppmicroservices::CoreBundleContext *cfrContext;
   std::unique_ptr<
     cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>
     serviceTracker;
   std::shared_ptr<cppmicroservices::logservice::LogService> logService;
+  std::atomic<bool> bOpen;
 };
 } // cfrimpl
 } // cppmicroservices

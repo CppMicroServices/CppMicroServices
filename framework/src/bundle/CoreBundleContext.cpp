@@ -92,7 +92,7 @@ CoreBundleContext::CoreBundleContext(
   , frameworkProperties(InitProperties(props))
   , workingDir(ref_any_cast<std::string>(
       frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
-  , logger(nullptr)
+  , logger(std::make_shared<cppmicroservices::cfrimpl::CFRLogger>(this))
   , listeners(this)
   , services(this)
   , serviceHooks(this)
@@ -177,9 +177,7 @@ void CoreBundleContext::Init()
 
   bundleRegistry.Load();
 
-  // Initialize the CFRLogger. This is done here rather than in the constructor since
-  // we do not have access to a bundle context until this point.
-  logger = std::make_shared<cppmicroservices::cfrimpl::CFRLogger>(MakeBundleContext(systemBundle->bundleContext.Load().get()));
+  logger->Open();
 
   std::string execPath;
   try {
@@ -224,6 +222,7 @@ void CoreBundleContext::Init()
 void CoreBundleContext::Uninit0()
 {
   DIAG_LOG(*sink) << "uninit";
+  logger->Close();
   serviceHooks.Close();
   systemBundle->UninitSystemBundle();
 }

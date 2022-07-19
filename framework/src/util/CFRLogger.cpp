@@ -21,25 +21,23 @@
  =============================================================================*/
 
 #include "CFRLogger.h"
+#include "CoreBundleContext.h"
+#include "cppmicroservices/GetBundleContext.h"
 
 namespace cppmicroservices {
 namespace cfrimpl {
-CFRLogger::CFRLogger(cppmicroservices::BundleContext context)
-  : cfrContext(std::move(context))
-  , serviceTracker(
-      std::make_unique<cppmicroservices::ServiceTracker<
-        cppmicroservices::logservice::LogService>>(cfrContext, this))
+CFRLogger::CFRLogger(cppmicroservices::CoreBundleContext* context)
+  : cfrContext(context)
+  , serviceTracker()
   , logService(nullptr)
+  , bOpen(false)
 {
-  serviceTracker->Open(); // Start tracking
 }
 
 CFRLogger::~CFRLogger()
 {
   try {
-    if (serviceTracker) {
-      serviceTracker->Close();
-    }
+    this->Close();
   } catch (...) {
   }
 }
@@ -51,7 +49,7 @@ CFRLogger::AddingService(
   auto currLogger = std::atomic_load(&logService);
   std::shared_ptr<cppmicroservices::logservice::LogService> logger;
   if (!currLogger && reference) {
-    logger = cfrContext.GetService<cppmicroservices::logservice::LogService>(
+    logger = GetBundleContext().GetService<cppmicroservices::logservice::LogService>(
       reference);
     std::atomic_store(&logService, logger);
   }
@@ -81,9 +79,11 @@ void CFRLogger::RemovedService(
 
 void CFRLogger::Log(logservice::SeverityLevel level, const std::string& message)
 {
-  auto currLogger = std::atomic_load(&logService);
-  if (currLogger) {
-    currLogger->Log(level, message);
+  if (IsOpen()) {
+    auto currLogger = std::atomic_load(&logService);
+    if (currLogger) {
+      currLogger->Log(level, message);
+    }
   }
 }
 
@@ -91,9 +91,11 @@ void CFRLogger::Log(logservice::SeverityLevel level,
                     const std::string& message,
                     const std::exception_ptr ex)
 {
-  auto currLogger = std::atomic_load(&logService);
-  if (currLogger) {
-    currLogger->Log(level, message, ex);
+  if (IsOpen()) {
+    auto currLogger = std::atomic_load(&logService);
+    if (currLogger) {
+      currLogger->Log(level, message, ex);
+    }
   }
 }
 
@@ -101,9 +103,11 @@ void CFRLogger::Log(const cppmicroservices::ServiceReferenceBase& sr,
                     logservice::SeverityLevel level,
                     const std::string& message)
 {
-  auto currLogger = std::atomic_load(&logService);
-  if (currLogger) {
-    currLogger->Log(sr, level, message);
+  if (IsOpen()) {
+    auto currLogger = std::atomic_load(&logService);
+    if (currLogger) {
+      currLogger->Log(sr, level, message);
+    }
   }
 }
 
@@ -112,10 +116,38 @@ void CFRLogger::Log(const cppmicroservices::ServiceReferenceBase& sr,
                     const std::string& message,
                     const std::exception_ptr ex)
 {
-  auto currLogger = std::atomic_load(&logService);
-  if (currLogger) {
-    currLogger->Log(sr, level, message, ex);
+   if (IsOpen()) {
+    auto currLogger = std::atomic_load(&logService);
+    if (currLogger) {
+      currLogger->Log(sr, level, message, ex);
+    }
   }
+}
+
+void CFRLogger::Open()
+{
+  auto l = this->Lock();
+  US_UNUSED(l);
+  serviceTracker.reset(
+    new cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService> (GetBundleContext(), this));
+  serviceTracker->Open();
+  bOpen = true;
+}
+
+void CFRLogger::Close() 
+{
+  auto l = this->Lock();
+  US_UNUSED(l);
+  if (serviceTracker) {
+    serviceTracker->Close();
+    serviceTracker.reset();
+  }
+  bOpen = false;
+}
+
+bool CFRLogger::IsOpen() const 
+{
+  return bOpen;
 }
 } // cfrimpl
 } // cppmicroservices

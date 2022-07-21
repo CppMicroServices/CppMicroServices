@@ -2,7 +2,7 @@ name: BuildAndTestWindows
 
 on:
   push:
-    branches: [ development, master, bundle-tracker-test ]
+    branches: [ development, master, bundle-tracker, bundle-tracker-test ]
   pull_request:
     branches: [ development ]
   workflow_dispatch:

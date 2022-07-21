@@ -113,6 +113,7 @@ void BundleAbstractTracked<S, TTT, R>::Close()
 template<class S, class TTT, class R>
 void BundleAbstractTracked<S, TTT, R>::Track(S item, R related)
 {
+  bool isInMap = false;
   TrackedParamType object;
   {
     auto l = this->Lock();
@@ -123,8 +124,9 @@ void BundleAbstractTracked<S, TTT, R>::Track(S item, R related)
     auto trackedItemIter = tracked.find(item);
     if (trackedItemIter != tracked.end()) {
       object = trackedItemIter->second;
+      isInMap = true;
     }
-    if (!object) { /* we are not tracking the item */
+    if (!isInMap) { /* we are not tracking the item */
       if (std::find(adding.begin(), adding.end(), item) != adding.end()) {
         /* if this item is already in the process of being added. */
         DIAG_LOG(*bc.GetLogSink())
@@ -139,7 +141,7 @@ void BundleAbstractTracked<S, TTT, R>::Track(S item, R related)
     }
   }
 
-  if (!object) { /* we are not tracking the item */
+  if (!isInMap) { /* we are not tracking the item */
     TrackAdding(item, related);
   } else {
     /* Call customizer outside of synchronized region */

@@ -2,7 +2,7 @@ name: BuildAndTestNix
 
 on:
   push:
-    branches: [ development, master, bundle-tracker ]
+    branches: [ development, master, bundle-tracker, bundle-tracker-test ]
   pull_request:
     branches: [ development ]
   workflow_dispatch:

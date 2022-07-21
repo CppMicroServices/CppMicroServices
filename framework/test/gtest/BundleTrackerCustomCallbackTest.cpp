@@ -64,23 +64,6 @@ public:
   }
 };
 
-TEST_F(BundleTrackerCustomCallbackTest, StartTrackerAfterBundlesOpen)
-{
-  auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
-  Bundle bundle = cppmicroservices::testing::InstallLib(
-    framework.GetBundleContext(), "TestBundleA");
-
-  ASSERT_NO_THROW(bundleTracker->Open())
-    << "BundleTracker failed to start after a bundle was installed";
-
-  bundleTracker->Close();
-}
-
-TEST_F(BundleTrackerCustomCallbackTest, NoCallbacksWhenClosed)
-{
-  //TODO
-}
-
 //
 // Test custom implementation through a BundleTrackerCustomizer subclass tracking bundles
 //
@@ -101,6 +84,42 @@ public:
               (override));
 };
 
+TEST_F(BundleTrackerCustomCallbackTest, NoCallbacksWhenClosed)
+{
+  auto customizer = std::make_shared<MockCustomizer>();
+  auto bundleTracker =
+    std::make_shared<BundleTracker<>>(context, all_states, customizer);
+
+  // When bundles change states before the BundleTracker is open, there should be no callbacks
+  EXPECT_CALL(*customizer, AddingBundle).Times(0);
+  EXPECT_CALL(*customizer, ModifiedBundle).Times(0);
+  EXPECT_CALL(*customizer, RemovedBundle).Times(0);
+  Bundle bundle0 = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleM");
+  bundle0.Start();
+
+  // Given a series of callbacks while the BundleTracker is open
+  EXPECT_CALL(*customizer, AddingBundle)
+    .WillRepeatedly(::testing::ReturnArg<0>());
+  EXPECT_CALL(*customizer, ModifiedBundle).Times(::testing::AnyNumber());
+  EXPECT_CALL(*customizer, RemovedBundle).Times(::testing::AnyNumber());
+  bundleTracker->Open();
+  Bundle bundle1 = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+  bundleTracker->Close();
+
+  // When bundles change states after the BundleTracker is closed, there should be no callbacks
+  EXPECT_CALL(*customizer, AddingBundle).Times(0);
+  EXPECT_CALL(*customizer, ModifiedBundle).Times(0);
+  EXPECT_CALL(*customizer, RemovedBundle).Times(0);
+  bundle0.Uninstall();
+  bundle1.Start();
+  bundle1.Uninstall();
+  Bundle bundle2 = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleB");
+  bundle2.Uninstall();
+}
+
 TEST_F(BundleTrackerCustomCallbackTest,
        BundleIsTrackedWhenReturnedByAddingBundleFromCustomizer)
 {
@@ -113,7 +132,7 @@ TEST_F(BundleTrackerCustomCallbackTest,
     .WillRepeatedly(::testing::Return(std::nullopt));
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
 
-  // bundles: --(Add)--> INSTALLED
+  // bundle: --(Add)--> INSTALLED
   EXPECT_CALL(*customizer, AddingBundle)
     .Times(1)
     .WillOnce(::testing::ReturnArg<0>()); // returns the bundle
@@ -162,7 +181,6 @@ TEST_F(BundleTrackerCustomCallbackTest,
   EXPECT_CALL(*customizer, AddingBundle)
     .Times(1)
     .WillOnce(::testing::ReturnArg<0>());
-
   Bundle bundle = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
 
@@ -190,7 +208,8 @@ TEST_F(BundleTrackerCustomCallbackTest,
     .WillRepeatedly(::testing::Return(std::nullopt));
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
 
-  EXPECT_CALL(*customizer, AddingBundle).WillOnce(::testing::ReturnArg<0>());
+  EXPECT_CALL(*customizer, AddingBundle)
+    .WillRepeatedly(::testing::ReturnArg<0>());
   Bundle bundle = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
 
@@ -200,8 +219,29 @@ TEST_F(BundleTrackerCustomCallbackTest,
   EXPECT_CALL(*customizer, RemovedBundle).Times(1);
   bundle.Uninstall();
 
-  // What happens after the bundle is modified is out of scope for this test
-  EXPECT_CALL(*customizer, RemovedBundle).Times(::testing::AnyNumber());
+  bundleTracker->Close();
+}
+
+TEST_F(BundleTrackerCustomCallbackTest, RemovedBundleCalledUponClose)
+{
+  auto customizer = std::make_shared<MockCustomizer>();
+  auto stateMask = Bundle::State::STATE_INSTALLED;
+  auto bundleTracker =
+    std::make_shared<BundleTracker<>>(context, stateMask, customizer);
+  EXPECT_CALL(*customizer, AddingBundle)
+    .WillRepeatedly(::testing::Return(std::nullopt));
+  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
+
+  EXPECT_CALL(*customizer, AddingBundle)
+    .WillRepeatedly(::testing::ReturnArg<0>());
+  Bundle bundle1 = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+  Bundle bundle2 = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleM");
+
+  EXPECT_CALL(*customizer, AddingBundle).Times(0);
+  EXPECT_CALL(*customizer, ModifiedBundle).Times(0);
+  EXPECT_CALL(*customizer, RemovedBundle).Times(2);
   bundleTracker->Close();
 }
 
@@ -249,143 +289,6 @@ TEST_F(BundleTrackerCustomCallbackTest,
   //TODO
 }
 
-class MyCustomizer2
-  : public cppmicroservices::BundleTrackerCustomizer<std::string>
-{
-public:
-  int addCount = 0;
-  int modifyCount = 0;
-  int removeCount = 0;
-  std::vector<std::string> ignoredBundles = { "main",
-                                              "system_bundle",
-                                              "TestBundleM" };
-
-  std::optional<std::string> AddingBundle(const Bundle& bundle,
-                                          const BundleEvent&) override
-  {
-    bool isIgnored =
-      std::find(ignoredBundles.begin(),
-                ignoredBundles.end(),
-                bundle.GetSymbolicName()) != ignoredBundles.end();
-    if (isIgnored) {
-      return {};
-    }
-    addCount += 1;
-    return bundle.GetSymbolicName();
-  }
-
-  void ModifiedBundle(const Bundle&,
-                      const BundleEvent& event,
-                      std::string str) override
-  {
-    switch (event.GetType()) {
-      case BundleEvent::BUNDLE_RESOLVED:
-        str.append("-resolved");
-        break;
-
-      case BundleEvent::BUNDLE_STARTING:
-        str.append("-starting");
-        break;
-
-      case BundleEvent::BUNDLE_STARTED:
-        str.append("-started");
-        break;
-
-      default:
-        str.append("-other");
-    }
-    modifyCount += 1;
-  }
-
-  void RemovedBundle(const Bundle&, const BundleEvent&, std::string) override
-  {
-    removeCount += 1;
-  }
-};
-
-//TEST_F(BundleTrackerCustomCallbackTest,
-//       ObjectIsTrackedWhenReturnedByCustomAddingBundleFromCustomizer)
-//{
-//  std::shared_ptr<MyCustomizer2> custom = std::make_shared<MyCustomizer2>();
-//  auto bundleTracker =
-//    std::make_shared<BundleTracker<std::string>>(context, all_states, custom);
-//  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
-//
-//  Bundle bundle = cppmicroservices::testing::InstallLib(
-//    framework.GetBundleContext(), "TestBundleA");
-//  bundle.Start();
-//  bundle.Uninstall();
-//  EXPECT_EQ("TestBundleA", bundleTracker->GetObject(bundle))
-//    << "The custom object returned by custom AddingBundle from "
-//       "BundleTrackerCustomizer was not tracked";
-//
-//  bundleTracker->Close();
-//}
-
-//TEST_F(BundleTrackerCustomCallbackTest,
-//       BundleUntrackedIfCustomAddingBundleFromCustomizerReturnsNull)
-//{
-//  std::shared_ptr<MyCustomizer2> custom = std::make_shared<MyCustomizer2>();
-//  auto bundleTracker =
-//    std::make_shared<BundleTracker<std::string>>(context, all_states, custom);
-//  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
-//
-//  Bundle ignoredBundle = cppmicroservices::testing::InstallLib(
-//    framework.GetBundleContext(), "TestBundleM");
-//  ignoredBundle.Start();
-//  ignoredBundle.Uninstall();
-//
-//  /*EXPECT_EQ(nullptr, bundleTracker->GetObject(ignoredBundle))
-//    << "Custom AddingBundle from BundleTrackerCustomizer returned null but the "
-//       "bundle was still tracked";*/
-//
-//  bundleTracker->Close();
-//}
-
-//TEST_F(BundleTrackerCustomCallbackTest,
-//       CustomModifiedBundleFromCustomizerCallbackWorks)
-//{
-//  std::shared_ptr<MyCustomizer2> custom = std::make_shared<MyCustomizer2>();
-//  auto bundleTracker =
-//    std::make_shared<BundleTracker<std::string>>(context, all_states, custom);
-//  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
-//
-//  Bundle bundle = cppmicroservices::testing::InstallLib(
-//    framework.GetBundleContext(), "TestBundleA");
-//  bundle.Start();
-//
-//  EXPECT_EQ("TestBundleA-resolved-starting-started",
-//            bundleTracker->GetObject(bundle))
-//    << "Callbacks to custom ModifiedBundle from BundleTrackerCustomizer were "
-//       "not issued correctly";
-//
-//  bundleTracker->Close();
-//}
-
-//TEST_F(BundleTrackerCustomCallbackTest,
-//       CustomRemovedBundleFromCustomizerCallbackWorks)
-//{
-//  std::shared_ptr<MyCustomizer2> custom = std::make_shared<MyCustomizer2>();
-//  auto stateMask = all_states - Bundle::State::STATE_UNINSTALLED;
-//  auto bundleTracker =
-//    std::make_shared<BundleTracker<std::string>>(context, stateMask, custom);
-//  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
-//
-//  Bundle bundle = cppmicroservices::testing::InstallLib(
-//    framework.GetBundleContext(), "TestBundleA");
-//  bundle.Start();
-//  bundle.Uninstall();
-//
-//  EXPECT_LE(1, custom->removeCount)
-//    << "More than 1 callback was issued to custom RemovedBundle from "
-//       "BundleTrackerCustomizer for a single removal";
-//  EXPECT_GE(1, custom->removeCount)
-//    << "No callbacks were issued to custom RemovedBundle from "
-//       "BundleTrackerCustomizer after a removal";
-//
-//  bundleTracker->Close();
-//}
-
 class MockBundleTracker : public BundleTracker<>
 {
 public:
@@ -406,59 +309,6 @@ public:
               (const Bundle&, const BundleEvent&, Bundle),
               (override));
 };
-
-//class MyBundleTracker : public BundleTracker<std::string>
-//{
-//public:
-//  int addCount = 0;
-//  int modifyCount = 0;
-//  int removeCount = 0;
-//  std::vector<std::string> ignoredBundles = { "main",
-//                                              "system_bundle",
-//                                              "TestBundleM" };
-//
-//  std::optional<std::string> AddingBundle(const Bundle& bundle,
-//                                          const BundleEvent&) override
-//  {
-//    bool isIgnored =
-//      std::find(ignoredBundles.begin(),
-//                ignoredBundles.end(),
-//                bundle.GetSymbolicName()) != ignoredBundles.end();
-//    if (isIgnored) {
-//      return {};
-//    }
-//    addCount += 1;
-//    return bundle.GetSymbolicName();
-//  }
-//
-//  void ModifiedBundle(const Bundle&,
-//                      const BundleEvent& event,
-//                      std::string str) override
-//  {
-//    switch (event.GetType()) {
-//      case BundleEvent::BUNDLE_RESOLVED:
-//        str.append("-resolved");
-//        break;
-//
-//      case BundleEvent::BUNDLE_STARTING:
-//        str.append("-starting");
-//        break;
-//
-//      case BundleEvent::BUNDLE_STARTED:
-//        str.append("-started");
-//        break;
-//
-//      default:
-//        str.append("-other");
-//    }
-//    modifyCount += 1;
-//  }
-//
-//  void RemovedBundle(const Bundle&, const BundleEvent&, std::string) override
-//  {
-//    removeCount += 1;
-//  }
-//};
 
 TEST_F(BundleTrackerCustomCallbackTest,
        BundleIsTrackedWhenReturnedByAddingBundleFromOverride)
@@ -551,8 +401,6 @@ TEST_F(BundleTrackerCustomCallbackTest,
   EXPECT_CALL(*bundleTracker, RemovedBundle).Times(1);
   bundle.Uninstall();
 
-  // What happens after the bundle is modified is out of scope for this test
-  EXPECT_CALL(*bundleTracker, RemovedBundle).Times(::testing::AnyNumber());
   bundleTracker->Close();
 }
 

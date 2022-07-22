@@ -124,7 +124,7 @@ public:
    *
    * @see BundleTrackerCustomizer:AddingBundle(Bundle, BundleEvent)
    */
-  virtual std::optional<typename TrackedParamType> AddingBundle(
+  virtual std::optional<TrackedParamType> AddingBundle(
     const Bundle& bundle,
     const BundleEvent& event);
 

@@ -91,7 +91,7 @@ void SCRActivator::Start(BundleContext context)
         std::move(configListener));
 }
 
-void SCRActivator::Stop(cppmicroservices::BundleContext context)
+void SCRActivator::Stop(cppmicroservices::BundleContext)
 {
   try {
     // remove the bundle listener

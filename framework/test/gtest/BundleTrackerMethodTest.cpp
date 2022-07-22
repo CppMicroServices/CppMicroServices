@@ -317,7 +317,16 @@ TEST_F(BundleTrackerMethodTest, DefaultAddingBundleReturnsCorrectValue)
 
 TEST_F(BundleTrackerMethodTest, RemoveUntrackedBundleDoesNothing)
 {
-  //TODO
+  BundleTracker<> bundleTracker = BundleTracker<>(context, Bundle::State::STATE_ACTIVE);
+  ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
+  Bundle bundle = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+  int preCount = bundleTracker.GetTrackingCount();
+  ASSERT_NO_THROW(bundleTracker.Remove(bundle))
+    << "Manually removing untracked Bundle should not throw";
+  int postCount = bundleTracker.GetTrackingCount();
+  ASSERT_EQ(preCount, postCount)
+    << "BundleTracker should no-op when untracked Bundle is manually removed";
 }
 
 TEST_F(BundleTrackerMethodTest, OpeningOpenTrackerDoesNothing)
@@ -343,15 +352,27 @@ TEST_F(BundleTrackerMethodTest, OpeningOpenTrackerDoesNothing)
 
 TEST_F(BundleTrackerMethodTest, OpenWithInvalidContextThrowsError)
 {
-  //TODO
+  auto invalidContext = BundleContext();
+  BundleTracker<> bundleTracker = BundleTracker<>(invalidContext, all_states);
+  EXPECT_THROW(bundleTracker.Open(), std::runtime_error) << "Opening BundleTracker with invalid context should throw";
 }
 
 TEST_F(BundleTrackerMethodTest, ClosingClosedTrackerDoesNothing)
 {
-  //TODO
+  BundleTracker<> bundleTracker = BundleTracker<>(context, all_states);
+  ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
+  ASSERT_NO_THROW(bundleTracker.Close()) << "BundleTracker failed to close";
+  int preCount = bundleTracker.GetTrackingCount();
+  ASSERT_NO_THROW(bundleTracker.Close()) << "Closing closed BundleTracker should no-op";
+  int postCount = bundleTracker.GetTrackingCount();
+  EXPECT_EQ(preCount, postCount) << "Closing closed BundleTracker should no-op";
 }
 
 TEST_F(BundleTrackerMethodTest, ClosingUnopenTrackerDoesNothing)
 {
-  //TODO
+  BundleTracker<> bundleTracker = BundleTracker<>(context, all_states);
+  int preCount = bundleTracker.GetTrackingCount();
+  ASSERT_NO_THROW(bundleTracker.Close()) << "Closing closed BundleTracker should no-op";
+  int postCount = bundleTracker.GetTrackingCount();
+  EXPECT_EQ(preCount, postCount) << "Closing closed BundleTracker should no-op";
 }

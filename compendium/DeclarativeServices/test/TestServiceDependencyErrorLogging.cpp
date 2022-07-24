@@ -32,47 +32,37 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/ServiceInterface.h"
 
-#include <ostream>
-#include <regex>
 #include <string>
-
-#include <spdlog/sinks/ostream_sink.h>
-#include <spdlog/spdlog.h>
-#include "LogServiceImpl.hpp"
-
-namespace ls = cppmicroservices::logservice;
-
-static const std::string sinkFormat = "[%T] [%P:%t] %n (%^%l%$): %v";
-static const std::string log_preamble(
-  "\\[([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})\\] "
-  "\\[([0-9]{1,9}):([0-9]{1,9})\\] cppmicroservices::testing::logservice "
-  "\\((debug|trace|info|warning|error)\\): ");
 
 namespace cppmicroservices {
 namespace scrimpl {
+
+class CustomLogger : public FakeLogger
+{
+  std::string msg;
+
+public:
+  using FakeLogger::Log;
+  void Log(cppmicroservices::logservice::SeverityLevel,
+           const std::string& message) override
+  {
+    msg = message;
+  }
+
+  std::string GetLoggerMessage() { return msg; }
+};
 
 class ServiceDependencyErrorLoggingTest : public ::testing::Test
 {
 
 public:
-  bool ContainsRegex(const std::string& regex)
-  {
-    std::string text = oss.str();
-    std::smatch m;
-    bool found = std::regex_search(text, m, std::regex(regex));
-    oss.str("");
-    return found;
-  }
-
-  std::shared_ptr<ls::LogServiceImpl> GetLogger() { return _impl; }
-  std::ostringstream& GetStream() { return oss; }
+  std::shared_ptr<CustomLogger> GetLogger() { return logger_; }
 
 protected:
   ServiceDependencyErrorLoggingTest()
       : framework(cppmicroservices::FrameworkFactory().NewFramework())
   {
-    _impl = std::make_shared<ls::LogServiceImpl>(
-      "cppmicroservices::testing::logservice");
+    logger_ = std::make_shared<CustomLogger>(); 
   }
 
   virtual ~ServiceDependencyErrorLoggingTest() = default;
@@ -80,47 +70,32 @@ protected:
   virtual void SetUp()
   {
     framework.Start();
-    _sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(oss);
-    _sink->set_pattern(sinkFormat);
-    _impl->AddSink(_sink);
   }
 
   virtual void TearDown()
   {
     framework.Stop();
     framework.WaitForStop(std::chrono::milliseconds::zero());
-    _sink.reset();
-    _impl.reset();
   }
 
  cppmicroservices::Framework& GetFramework() { return framework; }
 
 private:
-  std::ostringstream oss;
-  spdlog::sink_ptr _sink;
-  std::shared_ptr<ls::LogServiceImpl> _impl;
+  std::shared_ptr<CustomLogger> logger_;
+
 
 public:
   cppmicroservices::Framework framework;
 };
 
-TEST_F(ServiceDependencyErrorLoggingTest, ProperLoggerUsage)
-{
-  auto logger = GetLogger();
-  logger->Log(ls::SeverityLevel::LOG_DEBUG, "Bonjour!");
-  EXPECT_TRUE(ContainsRegex(log_preamble + "Bonjour!"));
-}
 
 TEST_F(ServiceDependencyErrorLoggingTest, TestServiceDependencyLDAPFilter)
 {
-  auto serviceImpllogger = GetLogger();
- 
+  auto customLogger = GetLogger();
   GetFramework().GetBundleContext()
-    .RegisterService<cppmicroservices::logservice::LogService>(
-      serviceImpllogger);
+    .RegisterService<cppmicroservices::logservice::LogService>(customLogger);
 
   auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
-
   mockMetadata->serviceMetadata.interfaces = {
     us_service_interface_iid<dummy::ServiceImpl>()
   };
@@ -138,7 +113,7 @@ TEST_F(ServiceDependencyErrorLoggingTest, TestServiceDependencyLDAPFilter)
     std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
       framework.GetBundleContext(), logger);
   auto notifier = std::make_shared<ConfigurationNotifier>(
-    framework.GetBundleContext(), serviceImpllogger, asyncWorkService);
+    framework.GetBundleContext(), customLogger, asyncWorkService);
   auto managers =
     std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
@@ -147,14 +122,13 @@ TEST_F(ServiceDependencyErrorLoggingTest, TestServiceDependencyLDAPFilter)
     refmockMetadata->serviceMetadata.interfaces = {
       us_service_interface_iid<dummy::Reference1>()
     };
-    // Test for wrong LDAP filter values, actual LDAP string should be "abc" as per ServiceImpl reference properties
+    // create wrong LDAP filter value, actual LDAP string should be "abc" as per ServiceImpl reference properties
     refmockMetadata->properties.insert(
       std::make_pair("scheme", Any(std::string("abcd"))));
     auto fakeCompConfig =
       std::make_shared<SingletonComponentConfigurationImpl>(mockMetadata,
                                                             framework,
-                                                            mockRegistry,
-                                                            serviceImpllogger,
+                                                            mockRegistry, customLogger,
                                                             notifier,
                                                             managers);
     EXPECT_EQ(fakeCompConfig->GetConfigState(),
@@ -164,44 +138,13 @@ TEST_F(ServiceDependencyErrorLoggingTest, TestServiceDependencyLDAPFilter)
       std::make_shared<SingletonComponentConfigurationImpl>(refmockMetadata,
                                                             framework,
                                                             mockRegistry,
-                                                            serviceImpllogger,
+                                                            customLogger,
                                                             notifier,
                                                             managers);
     serviceRefFakeCompConfig->Initialize();
-    EXPECT_TRUE(ContainsRegex("reference LDAP filter doesn't match"));
-    fakeCompConfig->Deactivate();
-    fakeCompConfig->Stop();
-    serviceRefFakeCompConfig->Deactivate();
-    serviceRefFakeCompConfig->Stop();
-  }
-
-  {
-    auto refmockMetadata = std::make_shared<metadata::ComponentMetadata>();
-    refmockMetadata->serviceMetadata.interfaces = {
-      us_service_interface_iid<dummy::Reference1>()
-    };
-    // Test for correct LDAP filter values
-    refmockMetadata->properties.insert(
-      std::make_pair("scheme", Any(std::string("abc"))));
-    auto fakeCompConfig =
-      std::make_shared<SingletonComponentConfigurationImpl>(mockMetadata,
-                                                            framework,
-                                                            mockRegistry,
-                                                            serviceImpllogger,
-                                                            notifier,
-                                                            managers);
-    EXPECT_EQ(fakeCompConfig->GetConfigState(),
-              ComponentState::UNSATISFIED_REFERENCE);
-    fakeCompConfig->Initialize();
-    auto serviceRefFakeCompConfig =
-      std::make_shared<SingletonComponentConfigurationImpl>(refmockMetadata,
-                                                            framework,
-                                                            mockRegistry,
-                                                            serviceImpllogger,
-                                                            notifier,
-                                                            managers);
-    serviceRefFakeCompConfig->Initialize();
-    EXPECT_FALSE(ContainsRegex("reference LDAP filter doesn't match"));
+    using ::testing::ContainsRegex;
+    EXPECT_THAT(
+      customLogger->GetLoggerMessage(), ContainsRegex("doesn't match service reference properties"));
     fakeCompConfig->Deactivate();
     fakeCompConfig->Stop();
     serviceRefFakeCompConfig->Deactivate();

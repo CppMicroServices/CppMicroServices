@@ -119,7 +119,7 @@ void CFRLogger::Open()
 {
   auto l = this->Lock();
   US_UNUSED(l);
-  cfrContext = std::move(GetBundleContext());
+  cfrContext = GetBundleContext();
   serviceTracker.reset(
     new cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService> (cfrContext, this));
   serviceTracker->Open();

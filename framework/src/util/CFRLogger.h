@@ -91,6 +91,7 @@ public:
   bool IsOpen() const;
 
 private:
+  cppmicroservices::BundleContext cfrContext;
   std::unique_ptr<
     cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>
     serviceTracker;

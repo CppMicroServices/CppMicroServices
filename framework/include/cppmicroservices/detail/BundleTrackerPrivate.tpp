@@ -39,8 +39,8 @@ BundleTrackerPrivate<TTT>::BundleTrackerPrivate(
   StateType stateMask,
   std::shared_ptr<BundleTrackerCustomizer<T>> customizer)
   : context(std::move(context))
-  , customizer(customizer)
   , stateMask(stateMask)
+  , customizer(customizer)
   , listenerToken()
   , trackedBundle()
   , q_ptr(bt)
@@ -65,7 +65,9 @@ std::vector<Bundle> BundleTrackerPrivate<TTT>::GetInitialBundles(
   std::vector<Bundle> result;
   std::vector<Bundle> contextBundles = context.GetBundles();
   for (Bundle bundle : contextBundles) {
-    result.push_back(bundle);
+    if ((bundle.GetState() & stateMask) != 0) {
+      result.push_back(bundle);
+    }
   }
   return result;
 }

@@ -71,6 +71,11 @@ public:
   BundleContext context;
 
   /**
+   * State mask for tracked bundles.
+   */
+  StateType stateMask;
+    
+  /**
    * The <code>BundleTrackerCustomizer</code> for this tracker.
    */
   std::shared_ptr<BundleTrackerCustomizer<T>> customizer;
@@ -80,11 +85,6 @@ public:
    * Otherwise, it represents an invalid token.
    */
   ListenerToken listenerToken;
-
-  /**
-   * State mask for tracked bundles.
-   */
-  StateType stateMask;
 
   /**
    * Tracked bundles: <code>Bundle</code> -> custom Object

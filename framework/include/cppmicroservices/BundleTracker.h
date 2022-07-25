@@ -124,9 +124,9 @@ public:
    *
    * @see BundleTrackerCustomizer:AddingBundle(Bundle, BundleEvent)
    */
-  virtual std::optional<typename TrackedParamType> AddingBundle(
+  virtual std::optional<TrackedParamType> AddingBundle(
     const Bundle& bundle,
-    const BundleEvent& event);
+    const BundleEvent& event) override;
 
   /**
    * Close this <code>BundleTracker</code>.
@@ -194,7 +194,7 @@ public:
    */
   virtual void ModifiedBundle(const Bundle& bundle,
                               const BundleEvent& event,
-                              TrackedParamType object);
+                              TrackedParamType object) override;
 
   /**
    * Open this <code>BundleTracker</code> to begin tracking bundles.
@@ -225,7 +225,7 @@ public:
    */
   virtual void RemovedBundle(const Bundle& bundle,
                              const BundleEvent& event,
-                             TrackedParamType object);
+                             TrackedParamType object) override;
 
   /**
    * Return the number of bundles being tracked by this <code>BundleTracker</code>.

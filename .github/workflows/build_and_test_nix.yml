@@ -4,7 +4,7 @@ on:
   push:
     branches: [ development, master, bundle-tracker, bundle-tracker-test ]
   pull_request:
-    branches: [ development ]
+    branches: [ development, bundle-tracker ]
   workflow_dispatch:
 
 env:

@@ -239,24 +239,24 @@ size_t BundleTracker<T>::Size()
 
 template<class T>
 std::optional<typename BundleTracker<T>::TrackedParamType>
-BundleTracker<T>::AddingBundle(const Bundle& bundle, const BundleEvent& event)
+BundleTracker<T>::AddingBundle(const Bundle& bundle, const BundleEvent&)
 {
   // TODO: Make this SFINAE
   return TypeTraits::ConvertToTrackedType(bundle);
 }
 
 template<class T>
-void BundleTracker<T>::ModifiedBundle(const Bundle& bundle,
-                                      const BundleEvent& event,
-                                      BundleTracker<T>::TrackedParamType object)
+void BundleTracker<T>::ModifiedBundle(const Bundle&,
+                                      const BundleEvent&,
+                                      BundleTracker<T>::TrackedParamType)
 {
   /* do nothing */
 }
 
 template<class T>
-void BundleTracker<T>::RemovedBundle(const Bundle& bundle,
-                                     const BundleEvent& event,
-                                     BundleTracker<T>::TrackedParamType object)
+void BundleTracker<T>::RemovedBundle(const Bundle&,
+                                     const BundleEvent&,
+                                     BundleTracker<T>::TrackedParamType)
 {
   /* do nothing */
 }

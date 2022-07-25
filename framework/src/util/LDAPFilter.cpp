@@ -39,11 +39,13 @@ class LDAPFilterData
 public:
   LDAPFilterData()
     : ldapExpr()
-  {}
+  {
+  }
 
   LDAPFilterData(const std::string& filter)
     : ldapExpr(filter)
-  {}
+  {
+  }
 
   LDAPFilterData(const LDAPFilterData&) = default;
 
@@ -52,7 +54,8 @@ public:
 
 LDAPFilter::LDAPFilter()
   : d(nullptr)
-{}
+{
+}
 
 LDAPFilter::LDAPFilter(const std::string& filter)
   : d(nullptr)
@@ -79,6 +82,9 @@ bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
               : false);
 }
 
+// This function has been modified to call the LDAPExpr::Evaluate() function which takes
+// an AnyMap rather than a PropertiesHandle to optimize the code. Constructing a Properties
+// object is much slower (requiring a copy) than simply using the AnyMap directly.
 bool LDAPFilter::Match(const Bundle& bundle) const
 {
   if (d) {
@@ -94,6 +100,9 @@ bool LDAPFilter::Match(const Bundle& bundle) const
   }
 }
 
+// This function has been modified to call the LDAPExpr::Evaluate() function which takes
+// an AnyMap rather than a PropertiesHandle to optimize the code. Constructing a Properties
+// object is much slower (requiring a copy) than simply using the AnyMap directly.
 bool LDAPFilter::Match(const AnyMap& dictionary) const
 {
   if (d) {
@@ -107,6 +116,9 @@ bool LDAPFilter::Match(const AnyMap& dictionary) const
   }
 }
 
+// This function has been modified to call the LDAPExpr::Evaluate() function which takes
+// an AnyMap rather than a PropertiesHandle to optimize the code. Constructing a Properties
+// object is much slower (requiring a copy) than simply using the AnyMap directly.
 bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
 {
   if (d) {

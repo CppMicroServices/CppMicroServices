@@ -113,7 +113,8 @@ private:
 
     iterator_base(iter_type type)
       : type(type)
-    {}
+    {
+    }
 
   public:
     using value_type = any_map::value_type;
@@ -307,7 +308,12 @@ private:
 
   // Private "fast" and type-checked functions for working with map iterators
   // and finding elements (these functions should only be called in a context)
-  // where the type of the map is guaranteed
+  // where the type of the map is guaranteed.
+  //
+  // These functions bypass the creation of "any_map::iterator" and "any_map::const_iterator"
+  // objects as construction of those are slow. Once the AnyMap class is refactored, these
+  // functions will likely be unnecessary as the begin(), end(), and find() functions will
+  // inherently do what these functions do.
   ordered_any_map::const_iterator beginOM_TypeChecked() const;
   ordered_any_map::const_iterator endOM_TypeChecked() const;
   ordered_any_map::const_iterator findOM_TypeChecked(const key_type& key) const;

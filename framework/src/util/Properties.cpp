@@ -53,6 +53,12 @@ void Properties::PopulateCaseInsensitiveLookupMap()
   }
 }
 
+// NOTE: UNORDERED_MAP_CASEINSENSITIVE_KEYS AnyMaps inherently can never be invalid given that
+// they can _never_ contain some pair of keys which are only different in case. Because of this,
+// the validation check is not performed on these map types. Additionally, those types of maps
+// are already case insensitive so populating and using the case insensitive lookup map is
+// unnecessary.
+
 Properties::Properties(const AnyMap& p)
   : props(p)
 {
@@ -90,6 +96,13 @@ Properties& Properties::operator=(Properties&& o) noexcept
   return *this;
 }
 
+// This function has been modified to perform both the "find" and "lookup" operations rather than
+// just the "lookup" as originally written.
+//
+// This code has been made more verbose as to extract the most performance out of it. If we know
+// the map type for which we are operating on, then we can safely call the "*_TypeChecked()"
+// version of certain functions on the map to bypass using the slow functions that return
+// "any_map::iterator" or "any_map::const_iterator".
 std::pair<Any, bool> Properties::Value_unlocked(const std::string& key,
                                                 bool matchCase) const
 {

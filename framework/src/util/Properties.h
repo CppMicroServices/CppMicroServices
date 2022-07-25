@@ -50,7 +50,14 @@ public:
   void Clear_unlocked();
 
 private:
+  // An AnyMap is used to store the properties rather than 2 vectors (one for keys
+  // and the other for values) as previously done in the past. This reduces the number of
+  // copies and allows for finds to leverage a map find vs vector find.
   AnyMap props;
+
+  // A case-insensitive map which maps all-lowercased keys to the original key values. This
+  // allows for efficient case-insensitive lookups in map types that are not inherently
+  // case insensitive.
   std::unordered_map<std::string,
                      std::string_view,
                      detail::any_map_cihash,
@@ -59,6 +66,8 @@ private:
 
   static const Any emptyAny;
 
+  // Helper that populates the case-insensitive lookup map when the provided AnyMap is not
+  // already case insensitive.
   void PopulateCaseInsensitiveLookupMap();
 };
 
@@ -68,12 +77,14 @@ public:
   PropertiesHandle(const Properties& props, bool lock)
     : props(props)
     , l(lock ? props.Lock() : Properties::UniqueLock())
-  {}
+  {
+  }
 
   PropertiesHandle(PropertiesHandle&& o) noexcept
     : props(o.props)
     , l(std::move(o.l))
-  {}
+  {
+  }
 
   const Properties* operator->() const { return &props; }
 

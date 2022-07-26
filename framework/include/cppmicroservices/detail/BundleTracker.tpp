@@ -28,8 +28,29 @@
 
 #include <optional>
 #include <vector>
+#include <type_traits>
 
 namespace cppmicroservices {
+
+
+template<class = void>
+std::underlying_type_t<Bundle::State> _CreateStateMask(std::underlying_type_t<Bundle::State> s)
+{
+  return s;
+}
+
+template<class... States>
+std::underlying_type_t<Bundle::State> _CreateStateMask(std::underlying_type_t<Bundle::State> s, States... states)
+{
+  return s | _CreateStateMask(states...);
+}
+
+template<class T>
+template<class... States>
+typename BundleTracker<T>::BundleState BundleTracker<T>::CreateStateMask(States... states)
+{
+  return _CreateStateMask(states...);
+}
 
 // Destructor
 template<class T>
@@ -44,7 +65,7 @@ BundleTracker<T>::~BundleTracker()
 template<class T>
 BundleTracker<T>::BundleTracker(
   const BundleContext& context,
-  StateType stateMask,
+  BundleState stateMask,
   std::shared_ptr<_BundleTrackerCustomizer> customizer)
   : d(new _BundleTrackerPrivate(this, context, stateMask, customizer))
 {

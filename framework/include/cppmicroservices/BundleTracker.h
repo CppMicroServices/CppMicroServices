@@ -86,7 +86,18 @@ public:
   using TrackingMap = typename std::unordered_map<Bundle, TrackedParamType>;
 
   // The type of the state mask
-  using StateType = std::underlying_type_t<Bundle::State>;
+  using BundleState = std::underlying_type_t<Bundle::State>;
+
+  /**
+   * Create a <code>StateType</code> stateMask for a BundleTracker
+   * 
+   * @param states The <code>StateType</code> states of <code>Bundle</code>s.
+   * 
+   * @return The state mask.
+   * 
+   */
+  template<class... States>
+  static BundleState CreateStateMask(States ...state);
 
   /**
    * Create a <code>BundleTracker</code> that tracks bundles through states covered by the state mask.
@@ -99,7 +110,7 @@ public:
    */
   BundleTracker(
     const BundleContext& context,
-    StateType stateMask,
+    BundleState stateMask,
     std::shared_ptr<BundleTrackerCustomizer<T>> customizer = nullptr);
 
   /**
@@ -240,7 +251,6 @@ private:
   using _TrackedBundle = detail::TrackedBundle<TypeTraits>;
   using _BundleTrackerPrivate = detail::BundleTrackerPrivate<TypeTraits>;
   using _BundleTrackerCustomizer = BundleTrackerCustomizer<T>;
-  using BundleState = std::underlying_type_t<typename BundleEvent::Type>;
 
   friend class detail::TrackedBundle<TypeTraits>;
   friend class detail::BundleTrackerPrivate<TypeTraits>;

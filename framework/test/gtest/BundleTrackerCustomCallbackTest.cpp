@@ -40,10 +40,13 @@ class BundleTrackerCustomCallbackTest : public ::testing::Test
 protected:
   Framework framework;
   BundleContext context;
-  BundleTracker<>::StateType all_states =
-    Bundle::State::STATE_ACTIVE | Bundle::State::STATE_INSTALLED |
-    Bundle::State::STATE_RESOLVED | Bundle::State::STATE_STARTING |
-    Bundle::State::STATE_STOPPING | Bundle::State::STATE_UNINSTALLED;
+  BundleTracker<>::BundleState all_states =
+    _CreateStateMask(Bundle::State::STATE_ACTIVE,
+                     Bundle::State::STATE_INSTALLED,
+                     Bundle::State::STATE_RESOLVED,
+                     Bundle::State::STATE_STARTING,
+                     Bundle::State::STATE_STOPPING,
+                     Bundle::State::STATE_UNINSTALLED);
 
 public:
   BundleTrackerCustomCallbackTest()
@@ -92,7 +95,7 @@ public:
 TEST_F(BundleTrackerCustomCallbackTest,
        BundleIsTrackedWhenReturnedByAddingBundleFromCustomizer)
 {
-  auto stateMask = Bundle::State::STATE_ACTIVE;
+  auto stateMask = _CreateStateMask(Bundle::State::STATE_ACTIVE);
   auto customizer = std::make_shared<MockCustomizer>();
   auto bundleTracker =
     std::make_shared<BundleTracker<>>(context, stateMask, customizer);
@@ -174,7 +177,7 @@ TEST_F(BundleTrackerCustomCallbackTest,
        CallbacksWorkForCustomizerTrackingBundlesAfterBundleRemoved)
 {
   auto customizer = std::make_shared<MockCustomizer>();
-  auto stateMask = Bundle::State::STATE_INSTALLED;
+  auto stateMask = _CreateStateMask(Bundle::State::STATE_INSTALLED);
   auto bundleTracker =
     std::make_shared<BundleTracker<>>(context, stateMask, customizer);
   EXPECT_CALL(*customizer, AddingBundle)
@@ -225,7 +228,7 @@ public:
 TEST_F(BundleTrackerCustomCallbackTest,
        ObjectIsTrackedWhenReturnedByAddingBundleFromCustomizer)
 {
-  auto stateMask = Bundle::State::STATE_ACTIVE;
+  auto stateMask = _CreateStateMask(Bundle::State::STATE_ACTIVE);
   auto customizer = std::make_shared<MockCustomizerWithObject>();
   auto bundleTracker =
     std::make_shared<BundleTracker<int>>(context, stateMask, customizer);
@@ -261,7 +264,7 @@ TEST_F(BundleTrackerCustomCallbackTest,
 class MockBundleTracker : public BundleTracker<>
 {
 public:
-  MockBundleTracker(const BundleContext& context, StateType stateMask)
+  MockBundleTracker(const BundleContext& context, BundleState stateMask)
     : BundleTracker(context, stateMask)
   {}
 
@@ -282,7 +285,7 @@ public:
 TEST_F(BundleTrackerCustomCallbackTest,
        BundleIsTrackedWhenReturnedByAddingBundleFromOverride)
 {
-  auto stateMask = Bundle::State::STATE_ACTIVE;
+  auto stateMask = _CreateStateMask(Bundle::State::STATE_ACTIVE);
   auto bundleTracker = std::make_shared<MockBundleTracker>(context, stateMask);
   // Make AddingBundle return null for bundles we aren't testing (main, system_bundle)
   EXPECT_CALL(*bundleTracker, AddingBundle)
@@ -357,7 +360,7 @@ TEST_F(BundleTrackerCustomCallbackTest,
 TEST_F(BundleTrackerCustomCallbackTest,
        CallbacksWorkForOverridenTrackerTrackingBundlesAfterBundleRemoved)
 {
-  auto stateMask = Bundle::State::STATE_INSTALLED;
+  auto stateMask = _CreateStateMask(Bundle::State::STATE_INSTALLED);
   auto bundleTracker = std::make_shared<MockBundleTracker>(context, stateMask);
   EXPECT_CALL(*bundleTracker, AddingBundle)
     .WillRepeatedly(::testing::ReturnArg<0>());
@@ -384,7 +387,8 @@ TEST_F(BundleTrackerCustomCallbackTest,
 class MockBundleTrackerWithObject : public BundleTracker<int>
 {
 public:
-  MockBundleTrackerWithObject(const BundleContext& context, StateType stateMask)
+  MockBundleTrackerWithObject(const BundleContext& context,
+                              BundleState stateMask)
     : BundleTracker(context, stateMask)
   {}
 
@@ -405,7 +409,7 @@ public:
 TEST_F(BundleTrackerCustomCallbackTest,
        ObjectIsTrackedWhenReturnedByAddingBundleFromOverride)
 {
-  auto stateMask = Bundle::State::STATE_ACTIVE;
+  auto stateMask = _CreateStateMask(Bundle::State::STATE_ACTIVE);
   auto bundleTracker =
     std::make_shared<MockBundleTrackerWithObject>(context, stateMask);
   // Make AddingBundle return null for bundles we aren't testing (main, system_bundle)
@@ -485,8 +489,9 @@ TEST_F(BundleTrackerCustomCallbackTest,
     framework.GetBundleContext(), "TestBundleA");
   testBundle.Start();
   auto customizer = std::make_shared<MockCustomizer>();
-  auto stateMask = Bundle::State::STATE_RESOLVED |
-                   Bundle::State::STATE_STARTING | Bundle::State::STATE_ACTIVE;
+  auto stateMask = _CreateStateMask(Bundle::State::STATE_RESOLVED,
+                                    Bundle::State::STATE_STARTING,
+                                    Bundle::State::STATE_ACTIVE);
   auto bundleTracker =
     std::make_shared<BundleTracker<>>(context, stateMask, customizer);
   // and that we ignore callbacks to non-tested bundles
@@ -527,7 +532,7 @@ void CreateOpenTracker(Framework framework,
                        BundleContext context,
                        std::shared_ptr<MockCustomizer> customizer)
 {
-  auto stateMask = Bundle::State::STATE_ACTIVE;
+  auto stateMask = _CreateStateMask(Bundle::State::STATE_ACTIVE);
   auto bundleTracker =
     std::make_shared<BundleTracker<>>(context, stateMask, customizer);
   EXPECT_CALL(*customizer, AddingBundle)

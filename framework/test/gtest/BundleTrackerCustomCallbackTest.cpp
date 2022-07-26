@@ -522,3 +522,31 @@ TEST_F(BundleTrackerCustomCallbackTest,
     .Times(1);
   bundleTracker->Close();
 }
+
+void CreateOpenTracker(Framework framework,
+                       BundleContext context,
+                       std::shared_ptr<MockCustomizer> customizer)
+{
+  auto stateMask = Bundle::State::STATE_ACTIVE;
+  auto bundleTracker =
+    std::make_shared<BundleTracker<>>(context, stateMask, customizer);
+  EXPECT_CALL(*customizer, AddingBundle)
+    .WillRepeatedly(::testing::ReturnArg<0>());
+  bundleTracker->Open();
+  Bundle testBundle = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+  testBundle.Start();
+  // bundleTracker goes out of scope
+}
+
+TEST_F(BundleTrackerCustomCallbackTest,
+       CloseIsCalledWhenOpenTrackerGoesOutOfScope)
+{
+  auto customizer = std::make_shared<MockCustomizer>();
+
+  // When an open BundleTracker goes out of scope,
+  // Close() should be called, and therefore
+  // RemovedBundle should be called on tracked bundles
+  EXPECT_CALL(*customizer, RemovedBundle).Times(::testing::AtLeast(1));
+  CreateOpenTracker(framework, context, customizer);
+}

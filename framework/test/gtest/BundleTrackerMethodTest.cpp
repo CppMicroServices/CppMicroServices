@@ -161,12 +161,14 @@ TEST_F(BundleTrackerMethodTest, SizeWorks)
     << "Size of unopened BundleTracker was not 0";
 
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
-  EXPECT_EQ(0, bundleTracker->Size()) << "Size should be 0 when no bundles has entered a tracked state";
+  EXPECT_EQ(0, bundleTracker->Size())
+    << "Size should be 0 when no bundles has entered a tracked state";
 
   Bundle bundle = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
   bundle.Uninstall();
-  EXPECT_EQ(1, bundleTracker->Size()) << "Size should be 1 when 1 bundle entered a tracked state";
+  EXPECT_EQ(1, bundleTracker->Size())
+    << "Size should be 1 when 1 bundle entered a tracked state";
 
   bundleTracker->Close();
   EXPECT_EQ(0, bundleTracker->Size())
@@ -334,6 +336,52 @@ TEST_F(BundleTrackerMethodTest, RemoveUntrackedBundleDoesNothing)
   bundleTracker.Close();
 }
 
+TEST_F(BundleTrackerMethodTest, ReopeningTrackerWorks)
+{
+  auto stateMask = Bundle::State::STATE_ACTIVE;
+  auto bundleTracker = std::make_shared<BundleTracker<>>(context, stateMask);
+  ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
+  Bundle bundle = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+  bundle.Start();
+  ASSERT_EQ(2, bundleTracker->Size());
+  bundleTracker->Close();
+
+  ASSERT_NO_THROW(bundleTracker->Open())
+    << "BundleTracker failed to start after it was previously opened and "
+       "closed";
+  EXPECT_EQ(2, bundleTracker->Size())
+    << "2 bundles should be tracked after tracker is reopened";
+
+  bundleTracker->Close();
+}
+
+TEST_F(BundleTrackerMethodTest, BundlesInUntrackedStatesUntracked)
+{
+  auto stateMask =
+    Bundle::State::STATE_STARTING | Bundle::State::STATE_STOPPING;
+  BundleTracker<> bundleTracker = BundleTracker<>(context, stateMask);
+  ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
+
+  Bundle bundle = cppmicroservices::testing::InstallLib(
+    framework.GetBundleContext(), "TestBundleA");
+  bundle.Start();
+
+  EXPECT_EQ(0, bundleTracker.Size())
+    << "No bundles should be tracked when none are in a state covered by the "
+       "state mask";
+  bundleTracker.Close();
+}
+
+TEST_F(BundleTrackerMethodTest, OpenWithInvalidContextThrowsError)
+{
+  auto invalidContext = BundleContext();
+  BundleTracker<> bundleTracker = BundleTracker<>(invalidContext, all_states);
+
+  EXPECT_THROW(bundleTracker.Open(), std::runtime_error)
+    << "Opening BundleTracker with invalid context should throw";
+}
+
 TEST_F(BundleTrackerMethodTest, OpeningOpenTrackerDoesNothing)
 {
   auto bundleTracker = std::make_shared<BundleTracker<>>(context, all_states);
@@ -353,15 +401,6 @@ TEST_F(BundleTrackerMethodTest, OpeningOpenTrackerDoesNothing)
     << "Open() on opened BundleTracker increased the tracking count";
   EXPECT_EQ(0, s1 - s0) << "Open() on opened BundleTracker changed the size";
   bundleTracker->Close();
-}
-
-TEST_F(BundleTrackerMethodTest, OpenWithInvalidContextThrowsError)
-{
-  auto invalidContext = BundleContext();
-  BundleTracker<> bundleTracker = BundleTracker<>(invalidContext, all_states);
-
-  EXPECT_THROW(bundleTracker.Open(), std::runtime_error)
-    << "Opening BundleTracker with invalid context should throw";
 }
 
 TEST_F(BundleTrackerMethodTest, ClosingClosedTrackerDoesNothing)

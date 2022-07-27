@@ -76,6 +76,7 @@ set(_gtest_tests
   BundleTest.cpp
   BundleTrackerMethodTest.cpp
   BundleTrackerCustomCallbackTest.cpp
+  BundleTrackerConcurrencyTest.cpp
   main.cpp
 )
 

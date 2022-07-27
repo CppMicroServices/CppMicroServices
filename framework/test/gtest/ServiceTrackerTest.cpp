@@ -171,7 +171,32 @@ TEST_F(ServiceTrackerTestFixture, TestFilterString)
 
   EXPECT_EQ(tracker.GetServiceReferences().size(), 1) << "tracking count";
 }
+/*
+TEST_F(ServiceTrackerTestFixture, TestFilterStringUsingJSONFilter)
+{
+  BundleContext context = framework.GetBundleContext();
+  MyCustomizer customizer(context);
 
+  cppmicroservices::JSONFilter filter(
+  cppmicroservices::Constants::SERVICE_ID + ">= '0'");
+  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(
+    context, filter, &customizer);
+  tracker.Open();
+
+  struct MyServiceOne : public MyInterfaceOne
+  {};
+  struct MyServiceTwo : public MyInterfaceTwo
+  {};
+
+  auto serviceOne = std::make_shared<MyServiceOne>();
+  auto serviceTwo = std::make_shared<MyServiceTwo>();
+
+  context.RegisterService<MyInterfaceOne>(serviceOne);
+  context.RegisterService<MyInterfaceTwo>(serviceTwo);
+
+  EXPECT_EQ(tracker.GetServiceReferences().size(), 1) << "tracking count";
+}
+*/
 TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
 {
   BundleContext context = framework.GetBundleContext();
@@ -634,7 +659,32 @@ TEST_F(ServiceTrackerTestFixture, TestNullPtrServiceTrackerCustomizer)
   auto trackedObj = tracker.WaitForService(std::chrono::seconds(1));
   ASSERT_EQ(nullptr, trackedObj) << "tracked object should be nullptr";
 }
+/*
+TEST_F(ServiceTrackerTestFixture, TestNullPtrServiceTrackerCustomizerUsingJSONFilter)
+{
+  auto context = framework.GetBundleContext();
+  MyNullPtrCustomizer customizer(context);
 
+  cppmicroservices::JSONFilter filter(
+    cppmicroservices::Constants::SERVICE_ID + ">= '0'");
+  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(
+    context, filter, &customizer);
+  tracker.Open();
+
+  struct MyServiceOne : public MyInterfaceOne
+  {};
+
+  auto serviceOne = std::make_shared<MyServiceOne>();
+
+  context.RegisterService<MyInterfaceOne>(serviceOne);
+
+  ASSERT_EQ(tracker.GetServiceReferences().size(), 0)
+    << "tracking count should be 0";
+
+  auto trackedObj = tracker.WaitForService(std::chrono::seconds(1));
+  ASSERT_EQ(nullptr, trackedObj) << "tracked object should be nullptr";
+}
+*/
 /// <summary>
 /// opening a closed tracker should have it receive adding, modified and removed service events.
 /// </summary>

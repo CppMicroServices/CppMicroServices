@@ -152,6 +152,8 @@ public:
   virtual void Start(uint32_t options);
 
   virtual const AnyMap& GetHeaders() const;
+  
+  //virtual const jsoncons::json GetJsonProps() const;
 
   /**
    * Start code that is executed without holding the

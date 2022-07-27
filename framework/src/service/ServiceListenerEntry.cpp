@@ -53,20 +53,30 @@ public:
                            const ServiceListener& l,
                            void* data,
                            ListenerTokenId tokenId,
-                           const std::string& filter)
+                           const std::string& filter,
+                           const bool isJSON)
     : ServiceListenerHook::ListenerInfoData(context, l, data, tokenId, filter)
     , ldap()
     , hashValue(0)
+    , isJSON(isJSON)
+    , json()
   {
-    if (!filter.empty()) {
+    if ( !isJSON && !filter.empty()) {
       ldap = LDAPExpr(filter);
     }
+
+    if (isJSON) {
+      json = JSONFilter(filter);
+    }
+
   }
 
   ~ServiceListenerEntryData() override = default;
 
   LDAPExpr ldap;
-
+  bool isJSON ;
+  JSONFilter json ;
+  
   /**
    * The elements of "simple" filters are cached, for easy lookup.
    *
@@ -122,14 +132,25 @@ ServiceListenerEntry::ServiceListenerEntry(
   const ServiceListener& l,
   void* data,
   ListenerTokenId tokenId,
-  const std::string& filter)
+  const std::string& filter,
+   const bool isJSON)
   : ServiceListenerHook::ListenerInfo(
-      new ServiceListenerEntryData(context, l, data, tokenId, filter))
+      new ServiceListenerEntryData(context, l, data, tokenId, filter, isJSON))
 {}
 
 const LDAPExpr& ServiceListenerEntry::GetLDAPExpr() const
 {
   return static_cast<ServiceListenerEntryData*>(d.get())->ldap;
+}
+
+const JSONFilter& ServiceListenerEntry::GetJSONFilter() const
+{
+  return static_cast<ServiceListenerEntryData*>(d.get())->json;
+}
+
+const bool& ServiceListenerEntry::isJSONFilter() const
+{
+  return static_cast<ServiceListenerEntryData*>(d.get())->isJSON;
 }
 
 LDAPExpr::LocalCache& ServiceListenerEntry::GetLocalCache() const

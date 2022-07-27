@@ -74,6 +74,8 @@ set(_gtest_tests
   MultipleListenersTest.cpp
   BundleTest.cpp
   main.cpp
+  JSONFilterTest.cpp
+  JSONQueryTest.cpp
 )
 
 if(BUILD_SHARED_LIBS)

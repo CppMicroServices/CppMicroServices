@@ -25,6 +25,7 @@
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/LDAPFilter.h"
+#include "cppmicroservices/JSONFilter.h"
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/detail/Threads.h"
 
@@ -56,6 +57,11 @@ public:
   ServiceTrackerPrivate(ServiceTracker<S, T>* st,
                         const BundleContext& context,
                         const LDAPFilter& filter,
+                        ServiceTrackerCustomizer<S, T>* customizer);
+
+ ServiceTrackerPrivate(ServiceTracker<S, T>* st,
+                        const BundleContext& context,
+                        const JSONFilter& filter,
                         ServiceTrackerCustomizer<S, T>* customizer);
 
   ~ServiceTrackerPrivate();
@@ -90,6 +96,17 @@ public:
    */
   LDAPFilter filter;
 
+  /**
+   * The filter used by this <code>ServiceTracker</code> which specifies the
+   * search criteria for the services to track.
+   */
+  JSONFilter jsonFilter;
+
+  /**
+   *Check if tracker is JSON
+   */
+  bool isJSON;
+  
   /**
    * The <code>ServiceTrackerCustomizer</code> for this tracker.
    */

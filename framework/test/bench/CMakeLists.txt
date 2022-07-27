@@ -13,19 +13,22 @@ include_directories(
 # Add test source files
 #-----------------------------------------------------------------------------
 set(_bench_src 
-  ServiceRegistryTest.cpp
-  ServiceTrackerTest.cpp
-  AnyMapPerfTest.cpp
-  bundleinstall.cpp
-  ldapfilter.cpp
-  ldappropexpr.cpp
-  servicequery.cpp
+#  ServiceRegistryTest.cpp
+   ServiceTrackerTest.cpp
+#  AnyMapPerfTest.cpp
+#  bundleinstall.cpp
+   ldapfilter.cpp
+   ldapjson.cpp
+#  ldappropexpr.cpp
+#  servicequery.cpp
+ jsonfilter.cpp
 )
 
 set(_additional_srcs
   ../util/TestUtilBundleListener.cpp
   ../util/TestUtils.cpp
   ../util/ImportTestBundles.cpp
+  ../util/BundleManifest.cpp
   $<TARGET_OBJECTS:util>
   )
 
@@ -46,7 +49,7 @@ target_link_libraries(${us_bench_test_exe_name} ${Framework_TARGET})
 set_property(TARGET ${us_bench_test_exe_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
 set_property(TARGET ${us_bench_test_exe_name} PROPERTY US_BUNDLE_NAME main)
 
-
+target_include_directories(${us_bench_test_exe_name} PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
 
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)

@@ -48,6 +48,12 @@ public:
 
     ServiceProperties props;
     props["service.testproperty"] = std::string("YES");
+    
+    // nested service properties
+    AnyMap nested(AnyMap::UNORDERED_MAP);
+    nested["foo"] = std::string("bar");
+    props["service.nestedproperty"] = Any(nested);
+    
     sr = context.RegisterService<TestBundleLQService>(s, props);
   }
 

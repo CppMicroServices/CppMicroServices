@@ -28,6 +28,8 @@
 #include "cppmicroservices/ServiceListenerHook.h"
 
 #include "LDAPExpr.h"
+#include "cppmicroservices/JSONFilter.h"
+
 #include "Utils.h"
 
 namespace cppmicroservices {
@@ -57,9 +59,14 @@ public:
                        const ServiceListener& l,
                        void* data,
                        ListenerTokenId tokenId,
-                       const std::string& filter = "");
+                       const std::string& filter = "",
+                       const bool isJSON = false);
 
   const LDAPExpr& GetLDAPExpr() const;
+  
+  const JSONFilter& GetJSONFilter() const;
+
+  const bool& isJSONFilter() const; 
 
   LDAPExpr::LocalCache& GetLocalCache() const;
 

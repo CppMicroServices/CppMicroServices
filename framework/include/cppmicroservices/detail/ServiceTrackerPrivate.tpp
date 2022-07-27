@@ -26,6 +26,7 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/LDAPFilter.h"
+#include "cppmicroservices/JSONFilter.h"
 
 #include <stdexcept>
 #include <utility>
@@ -45,6 +46,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     trackedService(), cachedReference(), cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
+  this->isJSON = false;
   std::stringstream ss;
   ss << "(" << Constants::SERVICE_ID << "="
      << any_cast<long>(reference.GetProperty(Constants::SERVICE_ID)) << ")";
@@ -76,6 +78,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
+  this->isJSON = false;
   this->listenerFilter = std::string("(") + cppmicroservices::Constants::OBJECTCLASS + "="
                         + clazz + ")";
   try
@@ -106,6 +109,27 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     trackedService(), cachedReference(), cachedService(), q_ptr(st)
 {
   this->customizer = customizer ? customizer : q_func();
+  this->isJSON = false;
+  if (!context)
+  {
+    throw std::invalid_argument("The bundle context cannot be null.");
+  }
+}
+
+//jsonfilter changes
+template<class S, class TTT>
+ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
+    ServiceTracker<S,T>* st,
+    const BundleContext& context,
+    const JSONFilter& filter,
+    ServiceTrackerCustomizer<S,T>* customizer
+    )
+  : context(context), jsonFilter(filter), customizer(customizer),
+    listenerFilter(filter.ToString()), listenerToken(), trackReference(),
+    trackedService(), cachedReference(), cachedService(), q_ptr(st)
+{
+  this->customizer = customizer ? customizer : q_func();
+  this->isJSON = true;
   if (!context)
   {
     throw std::invalid_argument("The bundle context cannot be null.");

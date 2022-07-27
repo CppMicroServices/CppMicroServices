@@ -184,7 +184,8 @@ ServiceRegistrationU BundleContext::RegisterService(
 
 std::vector<ServiceReferenceU> BundleContext::GetServiceReferences(
   const std::string& clazz,
-  const std::string& filter)
+  const std::string& filter,
+  const bool isJSON)
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -299,7 +300,7 @@ InterfaceMapConstPtr BundleContext::GetService(
 }
 
 ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
-                                                const std::string& filter)
+                                                const std::string& filter, const bool isJSON )
 {
   d->CheckValid();
   auto b = (d->Lock(), d->bundle);
@@ -309,7 +310,7 @@ ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
   // the result is the same as if the calling thread had
   // won the race condition.
 
-  return b->coreCtx->listeners.AddServiceListener(d, delegate, nullptr, filter);
+  return b->coreCtx->listeners.AddServiceListener(d, delegate, nullptr, filter, isJSON);
 }
 
 void BundleContext::RemoveServiceListener(const ServiceListener& delegate)

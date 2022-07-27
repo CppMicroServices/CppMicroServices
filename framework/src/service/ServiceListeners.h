@@ -111,7 +111,8 @@ public:
     const std::shared_ptr<BundleContextPrivate>& context,
     const ServiceListener& listener,
     void* data,
-    const std::string& filter);
+    const std::string& filter,
+    const bool isJSON = false);
 
   /**
    * Remove service listener from current framework. Silently ignore

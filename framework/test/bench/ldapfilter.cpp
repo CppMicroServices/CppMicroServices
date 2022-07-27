@@ -116,6 +116,94 @@ static void MatchFilterWithServiceReference(benchmark::State& state,
   }
 }
 
+/*
+* "service" : {
+*       "testPropery" : "YES",
+*       "nestedProperty" : {
+*                 "foo" : "bar"
+*        }      
+* }
+
+
+static void LDAPNestedServiceReference(benchmark::State& state)
+{
+  using namespace benchmark::test;
+
+  // register service with custom properties
+  ScopedFramework scopedFramework;
+  ServiceProperties props;
+
+  LDAPFilter filt("(foo=bar)");
+
+  auto services =
+    scopedFramework.framework.GetBundleContext().GetServiceReference(
+      "cppmicroservices::TestBundleLQService");
+
+  /* for (const auto& service : services) {
+    try {
+      const AnyMap serviceProps = [&service] {
+        const auto props = ref_any_cast<const AnyMap>(service.GetProperty("service"));
+        return ref_any_cast<const AnyMap>(props.AtCompoundKey("nestedProperty"));
+      }();
+	
+		 for (auto _ : state) {
+		(void)filt.Match(serviceProps);
+		}
+    } catch (...) {
+      }
+   }
+}
+
+static void LDAPNestedBundle(benchmark::State& state)
+{
+
+  auto framework = FrameworkFactory().NewFramework();
+  framework.Start();
+  auto context = framework.GetBundleContext();
+  auto bundle = testing::InstallLib(context, "dummyService");
+  if (bundle.GetSymbolicName() != "dummyService") {
+    state.SkipWithError("Error: Couldn't find installed bundle with symbolic "
+                        "name 'dummyService'");
+  }
+
+  bool res = false;
+  std::vector<Any> vec;
+
+  LDAPFilter filt("(priority=required)");
+  for (auto _ : state) {
+    vec = ref_any_cast<std::vector<Any>>(
+      bundle.GetHeaders().AtCompoundKey("scr.components"));
+    for (const auto& anAny : vec) {
+      Any aaa = ref_any_cast<const AnyMap>(anAny).AtCompoundKey(
+        "properties.mw.startup_plugins", Any());
+      if (!aaa.Empty()) {
+        res = res || filt.Match(ref_any_cast<const AnyMap>(aaa));
+      }
+    }
+  };
+}
+*/
+static void LDAPNestedQuery(benchmark::State& state)
+{
+  auto framework = FrameworkFactory().NewFramework();
+  framework.Start();
+  auto context = framework.GetBundleContext();
+  auto bundle = testing::InstallLib(context, "dummyService");
+  if (bundle.GetSymbolicName() != "dummyService") {
+    state.SkipWithError("Error: Couldn't find installed bundle with symbolic "
+                        "name 'dummyService'");
+  }
+
+  LDAPFilter filt("(e=found)");
+  bool res = false;
+  for (auto _ : state) {
+    Any aaa = bundle.GetHeaders().AtCompoundKey("a.b.c.d", Any());
+    if (!aaa.Empty()) {
+      res = filt.Match(ref_any_cast<const AnyMap>(aaa));
+    }
+  }
+}
+
 // Register functions as benchmark
 BENCHMARK(ConstructFilterFromString);
 BENCHMARK(ConstructNonTrivialFilterFromString);
@@ -129,3 +217,4 @@ BENCHMARK_CAPTURE(MatchFilterWithServiceReference,
 BENCHMARK_CAPTURE(MatchFilterWithServiceReference,
                   Complex,
                   GetComplexLDAPFilter());
+BENCHMARK(LDAPNestedQuery);

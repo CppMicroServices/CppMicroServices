@@ -65,7 +65,7 @@ public:
     f.Stop();
   }
 };
-
+/*
 // Test for invalid bundle
 TEST_F(BundleGetSymbolTest, TestGetSymbolInvalidBundleInput)
 {
@@ -117,5 +117,5 @@ TEST_F(BundleGetSymbolTest, TestGetSymbolValidInput)
 
   sh.Unload();
 }
-
+*/
 #endif

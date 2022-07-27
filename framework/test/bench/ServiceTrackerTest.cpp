@@ -40,7 +40,7 @@ public:
 };
 
 /// Benchmark how long it takes to open a service tracker using a service reference
-BENCHMARK_DEFINE_F(ServiceTrackerFixture, OpenServiceTrackerWithSvcRef)
+/* BENCHMARK_DEFINE_F(ServiceTrackerFixture, OpenServiceTrackerWithSvcRef)
 (benchmark::State& state)
 {
   using namespace std::chrono;
@@ -160,7 +160,7 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture,
 
   tracker->Close();
 }
-
+*/
 BENCHMARK_DEFINE_F(ServiceTrackerFixture,
                    ServiceTrackerScalabilityWithLDAPFilter)
 (benchmark::State& state)
@@ -190,6 +190,35 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture,
   }
 }
 
+BENCHMARK_DEFINE_F(ServiceTrackerFixture,
+                   ServiceTrackerScalabilityWithJSONFilter)
+(benchmark::State& state)
+{
+  using namespace benchmark::test;
+  using namespace cppmicroservices;
+
+  auto fc = framework->GetBundleContext();
+
+  int64_t maxServiceTrackers{ state.range(0) };
+  std::vector<std::unique_ptr<ServiceTracker<Foo>>> trackers;
+  for (int64_t i = 0; i < maxServiceTrackers; ++i) {
+    auto fooTracker = std::make_unique<ServiceTracker<Foo>>(
+      fc,
+      cppmicroservices::JSONFilter("bundle.symbolic_name=='main'"));
+    fooTracker->Open();
+    trackers.emplace_back(std::move(fooTracker));
+  }
+
+  // how long does it take for N trackers to receive the register service event?
+  for (auto _ : state) {
+    fc.RegisterService<Foo>(std::make_shared<FooImpl>());
+  }
+
+  for (auto& tracker : trackers) {
+    tracker->Close();
+  }
+}
+/*
 static void CloseServiceTracker(benchmark::State& state)
 {
   using namespace std::chrono;
@@ -241,9 +270,14 @@ BENCHMARK_REGISTER_F(ServiceTrackerFixture,
                      MultipleImplOneInterfaceServiceTrackerScalability)
   ->Arg(1)
   ->Arg(4000)
-  ->Arg(10000);
+  ->Arg(10000);*/
 BENCHMARK_REGISTER_F(ServiceTrackerFixture,
                      ServiceTrackerScalabilityWithLDAPFilter)
+  ->Arg(1)
+  ->Arg(4000)
+  ->Arg(10000);
+BENCHMARK_REGISTER_F(ServiceTrackerFixture,
+                     ServiceTrackerScalabilityWithJSONFilter)
   ->Arg(1)
   ->Arg(4000)
   ->Arg(10000);

@@ -27,6 +27,7 @@
 #include <map>
 
 #include "cppmicroservices/LDAPFilter.h"
+#include "cppmicroservices/JSONFilter.h"
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
 
@@ -172,6 +173,29 @@ public:
    */
   ServiceTracker(const BundleContext& context,
                  const LDAPFilter& filter,
+                 ServiceTrackerCustomizer<S, T>* customizer = nullptr);
+
+ /**
+   * Create a <code>ServiceTracker</code> on the specified
+   * <code>JSONFilter</code> object.
+   *
+   * <p>
+   * Services which match the specified <code>JSONFilter</code> object will be
+   * tracked by this <code>ServiceTracker</code>.
+   *
+   * @param context The <code>BundleContext</code> against which the tracking
+   *        is done.
+   * @param filter The <code>JSONFilter</code> to select the services to be
+   *        tracked.
+   * @param customizer The customizer object to call when services are added,
+   *        modified, or removed in this <code>ServiceTracker</code>. If
+   *        customizer is null, then this <code>ServiceTracker</code> will be
+   *        used as the <code>ServiceTrackerCustomizer</code> and this
+   *        <code>ServiceTracker</code> will call the
+   *        <code>ServiceTrackerCustomizer</code> methods on itself.
+   */
+  ServiceTracker(const BundleContext& context,
+                 const JSONFilter& filter,
                  ServiceTrackerCustomizer<S, T>* customizer = nullptr);
 
   /**

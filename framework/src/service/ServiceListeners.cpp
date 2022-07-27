@@ -80,7 +80,8 @@ ListenerToken ServiceListeners::AddServiceListener(
   const std::shared_ptr<BundleContextPrivate>& context,
   const ServiceListener& listener,
   void* data,
-  const std::string& filter)
+  const std::string& filter,
+  const bool isJSON)
 {
   // The following condition is true only if the listener is a non-static member function.
   // If so, the existing listener is replaced with the new listener.
@@ -89,7 +90,7 @@ ListenerToken ServiceListeners::AddServiceListener(
   }
 
   auto token = MakeListenerToken();
-  ServiceListenerEntry sle(context, listener, data, token.Id(), filter);
+  ServiceListenerEntry sle(context, listener, data, token.Id(), filter, isJSON);
   {
     auto l = this->Lock();
     US_UNUSED(l);
@@ -425,6 +426,7 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
 void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
                                                    ServiceListenerEntries& set)
 {
+
   // Filter the original set of listeners
   ServiceListenerEntries receivers = (this->Lock(), serviceSet);
   // This must not be called with any locks held
@@ -438,6 +440,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
   {
     auto l = this->Lock();
     US_UNUSED(l);
+ 
     // Check complicated or empty listener filters
     for (auto& sse : complicatedListeners) {
       if (receivers.count(sse) == 0)
@@ -498,7 +501,7 @@ void ServiceListeners::RemoveFromCache_unlocked(const ServiceListenerEntry& sle)
 
 void ServiceListeners::CheckSimple_unlocked(const ServiceListenerEntry& sle)
 {
-  if (sle.GetLDAPExpr().IsNull()) {
+  if (sle.isJSONFilter() || sle.GetLDAPExpr().IsNull()) {
     complicatedListeners.push_back(sle);
   } else {
     LDAPExpr::LocalCache local_cache;

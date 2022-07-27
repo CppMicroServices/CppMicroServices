@@ -555,3 +555,105 @@ TEST_F(BundleTrackerCustomCallbackTest,
   EXPECT_CALL(*customizer, RemovedBundle).Times(::testing::AtLeast(1));
   CreateOpenTracker(framework, context, customizer);
 }
+
+TEST_F(BundleTrackerCustomCallbackTest, ErrorInAddingBundlePropagates)
+{
+  auto customizer = std::make_shared<MockCustomizer>();
+  auto stateMask = _CreateStateMask(Bundle::State::STATE_ACTIVE);
+  auto bundleTracker =
+    std::make_shared<BundleTracker<>>(context, stateMask, customizer);
+  EXPECT_CALL(*customizer, AddingBundle)
+    .WillRepeatedly(::testing::Return(std::nullopt));
+  bundleTracker->Open();
+  bool receivedErrorEvent{ false };
+  auto token = framework.GetBundleContext().AddFrameworkListener(
+    [&receivedErrorEvent](const FrameworkEvent& evt) {
+      if (evt.GetType() == FrameworkEvent::Type::FRAMEWORK_ERROR) {
+        receivedErrorEvent = true;
+      }
+    });
+
+  // When AddingBundle is called and throws an error
+  EXPECT_CALL(*customizer, AddingBundle)
+    .WillOnce(::testing::Throw(std::runtime_error("foo")));
+  cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
+                                        "TestBundleA")
+    .Start();
+
+  // Then the framework receives it
+  EXPECT_TRUE(receivedErrorEvent)
+    << "Framework did not receive error after AddingBundle throw";
+
+  EXPECT_CALL(*customizer, RemovedBundle).Times(::testing::AnyNumber());
+  bundleTracker->Close();
+  framework.GetBundleContext().RemoveListener(std::move(token));
+}
+
+TEST_F(BundleTrackerCustomCallbackTest, ErrorInModifiedBundlePropagates)
+{
+  auto customizer = std::make_shared<MockCustomizer>();
+  auto stateMask = _CreateStateMask(Bundle::State::STATE_STARTING,
+                                    Bundle::State::STATE_ACTIVE);
+  auto bundleTracker =
+    std::make_shared<BundleTracker<>>(context, stateMask, customizer);
+  EXPECT_CALL(*customizer, AddingBundle)
+    .WillRepeatedly(::testing::Return(std::nullopt));
+  bundleTracker->Open();
+  bool receivedErrorEvent{ false };
+  auto token = framework.GetBundleContext().AddFrameworkListener(
+    [&receivedErrorEvent](const FrameworkEvent& evt) {
+      if (evt.GetType() == FrameworkEvent::Type::FRAMEWORK_ERROR) {
+        receivedErrorEvent = true;
+      }
+    });
+
+  // When ModifiedBundle is called and throws an error
+  EXPECT_CALL(*customizer, AddingBundle).WillOnce(::testing::ReturnArg<0>());
+  EXPECT_CALL(*customizer, ModifiedBundle)
+    .WillOnce(::testing::Throw(std::runtime_error("foo")));
+  cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
+                                        "TestBundleA")
+    .Start();
+
+  // Then the framework receives it
+  EXPECT_TRUE(receivedErrorEvent)
+    << "Framework did not receive error after ModifiedBundle throw";
+
+  EXPECT_CALL(*customizer, RemovedBundle).Times(::testing::AnyNumber());
+  bundleTracker->Close();
+  framework.GetBundleContext().RemoveListener(std::move(token));
+}
+
+TEST_F(BundleTrackerCustomCallbackTest, ErrorInRemovedBundlePropagates)
+{
+  auto customizer = std::make_shared<MockCustomizer>();
+  auto stateMask = _CreateStateMask(Bundle::State::STATE_STARTING);
+  auto bundleTracker =
+    std::make_shared<BundleTracker<>>(context, stateMask, customizer);
+  EXPECT_CALL(*customizer, AddingBundle)
+    .WillRepeatedly(::testing::Return(std::nullopt));
+  bundleTracker->Open();
+  bool receivedErrorEvent{ false };
+  auto token = framework.GetBundleContext().AddFrameworkListener(
+    [&receivedErrorEvent](const FrameworkEvent& evt) {
+      if (evt.GetType() == FrameworkEvent::Type::FRAMEWORK_ERROR) {
+        receivedErrorEvent = true;
+      }
+    });
+
+  // When RemovedBundle is called and throws an error
+  EXPECT_CALL(*customizer, AddingBundle).WillOnce(::testing::ReturnArg<0>());
+  EXPECT_CALL(*customizer, RemovedBundle)
+    .WillOnce(::testing::Throw(std::runtime_error("foo")));
+  cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
+                                        "TestBundleA")
+    .Start();
+
+  // Then the framework receives it
+  EXPECT_TRUE(receivedErrorEvent)
+    << "Framework did not receive error after RemovedBundle throw";
+
+  EXPECT_CALL(*customizer, RemovedBundle).Times(::testing::AnyNumber());
+  bundleTracker->Close();
+  framework.GetBundleContext().RemoveListener(std::move(token));
+}

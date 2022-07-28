@@ -31,6 +31,7 @@
 #include <stdexcept>
 #include <string>
 #include <chrono>
+#include <optional>
 
 namespace cppmicroservices {
 
@@ -354,7 +355,12 @@ ServiceTracker<S,T>::GetService(const ServiceReference<S>& reference) const
   { /* if ServiceTracker is not open */
     return std::shared_ptr<TrackedParamType>();
   }
-  return (t->Lock(), t->GetCustomizedObject_unlocked(reference));
+  {
+    auto l = t->Lock();
+    US_UNUSED(l);
+    auto optional = t->GetCustomizedObject_unlocked(reference);
+    return optional.value_or(nullptr);
+  }
 }
 
 template<class S, class T>
@@ -372,7 +378,7 @@ std::vector<std::shared_ptr<typename ServiceTracker<S,T>::TrackedParamType>> Ser
     d->GetServiceReferences_unlocked(references, t.get());
     for(auto& ref : references)
     {
-      services.push_back(t->GetCustomizedObject_unlocked(ref));
+      services.push_back(t->GetCustomizedObject_unlocked(ref).value_or(nullptr));
     }
   }
   return services;

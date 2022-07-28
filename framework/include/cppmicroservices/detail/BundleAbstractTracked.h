@@ -139,7 +139,7 @@ public:
    *
    * @GuardedBy this
    */
-  TrackedParamType GetCustomizedObject_unlocked(S item) const;
+  std::optional<TrackedParamType> GetCustomizedObject_unlocked(S item) const;
 
   /**
    * Return the list of tracked items.

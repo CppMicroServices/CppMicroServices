@@ -98,15 +98,13 @@ TEST_F(BundleTrackerCustomCallbackTest,
   auto stateMask = _CreateStateMask(Bundle::State::STATE_ACTIVE);
   auto customizer = std::make_shared<MockCustomizer>();
   auto bundleTracker = BundleTracker<>(context, stateMask, customizer);
-
   // Make AddingBundle return null for bundles we aren't testing (main, system_bundle)
   EXPECT_CALL(*customizer, AddingBundle)
     .WillRepeatedly(::testing::Return(std::nullopt));
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
 
   // When bundle makes the following state transitions:
-  // ---> INSTALLED ---> RESOLVED ---> STARTING
-  // ---> ACTIVE (Add)
+  // ---> installed ---> resolved ---> starting ---> ACTIVE (Add)
   // Then there should be 1 AddingBundle callback, and
   // When it returns the bundle
   EXPECT_CALL(*customizer, AddingBundle)
@@ -133,7 +131,7 @@ TEST_F(BundleTrackerCustomCallbackTest,
   auto customizer = std::make_shared<MockCustomizer>();
   auto bundleTracker = BundleTracker<>(context, all_states, customizer);
 
-  // Make AddingBundle return null for all bundles
+  // When AddingBundle callbacks are issued and return null
   EXPECT_CALL(*customizer, AddingBundle)
     .Times(::testing::AtLeast(1))
     .WillRepeatedly(::testing::Return(std::nullopt));
@@ -141,6 +139,7 @@ TEST_F(BundleTrackerCustomCallbackTest,
   Bundle ignoredBundle = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleM");
 
+  // Then no bundles should be tracked
   EXPECT_EQ(0, bundleTracker.Size())
     << "No bundles should be tracked if AddingBundle always returns null";
 
@@ -186,7 +185,7 @@ TEST_F(BundleTrackerCustomCallbackTest,
   Bundle bundle2 = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleM");
 
-  // bundle: INSTALLED ---> UNINSTALLED (Remove)
+  // bundle: INSTALLED ---> uninstalled (Remove)
   EXPECT_CALL(*customizer, AddingBundle).Times(0);
   EXPECT_CALL(*customizer, ModifiedBundle).Times(0);
   EXPECT_CALL(*customizer, RemovedBundle).Times(1);
@@ -235,8 +234,7 @@ TEST_F(BundleTrackerCustomCallbackTest,
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
 
   // When bundle makes the following state transitions:
-  // ---> INSTALLED ---> RESOLVED ---> STARTING
-  // ---> ACTIVE (Add)
+  // ---> installed ---> resolved ---> starting ---> ACTIVE (Add)
   // Then there should be 1 AddingBundle callback, and
   // When it returns the object 5
   EXPECT_CALL(*customizer, AddingBundle)
@@ -289,8 +287,7 @@ TEST_F(BundleTrackerCustomCallbackTest,
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
 
   // When bundle makes the following state transitions:
-  // ---> INSTALLED ---> RESOLVED ---> STARTING
-  // ---> ACTIVE (Add)
+  // ---> installed ---> resolved ---> starting ---> ACTIVE (Add)
   // Then there should be 1 AddingBundle callback, and
   // When it returns the bundle
   EXPECT_CALL(bundleTracker, AddingBundle)
@@ -317,13 +314,14 @@ TEST_F(BundleTrackerCustomCallbackTest,
 {
   auto bundleTracker = MockBundleTracker(context, all_states);
 
-  // Make AddingBundle return null for all bundles
+  // When AddingBundle callbacks are issued and return null
   EXPECT_CALL(bundleTracker, AddingBundle)
     .WillRepeatedly(::testing::Return(std::nullopt));
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
   Bundle ignoredBundle = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleM");
 
+  // Then no bundles should be tracked
   EXPECT_EQ(0, bundleTracker.Size())
     << "No bundles should be tracked if AddingBundle always returns null";
 
@@ -365,7 +363,7 @@ TEST_F(BundleTrackerCustomCallbackTest,
   Bundle bundle = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
 
-  // bundle: INSTALLED ---> UNINSTALLED (Remove)
+  // bundle: INSTALLED ---> uninstalled (Remove)
   EXPECT_CALL(bundleTracker, AddingBundle).Times(0);
   EXPECT_CALL(bundleTracker, ModifiedBundle).Times(0);
   EXPECT_CALL(bundleTracker, RemovedBundle).Times(1);
@@ -413,8 +411,7 @@ TEST_F(BundleTrackerCustomCallbackTest,
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
 
   // When bundle makes the following state transitions:
-  // ---> INSTALLED ---> RESOLVED ---> STARTING
-  // ---> ACTIVE (Add)
+  // ---> installed ---> resolved ---> starting ---> ACTIVE (Add)
   // Then there should be 1 AddingBundle callback, and
   // When it returns the object 5
   EXPECT_CALL(bundleTracker, AddingBundle)
@@ -449,9 +446,9 @@ TEST_F(BundleTrackerCustomCallbackTest, NoCallbacksWhenClosed)
   EXPECT_CALL(*customizer, AddingBundle).Times(0);
   EXPECT_CALL(*customizer, ModifiedBundle).Times(0);
   EXPECT_CALL(*customizer, RemovedBundle).Times(0);
-  Bundle bundle0 = cppmicroservices::testing::InstallLib(
+  Bundle testBundle1 = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleM");
-  bundle0.Start();
+  testBundle1.Start();
 
   // Given a series of callbacks while the BundleTracker is open
   EXPECT_CALL(*customizer, AddingBundle)
@@ -459,7 +456,7 @@ TEST_F(BundleTrackerCustomCallbackTest, NoCallbacksWhenClosed)
   EXPECT_CALL(*customizer, ModifiedBundle).Times(::testing::AnyNumber());
   EXPECT_CALL(*customizer, RemovedBundle).Times(::testing::AnyNumber());
   bundleTracker.Open();
-  Bundle bundle1 = cppmicroservices::testing::InstallLib(
+  Bundle testBundle2 = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
   bundleTracker.Close();
 
@@ -467,12 +464,11 @@ TEST_F(BundleTrackerCustomCallbackTest, NoCallbacksWhenClosed)
   EXPECT_CALL(*customizer, AddingBundle).Times(0);
   EXPECT_CALL(*customizer, ModifiedBundle).Times(0);
   EXPECT_CALL(*customizer, RemovedBundle).Times(0);
-  bundle0.Uninstall();
-  bundle1.Start();
-  bundle1.Uninstall();
-  Bundle bundle2 = cppmicroservices::testing::InstallLib(
-    framework.GetBundleContext(), "TestBundleB");
-  bundle2.Uninstall();
+  testBundle1.Uninstall();
+  testBundle2.Start();
+  testBundle2.Uninstall();
+  cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
+                                        "TestBundleB");
 }
 
 TEST_F(BundleTrackerCustomCallbackTest,
@@ -505,8 +501,7 @@ TEST_F(BundleTrackerCustomCallbackTest,
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
 
   // When the test bundle is stopped, we should observe
-  //   testBundle : ACTIVE ---> STOPPING (Remove)
-  //                       ---> RESOLVED (Add)
+  //   testBundle : ACTIVE ---> stopping (Remove) ---> RESOLVED (Add)
   EXPECT_CALL(
     *customizer,
     RemovedBundle(HasName("TestBundleA"), ::testing::_, ::testing::_));

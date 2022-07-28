@@ -95,7 +95,6 @@ private:
     cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>
     serviceTracker;
   std::shared_ptr<cppmicroservices::logservice::LogService> logService;
-  std::atomic<bool> bOpen;
 };
 } // cfrimpl
 } // cppmicroservices

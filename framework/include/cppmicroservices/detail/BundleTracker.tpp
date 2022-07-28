@@ -171,7 +171,7 @@ template<class T>
 std::optional<typename BundleTracker<T>::TrackedParamType> BundleTracker<T>::GetObject(
   const Bundle& bundle)
 {
-  typename BundleTracker<T>::TrackedParamType object;
+  std::optional<typename BundleTracker<T>::TrackedParamType> optional;
   auto t = d->Tracked();
   if (!t || !bundle) { /* If BundleTracker is not open or if bundle is invalid */
     return std::nullopt;
@@ -179,9 +179,9 @@ std::optional<typename BundleTracker<T>::TrackedParamType> BundleTracker<T>::Get
   {
     auto l = t->Lock();
     US_UNUSED(l);
-    object = t->GetCustomizedObject_unlocked(bundle);
+    optional = t->GetCustomizedObject_unlocked(bundle);
   }
-  return object;
+  return optional;
 }
 
 template<class T>

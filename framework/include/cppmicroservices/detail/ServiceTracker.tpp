@@ -130,9 +130,9 @@ void ServiceTracker<S,T>::Open()
         else
         { /* user supplied filter */
           references = d->GetInitialReferences(std::string(),
-                                                   (d->listenerFilter.empty() ?
-											            ((d->isJSON == false) ? d->filter.ToString() : d->jsonFilter.ToString())
-											         : d->listenerFilter)
+                                               (d->listenerFilter.empty() ?
+                                               ((d->isJSON == false) ? d->filter.ToString() : d->jsonFilter.ToString())
+											   : d->listenerFilter)
 											   );
         }
       }
@@ -176,7 +176,8 @@ void ServiceTracker<S,T>::Close()
    /* DIAG_LOG(*d->context.GetLogSink())
       << "ServiceTracker<S,TTT>::close:" 
 	  <<((d->isJSON == false) ? d->filter : d->jsonFilter);
-    */outgoing->Close();
+   */
+   outgoing->Close();
 
     d->Modified();         /* clear the cache */
     outgoing->NotifyAll(); /* wake up any waiters */
@@ -287,8 +288,8 @@ ServiceTracker<S,T>::GetServiceReference() const
   if (reference.GetBundle())
   {
    /* DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
-                  << ((d->isJSON == false) ? d->filter : d->jsonFilter);
-    */return reference;
+                  << ((d->isJSON == false) ? d->filter : d->jsonFilter);*/
+    return reference;
   }
   //DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference:" << ((d->isJSON == false) ? d->filter : d->jsonFilter);
   auto references = GetServiceReferences();
@@ -399,8 +400,8 @@ ServiceTracker<S,T>::GetService() const
   if (service)
   {
    /* DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService[cached]:"
-                  << ((d->isJSON == false) ? d->filter : d->jsonFilter);
-    */return service;
+                  << ((d->isJSON == false) ? d->filter : d->jsonFilter);*/
+    return service;
   }
   /*DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService:" 
                                      << ((d->isJSON == false) ? d->filter : d->jsonFilter);

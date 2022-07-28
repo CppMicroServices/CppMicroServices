@@ -116,7 +116,6 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
   }
 }
 
-//jsonfilter changes
 template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTracker<S,T>* st,

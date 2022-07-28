@@ -98,12 +98,13 @@ public:
 
   /**
    * The filter used by this <code>ServiceTracker</code> which specifies the
-   * search criteria for the services to track.
+   * search criteria for the services to track in case filter type is JSON.
    */
   JSONFilter jsonFilter;
 
   /**
-   *Check if tracker is JSON
+   * Checks if the filter used by this <code>ServiceTracker</code> which specifies the
+   * search criteria for the services to track is JSON.
    */
   bool isJSON;
   

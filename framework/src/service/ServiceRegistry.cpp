@@ -83,8 +83,7 @@ ServiceRegistry::ServiceRegistry(CoreBundleContext* coreCtx)
 ServiceRegistrationBase ServiceRegistry::RegisterService(
   BundlePrivate* bundle,
   const InterfaceMapConstPtr& service,
-  const ServiceProperties& properties
-  )
+  const ServiceProperties& properties)
 {
   if (!service || service->empty()) {
     throw std::invalid_argument(
@@ -187,8 +186,7 @@ ServiceReferenceBase ServiceRegistry::Get(BundlePrivate* bundle,
 void ServiceRegistry::Get(const std::string& clazz,
                           const std::string& filter,
                           BundlePrivate* bundle,
-                          std::vector<ServiceReferenceBase>& res
-                          ) const
+                          std::vector<ServiceReferenceBase>& res) const
 {
   this->Lock(), Get_unlocked(clazz, filter, bundle, res);
 }
@@ -196,13 +194,11 @@ void ServiceRegistry::Get(const std::string& clazz,
 void ServiceRegistry::Get_unlocked(const std::string& clazz,
                                    const std::string& filter,
                                    BundlePrivate* bundle,
-                                   std::vector<ServiceReferenceBase>& res
-                                   ) const
+                                   std::vector<ServiceReferenceBase>& res) const
 {
   std::vector<ServiceRegistrationBase>::const_iterator s;
   std::vector<ServiceRegistrationBase>::const_iterator send;
   std::vector<ServiceRegistrationBase> v;
- 
   LDAPExpr ldap;
   if (clazz.empty()) {
     if (!filter.empty()) {
@@ -252,7 +248,7 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz,
       res.push_back(sri);
     }
   }
- 
+
   if (!res.empty()) {
     if (bundle != nullptr) {
       auto ctx = bundle->bundleContext.Load();

@@ -103,8 +103,7 @@ public:
    */
   ServiceRegistrationBase RegisterService(BundlePrivate* bundle,
                                           const InterfaceMapConstPtr& service,
-                                          const ServiceProperties& properties
-                                          );
+                                          const ServiceProperties& properties);
 
   /**
    * Reorder registered services. Call this method if the ranking for

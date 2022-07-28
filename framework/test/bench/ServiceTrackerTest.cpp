@@ -40,7 +40,7 @@ public:
 };
 
 /// Benchmark how long it takes to open a service tracker using a service reference
-/* BENCHMARK_DEFINE_F(ServiceTrackerFixture, OpenServiceTrackerWithSvcRef)
+ BENCHMARK_DEFINE_F(ServiceTrackerFixture, OpenServiceTrackerWithSvcRef)
 (benchmark::State& state)
 {
   using namespace std::chrono;
@@ -160,7 +160,7 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture,
 
   tracker->Close();
 }
-*/
+
 BENCHMARK_DEFINE_F(ServiceTrackerFixture,
                    ServiceTrackerScalabilityWithLDAPFilter)
 (benchmark::State& state)
@@ -190,7 +190,7 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture,
   }
 }
 
-BENCHMARK_DEFINE_F(ServiceTrackerFixture,
+/* BENCHMARK_DEFINE_F(ServiceTrackerFixture,
                    ServiceTrackerScalabilityWithJSONFilter)
 (benchmark::State& state)
 {
@@ -218,7 +218,7 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture,
     tracker->Close();
   }
 }
-/*
+*/
 static void CloseServiceTracker(benchmark::State& state)
 {
   using namespace std::chrono;
@@ -270,14 +270,14 @@ BENCHMARK_REGISTER_F(ServiceTrackerFixture,
                      MultipleImplOneInterfaceServiceTrackerScalability)
   ->Arg(1)
   ->Arg(4000)
-  ->Arg(10000);*/
+  ->Arg(10000);
 BENCHMARK_REGISTER_F(ServiceTrackerFixture,
                      ServiceTrackerScalabilityWithLDAPFilter)
   ->Arg(1)
   ->Arg(4000)
   ->Arg(10000);
-BENCHMARK_REGISTER_F(ServiceTrackerFixture,
+/* BENCHMARK_REGISTER_F(ServiceTrackerFixture,
                      ServiceTrackerScalabilityWithJSONFilter)
   ->Arg(1)
   ->Arg(4000)
-  ->Arg(10000);
+  ->Arg(10000);*/

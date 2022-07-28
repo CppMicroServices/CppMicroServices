@@ -74,10 +74,10 @@ bool JSONFilter::Match(const ServiceReferenceBase& reference) const
 
 bool JSONFilter::Match(const Bundle& bundle) const
 {   
-	if (filter_str.empty())
+    if (filter_str.empty())
     {
-		return false;
-	}
+       return false;
+    }
 
     jsoncons::json js = PropertiesHandle(Properties(bundle.GetHeaders()), false)->JSON_unlocked();
     jsoncons::json result = jsoncons::jmespath::search(js, filter_str);
@@ -87,10 +87,10 @@ bool JSONFilter::Match(const Bundle& bundle) const
 
 bool JSONFilter::Match(const AnyMap& dictionary) const
 {
-	if (filter_str.empty())
+    if (filter_str.empty())
     {
-		return false;
-	}
+        return false;
+    }
 
     jsoncons::json js = PropertiesHandle(Properties(dictionary), false)->JSON_unlocked();
     jsoncons::json result = jsoncons::jmespath::search(js, filter_str);
@@ -114,11 +114,4 @@ std::ostream& operator<<(std::ostream& os, const JSONFilter& filter)
 {
   return os << filter.ToString();
 }
-/*
- bool JSONFilter::GetMatchedObjectClasses(ObjectClassSet& objClasses) const
-{
-  
-  
-  
-}*/
 }

@@ -24,7 +24,6 @@
 #define CPPMICROSERVICES_JSONFILTER_H
 
 #include "cppmicroservices/AnyMap.h"
-#include <unordered_set> //Jfor JSONExpr
 
 #ifdef _MSC_VER
 #  pragma warning(push)
@@ -46,7 +45,7 @@ class Bundle;
  * \ingroup MicroServices
  * \ingroup gr_ldap
  *
- * An <a href="http://www.ietf.org/rfc/rfc1960.txt">RFC 1960</a>-based Filter.
+ * An <a href="RFC Link Here">RFC 1960</a>-based Filter.
  *
  * <p>
  * A <code>JSONFilter</code> can be used numerous times to determine if the match
@@ -54,19 +53,12 @@ class Bundle;
  * <p>
  * Some examples of JSON filters are:
  *
- *   - "(cn=Babs Jensen)"
- *   - "(!(cn=Tim Howes))"
- *   - "(&(" + Constants::OBJECTCLASS + "=Person)(|(sn=Jensen)(cn=Babs J*)))"
- *   - "(o=univ*of*mich*)"
- *
- * \remarks This class is thread safe.
- *
- * \sa JSONProp for a fluent API generating JSON filter strings
+ *   - "cn == 'Babs Jensen'"
+ *   - "sn[?@ == '1'] | [0] == '1'"
+ *   - "a.b.c.d == 'found'" 
  */
 class US_Framework_EXPORT JSONFilter
 {
-// fo JSONExpr
-  using ObjectClassSet = std::unordered_set<std::string>;
 
 public:
   /**
@@ -103,7 +95,7 @@ public:
    * <p>
    * This <code>JSONFilter</code> is executed using the keys and values of the
    * referenced service's properties. The keys are looked up in a case
-   * insensitive manner.
+   * sensitive manner.
    *
    * @param reference The reference to the service whose properties are used
    *        in the match.
@@ -116,7 +108,7 @@ public:
    * Filter using a bundle's manifest headers.
    * <p>
    * This <code>JSONFilter</code> is executed using the keys and values of the
-   * bundle's manifest headers. The keys are looked up in a case insensitive
+   * bundle's manifest headers. The keys are looked up in a case sensitive
    * manner.
    *
    * @param bundle The bundle whose manifest's headers are used
@@ -129,9 +121,9 @@ public:
   bool Match(const Bundle& bundle) const;
 
   
-  /** Filter using a <code>AnyMap</code> object with case insensitive key lookup. This
+  /** Filter using a <code>AnyMap</code> object with case sensitive key lookup. This
    * <code>JSONFilter</code> is executed using the specified <code>AnyMap</code>'s keys
-   * and values. The keys are looked up in a case insensitive manner.
+   * and values. The keys are looked up in a case sensitive manner.
    *
    * @param dictionary The <code>AnyMap</code> whose key/value pairs are used
    *        in the match.
@@ -168,9 +160,6 @@ public:
   bool operator==(const JSONFilter& other) const;
 
   JSONFilter& operator=(const JSONFilter& filter);
-
-// for JSONExpr
-  bool GetMatchedObjectClasses(ObjectClassSet& objClasses) const;
 
  protected:
   std::string filter_str;

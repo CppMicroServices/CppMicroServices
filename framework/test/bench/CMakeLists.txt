@@ -13,15 +13,15 @@ include_directories(
 # Add test source files
 #-----------------------------------------------------------------------------
 set(_bench_src 
-#  ServiceRegistryTest.cpp
+   ServiceRegistryTest.cpp
    ServiceTrackerTest.cpp
-#  AnyMapPerfTest.cpp
-#  bundleinstall.cpp
+   AnyMapPerfTest.cpp
+   bundleinstall.cpp
    ldapfilter.cpp
-   ldapjson.cpp
-#  ldappropexpr.cpp
-#  servicequery.cpp
- jsonfilter.cpp
+ #  ldapjson.cpp
+   ldappropexpr.cpp
+   servicequery.cpp
+   jsonfilter.cpp
 )
 
 set(_additional_srcs

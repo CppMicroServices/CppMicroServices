@@ -43,7 +43,7 @@ const std::string testBundlePath = cppmicroservices::testing::BIN_PATH +
                                    "usFrameworkTests" + US_EXE_EXT;
 #endif
 }
-/*
+
 TEST(BundleObjFile, InvalidLocation)
 {
   ASSERT_THROW(cppmicroservices::BundleObjFactory().CreateBundleFileObj(
@@ -92,7 +92,7 @@ TEST(BundleObjFile, GetRawBundleResourceContainer)
   });
 #endif
 }
-*/
+
 #if defined(US_BUILD_SHARED_LIBS)
 #  if defined(US_PLATFORM_APPLE) || defined(US_PLATFORM_POSIX)
 TEST(BundleObjFile, MappedFile)

@@ -172,6 +172,7 @@ TEST_F(ServiceTrackerTestFixture, TestFilterString)
   EXPECT_EQ(tracker.GetServiceReferences().size(), 1) << "tracking count";
 }
 /*
+* This test is currenty failing in 
 TEST_F(ServiceTrackerTestFixture, TestFilterStringUsingJSONFilter)
 {
   BundleContext context = framework.GetBundleContext();

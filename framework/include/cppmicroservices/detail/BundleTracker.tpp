@@ -239,7 +239,11 @@ void BundleTracker<T>::Remove(const Bundle& bundle)
   if (!t) { /* If BundleTracker is not open */
     return;
   }
-  t->Untrack(bundle, BundleEvent());
+  {
+    auto l = t->Lock();
+    US_UNUSED(l);
+    t->Untrack(bundle, BundleEvent());
+  } 
 }
 
 template<class T>

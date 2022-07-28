@@ -160,7 +160,7 @@ public:
    * @param bundle The <code>Bundle</code> paired with the object
    * @return The custom object paired with the given <code>Bundle</code> or null if the <code>Bundle</code> is not being tracked.
    */
-  TrackedParamType GetObject(const Bundle& bundle);
+  std::optional<TrackedParamType> GetObject(const Bundle& bundle);
 
   /**
    * Returns an unordered map from all of the currently tracked Bundles to their custom objects.

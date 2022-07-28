@@ -168,13 +168,13 @@ std::vector<Bundle> BundleTracker<T>::GetBundles()
 }
 
 template<class T>
-typename BundleTracker<T>::TrackedParamType BundleTracker<T>::GetObject(
+std::optional<typename BundleTracker<T>::TrackedParamType> BundleTracker<T>::GetObject(
   const Bundle& bundle)
 {
   typename BundleTracker<T>::TrackedParamType object;
   auto t = d->Tracked();
-  if (!t) { /* If BundleTracker is not open */
-    return BundleTracker<T>::TrackedParamType();
+  if (!t || !bundle) { /* If BundleTracker is not open or if bundle is invalid */
+    return std::nullopt;
   }
   {
     auto l = t->Lock();

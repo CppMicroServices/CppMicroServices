@@ -46,6 +46,14 @@ void TrackedBundle<TTT>::BundleChanged(const BundleEvent& event)
   // Perform the business logic
   // Call track or untrack based on appropriate behavior
 
+  // Ignore events that do not correspond with
+  // Bundle state changes
+  auto eventType = event.GetType();
+  if (eventType == BundleEvent::Type::BUNDLE_UNRESOLVED)
+  {
+    return;
+  }
+
   (void)latch.CountUp();
   ScopeGuard sg([this]() {
     // By using try/catch here, we ensure that this lambda function doesn't

@@ -220,14 +220,14 @@ bool BundleAbstractTracked<S, TTT, R>::IsEmpty_unlocked() const
 }
 
 template<class S, class TTT, class R>
-typename BundleAbstractTracked<S, TTT, R>::TrackedParamType
+std::optional<typename BundleAbstractTracked<S, TTT, R>::TrackedParamType>
 BundleAbstractTracked<S, TTT, R>::GetCustomizedObject_unlocked(S item) const
 {
   typename TrackingMap::const_iterator i = tracked.find(item);
   if (i != tracked.end())
     return i->second;
 
-  return TrackedParamType();
+  return std::nullopt;
 }
 
 template<class S, class TTT, class R>

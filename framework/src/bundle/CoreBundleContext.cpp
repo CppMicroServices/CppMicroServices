@@ -92,9 +92,9 @@ CoreBundleContext::CoreBundleContext(
   , frameworkProperties(InitProperties(props))
   , workingDir(ref_any_cast<std::string>(
       frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
-  , logger(std::make_shared<cppmicroservices::cfrimpl::CFRLogger>(this))
   , listeners(this)
   , services(this)
+  , logger(std::make_shared<cppmicroservices::cfrimpl::CFRLogger>())
   , serviceHooks(this)
   , bundleHooks(this)
   , bundleRegistry(this)

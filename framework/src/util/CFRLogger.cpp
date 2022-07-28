@@ -26,7 +26,7 @@
 
 namespace cppmicroservices {
 namespace cfrimpl {
-CFRLogger::CFRLogger(cppmicroservices::CoreBundleContext*)
+CFRLogger::CFRLogger()
   : serviceTracker()
   , logService(nullptr)
   , bOpen(false)
@@ -120,8 +120,10 @@ void CFRLogger::Open()
   auto l = this->Lock();
   US_UNUSED(l);
   cfrContext = GetBundleContext();
-  serviceTracker.reset(
-    new cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService> (cfrContext, this));
+  if (!cfrContext) {
+    return;
+  }
+  serviceTracker = std::make_unique<cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>> (cfrContext, this);
   serviceTracker->Open();
   bOpen = true;
 }
@@ -137,9 +139,5 @@ void CFRLogger::Close()
   bOpen = false;
 }
 
-bool CFRLogger::IsOpen() const 
-{
-  return bOpen;
-}
 } // cfrimpl
 } // cppmicroservices

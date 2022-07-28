@@ -98,14 +98,7 @@ public:
   */
   std::shared_ptr<detail::LogSink> sink;
 
-  /**
-   * A LogService for logging framework messages via
-   * a default or user-provided LogService that are intended to be
-   * visible outside of the framework.
-   */
-  std::shared_ptr<cppmicroservices::cfrimpl::CFRLogger> logger;
-
-  /**
+   /**
    * Bundle Storage
    */
   std::unique_ptr<BundleStorage> storage;
@@ -124,6 +117,13 @@ public:
    * All registered services in this framework.
    */
   ServiceRegistry services;
+
+  /**
+   * A LogService for logging framework messages via
+   * a default or user-provided LogService that are intended to be
+   * visible outside of the framework.
+   */
+  std::shared_ptr<cppmicroservices::cfrimpl::CFRLogger> logger;
 
   /**
    * All service hooks.

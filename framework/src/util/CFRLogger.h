@@ -51,7 +51,7 @@ class CFRLogger final
       cppmicroservices::logservice::LogService>
 {
 public:
-  CFRLogger(cppmicroservices::CoreBundleContext*);
+  CFRLogger();
   CFRLogger(const CFRLogger&) = delete;
   CFRLogger(CFRLogger&&) = delete;
   CFRLogger& operator=(const CFRLogger&) = delete;
@@ -88,7 +88,6 @@ public:
   // methods for the CFRLogger class
   void Open();
   void Close();
-  bool IsOpen() const;
 
 private:
   cppmicroservices::BundleContext cfrContext;

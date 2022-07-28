@@ -110,9 +110,26 @@ TEST_F(BundleTrackerMethodTest, GetObjectWorks)
   ASSERT_NO_THROW(bundleTracker->Open()) << "BundleTracker failed to start";
   Bundle bundleA = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
+  auto bundles = bundleTracker->GetBundles();
+  bool bundleATracked =
+    std::find(bundles.begin(), bundles.end(), bundleA) != bundles.end();
+  ASSERT_TRUE(bundleATracked) << "A bundle that should be tracked is untracked";
 
-  EXPECT_EQ(bundleA, bundleTracker->GetObject(bundleA));
-  // TODO: test a case where GetObject returns null
+  EXPECT_EQ(bundleA, bundleTracker->GetObject(bundleA))
+    << "GetObject for a tracked bundle should return the bundle when no custom "
+       "objects were used";
+  
+  bundleTracker->Remove(bundleA);
+  EXPECT_EQ(std::nullopt, bundleTracker->GetObject(bundleA))
+    << "GetObject for an untracked, valid bundle should return nullopt";
+
+  Bundle invalidBundle = Bundle();
+  ASSERT_NO_THROW(bundleTracker->GetObject(invalidBundle))
+    << "GetObject threw an error for an invalid bundle";
+  EXPECT_EQ(std::nullopt, bundleTracker->GetObject(invalidBundle))
+    << "GetObject for an untracked, invalid bundle should return nullopt";
+
+  bundleTracker->Close();
 }
 
 TEST_F(BundleTrackerMethodTest, GetTrackedWorks)

@@ -5,9 +5,9 @@ name: "CodeQL/MSVC Code Analysis"
 
 on:
   push:
-    branches: [ development, bundle-tracker ]
+    branches: [ development ]
   pull_request:
-    branches: [ development, bundle-tracker ]
+    branches: [ development ]
   schedule:
     - cron: '28 10 * * 0'
 

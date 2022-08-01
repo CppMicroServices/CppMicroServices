@@ -87,7 +87,8 @@ InterfaceMapConstPtr ServiceReferenceBasePrivate::GetServiceFromFactory(
     std::vector<std::string> classes =
       (registration->properties.Lock(),
        any_cast<std::vector<std::string>>(
-         registration->properties.Value_unlocked(Constants::OBJECTCLASS)));
+         registration->properties.Value_unlocked(Constants::OBJECTCLASS)
+           .first));
     for (auto clazz : classes) {
       if (smap->find(clazz) == smap->end() &&
           clazz != "org.cppmicroservices.factory") {

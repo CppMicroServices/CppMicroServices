@@ -29,6 +29,8 @@
 #include <unordered_map>
 
 namespace cppmicroservices {
+class Properties;
+class LDAPExpr;
 
 namespace detail {
 
@@ -111,7 +113,8 @@ private:
 
     iterator_base(iter_type type)
       : type(type)
-    {}
+    {
+    }
 
   public:
     using value_type = any_map::value_type;
@@ -221,8 +224,11 @@ public:
 
   any_map(map_type type);
   any_map(const ordered_any_map& m);
+  any_map(ordered_any_map&& m);
   any_map(const unordered_any_map& m);
+  any_map(unordered_any_map&& m);
   any_map(const unordered_any_cimap& m);
+  any_map(unordered_any_cimap&& m);
 
   any_map(const any_map& m);
   any_map& operator=(const any_map& m);
@@ -297,6 +303,30 @@ protected:
   map_type type;
 
 private:
+  friend class Properties;
+  friend class LDAPExpr;
+
+  // Private "fast" and type-checked functions for working with map iterators
+  // and finding elements (these functions should only be called in a context)
+  // where the type of the map is guaranteed.
+  //
+  // These functions bypass the creation of "any_map::iterator" and "any_map::const_iterator"
+  // objects as construction of those are slow. Once the AnyMap class is refactored, these
+  // functions will likely be unnecessary as the begin(), end(), and find() functions will
+  // inherently do what these functions do.
+  ordered_any_map::const_iterator beginOM_TypeChecked() const;
+  ordered_any_map::const_iterator endOM_TypeChecked() const;
+  ordered_any_map::const_iterator findOM_TypeChecked(const key_type& key) const;
+  unordered_any_map::const_iterator beginUO_TypeChecked() const;
+  unordered_any_map::const_iterator endUO_TypeChecked() const;
+  unordered_any_map::const_iterator findUO_TypeChecked(
+    const key_type& key) const;
+  unordered_any_cimap::const_iterator beginUOCI_TypeChecked() const;
+  unordered_any_cimap::const_iterator endUOCI_TypeChecked() const;
+  unordered_any_cimap::const_iterator findUOCI_TypeChecked(
+    const key_type& key) const;
+  // =========================================================================
+
   ordered_any_map const& o_m() const;
   ordered_any_map& o_m();
   unordered_any_map const& uo_m() const;

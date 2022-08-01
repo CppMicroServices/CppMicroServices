@@ -14,6 +14,7 @@ set(_srcs
   util/LDAPFilter.cpp
   util/LDAPProp.cpp
   util/Properties.cpp
+  util/PropsCheck.cpp
   util/SecurityException.cpp
   util/SharedLibrary.cpp
   util/SharedLibraryException.cpp
@@ -65,6 +66,7 @@ set(_private_headers
   util/CFRLogger.h
   util/LDAPExpr.h
   util/Properties.h
+  util/PropsCheck.h
   util/Utils.h
 
   service/ServiceHooks.h
@@ -90,4 +92,3 @@ set(_private_headers
   bundle/CoreBundleContext.h
   bundle/Resolver.h
 )
-

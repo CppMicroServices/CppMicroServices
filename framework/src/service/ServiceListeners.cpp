@@ -447,7 +447,20 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
       if (ldapExpr.IsNull() || ldapExpr.Evaluate(props, false)) {
         set.insert(sse);
       } else if (evt.GetType() == ServiceEvent::SERVICE_REGISTERED) {
-        const std::string msg = "Service listener matching LDAP filter could not be found using LDAP filter: " + sse.GetFilter();
+        // get the props key and value for logging
+        std::string propsKeyValues{};
+
+        auto key = props->Keys_unlocked();
+        for (auto k : key) {
+          auto val = props->Value_unlocked(k).ToString();
+          propsKeyValues += k + " : " + val + ", ";
+        }
+
+        const std::string msg =
+          "Service listener matching LDAP filter could "
+          "not be found using LDAP filter: " +
+          sse.GetFilter() + ". Please verify the LDAP filter value in service properties: " + "{" + propsKeyValues + "}";
+
           coreCtx->logger->Log(
             cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, msg);
         }

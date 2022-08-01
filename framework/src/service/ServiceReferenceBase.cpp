@@ -80,7 +80,7 @@ Any ServiceReferenceBase::GetProperty(const std::string& key) const
 {
   auto l = d.load()->registration->properties.Lock();
   US_UNUSED(l);
-  return d.load()->registration->properties.Value_unlocked(key);
+  return d.load()->registration->properties.Value_unlocked(key).first;
 }
 
 void ServiceReferenceBase::GetPropertyKeys(std::vector<std::string>& keys) const
@@ -144,11 +144,14 @@ bool ServiceReferenceBase::operator<(
   {
     auto l = d.load()->registration->properties.Lock();
     US_UNUSED(l);
-    anyR1 = d.load()->registration->properties.Value_unlocked(
-      Constants::SERVICE_RANKING);
+    anyR1 =
+      d.load()
+        ->registration->properties.Value_unlocked(Constants::SERVICE_RANKING)
+        .first;
     assert(anyR1.Empty() || anyR1.Type() == typeid(int));
-    anyId1 =
-      d.load()->registration->properties.Value_unlocked(Constants::SERVICE_ID);
+    anyId1 = d.load()
+               ->registration->properties.Value_unlocked(Constants::SERVICE_ID)
+               .first;
     assert(anyId1.Type() == typeid(long int));
   }
 
@@ -157,11 +160,14 @@ bool ServiceReferenceBase::operator<(
   {
     auto l = reference.d.load()->registration->properties.Lock();
     US_UNUSED(l);
-    anyR2 = reference.d.load()->registration->properties.Value_unlocked(
-      Constants::SERVICE_RANKING);
+    anyR2 =
+      reference.d.load()
+        ->registration->properties.Value_unlocked(Constants::SERVICE_RANKING)
+        .first;
     assert(anyR2.Empty() || anyR2.Type() == typeid(int));
-    anyId2 = reference.d.load()->registration->properties.Value_unlocked(
-      Constants::SERVICE_ID);
+    anyId2 = reference.d.load()
+               ->registration->properties.Value_unlocked(Constants::SERVICE_ID)
+               .first;
     assert(anyId2.Type() == typeid(long int));
   }
 

@@ -29,6 +29,8 @@
 
 #include "Properties.h"
 
+#include "PropsCheck.h"
+
 #include <cctype>
 #include <cerrno>
 #include <cmath>
@@ -137,14 +139,16 @@ public:
     , m_args(std::move(args))
     , m_attrName()
     , m_attrValue()
-  {}
+  {
+  }
 
   LDAPExprData(int op, std::string attrName, std::string attrValue)
     : m_operator(op)
     , m_args()
     , m_attrName(std::move(attrName))
     , m_attrValue(std::move(attrValue))
-  {}
+  {
+  }
 
   LDAPExprData(const LDAPExprData& other)
 
@@ -158,7 +162,8 @@ public:
 
 LDAPExpr::LDAPExpr()
   : d()
-{}
+{
+}
 
 LDAPExpr::LDAPExpr(const std::string& filter)
   : d()
@@ -180,13 +185,15 @@ LDAPExpr::LDAPExpr(const std::string& filter)
 
 LDAPExpr::LDAPExpr(int op, const std::vector<LDAPExpr>& args)
   : d(new LDAPExprData(op, args))
-{}
+{
+}
 
 LDAPExpr::LDAPExpr(int op,
                    const std::string& attrName,
                    const std::string& attrValue)
   : d(new LDAPExprData(op, attrName, attrValue))
-{}
+{
+}
 
 LDAPExpr::LDAPExpr(const LDAPExpr&) = default;
 
@@ -306,13 +313,87 @@ bool LDAPExpr::IsNull() const
 bool LDAPExpr::Evaluate(const PropertiesHandle& p, bool matchCase) const
 {
   if ((d->m_operator & SIMPLE) != 0) {
-    // try case sensitive match first
-    int index = p->FindCaseSensitive_unlocked(d->m_attrName);
-    if (index < 0 && !matchCase)
-      index = p->Find_unlocked(d->m_attrName);
-    return index < 0
-             ? false
-             : Compare(p->Value_unlocked(index), d->m_operator, d->m_attrValue);
+    auto v = p->Value_unlocked(d->m_attrName, matchCase);
+    return (!v.second) ? false
+                       : Compare(v.first, d->m_operator, d->m_attrValue);
+  } else { // (d->m_operator & COMPLEX) != 0
+    switch (d->m_operator) {
+      case AND:
+        for (const auto& m_arg : d->m_args) {
+          if (!m_arg.Evaluate(p, matchCase))
+            return false;
+        }
+        return true;
+      case OR:
+        for (const auto& m_arg : d->m_args) {
+          if (m_arg.Evaluate(p, matchCase))
+            return true;
+        }
+        return false;
+      case NOT:
+        return !d->m_args[0].Evaluate(p, matchCase);
+      default:
+        return false; // Cannot happen
+    }
+  }
+}
+
+bool LDAPExpr::Evaluate(const AnyMap& p, bool matchCase) const
+{
+  if ((d->m_operator & SIMPLE) != 0) {
+    if (p.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+      auto itr = p.findUOCI_TypeChecked(d->m_attrName);
+      if (!matchCase && itr != p.endUOCI_TypeChecked()) {
+        return Compare(itr->second, d->m_operator, d->m_attrValue);
+      } else if (matchCase && itr != p.endUOCI_TypeChecked() &&
+                 itr->first == d->m_attrName) {
+        return Compare(itr->second, d->m_operator, d->m_attrValue);
+      } else {
+        return false;
+      }
+    } else if (p.GetType() == AnyMap::UNORDERED_MAP) {
+      auto itr = p.findUO_TypeChecked(d->m_attrName);
+      if (itr != p.endUO_TypeChecked()) {
+        return Compare(itr->second, d->m_operator, d->m_attrValue);
+      }
+
+      if (!matchCase) {
+        std::string const lower = LDAPExpr::ToLower(d->m_attrName);
+        for (auto itr = p.beginUO_TypeChecked(); itr != p.endUO_TypeChecked();
+             ++itr) {
+          if (itr->first == lower) {
+            return Compare(p.findUO_TypeChecked(lower)->second,
+                           d->m_operator,
+                           d->m_attrValue);
+          }
+        }
+        return false;
+      }
+
+      return false;
+    } else if (p.GetType() == AnyMap::ORDERED_MAP) {
+      auto itr = p.findOM_TypeChecked(d->m_attrName);
+      if (itr != p.endOM_TypeChecked()) {
+        return Compare(itr->second, d->m_operator, d->m_attrValue);
+      }
+
+      if (!matchCase) {
+        std::string const lower = LDAPExpr::ToLower(d->m_attrName);
+        for (auto itr = p.beginOM_TypeChecked(); itr != p.endOM_TypeChecked();
+             ++itr) {
+          if (itr->first == lower) {
+            return Compare(p.findOM_TypeChecked(lower)->second,
+                           d->m_operator,
+                           d->m_attrValue);
+          }
+        }
+        return false;
+      }
+
+      return false;
+    } else {
+      return false;
+    }
   } else { // (d->m_operator & COMPLEX) != 0
     switch (d->m_operator) {
       case AND:

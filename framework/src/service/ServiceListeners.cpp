@@ -451,13 +451,13 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
 
     // Check the cache
     const auto c = any_cast<std::vector<std::string>>(
-      props->Value_unlocked(Constants::OBJECTCLASS));
+      props->Value_unlocked(Constants::OBJECTCLASS).first);
     for (auto& objClass : c) {
       AddToSet_unlocked(set, receivers, OBJECTCLASS_IX, objClass);
     }
 
     auto service_id =
-      any_cast<long>(props->Value_unlocked(Constants::SERVICE_ID));
+      any_cast<long>(props->Value_unlocked(Constants::SERVICE_ID).first);
     AddToSet_unlocked(set,
                       receivers,
                       SERVICE_ID_IX,

@@ -144,7 +144,7 @@ TEST_F(ServiceDependencyErrorLoggingTest, TestServiceDependencyLDAPFilter)
     serviceRefFakeCompConfig->Initialize();
     using ::testing::ContainsRegex;
     EXPECT_THAT(
-      customLogger->GetLoggerMessage(), ContainsRegex("doesn't match service reference properties"));
+      customLogger->GetLoggerMessage(), ContainsRegex("Service listener matching LDAP filter could not be found"));
     fakeCompConfig->Deactivate();
     fakeCompConfig->Stop();
     serviceRefFakeCompConfig->Deactivate();

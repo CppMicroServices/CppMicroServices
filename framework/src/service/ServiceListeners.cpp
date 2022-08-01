@@ -447,14 +447,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
       if (ldapExpr.IsNull() || ldapExpr.Evaluate(props, false)) {
         set.insert(sse);
       } else if (evt.GetType() == ServiceEvent::SERVICE_REGISTERED) {
-        const std::string msg =
-          "References LDAP filter value in key 'target' of " +
-          sse.GetBundleContext().GetBundle().GetSymbolicName() +
-          " manifest doesn't match service reference properties'." +
-          "\nPlease verify ldap filter value '" + sse.GetLDAPExpr().ToString() +
-          "' in " + ref.GetBundle().GetSymbolicName() +
-          " manifest components 'properties' map.";
-
+        const std::string msg = "Service listener matching LDAP filter could not be found using LDAP filter: " + sse.GetFilter();
           coreCtx->logger->Log(
             cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, msg);
         }

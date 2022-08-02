@@ -106,8 +106,11 @@ TEST_F(BundleTrackerMethodTest, GetBundlesWorks)
 
 TEST_F(BundleTrackerMethodTest, GetObjectWorks)
 {
+  // Given an open BundleTracker not tracking custom objects
   BundleTracker<> bundleTracker(context, all_states);
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
+
+  // When a bundle is tracked
   Bundle bundleA = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
   auto bundles = bundleTracker.GetBundles();
@@ -115,14 +118,17 @@ TEST_F(BundleTrackerMethodTest, GetObjectWorks)
     std::find(bundles.begin(), bundles.end(), bundleA) != bundles.end();
   ASSERT_TRUE(bundleATracked) << "A bundle that should be tracked is untracked";
 
+  // Then GetObject should return the bundle
   EXPECT_EQ(bundleA, bundleTracker.GetObject(bundleA))
     << "GetObject for a tracked bundle should return the bundle when no custom "
        "objects were used";
 
+  // When the bundle is untracked, then GetObject should return nullopt
   bundleTracker.Remove(bundleA);
   EXPECT_EQ(std::nullopt, bundleTracker.GetObject(bundleA))
     << "GetObject for an untracked, valid bundle should return nullopt";
 
+  // When the bundle is invalid, then GetObject should return nullopt
   Bundle invalidBundle = Bundle();
   ASSERT_NO_THROW(bundleTracker.GetObject(invalidBundle))
     << "GetObject threw an error for an invalid bundle";
@@ -209,14 +215,14 @@ TEST_F(BundleTrackerMethodTest, GetTrackingCountWorksAfterBundleAdded)
     BundleTracker<>::CreateStateMask(Bundle::State::STATE_ACTIVE);
   BundleTracker<> bundleTracker(context, stateMask);
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
-  int trackingCount0 = bundleTracker.GetTrackingCount();
 
+  int preCount = bundleTracker.GetTrackingCount();
   Bundle bundle = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
-  bundle.Start();
-  int trackingCount1 = bundleTracker.GetTrackingCount();
+  bundle.Start(); // bundle: installed->resolved->starting->ACTIVE
+  int postCount = bundleTracker.GetTrackingCount();
 
-  EXPECT_EQ(1, trackingCount1 - trackingCount0)
+  EXPECT_EQ(1, postCount - preCount)
     << "Tracking count didn't increment by 1 after a bundle was added";
   bundleTracker.Close();
 }
@@ -229,14 +235,14 @@ TEST_F(BundleTrackerMethodTest, GetTrackingCountWorksAfterBundleModified)
     framework.GetBundleContext(), "TestBundleA");
   ASSERT_EQ(Bundle::State::STATE_INSTALLED, bundle.GetState())
     << "Test bundle failed to install";
-  int trackingCount0 = bundleTracker.GetTrackingCount();
 
+  int preCount = bundleTracker.GetTrackingCount();
   bundle.Start(); // bundle: INSTALLED->RESOLVED->STARTING->ACTIVE
   ASSERT_EQ(Bundle::State::STATE_ACTIVE, bundle.GetState())
     << "Test bundle failed to start";
-  int trackingCount1 = bundleTracker.GetTrackingCount();
+  int postCount = bundleTracker.GetTrackingCount();
 
-  EXPECT_EQ(3, trackingCount1 - trackingCount0)
+  EXPECT_EQ(3, postCount - preCount)
     << "Tracking count didn't increment by 3 after a bundle was modified 3 "
        "times";
   bundleTracker.Close();
@@ -253,14 +259,14 @@ TEST_F(BundleTrackerMethodTest,
     framework.GetBundleContext(), "TestBundleA");
   ASSERT_EQ(Bundle::State::STATE_INSTALLED, bundle.GetState())
     << "Test bundle failed to install";
-  int trackingCount0 = bundleTracker.GetTrackingCount();
 
+  int preCount = bundleTracker.GetTrackingCount();
   bundle.Start(); // bundle: INSTALLED->resolved->starting->active
   ASSERT_EQ(Bundle::State::STATE_ACTIVE, bundle.GetState())
     << "Test bundle failed to start";
-  int trackingCount1 = bundleTracker.GetTrackingCount();
+  int postCount = bundleTracker.GetTrackingCount();
 
-  EXPECT_EQ(1, trackingCount1 - trackingCount0)
+  EXPECT_EQ(1, postCount - preCount)
     << "Tracking count didn't increment by 1 after a bundle was removed";
   bundleTracker.Close();
 }
@@ -273,22 +279,23 @@ TEST_F(BundleTrackerMethodTest, GetTrackingCountWorksAfterRemoveMethod)
     framework.GetBundleContext(), "TestBundleA");
   ASSERT_EQ(Bundle::State::STATE_INSTALLED, bundle.GetState())
     << "Test bundle failed to install";
-  int trackingCount0 = bundleTracker.GetTrackingCount();
 
   // If Remove removes a bundle from being tracked, tracking count increments by 1
+  int preCount = bundleTracker.GetTrackingCount();
   bundleTracker.Remove(bundle);
   ASSERT_EQ(Bundle::State::STATE_INSTALLED, bundle.GetState())
     << "Remove() altered the bundle being removed";
-  int trackingCount1 = bundleTracker.GetTrackingCount();
+  int postCount = bundleTracker.GetTrackingCount();
 
-  EXPECT_EQ(1, trackingCount1 - trackingCount0)
+  EXPECT_EQ(1, postCount - preCount)
     << "Tracking count didn't increment by 1 after Remove() removed a bundle";
 
   // If Remove doesn't remove a bundle from being tracked, tracking count stays the same
+  preCount = postCount;
   bundleTracker.Remove(bundle);
-  int trackingCount2 = bundleTracker.GetTrackingCount();
+  postCount = bundleTracker.GetTrackingCount();
 
-  EXPECT_EQ(0, trackingCount2 - trackingCount1)
+  EXPECT_EQ(0, postCount - preCount)
     << "Tracking count changed after Remove() didn't remove a bundle";
   bundleTracker.Close();
 }
@@ -298,13 +305,11 @@ TEST_F(BundleTrackerMethodTest, GetTrackingCountWorksWhenClosed)
   BundleTracker<> bundleTracker(context, all_states);
   EXPECT_EQ(-1, bundleTracker.GetTrackingCount())
     << "Tracking count of unopened BundleTracker was not -1";
-
-  ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
-  bundleTracker.Close();
 }
 
 TEST_F(BundleTrackerMethodTest, RemoveWorks)
 {
+  // Given a BundleTracker tracking a bundle
   BundleTracker<> bundleTracker(context, all_states);
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
   Bundle bundle = cppmicroservices::testing::InstallLib(
@@ -315,8 +320,10 @@ TEST_F(BundleTrackerMethodTest, RemoveWorks)
     bundlesTracked.end();
   ASSERT_TRUE(bundleTracked) << "BundleTracker failed to track a bundle";
 
+  // When Remove is called
   bundleTracker.Remove(bundle);
 
+  // Then the bundle should not be tracked
   bundlesTracked = bundleTracker.GetBundles();
   bool bundleStillTracked =
     std::find(bundlesTracked.begin(), bundlesTracked.end(), bundle) !=
@@ -359,13 +366,14 @@ TEST_F(BundleTrackerMethodTest, RemoveUntrackedBundleDoesNothing)
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
   Bundle bundle = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
-  int preCount = bundleTracker.GetTrackingCount();
 
+  int preCount = bundleTracker.GetTrackingCount();
   ASSERT_NO_THROW(bundleTracker.Remove(bundle))
     << "Manually removing untracked Bundle should not throw";
   int postCount = bundleTracker.GetTrackingCount();
   EXPECT_EQ(preCount, postCount)
-    << "BundleTracker should no-op when untracked Bundle is manually removed";
+    << "BundleTracker should not change the tracking count when untracked "
+       "Bundle is manually removed";
 
   bundleTracker.Close();
 }
@@ -424,17 +432,17 @@ TEST_F(BundleTrackerMethodTest, OpeningOpenTrackerDoesNothing)
   Bundle bundle = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
   bundle.Start();
-  int trackingCount0 = bundleTracker.GetTrackingCount();
-  int size0 = bundleTracker.Size();
 
+  int preCount = bundleTracker.GetTrackingCount();
+  int preSize = bundleTracker.Size();
   ASSERT_NO_THROW(bundleTracker.Open())
     << "Open() on opened BundleTracker threw an error";
+  int postCount = bundleTracker.GetTrackingCount();
+  int postSize = bundleTracker.Size();
 
-  int trackingCount1 = bundleTracker.GetTrackingCount();
-  int size1 = bundleTracker.Size();
-  EXPECT_EQ(0, trackingCount1 - trackingCount0)
+  EXPECT_EQ(0, postCount - preCount)
     << "Open() on opened BundleTracker increased the tracking count";
-  EXPECT_EQ(0, size1 - size0)
+  EXPECT_EQ(0, postSize - preSize)
     << "Open() on opened BundleTracker changed the size";
   bundleTracker.Close();
 }
@@ -449,7 +457,8 @@ TEST_F(BundleTrackerMethodTest, ClosingClosedTrackerDoesNothing)
   ASSERT_NO_THROW(bundleTracker.Close())
     << "Closing closed BundleTracker should no-op";
   int postCount = bundleTracker.GetTrackingCount();
-  EXPECT_EQ(preCount, postCount) << "Closing closed BundleTracker should no-op";
+  EXPECT_EQ(preCount, postCount)
+    << "Closing closed BundleTracker should not change the tracking count";
 }
 
 TEST_F(BundleTrackerMethodTest, ClosingUnopenTrackerDoesNothing)
@@ -461,5 +470,5 @@ TEST_F(BundleTrackerMethodTest, ClosingUnopenTrackerDoesNothing)
     << "Closing unopened BundleTracker should no-op";
   int postCount = bundleTracker.GetTrackingCount();
   EXPECT_EQ(preCount, postCount)
-    << "Closing unopened BundleTracker should no-op";
+    << "Closing unopened BundleTracker should not change the tracking count";
 }

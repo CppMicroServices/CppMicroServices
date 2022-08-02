@@ -132,39 +132,40 @@ TEST_F(BundleTrackerConcurrencyTest, OpeningTrackerWhileBundlesChangeWorks)
   std::promise<void> gate;
   auto gateFuture = gate.get_future().share();
 
-  auto future1 =
+  auto openTrackerFuture =
     std::async(std::launch::async, [&bundleTracker, &gateFuture]() {
       gateFuture.get();
       bundleTracker->Open();
     });
 
-  auto future2 = std::async(std::launch::async, [this, &gateFuture]() {
-    gateFuture.get();
-    cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
-                                          "TestBundleA")
-      .Start();
-    cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
-                                          "TestBundleA2")
-      .Start();
-    cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
-                                          "TestBundleB")
-      .Start();
-    cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
-                                          "TestBundleH")
-      .Start();
-    cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
-                                          "TestBundleM")
-      .Start();
-    cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
-                                          "TestBundleR")
-      .Start();
-  });
+  auto startBundlesFuture =
+    std::async(std::launch::async, [this, &gateFuture]() {
+      gateFuture.get();
+      cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
+                                            "TestBundleA")
+        .Start();
+      cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
+                                            "TestBundleA2")
+        .Start();
+      cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
+                                            "TestBundleB")
+        .Start();
+      cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
+                                            "TestBundleH")
+        .Start();
+      cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
+                                            "TestBundleM")
+        .Start();
+      cppmicroservices::testing::InstallLib(framework.GetBundleContext(),
+                                            "TestBundleR")
+        .Start();
+    });
 
   EXPECT_CALL(*customizer, AddingBundle).Times(7);
   gate.set_value();
 
-  future1.get();
-  future2.get();
+  openTrackerFuture.get();
+  startBundlesFuture.get();
 
   bundleTracker->Close();
 }
@@ -187,15 +188,16 @@ TEST_F(BundleTrackerConcurrencyTest, NoRaceConditionForRemovingChangingBundle)
   ASSERT_GT(numThreads, 0ull) << "number of threads is 0";
   std::promise<void> gate;
   auto gateFuture = gate.get_future().share();
-  auto future1 =
+  auto removeBundleFuture =
     std::async(std::launch::async, [&gateFuture, &bundleTracker, &bundleA]() {
       gateFuture.get();
       bundleTracker->Remove(bundleA);
     });
-  auto future2 = std::async(std::launch::async, [&gateFuture, &bundleA]() {
-    gateFuture.get();
-    bundleA.Start();
-  });
+  auto startBundleFuture =
+    std::async(std::launch::async, [&gateFuture, &bundleA]() {
+      gateFuture.get();
+      bundleA.Start();
+    });
 
   // The Remove can occur while bundleA is in any state while being started,
   // so all 4 of the following series of callbacks are possible:
@@ -204,9 +206,9 @@ TEST_F(BundleTrackerConcurrencyTest, NoRaceConditionForRemovingChangingBundle)
   //    Modify -> Modify -> Remove -> Add
   //    Modify -> Modify -> Modify -> Remove
 
-  int counter =
+  int addModifyCounter =
     0; // counts the number of AddingBundle and ModifiedBundle callbacks
-  auto increment = [&counter]() { counter++; };
+  auto increment = [&addModifyCounter]() { addModifyCounter++; };
 
   EXPECT_CALL(*customizer, AddingBundle)
     .Times(::testing::AtMost(1))
@@ -218,10 +220,10 @@ TEST_F(BundleTrackerConcurrencyTest, NoRaceConditionForRemovingChangingBundle)
   EXPECT_CALL(*customizer, RemovedBundle).Times(1);
   gate.set_value();
 
-  future1.get();
-  future2.get();
+  removeBundleFuture.get();
+  startBundleFuture.get();
 
-  EXPECT_EQ(counter, 3) << "The wrong number of callbacks were issued";
+  EXPECT_EQ(addModifyCounter, 3) << "The wrong number of callbacks were issued";
 
   // What happens after is out of scope for this test
   EXPECT_CALL(*customizer, RemovedBundle).Times(::testing::AnyNumber());

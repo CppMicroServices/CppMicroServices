@@ -25,7 +25,6 @@
 #include "SCRAsyncWorkService.hpp"
 #include "SCRLogger.hpp"
 #include "ServiceComponentRuntimeImpl.hpp"
-#include "cppmicroservices/BundleTracker.h"
 #include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
@@ -38,7 +37,6 @@
 #include <future>
 #include <iostream>
 #include <memory>
-#include <optional>
 #include <stdexcept>
 #include <vector>
 
@@ -54,10 +52,6 @@ namespace scrimpl {
 void SCRActivator::Start(BundleContext context)
 {
   runtimeContext = context;
-  auto stateMask = Bundle::State::STATE_ACTIVE;
-  customizer = std::make_shared<ActivatorCustomizer>(this);
-  bundleTracker =
-    std::make_shared<BundleTracker<>>(context, stateMask, customizer);
 
   // Create the component registry
   componentRegistry = std::make_shared<ComponentRegistry>();
@@ -72,9 +66,17 @@ void SCRActivator::Start(BundleContext context)
   configNotifier =
     std::make_shared<ConfigurationNotifier>(context, logger, asyncWorkService);
 
-  // Open the tracker
-  bundleTracker->Open();
-
+  // Add bundle listener
+  bundleListenerToken = context.AddBundleListener(
+    std::bind(&SCRActivator::BundleChanged, this, std::placeholders::_1));
+  // HACK: Workaround for lack of Bundle Tracker. Iterate over all bundles and call the tracker method manually
+  for (const auto& bundle : context.GetBundles()) {
+    if (bundle.GetState() == cppmicroservices::Bundle::State::STATE_ACTIVE) {
+      cppmicroservices::BundleEvent evt(
+        cppmicroservices::BundleEvent::BUNDLE_STARTED, bundle);
+      BundleChanged(evt);
+    }
+  }
   // Publish ServiceComponentRuntimeService
   auto service = std::make_shared<ServiceComponentRuntimeImpl>(
     runtimeContext, componentRegistry, logger);
@@ -91,18 +93,21 @@ void SCRActivator::Start(BundleContext context)
         std::move(configListener));
 }
 
-void SCRActivator::Stop(cppmicroservices::BundleContext)
+void SCRActivator::Stop(cppmicroservices::BundleContext context)
 {
   try {
     // remove the bundle listener
-    //context.RemoveListener(std::move(bundleListenerToken));
+    context.RemoveListener(std::move(bundleListenerToken));
     // remove the runtime service from the framework
     scrServiceReg.Unregister();
     // remove the configuration listener service from the framework
     configListenerReg.Unregister();
 
     // dispose all components created by SCR
-    bundleTracker->Close();
+    const auto bundles = context.GetBundles();
+    for (auto const& bundle : bundles) {
+      DisposeExtension(bundle);
+    }
 
     // clear bundle registry
     {
@@ -204,36 +209,24 @@ void SCRActivator::DisposeExtension(const cppmicroservices::Bundle& bundle)
   }
 }
 
-std::optional<Bundle> SCRActivator::ActivatorCustomizer::AddingBundle(
-  const Bundle& bundle,
-  const BundleEvent&)
+void SCRActivator::BundleChanged(const cppmicroservices::BundleEvent& evt)
 {
-  q_ptr->logger->Log(SeverityLevel::LOG_DEBUG,
-                     "Adding Bundle: " + bundle.GetSymbolicName());
-  if (bundle != q_ptr->runtimeContext.GetBundle()) {
-    q_ptr->CreateExtension(bundle);
+  auto bundle = evt.GetBundle();
+  const auto eventType = evt.GetType();
+  if (bundle ==
+      runtimeContext.GetBundle()) // skip events for this (runtime) bundle
+  {
+    return;
   }
-  return std::optional<Bundle>{ bundle };
-}
 
-void SCRActivator::ActivatorCustomizer::ModifiedBundle(const Bundle&,
-                                                       const BundleEvent&,
-                                                       Bundle)
-{
-  /* no-op */
-}
-
-void SCRActivator::ActivatorCustomizer::RemovedBundle(const Bundle& bundle,
-                                                      const BundleEvent&,
-                                                      Bundle)
-{
-  q_ptr->logger->Log(SeverityLevel::LOG_DEBUG,
-                     "Removing Bundle: " + bundle.GetSymbolicName());
-  if (bundle != q_ptr->runtimeContext.GetBundle()) {
-    q_ptr->DisposeExtension(bundle);
+  // TODO: revisit to include LAZY_ACTIVATION when supported by the framework
+  if (eventType == cppmicroservices::BundleEvent::BUNDLE_STARTED) {
+    CreateExtension(bundle);
+  } else if (eventType == cppmicroservices::BundleEvent::BUNDLE_STOPPING) {
+    DisposeExtension(bundle);
   }
+  // else ignore
 }
-
 } // scrimpl
 } // cppmicroservices
 

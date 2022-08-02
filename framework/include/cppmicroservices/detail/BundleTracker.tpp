@@ -34,13 +34,13 @@ namespace cppmicroservices {
 
 
 template<class = void>
-std::underlying_type_t<Bundle::State> _CreateStateMask(std::underlying_type_t<Bundle::State> s)
+static std::underlying_type_t<Bundle::State> _CreateStateMask(std::underlying_type_t<Bundle::State> s)
 {
   return s;
 }
 
 template<class... States>
-std::underlying_type_t<Bundle::State> _CreateStateMask(std::underlying_type_t<Bundle::State> s, States... states)
+static std::underlying_type_t<Bundle::State> _CreateStateMask(std::underlying_type_t<Bundle::State> s, States... states)
 {
   return s | _CreateStateMask(states...);
 }
@@ -239,7 +239,11 @@ void BundleTracker<T>::Remove(const Bundle& bundle)
   if (!t) { /* If BundleTracker is not open */
     return;
   }
-  t->Untrack(bundle, BundleEvent());
+  {
+    auto l = t->Lock();
+    US_UNUSED(l);
+    t->Untrack(bundle, BundleEvent());
+  } 
 }
 
 template<class T>

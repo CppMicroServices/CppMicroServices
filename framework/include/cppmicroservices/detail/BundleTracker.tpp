@@ -32,24 +32,15 @@
 
 namespace cppmicroservices {
 
-
-template<class = void>
-static std::underlying_type_t<Bundle::State> _CreateStateMask(std::underlying_type_t<Bundle::State> s)
-{
-  return s;
-}
-
-template<class... States>
-static std::underlying_type_t<Bundle::State> _CreateStateMask(std::underlying_type_t<Bundle::State> s, States... states)
-{
-  return s | _CreateStateMask(states...);
-}
-
 template<class T>
-template<class... States>
-typename BundleTracker<T>::BundleState BundleTracker<T>::CreateStateMask(States... states)
-{
-  return _CreateStateMask(states...);
+template <typename S0, typename... S>
+constexpr typename BundleTracker<T>::BundleState BundleTracker<T>::CreateStateMask(S0 const &s0, S const &...s) {
+  static_assert((std::is_enum_v<S0> && ... && std::is_enum_v<S>),
+                "The function requires enumerations.");
+  static_assert((std::is_same_v<Bundle::State, std::decay_t<S0>> && ... &&
+                 std::is_same_v<Bundle::State, std::decay_t<S>>),
+                "All values must be Bundle States.");
+  return (s0 | ... | s);
 }
 
 // Destructor
@@ -239,11 +230,7 @@ void BundleTracker<T>::Remove(const Bundle& bundle)
   if (!t) { /* If BundleTracker is not open */
     return;
   }
-  {
-    auto l = t->Lock();
-    US_UNUSED(l);
-    t->Untrack(bundle, BundleEvent());
-  } 
+  t->Untrack(bundle, BundleEvent());
 }
 
 template<class T>
@@ -266,7 +253,6 @@ template<class T>
 std::optional<typename BundleTracker<T>::TrackedParamType>
 BundleTracker<T>::AddingBundle(const Bundle& bundle, const BundleEvent&)
 {
-  // TODO: Make this SFINAE
   return TypeTraits::ConvertToTrackedType(bundle);
 }
 

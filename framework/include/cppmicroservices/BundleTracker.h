@@ -91,13 +91,14 @@ public:
   /**
    * Create a <code>StateType</code> stateMask for a BundleTracker
    * 
-   * @param states The <code>StateType</code> states of <code>Bundle</code>s.
+   * @param s0 the <code>Bundle::State</code>.
+   * @param s the subsequent <code>Bundle::States5</code>.
    * 
    * @return The state mask.
    * 
    */
-  template<class... States>
-  static BundleState CreateStateMask(States ...state);
+  template <typename S0, typename... S>
+  static constexpr typename BundleTracker<T>::BundleState CreateStateMask(S0 const &s0, S const &...s);
 
   /**
    * Create a <code>BundleTracker</code> that tracks bundles through states covered by the state mask.

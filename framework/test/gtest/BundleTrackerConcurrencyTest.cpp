@@ -31,10 +31,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#ifdef GetObject
-#  undef GetObject
-#endif
-
 using namespace cppmicroservices;
 
 class BundleTrackerConcurrencyTest : public ::testing::Test
@@ -44,11 +40,11 @@ protected:
   BundleContext context;
   BundleTracker<>::BundleState all_states =
     BundleTracker<>::CreateStateMask(Bundle::State::STATE_ACTIVE,
-                     Bundle::State::STATE_INSTALLED,
-                     Bundle::State::STATE_RESOLVED,
-                     Bundle::State::STATE_STARTING,
-                     Bundle::State::STATE_STOPPING,
-                     Bundle::State::STATE_UNINSTALLED);
+                                     Bundle::State::STATE_INSTALLED,
+                                     Bundle::State::STATE_RESOLVED,
+                                     Bundle::State::STATE_STARTING,
+                                     Bundle::State::STATE_STOPPING,
+                                     Bundle::State::STATE_UNINSTALLED);
 
 public:
   BundleTrackerConcurrencyTest()
@@ -125,7 +121,8 @@ TEST_F(BundleTrackerConcurrencyTest, ConcurrentOpenCloseWorks)
 TEST_F(BundleTrackerConcurrencyTest, OpeningTrackerWhileBundlesChangeWorks)
 {
   auto customizer = std::make_shared<MockCustomizer2>();
-  auto stateMask = BundleTracker<>::CreateStateMask(Bundle::State::STATE_ACTIVE);
+  auto stateMask =
+    BundleTracker<>::CreateStateMask(Bundle::State::STATE_ACTIVE);
   auto bundleTracker =
     std::make_unique<BundleTracker<>>(context, stateMask, customizer);
 
@@ -207,7 +204,8 @@ TEST_F(BundleTrackerConcurrencyTest, NoRaceConditionForRemovingChangingBundle)
   //    Modify -> Modify -> Remove -> Add
   //    Modify -> Modify -> Modify -> Remove
 
-  int counter = 0; // counts the number of AddingBundle and ModifiedBundle callbacks
+  int counter =
+    0; // counts the number of AddingBundle and ModifiedBundle callbacks
   auto increment = [&counter]() { counter++; };
 
   EXPECT_CALL(*customizer, AddingBundle)

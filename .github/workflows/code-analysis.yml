@@ -5,7 +5,7 @@ name: "CodeQL/MSVC Code Analysis"
 
 on:
   push:
-    branches: [ development ]
+    branches: [ development, bundle-tracker-test-ci ]
   pull_request:
     branches: [ development ]
   schedule:

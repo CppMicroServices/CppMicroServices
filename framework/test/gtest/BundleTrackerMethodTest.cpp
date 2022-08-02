@@ -40,7 +40,7 @@ protected:
   Framework framework;
   BundleContext context;
   BundleTracker<>::BundleState all_states =
-    _CreateStateMask(Bundle::State::STATE_ACTIVE,
+    BundleTracker<>::CreateStateMask(Bundle::State::STATE_ACTIVE,
                      Bundle::State::STATE_INSTALLED,
                      Bundle::State::STATE_RESOLVED,
                      Bundle::State::STATE_STARTING,
@@ -183,7 +183,7 @@ TEST_F(BundleTrackerMethodTest, IsEmptyWorks)
 
 TEST_F(BundleTrackerMethodTest, SizeWorks)
 {
-  auto stateMask = _CreateStateMask(Bundle::State::STATE_UNINSTALLED);
+  auto stateMask = BundleTracker<>::CreateStateMask(Bundle::State::STATE_UNINSTALLED);
   BundleTracker<> bundleTracker(context, stateMask);
   EXPECT_EQ(0, bundleTracker.Size())
     << "Size of unopened BundleTracker was not 0";
@@ -205,7 +205,7 @@ TEST_F(BundleTrackerMethodTest, SizeWorks)
 
 TEST_F(BundleTrackerMethodTest, GetTrackingCountWorksAfterBundleAdded)
 {
-  auto stateMask = _CreateStateMask(Bundle::State::STATE_ACTIVE);
+  auto stateMask = BundleTracker<>::CreateStateMask(Bundle::State::STATE_ACTIVE);
   BundleTracker<> bundleTracker(context, stateMask);
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
   int trackingCount0 = bundleTracker.GetTrackingCount();
@@ -244,7 +244,7 @@ TEST_F(BundleTrackerMethodTest, GetTrackingCountWorksAfterBundleModified)
 TEST_F(BundleTrackerMethodTest,
        GetTrackingCountWorksAfterBundleRemovedByStateChange)
 {
-  auto stateMask = _CreateStateMask(Bundle::State::STATE_INSTALLED);
+  auto stateMask = BundleTracker<>::CreateStateMask(Bundle::State::STATE_INSTALLED);
   BundleTracker<> bundleTracker(context, stateMask);
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
   Bundle bundle = cppmicroservices::testing::InstallLib(
@@ -351,7 +351,7 @@ TEST_F(BundleTrackerMethodTest, DefaultAddingBundleReturnsCorrectValue)
 
 TEST_F(BundleTrackerMethodTest, RemoveUntrackedBundleDoesNothing)
 {
-  auto stateMask = _CreateStateMask(Bundle::State::STATE_ACTIVE);
+  auto stateMask = BundleTracker<>::CreateStateMask(Bundle::State::STATE_ACTIVE);
   BundleTracker<> bundleTracker(context, stateMask);
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
   Bundle bundle = cppmicroservices::testing::InstallLib(
@@ -369,7 +369,7 @@ TEST_F(BundleTrackerMethodTest, RemoveUntrackedBundleDoesNothing)
 
 TEST_F(BundleTrackerMethodTest, ReopeningTrackerWorks)
 {
-  auto stateMask = _CreateStateMask(Bundle::State::STATE_ACTIVE);
+  auto stateMask = BundleTracker<>::CreateStateMask(Bundle::State::STATE_ACTIVE);
   BundleTracker<> bundleTracker(context, stateMask);
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";
   Bundle bundle = cppmicroservices::testing::InstallLib(
@@ -389,7 +389,7 @@ TEST_F(BundleTrackerMethodTest, ReopeningTrackerWorks)
 
 TEST_F(BundleTrackerMethodTest, BundlesInUntrackedStatesUntracked)
 {
-  auto stateMask = _CreateStateMask(Bundle::State::STATE_STARTING,
+  auto stateMask = BundleTracker<>::CreateStateMask(Bundle::State::STATE_STARTING,
                                     Bundle::State::STATE_STOPPING);
   BundleTracker<> bundleTracker(context, stateMask);
   ASSERT_NO_THROW(bundleTracker.Open()) << "BundleTracker failed to start";

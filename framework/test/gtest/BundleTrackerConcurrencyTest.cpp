@@ -43,7 +43,7 @@ protected:
   Framework framework;
   BundleContext context;
   BundleTracker<>::BundleState all_states =
-    _CreateStateMask(Bundle::State::STATE_ACTIVE,
+    BundleTracker<>::CreateStateMask(Bundle::State::STATE_ACTIVE,
                      Bundle::State::STATE_INSTALLED,
                      Bundle::State::STATE_RESOLVED,
                      Bundle::State::STATE_STARTING,
@@ -125,7 +125,7 @@ TEST_F(BundleTrackerConcurrencyTest, ConcurrentOpenCloseWorks)
 TEST_F(BundleTrackerConcurrencyTest, OpeningTrackerWhileBundlesChangeWorks)
 {
   auto customizer = std::make_shared<MockCustomizer2>();
-  auto stateMask = _CreateStateMask(Bundle::State::STATE_ACTIVE);
+  auto stateMask = BundleTracker<>::CreateStateMask(Bundle::State::STATE_ACTIVE);
   auto bundleTracker =
     std::make_unique<BundleTracker<>>(context, stateMask, customizer);
 

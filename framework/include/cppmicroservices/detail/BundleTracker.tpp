@@ -102,17 +102,16 @@ void BundleTracker<T>::Open()
 template<class T>
 void BundleTracker<T>::Close()
 {
-  try {
-    d->context.RemoveListener(std::move(d->listenerToken));
-  } catch (const std::runtime_error&) {
-    /* Rescue if context is stopped or invalid */
-  }
-
-  std::shared_ptr<_TrackedBundle> outgoing;
-  outgoing = d->trackedBundle.Load();
+  std::shared_ptr<_TrackedBundle> outgoing = d->trackedBundle.Load();
   {
     auto l = d->Lock();
     US_UNUSED(l);
+    
+    try {
+      d->context.RemoveListener(std::move(d->listenerToken));
+    } catch (const std::runtime_error&) {
+      /* Rescue if context is stopped or invalid */
+    }
 
     if (outgoing == nullptr) {
       return;

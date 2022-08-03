@@ -77,8 +77,7 @@ void BundleTracker<T>::Open()
     DIAG_LOG(*d->context.GetLogSink())
       << "BundleTracker<T>::Open: " << d->stateMask;
 
-    t.reset(new _TrackedBundle(
-      this, d->customizer ? d->customizer.get() : d->q_func()));
+    t.reset(new _TrackedBundle(this, d->customizer ? d->customizer.get() : d->q_func()));
     try {
       // Attempt to drop old listener
       d->context.RemoveListener(std::move(d->listenerToken));
@@ -126,7 +125,8 @@ void BundleTracker<T>::Close()
       << "BundleTracker<T>::close:" << d->stateMask;
 
     outgoing->Close();
-    outgoing->NotifyAll();
+    d->Modified();         /* log message */
+    outgoing->NotifyAll(); /* wake up any waiters */
   }
 
   try {

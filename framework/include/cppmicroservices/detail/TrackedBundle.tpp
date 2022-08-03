@@ -43,16 +43,10 @@ void TrackedBundle<TTT>::WaitOnCustomizersToFinish()
 template<class TTT>
 void TrackedBundle<TTT>::BundleChanged(const BundleEvent& event)
 {
-  // Perform the business logic
-  // Call track or untrack based on appropriate behavior
+  // Call track or untrack based on state mask
 
   // Ignore events that do not correspond with
   // Bundle state changes
-  auto eventType = event.GetType();
-  if (eventType == BundleEvent::Type::BUNDLE_UNRESOLVED)
-  {
-    return;
-  }
 
   (void)latch.CountUp();
   ScopeGuard sg([this]() {
@@ -64,23 +58,26 @@ void TrackedBundle<TTT>::BundleChanged(const BundleEvent& event)
     }
   });
 
-  Bundle bundle;
-  Bundle::State state;
+  // Check trivial calls
+  Bundle bundle = event.GetBundle();
+  if (!bundle) {
+    return;
+  }
+  Bundle::State state = bundle.GetState();
+  if (!state) {
+    return;
+  }
+  BundleEvent::Type eventType = event.GetType();
+  if (eventType == BundleEvent::Type::BUNDLE_UNRESOLVED)
+  {
+    return;
+  }
   {
     auto l = this->Lock();
     US_UNUSED(l);
 
     // Check for delayed call
     if (this->closed) {
-      return;
-    }
-
-    bundle = event.GetBundle();
-    if (!bundle) {
-      return;
-    }
-    state = bundle.GetState();
-    if (!state) {
       return;
     }
 

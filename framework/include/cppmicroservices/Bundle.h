@@ -868,16 +868,9 @@ US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
                                              Bundle::State state);
 }
 
-namespace std {
-
-template<>
-struct hash<cppmicroservices::Bundle>
-{
-  std::size_t operator()(const cppmicroservices::Bundle& arg) const
-  {
-    return hash<std::string>()(arg.GetSymbolicName());
-  }
-};
-}
+// Hashing behavior for Bundles
+US_HASH_FUNCTION_BEGIN(cppmicroservices::Bundle)
+return hash<std::string>()(arg.GetSymbolicName());
+US_HASH_FUNCTION_END
 
 #endif // CPPMICROSERVICES_BUNDLE_H

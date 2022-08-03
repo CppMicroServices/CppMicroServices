@@ -121,6 +121,6 @@ struct BundleTrackerCustomizer
                              TrackedParamType object) = 0;
 };
 
-}
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLETRACKERCUSTOMIZER_H

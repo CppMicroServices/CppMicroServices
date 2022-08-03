@@ -65,7 +65,7 @@ std::vector<Bundle> BundleTrackerPrivate<TTT>::GetInitialBundles(
   std::vector<Bundle> result;
   std::vector<Bundle> contextBundles = context.GetBundles();
   for (Bundle bundle : contextBundles) {
-    if ((bundle.GetState() & stateMask) != 0) {
+    if (bundle.GetState() & stateMask) {
       result.push_back(bundle);
     }
   }
@@ -85,7 +85,8 @@ void BundleTrackerPrivate<TTT>::GetBundles_unlocked(std::vector<Bundle>& refs,
 template<class TTT>
 void BundleTrackerPrivate<TTT>::Modified()
 {
-  // No caching to clear
+  // No cache to clear
+  // Log message to parallel ServiceTracker
   DIAG_LOG(*context.GetLogSink()) << "BundleTracker::Modified(): " << stateMask;
 }
 

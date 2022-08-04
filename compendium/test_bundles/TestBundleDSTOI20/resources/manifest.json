@@ -1,0 +1,16 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSTOI20",
+    "bundle.name" : "TestBundleDSTOI20",
+    "bundle.activator" : false,
+    "scr" : {
+        "version" : 1,
+        "components" : [{
+            "enabled": true,
+            "immediate" : true,
+            "implementation-class": "sample::ServiceComponent",
+            "service" : {
+                "interfaces" : ["test::Interface4"]
+            }
+        }]
+    }
+}

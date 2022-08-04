@@ -180,6 +180,13 @@ public:
   virtual bool isDependencyInjected() = 0;
   virtual ~CAInterface1();
 };
+
+class US_TestInterfaces_EXPORT Interface4
+{
+public:
+  virtual std::shared_ptr<test::LifeCycleValidation> GetService() = 0;
+  virtual ~Interface4();
+};
 }
 
 #endif

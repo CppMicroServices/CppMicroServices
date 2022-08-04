@@ -452,7 +452,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
 
         auto key = props->Keys_unlocked();
         for (auto k : key) {
-          auto val = props->Value_unlocked(k).ToString();
+          auto val = props->Value_unlocked(k).first.ToString();
           propsKeyValues += k + " : " + val + ", ";
         }
 
@@ -463,7 +463,7 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
 
           coreCtx->logger->Log(
             cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, msg);
-        }
+      }
     }
 
     // Check the cache

@@ -407,7 +407,7 @@ public:
    * \param rhs The Any which should be moved into this Any.
    * \return A reference to this Any.
    */
-  Any& operator=(Any&& rhs)
+  Any& operator=(Any&& rhs) noexcept
   {
     _content = std::move(rhs._content);
     return *this;

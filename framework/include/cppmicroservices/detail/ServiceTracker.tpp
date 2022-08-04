@@ -434,7 +434,7 @@ template<class S, class T>
 int ServiceTracker<S,T>::GetTrackingCount() const
 {
   auto t = d->Tracked();
-  if (!t)
+  if (!t || (t->Lock(), t->closed))
   { /* if ServiceTracker is not open */
     return -1;
   }

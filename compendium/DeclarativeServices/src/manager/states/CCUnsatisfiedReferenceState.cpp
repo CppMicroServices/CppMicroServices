@@ -53,10 +53,10 @@ void CCUnsatisfiedReferenceState::Register(ComponentConfigurationImpl& mgr)
       currState
         ->WaitForTransitionTask(); // wait for the previous transition to finish
       if (!mgr.IsServiceProvider() || mgr.RegisterService()) {
-        transitionAction.set_value(); // unblock the next transition
         if (mgr.GetMetadata()->immediate) {
           mgr.Activate(cppmicroservices::Bundle());
         }
+        transitionAction.set_value(); // unblock the next transition
       } else {
         auto logger = mgr.GetLogger();
         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,

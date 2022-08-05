@@ -241,7 +241,7 @@ void ComponentConfigurationImpl::ConfigChangedState(
 
   if (configWasSatisfied && configNowSatisfied &&
       (metadata->configurationPolicy != CONFIG_POLICY_IGNORE)) {
-    if (!Modified()) {
+    if (configManager->shouldModifiedBeCalled(notification.changeCount) && !Modified()) {
       //The Component does not have a Modified method so the component instance
       //has been deactivated.
       if (configManager->IsConfigSatisfied() && AreReferencesSatisfied()) {
@@ -338,11 +338,11 @@ void ComponentConfigurationImpl::RefSatisfied(const std::string& refName)
   SatisfiedFunctor f = std::for_each(referenceManagers.begin(),
                                      referenceManagers.end(),
                                      SatisfiedFunctor(refName));
-  if (configManager != nullptr) {
-    if (!configManager->IsConfigSatisfied()) {
-      return;
-    }
+
+  if (configManager && !configManager->IsConfigSatisfied()) {
+    return;
   }
+
   if (f.IsSatisfied()) {
     GetState()->Register(*this);
   }

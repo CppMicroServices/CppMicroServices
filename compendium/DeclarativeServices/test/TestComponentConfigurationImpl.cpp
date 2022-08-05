@@ -1019,5 +1019,69 @@ TEST(ComponentConfigurationImplLogTest, LoadLibraryLogsMessagesNotImmediateTest)
   framework.WaitForStop(std::chrono::milliseconds::zero());
 }
 #endif
+
+/**
+ * Test that the Modified method on a component configuration that is
+ * lazily loaded and requires a configuration object to activate is never
+ * called if the configuration is only created once and updated once.
+ */
+TEST_F(ComponentConfigurationImplTest, TestModifiedIsNeverCalled) {
+  auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
+  auto mockRegistry = std::make_shared<MockComponentRegistry>();
+  auto fakeLogger = std::make_shared<FakeLogger>();
+  auto mockCompInstance = std::make_shared<MockComponentInstance>();
+  auto mockFactory = std::make_shared<MockFactory>();
+  auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
+  auto asyncWorkService =
+    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+      GetFramework().GetBundleContext(), logger);
+  auto notifier = std::make_shared<ConfigurationNotifier>(
+    GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
+  auto managers =
+    std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+
+#if defined(US_BUILD_SHARED_LIBS)
+  const auto caPluginPath = test::GetConfigAdminRuntimePluginFilePath();
+  auto cabundles =
+    GetFramework().GetBundleContext().InstallBundles(caPluginPath);
+  for (auto& bundle : cabundles) {
+    bundle.Start();
+  }
+#endif
+  // Get a service reference to ConfigAdmin to create the configuration object.
+  auto configAdminServiceRef =
+    GetFramework()
+      .GetBundleContext()
+      .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+  ASSERT_TRUE(configAdminServiceRef)
+    << "GetService failed for ConfigurationAdmin.";
+  auto configAdminService =
+    GetFramework().GetBundleContext().GetService(configAdminServiceRef);
+  ASSERT_TRUE(configAdminService);
+
+  mockMetadata->serviceMetadata.interfaces = {
+    us_service_interface_iid<dummy::ServiceImpl>()
+  };
+  mockMetadata->immediate = false;
+  mockMetadata->configurationPolicy = "require";
+  mockMetadata->configurationPids = { "sample::config" };
+
+  auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(
+    mockMetadata, GetFramework(), mockRegistry, fakeLogger, notifier, managers);
+
+  EXPECT_CALL(*fakeCompConfig, ModifyComponentInstanceProperties()).Times(0);
+  EXPECT_CALL(*mockCompInstance, Modified()).Times(0);
+
+  fakeCompConfig->Initialize();
+  fakeCompConfig->Register();
+
+  auto configuration =
+    configAdminService->GetConfiguration("sample::config");
+  configuration->UpdateIfDifferent(
+    std::unordered_map<std::string, cppmicroservices::Any>{ { "foo", true } });
+
+  fakeCompConfig->Deactivate();
+  fakeCompConfig->Stop();
+}
 }
 }

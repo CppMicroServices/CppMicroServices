@@ -90,6 +90,9 @@ public:
    */
   cppmicroservices::AnyMap GetProperties() const noexcept;
 
+  bool shouldModifiedBeCalled(const unsigned long changeCount) const noexcept;
+  void setInitialChangeCount(const unsigned long changeCount) noexcept;
+
 private:
   bool isConfigSatisfied() const noexcept;
 
@@ -99,10 +102,11 @@ private:
   cppmicroservices::BundleContext
     bundleContext; ///< context of the bundle which contains the component
   mutable std::mutex
-    propertiesMutex; // mutex to protect the configProperties and mergedProperties members
+    propertiesMutex; ///< mutex to protect the configProperties and mergedProperties members
   std::unordered_map<std::string, cppmicroservices::AnyMap>
-    configProperties; //properties for available configuration objects.
+    configProperties; ///< properties for available configuration objects.
   cppmicroservices::AnyMap mergedProperties;
+  unsigned long initialChangeCount; ///< The initial change count at the time of intitialization
 };
 }
 }

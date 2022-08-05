@@ -195,10 +195,11 @@ void ConfigurationNotifier::CreateFactoryComponent(
 void ConfigurationNotifier::NotifyAllListeners(
   const std::string& pid,
   cppmicroservices::service::cm::ConfigurationEventType type,
-  std::shared_ptr<cppmicroservices::AnyMap> properties)
+  std::shared_ptr<cppmicroservices::AnyMap> properties,
+  unsigned long changeCount)
 {
   ConfigChangeNotification notification =
-    ConfigChangeNotification(pid, std::move(properties), std::move(type));
+    ConfigChangeNotification(pid, std::move(properties), std::move(type), changeCount);
 
   std::shared_ptr<TokenMap> listenersMapCopy;
   {

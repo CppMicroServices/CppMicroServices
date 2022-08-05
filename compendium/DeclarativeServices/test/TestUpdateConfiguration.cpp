@@ -108,7 +108,6 @@ TEST_F(tServiceComponent, testConcurrentUpdateConfigAndActivateService)
     auto testBundle = ::test::InstallAndStartBundle(ctx, "TestBundleDSCA02");
     ASSERT_TRUE(testBundle);
     auto instance = GetInstance<test::CAInterface>();
-    ASSERT_TRUE(instance) << "GetService failed for CAInterface";
   });
 
   readies[0].get_future().wait();

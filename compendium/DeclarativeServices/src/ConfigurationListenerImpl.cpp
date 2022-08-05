@@ -76,15 +76,17 @@ void ConfigurationListenerImpl::configurationEvent(
     auto properties =
       cppmicroservices::AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
     auto type = event.getType();
+    unsigned long changeCount{0ul};
 
     if (type == ConfigurationEventType::CM_UPDATED) {
       auto configObject = configAdmin->GetConfiguration(pid);
       if (configObject) {
         properties = configObject->GetProperties();
+        changeCount = configObject->GetChangeCount();
       }
     }
     auto ptr = std::make_shared<cppmicroservices::AnyMap>(properties);
-    configNotifier->NotifyAllListeners(pid, type, ptr);
+    configNotifier->NotifyAllListeners(pid, type, ptr, changeCount);
   } catch (const cppmicroservices::SecurityException&) {
     logger->Log(
       cppmicroservices::logservice::SeverityLevel::LOG_ERROR,

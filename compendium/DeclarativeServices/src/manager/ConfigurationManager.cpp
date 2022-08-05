@@ -37,6 +37,7 @@ ConfigurationManager::ConfigurationManager(
   , metadata(metadata)
   , bundleContext(bc)
   , mergedProperties(metadata->properties)
+  , initialChangeCount(0ul)
 {
   if (!this->metadata || !this->bundleContext || !this->logger) {
     throw std::invalid_argument(
@@ -71,6 +72,7 @@ void ConfigurationManager::Initialize()
         auto config = configAdmin->ListConfigurations("(pid=" + pid + ")");
         if (config.size() > 0) {
           auto properties = config.front()->GetProperties();
+          initialChangeCount = config.front()->GetChangeCount();
           configProperties.emplace(pid, properties);
           for (const auto& item : properties) {
             mergedProperties[item.first] = item.second;
@@ -150,5 +152,18 @@ bool ConfigurationManager::isConfigSatisfied() const noexcept
 
   return false;
 }
+
+bool ConfigurationManager::shouldModifiedBeCalled(const unsigned long changeCount) const noexcept
+{
+  std::lock_guard<std::mutex> lock(propertiesMutex);
+  return ((initialChangeCount > 0) && (initialChangeCount < changeCount));
+}
+
+void ConfigurationManager::setInitialChangeCount(const unsigned long changeCount) noexcept
+{
+  std::lock_guard<std::mutex> lock(propertiesMutex);
+  initialChangeCount = changeCount;
+}
+
 }
 }

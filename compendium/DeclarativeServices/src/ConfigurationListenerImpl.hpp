@@ -32,25 +32,6 @@ namespace cppmicroservices {
 namespace service {
 namespace cm {
 
-/**
-   * ConfigChangeNotification
-   * This class is used by ConfigurationListener to notify ComponentConfigurationImpl
-   * about changes to Configuration Objects.
-   */
-struct ConfigChangeNotification final
-{
-  ConfigChangeNotification(std::string pid,
-                           std::shared_ptr<cppmicroservices::AnyMap> properties,
-                           ConfigurationEventType evt)
-    : pid(std::move(pid))
-    , event(std::move(evt))
-    , newProperties(std::move(properties))
-  {}
-
-  std::string pid;
-  ConfigurationEventType event;
-  std::shared_ptr<cppmicroservices::AnyMap> newProperties;
-};
 class ConfigurationListenerImpl final : public ConfigurationListener
 {
 

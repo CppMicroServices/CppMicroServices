@@ -41,15 +41,18 @@ struct ConfigChangeNotification final
   ConfigChangeNotification(
     std::string pid,
     std::shared_ptr<cppmicroservices::AnyMap> properties,
-    cppmicroservices::service::cm::ConfigurationEventType evt)
+    cppmicroservices::service::cm::ConfigurationEventType evt,
+    unsigned long configChangeCount)
     : pid(std::move(pid))
     , event(std::move(evt))
     , newProperties(properties)
+    , changeCount(configChangeCount)
   {}
 
   std::string pid;
   cppmicroservices::service::cm::ConfigurationEventType event;
   std::shared_ptr<cppmicroservices::AnyMap> newProperties;
+  unsigned long changeCount;
 };
 
 struct Listener final
@@ -100,7 +103,8 @@ public:
   void NotifyAllListeners(
     const std::string& pid,
     cppmicroservices::service::cm::ConfigurationEventType type,
-    std::shared_ptr<cppmicroservices::AnyMap> properties);
+    std::shared_ptr<cppmicroservices::AnyMap> properties,
+    unsigned long changeCount);
 
 private:
   void CreateFactoryComponent(const std::string& factoryName,

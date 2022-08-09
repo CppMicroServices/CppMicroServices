@@ -56,9 +56,11 @@ public:
   using TrackedServiceType = T;
 
   TrackedServiceWrapper(std::string trackedPid,
+                        const unsigned long initialChangeCount,
                         std::shared_ptr<TrackedServiceType> service)
-    : pid(std::move(trackedPid))
-    , trackedService(std::move(service))
+      : pid(std::move(trackedPid))
+      , trackedService(std::move(service))
+      , lastUpdatedChangeCount{initialChangeCount}
   {}
 
   TrackedServiceWrapper(const TrackedServiceWrapper&) = delete;
@@ -70,6 +72,9 @@ public:
 
   std::string pid;
   std::shared_ptr<TrackedServiceType> trackedService;
+  std::atomic_ullong lastUpdatedChangeCount; ///< The change count at the time of the last Updated method call
+  std::unordered_map<std::string, unsigned long> lastUpdatedChangeCountPerPid; ///< the change count for each factory pid instance
+  std::mutex updatedChangeCountMutex; ///< guard read/write access to lastUpdatedChangeCount
 };
 
 /**
@@ -160,7 +165,7 @@ public:
    * See {@code ConfigurationAdminPrivate#NotifyConfigurationUpdated}
    */
   std::shared_future<void> NotifyConfigurationUpdated(
-    const std::string& pid) override;
+    const std::string& pid, const unsigned long changeCount) override;
 
   /**
    * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or

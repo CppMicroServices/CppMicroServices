@@ -392,10 +392,11 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
   std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs;
   std::vector<bool> createdOrUpdated;
   std::vector<std::shared_ptr<ConfigurationImpl>> configurationsToInvalidate;
-  unsigned long changeCount{ 0u };
+  
   {
     std::lock_guard<std::mutex> lk{ configurationsMutex };
     for (const auto& configMetadata : configurationMetadata) {
+      unsigned long changeCount{ 0ul };
       auto& pid = configMetadata.pid;
       auto it = configurations.find(pid);
       if (it == std::end(configurations)) {
@@ -453,7 +454,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
   for (const auto& pidAndChangeCountAndID : pidsAndChangeCountsAndIDs) {
     const auto& pid = pidAndChangeCountAndID.pid;
     if (createdOrUpdated[idx]) {
-      NotifyConfigurationUpdated(pid);
+      NotifyConfigurationUpdated(pid, pidAndChangeCountAndID.changeCount);
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                   "AddConfigurations: Created or Updated Configuration "
                   "instance with PID " +
@@ -524,7 +525,7 @@ void ConfigurationAdminImpl::RemoveConfigurations(
     const auto& pid = pidAndChangeCountAndID.pid;
     if (removedAndUpdated[idx].first) {
       if (removedAndUpdated[idx].second) {
-        NotifyConfigurationUpdated(pid);
+        NotifyConfigurationUpdated(pid, pidAndChangeCountAndID.changeCount);
       }
       logger->Log(
         cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
@@ -542,7 +543,7 @@ void ConfigurationAdminImpl::RemoveConfigurations(
 }
 
 std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
-  const std::string& pid)
+  const std::string& pid, const unsigned long changeCount)
 {
   // NotifyConfigurationUpdated will only send a notification to the service if
   // the configuration object has been updated at least once. In order to determine whether or not
@@ -551,7 +552,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
   // is not available and that method cannot be called. For this reason, NotifyConfigurationUpdated
   // should not be called for Remove operations unless the caller has already confirmed
   // the configuration object has been updated at least once.
-  return PerformAsync([this, pid] {
+  return PerformAsync([this, pid, changeCount] {
     AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
     std::string fPid;
     std::string nonFPid;
@@ -604,12 +605,13 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
                   [&](const auto& managedServiceWrapper) {
                     // The ServiceTracker will return a default constructed shared_ptr for each ManagedService
                     // that we aren't tracking. We must be careful not to dereference these!
-                    if ((managedServiceWrapper) && (managedServiceWrapper->pid == pid)) {
+                    if ((managedServiceWrapper) && (managedServiceWrapper->pid == pid) && (removed || (!removed && managedServiceWrapper->lastUpdatedChangeCount < changeCount))) {
                         notifyServiceUpdated(
                           pid,
                           *(managedServiceWrapper->trackedService),
                           properties,
                           *logger);
+                        managedServiceWrapper->lastUpdatedChangeCount = changeCount;
                     }
                   });
 
@@ -631,12 +633,13 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
                               pid,
                               *(managedServiceFactoryWrapper->trackedService),
                               *logger);
-                         } else {
+                         } else if (managedServiceFactoryWrapper->lastUpdatedChangeCountPerPid[pid] < changeCount) {
                             notifyServiceUpdated(
                               pid,
                               *(managedServiceFactoryWrapper->trackedService),
                               properties,
                               *logger);
+                            managedServiceFactoryWrapper->lastUpdatedChangeCountPerPid[pid] = changeCount;
                          }
                        }
                     });
@@ -672,7 +675,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(
     RemoveFactoryInstanceIfRequired(pid);
   }
   if (configurationToInvalidate && hasBeenUpdated) {
-    auto removeFuture = NotifyConfigurationUpdated(pid);
+    auto removeFuture = NotifyConfigurationUpdated(pid, 0);
     // This functor will run on another thread. Just being overly cautious to guarantee that the
     // ConfigurationImpl which has called this method doesn't run its own destructor.
     PerformAsync(
@@ -724,7 +727,7 @@ ConfigurationAdminImpl::AddingService(
   if (it == std::end(configurations)) {
     auto factoryPid = getFactoryPid(pid);
     AddFactoryInstanceIfRequired(pid, factoryPid);
-    configurations.emplace(
+    auto insertPair = configurations.emplace(
         pid,
         std::make_shared<ConfigurationImpl>(
           this,
@@ -738,16 +741,18 @@ ConfigurationAdminImpl::AddingService(
                   "New ManagedService with PID " + pid);
     return std::make_shared<
         TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>(
-        pid, std::move(managedService));  
+        pid, (*insertPair.first).second->GetChangeCount(), std::move(managedService));  
   }
   // Send a notification in case a valid configuration object 
   // was created before the service was active. The service's properties
   // need to be updated. 
   AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
+  unsigned long initialChangeCount{0ul};
 
   if (it != std::end(configurations)) {
     try {
       properties = it->second->GetProperties();
+      initialChangeCount = it->second->GetChangeCount();
     } catch (const std::runtime_error&) {
       // Configuration is being removed
       logger->Log(SeverityLevel::LOG_WARNING,
@@ -774,7 +779,7 @@ ConfigurationAdminImpl::AddingService(
 
   return std::make_shared<
     TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>(
-    pid, std::move(managedService));
+    pid, initialChangeCount, std::move(managedService));
 }
 
 void ConfigurationAdminImpl::ModifiedService(
@@ -829,6 +834,7 @@ ConfigurationAdminImpl::AddingService(
   }  
 
   std::vector<std::pair<std::string, AnyMap>> pidsAndProperties;
+  unsigned long initialChangeCount{0ul};
 
   const auto it = factoryInstances.find(pid);
   if (it != std::end(factoryInstances)) {
@@ -838,6 +844,7 @@ ConfigurationAdminImpl::AddingService(
              "Invalid Configuration iterator");
       try {
         auto properties = configurationIt->second->GetProperties();
+        initialChangeCount = configurationIt->second->GetChangeCount();
         // Notifications can only be sent for configuration objects that 
         // been Updated. Only add it to the notification list if it has
         // been Updated.
@@ -870,7 +877,7 @@ ConfigurationAdminImpl::AddingService(
       " has been added, and async Update has been queued for all updated instances.");
   return std::make_shared<TrackedServiceWrapper<
     cppmicroservices::service::cm::ManagedServiceFactory>>(
-    pid, std::move(managedServiceFactory));
+    pid, initialChangeCount, std::move(managedServiceFactory));
 }
 
 void ConfigurationAdminImpl::ModifiedService(

@@ -123,8 +123,10 @@ TEST_F(BundleTrackerCustomCallbackTest,
   EXPECT_EQ(bundleA, bundleTracker.GetObject(bundleA))
     << "The bundle returned by a customizer's AddingBundle should be tracked";
 
-  // Whatever happens after the bundle is added is out of scope for this test
-  EXPECT_CALL(*customizer, RemovedBundle).Times(::testing::AnyNumber());
+  // At this point, the callbacks after the bundle is added have been verified.
+  // We test a different expected behavior below, that RemovedBundle is called on
+  // the tracked bundle when the BundleTracker is closed.
+  EXPECT_CALL(*customizer, RemovedBundle).Times(1);
   bundleTracker.Close();
 }
 
@@ -168,7 +170,11 @@ TEST_F(BundleTrackerCustomCallbackTest,
   EXPECT_CALL(*customizer, RemovedBundle).Times(0);
   bundle.Start();
 
-  // What happens after the bundle is modified is out of scope for this test
+  // At this point, the callbacks after the bundle is modified have been verified.
+  // The BundleTracker must be closed, after which RemovedBundle is called for
+  // all tracked bundles. This behavior is verified in another test, so we do not
+  // test it here. Instead, we add an EXPECT_CALL with AnyNumber to retire the
+  // previous EXPECT_CALL with Times(0).
   EXPECT_CALL(*customizer, RemovedBundle).Times(::testing::AnyNumber());
   bundleTracker.Close();
 }
@@ -186,8 +192,6 @@ TEST_F(BundleTrackerCustomCallbackTest,
 
   Bundle bundle = cppmicroservices::testing::InstallLib(
     framework.GetBundleContext(), "TestBundleA");
-  Bundle bundle2 = cppmicroservices::testing::InstallLib(
-    framework.GetBundleContext(), "TestBundleM");
 
   // bundle: INSTALLED ---> uninstalled (Remove)
   EXPECT_CALL(*customizer, AddingBundle).Times(0);
@@ -195,13 +199,12 @@ TEST_F(BundleTrackerCustomCallbackTest,
   EXPECT_CALL(*customizer, RemovedBundle).Times(1);
   bundle.Uninstall();
 
-  // When the BundleTracker is closed, RemovedBundle should be called
-  // for the tracked bundle bundle2
+  // At this point, the callbacks after the bundle is removed have been verified.
+  // The BundleTracker must be closed, after which RemovedBundle is called for
+  // all tracked bundles. This behavior is verified in another test, so we do not
+  // test it here. Instead, we add an EXPECT_CALL with AnyNumber to retire the
+  // previous EXPECT_CALL with Times(1).
   EXPECT_CALL(*customizer, RemovedBundle).Times(::testing::AnyNumber());
-  EXPECT_CALL(*customizer,
-              RemovedBundle(HasName("TestBundleM"), ::testing::_, ::testing::_))
-    .Times(1);
-
   bundleTracker.Close();
 }
 
@@ -255,7 +258,11 @@ TEST_F(BundleTrackerCustomCallbackTest,
   EXPECT_EQ(5, bundleTracker.GetObject(bundle))
     << "The object returned by a customizer's AddingBundle should be tracked";
 
-  // Whatever happens after the bundle is added is out of scope for this test
+  // At this point, the callbacks after the bundle is added have been verified.
+  // The BundleTracker must be closed, after which RemovedBundle is called for
+  // all tracked bundles. This behavior is verified in another test, so we do not
+  // test it here. Instead, we add an EXPECT_CALL with AnyNumber to retire the
+  // previous EXPECT_CALL with Times(0).
   EXPECT_CALL(*customizer, RemovedBundle).Times(::testing::AnyNumber());
   bundleTracker.Close();
 }
@@ -315,7 +322,11 @@ TEST_F(BundleTrackerCustomCallbackTest,
     << "The bundle returned by AddingBundle from a BundleTracker subclass "
        "should be tracked";
 
-  // Whatever happens after the bundle is added is out of scope for this test
+  // At this point, the callbacks after the bundle is added have been verified.
+  // The BundleTracker must be closed, after which RemovedBundle is called for
+  // all tracked bundles. This behavior is verified in another test, so we do not
+  // test it here. Instead, we add an EXPECT_CALL with AnyNumber to retire the
+  // previous EXPECT_CALL with Times(0).
   EXPECT_CALL(bundleTracker, RemovedBundle).Times(::testing::AnyNumber());
   bundleTracker.Close();
 }
@@ -357,7 +368,11 @@ TEST_F(BundleTrackerCustomCallbackTest,
   EXPECT_CALL(bundleTracker, RemovedBundle).Times(0);
   bundle.Start();
 
-  // What happens after the bundle is modified is out of scope for this test
+  // At this point, the callbacks after the bundle is modified have been verified.
+  // The BundleTracker must be closed, after which RemovedBundle is called for
+  // all tracked bundles. This behavior is verified in another test, so we do not
+  // test it here. Instead, we add an EXPECT_CALL with AnyNumber to retire the
+  // previous EXPECT_CALL with Times(0).
   EXPECT_CALL(bundleTracker, RemovedBundle).Times(::testing::AnyNumber());
   bundleTracker.Close();
 }
@@ -381,7 +396,11 @@ TEST_F(BundleTrackerCustomCallbackTest,
   EXPECT_CALL(bundleTracker, RemovedBundle).Times(1);
   bundle.Uninstall();
 
-  // What happens after the bundle is removed is out of scope for this test
+  // At this point, the callbacks after the bundle is removed have been verified.
+  // The BundleTracker must be closed, after which RemovedBundle is called for
+  // all tracked bundles. This behavior is verified in another test, so we do not
+  // test it here. Instead, we add an EXPECT_CALL with AnyNumber to retire the
+  // previous EXPECT_CALL with Times(1).
   EXPECT_CALL(bundleTracker, RemovedBundle).Times(::testing::AnyNumber());
   bundleTracker.Close();
 }
@@ -442,7 +461,11 @@ TEST_F(BundleTrackerCustomCallbackTest,
     << "The object returned by AddingBundle from a BundleTracker subclass "
        "should be tracked";
 
-  // Whatever happens after the bundle is added is out of scope for this test
+  // At this point, the callbacks after the bundle is added have been verified.
+  // The BundleTracker must be closed, after which RemovedBundle is called for
+  // all tracked bundles. This behavior is verified in another test, so we do not
+  // test it here. Instead, we add an EXPECT_CALL with AnyNumber to retire the
+  // previous EXPECT_CALL with Times(0).
   EXPECT_CALL(bundleTracker, RemovedBundle).Times(::testing::AnyNumber());
   bundleTracker.Close();
 }

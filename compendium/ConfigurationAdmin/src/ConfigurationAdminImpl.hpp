@@ -57,10 +57,12 @@ public:
 
   TrackedServiceWrapper(std::string trackedPid,
                         const unsigned long initialChangeCount,
+                        std::unordered_map<std::string, unsigned long> initialChangeCountPerPid,
                         std::shared_ptr<TrackedServiceType> service)
       : pid(std::move(trackedPid))
       , trackedService(std::move(service))
       , lastUpdatedChangeCount{initialChangeCount}
+      , lastUpdatedChangeCountPerPid(std::move(initialChangeCountPerPid))
   {}
 
   TrackedServiceWrapper(const TrackedServiceWrapper&) = delete;

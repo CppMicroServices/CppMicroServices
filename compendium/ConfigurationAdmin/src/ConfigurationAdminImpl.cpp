@@ -741,7 +741,7 @@ ConfigurationAdminImpl::AddingService(
                   "New ManagedService with PID " + pid);
     return std::make_shared<
         TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>(
-        pid, (*insertPair.first).second->GetChangeCount(), std::move(managedService));  
+            pid, (*insertPair.first).second->GetChangeCount(), std::unordered_map<std::string, unsigned long>{}, std::move(managedService));  
   }
   // Send a notification in case a valid configuration object 
   // was created before the service was active. The service's properties
@@ -779,7 +779,7 @@ ConfigurationAdminImpl::AddingService(
 
   return std::make_shared<
     TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>(
-    pid, initialChangeCount, std::move(managedService));
+        pid, initialChangeCount, std::unordered_map<std::string, unsigned long>{}, std::move(managedService));
 }
 
 void ConfigurationAdminImpl::ModifiedService(
@@ -835,6 +835,7 @@ ConfigurationAdminImpl::AddingService(
 
   std::vector<std::pair<std::string, AnyMap>> pidsAndProperties;
   unsigned long initialChangeCount{0ul};
+  std::unordered_map<std::string, unsigned long> initialChangeCountPerPid;
 
   const auto it = factoryInstances.find(pid);
   if (it != std::end(factoryInstances)) {
@@ -844,7 +845,7 @@ ConfigurationAdminImpl::AddingService(
              "Invalid Configuration iterator");
       try {
         auto properties = configurationIt->second->GetProperties();
-        initialChangeCount = configurationIt->second->GetChangeCount();
+        initialChangeCountPerPid[configurationIt->second->GetPid()] = configurationIt->second->GetChangeCount();
         // Notifications can only be sent for configuration objects that 
         // been Updated. Only add it to the notification list if it has
         // been Updated.
@@ -877,7 +878,7 @@ ConfigurationAdminImpl::AddingService(
       " has been added, and async Update has been queued for all updated instances.");
   return std::make_shared<TrackedServiceWrapper<
     cppmicroservices::service::cm::ManagedServiceFactory>>(
-    pid, initialChangeCount, std::move(managedServiceFactory));
+        pid, initialChangeCount, initialChangeCountPerPid, std::move(managedServiceFactory));
 }
 
 void ConfigurationAdminImpl::ModifiedService(

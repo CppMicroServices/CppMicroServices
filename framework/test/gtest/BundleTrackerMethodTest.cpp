@@ -305,6 +305,12 @@ TEST_F(BundleTrackerMethodTest, GetTrackingCountWorksWhenClosed)
   BundleTracker<> bundleTracker(context, all_states);
   EXPECT_EQ(-1, bundleTracker.GetTrackingCount())
     << "Tracking count of unopened BundleTracker was not -1";
+
+  bundleTracker.Open();
+  bundleTracker.Close();
+  
+  EXPECT_EQ(-1, bundleTracker.GetTrackingCount())
+    << "Tracking count of unopened BundleTracker was not -1";
 }
 
 TEST_F(BundleTrackerMethodTest, RemoveWorks)

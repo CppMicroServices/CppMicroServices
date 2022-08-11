@@ -260,7 +260,7 @@ public:
   int GetTrackingCount() const noexcept
   {
     auto t = d->Tracked();
-    if (!t) { /* If BundleTracker is not open */
+    if (!t || (t->Lock(), t->closed)) { /* If BundleTracker is not open */
       return -1;
     }
     return (t->Lock(), t->GetTrackingCount());

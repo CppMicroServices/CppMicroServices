@@ -2,7 +2,7 @@ name: BuildAndTestNix
 
 on:
   push:
-    branches: [ development, master, 702-tracker-trackingcount ]
+    branches: [ development, master ]
   pull_request:
     branches: [ development ]
   workflow_dispatch:

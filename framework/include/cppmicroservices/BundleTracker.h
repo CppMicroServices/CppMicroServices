@@ -349,7 +349,6 @@ public:
    */
   size_t Size() const noexcept
   {
-    size_t size;
     auto t = d->Tracked();
     if (!t) { /* If BundleTracker is not open */
       return 0;
@@ -379,7 +378,7 @@ public:
    * @see BundleTrackerCustomizer::AddingBundle(Bundle, BundleEvent)
    */
   virtual std::optional<T> AddingBundle(const Bundle& bundle,
-                                        const BundleEvent& event) override
+                                        const BundleEvent&) override
   {
     return BundleTrackerCustomizer<T>::ConvertToTrackedType(bundle);
   }
@@ -398,9 +397,9 @@ public:
    *
    * @see BundleTrackerCustomizer:ModifiedBundle(Bundle, BundleEvent, T)
    */
-  virtual void ModifiedBundle(const Bundle& bundle,
-                              const BundleEvent& event,
-                              const T& object) override
+  virtual void ModifiedBundle(const Bundle&,
+                              const BundleEvent&,
+                              const T&) override
   {
     /* do nothing */
   }
@@ -421,9 +420,9 @@ public:
    *
    * @see BundleTrackerCustomizer:RemovedBundle(Bundle, BundleEvent, T)
    */
-  virtual void RemovedBundle(const Bundle& bundle,
-                             const BundleEvent& event,
-                             const T& object) override
+  virtual void RemovedBundle(const Bundle&,
+                             const BundleEvent&,
+                             const T&) override
   {
     /* do nothing */
   }

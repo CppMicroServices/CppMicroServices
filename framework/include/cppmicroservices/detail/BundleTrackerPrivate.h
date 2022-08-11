@@ -31,6 +31,9 @@
 
 namespace cppmicroservices {
 
+template<class T>
+class BundleTracker;
+
 namespace detail {
 
 /**

@@ -230,7 +230,7 @@ BundleTracker<T>::AddingBundle(const Bundle& bundle, const BundleEvent&)
 template<class T>
 void BundleTracker<T>::ModifiedBundle(const Bundle&,
                                       const BundleEvent&,
-                                      BundleTracker<T>::TrackedParamType)
+                                      const T&)
 {
   /* do nothing */
 }
@@ -238,7 +238,7 @@ void BundleTracker<T>::ModifiedBundle(const Bundle&,
 template<class T>
 void BundleTracker<T>::RemovedBundle(const Bundle&,
                                      const BundleEvent&,
-                                     BundleTracker<T>::TrackedParamType)
+                                     const T&)
 {
   /* do nothing */
 }

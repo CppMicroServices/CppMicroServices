@@ -85,11 +85,11 @@ public:
               (override));
   MOCK_METHOD(void,
               ModifiedBundle,
-              (const Bundle&, const BundleEvent&, Bundle),
+              (const Bundle&, const BundleEvent&, const Bundle&),
               (override));
   MOCK_METHOD(void,
               RemovedBundle,
-              (const Bundle&, const BundleEvent&, Bundle),
+              (const Bundle&, const BundleEvent&, const Bundle&),
               (override));
 };
 
@@ -220,11 +220,11 @@ public:
               (override));
   MOCK_METHOD(void,
               ModifiedBundle,
-              (const Bundle&, const BundleEvent&, int),
+              (const Bundle&, const BundleEvent&, const int&),
               (override));
   MOCK_METHOD(void,
               RemovedBundle,
-              (const Bundle&, const BundleEvent&, int),
+              (const Bundle&, const BundleEvent&, const int&),
               (override));
 };
 
@@ -284,11 +284,11 @@ public:
               (override));
   MOCK_METHOD(void,
               ModifiedBundle,
-              (const Bundle&, const BundleEvent&, Bundle),
+              (const Bundle&, const BundleEvent&, const Bundle&),
               (override));
   MOCK_METHOD(void,
               RemovedBundle,
-              (const Bundle&, const BundleEvent&, Bundle),
+              (const Bundle&, const BundleEvent&, const Bundle&),
               (override));
 };
 
@@ -423,11 +423,11 @@ public:
               (override));
   MOCK_METHOD(void,
               ModifiedBundle,
-              (const Bundle&, const BundleEvent&, int),
+              (const Bundle&, const BundleEvent&, const int&),
               (override));
   MOCK_METHOD(void,
               RemovedBundle,
-              (const Bundle&, const BundleEvent&, int),
+              (const Bundle&, const BundleEvent&, const int&),
               (override));
 };
 

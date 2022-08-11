@@ -78,12 +78,9 @@ template<class T = Bundle>
 class BundleTracker : protected BundleTrackerCustomizer<T>
 {
 public:
-  // The type of tracked object
-  using TrackedParamType =
-    typename BundleTrackerCustomizer<T>::TrackedParamType;
 
   // The type of the tracking map
-  using TrackingMap = typename std::unordered_map<Bundle, TrackedParamType>;
+  using TrackingMap = typename std::unordered_map<Bundle, T>;
 
   // The type of the state mask
   using BundleStateMaskType = std::underlying_type_t<Bundle::State>;
@@ -149,7 +146,7 @@ public:
    * @param bundle The <code>Bundle</code> paired with the object
    * @return The custom object paired with the given <code>Bundle</code> or nullopt if the <code>Bundle</code> is not being tracked.
    */
-  std::optional<TrackedParamType> GetObject(
+  std::optional<T> GetObject(
     const Bundle& bundle) const noexcept;
 
   /**
@@ -228,7 +225,7 @@ public:
    *
    * @see BundleTrackerCustomizer::AddingBundle(Bundle, BundleEvent)
    */
-  virtual std::optional<TrackedParamType> AddingBundle(
+  virtual std::optional<T> AddingBundle(
     const Bundle& bundle,
     const BundleEvent& event) override;
 
@@ -248,7 +245,7 @@ public:
    */
   virtual void ModifiedBundle(const Bundle& bundle,
                               const BundleEvent& event,
-                              TrackedParamType object) override;
+                              const T& object) override;
 
   /**
    * Called when a <code>Bundle</code> is removed that is being tracked by this <code>BundleTracker</code>.
@@ -268,7 +265,7 @@ public:
    */
   virtual void RemovedBundle(const Bundle& bundle,
                              const BundleEvent& event,
-                             TrackedParamType object) override;
+                             const T& object) override;
 
 private:
   using TypeTraits = typename BundleTrackerCustomizer<T>::TypeTraits;

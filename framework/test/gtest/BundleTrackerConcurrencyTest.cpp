@@ -80,11 +80,11 @@ public:
               (override));
   MOCK_METHOD(void,
               ModifiedBundle,
-              (const Bundle&, const BundleEvent&, Bundle),
+              (const Bundle&, const BundleEvent&, const Bundle&),
               (override));
   MOCK_METHOD(void,
               RemovedBundle,
-              (const Bundle&, const BundleEvent&, Bundle),
+              (const Bundle&, const BundleEvent&, const Bundle&),
               (override));
 };
 

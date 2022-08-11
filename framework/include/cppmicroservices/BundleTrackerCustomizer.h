@@ -89,7 +89,7 @@ struct BundleTrackerCustomizer
    *
    * @return The object to be tracked for the specified <code>Bundle</code> object or nullopt to avoid tracking the <code>Bundle</code>.
    */
-  virtual std::optional<TrackedParamType> AddingBundle(
+  virtual std::optional<T> AddingBundle(
     const Bundle& bundle,
     const BundleEvent& event) = 0;
 
@@ -105,7 +105,7 @@ struct BundleTrackerCustomizer
    */
   virtual void ModifiedBundle(const Bundle& bundle,
                               const BundleEvent& event,
-                              TrackedParamType object) = 0;
+                              const T& object) = 0;
 
   /**
    * Called when a <code>Bundle</code> is removed that is being tracked by this <code>BundleTracker</code>.
@@ -121,7 +121,7 @@ struct BundleTrackerCustomizer
    */
   virtual void RemovedBundle(const Bundle& bundle,
                              const BundleEvent& event,
-                             TrackedParamType object) = 0;
+                             const T& object) = 0;
 };
 
 } // namespace cppmicroservices

@@ -25,12 +25,17 @@
 
 #include <chrono>
 #include <map>
+#include <memory>
 #include <optional>
 #include <type_traits>
+#include <vector>
 
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/BundleTrackerCustomizer.h"
+#include "cppmicroservices/detail/BundleTrackerPrivate.h"
+#include "cppmicroservices/detail/TrackedBundle.h"
 
 namespace cppmicroservices {
 
@@ -117,12 +122,23 @@ public:
   BundleTracker(
     const BundleContext& context,
     const BundleStateMaskType stateMask,
-    const std::shared_ptr<BundleTrackerCustomizer<T>> customizer = nullptr);
+    const std::shared_ptr<BundleTrackerCustomizer<T>> customizer = nullptr)
+    : d(std::make_unique<detail::BundleTrackerPrivate<T>>(this,
+                                                          context,
+                                                          stateMask,
+                                                          customizer))
+  {}
 
   /**
    * Automatically closes the <code>BundleTracker</code>
    */
-  ~BundleTracker() override;
+  ~BundleTracker() override
+  {
+    try {
+      Close();
+    } catch (...) {
+    }
+  }
 
   /**
    * Close this <code>BundleTracker</code>.
@@ -130,14 +146,68 @@ public:
    * Removes all tracked bundles from this <code>BundleTracker</code>, calling <code>RemovedBundle</code>  on all of the
    * currently tracked bundles. Also resets the tracking count.
    */
-  void Close() noexcept;
+  void Close() noexcept
+  {
+    std::shared_ptr<detail::TrackedBundle<T>> outgoing =
+      d->trackedBundle.Load();
+    {
+      auto l = d->Lock();
+      US_UNUSED(l);
+
+      try {
+        d->context.RemoveListener(std::move(d->listenerToken));
+      } catch (const std::runtime_error&) {
+        /* Rescue if context is stopped or invalid */
+      }
+
+      if (outgoing == nullptr) {
+        return;
+      }
+
+      // Check for already closed
+      if (d->Tracked()->closed) {
+        return;
+      }
+
+      DIAG_LOG(*d->context.GetLogSink())
+        << "BundleTracker<T>::close:" << d->stateMask;
+
+      outgoing->Close();
+      d->Modified();         /* log message */
+      outgoing->NotifyAll(); /* wake up any waiters */
+    }
+
+    try {
+      outgoing->WaitOnCustomizersToFinish();
+    } catch (const std::exception&) {
+      // Rescue CounterLatch issues
+    }
+
+    auto bundles = GetBundles();
+    for (auto& bundle : bundles) {
+      outgoing->Untrack(bundle, BundleEvent());
+    }
+  }
 
   /**
    * Returns a vector of all the tracked bundles.
    *
    * @return A vector of Bundles (could be empty).
    */
-  std::vector<Bundle> GetBundles() const noexcept;
+  std::vector<Bundle> GetBundles() const noexcept
+  {
+    std::vector<Bundle> bundles;
+    auto t = d->Tracked();
+    if (!t) { /* If BundleTracker is not open */
+      return bundles;
+    }
+    {
+      auto l = t->Lock();
+      US_UNUSED(l);
+      d->GetBundles_unlocked(bundles, t.get());
+    }
+    return bundles;
+  }
 
   /**
    * Returns the custom object for the given <code>Bundle</code> if the given <code>Bundle</code> is tracked. Otherwise nullopt.
@@ -145,15 +215,35 @@ public:
    * @param bundle The <code>Bundle</code> paired with the object
    * @return The custom object paired with the given <code>Bundle</code> or nullopt if the <code>Bundle</code> is not being tracked.
    */
-  std::optional<T> GetObject(const Bundle& bundle) const noexcept;
-
+  std::optional<T> GetObject(const Bundle& bundle) const noexcept
+  {
+    auto t = d->Tracked();
+    if (!t ||
+        !bundle) { /* If BundleTracker is not open or if bundle is invalid */
+      return std::nullopt;
+    }
+    return (t->Lock(), t->GetCustomizedObject_unlocked(bundle));
+  }
   /**
    * Returns an unordered map containing all of the currently tracked Bundles to their custom objects.
    *
    * @return An unordered map containing all of the Bundles currently tracked by this
    * <code>BundleTracker</code> to their custom objects.
    */
-  TrackingMap GetTracked() const noexcept;
+  TrackingMap GetTracked() const noexcept
+  {
+    BundleTracker<T>::TrackingMap trackingMap;
+    auto t = d->Tracked();
+    if (!t) { /* If BundleTracker is not open */
+      return trackingMap;
+    }
+    {
+      auto l = t->Lock();
+      US_UNUSED(l);
+      t->CopyEntries_unlocked(trackingMap);
+    }
+    return trackingMap;
+  }
 
   /**
    * Returns the tracking count for this <code>BundleTracker</code>.
@@ -167,14 +257,28 @@ public:
    *
    * @return The current tracking count, or -1 if the <code>BundleTracker</code> is closed.
    */
-  int GetTrackingCount() const noexcept;
+  int GetTrackingCount() const noexcept
+  {
+    auto t = d->Tracked();
+    if (!t) { /* If BundleTracker is not open */
+      return -1;
+    }
+    return (t->Lock(), t->GetTrackingCount());
+  }
 
   /**
    * Returns true if and only if this <code>BundleTracker</code> is tracking no bundles.
    *
    * @return true if and only if this <code>BundleTracker</code> is tracking no bundles.
    */
-  bool IsEmpty() const noexcept;
+  bool IsEmpty() const noexcept
+  {
+    auto t = d->Tracked();
+    if (!t) { /* If BundleTracker is not open */
+      return true;
+    }
+    return (t->Lock(), t->IsEmpty_unlocked());
+  }
 
   /**
    * Open this <code>BundleTracker</code> to begin tracking bundles.
@@ -184,7 +288,43 @@ public:
    * @throws std::logic_error If the <code>BundleContext</code> used in the creation of this
    * <code>BundleTracker</code> is no longer valid.
    */
-  void Open();
+  void Open()
+  {
+    std::shared_ptr<detail::TrackedBundle<T>> t;
+    {
+      auto l = d->Lock();
+      US_UNUSED(l);
+      if (d->trackedBundle.Load() &&
+          !d->Tracked()->closed) { /* If BundleTracker is open */
+        return;
+      }
+
+      DIAG_LOG(*d->context.GetLogSink())
+        << "BundleTracker<T>::Open: " << d->stateMask;
+
+      t = std::make_shared<detail::TrackedBundle<T>>(
+        this,
+        d->customizer ? d->customizer.get() : d->getTrackerAsCustomizer());
+      try {
+        // Attempt to drop old listener
+        d->context.RemoveListener(std::move(d->listenerToken));
+        // Make new listener
+        d->listenerToken = d->context.AddBundleListener(std::bind(
+          &detail::TrackedBundle<T>::BundleChanged, t, std::placeholders::_1));
+
+        std::vector<Bundle> bundles = d->GetInitialBundles(d->stateMask);
+        t->SetInitial(bundles);
+      } catch (const std::invalid_argument& e) {
+        // Remove listener and rethrow
+        d->context.RemoveListener(std::move(d->listenerToken));
+        throw std::runtime_error(
+          std::string("unexpected std::invalid_argument exception: ") +
+          e.what());
+      }
+      d->trackedBundle.Store(t);
+    }
+    t->TrackInitial();
+  }
 
   /**
    * Remove a bundle from this <code>BundleTracker</code>.
@@ -193,14 +333,29 @@ public:
    * 
    * @see BundleTrackerCustomizer:RemovedBundle(Bundle, BundleEvent, T)
    */
-  void Remove(const Bundle&) noexcept;
+  void Remove(const Bundle& bundle) noexcept
+  {
+    auto t = d->Tracked();
+    if (!t) { /* If BundleTracker is not open */
+      return;
+    }
+    t->Untrack(bundle, BundleEvent());
+  }
 
   /**
    * Return the number of bundles being tracked by this <code>BundleTracker</code>.
    *
    * @return The number of tracked bundles.
    */
-  size_t Size() const noexcept;
+  size_t Size() const noexcept
+  {
+    size_t size;
+    auto t = d->Tracked();
+    if (!t) { /* If BundleTracker is not open */
+      return 0;
+    }
+    return (t->Lock(), t->Size_unlocked());
+  }
 
   /**
    * Called when a <code>Bundle</code> is being added to the <code>BundleTracker</code> 
@@ -224,7 +379,10 @@ public:
    * @see BundleTrackerCustomizer::AddingBundle(Bundle, BundleEvent)
    */
   virtual std::optional<T> AddingBundle(const Bundle& bundle,
-                                        const BundleEvent& event) override;
+                                        const BundleEvent& event) override
+  {
+    return BundleTrackerCustomizer<T>::ConvertToTrackedType(bundle);
+  }
 
   /**
    * Called when a <code>Bundle</code> is modified that is being tracked by this <code>BundleTracker</code>.
@@ -242,7 +400,10 @@ public:
    */
   virtual void ModifiedBundle(const Bundle& bundle,
                               const BundleEvent& event,
-                              const T& object) override;
+                              const T& object) override
+  {
+    /* do nothing */
+  }
 
   /**
    * Called when a <code>Bundle</code> is removed that is being tracked by this <code>BundleTracker</code>.
@@ -262,7 +423,10 @@ public:
    */
   virtual void RemovedBundle(const Bundle& bundle,
                              const BundleEvent& event,
-                             const T& object) override;
+                             const T& object) override
+  {
+    /* do nothing */
+  }
 
 private:
   friend class detail::TrackedBundle<T>;
@@ -272,7 +436,5 @@ private:
 };
 
 } // namespace cppmicroservices
-
-#include "cppmicroservices/detail/BundleTracker.tpp"
 
 #endif // CPPMICROSERVICES_BUNDLETRACKER_H

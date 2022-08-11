@@ -52,23 +52,15 @@ template<class T = Bundle>
 struct BundleTrackerCustomizer
 {
 
-  struct TypeTraits
+  static T ConvertToTrackedType(const Bundle& b)
   {
-    using TrackedType = T;
-    using TrackedParamType = T;
-
-    static T ConvertToTrackedType(const Bundle& b)
-    {
-      if constexpr (std::is_same_v<T, Bundle>) {
-        return b;
-      } else {
-        throw std::runtime_error("A custom BundleTrackerCustomizer instance is "
-                                 "required for custom tracked objects.");
-      }
+    if constexpr (std::is_same_v<T, Bundle>) {
+      return b;
+    } else {
+      throw std::runtime_error("A custom BundleTrackerCustomizer instance is "
+                               "required for custom tracked objects.");
     }
-  };
-
-  using TrackedParamType = typename TypeTraits::TrackedParamType;
+  }
 
   virtual ~BundleTrackerCustomizer() = default;
 
@@ -89,9 +81,8 @@ struct BundleTrackerCustomizer
    *
    * @return The object to be tracked for the specified <code>Bundle</code> object or nullopt to avoid tracking the <code>Bundle</code>.
    */
-  virtual std::optional<T> AddingBundle(
-    const Bundle& bundle,
-    const BundleEvent& event) = 0;
+  virtual std::optional<T> AddingBundle(const Bundle& bundle,
+                                        const BundleEvent& event) = 0;
 
   /**
    * Called when a <code>Bundle</code> is modified that is being tracked by this <code>BundleTracker</code>.

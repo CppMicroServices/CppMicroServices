@@ -36,14 +36,11 @@ namespace detail {
 /**
  * \ingroup MicroServices
  */
-template<class TTT>
+template<class T>
 class BundleTrackerPrivate : MultiThreaded<>
 {
 
 public:
-  using T = typename TTT::TrackedType;
-  using TrackedParamType = typename TTT::TrackedParamType;
-
   using BundleStateMaskType = std::underlying_type_t<Bundle::State>;
 
   BundleTrackerPrivate(
@@ -64,7 +61,7 @@ public:
   std::vector<Bundle> GetInitialBundles(BundleStateMaskType stateMask);
 
   void GetBundles_unlocked(std::vector<Bundle>& refs,
-                           TrackedBundle<TTT>* t) const;
+                           TrackedBundle<T>* t) const;
 
   /**
    * The Bundle Context used by this <code>BundleTracker</code>.
@@ -90,7 +87,7 @@ public:
   /**
    * Tracked bundles: <code>Bundle</code> -> custom Object
    */
-  Atomic<std::shared_ptr<TrackedBundle<TTT>>> trackedBundle;
+  Atomic<std::shared_ptr<TrackedBundle<T>>> trackedBundle;
 
   /**
    * Accessor method for the current TrackedBundle object. This method is only
@@ -99,7 +96,7 @@ public:
    *
    * @return The current Tracked object.
    */
-  std::shared_ptr<TrackedBundle<TTT>> Tracked() const;
+  std::shared_ptr<TrackedBundle<T>> Tracked() const;
 
   /**
    * Called by the TrackedBundle object whenever the set of tracked bundles is

@@ -47,19 +47,17 @@ namespace detail {
  * implementation of the Tracker class.
  *
  * @tparam S The tracked item. It is the key.
- * @tparam TTT Type traits with TTT::TrackedType representing the value type mapped to the tracked item.
+ * @tparam T the value type mapped to the tracked item.
  * @tparam R The reason the tracked item is  being tracked or untracked.
  * @remarks This class is thread safe.
  */
-template<class S, class TTT, class R>
+template<class S, class T, class R>
 class BundleAbstractTracked
   : public MultiThreaded<MutexLockingStrategy<>, WaitCondition>
 {
 
 public:
-  using TrackedParamType = typename TTT::TrackedParamType;
-
-  using TrackingMap = std::unordered_map<S, TrackedParamType>;
+  using TrackingMap = std::unordered_map<S, T>;
 
   /**
    * BundleAbstractTracked constructor.
@@ -138,7 +136,7 @@ public:
    *
    * @GuardedBy this
    */
-  std::optional<TrackedParamType> GetCustomizedObject_unlocked(S item) const;
+  std::optional<T> GetCustomizedObject_unlocked(S item) const;
 
   /**
    * Return the list of tracked items.
@@ -188,9 +186,7 @@ public:
    * @return Customized object for the tracked item or <code>null</code> if
    *         the item is not to be tracked.
    */
-  virtual std::optional<TrackedParamType> CustomizerAdding(
-    S item,
-    const R& related) = 0;
+  virtual std::optional<T> CustomizerAdding(S item, const R& related) = 0;
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -202,7 +198,7 @@ public:
    */
   virtual void CustomizerModified(S item,
                                   const R& related,
-                                  const TrackedParamType& object) = 0;
+                                  const T& object) = 0;
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -212,9 +208,7 @@ public:
    * @param related Action related object.
    * @param object Customized object for the tracked item.
    */
-  virtual void CustomizerRemoved(S item,
-                                 const R& related,
-                                 const TrackedParamType& object) = 0;
+  virtual void CustomizerRemoved(S item, const R& related, const T& object) = 0;
 
   /**
    * List of items in the process of being added. This is used to deal with
@@ -267,7 +261,7 @@ public:
   void TrackAdding(S item, R related);
 
 private:
-  using Self = BundleAbstractTracked<S, TTT, R>;
+  using Self = BundleAbstractTracked<S, T, R>;
 
   /**
    * Map of tracked items to customized objects.
@@ -284,8 +278,7 @@ private:
 
   BundleContext bc;
 
-  bool CustomizerAddingFinal(S item,
-                             const std::optional<TrackedParamType>& custom);
+  bool CustomizerAddingFinal(S item, const std::optional<T>& custom);
 };
 
 } // namespace detail

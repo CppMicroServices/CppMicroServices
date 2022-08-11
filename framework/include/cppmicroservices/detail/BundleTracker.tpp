@@ -47,17 +47,17 @@ template<class T>
 BundleTracker<T>::BundleTracker(
   const BundleContext& context,
   const BundleStateMaskType stateMask,
-  const std::shared_ptr<_BundleTrackerCustomizer> customizer)
-  : d(std::make_unique<_BundleTrackerPrivate>(this,
-                                              context,
-                                              stateMask,
-                                              customizer))
+  const std::shared_ptr<BundleTrackerCustomizer<T>> customizer)
+  : d(std::make_unique<detail::BundleTrackerPrivate<T>>(this,
+                                                        context,
+                                                        stateMask,
+                                                        customizer))
 {}
 
 template<class T>
 void BundleTracker<T>::Open()
 {
-  std::shared_ptr<_TrackedBundle> t;
+  std::shared_ptr<detail::TrackedBundle<T>> t;
   {
     auto l = d->Lock();
     US_UNUSED(l);
@@ -69,14 +69,14 @@ void BundleTracker<T>::Open()
     DIAG_LOG(*d->context.GetLogSink())
       << "BundleTracker<T>::Open: " << d->stateMask;
 
-    t = std::make_shared<_TrackedBundle>(
+    t = std::make_shared<detail::TrackedBundle<T>>(
       this, d->customizer ? d->customizer.get() : d->getTrackerAsCustomizer());
     try {
       // Attempt to drop old listener
       d->context.RemoveListener(std::move(d->listenerToken));
       // Make new listener
-      d->listenerToken = d->context.AddBundleListener(
-        std::bind(&_TrackedBundle::BundleChanged, t, std::placeholders::_1));
+      d->listenerToken = d->context.AddBundleListener(std::bind(
+        &detail::TrackedBundle<T>::BundleChanged, t, std::placeholders::_1));
 
       std::vector<Bundle> bundles = d->GetInitialBundles(d->stateMask);
       t->SetInitial(bundles);
@@ -94,7 +94,7 @@ void BundleTracker<T>::Open()
 template<class T>
 void BundleTracker<T>::Close() noexcept
 {
-  std::shared_ptr<_TrackedBundle> outgoing = d->trackedBundle.Load();
+  std::shared_ptr<detail::TrackedBundle<T>> outgoing = d->trackedBundle.Load();
   {
     auto l = d->Lock();
     US_UNUSED(l);
@@ -151,8 +151,8 @@ std::vector<Bundle> BundleTracker<T>::GetBundles() const noexcept
 }
 
 template<class T>
-std::optional<typename BundleTracker<T>::TrackedParamType>
-BundleTracker<T>::GetObject(const Bundle& bundle) const noexcept
+std::optional<T> BundleTracker<T>::GetObject(
+  const Bundle& bundle) const noexcept
 {
   auto t = d->Tracked();
   if (!t ||
@@ -221,10 +221,10 @@ size_t BundleTracker<T>::Size() const noexcept
 }
 
 template<class T>
-std::optional<typename BundleTracker<T>::TrackedParamType>
-BundleTracker<T>::AddingBundle(const Bundle& bundle, const BundleEvent&)
+std::optional<T> BundleTracker<T>::AddingBundle(const Bundle& bundle,
+                                                const BundleEvent&)
 {
-  return TypeTraits::ConvertToTrackedType(bundle);
+  return ConvertToTrackedType(bundle);
 }
 
 template<class T>

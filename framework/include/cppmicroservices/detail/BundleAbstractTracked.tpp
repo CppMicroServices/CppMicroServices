@@ -29,18 +29,18 @@ namespace cppmicroservices {
 
 namespace detail {
 
-template<class S, class TTT, class R>
-BundleAbstractTracked<S, TTT, R>::BundleAbstractTracked(BundleContext context)
+template<class S, class T, class R>
+BundleAbstractTracked<S, T, R>::BundleAbstractTracked(BundleContext context)
   : closed(false)
   , trackingCount(0)
   , bc(std::move(context))
 {}
 
-template<class S, class TTT, class R>
-BundleAbstractTracked<S, TTT, R>::~BundleAbstractTracked() = default;
+template<class S, class T, class R>
+BundleAbstractTracked<S, T, R>::~BundleAbstractTracked() = default;
 
-template<class S, class TTT, class R>
-void BundleAbstractTracked<S, TTT, R>::SetInitial(
+template<class S, class T, class R>
+void BundleAbstractTracked<S, T, R>::SetInitial(
   const std::vector<S>& initiallist)
 {
   std::copy(
@@ -56,8 +56,8 @@ void BundleAbstractTracked<S, TTT, R>::SetInitial(
   }
 }
 
-template<class S, class TTT, class R>
-void BundleAbstractTracked<S, TTT, R>::TrackInitial()
+template<class S, class T, class R>
+void BundleAbstractTracked<S, T, R>::TrackInitial()
 {
   while (true) {
     S item;
@@ -103,17 +103,17 @@ void BundleAbstractTracked<S, TTT, R>::TrackInitial()
   }
 }
 
-template<class S, class TTT, class R>
-void BundleAbstractTracked<S, TTT, R>::Close()
+template<class S, class T, class R>
+void BundleAbstractTracked<S, T, R>::Close()
 {
   closed = true;
 }
 
-template<class S, class TTT, class R>
-void BundleAbstractTracked<S, TTT, R>::Track(S item, R related)
+template<class S, class T, class R>
+void BundleAbstractTracked<S, T, R>::Track(S item, R related)
 {
   bool isInMap = false;
-  TrackedParamType object;
+  T object;
   {
     auto l = this->Lock();
     US_UNUSED(l);
@@ -152,10 +152,10 @@ void BundleAbstractTracked<S, TTT, R>::Track(S item, R related)
   }
 }
 
-template<class S, class TTT, class R>
-void BundleAbstractTracked<S, TTT, R>::Untrack(S item, R related)
+template<class S, class T, class R>
+void BundleAbstractTracked<S, T, R>::Untrack(S item, R related)
 {
-  TrackedParamType object;
+  T object;
   {
     auto l = this->Lock();
     US_UNUSED(l);
@@ -206,33 +206,32 @@ void BundleAbstractTracked<S, TTT, R>::Untrack(S item, R related)
    */
 }
 
-template<class S, class TTT, class R>
-std::size_t BundleAbstractTracked<S, TTT, R>::Size_unlocked() const
+template<class S, class T, class R>
+std::size_t BundleAbstractTracked<S, T, R>::Size_unlocked() const
 {
   return tracked.size();
 }
 
-template<class S, class TTT, class R>
-bool BundleAbstractTracked<S, TTT, R>::IsEmpty_unlocked() const
+template<class S, class T, class R>
+bool BundleAbstractTracked<S, T, R>::IsEmpty_unlocked() const
 {
   return tracked.empty();
 }
 
-template<class S, class TTT, class R>
-std::optional<typename BundleAbstractTracked<S, TTT, R>::TrackedParamType>
-BundleAbstractTracked<S, TTT, R>::GetCustomizedObject_unlocked(S item) const
+template<class S, class T, class R>
+std::optional<T> BundleAbstractTracked<S, T, R>::GetCustomizedObject_unlocked(
+  S item) const
 {
   typename TrackingMap::const_iterator i = tracked.find(item);
   if (i != tracked.end()) {
-    return std::optional<
-      typename BundleAbstractTracked<S, TTT, R>::TrackedParamType>(i->second);
+    return std::optional<T>(i->second);
   }
 
   return std::nullopt;
 }
 
-template<class S, class TTT, class R>
-void BundleAbstractTracked<S, TTT, R>::GetTracked_unlocked(
+template<class S, class T, class R>
+void BundleAbstractTracked<S, T, R>::GetTracked_unlocked(
   std::vector<S>& items) const
 {
   for (auto& i : tracked) {
@@ -240,31 +239,31 @@ void BundleAbstractTracked<S, TTT, R>::GetTracked_unlocked(
   }
 }
 
-template<class S, class TTT, class R>
-void BundleAbstractTracked<S, TTT, R>::Modified()
+template<class S, class T, class R>
+void BundleAbstractTracked<S, T, R>::Modified()
 {
   // atomic
   ++trackingCount;
 }
 
-template<class S, class TTT, class R>
-int BundleAbstractTracked<S, TTT, R>::GetTrackingCount() const
+template<class S, class T, class R>
+int BundleAbstractTracked<S, T, R>::GetTrackingCount() const
 {
   // atomic
   return trackingCount;
 }
 
-template<class S, class TTT, class R>
-void BundleAbstractTracked<S, TTT, R>::CopyEntries_unlocked(
+template<class S, class T, class R>
+void BundleAbstractTracked<S, T, R>::CopyEntries_unlocked(
   TrackingMap& map) const
 {
   map.insert(tracked.begin(), tracked.end());
 }
 
-template<class S, class TTT, class R>
-bool BundleAbstractTracked<S, TTT, R>::CustomizerAddingFinal(
+template<class S, class T, class R>
+bool BundleAbstractTracked<S, T, R>::CustomizerAddingFinal(
   S item,
-  const std::optional<TrackedParamType>& custom)
+  const std::optional<T>& custom)
 {
   auto l = this->Lock();
   US_UNUSED(l);
@@ -286,11 +285,11 @@ bool BundleAbstractTracked<S, TTT, R>::CustomizerAddingFinal(
   }
 }
 
-template<class S, class TTT, class R>
-void BundleAbstractTracked<S, TTT, R>::TrackAdding(S item, R related)
+template<class S, class T, class R>
+void BundleAbstractTracked<S, T, R>::TrackAdding(S item, R related)
 {
   DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::trackAdding:" << item;
-  std::optional<TrackedParamType> object;
+  std::optional<T> object;
   bool becameUntracked = false;
   /* Call customizer outside of synchronized region */
   try {

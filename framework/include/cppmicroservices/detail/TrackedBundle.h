@@ -38,16 +38,13 @@ namespace detail {
  * This class is not intended to be used directly. It is exported to support
  * the CppMicroServices bundle system.
  */
-template<class TTT>
+template<class T = Bundle>
 class TrackedBundle
   : public TrackedBundleListener
-  , public BundleAbstractTracked<Bundle, TTT, BundleEvent>
+  , public BundleAbstractTracked<Bundle, T, BundleEvent>
 {
 
 public:
-  using T = typename TTT::TrackedType;
-  using TrackedParamType = typename TTT::TrackedParamType;
-
   TrackedBundle(BundleTracker<T>* _bundleTracker,
                 BundleTrackerCustomizer<T>* _customizer);
 
@@ -63,8 +60,6 @@ public:
   void WaitOnCustomizersToFinish();
 
 private:
-  using Superclass = BundleAbstractTracked<Bundle, TTT, BundleEvent>;
-
   BundleTracker<T>* bundleTracker;
   BundleTrackerCustomizer<T>* customizer;
 
@@ -89,9 +84,8 @@ private:
    * 
    * @see BundleTrackerCustomizer::AddingBundle(Bundle, BundleEvent)
    */
-  std::optional<TrackedParamType> CustomizerAdding(
-    Bundle bundle,
-    const BundleEvent& related) override;
+  std::optional<T> CustomizerAdding(Bundle bundle,
+                                    const BundleEvent& related) override;
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -105,7 +99,7 @@ private:
    */
   void CustomizerModified(Bundle bundle,
                           const BundleEvent& related,
-                          const TrackedParamType& object) override;
+                          const T& object) override;
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -119,7 +113,7 @@ private:
    */
   void CustomizerRemoved(Bundle bundle,
                          const BundleEvent& related,
-                         const TrackedParamType& object) override;
+                         const T& object) override;
 };
 
 } // namespace detail

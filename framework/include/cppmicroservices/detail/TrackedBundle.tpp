@@ -24,23 +24,23 @@ namespace cppmicroservices {
 
 namespace detail {
 
-template<class TTT>
-TrackedBundle<TTT>::TrackedBundle(BundleTracker<T>* _bundleTracker,
-                                  BundleTrackerCustomizer<T>* _customizer)
-  : Superclass(_bundleTracker->d->context)
+template<class T>
+TrackedBundle<T>::TrackedBundle(BundleTracker<T>* _bundleTracker,
+                                BundleTrackerCustomizer<T>* _customizer)
+  : BundleAbstractTracked<Bundle, T, BundleEvent>(_bundleTracker->d->context)
   , bundleTracker(_bundleTracker)
   , customizer(_customizer)
   , latch{}
 {}
 
-template<class TTT>
-void TrackedBundle<TTT>::WaitOnCustomizersToFinish()
+template<class T>
+void TrackedBundle<T>::WaitOnCustomizersToFinish()
 {
   latch.Wait();
 }
 
-template<class TTT>
-void TrackedBundle<TTT>::BundleChanged(const BundleEvent& event)
+template<class T>
+void TrackedBundle<T>::BundleChanged(const BundleEvent& event)
 {
   // Call track or untrack based on state mask
 
@@ -98,32 +98,33 @@ void TrackedBundle<TTT>::BundleChanged(const BundleEvent& event)
   }
 }
 
-template<class TTT>
-void TrackedBundle<TTT>::Modified()
+template<class T>
+void TrackedBundle<T>::Modified()
 {
-  Superclass::Modified(); /* increment the modification count */
+  BundleAbstractTracked<Bundle, T, BundleEvent>::
+    Modified(); /* increment the modification count */
   bundleTracker->d->Modified();
 }
 
-template<class TTT>
-std::optional<typename TrackedBundle<TTT>::TrackedParamType>
-TrackedBundle<TTT>::CustomizerAdding(Bundle bundle, const BundleEvent& event)
+template<class T>
+std::optional<T> TrackedBundle<T>::CustomizerAdding(Bundle bundle,
+                                                    const BundleEvent& event)
 {
   return customizer->AddingBundle(bundle, event);
 }
 
-template<class TTT>
-void TrackedBundle<TTT>::CustomizerModified(Bundle bundle,
-                                            const BundleEvent& event,
-                                            const TrackedParamType& object)
+template<class T>
+void TrackedBundle<T>::CustomizerModified(Bundle bundle,
+                                          const BundleEvent& event,
+                                          const T& object)
 {
   customizer->ModifiedBundle(bundle, event, object);
 }
 
-template<class TTT>
-void TrackedBundle<TTT>::CustomizerRemoved(Bundle bundle,
-                                           const BundleEvent& event,
-                                           const TrackedParamType& object)
+template<class T>
+void TrackedBundle<T>::CustomizerRemoved(Bundle bundle,
+                                         const BundleEvent& event,
+                                         const T& object)
 {
   customizer->RemovedBundle(bundle, event, object);
 }

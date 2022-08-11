@@ -32,8 +32,8 @@ namespace cppmicroservices {
 
 namespace detail {
 
-template<class TTT>
-BundleTrackerPrivate<TTT>::BundleTrackerPrivate(
+template<class T>
+BundleTrackerPrivate<T>::BundleTrackerPrivate(
   BundleTracker<T>* bt,
   const BundleContext& _context,
   BundleStateMaskType _stateMask,
@@ -48,19 +48,19 @@ BundleTrackerPrivate<TTT>::BundleTrackerPrivate(
   this->customizer = customizer;
 }
 
-template<class TTT>
-BundleTrackerPrivate<TTT>::~BundleTrackerPrivate() = default;
+template<class T>
+BundleTrackerPrivate<T>::~BundleTrackerPrivate() = default;
 
-template<class TTT>
-std::shared_ptr<detail::TrackedBundle<TTT>> BundleTrackerPrivate<TTT>::Tracked()
+template<class T>
+std::shared_ptr<detail::TrackedBundle<T>> BundleTrackerPrivate<T>::Tracked()
   const
 {
   return trackedBundle.Load();
 }
 
-template<class TTT>
-std::vector<Bundle> BundleTrackerPrivate<TTT>::GetInitialBundles(
-  typename BundleTrackerPrivate<TTT>::BundleStateMaskType stateMask)
+template<class T>
+std::vector<Bundle> BundleTrackerPrivate<T>::GetInitialBundles(
+  typename BundleTrackerPrivate<T>::BundleStateMaskType stateMask)
 {
   std::vector<Bundle> result;
   auto contextBundles = context.GetBundles();
@@ -72,9 +72,9 @@ std::vector<Bundle> BundleTrackerPrivate<TTT>::GetInitialBundles(
   return result;
 }
 
-template<class TTT>
-void BundleTrackerPrivate<TTT>::GetBundles_unlocked(std::vector<Bundle>& refs,
-                                                    TrackedBundle<TTT>* t) const
+template<class T>
+void BundleTrackerPrivate<T>::GetBundles_unlocked(std::vector<Bundle>& refs,
+                                                  TrackedBundle<T>* t) const
 {
   if (t->Size_unlocked() == 0) {
     return;
@@ -82,8 +82,8 @@ void BundleTrackerPrivate<TTT>::GetBundles_unlocked(std::vector<Bundle>& refs,
   t->GetTracked_unlocked(refs);
 }
 
-template<class TTT>
-void BundleTrackerPrivate<TTT>::Modified()
+template<class T>
+void BundleTrackerPrivate<T>::Modified()
 {
   // No cache to clear
   // Log message to parallel ServiceTracker

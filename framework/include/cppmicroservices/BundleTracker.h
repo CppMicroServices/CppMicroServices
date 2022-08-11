@@ -78,7 +78,6 @@ template<class T = Bundle>
 class BundleTracker : protected BundleTrackerCustomizer<T>
 {
 public:
-
   // The type of the tracking map
   using TrackingMap = typename std::unordered_map<Bundle, T>;
 
@@ -146,8 +145,7 @@ public:
    * @param bundle The <code>Bundle</code> paired with the object
    * @return The custom object paired with the given <code>Bundle</code> or nullopt if the <code>Bundle</code> is not being tracked.
    */
-  std::optional<T> GetObject(
-    const Bundle& bundle) const noexcept;
+  std::optional<T> GetObject(const Bundle& bundle) const noexcept;
 
   /**
    * Returns an unordered map containing all of the currently tracked Bundles to their custom objects.
@@ -174,7 +172,7 @@ public:
   /**
    * Returns true if and only if this <code>BundleTracker</code> is tracking no bundles.
    *
-   * @return true if and only if this <code>BundleTracker</code> is empty.
+   * @return true if and only if this <code>BundleTracker</code> is tracking no bundles.
    */
   bool IsEmpty() const noexcept;
 
@@ -225,9 +223,8 @@ public:
    *
    * @see BundleTrackerCustomizer::AddingBundle(Bundle, BundleEvent)
    */
-  virtual std::optional<T> AddingBundle(
-    const Bundle& bundle,
-    const BundleEvent& event) override;
+  virtual std::optional<T> AddingBundle(const Bundle& bundle,
+                                        const BundleEvent& event) override;
 
   /**
    * Called when a <code>Bundle</code> is modified that is being tracked by this <code>BundleTracker</code>.
@@ -268,16 +265,10 @@ public:
                              const T& object) override;
 
 private:
-  using TypeTraits = typename BundleTrackerCustomizer<T>::TypeTraits;
-  using _BundleTracker = BundleTracker<T>;
-  using _TrackedBundle = detail::TrackedBundle<TypeTraits>;
-  using _BundleTrackerPrivate = detail::BundleTrackerPrivate<TypeTraits>;
-  using _BundleTrackerCustomizer = BundleTrackerCustomizer<T>;
+  friend class detail::TrackedBundle<T>;
+  friend class detail::BundleTrackerPrivate<T>;
 
-  friend class detail::TrackedBundle<TypeTraits>;
-  friend class detail::BundleTrackerPrivate<TypeTraits>;
-
-  std::unique_ptr<_BundleTrackerPrivate> d;
+  std::unique_ptr<detail::BundleTrackerPrivate<T>> d;
 };
 
 } // namespace cppmicroservices

@@ -39,7 +39,7 @@ class BundleTrackerMethodTest : public ::testing::Test
 protected:
   Framework framework;
   BundleContext context;
-  BundleTracker<>::BundleState all_states =
+  BundleTracker<>::BundleStateMaskType all_states =
     BundleTracker<>::CreateStateMask(Bundle::State::STATE_ACTIVE,
                                      Bundle::State::STATE_INSTALLED,
                                      Bundle::State::STATE_RESOLVED,

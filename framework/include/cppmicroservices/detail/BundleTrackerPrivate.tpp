@@ -35,17 +35,17 @@ namespace detail {
 template<class TTT>
 BundleTrackerPrivate<TTT>::BundleTrackerPrivate(
   BundleTracker<T>* bt,
-  const BundleContext& context,
-  StateType stateMask,
-  std::shared_ptr<BundleTrackerCustomizer<T>> customizer)
-  : context(std::move(context))
-  , stateMask(stateMask)
-  , customizer(customizer)
+  const BundleContext& _context,
+  BundleStateMaskType _stateMask,
+  std::shared_ptr<BundleTrackerCustomizer<T>> _customizer)
+  : context(_context)
+  , stateMask(_stateMask)
+  , customizer(_customizer)
   , listenerToken()
   , trackedBundle()
-  , q_ptr(bt)
+  , bundleTracker(bt)
 {
-  this->customizer = customizer; // customizer ? customizer : q_func();
+  this->customizer = customizer;
 }
 
 template<class TTT>
@@ -60,10 +60,10 @@ std::shared_ptr<detail::TrackedBundle<TTT>> BundleTrackerPrivate<TTT>::Tracked()
 
 template<class TTT>
 std::vector<Bundle> BundleTrackerPrivate<TTT>::GetInitialBundles(
-  typename BundleTrackerPrivate<TTT>::StateType stateMask)
+  typename BundleTrackerPrivate<TTT>::BundleStateMaskType stateMask)
 {
   std::vector<Bundle> result;
-  std::vector<Bundle> contextBundles = context.GetBundles();
+  auto contextBundles = context.GetBundles();
   for (Bundle bundle : contextBundles) {
     if (bundle.GetState() & stateMask) {
       result.push_back(bundle);

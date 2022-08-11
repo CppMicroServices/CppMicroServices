@@ -48,8 +48,8 @@ public:
   using T = typename TTT::TrackedType;
   using TrackedParamType = typename TTT::TrackedParamType;
 
-  TrackedBundle(BundleTracker<T>* bundleTracker,
-                BundleTrackerCustomizer<T>* customizer);
+  TrackedBundle(BundleTracker<T>* _bundleTracker,
+                BundleTrackerCustomizer<T>* _customizer);
 
   /**
    * Method connected to bundle events for the
@@ -86,6 +86,8 @@ private:
    * @param related Action related object.
    * @return Customized object for the tracked bundle or <code>null</code>
    *         if the bundle is not to be tracked.
+   * 
+   * @see BundleTrackerCustomizer::AddingBundle(Bundle, BundleEvent)
    */
   std::optional<TrackedParamType> CustomizerAdding(
     Bundle bundle,
@@ -98,6 +100,8 @@ private:
    * @param bundle Tracked bundle.
    * @param related Action related object.
    * @param object Customized object for the tracked bundle.
+   * 
+   * @see BundleTrackerCustomizer::ModifiedBundle(Bundle, BundleEvent, T)
    */
   void CustomizerModified(Bundle bundle,
                           const BundleEvent& related,
@@ -110,6 +114,8 @@ private:
    * @param bundle Tracked bundle.
    * @param related Action related object.
    * @param object Customized object for the tracked bundle.
+   * 
+   * @see BundleTrackerCustomizer::RemovedBundle(Bundle, BundleEvent, T)
    */
   void CustomizerRemoved(Bundle bundle,
                          const BundleEvent& related,

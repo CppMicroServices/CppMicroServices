@@ -69,7 +69,7 @@ class BundleContext;
  *
  * <p>
  * The <code>BundleTracker</code> class is thread-safe. It does not call <code>BundleTrackerCustomizer</code> methods while
- * holding any locks. Customizer implementations must be thread-safe.
+ * holding any locks. <code>BundleTrackerCustomizer</code> implementations must be thread-safe.
  *
  * @tparam T The type of tracked object.
  * @remarks This class is thread safe.
@@ -86,24 +86,33 @@ public:
   using TrackingMap = typename std::unordered_map<Bundle, TrackedParamType>;
 
   // The type of the state mask
-  using BundleState = std::underlying_type_t<Bundle::State>;
+  using BundleStateMaskType = std::underlying_type_t<Bundle::State>;
 
   /**
-   * Create a <code>StateType</code> stateMask for a BundleTracker
+   * Create a <code>BundleStateMaskType</code> stateMask for a BundleTracker
    * 
    * @param s0 the <code>Bundle::State</code>.
-   * @param s the subsequent <code>Bundle::States5</code>.
+   * @param s the subsequent <code>Bundle::States</code>.
    * 
    * @return The state mask.
    * 
    */
-  template <typename S0, typename... S>
-  static constexpr typename BundleTracker<T>::BundleState CreateStateMask(S0 const &s0, S const &...s);
+  template<typename S0, typename... S>
+  static constexpr typename BundleTracker<T>::BundleStateMaskType
+  CreateStateMask(S0 const& s0, S const&... s)
+  {
+    static_assert((std::is_enum_v<S0> && ... && std::is_enum_v<S>),
+                  "The function requires enumerations.");
+    static_assert((std::is_same_v<Bundle::State, std::decay_t<S0>> && ... &&
+                   std::is_same_v<Bundle::State, std::decay_t<S>>),
+                  "All values must be Bundle States.");
+    return (s0 | ... | s);
+  }
 
   /**
    * Create a <code>BundleTracker</code> that tracks bundles through states covered by the state mask.
    * 
-   * @param context The <code>BundleTrackerContext</code> from which tracking occurs.
+   * @param context The <code>BundleContext</code> from which tracking occurs.
    * @param stateMask The bit mask which defines the bundle states to be tracked.
    * @param customizer The customizer to call when bundles are added, modified, or removed.
    *                   If the customizer is nullptr, then the callbacks in this <code>BundleTracker</code> will 
@@ -111,8 +120,8 @@ public:
    */
   BundleTracker(
     const BundleContext& context,
-    BundleState stateMask,
-    std::shared_ptr<BundleTrackerCustomizer<T>> customizer = nullptr);
+    const BundleStateMaskType stateMask,
+    const std::shared_ptr<BundleTrackerCustomizer<T>> customizer = nullptr);
 
   /**
    * Automatically closes the <code>BundleTracker</code>
@@ -120,56 +129,36 @@ public:
   ~BundleTracker() override;
 
   /**
-   * Called when a <code>Bundle</code> is being added to the <code>BundleTracker</code> 
-   * and the customizer constructor argument was nullptr.
-   * 
-   * When the <code>BundleTracker</code> detects a <code>Bundle</code> that should be added to the tracker 
-   * based on the search parameters (state mask, context, etc.),
-   * this method is called. This method should return the object to be tracked 
-   * for the specified <code>Bundle</code> if the <code>BundleTracker</code> is being extended.
-   * Otherwise, return the <code>Bundle</code> itself. If the return is nullptr, the <code>Bundle</code> is not tracked.
-   *
-   * @param bundle The <code>Bundle</code> being added to the <code>BundleTracker</code>.
-   * @param event the BundleEvent which was caught by the <code>BundleTracker</code>.
-   *
-   * @return The object to be tracked for the specified <code>Bundle</code> object or nullptr to avoid tracking the Bundle.
-   *
-   * @see BundleTrackerCustomizer:AddingBundle(Bundle, BundleEvent)
-   */
-  virtual std::optional<TrackedParamType> AddingBundle(
-    const Bundle& bundle,
-    const BundleEvent& event) override;
-
-  /**
    * Close this <code>BundleTracker</code>.
    *
    * Removes all tracked bundles from this <code>BundleTracker</code>, calling <code>RemovedBundle</code>  on all of the
    * currently tracked bundles. Also resets the tracking count.
    */
-  void Close();
+  void Close() noexcept;
 
   /**
-   * Returns an array of all the tracked bundles.
+   * Returns a vector of all the tracked bundles.
    *
    * @return A vector of Bundles (could be empty).
    */
-  std::vector<Bundle> GetBundles();
+  std::vector<Bundle> GetBundles() const noexcept;
 
   /**
-   * Returns the custom object for the given <code>Bundle</code> if the given <code>Bundle</code> is tracked. Otherwise null.
+   * Returns the custom object for the given <code>Bundle</code> if the given <code>Bundle</code> is tracked. Otherwise nullopt.
    *
    * @param bundle The <code>Bundle</code> paired with the object
-   * @return The custom object paired with the given <code>Bundle</code> or null if the <code>Bundle</code> is not being tracked.
+   * @return The custom object paired with the given <code>Bundle</code> or nullopt if the <code>Bundle</code> is not being tracked.
    */
-  std::optional<TrackedParamType> GetObject(const Bundle& bundle);
+  std::optional<TrackedParamType> GetObject(
+    const Bundle& bundle) const noexcept;
 
   /**
-   * Returns an unordered map from all of the currently tracked Bundles to their custom objects.
+   * Returns an unordered map containing all of the currently tracked Bundles to their custom objects.
    *
-   * @return An unordered map from all of the Bundles currently tracked by this
+   * @return An unordered map containing all of the Bundles currently tracked by this
    * <code>BundleTracker</code> to their custom objects.
    */
-  TrackingMap GetTracked();
+  TrackingMap GetTracked() const noexcept;
 
   /**
    * Returns the tracking count for this <code>BundleTracker</code>.
@@ -181,70 +170,105 @@ public:
    * to determine whether any bundles have changed.
    * If the <code>BundleTracker</code> is closed, return -1.
    *
-   * @return The current tracking count.
+   * @return The current tracking count, or -1 if the <code>BundleTracker</code> is closed.
    */
-  int GetTrackingCount();
+  int GetTrackingCount() const noexcept;
 
   /**
    * Returns true if and only if this <code>BundleTracker</code> is tracking no bundles.
    *
    * @return true if and only if this <code>BundleTracker</code> is empty.
    */
-  bool IsEmpty();
-
-  /**
-   * Called when a <code>Bundle</code> is modified that is being tracked by this <code>BundleTracker</code>
-   * and the <code>BundleTrackerCustomizer</code> constructor argument was nullptr.
-   *
-   * When a tracked bundle changes states, this method is called.
-   *
-   * @param bundle The tracked <code>Bundle</code> whose state has changed.
-   * @param event The BundleEvent which was caught by the <code>BundleTracker</code>. Can be null.
-   * @param object The tracked object corresponding to the tracked <code>Bundle</code> (returned from AddingBundle).
-   *
-   * @see BundleTrackerCustomizer:ModifiedBundle(Bundle, BundleEvent, std::shared_ptr<T>)
-   */
-  virtual void ModifiedBundle(const Bundle& bundle,
-                              const BundleEvent& event,
-                              TrackedParamType object) override;
+  bool IsEmpty() const noexcept;
 
   /**
    * Open this <code>BundleTracker</code> to begin tracking bundles.
    *
    * Bundles that match the state mask will be tracked by this <code>BundleTracker</code>.
    *
-   * @throws std::logic_error If the <code>BundleTrackerContext</code> used in the creation of this
+   * @throws std::logic_error If the <code>BundleContext</code> used in the creation of this
    * <code>BundleTracker</code> is no longer valid.
    */
   void Open();
 
   /**
    * Remove a bundle from this <code>BundleTracker</code>.
-   *
+   * 
    * @param bundle the <code>Bundle</code> to be removed
+   * 
+   * @see BundleTrackerCustomizer:RemovedBundle(Bundle, BundleEvent, T)
    */
-  void Remove(const Bundle&);
-
-  /**
-   * Called when a <code>Bundle</code> is being removed from this <code>BundleTracker</code>
-   * and the <code>BundleTrackerCustomizer</code> constructor argument was nullptr.
-   *
-   * @param bundle The tracked <code>Bundle</code> that is being removed.
-   * @param event The BundleEvent which was caught by the <code>BundleTracker</code>. Can be null.
-   * @param object The tracked object corresponding to the tracked <code>Bundle</code> (returned from AddingBundle).
-   *
-   * @see BundleTrackerCustomizer:RemovedBundle(Bundle, BundleEvent, std::shared_ptr<T>)
-   */
-  virtual void RemovedBundle(const Bundle& bundle,
-                             const BundleEvent& event,
-                             TrackedParamType object) override;
+  void Remove(const Bundle&) noexcept;
 
   /**
    * Return the number of bundles being tracked by this <code>BundleTracker</code>.
    *
    * @return The number of tracked bundles.
    */
-  size_t Size();
+  size_t Size() const noexcept;
+
+  /**
+   * Called when a <code>Bundle</code> is being added to the <code>BundleTracker</code> 
+   * 
+   * When a <code>Bundle</code> enters a state covered by the <code>BundleTracker</code>'s state mask
+   * and the <code>Bundle</code> is not currently tracked, this method is called.
+   * This method is also called if the <code>Bundle</code>'s state is covered by the state mask when 
+   * the <code>BundleTracker</code> is opened.
+   * 
+   * This method should return the object to be tracked for the specified <code>Bundle</code>
+   * if the <code>BundleTracker</code> is being extended.
+   * Otherwise, return the <code>Bundle</code> itself. If the return is nullopt, the Bundle is not tracked.
+   * 
+   * The default, uncustomized behavior is to track the Bundle.
+   *
+   * @param bundle The <code>Bundle</code> being added to the <code>BundleTracker</code>.
+   * @param event the BundleEvent which was caught by the <code>BundleTracker</code>.
+   *
+   * @return The object to be tracked for the specified <code>Bundle</code> object or nullptr to avoid tracking the Bundle.
+   *
+   * @see BundleTrackerCustomizer::AddingBundle(Bundle, BundleEvent)
+   */
+  virtual std::optional<TrackedParamType> AddingBundle(
+    const Bundle& bundle,
+    const BundleEvent& event) override;
+
+  /**
+   * Called when a <code>Bundle</code> is modified that is being tracked by this <code>BundleTracker</code>.
+   *
+   * When a <code>Bundle</code> enters a state covered by the <code>BundleTracker</code>'s state mask
+   * and the <code>Bundle</code> is currently tracked, this method is called.
+   * 
+   * The default, uncustomized behavior is to no-op.
+   * 
+   * @param bundle The tracked <code>Bundle</code> whose state has changed.
+   * @param event The BundleEvent which was caught by the <code>BundleTracker</code>.
+   * @param object The tracked object corresponding to the tracked <code>Bundle</code>.
+   *
+   * @see BundleTrackerCustomizer:ModifiedBundle(Bundle, BundleEvent, T)
+   */
+  virtual void ModifiedBundle(const Bundle& bundle,
+                              const BundleEvent& event,
+                              TrackedParamType object) override;
+
+  /**
+   * Called when a <code>Bundle</code> is removed that is being tracked by this <code>BundleTracker</code>.
+   * 
+   * When a <code>Bundle</code> enters a state not covered by the <code>BundleTracker</code>'s state mask
+   * and the <code>Bundle</code> is curently tracked, this method is called.
+   * This method is also called if the <code>Bundle</code> is currently being tracked when
+   * the <code>BundleTracker</code> is closed, or if Remove(Bundle) is called.
+   * 
+   * The default, uncustomized behavior is to no-op.
+   *
+   * @param bundle The tracked <code>Bundle</code> that is being removed.
+   * @param event The BundleEvent which was caught by the <code>BundleTracker</code>. Can be null.
+   * @param object The tracked object corresponding to the tracked <code>Bundle</code>.
+   *
+   * @see BundleTrackerCustomizer:RemovedBundle(Bundle, BundleEvent, T)
+   */
+  virtual void RemovedBundle(const Bundle& bundle,
+                             const BundleEvent& event,
+                             TrackedParamType object) override;
 
 private:
   using TypeTraits = typename BundleTrackerCustomizer<T>::TypeTraits;

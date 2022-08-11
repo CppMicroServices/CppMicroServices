@@ -25,14 +25,13 @@ namespace cppmicroservices {
 namespace detail {
 
 template<class TTT>
-TrackedBundle<TTT>::TrackedBundle(BundleTracker<T>* bundleTracker,
-                                  BundleTrackerCustomizer<T>* customizer)
-  : Superclass(bundleTracker->d->context)
-  , bundleTracker(bundleTracker)
-  , customizer(customizer)
+TrackedBundle<TTT>::TrackedBundle(BundleTracker<T>* _bundleTracker,
+                                  BundleTrackerCustomizer<T>* _customizer)
+  : Superclass(_bundleTracker->d->context)
+  , bundleTracker(_bundleTracker)
+  , customizer(_customizer)
   , latch{}
-{
-}
+{}
 
 template<class TTT>
 void TrackedBundle<TTT>::WaitOnCustomizersToFinish()
@@ -44,9 +43,6 @@ template<class TTT>
 void TrackedBundle<TTT>::BundleChanged(const BundleEvent& event)
 {
   // Call track or untrack based on state mask
-
-  // Ignore events that do not correspond with
-  // Bundle state changes
 
   (void)latch.CountUp();
   ScopeGuard sg([this]() {
@@ -67,9 +63,10 @@ void TrackedBundle<TTT>::BundleChanged(const BundleEvent& event)
   if (!state) {
     return;
   }
+  // Ignore events that do not correspond with
+  // Bundle state changes
   BundleEvent::Type eventType = event.GetType();
-  if (eventType == BundleEvent::Type::BUNDLE_UNRESOLVED)
-  {
+  if (eventType == BundleEvent::Type::BUNDLE_UNRESOLVED) {
     return;
   }
   {
@@ -87,17 +84,17 @@ void TrackedBundle<TTT>::BundleChanged(const BundleEvent& event)
 
   // Track iff state in mask
   if (state & bundleTracker->d->stateMask) {
+    /*
+     * The below method will throw if a customizer throws,
+     * and the exception will propagate to the listener.
+     */
     this->Track(bundle, event);
-    /*
-     * If the customizer throws an unchecked exception, it is
-     * safe to let it propagate
-     */
   } else {
-    this->Untrack(bundle, event);
     /*
-     * If the customizer throws an unchecked exception, it is
-     * safe to let it propagate
+     * The below method will throw if a customizer throws,
+     * and the exception will propagate to the listener.
      */
+    this->Untrack(bundle, event);
   }
 }
 

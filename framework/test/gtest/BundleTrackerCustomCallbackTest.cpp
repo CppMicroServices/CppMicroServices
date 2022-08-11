@@ -40,7 +40,7 @@ class BundleTrackerCustomCallbackTest : public ::testing::Test
 protected:
   Framework framework;
   BundleContext context;
-  BundleTracker<>::BundleState all_states =
+  static constexpr BundleTracker<>::BundleStateMaskType all_states =
     BundleTracker<>::CreateStateMask(Bundle::State::STATE_ACTIVE,
                                      Bundle::State::STATE_INSTALLED,
                                      Bundle::State::STATE_RESOLVED,
@@ -274,7 +274,7 @@ TEST_F(BundleTrackerCustomCallbackTest,
 class MockBundleTracker : public BundleTracker<>
 {
 public:
-  MockBundleTracker(const BundleContext& context, BundleState stateMask)
+  MockBundleTracker(const BundleContext& context, BundleStateMaskType stateMask)
     : BundleTracker(context, stateMask)
   {}
 
@@ -413,7 +413,7 @@ class MockBundleTrackerWithObject : public BundleTracker<int>
 {
 public:
   MockBundleTrackerWithObject(const BundleContext& context,
-                              BundleState stateMask)
+                              BundleStateMaskType stateMask)
     : BundleTracker(context, stateMask)
   {}
 

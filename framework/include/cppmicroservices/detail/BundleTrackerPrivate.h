@@ -44,12 +44,13 @@ public:
   using T = typename TTT::TrackedType;
   using TrackedParamType = typename TTT::TrackedParamType;
 
-  using StateType = std::underlying_type_t<Bundle::State>;
+  using BundleStateMaskType = std::underlying_type_t<Bundle::State>;
 
-  BundleTrackerPrivate(BundleTracker<T>*,
-                       const BundleContext& context,
-                       StateType stateMask,
-                       std::shared_ptr<BundleTrackerCustomizer<T>> customizer);
+  BundleTrackerPrivate(
+    BundleTracker<T>*,
+    const BundleContext& _context,
+    const BundleStateMaskType _stateMask,
+    const std::shared_ptr<BundleTrackerCustomizer<T>> _customizer);
   ~BundleTrackerPrivate();
 
   /**
@@ -60,7 +61,7 @@ public:
    * 
    * @return The list of initial <code>Bundle</code>s.
    */
-  std::vector<Bundle> GetInitialBundles(StateType stateMask);
+  std::vector<Bundle> GetInitialBundles(BundleStateMaskType stateMask);
 
   void GetBundles_unlocked(std::vector<Bundle>& refs,
                            TrackedBundle<TTT>* t) const;
@@ -73,8 +74,8 @@ public:
   /**
    * State mask for tracked bundles.
    */
-  StateType stateMask;
-    
+  const BundleStateMaskType stateMask;
+
   /**
    * The <code>BundleTrackerCustomizer</code> for this tracker.
    */
@@ -112,19 +113,19 @@ public:
   void Modified();
 
 private:
-  inline BundleTracker<T>* q_func()
+  inline BundleTrackerCustomizer<T>* getTrackerAsCustomizer()
   {
-    return static_cast<BundleTracker<T>*>(q_ptr);
+    return static_cast<BundleTrackerCustomizer<T>*>(bundleTracker);
   }
 
-  inline const BundleTracker<T>* q_func() const
+  inline const BundleTrackerCustomizer<T>* getTrackerAsCustomizer() const
   {
-    return static_cast<BundleTracker<T>*>(q_ptr);
+    return static_cast<BundleTrackerCustomizer<T>*>(bundleTracker);
   }
 
   friend class BundleTracker<T>;
 
-  BundleTracker<T>* const q_ptr;
+  BundleTracker<T>* const bundleTracker;
 };
 
 } // namespace detail

@@ -39,7 +39,7 @@ public:
   ~BundleTrackerFixture() { framework.reset(); };
 
   std::shared_ptr<cppmicroservices::Framework> framework;
-  static constexpr BundleTracker<>::BundleState all_states =
+  static constexpr BundleTracker<>::BundleStateMaskType all_states =
     BundleTracker<>::CreateStateMask(Bundle::State::STATE_ACTIVE,
                                      Bundle::State::STATE_INSTALLED,
                                      Bundle::State::STATE_RESOLVED,

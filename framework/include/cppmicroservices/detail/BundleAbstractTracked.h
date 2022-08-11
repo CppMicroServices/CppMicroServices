@@ -57,7 +57,6 @@ class BundleAbstractTracked
 {
 
 public:
-  // using T = typename TTT::TrackedType;
   using TrackedParamType = typename TTT::TrackedParamType;
 
   using TrackingMap = std::unordered_map<S, TrackedParamType>;

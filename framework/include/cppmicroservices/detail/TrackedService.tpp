@@ -26,14 +26,13 @@ namespace detail {
 
 template<class S, class TTT>
 TrackedService<S, TTT>::TrackedService(
-  ServiceTracker<S, T>* serviceTracker,
-  ServiceTrackerCustomizer<S, T>* customizer)
-  : Superclass(serviceTracker->d->context)
-  , serviceTracker(serviceTracker)
-  , customizer(customizer)
+  ServiceTracker<S, T>* _serviceTracker,
+  ServiceTrackerCustomizer<S, T>* _customizer)
+  : Superclass(_serviceTracker->d->context)
+  , serviceTracker(_serviceTracker)
+  , customizer(_customizer)
   , latch{}
-{
-}
+{}
 
 template<class S, class TTT>
 void TrackedService<S, TTT>::WaitOnCustomizersToFinish()
@@ -127,11 +126,14 @@ std::optional<
 TrackedService<S, TTT>::CustomizerAdding(ServiceReference<S> item,
                                          const ServiceEvent& /*related*/)
 {
-  auto value = customizer->AddingService(item);
-  // Services use a nullptr check
-  return value ? std::optional<std::shared_ptr<
-                   typename TrackedService<S, TTT>::TrackedParamType>>{ value }
-               : std::nullopt;
+  auto serviceObjectPointer = customizer->AddingService(item);
+
+  // Convert the shared pointer to an optional
+  return serviceObjectPointer
+           ? std::optional<
+               std::shared_ptr<typename TrackedService<S, TTT>::
+                                 TrackedParamType>>{ serviceObjectPointer }
+           : std::nullopt;
 }
 
 template<class S, class TTT>

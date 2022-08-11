@@ -34,13 +34,14 @@ namespace cppmicroservices {
  * \ingroup gr_bundletracker
  *
  * The <code>BundleTrackerCustomizer</code> interface allows for user callbacks to be included in a
- * <code>BundleTracker</code>. These callback methods customize the objects that are tracked.
+ * <code>BundleTracker</code>. These callback methods can customize the objects that are tracked,
+ * or trigger other behavior.
  * A <code>BundleTrackerCustomizer</code> is called when a <code>Bundle</code> is being added to a <code>BundleTracker</code>,
  * and it can then return an object for that tracked bundle. A <code>BundleTrackerCustomizer</code>,
  * is also called when a tracked bundle is modified or has been removed from a <code>BundleTracker</code>.
  *
  * <p>
- * BundleEvents are received synchronously by the <code>BundleTracker</code>, so it is recommended that
+ * Bundle events are received synchronously by the <code>BundleTracker</code>, so it is recommended that
  * implementations of the <code>BundleTrackerCustomizer</code> do not alter bundle states while being synchronized
  * on any object.
  *
@@ -73,20 +74,20 @@ struct BundleTrackerCustomizer
 
   /**
    * Called when a <code>Bundle</code> is being added to the <code>BundleTracker</code> 
-   * and the customizer constructor argument was nullptr.
    * 
-   * When the <code>BundleTracker</code> detects a Bundle that should be added to the tracker 
-   * based on the search parameters (state mask, context, etc.),
-   * this method is called. This method should return the object to be tracked 
-   * for the specified <code>Bundle</code> if the <code>BundleTracker</code> is being extended.
-   * Otherwise, return the <code>Bundle</code> itself. If the return is nullptr, the Bundle is not tracked.
+   * When a <code>Bundle</code> enters a state covered by the <code>BundleTracker</code>'s state mask
+   * and the <code>Bundle</code> is not currently tracked, this method is called.
+   * This method is also called if the <code>Bundle</code>'s state is covered by the state mask when 
+   * the <code>BundleTracker</code> is opened.
+   * 
+   * This method should return the object to be tracked for the specified <code>Bundle</code>
+   * if the <code>BundleTracker</code> is being extended.
+   * Otherwise, return the <code>Bundle</code> itself. If the return is nullopt, the Bundle is not tracked.
    *
    * @param bundle The <code>Bundle</code> being added to the <code>BundleTracker</code>.
    * @param event the <code>BundleEvent</code> which was caught by the <code>BundleTracker</code>.
    *
-   * @return The object to be tracked for the specified <code>Bundle</code> object or nullptr to avoid tracking the <code>Bundle</code>.
-   *
-   * @see BundleTrackerCustomizer:AddingBundle(Bundle, BundleEvent)
+   * @return The object to be tracked for the specified <code>Bundle</code> object or nullopt to avoid tracking the <code>Bundle</code>.
    */
   virtual std::optional<TrackedParamType> AddingBundle(
     const Bundle& bundle,
@@ -95,13 +96,12 @@ struct BundleTrackerCustomizer
   /**
    * Called when a <code>Bundle</code> is modified that is being tracked by this <code>BundleTracker</code>.
    *
-   * When a tracked bundle changes states, this method is called.
+   * When a <code>Bundle</code> enters a state covered by the <code>BundleTracker</code>'s state mask
+   * and the <code>Bundle</code> is currently tracked, this method is called.
    *
    * @param bundle The tracked <code>Bundle</code> whose state has changed.
-   * @param event The <code>BundleEvent</code> which was caught by the <code>BundleTracker</code>. Can be null.
-   * @param object The tracked object corresponding to the tracked <code>Bundle</code> (returned from <code>AddingBundle</code>).
-   *
-   * @see BundleTrackerCustomizer:ModifiedBundle(Bundle, BundleEvent, std::shared_ptr<T>)
+   * @param event The <code>BundleEvent</code> which was caught by the <code>BundleTracker</code>.
+   * @param object The tracked object corresponding to the tracked <code>Bundle</code>.
    */
   virtual void ModifiedBundle(const Bundle& bundle,
                               const BundleEvent& event,
@@ -109,12 +109,15 @@ struct BundleTrackerCustomizer
 
   /**
    * Called when a <code>Bundle</code> is removed that is being tracked by this <code>BundleTracker</code>.
-   *
+   * 
+   * When a <code>Bundle</code> enters a state not covered by the <code>BundleTracker</code>'s state mask
+   * and the <code>Bundle</code> is curently tracked, this method is called.
+   * This method is also called if the <code>Bundle</code> is currently being tracked when
+   * the <code>BundleTracker</code> is closed, or if Remove(Bundle) is called.
+   * 
    * @param bundle The tracked <code>Bundle</code> whose state has changed.
    * @param event The <code>BundleEvent</code> which was caught by the <code>BundleTracker</code>. Can be null.
-   * @param object The tracked object corresponding to the tracked <code>Bundle</code> (returned from <code>AddingBundle</code>).
-   *
-   * @see BundleTrackerCustomizer:RemovedBundle(Bundle, BundleEvent, std::shared_ptr<T>)
+   * @param object The tracked object corresponding to the tracked <code>Bundle</code>
    */
   virtual void RemovedBundle(const Bundle& bundle,
                              const BundleEvent& event,

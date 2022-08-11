@@ -63,8 +63,8 @@ public:
   using T = typename TTT::TrackedType;
   using TrackedParamType = typename TTT::TrackedParamType;
 
-  TrackedService(ServiceTracker<S, T>* serviceTracker,
-                 ServiceTrackerCustomizer<S, T>* customizer);
+  TrackedService(ServiceTracker<S, T>* _serviceTracker,
+                 ServiceTrackerCustomizer<S, T>* _customizer);
 
   /**
    * Method connected to service events for the

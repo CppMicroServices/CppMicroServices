@@ -30,6 +30,8 @@
 #include "cppmicroservices/detail/CounterLatch.h"
 #include "cppmicroservices/detail/ScopeGuard.h"
 
+#include <optional>
+
 namespace cppmicroservices {
 
 namespace detail {
@@ -41,15 +43,18 @@ namespace detail {
 template<class S, class TTT>
 class TrackedService
   : public TrackedServiceListener
-  , public BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>
+  , public BundleAbstractTracked<
+      ServiceReference<S>,
+      std::shared_ptr<typename TTT::TrackedParamType>,
+      ServiceEvent>
 {
 
 public:
   using T = typename TTT::TrackedType;
   using TrackedParamType = typename TTT::TrackedParamType;
 
-  TrackedService(ServiceTracker<S, T>* serviceTracker,
-                 ServiceTrackerCustomizer<S, T>* customizer);
+  TrackedService(ServiceTracker<S, T>* _serviceTracker,
+                 ServiceTrackerCustomizer<S, T>* _customizer);
 
   /**
    * Method connected to service events for the
@@ -64,7 +69,9 @@ public:
 
 private:
   using Superclass =
-    BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>;
+    BundleAbstractTracked<ServiceReference<S>,
+                          std::shared_ptr<typename TTT::TrackedParamType>,
+                          ServiceEvent>;
 
   ServiceTracker<S, T>* serviceTracker;
   ServiceTrackerCustomizer<S, T>* customizer;
@@ -88,7 +95,7 @@ private:
    * @return Customized object for the tracked item or <code>null</code>
    *         if the item is not to be tracked.
    */
-  std::shared_ptr<TrackedParamType> CustomizerAdding(
+  std::optional<std::shared_ptr<TrackedParamType>> CustomizerAdding(
     ServiceReference<S> item,
     const ServiceEvent& related) override;
 

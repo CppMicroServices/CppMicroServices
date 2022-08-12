@@ -74,6 +74,9 @@ set(_gtest_tests
   ResourceCompilerTest.cpp
   MultipleListenersTest.cpp
   BundleTest.cpp
+  BundleTrackerMethodTest.cpp
+  BundleTrackerCustomCallbackTest.cpp
+  BundleTrackerConcurrencyTest.cpp
   main.cpp
 )
 

@@ -20,6 +20,7 @@ set(_bench_src
   ldapfilter.cpp
   ldappropexpr.cpp
   servicequery.cpp
+  BundleTrackerTest.cpp
 )
 
 set(_additional_srcs

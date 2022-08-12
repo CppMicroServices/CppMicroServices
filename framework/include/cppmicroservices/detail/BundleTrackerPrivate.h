@@ -25,9 +25,13 @@
 
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/Constants.h"
 #include "cppmicroservices/detail/Threads.h"
+#include "cppmicroservices/detail/TrackedBundle.h"
 
 #include <memory>
+#include <stdexcept>
+#include <utility>
 
 namespace cppmicroservices {
 
@@ -47,11 +51,20 @@ public:
   using BundleStateMaskType = std::underlying_type_t<Bundle::State>;
 
   BundleTrackerPrivate(
-    BundleTracker<T>*,
+    BundleTracker<T>* _bundleTracker,
     const BundleContext& _context,
     const BundleStateMaskType _stateMask,
-    const std::shared_ptr<BundleTrackerCustomizer<T>> _customizer);
-  ~BundleTrackerPrivate();
+    const std::shared_ptr<BundleTrackerCustomizer<T>> _customizer)
+    : context(_context)
+    , stateMask(_stateMask)
+    , customizer(_customizer)
+    , listenerToken()
+    , trackedBundle()
+    , bundleTracker(_bundleTracker)
+  {
+    this->customizer = customizer;
+  }
+  ~BundleTrackerPrivate() = default;
 
   /**
    * Returns the list of initial <code>Bundle</code>s that will be
@@ -61,10 +74,25 @@ public:
    * 
    * @return The list of initial <code>Bundle</code>s.
    */
-  std::vector<Bundle> GetInitialBundles(BundleStateMaskType stateMask);
+  std::vector<Bundle> GetInitialBundles(BundleStateMaskType stateMask)
+  {
+    std::vector<Bundle> result;
+    auto contextBundles = context.GetBundles();
+    for (Bundle bundle : contextBundles) {
+      if (bundle.GetState() & stateMask) {
+        result.push_back(bundle);
+      }
+    }
+    return result;
+  }
 
-  void GetBundles_unlocked(std::vector<Bundle>& refs,
-                           TrackedBundle<T>* t) const;
+  void GetBundles_unlocked(std::vector<Bundle>& refs, TrackedBundle<T>* t) const
+  {
+    if (t->Size_unlocked() == 0) {
+      return;
+    }
+    t->GetTracked_unlocked(refs);
+  }
 
   /**
    * The Bundle Context used by this <code>BundleTracker</code>.
@@ -99,7 +127,10 @@ public:
    *
    * @return The current Tracked object.
    */
-  std::shared_ptr<TrackedBundle<T>> Tracked() const;
+  std::shared_ptr<TrackedBundle<T>> Tracked() const
+  {
+    return trackedBundle.Load();
+  }
 
   /**
    * Called by the TrackedBundle object whenever the set of tracked bundles is
@@ -110,7 +141,13 @@ public:
    * TrackedBundle is synchronized. We don't want synchronization interactions
    * between the listener thread and the user thread.
    */
-  void Modified();
+  void Modified()
+  {
+    // No cache to clear
+    // Log message to parallel ServiceTracker
+    DIAG_LOG(*context.GetLogSink())
+      << "BundleTracker::Modified(): " << stateMask;
+  }
 
 private:
   inline BundleTrackerCustomizer<T>* getTrackerAsCustomizer()
@@ -131,7 +168,5 @@ private:
 } // namespace detail
 
 } // namespace cppmicroservices
-
-#include "cppmicroservices/detail/BundleTrackerPrivate.tpp"
 
 #endif // CPPMICROSERVICES_BUNDLETRACKERPRIVATE_H

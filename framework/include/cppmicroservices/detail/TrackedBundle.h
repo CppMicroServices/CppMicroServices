@@ -49,7 +49,12 @@ class TrackedBundle
 
 public:
   TrackedBundle(BundleTracker<T>* _bundleTracker,
-                BundleTrackerCustomizer<T>* _customizer);
+                BundleTrackerCustomizer<T>* _customizer)
+    : BundleAbstractTracked<Bundle, T, BundleEvent>(_bundleTracker->d->context)
+    , bundleTracker(_bundleTracker)
+    , customizer(_customizer)
+    , latch{}
+  {}
 
   /**
    * Method connected to bundle events for the
@@ -58,9 +63,65 @@ public:
    *
    * @param event <code>BundleEvent</code> object from the framework.
    */
-  void BundleChanged(const BundleEvent& event) override;
+  void BundleChanged(const BundleEvent& event) override
+  {
+    // Call track or untrack based on state mask
 
-  void WaitOnCustomizersToFinish();
+    (void)latch.CountUp();
+    ScopeGuard sg([this]() {
+      // By using try/catch here, we ensure that this lambda function doesn't
+      // throw inside ScopeGuard
+      try {
+        latch.CountDown();
+      } catch (...) {
+      }
+    });
+
+    // Check trivial calls
+    Bundle bundle = event.GetBundle();
+    if (!bundle) {
+      return;
+    }
+    Bundle::State state = bundle.GetState();
+    if (!state) {
+      return;
+    }
+    // Ignore events that do not correspond with
+    // Bundle state changes
+    BundleEvent::Type eventType = event.GetType();
+    if (eventType == BundleEvent::Type::BUNDLE_UNRESOLVED) {
+      return;
+    }
+    {
+      auto l = this->Lock();
+      US_UNUSED(l);
+
+      // Check for delayed call
+      if (this->closed) {
+        return;
+      }
+
+      DIAG_LOG(*bundleTracker->d->context.GetLogSink())
+        << "TrackedService::BundleChanged[" << state << "]: " << bundle;
+    }
+
+    // Track iff state in mask
+    if (state & bundleTracker->d->stateMask) {
+      /*
+     * The below method will throw if a customizer throws,
+     * and the exception will propagate to the listener.
+     */
+      this->Track(bundle, event);
+    } else {
+      /*
+     * The below method will throw if a customizer throws,
+     * and the exception will propagate to the listener.
+     */
+      this->Untrack(bundle, event);
+    }
+  }
+
+  void WaitOnCustomizersToFinish() { latch.Wait(); }
 
 private:
   BundleTracker<T>* bundleTracker;
@@ -74,7 +135,12 @@ private:
    *
    * @GuardedBy this
    */
-  void Modified() override;
+  void Modified() override
+  {
+    BundleAbstractTracked<Bundle, T, BundleEvent>::
+      Modified(); /* increment the modification count */
+    bundleTracker->d->Modified();
+  }
 
   /**
    * Call the specific customizer adding method. This method must not be
@@ -88,7 +154,10 @@ private:
    * @see BundleTrackerCustomizer::AddingBundle(Bundle, BundleEvent)
    */
   std::optional<T> CustomizerAdding(Bundle bundle,
-                                    const BundleEvent& related) override;
+                                    const BundleEvent& related) override
+  {
+    return customizer->AddingBundle(bundle, related);
+  }
 
   /**
    * Call the specific customizer modified method. This method must not be
@@ -102,7 +171,10 @@ private:
    */
   void CustomizerModified(Bundle bundle,
                           const BundleEvent& related,
-                          const T& object) override;
+                          const T& object) override
+  {
+    customizer->ModifiedBundle(bundle, related, object);
+  }
 
   /**
    * Call the specific customizer removed method. This method must not be
@@ -116,13 +188,14 @@ private:
    */
   void CustomizerRemoved(Bundle bundle,
                          const BundleEvent& related,
-                         const T& object) override;
+                         const T& object) override
+  {
+    customizer->RemovedBundle(bundle, related, object);
+  }
 };
 
 } // namespace detail
 
 } // namespace cppmicroservices
-
-#include "cppmicroservices/detail/TrackedBundle.tpp"
 
 #endif // CPPMICROSERVICES_TRACKEDBUNDLE_H

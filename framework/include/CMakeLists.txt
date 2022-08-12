@@ -60,7 +60,6 @@ set(_public_headers
   cppmicroservices/Constants.h
   cppmicroservices/GetBundleContext.h
   cppmicroservices/detail/BundleTrackerPrivate.h
-  cppmicroservices/detail/BundleTrackerPrivate.tpp
   cppmicroservices/detail/BundleAbstractTracked.h
   cppmicroservices/detail/BundleAbstractTracked.tpp
   cppmicroservices/detail/BundleResourceBuffer.h

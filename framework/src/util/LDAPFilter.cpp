@@ -27,6 +27,7 @@
 
 #include "LDAPExpr.h"
 #include "Properties.h"
+#include "PropsCheck.h"
 #include "ServiceReferenceBasePrivate.h"
 
 #include <stdexcept>
@@ -38,11 +39,13 @@ class LDAPFilterData
 public:
   LDAPFilterData()
     : ldapExpr()
-  {}
+  {
+  }
 
   LDAPFilterData(const std::string& filter)
     : ldapExpr(filter)
-  {}
+  {
+  }
 
   LDAPFilterData(const LDAPFilterData&) = default;
 
@@ -51,7 +54,8 @@ public:
 
 LDAPFilter::LDAPFilter()
   : d(nullptr)
-{}
+{
+}
 
 LDAPFilter::LDAPFilter(const std::string& filter)
   : d(nullptr)
@@ -78,26 +82,54 @@ bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
               : false);
 }
 
+// This function has been modified to call the LDAPExpr::Evaluate() function which takes
+// an AnyMap rather than a PropertiesHandle to optimize the code. Constructing a Properties
+// object is much slower (requiring a copy) than simply using the AnyMap directly.
 bool LDAPFilter::Match(const Bundle& bundle) const
 {
-  return ((d)
-            ? d->ldapExpr.Evaluate(
-                PropertiesHandle(Properties(bundle.GetHeaders()), false), false)
-            : false);
+  if (d) {
+    const auto& headers = bundle.GetHeaders();
+
+    if (headers.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+      props_check::ValidateAnyMap(headers);
+    }
+
+    return d->ldapExpr.Evaluate(headers, false);
+  } else {
+    return false;
+  }
 }
 
+// This function has been modified to call the LDAPExpr::Evaluate() function which takes
+// an AnyMap rather than a PropertiesHandle to optimize the code. Constructing a Properties
+// object is much slower (requiring a copy) than simply using the AnyMap directly.
 bool LDAPFilter::Match(const AnyMap& dictionary) const
 {
-  return ((d) ? d->ldapExpr.Evaluate(
-                  PropertiesHandle(Properties(dictionary), false), false)
-              : false);
+  if (d) {
+    if (dictionary.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+      props_check::ValidateAnyMap(dictionary);
+    }
+
+    return d->ldapExpr.Evaluate(dictionary, false);
+  } else {
+    return false;
+  }
 }
 
+// This function has been modified to call the LDAPExpr::Evaluate() function which takes
+// an AnyMap rather than a PropertiesHandle to optimize the code. Constructing a Properties
+// object is much slower (requiring a copy) than simply using the AnyMap directly.
 bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
 {
-  return ((d) ? d->ldapExpr.Evaluate(
-                  PropertiesHandle(Properties(dictionary), false), true)
-              : false);
+  if (d) {
+    if (dictionary.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+      props_check::ValidateAnyMap(dictionary);
+    }
+
+    return d->ldapExpr.Evaluate(dictionary, true);
+  } else {
+    return false;
+  }
 }
 
 std::string LDAPFilter::ToString() const

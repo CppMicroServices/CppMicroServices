@@ -446,18 +446,35 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
       const LDAPExpr& ldapExpr = sse.GetLDAPExpr();
       if (ldapExpr.IsNull() || ldapExpr.Evaluate(props, false)) {
         set.insert(sse);
+      } else if (evt.GetType() == ServiceEvent::SERVICE_REGISTERED) {
+        // get the props key and value for logging
+        std::string propsKeyValues{};
+
+        auto key = props->Keys_unlocked();
+        for (auto k : key) {
+          auto val = props->Value_unlocked(k).first.ToString();
+          propsKeyValues += k + " : " + val + ", ";
+        }
+
+        const std::string msg =
+          "Service listener matching LDAP filter could "
+          "not be found using LDAP filter: " +
+          sse.GetFilter() + ". Please verify the LDAP filter value in service properties: " + "{" + propsKeyValues + "}";
+
+          coreCtx->logger->Log(
+            cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, msg);
       }
     }
 
     // Check the cache
     const auto c = any_cast<std::vector<std::string>>(
-      props->Value_unlocked(Constants::OBJECTCLASS));
+      props->Value_unlocked(Constants::OBJECTCLASS).first);
     for (auto& objClass : c) {
       AddToSet_unlocked(set, receivers, OBJECTCLASS_IX, objClass);
     }
 
     auto service_id =
-      any_cast<long>(props->Value_unlocked(Constants::SERVICE_ID));
+      any_cast<long>(props->Value_unlocked(Constants::SERVICE_ID).first);
     AddToSet_unlocked(set,
                       receivers,
                       SERVICE_ID_IX,

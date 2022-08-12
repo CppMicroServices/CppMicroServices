@@ -78,6 +78,7 @@ set(_declarativeservices_tests
   TestRegistrationManager.cpp
   TestSCRBundleExtension.cpp
   TestServiceComponentRuntimeImpl.cpp
+  TestServiceDependencyErrorLogging.cpp
   TestServiceMetadataParserV1.cpp
   TestSetConfiguration.cpp
   TestSingletonComponentConfiguration.cpp

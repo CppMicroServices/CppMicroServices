@@ -78,12 +78,12 @@ public:
   }
 
   void setLastUpdatedChangeCount(const std::string& pid, const unsigned long& changeCount) {
-    std::unique_lock<std::mutex>(updatedChangeCountMutex);
+    std::unique_lock<std::mutex> lock(updatedChangeCountMutex);
     lastUpdatedChangeCountPerPid[pid] = changeCount;
   }
 
   bool needsAnUpdateNotification(const std::string& pid, const unsigned long& changeCount) {
-    std::unique_lock<std::mutex>(updatedChangeCountMutex);
+    std::unique_lock<std::mutex> lock(updatedChangeCountMutex);
     return lastUpdatedChangeCountPerPid[pid] < changeCount;
   }
 

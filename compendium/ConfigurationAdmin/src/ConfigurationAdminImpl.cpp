@@ -837,7 +837,6 @@ ConfigurationAdminImpl::AddingService(
   }  
 
   std::vector<std::pair<std::string, AnyMap>> pidsAndProperties;
-  unsigned long initialChangeCount{0ul};
   std::unordered_map<std::string, unsigned long> initialChangeCountPerPid;
 
   const auto it = factoryInstances.find(pid);

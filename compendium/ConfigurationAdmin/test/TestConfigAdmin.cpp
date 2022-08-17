@@ -589,12 +589,12 @@ namespace cppmicroservices { namespace test {
         virtual ~TestManagedService() noexcept = default;
 
         void Updated(const cppmicroservices::AnyMap&) override {
-            std::unique_lock<std::mutex>(updatedCountMutex_);
+            std::unique_lock<std::mutex> lock(updatedCountMutex_);
             updatedCount_++;
         }
 
         unsigned long getUpdatedMethodCallCount() noexcept override {
-            std::unique_lock<std::mutex>(updatedCountMutex_);
+            std::unique_lock<std::mutex> lock(updatedCountMutex_);
             return updatedCount_;
         }
     private:

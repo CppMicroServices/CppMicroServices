@@ -4,8 +4,11 @@
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
+#include <cppmicroservices/ServiceProperties.h>
 #include <cppmicroservices/cm/ConfigurationAdmin.hpp>
 #include <cppmicroservices/util/FileSystem.h>
+
+#include <cppmicroservices/cm/ManagedService.hpp>
 
 #include "TestInterfaces/Interfaces.hpp"
 
@@ -568,11 +571,105 @@ TEST_F(ConfigAdminTests, testDuplicateUpdated)
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~0"), 1);
 }
 
-// This test simulates installing and starting a bundle and updating a
-// configuration object used by that bundle on different threads. This 
-// is the same test case as testDuplicateUpdated, except it is meant 
-// to be run in a loop to detect race conditions.
-TEST_F(ConfigAdminTests, testConcurrentDuplicateUpdated)
+/// <summary>
+/// Used by ConfigAdminTests.testConcurrentDuplicateManagedServiceUpdated
+/// </summary>
+namespace cppmicroservices { namespace test {
+    class TestManagedServiceInterface : public cppmicroservices::service::cm::ManagedService {
+    public:
+        virtual ~TestManagedServiceInterface() noexcept = default;
+
+        void Updated(const cppmicroservices::AnyMap&) override = 0;
+        virtual unsigned long getUpdatedMethodCallCount() noexcept = 0;
+    };
+
+    class TestManagedService : public TestManagedServiceInterface {
+    public:
+        TestManagedService() : updatedCount_{0} {}
+        virtual ~TestManagedService() noexcept = default;
+
+        void Updated(const cppmicroservices::AnyMap&) override {
+            std::unique_lock<std::mutex>(updatedCountMutex_);
+            updatedCount_++;
+        }
+
+        unsigned long getUpdatedMethodCallCount() noexcept override {
+            std::unique_lock<std::mutex>(updatedCountMutex_);
+            return updatedCount_;
+        }
+    private:
+        unsigned long updatedCount_;
+        std::mutex updatedCountMutex_;
+    };
+}}
+
+// This test simulates sending a config update when two threads are
+// racing to register a ManagedService and update the configuration
+// object.
+// Thgis test is meant to be run in a loop to detect race conditions.
+TEST_F(ConfigAdminTests, testConcurrentDuplicateManagedServiceUpdated)
+{
+  auto f = GetFramework();
+  auto ctx = f.GetBundleContext();
+
+  std::promise<void> go;
+  std::shared_future<void> ready(go.get_future());
+  std::vector<std::promise<void>> readies(2);
+
+  auto registerManagedService =
+    std::async(std::launch::async, [&ready, &readies, &ctx]() {
+      readies[0].set_value();
+      ready.wait();
+
+      cppmicroservices::ServiceProperties serviceProperties;
+      serviceProperties["service.pid"] =
+        cppmicroservices::Any(std::string("cm.testservice"));
+      (void)
+        ctx.RegisterService<cppmicroservices::test::TestManagedServiceInterface,
+                            cppmicroservices::service::cm::ManagedService>(
+          std::make_shared<cppmicroservices::test::TestManagedService>(),
+          serviceProperties);
+    });
+
+  auto updateConfigFuture =
+    std::async(std::launch::async, [this, &ready, &readies]() {
+      readies[1].set_value();
+      ready.wait();
+
+      // Add cm.testservice configuration object to the configuration repository
+      auto configuration = m_configAdmin->GetConfiguration("cm.testservice");
+
+      auto configurationMap =
+        std::unordered_map<std::string, cppmicroservices::Any>{
+          { "emgrid", std::to_string(0) }
+        };
+      // Update the cm.testservice configuration object. An Update
+      // notification will be sent to the ManagedServiceFactory.
+      auto result = configuration->UpdateIfDifferent(configurationMap);
+      result.second.get();
+    });
+
+  readies[0].get_future().wait();
+  readies[1].get_future().wait();
+  go.set_value();
+
+  ASSERT_NO_THROW(registerManagedService.get());
+  ASSERT_NO_THROW(updateConfigFuture.get());
+
+  auto sr = ctx.GetServiceReference<
+    cppmicroservices::test::TestManagedServiceInterface>();
+  auto managedService =
+    ctx.GetService<cppmicroservices::test::TestManagedServiceInterface>(sr);
+  ASSERT_NE(managedService, nullptr);
+
+  EXPECT_EQ(managedService->getUpdatedMethodCallCount(), 1);
+}
+
+// This test simulates sending a config update when two threads are
+// racing to register a ManagedServiceFactory and update the configuration
+// object.
+// Thgis test is meant to be run in a loop to detect race conditions.
+TEST_F(ConfigAdminTests, testConcurrentDuplicateManagedServiceFactoryUpdated)
 {
   auto f = GetFramework();
   auto ctx = f.GetBundleContext();

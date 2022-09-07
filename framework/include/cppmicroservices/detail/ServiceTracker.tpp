@@ -209,8 +209,9 @@ ServiceTracker<S, T>::WaitForService(
   }
 
   auto object = GetService();
-  if (object)
+  if (object) {
     return object;
+  }
 
   using D = std::chrono::duration<Rep, Period>;
 
@@ -237,8 +238,9 @@ ServiceTracker<S, T>::WaitForService(
     if (!object && endTime > std::chrono::steady_clock::time_point()) {
       timeout = std::chrono::duration_cast<D>(endTime -
                                               std::chrono::steady_clock::now());
-      if (timeout.count() <= 0)
+      if (timeout.count() <= 0) {
         break; // timed out
+      }
     }
   } while (!object && !d->Tracked()->closed);
 

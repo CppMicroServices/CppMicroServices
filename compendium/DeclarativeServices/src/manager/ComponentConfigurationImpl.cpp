@@ -413,20 +413,10 @@ ComponentConfigurationImpl::GetState() const
 void ComponentConfigurationImpl::LoadComponentCreatorDestructor()
 {
   if (newCompInstanceFunc == nullptr || deleteCompInstanceFunc == nullptr) {
-    auto compName = GetMetadata()->name;
-    auto position = compName.find("~");
-
-    if ((position != std::string::npos)) {
-      // this is a factory pid. Use implementation class
-      // instead of name to construct the instance.
-      compName = GetMetadata()->implClassName;
-    } else {
-      compName = GetMetadata()->name.empty() ? GetMetadata()->implClassName
-                                             : GetMetadata()->name;
-    }
-
+    auto instanceName = GetMetadata()->instanceName;
+    
     std::tie(newCompInstanceFunc, deleteCompInstanceFunc) =
-      GetComponentCreatorDeletors(compName, GetBundle(), logger);
+      GetComponentCreatorDeletors(instanceName, GetBundle(), logger);
   }
 }
 

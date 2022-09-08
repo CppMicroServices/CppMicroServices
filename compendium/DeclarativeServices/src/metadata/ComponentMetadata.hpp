@@ -48,6 +48,7 @@ struct ComponentMetadata
   {}
 
   std::string name;
+  std::string instanceName;
   bool enabled{ true };
   bool immediate{ false };
   std::string implClassName;

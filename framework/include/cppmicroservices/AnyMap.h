@@ -28,6 +28,25 @@
 #include <string>
 #include <unordered_map>
 
+/* rapidjson supports null values in a .json file. The AnyMap class does not support null values. 
+ * A value saved in the AnyMap must have a valid type and null is not a valid type. The NullValue 
+ * object allows us to save a null value in the AnyMap. 
+ */
+namespace cppmicroservices {
+  struct NullValue
+  {
+    std::string ToString() { return ""; };
+    bool operator==(const NullValue& nv) const
+    {
+      return typeid(nv) == typeid(NullValue);
+    }
+    friend std::ostream& operator<<(std::ostream& os, const NullValue& )
+    {
+      return os << "null";
+    }
+  };
+}
+
 namespace cppmicroservices {
 class Properties;
 class LDAPExpr;

@@ -31,6 +31,17 @@
         }]
       }
     },
+    "manifest_null_value": {
+      "cm": {
+        "version": 1,
+        "configurations": [{
+          "pid": "test",
+          "properties": {
+             "optional 'license_type' property": null
+           }
+        }]
+      }
+    },
     "manifest_empty_props": {
       "cm": {
         "version": 1,

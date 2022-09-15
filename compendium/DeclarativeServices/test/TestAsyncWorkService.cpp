@@ -42,6 +42,7 @@
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 
 #include <future>
+#include <thread>
 
 namespace test {
 

@@ -2,9 +2,9 @@ name: BuildAndTestWindows
 
 on:
   push:
-    branches: [ development, c++14-compliant, master ]
+    branches: [ development, c\+\+14-compliant, master ]
   pull_request:
-    branches: [ development, c++14-compliant ]
+    branches: [ development, c\+\+14-compliant ]
   workflow_dispatch:
 
 env:

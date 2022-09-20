@@ -417,10 +417,15 @@ public:
   {
     static_assert(
       std::is_default_constructible<C>::value,
-      "Default Constructor or Constructor with AnyMap input parameter "
-      "expected when injection is false. This error happens when an "
-      "appropriate constructor is not available or when the class being "
-      "validated is not a complete type.");
+      "An appropriate constructor was not found for the Service Instance. "
+      "The manifest.json inject-references property is false so the build "
+      "was looking for a default constructor or a constructor with an "
+      "AnyMap input parameter to receive the configuration properties. "
+      "All methods for the interfaces the Service Instance is implementing "
+      "must be present. Please see "
+      "https://confluence.mathworks.com/display/CppMicroServices/"
+      "Build+Failure+When+Constructing+Service+Instance "
+      "for more information.");
     return nullptr;
   }
 
@@ -442,9 +447,16 @@ public:
     static_assert(
       std::is_constructible<C,
                             const std::shared_ptr<CtorInjectedRefs>&...>::value,
-      "Suitable constructor not found for constructor injection. "
-      "This error happens when an appropriate constructor is not available "
-      "or when the class being validated is not a complete type.");
+      "An appropriate constructor was not found for the Service Instance. "
+      "The manifest.json inject-references property is true so the build "
+      "was looking for a constructor with input parameters to receive the "
+      "service parameters. The constructor may or may not have an AnyMap "
+      "input parameter to receive the configuration properties depending "
+      "on the configuration in the manifest.json file. All methods for the "
+      "interfaces the Service Instance is implementing must be present. Please see "
+      "https://confluence.mathworks.com/display/CppMicroServices/"
+      "Build+Failure+When+Constructing+Service+Instance for more "
+      "information.");
     return nullptr;
   }
 

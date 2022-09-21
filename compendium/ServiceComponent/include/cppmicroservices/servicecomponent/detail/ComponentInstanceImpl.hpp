@@ -419,13 +419,13 @@ public:
       std::is_default_constructible<C>::value,
       "An appropriate constructor was not found for the Service Instance. "
       "The manifest.json inject-references property is false so the build "
-      "was looking for a default constructor or a constructor with an "
-      "AnyMap input parameter to receive the configuration properties. "
-      "All methods for the interfaces the Service Instance is implementing "
-      "must be present. Please see "
-      "https://confluence.mathworks.com/display/CppMicroServices/"
-      "Build+Failure+When+Constructing+Service+Instance "
-      "for more information.");
+      "was not looking for a constructor with service reference input "
+      "parameters. It was looking for a default constructor or a constructor "
+      "with an AnyMap input parameter to receive the configuration properties. "
+      "Please check the constructor input parameters. "
+      "This failure can also be caused when all methods for the interface the "
+      "Service Instance is implementing are not present. Please check that all "
+      "interface methods are present.");
     return nullptr;
   }
 
@@ -450,13 +450,12 @@ public:
       "An appropriate constructor was not found for the Service Instance. "
       "The manifest.json inject-references property is true so the build "
       "was looking for a constructor with input parameters to receive the "
-      "service parameters. The constructor may or may not have an AnyMap "
+      "service references. The constructor may or may not have an AnyMap "
       "input parameter to receive the configuration properties depending "
-      "on the configuration in the manifest.json file. All methods for the "
-      "interfaces the Service Instance is implementing must be present. Please see "
-      "https://confluence.mathworks.com/display/CppMicroServices/"
-      "Build+Failure+When+Constructing+Service+Instance for more "
-      "information.");
+      "on the configuration in the manifest.json file. Please check the "
+      "constructor input parameters. This failure can also be caused when "
+      "all methods for the interface the Service Instance is implementing "
+      "are not present. Please check that all interface methods are present.");
     return nullptr;
   }
 

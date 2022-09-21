@@ -29,11 +29,11 @@ MIT License or Public Domain
 
 https://github.com/open-source-parsers/jsoncpp
 (formerly http://jsoncpp.sourceforge.net)
-0.10.6
+1.9.5
 
 Patches
 
- * Suppress -Wimplicit-fallthrough warning in GCC 7
+* Fixed some compiler warnings
 
 miniz
 -----
@@ -164,14 +164,10 @@ spdlog
 See https://github.com/gabime/spdlog/blob/v1.x/LICENSE for license information
 
 https://github.com/gabime/spdlog
-83b40b8cdac0253a147fbda6d6a7dbc2c836c380
+v1.10.0
 
 * We only use the include folder since we aren't statically linking to the library
-* Commit reflects the commit when we copied the include folder
-
-Patches:
-
- * Replaced old-style-cast to long int with static_cast<long int>
+* version reflects the version from which we copied the include folder
 
 Boost
 ------

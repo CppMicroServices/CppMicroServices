@@ -417,15 +417,11 @@ public:
   {
     static_assert(
       std::is_default_constructible<C>::value,
-      "An appropriate constructor was not found for the Service Instance. "
-      "The manifest.json inject-references property is false so the build "
-      "was not looking for a constructor with service reference input "
-      "parameters. It was looking for a default constructor or a constructor "
-      "with an AnyMap input parameter to receive the configuration properties. "
-      "Please check the constructor input parameters. "
-      "This failure can also be caused when all methods for the interface the "
-      "Service Instance is implementing are not present. Please check that all "
-      "interface methods are present.");
+      "An appropriate constructor was not found "
+      "and/or the service implementation does not implement all of the "
+      "service interface's methods. A default constructor or a constructor "
+      "with an AnyMap input parameter for the configuration properties is "
+      "required when inject-references is false. ");
     return nullptr;
   }
 
@@ -447,15 +443,12 @@ public:
     static_assert(
       std::is_constructible<C,
                             const std::shared_ptr<CtorInjectedRefs>&...>::value,
-      "An appropriate constructor was not found for the Service Instance. "
-      "The manifest.json inject-references property is true so the build "
-      "was looking for a constructor with input parameters to receive the "
-      "service references. The constructor may or may not have an AnyMap "
-      "input parameter to receive the configuration properties depending "
-      "on the configuration in the manifest.json file. Please check the "
-      "constructor input parameters. This failure can also be caused when "
-      "all methods for the interface the Service Instance is implementing "
-      "are not present. Please check that all interface methods are present.");
+      "An appropriate constructor was not found "
+      "and/or the service implementation does not implement all of the "
+      "service interface's methods. A constructor with service reference "
+      "input parameters or a constructor with an AnyMap input parameter for "
+      "configuration properties plus service reference input parameters is "
+      "required when inject-references is true. ");
     return nullptr;
   }
 

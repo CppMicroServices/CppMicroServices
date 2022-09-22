@@ -80,9 +80,10 @@ ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
                                  customizer))
 {
   std::string clazz = us_service_interface_iid<S>();
-  if (clazz.empty())
+  if (clazz.empty()) {
     throw ServiceException("The service interface class has no "
                            "CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
+  }
 }
 
 #ifdef _MSC_VER
@@ -209,8 +210,9 @@ ServiceTracker<S, T>::WaitForService(
   }
 
   auto object = GetService();
-  if (object)
+  if (object) {
     return object;
+  }
 
   using D = std::chrono::duration<Rep, Period>;
 
@@ -237,8 +239,9 @@ ServiceTracker<S, T>::WaitForService(
     if (!object && endTime > std::chrono::steady_clock::time_point()) {
       timeout = std::chrono::duration_cast<D>(endTime -
                                               std::chrono::steady_clock::now());
-      if (timeout.count() <= 0)
+      if (timeout.count() <= 0) {
         break; // timed out
+      }
     }
   } while (!object && !d->Tracked()->closed);
 
@@ -415,10 +418,17 @@ template<class S, class T>
 int ServiceTracker<S, T>::GetTrackingCount() const
 {
   auto t = d->Tracked();
-  if (!t) { /* if ServiceTracker is not open */
+  if (!t) { /* if ServiceTracker has not been opened */
     return -1;
   }
-  return (t->Lock(), t->GetTrackingCount());
+  {
+    auto l = t->Lock();
+    US_UNUSED(l);
+    if (t->closed) { /* if ServiceTracker was closed */
+      return -1;
+    }
+    return t->GetTrackingCount();
+  }
 }
 
 template<class S, class T>

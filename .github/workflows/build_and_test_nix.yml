@@ -2,9 +2,9 @@ name: BuildAndTestNix
 
 on:
   push:
-    branches: [ development, master ]
+    branches: [ development, c\+\+14-compliant, master ]
   pull_request:
-    branches: [ development ]
+    branches: [ development, c\+\+14-compliant ]
   workflow_dispatch:
 
 env:
@@ -69,7 +69,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macOS-10.15, macos-11]
+        os: [ubuntu-20.04, macOS-11, macos-12]
         # build configurations:
         # 0 = threading ON / shared lib ON
         # 1 = threading ON / shared lib OFF

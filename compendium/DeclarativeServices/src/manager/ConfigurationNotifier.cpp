@@ -20,15 +20,15 @@
 
   =============================================================================*/
 
-#include "ConfigurationNotifier.hpp"
 #include "../ComponentRegistry.hpp"
 #include "../metadata/ComponentMetadata.hpp"
 #include "ComponentConfigurationImpl.hpp"
 #include "ComponentManagerImpl.hpp"
+#include "ConfigurationNotifier.hpp"
+#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
-#include "cppmicroservices/SecurityException.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -200,18 +200,14 @@ void ConfigurationNotifier::NotifyAllListeners(
   ConfigChangeNotification notification =
     ConfigChangeNotification(pid, std::move(properties), std::move(type));
 
-  std::shared_ptr<TokenMap> listenersMapCopy;
-  {
-    auto listenersMapHandle = listenersMap.lock();
-    auto iter = listenersMapHandle->find(pid);
-    if (iter != listenersMapHandle->end()) {
-      listenersMapCopy = iter->second;
-    } else {
-      return;
+  auto listenersMapHandle = listenersMap.lock();
+  auto iter = listenersMapHandle->find(pid);
+  if (iter != listenersMapHandle->end()) {
+    for (const auto& configListenerPtr : *(iter->second)) {
+      configListenerPtr.second.notify(notification);
     }
-  }
-  for (const auto& configListenerPtr : *listenersMapCopy) {
-    configListenerPtr.second.notify(notification);
+  } else {
+    return;
   }
 }
 

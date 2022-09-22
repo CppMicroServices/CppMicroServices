@@ -42,6 +42,7 @@
 #include "boost/asio/thread_pool.hpp"
 
 #include <future>
+#include <thread>
 
 #include "ConfigurationAdminTestingConfig.h"
 

@@ -399,7 +399,7 @@ TEST_F(ServiceTrackerTestFixture, GetTrackingCount)
   ASSERT_EQ(tracker.GetTrackingCount(), 4);
 
   tracker.Close();
-  ASSERT_EQ(tracker.GetTrackingCount(), 5);
+  ASSERT_EQ(tracker.GetTrackingCount(), -1);
 }
 
 TEST_F(ServiceTrackerTestFixture, GetTracked)

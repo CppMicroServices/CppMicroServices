@@ -31,12 +31,9 @@ namespace detail {
 
 std::size_t any_map_cihash::operator()(const std::string& key) const
 {
-  std::size_t h = 0;
-  for (char c : key)
-  {
-      h ^= (c >= 'A' && c <= 'Z') ? c + ('a' - 'A') : c;
-  }
-  return h;
+  std::string lcase = key;
+  std::transform(lcase.begin(), lcase.end(), lcase.begin(), ::tolower);
+  return std::hash<std::string>{}(lcase);
 }
 
 bool any_map_ciequal::operator()(const std::string& l,

@@ -327,9 +327,11 @@ bool ServiceRegistrationBase::operator<(const ServiceRegistrationBase& o) const
     return true;
 
   {
-      auto l1 = d->Lock();
-      auto l2 = o.d->Lock();
-      return d->reference < o.d->reference;
+    auto l1 = d->Lock();
+    US_UNUSED(l1);
+    auto l2 = o.d->Lock();
+    US_UNUSED(l2);
+    return d->reference < o.d->reference;
   }
 }
 

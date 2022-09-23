@@ -447,7 +447,7 @@ public:
       "and/or the service implementation does not implement all of the "
       "service interface's methods. A constructor with service reference "
       "input parameters or a constructor with an AnyMap input parameter for "
-      "configuration properties plus service reference input parameters is "
+      "configuration properties and service reference input parameters is "
       "required when inject-references is true. ");
     return nullptr;
   }

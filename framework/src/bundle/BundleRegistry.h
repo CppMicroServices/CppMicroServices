@@ -165,7 +165,7 @@ private:
     std::vector<std::string>& alreadyInstalled);
 
   void DecrementInitialBundleMapRef(
-    cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock& l,
+    cppmicroservices::detail::MutexLockingStrategy<std::recursive_mutex>::UniqueLock& l,
     const std::string& location);
 
   /*

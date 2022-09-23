@@ -59,7 +59,12 @@ void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 
 ServiceReferenceBase::operator bool() const
 {
-  return static_cast<bool>(GetBundle());
+  auto p = d.load();
+  if (p->registration == nullptr) {
+    return false;
+  }
+
+  return (!p->registration->bundle.expired());
 }
 
 ServiceReferenceBase& ServiceReferenceBase::operator=(std::nullptr_t)
@@ -139,51 +144,41 @@ bool ServiceReferenceBase::operator<(
     return false;
   }
 
-  Any anyR1;
-  Any anyId1;
+  // scoped for locks
   {
-    auto l = d.load()->registration->properties.Lock();
-    US_UNUSED(l);
-    anyR1 =
+    auto l1 = d.load()->registration->properties.Lock();
+    US_UNUSED(l1);
+    const Any &anyR1 =
       d.load()
-        ->registration->properties.Value_unlocked(Constants::SERVICE_RANKING)
-        .first;
+        ->registration->properties.Value(Constants::SERVICE_RANKING);
     assert(anyR1.Empty() || anyR1.Type() == typeid(int));
-    anyId1 = d.load()
-               ->registration->properties.Value_unlocked(Constants::SERVICE_ID)
-               .first;
-    assert(anyId1.Type() == typeid(long int));
-  }
+    const Any &anyId1 = d.load()
+               ->registration->properties.Value(Constants::SERVICE_ID);
+    assert(anyId1.Empty() || anyId1.Type() == typeid(long int));
 
-  Any anyR2;
-  Any anyId2;
-  {
-    auto l = reference.d.load()->registration->properties.Lock();
-    US_UNUSED(l);
-    anyR2 =
+    auto l2 = reference.d.load()->registration->properties.Lock();
+    US_UNUSED(l2);
+    const Any &anyR2 =
       reference.d.load()
-        ->registration->properties.Value_unlocked(Constants::SERVICE_RANKING)
-        .first;
+        ->registration->properties.Value(Constants::SERVICE_RANKING);
     assert(anyR2.Empty() || anyR2.Type() == typeid(int));
-    anyId2 = reference.d.load()
-               ->registration->properties.Value_unlocked(Constants::SERVICE_ID)
-               .first;
-    assert(anyId2.Type() == typeid(long int));
-  }
+    const Any &anyId2 = reference.d.load()
+               ->registration->properties.Value(Constants::SERVICE_ID);
+    assert(anyId2.Empty() || anyId2.Type() == typeid(long int));
+    const int r1 = anyR1.Empty() ? 0 : *any_cast<int>(&anyR1);
+    const int r2 = anyR2.Empty() ? 0 : *any_cast<int>(&anyR2);
 
-  const int r1 = anyR1.Empty() ? 0 : *any_cast<int>(&anyR1);
-  const int r2 = anyR2.Empty() ? 0 : *any_cast<int>(&anyR2);
+    if (r1 != r2) {
+      // use ranking if ranking differs
+      return r1 < r2;
+    } else {
+      const long int id1 = *any_cast<long int>(&anyId1);
+      const long int id2 = *any_cast<long int>(&anyId2);
 
-  if (r1 != r2) {
-    // use ranking if ranking differs
-    return r1 < r2;
-  } else {
-    const long int id1 = *any_cast<long int>(&anyId1);
-    const long int id2 = *any_cast<long int>(&anyId2);
-
-    // otherwise compare using IDs,
-    // is less than if it has a higher ID.
-    return id2 < id1;
+      // otherwise compare using IDs,
+      // is less than if it has a higher ID.
+      return id2 < id1;
+    }
   }
 }
 

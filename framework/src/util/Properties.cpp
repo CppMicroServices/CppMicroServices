@@ -158,6 +158,58 @@ std::pair<Any, bool> Properties::Value_unlocked(const std::string& key,
   }
 }
 
+const Any& Properties::Value(const std::string& key, bool matchCase) const
+{
+  if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
+    if (auto itr = props.findUOCI_TypeChecked(key);
+        itr != props.endUOCI_TypeChecked()) {
+      if (!matchCase) {
+        return itr->second;
+      } else if (matchCase && itr->first == key) {
+          return itr->second;
+      } else {
+          return emptyAny;
+      }
+    } else {
+      return emptyAny;
+    }
+  } else if (props.GetType() == AnyMap::UNORDERED_MAP) {
+    auto itr = props.findUO_TypeChecked(key);
+    if (itr != props.endUO_TypeChecked()) {
+        return itr->second;
+    }
+
+    if (!matchCase) {
+      auto ciItr = caseInsensitiveLookup.find(key);
+      if (ciItr != caseInsensitiveLookup.end()) {
+          return props.findUO_TypeChecked(ciItr->second.data())->second;
+      } else {
+        return emptyAny;
+      }
+    }
+
+    return emptyAny;
+  } else if (props.GetType() == AnyMap::ORDERED_MAP) {
+    auto itr = props.findOM_TypeChecked(key);
+    if (itr != props.endOM_TypeChecked()) {
+        return itr->second;
+    }
+
+    if (!matchCase) {
+      auto ciItr = caseInsensitiveLookup.find(key);
+      if (ciItr != caseInsensitiveLookup.end()) {
+          return props.findOM_TypeChecked(ciItr->second.data())->second;
+      } else {
+          return emptyAny;
+      }
+    }
+
+    return emptyAny;
+  } else {
+    throw std::runtime_error("Unknown AnyMap type.");
+  }
+}
+
 std::vector<std::string> Properties::Keys_unlocked() const
 {
   std::vector<std::string> result{};

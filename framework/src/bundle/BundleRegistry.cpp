@@ -87,7 +87,7 @@ void BundleRegistry::Clear()
   0, it is erased from the initialBundleInstallMap map.
 */
 void BundleRegistry::DecrementInitialBundleMapRef(
-  cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock& l,
+  cppmicroservices::detail::MutexLockingStrategy<std::recursive_mutex>::UniqueLock& l,
   const std::string& location)
 {
   l.Lock();

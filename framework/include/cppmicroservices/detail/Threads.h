@@ -151,7 +151,7 @@ template<class MutexHost>
 class NoWaitCondition
 {};
 
-template<class LockingStrategy = MutexLockingStrategy<>,
+template<class LockingStrategy = MutexLockingStrategy<std::recursive_mutex>,
          template<class MutexHost> class WaitConditionStrategy =
            NoWaitCondition>
 class MultiThreaded

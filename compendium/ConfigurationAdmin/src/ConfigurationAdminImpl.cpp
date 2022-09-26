@@ -751,6 +751,12 @@ ConfigurationAdminImpl::AddingService(
     if (it->second->HasBeenUpdatedAtLeastOnce()) {
       try {
         properties = it->second->GetProperties();
+	// specifically set the initial change count here because there is
+        // a race between the call to GetChangeCount() and HasBeenUpdatedAtLeastOnce().
+        // The logic is that, if HasBeenUpdatedAtLeastOnce() returns true, the change
+        // count will always be > 1 and should at this point be captured for the
+        // tracked object to eliminate redundant config updates.
+        initialChangeCount = it->second->GetChangeCount();
       } catch (const std::runtime_error&) {
         // Configuration is being removed
         logger->Log(SeverityLevel::LOG_WARNING,
@@ -758,12 +764,7 @@ ConfigurationAdminImpl::AddingService(
                     "which has been removed.",
                     std::current_exception());
       }
-      // specifically set the initial change count here because there is
-      // a race between the call to GetChangeCount() and HasBeenUpdatedAtLeastOnce().
-      // The logic is that, if HasBeenUpdatedAtLeastOnce() returns true, the change
-      // count will always be > 1 and should at this point be captured for the
-      // tracked object to eliminate redundant config updates.
-      initialChangeCount = it->second->GetChangeCount();
+
       PerformAsync([this, pid, managedService, properties] {
         notifyServiceUpdated(pid, *managedService, properties, *logger);
       });

@@ -33,8 +33,8 @@ namespace cppmicroservices {
 struct ServiceListenerHook;
 
 class ServiceHooks
-  : private detail::MultiThreaded<>
-  , private ServiceTrackerCustomizer<ServiceListenerHook>
+  : public detail::MultiThreaded<>
+  , public ServiceTrackerCustomizer<ServiceListenerHook>
 {
 
 private:

@@ -86,8 +86,7 @@ void ServiceHooks::Open()
 {
   auto l = this->Lock();
   US_UNUSED(l);
-  listenerHookTracker.reset(
-    new ServiceTracker<ServiceListenerHook>(GetBundleContext(), this));
+  listenerHookTracker = std::make_unique<ServiceTracker<ServiceListenerHook>>(GetBundleContext(), this);
   listenerHookTracker->Open();
 
   bOpen = true;
@@ -99,7 +98,6 @@ void ServiceHooks::Close()
   US_UNUSED(l);
   if (listenerHookTracker) {
     listenerHookTracker->Close();
-    listenerHookTracker.reset();
   }
 
   bOpen = false;

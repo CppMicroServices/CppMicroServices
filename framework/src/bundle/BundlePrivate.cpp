@@ -218,7 +218,10 @@ void BundlePrivate::FinalizeActivation()
 {
   switch (GetUpdatedState()) {
     case Bundle::STATE_INSTALLED: {
-      std::rethrow_exception(resolveFailException);
+      if(resolveFailException) {
+        std::rethrow_exception(resolveFailException);
+      }
+      break;
     }
     case Bundle::STATE_STARTING: {
       if (operation == OP_ACTIVATING) {
@@ -570,7 +573,10 @@ void BundlePrivate::StartFailed()
   coreCtx->listeners.BundleChanged(BundleEvent(
     BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
   RemoveBundleResources();
-  bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>())->Invalidate();
+  auto oldBundleContext = bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>());
+  if (oldBundleContext) {
+    oldBundleContext->Invalidate();
+  }
   state = Bundle::STATE_RESOLVED;
   coreCtx->listeners.BundleChanged(BundleEvent(
     BundleEvent::BUNDLE_STOPPED, MakeBundle(this->shared_from_this())));

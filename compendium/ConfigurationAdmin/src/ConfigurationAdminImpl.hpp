@@ -25,6 +25,7 @@
 
 #include <cstdint>
 #include <future>
+#include <memory>
 #include <mutex>
 #include <random>
 #include <unordered_map>
@@ -272,6 +273,16 @@ private:
   cppmicroservices::ServiceTracker<
     cppmicroservices::service::cm::ConfigurationListener>
     configListenerTracker;
+
+  // used instead of querying the service trackers since a race exists between when the service tracker
+  // adds the tracked service to the internal map and when a client asks the service tracker for the
+  // list of tracked objects.
+  std::vector<std::shared_ptr<
+    TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>>
+    trackedManagedServices_;
+  std::vector<std::shared_ptr<TrackedServiceWrapper<
+    cppmicroservices::service::cm::ManagedServiceFactory>>>
+    trackedManagedServiceFactories_;
 };
 } // cmimpl
 } // cppmicroservices

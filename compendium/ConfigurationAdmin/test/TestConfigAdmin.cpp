@@ -588,9 +588,14 @@ namespace cppmicroservices { namespace test {
         TestManagedService() : updatedCount_{0} {}
         virtual ~TestManagedService() noexcept = default;
 
-        void Updated(const cppmicroservices::AnyMap&) override {
+        void Updated(const cppmicroservices::AnyMap& props) override {
             std::unique_lock<std::mutex> lock(updatedCountMutex_);
-            updatedCount_++;
+            // empty properties can be sent when stopping the configadmin
+            // service. For the purpose of this test we only want to
+            // update the count when non-empty properties have been sent.
+            if(!props.empty()) {
+              updatedCount_++;
+            }
         }
 
         unsigned long getUpdatedMethodCallCount() noexcept override {
@@ -606,7 +611,7 @@ namespace cppmicroservices { namespace test {
 // This test simulates sending a config update when two threads are
 // racing to register a ManagedService and update the configuration
 // object.
-// Thgis test is meant to be run in a loop to detect race conditions.
+// This test is meant to be run in a loop to detect race conditions.
 TEST_F(ConfigAdminTests, testConcurrentDuplicateManagedServiceUpdated)
 {
   auto f = GetFramework();
@@ -662,6 +667,13 @@ TEST_F(ConfigAdminTests, testConcurrentDuplicateManagedServiceUpdated)
     ctx.GetService<cppmicroservices::test::TestManagedServiceInterface>(sr);
   ASSERT_NE(managedService, nullptr);
 
+  // wait for config admin to finish processing all config events
+  // by stopping the configadmin bundle. This is necessary to guarantee
+  // that when we check for the # of Updated method calls, a config
+  // admin thread isn't still processing one.
+  auto configAdminBundle = GetConfigAdminBundle();
+  configAdminBundle.Stop();
+  m_configAdmin.reset();
   EXPECT_EQ(managedService->getUpdatedMethodCallCount(), 1);
 }
 
@@ -717,6 +729,13 @@ TEST_F(ConfigAdminTests, testConcurrentDuplicateManagedServiceFactoryUpdated)
   auto const serviceFactory = getManagedServiceFactory(ctx);
   ASSERT_NE(serviceFactory, nullptr);
 
+  // wait for config admin to finish processing all config events
+  // by stopping the configadmin bundle. This is necessary to guarantee
+  // that when we check for the # of Updated method calls, a config
+  // admin thread isn't still processing one.
+  auto configAdminBundle = GetConfigAdminBundle();
+  configAdminBundle.Stop();
+  m_configAdmin.reset();
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~0"), 1);
 }
 

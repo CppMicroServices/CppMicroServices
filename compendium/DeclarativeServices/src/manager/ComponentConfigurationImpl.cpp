@@ -218,10 +218,10 @@ void ComponentConfigurationImpl::Initialize()
                                    "ConfigurationAdmin service");
         }
         auto configs = configAdmin->ListConfigurations("(pid=" + metadata->configurationPids[0] + "~*)");
-
+        std::shared_ptr<ComponentConfigurationImpl> mgr = shared_from_this();
         if (!configs.empty()) {
           for (const auto& config : configs) {
-            configNotifier->CreateFactoryComponent(config->GetPid(), shared_from_this());
+            configNotifier->CreateFactoryComponent(config->GetPid(), mgr);
           }
         }
       }

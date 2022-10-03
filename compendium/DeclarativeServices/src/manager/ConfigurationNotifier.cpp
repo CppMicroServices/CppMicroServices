@@ -155,7 +155,7 @@ void ConfigurationNotifier::CreateFactoryComponent(
   // component except the factory component itself.
   newMetadata->configurationPids.clear();
   for (const auto& basePid : oldMetadata->configurationPids) {
-    if (basePid != factoryName) {
+    if (basePid != oldMetadata->configurationPids[0])  {
       newMetadata->configurationPids.emplace_back(basePid);
     }
   }

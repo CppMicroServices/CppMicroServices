@@ -200,6 +200,22 @@ void ComponentConfigurationImpl::Initialize()
       if (AreReferencesSatisfied() && configManager->IsConfigSatisfied()) {
         GetState()->Register(*this);
       }
+      // For factory components, see if any configuration objects for factory instances
+      // were created before the factory component was started. If so, create the factory
+      // component instances.
+      if (metadata->factoryComponentID != "") {
+        auto sr = this->bundle.GetBundleContext().GetServiceReference<
+            cppmicroservices::service::cm::ConfigurationAdmin>();
+        auto configAdmin =
+           this->bundle.GetBundleContext()
+            .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
+        auto configs = configAdmin->ListConfigurations("(pid=" + metadata->configurationPids[0] + "~*)");
+        if (configs.size() > 0) {
+          for (const auto& config : configs) {
+            configNotifier->CreateFactoryComponent(metadata->name, config->GetPid(), shared_from_this());
+          }
+        }
+      }
     }
   }
 }

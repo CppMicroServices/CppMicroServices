@@ -102,8 +102,7 @@ public:
     cppmicroservices::service::cm::ConfigurationEventType type,
     std::shared_ptr<cppmicroservices::AnyMap> properties);
 
-  void CreateFactoryComponent(const std::string& factoryName,
-                              const std::string& pid,
+  void CreateFactoryComponent(const std::string& pid,
                               std::shared_ptr<ComponentConfigurationImpl>& mgr);
 private:
 

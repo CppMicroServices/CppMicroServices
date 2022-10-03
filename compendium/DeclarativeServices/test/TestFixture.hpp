@@ -175,7 +175,7 @@ public:
       std::vector<cppmicroservices::ServiceReference<T>> instanceRefs;
       std::vector<std::shared_ptr<T>> instances;
       instanceRefs = context.GetServiceReferences<T>();
-      if (instanceRefs.size() <= 0) {
+      if (instanceRefs.empty()) {
         return std::vector<std::shared_ptr<T>>();
       }
       for (const auto& ref : instanceRefs) {

@@ -136,11 +136,10 @@ bool ConfigurationNotifier::AnyListenersForPid(const std::string& pid) noexcept
       return false;
     }
   } //release listenersMapHandle lock
-  CreateFactoryComponent(factoryName, pid, mgr);
+  CreateFactoryComponent(pid, mgr);
   return true;
 }
 void ConfigurationNotifier::CreateFactoryComponent(
-  const std::string& factoryName,
   const std::string& pid,
   std::shared_ptr<ComponentConfigurationImpl>& mgr)
 {

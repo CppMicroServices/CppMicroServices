@@ -63,7 +63,7 @@ public:
       } catch (...) {
         auto exceptionPtr = std::current_exception();
         std::string msg =
-          "An exception has occured while trying to shutdown "
+          "An exception has occurred while trying to shutdown "
           "the fallback cppmicroservices::async::AsyncWorkService "
           "instance.";
         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
@@ -102,9 +102,19 @@ CMAsyncWorkService::CMAsyncWorkService(
   : scrContext(context)
   , serviceTracker(std::make_unique<cppmicroservices::ServiceTracker<
                      cppmicroservices::async::AsyncWorkService>>(context, this))
-  , asyncWorkService(std::make_shared<FallbackAsyncWorkService>(logger_))
+  , asyncWorkService(nullptr)
   , logger(logger_)
 {
+  auto asyncWSSRef =
+    context.GetServiceReference<cppmicroservices::async::AsyncWorkService>();
+  if (asyncWSSRef) {
+    asyncWorkService =
+      context.GetService<cppmicroservices::async::AsyncWorkService>(
+        asyncWSSRef);
+  } else {
+    asyncWorkService = std::make_shared<FallbackAsyncWorkService>(logger_);
+  }
+
   serviceTracker->Open();
 }
 

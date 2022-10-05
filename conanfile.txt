@@ -1,5 +1,5 @@
 [requires]
-zlib/1.2.11
+gtest/cci.20210126
 
 [generators]
 CMakeDeps

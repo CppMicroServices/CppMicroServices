@@ -149,15 +149,19 @@ long long HighPrecisionTimer::ElapsedMicro()
 
 #endif
 
-Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
+Bundle InstallLib(BundleContext frameworkCtx,
+                  const std::string& libName,
+                  const cppmicroservices::AnyMap& bundleManifest)
 {
   std::vector<Bundle> bundles;
 
 #if defined(US_BUILD_SHARED_LIBS)
   bundles =
     frameworkCtx.InstallBundles(LIB_PATH + util::DIR_SEP + US_LIB_PREFIX +
-                                libName + US_LIB_POSTFIX + US_LIB_EXT);
+                                  libName + US_LIB_POSTFIX + US_LIB_EXT,
+                                bundleManifest);
 #else
+  US_UNUSED(bundleManifest);
   bundles = frameworkCtx.GetBundles();
 #endif
 

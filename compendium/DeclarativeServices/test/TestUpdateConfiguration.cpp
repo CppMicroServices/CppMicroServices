@@ -77,6 +77,98 @@ TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleResolvesService)
   ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
     << "Component state should be ACTIVE";
 }
+
+TEST_F(tServiceComponent, testConcurrentUpdateConfigAndActivateService)
+{
+  cppmicroservices::BundleContext ctx = framework.GetBundleContext();
+
+  // Get a service reference to ConfigAdmin to create the configuration object.
+  auto configAdminService =
+    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+  ASSERT_TRUE(configAdminService)
+    << "GetService failed for ConfigurationAdmin.";
+  
+  std::promise<void> go;
+  std::shared_future<void> ready(go.get_future());
+  std::vector<std::promise<void>> readies(2);
+
+  auto updateConfigFuture = std::async(std::launch::async, [&ready, &readies, &configAdminService]() {
+      readies[0].set_value();
+      ready.wait();
+    auto configuration =
+      configAdminService->GetConfiguration("sample::ServiceComponentCA02");
+    configuration->UpdateIfDifferent(
+      std::unordered_map<std::string, cppmicroservices::Any>{
+        { "foo", true } });
+  });
+
+  auto activateServiceFuture = std::async(std::launch::async, [this, &ready, &readies, &ctx]() {
+      readies[1].set_value();
+      ready.wait();
+    auto testBundle = ::test::InstallAndStartBundle(ctx, "TestBundleDSCA02");
+    ASSERT_TRUE(testBundle);
+    auto instance = GetInstance<test::CAInterface>();
+    ASSERT_TRUE(instance) << "GetService failed for CAInterface";
+  });
+
+  readies[0].get_future().wait();
+  readies[1].get_future().wait();
+  go.set_value();
+  ASSERT_NO_THROW(updateConfigFuture.get());
+  ASSERT_NO_THROW(activateServiceFuture.get());
+}
+
+/**
+ * Tests that a component configuration which requires a configuration object
+ * is not satisfied by a default constructed, empty configuration object.
+ */
+TEST_F(tServiceComponent, testActivateServiceWithEmptyConfigProps)
+{
+  cppmicroservices::BundleContext ctx = framework.GetBundleContext();
+
+  const std::string svcComponentName{ "sample::ServiceComponentCA02" };
+
+  // Get a service reference to ConfigAdmin to create the configuration object.
+  auto configAdminService =
+    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+  ASSERT_TRUE(configAdminService)
+    << "GetService failed for ConfigurationAdmin.";
+
+  auto configuration =
+        configAdminService->GetConfiguration("sample::ServiceComponentCA02");
+
+  auto testBundle = ::test::InstallAndStartBundle(ctx, "TestBundleDSCA02");
+  ASSERT_TRUE(testBundle);
+
+  scr::dto::ComponentDescriptionDTO compDescDTO;
+  auto compConfigs = GetComponentConfigs(testBundle, svcComponentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
+  EXPECT_EQ(compConfigs.at(0).state,
+            scr::dto::ComponentState::UNSATISFIED_REFERENCE)
+    << "UNSATISFIED_REFERENCE is expected because configuration object is not "
+       "created.";
+  
+  auto instance = GetInstance<test::CAInterface>();
+  ASSERT_FALSE(instance) << "GetService returned a valid service with an empty config for CAInterface";
+
+  configuration->UpdateIfDifferent(
+        std::unordered_map<std::string, cppmicroservices::Any>{
+          { "foo", true } }).second.get();
+
+  compConfigs = GetComponentConfigs(testBundle, svcComponentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
+    << "SATISFIED is exepected since configuration object is created.";
+
+  instance = GetInstance<test::CAInterface>();
+  ASSERT_TRUE(instance) << "GetService failed to return a service for CAInterface";
+
+  compConfigs = GetComponentConfigs(testBundle, svcComponentName, compDescDTO);
+  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
+  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+    << "SATISFIED is exepected since configuration object is created.";
+}
+
 /*
  * Tests that if a configuration object is defined in the manifest.json file
  * the service that is dependent on the configuration object is resolved as soon
@@ -207,13 +299,7 @@ TEST_F(tServiceComponent, testUpdateConfigBeforeStartingBundleAndManifest)
   ASSERT_TRUE(result);
 
   // GetService to make component active
-  std::shared_ptr<test::CAInterface> instance;
-  startTime = std::chrono::steady_clock::now();
-  while (!instance &&
-         std::chrono::duration_cast<std::chrono::milliseconds>(
-           std::chrono::steady_clock::now() - startTime) <= TIMEOUT) {
-    instance = GetInstance<test::CAInterface>();
-  }
+  std::shared_ptr<test::CAInterface> instance = GetInstance<test::CAInterface>();
  
   ASSERT_TRUE(instance) << "GetService failed for CAInterface";
 

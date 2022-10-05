@@ -157,7 +157,7 @@ TEST_F(tServiceComponent, testFactoryConfigBeforeInstall)
   ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
   // Create some factory configuration objects.
-  auto const count = 5;
+  constexpr auto count = 5;
   for (int i = 0; i < count; i++) {
     // Create the factory configuration object
     auto factoryConfig =

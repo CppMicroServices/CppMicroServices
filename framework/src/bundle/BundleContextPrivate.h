@@ -48,7 +48,7 @@ public:
 
   void Invalidate();
 
-  BundlePrivate* bundle;
+  std::weak_ptr<BundlePrivate> bundle;
 
   /**
    * Is bundle context valid.

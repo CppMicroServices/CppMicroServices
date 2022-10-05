@@ -300,8 +300,10 @@ void ServiceRegistry::GetRegisteredByBundle(
   US_UNUSED(l);
 
   for (auto& sr : serviceRegistrations) {
-    if (sr.d->bundle == p) {
-      res.push_back(sr);
+    if (auto bundle_ = sr.d->bundle.lock()) {
+      if (bundle_.get() == p) {
+        res.push_back(sr);
+      }
     }
   }
 }

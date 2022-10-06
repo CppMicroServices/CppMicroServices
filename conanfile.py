@@ -6,12 +6,55 @@ from conan.tools.microsoft import is_msvc_static_runtime
 from conan.tools.build import check_min_cppstd
 from conan.errors import ConanInvalidConfiguration
 import os
+import platform
 
 required_conan_version = ">=1.52.0"
 
-def IsMSVC(conanfile):
-    return conanfile.info.settings.compiler == "Visual Studio" or conanfile.info.settings.compiler == "msvc"
+def IsWindows():
+    return 'Windows' == platform.system()
 
+def IsMacOS():
+    return 'Darwin' == platform.system()
+
+def IsLinux():
+    return 'Linux' == platform.system()
+
+upstreamPackageLibInfoLookup = {
+    'Windows': {
+        'shared': {
+            'ext': 'dll',
+            'src_loc': 'bin'
+        },
+        'static': {
+            'ext': 'lib',
+            'src_loc': 'lib'
+        }
+    },
+    'Darwin': {
+        'shared': {
+            'ext': 'dylib',
+            'src_loc': 'lib'
+        },
+        'static': {
+            'ext': 'a',
+            'src_loc': 'lib'
+        }
+    },
+    'Linux': {
+        'shared': {
+            'ext': 'so',
+            'src_loc': 'lib'
+        },
+        'static': {
+            'ext': 'a',
+            'src_log': 'lib'
+        }
+    }
+}
+
+def GetGeneralUpstreamDependencyInfo(prop, isShared):
+    return upstreamPackageLibInfoLookup[platform.system()]['shared' if isShared else 'static'][prop]
+                 
 class CppMicroServicesConan(ConanFile):
     name = "cppmicroservices"
     package_type = "library"
@@ -41,28 +84,35 @@ class CppMicroServicesConan(ConanFile):
         if self.info.settings.compiler.cppstd:
             check_min_cppstd(self, 17)
 
+        if not IsWindows() and not IsMacOS() and not IsLinux():
+            raise ConanInvalidConfiguration("Building CppMicroServices is not supported on your platform.")
+
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
     def layout(self):
         cmake_layout(self, build_folder="build")
+
+        # Linux sets self.folders.build differently than it does on Windows (and maybe macOS)
+        # This fixes the folder to be the right location
+        if IsLinux():
+            self.folders.build = 'build'
         
     def configure(self):
         self.options["gtest"].shared = self.options.shared
         self.options["benchmark"].shared = self.options.shared
         
     def imports(self):
-        if IsMSVC(self):
+        lib_ext = GetGeneralUpstreamDependencyInfo('ext', self.options.shared)
+        src_loc = GetGeneralUpstreamDependencyInfo('src_loc', self.options.shared)
+
+        if IsWindows():
             dst_folder = self.folders.build + f'/bin/{str(self.settings.build_type)}'
-        else:
-            dst_folder = self.folders.build + '/bin'
+        else: # Linux and macOS
+            dst_folder = self.folders.build + f'/bin'
 
-        print(dst_folder)
+        self.copy(f'*.{lib_ext}*', dst=dst_folder, src=src_loc)
             
-        self.copy("*.dll", dst=dst_folder, src="bin")
-        self.copy("*.dylib", dst=dst_folder, src="lib")
-        self.copy("*.so", dst=dst_folder, src="lib")
-
     def generate(self):
         tc = CMakeToolchain(self)
         tc.variables["BUILD_SHARED_LIBS"] = self.options.shared

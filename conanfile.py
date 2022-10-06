@@ -93,14 +93,13 @@ class CppMicroServicesConan(ConanFile):
     def layout(self):
         cmake_layout(self, build_folder="build")
 
-        # Linux sets self.folders.build differently than it does on Windows (and maybe macOS)
-        # This fixes the folder to be the right location
-        if IsLinux():
+        # Linux and macOS sets self.folders.build differently than it does on Windows 
+        if IsLinux() or IsMacOS():
             self.folders.build = 'build'
         
     def configure(self):
-        self.options["gtest"].shared = self.options.shared
-        self.options["benchmark"].shared = self.options.shared
+        self.options["gtest"].shared = False
+        self.options["benchmark"].shared = False
         
     def imports(self):
         lib_ext = GetGeneralUpstreamDependencyInfo('ext', self.options.shared)
@@ -108,8 +107,10 @@ class CppMicroServicesConan(ConanFile):
 
         if IsWindows():
             dst_folder = self.folders.build + f'/bin/{str(self.settings.build_type)}'
-        else: # Linux and macOS
-            dst_folder = self.folders.build + f'/bin'
+        elif IsLinux():
+            dst_folder = self.folders.build + '/bin'
+        elif IsMacOS():
+            dst_folder = self.folders.build + '/bin'
 
         self.copy(f'*.{lib_ext}*', dst=dst_folder, src=src_loc)
             

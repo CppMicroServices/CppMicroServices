@@ -403,6 +403,9 @@ if(US_BUILD_TESTING)
 
   set(GTEST_BOTH_LIBRARIES GTest::gtest)# GTest::gtest_main)
   set(GMOCK_BOTH_LIBRARIES GTest::gmock)# GTest::gmock_main)
+
+  set(GTEST_NO_INSTALL 1)
+  set(GMOCK_NO_INSTALL 1)
 endif()
 
 

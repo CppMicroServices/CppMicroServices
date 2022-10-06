@@ -98,8 +98,15 @@ class CppMicroServicesConan(ConanFile):
             self.folders.build = 'build'
         
     def configure(self):
-        self.options["gtest"].shared = False
-        self.options["benchmark"].shared = False
+        # HACK: Can't get RPATHs to work properly on macOS for gtest and benchmark.
+        # All resources online use the older 'cmake' generator whereas CMakeDeps and
+        # CMakeToolchain are recommended for conan 2.0.
+        #
+        # Windows appears to build gtest and benchmark as shared libraries when the project
+        # is has BUILD_SHARED_LIBS=ON. That will remain the same. The hack is to always build
+        # gtest and benchmark as static libraries on macOS.
+        self.options["gtest"].shared = False if IsMacOS() else self.options.shared
+        self.options["benchmark"].shared = False if IsMacOS() else self.options.shared
         
     def imports(self):
         lib_ext = GetGeneralUpstreamDependencyInfo('ext', self.options.shared)
@@ -107,9 +114,7 @@ class CppMicroServicesConan(ConanFile):
 
         if IsWindows():
             dst_folder = self.folders.build + f'/bin/{str(self.settings.build_type)}'
-        elif IsLinux():
-            dst_folder = self.folders.build + '/bin'
-        elif IsMacOS():
+        elif IsLinux() or IsMacOS():
             dst_folder = self.folders.build + '/bin'
 
         self.copy(f'*.{lib_ext}*', dst=dst_folder, src=src_loc)

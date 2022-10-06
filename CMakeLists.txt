@@ -140,7 +140,7 @@ set(US_CMAKE_DIR ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_MODULE_PATH
   ${US_CMAKE_DIR}
   ${CMAKE_MODULE_PATH}
-  )
+)
 
 #-----------------------------------------------------------------------------
 # CMake function(s) and macro(s)
@@ -397,47 +397,12 @@ if(US_BUILD_TESTING)
     mark_as_advanced(US_COVERAGE_COMMAND)
   endif()
 
-  if(US_USE_SYSTEM_GTEST)
-    find_package(GTest REQUIRED)
-  else()
-    # This keeps GTest CMake variables hidden from users unless they explicitly want to view/modify them.
-    us_cache_var(BUILD_GMOCK ON BOOL "Build GMock" ADVANCED FORCE)
-    us_cache_var(BUILD_GTEST ON BOOL "Build GTest" ADVANCED FORCE)
+  find_package(spdlog REQUIRED)
+  find_package(GTest REQUIRED)
+  find_package(benchmark REQUIRED)
 
-    us_cache_var(gtest_build_samples OFF BOOL "Build GTest samples" ADVANCED)
-    us_cache_var(gtest_build_tests OFF BOOL "Build GTest tests" ADVANCED)
-    us_cache_var(gtest_disable_pthreads OFF BOOL "Disable the use of pthreads" ADVANCED)
-
-    # Prevent overriding the parent project's compiler/linker
-    # settings on Windows
-    us_cache_var(gtest_force_shared_crt ON BOOL "" ADVANCED FORCE)
-
-    us_cache_var(gtest_hide_internal_symbols OFF BOOL "" ADVANCED)
-
-    # pthreads on MinGW is not supported, turn it off. Refer to
-    # https://github.com/google/googletest/pull/721/files for details.
-    if(MINGW)
-     set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
-    endif()
-
-    set(GTEST_BOTH_LIBRARIES gtest gtest_main)
-    set(GMOCK_BOTH_LIBRARIES gmock gmock_main)
-
-    # Prevent GTest/GMock from installing libraries into our install dir.
-    set(GTEST_NO_INSTALL 1)
-    set(GMOCK_NO_INSTALL 1)
-
-    # This project also sets BUILD_SHARED_LIBS. We want to save what we initially
-    # set.
-    set(_us_build_shared ${BUILD_SHARED_LIBS})
-    add_subdirectory(third_party/googletest)
-
-    set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
-    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
-    add_subdirectory(third_party/benchmark)
-
-    set(BUILD_SHARED_LIBS ${_us_build_shared} CACHE BOOL "Build shared libraries" FORCE)
-  endif()
+  set(GTEST_BOTH_LIBRARIES GTest::gtest)# GTest::gtest_main)
+  set(GMOCK_BOTH_LIBRARIES GTest::gmock)# GTest::gmock_main)
 endif()
 
 

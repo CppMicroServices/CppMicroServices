@@ -18,9 +18,8 @@ endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/DSTestingConfig.h")
 
 include_directories(
-  ${GTEST_INCLUDE_DIRS}
-  ${GMOCK_INCLUDE_DIRS}
-  )
+  ${GTest_INCLUDE_DIRS}
+)
 
 # There are warnings in the boost asio headers which are flagged as errors. Include the boost
 # asio headers as system headers to ignore these warnings and not treat them as errors.
@@ -221,8 +220,6 @@ target_link_libraries(${us_declarativeservices_test_exe_name}
   usAsyncWorkService
   usIDictionaryService
   usISpellCheckService
-  gtest
-  gmock
   util
 )
 

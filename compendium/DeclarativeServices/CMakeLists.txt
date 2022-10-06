@@ -62,8 +62,7 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_SOURCE_DIR}/compendium/LogService/include
   ${CppMicroServices_SOURCE_DIR}/compendium/AsyncWorkService/include
   ${CppMicroServices_SOURCE_DIR}/compendium/CM/include
-  ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
-  ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
+  ${GTest_INCLUDE_DIRS}
   ${CppMicroServices_SOURCE_DIR}/cppmicroservices/cm/include
   )
 

@@ -4,8 +4,7 @@
 set(us_cm_test_exe_name usCMTests)
 
 include_directories(
-  ${GTEST_INCLUDE_DIRS}
-  ${GMOCK_INCLUDE_DIRS}
+  ${GTest_INCLUDE_DIRS}
   )
 
 if(MSVC)
@@ -31,8 +30,6 @@ include_directories(
   ${CppMicroServices_BINARY_DIR}/compendium/LogService/include
   ${CppMicroServices_SOURCE_DIR}/compendium/CM/include
   ${CppMicroServices_BINARY_DIR}/compendium/CM/include
-  ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
-  ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )
 
 add_executable(${us_cm_test_exe_name} ${_cm_tests})
@@ -48,12 +45,14 @@ if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
   set_source_files_properties(${_cm_tests} PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations)
 endif()
 
+message(STATUS ${GTest_LIBRARIES})
+
 target_link_libraries(${us_cm_test_exe_name}
   PRIVATE
     ${GTEST_BOTH_LIBRARIES}
     ${GMOCK_BOTH_LIBRARIES}
-      CppMicroServices
-      usLogService
+    CppMicroServices
+    usLogService
   )
 
 # Run the GTest EXE from ctest.

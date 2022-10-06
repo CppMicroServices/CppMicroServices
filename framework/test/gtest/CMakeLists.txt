@@ -18,8 +18,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINAR
 set(us_gtest_test_exe_name usFrameworkTests)
 
 include_directories(
-  ${GTEST_INCLUDE_DIRS}
-  ${GMOCK_INCLUDE_DIRS}
+  ${GTest_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/../util
   ${CMAKE_CURRENT_SOURCE_DIR}/../../../third_party
   )

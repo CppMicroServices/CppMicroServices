@@ -5,7 +5,7 @@
 set(us_bench_test_exe_name usFrameworkBenchTests)
 
 include_directories(
-  ${CMAKE_SOURCE_DIR}/third_party/benchmark/include
+  ${benchmark_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/../util
   )
 
@@ -40,7 +40,7 @@ add_executable(${us_bench_test_exe_name} ${_bench_src} ${_additional_srcs} )
 
 target_include_directories(${us_bench_test_exe_name} PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
 
-target_link_libraries(${us_bench_test_exe_name} benchmark_main usLogService)
+target_link_libraries(${us_bench_test_exe_name} benchmark::benchmark_main usLogService)
 target_link_libraries(${us_bench_test_exe_name} ${Framework_TARGET})
 
 set_property(TARGET ${us_bench_test_exe_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)

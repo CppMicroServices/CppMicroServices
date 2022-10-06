@@ -8,7 +8,8 @@ set(_hdrs
   src/LogServiceImpl.hpp
   )
 
-set(_link_libraries )
+message(STATUS ${spdlog_LIBRARIES} ${fmt_LIBRARIES})
+set(_link_libraries ${spdlog_LIBRARIES} ${fmt_LIBRARIES})
 if(UNIX)
   list(APPEND _link_libraries dl)
 endif()
@@ -49,7 +50,7 @@ target_include_directories(LogService PRIVATE
   ${CppMicroServices_BINARY_DIR}/framework/include
   ${CppMicroServices_SOURCE_DIR}/compendium/LogService/include
   ${CppMicroServices_BINARY_DIR}/compendium/LogService/include
-  ${CppMicroServices_SOURCE_DIR}/third_party/spdlog/include
+  ${spdlog_INCLUDE_DIRS}
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )

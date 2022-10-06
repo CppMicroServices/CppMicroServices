@@ -18,8 +18,7 @@ endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/ConfigurationAdminTestingConfig.h")
 
 include_directories(
-  ${GTEST_INCLUDE_DIRS}
-  ${GMOCK_INCLUDE_DIRS}
+  ${GTest_INCLUDE_DIRS}
   )
 
 # There are warnings in the boost asio headers which are flagged as errors. Include the boost
@@ -137,8 +136,6 @@ target_link_libraries(${us_configurationadmin_test_exe_name}
   usLogService
   usAsyncWorkService
   usServiceComponent
-  gtest
-  gmock
   util
 )
 

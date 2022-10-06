@@ -18,8 +18,7 @@ endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/LogServiceTestingConfig.h")
 
 include_directories(
-  ${GTEST_INCLUDE_DIRS}
-  ${GMOCK_INCLUDE_DIRS}
+  ${GTest_INCLUDE_DIRS}
   )
 
 if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
@@ -86,8 +85,6 @@ target_link_libraries(${us_logservice_test_exe_name}
   ${${PROJECT_NAME}_LINK_LIBRARIES}
   CppMicroServices
   usLogService
-  gtest
-  gmock
   util
   )
 

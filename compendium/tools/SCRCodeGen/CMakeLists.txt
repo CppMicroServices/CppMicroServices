@@ -14,8 +14,8 @@ set(_private_headers
     Util.hpp)
 
 include_directories(../../../third_party
-		    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
-		    ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include)
+                    ${GTest_INCLUDE_DIRS}
+)
 
 set(US_SCRCODEGEN_EXECUTABLE_TARGET SCRCodeGen)
 set(US_SCRCODEGEN_EXECUTABLE_OUTPUT_NAME ${US_SCRCODEGEN_EXECUTABLE_TARGET}${US_GLOBAL_VERSION_SUFFIX})

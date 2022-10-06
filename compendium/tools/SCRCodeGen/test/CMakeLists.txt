@@ -4,12 +4,6 @@
 
 set(scrcodegen_test_exe_name SCRCodeGenTests)
 
-include_directories(
-  ${GTEST_INCLUDE_DIRS}
-  ${GMOCK_INCLUDE_DIRS}
-  )
-
-
 if(MSVC)
   add_compile_definitions(GTEST_HAS_STD_TUPLE_=1)
   add_compile_definitions(GTEST_HAS_TR1_TUPLE=0)
@@ -32,9 +26,8 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_BINARY_DIR}/include
   ${CppMicroServices_BINARY_DIR}/framework/include
   ${CppMicroServices_SOURCE_DIR}/compendium/tools/SCRCodeGen
-  ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
-  ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   ${CppMicroServices_SOURCE_DIR}/third_party
+  ${GTest_INCLUDE_DIRS}
   )
 
 add_executable(${scrcodegen_test_exe_name} ${_scrcodegen_tests})
@@ -51,10 +44,10 @@ if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
 endif()
 
 target_link_libraries(${scrcodegen_test_exe_name} 
-	PRIVATE
-		${GTEST_BOTH_LIBRARIES}
-		${GMOCK_BOTH_LIBRARIES}
-                CppMicroServices
+  PRIVATE
+    ${GTEST_BOTH_LIBRARIES}
+    ${GMOCK_BOTH_LIBRARIES}
+    CppMicroServices
 )
 
 # tests can be configured to run using add_test or GTEST_ADD_TEST (https://cmake.org/cmake/help/v3.0/module/FindGTest.html)

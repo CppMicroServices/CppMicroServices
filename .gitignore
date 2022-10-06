@@ -41,3 +41,5 @@ doc/src/examples/makefile/main
 /build*
 .vscode/
 .venv/
+CMakeUserPresets.json
+conan_imports_manifest.txt

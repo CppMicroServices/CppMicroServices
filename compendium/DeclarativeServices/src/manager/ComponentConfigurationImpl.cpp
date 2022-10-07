@@ -197,7 +197,7 @@ void ComponentConfigurationImpl::Initialize()
         configListenerTokens.emplace_back(listenerToken);
       }
       configManager->Initialize();
-      if (referenceManagers.empty() && configManager->IsConfigSatisfied()) {
+      if (AreReferencesSatisfied() && configManager->IsConfigSatisfied()) {
         GetState()->Register(*this);
       }
     }

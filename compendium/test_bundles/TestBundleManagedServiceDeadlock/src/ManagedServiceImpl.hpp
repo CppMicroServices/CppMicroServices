@@ -3,6 +3,7 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 
+#include <condition_variable>
 #include <mutex>
 
 namespace cppmicroservices {

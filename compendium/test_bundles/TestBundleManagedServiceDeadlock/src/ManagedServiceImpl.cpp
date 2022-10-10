@@ -3,6 +3,7 @@
 #include <cppmicroservices/BundleContext.h>
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkFactory.h>
+#include <condition_variable>
 #include <iostream>
 #include <string>
 

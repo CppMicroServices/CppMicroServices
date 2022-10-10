@@ -78,11 +78,17 @@ void InstallAndStartDSAndConfigAdmin(::cppmicroservices::BundleContext& ctx)
   }
 }
 
+std::vector<cppmicroservices::Bundle> InstallBundles(cppmicroservices::BundleContext& ctx,
+        const std::string& bundleName)
+{
+  std::string path = PathToLib(bundleName);
+  return ctx.InstallBundles(path);
+}
+
 size_t installAndStartTestBundles(cppmicroservices::BundleContext& ctx,
                                   const std::string& bundleName)
 {
-  std::string path = PathToLib(bundleName);
-  auto bundles = ctx.InstallBundles(path);
+  auto bundles = InstallBundles(ctx, bundleName);
   for (auto& b : bundles) {
     b.Start();
   }
@@ -842,4 +848,88 @@ TEST_F(ConfigAdminTests, testMultipleManagedFactoriesInBundleGetUpdate)
                   ASSERT_EQ(factory->getUpdatedCounter("cm.testfactory~ver1"),
                             1);
                 });
+}
+/*
+* testManagedServiceRemoveConfigurationsDeadlock
+* 
+* This test was added in response to a deadlock bug. 
+* The Use Case is as follows:
+*     A configuration object is defined in the manifest.json file. 
+*     The User's main thread stopped the bundle which causes 
+*         the ConfigurationAdminImpl RemoveConfigurations method 
+*         to remove the configuration object from the ConfigurationAdmin
+*         repository and to send an Updated notification to the service
+*         instance. RemoveConfigurations would then execute a WaitForAllAsync
+*         to wait for all asynchronous threads to complete including the 
+*         asynchronous thread that was launched as part of the Updated 
+*         notification. 
+*      The user's Updated method also tried to stop the bundle. This means
+*          that it had to wait for the RemoveConfigurations method to complete. 
+*      Hence the deadlock.
+*
+* The solution is to remove the WaitForAllAsync from RemoveConfigurations. 
+* 
+* The following test simulates the use case by using two separate bundles. 
+* The first bundle,  TestBundleManagedServiceDeadlock is installed and started
+* The service component inside that bundle is dependent on the cm.testdeadlock
+* configuration object which is defined in the manifest.json file and is then
+* updated by this code. The update passes a mutex and condition_variable to 
+* the Service Instance. When the Updated method is called it will wait on that
+* condition variable.
+* 
+* The second bundle, ManagedServiceAndFactoryBundle contains a configuration object
+* called cm.testservice. It is installed and started and then stopped. When this 
+* bundle is stopped, RemoveConfigurations executes. If the WaitForAllAsync call is 
+* present in RemoveConfigurations the bundle.Stop method will never return. 
+* 
+* If the WaitForAllAsync call is not present in RemoveConfigurations, the bundle.Stop 
+* will return and the test can call the notify_All method of the condition_variable to 
+* release the TestBundleManagedServiceDeadlock service component's Updated method.
+*/
+TEST_F(ConfigAdminTests, testManagedServiceRemoveConfigurationsDeadlock)
+{
+
+  auto f = GetFramework();
+  auto ctx = f.GetBundleContext();
+
+  auto const numBundles =
+    installAndStartTestBundles(ctx, "TestBundleManagedServiceDeadlock");
+  ASSERT_EQ(numBundles, 1);
+
+  auto const service = getManagedService(ctx);
+  ASSERT_NE(service, nullptr);
+
+  auto bundles = InstallBundles(ctx, "ManagedServiceAndFactoryBundle");
+  ASSERT_FALSE(bundles.empty());
+  for (auto& b : bundles) {
+    b.Start();
+  }
+
+  auto sharedConfiguration = m_configAdmin->GetConfiguration("cm.testdeadlock");
+  ASSERT_EQ(sharedConfiguration->GetPid(), "cm.testdeadlock");
+
+  std::shared_ptr<std::mutex> mtxPtr = std::make_shared<std::mutex>();
+  std::shared_ptr<std::condition_variable> cvPtr =
+    std::make_shared<std::condition_variable>();
+
+  cppmicroservices::AnyMap props(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  props["myMutex"] = mtxPtr;
+  props["myConditionVariable"] = cvPtr;
+
+  auto fut = sharedConfiguration->Update(props);
+  // We can't wait on the future because it won't return. 
+  // We can wait on the counter though. When it reaches 2 we know that the Updated
+  // method with the mutex and condition_variable has been called and is executing.
+  while (service->getCounter() < 2) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+  for (auto& b : bundles) {
+    b.Stop();
+  }
+ 
+  // Release the Updated method
+  std::unique_lock<std::mutex> lck(*mtxPtr);
+  cvPtr->notify_all();
+  
 }

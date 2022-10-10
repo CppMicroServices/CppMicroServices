@@ -1,0 +1,33 @@
+{
+  "bundle.symbolic_name": "TestBundleManagedServiceDeadlock",
+  "bundle.name": "TestBundleManagedServiceDeadlock",
+  "bundle.activator": false,
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "name": "cppmicroservices::service::cm::test::TestManagedServiceImpl2",
+        "implementation-class": "cppmicroservices::service::cm::test::TestManagedServiceImpl2",
+        "properties" : {
+          "service.pid" : "cm.testdeadlock"
+        },
+        "service": {
+          "interfaces": [
+             "test::TestManagedServiceInterface", "cppmicroservices::service::cm::ManagedService"
+          ]
+        }
+      }
+     ]
+  },
+  "cm": {
+    "version": 1,
+    "configurations": [
+      {
+        "pid": "cm.testdeadlock",
+        "properties": {
+          "anInt": 2
+        }
+      } 
+    ]
+  }
+}

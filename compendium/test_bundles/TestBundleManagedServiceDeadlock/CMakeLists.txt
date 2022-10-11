@@ -1,7 +1,6 @@
 usFunctionCreateDSTestBundle(TestBundleManagedServiceDeadlock)
 
 usFunctionCreateTestBundleWithResources(TestBundleManagedServiceDeadlock
-  SOURCES src/ManagedServiceImpl.cpp ${_glue_file}
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME TestBundleManagedServiceDeadlock
   OTHER_LIBRARIES usTestInterfaces usServiceComponent cm)

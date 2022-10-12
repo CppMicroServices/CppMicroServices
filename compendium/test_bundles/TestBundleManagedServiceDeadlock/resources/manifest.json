@@ -1,0 +1,16 @@
+{
+  "bundle.symbolic_name": "TestBundleManagedServiceDeadlock",
+  "bundle.name": "TestBundleManagedServiceDeadlock",
+  "bundle.activator": false,
+   "cm": {
+    "version": 1,
+    "configurations": [
+      {
+        "pid": "cm.testdeadlock",
+        "properties": {
+          "anInt": 2
+        }
+      } 
+    ]
+  }
+}

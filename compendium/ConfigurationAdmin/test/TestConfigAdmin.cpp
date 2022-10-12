@@ -878,7 +878,9 @@ public:
       auto ctx = m_framework.GetBundleContext();
       auto bundles =
         ctx.GetBundles(PathToLib("TestBundleManagedServiceDeadlock"));
+      ASSERT_EQ(bundles.size(), 1ul);
       for (auto& b : bundles) {
+        ASSERT_EQ(b.GetSymbolicName(), "TestBundleManagedServiceDeadlock");
         b.Stop();
       }
     }

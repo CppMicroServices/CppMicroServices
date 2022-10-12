@@ -26,7 +26,7 @@ Deprecated
 Fixed
 -----
 
-` v3.7.4 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (2022-10-12)
+`v3.7.4 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (2022-10-12)
 ---------------------------------------------------------------------------------------------------------
 
 `Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...development>`_

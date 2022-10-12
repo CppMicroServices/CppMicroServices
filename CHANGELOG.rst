@@ -26,6 +26,38 @@ Deprecated
 Fixed
 -----
 
+` v3.7.4 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (2022-10-12)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...development>`_
+
+General Note
+------------
+This entry in the change log captures the changes that were made between v3.7.3 and v3.7.4
+
+Added
+-----
+
+Changed
+-------
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Declarative Services] Revert PR 713 <https://github.com/CppMicroServices/CppMicroServices/pull/744>`_
+- `[ConfigurationAdmin] Factory Configuration Bug Fix <https://github.com/CppMicroServices/CppMicroServices/pull/731>`_
+- `[Declarative Services] Improve error messages for  ComponentInstance constructor <https://github.com/CppMicroServices/CppMicroServices/pull/724>`_
+- `[Configuration Admin] Fix race that results in missed config updated event <https://github.com/CppMicroServices/CppMicroServices/pull/727>`_
+- `[Core Framework] Fix sporadic race conditions during framework shutdown <https://github.com/CppMicroServices/CppMicroServices/pull/725>`_
+- `[CA and DS] Add missing include file to fix minimum gcc compiler error <https://github.com/CppMicroServices/CppMicroServices/pull/721>`_
+- `[Declarative Services] Factory instance name should use component name  <https://github.com/CppMicroServices/CppMicroServices/pull/720>`_
+
+
 
 `v3.7.2 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.7.2>`_ (2022-06-16)
 ---------------------------------------------------------------------------------------------------------

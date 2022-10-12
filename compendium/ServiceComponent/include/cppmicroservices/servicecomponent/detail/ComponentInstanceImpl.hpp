@@ -417,10 +417,11 @@ public:
   {
     static_assert(
       std::is_default_constructible<C>::value,
-      "Default Constructor or Constructor with AnyMap input parameter "
-      "expected when injection is false. This error happens when an "
-      "appropriate constructor is not available or when the class being "
-      "validated is not a complete type.");
+      "An appropriate constructor was not found "
+      "and/or the service implementation does not implement all of the "
+      "service interface's methods. A default constructor or a constructor "
+      "with an AnyMap input parameter for the configuration properties is "
+      "required when inject-references is false. ");
     return nullptr;
   }
 
@@ -442,9 +443,12 @@ public:
     static_assert(
       std::is_constructible<C,
                             const std::shared_ptr<CtorInjectedRefs>&...>::value,
-      "Suitable constructor not found for constructor injection. "
-      "This error happens when an appropriate constructor is not available "
-      "or when the class being validated is not a complete type.");
+      "An appropriate constructor was not found "
+      "and/or the service implementation does not implement all of the "
+      "service interface's methods. A constructor with service reference "
+      "input parameters or a constructor with an AnyMap input parameter for "
+      "configuration properties and service reference input parameters is "
+      "required when inject-references is true. ");
     return nullptr;
   }
 

@@ -876,7 +876,8 @@ public:
     // For the Removed operations, the properties are empty.
     if (props.empty()) {
       auto ctx = m_framework.GetBundleContext();
-      auto bundles = ctx.GetBundles();
+      auto bundles =
+        ctx.GetBundles(PathToLib("TestBundleManagedServiceDeadlock"));
       for (auto& b : bundles) {
         b.Stop();
       }

@@ -450,8 +450,8 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
     }
 
     // Check the cache
-    const auto &c = ref_any_cast<std::vector<std::string>>(
-      props->Value(Constants::OBJECTCLASS));
+    const auto& c = ref_any_cast<std::vector<std::string>>(
+      props->ValueByRef(Constants::OBJECTCLASS));
     for (auto& objClass : c) {
       AddToSet_unlocked(set, receivers, OBJECTCLASS_IX, objClass);
     }

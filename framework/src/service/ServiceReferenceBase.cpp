@@ -35,7 +35,8 @@ namespace cppmicroservices {
 
 ServiceReferenceBase::ServiceReferenceBase()
   : d(new ServiceReferenceBasePrivate(nullptr))
-{}
+{
+}
 
 ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
   : d(ref.d.load())
@@ -45,7 +46,8 @@ ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
 
 ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
   : d(new ServiceReferenceBasePrivate(reg))
-{}
+{
+}
 
 void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 {
@@ -59,12 +61,7 @@ void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 
 ServiceReferenceBase::operator bool() const
 {
-  auto p = d.load();
-  if (p->registration == nullptr) {
-    return false;
-  }
-
-  return (!p->registration->bundle.expired());
+  return static_cast<bool>(GetBundle());
 }
 
 ServiceReferenceBase& ServiceReferenceBase::operator=(std::nullptr_t)
@@ -148,22 +145,20 @@ bool ServiceReferenceBase::operator<(
   {
     auto l1 = d.load()->registration->properties.Lock();
     US_UNUSED(l1);
-    const Any &anyR1 =
-      d.load()
-        ->registration->properties.Value(Constants::SERVICE_RANKING);
+    const Any& anyR1 =
+      d.load()->registration->properties.ValueByRef(Constants::SERVICE_RANKING);
     assert(anyR1.Empty() || anyR1.Type() == typeid(int));
-    const Any &anyId1 = d.load()
-               ->registration->properties.Value(Constants::SERVICE_ID);
+    const Any& anyId1 =
+      d.load()->registration->properties.ValueByRef(Constants::SERVICE_ID);
     assert(anyId1.Empty() || anyId1.Type() == typeid(long int));
 
     auto l2 = reference.d.load()->registration->properties.Lock();
     US_UNUSED(l2);
-    const Any &anyR2 =
-      reference.d.load()
-        ->registration->properties.Value(Constants::SERVICE_RANKING);
+    const Any& anyR2 = reference.d.load()->registration->properties.ValueByRef(
+      Constants::SERVICE_RANKING);
     assert(anyR2.Empty() || anyR2.Type() == typeid(int));
-    const Any &anyId2 = reference.d.load()
-               ->registration->properties.Value(Constants::SERVICE_ID);
+    const Any& anyId2 = reference.d.load()->registration->properties.ValueByRef(
+      Constants::SERVICE_ID);
     assert(anyId2.Empty() || anyId2.Type() == typeid(long int));
     const int r1 = anyR1.Empty() ? 0 : *any_cast<int>(&anyR1);
     const int r2 = anyR2.Empty() ? 0 : *any_cast<int>(&anyR2);

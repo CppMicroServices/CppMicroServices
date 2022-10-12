@@ -326,13 +326,14 @@ bool ServiceRegistrationBase::operator<(const ServiceRegistrationBase& o) const
   if (!d)
     return true;
 
+  ServiceReferenceBase sr1;
+  ServiceReferenceBase sr2;
   {
-    auto l1 = d->Lock();
-    US_UNUSED(l1);
-    auto l2 = o.d->Lock();
-    US_UNUSED(l2);
-    return d->reference < o.d->reference;
+    d->Lock(), sr1 = d->reference;
+    o.d->Lock(), sr2 = o.d->reference;
   }
+
+  return sr1 < sr2;
 }
 
 bool ServiceRegistrationBase::operator==(

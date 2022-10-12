@@ -29,11 +29,11 @@
 #include <tuple>
 #include <vector>
 
+#include "Binders.hpp"
 #include "ComponentInstance.hpp"
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 
-#include "Binders.hpp"
-#include "cppmicroservices/AnyMap.h"
 
 namespace cppmicroservices {
 namespace service {

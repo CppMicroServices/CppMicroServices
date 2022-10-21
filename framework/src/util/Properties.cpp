@@ -158,7 +158,8 @@ std::pair<Any, bool> Properties::Value_unlocked(const std::string& key,
   }
 }
 
-const Any& Properties::ValueByRef(const std::string& key, bool matchCase) const
+const Any& Properties::ValueByRef_unlocked(const std::string& key,
+                                           bool matchCase) const
 {
   if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
     if (auto itr = props.findUOCI_TypeChecked(key);

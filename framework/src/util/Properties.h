@@ -45,7 +45,8 @@ public:
   std::pair<Any, bool> Value_unlocked(const std::string& key,
                                       bool matchCase = false) const;
 
-  const Any& ValueByRef(const std::string& key, bool matchCase = false) const;
+  const Any& ValueByRef_unlocked(const std::string& key,
+                                 bool matchCase = false) const;
 
   std::vector<std::string> Keys_unlocked() const;
 

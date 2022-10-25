@@ -194,7 +194,8 @@ public:
    */
   std::shared_future<void> NotifyConfigurationRemoved(
     const std::string& pid,
-    std::uintptr_t configurationId) override;
+    std::uintptr_t configurationId,
+    unsigned long changeCount) override;
 
   // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedService
   std::shared_ptr<

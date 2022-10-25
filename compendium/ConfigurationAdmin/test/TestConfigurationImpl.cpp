@@ -69,7 +69,7 @@ TEST(TestConfigurationImpl, ThrowsWhenRemoved)
   ConfigurationImpl conf{ mockConfigAdmin.get(), pid, factoryPid, props };
   EXPECT_CALL(
     *mockConfigAdmin,
-    NotifyConfigurationRemoved(pid, reinterpret_cast<std::uintptr_t>(&conf)))
+    NotifyConfigurationRemoved(pid, reinterpret_cast<std::uintptr_t>(&conf), testing::_))
     .Times(1);
   EXPECT_NO_THROW(conf.Remove());
   EXPECT_THROW(conf.GetPid(), std::runtime_error);
@@ -95,7 +95,7 @@ TEST(TestConfigurationImpl, NoCallbacksAfterInvalidate)
   std::string factoryPid{ "test" };
   ConfigurationImpl conf{ mockConfigAdmin.get(), pid, factoryPid, props };
   EXPECT_CALL(*mockConfigAdmin,
-              NotifyConfigurationRemoved(testing::_, testing::_))
+              NotifyConfigurationRemoved(testing::_, testing::_, testing::_))
     .Times(0);
   EXPECT_CALL(*mockConfigAdmin, NotifyConfigurationUpdated(testing::_, testing::_))
     .Times(0);
@@ -164,7 +164,7 @@ TEST(TestConfigurationImpl, VerifyRemoveWithoutNotificationIfChangeCountEquals)
   std::string factoryPid{ "test" };
   ConfigurationImpl conf{ mockConfigAdmin.get(), pid, factoryPid, props };
   EXPECT_CALL(*mockConfigAdmin,
-              NotifyConfigurationRemoved(testing::_, testing::_))
+              NotifyConfigurationRemoved(testing::_, testing::_, testing::_))
     .Times(0);
   EXPECT_FALSE(conf.RemoveWithoutNotificationIfChangeCountEquals(0ul));
   EXPECT_TRUE(conf.RemoveWithoutNotificationIfChangeCountEquals(1ul));

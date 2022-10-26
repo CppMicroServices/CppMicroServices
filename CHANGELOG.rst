@@ -34,6 +34,12 @@ Fixed
 General Note
 ------------
 This entry in the change log captures the changes that were made between v3.7.3 and v3.7.4
+ The following PR's were not included in this release
+651 Configuration Admin fix deadlock and double update.
+717 Remove automatic configuration object creation
+714 ServiceTracker GetTrackingCount when opened and closed
+725 Fixed sporadic race conditions during framework shutdown
+727 Fix race that results in a missed config updated event
 
 Added
 -----
@@ -49,11 +55,10 @@ Deprecated
 
 Fixed
 -----
+- `[Declarative Services] Fixed ConfigurationAdminImpl::RemoveConfigurations deadlock <https://github.com/CppMicroServices/CppMicroServices/pull/745>`_
 - `[Declarative Services] Revert PR 713 <https://github.com/CppMicroServices/CppMicroServices/pull/744>`_
 - `[ConfigurationAdmin] Factory Configuration Bug Fix <https://github.com/CppMicroServices/CppMicroServices/pull/731>`_
 - `[Declarative Services] Improve error messages for  ComponentInstance constructor <https://github.com/CppMicroServices/CppMicroServices/pull/724>`_
-- `[Configuration Admin] Fix race that results in missed config updated event <https://github.com/CppMicroServices/CppMicroServices/pull/727>`_
-- `[Core Framework] Fix sporadic race conditions during framework shutdown <https://github.com/CppMicroServices/CppMicroServices/pull/725>`_
 - `[CA and DS] Add missing include file to fix minimum gcc compiler error <https://github.com/CppMicroServices/CppMicroServices/pull/721>`_
 - `[Declarative Services] Factory instance name should use component name  <https://github.com/CppMicroServices/CppMicroServices/pull/720>`_
 

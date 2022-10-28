@@ -245,16 +245,18 @@ bool BundleResourceContainer::Matches(const std::string& name,
                                       const std::string& filePattern) const
 {
   // short-cut
-  if (filePattern == "*")
+  if (filePattern == "*") {
     return true;
+  }
 
   std::stringstream ss(filePattern);
   std::string tok;
   std::size_t pos = 0;
   while (std::getline(ss, tok, '*')) {
     std::size_t index = name.find(tok, pos);
-    if (index == std::string::npos)
+    if (index == std::string::npos) {
       return false;
+    }
     pos = index + tok.size();
   }
   return true;
@@ -268,6 +270,10 @@ void BundleResourceContainer::OpenAndInitializeContainer() const
 
     InitSortedEntries();
     if (m_SortedToplevelDirs.empty()) {
+      // This is not a file containing a valid bundle
+      // so make sure we clean up and close the file handle.
+      mz_zip_reader_end(&m_ZipArchive);
+      m_ObjFile.reset();
       throw std::runtime_error("Invalid zip archive layout for bundle at " +
                                m_Location);
     }

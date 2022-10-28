@@ -88,6 +88,11 @@ public:
     return lastUpdatedChangeCountPerPid[pid] < changeCount;
   }
 
+  void removeLastUpdatedChangeCount(const std::string& pid) noexcept {
+    std::unique_lock<std::mutex> lock(updatedChangeCountMutex);
+    (void)lastUpdatedChangeCountPerPid.erase(pid);
+  }
+
 private:
   std::string pid;
   std::shared_ptr<TrackedServiceType> trackedService;

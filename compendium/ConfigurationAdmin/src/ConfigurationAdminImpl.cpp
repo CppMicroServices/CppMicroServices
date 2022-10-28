@@ -625,7 +625,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
                                properties,
                                *logger);
           if (removed) {
-            managedServiceWrapper->setLastUpdatedChangeCount(pid, 0);
+            managedServiceWrapper->removeLastUpdatedChangeCount(pid);
           } else {
             managedServiceWrapper->setLastUpdatedChangeCount(pid, changeCount);
           }
@@ -650,8 +650,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
               pid,
               *(managedServiceFactoryWrapper->getTrackedService()),
               *logger);
-            managedServiceFactoryWrapper->setLastUpdatedChangeCount(
-              pid, 0);
+            managedServiceFactoryWrapper->removeLastUpdatedChangeCount(pid);
           } else if (managedServiceFactoryWrapper->needsAnUpdateNotification(
                        pid, changeCount)) {
             notifyServiceUpdated(

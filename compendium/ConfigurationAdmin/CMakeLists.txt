@@ -43,7 +43,7 @@ usMacroCreateBundle(ConfigurationAdmin
   SYMBOLIC_NAME configuration_admin
   EMBED_RESOURCE_METHOD LINK
   PRIVATE_INCLUDE_DIRS src/util src/service src/bundle ../third_party
-  LINK_LIBRARIES ${_link_libraries} usLogService usAsyncWorkService
+  LINK_LIBRARIES ${_link_libraries} usAsyncWorkService
   PUBLIC_HEADERS ${_ca_public_headers}
   PRIVATE_HEADERS ${_ca_private_headers}
   SOURCES $<TARGET_OBJECTS:ConfigurationAdminObjs> src/CMActivator.cpp

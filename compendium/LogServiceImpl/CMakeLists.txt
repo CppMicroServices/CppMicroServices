@@ -35,7 +35,7 @@ usMacroCreateBundle(LogServiceImpl
   SYMBOLIC_NAME log_service
   EMBED_RESOURCE_METHOD LINK
   PRIVATE_INCLUDE_DIRS src/util src/service src/bundle ../third_party
-  LINK_LIBRARIES ${_link_libraries} usLogService
+  LINK_LIBRARIES ${_link_libraries}
   PUBLIC_HEADERS ${_public_headers}
   PRIVATE_HEADERS ${_hdrs}
   SOURCES ${_srcs} src/Activator.cpp

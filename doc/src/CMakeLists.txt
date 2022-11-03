@@ -199,7 +199,7 @@ if(US_BUILD_TESTING)
                COMMAND ${MAKE_COMMAND})
       set_tests_properties(MakefileExampleTest PROPERTIES
                            DEPENDS "MakefileExampleCleanTest;InstallTest"
-                           ENVIRONMENT "CppMicroServices_ROOT=${CppMicroServices_BINARY_DIR}/install_test${CMAKE_INSTALL_PREFIX};US_CXX_FLAGS=${US_CXX_FLAGS};US_CPPMICROSERVICES_TARGET=$<TARGET_FILE:CppMicroServices>;US_CXX=${CMAKE_CXX_COMPILER}")
+                           ENVIRONMENT "CppMicroServices_ROOT=${CppMicroServices_BINARY_DIR}/install_test${CMAKE_INSTALL_PREFIX};CPPMICROSERVICES_MAJOR_VER=${CppMicroServices_VERSION_MAJOR};US_CXX_FLAGS=${US_CXX_FLAGS};US_CPPMICROSERVICES_TARGET=$<TARGET_FILE:CppMicroServices>;US_CXX=${CMAKE_CXX_COMPILER}")
       list(APPEND _doc_code_tests MakefileExampleCleanTest MakefileExampleTest)
     endif()
   endif()

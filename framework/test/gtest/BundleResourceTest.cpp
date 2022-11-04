@@ -512,3 +512,49 @@ TEST_F(BundleResourceTest, testSpecialCharacters)
   ASSERT_TRUE(rs.eof());
   ASSERT_EQ(content, fileData);
 }
+
+class BundleResourceDataOnlyTest : public ::testing::Test
+{
+protected:
+  Framework framework;
+  BundleContext context;
+
+public:
+  BundleResourceDataOnlyTest()
+    : framework(FrameworkFactory().NewFramework())
+  {}
+  ~BundleResourceDataOnlyTest() override = default;
+
+  void SetUp() override
+  {
+    framework.Start();
+    context = framework.GetBundleContext();
+    ASSERT_TRUE(context);
+  }
+
+  void TearDown() override
+  {
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+  }
+};
+
+TEST_F(BundleResourceDataOnlyTest, TestResourceContainerGetsOpened)
+{
+  cppmicroservices::AnyMap fakeManifest(
+    AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  cppmicroservices::AnyMap manifestForTestBundleR(
+    AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  manifestForTestBundleR["bundle.symbolic_name"] = std::string("TestBundleR");
+  fakeManifest["TestBundleR"] = manifestForTestBundleR;
+
+  // Install bundle with fake manifest cache entry
+  auto testBundle =
+    cppmicroservices::testing::InstallLib(context, "TestBundleR", fakeManifest);
+  ASSERT_TRUE(testBundle);
+
+  // Try to get resource, should not throw and resources should be returend.
+  auto resources = testBundle.FindResources("icons", "*", true);
+  ASSERT_FALSE(resources.empty());
+  ASSERT_EQ(resources.size(), 3);
+}

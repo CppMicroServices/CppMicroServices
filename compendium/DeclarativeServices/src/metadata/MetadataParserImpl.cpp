@@ -137,6 +137,7 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
   compMetadata->name = compMetadata->implClassName;
   ObjectValidator(metadata, "name", /*isOptional=*/true)
     .AssignValueTo(compMetadata->name);
+  compMetadata->instanceName = compMetadata->name;
 
   // component.configuration-policy (Optional)
   compMetadata->configurationPolicy = CONFIG_POLICY_IGNORE;

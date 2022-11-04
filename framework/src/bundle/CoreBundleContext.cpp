@@ -33,6 +33,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "cppmicroservices/util/FileSystem.h"
 #include "cppmicroservices/util/String.h"
 
+#include "BundleContextPrivate.h"
 #include "BundleStorageMemory.h"
 #include "BundleUtils.h"
 #include "FrameworkPrivate.h"
@@ -86,13 +87,14 @@ std::unordered_map<std::string, Any> InitProperties(
 
 CoreBundleContext::CoreBundleContext(
   const std::unordered_map<std::string, Any>& props,
-  std::ostream* logger)
+  std::ostream* diagLogger)
   : id(globalId++)
   , frameworkProperties(InitProperties(props))
   , workingDir(ref_any_cast<std::string>(
       frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
   , listeners(this)
   , services(this)
+  , logger(std::make_shared<cppmicroservices::cfrimpl::CFRLogger>())
   , serviceHooks(this)
   , bundleHooks(this)
   , bundleRegistry(this)
@@ -102,7 +104,7 @@ CoreBundleContext::CoreBundleContext(
 {
   auto enableDiagLog =
     any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
-  std::ostream* diagnosticLogger = (logger) ? logger : &std::clog;
+  std::ostream* diagnosticLogger = (diagLogger) ? diagLogger : &std::clog;
   sink = std::make_shared<detail::LogSink>(diagnosticLogger, enableDiagLog);
   systemBundle = std::shared_ptr<FrameworkPrivate>(new FrameworkPrivate(this));
   DIAG_LOG(*sink) << "created";
@@ -175,6 +177,8 @@ void CoreBundleContext::Init()
 
   bundleRegistry.Load();
 
+  logger->Open();
+
   std::string execPath;
   try {
     execPath = util::GetExecutablePath();
@@ -218,6 +222,7 @@ void CoreBundleContext::Init()
 void CoreBundleContext::Uninit0()
 {
   DIAG_LOG(*sink) << "uninit";
+  logger->Close();
   serviceHooks.Close();
   systemBundle->UninitSystemBundle();
 }

@@ -20,15 +20,15 @@
 
   =============================================================================*/
 
-#include "ConfigurationNotifier.hpp"
 #include "../ComponentRegistry.hpp"
 #include "../metadata/ComponentMetadata.hpp"
 #include "ComponentConfigurationImpl.hpp"
 #include "ComponentManagerImpl.hpp"
+#include "ConfigurationNotifier.hpp"
+#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
-#include "cppmicroservices/SecurityException.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -136,11 +136,10 @@ bool ConfigurationNotifier::AnyListenersForPid(const std::string& pid) noexcept
       return false;
     }
   } //release listenersMapHandle lock
-  CreateFactoryComponent(factoryName, pid, mgr);
+  CreateFactoryComponent(pid, mgr);
   return true;
 }
 void ConfigurationNotifier::CreateFactoryComponent(
-  const std::string& factoryName,
   const std::string& pid,
   std::shared_ptr<ComponentConfigurationImpl>& mgr)
 {
@@ -155,7 +154,7 @@ void ConfigurationNotifier::CreateFactoryComponent(
   // component except the factory component itself.
   newMetadata->configurationPids.clear();
   for (const auto& basePid : oldMetadata->configurationPids) {
-    if (basePid != factoryName) {
+    if (basePid != oldMetadata->configurationPids[0])  {
       newMetadata->configurationPids.emplace_back(basePid);
     }
   }
@@ -200,18 +199,14 @@ void ConfigurationNotifier::NotifyAllListeners(
   ConfigChangeNotification notification =
     ConfigChangeNotification(pid, std::move(properties), std::move(type));
 
-  std::shared_ptr<TokenMap> listenersMapCopy;
-  {
-    auto listenersMapHandle = listenersMap.lock();
-    auto iter = listenersMapHandle->find(pid);
-    if (iter != listenersMapHandle->end()) {
-      listenersMapCopy = iter->second;
-    } else {
-      return;
+  auto listenersMapHandle = listenersMap.lock();
+  auto iter = listenersMapHandle->find(pid);
+  if (iter != listenersMapHandle->end()) {
+    for (const auto& configListenerPtr : *(iter->second)) {
+      configListenerPtr.second.notify(notification);
     }
-  }
-  for (const auto& configListenerPtr : *listenersMapCopy) {
-    configListenerPtr.second.notify(notification);
+  } else {
+    return;
   }
 }
 

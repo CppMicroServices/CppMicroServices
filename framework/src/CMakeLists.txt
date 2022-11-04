@@ -5,6 +5,7 @@
 set(_srcs
   util/Any.cpp
   util/AnyMap.cpp
+  util/CFRLogger.cpp
   util/Framework.cpp
   util/FrameworkEvent.cpp
   util/FrameworkFactory.cpp
@@ -14,6 +15,7 @@ set(_srcs
   util/LDAPFilter.cpp
   util/LDAPProp.cpp
   util/Properties.cpp
+  util/PropsCheck.cpp
   util/SecurityException.cpp
   util/SharedLibrary.cpp
   util/SharedLibraryException.cpp
@@ -62,8 +64,10 @@ set(_srcs
 
 set(_private_headers
   util/FrameworkPrivate.h
+  util/CFRLogger.h
   util/LDAPExpr.h
   util/Properties.h
+  util/PropsCheck.h
   util/Utils.h
 
   service/ServiceHooks.h
@@ -89,4 +93,3 @@ set(_private_headers
   bundle/CoreBundleContext.h
   bundle/Resolver.h
 )
-

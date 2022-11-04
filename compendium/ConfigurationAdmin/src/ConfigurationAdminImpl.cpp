@@ -217,11 +217,11 @@ ConfigurationAdminImpl::~ConfigurationAdminImpl()
     if (managedService) {
       // can only send a Removed notification if the managedService has previously
       // received an Updated notification.
-      const auto it = configurationsToInvalidate.find(managedService->pid);
+      const auto it = configurationsToInvalidate.find(managedService->getPid());
       if (it != std::end(configurationsToInvalidate) &&
           it->second->HasBeenUpdatedAtLeastOnce()) {
-          notifyServiceUpdated(managedService->pid,
-                               *(managedService->trackedService),
+          notifyServiceUpdated(managedService->getPid(),
+                               *(managedService->getTrackedService()),
                                emptyMap,
                                *logger);
       }
@@ -233,7 +233,7 @@ ConfigurationAdminImpl::~ConfigurationAdminImpl()
     if (!managedServiceFactory) {
       continue;
     }
-    auto it = factoryInstancesCopy.find(managedServiceFactory->pid);
+    auto it = factoryInstancesCopy.find(managedServiceFactory->getPid());
     if (it == std::end(factoryInstancesCopy)) {
       continue;
     }
@@ -244,7 +244,7 @@ ConfigurationAdminImpl::~ConfigurationAdminImpl()
       const auto it = configurationsToInvalidate.find(pid);
       if (it != std::end(configurationsToInvalidate) && (it->second->HasBeenUpdatedAtLeastOnce())) {
            notifyServiceRemoved(
-            pid, *(managedServiceFactory->trackedService), *logger);
+            pid, *(managedServiceFactory->getTrackedService()), *logger);
       }
     }
   }
@@ -345,7 +345,9 @@ ConfigurationAdminImpl::ListConfigurations(const std::string& filter)
     if (filter.empty()) {
       result.reserve(configurations.size());
       for (const auto& it : configurations) {
-        result.push_back(it.second);
+        if (it.second->HasBeenUpdatedAtLeastOnce()) {
+          result.push_back(it.second);
+        }
       }
       return result;
     }
@@ -357,12 +359,16 @@ ConfigurationAdminImpl::ListConfigurations(const std::string& filter)
     };
 
     for (const auto& it : configurations) {
+      // configurations that have not yet been updated cannot be
+      // returned.
+      if (!it.second->HasBeenUpdatedAtLeastOnce()) {
+        continue;
+      }
       /* Create an AnyMap containing the pid or factoryPid so that the ldap filter 
-	 * functionality can be used to match the pid to the 
-	 * input parameter. Easy way to do the comparison since input parameter could 
-	 * contain a regular expression 
-	 */
-
+	   * functionality can be used to match the pid to the 
+	   * input parameter. Easy way to do the comparison since input parameter could 
+	   * contain a regular expression 
+	   */
       pidMap["pid"] = it.first;
 
       if (ldap.Match(pidMap)) {
@@ -386,20 +392,26 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
   std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs;
   std::vector<bool> createdOrUpdated;
   std::vector<std::shared_ptr<ConfigurationImpl>> configurationsToInvalidate;
-  unsigned long changeCount{ 0u };
+  
   {
     std::lock_guard<std::mutex> lk{ configurationsMutex };
     for (const auto& configMetadata : configurationMetadata) {
+      unsigned long changeCount{ 0ul };
       auto& pid = configMetadata.pid;
       auto it = configurations.find(pid);
       if (it == std::end(configurations)) {
         auto factoryPid = getFactoryPid(pid);
         AddFactoryInstanceIfRequired(pid, factoryPid);
+        // construct the Configuration Object with a changeCount of 1 
+        // since configuration objects created from metadata already
+        // have their properties (if any) present. The create operation
+        // counts as a create and an update operation.
         auto newConfig = std::make_shared<ConfigurationImpl>(
                            this,
                            pid,
                            std::move(factoryPid),
-                           std::move(configMetadata.properties));
+                           configMetadata.properties,
+                           1u);
         changeCount = newConfig->GetChangeCount();
         it = configurations
                .emplace(pid,
@@ -427,7 +439,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
       {
         configurationsToInvalidate.push_back(std::move(it->second));
         it->second = std::make_shared<ConfigurationImpl>(
-          this, pid, getFactoryPid(pid), std::move(configMetadata.properties));
+          this, pid, getFactoryPid(pid), configMetadata.properties);
         pidsAndChangeCountsAndIDs.emplace_back(
           pid, changeCount, reinterpret_cast<std::uintptr_t>(it->second.get()));
         createdOrUpdated.push_back(true);
@@ -442,7 +454,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
   for (const auto& pidAndChangeCountAndID : pidsAndChangeCountsAndIDs) {
     const auto& pid = pidAndChangeCountAndID.pid;
     if (createdOrUpdated[idx]) {
-      NotifyConfigurationUpdated(pid);
+      NotifyConfigurationUpdated(pid, pidAndChangeCountAndID.changeCount);
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                   "AddConfigurations: Created or Updated Configuration "
                   "instance with PID " +
@@ -513,7 +525,7 @@ void ConfigurationAdminImpl::RemoveConfigurations(
     const auto& pid = pidAndChangeCountAndID.pid;
     if (removedAndUpdated[idx].first) {
       if (removedAndUpdated[idx].second) {
-        NotifyConfigurationUpdated(pid);
+        NotifyConfigurationUpdated(pid, pidAndChangeCountAndID.changeCount);
       }
       logger->Log(
         cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
@@ -527,59 +539,69 @@ void ConfigurationAdminImpl::RemoveConfigurations(
     }
     ++idx;
   }
-  WaitForAllAsync();
 }
 
 std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
-  const std::string& pid)
+  const std::string& pid, const unsigned long changeCount)
 {
-  // NotifyConfigurationUpdated will only send a notification to the service if 
+  // NotifyConfigurationUpdated will only send a notification to the service if
   // the configuration object has been updated at least once. In order to determine whether or not
   // a configuration object has been updated, it calls the HasBeenUpdatedAtLeastOnce method for
-  // the configuration object. For a remove operation the configuration object 
+  // the configuration object. For a remove operation the configuration object
   // is not available and that method cannot be called. For this reason, NotifyConfigurationUpdated
   // should not be called for Remove operations unless the caller has already confirmed
-  // the configuration object has been updated at least once. 
-  return PerformAsync([this, pid] {
+  // the configuration object has been updated at least once.
+  return PerformAsync([this, pid, changeCount] {
     AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
     std::string fPid;
     std::string nonFPid;
     auto removed = false;
     auto hasBeenUpdated = false;
+    std::vector<std::shared_ptr<
+      TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>>
+      managedServiceWrappers;
+    std::vector<std::shared_ptr<TrackedServiceWrapper<
+      cppmicroservices::service::cm::ManagedServiceFactory>>>
+      managedServiceFactoryWrappers;
     {
       std::lock_guard<std::mutex> lk{ configurationsMutex };
       const auto it = configurations.find(pid);
       if (it == std::end(configurations)) {
         removed = true;
         hasBeenUpdated = true;
-       } else {
+      } else {
         try {
-           hasBeenUpdated = it->second->HasBeenUpdatedAtLeastOnce();
-           properties = it->second->GetProperties();
-       } catch (const std::runtime_error&) {
+          hasBeenUpdated = it->second->HasBeenUpdatedAtLeastOnce();
+          properties = it->second->GetProperties();
+        } catch (const std::runtime_error&) {
           // Configuration is being removed
           removed = true;
         }
       }
+
+      // We can only send update notifications for configuration objects that have
+      // been updated. Just return without sending the notification for objects
+      // that have not yet been updated.
+      if (!hasBeenUpdated) {
+        return;
+      }
+
+      if (pid.find('~') != std::string::npos) {
+        //this is a factory pid
+        fPid = pid;
+      } else {
+        nonFPid = pid;
+      }
+      managedServiceWrappers = trackedManagedServices_;
+      managedServiceFactoryWrappers = trackedManagedServiceFactories_;
     }
-    // We can only send update notifications for configuration objects that have
-    // been updated. Just return without sending the notification for objects
-    // that have not yet been updated. 
-    if (!hasBeenUpdated) {
-      return;
-    }
-    if (pid.find('~') != std::string::npos) {
-      //this is a factory pid
-      fPid = pid;
-    } else {
-      nonFPid = pid;
-    }
-    const auto configurationListeners = configListenerTracker.GetServices();
+
     auto type =
       removed
         ? cppmicroservices::service::cm::ConfigurationEventType::CM_DELETED
         : cppmicroservices::service::cm::ConfigurationEventType::CM_UPDATED;
 
+    auto configurationListeners = configListenerTracker.GetServices();
     auto configAdminRef = cmContext.GetServiceReference<ConfigurationAdmin>();
     for (const auto& it : configurationListeners) {
       auto configEvent = cppmicroservices::service::cm::ConfigurationEvent(
@@ -587,49 +609,55 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
       it->configurationEvent((configEvent));
     }
 
-    const auto managedServiceWrappers = managedServiceTracker.GetServices();
-    const auto it = std::find_if(
-      std::begin(managedServiceWrappers),
-      std::end(managedServiceWrappers),
-      [&pid](const auto& managedServiceWrapper) {
+    std::for_each(
+      managedServiceWrappers.begin(),
+      managedServiceWrappers.end(),
+      [&](const auto& managedServiceWrapper) {
         // The ServiceTracker will return a default constructed shared_ptr for each ManagedService
         // that we aren't tracking. We must be careful not to dereference these!
-        return (managedServiceWrapper ? (pid == managedServiceWrapper->pid)
-                                      : false);
+        if ((managedServiceWrapper) &&
+            (managedServiceWrapper->getPid() == pid) &&
+            (removed ||
+             (!removed && managedServiceWrapper->needsAnUpdateNotification(
+                            pid, changeCount)))) {
+          notifyServiceUpdated(pid,
+                               *(managedServiceWrapper->getTrackedService()),
+                               properties,
+                               *logger);
+          managedServiceWrapper->setLastUpdatedChangeCount(pid, changeCount);
+        }
       });
-    if (it != std::end(managedServiceWrappers)) {
-      const auto& managedServiceWrapper = *it;
-      notifyServiceUpdated(
-        pid, *(managedServiceWrapper->trackedService), properties, *logger);
-    }
+
     const auto factoryPid = getFactoryPid(pid);
     if (factoryPid.empty()) {
       return;
     }
-    const auto managedServiceFactoryWrappers =
-      managedServiceFactoryTracker.GetServices();
-    const auto factoryIt = std::find_if(
-      std::begin(managedServiceFactoryWrappers),
-      std::end(managedServiceFactoryWrappers),
-      [&factoryPid](const auto& managedServiceFactoryWrapper) {
+
+    std::for_each(
+      managedServiceFactoryWrappers.begin(),
+      managedServiceFactoryWrappers.end(),
+      [&](const auto& managedServiceFactoryWrapper) {
         // The ServiceTracker will return a default constructed shared_ptr for each ManagedServiceFactory
         // that we aren't tracking. We must be careful not to dereference these!
-        return (managedServiceFactoryWrapper
-                  ? (factoryPid == managedServiceFactoryWrapper->pid)
-                  : false);
+        if ((managedServiceFactoryWrapper) &&
+            (managedServiceFactoryWrapper->getPid() == factoryPid)) {
+          if (removed) {
+            notifyServiceRemoved(
+              pid,
+              *(managedServiceFactoryWrapper->getTrackedService()),
+              *logger);
+          } else if (managedServiceFactoryWrapper->needsAnUpdateNotification(
+                       pid, changeCount)) {
+            notifyServiceUpdated(
+              pid,
+              *(managedServiceFactoryWrapper->getTrackedService()),
+              properties,
+              *logger);
+            managedServiceFactoryWrapper->setLastUpdatedChangeCount(
+              pid, changeCount);
+          }
+        }
       });
-    if (factoryIt != std::end(managedServiceFactoryWrappers)) {
-      const auto& managedServiceFactoryWrapper = *factoryIt;
-      if (removed) {
-        notifyServiceRemoved(
-          pid, *(managedServiceFactoryWrapper->trackedService), *logger);
-      } else {
-        notifyServiceUpdated(pid,
-                             *(managedServiceFactoryWrapper->trackedService),
-                             properties,
-                             *logger);
-      }
-    }
   });
 }
 
@@ -663,7 +691,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(
     RemoveFactoryInstanceIfRequired(pid);
   }
   if (configurationToInvalidate && hasBeenUpdated) {
-    auto removeFuture = NotifyConfigurationUpdated(pid);
+    auto removeFuture = NotifyConfigurationUpdated(pid, 0);
     // This functor will run on another thread. Just being overly cautious to guarantee that the
     // ConfigurationImpl which has called this method doesn't run its own destructor.
     PerformAsync(
@@ -684,11 +712,20 @@ ConfigurationAdminImpl::AddingService(
   const ServiceReference<cppmicroservices::service::cm::ManagedService>&
     reference)
 {
+  // GetService can cause entry into user code, so don't hold a lock.
+  auto managedService = cmContext.GetService(reference);
+  if (!managedService) {
+    logger->Log(SeverityLevel::LOG_WARNING,
+                "Ignoring ManagedService as a valid service could not be "
+                "obtained from the BundleContext");
+    return nullptr;
+  }
+
   // Lock the configurations repository so no configuration objects can be
   // added or removed while AddingService is processing the new service.
   std::lock_guard<std::mutex> lk{ configurationsMutex };
- 
-  const auto pid = getPidFromServiceReference(reference);
+
+  auto pid = getPidFromServiceReference(reference);
   if (pid.empty()) {
     const auto bundle = reference.GetBundle();
     const auto serviceID = std::to_string(cppmicroservices::any_cast<long>(
@@ -700,60 +737,54 @@ ConfigurationAdminImpl::AddingService(
         " as it does not have a service.pid or component.name property");
     return nullptr;
   }
-  auto managedService = cmContext.GetService(reference);
-  if (!managedService) {
-    logger->Log(SeverityLevel::LOG_DEBUG,
-                "Ignoring ManagedService as a valid service could not be "
-                "obtained from the BundleContext");
-    return nullptr;
-  }
-  // Ensure there's a Configuration for this PID if one doesn't exist already.
 
-  const auto it = configurations.find(pid);
-  if (it == std::end(configurations)) {
-    auto factoryPid = getFactoryPid(pid);
-    AddFactoryInstanceIfRequired(pid, factoryPid);
-    configurations.emplace(
-        pid,
-        std::make_shared<ConfigurationImpl>(
-          this,
-          pid,
-          std::move(factoryPid),
-          AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
-	// According to OSGI, creating a new Configuration object must not initiate a callback to the 
-	// Managed Service updated method until the properties are set in the Configuration with the 
-	// update method. Return here without sending notification.
-    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                  "New ManagedService with PID " + pid);
-    return std::make_shared<
-        TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>(
-        pid, std::move(managedService));  
-  }
   // Send a notification in case a valid configuration object 
   // was created before the service was active. The service's properties
   // need to be updated. 
-  AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
+  unsigned long initialChangeCount{0ul};
 
-  if (it != std::end(configurations)) {
-    try {
-      properties = it->second->GetProperties();
-    } catch (const std::runtime_error&) {
-      // Configuration is being removed
-    }
+  if (const auto it = configurations.find(pid); it != std::end(configurations)) {
+    AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
     // Only send notifications for configuration objects that have been
-    // Updated. 
+    // Updated.
     if (it->second->HasBeenUpdatedAtLeastOnce()) {
+      try {
+        properties = it->second->GetProperties();
+	// specifically set the initial change count here because there is
+        // a race between the call to GetChangeCount() and HasBeenUpdatedAtLeastOnce().
+        // The logic is that, if HasBeenUpdatedAtLeastOnce() returns true, the change
+        // count will always be > 1 and should at this point be captured for the
+        // tracked object to eliminate redundant config updates.
+        initialChangeCount = it->second->GetChangeCount();
+      } catch (const std::runtime_error&) {
+        // Configuration is being removed
+        logger->Log(SeverityLevel::LOG_WARNING,
+                    "Attempted to retrieve properties from a configuration "
+                    "which has been removed.",
+                    std::current_exception());
+      }
+
       PerformAsync([this, pid, managedService, properties] {
         notifyServiceUpdated(pid, *managedService, properties, *logger);
       });
+
+      logger->Log(
+        cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+        "Async configuration update queued for new ManagedService with PID " +
+          pid + ".");
     }
   }
+
   logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
               "New ManagedService with PID " + pid +
-                " has been added, and async Update has been queued.");
-  return std::make_shared<
+                " has been added.");
+
+  std::unordered_map<std::string, unsigned long> initialChangeCountByPid = {{pid, initialChangeCount}};
+  auto trackedManagedService = std::make_shared<
     TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>(
-    pid, std::move(managedService));
+        pid, std::move(initialChangeCountByPid), std::move(managedService));
+  trackedManagedServices_.emplace_back(trackedManagedService);
+  return trackedManagedService;
 }
 
 void ConfigurationAdminImpl::ModifiedService(
@@ -772,9 +803,21 @@ void ConfigurationAdminImpl::RemovedService(
     TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>&
     service)
 {
-  // No need to do anything other than log; ManagedService just won't receive any more updates to its Configuration.
+  // Lock because we are modifying the container of tracked managed services.
+  std::lock_guard<std::mutex> lk{ configurationsMutex };
+
+  auto elemIter = std::find_if(
+    std::begin(trackedManagedServices_),
+    std::end(trackedManagedServices_),
+    [&service](const auto& trackedServiceWrapper) {
+      return (service->getTrackedService() == trackedServiceWrapper->getTrackedService());
+    });
+  if (elemIter != trackedManagedServices_.end()) {
+    trackedManagedServices_.erase(elemIter);
+  }
+  // ManagedService won't receive any more updates to its Configuration.
   logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-              "ManagedService with PID " + service->pid + " has been removed.");
+              "ManagedService with PID " + service->getPid() + " has been removed.");
 }
 
 std::shared_ptr<
@@ -783,10 +826,18 @@ ConfigurationAdminImpl::AddingService(
   const ServiceReference<cppmicroservices::service::cm::ManagedServiceFactory>&
     reference)
 {
+  // GetService can cause entry into user code, so don't hold a lock.
+  auto managedServiceFactory = cmContext.GetService(reference);
+  if (!managedServiceFactory) {
+    logger->Log(SeverityLevel::LOG_DEBUG,
+                "Ignoring ManagedServiceFactory as a valid service could not "
+                "be obtained from the BundleContext");
+    return nullptr;
+  }
 
   std::lock_guard<std::mutex> lk{ configurationsMutex };
 
-  const auto pid = getPidFromServiceReference(reference);
+  auto pid = getPidFromServiceReference(reference);
   if (pid.empty()) {
     const auto bundle = reference.GetBundle();
     const auto serviceID = std::to_string(cppmicroservices::any_cast<long>(
@@ -797,15 +848,10 @@ ConfigurationAdminImpl::AddingService(
         (bundle ? bundle.GetSymbolicName() : "Unknown") +
         " as it does not have a service.pid or component.name property");
     return nullptr;
-  }
-  auto managedServiceFactory = cmContext.GetService(reference);
-  if (!managedServiceFactory) {
-    logger->Log(SeverityLevel::LOG_DEBUG,
-                "Ignoring ManagedServiceFactory as a valid service could not "
-                "be obtained from the BundleContext");
-    return nullptr;
-  }
+  }  
+
   std::vector<std::pair<std::string, AnyMap>> pidsAndProperties;
+  std::unordered_map<std::string, unsigned long> initialChangeCountPerPid;
 
   const auto it = factoryInstances.find(pid);
   if (it != std::end(factoryInstances)) {
@@ -814,15 +860,20 @@ ConfigurationAdminImpl::AddingService(
       assert(configurationIt != std::end(configurations) &&
              "Invalid Configuration iterator");
       try {
-        auto properties = configurationIt->second->GetProperties();
         // Notifications can only be sent for configuration objects that 
         // been Updated. Only add it to the notification list if it has
         // been Updated.
         if (configurationIt->second->HasBeenUpdatedAtLeastOnce()) {
+          auto properties = configurationIt->second->GetProperties();
+          initialChangeCountPerPid[configurationIt->second->GetPid()] = configurationIt->second->GetChangeCount();
           pidsAndProperties.emplace_back(instance, std::move(properties));
         }
       } catch (const std::runtime_error&) {
         // Configuration is being removed
+        logger->Log(
+          SeverityLevel::LOG_WARNING,
+          "Attempted to retrieve properties for a configuration which has been removed.",
+          std::current_exception());
       }
     }
   }
@@ -837,13 +888,16 @@ ConfigurationAdminImpl::AddingService(
       }
     });
   }
+
   logger->Log(
     cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
     "New ManagedServiceFactory with PID " + pid +
       " has been added, and async Update has been queued for all updated instances.");
-  return std::make_shared<TrackedServiceWrapper<
+  auto trackedManagedServiceFactory = std::make_shared<TrackedServiceWrapper<
     cppmicroservices::service::cm::ManagedServiceFactory>>(
-    pid, std::move(managedServiceFactory));
+        pid, std::move(initialChangeCountPerPid), std::move(managedServiceFactory));
+  trackedManagedServiceFactories_.emplace_back(trackedManagedServiceFactory);
+  return trackedManagedServiceFactory;
 }
 
 void ConfigurationAdminImpl::ModifiedService(
@@ -861,9 +915,22 @@ void ConfigurationAdminImpl::RemovedService(
   const std::shared_ptr<TrackedServiceWrapper<
     cppmicroservices::service::cm::ManagedServiceFactory>>& service)
 {
-  // No need to do anything other than log; ManagedServiceFactory just won't receive any more updates to any of its Configurations.
+  // Lock because we are modifying the container of tracked managed services.
+  std::lock_guard<std::mutex> lk{ configurationsMutex };
+
+  auto elemIter = std::find_if(
+    std::begin(trackedManagedServiceFactories_),
+    std::end(trackedManagedServiceFactories_),
+    [&service](const auto& trackedServiceWrapper) {
+      return (service->getTrackedService() == trackedServiceWrapper->getTrackedService());
+    });
+  if (elemIter != trackedManagedServiceFactories_.end()) {
+    trackedManagedServiceFactories_.erase(elemIter);
+  }
+
+  // ManagedServiceFactory won't receive any more updates to any of its Configurations.
   logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-              "ManagedServiceFactory with PID " + service->pid +
+              "ManagedServiceFactory with PID " + service->getPid() +
                 " has been removed.");
 }
 
@@ -878,7 +945,7 @@ std::shared_future<void> ConfigurationAdminImpl::PerformAsync(Functor&& f)
     [this, func = std::forward<Functor>(f), id]() mutable {
       // func() can throw, make sure that the futures
       // are correctly cleaned up if an exception occurs.
-      detail::ScopeGuard cleanupFutures([this, &id]() {
+      detail::ScopeGuard cleanupFutures([this, id]() {
         std::lock_guard<std::mutex> lk{ futuresMutex };
         auto it = incompleteFutures.find(id);
         assert(it != std::end(incompleteFutures) && "Invalid future iterator");

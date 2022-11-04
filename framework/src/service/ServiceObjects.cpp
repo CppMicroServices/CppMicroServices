@@ -144,8 +144,12 @@ std::shared_ptr<void> ServiceObjectsBase::GetService() const
     return nullptr;
   }
 
-  auto h = std::make_shared<UngetHelper>(
-    interfaceMap, d->m_reference, d->m_context->bundle->shared_from_this());
+  auto bundle_ = d->m_context->bundle.lock();
+  if (!bundle_) {
+    return nullptr;
+  }
+
+  auto h = std::make_shared<UngetHelper>(interfaceMap, d->m_reference, bundle_);
   auto deleter =
     h->interfaceMap->find(d->m_reference.GetInterfaceId())->second.get();
   return std::shared_ptr<void>(h, deleter);
@@ -162,12 +166,17 @@ InterfaceMapConstPtr ServiceObjectsBase::GetServiceInterfaceMap() const
   // There are some circumstances that will cause the interfaceMap to be empty
   // like when another thread has unregistered the service.
   if (!interfaceMap) {
-      return result;
+    return result;
   }
   result = std::make_shared<const InterfaceMap>(*(interfaceMap.get()));
 
-  std::shared_ptr<UngetHelper> h(new UngetHelper{
-    result, d->m_reference, d->m_context->bundle->shared_from_this() });
+  auto bundle_ = d->m_context->bundle.lock();
+  if (!bundle_) {
+    return nullptr;
+  }
+
+  std::shared_ptr<UngetHelper> h(
+    new UngetHelper{ result, d->m_reference, bundle_ });
   return InterfaceMapConstPtr(h, h->interfaceMap.get());
 }
 
@@ -176,23 +185,23 @@ ServiceReferenceBase ServiceObjectsBase::GetReference() const
   return d->m_reference;
 }
 
-ServiceObjectsBase::ServiceObjectsBase(ServiceObjectsBase&& other)
+ServiceObjectsBase::ServiceObjectsBase(ServiceObjectsBase&& other) noexcept
   : d(std::move(other.d))
 {}
 
 ServiceObjectsBase::~ServiceObjectsBase() = default;
 
-ServiceObjectsBase& ServiceObjectsBase::operator=(ServiceObjectsBase&& other)
+ServiceObjectsBase& ServiceObjectsBase::operator=(ServiceObjectsBase&& other) noexcept
 {
   d = std::move(other.d);
   return *this;
 }
 
-ServiceObjects<void>::ServiceObjects(ServiceObjects&& other)
+ServiceObjects<void>::ServiceObjects(ServiceObjects&& other) noexcept
   : ServiceObjectsBase(std::move(other))
 {}
 
-ServiceObjects<void>& ServiceObjects<void>::operator=(ServiceObjects&& other)
+ServiceObjects<void>& ServiceObjects<void>::operator=(ServiceObjects&& other) noexcept
 {
   ServiceObjectsBase::operator=(std::move(other));
   return *this;

@@ -290,19 +290,54 @@ TEST_F(TestConfigurationAdminImpl, VerifyListConfigurations)
   const auto conf1 = configAdmin.GetConfiguration(pid1);
   const auto conf2 = configAdmin.GetConfiguration(pid2);
 
+  auto props1 = conf1->GetProperties();
+  props1["foo"] = std::string{ "baz" };
+  EXPECT_NO_THROW(conf1->Update(props1).get());
+
   auto props2 = conf2->GetProperties();
   props2["foo"] = std::string{ "bar" };
-  std::shared_future<void> fut;
-  EXPECT_NO_THROW(fut = conf2->Update(props2));
-  fut.get();
+  EXPECT_NO_THROW(conf2->Update(props2).get());
+
   const auto res1 = configAdmin.ListConfigurations();
   const auto res2 = configAdmin.ListConfigurations("(foo=bar)");
   const auto res3 = configAdmin.ListConfigurations("(foobar=baz)");
 
-  EXPECT_EQ(res1.size(), 2);
-  EXPECT_EQ(res2.size(), 1);
+  EXPECT_EQ(res1.size(), 2ul);
+  EXPECT_EQ(res2.size(), 1ul);
   EXPECT_EQ(res2[0]->GetPid(), pid2);
   EXPECT_TRUE(res3.empty());
+
+  // ListConfigurations can return empty config objects (those with no properties) but
+  // only if the configuration has been updated at least once. Nothing should
+  // be returned here because the configuration object has not been updated.
+  const auto emptyConfig = configAdmin.GetConfiguration("test.pid.emptyconfig");
+  const auto emptyConfigResult =
+    configAdmin.ListConfigurations("(pid=test.pid.emptyconfig)");
+  EXPECT_TRUE(emptyConfigResult.empty());
+
+  // ListConfigurations can return empty config objects (those with no properties) but
+  // only if the configuration has been updated at least once. In this example,
+  // only two configurations have been updated at least once.
+  const auto allConfigsResult = configAdmin.ListConfigurations();
+  EXPECT_EQ(allConfigsResult.size(), 2ul);
+
+  //ListConfigurations should return empty config objects if the config
+  //object was defined in a manifest.json file and added using AddConfigurations.
+  //Adding a configuration object this way counts as a create and update operation.
+  std::vector<metadata::ConfigurationMetadata> configs;
+  configs.push_back(metadata::ConfigurationMetadata(
+    "test.pid3", AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
+  auto result = configAdmin.AddConfigurations(std::move(configs));
+  auto allConfigs = configAdmin.ListConfigurations();
+  EXPECT_EQ(allConfigs.size(), 3ul);
+
+  //If the properties for a configuration object are removed, ListConfigurations
+  //should still include that configuration object in the result list.
+  cppmicroservices::AnyMap props(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  EXPECT_NO_THROW(conf1->Update(props).get());
+  allConfigs = configAdmin.ListConfigurations();
+  EXPECT_EQ(allConfigs.size(), 3ul);
 }
 
 TEST_F(TestConfigurationAdminImpl, VerifyAddConfigurations)

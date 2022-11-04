@@ -25,12 +25,12 @@
 
 #include "cppmicroservices/FrameworkConfig.h"
 
-#include "absl/strings/string_view.h"
-
 #include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
+
+#include "cppmicroservices/AnyMap.h"
 
 namespace cppmicroservices {
 
@@ -122,6 +122,12 @@ public:
   //! Evaluate this LDAP filter.
   bool Evaluate(const PropertiesHandle& p, bool matchCase) const;
 
+  // Evaluate this LDAP filter directly on an AnyMap rather than a PropertiesHandle.
+  //
+  // This function was added as an optimization since passing an AnyMap to the constructor of a
+  // PropertiesHandle causes unnecessary copies to occurr.
+  bool Evaluate(const AnyMap& p, bool matchCase) const;
+
   //!
   const std::string ToString() const;
 
@@ -154,20 +160,20 @@ private:
                            const std::string& s) const;
 
   //!
-  static bool CompareString(const absl::string_view s1,
+  static bool CompareString(const std::string_view s1,
                             int op,
-                            const absl::string_view s2);
+                            const std::string_view s2);
 
   //!
-  static std::string FixupString(const absl::string_view s);
+  static std::string FixupString(const std::string_view s);
 
   //!
-  static bool PatSubstr(const absl::string_view s, const absl::string_view pat);
+  static bool PatSubstr(const std::string_view s, const std::string_view pat);
 
   //!
-  static bool PatSubstr(const absl::string_view s,
+  static bool PatSubstr(const std::string_view s,
                         int si,
-                        const absl::string_view pat,
+                        const std::string_view pat,
                         int pi);
 
   //! Shared pointer

@@ -72,8 +72,12 @@ Properties ServiceRegistry::CreateServiceProperties(
       std::make_pair(Constants::SERVICE_SCOPE, Constants::SCOPE_SINGLETON));
   }
 
+<<<<<<< HEAD
   return Properties(std::move(props));
 // PropertiesHandle(Properties(std::move(props)), false)->JSON_unlocked();
+=======
+  return Properties(AnyMap(std::move(props)));
+>>>>>>> origin/development
 }
 
 ServiceRegistry::ServiceRegistry(CoreBundleContext* coreCtx)
@@ -274,10 +278,11 @@ void ServiceRegistry::RemoveServiceRegistration_unlocked(
   {
     auto l2 = sr.d->properties.Lock();
     US_UNUSED(l2);
-    assert(sr.d->properties.Value_unlocked(Constants::OBJECTCLASS).Type() ==
-           typeid(std::vector<std::string>));
+    assert(
+      sr.d->properties.Value_unlocked(Constants::OBJECTCLASS).first.Type() ==
+      typeid(std::vector<std::string>));
     classes = ref_any_cast<std::vector<std::string>>(
-      sr.d->properties.Value_unlocked(Constants::OBJECTCLASS));
+      sr.d->properties.Value_unlocked(Constants::OBJECTCLASS).first);
   }
   services.erase(sr);
   serviceRegistrations.erase(
@@ -301,8 +306,10 @@ void ServiceRegistry::GetRegisteredByBundle(
   US_UNUSED(l);
 
   for (auto& sr : serviceRegistrations) {
-    if (sr.d->bundle == p) {
-      res.push_back(sr);
+    if (auto bundle_ = sr.d->bundle.lock()) {
+      if (bundle_.get() == p) {
+        res.push_back(sr);
+      }
     }
   }
 }

@@ -105,6 +105,7 @@ public:
     test::InstallLib(context, "TestBundleDSCA12");
     test::InstallLib(context, "TestBundleDSCA16");
     test::InstallLib(context, "TestBundleDSCA20");
+    test::InstallLib(context, "TestBundleDSCA21");
     test::InstallLib(context, "TestBundleDSCA24");
     test::InstallLib(context, "TestBundleDSCA26");
     test::InstallLib(context, "TestBundleDSCA27");
@@ -167,6 +168,21 @@ public:
     }
     return context.GetService<T>(instanceRef);
   }
+
+  template<class T>
+    std::vector<std::shared_ptr<T>> GetInstances()
+    {
+      std::vector<cppmicroservices::ServiceReference<T>> instanceRefs;
+      std::vector<std::shared_ptr<T>> instances;
+      instanceRefs = context.GetServiceReferences<T>();
+      if (instanceRefs.empty()) {
+        return std::vector<std::shared_ptr<T>>();
+      }
+      for (const auto& ref : instanceRefs) {
+        instances.push_back(context.GetService<T>(ref));
+      }
+      return instances;
+    }
 
   std::vector<scr::dto::ComponentConfigurationDTO> GetComponentConfigs(
     const cppmicroservices::Bundle& testBundle,

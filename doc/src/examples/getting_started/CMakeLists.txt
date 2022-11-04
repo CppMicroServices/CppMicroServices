@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.17)
+
 # [proj-begin]
 project(CppMicroServicesGettingStarted)
 
@@ -5,6 +7,19 @@ find_package(CppMicroServices REQUIRED)
 # [proj-end]
 
 include(GenerateExportHeader)
+
+# Detect "local" build (build from getting started directory)
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  # Set binary and library output directories
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+  set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries")
+  set(US_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+
+  set(CMAKE_ENABLE_EXPORTS ON)
+endif()
 
 # [interface-begin]
 #=========================================================
@@ -127,8 +142,8 @@ if(NOT BUILD_SHARED_LIBS)
   usFunctionGetResourceSource(TARGET GettingStarted OUT _srcs)
 endif()
 
-add_executable(GettingStarted ${_srcs})
-
+add_executable(GettingStarted)
+target_sources(GettingStarted PRIVATE ${_srcs})
 target_link_libraries(GettingStarted CppMicroServices)
 
 if(NOT BUILD_SHARED_LIBS)

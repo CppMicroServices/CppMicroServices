@@ -180,6 +180,7 @@ public:
    * the Framework properties, the method returns an empty \c Any.
    *
    * @param key The name of the requested property.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @return The value of the requested property, or an empty \c Any if the
    *         property is undefined.
    */
@@ -188,6 +189,7 @@ public:
   /**
    * Returns all known properties.
    *
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @return A map of all framework properties.
    */
   AnyMap GetProperties() const;
@@ -445,7 +447,7 @@ public:
    *         search.
    * @throws std::invalid_argument If the specified <code>filter</code>
    *         contains an invalid filter expression that cannot be parsed.
-   * @throws std::logic_error If this BundleContext is no longer valid.
+   * @throws std::runtime_error If this BundleContext is no longer valid.
    * @throws ServiceException If the service interface id of \c S is empty, see @ref gr_serviceinterface.
    *
    * @see GetServiceReferences(const std::string&, const std::string&)
@@ -641,6 +643,9 @@ public:
   template<class S>
   ServiceObjects<S> GetServiceObjects(const ServiceReference<S>& reference)
   {
+    if (!d) {
+      throw std::runtime_error("The bundle context is no longer valid");
+    }
     return ServiceObjects<S>(d, reference);
   }
 

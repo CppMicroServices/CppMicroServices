@@ -21,6 +21,7 @@
 =============================================================================*/
 
 #include "ServiceRegistrationBasePrivate.h"
+#include "BundlePrivate.h"
 
 #include <utility>
 
@@ -32,12 +33,12 @@
 namespace cppmicroservices {
 
 ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
-  BundlePrivate* bundle,
+  BundlePrivate* bundle_,
   InterfaceMapConstPtr service,
   Properties&& props)
   : ref(0)
   , service(std::move(service))
-  , bundle(bundle)
+  , bundle(bundle_->shared_from_this())
   , reference(this)
   , properties(std::move(props))
   , available(true)

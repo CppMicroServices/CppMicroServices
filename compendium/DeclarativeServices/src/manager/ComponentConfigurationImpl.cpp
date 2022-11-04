@@ -23,9 +23,9 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/SecurityException.h"
 
-#include "ComponentConfigurationImpl.hpp"
 #include "../ConfigurationListenerImpl.hpp"
 #include "BundleLoader.hpp"
+#include "ComponentConfigurationImpl.hpp"
 #include "ComponentManager.hpp"
 #include "ConfigurationManager.hpp"
 #include "ReferenceManager.hpp"
@@ -197,8 +197,33 @@ void ComponentConfigurationImpl::Initialize()
         configListenerTokens.emplace_back(listenerToken);
       }
       configManager->Initialize();
-      if (referenceManagers.empty() && configManager->IsConfigSatisfied()) {
+      if (AreReferencesSatisfied() && configManager->IsConfigSatisfied()) {
         GetState()->Register(*this);
+      }
+      // For factory components, see if any configuration objects for factory instances
+      // were created before the factory component was started. If so, create the factory
+      // component instances.
+      if (!metadata->factoryComponentID.empty()) {
+        auto sr = this->bundle.GetBundleContext().GetServiceReference<
+            cppmicroservices::service::cm::ConfigurationAdmin>();
+        if (!sr) {
+          throw std::runtime_error("ComponentConfigurationImpl - Could not get "
+              "ConfigurationAdmin service reference");
+        }
+        auto configAdmin =
+           this->bundle.GetBundleContext()
+            .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
+        if (!configAdmin) {
+          throw std::runtime_error("ComponentConfigurationImpl - Could not get "
+                                   "ConfigurationAdmin service");
+        }
+        auto configs = configAdmin->ListConfigurations("(pid=" + metadata->configurationPids[0] + "~*)");
+        std::shared_ptr<ComponentConfigurationImpl> mgr = shared_from_this();
+        if (!configs.empty()) {
+          for (const auto& config : configs) {
+            configNotifier->CreateFactoryComponent(config->GetPid(), mgr);
+          }
+        }
       }
     }
   }
@@ -393,7 +418,7 @@ bool ComponentConfigurationImpl::Modified()
 
 ComponentState ComponentConfigurationImpl::GetConfigState() const
 {
-   return GetState()->GetValue();
+  return GetState()->GetValue();
 }
 
 bool ComponentConfigurationImpl::CompareAndSetState(
@@ -413,20 +438,10 @@ ComponentConfigurationImpl::GetState() const
 void ComponentConfigurationImpl::LoadComponentCreatorDestructor()
 {
   if (newCompInstanceFunc == nullptr || deleteCompInstanceFunc == nullptr) {
-    auto compName = GetMetadata()->name;
-    auto position = compName.find("~");
-
-    if ((position != std::string::npos)) {
-      // this is a factory pid. Use implementation class
-      // instead of name to construct the instance.
-      compName = GetMetadata()->implClassName;
-    } else {
-      compName = GetMetadata()->name.empty() ? GetMetadata()->implClassName
-                                             : GetMetadata()->name;
-    }
-
+    auto instanceName = GetMetadata()->instanceName;
+    
     std::tie(newCompInstanceFunc, deleteCompInstanceFunc) =
-      GetComponentCreatorDeletors(compName, GetBundle());
+      GetComponentCreatorDeletors(instanceName, GetBundle(), logger);
   }
 }
 
@@ -444,10 +459,11 @@ ComponentConfigurationImpl::CreateAndActivateComponentInstanceHelper(
 {
   Any func = this->bundle.GetBundleContext().GetProperty(
     cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
-  
+
   try {
-    if (!func.Empty() && !any_cast<std::function<bool(const cppmicroservices::Bundle&)>>(
-                           func)(this->bundle)) {
+    if (!func.Empty() &&
+        !any_cast<std::function<bool(const cppmicroservices::Bundle&)>>(func)(
+          this->bundle)) {
       std::string errMsg("Bundle at location ");
       errMsg += this->bundle.GetLocation();
       errMsg += " failed bundle validation.";
@@ -456,8 +472,9 @@ ComponentConfigurationImpl::CreateAndActivateComponentInstanceHelper(
   } catch (const cppmicroservices::SecurityException&) {
     throw;
   } catch (...) {
-    throw SecurityException{ "The bundle validation callback threw an exception",
-                             this->bundle };
+    throw SecurityException{
+      "The bundle validation callback threw an exception", this->bundle
+    };
   }
 
   auto componentInstance = CreateComponentInstance();

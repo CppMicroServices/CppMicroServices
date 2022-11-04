@@ -48,6 +48,7 @@ as specified in the OSGi R4.2 specifications.
 
 #include "BundleHooks.h"
 #include "BundleRegistry.h"
+#include "CFRLogger.h"
 #include "Resolver.h"
 #include "ServiceHooks.h"
 #include "ServiceListeners.h"
@@ -68,6 +69,18 @@ class FrameworkPrivate;
 class CoreBundleContext
 {
 public:
+  /**
+  * Please note: The order of the member variables in this class is important. When the 
+  * CoreBundleContext object is destroyed, it will call the destructors for the member 
+  * variables in the reverse order in which they are listed here. For example, serviceHooks 
+  * will be destroyed before the logger. The logger will be destroyed before the listeners, etc. 
+  * 
+  * The logger has a ServiceTracker member variable. When it is destroyed, the ServiceTracker::Close
+  * method is called to remove the ServiceListener. The logger object must be destroyed before the 
+  * listeners member variable is destroyed because when the listeners member variable is destroyed 
+  * it leaves the ServiceListeners data structures in an unusable state. If the logger object 
+  * destructor runs after the listeners object destructor, it results in an access violation. 
+  */
   /**
    * Framework id.
    */
@@ -97,7 +110,7 @@ public:
   */
   std::shared_ptr<detail::LogSink> sink;
 
-  /**
+   /**
    * Bundle Storage
    */
   std::unique_ptr<BundleStorage> storage;
@@ -116,6 +129,13 @@ public:
    * All registered services in this framework.
    */
   ServiceRegistry services;
+
+  /**
+   * A LogService for logging framework messages via
+   * a default or user-provided LogService that are intended to be
+   * visible outside of the framework.
+   */
+  std::shared_ptr<cppmicroservices::cfrimpl::CFRLogger> logger;
 
   /**
    * All service hooks.

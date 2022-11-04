@@ -25,6 +25,7 @@
 
 #include <cstdint>
 #include <future>
+#include <memory>
 #include <mutex>
 #include <random>
 #include <unordered_map>
@@ -49,16 +50,17 @@ namespace cmimpl {
  * A wrapper class used for storing the pid of a given ManagedService or ManagedServiceFactory
  * with the service in the ServiceTracker.
  */
-template<typename T>
+template<typename TrackedServiceType>
 class TrackedServiceWrapper
 {
 public:
-  using TrackedServiceType = T;
 
   TrackedServiceWrapper(std::string trackedPid,
+                        std::unordered_map<std::string, unsigned long> initialChangeCountPerPid,
                         std::shared_ptr<TrackedServiceType> service)
-    : pid(std::move(trackedPid))
-    , trackedService(std::move(service))
+      : pid(std::move(trackedPid))
+      , trackedService(std::move(service))
+      , lastUpdatedChangeCountPerPid(std::move(initialChangeCountPerPid))
   {}
 
   TrackedServiceWrapper(const TrackedServiceWrapper&) = delete;
@@ -68,8 +70,29 @@ public:
 
   explicit operator bool() const { return static_cast<bool>(trackedService); }
 
+  std::string getPid() noexcept {
+    return pid;
+  }
+
+  std::shared_ptr<TrackedServiceType> getTrackedService() noexcept {
+    return trackedService;
+  }
+
+  void setLastUpdatedChangeCount(const std::string& pid, const unsigned long& changeCount) {
+    std::unique_lock<std::mutex> lock(updatedChangeCountMutex);
+    lastUpdatedChangeCountPerPid[pid] = changeCount;
+  }
+
+  bool needsAnUpdateNotification(const std::string& pid, const unsigned long& changeCount) {
+    std::unique_lock<std::mutex> lock(updatedChangeCountMutex);
+    return lastUpdatedChangeCountPerPid[pid] < changeCount;
+  }
+
+private:
   std::string pid;
   std::shared_ptr<TrackedServiceType> trackedService;
+  std::unordered_map<std::string, unsigned long> lastUpdatedChangeCountPerPid; ///< the change count for each pid or factory pid instance
+  std::mutex updatedChangeCountMutex; ///< guard read/write access to lastUpdatedChangeCountPerPid
 };
 
 /**
@@ -124,7 +147,11 @@ public:
                           const std::string& instanceName) override;
 
   /**
-   * Used to list all of the available {@code Configuration} objects.
+   * Used to list all of the {@code Configuration} objects that exist in the
+   * ConfigurationAdmin repository with a pid that matches the filter expression 
+   * (if provided).
+   * All of the {@code Configuration} objects returned have been updated at least
+   * once by ConfigurationAdmin.
    *
    * See {@code ConfigurationAdmin#ListConfigurations}
    */
@@ -156,7 +183,7 @@ public:
    * See {@code ConfigurationAdminPrivate#NotifyConfigurationUpdated}
    */
   std::shared_future<void> NotifyConfigurationUpdated(
-    const std::string& pid) override;
+    const std::string& pid, const unsigned long changeCount) override;
 
   /**
    * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
@@ -246,6 +273,16 @@ private:
   cppmicroservices::ServiceTracker<
     cppmicroservices::service::cm::ConfigurationListener>
     configListenerTracker;
+
+  // used instead of querying the service trackers since a race exists between when the service tracker
+  // adds the tracked service to the internal map and when a client asks the service tracker for the
+  // list of tracked objects.
+  std::vector<std::shared_ptr<
+    TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>>
+    trackedManagedServices_;
+  std::vector<std::shared_ptr<TrackedServiceWrapper<
+    cppmicroservices::service::cm::ManagedServiceFactory>>>
+    trackedManagedServiceFactories_;
 };
 } // cmimpl
 } // cppmicroservices

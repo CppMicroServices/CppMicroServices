@@ -49,7 +49,8 @@ ServiceRegistrationBase::ServiceRegistrationBase(
     ++d->ref;
 }
 
-ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBase&& reg)
+ServiceRegistrationBase::ServiceRegistrationBase(
+  ServiceRegistrationBase&& reg) noexcept
   : d(nullptr)
 {
   std::swap(d, reg.d);
@@ -131,8 +132,10 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
   }
 
   // This calls into service event listener hooks. We must not hold any locks here
-  d->bundle->coreCtx->listeners.GetMatchingServiceListeners(
-    modifiedEndMatchEvent, before);
+  if (auto bundle = d->bundle.lock()) {
+    bundle->coreCtx->listeners.GetMatchingServiceListeners(
+      modifiedEndMatchEvent, before);
+  }
 
   int old_rank = 0;
   int new_rank = 0;
@@ -146,13 +149,14 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
 
     auto l2 = d->properties.Lock();
     US_UNUSED(l2);
+
     auto propsCopy(props);
     propsCopy[Constants::SERVICE_ID] =
-      d->properties.Value_unlocked(Constants::SERVICE_ID);
-    objectClasses = d->properties.Value_unlocked(Constants::OBJECTCLASS);
+      d->properties.Value_unlocked(Constants::SERVICE_ID).first;
+    objectClasses = d->properties.Value_unlocked(Constants::OBJECTCLASS).first;
     propsCopy[Constants::OBJECTCLASS] = objectClasses;
     propsCopy[Constants::SERVICE_SCOPE] =
-      d->properties.Value_unlocked(Constants::SERVICE_SCOPE);
+      d->properties.Value_unlocked(Constants::SERVICE_SCOPE).first;
 
     auto itr = propsCopy.find(Constants::SERVICE_RANKING);
     if (itr != propsCopy.end()) {
@@ -166,27 +170,31 @@ void ServiceRegistrationBase::SetProperties(const ServiceProperties& props)
       }
     }
 
-    auto oldRankAny = d->properties.Value_unlocked(Constants::SERVICE_RANKING);
+    auto oldRankAny =
+      d->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
     if (!oldRankAny.Empty()) {
       // since the old ranking is extracted from existing service properties
       // stored in the service registry, no need to type check before casting
       old_rank = any_cast<int>(oldRankAny);
     }
-    d->properties = Properties(std::move(propsCopy));
+    d->properties = Properties(AnyMap(std::move(propsCopy)));
   }
   if (old_rank != new_rank) {
     auto classes = any_cast<std::vector<std::string>>(objectClasses);
-    d->bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);
+    if (auto bundle = d->bundle.lock()) {
+      bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);
+    }
   }
 
   // Notify listeners, we must not hold any locks here
   ServiceListeners::ServiceListenerEntries matchingListeners;
-  d->bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent,
-                                                            matchingListeners);
-  d->bundle->coreCtx->listeners.ServiceChanged(
-    matchingListeners, modifiedEvent, before);
-
-  d->bundle->coreCtx->listeners.ServiceChanged(before, modifiedEndMatchEvent);
+  if (auto bundle = d->bundle.lock()) {
+    bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent,
+                                                           matchingListeners);
+    bundle->coreCtx->listeners.ServiceChanged(
+      matchingListeners, modifiedEvent, before);
+    bundle->coreCtx->listeners.ServiceChanged(before, modifiedEndMatchEvent);
+  }
 }
 
 void ServiceRegistrationBase::Unregister()
@@ -203,12 +211,14 @@ void ServiceRegistrationBase::Unregister()
   bool isUnregistering(false); // expected state
   if (atomic_compare_exchange_strong(
         &d->unregistering, &isUnregistering, true)) {
-    {
-      auto l1 = d->bundle->coreCtx->services.Lock();
-      US_UNUSED(l1);
-      d->bundle->coreCtx->services.RemoveServiceRegistration_unlocked(*this);
+    if (auto bundle = d->bundle.lock()) {
+      {
+        auto l1 = bundle->coreCtx->services.Lock();
+        US_UNUSED(l1);
+        bundle->coreCtx->services.RemoveServiceRegistration_unlocked(*this);
+      }
+      coreContext = bundle->coreCtx;
     }
-    coreContext = d->bundle->coreCtx;
   }
 
   if (isUnregistering) {
@@ -235,9 +245,11 @@ void ServiceRegistrationBase::Unregister()
     US_UNUSED(l);
     d->available = false;
     auto factoryIter = d->service->find("org.cppmicroservices.factory");
-    if (d->bundle && factoryIter != d->service->end()) {
-      serviceFactory =
-        std::static_pointer_cast<ServiceFactory>(factoryIter->second);
+    if (auto bundle = d->bundle.lock() && factoryIter != d->service->end()) {
+      if (bundle) {
+        serviceFactory =
+          std::static_pointer_cast<ServiceFactory>(factoryIter->second);
+      }
     }
     if (serviceFactory) {
       prototypeServiceInstances = d->prototypeServiceInstances;
@@ -255,12 +267,14 @@ void ServiceRegistrationBase::Unregister()
         } catch (const std::exception& ex) {
           std::string message(
             "ServiceFactory UngetService implementation threw an exception");
-          d->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
-            FrameworkEvent::Type::FRAMEWORK_ERROR,
-            MakeBundle(d->bundle->shared_from_this()),
-            message,
-            std::make_exception_ptr(ServiceException(
-              ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
+          if (auto bundle = d->bundle.lock()) {
+            bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
+              FrameworkEvent::Type::FRAMEWORK_ERROR,
+              MakeBundle(bundle->shared_from_this()),
+              message,
+              std::make_exception_ptr(ServiceException(
+                ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
+          }
         }
       }
     }
@@ -273,12 +287,14 @@ void ServiceRegistrationBase::Unregister()
       } catch (const std::exception& ex) {
         std::string message(
           "ServiceFactory UngetService implementation threw an exception");
-        d->bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
-          FrameworkEvent::Type::FRAMEWORK_ERROR,
-          MakeBundle(d->bundle->shared_from_this()),
-          message,
-          std::make_exception_ptr(ServiceException(
-            ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
+        if (auto bundle = d->bundle.lock()) {
+          bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
+            FrameworkEvent::Type::FRAMEWORK_ERROR,
+            MakeBundle(bundle->shared_from_this()),
+            message,
+            std::make_exception_ptr(ServiceException(
+              ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
+        }
       }
     }
   }
@@ -287,7 +303,7 @@ void ServiceRegistrationBase::Unregister()
     auto l = d->Lock();
     US_UNUSED(l);
 
-    d->bundle = nullptr;
+    d->bundle.reset();
     d->dependents.clear();
     d->service.reset();
     d->prototypeServiceInstances.clear();
@@ -340,7 +356,7 @@ ServiceRegistrationBase& ServiceRegistrationBase::operator=(
 }
 
 ServiceRegistrationBase& ServiceRegistrationBase::operator=(
-  ServiceRegistrationBase&& registration)
+  ServiceRegistrationBase&& registration) noexcept
 {
   if (d && !--d->ref)
     delete d;

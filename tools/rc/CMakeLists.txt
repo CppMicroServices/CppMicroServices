@@ -1,6 +1,9 @@
 
 enable_language(C)
 
+# Temporarily disable enable exports for executables
+set(CMAKE_ENABLE_EXPORTS OFF)
+
 include_directories(../../third_party)
 
 add_definitions(-DUS_RCC_EXECUTABLE_NAME=\"${US_RCC_EXECUTABLE_OUTPUT_NAME}\")
@@ -38,3 +41,6 @@ else()
   # the usResourceCompiler to be built and installed for the target machine.
   export( TARGETS ${US_RCC_EXECUTABLE_TARGET} FILE ${IMPORT_EXECUTABLES} NAMESPACE native-)
 endif()
+
+# Re-enable enable exports for executables after building usResourceCompiler
+set(CMAKE_ENABLE_EXPORTS ON)

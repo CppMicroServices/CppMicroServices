@@ -39,15 +39,13 @@ class Properties : public detail::MultiThreaded<>
 
 public:
   explicit Properties(const AnyMap& props);
+  explicit Properties(AnyMap&& props);
 
-  Properties(Properties&& o);
-  Properties& operator=(Properties&& o);
+  Properties(Properties&& o) noexcept;
+  Properties& operator=(Properties&& o) noexcept;
 
-  Any Value_unlocked(const std::string& key) const;
-  Any Value_unlocked(int index) const;
-
-  int Find_unlocked(const std::string& key) const;
-  int FindCaseSensitive_unlocked(const std::string& key) const;
+  std::pair<Any, bool> Value_unlocked(const std::string& key,
+                                      bool matchCase = false) const;
 
   std::vector<std::string> Keys_unlocked() const;
   jsoncons::json JSON_unlocked() const;
@@ -55,11 +53,31 @@ public:
   void Clear_unlocked();
 
 private:
+<<<<<<< HEAD
   std::vector<std::string> keys;
   std::vector<Any> values;
   jsoncons::json json_props;
+=======
+  // An AnyMap is used to store the properties rather than 2 vectors (one for keys
+  // and the other for values) as previously done in the past. This reduces the number of
+  // copies and allows for finds to leverage a map find vs vector find.
+  AnyMap props;
+
+  // A case-insensitive map which maps all-lowercased keys to the original key values. This
+  // allows for efficient case-insensitive lookups in map types that are not inherently
+  // case insensitive.
+  std::unordered_map<std::string,
+                     std::string_view,
+                     detail::any_map_cihash,
+                     detail::any_map_ciequal>
+    caseInsensitiveLookup;
+>>>>>>> origin/development
 
   static const Any emptyAny;
+
+  // Helper that populates the case-insensitive lookup map when the provided AnyMap is not
+  // already case insensitive.
+  void PopulateCaseInsensitiveLookupMap();
 };
 
 class PropertiesHandle
@@ -68,12 +86,14 @@ public:
   PropertiesHandle(const Properties& props, bool lock)
     : props(props)
     , l(lock ? props.Lock() : Properties::UniqueLock())
-  {}
+  {
+  }
 
-  PropertiesHandle(PropertiesHandle&& o)
+  PropertiesHandle(PropertiesHandle&& o) noexcept
     : props(o.props)
     , l(std::move(o.l))
-  {}
+  {
+  }
 
   const Properties* operator->() const { return &props; }
 

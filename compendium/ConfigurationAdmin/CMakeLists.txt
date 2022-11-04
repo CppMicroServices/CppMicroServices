@@ -37,13 +37,13 @@ add_compile_definitions(BOOST_DATE_TIME_NO_LIB)
 add_compile_definitions(BOOST_REGEX_NO_LIB)
 
 usMacroCreateBundle(ConfigurationAdmin
-  VERSION "1.1.2"
+  VERSION "1.3.3"
   DEPENDS Framework
   TARGET ConfigurationAdmin
   SYMBOLIC_NAME configuration_admin
   EMBED_RESOURCE_METHOD LINK
   PRIVATE_INCLUDE_DIRS src/util src/service src/bundle ../third_party
-  LINK_LIBRARIES ${_link_libraries} usLogService usAsyncWorkService
+  LINK_LIBRARIES ${_link_libraries} usAsyncWorkService
   PUBLIC_HEADERS ${_ca_public_headers}
   PRIVATE_HEADERS ${_ca_private_headers}
   SOURCES $<TARGET_OBJECTS:ConfigurationAdminObjs> src/CMActivator.cpp

@@ -141,9 +141,9 @@ TEST(LDAPExprTest, Compare)
   props["hosed"] = static_cast<long long int>(1);
   ASSERT_TRUE(ldapMatch.Match(props));
   props.clear();
-  props["hosed"] = static_cast<unsigned char>(1);
-  ASSERT_TRUE(ldapMatch.Match(props));
-  props.clear();
+  //  props["hosed"] = static_cast<unsigned char>(1);
+  //  ASSERT_TRUE(ldapMatch.Match(props));
+  //  props.clear();
   props["hosed"] = static_cast<unsigned short>(1);
   ASSERT_TRUE(ldapMatch.Match(props));
   props.clear();

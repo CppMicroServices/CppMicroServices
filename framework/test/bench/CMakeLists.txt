@@ -21,14 +21,12 @@ set(_bench_src
  #  ldapjson.cpp
    ldappropexpr.cpp
    servicequery.cpp
-   jsonfilter.cpp
 )
 
 set(_additional_srcs
   ../util/TestUtilBundleListener.cpp
   ../util/TestUtils.cpp
   ../util/ImportTestBundles.cpp
-  ../util/BundleManifest.cpp
   $<TARGET_OBJECTS:util>
   )
 

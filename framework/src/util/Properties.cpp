@@ -53,7 +53,9 @@ void Properties::PopulateCaseInsensitiveLookupMap()
   }
   
   // jsoncons
-  json_props = jsoncons::json::parse(Any(props).ToJSON());
+  std::stringstream jstr;
+  any_value_to_json(jstr,props);
+  json_props = jsoncons::json::parse(jstr.str());
 }
 
 // NOTE: UNORDERED_MAP_CASEINSENSITIVE_KEYS AnyMaps inherently can never be invalid given that

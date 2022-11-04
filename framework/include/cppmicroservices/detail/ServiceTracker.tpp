@@ -71,7 +71,6 @@ ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
 {}
 
 template<class S, class T>
-<<<<<<< HEAD
 ServiceTracker<S,T>::ServiceTracker(const BundleContext& context,
                                     const JSONFilter& filter,
                                     _ServiceTrackerCustomizer* customizer)
@@ -83,14 +82,6 @@ template<class S, class T>
 ServiceTracker<S,T>::ServiceTracker(const BundleContext& context,
                                     _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, us_service_interface_iid<S>(), customizer))
-=======
-ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
-                                     _ServiceTrackerCustomizer* customizer)
-  : d(new _ServiceTrackerPrivate(this,
-                                 context,
-                                 us_service_interface_iid<S>(),
-                                 customizer))
->>>>>>> origin/development
 {
   std::string clazz = us_service_interface_iid<S>();
   if (clazz.empty()) {
@@ -114,28 +105,16 @@ void ServiceTracker<S, T>::Open()
       return;
     }
 
-<<<<<<< HEAD
    /* DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::Open: " 
 	                                   << ((d->isJSON == false) ? d->filter : d->jsonFilter);
     */
-=======
-    DIAG_LOG(*d->context.GetLogSink())
-      << "ServiceTracker<S,TTT>::Open: " << d->filter;
-
->>>>>>> origin/development
     t.reset(new _TrackedService(this, d->customizer));
     try {
       /* Remove if already exists. No-op if it's an invalid (default) token */
       d->context.RemoveListener(std::move(d->listenerToken));
-<<<<<<< HEAD
       d->listenerToken = d->context.AddServiceListener(std::bind(&_TrackedService::ServiceChanged,
                                                                  t, std::placeholders::_1),
                                                        d->listenerFilter, d->isJSON);
-=======
-      d->listenerToken = d->context.AddServiceListener(
-        std::bind(&_TrackedService::ServiceChanged, t, std::placeholders::_1),
-        d->listenerFilter);
->>>>>>> origin/development
       std::vector<ServiceReference<S>> references;
       if (!d->trackClass.empty()) {
         references = d->GetInitialReferences(d->trackClass, std::string());
@@ -144,16 +123,10 @@ void ServiceTracker<S, T>::Open()
           references.push_back(d->trackReference);
         } else { /* user supplied filter */
           references = d->GetInitialReferences(std::string(),
-<<<<<<< HEAD
                                                (d->listenerFilter.empty() ?
                                                ((d->isJSON == false) ? d->filter.ToString() : d->jsonFilter.ToString())
 											   : d->listenerFilter)
 											   );
-=======
-                                               (d->listenerFilter.empty())
-                                                 ? d->filter.ToString()
-                                                 : d->listenerFilter);
->>>>>>> origin/development
         }
       }
       /* set tracked with the initial references */
@@ -220,13 +193,8 @@ void ServiceTracker<S, T>::Close()
   if (d->context.GetLogSink()->Enabled()) {
     if (!d->cachedReference.Load().GetBundle() &&
         d->cachedService.Load() == nullptr) {
-<<<<<<< HEAD
       /*DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close[cached cleared]:"
                     << ((d->isJSON == false) ? d->filter: d->jsonFilter);*/
-=======
-      DIAG_LOG(*d->context.GetLogSink())
-        << "ServiceTracker<S,TTT>::close[cached cleared]:" << d->filter;
->>>>>>> origin/development
     }
   }
 }
@@ -308,7 +276,6 @@ template<class S, class T>
 ServiceReference<S> ServiceTracker<S, T>::GetServiceReference() const
 {
   ServiceReference<S> reference = d->cachedReference.Load();
-<<<<<<< HEAD
   if (reference.GetBundle())
   {
    /* DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
@@ -316,15 +283,6 @@ ServiceReference<S> ServiceTracker<S, T>::GetServiceReference() const
     return reference;
   }
   //DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference:" << ((d->isJSON == false) ? d->filter : d->jsonFilter);
-=======
-  if (reference.GetBundle()) {
-    DIAG_LOG(*d->context.GetLogSink())
-      << "ServiceTracker<S,TTT>::getServiceReference[cached]:" << d->filter;
-    return reference;
-  }
-  DIAG_LOG(*d->context.GetLogSink())
-    << "ServiceTracker<S,TTT>::getServiceReference:" << d->filter;
->>>>>>> origin/development
   auto references = GetServiceReferences();
   std::size_t length = references.size();
   if (length == 0) { /* if no service is being tracked */
@@ -416,7 +374,6 @@ std::shared_ptr<typename ServiceTracker<S, T>::TrackedParamType>
 ServiceTracker<S, T>::GetService() const
 {
   auto service = d->cachedService.Load();
-<<<<<<< HEAD
   if (service)
   {
    /* DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService[cached]:"
@@ -428,17 +385,6 @@ ServiceTracker<S, T>::GetService() const
    */
   try
   {
-=======
-  if (service) {
-    DIAG_LOG(*d->context.GetLogSink())
-      << "ServiceTracker<S,TTT>::getService[cached]:" << d->filter;
-    return service;
-  }
-  DIAG_LOG(*d->context.GetLogSink())
-    << "ServiceTracker<S,TTT>::getService:" << d->filter;
-
-  try {
->>>>>>> origin/development
     auto reference = GetServiceReference();
     if (!reference.GetBundle()) {
       return std::shared_ptr<TrackedParamType>();

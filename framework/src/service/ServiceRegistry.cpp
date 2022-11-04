@@ -72,12 +72,7 @@ Properties ServiceRegistry::CreateServiceProperties(
       std::make_pair(Constants::SERVICE_SCOPE, Constants::SCOPE_SINGLETON));
   }
 
-<<<<<<< HEAD
-  return Properties(std::move(props));
-// PropertiesHandle(Properties(std::move(props)), false)->JSON_unlocked();
-=======
   return Properties(AnyMap(std::move(props)));
->>>>>>> origin/development
 }
 
 ServiceRegistry::ServiceRegistry(CoreBundleContext* coreCtx)

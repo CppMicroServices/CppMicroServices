@@ -511,7 +511,7 @@ else()
   endif()
 
   foreach(_cxxflag  -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
-		    -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
+		    -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor
 		    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option )
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()

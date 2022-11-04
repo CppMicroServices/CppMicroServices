@@ -53,11 +53,7 @@ public:
   void Clear_unlocked();
 
 private:
-<<<<<<< HEAD
-  std::vector<std::string> keys;
-  std::vector<Any> values;
   jsoncons::json json_props;
-=======
   // An AnyMap is used to store the properties rather than 2 vectors (one for keys
   // and the other for values) as previously done in the past. This reduces the number of
   // copies and allows for finds to leverage a map find vs vector find.
@@ -71,7 +67,6 @@ private:
                      detail::any_map_cihash,
                      detail::any_map_ciequal>
     caseInsensitiveLookup;
->>>>>>> origin/development
 
   static const Any emptyAny;
 

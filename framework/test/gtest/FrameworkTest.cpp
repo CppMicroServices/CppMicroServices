@@ -833,9 +833,6 @@ TEST(FrameworkTest, ConfigurationWithBundleValidation)
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
-<<<<<<< HEAD
-=======
-
 #if defined(US_BUILD_SHARED_LIBS)
 TEST(FrameworkTest, LoadLibraryLogsMessagesTest)
 {
@@ -862,6 +859,4 @@ TEST(FrameworkTest, LoadLibraryLogsMessagesTest)
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
 #endif
-
->>>>>>> origin/development
 US_MSVC_POP_WARNING

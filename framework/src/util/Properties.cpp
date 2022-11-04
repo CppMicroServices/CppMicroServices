@@ -53,31 +53,18 @@ void Properties::PopulateCaseInsensitiveLookupMap()
   }
   
   // jsoncons
-  json_props = jsoncons::json::parse(Any(p).ToJSON());
+  json_props = jsoncons::json::parse(Any(props).ToJSON());
 }
 
-<<<<<<< HEAD
-Properties::Properties(Properties&& o)
-  : keys(std::move(o.keys))
-  , values(std::move(o.values))
-  , json_props(std::move(o.json_props))
-{}
-=======
 // NOTE: UNORDERED_MAP_CASEINSENSITIVE_KEYS AnyMaps inherently can never be invalid given that
 // they can _never_ contain some pair of keys which are only different in case. Because of this,
 // the validation check is not performed on these map types. Additionally, those types of maps
 // are already case insensitive so populating and using the case insensitive lookup map is
 // unnecessary.
->>>>>>> origin/development
-
 Properties::Properties(const AnyMap& p)
-  : props(p)
+  : json_props()
+  , props(p)
 {
-<<<<<<< HEAD
-  keys = std::move(o.keys);
-  values = std::move(o.values);
-  json_props = std::move(o.json_props);
-=======
   if (p.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
     props_check::ValidateAnyMap(p);
 
@@ -86,7 +73,8 @@ Properties::Properties(const AnyMap& p)
 }
 
 Properties::Properties(AnyMap&& p)
-  : props(std::move(p))
+  : json_props()
+  , props(std::move(p))
 {
   if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
     props_check::ValidateAnyMap(props);
@@ -96,7 +84,8 @@ Properties::Properties(AnyMap&& p)
 }
 
 Properties::Properties(Properties&& o) noexcept
-  : props(std::move(o.props))
+  : json_props(std::move(o.json_props))
+  , props(std::move(o.props))
 {
   if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
     PopulateCaseInsensitiveLookupMap();
@@ -109,7 +98,6 @@ Properties& Properties::operator=(Properties&& o) noexcept
   if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
     PopulateCaseInsensitiveLookupMap();
   }
->>>>>>> origin/development
   return *this;
 }
 

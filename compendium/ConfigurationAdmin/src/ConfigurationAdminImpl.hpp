@@ -88,6 +88,11 @@ public:
     return lastUpdatedChangeCountPerPid[pid] < changeCount;
   }
 
+  void removeLastUpdatedChangeCount(const std::string& pid) noexcept {
+    std::unique_lock<std::mutex> lock(updatedChangeCountMutex);
+    (void)lastUpdatedChangeCountPerPid.erase(pid);
+  }
+
 private:
   std::string pid;
   std::shared_ptr<TrackedServiceType> trackedService;
@@ -194,7 +199,8 @@ public:
    */
   std::shared_future<void> NotifyConfigurationRemoved(
     const std::string& pid,
-    std::uintptr_t configurationId) override;
+    std::uintptr_t configurationId,
+    unsigned long changeCount) override;
 
   // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedService
   std::shared_ptr<

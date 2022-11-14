@@ -326,7 +326,7 @@ TEST_F(ConfigAdminTests, testServiceUpdated)
   EXPECT_EQ(service->getCounter(), expectedCount);
 }
 
-TEST_F(ConfigAdminTests, testServiceRemoved)
+TEST_F(ConfigAdminTests, testConfigurationRemoved)
 {
   auto f = GetFramework();
   auto ctx = f.GetBundleContext();
@@ -342,17 +342,14 @@ TEST_F(ConfigAdminTests, testServiceRemoved)
   std::this_thread::sleep_for(DEFAULT_POLL_PERIOD);
   EXPECT_GE(service->getCounter(), 1);
 
-  auto const initConfiguredCount = service->getCounter();
-  int expectedCount = initConfiguredCount;
-
+  auto expectedCount = service->getCounter();
   auto configuration = m_configAdmin->GetConfiguration("cm.testservice");
 
   EXPECT_EQ(service->getCounter(), expectedCount);
 
   // Remove sends an asynchronous notification to the ManagedService so we
   // have to wait until it's finished before checking the result.
-  auto fut = configuration->Remove();
-  fut.get();
+  configuration->Remove().get();
 
   expectedCount -= 1;
   EXPECT_EQ(service->getCounter(), expectedCount);
@@ -528,10 +525,9 @@ TEST_F(ConfigAdminTests, testRemoveFactoryConfiguration)
   auto configuration_config1 =
     m_configAdmin->GetFactoryConfiguration("cm.testfactory", "config1");
 
-  auto fut = configuration_config1->Remove();
-  fut.get();
+  configuration_config1->Remove().get();
 
-  EXPECT_NE(serviceFactory->getRemovedCounter("cm.testfactory~config1"), 0);
+  EXPECT_EQ(serviceFactory->getRemovedCounter("cm.testfactory~config1"), 1);
   EXPECT_EQ(serviceFactory->getRemovedCounter("cm.testfactory~config2"), 0);
 
   // Should create a new configuration
@@ -543,6 +539,14 @@ TEST_F(ConfigAdminTests, testRemoveFactoryConfiguration)
             expectedCount_config1);
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config2"),
             expectedCount_config2);
+
+  cppmicroservices::AnyMap props(
+    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  props["anInt"] = 5;
+  configuration_config1->UpdateIfDifferent(props).second.get();
+  expectedCount_config1 = initConfiguredCount_config1;
+  EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config1"), 7);
+
 }
 // This test confirms that if an object exists in the configuration repository
 // but has not yet been Updated prior to the start of the ManagedServiceFactory

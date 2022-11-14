@@ -105,7 +105,8 @@ public:
    */
   virtual std::shared_future<void> NotifyConfigurationRemoved(
     const std::string& pid,
-    std::uintptr_t configurationId) = 0;
+    std::uintptr_t configurationId,
+    unsigned long changeCount) = 0;
 };
 } // cmimpl
 } // cppmicroservices

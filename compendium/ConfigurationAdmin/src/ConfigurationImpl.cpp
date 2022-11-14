@@ -143,7 +143,7 @@ std::shared_future<void> ConfigurationImpl::Remove()
   std::lock_guard<std::mutex> lk{ configAdminMutex };
   if (configAdminImpl) {
     auto fut = configAdminImpl->NotifyConfigurationRemoved(
-      pid, reinterpret_cast<std::uintptr_t>(this));
+      pid, reinterpret_cast<std::uintptr_t>(this), changeCount);
     configAdminImpl = nullptr;
     return fut;
   }

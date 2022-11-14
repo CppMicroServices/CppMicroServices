@@ -624,7 +624,11 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
                                *(managedServiceWrapper->getTrackedService()),
                                properties,
                                *logger);
-          managedServiceWrapper->setLastUpdatedChangeCount(pid, changeCount);
+          if (removed) {
+            managedServiceWrapper->removeLastUpdatedChangeCount(pid);
+          } else {
+            managedServiceWrapper->setLastUpdatedChangeCount(pid, changeCount);
+          }
         }
       });
 
@@ -646,6 +650,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
               pid,
               *(managedServiceFactoryWrapper->getTrackedService()),
               *logger);
+            managedServiceFactoryWrapper->removeLastUpdatedChangeCount(pid);
           } else if (managedServiceFactoryWrapper->needsAnUpdateNotification(
                        pid, changeCount)) {
             notifyServiceUpdated(
@@ -663,7 +668,8 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
 
 std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(
   const std::string& pid,
-  std::uintptr_t configurationId)
+  std::uintptr_t configurationId,
+  unsigned long changeCount)
 {
   std::promise<void> ready;
   std::shared_future<void> alreadyRemoved = ready.get_future();
@@ -691,7 +697,7 @@ std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationRemoved(
     RemoveFactoryInstanceIfRequired(pid);
   }
   if (configurationToInvalidate && hasBeenUpdated) {
-    auto removeFuture = NotifyConfigurationUpdated(pid, 0);
+    auto removeFuture = NotifyConfigurationUpdated(pid, changeCount);
     // This functor will run on another thread. Just being overly cautious to guarantee that the
     // ConfigurationImpl which has called this method doesn't run its own destructor.
     PerformAsync(

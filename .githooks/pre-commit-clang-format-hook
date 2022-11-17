@@ -28,7 +28,7 @@ if [ "$clangformatoutput" != "" ];
 then
   printf "Error.\n";
   printf "clang-format detected that changes have been made and are not properly formatted!\n"
-  printf "Please run \`git clang-format --staged\`, re-stage modified files, and commit.\n"
+  printf "Please run \`git clang-format --style=file --staged\`, re-stage modified files, and commit.\n"
   exit 1
 else
   printf "Success.\n";

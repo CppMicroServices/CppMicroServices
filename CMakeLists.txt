@@ -28,6 +28,19 @@ foreach(policy ${policies_new})
 endforeach()
 
 #-----------------------------------------------------------------------------
+# Setup git hooks
+#-----------------------------------------------------------------------------
+find_package(Git)
+if (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+  execute_process(COMMAND ${GIT_EXECUTABLE} config core.hooksPath "${PROJECT_SOURCE_DIR}/.githooks"
+                          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                          RESULT_VARIABLE GIT_CONFIGMOD_RESULT)
+  if (NOT GIT_CONFIGMOD_RESULT EQUAL "0")
+    message(WARNING "Command `git config core.hooksPath ${PROJECT_SOURCE_DIR}/.githooks` failed with ${GIT_CONFIGMOD_RESULT}")
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
 # Check minimum required compiler versions
 #------------------------------------------------------------------------------
 

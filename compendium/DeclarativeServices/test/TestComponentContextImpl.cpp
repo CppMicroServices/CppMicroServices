@@ -55,7 +55,8 @@ class ComponentContextImplTest : public ::testing::Test
 protected:
   ComponentContextImplTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   virtual ~ComponentContextImplTest() = default;
 
   virtual void SetUp() { framework.Start(); }

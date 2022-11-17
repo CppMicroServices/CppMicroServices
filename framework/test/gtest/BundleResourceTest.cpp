@@ -52,7 +52,8 @@ protected:
 public:
   BundleResourceTest()
     : framework(FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   ~BundleResourceTest() override = default;
 
   void SetUp() override
@@ -522,7 +523,8 @@ protected:
 public:
   BundleResourceDataOnlyTest()
     : framework(FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   ~BundleResourceDataOnlyTest() override = default;
 
   void SetUp() override

@@ -37,7 +37,8 @@ namespace cppmicroservices {
 
 BundleHooks::BundleHooks(CoreBundleContext* ctx)
   : coreCtx(ctx)
-{}
+{
+}
 
 Bundle BundleHooks::FilterBundle(const BundleContext& context,
                                  const Bundle& bundle) const

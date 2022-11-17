@@ -48,7 +48,8 @@ public:
     , m_StreamBuf(nullptr)
     , m_Plugin(plugin)
     , m_Request(request)
-  {}
+  {
+  }
 
   ~FilteringResponseWrapper() override = default;
 
@@ -98,7 +99,8 @@ void WebConsolePluginTracker::AddPlugin(const std::string& label,
 WebConsolePluginTracker::WebConsolePluginTracker()
   : ServiceTracker<HttpServlet>(GetBundleContext())
   , m_ServletContext(nullptr)
-{}
+{
+}
 
 void WebConsolePluginTracker::Open(
   const std::shared_ptr<ServletContext>& context)

@@ -29,11 +29,13 @@ struct MyTrackingCustomizer
 
   virtual void ModifiedService(const ServiceReference<IFooService>&,
                                const std::shared_ptr<MyTrackedClass>&)
-  {}
+  {
+  }
 
   virtual void RemovedService(const ServiceReference<IFooService>&,
                               const std::shared_ptr<MyTrackedClass>&)
-  {}
+  {
+  }
 };
 //! [customizer]
 
@@ -49,11 +51,13 @@ struct MyTrackingCustomizerVoid
 
   virtual void ModifiedService(const ServiceReferenceU&,
                                const std::shared_ptr<MyTrackedClass>&)
-  {}
+  {
+  }
 
   virtual void RemovedService(const ServiceReferenceU&,
                               const std::shared_ptr<MyTrackedClass>&)
-  {}
+  {
+  }
 };
 
 int main(int /*argc*/, char* /*argv*/[])

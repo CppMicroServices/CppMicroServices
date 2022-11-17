@@ -621,7 +621,7 @@ TEST_F(ServiceFactoryTest, TestServiceFactoryBundleScopeErrorConditions)
 
   //Test that the service object returned is not a nullptr
   ASSERT_NE(nullptr,
-      GetBundleContext().GetService(svcRecursiveGetServiceRefs[0]));
+            GetBundleContext().GetService(svcRecursiveGetServiceRefs[0]));
   //Test that no FrameworkEvent was sent
   ASSERT_TRUE(fwEvents.empty());
 }

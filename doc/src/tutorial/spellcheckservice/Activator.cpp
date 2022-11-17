@@ -193,7 +193,8 @@ private:
 public:
   Activator()
     : m_context()
-  {}
+  {
+  }
 
   /**
    * Implements BundleActivator::Start(). Registers an

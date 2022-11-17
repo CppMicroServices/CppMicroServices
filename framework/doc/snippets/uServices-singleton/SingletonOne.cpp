@@ -20,7 +20,8 @@ SingletonOne& SingletonOne::GetInstance()
 
 SingletonOne::SingletonOne()
   : a(1)
-{}
+{
+}
 
 //![s1d]
 SingletonOne::~SingletonOne()

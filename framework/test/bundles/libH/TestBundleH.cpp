@@ -55,7 +55,8 @@ class TestProduct : public TestBundleH
 public:
   TestProduct(const Bundle& /*caller*/)
   //: caller(caller)
-  {}
+  {
+  }
 };
 
 class TestProduct2
@@ -65,7 +66,8 @@ class TestProduct2
 public:
   TestProduct2(const Bundle& caller)
     : TestProduct(caller)
-  {}
+  {
+  }
 };
 
 class FakeTestProduct : public TestBundleH3
@@ -87,7 +89,8 @@ public:
   void UngetService(const Bundle& /*caller*/,
                     const ServiceRegistrationBase& /*sReg*/,
                     const InterfaceMapConstPtr& /*service*/)
-  {}
+  {
+  }
 };
 
 class TestBundleHServiceFactory : public ServiceFactory
@@ -102,7 +105,8 @@ public:
   void UngetService(const Bundle& /*caller*/,
                     const ServiceRegistrationBase& /*sReg*/,
                     const InterfaceMapConstPtr& /*service*/)
-  {}
+  {
+  }
 };
 
 // Simulate the ServiceFactory throwing an exception
@@ -119,7 +123,8 @@ public:
   void UngetService(const Bundle& /*caller*/,
                     const ServiceRegistrationBase& /*sReg*/,
                     const InterfaceMapConstPtr& /*service*/)
-  {}
+  {
+  }
 };
 
 // Simulate the ServiceFactory throwing an exception
@@ -159,7 +164,8 @@ public:
   void UngetService(const Bundle& /*caller*/,
                     const ServiceRegistrationBase& /*sReg*/,
                     const InterfaceMapConstPtr& /*service*/)
-  {}
+  {
+  }
 };
 
 // Simulates an error condition of a ServiceFactory returning a nullptr
@@ -175,7 +181,8 @@ public:
   void UngetService(const Bundle& /* caller */,
                     const ServiceRegistrationBase& /*sReg*/,
                     const InterfaceMapConstPtr& /* service */)
-  {}
+  {
+  }
 };
 
 // Simulate an error condition whereby the service factory recursively tries
@@ -221,7 +228,8 @@ public:
   void UngetService(const Bundle& /*caller*/,
                     const ServiceRegistrationBase& /*sReg*/,
                     const InterfaceMapConstPtr& /*service*/)
-  {}
+  {
+  }
 };
 
 class TestBundleHActivator : public BundleActivator
@@ -243,7 +251,8 @@ class TestBundleHActivator : public BundleActivator
 public:
   TestBundleHActivator()
     : thisServiceName(us_service_interface_iid<TestBundleH>())
-  {}
+  {
+  }
 
   void Start(BundleContext context)
   {

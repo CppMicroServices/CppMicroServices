@@ -48,7 +48,8 @@ class SCRBundleExtensionTest : public ::testing::Test
 protected:
   SCRBundleExtensionTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   ~SCRBundleExtensionTest() = default;
 
   void SetUp() override { framework.Start(); }

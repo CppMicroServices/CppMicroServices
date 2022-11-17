@@ -64,7 +64,8 @@ public:
     : m_ModuleHandle(std::move(moduleHandle))
     , m_Data(data)
     , m_DataSize(dataSize)
-  {}
+  {
+  }
   ~ResDataContainer() = default;
 
   void* GetData() const override { return m_Data; }
@@ -80,7 +81,8 @@ struct InvalidPEException : public InvalidObjFileException
 {
   InvalidPEException(std::string what, int errorNumber = 0)
     : InvalidObjFileException(std::move(what), errorNumber)
-  {}
+  {
+  }
 };
 
 class BundlePEFile : public BundleObjFile

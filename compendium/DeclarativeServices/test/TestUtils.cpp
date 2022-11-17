@@ -154,7 +154,7 @@ void InstallAndStartConfigAdmin(::cppmicroservices::BundleContext frameworkCtx)
   std::vector<cppmicroservices::Bundle> bundles;
   auto cmPluginPath = test::GetConfigAdminRuntimePluginFilePath();
 
-  #if defined(US_BUILD_SHARED_LIBS)
+#if defined(US_BUILD_SHARED_LIBS)
   bundles = frameworkCtx.InstallBundles(cmPluginPath);
 #else
   bundles = frameworkCtx.GetBundles();

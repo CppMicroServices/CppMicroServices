@@ -55,7 +55,8 @@ std::shared_ptr<BundlePrivate> GetAndCheckBundlePrivate(
 
 BundleContext::BundleContext(std::shared_ptr<BundleContextPrivate> ctx)
   : d(std::move(ctx))
-{}
+{
+}
 
 BundleContext::BundleContext() = default;
 
@@ -247,7 +248,8 @@ struct ServiceHolder
     : b(b)
     , sref(sr)
     , service(std::move(s))
-  {}
+  {
+  }
 
   ~ServiceHolder()
   {

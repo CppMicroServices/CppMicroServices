@@ -87,7 +87,8 @@ struct LogMsg
     : enabled(other.enabled)
     , buffer()
     , _sink(other._sink)
-  {}
+  {
+  }
 
   ~LogMsg()
   {

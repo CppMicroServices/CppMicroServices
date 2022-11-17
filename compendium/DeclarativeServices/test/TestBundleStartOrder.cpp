@@ -47,7 +47,8 @@ protected:
   TestBundleStartOrder()
     : ::testing::Test()
     , framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   virtual ~TestBundleStartOrder() = default;
 
   virtual void SetUp() { framework.Start(); }
@@ -66,7 +67,8 @@ class BundleName final
 public:
   BundleName(std::string name)
     : lookingFor(std::move(name))
-  {}
+  {
+  }
 
   ~BundleName() = default;
 

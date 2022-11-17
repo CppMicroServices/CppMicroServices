@@ -94,7 +94,8 @@ std::string SizeTag(const std::pair<std::size_t, std::size_t>& p)
 
 BundlesPlugin::BundlesPlugin()
   : SimpleWebConsolePlugin("bundles", "Bundles", "")
-{}
+{
+}
 
 void BundlesPlugin::RenderContent(HttpServletRequest& request,
                                   HttpServletResponse& response)
@@ -300,7 +301,7 @@ std::pair<std::size_t, std::size_t> BundlesPlugin::GetResourceJsonTree(
         totalSize.second += size.second;
         json += indent + ",\n";
       }
-      for (auto & childFile : childFiles) {
+      for (auto& childFile : childFiles) {
         auto size = GetResourceJsonTree(bundle,
                                         currResource.GetResourcePath(),
                                         childFile,

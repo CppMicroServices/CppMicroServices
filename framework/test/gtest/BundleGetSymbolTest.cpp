@@ -48,7 +48,8 @@ protected:
 public:
   BundleGetSymbolTest()
     : f(FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   ~BundleGetSymbolTest() override = default;
 
   void SetUp() override

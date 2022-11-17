@@ -8,7 +8,8 @@ namespace test {
 TestManagedServiceFactoryServiceImpl3::TestManagedServiceFactoryServiceImpl3(
   int initialValue)
   : value{ initialValue }
-{}
+{
+}
 
 TestManagedServiceFactoryServiceImpl3::
   ~TestManagedServiceFactoryServiceImpl3() = default;

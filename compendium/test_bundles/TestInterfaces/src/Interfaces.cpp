@@ -4,7 +4,7 @@ namespace test {
 Interface1::~Interface1() = default;
 Interface2::~Interface2() = default;
 Interface3::~Interface3() = default;
-  
+
 TestBundleDSDependent::~TestBundleDSDependent() = default;
 TestBundleDSUpstreamDependency::~TestBundleDSUpstreamDependency() = default;
 

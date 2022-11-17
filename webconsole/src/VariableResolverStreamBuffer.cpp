@@ -32,7 +32,7 @@ namespace cppmicroservices {
 
 VariableResolverStreamBuffer::VariableResolverStreamBuffer(
   std::unique_ptr<std::ostream> out,
-  std::shared_ptr<WebConsoleVariableResolver>  variables)
+  std::shared_ptr<WebConsoleVariableResolver> variables)
   : m_State(State::NIL)
   , m_Out(std::move(out))
   , m_Variables(std::move(variables))

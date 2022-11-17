@@ -68,20 +68,23 @@ public:
     : foo(nullptr)
     , bar(nullptr)
     , activated(false)
-  {}
+  {
+  }
 
   TestServiceImpl1(const std::shared_ptr<ServiceDependency1>& f,
                    const std::shared_ptr<ServiceDependency2>& b)
     : foo(f)
     , bar(b)
     , activated(false)
-  {}
+  {
+  }
 
   TestServiceImpl1(const std::shared_ptr<ServiceDependency2>& b)
     : foo(nullptr)
     , bar(b)
     , activated(false)
-  {}
+  {
+  }
 
   virtual ~TestServiceImpl1() {}
 

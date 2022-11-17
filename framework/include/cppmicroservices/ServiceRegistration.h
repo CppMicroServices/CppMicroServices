@@ -64,7 +64,8 @@ public:
    */
   ServiceRegistration()
     : ServiceRegistrationBase()
-  {}
+  {
+  }
 
   /**
    * Returns a <code>ServiceReference</code> object for a service being
@@ -112,7 +113,8 @@ private:
 
   ServiceRegistration(const ServiceRegistrationBase& base)
     : ServiceRegistrationBase(base)
-  {}
+  {
+  }
 };
 
 /// \cond
@@ -128,11 +130,13 @@ public:
    */
   ServiceRegistration()
     : ServiceRegistrationBase()
-  {}
+  {
+  }
 
   ServiceRegistration(const ServiceRegistrationBase& base)
     : ServiceRegistrationBase(base)
-  {}
+  {
+  }
 
   using ServiceRegistrationBase::operator=;
 };

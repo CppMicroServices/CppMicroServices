@@ -44,7 +44,8 @@ public:
     : context()
     , stop(false)
     , count(0)
-  {}
+  {
+  }
 
   ~TestBundleC1Activator() {}
 

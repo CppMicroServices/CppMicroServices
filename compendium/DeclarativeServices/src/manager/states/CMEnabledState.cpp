@@ -24,8 +24,8 @@
 #include "../ComponentConfigurationFactory.hpp"
 #include "../ComponentManagerImpl.hpp"
 #include "CMDisabledState.hpp"
-#include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/SecurityException.h"
+#include "cppmicroservices/SharedLibraryException.h"
 
 namespace cppmicroservices {
 namespace scrimpl {

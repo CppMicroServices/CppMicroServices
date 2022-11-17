@@ -56,7 +56,8 @@ public:
 #ifdef DATA_NEEDS_NEWLINE_CONVERSION
     , pos(0)
 #endif
-  {}
+  {
+  }
 
   const char* const begin;
   const char* const end;

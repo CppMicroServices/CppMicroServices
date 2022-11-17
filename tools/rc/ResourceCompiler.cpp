@@ -122,10 +122,12 @@ class InvalidManifest : public std::runtime_error
 public:
   InvalidManifest(const std::string& msg)
     : std::runtime_error(msg)
-  {}
+  {
+  }
   InvalidManifest(const char* msg)
     : std::runtime_error(msg)
-  {}
+  {
+  }
 };
 
 /*

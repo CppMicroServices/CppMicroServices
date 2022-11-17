@@ -93,7 +93,8 @@ public:
 
   ServiceObjects(ServiceObjects&& other)
     : ServiceObjectsBase(std::move(other))
-  {}
+  {
+  }
   ServiceObjects& operator=(ServiceObjects&& other)
   {
     ServiceObjectsBase::operator=(std::move(other));
@@ -155,7 +156,8 @@ private:
   ServiceObjects(const std::shared_ptr<BundleContextPrivate>& context,
                  const ServiceReference<S>& reference)
     : ServiceObjectsBase(context, reference)
-  {}
+  {
+  }
 };
 
 /**

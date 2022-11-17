@@ -37,13 +37,14 @@ CCRegisteredState::CCRegisteredState()
 
 CCRegisteredState::CCRegisteredState(std::shared_future<void> blockUntil)
   : ready(std::move(blockUntil))
-{}
+{
+}
 
 std::shared_ptr<ComponentInstance> CCRegisteredState::Activate(
   ComponentConfigurationImpl& mgr,
   const cppmicroservices::Bundle& clientBundle)
 {
- 
+
   auto activeState = std::make_shared<CCActiveState>();
   auto currState = shared_from_this();
   bool success = false;

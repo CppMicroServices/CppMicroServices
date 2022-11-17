@@ -54,7 +54,8 @@ public:
   SharedLibraryPrivate()
     : m_Suffix(US_LIB_EXT)
     , m_Prefix(US_LIB_PREFIX)
-  {}
+  {
+  }
 
   void* m_Handle{ nullptr };
 
@@ -67,7 +68,8 @@ public:
 
 SharedLibrary::SharedLibrary()
   : d(new SharedLibraryPrivate)
-{}
+{
+}
 
 SharedLibrary::SharedLibrary(const SharedLibrary&) = default;
 

@@ -42,19 +42,19 @@ using metadata::ComponentMetadata;
 using util::ObjectValidator;
 
 SCRBundleExtension::SCRBundleExtension(
-  const cppmicroservices::BundleContext& bundleContext,
+  const cppmicroservices::Bundle& bundle,
   const cppmicroservices::AnyMap& scrMetadata,
   const std::shared_ptr<ComponentRegistry>& registry,
   const std::shared_ptr<LogService>& logger,
   const std::shared_ptr<cppmicroservices::async::AsyncWorkService>&
     asyncWorkService,
   const std::shared_ptr<ConfigurationNotifier>& configNotifier)
-  : bundleContext(bundleContext)
+  : bundle_(bundle)
   , registry(registry)
   , logger(logger)
   , configNotifier(configNotifier)
 {
-  if (!bundleContext || !registry || !logger || scrMetadata.empty() ||
+  if (!bundle || !registry || !logger || scrMetadata.empty() ||
       !asyncWorkService || !configNotifier) {
     throw std::invalid_argument(
       "Invalid parameters passed to SCRBundleExtension constructor");
@@ -72,7 +72,7 @@ SCRBundleExtension::SCRBundleExtension(
       auto compManager =
         std::make_shared<ComponentManagerImpl>(oneCompMetadata,
                                                registry,
-                                               bundleContext,
+                                               bundle_.GetBundleContext(),
                                                logger,
                                                asyncWorkService,
                                                configNotifier,
@@ -90,25 +90,31 @@ SCRBundleExtension::SCRBundleExtension(
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                   "Failed to create ComponentManager with name " +
                     oneCompMetadata->name + " from bundle with Id " +
-                    std::to_string(bundleContext.GetBundle().GetBundleId()),
+                    std::to_string(bundle_.GetBundleId()),
                   std::current_exception());
     }
   }
   logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
               "Created instance of SCRBundleExtension for " +
-                bundleContext.GetBundle().GetSymbolicName());
+                bundle_.GetSymbolicName());
 }
 
 SCRBundleExtension::~SCRBundleExtension()
 {
-  DisableAndRemoveAllComponentManagers();
+  try {
+    DisableAndRemoveAllComponentManagers();
+  } catch(...) {
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                "Exception while removing component managers for bundle " + 
+                bundle_.GetSymbolicName(), std::current_exception());
+  }
 }
 
 void SCRBundleExtension::DisableAndRemoveAllComponentManagers()
 {
   logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
               "Deleting instance of SCRBundleExtension for " +
-                bundleContext.GetBundle().GetSymbolicName());
+                bundle_.GetSymbolicName());
   for (auto& compManager : *managers) {
     auto fut = compManager->Disable();
     registry->RemoveComponentManager(compManager);

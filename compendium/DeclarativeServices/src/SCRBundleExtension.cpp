@@ -108,6 +108,8 @@ SCRBundleExtension::~SCRBundleExtension()
                 "Exception while removing component managers for bundle " + 
                 bundle_.GetSymbolicName(), std::current_exception());
   }
+  managers->clear();
+  registry.reset();
 }
 
 void SCRBundleExtension::DisableAndRemoveAllComponentManagers()
@@ -129,8 +131,6 @@ void SCRBundleExtension::DisableAndRemoveAllComponentManagers()
                   std::current_exception());
     }
   }
-  managers->clear();
-  registry.reset();
 }
 } // scrimpl
 } // cppmicroservices

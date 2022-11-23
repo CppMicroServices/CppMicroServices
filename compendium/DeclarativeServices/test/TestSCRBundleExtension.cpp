@@ -172,9 +172,7 @@ TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
 // Simulate a DS bundle is stopped before DS is able to cleanup the data associated
 // with the bundle.
 TEST_F(SCRBundleExtensionTest, DtorNoThrow) {
-    EXPECT_NO_THROW(
-    {
-      auto bundle = test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSTOI1");
+    auto bundle = test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSTOI1");
       ASSERT_TRUE(static_cast<bool>(bundle));
       auto fakeRegistry = std::make_shared<ComponentRegistry>();
       auto fakeLogger = std::make_shared<FakeLogger>();
@@ -185,6 +183,9 @@ TEST_F(SCRBundleExtensionTest, DtorNoThrow) {
         GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
       auto const& headers = ref_any_cast<cppmicroservices::AnyMap>(
         bundle.GetHeaders().at("scr"));
+    
+    EXPECT_NO_THROW(
+    {
       SCRBundleExtension bundleExt(bundle,
                                    headers,
                                    fakeRegistry,
@@ -196,6 +197,9 @@ TEST_F(SCRBundleExtensionTest, DtorNoThrow) {
       // Bundle object doesn't throw.
       bundle.Stop();
     });
+
+    asyncWorkService->StopTracking();
+    fakeRegistry->Clear();
 }
 }
 }

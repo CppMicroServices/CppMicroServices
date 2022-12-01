@@ -24,6 +24,7 @@
 #include "../src/SCRBundleExtension.hpp"
 #include "../src/metadata/Util.hpp"
 #include "Mocks.hpp"
+#include "TestUtils.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include <chrono>
 #include <cppmicroservices/BundleContext.h>
@@ -42,7 +43,7 @@ namespace cppmicroservices {
 namespace scrimpl {
 
 using cppmicroservices::AnyMap;
-// The fixture for testing class SCRActivator.
+// The fixture for testing class SCRBundleExtension.
 class SCRBundleExtensionTest : public ::testing::Test
 {
 protected:
@@ -81,7 +82,7 @@ TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
     bundleContext, fakeLogger, asyncWorkService);
   EXPECT_THROW(
     {
-      SCRBundleExtension bundleExt(BundleContext(),
+      SCRBundleExtension bundleExt(Bundle(),
                                    headers,
                                    mockRegistry,
                                    fakeLogger,
@@ -91,7 +92,7 @@ TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
     std::invalid_argument);
   EXPECT_THROW(
     {
-      SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
+      SCRBundleExtension bundleExt(GetFramework(),
                                    headers,
                                    nullptr,
                                    fakeLogger,
@@ -101,7 +102,7 @@ TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
     std::invalid_argument);
   EXPECT_THROW(
     {
-      SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
+      SCRBundleExtension bundleExt(GetFramework(),
                                    headers,
                                    mockRegistry,
                                    nullptr,
@@ -111,7 +112,7 @@ TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
     std::invalid_argument);
   EXPECT_THROW(
     {
-      SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
+      SCRBundleExtension bundleExt(GetFramework(),
                                    headers,
                                    mockRegistry,
                                    fakeLogger,
@@ -149,7 +150,7 @@ TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
   auto notifier = std::make_shared<ConfigurationNotifier>(
     GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
   EXPECT_NO_THROW({
-    SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
+    SCRBundleExtension bundleExt(GetFramework(),
                                  scr,
                                  mockRegistry,
                                  fakeLogger,
@@ -158,7 +159,7 @@ TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
     EXPECT_EQ(bundleExt.managers->size(), 0u);
   });
   EXPECT_NO_THROW({
-    SCRBundleExtension bundleExt(GetFramework().GetBundleContext(),
+    SCRBundleExtension bundleExt(GetFramework(),
                                  scr,
                                  mockRegistry,
                                  fakeLogger,
@@ -166,6 +167,39 @@ TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
                                  notifier);
     EXPECT_EQ(bundleExt.managers->size(), 1u);
   });
+}
+
+// Simulate a DS bundle is stopped before DS is able to cleanup the data associated
+// with the bundle.
+TEST_F(SCRBundleExtensionTest, DtorNoThrow) {
+    auto bundle = test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSTOI1");
+      ASSERT_TRUE(static_cast<bool>(bundle));
+      auto fakeRegistry = std::make_shared<ComponentRegistry>();
+      auto fakeLogger = std::make_shared<FakeLogger>();
+      auto asyncWorkService =
+        std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+          GetFramework().GetBundleContext(), fakeLogger);
+      auto notifier = std::make_shared<ConfigurationNotifier>(
+        GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
+      auto const& headers = ref_any_cast<cppmicroservices::AnyMap>(
+        bundle.GetHeaders().at("scr"));
+    
+    EXPECT_NO_THROW(
+    {
+      SCRBundleExtension bundleExt(bundle,
+                                   headers,
+                                   fakeRegistry,
+                                   fakeLogger,
+                                   asyncWorkService,
+                                   notifier);
+      // stop the bundle prior to ~SCRBundleExtension being called. ~SCRBundleExtension
+      // attempts to access the Bundle object, so make sure accessing an invalid
+      // Bundle object doesn't throw.
+      bundle.Stop();
+    });
+
+    asyncWorkService->StopTracking();
+    fakeRegistry->Clear();
 }
 }
 }

@@ -152,7 +152,7 @@ void SCRActivator::CreateExtension(const cppmicroservices::Bundle& bundle)
     try {
       auto const& scrMap =
         ref_any_cast<cppmicroservices::AnyMap>(headers.at(SERVICE_COMPONENT));
-      auto ba = std::make_unique<SCRBundleExtension>(bundle.GetBundleContext(),
+      auto ba = std::make_unique<SCRBundleExtension>(bundle,
                                                      scrMap,
                                                      componentRegistry,
                                                      logger,

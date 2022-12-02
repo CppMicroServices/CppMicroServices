@@ -54,7 +54,8 @@ public:
   Activator()
     : m_context()
     , m_dictionary(nullptr)
-  {}
+  {
+  }
 
   /**
    * Implements BundleActivator::Start(). Adds itself as a listener for service

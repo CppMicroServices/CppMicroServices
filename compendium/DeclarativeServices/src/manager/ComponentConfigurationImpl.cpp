@@ -204,20 +204,22 @@ void ComponentConfigurationImpl::Initialize()
       // were created before the factory component was started. If so, create the factory
       // component instances.
       if (!metadata->factoryComponentID.empty()) {
-        auto sr = this->bundle.GetBundleContext().GetServiceReference<
-            cppmicroservices::service::cm::ConfigurationAdmin>();
+        auto sr = this->bundle.GetBundleContext()
+                    .GetServiceReference<
+                      cppmicroservices::service::cm::ConfigurationAdmin>();
         if (!sr) {
           throw std::runtime_error("ComponentConfigurationImpl - Could not get "
-              "ConfigurationAdmin service reference");
+                                   "ConfigurationAdmin service reference");
         }
         auto configAdmin =
-           this->bundle.GetBundleContext()
+          this->bundle.GetBundleContext()
             .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
         if (!configAdmin) {
           throw std::runtime_error("ComponentConfigurationImpl - Could not get "
                                    "ConfigurationAdmin service");
         }
-        auto configs = configAdmin->ListConfigurations("(pid=" + metadata->configurationPids[0] + "~*)");
+        auto configs = configAdmin->ListConfigurations(
+          "(pid=" + metadata->configurationPids[0] + "~*)");
         std::shared_ptr<ComponentConfigurationImpl> mgr = shared_from_this();
         if (!configs.empty()) {
           for (const auto& config : configs) {
@@ -336,7 +338,8 @@ public:
   SatisfiedFunctor(std::string skipKeyName)
     : state(true)
     , skipKey(std::move(skipKeyName))
-  {}
+  {
+  }
   SatisfiedFunctor(const SatisfiedFunctor& cpy) = default;
   SatisfiedFunctor(SatisfiedFunctor&& cpy) = default;
   SatisfiedFunctor& operator=(const SatisfiedFunctor& cpy) = default;
@@ -439,7 +442,7 @@ void ComponentConfigurationImpl::LoadComponentCreatorDestructor()
 {
   if (newCompInstanceFunc == nullptr || deleteCompInstanceFunc == nullptr) {
     auto instanceName = GetMetadata()->instanceName;
-    
+
     std::tie(newCompInstanceFunc, deleteCompInstanceFunc) =
       GetComponentCreatorDeletors(instanceName, GetBundle(), logger);
   }

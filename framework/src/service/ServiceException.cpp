@@ -31,7 +31,8 @@ ServiceException::~ServiceException() = default;
 ServiceException::ServiceException(const std::string& msg, const Type& type)
   : std::runtime_error(msg)
   , type(type)
-{}
+{
+}
 
 ServiceException::ServiceException(const ServiceException&) = default;
 

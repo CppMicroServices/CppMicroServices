@@ -42,7 +42,8 @@ struct InvalidMachOException : public InvalidObjFileException
 {
   InvalidMachOException(const std::string& what, int errorNumber = 0)
     : InvalidObjFileException(what, errorNumber)
-  {}
+  {
+  }
 };
 
 template<uint32_t>

@@ -50,7 +50,8 @@ void ServletConfig::SetServletContext(
 
 ServletConfig::ServletConfig()
   : d(new ServletConfigPrivate)
-{}
+{
+}
 
 ServletConfig::ServletConfig(const ServletConfig&) = default;
 ServletConfig& ServletConfig::operator=(const ServletConfig&) = default;

@@ -42,7 +42,8 @@ ServiceHooks::ServiceHooks(CoreBundleContext* coreCtx)
   : coreCtx(coreCtx)
   , listenerHookTracker()
   , bOpen(false)
-{}
+{
+}
 
 ServiceHooks::~ServiceHooks()
 {
@@ -86,7 +87,8 @@ void ServiceHooks::Open()
 {
   auto l = this->Lock();
   US_UNUSED(l);
-  listenerHookTracker = std::make_unique<ServiceTracker<ServiceListenerHook>>(GetBundleContext(), this);
+  listenerHookTracker = std::make_unique<ServiceTracker<ServiceListenerHook>>(
+    GetBundleContext(), this);
   listenerHookTracker->Open();
 
   bOpen = true;

@@ -53,7 +53,8 @@ public:
   ServletHandler(std::shared_ptr<HttpServlet> servlet, std::string servletPath)
     : m_Servlet(std::move(servlet))
     , m_ServletPath(std::move(servletPath))
-  {}
+  {
+  }
 
   std::shared_ptr<ServletContext> GetServletContext() const
   {
@@ -129,7 +130,8 @@ ServletContainerPrivate::ServletContainerPrivate(BundleContext bundleCtx,
   , m_Server(nullptr)
   , m_ServletTracker(m_Context, this)
   , q(q)
-{}
+{
+}
 
 void ServletContainerPrivate::Start()
 {

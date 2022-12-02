@@ -59,9 +59,15 @@ protected:
     return TempDir.Path + DIR_SEP + longName.data();
   }
 
-  static std::string GetExistingDir() { return GetCurrentWorkingDirectory(); }
+  static std::string GetExistingDir()
+  {
+    return GetCurrentWorkingDirectory();
+  }
 
-  static std::string GetExistingFile() { return GetExecutablePath(); }
+  static std::string GetExistingFile()
+  {
+    return GetExecutablePath();
+  }
 
   static cppmicroservices::testing::TempDir TempDir;
 };

@@ -35,7 +35,8 @@ struct CoreBundleContextHolder
 {
   CoreBundleContextHolder(std::unique_ptr<CoreBundleContext> ctx)
     : ctx(std::move(ctx))
-  {}
+  {
+  }
 
   ~CoreBundleContextHolder()
   {

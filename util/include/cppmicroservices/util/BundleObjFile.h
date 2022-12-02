@@ -53,7 +53,8 @@ class RawBundleResources
 public:
   RawBundleResources(std::unique_ptr<DataContainer> data)
     : m_Data(std::move(data))
-  {}
+  {
+  }
 
   operator bool() const
   {

@@ -53,7 +53,8 @@ public:
                    const std::shared_ptr<ServiceDependency2>& b)
     : foo(f)
     , bar(b)
-  {}
+  {
+  }
 
   virtual ~TestServiceImpl1() = default;
 

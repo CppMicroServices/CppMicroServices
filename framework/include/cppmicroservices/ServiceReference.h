@@ -80,7 +80,8 @@ public:
    */
   ServiceReference()
     : ServiceReferenceBase()
-  {}
+  {
+  }
 
   ServiceReference(const ServiceReference&) = default;
   ServiceReference& operator=(const ServiceReference&) = default;
@@ -124,14 +125,16 @@ public:
    */
   ServiceReference()
     : ServiceReferenceBase()
-  {}
+  {
+  }
 
   ServiceReference(const ServiceReference&) = default;
   ServiceReference& operator=(const ServiceReference&) = default;
 
   ServiceReference(const ServiceReferenceBase& base)
     : ServiceReferenceBase(base)
-  {}
+  {
+  }
 
   using ServiceReferenceBase::operator=;
 

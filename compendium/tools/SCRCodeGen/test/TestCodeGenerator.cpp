@@ -575,7 +575,8 @@ struct CodegenValidManifestState
     : manifest(std::move(_manifest))
     , headers(std::move(_headers))
     , referenceOutput(std::move(_referenceOutput))
-  {}
+  {
+  }
 
   std::string manifest;
   std::vector<std::string> headers;
@@ -642,7 +643,8 @@ struct CodegenInvalidManifestState
     : manifest(std::move(_manifest))
     , errorOutput(std::move(_errorOutput))
     , isPartial(_isPartial)
-  {}
+  {
+  }
 
   std::string manifest;
   std::string errorOutput;
@@ -788,26 +790,26 @@ INSTANTIATE_TEST_SUITE_P(
       "Invalid value for the name 'references'. Expected non-empty array"),
     CodegenInvalidManifestState(
       manifest_illegal_configuration_policy,
-      "Invalid value 'default' for the name 'configuration-policy'. The valid choices are : [require, optional, ignore]"),  
+      "Invalid value 'default' for the name 'configuration-policy'. The valid "
+      "choices are : [require, optional, ignore]"),
     CodegenInvalidManifestState(
       manifest_duplicate_configuration_pid,
       "configuration-pid error in the manifest. Duplicate pid detected.",
-      true),  
+      true),
     CodegenInvalidManifestState(
       manifest_illegal_factory,
-      "Invalid value for the name 'factory'. Expected non-empty string"),  
+      "Invalid value for the name 'factory'. Expected non-empty string"),
     CodegenInvalidManifestState(
       manifest_configuration_policy_but_no_pid,
       "Error: Both configuration-policy and configuration-pid must be "
       "present in the manifest.json file to participate in Configuration "
       "Admin.",
-      true),  
+      true),
     CodegenInvalidManifestState(
       manifest_configuration_pid_but_no_policy,
       "Error: Both configuration-policy and configuration-pid must be "
       "present in the manifest.json file to participate in Configuration "
       "Admin.",
-      true)  
-      ));
+      true)));
 
 } // namespace codegen

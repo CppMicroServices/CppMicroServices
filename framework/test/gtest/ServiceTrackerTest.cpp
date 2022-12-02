@@ -82,7 +82,8 @@ class MyCustomizer
 public:
   MyCustomizer(const BundleContext& context)
     : m_context(context)
-  {}
+  {
+  }
 
   virtual std::shared_ptr<MyInterfaceOne> AddingService(
     const ServiceReference<MyInterfaceOne>& reference)
@@ -477,14 +478,16 @@ class CustomFooTracker final
      */
   void ModifiedService(::cppmicroservices::ServiceReference<FooService> const&,
                        std::shared_ptr<FooService> const&) override
-  {}
+  {
+  }
 
   /**
      * Called when a service is removed.
      */
   void RemovedService(::cppmicroservices::ServiceReference<FooService> const&,
                       std::shared_ptr<FooService> const&) override
-  {}
+  {
+  }
 };
 }
 
@@ -591,7 +594,8 @@ class MyNullPtrCustomizer final
 public:
   MyNullPtrCustomizer(const BundleContext& context)
     : m_context(context)
-  {}
+  {
+  }
 
   virtual std::shared_ptr<MyInterfaceOne> AddingService(
     const ServiceReference<MyInterfaceOne>&)
@@ -601,11 +605,13 @@ public:
 
   virtual void ModifiedService(const ServiceReference<MyInterfaceOne>&,
                                const std::shared_ptr<MyInterfaceOne>&)
-  {}
+  {
+  }
 
   virtual void RemovedService(const ServiceReference<MyInterfaceOne>&,
                               const std::shared_ptr<MyInterfaceOne>&)
-  {}
+  {
+  }
 
 private:
   BundleContext m_context;
@@ -630,7 +636,8 @@ TEST_F(ServiceTrackerTestFixture, TestNullPtrServiceTrackerCustomizer)
 
   context.RegisterService<MyInterfaceOne>(serviceOne);
 
-  ASSERT_EQ(tracker.GetServiceReferences().size(), 0) << "tracking count should be 0";
+  ASSERT_EQ(tracker.GetServiceReferences().size(), 0)
+    << "tracking count should be 0";
 
   auto trackedObj = tracker.WaitForService(std::chrono::seconds(1));
   ASSERT_EQ(nullptr, trackedObj) << "tracked object should be nullptr";
@@ -669,5 +676,4 @@ TEST_F(ServiceTrackerTestFixture, TestReOpenServiceTrackerWithCustomizer)
     context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
   svcReg2.SetProperties({ { "test", Any(std::string("foo")) } });
   tracker->Close();
-  
 }

@@ -51,7 +51,8 @@ HttpServletResponsePrivate::HttpServletResponsePrivate(
   , m_HttpOutputStream(nullptr)
   , m_IsCommited(false)
   , m_BufferSize(1024)
-{}
+{
+}
 
 HttpServletResponsePrivate::~HttpServletResponsePrivate()
 {
@@ -421,7 +422,8 @@ void HttpServletResponse::SetOutputStreamBuffer(std::streambuf* sb)
 
 HttpServletResponse::HttpServletResponse(HttpServletResponsePrivate* d)
   : d(d)
-{}
+{
+}
 }
 
 US_MSVC_POP_WARNING

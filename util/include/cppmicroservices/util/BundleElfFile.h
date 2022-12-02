@@ -41,7 +41,8 @@ struct InvalidElfException : public InvalidObjFileException
 {
   InvalidElfException(std::string what, int errorNumber = 0)
     : InvalidObjFileException(std::move(what), errorNumber)
-  {}
+  {
+  }
 };
 
 template<int>

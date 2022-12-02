@@ -29,8 +29,8 @@ limitations under the License.
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/SecurityException.h"
 
-#include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 #include "cppmicroservices/cm/Configuration.hpp"
+#include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
@@ -42,10 +42,12 @@ limitations under the License.
 
 TEST(TestBundleValidation, BundleValidationFailure)
 {
-  using validationFuncType = std::function<bool(const cppmicroservices::Bundle&)>;
+  using validationFuncType =
+    std::function<bool(const cppmicroservices::Bundle&)>;
 
-  validationFuncType validationFunc = [](const cppmicroservices::Bundle& b) -> bool {
-    if (b.GetSymbolicName() == "declarative_services" || 
+  validationFuncType validationFunc =
+    [](const cppmicroservices::Bundle& b) -> bool {
+    if (b.GetSymbolicName() == "declarative_services" ||
         b.GetSymbolicName() == "configuration_admin") {
       return true;
     }
@@ -62,8 +64,9 @@ TEST(TestBundleValidation, BundleValidationFailure)
 
   test::InstallAndStartDS(f.GetBundleContext());
 
-  auto sDSSvcRef =
-    f.GetBundleContext().GetServiceReference<cppmicroservices::service::component::runtime::ServiceComponentRuntime>();
+  auto sDSSvcRef = f.GetBundleContext()
+                     .GetServiceReference<cppmicroservices::service::component::
+                                            runtime::ServiceComponentRuntime>();
   ASSERT_TRUE(sDSSvcRef);
   auto dsRuntimeService =
     f.GetBundleContext()
@@ -99,20 +102,24 @@ TEST(TestBundleValidation, BundleValidationFailure)
     });
 
   ASSERT_NO_THROW(bundleIter->Start());
-  
+
   struct Interface1Impl final : public test::Interface1
   {
     std::string Description() override { return "foo"; }
   };
-  auto Interface1SvcReg = f.GetBundleContext().RegisterService<test::Interface1>(std::make_shared<Interface1Impl>());
+  auto Interface1SvcReg =
+    f.GetBundleContext().RegisterService<test::Interface1>(
+      std::make_shared<Interface1Impl>());
 
   auto svcRef = f.GetBundleContext().GetServiceReference<test::Interface2>();
   ASSERT_TRUE(svcRef);
-  ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef), cppmicroservices::SecurityException);
+  ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef),
+               cppmicroservices::SecurityException);
 
   // a bundle validation function which returns false must cause the
   // service component not to be enabled
-  auto compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponent6");
+  auto compDesc = dsRuntimeService->GetComponentDescriptionDTO(
+    *bundleIter, "sample::ServiceComponent6");
   ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
 
   // delayed components won't throw when enabled. they should throw on first
@@ -125,7 +132,8 @@ TEST(TestBundleValidation, BundleValidationFailure)
   ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef),
                cppmicroservices::SecurityException);
 
-  compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponent6");
+  compDesc = dsRuntimeService->GetComponentDescriptionDTO(
+    *bundleIter, "sample::ServiceComponent6");
   ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
   Interface1SvcReg.Unregister();
 
@@ -150,11 +158,11 @@ TEST(TestBundleValidation, BundleValidationFailure)
     std::make_shared<Interface1Impl>());
   svcRef = f.GetBundleContext().GetServiceReference<test::Interface2>();
   ASSERT_TRUE(svcRef);
-  ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef), cppmicroservices::SecurityException);
+  ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef),
+               cppmicroservices::SecurityException);
   ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
   auto enableCompFuture = dsRuntimeService->EnableComponent(compDesc);
-  ASSERT_THROW(enableCompFuture.get(),
-               cppmicroservices::SecurityException);
+  ASSERT_THROW(enableCompFuture.get(), cppmicroservices::SecurityException);
   Interface1SvcReg.Unregister();
 
   // test starting a prototype scope service component
@@ -193,14 +201,15 @@ TEST(TestBundleValidation, BundleValidationFailure)
 
   auto sCMSvcRef =
     f.GetBundleContext()
-                     .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+      .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
   ASSERT_TRUE(sCMSvcRef);
   auto cmRuntimeService =
     f.GetBundleContext()
       .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sCMSvcRef);
   ASSERT_TRUE(cmRuntimeService);
 
-  auto config = cmRuntimeService->GetConfiguration("sample::ServiceComponentCA02");
+  auto config =
+    cmRuntimeService->GetConfiguration("sample::ServiceComponentCA02");
   cppmicroservices::AnyMap configObj(cppmicroservices::AnyMap::UNORDERED_MAP);
   configObj["foo"] = std::string("bar");
   auto updateFuture = config->Update(configObj);
@@ -219,7 +228,6 @@ TEST(TestBundleValidation, BundleValidationFailure)
     *bundleIter, "sample::ServiceComponentCA02");
   ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
   config->Remove().get();
-
 
   // test starting an immediate activation ds component with a required configuration policy
   test::InstallLib(f.GetBundleContext(), "TestBundleDSCA03");
@@ -251,18 +259,17 @@ TEST(TestBundleValidation, BundleValidationFailure)
     *bundleIter, "sample::ServiceComponentCA03");
   ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
 
-
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
 TEST(TestBundleValidation, BundleValidationSuccess)
 {
-  using validationFuncType = std::function<bool(const cppmicroservices::Bundle&)>;
+  using validationFuncType =
+    std::function<bool(const cppmicroservices::Bundle&)>;
 
-  validationFuncType validationFunc = [](const cppmicroservices::Bundle&) -> bool {
-    return true;
-  };
+  validationFuncType validationFunc =
+    [](const cppmicroservices::Bundle&) -> bool { return true; };
   cppmicroservices::FrameworkConfiguration configuration{
     { cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC,
       validationFunc }
@@ -285,7 +292,8 @@ TEST(TestBundleValidation, BundleValidationSuccess)
   // a bundle validation function which returns true must cause the
   // Framework to start the bundle and it should be loaded
   // into the process.
-  ASSERT_EQ(bundleIter->GetState(), cppmicroservices::Bundle::State::STATE_ACTIVE);
+  ASSERT_EQ(bundleIter->GetState(),
+            cppmicroservices::Bundle::State::STATE_ACTIVE);
 
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
@@ -293,9 +301,11 @@ TEST(TestBundleValidation, BundleValidationSuccess)
 
 TEST(TestBundleValidation, BundleValidationFunctionException)
 {
-  using validationFuncType = std::function<bool(const cppmicroservices::Bundle&)>;
+  using validationFuncType =
+    std::function<bool(const cppmicroservices::Bundle&)>;
 
-  validationFuncType validationFunc = [](const cppmicroservices::Bundle& b) -> bool {
+  validationFuncType validationFunc =
+    [](const cppmicroservices::Bundle& b) -> bool {
     if (b.GetSymbolicName() == "declarative_services") {
       return true;
     }
@@ -313,7 +323,8 @@ TEST(TestBundleValidation, BundleValidationFunctionException)
   bool receivedBundleValidationErrorEvent{ false };
   bool receivedSecondBundleValidationErrorEvent{ false };
   auto token = f.GetBundleContext().AddFrameworkListener(
-    [&receivedBundleValidationErrorEvent, &receivedSecondBundleValidationErrorEvent](
+    [&receivedBundleValidationErrorEvent,
+     &receivedSecondBundleValidationErrorEvent](
       const cppmicroservices::FrameworkEvent& evt) {
       if (evt.GetType() ==
             cppmicroservices::FrameworkEvent::Type::FRAMEWORK_ERROR &&

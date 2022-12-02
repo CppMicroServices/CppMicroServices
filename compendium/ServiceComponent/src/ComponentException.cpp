@@ -27,11 +27,13 @@ namespace service {
 namespace component {
 ComponentException::ComponentException(const std::string& message)
   : std::runtime_error(message)
-{}
+{
+}
 
 ComponentException::ComponentException(const char* message)
   : std::runtime_error(message)
-{}
+{
+}
 
 ComponentException::~ComponentException() noexcept {}
 }

@@ -54,7 +54,8 @@ struct ServiceMetadataParserValidState
     : metadataIndex(_metadataIndex)
     , serviceScope(_serviceScope)
     , interfaces(_interfaces)
-  {}
+  {
+  }
 
   std::size_t metadataIndex;
   std::string serviceScope;
@@ -159,7 +160,8 @@ struct ServiceMetadataParserInvalidState
     : metadataIndex(_metadataIndex)
     , errorOutput(_errorOutput)
     , isPartial(_isPartial)
-  {}
+  {
+  }
 
   std::size_t metadataIndex;
   std::string errorOutput;

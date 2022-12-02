@@ -57,8 +57,8 @@ public:
   SimpleWebConsolePlugin(
     const std::string& label,
     const std::string& title,
-    std::string  category = std::string(),
-    std::vector<std::string>  css = std::vector<std::string>());
+    std::string category = std::string(),
+    std::vector<std::string> css = std::vector<std::string>());
 
   /**
    * @see AbstractWebConsolePlugin#GetLabel()

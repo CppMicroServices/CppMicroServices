@@ -33,7 +33,6 @@ void TestManagedServiceFactoryImpl::Updated(std::string const& pid,
     m_updatedCallCount[pid] -= 1;
   } else {
     m_updatedCallCount[pid] += 1;
-
   }
 }
 

@@ -110,7 +110,7 @@ public:
   */
   std::shared_ptr<detail::LogSink> sink;
 
-   /**
+  /**
    * Bundle Storage
    */
   std::unique_ptr<BundleStorage> storage;

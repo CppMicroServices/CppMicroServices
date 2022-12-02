@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#include "cppmicroservices/SecurityException.h"
 #include "ConfigurationListenerImpl.hpp"
+#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 
 namespace cppmicroservices {
@@ -86,10 +86,10 @@ void ConfigurationListenerImpl::configurationEvent(
     auto ptr = std::make_shared<cppmicroservices::AnyMap>(properties);
     configNotifier->NotifyAllListeners(pid, type, ptr);
   } catch (const cppmicroservices::SecurityException&) {
-    logger->Log(
-      cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-      "Security exception while executing ConfigurationListener::configEvent method.",
-      std::current_exception());
+    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                "Security exception while executing "
+                "ConfigurationListener::configEvent method.",
+                std::current_exception());
     throw;
   } catch (...) {
     logger->Log(

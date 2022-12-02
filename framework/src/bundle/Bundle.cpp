@@ -47,7 +47,8 @@ Bundle::Bundle(const Bundle&) = default;
 Bundle::Bundle(Bundle&& b) noexcept
   : d(std::move(b.d))
   , c(std::move(b.c))
-{}
+{
+}
 
 Bundle& Bundle::operator=(const Bundle&) = default;
 
@@ -97,7 +98,8 @@ Bundle& Bundle::operator=(std::nullptr_t)
 Bundle::Bundle(const std::shared_ptr<BundlePrivate>& d)
   : d(d)
   , c(d ? d->coreCtx->shared_from_this() : nullptr)
-{}
+{
+}
 
 Bundle::~Bundle() = default;
 

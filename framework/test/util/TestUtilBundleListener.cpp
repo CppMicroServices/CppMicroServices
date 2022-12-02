@@ -29,7 +29,8 @@ namespace cppmicroservices {
 TestBundleListener::TestBundleListener()
   : serviceEvents()
   , bundleEvents()
-{}
+{
+}
 
 void TestBundleListener::BundleChanged(const BundleEvent& event)
 {

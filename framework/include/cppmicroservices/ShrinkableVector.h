@@ -52,7 +52,8 @@ public:
 
   ShrinkableVector()
     : container(emptyVector)
-  {}
+  {
+  }
 
   iterator begin() { return container.begin(); }
 
@@ -122,7 +123,8 @@ private:
 
   ShrinkableVector(container_type& container)
     : container(container)
-  {}
+  {
+  }
 
   container_type& container;
 };

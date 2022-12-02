@@ -23,8 +23,8 @@
 #include "CCActiveState.hpp"
 #include "../ComponentConfigurationImpl.hpp"
 #include "CCUnsatisfiedReferenceState.hpp"
-#include "cppmicroservices/detail/ScopeGuard.h"
 #include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/detail/ScopeGuard.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -86,7 +86,7 @@ void CCActiveState::Deactivate(ComponentConfigurationImpl& mgr)
   std::promise<void> transitionAction;
   auto fut = transitionAction.get_future();
   auto unsatisfiedState =
-  std::make_shared<CCUnsatisfiedReferenceState>(std::move(fut));
+    std::make_shared<CCUnsatisfiedReferenceState>(std::move(fut));
   while (
     currentState->GetValue() !=
     service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE) {
@@ -95,7 +95,8 @@ void CCActiveState::Deactivate(ComponentConfigurationImpl& mgr)
       // that waits for the latch. The Deactivate function won't continue until
       // the latch counts down to 0, thereby allowing all Activate, Rebind and Modified
       // activities to complete.
-      currentState->WaitForTransitionTask(); // wait for the previous transition to finish
+      currentState
+        ->WaitForTransitionTask(); // wait for the previous transition to finish
       mgr.UnregisterService();
       mgr.DestroyComponentInstances();
       transitionAction.set_value();
@@ -142,56 +143,56 @@ bool CCActiveState::Modified(ComponentConfigurationImpl& mgr)
   return false;
 };
 
-void CCActiveState::Rebind(ComponentConfigurationImpl & mgr,
-                             const std::string& refName,
-                             const ServiceReference<void>& svcRefToBind,
-                             const ServiceReference<void>& svcRefToUnbind)
-  {
-    auto logger = mgr.GetLogger();
-    if (latch.CountUp()) {
-      detail::ScopeGuard sg([this, logger]() {
-        // By using try/catch here, we ensure that this lambda function doesn't
-        // throw inside LatchScopeGuard's dtor.
-        try {
-          latch.CountDown();
-        } catch (...) {
-          logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                      "latch.CountDown() threw an exception during "
-                      "LatchScopeGuard cleanup in CCActiveState::Rebind.",
-                      std::current_exception());
-        }
-      });
-      std::lock_guard<std::mutex> lock(oneAtATimeMutex);
-      // Make sure the state didn't change while we were waiting
-      auto currentState = mgr.GetState();
-      if (currentState->GetValue() !=
-          service::component::runtime::dto::ComponentState::ACTIVE) {
-        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
-                    "Rebind failed. Component no longer in Active State.");
-        return;
+void CCActiveState::Rebind(ComponentConfigurationImpl& mgr,
+                           const std::string& refName,
+                           const ServiceReference<void>& svcRefToBind,
+                           const ServiceReference<void>& svcRefToUnbind)
+{
+  auto logger = mgr.GetLogger();
+  if (latch.CountUp()) {
+    detail::ScopeGuard sg([this, logger]() {
+      // By using try/catch here, we ensure that this lambda function doesn't
+      // throw inside LatchScopeGuard's dtor.
+      try {
+        latch.CountDown();
+      } catch (...) {
+        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                    "latch.CountDown() threw an exception during "
+                    "LatchScopeGuard cleanup in CCActiveState::Rebind.",
+                    std::current_exception());
       }
-      if (svcRefToBind) {
-        try {
-          mgr.BindReference(refName, svcRefToBind);
-        } catch (const std::exception&) {
-          mgr.GetLogger()->Log(
-            cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-            "Exception while dynamically binding a reference. ",
-            std::current_exception());
-        }
+    });
+    std::lock_guard<std::mutex> lock(oneAtATimeMutex);
+    // Make sure the state didn't change while we were waiting
+    auto currentState = mgr.GetState();
+    if (currentState->GetValue() !=
+        service::component::runtime::dto::ComponentState::ACTIVE) {
+      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                  "Rebind failed. Component no longer in Active State.");
+      return;
+    }
+    if (svcRefToBind) {
+      try {
+        mgr.BindReference(refName, svcRefToBind);
+      } catch (const std::exception&) {
+        mgr.GetLogger()->Log(
+          cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+          "Exception while dynamically binding a reference. ",
+          std::current_exception());
       }
+    }
 
-      if (svcRefToUnbind) {
-        try {
-          mgr.UnbindReference(refName, svcRefToUnbind);
-        } catch (const std::exception&) {
-          mgr.GetLogger()->Log(
-            cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-            "Exception while dynamically unbinding a reference. ",
-            std::current_exception());
-        }
+    if (svcRefToUnbind) {
+      try {
+        mgr.UnbindReference(refName, svcRefToUnbind);
+      } catch (const std::exception&) {
+        mgr.GetLogger()->Log(
+          cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+          "Exception while dynamically unbinding a reference. ",
+          std::current_exception());
       }
     }
   }
+}
 }
 }

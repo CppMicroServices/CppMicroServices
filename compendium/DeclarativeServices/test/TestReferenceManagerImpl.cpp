@@ -77,7 +77,8 @@ class ReferenceManagerImplTest
 protected:
   ReferenceManagerImplTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   virtual ~ReferenceManagerImplTest() = default;
 
   virtual void SetUp() { framework.Start(); }

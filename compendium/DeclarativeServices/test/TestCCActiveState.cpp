@@ -43,7 +43,8 @@ class CCActiveStateTest : public ::testing::Test
 protected:
   CCActiveStateTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   virtual ~CCActiveStateTest() = default;
 
   virtual void SetUp()

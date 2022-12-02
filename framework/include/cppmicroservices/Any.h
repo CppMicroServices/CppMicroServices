@@ -120,18 +120,18 @@ US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
                                                     const uint8_t,
                                                     const int32_t);
 
-template <typename T>
+template<typename T>
 std::ostream& any_value_to_string(std::ostream& os,
-    const std::function<bool(const T&)>&)
+                                  const std::function<bool(const T&)>&)
 {
   return os;
 }
 
 template<typename T>
 std::ostream& any_value_to_json(std::ostream& os,
-    const std::function<bool(const T&)>&,
-    const uint8_t,
-    const int32_t)
+                                const std::function<bool(const T&)>&,
+                                const uint8_t,
+                                const int32_t)
 {
   return os;
 }
@@ -297,7 +297,8 @@ public:
   template<typename ValueType>
   Any(const ValueType& value)
     : _content(new Holder<ValueType>(value))
-  {}
+  {
+  }
 
   /**
    * Copy constructor, works with empty Anys and initialized Any values.
@@ -306,7 +307,8 @@ public:
    */
   Any(const Any& other)
     : _content(other._content ? other._content->Clone() : nullptr)
-  {}
+  {
+  }
 
   /**
    * Move constructor.
@@ -315,7 +317,8 @@ public:
    */
   Any(Any&& other) noexcept
     : _content(std::move(other._content))
-  {}
+  {
+  }
 
   /**
    * Swaps the content of the two Anys.
@@ -341,7 +344,8 @@ public:
   {
     if (Type() != typeid(ValueType))
       return false;
-    return cppmicroservices::any::detail::compare(*any_cast<const ValueType>(this), val);
+    return cppmicroservices::any::detail::compare(
+      *any_cast<const ValueType>(this), val);
   }
 
   /**
@@ -495,11 +499,13 @@ private:
   public:
     Holder(const ValueType& value)
       : _held(value)
-    {}
+    {
+    }
 
     Holder(ValueType&& value)
       : _held(std::move(value))
-    {}
+    {
+    }
 
     std::string ToString() const override
     {
@@ -558,7 +564,8 @@ public:
   BadAnyCastException(std::string msg = "")
     : std::bad_cast()
     , _msg(std::move(msg))
-  {}
+  {
+  }
 
   ~BadAnyCastException() override = default;
 

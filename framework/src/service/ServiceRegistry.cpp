@@ -77,7 +77,8 @@ Properties ServiceRegistry::CreateServiceProperties(
 
 ServiceRegistry::ServiceRegistry(CoreBundleContext* coreCtx)
   : core(coreCtx)
-{}
+{
+}
 
 ServiceRegistrationBase ServiceRegistry::RegisterService(
   BundlePrivate* bundle,

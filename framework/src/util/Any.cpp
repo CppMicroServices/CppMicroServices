@@ -108,8 +108,8 @@ std::ostream& any_value_to_json(std::ostream& o,
       default:
 // suppress type-limits warning on linux arm 64 build
 #if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wtype-limits"
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wtype-limits"
 #endif
         if ('\x00' <= *c && *c <= '\x1f') {
           o << "\\u" << std::hex << std::setw(4) << std::setfill('0')
@@ -118,7 +118,7 @@ std::ostream& any_value_to_json(std::ostream& o,
           o << *c;
         }
 #if defined(__GNUC__)
-#pragma GCC diagnostic pop
+#  pragma GCC diagnostic pop
 #endif
     }
   }

@@ -36,7 +36,7 @@ CCSatisfiedState::CCSatisfiedState()
 
 void CCSatisfiedState::Deactivate(ComponentConfigurationImpl& mgr)
 {
-  
+
   auto currentState = shared_from_this();
   std::packaged_task<void(void)> task([&mgr]() {
     mgr.UnregisterService();

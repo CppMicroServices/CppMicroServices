@@ -40,7 +40,8 @@ class CCRegisteredStateTest : public ::testing::Test
 protected:
   CCRegisteredStateTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   virtual ~CCRegisteredStateTest() = default;
 
   virtual void SetUp()

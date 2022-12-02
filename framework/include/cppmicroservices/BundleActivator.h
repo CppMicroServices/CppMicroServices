@@ -130,7 +130,7 @@ struct BundleActivator
   extern "C" US_ABI_EXPORT cppmicroservices::BundleActivator*                  \
     US_CREATE_ACTIVATOR_FUNC(US_BUNDLE_NAME)();                                \
   extern "C" US_ABI_EXPORT cppmicroservices::BundleActivator*                  \
-    US_CREATE_ACTIVATOR_FUNC(US_BUNDLE_NAME)()                                 \
+  US_CREATE_ACTIVATOR_FUNC(US_BUNDLE_NAME)()                                   \
   {                                                                            \
     return new _activator_type();                                              \
   }                                                                            \

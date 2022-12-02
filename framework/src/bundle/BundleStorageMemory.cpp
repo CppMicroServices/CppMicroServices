@@ -35,7 +35,8 @@ namespace sc = std::chrono;
 BundleStorageMemory::BundleStorageMemory()
   : BundleStorage()
   , nextFreeId(1)
-{}
+{
+}
 
 std::shared_ptr<BundleArchive> BundleStorageMemory::CreateAndInsertArchive(
   const std::shared_ptr<BundleResourceContainer>& resCont,

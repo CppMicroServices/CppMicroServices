@@ -28,7 +28,8 @@ namespace cppmicroservices {
 
 ServletContext::ServletContext(ServletContainer* container)
   : m_Container(container)
-{}
+{
+}
 
 std::string ServletContext::GetContextPath() const
 {

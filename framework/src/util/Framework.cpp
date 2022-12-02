@@ -40,7 +40,8 @@ Framework::Framework(const Framework&) = default;
 
 Framework::Framework(Framework&& fw) noexcept
   : Bundle(std::move(fw))
-{}
+{
+}
 
 Framework& Framework::operator=(const Framework&) = default;
 
@@ -60,7 +61,8 @@ Framework::Framework(Bundle b)
 
 Framework::Framework(const std::shared_ptr<FrameworkPrivate>& d)
   : Bundle(d)
-{}
+{
+}
 
 void Framework::Init()
 {

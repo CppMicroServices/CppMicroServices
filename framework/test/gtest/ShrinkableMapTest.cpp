@@ -62,7 +62,7 @@ TEST(ShrinkableMapTest, testShrinkableMapOperations)
   shrinkable.erase(shrinkable.find(1));
   //New size
   ASSERT_EQ(m.size(), 2);
-  EXPECT_THROW(shrinkable.at(1),std::out_of_range);
+  EXPECT_THROW(shrinkable.at(1), std::out_of_range);
   //back() access
   ASSERT_EQ(shrinkable.at(2), "two");
 }

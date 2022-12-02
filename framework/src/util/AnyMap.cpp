@@ -1025,31 +1025,38 @@ void any_map::destroy() noexcept
 
 AnyMap::AnyMap(map_type type)
   : any_map(type)
-{}
+{
+}
 
 AnyMap::AnyMap(const ordered_any_map& m)
   : any_map(m)
-{}
+{
+}
 
 AnyMap::AnyMap(ordered_any_map&& m)
   : any_map(std::move(m))
-{}
+{
+}
 
 AnyMap::AnyMap(const unordered_any_map& m)
   : any_map(m)
-{}
+{
+}
 
 AnyMap::AnyMap(unordered_any_map&& m)
   : any_map(std::move(m))
-{}
+{
+}
 
 AnyMap::AnyMap(const unordered_any_cimap& m)
   : any_map(m)
-{}
+{
+}
 
 AnyMap::AnyMap(unordered_any_cimap&& m)
   : any_map(std::move(m))
-{}
+{
+}
 
 AnyMap::map_type AnyMap::GetType() const
 {

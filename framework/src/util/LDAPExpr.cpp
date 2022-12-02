@@ -139,14 +139,16 @@ public:
     , m_args(std::move(args))
     , m_attrName()
     , m_attrValue()
-  {}
+  {
+  }
 
   LDAPExprData(int op, std::string attrName, std::string attrValue)
     : m_operator(op)
     , m_args()
     , m_attrName(std::move(attrName))
     , m_attrValue(std::move(attrValue))
-  {}
+  {
+  }
 
   LDAPExprData(const LDAPExprData& other)
 
@@ -160,7 +162,8 @@ public:
 
 LDAPExpr::LDAPExpr()
   : d()
-{}
+{
+}
 
 LDAPExpr::LDAPExpr(const std::string& filter)
   : d()
@@ -182,13 +185,15 @@ LDAPExpr::LDAPExpr(const std::string& filter)
 
 LDAPExpr::LDAPExpr(int op, const std::vector<LDAPExpr>& args)
   : d(new LDAPExprData(op, args))
-{}
+{
+}
 
 LDAPExpr::LDAPExpr(int op,
                    const std::string& attrName,
                    const std::string& attrValue)
   : d(new LDAPExprData(op, attrName, attrValue))
-{}
+{
+}
 
 LDAPExpr::LDAPExpr(const LDAPExpr&) = default;
 

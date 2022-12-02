@@ -40,7 +40,8 @@ class CMEnabledStateTest : public ::testing::Test
 protected:
   CMEnabledStateTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   virtual ~CMEnabledStateTest() = default;
 
   virtual void SetUp()

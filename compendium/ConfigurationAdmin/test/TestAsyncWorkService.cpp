@@ -57,7 +57,8 @@ class TestAsyncWorkServiceEndToEnd
 public:
   TestAsyncWorkServiceEndToEnd()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   void SetUp() override
   {
@@ -146,7 +147,8 @@ class AsyncWorkServiceInline : public cppmicroservices::async::AsyncWorkService
 public:
   AsyncWorkServiceInline()
     : cppmicroservices::async::AsyncWorkService()
-  {}
+  {
+  }
 
   void post(std::packaged_task<void()>&& task) override { task(); }
 };
@@ -157,7 +159,8 @@ class AsyncWorkServiceStdAsync
 public:
   AsyncWorkServiceStdAsync()
     : cppmicroservices::async::AsyncWorkService()
-  {}
+  {
+  }
 
   void post(std::packaged_task<void()>&& task) override
   {

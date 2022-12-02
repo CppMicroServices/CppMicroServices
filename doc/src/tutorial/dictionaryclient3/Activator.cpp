@@ -53,7 +53,8 @@ public:
   Activator()
     : m_context()
     , m_tracker(nullptr)
-  {}
+  {
+  }
 
   /**
    * Implements BundleActivator::Start(). Creates a service

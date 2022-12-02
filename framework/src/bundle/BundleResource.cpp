@@ -40,7 +40,8 @@ class BundleResourcePrivate
 public:
   BundleResourcePrivate(std::shared_ptr<const BundleArchive> archive)
     : archive(std::move(archive))
-  {}
+  {
+  }
 
   void InitFilePath(const std::string& file);
 
@@ -89,11 +90,13 @@ void BundleResourcePrivate::InitFilePath(const std::string& file)
 
 BundleResource::BundleResource()
   : d(std::make_shared<BundleResourcePrivate>(nullptr))
-{}
+{
+}
 
 BundleResource::BundleResource(const BundleResource& resource)
   : d(resource.d)
-{}
+{
+}
 
 BundleResource::BundleResource(
   const std::string& file,

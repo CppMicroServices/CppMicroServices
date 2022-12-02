@@ -48,7 +48,8 @@ class ActivatorTest : public ::testing::Test
 protected:
   ActivatorTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   virtual ~ActivatorTest() = default;
 

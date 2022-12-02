@@ -122,11 +122,13 @@ void CFRLogger::Open()
   if (!cfrContext) {
     return;
   }
-  serviceTracker = std::make_unique<cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>> (cfrContext, this);
+  serviceTracker = std::make_unique<
+    cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>(
+    cfrContext, this);
   serviceTracker->Open();
 }
 
-void CFRLogger::Close() 
+void CFRLogger::Close()
 {
   auto l = this->Lock();
   US_UNUSED(l);

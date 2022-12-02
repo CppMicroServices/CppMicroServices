@@ -57,7 +57,8 @@ public:
 
 BundleEvent::BundleEvent()
   : d(nullptr)
-{}
+{
+}
 
 BundleEvent::operator bool() const
 {
@@ -66,11 +67,13 @@ BundleEvent::operator bool() const
 
 BundleEvent::BundleEvent(Type type, const Bundle& bundle)
   : d(new BundleEventData(type, bundle, bundle))
-{}
+{
+}
 
 BundleEvent::BundleEvent(Type type, const Bundle& bundle, const Bundle& origin)
   : d(new BundleEventData(type, bundle, origin))
-{}
+{
+}
 
 Bundle BundleEvent::GetBundle() const
 {

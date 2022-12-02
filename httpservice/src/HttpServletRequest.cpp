@@ -329,7 +329,8 @@ void HttpServletRequest::SetAttribute(const std::string& name, const Any& value)
 
 HttpServletRequest::HttpServletRequest(HttpServletRequestPrivate* d)
   : d(d)
-{}
+{
+}
 }
 
 US_MSVC_POP_WARNING

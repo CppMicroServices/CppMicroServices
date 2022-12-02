@@ -90,7 +90,8 @@ class RegistrationManagerTest : public ::testing::Test
 protected:
   RegistrationManagerTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   virtual ~RegistrationManagerTest() = default;
 

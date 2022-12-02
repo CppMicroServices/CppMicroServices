@@ -51,7 +51,8 @@ class InitialBundleMapCleanup
 public:
   InitialBundleMapCleanup(std::function<void()> cleanupFcn)
     : _cleanupFcn(std::move(cleanupFcn))
-  {}
+  {
+  }
   ~InitialBundleMapCleanup() { _cleanupFcn(); }
 
 private:
@@ -64,7 +65,8 @@ namespace cppmicroservices {
 
 BundleRegistry::BundleRegistry(CoreBundleContext* coreCtx)
   : coreCtx(coreCtx)
-{}
+{
+}
 
 BundleRegistry::~BundleRegistry() = default;
 

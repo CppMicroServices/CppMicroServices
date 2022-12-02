@@ -40,7 +40,8 @@ class FailedBoundServiceActivationTest
 public:
   FailedBoundServiceActivationTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   void SetUp() override
   {

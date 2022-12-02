@@ -6,7 +6,8 @@ DSGraph01Impl::DSGraph01Impl(const std::shared_ptr<test::DSGraph02>& g02,
   : test::DSGraph01()
   , graph02(g02)
   , graph03(g03)
-{}
+{
+}
 
 DSGraph01Impl::~DSGraph01Impl() = default;
 

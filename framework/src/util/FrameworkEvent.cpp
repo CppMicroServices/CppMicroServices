@@ -41,7 +41,8 @@ public:
     , bundle(std::move(bundle))
     , message(std::move(message))
     , exception(exception)
-  {}
+  {
+  }
 
   FrameworkEventData(const FrameworkEventData& other)
 
@@ -55,14 +56,16 @@ public:
 
 FrameworkEvent::FrameworkEvent()
   : d(nullptr)
-{}
+{
+}
 
 FrameworkEvent::FrameworkEvent(Type type,
                                const Bundle& bundle,
                                const std::string& message,
                                const std::exception_ptr exception)
   : d(new FrameworkEventData(type, bundle, message, exception))
-{}
+{
+}
 
 Bundle FrameworkEvent::GetBundle() const
 {

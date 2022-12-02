@@ -87,7 +87,8 @@ class MetadataParserImplV1Test : public ::testing::Test
 protected:
   MetadataParserImplV1Test()
     : logger(std::make_shared<FakeLogger>())
-  {}
+  {
+  }
   ~MetadataParserImplV1Test() = default;
   std::shared_ptr<FakeLogger> logger;
 
@@ -174,7 +175,8 @@ struct MetadataInvalidManifestState
     : manifestName(std::move(manifestName))
     , errorOutput(std::move(_errorOutput))
     , isPartial(_isPartial)
-  {}
+  {
+  }
 
   std::string manifestName;
   std::string errorOutput;
@@ -199,7 +201,8 @@ protected:
 
   InvalidMetadataTest()
     : logger(std::make_shared<FakeLogger>())
-  {}
+  {
+  }
 
   ~InvalidMetadataTest() = default;
 

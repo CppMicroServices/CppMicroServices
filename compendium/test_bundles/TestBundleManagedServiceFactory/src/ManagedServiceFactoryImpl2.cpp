@@ -17,14 +17,13 @@ void TestManagedServiceFactoryImpl2::Activate(
 }
 
 void TestManagedServiceFactoryImpl2::Updated(std::string const& pid,
-                                            AnyMap const& properties)
+                                             AnyMap const& properties)
 {
   std::lock_guard<std::mutex> lk(m_updatedMtx);
   if (properties.empty()) {
     m_updatedCallCount[pid] -= 1;
   } else {
     m_updatedCallCount[pid] += 1;
-
   }
 }
 

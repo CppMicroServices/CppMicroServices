@@ -154,7 +154,7 @@ MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
   object = ObjectValidator(metadata, "configuration-pid", /*isOptional=*/true);
   if (object.KeyExists()) {
     configPid = true;
-    if (configPolicy ) {
+    if (configPolicy) {
       const auto configPids =
         object.GetValue<std::vector<cppmicroservices::Any>>();
       std::transform(

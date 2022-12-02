@@ -34,7 +34,8 @@ namespace metadata {
 MetadataParserImplV1::MetadataParserImplV1(
   std::shared_ptr<cppmicroservices::logservice::LogService> lggr)
   : logger(std::move(lggr))
-{}
+{
+}
 
 std::vector<ConfigurationMetadata>
 MetadataParserImplV1::ParseAndGetConfigurationMetadata(

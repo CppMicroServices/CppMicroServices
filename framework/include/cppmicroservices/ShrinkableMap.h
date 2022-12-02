@@ -54,7 +54,8 @@ public:
 
   ShrinkableMap()
     : container(emptyContainer)
-  {}
+  {
+  }
 
   iterator begin() { return container.begin(); }
 
@@ -128,7 +129,8 @@ private:
 
   ShrinkableMap(container_type& container)
     : container(container)
-  {}
+  {
+  }
 
   container_type& container;
 };

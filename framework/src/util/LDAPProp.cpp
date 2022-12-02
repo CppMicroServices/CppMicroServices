@@ -29,11 +29,13 @@ namespace cppmicroservices {
 
 LDAPPropExpr::LDAPPropExpr()
   : m_ldapExpr()
-{}
+{
+}
 
 LDAPPropExpr::LDAPPropExpr(std::string expr)
   : m_ldapExpr(std::move(expr))
-{}
+{
+}
 
 LDAPPropExpr& LDAPPropExpr::operator!()
 {

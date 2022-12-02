@@ -178,7 +178,8 @@ public:
 
   ServiceRegistrationBase& operator=(
     const ServiceRegistrationBase& registration);
-  ServiceRegistrationBase& operator=(ServiceRegistrationBase&& registration) noexcept;
+  ServiceRegistrationBase& operator=(
+    ServiceRegistrationBase&& registration) noexcept;
 
 private:
   friend class ServiceRegistry;

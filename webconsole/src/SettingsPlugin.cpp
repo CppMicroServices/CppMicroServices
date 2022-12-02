@@ -38,7 +38,8 @@ namespace cppmicroservices {
 
 SettingsPlugin::SettingsPlugin()
   : SimpleWebConsolePlugin("settings", "Settings", "")
-{}
+{
+}
 
 void SettingsPlugin::RenderContent(HttpServletRequest& request,
                                    HttpServletResponse& response)

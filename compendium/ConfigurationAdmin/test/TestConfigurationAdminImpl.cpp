@@ -84,7 +84,8 @@ class TestConfigurationAdminImpl : public ::testing::Test
 protected:
   TestConfigurationAdminImpl()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   ~TestConfigurationAdminImpl() override = default;
 
@@ -610,7 +611,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
     std::make_shared<MockManagedServiceFactory>();
   // setup expectations.
   // mockManagedServiceFactory will receive one Updated notification
-  // and one Removed Notification. 
+  // and one Removed Notification.
   // mockManagedServiceFactory2 will receive two Updated notifications.
   // mockManagedServiceFactory3 will receive no notifications.
   EXPECT_CALL(*mockManagedServiceFactory,
@@ -707,10 +708,10 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceFactoryNotification)
 
   configAdmin.WaitForAllAsync();
 }
-// This test confirms that when ConfigurationAdmin shuts down the appropriate 
+// This test confirms that when ConfigurationAdmin shuts down the appropriate
 // Removed notifications should be sent to the ManagedService and ManagedFactoryServices.
-// Configuration objects will be added to the repository but never updated so when 
-// ConfigurationAdmin shuts down no Remove notifications should be sent to the 
+// Configuration objects will be added to the repository but never updated so when
+// ConfigurationAdmin shuts down no Remove notifications should be sent to the
 // ManagedServices or ManagedServiceFactorys
 TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
 {
@@ -731,9 +732,9 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
   auto mockManagedServiceFactory2 =
     std::make_shared<MockManagedServiceFactory>();
   // setup expectations.
-  // Test registers two mockManagedServices and two mockManagedFactoryServices 
+  // Test registers two mockManagedServices and two mockManagedFactoryServices
   // Configuration objects are created but never updated so no Updated or Removed
-  // notifications should be sent to the services when ConfigurationAdmin 
+  // notifications should be sent to the services when ConfigurationAdmin
   // shuts down.
 
   // ManagedServices do not have a Removed method. Updated is called with empty
@@ -797,11 +798,11 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
 
     EXPECT_TRUE(factoryInvokedZeroTimes);
     // ConfigurationAdminImpl was constructed in this scope so the next statement will
-    // cause it to be shut down. 
-    // The configuration objects that were added to the repository were never updated 
-    // so no Removed notifications will be sent to the ManagedServices or the 
-    // ManagedFactoryServices. Removed notifications can only be sent if an Updated 
-    // notification has been previously sent. 
+    // cause it to be shut down.
+    // The configuration objects that were added to the repository were never updated
+    // so no Removed notifications will be sent to the ManagedServices or the
+    // ManagedFactoryServices. Removed notifications can only be sent if an Updated
+    // notification has been previously sent.
   }
 
   std::unique_lock<std::mutex> ul{ counterMutex };
@@ -823,7 +824,8 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotification)
 // Configuration objects will be added to the repository and updated so when
 // ConfigurationAdmin shuts down  Remove notifications should be sent to the
 // ManagedServices and ManagedServiceFactories
-TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotificationWithUpdate)
+TEST_F(TestConfigurationAdminImpl,
+       VerifyConfigAdminStartupShutdownNotificationWithUpdate)
 {
   auto bundleContext = GetFramework().GetBundleContext();
   auto fakeLogger = std::make_shared<FakeLogger>();
@@ -838,7 +840,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotificationW
   std::condition_variable counterCV;
   auto msCounter = 0u;
   auto msfCounter = 0u;
- 
+
   auto f = [&counterMutex, &counterCV, &msCounter] {
     {
       std::lock_guard<std::mutex> lk{ counterMutex };
@@ -859,17 +861,16 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotificationW
     std::make_shared<MockManagedServiceFactory>();
   // setup expectations.
   // The test registers a mockManagedService and a mockManagedFactoryService.
-  // Configuration objects are created and updated so each of the services 
-  // should receive one Updated notification and one Removed notification. 
+  // Configuration objects are created and updated so each of the services
+  // should receive one Updated notification and one Removed notification.
 
-  // For the mockManagedService the Updated method is used for both Updated 
+  // For the mockManagedService the Updated method is used for both Updated
   // and Removed. The Removed notification calls Updated with empty properties.
   EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(props))).Times(1);
   EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(emptyProps)))
-    .WillOnce(testing::InvokeWithoutArgs(f)); 
-  EXPECT_CALL(
-    *mockManagedServiceFactory,
-    Updated(std::string{ "factory~instance1" }, AnyMapEquals(props)))
+    .WillOnce(testing::InvokeWithoutArgs(f));
+  EXPECT_CALL(*mockManagedServiceFactory,
+              Updated(std::string{ "factory~instance1" }, AnyMapEquals(props)))
     .Times(1);
   EXPECT_CALL(*mockManagedServiceFactory,
               Removed(std::string{ "factory~instance1" }))
@@ -924,7 +925,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotificationW
     // The configuration objects that were added to the repository were updated
     // so Removed notifications will be sent to the ManagedServices and the
     // ManagedFactoryServices. Removed notifications must be sent if an Updated
-    // notification has been previously sent. 
+    // notification has been previously sent.
   }
 
   std::unique_lock<std::mutex> ul{ counterMutex };
@@ -938,7 +939,6 @@ TEST_F(TestConfigurationAdminImpl, VerifyConfigAdminStartupShutdownNotificationW
 
   reg1.Unregister();
   reg2.Unregister();
-
 }
 TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceExceptionsAreLogged)
 {
@@ -1066,7 +1066,7 @@ TEST_F(TestConfigurationAdminImpl, VerifyManagedServiceExceptionsAreLogged)
     .WillOnce(
       testing::DoAll(testing::InvokeWithoutArgs(f),
                      testing::Throw(std::runtime_error("An exception"))));
-  
+
   // Update is called without any properties for a Remove operation
   EXPECT_CALL(*mockManagedService, Updated(AnyMapEquals(emptyProps)))
     .WillOnce(

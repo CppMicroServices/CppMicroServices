@@ -57,7 +57,8 @@ BundleArchive::BundleArchive()
   : storage(nullptr)
   , bundleId(0)
   , manifest(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
-{}
+{
+}
 
 BundleArchive::BundleArchive(
   BundleStorage* storage,
@@ -74,7 +75,8 @@ BundleArchive::BundleArchive(
   , lastModified(now())
   , autostartSetting(-1)
   , manifest(std::move(bundleManifest))
-{}
+{
+}
 
 bool BundleArchive::IsValid() const
 {

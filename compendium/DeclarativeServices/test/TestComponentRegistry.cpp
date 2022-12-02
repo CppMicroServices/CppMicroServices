@@ -61,7 +61,8 @@ public:
     : ComponentManager()
     , mBundleId(++id)
     , mName(GenRandomString())
-  {}
+  {
+  }
   ~FakeComponentManager(){};
   unsigned long GetBundleId() const override { return mBundleId; }
   std::string GetName() const override { return mName; }
@@ -91,7 +92,8 @@ protected:
   ComponentRegistryTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
     , registry(std::make_shared<ComponentRegistry>())
-  {}
+  {
+  }
   virtual ~ComponentRegistryTest() = default;
 
   virtual void SetUp()

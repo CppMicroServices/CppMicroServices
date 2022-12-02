@@ -69,7 +69,8 @@ ServiceRegistrationBase::ServiceRegistrationBase(
   const InterfaceMapConstPtr& service,
   Properties&& props)
   : d(new ServiceRegistrationBasePrivate(bundle, service, std::move(props)))
-{}
+{
+}
 
 ServiceRegistrationBase::operator bool() const
 {

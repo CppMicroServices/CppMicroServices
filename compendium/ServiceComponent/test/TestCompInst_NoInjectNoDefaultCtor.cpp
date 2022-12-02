@@ -42,7 +42,8 @@ public:
   TestServiceImpl() = delete;
   TestServiceImpl(const std::shared_ptr<ServiceDependency>& d)
     : dep(d)
-  {}
+  {
+  }
   virtual ~TestServiceImpl() = default;
 
 private:

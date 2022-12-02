@@ -39,7 +39,8 @@ class SingletonComponentConfigurationTest : public ::testing::Test
 protected:
   SingletonComponentConfigurationTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   virtual ~SingletonComponentConfigurationTest() = default;
 

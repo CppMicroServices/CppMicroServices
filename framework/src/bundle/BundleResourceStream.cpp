@@ -35,7 +35,8 @@ BundleResourceStream::BundleResourceStream(const BundleResource& resource,
                          resource.GetSize(),
                          mode | std::ios_base::in)
   , std::istream(this)
-{}
+{
+}
 }
 
 US_MSVC_POP_WARNING

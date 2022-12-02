@@ -68,8 +68,8 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
         { "require", "optional", "ignore" }
       };
       componentInfo.configurationPolicy =
-       JsonValueValidator(
-          jsonComponent, "configuration-policy", policyChoices).GetString();
+        JsonValueValidator(jsonComponent, "configuration-policy", policyChoices)
+          .GetString();
     }
     if (jsonComponent.isMember("configuration-pid")) {
       configPid = true;
@@ -98,12 +98,12 @@ std::vector<ComponentInfo> ManifestParserImplV1::ParseAndGetComponentInfos(
         "Admin.");
     }
     // factory
-     if (jsonComponent.isMember("factory")) {
-      auto factoryComponentID =
-        JsonValueValidator(
-          jsonComponent, "factory", Json::ValueType::stringValue)
-          .GetString();
-     }
+    if (jsonComponent.isMember("factory")) {
+      auto factoryComponentID = JsonValueValidator(jsonComponent,
+                                                   "factory",
+                                                   Json::ValueType::stringValue)
+                                  .GetString();
+    }
 
     // service
     if (jsonComponent.isMember("service")) {

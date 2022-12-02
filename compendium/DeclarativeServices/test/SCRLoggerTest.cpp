@@ -44,7 +44,8 @@ class SCRLoggerTest : public ::testing::Test
 protected:
   SCRLoggerTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   virtual ~SCRLoggerTest() = default;
 
   virtual void SetUp() { framework.Start(); }

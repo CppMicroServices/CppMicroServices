@@ -10,7 +10,8 @@ namespace test {
 
 TestManagedServiceImpl::TestManagedServiceImpl()
   : m_counter{ 0 }
-{}
+{
+}
 
 TestManagedServiceImpl::~TestManagedServiceImpl() = default;
 

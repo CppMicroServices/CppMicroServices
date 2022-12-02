@@ -5,11 +5,13 @@ namespace sample {
 
 void ServiceComponentDynamicReluctantMandatoryUnary::Activate(
   const std::shared_ptr<ComponentContext>& /*ctxt*/)
-{}
+{
+}
 
 void ServiceComponentDynamicReluctantMandatoryUnary::Deactivate(
   const std::shared_ptr<ComponentContext>&)
-{}
+{
+}
 
 std::string
 ServiceComponentDynamicReluctantMandatoryUnary::ExtendedDescription()

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+printf "Running clang-format pre-commit hook... ";
+
+CLANG_FORMAT=$(which clang-format)
+
+if [ ! -x "$CLANG_FORMAT" ]; then
+  printf "Error.\n";
+  printf "The clang-format cannot be found in your PATH. Please ensure clang-format is installed and on the PATH."
+  exit 1
+fi
+
+# Get clang-format output and store it for later checking
+clangformatoutput=$(git clang-format --style=file --diff --staged -q)
+
+# Redirect output to stderr
+exec 1>&2
+
+if [ "$clangformatoutput" != "" ];
+then
+  printf "Error.\n";
+  printf "clang-format detected that changes have been made and are not properly formatted!\n"
+  printf "Please run \`git clang-format --style=file --staged\`, re-stage modified files, and commit.\n"
+  exit 1
+else
+  printf "Success.\n";
+fi

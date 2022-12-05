@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Run clang-format pre-commit hook
+sh .githooks/pre-commit-clang-format-hook

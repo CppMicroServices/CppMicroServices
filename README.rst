@@ -237,4 +237,5 @@ If the clang-format pre-commit hook fails because `clang-format` is not installe
 put it on the path. Similarly, if `git-clang-format` is not installed, do the same. `git-clang-format` comes
 with the LLVM distribution of `clang-format`.
 
-If this is not feasible for you, you can specify `--no-verify` when committing your changes. This is heavily discouraged.
+If this is not feasible for you, you can specify `--no-verify` when committing your changes. This is heavily discouraged
+and you must provide a justification as to why you are unable to format your commit.

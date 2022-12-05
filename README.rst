@@ -239,3 +239,6 @@ with the LLVM distribution of `clang-format`.
 
 If this is not feasible for you, you can specify `--no-verify` when committing your changes. This is heavily discouraged
 and you must provide a justification as to why you are unable to format your commit.
+
+We reserve the right to reject any pull requests that are not properly formatted and do not have a
+valid justification specified.

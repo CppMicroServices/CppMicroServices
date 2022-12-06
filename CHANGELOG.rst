@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project branch will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
@@ -14,10 +14,34 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 General Note
 ------------
 
-This branch currently contains all changes from v3.7.2 except the ones introducing C++17 functionality and removing abseil.
+This branch is intended to continue to provide bugfixes and improvements while staying compliant to C++14.
+
+Added
+-----
+
+Changed
+-------
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+`v3.6.1 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.6.1>`_ (2022-12-06)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.6.0...v3.6.1>`_
+
+General Note
+------------
+
+This version contains all changes from v3.7.2 except the ones introducing C++17 functionality and removing abseil.
 Additionally there have been 3rd-party dependency updates and some compiler warning fixes not in v3.7.2.
 Same as for v3.7.2, this list does not include every change since v3.6.0, but only the relevant changes.
-The version was set to v3.6.1.
 
 Added
 -----

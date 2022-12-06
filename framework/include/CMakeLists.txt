@@ -5,6 +5,7 @@
 set(_public_headers
   cppmicroservices/Any.h
   cppmicroservices/AnyMap.h
+  cppmicroservices/FilteringStrategy.h
   cppmicroservices/Framework.h
   cppmicroservices/FrameworkEvent.h
   cppmicroservices/FrameworkFactory.h

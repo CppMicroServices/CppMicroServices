@@ -52,6 +52,7 @@ public:
 
   void Clear_unlocked();
 
+  const AnyMap& GetPropsAnyMap() const { return props; }
 private:
   jsoncons::json json_props;
   // An AnyMap is used to store the properties rather than 2 vectors (one for keys
@@ -73,6 +74,7 @@ private:
   // Helper that populates the case-insensitive lookup map when the provided AnyMap is not
   // already case insensitive.
   void PopulateCaseInsensitiveLookupMap();
+  void update_json_props();
 };
 
 class PropertiesHandle

@@ -51,8 +51,10 @@ void Properties::PopulateCaseInsensitiveLookupMap()
   } else {
     throw std::runtime_error("Unsupported map type.");
   }
-  
-  // jsoncons
+}
+
+void Properties::update_json_props()
+{
   std::stringstream jstr;
   any_value_to_json(jstr,props);
   json_props = jsoncons::json::parse(jstr.str());
@@ -72,6 +74,7 @@ Properties::Properties(const AnyMap& p)
 
     PopulateCaseInsensitiveLookupMap();
   }
+  update_json_props();
 }
 
 Properties::Properties(AnyMap&& p)
@@ -83,6 +86,7 @@ Properties::Properties(AnyMap&& p)
 
     PopulateCaseInsensitiveLookupMap();
   }
+  update_json_props();
 }
 
 Properties::Properties(Properties&& o) noexcept
@@ -92,6 +96,7 @@ Properties::Properties(Properties&& o) noexcept
   if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
     PopulateCaseInsensitiveLookupMap();
   }
+  update_json_props();
 }
 
 Properties& Properties::operator=(Properties&& o) noexcept
@@ -100,6 +105,7 @@ Properties& Properties::operator=(Properties&& o) noexcept
   if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
     PopulateCaseInsensitiveLookupMap();
   }
+  update_json_props();
   return *this;
 }
 

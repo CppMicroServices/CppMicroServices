@@ -300,6 +300,22 @@ bool LDAPExpr::IsSimple(const StringList& keywords,
   return false;
 }
 
+bool LDAPExpr::IsComplicated() const
+{
+  bool rval = true;
+  if (d) {
+    if (d->m_operator == EQ) {
+      rval = false;
+    }
+    else if (d->m_operator == OR) {
+      rval = std::any_of(std::begin(d->m_args),std::end(d->m_args),[](const LDAPExpr& subexpr) {
+        return subexpr.IsComplicated();
+      });
+    }
+  }
+  return rval;
+}
+
 bool LDAPExpr::IsNull() const
 {
   return !d;

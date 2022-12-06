@@ -42,7 +42,7 @@ JSONFilter::JSONFilter()
 
 JSONFilter::JSONFilter(const std::string& filter)
   : filter_str(filter)
-{  
+{
       std::error_code ec;
       auto expr =  jsoncons::jmespath::jmespath_expression<jsoncons::json>::compile(filter, ec);
       if (ec) {
@@ -60,28 +60,29 @@ JSONFilter::operator bool() const
 }
 
 bool JSONFilter::Match(const ServiceReferenceBase& reference) const
-{ 
-	if (filter_str.empty()) 
+{
+    if (filter_str.empty())
     {
-		return false;
-	}
+        return false;
+    }
 
-	jsoncons::json js = reference.d.load()->GetProperties()->JSON_unlocked();
-	jsoncons::json result = jsoncons::jmespath::search(js, filter_str);
-  
-	return ( result.is_bool() ? result.as_bool(): false );
+    jsoncons::json js = reference.d.load()->GetProperties()->JSON_unlocked();
+    jsoncons::json result = jsoncons::jmespath::search(js, filter_str);
+
+    return ( result.is_bool() ? result.as_bool(): false );
 }
 
 bool JSONFilter::Match(const Bundle& bundle) const
-{   
+{
     if (filter_str.empty())
     {
        return false;
     }
 
-    jsoncons::json js = PropertiesHandle(Properties(bundle.GetHeaders()), false)->JSON_unlocked();
+    auto props = Properties(bundle.GetHeaders());
+    jsoncons::json js = PropertiesHandle(props, false)->JSON_unlocked();
     jsoncons::json result = jsoncons::jmespath::search(js, filter_str);
- 
+
     return (result.is_bool() ? result.as_bool() : false);
  }
 
@@ -94,8 +95,8 @@ bool JSONFilter::Match(const AnyMap& dictionary) const
 
     jsoncons::json js = PropertiesHandle(Properties(dictionary), false)->JSON_unlocked();
     jsoncons::json result = jsoncons::jmespath::search(js, filter_str);
-    
-	return (result.is_bool() ? result.as_bool() : false);
+
+    return (result.is_bool() ? result.as_bool() : false);
 }
 
 std::string JSONFilter::ToString() const

@@ -25,23 +25,12 @@
 US_MSVC_PUSH_DISABLE_WARNING(
   4180) // qualifier applied to function type has no meaning; ignored
 
+#include "cppmicroservices/FilteringStrategy.h"
 #include "ServiceListenerEntry.h"
-
 #include "ServiceListenerHookPrivate.h"
-
 #include <cassert>
 
 namespace cppmicroservices {
-
-struct ServiceListenerCompare
-  : std::function<bool(ServiceListener, ServiceListener)>
-{
-  bool operator()(const ServiceListener& f1, const ServiceListener& f2) const
-  {
-    return f1.target<void(const ServiceEvent&)>() ==
-           f2.target<void(const ServiceEvent&)>();
-  }
-};
 
 class ServiceListenerEntryData : public ServiceListenerHook::ListenerInfoData
 {
@@ -53,29 +42,17 @@ public:
                            const ServiceListener& l,
                            void* data,
                            ListenerTokenId tokenId,
-                           const std::string& filter,
-                           const bool isJSON)
-    : ServiceListenerHook::ListenerInfoData(context, l, data, tokenId, filter)
-    , ldap()
+                           const std::string& filter_string)
+    : ServiceListenerHook::ListenerInfoData(context, l, data, tokenId, filter_string)
+    , filter(filter_string)
+    , local_cache()
     , hashValue(0)
-    , isJSON(isJSON)
-    , json()
   {
-    if ( !isJSON && !filter.empty()) {
-      ldap = LDAPExpr(filter);
-    }
-
-    if (isJSON) {
-      json = JSONFilter(filter);
-    }
-
   }
 
   ~ServiceListenerEntryData() override = default;
 
-  LDAPExpr ldap;
-  bool isJSON ;
-  JSONFilter json ;
+  FilteringStrategy filter;
   
   /**
    * The elements of "simple" filters are cached, for easy lookup.
@@ -132,26 +109,10 @@ ServiceListenerEntry::ServiceListenerEntry(
   const ServiceListener& l,
   void* data,
   ListenerTokenId tokenId,
-  const std::string& filter,
-   const bool isJSON)
+  const std::string& filter_string)
   : ServiceListenerHook::ListenerInfo(
-      new ServiceListenerEntryData(context, l, data, tokenId, filter, isJSON))
+      new ServiceListenerEntryData(context, l, data, tokenId, filter_string))
 {}
-
-const LDAPExpr& ServiceListenerEntry::GetLDAPExpr() const
-{
-  return static_cast<ServiceListenerEntryData*>(d.get())->ldap;
-}
-
-const JSONFilter& ServiceListenerEntry::GetJSONFilter() const
-{
-  return static_cast<ServiceListenerEntryData*>(d.get())->json;
-}
-
-const bool& ServiceListenerEntry::isJSONFilter() const
-{
-  return static_cast<ServiceListenerEntryData*>(d.get())->isJSON;
-}
 
 LDAPExpr::LocalCache& ServiceListenerEntry::GetLocalCache() const
 {
@@ -180,8 +141,10 @@ bool ServiceListenerEntry::Contains(
   const ServiceListener& listener,
   void* data) const
 {
-  return (d->context == context) && (d->data == data) &&
-         ServiceListenerCompare()(d->listener, listener);
+  return ((d->context == context)
+          && (d->data == data)
+          && (d->listener.target<void(const ServiceEvent&)>() ==
+              listener.target<void(const ServiceEvent&)>()));
 }
 
 ListenerTokenId ServiceListenerEntry::Id() const
@@ -201,6 +164,22 @@ std::size_t ServiceListenerEntry::Hash() const
 
   return static_cast<ServiceListenerEntryData*>(d.get())->hashValue;
 }
+
+bool ServiceListenerEntry::MatchFilter(const AnyMap& props) const
+{
+  return static_cast<ServiceListenerEntryData*>(d.get())->filter.Match(props);
+}
+
+bool ServiceListenerEntry::IsComplicatedFilter() const
+{
+  return static_cast<ServiceListenerEntryData*>(d.get())->filter.IsComplicated();
+}
+
+bool ServiceListenerEntry::AddToSimpleCache(const StringList& keywords, LocalCache& cache) const
+{
+  return static_cast<ServiceListenerEntryData*>(d.get())->filter.AddToSimpleCache(keywords, cache);
+}
+
 }
 
 US_MSVC_POP_WARNING

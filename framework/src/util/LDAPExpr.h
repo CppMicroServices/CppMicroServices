@@ -109,7 +109,8 @@ public:
   bool IsSimple(const StringList& keywords,
                 LocalCache& cache,
                 bool matchCase) const;
-
+  bool IsComplicated() const;
+  
   /**
    * Returns <code>true</code> if this instance is invalid, i.e. it was
    * constructed using LDAPExpr().

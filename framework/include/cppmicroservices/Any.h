@@ -116,6 +116,10 @@ US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
                                                     const uint8_t,
                                                     const int32_t);
 US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
+                                                    const char* val,
+                                                    const uint8_t,
+                                                    const int32_t);
+US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
                                                     bool val,
                                                     const uint8_t,
                                                     const int32_t);

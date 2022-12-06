@@ -199,8 +199,7 @@ ServiceRegistrationU BundleContext::RegisterService(
 
 std::vector<ServiceReferenceU> BundleContext::GetServiceReferences(
   const std::string& clazz,
-  const std::string& filter,
-  const bool isJSON)
+  const std::string& filter)
 {
   if (!d) {
     throw std::runtime_error("The bundle context is no longer valid");
@@ -312,7 +311,7 @@ InterfaceMapConstPtr BundleContext::GetService(
 }
 
 ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
-                                                const std::string& filter, const bool isJSON )
+                                                const std::string& filter)
 {
   if (!d) {
     throw std::runtime_error("The bundle context is no longer valid");
@@ -321,7 +320,7 @@ ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
   d->CheckValid();
   auto b = GetAndCheckBundlePrivate(d);
 
-  return b->coreCtx->listeners.AddServiceListener(d, delegate, nullptr, filter, isJSON);
+  return b->coreCtx->listeners.AddServiceListener(d, delegate, nullptr, filter);
 }
 
 void BundleContext::RemoveServiceListener(const ServiceListener& delegate)

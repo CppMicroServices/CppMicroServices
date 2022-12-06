@@ -46,6 +46,9 @@ class ServiceListenerEntry : public ServiceListenerHook::ListenerInfo
 {
 
 public:
+  using StringList = std::vector<std::string>;
+  using LocalCache = std::vector<StringList>;
+
   ServiceListenerEntry();
   ServiceListenerEntry(const ServiceListenerEntry& other);
   ServiceListenerEntry(const ServiceListenerHook::ListenerInfo& info);
@@ -59,14 +62,7 @@ public:
                        const ServiceListener& l,
                        void* data,
                        ListenerTokenId tokenId,
-                       const std::string& filter = "",
-                       const bool isJSON = false);
-
-  const LDAPExpr& GetLDAPExpr() const;
-  
-  const JSONFilter& GetJSONFilter() const;
-
-  const bool& isJSONFilter() const; 
+                       const std::string& filter = "");
 
   LDAPExpr::LocalCache& GetLocalCache() const;
 
@@ -82,6 +78,10 @@ public:
   ListenerTokenId Id() const;
 
   std::size_t Hash() const;
+
+  bool MatchFilter(const AnyMap& props) const;
+  bool IsComplicatedFilter() const;
+  bool AddToSimpleCache(const StringList& keywords, LocalCache& cache) const;
 };
 }
 

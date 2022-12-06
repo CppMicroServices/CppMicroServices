@@ -427,7 +427,7 @@ public:
    */
   std::vector<ServiceReferenceU> GetServiceReferences(
     const std::string& clazz,
-    const std::string& filter = std::string(), const bool isJSON = false);
+    const std::string& filter = std::string());
 
   /**
    * Returns a list of <code>ServiceReference</code> objects. The returned
@@ -454,7 +454,7 @@ public:
    */
   template<class S>
   std::vector<ServiceReference<S>> GetServiceReferences(
-    const std::string& filter = std::string(), const bool isJSON = false)
+    const std::string& filter = std::string())
   {
     auto& clazz = us_service_interface_iid<S>();
     if (clazz.empty())
@@ -462,7 +462,7 @@ public:
         "The service interface class has no "
         "CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
     using BaseVectorT = std::vector<ServiceReferenceU>;
-    BaseVectorT serviceRefs = GetServiceReferences(clazz, filter, isJSON);
+    BaseVectorT serviceRefs = GetServiceReferences(clazz, filter);
     std::vector<ServiceReference<S>> result;
     for (BaseVectorT::const_iterator i = serviceRefs.begin();
          i != serviceRefs.end();
@@ -692,8 +692,7 @@ public:
    * @see RemoveServiceListener()
    */
   ListenerToken AddServiceListener(const ServiceListener& listener,
-                                   const std::string& filter = std::string(),
-                                   const bool isJSON = false);
+                                   const std::string& filter = std::string());
 
   /**
    * Removes the specified <code>listener</code> from the context bundle's

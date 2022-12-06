@@ -116,13 +116,13 @@ static void MatchFilterWithServiceReference(benchmark::State& state,
   }
 }
 
-/*
-* "service" : {
-*       "testPropery" : "YES",
-*       "nestedProperty" : {
-*                 "foo" : "bar"
-*        }      
-* }
+#if NEVER
+"service" : {
+      "testPropery" : "YES",
+      "nestedProperty" : {
+                "foo" : "bar"
+       }      
+}
 
 
 static void LDAPNestedServiceReference(benchmark::State& state)
@@ -139,7 +139,7 @@ static void LDAPNestedServiceReference(benchmark::State& state)
     scopedFramework.framework.GetBundleContext().GetServiceReference(
       "cppmicroservices::TestBundleLQService");
 
-  /* for (const auto& service : services) {
+  for (const auto& service : services) {
     try {
       const AnyMap serviceProps = [&service] {
         const auto props = ref_any_cast<const AnyMap>(service.GetProperty("service"));
@@ -182,7 +182,8 @@ static void LDAPNestedBundle(benchmark::State& state)
     }
   };
 }
-*/
+#endif
+
 static void LDAPNestedQuery(benchmark::State& state)
 {
   auto framework = FrameworkFactory().NewFramework();
@@ -195,11 +196,10 @@ static void LDAPNestedQuery(benchmark::State& state)
   }
 
   LDAPFilter filt("(e=found)");
-  bool res = false;
   for (auto _ : state) {
     Any aaa = bundle.GetHeaders().AtCompoundKey("a.b.c.d", Any());
     if (!aaa.Empty()) {
-      res = filt.Match(ref_any_cast<const AnyMap>(aaa));
+      (void)filt.Match(ref_any_cast<const AnyMap>(aaa));
     }
   }
 }

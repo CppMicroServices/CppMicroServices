@@ -67,6 +67,9 @@ class US_Framework_EXPORT LDAPFilter
 {
 
 public:
+  using StringList = std::vector<std::string>;
+  using LocalCache = std::vector<StringList>;
+
   /**
    * Creates a valid <code>LDAPFilter</code> object that
    * matches nothing.
@@ -158,6 +161,9 @@ public:
    */
   bool MatchCase(const AnyMap& dictionary) const;
 
+  bool IsComplicated() const;
+  bool AddToSimpleCache(const StringList& keywords, LocalCache& cache) const;
+  
   /**
    * Returns this <code>LDAPFilter</code>'s filter string.
    * <p>

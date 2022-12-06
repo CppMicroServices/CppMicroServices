@@ -132,6 +132,24 @@ bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
   }
 }
 
+bool LDAPFilter::IsComplicated() const
+{
+  if (d) {
+    return d->ldapExpr.IsComplicated();
+  }
+  else {
+    return false;
+  }
+}
+
+bool LDAPFilter::AddToSimpleCache(const StringList& keywords, LocalCache& cache) const
+{
+  if (d) {
+    return d->ldapExpr.IsSimple(keywords, cache, false);
+  }
+  return false;
+}
+
 std::string LDAPFilter::ToString() const
 {
   return ((d) ? d->ldapExpr.ToString() : std::string());

@@ -77,6 +77,14 @@ std::ostream& any_value_to_json(std::ostream& os,
 }
 
 std::ostream& any_value_to_json(std::ostream& o,
+                                const char* s,
+                                const uint8_t increment,
+                                const int32_t indent)
+{
+  return any_value_to_json(o,std::string(s),increment,indent);
+}
+  
+std::ostream& any_value_to_json(std::ostream& o,
                                 const std::string& s,
                                 const uint8_t,
                                 const int32_t)

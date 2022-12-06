@@ -67,14 +67,14 @@ template<class S, class T>
 ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
                                      const LDAPFilter& filter,
                                      _ServiceTrackerCustomizer* customizer)
-  : d(new _ServiceTrackerPrivate(this, context, filter, customizer))
+  : d(new _ServiceTrackerPrivate(this, context, FilteringStrategy(filter), customizer))
 {}
 
 template<class S, class T>
 ServiceTracker<S,T>::ServiceTracker(const BundleContext& context,
                                     const JSONFilter& filter,
                                     _ServiceTrackerCustomizer* customizer)
-  : d(new _ServiceTrackerPrivate(this, context, filter, customizer))
+  : d(new _ServiceTrackerPrivate(this, context, FilteringStrategy(filter), customizer))
 {
 }
 
@@ -105,16 +105,15 @@ void ServiceTracker<S, T>::Open()
       return;
     }
 
-   /* DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::Open: " 
-	                                   << ((d->isJSON == false) ? d->filter : d->jsonFilter);
-    */
+    DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::Open: " 
+                                       << d->filter.ToString();
     t.reset(new _TrackedService(this, d->customizer));
     try {
       /* Remove if already exists. No-op if it's an invalid (default) token */
       d->context.RemoveListener(std::move(d->listenerToken));
       d->listenerToken = d->context.AddServiceListener(std::bind(&_TrackedService::ServiceChanged,
                                                                  t, std::placeholders::_1),
-                                                       d->listenerFilter, d->isJSON);
+                                                       d->listenerFilter);
       std::vector<ServiceReference<S>> references;
       if (!d->trackClass.empty()) {
         references = d->GetInitialReferences(d->trackClass, std::string());
@@ -123,10 +122,7 @@ void ServiceTracker<S, T>::Open()
           references.push_back(d->trackReference);
         } else { /* user supplied filter */
           references = d->GetInitialReferences(std::string(),
-                                               (d->listenerFilter.empty() ?
-                                               ((d->isJSON == false) ? d->filter.ToString() : d->jsonFilter.ToString())
-											   : d->listenerFilter)
-											   );
+                                               (d->listenerFilter.empty() ? d->filter.ToString() : d->listenerFilter));
         }
       }
       /* set tracked with the initial references */
@@ -164,11 +160,9 @@ void ServiceTracker<S, T>::Close()
       return;
     }
 
-   /* DIAG_LOG(*d->context.GetLogSink())
-      << "ServiceTracker<S,TTT>::close:" 
-	  <<((d->isJSON == false) ? d->filter : d->jsonFilter);
-   */
-   outgoing->Close();
+    DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close:" 
+                                       << d->filter.ToString();
+    outgoing->Close();
 
     d->Modified();         /* clear the cache */
     outgoing->NotifyAll(); /* wake up any waiters */
@@ -193,8 +187,8 @@ void ServiceTracker<S, T>::Close()
   if (d->context.GetLogSink()->Enabled()) {
     if (!d->cachedReference.Load().GetBundle() &&
         d->cachedService.Load() == nullptr) {
-      /*DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close[cached cleared]:"
-                    << ((d->isJSON == false) ? d->filter: d->jsonFilter);*/
+      DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close[cached cleared]:"
+                                         << d->filter.ToString();
     }
   }
 }
@@ -278,11 +272,12 @@ ServiceReference<S> ServiceTracker<S, T>::GetServiceReference() const
   ServiceReference<S> reference = d->cachedReference.Load();
   if (reference.GetBundle())
   {
-   /* DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
-                  << ((d->isJSON == false) ? d->filter : d->jsonFilter);*/
+    DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference[cached]:"
+                                       << d->filter.ToString();
     return reference;
   }
-  //DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference:" << ((d->isJSON == false) ? d->filter : d->jsonFilter);
+  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference:"
+                                     << d->filter.ToString();
   auto references = GetServiceReferences();
   std::size_t length = references.size();
   if (length == 0) { /* if no service is being tracked */
@@ -376,13 +371,12 @@ ServiceTracker<S, T>::GetService() const
   auto service = d->cachedService.Load();
   if (service)
   {
-   /* DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService[cached]:"
-                  << ((d->isJSON == false) ? d->filter : d->jsonFilter);*/
+    DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService[cached]:"
+                                       << d->filter.ToString();
     return service;
   }
-  /*DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService:" 
-                                     << ((d->isJSON == false) ? d->filter : d->jsonFilter);
-   */
+  DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService:" 
+                                     << d->filter.ToString();
   try
   {
     auto reference = GetServiceReference();

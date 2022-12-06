@@ -26,7 +26,7 @@ Deprecated
 Fixed
 -----
 
-`(UNRELEASED) v3.7.4 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (2022-11-02)
+`(UNRELEASED) v3.7.4 <https://github.com/cppmicroservices/cppmicroservices/tree/0b4f93e6f23b1591ffffbe4ee234a428feff55fa>`_ (2022-11-02)
 ---------------------------------------------------------------------------------------------------------
 
 `Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/13ca108641c1960539cdaed10bcc39ae9a46b7a6...0b4f93e6f23b1591ffffbe4ee234a428feff55fa>`_
@@ -49,7 +49,7 @@ Fixed
 - `[Configuration Admin] configurations using the same pid are not updated properly <https://github.com/CppMicroServices/CppMicroServices/pull/754>`_
 
 
-`(UNRELEASED) v3.7.3 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (2022-08-29)
+`(UNRELEASED) v3.7.3 <https://github.com/cppmicroservices/cppmicroservices/tree/13ca108641c1960539cdaed10bcc39ae9a46b7a6>`_ (2022-08-29)
 ---------------------------------------------------------------------------------------------------------
 
 `Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...13ca108641c1960539cdaed10bcc39ae9a46b7a6>`_

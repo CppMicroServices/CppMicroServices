@@ -198,13 +198,15 @@ TEST(AnyMapTest, AnyMap)
 
 TEST(AnyMapTest, MoveConstructor)
 {
+  testing::FLAGS_gtest_death_test_style = "threadsafe";
   AnyMap o(AnyMap::ORDERED_MAP);
   o["do"] = Any(1);
   o["re"] = Any(2);
   AnyMap o_anymap_move_ctor(std::move(o));
   ASSERT_EQ(any_cast<int>(o_anymap_move_ctor.at("do")), 1);
-  ASSERT_DEATH(o.size(), ".*")
-    << "This call should result in a crash because the object has been moved from";
+  ASSERT_DEATH({ o.size(); }, ".*")
+    << "This call should result in a crash because "
+       "the object has been moved from";
 
   AnyMap uo(AnyMap::UNORDERED_MAP);
   AnyMap uo_move(std::move(uo));
@@ -212,20 +214,21 @@ TEST(AnyMapTest, MoveConstructor)
 
   AnyMap uoci(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
   AnyMap uoci_move(std::move(uoci));
-  ASSERT_EQ(uoci_move.size(), 0u) << "Size of an empty moved-to AnyMap must be 0";
+  ASSERT_EQ(uoci_move.size(), 0u)
+    << "Size of an empty moved-to AnyMap must be 0";
 }
 
 TEST(AnyMapTest, MoveAssignment)
 {
+  testing::FLAGS_gtest_death_test_style = "threadsafe";
   AnyMap o(AnyMap::ORDERED_MAP);
   o["do"] = Any(1);
   o["re"] = Any(2);
   AnyMap uo_anymap_move_assign(AnyMap::UNORDERED_MAP);
   uo_anymap_move_assign = std::move(o);
   ASSERT_EQ(any_cast<int>(uo_anymap_move_assign.at("re")), 2);
-  ASSERT_DEATH(o.size(), ".*")
-    << "This call should result in a crash because the object has been moved from";
-
+  ASSERT_DEATH(o.size(), ".*") << "This call should result in a crash because "
+                                  "the object has been moved from";
 }
 
 TEST(AnyMapTest, CIHash)
@@ -236,7 +239,7 @@ TEST(AnyMapTest, CIHash)
   any_map::unordered_any_cimap::hasher hash;
   std::size_t hashUpper = hash(allUpper);
   std::size_t hashLower = hash(allLower);
-  
+
   ASSERT_EQ(hashUpper, hashLower);
   ASSERT_EQ(true, 0 != hashUpper);
   ASSERT_EQ(true, 0 != hashLower);
@@ -250,6 +253,157 @@ TEST(AnyMapTest, CIHashUnique)
   any_map::unordered_any_cimap::hasher hash;
   std::size_t hashV1 = hash(v1);
   std::size_t hashV2 = hash(v2);
-  
+
   ASSERT_EQ(true, hashV1 != hashV2);
+}
+
+TEST(AnyMapTest, GeneralUsage)
+{
+  ASSERT_THROW(AnyMap m(static_cast<AnyMap::map_type>(100)), std::logic_error);
+
+  AnyMap om(AnyMap::ORDERED_MAP);
+  ASSERT_EQ(0, om.size());
+  ASSERT_TRUE(om.empty());
+  ASSERT_EQ(0, om.count("key1"));
+
+  auto it =
+    om.insert(std::make_pair(std::string("key1"), Any(std::string("val1"))));
+  ASSERT_TRUE(it.second);
+  ASSERT_EQ("key1", it.first->first);
+  ASSERT_EQ(std::string("val1"), any_cast<std::string>(it.first->second));
+  ASSERT_EQ(std::string("val1"), any_cast<std::string>(om["key1"]));
+
+  /* Create a AnyMap with the following JSON representation:
+   *
+   * {
+   *   key1 : "val1",
+   *   uoci : {
+   *     FiRST : 1,
+   *     SECOND : 2,
+   *     vec : [
+   *       "one",
+   *       2,
+   *       {
+   *         hi : "hi",
+   *         there : "there"
+   *       }
+   *     ]
+   *   },
+   *   dot.key : 5
+   * }
+   *
+   */
+  AnyMap uoci(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  uoci["FiRST"] = 1;
+  uoci["SECOND"] = 2;
+
+  AnyMap uo(AnyMap::UNORDERED_MAP);
+  uo["hi"] = std::string("hi");
+  uo["there"] = std::string("there");
+
+  std::vector<Any> anyVec{ Any(std::string("one")), Any(2), Any(uo) };
+  uoci["vec"] = anyVec;
+
+  om["uoci"] = uoci;
+  om["dot.key"] = 5;
+
+  ASSERT_EQ(std::string("val1"),
+            any_cast<std::string>(om.AtCompoundKey("key1")));
+  ASSERT_EQ(1, any_cast<int>(om.AtCompoundKey("uoci.first")));
+  ASSERT_EQ(2, any_cast<int>(om.AtCompoundKey("uoci.second")));
+  ASSERT_EQ(std::string("one"),
+            any_cast<std::string>(om.AtCompoundKey("uoci.Vec.0")));
+  ASSERT_EQ(std::string("there"),
+            any_cast<std::string>(om.AtCompoundKey("uoci.Vec.2.there")));
+
+  Any emptyAny;
+  ASSERT_EQ(std::string("val1"),
+            any_cast<std::string>(om.AtCompoundKey("key1", emptyAny)));
+  ASSERT_EQ(1, any_cast<int>(om.AtCompoundKey("uoci.first", emptyAny)));
+  ASSERT_EQ(2, any_cast<int>(om.AtCompoundKey("uoci.second", emptyAny)));
+  ASSERT_EQ(std::string("one"),
+            any_cast<std::string>(om.AtCompoundKey("uoci.Vec.0")));
+  ASSERT_EQ(std::string("there"),
+            any_cast<std::string>(om.AtCompoundKey("uoci.Vec.2.there")));
+
+  std::set<std::string> keys;
+  for (auto p : uoci) {
+    keys.insert(p.first);
+  }
+
+  auto key = keys.begin();
+  ASSERT_EQ(3, keys.size());
+  ASSERT_EQ("FiRST", *key++);
+  ASSERT_EQ("SECOND", *key++);
+  ASSERT_EQ("vec", *key++);
+
+  ASSERT_THROW(om.at("Key1"), std::out_of_range);
+  ASSERT_THROW(om.AtCompoundKey("dot.key"), std::out_of_range);
+  ASSERT_THROW(uoci.AtCompoundKey("Vec.bla"), std::invalid_argument);
+  ASSERT_THROW(uoci.AtCompoundKey("Vec.1.bla"), std::invalid_argument);
+
+  ASSERT_NO_THROW(om.AtCompoundKey("dot.key", emptyAny));
+  ASSERT_NO_THROW({
+    auto val = uoci.AtCompoundKey("Vec.bla", emptyAny);
+    ASSERT_TRUE(val.Empty());
+  });
+  ASSERT_NO_THROW({
+    auto val1 = uoci.AtCompoundKey("Vec.1.bla", Any(std::string("")));
+    ASSERT_TRUE(!val1.Empty());
+    ASSERT_EQ(std::string(""), any_cast<std::string>(val1));
+  });
+}
+
+cppmicroservices::AnyMap manifest_from_cache(
+  const cppmicroservices::any_map::key_type& key,
+  cppmicroservices::any_map& cache)
+{
+  using namespace cppmicroservices;
+
+  AnyMap& bundles = ref_any_cast<AnyMap>(cache["bundles"]);
+  if (bundles.find(key) != std::end(bundles)) {
+    try {
+      AnyMap result = std::move(ref_any_cast<AnyMap>(bundles[key]));
+      bundles.erase(key);
+      return result;
+    } catch (...) {
+    }
+  }
+  return AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+}
+
+TEST(AnyMapTest, ManifestFromCache)
+{
+  AnyMap cache(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  AnyMap cache_bundles(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  AnyMap cache_bundle1(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  AnyMap cache_bundle2(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+
+  cache_bundle1["a"] = std::string("A");
+  cache_bundle1["b"] = std::string("B");
+  cache_bundle1["c"] = std::string("C");
+  auto cache_bundle1_copy = cache_bundle1;
+
+  cache_bundle2["d"] = std::string("D");
+  cache_bundle2["e"] = std::string("E");
+  cache_bundle2["f"] = std::string("F");
+  auto cache_bundle2_copy = cache_bundle2;
+
+  cache_bundles.emplace(std::string("bundle1"), std::move(cache_bundle1));
+  cache_bundles.emplace(std::string("bundle2"), std::move(cache_bundle2));
+  cache["created"] = 1234567890;
+  cache["version"] = 1;
+  cache.emplace(std::string("bundles"), std::move(cache_bundles));
+  EXPECT_EQ(3, cache.size()); // created, version, bundles
+
+  auto const& bundles = ref_any_cast<AnyMap>(cache.at("bundles"));
+  EXPECT_EQ(2, bundles.size()); // bundle1, bundle2
+
+  auto bundle1 = manifest_from_cache(std::string("bundle1"), cache);
+  EXPECT_EQ(cache_bundle1_copy, bundle1);
+  EXPECT_EQ(1, bundles.size());
+
+  auto bundle2 = manifest_from_cache(std::string("bundle2"), cache);
+  EXPECT_EQ(cache_bundle2_copy, bundle2);
+  EXPECT_EQ(0, bundles.size());
 }

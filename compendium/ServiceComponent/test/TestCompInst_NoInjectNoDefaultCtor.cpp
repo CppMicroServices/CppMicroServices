@@ -20,15 +20,15 @@
 
   =============================================================================*/
 #if NEVER
-#include <cstdio>
-#include <iostream>
-#include <algorithm>
-#include <chrono>
+#  include <algorithm>
+#  include <chrono>
+#  include <cstdio>
+#  include <iostream>
 
-#include "gtest/gtest.h"
+#  include "gtest/gtest.h"
 
-#include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
-#include <cppmicroservices/ServiceInterface.h>
+#  include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#  include <cppmicroservices/ServiceInterface.h>
 
 using cppmicroservices::service::component::detail::ComponentInstanceImpl;
 
@@ -40,8 +40,11 @@ class TestServiceImpl
 {
 public:
   TestServiceImpl() = delete;
-  TestServiceImpl(const std::shared_ptr<ServiceDependency>& d) : dep(d) {}
+  TestServiceImpl(const std::shared_ptr<ServiceDependency>& d)
+    : dep(d)
+  {}
   virtual ~TestServiceImpl() = default;
+
 private:
   std::shared_ptr<ServiceDependency> dep;
 };
@@ -54,11 +57,16 @@ private:
  */
 TEST(ComponentInstance, CheckNoDefaultCtorNoInjection)
 {
-  ComponentInstanceImpl<TestServiceImpl, std::tuple<>, std::false_type, ServiceDependency> compInstance; // compile error
+  ComponentInstanceImpl<TestServiceImpl,
+                        std::tuple<>,
+                        std::false_type,
+                        ServiceDependency>
+    compInstance; // compile error
 }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv)
+{
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

@@ -39,6 +39,12 @@ const std::string manifest_json = R"manifest(
                        "implementation-class": "DSSpellCheck::SpellCheckImpl",
                        "activate" : "Activate",
                        "deactivate" : "Deactivate",
+                       "configuration-policy" : "require",
+                       "configuration-pid" : ["DSSpellCheck::SpellCheckImpl"],
+                       "factory" : "factory id",
+                       "factory-properties" : {
+                         "abc" : "123"
+                       },
                        "service": {
                        "scope": "singleton",
                        "interfaces": ["SpellCheck::ISpellCheckService"]
@@ -483,6 +489,75 @@ const std::string manifest_empty_interfaces_string = R"manifest(
   }
   )manifest";
 
+const std::string manifest_illegal_configuration_policy = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "Foo",
+                       "configuration-policy": "default",
+                       "configuration-pid" : ["Foo"]
+                       }]
+            }
+  }
+  )manifest";
+
+const std::string manifest_illegal_configuration_pid = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "Foo",
+                        "configuration-policy": "ignore",
+                         "configuration-pid": [""]
+                       }]
+            }
+  }
+  )manifest";
+
+const std::string manifest_duplicate_configuration_pid = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "Foo",
+                        "configuration-policy": "require",
+                        "configuration-pid": ["Foo", "Foo"]
+                       }]
+            }
+  }
+  )manifest";
+
+const std::string manifest_illegal_factory = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "Foo",
+                       "factory": true
+                       }]
+            }
+  }
+  )manifest";
+
+const std::string manifest_configuration_policy_but_no_pid = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "Foo",
+                       "configuration-policy": "optional"
+                       }]
+            }
+  }
+  )manifest";
+
+const std::string manifest_configuration_pid_but_no_policy = R"manifest(
+  {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "Foo",
+                       "configuration-pid": ["Foo"]
+                       }]
+            }
+  }
+  )manifest";
+
 auto GetManifestSCRData(const std::string& content)
 {
   std::istringstream istrstream(content);
@@ -667,8 +742,9 @@ INSTANTIATE_TEST_SUITE_P(
       manifest_illegal_ref_name,
       "Invalid value for the name 'name'. Expected non-empty string"),
     CodegenInvalidManifestState(
-        manifest_duplicate_ref_name,
-        "Duplicate service reference names found. Reference names must be unique. Duplicate names: foo "),
+      manifest_duplicate_ref_name,
+      "Duplicate service reference names found. Reference names must be "
+      "unique. Duplicate names: foo "),
     CodegenInvalidManifestState(
       manifest_no_ref_interface,
       "Mandatory name 'interface' missing from the manifest"),
@@ -709,6 +785,29 @@ INSTANTIATE_TEST_SUITE_P(
       "[singleton, bundle, prototype]"),
     CodegenInvalidManifestState(
       manifest_illegal_ref,
-      "Invalid value for the name 'references'. Expected non-empty array")));
+      "Invalid value for the name 'references'. Expected non-empty array"),
+    CodegenInvalidManifestState(
+      manifest_illegal_configuration_policy,
+      "Invalid value 'default' for the name 'configuration-policy'. The valid choices are : [require, optional, ignore]"),  
+    CodegenInvalidManifestState(
+      manifest_duplicate_configuration_pid,
+      "configuration-pid error in the manifest. Duplicate pid detected.",
+      true),  
+    CodegenInvalidManifestState(
+      manifest_illegal_factory,
+      "Invalid value for the name 'factory'. Expected non-empty string"),  
+    CodegenInvalidManifestState(
+      manifest_configuration_policy_but_no_pid,
+      "Error: Both configuration-policy and configuration-pid must be "
+      "present in the manifest.json file to participate in Configuration "
+      "Admin.",
+      true),  
+    CodegenInvalidManifestState(
+      manifest_configuration_pid_but_no_policy,
+      "Error: Both configuration-policy and configuration-pid must be "
+      "present in the manifest.json file to participate in Configuration "
+      "Admin.",
+      true)  
+      ));
 
 } // namespace codegen

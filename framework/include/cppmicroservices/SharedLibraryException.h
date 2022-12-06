@@ -50,7 +50,9 @@ public:
 private:
   Bundle origin; ///< The bundle of the shared library which failed to load.
 };
-
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 }
 
 #endif /* CPPMICROSERVICES_SHAREDLIBRARYEXCEPTION_H */

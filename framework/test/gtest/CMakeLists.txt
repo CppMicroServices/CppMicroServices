@@ -2,12 +2,26 @@
 # Build and run the GTest Suite of tests
 #-----------------------------------------------------------------------------
 
+# Make sure that the correct paths separators are used on each platform
+if(WIN32)
+  set(DIR_SEP "\\\\")
+  string(REPLACE "/" "\\\\" CMAKE_LIBRARY_OUTPUT_DIRECTORY_NATIVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+  string(REPLACE "/" "\\\\" CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+else()
+  set(DIR_SEP "/")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_NATIVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endif()
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/TestingConfig.h")
+
 set(us_gtest_test_exe_name usFrameworkTests)
 
 include_directories(
   ${GTEST_INCLUDE_DIRS}
   ${GMOCK_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/../util
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../third_party
   )
 
 #-----------------------------------------------------------------------------
@@ -17,8 +31,10 @@ set(_gtest_tests
   AnyTest.cpp
   AnyMapTest.cpp
   BundleActivatorTest.cpp
+  BundleContextTest.cpp
   BundleDeadLockTest.cpp
   BundleManifestTest.cpp
+  BundleValidationTest.cpp
   BundleVersionTest.cpp
   InvalidBundleTest.cpp
   GlobalServiceTrackerTest.cpp
@@ -29,20 +45,49 @@ set(_gtest_tests
   FrameworkTest.cpp
   BundleObjFileTest.cpp
   BundleGetSymbolTest.cpp
+  SecurityExceptionTest.cpp
   ServiceExceptionTest.cpp
   ServiceObjectsTest.cpp
   ServiceReferenceTest.cpp
   ServiceFactoryTest.cpp
+  ServiceTrackerTest.cpp
   SharedLibraryExceptionTest.cpp
   ShrinkableVectorTest.cpp
   BundleEventTest.cpp
   BundleResourceTest.cpp
   BundleStreamOperatorTest.cpp
   ServiceEventStreamOperatorTest.cpp
+  ServiceRegistryTest.cpp
+  LDAPQueryTest.cpp
+  FrameworkFactoryTest.cpp
+  LogTest.cpp
+  StaticBundleResourceTest.cpp
+  FrameworkEventTest.cpp
+  ServiceTemplateTest.cpp
+  BundleRegistryConcurrencyTest.cpp
+  StaticBundleTest.cpp
+  ShrinkableMapTest.cpp
+  FrameworkListenerTest.cpp
+  BundleHooksTest.cpp
+  ServiceHooksTest.cpp
+  TestCounterLatch.cpp
+  ResourceCompilerTest.cpp
+  MultipleListenersTest.cpp
+  BundleTest.cpp
+  main.cpp
 )
 
+if(BUILD_SHARED_LIBS)
+  list(APPEND _gtest_tests
+       SharedLibraryTest.cpp
+       ServiceListenerTest.cpp
+      )
+endif()
+
 set(_additional_srcs
+  FrameworkTestActivator.cpp
   ../util/TestUtilBundleListener.cpp
+  ../util/TestUtilFrameworkListener.cpp
   ../util/TestUtils.cpp
   ../util/ImportTestBundles.cpp
   $<TARGET_OBJECTS:util>
@@ -52,12 +97,21 @@ set(_additional_srcs
 # Build the main test driver executable
 #-----------------------------------------------------------------------------
 
+set(_third_party_srcs 
+  ../../../third_party/miniz.c
+  ../../../third_party/jsoncpp.cpp
+)
+
 # Generate a custom "bundle init" file for the test driver executable
 usFunctionGenerateBundleInit(TARGET ${us_gtest_test_exe_name} OUT _additional_srcs)
 
 usFunctionGetResourceSource(TARGET ${us_gtest_test_exe_name} OUT _additional_srcs)
 
-add_executable(${us_gtest_test_exe_name} ${_gtest_tests} ${_additional_srcs})
+add_executable(${us_gtest_test_exe_name} ${_gtest_tests} ${_additional_srcs} ${_third_party_srcs})
+
+if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
+  target_compile_options(${us_gtest_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
+endif()
 
 # Needed for ResourceCompilerTest
 add_dependencies(${us_gtest_test_exe_name} ${US_RCC_EXECUTABLE_TARGET})
@@ -71,14 +125,14 @@ if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
   set_source_files_properties(${_gtest_tests}
-								PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations
-											COMPILE_FLAGS -Wno-deprecated
-											COMPILE_FLAGS -Wno-deprecated-declarations)
+                                PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations
+                                            COMPILE_FLAGS -Wno-deprecated
+                                            COMPILE_FLAGS -Wno-deprecated-declarations)
 endif()
 
 target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${GMOCK_BOTH_LIBRARIES})
-target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET})
+target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET} usLogService)
 
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)
@@ -100,7 +154,7 @@ set_property(TEST ${us_gtest_test_exe_name} PROPERTY LABELS regular)
 
 # Run the GTest EXE from valgrind
 if(US_MEMCHECK_COMMAND)
-  add_test(NAME memcheck_${us_gtest_test_exe_name} COMMAND ${US_MEMCHECK_COMMAND} --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${us_gtest_test_exe_name}
+  add_test(NAME memcheck_${us_gtest_test_exe_name} COMMAND ${US_MEMCHECK_COMMAND} --max-threads=2000 --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${us_gtest_test_exe_name}
     WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
   set_property(TEST memcheck_${us_gtest_test_exe_name} PROPERTY LABELS valgrind memcheck)
 endif()
@@ -142,11 +196,11 @@ if(BUILD_SHARED_LIBS)
     add_dependencies(${us_gtest_test_exe_name} ${_us_test_bundle_libs})
     # Add resources
     usFunctionEmbedResources(TARGET ${us_gtest_test_exe_name}
-                             FILES manifest.json)
+                             FILES TestResource.ptxt manifest.json)
 else()
     target_link_libraries(${us_gtest_test_exe_name} ${_us_test_bundle_libs})
     # Add resources
     usFunctionEmbedResources(TARGET ${us_gtest_test_exe_name}
-                             FILES manifest.json
+                             FILES TestResource.ptxt manifest.json
                              ZIP_ARCHIVES ${Framework_TARGET} ${_us_test_bundle_libs})
 endif()

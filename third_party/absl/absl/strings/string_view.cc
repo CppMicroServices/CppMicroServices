@@ -14,7 +14,7 @@
 
 #include "absl/strings/string_view.h"
 
-#ifndef ABSL_HAVE_STD_STRING_VIEW
+#ifndef ABSL_USES_STD_STRING_VIEW
 
 #include <algorithm>
 #include <climits>
@@ -24,6 +24,7 @@
 #include "absl/strings/internal/memutil.h"
 
 namespace absl {
+ABSL_NAMESPACE_BEGIN
 
 namespace {
 void WritePadding(std::ostream& o, size_t pad) {
@@ -64,9 +65,9 @@ std::ostream& operator<<(std::ostream& o, string_view piece) {
     if (static_cast<size_t>(o.width()) > piece.size()) {
       size_t pad = o.width() - piece.size();
       if ((o.flags() & o.adjustfield) == o.left) {
-	rpad = pad;
+        rpad = pad;
       } else {
-	lpad = pad;
+        lpad = pad;
       }
     }
     if (lpad) WritePadding(o, lpad);
@@ -77,8 +78,8 @@ std::ostream& operator<<(std::ostream& o, string_view piece) {
   return o;
 }
 
-string_view::size_type string_view::find(string_view s, size_type pos) const
-    noexcept {
+string_view::size_type string_view::find(string_view s,
+                                         size_type pos) const noexcept {
   if (empty() || pos > length_) {
     if (empty() && pos == 0 && s.empty()) return 0;
     return npos;
@@ -97,8 +98,8 @@ string_view::size_type string_view::find(char c, size_type pos) const noexcept {
   return result != nullptr ? result - ptr_ : npos;
 }
 
-string_view::size_type string_view::rfind(string_view s, size_type pos) const
-    noexcept {
+string_view::size_type string_view::rfind(string_view s,
+                                          size_type pos) const noexcept {
   if (length_ < s.length_) return npos;
   if (s.empty()) return std::min(length_, pos);
   const char* last = ptr_ + std::min(length_ - s.length_, pos) + s.length_;
@@ -107,8 +108,8 @@ string_view::size_type string_view::rfind(string_view s, size_type pos) const
 }
 
 // Search range is [0..pos] inclusive.  If pos == npos, search everything.
-string_view::size_type string_view::rfind(char c, size_type pos) const
-    noexcept {
+string_view::size_type string_view::rfind(char c,
+                                          size_type pos) const noexcept {
   // Note: memrchr() is not available on Windows.
   if (empty()) return npos;
   for (size_type i = std::min(pos, length_ - 1);; --i) {
@@ -120,9 +121,8 @@ string_view::size_type string_view::rfind(char c, size_type pos) const
   return npos;
 }
 
-string_view::size_type string_view::find_first_of(string_view s,
-						  size_type pos) const
-    noexcept {
+string_view::size_type string_view::find_first_of(
+    string_view s, size_type pos) const noexcept {
   if (empty() || s.empty()) {
     return npos;
   }
@@ -137,9 +137,8 @@ string_view::size_type string_view::find_first_of(string_view s,
   return npos;
 }
 
-string_view::size_type string_view::find_first_not_of(string_view s,
-						      size_type pos) const
-    noexcept {
+string_view::size_type string_view::find_first_not_of(
+    string_view s, size_type pos) const noexcept {
   if (empty()) return npos;
   // Avoid the cost of LookupTable() for a single-character search.
   if (s.length_ == 1) return find_first_not_of(s.ptr_[0], pos);
@@ -152,9 +151,8 @@ string_view::size_type string_view::find_first_not_of(string_view s,
   return npos;
 }
 
-string_view::size_type string_view::find_first_not_of(char c,
-						      size_type pos) const
-    noexcept {
+string_view::size_type string_view::find_first_not_of(
+    char c, size_type pos) const noexcept {
   if (empty()) return npos;
   for (; pos < length_; ++pos) {
     if (ptr_[pos] != c) {
@@ -165,7 +163,7 @@ string_view::size_type string_view::find_first_not_of(char c,
 }
 
 string_view::size_type string_view::find_last_of(string_view s,
-						 size_type pos) const noexcept {
+                                                 size_type pos) const noexcept {
   if (empty() || s.empty()) return npos;
   // Avoid the cost of LookupTable() for a single-character search.
   if (s.length_ == 1) return find_last_of(s.ptr_[0], pos);
@@ -179,9 +177,8 @@ string_view::size_type string_view::find_last_of(string_view s,
   return npos;
 }
 
-string_view::size_type string_view::find_last_not_of(string_view s,
-						     size_type pos) const
-    noexcept {
+string_view::size_type string_view::find_last_not_of(
+    string_view s, size_type pos) const noexcept {
   if (empty()) return npos;
   size_type i = std::min(pos, length_ - 1);
   if (s.empty()) return i;
@@ -197,9 +194,8 @@ string_view::size_type string_view::find_last_not_of(string_view s,
   return npos;
 }
 
-string_view::size_type string_view::find_last_not_of(char c,
-						     size_type pos) const
-    noexcept {
+string_view::size_type string_view::find_last_not_of(
+    char c, size_type pos) const noexcept {
   if (empty()) return npos;
   size_type i = std::min(pos, length_ - 1);
   for (;; --i) {
@@ -211,23 +207,13 @@ string_view::size_type string_view::find_last_not_of(char c,
   return npos;
 }
 
-// MSVC has non-standard behavior that implicitly creates definitions for static
-// const members. These implicit definitions conflict with explicit out-of-class
-// member definitions that are required by the C++ standard, resulting in
-// LNK1169 "multiply defined" errors at link time. __declspec(selectany) asks
-// MSVC to choose only one definition for the symbol it decorates. See details
-// at https://msdn.microsoft.com/en-us/library/34h23df8(v=vs.100).aspx
-#ifdef _MSC_VER
-#define ABSL_STRING_VIEW_SELECTANY __declspec(selectany)
-#else
-#define ABSL_STRING_VIEW_SELECTANY
+
+#ifdef ABSL_INTERNAL_NEED_REDUNDANT_CONSTEXPR_DECL
+constexpr string_view::size_type string_view::npos;
+constexpr string_view::size_type string_view::kMaxSize;
 #endif
 
-ABSL_STRING_VIEW_SELECTANY
-constexpr string_view::size_type string_view::npos;
-ABSL_STRING_VIEW_SELECTANY
-constexpr string_view::size_type string_view::kMaxSize;
-
+ABSL_NAMESPACE_END
 }  // namespace absl
 
-#endif  // ABSL_HAVE_STD_STRING_VIEW
+#endif  // ABSL_USES_STD_STRING_VIEW

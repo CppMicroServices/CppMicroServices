@@ -23,21 +23,30 @@
 #ifndef ComponentContext_hpp
 #define ComponentContext_hpp
 
-#include <unordered_map>
-#include <vector>
 #include <memory>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/ServiceInterface.h"
+#include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/servicecomponent/ServiceComponentExport.h"
 
-namespace cppmicroservices { namespace service { namespace component {
+namespace cppmicroservices {
+namespace service {
+namespace component {
 
 /**
+	\defgroup gr_componentcontext ComponentContext
+	\brief Groups ComponentContext class related symbols.
+	*/
+
+/**
+ * \ingroup gr_componentcontext
+ *
  * A Component Context object is used by a component instance to interact with
  * its execution context including locating services by reference name. Each
  * component instance has a unique Component Context.
@@ -48,7 +57,7 @@ namespace cppmicroservices { namespace service { namespace component {
  */
 class US_ServiceComponent_EXPORT ComponentContext
 {
-  public:
+public:
   virtual ~ComponentContext() noexcept;
 
   /**
@@ -56,20 +65,21 @@ class US_ServiceComponent_EXPORT ComponentContext
    *
    * @return The properties for this Component Context.
    */
-  virtual std::unordered_map<std::string, cppmicroservices::Any> GetProperties() const = 0;
+  virtual std::unordered_map<std::string, cppmicroservices::Any> GetProperties()
+    const = 0;
 
   /**
-   * Returns the {@code BundleContext} of the bundle which contains this
+   * Returns the {@link BundleContext} of the bundle which contains this
    * component.
    *
-   * @return The {@code BundleContext} of the bundle containing this
+   * @return The {@link BundleContext} of the bundle containing this
    *         component.
    */
   virtual cppmicroservices::BundleContext GetBundleContext() const = 0;
 
   /**
    * If the component instance is registered as a service using the
-   * {@code servicescope="bundle"} or {@code servicescope="prototype"}
+   * \c servicescope="bundle" or \c servicescope="prototype"
    * attribute, then this method returns the bundle using the service provided
    * by the component instance.
    * <p>
@@ -78,7 +88,7 @@ class US_ServiceComponent_EXPORT ComponentContext
    * <li>The component instance is not a service, then no bundle can be using
    * it as a service.</li>
    * <li>The component instance is a service but did not specify the
-   * {@code servicescope="bundle"} or {@code servicescope="prototype"}
+   * \c servicescope="bundle" or \c servicescope="prototype"
    * attribute, then all bundles using the service provided by the component
    * instance will share the same component instance.</li>
    * <li>The service provided by the component instance is not currently being
@@ -121,107 +131,117 @@ class US_ServiceComponent_EXPORT ComponentContext
 
   /**
    * If the component instance is registered as a service using the
-   * {@code service} element, then this method returns the service reference
+   * \c service element, then this method returns the service reference
    * of the service provided by this component instance.
    * <p>
-   * This method will return an invalid {@code ServiceReference} object if the
+   * This method will return an invalid {@link ServiceReference} object if the
    * component instance is not registered as a service.
    *
-   * @return The {@code ServiceReference} object for the component instance or
+   * @return The {@link ServiceReference} object for the component instance or
    *         invalid object if the component instance is not registered as a
    *         service.
    */
-  virtual cppmicroservices::ServiceReferenceBase GetServiceReference() const = 0;
+  virtual cppmicroservices::ServiceReferenceBase GetServiceReference()
+    const = 0;
 
   /**
    * Returns the service object for the specified reference name and type.
    *
    * <p>
-   * If the cardinality of the reference is {@code 0..n} or {@code 1..n} and
+   * If the cardinality of the reference is <tt>0..n</tt> or <tt>1..n</tt> and
    * multiple services are bound to the reference, the service with the
-   * highest ranking (as specified in its {@code Constants.SERVICE_RANKING}
+   * highest ranking (as specified in its {@link Constants::SERVICE_RANKING}
    * property) is returned. If there is a tie in ranking, the service with the
-   * lowest service id (as specified in its {@code Constants.SERVICE_ID}
+   * lowest service id (as specified in its {@link Constants::SERVICE_ID}
    * property); that is, the service that was registered first is returned.
    *
-   * @param name The name of a reference as specified in a {@code reference}
+   * @param refName The name of a reference as specified in a \c reference
    *        element in this component's description.
-   * @return A service object for the referenced service or {@code nullptr} if
-   *         the reference cardinality is {@code 0..1} or {@code 0..n} and no
+   * @return A service object for the referenced service or \c nullptr if
+   *         the reference cardinality is <tt>0..1</tt> or <tt>0..n</tt> and no
    *         bound service is available.
    * @throws ComponentException If Service Component Runtime catches an
    *         exception while activating the bound service.
    */
   template<class T>
-  std::shared_ptr<T>  LocateService(const std::string& refName) const
+  std::shared_ptr<T> LocateService(const std::string& refName) const
   {
-    std::shared_ptr<void> sObj = LocateService(refName, us_service_interface_iid<T>());
+    std::shared_ptr<void> sObj =
+      LocateService(refName, us_service_interface_iid<T>());
     return std::static_pointer_cast<T>(sObj);
   }
 
   /**
    * Returns the service objects for the specified reference name and type.
    *
-   * @param name The name of a reference as specified in a {@code reference}
+   * @param refName The name of a reference as specified in a \c reference
    *        element in this component's description.
    * @return A vector of service objects for the referenced service or
-   *         empty vector if the reference cardinality is {@code 0..1} or
-   *         {@code 0..n} and no bound service is available. If the reference
-   *         cardinality is {@code 0..1} or {@code 1..1} and a bound service
+   *         empty vector if the reference cardinality is <tt>0..1</tt> or
+   *         <tt>0..n</tt> and no bound service is available. If the reference
+   *         cardinality is <tt>0..1</tt> or <tt>1..1</tt> and a bound service
    *         is available, the vector will have exactly one element.
    * @throws ComponentException If Service Component Runtime catches an
    *         exception while activating a bound service.
    */
   template<class T>
-  std::vector<std::shared_ptr<T>>  LocateServices(const std::string& refName) const
+  std::vector<std::shared_ptr<T>> LocateServices(
+    const std::string& refName) const
   {
     auto sObjs = LocateServices(refName, us_service_interface_iid<T>());
     std::vector<std::shared_ptr<T>> objs;
-    for(auto obj : sObjs)
-    {
+    for (auto obj : sObjs) {
       objs.push_back(std::static_pointer_cast<T>(obj));
     }
     return objs;
   }
 
-  protected:
+protected:
   /**
    * Returns the service object for the specified reference name and type.
    *
    * <p>
-   * If the cardinality of the reference is {@code 0..n} or {@code 1..n} and
+   * If the cardinality of the reference is <tt>0..n</tt> or <tt>1..n</tt> and
    * multiple services are bound to the reference, the service with the
-   * highest ranking (as specified in its {@code Constants.SERVICE_RANKING}
+   * highest ranking (as specified in its {@link Constants::SERVICE_RANKING}
    * property) is returned. If there is a tie in ranking, the service with the
-   * lowest service id (as specified in its {@code Constants.SERVICE_ID}
+   * lowest service id (as specified in its {@link Constants::SERVICE_ID}
    * property); that is, the service that was registered first is returned.
    *
-   * @param name The name of a reference as specified in a {@code reference}
+   * @param name The name of a reference as specified in a \c reference
    *        element in this component's description.
-   * @return A service object for the referenced service or {@code nullptr} if
-   *         the reference cardinality is {@code 0..1} or {@code 0..n} and no
+   * @param type The service interface type.
+   * @return A service object for the referenced service or \c nullptr if
+   *         the reference cardinality is <tt>0..1</tt> or <tt>0..n</tt> and no
    *         bound service is available.
    * @throws ComponentException If Service Component Runtime catches an
    *         exception while activating the bound service.
    */
-  virtual std::shared_ptr<void> LocateService(const std::string& name, const std::string& type) const = 0;
+  virtual std::shared_ptr<void> LocateService(
+    const std::string& name,
+    const std::string& type) const = 0;
 
   /**
    * Returns the service objects for the specified reference name and type.
    *
-   * @param name The name of a reference as specified in a {@code reference}
+   * @param name The name of a reference as specified in a \c reference
    *        element in this component's description.
+   * @param type The service interface type.
    * @return A vector of service objects for the referenced service or
-   *         empty vector if the reference cardinality is {@code 0..1} or
-   *         {@code 0..n} and no bound service is available. If the reference
-   *         cardinality is {@code 0..1} or {@code 1..1} and a bound service
+   *         empty vector if the reference cardinality is <tt>0..1</tt> or
+   *         <tt>0..n</tt> and no bound service is available. If the reference
+   *         cardinality is <tt>0..1</tt> or <tt>1..1</tt> and a bound service
    *         is available, the vector will have exactly one element.
    * @throws ComponentException If Service Component Runtime catches an
    *         exception while activating a bound service.
    */
-  virtual  std::vector<std::shared_ptr<void>> LocateServices(const std::string& name, const std::string& type) const = 0;
+  virtual std::vector<std::shared_ptr<void>> LocateServices(
+    const std::string& name,
+    const std::string& type) const = 0;
 };
 
-}}} // namespaces
+}
+}
+} // namespaces
 
 #endif /* ComponentContext_hpp */

@@ -53,8 +53,7 @@ BundleVersion BundleVersion::UndefinedVersion()
 BundleVersion& BundleVersion::operator=(const BundleVersion&) = default;
 
 BundleVersion::BundleVersion(bool undefined)
-  : 
-   qualifier("")
+  : qualifier("")
   , undefined(undefined)
 {}
 
@@ -80,7 +79,7 @@ BundleVersion::BundleVersion(unsigned int majorVersion,
 BundleVersion::BundleVersion(unsigned int majorVersion,
                              unsigned int minorVersion,
                              unsigned int microVersion,
-                             std::string  qualifier)
+                             std::string qualifier)
   : majorVersion(majorVersion)
   , minorVersion(minorVersion)
   , microVersion(microVersion)

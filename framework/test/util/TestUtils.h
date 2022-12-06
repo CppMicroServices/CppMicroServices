@@ -79,7 +79,11 @@ private:
 
 // Helper function to install bundles, given a framework's bundle context and the name of the library.
 // Assumes that test bundles are within the same directory during unit testing.
-Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName);
+Bundle InstallLib(
+  BundleContext frameworkCtx,
+  const std::string& libName,
+  const cppmicroservices::AnyMap& bundleManifest = cppmicroservices::AnyMap(
+    cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
 
 /*
 * Change to destination directory specified by destdir

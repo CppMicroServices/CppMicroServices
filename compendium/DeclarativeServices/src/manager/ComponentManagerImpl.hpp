@@ -24,13 +24,15 @@
 #define __COMPONENTMANAGERIMPL_HPP__
 
 #if defined(USING_GTEST)
-#include "gtest/gtest_prod.h"
+#  include "gtest/gtest_prod.h"
 #else
-#define FRIEND_TEST(x, y)
+#  define FRIEND_TEST(x, y)
 #endif
-#include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/logservice/LogService.hpp"
 #include "ComponentManager.hpp"
+#include "ConfigurationNotifier.hpp"
+#include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
+#include "cppmicroservices/logservice/LogService.hpp"
 
 namespace cppmicroservices {
 namespace scrimpl {
@@ -43,14 +45,17 @@ class ComponentManagerState;
  * service component. It implements a thread safe state design pattern to
  * handle requests for enabling and disabling a component.
  */
-class ComponentManagerImpl
-  : public ComponentManager
+class ComponentManagerImpl : public ComponentManager
 {
 public:
-  ComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
-                       std::shared_ptr<const ComponentRegistry> registry,
-                       cppmicroservices::BundleContext bundleContext,
-                       std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+  ComponentManagerImpl(
+    std::shared_ptr<const metadata::ComponentMetadata> metadata,
+    std::shared_ptr<ComponentRegistry> registry,
+    cppmicroservices::BundleContext bundleContext,
+    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+    std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
+    std::shared_ptr<ConfigurationNotifier> configNotifier,
+    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
   ComponentManagerImpl(const ComponentManagerImpl&) = delete;
   ComponentManagerImpl(ComponentManagerImpl&&) = delete;
   ComponentManagerImpl& operator=(const ComponentManagerImpl&) = delete;
@@ -80,12 +85,17 @@ public:
   /** @copydoc ComponentManager::GetComponentConfigurations()
    * Delegates the call to the current state object
    */
-  std::vector<std::shared_ptr<ComponentConfiguration>> GetComponentConfigurations() const override;
+  std::vector<std::shared_ptr<ComponentConfiguration>>
+  GetComponentConfigurations() const override;
 
   /** @copydoc ComponentManager::GetMetadata()
    * Returns the stored component description
    */
-  std::shared_ptr<const metadata::ComponentMetadata> GetMetadata() const override { return compDesc; }
+  std::shared_ptr<const metadata::ComponentMetadata> GetMetadata()
+    const override
+  {
+    return compDesc;
+  }
 
   /** @copydoc ComponentManager::GetName()
    * Returns the names from the stored component description
@@ -95,19 +105,51 @@ public:
   /** @copydoc ComponentManager::GetBundleId()
    * Returns the id of the {@link Bundle} which contains the component managed by this object
    */
-  unsigned long GetBundleId() const override { return GetBundle().GetBundleId(); }
+  unsigned long GetBundleId() const override
+  {
+    return GetBundle().GetBundleId();
+  }
 
   /**
    * This method returns the {@link Bundle} which contains the component managed by this object.
    */
-  Bundle GetBundle() const { return bundleContext ? bundleContext.GetBundle() : Bundle(); }
+  Bundle GetBundle() const
+  {
+    return bundleContext ? bundleContext.GetBundle() : Bundle();
+  }
 
   /**
    * Returns the logger object associated with this ComponentManager
    */
   std::shared_ptr<cppmicroservices::logservice::LogService> GetLogger() const
-  { return logger; }
+  {
+    return logger;
+  }
 
+  /**
+   * Returns the configNotifier object associated with this ComponentManager
+   */
+  std::shared_ptr<ConfigurationNotifier> GetConfigNotifier() const
+  {
+    return configNotifier;
+  }
+  /**
+   * Returns the threadpool object associated with this ComponentManager
+   */
+  std::shared_ptr<cppmicroservices::async::AsyncWorkService>
+  GetAsyncWorkService() const
+  {
+    return asyncWorkService;
+  }
+
+  /**
+   * Returns the managers object associated with this ComponentManager
+   */
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> GetManagers()
+    const
+  {
+    return managers;
+  }
   /**
    * This method modifies the vector of futures stored in this object. If
    * any of the futures in the vector are ready, the ready future is replaced
@@ -123,8 +165,9 @@ public:
    * \param expectedState is the pointer to the current state object
    * \param desiredState is the state the caller wishes to set on this object
    */
-  virtual bool CompareAndSetState(std::shared_ptr<ComponentManagerState>* expectedState,
-                                  std::shared_ptr<ComponentManagerState> desiredState);
+  virtual bool CompareAndSetState(
+    std::shared_ptr<ComponentManagerState>* expectedState,
+    std::shared_ptr<ComponentManagerState> desiredState);
 
   /**
    * This method returns the current state object of this object.
@@ -135,18 +178,56 @@ public:
    * Returns the {@link ComponentRegistry} object associated with this
    * runtime instance
    */
-  virtual std::shared_ptr<const ComponentRegistry> GetRegistry() const { return registry; }
+
+  virtual std::shared_ptr<ComponentRegistry> GetRegistry() const
+  {
+    return registry;
+  }
+
+  /**
+   * Attempts to change the state from disabled to enabled and posts asynchronous work
+   * to be completed if the state was successfully changed.
+   * 
+   * \param currentState The current state object
+   * \return a shared_future<void> on which to wait for the asynchronous work to complete.
+   */
+  std::shared_future<void> PostAsyncDisabledToEnabled(
+    std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>&
+      currentState);
+
+  /**
+   * Attempts to change the state from enabled to disabled and posts asynchronous work
+   * to be completed if the state was successfully changed.
+   * 
+   * \param currentState The current state object
+   * \return a shared_future<void> on which to wait for the asynchronous work to complete.
+   */
+  std::shared_future<void> PostAsyncEnabledToDisabled(
+    std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>&
+      currentState);
 
 private:
   FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
 
-  const std::shared_ptr<const ComponentRegistry> registry; ///< component registry associated with the current runtime
-  const std::shared_ptr<const metadata::ComponentMetadata> compDesc; ///< the component description
-  cppmicroservices::BundleContext bundleContext; ///< context of the bundle which contains the component
-  const std::shared_ptr<cppmicroservices::logservice::LogService> logger; ///< logger associated with the current runtime
-  std::shared_ptr<ComponentManagerState> state; ///< This member is always accessed using atomic operations
-  std::vector<std::shared_future<void>> disableFutures; ///< futures created when the component transitioned to \c DISABLED state
+  const std::shared_ptr<ComponentRegistry>
+    registry; ///< component registry associated with the current runtime
+  const std::shared_ptr<const metadata::ComponentMetadata>
+    compDesc; ///< the component description
+  cppmicroservices::BundleContext
+    bundleContext; ///< context of the bundle which contains the component
+  const std::shared_ptr<cppmicroservices::logservice::LogService>
+    logger; ///< logger associated with the current runtime
+  std::shared_ptr<ComponentManagerState>
+    state; ///< This member is always accessed using atomic operations
+  std::vector<std::shared_future<void>>
+    disableFutures; ///< futures created when the component transitioned to \c DISABLED state
   std::mutex futuresMutex; ///< mutex to protect the #disableFutures member
+  std::shared_ptr<cppmicroservices::async::AsyncWorkService>
+    asyncWorkService; ///< work service to execute async work
+  std::mutex
+    transitionMutex; ///< mutex to make the state transition and posting of the async operations atomic
+  std::shared_ptr<ConfigurationNotifier> configNotifier;
+  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
 };
 }
 }

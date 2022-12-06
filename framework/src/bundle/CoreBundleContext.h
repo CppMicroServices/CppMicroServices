@@ -48,6 +48,7 @@ as specified in the OSGi R4.2 specifications.
 
 #include "BundleHooks.h"
 #include "BundleRegistry.h"
+#include "CFRLogger.h"
 #include "Resolver.h"
 #include "ServiceHooks.h"
 #include "ServiceListeners.h"
@@ -60,7 +61,6 @@ as specified in the OSGi R4.2 specifications.
 namespace cppmicroservices {
 
 struct BundleStorage;
-class BundleThread;
 class FrameworkPrivate;
 
 /**
@@ -99,13 +99,11 @@ public:
   std::shared_ptr<detail::LogSink> sink;
 
   /**
-   * Threads for running listeners and activators
+   * A LogService for logging framework messages via
+   * a default or user-provided LogService that are intended to be
+   * visible outside of the framework.
    */
-  struct : detail::MultiThreaded<>
-  {
-    std::list<std::shared_ptr<BundleThread>> value;
-    std::list<std::shared_ptr<BundleThread>> zombies;
-  } bundleThreads;
+  std::shared_ptr<cppmicroservices::cfrimpl::CFRLogger> logger;
 
   /**
    * Bundle Storage
@@ -160,7 +158,9 @@ public:
    * Flags to use for dlopen calls on unix systems. Ignored on Windows.
    */
   int libraryLoadOptions;
-  
+
+  std::function<bool(const cppmicroservices::Bundle&)> validationFunc;
+
   ~CoreBundleContext();
 
   // thread-safe shared_from_this implementation

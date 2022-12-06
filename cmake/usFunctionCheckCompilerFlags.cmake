@@ -62,7 +62,13 @@ function(usFunctionCheckCompilerFlags FLAG_TO_TEST RESULT_VAR)
   CHECK_CXX_COMPILER_FLAG(${FLAG_TO_TEST} HAS_CXX_FLAG_${suffix})
 
   if(HAS_CXX_FLAG_${suffix})
-    set(${RESULT_VAR} "${_saved_result_var} ${FLAG_TO_TEST}" PARENT_SCOPE)
+    # If the variable passed in as RESULT_VAR was initially empty, then do not
+    # include it in the new value for RESULT_VAR since it adds 1 extra space
+    if ("${_saved_result_var}" STREQUAL "")
+      set(${RESULT_VAR} "${FLAG_TO_TEST}" PARENT_SCOPE)
+    else()
+      set(${RESULT_VAR} "${_saved_result_var} ${FLAG_TO_TEST}" PARENT_SCOPE)
+    endif()
   endif()
 
 endfunction()

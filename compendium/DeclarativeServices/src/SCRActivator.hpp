@@ -22,23 +22,25 @@
 
 #ifndef SCRACTIVATOR_HPP
 #define SCRACTIVATOR_HPP
-#include <map>
-#include <vector>
-#include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/BundleActivator.h"
-#include "cppmicroservices/BundleEvent.h"
-#include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 #include "ComponentRegistry.hpp"
+#include "SCRAsyncWorkService.hpp"
 #include "SCRBundleExtension.hpp"
 #include "SCRLogger.hpp"
+#include "cppmicroservices/BundleActivator.h"
+#include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/BundleEvent.h"
+#include "cppmicroservices/cm/ConfigurationListener.hpp"
+#include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
+#include "manager/ConfigurationNotifier.hpp"
+#include <map>
+#include <vector>
 
 using cppmicroservices::service::component::runtime::ServiceComponentRuntime;
 
 namespace cppmicroservices {
 namespace scrimpl {
 
-class SCRActivator
-  : public cppmicroservices::BundleActivator
+class SCRActivator : public cppmicroservices::BundleActivator
 {
 public:
   SCRActivator() = default;
@@ -51,6 +53,7 @@ public:
   // callback methods for bundle lifecycle
   void Start(cppmicroservices::BundleContext context) override;
   void Stop(cppmicroservices::BundleContext context) override;
+
 protected:
   /**
    * bundle listener callback
@@ -66,6 +69,7 @@ protected:
    * with declarative services metadata
    */
   void DisposeExtension(const cppmicroservices::Bundle& bundle);
+
 private:
   cppmicroservices::BundleContext runtimeContext;
   cppmicroservices::ServiceRegistration<ServiceComponentRuntime> scrServiceReg;
@@ -74,6 +78,11 @@ private:
   std::unordered_map<long, std::unique_ptr<SCRBundleExtension>> bundleRegistry;
   std::shared_ptr<SCRLogger> logger;
   ListenerToken bundleListenerToken;
+  std::shared_ptr<SCRAsyncWorkService> asyncWorkService;
+  cppmicroservices::ServiceRegistration<
+    cppmicroservices::service::cm::ConfigurationListener>
+    configListenerReg;
+  std::shared_ptr<ConfigurationNotifier> configNotifier;
 };
 } // scrimpl
 } // cppmicroservices

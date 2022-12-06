@@ -125,12 +125,14 @@ public:
    *
    * @param property The name of the LDAP property.
    */
-  LDAPProp(std::string  property);
+  LDAPProp(std::string property);
 
   /**
+   * \addtogroup gr_ldap
    * LDAP equality '='
    *
    * @param s A type convertible to std::string.
+   * @param b A type convertible to bool
    * @return A LDAP expression object.
    *
    * @{
@@ -157,6 +159,7 @@ public:
   LDAPPropExpr operator!() const;
 
   /**
+   * \addtogroup gr_ldap
    * Convenience operator for LDAP inequality.
    *
    * Writing either
@@ -186,6 +189,7 @@ public:
   /// @}
 
   /**
+   * \addtogroup gr_ldap
    * LDAP greater or equal '>='
    *
    * @param s A type convertible to std::string.
@@ -205,6 +209,7 @@ public:
   /// @}
 
   /**
+   * \addtogroup gr_ldap
    * LDAP less or equal '<='
    *
    * @param s A type convertible to std::string.
@@ -224,6 +229,7 @@ public:
   /// @}
 
   /**
+   * \addtogroup gr_ldap
    * LDAP approximation '~='
    *
    * @param s A type convertible to std::string.

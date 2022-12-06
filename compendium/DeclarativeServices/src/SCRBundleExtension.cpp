@@ -21,76 +21,110 @@
   =============================================================================*/
 
 #include "SCRBundleExtension.hpp"
+#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "manager/ComponentManagerImpl.hpp"
+#include "manager/ConfigurationNotifier.hpp"
 #include "metadata/ComponentMetadata.hpp"
 #include "metadata/MetadataParser.hpp"
 #include "metadata/MetadataParserFactory.hpp"
 #include "metadata/Util.hpp"
 
-using cppmicroservices::service::component::ComponentConstants::SERVICE_COMPONENT;
+using cppmicroservices::service::component::ComponentConstants::
+  SERVICE_COMPONENT;
 
 namespace cppmicroservices {
 namespace scrimpl {
 
 using metadata::ComponentMetadata;
 using util::ObjectValidator;
-SCRBundleExtension::SCRBundleExtension(const cppmicroservices::BundleContext& bundleContext,
-                                       const cppmicroservices::AnyMap& scrMetadata,
-                                       const std::shared_ptr<ComponentRegistry>& registry,
-                                       const std::shared_ptr<LogService>& logger)
+
+SCRBundleExtension::SCRBundleExtension(
+  const cppmicroservices::BundleContext& bundleContext,
+  const cppmicroservices::AnyMap& scrMetadata,
+  const std::shared_ptr<ComponentRegistry>& registry,
+  const std::shared_ptr<LogService>& logger,
+  const std::shared_ptr<cppmicroservices::async::AsyncWorkService>&
+    asyncWorkService,
+  const std::shared_ptr<ConfigurationNotifier>& configNotifier)
   : bundleContext(bundleContext)
   , registry(registry)
   , logger(logger)
+  , configNotifier(configNotifier)
 {
-  if(!bundleContext || !registry || !logger || scrMetadata.empty())
-  {
-    throw std::invalid_argument("Invalid parameters passed to SCRBundleExtension constructor");
+  if (!bundleContext || !registry || !logger || scrMetadata.empty() ||
+      !asyncWorkService || !configNotifier) {
+    throw std::invalid_argument(
+      "Invalid parameters passed to SCRBundleExtension constructor");
   }
+  managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
   auto version = ObjectValidator(scrMetadata, "version").GetValue<int>();
-  auto metadataparser = metadata::MetadataParserFactory::Create(version, logger);
+  auto metadataparser =
+    metadata::MetadataParserFactory::Create(version, logger);
   std::vector<std::shared_ptr<ComponentMetadata>> componentsMetadata;
-  componentsMetadata = metadataparser->ParseAndGetComponentsMetadata(scrMetadata);
-  for (auto& oneCompMetadata : componentsMetadata)
-  {
-    try
-    {
-      auto compManager = std::make_shared<ComponentManagerImpl>(oneCompMetadata,
-                                                                registry,
-                                                                bundleContext,
-                                                                logger);
-      if(registry->AddComponentManager(compManager))
-      {
-        managers.push_back(compManager);
+  componentsMetadata =
+    metadataparser->ParseAndGetComponentsMetadata(scrMetadata);
+  for (auto& oneCompMetadata : componentsMetadata) {
+    try {
+      auto compManager =
+        std::make_shared<ComponentManagerImpl>(oneCompMetadata,
+                                               registry,
+                                               bundleContext,
+                                               logger,
+                                               asyncWorkService,
+                                               configNotifier,
+                                               managers);
+      if (registry->AddComponentManager(compManager)) {
+        managers->push_back(compManager);
         compManager->Initialize();
       }
     } catch (const cppmicroservices::SharedLibraryException&) {
       throw;
+    } catch (const cppmicroservices::SecurityException&) {
+      DisableAndRemoveAllComponentManagers();
+      throw;
     } catch (const std::exception&) {
       logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                  "Failed to create ComponentManager with name " + oneCompMetadata->name + " from bundle with Id " + std::to_string(bundleContext.GetBundle().GetBundleId()),
+                  "Failed to create ComponentManager with name " +
+                    oneCompMetadata->name + " from bundle with Id " +
+                    std::to_string(bundleContext.GetBundle().GetBundleId()),
                   std::current_exception());
     }
   }
   logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-              "Created instance of SCRBundleExtension for " + bundleContext.GetBundle().GetSymbolicName());
+              "Created instance of SCRBundleExtension for " +
+                bundleContext.GetBundle().GetSymbolicName());
 }
 
 SCRBundleExtension::~SCRBundleExtension()
 {
+  DisableAndRemoveAllComponentManagers();
+}
+
+void SCRBundleExtension::DisableAndRemoveAllComponentManagers()
+{
   logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-              "Deleting instance of SCRBundleExtension for " + bundleContext.GetBundle().GetSymbolicName());
-  for(auto compManager : managers)
-  {
+              "Deleting instance of SCRBundleExtension for " +
+                bundleContext.GetBundle().GetSymbolicName());
+  for (auto& compManager : *managers) {
     auto fut = compManager->Disable();
     registry->RemoveComponentManager(compManager);
-    fut.get(); // since this happens when the bundle is stopped. Wait until the disable is finished on the other thread.
+    try {
+      fut.get(); // since this happens when the bundle is stopped. Wait until the disable is finished on the other thread.
+    } catch (...) {
+      std::string errMsg("An exception occurred while disabling "
+                         "component manager: ");
+      errMsg += compManager->GetName();
+      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                  errMsg,
+                  std::current_exception());
+    }
   }
-  managers.clear();
+  managers->clear();
   registry.reset();
-};
+}
 } // scrimpl
 } // cppmicroservices
-

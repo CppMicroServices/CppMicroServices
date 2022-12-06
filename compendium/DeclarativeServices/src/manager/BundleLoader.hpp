@@ -24,6 +24,7 @@
 #define __BUNDLELOADER_HPP__
 
 #include "ConcurrencyUtil.hpp"
+#include "cppmicroservices/logservice/LogService.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"
 #include <map>
 
@@ -40,6 +41,7 @@ namespace scrimpl {
  *
  * \param compName is a unique identifier for the component
  * \param fromBundle is the bundle where the component is located
+ * \param logger the logger to use for logging messages
  *
  * \throws \c cppmicroservices::SharedLibraryException on failure to load the bundle binary.
  *         \c std::runtime_error if the entry points for \c compName are
@@ -49,8 +51,10 @@ namespace scrimpl {
  */
 std::tuple<std::function<ComponentInstance*(void)>,
            std::function<void(ComponentInstance*)>>
-GetComponentCreatorDeletors(const std::string& compName,
-                            const cppmicroservices::Bundle& fromBundle);
+GetComponentCreatorDeletors(
+  const std::string& compName,
+  const cppmicroservices::Bundle& fromBundle,
+  const std::shared_ptr<cppmicroservices::logservice::LogService>& logger);
 }
 }
 #endif /* __BUNDLELOADER_HPP__ */

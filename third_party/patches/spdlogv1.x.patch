@@ -1,0 +1,13 @@
+diff --git a/Users/alexchristoforides/Desktop/os-inl.h b/third_party/spdlog/include/spdlog/details/os-inl.h
+index 87c8c5a0..759021ac 100644
+--- a/Users/alexchristoforides/Desktop/os-inl.h
++++ b/third_party/spdlog/include/spdlog/details/os-inl.h
+@@ -295,7 +295,7 @@ SPDLOG_INLINE int utc_minutes_offset(const std::tm &tm)
+                 ((local_year / 100 >> 2) - (gmt_year / 100 >> 2))
+
+                 // + difference in years * 365 */
+-                + (long int)(local_year - gmt_year) * 365);
++                + static_cast<long int>(local_year - gmt_year) * 365);
+
+             long int hours = (24 * days) + (localtm.tm_hour - gmtm.tm_hour);
+             long int mins = (60 * hours) + (localtm.tm_min - gmtm.tm_min);

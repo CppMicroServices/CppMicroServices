@@ -23,27 +23,27 @@
 
 namespace DSFrenchDictionary {
 
-  DictionaryImpl::DictionaryImpl()
-  {
-    m_dictionary.insert("bienvenue");
-    m_dictionary.insert("au");
-    m_dictionary.insert("tutoriel");
-    m_dictionary.insert("micro");
-    m_dictionary.insert("services");
-  }
+DictionaryImpl::DictionaryImpl()
+{
+  m_dictionary.insert("bienvenue");
+  m_dictionary.insert("au");
+  m_dictionary.insert("tutoriel");
+  m_dictionary.insert("micro");
+  m_dictionary.insert("services");
+}
 
-  /**
-   * Implements IDictionaryService::CheckWord(). Determines
-   * if the passed in word is contained in the dictionary.
-   * @param word the word to be checked.
-   * @return true if the word is in the dictionary,
-   *         false otherwise.
-   **/
-  bool DictionaryImpl::CheckWord(const std::string& word)
-  {
-    std::string lword(word);
-    std::transform(lword.begin(), lword.end(), lword.begin(), ::tolower);
-    return (m_dictionary.find(lword) != m_dictionary.end());
-  }
+/**
+ * Implements IDictionaryService::CheckWord(). Determines
+ * if the passed in word is contained in the dictionary.
+ * @param word the word to be checked.
+ * @return true if the word is in the dictionary,
+ *         false otherwise.
+ **/
+bool DictionaryImpl::CheckWord(const std::string& word)
+{
+  std::string lword(word);
+  std::transform(lword.begin(), lword.end(), lword.begin(), ::tolower);
+  return (m_dictionary.find(lword) != m_dictionary.end());
+}
 
 }

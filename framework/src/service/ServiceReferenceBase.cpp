@@ -98,14 +98,16 @@ std::vector<std::string> ServiceReferenceBase::GetPropertyKeys() const
 Bundle ServiceReferenceBase::GetBundle() const
 {
   auto p = d.load();
-  if (p->registration == nullptr)
+  if (p->registration == nullptr) {
     return Bundle();
+  }
 
   auto l = p->registration->Lock();
   US_UNUSED(l);
-  if (p->registration->bundle == nullptr)
+  if (p->registration->bundle.lock() == nullptr) {
     return Bundle();
-  return MakeBundle(p->registration->bundle->shared_from_this());
+  }
+  return MakeBundle(p->registration->bundle.lock()->shared_from_this());
 }
 
 std::vector<Bundle> ServiceReferenceBase::GetUsingBundles() const
@@ -214,7 +216,8 @@ std::string ServiceReferenceBase::GetInterfaceId() const
 
 std::size_t ServiceReferenceBase::Hash() const
 {
-  return std::hash<ServiceRegistrationBasePrivate*>()(this->d.load()->registration);
+  return std::hash<ServiceRegistrationBasePrivate*>()(
+    this->d.load()->registration);
 }
 
 std::ostream& operator<<(std::ostream& os,

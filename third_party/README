@@ -29,11 +29,11 @@ MIT License or Public Domain
 
 https://github.com/open-source-parsers/jsoncpp
 (formerly http://jsoncpp.sourceforge.net)
-0.10.6
+1.9.5
 
 Patches
 
- * Suppress -Wimplicit-fallthrough warning in GCC 7
+* Fixed some compiler warnings
 
 miniz
 -----
@@ -132,7 +132,7 @@ Google Test and Google Mock
 See https://github.com/google/googletest/blob/master/LICENSE for license information.
 
 https://github.com/google/googletest
-ba33a8876c3eda4cb8def8e0e90f45930ef8c54f
+aefb45469ee7e6bde0cd1d2c18412046c30e7bb6
 
 RapidJSON
 ---------
@@ -147,8 +147,8 @@ Google benchmark
 
 See https://github.com/google/benchmark/blob/master/LICENSE for license information
 
-https://github.com/google/benchmark/releases
-1.4.1
+https://github.com/google/benchmark
+4124223bf5303d1d65fe2c40f33e28372bbb986c
 
 Abseil (absl)
 -------------
@@ -156,5 +156,21 @@ Abseil (absl)
 See https://github.com/abseil/abseil-cpp/blob/master/LICENSE for license information
 
 https://github.com/abseil/abseil-cpp
-6ec136281086b71da32b5fb068bd6e46b78a5c79
+https://github.com/abseil/abseil-cpp/releases/tag/20220623.1
 
+spdlog
+------
+
+See https://github.com/gabime/spdlog/blob/v1.x/LICENSE for license information
+
+https://github.com/gabime/spdlog
+v1.10.0
+
+* We only use the include folder since we aren't statically linking to the library
+* version reflects the version from which we copied the include folder
+
+Boost
+------
+
+See https://www.boost.org/users/license.html for license information
+1.73.0

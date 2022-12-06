@@ -52,9 +52,7 @@ public:
   InitialBundleMapCleanup(std::function<void()> cleanupFcn)
     : _cleanupFcn(std::move(cleanupFcn))
   {}
-  ~InitialBundleMapCleanup() {
-    _cleanupFcn();
-  }
+  ~InitialBundleMapCleanup() { _cleanupFcn(); }
 
 private:
   std::function<void()> _cleanupFcn;
@@ -125,7 +123,7 @@ BundleRegistry::GetAlreadyInstalledBundlesAtLocation(
        ? std::make_shared<BundleResourceContainer>(location, bundleManifest)
        : foundBundles.first->second->GetBundleArchive()
            ->GetResourceContainer());
-  
+
   while (foundBundles.first != foundBundles.second) {
     auto installedBundlePrivate = foundBundles.first->second;
     alreadyInstalled.emplace_back(installedBundlePrivate->symbolicName);
@@ -225,18 +223,18 @@ std::vector<Bundle> BundleRegistry::Install(
       std::vector<Bundle> installedBundles;
       {
         // create instance of clean-up object to ensure RAII
-        InitialBundleMapCleanup cleanup ([this, &l, &location]() {
-                                            {
-                                              l.Lock();
-                                              auto& p = initialBundleInstallMap[location];
-                                              // Notify all waiting threads that it is safe to install the bundle
-                                              std::lock_guard<std::mutex> lock(*(p.second.m));
-                                              p.second.waitFlag = false;
-                                              p.second.cv->notify_all();
-                                              l.UnLock();
-                                            }
-                                            DecrementInitialBundleMapRef(l, location);
-                                         });
+        InitialBundleMapCleanup cleanup([this, &l, &location]() {
+          {
+            l.Lock();
+            auto& p = initialBundleInstallMap[location];
+            // Notify all waiting threads that it is safe to install the bundle
+            std::lock_guard<std::mutex> lock(*(p.second.m));
+            p.second.waitFlag = false;
+            p.second.cv->notify_all();
+            l.UnLock();
+          }
+          DecrementInitialBundleMapRef(l, location);
+        });
 
         // Perform the install
         auto resCont =
@@ -282,9 +280,9 @@ std::vector<Bundle> BundleRegistry::Install(
       std::vector<Bundle> newBundles;
       {
         // create instance of clean-up object to ensure RAII
-        InitialBundleMapCleanup cleanup ([this, &l, &location]() {
-                                           DecrementInitialBundleMapRef(l, location);
-                                         });
+        InitialBundleMapCleanup cleanup([this, &l, &location]() {
+          DecrementInitialBundleMapRef(l, location);
+        });
 
         // Perform the install
         newBundles =

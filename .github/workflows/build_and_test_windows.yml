@@ -1,0 +1,132 @@
+name: BuildAndTestWindows
+
+on:
+  push:
+    branches: [ development, c\+\+14-compliant, master ]
+  pull_request:
+    branches: [ development, c\+\+14-compliant ]
+  workflow_dispatch:
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+  BUILD_CONFIGURATION: 0
+  WITH_COVERAGE: 0
+
+jobs:
+  build_win_msvc:
+    name: Build and Test [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
+    runs-on: ${{matrix.os}}
+    env:
+      BUILD_DIR: Z:\build\config_${{matrix.buildconfiguration}}
+      BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+      BUILD_OS: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2019, windows-2022]
+        # build configurations:
+        # 0 = threading ON / shared lib ON
+        # 1 = threading ON / shared lib OFF
+        # 2 = threading OFF / shared lib ON
+        # 3 = threading OFF/ shared lib OFF
+        buildconfiguration: [0,1,2,3]
+
+    steps:
+    - name: Initialization
+      run: |
+        git config --global core.autocrlf true
+        subst Z: ${{github.workspace}}
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Build And Test
+      working-directory: Z:\
+      run: ctest -VV -S cmake\usCTestScript_github.cmake
+
+  build_win_msvc_coverage:
+    name: Build and Test with Code Coverage [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
+    runs-on: ${{matrix.os}}
+    env:
+      BUILD_DIR: Z:/build/config_${{matrix.buildconfiguration}}
+      BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+      BUILD_TYPE: Debug
+      BUILD_OS: ${{matrix.os}}
+      WITH_COVERAGE: 1
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2019, windows-2022]
+        # build configurations:
+        # 0 = threading ON / shared lib ON
+        # 1 = threading ON / shared lib OFF
+        buildconfiguration: [0,1,2,3]
+
+    steps:
+      - name: Initialization
+        run: |
+          git config --global core.autocrlf true
+          subst Z: ${{github.workspace}}
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: 1
+
+      # Install OpenCppCoverage for windows builds and add it to the path so CMake and CTest can find it and use
+      # it for generation of code coverage files
+      - name: Install OpenCppCoverage
+        run: ${{github.workspace}}\install_opencppcoverage.ps1
+
+      - name: Build And Test
+        working-directory: Z:\
+        run: ctest -VV -S cmake\usCTestScript_github.cmake
+
+      - name: Merge Code Coverage Reports
+        working-directory: ${{github.workspace}}\build\config_${{matrix.buildconfiguration}}
+        run: ${{github.workspace}}\opencppcoverage_mergereports.bat
+
+      - name: Fix Filepaths for Coverage Report
+        working-directory: ${{github.workspace}}
+        run: python ${{github.workspace}}\fixcoveragefilepaths.py -i build\config_${{matrix.buildconfiguration}}\coverage.xml -s Z:\ -o ${{github.workspace}}\coverage_pathsfixed.xml
+
+      - uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage_pathsfixed.xml
+          fail_ci_if_error: true
+          verbose: true
+
+  build_win_mingw:
+    name: Build and Test [mingw-w64,Configuration=${{matrix.buildconfiguration}}]
+    runs-on: windows-2019
+    env:
+      BUILD_DIR: Z:\build\config_${{matrix.buildconfiguration}}
+      BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+      BUILD_OS: mingw-w64
+      CC: gcc
+      CXX: g++
+    strategy:
+      fail-fast: false
+      matrix:
+        # build configurations:
+        # 0 = threading ON / shared lib ON
+        # 1 = threading ON / shared lib OFF
+        # 2 = threading OFF / shared lib ON
+        # 3 = threading OFF/ shared lib OFF
+        buildconfiguration: [0,1,2,3]
+
+    steps:
+    - name: Initialization
+      run: |
+        git config --global core.autocrlf true
+        subst Z: ${{github.workspace}}
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Build And Test
+      working-directory: Z:\
+      run: ctest -VV -S cmake\usCTestScript_github.cmake

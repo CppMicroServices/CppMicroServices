@@ -8,7 +8,7 @@
 
 using namespace cppmicroservices;
 
-int main(int /*argc*/, char* /*argv*/ [])
+int main(int /*argc*/, char* /*argv*/[])
 {
   ServiceReference<IDictionaryService> dictionaryServiceRef =
     GetBundleContext().GetServiceReference<IDictionaryService>();

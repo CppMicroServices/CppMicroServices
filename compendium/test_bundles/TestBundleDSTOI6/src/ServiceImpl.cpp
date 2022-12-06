@@ -1,12 +1,11 @@
 #include "ServiceImpl.hpp"
 
-namespace sample
-{
+namespace sample {
 void ServiceComponent6::Activate(const std::shared_ptr<ComponentContext>& ctxt)
 {
   foo = ctxt->LocateService<test::Interface1>("foo");
 }
-  
+
 void ServiceComponent6::Deactivate(const std::shared_ptr<ComponentContext>&)
 {
   foo = nullptr;
@@ -14,8 +13,7 @@ void ServiceComponent6::Deactivate(const std::shared_ptr<ComponentContext>&)
 
 std::string ServiceComponent6::ExtendedDescription()
 {
-  if(!foo)
-  {
+  if (!foo) {
     throw std::runtime_error("Dependency not available");
   }
   std::string result(STRINGIZE(US_BUNDLE_NAME));
@@ -26,16 +24,15 @@ std::string ServiceComponent6::ExtendedDescription()
 
 void ServiceComponent6::Bindfoo(const std::shared_ptr<test::Interface1>& theFoo)
 {
-  if (foo != theFoo)
-  {
+  if (foo != theFoo) {
     foo = theFoo;
   }
 }
 
-void ServiceComponent6::Unbindfoo(const std::shared_ptr<test::Interface1>& theFoo)
+void ServiceComponent6::Unbindfoo(
+  const std::shared_ptr<test::Interface1>& theFoo)
 {
-  if (foo == theFoo)
-  {
+  if (foo == theFoo) {
     foo = nullptr;
   }
 }

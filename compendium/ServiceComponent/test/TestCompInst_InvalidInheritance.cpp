@@ -20,30 +20,30 @@
 
   =============================================================================*/
 #if NEVER
-#include <cstdio>
-#include <iostream>
-#include <algorithm>
-#include <chrono>
+#  include <algorithm>
+#  include <chrono>
+#  include <cstdio>
+#  include <iostream>
 
 //#include "version.h"
 
-#include "gtest/gtest.h"
+#  include "gtest/gtest.h"
 
-#include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
-#include <cppmicroservices/ServiceInterface.h>
+#  include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#  include <cppmicroservices/ServiceInterface.h>
 
 using cppmicroservices::service::component::detail::ComponentInstanceImpl;
 
 namespace {
 
 // dummy types used for testing
-struct TestServiceInterface1 {};
-struct TestServiceInterface2 {};
+struct TestServiceInterface1
+{};
+struct TestServiceInterface2
+{};
 
-class TestServiceImpl3
-  : public TestServiceInterface1
-{
-};
+class TestServiceImpl3 : public TestServiceInterface1
+{};
 
 /**
  * This test point is used to verify a compile error is generated when a service component
@@ -53,11 +53,13 @@ class TestServiceImpl3
  */
 TEST(ComponentInstance, ValidateInheritance)
 {
-  ComponentInstanceImpl<TestServiceImpl3, std::tuple<TestServiceInterface2>> compInstance; // compile error
+  ComponentInstanceImpl<TestServiceImpl3, std::tuple<TestServiceInterface2>>
+    compInstance; // compile error
 }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv)
+{
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

@@ -17,6 +17,8 @@ target_include_directories(usTestInterfaces
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     $<BUILD_INTERFACE:${CppMicroServices_BINARY_DIR}/include>
+    ${CppMicroServices_BINARY_DIR}/framework/include
+    ${CppMicroServices_SOURCE_DIR}/framework/include
     $<INSTALL_INTERFACE:${HEADER_INSTALL_DIR}>
   )
 

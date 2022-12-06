@@ -45,6 +45,8 @@ limitations under the License.
 #include <fcntl.h>
 #include <sys/stat.h> // mkdir, _S_IREAD, etc.
 
+US_MSVC_PUSH_DISABLE_WARNING(4996)
+
 namespace cppmicroservices {
 
 namespace testing {
@@ -147,18 +149,19 @@ long long HighPrecisionTimer::ElapsedMicro()
 
 #endif
 
-Bundle InstallLib(BundleContext frameworkCtx, const std::string& libName)
+Bundle InstallLib(BundleContext frameworkCtx,
+                  const std::string& libName,
+                  const cppmicroservices::AnyMap& bundleManifest)
 {
   std::vector<Bundle> bundles;
 
 #if defined(US_BUILD_SHARED_LIBS)
-  bundles = frameworkCtx.InstallBundles(LIB_PATH
-                                        + util::DIR_SEP
-                                        + US_LIB_PREFIX
-                                        + libName
-                                        + US_LIB_POSTFIX
-                                        + US_LIB_EXT);
+  bundles =
+    frameworkCtx.InstallBundles(LIB_PATH + util::DIR_SEP + US_LIB_PREFIX +
+                                  libName + US_LIB_POSTFIX + US_LIB_EXT,
+                                bundleManifest);
 #else
+  US_UNUSED(bundleManifest);
   bundles = frameworkCtx.GetBundles();
 #endif
 
@@ -487,3 +490,5 @@ Bundle GetBundle(const std::string& bsn, BundleContext context)
 }
 }
 }
+
+US_MSVC_POP_WARNING

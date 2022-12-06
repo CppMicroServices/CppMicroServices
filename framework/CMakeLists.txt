@@ -28,13 +28,9 @@ endif()
 if(CMAKE_THREAD_LIBS_INIT)
   list(APPEND _link_libraries ${CMAKE_THREAD_LIBS_INIT})
 endif()
-
-# Configure the bundles manifest.json file
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
-               ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
-
+               
 usMacroCreateBundle(Framework
-  VERSION "${CppMicroServices_VERSION}"
+  VERSION "${_version}"
   TARGET CppMicroServices
   SYMBOLIC_NAME system_bundle
   SKIP_INIT # we do it manually
@@ -51,3 +47,7 @@ set_property(
   TARGET ${PROJECT_TARGET} APPEND PROPERTY
   COMPILE_DEFINITIONS "MINIZ_NO_ARCHIVE_WRITING_API;MINIZ_NO_ZLIB_COMPATIBLE_NAMES"
 )
+
+if (US_ENABLE_ASAN AND US_ASAN_USER_DLL)
+  add_custom_command(TARGET CppMicroServices POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${US_ASAN_USER_DLL} ${US_RUNTIME_OUTPUT_DIRECTORY}/.)
+endif()

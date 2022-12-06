@@ -394,7 +394,7 @@ public:
     * @post If the symbol does not exist, the API returns nullptr 
     */
 
-   void* GetSymbol(void * handle, const std::string& symname) const;
+  void* GetSymbol(void* handle, const std::string& symname) const;
 
   /**
    * Returns the symbolic name of this bundle as specified by the
@@ -693,6 +693,8 @@ public:
    * @throws std::logic_error If this bundle has been uninstalled or this
    *         bundle tries to change its own state.
    * @throws std::invalid_argument if this bundle is not initialized.
+   * @throws cppmicroservices::SecurityException if the bundle's shared library
+   *         to be loaded failed a security check.
    */
   void Start(uint32_t options);
 
@@ -704,8 +706,9 @@ public:
    * @throws std::runtime_error If this bundle could not be started.
    * @throws std::logic_error If this bundle has been uninstalled or this
    *         bundle tries to change its own state.
-   * 
    * @throws std::invalid_argument if this bundle is not initialized.
+   * @throws cppmicroservices::SecurityException if the bundle's shared library
+   *         to be loaded failed a security check.
    * 
    * @see #Start(uint32_t)
    */

@@ -27,30 +27,52 @@ namespace detail {
 template<class S, class TTT>
 TrackedService<S,TTT>::TrackedService(ServiceTracker<S,T>* serviceTracker,
                   ServiceTrackerCustomizer<S,T>* customizer)
-  : Superclass(&serviceTracker->d->context), serviceTracker(serviceTracker), customizer(customizer)
+  : Superclass(serviceTracker->d->context)
+  , serviceTracker(serviceTracker)
+  , customizer(customizer)
+  , latch{}
 {
 
 }
 
 template<class S, class TTT>
+void TrackedService<S,TTT>::WaitOnCustomizersToFinish() {
+  latch.Wait();
+}
+
+template<class S, class TTT>
 void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent& event)
 {
-  /*
+  (void)latch.CountUp();
+  ScopeGuard sg([this]() {
+    // By using try/catch here, we ensure that this lambda function doesn't
+    // throw inside ScopeGuard's dtor.
+    try {
+      latch.CountDown();
+    } catch (...) {
+    }
+  });
+
+  ServiceReference<S> reference;
+  {
+    auto l = this->Lock();
+    US_UNUSED(l);
+    /*
    * Check if we had a delayed call (which could happen when we
    * close).
    */
-  if (this->closed)
-  {
-    return;
-  }
+    if (this->closed) {
+      return;
+    }
 
-  ServiceReference<S> reference = event.GetServiceReference<S>();
+    reference = event.GetServiceReference<S>();
 
-  DIAG_LOG(*serviceTracker->d->context.GetLogSink()) << "TrackedService::ServiceChanged["
-                                                    << event.GetType() << "]: " << reference;
-  if (!reference)
-  {
-    return;
+    DIAG_LOG(*serviceTracker->d->context.GetLogSink())
+      << "TrackedService::ServiceChanged[" << event.GetType()
+      << "]: " << reference;
+    if (!reference) {
+      return;
+    }
   }
 
   switch (event.GetType())

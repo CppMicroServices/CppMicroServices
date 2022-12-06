@@ -27,19 +27,23 @@ US_MSVC_PUSH_DISABLE_WARNING(
 
 #include "ServiceListeners.h"
 
+#include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/ListenerFunctors.h"
+#include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/util/Error.h"
 #include "cppmicroservices/util/String.h"
 
 #include "BundleContextPrivate.h"
+
 #include "BundlePrivate.h"
 #include "CoreBundleContext.h"
 #include "Properties.h"
 #include "ServiceReferenceBasePrivate.h"
 
 #include <cassert>
+#include <utility>
 
 namespace cppmicroservices {
 
@@ -81,7 +85,7 @@ ListenerToken ServiceListeners::AddServiceListener(
   // The following condition is true only if the listener is a non-static member function.
   // If so, the existing listener is replaced with the new listener.
   if (data != nullptr) {
-    RemoveServiceListener(context, ListenerTokenId(0), listener, data);
+    RemoveLegacyServiceListenerAndNotifyHooks(context, listener, data);
   }
 
   auto token = MakeListenerToken();
@@ -102,26 +106,43 @@ void ServiceListeners::RemoveServiceListener(
   const ServiceListener& listener,
   void* data)
 {
+  if (0 == tokenId) {
+    RemoveLegacyServiceListenerAndNotifyHooks(context, listener, data);
+  } else {
+    ServiceListenerEntry sle;
+    {
+      auto l = this->Lock();
+      US_UNUSED(l);
+      auto it = serviceSet.find(
+        ServiceListenerEntry{ context, listener, data, tokenId });
+      if (it != serviceSet.end()) {
+        sle = *it;
+        it->SetRemoved(true);
+        RemoveFromCache_unlocked(*it);
+        serviceSet.erase(it);
+      }
+    }
+    if (!sle.IsNull()) {
+      coreCtx->serviceHooks.HandleServiceListenerUnreg(sle);
+    }
+  }
+}
+
+void ServiceListeners::RemoveLegacyServiceListenerAndNotifyHooks(
+  const std::shared_ptr<BundleContextPrivate>& context,
+  const ServiceListener& listener,
+  void* data)
+{
   ServiceListenerEntry sle;
   {
     auto l = this->Lock();
     US_UNUSED(l);
-    std::function<bool(const ServiceListenerEntry&)> entryExists;
-    if (tokenId) {
-      assert(!listener);
-      assert(data == nullptr);
-      entryExists = [&context,
-                     &tokenId](const ServiceListenerEntry& entry) -> bool {
-        return entry.Contains(context, tokenId);
-      };
-    } else {
-      entryExists = [&context, &listener, &data](
-                      const ServiceListenerEntry& entry) -> bool {
+    auto it = std::find_if(
+      serviceSet.begin(),
+      serviceSet.end(),
+      [&context, &listener, &data](const ServiceListenerEntry& entry) -> bool {
         return entry.Contains(context, listener, data);
-      };
-    }
-
-    auto it = std::find_if(serviceSet.begin(), serviceSet.end(), entryExists);
+      });
     if (it != serviceSet.end()) {
       sle = *it;
       it->SetRemoved(true);
@@ -292,21 +313,29 @@ void ServiceListeners::BundleChanged(const BundleEvent& evt)
 
   for (auto& bundleListeners : filteredBundleListeners) {
     for (auto& bundleListener : bundleListeners.second) {
+      auto bundle_ = bundleListeners.first->bundle.lock();
       try {
         std::get<0>(bundleListener.second)(evt);
       } catch (const cppmicroservices::SharedLibraryException&) {
-        SendFrameworkEvent(FrameworkEvent(
+        SendFrameworkEvent(
+          FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                         MakeBundle(bundle_),
+                         std::string("Bundle listener threw an exception"),
+                         std::current_exception()));
+        throw;
+      } catch (const cppmicroservices::SecurityException&) {
+        SendFrameworkEvent(FrameworkEvent{
           FrameworkEvent::Type::FRAMEWORK_ERROR,
-          MakeBundle(bundleListeners.first->bundle->shared_from_this()),
-          std::string("Bundle listener threw an exception"),
-          std::current_exception()));
+          evt.GetOrigin(),
+          std::string("Bundle listener threw a security exception"),
+          std::current_exception() });
         throw;
       } catch (...) {
-        SendFrameworkEvent(FrameworkEvent(
-          FrameworkEvent::Type::FRAMEWORK_ERROR,
-          MakeBundle(bundleListeners.first->bundle->shared_from_this()),
-          std::string("Bundle listener threw an exception"),
-          std::current_exception()));
+        SendFrameworkEvent(
+          FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
+                         MakeBundle(bundle_),
+                         std::string("Bundle listener threw an exception"),
+                         std::current_exception()));
       }
     }
   }
@@ -318,9 +347,7 @@ void ServiceListeners::RemoveAllListeners(
   {
     auto l = this->Lock();
     US_UNUSED(l);
-    for (auto it = serviceSet.begin();
-         it != serviceSet.end();) {
-
+    for (auto it = serviceSet.begin(); it != serviceSet.end();) {
       if (GetPrivate(it->GetBundleContext()) == context) {
         RemoveFromCache_unlocked(*it);
         serviceSet.erase(it++);
@@ -378,7 +405,7 @@ void ServiceListeners::ServiceChanged(ServiceListenerEntries& receivers,
     }
   }
 
-  for (auto& l : receivers) {
+  for (auto const& l : receivers) {
     if (!l.IsRemoved()) {
       try {
         ++n;
@@ -445,7 +472,7 @@ ServiceListeners::GetListenerInfoCollection() const
   US_UNUSED(l);
   std::vector<ServiceListenerHook::ListenerInfo> result;
   result.reserve(serviceSet.size());
-  for (auto info : serviceSet) {
+  for (const auto& info : serviceSet) {
     result.push_back(info);
   }
   return result;
@@ -499,11 +526,14 @@ void ServiceListeners::AddToSet_unlocked(
   int cache_ix,
   const std::string& val)
 {
-  std::set<ServiceListenerEntry>& l = cache[cache_ix][val];
-  if (!l.empty()) {
-    for (const ServiceListenerEntry& entry : l) {
-      if (receivers.count(entry)) {
-        set.insert(entry);
+  const auto cacheItr = cache[cache_ix].find(val);
+  if (cacheItr != cache[cache_ix].end()) {
+    std::set<ServiceListenerEntry>& l = cache[cache_ix][val];
+    if (!l.empty()) {
+      for (const ServiceListenerEntry& entry : l) {
+        if (receivers.count(entry)) {
+          set.insert(entry);
+        }
       }
     }
   }

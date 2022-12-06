@@ -20,7 +20,7 @@
 #include <cstring>
 
 #include "absl/base/casts.h"
-#include "absl/base/internal/bits.h"
+#include "absl/numeric/bits.h"
 #include "absl/numeric/int128.h"
 #include "absl/strings/internal/charconv_bigint.h"
 #include "absl/strings/internal/charconv_parse.h"
@@ -57,6 +57,7 @@
 // narrower mantissas.
 
 namespace absl {
+ABSL_NAMESPACE_BEGIN
 namespace {
 
 template <typename FloatType>
@@ -110,7 +111,7 @@ struct FloatTraits<double> {
     return sign ? -ldexp(mantissa, exponent) : ldexp(mantissa, exponent);
 #else
     constexpr uint64_t kMantissaMask =
-	(uint64_t(1) << (kTargetMantissaBits - 1)) - 1;
+        (uint64_t{1} << (kTargetMantissaBits - 1)) - 1;
     uint64_t dbl = static_cast<uint64_t>(sign) << 63;
     if (mantissa > kMantissaMask) {
       // Normal value.
@@ -150,7 +151,7 @@ struct FloatTraits<float> {
     return sign ? -ldexpf(mantissa, exponent) : ldexpf(mantissa, exponent);
 #else
     constexpr uint32_t kMantissaMask =
-	(uint32_t(1) << (kTargetMantissaBits - 1)) - 1;
+        (uint32_t{1} << (kTargetMantissaBits - 1)) - 1;
     uint32_t flt = static_cast<uint32_t>(sign) << 31;
     if (mantissa > kMantissaMask) {
       // Normal value.
@@ -241,11 +242,11 @@ struct CalculatedFloat {
 
 // Returns the bit width of the given uint128.  (Equivalently, returns 128
 // minus the number of leading zero bits.)
-int BitWidth(uint128 value) {
+unsigned BitWidth(uint128 value) {
   if (Uint128High64(value) == 0) {
-    return 64 - base_internal::CountLeadingZeros64(Uint128Low64(value));
+    return static_cast<unsigned>(bit_width(Uint128Low64(value)));
   }
-  return 128 - base_internal::CountLeadingZeros64(Uint128High64(value));
+  return 128 - countl_zero(Uint128High64(value));
 }
 
 // Calculates how far to the right a mantissa needs to be shifted to create a
@@ -282,7 +283,7 @@ int TruncateToBitWidth(int bit_width, uint128* value) {
 // the appropriate double, and returns true.
 template <typename FloatType>
 bool HandleEdgeCase(const strings_internal::ParsedFloat& input, bool negative,
-		    FloatType* value) {
+                    FloatType* value) {
   if (input.type == strings_internal::FloatType::kNan) {
     // A bug in both clang and gcc would cause the compiler to optimize away the
     // buffer we are building below.  Declaring the buffer volatile avoids the
@@ -302,12 +303,12 @@ bool HandleEdgeCase(const strings_internal::ParsedFloat& input, bool negative,
     }
     char* nan_argument = const_cast<char*>(n_char_sequence);
     *value = negative ? -FloatTraits<FloatType>::MakeNan(nan_argument)
-		      : FloatTraits<FloatType>::MakeNan(nan_argument);
+                      : FloatTraits<FloatType>::MakeNan(nan_argument);
     return true;
   }
   if (input.type == strings_internal::FloatType::kInfinity) {
     *value = negative ? -std::numeric_limits<FloatType>::infinity()
-		      : std::numeric_limits<FloatType>::infinity();
+                      : std::numeric_limits<FloatType>::infinity();
     return true;
   }
   if (input.mantissa == 0) {
@@ -325,11 +326,11 @@ bool HandleEdgeCase(const strings_internal::ParsedFloat& input, bool negative,
 // number is stored in *value.
 template <typename FloatType>
 void EncodeResult(const CalculatedFloat& calculated, bool negative,
-		  absl::from_chars_result* result, FloatType* value) {
+                  absl::from_chars_result* result, FloatType* value) {
   if (calculated.exponent == kOverflow) {
     result->ec = std::errc::result_out_of_range;
     *value = negative ? -std::numeric_limits<FloatType>::max()
-		      : std::numeric_limits<FloatType>::max();
+                      : std::numeric_limits<FloatType>::max();
     return;
   } else if (calculated.mantissa == 0 || calculated.exponent == kUnderflow) {
     result->ec = std::errc::result_out_of_range;
@@ -337,7 +338,7 @@ void EncodeResult(const CalculatedFloat& calculated, bool negative,
     return;
   }
   *value = FloatTraits<FloatType>::Make(calculated.mantissa,
-					calculated.exponent, negative);
+                                        calculated.exponent, negative);
 }
 
 // Returns the given uint128 shifted to the right by `shift` bits, and rounds
@@ -369,7 +370,7 @@ void EncodeResult(const CalculatedFloat& calculated, bool negative,
 // Zero and negative values of `shift` are accepted, in which case the word is
 // shifted left, as necessary.
 uint64_t ShiftRightAndRound(uint128 value, int shift, bool input_exact,
-			    bool* output_exact) {
+                            bool* output_exact) {
   if (shift <= 0) {
     *output_exact = input_exact;
     return static_cast<uint64_t>(value << -shift);
@@ -426,7 +427,7 @@ uint64_t ShiftRightAndRound(uint128 value, int shift, bool input_exact,
 // This function returns false if `A` is the better guess, and true if `B` is
 // the better guess, with rounding ties broken by rounding to even.
 bool MustRoundUp(uint64_t guess_mantissa, int guess_exponent,
-		 const strings_internal::ParsedFloat& parsed_decimal) {
+                 const strings_internal::ParsedFloat& parsed_decimal) {
   // 768 is the number of digits needed in the worst case.  We could determine a
   // better limit dynamically based on the value of parsed_decimal.exponent.
   // This would optimize pathological input cases only.  (Sane inputs won't have
@@ -463,7 +464,7 @@ bool MustRoundUp(uint64_t guess_mantissa, int guess_exponent,
     // lhs = exact_mantissa * 2**exact_exponent
     // rhs = guess_mantissa * 5**(-exact_exponent) * 2**guess_exponent
     absl::strings_internal::BigUnsigned<84> rhs =
-	absl::strings_internal::BigUnsigned<84>::FiveToTheNth(-exact_exponent);
+        absl::strings_internal::BigUnsigned<84>::FiveToTheNth(-exact_exponent);
     rhs.MultiplyBy(guess_mantissa);
     if (exact_exponent > guess_exponent) {
       lhs.ShiftLeft(exact_exponent - guess_exponent);
@@ -498,7 +499,7 @@ bool MustRoundUp(uint64_t guess_mantissa, int guess_exponent,
 template <typename FloatType>
 CalculatedFloat CalculatedFloatFromRawValues(uint64_t mantissa, int exponent) {
   CalculatedFloat result;
-  if (mantissa == uint64_t(1) << FloatTraits<FloatType>::kTargetMantissaBits) {
+  if (mantissa == uint64_t{1} << FloatTraits<FloatType>::kTargetMantissaBits) {
     mantissa >>= 1;
     exponent += 1;
   }
@@ -518,12 +519,12 @@ CalculatedFloat CalculateFromParsedHexadecimal(
     const strings_internal::ParsedFloat& parsed_hex) {
   uint64_t mantissa = parsed_hex.mantissa;
   int exponent = parsed_hex.exponent;
-  int mantissa_width = 64 - base_internal::CountLeadingZeros64(mantissa);
+  auto mantissa_width = static_cast<unsigned>(bit_width(mantissa));
   const int shift = NormalizedShiftSize<FloatType>(mantissa_width, exponent);
   bool result_exact;
   exponent += shift;
   mantissa = ShiftRightAndRound(mantissa, shift,
-				/* input exact= */ true, &result_exact);
+                                /* input exact= */ true, &result_exact);
   // ParseFloat handles rounding in the hexadecimal case, so we don't have to
   // check `result_exact` here.
   return CalculatedFloatFromRawValues<FloatType>(mantissa, exponent);
@@ -562,13 +563,13 @@ CalculatedFloat CalculateFromParsedDecimal(
     mantissa_width = 58;
     mantissa_exact = false;
     binary_exponent +=
-	TruncateToBitWidth(mantissa_width, &wide_binary_mantissa);
+        TruncateToBitWidth(mantissa_width, &wide_binary_mantissa);
   } else if (!Power10Exact(parsed_decimal.exponent)) {
     // Exact mantissa, truncated power of ten
     mantissa_width = 63;
     mantissa_exact = false;
     binary_exponent +=
-	TruncateToBitWidth(mantissa_width, &wide_binary_mantissa);
+        TruncateToBitWidth(mantissa_width, &wide_binary_mantissa);
   } else {
     // Product is exact
     mantissa_width = BitWidth(wide_binary_mantissa);
@@ -581,7 +582,7 @@ CalculatedFloat CalculateFromParsedDecimal(
   bool result_exact;
   binary_exponent += shift;
   uint64_t binary_mantissa = ShiftRightAndRound(wide_binary_mantissa, shift,
-						mantissa_exact, &result_exact);
+                                                mantissa_exact, &result_exact);
   if (!result_exact) {
     // We could not determine the rounding direction using int128 math.  Use
     // full resolution math instead.
@@ -591,12 +592,12 @@ CalculatedFloat CalculateFromParsedDecimal(
   }
 
   return CalculatedFloatFromRawValues<FloatType>(binary_mantissa,
-						 binary_exponent);
+                                                 binary_exponent);
 }
 
 template <typename FloatType>
 from_chars_result FromCharsImpl(const char* first, const char* last,
-				FloatType& value, chars_format fmt_flags) {
+                                FloatType& value, chars_format fmt_flags) {
   from_chars_result result;
   result.ptr = first;  // overwritten on successful parse
   result.ec = std::errc();
@@ -612,21 +613,21 @@ from_chars_result FromCharsImpl(const char* first, const char* last,
       *first == '0' && (first[1] == 'x' || first[1] == 'X')) {
     const char* hex_first = first + 2;
     strings_internal::ParsedFloat hex_parse =
-	strings_internal::ParseFloat<16>(hex_first, last, fmt_flags);
+        strings_internal::ParseFloat<16>(hex_first, last, fmt_flags);
     if (hex_parse.end == nullptr ||
-	hex_parse.type != strings_internal::FloatType::kNumber) {
+        hex_parse.type != strings_internal::FloatType::kNumber) {
       // Either we failed to parse a hex float after the "0x", or we read
       // "0xinf" or "0xnan" which we don't want to match.
       //
-      // However, a std::string that begins with "0x" also begins with "0", which
+      // However, a string that begins with "0x" also begins with "0", which
       // is normally a valid match for the number zero.  So we want these
       // strings to match zero unless fmt_flags is `scientific`.  (This flag
-      // means an exponent is required, which the std::string "0" does not have.)
+      // means an exponent is required, which the string "0" does not have.)
       if (fmt_flags == chars_format::scientific) {
-	result.ec = std::errc::invalid_argument;
+        result.ec = std::errc::invalid_argument;
       } else {
-	result.ptr = first + 1;
-	value = negative ? -0.0 : 0.0;
+        result.ptr = first + 1;
+        value = negative ? -0.0 : 0.0;
       }
       return result;
     }
@@ -636,14 +637,14 @@ from_chars_result FromCharsImpl(const char* first, const char* last,
       return result;
     }
     CalculatedFloat calculated =
-	CalculateFromParsedHexadecimal<FloatType>(hex_parse);
+        CalculateFromParsedHexadecimal<FloatType>(hex_parse);
     EncodeResult(calculated, negative, &result, &value);
     return result;
   }
   // Otherwise, we choose the number base based on the flags.
   if ((fmt_flags & chars_format::hex) == chars_format::hex) {
     strings_internal::ParsedFloat hex_parse =
-	strings_internal::ParseFloat<16>(first, last, fmt_flags);
+        strings_internal::ParseFloat<16>(first, last, fmt_flags);
     if (hex_parse.end == nullptr) {
       result.ec = std::errc::invalid_argument;
       return result;
@@ -653,12 +654,12 @@ from_chars_result FromCharsImpl(const char* first, const char* last,
       return result;
     }
     CalculatedFloat calculated =
-	CalculateFromParsedHexadecimal<FloatType>(hex_parse);
+        CalculateFromParsedHexadecimal<FloatType>(hex_parse);
     EncodeResult(calculated, negative, &result, &value);
     return result;
   } else {
     strings_internal::ParsedFloat decimal_parse =
-	strings_internal::ParseFloat<10>(first, last, fmt_flags);
+        strings_internal::ParseFloat<10>(first, last, fmt_flags);
     if (decimal_parse.end == nullptr) {
       result.ec = std::errc::invalid_argument;
       return result;
@@ -668,21 +669,20 @@ from_chars_result FromCharsImpl(const char* first, const char* last,
       return result;
     }
     CalculatedFloat calculated =
-	CalculateFromParsedDecimal<FloatType>(decimal_parse);
+        CalculateFromParsedDecimal<FloatType>(decimal_parse);
     EncodeResult(calculated, negative, &result, &value);
     return result;
   }
-  return result;
 }
 }  // namespace
 
 from_chars_result from_chars(const char* first, const char* last, double& value,
-			     chars_format fmt) {
+                             chars_format fmt) {
   return FromCharsImpl(first, last, value, fmt);
 }
 
 from_chars_result from_chars(const char* first, const char* last, float& value,
-			     chars_format fmt) {
+                             chars_format fmt) {
   return FromCharsImpl(first, last, value, fmt);
 }
 
@@ -980,4 +980,5 @@ const int16_t kPower10ExponentTable[] = {
 };
 
 }  // namespace
+ABSL_NAMESPACE_END
 }  // namespace absl

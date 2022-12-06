@@ -20,42 +20,50 @@
 
   =============================================================================*/
 
-#include <memory>
 #include <future>
 #include <iostream>
+#include <memory>
 
-#include "cppmicroservices/Framework.h"
-#include "cppmicroservices/FrameworkFactory.h"
-#include "cppmicroservices/FrameworkEvent.h"
+#include "../src/SCRAsyncWorkService.hpp"
 #include "../src/manager/states/CCUnsatisfiedReferenceState.hpp"
-#include "Mocks.hpp"
 #include "ConcurrencyTestUtil.hpp"
+#include "Mocks.hpp"
+#include "cppmicroservices/Framework.h"
+#include "cppmicroservices/FrameworkEvent.h"
+#include "cppmicroservices/FrameworkFactory.h"
 
 namespace cppmicroservices {
 namespace scrimpl {
 
-class CCUnsatisfiedReferenceStateTest
-  : public ::testing::Test
+class CCUnsatisfiedReferenceStateTest : public ::testing::Test
 {
 protected:
   CCUnsatisfiedReferenceStateTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  { }
+  {}
   virtual ~CCUnsatisfiedReferenceStateTest() = default;
 
-  virtual void SetUp() {
+  virtual void SetUp()
+  {
     framework.Start();
     auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
     mockMetadata->serviceMetadata.interfaces.push_back("Service::Interface");
     auto mockRegistry = std::make_shared<MockComponentRegistry>();
     auto fakeLogger = std::make_shared<FakeLogger>();
-    mockCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                      framework,
-                                                                      mockRegistry,
-                                                                      fakeLogger);
+    auto logger = std::make_shared<SCRLogger>(framework.GetBundleContext());
+    auto asyncWorkService =
+      std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
+        framework.GetBundleContext(), logger);
+    auto notifier = std::make_shared<ConfigurationNotifier>(
+      framework.GetBundleContext(), fakeLogger, asyncWorkService);
+    auto managers =
+      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+    mockCompConfig = std::make_shared<MockComponentConfigurationImpl>(
+      mockMetadata, framework, mockRegistry, fakeLogger, notifier, managers);
   }
 
-  virtual void TearDown() {
+  virtual void TearDown()
+  {
     mockCompConfig.reset();
     framework.Stop();
     framework.WaitForStop(std::chrono::milliseconds::zero());
@@ -75,12 +83,14 @@ TEST_F(CCUnsatisfiedReferenceStateTest, TestActivate)
 {
   auto state = std::make_shared<CCUnsatisfiedReferenceState>();
   mockCompConfig->SetState(state);
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(mockCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
   EXPECT_NO_THROW({
-      auto inst = state->Activate(*mockCompConfig, framework);
-      EXPECT_EQ(inst, nullptr);
-    });
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+    auto inst = state->Activate(*mockCompConfig, framework);
+    EXPECT_EQ(inst, nullptr);
+  });
+  EXPECT_EQ(mockCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
   EXPECT_EQ(mockCompConfig->GetState(), state);
 }
 
@@ -88,11 +98,11 @@ TEST_F(CCUnsatisfiedReferenceStateTest, TestDeactivate)
 {
   auto state = std::make_shared<CCUnsatisfiedReferenceState>();
   mockCompConfig->SetState(state);
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
-  EXPECT_NO_THROW({
-      state->Deactivate(*mockCompConfig);
-    });
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(mockCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_NO_THROW({ state->Deactivate(*mockCompConfig); });
+  EXPECT_EQ(mockCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
   EXPECT_EQ(mockCompConfig->GetState(), state);
 }
 
@@ -100,51 +110,57 @@ TEST_F(CCUnsatisfiedReferenceStateTest, TestRegister)
 {
   auto state = std::make_shared<CCUnsatisfiedReferenceState>();
   mockCompConfig->SetState(state);
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(mockCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
   EXPECT_CALL(*mockCompConfig, GetFactory())
     .WillRepeatedly(testing::Return(std::make_shared<MockFactory>()));
-  EXPECT_NO_THROW({
-      state->Register(*mockCompConfig);
-    });
+  EXPECT_NO_THROW({ state->Register(*mockCompConfig); });
   EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
   EXPECT_NE(mockCompConfig->GetState(), state);
-  EXPECT_EQ(framework.GetBundleContext().GetServiceReferences("Service::Interface").size(), 1u);
+  EXPECT_EQ(framework.GetBundleContext()
+              .GetServiceReferences("Service::Interface")
+              .size(),
+            1u);
 }
 
 TEST_F(CCUnsatisfiedReferenceStateTest, TestRegister_Failure)
 {
   auto state = std::make_shared<CCUnsatisfiedReferenceState>();
   mockCompConfig->SetState(state);
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(mockCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
   EXPECT_CALL(*mockCompConfig, GetFactory())
     .WillRepeatedly(testing::Return(nullptr));
-  EXPECT_NO_THROW({
-      state->Register(*mockCompConfig);
-    });
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
-  EXPECT_EQ(framework.GetBundleContext().GetServiceReferences("Service::Interface").size(), 0u);
+  EXPECT_NO_THROW({ state->Register(*mockCompConfig); });
+  EXPECT_EQ(mockCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(framework.GetBundleContext()
+              .GetServiceReferences("Service::Interface")
+              .size(),
+            0u);
 }
 
 TEST_F(CCUnsatisfiedReferenceStateTest, TestConcurrentRegister)
 {
   auto state = std::make_shared<CCUnsatisfiedReferenceState>();
   mockCompConfig->SetState(state);
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+  EXPECT_EQ(mockCompConfig->GetConfigState(),
+            ComponentState::UNSATISFIED_REFERENCE);
   EXPECT_CALL(*mockCompConfig, GetFactory())
     .WillRepeatedly(testing::Return(std::make_shared<MockFactory>()));
   std::function<ComponentState()> func = [&state, this]() {
-                                           EXPECT_NO_THROW({
-                                               state->Register(*mockCompConfig);
-                                             });
-                                           return mockCompConfig->GetConfigState();
-                                         };
+    EXPECT_NO_THROW({ state->Register(*mockCompConfig); });
+    return mockCompConfig->GetConfigState();
+  };
   std::vector<ComponentState> resultVec = ConcurrentInvoke(func);
-  for(auto result : resultVec)
-  {
+  for (auto result : resultVec) {
     EXPECT_EQ(result, ComponentState::SATISFIED);
   }
   EXPECT_NE(mockCompConfig->GetState(), state);
-  EXPECT_EQ(framework.GetBundleContext().GetServiceReferences("Service::Interface").size(), 1u);
+  EXPECT_EQ(framework.GetBundleContext()
+              .GetServiceReferences("Service::Interface")
+              .size(),
+            1u);
 }
 }
 }

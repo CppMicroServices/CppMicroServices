@@ -22,6 +22,7 @@
 #include "absl/strings/internal/memutil.h"
 
 namespace absl {
+ABSL_NAMESPACE_BEGIN
 namespace {
 
 // ParseFloat<10> will read the first 19 significant digits of the mantissa.
@@ -41,8 +42,8 @@ namespace {
 constexpr int kDecimalMantissaDigitsMax = 19;
 
 static_assert(std::numeric_limits<uint64_t>::digits10 ==
-		  kDecimalMantissaDigitsMax,
-	      "(a) above");
+                  kDecimalMantissaDigitsMax,
+              "(a) above");
 
 // IEEE doubles, which we assume in Abseil, have 53 binary bits of mantissa.
 static_assert(std::numeric_limits<double>::is_iec559, "IEEE double assumed");
@@ -51,7 +52,7 @@ static_assert(std::numeric_limits<double>::digits == 53, "IEEE double fact");
 
 // The lowest valued 19-digit decimal mantissa we can read still contains
 // sufficient information to reconstruct a binary mantissa.
-static_assert(1000000000000000000u > (uint64_t(1) << (53 + 3)), "(b) above");
+static_assert(1000000000000000000u > (uint64_t{1} << (53 + 3)), "(b) above");
 
 // ParseFloat<16> will read the first 15 significant digits of the mantissa.
 //
@@ -74,8 +75,8 @@ constexpr int kGuaranteedHexadecimalMantissaBitPrecision =
     4 * kHexadecimalMantissaDigitsMax - 3;
 
 static_assert(kGuaranteedHexadecimalMantissaBitPrecision >
-		  std::numeric_limits<double>::digits + 2,
-	      "kHexadecimalMantissaDigitsMax too small");
+                  std::numeric_limits<double>::digits + 2,
+              "kHexadecimalMantissaDigitsMax too small");
 
 // We also impose a limit on the number of significant digits we will read from
 // an exponent, to avoid having to deal with integer overflow.  We use 9 for
@@ -87,7 +88,7 @@ static_assert(kGuaranteedHexadecimalMantissaBitPrecision >
 // logic.
 constexpr int kDecimalExponentDigitsMax = 9;
 static_assert(std::numeric_limits<int>::digits10 >= kDecimalExponentDigitsMax,
-	      "int type too small");
+              "int type too small");
 
 // To avoid incredibly large inputs causing integer overflow for our exponent,
 // we impose an arbitrary but very large limit on the number of significant
@@ -110,11 +111,11 @@ constexpr int kHexadecimalDigitLimit = kDecimalDigitLimit / 4;
 // significant digits before the decimal point, there are independent limits for
 // post-decimal-point leading zeroes and for significant digits.)
 static_assert(999999999 + 2 * kDecimalDigitLimit <
-		  std::numeric_limits<int>::max(),
-	      "int type too small");
+                  std::numeric_limits<int>::max(),
+              "int type too small");
 static_assert(999999999 + 2 * (4 * kHexadecimalDigitLimit) <
-		  std::numeric_limits<int>::max(),
-	      "int type too small");
+                  std::numeric_limits<int>::max(),
+              "int type too small");
 
 // Returns true if the provided bitfield allows parsing an exponent value
 // (e.g., "1.5e100").
@@ -245,14 +246,20 @@ constexpr int DigitMagnitude<16>() {
 // ConsumeDigits does not protect against overflow on *out; max_digits must
 // be chosen with respect to type T to avoid the possibility of overflow.
 template <int base, typename T>
-std::size_t ConsumeDigits(const char* begin, const char* end, int max_digits,
-			  T* out, bool* dropped_nonzero_digit) {
+int ConsumeDigits(const char* begin, const char* end, int max_digits, T* out,
+                  bool* dropped_nonzero_digit) {
   if (base == 10) {
     assert(max_digits <= std::numeric_limits<T>::digits10);
   } else if (base == 16) {
     assert(max_digits * 4 <= std::numeric_limits<T>::digits);
   }
   const char* const original_begin = begin;
+
+  // Skip leading zeros, but only if *out is zero.
+  // They don't cause an overflow so we don't have to count them for
+  // `max_digits`.
+  while (!*out && end != begin && *begin == '0') ++begin;
+
   T accumulator = *out;
   const char* significant_digits_end =
       (end - begin > max_digits) ? begin + max_digits : end;
@@ -275,37 +282,37 @@ std::size_t ConsumeDigits(const char* begin, const char* end, int max_digits,
     *dropped_nonzero_digit = true;
   }
   *out = accumulator;
-  return begin - original_begin;
+  return static_cast<int>(begin - original_begin);
 }
 
 // Returns true if `v` is one of the chars allowed inside parentheses following
 // a NaN.
 bool IsNanChar(char v) {
   return (v == '_') || (v >= '0' && v <= '9') || (v >= 'a' && v <= 'z') ||
-	 (v >= 'A' && v <= 'Z');
+         (v >= 'A' && v <= 'Z');
 }
 
 // Checks the range [begin, end) for a strtod()-formatted infinity or NaN.  If
 // one is found, sets `out` appropriately and returns true.
 bool ParseInfinityOrNan(const char* begin, const char* end,
-			strings_internal::ParsedFloat* out) {
+                        strings_internal::ParsedFloat* out) {
   if (end - begin < 3) {
     return false;
   }
   switch (*begin) {
     case 'i':
     case 'I': {
-      // An infinity std::string consists of the characters "inf" or "infinity",
+      // An infinity string consists of the characters "inf" or "infinity",
       // case insensitive.
       if (strings_internal::memcasecmp(begin + 1, "nf", 2) != 0) {
-	return false;
+        return false;
       }
       out->type = strings_internal::FloatType::kInfinity;
       if (end - begin >= 8 &&
-	  strings_internal::memcasecmp(begin + 3, "inity", 5) == 0) {
-	out->end = begin + 8;
+          strings_internal::memcasecmp(begin + 3, "inity", 5) == 0) {
+        out->end = begin + 8;
       } else {
-	out->end = begin + 3;
+        out->end = begin + 3;
       }
       return true;
     }
@@ -315,24 +322,24 @@ bool ParseInfinityOrNan(const char* begin, const char* end,
       // followed by a parenthesized sequence of zero or more alphanumeric
       // characters and/or underscores.
       if (strings_internal::memcasecmp(begin + 1, "an", 2) != 0) {
-	return false;
+        return false;
       }
       out->type = strings_internal::FloatType::kNan;
       out->end = begin + 3;
-      // NaN is allowed to be followed by a parenthesized std::string, consisting of
+      // NaN is allowed to be followed by a parenthesized string, consisting of
       // only the characters [a-zA-Z0-9_].  Match that if it's present.
       begin += 3;
       if (begin < end && *begin == '(') {
-	const char* nan_begin = begin + 1;
-	while (nan_begin < end && IsNanChar(*nan_begin)) {
-	  ++nan_begin;
-	}
-	if (nan_begin < end && *nan_begin == ')') {
-	  // We found an extra NaN specifier range
-	  out->subrange_begin = begin + 1;
-	  out->subrange_end = nan_begin;
-	  out->end = nan_begin + 1;
-	}
+        const char* nan_begin = begin + 1;
+        while (nan_begin < end && IsNanChar(*nan_begin)) {
+          ++nan_begin;
+        }
+        if (nan_begin < end && *nan_begin == ')') {
+          // We found an extra NaN specifier range
+          out->subrange_begin = begin + 1;
+          out->subrange_end = nan_begin;
+          out->end = nan_begin + 1;
+        }
       }
       return true;
     }
@@ -346,7 +353,7 @@ namespace strings_internal {
 
 template <int base>
 strings_internal::ParsedFloat ParseFloat(const char* begin, const char* end,
-					 chars_format format_flags) {
+                                         chars_format format_flags) {
   strings_internal::ParsedFloat result;
 
   // Exit early if we're given an empty range.
@@ -365,7 +372,7 @@ strings_internal::ParsedFloat ParseFloat(const char* begin, const char* end,
 
   int exponent_adjustment = 0;
   bool mantissa_is_inexact = false;
-  std::size_t pre_decimal_digits = ConsumeDigits<base>(
+  int pre_decimal_digits = ConsumeDigits<base>(
       begin, end, MantissaDigitsMax<base>(), &mantissa, &mantissa_is_inexact);
   begin += pre_decimal_digits;
   int digits_left;
@@ -376,11 +383,11 @@ strings_internal::ParsedFloat ParseFloat(const char* begin, const char* end,
     // We dropped some non-fraction digits on the floor.  Adjust our exponent
     // to compensate.
     exponent_adjustment =
-	static_cast<int>(pre_decimal_digits - MantissaDigitsMax<base>());
+        static_cast<int>(pre_decimal_digits - MantissaDigitsMax<base>());
     digits_left = 0;
   } else {
     digits_left =
-	static_cast<int>(MantissaDigitsMax<base>() - pre_decimal_digits);
+        static_cast<int>(MantissaDigitsMax<base>() - pre_decimal_digits);
   }
   if (begin < end && *begin == '.') {
     ++begin;
@@ -389,17 +396,17 @@ strings_internal::ParsedFloat ParseFloat(const char* begin, const char* end,
       // have to adjust the exponent to reflect the changed place value.
       const char* begin_zeros = begin;
       while (begin < end && *begin == '0') {
-	++begin;
+        ++begin;
       }
-      std::size_t zeros_skipped = begin - begin_zeros;
+      int zeros_skipped = static_cast<int>(begin - begin_zeros);
       if (zeros_skipped >= DigitLimit<base>()) {
-	// refuse to parse pathological inputs
-	return result;
+        // refuse to parse pathological inputs
+        return result;
       }
       exponent_adjustment -= static_cast<int>(zeros_skipped);
     }
-    std::size_t post_decimal_digits = ConsumeDigits<base>(
-	begin, end, digits_left, &mantissa, &mantissa_is_inexact);
+    int post_decimal_digits = ConsumeDigits<base>(
+        begin, end, digits_left, &mantissa, &mantissa_is_inexact);
     begin += post_decimal_digits;
 
     // Since `mantissa` is an integer, each significant digit we read after
@@ -455,7 +462,7 @@ strings_internal::ParsedFloat ParseFloat(const char* begin, const char* end,
     const char* const exponent_digits_begin = begin;
     // Exponent is always expressed in decimal, even for hexadecimal floats.
     begin += ConsumeDigits<10>(begin, end, kDecimalExponentDigitsMax,
-			       &result.literal_exponent, nullptr);
+                               &result.literal_exponent, nullptr);
     if (begin == exponent_digits_begin) {
       // there were no digits where we expected an exponent.  We failed to read
       // an exponent and should not consume the 'e' after all.  Rewind 'begin'.
@@ -464,7 +471,7 @@ strings_internal::ParsedFloat ParseFloat(const char* begin, const char* end,
     } else {
       found_exponent = true;
       if (negative_exponent) {
-	result.literal_exponent = -result.literal_exponent;
+        result.literal_exponent = -result.literal_exponent;
       }
     }
   }
@@ -479,7 +486,7 @@ strings_internal::ParsedFloat ParseFloat(const char* begin, const char* end,
   result.type = strings_internal::FloatType::kNumber;
   if (result.mantissa > 0) {
     result.exponent = result.literal_exponent +
-		      (DigitMagnitude<base>() * exponent_adjustment);
+                      (DigitMagnitude<base>() * exponent_adjustment);
   } else {
     result.exponent = 0;
   }
@@ -488,9 +495,10 @@ strings_internal::ParsedFloat ParseFloat(const char* begin, const char* end,
 }
 
 template ParsedFloat ParseFloat<10>(const char* begin, const char* end,
-				    chars_format format_flags);
+                                    chars_format format_flags);
 template ParsedFloat ParseFloat<16>(const char* begin, const char* end,
-				    chars_format format_flags);
+                                    chars_format format_flags);
 
 }  // namespace strings_internal
+ABSL_NAMESPACE_END
 }  // namespace absl

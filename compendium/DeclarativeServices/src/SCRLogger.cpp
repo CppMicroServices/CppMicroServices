@@ -27,7 +27,8 @@ namespace scrimpl {
 
 SCRLogger::SCRLogger(cppmicroservices::BundleContext context)
   : scrContext(context)
-  , serviceTracker(std::make_unique<cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>(context, this))
+  , serviceTracker(std::make_unique<cppmicroservices::ServiceTracker<
+                     cppmicroservices::logservice::LogService>>(context, this))
   , logService(nullptr)
 {
   serviceTracker->Open(); // Start tracking
@@ -35,89 +36,89 @@ SCRLogger::SCRLogger(cppmicroservices::BundleContext context)
 
 SCRLogger::~SCRLogger()
 {
+  logService.reset();
 }
 
 void SCRLogger::StopTracking()
 {
-  if (serviceTracker)
-  {
+  if (serviceTracker) {
     serviceTracker->Close();
     serviceTracker.reset();
   }
 }
 
-std::shared_ptr<cppmicroservices::logservice::LogService> SCRLogger::AddingService(const ServiceReference<cppmicroservices::logservice::LogService>& reference)
+std::shared_ptr<cppmicroservices::logservice::LogService>
+SCRLogger::AddingService(
+  const ServiceReference<cppmicroservices::logservice::LogService>& reference)
 {
   auto currLogger = std::atomic_load(&logService);
   std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-  if(!currLogger && reference)
-  {
-    logger = scrContext.GetService<cppmicroservices::logservice::LogService>(reference);
+  if (!currLogger && reference) {
+    logger = scrContext.GetService<cppmicroservices::logservice::LogService>(
+      reference);
     std::atomic_store(&logService, logger);
   }
   return logger;
 }
 
-void SCRLogger::ModifiedService(const ServiceReference<cppmicroservices::logservice::LogService>& /*reference*/,
-                                const std::shared_ptr<cppmicroservices::logservice::LogService>& /*service*/)
+void SCRLogger::ModifiedService(
+  const ServiceReference<
+    cppmicroservices::logservice::LogService>& /*reference*/,
+  const std::shared_ptr<cppmicroservices::logservice::LogService>& /*service*/)
 {
   // no-op. Don't care if properties change
 }
 
-void SCRLogger::RemovedService(const ServiceReference<cppmicroservices::logservice::LogService>& /*reference*/,
-                               const std::shared_ptr<cppmicroservices::logservice::LogService>& service)
+void SCRLogger::RemovedService(
+  const ServiceReference<
+    cppmicroservices::logservice::LogService>& /*reference*/,
+  const std::shared_ptr<cppmicroservices::logservice::LogService>& service)
 {
   auto currLogger = std::atomic_load(&logService);
-  if(service == currLogger)
-  {
+  if (service == currLogger) {
     // replace existing logger with a nullptr logger
     std::shared_ptr<cppmicroservices::logservice::LogService> logger(nullptr);
     std::atomic_store(&logService, logger);
   }
 }
 
-void SCRLogger::Log(logservice::SeverityLevel level, const std::string &message)
+void SCRLogger::Log(logservice::SeverityLevel level, const std::string& message)
 {
   auto currLogger = std::atomic_load(&logService);
-  if (currLogger)
-  {
+  if (currLogger) {
     currLogger->Log(level, message);
   }
 }
 
 void SCRLogger::Log(logservice::SeverityLevel level,
-                    const std::string &message,
+                    const std::string& message,
                     const std::exception_ptr ex)
 {
   auto currLogger = std::atomic_load(&logService);
-  if (currLogger)
-  {
+  if (currLogger) {
     currLogger->Log(level, message, ex);
   }
 }
 
-void SCRLogger::Log(const cppmicroservices::ServiceReferenceBase &sr,
+void SCRLogger::Log(const cppmicroservices::ServiceReferenceBase& sr,
                     logservice::SeverityLevel level,
-                    const std::string &message)
+                    const std::string& message)
 {
   auto currLogger = std::atomic_load(&logService);
-  if (currLogger)
-  {
+  if (currLogger) {
     currLogger->Log(sr, level, message);
   }
 }
 
-void SCRLogger::Log(const cppmicroservices::ServiceReferenceBase &sr,
+void SCRLogger::Log(const cppmicroservices::ServiceReferenceBase& sr,
                     logservice::SeverityLevel level,
-                    const std::string &message,
+                    const std::string& message,
                     const std::exception_ptr ex)
 {
   auto currLogger = std::atomic_load(&logService);
-  if (currLogger)
-  {
+  if (currLogger) {
     currLogger->Log(sr, level, message, ex);
   }
 }
 } // scrimpl
 } // cppmicroservices
-

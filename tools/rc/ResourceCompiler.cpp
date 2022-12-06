@@ -35,6 +35,9 @@
 #include <utility>
 #include <vector>
 
+#include <nowide/args.hpp>
+#include <nowide/fstream.hpp>
+
 #include "optionparser.h"
 #include "json/json.h"
 
@@ -60,7 +63,7 @@ static std::string get_error_str()
                    NULL,
                    dw,
                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                   reinterpret_cast<LPTSTR>(&lpMsgBuf),
+                   reinterpret_cast<LPSTR>(&lpMsgBuf),
                    0,
                    NULL);
   // If FormatMessage fails using FORMAT_MESSAGE_ALLOCATE_BUFFER
@@ -71,7 +74,7 @@ static std::string get_error_str()
   if (rc == 0) {
     errMsg = "Failed to retrieve error message.";
   } else {
-    errMsg = reinterpret_cast<LPCTSTR>(lpMsgBuf);
+    errMsg = reinterpret_cast<LPSTR>(lpMsgBuf);
     LocalFree(lpMsgBuf);
   }
   return errMsg;
@@ -156,7 +159,7 @@ void parseAndValidateJsonFromFile(const std::string& jsonFile,
                                   Json::Value& root)
 {
   try {
-    std::ifstream json(jsonFile);
+    nowide::ifstream json(jsonFile);
     if (!json.is_open()) {
       throw std::runtime_error("Could not open file " + jsonFile);
     }
@@ -179,8 +182,9 @@ void validateManifestInArchive(mz_zip_archive* zipArchive,
                                const std::string& archiveFile,
                                const std::string& archiveEntry)
 {
+  size_t length = 0;
   void* data = mz_zip_reader_extract_file_to_heap(
-    zipArchive, archiveEntry.c_str(), nullptr, 0);
+    zipArchive, archiveEntry.c_str(), &length, 0);
   std::unique_ptr<void, void (*)(void*)> manifestFileContents(data, ::free);
 
   if (!manifestFileContents) {
@@ -190,8 +194,8 @@ void validateManifestInArchive(mz_zip_archive* zipArchive,
 
   try {
     Json::Value root;
-    std::istringstream json(
-      reinterpret_cast<const char*>(manifestFileContents.get()));
+    std::istringstream json(std::string(
+      reinterpret_cast<const char*>(manifestFileContents.get()), length));
     parseAndValidateJson(json, root);
   } catch (const InvalidManifest& e) {
     std::string exceptionMsg(archiveFile);
@@ -369,7 +373,7 @@ ZipArchive::ZipArchive(const std::string& archiveFileName,
 {
   std::clog << "Initializing zip archive " << fileName << " ..." << std::endl;
   // clear the contents of a outFile if it exists
-  std::ofstream ofile(fileName, std::ofstream::trunc);
+  nowide::ofstream ofile(fileName, nowide::ofstream::trunc);
   ofile.close();
   if (!mz_zip_writer_init_file(writeArchive.get(), fileName.c_str(), 0)) {
     throw std::runtime_error("Internal error, could not init new zip archive");
@@ -788,6 +792,8 @@ static int checkSanity(option::Parser& parse, option::Option* options)
 
 int main(int argc, char** argv)
 {
+  nowide::args _(argc, argv);
+
   const int BUNDLE_MANIFEST_VALIDATION_ERROR_CODE(2);
 
   int compressionLevel = MZ_DEFAULT_LEVEL; //default compression level;
@@ -888,9 +894,9 @@ int main(int argc, char** argv)
     if (bundleFileOpt) {
       validateManifestsInArchive(zipFile);
       std::string bundleBinaryFile(bundleFileOpt->arg);
-      std::ofstream outFileStream(
+      nowide::ofstream outFileStream(
         bundleBinaryFile, std::ios::ate | std::ios::binary | std::ios::app);
-      std::ifstream zipFileStream(zipFile, std::ios::in | std::ios::binary);
+      nowide::ifstream zipFileStream(zipFile, std::ios::in | std::ios::binary);
       if (outFileStream.is_open() && zipFileStream.is_open()) {
         std::clog << "Appending file " << bundleBinaryFile
                   << " with contents of resources zip file at " << zipFile
@@ -903,7 +909,7 @@ int main(int argc, char** argv)
         // Depending on the ofstream destructor to close the file may result in a silent
         // file write error. Hence the explicit call to close.
         outFileStream.close();
-        if (outFileStream.rdstate() & std::ofstream::failbit) {
+        if (outFileStream.rdstate() & nowide::ofstream::failbit) {
           std::cerr << "Failed to write file : " << bundleBinaryFile
                     << std::endl;
           return_code = EXIT_FAILURE;

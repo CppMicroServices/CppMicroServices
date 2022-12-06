@@ -1,6 +1,9 @@
 
 enable_language(C)
 
+# Temporarily disable enable exports for executables
+set(CMAKE_ENABLE_EXPORTS OFF)
+
 include_directories(../../third_party)
 
 add_definitions(-DUS_RCC_EXECUTABLE_NAME=\"${US_RCC_EXECUTABLE_OUTPUT_NAME}\")
@@ -12,6 +15,9 @@ set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} PROPERTY OUTPUT_NAME ${US_RCC_EX
 if(WIN32)
     target_link_libraries(${US_RCC_EXECUTABLE_TARGET} Shlwapi)
 endif()
+
+target_link_libraries(${US_RCC_EXECUTABLE_TARGET} nowide::nowide)
+target_include_directories(${US_RCC_EXECUTABLE_TARGET} PRIVATE ${CppMicroServices_SOURCE_DIR}/third_party/boost/nowide/include)
 
 set_property(TARGET ${US_RCC_EXECUTABLE_TARGET} APPEND PROPERTY
              COMPILE_DEFINITIONS "MINIZ_NO_ARCHIVE_READING_API;MINIZ_NO_ZLIB_COMPATIBLE_NAMES")
@@ -35,3 +41,6 @@ else()
   # the usResourceCompiler to be built and installed for the target machine.
   export( TARGETS ${US_RCC_EXECUTABLE_TARGET} FILE ${IMPORT_EXECUTABLES} NAMESPACE native-)
 endif()
+
+# Re-enable enable exports for executables after building usResourceCompiler
+set(CMAKE_ENABLE_EXPORTS ON)

@@ -24,9 +24,9 @@
 #define CMDisabledState_hpp
 
 #if defined(USING_GTEST)
-#include "gtest/gtest_prod.h"
+#  include "gtest/gtest_prod.h"
 #else
-#define FRIEND_TEST(x, y)
+#  define FRIEND_TEST(x, y)
 #endif
 #include "ComponentManagerState.hpp"
 
@@ -36,8 +36,7 @@ namespace scrimpl {
 /**
  * This class represents the disabled state of {\code ComponentManagerImpl}
  */
-class CMDisabledState final
-  : public ComponentManagerState
+class CMDisabledState final : public ComponentManagerState
 {
 public:
   /**
@@ -55,7 +54,8 @@ public:
    *        the task performed when the ComponentManager changes it's state from
    *        \c CMEnabledState to this object.
    */
-  explicit CMDisabledState(std::shared_future<void> fut) : fut(std::move(fut)) {};
+  explicit CMDisabledState(std::shared_future<void> fut)
+    : fut(std::move(fut)){};
   ~CMDisabledState() override = default;
   CMDisabledState(const CMDisabledState&) = delete;
   CMDisabledState& operator=(const CMDisabledState&) = delete;
@@ -91,7 +91,8 @@ public:
    * Returns an empty vector because there are no configurations associated
    * with a disabled state
    */
-  std::vector<std::shared_ptr<ComponentConfiguration>> GetConfigurations(const ComponentManagerImpl& cm) const override;
+  std::vector<std::shared_ptr<ComponentConfiguration>> GetConfigurations(
+    const ComponentManagerImpl& cm) const override;
 
   /**
    * Returns false indicating this is not the ENABLED state
@@ -106,10 +107,8 @@ public:
    * spawned to delete the component configuration objects created
    * when the component was enabled.
    */
-  std::shared_future<void> GetFuture() const override
-  {
-    return fut;
-  }
+  std::shared_future<void> GetFuture() const override { return fut; }
+
 private:
   FRIEND_TEST(CMDisabledStateTest, Ctor);
   std::shared_future<void> fut; ///< future associated with the transition task

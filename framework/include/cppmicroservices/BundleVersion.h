@@ -65,9 +65,9 @@ class US_Framework_EXPORT BundleVersion
 private:
   friend class BundlePrivate;
 
-  unsigned int majorVersion{0};
-  unsigned int minorVersion{0};
-  unsigned int microVersion{0};
+  unsigned int majorVersion{ 0 };
+  unsigned int minorVersion{ 0 };
+  unsigned int microVersion{ 0 };
   std::string qualifier;
 
   static const char SEPARATOR; //  = "."
@@ -77,7 +77,6 @@ private:
   /**
    * Called by the BundleVersion constructors to validate the version components.
    *
-   * @return <code>true</code> if the validation was successfull, <code>false</code> otherwise.
    */
   void Validate();
 
@@ -123,7 +122,7 @@ public:
   BundleVersion(unsigned int majorVersion,
                 unsigned int minorVersion,
                 unsigned int microVersion,
-                std::string  qualifier);
+                std::string qualifier);
 
   /**
    * Created a version identifier from the specified string.

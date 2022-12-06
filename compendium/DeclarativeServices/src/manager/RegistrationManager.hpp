@@ -23,9 +23,9 @@
 #ifndef __REGISTRATION_MANAGER_HPP__
 #define __REGISTRATION_MANAGER_HPP__
 #if defined(USING_GTEST)
-#include "gtest/gtest_prod.h"
+#  include "gtest/gtest_prod.h"
 #else
-#define FRIEND_TEST(x, y)
+#  define FRIEND_TEST(x, y)
 #endif
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceFactory.h"
@@ -57,10 +57,11 @@ public:
    *             \c scope is not one of "singleton", "bundle" or "prototype"
    *             \c logger is nullptr
    */
-  RegistrationManager(const cppmicroservices::BundleContext& bc,
-                      const std::vector<std::string>& services,
-                      const std::string& scope,
-                      const std::shared_ptr<cppmicroservices::logservice::LogService>& logger);
+  RegistrationManager(
+    const cppmicroservices::BundleContext& bc,
+    const std::vector<std::string>& services,
+    const std::string& scope,
+    const std::shared_ptr<cppmicroservices::logservice::LogService>& logger);
   RegistrationManager(const RegistrationManager&) = delete;
   RegistrationManager(RegistrationManager&&) = delete;
   RegistrationManager& operator=(const RegistrationManager&) = delete;
@@ -90,8 +91,25 @@ public:
    * \param props - a map with properties used for service registration
    * \return \c true if registration succeeded, \c false otherwise
    */
-  bool RegisterService(const std::shared_ptr<cppmicroservices::ServiceFactory>& factory,
-                       const cppmicroservices::ServiceProperties& props);
+  bool RegisterService(
+    const std::shared_ptr<cppmicroservices::ServiceFactory>& factory,
+    const cppmicroservices::ServiceProperties& props);
+
+  /**
+   * SetRegistrationProperties. Sets component properties in registration object. 
+   * @param properties The properties for this service. See {@link ServiceProperties}
+   *        for a list of standard service property keys. Changes should not
+   *        be made to this object after calling this method. To update the
+   *        service's properties this method should be called again.
+   *
+   * @throws std::logic_error If this <code>ServiceRegistrationBase</code>
+   *         object has already been unregistered or if it is invalid.
+   * @throws std::invalid_argument If <code>properties</code> contains
+   *         case variants of the same key name or if the number of the keys
+   *         of <code>properties</code> exceeds the value returned by
+   *         std::numeric_limits<int>::max().
+   */
+  void SetProperties(const cppmicroservices::ServiceProperties& properties);
 
   /**
    * This method unregisters the service from the framework service registry. The
@@ -101,6 +119,7 @@ public:
    * \throws std::logic_error if the service was never registered or has already been unregistered
    */
   void UnregisterService();
+
 private:
   FRIEND_TEST(RegistrationManagerTest, VerifyUnregister);
 

@@ -74,7 +74,7 @@ void ReferenceManagerBaseImpl::BindingPolicyDynamicGreedy::ServiceAdded(
       // The bind notification must happen before the unbind notification
       // to eliminate any gaps between unbinding the current bound target service
       // and binding to the new bound target service.
-      notifications.push_back(RefChangeNotification {
+      notifications.push_back(RefChangeNotification{
         mgr.metadata.name, RefEvent::REBIND, reference, svcRefToUnBind });
     }
   }

@@ -1,0 +1,20 @@
+{
+  "bundle.symbolic_name": "TestBundleManagedServiceFactory",
+  "bundle.name": "TestBundleManagedServiceFactory",
+  "bundle.activator": false,  "scr": {
+    "version": 1,
+    "components": [
+       {
+        "implementation-class": "cppmicroservices::service::cm::test::TestManagedServiceFactoryImpl2",
+        "properties" : {
+          "service.pid" : "cm.testfactory"
+        },
+        "service": {
+          "interfaces": [
+            "test::TestManagedServiceFactory", "cppmicroservices::service::cm::ManagedServiceFactory"
+          ]
+        }
+      }
+    ]
+  }
+ }

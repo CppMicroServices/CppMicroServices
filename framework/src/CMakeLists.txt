@@ -5,6 +5,7 @@
 set(_srcs
   util/Any.cpp
   util/AnyMap.cpp
+  util/CFRLogger.cpp
   util/Framework.cpp
   util/FrameworkEvent.cpp
   util/FrameworkFactory.cpp
@@ -13,6 +14,7 @@ set(_srcs
   util/LDAPFilter.cpp
   util/LDAPProp.cpp
   util/Properties.cpp
+  util/SecurityException.cpp
   util/SharedLibrary.cpp
   util/SharedLibraryException.cpp
   util/Utils.cpp
@@ -50,7 +52,6 @@ set(_srcs
   bundle/BundleResourceStream.cpp
   bundle/BundleStorageFile.cpp
   bundle/BundleStorageMemory.cpp
-  bundle/BundleThread.cpp
   bundle/BundleUtils.cpp
   bundle/BundleVersion.cpp
   bundle/Constants.cpp
@@ -61,6 +62,7 @@ set(_srcs
 
 set(_private_headers
   util/FrameworkPrivate.h
+  util/CFRLogger.h
   util/LDAPExpr.h
   util/Properties.h
   util/Utils.h
@@ -84,7 +86,6 @@ set(_private_headers
   bundle/BundleStorage.h
   bundle/BundleStorageFile.h
   bundle/BundleStorageMemory.h
-  bundle/BundleThread.h
   bundle/BundleUtils.h
   bundle/CoreBundleContext.h
   bundle/Resolver.h

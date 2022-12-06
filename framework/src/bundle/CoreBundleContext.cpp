@@ -28,12 +28,13 @@ US_MSVC_DISABLE_WARNING(4355)
 
 #include "cppmicroservices/BundleInitialization.h"
 #include "cppmicroservices/Constants.h"
+#include "cppmicroservices/FrameworkFactory.h"
 
 #include "cppmicroservices/util/FileSystem.h"
 #include "cppmicroservices/util/String.h"
 
+#include "BundleContextPrivate.h"
 #include "BundleStorageMemory.h"
-#include "BundleThread.h"
 #include "BundleUtils.h"
 #include "FrameworkPrivate.h"
 
@@ -41,7 +42,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include <memory>
 
 #ifdef US_PLATFORM_POSIX
-#include <dlfcn.h>
+#  include <dlfcn.h>
 #endif
 
 CPPMICROSERVICES_INITIALIZE_BUNDLE
@@ -50,7 +51,8 @@ namespace cppmicroservices {
 
 std::atomic<int> CoreBundleContext::globalId{ 0 };
 
-std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::string, Any> configuration)
+std::unordered_map<std::string, Any> InitProperties(
+  std::unordered_map<std::string, Any> configuration)
 {
   // Framework internal diagnostic logging is off by default
   configuration.emplace(std::make_pair(Constants::FRAMEWORK_LOG, Any(false)));
@@ -66,15 +68,16 @@ std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::stri
   configuration.emplace(std::make_pair(Constants::FRAMEWORK_WORKING_DIR,
                                        util::GetCurrentWorkingDirectory()));
 
-  configuration.emplace(std::make_pair(Constants::FRAMEWORK_STORAGE,
-                                       Any(FWDIR_DEFAULT)));
+  configuration.emplace(
+    std::make_pair(Constants::FRAMEWORK_STORAGE, Any(FWDIR_DEFAULT)));
 
-  configuration[Constants::FRAMEWORK_VERSION] = std::string(CppMicroServices_VERSION_STR);
-  configuration[Constants::FRAMEWORK_VENDOR]  = std::string("CppMicroServices");
+  configuration[Constants::FRAMEWORK_VERSION] =
+    std::string(CppMicroServices_VERSION_STR);
+  configuration[Constants::FRAMEWORK_VENDOR] = std::string("CppMicroServices");
 
 #ifdef US_PLATFORM_POSIX
-  configuration.emplace(std::make_pair(Constants::LIBRARY_LOAD_OPTIONS,
-                                       RTLD_LAZY | RTLD_LOCAL));
+  configuration.emplace(
+    std::make_pair(Constants::LIBRARY_LOAD_OPTIONS, RTLD_LAZY | RTLD_LOCAL));
 #else
   configuration[Constants::LIBRARY_LOAD_OPTIONS] = int(0);
 #endif
@@ -82,11 +85,14 @@ std::unordered_map<std::string, Any> InitProperties(std::unordered_map<std::stri
   return configuration;
 }
 
-CoreBundleContext::CoreBundleContext(const std::unordered_map<std::string, Any>& props
-                                     , std::ostream* logger)
+CoreBundleContext::CoreBundleContext(
+  const std::unordered_map<std::string, Any>& props,
+  std::ostream* logger)
   : id(globalId++)
   , frameworkProperties(InitProperties(props))
-  , workingDir(ref_any_cast<std::string>(frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
+  , workingDir(ref_any_cast<std::string>(
+      frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
+  , logger(nullptr)
   , listeners(this)
   , services(this)
   , serviceHooks(this)
@@ -96,7 +102,8 @@ CoreBundleContext::CoreBundleContext(const std::unordered_map<std::string, Any>&
   , initCount(0)
   , libraryLoadOptions(0)
 {
-  auto enableDiagLog = any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
+  auto enableDiagLog =
+    any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
   std::ostream* diagnosticLogger = (logger) ? logger : &std::clog;
   sink = std::make_shared<detail::LogSink>(diagnosticLogger, enableDiagLog);
   systemBundle = std::shared_ptr<FrameworkPrivate>(new FrameworkPrivate(this));
@@ -154,6 +161,12 @@ void CoreBundleContext::Init()
                     << "' from the GetPersistentStoragePath function.\n";
   }
 
+  auto bundleValidationFunc =
+    frameworkProperties.find(Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
+  if (bundleValidationFunc != frameworkProperties.end()) {
+    validationFunc = any_cast<std::function<bool(const cppmicroservices::Bundle&)>>(bundleValidationFunc->second);
+  }
+
   systemBundle->InitSystemBundle();
   _us_set_bundle_context_instance_system_bundle(
     systemBundle->bundleContext.Load().get());
@@ -163,6 +176,10 @@ void CoreBundleContext::Init()
   serviceHooks.Open();
 
   bundleRegistry.Load();
+
+  // Initialize the CFRLogger. This is done here rather than in the constructor since
+  // we do not have access to a bundle context until this point.
+  logger = std::make_shared<cppmicroservices::cfrimpl::CFRLogger>(MakeBundleContext(systemBundle->bundleContext.Load().get()));
 
   std::string execPath;
   try {
@@ -190,13 +207,15 @@ void CoreBundleContext::Init()
 
 #ifdef US_PLATFORM_POSIX
   try {
-      libraryLoadOptions = any_cast<int>(frameworkProperties[Constants::LIBRARY_LOAD_OPTIONS]);
+    libraryLoadOptions =
+      any_cast<int>(frameworkProperties[Constants::LIBRARY_LOAD_OPTIONS]);
   } catch (...) {
-      DIAG_LOG(*sink) << "Unable to read default library load options from config.";
-      libraryLoadOptions = RTLD_LAZY | RTLD_LOCAL;
-    
-      // override non-integer framework property value to reflect default library load option for POSIX
-      frameworkProperties[Constants::LIBRARY_LOAD_OPTIONS] = libraryLoadOptions;
+    DIAG_LOG(*sink)
+      << "Unable to read default library load options from config.";
+    libraryLoadOptions = RTLD_LAZY | RTLD_LOCAL;
+
+    // override non-integer framework property value to reflect default library load option for POSIX
+    frameworkProperties[Constants::LIBRARY_LOAD_OPTIONS] = libraryLoadOptions;
   }
   DIAG_LOG(*sink) << "Library Load Options = " << libraryLoadOptions;
 #endif
@@ -215,31 +234,6 @@ void CoreBundleContext::Uninit1()
   services.Clear();
   listeners.Clear();
   resolver.Clear();
-
-  // Do not hold the bundleThreads lock while calling
-  // BundleThread::Quit() because this will join the bundle
-  // thread which may need to acquire the bundleThreads lock
-  // itself.
-  //
-  // At this point, all bundles are stopped and all
-  // bundle context instances invalidated. So no new bundle
-  // threads can be created and it is sufficient to get
-  // the current list once and not check for new bundle
-  // threads again.
-  std::list<std::shared_ptr<BundleThread>> threads;
-  bundleThreads.Lock(), std::swap(threads, bundleThreads.value);
-
-  while (!threads.empty()) {
-    // Quit the bundle thread. This joins the bundle thread
-    // with this thread and puts it into the zombies list.
-    threads.front()->Quit();
-    threads.pop_front();
-  }
-
-  // Clear up all bundle threads that have been quit. At this
-  // point, we do not need to lock the bundleTheads structure
-  // any more.
-  bundleThreads.zombies.clear();
 
   dataStorage.clear();
   storage->Close();

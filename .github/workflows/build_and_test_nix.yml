@@ -1,0 +1,97 @@
+name: BuildAndTestNix
+
+on:
+  push:
+    branches: [ development, c\+\+14-compliant, master ]
+  pull_request:
+    branches: [ development, c\+\+14-compliant ]
+  workflow_dispatch:
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+  BUILD_DIR: ${{github.workspace}}/build
+  BUILD_CONFIGURATION: 0
+  WITH_COVERAGE: 1
+  MY_COVERAGE: gcov
+
+jobs:
+  linux_minimum_supported_gcc_build:
+    name: Build and Test [ubuntu-18.04, Minimum GCC]
+    runs-on: ubuntu-18.04
+    env:
+      BUILD_CONFIGURATION: 0
+      WITH_COVERAGE: 0
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    
+    - name: Install Dependencies
+      run: |
+        sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+        sudo apt-get update
+        sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-5 g++-5 valgrind
+      
+    - name: Build and Test
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
+      env:
+        CC: gcc-5
+        CXX: g++-5
+
+  linux_clang_build:
+    name: Build and Test [ubuntu-18.04, Supported Clang]
+    runs-on: ubuntu-18.04
+    env:
+      BUILD_CONFIGURATION: 0
+      WITH_COVERAGE: 0
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get -yq --no-install-suggests --no-install-recommends install valgrind lld
+      
+    - name: Build and Test
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
+      env:
+         CC: clang
+         CXX: clang++
+  
+  build_nix:
+    name: Build and Test [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, macOS-10.15, macos-11]
+        # build configurations:
+        # 0 = threading ON / shared lib ON
+        # 1 = threading ON / shared lib OFF
+        # 2 = threading OFF / shared lib ON
+        # 3 = threading OFF/ shared lib OFF
+        buildconfiguration: [0,1,2,3]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+         submodules: true
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y valgrind
+      if: ${{matrix.os == 'ubuntu-18.04'}}
+
+    - name: Build And Test
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
+      env: 
+         BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+      
+    - name: Code Coverage
+      run: bash <(curl -s https://codecov.io/bash) -X gcov -s ${{github.workspace}}/build

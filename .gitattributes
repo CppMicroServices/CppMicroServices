@@ -1,0 +1,4 @@
+# .ptxt files are used for explictly setting the line endings of a resource that is
+# used during testing. They will always have LF line endings no matter what settings
+# developers use for git checkout
+*.ptxt text eol=lf

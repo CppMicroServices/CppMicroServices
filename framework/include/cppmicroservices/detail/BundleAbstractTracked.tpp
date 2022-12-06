@@ -30,8 +30,8 @@ namespace cppmicroservices {
 namespace detail {
 
 template<class S, class TTT, class R>
-BundleAbstractTracked<S,TTT,R>::BundleAbstractTracked(BundleContext* bc)
-  : closed(false), bc(bc)
+BundleAbstractTracked<S,TTT,R>::BundleAbstractTracked(BundleContext bc)
+  : closed(false), trackingCount(0), bc(bc)
 {
 }
 
@@ -44,12 +44,12 @@ void BundleAbstractTracked<S,TTT,R>::SetInitial(const std::vector<S>& initiallis
 {
   std::copy(initiallist.begin(), initiallist.end(), std::back_inserter(initial));
 
-  if (bc->GetLogSink()->Enabled())
+  if (bc.GetLogSink()->Enabled())
   {
     for(typename std::list<S>::const_iterator item = initial.begin();
       item != initial.end(); ++item)
     {
-      DIAG_LOG(*bc->GetLogSink()) << "BundleAbstractTracked::setInitial: " << (*item);
+      DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::setInitial: " << (*item);
     }
   }
 }
@@ -75,10 +75,10 @@ void BundleAbstractTracked<S,TTT,R>::TrackInitial()
        */
       item = initial.front();
       initial.pop_front();
-      if (tracked[item])
+      if (tracked.end() != tracked.find(item))
       {
         /* if we are already tracking this item */
-        DIAG_LOG(*bc->GetLogSink()) << "BundleAbstractTracked::trackInitial[already tracked]: " << item;
+        DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::trackInitial[already tracked]: " << item;
         continue; /* skip this item */
       }
       if (std::find(adding.begin(), adding.end(), item) != adding.end())
@@ -86,12 +86,12 @@ void BundleAbstractTracked<S,TTT,R>::TrackInitial()
         /*
          * if this item is already in the process of being added.
          */
-        DIAG_LOG(*bc->GetLogSink()) << "BundleAbstractTracked::trackInitial[already adding]: " << item;
+        DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::trackInitial[already adding]: " << item;
         continue; /* skip this item */
       }
       adding.push_back(item);
     }
-    DIAG_LOG(*bc->GetLogSink()) << "BundleAbstractTracked::trackInitial: " << item;
+    DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::trackInitial: " << item;
     TrackAdding(item, R());
     /*
      * Begin tracking it. We call trackAdding
@@ -117,20 +117,23 @@ void BundleAbstractTracked<S,TTT,R>::Track(S item, R related)
     {
       return;
     }
-    object = tracked[item];
+    auto trackedItemIter = tracked.find(item);
+    if (trackedItemIter != tracked.end()) {
+      object = trackedItemIter->second;
+    }
     if (!object)
     { /* we are not tracking the item */
-      if (std::find(adding.begin(), adding.end(),item) != adding.end())
+      if (std::find(adding.begin(), adding.end(), item) != adding.end())
       {
         /* if this item is already in the process of being added. */
-        DIAG_LOG(*bc->GetLogSink()) << "BundleAbstractTracked::track[already adding]: " << item;
+        DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::track[already adding]: " << item;
         return;
       }
       adding.push_back(item); /* mark this item is being added */
     }
     else
     { /* we are currently tracking this item */
-      DIAG_LOG(*bc->GetLogSink()) << "BundleAbstractTracked::track[modified]: " << item;
+      DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::track[modified]: " << item;
       Modified(); /* increment modification count */
     }
   }
@@ -162,7 +165,7 @@ void BundleAbstractTracked<S,TTT,R>::Untrack(S item, R related)
     { /* if this item is already in the list
        * of initial references to process
        */
-      DIAG_LOG(*bc->GetLogSink()) << "BundleAbstractTracked::untrack[removed from initial]: " << item;
+      DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::untrack[removed from initial]: " << item;
       return; /* we have removed it from the list and it will not be
                * processed
                */
@@ -174,25 +177,26 @@ void BundleAbstractTracked<S,TTT,R>::Untrack(S item, R related)
     { /* if the item is in the process of
        * being added
        */
-      DIAG_LOG(*bc->GetLogSink()) << "BundleAbstractTracked::untrack[being added]: " << item;
+      DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::untrack[being added]: " << item;
       return; /*
            * in case the item is untracked while in the process of
            * adding
            */
     }
-    object = tracked[item];
+    auto trackedItemIter = tracked.find(item);
+    // nothing to do, no item is being tracked.
+    if (trackedItemIter == tracked.end()) {
+      return;
+    }
     /*
      * must remove from tracker before
      * calling customizer callback
      */
+    object = trackedItemIter->second;
     tracked.erase(item);
-    if (!object)
-    { /* are we actually tracking the item */
-      return;
-    }
     Modified(); /* increment modification count */
   }
-  DIAG_LOG(*bc->GetLogSink()) << "BundleAbstractTracked::untrack[removed]: " << item;
+  DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::untrack[removed]: " << item;
   /* Call customizer outside of synchronized region */
   CustomizerRemoved(item, related, object);
   /*
@@ -280,7 +284,7 @@ bool BundleAbstractTracked<S,TTT,R>::CustomizerAddingFinal(S item, const std::sh
 template<class S, class TTT, class R>
 void BundleAbstractTracked<S,TTT,R>::TrackAdding(S item, R related)
 {
-  DIAG_LOG(*bc->GetLogSink()) << "BundleAbstractTracked::trackAdding:" << item;
+  DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::trackAdding:" << item;
   std::shared_ptr<TrackedParamType> object;
   bool becameUntracked = false;
   /* Call customizer outside of synchronized region */
@@ -304,7 +308,7 @@ void BundleAbstractTracked<S,TTT,R>::TrackAdding(S item, R related)
    */
   if (becameUntracked && object)
   {
-    DIAG_LOG(*bc->GetLogSink()) << "BundleAbstractTracked::trackAdding[removed]: " << item;
+    DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::trackAdding[removed]: " << item;
     /* Call customizer outside of synchronized region */
     CustomizerRemoved(item, related, object);
     /*

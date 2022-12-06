@@ -40,6 +40,19 @@
 
 namespace cppmicroservices {
 
+namespace {
+std::shared_ptr<BundlePrivate> GetAndCheckBundlePrivate(
+  const std::shared_ptr<BundleContextPrivate>& d)
+{
+  auto b = (d->Lock(), d->bundle.lock());
+  if (!b) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
+
+  return b;
+}
+}
+
 BundleContext::BundleContext(std::shared_ptr<BundleContextPrivate> ctx)
   : d(std::move(ctx))
 {}
@@ -74,19 +87,27 @@ BundleContext& BundleContext::operator=(std::nullptr_t)
 
 std::shared_ptr<detail::LogSink> BundleContext::GetLogSink() const
 {
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
+
   d->CheckValid();
-  return d->bundle->coreCtx->sink->shared_from_this();
+
+  if (auto bundle_ = d->bundle.lock()) {
+    return bundle_->coreCtx->sink->shared_from_this();
+  } else {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 }
 
 Any BundleContext::GetProperty(const std::string& key) const
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   auto iter = b->coreCtx->frameworkProperties.find(key);
   return iter == b->coreCtx->frameworkProperties.end() ? Any() : iter->second;
@@ -94,39 +115,36 @@ Any BundleContext::GetProperty(const std::string& key) const
 
 AnyMap BundleContext::GetProperties() const
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->frameworkProperties;
 }
 
 Bundle BundleContext::GetBundle() const
 {
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
+
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  auto b = GetAndCheckBundlePrivate(d);
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
-
-  return MakeBundle(b->shared_from_this());
+  return MakeBundle(b);
 }
 
 Bundle BundleContext::GetBundle(long id) const
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->bundleHooks.FilterBundle(
     *this, MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id)));
@@ -134,13 +152,12 @@ Bundle BundleContext::GetBundle(long id) const
 
 std::vector<Bundle> BundleContext::GetBundles(const std::string& location) const
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   std::vector<Bundle> res;
   for (auto bu : b->coreCtx->bundleRegistry.GetBundles(location)) {
@@ -151,13 +168,12 @@ std::vector<Bundle> BundleContext::GetBundles(const std::string& location) const
 
 std::vector<Bundle> BundleContext::GetBundles() const
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   std::vector<Bundle> bus;
   for (auto bu : b->coreCtx->bundleRegistry.GetBundles()) {
@@ -171,45 +187,42 @@ ServiceRegistrationU BundleContext::RegisterService(
   const InterfaceMapConstPtr& service,
   const ServiceProperties& properties)
 {
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
+
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  auto b = GetAndCheckBundlePrivate(d);
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
-
-  return b->coreCtx->services.RegisterService(b, service, properties);
+  return b->coreCtx->services.RegisterService(b.get(), service, properties);
 }
 
 std::vector<ServiceReferenceU> BundleContext::GetServiceReferences(
   const std::string& clazz,
   const std::string& filter)
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   std::vector<ServiceReferenceBase> refs;
-  b->coreCtx->services.Get(clazz, filter, b, refs);
+  b->coreCtx->services.Get(clazz, filter, b.get(), refs);
   return std::vector<ServiceReferenceU>(refs.begin(), refs.end());
 }
 
 ServiceReferenceU BundleContext::GetServiceReference(const std::string& clazz)
 {
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
+
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  auto b = GetAndCheckBundlePrivate(d);
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
-
-  return b->coreCtx->services.Get(d->bundle, clazz);
+  return b->coreCtx->services.Get(b.get(), clazz);
 }
 
 /* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
@@ -263,16 +276,15 @@ std::shared_ptr<void> BundleContext::GetService(
                                 "valid input to GetService()");
   }
 
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   std::shared_ptr<ServiceHolder<void>> h(new ServiceHolder<void>(
-    b->shared_from_this(), reference, reference.d.load()->GetService(b)));
+    b, reference, reference.d.load()->GetService(b.get())));
   return std::shared_ptr<void>(h, h->service.get());
 }
 
@@ -284,43 +296,41 @@ InterfaceMapConstPtr BundleContext::GetService(
                                 "valid input to GetService()");
   }
 
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
-  auto serviceInterfaceMap = reference.d.load()->GetServiceInterfaceMap(b);
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
+
+  auto serviceInterfaceMap =
+    reference.d.load()->GetServiceInterfaceMap(b.get());
   std::shared_ptr<ServiceHolder<const InterfaceMap>> h(
-    new ServiceHolder<const InterfaceMap>(
-      b->shared_from_this(), reference, serviceInterfaceMap));
+    new ServiceHolder<const InterfaceMap>(b, reference, serviceInterfaceMap));
   return InterfaceMapConstPtr(h, h->service.get());
 }
 
 ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
                                                 const std::string& filter)
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->listeners.AddServiceListener(d, delegate, nullptr, filter);
 }
 
 void BundleContext::RemoveServiceListener(const ServiceListener& delegate)
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   b->coreCtx->listeners.RemoveServiceListener(
     d, ListenerTokenId(0), delegate, nullptr);
@@ -328,26 +338,24 @@ void BundleContext::RemoveServiceListener(const ServiceListener& delegate)
 
 ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate)
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->listeners.AddBundleListener(d, delegate, nullptr);
 }
 
 void BundleContext::RemoveBundleListener(const BundleListener& delegate)
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   b->coreCtx->listeners.RemoveBundleListener(d, delegate, nullptr);
 }
@@ -355,26 +363,24 @@ void BundleContext::RemoveBundleListener(const BundleListener& delegate)
 ListenerToken BundleContext::AddFrameworkListener(
   const FrameworkListener& listener)
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->listeners.AddFrameworkListener(d, listener, nullptr);
 }
 
 void BundleContext::RemoveFrameworkListener(const FrameworkListener& listener)
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   b->coreCtx->listeners.RemoveFrameworkListener(d, listener, nullptr);
 }
@@ -383,13 +389,12 @@ ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
                                                 void* data,
                                                 const std::string& filter)
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->listeners.AddServiceListener(d, delegate, data, filter);
 }
@@ -397,13 +402,12 @@ ListenerToken BundleContext::AddServiceListener(const ServiceListener& delegate,
 void BundleContext::RemoveServiceListener(const ServiceListener& delegate,
                                           void* data)
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   b->coreCtx->listeners.RemoveServiceListener(
     d, ListenerTokenId(0), delegate, data);
@@ -412,13 +416,12 @@ void BundleContext::RemoveServiceListener(const ServiceListener& delegate,
 ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate,
                                                void* data)
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   return b->coreCtx->listeners.AddBundleListener(d, delegate, data);
 }
@@ -426,39 +429,36 @@ ListenerToken BundleContext::AddBundleListener(const BundleListener& delegate,
 void BundleContext::RemoveBundleListener(const BundleListener& delegate,
                                          void* data)
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   b->coreCtx->listeners.RemoveBundleListener(d, delegate, data);
 }
 
 void BundleContext::RemoveListener(ListenerToken token)
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   b->coreCtx->listeners.RemoveListener(d, std::move(token));
 }
 
 std::string BundleContext::GetDataFile(const std::string& filename) const
 {
-  d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
 
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
+  d->CheckValid();
+  auto b = GetAndCheckBundlePrivate(d);
 
   std::string dataRoot = b->bundleDir;
   if (!dataRoot.empty()) {
@@ -474,13 +474,14 @@ std::vector<Bundle> BundleContext::InstallBundles(
   const std::string& location,
   const cppmicroservices::AnyMap& bundleManifest)
 {
+  if (!d) {
+    throw std::runtime_error("The bundle context is no longer valid");
+  }
+
   d->CheckValid();
-  auto b = (d->Lock(), d->bundle);
-  // CONCURRENCY NOTE: This is a check-then-act situation,
-  // but we ignore it since the time window is small and
-  // the result is the same as if the calling thread had
-  // won the race condition.
-  return b->coreCtx->bundleRegistry.Install(location, b, bundleManifest);
+  auto b = GetAndCheckBundlePrivate(d);
+
+  return b->coreCtx->bundleRegistry.Install(location, b.get(), bundleManifest);
 }
 
 }

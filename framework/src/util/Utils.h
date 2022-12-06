@@ -26,6 +26,7 @@
 #include "BundleResourceContainer.h"
 #include "cppmicroservices/FrameworkExport.h"
 
+#include <exception>
 #include <string>
 
 namespace cppmicroservices {
@@ -46,7 +47,8 @@ bool IsBundleFile(const std::string& location);
  *         manifest file, false otherwise.
  * @throw std::runtime_error if the bundle manifest cannot be read.
  */
-bool OnlyContainsManifest(const std::shared_ptr<BundleResourceContainer>& resContainer);
+bool OnlyContainsManifest(
+  const std::shared_ptr<BundleResourceContainer>& resContainer);
 
 //-------------------------------------------------------------------
 // Framework storage
@@ -59,18 +61,18 @@ extern const std::string FWDIR_DEFAULT;
 std::string GetFrameworkDir(CoreBundleContext* ctx);
 
 /**
-* Optionally create and get the persistent storage path.
-*
-* @param ctx Pointer to the CoreBundleContext object.
-* @param leafDir The name of the leaf directory in the persistent storage path.
-* @param create Specify if the directory needs to be created if it doesn't already exist.
-*
-* @return A directory path or an empty string if no storage is available.
-*
-* @throw std::runtime_error if the storage directory is inaccessible
-*        or if there exists a file named @c leafDir in that directory
-*        or if the directory cannot be created when @c create is @c true.
-*/
+ * Optionally create and get the persistent storage path.
+ *
+ * @param ctx Pointer to the CoreBundleContext object.
+ * @param leafDir The name of the leaf directory in the persistent storage path.
+ * @param create Specify if the directory needs to be created if it doesn't already exist.
+ *
+ * @return A directory path or an empty string if no storage is available.
+ *
+ * @throw std::runtime_error if the storage directory is inaccessible
+ *        or if there exists a file named @c leafDir in that directory
+ *        or if the directory cannot be created when @c create is @c true.
+ */
 std::string GetPersistentStoragePath(CoreBundleContext* ctx,
                                      const std::string& leafDir,
                                      bool create = true);

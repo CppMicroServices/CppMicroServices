@@ -334,7 +334,7 @@ ShellService::ShellService()
 
   std::vector<BundleResource> schemeResources =
     GetBundleContext().GetBundle().FindResources("/", "*.scm", false);
-  for (auto & schemeResource : schemeResources) {
+  for (auto& schemeResource : schemeResources) {
     if (schemeResource) {
       this->LoadSchemeResource(schemeResource);
     }
@@ -409,7 +409,7 @@ std::vector<std::string> ShellService::GetCompletions(const std::string& in)
     return result;
   }
 
-  for (const auto & symIter : iter->second) {
+  for (const auto& symIter : iter->second) {
     if (symIter.size() < cmd.size())
       continue;
     if (symIter.compare(0, cmd.size(), cmd) == 0) {

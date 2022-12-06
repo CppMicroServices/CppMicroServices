@@ -67,14 +67,14 @@ template<class S, class T>
 ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
                                      const LDAPFilter& filter,
                                      _ServiceTrackerCustomizer* customizer)
-  : d(new _ServiceTrackerPrivate(this, context, FilteringStrategy(filter), customizer))
+  : d(new _ServiceTrackerPrivate(this, context, FilterAdapter(filter), customizer))
 {}
 
 template<class S, class T>
 ServiceTracker<S,T>::ServiceTracker(const BundleContext& context,
                                     const JSONFilter& filter,
                                     _ServiceTrackerCustomizer* customizer)
-  : d(new _ServiceTrackerPrivate(this, context, FilteringStrategy(filter), customizer))
+  : d(new _ServiceTrackerPrivate(this, context, FilterAdapter(filter), customizer))
 {
 }
 

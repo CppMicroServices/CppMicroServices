@@ -16,7 +16,7 @@
 
 namespace cppmicroservices {
 
-class FilteringStrategy
+class FilterAdapter
 {
 private:
   struct NoFilter {};
@@ -101,10 +101,10 @@ public:
   using StringList = std::vector<std::string>;
   using LocalCache = std::vector<StringList>;
 
-  FilteringStrategy() = default;
-  FilteringStrategy(const FilteringStrategy&) = default;
+  FilterAdapter() = default;
+  FilterAdapter(const FilterAdapter&) = default;
 
-  FilteringStrategy(std::string filter_string)
+  FilterAdapter(std::string filter_string)
     : filter()
   {
     if (filter_string.empty()) {
@@ -119,7 +119,7 @@ public:
   }
 
   template<typename FilterT>
-  explicit FilteringStrategy(FilterT f)
+  explicit FilterAdapter(FilterT f)
     : filter(std::move(f))
   {
   }
@@ -167,17 +167,17 @@ public:
     return std::visit(ToStringVisitor{},filter);
   }
 
-  FilteringStrategy& operator=(const FilteringStrategy& other)
+  FilterAdapter& operator=(const FilterAdapter& other)
   {
     filter = other.filter;
     return *this;
   }
-  FilteringStrategy& operator=(const LDAPFilter& other)
+  FilterAdapter& operator=(const LDAPFilter& other)
   {
     filter = other;
     return *this;
   }
-  FilteringStrategy& operator=(const JSONFilter& other)
+  FilterAdapter& operator=(const JSONFilter& other)
   {
     filter = other;
     return *this;

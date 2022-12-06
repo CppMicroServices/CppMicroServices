@@ -24,7 +24,7 @@
 #define CPPMICROSERVICES_SERVICETRACKERPRIVATE_H
 
 #include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/FilteringStrategy.h"
+#include "cppmicroservices/FilterAdapter.h"
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/detail/Threads.h"
 
@@ -55,7 +55,7 @@ public:
 
   ServiceTrackerPrivate(ServiceTracker<S, T>* st,
                         const BundleContext& context,
-                        const FilteringStrategy& filter,
+                        const FilterAdapter& filter,
                         ServiceTrackerCustomizer<S, T>* customizer);
 
   ~ServiceTrackerPrivate();
@@ -88,7 +88,7 @@ public:
    * The filter used by this <code>ServiceTracker</code> which specifies the
    * search criteria for the services to track.
    */
-  FilteringStrategy filter;
+  FilterAdapter filter;
 
   /**
    * The <code>ServiceTrackerCustomizer</code> for this tracker.

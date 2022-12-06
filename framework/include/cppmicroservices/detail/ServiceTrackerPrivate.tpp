@@ -25,7 +25,7 @@
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Constants.h"
-#include "cppmicroservices/FilteringStrategy.h"
+#include "cppmicroservices/FilterAdapter.h"
 
 #include <stdexcept>
 #include <utility>
@@ -98,7 +98,7 @@ template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTracker<S,T>* st,
     const BundleContext& context,
-    const FilteringStrategy& f,
+    const FilterAdapter& f,
     ServiceTrackerCustomizer<S,T>* customizer
     )
   : context(context), filter(f), customizer(customizer),

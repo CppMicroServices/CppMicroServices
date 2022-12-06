@@ -25,7 +25,7 @@
 US_MSVC_PUSH_DISABLE_WARNING(
   4180) // qualifier applied to function type has no meaning; ignored
 
-#include "cppmicroservices/FilteringStrategy.h"
+#include "cppmicroservices/FilterAdapter.h"
 #include "ServiceListenerEntry.h"
 #include "ServiceListenerHookPrivate.h"
 #include <cassert>
@@ -52,7 +52,7 @@ public:
 
   ~ServiceListenerEntryData() override = default;
 
-  FilteringStrategy filter;
+  FilterAdapter filter;
   
   /**
    * The elements of "simple" filters are cached, for easy lookup.

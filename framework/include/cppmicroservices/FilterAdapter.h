@@ -7,6 +7,7 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <unordered_set>
 
 #include "cppmicroservices/JSONFilter.h"
 #include "cppmicroservices/LDAPFilter.h"
@@ -18,6 +19,11 @@ namespace cppmicroservices {
 
 class FilterAdapter
 {
+public:
+  using ObjectClassSet = std::unordered_set<std::string>;
+  using StringList = std::vector<std::string>;
+  using LocalCache = std::vector<StringList>;
+
 private:
   struct NoFilter {};
 
@@ -45,12 +51,28 @@ private:
     const T& ref;
   };
 
+  class MatchedObjectClassesVisitor
+  {
+  public:
+    MatchedObjectClassesVisitor(ObjectClassSet& matches)
+      : matchedClasses(matches)
+    {
+    }
+
+    bool operator()(const cppmicroservices::LDAPFilter& filter) const
+    {
+      return filter.GetMatchedObjectClasses(matchedClasses);
+    }
+    bool operator()(const cppmicroservices::JSONFilter&) const { return false; }
+    bool operator()(const NoFilter&) const { return false; }
+    
+  private:
+    ObjectClassSet& matchedClasses;
+  };
+  
   class AddToSimpleCacheVisitor
   {
   public:
-    using StringList = std::vector<std::string>;
-    using LocalCache = std::vector<StringList>;
-
     AddToSimpleCacheVisitor(const StringList& k, LocalCache& c)
       : keywords(k), cache(c)
     {
@@ -98,9 +120,6 @@ private:
 
 
 public:
-  using StringList = std::vector<std::string>;
-  using LocalCache = std::vector<StringList>;
-
   FilterAdapter() = default;
   FilterAdapter(const FilterAdapter&) = default;
 
@@ -118,8 +137,14 @@ public:
     }
   }
 
+  FilterAdapter(const char* filter_string)
+    : filter()
+  {
+    FilterAdapter(std::string(filter_string));
+  }
+
   template<typename FilterT>
-  explicit FilterAdapter(FilterT f)
+  FilterAdapter(FilterT f)
     : filter(std::move(f))
   {
   }
@@ -167,6 +192,11 @@ public:
     return std::visit(ToStringVisitor{},filter);
   }
 
+  bool GetMatchedObjectClasses(ObjectClassSet& matches) const
+  {
+    return std::visit(MatchedObjectClassesVisitor{matches},filter);
+  }
+
   FilterAdapter& operator=(const FilterAdapter& other)
   {
     filter = other.filter;
@@ -182,6 +212,7 @@ public:
     filter = other;
     return *this;
   }
+
 private:
   static bool isLDAPFilterString(const std::string& filter_string)
   {

@@ -53,7 +53,7 @@ public:
                         const std::string& clazz,
                         ServiceTrackerCustomizer<S, T>* customizer);
 
-  ServiceTrackerPrivate(ServiceTracker<S, T>* st,
+  explicit ServiceTrackerPrivate(ServiceTracker<S, T>* st,
                         const BundleContext& context,
                         const FilterAdapter& filter,
                         ServiceTrackerCustomizer<S, T>* customizer);

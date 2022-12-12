@@ -5,6 +5,7 @@
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
 #include <cppmicroservices/ServiceTracker.h>
+#include <cppmicroservices/FilterAdapter.h>
 
 #include <chrono>
 #include <unordered_set>
@@ -175,7 +176,7 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture,
   for (int64_t i = 0; i < maxServiceTrackers; ++i) {
     auto fooTracker = std::make_unique<ServiceTracker<Foo>>(
       fc,
-      cppmicroservices::LDAPFilter(std::string("(bundle.symbolic_name=main)")));
+      FilterAdapter(LDAPFilter(std::string("(bundle.symbolic_name=main)"))));
     fooTracker->Open();
     trackers.emplace_back(std::move(fooTracker));
   }

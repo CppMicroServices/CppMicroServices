@@ -190,6 +190,9 @@ void ServiceRegistry::Get(const std::string& clazz,
   this->Lock(), Get_unlocked(clazz, filter, bundle, res);
 }
 
+/**
+ * TODO: Integrate with FilterAdapter
+ */
 void ServiceRegistry::Get_unlocked(const std::string& clazz,
                                    const std::string& filter,
                                    BundlePrivate* bundle,
@@ -198,12 +201,11 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz,
   std::vector<ServiceRegistrationBase>::const_iterator s;
   std::vector<ServiceRegistrationBase>::const_iterator send;
   std::vector<ServiceRegistrationBase> v;
-  LDAPExpr ldap;
+  FilterAdapter adapter(filter);
   if (clazz.empty()) {
     if (!filter.empty()) {
-      ldap = LDAPExpr(filter);
       LDAPExpr::ObjectClassSet matched;
-      if (ldap.GetMatchedObjectClasses(matched)) {
+      if (adapter.GetMatchedObjectClasses(matched)) {
         v.clear();
         for (auto& className : matched) {
           auto i = classServices.find(className);
@@ -234,16 +236,12 @@ void ServiceRegistry::Get_unlocked(const std::string& clazz,
     } else {
       return;
     }
-    if (!filter.empty()) {
-      ldap = LDAPExpr(filter);
-    }
   }
 
   for (; s != send; ++s) {
     ServiceReferenceBase sri = s->GetReference(clazz);
 
-    if (filter.empty() ||
-        ldap.Evaluate(PropertiesHandle(s->d->properties, true), false)) {
+    if (adapter.Match(sri)) {
       res.push_back(sri);
     }
   }

@@ -25,6 +25,7 @@
 #include "cppmicroservices/LDAPProp.h"
 #include "cppmicroservices/ServiceRegistration.h"
 #include "cppmicroservices/ServiceTracker.h"
+#include "cppmicroservices/FilterAdapter.h"
 
 #include "cppmicroservices/util/String.h"
 
@@ -56,7 +57,7 @@ public:
       cppmicroservices::LDAPProp(Constants::OBJECTCLASS) ==
         "org.cppmicroservices.c1.*" &&
       cppmicroservices::LDAPProp("i") == 5);
-    tracker.reset(new ServiceTracker<void>(context, filter, this));
+    tracker.reset(new ServiceTracker<void>(context, FilterAdapter(filter), this));
     tracker->Open();
 
     std::promise<void> p;

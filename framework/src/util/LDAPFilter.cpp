@@ -150,6 +150,14 @@ bool LDAPFilter::AddToSimpleCache(const StringList& keywords, LocalCache& cache)
   return false;
 }
 
+bool  LDAPFilter::GetMatchedObjectClasses(ObjectClassSet& matchedObjectClasses) const
+{
+  if (d) {
+    return d->ldapExpr.GetMatchedObjectClasses(matchedObjectClasses);
+  }
+  return false;
+}
+
 std::string LDAPFilter::ToString() const
 {
   return ((d) ? d->ldapExpr.ToString() : std::string());

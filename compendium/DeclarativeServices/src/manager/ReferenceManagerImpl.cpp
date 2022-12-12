@@ -23,6 +23,7 @@
 #include <memory>
 
 #include "ReferenceManagerImpl.hpp"
+#include "cppmicroservices/FilterAdapter.h"
 #include "cppmicroservices/LDAPProp.h"
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
@@ -41,8 +42,10 @@ namespace scrimpl {
  * @brief Returns the LDAPFilter of the reference metadata
  * @param refMetadata The metadata representing a service reference
  * @returns a LDAPFilter object corresponding to the @p refMetadata
+ *
+ * TODO: Figure out how to adapt for JSONFilter building as well
  */
-LDAPFilter GetReferenceLDAPFilter(
+FilterAdapter GetReferenceFilter(
   const metadata::ReferenceMetadata& refMetadata)
 {
   LDAPPropExpr expr;
@@ -55,7 +58,7 @@ LDAPFilter GetReferenceLDAPFilter(
   if (refMetadata.scope == REFERENCE_SCOPE_PROTOTYPE_REQUIRED) {
     expr &= (LDAPProp(SERVICE_SCOPE) == SCOPE_PROTOTYPE);
   }
-  return LDAPFilter(expr);
+  return FilterAdapter(LDAPFilter(expr));
 }
 
 ReferenceManagerBaseImpl::ReferenceManagerBaseImpl(
@@ -89,7 +92,7 @@ ReferenceManagerBaseImpl::ReferenceManagerBaseImpl(
   }
   try {
     tracker = std::make_unique<ServiceTracker<void>>(
-      bc, GetReferenceLDAPFilter(metadata), this);
+      bc, GetReferenceFilter(metadata), this);
     tracker->Open();
   } catch (...) {
     logger->Log(SeverityLevel::LOG_ERROR,

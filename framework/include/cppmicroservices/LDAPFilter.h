@@ -24,6 +24,7 @@
 #define CPPMICROSERVICES_LDAPFILTER_H
 
 #include "cppmicroservices/AnyMap.h"
+#include <unordered_set>
 
 #ifdef _MSC_VER
 #  pragma warning(push)
@@ -69,6 +70,7 @@ class US_Framework_EXPORT LDAPFilter
 public:
   using StringList = std::vector<std::string>;
   using LocalCache = std::vector<StringList>;
+  using ObjectClassSet = std::unordered_set<std::string>;
 
   /**
    * Creates a valid <code>LDAPFilter</code> object that
@@ -163,6 +165,7 @@ public:
 
   bool IsComplicated() const;
   bool AddToSimpleCache(const StringList& keywords, LocalCache& cache) const;
+  bool GetMatchedObjectClasses(ObjectClassSet& matchedObjectClasses) const;
   
   /**
    * Returns this <code>LDAPFilter</code>'s filter string.

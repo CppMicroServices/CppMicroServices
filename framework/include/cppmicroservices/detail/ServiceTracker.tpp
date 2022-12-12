@@ -58,6 +58,13 @@ ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
 
 template<class S, class T>
 ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
+                                     const char* clazz,
+                                     _ServiceTrackerCustomizer* customizer)
+  : d(new _ServiceTrackerPrivate(this, context, std::string(clazz), customizer))
+{}
+
+template<class S, class T>
+ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
                                      const std::string& clazz,
                                      _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, clazz, customizer))
@@ -65,18 +72,10 @@ ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
 
 template<class S, class T>
 ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
-                                     const LDAPFilter& filter,
+                                     const FilterAdapter& filter,
                                      _ServiceTrackerCustomizer* customizer)
-  : d(new _ServiceTrackerPrivate(this, context, FilterAdapter(filter), customizer))
+  : d(new _ServiceTrackerPrivate(this, context, filter, customizer))
 {}
-
-template<class S, class T>
-ServiceTracker<S,T>::ServiceTracker(const BundleContext& context,
-                                    const JSONFilter& filter,
-                                    _ServiceTrackerCustomizer* customizer)
-  : d(new _ServiceTrackerPrivate(this, context, FilterAdapter(filter), customizer))
-{
-}
 
 template<class S, class T>
 ServiceTracker<S,T>::ServiceTracker(const BundleContext& context,

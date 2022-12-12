@@ -29,6 +29,7 @@
 #include "cppmicroservices/GetBundleContext.h"
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceReference.h"
+#include "cppmicroservices/FilterAdapter.h"
 
 #include "ServiceControlInterface.h"
 #include "TestUtils.h"
@@ -153,10 +154,8 @@ TEST_F(ServiceTrackerTestFixture, TestFilterString)
   BundleContext context = framework.GetBundleContext();
   MyCustomizer customizer(context);
 
-  cppmicroservices::LDAPFilter filter(
-    "(" + cppmicroservices::Constants::SERVICE_ID + ">=0)");
-  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(
-    context, filter, &customizer);
+  LDAPFilter filter("(" + Constants::SERVICE_ID + ">=0)");
+  ServiceTracker<MyInterfaceOne> tracker(context, FilterAdapter(filter), &customizer);
   tracker.Open();
 
   struct MyServiceOne : public MyInterfaceOne

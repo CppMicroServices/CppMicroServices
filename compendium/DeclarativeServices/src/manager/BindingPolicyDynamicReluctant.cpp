@@ -22,53 +22,59 @@
 
 #include "ReferenceManagerImpl.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-using namespace cppmicroservices::logservice;
-
-void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceAdded(
-  const ServiceReferenceBase& reference)
+namespace cppmicroservices
 {
-  std::vector<RefChangeNotification> notifications;
-  if (!reference) {
-    Log("BindingPolicyDynamicReluctant::ServiceAdded called with an invalid "
-        "service reference");
-    return;
-  }
+    namespace scrimpl
+    {
 
-  auto notifySatisfied = false;
+        using namespace cppmicroservices::logservice;
 
-  if (!mgr.IsSatisfied()) {
-    notifySatisfied =
-      mgr.UpdateBoundRefs(); // becomes satisfied if return value is true
-  } else {
-    // previously satisfied
-    // If the service was previously satisfied then either there is
-    // nothing to do or a rebind needs to happen if the cardinality
-    // is optional and there are no bound refs.
-    if (0 == mgr.GetBoundReferences().size()) {
-      Log("Notify BIND for reference " + mgr.metadata.name);
+        void
+        ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceAdded(ServiceReferenceBase const& reference)
+        {
+            std::vector<RefChangeNotification> notifications;
+            if (!reference)
+            {
+                Log("BindingPolicyDynamicReluctant::ServiceAdded called with an invalid "
+                    "service reference");
+                return;
+            }
 
-      ClearBoundRefs();
-      mgr.UpdateBoundRefs();
+            auto notifySatisfied = false;
 
-      notifications.emplace_back(
-        mgr.metadata.name, RefEvent::REBIND, reference);
-    }
-  }
+            if (!mgr.IsSatisfied())
+            {
+                notifySatisfied = mgr.UpdateBoundRefs(); // becomes satisfied if return value is true
+            }
+            else
+            {
+                // previously satisfied
+                // If the service was previously satisfied then either there is
+                // nothing to do or a rebind needs to happen if the cardinality
+                // is optional and there are no bound refs.
+                if (0 == mgr.GetBoundReferences().size())
+                {
+                    Log("Notify BIND for reference " + mgr.metadata.name);
 
-  if (notifySatisfied) {
-    Log("Notify SATISFIED for reference " + mgr.metadata.name);
-    notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_SATISFIED);
-  }
-  mgr.BatchNotifyAllListeners(notifications);
-}
+                    ClearBoundRefs();
+                    mgr.UpdateBoundRefs();
 
-void ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceRemoved(
-  const ServiceReferenceBase& reference)
-{
-  DynamicRemoveService(reference);
-}
-}
-}
+                    notifications.emplace_back(mgr.metadata.name, RefEvent::REBIND, reference);
+                }
+            }
+
+            if (notifySatisfied)
+            {
+                Log("Notify SATISFIED for reference " + mgr.metadata.name);
+                notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_SATISFIED);
+            }
+            mgr.BatchNotifyAllListeners(notifications);
+        }
+
+        void
+        ReferenceManagerBaseImpl::BindingPolicyDynamicReluctant::ServiceRemoved(ServiceReferenceBase const& reference)
+        {
+            DynamicRemoveService(reference);
+        }
+    } // namespace scrimpl
+} // namespace cppmicroservices

@@ -22,17 +22,18 @@
 
 #include "cppmicroservices/SecurityException.h"
 
-namespace cppmicroservices {
-SecurityException::SecurityException(std::string what,
-                                     cppmicroservices::Bundle origin)
-  : std::runtime_error(std::move(what))
-  , origin(std::move(origin))
+namespace cppmicroservices
 {
-}
+    SecurityException::SecurityException(std::string what, cppmicroservices::Bundle origin)
+        : std::runtime_error(std::move(what))
+        , origin(std::move(origin))
+    {
+    }
 
-Bundle SecurityException::GetBundle() const
-{
-  return origin;
-}
+    Bundle
+    SecurityException::GetBundle() const
+    {
+        return origin;
+    }
 
-}
+} // namespace cppmicroservices

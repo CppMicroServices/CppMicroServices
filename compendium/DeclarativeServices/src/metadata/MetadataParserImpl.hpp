@@ -26,71 +26,73 @@
 #include "MetadataParser.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-namespace metadata {
-/*
- * Represents a concrete implementation (Version 1) of the MetadataParser
- */
-class MetadataParserImplV1 : public MetadataParser
+namespace cppmicroservices
 {
-public:
-  MetadataParserImplV1(
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger)
-    : logger(std::move(logger))
-  {}
+    namespace scrimpl
+    {
+        namespace metadata
+        {
+            /*
+             * Represents a concrete implementation (Version 1) of the MetadataParser
+             */
+            class MetadataParserImplV1 : public MetadataParser
+            {
+              public:
+                MetadataParserImplV1(std::shared_ptr<cppmicroservices::logservice::LogService> logger)
+                    : logger(std::move(logger))
+                {
+                }
 
-  MetadataParserImplV1(const MetadataParserImplV1&) = delete;
-  MetadataParserImplV1& operator=(const MetadataParserImplV1&) = delete;
-  MetadataParserImplV1(MetadataParserImplV1&&) = delete;
-  MetadataParserImplV1& operator=(MetadataParserImplV1&&) = delete;
+                MetadataParserImplV1(MetadataParserImplV1 const&) = delete;
+                MetadataParserImplV1& operator=(MetadataParserImplV1 const&) = delete;
+                MetadataParserImplV1(MetadataParserImplV1&&) = delete;
+                MetadataParserImplV1& operator=(MetadataParserImplV1&&) = delete;
 
-  ~MetadataParserImplV1() override = default;
+                ~MetadataParserImplV1() override = default;
 
-  /*
-   * @brief Parse and return the ServiceMetadata object
-   * @param metadata The value of the key "service" in the manifest
-   * @returns the @c ServiceMetadata object
-   */
-  ServiceMetadata CreateServiceMetadata(const AnyMap& metadata) const;
+                /*
+                 * @brief Parse and return the ServiceMetadata object
+                 * @param metadata The value of the key "service" in the manifest
+                 * @returns the @c ServiceMetadata object
+                 */
+                ServiceMetadata CreateServiceMetadata(AnyMap const& metadata) const;
 
-  /*
-   * @brief Parse and return the vector of ReferenceMetadata object
-   * @param refs A vector of references of type Any (i.e. the value of the
-   *             key @c "references" in the manifest)
-   * @returns a vector of @c ReferenceMetadata objects
-   */
-  std::vector<ReferenceMetadata> CreateReferenceMetadatas(
-    const std::vector<cppmicroservices::Any>& refs) const;
+                /*
+                 * @brief Parse and return the vector of ReferenceMetadata object
+                 * @param refs A vector of references of type Any (i.e. the value of the
+                 *             key @c "references" in the manifest)
+                 * @returns a vector of @c ReferenceMetadata objects
+                 */
+                std::vector<ReferenceMetadata> CreateReferenceMetadatas(
+                    std::vector<cppmicroservices::Any> const& refs) const;
 
-  /*
-   * @brief Parse and return the ReferenceMetadata object
-   * @param metadata An array value of the key "references" in the manifest
-   * @returns the @c ReferenceMetadata object
-   */
-  ReferenceMetadata CreateReferenceMetadata(const AnyMap& metadata) const;
+                /*
+                 * @brief Parse and return the ReferenceMetadata object
+                 * @param metadata An array value of the key "references" in the manifest
+                 * @returns the @c ReferenceMetadata object
+                 */
+                ReferenceMetadata CreateReferenceMetadata(AnyMap const& metadata) const;
 
-  /*
-   * @brief Parse and return the ComponentMetadata object
-   * @param metadata An element in the array of the key "components" in the manifest
-   * @returns the shared_ptr to a @c ComponentMetadata object
-   */
-  std::shared_ptr<ComponentMetadata> CreateComponentMetadata(
-    const AnyMap& metadata) const;
+                /*
+                 * @brief Parse and return the ComponentMetadata object
+                 * @param metadata An element in the array of the key "components" in the manifest
+                 * @returns the shared_ptr to a @c ComponentMetadata object
+                 */
+                std::shared_ptr<ComponentMetadata> CreateComponentMetadata(AnyMap const& metadata) const;
 
-  /*
-   * @brief Parse and return the vector of ComponentMetadata's
-   * @param metadata The value of the key "scr" in the manifest
-   * @returns the vector of shared_ptrs to the created @ComponentMetadata objects
-   */
-  std::vector<std::shared_ptr<ComponentMetadata>> ParseAndGetComponentsMetadata(
-    const AnyMap& scrmap) const override;
+                /*
+                 * @brief Parse and return the vector of ComponentMetadata's
+                 * @param metadata The value of the key "scr" in the manifest
+                 * @returns the vector of shared_ptrs to the created @ComponentMetadata objects
+                 */
+                std::vector<std::shared_ptr<ComponentMetadata>> ParseAndGetComponentsMetadata(
+                    AnyMap const& scrmap) const override;
 
-private:
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-};
-}
-}
-}
+              private:
+                std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+            };
+        } // namespace metadata
+    }     // namespace scrimpl
+} // namespace cppmicroservices
 
-#endif //METADATAPARSERIMPL_HPP
+#endif // METADATAPARSERIMPL_HPP

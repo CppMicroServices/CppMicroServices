@@ -22,7 +22,8 @@
 
 #include "cppmicroservices/webconsole/WebConsoleVariableResolver.h"
 
-namespace cppmicroservices {
+namespace cppmicroservices
+{
 
-WebConsoleVariableResolver::~WebConsoleVariableResolver() = default;
+    WebConsoleVariableResolver::~WebConsoleVariableResolver() = default;
 }

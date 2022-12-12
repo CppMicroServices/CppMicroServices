@@ -27,236 +27,242 @@
 #include "cppmicroservices/FrameworkConfig.h"
 
 #ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4251)
+#    pragma warning(push)
+#    pragma warning(disable : 4251)
 #endif
 
-namespace cppmicroservices {
-
-/// \cond
-class US_Framework_EXPORT LDAPPropExpr
+namespace cppmicroservices
 {
-public:
-  LDAPPropExpr();
-  explicit LDAPPropExpr(std::string expr);
 
-  LDAPPropExpr& operator!();
+    /// \cond
+    class US_Framework_EXPORT LDAPPropExpr
+    {
+      public:
+        LDAPPropExpr();
+        explicit LDAPPropExpr(std::string expr);
 
-  operator std::string() const;
+        LDAPPropExpr& operator!();
 
-  bool IsNull() const;
+        operator std::string() const;
 
-  /**
-  * Convenience operator for LDAP logical or '|'.
-  *
-  * Writing either
-  * \code
-  * LDAPPropExpr expr(LDAPProp("key1") == "value1");
-  * expr = expr || LDAPProp("key2") == "value2";
-  * \endcode
-  * or
-  * \code
-  * LDAPPropExpr expr(LDAPProp("key1") == "value1");
-  * expr |= LDAPProp("key2") == "value2";
-  * \endcode
-  * leads to the same string "(|(key1=value1) (key2=value2))".
-  *
-  * @param right A LDAP expression object.
-  * @return A LDAP expression object.
-  *
-  * @{
-  */
-  LDAPPropExpr& operator|=(const LDAPPropExpr& right);
-  /// @}
+        bool IsNull() const;
 
-  /**
-  * Convenience operator for LDAP logical and '&'.
-  *
-  * Writing either
-  * \code
-  * LDAPPropExpr expr(LDAPProp("key1") == "value1");
-  * expr = expr && LDAPProp("key2") == "value2";
-  * \endcode
-  * or
-  * \code
-  * LDAPPropExpr expr(LDAPProp("key1") == "value1");
-  * expr &= LDAPProp("key2") == "value2";
-  * \endcode
-  * leads to the same string "(&(key1=value1) (key2=value2))".
-  *
-  * @param right A LDAP expression object.
-  * @return A LDAP expression object.
-  *
-  * @{
-  */
-  LDAPPropExpr& operator&=(const LDAPPropExpr& right);
-  /// @}
+        /**
+         * Convenience operator for LDAP logical or '|'.
+         *
+         * Writing either
+         * \code
+         * LDAPPropExpr expr(LDAPProp("key1") == "value1");
+         * expr = expr || LDAPProp("key2") == "value2";
+         * \endcode
+         * or
+         * \code
+         * LDAPPropExpr expr(LDAPProp("key1") == "value1");
+         * expr |= LDAPProp("key2") == "value2";
+         * \endcode
+         * leads to the same string "(|(key1=value1) (key2=value2))".
+         *
+         * @param right A LDAP expression object.
+         * @return A LDAP expression object.
+         *
+         * @{
+         */
+        LDAPPropExpr& operator|=(LDAPPropExpr const& right);
+        /// @}
 
-private:
-  std::string m_ldapExpr;
-};
-/// \endcond
+        /**
+         * Convenience operator for LDAP logical and '&'.
+         *
+         * Writing either
+         * \code
+         * LDAPPropExpr expr(LDAPProp("key1") == "value1");
+         * expr = expr && LDAPProp("key2") == "value2";
+         * \endcode
+         * or
+         * \code
+         * LDAPPropExpr expr(LDAPProp("key1") == "value1");
+         * expr &= LDAPProp("key2") == "value2";
+         * \endcode
+         * leads to the same string "(&(key1=value1) (key2=value2))".
+         *
+         * @param right A LDAP expression object.
+         * @return A LDAP expression object.
+         *
+         * @{
+         */
+        LDAPPropExpr& operator&=(LDAPPropExpr const& right);
+        /// @}
 
-/**
- * \ingroup MicroServicesUtils
- * \ingroup gr_ldap
- *
- * A fluent API for creating LDAP filter strings.
- *
- * Examples for creating LDAPFilter objects:
- * \code
- * // This creates the filter "(&(name=Ben)(!(count=1)))"
- * LDAPFilter filter(LDAPProp("name") == "Ben" && !(LDAPProp("count") == 1));
- *
- * // This creates the filter "(|(presence=*)(!(absence=*)))"
- * LDAPFilter filter(LDAPProp("presence") || !LDAPProp("absence"));
- *
- * // This creates the filter "(&(ge>=-3)(approx~=hi))"
- * LDAPFilter filter(LDAPProp("ge") >= -3 && LDAPProp("approx").Approx("hi"));
- * \endcode
- *
- * \sa LDAPFilter
- */
-class US_Framework_EXPORT LDAPProp
-{
-public:
-  /**
-   * Create a LDAPProp instance for the named LDAP property.
-   *
-   * @param property The name of the LDAP property.
-   */
-  LDAPProp(std::string property);
+      private:
+        std::string m_ldapExpr;
+    };
+    /// \endcond
 
-  /**
-   * \addtogroup gr_ldap
-   * LDAP equality '='
-   *
-   * @param s A type convertible to std::string.
-   * @param b A type convertible to bool
-   * @return A LDAP expression object.
-   *
-   * @{
-   */
-  LDAPPropExpr operator==(const std::string& s) const;
-  LDAPPropExpr operator==(const cppmicroservices::Any& s) const;
-  LDAPPropExpr operator==(bool b) const;
-  template<class T>
-  LDAPPropExpr operator==(const T& s) const
-  {
-    std::stringstream ss;
-    ss << s;
-    return LDAPPropExpr("(" + m_property + "=" + ss.str() + ")");
-  }
-  /// @}
+    /**
+     * \ingroup MicroServicesUtils
+     * \ingroup gr_ldap
+     *
+     * A fluent API for creating LDAP filter strings.
+     *
+     * Examples for creating LDAPFilter objects:
+     * \code
+     * // This creates the filter "(&(name=Ben)(!(count=1)))"
+     * LDAPFilter filter(LDAPProp("name") == "Ben" && !(LDAPProp("count") == 1));
+     *
+     * // This creates the filter "(|(presence=*)(!(absence=*)))"
+     * LDAPFilter filter(LDAPProp("presence") || !LDAPProp("absence"));
+     *
+     * // This creates the filter "(&(ge>=-3)(approx~=hi))"
+     * LDAPFilter filter(LDAPProp("ge") >= -3 && LDAPProp("approx").Approx("hi"));
+     * \endcode
+     *
+     * \sa LDAPFilter
+     */
+    class US_Framework_EXPORT LDAPProp
+    {
+      public:
+        /**
+         * Create a LDAPProp instance for the named LDAP property.
+         *
+         * @param property The name of the LDAP property.
+         */
+        LDAPProp(std::string property);
 
-  operator LDAPPropExpr() const;
+        /**
+         * \addtogroup gr_ldap
+         * LDAP equality '='
+         *
+         * @param s A type convertible to std::string.
+         * @param b A type convertible to bool
+         * @return A LDAP expression object.
+         *
+         * @{
+         */
+        LDAPPropExpr operator==(std::string const& s) const;
+        LDAPPropExpr operator==(cppmicroservices::Any const& s) const;
+        LDAPPropExpr operator==(bool b) const;
+        template <class T>
+        LDAPPropExpr
+        operator==(T const& s) const
+        {
+            std::stringstream ss;
+            ss << s;
+            return LDAPPropExpr("(" + m_property + "=" + ss.str() + ")");
+        }
+        /// @}
 
-  /**
-   * States the absence of the LDAP property.
-   *
-   * @return A LDAP expression object.
-   */
-  LDAPPropExpr operator!() const;
+        operator LDAPPropExpr() const;
 
-  /**
-   * \addtogroup gr_ldap
-   * Convenience operator for LDAP inequality.
-   *
-   * Writing either
-   * \code
-   * LDAPProp("attr") != "val"
-   * \endcode
-   * or
-   * \code
-   * !(LDAPProp("attr") == "val")
-   * \endcode
-   * leads to the same string "(!(attr=val))".
-   *
-   * @param s A type convertible to std::string.
-   * @return A LDAP expression object.
-   *
-   * @{
-   */
-  LDAPPropExpr operator!=(const std::string& s) const;
-  LDAPPropExpr operator!=(const cppmicroservices::Any& s) const;
-  template<class T>
-  LDAPPropExpr operator!=(const T& s) const
-  {
-    std::stringstream ss;
-    ss << s;
-    return operator!=(ss.str());
-  }
-  /// @}
+        /**
+         * States the absence of the LDAP property.
+         *
+         * @return A LDAP expression object.
+         */
+        LDAPPropExpr operator!() const;
 
-  /**
-   * \addtogroup gr_ldap
-   * LDAP greater or equal '>='
-   *
-   * @param s A type convertible to std::string.
-   * @return A LDAP expression object.
-   *
-   * @{
-   */
-  LDAPPropExpr operator>=(const std::string& s) const;
-  LDAPPropExpr operator>=(const cppmicroservices::Any& s) const;
-  template<class T>
-  LDAPPropExpr operator>=(const T& s) const
-  {
-    std::stringstream ss;
-    ss << s;
-    return operator>=(ss.str());
-  }
-  /// @}
+        /**
+         * \addtogroup gr_ldap
+         * Convenience operator for LDAP inequality.
+         *
+         * Writing either
+         * \code
+         * LDAPProp("attr") != "val"
+         * \endcode
+         * or
+         * \code
+         * !(LDAPProp("attr") == "val")
+         * \endcode
+         * leads to the same string "(!(attr=val))".
+         *
+         * @param s A type convertible to std::string.
+         * @return A LDAP expression object.
+         *
+         * @{
+         */
+        LDAPPropExpr operator!=(std::string const& s) const;
+        LDAPPropExpr operator!=(cppmicroservices::Any const& s) const;
+        template <class T>
+        LDAPPropExpr
+        operator!=(T const& s) const
+        {
+            std::stringstream ss;
+            ss << s;
+            return operator!=(ss.str());
+        }
+        /// @}
 
-  /**
-   * \addtogroup gr_ldap
-   * LDAP less or equal '<='
-   *
-   * @param s A type convertible to std::string.
-   * @return A LDAP expression object.
-   *
-   * @{
-   */
-  LDAPPropExpr operator<=(const std::string& s) const;
-  LDAPPropExpr operator<=(const cppmicroservices::Any& s) const;
-  template<class T>
-  LDAPPropExpr operator<=(const T& s) const
-  {
-    std::stringstream ss;
-    ss << s;
-    return operator<=(ss.str());
-  }
-  /// @}
+        /**
+         * \addtogroup gr_ldap
+         * LDAP greater or equal '>='
+         *
+         * @param s A type convertible to std::string.
+         * @return A LDAP expression object.
+         *
+         * @{
+         */
+        LDAPPropExpr operator>=(std::string const& s) const;
+        LDAPPropExpr operator>=(cppmicroservices::Any const& s) const;
+        template <class T>
+        LDAPPropExpr
+        operator>=(T const& s) const
+        {
+            std::stringstream ss;
+            ss << s;
+            return operator>=(ss.str());
+        }
+        /// @}
 
-  /**
-   * \addtogroup gr_ldap
-   * LDAP approximation '~='
-   *
-   * @param s A type convertible to std::string.
-   * @return A LDAP expression object.
-   *
-   * @{
-   */
-  LDAPPropExpr Approx(const std::string& s) const;
-  LDAPPropExpr Approx(const cppmicroservices::Any& s) const;
-  template<class T>
-  LDAPPropExpr Approx(const T& s) const
-  {
-    std::stringstream ss;
-    ss << s;
-    return Approx(ss.str());
-  }
-  /// @}
+        /**
+         * \addtogroup gr_ldap
+         * LDAP less or equal '<='
+         *
+         * @param s A type convertible to std::string.
+         * @return A LDAP expression object.
+         *
+         * @{
+         */
+        LDAPPropExpr operator<=(std::string const& s) const;
+        LDAPPropExpr operator<=(cppmicroservices::Any const& s) const;
+        template <class T>
+        LDAPPropExpr
+        operator<=(T const& s) const
+        {
+            std::stringstream ss;
+            ss << s;
+            return operator<=(ss.str());
+        }
+        /// @}
 
-private:
-  LDAPProp& operator=(const LDAPProp&) = delete;
+        /**
+         * \addtogroup gr_ldap
+         * LDAP approximation '~='
+         *
+         * @param s A type convertible to std::string.
+         * @return A LDAP expression object.
+         *
+         * @{
+         */
+        LDAPPropExpr Approx(std::string const& s) const;
+        LDAPPropExpr Approx(cppmicroservices::Any const& s) const;
+        template <class T>
+        LDAPPropExpr
+        Approx(T const& s) const
+        {
+            std::stringstream ss;
+            ss << s;
+            return Approx(ss.str());
+        }
+        /// @}
 
-  std::string m_property;
-};
-}
+      private:
+        LDAPProp& operator=(LDAPProp const&) = delete;
+
+        std::string m_property;
+    };
+} // namespace cppmicroservices
 
 #ifdef _MSC_VER
-#  pragma warning(pop)
+#    pragma warning(pop)
 #endif
 
 /**
@@ -269,9 +275,8 @@ private:
  * @param right A LDAP expression.
  * @return A LDAP expression
  */
-US_Framework_EXPORT cppmicroservices::LDAPPropExpr operator&&(
-  const cppmicroservices::LDAPPropExpr& left,
-  const cppmicroservices::LDAPPropExpr& right);
+US_Framework_EXPORT cppmicroservices::LDAPPropExpr operator&&(cppmicroservices::LDAPPropExpr const& left,
+                                                              cppmicroservices::LDAPPropExpr const& right);
 
 /**
  * \ingroup MicroServicesUtils
@@ -283,8 +288,7 @@ US_Framework_EXPORT cppmicroservices::LDAPPropExpr operator&&(
  * @param right A LDAP expression.
  * @return A LDAP expression
  */
-US_Framework_EXPORT cppmicroservices::LDAPPropExpr operator||(
-  const cppmicroservices::LDAPPropExpr& left,
-  const cppmicroservices::LDAPPropExpr& right);
+US_Framework_EXPORT cppmicroservices::LDAPPropExpr operator||(cppmicroservices::LDAPPropExpr const& left,
+                                                              cppmicroservices::LDAPPropExpr const& right);
 
 #endif // CPPMICROSERVICES_LDAPPROP_H

@@ -25,38 +25,41 @@
 
 #include "MetadataParserImpl.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-namespace metadata {
-/*
- * Houses a factory member function to return a @c MetadataParser
- */
-class MetadataParserFactory
+namespace cppmicroservices
 {
-public:
-  /*
-   * @brief returns a @c MetadataParser object
-   * @param version The version of the metadataparser to be parsed
-   * @param logger A @c LogService object
-   * @returns an unique_ptr to the created @c MetadataParser object
-   * @throws std::runtime_error if the version isn't supported
-   */
-  static std::unique_ptr<MetadataParser> Create(
-    uint64_t version,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger)
-  {
-    switch (version) {
-      case 1:
-        return std::make_unique<MetadataParserImplV1>(logger);
-      default:
-        throw std::runtime_error("Unsupported manifest file version '" +
-                                 std::to_string(version) + "'");
-        return nullptr;
-    }
-  }
-};
+    namespace scrimpl
+    {
+        namespace metadata
+        {
+            /*
+             * Houses a factory member function to return a @c MetadataParser
+             */
+            class MetadataParserFactory
+            {
+              public:
+                /*
+                 * @brief returns a @c MetadataParser object
+                 * @param version The version of the metadataparser to be parsed
+                 * @param logger A @c LogService object
+                 * @returns an unique_ptr to the created @c MetadataParser object
+                 * @throws std::runtime_error if the version isn't supported
+                 */
+                static std::unique_ptr<MetadataParser>
+                Create(uint64_t version, std::shared_ptr<cppmicroservices::logservice::LogService> logger)
+                {
+                    switch (version)
+                    {
+                        case 1:
+                            return std::make_unique<MetadataParserImplV1>(logger);
+                        default:
+                            throw std::runtime_error("Unsupported manifest file version '" + std::to_string(version)
+                                                     + "'");
+                            return nullptr;
+                    }
+                }
+            };
 
-}
-}
-}
-#endif //METADATAPARSERFACTORY_HPP
+        } // namespace metadata
+    }     // namespace scrimpl
+} // namespace cppmicroservices
+#endif // METADATAPARSERFACTORY_HPP

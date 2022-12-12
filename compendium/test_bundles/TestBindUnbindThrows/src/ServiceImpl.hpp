@@ -6,50 +6,51 @@
 
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
-namespace sample {
-
-class ServiceComponentDGMU : public test::Interface2
+namespace sample
 {
-public:
-  ServiceComponentDGMU() = default;
-  std::string ExtendedDescription() override;
-  ~ServiceComponentDGMU() = default;
 
-  void Bindfoo(const std::shared_ptr<test::Interface1>&);
-  void Unbindfoo(const std::shared_ptr<test::Interface1>&);
+    class ServiceComponentDGMU : public test::Interface2
+    {
+      public:
+        ServiceComponentDGMU() = default;
+        std::string ExtendedDescription() override;
+        ~ServiceComponentDGMU() = default;
 
-private:
-  std::shared_ptr<test::Interface1> foo;
-};
+        void Bindfoo(std::shared_ptr<test::Interface1> const&);
+        void Unbindfoo(std::shared_ptr<test::Interface1> const&);
 
-class ServiceComponentDGOU : public test::Interface2
-{
-public:
-  ServiceComponentDGOU() = default;
-  std::string ExtendedDescription() override;
-  ~ServiceComponentDGOU() = default;
+      private:
+        std::shared_ptr<test::Interface1> foo;
+    };
 
-  void Bindbar(const std::shared_ptr<test::Interface1>&);
-  void Unbindbar(const std::shared_ptr<test::Interface1>&);
+    class ServiceComponentDGOU : public test::Interface2
+    {
+      public:
+        ServiceComponentDGOU() = default;
+        std::string ExtendedDescription() override;
+        ~ServiceComponentDGOU() = default;
 
-private:
-  std::shared_ptr<test::Interface1> foo;
-};
+        void Bindbar(std::shared_ptr<test::Interface1> const&);
+        void Unbindbar(std::shared_ptr<test::Interface1> const&);
 
-class ServiceComponentFactory : public test::Interface2
-{
-public:
-  ServiceComponentFactory() = default;
-  std::string ExtendedDescription() override;
-  ~ServiceComponentFactory() = default;
+      private:
+        std::shared_ptr<test::Interface1> foo;
+    };
 
-  void Bindfactory(const std::shared_ptr<test::Interface1>&);
-  void Unbindfactory(const std::shared_ptr<test::Interface1>&);
+    class ServiceComponentFactory : public test::Interface2
+    {
+      public:
+        ServiceComponentFactory() = default;
+        std::string ExtendedDescription() override;
+        ~ServiceComponentFactory() = default;
 
-private:
-  std::shared_ptr<test::Interface1> foo;
-};
+        void Bindfactory(std::shared_ptr<test::Interface1> const&);
+        void Unbindfactory(std::shared_ptr<test::Interface1> const&);
 
-} // namespaces
+      private:
+        std::shared_ptr<test::Interface1> foo;
+    };
+
+} // namespace sample
 
 #endif // _SERVICE_IMPL_HPP_

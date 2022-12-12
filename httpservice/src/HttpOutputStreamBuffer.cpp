@@ -29,96 +29,101 @@
 #include <cassert>
 #include <functional>
 
-namespace cppmicroservices {
-
-HttpOutputStreamBuffer::HttpOutputStreamBuffer(
-  HttpServletResponsePrivate* response,
-  std::size_t bufferSize)
-  : m_Buffer(bufferSize + 1)
-  , m_Response(response)
-  , m_ChunkedCoding(true)
+namespace cppmicroservices
 {
-  char* base = &m_Buffer.front();
-  setp(base, base + m_Buffer.size() - 1);
-}
 
-HttpOutputStreamBuffer::~HttpOutputStreamBuffer()
-{
-  if (m_Response->m_Connection == nullptr)
-    return;
-
-  // if not committed yet and (i.e. the content completely fits
-  // into the buffer and nobody synced the stream yet), then
-  // set the Content-Length if it is not automatically set.
-  // This is equal to an explicit "close" operation.
-  if (!m_Response->m_IsCommited &&
-      m_Response->m_Headers.find("Content-Length") !=
-        m_Response->m_Headers.end()) {
-    m_Response->m_Headers["Content-Length"] =
-      m_Response->LexicalCast(static_cast<long>(pptr() - pbase()));
-  }
-  sync();
-  if (m_ChunkedCoding) {
-    mg_write(m_Response->m_Connection, "0\r\n\r\n", 5);
-  }
-}
-
-bool HttpOutputStreamBuffer::CommitStream()
-{
-  if (!m_Response->m_IsCommited) {
-    m_ChunkedCoding = m_Response->m_Headers.find("Content-Length") ==
-                      m_Response->m_Headers.end();
-    if (m_ChunkedCoding) {
-      m_Response->m_Headers["Transfer-Encoding"] = "chunked";
+    HttpOutputStreamBuffer::HttpOutputStreamBuffer(HttpServletResponsePrivate* response, std::size_t bufferSize)
+        : m_Buffer(bufferSize + 1)
+        , m_Response(response)
+        , m_ChunkedCoding(true)
+    {
+        char* base = &m_Buffer.front();
+        setp(base, base + m_Buffer.size() - 1);
     }
-    // this writes the headers if not already written
-    return m_Response->Commit();
-  }
-  return true;
-}
 
-std::streambuf::int_type HttpOutputStreamBuffer::overflow(int_type ch)
-{
-  if (ch != traits_type::eof()) {
-    assert(std::less_equal<char*>()(pptr(), epptr()));
-    *pptr() = ch;
-    pbump(1);
-    if (sendBuffer()) {
-      return ch;
+    HttpOutputStreamBuffer::~HttpOutputStreamBuffer()
+    {
+        if (m_Response->m_Connection == nullptr)
+            return;
+
+        // if not committed yet and (i.e. the content completely fits
+        // into the buffer and nobody synced the stream yet), then
+        // set the Content-Length if it is not automatically set.
+        // This is equal to an explicit "close" operation.
+        if (!m_Response->m_IsCommited && m_Response->m_Headers.find("Content-Length") != m_Response->m_Headers.end())
+        {
+            m_Response->m_Headers["Content-Length"] = m_Response->LexicalCast(static_cast<long>(pptr() - pbase()));
+        }
+        sync();
+        if (m_ChunkedCoding)
+        {
+            mg_write(m_Response->m_Connection, "0\r\n\r\n", 5);
+        }
     }
-  }
-  return traits_type::eof();
-}
 
-int HttpOutputStreamBuffer::sync()
-{
-  return sendBuffer() ? 0 : -1;
-}
+    bool
+    HttpOutputStreamBuffer::CommitStream()
+    {
+        if (!m_Response->m_IsCommited)
+        {
+            m_ChunkedCoding = m_Response->m_Headers.find("Content-Length") == m_Response->m_Headers.end();
+            if (m_ChunkedCoding)
+            {
+                m_Response->m_Headers["Transfer-Encoding"] = "chunked";
+            }
+            // this writes the headers if not already written
+            return m_Response->Commit();
+        }
+        return true;
+    }
 
-bool HttpOutputStreamBuffer::sendBuffer()
-{
-  if (!m_Response->m_Connection)
-    return false;
+    std::streambuf::int_type
+    HttpOutputStreamBuffer::overflow(int_type ch)
+    {
+        if (ch != traits_type::eof())
+        {
+            assert(std::less_equal<char*>()(pptr(), epptr()));
+            *pptr() = ch;
+            pbump(1);
+            if (sendBuffer())
+            {
+                return ch;
+            }
+        }
+        return traits_type::eof();
+    }
 
-  // commit the response by writing the headers
-  if (!CommitStream())
-    return false;
+    int
+    HttpOutputStreamBuffer::sync()
+    {
+        return sendBuffer() ? 0 : -1;
+    }
 
-  // write the buffer contents
-  std::ptrdiff_t n = pptr() - pbase();
-  pbump(static_cast<int>(-n));
-  int bytesSend = 0;
-  if (m_ChunkedCoding) {
-    // send chunk size
-    std::string chunkSize =
-      m_Response->LexicalCastHex(static_cast<long>(n)) + "\r\n";
-    bytesSend +=
-      mg_write(m_Response->m_Connection, &chunkSize[0], chunkSize.size());
-  }
-  bytesSend += mg_write(m_Response->m_Connection, pbase(), n);
-  if (m_ChunkedCoding) {
-    bytesSend += mg_write(m_Response->m_Connection, "\r\n", 2);
-  }
-  return bytesSend > 0;
-}
-}
+    bool
+    HttpOutputStreamBuffer::sendBuffer()
+    {
+        if (!m_Response->m_Connection)
+            return false;
+
+        // commit the response by writing the headers
+        if (!CommitStream())
+            return false;
+
+        // write the buffer contents
+        std::ptrdiff_t n = pptr() - pbase();
+        pbump(static_cast<int>(-n));
+        int bytesSend = 0;
+        if (m_ChunkedCoding)
+        {
+            // send chunk size
+            std::string chunkSize = m_Response->LexicalCastHex(static_cast<long>(n)) + "\r\n";
+            bytesSend += mg_write(m_Response->m_Connection, &chunkSize[0], chunkSize.size());
+        }
+        bytesSend += mg_write(m_Response->m_Connection, pbase(), n);
+        if (m_ChunkedCoding)
+        {
+            bytesSend += mg_write(m_Response->m_Connection, "\r\n", 2);
+        }
+        return bytesSend > 0;
+    }
+} // namespace cppmicroservices

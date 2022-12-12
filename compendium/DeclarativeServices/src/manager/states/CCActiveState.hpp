@@ -29,68 +29,74 @@
 
 using cppmicroservices::service::component::runtime::dto::ComponentState;
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-/**
- * This class represents the {\code ComponentState::ACTIVE} state of a
- * component configuration.
- */
-class CCActiveState final : public CCSatisfiedState
+namespace cppmicroservices
 {
-public:
-  CCActiveState();
-  ~CCActiveState() override = default;
-  CCActiveState(const CCActiveState&) = delete;
-  CCActiveState& operator=(const CCActiveState&) = delete;
-  CCActiveState(CCActiveState&&) = delete;
-  CCActiveState& operator=(CCActiveState&&) = delete;
+    namespace scrimpl
+    {
 
-  void Register(ComponentConfigurationImpl&) override{
-    // no-op, already resolved
-  };
-  std::shared_ptr<ComponentInstance> Activate(
-    ComponentConfigurationImpl& mgr,
-    const cppmicroservices::Bundle& clientBundle) override;
+        /**
+         * This class represents the {\code ComponentState::ACTIVE} state of a
+         * component configuration.
+         */
+        class CCActiveState final : public CCSatisfiedState
+        {
+          public:
+            CCActiveState();
+            ~CCActiveState() override = default;
+            CCActiveState(CCActiveState const&) = delete;
+            CCActiveState& operator=(CCActiveState const&) = delete;
+            CCActiveState(CCActiveState&&) = delete;
+            CCActiveState& operator=(CCActiveState&&) = delete;
 
-  void Deactivate(ComponentConfigurationImpl& mgr) override;
+            void Register(ComponentConfigurationImpl&) override {
+                // no-op, already resolved
+            };
+            std::shared_ptr<ComponentInstance> Activate(ComponentConfigurationImpl& mgr,
+                                                        cppmicroservices::Bundle const& clientBundle) override;
 
-  /**
-   * Modifies the properties of the component instance when a configuration object on 
-   * which it is dependent changes. No state change. R
-   * @return
-   *    - true if the component has a Modified method.
-   *    - false if the component does not have a Modified method. The 
-   *      component has been Deactivated
-   */
-  bool Modified(ComponentConfigurationImpl&) override;
+            void Deactivate(ComponentConfigurationImpl& mgr) override;
 
-  /**
-   * Rebind to a target service. This operation does not transition to another state.
-   *
-   * When rebinding the new target service must be bound first before the old
-   * target service is unbound.
-   * This reversed order allows the component to not have to handle the inevitable gap 
-   * between the unbind and bind methods.
-   */
-  void Rebind(ComponentConfigurationImpl& mgr,
-              const std::string& refName,
-              const ServiceReference<void>& svcRefToBind,
-              const ServiceReference<void>& svcRefToUnbind) override;
+            /**
+             * Modifies the properties of the component instance when a configuration object on
+             * which it is dependent changes. No state change. R
+             * @return
+             *    - true if the component has a Modified method.
+             *    - false if the component does not have a Modified method. The
+             *      component has been Deactivated
+             */
+            bool Modified(ComponentConfigurationImpl&) override;
 
-  /**
-   * Returns {@link ComponentState::ACTIVE} to indicate the 
-   * state represented by this object
-   */
-  ComponentState GetValue() const override { return ComponentState::ACTIVE; }
-  void WaitForTransitionTask() override {
-      latch.Wait(); 
-  }
+            /**
+             * Rebind to a target service. This operation does not transition to another state.
+             *
+             * When rebinding the new target service must be bound first before the old
+             * target service is unbound.
+             * This reversed order allows the component to not have to handle the inevitable gap
+             * between the unbind and bind methods.
+             */
+            void Rebind(ComponentConfigurationImpl& mgr,
+                        std::string const& refName,
+                        ServiceReference<void> const& svcRefToBind,
+                        ServiceReference<void> const& svcRefToUnbind) override;
 
-private:
-  detail::CounterLatch latch;
-  
-};
-}
-}
+            /**
+             * Returns {@link ComponentState::ACTIVE} to indicate the
+             * state represented by this object
+             */
+            ComponentState
+            GetValue() const override
+            {
+                return ComponentState::ACTIVE;
+            }
+            void
+            WaitForTransitionTask() override
+            {
+                latch.Wait();
+            }
+
+          private:
+            detail::CounterLatch latch;
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 #endif // CCActiveState_hpp

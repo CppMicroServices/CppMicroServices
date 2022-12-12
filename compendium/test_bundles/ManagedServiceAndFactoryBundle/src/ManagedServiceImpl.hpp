@@ -5,30 +5,34 @@
 
 #include <mutex>
 
-namespace cppmicroservices {
-namespace service {
-namespace cm {
-namespace test {
-
-class TestManagedServiceImpl
-  : public ::test::TestManagedServiceInterface
-  , public cppmicroservices::service::cm::ManagedService
+namespace cppmicroservices
 {
-public:
-  TestManagedServiceImpl();
+    namespace service
+    {
+        namespace cm
+        {
+            namespace test
+            {
 
-  virtual ~TestManagedServiceImpl();
+                class TestManagedServiceImpl
+                    : public ::test::TestManagedServiceInterface
+                    , public cppmicroservices::service::cm::ManagedService
+                {
+                  public:
+                    TestManagedServiceImpl();
 
-  void Updated(AnyMap const& properties) override;
+                    virtual ~TestManagedServiceImpl();
 
-  int getCounter() override;
+                    void Updated(AnyMap const& properties) override;
 
-private:
-  int m_counter;
-  std::mutex m_counterMtx;
-};
+                    int getCounter() override;
 
-} // namespace test
-} // namespace cm
-} // namespace service
+                  private:
+                    int m_counter;
+                    std::mutex m_counterMtx;
+                };
+
+            } // namespace test
+        }     // namespace cm
+    }         // namespace service
 } // namespace cppmicroservices

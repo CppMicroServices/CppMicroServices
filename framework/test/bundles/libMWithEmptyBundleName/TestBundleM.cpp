@@ -22,15 +22,22 @@
 
 #include "cppmicroservices/BundleActivator.h"
 
-namespace cppmicroservices {
-
-class TestBundleMActivator : public BundleActivator
+namespace cppmicroservices
 {
-public:
-  void Start(BundleContext) {}
 
-  void Stop(BundleContext) {}
-};
-}
+    class TestBundleMActivator : public BundleActivator
+    {
+      public:
+        void
+        Start(BundleContext)
+        {
+        }
+
+        void
+        Stop(BundleContext)
+        {
+        }
+    };
+} // namespace cppmicroservices
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleMActivator)

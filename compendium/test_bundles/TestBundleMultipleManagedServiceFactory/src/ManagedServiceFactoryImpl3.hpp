@@ -5,48 +5,50 @@
 #include <cppmicroservices/BundleContext.h>
 #include <cppmicroservices/cm/ManagedServiceFactory.hpp>
 
-
 #include <map>
 #include <memory>
 #include <mutex>
 
-namespace cppmicroservices {
-namespace service {
-namespace cm {
-namespace test {
-
-class TestManagedServiceFactoryImpl3
-  : public ::test::TestManagedServiceFactory
-  , public ::cppmicroservices::service::cm::ManagedServiceFactory
+namespace cppmicroservices
 {
+    namespace service
+    {
+        namespace cm
+        {
+            namespace test
+            {
 
-public:
-  virtual ~TestManagedServiceFactoryImpl3();
+                class TestManagedServiceFactoryImpl3
+                    : public ::test::TestManagedServiceFactory
+                    , public ::cppmicroservices::service::cm::ManagedServiceFactory
+                {
 
-  void Activate(
-    const std::shared_ptr<
-      cppmicroservices::service::component::ComponentContext>& context);
+                  public:
+                    virtual ~TestManagedServiceFactoryImpl3();
 
-  void Updated(std::string const& pid, AnyMap const& properties) override;
+                    void Activate(
+                        std::shared_ptr<cppmicroservices::service::component::ComponentContext> const& context);
 
-  void Removed(std::string const& pid) override;
+                    void Updated(std::string const& pid, AnyMap const& properties) override;
 
-  int getUpdatedCounter(std::string const& pid) override;
+                    void Removed(std::string const& pid) override;
 
-  int getRemovedCounter(std::string const& pid) override;
+                    int getUpdatedCounter(std::string const& pid) override;
 
-  std::shared_ptr<::test::TestManagedServiceFactoryServiceInterface> create(
-    std::string const& config) override;
+                    int getRemovedCounter(std::string const& pid) override;
 
-private:
-  std::map<std::string, int> m_updatedCallCount;
-  std::map<std::string, int> m_removedCallCount;
-  cppmicroservices::BundleContext bundleContext_;
-  std::mutex m_updatedMtx;
-  std::mutex m_removedMtx;
-};
+                    std::shared_ptr<::test::TestManagedServiceFactoryServiceInterface> create(
+                        std::string const& config) override;
 
-} // namespace test
-} // namespace cm
-} // namespace service
+                  private:
+                    std::map<std::string, int> m_updatedCallCount;
+                    std::map<std::string, int> m_removedCallCount;
+                    cppmicroservices::BundleContext bundleContext_;
+                    std::mutex m_updatedMtx;
+                    std::mutex m_removedMtx;
+                };
+
+            } // namespace test
+        }     // namespace cm
+    }         // namespace service
 } // namespace cppmicroservices

@@ -30,64 +30,65 @@
 #include <string>
 #include <vector>
 
-namespace cppmicroservices {
-
-struct BundleArchive;
-
-/**
- * Interface for managing all bundles library content.
- */
-struct BundleStorage
+namespace cppmicroservices
 {
 
-  BundleStorage() {}
+    struct BundleArchive;
 
-  virtual ~BundleStorage() {}
+    /**
+     * Interface for managing all bundles library content.
+     */
+    struct BundleStorage
+    {
 
-  /**
-   * Insert bundles from a container into persistent storagedata.
-   *
-   * @param resCont The container for the bundle data and resources.
-   * @param topLevelEntry The top level entries in the container to be inserted as bundle archives.
-   * @return A shared_ptr to the BundleArchive representing the installed bundles.
-   */
-  using ManifestT = cppmicroservices::AnyMap;
-  virtual std::shared_ptr<BundleArchive> CreateAndInsertArchive(
-    const std::shared_ptr<BundleResourceContainer>& resCont,
-    const std::string& topLevelEntry,
-    const ManifestT&) = 0;
+        BundleStorage() {}
 
-  /**
-   * Get all bundle archive objects.
-   *
-   * @return A list with bundle archive objects.
-   */
-  virtual std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives()
-    const = 0;
+        virtual ~BundleStorage() {}
 
-  /**
-   * Get all bundles tagged to start at next launch of framework.
-   * This list is sorted in suggest start order.
-   *
-   * @return A list with bundle ids.
-   */
-  virtual std::vector<long> GetStartOnLaunchBundles() const = 0;
+        /**
+         * Insert bundles from a container into persistent storagedata.
+         *
+         * @param resCont The container for the bundle data and resources.
+         * @param topLevelEntry The top level entries in the container to be inserted as bundle archives.
+         * @return A shared_ptr to the BundleArchive representing the installed bundles.
+         */
+        using ManifestT = cppmicroservices::AnyMap;
+        virtual std::shared_ptr<BundleArchive> CreateAndInsertArchive(
+            std::shared_ptr<BundleResourceContainer> const& resCont,
+            std::string const& topLevelEntry,
+            ManifestT const&)
+            = 0;
 
-  /**
-   * Close this bundle storage and all bundles in it.
-   */
-  virtual void Close() = 0;
+        /**
+         * Get all bundle archive objects.
+         *
+         * @return A list with bundle archive objects.
+         */
+        virtual std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives() const = 0;
 
-private:
-  friend struct BundleArchive;
-  /**
-   * Remove bundle archive from archives list.
-   *
-   * @param ba Bundle archive to remove.
-   * @return true if element was removed.
-   */
-  virtual bool RemoveArchive(const BundleArchive* ba) = 0;
-};
-}
+        /**
+         * Get all bundles tagged to start at next launch of framework.
+         * This list is sorted in suggest start order.
+         *
+         * @return A list with bundle ids.
+         */
+        virtual std::vector<long> GetStartOnLaunchBundles() const = 0;
+
+        /**
+         * Close this bundle storage and all bundles in it.
+         */
+        virtual void Close() = 0;
+
+      private:
+        friend struct BundleArchive;
+        /**
+         * Remove bundle archive from archives list.
+         *
+         * @param ba Bundle archive to remove.
+         * @return true if element was removed.
+         */
+        virtual bool RemoveArchive(BundleArchive const* ba) = 0;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLESTORAGE_H

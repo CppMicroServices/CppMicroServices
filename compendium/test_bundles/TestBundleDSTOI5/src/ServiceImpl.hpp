@@ -6,22 +6,23 @@
 
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
-namespace sample {
-class ServiceComponent5 : public test::Interface2
+namespace sample
 {
-public:
-  ServiceComponent5() = default;
-  std::string ExtendedDescription() override;
-  void Activate(const std::shared_ptr<ComponentContext>&);
-  void Deactivate(const std::shared_ptr<ComponentContext>&);
-  ~ServiceComponent5() = default;
+    class ServiceComponent5 : public test::Interface2
+    {
+      public:
+        ServiceComponent5() = default;
+        std::string ExtendedDescription() override;
+        void Activate(std::shared_ptr<ComponentContext> const&);
+        void Deactivate(std::shared_ptr<ComponentContext> const&);
+        ~ServiceComponent5() = default;
 
-  void Bindfoo(const std::shared_ptr<test::Interface1>&);
-  void Unbindfoo(const std::shared_ptr<test::Interface1>&);
+        void Bindfoo(std::shared_ptr<test::Interface1> const&);
+        void Unbindfoo(std::shared_ptr<test::Interface1> const&);
 
-private:
-  std::shared_ptr<test::Interface1> foo;
-};
-}
+      private:
+        std::shared_ptr<test::Interface1> foo;
+    };
+} // namespace sample
 
 #endif // _SERVICE_IMPL_HPP_

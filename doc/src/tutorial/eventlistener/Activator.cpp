@@ -30,72 +30,77 @@
 
 using namespace cppmicroservices;
 
-namespace {
-
-/**
- * This class implements a simple bundle that utilizes the CppMicroServices's
- * event mechanism to listen for service events. Upon receiving a service event,
- * it prints out the event's details.
- */
-class Activator : public BundleActivator
+namespace
 {
 
-private:
-  /**
-   * Implements BundleActivator::Start(). Prints a message and adds a member
-   * function to the bundle context as a service listener.
-   *
-   * @param context the framework context for the bundle.
-   */
-  void Start(BundleContext context)
-  {
-    std::cout << "Starting to listen for service events." << std::endl;
-    listenerToken = context.AddServiceListener(
-      std::bind(&Activator::ServiceChanged, this, std::placeholders::_1));
-  }
+    /**
+     * This class implements a simple bundle that utilizes the CppMicroServices's
+     * event mechanism to listen for service events. Upon receiving a service event,
+     * it prints out the event's details.
+     */
+    class Activator : public BundleActivator
+    {
 
-  /**
-   * Implements BundleActivator::Stop(). Prints a message and removes the
-   * member function from the bundle context as a service listener.
-   *
-   * @param context the framework context for the bundle.
-   */
-  void Stop(BundleContext context)
-  {
-    context.RemoveListener(std::move(listenerToken));
-    std::cout << "Stopped listening for service events." << std::endl;
+      private:
+        /**
+         * Implements BundleActivator::Start(). Prints a message and adds a member
+         * function to the bundle context as a service listener.
+         *
+         * @param context the framework context for the bundle.
+         */
+        void
+        Start(BundleContext context)
+        {
+            std::cout << "Starting to listen for service events." << std::endl;
+            listenerToken
+                = context.AddServiceListener(std::bind(&Activator::ServiceChanged, this, std::placeholders::_1));
+        }
 
-    // Note: It is not required that we remove the listener here,
-    // since the framework will do it automatically anyway.
-  }
+        /**
+         * Implements BundleActivator::Stop(). Prints a message and removes the
+         * member function from the bundle context as a service listener.
+         *
+         * @param context the framework context for the bundle.
+         */
+        void
+        Stop(BundleContext context)
+        {
+            context.RemoveListener(std::move(listenerToken));
+            std::cout << "Stopped listening for service events." << std::endl;
 
-  /**
-   * Prints the details of any service event from the framework.
-   *
-   * @param event the fired service event.
-   */
-  void ServiceChanged(const ServiceEvent& event)
-  {
-    std::string objectClass =
-      ref_any_cast<std::vector<std::string>>(
-        event.GetServiceReference().GetProperty(Constants::OBJECTCLASS))
-        .front();
+            // Note: It is not required that we remove the listener here,
+            // since the framework will do it automatically anyway.
+        }
 
-    if (event.GetType() == ServiceEvent::SERVICE_REGISTERED) {
-      std::cout << "Ex1: Service of type " << objectClass << " registered."
-                << std::endl;
-    } else if (event.GetType() == ServiceEvent::SERVICE_UNREGISTERING) {
-      std::cout << "Ex1: Service of type " << objectClass << " unregistered."
-                << std::endl;
-    } else if (event.GetType() == ServiceEvent::SERVICE_MODIFIED) {
-      std::cout << "Ex1: Service of type " << objectClass << " modified."
-                << std::endl;
-    }
-  }
+        /**
+         * Prints the details of any service event from the framework.
+         *
+         * @param event the fired service event.
+         */
+        void
+        ServiceChanged(ServiceEvent const& event)
+        {
+            std::string objectClass = ref_any_cast<std::vector<std::string>>(
+                                          event.GetServiceReference().GetProperty(Constants::OBJECTCLASS))
+                                          .front();
 
-  ListenerToken listenerToken;
-};
-}
+            if (event.GetType() == ServiceEvent::SERVICE_REGISTERED)
+            {
+                std::cout << "Ex1: Service of type " << objectClass << " registered." << std::endl;
+            }
+            else if (event.GetType() == ServiceEvent::SERVICE_UNREGISTERING)
+            {
+                std::cout << "Ex1: Service of type " << objectClass << " unregistered." << std::endl;
+            }
+            else if (event.GetType() == ServiceEvent::SERVICE_MODIFIED)
+            {
+                std::cout << "Ex1: Service of type " << objectClass << " modified." << std::endl;
+            }
+        }
+
+        ListenerToken listenerToken;
+    };
+} // namespace
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(Activator)
 //! [Activator]

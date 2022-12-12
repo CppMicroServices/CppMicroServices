@@ -26,145 +26,142 @@
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceReferenceBase.h"
 
-namespace cppmicroservices {
-
-/**
-\defgroup gr_servicereference ServiceReference
-
-\brief Groups ServiceReference related symbols.
-*/
-
-/**
- * \ingroup MicroServices
- * \ingroup gr_servicereference
- *
- * A reference to a service.
- *
- * <p>
- * The framework returns <code>ServiceReference</code> objects from the
- * <code>BundleContext::GetServiceReference</code> and
- * <code>BundleContext::GetServiceReferences</code> methods.
- * <p>
- * A <code>ServiceReference</code> object may be shared between bundles and
- * can be used to examine the properties of the service and to get the service
- * object.
- * <p>
- * Every service registered in the framework has a unique
- * <code>ServiceRegistration</code> object and may have multiple, distinct
- * <code>ServiceReference</code> objects referring to it.
- * <code>ServiceReference</code> objects associated with a
- * <code>ServiceRegistration</code> are considered equal
- * (more specifically, their <code>operator==()</code>
- * method will return <code>true</code> when compared).
- * <p>
- * If the same service object is registered multiple times,
- * <code>ServiceReference</code> objects associated with different
- * <code>ServiceRegistration</code> objects are not equal.
- *
- * @tparam S The class type of the service interface
- * @see BundleContext::GetServiceReference
- * @see BundleContext::GetServiceReferences
- * @see BundleContext::GetService
- */
-template<class S>
-class ServiceReference : public ServiceReferenceBase
+namespace cppmicroservices
 {
 
-public:
-  using ServiceType = S;
+    /**
+    \defgroup gr_servicereference ServiceReference
 
-  /**
-   * Creates an invalid ServiceReference object. You can use
-   * this object in boolean expressions and it will evaluate to
-   * <code>false</code>.
-   */
-  ServiceReference()
-    : ServiceReferenceBase()
-  {
-  }
+    \brief Groups ServiceReference related symbols.
+    */
 
-  ServiceReference(const ServiceReference&) = default;
-  ServiceReference& operator=(const ServiceReference&) = default;
+    /**
+     * \ingroup MicroServices
+     * \ingroup gr_servicereference
+     *
+     * A reference to a service.
+     *
+     * <p>
+     * The framework returns <code>ServiceReference</code> objects from the
+     * <code>BundleContext::GetServiceReference</code> and
+     * <code>BundleContext::GetServiceReferences</code> methods.
+     * <p>
+     * A <code>ServiceReference</code> object may be shared between bundles and
+     * can be used to examine the properties of the service and to get the service
+     * object.
+     * <p>
+     * Every service registered in the framework has a unique
+     * <code>ServiceRegistration</code> object and may have multiple, distinct
+     * <code>ServiceReference</code> objects referring to it.
+     * <code>ServiceReference</code> objects associated with a
+     * <code>ServiceRegistration</code> are considered equal
+     * (more specifically, their <code>operator==()</code>
+     * method will return <code>true</code> when compared).
+     * <p>
+     * If the same service object is registered multiple times,
+     * <code>ServiceReference</code> objects associated with different
+     * <code>ServiceRegistration</code> objects are not equal.
+     *
+     * @tparam S The class type of the service interface
+     * @see BundleContext::GetServiceReference
+     * @see BundleContext::GetServiceReferences
+     * @see BundleContext::GetService
+     */
+    template <class S>
+    class ServiceReference : public ServiceReferenceBase
+    {
 
-  ServiceReference(const ServiceReferenceBase& base)
-    : ServiceReferenceBase(base)
-  {
-    const std::string interfaceId(us_service_interface_iid<S>());
-    if (GetInterfaceId() != interfaceId) {
-      if (this->IsConvertibleTo(interfaceId)) {
-        this->SetInterfaceId(interfaceId);
-      } else {
-        this->operator=(nullptr);
-      }
-    }
-  }
+      public:
+        using ServiceType = S;
 
-  using ServiceReferenceBase::operator=;
+        /**
+         * Creates an invalid ServiceReference object. You can use
+         * this object in boolean expressions and it will evaluate to
+         * <code>false</code>.
+         */
+        ServiceReference() : ServiceReferenceBase() {}
 
-  using ServiceReferenceBase::operator==;
+        ServiceReference(ServiceReference const&) = default;
+        ServiceReference& operator=(ServiceReference const&) = default;
 
-  using ServiceReferenceBase::Hash;
-};
+        ServiceReference(ServiceReferenceBase const& base) : ServiceReferenceBase(base)
+        {
+            const std::string interfaceId(us_service_interface_iid<S>());
+            if (GetInterfaceId() != interfaceId)
+            {
+                if (this->IsConvertibleTo(interfaceId))
+                {
+                    this->SetInterfaceId(interfaceId);
+                }
+                else
+                {
+                    this->operator=(nullptr);
+                }
+            }
+        }
 
-/**
- * \cond
- *
- * Specialization for void, representing a generic service
- * reference not bound to any interface identifier.
- *
- */
-template<>
-class ServiceReference<void> : public ServiceReferenceBase
+        using ServiceReferenceBase::operator=;
+
+        using ServiceReferenceBase::operator==;
+
+        using ServiceReferenceBase::Hash;
+    };
+
+    /**
+     * \cond
+     *
+     * Specialization for void, representing a generic service
+     * reference not bound to any interface identifier.
+     *
+     */
+    template <>
+    class ServiceReference<void> : public ServiceReferenceBase
+    {
+
+      public:
+        /**
+         * Creates an invalid ServiceReference object. You can use
+         * this object in boolean expressions and it will evaluate to
+         * <code>false</code>.
+         */
+        ServiceReference() : ServiceReferenceBase() {}
+
+        ServiceReference(ServiceReference const&) = default;
+        ServiceReference& operator=(ServiceReference const&) = default;
+
+        ServiceReference(ServiceReferenceBase const& base) : ServiceReferenceBase(base) {}
+
+        using ServiceReferenceBase::operator=;
+
+        using ServiceReferenceBase::operator==;
+
+        using ServiceReferenceBase::Hash;
+
+        using ServiceType = void;
+    };
+    /// \endcond
+
+    /**
+     * \ingroup MicroServices
+     * \ingroup gr_servicereference
+     *
+     * A service reference of unknown type, which is not bound to any
+     * interface identifier.
+     */
+    using ServiceReferenceU = ServiceReference<void>;
+} // namespace cppmicroservices
+
+namespace std
 {
-
-public:
-  /**
-   * Creates an invalid ServiceReference object. You can use
-   * this object in boolean expressions and it will evaluate to
-   * <code>false</code>.
-   */
-  ServiceReference()
-    : ServiceReferenceBase()
-  {
-  }
-
-  ServiceReference(const ServiceReference&) = default;
-  ServiceReference& operator=(const ServiceReference&) = default;
-
-  ServiceReference(const ServiceReferenceBase& base)
-    : ServiceReferenceBase(base)
-  {
-  }
-
-  using ServiceReferenceBase::operator=;
-
-  using ServiceReferenceBase::operator==;
-
-  using ServiceReferenceBase::Hash;
-
-  using ServiceType = void;
-};
-/// \endcond
-
-/**
- * \ingroup MicroServices
- * \ingroup gr_servicereference
- *
- * A service reference of unknown type, which is not bound to any
- * interface identifier.
- */
-using ServiceReferenceU = ServiceReference<void>;
-}
-
-namespace std {
-template<class S>
-struct hash<cppmicroservices::ServiceReference<S>>
-{
-  std::size_t operator()(const cppmicroservices::ServiceReference<S>& arg) const
-  {
-    return arg.Hash();
-  }
-};
-}
+    template <class S>
+    struct hash<cppmicroservices::ServiceReference<S>>
+    {
+        std::size_t
+        operator()(cppmicroservices::ServiceReference<S> const& arg) const
+        {
+            return arg.Hash();
+        }
+    };
+} // namespace std
 
 #endif // CPPMICROSERVICES_SERVICEREFERENCE_H

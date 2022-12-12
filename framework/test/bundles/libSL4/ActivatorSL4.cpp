@@ -28,32 +28,39 @@
 
 #include <iostream>
 
-namespace cppmicroservices {
-
-class FooServiceImpl : public FooService
+namespace cppmicroservices
 {
 
-public:
-  void foo() {}
-};
+    class FooServiceImpl : public FooService
+    {
 
-class ActivatorSL4 : public BundleActivator
-{
+      public:
+        void
+        foo()
+        {
+        }
+    };
 
-public:
-  ~ActivatorSL4() {}
+    class ActivatorSL4 : public BundleActivator
+    {
 
-  void Start(BundleContext context)
-  {
-    sr =
-      context.RegisterService<FooService>(std::make_shared<FooServiceImpl>());
-  }
+      public:
+        ~ActivatorSL4() {}
 
-  void Stop(BundleContext /*context*/) {}
+        void
+        Start(BundleContext context)
+        {
+            sr = context.RegisterService<FooService>(std::make_shared<FooServiceImpl>());
+        }
 
-private:
-  ServiceRegistration<FooService> sr;
-};
-}
+        void
+        Stop(BundleContext /*context*/)
+        {
+        }
+
+      private:
+        ServiceRegistration<FooService> sr;
+    };
+} // namespace cppmicroservices
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::ActivatorSL4)

@@ -25,43 +25,43 @@
 #include "CCActiveState.hpp"
 #include "CCUnsatisfiedReferenceState.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-CCRegisteredState::CCRegisteredState()
+namespace cppmicroservices
 {
-  std::promise<void> prom;
-  ready = prom.get_future();
-  prom.set_value();
-}
+    namespace scrimpl
+    {
 
-CCRegisteredState::CCRegisteredState(std::shared_future<void> blockUntil)
-  : ready(std::move(blockUntil))
-{
-}
+        CCRegisteredState::CCRegisteredState()
+        {
+            std::promise<void> prom;
+            ready = prom.get_future();
+            prom.set_value();
+        }
 
-std::shared_ptr<ComponentInstance> CCRegisteredState::Activate(
-  ComponentConfigurationImpl& mgr,
-  const cppmicroservices::Bundle& clientBundle)
-{
+        CCRegisteredState::CCRegisteredState(std::shared_future<void> blockUntil) : ready(std::move(blockUntil)) {}
 
-  auto activeState = std::make_shared<CCActiveState>();
-  auto currState = shared_from_this();
-  bool success = false;
-  while (!success && currState->GetValue() == ComponentState::SATISFIED) {
-    success = mgr.CompareAndSetState(&currState, activeState);
-  };
+        std::shared_ptr<ComponentInstance>
+        CCRegisteredState::Activate(ComponentConfigurationImpl& mgr, cppmicroservices::Bundle const& clientBundle)
+        {
 
-  if (success) {
-    auto instance = activeState->Activate(mgr, clientBundle);
-    if (!instance) {
-      auto state =
-        std::dynamic_pointer_cast<ComponentConfigurationState>(activeState);
-      mgr.CompareAndSetState(&state, std::make_shared<CCRegisteredState>());
-    }
-    return instance;
-  }
-  return currState->Activate(mgr, clientBundle);
-}
-}
-}
+            auto activeState = std::make_shared<CCActiveState>();
+            auto currState = shared_from_this();
+            bool success = false;
+            while (!success && currState->GetValue() == ComponentState::SATISFIED)
+            {
+                success = mgr.CompareAndSetState(&currState, activeState);
+            };
+
+            if (success)
+            {
+                auto instance = activeState->Activate(mgr, clientBundle);
+                if (!instance)
+                {
+                    auto state = std::dynamic_pointer_cast<ComponentConfigurationState>(activeState);
+                    mgr.CompareAndSetState(&state, std::make_shared<CCRegisteredState>());
+                }
+                return instance;
+            }
+            return currState->Activate(mgr, clientBundle);
+        }
+    } // namespace scrimpl
+} // namespace cppmicroservices

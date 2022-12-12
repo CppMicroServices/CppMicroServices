@@ -26,43 +26,47 @@
 #include "TestingConfig.h"
 #include "gtest/gtest.h"
 
-namespace cppmicroservices {
-
-// Fake a ServiceHooks class so we can create
-// ShrinkableMap instances
-class ServiceHooks
+namespace cppmicroservices
 {
 
-public:
-  template<class K, class V>
-  static ShrinkableMap<K, V> MakeMap(std::map<K, V>& m)
-  {
-    return ShrinkableMap<K, V>(m);
-  }
-};
-}
+    // Fake a ServiceHooks class so we can create
+    // ShrinkableMap instances
+    class ServiceHooks
+    {
+
+      public:
+        template <class K, class V>
+        static ShrinkableMap<K, V>
+        MakeMap(std::map<K, V>& m)
+        {
+            return ShrinkableMap<K, V>(m);
+        }
+    };
+} // namespace cppmicroservices
 
 using namespace cppmicroservices;
 
 TEST(ShrinkableMapTest, testShrinkableMapOperations)
 {
-  ShrinkableMap<int, std::string>::container_type m{ { 1, "one" },
-                                                     { 2, "two" },
-                                                     { 3, "three" } };
+    ShrinkableMap<int, std::string>::container_type m {
+        {1,   "one"},
+        {2,   "two"},
+        {3, "three"}
+    };
 
-  auto shrinkable = ServiceHooks::MakeMap(m);
+    auto shrinkable = ServiceHooks::MakeMap(m);
 
-  //Original size
-  ASSERT_EQ(m.size(), 3);
-  //Equal size
-  ASSERT_EQ(m.size(), shrinkable.size());
-  //At access
-  ASSERT_EQ(shrinkable.at(1), "one");
+    // Original size
+    ASSERT_EQ(m.size(), 3);
+    // Equal size
+    ASSERT_EQ(m.size(), shrinkable.size());
+    // At access
+    ASSERT_EQ(shrinkable.at(1), "one");
 
-  shrinkable.erase(shrinkable.find(1));
-  //New size
-  ASSERT_EQ(m.size(), 2);
-  EXPECT_THROW(shrinkable.at(1), std::out_of_range);
-  //back() access
-  ASSERT_EQ(shrinkable.at(2), "two");
+    shrinkable.erase(shrinkable.find(1));
+    // New size
+    ASSERT_EQ(m.size(), 2);
+    EXPECT_THROW(shrinkable.at(1), std::out_of_range);
+    // back() access
+    ASSERT_EQ(shrinkable.at(2), "two");
 }

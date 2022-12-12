@@ -1,25 +1,28 @@
 #include "ManagedServiceFactoryServiceImpl2.hpp"
 
-namespace cppmicroservices {
-namespace service {
-namespace cm {
-namespace test {
-
-TestManagedServiceFactoryServiceImpl2::TestManagedServiceFactoryServiceImpl2(
-  int initialValue)
-  : value{ initialValue }
+namespace cppmicroservices
 {
-}
+    namespace service
+    {
+        namespace cm
+        {
+            namespace test
+            {
 
-TestManagedServiceFactoryServiceImpl2::
-  ~TestManagedServiceFactoryServiceImpl2() = default;
+                TestManagedServiceFactoryServiceImpl2::TestManagedServiceFactoryServiceImpl2(int initialValue)
+                    : value { initialValue }
+                {
+                }
 
-int TestManagedServiceFactoryServiceImpl2::getValue()
-{
-  return value;
-}
+                TestManagedServiceFactoryServiceImpl2::~TestManagedServiceFactoryServiceImpl2() = default;
 
-} // namespace test
-} // namespace cm
-} // namespace service
+                int
+                TestManagedServiceFactoryServiceImpl2::getValue()
+                {
+                    return value;
+                }
+
+            } // namespace test
+        }     // namespace cm
+    }         // namespace service
 } // namespace cppmicroservices

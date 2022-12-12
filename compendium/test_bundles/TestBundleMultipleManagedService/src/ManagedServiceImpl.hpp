@@ -5,48 +5,52 @@
 
 #include <mutex>
 
-namespace cppmicroservices {
-namespace service {
-namespace cm {
-namespace test {
-
-class TestManagedServiceImpl3
-  : public ::test::TestManagedServiceInterface
-  , public cppmicroservices::service::cm::ManagedService
+namespace cppmicroservices
 {
-public:
-  TestManagedServiceImpl3();
+    namespace service
+    {
+        namespace cm
+        {
+            namespace test
+            {
 
-  virtual ~TestManagedServiceImpl3();
+                class TestManagedServiceImpl3
+                    : public ::test::TestManagedServiceInterface
+                    , public cppmicroservices::service::cm::ManagedService
+                {
+                  public:
+                    TestManagedServiceImpl3();
 
-  void Updated(AnyMap const& properties) override;
+                    virtual ~TestManagedServiceImpl3();
 
-  int getCounter() override;
+                    void Updated(AnyMap const& properties) override;
 
-private:
-  int m_counter;
-  std::mutex m_counterMtx;
-};
+                    int getCounter() override;
 
-class TestManagedServiceImpl4
-  : public ::test::TestManagedServiceInterface
-  , public cppmicroservices::service::cm::ManagedService
-{
-public:
-  TestManagedServiceImpl4();
+                  private:
+                    int m_counter;
+                    std::mutex m_counterMtx;
+                };
 
-  virtual ~TestManagedServiceImpl4();
+                class TestManagedServiceImpl4
+                    : public ::test::TestManagedServiceInterface
+                    , public cppmicroservices::service::cm::ManagedService
+                {
+                  public:
+                    TestManagedServiceImpl4();
 
-  void Updated(AnyMap const& properties) override;
+                    virtual ~TestManagedServiceImpl4();
 
-  int getCounter() override;
+                    void Updated(AnyMap const& properties) override;
 
-private:
-  int m_counter;
-  std::mutex m_counterMtx;
-};
+                    int getCounter() override;
 
-} // namespace test
-} // namespace cm
-} // namespace service
+                  private:
+                    int m_counter;
+                    std::mutex m_counterMtx;
+                };
+
+            } // namespace test
+        }     // namespace cm
+    }         // namespace service
 } // namespace cppmicroservices

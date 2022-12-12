@@ -29,67 +29,64 @@
 #include "BundleContextPrivate.h"
 #include "ServiceListenerHookPrivate.h"
 
-namespace cppmicroservices {
-
-ServiceListenerHook::~ServiceListenerHook() = default;
-
-ServiceListenerHook::ListenerInfoData::ListenerInfoData(
-  std::shared_ptr<BundleContextPrivate> context,
-  ServiceListener l,
-  void* data,
-  ListenerTokenId tokenId,
-  std::string filter)
-  : context(std::move(context))
-  , listener(std::move(l))
-  , data(data)
-  , tokenId(tokenId)
-  , filter(std::move(filter))
-  , bRemoved(false)
+namespace cppmicroservices
 {
-}
 
-ServiceListenerHook::ListenerInfoData::~ListenerInfoData() = default;
+    ServiceListenerHook::~ServiceListenerHook() = default;
 
-ServiceListenerHook::ListenerInfo::ListenerInfo(ListenerInfoData* data)
-  : d(data)
-{
-}
+    ServiceListenerHook::ListenerInfoData::ListenerInfoData(std::shared_ptr<BundleContextPrivate> context,
+                                                            ServiceListener l,
+                                                            void* data,
+                                                            ListenerTokenId tokenId,
+                                                            std::string filter)
+        : context(std::move(context))
+        , listener(std::move(l))
+        , data(data)
+        , tokenId(tokenId)
+        , filter(std::move(filter))
+        , bRemoved(false)
+    {
+    }
 
-ServiceListenerHook::ListenerInfo::ListenerInfo()
-  : d(nullptr)
-{
-}
+    ServiceListenerHook::ListenerInfoData::~ListenerInfoData() = default;
 
-ServiceListenerHook::ListenerInfo::ListenerInfo(const ListenerInfo&) = default;
+    ServiceListenerHook::ListenerInfo::ListenerInfo(ListenerInfoData* data) : d(data) {}
 
-ServiceListenerHook::ListenerInfo::~ListenerInfo() = default;
+    ServiceListenerHook::ListenerInfo::ListenerInfo() : d(nullptr) {}
 
-ServiceListenerHook::ListenerInfo& ServiceListenerHook::ListenerInfo::operator=(
-  const ListenerInfo&) = default;
+    ServiceListenerHook::ListenerInfo::ListenerInfo(ListenerInfo const&) = default;
 
-bool ServiceListenerHook::ListenerInfo::IsNull() const
-{
-  return !d;
-}
+    ServiceListenerHook::ListenerInfo::~ListenerInfo() = default;
 
-BundleContext ServiceListenerHook::ListenerInfo::GetBundleContext() const
-{
-  return MakeBundleContext(d->context);
-}
+    ServiceListenerHook::ListenerInfo& ServiceListenerHook::ListenerInfo::operator=(ListenerInfo const&) = default;
 
-std::string ServiceListenerHook::ListenerInfo::GetFilter() const
-{
-  return d->filter;
-}
+    bool
+    ServiceListenerHook::ListenerInfo::IsNull() const
+    {
+        return !d;
+    }
 
-bool ServiceListenerHook::ListenerInfo::IsRemoved() const
-{
-  return d->bRemoved;
-}
+    BundleContext
+    ServiceListenerHook::ListenerInfo::GetBundleContext() const
+    {
+        return MakeBundleContext(d->context);
+    }
 
-bool ServiceListenerHook::ListenerInfo::operator==(
-  const ListenerInfo& other) const
-{
-  return d == other.d;
-}
-}
+    std::string
+    ServiceListenerHook::ListenerInfo::GetFilter() const
+    {
+        return d->filter;
+    }
+
+    bool
+    ServiceListenerHook::ListenerInfo::IsRemoved() const
+    {
+        return d->bRemoved;
+    }
+
+    bool
+    ServiceListenerHook::ListenerInfo::operator==(ListenerInfo const& other) const
+    {
+        return d == other.d;
+    }
+} // namespace cppmicroservices

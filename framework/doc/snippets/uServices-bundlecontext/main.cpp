@@ -8,12 +8,12 @@
 
 using namespace cppmicroservices;
 
-void RetrieveBundleContext()
+void
+RetrieveBundleContext()
 {
-  auto context = GetBundleContext();
-  auto bundle = context.GetBundle();
-  std::cout << "Bundle name: " << bundle.GetSymbolicName()
-            << " [id: " << bundle.GetBundleId() << "]\n";
+    auto context = GetBundleContext();
+    auto bundle = context.GetBundle();
+    std::cout << "Bundle name: " << bundle.GetSymbolicName() << " [id: " << bundle.GetBundleId() << "]\n";
 }
 //! [GetBundleContext]
 
@@ -23,13 +23,13 @@ void RetrieveBundleContext()
 CPPMICROSERVICES_INITIALIZE_BUNDLE
 //! [InitializeBundle]
 
-int main(int /*argc*/, char* /*argv*/[])
+int
+main(int /*argc*/, char* /*argv*/[])
 {
-  std::cout
-    << "This snippet is not meant to be executed.\n"
-       "It does not provide a complete working example.\n"
-       "See "
-       "http://docs.cppmicroservices.org/en/stable/doc/src/getting_started.html"
-    << std::endl;
-  return 0;
+    std::cout << "This snippet is not meant to be executed.\n"
+                 "It does not provide a complete working example.\n"
+                 "See "
+                 "http://docs.cppmicroservices.org/en/stable/doc/src/getting_started.html"
+              << std::endl;
+    return 0;
 }

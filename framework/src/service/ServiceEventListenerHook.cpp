@@ -22,7 +22,8 @@
 
 #include "cppmicroservices/ServiceEventListenerHook.h"
 
-namespace cppmicroservices {
+namespace cppmicroservices
+{
 
-ServiceEventListenerHook::~ServiceEventListenerHook() = default;
+    ServiceEventListenerHook::~ServiceEventListenerHook() = default;
 }

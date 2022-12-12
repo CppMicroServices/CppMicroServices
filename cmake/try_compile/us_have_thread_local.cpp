@@ -2,7 +2,8 @@
 
 // We use a non-POD type for this test
 static thread_local std::string dummy;
-int main()
+int
+main()
 {
-  return 0;
+    return 0;
 }

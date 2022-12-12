@@ -29,65 +29,63 @@
 
 #include "cppmicroservices/ServiceTracker.h"
 
-namespace cppmicroservices {
-
-class HttpServletRequest;
-class HttpServletResponse;
-
-class WebConsolePluginTracker : public ServiceTracker<HttpServlet>
+namespace cppmicroservices
 {
 
-public:
-  WebConsolePluginTracker();
+    class HttpServletRequest;
+    class HttpServletResponse;
 
-  void Open(const std::shared_ptr<ServletContext>& servlet);
+    class WebConsolePluginTracker : public ServiceTracker<HttpServlet>
+    {
 
-  AbstractWebConsolePlugin* GetPlugin(const std::string& label) const;
+      public:
+        WebConsolePluginTracker();
 
-  AbstractWebConsolePlugin::TemplateData GetLabelMap(
-    const std::string& current) const;
+        void Open(std::shared_ptr<ServletContext> const& servlet);
 
-private:
-  using Superclass = ServiceTracker<HttpServlet>;
+        AbstractWebConsolePlugin* GetPlugin(std::string const& label) const;
 
-  struct LabelMapEntry
-  {
-    std::string label;
-    std::string title;
-  };
+        AbstractWebConsolePlugin::TemplateData GetLabelMap(std::string const& current) const;
 
-  void Open();
+      private:
+        using Superclass = ServiceTracker<HttpServlet>;
 
-  std::shared_ptr<HttpServlet> AddingService(
-    const ServiceReference<HttpServlet>& reference);
+        struct LabelMapEntry
+        {
+            std::string label;
+            std::string title;
+        };
 
-  void AddPlugin(const std::string& label, AbstractWebConsolePlugin* plugin);
+        void Open();
 
-  std::string GetProperty(const ServiceReference<HttpServlet>& reference,
-                          const std::string& property) const;
+        std::shared_ptr<HttpServlet> AddingService(ServiceReference<HttpServlet> const& reference);
 
-  using PluginMapType = std::map<std::string, AbstractWebConsolePlugin*>;
-  PluginMapType m_Plugins;
-  std::map<std::string, LabelMapEntry> m_LabelMap;
+        void AddPlugin(std::string const& label, AbstractWebConsolePlugin* plugin);
 
-  std::shared_ptr<ServletContext> m_ServletContext;
-};
+        std::string GetProperty(ServiceReference<HttpServlet> const& reference, std::string const& property) const;
 
-class WebConsoleServlet : public HttpServlet
-{
+        using PluginMapType = std::map<std::string, AbstractWebConsolePlugin*>;
+        PluginMapType m_Plugins;
+        std::map<std::string, LabelMapEntry> m_LabelMap;
 
-public:
-  WebConsoleServlet();
+        std::shared_ptr<ServletContext> m_ServletContext;
+    };
 
-  void Init(const ServletConfig& config);
+    class WebConsoleServlet : public HttpServlet
+    {
 
-private:
-  void Service(HttpServletRequest& request, HttpServletResponse& response);
+      public:
+        WebConsoleServlet();
 
-  AbstractWebConsolePlugin* GetConsolePlugin(const std::string& label) const;
+        void Init(ServletConfig const& config);
 
-  WebConsolePluginTracker m_PluginTracker;
-};
-}
+      private:
+        void Service(HttpServletRequest& request, HttpServletResponse& response);
+
+        AbstractWebConsolePlugin* GetConsolePlugin(std::string const& label) const;
+
+        WebConsolePluginTracker m_PluginTracker;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_WEBCONSOLESERVLET_H

@@ -31,287 +31,310 @@ using cppmicroservices::Constants::SCOPE_PROTOTYPE;
 using cppmicroservices::Constants::SERVICE_SCOPE;
 using cppmicroservices::logservice::SeverityLevel;
 using cppmicroservices::service::component::ComponentConstants::COMPONENT_NAME;
-using cppmicroservices::service::component::ComponentConstants::
-  REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
+using cppmicroservices::service::component::ComponentConstants::REFERENCE_SCOPE_PROTOTYPE_REQUIRED;
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-/**
- * @brief Returns the LDAPFilter of the reference metadata
- * @param refMetadata The metadata representing a service reference
- * @returns a LDAPFilter object corresponding to the @p refMetadata
- */
-LDAPFilter GetReferenceLDAPFilter(
-  const metadata::ReferenceMetadata& refMetadata)
+namespace cppmicroservices
 {
-  LDAPPropExpr expr;
-  expr = (LDAPProp(cppmicroservices::Constants::OBJECTCLASS) ==
-          refMetadata.interfaceName);
-  if (!refMetadata.target.empty()) {
-    expr &= LDAPPropExpr(refMetadata.target);
-  }
+    namespace scrimpl
+    {
 
-  if (refMetadata.scope == REFERENCE_SCOPE_PROTOTYPE_REQUIRED) {
-    expr &= (LDAPProp(SERVICE_SCOPE) == SCOPE_PROTOTYPE);
-  }
-  return LDAPFilter(expr);
-}
+        /**
+         * @brief Returns the LDAPFilter of the reference metadata
+         * @param refMetadata The metadata representing a service reference
+         * @returns a LDAPFilter object corresponding to the @p refMetadata
+         */
+        LDAPFilter
+        GetReferenceLDAPFilter(metadata::ReferenceMetadata const& refMetadata)
+        {
+            LDAPPropExpr expr;
+            expr = (LDAPProp(cppmicroservices::Constants::OBJECTCLASS) == refMetadata.interfaceName);
+            if (!refMetadata.target.empty())
+            {
+                expr &= LDAPPropExpr(refMetadata.target);
+            }
 
-ReferenceManagerBaseImpl::ReferenceManagerBaseImpl(
-  const metadata::ReferenceMetadata& metadata,
-  const cppmicroservices::BundleContext& bc,
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-  const std::string& configName)
-  : ReferenceManagerBaseImpl(
-      metadata,
-      bc,
-      logger,
-      configName,
-      CreateBindingPolicy(*this, metadata.policy, metadata.policyOption))
-{
-}
+            if (refMetadata.scope == REFERENCE_SCOPE_PROTOTYPE_REQUIRED)
+            {
+                expr &= (LDAPProp(SERVICE_SCOPE) == SCOPE_PROTOTYPE);
+            }
+            return LDAPFilter(expr);
+        }
 
-ReferenceManagerBaseImpl::ReferenceManagerBaseImpl(
-  const metadata::ReferenceMetadata& metadata,
-  const cppmicroservices::BundleContext& bc,
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-  const std::string& configName,
-  std::unique_ptr<BindingPolicy> policy)
-  : metadata(metadata)
-  , tracker(nullptr)
-  , logger(std::move(logger))
-  , configName(configName)
-  , bindingPolicy(std::move(policy))
-{
-  if (!bc || !this->logger) {
-    throw std::invalid_argument(
-      "Failed to create object, Invalid arguments passed to constructor");
-  }
-  try {
-    tracker = std::make_unique<ServiceTracker<void>>(
-      bc, GetReferenceLDAPFilter(metadata), this);
-    tracker->Open();
-  } catch (...) {
-    logger->Log(SeverityLevel::LOG_ERROR,
-                "could not open service tracker for " + metadata.interfaceName,
-                std::current_exception());
-    tracker.reset();
-    throw std::current_exception();
-  }
-}
+        ReferenceManagerBaseImpl::ReferenceManagerBaseImpl(
+            metadata::ReferenceMetadata const& metadata,
+            cppmicroservices::BundleContext const& bc,
+            std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+            std::string const& configName)
+            : ReferenceManagerBaseImpl(metadata,
+                                       bc,
+                                       logger,
+                                       configName,
+                                       CreateBindingPolicy(*this, metadata.policy, metadata.policyOption))
+        {
+        }
 
-void ReferenceManagerBaseImpl::StopTracking()
-{
-  try {
-    tracker->Close();
-  } catch (...) {
-    logger->Log(SeverityLevel::LOG_ERROR,
-                "Exception caught while closing service tracker for " +
-                  metadata.interfaceName,
-                std::current_exception());
-  }
-}
+        ReferenceManagerBaseImpl::ReferenceManagerBaseImpl(
+            metadata::ReferenceMetadata const& metadata,
+            cppmicroservices::BundleContext const& bc,
+            std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+            std::string const& configName,
+            std::unique_ptr<BindingPolicy> policy)
+            : metadata(metadata)
+            , tracker(nullptr)
+            , logger(std::move(logger))
+            , configName(configName)
+            , bindingPolicy(std::move(policy))
+        {
+            if (!bc || !this->logger)
+            {
+                throw std::invalid_argument("Failed to create object, Invalid arguments passed to constructor");
+            }
+            try
+            {
+                tracker = std::make_unique<ServiceTracker<void>>(bc, GetReferenceLDAPFilter(metadata), this);
+                tracker->Open();
+            }
+            catch (...)
+            {
+                logger->Log(SeverityLevel::LOG_ERROR,
+                            "could not open service tracker for " + metadata.interfaceName,
+                            std::current_exception());
+                tracker.reset();
+                throw std::current_exception();
+            }
+        }
 
-std::set<cppmicroservices::ServiceReferenceBase>
-ReferenceManagerBaseImpl::GetBoundReferences() const
-{
-  auto boundRefsHandle = boundRefs.lock();
-  return std::set<cppmicroservices::ServiceReferenceBase>(
-    boundRefsHandle->begin(), boundRefsHandle->end());
-}
+        void
+        ReferenceManagerBaseImpl::StopTracking()
+        {
+            try
+            {
+                tracker->Close();
+            }
+            catch (...)
+            {
+                logger->Log(SeverityLevel::LOG_ERROR,
+                            "Exception caught while closing service tracker for " + metadata.interfaceName,
+                            std::current_exception());
+            }
+        }
 
-std::set<cppmicroservices::ServiceReferenceBase>
-ReferenceManagerBaseImpl::GetTargetReferences() const
-{
-  auto matchedRefsHandle = matchedRefs.lock();
-  return std::set<cppmicroservices::ServiceReferenceBase>(
-    matchedRefsHandle->begin(), matchedRefsHandle->end());
-}
+        std::set<cppmicroservices::ServiceReferenceBase>
+        ReferenceManagerBaseImpl::GetBoundReferences() const
+        {
+            auto boundRefsHandle = boundRefs.lock();
+            return std::set<cppmicroservices::ServiceReferenceBase>(boundRefsHandle->begin(), boundRefsHandle->end());
+        }
 
-bool ReferenceManagerBaseImpl::IsOptional() const
-{
-  return (metadata.minCardinality == 0);
-}
+        std::set<cppmicroservices::ServiceReferenceBase>
+        ReferenceManagerBaseImpl::GetTargetReferences() const
+        {
+            auto matchedRefsHandle = matchedRefs.lock();
+            return std::set<cppmicroservices::ServiceReferenceBase>(matchedRefsHandle->begin(),
+                                                                    matchedRefsHandle->end());
+        }
 
-bool ReferenceManagerBaseImpl::IsSatisfied() const
-{
-  return (boundRefs.lock()->size() >= metadata.minCardinality);
-}
+        bool
+        ReferenceManagerBaseImpl::IsOptional() const
+        {
+            return (metadata.minCardinality == 0);
+        }
 
-ReferenceManagerBaseImpl::~ReferenceManagerBaseImpl()
-{
-  StopTracking();
-}
+        bool
+        ReferenceManagerBaseImpl::IsSatisfied() const
+        {
+            return (boundRefs.lock()->size() >= metadata.minCardinality);
+        }
 
-struct dummyRefObj
-{};
+        ReferenceManagerBaseImpl::~ReferenceManagerBaseImpl() { StopTracking(); }
 
-bool ReferenceManagerBaseImpl::UpdateBoundRefs()
-{
-  auto matchedRefsHandle = matchedRefs.lock(); // acquires lock on matchedRefs
-  const auto matchedRefsHandleSize = matchedRefsHandle->size();
-  if (matchedRefsHandleSize >= metadata.minCardinality) {
-    auto boundRefsHandle = boundRefs.lock(); // acquires lock on boundRefs
-    boundRefsHandle->clear();
-    std::copy_n(matchedRefsHandle->rbegin(),
-                std::min(metadata.maxCardinality, matchedRefsHandleSize),
-                std::inserter(*(boundRefsHandle), boundRefsHandle->begin()));
-    return true;
-  }
-  return false;
-  // release locks on matchedRefs and boundRefs
-}
+        struct dummyRefObj
+        {
+        };
 
-cppmicroservices::InterfaceMapConstPtr ReferenceManagerBaseImpl::AddingService(
-  const cppmicroservices::ServiceReference<void>& reference)
-{
-  // Each service registered by DS contains a service property representing the component configuration name
-  // to which it belongs. By checking the component configuration name of a service it can be determined
-  // whether this service will satisfy its own reference. If it would, it is not a matched reference as
-  // a service from the same component configuration can't satisfy its own reference.
-  //
-  // ASSUMPTION: If there is no component configuration name then its assumed this service was not registered by
-  // DS and could not satisfy itself since it is not managed by DS.
-  auto const compConfigName = reference.GetProperty(COMPONENT_NAME);
-  if ((true == compConfigName.Empty()) ||
-      (configName != compConfigName.ToStringNoExcept())) {
-    // acquire lock on matchedRefs
-    auto matchedRefsHandle = matchedRefs.lock();
-    matchedRefsHandle->insert(reference);
-  } // release lock on matchedRefs
+        bool
+        ReferenceManagerBaseImpl::UpdateBoundRefs()
+        {
+            auto matchedRefsHandle = matchedRefs.lock(); // acquires lock on matchedRefs
+            auto const matchedRefsHandleSize = matchedRefsHandle->size();
+            if (matchedRefsHandleSize >= metadata.minCardinality)
+            {
+                auto boundRefsHandle = boundRefs.lock(); // acquires lock on boundRefs
+                boundRefsHandle->clear();
+                std::copy_n(matchedRefsHandle->rbegin(),
+                            std::min(metadata.maxCardinality, matchedRefsHandleSize),
+                            std::inserter(*(boundRefsHandle), boundRefsHandle->begin()));
+                return true;
+            }
+            return false;
+            // release locks on matchedRefs and boundRefs
+        }
 
-  // After updating the bound references on this thread, notifying listeners happens on the same thread.
-  // This behavior deviates from what is described in the "synchronous" section in
-  // https://osgi.org/download/r6/osgi.core-6.0.0.pdf#page=432. Sporadically not returning a valid service
-  // when a user calls getService, due to a service's references still resolving, was deemed undesirable
-  // for user workflows.
-  bindingPolicy->ServiceAdded(reference);
+        cppmicroservices::InterfaceMapConstPtr
+        ReferenceManagerBaseImpl::AddingService(cppmicroservices::ServiceReference<void> const& reference)
+        {
+            // Each service registered by DS contains a service property representing the component configuration name
+            // to which it belongs. By checking the component configuration name of a service it can be determined
+            // whether this service will satisfy its own reference. If it would, it is not a matched reference as
+            // a service from the same component configuration can't satisfy its own reference.
+            //
+            // ASSUMPTION: If there is no component configuration name then its assumed this service was not registered
+            // by DS and could not satisfy itself since it is not managed by DS.
+            auto const compConfigName = reference.GetProperty(COMPONENT_NAME);
+            if ((true == compConfigName.Empty()) || (configName != compConfigName.ToStringNoExcept()))
+            {
+                // acquire lock on matchedRefs
+                auto matchedRefsHandle = matchedRefs.lock();
+                matchedRefsHandle->insert(reference);
+            } // release lock on matchedRefs
 
-  // A non-null object must be returned to indicate to the ServiceTracker that
-  // we are tracking the service and need to be called back when the service is removed.
-  return MakeInterfaceMap<dummyRefObj>(std::make_shared<dummyRefObj>());
-}
+            // After updating the bound references on this thread, notifying listeners happens on the same thread.
+            // This behavior deviates from what is described in the "synchronous" section in
+            // https://osgi.org/download/r6/osgi.core-6.0.0.pdf#page=432. Sporadically not returning a valid service
+            // when a user calls getService, due to a service's references still resolving, was deemed undesirable
+            // for user workflows.
+            bindingPolicy->ServiceAdded(reference);
 
-void ReferenceManagerBaseImpl::ModifiedService(
-  const cppmicroservices::ServiceReference<void>& /*reference*/,
-  const cppmicroservices::InterfaceMapConstPtr& /*service*/)
-{
-  // no-op since there is no use case for property update
-}
+            // A non-null object must be returned to indicate to the ServiceTracker that
+            // we are tracking the service and need to be called back when the service is removed.
+            return MakeInterfaceMap<dummyRefObj>(std::make_shared<dummyRefObj>());
+        }
 
-/**
- * If a target service is available to replace the bound service which became unavailable,
- * the component configuration must be reactivated and the replacement service is bound to
- * the new component instance.
- */
-void ReferenceManagerBaseImpl::RemovedService(
-  const cppmicroservices::ServiceReference<void>& reference,
-  const cppmicroservices::InterfaceMapConstPtr& /*service*/)
-{
-  { // acquire lock on matchedRefs
-    auto matchedRefsHandle = matchedRefs.lock();
-    matchedRefsHandle->erase(reference);
-  } // release lock on matchedRefs
+        void
+        ReferenceManagerBaseImpl::ModifiedService(cppmicroservices::ServiceReference<void> const& /*reference*/,
+                                                  cppmicroservices::InterfaceMapConstPtr const& /*service*/)
+        {
+            // no-op since there is no use case for property update
+        }
 
-  // After updating the bound references on this thread, notifying listeners happens on the same thread.
-  // This behavior deviates from what is described in the "synchronous" section in
-  // https://osgi.org/download/r6/osgi.core-6.0.0.pdf#page=432. Sometimes not returning a valid service
-  // due to a service's references still resolving was deemed undesirable for user workflows.
-  bindingPolicy->ServiceRemoved(reference);
-}
+        /**
+         * If a target service is available to replace the bound service which became unavailable,
+         * the component configuration must be reactivated and the replacement service is bound to
+         * the new component instance.
+         */
+        void
+        ReferenceManagerBaseImpl::RemovedService(cppmicroservices::ServiceReference<void> const& reference,
+                                                 cppmicroservices::InterfaceMapConstPtr const& /*service*/)
+        {
+            { // acquire lock on matchedRefs
+                auto matchedRefsHandle = matchedRefs.lock();
+                matchedRefsHandle->erase(reference);
+            } // release lock on matchedRefs
 
-std::atomic<cppmicroservices::ListenerTokenId>
-  ReferenceManagerBaseImpl::tokenCounter(0);
+            // After updating the bound references on this thread, notifying listeners happens on the same thread.
+            // This behavior deviates from what is described in the "synchronous" section in
+            // https://osgi.org/download/r6/osgi.core-6.0.0.pdf#page=432. Sometimes not returning a valid service
+            // due to a service's references still resolving was deemed undesirable for user workflows.
+            bindingPolicy->ServiceRemoved(reference);
+        }
 
-/**
- * Method is used to register a listener for callbacks
- */
-cppmicroservices::ListenerTokenId ReferenceManagerBaseImpl::RegisterListener(
-  std::function<void(const RefChangeNotification&)> notify)
-{
-  auto notifySatisfied = UpdateBoundRefs();
-  if (notifySatisfied) {
-    RefChangeNotification notification{ metadata.name,
-                                        RefEvent::BECAME_SATISFIED };
-    notify(notification);
-  }
+        std::atomic<cppmicroservices::ListenerTokenId> ReferenceManagerBaseImpl::tokenCounter(0);
 
-  cppmicroservices::ListenerTokenId retToken = ++tokenCounter;
-  {
-    auto listenerMapHandle = listenersMap.lock();
-    listenerMapHandle->emplace(retToken, notify);
-  }
-  return retToken;
-}
+        /**
+         * Method is used to register a listener for callbacks
+         */
+        cppmicroservices::ListenerTokenId
+        ReferenceManagerBaseImpl::RegisterListener(std::function<void(RefChangeNotification const&)> notify)
+        {
+            auto notifySatisfied = UpdateBoundRefs();
+            if (notifySatisfied)
+            {
+                RefChangeNotification notification { metadata.name, RefEvent::BECAME_SATISFIED };
+                notify(notification);
+            }
 
-/**
- * Method is used to remove a registered listener
- */
-void ReferenceManagerBaseImpl::UnregisterListener(
-  cppmicroservices::ListenerTokenId token)
-{
-  auto listenerMapHandle = listenersMap.lock();
-  listenerMapHandle->erase(token);
-}
+            cppmicroservices::ListenerTokenId retToken = ++tokenCounter;
+            {
+                auto listenerMapHandle = listenersMap.lock();
+                listenerMapHandle->emplace(retToken, notify);
+            }
+            return retToken;
+        }
 
-/**
- * Method used to notify all listeners
- */
-void ReferenceManagerBaseImpl::BatchNotifyAllListeners(
-  const std::vector<RefChangeNotification>& notifications) noexcept
-{
-  if (notifications.empty() || listenersMap.lock()->empty()) {
-    return;
-  }
+        /**
+         * Method is used to remove a registered listener
+         */
+        void
+        ReferenceManagerBaseImpl::UnregisterListener(cppmicroservices::ListenerTokenId token)
+        {
+            auto listenerMapHandle = listenersMap.lock();
+            listenerMapHandle->erase(token);
+        }
 
-  RefMgrListenerMap listenersMapCopy;
-  {
-    auto listenerMapHandle = listenersMap.lock();
-    listenersMapCopy = *listenerMapHandle; // copy the listeners map
-  }
+        /**
+         * Method used to notify all listeners
+         */
+        void
+        ReferenceManagerBaseImpl::BatchNotifyAllListeners(
+            std::vector<RefChangeNotification> const& notifications) noexcept
+        {
+            if (notifications.empty() || listenersMap.lock()->empty())
+            {
+                return;
+            }
 
-  for (auto& listenerPair : listenersMapCopy) {
-    for (auto const& notification : notifications) {
-      try {
-        listenerPair.second(notification);
-      } catch (...) {
-        logger->Log(SeverityLevel::LOG_ERROR,
-                    "Exception caught while notifying service reference "
-                    "listeners for reference name " +
-                      notification.senderName,
-                    std::current_exception());
-      }
-    }
-  }
-}
+            RefMgrListenerMap listenersMapCopy;
+            {
+                auto listenerMapHandle = listenersMap.lock();
+                listenersMapCopy = *listenerMapHandle; // copy the listeners map
+            }
 
-// util method to extract service-id from a given reference
-long ReferenceManagerBaseImpl::GetServiceId(const ServiceReferenceBase& sRef)
-{
-  auto idAny = sRef.GetProperty(cppmicroservices::Constants::SERVICE_ID);
-  return cppmicroservices::any_cast<long>(idAny);
-}
+            for (auto& listenerPair : listenersMapCopy)
+            {
+                for (auto const& notification : notifications)
+                {
+                    try
+                    {
+                        listenerPair.second(notification);
+                    }
+                    catch (...)
+                    {
+                        logger->Log(SeverityLevel::LOG_ERROR,
+                                    "Exception caught while notifying service reference "
+                                    "listeners for reference name "
+                                        + notification.senderName,
+                                    std::current_exception());
+                    }
+                }
+            }
+        }
 
-std::unique_ptr<ReferenceManagerBaseImpl::BindingPolicy>
-ReferenceManagerBaseImpl::CreateBindingPolicy(ReferenceManagerBaseImpl& ref,
-                                              const std::string& policy,
-                                              const std::string& policyOption)
-{
-  if (policy == "static") {
-    if (policyOption == "reluctant") {
-      return std::make_unique<BindingPolicyStaticReluctant>(ref);
-    } else { // greedy
-      return std::make_unique<BindingPolicyStaticGreedy>(ref);
-    }
-  } else { // dynamic
-    if (policyOption == "reluctant") {
-      return std::make_unique<BindingPolicyDynamicReluctant>(ref);
-    } else { // greedy
-      return std::make_unique<BindingPolicyDynamicGreedy>(ref);
-    }
-  }
-}
+        // util method to extract service-id from a given reference
+        long
+        ReferenceManagerBaseImpl::GetServiceId(ServiceReferenceBase const& sRef)
+        {
+            auto idAny = sRef.GetProperty(cppmicroservices::Constants::SERVICE_ID);
+            return cppmicroservices::any_cast<long>(idAny);
+        }
 
-}
-}
+        std::unique_ptr<ReferenceManagerBaseImpl::BindingPolicy>
+        ReferenceManagerBaseImpl::CreateBindingPolicy(ReferenceManagerBaseImpl& ref,
+                                                      std::string const& policy,
+                                                      std::string const& policyOption)
+        {
+            if (policy == "static")
+            {
+                if (policyOption == "reluctant")
+                {
+                    return std::make_unique<BindingPolicyStaticReluctant>(ref);
+                }
+                else
+                { // greedy
+                    return std::make_unique<BindingPolicyStaticGreedy>(ref);
+                }
+            }
+            else
+            { // dynamic
+                if (policyOption == "reluctant")
+                {
+                    return std::make_unique<BindingPolicyDynamicReluctant>(ref);
+                }
+                else
+                { // greedy
+                    return std::make_unique<BindingPolicyDynamicGreedy>(ref);
+                }
+            }
+        }
+
+    } // namespace scrimpl
+} // namespace cppmicroservices

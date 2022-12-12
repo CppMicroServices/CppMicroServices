@@ -24,33 +24,34 @@
 
 #include <ostream>
 
-namespace cppmicroservices {
-
-ServiceException::~ServiceException() = default;
-
-ServiceException::ServiceException(const std::string& msg, const Type& type)
-  : std::runtime_error(msg)
-  , type(type)
+namespace cppmicroservices
 {
-}
 
-ServiceException::ServiceException(const ServiceException&) = default;
+    ServiceException::~ServiceException() = default;
 
-ServiceException& ServiceException::operator=(const ServiceException& o)
+    ServiceException::ServiceException(std::string const& msg, Type const& type) : std::runtime_error(msg), type(type)
+    {
+    }
+
+    ServiceException::ServiceException(ServiceException const&) = default;
+
+    ServiceException&
+    ServiceException::operator=(ServiceException const& o)
+    {
+        std::runtime_error::operator=(o);
+        this->type = o.type;
+        return *this;
+    }
+
+    ServiceException::Type
+    ServiceException::GetType() const
+    {
+        return type;
+    }
+} // namespace cppmicroservices
+
+std::ostream&
+operator<<(std::ostream& os, cppmicroservices::ServiceException const& exc)
 {
-  std::runtime_error::operator=(o);
-  this->type = o.type;
-  return *this;
-}
-
-ServiceException::Type ServiceException::GetType() const
-{
-  return type;
-}
-}
-
-std::ostream& operator<<(std::ostream& os,
-                         const cppmicroservices::ServiceException& exc)
-{
-  return os << "ServiceException: " << exc.what();
+    return os << "ServiceException: " << exc.what();
 }

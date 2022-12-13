@@ -25,7 +25,7 @@ public:
   using LocalCache = std::vector<StringList>;
 
 private:
-  struct NoFilter {};
+  struct AlwaysMatchFilter {};
 
   // T is one of ServiceReferenceBase or Bundle
   template<typename T>
@@ -45,7 +45,7 @@ private:
     {
       return filter.Match(ref);
     }
-    bool operator()(const NoFilter&) const { return true; }
+    bool operator()(const AlwaysMatchFilter&) const { return true; }
 
   private:
     const T& ref;
@@ -64,7 +64,7 @@ private:
       return filter.GetMatchedObjectClasses(matchedClasses);
     }
     bool operator()(const cppmicroservices::JSONFilter&) const { return false; }
-    bool operator()(const NoFilter&) const { return false; }
+    bool operator()(const AlwaysMatchFilter&) const { return false; }
     
   private:
     ObjectClassSet& matchedClasses;
@@ -86,7 +86,7 @@ private:
       return false;
     }
     bool operator()(const cppmicroservices::JSONFilter&) const { return false; }
-    bool operator()(const NoFilter&) const { return false; }
+    bool operator()(const AlwaysMatchFilter&) const { return false; }
   private:
     const StringList& keywords;
     LocalCache& cache;
@@ -100,7 +100,7 @@ private:
       return filter.IsComplicated();
     }
     bool operator()(const cppmicroservices::JSONFilter&) const { return true; }
-    bool operator()(const NoFilter&) const { return false; }
+    bool operator()(const AlwaysMatchFilter&) const { return false; }
   };
 
 
@@ -115,7 +115,7 @@ private:
     {
       return filter.ToString();
     }
-    std::string operator()(const NoFilter&) const { return ""; }
+    std::string operator()(const AlwaysMatchFilter&) const { return ""; }
   };
 
 
@@ -127,7 +127,7 @@ public:
     : filter()
   {
     if (filter_string.empty()) {
-      filter = NoFilter {};
+      filter = AlwaysMatchFilter {};
     }
     else if (isLDAPFilterString(filter_string)) {
       filter = cppmicroservices::LDAPFilter(std::move(filter_string));
@@ -221,8 +221,7 @@ private:
     return (!filter_string.empty() && ('(' == filter_string.at(0)));
   }
 
-  std::variant<cppmicroservices::LDAPFilter, cppmicroservices::JSONFilter, NoFilter>
-    filter;
+  std::variant<cppmicroservices::LDAPFilter, cppmicroservices::JSONFilter, AlwaysMatchFilter> filter;
 };
 
 } // namespace cppmicroservices

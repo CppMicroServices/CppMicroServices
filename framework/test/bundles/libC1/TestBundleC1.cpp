@@ -57,7 +57,7 @@ public:
       cppmicroservices::LDAPProp(Constants::OBJECTCLASS) ==
         "org.cppmicroservices.c1.*" &&
       cppmicroservices::LDAPProp("i") == 5);
-    tracker.reset(new ServiceTracker<void>(context, FilterAdapter(filter), this));
+    tracker.reset(new ServiceTracker<void>(context, filter, this));
     tracker->Open();
 
     std::promise<void> p;

@@ -52,23 +52,23 @@ TEST(LDAPExprTest, GetMatchedObjectClasses)
   context.RegisterService<MyInterfaceOne>(serviceOne);
 
   LDAPFilter filter("(&(objectclass=alpha)(objectclass=beta))");
-  ServiceTracker<MyInterfaceOne> tracker(context, FilterAdapter(filter), nullptr);
+  ServiceTracker<MyInterfaceOne> tracker(context, filter, nullptr);
   tracker.Open();
 
   LDAPFilter filter1("(&(objectclass=beta)(objectclass=alpha))");
-  ServiceTracker<MyInterfaceOne> tracker1(context, FilterAdapter(filter1), nullptr);
+  ServiceTracker<MyInterfaceOne> tracker1(context, filter1, nullptr);
   tracker1.Open();
 
   LDAPFilter filter2("(|(objectclass=alpha)(objectclass=beta))");
-  ServiceTracker<MyInterfaceOne> tracker2(context, FilterAdapter(filter2), nullptr);
+  ServiceTracker<MyInterfaceOne> tracker2(context, filter2, nullptr);
   tracker2.Open();
 
   LDAPFilter filter3("(&(objectclass=alpha)(objectclass=alpha))");
-  ServiceTracker<MyInterfaceOne> tracker3(context, FilterAdapter(filter3), nullptr);
+  ServiceTracker<MyInterfaceOne> tracker3(context, filter3, nullptr);
   tracker3.Open();
 
   LDAPFilter filter4("(|(object=alpha)(object=beta))");
-  ServiceTracker<MyInterfaceOne> tracker4(context, FilterAdapter(filter4), nullptr);
+  ServiceTracker<MyInterfaceOne> tracker4(context, filter4, nullptr);
   tracker4.Open();
 
   ASSERT_TRUE(tracker.GetServiceReferences().size() == 0);

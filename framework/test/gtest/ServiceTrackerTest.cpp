@@ -155,7 +155,7 @@ TEST_F(ServiceTrackerTestFixture, TestFilterString)
   MyCustomizer customizer(context);
 
   LDAPFilter filter("(" + Constants::SERVICE_ID + ">=0)");
-  ServiceTracker<MyInterfaceOne> tracker(context, FilterAdapter(filter), &customizer);
+  ServiceTracker<MyInterfaceOne> tracker(context, filter, &customizer);
   tracker.Open();
 
   struct MyServiceOne : public MyInterfaceOne
@@ -171,17 +171,14 @@ TEST_F(ServiceTrackerTestFixture, TestFilterString)
 
   EXPECT_EQ(tracker.GetServiceReferences().size(), 1) << "tracking count";
 }
-/*
-* This test is currenty failing in 
+
 TEST_F(ServiceTrackerTestFixture, TestFilterStringUsingJSONFilter)
 {
   BundleContext context = framework.GetBundleContext();
   MyCustomizer customizer(context);
 
-  cppmicroservices::JSONFilter filter(
-  cppmicroservices::Constants::SERVICE_ID + ">= '0'");
-  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(
-    context, filter, &customizer);
+  cppmicroservices::JSONFilter filter(cppmicroservices::Constants::SERVICE_ID + " >= 0");
+  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context, filter, &customizer);
   tracker.Open();
 
   struct MyServiceOne : public MyInterfaceOne
@@ -197,7 +194,7 @@ TEST_F(ServiceTrackerTestFixture, TestFilterStringUsingJSONFilter)
 
   EXPECT_EQ(tracker.GetServiceReferences().size(), 1) << "tracking count";
 }
-*/
+
 TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
 {
   BundleContext context = framework.GetBundleContext();

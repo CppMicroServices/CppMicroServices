@@ -55,7 +55,7 @@ public:
 
   explicit ServiceTrackerPrivate(ServiceTracker<S, T>* st,
                         const BundleContext& context,
-                        const FilterAdapter& filter,
+                        FilterAdapter filter,
                         ServiceTrackerCustomizer<S, T>* customizer);
 
   ~ServiceTrackerPrivate();

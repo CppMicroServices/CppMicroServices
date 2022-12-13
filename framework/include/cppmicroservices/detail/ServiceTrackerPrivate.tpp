@@ -98,10 +98,10 @@ template<class S, class TTT>
 ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
     ServiceTracker<S,T>* st,
     const BundleContext& context,
-    const FilterAdapter& f,
+    FilterAdapter f,
     ServiceTrackerCustomizer<S,T>* customizer
     )
-  : context(context), filter(f), customizer(customizer),
+  : context(context), filter(std::move(f)), customizer(customizer),
     listenerFilter(filter.ToString()), listenerToken(), trackReference(),
     trackedService(), cachedReference(), cachedService(), q_ptr(st)
 {

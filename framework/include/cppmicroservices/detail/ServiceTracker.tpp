@@ -72,9 +72,9 @@ ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
 
 template<class S, class T>
 ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
-                                     const FilterAdapter& filter,
+                                     FilterAdapter filter,
                                      _ServiceTrackerCustomizer* customizer)
-  : d(new _ServiceTrackerPrivate(this, context, filter, customizer))
+  : d(new _ServiceTrackerPrivate(this, context, std::move(filter), customizer))
 {}
 
 template<class S, class T>

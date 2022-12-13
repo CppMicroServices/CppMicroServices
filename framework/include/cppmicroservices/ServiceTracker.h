@@ -174,7 +174,7 @@ public:
    *        <code>ServiceTrackerCustomizer</code> methods on itself.
    */
   explicit ServiceTracker(const BundleContext& context,
-                 const FilterAdapter& filter,
+                 FilterAdapter filter,
                  ServiceTrackerCustomizer<S, T>* customizer = nullptr);
 
   /**

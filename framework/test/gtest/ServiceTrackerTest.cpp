@@ -172,13 +172,15 @@ TEST_F(ServiceTrackerTestFixture, TestFilterString)
   EXPECT_EQ(tracker.GetServiceReferences().size(), 1) << "tracking count";
 }
 
-#if NEVER
+
 TEST_F(ServiceTrackerTestFixture, TestFilterStringUsingJSONFilter)
 {
   BundleContext context = framework.GetBundleContext();
   MyCustomizer customizer(context);
 
-  cppmicroservices::JSONFilter filter(cppmicroservices::Constants::SERVICE_ID + ">=0");
+  // NOTE: The "key" MUST be enclosed in quotation marks (e.g. "service.id")
+  //       AND the value to compare MUST be enclosed in "`".
+  cppmicroservices::JSONFilter filter("\"" + Constants::SERVICE_ID + "\" >= `0`");
   cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context, filter, &customizer);
   tracker.Open();
 
@@ -195,7 +197,6 @@ TEST_F(ServiceTrackerTestFixture, TestFilterStringUsingJSONFilter)
 
   EXPECT_EQ(tracker.GetServiceReferences().size(), 1) << "tracking count";
 }
-#endif
 
 TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
 {

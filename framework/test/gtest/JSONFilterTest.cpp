@@ -80,3 +80,14 @@ TEST(JSONFilter, DefaultConstructedMatch)
   ASSERT_NO_THROW(filter.Match(ServiceReferenceU()));
   ASSERT_NO_THROW(filter.Match(Bundle()));
 }
+
+TEST(JSONFilter,DotNames)
+{
+  AnyMap serviceIdMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+  serviceIdMap["service.id"] = 1;
+
+  
+  JSONFilter filter("\"service.id\">=`0`");
+  bool rval = filter.Match(serviceIdMap);
+  ASSERT_TRUE(rval);
+}

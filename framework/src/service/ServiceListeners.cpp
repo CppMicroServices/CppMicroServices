@@ -435,7 +435,6 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
   // Get a copy of the service reference and keep it until we are
   // done with its properties.
   auto ref = evt.GetServiceReference();
-  auto props = ref.d.load()->GetProperties();
 
   {
     auto l = this->Lock();
@@ -445,11 +444,12 @@ void ServiceListeners::GetMatchingServiceListeners(const ServiceEvent& evt,
     for (auto& sse : complicatedListeners) {
       if (receivers.count(sse) == 0)
         continue;
-      if (sse.MatchFilter(props->GetPropsAnyMap())) {
+      if (sse.MatchFilter(ref)) {
         set.insert(sse);
       }
     }
 
+    auto props = ref.d.load()->GetProperties();
     // Check the cache
     const auto c = any_cast<std::vector<std::string>>(
       props->Value_unlocked(Constants::OBJECTCLASS).first);

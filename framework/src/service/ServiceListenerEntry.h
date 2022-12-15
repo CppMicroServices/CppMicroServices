@@ -79,7 +79,7 @@ public:
 
   std::size_t Hash() const;
 
-  bool MatchFilter(const AnyMap& props) const;
+  bool MatchFilter(const ServiceReferenceBase&) const;
   bool IsComplicatedFilter() const;
   bool AddToSimpleCache(const StringList& keywords, LocalCache& cache) const;
 };

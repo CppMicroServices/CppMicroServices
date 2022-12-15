@@ -6,6 +6,7 @@ set(_srcs
   util/Any.cpp
   util/AnyMap.cpp
   util/CFRLogger.cpp
+  util/FilterAdapter.cpp
   util/Framework.cpp
   util/FrameworkEvent.cpp
   util/FrameworkFactory.cpp

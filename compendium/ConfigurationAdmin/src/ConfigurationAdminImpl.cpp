@@ -334,50 +334,38 @@ ConfigurationAdminImpl::GetFactoryConfiguration(const std::string& factoryPid,
  * Regular expressions are allowed. 
  */
 std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
-ConfigurationAdminImpl::ListConfigurations(const std::string& filter)
+ConfigurationAdminImpl::ListConfigurations(const std::string& filter_str)
 {
   std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
     result;
   {
     std::lock_guard<std::mutex> lk{ configurationsMutex };
 
-    // return all configuration objects if the filter is empty
-    if (filter.empty()) {
-      result.reserve(configurations.size());
-      for (const auto& it : configurations) {
-        if (it.second->HasBeenUpdatedAtLeastOnce()) {
-          result.push_back(it.second);
-        }
-      }
-      return result;
-    }
-
     // filter is not empty so look for pid and property matches
-    LDAPFilter ldap{ filter };
-    cppmicroservices::AnyMap pidMap{
-      cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS
-    };
+    FilterAdapter filter{ filter_str };
+    cppmicroservices::AnyMap pidMap{ cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
 
     for (const auto& it : configurations) {
       // configurations that have not yet been updated cannot be
       // returned.
+
       if (!it.second->HasBeenUpdatedAtLeastOnce()) {
         continue;
       }
-      /* Create an AnyMap containing the pid or factoryPid so that the ldap filter 
-	   * functionality can be used to match the pid to the 
-	   * input parameter. Easy way to do the comparison since input parameter could 
-	   * contain a regular expression 
-	   */
+
+      // Create an AnyMap containing the pid or factoryPid so that the ldap filter
+      // functionality can be used to match the pid to the
+      // input parameter. Easy way to do the comparison since input parameter could
+      // contain a regular expression
       pidMap["pid"] = it.first;
 
-      if (ldap.Match(pidMap)) {
+      if (filter.Match(pidMap)) {
         // This configuration object has a matching pid.
         result.emplace_back(it.second);
       } else {
         // The pid wasn't a match but the properties might be. Check those.
         auto props = it.second->GetProperties();
-        if (ldap.Match(props)) {
+        if (filter.Match(props)) {
           result.emplace_back(it.second);
         }
       }
@@ -392,7 +380,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
   std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs;
   std::vector<bool> createdOrUpdated;
   std::vector<std::shared_ptr<ConfigurationImpl>> configurationsToInvalidate;
-  
+
   {
     std::lock_guard<std::mutex> lk{ configurationsMutex };
     for (const auto& configMetadata : configurationMetadata) {

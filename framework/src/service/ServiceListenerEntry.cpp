@@ -165,9 +165,9 @@ std::size_t ServiceListenerEntry::Hash() const
   return static_cast<ServiceListenerEntryData*>(d.get())->hashValue;
 }
 
-bool ServiceListenerEntry::MatchFilter(const AnyMap& props) const
+bool ServiceListenerEntry::MatchFilter(const ServiceReferenceBase& srb) const
 {
-  return static_cast<ServiceListenerEntryData*>(d.get())->filter.Match(props);
+  return static_cast<ServiceListenerEntryData*>(d.get())->filter.Match(srb);
 }
 
 bool ServiceListenerEntry::IsComplicatedFilter() const

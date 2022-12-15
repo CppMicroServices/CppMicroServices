@@ -43,7 +43,6 @@
 #include <vector>
 
 #include "cppmicroservices/AnyMap.h"
-#include "cppmicroservices/LDAPFilter.h"
 
 #ifdef US_PLATFORM_WINDOWS
 #  include <string.h>

@@ -51,7 +51,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
   this->listenerFilter = ss.str();
   try
   {
-    this->filter = LDAPFilter(listenerFilter);
+    this->filter = listenerFilter;
   }
   catch (const std::invalid_argument& e)
   {
@@ -80,7 +80,7 @@ ServiceTrackerPrivate<S,TTT>::ServiceTrackerPrivate(
                         + clazz + ")";
   try
   {
-    this->filter = LDAPFilter(listenerFilter);
+    this->filter = listenerFilter;
   }
   catch (const std::invalid_argument& e)
   {

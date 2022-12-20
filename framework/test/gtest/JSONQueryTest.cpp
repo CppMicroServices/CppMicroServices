@@ -165,15 +165,15 @@ TEST_F(JSONQueryTest, TestJSONFilterMatchAnyMap)
   //nested
   /* Create a AnyMap with the following JSON representation:
    *
-   *   uoci : {
-   *		vec : { 
-   *			First : 1,
-   *			Second : {
-							hi : "hi"
-							there : "there" 
-						 }
-   *        }
-   *   }
+   *  uoci : {
+   *	vec : {
+   *	  First : 1,
+   *	  Second : {
+   *        hi : "hi",
+   *        there : "there"
+   *      }
+   *    }
+   *  }
    */
   std::string filter_str = "vec.Second.there =='there'";
   json = JSONFilter(filter_str);
@@ -191,7 +191,3 @@ TEST_F(JSONQueryTest, TestJSONFilterMatchAnyMap)
   uoci["vec"] = uoc;
   ASSERT_TRUE(json.Match(uoci));
 }
-
-
-
-

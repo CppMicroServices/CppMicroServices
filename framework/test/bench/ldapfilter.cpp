@@ -146,9 +146,9 @@ static void LDAPNestedServiceReference(benchmark::State& state)
         return ref_any_cast<const AnyMap>(props.AtCompoundKey("nestedProperty"));
       }();
 	
-		 for (auto _ : state) {
-		(void)filt.Match(serviceProps);
-		}
+      for (auto _ : state) {
+        (void)filt.Match(serviceProps);
+      }
     } catch (...) {
       }
    }

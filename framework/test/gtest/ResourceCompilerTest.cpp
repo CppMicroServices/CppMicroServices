@@ -768,13 +768,13 @@ TEST_F(ResourceCompilerTest, testFailureModes)
 TEST_F(ResourceCompilerTest, testManifestAddWithInvalidJSON)
 {
   std::string invalidSyntax(R"(
-		{
-		 "bundle.name": "foo",
-		 "bundle.version" : "1.0.2"
-		 "bundle.description" : "This bundle is broken!",
-		 "authors" : ["John Doe", "Douglas Reynolds", "Daniel Cannady"],
-		 "rating" : 5
-		} 
+                {
+                 "bundle.name": "foo",
+                 "bundle.version" : "1.0.2"
+                 "bundle.description" : "This bundle is broken!",
+                 "authors" : ["John Doe", "Douglas Reynolds", "Daniel Cannady"],
+                 "rating" : 5
+                } 
     )");
 
   createManifestFile(tempdir, invalidSyntax);
@@ -924,13 +924,13 @@ TEST_F(ResourceCompilerTest, testUnicodeManifestAdd)
 TEST_F(ResourceCompilerTest, testManifestAddWithJSONComments)
 {
   std::string jsonCommentSyntax(R"(
-		{ /* no, no, no. */
-		 "bundle.name": "foo",
-		 "bundle.version" : "1.0.2",
-		 "bundle.description" : "This bundle shouldn't have comments!",
-		 "authors" : ["John Doe", "Douglas Reynolds", "Daniel Cannady"],
-		 "rating" : 5 // no comments allowed
-		} 
+                { /* no, no, no. */
+                 "bundle.name": "foo",
+                 "bundle.version" : "1.0.2",
+                 "bundle.description" : "This bundle shouldn't have comments!",
+                 "authors" : ["John Doe", "Douglas Reynolds", "Daniel Cannady"],
+                 "rating" : 5 // no comments allowed
+                } 
     )");
 
   createManifestFile(tempdir, jsonCommentSyntax);
@@ -948,14 +948,14 @@ TEST_F(ResourceCompilerTest, testManifestAddWithJSONComments)
 TEST_F(ResourceCompilerTest, testManifestAddWithDuplicateKeys)
 {
   std::string dupKeys(R"(
-		{
-		 "bundle.name": "foo",
-		 "bundle.version" : "1.0.2",
-		 "bundle.description" : "This bundle is broken!",
-		 "authors" : ["John Doe", "Douglas Reynolds", "Daniel Cannady"],
-		 "bundle.name" : "foobar",
-		 "rating" : 5
-		}
+                {
+                 "bundle.name": "foo",
+                 "bundle.version" : "1.0.2",
+                 "bundle.description" : "This bundle is broken!",
+                 "authors" : ["John Doe", "Douglas Reynolds", "Daniel Cannady"],
+                 "bundle.name" : "foobar",
+                 "rating" : 5
+                }
     )");
 
   createManifestFile(tempdir, dupKeys);
@@ -1040,13 +1040,13 @@ TEST_F(ResourceCompilerTest, testAppendZipWithInvalidManifest)
   ASSERT_EQ(EXIT_SUCCESS, runExecutable(cmdCreateBundle.str()));
 
   std::string invalidSyntax(R"(
-		{
+                {
          "bundle.name": "foo",
          "bundle.version" : "1.0.2"
          "bundle.description" : "This bundle is broken!",
          "authors" : ["John Doe", "Douglas Reynolds", "Daniel Cannady"],
          "rating" : 5
-		} 
+                } 
     )");
 
   ManifestZipFile badZip(
@@ -1081,13 +1081,13 @@ TEST_F(ResourceCompilerTest, testZipMergeWithInvalidManifest)
   ManifestZipFile validZip(tempdir + "merged_zip.zip", manifest_json, "main");
 
   std::string invalidSyntax(R"(
-		{
-		 "bundle.name": "foo",
-		 "bundle.version" : "1.0.2"
-		 "bundle.description" : "This bundle is broken!",
-		 "authors" : ["John Doe", "Douglas Reynolds", "Daniel Cannady"],
-		 "rating" : 5
-		} 
+                {
+                 "bundle.name": "foo",
+                 "bundle.version" : "1.0.2"
+                 "bundle.description" : "This bundle is broken!",
+                 "authors" : ["John Doe", "Douglas Reynolds", "Daniel Cannady"],
+                 "rating" : 5
+                } 
     )");
 
   ManifestZipFile badZip(
@@ -1155,10 +1155,10 @@ TEST_F(ResourceCompilerTest, testMultipleManifestAdd)
   ASSERT_EQ("main/manifest.json", merged_zip[0].name);
 
   std::string invalidManifestPart(R"(
-		{
-		 "invalid": "no comma" 
-		 "never.getting" : "here"
-		} 
+                {
+                 "invalid": "no comma" 
+                 "never.getting" : "here"
+                } 
     )");
 
   createManifestFile(tempdir, invalidManifestPart, "invalid_manifest.json");

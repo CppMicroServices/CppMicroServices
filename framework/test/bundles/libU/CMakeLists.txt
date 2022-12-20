@@ -1,4 +1,4 @@
-﻿
+
 usFunctionCreateTestBundleWithResources(TestBundleU SOURCES TestBundleU.cpp RESOURCES manifest.json LINK_RESOURCES)
 
 # Codepage for the prompt needs to be changed for command-line generator

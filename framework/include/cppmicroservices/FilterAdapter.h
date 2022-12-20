@@ -21,7 +21,7 @@ using ObjectClassSet = std::unordered_set<std::string>;
 using StringList = std::vector<std::string>;
 using LocalCache = std::vector<StringList>;
 
-class US_Framework_EXPORT FilterAdapter 
+class US_Framework_EXPORT FilterAdapter
 {
 public:
   struct AlwaysMatchFilter {};

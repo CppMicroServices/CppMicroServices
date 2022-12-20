@@ -291,7 +291,7 @@ static void ParseManifestToJsonconsThenToAnyMap(benchmark::State& state) {
   }
 }
 
-static void ParseManifestToAnyMapThenToJsoncons(benchmark::State& state) { 
+static void ParseManifestToAnyMapThenToJsoncons(benchmark::State& state) {
   std::string path(US_FRAMEWORK_SOURCE_DIR);
   path += "/test/bundles/dummyService/resources/manifest.json";
   BundleManifest bm;
@@ -324,9 +324,9 @@ static void LDAPNestedServiceReference(benchmark::State& state)
         return ref_any_cast<const AnyMap>(props.AtCompoundKey("nestedProperty"));
       }();
 	
-		 for (auto _ : state) {
-		(void)filt.Match(serviceProps);
-		}
+                 for (auto _ : state) {
+                (void)filt.Match(serviceProps);
+                }
     } catch (...) {
       }
    }

@@ -29,27 +29,27 @@
 
 #include <map>
 
-namespace cppmicroservices {
-
-using MustacheData = Kainjow::Mustache::Data;
-
-/**
- * The default Web Console variable resolver class.
- *
- * This variable resolver uses Mustache template logic to resolve
- * variables.
- */
-class US_WebConsole_EXPORT WebConsoleDefaultVariableResolver
-  : public WebConsoleVariableResolver
+namespace cppmicroservices
 {
-public:
-  virtual std::string Resolve(const std::string& variable) const;
 
-  MustacheData& GetData();
+    using MustacheData = Kainjow::Mustache::Data;
 
-private:
-  MustacheData m_Data;
-};
-}
+    /**
+     * The default Web Console variable resolver class.
+     *
+     * This variable resolver uses Mustache template logic to resolve
+     * variables.
+     */
+    class US_WebConsole_EXPORT WebConsoleDefaultVariableResolver : public WebConsoleVariableResolver
+    {
+      public:
+        virtual std::string Resolve(std::string const& variable) const;
+
+        MustacheData& GetData();
+
+      private:
+        MustacheData m_Data;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_WEBCONSOLEDEFAULTVARIABLERESOLVER_H

@@ -28,151 +28,153 @@
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/detail/Threads.h"
 
-namespace cppmicroservices {
-
-namespace detail {
-
-/**
- * \ingroup MicroServices
- */
-template<class S, class TTT>
-class ServiceTrackerPrivate : MultiThreaded<>
+namespace cppmicroservices
 {
 
-public:
-  using T = typename TTT::TrackedType;
-  using TrackedParamType = typename TTT::TrackedParamType;
+    namespace detail
+    {
 
-  ServiceTrackerPrivate(ServiceTracker<S, T>* st,
-                        BundleContext context,
-                        const ServiceReference<S>& reference,
-                        ServiceTrackerCustomizer<S, T>* customizer);
+        /**
+         * \ingroup MicroServices
+         */
+        template <class S, class TTT>
+        class ServiceTrackerPrivate : MultiThreaded<>
+        {
 
-  ServiceTrackerPrivate(ServiceTracker<S, T>* st,
-                        BundleContext context,
-                        const std::string& clazz,
-                        ServiceTrackerCustomizer<S, T>* customizer);
+          public:
+            using T = typename TTT::TrackedType;
+            using TrackedParamType = typename TTT::TrackedParamType;
 
-  ServiceTrackerPrivate(ServiceTracker<S, T>* st,
-                        const BundleContext& context,
-                        const LDAPFilter& filter,
-                        ServiceTrackerCustomizer<S, T>* customizer);
+            ServiceTrackerPrivate(ServiceTracker<S, T>* st,
+                                  BundleContext context,
+                                  ServiceReference<S> const& reference,
+                                  ServiceTrackerCustomizer<S, T>* customizer);
 
-  ~ServiceTrackerPrivate();
+            ServiceTrackerPrivate(ServiceTracker<S, T>* st,
+                                  BundleContext context,
+                                  std::string const& clazz,
+                                  ServiceTrackerCustomizer<S, T>* customizer);
 
-  /**
-   * Returns the list of initial <code>ServiceReference</code>s that will be
-   * tracked by this <code>ServiceTracker</code>.
-   *
-   * @param className The class name with which the service was registered, or
-   *        <code>null</code> for all services.
-   * @param filterString The filter criteria or <code>null</code> for all
-   *        services.
-   * @return The list of initial <code>ServiceReference</code>s.
-   * @throws std::invalid_argument If the specified filterString has an
-   *         invalid syntax.
-   */
-  std::vector<ServiceReference<S>> GetInitialReferences(
-    const std::string& className,
-    const std::string& filterString);
+            ServiceTrackerPrivate(ServiceTracker<S, T>* st,
+                                  BundleContext const& context,
+                                  LDAPFilter const& filter,
+                                  ServiceTrackerCustomizer<S, T>* customizer);
 
-  void GetServiceReferences_unlocked(std::vector<ServiceReference<S>>& refs,
-                                     TrackedService<S, TTT>* t) const;
+            ~ServiceTrackerPrivate();
 
-  /**
-   * The Bundle Context used by this <code>ServiceTracker</code>.
-   */
-  BundleContext context;
+            /**
+             * Returns the list of initial <code>ServiceReference</code>s that will be
+             * tracked by this <code>ServiceTracker</code>.
+             *
+             * @param className The class name with which the service was registered, or
+             *        <code>null</code> for all services.
+             * @param filterString The filter criteria or <code>null</code> for all
+             *        services.
+             * @return The list of initial <code>ServiceReference</code>s.
+             * @throws std::invalid_argument If the specified filterString has an
+             *         invalid syntax.
+             */
+            std::vector<ServiceReference<S>> GetInitialReferences(std::string const& className,
+                                                                  std::string const& filterString);
 
-  /**
-   * The filter used by this <code>ServiceTracker</code> which specifies the
-   * search criteria for the services to track.
-   */
-  LDAPFilter filter;
+            void GetServiceReferences_unlocked(std::vector<ServiceReference<S>>& refs, TrackedService<S, TTT>* t) const;
 
-  /**
-   * The <code>ServiceTrackerCustomizer</code> for this tracker.
-   */
-  ServiceTrackerCustomizer<S, T>* customizer;
+            /**
+             * The Bundle Context used by this <code>ServiceTracker</code>.
+             */
+            BundleContext context;
 
-  /**
-   * Filter string for use when adding the ServiceListener. If this field is
-   * set, then certain optimizations can be taken since we don't have a user
-   * supplied filter.
-   */
-  std::string listenerFilter;
+            /**
+             * The filter used by this <code>ServiceTracker</code> which specifies the
+             * search criteria for the services to track.
+             */
+            LDAPFilter filter;
 
-  /**
-   * This token corresponds to the ServiceListener, whenever it is added.
-   * Otherwise, it represents an invalid token.
-   */
-  ListenerToken listenerToken;
+            /**
+             * The <code>ServiceTrackerCustomizer</code> for this tracker.
+             */
+            ServiceTrackerCustomizer<S, T>* customizer;
 
-  /**
-   * Class name to be tracked. If this field is set, then we are tracking by
-   * class name.
-   */
-  std::string trackClass;
+            /**
+             * Filter string for use when adding the ServiceListener. If this field is
+             * set, then certain optimizations can be taken since we don't have a user
+             * supplied filter.
+             */
+            std::string listenerFilter;
 
-  /**
-   * Reference to be tracked. If this field is set, then we are tracking a
-   * single ServiceReference.
-   */
-  ServiceReference<S> trackReference;
+            /**
+             * This token corresponds to the ServiceListener, whenever it is added.
+             * Otherwise, it represents an invalid token.
+             */
+            ListenerToken listenerToken;
 
-  /**
-   * Tracked services: <code>ServiceReference</code> -> customized Object and
-   * <code>ServiceListenerEntry</code> object
-   */
-  Atomic<std::shared_ptr<TrackedService<S, TTT>>> trackedService;
+            /**
+             * Class name to be tracked. If this field is set, then we are tracking by
+             * class name.
+             */
+            std::string trackClass;
 
-  /**
-   * Accessor method for the current TrackedService object. This method is only
-   * intended to be used by the unsynchronized methods which do not modify the
-   * trackedService field.
-   *
-   * @return The current Tracked object.
-   */
-  std::shared_ptr<TrackedService<S, TTT>> Tracked() const;
+            /**
+             * Reference to be tracked. If this field is set, then we are tracking a
+             * single ServiceReference.
+             */
+            ServiceReference<S> trackReference;
 
-  /**
-   * Called by the TrackedService object whenever the set of tracked services is
-   * modified. Clears the cache.
-   */
-  /*
-   * This method must not be synchronized since it is called by TrackedService while
-   * TrackedService is synchronized. We don't want synchronization interactions
-   * between the listener thread and the user thread.
-   */
-  void Modified();
+            /**
+             * Tracked services: <code>ServiceReference</code> -> customized Object and
+             * <code>ServiceListenerEntry</code> object
+             */
+            Atomic<std::shared_ptr<TrackedService<S, TTT>>> trackedService;
 
-  /**
-   * Cached ServiceReference for getServiceReference.
-   */
-  mutable Atomic<ServiceReference<S>> cachedReference;
+            /**
+             * Accessor method for the current TrackedService object. This method is only
+             * intended to be used by the unsynchronized methods which do not modify the
+             * trackedService field.
+             *
+             * @return The current Tracked object.
+             */
+            std::shared_ptr<TrackedService<S, TTT>> Tracked() const;
 
-  /**
-   * Cached service object for GetService.
-   */
-  mutable Atomic<std::shared_ptr<TrackedParamType>> cachedService;
+            /**
+             * Called by the TrackedService object whenever the set of tracked services is
+             * modified. Clears the cache.
+             */
+            /*
+             * This method must not be synchronized since it is called by TrackedService while
+             * TrackedService is synchronized. We don't want synchronization interactions
+             * between the listener thread and the user thread.
+             */
+            void Modified();
 
-private:
-  inline ServiceTracker<S, T>* q_func()
-  {
-    return static_cast<ServiceTracker<S, T>*>(q_ptr);
-  }
+            /**
+             * Cached ServiceReference for getServiceReference.
+             */
+            mutable Atomic<ServiceReference<S>> cachedReference;
 
-  inline const ServiceTracker<S, T>* q_func() const
-  {
-    return static_cast<const ServiceTracker<S, T>*>(q_ptr);
-  }
+            /**
+             * Cached service object for GetService.
+             */
+            mutable Atomic<std::shared_ptr<TrackedParamType>> cachedService;
 
-  friend class ServiceTracker<S, T>;
+          private:
+            inline ServiceTracker<S, T>*
+            q_func()
+            {
+                return static_cast<ServiceTracker<S, T>*>(q_ptr);
+            }
 
-  ServiceTracker<S, T>* const q_ptr;
-};
+            inline ServiceTracker<S, T> const*
+            q_func() const
+            {
+                return static_cast<ServiceTracker<S, T> const*>(q_ptr);
+            }
 
-} // namespace detail
+            friend class ServiceTracker<S, T>;
+
+            ServiceTracker<S, T>* const q_ptr;
+        };
+
+    } // namespace detail
 
 } // namespace cppmicroservices
 

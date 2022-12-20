@@ -28,62 +28,66 @@
 
 #include "ServiceReferenceDTO.hpp"
 
-namespace cppmicroservices {
-namespace service {
-namespace component {
-namespace runtime {
-namespace dto {
-
-/**
- \defgroup gr_satisfiedreferencedto SatisfiedReferenceDTO
- \brief Groups SatisfiedReferenceDTO related symbols.
- */
-
-/**
- * \ingroup gr_satisfiedreferencedto
- *
- * A representation of a satisfied reference.
- */
-struct SatisfiedReferenceDTO
+namespace cppmicroservices
 {
-  /**
-   * The name of the declared reference.
-   *
-   * <p>
-   * This is declared in the \c name attribute of the \c reference
-   * element of the component description.
-   *
-   * @see ReferenceDTO#name
-   */
-  std::string name;
+    namespace service
+    {
+        namespace component
+        {
+            namespace runtime
+            {
+                namespace dto
+                {
 
-  /**
-   * The target property of the satisfied reference.
-   *
-   * <p>
-   * This is the value of the {@link ComponentConfigurationDTO#properties
-   * component property} whose name is the concatenation of the
-   * {@link ReferenceDTO#name declared reference name} and
-   * &quot;.target&quot;. This must be empty string if no target property is
-   * set for the reference.
-   */
-  std::string target;
+                    /**
+                     \defgroup gr_satisfiedreferencedto SatisfiedReferenceDTO
+                     \brief Groups SatisfiedReferenceDTO related symbols.
+                     */
 
-  /**
-   * The bound services.
-   *
-   * <p>
-   * Each {@link cppmicroservices::framework::dto::ServiceReferenceDTO ServiceReferenceDTO} in the vector represents a service bound
-   * to the satisfied reference. The vector must be empty if there are no bound
-   * services.
-   */
-  std::vector<cppmicroservices::framework::dto::ServiceReferenceDTO>
-    boundServices;
-};
-}
-}
-}
-}
-}
+                    /**
+                     * \ingroup gr_satisfiedreferencedto
+                     *
+                     * A representation of a satisfied reference.
+                     */
+                    struct SatisfiedReferenceDTO
+                    {
+                        /**
+                         * The name of the declared reference.
+                         *
+                         * <p>
+                         * This is declared in the \c name attribute of the \c reference
+                         * element of the component description.
+                         *
+                         * @see ReferenceDTO#name
+                         */
+                        std::string name;
+
+                        /**
+                         * The target property of the satisfied reference.
+                         *
+                         * <p>
+                         * This is the value of the {@link ComponentConfigurationDTO#properties
+                         * component property} whose name is the concatenation of the
+                         * {@link ReferenceDTO#name declared reference name} and
+                         * &quot;.target&quot;. This must be empty string if no target property is
+                         * set for the reference.
+                         */
+                        std::string target;
+
+                        /**
+                         * The bound services.
+                         *
+                         * <p>
+                         * Each {@link cppmicroservices::framework::dto::ServiceReferenceDTO ServiceReferenceDTO} in the
+                         * vector represents a service bound to the satisfied reference. The vector must be empty if
+                         * there are no bound services.
+                         */
+                        std::vector<cppmicroservices::framework::dto::ServiceReferenceDTO> boundServices;
+                    };
+                } // namespace dto
+            }     // namespace runtime
+        }         // namespace component
+    }             // namespace service
+} // namespace cppmicroservices
 
 #endif /* SatisfiedReferenceDTO_hpp */

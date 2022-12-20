@@ -30,34 +30,35 @@
 class CivetServer;
 struct mg_connection;
 
-namespace cppmicroservices {
-
-class Any;
-class ServletContext;
-
-struct HttpServletRequestPrivate
+namespace cppmicroservices
 {
-  HttpServletRequestPrivate(std::shared_ptr<ServletContext> servletContext,
-                            CivetServer* server,
-                            mg_connection* conn);
 
-  const std::shared_ptr<ServletContext> m_ServletContext;
-  CivetServer* const m_Server;
-  struct mg_connection* const m_Connection;
+    class Any;
+    class ServletContext;
 
-  std::string m_Scheme;
-  std::string m_ServerName;
-  std::string m_ServerPort;
-  std::string m_Uri;
-  std::string m_ContextPath;
-  std::string m_ServletPath;
-  std::string m_PathInfo;
-  std::string m_QueryString;
-  std::string m_Url;
+    struct HttpServletRequestPrivate
+    {
+        HttpServletRequestPrivate(std::shared_ptr<ServletContext> servletContext,
+                                  CivetServer* server,
+                                  mg_connection* conn);
 
-  using AttributeMapType = std::map<std::string, Any>;
-  AttributeMapType m_Attributes;
-};
-}
+        const std::shared_ptr<ServletContext> m_ServletContext;
+        CivetServer* const m_Server;
+        struct mg_connection* const m_Connection;
+
+        std::string m_Scheme;
+        std::string m_ServerName;
+        std::string m_ServerPort;
+        std::string m_Uri;
+        std::string m_ContextPath;
+        std::string m_ServletPath;
+        std::string m_PathInfo;
+        std::string m_QueryString;
+        std::string m_Url;
+
+        using AttributeMapType = std::map<std::string, Any>;
+        AttributeMapType m_Attributes;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_HTTPSERVLETREQUESTPRIVATE_H

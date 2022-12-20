@@ -30,15 +30,15 @@ limitations under the License.
 TEST(SecurityExceptionTest, ctor)
 {
 
-  cppmicroservices::Bundle b;
-  std::string excMessage{ "foo" };
-  cppmicroservices::SecurityException secException(excMessage, b);
+    cppmicroservices::Bundle b;
+    std::string excMessage { "foo" };
+    cppmicroservices::SecurityException secException(excMessage, b);
 
-  cppmicroservices::SecurityException copyOfException = secException;
+    cppmicroservices::SecurityException copyOfException = secException;
 
-  ASSERT_EQ(b, secException.GetBundle());
-  ASSERT_STREQ(excMessage.c_str(), secException.what());
+    ASSERT_EQ(b, secException.GetBundle());
+    ASSERT_STREQ(excMessage.c_str(), secException.what());
 
-  ASSERT_EQ(b, copyOfException.GetBundle());
-  ASSERT_STREQ(excMessage.c_str(), copyOfException.what());
+    ASSERT_EQ(b, copyOfException.GetBundle());
+    ASSERT_STREQ(excMessage.c_str(), copyOfException.what());
 }

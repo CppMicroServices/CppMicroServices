@@ -27,132 +27,122 @@
 #include "ConcurrencyUtil.hpp"
 #include "ConfigurationNotifier.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-/**
- * This class implements the ComponentConfigurationImpl interface. It is responsible for managing the
- * singleton instance of the {@link ComponentInstance}. It also implements the ServiceFactory pattern
- * to handle {@link ServiceFactory#GetService} calls from the user.
- */
-class SingletonComponentConfigurationImpl final
-  : public ComponentConfigurationImpl
-  , public cppmicroservices::ServiceFactory
+namespace cppmicroservices
 {
-public:
-  explicit SingletonComponentConfigurationImpl(
-    std::shared_ptr<const metadata::ComponentMetadata> metadata,
-    const cppmicroservices::Bundle& bundle,
-    std::shared_ptr<ComponentRegistry> registry,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-    std::shared_ptr<ConfigurationNotifier> configNotifier,
-    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
-  SingletonComponentConfigurationImpl(
-    const SingletonComponentConfigurationImpl&) = delete;
-  SingletonComponentConfigurationImpl(SingletonComponentConfigurationImpl&&) =
-    delete;
-  SingletonComponentConfigurationImpl& operator=(
-    const SingletonComponentConfigurationImpl&) = delete;
-  SingletonComponentConfigurationImpl& operator=(
-    SingletonComponentConfigurationImpl&&) = delete;
-  ~SingletonComponentConfigurationImpl() override;
+    namespace scrimpl
+    {
 
-  /**
-   * Returns the this object as a ServiceFactory object
-   */
-  std::shared_ptr<cppmicroservices::ServiceFactory> GetFactory() override;
+        /**
+         * This class implements the ComponentConfigurationImpl interface. It is responsible for managing the
+         * singleton instance of the {@link ComponentInstance}. It also implements the ServiceFactory pattern
+         * to handle {@link ServiceFactory#GetService} calls from the user.
+         */
+        class SingletonComponentConfigurationImpl final
+            : public ComponentConfigurationImpl
+            , public cppmicroservices::ServiceFactory
+        {
+          public:
+            explicit SingletonComponentConfigurationImpl(
+                std::shared_ptr<const metadata::ComponentMetadata> metadata,
+                cppmicroservices::Bundle const& bundle,
+                std::shared_ptr<ComponentRegistry> registry,
+                std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                std::shared_ptr<ConfigurationNotifier> configNotifier,
+                std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
+            SingletonComponentConfigurationImpl(SingletonComponentConfigurationImpl const&) = delete;
+            SingletonComponentConfigurationImpl(SingletonComponentConfigurationImpl&&) = delete;
+            SingletonComponentConfigurationImpl& operator=(SingletonComponentConfigurationImpl const&) = delete;
+            SingletonComponentConfigurationImpl& operator=(SingletonComponentConfigurationImpl&&) = delete;
+            ~SingletonComponentConfigurationImpl() override;
 
-  /**
-   * Returns a new created {@link ComponentInstance} object after activating it
-   * Calling this method multiple times, will return the same object.
-   *
-   * \param the bundle making the service request
-   */
-  std::shared_ptr<ComponentInstance> CreateAndActivateComponentInstance(
-    const cppmicroservices::Bundle& bundle) /* noexcept */ override;
+            /**
+             * Returns the this object as a ServiceFactory object
+             */
+            std::shared_ptr<cppmicroservices::ServiceFactory> GetFactory() override;
 
-  /**
-   * Method called to modify the configuration properties for this component configuration. 
-   * @return false if the component instance has not provided a Modified method.
-   */
-  bool ModifyComponentInstanceProperties() override;
+            /**
+             * Returns a new created {@link ComponentInstance} object after activating it
+             * Calling this method multiple times, will return the same object.
+             *
+             * \param the bundle making the service request
+             */
+            std::shared_ptr<ComponentInstance> CreateAndActivateComponentInstance(
+                cppmicroservices::Bundle const& bundle) /* noexcept */ override;
 
-  /**
-   * Method removes the singleton {@link ComponentInstance} object created by this object.
-   */
-  void DestroyComponentInstances() /* noexcept */ override;
+            /**
+             * Method called to modify the configuration properties for this component configuration.
+             * @return false if the component instance has not provided a Modified method.
+             */
+            bool ModifyComponentInstanceProperties() override;
 
-  /**
-   * Implements the {@link ServiceFactory#GetService} interface. This method
-   * wraps the service implementation object in an {@link InterfaceMapConstPtr}
-   * This method always returns the same service implementation object.
-   * A nullptr is returned if a service instance cannot be created or activated.
-   */
-  cppmicroservices::InterfaceMapConstPtr GetService(
-    const cppmicroservices::Bundle& bundle,
-    const cppmicroservices::ServiceRegistrationBase& registration) override;
+            /**
+             * Method removes the singleton {@link ComponentInstance} object created by this object.
+             */
+            void DestroyComponentInstances() /* noexcept */ override;
 
-  /**
-   * Implements the {@link ServiceFactory#UngetService} interface. No-op since the
-   * service is a \c shared_ptr
-   */
-  void UngetService(
-    const cppmicroservices::Bundle& bundle,
-    const cppmicroservices::ServiceRegistrationBase& registration,
-    const cppmicroservices::InterfaceMapConstPtr& service) override;
+            /**
+             * Implements the {@link ServiceFactory#GetService} interface. This method
+             * wraps the service implementation object in an {@link InterfaceMapConstPtr}
+             * This method always returns the same service implementation object.
+             * A nullptr is returned if a service instance cannot be created or activated.
+             */
+            cppmicroservices::InterfaceMapConstPtr GetService(
+                cppmicroservices::Bundle const& bundle,
+                cppmicroservices::ServiceRegistrationBase const& registration) override;
 
-  /**
-   * Calls the service component's bind method while performing a dynamic rebind.
-   *
-   * \param refName is the name of the reference as defined in the SCR JSON
-   * \param ref is the service reference to the target service to bind. A default
-   *  constructed \c ServiceReferenceBase denotes that there is no service to bind.
-   */
-  void BindReference(const std::string& refName,
-                     const ServiceReferenceBase& ref) override;
+            /**
+             * Implements the {@link ServiceFactory#UngetService} interface. No-op since the
+             * service is a \c shared_ptr
+             */
+            void UngetService(cppmicroservices::Bundle const& bundle,
+                              cppmicroservices::ServiceRegistrationBase const& registration,
+                              cppmicroservices::InterfaceMapConstPtr const& service) override;
 
-  /**
-   * Calls the service component's unbind method while performing a dynamic rebind.
-   *
-   * \param refName is the name of the reference as defined in the SCR JSON
-   * \param ref is the service reference to the target service to unbind. A default
-   *  constructed \c ServiceReferenceBase denotes that there is no service to unbind.
-   */
-  void UnbindReference(const std::string& refName,
-                       const ServiceReferenceBase& ref) override;
+            /**
+             * Calls the service component's bind method while performing a dynamic rebind.
+             *
+             * \param refName is the name of the reference as defined in the SCR JSON
+             * \param ref is the service reference to the target service to bind. A default
+             *  constructed \c ServiceReferenceBase denotes that there is no service to bind.
+             */
+            void BindReference(std::string const& refName, ServiceReferenceBase const& ref) override;
 
-private:
-  FRIEND_TEST(SingletonComponentConfigurationTest,
-              TestConcurrentCreateAndActivateComponentInstance);
-  FRIEND_TEST(SingletonComponentConfigurationTest,
-              TestCreateAndActivateComponentInstance);
-  FRIEND_TEST(SingletonComponentConfigurationTest,
-              TestDestroyComponentInstances);
-  FRIEND_TEST(SingletonComponentConfigurationTest,
-              TestModifiedMethodExceptionLogging);
-  FRIEND_TEST(SingletonComponentConfigurationTest, TestGetService);
-  FRIEND_TEST(SingletonComponentConfigurationTest,
-              TestDestroyComponentInstances_DeactivateFailure);
+            /**
+             * Calls the service component's unbind method while performing a dynamic rebind.
+             *
+             * \param refName is the name of the reference as defined in the SCR JSON
+             * \param ref is the service reference to the target service to unbind. A default
+             *  constructed \c ServiceReferenceBase denotes that there is no service to unbind.
+             */
+            void UnbindReference(std::string const& refName, ServiceReferenceBase const& ref) override;
 
-  /**
-   * Set the member data, only used in tests
-   */
-  void SetComponentInstancePair(InstanceContextPair instCtxtPair);
+          private:
+            FRIEND_TEST(SingletonComponentConfigurationTest, TestConcurrentCreateAndActivateComponentInstance);
+            FRIEND_TEST(SingletonComponentConfigurationTest, TestCreateAndActivateComponentInstance);
+            FRIEND_TEST(SingletonComponentConfigurationTest, TestDestroyComponentInstances);
+            FRIEND_TEST(SingletonComponentConfigurationTest, TestModifiedMethodExceptionLogging);
+            FRIEND_TEST(SingletonComponentConfigurationTest, TestGetService);
+            FRIEND_TEST(SingletonComponentConfigurationTest, TestDestroyComponentInstances_DeactivateFailure);
 
-  /**
-   * Get the component context associated with this configuration
-   */
-  std::shared_ptr<ComponentContextImpl> GetComponentContext();
+            /**
+             * Set the member data, only used in tests
+             */
+            void SetComponentInstancePair(InstanceContextPair instCtxtPair);
 
-  /**
-   * Get the component instance associated with this configuration
-   */
-  std::shared_ptr<ComponentInstance> GetComponentInstance();
+            /**
+             * Get the component context associated with this configuration
+             */
+            std::shared_ptr<ComponentContextImpl> GetComponentContext();
 
-  Guarded<InstanceContextPair>
-    data; ///< singleton pair of component instance and context associated with this configuration
-};
-}
-}
+            /**
+             * Get the component instance associated with this configuration
+             */
+            std::shared_ptr<ComponentInstance> GetComponentInstance();
+
+            Guarded<InstanceContextPair>
+                data; ///< singleton pair of component instance and context associated with this configuration
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 
 #endif /* __SINGLETONCOMPONENTCONFIGURATION_HPP__ */

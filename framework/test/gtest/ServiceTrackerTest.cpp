@@ -45,602 +45,580 @@
 
 using namespace cppmicroservices;
 
-namespace {
-
-bool CheckConvertibility(const std::vector<ServiceReferenceU>& refs,
-                         std::vector<std::string>::const_iterator idBegin,
-                         std::vector<std::string>::const_iterator idEnd)
-{
-  std::vector<std::string> ids{ idBegin, idEnd };
-
-  return std::all_of(
-    refs.cbegin(),
-    refs.cend(),
-    [interfaceIds = std::move(ids)](const ServiceReferenceU& ref) {
-      return std::any_of(interfaceIds.cbegin(),
-                         interfaceIds.cend(),
-                         [&ref](const std::string& interfaceId) {
-                           return ref.IsConvertibleTo(interfaceId);
-                         });
-    });
-}
-
-struct MyInterfaceOne
-{
-  virtual ~MyInterfaceOne() {}
-};
-
-struct MyInterfaceTwo
-{
-  virtual ~MyInterfaceTwo() {}
-};
-
-class MyCustomizer
-  : public cppmicroservices::ServiceTrackerCustomizer<MyInterfaceOne>
+namespace
 {
 
-public:
-  MyCustomizer(const BundleContext& context)
-    : m_context(context)
-  {
-  }
+    bool
+    CheckConvertibility(std::vector<ServiceReferenceU> const& refs,
+                        std::vector<std::string>::const_iterator idBegin,
+                        std::vector<std::string>::const_iterator idEnd)
+    {
+        std::vector<std::string> ids { idBegin, idEnd };
 
-  virtual std::shared_ptr<MyInterfaceOne> AddingService(
-    const ServiceReference<MyInterfaceOne>& reference)
-  {
-    EXPECT_TRUE(reference) << "AddingService() valid reference";
-    return m_context.GetService(reference);
-  }
+        return std::all_of(refs.cbegin(),
+                           refs.cend(),
+                           [interfaceIds = std::move(ids)](ServiceReferenceU const& ref)
+                           {
+                               return std::any_of(interfaceIds.cbegin(),
+                                                  interfaceIds.cend(),
+                                                  [&ref](const std::string& interfaceId)
+                                                  { return ref.IsConvertibleTo(interfaceId); });
+                           });
+    }
 
-  virtual void ModifiedService(
-    const ServiceReference<MyInterfaceOne>& reference,
-    const std::shared_ptr<MyInterfaceOne>& service)
-  {
-    EXPECT_TRUE(reference) << "ModifiedService() valid reference";
-    EXPECT_TRUE(service) << "ModifiedService() valid service";
-  }
+    struct MyInterfaceOne
+    {
+        virtual ~MyInterfaceOne() {}
+    };
 
-  virtual void RemovedService(const ServiceReference<MyInterfaceOne>& reference,
-                              const std::shared_ptr<MyInterfaceOne>& service)
-  {
-    EXPECT_TRUE(reference) << "RemovedService() valid reference";
-    EXPECT_TRUE(service) << "RemovedService() valid service";
-  }
+    struct MyInterfaceTwo
+    {
+        virtual ~MyInterfaceTwo() {}
+    };
 
-private:
-  BundleContext m_context;
-};
+    class MyCustomizer : public cppmicroservices::ServiceTrackerCustomizer<MyInterfaceOne>
+    {
 
-template<typename Interface>
-class MockCustomizedServiceTracker
-  : public cppmicroservices::ServiceTrackerCustomizer<Interface>
-{
-public:
-  MOCK_METHOD(std::shared_ptr<Interface>,
-              AddingService,
-              (const ServiceReference<Interface>& reference),
-              (override));
-  MOCK_METHOD(void,
-              ModifiedService,
-              (const ServiceReference<Interface>& reference,
-               const std::shared_ptr<Interface>& service),
-              (override));
-  MOCK_METHOD(void,
-              RemovedService,
-              (const ServiceReference<Interface>& reference,
-               const std::shared_ptr<Interface>& service),
-              (override));
-};
+      public:
+        MyCustomizer(BundleContext const& context) : m_context(context) {}
 
-class ServiceTrackerTestFixture : public ::testing::Test
-{
-public:
-  ServiceTrackerTestFixture()
-    : framework(FrameworkFactory().NewFramework()){};
-  ~ServiceTrackerTestFixture() override = default;
+        virtual std::shared_ptr<MyInterfaceOne>
+        AddingService(ServiceReference<MyInterfaceOne> const& reference)
+        {
+            EXPECT_TRUE(reference) << "AddingService() valid reference";
+            return m_context.GetService(reference);
+        }
 
-  void SetUp() override { framework.Start(); }
-  void TearDown() override
-  {
-    framework.Stop();
-    framework.WaitForStop(std::chrono::milliseconds::zero());
-  }
-  Framework framework;
-};
-}
+        virtual void
+        ModifiedService(ServiceReference<MyInterfaceOne> const& reference,
+                        std::shared_ptr<MyInterfaceOne> const& service)
+        {
+            EXPECT_TRUE(reference) << "ModifiedService() valid reference";
+            EXPECT_TRUE(service) << "ModifiedService() valid service";
+        }
+
+        virtual void
+        RemovedService(ServiceReference<MyInterfaceOne> const& reference,
+                       std::shared_ptr<MyInterfaceOne> const& service)
+        {
+            EXPECT_TRUE(reference) << "RemovedService() valid reference";
+            EXPECT_TRUE(service) << "RemovedService() valid service";
+        }
+
+      private:
+        BundleContext m_context;
+    };
+
+    template <typename Interface>
+    class MockCustomizedServiceTracker : public cppmicroservices::ServiceTrackerCustomizer<Interface>
+    {
+      public:
+        MOCK_METHOD(std::shared_ptr<Interface>,
+                    AddingService,
+                    (ServiceReference<Interface> const& reference),
+                    (override));
+        MOCK_METHOD(void,
+                    ModifiedService,
+                    (ServiceReference<Interface> const& reference, std::shared_ptr<Interface> const& service),
+                    (override));
+        MOCK_METHOD(void,
+                    RemovedService,
+                    (ServiceReference<Interface> const& reference, std::shared_ptr<Interface> const& service),
+                    (override));
+    };
+
+    class ServiceTrackerTestFixture : public ::testing::Test
+    {
+      public:
+        ServiceTrackerTestFixture() : framework(FrameworkFactory().NewFramework()) {};
+        ~ServiceTrackerTestFixture() override = default;
+
+        void
+        SetUp() override
+        {
+            framework.Start();
+        }
+        void
+        TearDown() override
+        {
+            framework.Stop();
+            framework.WaitForStop(std::chrono::milliseconds::zero());
+        }
+        Framework framework;
+    };
+} // namespace
 
 TEST_F(ServiceTrackerTestFixture, TestFilterString)
 {
-  BundleContext context = framework.GetBundleContext();
-  MyCustomizer customizer(context);
+    BundleContext context = framework.GetBundleContext();
+    MyCustomizer customizer(context);
 
-  cppmicroservices::LDAPFilter filter(
-    "(" + cppmicroservices::Constants::SERVICE_ID + ">=0)");
-  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(
-    context, filter, &customizer);
-  tracker.Open();
+    cppmicroservices::LDAPFilter filter("(" + cppmicroservices::Constants::SERVICE_ID + ">=0)");
+    cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context, filter, &customizer);
+    tracker.Open();
 
-  struct MyServiceOne : public MyInterfaceOne
-  {};
-  struct MyServiceTwo : public MyInterfaceTwo
-  {};
+    struct MyServiceOne : public MyInterfaceOne
+    {
+    };
+    struct MyServiceTwo : public MyInterfaceTwo
+    {
+    };
 
-  auto serviceOne = std::make_shared<MyServiceOne>();
-  auto serviceTwo = std::make_shared<MyServiceTwo>();
+    auto serviceOne = std::make_shared<MyServiceOne>();
+    auto serviceTwo = std::make_shared<MyServiceTwo>();
 
-  context.RegisterService<MyInterfaceOne>(serviceOne);
-  context.RegisterService<MyInterfaceTwo>(serviceTwo);
+    context.RegisterService<MyInterfaceOne>(serviceOne);
+    context.RegisterService<MyInterfaceTwo>(serviceTwo);
 
-  EXPECT_EQ(tracker.GetServiceReferences().size(), 1) << "tracking count";
+    EXPECT_EQ(tracker.GetServiceReferences().size(), 1) << "tracking count";
 }
 
 TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
 {
-  BundleContext context = framework.GetBundleContext();
+    BundleContext context = framework.GetBundleContext();
 
-  auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleS");
-  bundle.Start();
+    auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleS");
+    bundle.Start();
 
-  // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null
+    // 1. Create a ServiceTracker with ServiceTrackerCustomizer == null
 
-  std::string s1("cppmicroservices::TestBundleSService");
-  ServiceReferenceU servref = context.GetServiceReference(s1 + "0");
+    std::string s1("cppmicroservices::TestBundleSService");
+    ServiceReferenceU servref = context.GetServiceReference(s1 + "0");
 
-  ASSERT_TRUE(servref)
-    << "Test if registered service of id cppmicroservices::TestBundleSService0";
+    ASSERT_TRUE(servref) << "Test if registered service of id cppmicroservices::TestBundleSService0";
 
-  ServiceReference<ServiceControlInterface> servCtrlRef =
-    context.GetServiceReference<ServiceControlInterface>();
-  ASSERT_TRUE(servCtrlRef) << "Test if constrol service was registered";
+    ServiceReference<ServiceControlInterface> servCtrlRef = context.GetServiceReference<ServiceControlInterface>();
+    ASSERT_TRUE(servCtrlRef) << "Test if constrol service was registered";
 
-  auto serviceController = context.GetService(servCtrlRef);
-  ASSERT_TRUE(serviceController) << "Test valid service controller";
+    auto serviceController = context.GetService(servCtrlRef);
+    ASSERT_TRUE(serviceController) << "Test valid service controller";
 
-  std::unique_ptr<ServiceTracker<void>> st1(
-    new ServiceTracker<void>(context, servref));
+    std::unique_ptr<ServiceTracker<void>> st1(new ServiceTracker<void>(context, servref));
 
-  // 2. Check the size method with an unopened service tracker
+    // 2. Check the size method with an unopened service tracker
 
-  ASSERT_EQ(st1->Size(), 0) << "Test if size == 0";
+    ASSERT_EQ(st1->Size(), 0) << "Test if size == 0";
 
-  // 3. Open the service tracker and see what it finds,
-  // expect to find one instance of the implementation,
-  // "org.cppmicroservices.TestBundleSService0"
+    // 3. Open the service tracker and see what it finds,
+    // expect to find one instance of the implementation,
+    // "org.cppmicroservices.TestBundleSService0"
 
-  st1->Open();
-  std::vector<ServiceReferenceU> sa2 = st1->GetServiceReferences();
+    st1->Open();
+    std::vector<ServiceReferenceU> sa2 = st1->GetServiceReferences();
 
-  ASSERT_EQ(sa2.size(), 1) << "Checking ServiceTracker size";
-  ASSERT_EQ(s1 + "0", sa2[0].GetInterfaceId())
-    << "Checking service implementation name";
+    ASSERT_EQ(sa2.size(), 1) << "Checking ServiceTracker size";
+    ASSERT_EQ(s1 + "0", sa2[0].GetInterfaceId()) << "Checking service implementation name";
 
 #ifdef US_ENABLE_THREADING_SUPPORT
-  // 4. Test notifications via closing the tracker
-  {
-    ServiceTracker<void> st2(context, "dummy");
-    st2.Open();
+    // 4. Test notifications via closing the tracker
+    {
+        ServiceTracker<void> st2(context, "dummy");
+        st2.Open();
 
-    // wait indefinitely
-    auto fut1 =
-      std::async(std::launch::async, [&st2] { return st2.WaitForService(); });
-    // wait "long enough"
-    auto fut2 = std::async(std::launch::async, [&st2] {
-      return st2.WaitForService(std::chrono::minutes(1));
-    });
+        // wait indefinitely
+        auto fut1 = std::async(std::launch::async, [&st2] { return st2.WaitForService(); });
+        // wait "long enough"
+        auto fut2 = std::async(std::launch::async, [&st2] { return st2.WaitForService(std::chrono::minutes(1)); });
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ASSERT_EQ(fut1.wait_for(std::chrono::milliseconds(1)), US_FUTURE_TIMEOUT)
-      << "Waiter not notified yet";
-    ASSERT_EQ(fut2.wait_for(std::chrono::milliseconds(1)), US_FUTURE_TIMEOUT)
-      << "Waiter not notified yet";
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        ASSERT_EQ(fut1.wait_for(std::chrono::milliseconds(1)), US_FUTURE_TIMEOUT) << "Waiter not notified yet";
+        ASSERT_EQ(fut2.wait_for(std::chrono::milliseconds(1)), US_FUTURE_TIMEOUT) << "Waiter not notified yet";
 
-    st2.Close();
+        st2.Close();
 
-    // Closing the tracker should notify the waiters
-    auto wait_until =
-      std::chrono::steady_clock::now() + std::chrono::seconds(3);
-    ASSERT_EQ(fut1.wait_until(wait_until), US_FUTURE_READY)
-      << "Closed service tracker notifies waiters";
-    ASSERT_EQ(fut2.wait_until(wait_until), US_FUTURE_READY)
-      << "Closed service tracker notifies waiters";
-  }
+        // Closing the tracker should notify the waiters
+        auto wait_until = std::chrono::steady_clock::now() + std::chrono::seconds(3);
+        ASSERT_EQ(fut1.wait_until(wait_until), US_FUTURE_READY) << "Closed service tracker notifies waiters";
+        ASSERT_EQ(fut2.wait_until(wait_until), US_FUTURE_READY) << "Closed service tracker notifies waiters";
+    }
 #endif
 
-  // 5. Close this service tracker
-  st1->Close();
+    // 5. Close this service tracker
+    st1->Close();
 
-  // 6. Check the size method, now when the servicetracker is closed
-  ASSERT_EQ(st1->Size(), 0) << "Checking ServiceTracker size";
+    // 6. Check the size method, now when the servicetracker is closed
+    ASSERT_EQ(st1->Size(), 0) << "Checking ServiceTracker size";
 
-  // 7. Check if we still track anything , we should get null
-  sa2 = st1->GetServiceReferences();
-  ASSERT_TRUE(sa2.empty()) << "Checking ServiceTracker size";
+    // 7. Check if we still track anything , we should get null
+    sa2 = st1->GetServiceReferences();
+    ASSERT_TRUE(sa2.empty()) << "Checking ServiceTracker size";
 
-  // 8. A new Servicetracker, this time with a filter for the object
-  std::string fs =
-    std::string("(") + Constants::OBJECTCLASS + "=" + s1 + "*" + ")";
-  LDAPFilter f1(fs);
-  st1.reset(new ServiceTracker<void>(context, f1));
-  // add a service
-  serviceController->ServiceControl(1, "register", 7);
+    // 8. A new Servicetracker, this time with a filter for the object
+    std::string fs = std::string("(") + Constants::OBJECTCLASS + "=" + s1 + "*" + ")";
+    LDAPFilter f1(fs);
+    st1.reset(new ServiceTracker<void>(context, f1));
+    // add a service
+    serviceController->ServiceControl(1, "register", 7);
 
-  // 9. Open the service tracker and see what it finds,
-  // expect to find two instances of references to
-  // "org.cppmicroservices.TestBundleSService*"
-  // i.e. they refer to the same piece of code
+    // 9. Open the service tracker and see what it finds,
+    // expect to find two instances of references to
+    // "org.cppmicroservices.TestBundleSService*"
+    // i.e. they refer to the same piece of code
 
-  std::vector<std::string> ids;
-  ids.push_back((s1 + "0"));
-  ids.push_back((s1 + "1"));
-  ids.push_back((s1 + "2"));
-  ids.push_back((s1 + "3"));
+    std::vector<std::string> ids;
+    ids.push_back((s1 + "0"));
+    ids.push_back((s1 + "1"));
+    ids.push_back((s1 + "2"));
+    ids.push_back((s1 + "3"));
 
-  st1->Open();
-  sa2 = st1->GetServiceReferences();
-  ASSERT_EQ(sa2.size(), 2) << "Checking service reference count";
-  ASSERT_TRUE(CheckConvertibility(sa2, ids.cbegin(), ids.cbegin() + 2))
-    << "Check for 2 expected interface ids";
+    st1->Open();
+    sa2 = st1->GetServiceReferences();
+    ASSERT_EQ(sa2.size(), 2) << "Checking service reference count";
+    ASSERT_TRUE(CheckConvertibility(sa2, ids.cbegin(), ids.cbegin() + 2)) << "Check for 2 expected interface ids";
 
-  // 10. Get libTestBundleS to register one more service and see if it appears
-  serviceController->ServiceControl(2, "register", 1);
-  sa2 = st1->GetServiceReferences();
+    // 10. Get libTestBundleS to register one more service and see if it appears
+    serviceController->ServiceControl(2, "register", 1);
+    sa2 = st1->GetServiceReferences();
 
-  ASSERT_EQ(sa2.size(), 3) << "Checking service reference count";
+    ASSERT_EQ(sa2.size(), 3) << "Checking service reference count";
 
-  ASSERT_TRUE(CheckConvertibility(sa2, ids.cbegin(), ids.cbegin() + 3))
-    << "Check for 3 expected interface ids";
+    ASSERT_TRUE(CheckConvertibility(sa2, ids.cbegin(), ids.cbegin() + 3)) << "Check for 3 expected interface ids";
 
-  // 11. Get libTestBundleS to register one more service and see if it appears
-  serviceController->ServiceControl(3, "register", 2);
-  sa2 = st1->GetServiceReferences();
-  ASSERT_EQ(sa2.size(), 4) << "Checking service reference count";
-  ASSERT_TRUE(CheckConvertibility(sa2, ids.cbegin(), ids.cend()))
-    << "Check for 4 expected interface ids";
+    // 11. Get libTestBundleS to register one more service and see if it appears
+    serviceController->ServiceControl(3, "register", 2);
+    sa2 = st1->GetServiceReferences();
+    ASSERT_EQ(sa2.size(), 4) << "Checking service reference count";
+    ASSERT_TRUE(CheckConvertibility(sa2, ids.cbegin(), ids.cend())) << "Check for 4 expected interface ids";
 
-  // 12. Get libTestBundleS to unregister one service and see if it disappears
-  serviceController->ServiceControl(3, "unregister", 0);
-  sa2 = st1->GetServiceReferences();
-  ASSERT_EQ(sa2.size(), 3) << "Checking service reference count";
+    // 12. Get libTestBundleS to unregister one service and see if it disappears
+    serviceController->ServiceControl(3, "unregister", 0);
+    sa2 = st1->GetServiceReferences();
+    ASSERT_EQ(sa2.size(), 3) << "Checking service reference count";
 
-  // 13. Get the highest ranking service reference, it should have ranking 7
-  ServiceReferenceU h1 = st1->GetServiceReference();
-  int rank = any_cast<int>(h1.GetProperty(Constants::SERVICE_RANKING));
-  ASSERT_EQ(rank, 7) << "Check service rank";
+    // 13. Get the highest ranking service reference, it should have ranking 7
+    ServiceReferenceU h1 = st1->GetServiceReference();
+    int rank = any_cast<int>(h1.GetProperty(Constants::SERVICE_RANKING));
+    ASSERT_EQ(rank, 7) << "Check service rank";
 
-  // 14. Get the service of the highest ranked service reference
+    // 14. Get the service of the highest ranked service reference
 
-  auto o1 = st1->GetService(h1);
-  ASSERT_TRUE(o1.get() != nullptr && !o1->empty())
-    << "Check for non-null service";
+    auto o1 = st1->GetService(h1);
+    ASSERT_TRUE(o1.get() != nullptr && !o1->empty()) << "Check for non-null service";
 
-  // 14a Get the highest ranked service, directly this time
-  auto o3 = st1->GetService();
-  ASSERT_TRUE(o3.get() != nullptr && !o3->empty())
-    << "Check for non-null service";
-  ASSERT_EQ(o1, o3) << "Check for equal service instances";
+    // 14a Get the highest ranked service, directly this time
+    auto o3 = st1->GetService();
+    ASSERT_TRUE(o3.get() != nullptr && !o3->empty()) << "Check for non-null service";
+    ASSERT_EQ(o1, o3) << "Check for equal service instances";
 
-  // 15. Now release the tracking of that service and then try to get it
-  //     from the servicetracker, which should yield a null object
-  serviceController->ServiceControl(1, "unregister", 7);
-  auto o2 = st1->GetService(h1);
-  ASSERT_TRUE(!o2 || !o2.get()) << "Check that service is null";
+    // 15. Now release the tracking of that service and then try to get it
+    //     from the servicetracker, which should yield a null object
+    serviceController->ServiceControl(1, "unregister", 7);
+    auto o2 = st1->GetService(h1);
+    ASSERT_TRUE(!o2 || !o2.get()) << "Check that service is null";
 
-  // 16. Get all service objects this tracker tracks, it should be 2
-  auto ts1 = st1->GetServices();
-  ASSERT_EQ(ts1.size(), 2) << "Check service count";
+    // 16. Get all service objects this tracker tracks, it should be 2
+    auto ts1 = st1->GetServices();
+    ASSERT_EQ(ts1.size(), 2) << "Check service count";
 
-  // 17. Test the remove method.
-  //     First register another service, then remove it being tracked
-  serviceController->ServiceControl(1, "register", 7);
-  h1 = st1->GetServiceReference();
-  auto sa3 = st1->GetServiceReferences();
-  ASSERT_EQ(sa3.size(), 3) << "Check service reference count";
-  ASSERT_TRUE(CheckConvertibility(sa3, ids.cbegin(), ids.cbegin() + 3))
-    << "Check for 3 expected interface ids";
+    // 17. Test the remove method.
+    //     First register another service, then remove it being tracked
+    serviceController->ServiceControl(1, "register", 7);
+    h1 = st1->GetServiceReference();
+    auto sa3 = st1->GetServiceReferences();
+    ASSERT_EQ(sa3.size(), 3) << "Check service reference count";
+    ASSERT_TRUE(CheckConvertibility(sa3, ids.cbegin(), ids.cbegin() + 3)) << "Check for 3 expected interface ids";
 
-  st1->Remove(h1); // remove tracking on one servref
-  sa2 = st1->GetServiceReferences();
-  ASSERT_EQ(sa2.size(), 2) << "Check service reference count";
+    st1->Remove(h1); // remove tracking on one servref
+    sa2 = st1->GetServiceReferences();
+    ASSERT_EQ(sa2.size(), 2) << "Check service reference count";
 
-  // 18. Test the addingService method,add a service reference
+    // 18. Test the addingService method,add a service reference
 
-  // 19. Test the removedService method, remove a service reference
+    // 19. Test the removedService method, remove a service reference
 
-  // 20. Test the waitForService method
-  auto o9 = st1->WaitForService(std::chrono::milliseconds(50));
-  ASSERT_TRUE(o9 && !o9->empty()) << "Checking WaitForService method";
+    // 20. Test the waitForService method
+    auto o9 = st1->WaitForService(std::chrono::milliseconds(50));
+    ASSERT_TRUE(o9 && !o9->empty()) << "Checking WaitForService method";
 
-  // Test that the RemovedService callback is triggered when closing a service tracker
-  MockCustomizedServiceTracker<MyInterfaceOne> customizer;
+    // Test that the RemovedService callback is triggered when closing a service tracker
+    MockCustomizedServiceTracker<MyInterfaceOne> customizer;
 
-  // expect that closing the tracker results in RemovedService being called.
-  ON_CALL(customizer, AddingService(::testing::_))
-    .WillByDefault(::testing::Return(std::make_shared<MyInterfaceOne>()));
-  EXPECT_CALL(customizer, AddingService(::testing::_))
-    .Times(::testing::Exactly(1));
-  EXPECT_CALL(customizer, ModifiedService(::testing::_, ::testing::_))
-    .Times(::testing::Exactly(0));
-  EXPECT_CALL(customizer, RemovedService(::testing::_, ::testing::_))
-    .Times(::testing::Exactly(1));
+    // expect that closing the tracker results in RemovedService being called.
+    ON_CALL(customizer, AddingService(::testing::_))
+        .WillByDefault(::testing::Return(std::make_shared<MyInterfaceOne>()));
+    EXPECT_CALL(customizer, AddingService(::testing::_)).Times(::testing::Exactly(1));
+    EXPECT_CALL(customizer, ModifiedService(::testing::_, ::testing::_)).Times(::testing::Exactly(0));
+    EXPECT_CALL(customizer, RemovedService(::testing::_, ::testing::_)).Times(::testing::Exactly(1));
 
-  auto tracker =
-    std::make_unique<cppmicroservices::ServiceTracker<MyInterfaceOne>>(
-      context, &customizer);
-  tracker->Open();
-  struct MyServiceOne : public MyInterfaceOne
-  {};
-  auto svcReg =
-    context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
-  tracker->Close();
+    auto tracker = std::make_unique<cppmicroservices::ServiceTracker<MyInterfaceOne>>(context, &customizer);
+    tracker->Open();
+    struct MyServiceOne : public MyInterfaceOne
+    {
+    };
+    auto svcReg = context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+    tracker->Close();
 }
 
 TEST_F(ServiceTrackerTestFixture, GetTrackingCount)
 {
-  BundleContext context = framework.GetBundleContext();
+    BundleContext context = framework.GetBundleContext();
 
-  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context);
-  ASSERT_EQ(tracker.GetTrackingCount(), -1);
-  tracker.Open();
-  ASSERT_EQ(tracker.GetTrackingCount(), 0);
+    cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context);
+    ASSERT_EQ(tracker.GetTrackingCount(), -1);
+    tracker.Open();
+    ASSERT_EQ(tracker.GetTrackingCount(), 0);
 
-  struct MyServiceOne : public MyInterfaceOne
-  {};
-  auto svcReg =
-    context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
-  ASSERT_EQ(tracker.GetTrackingCount(), 1);
+    struct MyServiceOne : public MyInterfaceOne
+    {
+    };
+    auto svcReg = context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+    ASSERT_EQ(tracker.GetTrackingCount(), 1);
 
-  svcReg.SetProperties({ { "foo", Any{ 1 } } });
-  ASSERT_EQ(tracker.GetTrackingCount(), 2);
+    svcReg.SetProperties({
+        {"foo", Any { 1 }}
+    });
+    ASSERT_EQ(tracker.GetTrackingCount(), 2);
 
-  (void)context.RegisterService<MyInterfaceOne>(
-    std::make_shared<MyServiceOne>());
-  ASSERT_EQ(tracker.GetTrackingCount(), 3);
+    (void)context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+    ASSERT_EQ(tracker.GetTrackingCount(), 3);
 
-  svcReg.Unregister();
-  ASSERT_EQ(tracker.GetTrackingCount(), 4);
+    svcReg.Unregister();
+    ASSERT_EQ(tracker.GetTrackingCount(), 4);
 
-  tracker.Close();
-  ASSERT_EQ(tracker.GetTrackingCount(), -1);
+    tracker.Close();
+    ASSERT_EQ(tracker.GetTrackingCount(), -1);
 }
 
 TEST_F(ServiceTrackerTestFixture, GetTracked)
 {
-  BundleContext context = framework.GetBundleContext();
-  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context);
-  std::unordered_map<ServiceReference<MyInterfaceOne>,
-                     std::shared_ptr<MyInterfaceOne>>
-    tracked;
-  tracker.GetTracked(tracked);
-  ASSERT_TRUE(tracked.empty());
-  tracker.Open();
-  ASSERT_TRUE(tracked.empty());
+    BundleContext context = framework.GetBundleContext();
+    cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context);
+    std::unordered_map<ServiceReference<MyInterfaceOne>, std::shared_ptr<MyInterfaceOne>> tracked;
+    tracker.GetTracked(tracked);
+    ASSERT_TRUE(tracked.empty());
+    tracker.Open();
+    ASSERT_TRUE(tracked.empty());
 
-  struct MyServiceOne : public MyInterfaceOne
-  {};
-  auto svcReg =
-    context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
-  tracker.GetTracked(tracked);
-  ASSERT_EQ(tracked.size(), 1ul);
+    struct MyServiceOne : public MyInterfaceOne
+    {
+    };
+    auto svcReg = context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+    tracker.GetTracked(tracked);
+    ASSERT_EQ(tracked.size(), 1ul);
 
-  tracked.clear();
-  tracker.Close();
-  tracker.GetTracked(tracked);
-  ASSERT_TRUE(tracked.empty());
+    tracked.clear();
+    tracker.Close();
+    tracker.GetTracked(tracked);
+    ASSERT_TRUE(tracked.empty());
 }
 
 TEST_F(ServiceTrackerTestFixture, IsEmpty)
 {
-  BundleContext context = framework.GetBundleContext();
-  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context);
-  ASSERT_TRUE(tracker.IsEmpty());
-  tracker.Open();
-  ASSERT_TRUE(tracker.IsEmpty());
+    BundleContext context = framework.GetBundleContext();
+    cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context);
+    ASSERT_TRUE(tracker.IsEmpty());
+    tracker.Open();
+    ASSERT_TRUE(tracker.IsEmpty());
 
-  struct MyServiceOne : public MyInterfaceOne
-  {};
-  auto svcReg =
-    context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
-  ASSERT_FALSE(tracker.IsEmpty());
+    struct MyServiceOne : public MyInterfaceOne
+    {
+    };
+    auto svcReg = context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+    ASSERT_FALSE(tracker.IsEmpty());
 
-  tracker.Close();
-  ASSERT_TRUE(tracker.IsEmpty());
+    tracker.Close();
+    ASSERT_TRUE(tracker.IsEmpty());
 }
 
 #ifdef US_ENABLE_THREADING_SUPPORT
-namespace {
-class FooService
+namespace
 {
-public:
-  virtual ~FooService() = default;
-};
+    class FooService
+    {
+      public:
+        virtual ~FooService() = default;
+    };
 
-class FooServiceImpl final : public FooService
-{
-public:
-  ~FooServiceImpl() = default;
-};
+    class FooServiceImpl final : public FooService
+    {
+      public:
+        ~FooServiceImpl() = default;
+    };
 
-class CustomFooTracker final
-  : public cppmicroservices::ServiceTrackerCustomizer<FooService>
-{
-  /**
-     * Called when a service is started.
-     */
-  std::shared_ptr<FooService> AddingService(
-    ::cppmicroservices::ServiceReference<FooService> const& reference) override
-  {
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    return reference.GetBundle().GetBundleContext().GetService(reference);
-  }
+    class CustomFooTracker final : public cppmicroservices::ServiceTrackerCustomizer<FooService>
+    {
+        /**
+         * Called when a service is started.
+         */
+        std::shared_ptr<FooService>
+        AddingService(::cppmicroservices::ServiceReference<FooService> const& reference) override
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            return reference.GetBundle().GetBundleContext().GetService(reference);
+        }
 
-  /**
-     * Called when a service is modified. We don't care about this.
-     */
-  void ModifiedService(::cppmicroservices::ServiceReference<FooService> const&,
+        /**
+         * Called when a service is modified. We don't care about this.
+         */
+        void
+        ModifiedService(::cppmicroservices::ServiceReference<FooService> const&,
+                        std::shared_ptr<FooService> const&) override
+        {
+        }
+
+        /**
+         * Called when a service is removed.
+         */
+        void
+        RemovedService(::cppmicroservices::ServiceReference<FooService> const&,
                        std::shared_ptr<FooService> const&) override
-  {
-  }
-
-  /**
-     * Called when a service is removed.
-     */
-  void RemovedService(::cppmicroservices::ServiceReference<FooService> const&,
-                      std::shared_ptr<FooService> const&) override
-  {
-  }
-};
-}
+        {
+        }
+    };
+} // namespace
 
 TEST_F(ServiceTrackerTestFixture, ServiceTrackerCloseRace)
 {
-  BundleContext context = framework.GetBundleContext();
-  // test for a race in SerivceTracker<T>::Close
-  // that leads to a crash inside the service tracker.
-  auto customTracker = std::make_unique<CustomFooTracker>();
-  auto tracker = std::make_unique<cppmicroservices::ServiceTracker<FooService>>(
-    context, customTracker.get());
+    BundleContext context = framework.GetBundleContext();
+    // test for a race in SerivceTracker<T>::Close
+    // that leads to a crash inside the service tracker.
+    auto customTracker = std::make_unique<CustomFooTracker>();
+    auto tracker = std::make_unique<cppmicroservices::ServiceTracker<FooService>>(context, customTracker.get());
 
-  tracker->Open();
+    tracker->Open();
 
-  // set sleeps at certain points in the code to
-  // generate the conditions for the race.
-  std::promise<void> gate;
-  auto gateFuture = gate.get_future();
-  auto fut = std::async(std::launch::async, [&context, &gateFuture]() {
-    gateFuture.get();
-    (void)context.RegisterService<FooService>(
-      std::make_shared<FooServiceImpl>());
-  });
+    // set sleeps at certain points in the code to
+    // generate the conditions for the race.
+    std::promise<void> gate;
+    auto gateFuture = gate.get_future();
+    auto fut = std::async(std::launch::async,
+                          [&context, &gateFuture]()
+                          {
+                              gateFuture.get();
+                              (void)context.RegisterService<FooService>(std::make_shared<FooServiceImpl>());
+                          });
 
-  gate.set_value();
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  tracker->Close();
+    gate.set_value();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    tracker->Close();
 
-  fut.get();
+    fut.get();
 }
 
 TEST_F(ServiceTrackerTestFixture, DefaultCustomizerServiceTrackerCloseRace)
 {
-  BundleContext context = framework.GetBundleContext();
-  // test for a race in SerivceTracker<T>::Close when no user provided
-  // customizer is specified and a service event is being processed by
-  // the service tracker while it is being destroyed.
-  std::promise<void> gate;
-  auto gateFuture = gate.get_future();
+    BundleContext context = framework.GetBundleContext();
+    // test for a race in SerivceTracker<T>::Close when no user provided
+    // customizer is specified and a service event is being processed by
+    // the service tracker while it is being destroyed.
+    std::promise<void> gate;
+    auto gateFuture = gate.get_future();
 
-  std::atomic_bool keepRegisteringServices{ true };
+    std::atomic_bool keepRegisteringServices { true };
 
-  auto fut = std::async(std::launch::async,
-                        [&context, &gateFuture, &keepRegisteringServices]() {
-                          gateFuture.get();
-                          while (keepRegisteringServices) {
-                            (void)context.RegisterService<FooService>(
-                              std::make_shared<FooServiceImpl>());
-                          }
-                        });
+    auto fut = std::async(std::launch::async,
+                          [&context, &gateFuture, &keepRegisteringServices]()
+                          {
+                              gateFuture.get();
+                              while (keepRegisteringServices)
+                              {
+                                  (void)context.RegisterService<FooService>(std::make_shared<FooServiceImpl>());
+                              }
+                          });
 
-  gate.set_value();
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    gate.set_value();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-  {
-    ServiceTracker<FooService> scopedTracker(context);
-    scopedTracker.Open();
-  } // destroy scopedTracker
+    {
+        ServiceTracker<FooService> scopedTracker(context);
+        scopedTracker.Open();
+    } // destroy scopedTracker
 
-  keepRegisteringServices.store(false);
-  fut.get();
+    keepRegisteringServices.store(false);
+    fut.get();
 }
 
 TEST_F(ServiceTrackerTestFixture, ServiceTrackerConcurrentOpenClose)
 {
-  BundleContext context = framework.GetBundleContext();
-  auto customTracker = std::make_unique<CustomFooTracker>();
-  auto tracker = std::make_unique<cppmicroservices::ServiceTracker<FooService>>(
-    context, customTracker.get());
+    BundleContext context = framework.GetBundleContext();
+    auto customTracker = std::make_unique<CustomFooTracker>();
+    auto tracker = std::make_unique<cppmicroservices::ServiceTracker<FooService>>(context, customTracker.get());
 
-  size_t numThreads = std::thread::hardware_concurrency();
-  ASSERT_GT(numThreads, 0ull) << "number of threads is 0";
-  std::vector<std::future<void>> futures;
-  std::promise<void> gate;
-  auto gateFuture = gate.get_future().share();
-  for (size_t i = 0; i <= numThreads; ++i) {
-    futures.push_back(
-      std::async(std::launch::async, [i, &tracker, &gateFuture]() {
-        gateFuture.get();
-        for (int n = 0; n < 1000; ++n) {
-          if (i % 2 == 0) {
-            tracker->Open();
-          } else {
-            tracker->Close();
-          }
-        }
-      }));
-  }
+    size_t numThreads = std::thread::hardware_concurrency();
+    ASSERT_GT(numThreads, 0ull) << "number of threads is 0";
+    std::vector<std::future<void>> futures;
+    std::promise<void> gate;
+    auto gateFuture = gate.get_future().share();
+    for (size_t i = 0; i <= numThreads; ++i)
+    {
+        futures.push_back(std::async(std::launch::async,
+                                     [i, &tracker, &gateFuture]()
+                                     {
+                                         gateFuture.get();
+                                         for (int n = 0; n < 1000; ++n)
+                                         {
+                                             if (i % 2 == 0)
+                                             {
+                                                 tracker->Open();
+                                             }
+                                             else
+                                             {
+                                                 tracker->Close();
+                                             }
+                                         }
+                                     }));
+    }
 
-  gate.set_value();
+    gate.set_value();
 
-  for (auto& asyncFuture : futures) {
-    asyncFuture.get();
-  }
+    for (auto& asyncFuture : futures)
+    {
+        asyncFuture.get();
+    }
 }
 #endif
 
-namespace {
-
-class MyNullPtrCustomizer final
-  : public cppmicroservices::ServiceTrackerCustomizer<MyInterfaceOne>
+namespace
 {
 
-public:
-  MyNullPtrCustomizer(const BundleContext& context)
-    : m_context(context)
-  {
-  }
+    class MyNullPtrCustomizer final : public cppmicroservices::ServiceTrackerCustomizer<MyInterfaceOne>
+    {
 
-  virtual std::shared_ptr<MyInterfaceOne> AddingService(
-    const ServiceReference<MyInterfaceOne>&)
-  {
-    return nullptr;
-  }
+      public:
+        MyNullPtrCustomizer(BundleContext const& context) : m_context(context) {}
 
-  virtual void ModifiedService(const ServiceReference<MyInterfaceOne>&,
-                               const std::shared_ptr<MyInterfaceOne>&)
-  {
-  }
+        virtual std::shared_ptr<MyInterfaceOne>
+        AddingService(ServiceReference<MyInterfaceOne> const&)
+        {
+            return nullptr;
+        }
 
-  virtual void RemovedService(const ServiceReference<MyInterfaceOne>&,
-                              const std::shared_ptr<MyInterfaceOne>&)
-  {
-  }
+        virtual void
+        ModifiedService(ServiceReference<MyInterfaceOne> const&, std::shared_ptr<MyInterfaceOne> const&)
+        {
+        }
 
-private:
-  BundleContext m_context;
-};
-}
+        virtual void
+        RemovedService(ServiceReference<MyInterfaceOne> const&, std::shared_ptr<MyInterfaceOne> const&)
+        {
+        }
+
+      private:
+        BundleContext m_context;
+    };
+} // namespace
 
 TEST_F(ServiceTrackerTestFixture, TestNullPtrServiceTrackerCustomizer)
 {
-  auto context = framework.GetBundleContext();
-  MyNullPtrCustomizer customizer(context);
+    auto context = framework.GetBundleContext();
+    MyNullPtrCustomizer customizer(context);
 
-  cppmicroservices::LDAPFilter filter(
-    "(" + cppmicroservices::Constants::SERVICE_ID + ">=0)");
-  cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(
-    context, filter, &customizer);
-  tracker.Open();
+    cppmicroservices::LDAPFilter filter("(" + cppmicroservices::Constants::SERVICE_ID + ">=0)");
+    cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context, filter, &customizer);
+    tracker.Open();
 
-  struct MyServiceOne : public MyInterfaceOne
-  {};
+    struct MyServiceOne : public MyInterfaceOne
+    {
+    };
 
-  auto serviceOne = std::make_shared<MyServiceOne>();
+    auto serviceOne = std::make_shared<MyServiceOne>();
 
-  context.RegisterService<MyInterfaceOne>(serviceOne);
+    context.RegisterService<MyInterfaceOne>(serviceOne);
 
-  ASSERT_EQ(tracker.GetServiceReferences().size(), 0)
-    << "tracking count should be 0";
+    ASSERT_EQ(tracker.GetServiceReferences().size(), 0) << "tracking count should be 0";
 
-  auto trackedObj = tracker.WaitForService(std::chrono::seconds(1));
-  ASSERT_EQ(nullptr, trackedObj) << "tracked object should be nullptr";
+    auto trackedObj = tracker.WaitForService(std::chrono::seconds(1));
+    ASSERT_EQ(nullptr, trackedObj) << "tracked object should be nullptr";
 }
 
 /// <summary>
@@ -648,32 +626,28 @@ TEST_F(ServiceTrackerTestFixture, TestNullPtrServiceTrackerCustomizer)
 /// </summary>
 TEST_F(ServiceTrackerTestFixture, TestReOpenServiceTrackerWithCustomizer)
 {
-  auto context = framework.GetBundleContext();
-  MockCustomizedServiceTracker<MyInterfaceOne> customizer;
+    auto context = framework.GetBundleContext();
+    MockCustomizedServiceTracker<MyInterfaceOne> customizer;
 
-  // expect that closing the tracker results in RemovedService being called.
-  ON_CALL(customizer, AddingService(::testing::_))
-    .WillByDefault(::testing::Return(std::make_shared<MyInterfaceOne>()));
-  EXPECT_CALL(customizer, AddingService(::testing::_))
-    .Times(::testing::Exactly(3));
-  EXPECT_CALL(customizer, ModifiedService(::testing::_, ::testing::_))
-    .Times(::testing::Exactly(1));
-  EXPECT_CALL(customizer, RemovedService(::testing::_, ::testing::_))
-    .Times(::testing::Exactly(3));
+    // expect that closing the tracker results in RemovedService being called.
+    ON_CALL(customizer, AddingService(::testing::_))
+        .WillByDefault(::testing::Return(std::make_shared<MyInterfaceOne>()));
+    EXPECT_CALL(customizer, AddingService(::testing::_)).Times(::testing::Exactly(3));
+    EXPECT_CALL(customizer, ModifiedService(::testing::_, ::testing::_)).Times(::testing::Exactly(1));
+    EXPECT_CALL(customizer, RemovedService(::testing::_, ::testing::_)).Times(::testing::Exactly(3));
 
-  auto tracker =
-    std::make_unique<cppmicroservices::ServiceTracker<MyInterfaceOne>>(
-      context, &customizer);
-  tracker->Open();
-  struct MyServiceOne : public MyInterfaceOne
-  {};
-  auto svcReg =
-    context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
-  tracker->Close();
+    auto tracker = std::make_unique<cppmicroservices::ServiceTracker<MyInterfaceOne>>(context, &customizer);
+    tracker->Open();
+    struct MyServiceOne : public MyInterfaceOne
+    {
+    };
+    auto svcReg = context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+    tracker->Close();
 
-  tracker->Open();
-  auto svcReg2 =
-    context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
-  svcReg2.SetProperties({ { "test", Any(std::string("foo")) } });
-  tracker->Close();
+    tracker->Open();
+    auto svcReg2 = context.RegisterService<MyInterfaceOne>(std::make_shared<MyServiceOne>());
+    svcReg2.SetProperties({
+        {"test", Any(std::string("foo"))}
+    });
+    tracker->Close();
 }

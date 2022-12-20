@@ -28,33 +28,39 @@
 
 #include <iostream>
 
-namespace cppmicroservices {
-
-struct TestBundleA : public TestBundleAService
+namespace cppmicroservices
 {
 
-  TestBundleA() {}
-  virtual ~TestBundleA() {}
-};
+    struct TestBundleA : public TestBundleAService
+    {
 
-class TestBundleAActivator : public BundleActivator
-{
-public:
-  TestBundleAActivator() {}
-  ~TestBundleAActivator() {}
+        TestBundleA() {}
+        virtual ~TestBundleA() {}
+    };
 
-  void Start(BundleContext context)
-  {
-    s = std::make_shared<TestBundleA>();
-    sr = context.RegisterService<TestBundleAService>(s);
-  }
+    class TestBundleAActivator : public BundleActivator
+    {
+      public:
+        TestBundleAActivator() {}
+        ~TestBundleAActivator() {}
 
-  void Stop(BundleContext) { sr.Unregister(); }
+        void
+        Start(BundleContext context)
+        {
+            s = std::make_shared<TestBundleA>();
+            sr = context.RegisterService<TestBundleAService>(s);
+        }
 
-private:
-  std::shared_ptr<TestBundleA> s;
-  ServiceRegistration<TestBundleAService> sr;
-};
-}
+        void
+        Stop(BundleContext)
+        {
+            sr.Unregister();
+        }
+
+      private:
+        std::shared_ptr<TestBundleA> s;
+        ServiceRegistration<TestBundleAService> sr;
+    };
+} // namespace cppmicroservices
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleAActivator)

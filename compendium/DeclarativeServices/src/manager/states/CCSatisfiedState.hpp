@@ -27,57 +27,73 @@
 
 using cppmicroservices::service::component::runtime::dto::ComponentState;
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-/**
- * Abstract class that implements the #Deactivate transition method for \c SATISFIED states.
- */
-class CCSatisfiedState : public ComponentConfigurationState
+namespace cppmicroservices
 {
-public:
-  CCSatisfiedState();
-  ~CCSatisfiedState() override = default;
-  CCSatisfiedState(const CCSatisfiedState&) = delete;
-  CCSatisfiedState& operator=(const CCSatisfiedState&) = delete;
-  CCSatisfiedState(CCSatisfiedState&&) = delete;
-  CCSatisfiedState& operator=(CCSatisfiedState&&) = delete;
-  /**
-   * This method is used by both {@link CCRegisteredState} and {@link CCActiveState}
-   * to handle the deactivation of the component
-   */
-  void Deactivate(ComponentConfigurationImpl& mgr) override;
+    namespace scrimpl
+    {
 
-  /**
-   * Modifying properties while the component is in the SATISFIED state is a no-op
-   */
-  bool Modified(ComponentConfigurationImpl&) override { return true; };
-  /**
-   * Rebinding while in a \c SATISFIED state is a no-op
-   */
-  void Rebind(ComponentConfigurationImpl&,
-              const std::string&,
-              const ServiceReference<void>&,
-              const ServiceReference<void>&) override
-  {}
+        /**
+         * Abstract class that implements the #Deactivate transition method for \c SATISFIED states.
+         */
+        class CCSatisfiedState : public ComponentConfigurationState
+        {
+          public:
+            CCSatisfiedState();
+            ~CCSatisfiedState() override = default;
+            CCSatisfiedState(CCSatisfiedState const&) = delete;
+            CCSatisfiedState& operator=(CCSatisfiedState const&) = delete;
+            CCSatisfiedState(CCSatisfiedState&&) = delete;
+            CCSatisfiedState& operator=(CCSatisfiedState&&) = delete;
+            /**
+             * This method is used by both {@link CCRegisteredState} and {@link CCActiveState}
+             * to handle the deactivation of the component
+             */
+            void Deactivate(ComponentConfigurationImpl& mgr) override;
 
-  /**
-   * Returns {@link ComponentState::SATISFIED} to indicate the
-   * state represented by this object
-   */
-  ComponentState GetValue() const override { return ComponentState::SATISFIED; }
+            /**
+             * Modifying properties while the component is in the SATISFIED state is a no-op
+             */
+            bool
+            Modified(ComponentConfigurationImpl&) override
+            {
+                return true;
+            };
+            /**
+             * Rebinding while in a \c SATISFIED state is a no-op
+             */
+            void
+            Rebind(ComponentConfigurationImpl&,
+                   std::string const&,
+                   ServiceReference<void> const&,
+                   ServiceReference<void> const&) override
+            {
+            }
 
-  void WaitForTransitionTask() override { ready.get(); }
+            /**
+             * Returns {@link ComponentState::SATISFIED} to indicate the
+             * state represented by this object
+             */
+            ComponentState
+            GetValue() const override
+            {
+                return ComponentState::SATISFIED;
+            }
 
-protected:
-  // Mutex to make sure that one operation (Activate, Rebind, Modified) completes before another
-  // operation begins.
-  mutable std::mutex oneAtATimeMutex;
+            void
+            WaitForTransitionTask() override
+            {
+                ready.get();
+            }
 
-private:
-  std::shared_future<void> ready;
-};
+          protected:
+            // Mutex to make sure that one operation (Activate, Rebind, Modified) completes before another
+            // operation begins.
+            mutable std::mutex oneAtATimeMutex;
 
-}
-}
+          private:
+            std::shared_future<void> ready;
+        };
+
+    } // namespace scrimpl
+} // namespace cppmicroservices
 #endif // CCSatisfiedState_hpp

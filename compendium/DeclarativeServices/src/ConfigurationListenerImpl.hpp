@@ -28,63 +28,64 @@
 #include "manager/ConcurrencyUtil.hpp"
 #include "manager/ConfigurationNotifier.hpp"
 
-namespace cppmicroservices {
-namespace service {
-namespace cm {
-
-/**
-   * ConfigChangeNotification
-   * This class is used by ConfigurationListener to notify ComponentConfigurationImpl
-   * about changes to Configuration Objects.
-   */
-struct ConfigChangeNotification final
+namespace cppmicroservices
 {
-  ConfigChangeNotification(std::string pid,
-                           std::shared_ptr<cppmicroservices::AnyMap> properties,
-                           ConfigurationEventType evt)
-    : pid(std::move(pid))
-    , event(std::move(evt))
-    , newProperties(std::move(properties))
-  {}
+    namespace service
+    {
+        namespace cm
+        {
 
-  std::string pid;
-  ConfigurationEventType event;
-  std::shared_ptr<cppmicroservices::AnyMap> newProperties;
-};
-class ConfigurationListenerImpl final : public ConfigurationListener
-{
+            /**
+             * ConfigChangeNotification
+             * This class is used by ConfigurationListener to notify ComponentConfigurationImpl
+             * about changes to Configuration Objects.
+             */
+            struct ConfigChangeNotification final
+            {
+                ConfigChangeNotification(std::string pid,
+                                         std::shared_ptr<cppmicroservices::AnyMap> properties,
+                                         ConfigurationEventType evt)
+                    : pid(std::move(pid))
+                    , event(std::move(evt))
+                    , newProperties(std::move(properties))
+                {
+                }
 
-public:
-  /*
-  *@throws std::invalid_argument exception if any of the params is a nullptr 
-  */
-  ConfigurationListenerImpl(
-    const cppmicroservices::BundleContext& context,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-    std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier>
-      configNotifier);
-  ConfigurationListenerImpl(const ConfigurationListenerImpl&) = delete;
-  ConfigurationListenerImpl(ConfigurationListenerImpl&&) = delete;
-  ConfigurationListenerImpl& operator=(const ConfigurationListenerImpl&) =
-    delete;
-  ConfigurationListenerImpl& operator=(ConfigurationListenerImpl&&) = delete;
-  ~ConfigurationListenerImpl() = default;
+                std::string pid;
+                ConfigurationEventType event;
+                std::shared_ptr<cppmicroservices::AnyMap> newProperties;
+            };
+            class ConfigurationListenerImpl final : public ConfigurationListener
+            {
 
-  /*
-   * configurationEvent is the method called by Configuration Admin whenever a 
-   * a configuraton object is updated or removed.
-   *
-   */
-  void configurationEvent(const ConfigurationEvent& event) override;
+              public:
+                /*
+                 *@throws std::invalid_argument exception if any of the params is a nullptr
+                 */
+                ConfigurationListenerImpl(
+                    cppmicroservices::BundleContext const& context,
+                    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                    std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier> configNotifier);
+                ConfigurationListenerImpl(ConfigurationListenerImpl const&) = delete;
+                ConfigurationListenerImpl(ConfigurationListenerImpl&&) = delete;
+                ConfigurationListenerImpl& operator=(ConfigurationListenerImpl const&) = delete;
+                ConfigurationListenerImpl& operator=(ConfigurationListenerImpl&&) = delete;
+                ~ConfigurationListenerImpl() = default;
 
-private:
-  cppmicroservices::BundleContext bundleContext;
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-  std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier>
-    configNotifier;
-};
+                /*
+                 * configurationEvent is the method called by Configuration Admin whenever a
+                 * a configuraton object is updated or removed.
+                 *
+                 */
+                void configurationEvent(ConfigurationEvent const& event) override;
 
-} // namespace cm
-} // namespace service
+              private:
+                cppmicroservices::BundleContext bundleContext;
+                std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+                std::shared_ptr<cppmicroservices::scrimpl::ConfigurationNotifier> configNotifier;
+            };
+
+        } // namespace cm
+    }     // namespace service
 } // namespace cppmicroservices
-#endif //cppmicroservices_service_cm_ConfigurationListenerImpl_HPP
+#endif // cppmicroservices_service_cm_ConfigurationListenerImpl_HPP

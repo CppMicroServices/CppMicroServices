@@ -25,80 +25,80 @@
 
 #include "cppmicroservices/ServiceFactory.h"
 
-namespace cppmicroservices {
-
-/**
- * @ingroup MicroServices
- *
- * A factory for \link Constants::SCOPE_PROTOTYPE prototype scope\endlink services.
- * The factory can provide multiple, unique service objects.
- *
- * When registering a service, a PrototypeServiceFactory object can be used
- * instead of a service object, so that the bundle developer can create a
- * unique service object for each caller that is using the service.
- * When a caller uses a ServiceObjects to request a service instance, the
- * framework calls the GetService method to return a service object specifically
- * for the requesting caller. The caller can release the returned service object
- * and the framework will call the UngetService method with the service object.
- * When a bundle uses the BundleContext::GetService(const ServiceReferenceBase&)
- * method to obtain a service object, the framework acts as if the service
- * has bundle scope. That is, the framework will call the GetService method to
- * obtain a bundle-scoped instance which will be cached and have a use count.
- * See ServiceFactory.
- *
- * A bundle can use both ServiceObjects and BundleContext::GetService(const ServiceReferenceBase&)
- * to obtain a service object for a service. ServiceObjects::GetService() will always
- * return an instance provided by a call to GetService(const Bundle&, const ServiceRegistrationBase&)
- * and BundleContext::GetService(const ServiceReferenceBase&) will always
- * return the bundle-scoped instance.
- * PrototypeServiceFactory objects are only used by the framework and are not made
- * available to other bundles. The framework may concurrently call a PrototypeServiceFactory.
- *
- * @see BundleContext::GetServiceObjects()
- * @see ServiceObjects
- */
-struct PrototypeServiceFactory : public ServiceFactory
+namespace cppmicroservices
 {
 
-  /**
-   * Returns a service object for a caller.
-   *
-   * The framework invokes this method for each caller requesting a service object using
-   * ServiceObjects::GetService(). The factory can then return a specific service object for the caller.
-   * The framework checks that the returned service object is valid. If the returned service
-   * object is empty or does not contain entries for all the interfaces named when the service
-   * was registered, a warning is issued and nullptr is returned to the caller. If this
-   * method throws an exception, a warning is issued and nullptr is returned to the caller.
-   *
-   * @param bundle The bundle requesting the service.
-   * @param registration The ServiceRegistrationBase object for the requested service.
-   * @return A service object that must contain entries for all the interfaces named when
-   *         the service was registered.
-   *
-   * @see ServiceObjects#GetService()
-   * @see InterfaceMapConstPtr
-   */
-  InterfaceMapConstPtr GetService(
-    const Bundle& bundle,
-    const ServiceRegistrationBase& registration) override = 0;
+    /**
+     * @ingroup MicroServices
+     *
+     * A factory for \link Constants::SCOPE_PROTOTYPE prototype scope\endlink services.
+     * The factory can provide multiple, unique service objects.
+     *
+     * When registering a service, a PrototypeServiceFactory object can be used
+     * instead of a service object, so that the bundle developer can create a
+     * unique service object for each caller that is using the service.
+     * When a caller uses a ServiceObjects to request a service instance, the
+     * framework calls the GetService method to return a service object specifically
+     * for the requesting caller. The caller can release the returned service object
+     * and the framework will call the UngetService method with the service object.
+     * When a bundle uses the BundleContext::GetService(const ServiceReferenceBase&)
+     * method to obtain a service object, the framework acts as if the service
+     * has bundle scope. That is, the framework will call the GetService method to
+     * obtain a bundle-scoped instance which will be cached and have a use count.
+     * See ServiceFactory.
+     *
+     * A bundle can use both ServiceObjects and BundleContext::GetService(const ServiceReferenceBase&)
+     * to obtain a service object for a service. ServiceObjects::GetService() will always
+     * return an instance provided by a call to GetService(const Bundle&, const ServiceRegistrationBase&)
+     * and BundleContext::GetService(const ServiceReferenceBase&) will always
+     * return the bundle-scoped instance.
+     * PrototypeServiceFactory objects are only used by the framework and are not made
+     * available to other bundles. The framework may concurrently call a PrototypeServiceFactory.
+     *
+     * @see BundleContext::GetServiceObjects()
+     * @see ServiceObjects
+     */
+    struct PrototypeServiceFactory : public ServiceFactory
+    {
 
-  /**
-   * Releases a service object created for a caller.
-   *
-   * The framework invokes this method when a service has been released by a bundles such as
-   * by calling ServiceObjects::UngetService(). The service object may then be destroyed.
-   * If this method throws an exception, a warning is issued.
-   *
-   * @param bundle The bundle releasing the service.
-   * @param registration The ServiceRegistrationBase object for the service being released.
-   * @param service The service object returned by a previous call to the GetService method.
-   *
-   * @see ServiceObjects::UngetService()
-   */
-  void UngetService(const Bundle& bundle,
-                    const ServiceRegistrationBase& registration,
-                    const InterfaceMapConstPtr& service) override = 0;
-};
-}
+        /**
+         * Returns a service object for a caller.
+         *
+         * The framework invokes this method for each caller requesting a service object using
+         * ServiceObjects::GetService(). The factory can then return a specific service object for the caller.
+         * The framework checks that the returned service object is valid. If the returned service
+         * object is empty or does not contain entries for all the interfaces named when the service
+         * was registered, a warning is issued and nullptr is returned to the caller. If this
+         * method throws an exception, a warning is issued and nullptr is returned to the caller.
+         *
+         * @param bundle The bundle requesting the service.
+         * @param registration The ServiceRegistrationBase object for the requested service.
+         * @return A service object that must contain entries for all the interfaces named when
+         *         the service was registered.
+         *
+         * @see ServiceObjects#GetService()
+         * @see InterfaceMapConstPtr
+         */
+        InterfaceMapConstPtr GetService(Bundle const& bundle, ServiceRegistrationBase const& registration) override = 0;
+
+        /**
+         * Releases a service object created for a caller.
+         *
+         * The framework invokes this method when a service has been released by a bundles such as
+         * by calling ServiceObjects::UngetService(). The service object may then be destroyed.
+         * If this method throws an exception, a warning is issued.
+         *
+         * @param bundle The bundle releasing the service.
+         * @param registration The ServiceRegistrationBase object for the service being released.
+         * @param service The service object returned by a previous call to the GetService method.
+         *
+         * @see ServiceObjects::UngetService()
+         */
+        void UngetService(Bundle const& bundle,
+                          ServiceRegistrationBase const& registration,
+                          InterfaceMapConstPtr const& service) override
+            = 0;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_PROTOTYPESERVICEFACTORY_H

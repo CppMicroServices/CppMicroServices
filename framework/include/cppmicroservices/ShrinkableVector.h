@@ -27,110 +27,171 @@
 
 #include <vector>
 
-namespace cppmicroservices {
-
-/**
- * \ingroup MicroServicesUtils
- *
- * A std::vector style container allowing query and removal
- * operations only.
- */
-template<class E>
-class ShrinkableVector
+namespace cppmicroservices
 {
-private:
-  static std::vector<E> emptyVector;
 
-public:
-  using container_type = std::vector<E>;
-  using iterator = typename container_type::iterator;
-  using const_iterator = typename container_type::const_iterator;
-  using size_type = typename container_type::size_type;
-  using reference = typename container_type::reference;
-  using const_reference = typename container_type::const_reference;
-  using value_type = typename container_type::value_type;
+    /**
+     * \ingroup MicroServicesUtils
+     *
+     * A std::vector style container allowing query and removal
+     * operations only.
+     */
+    template <class E>
+    class ShrinkableVector
+    {
+      private:
+        static std::vector<E> emptyVector;
 
-  ShrinkableVector()
-    : container(emptyVector)
-  {
-  }
+      public:
+        using container_type = std::vector<E>;
+        using iterator = typename container_type::iterator;
+        using const_iterator = typename container_type::const_iterator;
+        using size_type = typename container_type::size_type;
+        using reference = typename container_type::reference;
+        using const_reference = typename container_type::const_reference;
+        using value_type = typename container_type::value_type;
 
-  iterator begin() { return container.begin(); }
+        ShrinkableVector() : container(emptyVector) {}
 
-  const_iterator begin() const { return container.begin(); }
+        iterator
+        begin()
+        {
+            return container.begin();
+        }
 
-  iterator end() { return container.end(); }
+        const_iterator
+        begin() const
+        {
+            return container.begin();
+        }
 
-  const_iterator end() const { return container.end(); }
+        iterator
+        end()
+        {
+            return container.end();
+        }
 
-  reference front() { return container.front(); }
+        const_iterator
+        end() const
+        {
+            return container.end();
+        }
 
-  const_reference front() const { return container.front(); }
+        reference
+        front()
+        {
+            return container.front();
+        }
 
-  reference back() { return container.back(); }
+        const_reference
+        front() const
+        {
+            return container.front();
+        }
 
-  const_reference back() const { return container.back(); }
+        reference
+        back()
+        {
+            return container.back();
+        }
 
-  iterator erase(iterator pos) { return container.erase(pos); }
+        const_reference
+        back() const
+        {
+            return container.back();
+        }
 
-  iterator erase(iterator first, iterator last)
-  {
-    return container.erase(first, last);
-  }
+        iterator
+        erase(iterator pos)
+        {
+            return container.erase(pos);
+        }
 
-  void pop_back() { container.pop_back(); }
+        iterator
+        erase(iterator first, iterator last)
+        {
+            return container.erase(first, last);
+        }
 
-  bool empty() const { return container.empty(); }
+        void
+        pop_back()
+        {
+            container.pop_back();
+        }
 
-  void clear() { container.clear(); }
+        bool
+        empty() const
+        {
+            return container.empty();
+        }
 
-  size_type size() const { return container.size(); }
+        void
+        clear()
+        {
+            container.clear();
+        }
 
-  reference at(size_type pos) { return container.at(pos); }
+        size_type
+        size() const
+        {
+            return container.size();
+        }
 
-  const_reference at(size_type pos) const { return container.at(pos); }
+        reference
+        at(size_type pos)
+        {
+            return container.at(pos);
+        }
 
-  /**
-   * \rststar
-   * .. deprecated:: 3.1.0
-   *
-   *    This function exists only to maintain backwards compatibility
-   *    and will be removed in the next major release.
-   *    Use :any:`at(size_type pos) <cppmicroservices::ShrinkableVector::at>`
-   *    instead.
-   * \endrststar
-   */
-  US_DEPRECATED const_reference operator[](size_type i) const
-  {
-    return container[i];
-  }
+        const_reference
+        at(size_type pos) const
+        {
+            return container.at(pos);
+        }
 
-  /**
-   * \rststar
-   * .. deprecated:: 3.1.0
-   *
-   *    This function exists only to maintain backwards compatibility
-   *    and will be removed in the next major release.
-   *    Use :any:`at(size_type pos) <cppmicroservices::ShrinkableVector::at>`
-   *    instead.
-   * \endrststar
-   */
-  US_DEPRECATED reference operator[](size_type i) { return container[i]; }
+        /**
+         * \rststar
+         * .. deprecated:: 3.1.0
+         *
+         *    This function exists only to maintain backwards compatibility
+         *    and will be removed in the next major release.
+         *    Use :any:`at(size_type pos) <cppmicroservices::ShrinkableVector::at>`
+         *    instead.
+         * \endrststar
+         */
+        US_DEPRECATED const_reference
+        operator[](size_type i) const
+        {
+            return container[i];
+        }
 
-private:
-  friend class BundleHooks;
-  friend class ServiceHooks;
+        /**
+         * \rststar
+         * .. deprecated:: 3.1.0
+         *
+         *    This function exists only to maintain backwards compatibility
+         *    and will be removed in the next major release.
+         *    Use :any:`at(size_type pos) <cppmicroservices::ShrinkableVector::at>`
+         *    instead.
+         * \endrststar
+         */
+        US_DEPRECATED reference
+        operator[](size_type i)
+        {
+            return container[i];
+        }
 
-  ShrinkableVector(container_type& container)
-    : container(container)
-  {
-  }
+      private:
+        friend class BundleHooks;
+        friend class ServiceHooks;
 
-  container_type& container;
-};
+        ShrinkableVector(container_type& container) : container(container) {}
 
-template<class E>
-std::vector<E> ShrinkableVector<E>::emptyVector;
-}
+        container_type& container;
+    };
+
+    template <class E>
+    std::vector<E> ShrinkableVector<E>::emptyVector;
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SHRINKABLEVECTOR_H

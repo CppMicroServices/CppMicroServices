@@ -32,52 +32,54 @@
 #include <string>
 #include <vector>
 
-namespace cppmicroservices {
-
-struct InvalidObjFileException : public std::exception
+namespace cppmicroservices
 {
-  ~InvalidObjFileException() throw() {}
-  InvalidObjFileException(std::string what, int errorNumber = 0);
 
-  virtual const char* what() const throw();
+    struct InvalidObjFileException : public std::exception
+    {
+        ~InvalidObjFileException() throw() {}
+        InvalidObjFileException(std::string what, int errorNumber = 0);
 
-private:
-  std::string m_What;
-};
+        virtual char const* what() const throw();
 
-// Represents the raw bundle resource data.
-// The data buffer contains the bits representing a zip file.
-// The data size is the zip file's size in bytes.
-class RawBundleResources
-{
-public:
-  RawBundleResources(std::unique_ptr<DataContainer> data)
-    : m_Data(std::move(data))
-  {
-  }
+      private:
+        std::string m_What;
+    };
 
-  operator bool() const
-  {
-    return m_Data && m_Data->GetData() && (m_Data->GetSize() > 0);
-  }
+    // Represents the raw bundle resource data.
+    // The data buffer contains the bits representing a zip file.
+    // The data size is the zip file's size in bytes.
+    class RawBundleResources
+    {
+      public:
+        RawBundleResources(std::unique_ptr<DataContainer> data) : m_Data(std::move(data)) {}
 
-  void* GetData() const { return m_Data->GetData(); }
-  std::size_t GetSize() const { return m_Data->GetSize(); }
+        operator bool() const { return m_Data && m_Data->GetData() && (m_Data->GetSize() > 0); }
 
-private:
-  std::unique_ptr<DataContainer> m_Data;
-};
+        void*
+        GetData() const
+        {
+            return m_Data->GetData();
+        }
+        std::size_t
+        GetSize() const
+        {
+            return m_Data->GetSize();
+        }
 
-class BundleObjFile
-{
-public:
-  virtual ~BundleObjFile() {}
+      private:
+        std::unique_ptr<DataContainer> m_Data;
+    };
 
-  /// Return the raw bundle resource container bits.
-  virtual std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer()
-    const = 0;
-};
+    class BundleObjFile
+    {
+      public:
+        virtual ~BundleObjFile() {}
 
-}
+        /// Return the raw bundle resource container bits.
+        virtual std::shared_ptr<RawBundleResources> GetRawBundleResourceContainer() const = 0;
+    };
+
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLEOBJFILE_H

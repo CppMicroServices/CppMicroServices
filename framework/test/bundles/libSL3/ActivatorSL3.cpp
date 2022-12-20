@@ -28,108 +28,108 @@
 
 #include "BundlePropsInterface.h"
 
-namespace cppmicroservices {
-
-class SL3BundlePropsImpl : public BundlePropsInterface
+namespace cppmicroservices
 {
 
-public:
-  const Properties& GetProperties() const { return props; }
+    class SL3BundlePropsImpl : public BundlePropsInterface
+    {
 
-  void SetProperty(std::string propertyKey, bool propertyValue)
-  {
-    props[propertyKey] = propertyValue;
-  }
+      public:
+        Properties const&
+        GetProperties() const
+        {
+            return props;
+        }
 
-private:
-  BundlePropsInterface::Properties props;
-};
+        void
+        SetProperty(std::string propertyKey, bool propertyValue)
+        {
+            props[propertyKey] = propertyValue;
+        }
 
-class SL3ServiceTrackerCustomizer : public ServiceTrackerCustomizer<FooService>
-{
+      private:
+        BundlePropsInterface::Properties props;
+    };
 
-public:
-  SL3ServiceTrackerCustomizer(
-    const std::shared_ptr<SL3BundlePropsImpl>& propService,
-    const BundleContext& bc)
-    : bundlePropsService(propService)
-    , context(bc)
-  {
-  }
+    class SL3ServiceTrackerCustomizer : public ServiceTrackerCustomizer<FooService>
+    {
 
-  virtual ~SL3ServiceTrackerCustomizer() { context = nullptr; }
+      public:
+        SL3ServiceTrackerCustomizer(std::shared_ptr<SL3BundlePropsImpl> const& propService, BundleContext const& bc)
+            : bundlePropsService(propService)
+            , context(bc)
+        {
+        }
 
-  std::shared_ptr<FooService> AddingService(
-    const ServiceReference<FooService>& reference)
-  {
-    bundlePropsService->SetProperty("serviceAdded", true);
+        virtual ~SL3ServiceTrackerCustomizer() { context = nullptr; }
 
-    std::shared_ptr<FooService> fooService =
-      context.GetService<FooService>(reference);
-    fooService->foo();
-    return fooService;
-  }
+        std::shared_ptr<FooService>
+        AddingService(ServiceReference<FooService> const& reference)
+        {
+            bundlePropsService->SetProperty("serviceAdded", true);
 
-  void ModifiedService(const ServiceReference<FooService>& /*reference*/,
-                       const std::shared_ptr<FooService>& /*service*/)
-  {
-  }
+            std::shared_ptr<FooService> fooService = context.GetService<FooService>(reference);
+            fooService->foo();
+            return fooService;
+        }
 
-  void RemovedService(const ServiceReference<FooService>& /*reference*/,
-                      const std::shared_ptr<FooService>& /*service*/)
-  {
-    bundlePropsService->SetProperty("serviceRemoved", true);
-  }
+        void
+        ModifiedService(ServiceReference<FooService> const& /*reference*/,
+                        std::shared_ptr<FooService> const& /*service*/)
+        {
+        }
 
-private:
-  std::shared_ptr<SL3BundlePropsImpl> bundlePropsService;
-  BundleContext context;
-};
+        void
+        RemovedService(ServiceReference<FooService> const& /*reference*/,
+                       std::shared_ptr<FooService> const& /*service*/)
+        {
+            bundlePropsService->SetProperty("serviceRemoved", true);
+        }
 
-class ActivatorSL3 : public BundleActivator
-{
+      private:
+        std::shared_ptr<SL3BundlePropsImpl> bundlePropsService;
+        BundleContext context;
+    };
 
-public:
-  ActivatorSL3()
-    : trackerCustomizer(nullptr)
-    , tracker(nullptr)
-    , context()
-  {
-  }
+    class ActivatorSL3 : public BundleActivator
+    {
 
-  ~ActivatorSL3() {}
+      public:
+        ActivatorSL3() : trackerCustomizer(nullptr), tracker(nullptr), context() {}
 
-  void Start(BundleContext context)
-  {
-    this->context = context;
-    bundlePropsService = std::make_shared<SL3BundlePropsImpl>();
-    InterfaceMapPtr im =
-      MakeInterfaceMap<BundlePropsInterface>(bundlePropsService);
-    im->insert(std::make_pair(std::string("ActivatorSL3"), bundlePropsService));
-    sr = context.RegisterService(im);
-    trackerCustomizer.reset(
-      new SL3ServiceTrackerCustomizer(bundlePropsService, context));
-    tracker.reset(new FooTracker(context, trackerCustomizer.get()));
-    tracker->Open();
-  }
+        ~ActivatorSL3() {}
 
-  void Stop(BundleContext /*context*/)
-  {
-    tracker->Close();
-    tracker.reset();
-    trackerCustomizer.reset();
-    this->context = nullptr;
-  }
+        void
+        Start(BundleContext context)
+        {
+            this->context = context;
+            bundlePropsService = std::make_shared<SL3BundlePropsImpl>();
+            InterfaceMapPtr im = MakeInterfaceMap<BundlePropsInterface>(bundlePropsService);
+            im->insert(std::make_pair(std::string("ActivatorSL3"), bundlePropsService));
+            sr = context.RegisterService(im);
+            trackerCustomizer.reset(new SL3ServiceTrackerCustomizer(bundlePropsService, context));
+            tracker.reset(new FooTracker(context, trackerCustomizer.get()));
+            tracker->Open();
+        }
 
-private:
-  std::shared_ptr<SL3BundlePropsImpl> bundlePropsService;
-  using FooTracker = ServiceTracker<FooService>;
-  std::unique_ptr<SL3ServiceTrackerCustomizer> trackerCustomizer;
-  std::unique_ptr<FooTracker> tracker;
-  BundleContext context;
+        void
+        Stop(BundleContext /*context*/)
+        {
+            tracker->Close();
+            tracker.reset();
+            trackerCustomizer.reset();
+            this->context = nullptr;
+        }
 
-  ServiceRegistrationU sr;
-};
-}
+      private:
+        std::shared_ptr<SL3BundlePropsImpl> bundlePropsService;
+        using FooTracker = ServiceTracker<FooService>;
+        std::unique_ptr<SL3ServiceTrackerCustomizer> trackerCustomizer;
+        std::unique_ptr<FooTracker> tracker;
+        BundleContext context;
+
+        ServiceRegistrationU sr;
+    };
+} // namespace cppmicroservices
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::ActivatorSL3)

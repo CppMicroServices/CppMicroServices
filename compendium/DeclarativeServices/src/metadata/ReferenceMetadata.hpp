@@ -34,55 +34,54 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/LDAPFilter.h"
 
-namespace cppmicroservices {
-namespace scrimpl {
-namespace metadata {
-
-/**
- * Stores the reference metadata information parsed from the Service Component
- * Runtime description.
- */
-struct ReferenceMetadata
+namespace cppmicroservices
 {
-  // defaults for the data model
-  ReferenceMetadata()
-    : cardinality("1..1")
-    , policy("static")
-    , policyOption("reluctant")
-    , scope("bundle")
-  {}
+    namespace scrimpl
+    {
+        namespace metadata
+        {
 
-  std::string name;
-  std::string target;
-  std::string interfaceName;
-  std::string cardinality;
-  std::string policy;
-  std::string policyOption;
-  std::string scope;
-  std::size_t minCardinality{ 1 };
-  std::size_t maxCardinality{ 1 };
+            /**
+             * Stores the reference metadata information parsed from the Service Component
+             * Runtime description.
+             */
+            struct ReferenceMetadata
+            {
+                // defaults for the data model
+                ReferenceMetadata() : cardinality("1..1"), policy("static"), policyOption("reluctant"), scope("bundle")
+                {
+                }
 
-  static const std::vector<std::string> Cardinalities;
-  static const std::vector<std::string> Policies;
-  static const std::vector<std::string> PolicyOptions;
-  static const std::vector<std::string> Scopes;
-};
+                std::string name;
+                std::string target;
+                std::string interfaceName;
+                std::string cardinality;
+                std::string policy;
+                std::string policyOption;
+                std::string scope;
+                std::size_t minCardinality { 1 };
+                std::size_t maxCardinality { 1 };
 
-/**
- * @brief Returns the cardinality information given a string representing the reference
- *        cardinality
- * @param cardinality the reference cardinality string
- * @returns a 2-element tuple, where
- *          the first element is the calculated maximum cardinality
- *          the second element is the calculated minimum cardinality
- * @throws std::out_of_range error if @p cardinality is not found in the
- *         global @c ReferenceMetadata::Cardinalities
- */
-std::tuple<std::size_t, std::size_t> GetReferenceCardinalityExtents(
-  const std::string& cardinality);
+                static const std::vector<std::string> Cardinalities;
+                static const std::vector<std::string> Policies;
+                static const std::vector<std::string> PolicyOptions;
+                static const std::vector<std::string> Scopes;
+            };
 
-}
-}
-}
+            /**
+             * @brief Returns the cardinality information given a string representing the reference
+             *        cardinality
+             * @param cardinality the reference cardinality string
+             * @returns a 2-element tuple, where
+             *          the first element is the calculated maximum cardinality
+             *          the second element is the calculated minimum cardinality
+             * @throws std::out_of_range error if @p cardinality is not found in the
+             *         global @c ReferenceMetadata::Cardinalities
+             */
+            std::tuple<std::size_t, std::size_t> GetReferenceCardinalityExtents(std::string const& cardinality);
 
-#endif //REFERENCEMETADATA_HPP
+        } // namespace metadata
+    }     // namespace scrimpl
+} // namespace cppmicroservices
+
+#endif // REFERENCEMETADATA_HPP

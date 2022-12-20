@@ -32,211 +32,185 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-class CMEnabledStateTest : public ::testing::Test
+namespace cppmicroservices
 {
-protected:
-  CMEnabledStateTest()
-    : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {
-  }
-  virtual ~CMEnabledStateTest() = default;
+    namespace scrimpl
+    {
 
-  virtual void SetUp()
-  {
-    framework.Start();
-    auto fakeLogger = std::make_shared<FakeLogger>();
-    auto compDesc = std::make_shared<metadata::ComponentMetadata>();
-    auto mockRegistry = std::make_shared<MockComponentRegistry>();
-    auto logger = std::make_shared<SCRLogger>(framework.GetBundleContext());
-    auto asyncWorkService =
-      std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-        framework.GetBundleContext(), logger);
-    auto notifier = std::make_shared<ConfigurationNotifier>(
-      framework.GetBundleContext(), fakeLogger, asyncWorkService);
-    auto managers =
-      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+        class CMEnabledStateTest : public ::testing::Test
+        {
+          protected:
+            CMEnabledStateTest() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
+            virtual ~CMEnabledStateTest() = default;
 
-    compMgr =
-      std::make_shared<MockComponentManagerImpl>(compDesc,
-                                                 mockRegistry,
-                                                 framework.GetBundleContext(),
-                                                 fakeLogger,
-                                                 asyncWorkService,
-                                                 notifier,
-                                                 managers);
-  }
+            virtual void
+            SetUp()
+            {
+                framework.Start();
+                auto fakeLogger = std::make_shared<FakeLogger>();
+                auto compDesc = std::make_shared<metadata::ComponentMetadata>();
+                auto mockRegistry = std::make_shared<MockComponentRegistry>();
+                auto logger = std::make_shared<SCRLogger>(framework.GetBundleContext());
+                auto asyncWorkService
+                    = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(framework.GetBundleContext(),
+                                                                                       logger);
+                auto notifier = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(),
+                                                                        fakeLogger,
+                                                                        asyncWorkService);
+                auto managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-  virtual void TearDown()
-  {
-    compMgr.reset();
-    framework.Stop();
-    framework.WaitForStop(std::chrono::milliseconds::zero());
-  }
+                compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
+                                                                     mockRegistry,
+                                                                     framework.GetBundleContext(),
+                                                                     fakeLogger,
+                                                                     asyncWorkService,
+                                                                     notifier,
+                                                                     managers);
+            }
 
-  cppmicroservices::Framework framework;
-  std::shared_ptr<MockComponentManagerImpl> compMgr;
-};
+            virtual void
+            TearDown()
+            {
+                compMgr.reset();
+                framework.Stop();
+                framework.WaitForStop(std::chrono::milliseconds::zero());
+            }
 
-TEST_F(CMEnabledStateTest, TestCtor)
-{
-  EXPECT_NO_THROW({
-    std::promise<void> prom;
-    auto enabledState =
-      std::make_shared<CMEnabledState>(prom.get_future().share());
-    EXPECT_TRUE(enabledState->fut.valid())
-      << "The future member of CMEnabledState must be valid";
-    EXPECT_EQ(enabledState->fut.wait_for(std::chrono::microseconds(1)),
-              std::future_status::timeout)
-      << "The future member of CMEnabledState must not be ready until the "
-         "corresponding promise is set";
-    prom.set_value();
-    enabledState->fut.get();
-  });
-}
+            cppmicroservices::Framework framework;
+            std::shared_ptr<MockComponentManagerImpl> compMgr;
+        };
 
-TEST_F(CMEnabledStateTest, TestIsEnabled)
-{
-  std::promise<void> prom;
-  auto enabledState =
-    std::make_shared<CMEnabledState>(prom.get_future().share());
-  EXPECT_TRUE(enabledState->IsEnabled(*compMgr))
-    << "CMEnabledState must always return true for IsEnabled";
-}
+        TEST_F(CMEnabledStateTest, TestCtor)
+        {
+            EXPECT_NO_THROW({
+                std::promise<void> prom;
+                auto enabledState = std::make_shared<CMEnabledState>(prom.get_future().share());
+                EXPECT_TRUE(enabledState->fut.valid()) << "The future member of CMEnabledState must be valid";
+                EXPECT_EQ(enabledState->fut.wait_for(std::chrono::microseconds(1)), std::future_status::timeout)
+                    << "The future member of CMEnabledState must not be ready until the "
+                       "corresponding promise is set";
+                prom.set_value();
+                enabledState->fut.get();
+            });
+        }
 
-TEST_F(CMEnabledStateTest, TestGetConfigurations)
-{
-  std::promise<void> prom;
-  auto enabledState =
-    std::make_shared<CMEnabledState>(prom.get_future().share());
-  enabledState->configurations = {
-    std::make_shared<MockComponentConfigurationImpl>(
-      compMgr->GetMetadata(),
-      framework,
-      compMgr->GetRegistry(),
-      compMgr->GetLogger(),
-      compMgr->GetConfigNotifier(),
-      compMgr->GetManagers())
-  };
-  auto fut = std::async(std::launch::async, [&]() {
-    return enabledState->GetConfigurations(*compMgr);
-  });
-  EXPECT_NE(fut.wait_for(std::chrono::milliseconds::zero()),
-            std::future_status::ready)
-    << "The call to GetConfigurations must not return until the promise is set";
-  prom.set_value();
-  auto configs = fut.get();
-  EXPECT_EQ(configs.size(), 1ul)
-    << "GetConfigurations must return the stored configuration";
-  enabledState->configurations
-    .clear(); // remove the inserted mock configuration
-}
+        TEST_F(CMEnabledStateTest, TestIsEnabled)
+        {
+            std::promise<void> prom;
+            auto enabledState = std::make_shared<CMEnabledState>(prom.get_future().share());
+            EXPECT_TRUE(enabledState->IsEnabled(*compMgr)) << "CMEnabledState must always return true for IsEnabled";
+        }
 
-/**
- * This test point checks the case when a call to Enable on one thread
- * succeeds in swapping the state and is responsible for setting a promise
- * and a call to Enable on another thread has to wait until the first
- * thread sets the promise
- */
-TEST_F(CMEnabledStateTest, TestEnable)
-{
-  std::promise<void> prom;
-  auto enabledState =
-    std::make_shared<CMEnabledState>(prom.get_future().share());
-  compMgr->SetState(enabledState);
-  auto fut = enabledState->Enable(*compMgr);
-  EXPECT_NE(fut.wait_for(std::chrono::milliseconds::zero()),
-            std::future_status::ready)
-    << "Future returned from Enable must not be ready until the promise is set";
-  prom.set_value();
-  EXPECT_NO_THROW(fut.get());
-}
+        TEST_F(CMEnabledStateTest, TestGetConfigurations)
+        {
+            std::promise<void> prom;
+            auto enabledState = std::make_shared<CMEnabledState>(prom.get_future().share());
+            enabledState->configurations
+                = { std::make_shared<MockComponentConfigurationImpl>(compMgr->GetMetadata(),
+                                                                     framework,
+                                                                     compMgr->GetRegistry(),
+                                                                     compMgr->GetLogger(),
+                                                                     compMgr->GetConfigNotifier(),
+                                                                     compMgr->GetManagers()) };
+            auto fut = std::async(std::launch::async, [&]() { return enabledState->GetConfigurations(*compMgr); });
+            EXPECT_NE(fut.wait_for(std::chrono::milliseconds::zero()), std::future_status::ready)
+                << "The call to GetConfigurations must not return until the promise is set";
+            prom.set_value();
+            auto configs = fut.get();
+            EXPECT_EQ(configs.size(), 1ul) << "GetConfigurations must return the stored configuration";
+            enabledState->configurations.clear(); // remove the inserted mock configuration
+        }
 
-TEST_F(CMEnabledStateTest, TestConcurrentEnable)
-{
-  std::promise<void> prom;
-  auto enabledState =
-    std::make_shared<CMEnabledState>(prom.get_future().share());
-  compMgr->SetState(enabledState);
-  prom.set_value();
-  EXPECT_TRUE(compMgr->IsEnabled());
-  // Invoke "Enable" from multiple threads
-  std::function<std::shared_future<void>()> func = [enabledState, this]() {
-    return enabledState->Enable(*(this->compMgr));
-  };
-  std::vector<std::shared_future<void>> futVec = ConcurrentInvoke(func);
-  EXPECT_TRUE(compMgr->IsEnabled()) << "ComponentManager must still be ENABLED "
-                                       "after concurrent calls to Enable";
-  // check if the futures returned from concurrent invocation are all valid
-  for (auto& fut : futVec) {
-    EXPECT_TRUE(fut.valid())
-      << "All futures returned from concurrent calls to Enable must be valid";
-    EXPECT_NO_THROW(fut.get());
-  }
-}
+        /**
+         * This test point checks the case when a call to Enable on one thread
+         * succeeds in swapping the state and is responsible for setting a promise
+         * and a call to Enable on another thread has to wait until the first
+         * thread sets the promise
+         */
+        TEST_F(CMEnabledStateTest, TestEnable)
+        {
+            std::promise<void> prom;
+            auto enabledState = std::make_shared<CMEnabledState>(prom.get_future().share());
+            compMgr->SetState(enabledState);
+            auto fut = enabledState->Enable(*compMgr);
+            EXPECT_NE(fut.wait_for(std::chrono::milliseconds::zero()), std::future_status::ready)
+                << "Future returned from Enable must not be ready until the promise is set";
+            prom.set_value();
+            EXPECT_NO_THROW(fut.get());
+        }
 
-TEST_F(CMEnabledStateTest, TestDisable)
-{
-  std::promise<void> prom;
-  auto enabledState =
-    std::make_shared<CMEnabledState>(prom.get_future().share());
-  prom.set_value();
-  compMgr->SetState(enabledState);
-  EXPECT_TRUE(compMgr->IsEnabled());
-  auto fut = enabledState->Disable(*compMgr);
-  EXPECT_TRUE(fut.valid())
-    << "A call to ComponentManager::Enable must always return a valid future";
-  EXPECT_NO_THROW(fut.get());
-  EXPECT_FALSE(compMgr->IsEnabled())
-    << "ComponentManager must be DISABLED after a call to Disable";
-}
+        TEST_F(CMEnabledStateTest, TestConcurrentEnable)
+        {
+            std::promise<void> prom;
+            auto enabledState = std::make_shared<CMEnabledState>(prom.get_future().share());
+            compMgr->SetState(enabledState);
+            prom.set_value();
+            EXPECT_TRUE(compMgr->IsEnabled());
+            // Invoke "Enable" from multiple threads
+            std::function<std::shared_future<void>()> func
+                = [enabledState, this]() { return enabledState->Enable(*(this->compMgr)); };
+            std::vector<std::shared_future<void>> futVec = ConcurrentInvoke(func);
+            EXPECT_TRUE(compMgr->IsEnabled()) << "ComponentManager must still be ENABLED "
+                                                 "after concurrent calls to Enable";
+            // check if the futures returned from concurrent invocation are all valid
+            for (auto& fut : futVec)
+            {
+                EXPECT_TRUE(fut.valid()) << "All futures returned from concurrent calls to Enable must be valid";
+                EXPECT_NO_THROW(fut.get());
+            }
+        }
 
-TEST_F(CMEnabledStateTest, TestConcurrentDisable)
-{
-  std::promise<void> prom;
-  auto enabledState =
-    std::make_shared<CMEnabledState>(prom.get_future().share());
-  compMgr->SetState(enabledState);
-  prom.set_value();
-  EXPECT_TRUE(compMgr->IsEnabled());
-  // Invoke "Disable" from multiple threads
-  std::function<std::shared_future<void>()> func = [enabledState, this]() {
-    return enabledState->Disable(*(this->compMgr));
-  };
-  std::vector<std::shared_future<void>> futVec = ConcurrentInvoke(func);
-  EXPECT_FALSE(compMgr->IsEnabled())
-    << "ComponentManager must be DISABLED after concurrent calls to Disable";
-  // check if the futures returned from concurrent invocation are all valid
-  for (auto& fut : futVec) {
-    EXPECT_TRUE(fut.valid())
-      << "All futures returned from concurrent calls to Disable must be valid";
-    EXPECT_NO_THROW(fut.get());
-  }
-}
+        TEST_F(CMEnabledStateTest, TestDisable)
+        {
+            std::promise<void> prom;
+            auto enabledState = std::make_shared<CMEnabledState>(prom.get_future().share());
+            prom.set_value();
+            compMgr->SetState(enabledState);
+            EXPECT_TRUE(compMgr->IsEnabled());
+            auto fut = enabledState->Disable(*compMgr);
+            EXPECT_TRUE(fut.valid()) << "A call to ComponentManager::Enable must always return a valid future";
+            EXPECT_NO_THROW(fut.get());
+            EXPECT_FALSE(compMgr->IsEnabled()) << "ComponentManager must be DISABLED after a call to Disable";
+        }
 
-TEST_F(CMEnabledStateTest, TestCreateConfigurations)
-{
-  std::promise<void> prom;
-  auto enabledState =
-    std::make_shared<CMEnabledState>(prom.get_future().share());
-  compMgr->SetState(enabledState);
-  prom.set_value();
-  EXPECT_EQ(enabledState->configurations.size(), 0ul)
-    << "Initial number of configurations is zero";
-  EXPECT_NO_THROW({
-    enabledState->CreateConfigurations(compMgr->GetMetadata(),
-                                       compMgr->GetBundle(),
-                                       compMgr->GetRegistry(),
-                                       compMgr->GetLogger(),
-                                       compMgr->GetConfigNotifier(),
-                                       compMgr->GetManagers());
-  });
-  EXPECT_EQ(enabledState->configurations.size(), 1ul)
-    << "Must have a configuration created after call to CreateConfigurations";
-  enabledState->configurations
-    .clear(); // remove configs due to the call to the private method.
-}
-}
-}
+        TEST_F(CMEnabledStateTest, TestConcurrentDisable)
+        {
+            std::promise<void> prom;
+            auto enabledState = std::make_shared<CMEnabledState>(prom.get_future().share());
+            compMgr->SetState(enabledState);
+            prom.set_value();
+            EXPECT_TRUE(compMgr->IsEnabled());
+            // Invoke "Disable" from multiple threads
+            std::function<std::shared_future<void>()> func
+                = [enabledState, this]() { return enabledState->Disable(*(this->compMgr)); };
+            std::vector<std::shared_future<void>> futVec = ConcurrentInvoke(func);
+            EXPECT_FALSE(compMgr->IsEnabled()) << "ComponentManager must be DISABLED after concurrent calls to Disable";
+            // check if the futures returned from concurrent invocation are all valid
+            for (auto& fut : futVec)
+            {
+                EXPECT_TRUE(fut.valid()) << "All futures returned from concurrent calls to Disable must be valid";
+                EXPECT_NO_THROW(fut.get());
+            }
+        }
+
+        TEST_F(CMEnabledStateTest, TestCreateConfigurations)
+        {
+            std::promise<void> prom;
+            auto enabledState = std::make_shared<CMEnabledState>(prom.get_future().share());
+            compMgr->SetState(enabledState);
+            prom.set_value();
+            EXPECT_EQ(enabledState->configurations.size(), 0ul) << "Initial number of configurations is zero";
+            EXPECT_NO_THROW({
+                enabledState->CreateConfigurations(compMgr->GetMetadata(),
+                                                   compMgr->GetBundle(),
+                                                   compMgr->GetRegistry(),
+                                                   compMgr->GetLogger(),
+                                                   compMgr->GetConfigNotifier(),
+                                                   compMgr->GetManagers());
+            });
+            EXPECT_EQ(enabledState->configurations.size(), 1ul)
+                << "Must have a configuration created after call to CreateConfigurations";
+            enabledState->configurations.clear(); // remove configs due to the call to the private method.
+        }
+    } // namespace scrimpl
+} // namespace cppmicroservices

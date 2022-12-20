@@ -25,49 +25,50 @@
 #include <string>
 #include <vector>
 
-namespace codegen {
-namespace datamodel {
-
-struct ReferenceInfo
+namespace codegen
 {
-  std::string name;
-  std::string interface;
-  std::string cardinality;
-  std::string policy;
-  std::string policy_option;
-  std::string target;
-  std::string scope;
-};
+    namespace datamodel
+    {
 
-struct ServiceInfo
-{
-  std::string scope;
-  std::vector<std::string> interfaces;
-};
+        struct ReferenceInfo
+        {
+            std::string name;
+            std::string interface;
+            std::string cardinality;
+            std::string policy;
+            std::string policy_option;
+            std::string target;
+            std::string scope;
+        };
 
-struct ComponentInfo
-{
-  std::string name;
-  std::string implClassName;
-  std::string configurationPolicy;
-  bool injectReferences;
-  ServiceInfo service;
-  std::vector<ReferenceInfo> references;
-  static const std::string CONFIG_POLICY_IGNORE;
-  static const std::string CONFIG_POLICY_REQUIRE;
-  static const std::string CONFIG_POLICY_OPTIONAL;
-};
+        struct ServiceInfo
+        {
+            std::string scope;
+            std::vector<std::string> interfaces;
+        };
 
-// These functions return the string representations for the data model
-// that's understood by the code-generator
-std::string GetComponentNameStr(const ComponentInfo& compInfo);
-std::string GetServiceInterfacesStr(const ServiceInfo& compInfo);
-std::string GetCtorInjectedRefTypes(const ComponentInfo& compInfo);
-std::string GetCtorInjectedRefNames(const ComponentInfo& compInfo);
-std::string GetReferenceBinderStr(const ReferenceInfo& ref,
-                                  bool injectReferences);
+        struct ComponentInfo
+        {
+            std::string name;
+            std::string implClassName;
+            std::string configurationPolicy;
+            bool injectReferences;
+            ServiceInfo service;
+            std::vector<ReferenceInfo> references;
+            static const std::string CONFIG_POLICY_IGNORE;
+            static const std::string CONFIG_POLICY_REQUIRE;
+            static const std::string CONFIG_POLICY_OPTIONAL;
+        };
 
-} // namespace datamodel
+        // These functions return the string representations for the data model
+        // that's understood by the code-generator
+        std::string GetComponentNameStr(ComponentInfo const& compInfo);
+        std::string GetServiceInterfacesStr(ServiceInfo const& compInfo);
+        std::string GetCtorInjectedRefTypes(ComponentInfo const& compInfo);
+        std::string GetCtorInjectedRefNames(ComponentInfo const& compInfo);
+        std::string GetReferenceBinderStr(ReferenceInfo const& ref, bool injectReferences);
+
+    } // namespace datamodel
 } // namespace codegen
 
 #endif // COMPONENTINFO_HPP

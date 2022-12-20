@@ -3,49 +3,51 @@
 #include <iostream>
 #include <string>
 
-namespace cppmicroservices {
-namespace service {
-namespace cm {
-namespace test {
-
-TestManagedServiceImpl3::TestManagedServiceImpl3()
-  : m_counter{ 0 }
+namespace cppmicroservices
 {
-}
+    namespace service
+    {
+        namespace cm
+        {
+            namespace test
+            {
 
-TestManagedServiceImpl3::~TestManagedServiceImpl3() = default;
+                TestManagedServiceImpl3::TestManagedServiceImpl3() : m_counter { 0 } {}
 
-void TestManagedServiceImpl3::Updated(AnyMap const&)
-{
-  std::lock_guard<std::mutex> lk(m_counterMtx);
-  m_counter++;
-}
+                TestManagedServiceImpl3::~TestManagedServiceImpl3() = default;
 
-int TestManagedServiceImpl3::getCounter()
-{
-  std::lock_guard<std::mutex> lk(m_counterMtx);
-  return m_counter;
-}
+                void
+                TestManagedServiceImpl3::Updated(AnyMap const&)
+                {
+                    std::lock_guard<std::mutex> lk(m_counterMtx);
+                    m_counter++;
+                }
 
-TestManagedServiceImpl4::TestManagedServiceImpl4()
-  : m_counter{ 0 }
-{
-}
+                int
+                TestManagedServiceImpl3::getCounter()
+                {
+                    std::lock_guard<std::mutex> lk(m_counterMtx);
+                    return m_counter;
+                }
 
-TestManagedServiceImpl4::~TestManagedServiceImpl4() = default;
+                TestManagedServiceImpl4::TestManagedServiceImpl4() : m_counter { 0 } {}
 
-void TestManagedServiceImpl4::Updated(AnyMap const&)
-{
-  std::lock_guard<std::mutex> lk(m_counterMtx);
-  m_counter++;
-}
+                TestManagedServiceImpl4::~TestManagedServiceImpl4() = default;
 
-int TestManagedServiceImpl4::getCounter()
-{
-  std::lock_guard<std::mutex> lk(m_counterMtx);
-  return m_counter;
-}
-} // namespace test
-} // namespace cm
-} // namespace service
+                void
+                TestManagedServiceImpl4::Updated(AnyMap const&)
+                {
+                    std::lock_guard<std::mutex> lk(m_counterMtx);
+                    m_counter++;
+                }
+
+                int
+                TestManagedServiceImpl4::getCounter()
+                {
+                    std::lock_guard<std::mutex> lk(m_counterMtx);
+                    return m_counter;
+                }
+            } // namespace test
+        }     // namespace cm
+    }         // namespace service
 } // namespace cppmicroservices

@@ -28,58 +28,59 @@
 #include <memory>
 #include <string>
 
-namespace cppmicroservices {
-
-class ServletContext;
-struct ServletConfigPrivate;
-
-/**
- *
- * A servlet configuration object used by a servlet container
- * to pass information to a servlet during initialization.
- *
- */
-class US_HttpService_EXPORT ServletConfig
+namespace cppmicroservices
 {
 
-public:
-  ServletConfig();
-  ServletConfig(const ServletConfig& other);
-  ServletConfig& operator=(const ServletConfig& other);
+    class ServletContext;
+    struct ServletConfigPrivate;
 
-  virtual ~ServletConfig();
+    /**
+     *
+     * A servlet configuration object used by a servlet container
+     * to pass information to a servlet during initialization.
+     *
+     */
+    class US_HttpService_EXPORT ServletConfig
+    {
 
-  /**
-   * Returns the name of this servlet instance.
-   * The name may be provided via server administration, assigned in the
-   * web application deployment descriptor, or for an unregistered (and thus
-   * unnamed) servlet instance it will be the servlet's class name.
-   *
-   * @return the name of the servlet instance
-   */
-  std::string GetServletName() const;
+      public:
+        ServletConfig();
+        ServletConfig(ServletConfig const& other);
+        ServletConfig& operator=(ServletConfig const& other);
 
-  /**
-   * Returns a reference to the {@link ServletContext} in which the caller
-   * is executing.
-   *
-   *
-   * @return  a {@link ServletContext} object, used
-   *   by the caller to interact with its servlet
-   *                  container
-   *
-   * @see  ServletContext
-   *
-   */
-  std::shared_ptr<ServletContext> GetServletContext() const;
+        virtual ~ServletConfig();
 
-protected:
-  void SetServletName(const std::string& name);
-  void SetServletContext(const std::shared_ptr<ServletContext>& context);
+        /**
+         * Returns the name of this servlet instance.
+         * The name may be provided via server administration, assigned in the
+         * web application deployment descriptor, or for an unregistered (and thus
+         * unnamed) servlet instance it will be the servlet's class name.
+         *
+         * @return the name of the servlet instance
+         */
+        std::string GetServletName() const;
 
-private:
-  std::shared_ptr<ServletConfigPrivate> d;
-};
-}
+        /**
+         * Returns a reference to the {@link ServletContext} in which the caller
+         * is executing.
+         *
+         *
+         * @return  a {@link ServletContext} object, used
+         *   by the caller to interact with its servlet
+         *                  container
+         *
+         * @see  ServletContext
+         *
+         */
+        std::shared_ptr<ServletContext> GetServletContext() const;
+
+      protected:
+        void SetServletName(std::string const& name);
+        void SetServletContext(std::shared_ptr<ServletContext> const& context);
+
+      private:
+        std::shared_ptr<ServletConfigPrivate> d;
+    };
+} // namespace cppmicroservices
 
 #endif // SERVLETCONFIG_H

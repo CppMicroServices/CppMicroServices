@@ -25,21 +25,21 @@
 
 #include "cppmicroservices/webconsole/SimpleWebConsolePlugin.h"
 
-namespace cppmicroservices {
-
-class SettingsPlugin : public SimpleWebConsolePlugin
+namespace cppmicroservices
 {
-public:
-  SettingsPlugin();
 
-private:
-  void RenderContent(HttpServletRequest& /*request*/,
-                     HttpServletResponse& response);
+    class SettingsPlugin : public SimpleWebConsolePlugin
+    {
+      public:
+        SettingsPlugin();
 
-  // WORKAROUND Remove this overload after the HttpService supports
-  // registering resources
-  BundleResource GetResource(const std::string& path) const;
-};
-}
+      private:
+        void RenderContent(HttpServletRequest& /*request*/, HttpServletResponse& response);
+
+        // WORKAROUND Remove this overload after the HttpService supports
+        // registering resources
+        BundleResource GetResource(std::string const& path) const;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SETTINGSPLUGIN_H

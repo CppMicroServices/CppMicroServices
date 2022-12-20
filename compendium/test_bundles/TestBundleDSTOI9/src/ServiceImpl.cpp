@@ -1,16 +1,19 @@
 #include "ServiceImpl.hpp"
 
-namespace sample {
-
-void ServiceComponent9::Activate(const std::shared_ptr<ComponentContext>&)
+namespace sample
 {
-  activated = true;
-  throw std::runtime_error("Exception thrown from user code");
-};
-void ServiceComponent9::Deactivate(const std::shared_ptr<ComponentContext>&)
-{
-  deactivated = true;
-  throw std::runtime_error("Exception thrown from user code");
-};
 
-} // namespaces
+    void
+    ServiceComponent9::Activate(std::shared_ptr<ComponentContext> const&)
+    {
+        activated = true;
+        throw std::runtime_error("Exception thrown from user code");
+    };
+    void
+    ServiceComponent9::Deactivate(std::shared_ptr<ComponentContext> const&)
+    {
+        deactivated = true;
+        throw std::runtime_error("Exception thrown from user code");
+    };
+
+} // namespace sample

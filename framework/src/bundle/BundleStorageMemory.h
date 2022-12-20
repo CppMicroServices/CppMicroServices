@@ -30,38 +30,37 @@
 #include <map>
 #include <memory>
 
-namespace cppmicroservices {
-
-class BundleStorageMemory : public BundleStorage
+namespace cppmicroservices
 {
 
-public:
-  BundleStorageMemory();
+    class BundleStorageMemory : public BundleStorage
+    {
 
-  std::shared_ptr<BundleArchive> CreateAndInsertArchive(
-    const std::shared_ptr<BundleResourceContainer>& resCont,
-    const std::string& topLevelEntry,
-    const ManifestT& bundleManifest) override;
+      public:
+        BundleStorageMemory();
 
-  bool RemoveArchive(const BundleArchive* ba) override;
+        std::shared_ptr<BundleArchive> CreateAndInsertArchive(std::shared_ptr<BundleResourceContainer> const& resCont,
+                                                              std::string const& topLevelEntry,
+                                                              ManifestT const& bundleManifest) override;
 
-  std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives()
-    const override;
+        bool RemoveArchive(BundleArchive const* ba) override;
 
-  std::vector<long> GetStartOnLaunchBundles() const override;
+        std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives() const override;
 
-  void Close() override;
+        std::vector<long> GetStartOnLaunchBundles() const override;
 
-private:
-  long nextFreeId;
-  /**
-   * Bundle id sorted list of all active bundle archives.
-   */
-  struct : detail::MultiThreaded<>
-  {
-    std::map<long, std::shared_ptr<BundleArchive>> v;
-  } archives;
-};
+        void Close() override;
+
+      private:
+        long nextFreeId;
+        /**
+         * Bundle id sorted list of all active bundle archives.
+         */
+        struct : detail::MultiThreaded<>
+        {
+            std::map<long, std::shared_ptr<BundleArchive>> v;
+        } archives;
+    };
 
 } // namespace cppmicroservices
 

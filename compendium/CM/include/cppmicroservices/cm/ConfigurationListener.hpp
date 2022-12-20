@@ -26,109 +26,124 @@
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 
-namespace cppmicroservices {
-namespace service {
-namespace cm {
-/**
- \defgroup gr_configurationlistener ConfigurationListener
- \brief Groups ConfigurationListener class related symbols.
- */
-/**
- * \addtogroup gr_configurationlistener
- * @{
- * The ConfigurationEventType is passed to a Configuration Listener to 
- * identify the type of ConfigurationEvent that has occurred.
- */
-enum class ConfigurationEventType
+namespace cppmicroservices
 {
-  CM_UPDATED =
-    1, ///< The ConfigurationEvent type for when a Configuration object has been updated
-  CM_DELETED =
-    2 ///< The ConfigurationEvent type for when a Configuration object has been removed
-};
-/** @}*/
+    namespace service
+    {
+        namespace cm
+        {
+            /**
+             \defgroup gr_configurationlistener ConfigurationListener
+             \brief Groups ConfigurationListener class related symbols.
+             */
+            /**
+             * \addtogroup gr_configurationlistener
+             * @{
+             * The ConfigurationEventType is passed to a Configuration Listener to
+             * identify the type of ConfigurationEvent that has occurred.
+             */
+            enum class ConfigurationEventType
+            {
+                CM_UPDATED = 1, ///< The ConfigurationEvent type for when a Configuration object has been updated
+                CM_DELETED = 2  ///< The ConfigurationEvent type for when a Configuration object has been removed
+            };
+            /** @}*/
 
-/**
- * \ingroup gr_configurationlistener
- *
- * The ConfigurationEvent object is passed to the ConfigurationListener when 
- * the configuration object for any service is updated or removed by ConfigurationAdmin
- */
-class ConfigurationEvent
-{
-public:
-  ConfigurationEvent(const ServiceReference<ConfigurationAdmin> configAdmin,
-                     const ConfigurationEventType type,
-                     const std::string factoryPid,
-                     const std::string pid)
-    : configAdmin(std::move(configAdmin))
-    , type(type)
-    , factoryPid(std::move(factoryPid))
-    , pid(std::move(pid))
-  {}
+            /**
+             * \ingroup gr_configurationlistener
+             *
+             * The ConfigurationEvent object is passed to the ConfigurationListener when
+             * the configuration object for any service is updated or removed by ConfigurationAdmin
+             */
+            class ConfigurationEvent
+            {
+              public:
+                ConfigurationEvent(ServiceReference<ConfigurationAdmin> const configAdmin,
+                                   const ConfigurationEventType type,
+                                   const std::string factoryPid,
+                                   const std::string pid)
+                    : configAdmin(std::move(configAdmin))
+                    , type(type)
+                    , factoryPid(std::move(factoryPid))
+                    , pid(std::move(pid))
+                {
+                }
 
-  /**
-   * Get the ServiceReference object of the Configuration Admin Service that created 
-   * this event.
-   *
-   * @return the service reference of this ConfigurationEvent
-   */
-  const ServiceReference<ConfigurationAdmin>& getReference() const noexcept
-  {
-    return configAdmin;
-  }
-  /**
-   * Get the PID of this ConfigurationEvent.
-   *
-   * @return the PID of this ConfigurationEvent
-   */
-  const std::string& getPid() const noexcept { return pid; }
-  /**
-   * Get the Factory PID which is responsible for this Configuration.
-   *
-   * @return the FactoryPID of this ConfigurationEvent
-   */
-  const std::string& getFactoryPid() const noexcept { return factoryPid; }
-  /**
-   * Get the type of this Configuration.
-   *
-   * @return the ConfigurationEventType of this ConfigurationEvent
-   */
-  ConfigurationEventType getType() const noexcept { return type; }
+                /**
+                 * Get the ServiceReference object of the Configuration Admin Service that created
+                 * this event.
+                 *
+                 * @return the service reference of this ConfigurationEvent
+                 */
+                ServiceReference<ConfigurationAdmin> const&
+                getReference() const noexcept
+                {
+                    return configAdmin;
+                }
+                /**
+                 * Get the PID of this ConfigurationEvent.
+                 *
+                 * @return the PID of this ConfigurationEvent
+                 */
+                std::string const&
+                getPid() const noexcept
+                {
+                    return pid;
+                }
+                /**
+                 * Get the Factory PID which is responsible for this Configuration.
+                 *
+                 * @return the FactoryPID of this ConfigurationEvent
+                 */
+                std::string const&
+                getFactoryPid() const noexcept
+                {
+                    return factoryPid;
+                }
+                /**
+                 * Get the type of this Configuration.
+                 *
+                 * @return the ConfigurationEventType of this ConfigurationEvent
+                 */
+                ConfigurationEventType
+                getType() const noexcept
+                {
+                    return type;
+                }
 
-private:
-  const ServiceReference<ConfigurationAdmin> configAdmin;
-  const ConfigurationEventType type;
-  const std::string factoryPid;
-  const std::string pid;
-};
+              private:
+                ServiceReference<ConfigurationAdmin> const configAdmin;
+                const ConfigurationEventType type;
+                const std::string factoryPid;
+                const std::string pid;
+            };
 
-/**
- * \ingroup gr_configurationlistener
- * 
- * The ConfigurationListener interface is the interface that Declarative Services implements
- * to receive updates from the ConfigurationAdmin implementation for all configuration object
- * updates. ConfigurationAdmin sends updates for all configuration object updates. It is up to
- * DS to determine if this is a configuration object associated with a service being managed
- * by DS.
- */
-class ConfigurationListener
-{
-public:
-  /**
-   * Called whenever the Configuration for any service is updated or removed from ConfigurationAdmin.
-   *
-   * @param ConfigurationEvent object containing the ConfigurationAdmin service reference
-   * of the ConfigurationAdmin service that updated the configuration object, 
-   * the PID or FactoryPid for the configuration object and the type of the update 
-   * operation (update or remove)
-   *
-   * @remarks This class is threadsafe
-   */
-  virtual void configurationEvent(const ConfigurationEvent& event) = 0;
-  virtual ~ConfigurationListener() noexcept = default;
-};
-} //cm namespace
-} //service namespace
-} //cppmicroservices namespace
+            /**
+             * \ingroup gr_configurationlistener
+             *
+             * The ConfigurationListener interface is the interface that Declarative Services implements
+             * to receive updates from the ConfigurationAdmin implementation for all configuration object
+             * updates. ConfigurationAdmin sends updates for all configuration object updates. It is up to
+             * DS to determine if this is a configuration object associated with a service being managed
+             * by DS.
+             */
+            class ConfigurationListener
+            {
+              public:
+                /**
+                 * Called whenever the Configuration for any service is updated or removed from ConfigurationAdmin.
+                 *
+                 * @param ConfigurationEvent object containing the ConfigurationAdmin service reference
+                 * of the ConfigurationAdmin service that updated the configuration object,
+                 * the PID or FactoryPid for the configuration object and the type of the update
+                 * operation (update or remove)
+                 *
+                 * @remarks This class is threadsafe
+                 */
+                virtual void configurationEvent(ConfigurationEvent const& event) = 0;
+                virtual ~ConfigurationListener() noexcept = default;
+            };
+        } // namespace cm
+    }     // namespace service
+} // namespace cppmicroservices
 #endif /* CppMicroServices_service_CM_ConfigurationListener_hpp */

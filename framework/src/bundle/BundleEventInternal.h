@@ -29,27 +29,24 @@
 
 #include <memory>
 
-namespace cppmicroservices {
-
-class BundlePrivate;
-
-struct BundleEventInternal
+namespace cppmicroservices
 {
-  BundleEventInternal(BundleEvent::Type t,
-                      std::shared_ptr<BundlePrivate> const& b)
-    : type(t)
-    , bundle(b)
-  {
-  }
 
-  BundleEvent::Type type;
-  std::shared_ptr<BundlePrivate> bundle;
-};
+    class BundlePrivate;
 
-inline BundleEvent MakeBundleEvent(const BundleEventInternal& be)
-{
-  return BundleEvent(be.type, MakeBundle(be.bundle));
-}
-}
+    struct BundleEventInternal
+    {
+        BundleEventInternal(BundleEvent::Type t, std::shared_ptr<BundlePrivate> const& b) : type(t), bundle(b) {}
+
+        BundleEvent::Type type;
+        std::shared_ptr<BundlePrivate> bundle;
+    };
+
+    inline BundleEvent
+    MakeBundleEvent(BundleEventInternal const& be)
+    {
+        return BundleEvent(be.type, MakeBundle(be.bundle));
+    }
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLEEVENTINTERNAL_H

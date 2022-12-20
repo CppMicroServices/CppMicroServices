@@ -3,14 +3,15 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 
-namespace graph {
-class DSGraph07Impl : public test::DSGraph07
+namespace graph
 {
-public:
-  DSGraph07Impl() = default;
-  ~DSGraph07Impl() override;
-  std::string Description() override;
-};
-}
+    class DSGraph07Impl : public test::DSGraph07
+    {
+      public:
+        DSGraph07Impl() = default;
+        ~DSGraph07Impl() override;
+        std::string Description() override;
+    };
+} // namespace graph
 
 #endif // _SERVICE_IMPL_HPP_

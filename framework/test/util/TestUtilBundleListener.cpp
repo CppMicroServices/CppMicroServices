@@ -24,147 +24,160 @@
 
 #include "cppmicroservices/Bundle.h"
 
-namespace cppmicroservices {
-
-TestBundleListener::TestBundleListener()
-  : serviceEvents()
-  , bundleEvents()
+namespace cppmicroservices
 {
-}
 
-void TestBundleListener::BundleChanged(const BundleEvent& event)
-{
-  bundleEvents.push_back(event);
-}
+    TestBundleListener::TestBundleListener() : serviceEvents(), bundleEvents() {}
 
-void TestBundleListener::ServiceChanged(const ServiceEvent& event)
-{
-  serviceEvents.push_back(event);
-}
-
-BundleEvent TestBundleListener::GetBundleEvent() const
-{
-  if (bundleEvents.empty()) {
-    return BundleEvent();
-  }
-  return bundleEvents.back();
-}
-
-ServiceEvent TestBundleListener::GetServiceEvent() const
-{
-  if (serviceEvents.empty()) {
-    return ServiceEvent();
-  }
-  return serviceEvents.back();
-}
-
-bool TestBundleListener::CheckListenerEvents(bool pexp,
-                                             BundleEvent::Type ptype,
-                                             bool sexp,
-                                             ServiceEvent::Type stype,
-                                             const Bundle& bundleX,
-                                             ServiceReferenceU* servX)
-{
-  std::vector<BundleEvent> pEvts;
-  std::vector<ServiceEvent> seEvts;
-
-  if (pexp)
-    pEvts.push_back(BundleEvent(ptype, bundleX));
-  if (sexp)
-    seEvts.push_back(ServiceEvent(stype, *servX));
-
-  return CheckListenerEvents(pEvts, seEvts);
-}
-
-bool TestBundleListener::CheckListenerEvents(
-  const std::vector<BundleEvent>& pEvts,
-  bool relaxed)
-{
-  bool listenState = true; // assume everything will work
-
-  if (pEvts.size() != bundleEvents.size() && !relaxed) {
-    listenState = false;
-    std::cerr << "*** Bundle event mismatch: \nexpected " << pEvts.size()
-              << " event(s), found " << bundleEvents.size() << " event(s).";
-
-    const std::size_t max =
-      pEvts.size() > bundleEvents.size() ? pEvts.size() : bundleEvents.size();
-    for (std::size_t i = 0; i < max; ++i) {
-      const BundleEvent& pE = i < pEvts.size() ? pEvts[i] : BundleEvent();
-      const BundleEvent& pR =
-        i < bundleEvents.size() ? bundleEvents[i] : BundleEvent();
-      std::cerr << "    " << pE << " - " << pR;
+    void
+    TestBundleListener::BundleChanged(BundleEvent const& event)
+    {
+        bundleEvents.push_back(event);
     }
-  } else {
-    if (relaxed) {
-      // just check if the expected events are present
-      for (auto e : pEvts) {
-        if (std::find(bundleEvents.begin(), bundleEvents.end(), e) ==
-            bundleEvents.end()) {
-          listenState = false;
-          std::cerr << "*** Expected event not found: " << e;
-          break;
+
+    void
+    TestBundleListener::ServiceChanged(ServiceEvent const& event)
+    {
+        serviceEvents.push_back(event);
+    }
+
+    BundleEvent
+    TestBundleListener::GetBundleEvent() const
+    {
+        if (bundleEvents.empty())
+        {
+            return BundleEvent();
         }
-      }
-    } else {
-      // check that the expected events match the received events exactly
-      for (std::size_t i = 0; i < pEvts.size(); ++i) {
-        const BundleEvent& pE = pEvts[i];
-        const BundleEvent& pR = bundleEvents[i];
-        if (pE.GetType() != pR.GetType() || pE.GetBundle() != pR.GetBundle()) {
-          listenState = false;
-          std::cerr << "*** Wrong bundle event: " << pR << "\nexpected " << pE;
+        return bundleEvents.back();
+    }
+
+    ServiceEvent
+    TestBundleListener::GetServiceEvent() const
+    {
+        if (serviceEvents.empty())
+        {
+            return ServiceEvent();
         }
-      }
+        return serviceEvents.back();
     }
-  }
 
-  bundleEvents.clear();
-  return listenState;
-}
+    bool
+    TestBundleListener::CheckListenerEvents(bool pexp,
+                                            BundleEvent::Type ptype,
+                                            bool sexp,
+                                            ServiceEvent::Type stype,
+                                            Bundle const& bundleX,
+                                            ServiceReferenceU* servX)
+    {
+        std::vector<BundleEvent> pEvts;
+        std::vector<ServiceEvent> seEvts;
 
-bool TestBundleListener::CheckListenerEvents(
-  const std::vector<ServiceEvent>& seEvts)
-{
-  bool listenState = true; // assume everything will work
+        if (pexp)
+            pEvts.push_back(BundleEvent(ptype, bundleX));
+        if (sexp)
+            seEvts.push_back(ServiceEvent(stype, *servX));
 
-  if (seEvts.size() != serviceEvents.size()) {
-    listenState = false;
-    std::cerr << "*** Service event mismatch: \nexpected " << seEvts.size()
-              << " event(s), found " << serviceEvents.size() << " event(s).";
-
-    const std::size_t max = seEvts.size() > serviceEvents.size()
-                              ? seEvts.size()
-                              : serviceEvents.size();
-    for (std::size_t i = 0; i < max; ++i) {
-      const ServiceEvent& seE = i < seEvts.size() ? seEvts[i] : ServiceEvent();
-      const ServiceEvent& seR =
-        i < serviceEvents.size() ? serviceEvents[i] : ServiceEvent();
-      std::cerr << "    " << seE << " - " << seR;
+        return CheckListenerEvents(pEvts, seEvts);
     }
-  } else {
-    for (std::size_t i = 0; i < seEvts.size(); ++i) {
-      const ServiceEvent& seE = seEvts[i];
-      const ServiceEvent& seR = serviceEvents[i];
-      if (seE.GetType() != seR.GetType() ||
-          (!(seE.GetServiceReference() == seR.GetServiceReference()))) {
-        listenState = false;
-        std::cerr << "*** Wrong service event: " << seR << "\nexpected " << seE;
-      }
+
+    bool
+    TestBundleListener::CheckListenerEvents(std::vector<BundleEvent> const& pEvts, bool relaxed)
+    {
+        bool listenState = true; // assume everything will work
+
+        if (pEvts.size() != bundleEvents.size() && !relaxed)
+        {
+            listenState = false;
+            std::cerr << "*** Bundle event mismatch: \nexpected " << pEvts.size() << " event(s), found "
+                      << bundleEvents.size() << " event(s).";
+
+            const std::size_t max = pEvts.size() > bundleEvents.size() ? pEvts.size() : bundleEvents.size();
+            for (std::size_t i = 0; i < max; ++i)
+            {
+                BundleEvent const& pE = i < pEvts.size() ? pEvts[i] : BundleEvent();
+                BundleEvent const& pR = i < bundleEvents.size() ? bundleEvents[i] : BundleEvent();
+                std::cerr << "    " << pE << " - " << pR;
+            }
+        }
+        else
+        {
+            if (relaxed)
+            {
+                // just check if the expected events are present
+                for (auto e : pEvts)
+                {
+                    if (std::find(bundleEvents.begin(), bundleEvents.end(), e) == bundleEvents.end())
+                    {
+                        listenState = false;
+                        std::cerr << "*** Expected event not found: " << e;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // check that the expected events match the received events exactly
+                for (std::size_t i = 0; i < pEvts.size(); ++i)
+                {
+                    BundleEvent const& pE = pEvts[i];
+                    BundleEvent const& pR = bundleEvents[i];
+                    if (pE.GetType() != pR.GetType() || pE.GetBundle() != pR.GetBundle())
+                    {
+                        listenState = false;
+                        std::cerr << "*** Wrong bundle event: " << pR << "\nexpected " << pE;
+                    }
+                }
+            }
+        }
+
+        bundleEvents.clear();
+        return listenState;
     }
-  }
 
-  serviceEvents.clear();
-  return listenState;
-}
+    bool
+    TestBundleListener::CheckListenerEvents(std::vector<ServiceEvent> const& seEvts)
+    {
+        bool listenState = true; // assume everything will work
 
-bool TestBundleListener::CheckListenerEvents(
-  const std::vector<BundleEvent>& pEvts,
-  const std::vector<ServiceEvent>& seEvts,
-  bool relaxed)
-{
-  if (!CheckListenerEvents(pEvts, relaxed))
-    return false;
-  return CheckListenerEvents(seEvts);
-}
-}
+        if (seEvts.size() != serviceEvents.size())
+        {
+            listenState = false;
+            std::cerr << "*** Service event mismatch: \nexpected " << seEvts.size() << " event(s), found "
+                      << serviceEvents.size() << " event(s).";
+
+            const std::size_t max = seEvts.size() > serviceEvents.size() ? seEvts.size() : serviceEvents.size();
+            for (std::size_t i = 0; i < max; ++i)
+            {
+                ServiceEvent const& seE = i < seEvts.size() ? seEvts[i] : ServiceEvent();
+                ServiceEvent const& seR = i < serviceEvents.size() ? serviceEvents[i] : ServiceEvent();
+                std::cerr << "    " << seE << " - " << seR;
+            }
+        }
+        else
+        {
+            for (std::size_t i = 0; i < seEvts.size(); ++i)
+            {
+                ServiceEvent const& seE = seEvts[i];
+                ServiceEvent const& seR = serviceEvents[i];
+                if (seE.GetType() != seR.GetType() || (!(seE.GetServiceReference() == seR.GetServiceReference())))
+                {
+                    listenState = false;
+                    std::cerr << "*** Wrong service event: " << seR << "\nexpected " << seE;
+                }
+            }
+        }
+
+        serviceEvents.clear();
+        return listenState;
+    }
+
+    bool
+    TestBundleListener::CheckListenerEvents(std::vector<BundleEvent> const& pEvts,
+                                            std::vector<ServiceEvent> const& seEvts,
+                                            bool relaxed)
+    {
+        if (!CheckListenerEvents(pEvts, relaxed))
+            return false;
+        return CheckListenerEvents(seEvts);
+    }
+} // namespace cppmicroservices

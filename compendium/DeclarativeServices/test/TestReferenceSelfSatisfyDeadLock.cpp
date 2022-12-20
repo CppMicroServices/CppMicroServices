@@ -37,40 +37,40 @@
 
 #include "TestUtils.hpp"
 
-namespace test {
-/**
- * Test for the case where one bundle both provides and depends on a service
- * of the same interface AND that bundle is stopped after the bundle
- * providing the service dependency.
- *
- *
- * A failure will result in a deadlock.
- */
-TEST(tServiceComponentRuntime, testReferenceSelfSatisfyDeadlock)
+namespace test
 {
-  auto framework = cppmicroservices::FrameworkFactory().NewFramework();
-  framework.Start();
-  EXPECT_TRUE(framework);
+    /**
+     * Test for the case where one bundle both provides and depends on a service
+     * of the same interface AND that bundle is stopped after the bundle
+     * providing the service dependency.
+     *
+     *
+     * A failure will result in a deadlock.
+     */
+    TEST(tServiceComponentRuntime, testReferenceSelfSatisfyDeadlock)
+    {
+        auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+        framework.Start();
+        EXPECT_TRUE(framework);
 
-  auto dsPluginPath = test::GetDSRuntimePluginFilePath();
-  auto dsbundles = framework.GetBundleContext().InstallBundles(dsPluginPath);
-  for (auto& bundle : dsbundles) {
-    bundle.Start();
-  }
+        auto dsPluginPath = test::GetDSRuntimePluginFilePath();
+        auto dsbundles = framework.GetBundleContext().InstallBundles(dsPluginPath);
+        for (auto& bundle : dsbundles)
+        {
+            bundle.Start();
+        }
 
-  // The names of the bundles do matter here. The bundle containing the dependency MUST
-  // be stopped after the one providing the dependency. CppMicroServices stores bundles
-  // in sorted order by path.
-  auto bundleB =
-    test::InstallAndStartBundle(framework.GetBundleContext(), "TestBundleDSb");
-  ASSERT_TRUE(bundleB);
-  bundleB.Start();
-  auto bundleA =
-    test::InstallAndStartBundle(framework.GetBundleContext(), "TestBundleDSa");
-  ASSERT_TRUE(bundleA);
-  bundleA.Start();
+        // The names of the bundles do matter here. The bundle containing the dependency MUST
+        // be stopped after the one providing the dependency. CppMicroServices stores bundles
+        // in sorted order by path.
+        auto bundleB = test::InstallAndStartBundle(framework.GetBundleContext(), "TestBundleDSb");
+        ASSERT_TRUE(bundleB);
+        bundleB.Start();
+        auto bundleA = test::InstallAndStartBundle(framework.GetBundleContext(), "TestBundleDSa");
+        ASSERT_TRUE(bundleA);
+        bundleA.Start();
 
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
-}
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+    }
 } // namespace test

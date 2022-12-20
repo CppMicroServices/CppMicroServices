@@ -29,47 +29,48 @@
 
 #include "cppmicroservices/webconsole/WebConsoleExport.h"
 
-namespace cppmicroservices {
-
-/**
- * The <code>WebConsoleVariableResolver</code> interface defines the API for an object
- * which may be provided by plugins to provide replacement values for
- * variables in the generated content.
- *
- * Plugins should call the AbstractWebConsolePlugin#SetVariableResolver
- * method to provide their implementation for variable resolution.
- *
- * The main use of such a variable resolver is when a plugin is using a static
- * template which provides slots to place dynamically generated content
- * parts.
- *
- * \rststar
- * .. note::
- *
- *    The variable resolver must be set in the request *before*
- *    the response stream is retrieved calling the
- *    :any:`HttpServletResponse::GetOutputStream <cppmicroservices::HttpServletResponse::GetOutputStream>`
- *    method. Otherwise the variable resolver will not be used for
- *    resolving variables.
- * \endrststar
- *
- * @see AbstractWebConsolePlugin#GetVariableResolver(HttpServletRequest&)
- * @see AbstractWebConsolePlugin#SetVariableResolver
- */
-struct US_WebConsole_EXPORT WebConsoleVariableResolver
+namespace cppmicroservices
 {
 
-  virtual ~WebConsoleVariableResolver();
+    /**
+     * The <code>WebConsoleVariableResolver</code> interface defines the API for an object
+     * which may be provided by plugins to provide replacement values for
+     * variables in the generated content.
+     *
+     * Plugins should call the AbstractWebConsolePlugin#SetVariableResolver
+     * method to provide their implementation for variable resolution.
+     *
+     * The main use of such a variable resolver is when a plugin is using a static
+     * template which provides slots to place dynamically generated content
+     * parts.
+     *
+     * \rststar
+     * .. note::
+     *
+     *    The variable resolver must be set in the request *before*
+     *    the response stream is retrieved calling the
+     *    :any:`HttpServletResponse::GetOutputStream <cppmicroservices::HttpServletResponse::GetOutputStream>`
+     *    method. Otherwise the variable resolver will not be used for
+     *    resolving variables.
+     * \endrststar
+     *
+     * @see AbstractWebConsolePlugin#GetVariableResolver(HttpServletRequest&)
+     * @see AbstractWebConsolePlugin#SetVariableResolver
+     */
+    struct US_WebConsole_EXPORT WebConsoleVariableResolver
+    {
 
-  /**
-   * Returns a replacement value for the named variable.
-   *
-   * @param variable The name of the variable for which to return a
-   *      replacement.
-   * @return The replacement value.
-   */
-  virtual std::string Resolve(const std::string& variable) const = 0;
-};
-}
+        virtual ~WebConsoleVariableResolver();
+
+        /**
+         * Returns a replacement value for the named variable.
+         *
+         * @param variable The name of the variable for which to return a
+         *      replacement.
+         * @return The replacement value.
+         */
+        virtual std::string Resolve(std::string const& variable) const = 0;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_WEBCONSOLEVARIABLERESOLVER_H

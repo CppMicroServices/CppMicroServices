@@ -28,31 +28,29 @@
 #include <memory>
 #include <vector>
 
-namespace cppmicroservices {
-
-class CoreBundleContext;
-class Bundle;
-class BundleContext;
-class BundleEvent;
-
-class BundleHooks
+namespace cppmicroservices
 {
 
-private:
-  CoreBundleContext* const coreCtx;
+    class CoreBundleContext;
+    class Bundle;
+    class BundleContext;
+    class BundleEvent;
 
-public:
-  BundleHooks(CoreBundleContext* ctx);
+    class BundleHooks
+    {
 
-  Bundle FilterBundle(const BundleContext& context, const Bundle& bundle) const;
+      private:
+        CoreBundleContext* const coreCtx;
 
-  void FilterBundles(const BundleContext& context,
-                     std::vector<Bundle>& bundles) const;
+      public:
+        BundleHooks(CoreBundleContext* ctx);
 
-  void FilterBundleEventReceivers(
-    const BundleEvent& evt,
-    ServiceListeners::BundleListenerMap& bundleListeners);
-};
-}
+        Bundle FilterBundle(BundleContext const& context, Bundle const& bundle) const;
+
+        void FilterBundles(BundleContext const& context, std::vector<Bundle>& bundles) const;
+
+        void FilterBundleEventReceivers(BundleEvent const& evt, ServiceListeners::BundleListenerMap& bundleListeners);
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLEHOOKS_H

@@ -28,64 +28,67 @@
 
 #include "ServiceReferenceDTO.hpp"
 
-namespace cppmicroservices {
-namespace service {
-namespace component {
-namespace runtime {
-namespace dto {
-
-/**
- \defgroup gr_unsatisfiedreferencedto UnsatisfiedReferenceDTO
- \brief Groups UnsatisfiedReferenceDTO related symbols.
- */
-
-/**
- * \ingroup gr_unsatisfiedreferencedto
- * 
- * A representation of an unsatisfied reference.
- */
-struct UnsatisfiedReferenceDTO
+namespace cppmicroservices
 {
-  /**
-   * The name of the declared reference.
-   *
-   * <p>
-   * This is declared in the \c name attribute of the \c reference
-   * element of the component description.
-   *
-   * @see ReferenceDTO#name
-   */
-  std::string name;
+    namespace service
+    {
+        namespace component
+        {
+            namespace runtime
+            {
+                namespace dto
+                {
 
-  /**
-   * The target property of the unsatisfied reference.
-   *
-   * <p>
-   * This is the value of the {@link ComponentConfigurationDTO#properties
-   * component property} whose name is the concatenation of the
-   * {@link ReferenceDTO#name declared reference name} and
-   * &quot;.target&quot;. This must be empty string if no target property is
-   * set for the reference.
-   */
-  std::string target;
+                    /**
+                     \defgroup gr_unsatisfiedreferencedto UnsatisfiedReferenceDTO
+                     \brief Groups UnsatisfiedReferenceDTO related symbols.
+                     */
 
-  /**
-   * The target services.
-   *
-   * <p>
-   * Each {@link cppmicroservices::framework::dto::ServiceReferenceDTO ServiceReferenceDTO} in the vector represents a target service
-   * for the reference. The vector must be empty if there are no target
-   * services. The upper bound on the number of target services in the vector
-   * is the upper bound on the {@link ReferenceDTO#cardinality cardinality} of
-   * the reference.
-   */
-  std::vector<cppmicroservices::framework::dto::ServiceReferenceDTO>
-    targetServices;
-};
-}
-}
-}
-}
-}
+                    /**
+                     * \ingroup gr_unsatisfiedreferencedto
+                     *
+                     * A representation of an unsatisfied reference.
+                     */
+                    struct UnsatisfiedReferenceDTO
+                    {
+                        /**
+                         * The name of the declared reference.
+                         *
+                         * <p>
+                         * This is declared in the \c name attribute of the \c reference
+                         * element of the component description.
+                         *
+                         * @see ReferenceDTO#name
+                         */
+                        std::string name;
+
+                        /**
+                         * The target property of the unsatisfied reference.
+                         *
+                         * <p>
+                         * This is the value of the {@link ComponentConfigurationDTO#properties
+                         * component property} whose name is the concatenation of the
+                         * {@link ReferenceDTO#name declared reference name} and
+                         * &quot;.target&quot;. This must be empty string if no target property is
+                         * set for the reference.
+                         */
+                        std::string target;
+
+                        /**
+                         * The target services.
+                         *
+                         * <p>
+                         * Each {@link cppmicroservices::framework::dto::ServiceReferenceDTO ServiceReferenceDTO} in the
+                         * vector represents a target service for the reference. The vector must be empty if there are
+                         * no target services. The upper bound on the number of target services in the vector is the
+                         * upper bound on the {@link ReferenceDTO#cardinality cardinality} of the reference.
+                         */
+                        std::vector<cppmicroservices::framework::dto::ServiceReferenceDTO> targetServices;
+                    };
+                } // namespace dto
+            }     // namespace runtime
+        }         // namespace component
+    }             // namespace service
+} // namespace cppmicroservices
 
 #endif /* UnsatisfiedReferenceDTO_hpp */

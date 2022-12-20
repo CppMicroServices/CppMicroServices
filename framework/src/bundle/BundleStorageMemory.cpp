@@ -29,71 +29,74 @@
 
 #include <chrono>
 
-namespace cppmicroservices {
-namespace sc = std::chrono;
-
-BundleStorageMemory::BundleStorageMemory()
-  : BundleStorage()
-  , nextFreeId(1)
+namespace cppmicroservices
 {
-}
+    namespace sc = std::chrono;
 
-std::shared_ptr<BundleArchive> BundleStorageMemory::CreateAndInsertArchive(
-  const std::shared_ptr<BundleResourceContainer>& resCont,
-  const std::string& prefix,
-  const ManifestT& bundleManifest)
-{
-  auto l = archives.Lock();
-  US_UNUSED(l);
-  auto id = nextFreeId++;
-  auto p = archives.v.insert(std::make_pair(
-    id,
-    std::make_shared<BundleArchive>(
-      this, resCont, prefix, resCont->GetLocation(), id, bundleManifest)));
-  return p.first->second;
-}
+    BundleStorageMemory::BundleStorageMemory() : BundleStorage(), nextFreeId(1) {}
 
-bool BundleStorageMemory::RemoveArchive(const BundleArchive* ba)
-{
-  auto l = archives.Lock();
-  US_UNUSED(l);
-  auto iter = archives.v.find(ba->GetBundleId());
-  if (iter != archives.v.end()) {
-    archives.v.erase(iter);
-    return true;
-  }
-  return false;
-}
-
-std::vector<std::shared_ptr<BundleArchive>>
-BundleStorageMemory::GetAllBundleArchives() const
-{
-  std::vector<std::shared_ptr<BundleArchive>> res;
-  auto l = archives.Lock();
-  US_UNUSED(l);
-  for (auto const& v : archives.v) {
-    res.emplace_back(v.second);
-  }
-  return res;
-}
-
-std::vector<long> BundleStorageMemory::GetStartOnLaunchBundles() const
-{
-  std::vector<long> res;
-  auto l = archives.Lock();
-  US_UNUSED(l);
-  for (auto& v : archives.v) {
-    if (v.second->GetAutostartSetting() != -1) {
-      res.emplace_back(v.second->GetBundleId());
+    std::shared_ptr<BundleArchive>
+    BundleStorageMemory::CreateAndInsertArchive(std::shared_ptr<BundleResourceContainer> const& resCont,
+                                                std::string const& prefix,
+                                                ManifestT const& bundleManifest)
+    {
+        auto l = archives.Lock();
+        US_UNUSED(l);
+        auto id = nextFreeId++;
+        auto p = archives.v.insert(std::make_pair(
+            id,
+            std::make_shared<BundleArchive>(this, resCont, prefix, resCont->GetLocation(), id, bundleManifest)));
+        return p.first->second;
     }
-  }
-  return res;
-}
 
-void BundleStorageMemory::Close()
-{
-  auto l = archives.Lock();
-  US_UNUSED(l);
-  archives.v.clear();
-}
-}
+    bool
+    BundleStorageMemory::RemoveArchive(BundleArchive const* ba)
+    {
+        auto l = archives.Lock();
+        US_UNUSED(l);
+        auto iter = archives.v.find(ba->GetBundleId());
+        if (iter != archives.v.end())
+        {
+            archives.v.erase(iter);
+            return true;
+        }
+        return false;
+    }
+
+    std::vector<std::shared_ptr<BundleArchive>>
+    BundleStorageMemory::GetAllBundleArchives() const
+    {
+        std::vector<std::shared_ptr<BundleArchive>> res;
+        auto l = archives.Lock();
+        US_UNUSED(l);
+        for (auto const& v : archives.v)
+        {
+            res.emplace_back(v.second);
+        }
+        return res;
+    }
+
+    std::vector<long>
+    BundleStorageMemory::GetStartOnLaunchBundles() const
+    {
+        std::vector<long> res;
+        auto l = archives.Lock();
+        US_UNUSED(l);
+        for (auto& v : archives.v)
+        {
+            if (v.second->GetAutostartSetting() != -1)
+            {
+                res.emplace_back(v.second->GetBundleId());
+            }
+        }
+        return res;
+    }
+
+    void
+    BundleStorageMemory::Close()
+    {
+        auto l = archives.Lock();
+        US_UNUSED(l);
+        archives.v.clear();
+    }
+} // namespace cppmicroservices

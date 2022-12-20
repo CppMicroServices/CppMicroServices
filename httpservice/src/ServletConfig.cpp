@@ -23,37 +23,38 @@
 #include "cppmicroservices/httpservice/ServletConfig.h"
 #include "ServletConfigPrivate.h"
 
-namespace cppmicroservices {
-
-ServletConfig::~ServletConfig() = default;
-
-std::string ServletConfig::GetServletName() const
+namespace cppmicroservices
 {
-  return d->m_Name;
-}
 
-std::shared_ptr<ServletContext> ServletConfig::GetServletContext() const
-{
-  return d->m_Context;
-}
+    ServletConfig::~ServletConfig() = default;
 
-void ServletConfig::SetServletName(const std::string& name)
-{
-  d->m_Name = name;
-}
+    std::string
+    ServletConfig::GetServletName() const
+    {
+        return d->m_Name;
+    }
 
-void ServletConfig::SetServletContext(
-  const std::shared_ptr<ServletContext>& context)
-{
-  d->m_Context = context;
-}
+    std::shared_ptr<ServletContext>
+    ServletConfig::GetServletContext() const
+    {
+        return d->m_Context;
+    }
 
-ServletConfig::ServletConfig()
-  : d(new ServletConfigPrivate)
-{
-}
+    void
+    ServletConfig::SetServletName(std::string const& name)
+    {
+        d->m_Name = name;
+    }
 
-ServletConfig::ServletConfig(const ServletConfig&) = default;
-ServletConfig& ServletConfig::operator=(const ServletConfig&) = default;
+    void
+    ServletConfig::SetServletContext(std::shared_ptr<ServletContext> const& context)
+    {
+        d->m_Context = context;
+    }
 
-}
+    ServletConfig::ServletConfig() : d(new ServletConfigPrivate) {}
+
+    ServletConfig::ServletConfig(ServletConfig const&) = default;
+    ServletConfig& ServletConfig::operator=(ServletConfig const&) = default;
+
+} // namespace cppmicroservices

@@ -26,7 +26,7 @@ namespace codegen
 {
 
 #if NEVER
-const std::string REF_SRC = R"manifestsrc(
+    const std::string REF_SRC = R"manifestsrc(
 #include <vector>
 #include <cppmicroservices/ServiceInterface.h>
 #include "ServiceComponent/detail/ComponentInstanceImpl.hpp"
@@ -53,7 +53,7 @@ extern "C" US_ABI_EXPORT void DeleteInstance_DSSpellCheck_SpellCheckImpl(scd::Co
 
 )manifestsrc";
 #else
-const std::string REF_SRC = R"manifestsrc(
+    const std::string REF_SRC = R"manifestsrc(
 #include <vector>
 #include <cppmicroservices/ServiceInterface.h>
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
@@ -78,7 +78,7 @@ extern "C" US_ABI_EXPORT void DeleteInstance_DSSpellCheck_SpellCheckImpl(scd::Co
 )manifestsrc";
 #endif
 
-const std::string REF_SRC_DYN = R"manifestsrc(
+    const std::string REF_SRC_DYN = R"manifestsrc(
 #include <vector>
 #include <cppmicroservices/ServiceInterface.h>
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
@@ -103,7 +103,7 @@ extern "C" US_ABI_EXPORT void DeleteInstance_DSSpellCheck_SpellCheckImpl(scd::Co
 
 )manifestsrc";
 
-const std::string REF_MULT_COMPS = R"manifestsrc(
+    const std::string REF_MULT_COMPS = R"manifestsrc(
 #include <vector>
 #include <cppmicroservices/ServiceInterface.h>
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
@@ -141,7 +141,7 @@ extern "C" US_ABI_EXPORT void DeleteInstance_Foo_Impl2(scd::ComponentInstance* c
 
 )manifestsrc";
 
-const std::string REF_MULT_COMPS_SAME_IMPL = R"manifestsrc(
+    const std::string REF_MULT_COMPS_SAME_IMPL = R"manifestsrc(
 #include <vector>
 #include <cppmicroservices/ServiceInterface.h>
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"

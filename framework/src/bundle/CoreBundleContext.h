@@ -58,156 +58,156 @@ as specified in the OSGi R4.2 specifications.
 #include <ostream>
 #include <string>
 
-namespace cppmicroservices {
-
-struct BundleStorage;
-class FrameworkPrivate;
-
-/**
- * This class is not part of the public API.
- */
-class CoreBundleContext
+namespace cppmicroservices
 {
-public:
-  /**
-  * Please note: The order of the member variables in this class is important. When the 
-  * CoreBundleContext object is destroyed, it will call the destructors for the member 
-  * variables in the reverse order in which they are listed here. For example, serviceHooks 
-  * will be destroyed before the logger. The logger will be destroyed before the listeners, etc. 
-  * 
-  * The logger has a ServiceTracker member variable. When it is destroyed, the ServiceTracker::Close
-  * method is called to remove the ServiceListener. The logger object must be destroyed before the 
-  * listeners member variable is destroyed because when the listeners member variable is destroyed 
-  * it leaves the ServiceListeners data structures in an unusable state. If the logger object 
-  * destructor runs after the listeners object destructor, it results in an access violation. 
-  */
-  /**
-   * Framework id.
-   */
-  int id;
 
-  /**
-   * Id to use for next instance of the framework.
-   */
-  static std::atomic<int> globalId;
+    struct BundleStorage;
+    class FrameworkPrivate;
 
-  /*
-  * Framework properties, which contain both the
-  * launch properties and the system properties.
-  * See OSGi spec revision 6, section 4.2.2
-  *
-  * Note: CppMicroServices currently has no concept
-  * of "system properties".
-  */
-  std::unordered_map<std::string, Any> frameworkProperties;
+    /**
+     * This class is not part of the public API.
+     */
+    class CoreBundleContext
+    {
+      public:
+        /**
+         * Please note: The order of the member variables in this class is important. When the
+         * CoreBundleContext object is destroyed, it will call the destructors for the member
+         * variables in the reverse order in which they are listed here. For example, serviceHooks
+         * will be destroyed before the logger. The logger will be destroyed before the listeners, etc.
+         *
+         * The logger has a ServiceTracker member variable. When it is destroyed, the ServiceTracker::Close
+         * method is called to remove the ServiceListener. The logger object must be destroyed before the
+         * listeners member variable is destroyed because when the listeners member variable is destroyed
+         * it leaves the ServiceListeners data structures in an unusable state. If the logger object
+         * destructor runs after the listeners object destructor, it results in an access violation.
+         */
+        /**
+         * Framework id.
+         */
+        int id;
 
-  const std::string& workingDir;
+        /**
+         * Id to use for next instance of the framework.
+         */
+        static std::atomic<int> globalId;
 
-  /**
-  * The diagnostic logging sink
-  * For internal Framework use only. Do not expose
-  * to Framework clients.
-  */
-  std::shared_ptr<detail::LogSink> sink;
+        /*
+         * Framework properties, which contain both the
+         * launch properties and the system properties.
+         * See OSGi spec revision 6, section 4.2.2
+         *
+         * Note: CppMicroServices currently has no concept
+         * of "system properties".
+         */
+        std::unordered_map<std::string, Any> frameworkProperties;
 
-  /**
-   * Bundle Storage
-   */
-  std::unique_ptr<BundleStorage> storage;
+        std::string const& workingDir;
 
-  /**
-   * Private Bundle Data Storage
-   */
-  std::string dataStorage;
+        /**
+         * The diagnostic logging sink
+         * For internal Framework use only. Do not expose
+         * to Framework clients.
+         */
+        std::shared_ptr<detail::LogSink> sink;
 
-  /**
-   * All listeners in this framework.
-   */
-  ServiceListeners listeners;
+        /**
+         * Bundle Storage
+         */
+        std::unique_ptr<BundleStorage> storage;
 
-  /**
-   * All registered services in this framework.
-   */
-  ServiceRegistry services;
+        /**
+         * Private Bundle Data Storage
+         */
+        std::string dataStorage;
 
-  /**
-   * A LogService for logging framework messages via
-   * a default or user-provided LogService that are intended to be
-   * visible outside of the framework.
-   */
-  std::shared_ptr<cppmicroservices::cfrimpl::CFRLogger> logger;
+        /**
+         * All listeners in this framework.
+         */
+        ServiceListeners listeners;
 
-  /**
-   * All service hooks.
-   */
-  ServiceHooks serviceHooks;
+        /**
+         * All registered services in this framework.
+         */
+        ServiceRegistry services;
 
-  /**
-   * All bundle hooks.
-   */
-  BundleHooks bundleHooks;
+        /**
+         * A LogService for logging framework messages via
+         * a default or user-provided LogService that are intended to be
+         * visible outside of the framework.
+         */
+        std::shared_ptr<cppmicroservices::cfrimpl::CFRLogger> logger;
 
-  /**
-   * All capabilities, exported and imported packages in this framework.
-   */
-  Resolver resolver;
+        /**
+         * All service hooks.
+         */
+        ServiceHooks serviceHooks;
 
-  /**
-   * All installed bundles.
-   */
-  BundleRegistry bundleRegistry;
+        /**
+         * All bundle hooks.
+         */
+        BundleHooks bundleHooks;
 
-  bool firstInit;
+        /**
+         * All capabilities, exported and imported packages in this framework.
+         */
+        Resolver resolver;
 
-  /**
-   * Framework init count.
-   */
-  int initCount;
+        /**
+         * All installed bundles.
+         */
+        BundleRegistry bundleRegistry;
 
-  std::shared_ptr<FrameworkPrivate> systemBundle;
+        bool firstInit;
 
-  /**
-   * Flags to use for dlopen calls on unix systems. Ignored on Windows.
-   */
-  int libraryLoadOptions;
+        /**
+         * Framework init count.
+         */
+        int initCount;
 
-  std::function<bool(const cppmicroservices::Bundle&)> validationFunc;
+        std::shared_ptr<FrameworkPrivate> systemBundle;
 
-  ~CoreBundleContext();
+        /**
+         * Flags to use for dlopen calls on unix systems. Ignored on Windows.
+         */
+        int libraryLoadOptions;
 
-  // thread-safe shared_from_this implementation
-  std::shared_ptr<CoreBundleContext> shared_from_this() const;
-  void SetThis(const std::shared_ptr<CoreBundleContext>& self);
+        std::function<bool(cppmicroservices::Bundle const&)> validationFunc;
 
-  void Init();
+        ~CoreBundleContext();
 
-  // must be called without any locks held
-  void Uninit0();
+        // thread-safe shared_from_this implementation
+        std::shared_ptr<CoreBundleContext> shared_from_this() const;
+        void SetThis(std::shared_ptr<CoreBundleContext> const& self);
 
-  void Uninit1();
+        void Init();
 
-  /**
-   * Get private bundle data storage file handle.
-   *
-   */
-  std::string GetDataStorage(long id) const;
+        // must be called without any locks held
+        void Uninit0();
 
-private:
-  // The core context is exclusively constructed by the FrameworkFactory class
-  friend class FrameworkFactory;
+        void Uninit1();
 
-  /**
-   * Construct a core context
-   *
-   */
-  CoreBundleContext(const std::unordered_map<std::string, Any>& props,
-                    std::ostream* logger);
+        /**
+         * Get private bundle data storage file handle.
+         *
+         */
+        std::string GetDataStorage(long id) const;
 
-  struct : detail::MultiThreaded<>
-  {
-    std::weak_ptr<CoreBundleContext> v;
-  } self;
-};
-}
+      private:
+        // The core context is exclusively constructed by the FrameworkFactory class
+        friend class FrameworkFactory;
+
+        /**
+         * Construct a core context
+         *
+         */
+        CoreBundleContext(std::unordered_map<std::string, Any> const& props, std::ostream* logger);
+
+        struct : detail::MultiThreaded<>
+        {
+            std::weak_ptr<CoreBundleContext> v;
+        } self;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_COREBUNDLECONTEXT_H

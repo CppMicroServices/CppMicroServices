@@ -31,28 +31,26 @@
 // ignore warning c4275 per MS documentation
 // https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-2-c4275
 #ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4275)
+#    pragma warning(push)
+#    pragma warning(disable : 4275)
 #endif
 
-namespace cppmicroservices {
-
-class US_Framework_EXPORT SharedLibraryException final
-  : public std::system_error
+namespace cppmicroservices
 {
-public:
-  explicit SharedLibraryException(std::error_code ec,
-                                  std::string what,
-                                  cppmicroservices::Bundle origin);
-  ~SharedLibraryException() override;
-  Bundle GetBundle() const;
 
-private:
-  Bundle origin; ///< The bundle of the shared library which failed to load.
-};
+    class US_Framework_EXPORT SharedLibraryException final : public std::system_error
+    {
+      public:
+        explicit SharedLibraryException(std::error_code ec, std::string what, cppmicroservices::Bundle origin);
+        ~SharedLibraryException() override;
+        Bundle GetBundle() const;
+
+      private:
+        Bundle origin; ///< The bundle of the shared library which failed to load.
+    };
 #ifdef _MSC_VER
-#  pragma warning(pop)
+#    pragma warning(pop)
 #endif
-}
+} // namespace cppmicroservices
 
 #endif /* CPPMICROSERVICES_SHAREDLIBRARYEXCEPTION_H */

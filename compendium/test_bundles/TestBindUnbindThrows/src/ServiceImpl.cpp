@@ -1,73 +1,84 @@
 #include "ServiceImpl.hpp"
 #include <iostream>
 
-namespace sample {
-
-std::string ServiceComponentDGMU::ExtendedDescription()
-{
-  if (!foo) {
-    throw std::runtime_error("Dependency not available");
-  }
-  std::string result(STRINGIZE(US_BUNDLE_NAME));
-  result.append("depends on ");
-  result.append(foo->Description());
-  return result;
-}
-
-void ServiceComponentDGMU::Bindfoo(const std::shared_ptr<test::Interface1>&)
-{
-  throw std::runtime_error("throw from bind method");
-}
-
-void ServiceComponentDGMU::Unbindfoo(const std::shared_ptr<test::Interface1>&)
-{
-  throw std::runtime_error("throw from unbind method");
-}
-
-std::string ServiceComponentDGOU::ExtendedDescription()
-{
-  if (!foo) {
-    throw std::runtime_error("Dependency not available");
-  }
-  std::string result(STRINGIZE(US_BUNDLE_NAME));
-  result.append("depends on ");
-  result.append(foo->Description());
-  return result;
-}
-
-void ServiceComponentDGOU::Bindbar(const std::shared_ptr<test::Interface1>&)
-{
-  throw std::runtime_error("throw from bind method");
-}
-
-void ServiceComponentDGOU::Unbindbar(const std::shared_ptr<test::Interface1>&)
+namespace sample
 {
 
-  throw std::runtime_error("throw from unbind method");
-}
+    std::string
+    ServiceComponentDGMU::ExtendedDescription()
+    {
+        if (!foo)
+        {
+            throw std::runtime_error("Dependency not available");
+        }
+        std::string result(STRINGIZE(US_BUNDLE_NAME));
+        result.append("depends on ");
+        result.append(foo->Description());
+        return result;
+    }
 
-std::string ServiceComponentFactory::ExtendedDescription()
-{
-  if (!foo) {
-    throw std::runtime_error("Dependency not available");
-  }
-  std::string result(STRINGIZE(US_BUNDLE_NAME));
-  result.append("depends on ");
-  result.append(foo->Description());
-  return result;
-}
+    void
+    ServiceComponentDGMU::Bindfoo(std::shared_ptr<test::Interface1> const&)
+    {
+        throw std::runtime_error("throw from bind method");
+    }
 
-void ServiceComponentFactory::Bindfactory(
-  const std::shared_ptr<test::Interface1>&)
-{
-  throw std::runtime_error("throw from bind method");
-}
+    void
+    ServiceComponentDGMU::Unbindfoo(std::shared_ptr<test::Interface1> const&)
+    {
+        throw std::runtime_error("throw from unbind method");
+    }
 
-void ServiceComponentFactory::Unbindfactory(
-  const std::shared_ptr<test::Interface1>&)
-{
+    std::string
+    ServiceComponentDGOU::ExtendedDescription()
+    {
+        if (!foo)
+        {
+            throw std::runtime_error("Dependency not available");
+        }
+        std::string result(STRINGIZE(US_BUNDLE_NAME));
+        result.append("depends on ");
+        result.append(foo->Description());
+        return result;
+    }
 
-  throw std::runtime_error("throw from unbind method");
-}
+    void
+    ServiceComponentDGOU::Bindbar(std::shared_ptr<test::Interface1> const&)
+    {
+        throw std::runtime_error("throw from bind method");
+    }
 
-} // namespaces
+    void
+    ServiceComponentDGOU::Unbindbar(std::shared_ptr<test::Interface1> const&)
+    {
+
+        throw std::runtime_error("throw from unbind method");
+    }
+
+    std::string
+    ServiceComponentFactory::ExtendedDescription()
+    {
+        if (!foo)
+        {
+            throw std::runtime_error("Dependency not available");
+        }
+        std::string result(STRINGIZE(US_BUNDLE_NAME));
+        result.append("depends on ");
+        result.append(foo->Description());
+        return result;
+    }
+
+    void
+    ServiceComponentFactory::Bindfactory(std::shared_ptr<test::Interface1> const&)
+    {
+        throw std::runtime_error("throw from bind method");
+    }
+
+    void
+    ServiceComponentFactory::Unbindfactory(std::shared_ptr<test::Interface1> const&)
+    {
+
+        throw std::runtime_error("throw from unbind method");
+    }
+
+} // namespace sample

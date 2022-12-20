@@ -28,49 +28,47 @@
 #include "cppmicroservices/ShrinkableMap.h"
 #include "cppmicroservices/ShrinkableVector.h"
 
-namespace cppmicroservices {
-
-class BundleContext;
-class ServiceEvent;
-
-/**
- * @ingroup MicroServices
- *
- * Service Event Listener Hook Service.
- *
- * <p>
- * Bundles registering this service will be called during service
- * (register, modify, and unregister service) operations.
- *
- * @remarks Implementations of this interface are required to be thread-safe.
- */
-struct US_Framework_EXPORT ServiceEventListenerHook
+namespace cppmicroservices
 {
-  /**
-   * ShrinkableMap type for filtering event listeners.
-   */
-  using ShrinkableMapType =
-    ShrinkableMap<BundleContext,
-                  ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
 
-  virtual ~ServiceEventListenerHook();
+    class BundleContext;
+    class ServiceEvent;
 
-  /**
-   * Event listener hook method. This method is called prior to service event
-   * delivery when a publishing bundle registers, modifies or unregisters a
-   * service. This method can filter the listeners which receive the event.
-   *
-   * @param event The service event to be delivered.
-   * @param listeners A map of Bundle Contexts to a list of Listener
-   *        Infos for the bundle's listeners to which the specified event will
-   *        be delivered. The implementation of this method may remove bundle
-   *        contexts from the map and listener infos from the list
-   *        values to prevent the event from being delivered to the associated
-   *        listeners.
-   */
-  virtual void Event(const ServiceEvent& event,
-                     ShrinkableMapType& listeners) = 0;
-};
-}
+    /**
+     * @ingroup MicroServices
+     *
+     * Service Event Listener Hook Service.
+     *
+     * <p>
+     * Bundles registering this service will be called during service
+     * (register, modify, and unregister service) operations.
+     *
+     * @remarks Implementations of this interface are required to be thread-safe.
+     */
+    struct US_Framework_EXPORT ServiceEventListenerHook
+    {
+        /**
+         * ShrinkableMap type for filtering event listeners.
+         */
+        using ShrinkableMapType = ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
+
+        virtual ~ServiceEventListenerHook();
+
+        /**
+         * Event listener hook method. This method is called prior to service event
+         * delivery when a publishing bundle registers, modifies or unregisters a
+         * service. This method can filter the listeners which receive the event.
+         *
+         * @param event The service event to be delivered.
+         * @param listeners A map of Bundle Contexts to a list of Listener
+         *        Infos for the bundle's listeners to which the specified event will
+         *        be delivered. The implementation of this method may remove bundle
+         *        contexts from the map and listener infos from the list
+         *        values to prevent the event from being delivered to the associated
+         *        listeners.
+         */
+        virtual void Event(ServiceEvent const& event, ShrinkableMapType& listeners) = 0;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SERVICEEVENTLISTENERHOOK_H

@@ -23,19 +23,19 @@
 
 #include "ServiceImpl.hpp"
 
-namespace sample {
-std::string ServiceComponentDSSLE2::Description()
+namespace sample
 {
-  return STRINGIZE(US_BUNDLE_NAME);
-}
-void ServiceComponentDSSLE2::Activate(
-  const std::shared_ptr<ComponentContext>& ctx)
-{
-  cppmicroservices::BundleContext bc = ctx->GetBundleContext();
-  throw cppmicroservices::SharedLibraryException(
-    std::error_code(), "test", bc.GetBundle());
-};
-void ServiceComponentDSSLE2::Deactivate(
-  const std::shared_ptr<ComponentContext>&){};
-ServiceComponentDSSLE2::~ServiceComponentDSSLE2(){};
-}
+    std::string
+    ServiceComponentDSSLE2::Description()
+    {
+        return STRINGIZE(US_BUNDLE_NAME);
+    }
+    void
+    ServiceComponentDSSLE2::Activate(std::shared_ptr<ComponentContext> const& ctx)
+    {
+        cppmicroservices::BundleContext bc = ctx->GetBundleContext();
+        throw cppmicroservices::SharedLibraryException(std::error_code(), "test", bc.GetBundle());
+    };
+    void ServiceComponentDSSLE2::Deactivate(std::shared_ptr<ComponentContext> const&) {};
+    ServiceComponentDSSLE2::~ServiceComponentDSSLE2() {};
+} // namespace sample

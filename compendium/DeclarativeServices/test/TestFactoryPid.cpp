@@ -26,156 +26,143 @@
 #include "TestInterfaces/Interfaces.hpp"
 #include <cppmicroservices/ServiceTracker.h>
 
-namespace test {
-/**
-   * Verify a component with default name(=implementation class name) is loaded properly
-   */
-
-TEST_F(tServiceComponent, testFactoryPidConstruction)
+namespace test
 {
+    /**
+     * Verify a component with default name(=implementation class name) is loaded properly
+     */
 
-  // Start the test bundle containing the factory component name.
-  std::string factoryComponentName = "sample::ServiceComponentCA20";
-  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA20");
+    TEST_F(tServiceComponent, testFactoryPidConstruction)
+    {
 
-  // Use DS runtime service to validate the component description and
-  // Verify that DS is finished creating the component data structures.
-  scr::dto::ComponentDescriptionDTO compDescDTO;
-  auto compConfigs =
-    GetComponentConfigs(testBundle, factoryComponentName, compDescDTO);
-  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
-  EXPECT_EQ(compConfigs.at(0).state,
-            scr::dto::ComponentState::UNSATISFIED_REFERENCE)
-    << "factory component state should be UNSATISIFIED_REFERENCE";
-  auto factoryProps = compConfigs.at(0).properties;
+        // Start the test bundle containing the factory component name.
+        std::string factoryComponentName = "sample::ServiceComponentCA20";
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA20");
 
-  auto factoryProp = factoryProps.find("component.factory");
-  ASSERT_TRUE(factoryProp != factoryProps.end())
-    << "factoryProp not found in factory properties";
-  const std::string factoryId{ "factory id" };
-  EXPECT_EQ(factoryProp->second, factoryId);
+        // Use DS runtime service to validate the component description and
+        // Verify that DS is finished creating the component data structures.
+        scr::dto::ComponentDescriptionDTO compDescDTO;
+        auto compConfigs = GetComponentConfigs(testBundle, factoryComponentName, compDescDTO);
+        EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
+        EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::UNSATISFIED_REFERENCE)
+            << "factory component state should be UNSATISIFIED_REFERENCE";
+        auto factoryProps = compConfigs.at(0).properties;
 
-  // Get a service reference to ConfigAdmin to create the factory component instance.
-  auto configAdminService =
-    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
-  ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+        auto factoryProp = factoryProps.find("component.factory");
+        ASSERT_TRUE(factoryProp != factoryProps.end()) << "factoryProp not found in factory properties";
+        const std::string factoryId { "factory id" };
+        EXPECT_EQ(factoryProp->second, factoryId);
 
-  //Create factory configuration object
-  auto factoryConfig =
-    configAdminService->CreateFactoryConfiguration(factoryComponentName);
-  auto factoryInstance = factoryConfig->GetPid();
+        // Get a service reference to ConfigAdmin to create the factory component instance.
+        auto configAdminService = GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+        ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
-  // CreateFactoryConfiguration created the configuration object on
-  // which the component is configured but it created it with no
-  // properties. Update the properties before instantiating the factory
-  // instance.
-  cppmicroservices::AnyMap props(
-    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  const std::string instanceId{ "instance1" };
-  props["uniqueProp"] = instanceId;
-  auto fut = factoryConfig->Update(props);
-  fut.get();
-  // Confirm the properties have been updated in DS.
-  compDescDTO =
-    dsRuntimeService->GetComponentDescriptionDTO(testBundle, factoryInstance);
-  EXPECT_EQ(compDescDTO.implementationClass, factoryComponentName)
-    << "Implementation class in the returned component description must be "
-    << factoryComponentName;
+        // Create factory configuration object
+        auto factoryConfig = configAdminService->CreateFactoryConfiguration(factoryComponentName);
+        auto factoryInstance = factoryConfig->GetPid();
 
-  compConfigs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
-  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
-    << "Factory instance state should be SATISFIED";
+        // CreateFactoryConfiguration created the configuration object on
+        // which the component is configured but it created it with no
+        // properties. Update the properties before instantiating the factory
+        // instance.
+        cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+        const std::string instanceId { "instance1" };
+        props["uniqueProp"] = instanceId;
+        auto fut = factoryConfig->Update(props);
+        fut.get();
+        // Confirm the properties have been updated in DS.
+        compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, factoryInstance);
+        EXPECT_EQ(compDescDTO.implementationClass, factoryComponentName)
+            << "Implementation class in the returned component description must be " << factoryComponentName;
 
-  //Request a service reference to the new component instance. This will
-  //cause DS to construct the instance with the updated properties.
-  auto instance = GetInstance<test::CAInterface>();
-  ASSERT_TRUE(instance) << "GetService failed for CAInterface";
+        compConfigs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+        EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
+        EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::SATISFIED)
+            << "Factory instance state should be SATISFIED";
 
-  //Confirm factory instance was created with the correct properties
+        // Request a service reference to the new component instance. This will
+        // cause DS to construct the instance with the updated properties.
+        auto instance = GetInstance<test::CAInterface>();
+        ASSERT_TRUE(instance) << "GetService failed for CAInterface";
 
-  auto instanceProps = instance->GetProperties();
-  auto uniqueProp = instanceProps.find("uniqueProp");
+        // Confirm factory instance was created with the correct properties
 
-  ASSERT_TRUE(uniqueProp != instanceProps.end())
-    << "uniqueProp not found in constructed instance";
-  EXPECT_EQ(uniqueProp->second, instanceId);
-}
-TEST_F(tServiceComponent, testFactoryPidConstructionNameDifferentThanClass)
-{
+        auto instanceProps = instance->GetProperties();
+        auto uniqueProp = instanceProps.find("uniqueProp");
 
-  // Start the test bundle containing the factory component.
-  std::string factoryComponentName = "ServiceComponentName";
-  std::string factoryComponentClass = "sample::ServiceComponentCA21";
-  std::string configurationPid = "ServiceComponentPid";
-  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA21");
+        ASSERT_TRUE(uniqueProp != instanceProps.end()) << "uniqueProp not found in constructed instance";
+        EXPECT_EQ(uniqueProp->second, instanceId);
+    }
+    TEST_F(tServiceComponent, testFactoryPidConstructionNameDifferentThanClass)
+    {
 
-  // Get a service reference to ConfigAdmin to create the factory component instance.
-  auto configAdminService =
-    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
-  ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+        // Start the test bundle containing the factory component.
+        std::string factoryComponentName = "ServiceComponentName";
+        std::string factoryComponentClass = "sample::ServiceComponentCA21";
+        std::string configurationPid = "ServiceComponentPid";
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA21");
 
-  //Create factory configuration object
-  auto factoryConfig =
-    configAdminService->CreateFactoryConfiguration(configurationPid);
-  auto factoryInstance = factoryConfig->GetPid();
+        // Get a service reference to ConfigAdmin to create the factory component instance.
+        auto configAdminService = GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+        ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
-  // CreateFactoryConfiguration created the configuration object on
-  // which the component is configured but it created it with no
-  // properties. Update the properties before instantiating the factory
-  // instance.
-  cppmicroservices::AnyMap props(
-    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  const std::string instanceId{ "instance1" };
-  props["uniqueProp"] = instanceId;
-  auto fut = factoryConfig->Update(props);
-  fut.get();
+        // Create factory configuration object
+        auto factoryConfig = configAdminService->CreateFactoryConfiguration(configurationPid);
+        auto factoryInstance = factoryConfig->GetPid();
 
-  //Request a service reference to the new component instance. This will
-  //cause DS to construct the instance with the updated properties.
-  auto instance = GetInstance<test::CAInterface>();
-  ASSERT_TRUE(instance) << "GetService failed for CAInterface";
-}
+        // CreateFactoryConfiguration created the configuration object on
+        // which the component is configured but it created it with no
+        // properties. Update the properties before instantiating the factory
+        // instance.
+        cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+        const std::string instanceId { "instance1" };
+        props["uniqueProp"] = instanceId;
+        auto fut = factoryConfig->Update(props);
+        fut.get();
 
-/* testFactoryConfigBeforeInstall
-   This test creates the configuration objects for the factory instances
-   before the factory component has been installed and started. 
-   Once the factory component is installed and started the instances 
-   associated with the configuration objects should be registered
-   automatically by DS.
-*/
-TEST_F(tServiceComponent, testFactoryConfigBeforeInstall)
-{
-  std::string configurationPid = "ServiceComponentPid";
+        // Request a service reference to the new component instance. This will
+        // cause DS to construct the instance with the updated properties.
+        auto instance = GetInstance<test::CAInterface>();
+        ASSERT_TRUE(instance) << "GetService failed for CAInterface";
+    }
 
-  // Get a service reference to ConfigAdmin to create the factory component instances.
-  auto configAdminService =
-    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
-  ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+    /* testFactoryConfigBeforeInstall
+       This test creates the configuration objects for the factory instances
+       before the factory component has been installed and started.
+       Once the factory component is installed and started the instances
+       associated with the configuration objects should be registered
+       automatically by DS.
+    */
+    TEST_F(tServiceComponent, testFactoryConfigBeforeInstall)
+    {
+        std::string configurationPid = "ServiceComponentPid";
 
-  // Create some factory configuration objects.
-  constexpr auto count = 5;
-  for (int i = 0; i < count; i++) {
-    // Create the factory configuration object
-    auto factoryConfig =
-      configAdminService->CreateFactoryConfiguration(configurationPid);
+        // Get a service reference to ConfigAdmin to create the factory component instances.
+        auto configAdminService = GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+        ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
-    // Update the properties for the factory configuration object
-    cppmicroservices::AnyMap props(
-      cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-    const std::string instanceId{ "instance" + std::to_string(i) };
-    props["uniqueProp"] = instanceId;
-    auto fut = factoryConfig->Update(props);
-    fut.get();
-  }
+        // Create some factory configuration objects.
+        constexpr auto count = 5;
+        for (int i = 0; i < count; i++)
+        {
+            // Create the factory configuration object
+            auto factoryConfig = configAdminService->CreateFactoryConfiguration(configurationPid);
 
-  // Start the test bundle containing the factory component. This will
-  // cause DS to register the factory instances.
-  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA21");
+            // Update the properties for the factory configuration object
+            cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+            const std::string instanceId { "instance" + std::to_string(i) };
+            props["uniqueProp"] = instanceId;
+            auto fut = factoryConfig->Update(props);
+            fut.get();
+        }
 
-  //Request service references to the new component instances. This will
-  //cause DS to construct the factory instances.
-  auto instances = GetInstances<test::CAInterface>();
-  EXPECT_EQ(instances.size(), count);
-}
-}
+        // Start the test bundle containing the factory component. This will
+        // cause DS to register the factory instances.
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA21");
+
+        // Request service references to the new component instances. This will
+        // cause DS to construct the factory instances.
+        auto instances = GetInstances<test::CAInterface>();
+        EXPECT_EQ(instances.size(), count);
+    }
+} // namespace test

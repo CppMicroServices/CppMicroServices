@@ -29,56 +29,68 @@
 
 #include <stdexcept>
 
-namespace cppmicroservices {
-
-namespace detail {
-
-US_Framework_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d)
+namespace cppmicroservices
 {
-  return ::cppmicroservices::MakeBundleContext(d);
-}
-}
 
-BundleContext MakeBundleContext(BundleContextPrivate* d)
-{
-  return BundleContext(d->shared_from_this());
-}
+    namespace detail
+    {
 
-BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>& d)
-{
-  return BundleContext(d);
-}
+        US_Framework_EXPORT BundleContext
+        MakeBundleContext(BundleContextPrivate* d)
+        {
+            return ::cppmicroservices::MakeBundleContext(d);
+        }
+    } // namespace detail
 
-std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext& c)
-{
-  return c.d;
-}
-
-BundleContextPrivate::BundleContextPrivate(BundlePrivate* bundle_)
-  : bundle(bundle_->shared_from_this())
-  , valid(true)
-{
-}
-
-bool BundleContextPrivate::IsValid() const
-{
-  return valid;
-}
-
-void BundleContextPrivate::CheckValid() const
-{
-  if (!valid) {
-    throw std::runtime_error("The bundle context is no longer valid");
-  }
-}
-
-void BundleContextPrivate::Invalidate()
-{
-  valid = false;
-  if (auto bundle_ = bundle.lock()) {
-    if (bundle_->SetBundleContext) {
-      bundle_->SetBundleContext(nullptr);
+    BundleContext
+    MakeBundleContext(BundleContextPrivate* d)
+    {
+        return BundleContext(d->shared_from_this());
     }
-  }
-}
-}
+
+    BundleContext
+    MakeBundleContext(std::shared_ptr<BundleContextPrivate> const& d)
+    {
+        return BundleContext(d);
+    }
+
+    std::shared_ptr<BundleContextPrivate>
+    GetPrivate(BundleContext const& c)
+    {
+        return c.d;
+    }
+
+    BundleContextPrivate::BundleContextPrivate(BundlePrivate* bundle_)
+        : bundle(bundle_->shared_from_this())
+        , valid(true)
+    {
+    }
+
+    bool
+    BundleContextPrivate::IsValid() const
+    {
+        return valid;
+    }
+
+    void
+    BundleContextPrivate::CheckValid() const
+    {
+        if (!valid)
+        {
+            throw std::runtime_error("The bundle context is no longer valid");
+        }
+    }
+
+    void
+    BundleContextPrivate::Invalidate()
+    {
+        valid = false;
+        if (auto bundle_ = bundle.lock())
+        {
+            if (bundle_->SetBundleContext)
+            {
+                bundle_->SetBundleContext(nullptr);
+            }
+        }
+    }
+} // namespace cppmicroservices

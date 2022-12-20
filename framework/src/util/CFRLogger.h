@@ -27,76 +27,67 @@
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/logservice/LogService.hpp"
 
-namespace cppmicroservices {
-namespace cfrimpl {
-/**
- * This class is used to track the availability of LogService in the
- * framework. If a LogService is available the calls to Log methods
- * are forwarded to the LogService. Otherwise, the calls to Log methods
- * are no-op calls. This class implements the LogService interface so that
- * other classes within the runtime can easily use a mock log service for
- * testing purposes.
- *
- * Note: This is directly copied from CMLogger.hpp. The only difference
- * is that the name of the class has been changed.
- *
- * TODO(achristoforides): Provide unified "utility" library for the core framework,
- *   DS, CA, and future services containing an implementation of this class, the one
- *   for the AsyncWorkService, and any others that may be needed.
- */
-class CFRLogger final
-  : public cppmicroservices::logservice::LogService
-  , public detail::MultiThreaded<>
-  , public cppmicroservices::ServiceTrackerCustomizer<
-      cppmicroservices::logservice::LogService>
+namespace cppmicroservices
 {
-public:
-  CFRLogger();
-  CFRLogger(const CFRLogger&) = delete;
-  CFRLogger(CFRLogger&&) = delete;
-  CFRLogger& operator=(const CFRLogger&) = delete;
-  CFRLogger& operator=(CFRLogger&&) = delete;
-  ~CFRLogger() override;
+    namespace cfrimpl
+    {
+        /**
+         * This class is used to track the availability of LogService in the
+         * framework. If a LogService is available the calls to Log methods
+         * are forwarded to the LogService. Otherwise, the calls to Log methods
+         * are no-op calls. This class implements the LogService interface so that
+         * other classes within the runtime can easily use a mock log service for
+         * testing purposes.
+         *
+         * Note: This is directly copied from CMLogger.hpp. The only difference
+         * is that the name of the class has been changed.
+         *
+         * TODO(achristoforides): Provide unified "utility" library for the core framework,
+         *   DS, CA, and future services containing an implementation of this class, the one
+         *   for the AsyncWorkService, and any others that may be needed.
+         */
+        class CFRLogger final
+            : public cppmicroservices::logservice::LogService
+            , public detail::MultiThreaded<>
+            , public cppmicroservices::ServiceTrackerCustomizer<cppmicroservices::logservice::LogService>
+        {
+          public:
+            CFRLogger();
+            CFRLogger(CFRLogger const&) = delete;
+            CFRLogger(CFRLogger&&) = delete;
+            CFRLogger& operator=(CFRLogger const&) = delete;
+            CFRLogger& operator=(CFRLogger&&) = delete;
+            ~CFRLogger() override;
 
-  // methods from the cppmicroservices::logservice::LogService interface
-  void Log(logservice::SeverityLevel level,
-           const std::string& message) override;
-  void Log(logservice::SeverityLevel level,
-           const std::string& message,
-           const std::exception_ptr ex) override;
-  void Log(const ServiceReferenceBase& sr,
-           logservice::SeverityLevel level,
-           const std::string& message) override;
-  void Log(const ServiceReferenceBase& sr,
-           logservice::SeverityLevel level,
-           const std::string& message,
-           const std::exception_ptr ex) override;
+            // methods from the cppmicroservices::logservice::LogService interface
+            void Log(logservice::SeverityLevel level, std::string const& message) override;
+            void Log(logservice::SeverityLevel level, std::string const& message, const std::exception_ptr ex) override;
+            void Log(ServiceReferenceBase const& sr,
+                     logservice::SeverityLevel level,
+                     std::string const& message) override;
+            void Log(ServiceReferenceBase const& sr,
+                     logservice::SeverityLevel level,
+                     std::string const& message,
+                     const std::exception_ptr ex) override;
 
-  // methods from the cppmicroservices::ServiceTrackerCustomizer interface
-  std::shared_ptr<TrackedParamType> AddingService(
-    const ServiceReference<cppmicroservices::logservice::LogService>& reference)
-    override;
-  void ModifiedService(
-    const ServiceReference<cppmicroservices::logservice::LogService>& reference,
-    const std::shared_ptr<cppmicroservices::logservice::LogService>& service)
-    override;
-  void RemovedService(
-    const ServiceReference<cppmicroservices::logservice::LogService>& reference,
-    const std::shared_ptr<cppmicroservices::logservice::LogService>& service)
-    override;
+            // methods from the cppmicroservices::ServiceTrackerCustomizer interface
+            std::shared_ptr<TrackedParamType> AddingService(
+                ServiceReference<cppmicroservices::logservice::LogService> const& reference) override;
+            void ModifiedService(ServiceReference<cppmicroservices::logservice::LogService> const& reference,
+                                 std::shared_ptr<cppmicroservices::logservice::LogService> const& service) override;
+            void RemovedService(ServiceReference<cppmicroservices::logservice::LogService> const& reference,
+                                std::shared_ptr<cppmicroservices::logservice::LogService> const& service) override;
 
-  // methods for the CFRLogger class
-  void Open();
-  void Close();
+            // methods for the CFRLogger class
+            void Open();
+            void Close();
 
-private:
-  cppmicroservices::BundleContext cfrContext;
-  std::unique_ptr<
-    cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>
-    serviceTracker;
-  std::shared_ptr<cppmicroservices::logservice::LogService> logService;
-};
-} // cfrimpl
-} // cppmicroservices
+          private:
+            cppmicroservices::BundleContext cfrContext;
+            std::unique_ptr<cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>> serviceTracker;
+            std::shared_ptr<cppmicroservices::logservice::LogService> logService;
+        };
+    } // namespace cfrimpl
+} // namespace cppmicroservices
 
 #endif // CFRLOGGER_HPP

@@ -29,64 +29,62 @@
 #include <exception>
 #include <string>
 
-namespace cppmicroservices {
+namespace cppmicroservices
+{
 
-//-------------------------------------------------------------------
-// File type checking
-//-------------------------------------------------------------------
+    //-------------------------------------------------------------------
+    // File type checking
+    //-------------------------------------------------------------------
 
-bool IsBundleFile(const std::string& location);
+    bool IsBundleFile(std::string const& location);
 
-/**
- * Return true if the bundle's zip file only contains a 
- * manifest file, false otherwise.
- *
- * @param resContainer The BundleResourceContainer to check
- *
- * @return true if the bundle's zip file only contains a 
- *         manifest file, false otherwise.
- * @throw std::runtime_error if the bundle manifest cannot be read.
- */
-bool OnlyContainsManifest(
-  const std::shared_ptr<BundleResourceContainer>& resContainer);
+    /**
+     * Return true if the bundle's zip file only contains a
+     * manifest file, false otherwise.
+     *
+     * @param resContainer The BundleResourceContainer to check
+     *
+     * @return true if the bundle's zip file only contains a
+     *         manifest file, false otherwise.
+     * @throw std::runtime_error if the bundle manifest cannot be read.
+     */
+    bool OnlyContainsManifest(std::shared_ptr<BundleResourceContainer> const& resContainer);
 
-//-------------------------------------------------------------------
-// Framework storage
-//-------------------------------------------------------------------
+    //-------------------------------------------------------------------
+    // Framework storage
+    //-------------------------------------------------------------------
 
-class CoreBundleContext;
+    class CoreBundleContext;
 
-extern const std::string FWDIR_DEFAULT;
+    extern const std::string FWDIR_DEFAULT;
 
-std::string GetFrameworkDir(CoreBundleContext* ctx);
+    std::string GetFrameworkDir(CoreBundleContext* ctx);
 
-/**
- * Optionally create and get the persistent storage path.
- *
- * @param ctx Pointer to the CoreBundleContext object.
- * @param leafDir The name of the leaf directory in the persistent storage path.
- * @param create Specify if the directory needs to be created if it doesn't already exist.
- *
- * @return A directory path or an empty string if no storage is available.
- *
- * @throw std::runtime_error if the storage directory is inaccessible
- *        or if there exists a file named @c leafDir in that directory
- *        or if the directory cannot be created when @c create is @c true.
- */
-std::string GetPersistentStoragePath(CoreBundleContext* ctx,
-                                     const std::string& leafDir,
-                                     bool create = true);
+    /**
+     * Optionally create and get the persistent storage path.
+     *
+     * @param ctx Pointer to the CoreBundleContext object.
+     * @param leafDir The name of the leaf directory in the persistent storage path.
+     * @param create Specify if the directory needs to be created if it doesn't already exist.
+     *
+     * @return A directory path or an empty string if no storage is available.
+     *
+     * @throw std::runtime_error if the storage directory is inaccessible
+     *        or if there exists a file named @c leafDir in that directory
+     *        or if the directory cannot be created when @c create is @c true.
+     */
+    std::string GetPersistentStoragePath(CoreBundleContext* ctx, std::string const& leafDir, bool create = true);
 
-//-------------------------------------------------------------------
-// Generic utility functions
-//-------------------------------------------------------------------
+    //-------------------------------------------------------------------
+    // Generic utility functions
+    //-------------------------------------------------------------------
 
-void TerminateForDebug(const std::exception_ptr ex);
+    void TerminateForDebug(const std::exception_ptr ex);
 
-namespace detail {
-US_Framework_EXPORT std::string GetDemangledName(
-  const std::type_info& typeInfo);
-}
+    namespace detail
+    {
+        US_Framework_EXPORT std::string GetDemangledName(std::type_info const& typeInfo);
+    }
 
 } // namespace cppmicroservices
 

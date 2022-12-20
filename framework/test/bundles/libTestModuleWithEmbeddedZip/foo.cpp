@@ -1,5 +1,5 @@
 
 class foo final
 {
-  ~foo() = default;
+    ~foo() = default;
 };

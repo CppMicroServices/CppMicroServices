@@ -30,36 +30,37 @@
 #include <atomic>
 #include <memory>
 
-namespace cppmicroservices {
-
-class BundleContext;
-class BundlePrivate;
-
-class BundleContextPrivate
-  : public detail::MultiThreaded<>
-  , public std::enable_shared_from_this<BundleContextPrivate>
+namespace cppmicroservices
 {
 
-public:
-  BundleContextPrivate(BundlePrivate* bundle);
+    class BundleContext;
+    class BundlePrivate;
 
-  bool IsValid() const;
-  void CheckValid() const;
+    class BundleContextPrivate
+        : public detail::MultiThreaded<>
+        , public std::enable_shared_from_this<BundleContextPrivate>
+    {
 
-  void Invalidate();
+      public:
+        BundleContextPrivate(BundlePrivate* bundle);
 
-  std::weak_ptr<BundlePrivate> bundle;
+        bool IsValid() const;
+        void CheckValid() const;
 
-  /**
-   * Is bundle context valid.
-   */
-  std::atomic<bool> valid;
-};
+        void Invalidate();
 
-// The following method is exported for the GetBundleContext() method
-US_Framework_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d);
-BundleContext MakeBundleContext(const std::shared_ptr<BundleContextPrivate>& d);
-std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext& c);
-}
+        std::weak_ptr<BundlePrivate> bundle;
+
+        /**
+         * Is bundle context valid.
+         */
+        std::atomic<bool> valid;
+    };
+
+    // The following method is exported for the GetBundleContext() method
+    US_Framework_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d);
+    BundleContext MakeBundleContext(std::shared_ptr<BundleContextPrivate> const& d);
+    std::shared_ptr<BundleContextPrivate> GetPrivate(BundleContext const& c);
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLECONTEXTPRIVATE_H

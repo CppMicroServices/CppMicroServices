@@ -43,254 +43,244 @@
 #include "ConfigurationAdminPrivate.hpp"
 #include "ConfigurationImpl.hpp"
 
-namespace cppmicroservices {
-namespace cmimpl {
-
-/**
- * A wrapper class used for storing the pid of a given ManagedService or ManagedServiceFactory
- * with the service in the ServiceTracker.
- */
-template<typename TrackedServiceType>
-class TrackedServiceWrapper
+namespace cppmicroservices
 {
-public:
+    namespace cmimpl
+    {
 
-  TrackedServiceWrapper(std::string trackedPid,
-                        std::unordered_map<std::string, unsigned long> initialChangeCountPerPid,
-                        std::shared_ptr<TrackedServiceType> service)
-      : pid(std::move(trackedPid))
-      , trackedService(std::move(service))
-      , lastUpdatedChangeCountPerPid(std::move(initialChangeCountPerPid))
-  {}
+        /**
+         * A wrapper class used for storing the pid of a given ManagedService or ManagedServiceFactory
+         * with the service in the ServiceTracker.
+         */
+        template <typename TrackedServiceType>
+        class TrackedServiceWrapper
+        {
+          public:
+            TrackedServiceWrapper(std::string trackedPid,
+                                  std::unordered_map<std::string, unsigned long> initialChangeCountPerPid,
+                                  std::shared_ptr<TrackedServiceType> service)
+                : pid(std::move(trackedPid))
+                , trackedService(std::move(service))
+                , lastUpdatedChangeCountPerPid(std::move(initialChangeCountPerPid))
+            {
+            }
 
-  TrackedServiceWrapper(const TrackedServiceWrapper&) = delete;
-  TrackedServiceWrapper& operator=(const TrackedServiceWrapper&) = delete;
-  TrackedServiceWrapper(TrackedServiceWrapper&&) = delete;
-  TrackedServiceWrapper& operator=(TrackedServiceWrapper&&) = delete;
+            TrackedServiceWrapper(TrackedServiceWrapper const&) = delete;
+            TrackedServiceWrapper& operator=(TrackedServiceWrapper const&) = delete;
+            TrackedServiceWrapper(TrackedServiceWrapper&&) = delete;
+            TrackedServiceWrapper& operator=(TrackedServiceWrapper&&) = delete;
 
-  explicit operator bool() const { return static_cast<bool>(trackedService); }
+            explicit operator bool() const { return static_cast<bool>(trackedService); }
 
-  std::string getPid() noexcept {
-    return pid;
-  }
+            std::string
+            getPid() noexcept
+            {
+                return pid;
+            }
 
-  std::shared_ptr<TrackedServiceType> getTrackedService() noexcept {
-    return trackedService;
-  }
+            std::shared_ptr<TrackedServiceType>
+            getTrackedService() noexcept
+            {
+                return trackedService;
+            }
 
-  void setLastUpdatedChangeCount(const std::string& pid, const unsigned long& changeCount) {
-    std::unique_lock<std::mutex> lock(updatedChangeCountMutex);
-    lastUpdatedChangeCountPerPid[pid] = changeCount;
-  }
+            void
+            setLastUpdatedChangeCount(std::string const& pid, unsigned long const& changeCount)
+            {
+                std::unique_lock<std::mutex> lock(updatedChangeCountMutex);
+                lastUpdatedChangeCountPerPid[pid] = changeCount;
+            }
 
-  bool needsAnUpdateNotification(const std::string& pid, const unsigned long& changeCount) {
-    std::unique_lock<std::mutex> lock(updatedChangeCountMutex);
-    return lastUpdatedChangeCountPerPid[pid] < changeCount;
-  }
+            bool
+            needsAnUpdateNotification(std::string const& pid, unsigned long const& changeCount)
+            {
+                std::unique_lock<std::mutex> lock(updatedChangeCountMutex);
+                return lastUpdatedChangeCountPerPid[pid] < changeCount;
+            }
 
-  void removeLastUpdatedChangeCount(const std::string& pid) noexcept {
-    std::unique_lock<std::mutex> lock(updatedChangeCountMutex);
-    (void)lastUpdatedChangeCountPerPid.erase(pid);
-  }
+            void
+            removeLastUpdatedChangeCount(std::string const& pid) noexcept
+            {
+                std::unique_lock<std::mutex> lock(updatedChangeCountMutex);
+                (void)lastUpdatedChangeCountPerPid.erase(pid);
+            }
 
-private:
-  std::string pid;
-  std::shared_ptr<TrackedServiceType> trackedService;
-  std::unordered_map<std::string, unsigned long> lastUpdatedChangeCountPerPid; ///< the change count for each pid or factory pid instance
-  std::mutex updatedChangeCountMutex; ///< guard read/write access to lastUpdatedChangeCountPerPid
-};
+          private:
+            std::string pid;
+            std::shared_ptr<TrackedServiceType> trackedService;
+            std::unordered_map<std::string, unsigned long>
+                lastUpdatedChangeCountPerPid;   ///< the change count for each pid or factory pid instance
+            std::mutex updatedChangeCountMutex; ///< guard read/write access to lastUpdatedChangeCountPerPid
+        };
 
-/**
- * This class implements the {@code cppmicroservices::service::cm::ConfigurationAdmin} interface.
- */
-class ConfigurationAdminImpl final
-  : public cppmicroservices::service::cm::ConfigurationAdmin
-  , public ConfigurationAdminPrivate
-  , public cppmicroservices::ServiceTrackerCustomizer<
-      cppmicroservices::service::cm::ManagedService,
-      TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>
-  , public cppmicroservices::ServiceTrackerCustomizer<
-      cppmicroservices::service::cm::ManagedServiceFactory,
-      TrackedServiceWrapper<
-        cppmicroservices::service::cm::ManagedServiceFactory>>
-{
-public:
-  ConfigurationAdminImpl(
-    cppmicroservices::BundleContext cmContext,
-    const std::shared_ptr<cppmicroservices::logservice::LogService>& logger,
-    const std::shared_ptr<cppmicroservices::async::AsyncWorkService>&
-      asyncWorkService);
-  ~ConfigurationAdminImpl() override;
-  ConfigurationAdminImpl(const ConfigurationAdminImpl&) = delete;
-  ConfigurationAdminImpl& operator=(const ConfigurationAdminImpl&) = delete;
-  ConfigurationAdminImpl(ConfigurationAdminImpl&&) = delete;
-  ConfigurationAdminImpl& operator=(ConfigurationAdminImpl&&) = delete;
+        /**
+         * This class implements the {@code cppmicroservices::service::cm::ConfigurationAdmin} interface.
+         */
+        class ConfigurationAdminImpl final
+            : public cppmicroservices::service::cm::ConfigurationAdmin
+            , public ConfigurationAdminPrivate
+            , public cppmicroservices::ServiceTrackerCustomizer<
+                  cppmicroservices::service::cm::ManagedService,
+                  TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>
+            , public cppmicroservices::ServiceTrackerCustomizer<
+                  cppmicroservices::service::cm::ManagedServiceFactory,
+                  TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>>
+        {
+          public:
+            ConfigurationAdminImpl(cppmicroservices::BundleContext cmContext,
+                                   std::shared_ptr<cppmicroservices::logservice::LogService> const& logger,
+                                   std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& asyncWorkService);
+            ~ConfigurationAdminImpl() override;
+            ConfigurationAdminImpl(ConfigurationAdminImpl const&) = delete;
+            ConfigurationAdminImpl& operator=(ConfigurationAdminImpl const&) = delete;
+            ConfigurationAdminImpl(ConfigurationAdminImpl&&) = delete;
+            ConfigurationAdminImpl& operator=(ConfigurationAdminImpl&&) = delete;
 
-  /**
-   * Get an existing or new {@code Configuration} object.
-   *
-   * See {@code ConfigurationAdmin#GetConfiguration}
-   */
-  std::shared_ptr<cppmicroservices::service::cm::Configuration>
-  GetConfiguration(const std::string& pid) override;
+            /**
+             * Get an existing or new {@code Configuration} object.
+             *
+             * See {@code ConfigurationAdmin#GetConfiguration}
+             */
+            std::shared_ptr<cppmicroservices::service::cm::Configuration> GetConfiguration(
+                std::string const& pid) override;
 
-  /**
-   * Create a new {@code Configuration} object for a {@code ManagedServiceFactory}.
-   *
-   * See {@code ConfigurationAdmin#CreateFactoryConfiguration}
-   */
-  std::shared_ptr<cppmicroservices::service::cm::Configuration>
-  CreateFactoryConfiguration(const std::string& factoryPid) override;
+            /**
+             * Create a new {@code Configuration} object for a {@code ManagedServiceFactory}.
+             *
+             * See {@code ConfigurationAdmin#CreateFactoryConfiguration}
+             */
+            std::shared_ptr<cppmicroservices::service::cm::Configuration> CreateFactoryConfiguration(
+                std::string const& factoryPid) override;
 
-  /**
-   * Get an existing or new {@code Configuration} object for a {@code ManagedServiceFactory}.
-   *
-   * See {@code ConfigurationAdmin#GetFactoryConfiguration}
-   */
-  std::shared_ptr<cppmicroservices::service::cm::Configuration>
-  GetFactoryConfiguration(const std::string& factoryPid,
-                          const std::string& instanceName) override;
+            /**
+             * Get an existing or new {@code Configuration} object for a {@code ManagedServiceFactory}.
+             *
+             * See {@code ConfigurationAdmin#GetFactoryConfiguration}
+             */
+            std::shared_ptr<cppmicroservices::service::cm::Configuration> GetFactoryConfiguration(
+                std::string const& factoryPid,
+                std::string const& instanceName) override;
 
-  /**
-   * Used to list all of the {@code Configuration} objects that exist in the
-   * ConfigurationAdmin repository with a pid that matches the filter expression 
-   * (if provided).
-   * All of the {@code Configuration} objects returned have been updated at least
-   * once by ConfigurationAdmin.
-   *
-   * See {@code ConfigurationAdmin#ListConfigurations}
-   */
-  std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>>
-  ListConfigurations(const std::string& filter = std::string{}) override;
+            /**
+             * Used to list all of the {@code Configuration} objects that exist in the
+             * ConfigurationAdmin repository with a pid that matches the filter expression
+             * (if provided).
+             * All of the {@code Configuration} objects returned have been updated at least
+             * once by ConfigurationAdmin.
+             *
+             * See {@code ConfigurationAdmin#ListConfigurations}
+             */
+            std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>> ListConfigurations(
+                std::string const& filter = std::string {}) override;
 
-  /**
-   * Internal method used by {@code CMBundleExtension} to add new {@code Configuration} objects
-   *
-   * See {@code ConfigurationAdminPrivate#AddConfigurations}
-   */
-  std::vector<ConfigurationAddedInfo> AddConfigurations(
-    std::vector<metadata::ConfigurationMetadata> configurationMetadata)
-    override;
+            /**
+             * Internal method used by {@code CMBundleExtension} to add new {@code Configuration} objects
+             *
+             * See {@code ConfigurationAdminPrivate#AddConfigurations}
+             */
+            std::vector<ConfigurationAddedInfo> AddConfigurations(
+                std::vector<metadata::ConfigurationMetadata> configurationMetadata) override;
 
-  /**
-   * Internal method used by {@code CMBundleExtension} to remove the {@code Configuration} objects that it created
-   *
-   * See {@code ConfigurationAdminPrivate#RemoveConfigurations}
-   */
-  void RemoveConfigurations(
-    std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs) override;
+            /**
+             * Internal method used by {@code CMBundleExtension} to remove the {@code Configuration} objects that it
+             * created
+             *
+             * See {@code ConfigurationAdminPrivate#RemoveConfigurations}
+             */
+            void RemoveConfigurations(std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs) override;
 
-  /**
-   * Internal method used to notify any {@code ManagedService} or {@code ManagedServiceFactory} or 
-   * {@code ConfigurationListener} of an update to a {@code Configuration}. Performs the 
-   * notifications asynchronously with the latest state of the properties at the time.
-   *
-   * See {@code ConfigurationAdminPrivate#NotifyConfigurationUpdated}
-   */
-  std::shared_future<void> NotifyConfigurationUpdated(
-    const std::string& pid, const unsigned long changeCount) override;
+            /**
+             * Internal method used to notify any {@code ManagedService} or {@code ManagedServiceFactory} or
+             * {@code ConfigurationListener} of an update to a {@code Configuration}. Performs the
+             * notifications asynchronously with the latest state of the properties at the time.
+             *
+             * See {@code ConfigurationAdminPrivate#NotifyConfigurationUpdated}
+             */
+            std::shared_future<void> NotifyConfigurationUpdated(std::string const& pid,
+                                                                unsigned long const changeCount) override;
 
-  /**
-   * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
-   * {@code ManagedServiceFactory} of the removal of a {@code Configuration}. Performs the notifications
-   * asynchronously.
-   *
-   * See {@code ConfigurationAdminPrivate#NotifyConfigurationRemoved}
-   */
-  std::shared_future<void> NotifyConfigurationRemoved(
-    const std::string& pid,
-    std::uintptr_t configurationId,
-    unsigned long changeCount) override;
+            /**
+             * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
+             * {@code ManagedServiceFactory} of the removal of a {@code Configuration}. Performs the notifications
+             * asynchronously.
+             *
+             * See {@code ConfigurationAdminPrivate#NotifyConfigurationRemoved}
+             */
+            std::shared_future<void> NotifyConfigurationRemoved(std::string const& pid,
+                                                                std::uintptr_t configurationId,
+                                                                unsigned long changeCount) override;
 
-  // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedService
-  std::shared_ptr<
-    TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>
-  AddingService(
-    const ServiceReference<cppmicroservices::service::cm::ManagedService>&
-      reference) override;
-  void ModifiedService(
-    const ServiceReference<cppmicroservices::service::cm::ManagedService>&
-      reference,
-    const std::shared_ptr<
-      TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>&
-      service) override;
-  void RemovedService(
-    const ServiceReference<cppmicroservices::service::cm::ManagedService>&
-      reference,
-    const std::shared_ptr<
-      TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>&
-      service) override;
+            // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedService
+            std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>> AddingService(
+                ServiceReference<cppmicroservices::service::cm::ManagedService> const& reference) override;
+            void ModifiedService(
+                ServiceReference<cppmicroservices::service::cm::ManagedService> const& reference,
+                std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>> const& service)
+                override;
+            void RemovedService(
+                ServiceReference<cppmicroservices::service::cm::ManagedService> const& reference,
+                std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>> const& service)
+                override;
 
-  // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedServiceFactory
-  std::shared_ptr<
-    TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>>
-  AddingService(const ServiceReference<
-                cppmicroservices::service::cm::ManagedServiceFactory>&
-                  reference) override;
-  void ModifiedService(
-    const ServiceReference<
-      cppmicroservices::service::cm::ManagedServiceFactory>& reference,
-    const std::shared_ptr<TrackedServiceWrapper<
-      cppmicroservices::service::cm::ManagedServiceFactory>>& service) override;
-  void RemovedService(
-    const ServiceReference<
-      cppmicroservices::service::cm::ManagedServiceFactory>& reference,
-    const std::shared_ptr<TrackedServiceWrapper<
-      cppmicroservices::service::cm::ManagedServiceFactory>>& service) override;
+            // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedServiceFactory
+            std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>> AddingService(
+                ServiceReference<cppmicroservices::service::cm::ManagedServiceFactory> const& reference) override;
+            void ModifiedService(
+                ServiceReference<cppmicroservices::service::cm::ManagedServiceFactory> const& reference,
+                std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>> const&
+                    service) override;
+            void RemovedService(
+                ServiceReference<cppmicroservices::service::cm::ManagedServiceFactory> const& reference,
+                std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>> const&
+                    service) override;
 
-  // Used by tests to avoid race conditions and CMBundleExtension destructor to make sure all asynchronous 
-  // threads have completed. 
-  void WaitForAllAsync();
+            // Used by tests to avoid race conditions and CMBundleExtension destructor to make sure all asynchronous
+            // threads have completed.
+            void WaitForAllAsync();
 
-private:
-  // Convenience wrapper which is used to perform asyncronous operations
-  template<typename Functor>
-  std::shared_future<void> PerformAsync(Functor&& f);
+          private:
+            // Convenience wrapper which is used to perform asyncronous operations
+            template <typename Functor>
+            std::shared_future<void> PerformAsync(Functor&& f);
 
-  // Used to generate a random instance name for CreateFactoryConfiguration
-  std::string RandomInstanceName();
+            // Used to generate a random instance name for CreateFactoryConfiguration
+            std::string RandomInstanceName();
 
-  // Used to keep track of the instances of each ManagedServiceFactory
-  void AddFactoryInstanceIfRequired(const std::string& pid,
-                                    const std::string& factoryPid);
-  void RemoveFactoryInstanceIfRequired(const std::string& pid);
+            // Used to keep track of the instances of each ManagedServiceFactory
+            void AddFactoryInstanceIfRequired(std::string const& pid, std::string const& factoryPid);
+            void RemoveFactoryInstanceIfRequired(std::string const& pid);
 
-  cppmicroservices::BundleContext cmContext;
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
-  std::mutex configurationsMutex;
-  std::unordered_map<std::string, std::shared_ptr<ConfigurationImpl>>
-    configurations;
-  std::unordered_map<std::string, std::set<std::string>> factoryInstances;
-  std::mutex futuresMutex;
-  std::uint64_t futuresID;
-  std::condition_variable futuresCV;
-  std::vector<std::shared_future<void>> completeFutures;
-  std::unordered_map<std::uint64_t, std::shared_future<void>> incompleteFutures;
-  cppmicroservices::ServiceTracker<
-    cppmicroservices::service::cm::ManagedService,
-    TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>
-    managedServiceTracker;
-  cppmicroservices::ServiceTracker<
-    cppmicroservices::service::cm::ManagedServiceFactory,
-    TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>>
-    managedServiceFactoryTracker;
-  std::mt19937 randomGenerator;
-  cppmicroservices::ServiceTracker<
-    cppmicroservices::service::cm::ConfigurationListener>
-    configListenerTracker;
+            cppmicroservices::BundleContext cmContext;
+            std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
+            std::mutex configurationsMutex;
+            std::unordered_map<std::string, std::shared_ptr<ConfigurationImpl>> configurations;
+            std::unordered_map<std::string, std::set<std::string>> factoryInstances;
+            std::mutex futuresMutex;
+            std::uint64_t futuresID;
+            std::condition_variable futuresCV;
+            std::vector<std::shared_future<void>> completeFutures;
+            std::unordered_map<std::uint64_t, std::shared_future<void>> incompleteFutures;
+            cppmicroservices::ServiceTracker<cppmicroservices::service::cm::ManagedService,
+                                             TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>
+                managedServiceTracker;
+            cppmicroservices::ServiceTracker<
+                cppmicroservices::service::cm::ManagedServiceFactory,
+                TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>>
+                managedServiceFactoryTracker;
+            std::mt19937 randomGenerator;
+            cppmicroservices::ServiceTracker<cppmicroservices::service::cm::ConfigurationListener>
+                configListenerTracker;
 
-  // used instead of querying the service trackers since a race exists between when the service tracker
-  // adds the tracked service to the internal map and when a client asks the service tracker for the
-  // list of tracked objects.
-  std::vector<std::shared_ptr<
-    TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>>
-    trackedManagedServices_;
-  std::vector<std::shared_ptr<TrackedServiceWrapper<
-    cppmicroservices::service::cm::ManagedServiceFactory>>>
-    trackedManagedServiceFactories_;
-};
-} // cmimpl
-} // cppmicroservices
+            // used instead of querying the service trackers since a race exists between when the service tracker
+            // adds the tracked service to the internal map and when a client asks the service tracker for the
+            // list of tracked objects.
+            std::vector<std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>>
+                trackedManagedServices_;
+            std::vector<std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>>>
+                trackedManagedServiceFactories_;
+        };
+    } // namespace cmimpl
+} // namespace cppmicroservices
 
 #endif /* CONFIGURATIONADMINIMPL_HPP */

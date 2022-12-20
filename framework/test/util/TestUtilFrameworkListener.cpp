@@ -27,61 +27,63 @@ limitations under the License.
 
 #include <stdexcept>
 
-namespace cppmicroservices {
-
-TestFrameworkListener::TestFrameworkListener()
-  : _events()
+namespace cppmicroservices
 {
-}
-TestFrameworkListener::~TestFrameworkListener(){};
 
-std::size_t TestFrameworkListener::events_received() const
-{
-  return _events.size();
-}
+    TestFrameworkListener::TestFrameworkListener() : _events() {}
+    TestFrameworkListener::~TestFrameworkListener() {};
 
-bool TestFrameworkListener::CheckEvents(
-  const std::vector<FrameworkEvent>& events)
-{
-  bool listenState = true; // assume success
-  if (events.size() != _events.size()) {
-    listenState = false;
-    ADD_FAILURE() << "*** Framework event mismatch ***\n expected "
-                  << events.size() << " event(s)\n found " << _events.size()
-                  << " event(s).";
-
-    const std::size_t max =
-      events.size() > _events.size() ? events.size() : _events.size();
-    for (std::size_t i = 0; i < max; ++i) {
-      const FrameworkEvent& pE =
-        i < events.size() ? events[i] : FrameworkEvent();
-      const FrameworkEvent& pR =
-        i < _events.size() ? _events[i] : FrameworkEvent();
-      std::cout << " - " << pE << " - " << pR;
+    std::size_t
+    TestFrameworkListener::events_received() const
+    {
+        return _events.size();
     }
-  } else {
-    for (std::size_t i = 0; i < events.size(); ++i) {
-      const FrameworkEvent& pE = events[i];
-      const FrameworkEvent& pR = _events[i];
-      if (pE.GetType() != pR.GetType() || pE.GetBundle() != pR.GetBundle()) {
-        listenState = false;
-        ADD_FAILURE() << "*** Wrong framework event ***\n found " << pR
-                      << "\n expected " << pE;
-      }
+
+    bool
+    TestFrameworkListener::CheckEvents(std::vector<FrameworkEvent> const& events)
+    {
+        bool listenState = true; // assume success
+        if (events.size() != _events.size())
+        {
+            listenState = false;
+            ADD_FAILURE() << "*** Framework event mismatch ***\n expected " << events.size() << " event(s)\n found "
+                          << _events.size() << " event(s).";
+
+            const std::size_t max = events.size() > _events.size() ? events.size() : _events.size();
+            for (std::size_t i = 0; i < max; ++i)
+            {
+                FrameworkEvent const& pE = i < events.size() ? events[i] : FrameworkEvent();
+                FrameworkEvent const& pR = i < _events.size() ? _events[i] : FrameworkEvent();
+                std::cout << " - " << pE << " - " << pR;
+            }
+        }
+        else
+        {
+            for (std::size_t i = 0; i < events.size(); ++i)
+            {
+                FrameworkEvent const& pE = events[i];
+                FrameworkEvent const& pR = _events[i];
+                if (pE.GetType() != pR.GetType() || pE.GetBundle() != pR.GetBundle())
+                {
+                    listenState = false;
+                    ADD_FAILURE() << "*** Wrong framework event ***\n found " << pR << "\n expected " << pE;
+                }
+            }
+        }
+
+        _events.clear();
+        return listenState;
     }
-  }
 
-  _events.clear();
-  return listenState;
-}
+    void
+    TestFrameworkListener::frameworkEvent(FrameworkEvent const& evt)
+    {
+        _events.push_back(evt);
+    }
 
-void TestFrameworkListener::frameworkEvent(const FrameworkEvent& evt)
-{
-  _events.push_back(evt);
-}
-
-void TestFrameworkListener::throwOnFrameworkEvent(const FrameworkEvent&)
-{
-  throw std::runtime_error("whoopsie!");
-}
-}
+    void
+    TestFrameworkListener::throwOnFrameworkEvent(FrameworkEvent const&)
+    {
+        throw std::runtime_error("whoopsie!");
+    }
+} // namespace cppmicroservices

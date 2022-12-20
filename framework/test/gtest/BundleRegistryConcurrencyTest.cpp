@@ -38,110 +38,116 @@ limitations under the License.
 using namespace cppmicroservices;
 
 #ifdef US_BUILD_SHARED_LIBS
-namespace {
-
-std::mutex mutex_io = {};
-std::unique_lock<std::mutex> io_lock()
+namespace
 {
-  return std::unique_lock<std::mutex>(mutex_io);
-}
 
-// Attempt to get as close an approximation as to how long it takes to install a bundle
-// without having the extra machinery of error handling in the way.
-inline void InstallTestBundleNoErrorHandling(BundleContext frameworkCtx,
-                                             const std::string& bundleName)
-{
-  auto bundles = frameworkCtx.InstallBundles(
-    cppmicroservices::testing::LIB_PATH + util::DIR_SEP + US_LIB_PREFIX +
-    bundleName + US_LIB_POSTFIX + US_LIB_EXT);
-
-  for (auto& b : bundles) {
-    std::unique_lock<std::mutex> lock = io_lock();
-    //Test to check if returned bundle is valid.
-    ASSERT_TRUE(b);
-  }
-}
-
-void TestSerialBundleInstall(const Framework& f)
-{
-  // Installing such a small set of bundles doesn't yield significant
-  // data about performance. Consider increasing the number of bundles
-  // used.
-  auto bc = f.GetBundleContext();
-
-  InstallTestBundleNoErrorHandling(bc, "TestBundleA");
-  InstallTestBundleNoErrorHandling(bc, "TestBundleA2");
-  InstallTestBundleNoErrorHandling(bc, "TestBundleB");
-#  ifdef US_ENABLE_THREADING_SUPPORT
-  InstallTestBundleNoErrorHandling(bc, "TestBundleC1");
-#  endif
-  InstallTestBundleNoErrorHandling(bc, "TestBundleH");
-  InstallTestBundleNoErrorHandling(bc, "TestBundleLQ");
-  InstallTestBundleNoErrorHandling(bc, "TestBundleM");
-  InstallTestBundleNoErrorHandling(bc, "TestBundleR");
-  InstallTestBundleNoErrorHandling(bc, "TestBundleRA");
-  InstallTestBundleNoErrorHandling(bc, "TestBundleRL");
-  InstallTestBundleNoErrorHandling(bc, "TestBundleS");
-  InstallTestBundleNoErrorHandling(bc, "TestBundleSL1");
-  InstallTestBundleNoErrorHandling(bc, "TestBundleSL3");
-  InstallTestBundleNoErrorHandling(bc, "TestBundleSL4");
-
-  auto bundles = bc.GetBundles();
-  for (auto& bundle : bundles) {
-    EXPECT_NO_THROW(bundle.Start());
-  }
-}
-
-TEST(BundleRegistryConcurrencyTest, testSerial)
-{
-  FrameworkFactory factory;
-  auto framework = factory.NewFramework();
-  framework.Start();
-  TestSerialBundleInstall(framework);
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
-}
-
-#  ifdef US_ENABLE_THREADING_SUPPORT
-TEST(BundleRegistryConcurrencyTest, testConcurrent)
-{
-  FrameworkFactory factory;
-  auto framework = factory.NewFramework();
-  framework.Start();
-
-  for (auto bundle : framework.GetBundleContext().GetBundles()) {
-    if (bundle.GetBundleId() != 0 && bundle.GetSymbolicName() != "main") {
-      bundle.Uninstall();
+    std::mutex mutex_io = {};
+    std::unique_lock<std::mutex>
+    io_lock()
+    {
+        return std::unique_lock<std::mutex>(mutex_io);
     }
-  }
 
-  // This is by no means a "real world" example. At best it is a simulation to test
-  // the performance of concurrent access to the bundle registry.
-  // At any point in which real customer usage in a concurrent way becomes known,
-  // it would be ideal to model it as a test.
+    // Attempt to get as close an approximation as to how long it takes to install a bundle
+    // without having the extra machinery of error handling in the way.
+    inline void
+    InstallTestBundleNoErrorHandling(BundleContext frameworkCtx, std::string const& bundleName)
+    {
+        auto bundles = frameworkCtx.InstallBundles(cppmicroservices::testing::LIB_PATH + util::DIR_SEP + US_LIB_PREFIX
+                                                   + bundleName + US_LIB_POSTFIX + US_LIB_EXT);
 
-  std::size_t numTestBundles =
-    16; // 14 test bundles + 1 statically linked bundle + the system bundle
-  numTestBundles += 1; // main
-  const int numTestThreads = 50;
-  std::vector<std::thread> threads;
-  for (int i = 0; i < numTestThreads; ++i) {
-    threads.emplace_back(TestSerialBundleInstall, framework);
-    threads.emplace_back(
-      [framework] { framework.GetBundleContext().GetBundles(); });
-  }
+        for (auto& b : bundles)
+        {
+            std::unique_lock<std::mutex> lock = io_lock();
+            // Test to check if returned bundle is valid.
+            ASSERT_TRUE(b);
+        }
+    }
 
-  for (auto& th : threads) {
-    th.join();
-  }
+    void
+    TestSerialBundleInstall(Framework const& f)
+    {
+        // Installing such a small set of bundles doesn't yield significant
+        // data about performance. Consider increasing the number of bundles
+        // used.
+        auto bc = f.GetBundleContext();
 
-  io_lock();
-  //Test for correct number of installed bundles
-  ASSERT_EQ(numTestBundles, framework.GetBundleContext().GetBundles().size());
-  framework.Stop();
-  framework.WaitForStop(std::chrono::milliseconds::zero());
-}
-#  endif
+        InstallTestBundleNoErrorHandling(bc, "TestBundleA");
+        InstallTestBundleNoErrorHandling(bc, "TestBundleA2");
+        InstallTestBundleNoErrorHandling(bc, "TestBundleB");
+#    ifdef US_ENABLE_THREADING_SUPPORT
+        InstallTestBundleNoErrorHandling(bc, "TestBundleC1");
+#    endif
+        InstallTestBundleNoErrorHandling(bc, "TestBundleH");
+        InstallTestBundleNoErrorHandling(bc, "TestBundleLQ");
+        InstallTestBundleNoErrorHandling(bc, "TestBundleM");
+        InstallTestBundleNoErrorHandling(bc, "TestBundleR");
+        InstallTestBundleNoErrorHandling(bc, "TestBundleRA");
+        InstallTestBundleNoErrorHandling(bc, "TestBundleRL");
+        InstallTestBundleNoErrorHandling(bc, "TestBundleS");
+        InstallTestBundleNoErrorHandling(bc, "TestBundleSL1");
+        InstallTestBundleNoErrorHandling(bc, "TestBundleSL3");
+        InstallTestBundleNoErrorHandling(bc, "TestBundleSL4");
+
+        auto bundles = bc.GetBundles();
+        for (auto& bundle : bundles)
+        {
+            EXPECT_NO_THROW(bundle.Start());
+        }
+    }
+
+    TEST(BundleRegistryConcurrencyTest, testSerial)
+    {
+        FrameworkFactory factory;
+        auto framework = factory.NewFramework();
+        framework.Start();
+        TestSerialBundleInstall(framework);
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+    }
+
+#    ifdef US_ENABLE_THREADING_SUPPORT
+    TEST(BundleRegistryConcurrencyTest, testConcurrent)
+    {
+        FrameworkFactory factory;
+        auto framework = factory.NewFramework();
+        framework.Start();
+
+        for (auto bundle : framework.GetBundleContext().GetBundles())
+        {
+            if (bundle.GetBundleId() != 0 && bundle.GetSymbolicName() != "main")
+            {
+                bundle.Uninstall();
+            }
+        }
+
+        // This is by no means a "real world" example. At best it is a simulation to test
+        // the performance of concurrent access to the bundle registry.
+        // At any point in which real customer usage in a concurrent way becomes known,
+        // it would be ideal to model it as a test.
+
+        std::size_t numTestBundles = 16; // 14 test bundles + 1 statically linked bundle + the system bundle
+        numTestBundles += 1;             // main
+        int const numTestThreads = 50;
+        std::vector<std::thread> threads;
+        for (int i = 0; i < numTestThreads; ++i)
+        {
+            threads.emplace_back(TestSerialBundleInstall, framework);
+            threads.emplace_back([framework] { framework.GetBundleContext().GetBundles(); });
+        }
+
+        for (auto& th : threads)
+        {
+            th.join();
+        }
+
+        io_lock();
+        // Test for correct number of installed bundles
+        ASSERT_EQ(numTestBundles, framework.GetBundleContext().GetBundles().size());
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+    }
+#    endif
 } // end anonymous namespace
 
 #endif

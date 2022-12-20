@@ -27,55 +27,56 @@
 
 #include <cstdint>
 
-namespace cppmicroservices {
-
-using ListenerTokenId = std::uint64_t;
-
-/**
-   * \brief The token returned when a listener is registered with the framework.
-   *
-   * The token object is a move-only type and enables clients to remove the
-   * listeners from the framework.
-   */
-class US_Framework_EXPORT ListenerToken
+namespace cppmicroservices
 {
-public:
-  /**
-     * Constructs a default, invalid %ListenerToken object.
-     * As this is not associated with any valid listener, a RemoveListener
-     * call taking a default ListenerToken object will do nothing.
-     */
-  ListenerToken();
 
-  ListenerToken(const ListenerToken&) = delete;
+    using ListenerTokenId = std::uint64_t;
 
-  ListenerToken& operator=(const ListenerToken&) = delete;
-
-  ListenerToken(ListenerToken&& other) noexcept;
-
-  ListenerToken& operator=(ListenerToken&& other) noexcept;
-
-  /**
-     * Tests this %ListenerToken object for validity.
+    /**
+     * \brief The token returned when a listener is registered with the framework.
      *
-     * Invalid \c ListenerToken objects are created by the default constructor.
-     * Also, a \c ListenerToken object can become invalid if it is moved to another
-     * ListenerToken object.
-     *
-     * @return \c true if this %ListenerToken object is valid, false otherwise.
+     * The token object is a move-only type and enables clients to remove the
+     * listeners from the framework.
      */
-  explicit operator bool() const;
+    class US_Framework_EXPORT ListenerToken
+    {
+      public:
+        /**
+         * Constructs a default, invalid %ListenerToken object.
+         * As this is not associated with any valid listener, a RemoveListener
+         * call taking a default ListenerToken object will do nothing.
+         */
+        ListenerToken();
 
-private:
-  // The only (internal) client which can initialize this class with a ListenerTokenId.
-  friend class ServiceListeners;
+        ListenerToken(ListenerToken const&) = delete;
 
-  explicit ListenerToken(ListenerTokenId _tokenId);
+        ListenerToken& operator=(ListenerToken const&) = delete;
 
-  ListenerTokenId Id() const;
+        ListenerToken(ListenerToken&& other) noexcept;
 
-  ListenerTokenId tokenId;
-};
-}
+        ListenerToken& operator=(ListenerToken&& other) noexcept;
+
+        /**
+         * Tests this %ListenerToken object for validity.
+         *
+         * Invalid \c ListenerToken objects are created by the default constructor.
+         * Also, a \c ListenerToken object can become invalid if it is moved to another
+         * ListenerToken object.
+         *
+         * @return \c true if this %ListenerToken object is valid, false otherwise.
+         */
+        explicit operator bool() const;
+
+      private:
+        // The only (internal) client which can initialize this class with a ListenerTokenId.
+        friend class ServiceListeners;
+
+        explicit ListenerToken(ListenerTokenId _tokenId);
+
+        ListenerTokenId Id() const;
+
+        ListenerTokenId tokenId;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_LISTENERTOKEN_H

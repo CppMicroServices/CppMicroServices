@@ -27,59 +27,62 @@
 
 #include <cppmicroservices/servicecomponent/ServiceComponentExport.h>
 
-namespace cppmicroservices {
-namespace framework {
-namespace dto {
-
-/**
- \defgroup gr_bundledto BundleDTO
- \brief Groups BundleDTO related symbols.
- */
-
-/**
- * \ingroup gr_bundledto 
- * 
- * A representation of a bundle.
- */
-struct US_ServiceComponent_EXPORT BundleDTO
+namespace cppmicroservices
 {
-  /**
-   * The bundle's unique identifier.
-   *
-   * @see Bundle#GetBundleId()
-   */
-  unsigned long id;
+    namespace framework
+    {
+        namespace dto
+        {
 
-  /**
-   * The time when the bundle was last modified.
-   *
-   * @see Bundle#GetLastModified()
-   */
-  unsigned long lastModified;
+            /**
+             \defgroup gr_bundledto BundleDTO
+             \brief Groups BundleDTO related symbols.
+             */
 
-  /**
-   * The bundle's state.
-   *
-   * @see Bundle#GetState()
-   */
-  uint32_t state;
+            /**
+             * \ingroup gr_bundledto
+             *
+             * A representation of a bundle.
+             */
+            struct US_ServiceComponent_EXPORT BundleDTO
+            {
+                /**
+                 * The bundle's unique identifier.
+                 *
+                 * @see Bundle#GetBundleId()
+                 */
+                unsigned long id;
 
-  /**
-   * The bundle's symbolic name.
-   *
-   * @see Bundle#GetSymbolicName()
-   */
-  std::string symbolicName;
+                /**
+                 * The time when the bundle was last modified.
+                 *
+                 * @see Bundle#GetLastModified()
+                 */
+                unsigned long lastModified;
 
-  /**
-   * The bundle's version.
-   *
-   * @see Bundle#GetVersion()
-   */
-  std::string version;
-};
-}
-}
-}
+                /**
+                 * The bundle's state.
+                 *
+                 * @see Bundle#GetState()
+                 */
+                uint32_t state;
+
+                /**
+                 * The bundle's symbolic name.
+                 *
+                 * @see Bundle#GetSymbolicName()
+                 */
+                std::string symbolicName;
+
+                /**
+                 * The bundle's version.
+                 *
+                 * @see Bundle#GetVersion()
+                 */
+                std::string version;
+            };
+        } // namespace dto
+    }     // namespace framework
+} // namespace cppmicroservices
 
 #endif /* BundleDTO_hpp */

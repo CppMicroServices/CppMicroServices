@@ -28,105 +28,103 @@
 #include "cppmicroservices/ServiceRegistration.h"
 #include "cppmicroservices/webconsole/WebConsoleExport.h"
 
-namespace cppmicroservices {
-
-/**
- * SimpleWebConsolePlugin is a utility class that provides a default
- * implementation of the AbstractWebConsolePlugin and supports the
- * following features:
- *
- *   - Methods for (un)registering the web console plugin service
- *   - Default implementation for resource loading
- *
- */
-class US_WebConsole_EXPORT SimpleWebConsolePlugin
-  : public AbstractWebConsolePlugin
+namespace cppmicroservices
 {
 
-public:
-  /**
-   * Creates new Simple Web Console Plugin with the given category.
-   *
-   * @param label the front label. See AbstractWebConsolePlugin#GetLabel()
-   * @param title the plugin title . See AbstractWebConsolePlugin#GetTitle()
-   * @param category the plugin's navigation category. See
-   *        AbstractWebConsolePlugin#GetCategory()
-   * @param css the additional plugin CSS. See
-   *        AbstractWebConsolePlugin#GetCssReferences()
-   */
-  SimpleWebConsolePlugin(
-    const std::string& label,
-    const std::string& title,
-    std::string category = std::string(),
-    std::vector<std::string> css = std::vector<std::string>());
+    /**
+     * SimpleWebConsolePlugin is a utility class that provides a default
+     * implementation of the AbstractWebConsolePlugin and supports the
+     * following features:
+     *
+     *   - Methods for (un)registering the web console plugin service
+     *   - Default implementation for resource loading
+     *
+     */
+    class US_WebConsole_EXPORT SimpleWebConsolePlugin : public AbstractWebConsolePlugin
+    {
 
-  /**
-   * @see AbstractWebConsolePlugin#GetLabel()
-   */
-  std::string GetLabel() const;
+      public:
+        /**
+         * Creates new Simple Web Console Plugin with the given category.
+         *
+         * @param label the front label. See AbstractWebConsolePlugin#GetLabel()
+         * @param title the plugin title . See AbstractWebConsolePlugin#GetTitle()
+         * @param category the plugin's navigation category. See
+         *        AbstractWebConsolePlugin#GetCategory()
+         * @param css the additional plugin CSS. See
+         *        AbstractWebConsolePlugin#GetCssReferences()
+         */
+        SimpleWebConsolePlugin(std::string const& label,
+                               std::string const& title,
+                               std::string category = std::string(),
+                               std::vector<std::string> css = std::vector<std::string>());
 
-  /**
-   * @see AbstractWebConsolePlugin#GetTitle()
-   */
-  std::string GetTitle() const;
+        /**
+         * @see AbstractWebConsolePlugin#GetLabel()
+         */
+        std::string GetLabel() const;
 
-  /**
-   * @see AbstractWebConsolePlugin#GetCategory()
-   */
-  std::string GetCategory() const;
+        /**
+         * @see AbstractWebConsolePlugin#GetTitle()
+         */
+        std::string GetTitle() const;
 
-  /**
-   * This is an utility method. It is used to register the plugin service. Don't
-   * forget to call #Unregister() when the plugin is no longer
-   * needed.
-   *
-   * @param context the bundle context used for service registration.
-   * @return A shared pointer to this plugin.
-   */
-  std::shared_ptr<SimpleWebConsolePlugin> Register(
-    const BundleContext& context = GetBundleContext());
+        /**
+         * @see AbstractWebConsolePlugin#GetCategory()
+         */
+        std::string GetCategory() const;
 
-  /**
-   * An utility method that removes the service, registered by the
-   * #Register(const BundleContext&) method.
-   */
-  void Unregister();
+        /**
+         * This is an utility method. It is used to register the plugin service. Don't
+         * forget to call #Unregister() when the plugin is no longer
+         * needed.
+         *
+         * @param context the bundle context used for service registration.
+         * @return A shared pointer to this plugin.
+         */
+        std::shared_ptr<SimpleWebConsolePlugin> Register(BundleContext const& context = GetBundleContext());
 
-protected:
-  /**
-   * @see AbstractWebConsolePlugin#GetCssReferences()
-   */
-  std::vector<std::string> GetCssReferences() const;
+        /**
+         * An utility method that removes the service, registered by the
+         * #Register(const BundleContext&) method.
+         */
+        void Unregister();
 
-  BundleContext GetContext() const;
+      protected:
+        /**
+         * @see AbstractWebConsolePlugin#GetCssReferences()
+         */
+        std::vector<std::string> GetCssReferences() const;
 
-private:
-  /**
-   * Called internally by AbstractWebConsolePlugin to load resources.
-   *
-   * This particular implementation depends on the label. As example, if the
-   * plugin is accessed as <code>/us/console/abc</code>, and the plugin
-   * resources are accessed like <code>/us/console/abc/res/logo.gif</code>,
-   * the code here will try load resource <code>/res/logo.gif</code> from the
-   * bundle, providing the plugin.
-   *
-   * @param path the path to read.
-   * @return the URL of the resource or <code>null</code> if not found.
-   */
-  BundleResource GetResource(const std::string& path) const;
+        BundleContext GetContext() const;
 
-  // used for standard AbstractWebConsolePlugin implementation
-  std::string m_Label;
-  std::string m_Title;
-  std::string m_Category;
-  std::vector<std::string> m_Css;
-  std::string m_LabelRes;
-  std::size_t m_LabelResLen;
+      private:
+        /**
+         * Called internally by AbstractWebConsolePlugin to load resources.
+         *
+         * This particular implementation depends on the label. As example, if the
+         * plugin is accessed as <code>/us/console/abc</code>, and the plugin
+         * resources are accessed like <code>/us/console/abc/res/logo.gif</code>,
+         * the code here will try load resource <code>/res/logo.gif</code> from the
+         * bundle, providing the plugin.
+         *
+         * @param path the path to read.
+         * @return the URL of the resource or <code>null</code> if not found.
+         */
+        BundleResource GetResource(std::string const& path) const;
 
-  // used for service registration
-  ServiceRegistration<HttpServlet> m_Reg;
-  BundleContext m_Context;
-};
-}
+        // used for standard AbstractWebConsolePlugin implementation
+        std::string m_Label;
+        std::string m_Title;
+        std::string m_Category;
+        std::vector<std::string> m_Css;
+        std::string m_LabelRes;
+        std::size_t m_LabelResLen;
+
+        // used for service registration
+        ServiceRegistration<HttpServlet> m_Reg;
+        BundleContext m_Context;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SIMPLEWEBCONSOLEPLUGIN_H

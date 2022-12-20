@@ -30,185 +30,215 @@
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-using cppmicroservices::scrimpl::metadata::ComponentMetadata;
-
-ConfigurationNotifier::ConfigurationNotifier(
-  const cppmicroservices::BundleContext& context,
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService_)
-  : tokenCounter(0)
-  , bundleContext(context)
-  , logger(std::move(logger))
-  , asyncWorkService(asyncWorkService_)
+namespace cppmicroservices
 {
-  if (!bundleContext || !(this->logger) || (!this->asyncWorkService)) {
-    throw std::invalid_argument("ConfigurationNotifier Constructor "
-                                "provided with invalid arguments");
-  }
-}
+    namespace scrimpl
+    {
+        using cppmicroservices::scrimpl::metadata::ComponentMetadata;
 
-cppmicroservices::ListenerTokenId ConfigurationNotifier::RegisterListener(
-  const std::string& pid,
-  std::function<void(const ConfigChangeNotification&)> notify,
-  std::shared_ptr<ComponentConfigurationImpl> mgr)
-{
-  cppmicroservices::ListenerTokenId retToken = ++tokenCounter;
+        ConfigurationNotifier::ConfigurationNotifier(
+            cppmicroservices::BundleContext const& context,
+            std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService_)
+            : tokenCounter(0)
+            , bundleContext(context)
+            , logger(std::move(logger))
+            , asyncWorkService(asyncWorkService_)
+        {
+            if (!bundleContext || !(this->logger) || (!this->asyncWorkService))
+            {
+                throw std::invalid_argument("ConfigurationNotifier Constructor "
+                                            "provided with invalid arguments");
+            }
+        }
 
-  {
-    auto listener = Listener(notify, mgr);
+        cppmicroservices::ListenerTokenId
+        ConfigurationNotifier::RegisterListener(std::string const& pid,
+                                                std::function<void(ConfigChangeNotification const&)> notify,
+                                                std::shared_ptr<ComponentConfigurationImpl> mgr)
+        {
+            cppmicroservices::ListenerTokenId retToken = ++tokenCounter;
 
-    auto listenersMapHandle = listenersMap.lock();
-    auto iter = listenersMapHandle->find(pid);
-    if (iter != listenersMapHandle->end()) {
-      (*(iter->second)).emplace(retToken, listener);
-    } else {
-      auto tokenMapPtr = std::make_shared<TokenMap>();
-      tokenMapPtr->emplace(retToken, listener);
-      listenersMapHandle->emplace(pid, tokenMapPtr);
-    }
-  }
+            {
+                auto listener = Listener(notify, mgr);
 
-  return retToken;
-}
+                auto listenersMapHandle = listenersMap.lock();
+                auto iter = listenersMapHandle->find(pid);
+                if (iter != listenersMapHandle->end())
+                {
+                    (*(iter->second)).emplace(retToken, listener);
+                }
+                else
+                {
+                    auto tokenMapPtr = std::make_shared<TokenMap>();
+                    tokenMapPtr->emplace(retToken, listener);
+                    listenersMapHandle->emplace(pid, tokenMapPtr);
+                }
+            }
 
-void ConfigurationNotifier::UnregisterListener(
-  const std::string& pid,
-  const cppmicroservices::ListenerTokenId token) noexcept
-{
-  auto listenersMapHandle = listenersMap.lock();
-  if (listenersMapHandle->empty() || pid.empty()) {
-    return;
-  }
+            return retToken;
+        }
 
-  auto iter = listenersMapHandle->find(pid);
-  if (iter == listenersMapHandle->end()) {
-    return;
-  }
+        void
+        ConfigurationNotifier::UnregisterListener(std::string const& pid,
+                                                  const cppmicroservices::ListenerTokenId token) noexcept
+        {
+            auto listenersMapHandle = listenersMap.lock();
+            if (listenersMapHandle->empty() || pid.empty())
+            {
+                return;
+            }
 
-  auto tokenMapPtr = iter->second;
-  for (const auto& tokenMap : (*tokenMapPtr)) {
-    if (tokenMap.first == token) {
-      tokenMapPtr->erase(tokenMap.first);
-      if (tokenMapPtr->size() == 0) {
-        listenersMapHandle->erase(iter);
-      }
-      break;
-    }
-  }
-}
-bool ConfigurationNotifier::AnyListenersForPid(const std::string& pid) noexcept
-{
-  std::string factoryName;
-  std::shared_ptr<ComponentConfigurationImpl> mgr;
-  {
-    auto listenersMapHandle = listenersMap.lock();
-    if (listenersMapHandle->empty() || pid.empty()) {
-      return false;
-    }
+            auto iter = listenersMapHandle->find(pid);
+            if (iter == listenersMapHandle->end())
+            {
+                return;
+            }
 
-    auto iter = listenersMapHandle->find(pid);
-    if (iter != listenersMapHandle->end()) {
-      return true;
-    }
+            auto tokenMapPtr = iter->second;
+            for (auto const& tokenMap : (*tokenMapPtr))
+            {
+                if (tokenMap.first == token)
+                {
+                    tokenMapPtr->erase(tokenMap.first);
+                    if (tokenMapPtr->size() == 0)
+                    {
+                        listenersMapHandle->erase(iter);
+                    }
+                    break;
+                }
+            }
+        }
+        bool
+        ConfigurationNotifier::AnyListenersForPid(std::string const& pid) noexcept
+        {
+            std::string factoryName;
+            std::shared_ptr<ComponentConfigurationImpl> mgr;
+            {
+                auto listenersMapHandle = listenersMap.lock();
+                if (listenersMapHandle->empty() || pid.empty())
+                {
+                    return false;
+                }
 
-    //The exact pid isn't present. See if this is a factory pid.
-    auto position = pid.find('~');
-    if (position == std::string::npos) {
-      return false;
-    }
-    //This is a factoryPid with format factoryComponentName~instanceName.
-    //See if we're listening for changes to this factoryComponentName
-    factoryName = pid.substr(0, position);
-    if (factoryName.empty()) {
-      return false;
-    }
-    iter = listenersMapHandle->find(factoryName);
-    if (iter == listenersMapHandle->end()) {
-      return false;
-    }
-    auto listener = iter->second->begin();
+                auto iter = listenersMapHandle->find(pid);
+                if (iter != listenersMapHandle->end())
+                {
+                    return true;
+                }
 
-    mgr = listener->second.mgr;
-    if (mgr->GetMetadata()->factoryComponentID.empty()) {
-      // The component in our listener's map is not a factory component.
-      return false;
-    }
-  } //release listenersMapHandle lock
-  CreateFactoryComponent(pid, mgr);
-  return true;
-}
-void ConfigurationNotifier::CreateFactoryComponent(
-  const std::string& pid,
-  std::shared_ptr<ComponentConfigurationImpl>& mgr)
-{
-  auto oldMetadata = mgr->GetMetadata();
-  auto newMetadata = std::make_shared<ComponentMetadata>(*oldMetadata);
+                // The exact pid isn't present. See if this is a factory pid.
+                auto position = pid.find('~');
+                if (position == std::string::npos)
+                {
+                    return false;
+                }
+                // This is a factoryPid with format factoryComponentName~instanceName.
+                // See if we're listening for changes to this factoryComponentName
+                factoryName = pid.substr(0, position);
+                if (factoryName.empty())
+                {
+                    return false;
+                }
+                iter = listenersMapHandle->find(factoryName);
+                if (iter == listenersMapHandle->end())
+                {
+                    return false;
+                }
+                auto listener = iter->second->begin();
 
-  newMetadata->name = pid;
-  // this is a factory instance not a factory component
-  newMetadata->factoryComponentID = "";
+                mgr = listener->second.mgr;
+                if (mgr->GetMetadata()->factoryComponentID.empty())
+                {
+                    // The component in our listener's map is not a factory component.
+                    return false;
+                }
+            } // release listenersMapHandle lock
+            CreateFactoryComponent(pid, mgr);
+            return true;
+        }
+        void
+        ConfigurationNotifier::CreateFactoryComponent(std::string const& pid,
+                                                      std::shared_ptr<ComponentConfigurationImpl>& mgr)
+        {
+            auto oldMetadata = mgr->GetMetadata();
+            auto newMetadata = std::make_shared<ComponentMetadata>(*oldMetadata);
 
-  // Factory instance is dependent on the same configurationPids as the factory
-  // component except the factory component itself.
-  newMetadata->configurationPids.clear();
-  for (const auto& basePid : oldMetadata->configurationPids) {
-    if (basePid != oldMetadata->configurationPids[0]) {
-      newMetadata->configurationPids.emplace_back(basePid);
-    }
-  }
-  newMetadata->configurationPids.emplace_back(pid);
-  auto bundle = mgr->GetBundle();
-  auto registry = mgr->GetRegistry();
-  auto logger = mgr->GetLogger();
-  auto configNotifier = mgr->GetConfigNotifier();
-  auto managers = mgr->GetManagers();
+            newMetadata->name = pid;
+            // this is a factory instance not a factory component
+            newMetadata->factoryComponentID = "";
 
-  try {
-    auto compManager =
-      std::make_shared<ComponentManagerImpl>(newMetadata,
-                                             registry,
-                                             bundle.GetBundleContext(),
-                                             logger,
-                                             asyncWorkService,
-                                             configNotifier,
-                                             managers);
-    if (registry->AddComponentManager(compManager)) {
-      managers->push_back(compManager);
-      compManager->Initialize();
-    }
-  } catch (const cppmicroservices::SharedLibraryException&) {
-    throw;
-  } catch (const cppmicroservices::SecurityException&) {
-    throw;
-  } catch (const std::exception&) {
-    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                "Failed to create ComponentManager with name " +
-                  newMetadata->name + " from bundle with Id " +
-                  std::to_string(bundleContext.GetBundle().GetBundleId()),
-                std::current_exception());
-  }
-}
+            // Factory instance is dependent on the same configurationPids as the factory
+            // component except the factory component itself.
+            newMetadata->configurationPids.clear();
+            for (auto const& basePid : oldMetadata->configurationPids)
+            {
+                if (basePid != oldMetadata->configurationPids[0])
+                {
+                    newMetadata->configurationPids.emplace_back(basePid);
+                }
+            }
+            newMetadata->configurationPids.emplace_back(pid);
+            auto bundle = mgr->GetBundle();
+            auto registry = mgr->GetRegistry();
+            auto logger = mgr->GetLogger();
+            auto configNotifier = mgr->GetConfigNotifier();
+            auto managers = mgr->GetManagers();
 
-void ConfigurationNotifier::NotifyAllListeners(
-  const std::string& pid,
-  cppmicroservices::service::cm::ConfigurationEventType type,
-  std::shared_ptr<cppmicroservices::AnyMap> properties)
-{
-  ConfigChangeNotification notification =
-    ConfigChangeNotification(pid, std::move(properties), std::move(type));
+            try
+            {
+                auto compManager = std::make_shared<ComponentManagerImpl>(newMetadata,
+                                                                          registry,
+                                                                          bundle.GetBundleContext(),
+                                                                          logger,
+                                                                          asyncWorkService,
+                                                                          configNotifier,
+                                                                          managers);
+                if (registry->AddComponentManager(compManager))
+                {
+                    managers->push_back(compManager);
+                    compManager->Initialize();
+                }
+            }
+            catch (cppmicroservices::SharedLibraryException const&)
+            {
+                throw;
+            }
+            catch (cppmicroservices::SecurityException const&)
+            {
+                throw;
+            }
+            catch (std::exception const&)
+            {
+                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                            "Failed to create ComponentManager with name " + newMetadata->name + " from bundle with Id "
+                                + std::to_string(bundleContext.GetBundle().GetBundleId()),
+                            std::current_exception());
+            }
+        }
 
-  auto listenersMapHandle = listenersMap.lock();
-  auto iter = listenersMapHandle->find(pid);
-  if (iter != listenersMapHandle->end()) {
-    for (const auto& configListenerPtr : *(iter->second)) {
-      configListenerPtr.second.notify(notification);
-    }
-  } else {
-    return;
-  }
-}
+        void
+        ConfigurationNotifier::NotifyAllListeners(std::string const& pid,
+                                                  cppmicroservices::service::cm::ConfigurationEventType type,
+                                                  std::shared_ptr<cppmicroservices::AnyMap> properties)
+        {
+            ConfigChangeNotification notification
+                = ConfigChangeNotification(pid, std::move(properties), std::move(type));
 
-} // namespace scrimpl
+            auto listenersMapHandle = listenersMap.lock();
+            auto iter = listenersMapHandle->find(pid);
+            if (iter != listenersMapHandle->end())
+            {
+                for (auto const& configListenerPtr : *(iter->second))
+                {
+                    configListenerPtr.second.notify(notification);
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
+
+    } // namespace scrimpl
 } // namespace cppmicroservices

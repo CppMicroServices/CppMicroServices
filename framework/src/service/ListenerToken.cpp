@@ -24,38 +24,31 @@
 
 #include <utility>
 
-namespace cppmicroservices {
-
-ListenerToken::ListenerToken()
-  : tokenId(ListenerTokenId(0))
+namespace cppmicroservices
 {
-}
 
-ListenerToken::ListenerToken(ListenerTokenId _tokenId)
-  : tokenId(_tokenId)
-{
-}
+    ListenerToken::ListenerToken() : tokenId(ListenerTokenId(0)) {}
 
-ListenerToken::ListenerToken(ListenerToken&& other) noexcept
-  : tokenId(std::move(other.tokenId))
-{
-  other.tokenId = ListenerTokenId(0);
-}
+    ListenerToken::ListenerToken(ListenerTokenId _tokenId) : tokenId(_tokenId) {}
 
-ListenerToken& ListenerToken::operator=(ListenerToken&& other) noexcept
-{
-  tokenId = std::move(other.tokenId);
-  other.tokenId = ListenerTokenId(0);
-  return *this;
-}
+    ListenerToken::ListenerToken(ListenerToken&& other) noexcept : tokenId(std::move(other.tokenId))
+    {
+        other.tokenId = ListenerTokenId(0);
+    }
 
-ListenerToken::operator bool() const
-{
-  return (tokenId != ListenerTokenId(0));
-}
+    ListenerToken&
+    ListenerToken::operator=(ListenerToken&& other) noexcept
+    {
+        tokenId = std::move(other.tokenId);
+        other.tokenId = ListenerTokenId(0);
+        return *this;
+    }
 
-ListenerTokenId ListenerToken::Id() const
-{
-  return tokenId;
-}
-}
+    ListenerToken::operator bool() const { return (tokenId != ListenerTokenId(0)); }
+
+    ListenerTokenId
+    ListenerToken::Id() const
+    {
+        return tokenId;
+    }
+} // namespace cppmicroservices

@@ -1,9 +1,42 @@
 ---
-BasedOnStyle: Mozilla
-
-# Reflowing comments interfers with .rst identation
-ReflowComments: false
-AlwaysBreakAfterReturnType: None
-AlwaysBreakAfterDefinitionReturnType: None
+BasedOnStyle: Microsoft
+AlignArrayOfStructures: Right
+AlignConsecutiveAssignments:
+  AcrossEmptyLines: true
+  AlignCompound: true
+AlignConsecutiveBitFields:
+  AlignCompound: true
+AlignConsecutiveDeclarations:
+  AlignCompound: true
+  PadOperators: true
+AlignConsecutiveMacros:
+  Enabled: true
+AlignEscapedNewlines: Left
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: Always
+AllowShortFunctionsOnASingleLine: All
+AlwaysBreakAfterReturnType: AllDefinitions
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: false
+BinPackParameters: false
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: false
+  AfterUnion: true
+  SplitEmptyFunction: false
+BreakBeforeBinaryOperators: All
+BreakBeforeBraces: Allman
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+Cpp11BracedListStyle: false
+IndentCaseLabels: true
+IndentGotoLabels: false
 IndentPPDirectives: AfterHash
-...
+NamespaceIndentation: All
+PackConstructorInitializers: CurrentLine
+PointerAlignment: Left
+QualifierAlignment: Right
+ReferenceAlignment: Left
+SpaceAroundPointerQualifiers: Before
+SpaceBeforeCpp11BracedList: true

@@ -25,9 +25,9 @@
 
 #include <memory>
 #if defined(USING_GTEST)
-#  include "gtest/gtest_prod.h"
+#    include "gtest/gtest_prod.h"
 #else
-#  define FRIEND_TEST(x, y)
+#    define FRIEND_TEST(x, y)
 #endif
 #include "ComponentRegistry.hpp"
 #include "cppmicroservices/BundleContext.h"
@@ -39,44 +39,44 @@
 
 using cppmicroservices::logservice::LogService;
 
-namespace cppmicroservices {
-namespace scrimpl {
-/**
- * The SCRBundleExtension is a helper class to load and unload Components of
- * a single bundle. It is responsible for creating a component manager for each
- * valid component description found in the bundle. On destruction, this object
- * removes and destroys the component managers created during it's construction
- */
-class SCRBundleExtension
+namespace cppmicroservices
 {
-public:
-  SCRBundleExtension(
-    const cppmicroservices::Bundle& bundle,
-    const cppmicroservices::AnyMap& scrMetadata,
-    const std::shared_ptr<ComponentRegistry>& registry,
-    const std::shared_ptr<LogService>& logger,
-    const std::shared_ptr<cppmicroservices::async::AsyncWorkService>&
-      asyncWorkService,
-    const std::shared_ptr<ConfigurationNotifier>& configNotifier);
+    namespace scrimpl
+    {
+        /**
+         * The SCRBundleExtension is a helper class to load and unload Components of
+         * a single bundle. It is responsible for creating a component manager for each
+         * valid component description found in the bundle. On destruction, this object
+         * removes and destroys the component managers created during it's construction
+         */
+        class SCRBundleExtension
+        {
+          public:
+            SCRBundleExtension(cppmicroservices::Bundle const& bundle,
+                               cppmicroservices::AnyMap const& scrMetadata,
+                               std::shared_ptr<ComponentRegistry> const& registry,
+                               std::shared_ptr<LogService> const& logger,
+                               std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& asyncWorkService,
+                               std::shared_ptr<ConfigurationNotifier> const& configNotifier);
 
-  SCRBundleExtension(const SCRBundleExtension&) = delete;
-  SCRBundleExtension(SCRBundleExtension&&) = delete;
-  SCRBundleExtension& operator=(const SCRBundleExtension&) = delete;
-  SCRBundleExtension& operator=(SCRBundleExtension&&) = delete;
-  ~SCRBundleExtension();
+            SCRBundleExtension(SCRBundleExtension const&) = delete;
+            SCRBundleExtension(SCRBundleExtension&&) = delete;
+            SCRBundleExtension& operator=(SCRBundleExtension const&) = delete;
+            SCRBundleExtension& operator=(SCRBundleExtension&&) = delete;
+            ~SCRBundleExtension();
 
-private:
-  FRIEND_TEST(SCRBundleExtensionTest, CtorWithValidArgs);
+          private:
+            FRIEND_TEST(SCRBundleExtensionTest, CtorWithValidArgs);
 
-  void DisableAndRemoveAllComponentManagers();
+            void DisableAndRemoveAllComponentManagers();
 
-  cppmicroservices::Bundle bundle_;
-  std::shared_ptr<ComponentRegistry> registry;
-  std::shared_ptr<LogService> logger;
-  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
-  std::shared_ptr<ConfigurationNotifier> configNotifier;
-};
-} // scrimpl
-} // cppmicroservices
+            cppmicroservices::Bundle bundle_;
+            std::shared_ptr<ComponentRegistry> registry;
+            std::shared_ptr<LogService> logger;
+            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
+            std::shared_ptr<ConfigurationNotifier> configNotifier;
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 
 #endif // __SCRBUNDLEEXTENSION_HPP__

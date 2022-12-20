@@ -29,35 +29,35 @@
 #include <streambuf>
 #include <vector>
 
-namespace cppmicroservices {
-
-struct HttpServletResponsePrivate;
-
-class HttpOutputStreamBuffer : public std::streambuf
+namespace cppmicroservices
 {
-public:
-  explicit HttpOutputStreamBuffer(HttpServletResponsePrivate* response,
-                                  std::size_t bufferSize = 1024);
-  ~HttpOutputStreamBuffer();
 
-protected:
-  bool CommitStream();
+    struct HttpServletResponsePrivate;
 
-private:
-  int_type overflow(int_type ch);
+    class HttpOutputStreamBuffer : public std::streambuf
+    {
+      public:
+        explicit HttpOutputStreamBuffer(HttpServletResponsePrivate* response, std::size_t bufferSize = 1024);
+        ~HttpOutputStreamBuffer();
 
-  int sync();
+      protected:
+        bool CommitStream();
 
-  bool sendBuffer();
+      private:
+        int_type overflow(int_type ch);
 
-  HttpOutputStreamBuffer(const HttpOutputStreamBuffer&);
-  HttpOutputStreamBuffer& operator=(const HttpOutputStreamBuffer&);
+        int sync();
 
-private:
-  std::vector<char> m_Buffer;
-  HttpServletResponsePrivate* m_Response;
-  bool m_ChunkedCoding;
-};
-}
+        bool sendBuffer();
+
+        HttpOutputStreamBuffer(HttpOutputStreamBuffer const&);
+        HttpOutputStreamBuffer& operator=(HttpOutputStreamBuffer const&);
+
+      private:
+        std::vector<char> m_Buffer;
+        HttpServletResponsePrivate* m_Response;
+        bool m_ChunkedCoding;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_HTTPOUTPUTSTREAMBUFFER_H

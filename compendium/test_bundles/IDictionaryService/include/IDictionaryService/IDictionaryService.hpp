@@ -25,20 +25,21 @@
 #include "IDictionaryService/IDictionaryServiceExport.h"
 #include <string>
 
-namespace test {
-
-class US_IDictionaryService_EXPORT IDictionaryService
+namespace test
 {
-public:
-  virtual ~IDictionaryService();
-  /**
-   * Check for the existence of a word.
-   * @param word the word to be checked.
-   * @return true if the word is in the dictionary,
-   *         false otherwise.
-   **/
-  virtual bool CheckWord(const std::string& word) = 0;
-};
 
-}
+    class US_IDictionaryService_EXPORT IDictionaryService
+    {
+      public:
+        virtual ~IDictionaryService();
+        /**
+         * Check for the existence of a word.
+         * @param word the word to be checked.
+         * @return true if the word is in the dictionary,
+         *         false otherwise.
+         **/
+        virtual bool CheckWord(std::string const& word) = 0;
+    };
+
+} // namespace test
 #endif // _SAMPLEINTERFACE_HPP_

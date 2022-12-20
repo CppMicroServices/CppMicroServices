@@ -27,37 +27,39 @@
 
 #include "MetadataParser.hpp"
 
-namespace cppmicroservices {
-namespace cmimpl {
-namespace metadata {
-/*
- * Represents a concrete implementation (Version 1) of the MetadataParser
- */
-class MetadataParserImplV1 final : public MetadataParser
+namespace cppmicroservices
 {
-public:
-  MetadataParserImplV1(
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+    namespace cmimpl
+    {
+        namespace metadata
+        {
+            /*
+             * Represents a concrete implementation (Version 1) of the MetadataParser
+             */
+            class MetadataParserImplV1 final : public MetadataParser
+            {
+              public:
+                MetadataParserImplV1(std::shared_ptr<cppmicroservices::logservice::LogService> logger);
 
-  ~MetadataParserImplV1() override = default;
-  MetadataParserImplV1(const MetadataParserImplV1&) = delete;
-  MetadataParserImplV1& operator=(const MetadataParserImplV1&) = delete;
-  MetadataParserImplV1(MetadataParserImplV1&&) = delete;
-  MetadataParserImplV1& operator=(MetadataParserImplV1&&) = delete;
+                ~MetadataParserImplV1() override = default;
+                MetadataParserImplV1(MetadataParserImplV1 const&) = delete;
+                MetadataParserImplV1& operator=(MetadataParserImplV1 const&) = delete;
+                MetadataParserImplV1(MetadataParserImplV1&&) = delete;
+                MetadataParserImplV1& operator=(MetadataParserImplV1&&) = delete;
 
-  /*
-   * @brief Parse and return the vector of ComponentMetadata
-   * @param metadata The value of the key "cm" in the manifest
-   * @returns the vector of @ConfigurationMetadata objects
-   */
-  std::vector<ConfigurationMetadata> ParseAndGetConfigurationMetadata(
-    const AnyMap& scrmap) const override;
+                /*
+                 * @brief Parse and return the vector of ComponentMetadata
+                 * @param metadata The value of the key "cm" in the manifest
+                 * @returns the vector of @ConfigurationMetadata objects
+                 */
+                std::vector<ConfigurationMetadata> ParseAndGetConfigurationMetadata(
+                    AnyMap const& scrmap) const override;
 
-private:
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-};
-} // metadata
-} // cmimpl
-} // cppmicroservices
+              private:
+                std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+            };
+        } // namespace metadata
+    }     // namespace cmimpl
+} // namespace cppmicroservices
 
-#endif //METADATAPARSERIMPL_HPP
+#endif // METADATAPARSERIMPL_HPP

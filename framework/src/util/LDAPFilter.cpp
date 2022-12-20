@@ -32,120 +32,129 @@
 
 #include <stdexcept>
 
-namespace cppmicroservices {
-
-class LDAPFilterData
+namespace cppmicroservices
 {
-public:
-  LDAPFilterData()
-    : ldapExpr()
-  {
-  }
 
-  LDAPFilterData(const std::string& filter)
-    : ldapExpr(filter)
-  {
-  }
+    class LDAPFilterData
+    {
+      public:
+        LDAPFilterData() : ldapExpr() {}
 
-  LDAPFilterData(const LDAPFilterData&) = default;
+        LDAPFilterData(std::string const& filter) : ldapExpr(filter) {}
 
-  LDAPExpr ldapExpr;
-};
+        LDAPFilterData(LDAPFilterData const&) = default;
 
-LDAPFilter::LDAPFilter()
-  : d(nullptr)
-{
-}
+        LDAPExpr ldapExpr;
+    };
 
-LDAPFilter::LDAPFilter(const std::string& filter)
-  : d(nullptr)
-{
-  try {
-    d = std::make_shared<LDAPFilterData>(filter);
-  } catch (const std::exception& e) {
-    throw std::invalid_argument(e.what());
-  }
-}
+    LDAPFilter::LDAPFilter() : d(nullptr) {}
 
-LDAPFilter::LDAPFilter(const LDAPFilter&) = default;
-
-LDAPFilter::~LDAPFilter() = default;
-
-LDAPFilter::operator bool() const
-{
-  return d != nullptr;
-}
-
-bool LDAPFilter::Match(const ServiceReferenceBase& reference) const
-{
-  return ((d) ? d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), false)
-              : false);
-}
-
-// This function has been modified to call the LDAPExpr::Evaluate() function which takes
-// an AnyMap rather than a PropertiesHandle to optimize the code. Constructing a Properties
-// object is much slower (requiring a copy) than simply using the AnyMap directly.
-bool LDAPFilter::Match(const Bundle& bundle) const
-{
-  if (d) {
-    const auto& headers = bundle.GetHeaders();
-
-    if (headers.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-      props_check::ValidateAnyMap(headers);
+    LDAPFilter::LDAPFilter(std::string const& filter) : d(nullptr)
+    {
+        try
+        {
+            d = std::make_shared<LDAPFilterData>(filter);
+        }
+        catch (std::exception const& e)
+        {
+            throw std::invalid_argument(e.what());
+        }
     }
 
-    return d->ldapExpr.Evaluate(headers, false);
-  } else {
-    return false;
-  }
-}
+    LDAPFilter::LDAPFilter(LDAPFilter const&) = default;
 
-// This function has been modified to call the LDAPExpr::Evaluate() function which takes
-// an AnyMap rather than a PropertiesHandle to optimize the code. Constructing a Properties
-// object is much slower (requiring a copy) than simply using the AnyMap directly.
-bool LDAPFilter::Match(const AnyMap& dictionary) const
-{
-  if (d) {
-    if (dictionary.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-      props_check::ValidateAnyMap(dictionary);
+    LDAPFilter::~LDAPFilter() = default;
+
+    LDAPFilter::operator bool() const { return d != nullptr; }
+
+    bool
+    LDAPFilter::Match(ServiceReferenceBase const& reference) const
+    {
+        return ((d) ? d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), false) : false);
     }
 
-    return d->ldapExpr.Evaluate(dictionary, false);
-  } else {
-    return false;
-  }
-}
+    // This function has been modified to call the LDAPExpr::Evaluate() function which takes
+    // an AnyMap rather than a PropertiesHandle to optimize the code. Constructing a Properties
+    // object is much slower (requiring a copy) than simply using the AnyMap directly.
+    bool
+    LDAPFilter::Match(Bundle const& bundle) const
+    {
+        if (d)
+        {
+            auto const& headers = bundle.GetHeaders();
 
-// This function has been modified to call the LDAPExpr::Evaluate() function which takes
-// an AnyMap rather than a PropertiesHandle to optimize the code. Constructing a Properties
-// object is much slower (requiring a copy) than simply using the AnyMap directly.
-bool LDAPFilter::MatchCase(const AnyMap& dictionary) const
-{
-  if (d) {
-    if (dictionary.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-      props_check::ValidateAnyMap(dictionary);
+            if (headers.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+            {
+                props_check::ValidateAnyMap(headers);
+            }
+
+            return d->ldapExpr.Evaluate(headers, false);
+        }
+        else
+        {
+            return false;
+        }
     }
 
-    return d->ldapExpr.Evaluate(dictionary, true);
-  } else {
-    return false;
-  }
-}
+    // This function has been modified to call the LDAPExpr::Evaluate() function which takes
+    // an AnyMap rather than a PropertiesHandle to optimize the code. Constructing a Properties
+    // object is much slower (requiring a copy) than simply using the AnyMap directly.
+    bool
+    LDAPFilter::Match(AnyMap const& dictionary) const
+    {
+        if (d)
+        {
+            if (dictionary.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+            {
+                props_check::ValidateAnyMap(dictionary);
+            }
 
-std::string LDAPFilter::ToString() const
-{
-  return ((d) ? d->ldapExpr.ToString() : std::string());
-}
+            return d->ldapExpr.Evaluate(dictionary, false);
+        }
+        else
+        {
+            return false;
+        }
+    }
 
-bool LDAPFilter::operator==(const LDAPFilter& other) const
-{
-  return (this->ToString() == other.ToString());
-}
+    // This function has been modified to call the LDAPExpr::Evaluate() function which takes
+    // an AnyMap rather than a PropertiesHandle to optimize the code. Constructing a Properties
+    // object is much slower (requiring a copy) than simply using the AnyMap directly.
+    bool
+    LDAPFilter::MatchCase(AnyMap const& dictionary) const
+    {
+        if (d)
+        {
+            if (dictionary.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+            {
+                props_check::ValidateAnyMap(dictionary);
+            }
 
-LDAPFilter& LDAPFilter::operator=(const LDAPFilter& filter) = default;
+            return d->ldapExpr.Evaluate(dictionary, true);
+        }
+        else
+        {
+            return false;
+        }
+    }
 
-std::ostream& operator<<(std::ostream& os, const LDAPFilter& filter)
-{
-  return os << filter.ToString();
-}
-}
+    std::string
+    LDAPFilter::ToString() const
+    {
+        return ((d) ? d->ldapExpr.ToString() : std::string());
+    }
+
+    bool
+    LDAPFilter::operator==(LDAPFilter const& other) const
+    {
+        return (this->ToString() == other.ToString());
+    }
+
+    LDAPFilter& LDAPFilter::operator=(LDAPFilter const& filter) = default;
+
+    std::ostream&
+    operator<<(std::ostream& os, LDAPFilter const& filter)
+    {
+        return os << filter.ToString();
+    }
+} // namespace cppmicroservices

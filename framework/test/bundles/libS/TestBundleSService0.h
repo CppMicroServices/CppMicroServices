@@ -25,12 +25,13 @@
 
 #include "cppmicroservices/ServiceInterface.h"
 
-namespace cppmicroservices {
-
-struct TestBundleSService0
+namespace cppmicroservices
 {
-  virtual ~TestBundleSService0() {}
-};
-}
+
+    struct TestBundleSService0
+    {
+        virtual ~TestBundleSService0() {}
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_TESTBUNDLESSERVICE0_H

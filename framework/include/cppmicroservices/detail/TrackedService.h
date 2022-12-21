@@ -30,96 +30,93 @@
 #include "cppmicroservices/detail/CounterLatch.h"
 #include "cppmicroservices/detail/ScopeGuard.h"
 
-namespace cppmicroservices {
-
-namespace detail {
-
-/**
- * This class is not intended to be used directly. It is exported to support
- * the CppMicroServices bundle system.
- */
-template<class S, class TTT>
-class TrackedService
-  : public TrackedServiceListener
-  , public BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>
+namespace cppmicroservices
 {
 
-public:
-  using T = typename TTT::TrackedType;
-  using TrackedParamType = typename TTT::TrackedParamType;
+    namespace detail
+    {
 
-  TrackedService(ServiceTracker<S, T>* serviceTracker,
-                 ServiceTrackerCustomizer<S, T>* customizer);
+        /**
+         * This class is not intended to be used directly. It is exported to support
+         * the CppMicroServices bundle system.
+         */
+        template <class S, class TTT>
+        class TrackedService
+            : public TrackedServiceListener
+            , public BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>
+        {
 
-  /**
-   * Method connected to service events for the
-   * <code>ServiceTracker</code> class. This method must NOT be
-   * synchronized to avoid deadlock potential.
-   *
-   * @param event <code>ServiceEvent</code> object from the framework.
-   */
-  void ServiceChanged(const ServiceEvent& event) override;
+          public:
+            using T = typename TTT::TrackedType;
+            using TrackedParamType = typename TTT::TrackedParamType;
 
-  void WaitOnCustomizersToFinish();
+            TrackedService(ServiceTracker<S, T>* serviceTracker, ServiceTrackerCustomizer<S, T>* customizer);
 
-private:
-  using Superclass =
-    BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>;
+            /**
+             * Method connected to service events for the
+             * <code>ServiceTracker</code> class. This method must NOT be
+             * synchronized to avoid deadlock potential.
+             *
+             * @param event <code>ServiceEvent</code> object from the framework.
+             */
+            void ServiceChanged(ServiceEvent const& event) override;
 
-  ServiceTracker<S, T>* serviceTracker;
-  ServiceTrackerCustomizer<S, T>* customizer;
+            void WaitOnCustomizersToFinish();
 
-  CounterLatch latch;
+          private:
+            using Superclass = BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>;
 
-  /**
-   * Increment the tracking count and tell the tracker there was a
-   * modification.
-   *
-   * @GuardedBy this
-   */
-  void Modified() override;
+            ServiceTracker<S, T>* serviceTracker;
+            ServiceTrackerCustomizer<S, T>* customizer;
 
-  /**
-   * Call the specific customizer adding method. This method must not be
-   * called while synchronized on this object.
-   *
-   * @param item Item to be tracked.
-   * @param related Action related object.
-   * @return Customized object for the tracked item or <code>null</code>
-   *         if the item is not to be tracked.
-   */
-  std::shared_ptr<TrackedParamType> CustomizerAdding(
-    ServiceReference<S> item,
-    const ServiceEvent& related) override;
+            CounterLatch latch;
 
-  /**
-   * Call the specific customizer modified method. This method must not be
-   * called while synchronized on this object.
-   *
-   * @param item Tracked item.
-   * @param related Action related object.
-   * @param object Customized object for the tracked item.
-   */
-  void CustomizerModified(
-    ServiceReference<S> item,
-    const ServiceEvent& related,
-    const std::shared_ptr<TrackedParamType>& object) override;
+            /**
+             * Increment the tracking count and tell the tracker there was a
+             * modification.
+             *
+             * @GuardedBy this
+             */
+            void Modified() override;
 
-  /**
-   * Call the specific customizer removed method. This method must not be
-   * called while synchronized on this object.
-   *
-   * @param item Tracked item.
-   * @param related Action related object.
-   * @param object Customized object for the tracked item.
-   */
-  void CustomizerRemoved(
-    ServiceReference<S> item,
-    const ServiceEvent& related,
-    const std::shared_ptr<TrackedParamType>& object) override;
-};
+            /**
+             * Call the specific customizer adding method. This method must not be
+             * called while synchronized on this object.
+             *
+             * @param item Item to be tracked.
+             * @param related Action related object.
+             * @return Customized object for the tracked item or <code>null</code>
+             *         if the item is not to be tracked.
+             */
+            std::shared_ptr<TrackedParamType> CustomizerAdding(ServiceReference<S> item,
+                                                               ServiceEvent const& related) override;
 
-} // namespace detail
+            /**
+             * Call the specific customizer modified method. This method must not be
+             * called while synchronized on this object.
+             *
+             * @param item Tracked item.
+             * @param related Action related object.
+             * @param object Customized object for the tracked item.
+             */
+            void CustomizerModified(ServiceReference<S> item,
+                                    ServiceEvent const& related,
+                                    std::shared_ptr<TrackedParamType> const& object) override;
+
+            /**
+             * Call the specific customizer removed method. This method must not be
+             * called while synchronized on this object.
+             *
+             * @param item Tracked item.
+             * @param related Action related object.
+             * @param object Customized object for the tracked item.
+             */
+            void CustomizerRemoved(ServiceReference<S> item,
+                                   ServiceEvent const& related,
+                                   std::shared_ptr<TrackedParamType> const& object) override;
+        };
+
+    } // namespace detail
 
 } // namespace cppmicroservices
 

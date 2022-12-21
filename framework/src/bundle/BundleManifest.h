@@ -10,7 +10,7 @@
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+  http://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-=============================================================================*/
+  =============================================================================*/
 
 #ifndef CPPMICROSERVICES_BUNDLEMANIFEST_H
 #define CPPMICROSERVICES_BUNDLEMANIFEST_H
@@ -29,44 +29,45 @@
 
 #include <jsoncons/json.hpp>
 
-namespace cppmicroservices {
-
-class BundleManifest
+namespace cppmicroservices
 {
 
-public:
-  BundleManifest();
-  explicit BundleManifest(const AnyMap& m);
+    class BundleManifest
+    {
 
-  void Parse(std::istream& is);
+      public:
+        BundleManifest();
+        explicit BundleManifest(AnyMap const& m);
 
-  const AnyMap& GetHeaders() const;
+        void Parse(std::istream& is);
 
-  bool Contains(const std::string& key) const;
-  Any GetValue(const std::string& key) const;
+        AnyMap const& GetHeaders() const;
 
-  Any GetValueDeprecated(const std::string& key) const;
-  std::vector<std::string> GetKeysDeprecated() const;
+        bool Contains(std::string const& key) const;
+        Any GetValue(std::string const& key) const;
 
-  std::map<std::string, Any> GetPropertiesDeprecated() const;
+        Any GetValueDeprecated(std::string const& key) const;
+        std::vector<std::string> GetKeysDeprecated() const;
 
-private:
-  // m_PropertiesDeprecated must be mutable because its content is lazily initialized when
-  // one of the const methods GetValueDeprecated(), GetKeysDeprecated(), or
-  // GetPropertiesDeprecated() is called.
-  mutable std::map<std::string, Any> m_PropertiesDeprecated;
-  mutable std::once_flag m_DidCopyDeprecatedProperties;
-  AnyMap m_Headers;
-  jsoncons::json m_JsonProps;
+        std::map<std::string, Any> GetPropertiesDeprecated() const;
 
-  /** copies m_Headers to m_PropertiesDeprecated exactly once per BundleManifest using
-   * std::call_once. Needs to be a const method because it's called from other const
-   * methods. However, it does modify the values of both mutable fields:
-   * m_PropertiesDeprecated and m_DidCopyDeprecatedProperties
-   */
-  void CopyDeprecatedProperties() const;
-};
+      private:
+        // m_PropertiesDeprecated must be mutable because its content is lazily initialized when
+        // one of the const methods GetValueDeprecated(), GetKeysDeprecated(), or
+        // GetPropertiesDeprecated() is called.
+        mutable std::map<std::string, Any> m_PropertiesDeprecated;
+        mutable std::once_flag m_DidCopyDeprecatedProperties;
+        AnyMap m_Headers;
+        jsoncons::json m_JsonProps;
 
-}
+        /** copies m_Headers to m_PropertiesDeprecated exactly once per BundleManifest using
+         * std::call_once. Needs to be a const method because it's called from other const
+         * methods. However, it does modify the values of both mutable fields:
+         * m_PropertiesDeprecated and m_DidCopyDeprecatedProperties
+         */
+        void CopyDeprecatedProperties() const;
+    };
+
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLEMANIFEST_H

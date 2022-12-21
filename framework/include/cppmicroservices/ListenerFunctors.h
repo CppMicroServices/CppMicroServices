@@ -29,161 +29,159 @@
 #include <cstring>
 #include <functional>
 
-namespace cppmicroservices {
-
-class ServiceEvent;
-class BundleEvent;
-class FrameworkEvent;
-class ServiceListeners;
-
-/**
-  \defgroup gr_listeners Listeners
-
-  \brief Groups Listener related symbols.
-  */
-
-/**
- * \ingroup MicroServices
- * \ingroup gr_listeners
- *
- * A \c ServiceEvent listener.
- *
- * A \c ServiceListener can be any callable object and is registered
- * with the Framework using the
- * {@link BundleContext#AddServiceListener(const ServiceListener&, const std::string&)} method.
- * \c ServiceListener instances are called with a \c ServiceEvent object when a
- * service has been registered, unregistered, or modified.
- *
- * @see ServiceEvent
- */
-using ServiceListener = std::function<void(const ServiceEvent&)>;
-
-/**
- * \ingroup MicroServices
- * \ingroup gr_listeners
- *
- * A \c BundleEvent listener. When a \c BundleEvent is fired, it is
- * asynchronously (if threading support is enabled) delivered to a
- * \c BundleListener. The Framework delivers \c BundleEvent objects to
- * a \c BundleListener in order and does not concurrently call a
- * \c BundleListener.
- *
- * A \c BundleListener can be any callable object and is registered
- * with the Framework using the
- * {@link BundleContext#AddBundleListener(const BundleListener&)} method.
- * \c BundleListener instances are called with a \c BundleEvent object when a
- * bundle has been installed, resolved, started, stopped, updated, unresolved,
- * or uninstalled.
- *
- * @see BundleEvent
- */
-using BundleListener = std::function<void(const BundleEvent&)>;
-
-/**
- * \ingroup MicroServices
- * \ingroup gr_listeners
- *
- * A \c FrameworkEvent listener. When a \c BundleEvent is fired, it is
- * asynchronously (if threading support is enabled) delivered to a
- * \c FrameworkListener. The Framework delivers \c FrameworkEvent objects to
- * a \c FrameworkListener in order and does not concurrently call a
- * \c FrameworkListener.
- *
- * A \c FrameworkListener can be any callable object and is registered
- * with the Framework using the
- * {@link BundleContext#AddFrameworkListener(const FrameworkListener&)} method.
- * \c FrameworkListener instances are called with a \c FrameworkEvent object when a
- * framework life-cycle event or notification message occured.
- *
- * @see FrameworkEvent
- */
-using FrameworkListener = std::function<void(const FrameworkEvent&)>;
-
-/**
- * \ingroup MicroServices
- * \ingroup gr_listeners
- *
- * A convenience function that binds the member function <code>callback</code> of
- * an object of type <code>R</code> and returns a <code>ServiceListener</code> object.
- * This object can then be passed into <code>AddServiceListener()</code>.
- *
- * \rststar
- * .. deprecated:: 3.1.0
- *    This function exists only to maintain backwards compatibility
- *     and will be removed in the next major release. Use std::bind instead.
- * \endrststar
- *
- * @tparam R The type containing the member function.
- * @param receiver The object of type R.
- * @param callback The member function pointer.
- * @returns a ServiceListener object.
- */
-template<class R>
-US_DEPRECATED ServiceListener
-ServiceListenerMemberFunctor(R* receiver,
-                             void (R::*callback)(const ServiceEvent&))
+namespace cppmicroservices
 {
-  return std::bind(callback, receiver, std::placeholders::_1);
-}
 
-/**
- * \ingroup MicroServices
- * \ingroup gr_listeners
- *
- * A convenience function that binds the member function <code>callback</code> of
- * an object of type <code>R</code> and returns a <code>BundleListener</code> object.
- * This object can then be passed into <code>AddBundleListener()</code>.
- *
- * \rststar
- * .. deprecated:: 3.1.0
- *    This function exists only to maintain backwards compatibility
- *     and will be removed in the next major release. Use std::bind instead.
- * \endrststar
- *
- * @tparam R The type containing the member function.
- * @param receiver The object of type R.
- * @param callback The member function pointer.
- * @returns a BundleListener object.
- */
-template<class R>
-US_DEPRECATED BundleListener
-BundleListenerMemberFunctor(R* receiver,
-                            void (R::*callback)(const BundleEvent&))
-{
-  return std::bind(callback, receiver, std::placeholders::_1);
-}
+    class ServiceEvent;
+    class BundleEvent;
+    class FrameworkEvent;
+    class ServiceListeners;
 
-/**
- * \ingroup MicroServices
- * \ingroup gr_listeners
- *
- * A convenience function that binds the member function <code>callback</code> of
- * an object of type <code>R</code> and returns a <code>FrameworkListener</code> object.
- * This object can then be passed into <code>AddFrameworkListener()</code>.
- *
- * \rststar
- * .. deprecated:: 3.1.0
- *    This function exists only to maintain backwards compatibility
- *     and will be removed in the next major release. Use std::bind instead.
- * \endrststar
- *
- * @tparam R The type containing the member function.
- * @param receiver The object of type R.
- * @param callback The member function pointer.
- * @returns a FrameworkListener object.
- */
-template<class R>
-US_DEPRECATED FrameworkListener
-BindFrameworkListenerToFunctor(R* receiver,
-                               void (R::*callback)(const FrameworkEvent&))
-{
-  return std::bind(callback, receiver, std::placeholders::_1);
-}
-}
+    /**
+      \defgroup gr_listeners Listeners
+
+      \brief Groups Listener related symbols.
+      */
+
+    /**
+     * \ingroup MicroServices
+     * \ingroup gr_listeners
+     *
+     * A \c ServiceEvent listener.
+     *
+     * A \c ServiceListener can be any callable object and is registered
+     * with the Framework using the
+     * {@link BundleContext#AddServiceListener(const ServiceListener&, const std::string&)} method.
+     * \c ServiceListener instances are called with a \c ServiceEvent object when a
+     * service has been registered, unregistered, or modified.
+     *
+     * @see ServiceEvent
+     */
+    using ServiceListener = std::function<void(ServiceEvent const&)>;
+
+    /**
+     * \ingroup MicroServices
+     * \ingroup gr_listeners
+     *
+     * A \c BundleEvent listener. When a \c BundleEvent is fired, it is
+     * asynchronously (if threading support is enabled) delivered to a
+     * \c BundleListener. The Framework delivers \c BundleEvent objects to
+     * a \c BundleListener in order and does not concurrently call a
+     * \c BundleListener.
+     *
+     * A \c BundleListener can be any callable object and is registered
+     * with the Framework using the
+     * {@link BundleContext#AddBundleListener(const BundleListener&)} method.
+     * \c BundleListener instances are called with a \c BundleEvent object when a
+     * bundle has been installed, resolved, started, stopped, updated, unresolved,
+     * or uninstalled.
+     *
+     * @see BundleEvent
+     */
+    using BundleListener = std::function<void(BundleEvent const&)>;
+
+    /**
+     * \ingroup MicroServices
+     * \ingroup gr_listeners
+     *
+     * A \c FrameworkEvent listener. When a \c BundleEvent is fired, it is
+     * asynchronously (if threading support is enabled) delivered to a
+     * \c FrameworkListener. The Framework delivers \c FrameworkEvent objects to
+     * a \c FrameworkListener in order and does not concurrently call a
+     * \c FrameworkListener.
+     *
+     * A \c FrameworkListener can be any callable object and is registered
+     * with the Framework using the
+     * {@link BundleContext#AddFrameworkListener(const FrameworkListener&)} method.
+     * \c FrameworkListener instances are called with a \c FrameworkEvent object when a
+     * framework life-cycle event or notification message occured.
+     *
+     * @see FrameworkEvent
+     */
+    using FrameworkListener = std::function<void(FrameworkEvent const&)>;
+
+    /**
+     * \ingroup MicroServices
+     * \ingroup gr_listeners
+     *
+     * A convenience function that binds the member function <code>callback</code> of
+     * an object of type <code>R</code> and returns a <code>ServiceListener</code> object.
+     * This object can then be passed into <code>AddServiceListener()</code>.
+     *
+     * \rststar
+     * .. deprecated:: 3.1.0
+     *    This function exists only to maintain backwards compatibility
+     *     and will be removed in the next major release. Use std::bind instead.
+     * \endrststar
+     *
+     * @tparam R The type containing the member function.
+     * @param receiver The object of type R.
+     * @param callback The member function pointer.
+     * @returns a ServiceListener object.
+     */
+    template <class R>
+    US_DEPRECATED ServiceListener
+    ServiceListenerMemberFunctor(R* receiver, void (R::*callback)(ServiceEvent const&))
+    {
+        return std::bind(callback, receiver, std::placeholders::_1);
+    }
+
+    /**
+     * \ingroup MicroServices
+     * \ingroup gr_listeners
+     *
+     * A convenience function that binds the member function <code>callback</code> of
+     * an object of type <code>R</code> and returns a <code>BundleListener</code> object.
+     * This object can then be passed into <code>AddBundleListener()</code>.
+     *
+     * \rststar
+     * .. deprecated:: 3.1.0
+     *    This function exists only to maintain backwards compatibility
+     *     and will be removed in the next major release. Use std::bind instead.
+     * \endrststar
+     *
+     * @tparam R The type containing the member function.
+     * @param receiver The object of type R.
+     * @param callback The member function pointer.
+     * @returns a BundleListener object.
+     */
+    template <class R>
+    US_DEPRECATED BundleListener
+    BundleListenerMemberFunctor(R* receiver, void (R::*callback)(BundleEvent const&))
+    {
+        return std::bind(callback, receiver, std::placeholders::_1);
+    }
+
+    /**
+     * \ingroup MicroServices
+     * \ingroup gr_listeners
+     *
+     * A convenience function that binds the member function <code>callback</code> of
+     * an object of type <code>R</code> and returns a <code>FrameworkListener</code> object.
+     * This object can then be passed into <code>AddFrameworkListener()</code>.
+     *
+     * \rststar
+     * .. deprecated:: 3.1.0
+     *    This function exists only to maintain backwards compatibility
+     *     and will be removed in the next major release. Use std::bind instead.
+     * \endrststar
+     *
+     * @tparam R The type containing the member function.
+     * @param receiver The object of type R.
+     * @param callback The member function pointer.
+     * @returns a FrameworkListener object.
+     */
+    template <class R>
+    US_DEPRECATED FrameworkListener
+    BindFrameworkListenerToFunctor(R* receiver, void (R::*callback)(FrameworkEvent const&))
+    {
+        return std::bind(callback, receiver, std::placeholders::_1);
+    }
+} // namespace cppmicroservices
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListener)
-using TargetType = void (*)(const cppmicroservices::ServiceEvent&);
-const auto* targetFunc = arg.target<TargetType>();
+using TargetType = void (*)(cppmicroservices::ServiceEvent const&);
+auto const* targetFunc = arg.target<TargetType>();
 void* targetPtr = nullptr;
 std::memcpy(&targetPtr, &targetFunc, sizeof(void*));
 return hash<void*>()(targetPtr);

@@ -28,49 +28,51 @@
 
 #include <string>
 
-namespace cppmicroservices {
-
-class Bundle;
-class BundleContext;
-class ServiceReferenceBase;
-
-/**
- * @ingroup MicroServices
- *
- * Service Find Hook Service.
- *
- * <p>
- * Bundles registering this service will be called during service find
- * (get service references) operations.
- *
- * @remarks Implementations of this interface are required to be thread-safe.
- */
-struct US_Framework_EXPORT ServiceFindHook
+namespace cppmicroservices
 {
 
-  virtual ~ServiceFindHook();
+    class Bundle;
+    class BundleContext;
+    class ServiceReferenceBase;
 
-  /**
-   * Find hook method. This method is called during the service find operation
-   * (for example, BundleContext::GetServiceReferences<S>()). This method can
-   * filter the result of the find operation.
-   *
-   * @param context The bundle context of the bundle performing the find
-   *        operation.
-   * @param name The class name of the services to find or an empty string to
-   *        find all services.
-   * @param filter The filter criteria of the services to find or an empty string
-   *        for no filter criteria.
-   * @param references A list of Service References to be returned as a result of the
-   *        find operation. The implementation of this method may remove
-   *        service references from the list to prevent the references from being
-   *        returned to the bundle performing the find operation.
-   */
-  virtual void Find(const BundleContext& context,
-                    const std::string& name,
-                    const std::string& filter,
-                    ShrinkableVector<ServiceReferenceBase>& references) = 0;
-};
-}
+    /**
+     * @ingroup MicroServices
+     *
+     * Service Find Hook Service.
+     *
+     * <p>
+     * Bundles registering this service will be called during service find
+     * (get service references) operations.
+     *
+     * @remarks Implementations of this interface are required to be thread-safe.
+     */
+    struct US_Framework_EXPORT ServiceFindHook
+    {
+
+        virtual ~ServiceFindHook();
+
+        /**
+         * Find hook method. This method is called during the service find operation
+         * (for example, BundleContext::GetServiceReferences<S>()). This method can
+         * filter the result of the find operation.
+         *
+         * @param context The bundle context of the bundle performing the find
+         *        operation.
+         * @param name The class name of the services to find or an empty string to
+         *        find all services.
+         * @param filter The filter criteria of the services to find or an empty string
+         *        for no filter criteria.
+         * @param references A list of Service References to be returned as a result of the
+         *        find operation. The implementation of this method may remove
+         *        service references from the list to prevent the references from being
+         *        returned to the bundle performing the find operation.
+         */
+        virtual void Find(BundleContext const& context,
+                          std::string const& name,
+                          std::string const& filter,
+                          ShrinkableVector<ServiceReferenceBase>& references)
+            = 0;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SERVICEFINDHOOK_H

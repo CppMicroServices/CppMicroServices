@@ -28,27 +28,28 @@
 
 #include <IDictionaryService/IDictionaryService.hpp>
 
-namespace EnglishDictionary {
-
-class DictionaryImpl : public test::IDictionaryService
+namespace EnglishDictionary
 {
-public:
-  DictionaryImpl();
-  ~DictionaryImpl() override = default;
 
-  /**
-   * Implements IDictionaryService::CheckWord(). Determines
-   * if the passed in word is contained in the dictionary.
-   * @param word the word to be checked.
-   * @return true if the word is in the dictionary,
-   *         false otherwise.
-   **/
-  bool CheckWord(const std::string& word) override;
+    class DictionaryImpl : public test::IDictionaryService
+    {
+      public:
+        DictionaryImpl();
+        ~DictionaryImpl() override = default;
 
-private:
-  // The set of words contained in the dictionary.
-  std::set<std::string> m_dictionary;
-};
-}
+        /**
+         * Implements IDictionaryService::CheckWord(). Determines
+         * if the passed in word is contained in the dictionary.
+         * @param word the word to be checked.
+         * @return true if the word is in the dictionary,
+         *         false otherwise.
+         **/
+        bool CheckWord(std::string const& word) override;
+
+      private:
+        // The set of words contained in the dictionary.
+        std::set<std::string> m_dictionary;
+    };
+} // namespace EnglishDictionary
 
 #endif // ENGLISHDICTIONARY_HPP

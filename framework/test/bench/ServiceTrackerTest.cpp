@@ -206,10 +206,10 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture, ServiceTrackerScalabilityWithLDAPFilte
                    ServiceTrackerScalabilityWithJSONFilter)
 (benchmark::State& state)
 {
-  using namespace benchmark::test;
-  using namespace cppmicroservices;
+    using namespace benchmark::test;
+    using namespace cppmicroservices;
 
-  auto fc = framework->GetBundleContext();
+    auto fc = framework->GetBundleContext();
 
   int64_t maxServiceTrackers{ state.range(0) };
   std::vector<std::unique_ptr<ServiceTracker<Foo>>> trackers;
@@ -221,14 +221,16 @@ BENCHMARK_DEFINE_F(ServiceTrackerFixture, ServiceTrackerScalabilityWithLDAPFilte
     trackers.emplace_back(std::move(fooTracker));
   }
 
-  // how long does it take for N trackers to receive the register service event?
-  for (auto _ : state) {
-    fc.RegisterService<Foo>(std::make_shared<FooImpl>());
-  }
+    // how long does it take for N trackers to receive the register service event?
+    for (auto _ : state)
+    {
+        fc.RegisterService<Foo>(std::make_shared<FooImpl>());
+    }
 
-  for (auto& tracker : trackers) {
-    tracker->Close();
-  }
+    for (auto& tracker : trackers)
+    {
+        tracker->Close();
+    }
 }
 */
 static void

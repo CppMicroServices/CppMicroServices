@@ -660,18 +660,19 @@ TEST_F(ServiceTrackerTestFixture, TestNullPtrServiceTrackerCustomizerUsingJSONFi
     context, filter, &customizer);
   tracker.Open();
 
-  struct MyServiceOne : public MyInterfaceOne
-  {};
+    struct MyServiceOne : public MyInterfaceOne
+    {
+    };
 
-  auto serviceOne = std::make_shared<MyServiceOne>();
+    auto serviceOne = std::make_shared<MyServiceOne>();
 
-  context.RegisterService<MyInterfaceOne>(serviceOne);
+    context.RegisterService<MyInterfaceOne>(serviceOne);
 
   ASSERT_EQ(tracker.GetServiceReferences().size(), 0)
     << "tracking count should be 0";
 
-  auto trackedObj = tracker.WaitForService(std::chrono::seconds(1));
-  ASSERT_EQ(nullptr, trackedObj) << "tracked object should be nullptr";
+    auto trackedObj = tracker.WaitForService(std::chrono::seconds(1));
+    ASSERT_EQ(nullptr, trackedObj) << "tracked object should be nullptr";
 }
 */
 /// <summary>

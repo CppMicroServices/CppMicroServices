@@ -59,7 +59,6 @@ set(_srcs
   bundle/BundleVersion.cpp
   bundle/Constants.cpp
   bundle/CoreBundleContext.cpp
-  ../../third_party/jsoncpp.cpp
   ../../third_party/miniz.c
 )
 

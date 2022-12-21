@@ -29,25 +29,26 @@
 #include <memory>
 #include <string>
 
-namespace cppmicroservices {
-
-class ServletContainer;
-
-class US_HttpService_EXPORT ServletContext
+namespace cppmicroservices
 {
-public:
-  std::string GetContextPath() const;
 
-  std::shared_ptr<ServletContext> GetContext(const std::string& uripath);
+    class ServletContainer;
 
-  std::string GetMimeType(const std::string& file) const;
+    class US_HttpService_EXPORT ServletContext
+    {
+      public:
+        std::string GetContextPath() const;
 
-private:
-  friend struct ServletContainerPrivate;
+        std::shared_ptr<ServletContext> GetContext(std::string const& uripath);
 
-  ServletContext(ServletContainer* container);
-  ServletContainer* m_Container;
-};
-}
+        std::string GetMimeType(std::string const& file) const;
+
+      private:
+        friend struct ServletContainerPrivate;
+
+        ServletContext(ServletContainer* container);
+        ServletContainer* m_Container;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SERVLETCONTEXT_H

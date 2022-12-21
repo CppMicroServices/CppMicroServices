@@ -3,17 +3,18 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 
-namespace sample {
-class ServiceComponent final : public test::Interface1
+namespace sample
 {
-public:
-  ServiceComponent(std::shared_ptr<test::Interface1>);
-  ~ServiceComponent() override = default;
-  std::string Description() override;
+    class ServiceComponent final : public test::Interface1
+    {
+      public:
+        ServiceComponent(std::shared_ptr<test::Interface1>);
+        ~ServiceComponent() override = default;
+        std::string Description() override;
 
-private:
-  std::shared_ptr<test::Interface1> m_interface1;
-};
-}
+      private:
+        std::shared_ptr<test::Interface1> m_interface1;
+    };
+} // namespace sample
 
 #endif // _SERVICE_IMPL_HPP_

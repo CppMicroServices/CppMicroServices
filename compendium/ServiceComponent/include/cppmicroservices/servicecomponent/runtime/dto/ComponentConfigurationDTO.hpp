@@ -30,110 +30,116 @@
 #include "UnsatisfiedReferenceDTO.hpp"
 #include "cppmicroservices/servicecomponent/ServiceComponentExport.h"
 
-namespace cppmicroservices {
-namespace service {
-namespace component {
-namespace runtime {
-namespace dto {
-
-/**
-\defgroup gr_componentconfigurationdto ComponentConfigurationDTO
-\brief Groups ComponentConfigurationDTO related symbols.
-*/
-
-/**
- * \addtogroup gr_componentconfigurationdto
- * @{
- */
-enum class ComponentState : uint8_t
+namespace cppmicroservices
 {
-  /**
-   * The component configuration is unsatisfied due to an unsatisfied
-   * reference.
-   */
-  UNSATISFIED_REFERENCE,
-  /**
-   * The component configuration is satisfied.
-   *
-   * <p>
-   * Any {@link ComponentDescriptionDTO#serviceInterfaces services} declared
-   * by the component description are registered.
-   */
-  SATISFIED,
-  /**
-   * The component configuration is active.
-   *
-   * <p>
-   * This is the normal operational state of a component configuration.
-   */
-  ACTIVE
-};
-/** @}*/
+    namespace service
+    {
+        namespace component
+        {
+            namespace runtime
+            {
+                namespace dto
+                {
 
-/**
- * \ingroup gr_componentconfigurationdto
- * A representation of an actual instance of a declared component description
- * parameterized by component properties.
- */
-struct US_ServiceComponent_EXPORT ComponentConfigurationDTO
-{
-  /**
-   * The representation of the component configuration's component
-   * description.
-   */
-  ComponentDescriptionDTO description;
+                    /**
+                    \defgroup gr_componentconfigurationdto ComponentConfigurationDTO
+                    \brief Groups ComponentConfigurationDTO related symbols.
+                    */
 
-  /**
-   * The current state of the component configuration.
-   *
-   * <p>
-   * This is one of
-   * {@link #ComponentState::UNSATISFIED_REFERENCE}, {@link #ComponentState::SATISFIED} or {@link #ComponentState::ACTIVE}.
-   */
-  ComponentState state;
+                    /**
+                     * \addtogroup gr_componentconfigurationdto
+                     * @{
+                     */
+                    enum class ComponentState : uint8_t
+                    {
+                        /**
+                         * The component configuration is unsatisfied due to an unsatisfied
+                         * reference.
+                         */
+                        UNSATISFIED_REFERENCE,
+                        /**
+                         * The component configuration is satisfied.
+                         *
+                         * <p>
+                         * Any {@link ComponentDescriptionDTO#serviceInterfaces services} declared
+                         * by the component description are registered.
+                         */
+                        SATISFIED,
+                        /**
+                         * The component configuration is active.
+                         *
+                         * <p>
+                         * This is the normal operational state of a component configuration.
+                         */
+                        ACTIVE
+                    };
+                    /** @}*/
 
-  /**
-   * The id of the component configuration.
-   *
-   * <p>
-   * The id is a non-persistent, unique value assigned at runtime. The id is
-   * also available as the \c component.id component property. The value
-   * of this field is unspecified if the state of this component configuration
-   * is unsatisfied.
-   */
-  unsigned long id;
+                    /**
+                     * \ingroup gr_componentconfigurationdto
+                     * A representation of an actual instance of a declared component description
+                     * parameterized by component properties.
+                     */
+                    struct US_ServiceComponent_EXPORT ComponentConfigurationDTO
+                    {
+                        /**
+                         * The representation of the component configuration's component
+                         * description.
+                         */
+                        ComponentDescriptionDTO description;
 
-  /**
-   * The component properties for the component configuration.
-   *
-   * @see ComponentContext#GetProperties()
-   */
-  std::unordered_map<std::string, cppmicroservices::Any> properties;
+                        /**
+                         * The current state of the component configuration.
+                         *
+                         * <p>
+                         * This is one of
+                         * {@link #ComponentState::UNSATISFIED_REFERENCE}, {@link #ComponentState::SATISFIED} or {@link
+                         * #ComponentState::ACTIVE}.
+                         */
+                        ComponentState state;
 
-  /**
-   * The satisfied references.
-   *
-   * <p>
-   * Each {@link SatisfiedReferenceDTO} in the vector represents a satisfied
-   * reference of the component configuration. The vector must be empty if the
-   * component configuration has no satisfied references.
-   */
-  std::vector<SatisfiedReferenceDTO> satisfiedReferences;
+                        /**
+                         * The id of the component configuration.
+                         *
+                         * <p>
+                         * The id is a non-persistent, unique value assigned at runtime. The id is
+                         * also available as the \c component.id component property. The value
+                         * of this field is unspecified if the state of this component configuration
+                         * is unsatisfied.
+                         */
+                        unsigned long id;
 
-  /**
-   * The unsatisfied references.
-   *
-   * <p>
-   * Each {@link UnsatisfiedReferenceDTO} in the vector represents an
-   * unsatisfied reference of the component configuration. The vector must be
-   * empty if the component configuration has no unsatisfied references.
-   */
-  std::vector<UnsatisfiedReferenceDTO> unsatisfiedReferences;
-};
-}
-}
-}
-}
-}
+                        /**
+                         * The component properties for the component configuration.
+                         *
+                         * @see ComponentContext#GetProperties()
+                         */
+                        std::unordered_map<std::string, cppmicroservices::Any> properties;
+
+                        /**
+                         * The satisfied references.
+                         *
+                         * <p>
+                         * Each {@link SatisfiedReferenceDTO} in the vector represents a satisfied
+                         * reference of the component configuration. The vector must be empty if the
+                         * component configuration has no satisfied references.
+                         */
+                        std::vector<SatisfiedReferenceDTO> satisfiedReferences;
+
+                        /**
+                         * The unsatisfied references.
+                         *
+                         * <p>
+                         * Each {@link UnsatisfiedReferenceDTO} in the vector represents an
+                         * unsatisfied reference of the component configuration. The vector must be
+                         * empty if the component configuration has no unsatisfied references.
+                         */
+                        std::vector<UnsatisfiedReferenceDTO> unsatisfiedReferences;
+                    };
+                } // namespace dto
+            }     // namespace runtime
+        }         // namespace component
+    }             // namespace service
+} // namespace cppmicroservices
 
 #endif /* ComponentConfigurationDTO_hpp */

@@ -194,9 +194,6 @@ namespace cppmicroservices
         this->Lock(), Get_unlocked(clazz, filter, bundle, res);
     }
 
-    /**
-     * TODO: Integrate with FilterAdapter
-     */
     void
     ServiceRegistry::Get_unlocked(std::string const& clazz,
                                   std::string const& filter,

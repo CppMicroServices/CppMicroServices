@@ -42,10 +42,9 @@ using codegen::datamodel::ComponentInfo;
 // supports multiple versions of the manifest.
 class ManifestParser
 {
-public:
-  virtual ~ManifestParser() = default;
-  virtual std::vector<ComponentInfo> ParseAndGetComponentInfos(
-    const Json::Value& scr) const = 0;
+  public:
+    virtual ~ManifestParser() = default;
+    virtual std::vector<ComponentInfo> ParseAndGetComponentInfos(Json::Value const& scr) const = 0;
 };
 
 #endif // MANIFESTPARSER_HPP

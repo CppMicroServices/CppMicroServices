@@ -21,31 +21,36 @@
   =============================================================================*/
 #include "Util.hpp"
 
-namespace codegen {
-namespace util {
-
-Json::Value ParseManifestOrThrow(std::istream& jsonStream)
+namespace codegen
 {
-  Json::Value root;
-  Json::CharReaderBuilder rbuilder;
-  rbuilder["rejectDupKeys"] = true;
-  std::string errs;
+    namespace util
+    {
 
-  if (!Json::parseFromStream(rbuilder, jsonStream, &root, &errs)) {
-    throw std::runtime_error(errs);
-  }
-  return root;
-}
+        Json::Value
+        ParseManifestOrThrow(std::istream& jsonStream)
+        {
+            Json::Value root;
+            Json::CharReaderBuilder rbuilder;
+            rbuilder["rejectDupKeys"] = true;
+            std::string errs;
 
-void WriteToFile(const std::string& filePath, const std::string& content)
-{
-  auto fileStream =
-    std::ofstream(filePath, std::ofstream::binary | std::ofstream::out);
-  if (!fileStream.is_open()) {
-    throw std::runtime_error("Could not open out file at " + filePath);
-  }
-  fileStream << content;
-  fileStream.close();
-}
-} // namespace util
+            if (!Json::parseFromStream(rbuilder, jsonStream, &root, &errs))
+            {
+                throw std::runtime_error(errs);
+            }
+            return root;
+        }
+
+        void
+        WriteToFile(std::string const& filePath, std::string const& content)
+        {
+            auto fileStream = std::ofstream(filePath, std::ofstream::binary | std::ofstream::out);
+            if (!fileStream.is_open())
+            {
+                throw std::runtime_error("Could not open out file at " + filePath);
+            }
+            fileStream << content;
+            fileStream.close();
+        }
+    } // namespace util
 } // namespace codegen

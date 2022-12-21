@@ -8,57 +8,65 @@
 #include <future>
 #include <vector>
 
-namespace cppmicroservices {
-namespace detail {
-namespace test {
-/**
- * Util method to determine if a future object is ready
- */
-template<typename T>
-bool is_ready(T&& futObj)
+namespace cppmicroservices
 {
-  return (futObj.wait_for(std::chrono::seconds::zero()) ==
-          std::future_status::ready);
-}
+    namespace detail
+    {
+        namespace test
+        {
+            /**
+             * Util method to determine if a future object is ready
+             */
+            template <typename T>
+            bool
+            is_ready(T&& futObj)
+            {
+                return (futObj.wait_for(std::chrono::seconds::zero()) == std::future_status::ready);
+            }
 
-/**
- * Utility method for concurrently running a function
- */
-template<class R, class... Args>
-std::vector<R> ConcurrentInvoke(std::function<R(Args...)> func)
-{
-  // test concurrent calls to enable and disable from multiple threads
-  std::vector<R> returnVals;
-  std::promise<void> go;
-  std::shared_future<void> ready(go.get_future());
-  size_t numCalls = std::max(64u, std::thread::hardware_concurrency());
-  std::vector<std::promise<void>> readies(numCalls);
+            /**
+             * Utility method for concurrently running a function
+             */
+            template <class R, class... Args>
+            std::vector<R>
+            ConcurrentInvoke(std::function<R(Args...)> func)
+            {
+                // test concurrent calls to enable and disable from multiple threads
+                std::vector<R> returnVals;
+                std::promise<void> go;
+                std::shared_future<void> ready(go.get_future());
+                size_t numCalls = std::max(64u, std::thread::hardware_concurrency());
+                std::vector<std::promise<void>> readies(numCalls);
 
-  // TODO: use std::barrier when available
-  std::vector<std::future<R>> enable_async_futs(numCalls);
-  for (size_t i = 0; i < numCalls; ++i) {
-    enable_async_futs[i] =
-      std::async(std::launch::async, [&readies, i, &ready, &func]() {
-        readies[i].set_value();
-        ready.wait();
-        return func();
-      });
-  }
+                // TODO: use std::barrier when available
+                std::vector<std::future<R>> enable_async_futs(numCalls);
+                for (size_t i = 0; i < numCalls; ++i)
+                {
+                    enable_async_futs[i] = std::async(std::launch::async,
+                                                      [&readies, i, &ready, &func]()
+                                                      {
+                                                          readies[i].set_value();
+                                                          ready.wait();
+                                                          return func();
+                                                      });
+                }
 
-  for (size_t i = 0; i < numCalls; ++i) {
-    readies[i].get_future().wait();
-  }
+                for (size_t i = 0; i < numCalls; ++i)
+                {
+                    readies[i].get_future().wait();
+                }
 
-  go.set_value();
+                go.set_value();
 
-  for (size_t i = 0; i < numCalls; ++i) {
-    returnVals.push_back(enable_async_futs[i].get());
-  }
-  return returnVals;
-}
+                for (size_t i = 0; i < numCalls; ++i)
+                {
+                    returnVals.push_back(enable_async_futs[i].get());
+                }
+                return returnVals;
+            }
 
-}
-}
-}
+        } // namespace test
+    }     // namespace detail
+} // namespace cppmicroservices
 
 #endif /* ConcurrencyTestUtil_hpp */

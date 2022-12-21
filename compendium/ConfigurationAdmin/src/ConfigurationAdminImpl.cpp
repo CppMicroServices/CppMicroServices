@@ -679,7 +679,14 @@ namespace cppmicroservices
                                                      *(managedServiceWrapper->getTrackedService()),
                                                      properties,
                                                      *logger);
-                                managedServiceWrapper->setLastUpdatedChangeCount(pid, changeCount);
+                                if (removed)
+                                {
+                                    managedServiceWrapper->removeLastUpdatedChangeCount(pid);
+                                }
+                                else
+                                {
+                                    managedServiceWrapper->setLastUpdatedChangeCount(pid, changeCount);
+                                }
                             }
                         });
 
@@ -705,6 +712,7 @@ namespace cppmicroservices
                                     notifyServiceRemoved(pid,
                                                          *(managedServiceFactoryWrapper->getTrackedService()),
                                                          *logger);
+                                    managedServiceFactoryWrapper->removeLastUpdatedChangeCount(pid);
                                 }
                                 else if (managedServiceFactoryWrapper->needsAnUpdateNotification(pid, changeCount))
                                 {
@@ -720,7 +728,9 @@ namespace cppmicroservices
         }
 
         std::shared_future<void>
-        ConfigurationAdminImpl::NotifyConfigurationRemoved(std::string const& pid, std::uintptr_t configurationId)
+        ConfigurationAdminImpl::NotifyConfigurationRemoved(std::string const& pid,
+                                                           std::uintptr_t configurationId,
+                                                           unsigned long changeCount)
         {
             std::promise<void> ready;
             std::shared_future<void> alreadyRemoved = ready.get_future();
@@ -751,7 +761,7 @@ namespace cppmicroservices
             }
             if (configurationToInvalidate && hasBeenUpdated)
             {
-                auto removeFuture = NotifyConfigurationUpdated(pid, 0);
+                auto removeFuture = NotifyConfigurationUpdated(pid, changeCount);
                 // This functor will run on another thread. Just being overly cautious to guarantee that the
                 // ConfigurationImpl which has called this method doesn't run its own destructor.
                 PerformAsync(
@@ -939,7 +949,8 @@ namespace cppmicroservices
                     {
                         // Configuration is being removed
                         logger->Log(SeverityLevel::LOG_WARNING,
-                                    "Attempted to retrieve properties for a configuration which has been removed.",
+                                    "Attempted to retrieve properties for a configuration "
+                                    "which has been removed.",
                                     std::current_exception());
                     }
                 }
@@ -962,7 +973,8 @@ namespace cppmicroservices
 
             logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
                         "New ManagedServiceFactory with PID " + pid
-                            + " has been added, and async Update has been queued for all updated instances.");
+                            + " has been added, and async Update has been queued for all "
+                              "updated instances.");
             auto trackedManagedServiceFactory
                 = std::make_shared<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>>(
                     pid,

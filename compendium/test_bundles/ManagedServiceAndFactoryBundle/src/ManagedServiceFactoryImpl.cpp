@@ -2,58 +2,69 @@
 
 #include <iostream>
 
-namespace cppmicroservices {
-namespace service {
-namespace cm {
-namespace test {
-
-TestManagedServiceFactoryImpl::~TestManagedServiceFactoryImpl() = default;
-
-void TestManagedServiceFactoryImpl::Updated(std::string const& pid,
-                                            AnyMap const& properties)
+namespace cppmicroservices
 {
-  std::lock_guard<std::mutex> lk(m_updatedMtx);
-  if (properties.empty()) {
-    m_updatedCallCount[pid] -= 1;
-  } else {
-    auto const incrementBy =
-      cppmicroservices::any_cast<int>(properties.AtCompoundKey("anInt"));
-    m_updatedCallCount[pid] += incrementBy;
-  }
-}
+    namespace service
+    {
+        namespace cm
+        {
+            namespace test
+            {
 
-void TestManagedServiceFactoryImpl::Removed(std::string const& pid)
-{
-  std::lock_guard<std::mutex> lk(m_removedMtx);
-  ++m_removedCallCount[pid];
-}
+                TestManagedServiceFactoryImpl::~TestManagedServiceFactoryImpl() = default;
 
-int TestManagedServiceFactoryImpl::getUpdatedCounter(std::string const& pid)
-{
-  std::lock_guard<std::mutex> lk(m_updatedMtx);
-  return m_updatedCallCount[pid];
-}
+                void
+                TestManagedServiceFactoryImpl::Updated(std::string const& pid, AnyMap const& properties)
+                {
+                    std::lock_guard<std::mutex> lk(m_updatedMtx);
+                    if (properties.empty())
+                    {
+                        m_updatedCallCount[pid] -= 1;
+                    }
+                    else
+                    {
+                        auto const incrementBy = cppmicroservices::any_cast<int>(properties.AtCompoundKey("anInt"));
+                        m_updatedCallCount[pid] += incrementBy;
+                    }
+                }
 
-int TestManagedServiceFactoryImpl::getRemovedCounter(std::string const& pid)
-{
-  std::lock_guard<std::mutex> lk(m_removedMtx);
-  return m_removedCallCount[pid];
-}
+                void
+                TestManagedServiceFactoryImpl::Removed(std::string const& pid)
+                {
+                    std::lock_guard<std::mutex> lk(m_removedMtx);
+                    ++m_removedCallCount[pid];
+                }
 
-std::shared_ptr<::test::TestManagedServiceFactoryServiceInterface>
-TestManagedServiceFactoryImpl::create(std::string const& config)
-{
+                int
+                TestManagedServiceFactoryImpl::getUpdatedCounter(std::string const& pid)
+                {
+                    std::lock_guard<std::mutex> lk(m_updatedMtx);
+                    return m_updatedCallCount[pid];
+                }
 
-  std::lock_guard<std::mutex> lk(m_updatedMtx);
-  try {
-    return std::make_shared<TestManagedServiceFactoryServiceImpl>(
-      m_updatedCallCount.at(config));
-  } catch (...) {
-    return nullptr;
-  }
-}
+                int
+                TestManagedServiceFactoryImpl::getRemovedCounter(std::string const& pid)
+                {
+                    std::lock_guard<std::mutex> lk(m_removedMtx);
+                    return m_removedCallCount[pid];
+                }
 
-} // namespace test
-} // namespace cm
-} // namespace service
+                std::shared_ptr<::test::TestManagedServiceFactoryServiceInterface>
+                TestManagedServiceFactoryImpl::create(std::string const& config)
+                {
+
+                    std::lock_guard<std::mutex> lk(m_updatedMtx);
+                    try
+                    {
+                        return std::make_shared<TestManagedServiceFactoryServiceImpl>(m_updatedCallCount.at(config));
+                    }
+                    catch (...)
+                    {
+                        return nullptr;
+                    }
+                }
+
+            } // namespace test
+        }     // namespace cm
+    }         // namespace service
 } // namespace cppmicroservices

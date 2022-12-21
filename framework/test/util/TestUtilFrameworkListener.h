@@ -27,22 +27,23 @@ limitations under the License.
 
 #include <vector>
 
-namespace cppmicroservices {
-
-class TestFrameworkListener
+namespace cppmicroservices
 {
-public:
-  TestFrameworkListener();
-  virtual ~TestFrameworkListener();
 
-  std::size_t events_received() const;
-  bool CheckEvents(const std::vector<FrameworkEvent>& events);
-  void frameworkEvent(const FrameworkEvent& evt);
-  void throwOnFrameworkEvent(const FrameworkEvent&);
+    class TestFrameworkListener
+    {
+      public:
+        TestFrameworkListener();
+        virtual ~TestFrameworkListener();
 
-private:
-  std::vector<FrameworkEvent> _events;
-};
-}
+        std::size_t events_received() const;
+        bool CheckEvents(std::vector<FrameworkEvent> const& events);
+        void frameworkEvent(FrameworkEvent const& evt);
+        void throwOnFrameworkEvent(FrameworkEvent const&);
+
+      private:
+        std::vector<FrameworkEvent> _events;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_TESTUTILFRAMEWORKLISTENER_H

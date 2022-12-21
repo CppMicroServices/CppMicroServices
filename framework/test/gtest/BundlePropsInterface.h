@@ -26,16 +26,17 @@
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ServiceProperties.h"
 
-namespace cppmicroservices {
-
-struct BundlePropsInterface
+namespace cppmicroservices
 {
-  using Properties = ServiceProperties;
 
-  virtual ~BundlePropsInterface() {}
+    struct BundlePropsInterface
+    {
+        using Properties = ServiceProperties;
 
-  virtual const Properties& GetProperties() const = 0;
-};
-}
+        virtual ~BundlePropsInterface() {}
+
+        virtual Properties const& GetProperties() const = 0;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLEPROPSINTERFACE_H

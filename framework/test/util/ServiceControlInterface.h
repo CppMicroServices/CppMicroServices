@@ -28,17 +28,16 @@
 
 #include <string>
 
-namespace cppmicroservices {
-
-struct ServiceControlInterface
+namespace cppmicroservices
 {
 
-  virtual ~ServiceControlInterface() {}
+    struct ServiceControlInterface
+    {
 
-  virtual void ServiceControl(int service,
-                              const std::string& operation,
-                              int ranking) = 0;
-};
-}
+        virtual ~ServiceControlInterface() {}
+
+        virtual void ServiceControl(int service, std::string const& operation, int ranking) = 0;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SERVICECONTROLINTERFACE_H

@@ -18,7 +18,7 @@ set(_bench_src
    AnyMapPerfTest.cpp
    bundleinstall.cpp
    ldapfilter.cpp
- #  ldapjson.cpp
+   ldapjson.cpp
    ldappropexpr.cpp
    servicequery.cpp
 )

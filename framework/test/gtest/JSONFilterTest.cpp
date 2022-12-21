@@ -20,9 +20,9 @@ limitations under the License.
 
 =============================================================================*/
 
+#include "cppmicroservices/JSONFilter.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Constants.h"
-#include "cppmicroservices/JSONFilter.h"
 #include "cppmicroservices/ServiceReference.h"
 
 #include "gtest/gtest.h"
@@ -31,63 +31,61 @@ using namespace cppmicroservices;
 
 TEST(JSONFilter, ToString)
 {
-  JSONFilter filter;
-  ASSERT_NO_THROW(filter.ToString());
-  ASSERT_NO_THROW(std::cout << "Empty JSONFilter: " << filter << std::endl;);
+    JSONFilter filter;
+    ASSERT_NO_THROW(filter.ToString());
+    ASSERT_NO_THROW(std::cout << "Empty JSONFilter: " << filter << std::endl;);
 }
 
 TEST(JSONFilter, BooleanOperator)
 {
-  JSONFilter emptyFilter;
-  ASSERT_FALSE(emptyFilter);
+    JSONFilter emptyFilter;
+    ASSERT_FALSE(emptyFilter);
 
-  JSONFilter validFilter("cn == 'Babs Jensen'");
-  ASSERT_TRUE(validFilter);
+    JSONFilter validFilter("cn == 'Babs Jensen'");
+    ASSERT_TRUE(validFilter);
 }
 
 TEST(JSONFilter, Comparison)
 {
-  JSONFilter filter1, filter2;
-  ASSERT_TRUE(filter1 == filter2);
+    JSONFilter filter1, filter2;
+    ASSERT_TRUE(filter1 == filter2);
 
-  JSONFilter filt("cn == 'Babs Jensen'");
-  ASSERT_FALSE(filter1 == filt);
+    JSONFilter filt("cn == 'Babs Jensen'");
+    ASSERT_FALSE(filter1 == filt);
 }
 
 TEST(JSONFilter, Equality)
 {
-  JSONFilter jsonfilt1("prod == 'CppMiroServices'");
-  JSONFilter jsonfilt2("prod == 'CppMiroServices'");
-  ASSERT_EQ(jsonfilt1, jsonfilt2);
+    JSONFilter jsonfilt1("prod == 'CppMiroServices'");
+    JSONFilter jsonfilt2("prod == 'CppMiroServices'");
+    ASSERT_EQ(jsonfilt1, jsonfilt2);
 
-  JSONFilter jsonfilt3("prod == microservices");
-  ASSERT_FALSE( jsonfilt1 == jsonfilt3);
-
+    JSONFilter jsonfilt3("prod == microservices");
+    ASSERT_FALSE(jsonfilt1 == jsonfilt3);
 }
 
 TEST(JSONFilter, TestParsing)
 {
-  // WELL FORMED Expr
-   EXPECT_NO_THROW(JSONFilter json("cn=='Babs Jensen'"));
- 
-  // MALFORMED Expr
-  EXPECT_THROW(JSONFilter json("cn='Babs *"), std::invalid_argument);
+    // WELL FORMED Expr
+    EXPECT_NO_THROW(JSONFilter json("cn=='Babs Jensen'"));
+
+    // MALFORMED Expr
+    EXPECT_THROW(JSONFilter json("cn='Babs *"), std::invalid_argument);
 }
 TEST(JSONFilter, DefaultConstructedMatch)
 {
-  JSONFilter filter;
-  ASSERT_NO_THROW(filter.Match(AnyMap(any_map::map_type::ORDERED_MAP)));
-  ASSERT_NO_THROW(filter.Match(ServiceReferenceU()));
-  ASSERT_NO_THROW(filter.Match(Bundle()));
+    JSONFilter filter;
+    ASSERT_NO_THROW(filter.Match(AnyMap(any_map::map_type::ORDERED_MAP)));
+    ASSERT_NO_THROW(filter.Match(ServiceReferenceU()));
+    ASSERT_NO_THROW(filter.Match(Bundle()));
 }
 
-TEST(JSONFilter,DotNames)
+TEST(JSONFilter, DotNames)
 {
-  AnyMap serviceIdMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  serviceIdMap["service.id"] = 1;
+    AnyMap serviceIdMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+    serviceIdMap["service.id"] = 1;
 
-  
-  JSONFilter filter("\"service.id\">=`0`");
-  bool rval = filter.Match(serviceIdMap);
-  ASSERT_TRUE(rval);
+    JSONFilter filter("\"service.id\">=`0`");
+    bool rval = filter.Match(serviceIdMap);
+    ASSERT_TRUE(rval);
 }

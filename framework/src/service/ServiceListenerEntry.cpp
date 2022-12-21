@@ -22,164 +22,169 @@
 
 #include "cppmicroservices/GlobalConfig.h"
 
-US_MSVC_PUSH_DISABLE_WARNING(
-  4180) // qualifier applied to function type has no meaning; ignored
+US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no meaning; ignored
 
-#include "cppmicroservices/FilterAdapter.h"
 #include "ServiceListenerEntry.h"
 #include "ServiceListenerHookPrivate.h"
+#include "cppmicroservices/FilterAdapter.h"
 #include <cassert>
 
-namespace cppmicroservices {
-
-class ServiceListenerEntryData : public ServiceListenerHook::ListenerInfoData
+namespace cppmicroservices
 {
-public:
-  ServiceListenerEntryData(const ServiceListenerEntryData&) = delete;
-  ServiceListenerEntryData& operator=(const ServiceListenerEntryData&) = delete;
 
-  ServiceListenerEntryData(const std::shared_ptr<BundleContextPrivate>& context,
-                           const ServiceListener& l,
-                           void* data,
-                           ListenerTokenId tokenId,
-                           const std::string& filter_string)
-    : ServiceListenerHook::ListenerInfoData(context, l, data, tokenId, filter_string)
-    , filter(filter_string)
-    , local_cache()
-    , hashValue(0)
-  {
-  }
+    class ServiceListenerEntryData : public ServiceListenerHook::ListenerInfoData
+    {
+      public:
+        ServiceListenerEntryData(ServiceListenerEntryData const&) = delete;
+        ServiceListenerEntryData& operator=(ServiceListenerEntryData const&) = delete;
 
-  ~ServiceListenerEntryData() override = default;
+        ServiceListenerEntryData(std::shared_ptr<BundleContextPrivate> const& context,
+                                 ServiceListener const& l,
+                                 void* data,
+                                 ListenerTokenId tokenId,
+                                 std::string const& filter_string)
+            : ServiceListenerHook::ListenerInfoData(context, l, data, tokenId, filter_string)
+            , filter(filter_string)
+            , local_cache()
+            , hashValue(0)
+        {
+        }
 
-  FilterAdapter filter;
-  
-  /**
-   * The elements of "simple" filters are cached, for easy lookup.
-   *
-   * The grammar for simple filters is as follows:
-   *
-   * <pre>
-   * Simple = '(' attr '=' value ')'
-   *        | '(' '|' Simple+ ')'
-   * </pre>
-   * where <code>attr</code> is one of Constants#OBJECTCLASS,
-   * Constants#SERVICE_ID or Constants#SERVICE_PID, and
-   * <code>value</code> must not contain a wildcard character.
-   * <p>
-   * The index of the vector determines which key the cache is for
-   * (see ServiceListenerState#hashedKeys). For each key, there is
-   * a vector pointing out the values which are accepted by this
-   * ServiceListenerEntry's filter. This cache is maintained to make
-   * it easy to remove this service listener.
-   */
-  LDAPExpr::LocalCache local_cache;
+        ~ServiceListenerEntryData() override = default;
 
-  std::size_t hashValue;
-};
+        FilterAdapter filter;
 
-ServiceListenerEntry::ServiceListenerEntry() = default;
+        /**
+         * The elements of "simple" filters are cached, for easy lookup.
+         *
+         * The grammar for simple filters is as follows:
+         *
+         * <pre>
+         * Simple = '(' attr '=' value ')'
+         *        | '(' '|' Simple+ ')'
+         * </pre>
+         * where <code>attr</code> is one of Constants#OBJECTCLASS,
+         * Constants#SERVICE_ID or Constants#SERVICE_PID, and
+         * <code>value</code> must not contain a wildcard character.
+         * <p>
+         * The index of the vector determines which key the cache is for
+         * (see ServiceListenerState#hashedKeys). For each key, there is
+         * a vector pointing out the values which are accepted by this
+         * ServiceListenerEntry's filter. This cache is maintained to make
+         * it easy to remove this service listener.
+         */
+        LDAPExpr::LocalCache local_cache;
 
-ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry&) =
-  default;
+        std::size_t hashValue;
+    };
 
-ServiceListenerEntry::ServiceListenerEntry(
-  const ServiceListenerHook::ListenerInfo& info)
-  : ServiceListenerHook::ListenerInfo(info)
-{
-  assert(info.d);
-}
+    ServiceListenerEntry::ServiceListenerEntry() = default;
 
-ServiceListenerEntry::~ServiceListenerEntry() = default;
+    ServiceListenerEntry::ServiceListenerEntry(ServiceListenerEntry const&) = default;
 
-ServiceListenerEntry& ServiceListenerEntry::operator=(
-  const ServiceListenerEntry& other)
-{
-  d = other.d;
-  return *this;
-}
+    ServiceListenerEntry::ServiceListenerEntry(ServiceListenerHook::ListenerInfo const& info)
+        : ServiceListenerHook::ListenerInfo(info)
+    {
+        assert(info.d);
+    }
 
-void ServiceListenerEntry::SetRemoved(bool removed) const
-{
-  d->bRemoved = removed;
-}
+    ServiceListenerEntry::~ServiceListenerEntry() = default;
 
-ServiceListenerEntry::ServiceListenerEntry(
-  const std::shared_ptr<BundleContextPrivate>& context,
-  const ServiceListener& l,
-  void* data,
-  ListenerTokenId tokenId,
-  const std::string& filter_string)
-  : ServiceListenerHook::ListenerInfo(
-      new ServiceListenerEntryData(context, l, data, tokenId, filter_string))
-{}
+    ServiceListenerEntry&
+    ServiceListenerEntry::operator=(ServiceListenerEntry const& other)
+    {
+        d = other.d;
+        return *this;
+    }
 
-LDAPExpr::LocalCache& ServiceListenerEntry::GetLocalCache() const
-{
-  return static_cast<ServiceListenerEntryData*>(d.get())->local_cache;
-}
+    void
+    ServiceListenerEntry::SetRemoved(bool removed) const
+    {
+        d->bRemoved = removed;
+    }
 
-void ServiceListenerEntry::CallDelegate(const ServiceEvent& event) const
-{
-  d->listener(event);
-}
+    ServiceListenerEntry::ServiceListenerEntry(std::shared_ptr<BundleContextPrivate> const& context,
+                                               ServiceListener const& l,
+                                               void* data,
+                                               ListenerTokenId tokenId,
+                                               std::string const& filter_string)
+        : ServiceListenerHook::ListenerInfo(new ServiceListenerEntryData(context, l, data, tokenId, filter_string))
+    {
+    }
 
-bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
-{
-  return (d->tokenId == other.d->tokenId) &&
-         ((d->context == nullptr || other.d->context == nullptr) ||
-          d->context == other.d->context);
-}
+    LDAPExpr::LocalCache&
+    ServiceListenerEntry::GetLocalCache() const
+    {
+        return static_cast<ServiceListenerEntryData*>(d.get())->local_cache;
+    }
 
-bool ServiceListenerEntry::operator<(const ServiceListenerEntry& other) const
-{
-  return d->tokenId < other.d->tokenId;
-}
+    void
+    ServiceListenerEntry::CallDelegate(ServiceEvent const& event) const
+    {
+        d->listener(event);
+    }
 
-bool ServiceListenerEntry::Contains(
-  const std::shared_ptr<BundleContextPrivate>& context,
-  const ServiceListener& listener,
-  void* data) const
-{
-  return ((d->context == context)
-          && (d->data == data)
-          && (d->listener.target<void(const ServiceEvent&)>() ==
-              listener.target<void(const ServiceEvent&)>()));
-}
+    bool
+    ServiceListenerEntry::operator==(ServiceListenerEntry const& other) const
+    {
+        return (d->tokenId == other.d->tokenId)
+               && ((d->context == nullptr || other.d->context == nullptr) || d->context == other.d->context);
+    }
 
-ListenerTokenId ServiceListenerEntry::Id() const
-{
-  return d->tokenId;
-}
+    bool
+    ServiceListenerEntry::operator<(ServiceListenerEntry const& other) const
+    {
+        return d->tokenId < other.d->tokenId;
+    }
 
-std::size_t ServiceListenerEntry::Hash() const
-{
-  using std::hash;
+    bool
+    ServiceListenerEntry::Contains(std::shared_ptr<BundleContextPrivate> const& context,
+                                   ServiceListener const& listener,
+                                   void* data) const
+    {
+        return ((d->context == context) && (d->data == data)
+                && (d->listener.target<void(ServiceEvent const&)>() == listener.target<void(ServiceEvent const&)>()));
+    }
 
-  if (static_cast<ServiceListenerEntryData*>(d.get())->hashValue == 0) {
-    static_cast<ServiceListenerEntryData*>(d.get())->hashValue =
-      (hash<BundleContextPrivate*>()(d->context.get()) >> 1) ^
-      ((hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
-  }
+    ListenerTokenId
+    ServiceListenerEntry::Id() const
+    {
+        return d->tokenId;
+    }
 
-  return static_cast<ServiceListenerEntryData*>(d.get())->hashValue;
-}
+    std::size_t
+    ServiceListenerEntry::Hash() const
+    {
+        using std::hash;
 
-bool ServiceListenerEntry::MatchFilter(const ServiceReferenceBase& srb) const
-{
-  return static_cast<ServiceListenerEntryData*>(d.get())->filter.Match(srb);
-}
+        if (static_cast<ServiceListenerEntryData*>(d.get())->hashValue == 0)
+        {
+            static_cast<ServiceListenerEntryData*>(d.get())->hashValue
+                = (hash<BundleContextPrivate*>()(d->context.get()) >> 1)
+                  ^ ((hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
+        }
 
-bool ServiceListenerEntry::IsComplicatedFilter() const
-{
-  return static_cast<ServiceListenerEntryData*>(d.get())->filter.IsComplicated();
-}
+        return static_cast<ServiceListenerEntryData*>(d.get())->hashValue;
+    }
 
-bool ServiceListenerEntry::AddToSimpleCache(const StringList& keywords, LocalCache& cache) const
-{
-  return static_cast<ServiceListenerEntryData*>(d.get())->filter.AddToSimpleCache(keywords, cache);
-}
+    bool
+    ServiceListenerEntry::MatchFilter(ServiceReferenceBase const& srb) const
+    {
+        return static_cast<ServiceListenerEntryData*>(d.get())->filter.Match(srb);
+    }
 
-}
+    bool
+    ServiceListenerEntry::IsComplicatedFilter() const
+    {
+        return static_cast<ServiceListenerEntryData*>(d.get())->filter.IsComplicated();
+    }
+
+    bool
+    ServiceListenerEntry::AddToSimpleCache(StringList const& keywords, LocalCache& cache) const
+    {
+        return static_cast<ServiceListenerEntryData*>(d.get())->filter.AddToSimpleCache(keywords, cache);
+    }
+
+} // namespace cppmicroservices
 
 US_MSVC_POP_WARNING

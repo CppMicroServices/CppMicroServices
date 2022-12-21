@@ -30,166 +30,197 @@
 
 US_MSVC_PUSH_DISABLE_WARNING(4996)
 
-namespace cppmicroservices {
-
-const Any Properties::emptyAny;
-
-void Properties::PopulateCaseInsensitiveLookupMap()
+namespace cppmicroservices
 {
-  if (props.GetType() == AnyMap::ORDERED_MAP) {
-    for (auto itr = props.beginOM_TypeChecked();
-         itr != props.endOM_TypeChecked();
-         ++itr) {
-      caseInsensitiveLookup[props_check::ToLower(itr->first)] = itr->first;
-    }
-  } else if (props.GetType() == AnyMap::UNORDERED_MAP) {
-    for (auto itr = props.beginUO_TypeChecked();
-         itr != props.endUO_TypeChecked();
-         ++itr) {
-      caseInsensitiveLookup[props_check::ToLower(itr->first)] = itr->first;
-    }
-  } else {
-    throw std::runtime_error("Unsupported map type.");
-  }
-}
 
-void Properties::update_json_props()
-{
-  std::stringstream jstr;
-  any_value_to_json(jstr,props);
-  json_props = jsoncons::json::parse(jstr.str());
-}
+    const Any Properties::emptyAny;
 
-// NOTE: UNORDERED_MAP_CASEINSENSITIVE_KEYS AnyMaps inherently can never be invalid given that
-// they can _never_ contain some pair of keys which are only different in case. Because of this,
-// the validation check is not performed on these map types. Additionally, those types of maps
-// are already case insensitive so populating and using the case insensitive lookup map is
-// unnecessary.
-Properties::Properties(const AnyMap& p)
-  : json_props()
-  , props(p)
-{
-  if (p.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-    props_check::ValidateAnyMap(p);
-
-    PopulateCaseInsensitiveLookupMap();
-  }
-  update_json_props();
-}
-
-Properties::Properties(AnyMap&& p)
-  : json_props()
-  , props(std::move(p))
-{
-  if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-    props_check::ValidateAnyMap(props);
-
-    PopulateCaseInsensitiveLookupMap();
-  }
-  update_json_props();
-}
-
-Properties::Properties(Properties&& o) noexcept
-  : json_props(std::move(o.json_props))
-  , props(std::move(o.props))
-{
-  if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-    PopulateCaseInsensitiveLookupMap();
-  }
-  update_json_props();
-}
-
-Properties& Properties::operator=(Properties&& o) noexcept
-{
-  props = std::move(o.props);
-  if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-    PopulateCaseInsensitiveLookupMap();
-  }
-  update_json_props();
-  return *this;
-}
-
-// This function has been modified to perform both the "find" and "lookup" operations rather than
-// just the "lookup" as originally written.
-//
-// This code has been made more verbose as to extract the most performance out of it. If we know
-// the map type for which we are operating on, then we can safely call the "*_TypeChecked()"
-// version of certain functions on the map to bypass using the slow functions that return
-// "any_map::iterator" or "any_map::const_iterator".
-std::pair<Any, bool> Properties::Value_unlocked(const std::string& key,
-                                                bool matchCase) const
-{
-  if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {
-    if (auto itr = props.findUOCI_TypeChecked(key);
-        itr != props.endUOCI_TypeChecked()) {
-      if (!matchCase) {
-        return std::make_pair(itr->second, true);
-      } else if (matchCase && itr->first == key) {
-        return std::make_pair(itr->second, true);
-      } else {
-        return std::make_pair(emptyAny, false);
-      }
-    } else {
-      return std::make_pair(emptyAny, false);
-    }
-  } else if (props.GetType() == AnyMap::UNORDERED_MAP) {
-    auto itr = props.findUO_TypeChecked(key);
-    if (itr != props.endUO_TypeChecked()) {
-      return std::make_pair(itr->second, true);
+    void
+    Properties::PopulateCaseInsensitiveLookupMap()
+    {
+        if (props.GetType() == AnyMap::ORDERED_MAP)
+        {
+            for (auto itr = props.beginOM_TypeChecked(); itr != props.endOM_TypeChecked(); ++itr)
+            {
+                caseInsensitiveLookup[props_check::ToLower(itr->first)] = itr->first;
+            }
+        }
+        else if (props.GetType() == AnyMap::UNORDERED_MAP)
+        {
+            for (auto itr = props.beginUO_TypeChecked(); itr != props.endUO_TypeChecked(); ++itr)
+            {
+                caseInsensitiveLookup[props_check::ToLower(itr->first)] = itr->first;
+            }
+        }
+        else
+        {
+            throw std::runtime_error("Unsupported map type.");
+        }
     }
 
-    if (!matchCase) {
-      auto ciItr = caseInsensitiveLookup.find(key);
-      if (ciItr != caseInsensitiveLookup.end()) {
-        return std::make_pair(
-          props.findUO_TypeChecked(ciItr->second.data())->second, true);
-      } else {
-        return std::make_pair(emptyAny, false);
-      }
+    void
+    Properties::update_json_props()
+    {
+        std::stringstream jstr;
+        any_value_to_json(jstr, props);
+        json_props = jsoncons::json::parse(jstr.str());
     }
 
-    return std::make_pair(emptyAny, false);
-  } else if (props.GetType() == AnyMap::ORDERED_MAP) {
-    auto itr = props.findOM_TypeChecked(key);
-    if (itr != props.endOM_TypeChecked()) {
-      return std::make_pair(itr->second, true);
+    // NOTE: UNORDERED_MAP_CASEINSENSITIVE_KEYS AnyMaps inherently can never be invalid given that
+    // they can _never_ contain some pair of keys which are only different in case. Because of this,
+    // the validation check is not performed on these map types. Additionally, those types of maps
+    // are already case insensitive so populating and using the case insensitive lookup map is
+    // unnecessary.
+    Properties::Properties(AnyMap const& p) : json_props(), props(p)
+    {
+        if (p.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+        {
+            props_check::ValidateAnyMap(p);
+
+            PopulateCaseInsensitiveLookupMap();
+        }
+        update_json_props();
     }
 
-    if (!matchCase) {
-      auto ciItr = caseInsensitiveLookup.find(key);
-      if (ciItr != caseInsensitiveLookup.end()) {
-        return std::make_pair(
-          props.findOM_TypeChecked(ciItr->second.data())->second, true);
-      } else {
-        return std::make_pair(emptyAny, false);
-      }
+    Properties::Properties(AnyMap&& p) : json_props(), props(std::move(p))
+    {
+        if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+        {
+            props_check::ValidateAnyMap(props);
+
+            PopulateCaseInsensitiveLookupMap();
+        }
+        update_json_props();
     }
 
-    return std::make_pair(emptyAny, false);
-  } else {
-    throw std::runtime_error("Unknown AnyMap type.");
-  }
-}
+    Properties::Properties(Properties&& o) noexcept : json_props(std::move(o.json_props)), props(std::move(o.props))
+    {
+        if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+        {
+            PopulateCaseInsensitiveLookupMap();
+        }
+        update_json_props();
+    }
 
-std::vector<std::string> Properties::Keys_unlocked() const
-{
-  std::vector<std::string> result{};
-  for (const auto& kv_pair : props) {
-    result.push_back(kv_pair.first);
-  }
+    Properties&
+    Properties::operator=(Properties&& o) noexcept
+    {
+        props = std::move(o.props);
+        if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+        {
+            PopulateCaseInsensitiveLookupMap();
+        }
+        update_json_props();
+        return *this;
+    }
 
-  return result;
-}
+    // This function has been modified to perform both the "find" and "lookup" operations rather than
+    // just the "lookup" as originally written.
+    //
+    // This code has been made more verbose as to extract the most performance out of it. If we know
+    // the map type for which we are operating on, then we can safely call the "*_TypeChecked()"
+    // version of certain functions on the map to bypass using the slow functions that return
+    // "any_map::iterator" or "any_map::const_iterator".
+    std::pair<Any, bool>
+    Properties::Value_unlocked(std::string const& key, bool matchCase) const
+    {
+        if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+        {
+            if (auto itr = props.findUOCI_TypeChecked(key); itr != props.endUOCI_TypeChecked())
+            {
+                if (!matchCase)
+                {
+                    return std::make_pair(itr->second, true);
+                }
+                else if (matchCase && itr->first == key)
+                {
+                    return std::make_pair(itr->second, true);
+                }
+                else
+                {
+                    return std::make_pair(emptyAny, false);
+                }
+            }
+            else
+            {
+                return std::make_pair(emptyAny, false);
+            }
+        }
+        else if (props.GetType() == AnyMap::UNORDERED_MAP)
+        {
+            auto itr = props.findUO_TypeChecked(key);
+            if (itr != props.endUO_TypeChecked())
+            {
+                return std::make_pair(itr->second, true);
+            }
 
-jsoncons::json Properties::JSON_unlocked() const
-{
-  return json_props;
-}
+            if (!matchCase)
+            {
+                auto ciItr = caseInsensitiveLookup.find(key);
+                if (ciItr != caseInsensitiveLookup.end())
+                {
+                    return std::make_pair(props.findUO_TypeChecked(ciItr->second.data())->second, true);
+                }
+                else
+                {
+                    return std::make_pair(emptyAny, false);
+                }
+            }
 
-void Properties::Clear_unlocked()
-{
-  props.clear();
-}
-}
+            return std::make_pair(emptyAny, false);
+        }
+        else if (props.GetType() == AnyMap::ORDERED_MAP)
+        {
+            auto itr = props.findOM_TypeChecked(key);
+            if (itr != props.endOM_TypeChecked())
+            {
+                return std::make_pair(itr->second, true);
+            }
+
+            if (!matchCase)
+            {
+                auto ciItr = caseInsensitiveLookup.find(key);
+                if (ciItr != caseInsensitiveLookup.end())
+                {
+                    return std::make_pair(props.findOM_TypeChecked(ciItr->second.data())->second, true);
+                }
+                else
+                {
+                    return std::make_pair(emptyAny, false);
+                }
+            }
+
+            return std::make_pair(emptyAny, false);
+        }
+        else
+        {
+            throw std::runtime_error("Unknown AnyMap type.");
+        }
+    }
+
+    std::vector<std::string>
+    Properties::Keys_unlocked() const
+    {
+        std::vector<std::string> result {};
+        for (auto const& kv_pair : props)
+        {
+            result.push_back(kv_pair.first);
+        }
+
+        return result;
+    }
+
+    jsoncons::json
+    Properties::JSON_unlocked() const
+    {
+        return json_props;
+    }
+
+    void
+    Properties::Clear_unlocked()
+    {
+        props.clear();
+    }
+} // namespace cppmicroservices
 
 US_MSVC_POP_WARNING

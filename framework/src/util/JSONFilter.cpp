@@ -32,87 +32,87 @@
 #include "Properties.h"
 #include "ServiceReferenceBasePrivate.h"
 
-namespace cppmicroservices {
-
-
-
-JSONFilter::JSONFilter()
-  : filter_str(std::string())
-{}
-
-JSONFilter::JSONFilter(const std::string& filter)
-  : filter_str(filter)
+namespace cppmicroservices
 {
-      std::error_code ec;
-      auto expr =  jsoncons::jmespath::jmespath_expression<jsoncons::json>::compile(filter, ec);
-      if (ec) {
-        throw std::invalid_argument(jsoncons::jmespath::jmespath_error(ec).what());
-    }
-}
 
-JSONFilter::JSONFilter(const JSONFilter&) = default;
+    JSONFilter::JSONFilter() : filter_str(std::string()) {}
 
-JSONFilter::~JSONFilter() = default;
-
-JSONFilter::operator bool() const
-{
-  return !filter_str.empty();
-}
-
-bool JSONFilter::Match(const ServiceReferenceBase& reference) const
-{
-    if (filter_str.empty())
+    JSONFilter::JSONFilter(std::string const& filter) : filter_str(filter)
     {
-        return false;
+        std::error_code ec;
+        auto expr = jsoncons::jmespath::jmespath_expression<jsoncons::json>::compile(filter, ec);
+        if (ec)
+        {
+            throw std::invalid_argument(jsoncons::jmespath::jmespath_error(ec).what());
+        }
     }
 
-    jsoncons::json js = reference.d.load()->GetProperties()->JSON_unlocked();
-    jsoncons::json result = jsoncons::jmespath::search(js, filter_str);
+    JSONFilter::JSONFilter(JSONFilter const&) = default;
 
-    return ( result.is_bool() ? result.as_bool(): false );
-}
+    JSONFilter::~JSONFilter() = default;
 
-bool JSONFilter::Match(const Bundle& bundle) const
-{
-    if (filter_str.empty())
+    JSONFilter::operator bool() const { return !filter_str.empty(); }
+
+    bool
+    JSONFilter::Match(ServiceReferenceBase const& reference) const
     {
-       return false;
+        if (filter_str.empty())
+        {
+            return false;
+        }
+
+        jsoncons::json js = reference.d.load()->GetProperties()->JSON_unlocked();
+        jsoncons::json result = jsoncons::jmespath::search(js, filter_str);
+
+        return (result.is_bool() ? result.as_bool() : false);
     }
 
-    auto props = Properties(bundle.GetHeaders());
-    jsoncons::json js = PropertiesHandle(props, false)->JSON_unlocked();
-    jsoncons::json result = jsoncons::jmespath::search(js, filter_str);
-
-    return (result.is_bool() ? result.as_bool() : false);
- }
-
-bool JSONFilter::Match(const AnyMap& dictionary) const
-{
-    if (filter_str.empty())
+    bool
+    JSONFilter::Match(Bundle const& bundle) const
     {
-        return false;
+        if (filter_str.empty())
+        {
+            return false;
+        }
+
+        auto props = Properties(bundle.GetHeaders());
+        jsoncons::json js = PropertiesHandle(props, false)->JSON_unlocked();
+        jsoncons::json result = jsoncons::jmespath::search(js, filter_str);
+
+        return (result.is_bool() ? result.as_bool() : false);
     }
 
-    jsoncons::json js = PropertiesHandle(Properties(dictionary), false)->JSON_unlocked();
-    jsoncons::json result = jsoncons::jmespath::search(js, filter_str);
+    bool
+    JSONFilter::Match(AnyMap const& dictionary) const
+    {
+        if (filter_str.empty())
+        {
+            return false;
+        }
 
-    return (result.is_bool() ? result.as_bool() : false);
-}
+        jsoncons::json js = PropertiesHandle(Properties(dictionary), false)->JSON_unlocked();
+        jsoncons::json result = jsoncons::jmespath::search(js, filter_str);
 
-std::string JSONFilter::ToString() const
-{
-  return filter_str;
-}
+        return (result.is_bool() ? result.as_bool() : false);
+    }
 
-bool JSONFilter::operator==(const JSONFilter& other) const
-{
-  return (this->ToString() == other.ToString());
-}
+    std::string
+    JSONFilter::ToString() const
+    {
+        return filter_str;
+    }
 
-JSONFilter& JSONFilter::operator=(const JSONFilter& filter) = default;
+    bool
+    JSONFilter::operator==(JSONFilter const& other) const
+    {
+        return (this->ToString() == other.ToString());
+    }
 
-std::ostream& operator<<(std::ostream& os, const JSONFilter& filter)
-{
-  return os << filter.ToString();
-}
-}
+    JSONFilter& JSONFilter::operator=(JSONFilter const& filter) = default;
+
+    std::ostream&
+    operator<<(std::ostream& os, JSONFilter const& filter)
+    {
+        return os << filter.ToString();
+    }
+} // namespace cppmicroservices

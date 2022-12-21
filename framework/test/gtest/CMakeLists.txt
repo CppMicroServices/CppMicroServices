@@ -17,6 +17,10 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINAR
 
 set(us_gtest_test_exe_name usFrameworkTests)
 
+if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
+  add_compile_options(-Wno-error=unneeded-internal-declaration)
+endif()
+
 include_directories(
   ${GTEST_INCLUDE_DIRS}
   ${GMOCK_INCLUDE_DIRS}

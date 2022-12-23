@@ -100,6 +100,40 @@ namespace cppmicroservices
             }
         };
 
+        class IsLDAPFilterVisitor
+        {
+          public:
+            bool
+            operator()(cppmicroservices::LDAPFilter const&) const
+            {
+                return true;
+            }
+
+            template <typename T>
+            bool
+            operator()(T const&) const
+            {
+                return false;
+            }
+        };
+
+        class IsJSONFilterVisitor
+        {
+          public:
+            bool
+            operator()(cppmicroservices::JSONFilter const&) const
+            {
+                return true;
+            }
+
+            template <typename T>
+            bool
+            operator()(T const&) const
+            {
+                return false;
+            }
+        };
+
         class ToStringVisitor
         {
           public:
@@ -185,6 +219,16 @@ namespace cppmicroservices
         return std::visit(MatchedObjectClassesVisitor { matches }, filter);
     }
 
+    bool FilterAdapter::IsLDAPFilter() const
+    {
+        return std::visit(IsLDAPFilterVisitor {}, filter);
+    }
+        
+    bool FilterAdapter::IsJSONFilter() const
+    {
+        return std::visit(IsJSONFilterVisitor {}, filter);
+    }
+        
     FilterAdapter&
     FilterAdapter::operator=(FilterAdapter const& other)
     {

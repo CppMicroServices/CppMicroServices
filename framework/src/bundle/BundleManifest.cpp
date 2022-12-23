@@ -22,16 +22,21 @@
 
 #include "BundleManifest.h"
 
-#include <rapidjson/document.h>
-#include <rapidjson/error/en.h>
-#include <rapidjson/istreamwrapper.h>
+#define USE_JSCONS 1
+#if USE_JSCONS
+#    include <jsoncons/json.hpp>
+#    include <jsoncons_ext/jmespath/jmespath.hpp>
+#else
+#    include <rapidjson/document.h>
+#    include <rapidjson/error/en.h>
+#    include <rapidjson/istreamwrapper.h>
+#endif
 
 #include <stdexcept>
 #include <typeinfo>
 
 namespace
 {
-
     using AnyOrderedMap = std::map<std::string, cppmicroservices::Any>;
     using AnyMap = cppmicroservices::AnyMap;
     using AnyVector = std::vector<cppmicroservices::Any>;
@@ -64,10 +69,102 @@ namespace
 
 namespace cppmicroservices
 {
-
     namespace
     {
+#if USE_JSCONS
+        void ParseJsonObject(jsoncons::json const& jsonObject, AnyMap& anyMap);
+        void ParseJsonObject(jsoncons::json const& jsonObject, AnyOrderedMap& anyMap);
+        void ParseJsonArray(jsoncons::json const& jsonArray, AnyVector& anyVector, bool ci);
 
+        Any
+        ParseJsonValue(jsoncons::json const& jsonValue, bool ci)
+        {
+            if (jsonValue.is_object())
+            {
+                if (ci)
+                {
+                    Any any = AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+                    ParseJsonObject(jsonValue, ref_any_cast<AnyMap>(any));
+                    return any;
+                }
+                else
+                {
+                    Any any = AnyOrderedMap();
+                    ParseJsonObject(jsonValue, ref_any_cast<AnyOrderedMap>(any));
+                    return any;
+                }
+            }
+            else if (jsonValue.is_array())
+            {
+                Any any = AnyVector();
+                ParseJsonArray(jsonValue, ref_any_cast<AnyVector>(any), ci);
+                return any;
+            }
+            else if (jsonValue.is_string())
+            {
+                // We do not support attribute localization yet, so we just
+                // always remove the leading '%' character.
+                std::string val = jsonValue.as<std::string>();
+                if (!val.empty() && val[0] == '%')
+                    val = val.substr(1);
+
+                return Any(val);
+            }
+            else if (jsonValue.is_bool())
+            {
+                return Any(jsonValue.as<bool>());
+            }
+            else if (jsonValue.is_int64())
+            {
+                return Any(jsonValue.as<int>());
+            }
+            else if (jsonValue.is_double())
+            {
+                return Any(jsonValue.as<double>());
+            }
+
+            return Any();
+        }
+
+        void
+        ParseJsonObject(jsoncons::json const& jsonObject, AnyOrderedMap& anyMap)
+        {
+            for (auto const& m : jsonObject.object_range())
+            {
+                Any anyValue = ParseJsonValue(m.value(), false);
+                if (!anyValue.Empty())
+                {
+                    anyMap.emplace(m.key(), std::move(anyValue));
+                }
+            }
+        }
+
+        void
+        ParseJsonObject(jsoncons::json const& jsonObject, AnyMap& anyMap)
+        {
+            for (auto const& m : jsonObject.object_range())
+            {
+                Any anyValue = ParseJsonValue(m.value(), true);
+                if (!anyValue.Empty())
+                {
+                    anyMap.emplace(m.key(), std::move(anyValue));
+                }
+            }
+        }
+
+        void
+        ParseJsonArray(jsoncons::json const& jsonArray, AnyVector& anyVector, bool ci)
+        {
+            for (auto const& jsonValue : jsonArray.array_range())
+            {
+                Any anyValue = ParseJsonValue(jsonValue, ci);
+                if (!anyValue.Empty())
+                {
+                    anyVector.emplace_back(std::move(anyValue));
+                }
+            }
+        }
+#else
         void ParseJsonObject(rapidjson::Value const& jsonObject, AnyMap& anyMap);
         void ParseJsonObject(rapidjson::Value const& jsonObject, AnyOrderedMap& anyMap);
         void ParseJsonArray(rapidjson::Value const& jsonArray, AnyVector& anyVector, bool ci);
@@ -160,7 +257,7 @@ namespace cppmicroservices
                 }
             }
         }
-
+#endif
     } // namespace
 
     BundleManifest::BundleManifest() : m_Headers(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {}
@@ -170,6 +267,21 @@ namespace cppmicroservices
     void
     BundleManifest::Parse(std::istream& is)
     {
+#if USE_JSCONS
+        try
+        {
+            jsoncons::json root = jsoncons::json::parse(is);
+            if (!root.is_object())
+            {
+                throw std::runtime_error("The json root element must be an object.");
+            }
+            ParseJsonObject(root, m_Headers);
+        }
+        catch (jsoncons::ser_error const& e)
+        {
+            throw std::runtime_error(e.what());
+        }
+#else
         rapidjson::IStreamWrapper jsonStream(is);
         rapidjson::Document root;
         if (root.ParseStream(jsonStream).HasParseError())
@@ -183,6 +295,7 @@ namespace cppmicroservices
         }
 
         ParseJsonObject(root, m_Headers);
+#endif
     }
 
     AnyMap const&

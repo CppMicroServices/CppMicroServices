@@ -62,6 +62,9 @@ namespace cppmicroservices
 
         bool GetMatchedObjectClasses(ObjectClassSet& matches) const;
 
+        bool IsLDAPFilter() const;
+        bool IsJSONFilter() const;
+        
         FilterAdapter& operator=(FilterAdapter const& other);
         FilterAdapter& operator=(LDAPFilter const& other);
         FilterAdapter& operator=(JSONFilter const& other);

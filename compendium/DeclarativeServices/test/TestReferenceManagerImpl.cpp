@@ -703,6 +703,36 @@ namespace cppmicroservices
             ASSERT_TRUE(refManager.IsSatisfied());
         }
 
+        TEST_P(ReferenceManagerImplTest, TestJSONTargetProperty)
+        {
+            namespace constants = cppmicroservices::Constants;
+            auto fakeMetadata = GetParam();
+            auto bc = GetFramework().GetBundleContext();
+            auto fakeLogger = std::make_shared<FakeLogger>();
+
+            fakeMetadata.target = "foo=='bar'";
+            ReferenceManagerImpl refManager { fakeMetadata, bc, fakeLogger, FakeComponentConfigName };
+
+            // an optional service reference means that the reference manager is satisfied
+            // without registering a service
+
+            ASSERT_FALSE(refManager.IsOptional() ? false : refManager.IsSatisfied());
+
+            (void)bc.RegisterService<dummy::Reference1>(ToFactory(std::make_shared<MockFactory>()),
+                                                        {
+                                                            {constants::SERVICE_SCOPE, constants::SCOPE_BUNDLE}
+            });
+
+            ASSERT_FALSE(refManager.IsOptional() ? false : refManager.IsSatisfied());
+
+            (void)bc.RegisterService<dummy::Reference1>(ToFactory(std::make_shared<MockFactory>()),
+                                                        {
+                                                            {"foo", std::string("bar")}
+            });
+
+            ASSERT_TRUE(refManager.IsSatisfied());
+        }
+
         // A service dependency cannot be satisfied by a service published from the same component
         // configuration.
         TEST_P(ReferenceManagerImplTest, TestSelfSatisfy)

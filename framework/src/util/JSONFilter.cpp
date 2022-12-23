@@ -61,7 +61,8 @@ namespace cppmicroservices
             return false;
         }
 
-        jsoncons::json js = reference.d.load()->GetProperties()->JSON_unlocked();
+        auto const& props_handle = reference.d.load()->GetProperties();
+        jsoncons::json js = props_handle->JSON_unlocked();
         jsoncons::json result = jsoncons::jmespath::search(js, filter_str);
 
         return (result.is_bool() ? result.as_bool() : false);

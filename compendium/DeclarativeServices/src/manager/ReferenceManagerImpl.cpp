@@ -21,6 +21,7 @@
   =============================================================================*/
 #include <cassert>
 #include <memory>
+#include <sstream>
 
 #include "ReferenceManagerImpl.hpp"
 #include "cppmicroservices/FilterAdapter.h"
@@ -49,18 +50,38 @@ namespace cppmicroservices
         FilterAdapter
         GetReferenceFilter(metadata::ReferenceMetadata const& refMetadata)
         {
-            LDAPPropExpr expr;
-            expr = (LDAPProp(cppmicroservices::Constants::OBJECTCLASS) == refMetadata.interfaceName);
-            if (!refMetadata.target.empty())
+            // TODO: Make a GetReferenceFilter method on FilterAdapter. Use visitor to pick the
+            // right algorithm to build the expression.
+            FilterAdapter adapter { refMetadata.target };
+            if (adapter.IsJSONFilter())
             {
-                expr &= LDAPPropExpr(refMetadata.target);
+                std::stringstream exprStr;
+                exprStr << cppmicroservices::Constants::OBJECTCLASS << ".contains(@,'" << refMetadata.interfaceName << "')";
+                if (!refMetadata.target.empty())
+                {
+                    exprStr << " && (" << refMetadata.target << ")";
+                }
+                if (refMetadata.scope == REFERENCE_SCOPE_PROTOTYPE_REQUIRED)
+                {
+                    exprStr << " && (" << SERVICE_SCOPE << "=='" << SCOPE_PROTOTYPE << "')";
+                }
+                return FilterAdapter(JSONFilter(exprStr.str()));
             }
-
-            if (refMetadata.scope == REFERENCE_SCOPE_PROTOTYPE_REQUIRED)
+            else
             {
-                expr &= (LDAPProp(SERVICE_SCOPE) == SCOPE_PROTOTYPE);
+                LDAPPropExpr expr;
+                expr = (LDAPProp(cppmicroservices::Constants::OBJECTCLASS) == refMetadata.interfaceName);
+                if (!refMetadata.target.empty())
+                {
+                    expr &= LDAPPropExpr(refMetadata.target);
+                }
+                
+                if (refMetadata.scope == REFERENCE_SCOPE_PROTOTYPE_REQUIRED)
+                {
+                    expr &= (LDAPProp(SERVICE_SCOPE) == SCOPE_PROTOTYPE);
+                }
+                return FilterAdapter(LDAPFilter(expr));
             }
-            return FilterAdapter(LDAPFilter(expr));
         }
 
         ReferenceManagerBaseImpl::ReferenceManagerBaseImpl(
@@ -76,15 +97,14 @@ namespace cppmicroservices
         {
         }
 
-        ReferenceManagerBaseImpl::ReferenceManagerBaseImpl(
-            metadata::ReferenceMetadata const& metadata,
-            cppmicroservices::BundleContext const& bc,
-            std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-            std::string const& configName,
-            std::unique_ptr<BindingPolicy> policy)
+        ReferenceManagerBaseImpl::ReferenceManagerBaseImpl(metadata::ReferenceMetadata const& metadata,
+                                                           cppmicroservices::BundleContext const& bc,
+                                                           std::shared_ptr<cppmicroservices::logservice::LogService> l,
+                                                           std::string const& configName,
+                                                           std::unique_ptr<BindingPolicy> policy)
             : metadata(metadata)
             , tracker(nullptr)
-            , logger(std::move(logger))
+            , logger(std::move(l))
             , configName(configName)
             , bindingPolicy(std::move(policy))
         {

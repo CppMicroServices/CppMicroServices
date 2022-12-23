@@ -150,10 +150,7 @@ endif()
 
 # Embed bundle resources
 if(${PROJECT_NAME}_RESOURCES)
-  set(_wd ${CMAKE_CURRENT_SOURCE_DIR})
-  if(${PROJECT_NAME}_RESOURCES)
-    set(_wd ${CMAKE_CURRENT_SOURCE_DIR}/resources)
-  endif()
+  set(_wd ${CMAKE_CURRENT_SOURCE_DIR}/resources)
   usFunctionAddResources(TARGET ${${PROJECT_NAME}_TARGET}
                          WORKING_DIRECTORY ${_wd}
                          FILES ${${PROJECT_NAME}_RESOURCES}

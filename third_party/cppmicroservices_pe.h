@@ -24,7 +24,7 @@
 // available PE/COFF format document:
 //
 // Microsoft Portable Executable and Common Object File Format Specification
-// Revision 8.3 – February 6, 2013
+// Revision 8.3 - February 6, 2013
 //
 // http://msdn.microsoft.com/en-us/windows/hardware/gg463119.aspx
 

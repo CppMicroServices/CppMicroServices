@@ -361,4 +361,148 @@ namespace test
         EXPECT_FALSE(static_cast<bool>(sRef2)) << "Service must not be available after it's dependency is removed";
     }
 
+    TEST_F(tServiceComponent, testServiceDependency_JSONFilter) // DS_TOI_20
+    {
+
+      auto testBundle = StartTestBundle("TestBundleDSTOI20");
+      auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
+        testBundle, "sample::ServiceComponent20");
+      auto compConfigDTOs =
+        dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+      EXPECT_EQ(compConfigDTOs.size(), 1ul);
+      EXPECT_EQ(compConfigDTOs.at(0).state,
+        scr::dto::ComponentState::UNSATISFIED_REFERENCE);
+      auto ctxt = framework.GetBundleContext();
+      auto sRef = ctxt.GetServiceReference<test::Interface2>();
+      EXPECT_FALSE(static_cast<bool>(sRef))
+        << "Service must not be available before it's dependency";
+
+      //start non-matching bundle
+      auto depBundle1 = StartTestBundle("TestBundleDSTOI1");
+      auto sRef1 = ctxt.GetServiceReference<test::Interface2>();
+      EXPECT_FALSE(static_cast<bool>(sRef1))
+        << "Service must not be available as this dependency does not match the "
+        "filter";
+
+      //start matching bundle
+      auto depBundle2 = StartTestBundle("TestBundleDSTOI12");
+      auto result = RepeatTaskUntilOrTimeout(
+        [&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]() {
+        compConfigDTOs = service->GetComponentConfigurationDTOs(compDescDTO);
+      },
+        [&compConfigDTOs]() -> bool {
+        return compConfigDTOs.at(0).state == scr::dto::ComponentState::ACTIVE;
+      });
+
+      ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE "
+        "after the dependency became available";
+      auto sRef2 = ctxt.GetServiceReference<test::Interface2>();
+      EXPECT_TRUE(static_cast<bool>(sRef2))
+        << "Service must be available after it's dependency is available";
+      auto service = ctxt.GetService<test::Interface2>(sRef2);
+      ASSERT_NE(service, nullptr);
+      EXPECT_NO_THROW(service->ExtendedDescription())
+        << "Throws if the dependency could not be found";
+
+      //stop non matching bundle
+      depBundle1.Stop();
+      sRef1 = ctxt.GetServiceReference<test::Interface2>();
+      EXPECT_TRUE(static_cast<bool>(sRef1))
+        << "Service must be available as the removed dependency does not match the "
+        "filter";
+      service = ctxt.GetService<test::Interface2>(sRef1);
+      ASSERT_NE(service, nullptr);
+
+      //stop matching bundle
+      depBundle2.Stop();
+      result = RepeatTaskUntilOrTimeout(
+        [&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]() {
+        compConfigDTOs = service->GetComponentConfigurationDTOs(compDescDTO);
+      },
+        [&compConfigDTOs]() -> bool {
+        return compConfigDTOs.at(0).state ==
+          scr::dto::ComponentState::UNSATISFIED_REFERENCE;
+      });
+
+      ASSERT_TRUE(result)
+        << "Timed out waiting for state to change to UNSATISFIED_REFERENCE after "
+        "the dependency was removed";
+      sRef2 = ctxt.GetServiceReference<test::Interface2>();
+      EXPECT_FALSE(static_cast<bool>(sRef2))
+        << "Service must not be available after it's dependency is removed";
+
+    }
+
+    TEST_F(tServiceComponent, testServiceDependency_JSONFilterNestedProperties) // DS_TOI_21
+    {
+
+      auto testBundle = StartTestBundle("TestBundleDSTOI21");
+      auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
+        testBundle, "sample::ServiceComponent21");
+      auto compConfigDTOs =
+        dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+      EXPECT_EQ(compConfigDTOs.size(), 1ul);
+      EXPECT_EQ(compConfigDTOs.at(0).state,
+        scr::dto::ComponentState::UNSATISFIED_REFERENCE);
+      auto ctxt = framework.GetBundleContext();
+      auto sRef = ctxt.GetServiceReference<test::Interface2>();
+      EXPECT_FALSE(static_cast<bool>(sRef))
+        << "Service must not be available before it's dependency";
+
+      //start non-matching bundle
+      auto depBundle1 = StartTestBundle("TestBundleDSTOI1");
+      auto sRef1 = ctxt.GetServiceReference<test::Interface2>();
+      EXPECT_FALSE(static_cast<bool>(sRef1))
+        << "Service must not be available as this dependency does not match the "
+        "filter";
+
+      //start matching bundle
+      auto depBundle2 = StartTestBundle("TestBundleDSTOI12");
+      auto result = RepeatTaskUntilOrTimeout(
+        [&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]() {
+        compConfigDTOs = service->GetComponentConfigurationDTOs(compDescDTO);
+      },
+        [&compConfigDTOs]() -> bool {
+        return compConfigDTOs.at(0).state == scr::dto::ComponentState::ACTIVE;
+      });
+
+      ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE "
+        "after the dependency became available";
+      auto sRef2 = ctxt.GetServiceReference<test::Interface2>();
+      EXPECT_TRUE(static_cast<bool>(sRef2))
+        << "Service must be available after it's dependency is available";
+      auto service = ctxt.GetService<test::Interface2>(sRef2);
+      ASSERT_NE(service, nullptr);
+      EXPECT_NO_THROW(service->ExtendedDescription())
+        << "Throws if the dependency could not be found";
+
+      //stop non matching bundle
+      depBundle1.Stop();
+      sRef1 = ctxt.GetServiceReference<test::Interface2>();
+      EXPECT_TRUE(static_cast<bool>(sRef1))
+        << "Service must be available as the removed dependency does not match the "
+        "filter";
+      service = ctxt.GetService<test::Interface2>(sRef1);
+      ASSERT_NE(service, nullptr);
+
+      //stop matching bundle
+      depBundle2.Stop();
+      result = RepeatTaskUntilOrTimeout(
+        [&compConfigDTOs, service = this->dsRuntimeService, &compDescDTO]() {
+        compConfigDTOs = service->GetComponentConfigurationDTOs(compDescDTO);
+      },
+        [&compConfigDTOs]() -> bool {
+        return compConfigDTOs.at(0).state ==
+          scr::dto::ComponentState::UNSATISFIED_REFERENCE;
+      });
+
+      ASSERT_TRUE(result)
+        << "Timed out waiting for state to change to UNSATISFIED_REFERENCE after "
+        "the dependency was removed";
+      sRef2 = ctxt.GetServiceReference<test::Interface2>();
+      EXPECT_FALSE(static_cast<bool>(sRef2))
+        << "Service must not be available after it's dependency is removed";
+
+    }
+
 } // namespace test

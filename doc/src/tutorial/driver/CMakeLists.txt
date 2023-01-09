@@ -36,10 +36,9 @@ if(NOT BUILD_SHARED_LIBS)
   target_link_libraries(usTutorialDriver ${_target_zip_archives})
 
   # Merge all resources from the static bundles and embed them into the executable.
-  usFunctionAddResources(TARGET usTutorialDriver
-                         BUNDLE_NAME main
-                         ZIP_ARCHIVES ${_target_zip_archives})
-  usFunctionEmbedResources(TARGET usTutorialDriver)
+  usFunctionEmbedResources(TARGET usTutorialDriver
+                           BUNDLE_NAME main
+                           ZIP_ARCHIVES ${_target_zip_archives})
 else()
   add_executable(usTutorialDriver main.cpp)
   target_link_libraries(usTutorialDriver ${CppMicroServices_LIBRARIES})

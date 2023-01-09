@@ -31,40 +31,44 @@
 #include "ReferenceMetadata.hpp"
 #include "ServiceMetadata.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-namespace metadata {
-
-/**
- * Stores component metadata information parsed from the Service Component
- * Runtime description.
- */
-struct ComponentMetadata
+namespace cppmicroservices
 {
-  ComponentMetadata()
-    : activateMethodName("Activate")
-    , deactivateMethodName("Deactivate")
-    , modifiedMethodName("Modified")
-  {}
+    namespace scrimpl
+    {
+        namespace metadata
+        {
 
-  std::string name;
-  std::string instanceName;
-  bool enabled{ true };
-  bool immediate{ false };
-  std::string implClassName;
-  std::string activateMethodName;
-  std::string deactivateMethodName;
-  std::string modifiedMethodName;
-  std::vector<ReferenceMetadata> refsMetadata;
-  ServiceMetadata serviceMetadata;
-  std::unordered_map<std::string, cppmicroservices::Any> properties;
-  std::string configurationPolicy;
-  std::vector<std::string> configurationPids;
-  std::string factoryComponentID;
-  std::unordered_map<std::string, cppmicroservices::Any> factoryComponentProperties;
-};
-}
-}
-}
+            /**
+             * Stores component metadata information parsed from the Service Component
+             * Runtime description.
+             */
+            struct ComponentMetadata
+            {
+                ComponentMetadata()
+                    : activateMethodName("Activate")
+                    , deactivateMethodName("Deactivate")
+                    , modifiedMethodName("Modified")
+                {
+                }
 
-#endif //COMPONENTMETADATA_HPP
+                std::string name;
+                std::string instanceName;
+                bool enabled { true };
+                bool immediate { false };
+                std::string implClassName;
+                std::string activateMethodName;
+                std::string deactivateMethodName;
+                std::string modifiedMethodName;
+                std::vector<ReferenceMetadata> refsMetadata;
+                ServiceMetadata serviceMetadata;
+                std::unordered_map<std::string, cppmicroservices::Any> properties;
+                std::string configurationPolicy;
+                std::vector<std::string> configurationPids;
+                std::string factoryComponentID;
+                std::unordered_map<std::string, cppmicroservices::Any> factoryComponentProperties;
+            };
+        } // namespace metadata
+    }     // namespace scrimpl
+} // namespace cppmicroservices
+
+#endif // COMPONENTMETADATA_HPP

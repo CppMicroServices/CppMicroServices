@@ -29,26 +29,25 @@
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
-namespace DSSpellCheck {
-
-/**
- * A private class that implements a spell check service; see
- * ISpellCheckService for details of the service.
- */
-class SpellCheckImpl : public test::ISpellCheckService
+namespace DSSpellCheck
 {
 
-private:
-  std::shared_ptr<test::IDictionaryService> mDictionary;
+    /**
+     * A private class that implements a spell check service; see
+     * ISpellCheckService for details of the service.
+     */
+    class SpellCheckImpl : public test::ISpellCheckService
+    {
 
-public:
-  SpellCheckImpl(const std::shared_ptr<test::IDictionaryService>& dict)
-    : mDictionary(dict)
-  {}
-  ~SpellCheckImpl() override = default;
-  std::vector<std::string> Check(const std::string& passage) override;
-};
+      private:
+        std::shared_ptr<test::IDictionaryService> mDictionary;
 
-}
+      public:
+        SpellCheckImpl(std::shared_ptr<test::IDictionaryService> const& dict) : mDictionary(dict) {}
+        ~SpellCheckImpl() override = default;
+        std::vector<std::string> Check(std::string const& passage) override;
+    };
+
+} // namespace DSSpellCheck
 
 #endif // SPELLCHECKIMPL_HPP

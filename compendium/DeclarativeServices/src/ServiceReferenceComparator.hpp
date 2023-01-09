@@ -28,34 +28,40 @@
 using cppmicroservices::Constants::SERVICE_ID;
 using cppmicroservices::Constants::SERVICE_RANKING;
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-/**
- * This functor is used to sort a container of ServiceReferences. The comparator implements the "<"
- * function such that a reference with lower ranking is less than a reference with higher ranking.
- * In case both references have the same ranking, the reference with higher id is less than the
- * reference with lower id.
- */
-class ServiceReferenceComparator
+namespace cppmicroservices
 {
-public:
-  bool operator()(const ServiceReferenceU& lhs, const ServiceReferenceU& rhs)
-  {
-    auto lRankAny = lhs.GetProperty(SERVICE_RANKING);
-    auto rRankAny = rhs.GetProperty(SERVICE_RANKING);
-    int lRank = lRankAny.Empty() ? 0 : any_cast<int>(lRankAny);
-    int rRank = rRankAny.Empty() ? 0 : any_cast<int>(rRankAny);
-    if (lRank == rRank) {
-      auto lId = any_cast<long>(lhs.GetProperty(SERVICE_ID));
-      auto rId = any_cast<long>(rhs.GetProperty(SERVICE_ID));
-      return lId > rId;
-    } else {
-      return lRank < rRank;
-    }
-  };
-};
-}
-}
+    namespace scrimpl
+    {
+
+        /**
+         * This functor is used to sort a container of ServiceReferences. The comparator implements the "<"
+         * function such that a reference with lower ranking is less than a reference with higher ranking.
+         * In case both references have the same ranking, the reference with higher id is less than the
+         * reference with lower id.
+         */
+        class ServiceReferenceComparator
+        {
+          public:
+            bool
+            operator()(ServiceReferenceU const& lhs, ServiceReferenceU const& rhs)
+            {
+                auto lRankAny = lhs.GetProperty(SERVICE_RANKING);
+                auto rRankAny = rhs.GetProperty(SERVICE_RANKING);
+                int lRank = lRankAny.Empty() ? 0 : any_cast<int>(lRankAny);
+                int rRank = rRankAny.Empty() ? 0 : any_cast<int>(rRankAny);
+                if (lRank == rRank)
+                {
+                    auto lId = any_cast<long>(lhs.GetProperty(SERVICE_ID));
+                    auto rId = any_cast<long>(rhs.GetProperty(SERVICE_ID));
+                    return lId > rId;
+                }
+                else
+                {
+                    return lRank < rRank;
+                }
+            };
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 
 #endif /* __SERVICEREFERENCECOMPARATOR_HPP__ */

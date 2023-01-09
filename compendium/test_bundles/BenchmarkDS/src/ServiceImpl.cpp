@@ -1,8 +1,10 @@
 #include "ServiceImpl.hpp"
 
-namespace sample {
-std::string DSBenchmarkComponent::Description()
+namespace sample
 {
-  return STRINGIZE(US_BUNDLE_NAME);
-}
-}
+    std::string
+    DSBenchmarkComponent::Description()
+    {
+        return STRINGIZE(US_BUNDLE_NAME);
+    }
+} // namespace sample

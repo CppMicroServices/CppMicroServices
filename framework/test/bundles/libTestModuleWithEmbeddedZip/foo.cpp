@@ -1,4 +1,5 @@
 
-class foo final {
+class foo final
+{
     ~foo() = default;
 };

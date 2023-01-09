@@ -29,75 +29,78 @@
 #include "cppmicroservices/servicecomponent/ServiceComponentExport.h"
 #include <cppmicroservices/ServiceReference.h>
 
-namespace cppmicroservices {
-namespace service {
-namespace component {
-namespace detail {
-
-/**
- * This interface is used by the declarative services runtime to manage the
- * creation, dependency injection and deletion of instances of the service
- * component class.
- */
-class US_ServiceComponent_EXPORT ComponentInstance
+namespace cppmicroservices
 {
-public:
-  virtual ~ComponentInstance() noexcept;
+    namespace service
+    {
+        namespace component
+        {
+            namespace detail
+            {
 
-  /**
-   * This method is responsible for creating an instance of the service component
-   * implementation class. The dependencies are injected into the class constructor.
-   * This method is called by the runtime while activating the component configuration.
-   *
-   * @param ctxt The {@code ComponentContext} object associated with the component instance.
-   */
-  virtual void CreateInstance(
-    const std::shared_ptr<ComponentContext>& ctxt) = 0;
-  virtual void BindReferences(
-    const std::shared_ptr<ComponentContext>& ctxt) = 0;
-  virtual void UnbindReferences() = 0;
+                /**
+                 * This interface is used by the declarative services runtime to manage the
+                 * creation, dependency injection and deletion of instances of the service
+                 * component class.
+                 */
+                class US_ServiceComponent_EXPORT ComponentInstance
+                {
+                  public:
+                    virtual ~ComponentInstance() noexcept;
 
-  /**
-   * This method is called by the runtime while activating the component configuration.
-   * It is called after the call to {@code #CreateInstanceAndBindReferences} method suceeded.
-   */
-  virtual void Activate() = 0;
+                    /**
+                     * This method is responsible for creating an instance of the service component
+                     * implementation class. The dependencies are injected into the class constructor.
+                     * This method is called by the runtime while activating the component configuration.
+                     *
+                     * @param ctxt The {@code ComponentContext} object associated with the component instance.
+                     */
+                    virtual void CreateInstance(std::shared_ptr<ComponentContext> const& ctxt) = 0;
+                    virtual void BindReferences(std::shared_ptr<ComponentContext> const& ctxt) = 0;
+                    virtual void UnbindReferences() = 0;
 
-  /**
-   * This method is called by the runtime while deactivating the component configuration.
-   * On return, the service component object is destroyed.
-   */
-  virtual void Deactivate() = 0;
+                    /**
+                     * This method is called by the runtime while activating the component configuration.
+                     * It is called after the call to {@code #CreateInstanceAndBindReferences} method suceeded.
+                     */
+                    virtual void Activate() = 0;
 
-/**
-   * This method is called by the runtime when configuration objects change to 
-   * notify the component instance of the configuration changes. .
-   */
-  virtual void Modified() = 0;
-  /**
-   * This method is called by the runtime to bind a reference with dynamic policy
-   */
-  virtual void InvokeUnbindMethod(
-    const std::string& refName,
-    const cppmicroservices::ServiceReferenceBase& sRef) = 0;
+                    /**
+                     * This method is called by the runtime while deactivating the component configuration.
+                     * On return, the service component object is destroyed.
+                     */
+                    virtual void Deactivate() = 0;
 
-  /**
-   * This method is called by the runtime to unbind a reference with dynamic policy
-   */
-  virtual void InvokeBindMethod(
-    const std::string& refName,
-    const cppmicroservices::ServiceReferenceBase& sRef) = 0;
+                    /**
+                     * This method is called by the runtime when configuration objects change to
+                     * notify the component instance of the configuration changes. .
+                     */
+                    virtual void Modified() = 0;
+                    /**
+                     * This method is called by the runtime to bind a reference with dynamic policy
+                     */
+                    virtual void InvokeUnbindMethod(std::string const& refName,
+                                                    cppmicroservices::ServiceReferenceBase const& sRef)
+                        = 0;
 
-  /**
-   * This method is called when a call to @{code ServiceFactory#GetService} is received by the runtime.
-   */
-  virtual cppmicroservices::InterfaceMapPtr GetInterfaceMap() = 0;
-  virtual bool DoesModifiedMethodExist() = 0;
-};
+                    /**
+                     * This method is called by the runtime to unbind a reference with dynamic policy
+                     */
+                    virtual void InvokeBindMethod(std::string const& refName,
+                                                  cppmicroservices::ServiceReferenceBase const& sRef)
+                        = 0;
 
-}
-}
-}
-} // namespaces
+                    /**
+                     * This method is called when a call to @{code ServiceFactory#GetService} is received by the
+                     * runtime.
+                     */
+                    virtual cppmicroservices::InterfaceMapPtr GetInterfaceMap() = 0;
+                    virtual bool DoesModifiedMethodExist() = 0;
+                };
+
+            } // namespace detail
+        }     // namespace component
+    }         // namespace service
+} // namespace cppmicroservices
 
 #endif /* ComponentInstance_hpp */

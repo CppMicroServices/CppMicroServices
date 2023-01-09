@@ -26,17 +26,18 @@
 #include <memory>
 #include <string>
 
-namespace cppmicroservices {
-
-class ServletContext;
-
-struct ServletConfigPrivate
+namespace cppmicroservices
 {
-  ServletConfigPrivate() {}
 
-  std::string m_Name;
-  std::shared_ptr<ServletContext> m_Context;
-};
-}
+    class ServletContext;
+
+    struct ServletConfigPrivate
+    {
+        ServletConfigPrivate() {}
+
+        std::string m_Name;
+        std::shared_ptr<ServletContext> m_Context;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SERVLETCONFIGPRIVATE_H

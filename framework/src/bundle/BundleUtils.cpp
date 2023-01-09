@@ -31,84 +31,94 @@
 
 #ifdef US_PLATFORM_WINDOWS
 
-#  include "cppmicroservices/util/Error.h"
-#  include "cppmicroservices/util/String.h"
-#  include <windows.h>
+#    include "cppmicroservices/util/Error.h"
+#    include "cppmicroservices/util/String.h"
+#    include <windows.h>
 
-#  define RTLD_LAZY 0 // unused
+#    define RTLD_LAZY 0 // unused
 
-std::string dlerror(void)
+std::string
+dlerror(void)
 {
-  return cppmicroservices::util::GetLastWin32ErrorStr();
+    return cppmicroservices::util::GetLastWin32ErrorStr();
 }
 
-void* dlopen(const char* path, int)
+void*
+dlopen(char const* path, int)
 {
-  auto loadLibrary = [](const std::string& path) -> HANDLE {
-    std::wstring wpath(cppmicroservices::util::ToWString(path));
-    return LoadLibraryW(wpath.c_str());
-  };
-  return reinterpret_cast<void*>(path == nullptr ? GetModuleHandleW(nullptr)
-                                                 : loadLibrary(path));
+    auto loadLibrary = [](std::string const& path) -> HANDLE
+    {
+        std::wstring wpath(cppmicroservices::util::ToWString(path));
+        return LoadLibraryW(wpath.c_str());
+    };
+    return reinterpret_cast<void*>(path == nullptr ? GetModuleHandleW(nullptr) : loadLibrary(path));
 }
 
-void* dlsym(void* handle, const char* symbol)
+void*
+dlsym(void* handle, char const* symbol)
 {
-  return reinterpret_cast<void*>(
-    GetProcAddress(reinterpret_cast<HMODULE>(handle), symbol));
+    return reinterpret_cast<void*>(GetProcAddress(reinterpret_cast<HMODULE>(handle), symbol));
 }
 
 #elif defined(__GNUC__)
 
-#  ifndef _GNU_SOURCE
-#    define _GNU_SOURCE
-#  endif
+#    ifndef _GNU_SOURCE
+#        define _GNU_SOURCE
+#    endif
 
-#  include <dlfcn.h>
+#    include <dlfcn.h>
 
-#  if defined(__APPLE__)
-#    include <mach-o/dyld.h>
-#    include <sys/param.h>
-#  endif
+#    if defined(__APPLE__)
+#        include <mach-o/dyld.h>
+#        include <sys/param.h>
+#    endif
 
-#  include <unistd.h>
+#    include <unistd.h>
 
 #endif
 
-namespace cppmicroservices {
-
-// Private util function to return system bundle's log sink
-std::shared_ptr<detail::LogSink> GetFrameworkLogSink()
+namespace cppmicroservices
 {
-  auto bundle_ = GetPrivate(GetBundleContext())->bundle.lock();
-  if (bundle_) {
-    // The following is a hack, we need a cleaner solution in the future
-    return bundle_->coreCtx->sink;
-  } else {
-    return nullptr;
-  }
-}
 
-namespace BundleUtils {
+    // Private util function to return system bundle's log sink
+    std::shared_ptr<detail::LogSink>
+    GetFrameworkLogSink()
+    {
+        auto bundle_ = GetPrivate(GetBundleContext())->bundle.lock();
+        if (bundle_)
+        {
+            // The following is a hack, we need a cleaner solution in the future
+            return bundle_->coreCtx->sink;
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
 
-void* GetExecutableHandle()
-{
-  return dlopen(nullptr, RTLD_LAZY);
-  ;
-}
+    namespace BundleUtils
+    {
 
-void* GetSymbol(void* libHandle, const char* symbol)
-{
-  void* addr = libHandle ? dlsym(libHandle, symbol) : nullptr;
-  if (!addr) {
-    const std::string dlerrorMsg = dlerror();
-    DIAG_LOG(*GetFrameworkLogSink())
-      << "GetSymbol() failed to find (" << symbol
-      << ") with error : " << (!dlerrorMsg.empty() ? dlerrorMsg : "unknown");
-  }
-  return addr;
-}
+        void*
+        GetExecutableHandle()
+        {
+            return dlopen(nullptr, RTLD_LAZY);
+            ;
+        }
 
-} // namespace BundleUtils
+        void*
+        GetSymbol(void* libHandle, char const* symbol)
+        {
+            void* addr = libHandle ? dlsym(libHandle, symbol) : nullptr;
+            if (!addr)
+            {
+                const std::string dlerrorMsg = dlerror();
+                DIAG_LOG(*GetFrameworkLogSink()) << "GetSymbol() failed to find (" << symbol
+                                                 << ") with error : " << (!dlerrorMsg.empty() ? dlerrorMsg : "unknown");
+            }
+            return addr;
+        }
+
+    } // namespace BundleUtils
 
 } // namespace cppmicroservices

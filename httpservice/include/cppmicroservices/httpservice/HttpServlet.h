@@ -28,118 +28,111 @@
 
 #include <mutex>
 
-namespace cppmicroservices {
-
-class HttpServletRequest;
-class HttpServletResponse;
-class ServletContext;
-class ServletConfig;
-
-struct HttpServletPrivate;
-
-class US_HttpService_EXPORT HttpServlet
-  : public std::enable_shared_from_this<HttpServlet>
+namespace cppmicroservices
 {
-public:
-  static const std::string PROP_CONTEXT_ROOT;
 
-  HttpServlet();
+    class HttpServletRequest;
+    class HttpServletResponse;
+    class ServletContext;
+    class ServletConfig;
 
-  /**
-   * Called by the servlet container to indicate to a servlet that the
-   * servlet is being placed into service.
-   *
-   * The servlet container calls the <code>Init</code>
-   * method exactly once after instantiating the servlet.
-   * The <code>Init</code> method must complete successfully
-   * before the servlet can receive any requests.
-   *
-   * The servlet container cannot place the servlet into service
-   * if the <code>Init</code> method
-   * <ol>
-   * <li>Throws a <code>ServletException</code>
-   * <li>Does not return within a time period defined by the Web server
-   * </ol>
-   *
-   *
-   * @param config   a <code>ServletConfig</code> object
-   *     containing the servlet's
-   *      configuration and initialization parameters
-   *
-   * @exception ServletException  if an exception has occurred that
-   *     interferes with the servlet's normal
-   *     operation
-   *
-   * @see     UnavailableException
-   * @see     #GetServletConfig
-   *
-   */
-  virtual void Init(const ServletConfig& config);
+    struct HttpServletPrivate;
 
-  /**
-   *
-   * Called by the servlet container to indicate to a servlet that the
-   * servlet is being taken out of service.  This method is
-   * only called once all threads within the servlet's
-   * <code>service</code> method have exited or after a timeout
-   * period has passed. After the servlet container calls this
-   * method, it will not call the <code>service</code> method again
-   * on this servlet.
-   *
-   * This method gives the servlet an opportunity
-   * to clean up any resources that are being held (for example, memory,
-   * file handles, threads) and make sure that any persistent state is
-   * synchronized with the servlet's current state in memory.
-   *
-   */
-  virtual void Destroy();
+    class US_HttpService_EXPORT HttpServlet : public std::enable_shared_from_this<HttpServlet>
+    {
+      public:
+        static const std::string PROP_CONTEXT_ROOT;
 
-  /**
-   * Returns a ServletConfig object, which contains
-   * initialization and startup parameters for this servlet.
-   * The <code>ServletConfig</code> object returned is the one
-   * passed to the <code>Init</code> method.
-   *
-   * @return  the <code>ServletConfig</code> object
-   *   that initializes this servlet
-   *
-   * @see   #Init
-   *
-   */
-  ServletConfig GetServletConfig() const;
+        HttpServlet();
 
-  virtual void Service(HttpServletRequest& request,
-                       HttpServletResponse& response);
+        /**
+         * Called by the servlet container to indicate to a servlet that the
+         * servlet is being placed into service.
+         *
+         * The servlet container calls the <code>Init</code>
+         * method exactly once after instantiating the servlet.
+         * The <code>Init</code> method must complete successfully
+         * before the servlet can receive any requests.
+         *
+         * The servlet container cannot place the servlet into service
+         * if the <code>Init</code> method
+         * <ol>
+         * <li>Throws a <code>ServletException</code>
+         * <li>Does not return within a time period defined by the Web server
+         * </ol>
+         *
+         *
+         * @param config   a <code>ServletConfig</code> object
+         *     containing the servlet's
+         *      configuration and initialization parameters
+         *
+         * @exception ServletException  if an exception has occurred that
+         *     interferes with the servlet's normal
+         *     operation
+         *
+         * @see     UnavailableException
+         * @see     #GetServletConfig
+         *
+         */
+        virtual void Init(ServletConfig const& config);
 
-  std::shared_ptr<ServletContext> GetServletContext() const;
+        /**
+         *
+         * Called by the servlet container to indicate to a servlet that the
+         * servlet is being taken out of service.  This method is
+         * only called once all threads within the servlet's
+         * <code>service</code> method have exited or after a timeout
+         * period has passed. After the servlet container calls this
+         * method, it will not call the <code>service</code> method again
+         * on this servlet.
+         *
+         * This method gives the servlet an opportunity
+         * to clean up any resources that are being held (for example, memory,
+         * file handles, threads) and make sure that any persistent state is
+         * synchronized with the servlet's current state in memory.
+         *
+         */
+        virtual void Destroy();
 
-  virtual ~HttpServlet();
+        /**
+         * Returns a ServletConfig object, which contains
+         * initialization and startup parameters for this servlet.
+         * The <code>ServletConfig</code> object returned is the one
+         * passed to the <code>Init</code> method.
+         *
+         * @return  the <code>ServletConfig</code> object
+         *   that initializes this servlet
+         *
+         * @see   #Init
+         *
+         */
+        ServletConfig GetServletConfig() const;
 
-protected:
-  virtual long long GetLastModified(HttpServletRequest& request);
+        virtual void Service(HttpServletRequest& request, HttpServletResponse& response);
 
-  virtual void DoGet(HttpServletRequest& request,
-                     HttpServletResponse& response);
-  virtual void DoHead(HttpServletRequest& request,
-                      HttpServletResponse& response);
-  virtual void DoDelete(HttpServletRequest& request,
-                        HttpServletResponse& response);
-  virtual void DoPost(HttpServletRequest& request,
-                      HttpServletResponse& response);
-  virtual void DoPut(HttpServletRequest& request,
-                     HttpServletResponse& response);
+        std::shared_ptr<ServletContext> GetServletContext() const;
 
-  virtual void DoTrace(HttpServletRequest& request,
-                       HttpServletResponse& response);
+        virtual ~HttpServlet();
 
-  std::unique_lock<std::mutex> Lock() const;
+      protected:
+        virtual long long GetLastModified(HttpServletRequest& request);
 
-private:
-  HttpServletPrivate* d;
+        virtual void DoGet(HttpServletRequest& request, HttpServletResponse& response);
+        virtual void DoHead(HttpServletRequest& request, HttpServletResponse& response);
+        virtual void DoDelete(HttpServletRequest& request, HttpServletResponse& response);
+        virtual void DoPost(HttpServletRequest& request, HttpServletResponse& response);
+        virtual void DoPut(HttpServletRequest& request, HttpServletResponse& response);
 
-  friend class ServletHandler;
-  //friend class ServletContainerPrivate;
-};
-}
+        virtual void DoTrace(HttpServletRequest& request, HttpServletResponse& response);
+
+        std::unique_lock<std::mutex> Lock() const;
+
+      private:
+        HttpServletPrivate* d;
+
+        friend class ServletHandler;
+        // friend class ServletContainerPrivate;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_HTTPSERVLET_H

@@ -28,100 +28,95 @@
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-class ComponentConfigurationImpl;
-
-/** ConfigChangeNotification
-     * This class is used by ConfigurationListener to notify ComponentConfigurationImpl
-     * about changes to Configuration Objects.
-     */
-struct ConfigChangeNotification final
+namespace cppmicroservices
 {
-  ConfigChangeNotification(
-    std::string pid,
-    std::shared_ptr<cppmicroservices::AnyMap> properties,
-    cppmicroservices::service::cm::ConfigurationEventType evt)
-    : pid(std::move(pid))
-    , event(std::move(evt))
-    , newProperties(properties)
-  {}
+    namespace scrimpl
+    {
+        class ComponentConfigurationImpl;
 
-  std::string pid;
-  cppmicroservices::service::cm::ConfigurationEventType event;
-  std::shared_ptr<cppmicroservices::AnyMap> newProperties;
-};
+        /** ConfigChangeNotification
+         * This class is used by ConfigurationListener to notify ComponentConfigurationImpl
+         * about changes to Configuration Objects.
+         */
+        struct ConfigChangeNotification final
+        {
+            ConfigChangeNotification(std::string pid,
+                                     std::shared_ptr<cppmicroservices::AnyMap> properties,
+                                     cppmicroservices::service::cm::ConfigurationEventType evt)
+                : pid(std::move(pid))
+                , event(std::move(evt))
+                , newProperties(properties)
+            {
+            }
 
-struct Listener final
-{
-  Listener(std::function<void(const ConfigChangeNotification&)> notify,
-           std::shared_ptr<ComponentConfigurationImpl> mgr)
-    : notify(std::move(notify))
-    , mgr(std::move(mgr))
-  {}
+            std::string pid;
+            cppmicroservices::service::cm::ConfigurationEventType event;
+            std::shared_ptr<cppmicroservices::AnyMap> newProperties;
+        };
 
-  std::function<void(const ConfigChangeNotification&)> notify;
-  std::shared_ptr<ComponentConfigurationImpl> mgr;
-};
+        struct Listener final
+        {
+            Listener(std::function<void(ConfigChangeNotification const&)> notify,
+                     std::shared_ptr<ComponentConfigurationImpl> mgr)
+                : notify(std::move(notify))
+                , mgr(std::move(mgr))
+            {
+            }
 
-class ConfigurationNotifier final
-{
+            std::function<void(ConfigChangeNotification const&)> notify;
+            std::shared_ptr<ComponentConfigurationImpl> mgr;
+        };
 
-public:
-  /**
-   * @throws std::invalid_argument exception if any of the params is a nullptr 
-   */
-  ConfigurationNotifier(
-    const cppmicroservices::BundleContext& context,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-    std::shared_ptr<cppmicroservices::async::AsyncWorkService>
-      asyncWorkService_);
+        class ConfigurationNotifier final
+        {
 
-  ConfigurationNotifier(const ConfigurationNotifier&) = delete;
-  ConfigurationNotifier(ConfigurationNotifier&&) = delete;
-  ConfigurationNotifier& operator=(const ConfigurationNotifier&) = delete;
-  ConfigurationNotifier& operator=(ConfigurationNotifier&&) = delete;
-  ~ConfigurationNotifier() = default;
+          public:
+            /**
+             * @throws std::invalid_argument exception if any of the params is a nullptr
+             */
+            ConfigurationNotifier(cppmicroservices::BundleContext const& context,
+                                  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                                  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService_);
 
-  /**
-   * @throws std::bad_alloc exception if memory cannot be allocated
-   */
-  cppmicroservices::ListenerTokenId RegisterListener(
-    const std::string& pid,
-    std::function<void(const ConfigChangeNotification&)> notify,
-    std::shared_ptr<ComponentConfigurationImpl> mgr);
+            ConfigurationNotifier(ConfigurationNotifier const&) = delete;
+            ConfigurationNotifier(ConfigurationNotifier&&) = delete;
+            ConfigurationNotifier& operator=(ConfigurationNotifier const&) = delete;
+            ConfigurationNotifier& operator=(ConfigurationNotifier&&) = delete;
+            ~ConfigurationNotifier() = default;
 
-  void UnregisterListener(
-    const std::string& pid,
-    const cppmicroservices::ListenerTokenId token) noexcept;
+            /**
+             * @throws std::bad_alloc exception if memory cannot be allocated
+             */
+            cppmicroservices::ListenerTokenId RegisterListener(
+                std::string const& pid,
+                std::function<void(ConfigChangeNotification const&)> notify,
+                std::shared_ptr<ComponentConfigurationImpl> mgr);
 
-  bool AnyListenersForPid(const std::string& pid) noexcept;
+            void UnregisterListener(std::string const& pid, const cppmicroservices::ListenerTokenId token) noexcept;
 
-  void NotifyAllListeners(
-    const std::string& pid,
-    cppmicroservices::service::cm::ConfigurationEventType type,
-    std::shared_ptr<cppmicroservices::AnyMap> properties);
+            bool AnyListenersForPid(std::string const& pid) noexcept;
 
-  void CreateFactoryComponent(const std::string& pid,
-                              std::shared_ptr<ComponentConfigurationImpl>& mgr);
-private:
+            void NotifyAllListeners(std::string const& pid,
+                                    cppmicroservices::service::cm::ConfigurationEventType type,
+                                    std::shared_ptr<cppmicroservices::AnyMap> properties);
 
-  using TokenMap = std::unordered_map<ListenerTokenId, Listener>;
+            void CreateFactoryComponent(std::string const& pid, std::shared_ptr<ComponentConfigurationImpl>& mgr);
 
-  cppmicroservices::scrimpl::Guarded<
-    std::unordered_map<std::string, std::shared_ptr<TokenMap>>>
-    listenersMap;
+          private:
+            using TokenMap = std::unordered_map<ListenerTokenId, Listener>;
 
-  std::atomic<cppmicroservices::ListenerTokenId> tokenCounter; ///< used to
-    ///generate unique
-    ///tokens for
-    ///listeners
+            cppmicroservices::scrimpl::Guarded<std::unordered_map<std::string, std::shared_ptr<TokenMap>>> listenersMap;
 
-  cppmicroservices::BundleContext bundleContext;
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
-};
+            std::atomic<cppmicroservices::ListenerTokenId> tokenCounter; ///< used to
+                                                                         /// generate unique
+                                                                         /// tokens for
+                                                                         /// listeners
 
-} // namespace scrimpl
+            cppmicroservices::BundleContext bundleContext;
+            std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
+        };
+
+    } // namespace scrimpl
 } // namespace cppmicroservices
 #endif //__CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP__

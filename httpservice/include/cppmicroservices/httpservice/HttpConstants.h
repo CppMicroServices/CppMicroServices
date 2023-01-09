@@ -27,27 +27,20 @@
 
 #include "cppmicroservices/httpservice/HttpServiceExport.h"
 
-namespace cppmicroservices {
-
-struct US_HttpService_EXPORT HttpConstants
+namespace cppmicroservices
 {
-  static std::string
-  HTTP_SERVICE_ENDPOINT_ATTRIBUTE(); // "org.cppmicroservices.http.endpoint"
-  static std::string
-  HTTP_WHITEBOARD_CONTEXT_NAME(); // "org.cppmicroservices.http.whiteboard.context.name"
-  static std::string
-  HTTP_WHITEBOARD_CONTEXT_SELECT(); // "org.cppmicroservices.http.whiteboard.context.select"
-  static std::string
-  HTTP_WHITEBOARD_CONTEXT_SHARED(); // "org.cppmicroservices.http.whiteboard.context.shared"
-  static std::string
-  HTTP_WHITEBOARD_RESOURCE_PREFIX(); // "org.cppmicroservices.http.whiteboard.resource.prefix"
-  static std::string
-  HTTP_WHITEBOARD_SERVLET_NAME(); // "org.cppmicroservices.http.whiteboard.servlet.name"
-  static std::string
-  HTTP_WHITEBOARD_SERVLET_PATTERN(); // "org.cppmicroservices.http.whiteboard.servlet.pattern"
-  static std::string
-  HTTP_WHITEBOARD_TARGET(); // "org.cppmicroservices.http.whiteboard.target"
-};
-}
+
+    struct US_HttpService_EXPORT HttpConstants
+    {
+        static std::string HTTP_SERVICE_ENDPOINT_ATTRIBUTE(); // "org.cppmicroservices.http.endpoint"
+        static std::string HTTP_WHITEBOARD_CONTEXT_NAME();    // "org.cppmicroservices.http.whiteboard.context.name"
+        static std::string HTTP_WHITEBOARD_CONTEXT_SELECT();  // "org.cppmicroservices.http.whiteboard.context.select"
+        static std::string HTTP_WHITEBOARD_CONTEXT_SHARED();  // "org.cppmicroservices.http.whiteboard.context.shared"
+        static std::string HTTP_WHITEBOARD_RESOURCE_PREFIX(); // "org.cppmicroservices.http.whiteboard.resource.prefix"
+        static std::string HTTP_WHITEBOARD_SERVLET_NAME();    // "org.cppmicroservices.http.whiteboard.servlet.name"
+        static std::string HTTP_WHITEBOARD_SERVLET_PATTERN(); // "org.cppmicroservices.http.whiteboard.servlet.pattern"
+        static std::string HTTP_WHITEBOARD_TARGET();          // "org.cppmicroservices.http.whiteboard.target"
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_HTTPCONSTANTS_H

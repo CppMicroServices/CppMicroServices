@@ -29,35 +29,34 @@
 class CivetServer;
 struct mg_connection;
 
-namespace cppmicroservices {
-
-class HttpServletRequest;
-
-struct HttpServletResponsePrivate
+namespace cppmicroservices
 {
-  HttpServletResponsePrivate(HttpServletRequest* request,
-                             CivetServer* server,
-                             mg_connection* conn);
-  ~HttpServletResponsePrivate();
 
-  bool Commit();
+    class HttpServletRequest;
 
-  std::string LexicalCast(long int value);
-  std::string LexicalCastHex(long int value);
+    struct HttpServletResponsePrivate
+    {
+        HttpServletResponsePrivate(HttpServletRequest* request, CivetServer* server, mg_connection* conn);
+        ~HttpServletResponsePrivate();
 
-  HttpServletRequest* const m_Request;
-  CivetServer* const m_Server;
-  struct mg_connection* const m_Connection;
+        bool Commit();
 
-  int m_StatusCode;
-  std::map<std::string, std::string> m_Headers;
-  std::streambuf* m_StreamBuf;
-  std::streambuf* m_HttpOutputStreamBuf;
-  std::ostream* m_HttpOutputStream;
-  bool m_IsCommited;
-  std::size_t m_BufferSize;
-  std::string m_Charset;
-};
-}
+        std::string LexicalCast(long int value);
+        std::string LexicalCastHex(long int value);
+
+        HttpServletRequest* const m_Request;
+        CivetServer* const m_Server;
+        struct mg_connection* const m_Connection;
+
+        int m_StatusCode;
+        std::map<std::string, std::string> m_Headers;
+        std::streambuf* m_StreamBuf;
+        std::streambuf* m_HttpOutputStreamBuf;
+        std::ostream* m_HttpOutputStream;
+        bool m_IsCommited;
+        std::size_t m_BufferSize;
+        std::string m_Charset;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_HTTPSERVLETRESPONSEPRIVATE_H

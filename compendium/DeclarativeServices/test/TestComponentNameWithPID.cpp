@@ -25,66 +25,60 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 
-namespace test {
-
-/**
-* Test using custom component name
-*/
-TEST_F(tServiceComponent, testComponentNameWithPID) // DS_CAI_FTC_16
+namespace test
 {
-  // Start the test bundle containing the custom component name.
-  std::string componentName = "sampleServiceComponentCA16";
-  std::string implementationClass = "sample::ServiceComponentCA16";
-  cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA16");
 
-  // Use DS runtime service to validate the component state
-  scr::dto::ComponentDescriptionDTO compDescDTO =
-    dsRuntimeService->GetComponentDescriptionDTO(testBundle, componentName);
-  EXPECT_EQ(compDescDTO.name, componentName)
-    << "Component name must be " << componentName;
-  EXPECT_EQ(compDescDTO.implementationClass, implementationClass)
-    << "Implementation class must be " << implementationClass;
+    /**
+     * Test using custom component name
+     */
+    TEST_F(tServiceComponent, testComponentNameWithPID) // DS_CAI_FTC_16
+    {
+        // Start the test bundle containing the custom component name.
+        std::string componentName = "sampleServiceComponentCA16";
+        std::string implementationClass = "sample::ServiceComponentCA16";
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA16");
 
-  auto compConfigs =
-    dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
-  EXPECT_EQ(compConfigs.at(0).state,
-            scr::dto::ComponentState::UNSATISFIED_REFERENCE)
-    << "The state should be UNSATISFIED_REFERENCE.";
+        // Use DS runtime service to validate the component state
+        scr::dto::ComponentDescriptionDTO compDescDTO
+            = dsRuntimeService->GetComponentDescriptionDTO(testBundle, componentName);
+        EXPECT_EQ(compDescDTO.name, componentName) << "Component name must be " << componentName;
+        EXPECT_EQ(compDescDTO.implementationClass, implementationClass)
+            << "Implementation class must be " << implementationClass;
 
-  // Get a service reference to ConfigAdmin to create the component instance.
-  auto configAdminService =
-    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
-  ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+        auto compConfigs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+        EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
+        EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::UNSATISFIED_REFERENCE)
+            << "The state should be UNSATISFIED_REFERENCE.";
 
-  // Create configuration object and update property.
-  auto configuration =
-    configAdminService->GetConfiguration(implementationClass);
-  auto configInstance = configuration->GetPid();
+        // Get a service reference to ConfigAdmin to create the component instance.
+        auto configAdminService = GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+        ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
-  cppmicroservices::AnyMap props(
-    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  const std::string instanceId{ "instance1" };
-  props["uniqueProp"] = instanceId;
-  auto fut = configuration->Update(props);
-  fut.get();
-  // GetService to make component active.
-  auto instance = GetInstance<test::CAInterface>();
-  ASSERT_TRUE(instance) << "GetService failed for CAInterface.";
+        // Create configuration object and update property.
+        auto configuration = configAdminService->GetConfiguration(implementationClass);
+        auto configInstance = configuration->GetPid();
 
-  // Confirm configuration object presented and check component state.
-  compConfigs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-  EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
-  EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
-    << "Component instance state should be ACTIVE.";
+        cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+        const std::string instanceId { "instance1" };
+        props["uniqueProp"] = instanceId;
+        auto fut = configuration->Update(props);
+        fut.get();
+        // GetService to make component active.
+        auto instance = GetInstance<test::CAInterface>();
+        ASSERT_TRUE(instance) << "GetService failed for CAInterface.";
 
-  // Confirm component instance was created with the correct properties.
-  auto instanceProps = instance->GetProperties();
-  auto uniqueProp = instanceProps.find("uniqueProp");
+        // Confirm configuration object presented and check component state.
+        compConfigs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+        EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected.";
+        EXPECT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE)
+            << "Component instance state should be ACTIVE.";
 
-  ASSERT_TRUE(uniqueProp != instanceProps.end())
-    << "uniqueProp not found in constructed instance.";
-  EXPECT_EQ(uniqueProp->second, instanceId);
-} // end of testComponentNameWithPID
+        // Confirm component instance was created with the correct properties.
+        auto instanceProps = instance->GetProperties();
+        auto uniqueProp = instanceProps.find("uniqueProp");
 
-} // end of test namespace
+        ASSERT_TRUE(uniqueProp != instanceProps.end()) << "uniqueProp not found in constructed instance.";
+        EXPECT_EQ(uniqueProp->second, instanceId);
+    } // end of testComponentNameWithPID
+
+} // namespace test

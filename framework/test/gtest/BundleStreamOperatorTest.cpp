@@ -1,6 +1,6 @@
 /*=============================================================================
 
-  Library: CppMicroServices 
+  Library: CppMicroServices
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
@@ -26,32 +26,21 @@
 
 using namespace cppmicroservices;
 
-void streamOperatorTest(Bundle::State bundleState, std::string expectedStr)
+void
+streamOperatorTest(Bundle::State bundleState, std::string expectedStr)
 {
-  std::stringstream buffer;
-  std::streambuf* backup = std::cout.rdbuf(buffer.rdbuf());
-  std::cout << bundleState;
-  std::string actStr = buffer.str();
-  ASSERT_TRUE(actStr.find(expectedStr) != std::string::npos);
-  std::cout.rdbuf(backup);
+    std::stringstream buffer;
+    std::streambuf* backup = std::cout.rdbuf(buffer.rdbuf());
+    std::cout << bundleState;
+    std::string actStr = buffer.str();
+    ASSERT_TRUE(actStr.find(expectedStr) != std::string::npos);
+    std::cout.rdbuf(backup);
 }
 
-TEST(BundleStreamOperatorTest, bundleStateUninstalled)
-{
-  streamOperatorTest(Bundle::STATE_UNINSTALLED, "UNINSTALLED");
-}
+TEST(BundleStreamOperatorTest, bundleStateUninstalled) { streamOperatorTest(Bundle::STATE_UNINSTALLED, "UNINSTALLED"); }
 
-TEST(BundleStreamOperatorTest, bundleStateStarting)
-{
-  streamOperatorTest(Bundle::STATE_STARTING, "STARTING");
-}
+TEST(BundleStreamOperatorTest, bundleStateStarting) { streamOperatorTest(Bundle::STATE_STARTING, "STARTING"); }
 
-TEST(BundleStreamOperatorTest, bundleStateStopping)
-{
-  streamOperatorTest(Bundle::STATE_STOPPING, "STOPPING");
-}
+TEST(BundleStreamOperatorTest, bundleStateStopping) { streamOperatorTest(Bundle::STATE_STOPPING, "STOPPING"); }
 
-TEST(BundleStreamOperatorTest, bundleStateDefault)
-{
-  streamOperatorTest(Bundle::State(), std::string{});
-}
+TEST(BundleStreamOperatorTest, bundleStateDefault) { streamOperatorTest(Bundle::State(), std::string {}); }

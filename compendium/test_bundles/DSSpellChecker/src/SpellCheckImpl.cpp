@@ -26,54 +26,60 @@
 US_MSVC_PUSH_DISABLE_WARNING(4996)
 
 using namespace cppmicroservices;
-namespace DSSpellCheck {
-/**
- * Implements ISpellCheckService::Check(). Checks the given passage for
- * misspelled words.
- *
- * @param passage the passage to spell check.
- * @return A list of misspelled words.
- */
-std::vector<std::string> SpellCheckImpl::Check(const std::string& passage)
+namespace DSSpellCheck
 {
-  std::vector<std::string> errorList;
+    /**
+     * Implements ISpellCheckService::Check(). Checks the given passage for
+     * misspelled words.
+     *
+     * @param passage the passage to spell check.
+     * @return A list of misspelled words.
+     */
+    std::vector<std::string>
+    SpellCheckImpl::Check(std::string const& passage)
+    {
+        std::vector<std::string> errorList;
 
-  // No misspelled words for an empty string.
-  if (passage.empty()) {
-    return errorList;
-  }
+        // No misspelled words for an empty string.
+        if (passage.empty())
+        {
+            return errorList;
+        }
 
-  // Tokenize the passage using spaces and punctuation.
-  const char* delimiters = " ,.!?;:";
-  char* passageCopy = new char[passage.size() + 1];
-  std::memcpy(passageCopy, passage.c_str(), passage.size() + 1);
-  char* pch = std::strtok(passageCopy, delimiters);
+        // Tokenize the passage using spaces and punctuation.
+        char const* delimiters = " ,.!?;:";
+        char* passageCopy = new char[passage.size() + 1];
+        std::memcpy(passageCopy, passage.c_str(), passage.size() + 1);
+        char* pch = std::strtok(passageCopy, delimiters);
 
-  {
-    // Loop through each word in the passage.
-    while (pch) {
-      std::string word(pch);
+        {
+            // Loop through each word in the passage.
+            while (pch)
+            {
+                std::string word(pch);
 
-      bool correct = false;
+                bool correct = false;
 
-      if (mDictionary->CheckWord(word)) {
-        correct = true;
-      }
+                if (mDictionary->CheckWord(word))
+                {
+                    correct = true;
+                }
 
-      // If the word is not correct, then add it
-      // to the incorrect word list.
-      if (!correct) {
-        errorList.push_back(word);
-      }
+                // If the word is not correct, then add it
+                // to the incorrect word list.
+                if (!correct)
+                {
+                    errorList.push_back(word);
+                }
 
-      pch = std::strtok(nullptr, delimiters);
+                pch = std::strtok(nullptr, delimiters);
+            }
+        }
+
+        delete[] passageCopy;
+
+        return errorList;
     }
-  }
-
-  delete[] passageCopy;
-
-  return errorList;
-}
-}
+} // namespace DSSpellCheck
 
 US_MSVC_POP_WARNING

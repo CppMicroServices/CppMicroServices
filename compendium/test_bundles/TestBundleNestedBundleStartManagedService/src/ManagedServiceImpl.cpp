@@ -25,50 +25,56 @@
 #include <iostream>
 #include <string>
 
-namespace cppmicroservices {
-namespace service {
-namespace cm {
-namespace test {
-
-TestManagedServiceImpl::TestManagedServiceImpl()
-  : m_counter{ 0 }
-{ }
-
-TestManagedServiceImpl::~TestManagedServiceImpl() = default;
-
-void TestManagedServiceImpl::Updated(AnyMap const& properties)
+namespace cppmicroservices
 {
-  std::lock_guard<std::mutex> lk(m_counterMtx);
-  if (properties.empty()) {
-    // Usually corresponds to the configuration being removed
-    --m_counter;
-  } else {
-    ++m_counter;
-  }
-}
+    namespace service
+    {
+        namespace cm
+        {
+            namespace test
+            {
 
-void TestManagedServiceImpl::Activate(
-  const std::shared_ptr<
-    cppmicroservices::service::component::ComponentContext>& ctx)
-{
-  auto installedBundles = ctx->GetBundleContext().GetBundles();
-  auto testBundleIter =
-    std::find_if(installedBundles.begin(),
-                 installedBundles.end(),
-                 [](const cppmicroservices::Bundle& b) {
-                   return (b.GetSymbolicName() == "ManagedServiceAndFactoryBundle");
-                 });
-  assert(testBundleIter != installedBundles.end());
-  testBundleIter->Start();
-}
+                TestManagedServiceImpl::TestManagedServiceImpl() : m_counter { 0 } {}
 
-int TestManagedServiceImpl::getCounter()
-{
-  std::lock_guard<std::mutex> lk(m_counterMtx);
-  return m_counter;
-}
+                TestManagedServiceImpl::~TestManagedServiceImpl() = default;
 
-} // namespace test
-} // namespace cm
-} // namespace service
+                void
+                TestManagedServiceImpl::Updated(AnyMap const& properties)
+                {
+                    std::lock_guard<std::mutex> lk(m_counterMtx);
+                    if (properties.empty())
+                    {
+                        // Usually corresponds to the configuration being removed
+                        --m_counter;
+                    }
+                    else
+                    {
+                        ++m_counter;
+                    }
+                }
+
+                void
+                TestManagedServiceImpl::Activate(
+                    std::shared_ptr<cppmicroservices::service::component::ComponentContext> const& ctx)
+                {
+                    auto installedBundles = ctx->GetBundleContext().GetBundles();
+                    auto testBundleIter
+                        = std::find_if(installedBundles.begin(),
+                                       installedBundles.end(),
+                                       [](cppmicroservices::Bundle const& b)
+                                       { return (b.GetSymbolicName() == "ManagedServiceAndFactoryBundle"); });
+                    assert(testBundleIter != installedBundles.end());
+                    testBundleIter->Start();
+                }
+
+                int
+                TestManagedServiceImpl::getCounter()
+                {
+                    std::lock_guard<std::mutex> lk(m_counterMtx);
+                    return m_counter;
+                }
+
+            } // namespace test
+        }     // namespace cm
+    }         // namespace service
 } // namespace cppmicroservices

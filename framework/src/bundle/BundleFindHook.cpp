@@ -22,7 +22,8 @@
 
 #include "cppmicroservices/BundleFindHook.h"
 
-namespace cppmicroservices {
+namespace cppmicroservices
+{
 
-BundleFindHook::~BundleFindHook() = default;
+    BundleFindHook::~BundleFindHook() = default;
 }

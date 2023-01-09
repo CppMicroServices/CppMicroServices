@@ -26,29 +26,30 @@ Library: CppMicroServices
 #include "cppmicroservices/util/BundleObjFile.h"
 #include "cppmicroservices/util/BundlePEFile.h"
 
-namespace cppmicroservices {
-
-/// Return a BundleObjFile which represents data read from the binary at
-/// the given location.
-///
-/// @param location absolute path to a PE, ELF or Mach-O binary file.
-/// @return A BundleObjFile object
-/// @throws If location is not a valid PE, ELF or Mach-O binary file.
-///
-/// @note The location must be a valid binary format for the host machine.
-///       i.e. PE file on Windows, Mach-O on macOS, ELF on Linux
-std::unique_ptr<BundleObjFile> BundleObjFactory::CreateBundleFileObj(
-  const std::string& location)
+namespace cppmicroservices
 {
+
+    /// Return a BundleObjFile which represents data read from the binary at
+    /// the given location.
+    ///
+    /// @param location absolute path to a PE, ELF or Mach-O binary file.
+    /// @return A BundleObjFile object
+    /// @throws If location is not a valid PE, ELF or Mach-O binary file.
+    ///
+    /// @note The location must be a valid binary format for the host machine.
+    ///       i.e. PE file on Windows, Mach-O on macOS, ELF on Linux
+    std::unique_ptr<BundleObjFile>
+    BundleObjFactory::CreateBundleFileObj(std::string const& location)
+    {
 #if defined(US_PLATFORM_WINDOWS)
-  return CreateBundlePEFile(location);
+        return CreateBundlePEFile(location);
 #elif defined(US_PLATFORM_APPLE)
-  return CreateBundleMachOFile(location);
+        return CreateBundleMachOFile(location);
 #elif defined(US_PLATFORM_LINUX)
-  return CreateBundleElfFile(location);
+        return CreateBundleElfFile(location);
 #else
-#  error "Unknown OS platform";
+#    error "Unknown OS platform";
 #endif
-  return {};
-}
-};
+        return {};
+    }
+}; // namespace cppmicroservices

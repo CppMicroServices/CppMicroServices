@@ -25,18 +25,25 @@
 
 #include <iostream>
 
-namespace cppmicroservices {
-
-class TestBundleUActivator : public BundleActivator
+namespace cppmicroservices
 {
-public:
-  TestBundleUActivator() {}
-  ~TestBundleUActivator() {}
 
-  void Start(BundleContext) {}
+    class TestBundleUActivator : public BundleActivator
+    {
+      public:
+        TestBundleUActivator() {}
+        ~TestBundleUActivator() {}
 
-  void Stop(BundleContext) {}
-};
-}
+        void
+        Start(BundleContext)
+        {
+        }
+
+        void
+        Stop(BundleContext)
+        {
+        }
+    };
+} // namespace cppmicroservices
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleUActivator)

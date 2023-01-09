@@ -7,24 +7,25 @@
 
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
-namespace sample {
-class ServiceComponentCA09 : public test::CAInterface1
+namespace sample
 {
-public:
-  ServiceComponentCA09(const std::shared_ptr<cppmicroservices::AnyMap>& props,
-                       const std::shared_ptr<test::Interface1> interface1);
-  void Modified(const std::shared_ptr<ComponentContext>& context,
-                const std::shared_ptr<cppmicroservices::AnyMap>& configuration);
-  cppmicroservices::AnyMap GetProperties() override;
-  bool isDependencyInjected() override;
+    class ServiceComponentCA09 : public test::CAInterface1
+    {
+      public:
+        ServiceComponentCA09(std::shared_ptr<cppmicroservices::AnyMap> const& props,
+                             const std::shared_ptr<test::Interface1> interface1);
+        void Modified(std::shared_ptr<ComponentContext> const& context,
+                      std::shared_ptr<cppmicroservices::AnyMap> const& configuration);
+        cppmicroservices::AnyMap GetProperties() override;
+        bool isDependencyInjected() override;
 
-  ~ServiceComponentCA09() = default;
+        ~ServiceComponentCA09() = default;
 
-private:
-  std::mutex propertiesLock;
-  std::shared_ptr<cppmicroservices::AnyMap> properties;
-  bool constructorHit;
-};
-}
+      private:
+        std::mutex propertiesLock;
+        std::shared_ptr<cppmicroservices::AnyMap> properties;
+        bool constructorHit;
+    };
+} // namespace sample
 
 #endif // _SERVICE_IMPL_HPP_

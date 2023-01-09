@@ -25,13 +25,14 @@
 
 #include "cppmicroservices/httpservice/ServletConfig.h"
 
-namespace cppmicroservices {
-
-struct HttpServletPrivate
+namespace cppmicroservices
 {
-  mutable std::mutex m_Mutex;
-  ServletConfig m_Config;
-};
-}
+
+    struct HttpServletPrivate
+    {
+        mutable std::mutex m_Mutex;
+        ServletConfig m_Config;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_HTTPSERVLETPRIVATE_H

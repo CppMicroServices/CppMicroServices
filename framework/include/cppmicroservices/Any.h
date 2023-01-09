@@ -139,12 +139,6 @@ namespace cppmicroservices
     template <typename ValueType>
     ValueType* any_cast(Any* operand);
 
-    template <typename ValueType>
-    ValueType& ref_any_cast(Any& operand);
-
-    template <typename ValueType>
-    ValueType const& ref_any_cast(Any const& operand);
-
     template <class T>
     std::ostream&
     any_value_to_string(std::ostream& os, T const& val)
@@ -346,8 +340,7 @@ namespace cppmicroservices
         {
             if (Type() != typeid(ValueType))
                 return false;
-            ValueType const& my_val = cppmicroservices::ref_any_cast<ValueType>(*this);
-            return cppmicroservices::any::detail::compare(my_val, val);
+            return cppmicroservices::any::detail::compare(*any_cast<ValueType const>(this), val);
         }
 
         /**

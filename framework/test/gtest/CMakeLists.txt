@@ -43,6 +43,7 @@ set(_gtest_tests
   InvalidBundleTest.cpp
   GlobalServiceTrackerTest.cpp
   LDAPExprTest.cpp
+  JSONExprTest.cpp
   LDAPFilterTest.cpp
   OpenFileHandleTest.cpp
   UtilsTest.cpp

@@ -15,6 +15,7 @@ set(_srcs
   util/LDAPExpr.cpp
   util/LDAPFilter.cpp
   util/LDAPProp.cpp
+  util/JSONProp.cpp
   util/Properties.cpp
   util/PropsCheck.cpp
   util/SecurityException.cpp

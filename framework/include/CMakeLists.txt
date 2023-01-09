@@ -12,6 +12,7 @@ set(_public_headers
   cppmicroservices/JSONFilter.h
   cppmicroservices/LDAPFilter.h
   cppmicroservices/LDAPProp.h
+  cppmicroservices/JSONProp.h
   cppmicroservices/ListenerToken.h
   cppmicroservices/ListenerFunctors.h
   cppmicroservices/SecurityException.h

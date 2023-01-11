@@ -90,6 +90,12 @@ namespace cppmicroservices
     JSONProp::operator JSONPropExpr() const { return JSONPropExpr("contains(keys(@), \'" + m_property + "\')"); }
 
     JSONPropExpr
+    JSONProp::operator[](std::string const& value) const
+    {
+        return JSONPropExpr(m_property + ".contains(@,\'" + value + "\')");
+    }
+
+    JSONPropExpr
     JSONProp::operator!() const
     {
         return JSONPropExpr("!" + (std::string)JSONPropExpr(this->operator cppmicroservices::JSONPropExpr()));

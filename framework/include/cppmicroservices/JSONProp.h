@@ -126,7 +126,7 @@ namespace cppmicroservices
          * \name JSONProp comparison operator ==
          *
          * @{
-         * population expression which compares property for equality
+         * populates JMESPath expression which compares current property for equality
          * Example:
          * \code
          *
@@ -157,7 +157,57 @@ namespace cppmicroservices
         }
         /// @}
 
+        /**
+         * Checks for existence of a key inside a JSON data
+         * \note this operator only looks for 1st level keys.
+         *
+         * Example:
+         *
+         * \code
+         * // Sample JSON
+         * {
+         *    "prop1": {
+         *        "p1_prop1"
+         *    },
+         *
+         *    "prop2":"Sample String"
+         * }
+         * \endcode
+         *
+         * \code
+         * JSONPropExpr expr = (JSONPropExpr) JSONProp("prop1");
+         * \endcode
+         * above statement frames populates JMESPath expression:
+         * <b>"keys(@, contains('prop1'))"</b>
+         * which when matched against example JSON data gives `true` boolean value
+         *
+         * Similarly example below will frame a JMESPath which will return false
+         * when tested against Sample JSON data above
+         *
+         * \code
+         * JSONPropExpr expr = (JSONPropExpr) JSONProp("this_property_doesnot_exists");
+         * \endcode
+         *
+         */
         operator JSONPropExpr() const;
+
+        /**
+         * Checks for existence of a value inside a JSON array
+         * \note this operator only looks for 1st level keys.
+         * Example:
+         *
+         * Sample JSON data:
+         * \code
+         * {
+         *    "prop1": ["value1", "value2", "value3" ]
+         * }
+         * \endcode
+         *
+         * JSONPropExpr expr = JSONProp("prop1")["value"];
+         * Frames below JMESPath expression
+         * "'prop1'.contains(@, 'value')"
+         */
+        JSONPropExpr operator[](std::string const&) const;
 
         /**
          * States the absence of the JSON property.
@@ -258,7 +308,7 @@ namespace cppmicroservices
  * \ingroup MicroServicesUtils
  * \ingroup gr_json
  *
- * json logical and '&'
+ * json logical and '&&'
  *
  * @param left A json expression.
  * @param right A json expression.
@@ -271,7 +321,7 @@ US_Framework_EXPORT cppmicroservices::JSONPropExpr operator&&(cppmicroservices::
  * \ingroup MicroServicesUtils
  * \ingroup gr_json
  *
- * json logical or '|'
+ * json logical or '||'
  *
  * @param left A json expression.
  * @param right A json expression.

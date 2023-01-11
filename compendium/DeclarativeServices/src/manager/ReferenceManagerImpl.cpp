@@ -25,6 +25,7 @@
 
 #include "ReferenceManagerImpl.hpp"
 #include "cppmicroservices/FilterAdapter.h"
+#include "cppmicroservices/JSONProp.h"
 #include "cppmicroservices/LDAPProp.h"
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
@@ -55,17 +56,18 @@ namespace cppmicroservices
             FilterAdapter adapter { refMetadata.target };
             if (adapter.IsJSONFilter())
             {
-                std::stringstream exprStr;
-                exprStr << cppmicroservices::Constants::OBJECTCLASS << ".contains(@,'" << refMetadata.interfaceName << "')";
+
+                JSONPropExpr expr;
+                expr = JSONProp(cppmicroservices::Constants::OBJECTCLASS)[refMetadata.interfaceName];
                 if (!refMetadata.target.empty())
                 {
-                    exprStr << " && (" << refMetadata.target << ")";
+                    expr &= JSONPropExpr(refMetadata.target);
                 }
                 if (refMetadata.scope == REFERENCE_SCOPE_PROTOTYPE_REQUIRED)
                 {
-                    exprStr << " && (" << SERVICE_SCOPE << "=='" << SCOPE_PROTOTYPE << "')";
+                    expr &= JSONProp(SERVICE_SCOPE) == SCOPE_PROTOTYPE;
                 }
-                return FilterAdapter(JSONFilter(exprStr.str()));
+                return FilterAdapter(JSONFilter(expr));
             }
             else
             {

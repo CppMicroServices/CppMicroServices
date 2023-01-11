@@ -158,10 +158,10 @@ TEST(JSONExprTest, SimplePropUsage)
         FilterAdapter filter(intProp1 == true);
         ASSERT_FALSE(filter.Match(serviceIdMap));
     }
-    //{
-    //    FilterAdapter filter(intProp1 != true);
-    //    ASSERT_FALSE(filter.Match(serviceIdMap));
-    //}
+    /*{
+        FilterAdapter filter(intProp1 != true);
+        ASSERT_FALSE(filter.Match(serviceIdMap));
+    }*/
     {
         FilterAdapter filter(boolProp1 == true);
         ASSERT_FALSE(filter.Match(serviceIdMap));

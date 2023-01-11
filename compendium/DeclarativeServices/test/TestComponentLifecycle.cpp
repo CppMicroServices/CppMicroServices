@@ -396,6 +396,7 @@ namespace test
 
       ASSERT_TRUE(result) << "Timed out waiting for state to change to ACTIVE "
         "after the dependency became available";
+
       auto sRef2 = ctxt.GetServiceReference<test::Interface2>();
       EXPECT_TRUE(static_cast<bool>(sRef2))
         << "Service must be available after it's dependency is available";

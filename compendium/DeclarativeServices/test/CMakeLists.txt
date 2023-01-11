@@ -183,6 +183,7 @@ set(_test_bundles
   TestBundleDSTOI9
   TestBundleDSTOI10
   TestBundleDSTOI12
+  TestBundleDSTOI1201
   TestBundleDSTOI14
   TestBundleDSTOI15
   TestBundleDSTOI16

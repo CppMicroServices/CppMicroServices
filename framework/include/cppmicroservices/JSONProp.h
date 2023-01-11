@@ -26,11 +26,6 @@
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/FrameworkConfig.h"
 
-#ifdef _MSC_VER
-#    pragma warning(push)
-#    pragma warning(disable : 4251)
-#endif
-
 namespace cppmicroservices
 {
 
@@ -48,7 +43,7 @@ namespace cppmicroservices
         bool IsNull() const;
 
         /**
-         * Convenience operator for json logical or '|'.
+         * Convenience operator for json logical or '||'.
          *
          * Writing either
          * \code
@@ -60,7 +55,7 @@ namespace cppmicroservices
          * JSONPropExpr expr(JSONProp("key1") == "value1");
          * expr |= JSONProp("key2") == "value2";
          * \endcode
-         * leads to the same string "(|(key1=value1) (key2=value2))".
+         * leads to the same string "(key1=='value1') || (key2=='value2')".
          *
          * @param right A json expression object.
          * @return A json expression object.
@@ -71,7 +66,7 @@ namespace cppmicroservices
         /// @}
 
         /**
-         * Convenience operator for json logical and '&'.
+         * Convenience operator for json logical and '&&'.
          *
          * Writing either
          * \code
@@ -83,7 +78,7 @@ namespace cppmicroservices
          * JSONPropExpr expr(JSONProp("key1") == "value1");
          * expr &= JSONProp("key2") == "value2";
          * \endcode
-         * leads to the same string "(&(key1=value1) (key2=value2))".
+         * leads to the same string "(key1=='value1')&&(key2=='value2')".
          *
          * @param right A json expression object.
          * @return A json expression object.
@@ -102,21 +97,20 @@ namespace cppmicroservices
      * \ingroup MicroServicesUtils
      * \ingroup gr_json
      *
-     * A fluent API for creating json filter strings.
+     * A fluent API for creating JSON filter strings.
      *
      * Examples for creating jsonFilter objects:
      * \code
-     * // This creates the filter "(&(name=Ben)(!(count=1)))"
+     *
+     * // This creates the filter "(name=='Ben')&&!(count==`1`)"
      * jsonFilter filter(JSONProp("name") == "Ben" && !(JSONProp("count") == 1));
      *
-     * // This creates the filter "(|(presence=*)(!(absence=*)))"
+     * // This creates the filter "(presence==`true`)||!(absence==`true`)"
      * jsonFilter filter(JSONProp("presence") || !JSONProp("absence"));
      *
-     * // This creates the filter "(&(ge>=-3)(approx~=hi))"
-     * jsonFilter filter(JSONProp("ge") >= -3 && JSONProp("approx").Approx("hi"));
      * \endcode
      *
-     * \sa jsonFilter
+     * \sa LDAPFilter
      */
     class US_Framework_EXPORT JSONProp
     {
@@ -129,15 +123,22 @@ namespace cppmicroservices
         JSONProp(std::string property);
 
         /**
-         * \addtogroup gr_json
-         * json equality '='
-         *
-         * @param s A type convertible to std::string.
-         * @param b A type convertible to bool
-         * @return A json expression object.
+         * \name JSONProp comparison operator ==
          *
          * @{
+         * population expression which compares property for equality
+         * Example:
+         * \code
+         *
+         * // Example for using JSONProp equality operator with numeric values
+         * JSONPropExpr propexpr(JSONProp("property1") == 1)   // "property1==`1`"
+         *
+         * // Example for using JSONProp equality operator with non numeric values
+         * JSONPropExpr propexpr(JSONProp("property1") == "1") // "property1=='1'"
+         *
+         * \endcode
          */
+
         JSONPropExpr operator==(std::string const& s) const;
         JSONPropExpr operator==(cppmicroservices::Any const& s) const;
         JSONPropExpr operator==(bool b) const;
@@ -146,111 +147,99 @@ namespace cppmicroservices
         operator==(T const& s) const
         {
             std::stringstream ss;
+            std::string surroundChar = "\'";
+            if (std::is_arithmetic<T>::value == true)
+            {
+                surroundChar = "`";
+            }
             ss << s;
-            return JSONPropExpr(m_property + "==\'" + ss.str() + "\'");
+            return JSONPropExpr(m_property + "==" + surroundChar + ss.str() + surroundChar);
         }
         /// @}
 
         operator JSONPropExpr() const;
 
         /**
-         * States the absence of the json property.
+         * States the absence of the JSON property.
          *
-         * @return A json expression object.
+         * @return A JSON expression object.
          */
         JSONPropExpr operator!() const;
 
         /**
-         * \addtogroup gr_json
-         * Convenience operator for json inequality.
+         * \name JSONProp inequality operator
          *
-         * Writing either
+         * @{
+         * Convenience operator for JSON inequality.
+         *
          * \code
          * JSONProp("attr") != "val"
          * \endcode
-         * or
-         * \code
-         * !(JSONProp("attr") == "val")
-         * \endcode
-         * leads to the same string "(!(attr=val))".
-         *
+         * leads to string "attr!='val'".
+         */
+
+        /**
          * @param s A type convertible to std::string.
-         * @return A json expression object.
-         *
-         * @{
+         * @return A JSON expression object.
          */
         JSONPropExpr operator!=(std::string const& s) const;
+        /// Overloaded != with cppmicroservices::Any
         JSONPropExpr operator!=(cppmicroservices::Any const& s) const;
+        JSONPropExpr operator!=(bool const& s) const;
+        /// Overloaded !=
         template <class T>
         JSONPropExpr
         operator!=(T const& s) const
         {
             std::stringstream ss;
-            ss << s;
-            return operator!=(ss.str());
+            if constexpr (std::is_arithmetic<T>::value)
+            {
+                ss << s;
+                return JSONPropExpr(m_property + "!=`" + ss.str() + "`");
+            }
+            else
+            {
+                std::stringstream ss;
+                ss << s;
+                return operator!=(ss.str());
+            }
         }
         /// @}
 
         /**
-         * \addtogroup gr_json
-         * json greater or equal '>='
-         *
-         * @param s A type convertible to std::string.
-         * @return A json expression object.
-         *
          * @{
+         *
+         * \name JSONProp comparison operators >= and <=
+         *
+         * Convenience operator to compare arithmetic values.
+         * \warning These operators are only supported for arithmetic and cppmicroservices::Any type values,
+         * passing other type is not supported.
+         *
          */
         JSONPropExpr operator>=(std::string const& s) const;
         JSONPropExpr operator>=(cppmicroservices::Any const& s) const;
+        JSONPropExpr operator>=(bool) const = delete;
         template <class T>
         JSONPropExpr
         operator>=(T const& s) const
         {
+            static_assert(std::is_arithmetic<T>::value == true);
             std::stringstream ss;
             ss << s;
             return operator>=(ss.str());
         }
-        /// @}
 
-        /**
-         * \addtogroup gr_json
-         * json less or equal '<='
-         *
-         * @param s A type convertible to std::string.
-         * @return A json expression object.
-         *
-         * @{
-         */
         JSONPropExpr operator<=(std::string const& s) const;
         JSONPropExpr operator<=(cppmicroservices::Any const& s) const;
+        JSONPropExpr operator<=(bool) const = delete;
         template <class T>
         JSONPropExpr
         operator<=(T const& s) const
         {
+            static_assert(std::is_arithmetic<T>::value == true);
             std::stringstream ss;
             ss << s;
             return operator<=(ss.str());
-        }
-        /// @}
-
-        /**
-         * \addtogroup gr_json
-         * json approximation '~='
-         *
-         * @param s A type convertible to std::string.
-         * @return A json expression object.
-         *
-         * @{
-         */
-        JSONPropExpr Approx(std::string const& s) const;
-        JSONPropExpr Approx(cppmicroservices::Any const& s) const;
-        template <class T>
-        JSONPropExpr
-        Approx(T const& s) const
-        {
-            std::stringstream ss;
-            ss << s;
-            return Approx(ss.str());
         }
         /// @}
 

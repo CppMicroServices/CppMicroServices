@@ -84,15 +84,15 @@ namespace cppmicroservices
     JSONPropExpr
     JSONProp::operator==(bool b) const
     {
-        return (b == true ? JSONPropExpr(m_property + " == `true`") : JSONPropExpr(m_property + " == `false`"));
+        return (b == true ? JSONPropExpr(m_property + "==`true`") : JSONPropExpr(m_property + "==`false`"));
     }
 
-    JSONProp::operator JSONPropExpr() const { return operator==(true); }
+    JSONProp::operator JSONPropExpr() const { return JSONPropExpr("contains(keys(@), \'" + m_property + "\')"); }
 
     JSONPropExpr
     JSONProp::operator!() const
     {
-        return JSONPropExpr("!" + m_property);
+        return JSONPropExpr("!" + (std::string)JSONPropExpr(this->operator cppmicroservices::JSONPropExpr()));
     }
 
     JSONPropExpr
@@ -110,9 +110,15 @@ namespace cppmicroservices
     }
 
     JSONPropExpr
+    JSONProp::operator!=(bool const& s) const
+    {
+        return JSONPropExpr(m_property + "!=`" + ((s == true) ? "true" : "false") + "`");
+    }
+
+    JSONPropExpr
     JSONProp::operator>=(std::string const& s) const
     {
-        throw std::logic_error("Do we need to implement this for strings ?");
+        return JSONPropExpr(m_property + ">=`" + s + "`");
     }
 
     JSONPropExpr
@@ -124,25 +130,13 @@ namespace cppmicroservices
     JSONPropExpr
     JSONProp::operator<=(std::string const& s) const
     {
-        throw std::logic_error("Do we need to implement this for strings ?");
+        return JSONPropExpr(m_property + "<=`" + s + "`");
     }
 
     JSONPropExpr
     JSONProp::operator<=(cppmicroservices::Any const& any) const
     {
         return operator<=(any.ToJSON());
-    }
-
-    JSONPropExpr
-    JSONProp::Approx(std::string const& s) const
-    {
-        throw std::logic_error("Unsupported operator");
-    }
-
-    JSONPropExpr
-    JSONProp::Approx(cppmicroservices::Any const& any) const
-    {
-        return Approx(any.ToJSON());
     }
 
 } // namespace cppmicroservices
@@ -154,7 +148,7 @@ operator&&(cppmicroservices::JSONPropExpr const& left, cppmicroservices::JSONPro
         return right;
     if (right.IsNull())
         return left;
-    return cppmicroservices::JSONPropExpr("(" + static_cast<std::string>(left) + ") && ("
+    return cppmicroservices::JSONPropExpr("(" + static_cast<std::string>(left) + ")&&("
                                           + static_cast<std::string>(right) + ")");
 }
 
@@ -165,6 +159,6 @@ operator||(cppmicroservices::JSONPropExpr const& left, cppmicroservices::JSONPro
         return right;
     if (right.IsNull())
         return left;
-    return cppmicroservices::JSONPropExpr("(" + static_cast<std::string>(left) + ") || ("
+    return cppmicroservices::JSONPropExpr("(" + static_cast<std::string>(left) + ")||("
                                           + static_cast<std::string>(right) + ")");
 }

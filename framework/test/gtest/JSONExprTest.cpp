@@ -34,62 +34,6 @@ limitations under the License.
 
 using namespace cppmicroservices;
 
-/*TEST(JSONExprTest, GetMatchedObjectClasses)
-{
-  // Improve coverage for LDAPExpr::GetMatchedObjectClasses()
-  struct MyInterfaceOne
-  {
-    virtual ~MyInterfaceOne() {}
-  };
-  struct MyServiceOne : public MyInterfaceOne
-  {};
-
-  auto f = FrameworkFactory().NewFramework();
-  f.Init();
-  BundleContext context{ f.GetBundleContext() };
-
-  auto serviceOne = std::make_shared<MyServiceOne>();
-  context.RegisterService<MyInterfaceOne>(serviceOne);
-
-  JSONFilter filter("(&(objectclass=alpha)(objectclass=beta))");
-  ServiceTracker<MyInterfaceOne> tracker(context, filter, nullptr);
-  tracker.Open();
-
-  JSONFilter filter1("(&(objectclass=beta)(objectclass=alpha))");
-  ServiceTracker<MyInterfaceOne> tracker1(context, filter1, nullptr);
-  tracker1.Open();
-
-  JSONFilter filter2("(|(objectclass=alpha)(objectclass=beta))");
-  ServiceTracker<MyInterfaceOne> tracker2(context, filter2, nullptr);
-  tracker2.Open();
-
-  JSONFilter filter3("(&(objectclass=alpha)(objectclass=alpha))");
-  ServiceTracker<MyInterfaceOne> tracker3(context, filter3, nullptr);
-  tracker3.Open();
-
-  JSONFilter filter4("(|(object=alpha)(object=beta))");
-  ServiceTracker<MyInterfaceOne> tracker4(context, filter4, nullptr);
-  tracker4.Open();
-
-  ASSERT_TRUE(tracker.GetServiceReferences().size() == 0);
-}
-
-TEST(JSONExprTest, IsSimple)
-{
-  // Expanding coverage for LDAPExpr::IsSimple by testing the OR filter.
-  auto f = FrameworkFactory().NewFramework();
-  f.Init();
-  BundleContext fCtx{ f.GetBundleContext() };
-
-  auto lambda = [](const ServiceEvent&) { std::cout << "ServiceEvent!"; };
-
-  const std::string jsonFilter = "(|(objectClass=foo)(objectClass=bar))";
-  ASSERT_TRUE(fCtx.AddServiceListener(lambda, jsonFilter));
-  const std::string jsonFilter2 =
-    "(|(&(objectClass=foo)(objectClass=bar))(objectClass=baz))";
-  ASSERT_TRUE(fCtx.AddServiceListener(lambda, jsonFilter2));
-}
-*/
 TEST(JSONExprTest, Evaluate)
 {
     // Testing previously uncovered lines in LDAPExpr::Evaluate()
@@ -108,12 +52,13 @@ TEST(JSONExprTest, Evaluate)
 TEST(JSONExprTest, Compare)
 {
     // Testing wildcard
-    // TODO: chheck if '*' wildcard is required
-    // what is use of it in case of ldap filters ?
-    JSONFilter jsonMatch("\"hosed\"=='*'");
+    JSONFilter jsonMatch("contains(keys(@), 'hosed')");
+    JSONProp p1("hosed");
+    JSONFilter jsonM((JSONPropExpr)p1);
     AnyMap props(AnyMap::UNORDERED_MAP);
     props["hosed"] = 5;
-    // ASSERT_TRUE(jsonMatch.Match(props));
+    ASSERT_TRUE(jsonMatch.Match(props));
+    ASSERT_TRUE(jsonM.Match(props));
 
     // Testing empty
     jsonMatch = JSONFilter("\"hosed\"=='1'");
@@ -171,36 +116,68 @@ TEST(JSONExprTest, Compare)
     props["hosed"] = static_cast<float>(1.0);
     ASSERT_TRUE(jsonMatch.Match(props));
 
-    // Test floating point overflow
-    // TODO: How to deal with 1.18973e+4932zzz
-    /*jsonMatch = JSONFilter("(hosed=1.18973e+4932zzz)");
-    ASSERT_FALSE(jsonMatch.Match(props));
-    jsonMatch = JSONFilter("(hosed>=0.1)");
-    ASSERT_TRUE(jsonMatch.Match(props));
-    jsonMatch = JSONFilter("(hosed<=2.0)");
-    ASSERT_TRUE(jsonMatch.Match(props));*/
-
     props.clear();
     props["hosed"] = static_cast<double>(1.0);
     jsonMatch = JSONFilter("\"hosed\"==`1`");
     ASSERT_TRUE(jsonMatch.Match(props));
-    // Test floating point overflow
-    // TODO: How to deal with 1.18973e+4932zzz
-    /*jsonMatch = JSONFilter("(hosed=1.18973e+4932zzz)");
-    ASSERT_FALSE(jsonMatch.Match(props));
-    jsonMatch = JSONFilter("\"hosed\">=`0.1`)");
-    ASSERT_TRUE(jsonMatch.Match(props));
-    jsonMatch = JSONFilter("\"hosed\"<=`2.0`");
-    ASSERT_TRUE(jsonMatch.Match(props));*/
 }
 
 TEST(JSONExprTest, SimplePropUsage)
 {
     AnyMap serviceIdMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
     serviceIdMap["property1"] = std::string("abcd");
+    serviceIdMap["intProperty1"] = 1;
+    serviceIdMap["boolProperty1"] = false;
+
     JSONProp prop1("property1");
     JSONProp prop2("property2");
+    JSONProp intProp1("intProperty1");
+    JSONProp boolProp1("boolProperty1");
 
+    {
+        FilterAdapter filter(intProp1 == 1);
+        ASSERT_TRUE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter(intProp1 == "1");
+        ASSERT_FALSE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter(intProp1 >= 1);
+        ASSERT_TRUE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter(intProp1 >= 5);
+        ASSERT_FALSE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter(intProp1 == false);
+        ASSERT_FALSE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter(intProp1 == true);
+        ASSERT_FALSE(filter.Match(serviceIdMap));
+    }
+    //{
+    //    FilterAdapter filter(intProp1 != true);
+    //    ASSERT_FALSE(filter.Match(serviceIdMap));
+    //}
+    {
+        FilterAdapter filter(boolProp1 == true);
+        ASSERT_FALSE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter(boolProp1 == false);
+        ASSERT_TRUE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter(boolProp1 != 1);
+        ASSERT_TRUE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter(boolProp1 != false);
+        ASSERT_FALSE(filter.Match(serviceIdMap));
+    }
     {
         JSONFilter filter(prop1 == "abcd");
         bool rval = filter.Match(serviceIdMap);
@@ -210,7 +187,7 @@ TEST(JSONExprTest, SimplePropUsage)
         serviceIdMap["property2"] = false;
         JSONFilter boolFilter(!prop2);
         bool rval = boolFilter.Match(serviceIdMap);
-        ASSERT_TRUE(rval);
+        ASSERT_FALSE(rval);
     }
     {
         serviceIdMap["property2"] = true;
@@ -245,7 +222,70 @@ TEST(JSONExprTest, ComplexPropUsage)
     JSONProp prop2("property2");
     JSONProp prop3("property3");
     JSONProp prop4("property4");
+    JSONProp prop5("property5");
 
-    JSONFilter filter((prop1 == "abcde" || !prop3) && (prop2 == "efgg" || prop4));
-    ASSERT_TRUE(filter.Match(serviceIdMap));
+    {
+        FilterAdapter filter((prop1 == "abcd" && prop5));
+        ASSERT_FALSE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter((prop1 == "abcd" && !prop5));
+        ASSERT_TRUE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter((prop1 == "abcd" || !prop3) && (prop2 == "efg" || prop4));
+        ASSERT_TRUE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter((prop1 == "abcd" || prop3) && (prop2 == "efg" || !prop4));
+        ASSERT_TRUE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter((prop1 == "abcde" || prop3) && (prop2 == "efg" || !prop4));
+        ASSERT_TRUE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter((prop1 == "abcd" || !prop3) && (prop2 == "efgg" || !prop4));
+        ASSERT_FALSE(filter.Match(serviceIdMap));
+    }
+    {
+        FilterAdapter filter((prop1 == "abcd" || !prop3) && (prop2 == "efgg" || !prop5));
+        ASSERT_TRUE(filter.Match(serviceIdMap));
+    }
+}
+
+TEST(JSONExprTest, BitWiseOperatorAnd)
+{
+    JSONPropExpr checkedExpr((JSONProp("key1") == "value1") && (JSONProp("key2") == "value2"));
+    JSONPropExpr expr(JSONProp("key1") == "value1");
+    expr &= JSONProp("key2") == "value2";
+    ASSERT_EQ(expr.operator std::string(), checkedExpr.operator std::string());
+}
+TEST(JSONExprTest, BitWiseOperatorOr)
+{
+    JSONPropExpr checkedExpr((JSONProp("key1") == "value1") || (JSONProp("key2") == "value2"));
+    JSONPropExpr expr(JSONProp("key1") == "value1");
+    expr |= JSONProp("key2") == "value2";
+    ASSERT_EQ(expr.operator std::string(), checkedExpr.operator std::string());
+}
+
+TEST(JSONExprTest, JSONPropExprWithFramedExpr)
+{
+    FilterAdapter filter(JSONProp("bla") == "jo" && !(JSONProp("ha") == 1)
+                         && (JSONProp("presence") || !JSONProp("absence")) && JSONProp("le") <= 4.1
+                         && JSONProp("ge") >= -3);
+    const std::string filterStr = "((((bla=='jo')&&(!ha==`1`))&&((contains(keys(@), 'presence'))||(!contains(keys(@), "
+                                  "'absence'))))&&(le<=`4.1`))&&(ge>=`-3`)";
+    ASSERT_EQ(filter.ToString(), filterStr);
+    std::string emptyValue;
+    std::string someValue = "some";
+    std::string filter1 = JSONProp("key2") == someValue && JSONProp("key3");
+    std::string filter2 = JSONProp("key2") == someValue && (JSONProp("key1") == emptyValue || JSONProp("key3"));
+    ASSERT_EQ(filter1, filter2);
+
+    FilterAdapter boolFilter(JSONProp("t") == true || JSONProp("f") == false);
+    ASSERT_EQ(boolFilter.ToString(), "(t==`true`)||(f==`false`)");
+
+    FilterAdapter numericVsStringEqOp(JSONProp("numProp1") == 1 && JSONProp("strProp2") == "1");
+    ASSERT_EQ(numericVsStringEqOp.ToString(), "(numProp1==`1`)&&(strProp2=='1')");
 }

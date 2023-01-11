@@ -88,6 +88,7 @@ public:
     test::InstallLib(context, "TestBundleDSTOI9");
     test::InstallLib(context, "TestBundleDSTOI10");
     test::InstallLib(context, "TestBundleDSTOI12");
+    test::InstallLib(context, "TestBundleDSTOI1201");
     test::InstallLib(context, "TestBundleDSTOI14");
     test::InstallLib(context, "TestBundleDSTOI15");
     test::InstallLib(context, "TestBundleDSTOI16");
@@ -136,7 +137,8 @@ public:
     framework.WaitForStop(std::chrono::milliseconds::zero());
   }
 
-  cppmicroservices::Bundle GetTestBundle(const std::string& symbolicName)
+  cppmicroservices::Bundle
+  GetTestBundle(std::string const& symbolicName)
   {
     auto bundles = context.GetBundles();
 
@@ -149,7 +151,8 @@ public:
     return cppmicroservices::Bundle();
   }
 
-  cppmicroservices::Bundle StartTestBundle(const std::string& symName)
+  cppmicroservices::Bundle
+  StartTestBundle(std::string const& symName)
   {
     cppmicroservices::Bundle testBundle = GetTestBundle(symName);
     EXPECT_EQ(static_cast<bool>(testBundle), true);
@@ -180,25 +183,24 @@ public:
       if (instanceRefs.empty()) {
         return std::vector<std::shared_ptr<T>>();
       }
-      for (const auto& ref : instanceRefs) {
+      for (auto const& ref : instanceRefs)
+      {
         instances.push_back(context.GetService<T>(ref));
       }
       return instances;
     }
 
-  std::vector<scr::dto::ComponentConfigurationDTO> GetComponentConfigs(
-    const cppmicroservices::Bundle& testBundle,
-    const std::string& componentName,
-    scr::dto::ComponentDescriptionDTO& compDescDTO)
-  {
-    compDescDTO =
-      dsRuntimeService->GetComponentDescriptionDTO(testBundle, componentName);
-    EXPECT_EQ(compDescDTO.implementationClass, componentName)
-      << "Implementation class in the returned component description must be "
-      << componentName;
+    std::vector<scr::dto::ComponentConfigurationDTO>
+    GetComponentConfigs(cppmicroservices::Bundle const& testBundle,
+                        std::string const& componentName,
+                        scr::dto::ComponentDescriptionDTO& compDescDTO)
+    {
+      compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, componentName);
+      EXPECT_EQ(compDescDTO.implementationClass, componentName)
+          << "Implementation class in the returned component description must be " << componentName;
 
-    return dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
-  }
+      return dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+    }
 
   std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
   //std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin>  configAdminService;
@@ -240,7 +242,8 @@ public:
     framework.WaitForStop(std::chrono::milliseconds::zero());
   }
 
-  cppmicroservices::Bundle GetTestBundle(const std::string& symbolicName)
+  cppmicroservices::Bundle
+  GetTestBundle(std::string const& symbolicName)
   {
     auto bundles = context.GetBundles();
 
@@ -253,7 +256,8 @@ public:
     return cppmicroservices::Bundle();
   }
 
-  cppmicroservices::Bundle StartTestBundle(const std::string& symName)
+  cppmicroservices::Bundle
+  StartTestBundle(std::string const& symName)
   {
     cppmicroservices::Bundle testBundle = GetTestBundle(symName);
     EXPECT_EQ(static_cast<bool>(testBundle), true);
@@ -275,10 +279,10 @@ public:
     return context.GetService<T>(instanceRef);
   }
 
-  std::vector<scr::dto::ComponentConfigurationDTO> GetComponentConfigs(
-    const cppmicroservices::Bundle& testBundle,
-    const std::string& componentName,
-    scr::dto::ComponentDescriptionDTO& compDescDTO)
+  std::vector<scr::dto::ComponentConfigurationDTO>
+  GetComponentConfigs(cppmicroservices::Bundle const& testBundle,
+                      std::string const& componentName,
+                      scr::dto::ComponentDescriptionDTO& compDescDTO)
   {
     compDescDTO =
       dsRuntimeService->GetComponentDescriptionDTO(testBundle, componentName);

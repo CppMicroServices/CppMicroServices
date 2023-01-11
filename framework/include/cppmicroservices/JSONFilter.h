@@ -36,7 +36,7 @@ class ServiceReferenceBase;
 class Bundle;
 
 /**
-\defgroup gr_ldap JSON Filter
+\defgroup gr_json JSON Filter
 
 \brief Groups JSONFilter class related symbols.
 */
@@ -82,9 +82,9 @@ public:
    *         filter string that cannot be parsed.
    * @see "Framework specification for a description of the filter string syntax." TODO!
    */
-  JSONFilter(const std::string& filter);
+  JSONFilter(std::string const& filter);
 
-  JSONFilter(const JSONFilter& other);
+  JSONFilter(JSONFilter const& other);
 
   ~JSONFilter();
 
@@ -102,7 +102,7 @@ public:
    * @return <code>true</code> if the service's properties match this
    *         <code>JSONFilter</code> <code>false</code> otherwise.
    */
-  bool Match(const ServiceReferenceBase& reference) const;
+  bool Match(ServiceReferenceBase const& reference) const;
 
   /**
    * Filter using a bundle's manifest headers.
@@ -118,9 +118,8 @@ public:
    * @throws std::runtime_error If the number of keys of the bundle's manifest
    *         headers exceeds the value returned by std::numeric_limits<int>::max().
    */
-  bool Match(const Bundle& bundle) const;
+  bool Match(Bundle const& bundle) const;
 
-  
   /** Filter using a <code>AnyMap</code> object with case sensitive key lookup. This
    * <code>JSONFilter</code> is executed using the specified <code>AnyMap</code>'s keys
    * and values. The keys are looked up in a case sensitive manner.
@@ -134,7 +133,7 @@ public:
    * @throws std::runtime_error If the <code>dictionary</code> contains case variants
    *         of the same key name.
    */
-  bool Match(const AnyMap& dictionary) const;
+  bool Match(AnyMap const& dictionary) const;
 
   /**
    * Returns this <code>JSONFilter</code>'s filter string.
@@ -157,11 +156,11 @@ public:
    * @return Returns the result of calling
    *         <code>this->ToString() == other.ToString()</code>.
    */
-  bool operator==(const JSONFilter& other) const;
+  bool operator==(JSONFilter const& other) const;
 
-  JSONFilter& operator=(const JSONFilter& filter);
+  JSONFilter& operator=(JSONFilter const& filter);
 
- protected:
+protected:
   std::string filter_str;
 };
 
@@ -172,8 +171,7 @@ public:
  * Streams the string representation of \c filter into the stream \c os
  * via JSONFilter::ToString().
  */
-US_Framework_EXPORT std::ostream& operator<<(std::ostream& os,
-                                             const JSONFilter& filter);
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, JSONFilter const& filter);
 }
 
 #ifdef _MSC_VER

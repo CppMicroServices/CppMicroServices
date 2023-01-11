@@ -1,6 +1,8 @@
 /* TODO: Copyright */
 
 #include "cppmicroservices/FilterAdapter.h"
+#include "cppmicroservices/LDAPFilter.h"
+#include "cppmicroservices/LDAPProp.h"
 
 namespace cppmicroservices
 {
@@ -280,7 +282,15 @@ namespace cppmicroservices
     {
         /* parse f and figure out what kind of filter it represents, and then create a correct filter
            object and assign it into filter */
-        return (!filter_string.empty() && ('(' == filter_string.at(0)));
+        try
+        {
+            cppmicroservices::LDAPFilter filter(filter_string);
+        }
+        catch (std::invalid_argument e)
+        {
+            return false;
+        }
+        return true;
     }
 
 } // namespace cppmicroservices

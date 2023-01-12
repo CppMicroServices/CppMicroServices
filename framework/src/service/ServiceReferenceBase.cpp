@@ -148,39 +148,49 @@ namespace cppmicroservices
             return false;
         }
 
-        // scoped for locks
+        /// A deadlock caused by mutex order locking will happen if these two scoped blocks
+        /// are combined into one. Multiple threads can enter this function as a result of
+        /// adding/removing ServiceReferenceBase objects from STL containers. If that occurs
+        /// AND these two scoped blocks are combined into one such that both "Lock()" calls
+        /// happen in the same scoped block, sporadic deadlocks will occur.
+        Any anyR1;
+        Any anyId1;
         {
             auto l1 = d.load()->registration->properties.Lock();
             US_UNUSED(l1);
-            Any const& anyR1 = d.load()->registration->properties.ValueByRef_unlocked(Constants::SERVICE_RANKING);
+            anyR1 = d.load()->registration->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             assert(anyR1.Empty() || anyR1.Type() == typeid(int));
-            Any const& anyId1 = d.load()->registration->properties.ValueByRef_unlocked(Constants::SERVICE_ID);
+            anyId1 = d.load()->registration->properties.Value_unlocked(Constants::SERVICE_ID).first;
             assert(anyId1.Empty() || anyId1.Type() == typeid(long int));
+        }
 
+        Any anyR2;
+        Any anyId2;
+        {
             auto l2 = reference.d.load()->registration->properties.Lock();
             US_UNUSED(l2);
-            Any const& anyR2
-                = reference.d.load()->registration->properties.ValueByRef_unlocked(Constants::SERVICE_RANKING);
+            anyR2 = reference.d.load()->registration->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             assert(anyR2.Empty() || anyR2.Type() == typeid(int));
-            Any const& anyId2 = reference.d.load()->registration->properties.ValueByRef_unlocked(Constants::SERVICE_ID);
+            anyId2 = reference.d.load()->registration->properties.Value_unlocked(Constants::SERVICE_ID).first;
             assert(anyId2.Empty() || anyId2.Type() == typeid(long int));
-            int const r1 = anyR1.Empty() ? 0 : *any_cast<int>(&anyR1);
-            int const r2 = anyR2.Empty() ? 0 : *any_cast<int>(&anyR2);
+        }
 
-            if (r1 != r2)
-            {
-                // use ranking if ranking differs
-                return r1 < r2;
-            }
-            else
-            {
-                long int const id1 = *any_cast<long int>(&anyId1);
-                long int const id2 = *any_cast<long int>(&anyId2);
+        int const r1 = anyR1.Empty() ? 0 : *any_cast<int>(&anyR1);
+        int const r2 = anyR2.Empty() ? 0 : *any_cast<int>(&anyR2);
 
-                // otherwise compare using IDs,
-                // is less than if it has a higher ID.
-                return id2 < id1;
-            }
+        if (r1 != r2)
+        {
+            // use ranking if ranking differs
+            return r1 < r2;
+        }
+        else
+        {
+            long int const id1 = *any_cast<long int>(&anyId1);
+            long int const id2 = *any_cast<long int>(&anyId2);
+
+            // otherwise compare using IDs,
+            // is less than if it has a higher ID.
+            return id2 < id1;
         }
     }
 

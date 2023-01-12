@@ -249,6 +249,8 @@ namespace cppmicroservices
         ident[1] = CPU_TYPE_X86;
 #    elif defined(__arm__) || defined(_M_ARM)
         ident[1] = CPU_TYPE_ARM;
+#    elif defined(__arm64__)
+        ident[1] = CPU_TYPE_ARM64;
 #    endif
 
         return ident;

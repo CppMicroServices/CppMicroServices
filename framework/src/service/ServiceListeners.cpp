@@ -478,7 +478,7 @@ namespace cppmicroservices
             }
 
             // Check the cache
-            auto const c = any_cast<std::vector<std::string>>(props->Value_unlocked(Constants::OBJECTCLASS).first);
+            auto const& c = ref_any_cast<std::vector<std::string>>(props->ValueByRef_unlocked(Constants::OBJECTCLASS));
             for (auto& objClass : c)
             {
                 AddToSet_unlocked(set, receivers, OBJECTCLASS_IX, objClass);

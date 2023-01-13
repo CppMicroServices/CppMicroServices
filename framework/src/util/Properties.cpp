@@ -103,6 +103,84 @@ namespace cppmicroservices
         return *this;
     }
 
+    Any const&
+    Properties::ValueByRef_unlocked(std::string const& key, bool matchCase) const
+    {
+        if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+        {
+            auto itr = props.findUOCI_TypeChecked(key);
+            if (itr != props.endUOCI_TypeChecked())
+            {
+                if (!matchCase)
+                {
+                    return itr->second;
+                }
+                else if (matchCase && itr->first == key)
+                {
+                    return itr->second;
+                }
+                else
+                {
+                    return emptyAny;
+                }
+            }
+            else
+            {
+                return emptyAny;
+            }
+        }
+        else if (props.GetType() == AnyMap::UNORDERED_MAP)
+        {
+            auto itr = props.findUO_TypeChecked(key);
+            if (itr != props.endUO_TypeChecked())
+            {
+                return itr->second;
+            }
+
+            if (!matchCase)
+            {
+                auto ciItr = caseInsensitiveLookup.find(key);
+                if (ciItr != caseInsensitiveLookup.end())
+                {
+                    return props.findUO_TypeChecked(ciItr->second.data())->second;
+                }
+                else
+                {
+                    return emptyAny;
+                }
+            }
+
+            return emptyAny;
+        }
+        else if (props.GetType() == AnyMap::ORDERED_MAP)
+        {
+            auto itr = props.findOM_TypeChecked(key);
+            if (itr != props.endOM_TypeChecked())
+            {
+                return itr->second;
+            }
+
+            if (!matchCase)
+            {
+                auto ciItr = caseInsensitiveLookup.find(key);
+                if (ciItr != caseInsensitiveLookup.end())
+                {
+                    return props.findOM_TypeChecked(ciItr->second.data())->second;
+                }
+                else
+                {
+                    return emptyAny;
+                }
+            }
+
+            return emptyAny;
+        }
+        else
+        {
+            throw std::runtime_error("Unknown AnyMap type.");
+        }
+    }
+
     // This function has been modified to perform both the "find" and "lookup" operations rather than
     // just the "lookup" as originally written.
     //

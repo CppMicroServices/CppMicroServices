@@ -129,7 +129,9 @@ namespace cppmicroservices
     ServiceReferenceBase::operator<(ServiceReferenceBase const& reference) const
     {
         if (d.load() == reference.d.load())
+        {
             return false;
+        }
 
         if (!(*this))
         {
@@ -146,26 +148,31 @@ namespace cppmicroservices
             return false;
         }
 
+        /// A deadlock caused by mutex order locking will happen if these two scoped blocks
+        /// are combined into one. Multiple threads can enter this function as a result of
+        /// adding/removing ServiceReferenceBase objects from STL containers. If that occurs
+        /// AND these two scoped blocks are combined into one such that both "Lock()" calls
+        /// happen in the same scoped block, sporadic deadlocks will occur.
         Any anyR1;
         Any anyId1;
         {
-            auto l = d.load()->registration->properties.Lock();
-            US_UNUSED(l);
+            auto l1 = d.load()->registration->properties.Lock();
+            US_UNUSED(l1);
             anyR1 = d.load()->registration->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             assert(anyR1.Empty() || anyR1.Type() == typeid(int));
             anyId1 = d.load()->registration->properties.Value_unlocked(Constants::SERVICE_ID).first;
-            assert(anyId1.Type() == typeid(long int));
+            assert(anyId1.Empty() || anyId1.Type() == typeid(long int));
         }
 
         Any anyR2;
         Any anyId2;
         {
-            auto l = reference.d.load()->registration->properties.Lock();
-            US_UNUSED(l);
+            auto l2 = reference.d.load()->registration->properties.Lock();
+            US_UNUSED(l2);
             anyR2 = reference.d.load()->registration->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             assert(anyR2.Empty() || anyR2.Type() == typeid(int));
             anyId2 = reference.d.load()->registration->properties.Value_unlocked(Constants::SERVICE_ID).first;
-            assert(anyId2.Type() == typeid(long int));
+            assert(anyId2.Empty() || anyId2.Type() == typeid(long int));
         }
 
         int const r1 = anyR1.Empty() ? 0 : *any_cast<int>(&anyR1);

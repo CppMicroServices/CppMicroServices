@@ -263,11 +263,9 @@ namespace cppmicroservices
 
         for (; s != send; ++s)
         {
-            ServiceReferenceBase sri = s->GetReference(clazz);
-
             if (filter.empty() || ldap.Evaluate(PropertiesHandle(s->d->properties, true), false))
             {
-                res.push_back(sri);
+                res.emplace_back(s->GetReference(clazz));
             }
         }
 

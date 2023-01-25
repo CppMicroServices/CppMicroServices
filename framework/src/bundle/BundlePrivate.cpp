@@ -507,6 +507,10 @@ std::exception_ptr BundlePrivate::Start0()
       res = std::make_exception_ptr(cppmicroservices::SharedLibraryException(
         ex.code(), ex.what(), thisBundle));
     } catch (...) {
+      coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
+                           "Failed to start Bundle #" + util::ToString(id) +
+                             " (location=" + location + ")",
+                           std::current_exception());
       res = std::make_exception_ptr(std::runtime_error(
         "Bundle #" + util::ToString(id) + " (location= " + location +
         ") start failed: " + util::GetLastExceptionStr()));

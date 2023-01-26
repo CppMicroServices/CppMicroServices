@@ -611,7 +611,7 @@ namespace cppmicroservices
 
             auto registeredServiceRefs = bc.GetServiceReferences<dummy::Reference1>();
             auto registeredServiceCount = registeredServiceRefs.size();
-            // statuc-reluctant, mandatory-unary - depends on which thread's service was bound
+            // static-reluctant, mandatory-unary - depends on which thread's service was bound
             // static-reluctant, optional-unary - none of the services are bound
             if (refManager.IsOptional() && fakeMetadata.policyOption == ReferencePolicyOption_Reluctant
                 && !(ReferencePolicy_Dynamic == fakeMetadata.policy))
@@ -631,7 +631,6 @@ namespace cppmicroservices
             if (refManager.IsOptional())
             {
                 EXPECT_TRUE(refManager.IsSatisfied()) << "Ref should only be satisfied if it is optional";
-                ;
             }
             EXPECT_EQ(refManager.GetTargetReferences().size(), registeredServiceCount)
                 << "TargetReferences must be the same as any available services in the "

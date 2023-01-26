@@ -137,9 +137,6 @@ namespace cppmicroservices
     }
 
     template <typename ValueType>
-    ValueType* any_cast(Any* operand);
-
-    template <typename ValueType>
     ValueType& ref_any_cast(Any& operand);
 
     template <typename ValueType>

@@ -62,3 +62,5 @@ add_subdirectory(largeBundle)
 
 add_subdirectory(libStartBundleA)
 add_subdirectory(libStopBundleA)
+
+add_subdirectory(libTestModuleWithEmbeddedZip)

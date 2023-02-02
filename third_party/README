@@ -38,10 +38,14 @@ Patches
 miniz
 -----
 
-Public Domain
+MIT License (GitHub) or Public Domain
 
-https://code.google.com/p/miniz/
-v1.15 r4
+https://github.com/richgel999/miniz
+(formerly https://code.google.com/p/miniz/)
+v3.0.2
+
+Note: miniz.c and miniz.h created by downloading the source code
+      and running amalgamate.sh.
 
 Patches
 

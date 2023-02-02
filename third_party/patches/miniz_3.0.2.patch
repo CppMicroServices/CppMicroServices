@@ -1,17 +1,17 @@
---- miniz_76b3a87/miniz.h	2022-06-19 23:44:50.000000000 -0400
-+++ third_party/miniz.h	    2022-06-19 23:46:51.000000000 -0400
-@@ -1127,8 +1127,9 @@
+--- miniz_3.0.2/miniz.h
++++ third_party/miniz.h
+@@ -1127,7 +1127,8 @@
  typedef struct
  {
      mz_uint64 m_archive_size;
 +    mz_uint64 m_archive_file_ofs;
      mz_uint64 m_central_directory_file_ofs;
- 
-     /* We only support up to UINT32_MAX files in zip64 mode. */
 
---- miniz_76b3a87/miniz.c	2022-06-19 23:44:50.000000000 -0400
-+++ third_party/miniz.c	    2022-06-20 00:06:13.000000000 -0400
-@@ -3598,6 +3598,7 @@
+     /* We only support up to UINT32_MAX files in zip64 mode. */
+     mz_uint32 m_total_files;
+--- miniz_3.0.2/miniz.c
++++ third_party/miniz.c
+@@ -3602,6 +3602,7 @@
      mz_int64 cur_file_ofs;
      mz_uint32 buf_u32[4096 / sizeof(mz_uint32)];
      mz_uint8 *pBuf = (mz_uint8 *)buf_u32;
@@ -19,7 +19,7 @@
  
      /* Basic sanity checks - reject files which are too small */
      if (pZip->m_archive_size < record_size)
-@@ -3614,25 +3615,28 @@
+@@ -3618,25 +3619,28 @@
  
          for (i = n - 4; i >= 0; --i)
          {
@@ -57,7 +57,7 @@
      }
  
      *pOfs = cur_file_ofs;
-@@ -3697,7 +3701,7 @@
+@@ -3701,7 +3705,7 @@
      num_this_disk = MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_NUM_THIS_DISK_OFS);
      cdir_disk_index = MZ_READ_LE16(pBuf + MZ_ZIP_ECDH_NUM_DISK_CDIR_OFS);
      cdir_size = MZ_READ_LE32(pBuf + MZ_ZIP_ECDH_CDIR_SIZE_OFS);
@@ -66,7 +66,7 @@
  
      if (pZip->m_pState->m_zip64)
      {
-@@ -3751,6 +3755,10 @@
+@@ -3755,6 +3759,10 @@
  
      pZip->m_central_directory_file_ofs = cdir_ofs;
  
@@ -77,7 +77,7 @@
      if (pZip->m_total_files)
      {
          mz_uint i, n;
-@@ -4044,13 +4052,12 @@
+@@ -4048,13 +4056,12 @@
      file_size = archive_size;
      if (!file_size)
      {
@@ -94,7 +94,7 @@
      }
  
      /* TODO: Better sanity check archive_size and the # of actual remaining bytes */
-@@ -4514,7 +4521,7 @@
+@@ -4518,7 +4525,7 @@
          return mz_zip_set_error(pZip, MZ_ZIP_BUF_TOO_SMALL);
  
      /* Read and parse the local directory entry. */
@@ -103,7 +103,7 @@
      if (pZip->m_pRead(pZip->m_pIO_opaque, cur_file_ofs, pLocal_header, MZ_ZIP_LOCAL_DIR_HEADER_SIZE) != MZ_ZIP_LOCAL_DIR_HEADER_SIZE)
          return mz_zip_set_error(pZip, MZ_ZIP_FILE_READ_FAILED);
  
-@@ -7036,7 +7043,7 @@
+@@ -7040,7 +7047,7 @@
      if (!mz_zip_file_stat_internal(pSource_zip, src_file_index, pSrc_central_header, &src_file_stat, NULL))
          return MZ_FALSE;
  

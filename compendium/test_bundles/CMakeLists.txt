@@ -59,3 +59,5 @@ add_subdirectory(EnglishDictionary)
 
 add_subdirectory(ManagedServiceAndFactoryBundle)
 add_subdirectory(TestBundleManagedServiceFactory)
+add_subdirectory(TestBundleMultipleManagedService)
+add_subdirectory(TestBundleMultipleManagedServiceFactory)

@@ -34,13 +34,13 @@ ListenerToken::ListenerToken(ListenerTokenId _tokenId)
   : tokenId(_tokenId)
 {}
 
-ListenerToken::ListenerToken(ListenerToken&& other)
+ListenerToken::ListenerToken(ListenerToken&& other) noexcept
   : tokenId(std::move(other.tokenId))
 {
   other.tokenId = ListenerTokenId(0);
 }
 
-ListenerToken& ListenerToken::operator=(ListenerToken&& other)
+ListenerToken& ListenerToken::operator=(ListenerToken&& other) noexcept
 {
   tokenId = std::move(other.tokenId);
   other.tokenId = ListenerTokenId(0);

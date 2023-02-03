@@ -1,13 +1,11 @@
-diff --git a/Users/alexchristoforides/Desktop/os-inl.h b/third_party/spdlog/include/spdlog/details/os-inl.h
-index 87c8c5a0..759021ac 100644
---- a/Users/alexchristoforides/Desktop/os-inl.h
-+++ b/third_party/spdlog/include/spdlog/details/os-inl.h
-@@ -295,7 +295,7 @@ SPDLOG_INLINE int utc_minutes_offset(const std::tm &tm)
-                 ((local_year / 100 >> 2) - (gmt_year / 100 >> 2))
-
-                 // + difference in years * 365 */
--                + (long int)(local_year - gmt_year) * 365);
-+                + static_cast<long int>(local_year - gmt_year) * 365);
-
-             long int hours = (24 * days) + (localtm.tm_hour - gmtm.tm_hour);
-             long int mins = (60 * hours) + (localtm.tm_min - gmtm.tm_min);
+--- spdlog-1.11.0/include/spdlog/common.h	2022-11-02 22:13:08.000000000 +0100
++++ spdlog/include/spdlog/common.h	2023-02-03 11:20:48.986307242 +0100
+@@ -165,7 +165,7 @@
+ template<class T, class Char = char>
+ struct is_convertible_to_basic_format_string
+     : std::integral_constant<bool,
+-          std::is_convertible<T, fmt::basic_string_view<Char>>::value || std::is_same<remove_cvref_t<T>, fmt::basic_runtime<Char>>::value>
++          std::is_convertible<T, fmt::basic_string_view<Char>>::value || std::is_same<remove_cvref_t<T>, fmt::runtime_format_string<Char>>::value>
+ {};
+ 
+ #    if defined(SPDLOG_WCHAR_FILENAMES) || defined(SPDLOG_WCHAR_TO_UTF8_SUPPORT)

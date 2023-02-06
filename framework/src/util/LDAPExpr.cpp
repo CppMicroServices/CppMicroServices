@@ -439,12 +439,13 @@ namespace cppmicroservices
     bool
     LDAPExpr::Evaluate(AnyMap const& p, bool matchCase) const
     {
+        // Use a ptr instead of a reference so we can "walk down" the json tree by reassigning it to
+        // a nested level. You can't reassign references to point to a different object.
         AnyMap const* pPtr = &p;
         if ((d->m_operator & SIMPLE) != 0)
         {
             if (pPtr->GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
             {
-                //                auto itr = pPtr->findUOCI_TypeChecked(d->m_attrName);
                 auto itr = find_attr_value_in_map<any_map::unordered_any_cimap>(
                     *pPtr,
                     d->m_attrName,
@@ -466,7 +467,6 @@ namespace cppmicroservices
             }
             else if (pPtr->GetType() == AnyMap::UNORDERED_MAP)
             {
-                //                auto itr = pPtr->findUO_TypeChecked(d->m_attrName);
                 auto itr = find_attr_value_in_map<any_map::unordered_any_map>(
                     *pPtr,
                     d->m_attrName,
@@ -493,7 +493,6 @@ namespace cppmicroservices
             }
             else if (pPtr->GetType() == AnyMap::ORDERED_MAP)
             {
-                //                auto itr = pPtr->findOM_TypeChecked(d->m_attrName);
                 auto itr = find_attr_value_in_map<any_map::ordered_any_map>(
                     *pPtr,
                     d->m_attrName,

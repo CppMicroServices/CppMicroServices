@@ -31,6 +31,7 @@
 
 #include "PropsCheck.h"
 
+#include <bitset>
 #include <cctype>
 #include <cerrno>
 #include <cmath>
@@ -47,6 +48,43 @@ namespace cppmicroservices
 {
     namespace
     {
+        // String split from: https://stackoverflow.com/a/5506223/13030801
+        template <typename C>
+        void
+        new_string_split(std::string const& s, char const* d, C& ret)
+        {
+            C output;
+
+            std::bitset<255> delims;
+            while (*d)
+            {
+                unsigned char code = *d++;
+                delims[code] = true;
+            }
+            typedef std::string::const_iterator iter;
+            iter beg;
+            bool in_token = false;
+            for (std::string::const_iterator it = s.begin(), end = s.end(); it != end; ++it)
+            {
+                if (delims[*it])
+                {
+                    if (in_token)
+                    {
+                        output.push_back(typename C::value_type(beg, it));
+                        in_token = false;
+                    }
+                }
+                else if (!in_token)
+                {
+                    beg = it;
+                    in_token = true;
+                }
+            }
+            if (in_token)
+                output.push_back(typename C::value_type(beg, s.end()));
+            output.swap(ret);
+        }
+
         // Split a string into a vector based on the delimiter
         std::vector<std::string>
         split_string(std::string const& input, char const& delimiter)
@@ -78,8 +116,15 @@ namespace cppmicroservices
             // Since we can't reassign references, we use a pointer to "walk down" the json object tree.
             AnyMap const* pPtr = &map;
 
+            auto lookup = get_value_from_map(pPtr, attrName);
+            if (lookup != getEndItr(pPtr))
+            {
+                return lookup;
+            }
+
             // First, split the m_attrName into a vector at the . separator and reverse it.
-            std::vector<std::string> scope = split_string(attrName, '.');
+            std::vector<std::string> scope;
+            new_string_split(attrName, ".", scope);
             std::reverse(std::begin(scope), std::end(scope));
 
             std::string key;

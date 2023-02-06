@@ -26,8 +26,6 @@
 #include "cppmicroservices/Constants.h"
 
 #include "absl/strings/str_cat.h"
-// #include "boost/algorithm/string/classification.hpp"
-// #include "boost/algorithm/string/split.hpp"
 
 #include "Properties.h"
 

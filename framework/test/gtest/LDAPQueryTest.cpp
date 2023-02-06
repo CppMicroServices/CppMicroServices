@@ -143,15 +143,6 @@ TEST_F(LDAPQueryTest, TestNestedData)
     LDAPFilter filter7(LDAPProp("i.expect.this.to.fail") == true);
 
     auto const& headers = testBundle.GetHeaders();
-    std::cerr << "Filter 1 = " << filter1.ToString() << std::endl;
-    std::cerr << "Filter 2 = " << filter2.ToString() << std::endl;
-    std::cerr << "Filter 3 = " << filter3.ToString() << std::endl;
-    std::cerr << "Filter 4 = " << filter4.ToString() << std::endl;
-    std::cerr << "Filter 5 = " << filter5.ToString() << std::endl;
-    std::cerr << "Filter 6 = " << filter6.ToString() << std::endl;
-    std::cerr << "Filter 7 = " << filter7.ToString() << std::endl;
-    std::cerr << "Headers:" << std::endl;
-    any_value_to_json(std::cerr, headers, 4, 4);
 
     ASSERT_TRUE(filter1.Match(headers));
     ASSERT_TRUE(filter2.Match(headers));

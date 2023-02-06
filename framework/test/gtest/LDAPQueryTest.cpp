@@ -144,6 +144,34 @@ TEST_F(LDAPQueryTest, TestNestedData)
 
     auto const& headers = testBundle.GetHeaders();
 
+    /*
+        a: {
+            b: 1
+        }
+    */
+    cppmicroservices::AnyMap uomTestMap(cppmicroservices::AnyMap::UNORDERED_MAP);
+    cppmicroservices::AnyMap uomTestMapNested(cppmicroservices::AnyMap::UNORDERED_MAP);
+    uomTestMapNested["b"] = 1;
+    uomTestMap["a"] = uomTestMapNested;
+
+    LDAPFilter filter8(LDAPProp("a.b") == 1);
+    LDAPFilter filter9(LDAPProp("a.B") == 1);
+
+    cppmicroservices::AnyMap uociTestMap(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+    uociTestMap["A"] = 1;
+    LDAPFilter filter10(LDAPProp("a") == 1);
+
+    /*
+        a: {
+            b: 1
+        }
+    */
+    cppmicroservices::AnyMap omTestMap(cppmicroservices::AnyMap::ORDERED_MAP);
+    cppmicroservices::AnyMap omTestMapNested(cppmicroservices::AnyMap::ORDERED_MAP);
+    omTestMapNested["b"] = 1;
+    omTestMap["a"] = omTestMapNested;
+    LDAPFilter filter11(LDAPProp("a.B") == 1);
+
     ASSERT_TRUE(filter1.Match(headers));
     ASSERT_TRUE(filter2.Match(headers));
     ASSERT_TRUE(filter3.Match(headers));
@@ -151,4 +179,17 @@ TEST_F(LDAPQueryTest, TestNestedData)
     ASSERT_TRUE(filter5.Match(headers));
     ASSERT_TRUE(filter6.Match(headers));
     ASSERT_FALSE(filter7.Match(headers));
+
+    // UOM
+    ASSERT_TRUE(filter8.Match(uomTestMap));
+    ASSERT_FALSE(filter9.MatchCase(uomTestMap));
+    ASSERT_TRUE(filter9.Match(uomTestMap));
+
+    // UOCI
+    ASSERT_TRUE(filter10.Match(uociTestMap));
+    ASSERT_FALSE(filter10.MatchCase(uociTestMap));
+
+    // OM
+    ASSERT_TRUE(filter11.Match(omTestMap));
+    ASSERT_FALSE(filter11.MatchCase(omTestMap));
 }

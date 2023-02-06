@@ -24,6 +24,7 @@
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/LDAPProp.h"
 
 #include "TestUtils.h"
 #include "cppmicroservices/LDAPFilter.h"
@@ -129,4 +130,34 @@ TEST_F(LDAPQueryTest, TestLDAPFilterMatchServiceReferenceBase)
     // Testing the behavior after the bundle has stopped (service properties
     // should still be available for queries according to OSGi spec 5.2.1).
     ASSERT_TRUE(ldapMatchCase.Match(sr));
+}
+
+TEST_F(LDAPQueryTest, TestNestedData)
+{
+    LDAPFilter filter1(LDAPProp("a.b.c.d") == 5);
+    LDAPFilter filter2(LDAPProp("a.e.f.g") == 6);
+    LDAPFilter filter3(LDAPProp("h.i.j.k") == 12);
+    LDAPFilter filter4(LDAPProp("h.i.l.m.n") == true);
+    LDAPFilter filter5(LDAPProp("bundle.testproperty") == "YES");
+    LDAPFilter filter6(LDAPProp("bundle.nestedproperty.foo") == "bar");
+    LDAPFilter filter7(LDAPProp("i.expect.this.to.fail") == true);
+
+    auto const& headers = testBundle.GetHeaders();
+    std::cerr << "Filter 1 = " << filter1.ToString() << std::endl;
+    std::cerr << "Filter 2 = " << filter2.ToString() << std::endl;
+    std::cerr << "Filter 3 = " << filter3.ToString() << std::endl;
+    std::cerr << "Filter 4 = " << filter4.ToString() << std::endl;
+    std::cerr << "Filter 5 = " << filter5.ToString() << std::endl;
+    std::cerr << "Filter 6 = " << filter6.ToString() << std::endl;
+    std::cerr << "Filter 7 = " << filter7.ToString() << std::endl;
+    std::cerr << "Headers:" << std::endl;
+    any_value_to_json(std::cerr, headers, 4, 4);
+
+    ASSERT_TRUE(filter1.Match(headers));
+    ASSERT_TRUE(filter2.Match(headers));
+    ASSERT_TRUE(filter3.Match(headers));
+    ASSERT_TRUE(filter4.Match(headers));
+    ASSERT_TRUE(filter5.Match(headers));
+    ASSERT_TRUE(filter6.Match(headers));
+    ASSERT_FALSE(filter7.Match(headers));
 }

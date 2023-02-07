@@ -93,7 +93,7 @@ public:
    * @param pid The PID of the {@code Configuration} which has been updated
    */
   virtual std::shared_future<void> NotifyConfigurationUpdated(
-    const std::string& pid) = 0;
+    const std::string& pid, const unsigned long changeCount) = 0;
 
   /**
    * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or

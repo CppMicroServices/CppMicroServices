@@ -1,0 +1,34 @@
+{
+  "bundle.symbolic_name": "TestBundleNestedBundleStartManagedService",
+  "bundle.name": "TestBundleNestedBundleStartManagedService",
+  "bundle.activator": false,
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "name": "cppmicroservices::service::cm::test::TestManagedServiceImpl",
+        "implementation-class": "cppmicroservices::service::cm::test::TestManagedServiceImpl",
+        "properties" : {
+          "service.pid" : "cm.testmanagedservice"
+        },
+        "service": {
+          "interfaces": [
+             "test::TestManagedServiceInterface", "cppmicroservices::service::cm::ManagedService"
+          ]
+        }
+      },
+	  {
+        "name": "cppmicroservices::service::cm::test::TestManagedServiceFactoryImpl",
+        "implementation-class": "cppmicroservices::service::cm::test::TestManagedServiceFactoryImpl",
+        "properties" : {
+          "service.pid" : "cm.testmanagedservicefactory"
+        },
+        "service": {
+          "interfaces": [
+             "cppmicroservices::service::cm::ManagedServiceFactory"
+          ]
+        }
+      }
+    ]
+  }
+}

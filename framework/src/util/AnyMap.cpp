@@ -25,6 +25,7 @@
 #include "absl/strings/numbers.h"
 #include "absl/strings/string_view.h"
 
+#include <cassert>
 #include <stdexcept>
 
 namespace cppmicroservices {
@@ -579,16 +580,34 @@ any_map::any_map(const ordered_any_map& m)
   map.o = new ordered_any_map(m);
 }
 
+any_map::any_map(ordered_any_map&& m)
+  : type(map_type::ORDERED_MAP)
+{
+  map.o = new ordered_any_map(std::move(m));
+}
+
 any_map::any_map(const unordered_any_map& m)
   : type(map_type::UNORDERED_MAP)
 {
   map.uo = new unordered_any_map(m);
 }
 
+any_map::any_map(unordered_any_map&& m)
+  : type(map_type::UNORDERED_MAP)
+{
+  map.uo = new unordered_any_map(std::move(m));
+}
+
 any_map::any_map(const unordered_any_cimap& m)
   : type(map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
 {
   map.uoci = new unordered_any_cimap(m);
+}
+
+any_map::any_map(unordered_any_cimap&& m)
+  : type(map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+{
+  map.uoci = new unordered_any_cimap(std::move(m));
 }
 
 any_map::any_map(const any_map& m)
@@ -839,6 +858,78 @@ any_map::const_iterator any_map::find(const key_type& key) const
   }
 }
 
+any_map::ordered_any_map::const_iterator any_map::beginOM_TypeChecked() const
+{
+  assert(type == ORDERED_MAP && "You are calling beginOM_TypeChecked() on map "
+                                "whose type is not ORDERED_MAP.");
+  return map.o->begin();
+}
+
+any_map::ordered_any_map::const_iterator any_map::endOM_TypeChecked() const
+{
+  assert(type == ORDERED_MAP && "You are calling endOM_TypeChecked() on map "
+                                "whose type is not ORDERED_MAP.");
+  return map.o->end();
+}
+
+any_map::ordered_any_map::const_iterator any_map::findOM_TypeChecked(
+  const key_type& key) const
+{
+  assert(type == ORDERED_MAP && "You are calling findOM_TypeChecked() on map "
+                                "whose type is not ORDERED_MAP.");
+  return map.o->find(key);
+}
+
+any_map::unordered_any_map::const_iterator any_map::beginUO_TypeChecked() const
+{
+  assert(type == UNORDERED_MAP &&
+         "You are calling beginUO_TypeChecked() on map "
+         "whose type is not UNORDERED_MAP.");
+  return map.uo->begin();
+}
+
+any_map::unordered_any_map::const_iterator any_map::endUO_TypeChecked() const
+{
+  assert(type == UNORDERED_MAP && "You are calling endUO_TypeChecked() on map "
+                                  "whose type is not UNORDERED_MAP.");
+  return map.uo->end();
+}
+
+any_map::unordered_any_map::const_iterator any_map::findUO_TypeChecked(
+  const key_type& key) const
+{
+  assert(type == UNORDERED_MAP && "You are calling findUO_TypeChecked() on map "
+                                  "whose type is not UNORDERED_MAP.");
+  return map.uo->find(key);
+}
+
+any_map::unordered_any_cimap::const_iterator any_map::beginUOCI_TypeChecked()
+  const
+{
+  assert(type == UNORDERED_MAP_CASEINSENSITIVE_KEYS &&
+         "You are calling beginUOCI_TypeChecked() on map "
+         "whose type is not UNORDERED_MAP_CASEINSENSITIVE_KEYS.");
+  return map.uoci->begin();
+}
+
+any_map::unordered_any_cimap::const_iterator any_map::endUOCI_TypeChecked()
+  const
+{
+  assert(type == UNORDERED_MAP_CASEINSENSITIVE_KEYS &&
+         "You are calling endUOCI_TypeChecked() on map "
+         "whose type is not UNORDERED_MAP_CASEINSENSITIVE_KEYS.");
+  return map.uoci->end();
+}
+
+any_map::unordered_any_cimap::const_iterator any_map::findUOCI_TypeChecked(
+  const key_type& key) const
+{
+  assert(type == UNORDERED_MAP_CASEINSENSITIVE_KEYS &&
+         "You are calling findUOCI_TypeChecked() on map "
+         "whose type is not UNORDERED_MAP_CASEINSENSITIVE_KEYS.");
+  return map.uoci->find(key);
+}
+
 any_map::size_type any_map::erase(const key_type& key)
 {
   switch (type) {
@@ -938,31 +1029,38 @@ void any_map::destroy() noexcept
 
 AnyMap::AnyMap(map_type type)
   : any_map(type)
-{}
+{
+}
 
 AnyMap::AnyMap(const ordered_any_map& m)
   : any_map(m)
-{}
+{
+}
 
 AnyMap::AnyMap(ordered_any_map&& m)
   : any_map(std::move(m))
-{}
+{
+}
 
 AnyMap::AnyMap(const unordered_any_map& m)
   : any_map(m)
-{}
+{
+}
 
 AnyMap::AnyMap(unordered_any_map&& m)
   : any_map(std::move(m))
-{}
+{
+}
 
 AnyMap::AnyMap(const unordered_any_cimap& m)
   : any_map(m)
-{}
+{
+}
 
 AnyMap::AnyMap(unordered_any_cimap&& m)
   : any_map(std::move(m))
-{}
+{
+}
 
 AnyMap::map_type AnyMap::GetType() const
 {

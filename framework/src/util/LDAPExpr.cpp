@@ -74,10 +74,9 @@ namespace cppmicroservices
                 // "beg" and "it"... save it off into the result container.
                 if (delim[*it])
                 {
-                    // Only store a token if we're actually parsing a token. If not, collapse a
-                    // sequential set of delimiters into one.
                     if (in_token)
                     {
+                        // Only store a token if we're actually parsing a token.
                         result.push_back(std::string(beg, it));
                         in_token = false;
                     }
@@ -93,7 +92,9 @@ namespace cppmicroservices
             }
             // deal with the boundary condition... the last token in input.
             if (in_token)
+            {
                 result.push_back(std::string(beg, std::end(input)));
+            }
 
             return result;
         }
@@ -108,14 +109,14 @@ namespace cppmicroservices
             AnyMap const& map,
             std::string const& attrName,
             std::function<typename MapT::const_iterator(AnyMap const* p, std::string const& name)> get_value_from_map,
-            std::function<typename MapT::const_iterator(AnyMap const* p)> getEndItr)
+            std::function<typename MapT::const_iterator(AnyMap const* p)> end_iter)
         {
             // Since we can't reassign references, we use a pointer to "walk down" the json object tree.
             AnyMap const* pPtr = &map;
 
             // shortcut checking the full attrname path.
             auto lookup = get_value_from_map(pPtr, attrName);
-            if (lookup != getEndItr(pPtr))
+            if (lookup != end_iter(pPtr))
             {
                 return lookup;
             }
@@ -146,14 +147,14 @@ namespace cppmicroservices
             // Basically, we need to check if there's a value at: "a.b.c","d", or
             // "a.b","c","d", or "a.b","c.d", or "a","b.c.d" or "a","b.c","d", or
             // "a","b","c.d", or "a","b","c.d", or "a","b","c","d"
-            auto iter = getEndItr(pPtr);
-            while (!scope.empty() && (iter == getEndItr(pPtr)))
+            auto iter = end_iter(pPtr);
+            while (!scope.empty() && (iter == end_iter(pPtr)))
             {
                 key += sep + scope.back();
                 sep = ".";
                 scope.pop_back();
                 iter = get_value_from_map(pPtr, key);
-                if (iter != getEndItr(pPtr))
+                if (iter != end_iter(pPtr))
                 {
                     // Attempt to cast the found value to an AnyMap.
                     pPtr = any_cast<AnyMap const>(&iter->second);
@@ -172,7 +173,7 @@ namespace cppmicroservices
                         // continue the walk down the json tree to the next level.
                         key = "";
                         sep = "";
-                        iter = getEndItr(pPtr);
+                        iter = end_iter(pPtr);
                     }
                 }
             }
@@ -185,6 +186,7 @@ namespace cppmicroservices
             }
             else
             {
+                // return an empty object... we did not find a named attrName in the map.
                 return {};
             }
         }
@@ -497,19 +499,19 @@ namespace cppmicroservices
         {
             if (pPtr->GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
             {
-                auto itr = find_attr_value_in_map<any_map::unordered_any_cimap>(
+                auto value_iter = find_attr_value_in_map<any_map::unordered_any_cimap>(
                     *pPtr,
                     d->m_attrName,
                     [](AnyMap const* p, std::string const& key) { return p->findUOCI_TypeChecked(key); },
                     [](AnyMap const* p) { return p->endUOCI_TypeChecked(); });
 
-                if (!matchCase && itr)
+                if (!matchCase && value_iter)
                 {
-                    return Compare(itr.value()->second, d->m_operator, d->m_attrValue);
+                    return Compare(value_iter.value()->second, d->m_operator, d->m_attrValue);
                 }
-                else if (matchCase && itr && itr.value()->first == d->m_attrName)
+                else if (matchCase && value_iter && value_iter.value()->first == d->m_attrName)
                 {
-                    return Compare(itr.value()->second, d->m_operator, d->m_attrValue);
+                    return Compare(value_iter.value()->second, d->m_operator, d->m_attrValue);
                 }
                 else
                 {
@@ -518,63 +520,67 @@ namespace cppmicroservices
             }
             else if (pPtr->GetType() == AnyMap::UNORDERED_MAP)
             {
-                auto itr = find_attr_value_in_map<any_map::unordered_any_map>(
+                auto value_iter = find_attr_value_in_map<any_map::unordered_any_map>(
                     *pPtr,
                     d->m_attrName,
                     [matchCase](AnyMap const* p, std::string const& key)
                     {
-                        auto itr = p->findUO_TypeChecked(key);
-                        if (!matchCase && itr == p->endUO_TypeChecked())
+                        auto value_iter = p->findUO_TypeChecked(key);
+                        if (!matchCase && value_iter == p->endUO_TypeChecked())
                         {
-                            for (auto itr = p->beginUO_TypeChecked(); itr != p->endUO_TypeChecked(); ++itr)
+                            for (auto value_iter = p->beginUO_TypeChecked(); value_iter != p->endUO_TypeChecked();
+                                 ++value_iter)
                             {
-                                if (std::string lower = LDAPExpr::ToLower(key); LDAPExpr::ToLower(itr->first) == lower)
+                                if (std::string lower = LDAPExpr::ToLower(key);
+                                    LDAPExpr::ToLower(value_iter->first) == lower)
                                 {
-                                    return itr;
+                                    return value_iter;
                                 }
                             }
                             return p->endUO_TypeChecked();
                         }
 
-                        return itr;
+                        return value_iter;
                     },
                     [](AnyMap const* p) { return p->endUO_TypeChecked(); });
 
-                if (itr)
+                if (value_iter)
                 {
-                    return Compare(itr.value()->second, d->m_operator, d->m_attrValue);
+                    return Compare(value_iter.value()->second, d->m_operator, d->m_attrValue);
                 }
 
                 return false;
             }
             else if (pPtr->GetType() == AnyMap::ORDERED_MAP)
             {
-                auto itr = find_attr_value_in_map<any_map::ordered_any_map>(
+                auto value_iter = find_attr_value_in_map<any_map::ordered_any_map>(
                     *pPtr,
                     d->m_attrName,
                     [matchCase](AnyMap const* p, std::string const& key)
                     {
-                        auto itr = p->findOM_TypeChecked(key);
-                        if (!matchCase && itr == p->endOM_TypeChecked())
+                        auto value_iter = p->findOM_TypeChecked(key);
+                        if (!matchCase && value_iter == p->endOM_TypeChecked())
                         {
-                            for (auto itr = p->beginOM_TypeChecked(); itr != p->endOM_TypeChecked(); ++itr)
+                            for (auto value_iter = p->beginOM_TypeChecked(); value_iter != p->endOM_TypeChecked();
+                                 ++value_iter)
                             {
-                                if (std::string lower = LDAPExpr::ToLower(key); LDAPExpr::ToLower(itr->first) == lower)
+                                if (std::string lower = LDAPExpr::ToLower(key);
+                                    LDAPExpr::ToLower(value_iter->first) == lower)
                                 {
-                                    return itr;
+                                    return value_iter;
                                 }
                             }
 
                             return p->endOM_TypeChecked();
                         }
 
-                        return itr;
+                        return value_iter;
                     },
                     [](AnyMap const* p) { return p->endOM_TypeChecked(); });
 
-                if (itr)
+                if (value_iter)
                 {
-                    return Compare(itr.value()->second, d->m_operator, d->m_attrValue);
+                    return Compare(value_iter.value()->second, d->m_operator, d->m_attrValue);
                 }
 
                 return false;

@@ -51,7 +51,7 @@ namespace cppmicroservices
         // String split from: https://stackoverflow.com/a/5506223/13030801
         template <typename C>
         void
-        new_string_split(std::string const& s, char const* d, C& ret)
+        string_split(std::string const& s, char const* d, C& ret)
         {
             C output;
 
@@ -85,22 +85,6 @@ namespace cppmicroservices
             output.swap(ret);
         }
 
-        // Split a string into a vector based on the delimiter
-        std::vector<std::string>
-        split_string(std::string const& input, char const& delimiter)
-        {
-            std::vector<std::string> elements;
-            std::stringstream stream(input);
-            std::string element;
-
-            while (getline(stream, element, delimiter))
-            {
-                elements.push_back(element);
-            }
-
-            return elements;
-        }
-
         // Given the name of an attribute, find that value within the provded AnyMap. The template
         // argument is the type of the underlying storage map for the AnyMap. The third argument is a
         // std::function supplied at the call site which fetches a value from the underlying map
@@ -116,15 +100,17 @@ namespace cppmicroservices
             // Since we can't reassign references, we use a pointer to "walk down" the json object tree.
             AnyMap const* pPtr = &map;
 
+            // shortcut checking the full attrname path.
             auto lookup = get_value_from_map(pPtr, attrName);
             if (lookup != getEndItr(pPtr))
             {
                 return lookup;
             }
 
+            // If not found at the full attrname, decompose the path and do a full check.
             // First, split the m_attrName into a vector at the . separator and reverse it.
             std::vector<std::string> scope;
-            new_string_split(attrName, ".", scope);
+            string_split(attrName, ".", scope);
             std::reverse(std::begin(scope), std::end(scope));
 
             std::string key;
@@ -148,7 +134,7 @@ namespace cppmicroservices
             // Basically, we need to check if there's a value at: "a.b.c","d", or
             // "a.b","c","d", or "a.b","c.d", or "a","b.c.d" or "a","b.c","d", or
             // "a","b","c.d", or "a","b","c.d", or "a","b","c","d"
-            MapT::const_iterator iter = getEndItr(pPtr);
+            auto iter = getEndItr(pPtr);
             while (!scope.empty() && (iter == getEndItr(pPtr)))
             {
                 key += sep + scope.back();

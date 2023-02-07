@@ -49,40 +49,53 @@ namespace cppmicroservices
     namespace
     {
         // String split from: https://stackoverflow.com/a/5506223/13030801
-        template <typename C>
-        void
-        string_split(std::string const& s, char const* d, C& ret)
+        // This is the fasted string split algorithm that we could find.
+        std::vector<std::string>
+        string_split(std::string const& input, char const* delimiter_list)
         {
-            C output;
+            std::vector<std::string> result;
 
-            std::bitset<255> delims;
-            while (*d)
+            // Initialize a set of boolean flags indexed by ascii character value, one bit per
+            // character. If the bit is 1, that character is a delimiter.
+            std::bitset<255> delim;
+            while (*delimiter_list)
             {
-                unsigned char code = *d++;
-                delims[code] = true;
+                unsigned char code = *delimiter_list++;
+                delim[code] = true;
             }
-            typedef std::string::const_iterator iter;
-            iter beg;
+
+            std::string::const_iterator beg;
             bool in_token = false;
-            for (std::string::const_iterator it = s.begin(), end = s.end(); it != end; ++it)
+            // Loop through the input string and check each character for a delimiter. If a
+            // delimiter is found, add the string processed so far to the result container.
+            for (auto it = std::begin(input); it != std::end(input); std::advance(it, 1))
             {
-                if (delims[*it])
+                // If *it is a delimiter, the value marked by the delimiter is the string between
+                // "beg" and "it"... save it off into the result container.
+                if (delim[*it])
                 {
+                    // Only store a token if we're actually parsing a token. If not, collapse a
+                    // sequential set of delimiters into one.
                     if (in_token)
                     {
-                        output.push_back(typename C::value_type(beg, it));
+                        result.push_back(std::string(beg, it));
                         in_token = false;
                     }
                 }
                 else if (!in_token)
                 {
+                    // Found a non-delimiter character. If we're not currently processing a token,
+                    // mark that we've found the beginning of a token so the next characters are
+                    // part of the token.
                     beg = it;
                     in_token = true;
                 }
             }
+            // deal with the boundary condition... the last token in input.
             if (in_token)
-                output.push_back(typename C::value_type(beg, s.end()));
-            output.swap(ret);
+                result.push_back(std::string(beg, std::end(input)));
+
+            return result;
         }
 
         // Given the name of an attribute, find that value within the provded AnyMap. The template
@@ -109,8 +122,7 @@ namespace cppmicroservices
 
             // If not found at the full attrname, decompose the path and do a full check.
             // First, split the m_attrName into a vector at the . separator and reverse it.
-            std::vector<std::string> scope;
-            string_split(attrName, ".", scope);
+            auto scope = string_split(attrName, ".");
             std::reverse(std::begin(scope), std::end(scope));
 
             std::string key;

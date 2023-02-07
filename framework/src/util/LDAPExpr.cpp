@@ -31,6 +31,7 @@
 
 #include "PropsCheck.h"
 
+#include <algorithm>
 #include <bitset>
 #include <cctype>
 #include <cerrno>
@@ -48,21 +49,26 @@ namespace cppmicroservices
 {
     namespace
     {
-        // String split from: https://stackoverflow.com/a/5506223/13030801
-        // This is the fasted string split algorithm that we could find.
+        /**
+         * @brief split a delimited string into a vector of values
+         *
+         * String split from: https://stackoverflow.com/a/5506223/13030801
+         * This is the fasted string split algorithm that we could find.
+         *
+         * @param input a delimited string to split
+         * @param delimiter_list a string_view of characters representing delimiters
+         *
+         * @return a std::vector<std::string> of the delimited items from input
+         */
         std::vector<std::string>
-        string_split(std::string const& input, char const* delimiter_list)
+        string_split(std::string const& input, std::string_view delimiter_list)
         {
             std::vector<std::string> result;
 
             // Initialize a set of boolean flags indexed by ascii character value, one bit per
             // character. If the bit is 1, that character is a delimiter.
             std::bitset<255> delim;
-            while (*delimiter_list)
-            {
-                unsigned char code = *delimiter_list++;
-                delim[code] = true;
-            }
+            std::for_each(std::begin(delimiter_list), std::end(delimiter_list), [&delim](char c) { delim[c] = true; });
 
             std::string::const_iterator beg;
             bool in_token = false;
@@ -99,10 +105,21 @@ namespace cppmicroservices
             return result;
         }
 
-        // Given the name of an attribute, find that value within the provded AnyMap. The template
-        // argument is the type of the underlying storage map for the AnyMap. The third argument is a
-        // std::function supplied at the call site which fetches a value from the underlying map
-        // storage, and the fourth argument is the end iterator for that underlying map.
+        /**
+         * @brief Find value for attrName in map
+         *
+         * @tparam MapT the underlying storage class for the AnyMap.
+         *
+         * @param map an AnyMap with data to look up
+         * @param attrName a string naming the attribute to find
+         * @param get_value_from_map a function used to lookup values in map. Required because this
+         *        algorithm does not know the underlying storage of the AnyMap
+         * @param end_iter a function which returns the end iterator for the map. Required because
+         *        this algorithm does not know the underlying storage of the AnyMap
+         *
+         * @return a std::optional const_iterator pointing to the found value. If the correct value
+         *         is not found, and empty std::optional is returned.
+         */
         template <typename MapT>
         std::optional<typename MapT::const_iterator>
         find_attr_value_in_map(
@@ -187,7 +204,7 @@ namespace cppmicroservices
             else
             {
                 // return an empty object... we did not find a named attrName in the map.
-                return {};
+                return std::nullopt;
             }
         }
     } // namespace

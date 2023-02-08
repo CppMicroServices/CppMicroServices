@@ -123,14 +123,11 @@ namespace cppmicroservices
         template <typename MapT>
         std::optional<typename MapT::const_iterator>
         find_attr_value_in_map(
-            AnyMap const& map,
+            AnyMap const* pPtr,
             std::string const& attrName,
             std::function<typename MapT::const_iterator(AnyMap const* p, std::string const& name)> get_value_from_map,
             std::function<typename MapT::const_iterator(AnyMap const* p)> end_iter)
         {
-            // Since we can't reassign references, we use a pointer to "walk down" the json object tree.
-            AnyMap const* pPtr = &map;
-
             // shortcut checking the full attrname path.
             auto lookup = get_value_from_map(pPtr, attrName);
             if (lookup != end_iter(pPtr))
@@ -142,9 +139,6 @@ namespace cppmicroservices
             // First, split the m_attrName into a vector at the . separator and reverse it.
             auto scope = string_split(attrName, ".");
             std::reverse(std::begin(scope), std::end(scope));
-
-            std::string key;
-            std::string sep = "";
 
             // Now, the scope vector contains all the segments in the key in reverse
             // order. We are trying to "walk down" the AnyMap to a value.
@@ -165,6 +159,8 @@ namespace cppmicroservices
             // "a.b","c","d", or "a.b","c.d", or "a","b.c.d" or "a","b.c","d", or
             // "a","b","c.d", or "a","b","c.d", or "a","b","c","d"
             auto iter = end_iter(pPtr);
+            std::string key {};
+            std::string sep {};
             while (!scope.empty() && (iter == end_iter(pPtr)))
             {
                 key += sep + scope.back();
@@ -194,11 +190,11 @@ namespace cppmicroservices
                     }
                 }
             }
-            // If we get to this point, we have found the right value only if the entire attr path has
-            // been processed, indicated by an empty scope vector. If we've found the right value,
-            // return the iterator to it. If not, return the endIter.
             if (scope.empty() && !pPtr)
             {
+                // If we get to this point, we have found the right value only if the entire attr
+                // path has been processed, indicated by an empty scope vector AND a null pointer to
+                // the map.
                 return iter;
             }
             else
@@ -517,7 +513,7 @@ namespace cppmicroservices
             if (pPtr->GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
             {
                 auto value_iter = find_attr_value_in_map<any_map::unordered_any_cimap>(
-                    *pPtr,
+                    pPtr,
                     d->m_attrName,
                     [](AnyMap const* p, std::string const& key) { return p->findUOCI_TypeChecked(key); },
                     [](AnyMap const* p) { return p->endUOCI_TypeChecked(); });
@@ -538,7 +534,7 @@ namespace cppmicroservices
             else if (pPtr->GetType() == AnyMap::UNORDERED_MAP)
             {
                 auto value_iter = find_attr_value_in_map<any_map::unordered_any_map>(
-                    *pPtr,
+                    pPtr,
                     d->m_attrName,
                     [matchCase](AnyMap const* p, std::string const& key)
                     {
@@ -571,7 +567,7 @@ namespace cppmicroservices
             else if (pPtr->GetType() == AnyMap::ORDERED_MAP)
             {
                 auto value_iter = find_attr_value_in_map<any_map::ordered_any_map>(
-                    *pPtr,
+                    pPtr,
                     d->m_attrName,
                     [matchCase](AnyMap const* p, std::string const& key)
                     {

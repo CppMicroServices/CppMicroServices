@@ -722,36 +722,14 @@ ConfigurationAdminImpl::AddingService(
     return nullptr;
   }
 
-  // Ensure there's a Configuration for this PID if one doesn't exist already.
-  const auto it = configurations.find(pid);
-  if (it == std::end(configurations)) {
-    auto factoryPid = getFactoryPid(pid);
-    AddFactoryInstanceIfRequired(pid, factoryPid);
-    auto insertPair = configurations.emplace(
-        pid,
-        std::make_shared<ConfigurationImpl>(
-          this,
-          pid,
-          std::move(factoryPid),
-          AnyMap{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
-	// According to OSGI, creating a new Configuration object must not initiate a callback to the 
-	// Managed Service updated method until the properties are set in the Configuration with the 
-	// update method. Return here without sending notification.
-    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                  "New ManagedService with PID " + pid);
-
-    std::unordered_map<std::string, unsigned long> initialChangeCountByPid = {{pid, insertPair.first->second->GetChangeCount()}};
-    return std::make_shared<
-        TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>(
-            pid, std::move(initialChangeCountByPid), std::move(managedService));  
-  }
   // Send a notification in case a valid configuration object 
   // was created before the service was active. The service's properties
   // need to be updated. 
-  AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
   unsigned long initialChangeCount{0ul};
 
+  const auto it = configurations.find(pid);
   if (it != std::end(configurations)) {
+    AnyMap properties{ AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
     try {
       properties = it->second->GetProperties();
       initialChangeCount = it->second->GetChangeCount();

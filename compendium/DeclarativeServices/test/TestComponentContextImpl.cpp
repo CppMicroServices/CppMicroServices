@@ -357,6 +357,84 @@ namespace cppmicroservices
             });
         }
 
+        TEST_F(ComponentContextImplTest, VerifyLocateServiceWithEmptyInterfaceTypeString)
+        {
+            auto mockCompConfig = std::make_shared<MockComponentConfiguration>();
+
+            ON_CALL(*mockCompConfig, GetBundle).WillByDefault(::testing::Return(GetFramework()));
+            auto registeredFooSvc = std::make_shared<test::Foo>();
+            auto fooServiceReg = GetFramework().GetBundleContext().RegisterService<test::Foo>(registeredFooSvc);
+
+            auto compCtx = std::make_shared<ComponentContextImpl>(mockCompConfig, GetFramework());
+            ASSERT_TRUE(compCtx->AddToBoundServicesCache("foo", fooServiceReg.GetReference()));
+            ASSERT_NO_THROW(
+                {
+                    auto fooSvc = compCtx->LocateService("foo", "");
+                    ASSERT_TRUE(fooSvc == registeredFooSvc);
+                });
+
+            fooServiceReg.Unregister();
+        }
+
+
+        /// Simulate a service instance being constructed with a missing mandatory service dependency
+        /// The construction of the ComponentContext object should throw for a service with a static
+        /// mandatory service dependency. 
+        TEST_F(ComponentContextImplTest, VerifyConstructComponentContextWithMissingMandatoryServiceDependency)
+        {
+            auto mockCompConfig = std::make_shared<MockComponentConfiguration>();
+            auto mockRefManager = std::make_shared<MockReferenceManager>();
+
+            // set the default actions of MockReferenceManager and MockComponentConfiguration to simulate
+            // constructing a ComponentContext object with data that should trigger an error condition (i.e. an exception).
+            auto fooSvcReg = GetFramework().GetBundleContext().RegisterService<test::Foo>(std::make_shared<test::Foo>());
+            std::set<cppmicroservices::ServiceReferenceBase> svcRefsSet;
+            svcRefsSet.insert(fooSvcReg.GetReference());
+            ON_CALL(*mockRefManager, GetBoundReferences).WillByDefault(::testing::Return(svcRefsSet));
+            ON_CALL(*mockRefManager, GetReferenceScope).WillByDefault(::testing::Return(cppmicroservices::Constants::SCOPE_BUNDLE));
+            ON_CALL(*mockRefManager, IsOptional).WillByDefault(::testing::Return(false));
+
+            std::vector<std::shared_ptr<ReferenceManager>> refManagers;
+            refManagers.push_back(std::move(mockRefManager));
+            ON_CALL(*mockCompConfig, GetAllDependencyManagers).WillByDefault(::testing::Return(refManagers));
+            ON_CALL(*mockCompConfig, GetBundle).WillByDefault(::testing::Return(GetFramework()));
+            ON_CALL(*mockCompConfig, GetMetadata).WillByDefault(::testing::Return(std::make_shared<metadata::ComponentMetadata>()));
+
+            // cause the service reference to become invalid for the component context constructor
+            fooSvcReg.Unregister();
+            ASSERT_THROW(auto compCtx = std::make_shared<ComponentContextImpl>(mockCompConfig), ComponentException);
+        }
+
+        /// Simulate a service instance being constructed with a missing optional service dependency
+        /// The construction of the ComponentContext object should succeed for a service with a missing
+        /// static optional service dependency. 
+        TEST_F(ComponentContextImplTest, VerifyConstructComponentContextWithMissingOptionalServiceDependency)
+        {
+            auto mockCompConfig = std::make_shared<MockComponentConfiguration>();
+            auto mockRefManager = std::make_shared<MockReferenceManager>();
+
+            // set the default actions of MockReferenceManager and MockComponentConfiguration to simulate
+            // constructing a ComponentContext object with data that should not trigger an error condition (i.e. an exception).
+            auto fooSvcReg = GetFramework().GetBundleContext().RegisterService<test::Foo>(std::make_shared<test::Foo>());
+            std::set<cppmicroservices::ServiceReferenceBase> svcRefsSet;
+            svcRefsSet.insert(fooSvcReg.GetReference());
+            ON_CALL(*mockRefManager, GetBoundReferences).WillByDefault(::testing::Return(svcRefsSet));
+            ON_CALL(*mockRefManager, GetReferenceScope).WillByDefault(::testing::Return(cppmicroservices::Constants::SCOPE_BUNDLE));
+            ON_CALL(*mockRefManager, IsOptional).WillByDefault(::testing::Return(true));
+
+            std::vector<std::shared_ptr<ReferenceManager>> refManagers;
+            refManagers.push_back(std::move(mockRefManager));
+            ON_CALL(*mockCompConfig, GetAllDependencyManagers).WillByDefault(::testing::Return(refManagers));
+            ON_CALL(*mockCompConfig, GetBundle).WillByDefault(::testing::Return(GetFramework()));
+            ON_CALL(*mockCompConfig, GetMetadata).WillByDefault(::testing::Return(std::make_shared<metadata::ComponentMetadata>()));
+
+            // cause the service reference to become invalid for the component context constructor
+            // since the service reference is optional an invalid service reference is acceptable
+            // and the component context construction should succeed.
+            fooSvcReg.Unregister();
+            ASSERT_NO_THROW(auto compCtx = std::make_shared<ComponentContextImpl>(mockCompConfig));
+        }
+
         TEST_F(ComponentContextImplTest, VerifyLocateServices)
         {
             auto mockConfig = std::make_shared<MockComponentConfiguration>();
@@ -464,6 +542,22 @@ namespace cppmicroservices
             EXPECT_THROW(ctxt->DisableComponent("foo"), ComponentException);
             EXPECT_EQ(ctxt->GetBundleContext().operator bool(), false);
             EXPECT_EQ(ctxt->GetServiceReference().operator bool(), false);
+        }
+
+        TEST(TestComponentContextImpl, TestInvalidComponentConfiguration)
+        {
+            auto mockConfig = std::make_shared<MockComponentConfiguration>();
+            // perform some object ownership gymnastics so that ComponentContextImpl
+            // can be constructed with a valid ComponentConfiguration and then destroy the
+            // ComponentConfiguration object such that any subsequent ComponentContext 
+            // calls fail because the ComponentConfiguration is no longer valid.
+            std::weak_ptr<MockComponentConfiguration> weakMockCompConfig;
+            weakMockCompConfig = mockConfig;
+            auto compCtx = std::make_shared<ComponentContextImpl>(weakMockCompConfig);
+            mockConfig.reset();
+            
+            ASSERT_THROW(compCtx->LocateService("", ""), ComponentException);
+            ASSERT_THROW(compCtx->LocateServices("", ""), ComponentException);
         }
     } // namespace scrimpl
 } // namespace cppmicroservices

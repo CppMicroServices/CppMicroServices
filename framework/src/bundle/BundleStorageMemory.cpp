@@ -91,8 +91,8 @@ std::vector<long> BundleStorageMemory::GetStartOnLaunchBundles() const
 
 void BundleStorageMemory::Close()
 {
-  // Not need to lock "archives" here: at this point, the framework
-  // is going down and no other threads can access it.
+  auto l = archives.Lock();
+  US_UNUSED(l);
   archives.v.clear();
 }
 }

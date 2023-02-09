@@ -1,4 +1,4 @@
-﻿/*=============================================================================
+/*=============================================================================
 
   Library: CppMicroServices
 
@@ -41,7 +41,9 @@
 #include "TestUtils.h"
 #include "TestingConfig.h"
 
+#include <atomic>
 #include <chrono>
+#include <future>
 #include <thread>
 
 #include "gtest/gtest.h"
@@ -90,7 +92,8 @@ public:
   FrameworkTestSuite(const BundleContext& bc)
     : bc(bc)
     , bu(bc.GetBundle())
-  {}
+  {
+  }
 
   void setup()
   {
@@ -917,5 +920,59 @@ TEST_F(BundleTest, TestBundleStreamOperator)
   ASSERT_TRUE(bundle);
   std::cout << &bundle;
 }
+
+#if defined(US_BUILD_SHARED_LIBS) && defined(US_ENABLE_THREADING_SUPPORT)
+// This test is designed to be run in a loop to find race conditions
+// when shutting down the framework when other framework operations are
+// happening.
+TEST_F(BundleTest, TestFrameworkAccessDuringFrameworkShutdown)
+{
+
+  std::promise<void> frameworkshuttingdown;
+  std::future<void> waitForShuttingDown = frameworkshuttingdown.get_future();
+
+  std::atomic_bool keepLooping{ true };
+
+  auto frameworkAccessThread = std::async(
+    std::launch::async,
+    [this, &keepLooping, waitForIt = std::move(waitForShuttingDown)]() {
+      waitForIt.wait();
+
+      while (keepLooping) {
+        auto token = framework.GetBundleContext().AddBundleListener(
+          [](const cppmicroservices::BundleEvent& evt) {
+            if (evt.GetType() ==
+                  cppmicroservices::BundleEvent::Type::BUNDLE_STOPPING &&
+                evt.GetBundle().GetBundleId() == 0) {
+              return;
+            }
+          });
+        auto bundle = InstallLib(framework.GetBundleContext(), "TestBundleA");
+        bundle.Start();
+        const auto& map = bundle.GetHeaders();
+        ASSERT_TRUE(!map.empty());
+        framework.GetBundleContext().RemoveListener(std::move(token));
+        bundle.Stop();
+        bundle.Uninstall();
+      }
+    });
+
+  frameworkshuttingdown.set_value();
+  framework.Stop();
+  auto evt = framework.WaitForStop(std::chrono::milliseconds::zero());
+  keepLooping = false;
+
+  // some of the framework operations can throw based on the point at which
+  // framework shutdown is happening. Catch any of those and continue, those
+  // exceptions are not relevant to this test.
+  try {
+    frameworkAccessThread.get();
+  } catch (...) {
+  }
+
+  ASSERT_EQ(evt.GetType(),
+            cppmicroservices::FrameworkEvent::Type::FRAMEWORK_STOPPED);
+}
+#endif
 
 US_MSVC_POP_WARNING

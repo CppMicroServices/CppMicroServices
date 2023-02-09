@@ -59,6 +59,19 @@ namespace cppmicroservices
      *   - "(!(cn=Tim Howes))"
      *   - "(&(" + Constants::OBJECTCLASS + "=Person)(|(sn=Jensen)(cn=Babs J*)))"
      *   - "(o=univ*of*mich*)"
+     * <p>
+     * We have added an extension to LDAPFilters to support querying against nested keys within the
+     * JSON manifest. Keys which contain the "." character may refer to nested values. We first look
+     * at the top level for a matching entry, and if one isn't found, we decompose the nested key
+     * and "walk down" the JSON structure looking for a match. For example:
+     *
+     *   - "("bundle.symbolic_name=my_bundle)". This will look for a match in two places. First it
+     *     will look in the JSON manifest for:
+     *     { "bundle.symbolic_name" : "my_bundle" }
+     *
+     *     If not found there, this will be checked:
+     *     { "bundle" : { "symbolic_name" : "my_bundle" } }
+     *   - top level flat keys are preferred in order to preserve the behavior of existing filters.
      *
      * \remarks This class is thread safe.
      *

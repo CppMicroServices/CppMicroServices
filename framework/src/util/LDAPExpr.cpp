@@ -128,7 +128,9 @@ namespace cppmicroservices
             std::function<typename MapT::const_iterator(AnyMap const* p, std::string const& name)> get_value_from_map,
             std::function<typename MapT::const_iterator(AnyMap const* p)> end_iter)
         {
-            // shortcut checking the full attrname path.
+            // short ciruit check. See if the full attrName is defined at the top level and return
+            // quickly if it is. We match this first to preserve existing behavior and only proceed
+            // to "walk down" the JSON tree if we don't find the value at the top level.
             auto lookup = get_value_from_map(pPtr, attrName);
             if (lookup != end_iter(pPtr))
             {

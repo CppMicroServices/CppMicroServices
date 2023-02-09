@@ -18,6 +18,7 @@
     },
     "h.i" : {
         "j.k" : 12,
-        "l.m.n" : true
-    }
+        "l.m.n" : false
+    },
+    "h.i.l.m.n" : true
 }

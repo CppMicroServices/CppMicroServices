@@ -136,11 +136,10 @@ bool ConfigurationNotifier::AnyListenersForPid(const std::string& pid) noexcept
       return false;
     }
   } //release listenersMapHandle lock
-  CreateFactoryComponent(factoryName, pid, mgr);
+  CreateFactoryComponent(pid, mgr);
   return true;
 }
 void ConfigurationNotifier::CreateFactoryComponent(
-  const std::string& factoryName,
   const std::string& pid,
   std::shared_ptr<ComponentConfigurationImpl>& mgr)
 {
@@ -155,7 +154,7 @@ void ConfigurationNotifier::CreateFactoryComponent(
   // component except the factory component itself.
   newMetadata->configurationPids.clear();
   for (const auto& basePid : oldMetadata->configurationPids) {
-    if (basePid != factoryName) {
+    if (basePid != oldMetadata->configurationPids[0])  {
       newMetadata->configurationPids.emplace_back(basePid);
     }
   }

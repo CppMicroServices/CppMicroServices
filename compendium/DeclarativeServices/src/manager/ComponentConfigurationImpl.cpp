@@ -200,6 +200,31 @@ void ComponentConfigurationImpl::Initialize()
       if (AreReferencesSatisfied() && configManager->IsConfigSatisfied()) {
         GetState()->Register(*this);
       }
+      // For factory components, see if any configuration objects for factory instances
+      // were created before the factory component was started. If so, create the factory
+      // component instances.
+      if (!metadata->factoryComponentID.empty()) {
+        auto sr = this->bundle.GetBundleContext().GetServiceReference<
+            cppmicroservices::service::cm::ConfigurationAdmin>();
+        if (!sr) {
+          throw std::runtime_error("ComponentConfigurationImpl - Could not get "
+              "ConfigurationAdmin service reference");
+        }
+        auto configAdmin =
+           this->bundle.GetBundleContext()
+            .GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
+        if (!configAdmin) {
+          throw std::runtime_error("ComponentConfigurationImpl - Could not get "
+                                   "ConfigurationAdmin service");
+        }
+        auto configs = configAdmin->ListConfigurations("(pid=" + metadata->configurationPids[0] + "~*)");
+        std::shared_ptr<ComponentConfigurationImpl> mgr = shared_from_this();
+        if (!configs.empty()) {
+          for (const auto& config : configs) {
+            configNotifier->CreateFactoryComponent(config->GetPid(), mgr);
+          }
+        }
+      }
     }
   }
 }

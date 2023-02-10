@@ -131,8 +131,7 @@ namespace cppmicroservices
             // short ciruit check. See if the full attrName is defined at the top level and return
             // quickly if it is. We match this first to preserve existing behavior and only proceed
             // to "walk down" the JSON tree if we don't find the value at the top level.
-            auto lookup = get_value_from_map(pPtr, attrName);
-            if (lookup != end_iter(pPtr))
+            if (auto lookup = get_value_from_map(pPtr, attrName); lookup != end_iter(pPtr))
             {
                 return lookup;
             }

@@ -37,6 +37,8 @@
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
 
+#include "TestUtils.hpp"
+
 using cppmicroservices::Constants::SCOPE_BUNDLE;
 using cppmicroservices::Constants::SCOPE_PROTOTYPE;
 using cppmicroservices::Constants::SCOPE_SINGLETON;
@@ -159,12 +161,11 @@ namespace cppmicroservices
          * This test point creates mutiple component configs per available bundle and
          * calls LocateService multiple times on each ComponentContext
          */
-        TEST_F(ComponentContextImplTest, DISABLED_VerifyLocateServiceWithReferenceScopes)
+        TEST_F(ComponentContextImplTest, VerifyLocateServiceWithReferenceScopes)
         {
             size_t iterCount = 4ul;
             size_t componentInstanceCount = 3ul;
             auto bc = GetFramework().GetBundleContext();
-            auto bundles = bc.GetBundles();
             auto VerifyLocateServiceWithScopes
                 = [&](std::string referenceScope, std::string publishedScope, size_t expectedServiceInstanceCount)
             {
@@ -204,7 +205,6 @@ namespace cppmicroservices
                             const cppmicroservices::ServiceRegistrationBase&,
                             const cppmicroservices::InterfaceMapConstPtr& service)
                         {
-                            // std::cout << "Unget called from bundle id " << bundle.GetBundleId() << std::endl;
                             if (publishedScope == SCOPE_SINGLETON)
                             {
                                 ASSERT_EQ(service, singletonInstance);
@@ -217,36 +217,43 @@ namespace cppmicroservices
                         {cppmicroservices::Constants::SERVICE_SCOPE, Any(publishedScope)}
                 });
 
-                for (auto& bundle : bundles)
-                {
-                    bundle.Start(); // In case the pkgtest bundle is not started
-                    auto bundleContext = bundle.GetBundleContext();
-                    auto mockRefMgrFoo
-                        = std::make_shared<ReferenceManagerImpl>(fakeRefMetadata, bundleContext, fakeLogger, "foobar");
-                    std::vector<std::shared_ptr<ReferenceManager>> depMgrs { mockRefMgrFoo };
-                    EXPECT_CALL(*mockConfig, GetAllDependencyManagers()).WillRepeatedly(testing::Return(depMgrs));
-                    EXPECT_CALL(*mockConfig, GetBundle()).WillRepeatedly(testing::Return(bundle));
+                auto bundleContext = GetFramework().GetBundleContext();
+                auto mockRefMgrFoo
+                    = std::make_shared<ReferenceManagerImpl>(fakeRefMetadata, bundleContext, fakeLogger, "foobar");
+                std::vector<std::shared_ptr<ReferenceManager>> depMgrs { mockRefMgrFoo };
+                EXPECT_CALL(*mockConfig, GetAllDependencyManagers()).WillRepeatedly(testing::Return(depMgrs));
+                EXPECT_CALL(*mockConfig, GetBundle()).WillRepeatedly(testing::Return(GetFramework()));
+                EXPECT_CALL(*mockConfig, GetMetadata()).WillRepeatedly(::testing::Return(std::make_shared<metadata::ComponentMetadata>()));
 
-                    // component context has 1:1 relation with component instance, so we
-                    // use the context to validate the number of instances of a reference
-                    std::vector<std::shared_ptr<ComponentContext>> contexts;
-                    for (size_t i = 0; i < componentInstanceCount; i++)
+                // component context has 1:1 relation with component instance, so we
+                // use the context to validate the number of instances of a reference
+                std::vector<std::shared_ptr<ComponentContext>> contexts;
+                for (size_t i = 0; i < componentInstanceCount; i++)
+                {
+                    // ComponentContextImpl ctor can throw if there are mandatory service references that are
+                    // not bound (i.e. unsatisfied). This test doesn't care about whether or not 
+                    // ComponentContextimpl throws, so catch and ignore the exception.
+                    try 
                     {
                         contexts.push_back(std::make_shared<ComponentContextImpl>(mockConfig));
-                    }
-
-                    for (size_t i = 0; i < iterCount; i++)
+                    } 
+                    catch(...) 
                     {
-                        for (auto ctxt : contexts)
+                    }
+                }
+
+                for (size_t i = 0; i < iterCount; i++)
+                {
+                    for (auto ctxt : contexts)
+                    {
+                        auto serviceObj = ctxt->LocateService<dummy::ServiceImpl>("foo");
+                        if (serviceObj)
                         {
-                            auto serviceObj = ctxt->LocateService<dummy::ServiceImpl>("foo");
-                            if (serviceObj)
-                            {
-                                instances.insert(serviceObj);
-                            }
+                            instances.insert(serviceObj);
                         }
                     }
                 }
+
                 EXPECT_TRUE(std::none_of(instances.begin(),
                                          instances.end(),
                                          [](const std::shared_ptr<dummy::ServiceImpl>& sObj)
@@ -264,11 +271,11 @@ namespace cppmicroservices
             // scope all component instances within the same bundle must receive the
             // same instance of the reference. Components from different bundles must
             // receive distinct instances
-            VerifyLocateServiceWithScopes(SCOPE_BUNDLE, SCOPE_BUNDLE, bundles.size());
+            VerifyLocateServiceWithScopes(SCOPE_BUNDLE, SCOPE_BUNDLE, 1ul);
             // If the reference scope is BUNDLE, and service is published with PROTOTYPE
             // this is no different from the case where the service is published with
             // BUNDLE scope
-            VerifyLocateServiceWithScopes(SCOPE_BUNDLE, SCOPE_PROTOTYPE, bundles.size());
+            VerifyLocateServiceWithScopes(SCOPE_BUNDLE, SCOPE_PROTOTYPE, 1ul);
 
             // If the reference scope is PROTOTYPE, and service is published with SINGLETON
             // scope all component instances must receive the same instance of the reference
@@ -277,11 +284,11 @@ namespace cppmicroservices
             // scope all component instances within the same bundle must receive the
             // same instance of the reference. Components from different bundles must
             // receive distinct instances
-            VerifyLocateServiceWithScopes(SCOPE_PROTOTYPE, SCOPE_BUNDLE, bundles.size());
+            VerifyLocateServiceWithScopes(SCOPE_PROTOTYPE, SCOPE_BUNDLE, 1ul);
             // If the reference scope is PROTOTYPE, and service is published with PROTOTYPE
             // scope each component instance must receive a unique instance of the reference
             // service
-            VerifyLocateServiceWithScopes(SCOPE_PROTOTYPE, SCOPE_PROTOTYPE, bundles.size() * componentInstanceCount);
+            VerifyLocateServiceWithScopes(SCOPE_PROTOTYPE, SCOPE_PROTOTYPE, componentInstanceCount);
 
             // If the reference scope is PROTOTYPE_REQUIRED, and service is published
             // with SINGLETON scope, the reference remains unsatisfied
@@ -294,7 +301,7 @@ namespace cppmicroservices
             // instance of the reference service
             VerifyLocateServiceWithScopes(REFERENCE_SCOPE_PROTOTYPE_REQUIRED,
                                           SCOPE_PROTOTYPE,
-                                          bundles.size() * componentInstanceCount);
+                                          componentInstanceCount);
         }
 
         TEST_F(ComponentContextImplTest, VerifyLocateServiceWithHighestRank)
@@ -357,6 +364,8 @@ namespace cppmicroservices
             });
         }
 
+        // Test that calling LocateService with an empty type string returns the service associated
+        // with the service reference name.
         TEST_F(ComponentContextImplTest, VerifyLocateServiceWithEmptyInterfaceTypeString)
         {
             auto mockCompConfig = std::make_shared<MockComponentConfiguration>();
@@ -373,7 +382,69 @@ namespace cppmicroservices
                     ASSERT_TRUE(fooSvc == registeredFooSvc);
                 });
 
-            fooServiceReg.Unregister();
+            ASSERT_NO_THROW(fooServiceReg.Unregister());
+        }
+
+        // Test that if a nullptr service makes it into the bound services cache, for example
+        // if the service is unregistered on another thread, that LocateService will throw an exception.
+        TEST_F(ComponentContextImplTest, VerifyLocateServiceWithNullPtrService)
+        {
+            // publish a service
+            auto mockServiceFactory = std::make_shared<MockFactory>();
+
+            EXPECT_CALL(*mockServiceFactory, GetService(testing::_, testing::_))
+                .WillRepeatedly(testing::Invoke(
+                    [&](const cppmicroservices::Bundle&, const cppmicroservices::ServiceRegistrationBase&)
+                    {
+                        std::unordered_map<std::string, std::shared_ptr<void>> nullptrSvcMap;
+                        nullptrSvcMap.insert({"cppmicroservices::scrimpl::dummy::ServiceImpl", nullptr});
+                        return std::make_shared<InterfaceMap const>(std::move(nullptrSvcMap));
+                    }));
+
+            EXPECT_CALL(*mockServiceFactory, UngetService(testing::_, testing::_, testing::_))
+                .WillRepeatedly(testing::Invoke(
+                    [&](const cppmicroservices::Bundle&,
+                        const cppmicroservices::ServiceRegistrationBase&,
+                        const cppmicroservices::InterfaceMapConstPtr& )
+                    {
+                    }));
+
+            auto sReg = GetFramework().GetBundleContext().RegisterService<dummy::ServiceImpl>(
+                ToFactory(mockServiceFactory),
+                {
+                    {cppmicroservices::Constants::SERVICE_SCOPE, cppmicroservices::Constants::SCOPE_BUNDLE}
+            });
+
+            auto mockCompConfig = std::make_shared<MockComponentConfiguration>();
+            ON_CALL(*mockCompConfig, GetBundle).WillByDefault(::testing::Return(GetFramework()));
+            ON_CALL(*mockCompConfig, GetMetadata).WillByDefault(::testing::Return(std::make_shared<metadata::ComponentMetadata>()));
+
+            auto compCtx = std::make_shared<ComponentContextImpl>(mockCompConfig, GetFramework());
+
+            ASSERT_TRUE(compCtx->AddToBoundServicesCache("foo", sReg.GetReference()));
+            ASSERT_THROW(compCtx->LocateService("foo", "cppmicroservices::scrimpl::dummy::ServiceImpl"), ComponentException);
+
+            ASSERT_NO_THROW(sReg.Unregister());
+        }
+
+        // Test that LocateService returns nullptr if a DS service failed to be constructed and
+        // activated and if that service was added to the cache of bound services for the service component.
+        TEST_F(ComponentContextImplTest, VerifyLocateServiceOnFailedServiceObjectConstruction)
+        {
+            ::test::InstallAndStartDS(GetFramework().GetBundleContext());
+            auto testBundle = ::test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSUpstreamDependencyA");
+            auto svcRef = testBundle.GetBundleContext().GetServiceReference("test::TestBundleDSUpstreamDependency");
+            auto svc = testBundle.GetBundleContext().GetService(svcRef);
+
+            ASSERT_TRUE(!svc);
+
+            auto mockCompConfig = std::make_shared<MockComponentConfiguration>();
+            ON_CALL(*mockCompConfig, GetBundle).WillByDefault(::testing::Return(GetFramework()));
+
+            auto compCtx = std::make_shared<ComponentContextImpl>(mockCompConfig, GetFramework());
+
+            ASSERT_FALSE(compCtx->AddToBoundServicesCache("foo", svcRef));
+            ASSERT_TRUE(nullptr == compCtx->LocateService("foo", "test::TestBundleDSUpstreamDependency"));
         }
 
 

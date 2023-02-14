@@ -539,7 +539,6 @@ void ConfigurationAdminImpl::RemoveConfigurations(
     }
     ++idx;
   }
-  WaitForAllAsync();
 }
 
 std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(

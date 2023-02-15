@@ -70,6 +70,7 @@ namespace cppmicroservices
                 auto const& sRefs = refManager->GetBoundReferences();
                 auto const& refName = refManager->GetReferenceName();
                 auto const& refScope = refManager->GetReferenceScope();
+                bool foundAtLeastOneValidBoundService = false;
                 std::for_each(
                     sRefs.rbegin(),
                     sRefs.rend(),
@@ -83,21 +84,36 @@ namespace cppmicroservices
                             auto& serviceMap = (*boundServicesCacheHandle)[refName];
                             if (refScope == cppmicroservices::Constants::SCOPE_BUNDLE)
                             {
-                                serviceMap.push_back(bc.GetService(sRefU));
+                                auto svc = bc.GetService(sRefU);
+                                if (svc)
+                                {
+                                    foundAtLeastOneValidBoundService = true;
+                                }
+                                serviceMap.push_back(svc);
                             }
                             else
                             {
-                                auto registeredScope
-                                    = sRef.GetProperty(cppmicroservices::Constants::SERVICE_SCOPE).ToStringNoExcept();
                                 cppmicroservices::ServiceObjects<void> sObjs = bc.GetServiceObjects(sRefU);
                                 auto interfaceMap = sObjs.GetService();
                                 if (interfaceMap)
                                 {
+                                    foundAtLeastOneValidBoundService = true;
                                     serviceMap.push_back(interfaceMap);
                                 }
                             }
                         }
                     });
+
+                // Check that all the refernece managers have a valid bound service reference if one
+                // is manodatory.
+                // If this check fails, it's usually because a dependent service was unregistered
+                // while the service object was being retrieved to add to the container of bound services.
+                if (!refManager->IsOptional() && !foundAtLeastOneValidBoundService)
+                {
+                    throw ComponentException("Failed to construct a component context for " + configManagerPtr->GetMetadata()->implClassName + 
+                        ". No services were found which satisfy the mandatory service dependency " + refName + 
+                        ". This typically occurs because the dependent service was unregistered before it could be used.");
+                }
             }
         }
 
@@ -110,6 +126,21 @@ namespace cppmicroservices
                 throw ComponentException("Context is invalid");
             }
             return configManagerPtr->GetProperties();
+        }
+
+        bool ServiceReferenceTargetIsMandatory(std::shared_ptr<ComponentConfiguration> const& configManagerPtr, std::string const& svcRefTargetName)
+        {
+            auto metadata = configManagerPtr->GetMetadata();
+            for (auto const& _data : metadata->refsMetadata)
+            {
+                if (_data.name == svcRefTargetName)
+                {
+                    auto const cardinality = _data.cardinality;
+                    return (cardinality.empty())?true:(cardinality.find("1..") != std::string::npos);
+                }
+            }
+
+            return true;
         }
 
         /**
@@ -209,40 +240,19 @@ namespace cppmicroservices
             {
                 return lookupInfo.service;
             }
-            else
-            { // Checking for error condition and throwing if necessary
-                std::string cardinality {};
-                auto metadata = configManagerPtr->GetMetadata();
-                for (auto const& _data : metadata->refsMetadata)
-                {
-                    if (_data.name == name)
-                    {
-                        cardinality = _data.cardinality;
-                    }
-                }
 
-                bool isMandatory = false;
-                if (cardinality.empty())
-                {
-                    isMandatory = true;
-                }
-                else
-                {
-                    isMandatory = cardinality.find("1..") != std::string::npos;
-                }
+            // Checking for error condition and throwing if necessary
+            // In the case of service being a nullptr, we throw because this implies
+            // that the construction or activation of the service failed.
+            if (ServiceReferenceTargetIsMandatory(configManagerPtr, name))
+            {
+                std::string errMsg = "Service ";
+                errMsg += name;
+                errMsg += " with type ";
+                errMsg += type;
+                errMsg += " failed to construct or activate.";
 
-                // In the case of service being a nullptr, we throw because this implies
-                // that the construction or activation of the service failed.
-                if (!lookupInfo.IsValid() && isMandatory)
-                {
-                    std::string errMsg = "Service ";
-                    errMsg += name;
-                    errMsg += " with type ";
-                    errMsg += type;
-                    errMsg += " failed to construct or activate.";
-
-                    throw ComponentException(errMsg);
-                }
+                throw ComponentException(errMsg);
             }
 
             return nullptr;
@@ -267,7 +277,7 @@ namespace cppmicroservices
                     return service;
                 }
             }
-
+            
             return nullptr;
         }
 

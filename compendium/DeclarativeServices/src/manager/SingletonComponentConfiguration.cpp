@@ -216,7 +216,7 @@ namespace cppmicroservices
             if (!context->AddToBoundServicesCache(refName, ref))
             {
                 GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
-                                 "Failure while trying to add reference to BoundServices Cache ");
+                                 "Failure while adding reference " + refName + " to the bound services cache.");
                 return;
             }
             try
@@ -226,8 +226,8 @@ namespace cppmicroservices
             catch (std::exception const&)
             {
                 GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                 "Exception received from user code while binding a "
-                                 "service reference.",
+                                 "Exception received from user code while binding "
+                                 "service reference" + refName + ".",
                                  std::current_exception());
             }
         }
@@ -243,8 +243,8 @@ namespace cppmicroservices
             catch (std::exception const&)
             {
                 GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                 "Exception received from user code while unbinding a "
-                                 "service reference.",
+                                 "Exception received from user code while unbinding "
+                                 "service reference" + refName + ".",
                                  std::current_exception());
             }
             auto context = GetComponentContext();

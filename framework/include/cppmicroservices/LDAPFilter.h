@@ -60,10 +60,10 @@ namespace cppmicroservices
      *   - "(&(" + Constants::OBJECTCLASS + "=Person)(|(sn=Jensen)(cn=Babs J*)))"
      *   - "(o=univ*of*mich*)"
      *
-     * We extended LDAPFilters to make it easier to query nested JSON keys.  Keys which contain the
-     * "." character may refer to nested values. We first look at the top level for a matching
-     * entry, and if one isn't found, we decompose the nested key and "walk down" the JSON structure
-     * looking for a match.
+     * LDAPFilters have been extended to make it easier to query nested JSON keys.  Keys which
+     * contain the "." character may refer to nested values. We first look at the top level for a
+     * matching entry, and if one isn't found, we decompose the nested key and "walk down" the JSON
+     * structure looking for a match.
      *
      * Keys are decomposed into individual segments using the "." character as a segment
      * separator. For example, given a key "a.b.c.d", if a value exists in the top level map with
@@ -91,6 +91,8 @@ namespace cppmicroservices
      *   - top level flat keys are preferred in order to preserve the behavior of existing filters.
      *
      * \remarks This class is thread safe.
+     *
+     * \sa Use LDAPProp API to conveniently generate LDAP filter strings
      *
      */
     class US_Framework_EXPORT LDAPFilter

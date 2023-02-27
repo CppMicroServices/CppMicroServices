@@ -15,7 +15,7 @@ else()
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
 
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/DSTestingConfig.h")
+#configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/DSTestingConfig.h")
 
 include_directories(
   ${GTEST_INCLUDE_DIRS}
@@ -196,21 +196,6 @@ endif()
 if(MINGW)
   target_link_libraries(${us_declarativeservices_bench_test_exe_name} PRIVATE -lpsapi)
 endif()
-
-# Copy the Google Test libraries into the same folder as the
-# executable so that they can be seen at runtime on Windows.
-# Mac and Linux use RPATHs and do not need to do this.
-#if (WIN32 AND US_USE_SYSTEM_GTEST)
-#  foreach(lib_fullpath ${GTEST_BOTH_LIBRARIES})
-#    get_filename_component(dir ${lib_fullpath} DIRECTORY)
-#    get_filename_component(name_no_ext ${lib_fullpath} NAME_WE)
-#    set(dll_file "${dir}/${name_no_ext}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-#    add_custom_command(TARGET ${us_declarativeservices_bench_test_exe_name} POST_BUILD
-#    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#        "${dll_file}"
-#        $<TARGET_FILE_DIR:${us_declarativeservices_bench_test_exe_name}>)
-#  endforeach(lib_fullpath)
-#endif()
 
 #-----------------------------------------------------------------------------
 # Add dependencies on test bundles if building shared libraries or

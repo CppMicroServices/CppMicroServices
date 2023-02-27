@@ -15,8 +15,6 @@ else()
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_NATIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
 
-#configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../TestingConfig.h.in" "${PROJECT_BINARY_DIR}/include/DSTestingConfig.h")
-
 include_directories(
   ${GTEST_INCLUDE_DIRS}
   ${GMOCK_INCLUDE_DIRS}

@@ -60,9 +60,40 @@ namespace cppmicroservices
      *   - "(&(" + Constants::OBJECTCLASS + "=Person)(|(sn=Jensen)(cn=Babs J*)))"
      *   - "(o=univ*of*mich*)"
      *
+     * LDAPFilters have been extended to make it easier to query nested JSON keys.  Keys which
+     * contain the "." character may refer to nested values. We first look at the top level for a
+     * matching entry, and if one isn't found, we decompose the nested key and "walk down" the JSON
+     * structure looking for a match.
+     *
+     * Keys are decomposed into individual segments using the "." character as a segment
+     * separator. For example, given a key "a.b.c.d", if a value exists in the top level map with
+     * that key, we return it. if a value is not found at the top level with that key, we decompose
+     * that key into a vector: ["a","b","c","d"]. Ultimately for the filter to be applied, there
+     * must be a value in a nested AnyMap with a key ending with "d". So, we first look at the top
+     * level map for a submap at key "a". If a value rather than a map is found there, there is no
+     * path to "d", so we stop with an unsuccessful lookup. If a map does exist, we look in that map
+     * for a key of "b" and continue from there with the same algorithm (looking at that submap for
+     * keys "b", "b.c", and "b.c.d"). If not, we then look for a submap at the top level at key
+     * "a.b". Again, if a value is found rather than a map, there is no path to "d" so we halt the
+     * lookup. If a submap is found there, we then look in that map for a key of "c" and continue
+     * from there. Finally, if there is no item in the to plevel map at "a.b", we look at
+     * "a.b.c". And again, a value there halts the algorithem. If a map is found there, we finally
+     * look for a value at "d" in that map.
+     *
+     * A real world example:
+     *
+     *   - "("bundle.symbolic_name=my_bundle)". This will look for a match in two places. First it
+     *     will look in the JSON manifest for:
+     *     { "bundle.symbolic_name" : "my_bundle" }
+     *
+     *     If not found there, this will be checked:
+     *     { "bundle" : { "symbolic_name" : "my_bundle" } }
+     *   - top level flat keys are preferred in order to preserve the behavior of existing filters.
+     *
      * \remarks This class is thread safe.
      *
-     * \sa LDAPProp for a fluent API generating LDAP filter strings
+     * \sa Use LDAPProp API to conveniently generate LDAP filter strings
+     *
      */
     class US_Framework_EXPORT LDAPFilter
     {

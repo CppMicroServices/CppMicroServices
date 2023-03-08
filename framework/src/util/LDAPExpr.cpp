@@ -138,10 +138,7 @@ namespace cppmicroservices
                 return lookup;
             }
 #ifndef SUPPORT_NESTED_LOOKUP
-            else
-            {
-                return std::nullopt;
-            }
+            return std::nullopt;
 #else
             // If not found at the full attrname, decompose the path and do a full check.
             // First, split the m_attrName into a vector at the . separator and reverse it.

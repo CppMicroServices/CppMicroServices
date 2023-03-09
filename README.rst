@@ -17,6 +17,8 @@
 
 |Coverity Scan Build Status|
 
+|Performance Status|
+ 
 
 C++ Micro Services
 ==================
@@ -223,6 +225,8 @@ file for details about the contribution process.
    :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/master
 .. |Code Coverage Status (development)| image:: https://img.shields.io/codecov/c/github/CppMicroServices/CppMicroServices/development.svg?style=flat-square
    :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/development
+.. |Performance Status| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/performance_windows.yml/badge.svg
+   :target: http://cppmicroservices.org/
 
 Git Hooks General Information
 -----------------------------

@@ -26,6 +26,6 @@ namespace {
 // empty object files.
 struct CMakeResourceDependencies
 {
-  CMakeResourceDependencies() {}
+  CMakeResourceDependencies() = default;
 };
 }

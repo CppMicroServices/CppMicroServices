@@ -70,7 +70,7 @@ jobs:
         output-file-path: Z:\build\config_0\bin\Release\benchmark_result.json
         github-token: ${{ secrets.GITHUB_TOKEN }}
         gh-repository: 'github.com/aadityap-mathworks/CppMicroServices_UPT'
-        gh-pages-branch: performance-results
+        gh-pages-branch: perf
         auto-push: true
         # Show alert with commit comment on detecting possible performance regression
         alert-threshold: '15%'

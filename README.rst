@@ -226,7 +226,7 @@ file for details about the contribution process.
 .. |Code Coverage Status (development)| image:: https://img.shields.io/codecov/c/github/CppMicroServices/CppMicroServices/development.svg?style=flat-square
    :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/development
 .. |Performance Status| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/performance_windows.yml/badge.svg
-   :target: http://cppmicroservices.org/
+   :target: https://cppmicroservices.org/dev/bench/
 
 Git Hooks General Information
 -----------------------------

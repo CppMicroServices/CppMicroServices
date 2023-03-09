@@ -62,14 +62,13 @@ jobs:
     - name: Run benchmark and store result in json format
       run: Z:\build\config_0\bin\Release\usFrameworkBenchTests.exe  --benchmark_format=json | tee Z:\build\config_0\bin\Release\benchmark_result.json
 
-    - name: Continuous Benchmark
+    - name: Benchmark and Deploy
       uses: benchmark-action/github-action-benchmark@v1.16.1
       with:
         name: C++ Benchmark
         tool: 'googlecpp'
         output-file-path: Z:\build\config_0\bin\Release\benchmark_result.json
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        gh-pages-branch: performance-results
         auto-push: true
         # Show alert with commit comment on detecting possible performance regression
         alert-threshold: '15%'

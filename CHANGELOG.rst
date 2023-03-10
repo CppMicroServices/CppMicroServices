@@ -6,10 +6,10 @@ All notable changes to this project branch will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-`Unreleased C++14-branch based on 3.6.0 <https://github.com/cppmicroservices/cppmicroservices/tree/c++14-compliant>`_
+`Unreleased C++14-branch based on 3.6.2 <https://github.com/cppmicroservices/cppmicroservices/tree/c++14-compliant>`_
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/CppMicroServices/CppMicroServices/compare/v3.6.0...c++14-compliant>`_
+`Full Changelog <https://github.com/CppMicroServices/CppMicroServices/compare/v3.6.2...c++14-compliant>`_
 
 General Note
 ------------
@@ -30,6 +30,47 @@ Deprecated
 
 Fixed
 -----
+
+`v3.6.2 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.6.2>`_ (2023-03-10)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/CppMicroServices/CppMicroServices/compare/v3.6.1...v3.6.2>`_
+
+General Note
+------------
+
+This entry in the change log captures the relevant changes that were made between v3.6.1 and v3.6.2.
+This version contains all changes between v3.7.2 and v3.7.4 except setting CXX_STANDARD to 17 for the documentation.
+Additionally there have been 3rd-party dependency updates and some compiler warning fixes not in v3.7.4.
+
+Added
+-----
+
+Changed
+-------
+- `Update spdlog to v1.11.0 and its bundled fmt to latest master <https://github.com/CppMicroServices/CppMicroServices/pull/789>`_
+- `Update miniz to v3.0.2 <https://github.com/CppMicroServices/CppMicroServices/pull/788>`_
+- `Update gtest to v1.13.0 to fix compiler warnings with gcc-12 <https://github.com/CppMicroServices/CppMicroServices/pull/803>`_
+- `[Core Framework] Improve performance of LDAP matching - C++14 variant <https://github.com/CppMicroServices/CppMicroServices/pull/793>`_
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[ConfigurationAdmin] Factory Configuration Bug Fix <https://github.com/CppMicroServices/CppMicroServices/pull/731>`_
+- `[Declarative Services] Improve error messages for ComponentInstance constructor <https://github.com/CppMicroServices/CppMicroServices/pull/724>`_
+- `[Configuration Admin] Fix race that results in missed config updated event <https://github.com/CppMicroServices/CppMicroServices/pull/727>`_
+- `[Core Framework] Fix sporadic race conditions during framework shutdown <https://github.com/CppMicroServices/CppMicroServices/pull/725>`_
+- `[Declarative Services] Factory instance name should use component name <https://github.com/CppMicroServices/CppMicroServices/pull/720>`_
+- `[Configuration Admin] ListConfigurations fix for empty configuration objects. <https://github.com/CppMicroServices/CppMicroServices/pull/682>`_
+- `[Configuration Admin] Fix deadlock and double update. <https://github.com/CppMicroServices/CppMicroServices/pull/651>`_
+- `[Configuration Admin] Remove automatic configuration object creation <https://github.com/CppMicroServices/CppMicroServices/pull/717>`_
+- `[Core Framework] ServiceTracker GetTrackingCount() when opened and then closed <https://github.com/CppMicroServices/CppMicroServices/pull/714>`_
+- `[SCRCodeGen] Fixed compiler warning for gcc-12 <https://github.com/CppMicroServices/CppMicroServices/pull/803>`_
 
 `v3.6.1 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.6.1>`_ (2022-12-06)
 ---------------------------------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ namespace
     {
       public:
         void
-        SetUp(::benchmark::State const&)
+        SetUp(::benchmark::State const&) override
         {
             using namespace cppmicroservices;
             framework = std::make_shared<Framework>(FrameworkFactory().NewFramework());
@@ -30,7 +30,7 @@ namespace
         }
 
         void
-        TearDown(::benchmark::State const&)
+        TearDown(::benchmark::State const&) override
         {
             framework->Stop();
             framework->WaitForStop(std::chrono::milliseconds::zero());

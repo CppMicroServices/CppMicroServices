@@ -17,8 +17,11 @@ namespace
     class GetDSServiceFixture : public ::benchmark::Fixture
     {
       public:
+        using benchmark::Fixture::SetUp;
+        using benchmark::Fixture::TearDown;
+
         void
-        SetUp(::benchmark::State const&) override
+        SetUp(::benchmark::State const&)
         {
             using namespace cppmicroservices;
             framework = std::make_shared<Framework>(FrameworkFactory().NewFramework());
@@ -30,7 +33,7 @@ namespace
         }
 
         void
-        TearDown(::benchmark::State const&) override
+        TearDown(::benchmark::State const&)
         {
             framework->Stop();
             framework->WaitForStop(std::chrono::milliseconds::zero());

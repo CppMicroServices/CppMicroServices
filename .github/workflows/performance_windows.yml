@@ -3,8 +3,6 @@ name: PerformanceWindows
 on:
   push:
     branches: [ development, performance, c\+\+14-compliant, master ]
-  pull_request:
-    branches: [ development, c\+\+14-compliant ]
   workflow_dispatch:
 
 permissions:

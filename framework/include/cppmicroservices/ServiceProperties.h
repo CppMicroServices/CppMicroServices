@@ -28,18 +28,19 @@
 #include <string>
 #include <unordered_map>
 
-namespace cppmicroservices {
+namespace cppmicroservices
+{
 
-/**
- * \ingroup MicroServices
- *
- * A hash table with std::string as the key type and Any as the value
- * type. It is typically used for passing service properties to
- * BundleContext::RegisterService.
- *
- * Deprecated. Use AnyMap instead.
- */
-using ServiceProperties = std::unordered_map<std::string, Any>;
-}
+    /**
+     * \ingroup MicroServices
+     *
+     * A hash table with std::string as the key type and Any as the value
+     * type. It is typically used for passing service properties to
+     * BundleContext::RegisterService.
+     *
+     * Deprecated. Use AnyMap instead.
+     */
+    using ServiceProperties = std::unordered_map<std::string, Any>;
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SERVICEPROPERTIES_H

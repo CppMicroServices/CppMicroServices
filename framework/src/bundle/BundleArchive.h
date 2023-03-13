@@ -30,151 +30,151 @@
 
 #include "BundleManifest.h"
 
-namespace cppmicroservices {
-
-class BundleResource;
-class BundleResourceContainer;
-struct BundleStorage;
-
-/**
- * Class for managing bundle data.
- */
-struct BundleArchive : std::enable_shared_from_this<BundleArchive>
+namespace cppmicroservices
 {
-  using TimeStamp = std::chrono::steady_clock::time_point;
 
-  BundleArchive(const BundleArchive&) = delete;
-  BundleArchive& operator=(const BundleArchive&) = delete;
+    class BundleResource;
+    class BundleResourceContainer;
+    struct BundleStorage;
 
-  BundleArchive();
+    /**
+     * Class for managing bundle data.
+     */
+    struct BundleArchive : std::enable_shared_from_this<BundleArchive>
+    {
+        using TimeStamp = std::chrono::steady_clock::time_point;
 
-  BundleArchive(BundleStorage* storage,
-                std::shared_ptr<BundleResourceContainer> resourceContainer,
-                std::string resourcePrefix,
-                std::string location,
-                long bundleId,
-                AnyMap bundleManifest);
+        BundleArchive(BundleArchive const&) = delete;
+        BundleArchive& operator=(BundleArchive const&) = delete;
 
-  /**
-   * Autostart setting stopped.
-   *
-   * @see BundleArchive#setAutostartSetting(String)
-   */
-  static const std::string AUTOSTART_SETTING_STOPPED; // = "stopped";
+        BundleArchive();
 
-  /**
-   * Autostart setting eager.
-   *
-   * @see BundleArchive#setAutostartSetting(String)
-   */
-  static const std::string AUTOSTART_SETTING_EAGER; // = "eager";
+        BundleArchive(BundleStorage* storage,
+                      std::shared_ptr<BundleResourceContainer> resourceContainer,
+                      std::string resourcePrefix,
+                      std::string location,
+                      long bundleId,
+                      AnyMap bundleManifest);
 
-  /**
-   * Autostart setting declared activation policy.
-   *
-   * @see BundleArchive#setAutostartSetting(String)
-   */
-  static const std::string
-    AUTOSTART_SETTING_ACTIVATION_POLICY; // = "activation_policy";
+        /**
+         * Autostart setting stopped.
+         *
+         * @see BundleArchive#setAutostartSetting(String)
+         */
+        static const std::string AUTOSTART_SETTING_STOPPED; // = "stopped";
 
-  bool IsValid() const;
+        /**
+         * Autostart setting eager.
+         *
+         * @see BundleArchive#setAutostartSetting(String)
+         */
+        static const std::string AUTOSTART_SETTING_EAGER; // = "eager";
 
-  /**
-   * Remove bundle archive from storage.
-   */
-  void Purge();
+        /**
+         * Autostart setting declared activation policy.
+         *
+         * @see BundleArchive#setAutostartSetting(String)
+         */
+        static const std::string AUTOSTART_SETTING_ACTIVATION_POLICY; // = "activation_policy";
 
-  /**
-   * Get bundle identifier for this bundle archive.
-   *
-   * @return Bundle identifier.
-   */
-  long GetBundleId() const;
+        bool IsValid() const;
 
-  /**
-   * Get bundle location for this bundle archive.
-   *
-   * @return Bundle location.
-   */
-  std::string GetBundleLocation() const;
+        /**
+         * Remove bundle archive from storage.
+         */
+        void Purge();
 
-  /**
-   * Get resource prefix in the shared resource container for this bundle archive.
-   *
-   * @return Resource prefix.
-   */
-  std::string GetResourcePrefix() const;
+        /**
+         * Get bundle identifier for this bundle archive.
+         *
+         * @return Bundle identifier.
+         */
+        long GetBundleId() const;
 
-  /**
-   * Get a BundleResource to named entry inside a bundle.
-   *
-   * @param path Entry to get reference to.
-   * @return BundleResource to entry.
-   */
-  BundleResource GetResource(const std::string& path) const;
+        /**
+         * Get bundle location for this bundle archive.
+         *
+         * @return Bundle location.
+         */
+        std::string GetBundleLocation() const;
 
-  /**
-   * Returns a list of all the paths to entries within the bundle matching
-   * the pattern.
-   *
-   * @param path
-   * @param filePattern
-   * @param recurse
-   * @return
-   */
-  std::vector<BundleResource> FindResources(const std::string& path,
-                                            const std::string& filePattern,
-                                            bool recurse) const;
+        /**
+         * Get resource prefix in the shared resource container for this bundle archive.
+         *
+         * @return Resource prefix.
+         */
+        std::string GetResourcePrefix() const;
 
-  /**
-   * Get last modified timestamp.
-   */
-  TimeStamp GetLastModified() const;
+        /**
+         * Get a BundleResource to named entry inside a bundle.
+         *
+         * @param path Entry to get reference to.
+         * @return BundleResource to entry.
+         */
+        BundleResource GetResource(std::string const& path) const;
 
-  /**
-   * Set stored last modified timestamp.
-   */
-  void SetLastModified(const TimeStamp& ts);
+        /**
+         * Returns a list of all the paths to entries within the bundle matching
+         * the pattern.
+         *
+         * @param path
+         * @param filePattern
+         * @param recurse
+         * @return
+         */
+        std::vector<BundleResource> FindResources(std::string const& path,
+                                                  std::string const& filePattern,
+                                                  bool recurse) const;
 
-  /**
-   * Get auto-start setting.
-   *
-   * @return the autostart setting. "-1" if bundle not started.
-   */
-  int32_t GetAutostartSetting() const;
+        /**
+         * Get last modified timestamp.
+         */
+        TimeStamp GetLastModified() const;
 
-  /**
-   * Set the auto-start setting.
-   *
-   * @param setting the autostart setting to use.
-   */
-  void SetAutostartSetting(int32_t setting);
+        /**
+         * Set stored last modified timestamp.
+         */
+        void SetLastModified(TimeStamp const& ts);
 
-  std::shared_ptr<BundleResourceContainer> GetResourceContainer() const;
+        /**
+         * Get auto-start setting.
+         *
+         * @return the autostart setting. "-1" if bundle not started.
+         */
+        int32_t GetAutostartSetting() const;
 
-  /**
-   * Return the manifest for the bundle in this bundlearchive.
-   */
-  const AnyMap& GetInjectedManifest() const;
+        /**
+         * Set the auto-start setting.
+         *
+         * @param setting the autostart setting to use.
+         */
+        void SetAutostartSetting(int32_t setting);
 
-private:
-  BundleStorage* const storage;
-  const std::shared_ptr<BundleResourceContainer> resourceContainer;
-  const std::string resourcePrefix;
-  const std::string location;
+        std::shared_ptr<BundleResourceContainer> GetResourceContainer() const;
 
-  const long bundleId;
-  int64_t lastModified;
-  int32_t autostartSetting;
+        /**
+         * Return the manifest for the bundle in this bundlearchive.
+         */
+        AnyMap const& GetInjectedManifest() const;
 
-  /** The BundleManifest for this BundleArchive.
-   *
-   * Needs to be mutable to allow for lazy loading from the file. The "GetManifest()" method is
-   * "const". A BundleArchive is constructed with an empty manifest will read its manifest from the
-   * file the first time it's asked for, and stored here.
-   */
-  AnyMap manifest;
-};
-}
+      private:
+        BundleStorage* const storage;
+        const std::shared_ptr<BundleResourceContainer> resourceContainer;
+        const std::string resourcePrefix;
+        const std::string location;
+
+        long const bundleId;
+        int64_t lastModified;
+        int32_t autostartSetting;
+
+        /** The BundleManifest for this BundleArchive.
+         *
+         * Needs to be mutable to allow for lazy loading from the file. The "GetManifest()" method is
+         * "const". A BundleArchive is constructed with an empty manifest will read its manifest from the
+         * file the first time it's asked for, and stored here.
+         */
+        AnyMap manifest;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLEARCHIVE_H

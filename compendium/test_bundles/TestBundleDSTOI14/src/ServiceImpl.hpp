@@ -3,14 +3,15 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 
-namespace sample {
-class ServiceComponent14 : public test::Interface1
+namespace sample
 {
-public:
-  ServiceComponent14() = default;
-  ~ServiceComponent14() override;
-  std::string Description() override;
-};
-}
+    class ServiceComponent14 : public test::Interface1
+    {
+      public:
+        ServiceComponent14() = default;
+        ~ServiceComponent14() override;
+        std::string Description() override;
+    };
+} // namespace sample
 
 #endif // _SERVICE_IMPL_HPP_

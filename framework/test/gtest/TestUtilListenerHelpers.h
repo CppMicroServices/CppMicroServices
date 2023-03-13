@@ -30,66 +30,57 @@
 
 US_MSVC_PUSH_DISABLE_WARNING(4996)
 
-namespace cppmicroservices {
-
-template<class Receiver>
-class BundleListenerRegistrationHelper
+namespace cppmicroservices
 {
 
-public:
-  typedef void (Receiver::*CallbackType)(const BundleEvent&);
+    template <class Receiver>
+    class BundleListenerRegistrationHelper
+    {
 
-  BundleListenerRegistrationHelper(const BundleContext& context,
-                                   Receiver* receiver,
-                                   CallbackType callback)
-    : context(context)
-    , receiver(receiver)
-    , callback(callback)
-  {
-    EXPECT_NO_THROW(this->context.AddBundleListener(receiver, callback))
-      << "bundle listener registration failed";
-  }
+      public:
+        typedef void (Receiver::*CallbackType)(BundleEvent const&);
 
-  ~BundleListenerRegistrationHelper()
-  {
-    context.RemoveBundleListener(receiver, callback);
-  }
+        BundleListenerRegistrationHelper(BundleContext const& context, Receiver* receiver, CallbackType callback)
+            : context(context)
+            , receiver(receiver)
+            , callback(callback)
+        {
+            EXPECT_NO_THROW(this->context.AddBundleListener(receiver, callback))
+                << "bundle listener registration failed";
+        }
 
-private:
-  BundleContext context;
-  Receiver* receiver;
-  CallbackType callback;
-};
+        ~BundleListenerRegistrationHelper() { context.RemoveBundleListener(receiver, callback); }
 
-template<class Receiver>
-class ServiceListenerRegistrationHelper
-{
+      private:
+        BundleContext context;
+        Receiver* receiver;
+        CallbackType callback;
+    };
 
-public:
-  typedef void (Receiver::*CallbackType)(const ServiceEvent&);
+    template <class Receiver>
+    class ServiceListenerRegistrationHelper
+    {
 
-  ServiceListenerRegistrationHelper(const BundleContext& context,
-                                    Receiver* receiver,
-                                    CallbackType callback)
-    : context(context)
-    , receiver(receiver)
-    , callback(callback)
-  {
-    EXPECT_NO_THROW(this->context.AddServiceListener(receiver, callback))
-      << "service listener registration failed";
-  }
+      public:
+        typedef void (Receiver::*CallbackType)(ServiceEvent const&);
 
-  ~ServiceListenerRegistrationHelper()
-  {
-    context.RemoveServiceListener(receiver, callback);
-  }
+        ServiceListenerRegistrationHelper(BundleContext const& context, Receiver* receiver, CallbackType callback)
+            : context(context)
+            , receiver(receiver)
+            , callback(callback)
+        {
+            EXPECT_NO_THROW(this->context.AddServiceListener(receiver, callback))
+                << "service listener registration failed";
+        }
 
-private:
-  BundleContext context;
-  Receiver* receiver;
-  CallbackType callback;
-};
-}
+        ~ServiceListenerRegistrationHelper() { context.RemoveServiceListener(receiver, callback); }
+
+      private:
+        BundleContext context;
+        Receiver* receiver;
+        CallbackType callback;
+    };
+} // namespace cppmicroservices
 
 US_MSVC_POP_WARNING
 

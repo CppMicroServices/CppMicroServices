@@ -34,59 +34,58 @@
 #include <string>
 #include <unordered_map>
 
-namespace cppmicroservices {
-
-class Any;
-
-class Framework;
-
-using FrameworkConfiguration = std::unordered_map<std::string, Any>;
-
-/**
- * \ingroup MicroServices
- *
- * A factory for creating Framework instances.
- *
- * @remarks This class is thread-safe.
- */
-class US_Framework_EXPORT FrameworkFactory
+namespace cppmicroservices
 {
-public:
-  /**
-     * Create a new Framework instance.
-     *
-     * @param configuration The framework properties to configure the new framework instance. If framework properties
-     * are not provided by the configuration argument, the created framework instance will use a reasonable
-     * default configuration.
-     * @param logger Any ostream object which will receieve redirected debug log output.
-     *
-     * @return A new, configured Framework instance.
-     */
-  Framework NewFramework(const FrameworkConfiguration& configuration,
-                         std::ostream* logger = nullptr);
 
-  /**
-     * Create a new Framework instance.
-     *
-     * This is the same as calling \code NewFramework(FrameworkConfiguration()) \endcode.
-     *
-     * @return A new, configured Framework instance.
-     */
-  Framework NewFramework();
+    class Any;
 
-  /**
-     * Create a new Framework instance.
-     *
-     * @deprecated Since 3.1, use NewFramework() or NewFramework(const FramworkConfiguration&, std::ostream*)
-     * instead.
-     *
-     * @return A new, configured Framework instance.
-     */
-  US_DEPRECATED Framework
-  NewFramework(const std::map<std::string, Any>& configuration,
-               std::ostream* logger = nullptr);
-};
+    class Framework;
 
-}
+    using FrameworkConfiguration = std::unordered_map<std::string, Any>;
+
+    /**
+     * \ingroup MicroServices
+     *
+     * A factory for creating Framework instances.
+     *
+     * @remarks This class is thread-safe.
+     */
+    class US_Framework_EXPORT FrameworkFactory
+    {
+      public:
+        /**
+         * Create a new Framework instance.
+         *
+         * @param configuration The framework properties to configure the new framework instance. If framework
+         * properties are not provided by the configuration argument, the created framework instance will use a
+         * reasonable default configuration.
+         * @param logger Any ostream object which will receieve redirected debug log output.
+         *
+         * @return A new, configured Framework instance.
+         */
+        Framework NewFramework(FrameworkConfiguration const& configuration, std::ostream* logger = nullptr);
+
+        /**
+         * Create a new Framework instance.
+         *
+         * This is the same as calling \code NewFramework(FrameworkConfiguration()) \endcode.
+         *
+         * @return A new, configured Framework instance.
+         */
+        Framework NewFramework();
+
+        /**
+         * Create a new Framework instance.
+         *
+         * @deprecated Since 3.1, use NewFramework() or NewFramework(const FramworkConfiguration&, std::ostream*)
+         * instead.
+         *
+         * @return A new, configured Framework instance.
+         */
+        US_DEPRECATED Framework NewFramework(std::map<std::string, Any> const& configuration,
+                                             std::ostream* logger = nullptr);
+    };
+
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_FRAMEWORKFACTORY_H

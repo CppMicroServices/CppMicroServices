@@ -8,6 +8,10 @@ include_directories(../../third_party)
 
 add_definitions(-DUS_RCC_EXECUTABLE_NAME=\"${US_RCC_EXECUTABLE_OUTPUT_NAME}\")
 
+if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
+  add_compile_options(-Wno-error=unneeded-internal-declaration)
+endif()
+
 set(srcs ResourceCompiler.cpp ../../third_party/miniz.c ../../third_party/jsoncpp.cpp)
 
 add_executable(${US_RCC_EXECUTABLE_TARGET} ${srcs})

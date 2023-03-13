@@ -27,80 +27,91 @@
 
 using cppmicroservices::service::component::runtime::dto::ComponentState;
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-/**
- * This class is a subclass of {\code ComponentConfigurationState} which
- * represents the {\code ComponentState::UNSATISFIED_REFERENCE} state of a
- * component configuration.
- */
-class CCUnsatisfiedReferenceState final : public ComponentConfigurationState
+namespace cppmicroservices
 {
-public:
-  CCUnsatisfiedReferenceState();
-  explicit CCUnsatisfiedReferenceState(std::shared_future<void> blockUntil);
-  ~CCUnsatisfiedReferenceState() override = default;
-  CCUnsatisfiedReferenceState(const CCUnsatisfiedReferenceState&) = delete;
-  CCUnsatisfiedReferenceState& operator=(const CCUnsatisfiedReferenceState&) =
-    delete;
-  CCUnsatisfiedReferenceState(CCUnsatisfiedReferenceState&&) = delete;
-  CCUnsatisfiedReferenceState& operator=(CCUnsatisfiedReferenceState&&) =
-    delete;
+    namespace scrimpl
+    {
 
-  /**
-   * This method will set handle the operations for transitioning the state
-   * from current state to SATISFIED state.
-   */
-  void Register(ComponentConfigurationImpl& mgr) override;
+        /**
+         * This class is a subclass of {\code ComponentConfigurationState} which
+         * represents the {\code ComponentState::UNSATISFIED_REFERENCE} state of a
+         * component configuration.
+         */
+        class CCUnsatisfiedReferenceState final : public ComponentConfigurationState
+        {
+          public:
+            CCUnsatisfiedReferenceState();
+            explicit CCUnsatisfiedReferenceState(std::shared_future<void> blockUntil);
+            ~CCUnsatisfiedReferenceState() override = default;
+            CCUnsatisfiedReferenceState(CCUnsatisfiedReferenceState const&) = delete;
+            CCUnsatisfiedReferenceState& operator=(CCUnsatisfiedReferenceState const&) = delete;
+            CCUnsatisfiedReferenceState(CCUnsatisfiedReferenceState&&) = delete;
+            CCUnsatisfiedReferenceState& operator=(CCUnsatisfiedReferenceState&&) = delete;
 
-  /**
-   * Calling an Activate transition on UNSATISFIED_REFERENCE state is a no-op
-   */
-  std::shared_ptr<ComponentInstance> Activate(
-    ComponentConfigurationImpl& /*mgr*/,
-    const cppmicroservices::Bundle& /*clientBundle*/) override
-  {
-    return nullptr;
-  };
+            /**
+             * This method will set handle the operations for transitioning the state
+             * from current state to SATISFIED state.
+             */
+            void Register(ComponentConfigurationImpl& mgr) override;
 
-  /**
-   * This method does not result in a state change since the component configuration is already in
-   * UNSATISFIED_REFERENCE state. 
-   */
-  void Deactivate(ComponentConfigurationImpl& /*mgr*/) override
-  {
-    // wait for the transition to finish
-    WaitForTransitionTask();
-  };
+            /**
+             * Calling an Activate transition on UNSATISFIED_REFERENCE state is a no-op
+             */
+            std::shared_ptr<ComponentInstance>
+            Activate(ComponentConfigurationImpl& /*mgr*/, cppmicroservices::Bundle const& /*clientBundle*/) override
+            {
+                return nullptr;
+            };
 
-  /**
-   * Modifying properties while the component is in the UNSATISFIED_REFERENCE state is a no-op
-   */
-  bool Modified(ComponentConfigurationImpl& /*mgr*/) override { return true; };
-  /**
-   * Rebinding while in an UNSATISFIED_REFERENCE state is a no-op
-   */
-  void Rebind(ComponentConfigurationImpl&,
-              const std::string&,
-              const ServiceReference<void>&,
-              const ServiceReference<void>&) override
-  {}
+            /**
+             * This method does not result in a state change since the component configuration is already in
+             * UNSATISFIED_REFERENCE state.
+             */
+            void
+            Deactivate(ComponentConfigurationImpl& /*mgr*/) override
+            {
+                // wait for the transition to finish
+                WaitForTransitionTask();
+            };
 
-  /**
-   * Returns {\code ComponentState::UNSATISFIED_REFERENCE} to indicate the
-   * state represented by this object
-   */
-  ComponentState GetValue() const override
-  {
-    return ComponentState::UNSATISFIED_REFERENCE;
-  }
+            /**
+             * Modifying properties while the component is in the UNSATISFIED_REFERENCE state is a no-op
+             */
+            bool
+            Modified(ComponentConfigurationImpl& /*mgr*/) override
+            {
+                return true;
+            };
+            /**
+             * Rebinding while in an UNSATISFIED_REFERENCE state is a no-op
+             */
+            void
+            Rebind(ComponentConfigurationImpl&,
+                   std::string const&,
+                   ServiceReference<void> const&,
+                   ServiceReference<void> const&) override
+            {
+            }
 
-  void WaitForTransitionTask() override { ready.get(); }
+            /**
+             * Returns {\code ComponentState::UNSATISFIED_REFERENCE} to indicate the
+             * state represented by this object
+             */
+            ComponentState
+            GetValue() const override
+            {
+                return ComponentState::UNSATISFIED_REFERENCE;
+            }
 
-private:
-  std::shared_future<void> ready;
-};
-}
-}
+            void
+            WaitForTransitionTask() override
+            {
+                ready.get();
+            }
+
+          private:
+            std::shared_future<void> ready;
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 #endif // CCUnsatisfiedReferenceState_hpp

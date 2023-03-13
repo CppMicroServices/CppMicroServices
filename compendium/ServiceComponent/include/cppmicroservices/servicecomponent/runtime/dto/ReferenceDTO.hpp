@@ -27,127 +27,132 @@
 
 #include <cppmicroservices/servicecomponent/ServiceComponentExport.h>
 
-namespace cppmicroservices {
-namespace service {
-namespace component {
-namespace runtime {
-namespace dto {
-
-/**
- \defgroup gr_referencedto ReferenceDTO
- \brief Groups ReferenceDTO related symbols.
- */
-
-/**
- * \ingroup gr_referencedto 
- *
- * A representation of a declared reference to a service.
- */
-struct US_ServiceComponent_EXPORT ReferenceDTO
+namespace cppmicroservices
 {
-  /**
-   * The name of the reference.
-   *
-   * <p>
-   * This is declared in the \c name attribute of the \c reference
-   * element. This must be the default name if the component description does
-   * not declare a name for the reference.
-   */
-  std::string name;
+    namespace service
+    {
+        namespace component
+        {
+            namespace runtime
+            {
+                namespace dto
+                {
 
-  /**
-   * The service interface of the reference.
-   *
-   * <p>
-   * This is declared in the \c interface attribute of the
-   * \c reference element.
-   */
-  std::string interfaceName;
+                    /**
+                     \defgroup gr_referencedto ReferenceDTO
+                     \brief Groups ReferenceDTO related symbols.
+                     */
 
-  /**
-   * The cardinality of the reference.
-   *
-   * <p>
-   * This is declared in the \c cardinality attribute of the
-   * \c reference element. This must be the default cardinality if the
-   * component description does not declare a cardinality for the reference.
-   */
-  std::string cardinality;
+                    /**
+                     * \ingroup gr_referencedto
+                     *
+                     * A representation of a declared reference to a service.
+                     */
+                    struct US_ServiceComponent_EXPORT ReferenceDTO
+                    {
+                        /**
+                         * The name of the reference.
+                         *
+                         * <p>
+                         * This is declared in the \c name attribute of the \c reference
+                         * element. This must be the default name if the component description does
+                         * not declare a name for the reference.
+                         */
+                        std::string name;
 
-  /**
-   * The policy of the reference.
-   *
-   * <p>
-   * This is declared in the \c policy attribute of the \c reference
-   * element. This must be the default policy if the component description
-   * does not declare a policy for the reference.
-   */
-  std::string policy;
+                        /**
+                         * The service interface of the reference.
+                         *
+                         * <p>
+                         * This is declared in the \c interface attribute of the
+                         * \c reference element.
+                         */
+                        std::string interfaceName;
 
-  /**
-   * The policy option of the reference.
-   *
-   * <p>
-   * This is declared in the \c policy-option attribute of the
-   * \c reference element. This must be the default policy option if the
-   * component description does not declare a policy option for the reference.
-   */
-  std::string policyOption;
+                        /**
+                         * The cardinality of the reference.
+                         *
+                         * <p>
+                         * This is declared in the \c cardinality attribute of the
+                         * \c reference element. This must be the default cardinality if the
+                         * component description does not declare a cardinality for the reference.
+                         */
+                        std::string cardinality;
 
-  /**
-   * The target of the reference.
-   *
-   * <p>
-   * This is declared in the \c target attribute of the \c reference
-   * element. This must be an empty string if the component description does not
-   * declare a target for the reference.
-   */
-  std::string target;
+                        /**
+                         * The policy of the reference.
+                         *
+                         * <p>
+                         * This is declared in the \c policy attribute of the \c reference
+                         * element. This must be the default policy if the component description
+                         * does not declare a policy for the reference.
+                         */
+                        std::string policy;
 
-  /**
-   * The name of the bind method of the reference.
-   *
-   * <p>
-   * This is declared in the \c bind attribute of the \c reference
-   * element. This must be an empty string if the component description does not
-   * declare a bind method for the reference.
-   */
-  std::string bind;
+                        /**
+                         * The policy option of the reference.
+                         *
+                         * <p>
+                         * This is declared in the \c policy-option attribute of the
+                         * \c reference element. This must be the default policy option if the
+                         * component description does not declare a policy option for the reference.
+                         */
+                        std::string policyOption;
 
-  /**
-   * The name of the unbind method of the reference.
-   *
-   * <p>
-   * This is declared in the \c unbind attribute of the \c reference
-   * element. This must be an empty string if the component description does not
-   * declare an unbind method for the reference.
-   */
-  std::string unbind;
+                        /**
+                         * The target of the reference.
+                         *
+                         * <p>
+                         * This is declared in the \c target attribute of the \c reference
+                         * element. This must be an empty string if the component description does not
+                         * declare a target for the reference.
+                         */
+                        std::string target;
 
-  /**
-   * The name of the updated method of the reference.
-   *
-   * <p>
-   * This is declared in the \c updated attribute of the
-   * \c reference element. This must be an empty string if the component
-   * description does not declare an updated method for the reference.
-   */
-  std::string updated;
+                        /**
+                         * The name of the bind method of the reference.
+                         *
+                         * <p>
+                         * This is declared in the \c bind attribute of the \c reference
+                         * element. This must be an empty string if the component description does not
+                         * declare a bind method for the reference.
+                         */
+                        std::string bind;
 
-  /**
-   * The scope of the reference.
-   *
-   * <p>
-   * This is declared in the \c scope attribute of the \c reference
-   * element. This must be the default scope if the component description does
-   * not declare a scope for the reference.
-   */
-  std::string scope;
-};
-}
-}
-}
-}
-}
+                        /**
+                         * The name of the unbind method of the reference.
+                         *
+                         * <p>
+                         * This is declared in the \c unbind attribute of the \c reference
+                         * element. This must be an empty string if the component description does not
+                         * declare an unbind method for the reference.
+                         */
+                        std::string unbind;
+
+                        /**
+                         * The name of the updated method of the reference.
+                         *
+                         * <p>
+                         * This is declared in the \c updated attribute of the
+                         * \c reference element. This must be an empty string if the component
+                         * description does not declare an updated method for the reference.
+                         */
+                        std::string updated;
+
+                        /**
+                         * The scope of the reference.
+                         *
+                         * <p>
+                         * This is declared in the \c scope attribute of the \c reference
+                         * element. This must be the default scope if the component description does
+                         * not declare a scope for the reference.
+                         */
+                        std::string scope;
+                    };
+                } // namespace dto
+            }     // namespace runtime
+        }         // namespace component
+    }             // namespace service
+} // namespace cppmicroservices
 
 #endif /* ReferenceDTO_hpp */

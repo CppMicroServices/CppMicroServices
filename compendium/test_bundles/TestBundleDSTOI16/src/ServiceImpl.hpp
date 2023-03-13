@@ -3,16 +3,17 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 
-namespace sample {
-class ServiceComponent16
-  : public test::Interface1
-  , public test::Interface2
+namespace sample
 {
-public:
-  std::string Description() override;
-  std::string ExtendedDescription() override;
-  ~ServiceComponent16() override;
-};
-}
+    class ServiceComponent16
+        : public test::Interface1
+        , public test::Interface2
+    {
+      public:
+        std::string Description() override;
+        std::string ExtendedDescription() override;
+        ~ServiceComponent16() override;
+    };
+} // namespace sample
 
 #endif // _SERVICE_IMPL_HPP_

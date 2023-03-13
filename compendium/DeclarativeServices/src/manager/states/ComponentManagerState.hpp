@@ -28,55 +28,57 @@
 #include <string>
 #include <vector>
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-class ComponentManagerImpl;
-class ComponentConfiguration;
-
-/**
- * Interface for the state objects used in ComponentManager's state machine.
- */
-class ComponentManagerState
-  : public std::enable_shared_from_this<ComponentManagerState>
+namespace cppmicroservices
 {
-public:
-  ComponentManagerState() = default;
-  virtual ~ComponentManagerState() = default;
-  ComponentManagerState(const ComponentManagerState&) = delete;
-  ComponentManagerState& operator=(const ComponentManagerState&) = delete;
-  ComponentManagerState(ComponentManagerState&&) = delete;
-  ComponentManagerState& operator=(ComponentManagerState&&) = delete;
+    namespace scrimpl
+    {
 
-  /**
-   * Implementation of this method must handle the Enable state transition for current state
-   */
-  virtual std::shared_future<void> Enable(ComponentManagerImpl& cm) = 0;
+        class ComponentManagerImpl;
+        class ComponentConfiguration;
 
-  /**
-   * Implementation of this method must handle the Disable state transition for current state
-   */
-  virtual std::shared_future<void> Disable(ComponentManagerImpl& cm) = 0;
+        /**
+         * Interface for the state objects used in ComponentManager's state machine.
+         */
+        class ComponentManagerState : public std::enable_shared_from_this<ComponentManagerState>
+        {
+          public:
+            ComponentManagerState() = default;
+            virtual ~ComponentManagerState() = default;
+            ComponentManagerState(ComponentManagerState const&) = delete;
+            ComponentManagerState& operator=(ComponentManagerState const&) = delete;
+            ComponentManagerState(ComponentManagerState&&) = delete;
+            ComponentManagerState& operator=(ComponentManagerState&&) = delete;
 
-  /**
-   * Implementation returns true if the current state is enabled state, false otherwise
-   */
-  virtual bool IsEnabled(const ComponentManagerImpl& cm) const = 0;
+            /**
+             * Implementation of this method must handle the Enable state transition for current state
+             */
+            virtual std::shared_future<void> Enable(ComponentManagerImpl& cm) = 0;
 
-  /**
-   * Implementation returns a \c std::vector of configurations created for
-   * the component passed as parameter
-   */
-  virtual std::vector<std::shared_ptr<ComponentConfiguration>>
-  GetConfigurations(const ComponentManagerImpl& cm) const = 0;
+            /**
+             * Implementation of this method must handle the Disable state transition for current state
+             */
+            virtual std::shared_future<void> Disable(ComponentManagerImpl& cm) = 0;
 
-  /**
-   * Implementation returns a \c std::shared_future object representing the async
-   * task spawned due to transitioning to this state.
-   */
-  virtual std::shared_future<void> GetFuture() const = 0;
-};
-}
-}
+            /**
+             * Implementation returns true if the current state is enabled state, false otherwise
+             */
+            virtual bool IsEnabled(ComponentManagerImpl const& cm) const = 0;
+
+            /**
+             * Implementation returns a \c std::vector of configurations created for
+             * the component passed as parameter
+             */
+            virtual std::vector<std::shared_ptr<ComponentConfiguration>> GetConfigurations(
+                ComponentManagerImpl const& cm) const
+                = 0;
+
+            /**
+             * Implementation returns a \c std::shared_future object representing the async
+             * task spawned due to transitioning to this state.
+             */
+            virtual std::shared_future<void> GetFuture() const = 0;
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 
 #endif /* ComponentManagerState_hpp */

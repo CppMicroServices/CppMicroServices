@@ -28,19 +28,21 @@
 #include <exception>
 #include <string>
 
-namespace cppmicroservices {
+namespace cppmicroservices
+{
 
-namespace util {
+    namespace util
+    {
 
-std::string GetLastCErrorStr();
+        std::string GetLastCErrorStr();
 #ifdef US_PLATFORM_WINDOWS
-std::string GetLastWin32ErrorStr();
+        std::string GetLastWin32ErrorStr();
 #endif
 
-std::string GetExceptionStr(const std::exception_ptr& exc);
-std::string GetLastExceptionStr();
+        std::string GetExceptionStr(std::exception_ptr const& exc);
+        std::string GetLastExceptionStr();
 
-} // namespace util
+    } // namespace util
 } // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_UTIL_ERROR_H

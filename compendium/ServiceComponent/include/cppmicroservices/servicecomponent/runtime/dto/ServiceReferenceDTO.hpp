@@ -30,55 +30,58 @@
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/servicecomponent/ServiceComponentExport.h"
 
-namespace cppmicroservices {
-namespace framework {
-namespace dto {
-
-/**
- \defgroup gr_servicereferencedto ServiceReferenceDTO
- \brief Groups ServiceReferenceDTO related symbols.
- */
-
-/**
- * \ingroup gr_servicereferencedto
- *
- * A representation of a satisfied reference.
- */
-struct US_ServiceComponent_EXPORT ServiceReferenceDTO
+namespace cppmicroservices
 {
-  /**
-   * The id of the service.
-   *
-   * @see Constants#SERVICE_ID
-   */
-  unsigned long id;
+    namespace framework
+    {
+        namespace dto
+        {
 
-  /**
-   * The id of the bundle that registered the service.
-   *
-   * @see ServiceReference#GetBundle()
-   */
-  unsigned long bundle;
+            /**
+             \defgroup gr_servicereferencedto ServiceReferenceDTO
+             \brief Groups ServiceReferenceDTO related symbols.
+             */
 
-  /**
-   * The properties for the service.
-   *
-   * The value type must be a numerical type, Boolean, String or a container
-   * of any of the former.
-   *
-   * @see ServiceReference#GetProperty(String)
-   */
-  std::unordered_map<std::string, cppmicroservices::Any> properties;
+            /**
+             * \ingroup gr_servicereferencedto
+             *
+             * A representation of a satisfied reference.
+             */
+            struct US_ServiceComponent_EXPORT ServiceReferenceDTO
+            {
+                /**
+                 * The id of the service.
+                 *
+                 * @see Constants#SERVICE_ID
+                 */
+                unsigned long id;
 
-  /**
-   * The ids of the bundles that are using the service.
-   *
-   * @see ServiceReference#GetUsingBundles()
-   */
-  std::vector<unsigned long> usingBundles;
-};
-}
-}
-}
+                /**
+                 * The id of the bundle that registered the service.
+                 *
+                 * @see ServiceReference#GetBundle()
+                 */
+                unsigned long bundle;
+
+                /**
+                 * The properties for the service.
+                 *
+                 * The value type must be a numerical type, Boolean, String or a container
+                 * of any of the former.
+                 *
+                 * @see ServiceReference#GetProperty(String)
+                 */
+                std::unordered_map<std::string, cppmicroservices::Any> properties;
+
+                /**
+                 * The ids of the bundles that are using the service.
+                 *
+                 * @see ServiceReference#GetUsingBundles()
+                 */
+                std::vector<unsigned long> usingBundles;
+            };
+        } // namespace dto
+    }     // namespace framework
+} // namespace cppmicroservices
 
 #endif /* ServiceReferenceDTO_hpp */

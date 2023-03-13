@@ -27,42 +27,42 @@
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/ServiceEvent.h"
 
-namespace cppmicroservices {
-
-class TestBundleListener
+namespace cppmicroservices
 {
 
-public:
-  TestBundleListener();
+    class TestBundleListener
+    {
 
-  void BundleChanged(const BundleEvent& event);
+      public:
+        TestBundleListener();
 
-  void ServiceChanged(const ServiceEvent& event);
+        void BundleChanged(BundleEvent const& event);
 
-  BundleEvent GetBundleEvent() const;
+        void ServiceChanged(ServiceEvent const& event);
 
-  ServiceEvent GetServiceEvent() const;
+        BundleEvent GetBundleEvent() const;
 
-  bool CheckListenerEvents(bool pexp,
-                           BundleEvent::Type ptype,
-                           bool sexp,
-                           ServiceEvent::Type stype,
-                           const Bundle& bundleX,
-                           ServiceReferenceU* servX);
+        ServiceEvent GetServiceEvent() const;
 
-  bool CheckListenerEvents(const std::vector<BundleEvent>& pEvts,
-                           bool relaxed = false);
+        bool CheckListenerEvents(bool pexp,
+                                 BundleEvent::Type ptype,
+                                 bool sexp,
+                                 ServiceEvent::Type stype,
+                                 Bundle const& bundleX,
+                                 ServiceReferenceU* servX);
 
-  bool CheckListenerEvents(const std::vector<ServiceEvent>& seEvts);
+        bool CheckListenerEvents(std::vector<BundleEvent> const& pEvts, bool relaxed = false);
 
-  bool CheckListenerEvents(const std::vector<BundleEvent>& pEvts,
-                           const std::vector<ServiceEvent>& seEvts,
-                           bool relaxed = false);
+        bool CheckListenerEvents(std::vector<ServiceEvent> const& seEvts);
 
-private:
-  std::vector<ServiceEvent> serviceEvents;
-  std::vector<BundleEvent> bundleEvents;
-};
-}
+        bool CheckListenerEvents(std::vector<BundleEvent> const& pEvts,
+                                 std::vector<ServiceEvent> const& seEvts,
+                                 bool relaxed = false);
+
+      private:
+        std::vector<ServiceEvent> serviceEvents;
+        std::vector<BundleEvent> bundleEvents;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_TESTUTILBUNDLELISTENER_H

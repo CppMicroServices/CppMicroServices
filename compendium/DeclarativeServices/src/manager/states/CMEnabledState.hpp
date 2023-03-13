@@ -24,9 +24,9 @@
 #define CMEnabledState_hpp
 
 #if defined(USING_GTEST)
-#  include "gtest/gtest_prod.h"
+#    include "gtest/gtest_prod.h"
 #else
-#  define FRIEND_TEST(x, y)
+#    define FRIEND_TEST(x, y)
 #endif
 #include "../../ComponentRegistry.hpp"
 #include "../../metadata/ComponentMetadata.hpp"
@@ -34,109 +34,113 @@
 #include "ComponentManagerState.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-class ComponentConfigurationImpl;
-
-class CMEnabledState final : public ComponentManagerState
+namespace cppmicroservices
 {
-public:
-  /**
-   * Construct with a future object
-   *
-   * /param fut is the future associated with this state. This future represents
-   *        the task performed when the ComponentManager changes it's state to
-   *        this object. The transition task associated with the change from this
-   *        state to the next \c CMDisabledState has to wait on this future.
-   */
-  explicit CMEnabledState(std::shared_future<void> fut)
-    : fut(std::move(fut))
-  {}
-  ~CMEnabledState() override = default;
-  CMEnabledState(const CMEnabledState&) = delete;
-  CMEnabledState& operator=(const CMEnabledState&) = delete;
-  CMEnabledState(CMEnabledState&&) = delete;
-  CMEnabledState& operator=(CMEnabledState&&) = delete;
+    namespace scrimpl
+    {
 
-  /**
-   * This method simply returns the stored future. No state change takes place
-   *
-   * \param cm is the component manager which needs to be enabled
-   * \return a future object representing the actions performed due to the
-   *         previous state change from \c DISABLED to \c ENABLED
-   */
-  std::shared_future<void> Enable(ComponentManagerImpl& cm) override;
+        class ComponentConfigurationImpl;
 
-  /**
-   * This method changes the state of the {@link ComponentManagerImpl} object
-   *
-   * \param cm is the component manager which needs to be disabled
-   * \return a future object representing the actions performed due to the state change
-   */
-  std::shared_future<void> Disable(ComponentManagerImpl& cm) override;
+        class CMEnabledState final : public ComponentManagerState
+        {
+          public:
+            /**
+             * Construct with a future object
+             *
+             * /param fut is the future associated with this state. This future represents
+             *        the task performed when the ComponentManager changes it's state to
+             *        this object. The transition task associated with the change from this
+             *        state to the next \c CMDisabledState has to wait on this future.
+             */
+            explicit CMEnabledState(std::shared_future<void> fut) : fut(std::move(fut)) {}
+            ~CMEnabledState() override = default;
+            CMEnabledState(CMEnabledState const&) = delete;
+            CMEnabledState& operator=(CMEnabledState const&) = delete;
+            CMEnabledState(CMEnabledState&&) = delete;
+            CMEnabledState& operator=(CMEnabledState&&) = delete;
 
-  /**
-   * This method waits for the configurations to be created and then returns the
-   * list of configurations associated with the {@link ComponentManagerImpl} object
-   *
-   * \param cm is the component manager
-   * \return a vector of configurations for the given component manager
-   */
-  std::vector<std::shared_ptr<ComponentConfiguration>> GetConfigurations(
-    const ComponentManagerImpl& cm) const override;
+            /**
+             * This method simply returns the stored future. No state change takes place
+             *
+             * \param cm is the component manager which needs to be enabled
+             * \return a future object representing the actions performed due to the
+             *         previous state change from \c DISABLED to \c ENABLED
+             */
+            std::shared_future<void> Enable(ComponentManagerImpl& cm) override;
 
-  /**
-   * Always returns true since this state represents an Enabled state
-   */
-  bool IsEnabled(const ComponentManagerImpl& /*cm*/) const override
-  {
-    return true;
-  }
+            /**
+             * This method changes the state of the {@link ComponentManagerImpl} object
+             *
+             * \param cm is the component manager which needs to be disabled
+             * \return a future object representing the actions performed due to the state change
+             */
+            std::shared_future<void> Disable(ComponentManagerImpl& cm) override;
 
-  /**
-   * Returns the future associated with the transition into this state
-   */
-  std::shared_future<void> GetFuture() const override { return fut; }
+            /**
+             * This method waits for the configurations to be created and then returns the
+             * list of configurations associated with the {@link ComponentManagerImpl} object
+             *
+             * \param cm is the component manager
+             * \return a vector of configurations for the given component manager
+             */
+            std::vector<std::shared_ptr<ComponentConfiguration>> GetConfigurations(
+                ComponentManagerImpl const& cm) const override;
 
-  /**
-   * Helper function used to create configuration objects for the
-   * {@link ComponentManagerImpl} object. This method populates the
-   * {@link #configurations} vector in this object
-   *
-   * \param compDesc is the component metadata
-   * \param bundle which contains the component
-   * \param registry is the runtime's component registry
-   * \param logger is the runtime's logger
-   */
-  void CreateConfigurations(
-    std::shared_ptr<const metadata::ComponentMetadata> compDesc,
-    const cppmicroservices::Bundle& bundle,
-    std::shared_ptr<ComponentRegistry> registry,
-    std::shared_ptr<logservice::LogService> logger,
-    std::shared_ptr<ConfigurationNotifier> configNotifier,
-    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
+            /**
+             * Always returns true since this state represents an Enabled state
+             */
+            bool
+            IsEnabled(ComponentManagerImpl const& /*cm*/) const override
+            {
+                return true;
+            }
 
-  /**
-   * Helper function used to remove all the configuration objects created by this state.
-   */
-  void DeleteConfigurations();
+            /**
+             * Returns the future associated with the transition into this state
+             */
+            std::shared_future<void>
+            GetFuture() const override
+            {
+                return fut;
+            }
 
-  FRIEND_TEST(CMEnabledStateTest, TestCtor);
-  FRIEND_TEST(CMEnabledStateTest, TestEnable);
-  FRIEND_TEST(CMEnabledStateTest, TestDisable);
-  FRIEND_TEST(CMEnabledStateTest, TestConcurrentEnable);
-  FRIEND_TEST(CMEnabledStateTest, TestConcurrentDisable);
-  FRIEND_TEST(CMEnabledStateTest, TestGetConfigurations);
-  FRIEND_TEST(CMEnabledStateTest, TestCreateConfigurationsAsync);
-  FRIEND_TEST(CMEnabledStateTest, TestCreateConfigurations);
+            /**
+             * Helper function used to create configuration objects for the
+             * {@link ComponentManagerImpl} object. This method populates the
+             * {@link #configurations} vector in this object
+             *
+             * \param compDesc is the component metadata
+             * \param bundle which contains the component
+             * \param registry is the runtime's component registry
+             * \param logger is the runtime's logger
+             */
+            void CreateConfigurations(std::shared_ptr<const metadata::ComponentMetadata> compDesc,
+                                      cppmicroservices::Bundle const& bundle,
+                                      std::shared_ptr<ComponentRegistry> registry,
+                                      std::shared_ptr<logservice::LogService> logger,
+                                      std::shared_ptr<ConfigurationNotifier> configNotifier,
+                                      std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
 
-  std::shared_future<void>
-    fut; ///< future object to represent the transition task associated with this state.
-  std::vector<std::shared_ptr<ComponentConfigurationImpl>>
-    configurations; ///< configurations created by this state object
-};
-}
-}
+            /**
+             * Helper function used to remove all the configuration objects created by this state.
+             */
+            void DeleteConfigurations();
+
+            FRIEND_TEST(CMEnabledStateTest, TestCtor);
+            FRIEND_TEST(CMEnabledStateTest, TestEnable);
+            FRIEND_TEST(CMEnabledStateTest, TestDisable);
+            FRIEND_TEST(CMEnabledStateTest, TestConcurrentEnable);
+            FRIEND_TEST(CMEnabledStateTest, TestConcurrentDisable);
+            FRIEND_TEST(CMEnabledStateTest, TestGetConfigurations);
+            FRIEND_TEST(CMEnabledStateTest, TestCreateConfigurationsAsync);
+            FRIEND_TEST(CMEnabledStateTest, TestCreateConfigurations);
+
+            std::shared_future<void>
+                fut; ///< future object to represent the transition task associated with this state.
+            std::vector<std::shared_ptr<ComponentConfigurationImpl>>
+                configurations; ///< configurations created by this state object
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 
 #endif /* CMEnabledState_hpp */

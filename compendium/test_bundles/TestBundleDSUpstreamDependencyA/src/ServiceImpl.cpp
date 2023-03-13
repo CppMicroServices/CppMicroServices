@@ -2,12 +2,12 @@
 
 #include <stdexcept>
 
-namespace dependent {
-TestBundleDSUpstreamDependencyImpl::TestBundleDSUpstreamDependencyImpl()
+namespace dependent
 {
-  throw std::runtime_error("Failed to create TestBundleDSUpstreamDepdencyImpl");
-}
+    TestBundleDSUpstreamDependencyImpl::TestBundleDSUpstreamDependencyImpl()
+    {
+        throw std::runtime_error("Failed to create TestBundleDSUpstreamDepdencyImpl");
+    }
 
-TestBundleDSUpstreamDependencyImpl::~TestBundleDSUpstreamDependencyImpl() =
-  default;
-}
+    TestBundleDSUpstreamDependencyImpl::~TestBundleDSUpstreamDependencyImpl() = default;
+} // namespace dependent

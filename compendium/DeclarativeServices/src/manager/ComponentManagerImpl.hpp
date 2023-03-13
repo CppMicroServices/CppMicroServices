@@ -24,9 +24,9 @@
 #define __COMPONENTMANAGERIMPL_HPP__
 
 #if defined(USING_GTEST)
-#  include "gtest/gtest_prod.h"
+#    include "gtest/gtest_prod.h"
 #else
-#  define FRIEND_TEST(x, y)
+#    define FRIEND_TEST(x, y)
 #endif
 #include "ComponentManager.hpp"
 #include "ConfigurationNotifier.hpp"
@@ -34,202 +34,205 @@
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-class ComponentRegistry;
-class ComponentManagerState;
-
-/**
- * This class is responsible for managing the enabled/disabled states of a
- * service component. It implements a thread safe state design pattern to
- * handle requests for enabling and disabling a component.
- */
-class ComponentManagerImpl : public ComponentManager
+namespace cppmicroservices
 {
-public:
-  ComponentManagerImpl(
-    std::shared_ptr<const metadata::ComponentMetadata> metadata,
-    std::shared_ptr<ComponentRegistry> registry,
-    cppmicroservices::BundleContext bundleContext,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-    std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
-    std::shared_ptr<ConfigurationNotifier> configNotifier,
-    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
-  ComponentManagerImpl(const ComponentManagerImpl&) = delete;
-  ComponentManagerImpl(ComponentManagerImpl&&) = delete;
-  ComponentManagerImpl& operator=(const ComponentManagerImpl&) = delete;
-  ComponentManagerImpl& operator=(ComponentManagerImpl&&) = delete;
-  ~ComponentManagerImpl() override;
+    namespace scrimpl
+    {
 
-  /**
-   * Initialization method used to kick start the state machine implemented by this class.
-   */
-  void Initialize();
+        class ComponentRegistry;
+        class ComponentManagerState;
 
-  /** @copydoc ComponentManager::IsEnabled()
-   * Delegates the call to the current state object
-   */
-  bool IsEnabled() const override;
+        /**
+         * This class is responsible for managing the enabled/disabled states of a
+         * service component. It implements a thread safe state design pattern to
+         * handle requests for enabling and disabling a component.
+         */
+        class ComponentManagerImpl : public ComponentManager
+        {
+          public:
+            ComponentManagerImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
+                                 std::shared_ptr<ComponentRegistry> registry,
+                                 cppmicroservices::BundleContext bundleContext,
+                                 std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                                 std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
+                                 std::shared_ptr<ConfigurationNotifier> configNotifier,
+                                 std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
+            ComponentManagerImpl(ComponentManagerImpl const&) = delete;
+            ComponentManagerImpl(ComponentManagerImpl&&) = delete;
+            ComponentManagerImpl& operator=(ComponentManagerImpl const&) = delete;
+            ComponentManagerImpl& operator=(ComponentManagerImpl&&) = delete;
+            ~ComponentManagerImpl() override;
 
-  /** @copydoc ComponentManager::Enable()
-   * Delegates the call to the current state object
-   */
-  std::shared_future<void> Enable() override;
+            /**
+             * Initialization method used to kick start the state machine implemented by this class.
+             */
+            void Initialize();
 
-  /** @copydoc ComponentManager::Disable()
-   * Delegates the call to the current state object
-   */
-  std::shared_future<void> Disable() override;
+            /** @copydoc ComponentManager::IsEnabled()
+             * Delegates the call to the current state object
+             */
+            bool IsEnabled() const override;
 
-  /** @copydoc ComponentManager::GetComponentConfigurations()
-   * Delegates the call to the current state object
-   */
-  std::vector<std::shared_ptr<ComponentConfiguration>>
-  GetComponentConfigurations() const override;
+            /** @copydoc ComponentManager::Enable()
+             * Delegates the call to the current state object
+             */
+            std::shared_future<void> Enable() override;
 
-  /** @copydoc ComponentManager::GetMetadata()
-   * Returns the stored component description
-   */
-  std::shared_ptr<const metadata::ComponentMetadata> GetMetadata()
-    const override
-  {
-    return compDesc;
-  }
+            /** @copydoc ComponentManager::Disable()
+             * Delegates the call to the current state object
+             */
+            std::shared_future<void> Disable() override;
 
-  /** @copydoc ComponentManager::GetName()
-   * Returns the names from the stored component description
-   */
-  std::string GetName() const override { return GetMetadata()->name; }
+            /** @copydoc ComponentManager::GetComponentConfigurations()
+             * Delegates the call to the current state object
+             */
+            std::vector<std::shared_ptr<ComponentConfiguration>> GetComponentConfigurations() const override;
 
-  /** @copydoc ComponentManager::GetBundleId()
-   * Returns the id of the {@link Bundle} which contains the component managed by this object
-   */
-  unsigned long GetBundleId() const override
-  {
-    return GetBundle().GetBundleId();
-  }
+            /** @copydoc ComponentManager::GetMetadata()
+             * Returns the stored component description
+             */
+            std::shared_ptr<const metadata::ComponentMetadata>
+            GetMetadata() const override
+            {
+                return compDesc;
+            }
 
-  /**
-   * This method returns the {@link Bundle} which contains the component managed by this object.
-   */
-  Bundle GetBundle() const
-  {
-    return bundleContext ? bundleContext.GetBundle() : Bundle();
-  }
+            /** @copydoc ComponentManager::GetName()
+             * Returns the names from the stored component description
+             */
+            std::string
+            GetName() const override
+            {
+                return GetMetadata()->name;
+            }
 
-  /**
-   * Returns the logger object associated with this ComponentManager
-   */
-  std::shared_ptr<cppmicroservices::logservice::LogService> GetLogger() const
-  {
-    return logger;
-  }
+            /** @copydoc ComponentManager::GetBundleId()
+             * Returns the id of the {@link Bundle} which contains the component managed by this object
+             */
+            unsigned long
+            GetBundleId() const override
+            {
+                return GetBundle().GetBundleId();
+            }
 
-  /**
-   * Returns the configNotifier object associated with this ComponentManager
-   */
-  std::shared_ptr<ConfigurationNotifier> GetConfigNotifier() const
-  {
-    return configNotifier;
-  }
-  /**
-   * Returns the threadpool object associated with this ComponentManager
-   */
-  std::shared_ptr<cppmicroservices::async::AsyncWorkService>
-  GetAsyncWorkService() const
-  {
-    return asyncWorkService;
-  }
+            /**
+             * This method returns the {@link Bundle} which contains the component managed by this object.
+             */
+            Bundle
+            GetBundle() const
+            {
+                return bundleContext ? bundleContext.GetBundle() : Bundle();
+            }
 
-  /**
-   * Returns the managers object associated with this ComponentManager
-   */
-  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> GetManagers()
-    const
-  {
-    return managers;
-  }
-  /**
-   * This method modifies the vector of futures stored in this object. If
-   * any of the futures in the vector are ready, the ready future is replaced
-   * by the given future. If none of the futures are ready, the given future
-   * is added to the vector.
-   */
-  void AccumulateFuture(std::shared_future<void> fObj);
+            /**
+             * Returns the logger object associated with this ComponentManager
+             */
+            std::shared_ptr<cppmicroservices::logservice::LogService>
+            GetLogger() const
+            {
+                return logger;
+            }
 
-  /**
-   * Method used to set the state of this object. It invokes the std::atomic
-   * operations on the state member of this object.
-   *
-   * \param expectedState is the pointer to the current state object
-   * \param desiredState is the state the caller wishes to set on this object
-   */
-  virtual bool CompareAndSetState(
-    std::shared_ptr<ComponentManagerState>* expectedState,
-    std::shared_ptr<ComponentManagerState> desiredState);
+            /**
+             * Returns the configNotifier object associated with this ComponentManager
+             */
+            std::shared_ptr<ConfigurationNotifier>
+            GetConfigNotifier() const
+            {
+                return configNotifier;
+            }
+            /**
+             * Returns the threadpool object associated with this ComponentManager
+             */
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService>
+            GetAsyncWorkService() const
+            {
+                return asyncWorkService;
+            }
 
-  /**
-   * This method returns the current state object of this object.
-   */
-  std::shared_ptr<ComponentManagerState> GetState() const;
+            /**
+             * Returns the managers object associated with this ComponentManager
+             */
+            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>>
+            GetManagers() const
+            {
+                return managers;
+            }
+            /**
+             * This method modifies the vector of futures stored in this object. If
+             * any of the futures in the vector are ready, the ready future is replaced
+             * by the given future. If none of the futures are ready, the given future
+             * is added to the vector.
+             */
+            void AccumulateFuture(std::shared_future<void> fObj);
 
-  /**
-   * Returns the {@link ComponentRegistry} object associated with this
-   * runtime instance
-   */
+            /**
+             * Method used to set the state of this object. It invokes the std::atomic
+             * operations on the state member of this object.
+             *
+             * \param expectedState is the pointer to the current state object
+             * \param desiredState is the state the caller wishes to set on this object
+             */
+            virtual bool CompareAndSetState(std::shared_ptr<ComponentManagerState>* expectedState,
+                                            std::shared_ptr<ComponentManagerState> desiredState);
 
-  virtual std::shared_ptr<ComponentRegistry> GetRegistry() const
-  {
-    return registry;
-  }
+            /**
+             * This method returns the current state object of this object.
+             */
+            std::shared_ptr<ComponentManagerState> GetState() const;
 
-  /**
-   * Attempts to change the state from disabled to enabled and posts asynchronous work
-   * to be completed if the state was successfully changed.
-   * 
-   * \param currentState The current state object
-   * \return a shared_future<void> on which to wait for the asynchronous work to complete.
-   */
-  std::shared_future<void> PostAsyncDisabledToEnabled(
-    std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>&
-      currentState);
+            /**
+             * Returns the {@link ComponentRegistry} object associated with this
+             * runtime instance
+             */
 
-  /**
-   * Attempts to change the state from enabled to disabled and posts asynchronous work
-   * to be completed if the state was successfully changed.
-   * 
-   * \param currentState The current state object
-   * \return a shared_future<void> on which to wait for the asynchronous work to complete.
-   */
-  std::shared_future<void> PostAsyncEnabledToDisabled(
-    std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>&
-      currentState);
+            virtual std::shared_ptr<ComponentRegistry>
+            GetRegistry() const
+            {
+                return registry;
+            }
 
-private:
-  FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
+            /**
+             * Attempts to change the state from disabled to enabled and posts asynchronous work
+             * to be completed if the state was successfully changed.
+             *
+             * \param currentState The current state object
+             * \return a shared_future<void> on which to wait for the asynchronous work to complete.
+             */
+            std::shared_future<void> PostAsyncDisabledToEnabled(
+                std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState);
 
-  const std::shared_ptr<ComponentRegistry>
-    registry; ///< component registry associated with the current runtime
-  const std::shared_ptr<const metadata::ComponentMetadata>
-    compDesc; ///< the component description
-  cppmicroservices::BundleContext
-    bundleContext; ///< context of the bundle which contains the component
-  const std::shared_ptr<cppmicroservices::logservice::LogService>
-    logger; ///< logger associated with the current runtime
-  std::shared_ptr<ComponentManagerState>
-    state; ///< This member is always accessed using atomic operations
-  std::vector<std::shared_future<void>>
-    disableFutures; ///< futures created when the component transitioned to \c DISABLED state
-  std::mutex futuresMutex; ///< mutex to protect the #disableFutures member
-  std::shared_ptr<cppmicroservices::async::AsyncWorkService>
-    asyncWorkService; ///< work service to execute async work
-  std::mutex
-    transitionMutex; ///< mutex to make the state transition and posting of the async operations atomic
-  std::shared_ptr<ConfigurationNotifier> configNotifier;
-  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
-};
-}
-}
+            /**
+             * Attempts to change the state from enabled to disabled and posts asynchronous work
+             * to be completed if the state was successfully changed.
+             *
+             * \param currentState The current state object
+             * \return a shared_future<void> on which to wait for the asynchronous work to complete.
+             */
+            std::shared_future<void> PostAsyncEnabledToDisabled(
+                std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState);
+
+          private:
+            FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
+
+            const std::shared_ptr<ComponentRegistry>
+                registry; ///< component registry associated with the current runtime
+            const std::shared_ptr<const metadata::ComponentMetadata> compDesc; ///< the component description
+            cppmicroservices::BundleContext bundleContext; ///< context of the bundle which contains the component
+            const std::shared_ptr<cppmicroservices::logservice::LogService>
+                logger;                                   ///< logger associated with the current runtime
+            std::shared_ptr<ComponentManagerState> state; ///< This member is always accessed using atomic operations
+            std::vector<std::shared_future<void>>
+                disableFutures;      ///< futures created when the component transitioned to \c DISABLED state
+            std::mutex futuresMutex; ///< mutex to protect the #disableFutures member
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService>
+                asyncWorkService; ///< work service to execute async work
+            std::mutex
+                transitionMutex; ///< mutex to make the state transition and posting of the async operations atomic
+            std::shared_ptr<ConfigurationNotifier> configNotifier;
+            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 
 #endif /* __COMPONENTMANAGERIMPL_HPP__ */

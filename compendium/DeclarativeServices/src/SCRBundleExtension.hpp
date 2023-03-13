@@ -51,7 +51,7 @@ class SCRBundleExtension
 {
 public:
   SCRBundleExtension(
-    const cppmicroservices::BundleContext& bundleContext,
+    const cppmicroservices::Bundle& bundle,
     const cppmicroservices::AnyMap& scrMetadata,
     const std::shared_ptr<ComponentRegistry>& registry,
     const std::shared_ptr<LogService>& logger,
@@ -70,7 +70,7 @@ private:
 
   void DisableAndRemoveAllComponentManagers();
 
-  cppmicroservices::BundleContext bundleContext;
+  cppmicroservices::Bundle bundle_;
   std::shared_ptr<ComponentRegistry> registry;
   std::shared_ptr<LogService> logger;
   std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;

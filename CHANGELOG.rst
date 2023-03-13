@@ -9,7 +9,7 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 `(UNRELEASED) vX.X.X <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (20XX-XX-XX)
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/0b4f93e6f23b1591ffffbe4ee234a428feff55fa...development>`_
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.4...development>`_
 
 Added
 -----
@@ -29,7 +29,7 @@ Fixed
 `v3.7.4 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.7.4>`_ (2022-11-02)
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...master>`_
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...v3.7.4>`_
 
 Added
 -----

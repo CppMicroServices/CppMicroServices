@@ -60,10 +60,19 @@ namespace cppmicroservices
      *   - "(&(" + Constants::OBJECTCLASS + "=Person)(|(sn=Jensen)(cn=Babs J*)))"
      *   - "(o=univ*of*mich*)"
      *
-     * LDAPFilters have been extended to make it easier to query nested JSON keys.  Keys which
-     * contain the "." character may refer to nested values. The top level is checked first for a
-     * matching entry. If one isn't found, the key is decomposed and the JSON structure "walked down"
-     * to look for a match.
+     * LDAPFilters have been extended to make it easier to query nested JSON keys. This is disabled
+     * by default. To enable this functionality, define SUPPORT_NESTED_LOOKUP at compile time. For
+     * example, if using "make" to build:
+     *
+     * >> make clean
+     * >> make SUPPORT_NESTED_LOOKUP=1
+     *
+     * Nested Lookup Description
+     * =========================
+     *
+     * Keys which contain the "." character may refer to nested values. The top level is checked
+     * first for a matching entry. If one isn't found, the key is decomposed and the JSON structure
+     * "walked down" to look for a match.
      *
      * For example, given a key "a.b.c.d", if a value exists in the top level map with that key,
      * it's retuned. If a value is not found at the top level with that key, it's decomposed into a

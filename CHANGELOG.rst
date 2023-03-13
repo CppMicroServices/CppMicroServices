@@ -29,7 +29,7 @@ Fixed
 `v3.7.4 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.7.4>`_ (2022-11-02)
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...master>`_
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...v3.7.4>`_
 
 Added
 -----

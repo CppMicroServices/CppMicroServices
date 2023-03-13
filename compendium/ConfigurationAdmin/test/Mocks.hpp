@@ -123,8 +123,8 @@ public:
   MOCK_METHOD1(RemoveConfigurations, void(std::vector<ConfigurationAddedInfo>));
   MOCK_METHOD2(NotifyConfigurationUpdated,
                std::shared_future<void>(const std::string&, const unsigned long));
-  MOCK_METHOD2(NotifyConfigurationRemoved,
-               std::shared_future<void>(const std::string&, std::uintptr_t));
+  MOCK_METHOD3(NotifyConfigurationRemoved,
+               std::shared_future<void>(const std::string&, std::uintptr_t, unsigned long));
 };
 
 namespace async {

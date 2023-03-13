@@ -28,95 +28,108 @@
 #include <chrono>
 #include <condition_variable>
 
-namespace cppmicroservices {
-
-namespace detail {
-
-template<class MutexHost>
-class WaitCondition
+namespace cppmicroservices
 {
-public:
-  void Wait(typename MutexHost::UniqueLock& lock)
-  {
+
+    namespace detail
+    {
+
+        template <class MutexHost>
+        class WaitCondition
+        {
+          public:
+            void
+            Wait(typename MutexHost::UniqueLock& lock)
+            {
 #ifdef US_ENABLE_THREADING_SUPPORT
-    m_CondVar.wait(lock.m_Lock);
+                m_CondVar.wait(lock.m_Lock);
 #else
-    US_UNUSED(lock);
+                US_UNUSED(lock);
 #endif
-  }
+            }
 
-  template<class Predicate>
-  void Wait(typename MutexHost::UniqueLock& lock, Predicate pred)
-  {
+            template <class Predicate>
+            void
+            Wait(typename MutexHost::UniqueLock& lock, Predicate pred)
+            {
 #ifdef US_ENABLE_THREADING_SUPPORT
-    m_CondVar.wait(lock.m_Lock, pred);
+                m_CondVar.wait(lock.m_Lock, pred);
 #else
-    US_UNUSED(lock);
-    US_UNUSED(pred);
+                US_UNUSED(lock);
+                US_UNUSED(pred);
 #endif
-  }
+            }
 
-  template<class Rep, class Period>
-  std::cv_status WaitFor(typename MutexHost::UniqueLock& lock,
-                         const std::chrono::duration<Rep, Period>& rel_time)
-  {
+            template <class Rep, class Period>
+            std::cv_status
+            WaitFor(typename MutexHost::UniqueLock& lock, std::chrono::duration<Rep, Period> const& rel_time)
+            {
 #ifdef US_ENABLE_THREADING_SUPPORT
-    if (rel_time == std::chrono::duration<Rep, Period>::zero()) {
-      Wait(lock);
-      return std::cv_status::no_timeout;
-    } else {
-      return m_CondVar.wait_for(lock.m_Lock, rel_time);
-    }
+                if (rel_time == std::chrono::duration<Rep, Period>::zero())
+                {
+                    Wait(lock);
+                    return std::cv_status::no_timeout;
+                }
+                else
+                {
+                    return m_CondVar.wait_for(lock.m_Lock, rel_time);
+                }
 #else
-    US_UNUSED(lock);
-    US_UNUSED(rel_time);
-    return std::cv_status::no_timeout;
+                US_UNUSED(lock);
+                US_UNUSED(rel_time);
+                return std::cv_status::no_timeout;
 #endif
-  }
+            }
 
-  template<class Rep, class Period, class Predicate>
-  bool WaitFor(typename MutexHost::UniqueLock& lock,
-               const std::chrono::duration<Rep, Period>& rel_time,
-               Predicate pred)
-  {
+            template <class Rep, class Period, class Predicate>
+            bool
+            WaitFor(typename MutexHost::UniqueLock& lock,
+                    std::chrono::duration<Rep, Period> const& rel_time,
+                    Predicate pred)
+            {
 #ifdef US_ENABLE_THREADING_SUPPORT
-    if (rel_time == std::chrono::duration<Rep, Period>::zero()) {
-      Wait(lock, pred);
-      return true;
-    } else {
-      return m_CondVar.wait_for(lock.m_Lock, rel_time, pred);
-    }
+                if (rel_time == std::chrono::duration<Rep, Period>::zero())
+                {
+                    Wait(lock, pred);
+                    return true;
+                }
+                else
+                {
+                    return m_CondVar.wait_for(lock.m_Lock, rel_time, pred);
+                }
 #else
-    US_UNUSED(lock);
-    US_UNUSED(rel_time);
-    US_UNUSED(pred);
-    return pred();
+                US_UNUSED(lock);
+                US_UNUSED(rel_time);
+                US_UNUSED(pred);
+                return pred();
 #endif
-  }
+            }
 
-  /** Notify that the condition is true and release one waiting thread */
-  void Notify()
-  {
+            /** Notify that the condition is true and release one waiting thread */
+            void
+            Notify()
+            {
 #ifdef US_ENABLE_THREADING_SUPPORT
-    m_CondVar.notify_one();
+                m_CondVar.notify_one();
 #endif
-  }
+            }
 
-  /** Notify that the condition is true and release all waiting threads */
-  void NotifyAll()
-  {
+            /** Notify that the condition is true and release all waiting threads */
+            void
+            NotifyAll()
+            {
 #ifdef US_ENABLE_THREADING_SUPPORT
-    m_CondVar.notify_all();
+                m_CondVar.notify_all();
 #endif
-  }
+            }
 
-private:
+          private:
 #ifdef US_ENABLE_THREADING_SUPPORT
-  std::condition_variable m_CondVar;
+            std::condition_variable m_CondVar;
 #endif
-};
+        };
 
-} // namespace detail
+    } // namespace detail
 
 } // namespace cppmicroservices
 

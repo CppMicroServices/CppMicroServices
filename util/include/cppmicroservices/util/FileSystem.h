@@ -25,36 +25,38 @@
 
 #include <string>
 
-namespace cppmicroservices {
+namespace cppmicroservices
+{
 
-namespace util {
+    namespace util
+    {
 
-const char DIR_SEP_WIN32 = '\\';
-const char DIR_SEP_POSIX = '/';
+        char const DIR_SEP_WIN32 = '\\';
+        char const DIR_SEP_POSIX = '/';
 
-extern const char DIR_SEP;
+        extern char const DIR_SEP;
 
-// Get the path of the calling executable.
-// Throws std::runtime_error if the path cannot be
-// determined.
-std::string GetExecutablePath();
+        // Get the path of the calling executable.
+        // Throws std::runtime_error if the path cannot be
+        // determined.
+        std::string GetExecutablePath();
 
-// Platform agnostic way to get the current working directory.
-// Supports Linux, Mac, and Windows.
-std::string GetCurrentWorkingDirectory();
-bool Exists(const std::string& path);
+        // Platform agnostic way to get the current working directory.
+        // Supports Linux, Mac, and Windows.
+        std::string GetCurrentWorkingDirectory();
+        bool Exists(std::string const& path);
 
-bool IsDirectory(const std::string& path);
-bool IsFile(const std::string& path);
-bool IsRelative(const std::string& path);
+        bool IsDirectory(std::string const& path);
+        bool IsFile(std::string const& path);
+        bool IsRelative(std::string const& path);
 
-std::string GetAbsolute(const std::string& path, const std::string& base);
+        std::string GetAbsolute(std::string const& path, std::string const& base);
 
-void MakePath(const std::string& path);
+        void MakePath(std::string const& path);
 
-void RemoveDirectoryRecursive(const std::string& path);
+        void RemoveDirectoryRecursive(std::string const& path);
 
-} // namespace util
+    } // namespace util
 } // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_UTIL_FILESYSTEM_H

@@ -4,11 +4,11 @@
 +-------------+---------------------------+--------------------------------------+----------------------------------------+
 | Branch      | GCC 7.5.0 and 9.4.0       | Visual Studio 2019                   |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
-|             | Xcode 12.4                | Visual Studio 2022                   |                                        |
+|             | Clang 9.0                 | Visual Studio 2022                   |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
-|             | Xcode 13.0                | MinGW-w64                            |                                        |
+|             | Xcode 13.2                | MinGW-w64                            |                                        |
 |             +---------------------------+--------------------------------------+----------------------------------------+
-|             | Clang 9.0                 |                                      |                                        |
+|             | Xcode 13.4                |                                      |                                        |
 +=============+===========================+======================================+========================================+
 | master      | |BuildAndTestNix(master)| | |BuildAndTestWindows(master)|        | |Code Coverage Status|                 |
 +-------------+---------------------------+--------------------------------------+----------------------------------------+
@@ -66,12 +66,12 @@ the following compilers:
 
 - GCC 9.4.0
 - Clang 9.0
-- Clang from Xcode 12.0 and 13.0
+- Clang from Xcode 13.2 and 13.4
 - Visual Studio 2019 and 2022
 
 Recommended minimum required CMake version:
 
-- CMake 3.12.4 
+- CMake 3.17.0
 
 For all CI builds through GitHub Actions, the CMake version (and
 version of other provided software) we use is determined by the 
@@ -82,8 +82,8 @@ use, please see the following resources:
 
 - `ubuntu-18.04 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu1804-README.md>`
 - `ubuntu-20.04 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-Readme.md>`
-- `macos-10.15 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md>`
 - `macos-11 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-11-Readme.md>`
+- `macos-12 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-12-Readme.md>`
 - `windows-2019 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/win/Windows2019-Readme.md>`
 - `windows-2022 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/win/Windows2022-Readme.md>`
 
@@ -92,8 +92,8 @@ Below is a list of tested compiler/OS combinations:
 - GCC 7.5.0 (Ubuntu 18.04)
 - GCC 9.4.0 (Ubuntu 20.04)
 - Clang 9.0 (Ubuntu 18.04)
-- Apple Clang, Xcode 12.0.1 (OS X 10.15.7)
-- Apple Clang, Xcode 13.0.0 (OS X 11.0)
+- Apple Clang, Xcode 13.2.0 (OS X 11.6.8)
+- Apple Clang, Xcode 13.4.0 (OS X 12.5.0)
 - Visual Studio 2019
 - Visual Studio 2022
 - MinGW-w64
@@ -223,3 +223,22 @@ file for details about the contribution process.
    :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/master
 .. |Code Coverage Status (development)| image:: https://img.shields.io/codecov/c/github/CppMicroServices/CppMicroServices/development.svg?style=flat-square
    :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/development
+
+Git Hooks General Information
+-----------------------------
+
+The CppMicroServices repository defines its git hooks in the `.githooks` directory. This directory is
+set as the directory for git hooks via executing `git config core.hooksPath <path>` in our `CMakeLists.txt` file.
+
+Git Hooks Failure Help
+----------------------
+
+If the clang-format pre-commit hook fails because `clang-format` is not installed, please install it and
+put it on the path. Similarly, if `git-clang-format` is not installed, do the same. `git-clang-format` comes
+with the LLVM distribution of `clang-format`.
+
+If this is not feasible for you, you can specify `--no-verify` when committing your changes. This is heavily discouraged
+and you must provide a justification as to why you are unable to format your commit.
+
+We reserve the right to reject any pull requests that are not properly formatted and do not have a
+valid justification specified.

@@ -30,13 +30,13 @@
 #include <vector>
 
 #ifdef US_BUILD_SHARED_LIBS
-#  ifdef Tutorial_spellcheckservice_EXPORTS
-#    define SPELLCHECKSERVICE_EXPORT US_ABI_EXPORT
-#  else
-#    define SPELLCHECKSERVICE_EXPORT US_ABI_IMPORT
-#  endif
+#    ifdef Tutorial_spellcheckservice_EXPORTS
+#        define SPELLCHECKSERVICE_EXPORT US_ABI_EXPORT
+#    else
+#        define SPELLCHECKSERVICE_EXPORT US_ABI_IMPORT
+#    endif
 #else
-#  define SPELLCHECKSERVICE_EXPORT US_ABI_EXPORT
+#    define SPELLCHECKSERVICE_EXPORT US_ABI_EXPORT
 #endif
 
 /**
@@ -47,20 +47,20 @@
  */
 struct SPELLCHECKSERVICE_EXPORT ISpellCheckService
 {
-  // Out-of-line virtual desctructor for proper dynamic cast
-  // support with older versions of gcc.
-  virtual ~ISpellCheckService();
+    // Out-of-line virtual desctructor for proper dynamic cast
+    // support with older versions of gcc.
+    virtual ~ISpellCheckService();
 
-  /**
-   * Checks a given passage for spelling errors. A passage is any number of
-   * words separated by a space and any of the following punctuation marks:
-   * comma (,), period (.), exclamation mark (!), question mark (?),
-   * semi-colon (;), and colon(:).
-   *
-   * @param passage the passage to spell check.
-   * @return A list of misspelled words.
-   */
-  virtual std::vector<std::string> Check(const std::string& passage) = 0;
+    /**
+     * Checks a given passage for spelling errors. A passage is any number of
+     * words separated by a space and any of the following punctuation marks:
+     * comma (,), period (.), exclamation mark (!), question mark (?),
+     * semi-colon (;), and colon(:).
+     *
+     * @param passage the passage to spell check.
+     * @return A list of misspelled words.
+     */
+    virtual std::vector<std::string> Check(std::string const& passage) = 0;
 };
 //! [service]
 //!

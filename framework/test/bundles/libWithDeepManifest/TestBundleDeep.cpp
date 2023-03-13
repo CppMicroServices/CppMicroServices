@@ -23,19 +23,25 @@
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
 
-namespace cppmicroservices {
-
-class TestBundleDeepActivator : public BundleActivator
+namespace cppmicroservices
 {
-public:
-  TestBundleDeepActivator() {}
-  ~TestBundleDeepActivator() {}
 
-  void Start(BundleContext) {}
-  void Stop(BundleContext) {}
-};
+    class TestBundleDeepActivator : public BundleActivator
+    {
+      public:
+        TestBundleDeepActivator() {}
+        ~TestBundleDeepActivator() {}
 
-}
+        void
+        Start(BundleContext)
+        {
+        }
+        void
+        Stop(BundleContext)
+        {
+        }
+    };
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
-  cppmicroservices::TestBundleDeepActivator)
+} // namespace cppmicroservices
+
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleDeepActivator)

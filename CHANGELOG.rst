@@ -9,7 +9,7 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 `(UNRELEASED) vX.X.X <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (20XX-XX-XX)
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...development>`_
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/0b4f93e6f23b1591ffffbe4ee234a428feff55fa...development>`_
 
 Added
 -----
@@ -26,26 +26,22 @@ Deprecated
 Fixed
 -----
 
-`v3.7.4 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (2022-10-12)
+`v3.7.4 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.7.4>`_ (2022-11-02)
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...development>`_
-
-General Note
-------------
-This entry in the change log captures the changes that were made between v3.7.3 and v3.7.4
- The following PR's were not included in this release
-651 Configuration Admin fix deadlock and double update.
-717 Remove automatic configuration object creation
-714 ServiceTracker GetTrackingCount when opened and closed
-725 Fixed sporadic race conditions during framework shutdown
-727 Fix race that results in a missed config updated event
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...master>`_
 
 Added
 -----
+- `Support arm64 on macOS <https://github.com/CppMicroServices/CppMicroServices/pull/778>`_
 
 Changed
 -------
+- Code formatting, no functional changes:
+    - `updated formatting - clang-fromat ran on all files <https://github.com/CppMicroServices/CppMicroServices/pull/759>`_
+    - `Clang-format git hook pre-commit enforcement <https://github.com/CppMicroServices/CppMicroServices/pull/760>`_
+    - `clang-format ran on all files <https://github.com/CppMicroServices/CppMicroServices/pull/766>`_
+- `[Core Framework] Upgrade jsoncpp <https://github.com/CppMicroServices/CppMicroServices/pull/773>`_
 
 Removed
 -------
@@ -55,12 +51,56 @@ Deprecated
 
 Fixed
 -----
-- `[Declarative Services] Fixed ConfigurationAdminImpl::RemoveConfigurations deadlock <https://github.com/CppMicroServices/CppMicroServices/pull/745>`_
-- `[Declarative Services] Revert PR 713 <https://github.com/CppMicroServices/CppMicroServices/pull/744>`_
-- `[ConfigurationAdmin] Factory Configuration Bug Fix <https://github.com/CppMicroServices/CppMicroServices/pull/731>`_
-- `[Declarative Services] Improve error messages for  ComponentInstance constructor <https://github.com/CppMicroServices/CppMicroServices/pull/724>`_
-- `[CA and DS] Add missing include file to fix minimum gcc compiler error <https://github.com/CppMicroServices/CppMicroServices/pull/721>`_
-- `[Declarative Services] Factory instance name should use component name  <https://github.com/CppMicroServices/CppMicroServices/pull/720>`_
+- `[Configuration Admin] Fix deadlock in ConfigurationAdminImpl::RemoveConfigurations <https://github.com/CppMicroServices/CppMicroServices/pull/748>`_
+- `[Configuration Admin] configurations using the same pid are not updated properly <https://github.com/CppMicroServices/CppMicroServices/pull/754>`_
+- `[Declarative Services] Ensure ~SCRBundleExtension does not throw <https://github.com/CppMicroServices/CppMicroServices/pull/761>`_
+- `Fix broken static build configurations on macOS <https://github.com/CppMicroServices/CppMicroServices/pull/774>`_
+
+
+`(UNRELEASED) v3.7.3 <https://github.com/cppmicroservices/cppmicroservices/tree/13ca108641c1960539cdaed10bcc39ae9a46b7a6>`_ (2022-08-29)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...13ca108641c1960539cdaed10bcc39ae9a46b7a6>`_
+
+Added
+-----
+- `Add MSVC analysis to project <https://github.com/CppMicroServices/CppMicroServices/pull/685>`_
+
+Changed
+-------
+- `[Declarative Services] Improve error message that is generated when an appropriate constructor isn't found for the Service Instance. <https://github.com/CppMicroServices/CppMicroServices/pull/724>`_
+- `[Configuration Admin] Remove automatic config object creation <https://github.com/CppMicroServices/CppMicroServices/pull/717>`_
+- `Updated CI to use macos-12 <https://github.com/CppMicroServices/CppMicroServices/pull/711>`_
+- `Update CXX_STANDARD to 17 for doc <https://github.com/CppMicroServices/CppMicroServices/pull/705>`_
+- `[Core Framework] Upgrade miniz to v3.0 <https://github.com/CppMicroServices/CppMicroServices/pull/688>`_
+- `[Core Framework] Remove manual ref counting for BundleResource <https://github.com/CppMicroServices/CppMicroServices/pull/695>`_
+- `Add ignore for 3rdparty code for MSVC code analysis <https://github.com/CppMicroServices/CppMicroServices/pull/692>`_
+- `[Core Framework/Declarative Services] Add log messages when shared library loading throws an exception <https://github.com/CppMicroServices/CppMicroServices/pull/690>`_
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Declarative Services] Factory Configuration Bug Fix <https://github.com/CppMicroServices/CppMicroServices/pull/731>`_
+- `[Configuration Admin] Fix race that results in a missed config updated event <https://github.com/CppMicroServices/CppMicroServices/pull/727>`_
+- `[Core Framework] Fixed sporadic race conditions during framework shutdown <https://github.com/CppMicroServices/CppMicroServices/pull/725>`_
+- `[Core Framework] Ensure that the ServiceTracker::GetTrackingCount() method returns -1 if the tracker has been opened and then closed. <https://github.com/CppMicroServices/CppMicroServices/pull/714>`_
+- `Added missing include for <thread> <https://github.com/CppMicroServices/CppMicroServices/pull/721>`_
+- `[Declarative Services] BugFix when creating instance name for factory components <https://github.com/CppMicroServices/CppMicroServices/pull/720>`_
+- `[Configuration Admin] Fix race in ConfigurationNotifier::NotifyAllListeners() <https://github.com/CppMicroServices/CppMicroServices/pull/715>`_
+- `[Configuration Admin] Fix deadlock <https://github.com/CppMicroServices/CppMicroServices/pull/651>`_
+- `[Core Framework] Improve performance of LDAP matching <https://github.com/CppMicroServices/CppMicroServices/pull/704>`_
+- `[Core Framework] Fix CFRlogger accessviolation <https://github.com/CppMicroServices/CppMicroServices/pull/706>`_
+- `Cleaned up some security warnings regarding 'noexcept' <https://github.com/CppMicroServices/CppMicroServices/pull/700>`_
+- `[Configuration Admin] Multiple services and factory services in bundle dependent on same configuration pid <https://github.com/CppMicroServices/CppMicroServices/pull/698>`_
+- `Disable code signing for bundle with no c++ code <https://github.com/CppMicroServices/CppMicroServices/pull/697>`_
+- `Fix compilation issue for arm macOS native compilation <https://github.com/CppMicroServices/CppMicroServices/pull/696>`_
+- `[Core Framework] Add file handle leak test <https://github.com/CppMicroServices/CppMicroServices/pull/693>`_
+- `[Configuration Admin] ListConfigurations fix for empty configuration objects. <https://github.com/CppMicroServices/CppMicroServices/pull/682>`_
 
 
 

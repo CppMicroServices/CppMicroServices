@@ -25,29 +25,31 @@
 
 #include "cppmicroservices/ServiceEvent.h"
 
-namespace cppmicroservices {
-
-namespace detail {
-
-/**
- * This class is not intended to be used directly. It is exported to support
- * the CppMicroServices bundle system.
- */
-struct TrackedServiceListener
+namespace cppmicroservices
 {
-  virtual ~TrackedServiceListener() = default;
 
-  /**
-   * Slot connected to service events for the
-   * <code>ServiceTracker</code> class. This method must NOT be
-   * synchronized to avoid deadlock potential.
-   *
-   * @param event <code>ServiceEvent</code> object from the framework.
-   */
-  virtual void ServiceChanged(const ServiceEvent& event) = 0;
-};
+    namespace detail
+    {
 
-} // namespace detail
+        /**
+         * This class is not intended to be used directly. It is exported to support
+         * the CppMicroServices bundle system.
+         */
+        struct TrackedServiceListener
+        {
+            virtual ~TrackedServiceListener() = default;
+
+            /**
+             * Slot connected to service events for the
+             * <code>ServiceTracker</code> class. This method must NOT be
+             * synchronized to avoid deadlock potential.
+             *
+             * @param event <code>ServiceEvent</code> object from the framework.
+             */
+            virtual void ServiceChanged(ServiceEvent const& event) = 0;
+        };
+
+    } // namespace detail
 
 } // namespace cppmicroservices
 

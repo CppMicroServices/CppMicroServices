@@ -29,134 +29,134 @@ limitations under the License.
 #include <string>
 
 #ifdef US_PLATFORM_APPLE
-#  include <mach/mach_time.h>
+#    include <mach/mach_time.h>
 #elif defined(US_PLATFORM_POSIX)
-#  include <limits.h>
-#  include <time.h>
-#  include <unistd.h>
-#  ifndef _POSIX_MONOTONIC_CLOCK
-#    error Monotonic clock support missing on this POSIX platform
-#  endif
+#    include <limits.h>
+#    include <time.h>
+#    include <unistd.h>
+#    ifndef _POSIX_MONOTONIC_CLOCK
+#        error Monotonic clock support missing on this POSIX platform
+#    endif
 #elif defined(US_PLATFORM_WINDOWS)
-#  ifndef WIN32_LEAN_AND_MEAN
-#    define WIN32_LEAN_AND_MEAN
-#  endif
-#  ifndef VC_EXTRA_LEAN
-#    define VC_EXTRA_LEAN
-#  endif
-#  include <windows.h>
+#    ifndef WIN32_LEAN_AND_MEAN
+#        define WIN32_LEAN_AND_MEAN
+#    endif
+#    ifndef VC_EXTRA_LEAN
+#        define VC_EXTRA_LEAN
+#    endif
+#    include <windows.h>
 #else
-#  error High precision timer support not available on this platform
+#    error High precision timer support not available on this platform
 #endif
 
-namespace cppmicroservices {
-
-namespace testing {
-
-class HighPrecisionTimer
+namespace cppmicroservices
 {
 
-public:
-  HighPrecisionTimer();
+    namespace testing
+    {
 
-  void Start();
+        class HighPrecisionTimer
+        {
 
-  long long ElapsedMilli();
+          public:
+            HighPrecisionTimer();
 
-  long long ElapsedMicro();
+            void Start();
 
-private:
+            long long ElapsedMilli();
+
+            long long ElapsedMicro();
+
+          private:
 #ifdef US_PLATFORM_APPLE
-  static double timeConvert;
-  uint64_t startTime;
+            static double timeConvert;
+            uint64_t startTime;
 #elif defined(US_PLATFORM_POSIX)
-  timespec startTime;
+            timespec startTime;
 #elif defined(US_PLATFORM_WINDOWS)
-  LARGE_INTEGER timerFrequency;
-  LARGE_INTEGER startTime;
+            LARGE_INTEGER timerFrequency;
+            LARGE_INTEGER startTime;
 #endif
-};
+        };
 
-// Helper function to install bundles, given a framework's bundle context and the name of the library.
-// Assumes that test bundles are within the same directory during unit testing.
-Bundle InstallLib(
-  BundleContext frameworkCtx,
-  const std::string& libName,
-  const cppmicroservices::AnyMap& bundleManifest = cppmicroservices::AnyMap(
-    cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
+        // Helper function to install bundles, given a framework's bundle context and the name of the library.
+        // Assumes that test bundles are within the same directory during unit testing.
+        Bundle InstallLib(BundleContext frameworkCtx,
+                          std::string const& libName,
+                          cppmicroservices::AnyMap const& bundleManifest
+                          = cppmicroservices::AnyMap(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS));
 
-/*
-* Change to destination directory specified by destdir
-* @throws std::runtime_error if the directory cannot be changed to
-*/
-void ChangeDirectory(const std::string& destdir);
+        /*
+         * Change to destination directory specified by destdir
+         * @throws std::runtime_error if the directory cannot be changed to
+         */
+        void ChangeDirectory(std::string const& destdir);
 
-/*
-* Returns a platform appropriate location for use as temporary storage.
-*/
-std::string GetTempDirectory();
+        /*
+         * Returns a platform appropriate location for use as temporary storage.
+         */
+        std::string GetTempDirectory();
 
-/*
- * Closes the file descriptor on destruction.
- */
-struct File
-{
-  File(const File&) = delete;
-  File& operator=(const File&) = delete;
+        /*
+         * Closes the file descriptor on destruction.
+         */
+        struct File
+        {
+            File(File const&) = delete;
+            File& operator=(File const&) = delete;
 
-  File();
+            File();
 
-  // The file descriptor fd is owned by this
-  File(int fd, const std::string& path);
+            // The file descriptor fd is owned by this
+            File(int fd, std::string const& path);
 
-  File(File&& o);
-  File& operator=(File&& o);
+            File(File&& o);
+            File& operator=(File&& o);
 
-  ~File();
+            ~File();
 
-  int FileDescr;
-  std::string Path;
-};
+            int FileDescr;
+            std::string Path;
+        };
 
-/*
- * Removes the directory on destruction.
- */
-struct TempDir
-{
-  TempDir(const TempDir&) = delete;
-  TempDir& operator=(const TempDir&) = delete;
+        /*
+         * Removes the directory on destruction.
+         */
+        struct TempDir
+        {
+            TempDir(TempDir const&) = delete;
+            TempDir& operator=(TempDir const&) = delete;
 
-  TempDir();
+            TempDir();
 
-  // The file descriptor fd is owned by this
-  TempDir(const std::string& path);
+            // The file descriptor fd is owned by this
+            TempDir(std::string const& path);
 
-  TempDir(TempDir&& o);
-  TempDir& operator=(TempDir&& o);
+            TempDir(TempDir&& o);
+            TempDir& operator=(TempDir&& o);
 
-  ~TempDir();
+            ~TempDir();
 
-  operator std::string() const;
+            operator std::string() const;
 
-  std::string Path;
-};
+            std::string Path;
+        };
 
-/*
- * Creates a new unique sub-directory in the temporary storage
- * location returned by GetTempDirectory() and returns a string
- * containing the directory path.
- *
- * This is similar to mkdtemp on POSIX systems, but without a
- * custom template string.
- */
-std::string MakeUniqueTempDirectory();
+        /*
+         * Creates a new unique sub-directory in the temporary storage
+         * location returned by GetTempDirectory() and returns a string
+         * containing the directory path.
+         *
+         * This is similar to mkdtemp on POSIX systems, but without a
+         * custom template string.
+         */
+        std::string MakeUniqueTempDirectory();
 
-File MakeUniqueTempFile(const std::string& base);
+        File MakeUniqueTempFile(std::string const& base);
 
-Bundle GetBundle(const std::string& bsn,
-                 BundleContext context = BundleContext());
+        Bundle GetBundle(std::string const& bsn, BundleContext context = BundleContext());
 
-} // namespace testing
+    } // namespace testing
 } // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_TESTUTILS_H

@@ -26,12 +26,13 @@
 #include "cppmicroservices/GlobalConfig.h"
 #include "cppmicroservices/ServiceInterface.h"
 
-namespace cppmicroservices {
-
-struct TestBundleBA_X1Service
+namespace cppmicroservices
 {
-  virtual ~TestBundleBA_X1Service() {}
-};
-}
+
+    struct TestBundleBA_X1Service
+    {
+        virtual ~TestBundleBA_X1Service() {}
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_TESTBUNDLEASERVICE_H

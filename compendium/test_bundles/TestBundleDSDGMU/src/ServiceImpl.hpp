@@ -8,27 +8,27 @@
 
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
-namespace sample {
-
-class ServiceComponentDynamicGreedyMandatoryUnary final
-  : public test::Interface2
+namespace sample
 {
-public:
-  ServiceComponentDynamicGreedyMandatoryUnary() = default;
-  ~ServiceComponentDynamicGreedyMandatoryUnary() = default;
-  virtual std::string ExtendedDescription() override;
 
-  void Activate(const std::shared_ptr<ComponentContext>&);
-  void Deactivate(const std::shared_ptr<ComponentContext>&);
+    class ServiceComponentDynamicGreedyMandatoryUnary final : public test::Interface2
+    {
+      public:
+        ServiceComponentDynamicGreedyMandatoryUnary() = default;
+        ~ServiceComponentDynamicGreedyMandatoryUnary() = default;
+        virtual std::string ExtendedDescription() override;
 
-  void Bindfoo(const std::shared_ptr<test::Interface1>&);
-  void Unbindfoo(const std::shared_ptr<test::Interface1>&);
+        void Activate(std::shared_ptr<ComponentContext> const&);
+        void Deactivate(std::shared_ptr<ComponentContext> const&);
 
-private:
-  std::shared_ptr<test::Interface1> foo;
-  std::mutex fooMutex;
-};
+        void Bindfoo(std::shared_ptr<test::Interface1> const&);
+        void Unbindfoo(std::shared_ptr<test::Interface1> const&);
 
-} // namespaces
+      private:
+        std::shared_ptr<test::Interface1> foo;
+        std::mutex fooMutex;
+    };
+
+} // namespace sample
 
 #endif // _SERVICE_IMPL_HPP_

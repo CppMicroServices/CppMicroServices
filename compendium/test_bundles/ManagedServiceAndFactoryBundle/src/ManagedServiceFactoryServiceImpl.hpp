@@ -1,24 +1,27 @@
 #include "TestInterfaces/Interfaces.hpp"
 
-namespace cppmicroservices {
-namespace service {
-namespace cm {
-namespace test {
-
-class TestManagedServiceFactoryServiceImpl
-  : public ::test::TestManagedServiceFactoryServiceInterface
+namespace cppmicroservices
 {
-public:
-  TestManagedServiceFactoryServiceImpl(int initialValue);
-  ~TestManagedServiceFactoryServiceImpl();
+    namespace service
+    {
+        namespace cm
+        {
+            namespace test
+            {
 
-  int getValue() override;
+                class TestManagedServiceFactoryServiceImpl : public ::test::TestManagedServiceFactoryServiceInterface
+                {
+                  public:
+                    TestManagedServiceFactoryServiceImpl(int initialValue);
+                    ~TestManagedServiceFactoryServiceImpl();
 
-private:
-  int value;
-};
+                    int getValue() override;
 
-} // namespace test
-} // namespace cm
-} // namespace service
+                  private:
+                    int value;
+                };
+
+            } // namespace test
+        }     // namespace cm
+    }         // namespace service
 } // namespace cppmicroservices

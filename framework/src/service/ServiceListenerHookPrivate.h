@@ -27,26 +27,27 @@
 
 #include "ServiceListenerEntry.h"
 
-namespace cppmicroservices {
-
-class ServiceListenerHook::ListenerInfoData
+namespace cppmicroservices
 {
-public:
-  ListenerInfoData(std::shared_ptr<BundleContextPrivate> context,
-                   ServiceListener l,
-                   void* data,
-                   ListenerTokenId tokenId,
-                   std::string filter);
 
-  virtual ~ListenerInfoData();
+    class ServiceListenerHook::ListenerInfoData
+    {
+      public:
+        ListenerInfoData(std::shared_ptr<BundleContextPrivate> context,
+                         ServiceListener l,
+                         void* data,
+                         ListenerTokenId tokenId,
+                         std::string filter);
 
-  std::shared_ptr<BundleContextPrivate> const context;
-  ServiceListener listener;
-  void* data;
-  ListenerTokenId tokenId;
-  std::string filter;
-  bool bRemoved;
-};
-}
+        virtual ~ListenerInfoData();
+
+        std::shared_ptr<BundleContextPrivate> const context;
+        ServiceListener listener;
+        void* data;
+        ListenerTokenId tokenId;
+        std::string filter;
+        bool bRemoved;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SERVICELISTENERHOOKPRIVATE_H

@@ -21,71 +21,74 @@ using namespace cppmicroservices;
 class US_ABI_LOCAL MyActivator : public BundleActivator
 {
 
-private:
-  /**
-   * A private inner class that implements a dictionary service;
-   * see DictionaryService for details of the service.
-   */
-  class DictionaryImpl : public IDictionaryService
-  {
-    // The set of words contained in the dictionary.
-    std::set<std::string> m_Dictionary;
+  private:
+    /**
+     * A private inner class that implements a dictionary service;
+     * see DictionaryService for details of the service.
+     */
+    class DictionaryImpl : public IDictionaryService
+    {
+        // The set of words contained in the dictionary.
+        std::set<std::string> m_Dictionary;
+
+      public:
+        DictionaryImpl()
+        {
+            m_Dictionary.insert("welcome");
+            m_Dictionary.insert("to");
+            m_Dictionary.insert("the");
+            m_Dictionary.insert("micro");
+            m_Dictionary.insert("services");
+            m_Dictionary.insert("tutorial");
+        }
+
+        /**
+         * Implements IDictionaryService::CheckWord(). Determines
+         * if the passed in word is contained in the dictionary.
+         *
+         * @param word the word to be checked.
+         * @return true if the word is in the dictionary,
+         *         false otherwise.
+         **/
+        bool
+        CheckWord(std::string const& word)
+        {
+            std::string lword(word);
+            std::transform(lword.begin(), lword.end(), lword.begin(), ::tolower);
+
+            return m_Dictionary.find(lword) != m_Dictionary.end();
+        }
+    };
 
   public:
-    DictionaryImpl()
+    /**
+     * Implements BundleActivator::Start(). Registers an
+     * instance of a dictionary service using the bundle context;
+     * attaches properties to the service that can be queried
+     * when performing a service look-up.
+     *
+     * @param context the context for the bundle.
+     */
+    void
+    Start(BundleContext context)
     {
-      m_Dictionary.insert("welcome");
-      m_Dictionary.insert("to");
-      m_Dictionary.insert("the");
-      m_Dictionary.insert("micro");
-      m_Dictionary.insert("services");
-      m_Dictionary.insert("tutorial");
+        auto dictionaryService = std::make_shared<DictionaryImpl>();
+        ServiceProperties props;
+        props["Language"] = std::string("English");
+        context.RegisterService<IDictionaryService>(dictionaryService, props);
     }
 
     /**
-     * Implements IDictionaryService::CheckWord(). Determines
-     * if the passed in word is contained in the dictionary.
+     * Implements BundleActivator::Stop(). Does nothing since
+     * the C++ Micro Services library will automatically unregister any registered services.
      *
-     * @param word the word to be checked.
-     * @return true if the word is in the dictionary,
-     *         false otherwise.
-     **/
-    bool CheckWord(const std::string& word)
+     * @param context the context for the bundle.
+     */
+    void
+    Stop(BundleContext /*context*/)
     {
-      std::string lword(word);
-      std::transform(lword.begin(), lword.end(), lword.begin(), ::tolower);
-
-      return m_Dictionary.find(lword) != m_Dictionary.end();
+        // NOTE: The service is automatically unregistered
     }
-  };
-
-public:
-  /**
-   * Implements BundleActivator::Start(). Registers an
-   * instance of a dictionary service using the bundle context;
-   * attaches properties to the service that can be queried
-   * when performing a service look-up.
-   *
-   * @param context the context for the bundle.
-   */
-  void Start(BundleContext context)
-  {
-    auto dictionaryService = std::make_shared<DictionaryImpl>();
-    ServiceProperties props;
-    props["Language"] = std::string("English");
-    context.RegisterService<IDictionaryService>(dictionaryService, props);
-  }
-
-  /**
-   * Implements BundleActivator::Stop(). Does nothing since
-   * the C++ Micro Services library will automatically unregister any registered services.
-   *
-   * @param context the context for the bundle.
-   */
-  void Stop(BundleContext /*context*/)
-  {
-    // NOTE: The service is automatically unregistered
-  }
 };
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(MyActivator)

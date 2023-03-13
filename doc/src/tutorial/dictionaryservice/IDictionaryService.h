@@ -29,13 +29,13 @@
 #include <string>
 
 #ifdef US_BUILD_SHARED_LIBS
-#  ifdef Tutorial_dictionaryservice_EXPORTS
-#    define DICTIONARYSERVICE_EXPORT US_ABI_EXPORT
-#  else
-#    define DICTIONARYSERVICE_EXPORT US_ABI_IMPORT
-#  endif
+#    ifdef Tutorial_dictionaryservice_EXPORTS
+#        define DICTIONARYSERVICE_EXPORT US_ABI_EXPORT
+#    else
+#        define DICTIONARYSERVICE_EXPORT US_ABI_IMPORT
+#    endif
 #else
-#  define DICTIONARYSERVICE_EXPORT US_ABI_EXPORT
+#    define DICTIONARYSERVICE_EXPORT US_ABI_EXPORT
 #endif
 
 /**
@@ -44,17 +44,17 @@
  **/
 struct DICTIONARYSERVICE_EXPORT IDictionaryService
 {
-  // Out-of-line virtual desctructor for proper dynamic cast
-  // support with older versions of gcc.
-  virtual ~IDictionaryService();
+    // Out-of-line virtual desctructor for proper dynamic cast
+    // support with older versions of gcc.
+    virtual ~IDictionaryService();
 
-  /**
-   * Check for the existence of a word.
-   * @param word the word to be checked.
-   * @return true if the word is in the dictionary,
-   *         false otherwise.
-   **/
-  virtual bool CheckWord(const std::string& word) = 0;
+    /**
+     * Check for the existence of a word.
+     * @param word the word to be checked.
+     * @return true if the word is in the dictionary,
+     *         false otherwise.
+     **/
+    virtual bool CheckWord(std::string const& word) = 0;
 };
 //! [service]
 

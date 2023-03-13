@@ -28,47 +28,47 @@
 #include <memory>
 #include <streambuf>
 
-namespace cppmicroservices {
-
-namespace detail {
-
-class BundleResourceBufferPrivate;
-
-class US_Framework_EXPORT BundleResourceBuffer : public std::streambuf
+namespace cppmicroservices
 {
 
-public:
-  BundleResourceBuffer(const BundleResourceBuffer&) = delete;
-  BundleResourceBuffer& operator=(const BundleResourceBuffer&) = delete;
+    namespace detail
+    {
 
-  explicit BundleResourceBuffer(std::unique_ptr<void, void (*)(void*)> data,
-                                std::size_t size,
-                                std::ios_base::openmode mode);
+        class BundleResourceBufferPrivate;
 
-  ~BundleResourceBuffer() override;
+        class US_Framework_EXPORT BundleResourceBuffer : public std::streambuf
+        {
 
-private:
-  int_type underflow() override;
+          public:
+            BundleResourceBuffer(BundleResourceBuffer const&) = delete;
+            BundleResourceBuffer& operator=(BundleResourceBuffer const&) = delete;
 
-  int_type uflow() override;
+            explicit BundleResourceBuffer(std::unique_ptr<void, void (*)(void*)> data,
+                                          std::size_t size,
+                                          std::ios_base::openmode mode);
 
-  int_type pbackfail(int_type ch) override;
+            ~BundleResourceBuffer() override;
 
-  std::streamsize showmanyc() override;
+          private:
+            int_type underflow() override;
 
-  pos_type seekoff(off_type off,
-                   std::ios_base::seekdir way,
-                   std::ios_base::openmode which = std::ios_base::in |
-                                                   std::ios_base::out) override;
-  pos_type seekpos(pos_type sp,
-                   std::ios_base::openmode which = std::ios_base::in |
-                                                   std::ios_base::out) override;
+            int_type uflow() override;
 
-private:
-  std::unique_ptr<BundleResourceBufferPrivate> d;
-};
+            int_type pbackfail(int_type ch) override;
 
-} // namespace detail
+            std::streamsize showmanyc() override;
+
+            pos_type seekoff(off_type off,
+                             std::ios_base::seekdir way,
+                             std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override;
+            pos_type seekpos(pos_type sp,
+                             std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override;
+
+          private:
+            std::unique_ptr<BundleResourceBufferPrivate> d;
+        };
+
+    } // namespace detail
 
 } // namespace cppmicroservices
 

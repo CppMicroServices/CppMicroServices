@@ -30,72 +30,74 @@
 #include <random>
 #include <string>
 
-namespace test {
-
-template<typename Task, typename Predicate>
-bool RepeatTaskUntilOrTimeout(Task&& t, Predicate&& p)
+namespace test
 {
-  using namespace std::chrono;
-  auto startTime = system_clock::now();
-  do {
-    t();
-    duration<double> duration = system_clock::now() - startTime;
-    if (duration > milliseconds(30000)) {
-      return false;
+
+    template <typename Task, typename Predicate>
+    bool
+    RepeatTaskUntilOrTimeout(Task&& t, Predicate&& p)
+    {
+        using namespace std::chrono;
+        auto startTime = system_clock::now();
+        do
+        {
+            t();
+            duration<double> duration = system_clock::now() - startTime;
+            if (duration > milliseconds(30000))
+            {
+                return false;
+            }
+        } while (!p());
+        return true;
     }
-  } while (!p());
-  return true;
-}
 
-/**
- * Convenience Method to install but not start a bundle given the bundle's symbolic name.
- */
-void InstallLib(::cppmicroservices::BundleContext frameworkCtx,
-                const std::string& libName);
+    /**
+     * Convenience Method to install but not start a bundle given the bundle's symbolic name.
+     */
+    void InstallLib(::cppmicroservices::BundleContext frameworkCtx, std::string const& libName);
 
-/**
- * Convenience Method to install and start a bundle given the bundle's symbolic name.
- */
-cppmicroservices::Bundle InstallAndStartBundle(
-  ::cppmicroservices::BundleContext frameworkCtx,
-  const std::string& libName);
+    /**
+     * Convenience Method to install and start a bundle given the bundle's symbolic name.
+     */
+    cppmicroservices::Bundle InstallAndStartBundle(::cppmicroservices::BundleContext frameworkCtx,
+                                                   std::string const& libName);
 
-/**
- * Convenience Method to install and start DS.
- */
-void InstallAndStartDS(::cppmicroservices::BundleContext frameworkCtx);
+    /**
+     * Convenience Method to install and start DS.
+     */
+    void InstallAndStartDS(::cppmicroservices::BundleContext frameworkCtx);
 
-/**
- * Convenience Method to install and start ConfigurationAdmin.
- */
-void InstallAndStartConfigAdmin(::cppmicroservices::BundleContext frameworkCtx);
+    /**
+     * Convenience Method to install and start ConfigurationAdmin.
+     */
+    void InstallAndStartConfigAdmin(::cppmicroservices::BundleContext frameworkCtx);
 
-/**
- * Convenience Method to extract service-id from a service reference
- */
-long GetServiceId(const ::cppmicroservices::ServiceReferenceBase& sRef);
+    /**
+     * Convenience Method to extract service-id from a service reference
+     */
+    long GetServiceId(::cppmicroservices::ServiceReferenceBase const& sRef);
 
-/**
- * Returns the file path of declarative services runtime plugin
- */
-std::string GetDSRuntimePluginFilePath();
+    /**
+     * Returns the file path of declarative services runtime plugin
+     */
+    std::string GetDSRuntimePluginFilePath();
 
-/**
- * Returns the file path of Configuration Admin runtime plugin
- */
+    /**
+     * Returns the file path of Configuration Admin runtime plugin
+     */
 
-std::string GetConfigAdminRuntimePluginFilePath();
+    std::string GetConfigAdminRuntimePluginFilePath();
 
-/**
- * Returns the path to the test bundles folder
- */
-std::string GetTestPluginsPath();
+    /**
+     * Returns the path to the test bundles folder
+     */
+    std::string GetTestPluginsPath();
 
-/**
- * Method to check if a bundle is loaded in current process
- */
-bool isBundleLoadedInThisProcess(std::string bundleName);
+    /**
+     * Method to check if a bundle is loaded in current process
+     */
+    bool isBundleLoadedInThisProcess(std::string bundleName);
 
-} // namespaces
+} // namespace test
 
 #endif /* TestUtils_hpp */

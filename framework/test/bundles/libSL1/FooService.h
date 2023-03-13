@@ -25,13 +25,14 @@
 
 #include "cppmicroservices/ServiceInterface.h"
 
-namespace cppmicroservices {
-
-struct FooService
+namespace cppmicroservices
 {
-  virtual ~FooService() {}
-  virtual void foo() = 0;
-};
-}
+
+    struct FooService
+    {
+        virtual ~FooService() {}
+        virtual void foo() = 0;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_FOOSERVICE_H

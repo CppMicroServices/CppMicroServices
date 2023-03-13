@@ -28,36 +28,41 @@
 
 #include <iostream>
 
-namespace cppmicroservices {
-
-struct TestBundleLQ : public TestBundleLQService
+namespace cppmicroservices
 {
-  TestBundleLQ() {}
-  virtual ~TestBundleLQ() {}
-};
 
-class TestBundleLQActivator : public BundleActivator
-{
-public:
-  TestBundleLQActivator() {}
-  ~TestBundleLQActivator() {}
+    struct TestBundleLQ : public TestBundleLQService
+    {
+        TestBundleLQ() {}
+        virtual ~TestBundleLQ() {}
+    };
 
-  void Start(BundleContext context)
-  {
-    s = std::make_shared<TestBundleLQ>();
+    class TestBundleLQActivator : public BundleActivator
+    {
+      public:
+        TestBundleLQActivator() {}
+        ~TestBundleLQActivator() {}
 
-    ServiceProperties props;
-    props["service.testproperty"] = std::string("YES");
-    sr = context.RegisterService<TestBundleLQService>(s, props);
-  }
+        void
+        Start(BundleContext context)
+        {
+            s = std::make_shared<TestBundleLQ>();
 
-  void Stop(BundleContext) { sr.Unregister(); }
+            ServiceProperties props;
+            props["service.testproperty"] = std::string("YES");
+            sr = context.RegisterService<TestBundleLQService>(s, props);
+        }
 
-private:
-  std::shared_ptr<TestBundleLQ> s;
-  ServiceRegistration<TestBundleLQService> sr;
-};
-}
+        void
+        Stop(BundleContext)
+        {
+            sr.Unregister();
+        }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
-  cppmicroservices::TestBundleLQActivator)
+      private:
+        std::shared_ptr<TestBundleLQ> s;
+        ServiceRegistration<TestBundleLQService> sr;
+    };
+} // namespace cppmicroservices
+
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleLQActivator)

@@ -24,38 +24,40 @@
 #define CPPMICROSERVICES_GETBUNDLECONTEXT_H
 
 #ifndef US_BUNDLE_NAME
-#  error Missing preprocessor define US_BUNDLE_NAME
+#    error Missing preprocessor define US_BUNDLE_NAME
 #endif
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleInitialization.h"
 
-extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(
-  US_BUNDLE_NAME)();
+extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)();
 
-namespace cppmicroservices {
-
-namespace detail {
-
-US_Framework_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d);
-}
-
-/**
- * \ingroup MicroServices
- *
- * \brief Returns the bundle context of the calling bundle.
- *
- * This function allows easy access to the BundleContext instance from
- * inside a C++ Micro Services bundle.
- *
- * \return The BundleContext of the calling bundle. If the caller is not
- * part of an active bundle, an invalid BundleContext is returned.
- */
-static inline BundleContext GetBundleContext()
+namespace cppmicroservices
 {
-  auto ctx = US_GET_CTX_FUNC(US_BUNDLE_NAME)();
-  return ctx ? detail::MakeBundleContext(ctx) : BundleContext{};
-}
-}
+
+    namespace detail
+    {
+
+        US_Framework_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d);
+    }
+
+    /**
+     * \ingroup MicroServices
+     *
+     * \brief Returns the bundle context of the calling bundle.
+     *
+     * This function allows easy access to the BundleContext instance from
+     * inside a C++ Micro Services bundle.
+     *
+     * \return The BundleContext of the calling bundle. If the caller is not
+     * part of an active bundle, an invalid BundleContext is returned.
+     */
+    static inline BundleContext
+    GetBundleContext()
+    {
+        auto ctx = US_GET_CTX_FUNC(US_BUNDLE_NAME)();
+        return ctx ? detail::MakeBundleContext(ctx) : BundleContext {};
+    }
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_GETBUNDLECONTEXT_H

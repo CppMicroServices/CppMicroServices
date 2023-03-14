@@ -27,30 +27,34 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/GlobalConfig.h"
 
-namespace cppmicroservices {
-
-struct TestBundleSLE1 : public TestBundleSLE1Service
+namespace cppmicroservices
 {
 
-  TestBundleSLE1() {}
-  virtual ~TestBundleSLE1() {}
-};
+    struct TestBundleSLE1 : public TestBundleSLE1Service
+    {
 
-class TestBundleSLE1Activator : public BundleActivator
-{
-public:
-  TestBundleSLE1Activator() {}
-  ~TestBundleSLE1Activator() {}
+        TestBundleSLE1() {}
+        virtual ~TestBundleSLE1() {}
+    };
 
-  void Start(BundleContext)
-  {
-    // Mimic exception thrown from SharedLibrary::Load(int flags)
-    throw std::system_error(std::error_code(), "test");
-  }
+    class TestBundleSLE1Activator : public BundleActivator
+    {
+      public:
+        TestBundleSLE1Activator() {}
+        ~TestBundleSLE1Activator() {}
 
-  void Stop(BundleContext) {}
-};
-}
+        void
+        Start(BundleContext)
+        {
+            // Mimic exception thrown from SharedLibrary::Load(int flags)
+            throw std::system_error(std::error_code(), "test");
+        }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
-  cppmicroservices::TestBundleSLE1Activator)
+        void
+        Stop(BundleContext)
+        {
+        }
+    };
+} // namespace cppmicroservices
+
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleSLE1Activator)

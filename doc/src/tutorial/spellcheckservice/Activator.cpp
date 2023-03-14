@@ -37,197 +37,201 @@ US_MSVC_PUSH_DISABLE_WARNING(4996)
 
 using namespace cppmicroservices;
 
-namespace {
-
-/**
- * This class implements a bundle that implements a spell
- * checker service. The spell checker service uses all available
- * dictionary services to check for the existence of words in
- * a given sentence. This bundle uses a ServiceTracker to
- * monitors the dynamic availability of dictionary services,
- * and to aggregate all available dictionary services as they
- * arrive and depart. The spell checker service is only registered
- * if there are dictionary services available, thus the spell
- * checker service will appear and disappear as dictionary
- * services appear and disappear, respectively.
-**/
-class US_ABI_LOCAL Activator
-  : public BundleActivator
-  , public ServiceTrackerCustomizer<IDictionaryService>
+namespace
 {
 
-private:
-  /**
-   * A private inner class that implements a spell check service; see
-   * ISpellCheckService for details of the service.
-   */
-  class SpellCheckImpl : public ISpellCheckService
-  {
-
-  private:
-    typedef std::map<ServiceReference<IDictionaryService>,
-                     std::shared_ptr<IDictionaryService>>
-      RefToServiceType;
-    RefToServiceType m_refToSvcMap;
-
-  public:
     /**
-     * Implements ISpellCheckService::Check(). Checks the given passage for
-     * misspelled words.
-     *
-     * @param passage the passage to spell check.
-     * @return A list of misspelled words.
-     */
-    std::vector<std::string> Check(const std::string& passage)
+     * This class implements a bundle that implements a spell
+     * checker service. The spell checker service uses all available
+     * dictionary services to check for the existence of words in
+     * a given sentence. This bundle uses a ServiceTracker to
+     * monitors the dynamic availability of dictionary services,
+     * and to aggregate all available dictionary services as they
+     * arrive and depart. The spell checker service is only registered
+     * if there are dictionary services available, thus the spell
+     * checker service will appear and disappear as dictionary
+     * services appear and disappear, respectively.
+     **/
+    class US_ABI_LOCAL Activator
+        : public BundleActivator
+        , public ServiceTrackerCustomizer<IDictionaryService>
     {
-      std::vector<std::string> errorList;
 
-      // No misspelled words for an empty string.
-      if (passage.empty()) {
-        return errorList;
-      }
+      private:
+        /**
+         * A private inner class that implements a spell check service; see
+         * ISpellCheckService for details of the service.
+         */
+        class SpellCheckImpl : public ISpellCheckService
+        {
 
-      // Tokenize the passage using spaces and punctuation.
-      const char* delimiters = " ,.!?;:";
-      char* passageCopy = new char[passage.size() + 1];
-      std::memcpy(passageCopy, passage.c_str(), passage.size() + 1);
-      char* pch = std::strtok(passageCopy, delimiters);
+          private:
+            typedef std::map<ServiceReference<IDictionaryService>, std::shared_ptr<IDictionaryService>>
+                RefToServiceType;
+            RefToServiceType m_refToSvcMap;
 
-      {
-        // Lock the m_refToSvcMap member using your favorite thread library here...
-        // MutexLocker lock(&m_refToSvcMapMutex)
+          public:
+            /**
+             * Implements ISpellCheckService::Check(). Checks the given passage for
+             * misspelled words.
+             *
+             * @param passage the passage to spell check.
+             * @return A list of misspelled words.
+             */
+            std::vector<std::string>
+            Check(std::string const& passage)
+            {
+                std::vector<std::string> errorList;
 
-        // Loop through each word in the passage.
-        while (pch) {
-          std::string word(pch);
+                // No misspelled words for an empty string.
+                if (passage.empty())
+                {
+                    return errorList;
+                }
 
-          bool correct = false;
+                // Tokenize the passage using spaces and punctuation.
+                char const* delimiters = " ,.!?;:";
+                char* passageCopy = new char[passage.size() + 1];
+                std::memcpy(passageCopy, passage.c_str(), passage.size() + 1);
+                char* pch = std::strtok(passageCopy, delimiters);
 
-          // Check each available dictionary for the current word.
-          for (RefToServiceType::const_iterator i = m_refToSvcMap.begin();
-               (!correct) && (i != m_refToSvcMap.end());
-               ++i) {
-            std::shared_ptr<IDictionaryService> dictionary = i->second;
+                {
+                    // Lock the m_refToSvcMap member using your favorite thread library here...
+                    // MutexLocker lock(&m_refToSvcMapMutex)
 
-            if (dictionary->CheckWord(word)) {
-              correct = true;
+                    // Loop through each word in the passage.
+                    while (pch)
+                    {
+                        std::string word(pch);
+
+                        bool correct = false;
+
+                        // Check each available dictionary for the current word.
+                        for (RefToServiceType::const_iterator i = m_refToSvcMap.begin();
+                             (!correct) && (i != m_refToSvcMap.end());
+                             ++i)
+                        {
+                            std::shared_ptr<IDictionaryService> dictionary = i->second;
+
+                            if (dictionary->CheckWord(word))
+                            {
+                                correct = true;
+                            }
+                        }
+
+                        // If the word is not correct, then add it
+                        // to the incorrect word list.
+                        if (!correct)
+                        {
+                            errorList.push_back(word);
+                        }
+
+                        pch = std::strtok(nullptr, delimiters);
+                    }
+                }
+
+                delete[] passageCopy;
+
+                return errorList;
             }
-          }
 
-          // If the word is not correct, then add it
-          // to the incorrect word list.
-          if (!correct) {
-            errorList.push_back(word);
-          }
+            std::size_t
+            AddDictionary(ServiceReference<IDictionaryService> const& ref,
+                          std::shared_ptr<IDictionaryService> dictionary)
+            {
+                // Lock the m_refToSvcMap member using your favorite thread library here...
+                // MutexLocker lock(&m_refToSvcMapMutex)
 
-          pch = std::strtok(nullptr, delimiters);
+                m_refToSvcMap.insert(std::make_pair(ref, dictionary));
+
+                return m_refToSvcMap.size();
+            }
+
+            std::size_t
+            RemoveDictionary(ServiceReference<IDictionaryService> const& ref)
+            {
+                // Lock the m_refToSvcMap member using your favorite thread library here...
+                // MutexLocker lock(&m_refToSvcMapMutex)
+
+                m_refToSvcMap.erase(ref);
+
+                return m_refToSvcMap.size();
+            }
+        };
+
+        virtual std::shared_ptr<IDictionaryService>
+        AddingService(ServiceReference<IDictionaryService> const& reference)
+        {
+            std::shared_ptr<IDictionaryService> dictionary = m_context.GetService(reference);
+            std::size_t count = m_spellCheckService->AddDictionary(reference, dictionary);
+            if (!m_spellCheckReg && count > 1)
+            {
+                m_spellCheckReg = m_context.RegisterService<ISpellCheckService>(m_spellCheckService);
+            }
+            return dictionary;
         }
-      }
 
-      delete[] passageCopy;
+        virtual void
+        ModifiedService(ServiceReference<IDictionaryService> const& /*reference*/,
+                        std::shared_ptr<IDictionaryService> const& /*service*/)
+        {
+            // do nothing
+        }
 
-      return errorList;
-    }
+        virtual void
+        RemovedService(ServiceReference<IDictionaryService> const& reference,
+                       std::shared_ptr<IDictionaryService> const& /*service*/)
+        {
+            if (m_spellCheckService->RemoveDictionary(reference) < 2 && m_spellCheckReg)
+            {
+                m_spellCheckReg.Unregister();
+                m_spellCheckReg = nullptr;
+            }
+        }
 
-    std::size_t AddDictionary(const ServiceReference<IDictionaryService>& ref,
-                              std::shared_ptr<IDictionaryService> dictionary)
-    {
-      // Lock the m_refToSvcMap member using your favorite thread library here...
-      // MutexLocker lock(&m_refToSvcMapMutex)
+        std::shared_ptr<SpellCheckImpl> m_spellCheckService;
+        ServiceRegistration<ISpellCheckService> m_spellCheckReg;
 
-      m_refToSvcMap.insert(std::make_pair(ref, dictionary));
+        BundleContext m_context;
+        std::unique_ptr<ServiceTracker<IDictionaryService>> m_tracker;
 
-      return m_refToSvcMap.size();
-    }
+      public:
+        Activator() : m_context() {}
 
-    std::size_t RemoveDictionary(
-      const ServiceReference<IDictionaryService>& ref)
-    {
-      // Lock the m_refToSvcMap member using your favorite thread library here...
-      // MutexLocker lock(&m_refToSvcMapMutex)
+        /**
+         * Implements BundleActivator::Start(). Registers an
+         * instance of a dictionary service using the bundle context;
+         * attaches properties to the service that can be queried
+         * when performing a service look-up.
+         *
+         * @param context the context for the bundle.
+         */
+        void
+        Start(BundleContext context)
+        {
+            m_context = context;
 
-      m_refToSvcMap.erase(ref);
+            m_spellCheckService.reset(new SpellCheckImpl);
+            m_tracker.reset(new ServiceTracker<IDictionaryService>(context, this));
+            m_tracker->Open();
+        }
 
-      return m_refToSvcMap.size();
-    }
-  };
+        /**
+         * Implements BundleActivator::Stop(). Does nothing since
+         * the C++ Micro Services library will automatically unregister any registered services
+         * and release any used services.
+         *
+         * @param context the context for the bundle.
+         */
+        void
+        Stop(BundleContext /*context*/)
+        {
+            // NOTE: The service is automatically unregistered
 
-  virtual std::shared_ptr<IDictionaryService> AddingService(
-    const ServiceReference<IDictionaryService>& reference)
-  {
-    std::shared_ptr<IDictionaryService> dictionary =
-      m_context.GetService(reference);
-    std::size_t count =
-      m_spellCheckService->AddDictionary(reference, dictionary);
-    if (!m_spellCheckReg && count > 1) {
-      m_spellCheckReg =
-        m_context.RegisterService<ISpellCheckService>(m_spellCheckService);
-    }
-    return dictionary;
-  }
-
-  virtual void ModifiedService(
-    const ServiceReference<IDictionaryService>& /*reference*/,
-    const std::shared_ptr<IDictionaryService>& /*service*/)
-  {
-    // do nothing
-  }
-
-  virtual void RemovedService(
-    const ServiceReference<IDictionaryService>& reference,
-    const std::shared_ptr<IDictionaryService>& /*service*/)
-  {
-    if (m_spellCheckService->RemoveDictionary(reference) < 2 &&
-        m_spellCheckReg) {
-      m_spellCheckReg.Unregister();
-      m_spellCheckReg = nullptr;
-    }
-  }
-
-  std::shared_ptr<SpellCheckImpl> m_spellCheckService;
-  ServiceRegistration<ISpellCheckService> m_spellCheckReg;
-
-  BundleContext m_context;
-  std::unique_ptr<ServiceTracker<IDictionaryService>> m_tracker;
-
-public:
-  Activator()
-    : m_context()
-  {
-  }
-
-  /**
-   * Implements BundleActivator::Start(). Registers an
-   * instance of a dictionary service using the bundle context;
-   * attaches properties to the service that can be queried
-   * when performing a service look-up.
-   *
-   * @param context the context for the bundle.
-   */
-  void Start(BundleContext context)
-  {
-    m_context = context;
-
-    m_spellCheckService.reset(new SpellCheckImpl);
-    m_tracker.reset(new ServiceTracker<IDictionaryService>(context, this));
-    m_tracker->Open();
-  }
-
-  /**
-   * Implements BundleActivator::Stop(). Does nothing since
-   * the C++ Micro Services library will automatically unregister any registered services
-   * and release any used services.
-   *
-   * @param context the context for the bundle.
-   */
-  void Stop(BundleContext /*context*/)
-  {
-    // NOTE: The service is automatically unregistered
-
-    m_tracker->Close();
-  }
-};
-}
+            m_tracker->Close();
+        }
+    };
+} // namespace
 
 US_MSVC_POP_WARNING
 

@@ -34,144 +34,153 @@
 
 #include "Utils.h"
 
-namespace cppmicroservices {
-
-namespace {
-
-int64_t now()
+namespace cppmicroservices
 {
-  namespace sc = std::chrono;
-  return sc::duration_cast<sc::milliseconds>(
-           sc::steady_clock::now().time_since_epoch())
-    .count();
-}
 
-}
+    namespace
+    {
 
-const std::string BundleArchive::AUTOSTART_SETTING_STOPPED = "stopped";
-const std::string BundleArchive::AUTOSTART_SETTING_EAGER = "eager";
-const std::string BundleArchive::AUTOSTART_SETTING_ACTIVATION_POLICY =
-  "activation_policy";
+        int64_t
+        now()
+        {
+            namespace sc = std::chrono;
+            return sc::duration_cast<sc::milliseconds>(sc::steady_clock::now().time_since_epoch()).count();
+        }
 
-BundleArchive::BundleArchive()
-  : storage(nullptr)
-  , bundleId(0)
-  , manifest(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
-{
-}
+    } // namespace
 
-BundleArchive::BundleArchive(
-  BundleStorage* storage,
-  std::shared_ptr<BundleResourceContainer> resourceContainer,
-  std::string prefix,
-  std::string location,
-  long bundleId,
-  AnyMap bundleManifest)
-  : storage(storage)
-  , resourceContainer(std::move(resourceContainer))
-  , resourcePrefix(std::move(prefix))
-  , location(std::move(location))
-  , bundleId(bundleId)
-  , lastModified(now())
-  , autostartSetting(-1)
-  , manifest(std::move(bundleManifest))
-{
-}
+    const std::string BundleArchive::AUTOSTART_SETTING_STOPPED = "stopped";
+    const std::string BundleArchive::AUTOSTART_SETTING_EAGER = "eager";
+    const std::string BundleArchive::AUTOSTART_SETTING_ACTIVATION_POLICY = "activation_policy";
 
-bool BundleArchive::IsValid() const
-{
-  return bool(bundleId >= 0);
-}
+    BundleArchive::BundleArchive()
+        : storage(nullptr)
+        , bundleId(0)
+        , manifest(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+    {
+    }
 
-void BundleArchive::Purge()
-{
-  storage->RemoveArchive(this);
-}
+    BundleArchive::BundleArchive(BundleStorage* storage,
+                                 std::shared_ptr<BundleResourceContainer> resourceContainer,
+                                 std::string prefix,
+                                 std::string location,
+                                 long bundleId,
+                                 AnyMap bundleManifest)
+        : storage(storage)
+        , resourceContainer(std::move(resourceContainer))
+        , resourcePrefix(std::move(prefix))
+        , location(std::move(location))
+        , bundleId(bundleId)
+        , lastModified(now())
+        , autostartSetting(-1)
+        , manifest(std::move(bundleManifest))
+    {
+    }
 
-long BundleArchive::GetBundleId() const
-{
-  return bundleId;
-}
+    bool
+    BundleArchive::IsValid() const
+    {
+        return bool(bundleId >= 0);
+    }
 
-std::string BundleArchive::GetBundleLocation() const
-{
-  return location;
-}
+    void
+    BundleArchive::Purge()
+    {
+        storage->RemoveArchive(this);
+    }
 
-std::string BundleArchive::GetResourcePrefix() const
-{
-  return resourcePrefix;
-}
+    long
+    BundleArchive::GetBundleId() const
+    {
+        return bundleId;
+    }
 
-BundleResource BundleArchive::GetResource(const std::string& path) const
-{
-  if (!resourceContainer) {
-    return BundleResource();
-  }
-  BundleResource result(path, this->shared_from_this());
-  if (result)
-    return result;
-  return BundleResource();
-}
+    std::string
+    BundleArchive::GetBundleLocation() const
+    {
+        return location;
+    }
 
-std::vector<BundleResource> BundleArchive::FindResources(
-  const std::string& path,
-  const std::string& filePattern,
-  bool recurse) const
-{
-  std::vector<BundleResource> result;
-  if (!resourceContainer) {
-    return result;
-  }
+    std::string
+    BundleArchive::GetResourcePrefix() const
+    {
+        return resourcePrefix;
+    }
 
-  std::string normalizedPath = path;
-  // add a leading and trailing slash
-  if (normalizedPath.empty())
-    normalizedPath.push_back('/');
-  if (*normalizedPath.begin() != '/')
-    normalizedPath = '/' + normalizedPath;
-  if (*normalizedPath.rbegin() != '/')
-    normalizedPath.push_back('/');
-  resourceContainer->FindNodes(this->shared_from_this(),
-                               resourcePrefix + normalizedPath,
-                               filePattern.empty() ? "*" : filePattern,
-                               recurse,
-                               result);
-  return result;
-}
+    BundleResource
+    BundleArchive::GetResource(std::string const& path) const
+    {
+        if (!resourceContainer)
+        {
+            return BundleResource();
+        }
+        BundleResource result(path, this->shared_from_this());
+        if (result)
+            return result;
+        return BundleResource();
+    }
 
-BundleArchive::TimeStamp BundleArchive::GetLastModified() const
-{
-  return TimeStamp{ std::chrono::milliseconds(lastModified) };
-}
+    std::vector<BundleResource>
+    BundleArchive::FindResources(std::string const& path, std::string const& filePattern, bool recurse) const
+    {
+        std::vector<BundleResource> result;
+        if (!resourceContainer)
+        {
+            return result;
+        }
 
-void BundleArchive::SetLastModified(const TimeStamp& ts)
-{
-  namespace sc = std::chrono;
+        std::string normalizedPath = path;
+        // add a leading and trailing slash
+        if (normalizedPath.empty())
+            normalizedPath.push_back('/');
+        if (*normalizedPath.begin() != '/')
+            normalizedPath = '/' + normalizedPath;
+        if (*normalizedPath.rbegin() != '/')
+            normalizedPath.push_back('/');
+        resourceContainer->FindNodes(this->shared_from_this(),
+                                     resourcePrefix + normalizedPath,
+                                     filePattern.empty() ? "*" : filePattern,
+                                     recurse,
+                                     result);
+        return result;
+    }
 
-  lastModified =
-    sc::duration_cast<sc::milliseconds>(ts.time_since_epoch()).count();
-}
+    BundleArchive::TimeStamp
+    BundleArchive::GetLastModified() const
+    {
+        return TimeStamp { std::chrono::milliseconds(lastModified) };
+    }
 
-int32_t BundleArchive::GetAutostartSetting() const
-{
-  return autostartSetting;
-}
+    void
+    BundleArchive::SetLastModified(TimeStamp const& ts)
+    {
+        namespace sc = std::chrono;
 
-void BundleArchive::SetAutostartSetting(int32_t setting)
-{
-  autostartSetting = setting;
-}
+        lastModified = sc::duration_cast<sc::milliseconds>(ts.time_since_epoch()).count();
+    }
 
-std::shared_ptr<BundleResourceContainer> BundleArchive::GetResourceContainer()
-  const
-{
-  return resourceContainer;
-}
+    int32_t
+    BundleArchive::GetAutostartSetting() const
+    {
+        return autostartSetting;
+    }
 
-const AnyMap& BundleArchive::GetInjectedManifest() const
-{
-  return manifest;
-}
+    void
+    BundleArchive::SetAutostartSetting(int32_t setting)
+    {
+        autostartSetting = setting;
+    }
 
-}
+    std::shared_ptr<BundleResourceContainer>
+    BundleArchive::GetResourceContainer() const
+    {
+        return resourceContainer;
+    }
+
+    AnyMap const&
+    BundleArchive::GetInjectedManifest() const
+    {
+        return manifest;
+    }
+
+} // namespace cppmicroservices

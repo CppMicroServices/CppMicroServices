@@ -27,116 +27,191 @@
 
 #include <map>
 
-namespace cppmicroservices {
-
-/**
- * \ingroup MicroServicesUtils
- *
- * A std::map style associative container allowing query and removal
- * operations only.
- */
-template<class Key, class T>
-class ShrinkableMap
+namespace cppmicroservices
 {
-private:
-  static std::map<Key, T> emptyContainer;
 
-public:
-  using container_type = std::map<Key, T>;
-  using iterator = typename container_type::iterator;
-  using const_iterator = typename container_type::const_iterator;
-  using size_type = typename container_type::size_type;
-  using key_type = typename container_type::key_type;
-  using mapped_type = typename container_type::mapped_type;
-  using value_type = typename container_type::value_type;
-  using reference = typename container_type::reference;
-  using const_reference = typename container_type::const_reference;
+    /**
+     * \ingroup MicroServicesUtils
+     *
+     * A std::map style associative container allowing query and removal
+     * operations only.
+     */
+    template <class Key, class T>
+    class ShrinkableMap
+    {
+      private:
+        static std::map<Key, T> emptyContainer;
 
-  ShrinkableMap()
-    : container(emptyContainer)
-  {
-  }
+      public:
+        using container_type = std::map<Key, T>;
+        using iterator = typename container_type::iterator;
+        using const_iterator = typename container_type::const_iterator;
+        using size_type = typename container_type::size_type;
+        using key_type = typename container_type::key_type;
+        using mapped_type = typename container_type::mapped_type;
+        using value_type = typename container_type::value_type;
+        using reference = typename container_type::reference;
+        using const_reference = typename container_type::const_reference;
 
-  iterator begin() { return container.begin(); }
+        ShrinkableMap() : container(emptyContainer) {}
 
-  const_iterator begin() const { return container.begin(); }
+        iterator
+        begin()
+        {
+            return container.begin();
+        }
 
-  iterator end() { return container.end(); }
+        const_iterator
+        begin() const
+        {
+            return container.begin();
+        }
 
-  const_iterator end() const { return container.end(); }
+        iterator
+        end()
+        {
+            return container.end();
+        }
 
-  void erase(iterator pos) { container.erase(pos); }
+        const_iterator
+        end() const
+        {
+            return container.end();
+        }
 
-  void erase(iterator first, iterator last) { container.erase(first, last); }
+        void
+        erase(iterator pos)
+        {
+            container.erase(pos);
+        }
 
-  size_type erase(const Key& key) { return container.erase(key); }
+        void
+        erase(iterator first, iterator last)
+        {
+            container.erase(first, last);
+        }
 
-  bool empty() const { return container.empty(); }
+        size_type
+        erase(Key const& key)
+        {
+            return container.erase(key);
+        }
 
-  void clear() { container.clear(); }
+        bool
+        empty() const
+        {
+            return container.empty();
+        }
 
-  size_type size() const { return container.size(); }
+        void
+        clear()
+        {
+            container.clear();
+        }
 
-  size_type max_size() const { return container.max_size(); }
+        size_type
+        size() const
+        {
+            return container.size();
+        }
 
-  /**
-   * \rststar
-   * .. deprecated:: 3.1.0
-   *
-   *    This function exists only to maintain backwards compatibility
-   *    and will be removed in the next major release.
-   *    Use :any:`at(size_type pos) <cppmicroservices::ShrinkableMap::at>` instead.
-   * \endrststar
-   */
-  US_DEPRECATED T& operator[](const Key& key) { return container[key]; }
+        size_type
+        max_size() const
+        {
+            return container.max_size();
+        }
 
-  T& at(const Key& key) { return container.at(key); }
+        /**
+         * \rststar
+         * .. deprecated:: 3.1.0
+         *
+         *    This function exists only to maintain backwards compatibility
+         *    and will be removed in the next major release.
+         *    Use :any:`at(size_type pos) <cppmicroservices::ShrinkableMap::at>` instead.
+         * \endrststar
+         */
+        US_DEPRECATED T&
+        operator[](Key const& key)
+        {
+            return container[key];
+        }
 
-  const T& at(const Key& key) const { return container.at(key); }
+        T&
+        at(Key const& key)
+        {
+            return container.at(key);
+        }
 
-  size_type count(const Key& key) const { return container.count(key); }
+        T const&
+        at(Key const& key) const
+        {
+            return container.at(key);
+        }
 
-  iterator find(const Key& key) { return container.find(key); }
+        size_type
+        count(Key const& key) const
+        {
+            return container.count(key);
+        }
 
-  const_iterator find(const Key& key) const { return container.find(key); }
+        iterator
+        find(Key const& key)
+        {
+            return container.find(key);
+        }
 
-  std::pair<iterator, iterator> equal_range(const Key& key)
-  {
-    return container.equal_range(key);
-  }
+        const_iterator
+        find(Key const& key) const
+        {
+            return container.find(key);
+        }
 
-  std::pair<const_iterator, const_iterator> equal_range(const Key& key) const
-  {
-    return container.equal_range(key);
-  }
+        std::pair<iterator, iterator>
+        equal_range(Key const& key)
+        {
+            return container.equal_range(key);
+        }
 
-  iterator lower_bound(const Key& key) { return container.lower_bound(key); }
+        std::pair<const_iterator, const_iterator>
+        equal_range(Key const& key) const
+        {
+            return container.equal_range(key);
+        }
 
-  const_iterator lower_bound(const Key& key) const
-  {
-    return container.lower_bound(key);
-  }
+        iterator
+        lower_bound(Key const& key)
+        {
+            return container.lower_bound(key);
+        }
 
-  iterator upper_bound(const Key& key) { return container.upper_bound(key); }
+        const_iterator
+        lower_bound(Key const& key) const
+        {
+            return container.lower_bound(key);
+        }
 
-  const_iterator upper_bound(const Key& key) const
-  {
-    return container.upper_bound(key);
-  }
+        iterator
+        upper_bound(Key const& key)
+        {
+            return container.upper_bound(key);
+        }
 
-private:
-  friend class ServiceHooks;
+        const_iterator
+        upper_bound(Key const& key) const
+        {
+            return container.upper_bound(key);
+        }
 
-  ShrinkableMap(container_type& container)
-    : container(container)
-  {
-  }
+      private:
+        friend class ServiceHooks;
 
-  container_type& container;
-};
+        ShrinkableMap(container_type& container) : container(container) {}
 
-template<class Key, class T>
-std::map<Key, T> ShrinkableMap<Key, T>::emptyContainer;
-}
+        container_type& container;
+    };
+
+    template <class Key, class T>
+    std::map<Key, T> ShrinkableMap<Key, T>::emptyContainer;
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SHRINKABLEMAP_H

@@ -25,35 +25,38 @@
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-using namespace cppmicroservices::logservice;
-
-void ReferenceManagerBaseImpl::BindingPolicyStaticReluctant::ServiceAdded(
-  const ServiceReferenceBase& reference)
+namespace cppmicroservices
 {
-  std::vector<RefChangeNotification> notifications;
-  if (!reference) {
-    Log("BindingPolicyStaticReluctant::ServiceAdded called with an invalid "
-        "service reference");
-    return;
-  }
-  auto notifySatisfied = ShouldNotifySatisfied();
-  if (notifySatisfied) {
-    Log("Notify SATISFIED for reference " + mgr.metadata.name);
-    notifications.emplace_back(
-      mgr.metadata.name, RefEvent::BECAME_SATISFIED, reference);
-  }
+    namespace scrimpl
+    {
 
-  mgr.BatchNotifyAllListeners(notifications);
-}
+        using namespace cppmicroservices::logservice;
 
-void ReferenceManagerBaseImpl::BindingPolicyStaticReluctant::ServiceRemoved(
-  const ServiceReferenceBase& reference)
-{
-  StaticRemoveService(reference);
-}
+        void
+        ReferenceManagerBaseImpl::BindingPolicyStaticReluctant::ServiceAdded(ServiceReferenceBase const& reference)
+        {
+            std::vector<RefChangeNotification> notifications;
+            if (!reference)
+            {
+                Log("BindingPolicyStaticReluctant::ServiceAdded called with an invalid "
+                    "service reference");
+                return;
+            }
+            auto notifySatisfied = ShouldNotifySatisfied();
+            if (notifySatisfied)
+            {
+                Log("Notify SATISFIED for reference " + mgr.metadata.name);
+                notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_SATISFIED, reference);
+            }
 
-}
-} // namespaces
+            mgr.BatchNotifyAllListeners(notifications);
+        }
+
+        void
+        ReferenceManagerBaseImpl::BindingPolicyStaticReluctant::ServiceRemoved(ServiceReferenceBase const& reference)
+        {
+            StaticRemoveService(reference);
+        }
+
+    } // namespace scrimpl
+} // namespace cppmicroservices

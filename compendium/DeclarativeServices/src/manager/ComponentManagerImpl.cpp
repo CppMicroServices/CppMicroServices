@@ -31,195 +31,210 @@
 #include <future>
 #include <utility>
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-ComponentManagerImpl::ComponentManagerImpl(
-  std::shared_ptr<const metadata::ComponentMetadata> metadata,
-  std::shared_ptr<ComponentRegistry> registry,
-  BundleContext bundleContext,
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
-  std::shared_ptr<ConfigurationNotifier> configNotifier,
-  std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
-  : registry(std::move(registry))
-  , compDesc(std::move(metadata))
-  , bundleContext(std::move(bundleContext))
-  , logger(std::move(logger))
-  , state(std::make_shared<CMDisabledState>())
-  , asyncWorkService(std::move(asyncWorkService))
-  , configNotifier(std::move(configNotifier))
-  , managers(std::move(managers))
+namespace cppmicroservices
 {
-  if (!compDesc || !this->registry || !this->bundleContext || !this->logger ||
-      !this->asyncWorkService || !this->configNotifier || !this->managers) {
-    throw std::invalid_argument(
-      "Invalid arguments to ComponentManagerImpl constructor");
-  }
-}
+    namespace scrimpl
+    {
 
-ComponentManagerImpl::~ComponentManagerImpl()
-{
-  GetState()->Disable(*this);
-  for (auto& fut : disableFutures) {
-    try {
-      fut.get();
-    } catch (...) {
-      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                  "Exception while disabling component with name" + GetName(),
-                  std::current_exception());
-    }
-  }
-}
+        ComponentManagerImpl::ComponentManagerImpl(
+            std::shared_ptr<const metadata::ComponentMetadata> metadata,
+            std::shared_ptr<ComponentRegistry> registry,
+            BundleContext bundleContext,
+            std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
+            std::shared_ptr<ConfigurationNotifier> configNotifier,
+            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
+            : registry(std::move(registry))
+            , compDesc(std::move(metadata))
+            , bundleContext(std::move(bundleContext))
+            , logger(std::move(logger))
+            , state(std::make_shared<CMDisabledState>())
+            , asyncWorkService(std::move(asyncWorkService))
+            , configNotifier(std::move(configNotifier))
+            , managers(std::move(managers))
+        {
+            if (!compDesc || !this->registry || !this->bundleContext || !this->logger || !this->asyncWorkService
+                || !this->configNotifier || !this->managers)
+            {
+                throw std::invalid_argument("Invalid arguments to ComponentManagerImpl constructor");
+            }
+        }
 
-void ComponentManagerImpl::Initialize()
-{
-  if (compDesc->enabled) {
-    auto fut = Enable();
-    try {
-      fut.get();
-    } catch (const cppmicroservices::SharedLibraryException&) {
-      throw;
-    } catch (const cppmicroservices::SecurityException&) {
-      throw;
-    } catch (...) {
-      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                  "Failed to enable component with name" + GetName(),
-                  std::current_exception());
-    }
-  }
-}
+        ComponentManagerImpl::~ComponentManagerImpl()
+        {
+            GetState()->Disable(*this);
+            for (auto& fut : disableFutures)
+            {
+                try
+                {
+                    fut.get();
+                }
+                catch (...)
+                {
+                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                "Exception while disabling component with name" + GetName(),
+                                std::current_exception());
+                }
+            }
+        }
 
-bool ComponentManagerImpl::IsEnabled() const
-{
-  return GetState()->IsEnabled(*this);
-}
+        void
+        ComponentManagerImpl::Initialize()
+        {
+            if (compDesc->enabled)
+            {
+                auto fut = Enable();
+                try
+                {
+                    fut.get();
+                }
+                catch (cppmicroservices::SharedLibraryException const&)
+                {
+                    throw;
+                }
+                catch (cppmicroservices::SecurityException const&)
+                {
+                    throw;
+                }
+                catch (...)
+                {
+                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                "Failed to enable component with name" + GetName(),
+                                std::current_exception());
+                }
+            }
+        }
 
-std::shared_future<void> ComponentManagerImpl::Enable()
-{
-  return GetState()->Enable(*this);
-}
+        bool
+        ComponentManagerImpl::IsEnabled() const
+        {
+            return GetState()->IsEnabled(*this);
+        }
 
-std::shared_future<void> ComponentManagerImpl::Disable()
-{
-  return GetState()->Disable(*this);
-}
+        std::shared_future<void>
+        ComponentManagerImpl::Enable()
+        {
+            return GetState()->Enable(*this);
+        }
 
-std::vector<std::shared_ptr<ComponentConfiguration>>
-ComponentManagerImpl::GetComponentConfigurations() const
-{
-  return GetState()->GetConfigurations(*this);
-}
+        std::shared_future<void>
+        ComponentManagerImpl::Disable()
+        {
+            return GetState()->Disable(*this);
+        }
 
-std::shared_ptr<ComponentManagerState> ComponentManagerImpl::GetState() const
-{
-  return std::atomic_load(&state);
-}
+        std::vector<std::shared_ptr<ComponentConfiguration>>
+        ComponentManagerImpl::GetComponentConfigurations() const
+        {
+            return GetState()->GetConfigurations(*this);
+        }
 
-bool ComponentManagerImpl::CompareAndSetState(
-  std::shared_ptr<ComponentManagerState>* expectedState,
-  std::shared_ptr<ComponentManagerState> desiredState)
-{
-  return std::atomic_compare_exchange_strong(
-    &state, expectedState, desiredState);
-}
+        std::shared_ptr<ComponentManagerState>
+        ComponentManagerImpl::GetState() const
+        {
+            return std::atomic_load(&state);
+        }
 
-void ComponentManagerImpl::AccumulateFuture(std::shared_future<void> fObj)
-{
-  std::lock_guard<std::mutex> lk(futuresMutex);
-  auto iterator = std::find_if(disableFutures.begin(),
-                               disableFutures.end(),
-                               is_ready<std::shared_future<void>&>);
-  if (iterator == disableFutures.end()) {
-    disableFutures.push_back(fObj);
-  } else // swap the ready future with the new one
-  {
-    std::swap(*iterator, fObj);
-  }
-}
+        bool
+        ComponentManagerImpl::CompareAndSetState(std::shared_ptr<ComponentManagerState>* expectedState,
+                                                 std::shared_ptr<ComponentManagerState> desiredState)
+        {
+            return std::atomic_compare_exchange_strong(&state, expectedState, desiredState);
+        }
 
-std::shared_future<void> ComponentManagerImpl::PostAsyncDisabledToEnabled(
-  std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>&
-    currentState)
-{
-  auto metadata = GetMetadata();
-  auto bundle = GetBundle();
-  auto reg = GetRegistry();
-  auto logger = GetLogger();
-  auto configNotifier = GetConfigNotifier();
-  auto managers = GetManagers();
+        void
+        ComponentManagerImpl::AccumulateFuture(std::shared_future<void> fObj)
+        {
+            std::lock_guard<std::mutex> lk(futuresMutex);
+            auto iterator
+                = std::find_if(disableFutures.begin(), disableFutures.end(), is_ready<std::shared_future<void>&>);
+            if (iterator == disableFutures.end())
+            {
+                disableFutures.push_back(fObj);
+            }
+            else // swap the ready future with the new one
+            {
+                std::swap(*iterator, fObj);
+            }
+        }
 
-  using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
-  using PostTask = std::packaged_task<void()>;
+        std::shared_future<void>
+        ComponentManagerImpl::PostAsyncDisabledToEnabled(
+            std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState)
+        {
+            auto metadata = GetMetadata();
+            auto bundle = GetBundle();
+            auto reg = GetRegistry();
+            auto logger = GetLogger();
+            auto configNotifier = GetConfigNotifier();
+            auto managers = GetManagers();
 
-  ActualTask task([metadata, bundle, reg, logger, configNotifier, managers](
-                    std::shared_ptr<CMEnabledState> eState) mutable {
-    eState->CreateConfigurations(
-      metadata, bundle, reg, logger, configNotifier, managers);
-  });
+            using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
+            using PostTask = std::packaged_task<void()>;
 
-  std::shared_ptr<CMEnabledState> enabledState =
-    std::make_shared<CMEnabledState>(task.get_future().share());
+            ActualTask task([metadata, bundle, reg, logger, configNotifier, managers](
+                                std::shared_ptr<CMEnabledState> eState) mutable
+                            { eState->CreateConfigurations(metadata, bundle, reg, logger, configNotifier, managers); });
 
-  PostTask post_task([enabledState,
-                      taskPtr = std::make_shared<ActualTask>(std::move(
-                        task))]() mutable { (*taskPtr)(enabledState); });
+            std::shared_ptr<CMEnabledState> enabledState = std::make_shared<CMEnabledState>(task.get_future().share());
 
-  // if this object failed to change state and the current state is DISABLED, try again
-  auto succeeded = false;
-  std::lock_guard<std::mutex> lk(transitionMutex);
-  do {
-    succeeded = CompareAndSetState(&currentState, enabledState);
-  } while (!succeeded && !currentState->IsEnabled(*this));
+            PostTask post_task([enabledState, taskPtr = std::make_shared<ActualTask>(std::move(task))]() mutable
+                               { (*taskPtr)(enabledState); });
 
-  if (succeeded) // succeeded in changing the state
-  {
-    asyncWorkService->post(std::move(post_task));
-    return enabledState->GetFuture();
-  }
+            // if this object failed to change state and the current state is DISABLED, try again
+            auto succeeded = false;
+            std::lock_guard<std::mutex> lk(transitionMutex);
+            do
+            {
+                succeeded = CompareAndSetState(&currentState, enabledState);
+            } while (!succeeded && !currentState->IsEnabled(*this));
 
-  // return the stored future in the current enabled state object
-  return currentState->GetFuture();
-}
+            if (succeeded) // succeeded in changing the state
+            {
+                asyncWorkService->post(std::move(post_task));
+                return enabledState->GetFuture();
+            }
 
-std::shared_future<void> ComponentManagerImpl::PostAsyncEnabledToDisabled(
-  std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>&
-    currentState)
-{
-  using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
-  using PostTask = std::packaged_task<void()>;
+            // return the stored future in the current enabled state object
+            return currentState->GetFuture();
+        }
 
-  ActualTask task([](std::shared_ptr<CMEnabledState> enabledState) mutable {
-    enabledState->DeleteConfigurations();
-  });
+        std::shared_future<void>
+        ComponentManagerImpl::PostAsyncEnabledToDisabled(
+            std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState)
+        {
+            using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
+            using PostTask = std::packaged_task<void()>;
 
-  auto disabledState =
-    std::make_shared<CMDisabledState>(task.get_future().share());
+            ActualTask task([](std::shared_ptr<CMEnabledState> enabledState) mutable
+                            { enabledState->DeleteConfigurations(); });
 
-  // if this object failed to change state and the current state is ENABLED, try again
-  bool succeeded = false;
-  std::lock_guard<std::mutex> lk(transitionMutex);
-  do {
-    succeeded = CompareAndSetState(&currentState, disabledState);
-  } while (!succeeded && currentState->IsEnabled(*this));
+            auto disabledState = std::make_shared<CMDisabledState>(task.get_future().share());
 
-  if (succeeded) // succeeded in changing the state
-  {
-    std::shared_ptr<CMEnabledState> currEnabledState =
-      std::dynamic_pointer_cast<CMEnabledState>(currentState);
+            // if this object failed to change state and the current state is ENABLED, try again
+            bool succeeded = false;
+            std::lock_guard<std::mutex> lk(transitionMutex);
+            do
+            {
+                succeeded = CompareAndSetState(&currentState, disabledState);
+            } while (!succeeded && currentState->IsEnabled(*this));
 
-    PostTask post_task([currEnabledState,
-                        taskPtr = std::make_shared<ActualTask>(std::move(
-                          task))]() mutable { (*taskPtr)(currEnabledState); });
+            if (succeeded) // succeeded in changing the state
+            {
+                std::shared_ptr<CMEnabledState> currEnabledState
+                    = std::dynamic_pointer_cast<CMEnabledState>(currentState);
 
-    asyncWorkService->post(std::move(post_task));
+                PostTask post_task([currEnabledState, taskPtr = std::make_shared<ActualTask>(std::move(task))]() mutable
+                                   { (*taskPtr)(currEnabledState); });
 
-    auto fut = disabledState->GetFuture();
-    AccumulateFuture(fut);
-    return fut;
-  }
-  // return the stored future in the current disabled state object
-  return currentState->GetFuture();
-}
-}
-}
+                asyncWorkService->post(std::move(post_task));
+
+                auto fut = disabledState->GetFuture();
+                AccumulateFuture(fut);
+                return fut;
+            }
+            // return the stored future in the current disabled state object
+            return currentState->GetFuture();
+        }
+    } // namespace scrimpl
+} // namespace cppmicroservices

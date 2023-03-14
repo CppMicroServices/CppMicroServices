@@ -22,7 +22,8 @@
 
 #include "cppmicroservices/BundleEventHook.h"
 
-namespace cppmicroservices {
+namespace cppmicroservices
+{
 
-BundleEventHook::~BundleEventHook() = default;
+    BundleEventHook::~BundleEventHook() = default;
 }

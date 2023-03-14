@@ -27,34 +27,40 @@
 
 #include <mutex>
 
-namespace cppmicroservices {
-namespace service {
-namespace cm {
-namespace test {
-
-class TestManagedServiceImpl
-  : public ::test::TestManagedServiceInterface
-  , public cppmicroservices::service::cm::ManagedService
+namespace cppmicroservices
 {
-public:
-  TestManagedServiceImpl();
+    namespace service
+    {
+        namespace cm
+        {
+            namespace test
+            {
 
-  virtual ~TestManagedServiceImpl();
+                class TestManagedServiceImpl
+                    : public ::test::TestManagedServiceInterface
+                    , public cppmicroservices::service::cm::ManagedService
+                {
+                  public:
+                    TestManagedServiceImpl();
 
-  void Updated(AnyMap const& properties) override;
-  
-  void Activate(const std::shared_ptr<cppmicroservices::service::component::ComponentContext>&);
-  void Deactivate(const std::shared_ptr<cppmicroservices::service::component::ComponentContext>&)
-  {}
+                    virtual ~TestManagedServiceImpl();
 
-  int getCounter() override;
+                    void Updated(AnyMap const& properties) override;
 
-private:
-  int m_counter;
-  std::mutex m_counterMtx;
-};
+                    void Activate(std::shared_ptr<cppmicroservices::service::component::ComponentContext> const&);
+                    void
+                    Deactivate(std::shared_ptr<cppmicroservices::service::component::ComponentContext> const&)
+                    {
+                    }
 
-} // namespace test
-} // namespace cm
-} // namespace service
+                    int getCounter() override;
+
+                  private:
+                    int m_counter;
+                    std::mutex m_counterMtx;
+                };
+
+            } // namespace test
+        }     // namespace cm
+    }         // namespace service
 } // namespace cppmicroservices

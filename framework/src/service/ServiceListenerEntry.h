@@ -30,53 +30,54 @@
 #include "LDAPExpr.h"
 #include "Utils.h"
 
-namespace cppmicroservices {
-
-class BundleContextPrivate;
-class ServiceListenerEntryData;
-
-/**
- * Data structure for saving service listener info. Contains
- * the optional service listener filter, in addition to the info
- * in ListenerEntry.
- */
-class ServiceListenerEntry : public ServiceListenerHook::ListenerInfo
+namespace cppmicroservices
 {
 
-public:
-  ServiceListenerEntry();
-  ServiceListenerEntry(const ServiceListenerEntry& other);
-  ServiceListenerEntry(const ServiceListenerHook::ListenerInfo& info);
+    class BundleContextPrivate;
+    class ServiceListenerEntryData;
 
-  ~ServiceListenerEntry();
-  ServiceListenerEntry& operator=(const ServiceListenerEntry& other);
+    /**
+     * Data structure for saving service listener info. Contains
+     * the optional service listener filter, in addition to the info
+     * in ListenerEntry.
+     */
+    class ServiceListenerEntry : public ServiceListenerHook::ListenerInfo
+    {
 
-  void SetRemoved(bool removed) const;
+      public:
+        ServiceListenerEntry();
+        ServiceListenerEntry(ServiceListenerEntry const& other);
+        ServiceListenerEntry(ServiceListenerHook::ListenerInfo const& info);
 
-  ServiceListenerEntry(const std::shared_ptr<BundleContextPrivate>& context,
-                       const ServiceListener& l,
-                       void* data,
-                       ListenerTokenId tokenId,
-                       const std::string& filter = "");
+        ~ServiceListenerEntry();
+        ServiceListenerEntry& operator=(ServiceListenerEntry const& other);
 
-  const LDAPExpr& GetLDAPExpr() const;
+        void SetRemoved(bool removed) const;
 
-  LDAPExpr::LocalCache& GetLocalCache() const;
+        ServiceListenerEntry(std::shared_ptr<BundleContextPrivate> const& context,
+                             ServiceListener const& l,
+                             void* data,
+                             ListenerTokenId tokenId,
+                             std::string const& filter = "");
 
-  void CallDelegate(const ServiceEvent& event) const;
+        LDAPExpr const& GetLDAPExpr() const;
 
-  bool operator==(const ServiceListenerEntry& other) const;
-  bool operator<(const ServiceListenerEntry& other) const;
+        LDAPExpr::LocalCache& GetLocalCache() const;
 
-  bool Contains(const std::shared_ptr<BundleContextPrivate>& context,
-                const ServiceListener& listener,
-                void* data) const;
+        void CallDelegate(ServiceEvent const& event) const;
 
-  ListenerTokenId Id() const;
+        bool operator==(ServiceListenerEntry const& other) const;
+        bool operator<(ServiceListenerEntry const& other) const;
 
-  std::size_t Hash() const;
-};
-}
+        bool Contains(std::shared_ptr<BundleContextPrivate> const& context,
+                      ServiceListener const& listener,
+                      void* data) const;
+
+        ListenerTokenId Id() const;
+
+        std::size_t Hash() const;
+    };
+} // namespace cppmicroservices
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceListenerEntry)
 return arg.Hash();

@@ -22,8 +22,7 @@
 
 #include "cppmicroservices/GlobalConfig.h"
 
-US_MSVC_PUSH_DISABLE_WARNING(
-  4180) // qualifier applied to function type has no meaning; ignored
+US_MSVC_PUSH_DISABLE_WARNING(4180) // qualifier applied to function type has no meaning; ignored
 
 #include "ServiceListenerEntry.h"
 
@@ -31,156 +30,160 @@ US_MSVC_PUSH_DISABLE_WARNING(
 
 #include <cassert>
 
-namespace cppmicroservices {
-
-struct ServiceListenerCompare
-  : std::function<bool(ServiceListener, ServiceListener)>
+namespace cppmicroservices
 {
-  bool operator()(const ServiceListener& f1, const ServiceListener& f2) const
-  {
-    return f1.target<void(const ServiceEvent&)>() ==
-           f2.target<void(const ServiceEvent&)>();
-  }
-};
 
-class ServiceListenerEntryData : public ServiceListenerHook::ListenerInfoData
-{
-public:
-  ServiceListenerEntryData(const ServiceListenerEntryData&) = delete;
-  ServiceListenerEntryData& operator=(const ServiceListenerEntryData&) = delete;
+    struct ServiceListenerCompare : std::function<bool(ServiceListener, ServiceListener)>
+    {
+        bool
+        operator()(ServiceListener const& f1, ServiceListener const& f2) const
+        {
+            return f1.target<void(ServiceEvent const&)>() == f2.target<void(ServiceEvent const&)>();
+        }
+    };
 
-  ServiceListenerEntryData(const std::shared_ptr<BundleContextPrivate>& context,
-                           const ServiceListener& l,
-                           void* data,
-                           ListenerTokenId tokenId,
-                           const std::string& filter)
-    : ServiceListenerHook::ListenerInfoData(context, l, data, tokenId, filter)
-    , ldap()
-    , hashValue(0)
-  {
-    if (!filter.empty()) {
-      ldap = LDAPExpr(filter);
+    class ServiceListenerEntryData : public ServiceListenerHook::ListenerInfoData
+    {
+      public:
+        ServiceListenerEntryData(ServiceListenerEntryData const&) = delete;
+        ServiceListenerEntryData& operator=(ServiceListenerEntryData const&) = delete;
+
+        ServiceListenerEntryData(std::shared_ptr<BundleContextPrivate> const& context,
+                                 ServiceListener const& l,
+                                 void* data,
+                                 ListenerTokenId tokenId,
+                                 std::string const& filter)
+            : ServiceListenerHook::ListenerInfoData(context, l, data, tokenId, filter)
+            , ldap()
+            , hashValue(0)
+        {
+            if (!filter.empty())
+            {
+                ldap = LDAPExpr(filter);
+            }
+        }
+
+        ~ServiceListenerEntryData() override = default;
+
+        LDAPExpr ldap;
+
+        /**
+         * The elements of "simple" filters are cached, for easy lookup.
+         *
+         * The grammar for simple filters is as follows:
+         *
+         * <pre>
+         * Simple = '(' attr '=' value ')'
+         *        | '(' '|' Simple+ ')'
+         * </pre>
+         * where <code>attr</code> is one of Constants#OBJECTCLASS,
+         * Constants#SERVICE_ID or Constants#SERVICE_PID, and
+         * <code>value</code> must not contain a wildcard character.
+         * <p>
+         * The index of the vector determines which key the cache is for
+         * (see ServiceListenerState#hashedKeys). For each key, there is
+         * a vector pointing out the values which are accepted by this
+         * ServiceListenerEntry's filter. This cache is maintained to make
+         * it easy to remove this service listener.
+         */
+        LDAPExpr::LocalCache local_cache;
+
+        std::size_t hashValue;
+    };
+
+    ServiceListenerEntry::ServiceListenerEntry() = default;
+
+    ServiceListenerEntry::ServiceListenerEntry(ServiceListenerEntry const&) = default;
+
+    ServiceListenerEntry::ServiceListenerEntry(ServiceListenerHook::ListenerInfo const& info)
+        : ServiceListenerHook::ListenerInfo(info)
+    {
+        assert(info.d);
     }
-  }
 
-  ~ServiceListenerEntryData() override = default;
+    ServiceListenerEntry::~ServiceListenerEntry() = default;
 
-  LDAPExpr ldap;
+    ServiceListenerEntry&
+    ServiceListenerEntry::operator=(ServiceListenerEntry const& other)
+    {
+        d = other.d;
+        return *this;
+    }
 
-  /**
-   * The elements of "simple" filters are cached, for easy lookup.
-   *
-   * The grammar for simple filters is as follows:
-   *
-   * <pre>
-   * Simple = '(' attr '=' value ')'
-   *        | '(' '|' Simple+ ')'
-   * </pre>
-   * where <code>attr</code> is one of Constants#OBJECTCLASS,
-   * Constants#SERVICE_ID or Constants#SERVICE_PID, and
-   * <code>value</code> must not contain a wildcard character.
-   * <p>
-   * The index of the vector determines which key the cache is for
-   * (see ServiceListenerState#hashedKeys). For each key, there is
-   * a vector pointing out the values which are accepted by this
-   * ServiceListenerEntry's filter. This cache is maintained to make
-   * it easy to remove this service listener.
-   */
-  LDAPExpr::LocalCache local_cache;
+    void
+    ServiceListenerEntry::SetRemoved(bool removed) const
+    {
+        d->bRemoved = removed;
+    }
 
-  std::size_t hashValue;
-};
+    ServiceListenerEntry::ServiceListenerEntry(std::shared_ptr<BundleContextPrivate> const& context,
+                                               ServiceListener const& l,
+                                               void* data,
+                                               ListenerTokenId tokenId,
+                                               std::string const& filter)
+        : ServiceListenerHook::ListenerInfo(new ServiceListenerEntryData(context, l, data, tokenId, filter))
+    {
+    }
 
-ServiceListenerEntry::ServiceListenerEntry() = default;
+    LDAPExpr const&
+    ServiceListenerEntry::GetLDAPExpr() const
+    {
+        return static_cast<ServiceListenerEntryData*>(d.get())->ldap;
+    }
 
-ServiceListenerEntry::ServiceListenerEntry(const ServiceListenerEntry&) =
-  default;
+    LDAPExpr::LocalCache&
+    ServiceListenerEntry::GetLocalCache() const
+    {
+        return static_cast<ServiceListenerEntryData*>(d.get())->local_cache;
+    }
 
-ServiceListenerEntry::ServiceListenerEntry(
-  const ServiceListenerHook::ListenerInfo& info)
-  : ServiceListenerHook::ListenerInfo(info)
-{
-  assert(info.d);
-}
+    void
+    ServiceListenerEntry::CallDelegate(ServiceEvent const& event) const
+    {
+        d->listener(event);
+    }
 
-ServiceListenerEntry::~ServiceListenerEntry() = default;
+    bool
+    ServiceListenerEntry::operator==(ServiceListenerEntry const& other) const
+    {
+        return (d->tokenId == other.d->tokenId)
+               && ((d->context == nullptr || other.d->context == nullptr) || d->context == other.d->context);
+    }
 
-ServiceListenerEntry& ServiceListenerEntry::operator=(
-  const ServiceListenerEntry& other)
-{
-  d = other.d;
-  return *this;
-}
+    bool
+    ServiceListenerEntry::operator<(ServiceListenerEntry const& other) const
+    {
+        return d->tokenId < other.d->tokenId;
+    }
 
-void ServiceListenerEntry::SetRemoved(bool removed) const
-{
-  d->bRemoved = removed;
-}
+    bool
+    ServiceListenerEntry::Contains(std::shared_ptr<BundleContextPrivate> const& context,
+                                   ServiceListener const& listener,
+                                   void* data) const
+    {
+        return (d->context == context) && (d->data == data) && ServiceListenerCompare()(d->listener, listener);
+    }
 
-ServiceListenerEntry::ServiceListenerEntry(
-  const std::shared_ptr<BundleContextPrivate>& context,
-  const ServiceListener& l,
-  void* data,
-  ListenerTokenId tokenId,
-  const std::string& filter)
-  : ServiceListenerHook::ListenerInfo(
-      new ServiceListenerEntryData(context, l, data, tokenId, filter))
-{
-}
+    ListenerTokenId
+    ServiceListenerEntry::Id() const
+    {
+        return d->tokenId;
+    }
 
-const LDAPExpr& ServiceListenerEntry::GetLDAPExpr() const
-{
-  return static_cast<ServiceListenerEntryData*>(d.get())->ldap;
-}
+    std::size_t
+    ServiceListenerEntry::Hash() const
+    {
+        using std::hash;
 
-LDAPExpr::LocalCache& ServiceListenerEntry::GetLocalCache() const
-{
-  return static_cast<ServiceListenerEntryData*>(d.get())->local_cache;
-}
+        if (static_cast<ServiceListenerEntryData*>(d.get())->hashValue == 0)
+        {
+            static_cast<ServiceListenerEntryData*>(d.get())->hashValue
+                = (hash<BundleContextPrivate*>()(d->context.get()) >> 1)
+                  ^ ((hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
+        }
 
-void ServiceListenerEntry::CallDelegate(const ServiceEvent& event) const
-{
-  d->listener(event);
-}
-
-bool ServiceListenerEntry::operator==(const ServiceListenerEntry& other) const
-{
-  return (d->tokenId == other.d->tokenId) &&
-         ((d->context == nullptr || other.d->context == nullptr) ||
-          d->context == other.d->context);
-}
-
-bool ServiceListenerEntry::operator<(const ServiceListenerEntry& other) const
-{
-  return d->tokenId < other.d->tokenId;
-}
-
-bool ServiceListenerEntry::Contains(
-  const std::shared_ptr<BundleContextPrivate>& context,
-  const ServiceListener& listener,
-  void* data) const
-{
-  return (d->context == context) && (d->data == data) &&
-         ServiceListenerCompare()(d->listener, listener);
-}
-
-ListenerTokenId ServiceListenerEntry::Id() const
-{
-  return d->tokenId;
-}
-
-std::size_t ServiceListenerEntry::Hash() const
-{
-  using std::hash;
-
-  if (static_cast<ServiceListenerEntryData*>(d.get())->hashValue == 0) {
-    static_cast<ServiceListenerEntryData*>(d.get())->hashValue =
-      (hash<BundleContextPrivate*>()(d->context.get()) >> 1) ^
-      ((hash<ListenerTokenId>()(d->tokenId) << 1) << 1);
-  }
-
-  return static_cast<ServiceListenerEntryData*>(d.get())->hashValue;
-}
-}
+        return static_cast<ServiceListenerEntryData*>(d.get())->hashValue;
+    }
+} // namespace cppmicroservices
 
 US_MSVC_POP_WARNING

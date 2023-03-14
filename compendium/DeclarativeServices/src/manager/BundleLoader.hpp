@@ -29,32 +29,32 @@
 #include <map>
 
 using cppmicroservices::service::component::detail::ComponentInstance;
-//typedef ComponentInstance*(*NewComponentInstanceFuncPtr)();
-//typedef void(*DeleteComponentInstanceFuncPtr)(ComponentInstance*);
+// typedef ComponentInstance*(*NewComponentInstanceFuncPtr)();
+// typedef void(*DeleteComponentInstanceFuncPtr)(ComponentInstance*);
 
-namespace cppmicroservices {
-namespace scrimpl {
-/**
- * Method to load and find the extern C helper functions used to create and
- * delete {@link ComponentInstance} objects associated with a component from
- * a given {@link Bundle}
- *
- * \param compName is a unique identifier for the component
- * \param fromBundle is the bundle where the component is located
- * \param logger the logger to use for logging messages
- *
- * \throws \c cppmicroservices::SharedLibraryException on failure to load the bundle binary.
- *         \c std::runtime_error if the entry points for \c compName are
- *         not found in the bundle \c fromBundle
- *         \c std::invalid_argument if location of \c fromBundle cannot be
- *         converted to UTF16 on the Windows platform
- */
-std::tuple<std::function<ComponentInstance*(void)>,
-           std::function<void(ComponentInstance*)>>
-GetComponentCreatorDeletors(
-  const std::string& compName,
-  const cppmicroservices::Bundle& fromBundle,
-  const std::shared_ptr<cppmicroservices::logservice::LogService>& logger);
-}
-}
+namespace cppmicroservices
+{
+    namespace scrimpl
+    {
+        /**
+         * Method to load and find the extern C helper functions used to create and
+         * delete {@link ComponentInstance} objects associated with a component from
+         * a given {@link Bundle}
+         *
+         * \param compName is a unique identifier for the component
+         * \param fromBundle is the bundle where the component is located
+         * \param logger the logger to use for logging messages
+         *
+         * \throws \c cppmicroservices::SharedLibraryException on failure to load the bundle binary.
+         *         \c std::runtime_error if the entry points for \c compName are
+         *         not found in the bundle \c fromBundle
+         *         \c std::invalid_argument if location of \c fromBundle cannot be
+         *         converted to UTF16 on the Windows platform
+         */
+        std::tuple<std::function<ComponentInstance*(void)>, std::function<void(ComponentInstance*)>>
+        GetComponentCreatorDeletors(std::string const& compName,
+                                    cppmicroservices::Bundle const& fromBundle,
+                                    std::shared_ptr<cppmicroservices::logservice::LogService> const& logger);
+    } // namespace scrimpl
+} // namespace cppmicroservices
 #endif /* __BUNDLELOADER_HPP__ */

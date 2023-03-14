@@ -42,117 +42,126 @@ namespace scr = cppmicroservices::service::component::runtime;
 
 class SharedLibraryExceptionTest : public ::testing::Test
 {
-protected:
-  SharedLibraryExceptionTest()
-    : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {
-  }
+  protected:
+    SharedLibraryExceptionTest() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
 
-  virtual ~SharedLibraryExceptionTest() = default;
+    virtual ~SharedLibraryExceptionTest() = default;
 
-  virtual void SetUp()
-  {
-    framework.Start();
-    auto context = framework.GetBundleContext();
+    virtual void
+    SetUp()
+    {
+        framework.Start();
+        auto context = framework.GetBundleContext();
 
-    auto dsPluginPath = test::GetDSRuntimePluginFilePath();
-    auto dsbundles = context.InstallBundles(dsPluginPath);
-    for (auto& bundle : dsbundles) {
-      bundle.Start();
+        auto dsPluginPath = test::GetDSRuntimePluginFilePath();
+        auto dsbundles = context.InstallBundles(dsPluginPath);
+        for (auto& bundle : dsbundles)
+        {
+            bundle.Start();
+        }
+
+        auto sRef = context.GetServiceReference<scr::ServiceComponentRuntime>();
+        ASSERT_TRUE(sRef);
+        dsRuntimeService = context.GetService<scr::ServiceComponentRuntime>(sRef);
+        ASSERT_TRUE(dsRuntimeService);
     }
 
-    auto sRef = context.GetServiceReference<scr::ServiceComponentRuntime>();
-    ASSERT_TRUE(sRef);
-    dsRuntimeService = context.GetService<scr::ServiceComponentRuntime>(sRef);
-    ASSERT_TRUE(dsRuntimeService);
-  }
+    virtual void
+    TearDown()
+    {
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+    }
 
-  virtual void TearDown()
-  {
-    framework.Stop();
-    framework.WaitForStop(std::chrono::milliseconds::zero());
-  }
+    cppmicroservices::Framework&
+    GetFramework()
+    {
+        return framework;
+    }
+    std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
 
-  cppmicroservices::Framework& GetFramework() { return framework; }
-  std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
-
-private:
-  cppmicroservices::Framework framework;
+  private:
+    cppmicroservices::Framework framework;
 };
 
 TEST_F(SharedLibraryExceptionTest, testDSBundleLoaderFailure)
 {
-  // Using the framework bundle here, as it passes the GetLocation validity test,
-  // but fails at dlopen.
-  ASSERT_THROW(cppmicroservices::scrimpl::GetComponentCreatorDeletors(
-                 "invalid::name",
-                 GetFramework(),
-                 std::make_shared<cppmicroservices::scrimpl::FakeLogger>()),
-               cppmicroservices::SharedLibraryException);
+    // Using the framework bundle here, as it passes the GetLocation validity test,
+    // but fails at dlopen.
+    ASSERT_THROW(cppmicroservices::scrimpl::GetComponentCreatorDeletors(
+                     "invalid::name",
+                     GetFramework(),
+                     std::make_shared<cppmicroservices::scrimpl::FakeLogger>()),
+                 cppmicroservices::SharedLibraryException);
 }
 
 TEST_F(SharedLibraryExceptionTest, testDSBundleImmediateTrue)
 {
-  testing::FLAGS_gtest_death_test_style = "threadsafe";
-  ASSERT_DEATH(
-    {
-      auto context = GetFramework().GetBundleContext();
-      test::InstallLib(context, "TestBundleDSSLE1");
+    testing::FLAGS_gtest_death_test_style = "threadsafe";
+    ASSERT_DEATH(
+        {
+            auto context = GetFramework().GetBundleContext();
+            test::InstallLib(context, "TestBundleDSSLE1");
 
-      auto bundles = context.GetBundles();
-      auto bundle =
-        std::find_if(bundles.begin(),
-                     bundles.end(),
-                     [](const cppmicroservices::Bundle& bundle) {
-                       return (bundle.GetSymbolicName() == "TestBundleDSSLE1");
-                     });
+            auto bundles = context.GetBundles();
+            auto bundle = std::find_if(bundles.begin(),
+                                       bundles.end(),
+                                       [](const cppmicroservices::Bundle& bundle)
+                                       { return (bundle.GetSymbolicName() == "TestBundleDSSLE1"); });
 
-      ASSERT_NE(bundle, bundles.end()) << "TestBundleDSSLE1 not found";
+            ASSERT_NE(bundle, bundles.end()) << "TestBundleDSSLE1 not found";
 
-      try {
-        bundle
-          ->Start(); // should throw cppmicroservices::SharedLibraryException
-      } catch (...) {
-        std::cerr << "Success" << std::endl;
-        std::exit(-1);
-      }
-    },
-    "Success");
+            try
+            {
+                bundle->Start(); // should throw cppmicroservices::SharedLibraryException
+            }
+            catch (...)
+            {
+                std::cerr << "Success" << std::endl;
+                std::exit(-1);
+            }
+        },
+        "Success");
 }
 
 TEST_F(SharedLibraryExceptionTest, testDSBundleImmediateFalse)
 {
-  auto context = GetFramework().GetBundleContext();
-  test::InstallLib(context, "TestBundleDSSLE2");
+    auto context = GetFramework().GetBundleContext();
+    test::InstallLib(context, "TestBundleDSSLE2");
 
-  auto bundles = context.GetBundles();
-  auto bundle = std::find_if(
-    bundles.begin(), bundles.end(), [](const cppmicroservices::Bundle& bundle) {
-      return (bundle.GetSymbolicName() == "TestBundleDSSLE2");
-    });
+    auto bundles = context.GetBundles();
+    auto bundle = std::find_if(bundles.begin(),
+                               bundles.end(),
+                               [](cppmicroservices::Bundle const& bundle)
+                               { return (bundle.GetSymbolicName() == "TestBundleDSSLE2"); });
 
-  ASSERT_NE(bundle, bundles.end()) << "TestBundleDSSLE2 not found";
-  ASSERT_NO_THROW(bundle->Start());
+    ASSERT_NE(bundle, bundles.end()) << "TestBundleDSSLE2 not found";
+    ASSERT_NO_THROW(bundle->Start());
 
-  EXPECT_EQ(bundle->GetRegisteredServices().size(), 1ul)
-    << "Service from TestBundleDSSLE2 must be registered by DS runtime";
+    EXPECT_EQ(bundle->GetRegisteredServices().size(), 1ul)
+        << "Service from TestBundleDSSLE2 must be registered by DS runtime";
 
-  cppmicroservices::ServiceReference<test::Interface1> serviceRef =
-    context.GetServiceReference<test::Interface1>();
-  if (serviceRef) {
-    try {
-      context.GetService<test::Interface1>(
-        serviceRef); // should throw cppmicroservices::SharedLibraryException
-      FAIL() << "Exception should have been caught from GetService";
-    } catch (const cppmicroservices::SharedLibraryException& ex) {
-      // origin bundle captured by SharedLibraryException should
-      // point to the bundle that threw during Start()
-      ASSERT_TRUE(*bundle == ex.GetBundle());
-    } catch (...) {
-      FAIL()
-        << "SharedLibraryException expected, but a different exception caught.";
+    cppmicroservices::ServiceReference<test::Interface1> serviceRef = context.GetServiceReference<test::Interface1>();
+    if (serviceRef)
+    {
+        try
+        {
+            context.GetService<test::Interface1>(serviceRef); // should throw cppmicroservices::SharedLibraryException
+            FAIL() << "Exception should have been caught from GetService";
+        }
+        catch (cppmicroservices::SharedLibraryException const& ex)
+        {
+            // origin bundle captured by SharedLibraryException should
+            // point to the bundle that threw during Start()
+            ASSERT_TRUE(*bundle == ex.GetBundle());
+        }
+        catch (...)
+        {
+            FAIL() << "SharedLibraryException expected, but a different exception caught.";
+        }
     }
-  } else {
-    FAIL() << "Failed to get a valid service reference.";
-  }
+    else
+    {
+        FAIL() << "Failed to get a valid service reference.";
+    }
 }

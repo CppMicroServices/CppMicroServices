@@ -31,84 +31,82 @@
 
 using cppmicroservices::service::component::runtime::dto::ComponentState;
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-class ComponentRegistry;
-class ReferenceManager;
-class RegistrationManager;
-
-/**
- * This interface represents a component configuration. The implementations of
- * this interface are responsible for managing the lifecycle of a component
- * configuration. This interface is used by ServiceComponentRuntimeImpl to
- * support the runtime introspection API.
- */
-class ComponentConfiguration
+namespace cppmicroservices
 {
-public:
-  ComponentConfiguration() = default;
-  ComponentConfiguration(const ComponentConfiguration&) = delete;
-  ComponentConfiguration(ComponentConfiguration&&) = delete;
-  ComponentConfiguration& operator=(const ComponentConfiguration&) = delete;
-  ComponentConfiguration& operator=(ComponentConfiguration&&) = delete;
-  virtual ~ComponentConfiguration() = default;
+    namespace scrimpl
+    {
 
-  /**
-   * Returns a list of all the reference manager objects used to track
-   * this configuration's dependencies
-   */
-  virtual std::vector<std::shared_ptr<ReferenceManager>>
-  GetAllDependencyManagers() const = 0;
+        class ComponentRegistry;
+        class ReferenceManager;
+        class RegistrationManager;
 
-  /**
-   * Returns the reference manager object used to track a service dependency
-   * with a specific name
-   */
-  virtual std::shared_ptr<ReferenceManager> GetDependencyManager(
-    const std::string& refName) const = 0;
+        /**
+         * This interface represents a component configuration. The implementations of
+         * this interface are responsible for managing the lifecycle of a component
+         * configuration. This interface is used by ServiceComponentRuntimeImpl to
+         * support the runtime introspection API.
+         */
+        class ComponentConfiguration
+        {
+          public:
+            ComponentConfiguration() = default;
+            ComponentConfiguration(ComponentConfiguration const&) = delete;
+            ComponentConfiguration(ComponentConfiguration&&) = delete;
+            ComponentConfiguration& operator=(ComponentConfiguration const&) = delete;
+            ComponentConfiguration& operator=(ComponentConfiguration&&) = delete;
+            virtual ~ComponentConfiguration() = default;
 
-  /**
-   * Returns a valid ServiceReference object if this component is registered in
-   * the framework service registry
-   */
-  virtual ServiceReferenceBase GetServiceReference() const = 0;
+            /**
+             * Returns a list of all the reference manager objects used to track
+             * this configuration's dependencies
+             */
+            virtual std::vector<std::shared_ptr<ReferenceManager>> GetAllDependencyManagers() const = 0;
 
-  /**
-   * Returns the component registry object of this runtime. This method is used by
-   * ComponentContextImpl objects to retrieve ComponentManager objects.
-   */
-  virtual std::shared_ptr<ComponentRegistry> GetRegistry() const = 0;
+            /**
+             * Returns the reference manager object used to track a service dependency
+             * with a specific name
+             */
+            virtual std::shared_ptr<ReferenceManager> GetDependencyManager(std::string const& refName) const = 0;
 
-  /**
-   * Returns a map with properties specific to this component configuration
-   */
-  virtual std::unordered_map<std::string, cppmicroservices::Any> GetProperties()
-    const = 0;
+            /**
+             * Returns a valid ServiceReference object if this component is registered in
+             * the framework service registry
+             */
+            virtual ServiceReferenceBase GetServiceReference() const = 0;
 
-  /**
-   * Returns the bundle that contains this component
-   */
-  virtual cppmicroservices::Bundle GetBundle() const = 0;
+            /**
+             * Returns the component registry object of this runtime. This method is used by
+             * ComponentContextImpl objects to retrieve ComponentManager objects.
+             */
+            virtual std::shared_ptr<ComponentRegistry> GetRegistry() const = 0;
 
-  /**
-   * Returns the unique ID of this component configuration
-   */
-  virtual unsigned long GetId() const = 0;
+            /**
+             * Returns a map with properties specific to this component configuration
+             */
+            virtual std::unordered_map<std::string, cppmicroservices::Any> GetProperties() const = 0;
 
-  /**
-   * Returns the current {@code ComponentState} of this component configuration
-   */
-  virtual ComponentState GetConfigState() const = 0;
+            /**
+             * Returns the bundle that contains this component
+             */
+            virtual cppmicroservices::Bundle GetBundle() const = 0;
 
-  /**
-   * Returns the {@link ComponentMetadata} object created by parsing the
-   * component description.
-   */
-  virtual std::shared_ptr<
-    const cppmicroservices::scrimpl::metadata::ComponentMetadata>
-  GetMetadata() const = 0;
-};
-} // scrimpl
-} // cppmicroservices
+            /**
+             * Returns the unique ID of this component configuration
+             */
+            virtual unsigned long GetId() const = 0;
+
+            /**
+             * Returns the current {@code ComponentState} of this component configuration
+             */
+            virtual ComponentState GetConfigState() const = 0;
+
+            /**
+             * Returns the {@link ComponentMetadata} object created by parsing the
+             * component description.
+             */
+            virtual std::shared_ptr<const cppmicroservices::scrimpl::metadata::ComponentMetadata> GetMetadata() const
+                = 0;
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 #endif /* __COMPONENTCONFIGURATION_HPP__ */

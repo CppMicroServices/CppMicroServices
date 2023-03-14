@@ -22,21 +22,21 @@
 
 #include "cppmicroservices/SharedLibraryException.h"
 
-namespace cppmicroservices {
-
-SharedLibraryException::~SharedLibraryException() = default;
-
-SharedLibraryException::SharedLibraryException(std::error_code ec,
-                                               std::string msg,
-                                               Bundle origin)
-  : std::system_error(std::move(ec), std::move(msg))
-  , origin(std::move(origin))
+namespace cppmicroservices
 {
-}
 
-Bundle SharedLibraryException::GetBundle() const
-{
-  return origin;
-}
+    SharedLibraryException::~SharedLibraryException() = default;
 
-}
+    SharedLibraryException::SharedLibraryException(std::error_code ec, std::string msg, Bundle origin)
+        : std::system_error(std::move(ec), std::move(msg))
+        , origin(std::move(origin))
+    {
+    }
+
+    Bundle
+    SharedLibraryException::GetBundle() const
+    {
+        return origin;
+    }
+
+} // namespace cppmicroservices

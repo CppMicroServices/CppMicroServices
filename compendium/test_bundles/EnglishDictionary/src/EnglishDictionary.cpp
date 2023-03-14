@@ -21,31 +21,33 @@
 =============================================================================*/
 #include "EnglishDictionary.hpp"
 
-namespace EnglishDictionary {
-
-DictionaryImpl::DictionaryImpl()
+namespace EnglishDictionary
 {
-  m_dictionary.insert("welcome");
-  m_dictionary.insert("to");
-  m_dictionary.insert("the");
-  m_dictionary.insert("micro");
-  m_dictionary.insert("services");
-  m_dictionary.insert("tutorial");
-}
 
-/**
- * Implements IDictionaryService::CheckWord(). Determines
- * if the passed in word is contained in the dictionary.
- * @param word the word to be checked.
- * @return true if the word is in the dictionary,
- *         false otherwise.
- **/
-bool DictionaryImpl::CheckWord(const std::string& word)
-{
-  std::string lword(word);
-  std::transform(lword.begin(), lword.end(), lword.begin(), ::tolower);
+    DictionaryImpl::DictionaryImpl()
+    {
+        m_dictionary.insert("welcome");
+        m_dictionary.insert("to");
+        m_dictionary.insert("the");
+        m_dictionary.insert("micro");
+        m_dictionary.insert("services");
+        m_dictionary.insert("tutorial");
+    }
 
-  return m_dictionary.find(lword) != m_dictionary.end();
-}
+    /**
+     * Implements IDictionaryService::CheckWord(). Determines
+     * if the passed in word is contained in the dictionary.
+     * @param word the word to be checked.
+     * @return true if the word is in the dictionary,
+     *         false otherwise.
+     **/
+    bool
+    DictionaryImpl::CheckWord(std::string const& word)
+    {
+        std::string lword(word);
+        std::transform(lword.begin(), lword.end(), lword.begin(), ::tolower);
 
-}
+        return m_dictionary.find(lword) != m_dictionary.end();
+    }
+
+} // namespace EnglishDictionary

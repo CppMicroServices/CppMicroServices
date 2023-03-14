@@ -22,20 +22,17 @@
 
 #include "cppmicroservices/servicecomponent/ComponentException.hpp"
 
-namespace cppmicroservices {
-namespace service {
-namespace component {
-ComponentException::ComponentException(const std::string& message)
-  : std::runtime_error(message)
+namespace cppmicroservices
 {
-}
+    namespace service
+    {
+        namespace component
+        {
+            ComponentException::ComponentException(std::string const& message) : std::runtime_error(message) {}
 
-ComponentException::ComponentException(const char* message)
-  : std::runtime_error(message)
-{
-}
+            ComponentException::ComponentException(char const* message) : std::runtime_error(message) {}
 
-ComponentException::~ComponentException() noexcept {}
-}
-}
-}
+            ComponentException::~ComponentException() noexcept {}
+        } // namespace component
+    }     // namespace service
+} // namespace cppmicroservices

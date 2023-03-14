@@ -29,243 +29,247 @@
 #include <iterator>
 
 using cppmicroservices::scrimpl::util::ObjectValidator;
-using cppmicroservices::service::component::ComponentConstants::
-  CONFIG_POLICY_IGNORE;
+using cppmicroservices::service::component::ComponentConstants::CONFIG_POLICY_IGNORE;
 
-namespace cppmicroservices {
-namespace scrimpl {
-namespace metadata {
-
-ServiceMetadata MetadataParserImplV1::CreateServiceMetadata(
-  const AnyMap& metadata) const
+namespace cppmicroservices
 {
-  ServiceMetadata serviceMetadata{};
+    namespace scrimpl
+    {
+        namespace metadata
+        {
 
-  // service.interfaces (Mandatory)
-  const auto interfaces = ObjectValidator(metadata, "interfaces")
-                            .GetValue<std::vector<cppmicroservices::Any>>();
-  std::transform(std::begin(interfaces),
-                 std::end(interfaces),
-                 std::back_inserter(serviceMetadata.interfaces),
-                 [](const auto& interface) {
-                   return ObjectValidator(interface).GetValue<std::string>();
-                 });
+            ServiceMetadata
+            MetadataParserImplV1::CreateServiceMetadata(AnyMap const& metadata) const
+            {
+                ServiceMetadata serviceMetadata {};
 
-  // service.scope
-  const auto object = ObjectValidator(metadata, "scope", /*isOptional=*/true);
-  object.AssignValueTo(serviceMetadata.scope,
-                       /*choices=*/ServiceMetadata::Scopes);
+                // service.interfaces (Mandatory)
+                auto const interfaces
+                    = ObjectValidator(metadata, "interfaces").GetValue<std::vector<cppmicroservices::Any>>();
+                std::transform(std::begin(interfaces),
+                               std::end(interfaces),
+                               std::back_inserter(serviceMetadata.interfaces),
+                               [](auto const& interface)
+                               { return ObjectValidator(interface).GetValue<std::string>(); });
 
-  return serviceMetadata;
-}
+                // service.scope
+                auto const object = ObjectValidator(metadata, "scope", /*isOptional=*/true);
+                object.AssignValueTo(serviceMetadata.scope,
+                                     /*choices=*/ServiceMetadata::Scopes);
 
-ReferenceMetadata MetadataParserImplV1::CreateReferenceMetadata(
-  const AnyMap& metadata) const
-{
-  ReferenceMetadata refMetadata{};
+                return serviceMetadata;
+            }
 
-  // reference.interface (Mandatory)
-  ObjectValidator(metadata, "interface")
-    .AssignValueTo(refMetadata.interfaceName);
+            ReferenceMetadata
+            MetadataParserImplV1::CreateReferenceMetadata(AnyMap const& metadata) const
+            {
+                ReferenceMetadata refMetadata {};
 
-  // reference.name (Mandatory)
-  ObjectValidator(metadata, "name").AssignValueTo(refMetadata.name);
+                // reference.interface (Mandatory)
+                ObjectValidator(metadata, "interface").AssignValueTo(refMetadata.interfaceName);
 
-  // reference.cardinality
-  auto object = ObjectValidator(metadata, "cardinality", /*isOptional=*/true);
-  object.AssignValueTo(refMetadata.cardinality,
-                       /*choices=*/ReferenceMetadata::Cardinalities);
-  std::tie(refMetadata.minCardinality, refMetadata.maxCardinality) =
-    GetReferenceCardinalityExtents(refMetadata.cardinality);
+                // reference.name (Mandatory)
+                ObjectValidator(metadata, "name").AssignValueTo(refMetadata.name);
 
-  // reference.policy
-  object = ObjectValidator(metadata, "policy", /*isOptional=*/true);
-  object.AssignValueTo(refMetadata.policy,
-                       /*choices=*/ReferenceMetadata::Policies);
+                // reference.cardinality
+                auto object = ObjectValidator(metadata, "cardinality", /*isOptional=*/true);
+                object.AssignValueTo(refMetadata.cardinality,
+                                     /*choices=*/ReferenceMetadata::Cardinalities);
+                std::tie(refMetadata.minCardinality, refMetadata.maxCardinality)
+                    = GetReferenceCardinalityExtents(refMetadata.cardinality);
 
-  // reference.policy-option
-  object = ObjectValidator(metadata, "policy-option", /*isOptional=*/true);
-  object.AssignValueTo(refMetadata.policyOption,
-                       /*choices=*/ReferenceMetadata::PolicyOptions);
+                // reference.policy
+                object = ObjectValidator(metadata, "policy", /*isOptional=*/true);
+                object.AssignValueTo(refMetadata.policy,
+                                     /*choices=*/ReferenceMetadata::Policies);
 
-  // reference.target
-  ObjectValidator(metadata, "target", /*isOptional=*/true)
-    .AssignValueTo(refMetadata.target);
+                // reference.policy-option
+                object = ObjectValidator(metadata, "policy-option", /*isOptional=*/true);
+                object.AssignValueTo(refMetadata.policyOption,
+                                     /*choices=*/ReferenceMetadata::PolicyOptions);
 
-  return refMetadata;
-}
+                // reference.target
+                ObjectValidator(metadata, "target", /*isOptional=*/true).AssignValueTo(refMetadata.target);
 
-std::vector<ReferenceMetadata> MetadataParserImplV1::CreateReferenceMetadatas(
-  const std::vector<cppmicroservices::Any>& refs) const
-{
-  std::vector<ReferenceMetadata> refMetadatas;
-  for (const auto& ref : refs) {
-    auto metadata = ObjectValidator(ref).GetValue<AnyMap>();
-    refMetadatas.emplace_back(CreateReferenceMetadata(metadata));
-  }
-  return refMetadatas;
-}
+                return refMetadata;
+            }
 
-std::shared_ptr<ComponentMetadata>
-MetadataParserImplV1::CreateComponentMetadata(const AnyMap& metadata) const
-{
-  auto compMetadata = std::make_shared<ComponentMetadata>();
+            std::vector<ReferenceMetadata>
+            MetadataParserImplV1::CreateReferenceMetadatas(std::vector<cppmicroservices::Any> const& refs) const
+            {
+                std::vector<ReferenceMetadata> refMetadatas;
+                for (auto const& ref : refs)
+                {
+                    auto metadata = ObjectValidator(ref).GetValue<AnyMap>();
+                    refMetadatas.emplace_back(CreateReferenceMetadata(metadata));
+                }
+                return refMetadatas;
+            }
 
-  // component.implementation-class (Mandatory)
-  ObjectValidator(metadata, "implementation-class")
-    .AssignValueTo(compMetadata->implClassName);
+            std::shared_ptr<ComponentMetadata>
+            MetadataParserImplV1::CreateComponentMetadata(AnyMap const& metadata) const
+            {
+                auto compMetadata = std::make_shared<ComponentMetadata>();
 
-  // component.immediate
-  compMetadata->immediate = true;
-  const bool serviceSpecified =
-    ObjectValidator(metadata, "service", /*isOptional=*/true).KeyExists();
-  auto object = ObjectValidator(metadata, "immediate", /*isOptional=*/true);
-  const bool isImmediate =
-    (object.KeyExists()) ? object.GetValue<bool>() : !serviceSpecified;
-  if (!serviceSpecified && !isImmediate) {
-    throw std::runtime_error(
-      "Invalid value specified for the name 'immediate'.");
-  }
-  compMetadata->immediate =
-    (!serviceSpecified || (serviceSpecified && isImmediate));
+                // component.implementation-class (Mandatory)
+                ObjectValidator(metadata, "implementation-class").AssignValueTo(compMetadata->implClassName);
 
-  // component.enabled
-  ObjectValidator(metadata, "enabled", /*isOptional=*/true)
-    .AssignValueTo(compMetadata->enabled);
+                // component.immediate
+                compMetadata->immediate = true;
+                bool const serviceSpecified = ObjectValidator(metadata, "service", /*isOptional=*/true).KeyExists();
+                auto object = ObjectValidator(metadata, "immediate", /*isOptional=*/true);
+                bool const isImmediate = (object.KeyExists()) ? object.GetValue<bool>() : !serviceSpecified;
+                if (!serviceSpecified && !isImmediate)
+                {
+                    throw std::runtime_error("Invalid value specified for the name 'immediate'.");
+                }
+                compMetadata->immediate = (!serviceSpecified || (serviceSpecified && isImmediate));
 
-  // component.name
-  compMetadata->name = compMetadata->implClassName;
-  ObjectValidator(metadata, "name", /*isOptional=*/true)
-    .AssignValueTo(compMetadata->name);
-  compMetadata->instanceName = compMetadata->name;
+                // component.enabled
+                ObjectValidator(metadata, "enabled", /*isOptional=*/true).AssignValueTo(compMetadata->enabled);
 
-  // component.configuration-policy (Optional)
-  compMetadata->configurationPolicy = CONFIG_POLICY_IGNORE;
-  bool configPolicy = false;
-  object =
-    ObjectValidator(metadata, "configuration-policy", /*isOptional=*/true);
-  if (object.KeyExists()) {
-    object.AssignValueTo(compMetadata->configurationPolicy);
-    configPolicy = true;
-  }
+                // component.name
+                compMetadata->name = compMetadata->implClassName;
+                ObjectValidator(metadata, "name", /*isOptional=*/true).AssignValueTo(compMetadata->name);
+                compMetadata->instanceName = compMetadata->name;
 
-  // component.configuration-pid (Optional)
-  bool configPid = false;
-  object = ObjectValidator(metadata, "configuration-pid", /*isOptional=*/true);
-  if (object.KeyExists()) {
-    configPid = true;
-    if (configPolicy) {
-      const auto configPids =
-        object.GetValue<std::vector<cppmicroservices::Any>>();
-      std::transform(
-        std::begin(configPids),
-        std::end(configPids),
-        std::back_inserter(compMetadata->configurationPids),
-        [](const auto& configPid) {
-          return ObjectValidator(configPid).GetValue<std::string>();
-        });
+                // component.configuration-policy (Optional)
+                compMetadata->configurationPolicy = CONFIG_POLICY_IGNORE;
+                bool configPolicy = false;
+                object = ObjectValidator(metadata, "configuration-policy", /*isOptional=*/true);
+                if (object.KeyExists())
+                {
+                    object.AssignValueTo(compMetadata->configurationPolicy);
+                    configPolicy = true;
+                }
 
-      //search for a configuration pid equal to $. If present replace with component name.
-      // Also search for duplicates pids. These are errors.
-      std::unordered_map<std::string, std::string> duplicatePids;
-      for (auto& pid : compMetadata->configurationPids) {
-        if (pid == "$") {
-          pid = compMetadata->name;
-        }
+                // component.configuration-pid (Optional)
+                bool configPid = false;
+                object = ObjectValidator(metadata, "configuration-pid", /*isOptional=*/true);
+                if (object.KeyExists())
+                {
+                    configPid = true;
+                    if (configPolicy)
+                    {
+                        auto const configPids = object.GetValue<std::vector<cppmicroservices::Any>>();
+                        std::transform(std::begin(configPids),
+                                       std::end(configPids),
+                                       std::back_inserter(compMetadata->configurationPids),
+                                       [](auto const& configPid)
+                                       { return ObjectValidator(configPid).GetValue<std::string>(); });
 
-        if (duplicatePids.find(pid) != duplicatePids.end()) {
-          std::string msg =
-            "configuration-pid error in the manifest. Duplicate pid detected. ";
-          msg.append(pid);
-          throw std::runtime_error(msg);
-        }
-        duplicatePids.emplace(pid, pid);
-      };
-    }
-  }
-  /* In order to participate in ConfigurationAdmin both the configuration-policy
-     * and the configuration-pid must be present in the manifest.json file. 
-     * Otherwise the configuration-policy is set to ignore. If only one is present
-     * a Warning message is logged.
-     */
-  if ((configPolicy && !configPid) || (!configPolicy && configPid)) {
-    compMetadata->configurationPolicy = CONFIG_POLICY_IGNORE;
-    compMetadata->configurationPids.clear();
-    std::string msg = "Warning: configuration-policy has been set to ignore.";
-    msg.append(
-      " Both configuration-policy and configuration-pid must be present");
-    msg.append(" to participate in Configuration Admin. ");
-    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING, msg);
-  }
+                        // search for a configuration pid equal to $. If present replace with component name.
+                        //  Also search for duplicates pids. These are errors.
+                        std::unordered_map<std::string, std::string> duplicatePids;
+                        for (auto& pid : compMetadata->configurationPids)
+                        {
+                            if (pid == "$")
+                            {
+                                pid = compMetadata->name;
+                            }
 
-  if (compMetadata->configurationPolicy == CONFIG_POLICY_IGNORE) {
-    compMetadata->configurationPids.clear();
-  }
-  // component.factory
-  ObjectValidator(metadata, "factory", /*isOptional=*/true)
-    .AssignValueTo(compMetadata->factoryComponentID);
+                            if (duplicatePids.find(pid) != duplicatePids.end())
+                            {
+                                std::string msg = "configuration-pid error in the manifest. Duplicate pid detected. ";
+                                msg.append(pid);
+                                throw std::runtime_error(msg);
+                            }
+                            duplicatePids.emplace(pid, pid);
+                        };
+                    }
+                }
+                /* In order to participate in ConfigurationAdmin both the configuration-policy
+                 * and the configuration-pid must be present in the manifest.json file.
+                 * Otherwise the configuration-policy is set to ignore. If only one is present
+                 * a Warning message is logged.
+                 */
+                if ((configPolicy && !configPid) || (!configPolicy && configPid))
+                {
+                    compMetadata->configurationPolicy = CONFIG_POLICY_IGNORE;
+                    compMetadata->configurationPids.clear();
+                    std::string msg = "Warning: configuration-policy has been set to ignore.";
+                    msg.append(" Both configuration-policy and configuration-pid must be present");
+                    msg.append(" to participate in Configuration Admin. ");
+                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING, msg);
+                }
 
-  // component.factoryProperties
-  object = ObjectValidator(metadata, "factory-properties", /*isOptional=*/true);
-  if (object.KeyExists()) {
-    const auto props = object.GetValue<AnyMap>();
-    for (const auto& prop : props) {
-      compMetadata->factoryComponentProperties.insert(prop);
-    }
-  }
+                if (compMetadata->configurationPolicy == CONFIG_POLICY_IGNORE)
+                {
+                    compMetadata->configurationPids.clear();
+                }
+                // component.factory
+                ObjectValidator(metadata, "factory", /*isOptional=*/true)
+                    .AssignValueTo(compMetadata->factoryComponentID);
 
-  // component.properties
-  object = ObjectValidator(metadata, "properties", /*isOptional=*/true);
-  if (object.KeyExists()) {
-    const auto props = object.GetValue<AnyMap>();
-    for (const auto& prop : props) {
-      compMetadata->properties.insert(prop);
-    }
-  }
+                // component.factoryProperties
+                object = ObjectValidator(metadata, "factory-properties", /*isOptional=*/true);
+                if (object.KeyExists())
+                {
+                    auto const props = object.GetValue<AnyMap>();
+                    for (auto const& prop : props)
+                    {
+                        compMetadata->factoryComponentProperties.insert(prop);
+                    }
+                }
 
-  // component.service
-  compMetadata->serviceMetadata = {};
-  object = ObjectValidator(metadata, "service", /*isOptional=*/true);
-  if (object.KeyExists()) {
-    compMetadata->serviceMetadata =
-      CreateServiceMetadata(object.GetValue<AnyMap>());
-  }
+                // component.properties
+                object = ObjectValidator(metadata, "properties", /*isOptional=*/true);
+                if (object.KeyExists())
+                {
+                    auto const props = object.GetValue<AnyMap>();
+                    for (auto const& prop : props)
+                    {
+                        compMetadata->properties.insert(prop);
+                    }
+                }
 
-  // component.references
-  compMetadata->refsMetadata = {};
-  object = ObjectValidator(metadata, "references", /*isOptional=*/true);
-  if (object.KeyExists()) {
-    compMetadata->refsMetadata = CreateReferenceMetadatas(
-      object.GetValue<std::vector<cppmicroservices::Any>>());
-  }
+                // component.service
+                compMetadata->serviceMetadata = {};
+                object = ObjectValidator(metadata, "service", /*isOptional=*/true);
+                if (object.KeyExists())
+                {
+                    compMetadata->serviceMetadata = CreateServiceMetadata(object.GetValue<AnyMap>());
+                }
 
-  return compMetadata;
-}
+                // component.references
+                compMetadata->refsMetadata = {};
+                object = ObjectValidator(metadata, "references", /*isOptional=*/true);
+                if (object.KeyExists())
+                {
+                    compMetadata->refsMetadata
+                        = CreateReferenceMetadatas(object.GetValue<std::vector<cppmicroservices::Any>>());
+                }
 
-std::vector<std::shared_ptr<ComponentMetadata>>
-MetadataParserImplV1::ParseAndGetComponentsMetadata(const AnyMap& scrmap) const
-{
-  std::vector<std::shared_ptr<ComponentMetadata>> componentsMetadata;
-  const auto components = ObjectValidator(scrmap, "components")
-                            .GetValue<std::vector<cppmicroservices::Any>>();
-  std::size_t index = 0;
-  for (const auto& component : components) {
-    const auto componentMap = ObjectValidator(component).GetValue<AnyMap>();
-    // Log the exception if the component can't be parsed and process the next
-    // component
-    try {
-      componentsMetadata.emplace_back(CreateComponentMetadata(componentMap));
-    } catch (std::exception& ex) {
-      std::string msg = std::string(ex.what());
-      msg +=
-        " Could not load the component with index: " + std::to_string(index);
-      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, msg);
-    }
-    ++index;
-  }
-  return componentsMetadata;
-}
+                return compMetadata;
+            }
 
-}
-}
-}
+            std::vector<std::shared_ptr<ComponentMetadata>>
+            MetadataParserImplV1::ParseAndGetComponentsMetadata(AnyMap const& scrmap) const
+            {
+                std::vector<std::shared_ptr<ComponentMetadata>> componentsMetadata;
+                auto const components
+                    = ObjectValidator(scrmap, "components").GetValue<std::vector<cppmicroservices::Any>>();
+                std::size_t index = 0;
+                for (auto const& component : components)
+                {
+                    auto const componentMap = ObjectValidator(component).GetValue<AnyMap>();
+                    // Log the exception if the component can't be parsed and process the next
+                    // component
+                    try
+                    {
+                        componentsMetadata.emplace_back(CreateComponentMetadata(componentMap));
+                    }
+                    catch (std::exception& ex)
+                    {
+                        std::string msg = std::string(ex.what());
+                        msg += " Could not load the component with index: " + std::to_string(index);
+                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, msg);
+                    }
+                    ++index;
+                }
+                return componentsMetadata;
+            }
+
+        } // namespace metadata
+    }     // namespace scrimpl
+} // namespace cppmicroservices

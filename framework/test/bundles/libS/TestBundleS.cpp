@@ -32,91 +32,105 @@
 
 #include "ServiceControlInterface.h"
 
-namespace cppmicroservices {
-
-class TestBundleS
-  : public ServiceControlInterface
-  , public TestBundleSService0
-  , public TestBundleSService1
-  , public TestBundleSService2
-  , public TestBundleSService3
-  , public std::enable_shared_from_this<TestBundleS>
+namespace cppmicroservices
 {
 
-public:
-  TestBundleS(const BundleContext& context)
-    : context(context)
-  {
-    for (int i = 0; i <= 3; ++i) {
-      servregs.push_back(ServiceRegistrationU());
-    }
-  }
+    class TestBundleS
+        : public ServiceControlInterface
+        , public TestBundleSService0
+        , public TestBundleSService1
+        , public TestBundleSService2
+        , public TestBundleSService3
+        , public std::enable_shared_from_this<TestBundleS>
+    {
 
-  virtual const char* GetNameOfClass() const { return "TestBundleS"; }
-
-  void ServiceControl(int offset, const std::string& operation, int ranking)
-  {
-    if (0 <= offset && offset <= 3) {
-      if (operation == "register") {
-        if (!servregs[offset]) {
-          std::stringstream servicename;
-          servicename << SERVICE << offset;
-          InterfaceMapPtr ifm = std::make_shared<InterfaceMap>();
-          ifm->insert(std::make_pair(servicename.str(), shared_from_this()));
-          ServiceProperties props;
-          props.insert(
-            std::make_pair(Constants::SERVICE_RANKING, Any(ranking)));
-          servregs[offset] = context.RegisterService(ifm, props);
+      public:
+        TestBundleS(BundleContext const& context) : context(context)
+        {
+            for (int i = 0; i <= 3; ++i)
+            {
+                servregs.push_back(ServiceRegistrationU());
+            }
         }
-      }
-      if (operation == "unregister") {
-        if (servregs[offset]) {
-          ServiceRegistrationU sr1 = servregs[offset];
-          sr1.Unregister();
-          servregs[offset] = nullptr;
+
+        virtual char const*
+        GetNameOfClass() const
+        {
+            return "TestBundleS";
         }
-      }
-    }
-  }
 
-private:
-  static const std::string SERVICE; // = "cppmicroservices::TestBundleSService"
+        void
+        ServiceControl(int offset, std::string const& operation, int ranking)
+        {
+            if (0 <= offset && offset <= 3)
+            {
+                if (operation == "register")
+                {
+                    if (!servregs[offset])
+                    {
+                        std::stringstream servicename;
+                        servicename << SERVICE << offset;
+                        InterfaceMapPtr ifm = std::make_shared<InterfaceMap>();
+                        ifm->insert(std::make_pair(servicename.str(), shared_from_this()));
+                        ServiceProperties props;
+                        props.insert(std::make_pair(Constants::SERVICE_RANKING, Any(ranking)));
+                        servregs[offset] = context.RegisterService(ifm, props);
+                    }
+                }
+                if (operation == "unregister")
+                {
+                    if (servregs[offset])
+                    {
+                        ServiceRegistrationU sr1 = servregs[offset];
+                        sr1.Unregister();
+                        servregs[offset] = nullptr;
+                    }
+                }
+            }
+        }
 
-  BundleContext context;
-  std::vector<ServiceRegistrationU> servregs;
-};
+      private:
+        static const std::string SERVICE; // = "cppmicroservices::TestBundleSService"
 
-const std::string TestBundleS::SERVICE = "cppmicroservices::TestBundleSService";
+        BundleContext context;
+        std::vector<ServiceRegistrationU> servregs;
+    };
 
-class TestBundleSActivator : public BundleActivator
-{
+    const std::string TestBundleS::SERVICE = "cppmicroservices::TestBundleSService";
 
-public:
-  TestBundleSActivator() {}
-  ~TestBundleSActivator() {}
+    class TestBundleSActivator : public BundleActivator
+    {
 
-  void Start(BundleContext context)
-  {
-    s = std::make_shared<TestBundleS>(context);
-    sreg = context.RegisterService<TestBundleSService0>(s);
-    sciReg = context.RegisterService<ServiceControlInterface>(s);
-  }
+      public:
+        TestBundleSActivator() {}
+        ~TestBundleSActivator() {}
 
-  void Stop(BundleContext /*context*/)
-  {
-    if (sreg) {
-      sreg.Unregister();
-    }
-    if (sciReg) {
-      sciReg.Unregister();
-    }
-  }
+        void
+        Start(BundleContext context)
+        {
+            s = std::make_shared<TestBundleS>(context);
+            sreg = context.RegisterService<TestBundleSService0>(s);
+            sciReg = context.RegisterService<ServiceControlInterface>(s);
+        }
 
-private:
-  std::shared_ptr<TestBundleS> s;
-  ServiceRegistration<TestBundleSService0> sreg;
-  ServiceRegistration<ServiceControlInterface> sciReg;
-};
-}
+        void
+        Stop(BundleContext /*context*/)
+        {
+            if (sreg)
+            {
+                sreg.Unregister();
+            }
+            if (sciReg)
+            {
+                sciReg.Unregister();
+            }
+        }
+
+      private:
+        std::shared_ptr<TestBundleS> s;
+        ServiceRegistration<TestBundleSService0> sreg;
+        ServiceRegistration<ServiceControlInterface> sciReg;
+    };
+} // namespace cppmicroservices
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleSActivator)

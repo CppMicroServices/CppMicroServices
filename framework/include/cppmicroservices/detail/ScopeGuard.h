@@ -25,38 +25,39 @@
 
 #include <functional>
 
-namespace cppmicroservices {
-
-namespace detail {
-
-/**
- * A simple, single use scope guard using RAII
- * to guarantee operations are executed when 
- * the ScopeGuard object goes out of scope.
- */
-class ScopeGuard
+namespace cppmicroservices
 {
-public:
-  template<typename Callable>
-  ScopeGuard(Callable&& func)
-    : f(func)
-  {
-  }
 
-  ScopeGuard(const ScopeGuard&) = delete;
-  ScopeGuard& operator=(const ScopeGuard&) = delete;
-  ScopeGuard(ScopeGuard&&) = delete;
-  ScopeGuard& operator=(ScopeGuard&&) = delete;
+    namespace detail
+    {
 
-  ~ScopeGuard() noexcept
-  {
-    f(); // must not throw
-  }
+        /**
+         * A simple, single use scope guard using RAII
+         * to guarantee operations are executed when
+         * the ScopeGuard object goes out of scope.
+         */
+        class ScopeGuard
+        {
+          public:
+            template <typename Callable>
+            ScopeGuard(Callable&& func) : f(func)
+            {
+            }
 
-private:
-  std::function<void()> f;
-};
+            ScopeGuard(ScopeGuard const&) = delete;
+            ScopeGuard& operator=(ScopeGuard const&) = delete;
+            ScopeGuard(ScopeGuard&&) = delete;
+            ScopeGuard& operator=(ScopeGuard&&) = delete;
 
-}
-}
+            ~ScopeGuard() noexcept
+            {
+                f(); // must not throw
+            }
+
+          private:
+            std::function<void()> f;
+        };
+
+    } // namespace detail
+} // namespace cppmicroservices
 #endif

@@ -42,209 +42,214 @@ US_MSVC_DISABLE_WARNING(4355)
 #include <memory>
 
 #ifdef US_PLATFORM_POSIX
-#  include <dlfcn.h>
+#    include <dlfcn.h>
 #endif
 
 CPPMICROSERVICES_INITIALIZE_BUNDLE
 
-namespace cppmicroservices {
-
-std::atomic<int> CoreBundleContext::globalId{ 0 };
-
-std::unordered_map<std::string, Any> InitProperties(
-  std::unordered_map<std::string, Any> configuration)
+namespace cppmicroservices
 {
-  // Framework internal diagnostic logging is off by default
-  configuration.emplace(std::make_pair(Constants::FRAMEWORK_LOG, Any(false)));
 
-  // Framework::PROP_THREADING_SUPPORT is a read-only property whose value is based off of a compile-time switch.
-  // Run-time modification of the property should be ignored as it is irrelevant.
+    std::atomic<int> CoreBundleContext::globalId { 0 };
+
+    std::unordered_map<std::string, Any>
+    InitProperties(std::unordered_map<std::string, Any> configuration)
+    {
+        // Framework internal diagnostic logging is off by default
+        configuration.emplace(std::make_pair(Constants::FRAMEWORK_LOG, Any(false)));
+
+        // Framework::PROP_THREADING_SUPPORT is a read-only property whose value is based off of a compile-time switch.
+        // Run-time modification of the property should be ignored as it is irrelevant.
 #ifdef US_ENABLE_THREADING_SUPPORT
-  configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("multi");
+        configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("multi");
 #else
-  configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("single");
+        configuration[Constants::FRAMEWORK_THREADING_SUPPORT] = std::string("single");
 #endif
 
-  configuration.emplace(std::make_pair(Constants::FRAMEWORK_WORKING_DIR,
-                                       util::GetCurrentWorkingDirectory()));
+        configuration.emplace(std::make_pair(Constants::FRAMEWORK_WORKING_DIR, util::GetCurrentWorkingDirectory()));
 
-  configuration.emplace(
-    std::make_pair(Constants::FRAMEWORK_STORAGE, Any(FWDIR_DEFAULT)));
+        configuration.emplace(std::make_pair(Constants::FRAMEWORK_STORAGE, Any(FWDIR_DEFAULT)));
 
-  configuration[Constants::FRAMEWORK_VERSION] =
-    std::string(CppMicroServices_VERSION_STR);
-  configuration[Constants::FRAMEWORK_VENDOR] = std::string("CppMicroServices");
+        configuration[Constants::FRAMEWORK_VERSION] = std::string(CppMicroServices_VERSION_STR);
+        configuration[Constants::FRAMEWORK_VENDOR] = std::string("CppMicroServices");
 
 #ifdef US_PLATFORM_POSIX
-  configuration.emplace(
-    std::make_pair(Constants::LIBRARY_LOAD_OPTIONS, RTLD_LAZY | RTLD_LOCAL));
+        configuration.emplace(std::make_pair(Constants::LIBRARY_LOAD_OPTIONS, RTLD_LAZY | RTLD_LOCAL));
 #else
-  configuration[Constants::LIBRARY_LOAD_OPTIONS] = int(0);
+        configuration[Constants::LIBRARY_LOAD_OPTIONS] = int(0);
 #endif
 
-  return configuration;
-}
+        return configuration;
+    }
 
-CoreBundleContext::CoreBundleContext(
-  const std::unordered_map<std::string, Any>& props,
-  std::ostream* diagLogger)
-  : id(globalId++)
-  , frameworkProperties(InitProperties(props))
-  , workingDir(ref_any_cast<std::string>(
-      frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
-  , listeners(this)
-  , services(this)
-  , logger(std::make_shared<cppmicroservices::cfrimpl::CFRLogger>())
-  , serviceHooks(this)
-  , bundleHooks(this)
-  , bundleRegistry(this)
-  , firstInit(true)
-  , initCount(0)
-  , libraryLoadOptions(0)
-{
-  auto enableDiagLog =
-    any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
-  std::ostream* diagnosticLogger = (diagLogger) ? diagLogger : &std::clog;
-  sink = std::make_shared<detail::LogSink>(diagnosticLogger, enableDiagLog);
-  systemBundle = std::shared_ptr<FrameworkPrivate>(new FrameworkPrivate(this));
-  DIAG_LOG(*sink) << "created";
-}
+    CoreBundleContext::CoreBundleContext(std::unordered_map<std::string, Any> const& props, std::ostream* diagLogger)
+        : id(globalId++)
+        , frameworkProperties(InitProperties(props))
+        , workingDir(ref_any_cast<std::string>(frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
+        , listeners(this)
+        , services(this)
+        , logger(std::make_shared<cppmicroservices::cfrimpl::CFRLogger>())
+        , serviceHooks(this)
+        , bundleHooks(this)
+        , bundleRegistry(this)
+        , firstInit(true)
+        , initCount(0)
+        , libraryLoadOptions(0)
+    {
+        auto enableDiagLog = any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
+        std::ostream* diagnosticLogger = (diagLogger) ? diagLogger : &std::clog;
+        sink = std::make_shared<detail::LogSink>(diagnosticLogger, enableDiagLog);
+        systemBundle = std::shared_ptr<FrameworkPrivate>(new FrameworkPrivate(this));
+        DIAG_LOG(*sink) << "created";
+    }
 
-CoreBundleContext::~CoreBundleContext() = default;
+    CoreBundleContext::~CoreBundleContext() = default;
 
-std::shared_ptr<CoreBundleContext> CoreBundleContext::shared_from_this() const
-{
-  return self.Lock(), self.v.lock();
-}
+    std::shared_ptr<CoreBundleContext>
+    CoreBundleContext::shared_from_this() const
+    {
+        return self.Lock(), self.v.lock();
+    }
 
-void CoreBundleContext::SetThis(const std::shared_ptr<CoreBundleContext>& self)
-{
-  this->self.Lock(), this->self.v = self;
-}
+    void
+    CoreBundleContext::SetThis(std::shared_ptr<CoreBundleContext> const& self)
+    {
+        this->self.Lock(), this->self.v = self;
+    }
 
-void CoreBundleContext::Init()
-{
-  DIAG_LOG(*sink) << "initializing";
-  initCount++;
+    void
+    CoreBundleContext::Init()
+    {
+        DIAG_LOG(*sink) << "initializing";
+        initCount++;
 
-  auto storageCleanProp =
-    frameworkProperties.find(Constants::FRAMEWORK_STORAGE_CLEAN);
-  if (firstInit && storageCleanProp != frameworkProperties.end() &&
-      storageCleanProp->second ==
-        Constants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT) {
-    // DeleteFWDir();
-    firstInit = false;
-  }
+        auto storageCleanProp = frameworkProperties.find(Constants::FRAMEWORK_STORAGE_CLEAN);
+        if (firstInit && storageCleanProp != frameworkProperties.end()
+            && storageCleanProp->second == Constants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT)
+        {
+            // DeleteFWDir();
+            firstInit = false;
+        }
 
-  // We use a "pseudo" random UUID.
-  const std::string sid_base = "04f4f884-31bb-45c0-b176-";
-  std::stringstream ss;
-  ss << sid_base << std::setfill('0') << std::setw(8) << std::hex
-     << static_cast<int32_t>(id * 65536 + initCount);
+        // We use a "pseudo" random UUID.
+        const std::string sid_base = "04f4f884-31bb-45c0-b176-";
+        std::stringstream ss;
+        ss << sid_base << std::setfill('0') << std::setw(8) << std::hex << static_cast<int32_t>(id * 65536 + initCount);
 
-  frameworkProperties[Constants::FRAMEWORK_UUID] = ss.str();
+        frameworkProperties[Constants::FRAMEWORK_UUID] = ss.str();
 
-  // $TODO we only support non-persistent (main memory) storage yet
-  storage = std::make_unique<BundleStorageMemory>();
-  //  if (frameworkProperties[FWProps::READ_ONLY_PROP] == true)
-  //  {
-  //    dataStorage.clear();
-  //  }
-  //  else
-  //  {
-  //    dataStorage = GetFileStorage(this, "data");
-  //  }
-  try {
-    dataStorage = GetPersistentStoragePath(this, "data", /*create=*/false);
-  } catch (const std::exception& e) {
-    DIAG_LOG(*sink) << "Ignored runtime exception with message'" << e.what()
-                    << "' from the GetPersistentStoragePath function.\n";
-  }
+        // $TODO we only support non-persistent (main memory) storage yet
+        storage = std::make_unique<BundleStorageMemory>();
+        //  if (frameworkProperties[FWProps::READ_ONLY_PROP] == true)
+        //  {
+        //    dataStorage.clear();
+        //  }
+        //  else
+        //  {
+        //    dataStorage = GetFileStorage(this, "data");
+        //  }
+        try
+        {
+            dataStorage = GetPersistentStoragePath(this, "data", /*create=*/false);
+        }
+        catch (std::exception const& e)
+        {
+            DIAG_LOG(*sink) << "Ignored runtime exception with message'" << e.what()
+                            << "' from the GetPersistentStoragePath function.\n";
+        }
 
-  auto bundleValidationFunc =
-    frameworkProperties.find(Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
-  if (bundleValidationFunc != frameworkProperties.end()) {
-    validationFunc =
-      any_cast<std::function<bool(const cppmicroservices::Bundle&)>>(
-        bundleValidationFunc->second);
-  }
+        auto bundleValidationFunc = frameworkProperties.find(Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
+        if (bundleValidationFunc != frameworkProperties.end())
+        {
+            validationFunc
+                = any_cast<std::function<bool(cppmicroservices::Bundle const&)>>(bundleValidationFunc->second);
+        }
 
-  systemBundle->InitSystemBundle();
-  _us_set_bundle_context_instance_system_bundle(
-    systemBundle->bundleContext.Load().get());
+        systemBundle->InitSystemBundle();
+        _us_set_bundle_context_instance_system_bundle(systemBundle->bundleContext.Load().get());
 
-  bundleRegistry.Init();
+        bundleRegistry.Init();
 
-  serviceHooks.Open();
+        serviceHooks.Open();
 
-  bundleRegistry.Load();
+        bundleRegistry.Load();
 
-  logger->Open();
+        logger->Open();
 
-  std::string execPath;
-  try {
-    execPath = util::GetExecutablePath();
-  } catch (const std::exception& e) {
-    DIAG_LOG(*sink) << e.what();
-    // Let the exception propagate all the way up to the
-    // call site of Framework::Init().
-    throw;
-  }
+        std::string execPath;
+        try
+        {
+            execPath = util::GetExecutablePath();
+        }
+        catch (std::exception const& e)
+        {
+            DIAG_LOG(*sink) << e.what();
+            // Let the exception propagate all the way up to the
+            // call site of Framework::Init().
+            throw;
+        }
 
-  if (IsBundleFile(execPath) && bundleRegistry.GetBundles(execPath).empty()) {
-    // Auto-install all embedded bundles inside the executable.
-    // Same here: If an embedded bundle cannot be installed,
-    // an exception is thrown and we will let it propagate all
-    // the way up to the call site of Framework::Init().
-    bundleRegistry.Install(execPath, systemBundle.get());
-  }
+        if (IsBundleFile(execPath) && bundleRegistry.GetBundles(execPath).empty())
+        {
+            // Auto-install all embedded bundles inside the executable.
+            // Same here: If an embedded bundle cannot be installed,
+            // an exception is thrown and we will let it propagate all
+            // the way up to the call site of Framework::Init().
+            bundleRegistry.Install(execPath, systemBundle.get());
+        }
 
-  DIAG_LOG(*sink) << "inited\nInstalled bundles: ";
-  for (auto b : bundleRegistry.GetBundles()) {
-    DIAG_LOG(*sink) << " #" << b->id << " " << b->symbolicName << ":"
-                    << b->version << " location:" << b->location;
-  }
+        DIAG_LOG(*sink) << "inited\nInstalled bundles: ";
+        for (auto b : bundleRegistry.GetBundles())
+        {
+            DIAG_LOG(*sink) << " #" << b->id << " " << b->symbolicName << ":" << b->version
+                            << " location:" << b->location;
+        }
 
 #ifdef US_PLATFORM_POSIX
-  try {
-    libraryLoadOptions =
-      any_cast<int>(frameworkProperties[Constants::LIBRARY_LOAD_OPTIONS]);
-  } catch (...) {
-    DIAG_LOG(*sink)
-      << "Unable to read default library load options from config.";
-    libraryLoadOptions = RTLD_LAZY | RTLD_LOCAL;
+        try
+        {
+            libraryLoadOptions = any_cast<int>(frameworkProperties[Constants::LIBRARY_LOAD_OPTIONS]);
+        }
+        catch (...)
+        {
+            DIAG_LOG(*sink) << "Unable to read default library load options from config.";
+            libraryLoadOptions = RTLD_LAZY | RTLD_LOCAL;
 
-    // override non-integer framework property value to reflect default library load option for POSIX
-    frameworkProperties[Constants::LIBRARY_LOAD_OPTIONS] = libraryLoadOptions;
-  }
-  DIAG_LOG(*sink) << "Library Load Options = " << libraryLoadOptions;
+            // override non-integer framework property value to reflect default library load option for POSIX
+            frameworkProperties[Constants::LIBRARY_LOAD_OPTIONS] = libraryLoadOptions;
+        }
+        DIAG_LOG(*sink) << "Library Load Options = " << libraryLoadOptions;
 #endif
-}
+    }
 
-void CoreBundleContext::Uninit0()
-{
-  DIAG_LOG(*sink) << "uninit";
-  logger->Close();
-  serviceHooks.Close();
-  systemBundle->UninitSystemBundle();
-}
+    void
+    CoreBundleContext::Uninit0()
+    {
+        DIAG_LOG(*sink) << "uninit";
+        logger->Close();
+        serviceHooks.Close();
+        systemBundle->UninitSystemBundle();
+    }
 
-void CoreBundleContext::Uninit1()
-{
-  bundleRegistry.Clear();
-  services.Clear();
-  listeners.Clear();
-  resolver.Clear();
+    void
+    CoreBundleContext::Uninit1()
+    {
+        bundleRegistry.Clear();
+        services.Clear();
+        listeners.Clear();
+        resolver.Clear();
 
-  dataStorage.clear();
-  storage->Close();
-}
+        dataStorage.clear();
+        storage->Close();
+    }
 
-std::string CoreBundleContext::GetDataStorage(long id) const
-{
-  if (!dataStorage.empty()) {
-    return dataStorage + util::DIR_SEP + util::ToString(id);
-  }
-  return std::string();
-}
-}
+    std::string
+    CoreBundleContext::GetDataStorage(long id) const
+    {
+        if (!dataStorage.empty())
+        {
+            return dataStorage + util::DIR_SEP + util::ToString(id);
+        }
+        return std::string();
+    }
+} // namespace cppmicroservices

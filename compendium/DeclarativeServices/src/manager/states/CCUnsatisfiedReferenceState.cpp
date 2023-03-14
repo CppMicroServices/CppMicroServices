@@ -26,52 +26,55 @@
 #include "CCRegisteredState.hpp"
 #include "CCUnsatisfiedReferenceState.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-CCUnsatisfiedReferenceState::CCUnsatisfiedReferenceState()
+namespace cppmicroservices
 {
-  std::promise<void> prom;
-  ready = prom.get_future();
-  prom.set_value();
-}
+    namespace scrimpl
+    {
 
-CCUnsatisfiedReferenceState::CCUnsatisfiedReferenceState(
-  std::shared_future<void> blockUntil)
-  : ready(std::move(blockUntil))
-{
-}
-
-void CCUnsatisfiedReferenceState::Register(ComponentConfigurationImpl& mgr)
-{
-  auto currState =
-    shared_from_this(); // assume this is the current state object
-  std::promise<void> transitionAction;
-  auto fut = transitionAction.get_future();
-  auto registeredState = std::make_shared<CCRegisteredState>(std::move(fut));
-  while (currState->GetValue() == ComponentState::UNSATISFIED_REFERENCE) {
-    if (mgr.CompareAndSetState(&currState, registeredState)) {
-      currState
-        ->WaitForTransitionTask(); // wait for the previous transition to finish
-      if (!mgr.IsServiceProvider() || mgr.RegisterService()) {
-        transitionAction.set_value(); // unblock the next transition
-        if (mgr.GetMetadata()->immediate) {
-          mgr.Activate(cppmicroservices::Bundle());
+        CCUnsatisfiedReferenceState::CCUnsatisfiedReferenceState()
+        {
+            std::promise<void> prom;
+            ready = prom.get_future();
+            prom.set_value();
         }
-      } else {
-        auto logger = mgr.GetLogger();
-        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                    "Component registration failed");
-        auto expectedState =
-          std::dynamic_pointer_cast<ComponentConfigurationState>(
-            registeredState);
-        mgr.CompareAndSetState(&expectedState,
-                               std::make_shared<CCUnsatisfiedReferenceState>());
-        transitionAction.set_value(); // unblock the next transition
-      }
-      break;
-    }
-  }
-}
-}
-}
+
+        CCUnsatisfiedReferenceState::CCUnsatisfiedReferenceState(std::shared_future<void> blockUntil)
+            : ready(std::move(blockUntil))
+        {
+        }
+
+        void
+        CCUnsatisfiedReferenceState::Register(ComponentConfigurationImpl& mgr)
+        {
+            auto currState = shared_from_this(); // assume this is the current state object
+            std::promise<void> transitionAction;
+            auto fut = transitionAction.get_future();
+            auto registeredState = std::make_shared<CCRegisteredState>(std::move(fut));
+            while (currState->GetValue() == ComponentState::UNSATISFIED_REFERENCE)
+            {
+                if (mgr.CompareAndSetState(&currState, registeredState))
+                {
+                    currState->WaitForTransitionTask(); // wait for the previous transition to finish
+                    if (!mgr.IsServiceProvider() || mgr.RegisterService())
+                    {
+                        transitionAction.set_value(); // unblock the next transition
+                        if (mgr.GetMetadata()->immediate)
+                        {
+                            mgr.Activate(cppmicroservices::Bundle());
+                        }
+                    }
+                    else
+                    {
+                        auto logger = mgr.GetLogger();
+                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                    "Component registration failed");
+                        auto expectedState = std::dynamic_pointer_cast<ComponentConfigurationState>(registeredState);
+                        mgr.CompareAndSetState(&expectedState, std::make_shared<CCUnsatisfiedReferenceState>());
+                        transitionAction.set_value(); // unblock the next transition
+                    }
+                    break;
+                }
+            }
+        }
+    } // namespace scrimpl
+} // namespace cppmicroservices

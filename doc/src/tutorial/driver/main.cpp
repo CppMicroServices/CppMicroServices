@@ -30,18 +30,18 @@
 #include "CppMicroServicesExamplesDriverConfig.h"
 
 #if defined(US_PLATFORM_POSIX)
-#  include <dlfcn.h>
+#    include <dlfcn.h>
 #elif defined(US_PLATFORM_WINDOWS)
-#  ifndef WIN32_LEAN_AND_MEAN
-#    define WIN32_LEAN_AND_MEAN
-#  endif
+#    ifndef WIN32_LEAN_AND_MEAN
+#        define WIN32_LEAN_AND_MEAN
+#    endif
 // clang-format off
 // Do not re-order include directives, it would break MinGW builds.
   #include <windows.h>
   #include <strsafe.h>
 // clang-format on
 #else
-#  error Unsupported platform
+#    error Unsupported platform
 #endif
 
 #include <algorithm>
@@ -57,157 +57,193 @@ using namespace cppmicroservices;
 #if !defined(US_BUILD_SHARED_LIBS)
 static const std::string BUNDLE_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
 #else
-#  ifdef US_PLATFORM_WINDOWS
+#    ifdef US_PLATFORM_WINDOWS
 static const std::string BUNDLE_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
-#  else
+#    else
 static const std::string BUNDLE_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
-#  endif
+#    endif
 #endif // US_BUILD_SHARED_LIBS
 
-std::vector<std::string> GetExampleBundles()
+std::vector<std::string>
+GetExampleBundles()
 {
-  std::vector<std::string> names;
-  names.push_back("eventlistener");
-  names.push_back("dictionaryservice");
-  names.push_back("frenchdictionary");
-  names.push_back("dictionaryclient");
-  names.push_back("dictionaryclient2");
-  names.push_back("dictionaryclient3");
-  names.push_back("spellcheckservice");
-  names.push_back("spellcheckclient");
-  return names;
+    std::vector<std::string> names;
+    names.push_back("eventlistener");
+    names.push_back("dictionaryservice");
+    names.push_back("frenchdictionary");
+    names.push_back("dictionaryclient");
+    names.push_back("dictionaryclient2");
+    names.push_back("dictionaryclient3");
+    names.push_back("spellcheckservice");
+    names.push_back("spellcheckclient");
+    return names;
 }
 
-int main(int /*argc*/, char** /*argv*/)
+int
+main(int /*argc*/, char** /*argv*/)
 {
-  char cmd[256];
+    char cmd[256];
 
-  std::unordered_map<std::string, long> symbolicNameToId;
+    std::unordered_map<std::string, long> symbolicNameToId;
 
-  FrameworkFactory factory;
-  auto framework = factory.NewFramework();
+    FrameworkFactory factory;
+    auto framework = factory.NewFramework();
 
-  auto get_bundle = [&framework, &symbolicNameToId](const std::string& str) {
-    std::stringstream ss(str);
+    auto get_bundle = [&framework, &symbolicNameToId](std::string const& str)
+    {
+        std::stringstream ss(str);
 
-    long int id = -1;
-    ss >> id;
-    if (!ss) {
-      id = -1;
-      auto it = symbolicNameToId.find(str);
-      if (it != symbolicNameToId.end()) {
-        id = it->second;
-      }
-    }
+        long int id = -1;
+        ss >> id;
+        if (!ss)
+        {
+            id = -1;
+            auto it = symbolicNameToId.find(str);
+            if (it != symbolicNameToId.end())
+            {
+                id = it->second;
+            }
+        }
 
-    return framework.GetBundleContext().GetBundle(id);
-  };
+        return framework.GetBundleContext().GetBundle(id);
+    };
 
-  try {
-    framework.Start();
+    try
+    {
+        framework.Start();
 
-    /* install all available bundles for this example */
+        /* install all available bundles for this example */
 #if defined(US_BUILD_SHARED_LIBS)
-    for (auto name : GetExampleBundles()) {
-      framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR +
-                                                  US_LIB_PREFIX + name +
-                                                  US_LIB_POSTFIX + US_LIB_EXT);
-    }
+        for (auto name : GetExampleBundles())
+        {
+            framework.GetBundleContext().InstallBundles(BUNDLE_PATH + PATH_SEPARATOR + US_LIB_PREFIX + name
+                                                        + US_LIB_POSTFIX + US_LIB_EXT);
+        }
 #endif
 
-    for (auto b : framework.GetBundleContext().GetBundles()) {
-      symbolicNameToId[b.GetSymbolicName()] = b.GetBundleId();
-    }
-  } catch (const std::exception& e) {
-    std::cerr << e.what() << std::endl;
-    return 1;
-  }
-
-  std::cout << "> ";
-  while (std::cin.getline(cmd, sizeof(cmd))) {
-    /*
-     The user can stop the framework and we handle this like
-     a regular shutdown command.
-    */
-    if (framework.GetState() != Bundle::STATE_ACTIVE) {
-      break;
-    }
-
-    std::string strCmd(cmd);
-    if (strCmd == "shutdown") {
-      break;
-    } else if (strCmd == "h") {
-      std::cout << std::left << std::setw(20) << "h"
-                << " This help text\n"
-                << std::setw(20) << "start <id | name>"
-                << " Start the bundle with id <id> or name <name>\n"
-                << std::setw(20) << "stop <id | name>"
-                << " Stop the bundle with id <id> or name <name>\n"
-                << std::setw(20) << "status"
-                << " Print status information\n"
-                << std::setw(20) << "shutdown"
-                << " Shut down the framework\n"
-                << std::flush;
-    } else if (strCmd.find("start ") != std::string::npos) {
-      auto bundle = get_bundle(strCmd.substr(6));
-      if (bundle) {
-        try {
-          /* starting an already started bundle does nothing.
-             There is no harm in doing it. */
-          if (bundle.GetState() == Bundle::STATE_ACTIVE) {
-            std::cout << "Info: bundle already active" << std::endl;
-          }
-          bundle.Start();
-        } catch (const std::exception& e) {
-          std::cerr << e.what() << std::endl;
+        for (auto b : framework.GetBundleContext().GetBundles())
+        {
+            symbolicNameToId[b.GetSymbolicName()] = b.GetBundleId();
         }
-      } else {
-        std::cerr << "Error: unknown id or symbolic name" << std::endl;
-      }
-    } else if (strCmd.find("stop ") != std::string::npos) {
-      auto bundle = get_bundle(strCmd.substr(5));
-      if (bundle) {
-        try {
-          bundle.Stop();
-          if (bundle.GetBundleId() == 0) {
-            break;
-          }
-        } catch (const std::exception& e) {
-          std::cerr << e.what() << std::endl;
-        }
-      } else {
-        std::cerr << "Error: unknown id or symbolic name" << std::endl;
-      }
-    } else if (strCmd == "status") {
-      std::map<long, Bundle> bundles;
-      for (auto& b : framework.GetBundleContext().GetBundles()) {
-        bundles.insert(std::make_pair(b.GetBundleId(), b));
-      }
-
-      std::cout << std::left;
-
-      std::cout << "Id | " << std::setw(20) << "Symbolic Name"
-                << " | " << std::setw(9) << "State" << std::endl;
-      std::cout << "-----------------------------------\n";
-
-      for (auto& bundle : bundles) {
-        std::cout << std::right << std::setw(2) << bundle.first << std::left
-                  << " | ";
-        std::cout << std::setw(20) << bundle.second.GetSymbolicName() << " | ";
-        std::cout << std::setw(9) << (bundle.second.GetState());
-        std::cout << std::endl;
-      }
-    } else {
-      std::cout << "Unknown command: " << strCmd << " (type 'h' for help)"
-                << std::endl;
     }
+    catch (std::exception const& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
+
     std::cout << "> ";
-  }
+    while (std::cin.getline(cmd, sizeof(cmd)))
+    {
+        /*
+         The user can stop the framework and we handle this like
+         a regular shutdown command.
+        */
+        if (framework.GetState() != Bundle::STATE_ACTIVE)
+        {
+            break;
+        }
 
-  framework.Stop();
-  framework.WaitForStop(std::chrono::seconds(2));
+        std::string strCmd(cmd);
+        if (strCmd == "shutdown")
+        {
+            break;
+        }
+        else if (strCmd == "h")
+        {
+            std::cout << std::left << std::setw(20) << "h"
+                      << " This help text\n"
+                      << std::setw(20) << "start <id | name>"
+                      << " Start the bundle with id <id> or name <name>\n"
+                      << std::setw(20) << "stop <id | name>"
+                      << " Stop the bundle with id <id> or name <name>\n"
+                      << std::setw(20) << "status"
+                      << " Print status information\n"
+                      << std::setw(20) << "shutdown"
+                      << " Shut down the framework\n"
+                      << std::flush;
+        }
+        else if (strCmd.find("start ") != std::string::npos)
+        {
+            auto bundle = get_bundle(strCmd.substr(6));
+            if (bundle)
+            {
+                try
+                {
+                    /* starting an already started bundle does nothing.
+                       There is no harm in doing it. */
+                    if (bundle.GetState() == Bundle::STATE_ACTIVE)
+                    {
+                        std::cout << "Info: bundle already active" << std::endl;
+                    }
+                    bundle.Start();
+                }
+                catch (std::exception const& e)
+                {
+                    std::cerr << e.what() << std::endl;
+                }
+            }
+            else
+            {
+                std::cerr << "Error: unknown id or symbolic name" << std::endl;
+            }
+        }
+        else if (strCmd.find("stop ") != std::string::npos)
+        {
+            auto bundle = get_bundle(strCmd.substr(5));
+            if (bundle)
+            {
+                try
+                {
+                    bundle.Stop();
+                    if (bundle.GetBundleId() == 0)
+                    {
+                        break;
+                    }
+                }
+                catch (std::exception const& e)
+                {
+                    std::cerr << e.what() << std::endl;
+                }
+            }
+            else
+            {
+                std::cerr << "Error: unknown id or symbolic name" << std::endl;
+            }
+        }
+        else if (strCmd == "status")
+        {
+            std::map<long, Bundle> bundles;
+            for (auto& b : framework.GetBundleContext().GetBundles())
+            {
+                bundles.insert(std::make_pair(b.GetBundleId(), b));
+            }
 
-  return 0;
+            std::cout << std::left;
+
+            std::cout << "Id | " << std::setw(20) << "Symbolic Name"
+                      << " | " << std::setw(9) << "State" << std::endl;
+            std::cout << "-----------------------------------\n";
+
+            for (auto& bundle : bundles)
+            {
+                std::cout << std::right << std::setw(2) << bundle.first << std::left << " | ";
+                std::cout << std::setw(20) << bundle.second.GetSymbolicName() << " | ";
+                std::cout << std::setw(9) << (bundle.second.GetState());
+                std::cout << std::endl;
+            }
+        }
+        else
+        {
+            std::cout << "Unknown command: " << strCmd << " (type 'h' for help)" << std::endl;
+        }
+        std::cout << "> ";
+    }
+
+    framework.Stop();
+    framework.WaitForStop(std::chrono::seconds(2));
+
+    return 0;
 }
 
 #ifndef US_BUILD_SHARED_LIBS

@@ -32,136 +32,142 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-class CCRegisteredStateTest : public ::testing::Test
+namespace cppmicroservices
 {
-protected:
-  CCRegisteredStateTest()
-    : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {
-  }
-  virtual ~CCRegisteredStateTest() = default;
+    namespace scrimpl
+    {
 
-  virtual void SetUp()
-  {
-    framework.Start();
-    auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
-    auto mockRegistry = std::make_shared<MockComponentRegistry>();
-    auto fakeLogger = std::make_shared<FakeLogger>();
-    auto logger = std::make_shared<SCRLogger>(framework.GetBundleContext());
-    auto asyncWorkService =
-      std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-        framework.GetBundleContext(), logger);
-    auto notifier = std::make_shared<ConfigurationNotifier>(
-      framework.GetBundleContext(), fakeLogger, asyncWorkService);
-    auto managers =
-      std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+        class CCRegisteredStateTest : public ::testing::Test
+        {
+          protected:
+            CCRegisteredStateTest() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
+            virtual ~CCRegisteredStateTest() = default;
 
-    mockCompConfig = std::make_shared<MockComponentConfigurationImpl>(
-      mockMetadata, framework, mockRegistry, fakeLogger, notifier, managers);
-  }
+            virtual void
+            SetUp()
+            {
+                framework.Start();
+                auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
+                auto mockRegistry = std::make_shared<MockComponentRegistry>();
+                auto fakeLogger = std::make_shared<FakeLogger>();
+                auto logger = std::make_shared<SCRLogger>(framework.GetBundleContext());
+                auto asyncWorkService
+                    = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(framework.GetBundleContext(),
+                                                                                       logger);
+                auto notifier = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(),
+                                                                        fakeLogger,
+                                                                        asyncWorkService);
+                auto managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
 
-  virtual void TearDown()
-  {
-    mockCompConfig.reset();
-    framework.Stop();
-    framework.WaitForStop(std::chrono::milliseconds::zero());
-  }
+                mockCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
+                                                                                  framework,
+                                                                                  mockRegistry,
+                                                                                  fakeLogger,
+                                                                                  notifier,
+                                                                                  managers);
+            }
 
-  cppmicroservices::Framework framework;
-  std::shared_ptr<MockComponentConfigurationImpl> mockCompConfig;
-};
+            virtual void
+            TearDown()
+            {
+                mockCompConfig.reset();
+                framework.Stop();
+                framework.WaitForStop(std::chrono::milliseconds::zero());
+            }
 
-TEST_F(CCRegisteredStateTest, TestGetStateValue)
-{
-  auto state = std::make_shared<CCRegisteredState>();
-  EXPECT_EQ(state->GetValue(), ComponentState::SATISFIED);
-}
+            cppmicroservices::Framework framework;
+            std::shared_ptr<MockComponentConfigurationImpl> mockCompConfig;
+        };
 
-TEST_F(CCRegisteredStateTest, TestRegister)
-{
-  auto state = std::make_shared<CCRegisteredState>();
-  mockCompConfig->SetState(state);
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
-  EXPECT_NO_THROW({ state->Register(*mockCompConfig); });
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
-  EXPECT_EQ(mockCompConfig->GetState(), state);
-}
+        TEST_F(CCRegisteredStateTest, TestGetStateValue)
+        {
+            auto state = std::make_shared<CCRegisteredState>();
+            EXPECT_EQ(state->GetValue(), ComponentState::SATISFIED);
+        }
 
-TEST_F(CCRegisteredStateTest, TestActivate_Success)
-{
-  auto state = std::make_shared<CCRegisteredState>();
-  auto mockCompInstance = std::make_shared<MockComponentInstance>();
-  mockCompConfig->SetState(state);
-  EXPECT_CALL(*mockCompConfig, CreateAndActivateComponentInstance(testing::_))
-    .Times(1)
-    .WillRepeatedly(testing::Return(mockCompInstance));
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
-  EXPECT_NO_THROW({ state->Activate(*mockCompConfig, framework); });
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::ACTIVE);
-  EXPECT_NE(mockCompConfig->GetState(), state);
-}
+        TEST_F(CCRegisteredStateTest, TestRegister)
+        {
+            auto state = std::make_shared<CCRegisteredState>();
+            mockCompConfig->SetState(state);
+            EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
+            EXPECT_NO_THROW({ state->Register(*mockCompConfig); });
+            EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
+            EXPECT_EQ(mockCompConfig->GetState(), state);
+        }
 
-TEST_F(CCRegisteredStateTest, TestActivate_Failure)
-{
-  auto state = std::make_shared<CCRegisteredState>();
-  mockCompConfig->SetState(state);
-  EXPECT_CALL(*mockCompConfig, CreateAndActivateComponentInstance(testing::_))
-    .Times(1)
-    .WillRepeatedly(testing::Return(nullptr));
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
-  EXPECT_NO_THROW({ state->Activate(*mockCompConfig, framework); });
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
-  EXPECT_NE(mockCompConfig->GetState(), state);
-}
+        TEST_F(CCRegisteredStateTest, TestActivate_Success)
+        {
+            auto state = std::make_shared<CCRegisteredState>();
+            auto mockCompInstance = std::make_shared<MockComponentInstance>();
+            mockCompConfig->SetState(state);
+            EXPECT_CALL(*mockCompConfig, CreateAndActivateComponentInstance(testing::_))
+                .Times(1)
+                .WillRepeatedly(testing::Return(mockCompInstance));
+            EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
+            EXPECT_NO_THROW({ state->Activate(*mockCompConfig, framework); });
+            EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::ACTIVE);
+            EXPECT_NE(mockCompConfig->GetState(), state);
+        }
 
-TEST_F(CCRegisteredStateTest, TestConcurrentActivate)
-{
-  auto state = std::make_shared<CCRegisteredState>();
-  auto mockCompInstance = std::make_shared<MockComponentInstance>();
-  mockCompConfig->SetState(state);
-  EXPECT_CALL(*mockCompConfig, CreateAndActivateComponentInstance(testing::_))
-    .WillRepeatedly(testing::Return(mockCompInstance));
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
-  std::function<bool()> func = [&]() {
-    state->Activate(*mockCompConfig, framework);
-    return (mockCompConfig->GetConfigState() == ComponentState::ACTIVE);
-  };
-  std::vector<bool> resultVec = ConcurrentInvoke<bool>(func);
-  for (auto result : resultVec) {
-    EXPECT_TRUE(result);
-  }
-  EXPECT_NE(mockCompConfig->GetState(), state);
-}
+        TEST_F(CCRegisteredStateTest, TestActivate_Failure)
+        {
+            auto state = std::make_shared<CCRegisteredState>();
+            mockCompConfig->SetState(state);
+            EXPECT_CALL(*mockCompConfig, CreateAndActivateComponentInstance(testing::_))
+                .Times(1)
+                .WillRepeatedly(testing::Return(nullptr));
+            EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
+            EXPECT_NO_THROW({ state->Activate(*mockCompConfig, framework); });
+            EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
+            EXPECT_NE(mockCompConfig->GetState(), state);
+        }
 
-TEST_F(CCRegisteredStateTest, TestDeactivate)
-{
-  auto state = std::make_shared<CCRegisteredState>();
-  mockCompConfig->SetState(state);
-  EXPECT_CALL(*mockCompConfig, DestroyComponentInstances()).Times(1);
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
-  EXPECT_NO_THROW({ state->Deactivate(*mockCompConfig); });
-  EXPECT_EQ(mockCompConfig->GetConfigState(),
-            ComponentState::UNSATISFIED_REFERENCE);
-  EXPECT_NE(mockCompConfig->GetState(), state);
-}
+        TEST_F(CCRegisteredStateTest, TestConcurrentActivate)
+        {
+            auto state = std::make_shared<CCRegisteredState>();
+            auto mockCompInstance = std::make_shared<MockComponentInstance>();
+            mockCompConfig->SetState(state);
+            EXPECT_CALL(*mockCompConfig, CreateAndActivateComponentInstance(testing::_))
+                .WillRepeatedly(testing::Return(mockCompInstance));
+            EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
+            std::function<bool()> func = [&]()
+            {
+                state->Activate(*mockCompConfig, framework);
+                return (mockCompConfig->GetConfigState() == ComponentState::ACTIVE);
+            };
+            std::vector<bool> resultVec = ConcurrentInvoke<bool>(func);
+            for (auto result : resultVec)
+            {
+                EXPECT_TRUE(result);
+            }
+            EXPECT_NE(mockCompConfig->GetState(), state);
+        }
 
-TEST_F(CCRegisteredStateTest, TestConcurrentDeactivate)
-{
-  auto state = std::make_shared<CCRegisteredState>();
-  mockCompConfig->SetState(state);
-  EXPECT_CALL(*mockCompConfig, DestroyComponentInstances()).Times(1);
-  EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
-  std::function<ComponentState()> func = [&]() {
-    state->Deactivate(*mockCompConfig);
-    return mockCompConfig->GetConfigState();
-  };
-  auto results = ConcurrentInvoke(func);
-  EXPECT_EQ(mockCompConfig->GetConfigState(),
-            ComponentState::UNSATISFIED_REFERENCE);
-  EXPECT_NE(mockCompConfig->GetState(), state);
-}
-}
-}
+        TEST_F(CCRegisteredStateTest, TestDeactivate)
+        {
+            auto state = std::make_shared<CCRegisteredState>();
+            mockCompConfig->SetState(state);
+            EXPECT_CALL(*mockCompConfig, DestroyComponentInstances()).Times(1);
+            EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
+            EXPECT_NO_THROW({ state->Deactivate(*mockCompConfig); });
+            EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+            EXPECT_NE(mockCompConfig->GetState(), state);
+        }
+
+        TEST_F(CCRegisteredStateTest, TestConcurrentDeactivate)
+        {
+            auto state = std::make_shared<CCRegisteredState>();
+            mockCompConfig->SetState(state);
+            EXPECT_CALL(*mockCompConfig, DestroyComponentInstances()).Times(1);
+            EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::SATISFIED);
+            std::function<ComponentState()> func = [&]()
+            {
+                state->Deactivate(*mockCompConfig);
+                return mockCompConfig->GetConfigState();
+            };
+            auto results = ConcurrentInvoke(func);
+            EXPECT_EQ(mockCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+            EXPECT_NE(mockCompConfig->GetState(), state);
+        }
+    } // namespace scrimpl
+} // namespace cppmicroservices

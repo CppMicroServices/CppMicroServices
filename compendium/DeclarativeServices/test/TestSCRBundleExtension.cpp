@@ -32,172 +32,162 @@
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
 
-#define str(s) #s
+#define str(s)  #s
 #define xstr(s) str(s)
 
 using cppmicroservices::Any;
-using cppmicroservices::service::component::ComponentConstants::
-  SERVICE_COMPONENT;
+using cppmicroservices::service::component::ComponentConstants::SERVICE_COMPONENT;
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-using cppmicroservices::AnyMap;
-// The fixture for testing class SCRBundleExtension.
-class SCRBundleExtensionTest : public ::testing::Test
+namespace cppmicroservices
 {
-protected:
-  SCRBundleExtensionTest()
-    : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {
-  }
-  ~SCRBundleExtensionTest() = default;
-
-  void SetUp() override { framework.Start(); }
-
-  void TearDown() override
-  {
-    framework.Stop();
-    framework.WaitForStop(std::chrono::milliseconds::zero());
-  }
-
-  cppmicroservices::Framework& GetFramework() { return framework; }
-
-private:
-  cppmicroservices::Framework framework;
-};
-
-TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
-{
-  cppmicroservices::AnyMap headers(
-    cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-  auto mockRegistry = std::make_shared<MockComponentRegistry>();
-  auto fakeLogger = std::make_shared<FakeLogger>();
-  auto logger = std::make_shared<cppmicroservices::scrimpl::SCRLogger>(
-    GetFramework().GetBundleContext());
-  auto asyncWorkService =
-    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext(), logger);
-  auto bundleContext = GetFramework().GetBundleContext();
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    bundleContext, fakeLogger, asyncWorkService);
-  EXPECT_THROW(
+    namespace scrimpl
     {
-      SCRBundleExtension bundleExt(Bundle(),
-                                   headers,
-                                   mockRegistry,
-                                   fakeLogger,
-                                   asyncWorkService,
-                                   notifier);
-    },
-    std::invalid_argument);
-  EXPECT_THROW(
-    {
-      SCRBundleExtension bundleExt(GetFramework(),
-                                   headers,
-                                   nullptr,
-                                   fakeLogger,
-                                   asyncWorkService,
-                                   notifier);
-    },
-    std::invalid_argument);
-  EXPECT_THROW(
-    {
-      SCRBundleExtension bundleExt(GetFramework(),
-                                   headers,
-                                   mockRegistry,
-                                   nullptr,
-                                   asyncWorkService,
-                                   notifier);
-    },
-    std::invalid_argument);
-  EXPECT_THROW(
-    {
-      SCRBundleExtension bundleExt(GetFramework(),
-                                   headers,
-                                   mockRegistry,
-                                   fakeLogger,
-                                   asyncWorkService,
-                                   notifier);
-    },
-    std::invalid_argument);
-}
 
-TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
-{
-  auto bundles = GetFramework().GetBundleContext().GetBundles();
-  auto thisBundleItr = std::find_if(
-    bundles.begin(), bundles.end(), [](const cppmicroservices::Bundle& bundle) {
-      return (bundle.GetSymbolicName() == xstr(US_BUNDLE_NAME));
-    });
-  auto thisBundle = thisBundleItr != bundles.end() ? *thisBundleItr
-                                                   : cppmicroservices::Bundle();
-  ASSERT_TRUE(static_cast<bool>(thisBundle));
-  auto const& scr = ref_any_cast<cppmicroservices::AnyMap>(
-    thisBundle.GetHeaders().at("scr_test_0"));
+        using cppmicroservices::AnyMap;
+        // The fixture for testing class SCRBundleExtension.
+        class SCRBundleExtensionTest : public ::testing::Test
+        {
+          protected:
+            SCRBundleExtensionTest() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
+            ~SCRBundleExtensionTest() = default;
 
-  auto mockRegistry = std::make_shared<MockComponentRegistry>();
-  EXPECT_CALL(*mockRegistry, AddComponentManager(testing::_))
-    .Times(2)
-    .WillOnce(testing::Throw(std::runtime_error("Failed to add component")))
-    .WillOnce(testing::Return(true));
-  EXPECT_CALL(*mockRegistry, RemoveComponentManager(testing::_)).Times(1);
-  auto fakeLogger = std::make_shared<FakeLogger>();
-  auto logger = std::make_shared<cppmicroservices::scrimpl::SCRLogger>(
-    GetFramework().GetBundleContext());
-  auto asyncWorkService =
-    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext(), logger);
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
-  EXPECT_NO_THROW({
-    SCRBundleExtension bundleExt(GetFramework(),
-                                 scr,
-                                 mockRegistry,
-                                 fakeLogger,
-                                 asyncWorkService,
-                                 notifier);
-    EXPECT_EQ(bundleExt.managers->size(), 0u);
-  });
-  EXPECT_NO_THROW({
-    SCRBundleExtension bundleExt(GetFramework(),
-                                 scr,
-                                 mockRegistry,
-                                 fakeLogger,
-                                 asyncWorkService,
-                                 notifier);
-    EXPECT_EQ(bundleExt.managers->size(), 1u);
-  });
-}
+            void
+            SetUp() override
+            {
+                framework.Start();
+            }
 
-// Simulate a DS bundle is stopped before DS is able to cleanup the data associated
-// with the bundle.
-TEST_F(SCRBundleExtensionTest, DtorNoThrow)
-{
-  auto bundle = test::InstallAndStartBundle(GetFramework().GetBundleContext(),
-                                            "TestBundleDSTOI1");
-  ASSERT_TRUE(static_cast<bool>(bundle));
-  auto fakeRegistry = std::make_shared<ComponentRegistry>();
-  auto fakeLogger = std::make_shared<FakeLogger>();
-  auto asyncWorkService =
-    std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
-      GetFramework().GetBundleContext(), fakeLogger);
-  auto notifier = std::make_shared<ConfigurationNotifier>(
-    GetFramework().GetBundleContext(), fakeLogger, asyncWorkService);
-  auto const& headers =
-    ref_any_cast<cppmicroservices::AnyMap>(bundle.GetHeaders().at("scr"));
+            void
+            TearDown() override
+            {
+                framework.Stop();
+                framework.WaitForStop(std::chrono::milliseconds::zero());
+            }
 
-  EXPECT_NO_THROW({
-    SCRBundleExtension bundleExt(
-      bundle, headers, fakeRegistry, fakeLogger, asyncWorkService, notifier);
-    // stop the bundle prior to ~SCRBundleExtension being called. ~SCRBundleExtension
-    // attempts to access the Bundle object, so make sure accessing an invalid
-    // Bundle object doesn't throw.
-    bundle.Stop();
-  });
+            cppmicroservices::Framework&
+            GetFramework()
+            {
+                return framework;
+            }
 
-  asyncWorkService->StopTracking();
-  fakeRegistry->Clear();
-}
-}
-}
+          private:
+            cppmicroservices::Framework framework;
+        };
+
+        TEST_F(SCRBundleExtensionTest, CtorInvalidArgs)
+        {
+            cppmicroservices::AnyMap headers(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+            auto mockRegistry = std::make_shared<MockComponentRegistry>();
+            auto fakeLogger = std::make_shared<FakeLogger>();
+            auto logger = std::make_shared<cppmicroservices::scrimpl::SCRLogger>(GetFramework().GetBundleContext());
+            auto asyncWorkService
+                = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
+                                                                                   logger);
+            auto bundleContext = GetFramework().GetBundleContext();
+            auto notifier = std::make_shared<ConfigurationNotifier>(bundleContext, fakeLogger, asyncWorkService);
+            EXPECT_THROW(
+                {
+                    SCRBundleExtension bundleExt(Bundle(),
+                                                 headers,
+                                                 mockRegistry,
+                                                 fakeLogger,
+                                                 asyncWorkService,
+                                                 notifier);
+                },
+                std::invalid_argument);
+            EXPECT_THROW(
+                {
+                    SCRBundleExtension bundleExt(GetFramework(),
+                                                 headers,
+                                                 nullptr,
+                                                 fakeLogger,
+                                                 asyncWorkService,
+                                                 notifier);
+                },
+                std::invalid_argument);
+            EXPECT_THROW(
+                {
+                    SCRBundleExtension bundleExt(GetFramework(),
+                                                 headers,
+                                                 mockRegistry,
+                                                 nullptr,
+                                                 asyncWorkService,
+                                                 notifier);
+                },
+                std::invalid_argument);
+            EXPECT_THROW(
+                {
+                    SCRBundleExtension bundleExt(GetFramework(),
+                                                 headers,
+                                                 mockRegistry,
+                                                 fakeLogger,
+                                                 asyncWorkService,
+                                                 notifier);
+                },
+                std::invalid_argument);
+        }
+
+        TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
+        {
+            auto bundles = GetFramework().GetBundleContext().GetBundles();
+            auto thisBundleItr = std::find_if(bundles.begin(),
+                                              bundles.end(),
+                                              [](cppmicroservices::Bundle const& bundle)
+                                              { return (bundle.GetSymbolicName() == xstr(US_BUNDLE_NAME)); });
+            auto thisBundle = thisBundleItr != bundles.end() ? *thisBundleItr : cppmicroservices::Bundle();
+            ASSERT_TRUE(static_cast<bool>(thisBundle));
+            auto const& scr = ref_any_cast<cppmicroservices::AnyMap>(thisBundle.GetHeaders().at("scr_test_0"));
+
+            auto mockRegistry = std::make_shared<MockComponentRegistry>();
+            EXPECT_CALL(*mockRegistry, AddComponentManager(testing::_))
+                .Times(2)
+                .WillOnce(testing::Throw(std::runtime_error("Failed to add component")))
+                .WillOnce(testing::Return(true));
+            EXPECT_CALL(*mockRegistry, RemoveComponentManager(testing::_)).Times(1);
+            auto fakeLogger = std::make_shared<FakeLogger>();
+            auto logger = std::make_shared<cppmicroservices::scrimpl::SCRLogger>(GetFramework().GetBundleContext());
+            auto asyncWorkService
+                = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
+                                                                                   logger);
+            auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
+                                                                    fakeLogger,
+                                                                    asyncWorkService);
+            EXPECT_NO_THROW({
+                SCRBundleExtension bundleExt(GetFramework(), scr, mockRegistry, fakeLogger, asyncWorkService, notifier);
+                EXPECT_EQ(bundleExt.managers->size(), 0u);
+            });
+            EXPECT_NO_THROW({
+                SCRBundleExtension bundleExt(GetFramework(), scr, mockRegistry, fakeLogger, asyncWorkService, notifier);
+                EXPECT_EQ(bundleExt.managers->size(), 1u);
+            });
+        }
+
+        // Simulate a DS bundle is stopped before DS is able to cleanup the data associated
+        // with the bundle.
+        TEST_F(SCRBundleExtensionTest, DtorNoThrow)
+        {
+            auto bundle = test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSTOI1");
+            ASSERT_TRUE(static_cast<bool>(bundle));
+            auto fakeRegistry = std::make_shared<ComponentRegistry>();
+            auto fakeLogger = std::make_shared<FakeLogger>();
+            auto asyncWorkService
+                = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
+                                                                                   fakeLogger);
+            auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
+                                                                    fakeLogger,
+                                                                    asyncWorkService);
+            auto const& headers = ref_any_cast<cppmicroservices::AnyMap>(bundle.GetHeaders().at("scr"));
+
+            EXPECT_NO_THROW({
+                SCRBundleExtension bundleExt(bundle, headers, fakeRegistry, fakeLogger, asyncWorkService, notifier);
+                // stop the bundle prior to ~SCRBundleExtension being called. ~SCRBundleExtension
+                // attempts to access the Bundle object, so make sure accessing an invalid
+                // Bundle object doesn't throw.
+                bundle.Stop();
+            });
+
+            asyncWorkService->StopTracking();
+            fakeRegistry->Clear();
+        }
+    } // namespace scrimpl
+} // namespace cppmicroservices

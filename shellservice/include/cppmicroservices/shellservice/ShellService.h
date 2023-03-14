@@ -31,29 +31,30 @@
 #include <string>
 #include <vector>
 
-namespace cppmicroservices {
-
-class BundleResource;
-
-class US_ShellService_EXPORT ShellService
+namespace cppmicroservices
 {
-public:
-  ShellService();
-  ~ShellService();
 
-  void ExecuteCommand(const std::string& cmd);
+    class BundleResource;
 
-  std::vector<std::string> GetCompletions(const std::string& in);
+    class US_ShellService_EXPORT ShellService
+    {
+      public:
+        ShellService();
+        ~ShellService();
 
-private:
-  ShellService(const ShellService&);
-  ShellService& operator=(const ShellService&);
+        void ExecuteCommand(std::string const& cmd);
 
-  void LoadSchemeResource(const BundleResource& res);
+        std::vector<std::string> GetCompletions(std::string const& in);
 
-  struct Impl;
-  std::unique_ptr<Impl> d;
-};
-}
+      private:
+        ShellService(ShellService const&);
+        ShellService& operator=(ShellService const&);
+
+        void LoadSchemeResource(BundleResource const& res);
+
+        struct Impl;
+        std::unique_ptr<Impl> d;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SHELLSERVICE_H

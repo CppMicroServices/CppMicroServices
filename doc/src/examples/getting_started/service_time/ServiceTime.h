@@ -4,8 +4,8 @@
 
 struct SERVICETIME_EXPORT ServiceTime
 {
-  virtual ~ServiceTime();
+    virtual ~ServiceTime();
 
-  // Return the number of milliseconds since POSIX epoch time
-  virtual std::chrono::milliseconds elapsed() const = 0;
+    // Return the number of milliseconds since POSIX epoch time
+    virtual std::chrono::milliseconds elapsed() const = 0;
 };

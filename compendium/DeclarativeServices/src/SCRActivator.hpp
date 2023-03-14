@@ -37,53 +37,54 @@
 
 using cppmicroservices::service::component::runtime::ServiceComponentRuntime;
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-class SCRActivator : public cppmicroservices::BundleActivator
+namespace cppmicroservices
 {
-public:
-  SCRActivator() = default;
-  SCRActivator(const SCRActivator&) = delete;
-  SCRActivator(SCRActivator&&) = delete;
-  SCRActivator& operator=(const SCRActivator&) = delete;
-  SCRActivator& operator=(SCRActivator&&) = delete;
-  ~SCRActivator() override = default;
+    namespace scrimpl
+    {
 
-  // callback methods for bundle lifecycle
-  void Start(cppmicroservices::BundleContext context) override;
-  void Stop(cppmicroservices::BundleContext context) override;
+        class SCRActivator : public cppmicroservices::BundleActivator
+        {
+          public:
+            SCRActivator() = default;
+            SCRActivator(SCRActivator const&) = delete;
+            SCRActivator(SCRActivator&&) = delete;
+            SCRActivator& operator=(SCRActivator const&) = delete;
+            SCRActivator& operator=(SCRActivator&&) = delete;
+            ~SCRActivator() override = default;
 
-protected:
-  /**
-   * bundle listener callback
-   */
-  void BundleChanged(const cppmicroservices::BundleEvent&);
-  /*
-   * This method creates the BundleExtension object for a bundle
-   * with declarative services metadata
-   */
-  void CreateExtension(const cppmicroservices::Bundle& bundle);
-  /*
-   * This method removes the BundleExtension object for a bundle
-   * with declarative services metadata
-   */
-  void DisposeExtension(const cppmicroservices::Bundle& bundle);
+            // callback methods for bundle lifecycle
+            void Start(cppmicroservices::BundleContext context) override;
+            void Stop(cppmicroservices::BundleContext context) override;
 
-private:
-  cppmicroservices::BundleContext runtimeContext;
-  cppmicroservices::ServiceRegistration<ServiceComponentRuntime> scrServiceReg;
-  std::shared_ptr<ComponentRegistry> componentRegistry;
-  std::mutex bundleRegMutex;
-  std::unordered_map<long, std::unique_ptr<SCRBundleExtension>> bundleRegistry;
-  std::shared_ptr<SCRLogger> logger;
-  ListenerToken bundleListenerToken;
-  std::shared_ptr<SCRAsyncWorkService> asyncWorkService;
-  cppmicroservices::ServiceRegistration<
-    cppmicroservices::service::cm::ConfigurationListener>
-    configListenerReg;
-  std::shared_ptr<ConfigurationNotifier> configNotifier;
-};
-} // scrimpl
-} // cppmicroservices
+          protected:
+            /**
+             * bundle listener callback
+             */
+            void BundleChanged(cppmicroservices::BundleEvent const&);
+            /*
+             * This method creates the BundleExtension object for a bundle
+             * with declarative services metadata
+             */
+            void CreateExtension(cppmicroservices::Bundle const& bundle);
+            /*
+             * This method removes the BundleExtension object for a bundle
+             * with declarative services metadata
+             */
+            void DisposeExtension(cppmicroservices::Bundle const& bundle);
+
+          private:
+            cppmicroservices::BundleContext runtimeContext;
+            cppmicroservices::ServiceRegistration<ServiceComponentRuntime> scrServiceReg;
+            std::shared_ptr<ComponentRegistry> componentRegistry;
+            std::mutex bundleRegMutex;
+            std::unordered_map<long, std::unique_ptr<SCRBundleExtension>> bundleRegistry;
+            std::shared_ptr<SCRLogger> logger;
+            ListenerToken bundleListenerToken;
+            std::shared_ptr<SCRAsyncWorkService> asyncWorkService;
+            cppmicroservices::ServiceRegistration<cppmicroservices::service::cm::ConfigurationListener>
+                configListenerReg;
+            std::shared_ptr<ConfigurationNotifier> configNotifier;
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 #endif // SCRACTIVATOR_HPP

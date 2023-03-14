@@ -1,6 +1,7 @@
 #include <iostream>
 
-void SayHello()
+void
+SayHello()
 {
-  std::cout << "Hello" << std::endl;
+    std::cout << "Hello" << std::endl;
 }

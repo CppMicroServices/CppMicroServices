@@ -26,18 +26,19 @@
 
 class ManifestParserFactory
 {
-public:
-  static std::unique_ptr<ManifestParser> Create(unsigned int version)
-  {
-    switch (version) {
-      case 1:
-        return std::make_unique<ManifestParserImplV1>();
-      default:
-        throw std::runtime_error("Unsupported manifest file version '" +
-                                 std::to_string(version) + "'");
-        return nullptr; // to satisfy the compiler. Control should never reach here.
+  public:
+    static std::unique_ptr<ManifestParser>
+    Create(unsigned int version)
+    {
+        switch (version)
+        {
+            case 1:
+                return std::make_unique<ManifestParserImplV1>();
+            default:
+                throw std::runtime_error("Unsupported manifest file version '" + std::to_string(version) + "'");
+                return nullptr; // to satisfy the compiler. Control should never reach here.
+        }
     }
-  }
 };
 
 #endif //  MANIFESTPARSERFACTORY_HPP

@@ -7,22 +7,21 @@
 
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
-namespace sample {
-class ServiceComponentCA04 : public test::CAInterface
+namespace sample
 {
-public:
-  ServiceComponentCA04(const std::shared_ptr<cppmicroservices::AnyMap>& props)
-    : properties(props)
-  {}
+    class ServiceComponentCA04 : public test::CAInterface
+    {
+      public:
+        ServiceComponentCA04(std::shared_ptr<cppmicroservices::AnyMap> const& props) : properties(props) {}
 
-  cppmicroservices::AnyMap GetProperties();
+        cppmicroservices::AnyMap GetProperties();
 
-  ~ServiceComponentCA04() = default;
+        ~ServiceComponentCA04() = default;
 
-private:
-  std::mutex propertiesLock;
-  std::shared_ptr<cppmicroservices::AnyMap> properties;
-};
-}
+      private:
+        std::mutex propertiesLock;
+        std::shared_ptr<cppmicroservices::AnyMap> properties;
+    };
+} // namespace sample
 
 #endif // _SERVICE_IMPL_HPP_

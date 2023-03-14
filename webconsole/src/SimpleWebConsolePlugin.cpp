@@ -31,84 +31,93 @@
 #include "cppmicroservices/BundleResource.h"
 #include "cppmicroservices/ServiceProperties.h"
 
-namespace cppmicroservices {
-
-SimpleWebConsolePlugin::SimpleWebConsolePlugin(const std::string& label,
-                                               const std::string& title,
-                                               std::string category,
-                                               std::vector<std::string> css)
-  : m_Label(label)
-  , m_Title(title)
-  , m_Category(std::move(category))
-  , m_Css(std::move(css))
-  , m_Context()
+namespace cppmicroservices
 {
-  if (label.empty()) {
-    throw std::invalid_argument("Empty label");
-  }
-  if (title.empty()) {
-    throw std::invalid_argument("Empty title");
-  }
 
-  m_LabelRes = "/" + label + "/";
-  m_LabelResLen = m_LabelRes.size() - 1;
-}
+    SimpleWebConsolePlugin::SimpleWebConsolePlugin(std::string const& label,
+                                                   std::string const& title,
+                                                   std::string category,
+                                                   std::vector<std::string> css)
+        : m_Label(label)
+        , m_Title(title)
+        , m_Category(std::move(category))
+        , m_Css(std::move(css))
+        , m_Context()
+    {
+        if (label.empty())
+        {
+            throw std::invalid_argument("Empty label");
+        }
+        if (title.empty())
+        {
+            throw std::invalid_argument("Empty title");
+        }
 
-std::string SimpleWebConsolePlugin::GetLabel() const
-{
-  return m_Label;
-}
+        m_LabelRes = "/" + label + "/";
+        m_LabelResLen = m_LabelRes.size() - 1;
+    }
 
-std::string SimpleWebConsolePlugin::GetTitle() const
-{
-  return m_Title;
-}
+    std::string
+    SimpleWebConsolePlugin::GetLabel() const
+    {
+        return m_Label;
+    }
 
-std::string SimpleWebConsolePlugin::GetCategory() const
-{
-  return m_Category;
-}
+    std::string
+    SimpleWebConsolePlugin::GetTitle() const
+    {
+        return m_Title;
+    }
 
-std::shared_ptr<SimpleWebConsolePlugin> SimpleWebConsolePlugin::Register(
-  const BundleContext& context)
-{
-  ServiceProperties props;
-  props[WebConsoleConstants::PLUGIN_LABEL] = GetLabel();
-  props[WebConsoleConstants::PLUGIN_TITLE] = GetTitle();
-  if (!GetCategory().empty()) {
-    props[WebConsoleConstants::PLUGIN_CATEGORY] = GetCategory();
-  }
-  m_Context = context;
-  m_Reg = m_Context.RegisterService<HttpServlet>(shared_from_this(), props);
-  return std::static_pointer_cast<SimpleWebConsolePlugin>(
-    this->shared_from_this());
-}
+    std::string
+    SimpleWebConsolePlugin::GetCategory() const
+    {
+        return m_Category;
+    }
 
-void SimpleWebConsolePlugin::Unregister()
-{
-  if (m_Reg) {
-    m_Reg.Unregister();
-  }
-  m_Reg = nullptr;
-  m_Context = nullptr;
-}
+    std::shared_ptr<SimpleWebConsolePlugin>
+    SimpleWebConsolePlugin::Register(BundleContext const& context)
+    {
+        ServiceProperties props;
+        props[WebConsoleConstants::PLUGIN_LABEL] = GetLabel();
+        props[WebConsoleConstants::PLUGIN_TITLE] = GetTitle();
+        if (!GetCategory().empty())
+        {
+            props[WebConsoleConstants::PLUGIN_CATEGORY] = GetCategory();
+        }
+        m_Context = context;
+        m_Reg = m_Context.RegisterService<HttpServlet>(shared_from_this(), props);
+        return std::static_pointer_cast<SimpleWebConsolePlugin>(this->shared_from_this());
+    }
 
-std::vector<std::string> SimpleWebConsolePlugin::GetCssReferences() const
-{
-  return m_Css;
-}
+    void
+    SimpleWebConsolePlugin::Unregister()
+    {
+        if (m_Reg)
+        {
+            m_Reg.Unregister();
+        }
+        m_Reg = nullptr;
+        m_Context = nullptr;
+    }
 
-BundleContext SimpleWebConsolePlugin::GetContext() const
-{
-  return m_Context;
-}
+    std::vector<std::string>
+    SimpleWebConsolePlugin::GetCssReferences() const
+    {
+        return m_Css;
+    }
 
-BundleResource SimpleWebConsolePlugin::GetResource(
-  const std::string& path) const
-{
-  return (m_Context && path.size() > m_LabelRes.size() &&
-          path.compare(0, m_LabelRes.size(), m_LabelRes) == 0)
-           ? m_Context.GetBundle().GetResource(path.substr(m_LabelResLen))
-           : BundleResource();
-}
-}
+    BundleContext
+    SimpleWebConsolePlugin::GetContext() const
+    {
+        return m_Context;
+    }
+
+    BundleResource
+    SimpleWebConsolePlugin::GetResource(std::string const& path) const
+    {
+        return (m_Context && path.size() > m_LabelRes.size() && path.compare(0, m_LabelRes.size(), m_LabelRes) == 0)
+                   ? m_Context.GetBundle().GetResource(path.substr(m_LabelResLen))
+                   : BundleResource();
+    }
+} // namespace cppmicroservices

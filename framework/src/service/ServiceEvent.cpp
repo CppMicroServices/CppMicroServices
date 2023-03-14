@@ -24,86 +24,85 @@
 
 #include "cppmicroservices/Constants.h"
 
-namespace cppmicroservices {
-
-class ServiceEventData
+namespace cppmicroservices
 {
-public:
-  ServiceEventData(const ServiceEvent::Type& type,
-                   const ServiceReferenceBase& reference)
-    : type(type)
-    , reference(reference)
-  {
-  }
 
-  const ServiceEvent::Type type;
-  const ServiceReferenceBase reference;
-};
+    class ServiceEventData
+    {
+      public:
+        ServiceEventData(ServiceEvent::Type const& type, ServiceReferenceBase const& reference)
+            : type(type)
+            , reference(reference)
+        {
+        }
 
-ServiceEvent::ServiceEvent()
-  : d(nullptr)
-{
-}
+        const ServiceEvent::Type type;
+        const ServiceReferenceBase reference;
+    };
 
-ServiceEvent::operator bool() const
-{
-  return d.operator bool();
-}
+    ServiceEvent::ServiceEvent() : d(nullptr) {}
 
-ServiceEvent::ServiceEvent(Type type, const ServiceReferenceBase& reference)
-  : d(new ServiceEventData(type, reference))
-{
-}
+    ServiceEvent::operator bool() const { return d.operator bool(); }
 
-ServiceEvent::ServiceEvent(const ServiceEvent&) = default;
+    ServiceEvent::ServiceEvent(Type type, ServiceReferenceBase const& reference)
+        : d(new ServiceEventData(type, reference))
+    {
+    }
 
-ServiceEvent& ServiceEvent::operator=(const ServiceEvent&) = default;
+    ServiceEvent::ServiceEvent(ServiceEvent const&) = default;
 
-ServiceReferenceU ServiceEvent::GetServiceReference() const
-{
-  return d->reference;
-}
+    ServiceEvent& ServiceEvent::operator=(ServiceEvent const&) = default;
 
-ServiceEvent::Type ServiceEvent::GetType() const
-{
-  return d->type;
-}
+    ServiceReferenceU
+    ServiceEvent::GetServiceReference() const
+    {
+        return d->reference;
+    }
 
-std::ostream& operator<<(std::ostream& os, const ServiceEvent::Type& type)
-{
-  switch (type) {
-    case ServiceEvent::SERVICE_MODIFIED:
-      return os << "MODIFIED";
-    case ServiceEvent::SERVICE_MODIFIED_ENDMATCH:
-      return os << "MODIFIED_ENDMATCH";
-    case ServiceEvent::SERVICE_REGISTERED:
-      return os << "REGISTERED";
-    case ServiceEvent::SERVICE_UNREGISTERING:
-      return os << "UNREGISTERING";
+    ServiceEvent::Type
+    ServiceEvent::GetType() const
+    {
+        return d->type;
+    }
 
-    default:
-      return os << "unknown service event type (" << static_cast<int>(type)
-                << ")";
-  }
-}
+    std::ostream&
+    operator<<(std::ostream& os, ServiceEvent::Type const& type)
+    {
+        switch (type)
+        {
+            case ServiceEvent::SERVICE_MODIFIED:
+                return os << "MODIFIED";
+            case ServiceEvent::SERVICE_MODIFIED_ENDMATCH:
+                return os << "MODIFIED_ENDMATCH";
+            case ServiceEvent::SERVICE_REGISTERED:
+                return os << "REGISTERED";
+            case ServiceEvent::SERVICE_UNREGISTERING:
+                return os << "UNREGISTERING";
 
-std::ostream& operator<<(std::ostream& os, const ServiceEvent& event)
-{
-  if (!event)
-    return os << "NONE";
+            default:
+                return os << "unknown service event type (" << static_cast<int>(type) << ")";
+        }
+    }
 
-  os << event.GetType();
+    std::ostream&
+    operator<<(std::ostream& os, ServiceEvent const& event)
+    {
+        if (!event)
+            return os << "NONE";
 
-  ServiceReferenceU sr = event.GetServiceReference();
-  if (sr) {
-    // Some events will not have a service reference
-    auto sid = any_cast<long int>(sr.GetProperty(Constants::SERVICE_ID));
-    os << " " << sid;
+        os << event.GetType();
 
-    Any classes = sr.GetProperty(Constants::OBJECTCLASS);
-    os << " objectClass=" << classes.ToString() << ")";
-  }
+        ServiceReferenceU sr = event.GetServiceReference();
+        if (sr)
+        {
+            // Some events will not have a service reference
+            auto sid = any_cast<long int>(sr.GetProperty(Constants::SERVICE_ID));
+            os << " " << sid;
 
-  return os;
-}
-}
+            Any classes = sr.GetProperty(Constants::OBJECTCLASS);
+            os << " objectClass=" << classes.ToString() << ")";
+        }
+
+        return os;
+    }
+} // namespace cppmicroservices

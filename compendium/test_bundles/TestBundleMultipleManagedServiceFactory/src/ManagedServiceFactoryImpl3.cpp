@@ -2,59 +2,68 @@
 
 #include <iostream>
 
-namespace cppmicroservices {
-namespace service {
-namespace cm {
-namespace test {
-
-TestManagedServiceFactoryImpl3::~TestManagedServiceFactoryImpl3() = default;
-
-void TestManagedServiceFactoryImpl3::Activate(
-  const std::shared_ptr<cppmicroservices::service::component::ComponentContext>&
-    context)
+namespace cppmicroservices
 {
-  bundleContext_ = context->GetBundleContext();
-}
+    namespace service
+    {
+        namespace cm
+        {
+            namespace test
+            {
 
-void TestManagedServiceFactoryImpl3::Updated(std::string const& pid,
-                                             AnyMap const&)
-{
-  std::lock_guard<std::mutex> lk(m_updatedMtx);
-  m_updatedCallCount[pid] += 1;
-}
+                TestManagedServiceFactoryImpl3::~TestManagedServiceFactoryImpl3() = default;
 
-void TestManagedServiceFactoryImpl3::Removed(std::string const& pid)
-{
-  std::lock_guard<std::mutex> lk(m_removedMtx);
-  ++m_removedCallCount[pid];
-}
+                void
+                TestManagedServiceFactoryImpl3::Activate(
+                    std::shared_ptr<cppmicroservices::service::component::ComponentContext> const& context)
+                {
+                    bundleContext_ = context->GetBundleContext();
+                }
 
-int TestManagedServiceFactoryImpl3::getUpdatedCounter(std::string const& pid)
-{
-  std::lock_guard<std::mutex> lk(m_updatedMtx);
-  return m_updatedCallCount[pid];
-}
+                void
+                TestManagedServiceFactoryImpl3::Updated(std::string const& pid, AnyMap const&)
+                {
+                    std::lock_guard<std::mutex> lk(m_updatedMtx);
+                    m_updatedCallCount[pid] += 1;
+                }
 
-int TestManagedServiceFactoryImpl3::getRemovedCounter(std::string const& pid)
-{
-  std::lock_guard<std::mutex> lk(m_removedMtx);
-  return m_removedCallCount[pid];
-}
+                void
+                TestManagedServiceFactoryImpl3::Removed(std::string const& pid)
+                {
+                    std::lock_guard<std::mutex> lk(m_removedMtx);
+                    ++m_removedCallCount[pid];
+                }
 
-std::shared_ptr<::test::TestManagedServiceFactoryServiceInterface>
-TestManagedServiceFactoryImpl3::create(std::string const& config)
-{
+                int
+                TestManagedServiceFactoryImpl3::getUpdatedCounter(std::string const& pid)
+                {
+                    std::lock_guard<std::mutex> lk(m_updatedMtx);
+                    return m_updatedCallCount[pid];
+                }
 
-  std::lock_guard<std::mutex> lk(m_updatedMtx);
-  try {
-    return std::make_shared<TestManagedServiceFactoryServiceImpl3>(
-      m_updatedCallCount.at(config));
-  } catch (...) {
-    return nullptr;
-  }
-}
+                int
+                TestManagedServiceFactoryImpl3::getRemovedCounter(std::string const& pid)
+                {
+                    std::lock_guard<std::mutex> lk(m_removedMtx);
+                    return m_removedCallCount[pid];
+                }
 
-} // namespace test
-} // namespace cm
-} // namespace service
+                std::shared_ptr<::test::TestManagedServiceFactoryServiceInterface>
+                TestManagedServiceFactoryImpl3::create(std::string const& config)
+                {
+
+                    std::lock_guard<std::mutex> lk(m_updatedMtx);
+                    try
+                    {
+                        return std::make_shared<TestManagedServiceFactoryServiceImpl3>(m_updatedCallCount.at(config));
+                    }
+                    catch (...)
+                    {
+                        return nullptr;
+                    }
+                }
+
+            } // namespace test
+        }     // namespace cm
+    }         // namespace service
 } // namespace cppmicroservices

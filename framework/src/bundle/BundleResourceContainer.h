@@ -35,109 +35,101 @@
 #include <string>
 #include <vector>
 
-namespace cppmicroservices {
-
-struct BundleArchive;
-class BundleResource;
-
-class BundleResourceContainer
-  : public std::enable_shared_from_this<BundleResourceContainer>
+namespace cppmicroservices
 {
 
-public:
-  using ManifestT = cppmicroservices::AnyMap;
-  BundleResourceContainer(const std::string& location, const ManifestT&);
-  ~BundleResourceContainer();
+    struct BundleArchive;
+    class BundleResource;
 
-  struct Stat
-  {
-    Stat()
-      : index(-1)
-      , compressedSize(0)
-      , uncompressedSize(0)
-      , modifiedTime(0)
-      , crc32(0)
-      , isDir(false)
+    class BundleResourceContainer : public std::enable_shared_from_this<BundleResourceContainer>
     {
-    }
 
-    std::string filePath;
-    int index;
-    int compressedSize;
-    int uncompressedSize;
-    time_t modifiedTime;
-    uint32_t crc32;
-    bool isDir;
-  };
+      public:
+        using ManifestT = cppmicroservices::AnyMap;
+        BundleResourceContainer(std::string const& location, ManifestT const&);
+        ~BundleResourceContainer();
 
-  std::string GetLocation() const;
+        struct Stat
+        {
+            Stat() : index(-1), compressedSize(0), uncompressedSize(0), modifiedTime(0), crc32(0), isDir(false) {}
 
-  std::vector<std::string> GetTopLevelDirs() const;
+            std::string filePath;
+            int index;
+            int compressedSize;
+            int uncompressedSize;
+            time_t modifiedTime;
+            uint32_t crc32;
+            bool isDir;
+        };
 
-  bool GetStat(Stat& stat);
-  bool GetStat(int index, Stat& stat);
+        std::string GetLocation() const;
 
-  std::unique_ptr<void, void (*)(void*)> GetData(int index);
+        std::vector<std::string> GetTopLevelDirs() const;
 
-  void GetChildren(const std::string& resourcePath,
-                   bool relativePaths,
-                   std::vector<std::string>& names,
-                   std::vector<uint32_t>& indices) const;
+        bool GetStat(Stat& stat);
+        bool GetStat(int index, Stat& stat);
 
-  void FindNodes(const std::shared_ptr<const BundleArchive>& archive,
-                 const std::string& path,
-                 const std::string& filePattern,
-                 bool recurse,
-                 std::vector<BundleResource>& resources) const;
+        std::unique_ptr<void, void (*)(void*)> GetData(int index);
 
-  /// Force close the file handle to the underlying zip file.
-  /// This function should only be used as an optimization to
-  /// control the number of open file handles on platforms
-  /// with a limit (e.g. Windows).
-  void CloseContainer();
+        void GetChildren(std::string const& resourcePath,
+                         bool relativePaths,
+                         std::vector<std::string>& names,
+                         std::vector<uint32_t>& indices) const;
 
-private:
-  using NameIndexPair = std::pair<std::string, int>;
+        void FindNodes(std::shared_ptr<const BundleArchive> const& archive,
+                       std::string const& path,
+                       std::string const& filePattern,
+                       bool recurse,
+                       std::vector<BundleResource>& resources) const;
 
-  struct PairComp
-  {
-    inline bool operator()(const NameIndexPair& p1,
-                           const NameIndexPair& p2) const
-    {
-      return p1.first < p2.first;
-    }
-  };
+        /// Force close the file handle to the underlying zip file.
+        /// This function should only be used as an optimization to
+        /// control the number of open file handles on platforms
+        /// with a limit (e.g. Windows).
+        void CloseContainer();
 
-  void InitSortedEntries() const;
+      private:
+        using NameIndexPair = std::pair<std::string, int>;
 
-  bool Matches(const std::string& name, const std::string& filePattern) const;
+        struct PairComp
+        {
+            inline bool
+            operator()(NameIndexPair const& p1, NameIndexPair const& p2) const
+            {
+                return p1.first < p2.first;
+            }
+        };
 
-  /// Initialize miniz with the resource zip file information.
-  /// throws std::runtime_error if the underlying zip file cannot be opened or read.
-  void InitMiniz() const;
+        void InitSortedEntries() const;
 
-  /// Opens the zip file so that data can be accessed.
-  /// This function is thread-safe.
-  /// Throws std::runtime_error if the underlying zip file cannot be opened.
-  void OpenAndInitializeContainer() const;
+        bool Matches(std::string const& name, std::string const& filePattern) const;
 
-  const std::string m_Location;
-  mutable mz_zip_archive m_ZipArchive;
-  mutable std::unique_ptr<BundleObjFile> m_ObjFile;
+        /// Initialize miniz with the resource zip file information.
+        /// throws std::runtime_error if the underlying zip file cannot be opened or read.
+        void InitMiniz() const;
 
-  mutable std::set<NameIndexPair, PairComp> m_SortedEntries;
-  mutable std::set<std::string> m_SortedToplevelDirs;
+        /// Opens the zip file so that data can be accessed.
+        /// This function is thread-safe.
+        /// Throws std::runtime_error if the underlying zip file cannot be opened.
+        void OpenAndInitializeContainer() const;
 
-  // This is used to synchronize miniz file stream API calls.
-  // Working with file streams is stateful (e.g. current read position)
-  // and hence not thread-safe.
-  mutable std::mutex m_ZipFileStreamMutex;
+        const std::string m_Location;
+        mutable mz_zip_archive m_ZipArchive;
+        mutable std::unique_ptr<BundleObjFile> m_ObjFile;
 
-  // Synchronize opening/closing the underlying zip file. Only one thread
-  // should open the underlying zip file.
-  mutable std::mutex m_ZipFileMutex;
-  mutable bool m_IsContainerOpen;
-};
-}
+        mutable std::set<NameIndexPair, PairComp> m_SortedEntries;
+        mutable std::set<std::string> m_SortedToplevelDirs;
+
+        // This is used to synchronize miniz file stream API calls.
+        // Working with file streams is stateful (e.g. current read position)
+        // and hence not thread-safe.
+        mutable std::mutex m_ZipFileStreamMutex;
+
+        // Synchronize opening/closing the underlying zip file. Only one thread
+        // should open the underlying zip file.
+        mutable std::mutex m_ZipFileMutex;
+        mutable bool m_IsContainerOpen;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLERESOURCECONTAINER_H

@@ -28,13 +28,17 @@ using namespace cppmicroservices;
 
 class MyStaticBundleActivator : public BundleActivator
 {
-public:
-  void Start(BundleContext /*context*/)
-  {
-    std::cout << "Hello from a static bundle." << std::endl;
-  }
+  public:
+    void
+    Start(BundleContext /*context*/)
+    {
+        std::cout << "Hello from a static bundle." << std::endl;
+    }
 
-  void Stop(BundleContext /*context*/) {}
+    void
+    Stop(BundleContext /*context*/)
+    {
+    }
 };
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(MyStaticBundleActivator)

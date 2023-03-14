@@ -28,50 +28,50 @@
 #include <fstream>
 
 #ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4275)
+#    pragma warning(push)
+#    pragma warning(disable : 4275)
 #endif
 
-namespace cppmicroservices {
-
-class BundleResource;
-
-/**
- * \ingroup MicroServices
- *
- * An input stream class for BundleResource objects.
- *
- * This class provides access to the resource data embedded in a bundle's
- * shared library via a STL input stream interface.
- *
- * \see BundleResource for an example how to use this class.
- */
-class US_Framework_EXPORT BundleResourceStream
-  : private detail::BundleResourceBuffer
-  , public std::istream
+namespace cppmicroservices
 {
 
-public:
-  BundleResourceStream(const BundleResourceStream&) = delete;
-  BundleResourceStream& operator=(const BundleResourceStream&) = delete;
+    class BundleResource;
 
-  /**
-   * Construct a %BundleResourceStream object.
-   *
-   * @param resource The BundleResource object for which an input stream
-   * should be constructed.
-   * @param mode The open mode of the stream. If \c std::ios_base::binary
-   * is used, the resource data will be treated as binary data, otherwise
-   * the data is interpreted as text data and the usual platform specific
-   * end-of-line translations take place.
-   */
-  BundleResourceStream(const BundleResource& resource,
-                       std::ios_base::openmode mode = std::ios_base::in);
-};
-}
+    /**
+     * \ingroup MicroServices
+     *
+     * An input stream class for BundleResource objects.
+     *
+     * This class provides access to the resource data embedded in a bundle's
+     * shared library via a STL input stream interface.
+     *
+     * \see BundleResource for an example how to use this class.
+     */
+    class US_Framework_EXPORT BundleResourceStream
+        : private detail::BundleResourceBuffer
+        , public std::istream
+    {
+
+      public:
+        BundleResourceStream(BundleResourceStream const&) = delete;
+        BundleResourceStream& operator=(BundleResourceStream const&) = delete;
+
+        /**
+         * Construct a %BundleResourceStream object.
+         *
+         * @param resource The BundleResource object for which an input stream
+         * should be constructed.
+         * @param mode The open mode of the stream. If \c std::ios_base::binary
+         * is used, the resource data will be treated as binary data, otherwise
+         * the data is interpreted as text data and the usual platform specific
+         * end-of-line translations take place.
+         */
+        BundleResourceStream(BundleResource const& resource, std::ios_base::openmode mode = std::ios_base::in);
+    };
+} // namespace cppmicroservices
 
 #ifdef _MSC_VER
-#  pragma warning(pop)
+#    pragma warning(pop)
 #endif
 
 #endif // CPPMICROSERVICES_BUNDLERESOURCESTREAM_H

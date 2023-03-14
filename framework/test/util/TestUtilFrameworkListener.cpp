@@ -31,7 +31,8 @@ namespace cppmicroservices {
 
 TestFrameworkListener::TestFrameworkListener()
   : _events()
-{}
+{
+}
 TestFrameworkListener::~TestFrameworkListener(){};
 
 std::size_t TestFrameworkListener::events_received() const
@@ -45,9 +46,9 @@ bool TestFrameworkListener::CheckEvents(
   bool listenState = true; // assume success
   if (events.size() != _events.size()) {
     listenState = false;
-    ADD_FAILURE()<< "*** Framework event mismatch ***\n expected "
-                   << events.size() << " event(s)\n found " << _events.size()
-                   << " event(s).";
+    ADD_FAILURE() << "*** Framework event mismatch ***\n expected "
+                  << events.size() << " event(s)\n found " << _events.size()
+                  << " event(s).";
 
     const std::size_t max =
       events.size() > _events.size() ? events.size() : _events.size();
@@ -56,7 +57,7 @@ bool TestFrameworkListener::CheckEvents(
         i < events.size() ? events[i] : FrameworkEvent();
       const FrameworkEvent& pR =
         i < _events.size() ? _events[i] : FrameworkEvent();
-      std::cout<< " - " << pE << " - " << pR;
+      std::cout << " - " << pE << " - " << pR;
     }
   } else {
     for (std::size_t i = 0; i < events.size(); ++i) {
@@ -64,8 +65,8 @@ bool TestFrameworkListener::CheckEvents(
       const FrameworkEvent& pR = _events[i];
       if (pE.GetType() != pR.GetType() || pE.GetBundle() != pR.GetBundle()) {
         listenState = false;
-        ADD_FAILURE()<< "*** Wrong framework event ***\n found " << pR
-                       << "\n expected " << pE;
+        ADD_FAILURE() << "*** Wrong framework event ***\n found " << pR
+                      << "\n expected " << pE;
       }
     }
   }

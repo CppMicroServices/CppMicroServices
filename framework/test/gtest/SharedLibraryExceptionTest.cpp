@@ -38,7 +38,8 @@ class SharedLibraryExceptionTest : public ::testing::Test
 protected:
   SharedLibraryExceptionTest()
     : f(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   virtual ~SharedLibraryExceptionTest() = default;
 

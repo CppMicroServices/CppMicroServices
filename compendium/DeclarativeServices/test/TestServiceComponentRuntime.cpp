@@ -44,7 +44,8 @@ protected:
   TestServiceComponentRuntime()
     : ::testing::Test()
     , framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   virtual ~TestServiceComponentRuntime() = default;
 
   virtual void SetUp() { framework.Start(); }

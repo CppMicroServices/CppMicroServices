@@ -125,7 +125,8 @@ ServiceListenerEntry::ServiceListenerEntry(
   const std::string& filter)
   : ServiceListenerHook::ListenerInfo(
       new ServiceListenerEntryData(context, l, data, tokenId, filter))
-{}
+{
+}
 
 const LDAPExpr& ServiceListenerEntry::GetLDAPExpr() const
 {

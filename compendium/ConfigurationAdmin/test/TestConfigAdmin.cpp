@@ -78,8 +78,9 @@ void InstallAndStartDSAndConfigAdmin(::cppmicroservices::BundleContext& ctx)
   }
 }
 
-std::vector<cppmicroservices::Bundle> InstallBundles(cppmicroservices::BundleContext& ctx,
-        const std::string& bundleName)
+std::vector<cppmicroservices::Bundle> InstallBundles(
+  cppmicroservices::BundleContext& ctx,
+  const std::string& bundleName)
 {
   std::string path = PathToLib(bundleName);
   return ctx.InstallBundles(path);
@@ -108,8 +109,8 @@ getManagedServices(cppmicroservices::BundleContext& ctx)
 {
   auto srs = ctx.GetServiceReferences<::test::TestManagedServiceInterface>();
   std::vector<std::shared_ptr<::test::TestManagedServiceInterface>> services;
-  for (const auto& sr: srs) {
-    services.push_back( ctx.GetService<::test::TestManagedServiceInterface>(sr));
+  for (const auto& sr : srs) {
+    services.push_back(ctx.GetService<::test::TestManagedServiceInterface>(sr));
   }
 
   return services;
@@ -201,7 +202,8 @@ class ConfigAdminTests : public ::testing::Test
 public:
   ConfigAdminTests()
     : m_framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   void SetUp() override
   {
@@ -546,7 +548,6 @@ TEST_F(ConfigAdminTests, testRemoveFactoryConfiguration)
   configuration_config1->UpdateIfDifferent(props).second.get();
   expectedCount_config1 = initConfiguredCount_config1;
   EXPECT_EQ(serviceFactory->getUpdatedCounter("cm.testfactory~config1"), 7);
-
 }
 // This test confirms that if an object exists in the configuration repository
 // but has not yet been Updated prior to the start of the ManagedServiceFactory
@@ -584,39 +585,50 @@ TEST_F(ConfigAdminTests, testDuplicateUpdated)
 /// <summary>
 /// Used by ConfigAdminTests.testConcurrentDuplicateManagedServiceUpdated
 /// </summary>
-namespace cppmicroservices { namespace test {
-    class TestManagedServiceInterface : public cppmicroservices::service::cm::ManagedService {
-    public:
-        virtual ~TestManagedServiceInterface() noexcept = default;
+namespace cppmicroservices {
+namespace test {
+class TestManagedServiceInterface
+  : public cppmicroservices::service::cm::ManagedService
+{
+public:
+  virtual ~TestManagedServiceInterface() noexcept = default;
 
-        void Updated(const cppmicroservices::AnyMap&) override = 0;
-        virtual unsigned long getUpdatedMethodCallCount() noexcept = 0;
-    };
+  void Updated(const cppmicroservices::AnyMap&) override = 0;
+  virtual unsigned long getUpdatedMethodCallCount() noexcept = 0;
+};
 
-    class TestManagedService : public TestManagedServiceInterface {
-    public:
-        TestManagedService() : updatedCount_{0} {}
-        virtual ~TestManagedService() noexcept = default;
+class TestManagedService : public TestManagedServiceInterface
+{
+public:
+  TestManagedService()
+    : updatedCount_{ 0 }
+  {
+  }
+  virtual ~TestManagedService() noexcept = default;
 
-        void Updated(const cppmicroservices::AnyMap& props) override {
-            std::unique_lock<std::mutex> lock(updatedCountMutex_);
-            // empty properties can be sent when stopping the configadmin
-            // service. For the purpose of this test we only want to
-            // update the count when non-empty properties have been sent.
-            if(!props.empty()) {
-              updatedCount_++;
-            }
-        }
+  void Updated(const cppmicroservices::AnyMap& props) override
+  {
+    std::unique_lock<std::mutex> lock(updatedCountMutex_);
+    // empty properties can be sent when stopping the configadmin
+    // service. For the purpose of this test we only want to
+    // update the count when non-empty properties have been sent.
+    if (!props.empty()) {
+      updatedCount_++;
+    }
+  }
 
-        unsigned long getUpdatedMethodCallCount() noexcept override {
-            std::unique_lock<std::mutex> lock(updatedCountMutex_);
-            return updatedCount_;
-        }
-    private:
-        unsigned long updatedCount_;
-        std::mutex updatedCountMutex_;
-    };
-}}
+  unsigned long getUpdatedMethodCallCount() noexcept override
+  {
+    std::unique_lock<std::mutex> lock(updatedCountMutex_);
+    return updatedCount_;
+  }
+
+private:
+  unsigned long updatedCount_;
+  std::mutex updatedCountMutex_;
+};
+}
+}
 
 // This test simulates sending a config update when two threads are
 // racing to register a ManagedService and update the configuration
@@ -753,7 +765,8 @@ TEST_F(ConfigAdminTests, testConcurrentDuplicateManagedServiceFactoryUpdated)
 /// DS bundle with a ManagedService service within its Activate method. This test
 /// is meant to simulate nested calls to Configuration Admin's service trackers
 /// and test for deadlocks.
-TEST_F(ConfigAdminTests, testNestedBundleInstallAndStart) {
+TEST_F(ConfigAdminTests, testNestedBundleInstallAndStart)
+{
   auto f = GetFramework();
   auto ctx = f.GetBundleContext();
 
@@ -761,17 +774,19 @@ TEST_F(ConfigAdminTests, testNestedBundleInstallAndStart) {
   // happen within the Activate of TestBundleNestedBundleStartManagedService
   // It is done this way so that the test bundles don't have to have knowledge
   // about the paths to test bundles.
-  auto bundles = ctx.InstallBundles(PathToLib("ManagedServiceAndFactoryBundle"));
+  auto bundles =
+    ctx.InstallBundles(PathToLib("ManagedServiceAndFactoryBundle"));
   ASSERT_EQ(1ul, bundles.size());
 
   // This bundle's Activate method has a call to start TestBundleManagedService, which will trigger
   // a call to Config Admin's service tracker.
-  auto const numBundles =
-    installAndStartTestBundles(ctx, "TestBundleNestedBundleStartManagedService");
+  auto const numBundles = installAndStartTestBundles(
+    ctx, "TestBundleNestedBundleStartManagedService");
   ASSERT_EQ(numBundles, 1ul);
 }
 
-TEST_F(ConfigAdminTests, testMultipleManagedServicesInBundleGetUpdate) {
+TEST_F(ConfigAdminTests, testMultipleManagedServicesInBundleGetUpdate)
+{
   auto f = GetFramework();
   auto ctx = f.GetBundleContext();
 
@@ -781,21 +796,17 @@ TEST_F(ConfigAdminTests, testMultipleManagedServicesInBundleGetUpdate) {
 
   auto services = getManagedServices(ctx);
   ASSERT_EQ(services.size(), 2ul);
-  std::for_each(std::begin(services),
-                std::end(services),
-                [](auto& service) { ASSERT_NE(service, nullptr); });
+  std::for_each(std::begin(services), std::end(services), [](auto& service) {
+    ASSERT_NE(service, nullptr);
+  });
 
-  auto sharedConfiguration =
-    m_configAdmin->GetConfiguration("cm.testservice");
+  auto sharedConfiguration = m_configAdmin->GetConfiguration("cm.testservice");
   ASSERT_EQ(sharedConfiguration->GetPid(), "cm.testservice");
   ASSERT_TRUE(sharedConfiguration->GetProperties().empty());
 
-  std::for_each(std::begin(services),
-                std::end(services),
-                [](auto& service) {
-                  ASSERT_EQ(service->getCounter(),
-                            0);
-                });
+  std::for_each(std::begin(services), std::end(services), [](auto& service) {
+    ASSERT_EQ(service->getCounter(), 0);
+  });
 
   cppmicroservices::AnyMap props(
     cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
@@ -804,12 +815,9 @@ TEST_F(ConfigAdminTests, testMultipleManagedServicesInBundleGetUpdate) {
   auto fut = sharedConfiguration->Update(props);
   fut.get();
 
-  std::for_each(std::begin(services),
-                std::end(services),
-                [](auto& service) {
-                  ASSERT_EQ(service->getCounter(),
-                            1);
-                });
+  std::for_each(std::begin(services), std::end(services), [](auto& service) {
+    ASSERT_EQ(service->getCounter(), 1);
+  });
 }
 
 TEST_F(ConfigAdminTests, testMultipleManagedFactoriesInBundleGetUpdate)
@@ -863,7 +871,7 @@ class TestManagedServiceInterface2
 {
 public:
   virtual ~TestManagedServiceInterface2() noexcept = default;
-  void Updated(const cppmicroservices::AnyMap&) override = 0; 
+  void Updated(const cppmicroservices::AnyMap&) override = 0;
 };
 
 class TestManagedServiceImpl : public TestManagedServiceInterface2
@@ -871,12 +879,13 @@ class TestManagedServiceImpl : public TestManagedServiceInterface2
 public:
   TestManagedServiceImpl(cppmicroservices::Framework& framework)
     : m_framework(framework)
-   {}
+  {
+  }
   virtual ~TestManagedServiceImpl() noexcept = default;
 
   void Updated(const cppmicroservices::AnyMap& props) override
-  { 
-    // The Updated method is called for both Updated and Removed operations. 
+  {
+    // The Updated method is called for both Updated and Removed operations.
     // For the Removed operations, the properties are empty.
     if (props.empty()) {
       auto ctx = m_framework.GetBundleContext();
@@ -936,20 +945,20 @@ TEST_F(ConfigAdminTests, testManagedServiceRemoveConfigurationsDeadlock)
   // is updated or removed.
   cppmicroservices::ServiceProperties serviceProperties;
   serviceProperties["service.pid"] =
-  cppmicroservices::Any(std::string("cm.testdeadlock"));
-      (void)
-        ctx.RegisterService<cppmicroservices::test::TestManagedServiceInterface2,
-                            cppmicroservices::service::cm::ManagedService>(
-          std::make_shared<cppmicroservices::test::TestManagedServiceImpl>(f),
-          serviceProperties);
- 
+    cppmicroservices::Any(std::string("cm.testdeadlock"));
+  (void)
+    ctx.RegisterService<cppmicroservices::test::TestManagedServiceInterface2,
+                        cppmicroservices::service::cm::ManagedService>(
+      std::make_shared<cppmicroservices::test::TestManagedServiceImpl>(f),
+      serviceProperties);
+
   // Stop the bundle containing the cm.testdeadlock configuration object. This causes
   // ConfigurationAdminImpl::RemoveConfigurations to execute. It sends an Updated notification
   // to the TestManagedServiceImpl service. With the WaitForAllAsync method present in
-  // in RemoveConfigurations, the bundle Stop command won't return until the Updated 
-  // notification is complete. Unfortunately, the Updated method also tries to stop the 
+  // in RemoveConfigurations, the bundle Stop command won't return until the Updated
+  // notification is complete. Unfortunately, the Updated method also tries to stop the
   // bundle and a deadlock results.
   for (auto& b : bundles) {
-     b.Stop();
+    b.Stop();
   }
 }

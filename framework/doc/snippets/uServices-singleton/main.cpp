@@ -15,7 +15,8 @@ public:
   MyActivator()
     : m_SingletonOne(nullptr)
     , m_SingletonTwo(nullptr)
-  {}
+  {
+  }
 
   //![0]
   void Start(BundleContext context)

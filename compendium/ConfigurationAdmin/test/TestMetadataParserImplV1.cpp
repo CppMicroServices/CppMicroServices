@@ -96,7 +96,8 @@ class TestMetadataParserImplV1 : public ::testing::Test
 protected:
   TestMetadataParserImplV1()
     : logger(std::make_shared<FakeLogger>())
-  {}
+  {
+  }
   ~TestMetadataParserImplV1() override = default;
 
 private:
@@ -161,7 +162,8 @@ struct MetadataInvalidManifestState
   MetadataInvalidManifestState(std::string manifest, std::string errorOut)
     : manifestName(std::move(manifest))
     , errorOutput(std::move(errorOut))
-  {}
+  {
+  }
 
   std::string manifestName;
   std::string errorOutput;
@@ -184,7 +186,8 @@ private:
 protected:
   TestInvalidMetadata()
     : logger(std::make_shared<FakeLogger>())
-  {}
+  {
+  }
 
   ~TestInvalidMetadata() override = default;
 

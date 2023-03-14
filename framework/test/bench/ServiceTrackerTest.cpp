@@ -228,9 +228,7 @@ BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithBundleContext)
   ->UseManualTime();
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, OpenServiceTrackerWithInterfaceName)
   ->UseManualTime();
-BENCHMARK(CloseServiceTracker)
-  ->RangeMultiplier(2)
-  ->Range(1000, 1000000);
+BENCHMARK(CloseServiceTracker)->RangeMultiplier(2)->Range(1000, 1000000);
 
 // Run this benchmark for each Arg(...) call, passing in the parameter value to the benchmark.
 BENCHMARK_REGISTER_F(ServiceTrackerFixture, ServiceTrackerScalability)

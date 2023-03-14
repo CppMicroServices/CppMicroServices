@@ -20,11 +20,11 @@
 
   =============================================================================*/
 
+#include "ConfigurationNotifier.hpp"
 #include "../ComponentRegistry.hpp"
 #include "../metadata/ComponentMetadata.hpp"
 #include "ComponentConfigurationImpl.hpp"
 #include "ComponentManagerImpl.hpp"
-#include "ConfigurationNotifier.hpp"
 #include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
@@ -154,7 +154,7 @@ void ConfigurationNotifier::CreateFactoryComponent(
   // component except the factory component itself.
   newMetadata->configurationPids.clear();
   for (const auto& basePid : oldMetadata->configurationPids) {
-    if (basePid != oldMetadata->configurationPids[0])  {
+    if (basePid != oldMetadata->configurationPids[0]) {
       newMetadata->configurationPids.emplace_back(basePid);
     }
   }

@@ -70,7 +70,8 @@ struct ReferenceMetadataParserValidState
     , target(_target)
     , minCardinality(_minCardinality)
     , maxCardinality(_maxCardinality)
-  {}
+  {
+  }
 
   std::size_t metadataIndex;
   std::string interface;
@@ -325,7 +326,8 @@ struct ReferenceMetadataParserInvalidState
     : metadataIndex(_metadataIndex)
     , errorOutput(_errorOutput)
     , isPartial(_isPartial)
-  {}
+  {
+  }
 
   std::size_t metadataIndex;
   std::string errorOutput;

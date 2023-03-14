@@ -39,7 +39,8 @@ public:
   explicit NoBodyOutputStreamBuffer(HttpServletResponsePrivate* response)
     : HttpOutputStreamBuffer(response)
     , m_ContentLength(0)
-  {}
+  {
+  }
 
   std::size_t GetContentLength() const { return m_ContentLength; }
 
@@ -129,7 +130,8 @@ const std::string HttpServlet::PROP_CONTEXT_ROOT =
 
 HttpServlet::HttpServlet()
   : d(new HttpServletPrivate)
-{}
+{
+}
 
 void HttpServlet::Init(const ServletConfig& config)
 {

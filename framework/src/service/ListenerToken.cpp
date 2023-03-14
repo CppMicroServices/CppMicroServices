@@ -28,11 +28,13 @@ namespace cppmicroservices {
 
 ListenerToken::ListenerToken()
   : tokenId(ListenerTokenId(0))
-{}
+{
+}
 
 ListenerToken::ListenerToken(ListenerTokenId _tokenId)
   : tokenId(_tokenId)
-{}
+{
+}
 
 ListenerToken::ListenerToken(ListenerToken&& other) noexcept
   : tokenId(std::move(other.tokenId))

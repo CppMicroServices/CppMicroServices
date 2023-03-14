@@ -110,7 +110,6 @@ TEST_F(tServiceComponent, testFactoryPidConstructionNameDifferentThanClass)
   std::string configurationPid = "ServiceComponentPid";
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA21");
 
-  
   // Get a service reference to ConfigAdmin to create the factory component instance.
   auto configAdminService =
     GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
@@ -131,13 +130,11 @@ TEST_F(tServiceComponent, testFactoryPidConstructionNameDifferentThanClass)
   props["uniqueProp"] = instanceId;
   auto fut = factoryConfig->Update(props);
   fut.get();
-  
+
   //Request a service reference to the new component instance. This will
   //cause DS to construct the instance with the updated properties.
   auto instance = GetInstance<test::CAInterface>();
   ASSERT_TRUE(instance) << "GetService failed for CAInterface";
-
-
 }
 
 /* testFactoryConfigBeforeInstall
@@ -153,7 +150,7 @@ TEST_F(tServiceComponent, testFactoryConfigBeforeInstall)
 
   // Get a service reference to ConfigAdmin to create the factory component instances.
   auto configAdminService =
-      GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+    GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
   ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
   // Create some factory configuration objects.
@@ -161,25 +158,24 @@ TEST_F(tServiceComponent, testFactoryConfigBeforeInstall)
   for (int i = 0; i < count; i++) {
     // Create the factory configuration object
     auto factoryConfig =
-        configAdminService->CreateFactoryConfiguration(configurationPid);
-    
+      configAdminService->CreateFactoryConfiguration(configurationPid);
+
     // Update the properties for the factory configuration object
     cppmicroservices::AnyMap props(
-        cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-    const std::string instanceId{ "instance" + std::to_string(i)};
+      cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+    const std::string instanceId{ "instance" + std::to_string(i) };
     props["uniqueProp"] = instanceId;
     auto fut = factoryConfig->Update(props);
     fut.get();
   }
 
   // Start the test bundle containing the factory component. This will
-  // cause DS to register the factory instances. 
+  // cause DS to register the factory instances.
   cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA21");
-   
+
   //Request service references to the new component instances. This will
   //cause DS to construct the factory instances.
   auto instances = GetInstances<test::CAInterface>();
   EXPECT_EQ(instances.size(), count);
- }
 }
-
+}

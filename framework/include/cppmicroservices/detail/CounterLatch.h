@@ -57,7 +57,8 @@ class CounterLatch final
 public:
   CounterLatch()
     : count(0)
-  {}
+  {
+  }
   CounterLatch(const CounterLatch&) = delete;
   CounterLatch(CounterLatch&&) = delete;
   CounterLatch& operator=(const CounterLatch&) = delete;
@@ -111,7 +112,7 @@ public:
     }
     cond.wait(lock, [&]() { return count == 0; });
     count = (std::numeric_limits<
-      long>::min)(); // makes the latch unusable for other threads
+             long>::min)(); // makes the latch unusable for other threads
   }
 
   /**

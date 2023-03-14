@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#include "TestFixture.hpp"
 #include "ConcurrencyTestUtil.hpp"
+#include "TestFixture.hpp"
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/ServiceObjects.h"
@@ -298,16 +298,19 @@ TEST_F(tServiceComponent, testMultipleInterfaces) //DS_TOI_16
  *  containing the exception with the Log Service, if present, and the
  *  component configuration is not activated.
  */
-TEST_F(tServiceComponent, testServiceCtorThrow) {
+TEST_F(tServiceComponent, testServiceCtorThrow)
+{
   auto bundle = test::InstallAndStartBundle(framework.GetBundleContext(),
-                              "TestBundleDSUpstreamDependencyA");
+                                            "TestBundleDSUpstreamDependencyA");
   auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(
     bundle, "dependent::TestBundleDSUpstreamDependencyImpl");
 
-  auto compConfigDTO = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+  auto compConfigDTO =
+    dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
   EXPECT_EQ(compConfigDTO.size(), 1);
-  EXPECT_EQ(compConfigDTO[0].state, cppmicroservices::service::component::runtime::
-                                 dto::ComponentState::SATISFIED);
+  EXPECT_EQ(compConfigDTO[0].state,
+            cppmicroservices::service::component::runtime::dto::ComponentState::
+              SATISFIED);
 
   auto ctxt = framework.GetBundleContext();
   auto sRef = ctxt.GetServiceReference<test::TestBundleDSUpstreamDependency>();
@@ -318,23 +321,27 @@ TEST_F(tServiceComponent, testServiceCtorThrow) {
   // the component configuration must not be active.
   compConfigDTO = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
   EXPECT_EQ(compConfigDTO.size(), 1);
-  EXPECT_EQ(compConfigDTO[0].state, cppmicroservices::service::component::runtime::
-                                 dto::ComponentState::SATISFIED);
+  EXPECT_EQ(compConfigDTO[0].state,
+            cppmicroservices::service::component::runtime::dto::ComponentState::
+              SATISFIED);
 }
 
-TEST_F(tServiceComponent, testConcurrentGetServiceOnLazilyLoadedService) {
+TEST_F(tServiceComponent, testConcurrentGetServiceOnLazilyLoadedService)
+{
   auto bundle = test::InstallAndStartBundle(framework.GetBundleContext(),
                                             "TestBundleDSTOI16");
   ASSERT_TRUE(bundle);
 
-  std::function<cppmicroservices::InterfaceMapConstPtr()> func = [&bundle]() { 
-      auto context = bundle.GetBundleContext();
-      std::vector<cppmicroservices::ServiceReferenceU> serviceReferences = bundle.GetRegisteredServices();
-      return context.GetService(serviceReferences.front());
+  std::function<cppmicroservices::InterfaceMapConstPtr()> func = [&bundle]() {
+    auto context = bundle.GetBundleContext();
+    std::vector<cppmicroservices::ServiceReferenceU> serviceReferences =
+      bundle.GetRegisteredServices();
+    return context.GetService(serviceReferences.front());
   };
   auto results = ConcurrentInvoke(func);
-  ASSERT_TRUE(std::all_of(results.begin(),
-                          results.end(),
+  ASSERT_TRUE(
+    std::all_of(results.begin(),
+                results.end(),
                 [](cppmicroservices::InterfaceMapConstPtr& p) { return !!p; }));
 
   bundle.Uninstall();

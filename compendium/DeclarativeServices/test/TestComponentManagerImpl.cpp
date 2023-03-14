@@ -134,7 +134,8 @@ class ComponentManagerImplParameterizedTest
 protected:
   ComponentManagerImplParameterizedTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   virtual ~ComponentManagerImplParameterizedTest() = default;
 

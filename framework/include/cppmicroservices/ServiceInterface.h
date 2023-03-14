@@ -137,18 +137,21 @@ struct InterfacesTuple
 
 template<class T, class... List>
 struct Contains : std::true_type
-{};
+{
+};
 
 template<class T, class Head, class... Rest>
 struct Contains<T, Head, Rest...>
   : std::conditional<std::is_same<T, Head>::value,
                      std::true_type,
                      Contains<T, Rest...>>::type
-{};
+{
+};
 
 template<class T>
 struct Contains<T> : std::false_type
-{};
+{
+};
 }
 /// \endcond
 }
@@ -257,7 +260,8 @@ public:
   MakeInterfaceMap(const std::shared_ptr<Impl>& impl)
     : m_interfaces(
         detail::InterfacesTuple<std::tuple, Interfaces...>::create(impl))
-  {}
+  {
+  }
 
   /**
    * Constructor taking a service factory.

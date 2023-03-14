@@ -75,7 +75,8 @@ public:
       virtual void UngetService(const Bundle& /*bundle*/,
                                 const ServiceRegistrationBase& /*registration*/,
                                 const InterfaceMapConstPtr& /*service*/)
-      {}
+      {
+      }
     };
 
     std::shared_ptr<MyServiceFactory> myServiceFactory =
@@ -100,7 +101,8 @@ public:
       virtual void UngetService(const Bundle& /*bundle*/,
                                 const ServiceRegistrationBase& /*registration*/,
                                 const InterfaceMapConstPtr& /*service*/)
-      {}
+      {
+      }
     };
 
     std::shared_ptr<MyServiceFactory> myServiceFactory =

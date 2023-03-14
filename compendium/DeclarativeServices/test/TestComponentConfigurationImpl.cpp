@@ -52,7 +52,8 @@ class ComponentConfigurationImplTest : public ::testing::Test
 protected:
   ComponentConfigurationImplTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   virtual ~ComponentConfigurationImplTest() = default;
 

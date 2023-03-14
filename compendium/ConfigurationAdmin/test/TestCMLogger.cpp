@@ -44,7 +44,8 @@ class TestCMLogger : public ::testing::Test
 protected:
   TestCMLogger()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   ~TestCMLogger() override = default;
 
@@ -70,16 +71,14 @@ TEST_F(TestCMLogger, VerifyWithoutLoggerService)
   // check that calling log method is safe even if a LogService is unavailable
   EXPECT_NO_THROW({
     logger.Log(SeverityLevel::LOG_DEBUG, "sample log message");
-    logger.Log(
-      SeverityLevel::LOG_DEBUG,
-      "sample log message",
-      std::make_exception_ptr(std::runtime_error("error occured")));
+    logger.Log(SeverityLevel::LOG_DEBUG,
+               "sample log message",
+               std::make_exception_ptr(std::runtime_error("error occured")));
     logger.Log(dummyRef, SeverityLevel::LOG_DEBUG, "sample log message");
-    logger.Log(
-      dummyRef,
-      SeverityLevel::LOG_DEBUG,
-      "sample log message",
-      std::make_exception_ptr(std::runtime_error("error occured")));
+    logger.Log(dummyRef,
+               SeverityLevel::LOG_DEBUG,
+               "sample log message",
+               std::make_exception_ptr(std::runtime_error("error occured")));
   });
 }
 
@@ -106,18 +105,16 @@ TEST_F(TestCMLogger, VerifyWithLoggerService)
     // exercise methods on instance of CMLogger
     CMLogger logger(bundleContext);
     logger.Log(SeverityLevel::LOG_DEBUG, "some sample debug message");
-    logger.Log(
-      SeverityLevel::LOG_ERROR,
-      "some sample error message",
-      std::make_exception_ptr(std::runtime_error("error occured")));
+    logger.Log(SeverityLevel::LOG_ERROR,
+               "some sample error message",
+               std::make_exception_ptr(std::runtime_error("error occured")));
     cppmicroservices::ServiceReferenceU dummyRef;
     logger.Log(
       dummyRef, SeverityLevel::LOG_WARNING, "some sample warning message");
-    logger.Log(
-      dummyRef,
-      SeverityLevel::LOG_ERROR,
-      "some sample error message with service reference",
-      std::make_exception_ptr(std::runtime_error("error occured")));
+    logger.Log(dummyRef,
+               SeverityLevel::LOG_ERROR,
+               "some sample error message with service reference",
+               std::make_exception_ptr(std::runtime_error("error occured")));
     reg.Unregister();
   });
 }

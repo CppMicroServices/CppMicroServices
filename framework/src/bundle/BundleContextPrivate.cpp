@@ -57,7 +57,8 @@ std::shared_ptr<BundleContextPrivate> GetPrivate(const BundleContext& c)
 BundleContextPrivate::BundleContextPrivate(BundlePrivate* bundle_)
   : bundle(bundle_->shared_from_this())
   , valid(true)
-{}
+{
+}
 
 bool BundleContextPrivate::IsValid() const
 {

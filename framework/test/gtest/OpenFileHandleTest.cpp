@@ -102,7 +102,7 @@ TEST(OpenFileHandleTest, InstallBundle)
     << "The handle counts before and after installing a bundle should not "
        "differ.";
 
-  f.Stop(); 
+  f.Stop();
   f.WaitForStop(std::chrono::seconds::zero());
 }
 
@@ -140,18 +140,15 @@ TEST(OpenFileHandleTest, InstallBundleFailure)
   std::string testModulePath =
     cppmicroservices::testing::LIB_PATH + util::DIR_SEP + US_LIB_PREFIX +
     "TestModuleWithEmbeddedZip" + US_LIB_POSTFIX + US_LIB_EXT;
-  EXPECT_TRUE(
-    mz_zip_reader_init_file(&zipArchive, testModulePath.c_str(), 0));
+  EXPECT_TRUE(mz_zip_reader_init_file(&zipArchive, testModulePath.c_str(), 0));
 
   mz_uint numFiles =
     mz_zip_reader_get_num_files(const_cast<mz_zip_archive*>(&zipArchive));
   EXPECT_EQ(numFiles, 1) << "Wrong # of files in the zip found.";
   for (mz_uint fileIndex = 0; fileIndex < numFiles; ++fileIndex) {
     char fileName[MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE];
-    if (mz_zip_reader_get_filename(&zipArchive,
-                                   fileIndex,
-                                   fileName,
-                                   MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE)) {
+    if (mz_zip_reader_get_filename(
+          &zipArchive, fileIndex, fileName, MZ_ZIP_MAX_ARCHIVE_FILENAME_SIZE)) {
       std::string strFileName{ fileName };
       std::size_t pos = strFileName.find_first_of('/');
       EXPECT_EQ(pos, std::string::npos)
@@ -175,4 +172,3 @@ TEST(OpenFileHandleTest, InstallBundleFailure)
   f.Stop();
   f.WaitForStop(std::chrono::seconds::zero());
 }
-

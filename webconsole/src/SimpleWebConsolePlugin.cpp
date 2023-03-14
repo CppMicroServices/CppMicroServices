@@ -33,11 +33,10 @@
 
 namespace cppmicroservices {
 
-SimpleWebConsolePlugin::SimpleWebConsolePlugin(
-  const std::string& label,
-  const std::string& title,
-  std::string  category,
-  std::vector<std::string>  css)
+SimpleWebConsolePlugin::SimpleWebConsolePlugin(const std::string& label,
+                                               const std::string& title,
+                                               std::string category,
+                                               std::vector<std::string> css)
   : m_Label(label)
   , m_Title(title)
   , m_Category(std::move(category))

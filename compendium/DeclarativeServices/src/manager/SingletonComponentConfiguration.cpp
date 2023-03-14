@@ -21,8 +21,8 @@
   =============================================================================*/
 
 #include "SingletonComponentConfiguration.hpp"
-#include "ComponentManager.hpp"
 #include "../ComponentRegistry.hpp"
+#include "ComponentManager.hpp"
 #include "ReferenceManager.hpp"
 #include "ReferenceManagerImpl.hpp"
 #include "RegistrationManager.hpp"
@@ -53,7 +53,8 @@ SingletonComponentConfigurationImpl::SingletonComponentConfigurationImpl(
                                logger,
                                configNotifier,
                                managers)
-{}
+{
+}
 
 std::shared_ptr<ServiceFactory>
 SingletonComponentConfigurationImpl::GetFactory()
@@ -151,14 +152,20 @@ InterfaceMapConstPtr SingletonComponentConfigurationImpl::GetService(
   const cppmicroservices::ServiceRegistrationBase& registration)
 {
   // if activation passed, return the interface map from the instance
-  std::shared_ptr<cppmicroservices::service::component::detail::ComponentInstance> compInstance;
+  std::shared_ptr<
+    cppmicroservices::service::component::detail::ComponentInstance>
+    compInstance;
   try {
     compInstance = Activate(bundle);
   } catch (const cppmicroservices::SecurityException&) {
     auto compManagerRegistry = GetRegistry();
-    auto compMgrs = compManagerRegistry->GetComponentManagers(registration.GetReference().GetBundle().GetBundleId());
-    std::for_each(compMgrs.begin(),
-                  compMgrs.end(), [this](const std::shared_ptr<cppmicroservices::scrimpl::ComponentManager>& compMgr) {
+    auto compMgrs = compManagerRegistry->GetComponentManagers(
+      registration.GetReference().GetBundle().GetBundleId());
+    std::for_each(
+      compMgrs.begin(),
+      compMgrs.end(),
+      [this](const std::shared_ptr<cppmicroservices::scrimpl::ComponentManager>&
+               compMgr) {
         try {
           compMgr->Disable().get();
         } catch (...) {

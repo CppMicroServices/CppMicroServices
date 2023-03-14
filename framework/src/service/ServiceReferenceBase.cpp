@@ -35,7 +35,8 @@ namespace cppmicroservices {
 
 ServiceReferenceBase::ServiceReferenceBase()
   : d(new ServiceReferenceBasePrivate(nullptr))
-{}
+{
+}
 
 ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
   : d(ref.d.load())
@@ -45,7 +46,8 @@ ServiceReferenceBase::ServiceReferenceBase(const ServiceReferenceBase& ref)
 
 ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
   : d(new ServiceReferenceBasePrivate(reg))
-{}
+{
+}
 
 void ServiceReferenceBase::SetInterfaceId(const std::string& interfaceId)
 {

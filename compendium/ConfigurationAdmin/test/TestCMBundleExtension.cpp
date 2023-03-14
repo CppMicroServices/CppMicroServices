@@ -42,7 +42,8 @@ class TestCMBundleExtension : public ::testing::Test
 protected:
   TestCMBundleExtension()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   ~TestCMBundleExtension() = default;
 
   void SetUp() override { framework.Start(); }

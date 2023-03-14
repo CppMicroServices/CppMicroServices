@@ -102,7 +102,7 @@ std::shared_future<void> ConfigurationImpl::Update(AnyMap newProperties)
   }
   std::lock_guard<std::mutex> lk{ configAdminMutex };
   if (configAdminImpl) {
-   return configAdminImpl->NotifyConfigurationUpdated(pid, changeCount);
+    return configAdminImpl->NotifyConfigurationUpdated(pid, changeCount);
   }
   std::promise<void> ready;
   std::shared_future<void> fut = ready.get_future();

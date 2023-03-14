@@ -36,7 +36,8 @@ class ServiceComponentRuntimeImplTest : public ::testing::Test
 protected:
   ServiceComponentRuntimeImplTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   virtual ~ServiceComponentRuntimeImplTest() = default;
 

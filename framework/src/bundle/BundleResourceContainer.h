@@ -58,7 +58,8 @@ public:
       , modifiedTime(0)
       , crc32(0)
       , isDir(false)
-    {}
+    {
+    }
 
     std::string filePath;
     int index;

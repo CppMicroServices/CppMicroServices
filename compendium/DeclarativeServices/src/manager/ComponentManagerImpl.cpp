@@ -22,8 +22,8 @@
 
 #include "ComponentManagerImpl.hpp"
 #include "ConcurrencyUtil.hpp"
-#include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/SecurityException.h"
+#include "cppmicroservices/SharedLibraryException.h"
 #include "states/CMDisabledState.hpp"
 #include "states/CMEnabledState.hpp"
 #include "states/ComponentManagerState.hpp"

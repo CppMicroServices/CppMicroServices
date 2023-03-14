@@ -5,11 +5,13 @@ namespace sample {
 
 void ServiceComponentDynamicGreedyMandatoryUnary::Activate(
   const std::shared_ptr<ComponentContext>& /*ctxt*/)
-{}
+{
+}
 
 void ServiceComponentDynamicGreedyMandatoryUnary::Deactivate(
   const std::shared_ptr<ComponentContext>&)
-{}
+{
+}
 
 std::string ServiceComponentDynamicGreedyMandatoryUnary::ExtendedDescription()
 {

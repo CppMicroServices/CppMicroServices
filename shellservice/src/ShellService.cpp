@@ -279,7 +279,8 @@ struct ShellService::Impl
 {
   Impl()
     : m_Scheme(scheme_init_new())
-  {}
+  {
+  }
   ~Impl() { free(m_Scheme); }
 
   void InitSymbols();

@@ -388,12 +388,14 @@ char* mkdtemps_compat(char* tmpl, int suffixlen)
 File::File()
   : FileDescr(-1)
   , Path()
-{}
+{
+}
 
 File::File(int fd, const std::string& path)
   : FileDescr(fd)
   , Path(path)
-{}
+{
+}
 
 File::File(File&& o)
   : FileDescr(o.FileDescr)
@@ -419,11 +421,13 @@ TempDir::TempDir() {}
 
 TempDir::TempDir(const std::string& path)
   : Path(path)
-{}
+{
+}
 
 TempDir::TempDir(TempDir&& o)
   : Path(std::move(o.Path))
-{}
+{
+}
 
 TempDir& TempDir::operator=(TempDir&& o)
 {

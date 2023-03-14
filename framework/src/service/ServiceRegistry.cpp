@@ -100,7 +100,7 @@ namespace cppmicroservices
 
         std::vector<std::string> classes;
         // Check if service implements claimed classes and that they exist.
-        for (auto i : *service)
+        for (auto& i : *service)
         {
             if (i.first.empty() || (!isFactory && i.second == nullptr))
             {
@@ -263,11 +263,9 @@ namespace cppmicroservices
 
         for (; s != send; ++s)
         {
-            ServiceReferenceBase sri = s->GetReference(clazz);
-
             if (filter.empty() || ldap.Evaluate(PropertiesHandle(s->d->properties, true), false))
             {
-                res.push_back(sri);
+                res.emplace_back(s->GetReference(clazz));
             }
         }
 

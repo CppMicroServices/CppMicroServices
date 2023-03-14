@@ -84,7 +84,7 @@ public:
     const ServiceReference<cppmicroservices::logservice::LogService>& reference,
     const std::shared_ptr<cppmicroservices::logservice::LogService>& service)
     override;
-  
+
   // methods for the CFRLogger class
   void Open();
   void Close();

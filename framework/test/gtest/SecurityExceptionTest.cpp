@@ -20,19 +20,19 @@ limitations under the License.
 
 =============================================================================*/
 
-#include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/SecurityException.h"
+#include "cppmicroservices/Bundle.h"
 
 #include "TestUtils.h"
 
 #include "gtest/gtest.h"
 
-TEST(SecurityExceptionTest, ctor) {
+TEST(SecurityExceptionTest, ctor)
+{
 
   cppmicroservices::Bundle b;
   std::string excMessage{ "foo" };
-  cppmicroservices::SecurityException secException(excMessage,
-                                                   b);
+  cppmicroservices::SecurityException secException(excMessage, b);
 
   cppmicroservices::SecurityException copyOfException = secException;
 

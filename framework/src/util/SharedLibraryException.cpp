@@ -31,7 +31,8 @@ SharedLibraryException::SharedLibraryException(std::error_code ec,
                                                Bundle origin)
   : std::system_error(std::move(ec), std::move(msg))
   , origin(std::move(origin))
-{}
+{
+}
 
 Bundle SharedLibraryException::GetBundle() const
 {

@@ -104,10 +104,11 @@ SCRBundleExtension::~SCRBundleExtension()
 {
   try {
     DisableAndRemoveAllComponentManagers();
-  } catch(...) {
+  } catch (...) {
     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
-                "Exception while removing component managers for bundle " + 
-                bundle_.GetSymbolicName(), std::current_exception());
+                "Exception while removing component managers for bundle " +
+                  bundle_.GetSymbolicName(),
+                std::current_exception());
   }
   managers->clear();
   registry.reset();
@@ -122,7 +123,8 @@ void SCRBundleExtension::DisableAndRemoveAllComponentManagers()
     auto fut = compManager->Disable();
     registry->RemoveComponentManager(compManager);
     try {
-      fut.get(); // since this happens when the bundle is stopped. Wait until the disable is finished on the other thread.
+      fut
+        .get(); // since this happens when the bundle is stopped. Wait until the disable is finished on the other thread.
     } catch (...) {
       std::string errMsg("An exception occurred while disabling "
                          "component manager: ");

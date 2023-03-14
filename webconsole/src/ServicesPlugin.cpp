@@ -42,7 +42,8 @@ std::string NumToString(int64_t val);
 
 ServicesPlugin::ServicesPlugin()
   : SimpleWebConsolePlugin("services", "Services", "")
-{}
+{
+}
 
 void ServicesPlugin::RenderContent(HttpServletRequest& request,
                                    HttpServletResponse& response)

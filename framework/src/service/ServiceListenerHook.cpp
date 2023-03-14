@@ -45,17 +45,20 @@ ServiceListenerHook::ListenerInfoData::ListenerInfoData(
   , tokenId(tokenId)
   , filter(std::move(filter))
   , bRemoved(false)
-{}
+{
+}
 
 ServiceListenerHook::ListenerInfoData::~ListenerInfoData() = default;
 
 ServiceListenerHook::ListenerInfo::ListenerInfo(ListenerInfoData* data)
   : d(data)
-{}
+{
+}
 
 ServiceListenerHook::ListenerInfo::ListenerInfo()
   : d(nullptr)
-{}
+{
+}
 
 ServiceListenerHook::ListenerInfo::ListenerInfo(const ListenerInfo&) = default;
 

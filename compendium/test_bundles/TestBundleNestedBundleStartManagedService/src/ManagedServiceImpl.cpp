@@ -32,7 +32,8 @@ namespace test {
 
 TestManagedServiceImpl::TestManagedServiceImpl()
   : m_counter{ 0 }
-{ }
+{
+}
 
 TestManagedServiceImpl::~TestManagedServiceImpl() = default;
 
@@ -48,16 +49,16 @@ void TestManagedServiceImpl::Updated(AnyMap const& properties)
 }
 
 void TestManagedServiceImpl::Activate(
-  const std::shared_ptr<
-    cppmicroservices::service::component::ComponentContext>& ctx)
+  const std::shared_ptr<cppmicroservices::service::component::ComponentContext>&
+    ctx)
 {
   auto installedBundles = ctx->GetBundleContext().GetBundles();
-  auto testBundleIter =
-    std::find_if(installedBundles.begin(),
-                 installedBundles.end(),
-                 [](const cppmicroservices::Bundle& b) {
-                   return (b.GetSymbolicName() == "ManagedServiceAndFactoryBundle");
-                 });
+  auto testBundleIter = std::find_if(
+    installedBundles.begin(),
+    installedBundles.end(),
+    [](const cppmicroservices::Bundle& b) {
+      return (b.GetSymbolicName() == "ManagedServiceAndFactoryBundle");
+    });
   assert(testBundleIter != installedBundles.end());
   testBundleIter->Start();
 }

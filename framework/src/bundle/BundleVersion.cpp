@@ -55,7 +55,8 @@ BundleVersion& BundleVersion::operator=(const BundleVersion&) = default;
 BundleVersion::BundleVersion(bool undefined)
   : qualifier("")
   , undefined(undefined)
-{}
+{
+}
 
 void BundleVersion::Validate()
 {
@@ -74,7 +75,8 @@ BundleVersion::BundleVersion(unsigned int majorVersion,
   , microVersion(microVersion)
   , qualifier("")
   , undefined(false)
-{}
+{
+}
 
 BundleVersion::BundleVersion(unsigned int majorVersion,
                              unsigned int minorVersion,

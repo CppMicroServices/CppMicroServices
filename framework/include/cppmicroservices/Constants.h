@@ -335,7 +335,8 @@ US_Framework_EXPORT extern const std::string
  * Framework bundle validation property specifying a function that control
  * whether a shared library is loaded or not into the process.
  */
-US_Framework_EXPORT extern const std::string FRAMEWORK_BUNDLE_VALIDATION_FUNC; // = "org.cppmicroservices.framework.bundle.validation.function"
+US_Framework_EXPORT extern const std::string
+  FRAMEWORK_BUNDLE_VALIDATION_FUNC; // = "org.cppmicroservices.framework.bundle.validation.function"
 
 /*
  * Service properties.

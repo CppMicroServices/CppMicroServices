@@ -47,7 +47,8 @@ public:
                             const ServiceReferenceBase& reference)
     : m_context(std::move(context))
     , m_reference(reference)
-  {}
+  {
+  }
 
   InterfaceMapConstPtr GetServiceInterfaceMap()
   {
@@ -100,7 +101,8 @@ struct UngetHelper
     : interfaceMap(std::move(im))
     , sref(sr)
     , b(b)
-  {}
+  {
+  }
   ~UngetHelper()
   {
     try {
@@ -187,11 +189,13 @@ ServiceReferenceBase ServiceObjectsBase::GetReference() const
 
 ServiceObjectsBase::ServiceObjectsBase(ServiceObjectsBase&& other) noexcept
   : d(std::move(other.d))
-{}
+{
+}
 
 ServiceObjectsBase::~ServiceObjectsBase() = default;
 
-ServiceObjectsBase& ServiceObjectsBase::operator=(ServiceObjectsBase&& other) noexcept
+ServiceObjectsBase& ServiceObjectsBase::operator=(
+  ServiceObjectsBase&& other) noexcept
 {
   d = std::move(other.d);
   return *this;
@@ -199,9 +203,11 @@ ServiceObjectsBase& ServiceObjectsBase::operator=(ServiceObjectsBase&& other) no
 
 ServiceObjects<void>::ServiceObjects(ServiceObjects&& other) noexcept
   : ServiceObjectsBase(std::move(other))
-{}
+{
+}
 
-ServiceObjects<void>& ServiceObjects<void>::operator=(ServiceObjects&& other) noexcept
+ServiceObjects<void>& ServiceObjects<void>::operator=(
+  ServiceObjects&& other) noexcept
 {
   ServiceObjectsBase::operator=(std::move(other));
   return *this;
@@ -221,5 +227,6 @@ ServiceObjects<void>::ServiceObjects(
   const std::shared_ptr<BundleContextPrivate>& context,
   const ServiceReferenceU& reference)
   : ServiceObjectsBase(context, reference)
-{}
+{
+}
 }

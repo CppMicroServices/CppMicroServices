@@ -220,10 +220,10 @@ ConfigurationAdminImpl::~ConfigurationAdminImpl()
       const auto it = configurationsToInvalidate.find(managedService->getPid());
       if (it != std::end(configurationsToInvalidate) &&
           it->second->HasBeenUpdatedAtLeastOnce()) {
-          notifyServiceUpdated(managedService->getPid(),
-                               *(managedService->getTrackedService()),
-                               emptyMap,
-                               *logger);
+        notifyServiceUpdated(managedService->getPid(),
+                             *(managedService->getTrackedService()),
+                             emptyMap,
+                             *logger);
       }
     }
   }
@@ -240,11 +240,12 @@ ConfigurationAdminImpl::~ConfigurationAdminImpl()
     for (const auto& pid : it->second) {
       // can only send a Removed notification if the managedServiceFactory has previously
       // received an Updated notification.
-   
+
       const auto it = configurationsToInvalidate.find(pid);
-      if (it != std::end(configurationsToInvalidate) && (it->second->HasBeenUpdatedAtLeastOnce())) {
-           notifyServiceRemoved(
-            pid, *(managedServiceFactory->getTrackedService()), *logger);
+      if (it != std::end(configurationsToInvalidate) &&
+          (it->second->HasBeenUpdatedAtLeastOnce())) {
+        notifyServiceRemoved(
+          pid, *(managedServiceFactory->getTrackedService()), *logger);
       }
     }
   }
@@ -392,7 +393,7 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
   std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs;
   std::vector<bool> createdOrUpdated;
   std::vector<std::shared_ptr<ConfigurationImpl>> configurationsToInvalidate;
-  
+
   {
     std::lock_guard<std::mutex> lk{ configurationsMutex };
     for (const auto& configMetadata : configurationMetadata) {
@@ -402,21 +403,14 @@ std::vector<ConfigurationAddedInfo> ConfigurationAdminImpl::AddConfigurations(
       if (it == std::end(configurations)) {
         auto factoryPid = getFactoryPid(pid);
         AddFactoryInstanceIfRequired(pid, factoryPid);
-        // construct the Configuration Object with a changeCount of 1 
+        // construct the Configuration Object with a changeCount of 1
         // since configuration objects created from metadata already
         // have their properties (if any) present. The create operation
         // counts as a create and an update operation.
         auto newConfig = std::make_shared<ConfigurationImpl>(
-                           this,
-                           pid,
-                           std::move(factoryPid),
-                           configMetadata.properties,
-                           1u);
+          this, pid, std::move(factoryPid), configMetadata.properties, 1u);
         changeCount = newConfig->GetChangeCount();
-        it = configurations
-               .emplace(pid,
-                        std::move(newConfig))
-               .first;
+        it = configurations.emplace(pid, std::move(newConfig)).first;
         pidsAndChangeCountsAndIDs.emplace_back(
           pid, changeCount, reinterpret_cast<std::uintptr_t>(it->second.get()));
         createdOrUpdated.push_back(true);
@@ -542,7 +536,8 @@ void ConfigurationAdminImpl::RemoveConfigurations(
 }
 
 std::shared_future<void> ConfigurationAdminImpl::NotifyConfigurationUpdated(
-  const std::string& pid, const unsigned long changeCount)
+  const std::string& pid,
+  const unsigned long changeCount)
 {
   // NotifyConfigurationUpdated will only send a notification to the service if
   // the configuration object has been updated at least once. In order to determine whether or not
@@ -744,10 +739,10 @@ ConfigurationAdminImpl::AddingService(
     return nullptr;
   }
 
-  // Send a notification in case a valid configuration object 
+  // Send a notification in case a valid configuration object
   // was created before the service was active. The service's properties
-  // need to be updated. 
-  unsigned long initialChangeCount{0ul};
+  // need to be updated.
+  unsigned long initialChangeCount{ 0ul };
 
   const auto it = configurations.find(pid);
   if (it != std::end(configurations)) {
@@ -757,7 +752,7 @@ ConfigurationAdminImpl::AddingService(
     if (it->second->HasBeenUpdatedAtLeastOnce()) {
       try {
         properties = it->second->GetProperties();
-	// specifically set the initial change count here because there is
+        // specifically set the initial change count here because there is
         // a race between the call to GetChangeCount() and HasBeenUpdatedAtLeastOnce().
         // The logic is that, if HasBeenUpdatedAtLeastOnce() returns true, the change
         // count will always be > 1 and should at this point be captured for the
@@ -783,13 +778,14 @@ ConfigurationAdminImpl::AddingService(
   }
 
   logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-              "New ManagedService with PID " + pid +
-                " has been added.");
+              "New ManagedService with PID " + pid + " has been added.");
 
-  std::unordered_map<std::string, unsigned long> initialChangeCountByPid = {{pid, initialChangeCount}};
+  std::unordered_map<std::string, unsigned long> initialChangeCountByPid = {
+    { pid, initialChangeCount }
+  };
   auto trackedManagedService = std::make_shared<
     TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>(
-        pid, std::move(initialChangeCountByPid), std::move(managedService));
+    pid, std::move(initialChangeCountByPid), std::move(managedService));
   trackedManagedServices_.emplace_back(trackedManagedService);
   return trackedManagedService;
 }
@@ -813,18 +809,20 @@ void ConfigurationAdminImpl::RemovedService(
   // Lock because we are modifying the container of tracked managed services.
   std::lock_guard<std::mutex> lk{ configurationsMutex };
 
-  auto elemIter = std::find_if(
-    std::begin(trackedManagedServices_),
-    std::end(trackedManagedServices_),
-    [&service](const auto& trackedServiceWrapper) {
-      return (service->getTrackedService() == trackedServiceWrapper->getTrackedService());
-    });
+  auto elemIter =
+    std::find_if(std::begin(trackedManagedServices_),
+                 std::end(trackedManagedServices_),
+                 [&service](const auto& trackedServiceWrapper) {
+                   return (service->getTrackedService() ==
+                           trackedServiceWrapper->getTrackedService());
+                 });
   if (elemIter != trackedManagedServices_.end()) {
     trackedManagedServices_.erase(elemIter);
   }
   // ManagedService won't receive any more updates to its Configuration.
   logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-              "ManagedService with PID " + service->getPid() + " has been removed.");
+              "ManagedService with PID " + service->getPid() +
+                " has been removed.");
 }
 
 std::shared_ptr<
@@ -855,7 +853,7 @@ ConfigurationAdminImpl::AddingService(
         (bundle ? bundle.GetSymbolicName() : "Unknown") +
         " as it does not have a service.pid or component.name property");
     return nullptr;
-  }  
+  }
 
   std::vector<std::pair<std::string, AnyMap>> pidsAndProperties;
   std::unordered_map<std::string, unsigned long> initialChangeCountPerPid;
@@ -867,20 +865,21 @@ ConfigurationAdminImpl::AddingService(
       assert(configurationIt != std::end(configurations) &&
              "Invalid Configuration iterator");
       try {
-        // Notifications can only be sent for configuration objects that 
+        // Notifications can only be sent for configuration objects that
         // been Updated. Only add it to the notification list if it has
         // been Updated.
         if (configurationIt->second->HasBeenUpdatedAtLeastOnce()) {
           auto properties = configurationIt->second->GetProperties();
-          initialChangeCountPerPid[configurationIt->second->GetPid()] = configurationIt->second->GetChangeCount();
+          initialChangeCountPerPid[configurationIt->second->GetPid()] =
+            configurationIt->second->GetChangeCount();
           pidsAndProperties.emplace_back(instance, std::move(properties));
         }
       } catch (const std::runtime_error&) {
         // Configuration is being removed
-        logger->Log(
-          SeverityLevel::LOG_WARNING,
-          "Attempted to retrieve properties for a configuration which has been removed.",
-          std::current_exception());
+        logger->Log(SeverityLevel::LOG_WARNING,
+                    "Attempted to retrieve properties for a configuration "
+                    "which has been removed.",
+                    std::current_exception());
       }
     }
   }
@@ -896,13 +895,13 @@ ConfigurationAdminImpl::AddingService(
     });
   }
 
-  logger->Log(
-    cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-    "New ManagedServiceFactory with PID " + pid +
-      " has been added, and async Update has been queued for all updated instances.");
+  logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
+              "New ManagedServiceFactory with PID " + pid +
+                " has been added, and async Update has been queued for all "
+                "updated instances.");
   auto trackedManagedServiceFactory = std::make_shared<TrackedServiceWrapper<
     cppmicroservices::service::cm::ManagedServiceFactory>>(
-        pid, std::move(initialChangeCountPerPid), std::move(managedServiceFactory));
+    pid, std::move(initialChangeCountPerPid), std::move(managedServiceFactory));
   trackedManagedServiceFactories_.emplace_back(trackedManagedServiceFactory);
   return trackedManagedServiceFactory;
 }
@@ -925,12 +924,13 @@ void ConfigurationAdminImpl::RemovedService(
   // Lock because we are modifying the container of tracked managed services.
   std::lock_guard<std::mutex> lk{ configurationsMutex };
 
-  auto elemIter = std::find_if(
-    std::begin(trackedManagedServiceFactories_),
-    std::end(trackedManagedServiceFactories_),
-    [&service](const auto& trackedServiceWrapper) {
-      return (service->getTrackedService() == trackedServiceWrapper->getTrackedService());
-    });
+  auto elemIter =
+    std::find_if(std::begin(trackedManagedServiceFactories_),
+                 std::end(trackedManagedServiceFactories_),
+                 [&service](const auto& trackedServiceWrapper) {
+                   return (service->getTrackedService() ==
+                           trackedServiceWrapper->getTrackedService());
+                 });
   if (elemIter != trackedManagedServiceFactories_.end()) {
     trackedManagedServiceFactories_.erase(elemIter);
   }

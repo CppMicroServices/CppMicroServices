@@ -39,7 +39,8 @@ CCUnsatisfiedReferenceState::CCUnsatisfiedReferenceState()
 CCUnsatisfiedReferenceState::CCUnsatisfiedReferenceState(
   std::shared_future<void> blockUntil)
   : ready(std::move(blockUntil))
-{}
+{
+}
 
 void CCUnsatisfiedReferenceState::Register(ComponentConfigurationImpl& mgr)
 {

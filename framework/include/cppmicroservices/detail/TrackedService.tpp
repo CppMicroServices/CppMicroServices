@@ -25,23 +25,24 @@ namespace cppmicroservices {
 namespace detail {
 
 template<class S, class TTT>
-TrackedService<S,TTT>::TrackedService(ServiceTracker<S,T>* serviceTracker,
-                  ServiceTrackerCustomizer<S,T>* customizer)
+TrackedService<S, TTT>::TrackedService(
+  ServiceTracker<S, T>* serviceTracker,
+  ServiceTrackerCustomizer<S, T>* customizer)
   : Superclass(serviceTracker->d->context)
   , serviceTracker(serviceTracker)
   , customizer(customizer)
   , latch{}
 {
-
 }
 
 template<class S, class TTT>
-void TrackedService<S,TTT>::WaitOnCustomizersToFinish() {
+void TrackedService<S, TTT>::WaitOnCustomizersToFinish()
+{
   latch.Wait();
 }
 
 template<class S, class TTT>
-void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent& event)
+void TrackedService<S, TTT>::ServiceChanged(const ServiceEvent& event)
 {
   (void)latch.CountUp();
   ScopeGuard sg([this]() {
@@ -75,31 +76,24 @@ void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent& event)
     }
   }
 
-  switch (event.GetType())
-  {
-  case ServiceEvent::SERVICE_REGISTERED :
-  case ServiceEvent::SERVICE_MODIFIED :
-    {
-      if (!serviceTracker->d->listenerFilter.empty())
-      { // service listener added with filter
+  switch (event.GetType()) {
+    case ServiceEvent::SERVICE_REGISTERED:
+    case ServiceEvent::SERVICE_MODIFIED: {
+      if (!serviceTracker->d->listenerFilter
+             .empty()) { // service listener added with filter
         this->Track(reference, event);
         /*
        * If the customizer throws an unchecked exception, it
        * is safe to let it propagate
        */
-      }
-      else
-      { // service listener added without filter
-        if (serviceTracker->d->filter.Match(reference))
-        {
+      } else { // service listener added without filter
+        if (serviceTracker->d->filter.Match(reference)) {
           this->Track(reference, event);
           /*
          * If the customizer throws an unchecked exception,
          * it is safe to let it propagate
          */
-        }
-        else
-        {
+        } else {
           this->Untrack(reference, event);
           /*
          * If the customizer throws an unchecked exception,
@@ -109,44 +103,46 @@ void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent& event)
       }
       break;
     }
-  case ServiceEvent::SERVICE_MODIFIED_ENDMATCH :
-  case ServiceEvent::SERVICE_UNREGISTERING :
-    this->Untrack(reference, event);
-    /*
+    case ServiceEvent::SERVICE_MODIFIED_ENDMATCH:
+    case ServiceEvent::SERVICE_UNREGISTERING:
+      this->Untrack(reference, event);
+      /*
      * If the customizer throws an unchecked exception, it is
      * safe to let it propagate
      */
-    break;
+      break;
   }
 }
 
 template<class S, class TTT>
-void TrackedService<S,TTT>::Modified()
+void TrackedService<S, TTT>::Modified()
 {
   Superclass::Modified(); /* increment the modification count */
   serviceTracker->d->Modified();
 }
 
 template<class S, class TTT>
-std::shared_ptr<typename TrackedService<S,TTT>::TrackedParamType>
-TrackedService<S,TTT>::CustomizerAdding(ServiceReference<S> item,
-                                        const ServiceEvent& /*related*/)
+std::shared_ptr<typename TrackedService<S, TTT>::TrackedParamType>
+TrackedService<S, TTT>::CustomizerAdding(ServiceReference<S> item,
+                                         const ServiceEvent& /*related*/)
 {
   return customizer->AddingService(item);
 }
 
 template<class S, class TTT>
-void TrackedService<S,TTT>::CustomizerModified(ServiceReference<S> item,
-                                               const ServiceEvent& /*related*/,
-                                               const std::shared_ptr<TrackedParamType>& object)
+void TrackedService<S, TTT>::CustomizerModified(
+  ServiceReference<S> item,
+  const ServiceEvent& /*related*/,
+  const std::shared_ptr<TrackedParamType>& object)
 {
   customizer->ModifiedService(item, object);
 }
 
 template<class S, class TTT>
-void TrackedService<S,TTT>::CustomizerRemoved(ServiceReference<S> item,
-                                              const ServiceEvent& /*related*/,
-                                              const std::shared_ptr<TrackedParamType>& object)
+void TrackedService<S, TTT>::CustomizerRemoved(
+  ServiceReference<S> item,
+  const ServiceEvent& /*related*/,
+  const std::shared_ptr<TrackedParamType>& object)
 {
   customizer->RemovedService(item, object);
 }

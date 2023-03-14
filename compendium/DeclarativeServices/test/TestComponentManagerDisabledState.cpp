@@ -36,7 +36,8 @@ class CMDisabledStateTest : public ::testing::Test
 protected:
   CMDisabledStateTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   virtual ~CMDisabledStateTest() = default;
 
   virtual void SetUp()

@@ -44,7 +44,8 @@ class TestCMActivator : public ::testing::Test
 protected:
   TestCMActivator()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   ~TestCMActivator() override = default;
 
   void SetUp() override { framework.Start(); }

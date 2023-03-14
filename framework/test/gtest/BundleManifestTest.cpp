@@ -110,7 +110,8 @@ class BundleManifestTest : public ::testing::Test
 protected:
   BundleManifestTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
   virtual ~BundleManifestTest() = default;
 
   virtual void SetUp() { framework.Start(); }

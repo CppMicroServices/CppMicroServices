@@ -69,7 +69,8 @@ ReferenceManagerBaseImpl::ReferenceManagerBaseImpl(
       logger,
       configName,
       CreateBindingPolicy(*this, metadata.policy, metadata.policyOption))
-{}
+{
+}
 
 ReferenceManagerBaseImpl::ReferenceManagerBaseImpl(
   const metadata::ReferenceMetadata& metadata,
@@ -276,7 +277,8 @@ void ReferenceManagerBaseImpl::BatchNotifyAllListeners(
         listenerPair.second(notification);
       } catch (...) {
         logger->Log(SeverityLevel::LOG_ERROR,
-                    "Exception caught while notifying service reference listeners for reference name " +
+                    "Exception caught while notifying service reference "
+                    "listeners for reference name " +
                       notification.senderName,
                     std::current_exception());
       }

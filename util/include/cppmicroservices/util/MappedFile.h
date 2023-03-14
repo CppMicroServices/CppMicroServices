@@ -41,7 +41,8 @@ public:
     : fileDesc(-1)
     , mappedAddress(nullptr)
     , mapSize(0)
-  {}
+  {
+  }
   MappedFile(const std::string& fileLocation, size_t mapLength, off_t offset)
     : fileDesc(-1)
     , mappedAddress(nullptr)

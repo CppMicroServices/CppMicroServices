@@ -23,8 +23,8 @@
 #include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 
-#include "BundleOrPrototypeComponentConfiguration.hpp"
 #include "../ComponentRegistry.hpp"
+#include "BundleOrPrototypeComponentConfiguration.hpp"
 #include "ComponentManager.hpp"
 
 namespace cppmicroservices {
@@ -44,7 +44,8 @@ BundleOrPrototypeComponentConfigurationImpl::
                                logger,
                                configNotifier,
                                managers)
-{}
+{
+}
 
 std::shared_ptr<ServiceFactory>
 BundleOrPrototypeComponentConfigurationImpl::GetFactory()
@@ -149,7 +150,9 @@ InterfaceMapConstPtr BundleOrPrototypeComponentConfigurationImpl::GetService(
   const cppmicroservices::ServiceRegistrationBase& registration)
 {
   // if activation passed, return the interface map from the instance
-  std::shared_ptr<cppmicroservices::service::component::detail::ComponentInstance> compInstance;
+  std::shared_ptr<
+    cppmicroservices::service::component::detail::ComponentInstance>
+    compInstance;
   try {
     compInstance = Activate(bundle);
   } catch (const cppmicroservices::SecurityException&) {
@@ -159,7 +162,8 @@ InterfaceMapConstPtr BundleOrPrototypeComponentConfigurationImpl::GetService(
     std::for_each(
       compMgrs.begin(),
       compMgrs.end(),
-      [this](const std::shared_ptr<cppmicroservices::scrimpl::ComponentManager>& compMgr) {
+      [this](const std::shared_ptr<cppmicroservices::scrimpl::ComponentManager>&
+               compMgr) {
         try {
           compMgr->Disable().get();
         } catch (...) {

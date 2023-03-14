@@ -40,7 +40,8 @@ public:
   template<typename Callable>
   ScopeGuard(Callable&& func)
     : f(func)
-  {}
+  {
+  }
 
   ScopeGuard(const ScopeGuard&) = delete;
   ScopeGuard& operator=(const ScopeGuard&) = delete;

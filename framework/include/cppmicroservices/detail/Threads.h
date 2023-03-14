@@ -48,7 +48,8 @@ public:
 #ifdef US_ENABLE_THREADING_SUPPORT
     : m_Mtx()
 #endif
-  {}
+  {
+  }
 
   friend class UniqueLock;
 
@@ -64,7 +65,8 @@ public:
 
     UniqueLock(UniqueLock&& o) noexcept
       : m_Lock(std::move(o.m_Lock))
-    {}
+    {
+    }
 
     UniqueLock& operator=(UniqueLock&& o)
     {
@@ -75,20 +77,29 @@ public:
     // Lock object
     explicit UniqueLock(const MutexLockingStrategy& host)
       : m_Lock(host.m_Mtx)
-    {}
+    {
+    }
 
     // Lock object
     explicit UniqueLock(const MutexLockingStrategy* host)
       : m_Lock(host->m_Mtx)
-    {}
+    {
+    }
 
     UniqueLock(const MutexLockingStrategy& host, std::defer_lock_t d)
       : m_Lock(host.m_Mtx, d)
-    {}
+    {
+    }
 
-    void Lock() { m_Lock.lock(); }
+    void Lock()
+    {
+      m_Lock.lock();
+    }
 
-    void UnLock() { m_Lock.unlock(); }
+    void UnLock()
+    {
+      m_Lock.unlock();
+    }
 
     template<typename Rep, typename Period>
     bool TryLockFor(const std::chrono::duration<Rep, Period>& duration)
@@ -131,9 +142,15 @@ public:
    *
    * @return A lock object.
    */
-  UniqueLock Lock() const { return UniqueLock(this); }
+  UniqueLock Lock() const
+  {
+    return UniqueLock(this);
+  }
 
-  UniqueLock DeferLock() const { return UniqueLock(this); }
+  UniqueLock DeferLock() const
+  {
+    return UniqueLock(this);
+  }
 
 protected:
 #ifdef US_ENABLE_THREADING_SUPPORT
@@ -149,7 +166,8 @@ public:
 
 template<class MutexHost>
 class NoWaitCondition
-{};
+{
+};
 
 template<class LockingStrategy = MutexLockingStrategy<>,
          template<class MutexHost> class WaitConditionStrategy =
@@ -157,7 +175,8 @@ template<class LockingStrategy = MutexLockingStrategy<>,
 class MultiThreaded
   : public LockingStrategy
   , public WaitConditionStrategy<LockingStrategy>
-{};
+{
+};
 
 template<class T>
 class Atomic : private MultiThreaded<>
@@ -168,7 +187,8 @@ public:
   template<class... Args>
   Atomic(Args&&... args)
     : m_t{ std::forward<Args>(args)... }
-  {}
+  {
+  }
 
   T Load() const { return Lock(), m_t; }
 

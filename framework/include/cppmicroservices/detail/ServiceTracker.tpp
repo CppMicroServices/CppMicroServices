@@ -32,7 +32,6 @@
 #include <stdexcept>
 #include <string>
 
-
 namespace cppmicroservices {
 
 template<class S, class T>
@@ -54,21 +53,24 @@ ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
                                      const ServiceReference<S>& reference,
                                      _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, reference, customizer))
-{}
+{
+}
 
 template<class S, class T>
 ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
                                      const std::string& clazz,
                                      _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, clazz, customizer))
-{}
+{
+}
 
 template<class S, class T>
 ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,
                                      const LDAPFilter& filter,
                                      _ServiceTrackerCustomizer* customizer)
   : d(new _ServiceTrackerPrivate(this, context, filter, customizer))
-{}
+{
+}
 
 template<class S, class T>
 ServiceTracker<S, T>::ServiceTracker(const BundleContext& context,

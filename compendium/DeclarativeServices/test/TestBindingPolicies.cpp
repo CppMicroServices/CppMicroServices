@@ -74,7 +74,8 @@ class InterfaceImpl : public Interface1
 public:
   InterfaceImpl(std::string str)
     : str_(std::move(str))
-  {}
+  {
+  }
   virtual ~InterfaceImpl() = default;
   virtual std::string Description() { return str_; }
 
@@ -105,7 +106,8 @@ class BindingPolicyTest : public ::testing::TestWithParam<Policy>
 protected:
   BindingPolicyTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   virtual ~BindingPolicyTest() = default;
 
@@ -152,7 +154,8 @@ class DynamicRefPolicyTest : public ::testing::TestWithParam<DynamicRefPolicy>
 protected:
   DynamicRefPolicyTest()
     : framework(cppmicroservices::FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   virtual ~DynamicRefPolicyTest() = default;
 

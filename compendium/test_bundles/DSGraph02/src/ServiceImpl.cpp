@@ -5,7 +5,8 @@ DSGraph02Impl::DSGraph02Impl(const std::shared_ptr<test::DSGraph04>& g04,
                              const std::shared_ptr<test::DSGraph05>& g05)
   : graph04(g04)
   , graph05(g05)
-{}
+{
+}
 
 DSGraph02Impl::~DSGraph02Impl() = default;
 

@@ -183,7 +183,8 @@ private:
       : m(std::make_unique<std::mutex>())
       , cv(std::make_unique<std::condition_variable>())
       , waitFlag(true)
-    {}
+    {
+    }
   };
 
   std::unordered_map<std::string, std::pair<unsigned int, WaitCondition>>

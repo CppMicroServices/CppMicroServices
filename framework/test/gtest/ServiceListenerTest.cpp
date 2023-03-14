@@ -85,7 +85,8 @@ public:
     , events()
     , teststatus(true)
     , context(context)
-  {}
+  {
+  }
 
   bool getTestStatus() const { return teststatus; }
 

@@ -54,7 +54,8 @@ public:
     const BundleContext& bc)
     : bundlePropsService(propService)
     , context(bc)
-  {}
+  {
+  }
 
   virtual ~SL3ServiceTrackerCustomizer() { context = nullptr; }
 
@@ -71,7 +72,8 @@ public:
 
   void ModifiedService(const ServiceReference<FooService>& /*reference*/,
                        const std::shared_ptr<FooService>& /*service*/)
-  {}
+  {
+  }
 
   void RemovedService(const ServiceReference<FooService>& /*reference*/,
                       const std::shared_ptr<FooService>& /*service*/)
@@ -92,7 +94,8 @@ public:
     : trackerCustomizer(nullptr)
     , tracker(nullptr)
     , context()
-  {}
+  {
+  }
 
   ~ActivatorSL3() {}
 

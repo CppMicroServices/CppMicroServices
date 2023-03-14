@@ -30,7 +30,8 @@ FrameworkTestActivator* FrameworkTestActivator::m_Instance = nullptr;
 
 FrameworkTestActivator::FrameworkTestActivator()
   : m_StartCalled(false)
-{}
+{
+}
 
 bool FrameworkTestActivator::StartCalled()
 {

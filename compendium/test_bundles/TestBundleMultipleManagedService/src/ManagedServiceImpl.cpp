@@ -10,11 +10,12 @@ namespace test {
 
 TestManagedServiceImpl3::TestManagedServiceImpl3()
   : m_counter{ 0 }
-{}
+{
+}
 
 TestManagedServiceImpl3::~TestManagedServiceImpl3() = default;
 
-void TestManagedServiceImpl3::Updated(AnyMap const& )
+void TestManagedServiceImpl3::Updated(AnyMap const&)
 {
   std::lock_guard<std::mutex> lk(m_counterMtx);
   m_counter++;
@@ -28,7 +29,8 @@ int TestManagedServiceImpl3::getCounter()
 
 TestManagedServiceImpl4::TestManagedServiceImpl4()
   : m_counter{ 0 }
-{}
+{
+}
 
 TestManagedServiceImpl4::~TestManagedServiceImpl4() = default;
 

@@ -33,7 +33,8 @@ public:
                    const ServiceReferenceBase& reference)
     : type(type)
     , reference(reference)
-  {}
+  {
+  }
 
   const ServiceEvent::Type type;
   const ServiceReferenceBase reference;
@@ -41,7 +42,8 @@ public:
 
 ServiceEvent::ServiceEvent()
   : d(nullptr)
-{}
+{
+}
 
 ServiceEvent::operator bool() const
 {
@@ -50,7 +52,8 @@ ServiceEvent::operator bool() const
 
 ServiceEvent::ServiceEvent(Type type, const ServiceReferenceBase& reference)
   : d(new ServiceEventData(type, reference))
-{}
+{
+}
 
 ServiceEvent::ServiceEvent(const ServiceEvent&) = default;
 

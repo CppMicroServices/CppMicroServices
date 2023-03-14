@@ -24,8 +24,8 @@ limitations under the License.
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/Framework.h"
-#include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/FrameworkEvent.h"
+#include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/SecurityException.h"
 
 #include "TestUtils.h"
@@ -36,11 +36,11 @@ limitations under the License.
 
 TEST(BundleValidationTest, BundleValidationFailure)
 {
-  using validationFuncType = std::function<bool(const cppmicroservices::Bundle&)>;
+  using validationFuncType =
+    std::function<bool(const cppmicroservices::Bundle&)>;
 
-  validationFuncType validationFunc = [](const cppmicroservices::Bundle&) -> bool {
-    return false;
-  };
+  validationFuncType validationFunc =
+    [](const cppmicroservices::Bundle&) -> bool { return false; };
   cppmicroservices::FrameworkConfiguration configuration{
     { cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC,
       validationFunc }
@@ -65,12 +65,13 @@ TEST(BundleValidationTest, BundleValidationFailure)
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
-TEST(BundleValidationTest, BundleValidationSuccess) {
-  using validationFuncType = std::function<bool(const cppmicroservices::Bundle&)>;
+TEST(BundleValidationTest, BundleValidationSuccess)
+{
+  using validationFuncType =
+    std::function<bool(const cppmicroservices::Bundle&)>;
 
-  validationFuncType validationFunc = [](const cppmicroservices::Bundle&) -> bool {
-    return true;
-  };
+  validationFuncType validationFunc =
+    [](const cppmicroservices::Bundle&) -> bool { return true; };
   cppmicroservices::FrameworkConfiguration configuration{
     { cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC,
       validationFunc }
@@ -88,17 +89,19 @@ TEST(BundleValidationTest, BundleValidationSuccess) {
   // a bundle validation function which returns true must cause the
   // Framework to start the bundle and it should be loaded
   // into the process.
-  ASSERT_EQ(bundleA.GetState(),
-            cppmicroservices::Bundle::State::STATE_ACTIVE);
+  ASSERT_EQ(bundleA.GetState(), cppmicroservices::Bundle::State::STATE_ACTIVE);
 
   f.Stop();
   f.WaitForStop(std::chrono::milliseconds::zero());
 }
 
-TEST(BundleValidationTest, BundleValidationFunctionException) {
-  using validationFuncType = std::function<bool(const cppmicroservices::Bundle&)>;
+TEST(BundleValidationTest, BundleValidationFunctionException)
+{
+  using validationFuncType =
+    std::function<bool(const cppmicroservices::Bundle&)>;
 
-  validationFuncType validationFunc = [](const cppmicroservices::Bundle&) -> bool {
+  validationFuncType validationFunc =
+    [](const cppmicroservices::Bundle&) -> bool {
     throw std::runtime_error("foobar");
   };
   cppmicroservices::FrameworkConfiguration configuration{
@@ -115,7 +118,7 @@ TEST(BundleValidationTest, BundleValidationFunctionException) {
     [&receivedBundleValidationErrorEvent](
       const cppmicroservices::FrameworkEvent& evt) {
       if (evt.GetType() ==
-          cppmicroservices::FrameworkEvent::Type::FRAMEWORK_WARNING &&
+            cppmicroservices::FrameworkEvent::Type::FRAMEWORK_WARNING &&
           evt.GetBundle().GetSymbolicName() == "TestBundleA") {
         receivedBundleValidationErrorEvent = true;
       }

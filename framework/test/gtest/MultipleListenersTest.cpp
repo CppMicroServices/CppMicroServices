@@ -230,7 +230,8 @@ class MultipleListenersTest : public ::testing::Test
 public:
   MultipleListenersTest()
     : framework(FrameworkFactory().NewFramework())
-  {}
+  {
+  }
 
   ~MultipleListenersTest() override = default;
 
@@ -414,7 +415,8 @@ TEST_F(MultipleListenersTest, testListenerTypes)
       : service_count(0)
       , bundle_count(0)
       , framework_count(0)
-    {}
+    {
+    }
 
     void serviceChanged(const ServiceEvent& /*evt*/) { ++service_count; }
     void bundleChanged(const BundleEvent& /*evt*/) { ++bundle_count; }

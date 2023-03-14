@@ -218,7 +218,7 @@ void BundlePrivate::FinalizeActivation()
 {
   switch (GetUpdatedState()) {
     case Bundle::STATE_INSTALLED: {
-      if(resolveFailException) {
+      if (resolveFailException) {
         std::rethrow_exception(resolveFailException);
       }
       break;
@@ -573,7 +573,8 @@ void BundlePrivate::StartFailed()
   coreCtx->listeners.BundleChanged(BundleEvent(
     BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
   RemoveBundleResources();
-  auto oldBundleContext = bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>());
+  auto oldBundleContext =
+    bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>());
   if (oldBundleContext) {
     oldBundleContext->Invalidate();
   }
@@ -604,7 +605,8 @@ BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx)
   , bundleManifest()
   , lib()
   , SetBundleContext(nullptr)
-{}
+{
+}
 
 BundlePrivate::BundlePrivate(CoreBundleContext* coreCtx,
                              const std::shared_ptr<BundleArchive>& ba)

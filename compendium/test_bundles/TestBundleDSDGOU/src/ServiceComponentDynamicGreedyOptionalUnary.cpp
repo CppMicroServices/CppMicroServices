@@ -5,11 +5,13 @@ namespace sample {
 
 void ServiceComponentDynamicGreedyOptionalUnary::Activate(
   const std::shared_ptr<ComponentContext>& /*ctxt*/)
-{}
+{
+}
 
 void ServiceComponentDynamicGreedyOptionalUnary::Deactivate(
   const std::shared_ptr<ComponentContext>&)
-{}
+{
+}
 
 std::string ServiceComponentDynamicGreedyOptionalUnary::ExtendedDescription()
 {

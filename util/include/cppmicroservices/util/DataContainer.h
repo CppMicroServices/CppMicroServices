@@ -54,7 +54,8 @@ public:
                    std::size_t dataSize)
     : m_Data(std::move(data))
     , m_DataSize(dataSize)
-  {}
+  {
+  }
   ~RawDataContainer() = default;
 
   void* GetData() const override { return m_Data.get(); }

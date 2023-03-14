@@ -81,7 +81,8 @@ public:
   TestServiceEventListenerHook(int id, const BundleContext& context)
     : id(id)
     , bundleCtx(context)
-  {}
+  {
+  }
 
   using MapType =
     ShrinkableMap<BundleContext,
@@ -177,7 +178,8 @@ public:
   TestServiceFindHook(int id, const BundleContext& context)
     : id(id)
     , bundleCtx(context)
-  {}
+  {
+  }
 
   void Find(const BundleContext& context,
             const std::string& /*name*/,
@@ -218,7 +220,8 @@ public:
   TestServiceListenerHook(int id, const BundleContext& context)
     : id(id)
     , bundleCtx(context)
-  {}
+  {
+  }
 
   void Added(const std::vector<ListenerInfo>& listeners)
   {

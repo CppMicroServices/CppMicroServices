@@ -5,7 +5,8 @@ namespace sample {
 
 void ServiceComponent5::Activate(
   const std::shared_ptr<ComponentContext>& /*ctxt*/)
-{}
+{
+}
 
 void ServiceComponent5::Deactivate(const std::shared_ptr<ComponentContext>&) {}
 

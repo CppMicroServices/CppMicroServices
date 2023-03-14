@@ -224,3 +224,22 @@ file for details about the contribution process.
    :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/master
 .. |Code Coverage Status (development)| image:: https://img.shields.io/codecov/c/github/CppMicroServices/CppMicroServices/development.svg?style=flat-square
    :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/development
+
+Git Hooks General Information
+-----------------------------
+
+The CppMicroServices repository defines its git hooks in the `.githooks` directory. This directory is
+set as the directory for git hooks via executing `git config core.hooksPath <path>` in our `CMakeLists.txt` file.
+
+Git Hooks Failure Help
+----------------------
+
+If the clang-format pre-commit hook fails because `clang-format` is not installed, please install it and
+put it on the path. Similarly, if `git-clang-format` is not installed, do the same. `git-clang-format` comes
+with the LLVM distribution of `clang-format`.
+
+If this is not feasible for you, you can specify `--no-verify` when committing your changes. This is heavily discouraged
+and you must provide a justification as to why you are unable to format your commit.
+
+We reserve the right to reject any pull requests that are not properly formatted and do not have a
+valid justification specified.

@@ -22,13 +22,14 @@
 #ifndef _SERVICE_IMPL_HPP_
 #define _SERVICE_IMPL_HPP_
 #include "TestInterfaces/Interfaces.hpp"
-namespace sample {
-class ServiceComponent2 : public test::Interface1
+namespace sample
 {
-public:
-  ~ServiceComponent2();
-  std::string Description() override;
-};
-}
+    class ServiceComponent2 : public test::Interface1
+    {
+      public:
+        ~ServiceComponent2();
+        std::string Description() override;
+    };
+} // namespace sample
 
 #endif // _SERVICE_IMPL_HPP_

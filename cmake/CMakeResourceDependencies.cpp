@@ -20,12 +20,13 @@
 
 =============================================================================*/
 
-namespace {
-
-// This is dummy code to silence some linkers warning about
-// empty object files.
-struct CMakeResourceDependencies
+namespace
 {
-  CMakeResourceDependencies() = default;
-};
-}
+
+    // This is dummy code to silence some linkers warning about
+    // empty object files.
+    struct CMakeResourceDependencies
+    {
+        CMakeResourceDependencies() = default;
+    };
+} // namespace

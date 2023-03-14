@@ -25,61 +25,57 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 
-namespace test {
-/**
- * Verify state changes for a component with initial state as ENABLED
- */
-TEST_F(tServiceComponent, testInitialEnabled) //testDS_TOI_1
+namespace test
 {
-  std::string testBundleName("TestBundleDSTOI1");
-  cppmicroservices::Bundle testBundle = StartTestBundle(testBundleName);
-  scr::dto::ComponentDescriptionDTO compDescDTO =
-    dsRuntimeService->GetComponentDescriptionDTO(testBundle,
-                                                 "sample::ServiceComponent");
-  EXPECT_EQ(compDescDTO.name, "sample::ServiceComponent")
-    << "Name in the returned component description must be "
-       "sample::ServiceComponentImpl";
-  EXPECT_EQ(compDescDTO.defaultEnabled, true)
-    << "Component's initial state in component description must be ENABLED";
-  EXPECT_EQ(dsRuntimeService->IsComponentEnabled(compDescDTO), true)
-    << "current state reported by the runtime service must match the initial "
-       "state in component description";
-  auto sRef =
-    framework.GetBundleContext().GetServiceReference<test::Interface1>();
-  EXPECT_TRUE(static_cast<bool>(sRef));
-  auto fut = dsRuntimeService->DisableComponent(compDescDTO);
-  EXPECT_NO_THROW(fut.get());
-  EXPECT_EQ(dsRuntimeService->IsComponentEnabled(compDescDTO), false)
-    << "current state must be DISABLED after call to DisableComponent";
-  EXPECT_FALSE(static_cast<bool>(sRef));
-}
+    /**
+     * Verify state changes for a component with initial state as ENABLED
+     */
+    TEST_F(tServiceComponent, testInitialEnabled) // testDS_TOI_1
+    {
+        std::string testBundleName("TestBundleDSTOI1");
+        cppmicroservices::Bundle testBundle = StartTestBundle(testBundleName);
+        scr::dto::ComponentDescriptionDTO compDescDTO
+            = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent");
+        EXPECT_EQ(compDescDTO.name, "sample::ServiceComponent") << "Name in the returned component description must be "
+                                                                   "sample::ServiceComponentImpl";
+        EXPECT_EQ(compDescDTO.defaultEnabled, true)
+            << "Component's initial state in component description must be ENABLED";
+        EXPECT_EQ(dsRuntimeService->IsComponentEnabled(compDescDTO), true)
+            << "current state reported by the runtime service must match the initial "
+               "state in component description";
+        auto sRef = framework.GetBundleContext().GetServiceReference<test::Interface1>();
+        EXPECT_TRUE(static_cast<bool>(sRef));
+        auto fut = dsRuntimeService->DisableComponent(compDescDTO);
+        EXPECT_NO_THROW(fut.get());
+        EXPECT_EQ(dsRuntimeService->IsComponentEnabled(compDescDTO), false)
+            << "current state must be DISABLED after call to DisableComponent";
+        EXPECT_FALSE(static_cast<bool>(sRef));
+    }
 
-/**
- * Verify state changes for a component with initial state as DISABLED
- */
-TEST_F(tServiceComponent, testInitialDisabled) //testDS_TOI_2
-{
-  std::string testBundleName("TestBundleDSTOI2");
-  cppmicroservices::Bundle testBundle = StartTestBundle(testBundleName);
-  scr::dto::ComponentDescriptionDTO compDescDTO =
-    dsRuntimeService->GetComponentDescriptionDTO(testBundle,
-                                                 "sample::ServiceComponent2");
-  EXPECT_EQ(compDescDTO.name, "sample::ServiceComponent2")
-    << "Name in the returned component description must be "
-       "sample::ServiceComponentImpl";
-  EXPECT_EQ(compDescDTO.defaultEnabled, false)
-    << "Component's initial state in component description must be DISABLED";
-  EXPECT_EQ(dsRuntimeService->IsComponentEnabled(compDescDTO), false)
-    << "current state reported by the runtime service must match the initial "
-       "state in component description";
-  auto sRef =
-    framework.GetBundleContext().GetServiceReference<test::Interface1>();
-  EXPECT_FALSE(static_cast<bool>(sRef));
-  auto fut = dsRuntimeService->EnableComponent(compDescDTO);
-  EXPECT_NO_THROW(fut.get());
-  EXPECT_EQ(dsRuntimeService->IsComponentEnabled(compDescDTO), true)
-    << "current state must be ENABLED after call to EnableComponent";
-  sRef = framework.GetBundleContext().GetServiceReference<test::Interface1>();
-  EXPECT_TRUE(static_cast<bool>(sRef));
-}
-}
+    /**
+     * Verify state changes for a component with initial state as DISABLED
+     */
+    TEST_F(tServiceComponent, testInitialDisabled) // testDS_TOI_2
+    {
+        std::string testBundleName("TestBundleDSTOI2");
+        cppmicroservices::Bundle testBundle = StartTestBundle(testBundleName);
+        scr::dto::ComponentDescriptionDTO compDescDTO
+            = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent2");
+        EXPECT_EQ(compDescDTO.name, "sample::ServiceComponent2")
+            << "Name in the returned component description must be "
+               "sample::ServiceComponentImpl";
+        EXPECT_EQ(compDescDTO.defaultEnabled, false)
+            << "Component's initial state in component description must be DISABLED";
+        EXPECT_EQ(dsRuntimeService->IsComponentEnabled(compDescDTO), false)
+            << "current state reported by the runtime service must match the initial "
+               "state in component description";
+        auto sRef = framework.GetBundleContext().GetServiceReference<test::Interface1>();
+        EXPECT_FALSE(static_cast<bool>(sRef));
+        auto fut = dsRuntimeService->EnableComponent(compDescDTO);
+        EXPECT_NO_THROW(fut.get());
+        EXPECT_EQ(dsRuntimeService->IsComponentEnabled(compDescDTO), true)
+            << "current state must be ENABLED after call to EnableComponent";
+        sRef = framework.GetBundleContext().GetServiceReference<test::Interface1>();
+        EXPECT_TRUE(static_cast<bool>(sRef));
+    }
+} // namespace test

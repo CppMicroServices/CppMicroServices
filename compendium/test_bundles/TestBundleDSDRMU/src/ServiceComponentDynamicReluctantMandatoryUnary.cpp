@@ -1,47 +1,51 @@
 #include "ServiceImpl.hpp"
 #include <iostream>
 
-namespace sample {
-
-void ServiceComponentDynamicReluctantMandatoryUnary::Activate(
-  const std::shared_ptr<ComponentContext>& /*ctxt*/)
+namespace sample
 {
-}
 
-void ServiceComponentDynamicReluctantMandatoryUnary::Deactivate(
-  const std::shared_ptr<ComponentContext>&)
-{
-}
+    void
+    ServiceComponentDynamicReluctantMandatoryUnary::Activate(std::shared_ptr<ComponentContext> const& /*ctxt*/)
+    {
+    }
 
-std::string
-ServiceComponentDynamicReluctantMandatoryUnary::ExtendedDescription()
-{
-  std::lock_guard<std::mutex> lock(fooMutex);
-  if (!foo) {
-    throw std::runtime_error("Dependency not available");
-  }
-  std::string result("ServiceComponentDynamicReluctantMandatoryUnary ");
-  result.append("depends on ");
-  result.append(foo->Description());
-  return result;
-}
+    void
+    ServiceComponentDynamicReluctantMandatoryUnary::Deactivate(std::shared_ptr<ComponentContext> const&)
+    {
+    }
 
-void ServiceComponentDynamicReluctantMandatoryUnary::Bindfoo(
-  const std::shared_ptr<test::Interface1>& theFoo)
-{
-  std::lock_guard<std::mutex> lock(fooMutex);
-  if (foo != theFoo) {
-    foo = theFoo;
-  }
-}
+    std::string
+    ServiceComponentDynamicReluctantMandatoryUnary::ExtendedDescription()
+    {
+        std::lock_guard<std::mutex> lock(fooMutex);
+        if (!foo)
+        {
+            throw std::runtime_error("Dependency not available");
+        }
+        std::string result("ServiceComponentDynamicReluctantMandatoryUnary ");
+        result.append("depends on ");
+        result.append(foo->Description());
+        return result;
+    }
 
-void ServiceComponentDynamicReluctantMandatoryUnary::Unbindfoo(
-  const std::shared_ptr<test::Interface1>& theFoo)
-{
-  std::lock_guard<std::mutex> lock(fooMutex);
-  if (foo == theFoo) {
-    foo = nullptr;
-  }
-}
+    void
+    ServiceComponentDynamicReluctantMandatoryUnary::Bindfoo(std::shared_ptr<test::Interface1> const& theFoo)
+    {
+        std::lock_guard<std::mutex> lock(fooMutex);
+        if (foo != theFoo)
+        {
+            foo = theFoo;
+        }
+    }
 
-} // namespaces
+    void
+    ServiceComponentDynamicReluctantMandatoryUnary::Unbindfoo(std::shared_ptr<test::Interface1> const& theFoo)
+    {
+        std::lock_guard<std::mutex> lock(fooMutex);
+        if (foo == theFoo)
+        {
+            foo = nullptr;
+        }
+    }
+
+} // namespace sample

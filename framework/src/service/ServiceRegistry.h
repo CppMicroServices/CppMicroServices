@@ -27,166 +27,158 @@
 #include "cppmicroservices/ServiceRegistration.h"
 #include "cppmicroservices/detail/Threads.h"
 
-namespace cppmicroservices {
-
-class CoreBundleContext;
-class BundlePrivate;
-class Properties;
-
-/**
- * Here we handle all the CppMicroServices services that are registered.
- */
-class ServiceRegistry : private detail::MultiThreaded<>
+namespace cppmicroservices
 {
 
-public:
-  void Clear();
+    class CoreBundleContext;
+    class BundlePrivate;
+    class Properties;
 
-  /**
-   * Creates a new ServiceProperties object containing <code>in</code>
-   * with the keys converted to lower case.
-   *
-   * @param classes A list of class names which will be added to the
-   *        created ServiceProperties object under the key
-   *        BundleConstants::OBJECTCLASS.
-   * @param sid A service id which will be used instead of a default one.
-   */
-  static Properties CreateServiceProperties(
-    const ServiceProperties& in,
-    const std::vector<std::string>& classes = std::vector<std::string>(),
-    bool isFactory = false,
-    bool isPrototypeFactory = false,
-    long sid = -1);
+    /**
+     * Here we handle all the CppMicroServices services that are registered.
+     */
+    class ServiceRegistry : private detail::MultiThreaded<>
+    {
 
-  using MapServiceClasses =
-    std::unordered_map<ServiceRegistrationBase, std::vector<std::string>>;
-  using MapClassServices =
-    std::unordered_map<std::string, std::vector<ServiceRegistrationBase>>;
+      public:
+        void Clear();
 
-  /**
-   * All registered services in the current framework.
-   * Mapping of registered service to class names under which
-   * the service is registerd.
-   */
-  MapServiceClasses services;
+        /**
+         * Creates a new ServiceProperties object containing <code>in</code>
+         * with the keys converted to lower case.
+         *
+         * @param classes A list of class names which will be added to the
+         *        created ServiceProperties object under the key
+         *        BundleConstants::OBJECTCLASS.
+         * @param sid A service id which will be used instead of a default one.
+         */
+        static Properties CreateServiceProperties(ServiceProperties const& in,
+                                                  std::vector<std::string> const& classes = std::vector<std::string>(),
+                                                  bool isFactory = false,
+                                                  bool isPrototypeFactory = false,
+                                                  long sid = -1);
 
-  std::vector<ServiceRegistrationBase> serviceRegistrations;
+        using MapServiceClasses = std::unordered_map<ServiceRegistrationBase, std::vector<std::string>>;
+        using MapClassServices = std::unordered_map<std::string, std::vector<ServiceRegistrationBase>>;
 
-  /**
-   * Mapping of classname to registered service.
-   * The List of registered services are ordered with the highest
-   * ranked service first.
-   */
-  MapClassServices classServices;
+        /**
+         * All registered services in the current framework.
+         * Mapping of registered service to class names under which
+         * the service is registerd.
+         */
+        MapServiceClasses services;
 
-  CoreBundleContext* core;
+        std::vector<ServiceRegistrationBase> serviceRegistrations;
 
-  ServiceRegistry(const ServiceRegistry&) = delete;
-  ServiceRegistry& operator=(const ServiceRegistry&) = delete;
+        /**
+         * Mapping of classname to registered service.
+         * The List of registered services are ordered with the highest
+         * ranked service first.
+         */
+        MapClassServices classServices;
 
-  ServiceRegistry(CoreBundleContext* coreCtx);
+        CoreBundleContext* core;
 
-  /**
-   * Register a service in the framework wide register.
-   *
-   * @param bundle The bundle registering the service.
-   * @param classes The class names under which the service can be located.
-   * @param service The service object.
-   * @param properties The properties for this service.
-   * @return A ServiceRegistration object.
-   * @exception std::invalid_argument If one of the following is true:
-   * <ul>
-   * <li>The service object is 0.</li>
-   * <li>The service parameter is not a ServiceFactory or an
-   * instance of all the named classes in the classes parameter.</li>
-   * </ul>
-   */
-  ServiceRegistrationBase RegisterService(BundlePrivate* bundle,
-                                          const InterfaceMapConstPtr& service,
-                                          const ServiceProperties& properties);
+        ServiceRegistry(ServiceRegistry const&) = delete;
+        ServiceRegistry& operator=(ServiceRegistry const&) = delete;
 
-  /**
-   * Reorder registered services. Call this method if the ranking for
-   * a service registration has changed
-   *
-   * @param classes is the list of classes whose entries need to be reordered
-   */
-  void UpdateServiceRegistrationOrder(const std::vector<std::string>& classes);
+        ServiceRegistry(CoreBundleContext* coreCtx);
 
-  /**
-   * Get all services implementing a certain class.
-   * Only used internally by the framework.
-   *
-   * @param clazz The class name of the requested service.
-   * @return A sorted list of {@link ServiceRegistrationPrivate} objects.
-   */
-  void Get(const std::string& clazz,
-           std::vector<ServiceRegistrationBase>& serviceRegs) const;
+        /**
+         * Register a service in the framework wide register.
+         *
+         * @param bundle The bundle registering the service.
+         * @param classes The class names under which the service can be located.
+         * @param service The service object.
+         * @param properties The properties for this service.
+         * @return A ServiceRegistration object.
+         * @exception std::invalid_argument If one of the following is true:
+         * <ul>
+         * <li>The service object is 0.</li>
+         * <li>The service parameter is not a ServiceFactory or an
+         * instance of all the named classes in the classes parameter.</li>
+         * </ul>
+         */
+        ServiceRegistrationBase RegisterService(BundlePrivate* bundle,
+                                                InterfaceMapConstPtr const& service,
+                                                ServiceProperties const& properties);
 
-  /**
-   * Get a service implementing a certain class.
-   *
-   * @param bundle The bundle requesting reference
-   * @param clazz The class name of the requested service.
-   * @return A {@link ServiceReference} object.
-   */
-  ServiceReferenceBase Get(BundlePrivate* bundle,
-                           const std::string& clazz) const;
+        /**
+         * Reorder registered services. Call this method if the ranking for
+         * a service registration has changed
+         *
+         * @param classes is the list of classes whose entries need to be reordered
+         */
+        void UpdateServiceRegistrationOrder(std::vector<std::string> const& classes);
 
-  /**
-   * Get all services implementing a certain class and then
-   * filter these with a property filter.
-   *
-   * @param clazz The class name of requested service.
-   * @param filter The property filter.
-   * @param bundle The bundle requesting reference.
-   * @return A list of {@link ServiceReference} object.
-   */
-  void Get(const std::string& clazz,
-           const std::string& filter,
-           BundlePrivate* bundle,
-           std::vector<ServiceReferenceBase>& serviceRefs) const;
+        /**
+         * Get all services implementing a certain class.
+         * Only used internally by the framework.
+         *
+         * @param clazz The class name of the requested service.
+         * @return A sorted list of {@link ServiceRegistrationPrivate} objects.
+         */
+        void Get(std::string const& clazz, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
-  /**
-   * Remove a registered service.
-   *
-   * @param sr The ServiceRegistration object that is registered.
-   */
-  void RemoveServiceRegistration(const ServiceRegistrationBase& sr);
+        /**
+         * Get a service implementing a certain class.
+         *
+         * @param bundle The bundle requesting reference
+         * @param clazz The class name of the requested service.
+         * @return A {@link ServiceReference} object.
+         */
+        ServiceReferenceBase Get(BundlePrivate* bundle, std::string const& clazz) const;
 
-  /**
-   * Get all services that a bundle has registered.
-   *
-   * @param p The bundle
-   * @return A set of {@link ServiceRegistration} objects
-   */
-  void GetRegisteredByBundle(
-    BundlePrivate* m,
-    std::vector<ServiceRegistrationBase>& serviceRegs) const;
+        /**
+         * Get all services implementing a certain class and then
+         * filter these with a property filter.
+         *
+         * @param clazz The class name of requested service.
+         * @param filter The property filter.
+         * @param bundle The bundle requesting reference.
+         * @return A list of {@link ServiceReference} object.
+         */
+        void Get(std::string const& clazz,
+                 std::string const& filter,
+                 BundlePrivate* bundle,
+                 std::vector<ServiceReferenceBase>& serviceRefs) const;
 
-  /**
-   * Get all services that a bundle uses.
-   *
-   * @param bundle The bundle
-   * @return A set of {@link ServiceRegistration} objects
-   */
-  void GetUsedByBundle(BundlePrivate* bundle,
-                       std::vector<ServiceRegistrationBase>& serviceRegs) const;
+        /**
+         * Remove a registered service.
+         *
+         * @param sr The ServiceRegistration object that is registered.
+         */
+        void RemoveServiceRegistration(ServiceRegistrationBase const& sr);
 
-private:
-  friend class ServiceHooks;
-  friend class ServiceRegistrationBase;
+        /**
+         * Get all services that a bundle has registered.
+         *
+         * @param p The bundle
+         * @return A set of {@link ServiceRegistration} objects
+         */
+        void GetRegisteredByBundle(BundlePrivate* m, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
-  void RemoveServiceRegistration_unlocked(const ServiceRegistrationBase& sr);
+        /**
+         * Get all services that a bundle uses.
+         *
+         * @param bundle The bundle
+         * @return A set of {@link ServiceRegistration} objects
+         */
+        void GetUsedByBundle(BundlePrivate* bundle, std::vector<ServiceRegistrationBase>& serviceRegs) const;
 
-  void Get_unlocked(const std::string& clazz,
-                    std::vector<ServiceRegistrationBase>& serviceRegs) const;
+      private:
+        friend class ServiceHooks;
+        friend class ServiceRegistrationBase;
 
-  void Get_unlocked(const std::string& clazz,
-                    const std::string& filter,
-                    BundlePrivate* bundle,
-                    std::vector<ServiceReferenceBase>& serviceRefs) const;
-};
-}
+        void RemoveServiceRegistration_unlocked(ServiceRegistrationBase const& sr);
+
+        void Get_unlocked(std::string const& clazz, std::vector<ServiceRegistrationBase>& serviceRegs) const;
+
+        void Get_unlocked(std::string const& clazz,
+                          std::string const& filter,
+                          BundlePrivate* bundle,
+                          std::vector<ServiceReferenceBase>& serviceRefs) const;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SERVICEREGISTRY_H

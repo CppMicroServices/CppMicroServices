@@ -26,74 +26,84 @@
 
 #include "ComponentInfo.hpp"
 
-namespace codegen {
-namespace datamodel {
-const std::string ComponentInfo::CONFIG_POLICY_IGNORE = "ignore";
-const std::string ComponentInfo::CONFIG_POLICY_REQUIRE = "require";
-const std::string ComponentInfo::CONFIG_POLICY_OPTIONAL = "optional";
-
-std::string GetComponentNameStr(const ComponentInfo& compInfo)
+namespace codegen
 {
-  const auto name =
-    compInfo.name.empty() ? compInfo.implClassName : compInfo.name;
-  return std::regex_replace(name, std::regex("(::)"), "_");
-}
+    namespace datamodel
+    {
+        const std::string ComponentInfo::CONFIG_POLICY_IGNORE = "ignore";
+        const std::string ComponentInfo::CONFIG_POLICY_REQUIRE = "require";
+        const std::string ComponentInfo::CONFIG_POLICY_OPTIONAL = "optional";
 
-std::string GetServiceInterfacesStr(const ServiceInfo& serviceInfo)
-{
-  auto& interfaces = serviceInfo.interfaces;
-  if (interfaces.empty()) {
-    return "";
-  }
-  std::ostringstream strstream;
-  std::copy(std::begin(interfaces),
-            std::end(interfaces) - 1,
-            std::ostream_iterator<std::string>(strstream, ", "));
-  strstream << interfaces.back();
-  return strstream.str();
-}
+        std::string
+        GetComponentNameStr(ComponentInfo const& compInfo)
+        {
+            auto const name = compInfo.name.empty() ? compInfo.implClassName : compInfo.name;
+            return std::regex_replace(name, std::regex("(::)"), "_");
+        }
 
-std::string GetCtorInjectedRefTypes(const ComponentInfo& compInfo)
-{
-  std::string result;
-  auto sep = ", ";
-  for (const auto& reference : compInfo.references) {
-    if ((true == compInfo.injectReferences) && (reference.policy == "static")) {
-      result += (sep + reference.interface);
-    }
-  }
-  return result;
-}
+        std::string
+        GetServiceInterfacesStr(ServiceInfo const& serviceInfo)
+        {
+            auto& interfaces = serviceInfo.interfaces;
+            if (interfaces.empty())
+            {
+                return "";
+            }
+            std::ostringstream strstream;
+            std::copy(std::begin(interfaces),
+                      std::end(interfaces) - 1,
+                      std::ostream_iterator<std::string>(strstream, ", "));
+            strstream << interfaces.back();
+            return strstream.str();
+        }
 
-std::string GetCtorInjectedRefNames(const ComponentInfo& compInfo)
-{
-  std::stringstream resultStr;
-  auto sep = "";
+        std::string
+        GetCtorInjectedRefTypes(ComponentInfo const& compInfo)
+        {
+            std::string result;
+            auto sep = ", ";
+            for (auto const& reference : compInfo.references)
+            {
+                if ((true == compInfo.injectReferences) && (reference.policy == "static"))
+                {
+                    result += (sep + reference.interface);
+                }
+            }
+            return result;
+        }
 
-  resultStr << "{{";
-  for (const auto& reference : compInfo.references) {
-    if ((true == compInfo.injectReferences) && (reference.policy == "static")) {
-      resultStr << sep << "\"" << reference.name << "\"";
-      sep = ", ";
-    }
-  }
-  resultStr << "}}";
-  return resultStr.str();
-}
+        std::string
+        GetCtorInjectedRefNames(ComponentInfo const& compInfo)
+        {
+            std::stringstream resultStr;
+            auto sep = "";
 
-std::string GetReferenceBinderStr(const ReferenceInfo& ref,
-                                  bool injectReferences)
-{
-  auto isStatic = (ref.policy == "static");
-  std::stringstream binderObjStr;
-  if (!isStatic || !injectReferences) {
-    binderObjStr << "std::make_shared<scd::DynamicBinder<{0}, "
-                 << ref.interface << ">>(\"" + ref.name + "\""
-                 << ", &{0}::Bind" << ref.name << ", &{0}::Unbind" << ref.name
-                 << ")";
-  }
-  return binderObjStr.str();
-}
+            resultStr << "{{";
+            for (auto const& reference : compInfo.references)
+            {
+                if ((true == compInfo.injectReferences) && (reference.policy == "static"))
+                {
+                    resultStr << sep << "\"" << reference.name << "\"";
+                    sep = ", ";
+                }
+            }
+            resultStr << "}}";
+            return resultStr.str();
+        }
 
-}
-} // namespaces
+        std::string
+        GetReferenceBinderStr(ReferenceInfo const& ref, bool injectReferences)
+        {
+            auto isStatic = (ref.policy == "static");
+            std::stringstream binderObjStr;
+            if (!isStatic || !injectReferences)
+            {
+                binderObjStr << "std::make_shared<scd::DynamicBinder<{0}, "
+                             << ref.interface << ">>(\"" + ref.name + "\""
+                             << ", &{0}::Bind" << ref.name << ", &{0}::Unbind" << ref.name << ")";
+            }
+            return binderObjStr.str();
+        }
+
+    } // namespace datamodel
+} // namespace codegen

@@ -26,47 +26,47 @@
 #include "cppmicroservices/ServiceInterface.h"
 #include "cppmicroservices/ShrinkableVector.h"
 
-namespace cppmicroservices {
-
-class BundleContext;
-class BundleEvent;
-
-/**
- * @ingroup MicroServices
- *
- * %Bundle Event Hook Service.
- *
- * <p>
- * Bundles registering this service will be called during bundle lifecycle
- * (installed, starting, started, stopping, stopped, uninstalled) operations.
- *
- * @remarks Implementations of this interface are required to be thread-safe.
- */
-struct US_Framework_EXPORT BundleEventHook
+namespace cppmicroservices
 {
 
-  virtual ~BundleEventHook();
+    class BundleContext;
+    class BundleEvent;
 
-  /**
-   * Bundle event hook method. This method is called prior to bundle event
-   * delivery when a bundle is installed, starting, started, stopping,
-   * stopped, and uninstalled. This method can filter the bundles which receive
-   * the event.
-   * <p>
-   * This method is called one and only one time for
-   * each bundle event generated, this includes bundle events which are
-   * generated when there are no bundle listeners registered.
-   *
-   * @param event The bundle event to be delivered.
-   * @param contexts A list of Bundle Contexts for bundles which have
-   *        listeners to which the specified event will be delivered. The
-   *        implementation of this method may remove bundle contexts from the
-   *        list to prevent the event from being delivered to the
-   *        associated bundles.
-   */
-  virtual void Event(const BundleEvent& event,
-                     ShrinkableVector<BundleContext>& contexts) = 0;
-};
-}
+    /**
+     * @ingroup MicroServices
+     *
+     * %Bundle Event Hook Service.
+     *
+     * <p>
+     * Bundles registering this service will be called during bundle lifecycle
+     * (installed, starting, started, stopping, stopped, uninstalled) operations.
+     *
+     * @remarks Implementations of this interface are required to be thread-safe.
+     */
+    struct US_Framework_EXPORT BundleEventHook
+    {
+
+        virtual ~BundleEventHook();
+
+        /**
+         * Bundle event hook method. This method is called prior to bundle event
+         * delivery when a bundle is installed, starting, started, stopping,
+         * stopped, and uninstalled. This method can filter the bundles which receive
+         * the event.
+         * <p>
+         * This method is called one and only one time for
+         * each bundle event generated, this includes bundle events which are
+         * generated when there are no bundle listeners registered.
+         *
+         * @param event The bundle event to be delivered.
+         * @param contexts A list of Bundle Contexts for bundles which have
+         *        listeners to which the specified event will be delivered. The
+         *        implementation of this method may remove bundle contexts from the
+         *        list to prevent the event from being delivered to the
+         *        associated bundles.
+         */
+        virtual void Event(BundleEvent const& event, ShrinkableVector<BundleContext>& contexts) = 0;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLEEVENTHOOK_H

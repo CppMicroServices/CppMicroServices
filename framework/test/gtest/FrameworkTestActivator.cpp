@@ -24,34 +24,34 @@
 
 #include "cppmicroservices/BundleImport.h"
 
-namespace cppmicroservices {
-
-FrameworkTestActivator* FrameworkTestActivator::m_Instance = nullptr;
-
-FrameworkTestActivator::FrameworkTestActivator()
-  : m_StartCalled(false)
+namespace cppmicroservices
 {
-}
 
-bool FrameworkTestActivator::StartCalled()
-{
-  return m_Instance ? m_Instance->m_StartCalled : false;
-}
+    FrameworkTestActivator* FrameworkTestActivator::m_Instance = nullptr;
 
-void FrameworkTestActivator::Start(BundleContext)
-{
-  this->m_Instance = this;
-  this->m_StartCalled = true;
-}
+    FrameworkTestActivator::FrameworkTestActivator() : m_StartCalled(false) {}
 
-void FrameworkTestActivator::Stop(BundleContext)
-{
-  this->m_Instance = nullptr;
-}
-}
+    bool
+    FrameworkTestActivator::StartCalled()
+    {
+        return m_Instance ? m_Instance->m_StartCalled : false;
+    }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
-  cppmicroservices::FrameworkTestActivator)
+    void
+    FrameworkTestActivator::Start(BundleContext)
+    {
+        this->m_Instance = this;
+        this->m_StartCalled = true;
+    }
+
+    void
+    FrameworkTestActivator::Stop(BundleContext)
+    {
+        this->m_Instance = nullptr;
+    }
+} // namespace cppmicroservices
+
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::FrameworkTestActivator)
 
 #ifndef US_BUILD_SHARED_LIBS
 CPPMICROSERVICES_IMPORT_BUNDLE(main)

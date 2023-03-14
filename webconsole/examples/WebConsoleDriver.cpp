@@ -31,58 +31,64 @@
 #include <iostream>
 
 #ifdef US_PLATFORM_WINDOWS
-#  ifndef WIN32_LEAN_AND_MEAN
-#    define WIN32_LEAN_AND_MEAN
-#  endif
-#  include <windows.h>
-#  define SLEEP(x) Sleep(1000 * x)
+#    ifndef WIN32_LEAN_AND_MEAN
+#        define WIN32_LEAN_AND_MEAN
+#    endif
+#    include <windows.h>
+#    define SLEEP(x) Sleep(1000 * x)
 #else
-#  include <unistd.h>
-#  define SLEEP(x) sleep(x)
+#    include <unistd.h>
+#    define SLEEP(x) sleep(x)
 #endif
 
-void signalHandler(int /*num*/)
+void
+signalHandler(int /*num*/)
 {
-  std::exit(EXIT_SUCCESS);
+    std::exit(EXIT_SUCCESS);
 }
 
-int main(int argc, const char* argv[])
+int
+main(int argc, char const* argv[])
 {
-  std::signal(SIGTERM, signalHandler);
-  std::signal(SIGINT, signalHandler);
+    std::signal(SIGTERM, signalHandler);
+    std::signal(SIGINT, signalHandler);
 #ifndef WIN32
-  std::signal(SIGQUIT, signalHandler);
+    std::signal(SIGQUIT, signalHandler);
 #endif
 
-  if (argc < 2) {
-    std::cout << "No command line arguments given.\n"
-                 "Provide a space separated list of file paths pointing to "
-                 "bundles to load.\n"
-                 "The web console driver needs at least the httpservice and "
-                 "webconsole bundle.\n";
-    return 0;
-  }
+    if (argc < 2)
+    {
+        std::cout << "No command line arguments given.\n"
+                     "Provide a space separated list of file paths pointing to "
+                     "bundles to load.\n"
+                     "The web console driver needs at least the httpservice and "
+                     "webconsole bundle.\n";
+        return 0;
+    }
 
-  cppmicroservices::FrameworkFactory fwFactory;
-  auto fw = fwFactory.NewFramework();
-  fw.Start();
+    cppmicroservices::FrameworkFactory fwFactory;
+    auto fw = fwFactory.NewFramework();
+    fw.Start();
 
-  auto ctx = fw.GetBundleContext();
+    auto ctx = fw.GetBundleContext();
 
-  for (int i = 1; i < argc; ++i) {
-    ctx.InstallBundles(argv[i]);
-  }
+    for (int i = 1; i < argc; ++i)
+    {
+        ctx.InstallBundles(argv[i]);
+    }
 
-  for (auto& b : ctx.GetBundles()) {
-    b.Start();
-  }
+    for (auto& b : ctx.GetBundles())
+    {
+        b.Start();
+    }
 
-  cppmicroservices::ServletContainer servletContainer(ctx, "us");
-  servletContainer.Start();
+    cppmicroservices::ServletContainer servletContainer(ctx, "us");
+    servletContainer.Start();
 
-  while (true) {
-    SLEEP(1);
-  }
+    while (true)
+    {
+        SLEEP(1);
+    }
 
-  return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }

@@ -1,12 +1,12 @@
 #include "ServiceImpl.hpp"
 
-namespace dependent {
-TestBundleDSDependentImpl::TestBundleDSDependentImpl(
-  const std::shared_ptr<test::TestBundleDSUpstreamDependency>& c)
-  : test::TestBundleDSDependent()
-  , ref(c)
+namespace dependent
 {
-}
+    TestBundleDSDependentImpl::TestBundleDSDependentImpl(std::shared_ptr<test::TestBundleDSUpstreamDependency> const& c)
+        : test::TestBundleDSDependent()
+        , ref(c)
+    {
+    }
 
-TestBundleDSDependentImpl::~TestBundleDSDependentImpl() = default;
-}
+    TestBundleDSDependentImpl::~TestBundleDSDependentImpl() = default;
+} // namespace dependent

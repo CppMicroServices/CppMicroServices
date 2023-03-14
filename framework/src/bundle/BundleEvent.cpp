@@ -26,122 +26,117 @@
 
 #include <stdexcept>
 
-namespace cppmicroservices {
-
-class BundleEventData
+namespace cppmicroservices
 {
-public:
-  BundleEventData(BundleEvent::Type type,
-                  const Bundle& bundle,
-                  const Bundle& origin)
-    : type(type)
-    , bundle(bundle)
-    , origin(origin)
-  {
-    if (!bundle)
-      throw std::invalid_argument("invalid bundle");
-    if (!origin)
-      throw std::invalid_argument("invalid origin");
-  }
 
-  const BundleEvent::Type type;
+    class BundleEventData
+    {
+      public:
+        BundleEventData(BundleEvent::Type type, Bundle const& bundle, Bundle const& origin)
+            : type(type)
+            , bundle(bundle)
+            , origin(origin)
+        {
+            if (!bundle)
+                throw std::invalid_argument("invalid bundle");
+            if (!origin)
+                throw std::invalid_argument("invalid origin");
+        }
 
-  // Bundle that had a change occur in its lifecycle.
-  Bundle bundle;
+        const BundleEvent::Type type;
 
-  // Bundle that was the origin of the event. For install event type, this is
-  // the bundle whose context was used to install the bundle. Otherwise it is
-  // the bundle itself.
-  Bundle origin;
-};
+        // Bundle that had a change occur in its lifecycle.
+        Bundle bundle;
 
-BundleEvent::BundleEvent()
-  : d(nullptr)
-{
-}
+        // Bundle that was the origin of the event. For install event type, this is
+        // the bundle whose context was used to install the bundle. Otherwise it is
+        // the bundle itself.
+        Bundle origin;
+    };
 
-BundleEvent::operator bool() const
-{
-  return d.operator bool();
-}
+    BundleEvent::BundleEvent() : d(nullptr) {}
 
-BundleEvent::BundleEvent(Type type, const Bundle& bundle)
-  : d(new BundleEventData(type, bundle, bundle))
-{
-}
+    BundleEvent::operator bool() const { return d.operator bool(); }
 
-BundleEvent::BundleEvent(Type type, const Bundle& bundle, const Bundle& origin)
-  : d(new BundleEventData(type, bundle, origin))
-{
-}
+    BundleEvent::BundleEvent(Type type, Bundle const& bundle) : d(new BundleEventData(type, bundle, bundle)) {}
 
-Bundle BundleEvent::GetBundle() const
-{
-  if (!d)
-    return Bundle{};
-  return d->bundle;
-}
+    BundleEvent::BundleEvent(Type type, Bundle const& bundle, Bundle const& origin)
+        : d(new BundleEventData(type, bundle, origin))
+    {
+    }
 
-BundleEvent::Type BundleEvent::GetType() const
-{
-  if (!d)
-    return BundleEvent::Type::BUNDLE_UNINSTALLED;
-  return d->type;
-}
+    Bundle
+    BundleEvent::GetBundle() const
+    {
+        if (!d)
+            return Bundle {};
+        return d->bundle;
+    }
 
-Bundle BundleEvent::GetOrigin() const
-{
-  if (!d)
-    return Bundle{};
-  return d->origin;
-}
+    BundleEvent::Type
+    BundleEvent::GetType() const
+    {
+        if (!d)
+            return BundleEvent::Type::BUNDLE_UNINSTALLED;
+        return d->type;
+    }
 
-bool BundleEvent::operator==(const BundleEvent& evt) const
-{
-  if (!(*this) && !evt)
-    return true;
-  if (!(*this) || !evt)
-    return false;
-  return GetType() == evt.GetType() && GetBundle() == evt.GetBundle() &&
-         GetOrigin() == evt.GetOrigin();
-}
+    Bundle
+    BundleEvent::GetOrigin() const
+    {
+        if (!d)
+            return Bundle {};
+        return d->origin;
+    }
 
-std::ostream& operator<<(std::ostream& os, BundleEvent::Type eventType)
-{
-  switch (eventType) {
-    case BundleEvent::BUNDLE_STARTED:
-      return os << "STARTED";
-    case BundleEvent::BUNDLE_STOPPED:
-      return os << "STOPPED";
-    case BundleEvent::BUNDLE_STARTING:
-      return os << "STARTING";
-    case BundleEvent::BUNDLE_STOPPING:
-      return os << "STOPPING";
-    case BundleEvent::BUNDLE_INSTALLED:
-      return os << "INSTALLED";
-    case BundleEvent::BUNDLE_UNINSTALLED:
-      return os << "UNINSTALLED";
-    case BundleEvent::BUNDLE_RESOLVED:
-      return os << "RESOLVED";
-    case BundleEvent::BUNDLE_UNRESOLVED:
-      return os << "UNRESOLVED";
-    case BundleEvent::BUNDLE_LAZY_ACTIVATION:
-      return os << "LAZY_ACTIVATION";
+    bool
+    BundleEvent::operator==(BundleEvent const& evt) const
+    {
+        if (!(*this) && !evt)
+            return true;
+        if (!(*this) || !evt)
+            return false;
+        return GetType() == evt.GetType() && GetBundle() == evt.GetBundle() && GetOrigin() == evt.GetOrigin();
+    }
 
-    default:
-      return os << "Unknown bundle event type (" << static_cast<int>(eventType)
-                << ")";
-  }
-}
+    std::ostream&
+    operator<<(std::ostream& os, BundleEvent::Type eventType)
+    {
+        switch (eventType)
+        {
+            case BundleEvent::BUNDLE_STARTED:
+                return os << "STARTED";
+            case BundleEvent::BUNDLE_STOPPED:
+                return os << "STOPPED";
+            case BundleEvent::BUNDLE_STARTING:
+                return os << "STARTING";
+            case BundleEvent::BUNDLE_STOPPING:
+                return os << "STOPPING";
+            case BundleEvent::BUNDLE_INSTALLED:
+                return os << "INSTALLED";
+            case BundleEvent::BUNDLE_UNINSTALLED:
+                return os << "UNINSTALLED";
+            case BundleEvent::BUNDLE_RESOLVED:
+                return os << "RESOLVED";
+            case BundleEvent::BUNDLE_UNRESOLVED:
+                return os << "UNRESOLVED";
+            case BundleEvent::BUNDLE_LAZY_ACTIVATION:
+                return os << "LAZY_ACTIVATION";
 
-std::ostream& operator<<(std::ostream& os, const BundleEvent& event)
-{
-  if (!event)
-    return os << "NONE";
+            default:
+                return os << "Unknown bundle event type (" << static_cast<int>(eventType) << ")";
+        }
+    }
 
-  auto m = event.GetBundle();
-  os << event.GetType() << " #" << m.GetBundleId() << " ("
-     << m.GetSymbolicName() << " at " << m.GetLocation() << ")";
-  return os;
-}
-}
+    std::ostream&
+    operator<<(std::ostream& os, BundleEvent const& event)
+    {
+        if (!event)
+            return os << "NONE";
+
+        auto m = event.GetBundle();
+        os << event.GetType() << " #" << m.GetBundleId() << " (" << m.GetSymbolicName() << " at " << m.GetLocation()
+           << ")";
+        return os;
+    }
+} // namespace cppmicroservices

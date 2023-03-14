@@ -31,95 +31,96 @@ limitations under the License.
 #include <map>
 #include <string>
 
-namespace cppmicroservices {
-
-/**
- * The implementation of the Framework class.
- *
- * This class exists to hide and decouple the implementation of the
- * Framework class from client code.
- */
-class FrameworkPrivate : public BundlePrivate
+namespace cppmicroservices
 {
-public:
-  FrameworkPrivate(CoreBundleContext* fwCtx);
 
-  void Init();
+    /**
+     * The implementation of the Framework class.
+     *
+     * This class exists to hide and decouple the implementation of the
+     * Framework class from client code.
+     */
+    class FrameworkPrivate : public BundlePrivate
+    {
+      public:
+        FrameworkPrivate(CoreBundleContext* fwCtx);
 
-  void DoInit();
+        void Init();
 
-  void InitSystemBundle();
+        void DoInit();
 
-  void UninitSystemBundle();
+        void InitSystemBundle();
 
-  FrameworkEvent WaitForStop(const std::chrono::milliseconds& timeout);
+        void UninitSystemBundle();
 
-  void Shutdown(bool restart);
+        FrameworkEvent WaitForStop(std::chrono::milliseconds const& timeout);
 
-  void Start(uint32_t) override;
-  void Stop(uint32_t) override;
+        void Shutdown(bool restart);
 
-  void Uninstall() override;
-  std::string GetLocation() const override;
+        void Start(uint32_t) override;
+        void Stop(uint32_t) override;
 
-  const AnyMap& GetHeaders() const override;
+        void Uninstall() override;
+        std::string GetLocation() const override;
 
-  /**
-   * Stop this FrameworkContext, suspending all started contexts. This method
-   * suspends all started contexts so that they can be automatically restarted
-   * when this FrameworkContext is next launched.
-   *
-   * <p>
-   * If the framework is not started, this method does nothing. If the framework
-   * is started, this method will:
-   * <ol>
-   * <li>Set the state of the FrameworkContext to <i>inactive</i>.</li>
-   * <li>Stop all started bundles as described in the {@link Bundle#Stop(int)}
-   * method except that the persistent state of the bundle will continue to be
-   * started. Reports any exceptions that occur during stopping using
-   * <code>FrameworkErrorEvents</code>.</li>
-   * <li>Disable event handling.</li>
-   * </ol>
-   * </p>
-   *
-   */
-  void Shutdown0(bool restart, bool wasActive);
+        AnyMap const& GetHeaders() const override;
 
-  /**
-   * Tell system bundle shutdown finished.
-   */
-  void ShutdownDone_unlocked(bool restart);
+        /**
+         * Stop this FrameworkContext, suspending all started contexts. This method
+         * suspends all started contexts so that they can be automatically restarted
+         * when this FrameworkContext is next launched.
+         *
+         * <p>
+         * If the framework is not started, this method does nothing. If the framework
+         * is started, this method will:
+         * <ol>
+         * <li>Set the state of the FrameworkContext to <i>inactive</i>.</li>
+         * <li>Stop all started bundles as described in the {@link Bundle#Stop(int)}
+         * method except that the persistent state of the bundle will continue to be
+         * started. Reports any exceptions that occur during stopping using
+         * <code>FrameworkErrorEvents</code>.</li>
+         * <li>Disable event handling.</li>
+         * </ol>
+         * </p>
+         *
+         */
+        void Shutdown0(bool restart, bool wasActive);
 
-  /**
-   *  Stop and unresolve all bundles.
-   */
-  void StopAllBundles();
+        /**
+         * Tell system bundle shutdown finished.
+         */
+        void ShutdownDone_unlocked(bool restart);
 
-  /**
-   * The event to return to callers waiting in Framework.waitForStop() when the
-   * framework has been stopped.
-   */
-  struct FrameworkEventInternal
-  {
-    bool valid;
-    FrameworkEvent::Type type;
-    std::string msg;
-    std::exception_ptr excPtr;
-  } stopEvent;
+        /**
+         *  Stop and unresolve all bundles.
+         */
+        void StopAllBundles();
 
-  /**
-   * Shutting down is done.
-   */
-  void SystemShuttingdownDone_unlocked(const FrameworkEventInternal& fe);
+        /**
+         * The event to return to callers waiting in Framework.waitForStop() when the
+         * framework has been stopped.
+         */
+        struct FrameworkEventInternal
+        {
+            bool valid;
+            FrameworkEvent::Type type;
+            std::string msg;
+            std::exception_ptr excPtr;
+        } stopEvent;
 
-  /**
-   * The thread that performs shutdown of this framework instance.
-   */
-  std::thread shutdownThread;
+        /**
+         * Shutting down is done.
+         */
+        void SystemShuttingdownDone_unlocked(FrameworkEventInternal const& fe);
 
-private:
-  AnyMap headers;
-};
-}
+        /**
+         * The thread that performs shutdown of this framework instance.
+         */
+        std::thread shutdownThread;
+
+      private:
+        AnyMap headers;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_FRAMEWORKPRIVATE_H

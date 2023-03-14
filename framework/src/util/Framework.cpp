@@ -26,51 +26,51 @@
 
 #include "FrameworkPrivate.h"
 
-namespace cppmicroservices {
-
-namespace {
-
-FrameworkPrivate* pimpl(const std::shared_ptr<BundlePrivate>& p)
+namespace cppmicroservices
 {
-  return static_cast<FrameworkPrivate*>(p.get());
-}
-}
 
-Framework::Framework(const Framework&) = default;
+    namespace
+    {
 
-Framework::Framework(Framework&& fw) noexcept
-  : Bundle(std::move(fw))
-{
-}
+        FrameworkPrivate*
+        pimpl(std::shared_ptr<BundlePrivate> const& p)
+        {
+            return static_cast<FrameworkPrivate*>(p.get());
+        }
+    } // namespace
 
-Framework& Framework::operator=(const Framework&) = default;
+    Framework::Framework(Framework const&) = default;
 
-Framework& Framework::operator=(Framework&& fw) noexcept
-{
-  Bundle::operator=(std::move(fw));
-  return *this;
-}
+    Framework::Framework(Framework&& fw) noexcept : Bundle(std::move(fw)) {}
 
-Framework::Framework(Bundle b)
-  : Bundle(std::move(b))
-{
-  if (GetBundleId() != 0) {
-    throw std::logic_error("Not a framework bundle");
-  }
-}
+    Framework& Framework::operator=(Framework const&) = default;
 
-Framework::Framework(const std::shared_ptr<FrameworkPrivate>& d)
-  : Bundle(d)
-{
-}
+    Framework&
+    Framework::operator=(Framework&& fw) noexcept
+    {
+        Bundle::operator=(std::move(fw));
+        return *this;
+    }
 
-void Framework::Init()
-{
-  pimpl(d)->Init();
-}
+    Framework::Framework(Bundle b) : Bundle(std::move(b))
+    {
+        if (GetBundleId() != 0)
+        {
+            throw std::logic_error("Not a framework bundle");
+        }
+    }
 
-FrameworkEvent Framework::WaitForStop(const std::chrono::milliseconds& timeout)
-{
-  return pimpl(d)->WaitForStop(timeout);
-}
-}
+    Framework::Framework(std::shared_ptr<FrameworkPrivate> const& d) : Bundle(d) {}
+
+    void
+    Framework::Init()
+    {
+        pimpl(d)->Init();
+    }
+
+    FrameworkEvent
+    Framework::WaitForStop(std::chrono::milliseconds const& timeout)
+    {
+        return pimpl(d)->WaitForStop(timeout);
+    }
+} // namespace cppmicroservices

@@ -30,23 +30,24 @@
 // ignore warning c4275 per MS documentation
 // https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-2-c4275
 #ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4275)
+#    pragma warning(push)
+#    pragma warning(disable : 4275)
 #endif
 
-namespace cppmicroservices {
-class US_Framework_EXPORT SecurityException final : public std::runtime_error
+namespace cppmicroservices
 {
-public:
-  explicit SecurityException(std::string what, cppmicroservices::Bundle origin);
-  Bundle GetBundle() const;
+    class US_Framework_EXPORT SecurityException final : public std::runtime_error
+    {
+      public:
+        explicit SecurityException(std::string what, cppmicroservices::Bundle origin);
+        Bundle GetBundle() const;
 
-private:
-  Bundle origin; ///< The bundle from which the exception originated.
-};
+      private:
+        Bundle origin; ///< The bundle from which the exception originated.
+    };
 #ifdef _MSC_VER
-#  pragma warning(pop)
+#    pragma warning(pop)
 #endif
-}
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SECURITYEXCEPTION_H

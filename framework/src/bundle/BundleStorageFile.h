@@ -25,28 +25,27 @@
 
 #include "BundleStorage.h"
 
-namespace cppmicroservices {
-
-class BundleStorageFile : public BundleStorage
+namespace cppmicroservices
 {
 
-public:
-  BundleStorageFile();
+    class BundleStorageFile : public BundleStorage
+    {
 
-  std::shared_ptr<BundleArchive> CreateAndInsertArchive(
-    const std::shared_ptr<BundleResourceContainer>& resCont,
-    const std::string& topLevelEntry,
-    const ManifestT&) override;
+      public:
+        BundleStorageFile();
 
-  bool RemoveArchive(const BundleArchive* ba) override;
+        std::shared_ptr<BundleArchive> CreateAndInsertArchive(std::shared_ptr<BundleResourceContainer> const& resCont,
+                                                              std::string const& topLevelEntry,
+                                                              ManifestT const&) override;
 
-  std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives()
-    const override;
+        bool RemoveArchive(BundleArchive const* ba) override;
 
-  std::vector<long> GetStartOnLaunchBundles() const override;
+        std::vector<std::shared_ptr<BundleArchive>> GetAllBundleArchives() const override;
 
-  void Close() override;
-};
-}
+        std::vector<long> GetStartOnLaunchBundles() const override;
+
+        void Close() override;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLESTORAGEFILE_H

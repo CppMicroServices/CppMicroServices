@@ -26,42 +26,42 @@
 
 #include <stdexcept>
 
-namespace cppmicroservices {
-
-BundleStorageFile::BundleStorageFile()
-  : BundleStorage()
+namespace cppmicroservices
 {
-  throw std::logic_error("not implemented");
-}
 
-std::shared_ptr<BundleArchive> BundleStorageFile::CreateAndInsertArchive(
-  const std::shared_ptr<BundleResourceContainer>& /*resCont*/
-  ,
-  const std::string& /*topLevelEntries*/
-  ,
-  const ManifestT&)
-{
-  throw std::logic_error("not implemented");
-}
+    BundleStorageFile::BundleStorageFile() : BundleStorage() { throw std::logic_error("not implemented"); }
 
-bool BundleStorageFile::RemoveArchive(const BundleArchive* /*ba*/)
-{
-  throw std::logic_error("not implemented");
-}
+    std::shared_ptr<BundleArchive>
+    BundleStorageFile::CreateAndInsertArchive(std::shared_ptr<BundleResourceContainer> const& /*resCont*/
+                                              ,
+                                              std::string const& /*topLevelEntries*/
+                                              ,
+                                              ManifestT const&)
+    {
+        throw std::logic_error("not implemented");
+    }
 
-std::vector<std::shared_ptr<BundleArchive>>
-BundleStorageFile::GetAllBundleArchives() const
-{
-  throw std::logic_error("not implemented");
-}
+    bool
+    BundleStorageFile::RemoveArchive(BundleArchive const* /*ba*/)
+    {
+        throw std::logic_error("not implemented");
+    }
 
-std::vector<long> BundleStorageFile::GetStartOnLaunchBundles() const
-{
-  throw std::logic_error("not implemented");
-}
+    std::vector<std::shared_ptr<BundleArchive>>
+    BundleStorageFile::GetAllBundleArchives() const
+    {
+        throw std::logic_error("not implemented");
+    }
 
-void BundleStorageFile::Close()
-{
-  throw std::logic_error("not implemented");
-}
-}
+    std::vector<long>
+    BundleStorageFile::GetStartOnLaunchBundles() const
+    {
+        throw std::logic_error("not implemented");
+    }
+
+    void
+    BundleStorageFile::Close()
+    {
+        throw std::logic_error("not implemented");
+    }
+} // namespace cppmicroservices

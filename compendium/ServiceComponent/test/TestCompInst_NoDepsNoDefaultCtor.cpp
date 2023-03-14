@@ -20,44 +20,46 @@
 
   =============================================================================*/
 #if NEVER
-#  include <algorithm>
-#  include <chrono>
-#  include <cstdio>
-#  include <iostream>
+#    include <algorithm>
+#    include <chrono>
+#    include <cstdio>
+#    include <iostream>
 
-#  include "gtest/gtest.h"
+#    include "gtest/gtest.h"
 
-#  include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
-#  include <cppmicroservices/ServiceInterface.h>
+#    include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#    include <cppmicroservices/ServiceInterface.h>
 
 using cppmicroservices::service::component::detail::ComponentInstanceImpl;
 
-namespace {
-
-// dummy class used for testing
-class TestServiceImpl
+namespace
 {
-public:
-  TestServiceImpl() = delete;
-  TestServiceImpl(int) {}
-  virtual ~TestServiceImpl() = default;
-};
 
-/**
- * This test point is used to verify a compile error is generated when a service component
- * does not have any dependencies and it does not provide a default constructor.
- *
- * @todo Automate this test point. Currently interactive is the only way to verify compilation failures.
- */
-TEST(ComponentInstance, CheckNoDefaultCtor)
-{
-  ComponentInstanceImpl<TestServiceImpl> compInstance; // compile error
-}
-}
+    // dummy class used for testing
+    class TestServiceImpl
+    {
+      public:
+        TestServiceImpl() = delete;
+        TestServiceImpl(int) {}
+        virtual ~TestServiceImpl() = default;
+    };
 
-int main(int argc, char** argv)
+    /**
+     * This test point is used to verify a compile error is generated when a service component
+     * does not have any dependencies and it does not provide a default constructor.
+     *
+     * @todo Automate this test point. Currently interactive is the only way to verify compilation failures.
+     */
+    TEST(ComponentInstance, CheckNoDefaultCtor)
+    {
+        ComponentInstanceImpl<TestServiceImpl> compInstance; // compile error
+    }
+} // namespace
+
+int
+main(int argc, char** argv)
 {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
 #endif

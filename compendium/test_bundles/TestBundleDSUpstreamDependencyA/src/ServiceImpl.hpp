@@ -6,24 +6,28 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 
-namespace dependent {
-class TestBundleDSUpstreamDependencyImpl
-  : public test::TestBundleDSUpstreamDependency
+namespace dependent
 {
-public:
-  TestBundleDSUpstreamDependencyImpl();
-  ~TestBundleDSUpstreamDependencyImpl() override;
+    class TestBundleDSUpstreamDependencyImpl : public test::TestBundleDSUpstreamDependency
+    {
+      public:
+        TestBundleDSUpstreamDependencyImpl();
+        ~TestBundleDSUpstreamDependencyImpl() override;
 
-  void Activate(const std::shared_ptr<cppmicroservices::service::component::ComponentContext>& context)
-  {
-    ctx = context->GetBundleContext();  
-  }
+        void
+        Activate(std::shared_ptr<cppmicroservices::service::component::ComponentContext> const& context)
+        {
+            ctx = context->GetBundleContext();
+        }
 
-  void Deactivate(const std::shared_ptr<cppmicroservices::service::component::ComponentContext>&) {}
+        void
+        Deactivate(std::shared_ptr<cppmicroservices::service::component::ComponentContext> const&)
+        {
+        }
 
-private:
-  cppmicroservices::BundleContext ctx;
-};
-}
+      private:
+        cppmicroservices::BundleContext ctx;
+    };
+} // namespace dependent
 
 #endif // _SERVICE_IMPL_HPP_

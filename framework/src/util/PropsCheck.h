@@ -28,7 +28,7 @@
   The code contained in this file has been extracted from other individual files to promote
   code reusability while reducing the amount of code duplication that exists so that maintenance
   is easier.
-  
+
   Functions defined here are intended for internal use; no external clients of the core
   framework should be capable/allowed of calling these functions.
  */
@@ -45,31 +45,33 @@
 #include "cppmicroservices/LDAPFilter.h"
 
 #ifdef US_PLATFORM_WINDOWS
-#  include <string.h>
-#  define ci_compare strnicmp
+#    include <string.h>
+#    define ci_compare strnicmp
 #else
-#  include <strings.h>
-#  define ci_compare strncasecmp
+#    include <strings.h>
+#    define ci_compare strncasecmp
 #endif
 
-namespace cppmicroservices {
+namespace cppmicroservices
+{
 
-namespace props_check {
-/**
- * @brief Validates that the provided AnyMap conforms to the same constraints that
- * those stored in Property objects have.
- * 
- * The provided AnyMap is said to be valid if there exists no pairs of two keys
- * which differ in case only (e.g., "service.feature", "Service.feature"). If this
- * condition is not true, this function throws as defined below.
- * 
- * @param am The AnyMap to validate
- * @throws std::runtime_error Thrown when `am` is invalid (described above)
- */
-void ValidateAnyMap(const cppmicroservices::AnyMap& am);
+    namespace props_check
+    {
+        /**
+         * @brief Validates that the provided AnyMap conforms to the same constraints that
+         * those stored in Property objects have.
+         *
+         * The provided AnyMap is said to be valid if there exists no pairs of two keys
+         * which differ in case only (e.g., "service.feature", "Service.feature"). If this
+         * condition is not true, this function throws as defined below.
+         *
+         * @param am The AnyMap to validate
+         * @throws std::runtime_error Thrown when `am` is invalid (described above)
+         */
+        void ValidateAnyMap(cppmicroservices::AnyMap const& am);
 
-std::string ToLower(const std::string& s);
-}
-}
+        std::string ToLower(std::string const& s);
+    } // namespace props_check
+} // namespace cppmicroservices
 
 #endif

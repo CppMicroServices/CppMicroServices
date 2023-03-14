@@ -24,36 +24,39 @@
 #include "../ComponentConfigurationImpl.hpp"
 #include "CCUnsatisfiedReferenceState.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-CCSatisfiedState::CCSatisfiedState()
+namespace cppmicroservices
 {
-  std::promise<void> prom;
-  ready = prom.get_future();
-  prom.set_value();
-}
+    namespace scrimpl
+    {
 
-void CCSatisfiedState::Deactivate(ComponentConfigurationImpl& mgr)
-{
+        CCSatisfiedState::CCSatisfiedState()
+        {
+            std::promise<void> prom;
+            ready = prom.get_future();
+            prom.set_value();
+        }
 
-  auto currentState = shared_from_this();
-  std::packaged_task<void(void)> task([&mgr]() {
-    mgr.UnregisterService();
-    mgr.DestroyComponentInstances();
-  });
-  auto unsatisfiedState =
-    std::make_shared<CCUnsatisfiedReferenceState>(task.get_future().share());
-  while (
-    currentState->GetValue() !=
-    service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE) {
-    if (mgr.CompareAndSetState(&currentState, unsatisfiedState)) {
-      currentState
-        ->WaitForTransitionTask(); // wait for the previous transition to finish
-      task();
-      break;
-    }
-  }
-}
-}
-}
+        void
+        CCSatisfiedState::Deactivate(ComponentConfigurationImpl& mgr)
+        {
+
+            auto currentState = shared_from_this();
+            std::packaged_task<void(void)> task(
+                [&mgr]()
+                {
+                    mgr.UnregisterService();
+                    mgr.DestroyComponentInstances();
+                });
+            auto unsatisfiedState = std::make_shared<CCUnsatisfiedReferenceState>(task.get_future().share());
+            while (currentState->GetValue() != service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE)
+            {
+                if (mgr.CompareAndSetState(&currentState, unsatisfiedState))
+                {
+                    currentState->WaitForTransitionTask(); // wait for the previous transition to finish
+                    task();
+                    break;
+                }
+            }
+        }
+    } // namespace scrimpl
+} // namespace cppmicroservices

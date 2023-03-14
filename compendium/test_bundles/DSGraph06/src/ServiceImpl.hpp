@@ -3,17 +3,18 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 
-namespace graph {
-class DSGraph06Impl : public test::DSGraph06
+namespace graph
 {
-public:
-  DSGraph06Impl(const std::shared_ptr<test::DSGraph07>&);
-  ~DSGraph06Impl() override;
-  std::string Description() override;
+    class DSGraph06Impl : public test::DSGraph06
+    {
+      public:
+        DSGraph06Impl(std::shared_ptr<test::DSGraph07> const&);
+        ~DSGraph06Impl() override;
+        std::string Description() override;
 
-private:
-  std::shared_ptr<test::DSGraph07> graph07;
-};
-}
+      private:
+        std::shared_ptr<test::DSGraph07> graph07;
+    };
+} // namespace graph
 
 #endif // _SERVICE_IMPL_HPP_

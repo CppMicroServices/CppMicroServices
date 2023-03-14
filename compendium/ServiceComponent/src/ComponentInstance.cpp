@@ -22,12 +22,16 @@
 
 #include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"
 
-namespace cppmicroservices {
-namespace service {
-namespace component {
-namespace detail {
-ComponentInstance::~ComponentInstance() noexcept {}
-}
-}
-}
-}
+namespace cppmicroservices
+{
+    namespace service
+    {
+        namespace component
+        {
+            namespace detail
+            {
+                ComponentInstance::~ComponentInstance() noexcept {}
+            } // namespace detail
+        }     // namespace component
+    }         // namespace service
+} // namespace cppmicroservices

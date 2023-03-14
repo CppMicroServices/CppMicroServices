@@ -25,20 +25,20 @@
 
 #include "cppmicroservices/webconsole/SimpleWebConsolePlugin.h"
 
-namespace cppmicroservices {
-
-class ServicesPlugin : public SimpleWebConsolePlugin
+namespace cppmicroservices
 {
-public:
-  ServicesPlugin();
 
-private:
-  void RenderContent(HttpServletRequest& /*request*/,
-                     HttpServletResponse& response);
+    class ServicesPlugin : public SimpleWebConsolePlugin
+    {
+      public:
+        ServicesPlugin();
 
-  TemplateData GetIds() const;
-  TemplateData GetInterface(const std::string& iid) const;
-};
-}
+      private:
+        void RenderContent(HttpServletRequest& /*request*/, HttpServletResponse& response);
+
+        TemplateData GetIds() const;
+        TemplateData GetInterface(std::string const& iid) const;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SERVICESPLUGIN_H

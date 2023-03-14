@@ -27,25 +27,27 @@
 #include "ConfigurationNotifier.hpp"
 #include <memory>
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-class ComponentConfigurationFactory
+namespace cppmicroservices
 {
-public:
-  /**
-   * Factory method to create the appropriate {@link ComponentConfigurationImpl}
-   * object based on the Component' service scope
-   */
-  static std::shared_ptr<ComponentConfigurationImpl> CreateConfigurationManager(
-    std::shared_ptr<const metadata::ComponentMetadata> compDesc,
-    const cppmicroservices::Bundle& bundle,
-    std::shared_ptr<ComponentRegistry> registry,
-    std::shared_ptr<logservice::LogService> logger,
-    std::shared_ptr<ConfigurationNotifier> configNotifier,
-    std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
-};
-}
-}
+    namespace scrimpl
+    {
+
+        class ComponentConfigurationFactory
+        {
+          public:
+            /**
+             * Factory method to create the appropriate {@link ComponentConfigurationImpl}
+             * object based on the Component' service scope
+             */
+            static std::shared_ptr<ComponentConfigurationImpl> CreateConfigurationManager(
+                std::shared_ptr<const metadata::ComponentMetadata> compDesc,
+                cppmicroservices::Bundle const& bundle,
+                std::shared_ptr<ComponentRegistry> registry,
+                std::shared_ptr<logservice::LogService> logger,
+                std::shared_ptr<ConfigurationNotifier> configNotifier,
+                std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 
 #endif /* __COMPONENTCONFIGURATIONFACTORY_HPP__ */

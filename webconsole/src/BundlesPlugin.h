@@ -25,41 +25,38 @@
 
 #include "cppmicroservices/webconsole/SimpleWebConsolePlugin.h"
 
-namespace cppmicroservices {
-
-class BundlesPlugin : public SimpleWebConsolePlugin
+namespace cppmicroservices
 {
-public:
-  BundlesPlugin();
 
-private:
-  enum class RequestType : int
-  {
-    Unknown = 0,
-    MainPage,
-    Bundle,
-    Resource
-  };
+    class BundlesPlugin : public SimpleWebConsolePlugin
+    {
+      public:
+        BundlesPlugin();
 
-  void RenderContent(HttpServletRequest& request,
-                     HttpServletResponse& response);
+      private:
+        enum class RequestType : int
+        {
+            Unknown = 0,
+            MainPage,
+            Bundle,
+            Resource
+        };
 
-  bool IsHtmlRequest(HttpServletRequest& request);
+        void RenderContent(HttpServletRequest& request, HttpServletResponse& response);
 
-  TemplateData GetBundlesData() const;
+        bool IsHtmlRequest(HttpServletRequest& request);
 
-  void GetBundleData(long id,
-                     TemplateData& data,
-                     const std::string& pluginRoot) const;
+        TemplateData GetBundlesData() const;
 
-  std::pair<std::size_t, std::size_t> GetResourceJsonTree(
-    Bundle& bundle,
-    const std::string& parentPath,
-    const BundleResource& currResource,
-    std::string& json,
-    int level,
-    const std::string& pluginRoot) const;
-};
-}
+        void GetBundleData(long id, TemplateData& data, std::string const& pluginRoot) const;
+
+        std::pair<std::size_t, std::size_t> GetResourceJsonTree(Bundle& bundle,
+                                                                std::string const& parentPath,
+                                                                BundleResource const& currResource,
+                                                                std::string& json,
+                                                                int level,
+                                                                std::string const& pluginRoot) const;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLESPLUGIN_H

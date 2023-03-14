@@ -29,241 +29,264 @@
 #include <utility>
 #include <vector>
 
-namespace cppmicroservices {
-
-const char BundleVersion::SEPARATOR = '.';
-
-bool IsInvalidQualifier(char c)
+namespace cppmicroservices
 {
-  return !(std::isalnum(c) || c == '_' || c == '-');
-}
 
-BundleVersion BundleVersion::EmptyVersion()
-{
-  static BundleVersion emptyV(false);
-  return emptyV;
-}
+    char const BundleVersion::SEPARATOR = '.';
 
-BundleVersion BundleVersion::UndefinedVersion()
-{
-  static BundleVersion undefinedV(true);
-  return undefinedV;
-}
+    bool
+    IsInvalidQualifier(char c)
+    {
+        return !(std::isalnum(c) || c == '_' || c == '-');
+    }
 
-BundleVersion& BundleVersion::operator=(const BundleVersion&) = default;
+    BundleVersion
+    BundleVersion::EmptyVersion()
+    {
+        static BundleVersion emptyV(false);
+        return emptyV;
+    }
 
-BundleVersion::BundleVersion(bool undefined)
-  : qualifier("")
-  , undefined(undefined)
-{
-}
+    BundleVersion
+    BundleVersion::UndefinedVersion()
+    {
+        static BundleVersion undefinedV(true);
+        return undefinedV;
+    }
 
-void BundleVersion::Validate()
-{
-  if (std::find_if(qualifier.begin(), qualifier.end(), IsInvalidQualifier) !=
-      qualifier.end())
-    throw std::invalid_argument(std::string("invalid qualifier: ") + qualifier);
+    BundleVersion& BundleVersion::operator=(BundleVersion const&) = default;
 
-  undefined = false;
-}
+    BundleVersion::BundleVersion(bool undefined) : qualifier(""), undefined(undefined) {}
 
-BundleVersion::BundleVersion(unsigned int majorVersion,
-                             unsigned int minorVersion,
-                             unsigned int microVersion)
-  : majorVersion(majorVersion)
-  , minorVersion(minorVersion)
-  , microVersion(microVersion)
-  , qualifier("")
-  , undefined(false)
-{
-}
+    void
+    BundleVersion::Validate()
+    {
+        if (std::find_if(qualifier.begin(), qualifier.end(), IsInvalidQualifier) != qualifier.end())
+            throw std::invalid_argument(std::string("invalid qualifier: ") + qualifier);
 
-BundleVersion::BundleVersion(unsigned int majorVersion,
-                             unsigned int minorVersion,
-                             unsigned int microVersion,
-                             std::string qualifier)
-  : majorVersion(majorVersion)
-  , minorVersion(minorVersion)
-  , microVersion(microVersion)
-  , qualifier(std::move(qualifier))
-  , undefined(true)
-{
-  this->Validate();
-}
+        undefined = false;
+    }
 
-BundleVersion::BundleVersion(const std::string& version)
-  : majorVersion(0)
-  , minorVersion(0)
-  , microVersion(0)
-  , undefined(true)
-{
-  unsigned int maj = 0;
-  unsigned int min = 0;
-  unsigned int mic = 0;
-  std::string qual("");
+    BundleVersion::BundleVersion(unsigned int majorVersion, unsigned int minorVersion, unsigned int microVersion)
+        : majorVersion(majorVersion)
+        , minorVersion(minorVersion)
+        , microVersion(microVersion)
+        , qualifier("")
+        , undefined(false)
+    {
+    }
 
-  std::vector<std::string> st;
-  std::stringstream ss(version);
-  std::string token;
-  while (std::getline(ss, token, SEPARATOR)) {
-    st.push_back(token);
-  }
+    BundleVersion::BundleVersion(unsigned int majorVersion,
+                                 unsigned int minorVersion,
+                                 unsigned int microVersion,
+                                 std::string qualifier)
+        : majorVersion(majorVersion)
+        , minorVersion(minorVersion)
+        , microVersion(microVersion)
+        , qualifier(std::move(qualifier))
+        , undefined(true)
+    {
+        this->Validate();
+    }
 
-  if (st.empty())
-    return;
+    BundleVersion::BundleVersion(std::string const& version)
+        : majorVersion(0)
+        , minorVersion(0)
+        , microVersion(0)
+        , undefined(true)
+    {
+        unsigned int maj = 0;
+        unsigned int min = 0;
+        unsigned int mic = 0;
+        std::string qual("");
 
-  bool ok = true;
-  ss.clear();
-  ss.str(st[0]);
-  ss >> maj;
-  ok = !ss.fail();
-
-  if (st.size() > 1) {
-    ss.clear();
-    ss.str(st[1]);
-    ss >> min;
-    ok = !ss.fail();
-    if (st.size() > 2) {
-      ss.clear();
-      ss.str(st[2]);
-      ss >> mic;
-      ok = !ss.fail();
-      if (st.size() > 3) {
-        qual = st[3];
-        if (st.size() > 4) {
-          ok = false;
+        std::vector<std::string> st;
+        std::stringstream ss(version);
+        std::string token;
+        while (std::getline(ss, token, SEPARATOR))
+        {
+            st.push_back(token);
         }
-      }
-    }
-  }
 
-  if (!ok)
-    throw std::invalid_argument("invalid format");
+        if (st.empty())
+            return;
 
-  majorVersion = maj;
-  minorVersion = min;
-  microVersion = mic;
-  qualifier = qual;
-  this->Validate();
-}
+        bool ok = true;
+        ss.clear();
+        ss.str(st[0]);
+        ss >> maj;
+        ok = !ss.fail();
 
-BundleVersion::BundleVersion(const BundleVersion&) = default;
+        if (st.size() > 1)
+        {
+            ss.clear();
+            ss.str(st[1]);
+            ss >> min;
+            ok = !ss.fail();
+            if (st.size() > 2)
+            {
+                ss.clear();
+                ss.str(st[2]);
+                ss >> mic;
+                ok = !ss.fail();
+                if (st.size() > 3)
+                {
+                    qual = st[3];
+                    if (st.size() > 4)
+                    {
+                        ok = false;
+                    }
+                }
+            }
+        }
 
-BundleVersion BundleVersion::ParseVersion(const std::string& version)
-{
-  if (version.empty()) {
-    return EmptyVersion();
-  }
+        if (!ok)
+            throw std::invalid_argument("invalid format");
 
-  std::string version2(version);
-  version2.erase(0, version2.find_first_not_of(' '));
-  version2.erase(version2.find_last_not_of(' ') + 1);
-  if (version2.empty()) {
-    return EmptyVersion();
-  }
-
-  return BundleVersion(version2);
-}
-
-bool BundleVersion::IsUndefined() const
-{
-  return undefined;
-}
-
-unsigned int BundleVersion::GetMajor() const
-{
-  if (undefined)
-    throw std::logic_error("Version undefined");
-  return majorVersion;
-}
-
-unsigned int BundleVersion::GetMinor() const
-{
-  if (undefined)
-    throw std::logic_error("Version undefined");
-  return minorVersion;
-}
-
-unsigned int BundleVersion::GetMicro() const
-{
-  if (undefined)
-    throw std::logic_error("Version undefined");
-  return microVersion;
-}
-
-std::string BundleVersion::GetQualifier() const
-{
-  if (undefined)
-    throw std::logic_error("Version undefined");
-  return qualifier;
-}
-
-std::string BundleVersion::ToString() const
-{
-  if (undefined)
-    return "undefined";
-
-  std::stringstream ss;
-  ss << majorVersion << SEPARATOR << minorVersion << SEPARATOR << microVersion;
-  if (!qualifier.empty()) {
-    ss << SEPARATOR << qualifier;
-  }
-  return ss.str();
-}
-
-bool BundleVersion::operator==(const BundleVersion& other) const
-{
-  if (&other == this) { // quicktest
-    return true;
-  }
-
-  if (other.undefined && this->undefined)
-    return true;
-  if (this->undefined)
-    throw std::logic_error("Version undefined");
-  if (other.undefined)
-    return false;
-
-  return (majorVersion == other.majorVersion) &&
-         (minorVersion == other.minorVersion) &&
-         (microVersion == other.microVersion) && qualifier == other.qualifier;
-}
-
-int BundleVersion::Compare(const BundleVersion& other) const
-{
-  if (&other == this) { // quicktest
-    return 0;
-  }
-
-  if (this->undefined || other.undefined)
-    throw std::logic_error("Cannot compare undefined version");
-
-  if (majorVersion < other.majorVersion) {
-    return -1;
-  }
-
-  if (majorVersion == other.majorVersion) {
-
-    if (minorVersion < other.minorVersion) {
-      return -1;
+        majorVersion = maj;
+        minorVersion = min;
+        microVersion = mic;
+        qualifier = qual;
+        this->Validate();
     }
 
-    if (minorVersion == other.minorVersion) {
+    BundleVersion::BundleVersion(BundleVersion const&) = default;
 
-      if (microVersion < other.microVersion) {
-        return -1;
-      }
+    BundleVersion
+    BundleVersion::ParseVersion(std::string const& version)
+    {
+        if (version.empty())
+        {
+            return EmptyVersion();
+        }
 
-      if (microVersion == other.microVersion) {
-        return qualifier.compare(other.qualifier);
-      }
+        std::string version2(version);
+        version2.erase(0, version2.find_first_not_of(' '));
+        version2.erase(version2.find_last_not_of(' ') + 1);
+        if (version2.empty())
+        {
+            return EmptyVersion();
+        }
+
+        return BundleVersion(version2);
     }
-  }
-  return 1;
-}
 
-std::ostream& operator<<(std::ostream& os, const BundleVersion& v)
-{
-  return os << v.ToString();
-}
-}
+    bool
+    BundleVersion::IsUndefined() const
+    {
+        return undefined;
+    }
+
+    unsigned int
+    BundleVersion::GetMajor() const
+    {
+        if (undefined)
+            throw std::logic_error("Version undefined");
+        return majorVersion;
+    }
+
+    unsigned int
+    BundleVersion::GetMinor() const
+    {
+        if (undefined)
+            throw std::logic_error("Version undefined");
+        return minorVersion;
+    }
+
+    unsigned int
+    BundleVersion::GetMicro() const
+    {
+        if (undefined)
+            throw std::logic_error("Version undefined");
+        return microVersion;
+    }
+
+    std::string
+    BundleVersion::GetQualifier() const
+    {
+        if (undefined)
+            throw std::logic_error("Version undefined");
+        return qualifier;
+    }
+
+    std::string
+    BundleVersion::ToString() const
+    {
+        if (undefined)
+            return "undefined";
+
+        std::stringstream ss;
+        ss << majorVersion << SEPARATOR << minorVersion << SEPARATOR << microVersion;
+        if (!qualifier.empty())
+        {
+            ss << SEPARATOR << qualifier;
+        }
+        return ss.str();
+    }
+
+    bool
+    BundleVersion::operator==(BundleVersion const& other) const
+    {
+        if (&other == this)
+        { // quicktest
+            return true;
+        }
+
+        if (other.undefined && this->undefined)
+            return true;
+        if (this->undefined)
+            throw std::logic_error("Version undefined");
+        if (other.undefined)
+            return false;
+
+        return (majorVersion == other.majorVersion) && (minorVersion == other.minorVersion)
+               && (microVersion == other.microVersion) && qualifier == other.qualifier;
+    }
+
+    int
+    BundleVersion::Compare(BundleVersion const& other) const
+    {
+        if (&other == this)
+        { // quicktest
+            return 0;
+        }
+
+        if (this->undefined || other.undefined)
+            throw std::logic_error("Cannot compare undefined version");
+
+        if (majorVersion < other.majorVersion)
+        {
+            return -1;
+        }
+
+        if (majorVersion == other.majorVersion)
+        {
+
+            if (minorVersion < other.minorVersion)
+            {
+                return -1;
+            }
+
+            if (minorVersion == other.minorVersion)
+            {
+
+                if (microVersion < other.microVersion)
+                {
+                    return -1;
+                }
+
+                if (microVersion == other.microVersion)
+                {
+                    return qualifier.compare(other.qualifier);
+                }
+            }
+        }
+        return 1;
+    }
+
+    std::ostream&
+    operator<<(std::ostream& os, BundleVersion const& v)
+    {
+        return os << v.ToString();
+    }
+} // namespace cppmicroservices

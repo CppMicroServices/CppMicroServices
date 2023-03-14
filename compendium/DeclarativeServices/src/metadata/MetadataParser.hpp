@@ -26,46 +26,49 @@
 #include "ComponentMetadata.hpp"
 #include "Util.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-namespace metadata {
-
-/*
- * @brief Represents an abstract metadata parser.
- *
- * Whenever there is a change in the service description JSON file-format:
- *  1. The "version" field in the manifest should be bumped-up by one.
- *  2. A new concrete class that implements the following
- *     interface is implemented, which would contain the logic to parse
- *     that particular change of the manifest file-format.
- *  3. The MetadataParserFactory is changed to create and return
- *     that implementation for the corresponding version of the manifest.
- * This way, because the SCR Bundle Extension depends on the
- * following interface instead of any concrete implementation, it
- * supports multiple versions of the manifest.
- */
-class MetadataParser
+namespace cppmicroservices
 {
-public:
-  virtual ~MetadataParser() = default;
-  MetadataParser(const MetadataParser&) = delete;
-  MetadataParser& operator=(const MetadataParser&) = delete;
-  MetadataParser(MetadataParser&&) = delete;
-  MetadataParser& operator=(MetadataParser&&) = delete;
+    namespace scrimpl
+    {
+        namespace metadata
+        {
 
-  /*
-   * @brief Parses and returns the component metadatas as a vector
-   * @param anymap An @c AnyMap representation of the service description
-   * @returns a vector of shared_ptrs to each parsed @c ComponentMetadata
-   */
-  virtual std::vector<std::shared_ptr<ComponentMetadata>>
-  ParseAndGetComponentsMetadata(
-    const cppmicroservices::AnyMap& anymap) const = 0;
+            /*
+             * @brief Represents an abstract metadata parser.
+             *
+             * Whenever there is a change in the service description JSON file-format:
+             *  1. The "version" field in the manifest should be bumped-up by one.
+             *  2. A new concrete class that implements the following
+             *     interface is implemented, which would contain the logic to parse
+             *     that particular change of the manifest file-format.
+             *  3. The MetadataParserFactory is changed to create and return
+             *     that implementation for the corresponding version of the manifest.
+             * This way, because the SCR Bundle Extension depends on the
+             * following interface instead of any concrete implementation, it
+             * supports multiple versions of the manifest.
+             */
+            class MetadataParser
+            {
+              public:
+                virtual ~MetadataParser() = default;
+                MetadataParser(MetadataParser const&) = delete;
+                MetadataParser& operator=(MetadataParser const&) = delete;
+                MetadataParser(MetadataParser&&) = delete;
+                MetadataParser& operator=(MetadataParser&&) = delete;
 
-protected:
-  MetadataParser() = default;
-};
-}
-}
-}
-#endif //METADATAPARSER_HPP
+                /*
+                 * @brief Parses and returns the component metadatas as a vector
+                 * @param anymap An @c AnyMap representation of the service description
+                 * @returns a vector of shared_ptrs to each parsed @c ComponentMetadata
+                 */
+                virtual std::vector<std::shared_ptr<ComponentMetadata>> ParseAndGetComponentsMetadata(
+                    cppmicroservices::AnyMap const& anymap) const
+                    = 0;
+
+              protected:
+                MetadataParser() = default;
+            };
+        } // namespace metadata
+    }     // namespace scrimpl
+} // namespace cppmicroservices
+#endif // METADATAPARSER_HPP

@@ -27,29 +27,30 @@
 
 #include "cppmicroservices/AnyMap.h"
 
-namespace cppmicroservices {
-namespace cmimpl {
-namespace metadata {
-/**
- * Stores configuration information parsed from the configuration properties
- */
-struct ConfigurationMetadata final
+namespace cppmicroservices
 {
-  ConfigurationMetadata()
-    : pid()
-    , properties(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
-  {}
+    namespace cmimpl
+    {
+        namespace metadata
+        {
+            /**
+             * Stores configuration information parsed from the configuration properties
+             */
+            struct ConfigurationMetadata final
+            {
+                ConfigurationMetadata() : pid(), properties(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS) {}
 
-  ConfigurationMetadata(std::string thePid, AnyMap props)
-    : pid(std::move(thePid))
-    , properties(std::move(props))
-  {}
+                ConfigurationMetadata(std::string thePid, AnyMap props)
+                    : pid(std::move(thePid))
+                    , properties(std::move(props))
+                {
+                }
 
-  std::string pid;
-  AnyMap properties;
-};
-} // metadata
-} // cmimpl
-} // cppmicroservices
+                std::string pid;
+                AnyMap properties;
+            };
+        } // namespace metadata
+    }     // namespace cmimpl
+} // namespace cppmicroservices
 
-#endif //CONFIGURATIONMETADATA_HPP
+#endif // CONFIGURATIONMETADATA_HPP

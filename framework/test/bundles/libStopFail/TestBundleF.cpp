@@ -26,19 +26,26 @@
 
 #include <iostream>
 
-namespace cppmicroservices {
-
-class TestBundleStopFailActivator : public BundleActivator
+namespace cppmicroservices
 {
-public:
-  TestBundleStopFailActivator() {}
-  ~TestBundleStopFailActivator() {}
 
-  void Start(BundleContext) {}
+    class TestBundleStopFailActivator : public BundleActivator
+    {
+      public:
+        TestBundleStopFailActivator() {}
+        ~TestBundleStopFailActivator() {}
 
-  void Stop(BundleContext) { throw std::runtime_error("whoopsie!"); }
-};
-}
+        void
+        Start(BundleContext)
+        {
+        }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
-  cppmicroservices::TestBundleStopFailActivator)
+        void
+        Stop(BundleContext)
+        {
+            throw std::runtime_error("whoopsie!");
+        }
+    };
+} // namespace cppmicroservices
+
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleStopFailActivator)

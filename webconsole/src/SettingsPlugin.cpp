@@ -34,53 +34,49 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/GetBundleContext.h"
 
-namespace cppmicroservices {
-
-SettingsPlugin::SettingsPlugin()
-  : SimpleWebConsolePlugin("settings", "Settings", "")
+namespace cppmicroservices
 {
-}
 
-void SettingsPlugin::RenderContent(HttpServletRequest& request,
-                                   HttpServletResponse& response)
-{
-  BundleResource res =
-    GetBundleContext().GetBundle().GetResource("/templates/settings.html");
-  if (res) {
-    auto props = GetBundleContext().GetProperties();
-    auto& data = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(
-                   GetVariableResolver(request))
-                   ->GetData();
-    data["us-thread"] =
-      props[Constants::FRAMEWORK_THREADING_SUPPORT].ToStringNoExcept() ==
-          Constants::FRAMEWORK_THREADING_MULTI
-        ? TemplateData::Type::True
-        : TemplateData::Type::False;
+    SettingsPlugin::SettingsPlugin() : SimpleWebConsolePlugin("settings", "Settings", "") {}
+
+    void
+    SettingsPlugin::RenderContent(HttpServletRequest& request, HttpServletResponse& response)
+    {
+        BundleResource res = GetBundleContext().GetBundle().GetResource("/templates/settings.html");
+        if (res)
+        {
+            auto props = GetBundleContext().GetProperties();
+            auto& data
+                = std::static_pointer_cast<WebConsoleDefaultVariableResolver>(GetVariableResolver(request))->GetData();
+            data["us-thread"] = props[Constants::FRAMEWORK_THREADING_SUPPORT].ToStringNoExcept()
+                                        == Constants::FRAMEWORK_THREADING_MULTI
+                                    ? TemplateData::Type::True
+                                    : TemplateData::Type::False;
 #ifdef US_BUILD_SHARED_LIBS
-    data["us-shared"] = TemplateData::Type::True;
+            data["us-shared"] = TemplateData::Type::True;
 #else
-    data["us-shared"] = TemplateData::Type::False;
+            data["us-shared"] = TemplateData::Type::False;
 #endif
-    data["us-storagepath"] =
-      props[Constants::FRAMEWORK_STORAGE].ToStringNoExcept();
+            data["us-storagepath"] = props[Constants::FRAMEWORK_STORAGE].ToStringNoExcept();
 
-    TemplateData fwProps(TemplateData::Type::List);
-    for (auto p : props) {
-      TemplateData kv;
-      kv["key"] = p.first;
-      kv["value"] = p.second.ToString();
-      fwProps << kv;
+            TemplateData fwProps(TemplateData::Type::List);
+            for (auto p : props)
+            {
+                TemplateData kv;
+                kv["key"] = p.first;
+                kv["value"] = p.second.ToString();
+                fwProps << kv;
+            }
+            data["us-fwprops"] = std::move(fwProps);
+
+            BundleResourceStream rs(res, std::ios_base::binary);
+            response.GetOutputStream() << rs.rdbuf();
+        }
     }
-    data["us-fwprops"] = std::move(fwProps);
 
-    BundleResourceStream rs(res, std::ios_base::binary);
-    response.GetOutputStream() << rs.rdbuf();
-  }
-}
-
-BundleResource SettingsPlugin::GetResource(const std::string& path) const
-{
-  return (this->GetContext()) ? this->GetContext().GetBundle().GetResource(path)
-                              : BundleResource();
-}
-}
+    BundleResource
+    SettingsPlugin::GetResource(std::string const& path) const
+    {
+        return (this->GetContext()) ? this->GetContext().GetBundle().GetResource(path) : BundleResource();
+    }
+} // namespace cppmicroservices

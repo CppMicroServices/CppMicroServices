@@ -30,98 +30,114 @@ using cppmicroservices::Constants::SCOPE_PROTOTYPE;
 using cppmicroservices::Constants::SCOPE_SINGLETON;
 using cppmicroservices::Constants::SERVICE_SCOPE;
 
-namespace cppmicroservices {
-namespace scrimpl {
+namespace cppmicroservices
+{
+    namespace scrimpl
+    {
 
-bool inline IsValidScope(const std::string& scope)
-{
-  return (scope == SCOPE_SINGLETON || scope == SCOPE_BUNDLE ||
-          scope == SCOPE_PROTOTYPE);
-}
+        bool inline IsValidScope(std::string const& scope)
+        {
+            return (scope == SCOPE_SINGLETON || scope == SCOPE_BUNDLE || scope == SCOPE_PROTOTYPE);
+        }
 
-RegistrationManager::RegistrationManager(
-  const cppmicroservices::BundleContext& bc,
-  const std::vector<std::string>& services,
-  const std::string& scope,
-  const std::shared_ptr<cppmicroservices::logservice::LogService>& logger)
-  : bundleContext(bc)
-  , services(services)
-  , scope(scope)
-  , logger(logger)
-{
-  if (!bc || services.empty() || !IsValidScope(scope) || !logger) {
-    throw std::invalid_argument(
-      "RegistrationManager: Invalid arguments passed to constructor");
-  }
-}
+        RegistrationManager::RegistrationManager(
+            cppmicroservices::BundleContext const& bc,
+            std::vector<std::string> const& services,
+            std::string const& scope,
+            std::shared_ptr<cppmicroservices::logservice::LogService> const& logger)
+            : bundleContext(bc)
+            , services(services)
+            , scope(scope)
+            , logger(logger)
+        {
+            if (!bc || services.empty() || !IsValidScope(scope) || !logger)
+            {
+                throw std::invalid_argument("RegistrationManager: Invalid arguments passed to constructor");
+            }
+        }
 
-RegistrationManager::~RegistrationManager()
-{
-  if (IsServiceRegistered()) {
-    try {
-      serviceReg.Unregister();
-    } catch (...) {
-      logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                  "Service Unregistration failed with exception",
-                  std::current_exception());
-    }
-  }
-}
+        RegistrationManager::~RegistrationManager()
+        {
+            if (IsServiceRegistered())
+            {
+                try
+                {
+                    serviceReg.Unregister();
+                }
+                catch (...)
+                {
+                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                "Service Unregistration failed with exception",
+                                std::current_exception());
+                }
+            }
+        }
 
-bool RegistrationManager::IsServiceRegistered() const
-{
-  return static_cast<bool>(serviceReg); //(serviceReg ? true : false);
-}
+        bool
+        RegistrationManager::IsServiceRegistered() const
+        {
+            return static_cast<bool>(serviceReg); //(serviceReg ? true : false);
+        }
 
-bool RegistrationManager::RegisterService(
-  const std::shared_ptr<cppmicroservices::ServiceFactory>& factory,
-  const cppmicroservices::ServiceProperties& props)
-{
-  if (IsServiceRegistered()) {
-    return true;
-  }
-  try {
-    cppmicroservices::InterfaceMapPtr imap = MakeInterfaceMap<>(factory);
-    std::shared_ptr<void> instance = std::static_pointer_cast<void>(factory);
-    for (auto interface : services) {
-      imap->emplace(interface, instance);
-    }
-    auto localProps = props;
-    localProps.emplace(SERVICE_SCOPE, Any(scope));
-    serviceReg = bundleContext.RegisterService(imap, localProps);
-  } catch (...) {
-    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                "Service Registration failed with exception",
-                std::current_exception());
-  }
-  return IsServiceRegistered();
-}
-void RegistrationManager::SetProperties(
-  const cppmicroservices::ServiceProperties& properties)
-{
-  try {
-    if (IsServiceRegistered() && serviceReg) {
-      serviceReg.SetProperties(properties);
-    }
-  } catch (...) {
-    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                "Service SetProperties failed with exception",
-                std::current_exception());
-  }
-}
+        bool
+        RegistrationManager::RegisterService(std::shared_ptr<cppmicroservices::ServiceFactory> const& factory,
+                                             cppmicroservices::ServiceProperties const& props)
+        {
+            if (IsServiceRegistered())
+            {
+                return true;
+            }
+            try
+            {
+                cppmicroservices::InterfaceMapPtr imap = MakeInterfaceMap<>(factory);
+                std::shared_ptr<void> instance = std::static_pointer_cast<void>(factory);
+                for (auto interface : services)
+                {
+                    imap->emplace(interface, instance);
+                }
+                auto localProps = props;
+                localProps.emplace(SERVICE_SCOPE, Any(scope));
+                serviceReg = bundleContext.RegisterService(imap, localProps);
+            }
+            catch (...)
+            {
+                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                            "Service Registration failed with exception",
+                            std::current_exception());
+            }
+            return IsServiceRegistered();
+        }
+        void
+        RegistrationManager::SetProperties(cppmicroservices::ServiceProperties const& properties)
+        {
+            try
+            {
+                if (IsServiceRegistered() && serviceReg)
+                {
+                    serviceReg.SetProperties(properties);
+                }
+            }
+            catch (...)
+            {
+                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                            "Service SetProperties failed with exception",
+                            std::current_exception());
+            }
+        }
 
-void RegistrationManager::UnregisterService()
-{
-  serviceReg.Unregister();
-  // necessary because the bool operator of ServiceRegistration object
-  // returns true even after the service has been unregistered.
-  serviceReg = nullptr;
-}
+        void
+        RegistrationManager::UnregisterService()
+        {
+            serviceReg.Unregister();
+            // necessary because the bool operator of ServiceRegistration object
+            // returns true even after the service has been unregistered.
+            serviceReg = nullptr;
+        }
 
-cppmicroservices::ServiceReferenceBase
-RegistrationManager::GetServiceReference() const
-{
-  return serviceReg ? serviceReg.GetReference() : ServiceReferenceU();
-}
-}
-}
+        cppmicroservices::ServiceReferenceBase
+        RegistrationManager::GetServiceReference() const
+        {
+            return serviceReg ? serviceReg.GetReference() : ServiceReferenceU();
+        }
+    } // namespace scrimpl
+} // namespace cppmicroservices

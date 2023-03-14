@@ -51,16 +51,10 @@ jobs:
       working-directory: Z:\
       run: ctest -VV -S cmake\usCTestScript_github.cmake
 
-    - name: Download previous benchmark data
-      uses: actions/cache@v1
-      with:
-        path: ./cache
-        key: ${{matrix.os}}-benchmark
-
     - name: Run benchmark and store result in json format
       run: ${{ env.BUILD_DIR }}\bin\Release\usFrameworkBenchTests.exe  --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json
 
-    - name: Benchmark and Deploy
+    - name: Deploy results
       uses: benchmark-action/github-action-benchmark@v1.16.1
       with:
         name: C++ Benchmark

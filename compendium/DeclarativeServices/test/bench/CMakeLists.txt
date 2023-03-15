@@ -113,56 +113,7 @@ if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
 endif()
 
 set(_test_bundles
-  BenchmarkDS
-  DSFrenchDictionary
-  DSGraph01
-  DSGraph02
-  DSGraph03
-  DSGraph04
-  DSGraph05
-  DSGraph06
-  DSGraph07
-  DSSpellChecker
-  TestBindUnbindThrows
-  TestBundleDSa
-  TestBundleDSb
-  TestBundleDSDGMU
-  TestBundleDSDGOU
-  TestBundleDSDRMU
-  TestBundleDSDROU
-  TestBundleDSSLE1
-  TestBundleDSSLE2
   TestBundleDSTOI1
-  TestBundleDSTOI2
-  TestBundleDSTOI3
-  TestBundleDSTOI5
-  TestBundleDSTOI6
-  TestBundleDSTOI7
-  TestBundleDSTOI8
-  TestBundleDSTOI9
-  TestBundleDSTOI10
-  TestBundleDSTOI12
-  TestBundleDSTOI14
-  TestBundleDSTOI15
-  TestBundleDSTOI16
-  TestBundleDSTOI18
-  TestBundleDSTOI19
-  TestBundleDSCA01
-  TestBundleDSCA02
-  TestBundleDSCA03
-  TestBundleDSCA04
-  TestBundleDSCA05
-  TestBundleDSCA05a
-  TestBundleDSCA07
-  TestBundleDSCA08
-  TestBundleDSCA09
-  TestBundleDSCA12
-  TestBundleDSCA16
-  TestBundleDSCA20
-  TestBundleDSCA24
-  TestBundleDSCA26
-  TestBundleDSCA27
-  EnglishDictionary
   )
 
 target_link_libraries(${us_declarativeservices_bench_test_exe_name}
@@ -175,8 +126,6 @@ target_link_libraries(${us_declarativeservices_bench_test_exe_name}
   usServiceComponent
   usLogService
   usAsyncWorkService
-  usIDictionaryService
-  usISpellCheckService
   gtest
   benchmark_main
   util

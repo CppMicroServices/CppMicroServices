@@ -823,7 +823,7 @@ namespace cppmicroservices
 
         // test that concurrent service registrations and unregistrations
         // do not cause crashes.
-        TEST_F(BindingPolicyTest, DISABLED_TestConcurrentBindUnbind)
+        TEST_F(BindingPolicyTest, TestConcurrentBindUnbind)
         {
             auto bc = GetFramework().GetBundleContext();
             test::InstallAndStartDS(bc);

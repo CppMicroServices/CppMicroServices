@@ -515,7 +515,7 @@ namespace cppmicroservices
             auto componentInstance = CreateComponentInstance();
             auto ctxt = std::make_shared<ComponentContextImpl>(shared_from_this(), bundle);
             /*
-             * Failing to construct the servce object is an unrecoverable
+             * Failing to construct the service object is an unrecoverable
              * failure which will cause the service configuration to not
              * be active.
              */

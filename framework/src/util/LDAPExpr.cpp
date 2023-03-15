@@ -49,6 +49,7 @@ namespace cppmicroservices
 {
     namespace
     {
+#ifdef SUPPORT_NESTED_LOOKUP
         /**
          * @brief split a delimited string into a vector of values
          *
@@ -104,6 +105,7 @@ namespace cppmicroservices
 
             return result;
         }
+#endif
 
         /**
          * @brief Find value for attrName in map
@@ -138,7 +140,9 @@ namespace cppmicroservices
                     return lookup;
                 }
             }
-
+#ifndef SUPPORT_NESTED_LOOKUP
+            return absl::nullopt;
+#else
             // If not found at the full attrname, decompose the path and do a full check.
             // First, split the m_attrName into a vector at the . separator and reverse it.
             auto scope = string_split(attrName, ".");
@@ -206,6 +210,7 @@ namespace cppmicroservices
                 // return an empty object... we did not find a named attrName in the map.
                 return absl::nullopt;
             }
+#endif
         }
     } // namespace
 

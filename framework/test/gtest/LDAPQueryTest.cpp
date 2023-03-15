@@ -132,6 +132,7 @@ TEST_F(LDAPQueryTest, TestLDAPFilterMatchServiceReferenceBase)
     ASSERT_TRUE(ldapMatchCase.Match(sr));
 }
 
+#ifdef SUPPORT_NESTED_LOOKUP
 TEST_F(LDAPQueryTest, TestNestedData)
 {
     LDAPFilter filter1(LDAPProp("a.b.c.d") == 5);
@@ -193,3 +194,4 @@ TEST_F(LDAPQueryTest, TestNestedData)
     ASSERT_TRUE(filter11.Match(omTestMap));
     ASSERT_FALSE(filter11.MatchCase(omTestMap));
 }
+#endif

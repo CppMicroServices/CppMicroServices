@@ -44,6 +44,8 @@ namespace cppmicroservices
         Properties(Properties&& o) noexcept;
         Properties& operator=(Properties&& o) noexcept;
 
+        Any const& ValueByRef_unlocked(std::string const& key, bool matchCase = false) const;
+
         std::pair<Any, bool> Value_unlocked(std::string const& key, bool matchCase = false) const;
 
         std::vector<std::string> Keys_unlocked() const;

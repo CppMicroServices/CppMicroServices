@@ -149,7 +149,7 @@ function(usFunctionEmbedResources)
     endif()
     add_custom_command(
       OUTPUT ${_zip_archive}
-      COMMAND ${resource_compiler} -o ${_zip_archive} -n dummy ${_zip_args}
+      COMMAND ${resource_compiler} -o ${_zip_archive} ${_zip_args}
       DEPENDS ${_res_zips} ${resource_compiler}
       COMMENT "Creating resources zip file for ${US_RESOURCE_TARGET}"
       VERBATIM
@@ -176,7 +176,7 @@ function(usFunctionEmbedResources)
         COMMAND ${CMAKE_LINKER} -r -sectcreate __TEXT us_resources ${_zip_archive_name} stub.o -o ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}
-        COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"
+        COMMENT "Linking resources zip file ${_zip_archive} for ${US_RESOURCE_TARGET}"
         VERBATIM
        )
       set_source_files_properties(${_source_output} PROPERTIES EXTERNAL_OBJECT 1 GENERATED 1)
@@ -191,7 +191,7 @@ function(usFunctionEmbedResources)
         COMMAND ${CMAKE_COMMAND} -E copy ${_source_output}_autogen ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}
-        COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"
+        COMMENT "Linking resources zip file ${_zip_archive} for ${US_RESOURCE_TARGET}"
         VERBATIM
        )
        set_source_files_properties(${_source_output} PROPERTIES GENERATED 1)
@@ -202,7 +202,7 @@ function(usFunctionEmbedResources)
         COMMAND ${CMAKE_OBJCOPY} --rename-section .data=.us_resources,alloc,load,readonly,data,contents ${_source_output} ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}
-        COMMENT "Linking resources zip file for ${US_RESOURCE_TARGET}"
+        COMMENT "Linking resources zip file ${_zip_archive} for ${US_RESOURCE_TARGET}"
         VERBATIM
        )
       set_source_files_properties(${_source_output} PROPERTIES EXTERNAL_OBJECT 1 GENERATED 1)
@@ -227,21 +227,27 @@ function(usFunctionEmbedResources)
       VERBATIM
      )
 
-    add_custom_command(
-      TARGET ${US_RESOURCE_TARGET}
-      POST_BUILD
-      COMMAND ${resource_compiler} -b $<TARGET_FILE:${US_RESOURCE_TARGET}> -z ${_zip_archive}
-      WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
-      COMMENT "Appending zipped resources to ${US_RESOURCE_TARGET}"
-      VERBATIM
-    )
+    set(_us_target_type )
+    get_target_property(_us_target_type ${US_RESOURCE_TARGET} TYPE)
+    # We should not be appending metadata to any build artifact other than a dynamic shared library or
+    # an executable. Certain linkers, such as clang, do not tolerate linking static libraries that contain
+    # arbitrary data appended on the end.
+    if((_us_target_type STREQUAL "SHARED_LIBRARY" OR _us_target_type STREQUAL "EXECUTABLE"))
+      add_custom_command(
+        TARGET ${US_RESOURCE_TARGET}
+        POST_BUILD
+        COMMAND ${resource_compiler} -b $<TARGET_FILE:${US_RESOURCE_TARGET}> -z ${_zip_archive}
+        WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
+        COMMENT "Appending zip file ${_zip_archive} to ${US_RESOURCE_TARGET}"
+        VERBATIM
+      )
+    endif()
 
     # Disable code-signing on macOS if appending resources.
-   if(APPLE)
-     set_target_properties(${US_RESOURCE_TARGET} PROPERTIES
-      XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
-   endif()
-
+     if(APPLE)
+       set_target_properties(${US_RESOURCE_TARGET} PROPERTIES
+        XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
+     endif()
   endif()
 
 endfunction()

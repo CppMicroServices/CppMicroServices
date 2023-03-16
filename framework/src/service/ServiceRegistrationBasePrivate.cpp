@@ -26,60 +26,61 @@
 #include <utility>
 
 #ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4355)
+#    pragma warning(push)
+#    pragma warning(disable : 4355)
 #endif
 
-namespace cppmicroservices {
-
-ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(
-  BundlePrivate* bundle_,
-  InterfaceMapConstPtr service,
-  Properties&& props)
-  : ref(0)
-  , service(std::move(service))
-  , bundle(bundle_->shared_from_this())
-  , reference(this)
-  , properties(std::move(props))
-  , available(true)
-  , unregistering(false)
+namespace cppmicroservices
 {
-  // The reference counter is initialized to 0 because it will be
-  // incremented by the "reference" member.
-}
 
-ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
-{
-  properties.Lock(), properties.Clear_unlocked();
-}
+    ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(BundlePrivate* bundle_,
+                                                                   InterfaceMapConstPtr service,
+                                                                   Properties&& props)
+        : ref(0)
+        , service(std::move(service))
+        , bundle(bundle_->shared_from_this())
+        , reference(this)
+        , properties(std::move(props))
+        , available(true)
+        , unregistering(false)
+    {
+        // The reference counter is initialized to 0 because it will be
+        // incremented by the "reference" member.
+    }
 
-bool ServiceRegistrationBasePrivate::IsUsedByBundle(BundlePrivate* bundle) const
-{
-  auto l = this->Lock();
-  US_UNUSED(l);
-  return (dependents.find(bundle) != dependents.end()) ||
-         (prototypeServiceInstances.find(bundle) !=
-          prototypeServiceInstances.end());
-}
+    ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
+    {
+        properties.Lock(), properties.Clear_unlocked();
+    }
 
-InterfaceMapConstPtr ServiceRegistrationBasePrivate::GetInterfaces() const
-{
-  return (this->Lock(), service);
-}
+    bool
+    ServiceRegistrationBasePrivate::IsUsedByBundle(BundlePrivate* bundle) const
+    {
+        auto l = this->Lock();
+        US_UNUSED(l);
+        return (dependents.find(bundle) != dependents.end())
+               || (prototypeServiceInstances.find(bundle) != prototypeServiceInstances.end());
+    }
 
-std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService(
-  const std::string& interfaceId) const
-{
-  return this->Lock(), GetService_unlocked(interfaceId);
-}
+    InterfaceMapConstPtr
+    ServiceRegistrationBasePrivate::GetInterfaces() const
+    {
+        return (this->Lock(), service);
+    }
 
-std::shared_ptr<void> ServiceRegistrationBasePrivate::GetService_unlocked(
-  const std::string& interfaceId) const
-{
-  return ExtractInterface(service, interfaceId);
-}
-}
+    std::shared_ptr<void>
+    ServiceRegistrationBasePrivate::GetService(std::string const& interfaceId) const
+    {
+        return this->Lock(), GetService_unlocked(interfaceId);
+    }
+
+    std::shared_ptr<void>
+    ServiceRegistrationBasePrivate::GetService_unlocked(std::string const& interfaceId) const
+    {
+        return ExtractInterface(service, interfaceId);
+    }
+} // namespace cppmicroservices
 
 #ifdef _MSC_VER
-#  pragma warning(pop)
+#    pragma warning(pop)
 #endif

@@ -21,14 +21,17 @@
 =============================================================================*/
 #include "ServiceImpl.hpp"
 
-namespace sample {
-void ServiceComponent10::Activate(const std::shared_ptr<ComponentContext>&)
+namespace sample
 {
-  activated = true;
-};
-void ServiceComponent10::Deactivate(const std::shared_ptr<ComponentContext>&)
-{
-  deactivated = true;
-};
-ServiceComponent10::~ServiceComponent10(){};
-}
+    void
+    ServiceComponent10::Activate(std::shared_ptr<ComponentContext> const&)
+    {
+        activated = true;
+    };
+    void
+    ServiceComponent10::Deactivate(std::shared_ptr<ComponentContext> const&)
+    {
+        deactivated = true;
+    };
+    ServiceComponent10::~ServiceComponent10() {};
+} // namespace sample

@@ -29,15 +29,17 @@ using namespace cppmicroservices;
 
 TEST(ServiceExceptionTest, TestServiceException)
 {
-  try {
-    throw ServiceException("A service exception");
-  } catch (const ServiceException& se) {
-    ServiceException other_se = se;
-    other_se = se;
-    std::string expected_prefix = "ServiceException: ";
-    std::ostringstream strstream;
-    strstream << other_se;
-    ASSERT_TRUE(strstream.str().compare(
-                  0, expected_prefix.length(), expected_prefix) == 0);
-  }
+    try
+    {
+        throw ServiceException("A service exception");
+    }
+    catch (ServiceException const& se)
+    {
+        ServiceException other_se = se;
+        other_se = se;
+        std::string expected_prefix = "ServiceException: ";
+        std::ostringstream strstream;
+        strstream << other_se;
+        ASSERT_TRUE(strstream.str().compare(0, expected_prefix.length(), expected_prefix) == 0);
+    }
 }

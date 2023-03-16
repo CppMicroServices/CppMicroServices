@@ -38,52 +38,52 @@
 #include "CMLogger.hpp"
 #include "ConfigurationAdminImpl.hpp"
 
-namespace cppmicroservices {
-namespace cmimpl {
-class CMActivator final : public cppmicroservices::BundleActivator
+namespace cppmicroservices
 {
-public:
-  CMActivator() = default;
-  CMActivator(const CMActivator&) = delete;
-  CMActivator(CMActivator&&) = delete;
-  CMActivator& operator=(const CMActivator&) = delete;
-  CMActivator& operator=(CMActivator&&) = delete;
-  ~CMActivator() override = default;
+    namespace cmimpl
+    {
+        class CMActivator final : public cppmicroservices::BundleActivator
+        {
+          public:
+            CMActivator() = default;
+            CMActivator(CMActivator const&) = delete;
+            CMActivator(CMActivator&&) = delete;
+            CMActivator& operator=(CMActivator const&) = delete;
+            CMActivator& operator=(CMActivator&&) = delete;
+            ~CMActivator() override = default;
 
-  // callback methods for bundle lifecycle
-  void Start(cppmicroservices::BundleContext context) override;
-  void Stop(cppmicroservices::BundleContext context) override;
+            // callback methods for bundle lifecycle
+            void Start(cppmicroservices::BundleContext context) override;
+            void Stop(cppmicroservices::BundleContext context) override;
 
-  // protected for pkgtests
-protected:
-  /**
-   * Bundle listener callback
-   */
-  void BundleChanged(const cppmicroservices::BundleEvent&);
-  /*
-   * This method creates the CMBundleExtension object for a bundle
-   * with cm configuration metadata
-   */
-  void CreateExtension(const cppmicroservices::Bundle& bundle);
-  /*
-   * This method removes the CMBundleExtension object for a bundle
-   * with cm configuration metadata
-   */
-  void RemoveExtension(const cppmicroservices::Bundle& bundle);
+            // protected for pkgtests
+          protected:
+            /**
+             * Bundle listener callback
+             */
+            void BundleChanged(cppmicroservices::BundleEvent const&);
+            /*
+             * This method creates the CMBundleExtension object for a bundle
+             * with cm configuration metadata
+             */
+            void CreateExtension(cppmicroservices::Bundle const& bundle);
+            /*
+             * This method removes the CMBundleExtension object for a bundle
+             * with cm configuration metadata
+             */
+            void RemoveExtension(cppmicroservices::Bundle const& bundle);
 
-private:
-  cppmicroservices::BundleContext runtimeContext;
-  std::shared_ptr<CMLogger> logger;
-  std::shared_ptr<CMAsyncWorkService> asyncWorkService;
-  std::shared_ptr<ConfigurationAdminImpl> configAdminImpl;
-  std::mutex bundleRegMutex;
-  std::unordered_map<long, std::unique_ptr<CMBundleExtension>> bundleRegistry;
-  cppmicroservices::ListenerToken bundleListenerToken;
-  cppmicroservices::ServiceRegistration<
-    cppmicroservices::service::cm::ConfigurationAdmin>
-    configAdminReg;
-};
-} // cmimpl
-} // cppmicroservices
+          private:
+            cppmicroservices::BundleContext runtimeContext;
+            std::shared_ptr<CMLogger> logger;
+            std::shared_ptr<CMAsyncWorkService> asyncWorkService;
+            std::shared_ptr<ConfigurationAdminImpl> configAdminImpl;
+            std::mutex bundleRegMutex;
+            std::unordered_map<long, std::unique_ptr<CMBundleExtension>> bundleRegistry;
+            cppmicroservices::ListenerToken bundleListenerToken;
+            cppmicroservices::ServiceRegistration<cppmicroservices::service::cm::ConfigurationAdmin> configAdminReg;
+        };
+    } // namespace cmimpl
+} // namespace cppmicroservices
 
 #endif // CMACTIVATOR_HPP

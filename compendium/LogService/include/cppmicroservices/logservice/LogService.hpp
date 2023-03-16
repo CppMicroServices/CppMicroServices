@@ -28,93 +28,96 @@
 #include <exception>
 #include <string>
 
-namespace cppmicroservices {
-namespace logservice {
-
-/**
-\defgroup gr_logservice LogService
-
-\brief Groups LogService class related symbols.
-*/
-
-/**
- * \addtogroup gr_logservice
- * @{
- */
-enum class SeverityLevel : uint8_t
+namespace cppmicroservices
 {
-  LOG_ERROR =
-    1, ///< Indicates the bundle or service may not be functional. Action should be taken to correct this situation.
-  LOG_WARNING =
-    2, ///< Indicates a bundle or service is still functioning but may experience problems in the future because of the warning condition.
-  LOG_INFO =
-    3, ///< May be the result of any change in the bundle or service and does not indicate a problem.
-  LOG_DEBUG =
-    4 ///< Used for problem determination and may be irrelevant to anyone but the bundle developer.
-};
-/** @}*/
+    namespace logservice
+    {
 
-/**
- * \ingroup MicroService
- * \ingroup gr_logservice
- * 
- * Provides methods for bundles to write messages to the log. 
- * LogService methods are provided to log messages; optionally with a ServiceReference object or an exception.
- * Bundles must log messages in the OSGi environment with a severity level according to the following
- * hierarchy:
- *  1. LOG_ERROR
- *  2. LOG_WARNING
- *  3. LOG_INFO
- *  4. LOG_DEBUG
- *
- * @remarks This class is thread safe.
- */
-class LogService
-{
-public:
-  virtual ~LogService() = default;
+        /**
+        \defgroup gr_logservice LogService
 
-  /**
-   * Logs a message.
-   * @param level The severity of the message. This should be one of the defined log levels but may be any integer that is interpreted in a user defined way.
-   * @param message Human readable string describing the condition or empty string.
-   */
-  virtual void Log(SeverityLevel level, const std::string& message) = 0;
+        \brief Groups LogService class related symbols.
+        */
 
-  /**
-   * Logs a message.
-   * @param level The severity of the message. This should be one of the defined log levels but may be any integer that is interpreted in a user defined way.
-   * @param message Human readable string describing the condition or empty string.
-   * @param ex The exception that reflects the condition or nullptr.
-   */
-  virtual void Log(SeverityLevel level,
-                   const std::string& message,
-                   const std::exception_ptr ex) = 0;
+        /**
+         * \addtogroup gr_logservice
+         * @{
+         */
+        enum class SeverityLevel : uint8_t
+        {
+            LOG_ERROR = 1, ///< Indicates the bundle or service may not be functional. Action should be taken to correct
+                           ///< this situation.
+            LOG_WARNING = 2, ///< Indicates a bundle or service is still functioning but may experience problems in the
+                             ///< future because of the warning condition.
+            LOG_INFO = 3, ///< May be the result of any change in the bundle or service and does not indicate a problem.
+            LOG_DEBUG = 4 ///< Used for problem determination and may be irrelevant to anyone but the bundle developer.
+        };
+        /** @}*/
 
-  /**
-   * Logs a message.
-   * @param sr The ServiceReferenceBase object of the service that this message is associated with or an invalid object.
-   * @param level The severity of the message. This should be one of the defined log levels but may be any integer that is interpreted in a user defined way.
-   * @param message Human readable string describing the condition or empty string.
-   */
-  virtual void Log(const ServiceReferenceBase& sr,
-                   SeverityLevel level,
-                   const std::string& message) = 0;
+        /**
+         * \ingroup MicroService
+         * \ingroup gr_logservice
+         *
+         * Provides methods for bundles to write messages to the log.
+         * LogService methods are provided to log messages; optionally with a ServiceReference object or an exception.
+         * Bundles must log messages in the OSGi environment with a severity level according to the following
+         * hierarchy:
+         *  1. LOG_ERROR
+         *  2. LOG_WARNING
+         *  3. LOG_INFO
+         *  4. LOG_DEBUG
+         *
+         * @remarks This class is thread safe.
+         */
+        class LogService
+        {
+          public:
+            virtual ~LogService() = default;
 
-  /**
-   * Logs a message with an exception associated and a ServiceReference object.
-   * @param sr The ServiceReferenceBase object of the service that this message is associated with or an invalid object.
-   * @param level The severity of the message. This should be one of the defined log levels but may be any integer that is interpreted in a user defined way.
-   * @param message Human readable string describing the condition or empty string.
-   * @param ex The exception that reflects the condition or nullptr.
-   */
-  virtual void Log(const ServiceReferenceBase& sr,
-                   SeverityLevel level,
-                   const std::string& message,
-                   const std::exception_ptr ex) = 0;
-};
+            /**
+             * Logs a message.
+             * @param level The severity of the message. This should be one of the defined log levels but may be any
+             * integer that is interpreted in a user defined way.
+             * @param message Human readable string describing the condition or empty string.
+             */
+            virtual void Log(SeverityLevel level, std::string const& message) = 0;
 
-} // namespace logservice
+            /**
+             * Logs a message.
+             * @param level The severity of the message. This should be one of the defined log levels but may be any
+             * integer that is interpreted in a user defined way.
+             * @param message Human readable string describing the condition or empty string.
+             * @param ex The exception that reflects the condition or nullptr.
+             */
+            virtual void Log(SeverityLevel level, std::string const& message, const std::exception_ptr ex) = 0;
+
+            /**
+             * Logs a message.
+             * @param sr The ServiceReferenceBase object of the service that this message is associated with or an
+             * invalid object.
+             * @param level The severity of the message. This should be one of the defined log levels but may be any
+             * integer that is interpreted in a user defined way.
+             * @param message Human readable string describing the condition or empty string.
+             */
+            virtual void Log(ServiceReferenceBase const& sr, SeverityLevel level, std::string const& message) = 0;
+
+            /**
+             * Logs a message with an exception associated and a ServiceReference object.
+             * @param sr The ServiceReferenceBase object of the service that this message is associated with or an
+             * invalid object.
+             * @param level The severity of the message. This should be one of the defined log levels but may be any
+             * integer that is interpreted in a user defined way.
+             * @param message Human readable string describing the condition or empty string.
+             * @param ex The exception that reflects the condition or nullptr.
+             */
+            virtual void Log(ServiceReferenceBase const& sr,
+                             SeverityLevel level,
+                             std::string const& message,
+                             const std::exception_ptr ex)
+                = 0;
+        };
+
+    } // namespace logservice
 
 } // namespace cppmicroservices
 

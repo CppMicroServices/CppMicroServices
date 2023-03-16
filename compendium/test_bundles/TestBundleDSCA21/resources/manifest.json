@@ -1,0 +1,21 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSCA21",
+    "scr" : {
+        "version" : 1,
+         "components" : [{
+            "name": "ServiceComponentName",
+            "enabled" : true,
+            "immediate": false,
+            "implementation-class": "sample::ServiceComponentCA21",
+            "configuration-policy" : "require",
+            "configuration-pid" : ["ServiceComponentPid"],
+            "factory" : "factory id",
+             "factory-properties" : {
+                 "abc" : "123"
+            },
+             "service": {
+                "interfaces": ["test::CAInterface"]
+            }
+        }]
+    }
+}

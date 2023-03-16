@@ -24,100 +24,265 @@
 
 #include <limits>
 #include <stdexcept>
-#ifdef US_PLATFORM_WINDOWS
-#  include <string.h>
-#  define ci_compare strnicmp
-#else
-#  include <strings.h>
-#  define ci_compare strncasecmp
-#endif
+#include <utility>
+
+#include "PropsCheck.h"
 
 US_MSVC_PUSH_DISABLE_WARNING(4996)
 
-namespace cppmicroservices {
-
-const Any Properties::emptyAny;
-
-Properties::Properties(const AnyMap& p)
+namespace cppmicroservices
 {
-  if (p.size() > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
-    throw std::runtime_error("Properties contain too many keys");
-  }
 
-  keys.reserve(p.size());
-  values.reserve(p.size());
+    const Any Properties::emptyAny;
 
-  for (auto& iter : p) {
-    if (Find_unlocked(iter.first) > -1) {
-      std::string msg("Properties contain case variants of the key: ");
-      msg += iter.first;
-      throw std::runtime_error(msg.c_str());
+    void
+    Properties::PopulateCaseInsensitiveLookupMap()
+    {
+        if (props.GetType() == AnyMap::ORDERED_MAP)
+        {
+            for (auto itr = props.beginOM_TypeChecked(); itr != props.endOM_TypeChecked(); ++itr)
+            {
+                caseInsensitiveLookup[props_check::ToLower(itr->first)] = itr->first;
+            }
+        }
+        else if (props.GetType() == AnyMap::UNORDERED_MAP)
+        {
+            for (auto itr = props.beginUO_TypeChecked(); itr != props.endUO_TypeChecked(); ++itr)
+            {
+                caseInsensitiveLookup[props_check::ToLower(itr->first)] = itr->first;
+            }
+        }
+        else
+        {
+            throw std::runtime_error("Unsupported map type.");
+        }
     }
-    keys.push_back(iter.first);
-    values.push_back(iter.second);
-  }
-}
 
-Properties::Properties(Properties&& o)
-  : keys(std::move(o.keys))
-  , values(std::move(o.values))
-{}
+    // NOTE: UNORDERED_MAP_CASEINSENSITIVE_KEYS AnyMaps inherently can never be invalid given that
+    // they can _never_ contain some pair of keys which are only different in case. Because of this,
+    // the validation check is not performed on these map types. Additionally, those types of maps
+    // are already case insensitive so populating and using the case insensitive lookup map is
+    // unnecessary.
 
-Properties& Properties::operator=(Properties&& o)
-{
-  keys = std::move(o.keys);
-  values = std::move(o.values);
-  return *this;
-}
+    Properties::Properties(AnyMap const& p) : props(p)
+    {
+        if (p.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+        {
+            props_check::ValidateAnyMap(p);
 
-Any Properties::Value_unlocked(const std::string& key) const
-{
-  int i = Find_unlocked(key);
-  if (i < 0) {
-    return emptyAny;
-  }
-  return values[i];
-}
-
-Any Properties::Value_unlocked(int index) const
-{
-  if (index < 0 || static_cast<std::size_t>(index) >= values.size()) {
-    return emptyAny;
-  }
-  return values[static_cast<std::size_t>(index)];
-}
-
-int Properties::Find_unlocked(const std::string& key) const
-{
-  for (std::size_t i = 0; i < keys.size(); ++i) {
-    if (key.size() == keys[i].size() &&
-        ci_compare(key.c_str(), keys[i].c_str(), key.size()) == 0) {
-      return static_cast<int>(i);
+            PopulateCaseInsensitiveLookupMap();
+        }
     }
-  }
-  return -1;
-}
 
-int Properties::FindCaseSensitive_unlocked(const std::string& key) const
-{
-  for (std::size_t i = 0; i < keys.size(); ++i) {
-    if (key == keys[i]) {
-      return static_cast<int>(i);
+    Properties::Properties(AnyMap&& p) : props(std::move(p))
+    {
+        if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+        {
+            props_check::ValidateAnyMap(props);
+
+            PopulateCaseInsensitiveLookupMap();
+        }
     }
-  }
-  return -1;
-}
 
-std::vector<std::string> Properties::Keys_unlocked() const
-{
-  return keys;
-}
+    Properties::Properties(Properties&& o) noexcept : props(std::move(o.props))
+    {
+        if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+        {
+            PopulateCaseInsensitiveLookupMap();
+        }
+    }
 
-void Properties::Clear_unlocked()
-{
-  keys.clear();
-  values.clear();
-}
-}
+    Properties&
+    Properties::operator=(Properties&& o) noexcept
+    {
+        props = std::move(o.props);
+        if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+        {
+            PopulateCaseInsensitiveLookupMap();
+        }
+        return *this;
+    }
+
+    Any const&
+    Properties::ValueByRef_unlocked(std::string const& key, bool matchCase) const
+    {
+        if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+        {
+            auto itr = props.findUOCI_TypeChecked(key);
+            if (itr != props.endUOCI_TypeChecked())
+            {
+                if (!matchCase)
+                {
+                    return itr->second;
+                }
+                else if (matchCase && itr->first == key)
+                {
+                    return itr->second;
+                }
+                else
+                {
+                    return emptyAny;
+                }
+            }
+            else
+            {
+                return emptyAny;
+            }
+        }
+        else if (props.GetType() == AnyMap::UNORDERED_MAP)
+        {
+            auto itr = props.findUO_TypeChecked(key);
+            if (itr != props.endUO_TypeChecked())
+            {
+                return itr->second;
+            }
+
+            if (!matchCase)
+            {
+                auto ciItr = caseInsensitiveLookup.find(key);
+                if (ciItr != caseInsensitiveLookup.end())
+                {
+                    return props.findUO_TypeChecked(ciItr->second.data())->second;
+                }
+                else
+                {
+                    return emptyAny;
+                }
+            }
+
+            return emptyAny;
+        }
+        else if (props.GetType() == AnyMap::ORDERED_MAP)
+        {
+            auto itr = props.findOM_TypeChecked(key);
+            if (itr != props.endOM_TypeChecked())
+            {
+                return itr->second;
+            }
+
+            if (!matchCase)
+            {
+                auto ciItr = caseInsensitiveLookup.find(key);
+                if (ciItr != caseInsensitiveLookup.end())
+                {
+                    return props.findOM_TypeChecked(ciItr->second.data())->second;
+                }
+                else
+                {
+                    return emptyAny;
+                }
+            }
+
+            return emptyAny;
+        }
+        else
+        {
+            throw std::runtime_error("Unknown AnyMap type.");
+        }
+    }
+
+    // This function has been modified to perform both the "find" and "lookup" operations rather than
+    // just the "lookup" as originally written.
+    //
+    // This code has been made more verbose as to extract the most performance out of it. If we know
+    // the map type for which we are operating on, then we can safely call the "*_TypeChecked()"
+    // version of certain functions on the map to bypass using the slow functions that return
+    // "any_map::iterator" or "any_map::const_iterator".
+    std::pair<Any, bool>
+    Properties::Value_unlocked(std::string const& key, bool matchCase) const
+    {
+        if (props.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+        {
+            auto itr = props.findUOCI_TypeChecked(key);
+            if (itr != props.endUOCI_TypeChecked())
+            {
+                if (!matchCase)
+                {
+                    return std::make_pair(itr->second, true);
+                }
+                else if (matchCase && itr->first == key)
+                {
+                    return std::make_pair(itr->second, true);
+                }
+                else
+                {
+                    return std::make_pair(emptyAny, false);
+                }
+            }
+            else
+            {
+                return std::make_pair(emptyAny, false);
+            }
+        }
+        else if (props.GetType() == AnyMap::UNORDERED_MAP)
+        {
+            auto itr = props.findUO_TypeChecked(key);
+            if (itr != props.endUO_TypeChecked())
+            {
+                return std::make_pair(itr->second, true);
+            }
+
+            if (!matchCase)
+            {
+                auto ciItr = caseInsensitiveLookup.find(key);
+                if (ciItr != caseInsensitiveLookup.end())
+                {
+                    return std::make_pair(props.findUO_TypeChecked(ciItr->second.data())->second, true);
+                }
+                else
+                {
+                    return std::make_pair(emptyAny, false);
+                }
+            }
+
+            return std::make_pair(emptyAny, false);
+        }
+        else if (props.GetType() == AnyMap::ORDERED_MAP)
+        {
+            auto itr = props.findOM_TypeChecked(key);
+            if (itr != props.endOM_TypeChecked())
+            {
+                return std::make_pair(itr->second, true);
+            }
+
+            if (!matchCase)
+            {
+                auto ciItr = caseInsensitiveLookup.find(key);
+                if (ciItr != caseInsensitiveLookup.end())
+                {
+                    return std::make_pair(props.findOM_TypeChecked(ciItr->second.data())->second, true);
+                }
+                else
+                {
+                    return std::make_pair(emptyAny, false);
+                }
+            }
+
+            return std::make_pair(emptyAny, false);
+        }
+        else
+        {
+            throw std::runtime_error("Unknown AnyMap type.");
+        }
+    }
+
+    std::vector<std::string>
+    Properties::Keys_unlocked() const
+    {
+        std::vector<std::string> result {};
+        for (auto const& kv_pair : props)
+        {
+            result.push_back(kv_pair.first);
+        }
+
+        return result;
+    }
+
+    void
+    Properties::Clear_unlocked()
+    {
+        props.clear();
+    }
+} // namespace cppmicroservices
 
 US_MSVC_POP_WARNING

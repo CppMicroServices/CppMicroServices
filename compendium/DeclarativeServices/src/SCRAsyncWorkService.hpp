@@ -29,66 +29,57 @@
 
 #include <future>
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-class SCRAsyncWorkServiceDetail;
-
-/**
- * This class is used to track the availability of AsyncWorkService in the
- * framework. If a AsyncWorkService is available, the calls to "post" are forwarded
- * to the AsyncWorkService. Otherwise, the calls to "post" use the pre-defined,
- * default behavior for post. This class implements the AsyncWorkService interface
- * so that other classes within the runtime can easily use a mock async work service for
- * testing purposes.
- */
-class SCRAsyncWorkService final
-  : public cppmicroservices::async::AsyncWorkService
-  , public cppmicroservices::ServiceTrackerCustomizer<
-      cppmicroservices::async::AsyncWorkService>
+namespace cppmicroservices
 {
-public:
-  explicit SCRAsyncWorkService(
-    cppmicroservices::BundleContext context,
-    const std::shared_ptr<cppmicroservices::logservice::LogService>& logger_);
-  SCRAsyncWorkService(const SCRAsyncWorkService&) noexcept = delete;
-  SCRAsyncWorkService(SCRAsyncWorkService&&) noexcept = delete;
-  SCRAsyncWorkService& operator=(const SCRAsyncWorkService&) noexcept = delete;
-  SCRAsyncWorkService& operator=(SCRAsyncWorkService&&) noexcept = delete;
-  ~SCRAsyncWorkService() noexcept override;
+    namespace scrimpl
+    {
 
-  // methods from the cppmicroservices::async::AsyncWorkService interface
-  void post(std::packaged_task<void()>&& task) override;
+        class SCRAsyncWorkServiceDetail;
 
-  // methods from the cppmicroservices::ServiceTrackerCustomizer interface
-  std::shared_ptr<TrackedParamType> AddingService(
-    const ServiceReference<cppmicroservices::async::AsyncWorkService>&
-      reference) override;
-  void ModifiedService(
-    const ServiceReference<cppmicroservices::async::AsyncWorkService>&
-      reference,
-    const std::shared_ptr<cppmicroservices::async::AsyncWorkService>& service)
-    override;
-  void RemovedService(
-    const ServiceReference<cppmicroservices::async::AsyncWorkService>&
-      reference,
-    const std::shared_ptr<cppmicroservices::async::AsyncWorkService>& service)
-    override;
+        /**
+         * This class is used to track the availability of AsyncWorkService in the
+         * framework. If a AsyncWorkService is available, the calls to "post" are forwarded
+         * to the AsyncWorkService. Otherwise, the calls to "post" use the pre-defined,
+         * default behavior for post. This class implements the AsyncWorkService interface
+         * so that other classes within the runtime can easily use a mock async work service for
+         * testing purposes.
+         */
+        class SCRAsyncWorkService final
+            : public cppmicroservices::async::AsyncWorkService
+            , public cppmicroservices::ServiceTrackerCustomizer<cppmicroservices::async::AsyncWorkService>
+        {
+          public:
+            explicit SCRAsyncWorkService(cppmicroservices::BundleContext context,
+                                         std::shared_ptr<cppmicroservices::logservice::LogService> const& logger_);
+            SCRAsyncWorkService(SCRAsyncWorkService const&) noexcept = delete;
+            SCRAsyncWorkService(SCRAsyncWorkService&&) noexcept = delete;
+            SCRAsyncWorkService& operator=(SCRAsyncWorkService const&) noexcept = delete;
+            SCRAsyncWorkService& operator=(SCRAsyncWorkService&&) noexcept = delete;
+            ~SCRAsyncWorkService() noexcept override;
 
-  // method to stop tracking the AsyncWorkService. This must be called from the SCR
-  // BundleActivate's Stop method. Not thread-safe. Must not be called simultaneously from
-  // multiple threads
-  void StopTracking();
+            // methods from the cppmicroservices::async::AsyncWorkService interface
+            void post(std::packaged_task<void()>&& task) override;
 
-private:
-  cppmicroservices::BundleContext scrContext;
-  std::unique_ptr<
-    cppmicroservices::ServiceTracker<cppmicroservices::async::AsyncWorkService>>
-    serviceTracker;
-  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-};
-}
-}
+            // methods from the cppmicroservices::ServiceTrackerCustomizer interface
+            std::shared_ptr<TrackedParamType> AddingService(
+                ServiceReference<cppmicroservices::async::AsyncWorkService> const& reference) override;
+            void ModifiedService(ServiceReference<cppmicroservices::async::AsyncWorkService> const& reference,
+                                 std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& service) override;
+            void RemovedService(ServiceReference<cppmicroservices::async::AsyncWorkService> const& reference,
+                                std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& service) override;
+
+            // method to stop tracking the AsyncWorkService. This must be called from the SCR
+            // BundleActivate's Stop method. Not thread-safe. Must not be called simultaneously from
+            // multiple threads
+            void StopTracking();
+
+          private:
+            cppmicroservices::BundleContext scrContext;
+            std::unique_ptr<cppmicroservices::ServiceTracker<cppmicroservices::async::AsyncWorkService>> serviceTracker;
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
+            std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 
 #endif

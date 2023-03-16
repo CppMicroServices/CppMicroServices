@@ -25,67 +25,58 @@
 #include <cppmicroservices/ServiceTracker.h>
 #include <cppmicroservices/logservice/LogService.hpp>
 
-namespace cppmicroservices {
-namespace scrimpl {
-/**
- * This class is used to track the availability of LogService in the
- * framework. If a LogService is available the calls to Log methods
- * are forwarded to the LogService. Otherwise, the calls to Log methods
- * are no-op calls. This class implements the LogService interface so that
- * other classes within the runtime can easily use a mock log service for
- * testing purposes.
- */
-class SCRLogger
-  : public cppmicroservices::logservice::LogService
-  , public cppmicroservices::ServiceTrackerCustomizer<
-      cppmicroservices::logservice::LogService>
+namespace cppmicroservices
 {
-public:
-  explicit SCRLogger(cppmicroservices::BundleContext context);
-  SCRLogger(const SCRLogger&) = delete;
-  SCRLogger(SCRLogger&&) = delete;
-  SCRLogger& operator=(const SCRLogger&) = delete;
-  SCRLogger& operator=(SCRLogger&&) = delete;
-  ~SCRLogger() override;
+    namespace scrimpl
+    {
+        /**
+         * This class is used to track the availability of LogService in the
+         * framework. If a LogService is available the calls to Log methods
+         * are forwarded to the LogService. Otherwise, the calls to Log methods
+         * are no-op calls. This class implements the LogService interface so that
+         * other classes within the runtime can easily use a mock log service for
+         * testing purposes.
+         */
+        class SCRLogger
+            : public cppmicroservices::logservice::LogService
+            , public cppmicroservices::ServiceTrackerCustomizer<cppmicroservices::logservice::LogService>
+        {
+          public:
+            explicit SCRLogger(cppmicroservices::BundleContext context);
+            SCRLogger(SCRLogger const&) = delete;
+            SCRLogger(SCRLogger&&) = delete;
+            SCRLogger& operator=(SCRLogger const&) = delete;
+            SCRLogger& operator=(SCRLogger&&) = delete;
+            ~SCRLogger() override;
 
-  // methods from the cppmicroservices::logservice::LogService interface
-  void Log(logservice::SeverityLevel level,
-           const std::string& message) override;
-  void Log(logservice::SeverityLevel level,
-           const std::string& message,
-           const std::exception_ptr ex) override;
-  void Log(const ServiceReferenceBase& sr,
-           logservice::SeverityLevel level,
-           const std::string& message) override;
-  void Log(const ServiceReferenceBase& sr,
-           logservice::SeverityLevel level,
-           const std::string& message,
-           const std::exception_ptr ex) override;
+            // methods from the cppmicroservices::logservice::LogService interface
+            void Log(logservice::SeverityLevel level, std::string const& message) override;
+            void Log(logservice::SeverityLevel level, std::string const& message, const std::exception_ptr ex) override;
+            void Log(ServiceReferenceBase const& sr,
+                     logservice::SeverityLevel level,
+                     std::string const& message) override;
+            void Log(ServiceReferenceBase const& sr,
+                     logservice::SeverityLevel level,
+                     std::string const& message,
+                     const std::exception_ptr ex) override;
 
-  // methods from the cppmicroservices::ServiceTrackerCustomizer interface
-  std::shared_ptr<TrackedParamType> AddingService(
-    const ServiceReference<cppmicroservices::logservice::LogService>& reference)
-    override;
-  void ModifiedService(
-    const ServiceReference<cppmicroservices::logservice::LogService>& reference,
-    const std::shared_ptr<cppmicroservices::logservice::LogService>& service)
-    override;
-  void RemovedService(
-    const ServiceReference<cppmicroservices::logservice::LogService>& reference,
-    const std::shared_ptr<cppmicroservices::logservice::LogService>& service)
-    override;
+            // methods from the cppmicroservices::ServiceTrackerCustomizer interface
+            std::shared_ptr<TrackedParamType> AddingService(
+                ServiceReference<cppmicroservices::logservice::LogService> const& reference) override;
+            void ModifiedService(ServiceReference<cppmicroservices::logservice::LogService> const& reference,
+                                 std::shared_ptr<cppmicroservices::logservice::LogService> const& service) override;
+            void RemovedService(ServiceReference<cppmicroservices::logservice::LogService> const& reference,
+                                std::shared_ptr<cppmicroservices::logservice::LogService> const& service) override;
 
-  // method to stop tracking the Log Service. This must be called from the SCR BundleActivator's Stop method.
-  // Not Thread-safe. must not be called simultaneously from multiple threads
-  void StopTracking();
+            // method to stop tracking the Log Service. This must be called from the SCR BundleActivator's Stop method.
+            // Not Thread-safe. must not be called simultaneously from multiple threads
+            void StopTracking();
 
-private:
-  cppmicroservices::BundleContext scrContext;
-  std::unique_ptr<
-    cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>
-    serviceTracker;
-  std::shared_ptr<cppmicroservices::logservice::LogService> logService;
-};
-} // scrimpl
-} // cppmicroservices
+          private:
+            cppmicroservices::BundleContext scrContext;
+            std::unique_ptr<cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>> serviceTracker;
+            std::shared_ptr<cppmicroservices::logservice::LogService> logService;
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 #endif // __SCRLOGGER_HPP__

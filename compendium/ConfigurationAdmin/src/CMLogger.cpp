@@ -22,100 +22,111 @@
 
 #include "CMLogger.hpp"
 
-namespace cppmicroservices {
-namespace cmimpl {
-CMLogger::CMLogger(cppmicroservices::BundleContext context)
-  : cmContext(std::move(context))
-  , serviceTracker(
-      std::make_unique<cppmicroservices::ServiceTracker<
-        cppmicroservices::logservice::LogService>>(cmContext, this))
-  , logService(nullptr)
+namespace cppmicroservices
 {
-  serviceTracker->Open(); // Start tracking
-}
+    namespace cmimpl
+    {
+        CMLogger::CMLogger(cppmicroservices::BundleContext context)
+            : cmContext(std::move(context))
+            , serviceTracker(
+                  std::make_unique<cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>(
+                      cmContext,
+                      this))
+            , logService(nullptr)
+        {
+            serviceTracker->Open(); // Start tracking
+        }
 
-CMLogger::~CMLogger()
-{
-  try {
-    if (serviceTracker) {
-      serviceTracker->Close();
-    }
-  } catch (...) {
-  }
-}
+        CMLogger::~CMLogger()
+        {
+            try
+            {
+                if (serviceTracker)
+                {
+                    serviceTracker->Close();
+                }
+            }
+            catch (...)
+            {
+            }
+        }
 
-std::shared_ptr<cppmicroservices::logservice::LogService>
-CMLogger::AddingService(
-  const ServiceReference<cppmicroservices::logservice::LogService>& reference)
-{
-  auto currLogger = std::atomic_load(&logService);
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-  if (!currLogger && reference) {
-    logger =
-      cmContext.GetService<cppmicroservices::logservice::LogService>(reference);
-    std::atomic_store(&logService, logger);
-  }
-  return logger;
-}
+        std::shared_ptr<cppmicroservices::logservice::LogService>
+        CMLogger::AddingService(ServiceReference<cppmicroservices::logservice::LogService> const& reference)
+        {
+            auto currLogger = std::atomic_load(&logService);
+            std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+            if (!currLogger && reference)
+            {
+                logger = cmContext.GetService<cppmicroservices::logservice::LogService>(reference);
+                std::atomic_store(&logService, logger);
+            }
+            return logger;
+        }
 
-void CMLogger::ModifiedService(
-  const ServiceReference<
-    cppmicroservices::logservice::LogService>& /*reference*/,
-  const std::shared_ptr<cppmicroservices::logservice::LogService>& /*service*/)
-{
-  // no-op. Don't care if properties change
-}
+        void
+        CMLogger::ModifiedService(ServiceReference<cppmicroservices::logservice::LogService> const& /*reference*/,
+                                  std::shared_ptr<cppmicroservices::logservice::LogService> const& /*service*/)
+        {
+            // no-op. Don't care if properties change
+        }
 
-void CMLogger::RemovedService(
-  const ServiceReference<
-    cppmicroservices::logservice::LogService>& /*reference*/,
-  const std::shared_ptr<cppmicroservices::logservice::LogService>& service)
-{
-  auto currLogger = std::atomic_load(&logService);
-  if (service == currLogger) {
-    // replace existing logger with a nullptr logger
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger(nullptr);
-    std::atomic_store(&logService, logger);
-  }
-}
+        void
+        CMLogger::RemovedService(ServiceReference<cppmicroservices::logservice::LogService> const& /*reference*/,
+                                 std::shared_ptr<cppmicroservices::logservice::LogService> const& service)
+        {
+            auto currLogger = std::atomic_load(&logService);
+            if (service == currLogger)
+            {
+                // replace existing logger with a nullptr logger
+                std::shared_ptr<cppmicroservices::logservice::LogService> logger(nullptr);
+                std::atomic_store(&logService, logger);
+            }
+        }
 
-void CMLogger::Log(logservice::SeverityLevel level, const std::string& message)
-{
-  auto currLogger = std::atomic_load(&logService);
-  if (currLogger) {
-    currLogger->Log(level, message);
-  }
-}
+        void
+        CMLogger::Log(logservice::SeverityLevel level, std::string const& message)
+        {
+            auto currLogger = std::atomic_load(&logService);
+            if (currLogger)
+            {
+                currLogger->Log(level, message);
+            }
+        }
 
-void CMLogger::Log(logservice::SeverityLevel level,
-                   const std::string& message,
-                   const std::exception_ptr ex)
-{
-  auto currLogger = std::atomic_load(&logService);
-  if (currLogger) {
-    currLogger->Log(level, message, ex);
-  }
-}
+        void
+        CMLogger::Log(logservice::SeverityLevel level, std::string const& message, const std::exception_ptr ex)
+        {
+            auto currLogger = std::atomic_load(&logService);
+            if (currLogger)
+            {
+                currLogger->Log(level, message, ex);
+            }
+        }
 
-void CMLogger::Log(const cppmicroservices::ServiceReferenceBase& sr,
-                   logservice::SeverityLevel level,
-                   const std::string& message)
-{
-  auto currLogger = std::atomic_load(&logService);
-  if (currLogger) {
-    currLogger->Log(sr, level, message);
-  }
-}
+        void
+        CMLogger::Log(cppmicroservices::ServiceReferenceBase const& sr,
+                      logservice::SeverityLevel level,
+                      std::string const& message)
+        {
+            auto currLogger = std::atomic_load(&logService);
+            if (currLogger)
+            {
+                currLogger->Log(sr, level, message);
+            }
+        }
 
-void CMLogger::Log(const cppmicroservices::ServiceReferenceBase& sr,
-                   logservice::SeverityLevel level,
-                   const std::string& message,
-                   const std::exception_ptr ex)
-{
-  auto currLogger = std::atomic_load(&logService);
-  if (currLogger) {
-    currLogger->Log(sr, level, message, ex);
-  }
-}
-} // cmimpl
-} // cppmicroservices
+        void
+        CMLogger::Log(cppmicroservices::ServiceReferenceBase const& sr,
+                      logservice::SeverityLevel level,
+                      std::string const& message,
+                      const std::exception_ptr ex)
+        {
+            auto currLogger = std::atomic_load(&logService);
+            if (currLogger)
+            {
+                currLogger->Log(sr, level, message, ex);
+            }
+        }
+    } // namespace cmimpl
+} // namespace cppmicroservices

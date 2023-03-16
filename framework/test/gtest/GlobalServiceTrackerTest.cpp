@@ -33,33 +33,31 @@ limitations under the License.
 #include <memory>
 
 // A dummy interface to use with service trackers
-namespace {
-class Foo
+namespace
 {
-public:
-  virtual ~Foo() {}
-};
-}
+    class Foo
+    {
+      public:
+        virtual ~Foo() {}
+    };
+} // namespace
 
 // Since the Foo interface is embedded in the test executable, its symbols are
 // not exported. Using CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE ensures that
 // the symbols are exported correctly for use by CppMicroServices.
-CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE(
-  Foo,
-  "org.cppmicroservices.test.servicetracker.Foo");
+CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE(Foo, "org.cppmicroservices.test.servicetracker.Foo");
 
 TEST(GlobalServiceTrackerTest, Destroy)
 {
-  auto f = cppmicroservices::FrameworkFactory().NewFramework();
-  ASSERT_TRUE(f);
-  f.Start();
+    auto f = cppmicroservices::FrameworkFactory().NewFramework();
+    ASSERT_TRUE(f);
+    f.Start();
 
-  static std::shared_ptr<cppmicroservices::ServiceTracker<Foo>> globalTracker(
-    std::make_shared<cppmicroservices::ServiceTracker<Foo>>(
-      f.GetBundleContext()));
-  globalTracker->Open();
+    static std::shared_ptr<cppmicroservices::ServiceTracker<Foo>> globalTracker(
+        std::make_shared<cppmicroservices::ServiceTracker<Foo>>(f.GetBundleContext()));
+    globalTracker->Open();
 
-  f.Stop();
-  f.WaitForStop(std::chrono::milliseconds::zero());
-  // A test failure results in the executable crashing with an access violation.
+    f.Stop();
+    f.WaitForStop(std::chrono::milliseconds::zero());
+    // A test failure results in the executable crashing with an access violation.
 }

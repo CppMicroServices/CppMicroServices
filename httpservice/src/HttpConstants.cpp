@@ -24,53 +24,62 @@
 
 #include <string>
 
-namespace cppmicroservices {
-
-std::string HttpConstants::HTTP_SERVICE_ENDPOINT_ATTRIBUTE()
+namespace cppmicroservices
 {
-  static std::string s = "org.cppmicroservices.http.endpoint";
-  return s;
-}
 
-std::string HttpConstants::HTTP_WHITEBOARD_CONTEXT_NAME()
-{
-  static std::string s = "org.cppmicroservices.http.whiteboard.context.name";
-  return s;
-}
+    std::string
+    HttpConstants::HTTP_SERVICE_ENDPOINT_ATTRIBUTE()
+    {
+        static std::string s = "org.cppmicroservices.http.endpoint";
+        return s;
+    }
 
-std::string HttpConstants::HTTP_WHITEBOARD_CONTEXT_SELECT()
-{
-  static std::string s = "org.cppmicroservices.http.whiteboard.context.select";
-  return s;
-}
+    std::string
+    HttpConstants::HTTP_WHITEBOARD_CONTEXT_NAME()
+    {
+        static std::string s = "org.cppmicroservices.http.whiteboard.context.name";
+        return s;
+    }
 
-std::string HttpConstants::HTTP_WHITEBOARD_CONTEXT_SHARED()
-{
-  static std::string s = "org.cppmicroservices.http.whiteboard.context.shared";
-  return s;
-}
+    std::string
+    HttpConstants::HTTP_WHITEBOARD_CONTEXT_SELECT()
+    {
+        static std::string s = "org.cppmicroservices.http.whiteboard.context.select";
+        return s;
+    }
 
-std::string HttpConstants::HTTP_WHITEBOARD_RESOURCE_PREFIX()
-{
-  static std::string s = "org.cppmicroservices.http.whiteboard.resource.prefix";
-  return s;
-}
+    std::string
+    HttpConstants::HTTP_WHITEBOARD_CONTEXT_SHARED()
+    {
+        static std::string s = "org.cppmicroservices.http.whiteboard.context.shared";
+        return s;
+    }
 
-std::string HttpConstants::HTTP_WHITEBOARD_SERVLET_NAME()
-{
-  static std::string s = "org.cppmicroservices.http.whiteboard.servlet.name";
-  return s;
-}
+    std::string
+    HttpConstants::HTTP_WHITEBOARD_RESOURCE_PREFIX()
+    {
+        static std::string s = "org.cppmicroservices.http.whiteboard.resource.prefix";
+        return s;
+    }
 
-std::string HttpConstants::HTTP_WHITEBOARD_SERVLET_PATTERN()
-{
-  static std::string s = "org.cppmicroservices.http.whiteboard.servlet.pattern";
-  return s;
-}
+    std::string
+    HttpConstants::HTTP_WHITEBOARD_SERVLET_NAME()
+    {
+        static std::string s = "org.cppmicroservices.http.whiteboard.servlet.name";
+        return s;
+    }
 
-std::string HttpConstants::HTTP_WHITEBOARD_TARGET()
-{
-  static std::string s = "org.cppmicroservices.http.whiteboard.target";
-  return s;
-}
-}
+    std::string
+    HttpConstants::HTTP_WHITEBOARD_SERVLET_PATTERN()
+    {
+        static std::string s = "org.cppmicroservices.http.whiteboard.servlet.pattern";
+        return s;
+    }
+
+    std::string
+    HttpConstants::HTTP_WHITEBOARD_TARGET()
+    {
+        static std::string s = "org.cppmicroservices.http.whiteboard.target";
+        return s;
+    }
+} // namespace cppmicroservices

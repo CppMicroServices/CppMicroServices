@@ -25,38 +25,40 @@
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
 
-namespace cppmicroservices {
-
-struct TestBundleA2 : public TestBundleA2Service
+namespace cppmicroservices
 {
-  TestBundleA2() {}
-  virtual ~TestBundleA2() {}
-};
 
-class TestBundleA2Activator : public BundleActivator
-{
-public:
-  TestBundleA2Activator() {}
+    struct TestBundleA2 : public TestBundleA2Service
+    {
+        TestBundleA2() {}
+        virtual ~TestBundleA2() {}
+    };
 
-  ~TestBundleA2Activator() {}
+    class TestBundleA2Activator : public BundleActivator
+    {
+      public:
+        TestBundleA2Activator() {}
 
-  void Start(BundleContext context)
-  {
-    s = std::make_shared<TestBundleA2>();
-    sr = context.RegisterService<TestBundleA2Service>(s);
-  }
+        ~TestBundleA2Activator() {}
 
-  void Stop(BundleContext /*context*/)
-  {
-    sr.Unregister();
-    s.reset();
-  }
+        void
+        Start(BundleContext context)
+        {
+            s = std::make_shared<TestBundleA2>();
+            sr = context.RegisterService<TestBundleA2Service>(s);
+        }
 
-private:
-  std::shared_ptr<TestBundleA2> s;
-  ServiceRegistration<TestBundleA2Service> sr;
-};
-}
+        void
+        Stop(BundleContext /*context*/)
+        {
+            sr.Unregister();
+            s.reset();
+        }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
-  cppmicroservices::TestBundleA2Activator)
+      private:
+        std::shared_ptr<TestBundleA2> s;
+        ServiceRegistration<TestBundleA2Service> sr;
+    };
+} // namespace cppmicroservices
+
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleA2Activator)

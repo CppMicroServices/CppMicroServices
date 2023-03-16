@@ -32,26 +32,27 @@
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Constants.h"
 
-namespace cppmicroservices {
-namespace scrimpl {
-namespace metadata {
-/**
- * Stores the service metadata information parsed from the Service Component
- * Runtime description.
- */
-struct ServiceMetadata
+namespace cppmicroservices
 {
-  ServiceMetadata()
-    : scope(cppmicroservices::Constants::SCOPE_SINGLETON)
-  {}
+    namespace scrimpl
+    {
+        namespace metadata
+        {
+            /**
+             * Stores the service metadata information parsed from the Service Component
+             * Runtime description.
+             */
+            struct ServiceMetadata
+            {
+                ServiceMetadata() : scope(cppmicroservices::Constants::SCOPE_SINGLETON) {}
 
-  std::vector<std::string> interfaces;
-  std::string scope;
+                std::vector<std::string> interfaces;
+                std::string scope;
 
-  static const std::vector<std::string> Scopes;
-};
-}
-}
-}
+                static const std::vector<std::string> Scopes;
+            };
+        } // namespace metadata
+    }     // namespace scrimpl
+} // namespace cppmicroservices
 
 #endif

@@ -1,6 +1,6 @@
 /*=============================================================================
 
-  Library: CppMicroServices 
+  Library: CppMicroServices
 
   Copyright (c) The CppMicroServices developers. See the COPYRIGHT
   file at the top-level directory of this distribution and at
@@ -26,35 +26,35 @@
 
 using namespace cppmicroservices;
 
-template<typename T, typename S = std::string>
-void serviceEventOperatorTest(const T type, const S expectedStr)
+template <typename T, typename S = std::string>
+void
+serviceEventOperatorTest(const T type, const S expectedStr)
 {
-  std::stringstream buffer;
-  std::streambuf* backup = std::cout.rdbuf(buffer.rdbuf());
-  std::cout << type;
-  std::string actStr = buffer.str();
-  ASSERT_TRUE(actStr.find(expectedStr) != std::string::npos);
-  std::cout.rdbuf(backup);
+    std::stringstream buffer;
+    std::streambuf* backup = std::cout.rdbuf(buffer.rdbuf());
+    std::cout << type;
+    std::string actStr = buffer.str();
+    ASSERT_TRUE(actStr.find(expectedStr) != std::string::npos);
+    std::cout.rdbuf(backup);
 }
 
 TEST(ServiceEventStreamOperatorTest, serviceEventTypeModified)
 {
-  serviceEventOperatorTest(ServiceEvent::SERVICE_MODIFIED, "MODIFIED");
+    serviceEventOperatorTest(ServiceEvent::SERVICE_MODIFIED, "MODIFIED");
 }
 
 TEST(ServiceEventStreamOperatorTest, serviceEventTypeModifiedEndMatch)
 {
-  serviceEventOperatorTest(ServiceEvent::SERVICE_MODIFIED_ENDMATCH,
-                           "MODIFIED_ENDMATCH");
+    serviceEventOperatorTest(ServiceEvent::SERVICE_MODIFIED_ENDMATCH, "MODIFIED_ENDMATCH");
 }
 
 TEST(ServiceEventStreamOperatorTest, serviceEventTypeDefault)
 {
-  serviceEventOperatorTest(ServiceEvent::Type(), "unknown service event type");
+    serviceEventOperatorTest(ServiceEvent::Type(), "unknown service event type");
 }
 
 TEST(ServiceEventStreamOperatorTest, serviceEventNone)
 {
-  ServiceEvent event;
-  serviceEventOperatorTest(event, "NONE");
+    ServiceEvent event;
+    serviceEventOperatorTest(event, "NONE");
 }

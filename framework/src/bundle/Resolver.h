@@ -26,18 +26,20 @@
 #include "cppmicroservices/detail/Threads.h"
 #include "cppmicroservices/detail/WaitCondition.h"
 
-namespace cppmicroservices {
-
-/**
- * This class is not part of the public API.
- */
-class Resolver
-  : public detail::MultiThreaded<detail::MutexLockingStrategy<>,
-                                 detail::WaitCondition>
+namespace cppmicroservices
 {
-public:
-  void Clear() {}
-};
-}
+
+    /**
+     * This class is not part of the public API.
+     */
+    class Resolver : public detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition>
+    {
+      public:
+        void
+        Clear()
+        {
+        }
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_RESOLVER_H

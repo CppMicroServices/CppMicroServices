@@ -6,36 +6,36 @@
 
 class SingletonTwo
 {
-public:
-  static SingletonTwo& GetInstance();
+  public:
+    static SingletonTwo& GetInstance();
 
-  int b;
+    int b;
 
-private:
-  SingletonTwo();
-  ~SingletonTwo();
+  private:
+    SingletonTwo();
+    ~SingletonTwo();
 
-  // Disable copy constructor and assignment operator.
-  SingletonTwo(const SingletonTwo&);
-  SingletonTwo& operator=(const SingletonTwo&);
+    // Disable copy constructor and assignment operator.
+    SingletonTwo(SingletonTwo const&);
+    SingletonTwo& operator=(SingletonTwo const&);
 };
 
 class SingletonTwoService
 {
-public:
-  // Note: This is a helper method to migrate traditional singletons to
-  // services. Do not create this method in real world applications.
-  static std::shared_ptr<SingletonTwoService> GetInstance();
+  public:
+    // Note: This is a helper method to migrate traditional singletons to
+    // services. Do not create this method in real world applications.
+    static std::shared_ptr<SingletonTwoService> GetInstance();
 
-  int b;
+    int b;
 
-  SingletonTwoService();
-  ~SingletonTwoService();
+    SingletonTwoService();
+    ~SingletonTwoService();
 
-private:
-  // Disable copy constructor and assignment operator.
-  SingletonTwoService(const SingletonTwoService&);
-  SingletonTwoService& operator=(const SingletonTwoService&);
+  private:
+    // Disable copy constructor and assignment operator.
+    SingletonTwoService(SingletonTwoService const&);
+    SingletonTwoService& operator=(SingletonTwoService const&);
 };
 
 #endif // SINGLETONTWO_H

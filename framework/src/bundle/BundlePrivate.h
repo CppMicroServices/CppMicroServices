@@ -37,244 +37,243 @@
 #include <ostream>
 #include <thread>
 
-namespace cppmicroservices {
-
-class CoreBundleContext;
-class Bundle;
-class BundleContextPrivate;
-struct BundleActivator;
-
-/**
- * \ingroup MicroServices
- */
-class BundlePrivate
-  : public detail::MultiThreaded<detail::MutexLockingStrategy<>,
-                                 detail::WaitCondition>
-  , public std::enable_shared_from_this<BundlePrivate>
+namespace cppmicroservices
 {
 
-public:
-  using MutexHost = MutexLockingStrategy<>;
-  using LockType = MutexHost::UniqueLock;
-  using WaitConditionType = WaitCondition<MutexHost>;
+    class CoreBundleContext;
+    class Bundle;
+    class BundleContextPrivate;
+    struct BundleActivator;
 
-  BundlePrivate(const BundlePrivate&) = delete;
-  BundlePrivate& operator=(const BundlePrivate&) = delete;
+    /**
+     * \ingroup MicroServices
+     */
+    class BundlePrivate
+        : public detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition>
+        , public std::enable_shared_from_this<BundlePrivate>
+    {
 
-  /**
-   * Construct a new Bundle.
-   *
-   * Only called for the system bundle.
-   *
-   * @param coreCtx CoreBundleContext for this bundle.
-   */
-  BundlePrivate(CoreBundleContext* coreCtx);
+      public:
+        using MutexHost = MutexLockingStrategy<>;
+        using LockType = MutexHost::UniqueLock;
+        using WaitConditionType = WaitCondition<MutexHost>;
 
-  /**
-   * Construct a new Bundle based on a BundleArchive.
-   *
-   * @param coreCtx CoreBundleContext for this bundle.
-   * @param ba Bundle archive with holding the contents of the bundle.
-   * @throws std::runtime_error If we have duplicate symbolic name and version.
-   * @throws std::invalid_argument Faulty manifest for bundle
-   */
-  BundlePrivate(CoreBundleContext* coreCtx,
-                const std::shared_ptr<BundleArchive>& ba);
+        BundlePrivate(BundlePrivate const&) = delete;
+        BundlePrivate& operator=(BundlePrivate const&) = delete;
 
-  virtual ~BundlePrivate();
+        /**
+         * Construct a new Bundle.
+         *
+         * Only called for the system bundle.
+         *
+         * @param coreCtx CoreBundleContext for this bundle.
+         */
+        BundlePrivate(CoreBundleContext* coreCtx);
 
-  /**
-   * Check if bundle is in state UNINSTALLED. If so, throw exception.
-   */
-  void CheckUninstalled() const;
+        /**
+         * Construct a new Bundle based on a BundleArchive.
+         *
+         * @param coreCtx CoreBundleContext for this bundle.
+         * @param ba Bundle archive with holding the contents of the bundle.
+         * @throws std::runtime_error If we have duplicate symbolic name and version.
+         * @throws std::invalid_argument Faulty manifest for bundle
+         */
+        BundlePrivate(CoreBundleContext* coreCtx, std::shared_ptr<BundleArchive> const& ba);
 
-  void RemoveBundleResources();
+        virtual ~BundlePrivate();
 
-  virtual void Stop(uint32_t);
+        /**
+         * Check if bundle is in state UNINSTALLED. If so, throw exception.
+         */
+        void CheckUninstalled() const;
 
-  std::exception_ptr Stop0();
+        void RemoveBundleResources();
 
-  /**
-   * Stop code that is executed without holding the packages
-   * lock.
-   */
-  std::exception_ptr Stop1();
+        virtual void Stop(uint32_t);
 
-  void Stop2();
+        std::exception_ptr Stop0();
 
-  /**
-   * Get updated bundle state. That means check if an installed bundle has been
-   * resolved.
-   *
-   * @return Bundles state
-   */
-  Bundle::State GetUpdatedState();
+        /**
+         * Stop code that is executed without holding the packages
+         * lock.
+         */
+        std::exception_ptr Stop1();
 
-  /**
-   * Set state to BUNDLE_INSTALLED.
-   * We assume that the bundle is resolved when entering this method.
-   */
-  void SetStateInstalled(bool sendEvent);
+        void Stop2();
 
-  /**
-   * Purge any old files and data associated with this bundle.
-   */
-  void Purge();
+        /**
+         * Get updated bundle state. That means check if an installed bundle has been
+         * resolved.
+         *
+         * @return Bundles state
+         */
+        Bundle::State GetUpdatedState();
 
-  /**
-   * Get bundle archive.
-   *
-   * @return BundleArchive object.
-   */
-  std::shared_ptr<BundleArchive> GetBundleArchive(/*long generation*/) const;
+        /**
+         * Set state to BUNDLE_INSTALLED.
+         * We assume that the bundle is resolved when entering this method.
+         */
+        void SetStateInstalled(bool sendEvent);
 
-  /**
-   * Save the autostart setting to the persistent bundle storage.
-   *
-   * @param setting The autostart options to save.
-   */
-  void SetAutostartSetting(int32_t setting);
+        /**
+         * Purge any old files and data associated with this bundle.
+         */
+        void Purge();
 
-  /**
-   * Get the autostart setting from the bundle storage.
-   *
-   * @return the current autostart setting, "-1" if bundle not started.
-   */
-  int32_t GetAutostartSetting() const;
+        /**
+         * Get bundle archive.
+         *
+         * @return BundleArchive object.
+         */
+        std::shared_ptr<BundleArchive> GetBundleArchive(/*long generation*/) const;
 
-  // Performs the actual activation.
-  void FinalizeActivation();
+        /**
+         * Save the autostart setting to the persistent bundle storage.
+         *
+         * @param setting The autostart options to save.
+         */
+        void SetAutostartSetting(int32_t setting);
 
-  virtual void Uninstall();
+        /**
+         * Get the autostart setting from the bundle storage.
+         *
+         * @return the current autostart setting, "-1" if bundle not started.
+         */
+        int32_t GetAutostartSetting() const;
 
-  virtual std::string GetLocation() const;
+        // Performs the actual activation.
+        void FinalizeActivation();
 
-  virtual void Start(uint32_t options);
+        virtual void Uninstall();
 
-  virtual const AnyMap& GetHeaders() const;
+        virtual std::string GetLocation() const;
 
-  /**
-   * Start code that is executed without holding the
-   * packages lock.
-   */
-  std::exception_ptr Start0();
+        virtual void Start(uint32_t options);
 
-  void StartFailed();
+        virtual AnyMap const& GetHeaders() const;
 
-  /**
-   * Framework context.
-   */
-  CoreBundleContext* coreCtx;
+        /**
+         * Start code that is executed without holding the
+         * packages lock.
+         */
+        std::exception_ptr Start0();
 
-  /**
-   * Bundle identifier.
-   */
-  const long id;
+        void StartFailed();
 
-  /**
-   * Bundle location identifier.
-   */
-  const std::string location;
+        /**
+         * Framework context.
+         */
+        CoreBundleContext* coreCtx;
 
-  /**
-   * State of the bundle
-   */
-  // GCC 4.6 atomics do not support custom trivially copyable types
-  // like enums yet, so we use the underlying primitive type here.
-  std::atomic<uint32_t> state;
+        /**
+         * Bundle identifier.
+         */
+        long const id;
 
-  /**
-   * Bundle archive containing persistent data.
-   */
-  std::shared_ptr<BundleArchive> barchive;
+        /**
+         * Bundle location identifier.
+         */
+        const std::string location;
 
-  /**
-   * Directory for bundle data.
-   */
-  std::string bundleDir;
+        /**
+         * State of the bundle
+         */
+        // GCC 4.6 atomics do not support custom trivially copyable types
+        // like enums yet, so we use the underlying primitive type here.
+        std::atomic<uint32_t> state;
 
-  /**
-   * BundleContext for the bundle
-   */
-  detail::Atomic<std::shared_ptr<BundleContextPrivate>> bundleContext;
+        /**
+         * Bundle archive containing persistent data.
+         */
+        std::shared_ptr<BundleArchive> barchive;
 
-  using DestroyActivatorHook = std::function<void(BundleActivator*)>;
+        /**
+         * Directory for bundle data.
+         */
+        std::string bundleDir;
 
-  DestroyActivatorHook destroyActivatorHook;
+        /**
+         * BundleContext for the bundle
+         */
+        detail::Atomic<std::shared_ptr<BundleContextPrivate>> bundleContext;
 
-  std::unique_ptr<BundleActivator, DestroyActivatorHook> bactivator;
+        using DestroyActivatorHook = std::function<void(BundleActivator*)>;
 
-  enum Operation : uint8_t
-  {
-    OP_IDLE = 0,
-    OP_ACTIVATING = 1,
-    OP_DEACTIVATING = 2,
-    OP_RESOLVING = 3,
-    OP_UNINSTALLING = 4,
-    OP_UNRESOLVING = 5,
-    OP_UPDATING = 6
-  };
+        DestroyActivatorHook destroyActivatorHook;
 
-  /**
-   * Type of operation in progress. Blocks bundle calls during activator and
-   * listener calls
-   */
-  // GCC 4.6 atomics do not support custom trivially copyable types
-  // like enums yet, so we use the underlying primitive type here.
-  std::atomic<uint8_t> operation;
+        std::unique_ptr<BundleActivator, DestroyActivatorHook> bactivator;
 
-  /** Saved exception of resolve failure. */
-  std::exception_ptr resolveFailException;
+        enum Operation : uint8_t
+        {
+            OP_IDLE = 0,
+            OP_ACTIVATING = 1,
+            OP_DEACTIVATING = 2,
+            OP_RESOLVING = 3,
+            OP_UNINSTALLING = 4,
+            OP_UNRESOLVING = 5,
+            OP_UPDATING = 6
+        };
 
-  /** Remember if bundle was started */
-  bool wasStarted;
+        /**
+         * Type of operation in progress. Blocks bundle calls during activator and
+         * listener calls
+         */
+        // GCC 4.6 atomics do not support custom trivially copyable types
+        // like enums yet, so we use the underlying primitive type here.
+        std::atomic<uint8_t> operation;
 
-  enum class Aborted : uint8_t
-  {
-    NONE,
-    YES,
-    NO
-  };
+        /** Saved exception of resolve failure. */
+        std::exception_ptr resolveFailException;
 
-  /** start/stop time-out/uninstall flag */
-  // GCC 4.6 atomics do not support custom trivially copyable types
-  // like enums yet, so we use the underlying primitive type here.
-  std::atomic<uint8_t> aborted;
+        /** Remember if bundle was started */
+        bool wasStarted;
 
-  /**
-   * Bundle symbolic name.
-   */
-  const std::string symbolicName;
+        enum class Aborted : uint8_t
+        {
+            NONE,
+            YES,
+            NO
+        };
 
-  /**
-   * Bundle version
-   */
-  // Does not need to be locked by "this" when accessed.
-  BundleVersion version;
+        /** start/stop time-out/uninstall flag */
+        // GCC 4.6 atomics do not support custom trivially copyable types
+        // like enums yet, so we use the underlying primitive type here.
+        std::atomic<uint8_t> aborted;
 
-  /**
-   * Time when bundle was last modified.
-   *
-   */
-  Bundle::TimeStamp timeStamp;
+        /**
+         * Bundle symbolic name.
+         */
+        const std::string symbolicName;
 
-  // Does not need to be locked by "this" when accessed.
-  BundleManifest bundleManifest;
+        /**
+         * Bundle version
+         */
+        // Does not need to be locked by "this" when accessed.
+        BundleVersion version;
 
-  // -------------------------------------------------------------------------------
+        /**
+         * Time when bundle was last modified.
+         *
+         */
+        Bundle::TimeStamp timeStamp;
 
-  /**
-   * Responsible for platform specific loading and unloading
-   * of the bundle's physical form.
-   */
-  SharedLibrary lib;
+        // Does not need to be locked by "this" when accessed.
+        BundleManifest bundleManifest;
 
-  using SetBundleContextHook = std::function<void(BundleContextPrivate*)>;
-  SetBundleContextHook SetBundleContext;
-};
+        // -------------------------------------------------------------------------------
 
-Bundle MakeBundle(const std::shared_ptr<BundlePrivate>& d);
-std::shared_ptr<BundlePrivate> GetPrivate(const Bundle& b);
-}
+        /**
+         * Responsible for platform specific loading and unloading
+         * of the bundle's physical form.
+         */
+        SharedLibrary lib;
+
+        using SetBundleContextHook = std::function<void(BundleContextPrivate*)>;
+        SetBundleContextHook SetBundleContext;
+    };
+
+    Bundle MakeBundle(std::shared_ptr<BundlePrivate> const& d);
+    std::shared_ptr<BundlePrivate> GetPrivate(Bundle const& b);
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_BUNDLEPRIVATE_H

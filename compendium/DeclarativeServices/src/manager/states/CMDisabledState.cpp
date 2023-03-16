@@ -26,36 +26,39 @@
 #include "cppmicroservices/SharedLibraryException.h"
 #include <cassert>
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-CMDisabledState::CMDisabledState()
+namespace cppmicroservices
 {
-  // Initialization with a valid future is required to facilitate a request
-  // to DISABLE a ComponentManager whose initial state is DISABLED
-  std::packaged_task<void()> task([]() { /*empty task*/ });
-  fut = task.get_future().share();
-  task();
-}
+    namespace scrimpl
+    {
 
-std::shared_future<void> CMDisabledState::Enable(ComponentManagerImpl& cm)
-{
-  auto currentState =
-    shared_from_this(); // assume this object is the current state object.
-  return cm.PostAsyncDisabledToEnabled(currentState);
-}
+        CMDisabledState::CMDisabledState()
+        {
+            // Initialization with a valid future is required to facilitate a request
+            // to DISABLE a ComponentManager whose initial state is DISABLED
+            std::packaged_task<void()> task([]() { /*empty task*/ });
+            fut = task.get_future().share();
+            task();
+        }
 
-// if already in disabled state, simply return the existing future object. Equivalent to a no-op.
-std::shared_future<void> CMDisabledState::Disable(ComponentManagerImpl& /*cm*/)
-{
-  return GetFuture();
-}
+        std::shared_future<void>
+        CMDisabledState::Enable(ComponentManagerImpl& cm)
+        {
+            auto currentState = shared_from_this(); // assume this object is the current state object.
+            return cm.PostAsyncDisabledToEnabled(currentState);
+        }
 
-// There are no configurations for a disabled state. Equivalent to a no-op.
-std::vector<std::shared_ptr<ComponentConfiguration>>
-CMDisabledState::GetConfigurations(const ComponentManagerImpl&) const
-{
-  return {};
-}
-}
-}
+        // if already in disabled state, simply return the existing future object. Equivalent to a no-op.
+        std::shared_future<void>
+        CMDisabledState::Disable(ComponentManagerImpl& /*cm*/)
+        {
+            return GetFuture();
+        }
+
+        // There are no configurations for a disabled state. Equivalent to a no-op.
+        std::vector<std::shared_ptr<ComponentConfiguration>>
+        CMDisabledState::GetConfigurations(ComponentManagerImpl const&) const
+        {
+            return {};
+        }
+    } // namespace scrimpl
+} // namespace cppmicroservices

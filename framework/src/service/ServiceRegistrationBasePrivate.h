@@ -54,11 +54,6 @@ namespace cppmicroservices
         friend class ServiceReferenceBasePrivate;
 
         /**
-         * Reference count for implicitly shared private implementation.
-         */
-        std::atomic<int> ref;
-
-        /**
          * Service or ServiceFactory object.
          */
         InterfaceMapConstPtr service;

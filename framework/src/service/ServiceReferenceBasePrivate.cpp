@@ -41,9 +41,9 @@ US_MSVC_DISABLE_WARNING(4503) // decorated name length exceeded, name was trunca
 namespace cppmicroservices
 {
 
-    using ThreadMarksMapType = std::unordered_map<BundlePrivate*, std::unordered_set<ServiceRegistrationBasePrivate*>>;
+    using ThreadMarksMapType = std::unordered_map<BundlePrivate*, std::unordered_set<std::shared_ptr<ServiceRegistrationBasePrivate>>>;
 
-    ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg)
+    ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(std::shared_ptr<ServiceRegistrationBasePrivate> reg)
         : ref(1)
         , registration(reg)
     {

@@ -39,31 +39,19 @@ US_MSVC_DISABLE_WARNING(4503) // decorated name length exceeded, name was trunca
 namespace cppmicroservices
 {
 
-    ServiceRegistrationBase::ServiceRegistrationBase() {}
+    ServiceRegistrationBase::ServiceRegistrationBase() = default;
 
-    ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBase const& reg) : d(reg.d)
-    {
-        if (d)
-            ++d->ref;
-    }
+    ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBase const& reg) = default;
 
-    ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBase&& reg) noexcept : d(nullptr)
-    {
-        std::swap(d, reg.d);
-    }
+    ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBase&& reg) noexcept = default;
 
-    ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBasePrivate* registrationPrivate)
-        : d(registrationPrivate)
-    {
-        if (d)
-            ++d->ref;
-    }
+    ServiceRegistrationBase::ServiceRegistrationBase(std::shared<ServiceRegistrationBasePrivate> registrationPrivate) : d(registrationPrivate)
+    {}
 
     ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle,
                                                      InterfaceMapConstPtr const& service,
-                                                     Properties&& props)
-        : d(new ServiceRegistrationBasePrivate(bundle, service, std::move(props)))
-    {
+                                                     Properties&& props){
+        d = std::make_shared<ServiceRegistrationBasePrivate>(bundle, service, std::move(props))
     }
 
     ServiceRegistrationBase::operator bool() const { return d != nullptr; }
@@ -71,18 +59,17 @@ namespace cppmicroservices
     ServiceRegistrationBase&
     ServiceRegistrationBase::operator=(std::nullptr_t)
     {
-        if (d && !--d->ref)
-        {
-            delete d;
-        }
         d = nullptr;
         return *this;
     }
 
     ServiceRegistrationBase::~ServiceRegistrationBase()
     {
-        if (d && !--d->ref)
-            delete d;
+        // if (d && !--d->ref && d->available){
+        //     Unregister();
+        // } else if (d && !d->ref) {
+        //     delete d;
+        // }
     }
 
     ServiceReferenceBase
@@ -321,9 +308,6 @@ namespace cppmicroservices
             d->service.reset();
             d->prototypeServiceInstances.clear();
             d->bundleServiceInstance.clear();
-            // increment the reference count, since "d->reference" was used originally
-            // to keep d alive.
-            ++d->ref;
             d->reference = nullptr;
             d->unregistering = false;
         }
@@ -356,28 +340,10 @@ namespace cppmicroservices
     }
 
     ServiceRegistrationBase&
-    ServiceRegistrationBase::operator=(ServiceRegistrationBase const& registration)
-    {
-        ServiceRegistrationBasePrivate* curr_d = d;
-        d = registration.d;
-        if (d)
-            ++d->ref;
-
-        if (curr_d && !--curr_d->ref)
-            delete curr_d;
-
-        return *this;
-    }
+    ServiceRegistrationBase::operator=(ServiceRegistrationBase const& registration) = default;
 
     ServiceRegistrationBase&
-    ServiceRegistrationBase::operator=(ServiceRegistrationBase&& registration) noexcept
-    {
-        if (d && !--d->ref)
-            delete d;
-        d = nullptr;
-        std::swap(d, registration.d);
-        return *this;
-    }
+    ServiceRegistrationBase::operator=(ServiceRegistrationBase&& registration) noexcept = default;
 
     std::ostream&
     operator<<(std::ostream& os, ServiceRegistrationBase const&)

@@ -107,7 +107,7 @@ namespace cppmicroservices
         /**
          * Link to registration object for this reference.
          */
-        ServiceRegistrationBasePrivate* const registration;
+        std::shared_ptr<ServiceRegistrationBasePrivate> const registration;
 
         /**
          * The service interface id for this reference.

@@ -36,10 +36,9 @@ namespace cppmicroservices
     ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(BundlePrivate* bundle_,
                                                                    InterfaceMapConstPtr service,
                                                                    Properties&& props)
-        : ref(0)
-        , service(std::move(service))
+        : service(std::move(service))
         , bundle(bundle_->shared_from_this())
-        , reference(this)
+        , reference(shared_from_this())
         , properties(std::move(props))
         , available(true)
         , unregistering(false)

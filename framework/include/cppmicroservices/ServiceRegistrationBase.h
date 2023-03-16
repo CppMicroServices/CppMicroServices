@@ -195,7 +195,7 @@ namespace cppmicroservices
          */
         ServiceRegistrationBase();
 
-        ServiceRegistrationBase(ServiceRegistrationBasePrivate* registrationPrivate);
+        ServiceRegistrationBase(std::shared_ptr<ServiceRegistrationBasePrivate> registrationPrivate);
 
         ServiceRegistrationBase(BundlePrivate* bundle, InterfaceMapConstPtr const& service, Properties&& props);
 
@@ -223,7 +223,7 @@ namespace cppmicroservices
  */
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceRegistrationBase)
-return std::hash<cppmicroservices::ServiceRegistrationBasePrivate*>()(arg.d);
+return std::hash<std::shared_ptr<cppmicroservices::ServiceRegistrationBasePrivate>>()(arg.d);
 US_HASH_FUNCTION_END
 
 #endif // CPPMICROSERVICES_SERVICEREGISTRATIONBASE_H

@@ -47,16 +47,10 @@ namespace cppmicroservices
         : ref(1)
         , registration(reg)
     {
-        if (registration)
-            ++registration->ref;
     }
 
     ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
     {
-        if (registration && !--registration->ref)
-        {
-            delete registration;
-        }
     }
 
     InterfaceMapConstPtr
@@ -188,7 +182,7 @@ namespace cppmicroservices
             return s;
         std::shared_ptr<ServiceFactory> serviceFactory;
 
-        std::unordered_set<ServiceRegistrationBasePrivate*>* marks = nullptr;
+        std::unordered_set<std::shared_ptr<ServiceRegistrationBasePrivate>>* marks = nullptr;
 
         struct Unmark
         {
@@ -197,8 +191,8 @@ namespace cppmicroservices
                 if (s)
                     s->erase(r);
             }
-            std::unordered_set<ServiceRegistrationBasePrivate*>*& s;
-            ServiceRegistrationBasePrivate* r;
+            std::unordered_set<std::shared_ptr<ServiceRegistrationBasePrivate>>*& s;
+            std::shared_ptr<ServiceRegistrationBasePrivate> r;
         } unmark { marks, registration };
         US_UNUSED(unmark);
 

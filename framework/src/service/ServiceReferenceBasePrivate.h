@@ -47,7 +47,7 @@ namespace cppmicroservices
         ServiceReferenceBasePrivate(ServiceReferenceBasePrivate const&) = delete;
         ServiceReferenceBasePrivate& operator=(ServiceReferenceBasePrivate const&) = delete;
 
-        ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg);
+        ServiceReferenceBasePrivate(std::shared_ptr<ServiceRegistrationBasePrivate> reg);
 
         ~ServiceReferenceBasePrivate();
 

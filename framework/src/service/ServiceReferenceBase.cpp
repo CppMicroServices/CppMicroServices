@@ -38,7 +38,7 @@ namespace cppmicroservices
 
     ServiceReferenceBase::ServiceReferenceBase(ServiceReferenceBase const& ref) : d(ref.d.load()) { ++d.load()->ref; }
 
-    ServiceReferenceBase::ServiceReferenceBase(ServiceRegistrationBasePrivate* reg)
+    ServiceReferenceBase::ServiceReferenceBase(std::shared_ptr<ServiceRegistrationBasePrivate> reg)
         : d(new ServiceReferenceBasePrivate(reg))
     {
     }
@@ -232,7 +232,7 @@ namespace cppmicroservices
     std::size_t
     ServiceReferenceBase::Hash() const
     {
-        return std::hash<ServiceRegistrationBasePrivate*>()(this->d.load()->registration);
+        return std::hash<std::shared_ptr<ServiceRegistrationBasePrivate>>()(this->d.load()->registration);
     }
 
     std::ostream&

@@ -232,7 +232,7 @@ namespace cppmicroservices
          */
         ServiceReferenceBase();
 
-        ServiceReferenceBase(ServiceRegistrationBasePrivate* reg);
+        ServiceReferenceBase(std::shared_ptr<ServiceRegistrationBasePrivate> reg);
 
         void SetInterfaceId(std::string const& interfaceId);
 

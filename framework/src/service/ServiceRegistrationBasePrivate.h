@@ -40,7 +40,7 @@ namespace cppmicroservices
     /**
      * \ingroup MicroServices
      */
-    class ServiceRegistrationBasePrivate : public detail::MultiThreaded<>
+    class ServiceRegistrationBasePrivate : public detail::MultiThreaded<>, public std::enable_shared_from_this<ServiceRegistrationBasePrivate>
     {
 
       protected:

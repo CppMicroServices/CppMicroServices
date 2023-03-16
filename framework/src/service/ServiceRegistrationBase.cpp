@@ -45,13 +45,13 @@ namespace cppmicroservices
 
     ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBase&& reg) noexcept = default;
 
-    ServiceRegistrationBase::ServiceRegistrationBase(std::shared<ServiceRegistrationBasePrivate> registrationPrivate) : d(registrationPrivate)
+    ServiceRegistrationBase::ServiceRegistrationBase(std::shared_ptr<ServiceRegistrationBasePrivate> registrationPrivate) : d(registrationPrivate)
     {}
 
     ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle,
                                                      InterfaceMapConstPtr const& service,
                                                      Properties&& props){
-        d = std::make_shared<ServiceRegistrationBasePrivate>(bundle, service, std::move(props))
+        d = std::make_shared<ServiceRegistrationBasePrivate>(bundle, service, std::move(props));
     }
 
     ServiceRegistrationBase::operator bool() const { return d != nullptr; }

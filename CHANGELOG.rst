@@ -13,6 +13,7 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Added
 -----
+- `[Declarative Services] Add benchmark test infrastructure to DS <https://github.com/CppMicroServices/CppMicroServices/pull/813>`_
 
 Changed
 -------

@@ -183,7 +183,7 @@ namespace cppmicroservices
     }
 
     void
-    BundleResourceContainer::FindNodes(std::shared_ptr<const BundleArchive> const& archive,
+    BundleResourceContainer::FindNodes(std::shared_ptr<BundleArchive const> const& archive,
                                        std::string const& path,
                                        std::string const& filePattern,
                                        bool recurse,

@@ -100,7 +100,7 @@ namespace cppmicroservices
 
     BundleResource::BundleResource(BundleResource const& resource) : d(resource.d) {}
 
-    BundleResource::BundleResource(std::string const& file, std::shared_ptr<const BundleArchive> const& archive)
+    BundleResource::BundleResource(std::string const& file, std::shared_ptr<BundleArchive const> const& archive)
         : d(std::make_shared<BundleResourcePrivate>(archive))
     {
         d->InitFilePath(file);
@@ -112,7 +112,7 @@ namespace cppmicroservices
         InitializeChildren();
     }
 
-    BundleResource::BundleResource(int index, std::shared_ptr<const BundleArchive> const& archive)
+    BundleResource::BundleResource(int index, std::shared_ptr<BundleArchive const> const& archive)
         : d(std::make_shared<BundleResourcePrivate>(archive))
     {
         d->archive->GetResourceContainer()->GetStat(index, d->stat);

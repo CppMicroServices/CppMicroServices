@@ -76,7 +76,7 @@ namespace cppmicroservices
                          std::vector<std::string>& names,
                          std::vector<uint32_t>& indices) const;
 
-        void FindNodes(std::shared_ptr<const BundleArchive> const& archive,
+        void FindNodes(std::shared_ptr<BundleArchive const> const& archive,
                        std::string const& path,
                        std::string const& filePattern,
                        bool recurse,

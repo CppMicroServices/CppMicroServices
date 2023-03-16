@@ -521,7 +521,7 @@ namespace cppmicroservices
 
                     template <std::size_t... Is>
                     std::shared_ptr<T>
-                    call_make_shared_with_tuple(std::tuple<const std::shared_ptr<CtorInjectedRefs>&...> const& tuple,
+                    call_make_shared_with_tuple(std::tuple<std::shared_ptr<CtorInjectedRefs> const&...> const& tuple,
                                                 std::index_sequence<Is...>)
                     {
                         return std::make_shared<T>(std::get<Is>(tuple)...);
@@ -531,7 +531,7 @@ namespace cppmicroservices
                     std::shared_ptr<T>
                     call_make_shared_with_tuple_and_props(
                         std::shared_ptr<cppmicroservices::AnyMap> const& props,
-                        std::tuple<const std::shared_ptr<CtorInjectedRefs>&...> const& tuple,
+                        std::tuple<std::shared_ptr<CtorInjectedRefs> const&...> const& tuple,
                         std::index_sequence<Is...>)
                     {
                         return std::make_shared<T>(props, std::get<Is>(tuple)...);

@@ -114,6 +114,9 @@ namespace cppmicroservices
 
         ~ServiceRegistrationBasePrivate();
 
+        // Avoid Weak Ptr errors creating reference
+        void CreateReference();
+
         /**
          * Check if a bundle uses this service
          *

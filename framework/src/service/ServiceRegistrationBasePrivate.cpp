@@ -38,7 +38,6 @@ namespace cppmicroservices
                                                                    Properties&& props)
         : service(std::move(service))
         , bundle(bundle_->shared_from_this())
-        , reference(shared_from_this())
         , properties(std::move(props))
         , available(true)
         , unregistering(false)
@@ -50,6 +49,12 @@ namespace cppmicroservices
     ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
     {
         properties.Lock(), properties.Clear_unlocked();
+    }
+
+    // Need to first create shared_ptr to registration before duplicating for reference
+    void
+    ServiceRegistrationBasePrivate::CreateReference() {
+        reference = shared_from_this();
     }
 
     bool

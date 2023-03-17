@@ -52,6 +52,7 @@ namespace cppmicroservices
                                                      InterfaceMapConstPtr const& service,
                                                      Properties&& props){
         d = std::make_shared<ServiceRegistrationBasePrivate>(bundle, service, std::move(props));
+        d->CreateReference();
     }
 
     ServiceRegistrationBase::operator bool() const { return d != nullptr; }

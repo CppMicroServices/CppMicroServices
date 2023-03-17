@@ -20,7 +20,7 @@ env:
 jobs:
 
   benchmark:
-    name: UPT [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
+    name: CppMicroServices Benchmarks [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
     runs-on: ${{matrix.os}}
     env:
       BUILD_DIR: Z:\build\config_${{matrix.buildconfiguration}}

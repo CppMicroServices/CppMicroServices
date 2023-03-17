@@ -80,8 +80,8 @@ software provided on the GitHub-hosted runners.
 For information about the specific versions of software the runners
 use, please see the following resources:
 
-- `ubuntu-18.04 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu1804-README.md>`
 - `ubuntu-20.04 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-Readme.md>`
+- `ubuntu-22.04 Runner Information <https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md>`
 - `macos-11 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-11-Readme.md>`
 - `macos-12 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-12-Readme.md>`
 - `windows-2019 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/win/Windows2019-Readme.md>`
@@ -89,9 +89,9 @@ use, please see the following resources:
 
 Below is a list of tested compiler/OS combinations:
 
-- GCC 7.5.0 (Ubuntu 18.04)
 - GCC 9.4.0 (Ubuntu 20.04)
-- Clang 9.0 (Ubuntu 18.04)
+- GCC 9.5.0 (Ubuntu 22.04)
+- Clang 12.0.1 (Ubuntu 22.04)
 - Apple Clang, Xcode 13.2.0 (OS X 11.6.8)
 - Apple Clang, Xcode 13.4.0 (OS X 12.5.0)
 - Visual Studio 2019

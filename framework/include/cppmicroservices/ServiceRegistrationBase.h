@@ -128,7 +128,7 @@ namespace cppmicroservices
          *         of <code>properties</code> exceeds the value returned by
          *         std::numeric_limits<int>::max().
          */
-        void SetProperties(ServiceProperties const& properties);
+        void SetProperties(ServiceProperties && properties);
 
         /**
          * Unregisters a service. Remove a <code>ServiceRegistrationBase</code> object

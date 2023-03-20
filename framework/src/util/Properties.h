@@ -29,6 +29,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_set>
 
 namespace cppmicroservices
 {
@@ -66,7 +67,7 @@ namespace cppmicroservices
         // A case-insensitive map which maps all-lowercased keys to the original key values. This
         // allows for efficient case-insensitive lookups in map types that are not inherently
         // case insensitive.
-        std::unordered_map<std::string, std::string_view, detail::any_map_cihash, detail::any_map_ciequal>
+        std::unordered_set<std::string, detail::any_map_cihash, detail::any_map_ciequal>
             caseInsensitiveLookup;
 
         static const Any emptyAny;

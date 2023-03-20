@@ -109,7 +109,7 @@ namespace cppmicroservices
              *         of <code>properties</code> exceeds the value returned by
              *         std::numeric_limits<int>::max().
              */
-            void SetProperties(cppmicroservices::ServiceProperties const& properties);
+            void SetProperties(cppmicroservices::ServiceProperties && properties);
 
             /**
              * This method unregisters the service from the framework service registry. The

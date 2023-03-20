@@ -14,6 +14,8 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 Added
 -----
 - `[Declarative Services] Add benchmark test infrastructure to DS <https://github.com/CppMicroServices/CppMicroServices/pull/813>`_
+- `[Core Framework] Make nested JSON queries using LDAP build-time configurable <https://github.com/CppMicroServices/CppMicroServices/pull/811>`_
+- `[Core Framework] Support nested JSON queries using LDAP <https://github.com/CppMicroServices/CppMicroServices/pull/794>`_
 
 Changed
 -------
@@ -26,6 +28,7 @@ Deprecated
 
 Fixed
 -----
+- `[Core Framework] clang-tidy improvement for CMakeResourceDependencies <https://github.com/CppMicroServices/CppMicroServices/pull/812>`_
 
 `v3.7.5 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.7.5>`_ (2023-03-14)
 ---------------------------------------------------------------------------------------------------------

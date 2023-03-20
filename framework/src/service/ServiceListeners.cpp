@@ -471,7 +471,7 @@ namespace cppmicroservices
                 if (receivers.count(sse) == 0)
                     continue;
                 LDAPExpr const& ldapExpr = sse.GetLDAPExpr();
-                if (ldapExpr.IsNull() || ldapExpr.Evaluate(props, false))
+                if (ldapExpr.IsNull() || ldapExpr.Evaluate(props->GetPropsAnyMap(), false))
                 {
                     set.insert(sse);
                 }

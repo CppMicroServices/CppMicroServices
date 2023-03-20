@@ -22,6 +22,7 @@
 
 #include "cppmicroservices/LDAPFilter.h"
 
+#include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/ServiceReference.h"
 
@@ -34,7 +35,6 @@
 
 namespace cppmicroservices
 {
-
     class LDAPFilterData
     {
       public:
@@ -46,8 +46,6 @@ namespace cppmicroservices
 
         LDAPExpr ldapExpr;
     };
-
-    LDAPFilter::LDAPFilter() : d(nullptr) {}
 
     LDAPFilter::LDAPFilter(std::string const& filter) : d(nullptr)
     {
@@ -61,16 +59,18 @@ namespace cppmicroservices
         }
     }
 
-    LDAPFilter::LDAPFilter(LDAPFilter const&) = default;
-
-    LDAPFilter::~LDAPFilter() = default;
-
     LDAPFilter::operator bool() const { return d != nullptr; }
+
+    bool
+    LDAPFilter::Evaluate(LDAPExpr const& filter, AnyMap const& p, bool matchCase) const
+    {
+        return filter.Evaluate<LDAPExpr::FlatLookup>(p, matchCase);
+    }
 
     bool
     LDAPFilter::Match(ServiceReferenceBase const& reference) const
     {
-        return ((d) ? d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), false) : false);
+        return ((d) ? Evaluate(d->ldapExpr, reference.d.load()->GetProperties()->GetPropsAnyMap()) : false);
     }
 
     // This function has been modified to call the LDAPExpr::Evaluate() function which takes
@@ -88,7 +88,7 @@ namespace cppmicroservices
                 props_check::ValidateAnyMap(headers);
             }
 
-            return d->ldapExpr.Evaluate(headers, false);
+            return Evaluate(d->ldapExpr, headers);
         }
         else
         {
@@ -109,7 +109,7 @@ namespace cppmicroservices
                 props_check::ValidateAnyMap(dictionary);
             }
 
-            return d->ldapExpr.Evaluate(dictionary, false);
+            return Evaluate(d->ldapExpr, dictionary);
         }
         else
         {
@@ -130,7 +130,7 @@ namespace cppmicroservices
                 props_check::ValidateAnyMap(dictionary);
             }
 
-            return d->ldapExpr.Evaluate(dictionary, true);
+            return Evaluate(d->ldapExpr, dictionary, true);
         }
         else
         {
@@ -151,6 +151,19 @@ namespace cppmicroservices
     }
 
     LDAPFilter& LDAPFilter::operator=(LDAPFilter const& filter) = default;
+
+    bool
+    LDAPNestedFilter::Evaluate(LDAPExpr const& filter, AnyMap const& p, bool matchCase) const
+    {
+        return filter.Evaluate<LDAPExpr::NestedLookup>(p, matchCase);
+    }
+
+    bool
+    LDAPFlatOrNestedFilter::Evaluate(LDAPExpr const& filter, AnyMap const& p, bool matchCase) const
+    {
+        return filter.Evaluate<LDAPExpr::FlatLookup>(p, matchCase)
+               || filter.Evaluate<LDAPExpr::NestedLookup>(p, matchCase);
+    }
 
     std::ostream&
     operator<<(std::ostream& os, LDAPFilter const& filter)

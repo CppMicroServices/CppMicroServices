@@ -263,7 +263,7 @@ namespace cppmicroservices
 
         for (; s != send; ++s)
         {
-            if (filter.empty() || ldap.Evaluate(PropertiesHandle(s->d->properties, true), false))
+            if (filter.empty() || ldap.Evaluate(PropertiesHandle(s->d->properties, true)->GetPropsAnyMap(), false))
             {
                 res.emplace_back(s->GetReference(clazz));
             }

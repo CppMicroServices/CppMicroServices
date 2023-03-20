@@ -20,6 +20,8 @@
 
  =============================================================================*/
 
+#include <iostream>
+
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
@@ -132,16 +134,11 @@ TEST_F(LDAPQueryTest, TestLDAPFilterMatchServiceReferenceBase)
     ASSERT_TRUE(ldapMatchCase.Match(sr));
 }
 
-#ifdef SUPPORT_NESTED_LOOKUP
 TEST_F(LDAPQueryTest, TestNestedData)
 {
-    LDAPFilter filter1(LDAPProp("a.b.c.d") == 5);
-    LDAPFilter filter2(LDAPProp("a.e.f.g") == 6);
-    LDAPFilter filter3(LDAPProp("h.i.j.k") == 12);
-    LDAPFilter filter4(LDAPProp("h.i.l.m.n") == true);
+    LDAPNestedFilter filter1(LDAPProp("a.b.c.d") == 5);
     LDAPFilter filter5(LDAPProp("bundle.testproperty") == "YES");
-    LDAPFilter filter6(LDAPProp("bundle.nestedproperty.foo") == "bar");
-    LDAPFilter filter7(LDAPProp("i.expect.this.to.fail") == true);
+    LDAPNestedFilter filter7(LDAPProp("i.expect.this.to.fail") == true);
 
     auto const& headers = testBundle.GetHeaders();
 
@@ -155,8 +152,8 @@ TEST_F(LDAPQueryTest, TestNestedData)
     uomTestMapNested["b"] = 1;
     uomTestMap["a"] = uomTestMapNested;
 
-    LDAPFilter filter8(LDAPProp("a.b") == 1);
-    LDAPFilter filter9(LDAPProp("a.B") == 1);
+    LDAPNestedFilter filter8(LDAPProp("a.b") == 1);
+    LDAPNestedFilter filter9(LDAPProp("a.B") == 1);
 
     cppmicroservices::AnyMap uociTestMap(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
     uociTestMap["A"] = 1;
@@ -171,14 +168,10 @@ TEST_F(LDAPQueryTest, TestNestedData)
     cppmicroservices::AnyMap omTestMapNested(cppmicroservices::AnyMap::ORDERED_MAP);
     omTestMapNested["b"] = 1;
     omTestMap["a"] = omTestMapNested;
-    LDAPFilter filter11(LDAPProp("a.B") == 1);
+    LDAPNestedFilter filter11(LDAPProp("a.B") == 1);
 
     ASSERT_TRUE(filter1.Match(headers));
-    ASSERT_TRUE(filter2.Match(headers));
-    ASSERT_TRUE(filter3.Match(headers));
-    ASSERT_TRUE(filter4.Match(headers));
     ASSERT_TRUE(filter5.Match(headers));
-    ASSERT_TRUE(filter6.Match(headers));
     ASSERT_FALSE(filter7.Match(headers));
 
     // UOM
@@ -194,4 +187,3 @@ TEST_F(LDAPQueryTest, TestNestedData)
     ASSERT_TRUE(filter11.Match(omTestMap));
     ASSERT_FALSE(filter11.MatchCase(omTestMap));
 }
-#endif

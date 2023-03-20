@@ -113,7 +113,9 @@ namespace cppmicroservices
          * matches nothing.
          *
          */
-        LDAPFilter();
+        LDAPFilter() = default;
+        LDAPFilter(LDAPFilter const& other) = default;
+        virtual ~LDAPFilter() = default;
 
         /**
          * Creates a <code>LDAPFilter</code> object encapsulating the filter string.
@@ -130,10 +132,6 @@ namespace cppmicroservices
          * @see "Framework specification for a description of the filter string syntax." TODO!
          */
         LDAPFilter(std::string const& filter);
-
-        LDAPFilter(LDAPFilter const& other);
-
-        ~LDAPFilter();
 
         explicit operator bool() const;
 
@@ -225,7 +223,29 @@ namespace cppmicroservices
         LDAPFilter& operator=(LDAPFilter const& filter);
 
       protected:
+        virtual bool Evaluate(LDAPExpr const& filter, AnyMap const& p, bool matchCase = false) const;
+
         std::shared_ptr<LDAPFilterData> d;
+    };
+
+    class US_Framework_EXPORT LDAPNestedFilter : public LDAPFilter
+    {
+      public:
+        LDAPNestedFilter(std::string const& filter) : LDAPFilter(filter) {}
+        ~LDAPNestedFilter() = default;
+
+      protected:
+        bool Evaluate(LDAPExpr const& filter, AnyMap const& p, bool matchCase) const override;
+    };
+
+    class US_Framework_EXPORT LDAPFlatOrNestedFilter : public LDAPFilter
+    {
+      public:
+        LDAPFlatOrNestedFilter(std::string const& filter) : LDAPFilter(filter) {}
+        ~LDAPFlatOrNestedFilter() = default;
+
+      protected:
+        bool Evaluate(LDAPExpr const& filter, AnyMap const& p, bool matchCase) const override;
     };
 
     /**

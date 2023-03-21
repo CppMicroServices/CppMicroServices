@@ -190,6 +190,7 @@ TEST_F(ServiceFactoryTest, TestGetServiceObjectThrows)
         .WillRepeatedly(::testing::Throw(std::runtime_error(exceptionMsg)));
     EXPECT_CALL(*sf, UngetService(::testing::_, ::testing::_, ::testing::_)).Times(0);
 
+    // auto t = context.RegisterService<ITestServiceA>(ToFactory(sf),
     (void)context.RegisterService<ITestServiceA>(ToFactory(sf),
                                                  {
                                                      {Constants::SERVICE_SCOPE, Any(Constants::SCOPE_PROTOTYPE)}
@@ -201,6 +202,7 @@ TEST_F(ServiceFactoryTest, TestGetServiceObjectThrows)
     // Next line used to crash if a service implementation threw an exception in the
     // constructor. This test case checks to make sure that the fix is in place.
     EXPECT_NO_THROW((void)serviceObjects.GetService());
+    // t.Unregister();
 }
 
 // Tests the return type and FrameworkEvent generated when a

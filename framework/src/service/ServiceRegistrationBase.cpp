@@ -66,11 +66,19 @@ namespace cppmicroservices
 
     ServiceRegistrationBase::~ServiceRegistrationBase()
     {
+        long use_count = d.use_count();
+
+        // Only a singular registrationBase and referenceBasePrivate
+        // First destroy referenceBase preemptively so that destructor
+        if (use_count == 2) {
+            d->reference = nullptr;
+        }
         // if (d && !--d->ref && d->available){
         //     Unregister();
         // } else if (d && !d->ref) {
         //     delete d;
         // }
+        d = nullptr;
     }
 
     ServiceReferenceBase

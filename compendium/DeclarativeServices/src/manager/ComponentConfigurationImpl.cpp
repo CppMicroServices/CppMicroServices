@@ -139,7 +139,6 @@ namespace cppmicroservices
                 // If configuration object dependencies exist, use merged component and configuration object properties.
                 if (configManager != nullptr)
                 {
-                    props.clear();
                     for (auto const& item : configManager->GetProperties())
                     {
                         props.emplace(item.first, item.second);

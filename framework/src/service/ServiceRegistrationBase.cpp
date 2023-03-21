@@ -178,7 +178,7 @@ namespace cppmicroservices
         }
         if (old_rank != new_rank)
         {
-            const auto &classes = ref_any_cast<std::vector<std::string>>(objectClasses);
+            auto const& classes = ref_any_cast<std::vector<std::string>>(objectClasses);
             if (auto bundle = d->bundle.lock())
             {
                 bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);

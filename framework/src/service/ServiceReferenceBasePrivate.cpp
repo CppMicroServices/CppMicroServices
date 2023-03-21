@@ -83,8 +83,8 @@ namespace cppmicroservices
             }
             {
                 auto l = registration->properties.Lock();
-                for (const auto& clazz : 
-                    ref_any_cast<std::vector<std::string>>(registration->properties.ValueByRef_unlocked(Constants::OBJECTCLASS)))
+                for (auto const& clazz : ref_any_cast<std::vector<std::string>>(
+                         registration->properties.ValueByRef_unlocked(Constants::OBJECTCLASS)))
                 {
                     if (smap->find(clazz) == smap->end() && clazz != "org.cppmicroservices.factory")
                     {

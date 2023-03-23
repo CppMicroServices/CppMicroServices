@@ -183,8 +183,8 @@ namespace cppmicroservices
             auto registry = mgr->GetRegistry();
             auto logger = mgr->GetLogger();
             auto configNotifier = mgr->GetConfigNotifier();
-            auto managers = mgr->GetManagers();
-
+            auto managers = std::make_shared<std::vector<std::shared_ptr<cppmicroservices::scrimpl::ComponentManager>>>(
+                mgr->GetRegistry()->GetComponentManagers());
             try
             {
                 auto compManager = std::make_shared<ComponentManagerImpl>(newMetadata,
@@ -192,8 +192,7 @@ namespace cppmicroservices
                                                                           bundle.GetBundleContext(),
                                                                           logger,
                                                                           asyncWorkService,
-                                                                          configNotifier,
-                                                                          managers);
+                                                                          configNotifier);
                 if (registry->AddComponentManager(compManager))
                 {
                     managers->push_back(compManager);

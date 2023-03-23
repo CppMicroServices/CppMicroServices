@@ -55,9 +55,8 @@ namespace cppmicroservices
                                  cppmicroservices::BundleContext bundleContext,
                                  std::shared_ptr<cppmicroservices::logservice::LogService> logger,
                                  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
-                                 std::shared_ptr<ConfigurationNotifier> configNotifier,
-                                 std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
-            ComponentManagerImpl(ComponentManagerImpl const&) = delete;
+                                 std::shared_ptr<ConfigurationNotifier> configNotifier);
+             ComponentManagerImpl(ComponentManagerImpl const&) = delete;
             ComponentManagerImpl(ComponentManagerImpl&&) = delete;
             ComponentManagerImpl& operator=(ComponentManagerImpl const&) = delete;
             ComponentManagerImpl& operator=(ComponentManagerImpl&&) = delete;
@@ -151,14 +150,6 @@ namespace cppmicroservices
             }
 
             /**
-             * Returns the managers object associated with this ComponentManager
-             */
-            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>>
-            GetManagers() const
-            {
-                return managers;
-            }
-            /**
              * This method modifies the vector of futures stored in this object. If
              * any of the futures in the vector are ready, the ready future is replaced
              * by the given future. If none of the futures are ready, the given future
@@ -230,8 +221,7 @@ namespace cppmicroservices
             std::mutex
                 transitionMutex; ///< mutex to make the state transition and posting of the async operations atomic
             std::shared_ptr<ConfigurationNotifier> configNotifier;
-            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
-        };
+       };
     } // namespace scrimpl
 } // namespace cppmicroservices
 

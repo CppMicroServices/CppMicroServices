@@ -53,15 +53,13 @@ namespace cppmicroservices
                 auto notifier = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(),
                                                                         fakeLogger,
                                                                         asyncWorkService);
-                auto managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
-
+ 
                 compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                                      mockRegistry,
                                                                      framework.GetBundleContext(),
                                                                      fakeLogger,
                                                                      asyncWorkService,
-                                                                     notifier,
-                                                                     managers);
+                                                                     notifier);
             }
 
             virtual void

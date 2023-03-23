@@ -335,9 +335,8 @@ namespace cppmicroservices
                                      BundleContext bundleContext,
                                      std::shared_ptr<cppmicroservices::logservice::LogService> logger,
                                      std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
-                                     std::shared_ptr<ConfigurationNotifier> notifier,
-                                     std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
-                : ComponentManagerImpl(metadata, registry, bundleContext, logger, asyncWorkService, notifier, managers)
+                                     std::shared_ptr<ConfigurationNotifier> notifier)
+               : ComponentManagerImpl(metadata, registry, bundleContext, logger, asyncWorkService, notifier)
                 , statechangecount(0)
             {
             }
@@ -376,9 +375,8 @@ namespace cppmicroservices
                                            Bundle const& bundle,
                                            std::shared_ptr<ComponentRegistry> registry,
                                            std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-                                           std::shared_ptr<ConfigurationNotifier> notifier,
-                                           std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
-                : ComponentConfigurationImpl(metadata, bundle, registry, logger, notifier, managers)
+                                           std::shared_ptr<ConfigurationNotifier> notifier)
+                : ComponentConfigurationImpl(metadata, bundle, registry, logger, notifier)
                 , statechangecount(0)
             {
             }

@@ -73,8 +73,7 @@ namespace cppmicroservices
                                                                               bundle_.GetBundleContext(),
                                                                               logger,
                                                                               asyncWorkService,
-                                                                              configNotifier,
-                                                                              managers);
+                                                                              configNotifier);
                     if (registry->AddComponentManager(compManager))
                     {
                         managers->push_back(compManager);

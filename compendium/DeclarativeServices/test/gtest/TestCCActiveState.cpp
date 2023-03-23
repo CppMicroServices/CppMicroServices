@@ -60,15 +60,13 @@ namespace cppmicroservices
                 auto notifier = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(),
                                                                         fakeLogger,
                                                                         asyncWorkService);
-                auto managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
-
+ 
                 mockCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                   framework,
                                                                                   mockRegistry,
                                                                                   fakeLogger,
-                                                                                  notifier,
-                                                                                  managers);
-            }
+                                                                                  notifier);
+             }
 
             virtual void
             TearDown()

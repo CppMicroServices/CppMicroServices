@@ -51,8 +51,7 @@ namespace cppmicroservices
                                              cppmicroservices::Bundle const& bundle,
                                              std::shared_ptr<ComponentRegistry> registry,
                                              std::shared_ptr<logservice::LogService> logger,
-                                             std::shared_ptr<ConfigurationNotifier> configNotifier,
-                                             std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
+                                             std::shared_ptr<ConfigurationNotifier> configNotifier)
         {
             try
             {
@@ -60,9 +59,8 @@ namespace cppmicroservices
                                                                                     bundle,
                                                                                     registry,
                                                                                     logger,
-                                                                                    configNotifier,
-                                                                                    managers);
-                configurations.push_back(cc);
+                                                                                    configNotifier);
+               configurations.push_back(cc);
             }
             catch (cppmicroservices::SharedLibraryException const&)
             {

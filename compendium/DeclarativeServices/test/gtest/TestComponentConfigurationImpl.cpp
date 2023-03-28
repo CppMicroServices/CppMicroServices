@@ -23,6 +23,7 @@
 #include <random>
 
 #include "../../src/SCRAsyncWorkService.hpp"
+#include "../../src/SCRExtensionRegistry.hpp"
 #include "../../src/SCRLogger.hpp"
 #include "../../src/manager/BundleLoader.hpp"
 #include "../../src/manager/BundleOrPrototypeComponentConfiguration.hpp"
@@ -88,10 +89,11 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
-                                                                    asyncWorkService);
-
+                                                                    asyncWorkService,
+                                                                    extRegistry);
             EXPECT_THROW(
                 {
                     auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(nullptr,
@@ -141,10 +143,11 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
-                                                                    asyncWorkService);
- 
+                                                                    asyncWorkService,
+                                                                    extRegistry); 
             std::set<unsigned long> idSet;
             const size_t iterCount = 10;
             for (size_t i = 0; i < iterCount; ++i)
@@ -191,7 +194,8 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    logger);
-            auto notifier = std::make_shared<ConfigurationNotifier>(bc, fakeLogger, asyncWorkService);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
+            auto notifier = std::make_shared<ConfigurationNotifier>(bc, fakeLogger, asyncWorkService, extRegistry);
             auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                    GetFramework(),
                                                                                    mockRegistry,
@@ -226,9 +230,11 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
-                                                                    asyncWorkService);
+                                                                    asyncWorkService,
+                                                                    extRegistry);
             auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                    GetFramework(),
                                                                                    mockRegistry,
@@ -275,10 +281,11 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
-                                                                    asyncWorkService);
-
+                                                                    asyncWorkService,
+                                                                    extRegistry);
             auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                    GetFramework(),
                                                                                    mockRegistry,
@@ -302,10 +309,11 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
-                                                                    asyncWorkService);
- 
+                                                                    asyncWorkService,
+                                                                    extRegistry);
             // Test if a call to Register will change the state when the component
             // does not provide a service.
             {
@@ -330,10 +338,11 @@ namespace cppmicroservices
                 auto asyncWorkService = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
                     GetFramework().GetBundleContext(),
                     logger);
+                auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
                 auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                         fakeLogger,
-                                                                        asyncWorkService);
-
+                                                                        asyncWorkService,
+                                                                        extRegistry);
                 auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                        GetFramework(),
                                                                                        mockRegistry,
@@ -362,10 +371,11 @@ namespace cppmicroservices
                 auto asyncWorkService = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
                     GetFramework().GetBundleContext(),
                     logger);
+                auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
                 auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                         fakeLogger,
-                                                                        asyncWorkService);
-
+                                                                        asyncWorkService,
+                                                                        extRegistry);
                 auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                        GetFramework(),
                                                                                        mockRegistry,
@@ -397,10 +407,11 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
-                                                                    asyncWorkService);
-
+                                                                    asyncWorkService,
+                                                                    extRegistry);
             auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                    GetFramework(),
                                                                                    mockRegistry,
@@ -429,10 +440,11 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
-                                                                    asyncWorkService);
-
+                                                                    asyncWorkService,
+                                                                    extRegistry);
             auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                    GetFramework(),
                                                                                    mockRegistry,
@@ -457,10 +469,11 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
-                                                                    asyncWorkService);
- 
+                                                                    asyncWorkService,
+                                                                    extRegistry); 
             // Test for exception from user code
             auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                    GetFramework(),
@@ -485,10 +498,11 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
-                                                                    asyncWorkService);
-
+                                                                    asyncWorkService,
+                                                                    extRegistry);
             auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                    GetFramework(),
                                                                                    mockRegistry,
@@ -547,10 +561,11 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
-                                                                    asyncWorkService);
-
+                                                                    asyncWorkService,
+                                                                    extRegistry);
             auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                    GetFramework(),
                                                                                    mockRegistry,
@@ -605,10 +620,11 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
-                                                                    asyncWorkService);
-
+                                                                    asyncWorkService,
+                                                                    extRegistry);
             auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                    GetFramework(),
                                                                                    mockRegistry,
@@ -653,10 +669,11 @@ namespace cppmicroservices
                 auto asyncWorkService = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
                     GetFramework().GetBundleContext(),
                     logger);
+                auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
                 auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                         fakeLogger,
-                                                                        asyncWorkService);
-
+                                                                        asyncWorkService,
+                                                                        extRegistry);
                 auto mockCompInstance = std::make_shared<MockComponentInstance>();
                 auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                        GetFramework(),
@@ -689,10 +706,11 @@ namespace cppmicroservices
                 auto asyncWorkService = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(
                     GetFramework().GetBundleContext(),
                     logger);
+                auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
                 auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                         fakeLogger,
-                                                                        asyncWorkService);
- 
+                                                                        asyncWorkService,
+                                                                        extRegistry); 
                 mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
                 mockMetadata->immediate = false;
                 auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
@@ -747,10 +765,11 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
-                                                                    asyncWorkService);
-
+                                                                    asyncWorkService,
+                                                                    extRegistry);
             mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
             mockMetadata->immediate = false;
             metadata::ReferenceMetadata rm1;
@@ -812,10 +831,12 @@ namespace cppmicroservices
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
                                                                                    fakeLogger);
+            auto logger = std::make_shared<cppmicroservices::scrimpl::SCRLogger>(GetFramework().GetBundleContext());
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
-                                                                    asyncWorkService);
-
+                                                                    asyncWorkService,
+                                                                    extRegistry);
             auto fakeCompConfig
                 = std::make_shared<SingletonComponentConfigurationImpl>(mockMetadata,
                                                                         GetFramework(),

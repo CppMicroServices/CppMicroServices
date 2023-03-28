@@ -22,6 +22,7 @@
 
 #include "../../src/SCRAsyncWorkService.hpp"
 #include "../../src/manager/states/CMDisabledState.hpp"
+#include "../../src/SCRExtensionRegistry.hpp"
 #include "ConcurrencyTestUtil.hpp"
 #include "Mocks.hpp"
 #include "cppmicroservices/Framework.h"
@@ -50,10 +51,11 @@ namespace cppmicroservices
                 auto asyncWorkService
                     = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(framework.GetBundleContext(),
                                                                                        logger);
+                auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
                 auto notifier = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(),
                                                                         fakeLogger,
-                                                                        asyncWorkService);
- 
+                                                                        asyncWorkService,
+                                                                        extRegistry);
                 compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                                      mockRegistry,
                                                                      framework.GetBundleContext(),

@@ -29,6 +29,7 @@
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
+#include "../SCRExtensionRegistry.hpp"
 
 namespace cppmicroservices
 {
@@ -39,13 +40,15 @@ namespace cppmicroservices
         ConfigurationNotifier::ConfigurationNotifier(
             cppmicroservices::BundleContext const& context,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService_)
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService_,
+            std::shared_ptr<SCRExtensionRegistry> extensionRegistry_)
             : tokenCounter(0)
             , bundleContext(context)
             , logger(std::move(logger))
             , asyncWorkService(asyncWorkService_)
+            , extensionRegistry(extensionRegistry_)
         {
-            if (!bundleContext || !(this->logger) || (!this->asyncWorkService))
+            if (!bundleContext || !(this->logger) || (!this->asyncWorkService) || (!this->extensionRegistry))
             {
                 throw std::invalid_argument("ConfigurationNotifier Constructor "
                                             "provided with invalid arguments");
@@ -183,8 +186,6 @@ namespace cppmicroservices
             auto registry = mgr->GetRegistry();
             auto logger = mgr->GetLogger();
             auto configNotifier = mgr->GetConfigNotifier();
-            auto managers = std::make_shared<std::vector<std::shared_ptr<cppmicroservices::scrimpl::ComponentManager>>>(
-                mgr->GetRegistry()->GetComponentManagers());
             try
             {
                 auto compManager = std::make_shared<ComponentManagerImpl>(newMetadata,
@@ -195,9 +196,22 @@ namespace cppmicroservices
                                                                           configNotifier);
                 if (registry->AddComponentManager(compManager))
                 {
-                    managers->push_back(compManager);
-                    compManager->Initialize();
-                }
+                    auto extension = extensionRegistry->Find(bundle.GetBundleId());
+                    if (extension)
+                    {
+                        extension->AddComponentManager(compManager);
+                        compManager->Initialize();
+                    }
+                    else
+                    {
+                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                    "Failed to add ComponentManager with name " + newMetadata->name
+                                        + " from bundle with Id "
+                                        + std::to_string(bundleContext.GetBundle().GetBundleId()));
+                        throw std::runtime_error("ConfigurationNotifier::CreateFactoryComponent - Could not add  "
+                                                 "Component Manager to SCRExtension.");
+                    }
+               }
             }
             catch (cppmicroservices::SharedLibraryException const&)
             {

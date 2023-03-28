@@ -32,6 +32,7 @@
 #include "cppmicroservices/FrameworkFactory.h"
 
 #include "../../src/SCRAsyncWorkService.hpp"
+#include "../../src/SCRExtensionRegistry.hpp"
 #include "../../src/manager/ComponentManagerImpl.hpp"
 #include "../../src/manager/states/ComponentManagerState.hpp"
 #include "../../src/metadata/ComponentMetadata.hpp"
@@ -57,8 +58,9 @@ namespace cppmicroservices
             auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
             auto logger = std::make_shared<SCRLogger>(bc);
             auto asyncWorkService = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(bc, logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier
-                = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(), fakeLogger, asyncWorkService);
+                = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(), fakeLogger, asyncWorkService, extRegistry);
             {
                 EXPECT_THROW(
                     {
@@ -138,9 +140,11 @@ namespace cppmicroservices
                 asyncWorkService
                     = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(framework.GetBundleContext(),
                                                                                        logger);
+                extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
                 notifier = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(),
                                                                    fakeLogger,
-                                                                   asyncWorkService);
+                                                                   asyncWorkService,
+                                                                   extRegistry);
             }
 
             virtual void
@@ -155,6 +159,7 @@ namespace cppmicroservices
             cppmicroservices::Framework framework;
             std::shared_ptr<logservice::LogService> fakeLogger;
             std::shared_ptr<MockComponentRegistry> mockRegistry;
+            std::shared_ptr<SCRExtensionRegistry> extRegistry;
             std::shared_ptr<ConfigurationNotifier> notifier;
             std::shared_ptr<cppmicroservices::scrimpl::SCRAsyncWorkService> asyncWorkService;
         };

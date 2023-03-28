@@ -47,7 +47,7 @@ namespace cppmicroservices
         ServiceReferenceBasePrivate(ServiceReferenceBasePrivate const&) = delete;
         ServiceReferenceBasePrivate& operator=(ServiceReferenceBasePrivate const&) = delete;
 
-        ServiceReferenceBasePrivate(std::shared_ptr<ServiceRegistrationBasePrivate> reg);
+        ServiceReferenceBasePrivate(std::weak_ptr<ServiceRegistrationBasePrivate> reg);
 
         ~ServiceReferenceBasePrivate();
 
@@ -107,7 +107,7 @@ namespace cppmicroservices
         /**
          * Link to registration object for this reference.
          */
-        std::shared_ptr<ServiceRegistrationBasePrivate> const registration;
+        std::weak_ptr<ServiceRegistrationBasePrivate> const registration;
 
         /**
          * The service interface id for this reference.

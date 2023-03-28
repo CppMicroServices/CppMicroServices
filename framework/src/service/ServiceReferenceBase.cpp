@@ -28,13 +28,13 @@
 #include "BundlePrivate.h"
 #include "ServiceReferenceBasePrivate.h"
 #include "ServiceRegistrationBasePrivate.h"
-
+#include <iostream>
 #include <cassert>
 
 namespace cppmicroservices
 {
 
-    ServiceReferenceBase::ServiceReferenceBase() : d(new ServiceReferenceBasePrivate(nullptr)) {}
+    ServiceReferenceBase::ServiceReferenceBase() : d(new ServiceReferenceBasePrivate(std::weak_ptr<ServiceRegistrationBasePrivate>())) {}
 
     ServiceReferenceBase::ServiceReferenceBase(ServiceReferenceBase const& ref) : d(ref.d.load()) { ++d.load()->ref; }
 
@@ -62,12 +62,13 @@ namespace cppmicroservices
     {
         if (!--d.load()->ref)
             delete d.load();
-        d = new ServiceReferenceBasePrivate(nullptr);
+        d = new ServiceReferenceBasePrivate(std::weak_ptr<ServiceRegistrationBasePrivate>());
         return *this;
     }
 
     ServiceReferenceBase::~ServiceReferenceBase()
     {
+        // std::cout << "destructor RefBase: " << static_cast<void*>(d) << std::endl;
         if (!--d.load()->ref)
             delete d.load();
     }
@@ -75,9 +76,9 @@ namespace cppmicroservices
     Any
     ServiceReferenceBase::GetProperty(std::string const& key) const
     {
-        auto l = d.load()->registration->properties.Lock();
+        auto l = d.load()->registration.lock()->properties.Lock();
         US_UNUSED(l);
-        return d.load()->registration->properties.Value_unlocked(key).first;
+        return d.load()->registration.lock()->properties.Value_unlocked(key).first;
     }
 
     void
@@ -89,36 +90,38 @@ namespace cppmicroservices
     std::vector<std::string>
     ServiceReferenceBase::GetPropertyKeys() const
     {
-        auto l = d.load()->registration->properties.Lock();
+        auto l = d.load()->registration.lock()->properties.Lock();
         US_UNUSED(l);
-        return d.load()->registration->properties.Keys_unlocked();
+        return d.load()->registration.lock()->properties.Keys_unlocked();
     }
 
     Bundle
     ServiceReferenceBase::GetBundle() const
     {
         auto p = d.load();
-        if (p->registration == nullptr)
+        auto var = p->registration.expired();
+        US_UNUSED(var);
+        if (p->registration.expired())
         {
             return Bundle();
         }
 
-        auto l = p->registration->Lock();
+        auto l = p->registration.lock()->Lock();
         US_UNUSED(l);
-        if (p->registration->bundle.lock() == nullptr)
+        if (p->registration.lock()->bundle.lock() == nullptr)
         {
             return Bundle();
         }
-        return MakeBundle(p->registration->bundle.lock()->shared_from_this());
+        return MakeBundle(p->registration.lock()->bundle.lock()->shared_from_this());
     }
 
     std::vector<Bundle>
     ServiceReferenceBase::GetUsingBundles() const
     {
         std::vector<Bundle> bundles;
-        auto l = d.load()->registration->Lock();
+        auto l = d.load()->registration.lock()->Lock();
         US_UNUSED(l);
-        for (auto& iter : d.load()->registration->dependents)
+        for (auto& iter : d.load()->registration.lock()->dependents)
         {
             bundles.push_back(MakeBundle(iter.first->shared_from_this()));
         }
@@ -143,7 +146,7 @@ namespace cppmicroservices
             return false;
         }
 
-        if (d.load()->registration == reference.d.load()->registration)
+        if (d.load()->registration.lock() == reference.d.load()->registration.lock())
         {
             return false;
         }
@@ -156,22 +159,22 @@ namespace cppmicroservices
         Any anyR1;
         Any anyId1;
         {
-            auto l1 = d.load()->registration->properties.Lock();
+            auto l1 = d.load()->registration.lock()->properties.Lock();
             US_UNUSED(l1);
-            anyR1 = d.load()->registration->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
+            anyR1 = d.load()->registration.lock()->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             assert(anyR1.Empty() || anyR1.Type() == typeid(int));
-            anyId1 = d.load()->registration->properties.Value_unlocked(Constants::SERVICE_ID).first;
+            anyId1 = d.load()->registration.lock()->properties.Value_unlocked(Constants::SERVICE_ID).first;
             assert(anyId1.Empty() || anyId1.Type() == typeid(long int));
         }
 
         Any anyR2;
         Any anyId2;
         {
-            auto l2 = reference.d.load()->registration->properties.Lock();
+            auto l2 = reference.d.load()->registration.lock()->properties.Lock();
             US_UNUSED(l2);
-            anyR2 = reference.d.load()->registration->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
+            anyR2 = reference.d.load()->registration.lock()->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             assert(anyR2.Empty() || anyR2.Type() == typeid(int));
-            anyId2 = reference.d.load()->registration->properties.Value_unlocked(Constants::SERVICE_ID).first;
+            anyId2 = reference.d.load()->registration.lock()->properties.Value_unlocked(Constants::SERVICE_ID).first;
             assert(anyId2.Empty() || anyId2.Type() == typeid(long int));
         }
 
@@ -197,7 +200,7 @@ namespace cppmicroservices
     bool
     ServiceReferenceBase::operator==(ServiceReferenceBase const& reference) const
     {
-        return d.load()->registration == reference.d.load()->registration;
+        return d.load()->registration.lock() == reference.d.load()->registration.lock();
     }
 
     ServiceReferenceBase&
@@ -232,7 +235,7 @@ namespace cppmicroservices
     std::size_t
     ServiceReferenceBase::Hash() const
     {
-        return std::hash<std::shared_ptr<ServiceRegistrationBasePrivate>>()(this->d.load()->registration);
+        return std::hash<std::shared_ptr<ServiceRegistrationBasePrivate>>()(this->d.load()->registration.lock());
     }
 
     std::ostream&

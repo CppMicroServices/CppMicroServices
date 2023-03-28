@@ -100,4 +100,4 @@ namespace cppmicroservices
 
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif __CPPMICROSERVICES_SCRIMPL_SCREXTENSIONREGISTRY_HPP__
+#endif //__CPPMICROSERVICES_SCRIMPL_SCREXTENSIONREGISTRY_HPP__

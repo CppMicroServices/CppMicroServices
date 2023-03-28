@@ -156,6 +156,7 @@ namespace cppmicroservices
                                                                    logger,
                                                                    configNotifier);
                     bundleRegistry->Add(bundle.GetBundleId(), ba);
+                    // Create the ComponentManagerImpl object to manage the component configurations.
                     ba->Initialize(scrMap, asyncWorkService);
                  }
                 catch (cppmicroservices::SharedLibraryException const&)

@@ -186,7 +186,7 @@ TEST_F(ServiceRegistryTest, TestServicePropertiesUpdate)
     props["bool"] = true;
     // change the service ranking
     props[Constants::SERVICE_RANKING] = 100;
-    reg1.SetProperties(props);
+    reg1.SetProperties(std::move(props));
 
     ASSERT_EQ(context.GetServiceReferences<ITestServiceA>().size(), 2);
     ASSERT_TRUE(any_cast<bool>(ref1.GetProperty("bool")));

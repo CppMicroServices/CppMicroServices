@@ -240,7 +240,7 @@ BENCHMARK_DEFINE_F(ServiceRegistryFixture, ModifyServices)
 
         for (std::size_t i = 0; i < regs.size(); i++)
         {
-            regs[i].SetProperties(props);
+            regs[i].SetProperties(std::move(props));
         }
 
         auto end = high_resolution_clock::now();

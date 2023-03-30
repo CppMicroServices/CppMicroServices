@@ -83,6 +83,7 @@ namespace cppmicroservices
             }
             {
                 auto l = registration->properties.Lock();
+                US_UNUSED(l);
                 for (auto const& clazz : ref_any_cast<std::vector<std::string>>(
                          registration->properties.ValueByRef_unlocked(Constants::OBJECTCLASS)))
                 {
@@ -93,9 +94,9 @@ namespace cppmicroservices
                             std::string message("ServiceFactory produced an object that did not implement: " + clazz);
                             bundle_->coreCtx->listeners.SendFrameworkEvent(
                                 FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
-                                    MakeBundle(bundle->shared_from_this()),
-                                    message,
-                                    std::make_exception_ptr(std::logic_error(message.c_str()))));
+                                               MakeBundle(bundle->shared_from_this()),
+                                               message,
+                                               std::make_exception_ptr(std::logic_error(message.c_str()))));
                         }
                         return nullptr;
                     }
@@ -260,19 +261,21 @@ namespace cppmicroservices
 
         {
             auto l = registration->Lock();
-        
+            US_UNUSED(l);
+
             if (registration->bundleServiceInstance.end() != registration->bundleServiceInstance.find(bundle))
-            {   
+            {
                 ++registration->dependents.at(bundle);
-                return registration->bundleServiceInstance.at(bundle);            
-            } 
+                return registration->bundleServiceInstance.at(bundle);
+            }
         }
-        
+
         s = GetServiceFromFactory(bundle, serviceFactory);
-        
+
         {
             auto l = registration->Lock();
-            
+            US_UNUSED(l);
+
             registration->dependents.insert(std::make_pair(bundle, 0));
 
             if (s && !s->empty())

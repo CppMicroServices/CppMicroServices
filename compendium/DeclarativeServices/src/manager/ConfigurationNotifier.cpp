@@ -40,13 +40,13 @@ namespace cppmicroservices
         ConfigurationNotifier::ConfigurationNotifier(
             cppmicroservices::BundleContext const& context,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService_,
-            std::shared_ptr<SCRExtensionRegistry> extensionRegistry_)
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
+            std::shared_ptr<SCRExtensionRegistry> extensionReg)
             : tokenCounter(0)
             , bundleContext(context)
             , logger(std::move(logger))
-            , asyncWorkService(asyncWorkService_)
-            , extensionRegistry(extensionRegistry_)
+            , asyncWorkService(asyncWorkSvc)
+            , extensionRegistry(extensionReg)
         {
             if (!bundleContext || !(this->logger) || (!this->asyncWorkService) || (!this->extensionRegistry))
             {
@@ -196,8 +196,7 @@ namespace cppmicroservices
                                                                           configNotifier);
                 if (registry->AddComponentManager(compManager))
                 {
-                    auto extension = extensionRegistry->Find(bundle.GetBundleId());
-                    if (extension)
+                    if (auto const& extension = extensionRegistry->Find(bundle.GetBundleId()); extension)
                     {
                         extension->AddComponentManager(compManager);
                         compManager->Initialize();
@@ -211,13 +210,17 @@ namespace cppmicroservices
                         throw std::runtime_error("ConfigurationNotifier::CreateFactoryComponent - Could not add  "
                                                  "Component Manager to SCRExtension.");
                     }
-               }
+                }
             }
             catch (cppmicroservices::SharedLibraryException const&)
             {
                 throw;
             }
             catch (cppmicroservices::SecurityException const&)
+            {
+                throw;
+            }
+            catch (std::runtime_error const&)
             {
                 throw;
             }

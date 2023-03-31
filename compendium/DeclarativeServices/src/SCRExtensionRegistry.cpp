@@ -30,7 +30,7 @@ namespace cppmicroservices
         {
             if (!(this->logger))
             {
-            throw std::invalid_argument(" SCRExtensionRegistry Constructor "
+                throw std::invalid_argument(" SCRExtensionRegistry Constructor "
                 "provided with invalid arguments");
             }
         }
@@ -39,8 +39,7 @@ namespace cppmicroservices
         SCRExtensionRegistry::Find(long bundleId) noexcept
         {
             std::lock_guard<std::mutex> l(extensionRegMutex);
-            auto const it = extensionRegistry.find(bundleId);  
-            if (it != extensionRegistry.end())
+            if (auto const& it = extensionRegistry.find(bundleId); it != extensionRegistry.end())
             {
                 return it->second;
             }

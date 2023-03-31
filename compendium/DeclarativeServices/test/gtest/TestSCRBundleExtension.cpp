@@ -120,7 +120,22 @@ namespace cppmicroservices
                 },
                 std::invalid_argument);
         }
-
+        TEST_F(SCRBundleExtensionTest, InitializeWithInvalidArgs)
+        {
+            auto mockRegistry = std::make_shared<MockComponentRegistry>();
+            auto logger = std::make_shared<cppmicroservices::scrimpl::SCRLogger>(GetFramework().GetBundleContext());
+            auto bundleContext = GetFramework().GetBundleContext();
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
+            cppmicroservices::AnyMap headers(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+            auto asyncWorkService
+                = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
+                                                                                   logger);
+            auto notifier
+                = std::make_shared<ConfigurationNotifier>(bundleContext, logger, asyncWorkService, extRegistry);
+            SCRBundleExtension bundleExt(GetFramework(), mockRegistry, logger, notifier); 
+            EXPECT_THROW({ bundleExt.Initialize(headers, asyncWorkService); },
+                         std::invalid_argument);
+        }
         TEST_F(SCRBundleExtensionTest, CtorWithValidArgs)
         {
             auto bundles = GetFramework().GetBundleContext().GetBundles();

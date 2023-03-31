@@ -74,7 +74,7 @@ namespace cppmicroservices
 
              /*
              *@throws std::bad_alloc exception if a storage failure occurs on 
-             * reallocation.
+             * reallocation. Has the same exception guarantees as std::vector::push_back
              */
             void AddComponentManager(std::shared_ptr<ComponentManager>);
 

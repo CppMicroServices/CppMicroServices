@@ -152,7 +152,7 @@ namespace cppmicroservices
         void
         SCRBundleExtension::AddComponentManager(std::shared_ptr<ComponentManager> compManager)
         {
-            managers->push_back(compManager);
+            managers->push_back(std::move(compManager));
         }
 
     } // namespace scrimpl

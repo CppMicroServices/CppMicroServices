@@ -199,7 +199,7 @@ namespace test
         }
 
         // Wait for all factory objects to finish updating.
-        for (const auto& item : futures) {
+        for (auto const& item : futures) {
             item.get();
          } 
 

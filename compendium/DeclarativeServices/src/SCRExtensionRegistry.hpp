@@ -39,7 +39,7 @@ namespace cppmicroservices
          * valid component description found in the bundle. The SCRExtensionRegistry 
          * maintains a map of SCRBundleExtension objects that is accesed by BundleId.
          */
-        class SCRExtensionRegistry final
+        class SCRExtensionRegistry 
         {
 
           public:
@@ -73,7 +73,7 @@ namespace cppmicroservices
              * @throws std::invalid_argument if the extension input parameter if invalid.
              * @throws std::bad_alloc exception if a storage failure occurs. 
              */
-            void Add(long bundleId, std::shared_ptr < SCRBundleExtension> extension);
+            void Add(long bundleId, std::shared_ptr <SCRBundleExtension> extension);
 
             /* SCRExtensionRegistry::Remove
              * Removes a SCRBundleExtension object from the extensionRegistry using

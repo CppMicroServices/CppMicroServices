@@ -77,8 +77,8 @@ namespace cppmicroservices
              */
             ConfigurationNotifier(cppmicroservices::BundleContext const& context,
                                   std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-                                  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService_,
-                                  std::shared_ptr<SCRExtensionRegistry> extensionRegistry_);
+                                  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
+                                  std::shared_ptr<SCRExtensionRegistry> extensionReg);
 
             ConfigurationNotifier(ConfigurationNotifier const&) = delete;
             ConfigurationNotifier(ConfigurationNotifier&&) = delete;

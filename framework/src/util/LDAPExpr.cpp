@@ -208,7 +208,11 @@ namespace cppmicroservices
     LDAPExpr::Trim(std::string str)
     {
         str.erase(0, str.find_first_not_of(' '));
-        str.erase(str.find_last_not_of(' ') + 1);
+        auto const last_not_space = str.find_last_not_of(' ');
+        if(last_not_space != std::string::npos)
+        {
+            str.erase(last_not_space + 1);
+        }
         return str;
     }
 

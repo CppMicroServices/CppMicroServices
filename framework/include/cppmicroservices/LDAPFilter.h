@@ -223,11 +223,23 @@ namespace cppmicroservices
         LDAPFilter& operator=(LDAPFilter const& filter);
 
       protected:
+        /** Evaluate is a virtual function used to allow subclasses to choose different algorithms
+         * for finding values in the AnyMap.
+         *
+         * @param filter the ldap expression to use as a filter
+         * @param p an AnyMap with values to find
+         * @param matchCase a boolean indicating whether or not the key should require an exact
+         *        match, or of case doesn't matter.
+         * @return a boolean indicating whether or not the given AnyMap matches the LDAPExpr.
+         */
         virtual bool Evaluate(LDAPExpr const& filter, AnyMap const& p, bool matchCase = false) const;
 
         std::shared_ptr<LDAPFilterData> d;
     };
 
+    /** an LDAPFilter subclass that assumes nested keys when looking up values in an AnyMap.
+     *
+     */
     class US_Framework_EXPORT LDAPNestedFilter : public LDAPFilter
     {
       public:
@@ -235,6 +247,8 @@ namespace cppmicroservices
         ~LDAPNestedFilter() = default;
 
       protected:
+        /** The Evaluate implementation that provides the nested lookup algorithm.
+         */
         bool Evaluate(LDAPExpr const& filter, AnyMap const& p, bool matchCase) const override;
     };
 

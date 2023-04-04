@@ -400,10 +400,24 @@ namespace cppmicroservices
         }
 
       public:
+        /**
+         * Templated class to provide flat lookups in an anymap with a property name.
+         *
+         * @tparam MapT the underlying map type used for storage in the AnyMap, one of
+         *         any_map::ordered_any_map
+         *         any_map::unordered_any_map
+         *         any_map::using unordered_any_cimap
+         */
         template <typename MapT>
         class FlatLookup
         {
           public:
+            /** function call operator implementing a flat lookup on attrName
+             *
+             * @param pPtr a pointer to an anymap
+             * @param attrName the name of the property to lookup
+             * @param matchCase a boolean indicating whether or not the attrName must match case.
+             */
             std::optional<typename MapT::const_iterator>
             operator()(AnyMap const* pPtr, std::string const& attrName, bool matchCase) const
             {
@@ -418,10 +432,27 @@ namespace cppmicroservices
             }
         };
 
+        /**
+         * Templated class to provide nested lookups in an anymap on a dot separated property name.
+         *
+         * @tparam MapT the underlying map type used for storage in the AnyMap, one of
+         *         any_map::ordered_any_map
+         *         any_map::unordered_any_map
+         *         any_map::using unordered_any_cimap
+         */
         template <typename MapT>
         class NestedLookup
         {
           public:
+            /** function call operator implementing nested value lookup
+             *
+             * @param pPtr a pointer to an anymap
+             * @param attrName the name of a property to lookup. The name is a dot separated list of
+             *        keys into submaps of pPtr
+             * @param matchCase a boolean indicating whether or not attrName must match case
+             * @return an optional iterator pointing to the found value or std::nullopt if the value
+             *        named by attrName is not present in pPtr.
+             */
             std::optional<typename MapT::const_iterator>
             operator()(AnyMap const* pPtr, std::string const& attrName, bool matchCase) const
             {

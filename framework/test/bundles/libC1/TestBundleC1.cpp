@@ -129,7 +129,7 @@ namespace cppmicroservices
                         // change a property, unregister later
                         ServiceProperties newProps;
                         newProps["i"] = 15;
-                        reg.SetProperties(std::move(newProps));
+                        reg.SetProperties(newProps);
                         regs.Lock(), regs.v.push_back(reg);
                     }
                     else

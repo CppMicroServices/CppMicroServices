@@ -101,7 +101,14 @@ namespace cppmicroservices
     }
 
     void
-    ServiceRegistrationBase::SetProperties(ServiceProperties && propsCopy)
+    ServiceRegistrationBase::SetProperties(ServiceProperties const& props)
+    {
+        auto propsCopy(props);
+        SetProperties(std::move(propsCopy));
+    }
+
+    void
+    ServiceRegistrationBase::SetProperties(ServiceProperties&& propsCopy)
     {
         if (!d)
         {
@@ -150,7 +157,8 @@ namespace cppmicroservices
             propsCopy[Constants::SERVICE_ID] = std::move(d->properties.Value_unlocked(Constants::SERVICE_ID).first);
             objectClasses = std::move(d->properties.Value_unlocked(Constants::OBJECTCLASS).first);
             propsCopy[Constants::OBJECTCLASS] = objectClasses;
-            propsCopy[Constants::SERVICE_SCOPE] = std::move(d->properties.Value_unlocked(Constants::SERVICE_SCOPE).first);
+            propsCopy[Constants::SERVICE_SCOPE]
+                = std::move(d->properties.Value_unlocked(Constants::SERVICE_SCOPE).first);
 
             auto itr = propsCopy.find(Constants::SERVICE_RANKING);
             if (itr != propsCopy.end())

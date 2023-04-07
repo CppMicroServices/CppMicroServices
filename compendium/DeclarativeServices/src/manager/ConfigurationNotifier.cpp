@@ -204,11 +204,11 @@ namespace cppmicroservices
                     else
                     {
                         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                    "Failed to add ComponentManager with name " + newMetadata->name
+                                    "Failed to find ComponentManager with name " + newMetadata->name
                                         + " from bundle with Id "
                                         + std::to_string(bundleContext.GetBundle().GetBundleId()));
-                        throw std::runtime_error("ConfigurationNotifier::CreateFactoryComponent - Could not add  "
-                                                 "Component Manager to SCRExtension.");
+                        throw std::runtime_error("ConfigurationNotifier::CreateFactoryComponent - Could not find  "
+                                                 "SCRBundleExtension in Extension Registry.");
                     }
                 }
             }

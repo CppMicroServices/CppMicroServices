@@ -1,4 +1,4 @@
-/*=============================================================================
+ /*=============================================================================
 
   Library: CppMicroServices
 
@@ -134,16 +134,19 @@ namespace cppmicroservices
             {
                 // This is not a factory component
                 // Start with component properties
-                auto props = metadata->properties;
+                std::unordered_map<std::string, cppmicroservices::Any> props;
 
                 // If configuration object dependencies exist, use merged component and configuration object properties.
                 if (configManager != nullptr)
                 {
-                    props.clear();
                     for (auto const& item : configManager->GetProperties())
                     {
                         props.emplace(item.first, item.second);
                     }
+                }
+                else 
+                {
+                    props = metadata->properties;
                 }
 
                 props.emplace(COMPONENT_NAME, Any(this->metadata->name));
@@ -162,10 +165,9 @@ namespace cppmicroservices
         void
         ComponentConfigurationImpl::SetRegistrationProperties()
         {
-            auto properties = GetProperties();
             if (regManager)
             {
-                regManager->SetProperties(properties);
+                regManager->SetProperties(GetProperties());
             }
         }
 

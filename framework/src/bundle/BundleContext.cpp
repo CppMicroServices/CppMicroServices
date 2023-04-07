@@ -1,4 +1,4 @@
-/*=============================================================================
+ /*=============================================================================
 
   Library: CppMicroServices
 
@@ -275,6 +275,7 @@ namespace cppmicroservices
             try
             {
                 sref.d.load()->UngetService(b.lock(), true);
+                //sref.d.load()->UngetService(b.lock(), true);
             }
             catch (...)
             {

@@ -1,4 +1,4 @@
-/*=============================================================================
+ /*=============================================================================
 
   Library: CppMicroServices
 
@@ -64,7 +64,6 @@ namespace cppmicroservices
                                                        std::shared_ptr<ServiceFactory> const& factory)
     {
         assert(factory && "Factory service pointer is nullptr");
-        InterfaceMapConstPtr s;
         try
         {
             InterfaceMapConstPtr smap
@@ -82,27 +81,28 @@ namespace cppmicroservices
                     return smap;
                 }
             }
-            std::vector<std::string> classes
-                = (registration->properties.Lock(),
-                   any_cast<std::vector<std::string>>(
-                       registration->properties.Value_unlocked(Constants::OBJECTCLASS).first));
-            for (auto clazz : classes)
             {
-                if (smap->find(clazz) == smap->end() && clazz != "org.cppmicroservices.factory")
+                auto l = registration->properties.Lock();
+                US_UNUSED(l);
+                for (auto const& clazz : ref_any_cast<std::vector<std::string>>(
+                         registration->properties.ValueByRef_unlocked(Constants::OBJECTCLASS)))
                 {
-                    if (auto bundle_ = registration->bundle.lock())
+                    if (smap->find(clazz) == smap->end() && clazz != "org.cppmicroservices.factory")
                     {
-                        std::string message("ServiceFactory produced an object that did not implement: " + clazz);
-                        bundle_->coreCtx->listeners.SendFrameworkEvent(
-                            FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
-                                           MakeBundle(bundle->shared_from_this()),
-                                           message,
-                                           std::make_exception_ptr(std::logic_error(message.c_str()))));
+                        if (auto bundle_ = registration->bundle.lock())
+                        {
+                            std::string message("ServiceFactory produced an object that did not implement: " + clazz);
+                            bundle_->coreCtx->listeners.SendFrameworkEvent(
+                                FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WARNING,
+                                               MakeBundle(bundle->shared_from_this()),
+                                               message,
+                                               std::make_exception_ptr(std::logic_error(message.c_str()))));
+                        }
+                        return nullptr;
                     }
-                    return nullptr;
                 }
             }
-            s = smap;
+            return smap;
         }
         catch (cppmicroservices::SharedLibraryException const& ex)
         {
@@ -129,7 +129,6 @@ namespace cppmicroservices
         }
         catch (std::exception const& ex)
         {
-            s.reset();
             std::string message = "ServiceFactory threw an unknown exception.";
             if (auto bundle_ = registration->bundle.lock())
             {
@@ -140,7 +139,7 @@ namespace cppmicroservices
                     std::make_exception_ptr(ServiceException(ex.what(), ServiceException::Type::FACTORY_EXCEPTION))));
             }
         }
-        return s;
+        return nullptr;
     }
 
     InterfaceMapConstPtr
@@ -259,29 +258,33 @@ namespace cppmicroservices
         // we don't hold a lock while calling into the service factory eliminates
         // the possibility of a deadlock. It does not however eliminate the
         // possibility of infinite recursion.
-        s = GetServiceFromFactory(bundle, serviceFactory);
 
-        auto l = registration->Lock();
-        US_UNUSED(l);
-
-        registration->dependents.insert(std::make_pair(bundle, 0));
-
-        if (s && !s->empty())
         {
-            // Insert a cached service object instance only if one isn't already cached. If another thread
-            // already inserted a cached service object, discard the service object returned by
-            // GetServiceFromFactory and return the cached one.
-            auto insertResultPair = registration->bundleServiceInstance.insert(std::make_pair(bundle, s));
-            s = insertResultPair.first->second;
-            ++registration->dependents.at(bundle);
-        }
-        else
-        {
-            // If the service factory returned an invalid service object check the cache and return a valid one
-            // if it exists.
+            auto l = registration->Lock();
+            US_UNUSED(l);
+
             if (registration->bundleServiceInstance.end() != registration->bundleServiceInstance.find(bundle))
             {
-                s = registration->bundleServiceInstance.at(bundle);
+                ++registration->dependents.at(bundle);
+                return registration->bundleServiceInstance.at(bundle);
+            }
+        }
+
+        s = GetServiceFromFactory(bundle, serviceFactory);
+
+        {
+            auto l = registration->Lock();
+            US_UNUSED(l);
+
+            registration->dependents.insert(std::make_pair(bundle, 0));
+
+            if (s && !s->empty())
+            {
+                // Insert a cached service object instance only if one isn't already cached. If another thread
+                // already inserted a cached service object, discard the service object returned by
+                // GetServiceFromFactory and return the cached one.
+                auto insertResultPair = registration->bundleServiceInstance.insert(std::make_pair(bundle, s));
+                s = insertResultPair.first->second;
                 ++registration->dependents.at(bundle);
             }
         }

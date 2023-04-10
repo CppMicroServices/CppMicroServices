@@ -31,6 +31,7 @@
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
 #include "gmock/gmock.h"
+#include "Mocks.hpp"
 
 namespace cppmicroservices
 {
@@ -232,26 +233,30 @@ namespace cppmicroservices
         }; 
 
         // Tests the CreateFactoryComponent method of the ConfigurationNotifier class. If the bundle extension 
-        // cannot be found in the SCRExtensionRegistry when creating a factory component then a std::runtime_error
-        // exception should be thrown.
+        // cannot be found in the SCRExtensionRegistry when creating a factory component then an
+        // exception will be logged.
         TEST_F(SCRExtensionRegistryTest, testException)
         {
             auto bundle = test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSTOI1");
             ASSERT_TRUE(static_cast<bool>(bundle));
             auto mockExtRegistry = std::make_shared<MockSCRExtensionRegistry>(logger);
+            auto mockLogger = std::make_shared<MockLogger>();
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
-                                                                    logger,
+                                                                    mockLogger,
                                                                     asyncWorkService,
                                                                     mockExtRegistry);
   
             EXPECT_CALL(*mockExtRegistry, Find (bundle.GetBundleId())).Times(1).WillOnce(::testing::Return(nullptr));
+            EXPECT_CALL(*(mockLogger.get()),
+                        Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, testing::_, testing::_))
+                .Times(1);
             auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
  
  
             std::shared_ptr<ComponentConfigurationImpl> compConfigImpl
                 = std::make_shared<SingletonComponentConfigurationImpl>(mockMetadata, bundle, fakeRegistry, logger, notifier);
             std::string pid { 123 };
-            EXPECT_THROW({ notifier->CreateFactoryComponent(pid, compConfigImpl); }, std::exception); 
+            EXPECT_NO_THROW({ notifier->CreateFactoryComponent(pid, compConfigImpl); }); 
          }
     } // namespace scrimpl
 } // namespace cppmicroservices

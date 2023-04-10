@@ -207,7 +207,7 @@ namespace cppmicroservices
                                     "Failed to find ComponentManager with name " + newMetadata->name
                                         + " from bundle with Id "
                                         + std::to_string(bundleContext.GetBundle().GetBundleId()));
-                        throw std::runtime_error("ConfigurationNotifier::CreateFactoryComponent - Could not find  "
+                        throw std::exception("ConfigurationNotifier::CreateFactoryComponent - Could not find  "
                                                  "SCRBundleExtension in Extension Registry.");
                     }
                 }
@@ -217,10 +217,6 @@ namespace cppmicroservices
                 throw;
             }
             catch (cppmicroservices::SecurityException const&)
-            {
-                throw;
-            }
-            catch (std::runtime_error const&)
             {
                 throw;
             }

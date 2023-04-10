@@ -73,7 +73,7 @@ namespace cppmicroservices
              * @throws std::invalid_argument if the extension input parameter if invalid.
              * @throws std::bad_alloc exception if a storage failure occurs. 
              */
-            void Add(long bundleId, std::shared_ptr <SCRBundleExtension> extension);
+            void Add(long bundleId, std::shared_ptr<SCRBundleExtension> extension);
 
             /* SCRExtensionRegistry::Remove
              * Removes a SCRBundleExtension object from the extensionRegistry using
@@ -95,7 +95,7 @@ namespace cppmicroservices
           private:
             std::shared_ptr<SCRLogger> logger;
             std::mutex extensionRegMutex;  //protects the extensionRegistry
-            std::unordered_map<long, std::shared_ptr<SCRBundleExtension>> extensionRegistry;
+            std::unordered_map<long,std::shared_ptr<SCRBundleExtension>> extensionRegistry;
         };
 
     } // namespace scrimpl

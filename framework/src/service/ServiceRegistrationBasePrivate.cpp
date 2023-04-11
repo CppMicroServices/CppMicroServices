@@ -42,8 +42,6 @@ namespace cppmicroservices
         , available(true)
         , unregistering(false)
     {
-        // The reference counter is initialized to 0 because it will be
-        // incremented by the "reference" member.
     }
 
     ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()

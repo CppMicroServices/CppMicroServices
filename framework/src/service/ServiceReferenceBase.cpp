@@ -28,7 +28,6 @@
 #include "BundlePrivate.h"
 #include "ServiceReferenceBasePrivate.h"
 #include "ServiceRegistrationBasePrivate.h"
-#include <iostream>
 #include <cassert>
 
 namespace cppmicroservices
@@ -99,8 +98,6 @@ namespace cppmicroservices
     ServiceReferenceBase::GetBundle() const
     {
         auto p = d.load();
-        auto var = p->registration.expired();
-        US_UNUSED(var);
         if (p->registration.expired())
         {
             return Bundle();

@@ -37,8 +37,6 @@ namespace cppmicroservices
     /**
      * Here we handle all the CppMicroServices services that are registered.
      */
-    //     class ServiceRegistry : private detail::MultiThreaded<detail::MutexLockingStrategy<std::recursive_mutex>>
-
     class ServiceRegistry : private detail::MultiThreaded<>
     {
 

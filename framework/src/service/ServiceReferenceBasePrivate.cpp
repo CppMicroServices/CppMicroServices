@@ -50,14 +50,10 @@ namespace cppmicroservices
         if (!reg.expired()) {
             properties = reg.lock()->properties;
         }
-        // std::cout << "constructor: " << static_cast<void*>(this) << std::endl;
     }
 
     ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
     {
-        // std::cout << "destructor: " << static_cast<void*>(this) << std::endl;
-        long use_count = registration.use_count();
-        US_UNUSED(use_count);
     }
 
     InterfaceMapConstPtr

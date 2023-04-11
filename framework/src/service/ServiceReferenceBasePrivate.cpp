@@ -47,6 +47,9 @@ namespace cppmicroservices
         : ref(1)
         , registration(reg)
     {
+        if (!reg.expired()) {
+            properties = reg.lock()->properties;
+        }
         // std::cout << "constructor: " << static_cast<void*>(this) << std::endl;
     }
 
@@ -81,9 +84,9 @@ namespace cppmicroservices
                 }
             }
             std::vector<std::string> classes
-                = (registration.lock()->properties.Lock(),
+                = (properties->Lock(),
                    any_cast<std::vector<std::string>>(
-                       registration.lock()->properties.Value_unlocked(Constants::OBJECTCLASS).first));
+                       properties->Value_unlocked(Constants::OBJECTCLASS).first));
             for (auto clazz : classes)
             {
                 if (smap->find(clazz) == smap->end() && clazz != "org.cppmicroservices.factory")
@@ -437,7 +440,7 @@ namespace cppmicroservices
     PropertiesHandle
     ServiceReferenceBasePrivate::GetProperties() const
     {
-        return PropertiesHandle(registration.lock()->properties, true);
+        return PropertiesHandle(*properties, true);
     }
 
     bool

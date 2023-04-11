@@ -111,7 +111,7 @@ namespace cppmicroservices
 
         ServiceRegistrationBase res(bundle,
                                     service,
-                                    CreateServiceProperties(properties, classes, isFactory, isPrototypeFactory));
+                                    std::make_shared<Properties>(std::move(CreateServiceProperties(properties, classes, isFactory, isPrototypeFactory))));
         {
             auto l = this->Lock();
             US_UNUSED(l);
@@ -263,7 +263,7 @@ namespace cppmicroservices
 
         for (; s != send; ++s)
         {
-            if (filter.empty() || ldap.Evaluate(PropertiesHandle(s->d->properties, true), false))
+            if (filter.empty() || ldap.Evaluate(PropertiesHandle(*(s->d->properties), true), false))
             {
                 res.emplace_back(s->GetReference(clazz));
             }
@@ -296,12 +296,12 @@ namespace cppmicroservices
     {
         std::vector<std::string> classes;
         {
-            auto l2 = sr.d->properties.Lock();
+            auto l2 = sr.d->properties->Lock();
             US_UNUSED(l2);
-            assert(sr.d->properties.Value_unlocked(Constants::OBJECTCLASS).first.Type()
+            assert(sr.d->properties->Value_unlocked(Constants::OBJECTCLASS).first.Type()
                    == typeid(std::vector<std::string>));
             classes
-                = ref_any_cast<std::vector<std::string>>(sr.d->properties.Value_unlocked(Constants::OBJECTCLASS).first);
+                = ref_any_cast<std::vector<std::string>>(sr.d->properties->Value_unlocked(Constants::OBJECTCLASS).first);
         }
         services.erase(sr);
         serviceRegistrations.erase(std::remove(serviceRegistrations.begin(), serviceRegistrations.end(), sr),

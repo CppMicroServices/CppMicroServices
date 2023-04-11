@@ -50,7 +50,7 @@ namespace cppmicroservices
 
     ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle,
                                                      InterfaceMapConstPtr const& service,
-                                                     Properties&& props){
+                                                     std::shared_ptr<Properties> props){
         d = std::make_shared<ServiceRegistrationBasePrivate>(bundle, service, std::move(props));
         d->CreateReference();
     }
@@ -140,14 +140,14 @@ namespace cppmicroservices
                 throw std::logic_error("Service is unregistered");
             }
 
-            auto l2 = d->properties.Lock();
+            auto l2 = d->properties->Lock();
             US_UNUSED(l2);
 
             auto propsCopy(props);
-            propsCopy[Constants::SERVICE_ID] = d->properties.Value_unlocked(Constants::SERVICE_ID).first;
-            objectClasses = d->properties.Value_unlocked(Constants::OBJECTCLASS).first;
+            propsCopy[Constants::SERVICE_ID] = d->properties->Value_unlocked(Constants::SERVICE_ID).first;
+            objectClasses = d->properties->Value_unlocked(Constants::OBJECTCLASS).first;
             propsCopy[Constants::OBJECTCLASS] = objectClasses;
-            propsCopy[Constants::SERVICE_SCOPE] = d->properties.Value_unlocked(Constants::SERVICE_SCOPE).first;
+            propsCopy[Constants::SERVICE_SCOPE] = d->properties->Value_unlocked(Constants::SERVICE_SCOPE).first;
 
             auto itr = propsCopy.find(Constants::SERVICE_RANKING);
             if (itr != propsCopy.end())
@@ -164,14 +164,14 @@ namespace cppmicroservices
                 }
             }
 
-            auto oldRankAny = d->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
+            auto oldRankAny = d->properties->Value_unlocked(Constants::SERVICE_RANKING).first;
             if (!oldRankAny.Empty())
             {
                 // since the old ranking is extracted from existing service properties
                 // stored in the service registry, no need to type check before casting
                 old_rank = any_cast<int>(oldRankAny);
             }
-            d->properties = Properties(AnyMap(std::move(propsCopy)));
+            *(d->properties) = Properties(AnyMap(std::move(propsCopy)));
         }
         if (old_rank != new_rank)
         {

@@ -25,6 +25,8 @@
 
 #include "cppmicroservices/ServiceInterface.h"
 
+#include "Properties.h"
+
 #include <atomic>
 #include <string>
 
@@ -113,6 +115,11 @@ namespace cppmicroservices
          * The service interface id for this reference.
          */
         std::string interfaceId;
+
+        /**
+         * Link to properties for this reference.
+         */
+        std::shared_ptr<Properties> properties;
 
       private:
         InterfaceMapConstPtr GetServiceFromFactory(BundlePrivate* bundle,

@@ -95,7 +95,7 @@ namespace cppmicroservices
         /**
          * Service properties.
          */
-        Properties properties;
+        std::shared_ptr<Properties> properties;
 
         /**
          * Is service available. I.e., if <code>true</code> then holders
@@ -110,7 +110,7 @@ namespace cppmicroservices
          */
         std::atomic<bool> unregistering;
 
-        ServiceRegistrationBasePrivate(BundlePrivate* bundle, InterfaceMapConstPtr service, Properties&& props);
+        ServiceRegistrationBasePrivate(BundlePrivate* bundle, InterfaceMapConstPtr service, std::shared_ptr<Properties> props);
 
         ~ServiceRegistrationBasePrivate();
 

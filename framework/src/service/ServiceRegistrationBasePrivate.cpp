@@ -35,7 +35,7 @@ namespace cppmicroservices
 
     ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(BundlePrivate* bundle_,
                                                                    InterfaceMapConstPtr service,
-                                                                   Properties&& props)
+                                                                   std::shared_ptr<Properties> props)
         : service(std::move(service))
         , bundle(bundle_->shared_from_this())
         , properties(std::move(props))
@@ -48,7 +48,6 @@ namespace cppmicroservices
 
     ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
     {
-        properties.Lock(), properties.Clear_unlocked();
     }
 
     // Need to first create shared_ptr to registration before duplicating for reference

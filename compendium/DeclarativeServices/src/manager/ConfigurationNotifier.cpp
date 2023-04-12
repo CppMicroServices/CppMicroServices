@@ -207,7 +207,6 @@ namespace cppmicroservices
                                     "Failed to find ComponentManager with name " + newMetadata->name
                                         + " from bundle with Id "
                                         + std::to_string(bundleContext.GetBundle().GetBundleId()));
-                        throw std::exception();
                     }
                 }
             }

@@ -37,6 +37,8 @@ namespace cppmicroservices
                                                                    InterfaceMapConstPtr service,
                                                                    std::shared_ptr<Properties> props)
         : service(std::move(service))
+        , dependents(std::make_shared<BundleToRefsMap>())
+        , bundleServiceInstance(std::make_shared<BundleToServiceMap>())
         , bundle(bundle_->shared_from_this())
         , properties(std::move(props))
         , available(true)
@@ -59,7 +61,7 @@ namespace cppmicroservices
     {
         auto l = this->Lock();
         US_UNUSED(l);
-        return (dependents.find(bundle) != dependents.end())
+        return (dependents->find(bundle) != dependents->end())
                || (prototypeServiceInstances.find(bundle) != prototypeServiceInstances.end());
     }
 

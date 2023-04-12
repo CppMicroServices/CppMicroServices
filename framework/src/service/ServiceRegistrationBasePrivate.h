@@ -70,7 +70,7 @@ namespace cppmicroservices
          * Bundles dependent on this service. Integer is used as
          * reference counter, counting number of unbalanced getService().
          */
-        BundleToRefsMap dependents;
+        std::shared_ptr<BundleToRefsMap> dependents;
 
         /**
          * Object instances that a prototype factory has produced.
@@ -80,7 +80,7 @@ namespace cppmicroservices
         /**
          * Object instance with bundle scope that a factory may have produced.
          */
-        BundleToServiceMap bundleServiceInstance;
+        std::shared_ptr<BundleToServiceMap> bundleServiceInstance;
 
         /**
          * Bundle registering this service.

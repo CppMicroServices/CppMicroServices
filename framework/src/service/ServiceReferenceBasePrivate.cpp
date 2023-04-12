@@ -49,6 +49,8 @@ namespace cppmicroservices
     {
         if (!reg.expired()) {
             properties = reg.lock()->properties;
+            dependents = reg.lock()->dependents;
+            bundleServiceInstance = reg.lock()->bundleServiceInstance;
         }
     }
 
@@ -207,7 +209,7 @@ namespace cppmicroservices
             serviceFactory = std::static_pointer_cast<ServiceFactory>(
                 registration.lock()->GetService_unlocked("org.cppmicroservices.factory"));
 
-            auto res = registration.lock()->dependents.insert(std::make_pair(bundle, 0));
+            auto res = dependents->insert(std::make_pair(bundle, 0));
             auto& depCounter = res.first->second;
 
             // No service factory, just return the registered service directly.
@@ -221,8 +223,8 @@ namespace cppmicroservices
                 return s;
             }
 
-            auto serviceIter = registration.lock()->bundleServiceInstance.find(bundle);
-            if (registration.lock()->bundleServiceInstance.end() != serviceIter)
+            auto serviceIter = bundleServiceInstance->find(bundle);
+            if (bundleServiceInstance->end() != serviceIter)
             {
                 ++depCounter;
                 return serviceIter->second;
@@ -261,25 +263,25 @@ namespace cppmicroservices
         auto l = registration.lock()->Lock();
         US_UNUSED(l);
 
-        registration.lock()->dependents.insert(std::make_pair(bundle, 0));
+        dependents->insert(std::make_pair(bundle, 0));
 
         if (s && !s->empty())
         {
             // Insert a cached service object instance only if one isn't already cached. If another thread
             // already inserted a cached service object, discard the service object returned by
             // GetServiceFromFactory and return the cached one.
-            auto insertResultPair = registration.lock()->bundleServiceInstance.insert(std::make_pair(bundle, s));
+            auto insertResultPair = bundleServiceInstance->insert(std::make_pair(bundle, s));
             s = insertResultPair.first->second;
-            ++registration.lock()->dependents.at(bundle);
+            ++dependents->at(bundle);
         }
         else
         {
             // If the service factory returned an invalid service object check the cache and return a valid one
             // if it exists.
-            if (registration.lock()->bundleServiceInstance.end() != registration.lock()->bundleServiceInstance.find(bundle))
+            if (bundleServiceInstance->end() != bundleServiceInstance->find(bundle))
             {
-                s = registration.lock()->bundleServiceInstance.at(bundle);
-                ++registration.lock()->dependents.at(bundle);
+                s = bundleServiceInstance->at(bundle);
+                ++dependents->at(bundle);
             }
         }
         return s;
@@ -363,8 +365,8 @@ namespace cppmicroservices
         {
             auto l = registration.lock()->Lock();
             US_UNUSED(l);
-            auto depIter = registration.lock()->dependents.find(bundle.get());
-            if (registration.lock()->dependents.end() == depIter)
+            auto depIter = dependents->find(bundle.get());
+            if (dependents->end() == depIter)
             {
                 return hadReferences && removeService;
             }
@@ -393,8 +395,8 @@ namespace cppmicroservices
 
             if (removeService)
             {
-                auto serviceIter = registration.lock()->bundleServiceInstance.find(bundle.get());
-                if (registration.lock()->bundleServiceInstance.end() != serviceIter)
+                auto serviceIter = bundleServiceInstance->find(bundle.get());
+                if (bundleServiceInstance->end() != serviceIter)
                 {
                     sfi = serviceIter->second;
                 }
@@ -404,8 +406,8 @@ namespace cppmicroservices
                     sf = std::static_pointer_cast<ServiceFactory>(
                         registration.lock()->GetService_unlocked("org.cppmicroservices.factory"));
                 }
-                registration.lock()->bundleServiceInstance.erase(bundle.get());
-                registration.lock()->dependents.erase(bundle.get());
+                bundleServiceInstance->erase(bundle.get());
+                dependents->erase(bundle.get());
             }
         }
 

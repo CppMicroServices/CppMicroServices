@@ -116,9 +116,7 @@ namespace cppmicroservices
     ServiceReferenceBase::GetUsingBundles() const
     {
         std::vector<Bundle> bundles;
-        auto l = d.load()->registration.lock()->Lock();
-        US_UNUSED(l);
-        for (auto& iter : d.load()->registration.lock()->dependents)
+        for (auto& iter : *(d.load()->dependents))
         {
             bundles.push_back(MakeBundle(iter.first->shared_from_this()));
         }

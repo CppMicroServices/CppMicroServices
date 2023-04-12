@@ -242,7 +242,7 @@ namespace cppmicroservices
             if (serviceFactory)
             {
                 prototypeServiceInstances = d->prototypeServiceInstances;
-                bundleServiceInstance = d->bundleServiceInstance;
+                bundleServiceInstance = *d->bundleServiceInstance;
             }
         }
 
@@ -301,10 +301,8 @@ namespace cppmicroservices
             US_UNUSED(l);
 
             d->bundle.reset();
-            d->dependents.clear();
             d->service.reset();
             d->prototypeServiceInstances.clear();
-            d->bundleServiceInstance.clear();
             d->reference = nullptr;
             d->unregistering = false;
         }

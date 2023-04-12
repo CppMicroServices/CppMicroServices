@@ -46,6 +46,9 @@ namespace cppmicroservices
     class ServiceReferenceBasePrivate
     {
       public:
+        using BundleToRefsMap = std::unordered_map<BundlePrivate*, int>;
+        using BundleToServiceMap = std::unordered_map<BundlePrivate*, InterfaceMapConstPtr>;
+
         ServiceReferenceBasePrivate(ServiceReferenceBasePrivate const&) = delete;
         ServiceReferenceBasePrivate& operator=(ServiceReferenceBasePrivate const&) = delete;
 
@@ -120,6 +123,17 @@ namespace cppmicroservices
          * Link to properties for this reference.
          */
         std::shared_ptr<Properties> properties;
+
+        /**
+         * Bundles dependent on this service. Integer is used as
+         * reference counter, counting number of unbalanced getService().
+         */
+        std::shared_ptr<BundleToRefsMap> dependents;
+
+        /**
+         * Object instance with bundle scope that a factory may have produced.
+         */
+        std::shared_ptr<BundleToServiceMap> bundleServiceInstance;
 
       private:
         InterfaceMapConstPtr GetServiceFromFactory(BundlePrivate* bundle,

@@ -30,6 +30,7 @@ Fixed
 -----
 - `[Core Framework] clang-tidy improvement for CMakeResourceDependencies <https://github.com/CppMicroServices/CppMicroServices/pull/812>`_
 - `[Core Framework] GetService performance micro-optimizations <https://github.com/CppMicroServices/CppMicroServices/pull/833>`_
+- `[Declarative Services] Fix sporadic crash caused by concurrent access to ComponentMgrImpl vector <https://github.com/CppMicroServices/CppMicroServices/pull/834>`_
 
 `v3.7.5 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.7.5>`_ (2023-03-14)
 ---------------------------------------------------------------------------------------------------------

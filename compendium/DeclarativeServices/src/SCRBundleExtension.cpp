@@ -42,24 +42,30 @@ namespace cppmicroservices
         using metadata::ComponentMetadata;
         using util::ObjectValidator;
 
-        SCRBundleExtension::SCRBundleExtension(
-            cppmicroservices::Bundle const& bundle,
-            cppmicroservices::AnyMap const& scrMetadata,
-            std::shared_ptr<ComponentRegistry> const& registry,
-            std::shared_ptr<LogService> const& logger,
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& asyncWorkService,
-            std::shared_ptr<ConfigurationNotifier> const& configNotifier)
+        SCRBundleExtension::SCRBundleExtension(cppmicroservices::Bundle const& bundle,
+                                               std::shared_ptr<ComponentRegistry> const& registry,
+                                               std::shared_ptr<LogService> const& logger,
+                                               std::shared_ptr<ConfigurationNotifier> const& configNotifier)
             : bundle_(bundle)
             , registry(registry)
             , logger(logger)
             , configNotifier(configNotifier)
         {
-            if (!bundle || !registry || !logger || scrMetadata.empty() || !asyncWorkService || !configNotifier)
+            if (!bundle || !registry || !logger  || !configNotifier)
             {
                 throw std::invalid_argument("Invalid parameters passed to SCRBundleExtension constructor");
             }
             managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+        }
 
+       void SCRBundleExtension::Initialize(cppmicroservices::AnyMap const& scrMetadata,
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& asyncWorkService)
+         {
+            if ( scrMetadata.empty() || !asyncWorkService )
+            {
+                throw std::invalid_argument("Invalid parameters passed to SCRBundleExtension::Initialize");
+            }
+ 
             auto version = ObjectValidator(scrMetadata, "version").GetValue<int>();
             auto metadataparser = metadata::MetadataParserFactory::Create(version, logger);
             std::vector<std::shared_ptr<ComponentMetadata>> componentsMetadata;
@@ -73,8 +79,7 @@ namespace cppmicroservices
                                                                               bundle_.GetBundleContext(),
                                                                               logger,
                                                                               asyncWorkService,
-                                                                              configNotifier,
-                                                                              managers);
+                                                                              configNotifier);
                     if (registry->AddComponentManager(compManager))
                     {
                         managers->push_back(compManager);
@@ -144,5 +149,11 @@ namespace cppmicroservices
                 }
             }
         }
+        void
+        SCRBundleExtension::AddComponentManager(std::shared_ptr<ComponentManager> compManager)
+        {
+            managers->push_back(std::move(compManager));
+        }
+
     } // namespace scrimpl
 } // namespace cppmicroservices

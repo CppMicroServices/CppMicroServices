@@ -64,8 +64,11 @@ namespace cppmicroservices
 
             asyncWorkService = std::make_shared<SCRAsyncWorkService>(context, logger);
 
+            // Create SCRExtension Registry
+            bundleRegistry = std::make_shared<SCRExtensionRegistry>(logger);
+
             // Create configuration object notifier
-            configNotifier = std::make_shared<ConfigurationNotifier>(context, logger, asyncWorkService);
+            configNotifier = std::make_shared<ConfigurationNotifier>(context, logger, asyncWorkService, bundleRegistry);
 
             // Add bundle listener
             bundleListenerToken
@@ -113,10 +116,8 @@ namespace cppmicroservices
                 }
 
                 // clear bundle registry
-                {
-                    std::lock_guard<std::mutex> l(bundleRegMutex);
-                    bundleRegistry.clear();
-                }
+                bundleRegistry->Clear();
+
                 // clear component registry
                 componentRegistry->Clear();
 
@@ -143,30 +144,21 @@ namespace cppmicroservices
                 return;
             }
 
-            bool extensionFound = false;
-            {
-                std::lock_guard<std::mutex> l(bundleRegMutex);
-                extensionFound = (bundleRegistry.count(bundle.GetBundleId()) != 0u);
-            }
-
-            // bundle components have not been loaded, so create the extension which will load the components
-            if (!extensionFound)
+            //create the extension which will load the components
+            if (!bundleRegistry->Find(bundle.GetBundleId()))
             {
                 logger->Log(SeverityLevel::LOG_DEBUG, "Creating SCRBundleExtension ... " + bundle.GetSymbolicName());
                 try
                 {
                     auto const& scrMap = ref_any_cast<cppmicroservices::AnyMap>(headers.at(SERVICE_COMPONENT));
-                    auto ba = std::make_unique<SCRBundleExtension>(bundle,
-                                                                   scrMap,
+                    auto ba = std::make_shared<SCRBundleExtension>(bundle,
                                                                    componentRegistry,
                                                                    logger,
-                                                                   asyncWorkService,
                                                                    configNotifier);
-                    {
-                        std::lock_guard<std::mutex> l(bundleRegMutex);
-                        bundleRegistry.insert(std::make_pair(bundle.GetBundleId(), std::move(ba)));
-                    }
-                }
+                    bundleRegistry->Add(bundle.GetBundleId(), ba);
+                    // Create the ComponentManagerImpl object to manage the component configurations.
+                    ba->Initialize(scrMap, asyncWorkService);
+                 }
                 catch (cppmicroservices::SharedLibraryException const&)
                 {
                     throw;
@@ -200,19 +192,11 @@ namespace cppmicroservices
                 return;
             }
 
-            bool extensionFound = false;
-            {
-                std::lock_guard<std::mutex> l(bundleRegMutex);
-                extensionFound = (bundleRegistry.count(bundle.GetBundleId()) != 0u);
-            }
-            if (extensionFound)
+             if (bundleRegistry->Find(bundle.GetBundleId()))
             {
                 logger->Log(SeverityLevel::LOG_DEBUG, "Found SCRBundleExtension for " + bundle.GetSymbolicName());
                 // remove the bundle extension object from the map.
-                {
-                    std::lock_guard<std::mutex> l(bundleRegMutex);
-                    bundleRegistry.erase(bundle.GetBundleId());
-                }
+                bundleRegistry->Remove(bundle.GetBundleId());
             }
             else
             {

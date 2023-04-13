@@ -29,6 +29,7 @@
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
+#include "../SCRExtensionRegistry.hpp"
 
 namespace cppmicroservices
 {
@@ -39,13 +40,15 @@ namespace cppmicroservices
         ConfigurationNotifier::ConfigurationNotifier(
             cppmicroservices::BundleContext const& context,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService_)
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
+            std::shared_ptr<SCRExtensionRegistry> extensionReg)
             : tokenCounter(0)
             , bundleContext(context)
             , logger(std::move(logger))
-            , asyncWorkService(asyncWorkService_)
+            , asyncWorkService(asyncWorkSvc)
+            , extensionRegistry(extensionReg)
         {
-            if (!bundleContext || !(this->logger) || (!this->asyncWorkService))
+            if (!bundleContext || !(this->logger) || (!this->asyncWorkService) || (!this->extensionRegistry))
             {
                 throw std::invalid_argument("ConfigurationNotifier Constructor "
                                             "provided with invalid arguments");
@@ -183,8 +186,6 @@ namespace cppmicroservices
             auto registry = mgr->GetRegistry();
             auto logger = mgr->GetLogger();
             auto configNotifier = mgr->GetConfigNotifier();
-            auto managers = mgr->GetManagers();
-
             try
             {
                 auto compManager = std::make_shared<ComponentManagerImpl>(newMetadata,
@@ -192,12 +193,21 @@ namespace cppmicroservices
                                                                           bundle.GetBundleContext(),
                                                                           logger,
                                                                           asyncWorkService,
-                                                                          configNotifier,
-                                                                          managers);
+                                                                          configNotifier);
                 if (registry->AddComponentManager(compManager))
                 {
-                    managers->push_back(compManager);
-                    compManager->Initialize();
+                    if (auto const& extension = extensionRegistry->Find(bundle.GetBundleId()); extension)
+                    {
+                        extension->AddComponentManager(compManager);
+                        compManager->Initialize();
+                    }
+                    else
+                    {
+                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                    "Failed to find ComponentManager with name " + newMetadata->name
+                                        + " from bundle with Id "
+                                        + std::to_string(bundleContext.GetBundle().GetBundleId()));
+                    }
                 }
             }
             catch (cppmicroservices::SharedLibraryException const&)

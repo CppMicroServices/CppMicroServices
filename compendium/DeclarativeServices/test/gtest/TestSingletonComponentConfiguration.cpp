@@ -21,6 +21,7 @@
   =============================================================================*/
 
 #include "../../src/SCRAsyncWorkService.hpp"
+#include "../../src/SCRExtensionRegistry.hpp"
 #include "../../src/manager/SingletonComponentConfiguration.hpp"
 #include "../../src/manager/states/CCActiveState.hpp"
 #include "../../src/manager/states/CCRegisteredState.hpp"
@@ -54,17 +55,16 @@ namespace cppmicroservices
                 auto asyncWorkService
                     = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(framework.GetBundleContext(),
                                                                                        logger);
+                auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
                 auto notifier = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(),
                                                                         mockLogger,
-                                                                        asyncWorkService);
-                auto managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
-
+                                                                        asyncWorkService,
+                                                                        extRegistry); 
                 obj = std::make_shared<SingletonComponentConfigurationImpl>(mockMetadata,
                                                                             framework,
                                                                             mockRegistry,
                                                                             mockLogger,
-                                                                            notifier,
-                                                                            managers);
+                                                                            notifier);
             }
 
             virtual void

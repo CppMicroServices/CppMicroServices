@@ -165,4 +165,47 @@ namespace test
         auto instances = GetInstances<test::CAInterface>();
         EXPECT_EQ(instances.size(), count);
     }
+    /* test MultipleFactoryConfig. 
+     * This test creates 10 factory objects without waiting for the previous one to complete. 
+     */
+    TEST_F(tServiceComponent, testMultipleFactoryConfig)
+    {
+        std::string configurationPid = "ServiceComponentPid";
+
+        // Start the test bundle containing the factory component. 
+        cppmicroservices::Bundle testBundle = StartTestBundle(
+            "TestBundleDSCA21"); 
+        
+        // Get a service reference to ConfigAdmin to create the factory component instances.
+        auto configAdminService = GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+        ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+
+        // Create some factory configuration objects. Don't wait for one to complete before 
+        // creating the next one.
+        constexpr auto count = 10;
+        std::vector<std::shared_future<void>> futures;
+
+        for (int i = 0; i < count; i++)
+        {
+            // Create the factory configuration object
+            auto factoryConfig = configAdminService->CreateFactoryConfiguration(configurationPid);
+
+            // Update the properties for the factory configuration object
+            cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+            const std::string instanceId { "instance" + std::to_string(i) };
+            props["uniqueProp"] = instanceId;
+            auto fut = factoryConfig->Update(props);
+            futures.push_back(fut);
+        }
+
+        // Wait for all factory objects to finish updating.
+        for (auto const& item : futures) {
+            item.get();
+         } 
+
+        // Request service references to the new component instances. This will
+        // cause DS to construct the factory instances.
+        auto instances = GetInstances<test::CAInterface>();
+        EXPECT_EQ(instances.size(), count);
+    }
 } // namespace test

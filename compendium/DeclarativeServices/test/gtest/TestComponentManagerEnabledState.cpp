@@ -25,6 +25,7 @@
 #include <memory>
 
 #include "../../src/SCRAsyncWorkService.hpp"
+#include "../../src/SCRExtensionRegistry.hpp"
 #include "../../src/manager/states/CMEnabledState.hpp"
 #include "ConcurrencyTestUtil.hpp"
 #include "Mocks.hpp"
@@ -54,18 +55,17 @@ namespace cppmicroservices
                 auto asyncWorkService
                     = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(framework.GetBundleContext(),
                                                                                        logger);
+                auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
                 auto notifier = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(),
                                                                         fakeLogger,
-                                                                        asyncWorkService);
-                auto managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
-
+                                                                        asyncWorkService,
+                                                                        extRegistry);
                 compMgr = std::make_shared<MockComponentManagerImpl>(compDesc,
                                                                      mockRegistry,
                                                                      framework.GetBundleContext(),
                                                                      fakeLogger,
                                                                      asyncWorkService,
-                                                                     notifier,
-                                                                     managers);
+                                                                     notifier);
             }
 
             virtual void
@@ -110,8 +110,7 @@ namespace cppmicroservices
                                                                      framework,
                                                                      compMgr->GetRegistry(),
                                                                      compMgr->GetLogger(),
-                                                                     compMgr->GetConfigNotifier(),
-                                                                     compMgr->GetManagers()) };
+                                                                     compMgr->GetConfigNotifier()) };
             auto fut = std::async(std::launch::async, [&]() { return enabledState->GetConfigurations(*compMgr); });
             EXPECT_NE(fut.wait_for(std::chrono::milliseconds::zero()), std::future_status::ready)
                 << "The call to GetConfigurations must not return until the promise is set";
@@ -205,8 +204,7 @@ namespace cppmicroservices
                                                    compMgr->GetBundle(),
                                                    compMgr->GetRegistry(),
                                                    compMgr->GetLogger(),
-                                                   compMgr->GetConfigNotifier(),
-                                                   compMgr->GetManagers());
+                                                   compMgr->GetConfigNotifier());
             });
             EXPECT_EQ(enabledState->configurations.size(), 1ul)
                 << "Must have a configuration created after call to CreateConfigurations";

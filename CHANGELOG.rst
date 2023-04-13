@@ -29,6 +29,7 @@ Deprecated
 Fixed
 -----
 - `[Core Framework] clang-tidy improvement for CMakeResourceDependencies <https://github.com/CppMicroServices/CppMicroServices/pull/812>`_
+- `[Declarative Services] fixed sporadic crash caused by concurrrent modification of the ComponentMgrImpl vector <https://github.com/CppMicroServices/CppMicroServices/pull/834>`_
 
 `v3.7.5 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.7.5>`_ (2023-03-14)
 ---------------------------------------------------------------------------------------------------------

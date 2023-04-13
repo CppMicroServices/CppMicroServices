@@ -301,7 +301,6 @@ namespace cppmicroservices
             US_UNUSED(l);
 
             d->bundle.reset();
-            d->service.reset();
             d->prototypeServiceInstances.clear();
             d->reference = nullptr;
             d->unregistering = false;

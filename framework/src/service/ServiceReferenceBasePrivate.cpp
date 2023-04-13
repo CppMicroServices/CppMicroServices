@@ -51,6 +51,7 @@ namespace cppmicroservices
             properties = reg.lock()->properties;
             dependents = reg.lock()->dependents;
             bundleServiceInstance = reg.lock()->bundleServiceInstance;
+            service = reg.lock()->service;
         }
     }
 
@@ -215,7 +216,7 @@ namespace cppmicroservices
             // No service factory, just return the registered service directly.
             if (!serviceFactory)
             {
-                s = registration.lock()->service;
+                s = service;
                 if (s && !s->empty())
                 {
                     ++depCounter;
@@ -404,7 +405,7 @@ namespace cppmicroservices
                 if (sfi && !sfi->empty())
                 {
                     sf = std::static_pointer_cast<ServiceFactory>(
-                        registration.lock()->GetService_unlocked("org.cppmicroservices.factory"));
+                        ExtractInterface(service, "org.cppmicroservices.factory"));
                 }
                 bundleServiceInstance->erase(bundle.get());
                 dependents->erase(bundle.get());
@@ -448,7 +449,7 @@ namespace cppmicroservices
         {
             auto l = registration.lock()->Lock();
             US_UNUSED(l);
-            return registration.lock()->service ? registration.lock()->service->find(interfaceId) != registration.lock()->service->end()
+            return service ? service->find(interfaceId) != service->end()
                                          : false;
         }
         return false;

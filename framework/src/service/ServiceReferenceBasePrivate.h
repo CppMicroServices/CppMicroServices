@@ -104,6 +104,7 @@ namespace cppmicroservices
 
         bool IsConvertibleTo(std::string const& interfaceId) const;
 
+        InterfaceMapConstPtr service;
         /**
          * Reference count for implicitly shared private implementation.
          */

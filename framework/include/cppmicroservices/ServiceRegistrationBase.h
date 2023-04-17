@@ -197,7 +197,7 @@ namespace cppmicroservices
 
         ServiceRegistrationBase(std::shared_ptr<ServiceRegistrationBasePrivate> registrationPrivate);
 
-        ServiceRegistrationBase(BundlePrivate* bundle, InterfaceMapConstPtr const& service, std::shared_ptr<Properties> props);
+        ServiceRegistrationBase(BundlePrivate* bundle, InterfaceMapConstPtr const& service, Properties&& props);
 
         std::shared_ptr<ServiceRegistrationBasePrivate> d { nullptr };
     };

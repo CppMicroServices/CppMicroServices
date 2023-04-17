@@ -48,10 +48,7 @@ namespace cppmicroservices
         , registration(reg)
     {
         if (!reg.expired()) {
-            properties = reg.lock()->properties;
-            dependents = reg.lock()->dependents;
-            bundleServiceInstance = reg.lock()->bundleServiceInstance;
-            service = reg.lock()->service;
+            coreInfo = registration.lock()->coreInfo;
         }
     }
 
@@ -71,7 +68,7 @@ namespace cppmicroservices
                 = factory->GetService(MakeBundle(bundle->shared_from_this()), ServiceRegistrationBase(registration.lock()));
             if (!smap || smap->empty())
             {
-                if (auto bundle_ = registration.lock()->bundle.lock())
+                if (auto bundle_ = coreInfo->bundle.lock())
                 {
                     std::string message = "ServiceFactory returned an empty or nullptr interface map.";
                     bundle_->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
@@ -83,14 +80,14 @@ namespace cppmicroservices
                 }
             }
             std::vector<std::string> classes
-                = (properties->Lock(),
+                = (coreInfo->properties.Lock(),
                    any_cast<std::vector<std::string>>(
-                       properties->Value_unlocked(Constants::OBJECTCLASS).first));
+                       coreInfo->properties.Value_unlocked(Constants::OBJECTCLASS).first));
             for (auto clazz : classes)
             {
                 if (smap->find(clazz) == smap->end() && clazz != "org.cppmicroservices.factory")
                 {
-                    if (auto bundle_ = registration.lock()->bundle.lock())
+                    if (auto bundle_ = coreInfo->bundle.lock())
                     {
                         std::string message("ServiceFactory produced an object that did not implement: " + clazz);
                         bundle_->coreCtx->listeners.SendFrameworkEvent(
@@ -106,7 +103,7 @@ namespace cppmicroservices
         }
         catch (cppmicroservices::SharedLibraryException const& ex)
         {
-            if (auto bundle = registration.lock()->bundle.lock())
+            if (auto bundle = coreInfo->bundle.lock())
             {
                 bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_ERROR,
                                                                              ex.GetBundle(),
@@ -131,7 +128,7 @@ namespace cppmicroservices
         {
             s.reset();
             std::string message = "ServiceFactory threw an unknown exception.";
-            if (auto bundle_ = registration.lock()->bundle.lock())
+            if (auto bundle_ = coreInfo->bundle.lock())
             {
                 bundle_->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
                     FrameworkEvent::Type::FRAMEWORK_ERROR,
@@ -148,12 +145,12 @@ namespace cppmicroservices
     {
         InterfaceMapConstPtr s;
         {
-            if (registration.lock()->available)
+            if (coreInfo->available)
             {
                 auto factory = std::static_pointer_cast<ServiceFactory>(
                     registration.lock()->GetService("org.cppmicroservices.factory"));
                 s = GetServiceFromFactory(GetPrivate(bundle).get(), factory);
-                registration.lock()->Lock(), registration.lock()->prototypeServiceInstances[GetPrivate(bundle).get()].push_back(s);
+                registration.lock()->Lock(), coreInfo->Lock(), coreInfo->prototypeServiceInstances[GetPrivate(bundle).get()].push_back(s);
             }
         }
         return s;
@@ -184,7 +181,7 @@ namespace cppmicroservices
 #endif
 
         InterfaceMapConstPtr s;
-        if (!registration.lock()->available)
+        if (!coreInfo->available)
             return s;
         std::shared_ptr<ServiceFactory> serviceFactory;
 
@@ -205,18 +202,20 @@ namespace cppmicroservices
         {
             auto l = registration.lock()->Lock();
             US_UNUSED(l);
-            if (!registration.lock()->available)
+            auto l1 = coreInfo->Lock();
+            US_UNUSED(l1);
+            if (!coreInfo->available)
                 return s;
             serviceFactory = std::static_pointer_cast<ServiceFactory>(
                 registration.lock()->GetService_unlocked("org.cppmicroservices.factory"));
 
-            auto res = dependents->insert(std::make_pair(bundle, 0));
+            auto res = coreInfo->dependents.insert(std::make_pair(bundle, 0));
             auto& depCounter = res.first->second;
 
             // No service factory, just return the registered service directly.
             if (!serviceFactory)
             {
-                s = service;
+                s = coreInfo->service;
                 if (s && !s->empty())
                 {
                     ++depCounter;
@@ -224,8 +223,8 @@ namespace cppmicroservices
                 return s;
             }
 
-            auto serviceIter = bundleServiceInstance->find(bundle);
-            if (bundleServiceInstance->end() != serviceIter)
+            auto serviceIter = coreInfo->bundleServiceInstance.find(bundle);
+            if (coreInfo->bundleServiceInstance.end() != serviceIter)
             {
                 ++depCounter;
                 return serviceIter->second;
@@ -243,7 +242,7 @@ namespace cppmicroservices
                     msg,
                     std::make_exception_ptr(ServiceException(msg, ServiceException::FACTORY_RECURSION)));
 
-                if (auto bundle = registration.lock()->bundle.lock())
+                if (auto bundle = coreInfo->bundle.lock())
                 {
                     bundle->coreCtx->listeners.SendFrameworkEvent(fwEvent);
                 }
@@ -263,26 +262,27 @@ namespace cppmicroservices
 
         auto l = registration.lock()->Lock();
         US_UNUSED(l);
-
-        dependents->insert(std::make_pair(bundle, 0));
+        auto l1 = coreInfo->Lock();
+        US_UNUSED(l1);
+        coreInfo->dependents.insert(std::make_pair(bundle, 0));
 
         if (s && !s->empty())
         {
             // Insert a cached service object instance only if one isn't already cached. If another thread
             // already inserted a cached service object, discard the service object returned by
             // GetServiceFromFactory and return the cached one.
-            auto insertResultPair = bundleServiceInstance->insert(std::make_pair(bundle, s));
+            auto insertResultPair = coreInfo->bundleServiceInstance.insert(std::make_pair(bundle, s));
             s = insertResultPair.first->second;
-            ++dependents->at(bundle);
+            ++coreInfo->dependents.at(bundle);
         }
         else
         {
             // If the service factory returned an invalid service object check the cache and return a valid one
             // if it exists.
-            if (bundleServiceInstance->end() != bundleServiceInstance->find(bundle))
+            if (coreInfo->bundleServiceInstance.end() != coreInfo->bundleServiceInstance.find(bundle))
             {
-                s = bundleServiceInstance->at(bundle);
-                ++dependents->at(bundle);
+                s = coreInfo->bundleServiceInstance.at(bundle);
+                ++coreInfo->dependents.at(bundle);
             }
         }
         return s;
@@ -298,8 +298,10 @@ namespace cppmicroservices
         {
             auto l = registration.lock()->Lock();
             US_UNUSED(l);
-            auto iter = registration.lock()->prototypeServiceInstances.find(bundle.get());
-            if (iter == registration.lock()->prototypeServiceInstances.end())
+            auto l1 = coreInfo->Lock();
+            US_UNUSED(l1);
+            auto iter = coreInfo->prototypeServiceInstances.find(bundle.get());
+            if (iter == coreInfo->prototypeServiceInstances.end())
             {
                 return false;
             }
@@ -323,7 +325,7 @@ namespace cppmicroservices
                 }
                 catch (std::exception const& ex)
                 {
-                    if (auto bundle_ = registration.lock()->bundle.lock())
+                    if (auto bundle_ = coreInfo->bundle.lock())
                     {
                         std::string message("ServiceFactory threw an exception");
                         bundle_->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
@@ -337,8 +339,10 @@ namespace cppmicroservices
 
                 auto l = registration.lock()->Lock();
                 US_UNUSED(l);
-                auto iter = registration.lock()->prototypeServiceInstances.find(bundle.get());
-                if (iter == registration.lock()->prototypeServiceInstances.end())
+                auto l1 = coreInfo->Lock();
+                US_UNUSED(l1);
+                auto iter = coreInfo->prototypeServiceInstances.find(bundle.get());
+                if (iter == coreInfo->prototypeServiceInstances.end())
                     return true;
 
                 auto serviceIter = std::find(iter->second.begin(), iter->second.end(), service);
@@ -346,7 +350,7 @@ namespace cppmicroservices
                     iter->second.erase(serviceIter);
                 if (iter->second.empty())
                 {
-                    registration.lock()->prototypeServiceInstances.erase(iter);
+                    coreInfo->prototypeServiceInstances.erase(iter);
                 }
                 return true;
             }
@@ -366,8 +370,10 @@ namespace cppmicroservices
         {
             auto l = registration.lock()->Lock();
             US_UNUSED(l);
-            auto depIter = dependents->find(bundle.get());
-            if (dependents->end() == depIter)
+            auto l1 = coreInfo->Lock();
+            US_UNUSED(l1);
+            auto depIter = coreInfo->dependents.find(bundle.get());
+            if (coreInfo->dependents.end() == depIter)
             {
                 return hadReferences && removeService;
             }
@@ -396,8 +402,8 @@ namespace cppmicroservices
 
             if (removeService)
             {
-                auto serviceIter = bundleServiceInstance->find(bundle.get());
-                if (bundleServiceInstance->end() != serviceIter)
+                auto serviceIter = coreInfo->bundleServiceInstance.find(bundle.get());
+                if (coreInfo->bundleServiceInstance.end() != serviceIter)
                 {
                     sfi = serviceIter->second;
                 }
@@ -405,10 +411,10 @@ namespace cppmicroservices
                 if (sfi && !sfi->empty())
                 {
                     sf = std::static_pointer_cast<ServiceFactory>(
-                        ExtractInterface(service, "org.cppmicroservices.factory"));
+                        ExtractInterface(coreInfo->service, "org.cppmicroservices.factory"));
                 }
-                bundleServiceInstance->erase(bundle.get());
-                dependents->erase(bundle.get());
+                coreInfo->bundleServiceInstance.erase(bundle.get());
+                coreInfo->dependents.erase(bundle.get());
             }
         }
 
@@ -420,7 +426,7 @@ namespace cppmicroservices
             }
             catch (std::exception const& ex)
             {
-                if (auto bundle_ = registration.lock()->bundle.lock())
+                if (auto bundle_ = coreInfo->bundle.lock())
                 {
                     std::string message("ServiceFactory threw an exception");
                     bundle_->coreCtx->listeners.SendFrameworkEvent(
@@ -439,7 +445,7 @@ namespace cppmicroservices
     PropertiesHandle
     ServiceReferenceBasePrivate::GetProperties() const
     {
-        return PropertiesHandle(*properties, true);
+        return PropertiesHandle(coreInfo->properties, true);
     }
 
     bool
@@ -449,7 +455,9 @@ namespace cppmicroservices
         {
             auto l = registration.lock()->Lock();
             US_UNUSED(l);
-            return service ? service->find(interfaceId) != service->end()
+            auto l1 = coreInfo->Lock();
+            US_UNUSED(l1);
+            return coreInfo->service ? coreInfo->service->find(interfaceId) != coreInfo->service->end()
                                          : false;
         }
         return false;

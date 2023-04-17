@@ -35,14 +35,8 @@ namespace cppmicroservices
 
     ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(BundlePrivate* bundle_,
                                                                    InterfaceMapConstPtr service,
-                                                                   std::shared_ptr<Properties> props)
-        : service(std::move(service))
-        , dependents(std::make_shared<BundleToRefsMap>())
-        , bundleServiceInstance(std::make_shared<BundleToServiceMap>())
-        , bundle(bundle_->shared_from_this())
-        , properties(std::move(props))
-        , available(true)
-        , unregistering(false)
+                                                                   Properties&& props)
+        : coreInfo(std::make_shared<ServiceRegistrationCoreInfo>(bundle_, service, std::move(props)))
     {
     }
 
@@ -61,14 +55,14 @@ namespace cppmicroservices
     {
         auto l = this->Lock();
         US_UNUSED(l);
-        return (dependents->find(bundle) != dependents->end())
-               || (prototypeServiceInstances.find(bundle) != prototypeServiceInstances.end());
+        return (coreInfo->dependents.find(bundle) != coreInfo->dependents.end())
+               || (coreInfo->prototypeServiceInstances.find(bundle) != coreInfo->prototypeServiceInstances.end());
     }
 
     InterfaceMapConstPtr
     ServiceRegistrationBasePrivate::GetInterfaces() const
     {
-        return (this->Lock(), service);
+        return (this->Lock(), coreInfo->service);
     }
 
     std::shared_ptr<void>
@@ -80,7 +74,7 @@ namespace cppmicroservices
     std::shared_ptr<void>
     ServiceRegistrationBasePrivate::GetService_unlocked(std::string const& interfaceId) const
     {
-        return ExtractInterface(service, interfaceId);
+        return ExtractInterface(coreInfo->service, interfaceId);
     }
 } // namespace cppmicroservices
 

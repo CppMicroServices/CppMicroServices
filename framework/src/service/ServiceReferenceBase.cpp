@@ -75,9 +75,9 @@ namespace cppmicroservices
     Any
     ServiceReferenceBase::GetProperty(std::string const& key) const
     {
-        auto l = d.load()->properties->Lock();
+        auto l = d.load()->coreInfo->properties.Lock();
         US_UNUSED(l);
-        return d.load()->properties->Value_unlocked(key).first;
+        return d.load()->coreInfo->properties.Value_unlocked(key).first;
     }
 
     void
@@ -89,9 +89,9 @@ namespace cppmicroservices
     std::vector<std::string>
     ServiceReferenceBase::GetPropertyKeys() const
     {
-        auto l = d.load()->properties->Lock();
+        auto l = d.load()->coreInfo->properties.Lock();
         US_UNUSED(l);
-        return d.load()->properties->Keys_unlocked();
+        return d.load()->coreInfo->properties.Keys_unlocked();
     }
 
     Bundle
@@ -105,18 +105,20 @@ namespace cppmicroservices
 
         auto l = p->registration.lock()->Lock();
         US_UNUSED(l);
-        if (p->registration.lock()->bundle.lock() == nullptr)
+        auto l1 = p->coreInfo->Lock();
+        US_UNUSED(l1);
+        if (p->coreInfo->bundle.lock() == nullptr)
         {
             return Bundle();
         }
-        return MakeBundle(p->registration.lock()->bundle.lock()->shared_from_this());
+        return MakeBundle(p->coreInfo->bundle.lock()->shared_from_this());
     }
 
     std::vector<Bundle>
     ServiceReferenceBase::GetUsingBundles() const
     {
         std::vector<Bundle> bundles;
-        for (auto& iter : *(d.load()->dependents))
+        for (auto& iter : (d.load()->coreInfo->dependents))
         {
             bundles.push_back(MakeBundle(iter.first->shared_from_this()));
         }
@@ -154,22 +156,22 @@ namespace cppmicroservices
         Any anyR1;
         Any anyId1;
         {
-            auto l1 = d.load()->properties->Lock();
+            auto l1 = d.load()->coreInfo->properties.Lock();
             US_UNUSED(l1);
-            anyR1 = d.load()->properties->Value_unlocked(Constants::SERVICE_RANKING).first;
+            anyR1 = d.load()->coreInfo->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             assert(anyR1.Empty() || anyR1.Type() == typeid(int));
-            anyId1 = d.load()->properties->Value_unlocked(Constants::SERVICE_ID).first;
+            anyId1 = d.load()->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first;
             assert(anyId1.Empty() || anyId1.Type() == typeid(long int));
         }
 
         Any anyR2;
         Any anyId2;
         {
-            auto l2 = reference.d.load()->properties->Lock();
+            auto l2 = reference.d.load()->coreInfo->properties.Lock();
             US_UNUSED(l2);
-            anyR2 = reference.d.load()->properties->Value_unlocked(Constants::SERVICE_RANKING).first;
+            anyR2 = reference.d.load()->coreInfo->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             assert(anyR2.Empty() || anyR2.Type() == typeid(int));
-            anyId2 = reference.d.load()->properties->Value_unlocked(Constants::SERVICE_ID).first;
+            anyId2 = reference.d.load()->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first;
             assert(anyId2.Empty() || anyId2.Type() == typeid(long int));
         }
 

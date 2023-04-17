@@ -24,6 +24,7 @@
 #define CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H
 
 #include "cppmicroservices/ServiceInterface.h"
+#include "ServiceRegistrationCoreInfo.h"
 
 #include "Properties.h"
 
@@ -104,7 +105,6 @@ namespace cppmicroservices
 
         bool IsConvertibleTo(std::string const& interfaceId) const;
 
-        InterfaceMapConstPtr service;
         /**
          * Reference count for implicitly shared private implementation.
          */
@@ -120,21 +120,8 @@ namespace cppmicroservices
          */
         std::string interfaceId;
 
-        /**
-         * Link to properties for this reference.
-         */
-        std::shared_ptr<Properties> properties;
 
-        /**
-         * Bundles dependent on this service. Integer is used as
-         * reference counter, counting number of unbalanced getService().
-         */
-        std::shared_ptr<BundleToRefsMap> dependents;
-
-        /**
-         * Object instance with bundle scope that a factory may have produced.
-         */
-        std::shared_ptr<BundleToServiceMap> bundleServiceInstance;
+        std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo;
 
       private:
         InterfaceMapConstPtr GetServiceFromFactory(BundlePrivate* bundle,

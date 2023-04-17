@@ -28,6 +28,7 @@
 #include "cppmicroservices/detail/Threads.h"
 
 #include "Properties.h"
+#include "ServiceRegistrationCoreInfo.h"
 
 #include <atomic>
 
@@ -53,11 +54,6 @@ namespace cppmicroservices
         // unregistered service instances.
         friend class ServiceReferenceBasePrivate;
 
-        /**
-         * Service or ServiceFactory object.
-         */
-        InterfaceMapConstPtr service;
-
       public:
         using BundleToRefsMap = std::unordered_map<BundlePrivate*, int>;
         using BundleToServiceMap = std::unordered_map<BundlePrivate*, InterfaceMapConstPtr>;
@@ -67,50 +63,16 @@ namespace cppmicroservices
         ServiceRegistrationBasePrivate& operator=(ServiceRegistrationBasePrivate const&) = delete;
 
         /**
-         * Bundles dependent on this service. Integer is used as
-         * reference counter, counting number of unbalanced getService().
-         */
-        std::shared_ptr<BundleToRefsMap> dependents;
-
-        /**
-         * Object instances that a prototype factory has produced.
-         */
-        BundleToServicesMap prototypeServiceInstances;
-
-        /**
-         * Object instance with bundle scope that a factory may have produced.
-         */
-        std::shared_ptr<BundleToServiceMap> bundleServiceInstance;
-
-        /**
-         * Bundle registering this service.
-         */
-        std::weak_ptr<BundlePrivate> bundle;
-
-        /**
          * Reference object to this service registration.
          */
         ServiceReferenceBase reference;
 
         /**
-         * Service properties.
+         * Pointer to CoreInfo object for this registration.
          */
-        std::shared_ptr<Properties> properties;
+        std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo;
 
-        /**
-         * Is service available. I.e., if <code>true</code> then holders
-         * of a ServiceReference for the service are allowed to get it.
-         */
-        std::atomic<bool> available;
-
-        /**
-         * Avoid recursive unregistrations. I.e., if <code>true</code> then
-         * unregistration of this service has started but is not yet
-         * finished.
-         */
-        std::atomic<bool> unregistering;
-
-        ServiceRegistrationBasePrivate(BundlePrivate* bundle, InterfaceMapConstPtr service, std::shared_ptr<Properties> props);
+        ServiceRegistrationBasePrivate(BundlePrivate* bundle, InterfaceMapConstPtr service, Properties&& props);
 
         ~ServiceRegistrationBasePrivate();
 

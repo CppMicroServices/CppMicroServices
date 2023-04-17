@@ -50,7 +50,7 @@ namespace cppmicroservices
 
     ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle,
                                                      InterfaceMapConstPtr const& service,
-                                                     std::shared_ptr<Properties> props){
+                                                     Properties&& props){
         d = std::make_shared<ServiceRegistrationBasePrivate>(bundle, service, std::move(props));
         d->CreateReference();
     }
@@ -74,7 +74,7 @@ namespace cppmicroservices
     {
         if (!d)
             throw std::logic_error("ServiceRegistrationBase object invalid");
-        if (!d->available)
+        if (!d->coreInfo->available)
             throw std::logic_error("Service is unregistered");
 
         auto l = d->Lock();
@@ -97,7 +97,7 @@ namespace cppmicroservices
 
         ServiceListeners::ServiceListenerEntries before;
 
-        if (!d->available)
+        if (!d->coreInfo->available)
         {
             throw std::logic_error("Service is unregistered");
         }
@@ -105,14 +105,14 @@ namespace cppmicroservices
         {
             auto l = d->Lock();
             US_UNUSED(l);
-            if (!d->available)
+            if (!d->coreInfo->available)
                 throw std::logic_error("Service is unregistered");
             modifiedEndMatchEvent = ServiceEvent(ServiceEvent::SERVICE_MODIFIED_ENDMATCH, d->reference);
             modifiedEvent = ServiceEvent(ServiceEvent::SERVICE_MODIFIED, d->reference);
         }
 
         // This calls into service event listener hooks. We must not hold any locks here
-        if (auto bundle = d->bundle.lock())
+        if (auto bundle = d->coreInfo->bundle.lock())
         {
             bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEndMatchEvent, before);
         }
@@ -123,19 +123,19 @@ namespace cppmicroservices
         {
             auto l = d->Lock();
             US_UNUSED(l);
-            if (!d->available)
+            if (!d->coreInfo->available)
             {
                 throw std::logic_error("Service is unregistered");
             }
 
-            auto l2 = d->properties->Lock();
+            auto l2 = d->coreInfo->properties.Lock();
             US_UNUSED(l2);
 
             auto propsCopy(props);
-            propsCopy[Constants::SERVICE_ID] = d->properties->Value_unlocked(Constants::SERVICE_ID).first;
-            objectClasses = d->properties->Value_unlocked(Constants::OBJECTCLASS).first;
+            propsCopy[Constants::SERVICE_ID] = d->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first;
+            objectClasses = d->coreInfo->properties.Value_unlocked(Constants::OBJECTCLASS).first;
             propsCopy[Constants::OBJECTCLASS] = objectClasses;
-            propsCopy[Constants::SERVICE_SCOPE] = d->properties->Value_unlocked(Constants::SERVICE_SCOPE).first;
+            propsCopy[Constants::SERVICE_SCOPE] = d->coreInfo->properties.Value_unlocked(Constants::SERVICE_SCOPE).first;
 
             auto itr = propsCopy.find(Constants::SERVICE_RANKING);
             if (itr != propsCopy.end())
@@ -152,19 +152,19 @@ namespace cppmicroservices
                 }
             }
 
-            auto oldRankAny = d->properties->Value_unlocked(Constants::SERVICE_RANKING).first;
+            auto oldRankAny = d->coreInfo->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             if (!oldRankAny.Empty())
             {
                 // since the old ranking is extracted from existing service properties
                 // stored in the service registry, no need to type check before casting
                 old_rank = any_cast<int>(oldRankAny);
             }
-            *(d->properties) = Properties(AnyMap(std::move(propsCopy)));
+            (d->coreInfo->properties) = Properties(AnyMap(std::move(propsCopy)));
         }
         if (old_rank != new_rank)
         {
             auto classes = any_cast<std::vector<std::string>>(objectClasses);
-            if (auto bundle = d->bundle.lock())
+            if (auto bundle = d->coreInfo->bundle.lock())
             {
                 bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);
             }
@@ -172,7 +172,7 @@ namespace cppmicroservices
 
         // Notify listeners, we must not hold any locks here
         ServiceListeners::ServiceListenerEntries matchingListeners;
-        if (auto bundle = d->bundle.lock())
+        if (auto bundle = d->coreInfo->bundle.lock())
         {
             bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent, matchingListeners);
             bundle->coreCtx->listeners.ServiceChanged(matchingListeners, modifiedEvent, before);
@@ -190,14 +190,14 @@ namespace cppmicroservices
 
         CoreBundleContext* coreContext = nullptr;
 
-        if (!d->available)
+        if (!d->coreInfo->available)
         {
             throw std::logic_error("Service is unregistered");
         }
         bool isUnregistering(false); // expected state
-        if (atomic_compare_exchange_strong(&d->unregistering, &isUnregistering, true))
+        if (atomic_compare_exchange_strong(&d->coreInfo->unregistering, &isUnregistering, true))
         {
-            if (auto bundle = d->bundle.lock())
+            if (auto bundle = d->coreInfo->bundle.lock())
             {
                 {
                     auto l1 = bundle->coreCtx->services.Lock();
@@ -230,9 +230,9 @@ namespace cppmicroservices
         {
             auto l = d->Lock();
             US_UNUSED(l);
-            d->available = false;
-            auto factoryIter = d->service->find("org.cppmicroservices.factory");
-            if (auto bundle = d->bundle.lock() && factoryIter != d->service->end())
+            d->coreInfo->available = false;
+            auto factoryIter = d->coreInfo->service->find("org.cppmicroservices.factory");
+            if (auto bundle = d->coreInfo->bundle.lock() && factoryIter != d->coreInfo->service->end())
             {
                 if (bundle)
                 {
@@ -241,8 +241,8 @@ namespace cppmicroservices
             }
             if (serviceFactory)
             {
-                prototypeServiceInstances = d->prototypeServiceInstances;
-                bundleServiceInstance = *d->bundleServiceInstance;
+                prototypeServiceInstances = d->coreInfo->prototypeServiceInstances;
+                bundleServiceInstance = d->coreInfo->bundleServiceInstance;
             }
         }
 
@@ -260,7 +260,7 @@ namespace cppmicroservices
                     catch (std::exception const& ex)
                     {
                         std::string message("ServiceFactory UngetService implementation threw an exception");
-                        if (auto bundle = d->bundle.lock())
+                        if (auto bundle = d->coreInfo->bundle.lock())
                         {
                             bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
                                 FrameworkEvent::Type::FRAMEWORK_ERROR,
@@ -283,7 +283,7 @@ namespace cppmicroservices
                 catch (std::exception const& ex)
                 {
                     std::string message("ServiceFactory UngetService implementation threw an exception");
-                    if (auto bundle = d->bundle.lock())
+                    if (auto bundle = d->coreInfo->bundle.lock())
                     {
                         bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
                             FrameworkEvent::Type::FRAMEWORK_ERROR,
@@ -300,10 +300,14 @@ namespace cppmicroservices
             auto l = d->Lock();
             US_UNUSED(l);
 
-            d->bundle.reset();
-            d->prototypeServiceInstances.clear();
+            d->coreInfo->bundle.reset();
+            d->coreInfo->dependents.clear();
+            d->coreInfo->service.reset();
+            d->coreInfo->prototypeServiceInstances.clear();
+            d->coreInfo->bundleServiceInstance.clear();
+
             d->reference = nullptr;
-            d->unregistering = false;
+            d->coreInfo->unregistering = false;
         }
     }
 

@@ -47,13 +47,6 @@ namespace cppmicroservices
       protected:
         friend class ServiceRegistrationBase;
 
-        // The ServiceReferenceBasePrivate class holds a pointer to a
-        // ServiceRegistrationBasePrivate instance and needs to manipulate
-        // its reference count. This way it can keep the ServiceRegistrationBasePrivate
-        // instance alive and keep returning service properties for
-        // unregistered service instances.
-        friend class ServiceReferenceBasePrivate;
-
       public:
         using BundleToRefsMap = std::unordered_map<BundlePrivate*, int>;
         using BundleToServiceMap = std::unordered_map<BundlePrivate*, InterfaceMapConstPtr>;

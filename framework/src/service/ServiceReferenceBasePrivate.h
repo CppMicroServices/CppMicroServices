@@ -112,7 +112,9 @@ namespace cppmicroservices
          */
         std::string interfaceId;
 
-
+        /**
+         * Core Information for the service used by regestration and reference
+        */
         std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo;
 
       private:

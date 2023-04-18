@@ -66,7 +66,7 @@ namespace cppmicroservices
 
     ServiceRegistrationBase::~ServiceRegistrationBase()
     {
-        d = nullptr;
+        d.reset();
     }
 
     ServiceReferenceBase

@@ -70,7 +70,7 @@ namespace cppmicroservices
     bool
     LDAPFilter::Match(ServiceReferenceBase const& reference) const
     {
-        return ((d) ? d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), false) : false);
+        return ((d) ? d->ldapExpr.Evaluate(std::atomic_load(&reference.d)->GetProperties(), false) : false);
     }
 
     // This function has been modified to call the LDAPExpr::Evaluate() function which takes

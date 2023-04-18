@@ -823,7 +823,8 @@ namespace cppmicroservices
         coreCtx->services.GetUsedByBundle(this, srs);
         for (std::vector<ServiceRegistrationBase>::const_iterator i = srs.begin(); i != srs.end(); ++i)
         {
-            i->GetReference(std::string()).d.load()->UngetService(this->shared_from_this(), false);
+            auto ref = i->GetReference(std::string());
+            std::atomic_load(&ref.d)->UngetService(this->shared_from_this(), false);
         }
     }
 

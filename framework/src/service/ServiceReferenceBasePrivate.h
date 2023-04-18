@@ -47,9 +47,6 @@ namespace cppmicroservices
     class ServiceReferenceBasePrivate
     {
       public:
-        using BundleToRefsMap = std::unordered_map<BundlePrivate*, int>;
-        using BundleToServiceMap = std::unordered_map<BundlePrivate*, InterfaceMapConstPtr>;
-
         ServiceReferenceBasePrivate(ServiceReferenceBasePrivate const&) = delete;
         ServiceReferenceBasePrivate& operator=(ServiceReferenceBasePrivate const&) = delete;
 
@@ -104,11 +101,6 @@ namespace cppmicroservices
         PropertiesHandle GetProperties() const;
 
         bool IsConvertibleTo(std::string const& interfaceId) const;
-
-        /**
-         * Reference count for implicitly shared private implementation.
-         */
-        std::atomic<int> ref;
 
         /**
          * Link to registration object for this reference.

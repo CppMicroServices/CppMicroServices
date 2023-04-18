@@ -44,8 +44,7 @@ namespace cppmicroservices
     using ThreadMarksMapType = std::unordered_map<BundlePrivate*, std::unordered_set<ServiceRegistrationBasePrivate*>>;
 
     ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(std::weak_ptr<ServiceRegistrationBasePrivate> reg)
-        : ref(1)
-        , registration(reg)
+        : registration(reg)
     {
         if (!reg.expired()) {
             coreInfo = registration.lock()->coreInfo;
@@ -411,7 +410,7 @@ namespace cppmicroservices
                 if (sfi && !sfi->empty())
                 {
                     sf = std::static_pointer_cast<ServiceFactory>(
-                        ExtractInterface(coreInfo->service, "org.cppmicroservices.factory"));
+                        registration.lock()->GetService_unlocked("org.cppmicroservices.factory"));
                 }
                 coreInfo->bundleServiceInstance.erase(bundle.get());
                 coreInfo->dependents.erase(bundle.get());

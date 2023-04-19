@@ -77,14 +77,14 @@ namespace cppmicroservices
                 }
             }
             {
-                auto l = registration->properties.Lock();
+                auto l = coreInfo->properties.Lock();
                 US_UNUSED(l);
                 for (auto const& clazz : ref_any_cast<std::vector<std::string>>(
-                         registration->properties.ValueByRef_unlocked(Constants::OBJECTCLASS)))
+                         coreInfo->properties.ValueByRef_unlocked(Constants::OBJECTCLASS)))
                 {
                     if (smap->find(clazz) == smap->end() && clazz != "org.cppmicroservices.factory")
                     {
-                        if (auto bundle_ = registration->bundle.lock())
+                        if (auto bundle_ = coreInfo->bundle.lock())
                         {
                             std::string message("ServiceFactory produced an object that did not implement: " + clazz);
                             bundle_->coreCtx->listeners.SendFrameworkEvent(
@@ -258,32 +258,36 @@ namespace cppmicroservices
         // possibility of infinite recursion.
 
         {
-            auto l = registration->Lock();
+            auto l = registration.lock()->Lock();
             US_UNUSED(l);
+            auto l1 = coreInfo->Lock();
+            US_UNUSED(l1);
 
-            if (registration->bundleServiceInstance.end() != registration->bundleServiceInstance.find(bundle))
+            if (coreInfo->bundleServiceInstance.end() != coreInfo->bundleServiceInstance.find(bundle))
             {
-                ++registration->dependents.at(bundle);
-                return registration->bundleServiceInstance.at(bundle);
+                ++coreInfo->dependents.at(bundle);
+                return coreInfo->bundleServiceInstance.at(bundle);
             }
         }
 
         s = GetServiceFromFactory(bundle, serviceFactory);
 
         {
-            auto l = registration->Lock();
+            auto l = registration.lock()->Lock();
             US_UNUSED(l);
+            auto l1 = coreInfo->Lock();
+            US_UNUSED(l1);
 
-            registration->dependents.insert(std::make_pair(bundle, 0));
+            coreInfo->dependents.insert(std::make_pair(bundle, 0));
 
             if (s && !s->empty())
             {
                 // Insert a cached service object instance only if one isn't already cached. If another thread
                 // already inserted a cached service object, discard the service object returned by
                 // GetServiceFromFactory and return the cached one.
-                auto insertResultPair = registration->bundleServiceInstance.insert(std::make_pair(bundle, s));
+                auto insertResultPair = coreInfo->bundleServiceInstance.insert(std::make_pair(bundle, s));
                 s = insertResultPair.first->second;
-                ++registration->dependents.at(bundle);
+                ++coreInfo->dependents.at(bundle);
             }
         }
         return s;

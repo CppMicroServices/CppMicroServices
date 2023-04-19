@@ -139,11 +139,11 @@ namespace cppmicroservices
             auto l2 = d->coreInfo->properties.Lock();
             US_UNUSED(l2);
 
-            propsCopy[Constants::SERVICE_ID] = std::move(d->properties.Value_unlocked(Constants::SERVICE_ID).first);
-            objectClasses = std::move(d->properties.Value_unlocked(Constants::OBJECTCLASS).first);
+            propsCopy[Constants::SERVICE_ID] = std::move(d->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first);
+            objectClasses = std::move(d->coreInfo->properties.Value_unlocked(Constants::OBJECTCLASS).first);
             propsCopy[Constants::OBJECTCLASS] = objectClasses;
             propsCopy[Constants::SERVICE_SCOPE]
-                = std::move(d->properties.Value_unlocked(Constants::SERVICE_SCOPE).first);
+                = std::move(d->coreInfo->properties.Value_unlocked(Constants::SERVICE_SCOPE).first);
 
             auto itr = propsCopy.find(Constants::SERVICE_RANKING);
             if (itr != propsCopy.end())
@@ -172,7 +172,7 @@ namespace cppmicroservices
         if (old_rank != new_rank)
         {
             auto const& classes = ref_any_cast<std::vector<std::string>>(objectClasses);
-            if (auto bundle = d->bundle.lock())
+            if (auto bundle = d->coreInfo->bundle.lock())
             {
                 bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);
             }

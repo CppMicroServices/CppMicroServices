@@ -41,4 +41,3 @@ doc/src/examples/makefile/main
 /build*
 .vscode/
 .venv/
-notTracked

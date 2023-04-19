@@ -46,14 +46,13 @@ namespace cppmicroservices
     ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(std::weak_ptr<ServiceRegistrationBasePrivate> reg)
         : registration(reg)
     {
-        if (!reg.expired()) {
+        if (!reg.expired())
+        {
             coreInfo = registration.lock()->coreInfo;
         }
     }
 
-    ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate()
-    {
-    }
+    ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate() {}
 
     InterfaceMapConstPtr
     ServiceReferenceBasePrivate::GetServiceFromFactory(BundlePrivate* bundle,
@@ -63,8 +62,8 @@ namespace cppmicroservices
         InterfaceMapConstPtr s;
         try
         {
-            InterfaceMapConstPtr smap
-                = factory->GetService(MakeBundle(bundle->shared_from_this()), ServiceRegistrationBase(registration.lock()));
+            InterfaceMapConstPtr smap = factory->GetService(MakeBundle(bundle->shared_from_this()),
+                                                            ServiceRegistrationBase(registration.lock()));
             if (!smap || smap->empty())
             {
                 if (auto bundle_ = coreInfo->bundle.lock())
@@ -78,10 +77,9 @@ namespace cppmicroservices
                     return smap;
                 }
             }
-            std::vector<std::string> classes
-                = (coreInfo->properties.Lock(),
-                   any_cast<std::vector<std::string>>(
-                       coreInfo->properties.Value_unlocked(Constants::OBJECTCLASS).first));
+            std::vector<std::string> classes = (coreInfo->properties.Lock(),
+                                                any_cast<std::vector<std::string>>(
+                                                    coreInfo->properties.Value_unlocked(Constants::OBJECTCLASS).first));
             for (auto clazz : classes)
             {
                 if (smap->find(clazz) == smap->end() && clazz != "org.cppmicroservices.factory")
@@ -149,7 +147,8 @@ namespace cppmicroservices
                 auto factory = std::static_pointer_cast<ServiceFactory>(
                     registration.lock()->GetService("org.cppmicroservices.factory"));
                 s = GetServiceFromFactory(GetPrivate(bundle).get(), factory);
-                registration.lock()->Lock(), coreInfo->Lock(), coreInfo->prototypeServiceInstances[GetPrivate(bundle).get()].push_back(s);
+                registration.lock()->Lock(), coreInfo->Lock(),
+                    coreInfo->prototypeServiceInstances[GetPrivate(bundle).get()].push_back(s);
             }
         }
         return s;
@@ -456,8 +455,7 @@ namespace cppmicroservices
             US_UNUSED(l);
             auto l1 = coreInfo->Lock();
             US_UNUSED(l1);
-            return coreInfo->service ? coreInfo->service->find(interfaceId) != coreInfo->service->end()
-                                         : false;
+            return coreInfo->service ? coreInfo->service->find(interfaceId) != coreInfo->service->end() : false;
         }
         return false;
     }

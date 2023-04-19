@@ -40,13 +40,12 @@ namespace cppmicroservices
     {
     }
 
-    ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate()
-    {
-    }
+    ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate() {}
 
     // Need to first create shared_ptr to registration before duplicating for reference
     void
-    ServiceRegistrationBasePrivate::CreateReference() {
+    ServiceRegistrationBasePrivate::CreateReference()
+    {
         reference = shared_from_this();
     }
 

@@ -33,7 +33,10 @@
 namespace cppmicroservices
 {
 
-    ServiceReferenceBase::ServiceReferenceBase() : d(new ServiceReferenceBasePrivate(std::weak_ptr<ServiceRegistrationBasePrivate>())) {}
+    ServiceReferenceBase::ServiceReferenceBase()
+        : d(new ServiceReferenceBasePrivate(std::weak_ptr<ServiceRegistrationBasePrivate>()))
+    {
+    }
 
     ServiceReferenceBase::ServiceReferenceBase(ServiceReferenceBase const& ref) : d(std::atomic_load(&ref.d)) {}
 
@@ -58,9 +61,7 @@ namespace cppmicroservices
         return *this;
     }
 
-    ServiceReferenceBase::~ServiceReferenceBase()
-    {
-    }
+    ServiceReferenceBase::~ServiceReferenceBase() {}
 
     Any
     ServiceReferenceBase::GetProperty(std::string const& key) const
@@ -159,7 +160,8 @@ namespace cppmicroservices
         {
             auto l2 = std::atomic_load(&reference.d)->coreInfo->properties.Lock();
             US_UNUSED(l2);
-            anyR2 = std::atomic_load(&reference.d)->coreInfo->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
+            anyR2
+                = std::atomic_load(&reference.d)->coreInfo->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             assert(anyR2.Empty() || anyR2.Type() == typeid(int));
             anyId2 = std::atomic_load(&reference.d)->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first;
             assert(anyId2.Empty() || anyId2.Type() == typeid(long int));
@@ -216,7 +218,8 @@ namespace cppmicroservices
     std::size_t
     ServiceReferenceBase::Hash() const
     {
-        return std::hash<std::shared_ptr<ServiceRegistrationBasePrivate>>()(std::atomic_load(&this->d)->registration.lock());
+        return std::hash<std::shared_ptr<ServiceRegistrationBasePrivate>>()(
+            std::atomic_load(&this->d)->registration.lock());
     }
 
     std::ostream&

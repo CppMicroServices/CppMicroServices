@@ -109,9 +109,10 @@ namespace cppmicroservices
             classes.push_back(i.first);
         }
 
-        ServiceRegistrationBase res(bundle,
-                                    service,
-                                    std::move(CreateServiceProperties(properties, classes, isFactory, isPrototypeFactory)));
+        ServiceRegistrationBase res(
+            bundle,
+            service,
+            std::move(CreateServiceProperties(properties, classes, isFactory, isPrototypeFactory)));
         {
             auto l = this->Lock();
             US_UNUSED(l);
@@ -300,8 +301,8 @@ namespace cppmicroservices
             US_UNUSED(l2);
             assert(sr.d->coreInfo->properties.Value_unlocked(Constants::OBJECTCLASS).first.Type()
                    == typeid(std::vector<std::string>));
-            classes
-                = ref_any_cast<std::vector<std::string>>(sr.d->coreInfo->properties.Value_unlocked(Constants::OBJECTCLASS).first);
+            classes = ref_any_cast<std::vector<std::string>>(
+                sr.d->coreInfo->properties.Value_unlocked(Constants::OBJECTCLASS).first);
         }
         services.erase(sr);
         serviceRegistrations.erase(std::remove(serviceRegistrations.begin(), serviceRegistrations.end(), sr),

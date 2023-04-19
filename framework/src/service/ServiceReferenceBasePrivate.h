@@ -23,8 +23,8 @@
 #ifndef CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H
 #define CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H
 
-#include "cppmicroservices/ServiceInterface.h"
 #include "ServiceRegistrationCoreInfo.h"
+#include "cppmicroservices/ServiceInterface.h"
 
 #include "Properties.h"
 
@@ -114,7 +114,7 @@ namespace cppmicroservices
 
         /**
          * Core Information for the service used by ServiceReferenceBasePrivate
-        */
+         */
         std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo;
 
       private:

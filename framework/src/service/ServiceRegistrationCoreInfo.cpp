@@ -31,8 +31,8 @@ namespace cppmicroservices
 {
 
     ServiceRegistrationCoreInfo::ServiceRegistrationCoreInfo(BundlePrivate* bundle_,
-                                                                  InterfaceMapConstPtr service,
-                                                                  Properties&& props)
+                                                             InterfaceMapConstPtr service,
+                                                             Properties&& props)
         : service(std::move(service))
         , bundle(bundle_->shared_from_this())
         , properties(std::move(props))
@@ -43,11 +43,11 @@ namespace cppmicroservices
 
     ServiceRegistrationCoreInfo::~ServiceRegistrationCoreInfo()
     {
-      bundle.reset();
-      dependents.clear();
-      service.reset();
-      prototypeServiceInstances.clear();
-      bundleServiceInstance.clear();
+        bundle.reset();
+        dependents.clear();
+        service.reset();
+        prototypeServiceInstances.clear();
+        bundleServiceInstance.clear();
     }
 } // namespace cppmicroservices
 

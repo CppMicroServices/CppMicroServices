@@ -239,7 +239,7 @@ namespace cppmicroservices
         // This class is not thread-safe, but we support thread-safe
         // copying and assignment
         // This was changed to a std::shared_ptr and is accessed through
-        // std::atomic_load, but when this repository uses c++20, 
+        // std::atomic_load, but when this repository uses c++20,
         // this will be changed to std::atomic<shared_ptr>
         std::shared_ptr<ServiceReferenceBasePrivate> d;
     };

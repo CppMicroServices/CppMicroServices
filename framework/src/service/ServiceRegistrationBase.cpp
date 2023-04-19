@@ -45,12 +45,16 @@ namespace cppmicroservices
 
     ServiceRegistrationBase::ServiceRegistrationBase(ServiceRegistrationBase&& reg) noexcept = default;
 
-    ServiceRegistrationBase::ServiceRegistrationBase(std::shared_ptr<ServiceRegistrationBasePrivate> registrationPrivate) : d(registrationPrivate)
-    {}
+    ServiceRegistrationBase::ServiceRegistrationBase(
+        std::shared_ptr<ServiceRegistrationBasePrivate> registrationPrivate)
+        : d(registrationPrivate)
+    {
+    }
 
     ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle,
                                                      InterfaceMapConstPtr const& service,
-                                                     Properties&& props){
+                                                     Properties&& props)
+    {
         d = std::make_shared<ServiceRegistrationBasePrivate>(bundle, service, std::move(props));
         d->CreateReference();
     }
@@ -64,10 +68,7 @@ namespace cppmicroservices
         return *this;
     }
 
-    ServiceRegistrationBase::~ServiceRegistrationBase()
-    {
-        d.reset();
-    }
+    ServiceRegistrationBase::~ServiceRegistrationBase() { d.reset(); }
 
     ServiceReferenceBase
     ServiceRegistrationBase::GetReference(std::string const& interfaceId) const
@@ -135,7 +136,8 @@ namespace cppmicroservices
             propsCopy[Constants::SERVICE_ID] = d->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first;
             objectClasses = d->coreInfo->properties.Value_unlocked(Constants::OBJECTCLASS).first;
             propsCopy[Constants::OBJECTCLASS] = objectClasses;
-            propsCopy[Constants::SERVICE_SCOPE] = d->coreInfo->properties.Value_unlocked(Constants::SERVICE_SCOPE).first;
+            propsCopy[Constants::SERVICE_SCOPE]
+                = d->coreInfo->properties.Value_unlocked(Constants::SERVICE_SCOPE).first;
 
             auto itr = propsCopy.find(Constants::SERVICE_RANKING);
             if (itr != propsCopy.end())
@@ -337,11 +339,10 @@ namespace cppmicroservices
         return d == registration.d;
     }
 
-    ServiceRegistrationBase&
-    ServiceRegistrationBase::operator=(ServiceRegistrationBase const& registration) = default;
+    ServiceRegistrationBase& ServiceRegistrationBase::operator=(ServiceRegistrationBase const& registration) = default;
 
-    ServiceRegistrationBase&
-    ServiceRegistrationBase::operator=(ServiceRegistrationBase&& registration) noexcept = default;
+    ServiceRegistrationBase& ServiceRegistrationBase::operator=(ServiceRegistrationBase&& registration) noexcept
+        = default;
 
     std::ostream&
     operator<<(std::ostream& os, ServiceRegistrationBase const&)

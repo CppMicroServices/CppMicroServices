@@ -41,14 +41,7 @@ namespace cppmicroservices
     {
     }
 
-    ServiceRegistrationCoreInfo::~ServiceRegistrationCoreInfo()
-    {
-        bundle.reset();
-        dependents.clear();
-        service.reset();
-        prototypeServiceInstances.clear();
-        bundleServiceInstance.clear();
-    }
+    ServiceRegistrationCoreInfo::~ServiceRegistrationCoreInfo() = default;
 } // namespace cppmicroservices
 
 #ifdef _MSC_VER

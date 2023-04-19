@@ -60,25 +60,34 @@ namespace cppmicroservices
      *   - "(&(" + Constants::OBJECTCLASS + "=Person)(|(sn=Jensen)(cn=Babs J*)))"
      *   - "(o=univ*of*mich*)"
      *
-     * LDAPFilters have been extended to make it easier to query nested JSON keys.  Keys which
-     * contain the "." character may refer to nested values. We first look at the top level for a
-     * matching entry, and if one isn't found, we decompose the nested key and "walk down" the JSON
-     * structure looking for a match.
+     * LDAPFilters have been extended to make it easier to query nested JSON keys. This is disabled
+     * by default. To enable this functionality, define SUPPORT_NESTED_LOOKUP at compile time. For
+     * example, if using "make" to build:
      *
-     * Keys are decomposed into individual segments using the "." character as a segment
-     * separator. For example, given a key "a.b.c.d", if a value exists in the top level map with
-     * that key, we return it. if a value is not found at the top level with that key, we decompose
-     * that key into a vector: ["a","b","c","d"]. Ultimately for the filter to be applied, there
-     * must be a value in a nested AnyMap with a key ending with "d". So, we first look at the top
-     * level map for a submap at key "a". If a value rather than a map is found there, there is no
-     * path to "d", so we stop with an unsuccessful lookup. If a map does exist, we look in that map
-     * for a key of "b" and continue from there with the same algorithm (looking at that submap for
-     * keys "b", "b.c", and "b.c.d"). If not, we then look for a submap at the top level at key
-     * "a.b". Again, if a value is found rather than a map, there is no path to "d" so we halt the
+     * >> make clean
+     * >> make SUPPORT_NESTED_LOOKUP=1
+     *
+     * Nested Lookup Description
+     * =========================
+     *
+     * Keys which contain the "." character may refer to nested values. The top level is checked
+     * first for a matching entry. If one isn't found, the key is decomposed and the JSON structure
+     * "walked down" to look for a match.
+     *
+     * For example, given a key "a.b.c.d", if a value exists in the top level map with that key,
+     * it's retuned. If a value is not found at the top level with that key, it's decomposed into a
+     * vector: ["a","b","c","d"]. Ultimately for the filter to be applied, there must be a value in
+     * a nested AnyMap with a key ending with "d". So, the top level map is checked for the key
+     * "a". If a value rather than a map is found there, there is no path to "d", so the algorithm
+     * stops with an unsuccessful lookup. If a map does exist, the algorithm continues and looks for
+     * a key of "b" in that map and continues from there with the same algorithm (looking at that
+     * submap for keys "b", "b.c", and "b.c.d"). Finally, if nothing has been found for key "a",
+     * the algorithm combines the first two keys together into "a.b" and looks for a submap.
+     * Again, if a value is found rather than a map, there is no path to "d" so we halt the
      * lookup. If a submap is found there, we then look in that map for a key of "c" and continue
      * from there. Finally, if there is no item in the to plevel map at "a.b", we look at
-     * "a.b.c". And again, a value there halts the algorithem. If a map is found there, we finally
-     * look for a value at "d" in that map.
+     * "a.b.c". And again, a value there halts the algorithm. If a map is found there, it's checked
+     * for a value at key "d".
      *
      * A real world example:
      *
@@ -92,7 +101,7 @@ namespace cppmicroservices
      *
      * \remarks This class is thread safe.
      *
-     * \sa Use LDAPProp API to conveniently generate LDAP filter strings
+     * \sa Use LDAPProp class to conveniently generate LDAP filter strings
      *
      */
     class US_Framework_EXPORT LDAPFilter

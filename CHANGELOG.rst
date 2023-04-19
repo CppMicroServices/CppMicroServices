@@ -9,7 +9,33 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 `(UNRELEASED) vX.X.X <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (20XX-XX-XX)
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.4...development>`_
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.5...development>`_
+
+Added
+-----
+- `[Declarative Services] Add benchmark test infrastructure to DS <https://github.com/CppMicroServices/CppMicroServices/pull/813>`_
+- `[Core Framework] Make nested JSON queries using LDAP build-time configurable <https://github.com/CppMicroServices/CppMicroServices/pull/811>`_
+- `[Core Framework] Support nested JSON queries using LDAP <https://github.com/CppMicroServices/CppMicroServices/pull/794>`_
+
+Changed
+-------
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Core Framework] clang-tidy improvement for CMakeResourceDependencies <https://github.com/CppMicroServices/CppMicroServices/pull/812>`_
+- `[Core Framework] GetService performance micro-optimizations <https://github.com/CppMicroServices/CppMicroServices/pull/833>`_
+- `[Declarative Services] Fix sporadic crash caused by concurrent access to ComponentMgrImpl vector <https://github.com/CppMicroServices/CppMicroServices/pull/834>`_
+
+`v3.7.5 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.7.5>`_ (2023-03-14)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.4...v3.7.5>`_
 
 Added
 -----
@@ -25,6 +51,11 @@ Deprecated
 
 Fixed
 -----
+- `[Core Framework] Performance improvements <https://github.com/CppMicroServices/CppMicroServices/pull/728>`_
+- `[Core Framework] Fix undefined behavior <https://github.com/CppMicroServices/CppMicroServices/pull/777>`_
+- `[Declarative Services] Fix race with Declarative Services service object construction <https://github.com/CppMicroServices/CppMicroServices/pull/801>`_
+- `[Core Framework] RegisterService performance improvement <https://github.com/CppMicroServices/CppMicroServices/pull/808>`_
+
 
 `v3.7.4 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.7.4>`_ (2022-11-02)
 ---------------------------------------------------------------------------------------------------------

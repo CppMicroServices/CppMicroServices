@@ -49,6 +49,7 @@ namespace cppmicroservices
 {
     namespace
     {
+#ifdef SUPPORT_NESTED_LOOKUP
         /**
          * @brief split a delimited string into a vector of values
          *
@@ -104,6 +105,7 @@ namespace cppmicroservices
 
             return result;
         }
+#endif
 
         /**
          * @brief Find value for attrName in map
@@ -135,7 +137,9 @@ namespace cppmicroservices
             {
                 return lookup;
             }
-
+#ifndef SUPPORT_NESTED_LOOKUP
+            return std::nullopt;
+#else
             // If not found at the full attrname, decompose the path and do a full check.
             // First, split the m_attrName into a vector at the . separator and reverse it.
             auto scope = string_split(attrName, ".");
@@ -203,6 +207,7 @@ namespace cppmicroservices
                 // return an empty object... we did not find a named attrName in the map.
                 return std::nullopt;
             }
+#endif
         }
     } // namespace
 
@@ -370,7 +375,11 @@ namespace cppmicroservices
     LDAPExpr::Trim(std::string str)
     {
         str.erase(0, str.find_first_not_of(' '));
-        str.erase(str.find_last_not_of(' ') + 1);
+        auto const last_not_space = str.find_last_not_of(' ');
+        if(last_not_space != std::string::npos)
+        {
+            str.erase(last_not_space + 1);
+        }
         return str;
     }
 

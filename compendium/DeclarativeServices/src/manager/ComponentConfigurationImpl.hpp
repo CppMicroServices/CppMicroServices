@@ -77,13 +77,11 @@ namespace cppmicroservices
             /**
              * \throws std::invalid_argument exception if any of the params is a nullptr
              */
-            explicit ComponentConfigurationImpl(
-                std::shared_ptr<const metadata::ComponentMetadata> metadata,
-                Bundle const& bundle,
-                std::shared_ptr<ComponentRegistry> registry,
-                std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-                std::shared_ptr<ConfigurationNotifier> configNotifier,
-                std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
+            explicit ComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
+                                                Bundle const& bundle,
+                                                std::shared_ptr<ComponentRegistry> registry,
+                                                std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                                                std::shared_ptr<ConfigurationNotifier> configNotifier);
             ComponentConfigurationImpl(ComponentConfigurationImpl const&) = delete;
             ComponentConfigurationImpl(ComponentConfigurationImpl&&) = delete;
             ComponentConfigurationImpl& operator=(ComponentConfigurationImpl const&) = delete;
@@ -166,16 +164,7 @@ namespace cppmicroservices
                 return metadata;
             };
 
-            /**
-             * This method returns the {@link ComponentManager} vector which holds
-             * the ComponentManagerImpl objects.
-             */
-            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>>
-            GetManagers() const
-            {
-                return managers;
-            };
-
+            
             /**
              * Method to check if this component provides a service
              *
@@ -439,7 +428,6 @@ namespace cppmicroservices
             std::shared_ptr<ConfigurationNotifier> configNotifier; // to get updates for configuration objects
             std::vector<std::shared_ptr<ListenerToken>>
                 configListenerTokens; ///< vector of the listener tokens received from the config manager
-            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
             std::shared_ptr<ComponentConfigurationState> state; ///< only modified using std::atomic operations
             std::function<ComponentInstance*(void)>
                 newCompInstanceFunc; ///< extern C function to create a new instance {@link ComponentInstance} class

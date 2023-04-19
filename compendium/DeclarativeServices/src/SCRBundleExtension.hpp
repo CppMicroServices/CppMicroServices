@@ -52,12 +52,19 @@ namespace cppmicroservices
         class SCRBundleExtension
         {
           public:
+            /* SCRBundleExtension constructor
+             * @param bundle { @link Bundle }
+             * @param shared_ptr to {@link ComponentRegistry} registry 
+             * @param shared_ptr to {@link LogService} logger
+             * @param shared_ptr to {@link ConfigurationNotifier} object
+             * @throws std::illegal_argument if any input parameters fail validation.
+             */
+
             SCRBundleExtension(cppmicroservices::Bundle const& bundle,
-                               cppmicroservices::AnyMap const& scrMetadata,
-                               std::shared_ptr<ComponentRegistry> const& registry,
-                               std::shared_ptr<LogService> const& logger,
-                               std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& asyncWorkService,
-                               std::shared_ptr<ConfigurationNotifier> const& configNotifier);
+                                                   std::shared_ptr<ComponentRegistry> const& registry,
+                                                   std::shared_ptr<LogService> const& logger,
+                                                   std::shared_ptr<ConfigurationNotifier> const& configNotifier);
+   
 
             SCRBundleExtension(SCRBundleExtension const&) = delete;
             SCRBundleExtension(SCRBundleExtension&&) = delete;
@@ -65,6 +72,25 @@ namespace cppmicroservices
             SCRBundleExtension& operator=(SCRBundleExtension&&) = delete;
             ~SCRBundleExtension();
 
+             /*
+             *@throws std::bad_alloc exception if a storage failure occurs on 
+             * reallocation. Has the same exception guarantees as std::vector::push_back
+             */
+            void AddComponentManager(std::shared_ptr<ComponentManager>);
+
+            /* SCRBundleExtension::Initialize - Creates the ComponentManagerImpl
+             * object to manage the creation of the component configurations.
+             * @param AnyMap containing the bundle metadata 
+             * @param shared_ptr to {@link AsyncWorkService} object
+             * @throws std::illegal_argument if any input parameters fail validation.
+             * @throws {@link SharedLibraryException} if library cannot be loaded.
+             * @throws {@link SecurityException} if bundle validation fails.
+             * @throws std::exception for all other exceptions
+             */
+
+            void Initialize(cppmicroservices::AnyMap const& scrMetadata,
+                            std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& asyncWorkService);
+ 
           private:
             FRIEND_TEST(SCRBundleExtensionTest, CtorWithValidArgs);
 

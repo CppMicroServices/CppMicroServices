@@ -1,4 +1,4 @@
-/*=============================================================================
+ /*=============================================================================
 
   Library: CppMicroServices
 
@@ -108,13 +108,13 @@ namespace cppmicroservices
             return IsServiceRegistered();
         }
         void
-        RegistrationManager::SetProperties(cppmicroservices::ServiceProperties const& properties)
+        RegistrationManager::SetProperties(cppmicroservices::ServiceProperties && properties)
         {
             try
             {
                 if (IsServiceRegistered() && serviceReg)
                 {
-                    serviceReg.SetProperties(properties);
+                    serviceReg.SetProperties(std::move(properties));
                 }
             }
             catch (...)

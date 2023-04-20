@@ -109,7 +109,7 @@ namespace cppmicroservices
     ServiceReferenceBase::GetUsingBundles() const
     {
         std::vector<Bundle> bundles;
-        for (auto& iter : (std::atomic_load(&d)->coreInfo->dependents))
+        for (auto const& iter : (std::atomic_load(&d)->coreInfo->dependents))
         {
             bundles.push_back(MakeBundle(iter.first->shared_from_this()));
         }

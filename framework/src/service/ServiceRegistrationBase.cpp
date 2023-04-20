@@ -167,7 +167,7 @@ namespace cppmicroservices
                 // stored in the service registry, no need to type check before casting
                 old_rank = any_cast<int>(oldRankAny);
             }
-            (d->coreInfo->properties) = Properties(AnyMap(std::move(propsCopy)));
+            d->coreInfo->properties = Properties(AnyMap(std::move(propsCopy)));
         }
         if (old_rank != new_rank)
         {

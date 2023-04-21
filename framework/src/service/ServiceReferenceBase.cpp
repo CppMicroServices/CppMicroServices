@@ -34,14 +34,14 @@ namespace cppmicroservices
 {
 
     ServiceReferenceBase::ServiceReferenceBase()
-        : d(new ServiceReferenceBasePrivate(std::weak_ptr<ServiceRegistrationBasePrivate>()))
+        : d(std::make_shared<ServiceReferenceBasePrivate>(std::weak_ptr<ServiceRegistrationBasePrivate>()))
     {
     }
 
     ServiceReferenceBase::ServiceReferenceBase(ServiceReferenceBase const& ref) : d(std::atomic_load(&ref.d)) {}
 
     ServiceReferenceBase::ServiceReferenceBase(std::shared_ptr<ServiceRegistrationBasePrivate> reg)
-        : d(new ServiceReferenceBasePrivate(reg))
+        : d(std::make_shared<ServiceReferenceBasePrivate>(reg))
     {
     }
 

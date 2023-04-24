@@ -112,7 +112,7 @@ namespace cppmicroservices
         ServiceRegistrationBase res(
             bundle,
             service,
-            std::move(CreateServiceProperties(properties, classes, isFactory, isPrototypeFactory)));
+            CreateServiceProperties(properties, classes, isFactory, isPrototypeFactory));
         {
             auto l = this->Lock();
             US_UNUSED(l);

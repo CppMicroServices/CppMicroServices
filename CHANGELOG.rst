@@ -9,7 +9,27 @@ and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 `(UNRELEASED) vX.X.X <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (20XX-XX-XX)
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.5...development>`_
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.6...development>`_
+
+Added
+-----
+
+Changed
+-------
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+
+`v3.7.6 <https://github.com/cppmicroservices/cppmicroservices/tree/3.7.6>`_ (2023-04-25)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.5...3.7.6>`_
 
 Added
 -----
@@ -19,6 +39,7 @@ Added
 
 Changed
 -------
+- `Upgrade GitHub Actions to use Ubuntu 22.04 and remove use of Ubuntu 18.04 <https://github.com/CppMicroServices/CppMicroServices/pull/810>`_
 
 Removed
 -------

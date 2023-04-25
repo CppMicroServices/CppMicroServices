@@ -17,8 +17,8 @@ env:
 
 jobs:
   linux_minimum_supported_gcc_build:
-    name: Build and Test [ubuntu-18.04, Minimum GCC]
-    runs-on: ubuntu-18.04
+    name: Build and Test [ubuntu-20.04, Minimum GCC]
+    runs-on: ubuntu-20.04
     env:
       BUILD_CONFIGURATION: 0
       WITH_COVERAGE: 0
@@ -41,8 +41,8 @@ jobs:
         CXX: g++-7
 
   linux_clang_build:
-    name: Build and Test [ubuntu-18.04, Supported Clang]
-    runs-on: ubuntu-18.04
+    name: Build and Test [ubuntu-20.04, Supported Clang]
+    runs-on: ubuntu-20.04
     env:
       BUILD_CONFIGURATION: 0
       WITH_COVERAGE: 0
@@ -69,7 +69,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macOS-11, macos-12]
+        os: [ubuntu-22.04, macOS-11, macos-12]
         # build configurations:
         # 0 = threading ON / shared lib ON
         # 1 = threading ON / shared lib OFF
@@ -86,7 +86,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y valgrind
-      if: ${{matrix.os == 'ubuntu-20.04'}}
+      if: ${{matrix.os == 'ubuntu-22.04'}}
 
     - name: Build And Test
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake

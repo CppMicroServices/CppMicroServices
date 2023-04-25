@@ -1,4 +1,4 @@
-/*=============================================================================
+ /*=============================================================================
 
   Library: CppMicroServices
 
@@ -58,8 +58,7 @@ namespace cppmicroservices
             Bundle const& bundle,
             std::shared_ptr<ComponentRegistry> registry,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-            std::shared_ptr<ConfigurationNotifier> configNotifier,
-            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
+            std::shared_ptr<ConfigurationNotifier> configNotifier)
             : configID(++idCounter)
             , metadata(std::move(metadata))
             , bundle(bundle)
@@ -67,14 +66,12 @@ namespace cppmicroservices
             , logger(std::move(logger))
             , configManager()
             , configNotifier(std::move(configNotifier))
-            , managers(std::move(managers))
             , state(std::make_shared<CCUnsatisfiedReferenceState>())
             , newCompInstanceFunc(nullptr)
             , deleteCompInstanceFunc(nullptr)
         {
-            if (!this->metadata || !this->bundle || !this->registry || !this->logger || !this->configNotifier
-                || !this->managers)
-            {
+            if (!this->metadata || !this->bundle || !this->registry || !this->logger || !this->configNotifier)
+           {
                 throw std::invalid_argument("ComponentConfigurationImpl - Invalid arguments passed to constructor");
             }
 
@@ -134,16 +131,19 @@ namespace cppmicroservices
             {
                 // This is not a factory component
                 // Start with component properties
-                auto props = metadata->properties;
+                std::unordered_map<std::string, cppmicroservices::Any> props;
 
                 // If configuration object dependencies exist, use merged component and configuration object properties.
                 if (configManager != nullptr)
                 {
-                    props.clear();
                     for (auto const& item : configManager->GetProperties())
                     {
                         props.emplace(item.first, item.second);
                     }
+                }
+                else 
+                {
+                    props = metadata->properties;
                 }
 
                 props.emplace(COMPONENT_NAME, Any(this->metadata->name));
@@ -162,10 +162,9 @@ namespace cppmicroservices
         void
         ComponentConfigurationImpl::SetRegistrationProperties()
         {
-            auto properties = GetProperties();
             if (regManager)
             {
-                regManager->SetProperties(properties);
+                regManager->SetProperties(GetProperties());
             }
         }
 

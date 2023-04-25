@@ -172,7 +172,7 @@ function(usFunctionEmbedResources)
       # section name is "us_resources" because max length for section names in Mach-O format is 16 characters.
       add_custom_command(
         OUTPUT ${_source_output}
-        COMMAND ${CMAKE_CXX_COMPILER} ${_us_resource_cxx_flags} -c ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} -o stub.o
+        COMMAND ${CMAKE_CXX_COMPILER} --std=c++17 ${_us_resource_cxx_flags} -c ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP} -o stub.o
         COMMAND ${CMAKE_LINKER} -r -sectcreate __TEXT us_resources ${_zip_archive_name} stub.o -o ${_source_output}
         DEPENDS ${_zip_archive}
         WORKING_DIRECTORY ${_zip_archive_path}
@@ -226,7 +226,7 @@ function(usFunctionEmbedResources)
       COMMENT "Checking resource dependencies for ${US_RESOURCE_TARGET}"
       VERBATIM
      )
-    
+
     set(_us_target_type )
     get_target_property(_us_target_type ${US_RESOURCE_TARGET} TYPE)
     # We should not be appending metadata to any build artifact other than a dynamic shared library or
@@ -242,12 +242,12 @@ function(usFunctionEmbedResources)
         VERBATIM
       )
     endif()
-    
+
     # Disable code-signing on macOS if appending resources.
-	  if(APPLE)
-	    set_target_properties(${US_RESOURCE_TARGET} PROPERTIES
-		  XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
-	  endif()
+     if(APPLE)
+       set_target_properties(${US_RESOURCE_TARGET} PROPERTIES
+        XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
+     endif()
   endif()
 
 endfunction()

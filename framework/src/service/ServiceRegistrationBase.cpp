@@ -1,4 +1,4 @@
-/*=============================================================================
+ /*=============================================================================
 
   Library: CppMicroServices
 
@@ -103,6 +103,13 @@ namespace cppmicroservices
     void
     ServiceRegistrationBase::SetProperties(ServiceProperties const& props)
     {
+        auto propsCopy(props);
+        SetProperties(std::move(propsCopy));
+    }
+
+    void
+    ServiceRegistrationBase::SetProperties(ServiceProperties&& propsCopy)
+    {
         if (!d)
         {
             throw std::logic_error("ServiceRegistrationBase object invalid");
@@ -147,11 +154,11 @@ namespace cppmicroservices
             auto l2 = d->properties.Lock();
             US_UNUSED(l2);
 
-            auto propsCopy(props);
-            propsCopy[Constants::SERVICE_ID] = d->properties.Value_unlocked(Constants::SERVICE_ID).first;
-            objectClasses = d->properties.Value_unlocked(Constants::OBJECTCLASS).first;
+            propsCopy[Constants::SERVICE_ID] = std::move(d->properties.Value_unlocked(Constants::SERVICE_ID).first);
+            objectClasses = std::move(d->properties.Value_unlocked(Constants::OBJECTCLASS).first);
             propsCopy[Constants::OBJECTCLASS] = objectClasses;
-            propsCopy[Constants::SERVICE_SCOPE] = d->properties.Value_unlocked(Constants::SERVICE_SCOPE).first;
+            propsCopy[Constants::SERVICE_SCOPE]
+                = std::move(d->properties.Value_unlocked(Constants::SERVICE_SCOPE).first);
 
             auto itr = propsCopy.find(Constants::SERVICE_RANKING);
             if (itr != propsCopy.end())
@@ -179,7 +186,7 @@ namespace cppmicroservices
         }
         if (old_rank != new_rank)
         {
-            auto classes = any_cast<std::vector<std::string>>(objectClasses);
+            auto const& classes = ref_any_cast<std::vector<std::string>>(objectClasses);
             if (auto bundle = d->bundle.lock())
             {
                 bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);

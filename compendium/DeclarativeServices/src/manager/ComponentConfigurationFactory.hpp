@@ -44,9 +44,8 @@ namespace cppmicroservices
                 cppmicroservices::Bundle const& bundle,
                 std::shared_ptr<ComponentRegistry> registry,
                 std::shared_ptr<logservice::LogService> logger,
-                std::shared_ptr<ConfigurationNotifier> configNotifier,
-                std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers);
-        };
+                std::shared_ptr<ConfigurationNotifier> configNotifier);
+       };
     } // namespace scrimpl
 } // namespace cppmicroservices
 

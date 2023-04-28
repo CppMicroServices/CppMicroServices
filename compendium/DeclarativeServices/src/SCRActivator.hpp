@@ -25,6 +25,7 @@
 #include "ComponentRegistry.hpp"
 #include "SCRAsyncWorkService.hpp"
 #include "SCRBundleExtension.hpp"
+#include "SCRExtensionRegistry.hpp"
 #include "SCRLogger.hpp"
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
@@ -76,9 +77,8 @@ namespace cppmicroservices
             cppmicroservices::BundleContext runtimeContext;
             cppmicroservices::ServiceRegistration<ServiceComponentRuntime> scrServiceReg;
             std::shared_ptr<ComponentRegistry> componentRegistry;
-            std::mutex bundleRegMutex;
-            std::unordered_map<long, std::unique_ptr<SCRBundleExtension>> bundleRegistry;
             std::shared_ptr<SCRLogger> logger;
+            std::shared_ptr<SCRExtensionRegistry> bundleRegistry;
             ListenerToken bundleListenerToken;
             std::shared_ptr<SCRAsyncWorkService> asyncWorkService;
             cppmicroservices::ServiceRegistration<cppmicroservices::service::cm::ConfigurationListener>

@@ -1,4 +1,4 @@
-/*=============================================================================
+ /*=============================================================================
 
   Library: CppMicroServices
 
@@ -29,6 +29,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_set>
 
 namespace cppmicroservices
 {
@@ -51,6 +52,12 @@ namespace cppmicroservices
 
         void Clear_unlocked();
 
+        AnyMap const&
+        GetPropsAnyMap() const
+        {
+            return props;
+        }
+
       private:
         // An AnyMap is used to store the properties rather than 2 vectors (one for keys
         // and the other for values) as previously done in the past. This reduces the number of
@@ -60,14 +67,13 @@ namespace cppmicroservices
         // A case-insensitive map which maps all-lowercased keys to the original key values. This
         // allows for efficient case-insensitive lookups in map types that are not inherently
         // case insensitive.
-        std::unordered_map<std::string, std::string_view, detail::any_map_cihash, detail::any_map_ciequal>
-            caseInsensitiveLookup;
+        mutable std::unordered_set<std::string, detail::any_map_cihash, detail::any_map_ciequal> caseInsensitiveLookup;
 
         static const Any emptyAny;
 
         // Helper that populates the case-insensitive lookup map when the provided AnyMap is not
         // already case insensitive.
-        void PopulateCaseInsensitiveLookupMap();
+        void PopulateCaseInsensitiveLookupMap() const;
     };
 
     class PropertiesHandle

@@ -120,6 +120,8 @@ namespace cppmicroservices
       private:
         InterfaceMapConstPtr GetServiceFromFactory(BundlePrivate* bundle,
                                                    std::shared_ptr<ServiceFactory> const& factory);
+
+        std::shared_ptr<void> GetService_unlocked(std::string const& interfaceId) const;
     };
 } // namespace cppmicroservices
 

@@ -46,9 +46,9 @@ namespace cppmicroservices
     ServiceReferenceBasePrivate::ServiceReferenceBasePrivate(std::weak_ptr<ServiceRegistrationBasePrivate> reg)
         : registration(reg)
     {
-        if (!reg.expired())
+        if (auto reg = registration.lock(); reg)
         {
-            coreInfo = registration.lock()->coreInfo;
+            coreInfo = reg->coreInfo;
         }
     }
 
@@ -142,12 +142,13 @@ namespace cppmicroservices
     {
         InterfaceMapConstPtr s;
         {
-            if (coreInfo->available)
+            auto reg = registration.lock();
+            if (coreInfo->available && reg)
             {
                 auto factory = std::static_pointer_cast<ServiceFactory>(
-                    registration.lock()->GetService("org.cppmicroservices.factory"));
+                    reg->GetService("org.cppmicroservices.factory"));
                 s = GetServiceFromFactory(GetPrivate(bundle).get(), factory);
-                registration.lock()->Lock(), coreInfo->Lock(),
+                reg->Lock(), coreInfo->Lock(),
                     coreInfo->prototypeServiceInstances[GetPrivate(bundle).get()].push_back(s);
             }
         }
@@ -198,14 +199,12 @@ namespace cppmicroservices
         US_UNUSED(unmark);
 
         {
-            auto l = registration.lock()->Lock();
-            US_UNUSED(l);
             auto l1 = coreInfo->Lock();
             US_UNUSED(l1);
             if (!coreInfo->available)
                 return s;
             serviceFactory = std::static_pointer_cast<ServiceFactory>(
-                registration.lock()->GetService_unlocked("org.cppmicroservices.factory"));
+                GetService_unlocked("org.cppmicroservices.factory"));
 
             auto res = coreInfo->dependents.insert(std::make_pair(bundle, 0));
             auto& depCounter = res.first->second;
@@ -258,8 +257,6 @@ namespace cppmicroservices
         // possibility of infinite recursion.
 
         {
-            auto l = registration.lock()->Lock();
-            US_UNUSED(l);
             auto l1 = coreInfo->Lock();
             US_UNUSED(l1);
 
@@ -273,8 +270,6 @@ namespace cppmicroservices
         s = GetServiceFromFactory(bundle, serviceFactory);
 
         {
-            auto l = registration.lock()->Lock();
-            US_UNUSED(l);
             auto l1 = coreInfo->Lock();
             US_UNUSED(l1);
 
@@ -301,8 +296,6 @@ namespace cppmicroservices
         std::shared_ptr<ServiceFactory> sf;
 
         {
-            auto l = registration.lock()->Lock();
-            US_UNUSED(l);
             auto l1 = coreInfo->Lock();
             US_UNUSED(l1);
             auto iter = coreInfo->prototypeServiceInstances.find(bundle.get());
@@ -313,7 +306,7 @@ namespace cppmicroservices
 
             prototypeServiceMaps = iter->second;
             sf = std::static_pointer_cast<ServiceFactory>(
-                registration.lock()->GetService_unlocked("org.cppmicroservices.factory"));
+                GetService_unlocked("org.cppmicroservices.factory"));
         }
 
         if (!sf)
@@ -326,7 +319,11 @@ namespace cppmicroservices
             {
                 try
                 {
-                    sf->UngetService(MakeBundle(bundle), ServiceRegistrationBase(registration.lock()), service);
+                    if (auto reg = registration.lock(); reg){
+                        sf->UngetService(MakeBundle(bundle), ServiceRegistrationBase(registration.lock()), service);
+                    } else {
+                        sf->UngetService(MakeBundle(bundle), ServiceRegistrationBase(nullptr), service);
+                    }
                 }
                 catch (std::exception const& ex)
                 {
@@ -342,8 +339,6 @@ namespace cppmicroservices
                     }
                 }
 
-                auto l = registration.lock()->Lock();
-                US_UNUSED(l);
                 auto l1 = coreInfo->Lock();
                 US_UNUSED(l1);
                 auto iter = coreInfo->prototypeServiceInstances.find(bundle.get());
@@ -373,8 +368,6 @@ namespace cppmicroservices
         std::shared_ptr<ServiceFactory> sf;
 
         {
-            auto l = registration.lock()->Lock();
-            US_UNUSED(l);
             auto l1 = coreInfo->Lock();
             US_UNUSED(l1);
             auto depIter = coreInfo->dependents.find(bundle.get());
@@ -416,7 +409,7 @@ namespace cppmicroservices
                 if (sfi && !sfi->empty())
                 {
                     sf = std::static_pointer_cast<ServiceFactory>(
-                        registration.lock()->GetService_unlocked("org.cppmicroservices.factory"));
+                        GetService_unlocked("org.cppmicroservices.factory"));
                 }
                 coreInfo->bundleServiceInstance.erase(bundle.get());
                 coreInfo->dependents.erase(bundle.get());
@@ -427,7 +420,11 @@ namespace cppmicroservices
         {
             try
             {
-                sf->UngetService(MakeBundle(bundle), ServiceRegistrationBase(registration.lock()), sfi);
+                if (auto reg = registration.lock(); reg){
+                    sf->UngetService(MakeBundle(bundle), ServiceRegistrationBase(registration.lock()), sfi);
+                } else {
+                    sf->UngetService(MakeBundle(bundle), ServiceRegistrationBase(nullptr), sfi);
+                }
             }
             catch (std::exception const& ex)
             {
@@ -456,14 +453,19 @@ namespace cppmicroservices
     bool
     ServiceReferenceBasePrivate::IsConvertibleTo(std::string const& interfaceId) const
     {
-        if (registration.lock())
+        if (auto reg = registration.lock(); reg)
         {
-            auto l = registration.lock()->Lock();
+            auto l = reg->Lock();
             US_UNUSED(l);
             auto l1 = coreInfo->Lock();
             US_UNUSED(l1);
             return coreInfo->service ? coreInfo->service->find(interfaceId) != coreInfo->service->end() : false;
         }
         return false;
+    }
+
+    std::shared_ptr<void> 
+    ServiceReferenceBasePrivate::GetService_unlocked(std::string const& interfaceId) const{
+        return ExtractInterface(coreInfo->service, interfaceId);
     }
 } // namespace cppmicroservices

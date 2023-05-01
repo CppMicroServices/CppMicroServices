@@ -89,12 +89,13 @@ namespace cppmicroservices
     ServiceReferenceBase::GetBundle() const
     {
         auto p = std::atomic_load(&d);
-        if (p->registration.expired())
+        auto reg = p->registration.lock();
+        if (!reg)
         {
             return Bundle();
         }
 
-        auto l = p->registration.lock()->Lock();
+        auto l = reg->Lock();
         US_UNUSED(l);
         auto l1 = p->coreInfo->Lock();
         US_UNUSED(l1);

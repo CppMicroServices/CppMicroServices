@@ -62,10 +62,10 @@ namespace cppmicroservices
                                    const ConfigurationEventType type,
                                    const std::string factoryPid,
                                    const std::string pid)
-                    : configAdmin(std::move(configAdmin))
+                    : configAdmin(configAdmin)
                     , type(type)
-                    , factoryPid(std::move(factoryPid))
-                    , pid(std::move(pid))
+                    , factoryPid(factoryPid)
+                    , pid(pid)
                 {
                 }
 

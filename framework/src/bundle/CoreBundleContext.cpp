@@ -239,7 +239,6 @@ namespace cppmicroservices
         listeners.Clear();
         resolver.Clear();
 
-        dataStorage.clear();
         storage->Close();
     }
 

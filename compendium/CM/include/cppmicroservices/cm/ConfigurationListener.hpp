@@ -58,14 +58,14 @@ namespace cppmicroservices
             class ConfigurationEvent
             {
               public:
-                ConfigurationEvent(ServiceReference<ConfigurationAdmin> const configAdmin,
+                ConfigurationEvent(ServiceReference<ConfigurationAdmin> configAdmin,
                                    const ConfigurationEventType type,
-                                   const std::string factoryPid,
-                                   const std::string pid)
-                    : configAdmin(configAdmin)
+                                   std::string factoryPid,
+                                   std::string pid)
+                    : configAdmin(std::move(configAdmin))
                     , type(type)
-                    , factoryPid(factoryPid)
-                    , pid(pid)
+                    , factoryPid(std::move(factoryPid))
+                    , pid(std::move(pid))
                 {
                 }
 

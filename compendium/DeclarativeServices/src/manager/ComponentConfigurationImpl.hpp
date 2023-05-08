@@ -56,7 +56,7 @@ namespace cppmicroservices
         {
             ListenerToken(std::string pid, const ListenerTokenId tokenId)
                 : pid(std::move(pid))
-                , tokenId(std::move(tokenId))
+                , tokenId(tokenId)
             {
             }
             std::string pid;

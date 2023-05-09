@@ -61,11 +61,11 @@ namespace cppmicroservices
             if (isPrototypeScope)
             {
                 result
-                    = std::atomic_load(&m_reference.d)->GetPrototypeService(MakeBundleContext(m_context).GetBundle());
+                    = atomic_load_tSafe(m_reference.d)->GetPrototypeService(MakeBundleContext(m_context).GetBundle());
             }
             else
             {
-                result = std::atomic_load(&m_reference.d)
+                result = atomic_load_tSafe(m_reference.d)
                              ->GetServiceInterfaceMap(GetPrivate(MakeBundleContext(m_context).GetBundle()).get());
             }
 
@@ -116,11 +116,11 @@ namespace cppmicroservices
 
                     if (isPrototypeScope)
                     {
-                        std::atomic_load(&sref.d)->UngetPrototypeService(bundle, interfaceMap);
+                        atomic_load_tSafe(sref.d)->UngetPrototypeService(bundle, interfaceMap);
                     }
                     else
                     {
-                        std::atomic_load(&sref.d)->UngetService(bundle, true);
+                        atomic_load_tSafe(sref.d)->UngetService(bundle, true);
                     }
                 }
             }

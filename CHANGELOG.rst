@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-`(UNRELEASED) v3.7.6 <https://github.com/CppMicroServices/CppMicroServices/pull/845>`_ (2023-05-05)
+`(UNRELEASED) vX.X.X <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (20XX-XX-XX)
 ---------------------------------------------------------------------------------------------------------
 
 `Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.6...development>`_
@@ -25,6 +25,7 @@ Deprecated
 
 Fixed
 -----
+- `[Core Framework] Data Race Condition fix for Bundles dataStorage location <https://github.com/CppMicroServices/CppMicroServices/pull/845>`_
 
 `v3.7.6 <https://github.com/cppmicroservices/cppmicroservices/tree/3.7.6>`_ (2023-04-25)
 ---------------------------------------------------------------------------------------------------------

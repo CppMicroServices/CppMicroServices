@@ -31,6 +31,7 @@
 #include "ServiceListenerEntry.h"
 #include "ServiceRegistrationBasePrivate.h"
 #include "ServiceRegistry.h"
+#include "LockSet.h"
 
 #include <stdexcept>
 
@@ -78,7 +79,7 @@ namespace cppmicroservices
         if (!d->coreInfo->available)
             throw std::logic_error("Service is unregistered");
 
-        auto l = d->Lock();
+        auto l = GetLocks();
         US_UNUSED(l);
         ServiceReferenceBase ref = d->reference;
         ref.SetInterfaceId(interfaceId);
@@ -111,7 +112,7 @@ namespace cppmicroservices
         }
 
         {
-            auto l = d->Lock();
+            auto l = GetLocks();
             US_UNUSED(l);
             if (!d->coreInfo->available)
                 throw std::logic_error("Service is unregistered");
@@ -129,7 +130,7 @@ namespace cppmicroservices
         int new_rank = 0;
         Any objectClasses;
         {
-            auto l = d->Lock();
+            auto l = GetLocks();
             US_UNUSED(l);
             if (!d->coreInfo->available)
             {
@@ -236,7 +237,7 @@ namespace cppmicroservices
         ServiceRegistrationBasePrivate::BundleToServiceMap bundleServiceInstance;
 
         {
-            auto l = d->Lock();
+            auto l = GetLocks();
             US_UNUSED(l);
             d->coreInfo->available = false;
             auto factoryIter = d->coreInfo->service->find("org.cppmicroservices.factory");
@@ -305,7 +306,7 @@ namespace cppmicroservices
         }
 
         {
-            auto l = d->Lock();
+            auto l = GetLocks();
             US_UNUSED(l);
 
             d->coreInfo->bundle.reset();
@@ -318,6 +319,11 @@ namespace cppmicroservices
             d->coreInfo->unregistering = false;
         }
     }
+
+    std::shared_ptr<LockSet> ServiceRegistrationBase::GetLocks() const{
+        return std::make_shared<LockSet>(d, d->coreInfo);
+    }
+
 
     bool
     ServiceRegistrationBase::operator<(ServiceRegistrationBase const& o) const
@@ -333,8 +339,8 @@ namespace cppmicroservices
         ServiceReferenceBase sr1;
         ServiceReferenceBase sr2;
         {
-            d->Lock(), sr1 = d->reference;
-            o.d->Lock(), sr2 = o.d->reference;
+            GetLocks(), sr1 = d->reference;
+            o.GetLocks(), sr2 = o.d->reference;
         }
         return sr1 < sr2;
     }

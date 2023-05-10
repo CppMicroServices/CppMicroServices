@@ -27,6 +27,7 @@
 #include "cppmicroservices/ServiceInterface.h"
 
 #include "Properties.h"
+#include "LockSet.h"
 
 #include <atomic>
 #include <string>
@@ -53,6 +54,8 @@ namespace cppmicroservices
         ServiceReferenceBasePrivate(std::weak_ptr<ServiceRegistrationBasePrivate> reg);
 
         ~ServiceReferenceBasePrivate();
+        
+        std::shared_ptr<LockSet> GetLocks() const;
 
         /**
          * Get the service object.

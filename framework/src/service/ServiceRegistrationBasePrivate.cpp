@@ -54,6 +54,8 @@ namespace cppmicroservices
     {
         auto l = this->Lock();
         US_UNUSED(l);
+        auto l1 = coreInfo->Lock();
+        US_UNUSED(l1);
         return (coreInfo->dependents.find(bundle) != coreInfo->dependents.end())
                || (coreInfo->prototypeServiceInstances.find(bundle) != coreInfo->prototypeServiceInstances.end());
     }
@@ -61,13 +63,13 @@ namespace cppmicroservices
     InterfaceMapConstPtr
     ServiceRegistrationBasePrivate::GetInterfaces() const
     {
-        return (this->Lock(), coreInfo->service);
+        return (this->Lock(), coreInfo->Lock(), coreInfo->service);
     }
 
     std::shared_ptr<void>
     ServiceRegistrationBasePrivate::GetService(std::string const& interfaceId) const
     {
-        return this->Lock(), GetService_unlocked(interfaceId);
+        return this->Lock(), coreInfo->Lock(), GetService_unlocked(interfaceId);
     }
 
     std::shared_ptr<void>

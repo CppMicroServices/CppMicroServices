@@ -29,6 +29,7 @@
 #include "Utils.h"
 #include "ServiceReferenceBasePrivate.h"
 #include "ServiceRegistrationBasePrivate.h"
+#include "LockSet.h"
 #include <cassert>
 
 namespace cppmicroservices
@@ -96,10 +97,8 @@ namespace cppmicroservices
             return Bundle();
         }
 
-        auto l = reg->Lock();
+        auto l = p->GetLocks();
         US_UNUSED(l);
-        auto l1 = p->coreInfo->Lock();
-        US_UNUSED(l1);
         if (p->coreInfo->bundle.lock() == nullptr)
         {
             return Bundle();
@@ -111,7 +110,7 @@ namespace cppmicroservices
     ServiceReferenceBase::GetUsingBundles() const
     {
         std::vector<Bundle> bundles;
-        auto l = atomic_load_tSafe(d)->coreInfo->Lock();
+        auto l = atomic_load_tSafe(d)->GetLocks();
         US_UNUSED(l);
         for (auto const& iter : atomic_load_tSafe(d)->coreInfo->dependents)
         {

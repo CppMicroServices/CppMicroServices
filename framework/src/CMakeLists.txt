@@ -35,6 +35,7 @@ set(_srcs
   service/ServiceRegistrationBase.cpp
   service/ServiceRegistrationBasePrivate.cpp
   service/ServiceRegistrationCoreInfo.cpp
+  service/LockSet.cpp
   service/ServiceRegistry.cpp
 
   bundle/Bundle.cpp
@@ -76,6 +77,7 @@ set(_private_headers
   service/ServiceReferenceBasePrivate.h
   service/ServiceRegistrationBasePrivate.h
   service/ServiceRegistrationCoreInfo.h
+  service/LockSet.h
   service/ServiceRegistry.h
 
   bundle/BundleArchive.h

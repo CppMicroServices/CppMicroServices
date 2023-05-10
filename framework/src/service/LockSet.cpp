@@ -35,8 +35,8 @@ namespace cppmicroservices
         coreInfoL = coreInfo->Lock();
     }
 #else
-    LockSet::LockSet(std::shared_ptr<ServiceRegistrationBasePrivate> reg,
-                     std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo)
+    LockSet::LockSet(std::shared_ptr<ServiceRegistrationBasePrivate>,
+                     std::shared_ptr<ServiceRegistrationCoreInfo>)
     {
     }
 #endif

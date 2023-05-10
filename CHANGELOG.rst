@@ -25,6 +25,7 @@ Deprecated
 
 Fixed
 -----
+- `[Core Framework] Data Race Condition fix for Bundles dataStorage location <https://github.com/CppMicroServices/CppMicroServices/pull/845>`_
 
 `v3.7.6 <https://github.com/cppmicroservices/cppmicroservices/tree/3.7.6>`_ (2023-04-25)
 ---------------------------------------------------------------------------------------------------------

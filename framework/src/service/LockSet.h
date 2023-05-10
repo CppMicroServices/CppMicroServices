@@ -33,8 +33,10 @@ namespace cppmicroservices
             
             ~LockSet();
         private:
+#ifdef US_ENABLE_THREADING_SUPPORT
             cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock coreInfoL;
             cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock regL;
+#endif
     };
 } // namespace cppmicroservices
 

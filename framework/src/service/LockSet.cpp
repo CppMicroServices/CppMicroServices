@@ -24,14 +24,21 @@
 namespace cppmicroservices
 {
 
+#ifdef US_ENABLE_THREADING_SUPPORT
     LockSet::LockSet(std::shared_ptr<ServiceRegistrationBasePrivate> reg,
                      std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo)
     {
-        if (reg != nullptr){
+        if (reg != nullptr)
+        {
             regL = reg->Lock();
         }
         coreInfoL = coreInfo->Lock();
     }
+#else
+    LockSet::LockSet(std::shared_ptr<ServiceRegistrationBasePrivate> reg,
+                     std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo)
+        = default;
+#endif
 
     LockSet::~LockSet() = default;
 } // namespace cppmicroservices

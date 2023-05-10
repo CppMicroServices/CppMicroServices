@@ -37,7 +37,8 @@ namespace cppmicroservices
 #else
     LockSet::LockSet(std::shared_ptr<ServiceRegistrationBasePrivate> reg,
                      std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo)
-        = default;
+    {
+    }
 #endif
 
     LockSet::~LockSet() = default;

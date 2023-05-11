@@ -200,7 +200,7 @@ namespace cppmicroservices
         if (d.Load() == reference.d.Load())
             return *this;
 
-        d = reference.d;
+        d.Exchange(reference.d.Load());
 
         return *this;
     }

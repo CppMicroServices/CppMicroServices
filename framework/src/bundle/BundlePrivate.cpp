@@ -824,7 +824,7 @@ namespace cppmicroservices
         for (std::vector<ServiceRegistrationBase>::const_iterator i = srs.begin(); i != srs.end(); ++i)
         {
             auto ref = i->GetReference(std::string());
-            atomic_load_tSafe(ref.d)->UngetService(this->shared_from_this(), false);
+            ref.d.Load()->UngetService(this->shared_from_this(), false);
         }
     }
 

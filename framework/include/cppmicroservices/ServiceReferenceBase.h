@@ -25,6 +25,7 @@
 
 #include "cppmicroservices/Any.h"
 #include <functional>
+#include "cppmicroservices/detail/Threads.h"
 
 #include <atomic>
 #include <memory>
@@ -239,9 +240,9 @@ namespace cppmicroservices
         // This class is not thread-safe, but we support thread-safe
         // copying and assignment
         // This was changed to a std::shared_ptr and is accessed through
-        // atomic_load_tSafe, but when this repository uses c++20,
+        // Load(), but when this repository uses c++20,
         // this will be changed to std::atomic<shared_ptr>
-        std::shared_ptr<ServiceReferenceBasePrivate> d;
+        cppmicroservices::detail::Atomic<std::shared_ptr<ServiceReferenceBasePrivate>> d;
     };
 
     /**

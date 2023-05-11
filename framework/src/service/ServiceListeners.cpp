@@ -460,7 +460,7 @@ namespace cppmicroservices
         // Get a copy of the service reference and keep it until we are
         // done with its properties.
         auto ref = evt.GetServiceReference();
-        auto props = atomic_load_tSafe(ref.d)->GetProperties();
+        auto props = ref.d.Load()->GetProperties();
 
         {
             auto l = this->Lock();

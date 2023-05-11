@@ -274,7 +274,7 @@ namespace cppmicroservices
         {
             try
             {
-                atomic_load_tSafe(sref.d)->UngetService(b.lock(), true);
+                sref.d.Load()->UngetService(b.lock(), true);
             }
             catch (...)
             {
@@ -311,7 +311,7 @@ namespace cppmicroservices
         auto b = GetAndCheckBundlePrivate(d);
 
         std::shared_ptr<ServiceHolder<void>> h(
-            new ServiceHolder<void>(b, reference, atomic_load_tSafe(reference.d)->GetService(b.get())));
+            new ServiceHolder<void>(b, reference, reference.d.Load()->GetService(b.get())));
         return std::shared_ptr<void>(h, h->service.get());
     }
 
@@ -332,7 +332,7 @@ namespace cppmicroservices
         d->CheckValid();
         auto b = GetAndCheckBundlePrivate(d);
 
-        auto serviceInterfaceMap = atomic_load_tSafe(reference.d)->GetServiceInterfaceMap(b.get());
+        auto serviceInterfaceMap = reference.d.Load()->GetServiceInterfaceMap(b.get());
         std::shared_ptr<ServiceHolder<InterfaceMap const>> h(
             new ServiceHolder<InterfaceMap const>(b, reference, serviceInterfaceMap));
         return InterfaceMapConstPtr(h, h->service.get());

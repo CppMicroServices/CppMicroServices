@@ -14,30 +14,36 @@
   limitations under the License.
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_LOCKSET_H
-#define CPPMICROSERVICES_LOCKSET_H
+#include "RegistrationLocks.h"
 
-#include "ServiceRegistrationBasePrivate.h"
-#include "ServiceRegistrationCoreInfo.h"
+#ifdef _MSC_VER
+#    pragma warning(push)
+#    pragma warning(disable : 4355)
+#endif
 
 namespace cppmicroservices
 {
 
-    /**
-     * \ingroup MicroServices
-     */
-    class LockSet
-    {
-        public:
-            LockSet(std::shared_ptr<ServiceRegistrationBasePrivate> reg, std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo);
-            
-            ~LockSet();
-        private:
 #ifdef US_ENABLE_THREADING_SUPPORT
-            cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock coreInfoL;
-            cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock regL;
+    RegistrationLocks::RegistrationLocks(std::shared_ptr<ServiceRegistrationBasePrivate> reg,
+                     std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo)
+    {
+        if (reg != nullptr)
+        {
+            regL = reg->Lock();
+        }
+        coreInfoL = coreInfo->Lock();
+    }
+#else
+    RegistrationLocks::RegistrationLocks(std::shared_ptr<ServiceRegistrationBasePrivate>,
+                     std::shared_ptr<ServiceRegistrationCoreInfo>)
+    {
+    }
 #endif
-    };
+
+    RegistrationLocks::~RegistrationLocks() = default;
 } // namespace cppmicroservices
 
-#endif // CPPMICROSERVICES_LOCKSET_H
+#ifdef _MSC_VER
+#    pragma warning(pop)
+#endif

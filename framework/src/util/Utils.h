@@ -81,16 +81,6 @@ namespace cppmicroservices
 
     void TerminateForDebug(const std::exception_ptr ex);
 
-    template <typename T>
-    std::shared_ptr<T> atomic_load_tSafe(std::shared_ptr<T> ptr)
-    {
-#ifdef US_ENABLE_THREADING_SUPPORT
-        return std::atomic_load(&ptr);
-#else
-        return ptr;
-#endif
-    }
-
     namespace detail
     {
         US_Framework_EXPORT std::string GetDemangledName(std::type_info const& typeInfo);

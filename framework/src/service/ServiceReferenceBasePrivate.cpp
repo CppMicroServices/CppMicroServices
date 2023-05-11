@@ -54,10 +54,10 @@ namespace cppmicroservices
 
     ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate() {}
 
-    std::shared_ptr<LockSet>
-    ServiceReferenceBasePrivate::GetLocks() const
+    std::shared_ptr<RegistrationLocks>
+    ServiceReferenceBasePrivate::LockRegistration() const
     {
-        return std::make_shared<LockSet>(registration.lock(), coreInfo);
+        return std::make_shared<RegistrationLocks>(registration.lock(), coreInfo);
     }
 
     InterfaceMapConstPtr
@@ -154,7 +154,7 @@ namespace cppmicroservices
                 auto factory
                     = std::static_pointer_cast<ServiceFactory>(reg->GetService("org.cppmicroservices.factory"));
                 s = GetServiceFromFactory(GetPrivate(bundle).get(), factory);
-                GetLocks(), coreInfo->prototypeServiceInstances[GetPrivate(bundle).get()].push_back(s);
+                LockRegistration(), coreInfo->prototypeServiceInstances[GetPrivate(bundle).get()].push_back(s);
             }
         }
         return s;
@@ -207,7 +207,7 @@ namespace cppmicroservices
             auto reg = registration.lock();
             if (!reg)
                 return s;
-            auto l = GetLocks();
+            auto l = LockRegistration();
             US_UNUSED(l);
             if (!coreInfo->available)
                 return s;
@@ -265,7 +265,7 @@ namespace cppmicroservices
         // possibility of infinite recursion.
 
         {
-            auto l = GetLocks();
+            auto l = LockRegistration();
             US_UNUSED(l);
 
             if (coreInfo->bundleServiceInstance.end() != coreInfo->bundleServiceInstance.find(bundle))
@@ -278,7 +278,7 @@ namespace cppmicroservices
         s = GetServiceFromFactory(bundle, serviceFactory);
 
         {
-            auto l = GetLocks();
+            auto l = LockRegistration();
             US_UNUSED(l);
 
             coreInfo->dependents.insert(std::make_pair(bundle, 0));
@@ -305,7 +305,7 @@ namespace cppmicroservices
 
         {
             auto reg = registration.lock();
-            auto l = GetLocks();
+            auto l = LockRegistration();
             US_UNUSED(l);
             auto iter = coreInfo->prototypeServiceInstances.find(bundle.get());
             if (iter == coreInfo->prototypeServiceInstances.end())
@@ -343,7 +343,7 @@ namespace cppmicroservices
                     }
                 }
 
-                auto l = GetLocks();
+                auto l = LockRegistration();
                 US_UNUSED(l);
                 auto iter = coreInfo->prototypeServiceInstances.find(bundle.get());
                 if (iter == coreInfo->prototypeServiceInstances.end())
@@ -373,7 +373,7 @@ namespace cppmicroservices
 
         {
             auto reg = registration.lock();
-            auto l = GetLocks();
+            auto l = LockRegistration();
             US_UNUSED(l);
             auto depIter = coreInfo->dependents.find(bundle.get());
             if (coreInfo->dependents.end() == depIter)
@@ -460,7 +460,7 @@ namespace cppmicroservices
     {
         if (auto reg = registration.lock(); reg)
         {
-            auto l = GetLocks();
+            auto l = LockRegistration();
             US_UNUSED(l);
             return coreInfo->service ? coreInfo->service->find(interfaceId) != coreInfo->service->end() : false;
         }

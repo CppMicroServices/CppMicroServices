@@ -26,32 +26,32 @@
 #include "cppmicroservices/Constants.h"
 
 #include "BundlePrivate.h"
-#include "Utils.h"
+#include "RegistrationLocks.h"
 #include "ServiceReferenceBasePrivate.h"
 #include "ServiceRegistrationBasePrivate.h"
-#include "LockSet.h"
+#include "Utils.h"
 #include <cassert>
 
 namespace cppmicroservices
 {
 
     ServiceReferenceBase::ServiceReferenceBase()
-        : d(std::make_shared<ServiceReferenceBasePrivate>(std::weak_ptr<ServiceRegistrationBasePrivate>()))
     {
+        d.Exchange(std::make_shared<ServiceReferenceBasePrivate>(std::weak_ptr<ServiceRegistrationBasePrivate>()));
     }
 
-    ServiceReferenceBase::ServiceReferenceBase(ServiceReferenceBase const& ref) : d(atomic_load_tSafe(ref.d)) {}
+    ServiceReferenceBase::ServiceReferenceBase(ServiceReferenceBase const& ref) { d.Exchange(ref.d.Load()); }
 
     ServiceReferenceBase::ServiceReferenceBase(std::shared_ptr<ServiceRegistrationBasePrivate> reg)
-        : d(std::make_shared<ServiceReferenceBasePrivate>(reg))
     {
+        d.Exchange(std::make_shared<ServiceReferenceBasePrivate>(reg));
     }
 
     void
     ServiceReferenceBase::SetInterfaceId(std::string const& interfaceId)
     {
-        d = std::make_shared<ServiceReferenceBasePrivate>(atomic_load_tSafe(d)->registration);
-        atomic_load_tSafe(d)->interfaceId = interfaceId;
+        d.Exchange(std::make_shared<ServiceReferenceBasePrivate>(d.Load()->registration));
+        d.Load()->interfaceId = interfaceId;
     }
 
     ServiceReferenceBase::operator bool() const { return static_cast<bool>(GetBundle()); }
@@ -59,7 +59,7 @@ namespace cppmicroservices
     ServiceReferenceBase&
     ServiceReferenceBase::operator=(std::nullptr_t)
     {
-        d = std::make_shared<ServiceReferenceBasePrivate>(std::weak_ptr<ServiceRegistrationBasePrivate>());
+        d.Exchange(std::make_shared<ServiceReferenceBasePrivate>(std::weak_ptr<ServiceRegistrationBasePrivate>()));
         return *this;
     }
 
@@ -68,9 +68,9 @@ namespace cppmicroservices
     Any
     ServiceReferenceBase::GetProperty(std::string const& key) const
     {
-        auto l = atomic_load_tSafe(d)->coreInfo->properties.Lock();
+        auto l = d.Load()->coreInfo->properties.Lock();
         US_UNUSED(l);
-        return atomic_load_tSafe(d)->coreInfo->properties.Value_unlocked(key).first;
+        return d.Load()->coreInfo->properties.Value_unlocked(key).first;
     }
 
     void
@@ -82,22 +82,22 @@ namespace cppmicroservices
     std::vector<std::string>
     ServiceReferenceBase::GetPropertyKeys() const
     {
-        auto l = atomic_load_tSafe(d)->coreInfo->properties.Lock();
+        auto l = d.Load()->coreInfo->properties.Lock();
         US_UNUSED(l);
-        return atomic_load_tSafe(d)->coreInfo->properties.Keys_unlocked();
+        return d.Load()->coreInfo->properties.Keys_unlocked();
     }
 
     Bundle
     ServiceReferenceBase::GetBundle() const
     {
-        auto p = atomic_load_tSafe(d);
+        auto p = d.Load();
         auto reg = p->registration.lock();
         if (!reg)
         {
             return Bundle();
         }
 
-        auto l = p->GetLocks();
+        auto l = p->LockRegistration();
         US_UNUSED(l);
         if (p->coreInfo->bundle.lock() == nullptr)
         {
@@ -110,9 +110,9 @@ namespace cppmicroservices
     ServiceReferenceBase::GetUsingBundles() const
     {
         std::vector<Bundle> bundles;
-        auto l = atomic_load_tSafe(d)->GetLocks();
+        auto l = d.Load()->LockRegistration();
         US_UNUSED(l);
-        for (auto const& iter : atomic_load_tSafe(d)->coreInfo->dependents)
+        for (auto const& iter : d.Load()->coreInfo->dependents)
         {
             bundles.push_back(MakeBundle(iter.first->shared_from_this()));
         }
@@ -122,7 +122,7 @@ namespace cppmicroservices
     bool
     ServiceReferenceBase::operator<(ServiceReferenceBase const& reference) const
     {
-        if (atomic_load_tSafe(d) == atomic_load_tSafe(reference.d))
+        if (d.Load() == reference.d.Load())
         {
             return false;
         }
@@ -137,7 +137,7 @@ namespace cppmicroservices
             return false;
         }
 
-        if (atomic_load_tSafe(d)->registration.lock() == atomic_load_tSafe(reference.d)->registration.lock())
+        if (d.Load()->registration.lock() == reference.d.Load()->registration.lock())
         {
             return false;
         }
@@ -150,23 +150,22 @@ namespace cppmicroservices
         Any anyR1;
         Any anyId1;
         {
-            auto l1 = atomic_load_tSafe(d)->coreInfo->properties.Lock();
+            auto l1 = d.Load()->coreInfo->properties.Lock();
             US_UNUSED(l1);
-            anyR1 = atomic_load_tSafe(d)->coreInfo->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
+            anyR1 = d.Load()->coreInfo->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             assert(anyR1.Empty() || anyR1.Type() == typeid(int));
-            anyId1 = atomic_load_tSafe(d)->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first;
+            anyId1 = d.Load()->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first;
             assert(anyId1.Empty() || anyId1.Type() == typeid(long int));
         }
 
         Any anyR2;
         Any anyId2;
         {
-            auto l2 = atomic_load_tSafe(reference.d)->coreInfo->properties.Lock();
+            auto l2 = reference.d.Load()->coreInfo->properties.Lock();
             US_UNUSED(l2);
-            anyR2
-                = atomic_load_tSafe(reference.d)->coreInfo->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
+            anyR2 = reference.d.Load()->coreInfo->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             assert(anyR2.Empty() || anyR2.Type() == typeid(int));
-            anyId2 = atomic_load_tSafe(reference.d)->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first;
+            anyId2 = reference.d.Load()->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first;
             assert(anyId2.Empty() || anyId2.Type() == typeid(long int));
         }
 
@@ -192,13 +191,13 @@ namespace cppmicroservices
     bool
     ServiceReferenceBase::operator==(ServiceReferenceBase const& reference) const
     {
-        return atomic_load_tSafe(d)->registration.lock() == atomic_load_tSafe(reference.d)->registration.lock();
+        return d.Load()->registration.lock() == reference.d.Load()->registration.lock();
     }
 
     ServiceReferenceBase&
     ServiceReferenceBase::operator=(ServiceReferenceBase const& reference)
     {
-        if (d == atomic_load_tSafe(reference.d))
+        if (d.Load() == reference.d.Load())
             return *this;
 
         d = reference.d;
@@ -209,20 +208,19 @@ namespace cppmicroservices
     bool
     ServiceReferenceBase::IsConvertibleTo(std::string const& interfaceId) const
     {
-        return atomic_load_tSafe(d)->IsConvertibleTo(interfaceId);
+        return d.Load()->IsConvertibleTo(interfaceId);
     }
 
     std::string
     ServiceReferenceBase::GetInterfaceId() const
     {
-        return atomic_load_tSafe(d)->interfaceId;
+        return d.Load()->interfaceId;
     }
 
     std::size_t
     ServiceReferenceBase::Hash() const
     {
-        return std::hash<std::shared_ptr<ServiceRegistrationBasePrivate>>()(
-            atomic_load_tSafe(this->d)->registration.lock());
+        return std::hash<std::shared_ptr<ServiceRegistrationBasePrivate>>()(this->d.Load()->registration.lock());
     }
 
     std::ostream&

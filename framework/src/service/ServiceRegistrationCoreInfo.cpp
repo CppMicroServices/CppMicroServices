@@ -30,18 +30,16 @@
 namespace cppmicroservices
 {
 
-    ServiceRegistrationCoreInfo::ServiceRegistrationCoreInfo(BundlePrivate* bundle_,
+    ServiceRegistrationCoreInfo::ServiceRegistrationCoreInfo(BundlePrivate* bundle,
                                                              InterfaceMapConstPtr service,
                                                              Properties&& props)
         : service(std::move(service))
-        , bundle(bundle_->shared_from_this())
+        , bundle_(bundle->shared_from_this())
         , properties(std::move(props))
         , available(true)
         , unregistering(false)
     {
     }
-
-    ServiceRegistrationCoreInfo::~ServiceRegistrationCoreInfo() = default;
 } // namespace cppmicroservices
 
 #ifdef _MSC_VER

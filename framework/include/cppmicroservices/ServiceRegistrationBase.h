@@ -30,7 +30,7 @@
 namespace cppmicroservices
 {
 
-    class RegistrationLocks;
+    class ServiceRegistrationLocks;
     class BundlePrivate;
     class ServiceRegistrationBasePrivate;
     class Properties;
@@ -201,7 +201,7 @@ namespace cppmicroservices
 
         ServiceRegistrationBase(BundlePrivate* bundle, InterfaceMapConstPtr const& service, Properties&& props);
 
-        std::shared_ptr<RegistrationLocks> LockRegistration() const;
+        std::shared_ptr<ServiceRegistrationLocks> LockServiceRegistration() const;
 
         std::shared_ptr<ServiceRegistrationBasePrivate> d;
     };

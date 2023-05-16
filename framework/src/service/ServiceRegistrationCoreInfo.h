@@ -42,8 +42,8 @@ namespace cppmicroservices
     {
 
       public:
-        ServiceRegistrationCoreInfo(BundlePrivate* bundle_, InterfaceMapConstPtr service, Properties&& props);
-        ~ServiceRegistrationCoreInfo();
+        ServiceRegistrationCoreInfo(BundlePrivate* bundle, InterfaceMapConstPtr service, Properties&& props);
+        ~ServiceRegistrationCoreInfo() = default;
 
         ServiceRegistrationCoreInfo(ServiceRegistrationCoreInfo const&) = delete;
         ServiceRegistrationCoreInfo& operator=(ServiceRegistrationCoreInfo const&) = delete;
@@ -75,7 +75,7 @@ namespace cppmicroservices
         /**
          * Bundle registering this service.
          */
-        std::weak_ptr<BundlePrivate> bundle;
+        std::weak_ptr<BundlePrivate> bundle_;
 
         /**
          * Service properties.

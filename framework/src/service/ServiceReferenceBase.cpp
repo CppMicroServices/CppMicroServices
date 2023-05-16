@@ -26,7 +26,7 @@
 #include "cppmicroservices/Constants.h"
 
 #include "BundlePrivate.h"
-#include "RegistrationLocks.h"
+#include "ServiceRegistrationLocks.h"
 #include "ServiceReferenceBasePrivate.h"
 #include "ServiceRegistrationBasePrivate.h"
 #include "Utils.h"
@@ -97,20 +97,20 @@ namespace cppmicroservices
             return Bundle();
         }
 
-        auto l = p->LockRegistration();
+        auto l = p->LockServiceRegistration();
         US_UNUSED(l);
-        if (p->coreInfo->bundle.lock() == nullptr)
+        if (p->coreInfo->bundle_.lock() == nullptr)
         {
             return Bundle();
         }
-        return MakeBundle(p->coreInfo->bundle.lock()->shared_from_this());
+        return MakeBundle(p->coreInfo->bundle_.lock()->shared_from_this());
     }
 
     std::vector<Bundle>
     ServiceReferenceBase::GetUsingBundles() const
     {
         std::vector<Bundle> bundles;
-        auto l = d.Load()->LockRegistration();
+        auto l = d.Load()->LockServiceRegistration();
         US_UNUSED(l);
         for (auto const& iter : d.Load()->coreInfo->dependents)
         {

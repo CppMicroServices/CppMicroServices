@@ -14,8 +14,8 @@
   limitations under the License.
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_REGISTRATIONLOCKS_H
-#define CPPMICROSERVICES_REGISTRATIONLOCKS_H
+#ifndef CPPMICROSERVICES_SERVICEREGISTRATIONLOCKS_H
+#define CPPMICROSERVICES_SERVICEREGISTRATIONLOCKS_H
 
 #include "ServiceRegistrationBasePrivate.h"
 #include "ServiceRegistrationCoreInfo.h"
@@ -26,18 +26,18 @@ namespace cppmicroservices
     /**
      * \ingroup MicroServices
      */
-    class RegistrationLocks
+    class ServiceRegistrationLocks
     {
-        public:
-            RegistrationLocks(std::shared_ptr<ServiceRegistrationBasePrivate> reg, std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo);
-            
-            ~RegistrationLocks();
-        private:
-#ifdef US_ENABLE_THREADING_SUPPORT
-            cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock coreInfoL;
-            cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock regL;
-#endif
+      public:
+        ServiceRegistrationLocks(std::shared_ptr<ServiceRegistrationBasePrivate> reg,
+                                 std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo);
+
+        ~ServiceRegistrationLocks() = default;
+
+      private:
+        cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock coreInfoL;
+        cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock regL;
     };
 } // namespace cppmicroservices
 
-#endif // CPPMICROSERVICES_REGISTRATIONLOCKS_H
+#endif // CPPMICROSERVICES_SERVICEREGISTRATIONLOCKS_H

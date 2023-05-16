@@ -14,7 +14,7 @@
   limitations under the License.
 =============================================================================*/
 
-#include "RegistrationLocks.h"
+#include "ServiceRegistrationLocks.h"
 
 #ifdef _MSC_VER
 #    pragma warning(push)
@@ -24,9 +24,8 @@
 namespace cppmicroservices
 {
 
-#ifdef US_ENABLE_THREADING_SUPPORT
-    RegistrationLocks::RegistrationLocks(std::shared_ptr<ServiceRegistrationBasePrivate> reg,
-                     std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo)
+    ServiceRegistrationLocks::ServiceRegistrationLocks(std::shared_ptr<ServiceRegistrationBasePrivate> reg,
+                                                       std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo)
     {
         if (reg != nullptr)
         {
@@ -34,14 +33,6 @@ namespace cppmicroservices
         }
         coreInfoL = coreInfo->Lock();
     }
-#else
-    RegistrationLocks::RegistrationLocks(std::shared_ptr<ServiceRegistrationBasePrivate>,
-                     std::shared_ptr<ServiceRegistrationCoreInfo>)
-    {
-    }
-#endif
-
-    RegistrationLocks::~RegistrationLocks() = default;
 } // namespace cppmicroservices
 
 #ifdef _MSC_VER

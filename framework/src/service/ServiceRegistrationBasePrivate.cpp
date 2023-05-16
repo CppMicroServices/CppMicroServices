@@ -33,14 +33,14 @@
 namespace cppmicroservices
 {
 
-    ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(BundlePrivate* bundle_,
+    ServiceRegistrationBasePrivate::ServiceRegistrationBasePrivate(BundlePrivate* bundle,
                                                                    InterfaceMapConstPtr service,
                                                                    Properties&& props)
-        : coreInfo(std::make_shared<ServiceRegistrationCoreInfo>(bundle_, service, std::move(props)))
+        : coreInfo(std::make_shared<ServiceRegistrationCoreInfo>(bundle, service, std::move(props)))
     {
     }
 
-    ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate() {}
+    ServiceRegistrationBasePrivate::~ServiceRegistrationBasePrivate() = default;
 
     // Need to first create shared_ptr to registration before duplicating for reference
     void

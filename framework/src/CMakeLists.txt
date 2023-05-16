@@ -19,7 +19,7 @@ set(_srcs
   util/SharedLibrary.cpp
   util/SharedLibraryException.cpp
   util/Utils.cpp
-  util/RegistrationLocks.cpp
+  util/ServiceRegistrationLocks.cpp
 
   service/ListenerToken.cpp
   service/ServiceException.cpp
@@ -69,7 +69,7 @@ set(_private_headers
   util/Properties.h
   util/PropsCheck.h
   util/Utils.h
-  util/RegistrationLocks.h
+  util/ServiceRegistrationLocks.h
 
   service/ServiceHooks.h
   service/ServiceListenerEntry.h

@@ -329,7 +329,7 @@ namespace cppmicroservices
 
         for (auto& sr : serviceRegistrations)
         {
-            if (auto bundle_ = sr.d->coreInfo->bundle.lock())
+            if (auto bundle_ = sr.d->coreInfo->bundle_.lock())
             {
                 if (bundle_.get() == p)
                 {

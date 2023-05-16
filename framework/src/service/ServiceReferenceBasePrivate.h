@@ -27,7 +27,7 @@
 #include "cppmicroservices/ServiceInterface.h"
 
 #include "Properties.h"
-#include "RegistrationLocks.h"
+#include "ServiceRegistrationLocks.h"
 
 #include <atomic>
 #include <string>
@@ -55,7 +55,7 @@ namespace cppmicroservices
 
         ~ServiceReferenceBasePrivate();
         
-        std::shared_ptr<RegistrationLocks> LockRegistration() const;
+        std::shared_ptr<ServiceRegistrationLocks> LockServiceRegistration() const;
 
         /**
          * Get the service object.

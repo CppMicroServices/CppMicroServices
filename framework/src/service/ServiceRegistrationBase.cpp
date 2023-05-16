@@ -1,22 +1,22 @@
- /*=============================================================================
+/*=============================================================================
 
-  Library: CppMicroServices
+ Library: CppMicroServices
 
-  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
-  file at the top-level directory of this distribution and at
-  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
+ Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+ file at the top-level directory of this distribution and at
+ https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
 
 =============================================================================*/
 
@@ -30,8 +30,8 @@
 #include "CoreBundleContext.h"
 #include "ServiceListenerEntry.h"
 #include "ServiceRegistrationBasePrivate.h"
+#include "ServiceRegistrationLocks.h"
 #include "ServiceRegistry.h"
-#include "RegistrationLocks.h"
 
 #include <stdexcept>
 
@@ -55,8 +55,8 @@ namespace cppmicroservices
     ServiceRegistrationBase::ServiceRegistrationBase(BundlePrivate* bundle,
                                                      InterfaceMapConstPtr const& service,
                                                      Properties&& props)
+        : d(std::make_shared<ServiceRegistrationBasePrivate>(bundle, service, std::move(props)))
     {
-        d = std::make_shared<ServiceRegistrationBasePrivate>(bundle, service, std::move(props));
         d->CreateReference();
     }
 
@@ -69,7 +69,7 @@ namespace cppmicroservices
         return *this;
     }
 
-    ServiceRegistrationBase::~ServiceRegistrationBase() { d.reset(); }
+    ServiceRegistrationBase::~ServiceRegistrationBase() = default;
 
     ServiceReferenceBase
     ServiceRegistrationBase::GetReference(std::string const& interfaceId) const
@@ -79,7 +79,7 @@ namespace cppmicroservices
         if (!d->coreInfo->available)
             throw std::logic_error("Service is unregistered");
 
-        auto l = LockRegistration();
+        auto l = LockServiceRegistration();
         US_UNUSED(l);
         ServiceReferenceBase ref = d->reference;
         ref.SetInterfaceId(interfaceId);
@@ -112,7 +112,7 @@ namespace cppmicroservices
         }
 
         {
-            auto l = LockRegistration();
+            auto l = LockServiceRegistration();
             US_UNUSED(l);
             if (!d->coreInfo->available)
                 throw std::logic_error("Service is unregistered");
@@ -121,7 +121,7 @@ namespace cppmicroservices
         }
 
         // This calls into service event listener hooks. We must not hold any locks here
-        if (auto bundle = d->coreInfo->bundle.lock())
+        if (auto bundle = d->coreInfo->bundle_.lock())
         {
             bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEndMatchEvent, before);
         }
@@ -130,7 +130,7 @@ namespace cppmicroservices
         int new_rank = 0;
         Any objectClasses;
         {
-            auto l = LockRegistration();
+            auto l = LockServiceRegistration();
             US_UNUSED(l);
             if (!d->coreInfo->available)
             {
@@ -140,7 +140,8 @@ namespace cppmicroservices
             auto l2 = d->coreInfo->properties.Lock();
             US_UNUSED(l2);
 
-            propsCopy[Constants::SERVICE_ID] = std::move(d->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first);
+            propsCopy[Constants::SERVICE_ID]
+                = std::move(d->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first);
             objectClasses = std::move(d->coreInfo->properties.Value_unlocked(Constants::OBJECTCLASS).first);
             propsCopy[Constants::OBJECTCLASS] = objectClasses;
             propsCopy[Constants::SERVICE_SCOPE]
@@ -173,7 +174,7 @@ namespace cppmicroservices
         if (old_rank != new_rank)
         {
             auto const& classes = ref_any_cast<std::vector<std::string>>(objectClasses);
-            if (auto bundle = d->coreInfo->bundle.lock())
+            if (auto bundle = d->coreInfo->bundle_.lock())
             {
                 bundle->coreCtx->services.UpdateServiceRegistrationOrder(classes);
             }
@@ -181,7 +182,7 @@ namespace cppmicroservices
 
         // Notify listeners, we must not hold any locks here
         ServiceListeners::ServiceListenerEntries matchingListeners;
-        if (auto bundle = d->coreInfo->bundle.lock())
+        if (auto bundle = d->coreInfo->bundle_.lock())
         {
             bundle->coreCtx->listeners.GetMatchingServiceListeners(modifiedEvent, matchingListeners);
             bundle->coreCtx->listeners.ServiceChanged(matchingListeners, modifiedEvent, before);
@@ -206,7 +207,7 @@ namespace cppmicroservices
         bool isUnregistering(false); // expected state
         if (atomic_compare_exchange_strong(&d->coreInfo->unregistering, &isUnregistering, true))
         {
-            if (auto bundle = d->coreInfo->bundle.lock())
+            if (auto bundle = d->coreInfo->bundle_.lock())
             {
                 {
                     auto l1 = bundle->coreCtx->services.Lock();
@@ -237,11 +238,11 @@ namespace cppmicroservices
         ServiceRegistrationBasePrivate::BundleToServiceMap bundleServiceInstance;
 
         {
-            auto l = LockRegistration();
+            auto l = LockServiceRegistration();
             US_UNUSED(l);
             d->coreInfo->available = false;
             auto factoryIter = d->coreInfo->service->find("org.cppmicroservices.factory");
-            if (auto bundle = d->coreInfo->bundle.lock() && factoryIter != d->coreInfo->service->end())
+            if (auto bundle = d->coreInfo->bundle_.lock() && factoryIter != d->coreInfo->service->end())
             {
                 if (bundle)
                 {
@@ -269,7 +270,7 @@ namespace cppmicroservices
                     catch (std::exception const& ex)
                     {
                         std::string message("ServiceFactory UngetService implementation threw an exception");
-                        if (auto bundle = d->coreInfo->bundle.lock())
+                        if (auto bundle = d->coreInfo->bundle_.lock())
                         {
                             bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
                                 FrameworkEvent::Type::FRAMEWORK_ERROR,
@@ -292,7 +293,7 @@ namespace cppmicroservices
                 catch (std::exception const& ex)
                 {
                     std::string message("ServiceFactory UngetService implementation threw an exception");
-                    if (auto bundle = d->coreInfo->bundle.lock())
+                    if (auto bundle = d->coreInfo->bundle_.lock())
                     {
                         bundle->coreCtx->listeners.SendFrameworkEvent(FrameworkEvent(
                             FrameworkEvent::Type::FRAMEWORK_ERROR,
@@ -306,10 +307,10 @@ namespace cppmicroservices
         }
 
         {
-            auto l = LockRegistration();
+            auto l = LockServiceRegistration();
             US_UNUSED(l);
 
-            d->coreInfo->bundle.reset();
+            d->coreInfo->bundle_.reset();
             d->coreInfo->dependents.clear();
             d->coreInfo->service.reset();
             d->coreInfo->prototypeServiceInstances.clear();
@@ -320,10 +321,11 @@ namespace cppmicroservices
         }
     }
 
-    std::shared_ptr<RegistrationLocks> ServiceRegistrationBase::LockRegistration() const{
-        return std::make_shared<RegistrationLocks>(d, d->coreInfo);
+    std::shared_ptr<ServiceRegistrationLocks>
+    ServiceRegistrationBase::LockServiceRegistration() const
+    {
+        return std::make_shared<ServiceRegistrationLocks>(d, d->coreInfo);
     }
-
 
     bool
     ServiceRegistrationBase::operator<(ServiceRegistrationBase const& o) const
@@ -339,8 +341,8 @@ namespace cppmicroservices
         ServiceReferenceBase sr1;
         ServiceReferenceBase sr2;
         {
-            LockRegistration(), sr1 = d->reference;
-            o.LockRegistration(), sr2 = o.d->reference;
+            LockServiceRegistration(), sr1 = d->reference;
+            o.LockServiceRegistration(), sr2 = o.d->reference;
         }
         return sr1 < sr2;
     }

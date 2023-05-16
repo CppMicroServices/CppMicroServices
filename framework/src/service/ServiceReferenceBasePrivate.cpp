@@ -186,7 +186,9 @@ namespace cppmicroservices
 
         InterfaceMapConstPtr s;
         if (!coreInfo->available)
+        {
             return s;
+        }
         std::shared_ptr<ServiceFactory> serviceFactory;
 
         std::unordered_set<ServiceRegistrationBasePrivate*>* marks = nullptr;
@@ -196,7 +198,9 @@ namespace cppmicroservices
             ~Unmark()
             {
                 if (s)
+                {
                     s->erase(r);
+                }
             }
             std::unordered_set<ServiceRegistrationBasePrivate*>*& s;
             ServiceRegistrationBasePrivate* r;
@@ -206,7 +210,9 @@ namespace cppmicroservices
         {
             auto reg = registration.lock();
             if (!reg)
+            {
                 return s;
+            }
             auto l = LockServiceRegistration();
             US_UNUSED(l);
             if (!coreInfo->available)
@@ -320,7 +326,9 @@ namespace cppmicroservices
         }
 
         if (!sf)
+        {
             return false;
+        }
 
         for (auto& prototypeServiceMap : prototypeServiceMaps)
         {
@@ -349,11 +357,15 @@ namespace cppmicroservices
                 US_UNUSED(l);
                 auto iter = coreInfo->prototypeServiceInstances.find(bundle.get());
                 if (iter == coreInfo->prototypeServiceInstances.end())
+                {
                     return true;
+                }
 
                 auto serviceIter = std::find(iter->second.begin(), iter->second.end(), service);
                 if (serviceIter != iter->second.end())
+                {
                     iter->second.erase(serviceIter);
+                }
                 if (iter->second.empty())
                 {
                     coreInfo->prototypeServiceInstances.erase(iter);

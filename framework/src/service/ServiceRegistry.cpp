@@ -109,10 +109,9 @@ namespace cppmicroservices
             classes.push_back(i.first);
         }
 
-        ServiceRegistrationBase res(
-            bundle,
-            service,
-            CreateServiceProperties(properties, classes, isFactory, isPrototypeFactory));
+        ServiceRegistrationBase res(bundle,
+                                    service,
+                                    CreateServiceProperties(properties, classes, isFactory, isPrototypeFactory));
         {
             auto l = this->Lock();
             US_UNUSED(l);

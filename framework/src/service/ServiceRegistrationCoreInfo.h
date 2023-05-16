@@ -27,8 +27,8 @@
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/detail/Threads.h"
 
-#include "Properties.h"
 #include "BundlePrivate.h"
+#include "Properties.h"
 
 #include <atomic>
 

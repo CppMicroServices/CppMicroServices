@@ -24,8 +24,8 @@
 #define CPPMICROSERVICES_SERVICEREFERENCEBASE_H
 
 #include "cppmicroservices/Any.h"
-#include <functional>
 #include "cppmicroservices/detail/Threads.h"
+#include <functional>
 
 #include <atomic>
 #include <memory>

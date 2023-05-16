@@ -75,9 +75,13 @@ namespace cppmicroservices
     ServiceRegistrationBase::GetReference(std::string const& interfaceId) const
     {
         if (!d)
+        {
             throw std::logic_error("ServiceRegistrationBase object invalid");
+        }
         if (!d->coreInfo->available)
+        {
             throw std::logic_error("Service is unregistered");
+        }
 
         auto l = LockServiceRegistration();
         US_UNUSED(l);
@@ -115,7 +119,9 @@ namespace cppmicroservices
             auto l = LockServiceRegistration();
             US_UNUSED(l);
             if (!d->coreInfo->available)
+            {
                 throw std::logic_error("Service is unregistered");
+            }
             modifiedEndMatchEvent = ServiceEvent(ServiceEvent::SERVICE_MODIFIED_ENDMATCH, d->reference);
             modifiedEvent = ServiceEvent(ServiceEvent::SERVICE_MODIFIED, d->reference);
         }
@@ -331,12 +337,18 @@ namespace cppmicroservices
     ServiceRegistrationBase::operator<(ServiceRegistrationBase const& o) const
     {
         if (this == &o || d == o.d)
+        {
             return false;
+        }
 
         if ((!d && !o.d) || !o.d)
+        {
             return false;
+        }
         if (!d)
+        {
             return true;
+        }
 
         ServiceReferenceBase sr1;
         ServiceReferenceBase sr2;

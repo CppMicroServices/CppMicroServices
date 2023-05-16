@@ -124,8 +124,8 @@ namespace cppmicroservices
             for (auto fhrIter = srl.rbegin(), fhrEnd = srl.rend(); fhrIter != fhrEnd; ++fhrIter)
             {
                 ServiceReference<ServiceFindHook> sr = fhrIter->GetReference();
-                auto fh = std::static_pointer_cast<ServiceFindHook>(
-                    sr.d.Load()->GetService(GetPrivate(selfBundle).get()));
+                auto fh
+                    = std::static_pointer_cast<ServiceFindHook>(sr.d.Load()->GetService(GetPrivate(selfBundle).get()));
                 if (fh)
                 {
                     try

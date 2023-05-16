@@ -73,8 +73,8 @@ namespace cppmicroservices
         for (auto srBaseIter = srl.rbegin(), srBaseEnd = srl.rend(); srBaseIter != srBaseEnd; ++srBaseIter)
         {
             ServiceReference<BundleFindHook> sr = srBaseIter->GetReference();
-            std::shared_ptr<BundleFindHook> fh = std::static_pointer_cast<BundleFindHook>(
-                sr.d.Load()->GetService(GetPrivate(selfBundle).get()));
+            std::shared_ptr<BundleFindHook> fh
+                = std::static_pointer_cast<BundleFindHook>(sr.d.Load()->GetService(GetPrivate(selfBundle).get()));
             if (fh)
             {
                 try

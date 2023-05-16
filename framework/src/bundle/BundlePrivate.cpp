@@ -384,7 +384,9 @@ namespace cppmicroservices
                         try
                         {
                             if (util::Exists(bundleDir))
+                            {
                                 util::RemoveDirectoryRecursive(bundleDir);
+                            }
                         }
                         catch (...)
                         {

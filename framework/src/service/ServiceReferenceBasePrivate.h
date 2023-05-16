@@ -54,7 +54,7 @@ namespace cppmicroservices
         ServiceReferenceBasePrivate(std::weak_ptr<ServiceRegistrationBasePrivate> reg);
 
         ~ServiceReferenceBasePrivate();
-        
+
         std::shared_ptr<ServiceRegistrationLocks> LockServiceRegistration() const;
 
         /**

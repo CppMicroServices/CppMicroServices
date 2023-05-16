@@ -26,9 +26,9 @@
 #include "cppmicroservices/Constants.h"
 
 #include "BundlePrivate.h"
-#include "ServiceRegistrationLocks.h"
 #include "ServiceReferenceBasePrivate.h"
 #include "ServiceRegistrationBasePrivate.h"
+#include "ServiceRegistrationLocks.h"
 #include "Utils.h"
 #include <cassert>
 
@@ -198,7 +198,9 @@ namespace cppmicroservices
     ServiceReferenceBase::operator=(ServiceReferenceBase const& reference)
     {
         if (d.Load() == reference.d.Load())
+        {
             return *this;
+        }
 
         d.Exchange(reference.d.Load());
 
@@ -238,7 +240,9 @@ namespace cppmicroservices
             {
                 os << keys[i] << "=" << serviceRef.GetProperty(keys[i]).ToString();
                 if (i < keySize - 1)
+                {
                     os << ",";
+                }
             }
             os << ")";
         }

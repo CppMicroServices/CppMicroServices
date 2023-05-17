@@ -25,6 +25,12 @@ namespace cppmicroservices
 
     /**
      * \ingroup MicroServices
+     * This class is designed to store locks to the ServiceRegistrationBasePrivate object and the
+     * ServiceRegistrationCoreInfo objects. This will lock and unlock them in order to avoid deadlocks. It also verifies
+     * the aliveness of the ServiceRegistrationBasePrivate object as its lifetime is no longer linked to
+     * ServiceReferenceBasePrivate and can therefore die while ServiceRegistrationCoreInfo is still needed.
+     *
+     * This is an RAII object, construct it in scope and when it goes out of scope the locks will be released.
      */
     class ServiceRegistrationLocks
     {

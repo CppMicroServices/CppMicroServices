@@ -57,6 +57,9 @@ namespace cppmicroservices
                                                      Properties&& props)
         : d(std::make_shared<ServiceRegistrationBasePrivate>(bundle, service, std::move(props)))
     {
+        // Constructor of ServiceRegistrationBasePrivate does not take in the reference back to the
+        // ServiceRegistrationBasePrivate. It is created after construction in CreateReference because the sharedPtr
+        // back to ServiceRegistrationBasePrivate must be fully constructecd before shared_from_this can be called.
         d->CreateReference();
     }
 

@@ -63,7 +63,7 @@ namespace cppmicroservices
         return *this;
     }
 
-    ServiceReferenceBase::~ServiceReferenceBase() {}
+    ServiceReferenceBase::~ServiceReferenceBase() = default;
 
     Any
     ServiceReferenceBase::GetProperty(std::string const& key) const

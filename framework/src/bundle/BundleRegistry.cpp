@@ -249,10 +249,8 @@ namespace cppmicroservices
                 {
                     // Wait for the install thread to notify this thread that it is safe
                     // to install the current bundle
-                    l.UnLock();
-#ifdef US_ENABLE_THREADING_SUPPORT
                     auto& p = initialBundleInstallMap[location];
-
+                    l.UnLock();
                     std::unique_lock<std::mutex> lock(*(p.second.m));
 
                     // This while loop exists to prevent a known race condition. If the installing thread notifies
@@ -262,7 +260,6 @@ namespace cppmicroservices
                     // is reached, wait_for exits and the statement is re-evaluated since it would have returned false.
                     while (!p.second.cv->wait_for(lock, 0.1ms, [&p] { return !p.second.waitFlag; }))
                         ;
-#endif
                 }
 
                 // Re-acquire the range because while this thread was waiting, the installing

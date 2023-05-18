@@ -32,13 +32,11 @@ namespace cppmicroservices
      *
      * This is an RAII object, construct it in scope and when it goes out of scope the locks will be released.
      */
-    class ServiceRegistrationLocks
+    class ServiceRegistrationLocks final
     {
       public:
         ServiceRegistrationLocks(std::shared_ptr<ServiceRegistrationBasePrivate> reg,
                                  std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo);
-
-        ~ServiceRegistrationLocks() = default;
 
       private:
         cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock coreInfoL;

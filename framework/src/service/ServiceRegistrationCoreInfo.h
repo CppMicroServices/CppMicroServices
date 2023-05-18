@@ -38,12 +38,15 @@ namespace cppmicroservices
     /**
      * \ingroup MicroServices
      */
-    class ServiceRegistrationCoreInfo : public detail::MultiThreaded<>
+    class ServiceRegistrationCoreInfo final: public detail::MultiThreaded<>
     {
 
       public:
         ServiceRegistrationCoreInfo(BundlePrivate* bundle, InterfaceMapConstPtr service, Properties&& props);
         ~ServiceRegistrationCoreInfo() = default;
+
+        ServiceRegistrationCoreInfo(ServiceRegistrationCoreInfo &&) = delete;
+        ServiceRegistrationCoreInfo& operator=(ServiceRegistrationCoreInfo &&) = delete;
 
         ServiceRegistrationCoreInfo(ServiceRegistrationCoreInfo const&) = delete;
         ServiceRegistrationCoreInfo& operator=(ServiceRegistrationCoreInfo const&) = delete;

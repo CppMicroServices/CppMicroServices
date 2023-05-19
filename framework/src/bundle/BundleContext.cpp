@@ -1,22 +1,22 @@
- /*=============================================================================
+/*=============================================================================
 
-  Library: CppMicroServices
+ Library: CppMicroServices
 
-  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
-  file at the top-level directory of this distribution and at
-  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
+ Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+ file at the top-level directory of this distribution and at
+ https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
 
 =============================================================================*/
 
@@ -274,8 +274,7 @@ namespace cppmicroservices
         {
             try
             {
-                sref.d.load()->UngetService(b.lock(), true);
-                //sref.d.load()->UngetService(b.lock(), true);
+                sref.d.Load()->UngetService(b.lock(), true);
             }
             catch (...)
             {
@@ -312,7 +311,7 @@ namespace cppmicroservices
         auto b = GetAndCheckBundlePrivate(d);
 
         std::shared_ptr<ServiceHolder<void>> h(
-            new ServiceHolder<void>(b, reference, reference.d.load()->GetService(b.get())));
+            new ServiceHolder<void>(b, reference, reference.d.Load()->GetService(b.get())));
         return std::shared_ptr<void>(h, h->service.get());
     }
 
@@ -333,7 +332,7 @@ namespace cppmicroservices
         d->CheckValid();
         auto b = GetAndCheckBundlePrivate(d);
 
-        auto serviceInterfaceMap = reference.d.load()->GetServiceInterfaceMap(b.get());
+        auto serviceInterfaceMap = reference.d.Load()->GetServiceInterfaceMap(b.get());
         std::shared_ptr<ServiceHolder<InterfaceMap const>> h(
             new ServiceHolder<InterfaceMap const>(b, reference, serviceInterfaceMap));
         return InterfaceMapConstPtr(h, h->service.get());

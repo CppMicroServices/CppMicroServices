@@ -263,7 +263,7 @@ namespace cppmicroservices
 
         for (; s != send; ++s)
         {
-            if (filter.empty() || ldap.Evaluate(PropertiesHandle(s->d->properties, true), false))
+            if (filter.empty() || ldap.Evaluate(PropertiesHandle((s->d->coreInfo->properties), true), false))
             {
                 res.emplace_back(s->GetReference(clazz));
             }
@@ -296,12 +296,12 @@ namespace cppmicroservices
     {
         std::vector<std::string> classes;
         {
-            auto l2 = sr.d->properties.Lock();
+            auto l2 = sr.d->coreInfo->properties.Lock();
             US_UNUSED(l2);
-            assert(sr.d->properties.Value_unlocked(Constants::OBJECTCLASS).first.Type()
+            assert(sr.d->coreInfo->properties.Value_unlocked(Constants::OBJECTCLASS).first.Type()
                    == typeid(std::vector<std::string>));
-            classes
-                = ref_any_cast<std::vector<std::string>>(sr.d->properties.Value_unlocked(Constants::OBJECTCLASS).first);
+            classes = ref_any_cast<std::vector<std::string>>(
+                sr.d->coreInfo->properties.Value_unlocked(Constants::OBJECTCLASS).first);
         }
         services.erase(sr);
         serviceRegistrations.erase(std::remove(serviceRegistrations.begin(), serviceRegistrations.end(), sr),
@@ -328,7 +328,7 @@ namespace cppmicroservices
 
         for (auto& sr : serviceRegistrations)
         {
-            if (auto bundle_ = sr.d->bundle.lock())
+            if (auto bundle_ = sr.d->coreInfo->bundle_.lock())
             {
                 if (bundle_.get() == p)
                 {

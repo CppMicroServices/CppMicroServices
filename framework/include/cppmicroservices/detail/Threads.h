@@ -106,6 +106,7 @@ namespace cppmicroservices
                 UniqueLock&
                 operator=(UniqueLock&&)
                 {
+                    return *this;
                 }
                 explicit UniqueLock(MutexLockingStrategy const&) {}
                 explicit UniqueLock(MutexLockingStrategy const*) {}

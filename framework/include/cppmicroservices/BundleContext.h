@@ -292,7 +292,9 @@ namespace cppmicroservices
          *        no properties.
          * @return A <code>ServiceRegistration</code> object for use by the bundle
          *         registering the service to update the service's properties or to
-         *         unregister the service.
+         *         unregister the service. This object cannot be called from a discard-value
+         *         expression as the intent is for the <code>ServiceRegistration</code>
+         *         object is intended to be stored by the caller
          *
          * @throws std::runtime_error If this BundleContext is no longer valid, or if there are
                    case variants of the same key in the supplied properties map.
@@ -303,8 +305,15 @@ namespace cppmicroservices
          * @see ServiceFactory
          * @see PrototypeServiceFactory
          */
-        ServiceRegistrationU RegisterService(InterfaceMapConstPtr const& service,
-                                             ServiceProperties const& properties = ServiceProperties());
+#ifdef __has_cpp_attribute
+#    if __has_cpp_attribute(nodiscard)
+        [[nodiscard]]
+#    elif __has_cpp_attribute(gnu::warn_unused_result)
+        [[gnu::warn_unused_result]]
+#    endif
+#endif
+        ServiceRegistrationU
+        RegisterService(InterfaceMapConstPtr const& service, ServiceProperties const& properties = ServiceProperties());
 
         /**
          * Registers the specified service object with the specified properties
@@ -455,8 +464,10 @@ namespace cppmicroservices
         {
             auto& clazz = us_service_interface_iid<S>();
             if (clazz.empty())
+            {
                 throw ServiceException("The service interface class has no "
                                        "CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
+            }
             using BaseVectorT = std::vector<ServiceReferenceU>;
             BaseVectorT serviceRefs = GetServiceReferences(clazz, filter);
             std::vector<ServiceReference<S>> result;
@@ -521,8 +532,10 @@ namespace cppmicroservices
         {
             auto& clazz = us_service_interface_iid<S>();
             if (clazz.empty())
+            {
                 throw ServiceException("The service interface class has no "
                                        "CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
+            }
             return ServiceReference<S>(GetServiceReference(clazz));
         }
 

@@ -292,7 +292,9 @@ namespace cppmicroservices
          *        no properties.
          * @return A <code>ServiceRegistration</code> object for use by the bundle
          *         registering the service to update the service's properties or to
-         *         unregister the service.
+         *         unregister the service. This object cannot be called from a discard-value
+         *         expression as the intent is for the <code>ServiceRegistration</code>
+         *         object is intended to be stored by the caller
          *
          * @throws std::runtime_error If this BundleContext is no longer valid, or if there are
                    case variants of the same key in the supplied properties map.

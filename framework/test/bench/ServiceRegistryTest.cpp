@@ -154,7 +154,7 @@ BENCHMARK_DEFINE_F(ServiceRegistryFixture, FindServices)
     for (auto i = regCount; i > 0; --i)
     {
         InterfaceMapPtr iMapCopy(std::make_shared<InterfaceMap>(*interfaceMap));
-        regs.push_back(fc.RegisterService(iMapCopy));
+        regs.emplace_back(fc.RegisterService(iMapCopy));
     }
 
     for (auto _ : state)

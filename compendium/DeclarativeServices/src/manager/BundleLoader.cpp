@@ -78,7 +78,7 @@ namespace cppmicroservices
             wchar_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, wBuf.get(), wchar_count);
             if (wchar_count == 0)
             {
-                std::invalid_argument("Failed to convert " + inStr + " to UTF16.");
+                throw std::invalid_argument("Failed to convert " + inStr + " to UTF16.");
             }
             return wBuf.get();
         }

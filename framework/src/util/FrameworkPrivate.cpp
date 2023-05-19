@@ -31,6 +31,8 @@ limitations under the License.
 
 #include <chrono>
 
+#include <absl/base/attributes.h>
+
 namespace cppmicroservices
 {
 
@@ -93,7 +95,9 @@ namespace cppmicroservices
     {
         auto bc = bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>());
         if (bc)
+        {
             bc->Invalidate();
+        }
     }
 
     FrameworkEvent
@@ -153,7 +157,7 @@ namespace cppmicroservices
                 break;
             case Bundle::STATE_ACTIVE:
                 wasActive = true;
-                // Fall through
+                ABSL_FALLTHROUGH_INTENDED;
             case Bundle::STATE_STARTING:
             {
                 bool const wa = wasActive;
@@ -187,7 +191,7 @@ namespace cppmicroservices
                 case Bundle::STATE_INSTALLED:
                 case Bundle::STATE_RESOLVED:
                     DoInit();
-                    // Fall through
+                    ABSL_FALLTHROUGH_INTENDED;
                 case Bundle::STATE_STARTING:
                     operation = BundlePrivate::OP_ACTIVATING;
                     break;

@@ -79,25 +79,25 @@ namespace cppmicroservices
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
             std::string const& configName,
             std::unique_ptr<BindingPolicy> policy)
-            : metadata(metadata)
+            : metadata_(metadata)
             , tracker(nullptr)
-            , logger(std::move(logger))
-            , configName(configName)
+            , logger_(std::move(logger))
+            , configName_(configName)
             , bindingPolicy(std::move(policy))
         {
-            if (!bc || !this->logger)
+            if (!bc || !logger_)
             {
                 throw std::invalid_argument("Failed to create object, Invalid arguments passed to constructor");
             }
             try
             {
-                tracker = std::make_unique<ServiceTracker<void>>(bc, GetReferenceLDAPFilter(metadata), this);
+                tracker = std::make_unique<ServiceTracker<void>>(bc, GetReferenceLDAPFilter(metadata_), this);
                 tracker->Open();
             }
             catch (...)
             {
-                logger->Log(SeverityLevel::LOG_ERROR,
-                            "could not open service tracker for " + metadata.interfaceName,
+                logger_->Log(SeverityLevel::LOG_ERROR,
+                            "could not open service tracker for " + metadata_.interfaceName,
                             std::current_exception());
                 tracker.reset();
                 throw std::current_exception();
@@ -113,8 +113,8 @@ namespace cppmicroservices
             }
             catch (...)
             {
-                logger->Log(SeverityLevel::LOG_ERROR,
-                            "Exception caught while closing service tracker for " + metadata.interfaceName,
+                logger_->Log(SeverityLevel::LOG_ERROR,
+                            "Exception caught while closing service tracker for " + metadata_.interfaceName,
                             std::current_exception());
             }
         }
@@ -137,13 +137,13 @@ namespace cppmicroservices
         bool
         ReferenceManagerBaseImpl::IsOptional() const
         {
-            return (metadata.minCardinality == 0);
+            return (metadata_.minCardinality == 0);
         }
 
         bool
         ReferenceManagerBaseImpl::IsSatisfied() const
         {
-            return (boundRefs.lock()->size() >= metadata.minCardinality);
+            return (boundRefs.lock()->size() >= metadata_.minCardinality);
         }
 
         ReferenceManagerBaseImpl::~ReferenceManagerBaseImpl() { StopTracking(); }
@@ -157,12 +157,12 @@ namespace cppmicroservices
         {
             auto matchedRefsHandle = matchedRefs.lock(); // acquires lock on matchedRefs
             auto const matchedRefsHandleSize = matchedRefsHandle->size();
-            if (matchedRefsHandleSize >= metadata.minCardinality)
+            if (matchedRefsHandleSize >= metadata_.minCardinality)
             {
                 auto boundRefsHandle = boundRefs.lock(); // acquires lock on boundRefs
                 boundRefsHandle->clear();
                 std::copy_n(matchedRefsHandle->rbegin(),
-                            std::min(metadata.maxCardinality, matchedRefsHandleSize),
+                            std::min(metadata_.maxCardinality, matchedRefsHandleSize),
                             std::inserter(*(boundRefsHandle), boundRefsHandle->begin()));
                 return true;
             }
@@ -181,7 +181,7 @@ namespace cppmicroservices
             // ASSUMPTION: If there is no component configuration name then its assumed this service was not registered
             // by DS and could not satisfy itself since it is not managed by DS.
             auto const compConfigName = reference.GetProperty(COMPONENT_NAME);
-            if ((true == compConfigName.Empty()) || (configName != compConfigName.ToStringNoExcept()))
+            if ((true == compConfigName.Empty()) || (configName_ != compConfigName.ToStringNoExcept()))
             {
                 // acquire lock on matchedRefs
                 auto matchedRefsHandle = matchedRefs.lock();
@@ -239,7 +239,7 @@ namespace cppmicroservices
             auto notifySatisfied = UpdateBoundRefs();
             if (notifySatisfied)
             {
-                RefChangeNotification notification { metadata.name, RefEvent::BECAME_SATISFIED };
+                RefChangeNotification notification { metadata_.name, RefEvent::BECAME_SATISFIED };
                 notify(notification);
             }
 
@@ -289,7 +289,7 @@ namespace cppmicroservices
                     }
                     catch (...)
                     {
-                        logger->Log(SeverityLevel::LOG_ERROR,
+                        logger_->Log(SeverityLevel::LOG_ERROR,
                                     "Exception caught while notifying service reference "
                                     "listeners for reference name "
                                         + notification.senderName,

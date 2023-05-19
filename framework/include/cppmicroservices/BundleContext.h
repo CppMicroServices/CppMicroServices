@@ -303,8 +303,8 @@ namespace cppmicroservices
          * @see ServiceFactory
          * @see PrototypeServiceFactory
          */
-        ServiceRegistrationU RegisterService(InterfaceMapConstPtr const& service,
-                                             ServiceProperties const& properties = ServiceProperties());
+        [[nodiscard]] ServiceRegistrationU RegisterService(InterfaceMapConstPtr const& service,
+                                                           ServiceProperties const& properties = ServiceProperties());
 
         /**
          * Registers the specified service object with the specified properties
@@ -455,8 +455,10 @@ namespace cppmicroservices
         {
             auto& clazz = us_service_interface_iid<S>();
             if (clazz.empty())
+            {
                 throw ServiceException("The service interface class has no "
                                        "CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
+            }
             using BaseVectorT = std::vector<ServiceReferenceU>;
             BaseVectorT serviceRefs = GetServiceReferences(clazz, filter);
             std::vector<ServiceReference<S>> result;
@@ -521,8 +523,10 @@ namespace cppmicroservices
         {
             auto& clazz = us_service_interface_iid<S>();
             if (clazz.empty())
+            {
                 throw ServiceException("The service interface class has no "
                                        "CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
+            }
             return ServiceReference<S>(GetServiceReference(clazz));
         }
 

@@ -317,7 +317,8 @@ namespace cppmicroservices
             auto iMap = std::make_shared<InterfaceMap>();
             auto obj = std::make_shared<double>();
             iMap->insert(std::make_pair("double", std::static_pointer_cast<void>(obj)));
-            fc.RegisterService(iMap);
+            auto reg = fc.RegisterService(iMap);
+            US_UNUSED(reg);
 
             auto sRef = fc.GetServiceReference("double");
             EXPECT_TRUE(static_cast<bool>(sRef));

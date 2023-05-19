@@ -203,7 +203,7 @@ namespace cppmicroservices
         return bus;
     }
 
-    ServiceRegistrationU
+    [[nodiscard]] ServiceRegistrationU
     BundleContext::RegisterService(InterfaceMapConstPtr const& service, ServiceProperties const& properties)
     {
         if (!d)

@@ -32,7 +32,7 @@ namespace cppmicroservices
         ReferenceManagerBaseImpl::BindingPolicy::Log(std::string const& logStr,
                                                      cppmicroservices::logservice::SeverityLevel logLevel)
         {
-            mgr.logger->Log(logLevel, logStr);
+            mgr.logger_->Log(logLevel, logStr);
         }
 
         bool
@@ -62,14 +62,14 @@ namespace cppmicroservices
             std::vector<RefChangeNotification> notifications;
             if (ShouldClearBoundRefs(reference))
             {
-                Log("Notify UNSATISFIED for reference " + mgr.metadata.name);
-                notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_UNSATISFIED);
+                Log("Notify UNSATISFIED for reference " + mgr.metadata_.name);
+                notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_UNSATISFIED);
 
                 ClearBoundRefs();
                 if (mgr.UpdateBoundRefs())
                 {
-                    Log("Notify SATISFIED for reference " + mgr.metadata.name);
-                    notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_SATISFIED);
+                    Log("Notify SATISFIED for reference " + mgr.metadata_.name);
+                    notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED);
                 }
 
                 mgr.BatchNotifyAllListeners(notifications);
@@ -107,18 +107,18 @@ namespace cppmicroservices
                         if (!boundRefsHandle->empty())
                         {
                             svcRefToBind = *(boundRefsHandle->begin());
-                            Log("Notify BIND for reference " + mgr.metadata.name);
+                            Log("Notify BIND for reference " + mgr.metadata_.name);
                         }
                     }
 
-                    Log("Notify UNBIND for reference " + mgr.metadata.name);
-                    notifications.emplace_back(mgr.metadata.name, RefEvent::REBIND, svcRefToBind, reference);
+                    Log("Notify UNBIND for reference " + mgr.metadata_.name);
+                    notifications.emplace_back(mgr.metadata_.name, RefEvent::REBIND, svcRefToBind, reference);
                 }
 
                 if (!mgr.IsSatisfied())
                 {
-                    Log("Notify UNSATISFIED for reference " + mgr.metadata.name);
-                    notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_UNSATISFIED);
+                    Log("Notify UNSATISFIED for reference " + mgr.metadata_.name);
+                    notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_UNSATISFIED);
                 }
 
                 mgr.BatchNotifyAllListeners(notifications);

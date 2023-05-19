@@ -263,7 +263,7 @@ namespace cppmicroservices
                     return;
                 }
             }
-            // INTENTIONALLY FALLS THROUGH - in case of lazy activation.
+            [[fallthrough]];
             case Bundle::STATE_RESOLVED:
             {
                 state = Bundle::STATE_STARTING;
@@ -337,7 +337,7 @@ namespace cppmicroservices
                         }
                     }
                 }
-                // INTENTIONALLY FALLS THROUGH
+                [[fallthrough]];
                 case Bundle::STATE_RESOLVED:
                 case Bundle::STATE_INSTALLED:
                 {

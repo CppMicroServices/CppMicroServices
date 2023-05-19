@@ -153,7 +153,7 @@ namespace cppmicroservices
                 break;
             case Bundle::STATE_ACTIVE:
                 wasActive = true;
-                // Fall through
+                [[fallthrough]];
             case Bundle::STATE_STARTING:
             {
                 bool const wa = wasActive;
@@ -187,7 +187,7 @@ namespace cppmicroservices
                 case Bundle::STATE_INSTALLED:
                 case Bundle::STATE_RESOLVED:
                     DoInit();
-                    // Fall through
+                    [[fallthrough]];
                 case Bundle::STATE_STARTING:
                     operation = BundlePrivate::OP_ACTIVATING;
                     break;

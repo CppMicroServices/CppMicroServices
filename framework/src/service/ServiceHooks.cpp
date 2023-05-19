@@ -125,7 +125,7 @@ namespace cppmicroservices
             {
                 ServiceReference<ServiceFindHook> sr = fhrIter->GetReference();
                 auto fh
-                    = std::static_pointer_cast<ServiceFindHook>(sr.d.load()->GetService(GetPrivate(selfBundle).get()));
+                    = std::static_pointer_cast<ServiceFindHook>(sr.d.Load()->GetService(GetPrivate(selfBundle).get()));
                 if (fh)
                 {
                     try
@@ -177,7 +177,7 @@ namespace cppmicroservices
             {
                 ServiceReference<ServiceEventListenerHook> sr = sriIter->GetReference();
                 auto elh = std::static_pointer_cast<ServiceEventListenerHook>(
-                    sr.d.load()->GetService(GetPrivate(selfBundle).get()));
+                    sr.d.Load()->GetService(GetPrivate(selfBundle).get()));
                 if (elh)
                 {
                     try

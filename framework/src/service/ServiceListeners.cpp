@@ -460,7 +460,7 @@ namespace cppmicroservices
         // Get a copy of the service reference and keep it until we are
         // done with its properties.
         auto ref = evt.GetServiceReference();
-        auto props = ref.d.load()->GetProperties();
+        auto props = ref.d.Load()->GetProperties();
 
         {
             auto l = this->Lock();
@@ -469,7 +469,9 @@ namespace cppmicroservices
             for (auto& sse : complicatedListeners)
             {
                 if (receivers.count(sse) == 0)
+                {
                     continue;
+                }
                 LDAPExpr const& ldapExpr = sse.GetLDAPExpr();
                 if (ldapExpr.IsNull() || ldapExpr.Evaluate(props, false))
                 {

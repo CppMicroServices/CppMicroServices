@@ -23,7 +23,11 @@
 #ifndef CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H
 #define CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H
 
+#include "ServiceRegistrationCoreInfo.h"
 #include "cppmicroservices/ServiceInterface.h"
+
+#include "Properties.h"
+#include "ServiceRegistrationLocks.h"
 
 #include <atomic>
 #include <string>
@@ -47,9 +51,11 @@ namespace cppmicroservices
         ServiceReferenceBasePrivate(ServiceReferenceBasePrivate const&) = delete;
         ServiceReferenceBasePrivate& operator=(ServiceReferenceBasePrivate const&) = delete;
 
-        ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg);
+        ServiceReferenceBasePrivate(std::weak_ptr<ServiceRegistrationBasePrivate> reg);
 
         ~ServiceReferenceBasePrivate();
+
+        std::shared_ptr<ServiceRegistrationLocks> LockServiceRegistration() const;
 
         /**
          * Get the service object.
@@ -100,19 +106,19 @@ namespace cppmicroservices
         bool IsConvertibleTo(std::string const& interfaceId) const;
 
         /**
-         * Reference count for implicitly shared private implementation.
-         */
-        std::atomic<int> ref;
-
-        /**
          * Link to registration object for this reference.
          */
-        ServiceRegistrationBasePrivate* const registration;
+        std::weak_ptr<ServiceRegistrationBasePrivate> const registration;
 
         /**
          * The service interface id for this reference.
          */
         std::string interfaceId;
+
+        /**
+         * Core Information for the service used by ServiceReferenceBasePrivate
+         */
+        std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo;
 
       private:
         InterfaceMapConstPtr GetServiceFromFactory(BundlePrivate* bundle,

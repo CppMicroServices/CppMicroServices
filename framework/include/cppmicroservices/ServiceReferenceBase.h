@@ -24,6 +24,7 @@
 #define CPPMICROSERVICES_SERVICEREFERENCEBASE_H
 
 #include "cppmicroservices/Any.h"
+#include "cppmicroservices/detail/Threads.h"
 #include <functional>
 
 #include <atomic>
@@ -232,13 +233,16 @@ namespace cppmicroservices
          */
         ServiceReferenceBase();
 
-        ServiceReferenceBase(ServiceRegistrationBasePrivate* reg);
+        ServiceReferenceBase(std::shared_ptr<ServiceRegistrationBasePrivate> reg);
 
         void SetInterfaceId(std::string const& interfaceId);
 
         // This class is not thread-safe, but we support thread-safe
-        // copying and assignment.
-        std::atomic<ServiceReferenceBasePrivate*> d;
+        // copying and assignment
+        // This was changed to a std::shared_ptr and is accessed through
+        // Load(), but when this repository uses c++20,
+        // this will be changed to std::atomic<shared_ptr>
+        cppmicroservices::detail::Atomic<std::shared_ptr<ServiceReferenceBasePrivate>> d;
     };
 
     /**

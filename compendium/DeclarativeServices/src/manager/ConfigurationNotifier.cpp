@@ -159,12 +159,14 @@ namespace cppmicroservices
                         mgrs.emplace_back(listener.mgr);
                     }
                 }
-                if (mgrs.empty()) {
+                if (mgrs.empty())
+                {
                     // None of the components in our listeners map is a factory component.
                     return false;
                 }
             } // release listenersMapHandle lock
-            for (auto & mgr : mgrs) {
+            for (auto & mgr : mgrs)
+            {
                 CreateFactoryComponent(pid, mgr);
             }
             return true;

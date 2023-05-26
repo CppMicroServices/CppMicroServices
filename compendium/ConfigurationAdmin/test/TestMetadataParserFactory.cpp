@@ -25,16 +25,19 @@
 #include "../src/metadata/MetadataParserFactory.hpp"
 #include "Mocks.hpp"
 
-namespace cppmicroservices {
-namespace cmimpl {
-namespace metadata {
-
-TEST(TestMetadataParserFactory, ManifestVersionInvalid)
+namespace cppmicroservices
 {
-  auto logger = std::make_shared<FakeLogger>();
-  EXPECT_THROW(MetadataParserFactory::Create(0, logger);, std::runtime_error);
-  EXPECT_THROW(MetadataParserFactory::Create(2, logger);, std::runtime_error);
-}
-}
-}
-}
+    namespace cmimpl
+    {
+        namespace metadata
+        {
+
+            TEST(TestMetadataParserFactory, ManifestVersionInvalid)
+            {
+                auto logger = std::make_shared<FakeLogger>();
+                EXPECT_THROW(MetadataParserFactory::Create(0, logger);, std::runtime_error);
+                EXPECT_THROW(MetadataParserFactory::Create(2, logger);, std::runtime_error);
+            }
+        } // namespace metadata
+    }     // namespace cmimpl
+} // namespace cppmicroservices

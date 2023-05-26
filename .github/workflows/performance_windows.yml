@@ -1,0 +1,70 @@
+name: PerformanceWindows
+
+on:
+  push:
+    branches: [ development, c\+\+14-compliant, master ]
+  workflow_dispatch:
+
+permissions:
+  # deployments permission to deploy GitHub pages website
+  deployments: write
+  # contents permission to update benchmark contents in gh-pages branch
+  contents: write
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+  BUILD_CONFIGURATION: 0
+  WITH_COVERAGE: 0
+
+jobs:
+
+  benchmark:
+    name: CppMicroServices Benchmarks [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
+    runs-on: ${{matrix.os}}
+    env:
+      BUILD_DIR: Z:\build\config_${{matrix.buildconfiguration}}
+      BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
+      BUILD_OS: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022]
+        # build configurations:
+        # 0 = threading ON / shared lib ON
+        # 1 = threading ON / shared lib OFF
+        # 2 = threading OFF / shared lib ON
+        # 3 = threading OFF/ shared lib OFF
+        buildconfiguration: [0]
+
+    steps:
+    - name: Initialization
+      run: |
+        git config --global core.autocrlf true
+        subst Z: ${{github.workspace}}
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Build And Test
+      working-directory: Z:\
+      run: ctest -VV -S cmake\usCTestScript_github.cmake
+
+    - name: Run benchmark and store result in json format
+      run: ${{ env.BUILD_DIR }}\bin\Release\usFrameworkBenchTests.exe  --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json
+
+    - name: Deploy results
+      uses: benchmark-action/github-action-benchmark@v1.16.1
+      with:
+        name: C++ Benchmark
+        tool: 'googlecpp'
+        output-file-path: ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: true
+        # Show alert with commit comment on detecting possible performance regression
+        alert-threshold: '20%'
+        comment-on-alert: true
+        fail-on-alert: false
+        
+        

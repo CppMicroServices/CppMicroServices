@@ -32,281 +32,277 @@
 #include <string>
 #include <utility>
 
-namespace cppmicroservices {
-
-class BundleResourcePrivate
+namespace cppmicroservices
 {
 
-public:
-  BundleResourcePrivate(std::shared_ptr<const BundleArchive> archive)
-    : archive(std::move(archive))
-    , ref(1)
-  {}
+    class BundleResourcePrivate
+    {
 
-  void InitFilePath(const std::string& file);
+      public:
+        BundleResourcePrivate(std::shared_ptr<BundleArchive const> archive) : archive(std::move(archive)) {}
 
-  const std::shared_ptr<const BundleArchive> archive;
+        void InitFilePath(std::string const& file);
 
-  BundleResourceContainer::Stat stat;
+        const std::shared_ptr<BundleArchive const> archive;
 
-  std::string fileName;
-  std::string path;
+        BundleResourceContainer::Stat stat;
 
-  mutable std::vector<std::string> children;
-  mutable std::vector<uint32_t> childNodes;
+        std::string fileName;
+        std::string path;
 
-  /**
-   * Reference count for implicitly shared private implementation.
-   */
-  std::atomic<int> ref;
-};
+        mutable std::vector<std::string> children;
+        mutable std::vector<uint32_t> childNodes;
+    };
 
-void BundleResourcePrivate::InitFilePath(const std::string& file)
-{
-  std::string normalizedFile = file;
-  if (normalizedFile.empty() || normalizedFile[0] != '/') {
-    normalizedFile = '/' + normalizedFile;
-  }
+    void
+    BundleResourcePrivate::InitFilePath(std::string const& file)
+    {
+        std::string normalizedFile = file;
+        if (normalizedFile.empty() || normalizedFile[0] != '/')
+        {
+            normalizedFile = '/' + normalizedFile;
+        }
 
-  std::string rawPath;
-  std::size_t index = normalizedFile.find_last_of('/');
-  if (index == std::string::npos) {
-    fileName = normalizedFile;
-  } else if (index < normalizedFile.size() - 1) {
-    fileName = normalizedFile.substr(index + 1);
-    rawPath = normalizedFile.substr(0, index + 1);
-  } else {
-    rawPath = normalizedFile;
-  }
+        std::string rawPath;
+        std::size_t index = normalizedFile.find_last_of('/');
+        if (index == std::string::npos)
+        {
+            fileName = normalizedFile;
+        }
+        else if (index < normalizedFile.size() - 1)
+        {
+            fileName = normalizedFile.substr(index + 1);
+            rawPath = normalizedFile.substr(0, index + 1);
+        }
+        else
+        {
+            rawPath = normalizedFile;
+        }
 
-  // remove duplicate /
-  std::string::value_type lastChar = 0;
-  for (char i : rawPath) {
-    if (i == '/' && lastChar == '/') {
-      continue;
+        // remove duplicate /
+        std::string::value_type lastChar = 0;
+        for (char i : rawPath)
+        {
+            if (i == '/' && lastChar == '/')
+            {
+                continue;
+            }
+            lastChar = i;
+            path.push_back(lastChar);
+        }
+        if (path.empty())
+        {
+            path.push_back('/');
+        }
     }
-    lastChar = i;
-    path.push_back(lastChar);
-  }
-  if (path.empty()) {
-    path.push_back('/');
-  }
-}
 
-BundleResource::BundleResource()
-  : d(new BundleResourcePrivate(nullptr))
-{}
+    BundleResource::BundleResource() : d(std::make_shared<BundleResourcePrivate>(nullptr)) {}
 
-BundleResource::BundleResource(const BundleResource& resource)
-  : d(resource.d)
-{
-  ++d->ref;
-}
+    BundleResource::BundleResource(BundleResource const& resource) : d(resource.d) {}
 
-BundleResource::BundleResource(
-  const std::string& file,
-  const std::shared_ptr<const BundleArchive>& archive)
-  : d(new BundleResourcePrivate(archive))
-{
-  d->InitFilePath(file);
+    BundleResource::BundleResource(std::string const& file, std::shared_ptr<BundleArchive const> const& archive)
+        : d(std::make_shared<BundleResourcePrivate>(archive))
+    {
+        d->InitFilePath(file);
 
-  d->stat.filePath = d->archive->GetResourcePrefix() + d->path + d->fileName;
+        d->stat.filePath = d->archive->GetResourcePrefix() + d->path + d->fileName;
 
-  d->archive->GetResourceContainer()->GetStat(d->stat);
+        d->archive->GetResourceContainer()->GetStat(d->stat);
 
-  InitializeChildren();
-}
+        InitializeChildren();
+    }
 
-BundleResource::BundleResource(
-  int index,
-  const std::shared_ptr<const BundleArchive>& archive)
-  : d(new BundleResourcePrivate(archive))
-{
-  d->archive->GetResourceContainer()->GetStat(index, d->stat);
-  d->InitFilePath(
-    d->stat.filePath.substr(d->archive->GetResourcePrefix().size()));
+    BundleResource::BundleResource(int index, std::shared_ptr<BundleArchive const> const& archive)
+        : d(std::make_shared<BundleResourcePrivate>(archive))
+    {
+        d->archive->GetResourceContainer()->GetStat(index, d->stat);
+        d->InitFilePath(d->stat.filePath.substr(d->archive->GetResourcePrefix().size()));
 
-  InitializeChildren();
-}
+        InitializeChildren();
+    }
 
-void BundleResource::InitializeChildren()
-{
-  if (d->children.empty()) {
-    d->archive->GetResourceContainer()->GetChildren(
-      d->stat.filePath, true, d->children, d->childNodes);
-  }
-}
+    void
+    BundleResource::InitializeChildren()
+    {
+        if (d->children.empty())
+        {
+            d->archive->GetResourceContainer()->GetChildren(d->stat.filePath, true, d->children, d->childNodes);
+        }
+    }
 
-BundleResource::~BundleResource()
-{
-  if (!--d->ref)
-    delete d;
-}
+    bool
+    BundleResource::operator<(BundleResource const& resource) const
+    {
+        return this->GetResourcePath() < resource.GetResourcePath();
+    }
 
-BundleResource& BundleResource::operator=(const BundleResource& resource)
-{
-  BundleResourcePrivate* curr_d = d;
-  d = resource.d;
-  ++d->ref;
+    bool
+    BundleResource::operator==(BundleResource const& resource) const
+    {
+        if (!this->IsValid())
+        {
+            return !resource.IsValid();
+        }
 
-  if (!--curr_d->ref)
-    delete curr_d;
+        if (!resource.IsValid())
+        {
+            return false;
+        }
 
-  return *this;
-}
+        return d->archive->GetResourceContainer() == resource.d->archive->GetResourceContainer()
+               && d->archive->GetResourcePrefix() == resource.d->archive->GetResourcePrefix()
+               && this->GetResourcePath() == resource.GetResourcePath();
+    }
 
-bool BundleResource::operator<(const BundleResource& resource) const
-{
-  return this->GetResourcePath() < resource.GetResourcePath();
-}
+    bool
+    BundleResource::operator!=(BundleResource const& resource) const
+    {
+        return !(*this == resource);
+    }
 
-bool BundleResource::operator==(const BundleResource& resource) const
-{
-  if (!this->IsValid())
-    return !resource.IsValid();
-  if (!resource.IsValid())
-    return false;
-  return d->archive->GetResourceContainer() ==
-           resource.d->archive->GetResourceContainer() &&
-         d->archive->GetResourcePrefix() ==
-           resource.d->archive->GetResourcePrefix() &&
-         this->GetResourcePath() == resource.GetResourcePath();
-}
+    bool
+    BundleResource::IsValid() const
+    {
+        return d->archive && d->archive->IsValid() && d->stat.index > -1;
+    }
 
-bool BundleResource::operator!=(const BundleResource& resource) const
-{
-  return !(*this == resource);
-}
+    BundleResource::operator bool() const { return IsValid(); }
 
-bool BundleResource::IsValid() const
-{
-  return d->archive && d->archive->IsValid() && d->stat.index > -1;
-}
+    std::string
+    BundleResource::GetName() const
+    {
+        return d->fileName;
+    }
 
-BundleResource::operator bool() const
-{
-  return IsValid();
-}
+    std::string
+    BundleResource::GetPath() const
+    {
+        return d->path;
+    }
 
-std::string BundleResource::GetName() const
-{
-  return d->fileName;
-}
+    std::string
+    BundleResource::GetResourcePath() const
+    {
+        return d->path + d->fileName;
+    }
 
-std::string BundleResource::GetPath() const
-{
-  return d->path;
-}
+    std::string
+    BundleResource::GetBaseName() const
+    {
+        return d->fileName.substr(0, d->fileName.find_first_of('.'));
+    }
 
-std::string BundleResource::GetResourcePath() const
-{
-  return d->path + d->fileName;
-}
+    std::string
+    BundleResource::GetCompleteBaseName() const
+    {
+        return d->fileName.substr(0, d->fileName.find_last_of('.'));
+    }
 
-std::string BundleResource::GetBaseName() const
-{
-  return d->fileName.substr(0, d->fileName.find_first_of('.'));
-}
+    std::string
+    BundleResource::GetSuffix() const
+    {
+        std::size_t index = d->fileName.find_last_of('.');
+        return index < d->fileName.size() - 1 ? d->fileName.substr(index + 1) : std::string("");
+    }
 
-std::string BundleResource::GetCompleteBaseName() const
-{
-  return d->fileName.substr(0, d->fileName.find_last_of('.'));
-}
+    std::string
+    BundleResource::GetCompleteSuffix() const
+    {
+        std::size_t index = d->fileName.find_first_of('.');
+        return index < d->fileName.size() - 1 ? d->fileName.substr(index + 1) : std::string("");
+    }
 
-std::string BundleResource::GetSuffix() const
-{
-  std::size_t index = d->fileName.find_last_of('.');
-  return index < d->fileName.size() - 1 ? d->fileName.substr(index + 1)
-                                        : std::string("");
-}
+    bool
+    BundleResource::IsDir() const
+    {
+        return d->stat.isDir;
+    }
 
-std::string BundleResource::GetCompleteSuffix() const
-{
-  std::size_t index = d->fileName.find_first_of('.');
-  return index < d->fileName.size() - 1 ? d->fileName.substr(index + 1)
-                                        : std::string("");
-}
+    bool
+    BundleResource::IsFile() const
+    {
+        return !d->stat.isDir;
+    }
 
-bool BundleResource::IsDir() const
-{
-  return d->stat.isDir;
-}
+    std::vector<std::string>
+    BundleResource::GetChildren() const
+    {
+        if (!IsValid() || !IsDir())
+            return d->children;
 
-bool BundleResource::IsFile() const
-{
-  return !d->stat.isDir;
-}
+        return d->children;
+    }
 
-std::vector<std::string> BundleResource::GetChildren() const
-{
-  if (!IsValid() || !IsDir())
-    return d->children;
+    std::vector<BundleResource>
+    BundleResource::GetChildResources() const
+    {
+        std::vector<BundleResource> childResources;
 
-  return d->children;
-}
+        if (!IsValid() || !IsDir())
+            return childResources;
 
-std::vector<BundleResource> BundleResource::GetChildResources() const
-{
-  std::vector<BundleResource> childResources;
+        for (std::vector<uint32_t>::const_iterator iter = d->childNodes.begin(), iterEnd = d->childNodes.end();
+             iter != iterEnd;
+             ++iter)
+        {
+            childResources.push_back(BundleResource(static_cast<int>(*iter), d->archive));
+        }
+        return childResources;
+    }
 
-  if (!IsValid() || !IsDir())
-    return childResources;
+    int
+    BundleResource::GetSize() const
+    {
+        return d->stat.uncompressedSize;
+    }
 
-  for (std::vector<uint32_t>::const_iterator iter = d->childNodes.begin(),
-                                             iterEnd = d->childNodes.end();
-       iter != iterEnd;
-       ++iter) {
-    childResources.push_back(
-      BundleResource(static_cast<int>(*iter), d->archive));
-  }
-  return childResources;
-}
+    int
+    BundleResource::GetCompressedSize() const
+    {
+        return d->stat.compressedSize;
+    }
 
-int BundleResource::GetSize() const
-{
-  return d->stat.uncompressedSize;
-}
+    time_t
+    BundleResource::GetLastModified() const
+    {
+        return d->stat.modifiedTime;
+    }
 
-int BundleResource::GetCompressedSize() const
-{
-  return d->stat.compressedSize;
-}
+    uint32_t
+    BundleResource::GetCrc32() const
+    {
+        return d->stat.crc32;
+    }
 
-time_t BundleResource::GetLastModified() const
-{
-  return d->stat.modifiedTime;
-}
+    std::size_t
+    BundleResource::Hash() const
+    {
+        return std::hash<std::string>()(d->archive->GetResourcePrefix() + this->GetResourcePath());
+    }
 
-uint32_t BundleResource::GetCrc32() const
-{
-  return d->stat.crc32;
-}
+    std::unique_ptr<void, void (*)(void*)>
+    BundleResource::GetData() const
+    {
+        if (!IsValid())
+        {
+            return { nullptr, ::free };
+        }
 
-std::size_t BundleResource::Hash() const
-{
-  return std::hash<std::string>()(d->archive->GetResourcePrefix() +
-                                  this->GetResourcePath());
-}
+        auto data = d->archive->GetResourceContainer()->GetData(d->stat.index);
+        if (!data)
+        {
+            auto sink = GetBundleContext().GetLogSink();
+            DIAG_LOG(*sink) << "Error uncompressing resource data for " << this->GetResourcePath() << " from "
+                            << d->archive->GetBundleLocation();
+        }
 
-std::unique_ptr<void, void (*)(void*)> BundleResource::GetData() const
-{
-  if (!IsValid())
-    return { nullptr, ::free };
+        return data;
+    }
 
-  auto data = d->archive->GetResourceContainer()->GetData(d->stat.index);
-  if (!data) {
-    auto sink = GetBundleContext().GetLogSink();
-    DIAG_LOG(*sink) << "Error uncompressing resource data for "
-                    << this->GetResourcePath() << " from "
-                    << d->archive->GetBundleLocation();
-  }
-
-  return data;
-}
-
-std::ostream& operator<<(std::ostream& os, const BundleResource& resource)
-{
-  return os << resource.GetResourcePath();
-}
+    std::ostream&
+    operator<<(std::ostream& os, BundleResource const& resource)
+    {
+        return os << resource.GetResourcePath();
+    }
 
 } // namespace cppmicroservices

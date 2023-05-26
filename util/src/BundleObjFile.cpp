@@ -25,19 +25,24 @@
 #include <cstring>
 #include <utility>
 
-namespace cppmicroservices {
+US_MSVC_PUSH_DISABLE_WARNING(4996)
 
-InvalidObjFileException::InvalidObjFileException(std::string what,
-                                                 int errorNumber)
-  : m_What(std::move(what))
+namespace cppmicroservices
 {
-  if (errorNumber) {
-    m_What += std::string(": ") + strerror(errorNumber);
-  }
-}
 
-const char* InvalidObjFileException::what() const noexcept
-{
-  return m_What.c_str();
-}
-}
+    InvalidObjFileException::InvalidObjFileException(std::string what, int errorNumber) : m_What(std::move(what))
+    {
+        if (errorNumber)
+        {
+            m_What += std::string(": ") + strerror(errorNumber);
+        }
+    }
+
+    char const*
+    InvalidObjFileException::what() const noexcept
+    {
+        return m_What.c_str();
+    }
+} // namespace cppmicroservices
+
+US_MSVC_POP_WARNING

@@ -11,7 +11,7 @@ project or *Make* files.
 Prerequisites
 -------------
 
--  `CMake <http://www.cmake.org>`_ 3.2 (users of the latest Visual Studio
+-  `CMake <http://www.cmake.org>`_ 3.12.4 (users of the latest Visual Studio
    should typically also use the latest CMake version available)
 
 Configuration

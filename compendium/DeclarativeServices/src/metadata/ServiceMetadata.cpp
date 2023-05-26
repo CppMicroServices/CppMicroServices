@@ -22,14 +22,15 @@
 
 #include "ServiceMetadata.hpp"
 
-namespace cppmicroservices {
-namespace scrimpl {
-namespace metadata {
+namespace cppmicroservices
+{
+    namespace scrimpl
+    {
+        namespace metadata
+        {
 
-const std::vector<std::string> ServiceMetadata::Scopes = { "bundle",
-                                                           "prototype",
-                                                           "singleton" };
+            const std::vector<std::string> ServiceMetadata::Scopes = { "bundle", "prototype", "singleton" };
 
-}
-}
-}
+        }
+    } // namespace scrimpl
+} // namespace cppmicroservices

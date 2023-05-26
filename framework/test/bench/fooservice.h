@@ -1,15 +1,18 @@
 // A dummy interface and impl to use with service trackers
-namespace benchmark {
-namespace test {
-
-class Foo
+namespace benchmark
 {
-public:
-  virtual ~Foo() = default;
-};
+    namespace test
+    {
 
-class FooImpl : public Foo
-{};
+        class Foo
+        {
+          public:
+            virtual ~Foo() = default;
+        };
 
-}
-}
+        class FooImpl : public Foo
+        {
+        };
+
+    } // namespace test
+} // namespace benchmark

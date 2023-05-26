@@ -6,21 +6,27 @@
 
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
-namespace dependent {
-class TestBundleDSDependentImpl : public test::TestBundleDSDependent
+namespace dependent
 {
-public:
-  TestBundleDSDependentImpl(
-    const std::shared_ptr<test::TestBundleDSUpstreamDependency>&);
-  ~TestBundleDSDependentImpl() override;
+    class TestBundleDSDependentImpl : public test::TestBundleDSDependent
+    {
+      public:
+        TestBundleDSDependentImpl(std::shared_ptr<test::TestBundleDSUpstreamDependency> const&);
+        ~TestBundleDSDependentImpl() override;
 
-  void Activate(const std::shared_ptr<ComponentContext>&) {}
+        void
+        Activate(std::shared_ptr<ComponentContext> const&)
+        {
+        }
 
-  void Deactivate(const std::shared_ptr<ComponentContext>&) {}
+        void
+        Deactivate(std::shared_ptr<ComponentContext> const&)
+        {
+        }
 
-private:
-  std::shared_ptr<test::TestBundleDSUpstreamDependency> ref;
-};
-}
+      private:
+        std::shared_ptr<test::TestBundleDSUpstreamDependency> ref;
+    };
+} // namespace dependent
 
 #endif // _SERVICE_IMPL_HPP_

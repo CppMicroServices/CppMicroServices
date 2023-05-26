@@ -8,18 +8,19 @@
 
 using namespace cppmicroservices;
 
-int main(int /*argc*/, char* /*argv*/[])
+int
+main(int /*argc*/, char* /*argv*/[])
 {
-  ServiceReference<IDictionaryService> dictionaryServiceRef =
-    GetBundleContext().GetServiceReference<IDictionaryService>();
-  if (dictionaryServiceRef) {
-    auto dictionaryService =
-      GetBundleContext().GetService(dictionaryServiceRef);
-    if (dictionaryService) {
-      std::cout << "Dictionary contains 'Tutorial': "
-                << dictionaryService->CheckWord("Tutorial") << std::endl;
+    ServiceReference<IDictionaryService> dictionaryServiceRef
+        = GetBundleContext().GetServiceReference<IDictionaryService>();
+    if (dictionaryServiceRef)
+    {
+        auto dictionaryService = GetBundleContext().GetService(dictionaryServiceRef);
+        if (dictionaryService)
+        {
+            std::cout << "Dictionary contains 'Tutorial': " << dictionaryService->CheckWord("Tutorial") << std::endl;
+        }
     }
-  }
 }
 
 #include "cppmicroservices/BundleInitialization.h"

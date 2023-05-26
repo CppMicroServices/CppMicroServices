@@ -32,116 +32,102 @@ using namespace cppmicroservices;
 
 class BundleEventTest : public ::testing::Test
 {
-protected:
-  Bundle bundle;
-  Framework f;
+  protected:
+    Bundle bundle;
+    Framework f;
 
-public:
-  BundleEventTest()
-    : f(FrameworkFactory().NewFramework()){};
+  public:
+    BundleEventTest() : f(FrameworkFactory().NewFramework()) {};
 
-  ~BundleEventTest() override = default;
+    ~BundleEventTest() override = default;
 
-  void SetUp() override
-  {
-    f.Start();
+    void
+    SetUp() override
+    {
+        f.Start();
 
 #if defined(US_BUILD_SHARED_LIBS)
-    bundle = cppmicroservices::testing::InstallLib(f.GetBundleContext(),
-                                                   "TestBundleA");
+        bundle = cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleA");
 #else
-    bundle =
-      cppmicroservices::testing::GetBundle("TestBundleA", f.GetBundleContext());
+        bundle = cppmicroservices::testing::GetBundle("TestBundleA", f.GetBundleContext());
 #endif
-  }
+    }
 
-  void TearDown() override
-  {
-    f.Stop();
-    f.WaitForStop(std::chrono::milliseconds::zero());
-  }
+    void
+    TearDown() override
+    {
+        f.Stop();
+        f.WaitForStop(std::chrono::milliseconds::zero());
+    }
 };
 
 TEST_F(BundleEventTest, invalidBundleEvents)
 {
-  Bundle b;
-  ASSERT_THROW(BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, b),
-               std::invalid_argument);
+    Bundle b;
+    ASSERT_THROW(BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, b), std::invalid_argument);
 }
 
 TEST_F(BundleEventTest, invalidBundleOrigin)
 {
-  Bundle b;
-  ASSERT_THROW(BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, bundle, b),
-               std::invalid_argument);
+    Bundle b;
+    ASSERT_THROW(BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, bundle, b), std::invalid_argument);
 }
 
 TEST_F(BundleEventTest, validBundleOrigin)
 {
-  ASSERT_NO_THROW(
-    BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, bundle, bundle));
+    ASSERT_NO_THROW(BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, bundle, bundle));
 }
 
 TEST_F(BundleEventTest, StreamLazyActivationBundleEventType)
 {
-  std::stringstream buffer;
-  std::streambuf* backup = std::cout.rdbuf(buffer.rdbuf());
-  std::cout << BundleEvent(BundleEvent::Type::BUNDLE_LAZY_ACTIVATION, bundle);
-  std::string actStr = buffer.str();
-  ASSERT_TRUE(actStr.find("LAZY_ACTIVATION") != std::string::npos);
-  std::cout.rdbuf(backup);
+    std::stringstream buffer;
+    std::streambuf* backup = std::cout.rdbuf(buffer.rdbuf());
+    std::cout << BundleEvent(BundleEvent::Type::BUNDLE_LAZY_ACTIVATION, bundle);
+    std::string actStr = buffer.str();
+    ASSERT_TRUE(actStr.find("LAZY_ACTIVATION") != std::string::npos);
+    std::cout.rdbuf(backup);
 }
 
 TEST_F(BundleEventTest, StreamUnknownBundleEventType)
 {
-  std::stringstream buffer;
-  std::streambuf* backup = std::cout.rdbuf(buffer.rdbuf());
-  std::cout << BundleEvent(BundleEvent::Type::BUNDLE_UPDATED, bundle);
-  std::string actStr = buffer.str();
-  ASSERT_TRUE(actStr.find("Unknown bundle event type") != std::string::npos);
-  std::cout.rdbuf(backup);
+    std::stringstream buffer;
+    std::streambuf* backup = std::cout.rdbuf(buffer.rdbuf());
+    std::cout << BundleEvent(BundleEvent::Type::BUNDLE_UPDATED, bundle);
+    std::string actStr = buffer.str();
+    ASSERT_TRUE(actStr.find("Unknown bundle event type") != std::string::npos);
+    std::cout.rdbuf(backup);
 }
 
 TEST_F(BundleEventTest, BundleEventValidation)
 {
-  ASSERT_EQ(BundleEvent::Type::BUNDLE_INSTALLED,
-            static_cast<BundleEvent::Type>(1));
-  ASSERT_EQ(BundleEvent::Type::BUNDLE_STARTED,
-            static_cast<BundleEvent::Type>(2));
-  ASSERT_EQ(BundleEvent::Type::BUNDLE_STOPPED,
-            static_cast<BundleEvent::Type>(4));
-  ASSERT_EQ(BundleEvent::Type::BUNDLE_UPDATED,
-            static_cast<BundleEvent::Type>(8));
-  ASSERT_EQ(BundleEvent::Type::BUNDLE_UNINSTALLED,
-            static_cast<BundleEvent::Type>(16));
-  ASSERT_EQ(BundleEvent::Type::BUNDLE_RESOLVED,
-            static_cast<BundleEvent::Type>(32));
-  ASSERT_EQ(BundleEvent::Type::BUNDLE_UNRESOLVED,
-            static_cast<BundleEvent::Type>(64));
-  ASSERT_EQ(BundleEvent::Type::BUNDLE_STARTING,
-            static_cast<BundleEvent::Type>(128));
-  ASSERT_EQ(BundleEvent::Type::BUNDLE_STOPPING,
-            static_cast<BundleEvent::Type>(256));
-  ASSERT_EQ(BundleEvent::Type::BUNDLE_LAZY_ACTIVATION,
-            static_cast<BundleEvent::Type>(512));
+    ASSERT_EQ(BundleEvent::Type::BUNDLE_INSTALLED, static_cast<BundleEvent::Type>(1));
+    ASSERT_EQ(BundleEvent::Type::BUNDLE_STARTED, static_cast<BundleEvent::Type>(2));
+    ASSERT_EQ(BundleEvent::Type::BUNDLE_STOPPED, static_cast<BundleEvent::Type>(4));
+    ASSERT_EQ(BundleEvent::Type::BUNDLE_UPDATED, static_cast<BundleEvent::Type>(8));
+    ASSERT_EQ(BundleEvent::Type::BUNDLE_UNINSTALLED, static_cast<BundleEvent::Type>(16));
+    ASSERT_EQ(BundleEvent::Type::BUNDLE_RESOLVED, static_cast<BundleEvent::Type>(32));
+    ASSERT_EQ(BundleEvent::Type::BUNDLE_UNRESOLVED, static_cast<BundleEvent::Type>(64));
+    ASSERT_EQ(BundleEvent::Type::BUNDLE_STARTING, static_cast<BundleEvent::Type>(128));
+    ASSERT_EQ(BundleEvent::Type::BUNDLE_STOPPING, static_cast<BundleEvent::Type>(256));
+    ASSERT_EQ(BundleEvent::Type::BUNDLE_LAZY_ACTIVATION, static_cast<BundleEvent::Type>(512));
 
-  BundleEvent invalid_event;
-  ASSERT_TRUE(!invalid_event);
-  ASSERT_EQ(BundleEvent::Type::BUNDLE_UNINSTALLED, invalid_event.GetType());
-  ASSERT_TRUE(!invalid_event.GetBundle());
-  ASSERT_TRUE(!invalid_event.GetOrigin());
+    BundleEvent invalid_event;
+    ASSERT_TRUE(!invalid_event);
+    ASSERT_EQ(BundleEvent::Type::BUNDLE_UNINSTALLED, invalid_event.GetType());
+    ASSERT_TRUE(!invalid_event.GetBundle());
+    ASSERT_TRUE(!invalid_event.GetOrigin());
 
-  BundleEvent valid_event(BundleEvent::Type::BUNDLE_UNINSTALLED, f);
-  ASSERT_TRUE(valid_event);
-  ASSERT_EQ(BundleEvent::Type::BUNDLE_UNINSTALLED, valid_event.GetType());
-  ASSERT_EQ(f, valid_event.GetBundle());
+    BundleEvent valid_event(BundleEvent::Type::BUNDLE_UNINSTALLED, f);
+    ASSERT_TRUE(valid_event);
+    ASSERT_EQ(BundleEvent::Type::BUNDLE_UNINSTALLED, valid_event.GetType());
+    ASSERT_EQ(f, valid_event.GetBundle());
 
-  BundleEvent dup_valid_event(valid_event);
-  ASSERT_EQ(valid_event, dup_valid_event);
+    BundleEvent dup_valid_event(valid_event);
+    ASSERT_EQ(valid_event, dup_valid_event);
 
-  dup_valid_event = invalid_event;
-  ASSERT_EQ(invalid_event, dup_valid_event);
+    dup_valid_event = invalid_event;
+    ASSERT_EQ(invalid_event, dup_valid_event);
 
-  dup_valid_event = BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, f);
-  ASSERT_TRUE(!(dup_valid_event == invalid_event));
+    dup_valid_event = BundleEvent(BundleEvent::Type::BUNDLE_INSTALLED, f);
+    ASSERT_TRUE(!(dup_valid_event == invalid_event));
 }

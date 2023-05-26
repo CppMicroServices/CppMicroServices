@@ -29,25 +29,23 @@ using namespace cppmicroservices;
 
 TEST(FrameworkFactoryTest, testFrameworkInstantiation)
 {
-  auto f = FrameworkFactory().NewFramework();
-  ASSERT_TRUE(f) << "Unique Test Framework must be instantiated";
+    auto f = FrameworkFactory().NewFramework();
+    ASSERT_TRUE(f) << "Unique Test Framework must be instantiated";
 
-  auto f1 = FrameworkFactory().NewFramework();
-  ASSERT_NE(f, f1) << "Unique Test Framework must be instantiated";
+    auto f1 = FrameworkFactory().NewFramework();
+    ASSERT_NE(f, f1) << "Unique Test Framework must be instantiated";
 
-  FrameworkConfiguration configuration;
-  configuration["org.osgi.framework.security"] = std::string("osgi");
-  configuration["org.osgi.framework.startlevel.beginning"] = 0;
-  configuration["org.osgi.framework.bsnversion"] = std::string("single");
-  configuration["org.osgi.framework.custom1"] = std::string("foo");
-  configuration["org.osgi.framework.custom2"] = std::string("bar");
+    FrameworkConfiguration configuration;
+    configuration["org.osgi.framework.security"] = std::string("osgi");
+    configuration["org.osgi.framework.startlevel.beginning"] = 0;
+    configuration["org.osgi.framework.bsnversion"] = std::string("single");
+    configuration["org.osgi.framework.custom1"] = std::string("foo");
+    configuration["org.osgi.framework.custom2"] = std::string("bar");
 
-  auto f2 = FrameworkFactory().NewFramework(configuration);
-  ASSERT_TRUE(f2) << "Test Framework must be instantiated with configuration";
+    auto f2 = FrameworkFactory().NewFramework(configuration);
+    ASSERT_TRUE(f2) << "Test Framework must be instantiated with configuration";
 
-  auto f3 = FrameworkFactory().NewFramework(
-    std::unordered_map<std::string, cppmicroservices::Any>(), &std::clog);
-  ASSERT_TRUE(f3)
-    << "Test Framework must instantiated with default configuration "
-       "and custom logger";
+    auto f3 = FrameworkFactory().NewFramework(std::unordered_map<std::string, cppmicroservices::Any>(), &std::clog);
+    ASSERT_TRUE(f3) << "Test Framework must instantiated with default configuration "
+                       "and custom logger";
 }

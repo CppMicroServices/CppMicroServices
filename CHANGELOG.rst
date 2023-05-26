@@ -6,10 +6,10 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-`Unreleased v4.0.0 <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (2020-XX-XX)
+`(UNRELEASED) vX.X.X <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (20XX-XX-XX)
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.6.0...development>`_
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.6...development>`_
 
 Added
 -----
@@ -25,6 +25,216 @@ Deprecated
 
 Fixed
 -----
+- `[Core Framework] Data Race Condition fix for Bundles dataStorage location <https://github.com/CppMicroServices/CppMicroServices/pull/845>`_
+
+`v3.7.6 <https://github.com/cppmicroservices/cppmicroservices/tree/3.7.6>`_ (2023-04-25)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.5...3.7.6>`_
+
+Added
+-----
+- `[Declarative Services] Add benchmark test infrastructure to DS <https://github.com/CppMicroServices/CppMicroServices/pull/813>`_
+- `[Core Framework] Make nested JSON queries using LDAP build-time configurable <https://github.com/CppMicroServices/CppMicroServices/pull/811>`_
+- `[Core Framework] Support nested JSON queries using LDAP <https://github.com/CppMicroServices/CppMicroServices/pull/794>`_
+
+Changed
+-------
+- `Upgrade GitHub Actions to use Ubuntu 22.04 and remove use of Ubuntu 18.04 <https://github.com/CppMicroServices/CppMicroServices/pull/810>`_
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Core Framework] clang-tidy improvement for CMakeResourceDependencies <https://github.com/CppMicroServices/CppMicroServices/pull/812>`_
+- `[Core Framework] GetService performance micro-optimizations <https://github.com/CppMicroServices/CppMicroServices/pull/833>`_
+- `[Declarative Services] Fix sporadic crash caused by concurrent access to ComponentMgrImpl vector <https://github.com/CppMicroServices/CppMicroServices/pull/834>`_
+
+`v3.7.5 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.7.5>`_ (2023-03-14)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.4...v3.7.5>`_
+
+Added
+-----
+
+Changed
+-------
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Core Framework] Performance improvements <https://github.com/CppMicroServices/CppMicroServices/pull/728>`_
+- `[Core Framework] Fix undefined behavior <https://github.com/CppMicroServices/CppMicroServices/pull/777>`_
+- `[Declarative Services] Fix race with Declarative Services service object construction <https://github.com/CppMicroServices/CppMicroServices/pull/801>`_
+- `[Core Framework] RegisterService performance improvement <https://github.com/CppMicroServices/CppMicroServices/pull/808>`_
+
+
+`v3.7.4 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.7.4>`_ (2022-11-02)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...v3.7.4>`_
+
+Added
+-----
+- `Support arm64 on macOS <https://github.com/CppMicroServices/CppMicroServices/pull/778>`_
+
+Changed
+-------
+- Code formatting, no functional changes:
+    - `updated formatting - clang-fromat ran on all files <https://github.com/CppMicroServices/CppMicroServices/pull/759>`_
+    - `Clang-format git hook pre-commit enforcement <https://github.com/CppMicroServices/CppMicroServices/pull/760>`_
+    - `clang-format ran on all files <https://github.com/CppMicroServices/CppMicroServices/pull/766>`_
+- `[Core Framework] Upgrade jsoncpp <https://github.com/CppMicroServices/CppMicroServices/pull/773>`_
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Configuration Admin] Fix deadlock in ConfigurationAdminImpl::RemoveConfigurations <https://github.com/CppMicroServices/CppMicroServices/pull/748>`_
+- `[Configuration Admin] configurations using the same pid are not updated properly <https://github.com/CppMicroServices/CppMicroServices/pull/754>`_
+- `[Declarative Services] Ensure ~SCRBundleExtension does not throw <https://github.com/CppMicroServices/CppMicroServices/pull/761>`_
+- `Fix broken static build configurations on macOS <https://github.com/CppMicroServices/CppMicroServices/pull/774>`_
+
+
+`(UNRELEASED) v3.7.3 <https://github.com/cppmicroservices/cppmicroservices/tree/13ca108641c1960539cdaed10bcc39ae9a46b7a6>`_ (2022-08-29)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.2...13ca108641c1960539cdaed10bcc39ae9a46b7a6>`_
+
+Added
+-----
+- `Add MSVC analysis to project <https://github.com/CppMicroServices/CppMicroServices/pull/685>`_
+
+Changed
+-------
+- `[Declarative Services] Improve error message that is generated when an appropriate constructor isn't found for the Service Instance. <https://github.com/CppMicroServices/CppMicroServices/pull/724>`_
+- `[Configuration Admin] Remove automatic config object creation <https://github.com/CppMicroServices/CppMicroServices/pull/717>`_
+- `Updated CI to use macos-12 <https://github.com/CppMicroServices/CppMicroServices/pull/711>`_
+- `Update CXX_STANDARD to 17 for doc <https://github.com/CppMicroServices/CppMicroServices/pull/705>`_
+- `[Core Framework] Upgrade miniz to v3.0 <https://github.com/CppMicroServices/CppMicroServices/pull/688>`_
+- `[Core Framework] Remove manual ref counting for BundleResource <https://github.com/CppMicroServices/CppMicroServices/pull/695>`_
+- `Add ignore for 3rdparty code for MSVC code analysis <https://github.com/CppMicroServices/CppMicroServices/pull/692>`_
+- `[Core Framework/Declarative Services] Add log messages when shared library loading throws an exception <https://github.com/CppMicroServices/CppMicroServices/pull/690>`_
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Declarative Services] Factory Configuration Bug Fix <https://github.com/CppMicroServices/CppMicroServices/pull/731>`_
+- `[Configuration Admin] Fix race that results in a missed config updated event <https://github.com/CppMicroServices/CppMicroServices/pull/727>`_
+- `[Core Framework] Fixed sporadic race conditions during framework shutdown <https://github.com/CppMicroServices/CppMicroServices/pull/725>`_
+- `[Core Framework] Ensure that the ServiceTracker::GetTrackingCount() method returns -1 if the tracker has been opened and then closed. <https://github.com/CppMicroServices/CppMicroServices/pull/714>`_
+- `Added missing include for <thread> <https://github.com/CppMicroServices/CppMicroServices/pull/721>`_
+- `[Declarative Services] BugFix when creating instance name for factory components <https://github.com/CppMicroServices/CppMicroServices/pull/720>`_
+- `[Configuration Admin] Fix race in ConfigurationNotifier::NotifyAllListeners() <https://github.com/CppMicroServices/CppMicroServices/pull/715>`_
+- `[Configuration Admin] Fix deadlock <https://github.com/CppMicroServices/CppMicroServices/pull/651>`_
+- `[Core Framework] Improve performance of LDAP matching <https://github.com/CppMicroServices/CppMicroServices/pull/704>`_
+- `[Core Framework] Fix CFRlogger accessviolation <https://github.com/CppMicroServices/CppMicroServices/pull/706>`_
+- `Cleaned up some security warnings regarding 'noexcept' <https://github.com/CppMicroServices/CppMicroServices/pull/700>`_
+- `[Configuration Admin] Multiple services and factory services in bundle dependent on same configuration pid <https://github.com/CppMicroServices/CppMicroServices/pull/698>`_
+- `Disable code signing for bundle with no c++ code <https://github.com/CppMicroServices/CppMicroServices/pull/697>`_
+- `Fix compilation issue for arm macOS native compilation <https://github.com/CppMicroServices/CppMicroServices/pull/696>`_
+- `[Core Framework] Add file handle leak test <https://github.com/CppMicroServices/CppMicroServices/pull/693>`_
+- `[Configuration Admin] ListConfigurations fix for empty configuration objects. <https://github.com/CppMicroServices/CppMicroServices/pull/682>`_
+
+
+
+`v3.7.2 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.7.2>`_ (2022-06-16)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.6.0...v3.7.2>`_
+
+General Note
+------------
+
+The last time CppMicroServices was upgraded to a new version on GitHub was two years ago. We think
+it will not be useful to include every change since then; below we have captured all of the
+relevant changes between `v3.6.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.6.0>`_
+and `v3.7.2 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.7.2>`_.
+
+Added
+-----
+
+- `[Log Service] LogService Implementation <https://github.com/CppMicroServices/CppMicroServices/pull/499>`_
+- `[Declarative Services] Added thread pool to DS <https://github.com/CppMicroServices/CppMicroServices/pull/509>`_
+- `[Core Framework] Anymap erase and compare <https://github.com/CppMicroServices/CppMicroServices/pull/540>`_
+- `Provide updated manifest.json schema in repo <https://github.com/CppMicroServices/CppMicroServices/pull/583>`_
+- `[Configuration Admin/Declarative Services] Configadmin ds integration <https://github.com/CppMicroServices/CppMicroServices/pull/512>`_
+- GitHub Actions used as CI/CD solution
+- `[AsyncWorkService] Added AsyncWorkService interface to CppMicroServices <https://github.com/CppMicroServices/CppMicroServices/pull/598>`_
+- GitHub Actions runs workflow for clang build with ASAN, TSAN, and UBSAN enabled
+- `[AsyncWorkService] AsyncWorkService DS Integration <https://github.com/CppMicroServices/CppMicroServices/pull/599>`_
+- `[AsyncWorkService] AsyncWorkService ConfigAdmin Integration <https://github.com/CppMicroServices/CppMicroServices/pull/620>`_
+- `[Security/Core Framework] bundle validation mechanism <https://github.com/CppMicroServices/CppMicroServices/pull/630>`_
+
+Changed
+-------
+
+- [Core Framework] Migrated all test driver tests to gtest
+- `Optimize the string creation in us_service_interface_iid<void>() <https://github.com/CppMicroServices/CppMicroServices/pull/523>`_
+- `[Core Framework] Improve the performance of removing service listeners <https://github.com/CppMicroServices/CppMicroServices/pull/626>`_
+- `[Declarative Services] Reduce possibility for symbol conflicts with autogenerated DS files <https://github.com/CppMicroServices/CppMicroServices/pull/647>`_
+- `Switch project to c++17 <https://github.com/CppMicroServices/CppMicroServices/pull/654>`_
+- `Upgraded to CMake 3.17 <https://github.com/CppMicroServices/CppMicroServices/pull/655>`_
+- `[Core Framework] Switch code to use std::string_view instead of abseil <https://github.com/CppMicroServices/CppMicroServices/pull/657>`_
+- `[Core Framework] Integrate LogService core framework and add more detail to exception messages <https://github.com/CppMicroServices/CppMicroServices/pull/680>`_
+
+Removed
+-------
+
+- `[Core Framework] Remove Bundle Threads <https://github.com/CppMicroServices/CppMicroServices/pull/533>`_
+- TravisCI and Appveyor removed as CI/CD solution
+
+Deprecated
+----------
+
+Fixed
+-----
+
+- `[Core Framework] Fix ServiceTracker race <https://github.com/CppMicroServices/CppMicroServices/pull/518>`_
+- `[Core Framework] Made ToJSON for strings do proper escaping of special characters <https://github.com/CppMicroServices/CppMicroServices/pull/527>`_
+- `[Core Framework] Fix issues with line endings in BundleResourceTest.cpp test <https://github.com/CppMicroServices/CppMicroServices/pull/531>`_
+- `Fix #301 so TSAN buidls work on Linux <https://github.com/CppMicroServices/CppMicroServices/pull/537>`_
+- `[Configuration Admin] ConfigAdmin remove notification when configuration object is created <https://github.com/CppMicroServices/CppMicroServices/pull/539>`_
+- `[Configuration Admin] Fix TestConcurrentBindUnbind error <https://github.com/CppMicroServices/CppMicroServices/commit/61f8a8a150741feaacbadb18ee53720a211dcc31>`_
+- `[Core Framework] Fix ServiceTracker race <https://github.com/CppMicroServices/CppMicroServices/pull/558>`_
+- `[Configuration Admin] RemoveBoundServicesCache fix <https://github.com/CppMicroServices/CppMicroServices/commit/93b4cbfe570942dd282fc53749586426e31de82b>`_
+- `[Declarative Services] Prevent nullptr from being passed to service constructors <https://github.com/CppMicroServices/CppMicroServices/pull/572>`_
+- `[Declarative Services] fix segfault when service class ctor throws <https://github.com/CppMicroServices/CppMicroServices/pull/586>`_
+- `[Core Framework] Fix bug when an AddingService method returns nullptr <https://github.com/CppMicroServices/CppMicroServices/pull/613>`_
+- `[Configuration Admin] Fix deadlock in ConfigAdmin Update, UpdateIfDifferent, and Remove <https://github.com/CppMicroServices/CppMicroServices/pull/612>`_
+- `[Configuration Admin] Fix ConfigurationAdmin ListConfigurations and Fix Race Conditions in DS <https://github.com/CppMicroServices/CppMicroServices/commit/630ef502035801603cd30334de10b591b77e5716>`_
+- `[Resource Compimler] Allow ResourceCompiler to accept Unicode Command-line arguments <https://github.com/CppMicroServices/CppMicroServices/pull/624>`_
+- `[Core Framework] service tracker doesn't track services after a close and then open <https://github.com/CppMicroServices/CppMicroServices/pull/627>`_
+- `Fix warning suppression leakage to non-CppMicroServices code inside translation units <https://github.com/CppMicroServices/CppMicroServices/commit/25e11cdabfc1f46da79139e15ff06e9825fa305a>`_
+- `[Core Framework] Fix leak in ServiceListeners.cpp <https://github.com/CppMicroServices/CppMicroServices/pull/639>`_
+- `[Core Framework] Ensure that any BundleContext functions do not segfault if the bundle context is invalid <https://github.com/CppMicroServices/CppMicroServices/pull/656>`_
+- `Fixed issue where DS/CA do not build if US_BUILD_TESTING isn't ON <https://github.com/CppMicroServices/CppMicroServices/pull/661>`_
+- `Fixed build issues when building in "getting_started" dir <https://github.com/CppMicroServices/CppMicroServices/pull/662>`_
+- `[Core Framework] Fix check-then-act-race in GetServiceFromFactory <https://github.com/CppMicroServices/CppMicroServices/pull/664>`_
+- `[Core Framework] Fix bug in FindResources() for data-only bundles <https://github.com/CppMicroServices/CppMicroServices/pull/667>`_
+- `[Core Framework] Fix check-then-act race for BundleContext <https://github.com/CppMicroServices/CppMicroServices/pull/665>`_
+- `[Declarative Services] Fix inheritance for ComponentException <https://github.com/CppMicroServices/CppMicroServices/pull/676>`_
+- `[Core Framework] Add --max-threads flag for core framework mem test <https://github.com/CppMicroServices/CppMicroServices/pull/679>`_
+- `[Core Framework] Fix leaked file handle <https://github.com/CppMicroServices/CppMicroServices/pull/681>`_
 
 
 
@@ -58,7 +268,7 @@ Fixed
 - `Removed gtest dependency when not building the tests <https://github.com/CppMicroServices/CppMicroServices/pull/486>`_
 
 
-v3.5.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.5.0>`_ (2020-07-04)
+`v3.5.0 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.5.0>`_ (2020-07-04)
 ---------------------------------------------------------------------------------------------------------
 
 `Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.4.0...v3.5.0>`_

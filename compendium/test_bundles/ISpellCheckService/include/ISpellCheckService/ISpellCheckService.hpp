@@ -26,24 +26,25 @@
 #include <string>
 #include <vector>
 
-namespace test {
-
-class US_ISpellCheckService_EXPORT ISpellCheckService
+namespace test
 {
-public:
-  virtual ~ISpellCheckService();
 
-  /**
-   * Checks a given passage for spelling errors. A passage is any number of
-   * words separated by a space and any of the following punctuation marks:
-   * comma (,), period (.), exclamation mark (!), question mark (?),
-   * semi-colon (;), and colon(:).
-   *
-   * @param passage the passage to spell check.
-   * @return A list of misspelled words.
-   */
-  virtual std::vector<std::string> Check(const std::string& passage) = 0;
-};
+    class US_ISpellCheckService_EXPORT ISpellCheckService
+    {
+      public:
+        virtual ~ISpellCheckService();
 
-}
+        /**
+         * Checks a given passage for spelling errors. A passage is any number of
+         * words separated by a space and any of the following punctuation marks:
+         * comma (,), period (.), exclamation mark (!), question mark (?),
+         * semi-colon (;), and colon(:).
+         *
+         * @param passage the passage to spell check.
+         * @return A list of misspelled words.
+         */
+        virtual std::vector<std::string> Check(std::string const& passage) = 0;
+    };
+
+} // namespace test
 #endif // _ISPELLCHECKSERVICE_HPP_

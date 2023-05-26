@@ -29,68 +29,68 @@
 #include <future>
 #include <memory>
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-class ComponentConfiguration;
-/**
- * This interface provides the information about the current state of a component.
- * It is used by ServiceComponentRuntimeImpl and ComponentContextImpl classes.
- */
-class ComponentManager
+namespace cppmicroservices
 {
-public:
-  ComponentManager() = default;
-  ComponentManager(const ComponentManager&) = delete;
-  ComponentManager(ComponentManager&&) = delete;
-  ComponentManager& operator=(const ComponentManager&) = delete;
-  ComponentManager& operator=(ComponentManager&&) = delete;
-  virtual ~ComponentManager() = default;
+    namespace scrimpl
+    {
 
-  /**
-   * Returns the name of the component managed by this object. The name is the same
-   * as specified in the component description.
-   */
-  virtual std::string GetName() const = 0;
+        class ComponentConfiguration;
+        /**
+         * This interface provides the information about the current state of a component.
+         * It is used by ServiceComponentRuntimeImpl and ComponentContextImpl classes.
+         */
+        class ComponentManager
+        {
+          public:
+            ComponentManager() = default;
+            ComponentManager(ComponentManager const&) = delete;
+            ComponentManager(ComponentManager&&) = delete;
+            ComponentManager& operator=(ComponentManager const&) = delete;
+            ComponentManager& operator=(ComponentManager&&) = delete;
+            virtual ~ComponentManager() = default;
 
-  /**
-   * Returns the Id of the Bundle this component belongs to.
-   */
-  virtual unsigned long GetBundleId() const = 0;
+            /**
+             * Returns the name of the component managed by this object. The name is the same
+             * as specified in the component description.
+             */
+            virtual std::string GetName() const = 0;
 
-  /**
-   * Returns true if the component is enabled, false otherwise
-   */
-  virtual bool IsEnabled() const = 0;
+            /**
+             * Returns the Id of the Bundle this component belongs to.
+             */
+            virtual unsigned long GetBundleId() const = 0;
 
-  /**
-   * This method changes the state of the ComponentManager to ENABLED. The method returns
-   * immediately after changing the state. Any configurations created as a result of the
-   * state change will happen asynchronously on a separate thread.
-   */
-  virtual std::shared_future<void> Enable() = 0;
+            /**
+             * Returns true if the component is enabled, false otherwise
+             */
+            virtual bool IsEnabled() const = 0;
 
-  /**
-   * This method changes the state of the ComponentManager to DISABLED. The method returns
-   * immediately after changing the state. Any configurations deleted as a result of the
-   * state change will happen asynchronously on a separate thread.
-   */
-  virtual std::shared_future<void> Disable() = 0;
+            /**
+             * This method changes the state of the ComponentManager to ENABLED. The method returns
+             * immediately after changing the state. Any configurations created as a result of the
+             * state change will happen asynchronously on a separate thread.
+             */
+            virtual std::shared_future<void> Enable() = 0;
 
-  /**
-   * Returns a vector of ComponentConfiguration objects representing each of the configurations
-   * created for the component.
-   */
-  virtual std::vector<std::shared_ptr<ComponentConfiguration>>
-  GetComponentConfigurations() const = 0;
+            /**
+             * This method changes the state of the ComponentManager to DISABLED. The method returns
+             * immediately after changing the state. Any configurations deleted as a result of the
+             * state change will happen asynchronously on a separate thread.
+             */
+            virtual std::shared_future<void> Disable() = 0;
 
-  /**
-   * Returns the metadata object representing the component description for the
-   * component managed by this object.
-   */
-  virtual std::shared_ptr<const metadata::ComponentMetadata> GetMetadata()
-    const = 0;
-};
-} // scrimpl
-} // cppmicroservices
+            /**
+             * Returns a vector of ComponentConfiguration objects representing each of the configurations
+             * created for the component.
+             */
+            virtual std::vector<std::shared_ptr<ComponentConfiguration>> GetComponentConfigurations() const = 0;
+
+            /**
+             * Returns the metadata object representing the component description for the
+             * component managed by this object.
+             */
+            virtual std::shared_ptr<const metadata::ComponentMetadata> GetMetadata() const = 0;
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 #endif // __COMPONENTMANAGER_HPP__

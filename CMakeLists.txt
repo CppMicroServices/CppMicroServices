@@ -1,7 +1,7 @@
 # Extract the current version from the VERSION file
 file(STRINGS VERSION _version LIMIT_COUNT 1)
 
-set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.2)
+set(US_CMAKE_MINIMUM_REQUIRED_VERSION 3.17)
 
 cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 
@@ -28,12 +28,26 @@ foreach(policy ${policies_new})
 endforeach()
 
 #-----------------------------------------------------------------------------
+# Setup git hooks
+#-----------------------------------------------------------------------------
+find_package(Git)
+if (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+  execute_process(COMMAND ${GIT_EXECUTABLE} config core.hooksPath "${PROJECT_SOURCE_DIR}/.githooks"
+                          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                          RESULT_VARIABLE GIT_CONFIGMOD_RESULT)
+  if (NOT GIT_CONFIGMOD_RESULT EQUAL "0")
+    message(WARNING "Command `git config core.hooksPath ${PROJECT_SOURCE_DIR}/.githooks` failed with ${GIT_CONFIGMOD_RESULT}")
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
 # Check minimum required compiler versions
 #------------------------------------------------------------------------------
 
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_ENABLE_EXPORTS ON)
 
 # Since version 3.1, CMake pulls in implicit link libraries when compiling
 # source files in C mode. Because we mix C and C++ code in the test driver
@@ -76,20 +90,20 @@ set(CMAKE_C_IMPLICIT_LINK_LIBRARIES "")
 # wait_condition
 # exception_ptr
 
-set(US_COMPILER_GNU_MINIMUM_VERSION          5.1         )
-set(US_COMPILER_Clang_MINIMUM_VERSION        3.5         )
-set(US_COMPILER_AppleClang_MINIMUM_VERSION   7.3         )
-set(US_COMPILER_MSVC_MINIMUM_VERSION         19.00.23026 )
+set(US_COMPILER_GNU_MINIMUM_VERSION          7.5.0         )
+set(US_COMPILER_Clang_MINIMUM_VERSION        9.0.0         )
+set(US_COMPILER_AppleClang_MINIMUM_VERSION   10.0.0        )
+set(US_COMPILER_MSVC_MINIMUM_VERSION         19.10         )
 
 set(US_COMPILER_GNU_MINIMUM_VERSION_PRODUCT        "GCC ${US_COMPILER_GNU_MINIMUM_VERSION}")
 set(US_COMPILER_Clang_MINIMUM_VERSION_PRODUCT      "Clang ${US_COMPILER_CLANG_MINIMUM_VERSION}")
 set(US_COMPILER_AppleClang_MINIMUM_VERSION_PRODUCT "Xcode 7.3 (Clang ${US_COMPILER_AppleClang_MINIMUM_VERSION})")
 set(US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT       "Visual Studio 2015 (MSVC ${US_COMPILER_MSVC_MINIMUM_VERSION})")
 
-set(US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION         5.4   )
-set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION       3.5   )
-set(US_COMPILER_AppleClang_MINIMUM_RECOMMENDED_VERSION  8.0   )
-set(US_COMPILER_MSVC_MINIMUM_RECOMMENDED_VERSION        19.00 )
+set(US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION         9.4.0   )
+set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION       9.0     )
+set(US_COMPILER_AppleClang_MINIMUM_RECOMMENDED_VERSION  12.0.1  )
+set(US_COMPILER_MSVC_MINIMUM_RECOMMENDED_VERSION        19.20   )
 
 set(US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION_PRODUCT        "GCC ${US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION}")
 set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION_PRODUCT      "Clang ${US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION}")
@@ -238,6 +252,8 @@ us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
+
+set(_us_build_shared ${BUILD_SHARED_LIBS})
 
 if(NOT US_ENABLE_THREADING_SUPPORT AND US_ENABLE_TSAN)
   message(SEND_WARN "Thread-sanitizer enabled without threading support. Forcing US_ENABLE_TSAN to OFF")
@@ -472,8 +488,10 @@ if(MSVC)
 
   if (${MSVC_VERSION} LESS 1910)
     # For googletest on MSVC versions less than MSVC 2017
-    # 'identifier' : decorated name length exceeded, name was truncated
-    set(disabled_warnings ${disabled_warnings} 4503)
+    # - (4503) 'identifier' : decorated name length exceeded, name was truncated
+    # Additionally, on MSVC versions less than MSVC 2015
+    # - (4996) all deprecation warnings (pragma push/pop for disabling the warning does not work)
+    set(disabled_warnings ${disabled_warnings} 4503 4996)
   endif()
 
   foreach(wd ${disabled_warnings})
@@ -630,6 +648,9 @@ endif()
 # Compile libraries here if you do not want -Werror or /WX on
 #-----------------------------------------------------------------------------
 add_subdirectory(third_party/absl)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
+add_subdirectory(third_party/boost/nowide)
+set(BUILD_SHARED_LIBS ${_us_build_shared} CACHE BOOL "Build shared libraries" FORCE)
 #-----------------------------------------------------------------------------
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")

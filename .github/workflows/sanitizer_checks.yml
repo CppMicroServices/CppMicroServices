@@ -1,0 +1,74 @@
+name: SanitizerChecks
+
+on:
+  push:
+    branches: [ development, c\+\+14-compliant, master ]
+  pull_request:
+    branches: [ development, c\+\+14-compliant ]
+  workflow_dispatch:
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+  BUILD_DIR: ${{github.workspace}}/build
+  BUILD_CONFIGURATION: 0
+  WITH_COVERAGE: 0
+  WITH_MEMCHECK: 0
+  CC: clang
+  CXX: clang++
+
+jobs:
+  addresssanitizer_build:
+    name: AddressSanitizer (with leak checking) Build and Test [Clang]
+    runs-on: ubuntu-20.04
+    env:
+      WITH_ASAN: 1
+      ASAN_OPTIONS: "detect_leaks=1 symbolize=1 detect_odr_violation=1"
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Install dependencies
+      run: sudo apt-get -yq --no-install-suggests --no-install-recommends install lld
+
+    - name: Configure Build and Test
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
+
+  threadsanitizer_build:
+    name: ThreadSanitizer Build and Test [Clang]
+    runs-on: ubuntu-20.04
+    env:
+      WITH_TSAN: 1
+      TSAN_OPTIONS: "suppressions=${{github.workspace}}/tsan_suppressions.txt"
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Install dependencies
+      run: sudo apt-get -yq --no-install-suggests --no-install-recommends install lld
+
+    - name: Configure Build and Test
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
+
+  undefinedbehaviorsanitizer_build:
+    name: UndefinedBehaviorSanitizer Build and Test [Clang]
+    runs-on: ubuntu-20.04
+    env:
+      WITH_UBSAN: 1
+      UBSAN_OPTIONS: "suppressions=${{github.workspace}}/ubsan_suppressions.txt"
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Install dependencies
+      run: sudo apt-get -yq --no-install-suggests --no-install-recommends install lld
+
+    - name: Configure Build and Test
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
+  

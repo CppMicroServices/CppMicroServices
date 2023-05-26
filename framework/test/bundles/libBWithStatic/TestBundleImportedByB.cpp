@@ -27,34 +27,39 @@
 
 #include <iostream>
 
-namespace cppmicroservices {
-
-struct TestBundleImportedByB : public TestBundleBService
+namespace cppmicroservices
 {
 
-  TestBundleImportedByB() {}
-  virtual ~TestBundleImportedByB() {}
-};
+    struct TestBundleImportedByB : public TestBundleBService
+    {
 
-class TestBundleImportedByBActivator : public BundleActivator
-{
-public:
-  TestBundleImportedByBActivator() {}
-  ~TestBundleImportedByBActivator() {}
+        TestBundleImportedByB() {}
+        virtual ~TestBundleImportedByB() {}
+    };
 
-  void Start(BundleContext context)
-  {
-    s = std::make_shared<TestBundleImportedByB>();
-    sr = context.RegisterService<TestBundleBService>(s);
-  }
+    class TestBundleImportedByBActivator : public BundleActivator
+    {
+      public:
+        TestBundleImportedByBActivator() {}
+        ~TestBundleImportedByBActivator() {}
 
-  void Stop(BundleContext) { sr.Unregister(); }
+        void
+        Start(BundleContext context)
+        {
+            s = std::make_shared<TestBundleImportedByB>();
+            sr = context.RegisterService<TestBundleBService>(s);
+        }
 
-private:
-  std::shared_ptr<TestBundleImportedByB> s;
-  ServiceRegistration<TestBundleImportedByB> sr;
-};
-}
+        void
+        Stop(BundleContext)
+        {
+            sr.Unregister();
+        }
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
-  cppmicroservices::TestBundleImportedByBActivator)
+      private:
+        std::shared_ptr<TestBundleImportedByB> s;
+        ServiceRegistration<TestBundleImportedByB> sr;
+    };
+} // namespace cppmicroservices
+
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleImportedByBActivator)

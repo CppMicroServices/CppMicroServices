@@ -23,104 +23,107 @@
 #ifndef CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H
 #define CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H
 
+#include "ServiceRegistrationCoreInfo.h"
 #include "cppmicroservices/ServiceInterface.h"
+
+#include "Properties.h"
+#include "ServiceRegistrationLocks.h"
 
 #include <atomic>
 #include <string>
 
-namespace cppmicroservices {
-
-class Any;
-class Bundle;
-class BundlePrivate;
-class PropertiesHandle;
-class ServiceRegistrationBasePrivate;
-class ServiceReferenceBasePrivate;
-
-/**
- * \ingroup MicroServices
- */
-class ServiceReferenceBasePrivate
+namespace cppmicroservices
 {
-public:
-  ServiceReferenceBasePrivate(const ServiceReferenceBasePrivate&) = delete;
-  ServiceReferenceBasePrivate& operator=(const ServiceReferenceBasePrivate&) =
-    delete;
 
-  ServiceReferenceBasePrivate(ServiceRegistrationBasePrivate* reg);
+    class Any;
+    class Bundle;
+    class BundlePrivate;
+    class PropertiesHandle;
+    class ServiceRegistrationBasePrivate;
+    class ServiceReferenceBasePrivate;
 
-  ~ServiceReferenceBasePrivate();
+    /**
+     * \ingroup MicroServices
+     */
+    class ServiceReferenceBasePrivate
+    {
+      public:
+        ServiceReferenceBasePrivate(ServiceReferenceBasePrivate const&) = delete;
+        ServiceReferenceBasePrivate& operator=(ServiceReferenceBasePrivate const&) = delete;
 
-  /**
-    * Get the service object.
-    *
-    * @param bundle requester of service.
-    * @return Service requested or null in case of failure.
-    */
-  std::shared_ptr<void> GetService(BundlePrivate* bundle);
+        ServiceReferenceBasePrivate(std::weak_ptr<ServiceRegistrationBasePrivate> reg);
 
-  InterfaceMapConstPtr GetServiceInterfaceMap(BundlePrivate* bundle);
+        ~ServiceReferenceBasePrivate();
 
-  /**
-    * Get new service instance.
-    *
-    * @param bundle requester of service.
-    * @return Service requested or null in case of failure.
-    */
-  InterfaceMapConstPtr GetPrototypeService(const Bundle& bundle);
+        std::shared_ptr<ServiceRegistrationLocks> LockServiceRegistration() const;
 
-  /**
-   * Unget the service object.
-   *
-   * @param bundle Bundle who wants remove service.
-   * @param checkRefCounter If true decrement refence counter and remove service
-   *                        if we reach zero. If false remove service without
-   *                        checking refence counter.
-   * @return True if service was removed or false if only reference counter was
-   *         decremented.
-   */
-  bool UngetService(const std::shared_ptr<BundlePrivate>& bundle,
-                    bool checkRefCounter);
+        /**
+         * Get the service object.
+         *
+         * @param bundle requester of service.
+         * @return Service requested or null in case of failure.
+         */
+        std::shared_ptr<void> GetService(BundlePrivate* bundle);
 
-  /**
-   * Unget prototype scope service objects.
-   *
-   * @param bundle Bundle who wants to remove a prototype scope service.
-   * @param service The prototype scope service pointer.
-   * @return \c true if the service was removed, \c false otherwise.
-   */
-  bool UngetPrototypeService(const std::shared_ptr<BundlePrivate>& bundle,
-                             const InterfaceMapConstPtr& service);
+        InterfaceMapConstPtr GetServiceInterfaceMap(BundlePrivate* bundle);
 
-  /**
-   * Get a handle to the locked service properties.
-   *
-   * @return A locked ServicePropertiesImpl handle object.
-   */
-  PropertiesHandle GetProperties() const;
+        /**
+         * Get new service instance.
+         *
+         * @param bundle requester of service.
+         * @return Service requested or null in case of failure.
+         */
+        InterfaceMapConstPtr GetPrototypeService(Bundle const& bundle);
 
-  bool IsConvertibleTo(const std::string& interfaceId) const;
+        /**
+         * Unget the service object.
+         *
+         * @param bundle Bundle who wants remove service.
+         * @param checkRefCounter If true decrement refence counter and remove service
+         *                        if we reach zero. If false remove service without
+         *                        checking refence counter.
+         * @return True if service was removed or false if only reference counter was
+         *         decremented.
+         */
+        bool UngetService(std::shared_ptr<BundlePrivate> const& bundle, bool checkRefCounter);
 
-  /**
-   * Reference count for implicitly shared private implementation.
-   */
-  std::atomic<int> ref;
+        /**
+         * Unget prototype scope service objects.
+         *
+         * @param bundle Bundle who wants to remove a prototype scope service.
+         * @param service The prototype scope service pointer.
+         * @return \c true if the service was removed, \c false otherwise.
+         */
+        bool UngetPrototypeService(std::shared_ptr<BundlePrivate> const& bundle, InterfaceMapConstPtr const& service);
 
-  /**
-   * Link to registration object for this reference.
-   */
-  ServiceRegistrationBasePrivate* const registration;
+        /**
+         * Get a handle to the locked service properties.
+         *
+         * @return A locked ServicePropertiesImpl handle object.
+         */
+        PropertiesHandle GetProperties() const;
 
-  /**
-   * The service interface id for this reference.
-   */
-  std::string interfaceId;
+        bool IsConvertibleTo(std::string const& interfaceId) const;
 
-private:
-  InterfaceMapConstPtr GetServiceFromFactory(
-    BundlePrivate* bundle,
-    const std::shared_ptr<ServiceFactory>& factory);
-};
-}
+        /**
+         * Link to registration object for this reference.
+         */
+        std::weak_ptr<ServiceRegistrationBasePrivate> const registration;
+
+        /**
+         * The service interface id for this reference.
+         */
+        std::string interfaceId;
+
+        /**
+         * Core Information for the service used by ServiceReferenceBasePrivate
+         */
+        std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo;
+
+      private:
+        InterfaceMapConstPtr GetServiceFromFactory(BundlePrivate* bundle,
+                                                   std::shared_ptr<ServiceFactory> const& factory);
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H

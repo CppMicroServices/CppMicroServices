@@ -1,4 +1,4 @@
-/*=============================================================================
+ /*=============================================================================
 
   Library: CppMicroServices
 
@@ -29,54 +29,74 @@
 
 #include <string>
 #include <vector>
+#include <unordered_set>
 
-namespace cppmicroservices {
-
-class Properties : public detail::MultiThreaded<>
+namespace cppmicroservices
 {
 
-public:
-  explicit Properties(const AnyMap& props);
+    class Properties : public detail::MultiThreaded<>
+    {
 
-  Properties(Properties&& o);
-  Properties& operator=(Properties&& o);
+      public:
+        explicit Properties(AnyMap const& props);
+        explicit Properties(AnyMap&& props);
 
-  Any Value_unlocked(const std::string& key) const;
-  Any Value_unlocked(int index) const;
+        Properties(Properties&& o) noexcept;
+        Properties& operator=(Properties&& o) noexcept;
 
-  int Find_unlocked(const std::string& key) const;
-  int FindCaseSensitive_unlocked(const std::string& key) const;
+        Any const& ValueByRef_unlocked(std::string const& key, bool matchCase = false) const;
 
-  std::vector<std::string> Keys_unlocked() const;
+        std::pair<Any, bool> Value_unlocked(std::string const& key, bool matchCase = false) const;
 
-  void Clear_unlocked();
+        std::vector<std::string> Keys_unlocked() const;
 
-private:
-  std::vector<std::string> keys;
-  std::vector<Any> values;
+        void Clear_unlocked();
 
-  static const Any emptyAny;
-};
+        AnyMap const&
+        GetPropsAnyMap() const
+        {
+            return props;
+        }
 
-class PropertiesHandle
-{
-public:
-  PropertiesHandle(const Properties& props, bool lock)
-    : props(props)
-    , l(lock ? props.Lock() : Properties::UniqueLock())
-  {}
+      private:
+        // An AnyMap is used to store the properties rather than 2 vectors (one for keys
+        // and the other for values) as previously done in the past. This reduces the number of
+        // copies and allows for finds to leverage a map find vs vector find.
+        AnyMap props;
 
-  PropertiesHandle(PropertiesHandle&& o)
-    : props(o.props)
-    , l(std::move(o.l))
-  {}
+        // A case-insensitive map which maps all-lowercased keys to the original key values. This
+        // allows for efficient case-insensitive lookups in map types that are not inherently
+        // case insensitive.
+        mutable std::unordered_set<std::string, detail::any_map_cihash, detail::any_map_ciequal> caseInsensitiveLookup;
 
-  const Properties* operator->() const { return &props; }
+        static const Any emptyAny;
 
-private:
-  const Properties& props;
-  Properties::UniqueLock l;
-};
-}
+        // Helper that populates the case-insensitive lookup map when the provided AnyMap is not
+        // already case insensitive.
+        void PopulateCaseInsensitiveLookupMap() const;
+    };
+
+    class PropertiesHandle
+    {
+      public:
+        PropertiesHandle(Properties const& props, bool lock)
+            : props(props)
+            , l(lock ? props.Lock() : Properties::UniqueLock())
+        {
+        }
+
+        PropertiesHandle(PropertiesHandle&& o) noexcept : props(o.props), l(std::move(o.l)) {}
+
+        Properties const*
+        operator->() const
+        {
+            return &props;
+        }
+
+      private:
+        Properties const& props;
+        Properties::UniqueLock l;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_PROPERTIES_H

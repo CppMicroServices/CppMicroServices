@@ -35,35 +35,36 @@
 
 #include "ConfigurationAdminPrivate.hpp"
 
-namespace cppmicroservices {
-namespace cmimpl {
-/**
-     * The CMBundleExtension is a helper class to load and unload configurations from
-     * a single bundle. It pushes the configurations it finds to the ConfigurationAdmin
-     * implementation. On destruction, it removes the configurations created during
-     * construction.
-     */
-class CMBundleExtension final
+namespace cppmicroservices
 {
-public:
-  CMBundleExtension(
-    cppmicroservices::BundleContext bundleContext,
-    const cppmicroservices::AnyMap& cmMetadata,
-    std::shared_ptr<ConfigurationAdminPrivate> configAdminImpl,
-    std::shared_ptr<cppmicroservices::logservice::LogService> logger);
-  CMBundleExtension(const CMBundleExtension&) = delete;
-  CMBundleExtension(CMBundleExtension&&) = delete;
-  CMBundleExtension& operator=(const CMBundleExtension&) = delete;
-  CMBundleExtension& operator=(CMBundleExtension&&) = delete;
-  ~CMBundleExtension();
+    namespace cmimpl
+    {
+        /**
+         * The CMBundleExtension is a helper class to load and unload configurations from
+         * a single bundle. It pushes the configurations it finds to the ConfigurationAdmin
+         * implementation. On destruction, it removes the configurations created during
+         * construction.
+         */
+        class CMBundleExtension final
+        {
+          public:
+            CMBundleExtension(cppmicroservices::BundleContext bundleContext,
+                              cppmicroservices::AnyMap const& cmMetadata,
+                              std::shared_ptr<ConfigurationAdminPrivate> configAdminImpl,
+                              std::shared_ptr<cppmicroservices::logservice::LogService> logger);
+            CMBundleExtension(CMBundleExtension const&) = delete;
+            CMBundleExtension(CMBundleExtension&&) = delete;
+            CMBundleExtension& operator=(CMBundleExtension const&) = delete;
+            CMBundleExtension& operator=(CMBundleExtension&&) = delete;
+            ~CMBundleExtension();
 
-private:
-  cppmicroservices::BundleContext bundleContext;
-  std::shared_ptr<ConfigurationAdminPrivate> configAdminImpl;
-  std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-  std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs;
-};
-} // cmimpl
-} // cppmicroservices
+          private:
+            cppmicroservices::BundleContext bundleContext;
+            std::shared_ptr<ConfigurationAdminPrivate> configAdminImpl;
+            std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+            std::vector<ConfigurationAddedInfo> pidsAndChangeCountsAndIDs;
+        };
+    } // namespace cmimpl
+} // namespace cppmicroservices
 
 #endif // CMBUNDLEEXTENSION_HPP

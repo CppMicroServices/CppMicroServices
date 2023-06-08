@@ -91,7 +91,7 @@ namespace cppmicroservices
                     Result result(handler);
 
                     boost::asio::post(threadpool->get_executor(),
-                                      [handler = std::move(handler)]() mutable { handler(); });
+                                      [handler_ = std::move(handler)]() mutable { handler_(); });
                 }
             }
 

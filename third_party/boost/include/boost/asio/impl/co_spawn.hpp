@@ -45,9 +45,9 @@ awaitable<void, Executor> co_spawn_entry_point(
     done = true;
 
     (dispatch)(handler_work.get_executor(),
-        [handler = std::move(handler), t = std::move(t)]() mutable
+        [handler_ = std::move(handler), t = std::move(t)]() mutable
         {
-          handler(std::exception_ptr(), std::move(t));
+          handler_(std::exception_ptr(), std::move(t));
         });
   }
   catch (...)
@@ -56,9 +56,9 @@ awaitable<void, Executor> co_spawn_entry_point(
       throw;
 
     (dispatch)(handler_work.get_executor(),
-        [handler = std::move(handler), e = std::current_exception()]() mutable
+        [handler_ = std::move(handler), e = std::current_exception()]() mutable
         {
-          handler(e, T());
+          handler_(e, T());
         });
   }
 }
@@ -84,9 +84,9 @@ awaitable<void, Executor> co_spawn_entry_point(
   }
 
   (dispatch)(handler_work.get_executor(),
-      [handler = std::move(handler), e]() mutable
+      [handler_ = std::move(handler), e]() mutable
       {
-        handler(e);
+        handler_(e);
       });
 }
 

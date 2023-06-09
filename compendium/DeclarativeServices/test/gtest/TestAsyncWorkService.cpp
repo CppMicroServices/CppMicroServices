@@ -101,7 +101,7 @@ namespace test
         void
         post(std::packaged_task<void()>&& task) override
         {
-            std::future<void> f = std::async(std::launch::async, [task_ = std::move(task)]() mutable { task_(); });
+            std::future<void> f = std::async(std::launch::async, [task = std::move(task)]() mutable { task(); });
         }
     };
 
@@ -145,7 +145,7 @@ namespace test
             Handler handler(std::forward<decltype(task)>(task));
             Result result(handler);
 
-            boost::asio::post(threadpool->get_executor(), [handler_ = std::move(handler)]() mutable { handler_(); });
+            boost::asio::post(threadpool->get_executor(), [handler = std::move(handler)]() mutable { handler(); });
         }
 
       private:

@@ -88,7 +88,6 @@ namespace cppmicroservices
                     using Handler = typename Result::completion_handler_type;
 
                     Handler handler(std::forward<decltype(task)>(task));
-                    Result result(handler);
 
                     boost::asio::post(threadpool->get_executor(),
                                       [handler = std::move(handler)]() mutable { handler(); });

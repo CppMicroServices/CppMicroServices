@@ -353,12 +353,9 @@ namespace cppmicroservices
             return true;
         }
 
-        ServiceReferenceBase sr1;
-        ServiceReferenceBase sr2;
-        {
-            LockServiceRegistration(), sr1 = d->reference;
-            o.LockServiceRegistration(), sr2 = o.d->reference;
-        }
+        ServiceReferenceBase sr1 = (LockServiceRegistration(), d->reference);
+        ServiceReferenceBase sr2 = (o.LockServiceRegistration(), o.d->reference);
+
         return sr1 < sr2;
     }
 

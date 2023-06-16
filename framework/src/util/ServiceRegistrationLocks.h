@@ -40,7 +40,7 @@ namespace cppmicroservices
 
         // Delete all copy and move to enforce that it is only ever constructed into one object -- avoids deadlocks
         ServiceRegistrationLocks(ServiceRegistrationLocks const& lockObj) = delete;
-        ServiceRegistrationLocks(ServiceRegistrationLocks&& lockObj) = delete;
+        ServiceRegistrationLocks(ServiceRegistrationLocks&& lockObj) = default;
         ServiceRegistrationLocks& operator=(ServiceRegistrationLocks const& lockObj) = delete;
         ServiceRegistrationLocks& operator=(ServiceRegistrationLocks&& lockObj) = delete;
 

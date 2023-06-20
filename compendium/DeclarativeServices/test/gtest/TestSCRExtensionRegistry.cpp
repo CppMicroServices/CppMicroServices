@@ -30,6 +30,7 @@
 #include <cppmicroservices/Framework.h>
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
+#include "ConcurrencyTestUtil.hpp"
 #include "gmock/gmock.h"
 #include "Mocks.hpp"
 
@@ -73,66 +74,6 @@ namespace cppmicroservices
                 return framework;
             }
 
-            void
-            ConcurrentInvoke(std::vector<cppmicroservices::Bundle> allBundles, bool addOperation)
-            {
-                std::promise<void> go;
-                std::shared_future<void> ready(go.get_future());
-                int numCalls = allBundles.size();
-                std::vector<std::promise<void>> readies(numCalls);
-                std::vector<std::future<void>> bundle_result(numCalls);
-                try
-                {
-                    if (addOperation)
-                    {
-                        for (int i = 0; i < numCalls; i++)
-                        {
-
-                            bundle_result[i]
-                                = std::async(std::launch::async,
-                                             [&readies, &ready, &allBundles, this, i]()
-                                             {
-                                                 readies[i].set_value();
-                                                 ready.wait();
-                                                 auto ba = std::make_shared<SCRBundleExtension>(allBundles[i],
-                                                                                                this->fakeRegistry,
-                                                                                                this->logger,
-                                                                                                this->notifier);
-                                                 extRegistry->Add(allBundles[i].GetBundleId(), ba);
-                                             });
-                        }
-                    }
-                    else // remove operation
-                    {
-                        for (int i = 0; i < numCalls; i++)
-                        {
-                            bundle_result[i] = std::async(std::launch::async,
-                                                          [&readies, &ready, &allBundles, this, i]()
-                                                          {
-                                                              readies[i].set_value();
-                                                              ready.wait();
-                                                              this->extRegistry->Remove(allBundles[i].GetBundleId());
-                                                          });
-                        }
-                    }
-
-                    for (int i = 0; i < numCalls; i++)
-                    {
-                        readies[i].get_future().wait();
-                    }
-                    go.set_value();
-                    for (int i = 0; i < numCalls; i++)
-                    {
-                        bundle_result[i].wait();
-                    }
-                }
-                catch (std::exception const& e)
-                {
-                    EXPECT_TRUE(false) << "Error: exception received ... " << e.what() << std::endl;
-                    go.set_value();
-                    throw std::current_exception();
-                }
-            }
           protected:
             cppmicroservices::Framework framework;
             std::shared_ptr<ComponentRegistry> fakeRegistry;
@@ -185,36 +126,41 @@ namespace cppmicroservices
             asyncWorkService->StopTracking();
             fakeRegistry->Clear();
         }
-        // Test to test concurrent additions of bundle extensions to the SCRExtensionRegistry and
+        // Test concurrent additions of bundle extensions to the SCRExtensionRegistry and
         // concurrent removals.
         TEST_F(SCRExtensionRegistryTest, VerifyConcurrentAddRemove)
         {
-            int count = 4;
-            test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSTOI1");
-            test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSTOI2");
-            test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSTOI3");
-            test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSTOI5");
- 
+            constexpr int fakeBundleCount = 100;
             auto bundleContext = GetFramework().GetBundleContext();
-            auto allBundles = bundleContext.GetBundles();
-            ASSERT_TRUE(allBundles.size() > count) << "All bundles not installed.";
+            // This test doesn't require unique or even functional Bundle objects. Use the
+            // same bundle object for the purpose of testing thread safety of the SCRExtensionRegistry
+            // methods.
+            const auto bundle = test::InstallAndStartBundle(bundleContext, "TestBundleDSTOI1");
 
             // Add a bundle extension object for each bundle in the allBundles vector to the 
             // extension registry
-            ConcurrentInvoke(allBundles, true);           
-            for (auto const& item : allBundles) {
-                ASSERT_TRUE(extRegistry->Find(item.GetBundleId()))
-                    << "bundle " << item.GetSymbolicName() << " not found.";
-            }
+            std::function<bool()> addFunc = [this, &bundle, fakeBundleCount]() -> bool {
+                for(int fakeBundleId = 0; fakeBundleId <= fakeBundleCount; ++fakeBundleId) 
+                {
+                    extRegistry->Add(fakeBundleId, std::move(std::make_shared<SCRBundleExtension>(bundle, fakeRegistry, logger, notifier)));
+                }
+                return true;
+                };
+
+            ASSERT_NO_THROW((void)ConcurrentInvoke(std::move(addFunc)));
  
             // Remove the bundle extension for all bundles in the allBundles vector from 
             // the extension registry.
-            ConcurrentInvoke(allBundles, false);
-            for (auto const& item : allBundles)
-            {
-                ASSERT_TRUE(!extRegistry->Find(item.GetBundleId()))
-                    << "bundle " << item.GetSymbolicName() << " should have been removed.";
-            }
+            std::function<bool()> removeFunc = [this, fakeBundleCount]() -> bool {
+                for(int fakeBundleId = 0; fakeBundleId <= fakeBundleCount; ++fakeBundleId)
+                {
+                    extRegistry->Remove(fakeBundleId);
+                }
+                return true;
+                };
+
+            ASSERT_NO_THROW((void)ConcurrentInvoke(std::move(removeFunc)));
+
             asyncWorkService->StopTracking();
             fakeRegistry->Clear();
   

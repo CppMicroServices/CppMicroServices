@@ -130,7 +130,7 @@ namespace cppmicroservices
         // concurrent removals.
         TEST_F(SCRExtensionRegistryTest, VerifyConcurrentAddRemove)
         {
-            constexpr int fakeBundleCount = 100;
+            constexpr int fakeBundleCount{100};
             auto bundleContext = GetFramework().GetBundleContext();
             // This test doesn't require unique or even functional Bundle objects. Use the
             // same bundle object for the purpose of testing thread safety of the SCRExtensionRegistry
@@ -139,10 +139,10 @@ namespace cppmicroservices
 
             // Add a bundle extension object for each bundle in the allBundles vector to the 
             // extension registry
-            std::function<bool()> addFunc = [this, &bundle, fakeBundleCount]() -> bool {
+            std::function<bool()> addFunc = [&]() -> bool {
                 for(int fakeBundleId = 0; fakeBundleId <= fakeBundleCount; ++fakeBundleId) 
                 {
-                    extRegistry->Add(fakeBundleId, std::move(std::make_shared<SCRBundleExtension>(bundle, fakeRegistry, logger, notifier)));
+                    extRegistry->Add(fakeBundleId, std::make_shared<SCRBundleExtension>(bundle, fakeRegistry, logger, notifier));
                 }
                 return true;
                 };
@@ -151,7 +151,7 @@ namespace cppmicroservices
  
             // Remove the bundle extension for all bundles in the allBundles vector from 
             // the extension registry.
-            std::function<bool()> removeFunc = [this, fakeBundleCount]() -> bool {
+            std::function<bool()> removeFunc = [&]() -> bool {
                 for(int fakeBundleId = 0; fakeBundleId <= fakeBundleCount; ++fakeBundleId)
                 {
                     extRegistry->Remove(fakeBundleId);

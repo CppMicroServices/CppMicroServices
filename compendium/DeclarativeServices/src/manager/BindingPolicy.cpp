@@ -32,7 +32,7 @@ namespace cppmicroservices
         ReferenceManagerBaseImpl::BindingPolicy::Log(std::string const& logStr,
                                                      cppmicroservices::logservice::SeverityLevel logLevel)
         {
-            mgr.logger->Log(logLevel, logStr);
+            mgr.logger_->Log(logLevel, logStr);
         }
 
         bool
@@ -62,14 +62,14 @@ namespace cppmicroservices
             std::vector<RefChangeNotification> notifications;
             if (ShouldClearBoundRefs(reference))
             {
-                Log("Notify UNSATISFIED for reference " + mgr.metadata.name);
-                notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_UNSATISFIED);
+                Log("Notify UNSATISFIED for reference " + mgr.metadata_.name);
+                notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_UNSATISFIED);
 
                 ClearBoundRefs();
                 if (mgr.UpdateBoundRefs())
                 {
-                    Log("Notify SATISFIED for reference " + mgr.metadata.name);
-                    notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_SATISFIED);
+                    Log("Notify SATISFIED for reference " + mgr.metadata_.name);
+                    notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED);
                 }
 
                 mgr.BatchNotifyAllListeners(notifications);
@@ -104,21 +104,23 @@ namespace cppmicroservices
                     ServiceReference<void> svcRefToBind;
                     {
                         auto boundRefsHandle = mgr.boundRefs.lock(); // acquires lock on boundRefs
-                        if (!boundRefsHandle->empty())
+                        // we only need to rebind if maxCardinality is unary, in case of multiple
+                        // bound references remain as is after removing current reference
+                        if (!boundRefsHandle->empty() && mgr.metadata_.maxCardinality == 1)
                         {
                             svcRefToBind = *(boundRefsHandle->begin());
-                            Log("Notify BIND for reference " + mgr.metadata.name);
+                            Log("Notify BIND for reference " + mgr.metadata_.name);
                         }
                     }
 
-                    Log("Notify UNBIND for reference " + mgr.metadata.name);
-                    notifications.emplace_back(mgr.metadata.name, RefEvent::REBIND, svcRefToBind, reference);
+                    Log("Notify UNBIND for reference " + mgr.metadata_.name);
+                    notifications.emplace_back(mgr.metadata_.name, RefEvent::REBIND, svcRefToBind, reference);
                 }
 
                 if (!mgr.IsSatisfied())
                 {
-                    Log("Notify UNSATISFIED for reference " + mgr.metadata.name);
-                    notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_UNSATISFIED);
+                    Log("Notify UNSATISFIED for reference " + mgr.metadata_.name);
+                    notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_UNSATISFIED);
                 }
 
                 mgr.BatchNotifyAllListeners(notifications);

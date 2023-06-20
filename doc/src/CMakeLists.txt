@@ -176,7 +176,7 @@ if(US_BUILD_TESTING)
   if(UNIX AND NOT APPLE AND BUILD_SHARED_LIBS)
     set(US_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
     # We need to supply the correct language flag to the Makefile
-    set(US_CXX_VER_FLAGS -std=c++14)
+    set(US_CXX_VER_FLAGS -std=c++17)
     usFunctionCheckCompilerFlags(${US_CXX_VER_FLAGS} _have_cxx14)
     if(NOT _have_cxx14)
       set(US_CXX_VER_FLAGS -std=c++0x)

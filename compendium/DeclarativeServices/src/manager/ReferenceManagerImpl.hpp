@@ -82,7 +82,7 @@ namespace cppmicroservices
             std::string
             GetReferenceName() const override
             {
-                return metadata.name;
+                return metadata_.name;
             }
 
             /**
@@ -91,7 +91,7 @@ namespace cppmicroservices
             std::string
             GetReferenceScope() const override
             {
-                return metadata.scope;
+                return metadata_.scope;
             }
 
             /**
@@ -100,7 +100,7 @@ namespace cppmicroservices
             std::string
             GetLDAPString() const override
             {
-                return metadata.target;
+                return metadata_.target;
             }
 
             /**
@@ -131,7 +131,7 @@ namespace cppmicroservices
             metadata::ReferenceMetadata const&
             GetMetadata() const
             {
-                return metadata;
+                return metadata_;
             }
 
             /**
@@ -269,11 +269,11 @@ namespace cppmicroservices
              */
             void BatchNotifyAllListeners(std::vector<RefChangeNotification> const& notification) noexcept;
 
-            const metadata::ReferenceMetadata metadata;    ///< reference information from the component description
+            const metadata::ReferenceMetadata metadata_;    ///< reference information from the component description
             std::unique_ptr<ServiceTracker<void>> tracker; ///< used to track service availability
-            std::shared_ptr<cppmicroservices::logservice::LogService> logger; ///< logger for this runtime
+            std::shared_ptr<cppmicroservices::logservice::LogService> logger_; ///< logger for this runtime
             const std::string
-                configName; ///< Keep track of which component configuration object this reference manager belongs to.
+                configName_; ///< Keep track of which component configuration object this reference manager belongs to.
 
             mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>>
                 boundRefs; ///< guarded set of bound references

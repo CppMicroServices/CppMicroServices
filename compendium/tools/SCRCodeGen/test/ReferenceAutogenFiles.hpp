@@ -41,7 +41,7 @@ using scd::DynamicBinder;
 extern "C" US_ABI_EXPORT scd::ComponentInstance* NewInstance_DSSpellCheck_SpellCheckImpl()
 {
   std::vector<std::shared_ptr<scd::Binder<DSSpellCheck::SpellCheckImpl>>> binders;
-  scd::ComponentInstance* componentInstance = new (std::nothrow) scd::ComponentInstanceImpl<DSSpellCheck::SpellCheckImpl, std::tuple<test::ISpellCheckService>, test::IDictionaryService>({{"dictionary"}}, binders);
+  scd::ComponentInstance* componentInstance = new (std::nothrow) scd::ComponentInstanceImpl<DSSpellCheck::SpellCheckImpl, std::tuple<test::ISpellCheckService>, std::shared_ptr<test::IDictionaryService>>({{"dictionary"}}, binders);
 
   return componentInstance;
 }
@@ -65,7 +65,7 @@ namespace scd = cppmicroservices::service::component::detail;
 extern "C" US_ABI_EXPORT scd::ComponentInstance* NewInstance_DSSpellCheck_SpellCheckImpl()
 {
   std::vector<std::shared_ptr<scd::Binder<DSSpellCheck::SpellCheckImpl>>> binders;
-  scd::ComponentInstance* componentInstance = new (std::nothrow) scd::ComponentInstanceImpl<DSSpellCheck::SpellCheckImpl, std::tuple<SpellCheck::ISpellCheckService>, DictionaryService::IDictionaryService>({{"dictionary"}}, binders);
+  scd::ComponentInstance* componentInstance = new (std::nothrow) scd::ComponentInstanceImpl<DSSpellCheck::SpellCheckImpl, std::tuple<SpellCheck::ISpellCheckService>, std::shared_ptr<DictionaryService::IDictionaryService>>({{"dictionary"}}, binders);
 
   return componentInstance;
 }

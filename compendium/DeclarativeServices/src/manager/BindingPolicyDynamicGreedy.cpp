@@ -65,12 +65,26 @@ namespace cppmicroservices
                     auto boundRefsHandle = mgr.boundRefs.lock(); // acquires lock on boundRefs
                     if (boundRefsHandle->empty())
                     {
-                        notifications.emplace_back(mgr.metadata.name, RefEvent::REBIND, reference);
+                        notifications.emplace_back(mgr.metadata_.name, RefEvent::REBIND, reference);
                     }
                     else
                     { // there are bound refs, determine whether to rebind
-                        svcRefToUnBind = *(boundRefsHandle->begin());
-                        needRebind = svcRefToUnBind < reference;
+                        if (mgr.metadata_.maxCardinality == 1) {
+                            //rebind new and unbind older reference if maxCardinality is unary
+                            svcRefToUnBind = *(boundRefsHandle->begin());
+                            needRebind = svcRefToUnBind < reference;
+                        }
+                        else if (mgr.metadata_.maxCardinality > 1) {
+                            //bind to new reference if maxCardinality is multiple
+                            if (boundRefsHandle->size() < mgr.metadata_.maxCardinality) {
+                                //number of bound references are within maxCardinality limit
+                                notifications.emplace_back(mgr.metadata_.name, RefEvent::REBIND, reference);
+                            }
+                            else {
+                                //Maximum limit of multiple references has reached, no new references will be bound
+                                Log("Number of multiple references has reached its maximum limit. New reference(s) will not be bound.");
+                            }
+                        }
                     }
                 }
 
@@ -83,14 +97,14 @@ namespace cppmicroservices
                     // to eliminate any gaps between unbinding the current bound target service
                     // and binding to the new bound target service.
                     notifications.push_back(
-                        RefChangeNotification { mgr.metadata.name, RefEvent::REBIND, reference, svcRefToUnBind });
+                        RefChangeNotification { mgr.metadata_.name, RefEvent::REBIND, reference, svcRefToUnBind });
                 }
             }
 
             if (notifySatisfied)
             {
-                Log("Notify SATISFIED for reference " + mgr.metadata.name);
-                notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_SATISFIED);
+                Log("Notify SATISFIED for reference " + mgr.metadata_.name);
+                notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED);
             }
             mgr.BatchNotifyAllListeners(notifications);
         }

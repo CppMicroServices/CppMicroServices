@@ -29,6 +29,7 @@
 #include "Properties.h"
 #include "PropsCheck.h"
 #include "ServiceReferenceBasePrivate.h"
+#include "Utils.h"
 
 #include <stdexcept>
 
@@ -70,7 +71,7 @@ namespace cppmicroservices
     bool
     LDAPFilter::Match(ServiceReferenceBase const& reference) const
     {
-        return ((d) ? d->ldapExpr.Evaluate(reference.d.load()->GetProperties(), false) : false);
+        return ((d) ? d->ldapExpr.Evaluate(reference.d.Load()->GetProperties(), false) : false);
     }
 
     // This function has been modified to call the LDAPExpr::Evaluate() function which takes

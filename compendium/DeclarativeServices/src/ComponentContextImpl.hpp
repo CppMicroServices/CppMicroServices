@@ -49,11 +49,17 @@ namespace cppmicroservices
           public:
             /**
              * Constructor used for singleton component configuration
+             * \throws {@link ComponentException} if \c cm is nullptr or
+             * \c ComponentConfiguration requires a mandatory bound service which
+             * is no longer registered.
              */
             explicit ComponentContextImpl(std::weak_ptr<ComponentConfiguration> cm);
 
             /**
              * Constructor used for bundle or prototype component configurations
+             * \throws {@link ComponentException} if \c cm is nullptr or
+             * \c ComponentConfiguration requires a mandatory bound service which
+             * is no longer registered.
              */
             ComponentContextImpl(std::weak_ptr<ComponentConfiguration> cm, cppmicroservices::Bundle usingBundle);
             ComponentContextImpl(ComponentContextImpl const&) = delete;

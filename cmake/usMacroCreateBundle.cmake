@@ -150,10 +150,7 @@ endif()
 
 # Embed bundle resources
 if(${PROJECT_NAME}_RESOURCES)
-  set(_wd ${CMAKE_CURRENT_SOURCE_DIR})
-  if(${PROJECT_NAME}_RESOURCES)
-    set(_wd ${CMAKE_CURRENT_SOURCE_DIR}/resources)
-  endif()
+  set(_wd ${CMAKE_CURRENT_SOURCE_DIR}/resources)
   usFunctionAddResources(TARGET ${${PROJECT_NAME}_TARGET}
                          WORKING_DIRECTORY ${_wd}
                          FILES ${${PROJECT_NAME}_RESOURCES}
@@ -185,6 +182,15 @@ if(NOT US_NO_INSTALL)
   install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/cppmicroservices
           DESTINATION ${HEADER_INSTALL_DIR}
           OPTIONAL)
+
+  # the metadata zip file needs to be installed alongside the static library
+  # for use by downstream users of an installed CppMicroServices SDK.
+  if(NOT BUILD_SHARED_LIBS)
+    get_target_property(_us_target_metadata_zip_file ${${PROJECT_NAME}_TARGET} _us_resource_zips)
+    install(FILES ${_us_target_metadata_zip_file}
+            DESTINATION ${ARCHIVE_INSTALL_DIR}/${${PROJECT_NAME}_TARGET}
+            ${US_SDK_INSTALL_COMPONENT})
+  endif()
 endif()
 
 #-----------------------------------------------------------------------------

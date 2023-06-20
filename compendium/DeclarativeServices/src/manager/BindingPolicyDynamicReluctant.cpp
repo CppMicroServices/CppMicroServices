@@ -54,19 +54,36 @@ namespace cppmicroservices
                 // is optional and there are no bound refs.
                 if (0 == mgr.GetBoundReferences().size())
                 {
-                    Log("Notify BIND for reference " + mgr.metadata.name);
+                    Log("Notify BIND for reference " + mgr.metadata_.name);
 
                     ClearBoundRefs();
                     mgr.UpdateBoundRefs();
 
-                    notifications.emplace_back(mgr.metadata.name, RefEvent::REBIND, reference);
+                    notifications.emplace_back(mgr.metadata_.name, RefEvent::REBIND, reference);
+                }
+
+                // for multiple cardinality rebind to new reference if number of
+                // bound references is within limit of maxCardinality value
+                // otherwise log to the user that further bind is not possible
+                if (mgr.metadata_.maxCardinality > 1) {
+                    if (mgr.GetBoundReferences().size() < mgr.metadata_.maxCardinality) {
+                        Log("Notify BIND for reference " + mgr.metadata_.name);
+
+                        ClearBoundRefs();
+                        mgr.UpdateBoundRefs();
+
+                        notifications.emplace_back(mgr.metadata_.name, RefEvent::REBIND, reference);
+                    }
+                    else {
+                        Log("Number of multiple references has reached its maximum limit. New reference(s) will not be bound.");
+                    }
                 }
             }
 
             if (notifySatisfied)
             {
-                Log("Notify SATISFIED for reference " + mgr.metadata.name);
-                notifications.emplace_back(mgr.metadata.name, RefEvent::BECAME_SATISFIED);
+                Log("Notify SATISFIED for reference " + mgr.metadata_.name);
+                notifications.emplace_back(mgr.metadata_.name, RefEvent::BECAME_SATISFIED);
             }
             mgr.BatchNotifyAllListeners(notifications);
         }

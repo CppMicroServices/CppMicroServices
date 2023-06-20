@@ -86,8 +86,9 @@ BENCHMARK_DEFINE_F(ServiceRegistryFixture, RegisterServices)
         {
             InterfaceMapPtr iMapCopy(std::make_shared<InterfaceMap>(*interfaceMap));
             auto start = high_resolution_clock::now();
-            (void)fc.RegisterService(iMapCopy); // benchmark the call to RegisterService
+            auto reg = fc.RegisterService(iMapCopy); // benchmark the call to RegisterService
             auto end = high_resolution_clock::now();
+            US_UNUSED(reg);
             auto elapsed_seconds = duration_cast<duration<double>>(end - start);
             state.SetIterationTime(elapsed_seconds.count());
         }
@@ -118,12 +119,13 @@ BENCHMARK_DEFINE_F(ServiceRegistryFixture, RegisterServicesWithRank)
         {
             InterfaceMapPtr iMapCopy(std::make_shared<InterfaceMap>(*interfaceMap));
             auto start = std::chrono::high_resolution_clock::now();
-            (void)fc.RegisterService(iMapCopy,
-                                     {
-                                         {Constants::SERVICE_RANKING,
-                                          Any(static_cast<int>(i))}
+            auto reg = fc.RegisterService(iMapCopy,
+                                          {
+                                              {Constants::SERVICE_RANKING,
+                                               Any(static_cast<int>(i))}
             }); // benchmark the call to RegisterService
             auto end = std::chrono::high_resolution_clock::now();
+            US_UNUSED(reg);
             auto elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
             state.SetIterationTime(elapsed_seconds.count());
         }
@@ -147,11 +149,12 @@ BENCHMARK_DEFINE_F(ServiceRegistryFixture, FindServices)
     auto regCount = state.range(0);
     auto interfaceCount = state.range(1);
     auto interfaceMap = MakeInterfaceMapWithNInterfaces(interfaceCount);
+    std::vector<ServiceRegistrationU> regs;
 
     for (auto i = regCount; i > 0; --i)
     {
         InterfaceMapPtr iMapCopy(std::make_shared<InterfaceMap>(*interfaceMap));
-        fc.RegisterService(iMapCopy);
+        regs.emplace_back(fc.RegisterService(iMapCopy));
     }
 
     for (auto _ : state)

@@ -17,6 +17,8 @@
 
 |Coverity Scan Build Status|
 
+|Performance Status|
+ 
 
 C++ Micro Services
 ==================
@@ -64,8 +66,8 @@ Recommended absolute minimum required compiler versions:
 Not all of the absolute minimum compiler versions are tested (as noted). We test and recommend
 the following compilers:
 
-- GCC 9.4.0
-- Clang 9.0
+- GCC 11.3.0
+- Clang 11.0
 - Clang from Xcode 13.2 and 13.4
 - Visual Studio 2019 and 2022
 
@@ -80,8 +82,8 @@ software provided on the GitHub-hosted runners.
 For information about the specific versions of software the runners
 use, please see the following resources:
 
-- `ubuntu-18.04 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu1804-README.md>`
 - `ubuntu-20.04 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-Readme.md>`
+- `ubuntu-22.04 Runner Information <https://github.com/actions/runner-images/blob/main/images/linux/Ubuntu2204-Readme.md>`
 - `macos-11 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-11-Readme.md>`
 - `macos-12 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/macos/macos-12-Readme.md>`
 - `windows-2019 Runner Information <https://github.com/actions/virtual-environments/blob/main/images/win/Windows2019-Readme.md>`
@@ -89,11 +91,11 @@ use, please see the following resources:
 
 Below is a list of tested compiler/OS combinations:
 
-- GCC 7.5.0 (Ubuntu 18.04)
-- GCC 9.4.0 (Ubuntu 20.04)
-- Clang 9.0 (Ubuntu 18.04)
-- Apple Clang, Xcode 13.2.0 (OS X 11.6.8)
-- Apple Clang, Xcode 13.4.0 (OS X 12.5.0)
+- GCC 7.5.0 (Ubuntu 20.04)
+- GCC 11.3.0 (Ubuntu 22.04)
+- Clang 11.0.0 (Ubuntu 20.04)
+- Apple Clang 13.0.0.13000029, Xcode 13.2.0 (OS X 11.7.6)
+- Apple Clang 14.0.0.14000029, Xcode 13.4.0 (OS X 12.6.5)
 - Visual Studio 2019
 - Visual Studio 2022
 - MinGW-w64
@@ -223,6 +225,8 @@ file for details about the contribution process.
    :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/master
 .. |Code Coverage Status (development)| image:: https://img.shields.io/codecov/c/github/CppMicroServices/CppMicroServices/development.svg?style=flat-square
    :target: https://codecov.io/gh/cppmicroservices/CppMicroServices/branch/development
+.. |Performance Status| image:: https://github.com/CppMicroServices/CppMicroServices/actions/workflows/performance_windows.yml/badge.svg
+   :target: https://cppmicroservices.org/dev/bench/
 
 Git Hooks General Information
 -----------------------------

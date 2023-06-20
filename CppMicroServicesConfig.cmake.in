@@ -146,6 +146,18 @@ endif()
 set(CppMicroServices_LIBRARIES ${US_LIBRARIES})
 set(CppMicroServices_RUNTIME_LIBRARY_DIRS ${US_RUNTIME_LIBRARY_DIRS})
 
+# Check to see if _us_resource_zips is already set to determine whether this CMake
+# code is being run as part of the CppMicroServices build or from a downstream client's
+# CMake build (i.e. a build using an installed CppMicroServices SDK).
+set(_us_cppms_metadata_zip_file )
+get_target_property(_us_cppms_metadata_zip_file CppMicroServices _us_resource_zips)
+if(NOT _us_cppms_metadata_zip_file)
+  # set target properties to the path to the CppMicroServices core Framework
+  # metadata zip file to support downstream client's CMake files calling usFunctionAddResources
+  set_target_properties(CppMicroServices
+                        PROPERTIES _us_resource_zips "${CMAKE_CURRENT_LIST_DIR}/../../../lib/CppMicroServices/res_0.zip")
+endif()
+
 set(@PROJECT_NAME@_CONFIG ${CMAKE_CURRENT_LIST_FILE})
 find_package_handle_standard_args(@PROJECT_NAME@
   HANDLE_COMPONENTS

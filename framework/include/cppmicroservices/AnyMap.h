@@ -364,7 +364,7 @@ namespace cppmicroservices
     class US_Framework_EXPORT AnyMap : public any_map
     {
       public:
-        AnyMap(map_type type);
+        AnyMap(map_type type = any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
         AnyMap(ordered_any_map const& m);
         AnyMap(ordered_any_map&& m);
         AnyMap(unordered_any_map const& m);

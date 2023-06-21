@@ -77,6 +77,7 @@ set(_declarativeservices_tests
   TestReferenceSelfSatisfyDeadLock.cpp
   TestRegistrationManager.cpp
   TestSCRBundleExtension.cpp
+  TestSCRExtensionRegistry.cpp
   TestServiceComponentRuntimeImpl.cpp
   TestServiceMetadataParserV1.cpp
   TestSetConfiguration.cpp

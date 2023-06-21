@@ -24,7 +24,7 @@
 #define __CPPMICROSERVICES_SCRIMPL_SCREXTENSIONREGISTRY_HPP__
 
 #include "SCRBundleExtension.hpp"
-#include "SCRLogger.hpp"
+#include "cppmicroservices/logservice/LogService.hpp"
 
 #include <map>
 #include <memory>
@@ -46,7 +46,7 @@ namespace cppmicroservices
             /**
              * @throws std::invalid_argument exception if any of the params is a nullptr
              */
-            SCRExtensionRegistry(std::shared_ptr<SCRLogger> logger);
+            SCRExtensionRegistry(std::shared_ptr<cppmicroservices::logservice::LogService> logger);
  
             SCRExtensionRegistry(SCRExtensionRegistry const&) = delete;
             SCRExtensionRegistry(SCRExtensionRegistry&&) = delete;
@@ -93,7 +93,7 @@ namespace cppmicroservices
             void Clear();
 
           private:
-            std::shared_ptr<SCRLogger> logger;
+            std::shared_ptr<cppmicroservices::logservice::LogService> logger;
             std::mutex extensionRegMutex;  //protects the extensionRegistry
             std::unordered_map<long,std::shared_ptr<SCRBundleExtension>> extensionRegistry;
         };

@@ -166,43 +166,31 @@ namespace cppmicroservices
   
         }
 
-        //Mock SCRExtensionRegistry class used by the testException class
-        class MockSCRExtensionRegistry : public cppmicroservices::scrimpl::SCRExtensionRegistry
-        {
-          public:
-            MockSCRExtensionRegistry(std::shared_ptr<SCRLogger> const& logger)
-                : cppmicroservices::scrimpl::SCRExtensionRegistry (logger)
-            {
-            }
-            virtual ~MockSCRExtensionRegistry() = default;    
-            MOCK_METHOD1(Find, std::shared_ptr<SCRBundleExtension>(long bundleId));
-        }; 
-
         // Tests the CreateFactoryComponent method of the ConfigurationNotifier class. If the bundle extension 
         // cannot be found in the SCRExtensionRegistry when creating a factory component then an
         // exception will be logged.
-        TEST_F(SCRExtensionRegistryTest, testException)
+        TEST_F(SCRExtensionRegistryTest, testCreateFactoryComponentFailure)
         {
             auto bundle = test::InstallAndStartBundle(GetFramework().GetBundleContext(), "TestBundleDSTOI1");
             ASSERT_TRUE(static_cast<bool>(bundle));
-            auto mockExtRegistry = std::make_shared<MockSCRExtensionRegistry>(logger);
             auto mockLogger = std::make_shared<MockLogger>();
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     mockLogger,
                                                                     asyncWorkService,
-                                                                    mockExtRegistry);
-  
-            EXPECT_CALL(*mockExtRegistry, Find (bundle.GetBundleId())).Times(1).WillOnce(::testing::Return(nullptr));
-            EXPECT_CALL(*(mockLogger.get()),
-                        Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, testing::_, testing::_))
+                                                                    extRegistry);
+
+            EXPECT_CALL(*mockLogger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, testing::_))
                 .Times(1);
-            auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
- 
+            auto mockMetadata = std::make_shared<metadata::ComponentMetadata>(); 
  
             std::shared_ptr<ComponentConfigurationImpl> compConfigImpl
-                = std::make_shared<SingletonComponentConfigurationImpl>(mockMetadata, bundle, fakeRegistry, logger, notifier);
+                = std::make_shared<SingletonComponentConfigurationImpl>(mockMetadata, bundle, fakeRegistry, mockLogger, notifier);
             std::string pid { 123 };
-            EXPECT_NO_THROW({ notifier->CreateFactoryComponent(pid, compConfigImpl); }); 
+            EXPECT_NO_THROW({ notifier->CreateFactoryComponent(pid, compConfigImpl); });
+
+            asyncWorkService->StopTracking();
+            fakeRegistry->Clear();
+            compConfigImpl->Deactivate();
          }
     } // namespace scrimpl
 } // namespace cppmicroservices

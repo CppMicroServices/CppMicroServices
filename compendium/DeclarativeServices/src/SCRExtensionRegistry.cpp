@@ -25,7 +25,7 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
-        SCRExtensionRegistry::SCRExtensionRegistry(std::shared_ptr<SCRLogger> logger)
+        SCRExtensionRegistry::SCRExtensionRegistry(std::shared_ptr<cppmicroservices::logservice::LogService> logger)
             : logger(std::move(logger))
         {
             if (!(this->logger))

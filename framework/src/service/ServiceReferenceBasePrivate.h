@@ -55,7 +55,7 @@ namespace cppmicroservices
 
         ~ServiceReferenceBasePrivate();
 
-        std::shared_ptr<ServiceRegistrationLocks> LockServiceRegistration() const;
+        ServiceRegistrationLocks LockServiceRegistration() const;
 
         /**
          * Get the service object.

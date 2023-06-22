@@ -330,10 +330,10 @@ namespace cppmicroservices
         }
     }
 
-    std::shared_ptr<ServiceRegistrationLocks>
+    ServiceRegistrationLocks
     ServiceRegistrationBase::LockServiceRegistration() const
     {
-        return std::make_shared<ServiceRegistrationLocks>(d, d->coreInfo);
+        return ServiceRegistrationLocks(d, d->coreInfo);
     }
 
     bool
@@ -353,12 +353,9 @@ namespace cppmicroservices
             return true;
         }
 
-        ServiceReferenceBase sr1;
-        ServiceReferenceBase sr2;
-        {
-            LockServiceRegistration(), sr1 = d->reference;
-            o.LockServiceRegistration(), sr2 = o.d->reference;
-        }
+        ServiceReferenceBase sr1 = (LockServiceRegistration(), d->reference);
+        ServiceReferenceBase sr2 = (o.LockServiceRegistration(), o.d->reference);
+
         return sr1 < sr2;
     }
 

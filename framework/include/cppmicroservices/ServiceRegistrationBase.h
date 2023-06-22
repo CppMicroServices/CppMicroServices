@@ -201,7 +201,7 @@ namespace cppmicroservices
 
         ServiceRegistrationBase(BundlePrivate* bundle, InterfaceMapConstPtr const& service, Properties&& props);
 
-        std::shared_ptr<ServiceRegistrationLocks> LockServiceRegistration() const;
+        ServiceRegistrationLocks LockServiceRegistration() const;
 
         std::shared_ptr<ServiceRegistrationBasePrivate> d;
     };

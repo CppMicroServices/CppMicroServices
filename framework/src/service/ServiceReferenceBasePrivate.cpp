@@ -55,10 +55,10 @@ namespace cppmicroservices
 
     ServiceReferenceBasePrivate::~ServiceReferenceBasePrivate() = default;
 
-    std::shared_ptr<ServiceRegistrationLocks>
+    ServiceRegistrationLocks
     ServiceReferenceBasePrivate::LockServiceRegistration() const
     {
-        return std::make_shared<ServiceRegistrationLocks>(registration.lock(), coreInfo);
+        return ServiceRegistrationLocks(registration.lock(), coreInfo);
     }
 
     InterfaceMapConstPtr

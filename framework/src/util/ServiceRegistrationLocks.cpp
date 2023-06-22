@@ -24,14 +24,11 @@
 namespace cppmicroservices
 {
 
-    ServiceRegistrationLocks::ServiceRegistrationLocks(std::shared_ptr<ServiceRegistrationBasePrivate> reg,
-                                                       std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo)
-    {
-        if (reg != nullptr)
-        {
-            regL = reg->Lock();
-        }
-        coreInfoL = coreInfo->Lock();
+    ServiceRegistrationLocks::ServiceRegistrationLocks(const std::shared_ptr<ServiceRegistrationBasePrivate>& reg,
+                                                       const std::shared_ptr<ServiceRegistrationCoreInfo>& coreInfo)
+        : regL(reg != nullptr ? reg->Lock() : cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock())
+        , coreInfoL(coreInfo->Lock())
+    {      
     }
 } // namespace cppmicroservices
 

@@ -30,9 +30,6 @@ limitations under the License.
 #include "gtest/gtest.h"
 #include <array>
 
-#include <future>
-#include <thread>
-
 using namespace cppmicroservices;
 
 namespace ServiceNS

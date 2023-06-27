@@ -30,6 +30,9 @@ limitations under the License.
 #include "gtest/gtest.h"
 #include <array>
 
+#include <future>
+#include <thread>
+
 using namespace cppmicroservices;
 
 namespace ServiceNS
@@ -245,4 +248,33 @@ TEST_F(ServiceReferenceTest, TestGetServiceReferenceWithModifiedProperties)
         {Constants::SERVICE_RANKING, 10}
     });
     ASSERT_EQ(context.GetServiceReference<ServiceNS::ITestServiceA>(), regArr[1].GetReference());
+}
+
+TEST_F(ServiceReferenceTest, TestParallelAccessOfService)
+{
+    auto context = framework.GetBundleContext();
+
+    std::array<cppmicroservices::ServiceRegistration<ServiceNS::ITestServiceA>, 2> regArr;
+    regArr[0] = context.RegisterService<ServiceNS::ITestServiceA>(std::make_shared<TestServiceA>());
+    regArr[1] = context.RegisterService<ServiceNS::ITestServiceA>(std::make_shared<TestServiceA>());
+
+    std::vector<std::thread> worker_threads;
+    for (size_t i = 0; i < 2; ++i)
+    {
+        worker_threads.push_back(std::thread(
+            [tmp = regArr[i]]()
+            {
+                for (int i = 0; i < 1; ++i)
+                {
+                    auto ref = tmp.GetReference();
+                    auto keys = ref.GetPropertyKeys();
+                    US_UNUSED(keys);
+                }
+            }));
+    }
+
+    for (auto& t : worker_threads)
+    {
+        t.join();
+    }
 }

@@ -30,6 +30,9 @@ limitations under the License.
 #include "gtest/gtest.h"
 #include <array>
 
+#include <future>
+#include <thread>
+
 using namespace cppmicroservices;
 
 namespace ServiceNS
@@ -245,4 +248,42 @@ TEST_F(ServiceReferenceTest, TestGetServiceReferenceWithModifiedProperties)
         {Constants::SERVICE_RANKING, 10}
     });
     ASSERT_EQ(context.GetServiceReference<ServiceNS::ITestServiceA>(), regArr[1].GetReference());
+}
+
+TEST_F(ServiceReferenceTest, TestParallelAccessOfService)
+{
+    ServiceProperties props0;
+    props0["key1"] = std::string("string2");
+    props0["key2"] = true;
+
+    ServiceProperties props1;
+    props1["key1"] = std::string("string1");
+    props1["key2"] = false;
+
+    auto context = framework.GetBundleContext();
+
+    auto reg0 = context.RegisterService<ServiceNS::ITestServiceA>(std::make_shared<TestServiceA>(), props0);
+
+    // reg1 stores service with properties1
+    auto reg1 = context.RegisterService<ServiceNS::ITestServiceA>(std::make_shared<TestServiceA>(), props1);
+    auto ptr = std::make_shared<ServiceReferenceBase>(reg1.GetReference());
+
+    auto getProps = std::thread(
+        [ptr]()
+        {
+            auto str2 = ptr->GetProperty("key1");
+            ASSERT_EQ(any_cast<std::string>(str2), "string1");
+            // freeze thread, assign other
+            auto fa = ptr->GetProperty("key2");
+            ASSERT_EQ(any_cast<bool>(fa), true);
+        });
+    auto assign = std::thread(
+        [ptr, reg0]()
+        {
+            // freeze then unfreeze
+            *ptr = ServiceReferenceBase(reg0.GetReference());
+        });
+
+    getProps.join();
+    assign.join();
 }

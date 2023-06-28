@@ -246,7 +246,7 @@ namespace
       public:
         MultipleListenersTest() : framework(FrameworkFactory().NewFramework()) {}
 
-        ~MultipleListenersTest() override = default;
+        ~MultipleListenersTest() override { count = 0; }
 
         void
         SetUp() override

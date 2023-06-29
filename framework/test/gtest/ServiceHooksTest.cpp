@@ -82,7 +82,7 @@ namespace
 
       public:
         TestServiceEventListenerHook(int id, BundleContext const& context) : id(id), bundleCtx(context) {}
-        virtual ~TestServiceEventListenerHook() { ordering.clear(); }
+
         using MapType = ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
 
         void
@@ -180,7 +180,7 @@ namespace
 
       public:
         TestServiceFindHook(int id, BundleContext const& context) : id(id), bundleCtx(context) {}
-        virtual ~TestServiceFindHook() { ordering.clear(); }
+
         void
         Find(BundleContext const& context,
              std::string const& /*name*/,
@@ -217,8 +217,6 @@ namespace
 
       public:
         TestServiceListenerHook(int id, BundleContext const& context) : id(id), bundleCtx(context) {}
-
-        virtual ~TestServiceListenerHook() { ordering.clear(); }
 
         void
         Added(std::vector<ListenerInfo> const& listeners)
@@ -385,8 +383,6 @@ TEST_F(ServiceHooksTest, TestListenerHook)
 
     listenerHookReg2.Unregister();
     listenerHookReg1.Unregister();
-
-    // serviceListenerHook1->ordering.clear();
 }
 
 TEST_F(ServiceHooksTest, TestFindHook)

@@ -183,6 +183,8 @@ TEST(BundleContextTest, NoSegfaultWithServiceFactory)
     // .join() and when the spawned thread is destructed, it will call terminate because it was not joined.
     try
     {
+        // Framework may throw as the registration is no longer valid (depending on thread ordering) but we care that no
+        // thread segfaults
         context.GetService(svcGetServiceThrowsRefs[0]);
     }
     catch (...)

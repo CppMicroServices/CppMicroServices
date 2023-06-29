@@ -68,10 +68,10 @@ namespace cppmicroservices
     Any
     ServiceReferenceBase::GetProperty(std::string const& key) const
     {
-        auto temp = d.Load();
-        auto l = temp->coreInfo->properties.Lock();
+        auto refP = d.Load();
+        auto l = refP->coreInfo->properties.Lock();
         US_UNUSED(l);
-        return temp->coreInfo->properties.Value_unlocked(key).first;
+        return refP->coreInfo->properties.Value_unlocked(key).first;
     }
 
     void
@@ -83,39 +83,39 @@ namespace cppmicroservices
     std::vector<std::string>
     ServiceReferenceBase::GetPropertyKeys() const
     {
-        auto temp = d.Load();
-        auto l = temp->coreInfo->properties.Lock();
+        auto refP = d.Load();
+        auto l = refP->coreInfo->properties.Lock();
         US_UNUSED(l);
-        return temp->coreInfo->properties.Keys_unlocked();
+        return refP->coreInfo->properties.Keys_unlocked();
     }
 
     Bundle
     ServiceReferenceBase::GetBundle() const
     {
-        auto p = d.Load();
-        auto reg = p->registration.lock();
+        auto refP = d.Load();
+        auto reg = refP->registration.lock();
         if (!reg)
         {
             return Bundle();
         }
 
-        auto l = p->LockServiceRegistration();
+        auto l = refP->LockServiceRegistration();
         US_UNUSED(l);
-        if (p->coreInfo->bundle_.lock() == nullptr)
+        if (refP->coreInfo->bundle_.lock() == nullptr)
         {
             return Bundle();
         }
-        return MakeBundle(p->coreInfo->bundle_.lock()->shared_from_this());
+        return MakeBundle(refP->coreInfo->bundle_.lock()->shared_from_this());
     }
 
     std::vector<Bundle>
     ServiceReferenceBase::GetUsingBundles() const
     {
         std::vector<Bundle> bundles;
-        auto tmp = d.Load();
-        auto l = tmp->LockServiceRegistration();
+        auto refP = d.Load();
+        auto l = refP->LockServiceRegistration();
         US_UNUSED(l);
-        for (auto const& iter : tmp->coreInfo->dependents)
+        for (auto const& iter : refP->coreInfo->dependents)
         {
             bundles.push_back(MakeBundle(iter.first->shared_from_this()));
         }

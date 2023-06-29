@@ -320,8 +320,6 @@ namespace cppmicroservices
     {
         if (!reference)
         {
-            auto tmp = !reference;
-            US_UNUSED(tmp);
             throw std::invalid_argument("Default constructed ServiceReference is not a "
                                         "valid input to GetService()");
         }

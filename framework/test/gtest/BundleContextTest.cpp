@@ -172,17 +172,15 @@ TEST(BundleContextTest, NoSegfaultWithServiceFactory)
     ASSERT_EQ(svcGetServiceThrowsRefs.size(), 1);
     ASSERT_EQ("1", svcGetServiceThrowsRefs[0].GetProperty(std::string("getservice_exception")).ToString());
 
-    auto fut = std::async(std::launch::async,
-                          [&framework]()
-                          {
-                              framework.Stop();
-                              framework.WaitForStop(std::chrono::milliseconds::zero());
-                          });
-    auto temp = svcGetServiceThrowsRefs[0];
-    US_UNUSED(temp);
+    std::thread thread(
+        [&framework]()
+        {
+            framework.Stop();
+            framework.WaitForStop(std::chrono::milliseconds::zero());
+        });
 
-    // Framework may throw as the registration is no longer valid (depending on thread ordering) but we care that no
-    // thread segfaults
+    // Have to wrap call in a try catch. Without one, if the program throws the main thread will exit without calling
+    // .join() and when the spawned thread is destructed, it will call terminate because it was not joined.
     try
     {
         context.GetService(svcGetServiceThrowsRefs[0]);
@@ -190,7 +188,6 @@ TEST(BundleContextTest, NoSegfaultWithServiceFactory)
     catch (...)
     {
     }
-
-    fut.wait();
+    thread.join();
 }
 #endif

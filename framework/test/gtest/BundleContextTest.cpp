@@ -172,15 +172,25 @@ TEST(BundleContextTest, NoSegfaultWithServiceFactory)
     ASSERT_EQ(svcGetServiceThrowsRefs.size(), 1);
     ASSERT_EQ("1", svcGetServiceThrowsRefs[0].GetProperty(std::string("getservice_exception")).ToString());
 
-    std::thread thread(
-        [&framework]()
-        {
-            framework.Stop();
-            framework.WaitForStop(std::chrono::milliseconds::zero());
-        });
+    auto fut = std::async(std::launch::async,
+                          [&framework]()
+                          {
+                              framework.Stop();
+                              framework.WaitForStop(std::chrono::milliseconds::zero());
+                          });
+    auto temp = svcGetServiceThrowsRefs[0];
+    US_UNUSED(temp);
 
-    ASSERT_EQ(nullptr, context.GetService(svcGetServiceThrowsRefs[0]));
+    // Framework may throw as the registration is no longer valid (depending on thread ordering) but we care that no
+    // thread segfaults
+    try
+    {
+        context.GetService(svcGetServiceThrowsRefs[0]);
+    }
+    catch (...)
+    {
+    }
 
-    thread.join();
+    fut.wait();
 }
 #endif

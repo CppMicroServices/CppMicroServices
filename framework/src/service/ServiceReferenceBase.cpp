@@ -68,9 +68,10 @@ namespace cppmicroservices
     Any
     ServiceReferenceBase::GetProperty(std::string const& key) const
     {
-        auto l = d.Load()->coreInfo->properties.Lock();
+        auto refP = d.Load();
+        auto l = refP->coreInfo->properties.Lock();
         US_UNUSED(l);
-        return d.Load()->coreInfo->properties.Value_unlocked(key).first;
+        return refP->coreInfo->properties.Value_unlocked(key).first;
     }
 
     void
@@ -82,37 +83,39 @@ namespace cppmicroservices
     std::vector<std::string>
     ServiceReferenceBase::GetPropertyKeys() const
     {
-        auto l = d.Load()->coreInfo->properties.Lock();
+        auto refP = d.Load();
+        auto l = refP->coreInfo->properties.Lock();
         US_UNUSED(l);
-        return d.Load()->coreInfo->properties.Keys_unlocked();
+        return refP->coreInfo->properties.Keys_unlocked();
     }
 
     Bundle
     ServiceReferenceBase::GetBundle() const
     {
-        auto p = d.Load();
-        auto reg = p->registration.lock();
+        auto refP = d.Load();
+        auto reg = refP->registration.lock();
         if (!reg)
         {
             return Bundle();
         }
 
-        auto l = p->LockServiceRegistration();
+        auto l = refP->LockServiceRegistration();
         US_UNUSED(l);
-        if (p->coreInfo->bundle_.lock() == nullptr)
+        if (refP->coreInfo->bundle_.lock() == nullptr)
         {
             return Bundle();
         }
-        return MakeBundle(p->coreInfo->bundle_.lock()->shared_from_this());
+        return MakeBundle(refP->coreInfo->bundle_.lock()->shared_from_this());
     }
 
     std::vector<Bundle>
     ServiceReferenceBase::GetUsingBundles() const
     {
         std::vector<Bundle> bundles;
-        auto l = d.Load()->LockServiceRegistration();
+        auto refP = d.Load();
+        auto l = refP->LockServiceRegistration();
         US_UNUSED(l);
-        for (auto const& iter : d.Load()->coreInfo->dependents)
+        for (auto const& iter : refP->coreInfo->dependents)
         {
             bundles.push_back(MakeBundle(iter.first->shared_from_this()));
         }
@@ -136,8 +139,9 @@ namespace cppmicroservices
         {
             return false;
         }
-
-        if (d.Load()->registration.lock() == reference.d.Load()->registration.lock())
+        auto self = d.Load();
+        auto ref = reference.d.Load();
+        if (self->registration.lock() == ref->registration.lock())
         {
             return false;
         }
@@ -150,22 +154,22 @@ namespace cppmicroservices
         Any anyR1;
         Any anyId1;
         {
-            auto l1 = d.Load()->coreInfo->properties.Lock();
+            auto l1 = self->coreInfo->properties.Lock();
             US_UNUSED(l1);
-            anyR1 = d.Load()->coreInfo->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
+            anyR1 = self->coreInfo->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             assert(anyR1.Empty() || anyR1.Type() == typeid(int));
-            anyId1 = d.Load()->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first;
+            anyId1 = self->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first;
             assert(anyId1.Empty() || anyId1.Type() == typeid(long int));
         }
 
         Any anyR2;
         Any anyId2;
         {
-            auto l2 = reference.d.Load()->coreInfo->properties.Lock();
+            auto l2 = ref->coreInfo->properties.Lock();
             US_UNUSED(l2);
-            anyR2 = reference.d.Load()->coreInfo->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
+            anyR2 = ref->coreInfo->properties.Value_unlocked(Constants::SERVICE_RANKING).first;
             assert(anyR2.Empty() || anyR2.Type() == typeid(int));
-            anyId2 = reference.d.Load()->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first;
+            anyId2 = ref->coreInfo->properties.Value_unlocked(Constants::SERVICE_ID).first;
             assert(anyId2.Empty() || anyId2.Type() == typeid(long int));
         }
 

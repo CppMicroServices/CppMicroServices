@@ -179,8 +179,17 @@ TEST(BundleContextTest, NoSegfaultWithServiceFactory)
             framework.WaitForStop(std::chrono::milliseconds::zero());
         });
 
-    ASSERT_EQ(nullptr, context.GetService(svcGetServiceThrowsRefs[0]));
-
+    // Have to wrap call in a try catch. Without one, if the program throws the main thread will exit without calling
+    // .join() and when the spawned thread is destructed, it will call terminate because it was not joined.
+    try
+    {
+        // Framework may throw as the registration is no longer valid (depending on thread ordering) but we care that no
+        // thread segfaults
+        context.GetService(svcGetServiceThrowsRefs[0]);
+    }
+    catch (...)
+    {
+    }
     thread.join();
 }
 #endif

@@ -967,6 +967,8 @@ namespace cppmicroservices
             EXPECT_EQ(refManager.GetBoundReferences().size(), 0);
             EXPECT_EQ(unsatisfiedNotificationCount, 1);
             EXPECT_EQ(unbindNotificationCount, 2);
+
+            refManager.UnregisterListener(token);
         }
 
         // test that:
@@ -1062,6 +1064,8 @@ namespace cppmicroservices
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 0);
             EXPECT_EQ(unbindNotificationCount, 3);
+
+            refManager.UnregisterListener(token);
         }
 
        // test that:
@@ -1156,6 +1160,8 @@ namespace cppmicroservices
             EXPECT_EQ(refManager.GetBoundReferences().size(), 0);
             EXPECT_EQ(unsatisfiedNotificationCount, 1);
             EXPECT_EQ(unbindNotificationCount, 2);
+
+            refManager.UnregisterListener(token);
         }
 
         // test that:
@@ -1251,6 +1257,8 @@ namespace cppmicroservices
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 0);
             EXPECT_EQ(unbindNotificationCount, 3);
+
+            refManager.UnregisterListener(token);
         }
 
         // test that:
@@ -1342,6 +1350,7 @@ namespace cppmicroservices
             EXPECT_EQ(unsatisfiedNotificationCount, 3);
             EXPECT_EQ(satisfiedNotificationCount, 2);
 
+            refManager.UnregisterListener(token);
         }
 
         // test that:
@@ -1431,6 +1440,8 @@ namespace cppmicroservices
             EXPECT_EQ(refManager.GetBoundReferences().size(), 0);
             EXPECT_EQ(unsatisfiedNotificationCount, 3);
             EXPECT_EQ(satisfiedNotificationCount, 3);
+
+            refManager.UnregisterListener(token);
         }
 
         TEST_P(BindingPolicyTest, TestMaxLimitOfMultipleReferences) {

@@ -460,7 +460,7 @@ namespace cppmicroservices
                               class HasNoConstructorWithRefAndConfig = typename std::enable_if<
                                   std::is_constructible<C,
                                                         std::shared_ptr<cppmicroservices::AnyMap> const&,
-                                                        CtorInjectedRefs const&...>::value //later change this to without shared_ptr too
+                                                        CtorInjectedRefs const&...>::value
                                   == false>::type>
                     std::shared_ptr<T>
                     DoCreate(bool const&)
@@ -539,13 +539,13 @@ namespace cppmicroservices
 
                     // Type detector to see if given template parameter is std::vector type (multiple cardinality reference)
                     // or not (unary cardinality reference)
-                    template <typename T>
+                    template <typename RefType>
                     struct is_vector_type {
                         static const bool value = false;
                     };
 
-                    template <typename T>
-                    struct is_vector_type<std::vector<T> > {
+                    template <typename RefType>
+                    struct is_vector_type<std::vector<RefType> > {
                         static const bool value = true;
                     };
 
@@ -574,6 +574,7 @@ namespace cppmicroservices
                               >
                     R GetDependency(std::string const& name, bool val = true)
                     {
+                        (void)val;
                         // Overload to be used for references using unary cardinality
                         using RefType = typename R::element_type;
                         return this->mContext->template LocateService<RefType>(name);

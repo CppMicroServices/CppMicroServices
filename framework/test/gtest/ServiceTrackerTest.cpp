@@ -678,10 +678,9 @@ TEST_F(ServiceTrackerTestFixture, TestFilterPropertiesTypes)
     tracker.Open();
 
     auto fooService = std::make_shared<MockFooBar>();
-    cppmicroservices::ServiceProperties props = std::initializer_list<cppmicroservices::ServiceProperties::value_type> {
-        std::make_pair("tag",
-                       ("foo::bar::Baz"))
-    };
+    cppmicroservices::ServiceProperties props
+        = std::initializer_list<cppmicroservices::ServiceProperties::value_type> { std::make_pair("tag",
+                                                                                                  ("foo::bar::Baz")) };
 
     auto svc = framework.GetBundleContext().RegisterService<foo::Bar>(fooService, std::move(props));
 

@@ -64,16 +64,10 @@ using namespace cppmicroservices;
 
 namespace
 {
-        class FooService
+    class FooService
     {
       public:
         virtual ~FooService() = default;
-    };
-
-    class FooServiceImpl final : public FooService
-    {
-      public:
-        ~FooServiceImpl() = default;
     };
 
     class CustomFooTracker final : public cppmicroservices::ServiceTrackerCustomizer<FooService>
@@ -131,201 +125,30 @@ namespace
         std::vector<FrameworkEvent> events;
     };
 
-    class TestServiceEventListenerHook : public ServiceEventListenerHook
-    {
-      private:
-        int id;
-        BundleContext bundleCtx;
-
-      public:
-        TestServiceEventListenerHook(int id, BundleContext const& context) : id(id), bundleCtx(context) {}
-
-        using MapType = ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
-
-        void
-        Event(ServiceEvent const& /*event*/, MapType& listeners)
-        {
-            // Check listener content
-            ASSERT_TRUE(listeners.find(bundleCtx) != listeners.end());
-            ASSERT_GT(static_cast<int>(listeners.size()), 0);
-            ShrinkableVector<ServiceListenerHook::ListenerInfo>& listenerInfos = listeners[bundleCtx];
-
-            // listener count should be 2 because the event listener hooks are called with
-            // the list of listeners before filtering them according to ther LDAP filter
-            if (id == 1)
-            {
-#ifdef US_BUILD_SHARED_LIBS
-                // 2 service listeners expected
-                ASSERT_EQ(listenerInfos.size(), 2);
-#else
-                ASSERT_GE(static_cast<int>(listenerInfos.size()), 2);
-#endif
-                // test that Listener is not removed
-                ASSERT_FALSE(listenerInfos[0].IsRemoved());
-                ASSERT_FALSE(listenerInfos[1].IsRemoved());
-                ASSERT_FALSE(listenerInfos[0] == listenerInfos[1]);
-            }
-            else
-            {
-                // there is already one listener filtered out
-#ifdef US_BUILD_SHARED_LIBS
-                // 1 service listener expected
-                ASSERT_EQ(listenerInfos.size(), 1);
-#else
-                ASSERT_GE(static_cast<int>(listenerInfos.size()), 1);
-#endif
-                ASSERT_FALSE(listenerInfos[0].IsRemoved());
-            }
-            if (listenerInfo.IsNull())
-            {
-                listenerInfo = listenerInfos[0];
-            }
-            else
-            {
-                // Check Equal listener info objects
-                ASSERT_EQ(listenerInfo, listenerInfos[0]);
-            }
-
-            // Remove the listener without a filter from the list
-            for (ShrinkableVector<ServiceListenerHook::ListenerInfo>::iterator infoIter = listenerInfos.begin();
-                 infoIter != listenerInfos.end();)
-            {
-                if (infoIter->GetFilter().empty())
-                {
-                    infoIter = listenerInfos.erase(infoIter);
-                }
-                else
-                {
-                    ++infoIter;
-                }
-            }
-#ifdef US_BUILD_SHARED_LIBS
-            // One listener with LDAP filter should remain
-            ASSERT_EQ(listenerInfos.size(), 1);
-#else
-            // One listener with LDAP filter should remain
-            ASSERT_GE(static_cast<int>(listenerInfos.size()), 1);
-#endif
-
-            ordering.push_back(id);
-        }
-
-        ServiceListenerHook::ListenerInfo listenerInfo;
-
-        static std::vector<int> ordering;
-    };
-
-    class TestServiceEventListenerHookFailure : public ServiceEventListenerHook
-    {
-      public:
-        using MapType = ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
-
-        void
-        Event(ServiceEvent const&, MapType&)
-        {
-            throw std::runtime_error("TestServiceEventListenerHookFailure Event exception");
-        }
-    };
-
-    std::vector<int> TestServiceEventListenerHook::ordering;
-
-    class TestServiceFindHook : public ServiceFindHook
-    {
-      private:
-        int id;
-        BundleContext bundleCtx;
-
-      public:
-        TestServiceFindHook(int id, BundleContext const& context) : id(id), bundleCtx(context) {}
-
-        void
-        Find(BundleContext const& context,
-             std::string const& /*name*/,
-             std::string const& /*filter*/,
-             ShrinkableVector<ServiceReferenceBase>& references)
-        {
-            ASSERT_EQ(context, bundleCtx);
-
-            references.clear();
-            ordering.push_back(id);
-        }
-
-        static std::vector<int> ordering;
-    };
-
-    std::vector<int> TestServiceFindHook::ordering;
-
-    // Test failure modes for FindHook
-    class TestServiceFindHookFailure : public ServiceFindHook
-    {
-      public:
-        void
-        Find(BundleContext const&, std::string const&, std::string const&, ShrinkableVector<ServiceReferenceBase>&)
-        {
-            throw std::runtime_error("TestServiceFindHookFailure Find exception");
-        }
-    };
+    // Test failure modes for FindHo
 
     class TestServiceListenerHook : public ServiceListenerHook
     {
       private:
-        int id;
-        BundleContext bundleCtx;
-
       public:
-        TestServiceListenerHook(int id, BundleContext const& context, std::shared_ptr<cppmicroservices::ServiceTracker<FooService>>_tracker) : id(id), bundleCtx(context), tracker(_tracker) {}
+        TestServiceListenerHook(std::shared_ptr<cppmicroservices::ServiceTracker<FooService>> _tracker)
+            : tracker(_tracker)
+        {
+        }
 
         void
         Added(std::vector<ListenerInfo> const& listeners)
         {
-            for (std::vector<ListenerInfo>::const_iterator iter = listeners.begin(); iter != listeners.end(); ++iter)
-            {
-                if (iter->IsRemoved() || iter->GetBundleContext().GetBundle() != bundleCtx.GetBundle())
-                {
-                    continue;
-                }
-                listenerInfos.insert(*iter);
-                lastAdded = listeners.back();
-                ordering.push_back(id);
-            }
+            US_UNUSED(listeners);
         }
 
         void
         Removed(std::vector<ListenerInfo> const& listeners)
         {
-            for (std::vector<ListenerInfo>::const_iterator iter = listeners.begin(); iter != listeners.end(); ++iter)
-            {
-                listenerInfos.erase(*iter);
-                ordering.push_back(id * 10);
-            }
-            lastRemoved = listeners.back();
+            US_UNUSED(listeners);
             tracker->Close();
         }
-
-        static std::vector<int> ordering;
-
-        std::unordered_set<ListenerInfo> listenerInfos;
-        ListenerInfo lastAdded;
-        ListenerInfo lastRemoved;
         std::shared_ptr<cppmicroservices::ServiceTracker<FooService>> tracker;
-    };
-
-    std::vector<int> TestServiceListenerHook::ordering;
-
-    class TestServiceListenerHookFailure : public ServiceListenerHook
-    {
-      public:
-        void
-        Added(std::vector<ListenerInfo> const&)
-        {
-            throw std::runtime_error("TestServiceListenerHookFailure Added exception");
-        }
-
-        void
-        Removed(std::vector<ListenerInfo> const&)
-        {
-            throw std::runtime_error("TestServiceListenerHookFailure Removed exception");
-        }
     };
 
     class ServiceHooksTrackerTest : public ::testing::Test
@@ -374,7 +197,7 @@ TEST_F(ServiceHooksTrackerTest, TestBasic)
     TestServiceListener serviceListener1;
     context.AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
 
-    auto serviceListenerHook1 = std::make_shared<TestServiceListenerHook>(1, context, tracker);
+    auto serviceListenerHook1 = std::make_shared<TestServiceListenerHook>(tracker);
     ServiceProperties hookProps1;
     hookProps1[Constants::SERVICE_RANKING] = 0;
     ServiceRegistration<ServiceListenerHook> listenerHookReg1

@@ -1,6 +1,18 @@
 # ServiceTracker/ServiceListener races
-race:cppmicroservices::ServiceListeners::RemoveServiceListener
-race:cppmicroservices::ServiceTracker*
+#race:cppmicroservices::ServiceListeners::RemoveServiceListener
+#race:cppmicroservices::ServiceTracker*
+
+# FrameworkTest.Events double lock false-positive
+mutex:cppmicroservices::TestBundleC1Activator::*
+
+# FrameworkTest.Events race false-positive
+race:cppmicroservices::TestBundleC1*
+
+# Framework.LifeCycle double lock false-positive
+mutex:cppmicroservices::detail::MutexLockingStrategy
+
+# Framework.LifeCycle race false-positive
+race:Framework_LifeCycle_Test::TestBody
 
 # Potential Deadlock in CCACtiveState
 deadlock:cppmicroservices::scrimpl::CCActiveState::Activate

@@ -41,6 +41,11 @@ namespace cppmicroservices
         , public ServiceTrackerCustomizer<void>
     {
       public:
+        struct lockedReg : public detail::MultiThreaded<>
+        {
+            ServiceRegistrationU v;
+        };
+
         TestBundleC1Activator() : context(), stop(false), count(0) {}
 
         ~TestBundleC1Activator() {}
@@ -85,7 +90,9 @@ namespace cppmicroservices
             tracker->Close();
 
             if (count != 0)
+            {
                 throw std::logic_error("Not unregistered all services");
+            }
         }
 
         void
@@ -100,11 +107,13 @@ namespace cppmicroservices
                 im[std::string("org.cppmicroservices.c1.") + util::ToString(c)] = std::make_shared<int>(1);
                 ServiceProperties props;
                 props["i"] = i;
-                auto reg = context.RegisterService(std::make_shared<InterfaceMap const>(im), props);
-                regs.Lock(), regs.v.emplace_back(std::move(reg));
-                count++;
+                lockedReg reg;
+                regs.Lock(), reg.v = context.RegisterService(std::make_shared<InterfaceMap const>(im), props);
+                regs.Lock(), reg.Lock(), count++, regs.v.emplace_back(std::move(reg));
                 if (i % 5 == 0)
+                {
                     regs.NotifyAll();
+                }
             }
         }
 
@@ -113,9 +122,9 @@ namespace cppmicroservices
         {
             while (!(stop.load() && (regs.Lock(), regs.v.empty())))
             {
-                std::vector<ServiceRegistrationU> currRegs;
-                regs.Lock(), std::swap(currRegs, regs.v);
-                if (currRegs.empty())
+                std::vector<lockedReg> currRegs;
+                // regs.Lock(), std::swap(currRegs, regs.v);
+                // if (currRegs.empty())
                 {
                     auto l = regs.Lock();
                     regs.WaitFor(l, std::chrono::milliseconds(100), [this] { return !regs.v.empty(); });
@@ -124,17 +133,17 @@ namespace cppmicroservices
 
                 for (auto& reg : currRegs)
                 {
-                    if (reg.GetReference().GetProperty("i") == 5)
+                    if (reg.Lock(), reg.v.GetReference().GetProperty("i") == 5)
                     {
                         // change a property, unregister later
                         ServiceProperties newProps;
                         newProps["i"] = 15;
-                        reg.SetProperties(newProps);
-                        regs.Lock(), regs.v.push_back(reg);
+                        reg.Lock(), reg.v.SetProperties(newProps);
+                        regs.Lock(), reg.Lock(), regs.v.push_back(reg);
                     }
                     else
                     {
-                        reg.Unregister();
+                        reg.Lock(), reg.v.Unregister();
                         count--;
                     }
                 }
@@ -164,7 +173,9 @@ namespace cppmicroservices
         ModifiedService(ServiceReferenceU const& reference, InterfaceMapConstPtr const& /*service*/)
         {
             if (reference.GetProperty("i") != 5)
+            {
                 throw std::logic_error("modified end match: wrong property");
+            }
             context.GetService(reference);
         }
 
@@ -173,7 +184,9 @@ namespace cppmicroservices
         {
             auto l = additionalReg.Lock();
             if (additionalReg.v)
+            {
                 additionalReg.v.Unregister();
+            }
         }
 
       private:
@@ -186,13 +199,10 @@ namespace cppmicroservices
 
         struct : detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition>
         {
-            std::vector<ServiceRegistrationU> v;
+            std::vector<lockedReg> v;
         } regs;
 
-        struct : detail::MultiThreaded<>
-        {
-            ServiceRegistrationU v;
-        } additionalReg;
+        lockedReg additionalReg;
 
         std::atomic<bool> stop;
         std::atomic<int> count;

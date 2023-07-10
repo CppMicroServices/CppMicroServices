@@ -395,5 +395,4 @@ namespace cppmicroservices
     {
         return operator<<(os, *bundle);
     }
-
 } // namespace cppmicroservices

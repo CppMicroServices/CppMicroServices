@@ -1,0 +1,173 @@
+Note: Google Test filter = Framework.LifeCycle
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from Framework
+[ RUN      ] Framework.LifeCycle
+==================
+WARNING: ThreadSanitizer: double lock of a mutex (pid=1847977)
+    #0 pthread_mutex_lock ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:4148 (libtsan.so.0+0x4db3a)
+    #1 std::unique_lock<std::mutex>::unique_lock(std::mutex&) /usr/include/x86_64-linux-gnu/c++/10/bits/gthr-default.h:749 (libCppMicroServicesd.so.3.7.6+0x60d9a)
+    #2 cppmicroservices::detail::MutexLockingStrategy<std::mutex>::UniqueLock::UniqueLock(cppmicroservices::detail::MutexLockingStrategy<std::mutex> const*) /home/tcormack/dev/issue710/CppMicroServices/framework/include/cppmicroservices/detail/Threads.h:81 (libCppMicroServicesd.so.3.7.6+0x60d9a)
+    #3 cppmicroservices::detail::MutexLockingStrategy<std::mutex>::Lock() const /home/tcormack/dev/issue710/CppMicroServices/framework/include/cppmicroservices/detail/Threads.h:153 (libCppMicroServicesd.so.3.7.6+0x60d9a)
+    #4 cppmicroservices::FrameworkPrivate::Shutdown0(bool, bool) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:278 (libCppMicroServicesd.so.3.7.6+0x60d9a)
+    #5 std::thread::_State_impl<std::thread::_Invoker<std::tuple<std::_Bind<void (cppmicroservices::FrameworkPrivate::*(cppmicroservices::FrameworkPrivate*, bool, bool))(bool, bool)> > > >::_M_run() <null> (libCppMicroServicesd.so.3.7.6+0x614eb)
+    #6 <null> <null> (libstdc++.so.6+0xceecf)
+
+  Location is heap block of size 616 at 0x7b5400000280 allocated by main thread:
+    #0 operator new(unsigned long) ../../../../src/libsanitizer/tsan/tsan_new_delete.cpp:64 (libtsan.so.0+0x8499c)
+    #1 cppmicroservices::CoreBundleContext::CoreBundleContext(std::unordered_map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, cppmicroservices::Any, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, cppmicroservices::Any> > > const&, std::ostream*) /home/tcormack/dev/issue710/CppMicroServices/framework/src/bundle/CoreBundleContext.cpp:102 (libCppMicroServicesd.so.3.7.6+0x12246e)
+    #2 cppmicroservices::FrameworkFactory::NewFramework(std::unordered_map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, cppmicroservices::Any, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, cppmicroservices::Any> > > const&, std::ostream*) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkFactory.cpp:66 (libCppMicroServicesd.so.3.7.6+0x5b181)
+    #3 cppmicroservices::FrameworkFactory::NewFramework() /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkFactory.cpp:76 (libCppMicroServicesd.so.3.7.6+0x5b622)
+    #4 Framework_LifeCycle_Test::TestBody() /home/tcormack/dev/issue710/CppMicroServices/framework/test/gtest/FrameworkTest.cpp:386 (usFrameworkTests+0x12eff8)
+    #5 void testing::internal::HandleSehExceptionsInMethodIfSupported<testing::Test, void>(testing::Test*, void (testing::Test::*)(), char const*) /home/tcormack/dev/issue710/CppMicroServices/third_party/googletest/googletest/src/gtest.cc:2631 (libgtestd.so.1.11.0+0xc1d72)
+    #6 __libc_start_main ../csu/libc-start.c:308 (libc.so.6+0x23d09)
+
+  Mutex M589 (0x7b5400000288) created at:
+    #0 pthread_mutex_lock ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:4148 (libtsan.so.0+0x4db3a)
+    #1 __gthread_mutex_lock /usr/include/x86_64-linux-gnu/c++/10/bits/gthr-default.h:749 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #2 std::mutex::lock() /usr/include/c++/10/bits/std_mutex.h:100 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #3 std::unique_lock<std::mutex>::lock() /usr/include/c++/10/bits/unique_lock.h:138 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #4 std::unique_lock<std::mutex>::unique_lock(std::mutex&) /usr/include/c++/10/bits/unique_lock.h:68 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #5 cppmicroservices::detail::MutexLockingStrategy<std::mutex>::UniqueLock::UniqueLock(cppmicroservices::detail::MutexLockingStrategy<std::mutex> const*) /home/tcormack/dev/issue710/CppMicroServices/framework/include/cppmicroservices/detail/Threads.h:81 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #6 cppmicroservices::detail::MutexLockingStrategy<std::mutex>::Lock() const /home/tcormack/dev/issue710/CppMicroServices/framework/include/cppmicroservices/detail/Threads.h:153 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #7 cppmicroservices::FrameworkPrivate::WaitForStop(std::chrono::duration<long, std::ratio<1l, 1000l> > const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:102 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #8 cppmicroservices::Framework::WaitForStop(std::chrono::duration<long, std::ratio<1l, 1000l> > const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/Framework.cpp:74 (libCppMicroServicesd.so.3.7.6+0x59d94)
+    #9 Framework_LifeCycle_Test::TestBody() /home/tcormack/dev/issue710/CppMicroServices/framework/test/gtest/FrameworkTest.cpp:392 (usFrameworkTests+0x12f08f)
+    #10 void testing::internal::HandleSehExceptionsInMethodIfSupported<testing::Test, void>(testing::Test*, void (testing::Test::*)(), char const*) /home/tcormack/dev/issue710/CppMicroServices/third_party/googletest/googletest/src/gtest.cc:2631 (libgtestd.so.1.11.0+0xc1d72)
+    #11 __libc_start_main ../csu/libc-start.c:308 (libc.so.6+0x23d09)
+
+SUMMARY: ThreadSanitizer: double lock of a mutex /usr/include/x86_64-linux-gnu/c++/10/bits/gthr-default.h:749 in std::unique_lock<std::mutex>::unique_lock(std::mutex&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=1847977)
+  Write of size 1 at 0x7b54000004a0 by thread T4 (mutexes: write M589):
+    #0 cppmicroservices::FrameworkPrivate::FrameworkEventInternal::operator=(cppmicroservices::FrameworkPrivate::FrameworkEventInternal const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.h:103 (libCppMicroServicesd.so.3.7.6+0x5cc8d)
+    #1 cppmicroservices::FrameworkPrivate::SystemShuttingdownDone_unlocked(cppmicroservices::FrameworkPrivate::FrameworkEventInternal const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:375 (libCppMicroServicesd.so.3.7.6+0x5cc8d)
+    #2 cppmicroservices::FrameworkPrivate::ShutdownDone_unlocked(bool) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:323 (libCppMicroServicesd.so.3.7.6+0x5cdd7)
+    #3 cppmicroservices::FrameworkPrivate::Shutdown0(bool, bool) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:294 (libCppMicroServicesd.so.3.7.6+0x61171)
+    #4 std::thread::_State_impl<std::thread::_Invoker<std::tuple<std::_Bind<void (cppmicroservices::FrameworkPrivate::*(cppmicroservices::FrameworkPrivate*, bool, bool))(bool, bool)> > > >::_M_run() <null> (libCppMicroServicesd.so.3.7.6+0x614eb)
+    #5 <null> <null> (libstdc++.so.6+0xceecf)
+
+  Previous write of size 1 at 0x7b54000004a0 by thread T3 (mutexes: write M589):
+    #0 cppmicroservices::FrameworkPrivate::FrameworkEventInternal::operator=(cppmicroservices::FrameworkPrivate::FrameworkEventInternal&&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.h:103 (libCppMicroServicesd.so.3.7.6+0x5e5f0)
+    #1 cppmicroservices::FrameworkPrivate::WaitForStop(std::chrono::duration<long, std::ratio<1l, 1000l> > const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:109 (libCppMicroServicesd.so.3.7.6+0x5e5f0)
+    #2 cppmicroservices::Framework::WaitForStop(std::chrono::duration<long, std::ratio<1l, 1000l> > const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/Framework.cpp:74 (libCppMicroServicesd.so.3.7.6+0x59d94)
+    #3 operator() /home/tcormack/dev/issue710/CppMicroServices/framework/test/gtest/FrameworkTest.cpp:460 (usFrameworkTests+0x12c5b7)
+    #4 __invoke_impl<void, Framework_LifeCycle_Test::TestBody()::<lambda()> > /usr/include/c++/10/bits/invoke.h:60 (usFrameworkTests+0x12c5b7)
+    #5 __invoke<Framework_LifeCycle_Test::TestBody()::<lambda()> > /usr/include/c++/10/bits/invoke.h:95 (usFrameworkTests+0x12c5b7)
+    #6 _M_invoke<0> /usr/include/c++/10/thread:264 (usFrameworkTests+0x12c5b7)
+    #7 operator() /usr/include/c++/10/thread:271 (usFrameworkTests+0x12c5b7)
+    #8 _M_run /usr/include/c++/10/thread:215 (usFrameworkTests+0x12c5b7)
+    #9 <null> <null> (libstdc++.so.6+0xceecf)
+
+  Location is heap block of size 616 at 0x7b5400000280 allocated by main thread:
+    #0 operator new(unsigned long) ../../../../src/libsanitizer/tsan/tsan_new_delete.cpp:64 (libtsan.so.0+0x8499c)
+    #1 cppmicroservices::CoreBundleContext::CoreBundleContext(std::unordered_map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, cppmicroservices::Any, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, cppmicroservices::Any> > > const&, std::ostream*) /home/tcormack/dev/issue710/CppMicroServices/framework/src/bundle/CoreBundleContext.cpp:102 (libCppMicroServicesd.so.3.7.6+0x12246e)
+    #2 cppmicroservices::FrameworkFactory::NewFramework(std::unordered_map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, cppmicroservices::Any, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, cppmicroservices::Any> > > const&, std::ostream*) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkFactory.cpp:66 (libCppMicroServicesd.so.3.7.6+0x5b181)
+    #3 cppmicroservices::FrameworkFactory::NewFramework() /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkFactory.cpp:76 (libCppMicroServicesd.so.3.7.6+0x5b622)
+    #4 Framework_LifeCycle_Test::TestBody() /home/tcormack/dev/issue710/CppMicroServices/framework/test/gtest/FrameworkTest.cpp:386 (usFrameworkTests+0x12eff8)
+    #5 void testing::internal::HandleSehExceptionsInMethodIfSupported<testing::Test, void>(testing::Test*, void (testing::Test::*)(), char const*) /home/tcormack/dev/issue710/CppMicroServices/third_party/googletest/googletest/src/gtest.cc:2631 (libgtestd.so.1.11.0+0xc1d72)
+    #6 __libc_start_main ../csu/libc-start.c:308 (libc.so.6+0x23d09)
+
+  Mutex M589 (0x7b5400000288) created at:
+    #0 pthread_mutex_lock ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:4148 (libtsan.so.0+0x4db3a)
+    #1 __gthread_mutex_lock /usr/include/x86_64-linux-gnu/c++/10/bits/gthr-default.h:749 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #2 std::mutex::lock() /usr/include/c++/10/bits/std_mutex.h:100 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #3 std::unique_lock<std::mutex>::lock() /usr/include/c++/10/bits/unique_lock.h:138 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #4 std::unique_lock<std::mutex>::unique_lock(std::mutex&) /usr/include/c++/10/bits/unique_lock.h:68 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #5 cppmicroservices::detail::MutexLockingStrategy<std::mutex>::UniqueLock::UniqueLock(cppmicroservices::detail::MutexLockingStrategy<std::mutex> const*) /home/tcormack/dev/issue710/CppMicroServices/framework/include/cppmicroservices/detail/Threads.h:81 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #6 cppmicroservices::detail::MutexLockingStrategy<std::mutex>::Lock() const /home/tcormack/dev/issue710/CppMicroServices/framework/include/cppmicroservices/detail/Threads.h:153 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #7 cppmicroservices::FrameworkPrivate::WaitForStop(std::chrono::duration<long, std::ratio<1l, 1000l> > const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:102 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #8 cppmicroservices::Framework::WaitForStop(std::chrono::duration<long, std::ratio<1l, 1000l> > const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/Framework.cpp:74 (libCppMicroServicesd.so.3.7.6+0x59d94)
+    #9 Framework_LifeCycle_Test::TestBody() /home/tcormack/dev/issue710/CppMicroServices/framework/test/gtest/FrameworkTest.cpp:392 (usFrameworkTests+0x12f08f)
+    #10 void testing::internal::HandleSehExceptionsInMethodIfSupported<testing::Test, void>(testing::Test*, void (testing::Test::*)(), char const*) /home/tcormack/dev/issue710/CppMicroServices/third_party/googletest/googletest/src/gtest.cc:2631 (libgtestd.so.1.11.0+0xc1d72)
+    #11 __libc_start_main ../csu/libc-start.c:308 (libc.so.6+0x23d09)
+
+  Thread T4 (tid=1847983, running) created by main thread at:
+    #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:962 (libtsan.so.0+0x58ba2)
+    #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xcf144)
+    #2 cppmicroservices::FrameworkPrivate::Stop(unsigned int) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:249 (libCppMicroServicesd.so.3.7.6+0x5d31e)
+    #3 cppmicroservices::Bundle::Stop(unsigned int) /home/tcormack/dev/issue710/CppMicroServices/framework/src/bundle/Bundle.cpp:144 (libCppMicroServicesd.so.3.7.6+0xc916b)
+    #4 cppmicroservices::Bundle::Stop() /home/tcormack/dev/issue710/CppMicroServices/framework/src/bundle/Bundle.cpp:133 (libCppMicroServicesd.so.3.7.6+0xc920e)
+    #5 Framework_LifeCycle_Test::TestBody() /home/tcormack/dev/issue710/CppMicroServices/framework/test/gtest/FrameworkTest.cpp:469 (usFrameworkTests+0x12fec3)
+    #6 void testing::internal::HandleSehExceptionsInMethodIfSupported<testing::Test, void>(testing::Test*, void (testing::Test::*)(), char const*) /home/tcormack/dev/issue710/CppMicroServices/third_party/googletest/googletest/src/gtest.cc:2631 (libgtestd.so.1.11.0+0xc1d72)
+    #7 __libc_start_main ../csu/libc-start.c:308 (libc.so.6+0x23d09)
+
+  Thread T3 (tid=1847982, running) created by main thread at:
+    #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:962 (libtsan.so.0+0x58ba2)
+    #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xcf144)
+    #2 void testing::internal::HandleSehExceptionsInMethodIfSupported<testing::Test, void>(testing::Test*, void (testing::Test::*)(), char const*) /home/tcormack/dev/issue710/CppMicroServices/third_party/googletest/googletest/src/gtest.cc:2631 (libgtestd.so.1.11.0+0xc1d72)
+    #3 __libc_start_main ../csu/libc-start.c:308 (libc.so.6+0x23d09)
+
+SUMMARY: ThreadSanitizer: data race /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.h:103 in cppmicroservices::FrameworkPrivate::FrameworkEventInternal::operator=(cppmicroservices::FrameworkPrivate::FrameworkEventInternal const&)
+==================
+==================
+WARNING: ThreadSanitizer: data race (pid=1847977)
+  Write of size 4 at 0x7b54000004a4 by thread T4 (mutexes: write M589):
+    #0 cppmicroservices::FrameworkPrivate::FrameworkEventInternal::operator=(cppmicroservices::FrameworkPrivate::FrameworkEventInternal const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.h:103 (libCppMicroServicesd.so.3.7.6+0x5ccad)
+    #1 cppmicroservices::FrameworkPrivate::SystemShuttingdownDone_unlocked(cppmicroservices::FrameworkPrivate::FrameworkEventInternal const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:375 (libCppMicroServicesd.so.3.7.6+0x5ccad)
+    #2 cppmicroservices::FrameworkPrivate::ShutdownDone_unlocked(bool) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:323 (libCppMicroServicesd.so.3.7.6+0x5cdd7)
+    #3 cppmicroservices::FrameworkPrivate::Shutdown0(bool, bool) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:294 (libCppMicroServicesd.so.3.7.6+0x61171)
+    #4 std::thread::_State_impl<std::thread::_Invoker<std::tuple<std::_Bind<void (cppmicroservices::FrameworkPrivate::*(cppmicroservices::FrameworkPrivate*, bool, bool))(bool, bool)> > > >::_M_run() <null> (libCppMicroServicesd.so.3.7.6+0x614eb)
+    #5 <null> <null> (libstdc++.so.6+0xceecf)
+
+  Previous write of size 4 at 0x7b54000004a4 by thread T3 (mutexes: write M589):
+    #0 cppmicroservices::FrameworkPrivate::FrameworkEventInternal::operator=(cppmicroservices::FrameworkPrivate::FrameworkEventInternal&&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.h:103 (libCppMicroServicesd.so.3.7.6+0x5e610)
+    #1 cppmicroservices::FrameworkPrivate::WaitForStop(std::chrono::duration<long, std::ratio<1l, 1000l> > const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:109 (libCppMicroServicesd.so.3.7.6+0x5e610)
+    #2 cppmicroservices::Framework::WaitForStop(std::chrono::duration<long, std::ratio<1l, 1000l> > const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/Framework.cpp:74 (libCppMicroServicesd.so.3.7.6+0x59d94)
+    #3 operator() /home/tcormack/dev/issue710/CppMicroServices/framework/test/gtest/FrameworkTest.cpp:460 (usFrameworkTests+0x12c5b7)
+    #4 __invoke_impl<void, Framework_LifeCycle_Test::TestBody()::<lambda()> > /usr/include/c++/10/bits/invoke.h:60 (usFrameworkTests+0x12c5b7)
+    #5 __invoke<Framework_LifeCycle_Test::TestBody()::<lambda()> > /usr/include/c++/10/bits/invoke.h:95 (usFrameworkTests+0x12c5b7)
+    #6 _M_invoke<0> /usr/include/c++/10/thread:264 (usFrameworkTests+0x12c5b7)
+    #7 operator() /usr/include/c++/10/thread:271 (usFrameworkTests+0x12c5b7)
+    #8 _M_run /usr/include/c++/10/thread:215 (usFrameworkTests+0x12c5b7)
+    #9 <null> <null> (libstdc++.so.6+0xceecf)
+
+  Location is heap block of size 616 at 0x7b5400000280 allocated by main thread:
+    #0 operator new(unsigned long) ../../../../src/libsanitizer/tsan/tsan_new_delete.cpp:64 (libtsan.so.0+0x8499c)
+    #1 cppmicroservices::CoreBundleContext::CoreBundleContext(std::unordered_map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, cppmicroservices::Any, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, cppmicroservices::Any> > > const&, std::ostream*) /home/tcormack/dev/issue710/CppMicroServices/framework/src/bundle/CoreBundleContext.cpp:102 (libCppMicroServicesd.so.3.7.6+0x12246e)
+    #2 cppmicroservices::FrameworkFactory::NewFramework(std::unordered_map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, cppmicroservices::Any, std::hash<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::equal_to<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, cppmicroservices::Any> > > const&, std::ostream*) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkFactory.cpp:66 (libCppMicroServicesd.so.3.7.6+0x5b181)
+    #3 cppmicroservices::FrameworkFactory::NewFramework() /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkFactory.cpp:76 (libCppMicroServicesd.so.3.7.6+0x5b622)
+    #4 Framework_LifeCycle_Test::TestBody() /home/tcormack/dev/issue710/CppMicroServices/framework/test/gtest/FrameworkTest.cpp:386 (usFrameworkTests+0x12eff8)
+    #5 void testing::internal::HandleSehExceptionsInMethodIfSupported<testing::Test, void>(testing::Test*, void (testing::Test::*)(), char const*) /home/tcormack/dev/issue710/CppMicroServices/third_party/googletest/googletest/src/gtest.cc:2631 (libgtestd.so.1.11.0+0xc1d72)
+    #6 __libc_start_main ../csu/libc-start.c:308 (libc.so.6+0x23d09)
+
+  Mutex M589 (0x7b5400000288) created at:
+    #0 pthread_mutex_lock ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:4148 (libtsan.so.0+0x4db3a)
+    #1 __gthread_mutex_lock /usr/include/x86_64-linux-gnu/c++/10/bits/gthr-default.h:749 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #2 std::mutex::lock() /usr/include/c++/10/bits/std_mutex.h:100 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #3 std::unique_lock<std::mutex>::lock() /usr/include/c++/10/bits/unique_lock.h:138 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #4 std::unique_lock<std::mutex>::unique_lock(std::mutex&) /usr/include/c++/10/bits/unique_lock.h:68 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #5 cppmicroservices::detail::MutexLockingStrategy<std::mutex>::UniqueLock::UniqueLock(cppmicroservices::detail::MutexLockingStrategy<std::mutex> const*) /home/tcormack/dev/issue710/CppMicroServices/framework/include/cppmicroservices/detail/Threads.h:81 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #6 cppmicroservices::detail::MutexLockingStrategy<std::mutex>::Lock() const /home/tcormack/dev/issue710/CppMicroServices/framework/include/cppmicroservices/detail/Threads.h:153 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #7 cppmicroservices::FrameworkPrivate::WaitForStop(std::chrono::duration<long, std::ratio<1l, 1000l> > const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:102 (libCppMicroServicesd.so.3.7.6+0x5e4e4)
+    #8 cppmicroservices::Framework::WaitForStop(std::chrono::duration<long, std::ratio<1l, 1000l> > const&) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/Framework.cpp:74 (libCppMicroServicesd.so.3.7.6+0x59d94)
+    #9 Framework_LifeCycle_Test::TestBody() /home/tcormack/dev/issue710/CppMicroServices/framework/test/gtest/FrameworkTest.cpp:392 (usFrameworkTests+0x12f08f)
+    #10 void testing::internal::HandleSehExceptionsInMethodIfSupported<testing::Test, void>(testing::Test*, void (testing::Test::*)(), char const*) /home/tcormack/dev/issue710/CppMicroServices/third_party/googletest/googletest/src/gtest.cc:2631 (libgtestd.so.1.11.0+0xc1d72)
+    #11 __libc_start_main ../csu/libc-start.c:308 (libc.so.6+0x23d09)
+
+  Thread T4 (tid=1847983, running) created by main thread at:
+    #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:962 (libtsan.so.0+0x58ba2)
+    #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xcf144)
+    #2 cppmicroservices::FrameworkPrivate::Stop(unsigned int) /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.cpp:249 (libCppMicroServicesd.so.3.7.6+0x5d31e)
+    #3 cppmicroservices::Bundle::Stop(unsigned int) /home/tcormack/dev/issue710/CppMicroServices/framework/src/bundle/Bundle.cpp:144 (libCppMicroServicesd.so.3.7.6+0xc916b)
+    #4 cppmicroservices::Bundle::Stop() /home/tcormack/dev/issue710/CppMicroServices/framework/src/bundle/Bundle.cpp:133 (libCppMicroServicesd.so.3.7.6+0xc920e)
+    #5 Framework_LifeCycle_Test::TestBody() /home/tcormack/dev/issue710/CppMicroServices/framework/test/gtest/FrameworkTest.cpp:469 (usFrameworkTests+0x12fec3)
+    #6 void testing::internal::HandleSehExceptionsInMethodIfSupported<testing::Test, void>(testing::Test*, void (testing::Test::*)(), char const*) /home/tcormack/dev/issue710/CppMicroServices/third_party/googletest/googletest/src/gtest.cc:2631 (libgtestd.so.1.11.0+0xc1d72)
+    #7 __libc_start_main ../csu/libc-start.c:308 (libc.so.6+0x23d09)
+
+  Thread T3 (tid=1847982, running) created by main thread at:
+    #0 pthread_create ../../../../src/libsanitizer/tsan/tsan_interceptors_posix.cpp:962 (libtsan.so.0+0x58ba2)
+    #1 std::thread::_M_start_thread(std::unique_ptr<std::thread::_State, std::default_delete<std::thread::_State> >, void (*)()) <null> (libstdc++.so.6+0xcf144)
+    #2 void testing::internal::HandleSehExceptionsInMethodIfSupported<testing::Test, void>(testing::Test*, void (testing::Test::*)(), char const*) /home/tcormack/dev/issue710/CppMicroServices/third_party/googletest/googletest/src/gtest.cc:2631 (libgtestd.so.1.11.0+0xc1d72)
+    #3 __libc_start_main ../csu/libc-start.c:308 (libc.so.6+0x23d09)
+
+SUMMARY: ThreadSanitizer: data race /home/tcormack/dev/issue710/CppMicroServices/framework/src/util/FrameworkPrivate.h:103 in cppmicroservices::FrameworkPrivate::FrameworkEventInternal::operator=(cppmicroservices::FrameworkPrivate::FrameworkEventInternal const&)
+==================
+[       OK ] Framework.LifeCycle (160 ms)
+[----------] 1 test from Framework (160 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (160 ms total)
+[  PASSED  ] 1 test.
+ThreadSanitizer: reported 3 warnings

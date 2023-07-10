@@ -151,15 +151,15 @@ namespace cppmicroservices
     void
     ServiceTracker<S, T>::Close()
     {
-        // ListenerToken cpy;
-        // {
-        //     auto l = d->Lock();
-        //     std::swap(d->listenerToken, cpy)
-        // }
+        ListenerToken cpy;
+        {
+            auto l = d->Lock();
+            std::swap(d->listenerToken, cpy);
+        }
 
         try
         {
-            d->context.RemoveListener(std::move(d->listenerToken));
+            d->context.RemoveListener(std::move(cpy));
         }
         catch (std::runtime_error const& /*e*/)
         {

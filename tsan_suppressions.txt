@@ -1,12 +1,5 @@
 # ServiceTracker/ServiceListener races
-#race:cppmicroservices::ServiceListeners::RemoveServiceListener
-#race:cppmicroservices::ServiceTracker*
-
-# FrameworkTest.Events double lock false-positive
-mutex:cppmicroservices::TestBundleC1Activator::*
-
-# FrameworkTest.Events race false-positive
-race:cppmicroservices::TestBundleC1*
+mutex:ServiceTrackerTestFixture_TestServiceTracker_Test::TestBody
 
 # Framework.LifeCycle double lock false-positive
 mutex:cppmicroservices::detail::MutexLockingStrategy

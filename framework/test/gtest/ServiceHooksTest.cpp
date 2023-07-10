@@ -79,12 +79,13 @@ namespace
       private:
         int id;
         BundleContext bundleCtx;
+        std::shared_ptr<std::vector<int>> ordering_;
 
       public:
-        TestServiceEventListenerHook(int id, BundleContext const& context, std::shared_ptr<std::vector<int>> ordering_)
+        TestServiceEventListenerHook(int id, BundleContext const& context, std::shared_ptr<std::vector<int>> ordering)
             : id(id)
             , bundleCtx(context)
-            , ordering(ordering_)
+            , ordering_(ordering)
         {
         }
 
@@ -155,12 +156,16 @@ namespace
             ASSERT_GE(static_cast<int>(listenerInfos.size()), 1);
 #endif
 
-            ordering->push_back(id);
+            ordering_->push_back(id);
+        }
+
+        std::vector<int>
+        GetOrdering()
+        {
+            return *ordering_;
         }
 
         ServiceListenerHook::ListenerInfo listenerInfo;
-
-        std::shared_ptr<std::vector<int>> ordering;
     };
 
     class TestServiceEventListenerHookFailure : public ServiceEventListenerHook
@@ -180,12 +185,13 @@ namespace
       private:
         int id;
         BundleContext bundleCtx;
+        std::shared_ptr<std::vector<int>> ordering_;
 
       public:
-        TestServiceFindHook(int id, BundleContext const& context, std::shared_ptr<std::vector<int>> ordering_)
+        TestServiceFindHook(int id, BundleContext const& context, std::shared_ptr<std::vector<int>> ordering)
             : id(id)
             , bundleCtx(context)
-            , ordering(ordering_)
+            , ordering_(ordering)
         {
         }
 
@@ -198,10 +204,14 @@ namespace
             ASSERT_EQ(context, bundleCtx);
 
             references.clear();
-            ordering->push_back(id);
+            ordering_->push_back(id);
         }
 
-        std::shared_ptr<std::vector<int>> ordering;
+        std::vector<int>
+        GetOrdering()
+        {
+            return *ordering_;
+        }
     };
 
     // Test failure modes for FindHook
@@ -220,12 +230,13 @@ namespace
       private:
         int id;
         BundleContext bundleCtx;
+        std::shared_ptr<std::vector<int>> ordering_;
 
       public:
-        TestServiceListenerHook(int id, BundleContext const& context, std::shared_ptr<std::vector<int>> ordering_)
+        TestServiceListenerHook(int id, BundleContext const& context, std::shared_ptr<std::vector<int>> ordering)
             : id(id)
             , bundleCtx(context)
-            , ordering(ordering_)
+            , ordering_(ordering)
         {
         }
 
@@ -240,7 +251,7 @@ namespace
                 }
                 listenerInfos.insert(*iter);
                 lastAdded = listeners.back();
-                ordering->push_back(id);
+                ordering_->push_back(id);
             }
         }
 
@@ -250,12 +261,16 @@ namespace
             for (std::vector<ListenerInfo>::const_iterator iter = listeners.begin(); iter != listeners.end(); ++iter)
             {
                 listenerInfos.erase(*iter);
-                ordering->push_back(id * 10);
+                ordering_->push_back(id * 10);
             }
             lastRemoved = listeners.back();
         }
 
-        std::shared_ptr<std::vector<int>> ordering;
+        std::vector<int>
+        GetOrdering()
+        {
+            return *ordering_;
+        }
 
         std::unordered_set<ListenerInfo> listenerInfos;
         ListenerInfo lastAdded;
@@ -358,7 +373,7 @@ TEST_F(ServiceHooksTest, TestListenerHook)
     expectedOrdering.push_back(2);
     expectedOrdering.push_back(1);
     // Check Listener hook call order
-    ASSERT_EQ(*(serviceListenerHook1->ordering), expectedOrdering);
+    ASSERT_EQ(serviceListenerHook1->GetOrdering(), expectedOrdering);
 #endif
 
     context.AddServiceListener(&serviceListener1,
@@ -374,7 +389,7 @@ TEST_F(ServiceHooksTest, TestListenerHook)
     expectedOrdering.push_back(2);
     expectedOrdering.push_back(1);
     // Check Listener hook call order
-    ASSERT_EQ(*(serviceListenerHook1->ordering), expectedOrdering);
+    ASSERT_EQ(serviceListenerHook1->GetOrdering(), expectedOrdering);
 #endif
 
     context.RemoveServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
@@ -385,7 +400,7 @@ TEST_F(ServiceHooksTest, TestListenerHook)
     expectedOrdering.push_back(10);
     expectedOrdering.push_back(20);
     expectedOrdering.push_back(10);
-    ASSERT_EQ(*(serviceListenerHook1->ordering), expectedOrdering);
+    ASSERT_EQ(serviceListenerHook1->GetOrdering(), expectedOrdering);
 #endif
 
     // Removed listener infos
@@ -412,7 +427,7 @@ TEST_F(ServiceHooksTest, TestFindHook)
 
     std::vector<int> expectedOrdering;
     // Find hook call order
-    ASSERT_EQ(*(serviceFindHook1->ordering), expectedOrdering);
+    ASSERT_EQ(serviceFindHook1->GetOrdering(), expectedOrdering);
 
     TestServiceListener serviceListener;
     context.AddServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
@@ -436,7 +451,7 @@ TEST_F(ServiceHooksTest, TestFindHook)
     expectedOrdering.push_back(1);
 
     // Find hook call order
-    ASSERT_EQ(*(serviceFindHook1->ordering), expectedOrdering);
+    ASSERT_EQ(serviceFindHook1->GetOrdering(), expectedOrdering);
 
     findHookReg2.Unregister();
     findHookReg1.Unregister();
@@ -479,7 +494,7 @@ TEST_F(ServiceHooksTest, TestEventListenerHook)
     expectedOrdering.push_back(1);
     expectedOrdering.push_back(2);
     // Event listener hook call order
-    ASSERT_EQ(*(serviceEventListenerHook1->ordering), expectedOrdering);
+    ASSERT_EQ(serviceEventListenerHook1->GetOrdering(), expectedOrdering);
 
     // service event of service event listener hook
     ASSERT_TRUE(serviceListener1.events.empty());
@@ -493,7 +508,7 @@ TEST_F(ServiceHooksTest, TestEventListenerHook)
     expectedOrdering.push_back(1);
     expectedOrdering.push_back(2);
     // Test Event listener hook call order
-    ASSERT_EQ(*(serviceEventListenerHook1->ordering), expectedOrdering);
+    ASSERT_EQ(serviceEventListenerHook1->GetOrdering(), expectedOrdering);
 
     bundle.Stop();
 

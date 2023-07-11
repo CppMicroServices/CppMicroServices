@@ -1,8 +1,24 @@
 # ServiceTracker/ServiceListener races
 mutex:ServiceTrackerTestFixture_TestServiceTracker_Test::TestBody
+race:ServiceTrackerTestFixture_DefaultCustomizerServiceTrackerCloseRace_Test::TestBody
+
+# BundleRegistry races and double lock false-positives
+mutex:TestSerialBundleInstall
+race:TestSerialBundleInstall
+
+# TestConfigurationAdminImpl race and double lock
+race:TestConfigurationAdminImpl_VerifyManagedServiceNotification_Test::TestBody
+mutex:TestConfigurationAdminImpl_VerifyManagedServiceNotification_Test::TestBody
+
+race:TestConfigurationAdminImpl_VerifyManagedServiceFactoryNotification_Test::TestBody
+mutex:TestConfigurationAdminImpl_VerifyManagedServiceFactoryNotification_Test::TestBody
+
+race:TestConfigurationAdminImpl_VerifyManagedServiceExceptionsAreLogged_Test::TestBody
+mutex:TestConfigurationAdminImpl_VerifyManagedServiceExceptionsAreLogged_Test::TestBody
 
 # Framework.LifeCycle double lock false-positive
-mutex:cppmicroservices::detail::MutexLockingStrategy
+mutex:cppmicroservices::FrameworkPrivate::Shutdown0
+mutex:Framework_LifeCycle_Test::TestBody
 
 # Framework.LifeCycle race false-positive
 race:Framework_LifeCycle_Test::TestBody

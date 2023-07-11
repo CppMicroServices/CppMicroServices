@@ -155,6 +155,7 @@ namespace cppmicroservices
         ListenerToken tokenCpy;
         {
             auto l = d->Lock();
+            US_UNUSED(l);
             std::swap(d->listenerToken, tokenCpy);
         }
 

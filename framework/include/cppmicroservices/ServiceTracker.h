@@ -485,6 +485,6 @@ namespace cppmicroservices
     };
 } // namespace cppmicroservices
 
-#include "cppmicroservices/detail/ServiceTracker.tpp"
+#include "cppmicroservices/detail/ServiceTracker.hpp"
 
 #endif // CPPMICROSERVICES_SERVICETRACKER_H

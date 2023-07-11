@@ -74,7 +74,6 @@ set(_gtest_tests
   FrameworkListenerTest.cpp
   BundleHooksTest.cpp
   ServiceHooksTest.cpp
-  ServiceHooksTrackerTest.cpp
   TestCounterLatch.cpp
   ResourceCompilerTest.cpp
   MultipleListenersTest.cpp

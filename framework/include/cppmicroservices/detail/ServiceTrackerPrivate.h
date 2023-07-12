@@ -178,6 +178,6 @@ namespace cppmicroservices
 
 } // namespace cppmicroservices
 
-#include "cppmicroservices/detail/ServiceTrackerPrivate.tpp"
+#include "cppmicroservices/detail/ServiceTrackerPrivate.hpp"
 
 #endif // CPPMICROSERVICES_SERVICETRACKERPRIVATE_H

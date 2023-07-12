@@ -651,3 +651,42 @@ TEST_F(ServiceTrackerTestFixture, TestReOpenServiceTrackerWithCustomizer)
     });
     tracker->Close();
 }
+
+namespace
+{
+    namespace foo
+    {
+        class Bar
+        {
+          public:
+            virtual ~Bar() {}
+        };
+    } // namespace foo
+
+    class MockFooBar : public foo::Bar
+    {
+    };
+} // namespace
+
+TEST_F(ServiceTrackerTestFixture, TestFilterPropertiesTypes)
+{
+    auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+    framework.Start();
+
+    LDAPFilter filter("(tag=foo::bar::Baz)");
+    ServiceTracker<foo::Bar> tracker(framework.GetBundleContext(), filter);
+    tracker.Open();
+
+    auto fooService = std::make_shared<MockFooBar>();
+    cppmicroservices::ServiceProperties props
+        = std::initializer_list<cppmicroservices::ServiceProperties::value_type> { std::make_pair("tag",
+                                                                                                  ("foo::bar::Baz")) };
+
+    auto svc = framework.GetBundleContext().RegisterService<foo::Bar>(fooService, std::move(props));
+
+    ASSERT_EQ(tracker.GetTrackingCount(), 1);
+
+    tracker.Close();
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+}

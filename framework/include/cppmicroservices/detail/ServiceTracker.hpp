@@ -467,4 +467,4 @@ void ServiceTracker<S, T>::RemovedService(
   /* do nothing */
 }
 
-} // namespace cppmicroservices 
+} // namespace cppmicroservices

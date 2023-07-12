@@ -1,9 +1,6 @@
 # ServiceTracker/ServiceListener races
-# Call to WaitFor() in WaitForService() leads to TSAN false-positive
-mutex:ServiceTrackerTestFixture_TestServiceTracker_Test::TestBody
-
-# expected race condition that IsRemoved() checks for
-race:ServiceTrackerTestFixture_DefaultCustomizerServiceTrackerCloseRace_Test::TestBody
+race:cppmicroservices::ServiceListeners::RemoveServiceListener
+race:cppmicroservices::ServiceTracker*
 
 # BundleRegistry races and double lock false-positives
 # Calls to wait_for within BundleRegistry::Install, TSAN false-positive

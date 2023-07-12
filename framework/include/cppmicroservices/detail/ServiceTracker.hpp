@@ -152,8 +152,11 @@ namespace cppmicroservices
     ServiceTracker<S, T>::Close()
     {
 
-        /* Swap default ListenerToken with d-listenerToken required to prevent data race in call to
-        context.RemoveListener()*/
+        /*
+        The call to RemoveListener() below must be done while the ServiceTracker is unlocked becauseof a possibility for
+        reentry from customer code. Therefore, we have to swap d->listenerToken to a local variable and replace it with
+        a default constructed ListenerToken object.
+        */
         ListenerToken swappedToken;
         {
             auto l = d->Lock();

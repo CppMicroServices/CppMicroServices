@@ -151,9 +151,17 @@ namespace cppmicroservices
     void
     ServiceTracker<S, T>::Close()
     {
+
+        // Copy required to prevent data race in call to context.RemoveListener()
+        ListenerToken tokenCpy;
+        {
+            auto l = d->Lock();
+            US_UNUSED(l);
+            std::swap(d->listenerToken, tokenCpy);
+        }
         try
         {
-            d->context.RemoveListener(std::move(d->listenerToken));
+            d->context.RemoveListener(std::move(tokenCpy));
         }
         catch (std::runtime_error const& /*e*/)
         {

@@ -151,9 +151,21 @@ namespace cppmicroservices
     void
     ServiceTracker<S, T>::Close()
     {
+
+        /*
+        The call to RemoveListener() below must be done while the ServiceTracker object is unlocked because of a
+        possibility for reentry from customer code. Therefore, we have to swap d->listenerToken to a local variable and
+        replace it with a default constructed ListenerToken object.
+        */
+        ListenerToken swappedToken;
+        {
+            auto l = d->Lock();
+            US_UNUSED(l);
+            std::swap(d->listenerToken, swappedToken);
+        }
         try
         {
-            d->context.RemoveListener(std::move(d->listenerToken));
+            d->context.RemoveListener(std::move(swappedToken));
         }
         catch (std::runtime_error const& /*e*/)
         {

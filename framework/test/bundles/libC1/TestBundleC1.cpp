@@ -136,8 +136,12 @@ namespace cppmicroservices
                         count--;
                     }
                 }
-                // Rather than a condition variable, we are looping until regs is non-empty.
-                // This sleep stops the code from looping too quickly and causing slow downs.
+                /*
+                Rather than a condition variable, we are looping until regs is non-empty.
+                This sleep stops this function from looping too quickly and causing slow downs.
+                While this is less efficent than a condition variable, we are doing this in order to eliminate a
+                false-positive TSAN warning coming from the function wait_for.
+                */
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
         }

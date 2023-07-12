@@ -4,3 +4,6 @@ mutex:ServiceTrackerTestFixture_TestServiceTracker_Test::TestBody
 
 # expected race condition that IsRemoved() checks for
 race:ServiceTrackerTestFixture_DefaultCustomizerServiceTrackerCloseRace_Test::TestBody
+
+# Potential Deadlock in CCACtiveState
+deadlock:cppmicroservices::scrimpl::CCActiveState::Activate

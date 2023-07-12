@@ -33,11 +33,11 @@
 #include "cppmicroservices/ServiceEventListenerHook.h"
 #include "cppmicroservices/ServiceFindHook.h"
 #include "cppmicroservices/ServiceListenerHook.h"
+#include "gtest/gtest.h"
 
-#include "Mocks.hpp"
 #include "TestUtils.h"
 #include "TestingConfig.h"
-#include "gtest/gtest.h"
+#include "gmock/gmock.h"
 
 #include <unordered_set>
 
@@ -343,6 +343,7 @@ class MockServiceEventListenerHook : public ServiceEventListenerHook
     using MapType = ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
 
     MOCK_METHOD(void, Event, (ServiceEvent const& event, MapType& listeners), (override));
+    MOCK_METHOD(std::vector<int>, GetOrdering, ());
 
     void
     DelegateToFake()
@@ -350,6 +351,7 @@ class MockServiceEventListenerHook : public ServiceEventListenerHook
         ON_CALL(*this, Event)
             .WillByDefault([this](ServiceEvent const& event, MapType& listeners)
                            { return fake_.Event(event, listeners); });
+        ON_CALL(*this, GetOrdering).WillByDefault([this]() { return fake_.GetOrdering(); });
     }
 
   private:
@@ -371,6 +373,7 @@ class MockServiceFindHook : public ServiceFindHook
                  std::string const& filter,
                  ShrinkableVector<ServiceReferenceBase>& references),
                 (override));
+    MOCK_METHOD(std::vector<int>, GetOrdering, ());
 
     void
     DelegateToFake()
@@ -395,8 +398,27 @@ class MockServiceListenerHook : public ServiceListenerHook
     {
     }
 
-    MOCK_METHOD(void, Added, (std::vector<ListenerInfo> const& listeners), (override));
-    MOCK_METHOD(void, Removed, (std::vector<ListenerInfo> const& listeners), (override));
+    MOCK_METHOD(void, Added, (std::vector<ListenerInfo> const& listeners));
+    MOCK_METHOD(void, Removed, (std::vector<ListenerInfo> const& listeners));
+    MOCK_METHOD(std::vector<int>, GetOrdering, ());
+
+    ListenerInfo
+    lastAdded()
+    {
+        return fake_.lastAdded;
+    }
+
+    ListenerInfo
+    lastRemoved()
+    {
+        return fake_.lastRemoved;
+    }
+
+    std::size_t
+    listenerInfoSize()
+    {
+        return fake_.listenerInfos.size();
+    }
 
     void
     DelegateToFake()
@@ -405,6 +427,7 @@ class MockServiceListenerHook : public ServiceListenerHook
             .WillByDefault([this](std::vector<ListenerInfo> const& listeners) { return fake_.Added(listeners); });
         ON_CALL(*this, Removed)
             .WillByDefault([this](std::vector<ListenerInfo> const& listeners) { return fake_.Removed(listeners); });
+        ON_CALL(*this, GetOrdering).WillByDefault([this]() { return fake_.GetOrdering(); });
     }
 
   private:
@@ -421,13 +444,17 @@ TEST_F(ServiceHooksTest, TestListenerHook)
                                LDAPProp(Constants::OBJECTCLASS) == "bla");
 
     auto sharedOrdering = std::make_shared<std::vector<int>>();
-    auto serviceListenerHook1 = std::make_shared<TestServiceListenerHook>(1, context, sharedOrdering);
+    auto serviceListenerHook1 = std::make_shared<MockServiceListenerHook>(1, context, sharedOrdering);
+
+    serviceListenerHook1->DelegateToFake();
     ServiceProperties hookProps1;
     hookProps1[Constants::SERVICE_RANKING] = 0;
     ServiceRegistration<ServiceListenerHook> listenerHookReg1
         = context.RegisterService<ServiceListenerHook>(serviceListenerHook1, hookProps1);
 
-    auto serviceListenerHook2 = std::make_shared<TestServiceListenerHook>(2, context, sharedOrdering);
+    auto serviceListenerHook2 = std::make_shared<MockServiceListenerHook>(2, context, sharedOrdering);
+    serviceListenerHook2->DelegateToFake();
+
     ServiceProperties hookProps2;
     hookProps2[Constants::SERVICE_RANKING] = 10;
     ServiceRegistration<ServiceListenerHook> listenerHookReg2
@@ -435,12 +462,12 @@ TEST_F(ServiceHooksTest, TestListenerHook)
 
 #ifdef US_BUILD_SHARED_LIBS
     // check if hooks got notified about the existing listeners
-    ASSERT_EQ(serviceListenerHook1->listenerInfos.size(), 2);
+    ASSERT_EQ(serviceListenerHook1->listenerInfoSize(), 2);
 #endif
-    const std::size_t listenerInfoSizeOld = serviceListenerHook1->listenerInfos.size() - 2;
+    const std::size_t listenerInfoSizeOld = serviceListenerHook1->listenerInfoSize() - 2;
 
     context.AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
-    auto lastAdded = serviceListenerHook1->lastAdded;
+    auto lastAdded = serviceListenerHook1->lastAdded();
 
 #ifdef US_BUILD_SHARED_LIBS
     std::vector<int> expectedOrdering;
@@ -460,8 +487,8 @@ TEST_F(ServiceHooksTest, TestListenerHook)
                                &TestServiceListener::ServiceChanged,
                                LDAPProp(Constants::OBJECTCLASS) == "blub");
     // Test same ListenerInfo object
-    ASSERT_EQ(lastAdded, serviceListenerHook1->lastRemoved);
-    ASSERT_FALSE(lastAdded == serviceListenerHook1->lastAdded);
+    ASSERT_EQ(lastAdded, serviceListenerHook1->lastRemoved());
+    ASSERT_FALSE(lastAdded == serviceListenerHook1->lastAdded());
 
 #ifdef US_BUILD_SHARED_LIBS
     expectedOrdering.push_back(20);
@@ -484,7 +511,7 @@ TEST_F(ServiceHooksTest, TestListenerHook)
 #endif
 
     // Removed listener infos
-    ASSERT_EQ(serviceListenerHook1->listenerInfos.size(), listenerInfoSizeOld);
+    ASSERT_EQ(serviceListenerHook1->listenerInfoSize(), listenerInfoSizeOld);
 
     listenerHookReg2.Unregister();
     listenerHookReg1.Unregister();
@@ -493,13 +520,13 @@ TEST_F(ServiceHooksTest, TestListenerHook)
 TEST_F(ServiceHooksTest, TestFindHook)
 {
     auto sharedOrdering = std::make_shared<std::vector<int>>();
-    auto serviceFindHook1 = std::make_shared<TestServiceFindHook>(1, context, sharedOrdering);
+    auto serviceFindHook1 = std::make_shared<MockServiceFindHook>(1, context, sharedOrdering);
     ServiceProperties hookProps1;
     hookProps1[Constants::SERVICE_RANKING] = 0;
     ServiceRegistration<ServiceFindHook> findHookReg1
         = context.RegisterService<ServiceFindHook>(serviceFindHook1, hookProps1);
 
-    auto serviceFindHook2 = std::make_shared<TestServiceFindHook>(2, context, sharedOrdering);
+    auto serviceFindHook2 = std::make_shared<MockServiceFindHook>(2, context, sharedOrdering);
     ServiceProperties hookProps2;
     hookProps2[Constants::SERVICE_RANKING] = 10;
     ServiceRegistration<ServiceFindHook> findHookReg2
@@ -557,13 +584,13 @@ TEST_F(ServiceHooksTest, TestEventListenerHook)
                                &TestServiceListener::ServiceChanged,
                                LDAPProp(Constants::OBJECTCLASS) == "bla");
 
-    auto serviceEventListenerHook1 = std::make_shared<TestServiceEventListenerHook>(1, context, sharedOrdering);
+    auto serviceEventListenerHook1 = std::make_shared<MockServiceEventListenerHook>(1, context, sharedOrdering);
     ServiceProperties hookProps1;
     hookProps1[Constants::SERVICE_RANKING] = 10;
     ServiceRegistration<ServiceEventListenerHook> eventListenerHookReg1
         = context.RegisterService<ServiceEventListenerHook>(serviceEventListenerHook1, hookProps1);
 
-    auto serviceEventListenerHook2 = std::make_shared<TestServiceEventListenerHook>(2, context, sharedOrdering);
+    auto serviceEventListenerHook2 = std::make_shared<MockServiceEventListenerHook>(2, context, sharedOrdering);
     ServiceProperties hookProps2;
     hookProps2[Constants::SERVICE_RANKING] = 0;
     ServiceRegistration<ServiceEventListenerHook> eventListenerHookReg2

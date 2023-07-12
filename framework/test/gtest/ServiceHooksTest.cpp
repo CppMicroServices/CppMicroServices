@@ -34,6 +34,7 @@
 #include "cppmicroservices/ServiceFindHook.h"
 #include "cppmicroservices/ServiceListenerHook.h"
 
+#include "Mocks.hpp"
 #include "TestUtils.h"
 #include "TestingConfig.h"
 #include "gtest/gtest.h"
@@ -330,6 +331,85 @@ namespace
     };
 
 } // end unnamed namespace
+
+class MockServiceEventListenerHook : public ServiceEventListenerHook
+{
+  public:
+    MockServiceEventListenerHook(int id, BundleContext const& context, std::shared_ptr<std::vector<int>> ordering)
+        : fake_(TestServiceEventListenerHook(id, context, ordering))
+    {
+    }
+
+    using MapType = ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
+
+    MOCK_METHOD(void, Event, (ServiceEvent const& event, MapType& listeners), (override));
+
+    void
+    DelegateToFake()
+    {
+        ON_CALL(*this, Event)
+            .WillByDefault([this](ServiceEvent const& event, MapType& listeners)
+                           { return fake_.Event(event, listeners); });
+    }
+
+  private:
+    TestServiceEventListenerHook fake_;
+};
+
+class MockServiceFindHook : public ServiceFindHook
+{
+  public:
+    MockServiceFindHook(int id, BundleContext const& context, std::shared_ptr<std::vector<int>> ordering)
+        : fake_(TestServiceFindHook(id, context, ordering))
+    {
+    }
+
+    MOCK_METHOD(void,
+                Find,
+                (BundleContext const& context,
+                 std::string const& name,
+                 std::string const& filter,
+                 ShrinkableVector<ServiceReferenceBase>& references),
+                (override));
+
+    void
+    DelegateToFake()
+    {
+        ON_CALL(*this, Find)
+            .WillByDefault([this](BundleContext const& context,
+                                  std::string const& name,
+                                  std::string const& filter,
+                                  ShrinkableVector<ServiceReferenceBase>& references)
+                           { return fake_.Find(context, name, filter, references); });
+    }
+
+  private:
+    TestServiceFindHook fake_;
+};
+
+class MockServiceListenerHook : public ServiceListenerHook
+{
+  public:
+    MockServiceListenerHook(int id, BundleContext const& context, std::shared_ptr<std::vector<int>> ordering)
+        : fake_(TestServiceListenerHook(id, context, ordering))
+    {
+    }
+
+    MOCK_METHOD(void, Added, (std::vector<ListenerInfo> const& listeners), (override));
+    MOCK_METHOD(void, Removed, (std::vector<ListenerInfo> const& listeners), (override));
+
+    void
+    DelegateToFake()
+    {
+        ON_CALL(*this, Added)
+            .WillByDefault([this](std::vector<ListenerInfo> const& listeners) { return fake_.Added(listeners); });
+        ON_CALL(*this, Removed)
+            .WillByDefault([this](std::vector<ListenerInfo> const& listeners) { return fake_.Removed(listeners); });
+    }
+
+  private:
+    TestServiceListenerHook fake_;
+};
 
 TEST_F(ServiceHooksTest, TestListenerHook)
 {

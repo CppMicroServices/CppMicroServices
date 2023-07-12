@@ -153,9 +153,9 @@ namespace cppmicroservices
     {
 
         /*
-        The call to RemoveListener() below must be done while the ServiceTracker is unlocked becauseof a possibility for
-        reentry from customer code. Therefore, we have to swap d->listenerToken to a local variable and replace it with
-        a default constructed ListenerToken object.
+        The call to RemoveListener() below must be done while the ServiceTracker object is unlocked because of a
+        possibility for reentry from customer code. Therefore, we have to swap d->listenerToken to a local variable and
+        replace it with a default constructed ListenerToken object.
         */
         ListenerToken swappedToken;
         {

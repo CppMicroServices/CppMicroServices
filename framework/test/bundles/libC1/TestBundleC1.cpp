@@ -85,7 +85,9 @@ namespace cppmicroservices
             tracker->Close();
 
             if (count != 0)
+            {
                 throw std::logic_error("Not unregistered all services");
+            }
         }
 
         void
@@ -104,7 +106,9 @@ namespace cppmicroservices
                 regs.Lock(), regs.v.emplace_back(std::move(reg));
                 count++;
                 if (i % 5 == 0)
+                {
                     regs.NotifyAll();
+                }
             }
         }
 
@@ -132,7 +136,8 @@ namespace cppmicroservices
                         count--;
                     }
                 }
-                // stop spin
+                // Rather than a condition variable, we are looping until regs is non-empty.
+                // This sleep stops the code from looping too quickly and causing slow downs.
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
         }
@@ -160,7 +165,9 @@ namespace cppmicroservices
         ModifiedService(ServiceReferenceU const& reference, InterfaceMapConstPtr const& /*service*/)
         {
             if (reference.GetProperty("i") != 5)
+            {
                 throw std::logic_error("modified end match: wrong property");
+            }
             context.GetService(reference);
         }
 
@@ -169,7 +176,9 @@ namespace cppmicroservices
         {
             auto l = additionalReg.Lock();
             if (additionalReg.v)
+            {
                 additionalReg.v.Unregister();
+            }
         }
 
       private:

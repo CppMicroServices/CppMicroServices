@@ -3,6 +3,7 @@ race:cppmicroservices::ServiceListeners::RemoveServiceListener
 race:cppmicroservices::ServiceTracker*
 
 # BundleRegistry races and double lock false-positives
+# https://github.com/google/sanitizers/issues/1259
 # Calls to wait_for within BundleRegistry::Install, TSAN false-positive
 # Race condition on access of p.second.waitFlag within wait_for, TSAN false-positive
 mutex:TestSerialBundleInstall

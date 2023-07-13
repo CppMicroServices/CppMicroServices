@@ -234,12 +234,7 @@ namespace
         std::shared_ptr<std::vector<int>> ordering_;
 
       public:
-        TestServiceListenerHook(int id, BundleContext const& context, std::shared_ptr<std::vector<int>> ordering)
-            : id(id)
-            , bundleCtx(context)
-            , ordering_(ordering)
-        {
-        }
+        TestServiceListenerHook(int id, BundleContext const& context) : id(id), bundleCtx(context) {}
 
         void
         Added(std::vector<ListenerInfo> const& listeners)
@@ -252,7 +247,6 @@ namespace
                 }
                 listenerInfos.insert(*iter);
                 lastAdded = listeners.back();
-                ordering_->push_back(id);
             }
         }
 
@@ -262,15 +256,8 @@ namespace
             for (std::vector<ListenerInfo>::const_iterator iter = listeners.begin(); iter != listeners.end(); ++iter)
             {
                 listenerInfos.erase(*iter);
-                ordering_->push_back(id * 10);
             }
             lastRemoved = listeners.back();
-        }
-
-        std::vector<int>
-        GetOrdering()
-        {
-            return *ordering_;
         }
 
         std::unordered_set<ListenerInfo> listenerInfos;
@@ -393,14 +380,10 @@ class MockServiceFindHook : public ServiceFindHook
 class MockServiceListenerHook : public ServiceListenerHook
 {
   public:
-    MockServiceListenerHook(int id, BundleContext const& context, std::shared_ptr<std::vector<int>> ordering)
-        : fake_(TestServiceListenerHook(id, context, ordering))
-    {
-    }
+    MockServiceListenerHook(int id, BundleContext const& context) : fake_(TestServiceListenerHook(id, context)) {}
 
     MOCK_METHOD(void, Added, (std::vector<ListenerInfo> const& listeners));
     MOCK_METHOD(void, Removed, (std::vector<ListenerInfo> const& listeners));
-    MOCK_METHOD(std::vector<int>, GetOrdering, ());
 
     ListenerInfo
     lastAdded()
@@ -427,7 +410,6 @@ class MockServiceListenerHook : public ServiceListenerHook
             .WillByDefault([this](std::vector<ListenerInfo> const& listeners) { return fake_.Added(listeners); });
         ON_CALL(*this, Removed)
             .WillByDefault([this](std::vector<ListenerInfo> const& listeners) { return fake_.Removed(listeners); });
-        ON_CALL(*this, GetOrdering).WillByDefault([this]() { return fake_.GetOrdering(); });
     }
 
   private:
@@ -443,17 +425,35 @@ TEST_F(ServiceHooksTest, TestListenerHook)
                                &TestServiceListener::ServiceChanged,
                                LDAPProp(Constants::OBJECTCLASS) == "bla");
 
-    auto sharedOrdering = std::make_shared<std::vector<int>>();
-    auto serviceListenerHook1 = std::make_shared<MockServiceListenerHook>(1, context, sharedOrdering);
-
+    auto serviceListenerHook1 = std::make_shared<MockServiceListenerHook>(1, context);
     serviceListenerHook1->DelegateToFake();
+    auto serviceListenerHook2 = std::make_shared<MockServiceListenerHook>(2, context);
+    serviceListenerHook2->DelegateToFake();
+
+#ifdef US_BUILD_SHARED_LIBS
+    ::testing::InSequence s;
+    EXPECT_CALL(*serviceListenerHook1, Added(::testing::_));
+    EXPECT_CALL(*serviceListenerHook2, Added(::testing::_));
+    EXPECT_CALL(*serviceListenerHook2, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook1, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook2, Added(::testing::_));
+    EXPECT_CALL(*serviceListenerHook1, Added(::testing::_));
+
+    EXPECT_CALL(*serviceListenerHook2, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook1, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook2, Added(::testing::_));
+    EXPECT_CALL(*serviceListenerHook1, Added(::testing::_));
+
+    EXPECT_CALL(*serviceListenerHook2, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook1, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook2, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook1, Removed(::testing::_));
+#endif
+
     ServiceProperties hookProps1;
     hookProps1[Constants::SERVICE_RANKING] = 0;
     ServiceRegistration<ServiceListenerHook> listenerHookReg1
         = context.RegisterService<ServiceListenerHook>(serviceListenerHook1, hookProps1);
-
-    auto serviceListenerHook2 = std::make_shared<MockServiceListenerHook>(2, context, sharedOrdering);
-    serviceListenerHook2->DelegateToFake();
 
     ServiceProperties hookProps2;
     hookProps2[Constants::SERVICE_RANKING] = 10;
@@ -469,20 +469,6 @@ TEST_F(ServiceHooksTest, TestListenerHook)
     context.AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
     auto lastAdded = serviceListenerHook1->lastAdded();
 
-#ifdef US_BUILD_SHARED_LIBS
-    std::vector<int> expectedOrdering;
-    expectedOrdering.push_back(1);
-    expectedOrdering.push_back(1);
-    expectedOrdering.push_back(2);
-    expectedOrdering.push_back(2);
-    expectedOrdering.push_back(20);
-    expectedOrdering.push_back(10);
-    expectedOrdering.push_back(2);
-    expectedOrdering.push_back(1);
-    // Check Listener hook call order
-    ASSERT_EQ(serviceListenerHook1->GetOrdering(), expectedOrdering);
-#endif
-
     context.AddServiceListener(&serviceListener1,
                                &TestServiceListener::ServiceChanged,
                                LDAPProp(Constants::OBJECTCLASS) == "blub");
@@ -490,25 +476,8 @@ TEST_F(ServiceHooksTest, TestListenerHook)
     ASSERT_EQ(lastAdded, serviceListenerHook1->lastRemoved());
     ASSERT_FALSE(lastAdded == serviceListenerHook1->lastAdded());
 
-#ifdef US_BUILD_SHARED_LIBS
-    expectedOrdering.push_back(20);
-    expectedOrdering.push_back(10);
-    expectedOrdering.push_back(2);
-    expectedOrdering.push_back(1);
-    // Check Listener hook call order
-    ASSERT_EQ(serviceListenerHook1->GetOrdering(), expectedOrdering);
-#endif
-
     context.RemoveServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
     context.RemoveServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged);
-
-#ifdef US_BUILD_SHARED_LIBS
-    expectedOrdering.push_back(20);
-    expectedOrdering.push_back(10);
-    expectedOrdering.push_back(20);
-    expectedOrdering.push_back(10);
-    ASSERT_EQ(serviceListenerHook1->GetOrdering(), expectedOrdering);
-#endif
 
     // Removed listener infos
     ASSERT_EQ(serviceListenerHook1->listenerInfoSize(), listenerInfoSizeOld);

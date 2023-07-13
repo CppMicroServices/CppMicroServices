@@ -295,7 +295,7 @@ class MockServiceEventListenerHook : public ServiceEventListenerHook
 
     using MapType = ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
 
-    MOCK_METHOD(void, Event, (ServiceEvent const&, MapType& listeners), (override));
+    MOCK_METHOD(void, Event, (ServiceEvent const& event, MapType& listeners), (override));
 };
 
 class MockServiceFindHook : public ServiceFindHook

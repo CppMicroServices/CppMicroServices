@@ -1,11 +1,95 @@
-Note: Google Test filter = ServiceHooksTest.TestListenerHook
-[==========] Running 1 test from 1 test suite.
+Note: Google Test filter = ServiceHooksTest.*
+[==========] Running 9 tests from 1 test suite.
 [----------] Global test environment set-up.
-[----------] 1 test from ServiceHooksTest
+[----------] 9 tests from ServiceHooksTest
 [ RUN      ] ServiceHooksTest.TestListenerHook
 [       OK ] ServiceHooksTest.TestListenerHook (2 ms)
-[----------] 1 test from ServiceHooksTest (2 ms total)
+[ RUN      ] ServiceHooksTest.TestFindHook
+[       OK ] ServiceHooksTest.TestFindHook (1 ms)
+[ RUN      ] ServiceHooksTest.TestEventListenerHook
+[       OK ] ServiceHooksTest.TestEventListenerHook (1 ms)
+[ RUN      ] ServiceHooksTest.TestFindHookFailure
+[       OK ] ServiceHooksTest.TestFindHookFailure (1 ms)
+[ RUN      ] ServiceHooksTest.TestEventListenerHookFailure
+[       OK ] ServiceHooksTest.TestEventListenerHookFailure (1 ms)
+[ RUN      ] ServiceHooksTest.TestListenerHookFailure
+[       OK ] ServiceHooksTest.TestListenerHookFailure (3 ms)
+[ RUN      ] ServiceHooksTest.TestListenerHookCalbackOrdering
+[       OK ] ServiceHooksTest.TestListenerHookCalbackOrdering (4 ms)
+[ RUN      ] ServiceHooksTest.TestFindHookCallbackOrdering
+/home/tcormack/dev/issue872/CppMicroServices/framework/test/gtest/ServiceHooksTest.cpp:647: Failure
+Actual function call count doesn't match EXPECT_CALL(*serviceFindHook2, Find(::testing::_, ::testing::_, ::testing::_, ::testing::_))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+/home/tcormack/dev/issue872/CppMicroServices/framework/test/gtest/ServiceHooksTest.cpp:649: Failure
+Actual function call count doesn't match EXPECT_CALL(*serviceFindHook2, Find(::testing::_, ::testing::_, ::testing::_, ::testing::_))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+/home/tcormack/dev/issue872/CppMicroServices/framework/test/gtest/ServiceHooksTest.cpp:648: Failure
+Actual function call count doesn't match EXPECT_CALL(*serviceFindHook1, Find(::testing::_, ::testing::_, ::testing::_, ::testing::_))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+/home/tcormack/dev/issue872/CppMicroServices/framework/test/gtest/ServiceHooksTest.cpp:650: Failure
+Actual function call count doesn't match EXPECT_CALL(*serviceFindHook1, Find(::testing::_, ::testing::_, ::testing::_, ::testing::_))...
+         Expected: to be called once
+           Actual: never called - unsatisfied and active
+[  FAILED  ] ServiceHooksTest.TestFindHookCallbackOrdering (1 ms)
+[ RUN      ] ServiceHooksTest.TestEventListenerHookCallbackOrdering
+unknown file: Failure
+
+Unexpected mock function call - returning directly.
+    Function call: Event(@0x7ffcfdda2dd0 UNREGISTERING 21 objectClass=[cppmicroservices::TestBundleAService]), @0x7ffcfdda29b0 { (16-byte object <40-BC DA-4C 19-56 00-00 10-55 DD-4C 19-56 00-00>, { 16-byte object <10-AD DD-4C 19-56 00-00 70-6A DD-4C 19-56 00-00>, 16-byte object <40-BE DD-4C 19-56 00-00 80-CA DD-4C 19-56 00-00> }), (16-byte object <E0-F5 DD-4C 19-56 00-00 D0-F5 DD-4C 19-56 00-00>, { 16-byte object <70-AF DD-4C 19-56 00-00 E0-D3 DD-4C 19-56 00-00>, 16-byte object <C0-B5 DD-4C 19-56 00-00 20-20 DD-4C 19-56 00-00> }) })
+Google Mock tried the following 3 expectations, but none matched:
+
+/home/tcormack/dev/issue872/CppMicroServices/framework/test/gtest/ServiceHooksTest.cpp:693: tried expectation #0: EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_))...
+         Expected: the expectation is active
+           Actual: it is retired
+         Expected: to be called once
+           Actual: called once - saturated and retired
+/home/tcormack/dev/issue872/CppMicroServices/framework/test/gtest/ServiceHooksTest.cpp:694: tried expectation #1: EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_))...
+         Expected: the expectation is active
+           Actual: it is retired
+         Expected: to be called once
+           Actual: called once - saturated and retired
+/home/tcormack/dev/issue872/CppMicroServices/framework/test/gtest/ServiceHooksTest.cpp:696: tried expectation #2: EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_))...
+         Expected: the expectation is active
+           Actual: it is retired
+         Expected: to be called once
+           Actual: called once - saturated and retired
+/home/tcormack/dev/issue872/CppMicroServices/framework/test/gtest/ServiceHooksTest.cpp:697: Failure
+Mock function called more times than expected - returning directly.
+    Function call: Event(@0x7ffcfdda2dd0 UNREGISTERING 21 objectClass=[cppmicroservices::TestBundleAService]), @0x7ffcfdda29b0 { (16-byte object <40-BC DA-4C 19-56 00-00 10-55 DD-4C 19-56 00-00>, { 16-byte object <10-AD DD-4C 19-56 00-00 70-6A DD-4C 19-56 00-00>, 16-byte object <40-BE DD-4C 19-56 00-00 80-CA DD-4C 19-56 00-00> }), (16-byte object <E0-F5 DD-4C 19-56 00-00 D0-F5 DD-4C 19-56 00-00>, { 16-byte object <70-AF DD-4C 19-56 00-00 E0-D3 DD-4C 19-56 00-00>, 16-byte object <C0-B5 DD-4C 19-56 00-00 20-20 DD-4C 19-56 00-00> }) })
+         Expected: to be called once
+           Actual: called twice - over-saturated and active
+unknown file: Failure
+
+Unexpected mock function call - returning directly.
+    Function call: Event(@0x7ffcfdda3190 UNREGISTERING 20 objectClass=[cppmicroservices::ServiceEventListenerHook]), @0x7ffcfdda2d70 { (16-byte object <40-BC DA-4C 19-56 00-00 10-55 DD-4C 19-56 00-00>, { 16-byte object <10-AD DD-4C 19-56 00-00 70-6A DD-4C 19-56 00-00>, 16-byte object <40-BE DD-4C 19-56 00-00 80-CA DD-4C 19-56 00-00> }), (16-byte object <E0-F5 DD-4C 19-56 00-00 D0-F5 DD-4C 19-56 00-00>, { 16-byte object <70-AF DD-4C 19-56 00-00 E0-D3 DD-4C 19-56 00-00>, 16-byte object <C0-B5 DD-4C 19-56 00-00 20-20 DD-4C 19-56 00-00> }) })
+Google Mock tried the following 3 expectations, but none matched:
+
+/home/tcormack/dev/issue872/CppMicroServices/framework/test/gtest/ServiceHooksTest.cpp:693: tried expectation #0: EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_))...
+         Expected: the expectation is active
+           Actual: it is retired
+         Expected: to be called once
+           Actual: called once - saturated and retired
+/home/tcormack/dev/issue872/CppMicroServices/framework/test/gtest/ServiceHooksTest.cpp:694: tried expectation #1: EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_))...
+         Expected: the expectation is active
+           Actual: it is retired
+         Expected: to be called once
+           Actual: called once - saturated and retired
+/home/tcormack/dev/issue872/CppMicroServices/framework/test/gtest/ServiceHooksTest.cpp:696: tried expectation #2: EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_))...
+         Expected: the expectation is active
+           Actual: it is retired
+         Expected: to be called once
+           Actual: called once - saturated and retired
+[  FAILED  ] ServiceHooksTest.TestEventListenerHookCallbackOrdering (1 ms)
+[----------] 9 tests from ServiceHooksTest (18 ms total)
 
 [----------] Global test environment tear-down
-[==========] 1 test from 1 test suite ran. (3 ms total)
-[  PASSED  ] 1 test.
+[==========] 9 tests from 1 test suite ran. (18 ms total)
+[  PASSED  ] 7 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] ServiceHooksTest.TestFindHookCallbackOrdering
+[  FAILED  ] ServiceHooksTest.TestEventListenerHookCallbackOrdering
+
+ 2 FAILED TESTS

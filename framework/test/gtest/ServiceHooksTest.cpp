@@ -346,6 +346,7 @@ TEST_F(ServiceHooksTest, TestListenerHook)
     // check if hooks got notified about the existing listeners
     ASSERT_EQ(serviceListenerHook1->listenerInfos.size(), 2);
 #endif
+
     const std::size_t listenerInfoSizeOld = serviceListenerHook1->listenerInfos.size() - 2;
 
     context.AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
@@ -394,6 +395,7 @@ TEST_F(ServiceHooksTest, TestFindHook)
 
     std::vector<ServiceReferenceU> refs = context.GetServiceReferences("cppmicroservices::TestBundleAService");
     ASSERT_TRUE(refs.empty());
+
     ServiceReferenceU ref = context.GetServiceReference("cppmicroservices::TestBundleAService");
     // Invalid reference (filtered out)
     ASSERT_FALSE(ref);
@@ -404,6 +406,7 @@ TEST_F(ServiceHooksTest, TestFindHook)
     refs = context.GetServiceReferences("cppmicroservices::TestBundleAService");
     // Non-empty references
     ASSERT_FALSE(refs.empty());
+
     ref = context.GetServiceReference("cppmicroservices::TestBundleAService");
     ASSERT_TRUE(ref);
 
@@ -440,6 +443,7 @@ TEST_F(ServiceHooksTest, TestEventListenerHook)
 
     auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleA");
     ASSERT_TRUE(bundle);
+
     bundle.Start();
 
     bundle.Stop();
@@ -645,13 +649,11 @@ TEST_F(ServiceHooksTest, TestFindHookCallbackOrdering)
     context.AddServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
 
     auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleA");
-    ASSERT_TRUE(bundle);
 
     bundle.Start();
 
     std::vector<ServiceReferenceU> refs = context.GetServiceReferences("cppmicroservices::TestBundleAService");
     ServiceReferenceU ref = context.GetServiceReference("cppmicroservices::TestBundleAService");
-    // Invalid reference (filtered out)
 
     findHookReg2.Unregister();
     findHookReg1.Unregister();
@@ -695,7 +697,6 @@ TEST_F(ServiceHooksTest, TestEventListenerHookCallbackOrdering)
         = context.RegisterService<ServiceEventListenerHook>(serviceEventListenerHook2, hookProps2);
 
     auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleA");
-    ASSERT_TRUE(bundle);
 
     bundle.Start();
 

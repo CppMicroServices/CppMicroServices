@@ -291,7 +291,7 @@ namespace
 class MockServiceEventListenerHook : public ServiceEventListenerHook
 {
   public:
-    MockServiceEventListenerHook() {}
+    MockServiceEventListenerHook() = default;
 
     using MapType = ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
 
@@ -301,7 +301,7 @@ class MockServiceEventListenerHook : public ServiceEventListenerHook
 class MockServiceFindHook : public ServiceFindHook
 {
   public:
-    MockServiceFindHook() {}
+    MockServiceFindHook() = default;
 
     MOCK_METHOD(void,
                 Find,
@@ -315,7 +315,7 @@ class MockServiceFindHook : public ServiceFindHook
 class MockServiceListenerHook : public ServiceListenerHook
 {
   public:
-    MockServiceListenerHook() {};
+    MockServiceListenerHook() = default;
 
     MOCK_METHOD(void, Added, (std::vector<ListenerInfo> const& listeners));
     MOCK_METHOD(void, Removed, (std::vector<ListenerInfo> const& listeners));

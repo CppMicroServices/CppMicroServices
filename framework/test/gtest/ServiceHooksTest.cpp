@@ -82,11 +82,7 @@ namespace
         BundleContext bundleCtx;
 
       public:
-        TestServiceEventListenerHook(int id, BundleContext const& context)
-            : id(id)
-            , bundleCtx(context)
-        {
-        }
+        TestServiceEventListenerHook(int id, BundleContext const& context) : id(id), bundleCtx(context) {}
         using MapType = ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
 
         void
@@ -295,26 +291,17 @@ namespace
 class MockServiceEventListenerHook : public ServiceEventListenerHook
 {
   public:
-    MockServiceEventListenerHook(int id, BundleContext const& context)
-        : fake_(TestServiceEventListenerHook(id, context))
-    {
-    }
+    MockServiceEventListenerHook() {}
 
     using MapType = ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
 
-    MOCK_METHOD(void, Event, (ServiceEvent const& event, MapType& listeners), (override));
-
-  private:
-    TestServiceEventListenerHook fake_;
+    MOCK_METHOD(void, Event, (ServiceEvent const&, MapType& listeners), (override));
 };
 
 class MockServiceFindHook : public ServiceFindHook
 {
   public:
-    MockServiceFindHook(BundleContext const& context)
-        : fake_(TestServiceFindHook(context))
-    {
-    }
+    MockServiceFindHook() {}
 
     MOCK_METHOD(void,
                 Find,
@@ -323,21 +310,15 @@ class MockServiceFindHook : public ServiceFindHook
                  std::string const& filter,
                  ShrinkableVector<ServiceReferenceBase>& references),
                 (override));
-
-  private:
-    TestServiceFindHook fake_;
 };
 
 class MockServiceListenerHook : public ServiceListenerHook
 {
   public:
-    MockServiceListenerHook(BundleContext const& context) : fake_(TestServiceListenerHook(context)) {}
+    MockServiceListenerHook() {};
 
     MOCK_METHOD(void, Added, (std::vector<ListenerInfo> const& listeners));
     MOCK_METHOD(void, Removed, (std::vector<ListenerInfo> const& listeners));
-
-  private:
-    TestServiceListenerHook fake_;
 };
 
 TEST_F(ServiceHooksTest, TestListenerHook)
@@ -591,8 +572,8 @@ TEST_F(ServiceHooksTest, TestListenerHookCalbackOrdering)
                                &TestServiceListener::ServiceChanged,
                                LDAPProp(Constants::OBJECTCLASS) == "bla");
 
-    auto serviceListenerHook1 = std::make_shared<MockServiceListenerHook>(context);
-    auto serviceListenerHook2 = std::make_shared<MockServiceListenerHook>(context);
+    auto serviceListenerHook1 = std::make_shared<MockServiceListenerHook>();
+    auto serviceListenerHook2 = std::make_shared<MockServiceListenerHook>();
 
 #ifdef US_BUILD_SHARED_LIBS
     ::testing::InSequence s;
@@ -639,8 +620,8 @@ TEST_F(ServiceHooksTest, TestListenerHookCalbackOrdering)
 
 TEST_F(ServiceHooksTest, TestFindHookCallbackOrdering)
 {
-    auto serviceFindHook1 = std::make_shared<MockServiceFindHook>(context);
-    auto serviceFindHook2 = std::make_shared<MockServiceFindHook>(context);
+    auto serviceFindHook1 = std::make_shared<MockServiceFindHook>();
+    auto serviceFindHook2 = std::make_shared<MockServiceFindHook>();
 
 #ifdef US_BUILD_SHARED_LIBS
     ::testing::InSequence s;
@@ -668,6 +649,10 @@ TEST_F(ServiceHooksTest, TestFindHookCallbackOrdering)
 
     bundle.Start();
 
+    std::vector<ServiceReferenceU> refs = context.GetServiceReferences("cppmicroservices::TestBundleAService");
+    ServiceReferenceU ref = context.GetServiceReference("cppmicroservices::TestBundleAService");
+    // Invalid reference (filtered out)
+
     findHookReg2.Unregister();
     findHookReg1.Unregister();
 
@@ -685,16 +670,18 @@ TEST_F(ServiceHooksTest, TestEventListenerHookCallbackOrdering)
                                &TestServiceListener::ServiceChanged,
                                LDAPProp(Constants::OBJECTCLASS) == "bla");
 
-    auto serviceEventListenerHook1 = std::make_shared<MockServiceEventListenerHook>(1, context);
-    auto serviceEventListenerHook2 = std::make_shared<MockServiceEventListenerHook>(2, context);
+    auto serviceEventListenerHook1 = std::make_shared<MockServiceEventListenerHook>();
+    auto serviceEventListenerHook2 = std::make_shared<MockServiceEventListenerHook>();
 
 #ifdef US_BUILD_SHARED_LIBS
     ::testing::InSequence s;
-    EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_));
-    EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_));
+    EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_)).Times(2);
     EXPECT_CALL(*serviceEventListenerHook2, Event(::testing::_, ::testing::_));
     EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_));
     EXPECT_CALL(*serviceEventListenerHook2, Event(::testing::_, ::testing::_));
+    EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_));
+    EXPECT_CALL(*serviceEventListenerHook2, Event(::testing::_, ::testing::_));
+    EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_));
 #endif
 
     ServiceProperties hookProps1;

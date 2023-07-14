@@ -567,7 +567,7 @@ TEST_F(ServiceHooksTest, TestListenerHookFailure)
     framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
 }
 
-TEST_F(ServiceHooksTest, TestListenerHookCalbackOrdering)
+TEST_F(ServiceHooksTest, TestListenerHookCallbackOrdering)
 {
     TestServiceListener serviceListener1;
     TestServiceListener serviceListener2;
@@ -627,13 +627,11 @@ TEST_F(ServiceHooksTest, TestFindHookCallbackOrdering)
     auto serviceFindHook1 = std::make_shared<MockServiceFindHook>();
     auto serviceFindHook2 = std::make_shared<MockServiceFindHook>();
 
-#ifdef US_BUILD_SHARED_LIBS
     ::testing::InSequence s;
     EXPECT_CALL(*serviceFindHook2, Find(::testing::_, ::testing::_, ::testing::_, ::testing::_));
     EXPECT_CALL(*serviceFindHook1, Find(::testing::_, ::testing::_, ::testing::_, ::testing::_));
     EXPECT_CALL(*serviceFindHook2, Find(::testing::_, ::testing::_, ::testing::_, ::testing::_));
     EXPECT_CALL(*serviceFindHook1, Find(::testing::_, ::testing::_, ::testing::_, ::testing::_));
-#endif
 
     ServiceProperties hookProps1;
     hookProps1[Constants::SERVICE_RANKING] = 0;
@@ -675,7 +673,6 @@ TEST_F(ServiceHooksTest, TestEventListenerHookCallbackOrdering)
     auto serviceEventListenerHook1 = std::make_shared<MockServiceEventListenerHook>();
     auto serviceEventListenerHook2 = std::make_shared<MockServiceEventListenerHook>();
 
-#ifdef US_BUILD_SHARED_LIBS
     ::testing::InSequence s;
     EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_)).Times(2);
     EXPECT_CALL(*serviceEventListenerHook2, Event(::testing::_, ::testing::_));
@@ -684,7 +681,6 @@ TEST_F(ServiceHooksTest, TestEventListenerHookCallbackOrdering)
     EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_));
     EXPECT_CALL(*serviceEventListenerHook2, Event(::testing::_, ::testing::_));
     EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_));
-#endif
 
     ServiceProperties hookProps1;
     hookProps1[Constants::SERVICE_RANKING] = 10;

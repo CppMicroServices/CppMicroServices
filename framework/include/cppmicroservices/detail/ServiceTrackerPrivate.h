@@ -27,6 +27,12 @@
 #include "cppmicroservices/LDAPFilter.h"
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/detail/Threads.h"
+#include "cppmicroservices/detail/TrackedService.h"
+
+#include "cppmicroservices/Constants.h"
+
+#include <stdexcept>
+#include <utility>
 
 namespace cppmicroservices
 {
@@ -48,19 +54,90 @@ namespace cppmicroservices
             ServiceTrackerPrivate(ServiceTracker<S, T>* st,
                                   BundleContext context,
                                   ServiceReference<S> const& reference,
-                                  ServiceTrackerCustomizer<S, T>* customizer);
+                                  ServiceTrackerCustomizer<S, T>* customizer)
+                : context(std::move(context))
+                , customizer(customizer)
+                , listenerToken()
+                , trackReference(reference)
+                , trackedService()
+                , cachedReference()
+                , cachedService()
+                , q_ptr(st)
+            {
+                this->customizer = customizer ? customizer : q_func();
+                std::stringstream ss;
+                ss << "(" << Constants::SERVICE_ID << "="
+                   << any_cast<long>(reference.GetProperty(Constants::SERVICE_ID)) << ")";
+                this->listenerFilter = ss.str();
+                try
+                {
+                    this->filter = LDAPFilter(listenerFilter);
+                }
+                catch (std::invalid_argument const& e)
+                {
+                    /*
+                     * we could only get this exception if the ServiceReference was
+                     * invalid
+                     */
+                    std::invalid_argument ia(std::string("unexpected std::invalid_argument exception: ") + e.what());
+                    throw ia;
+                }
+            }
 
             ServiceTrackerPrivate(ServiceTracker<S, T>* st,
                                   BundleContext context,
                                   std::string const& clazz,
-                                  ServiceTrackerCustomizer<S, T>* customizer);
+                                  ServiceTrackerCustomizer<S, T>* customizer)
+                : context(std::move(context))
+                , customizer(customizer)
+                , listenerToken()
+                , trackClass(clazz)
+                , trackReference()
+                , trackedService()
+                , cachedReference()
+                , cachedService()
+                , q_ptr(st)
+            {
+                this->customizer = customizer ? customizer : q_func();
+                this->listenerFilter = std::string("(") + cppmicroservices::Constants::OBJECTCLASS + "=" + clazz + ")";
+                try
+                {
+                    this->filter = LDAPFilter(listenerFilter);
+                }
+                catch (std::invalid_argument const& e)
+                {
+                    /*
+                     * we could only get this exception if the clazz argument was
+                     * malformed
+                     */
+                    std::invalid_argument ia(std::string("unexpected std::invalid_argument exception: ") + e.what());
+                    throw ia;
+                }
+            }
 
             ServiceTrackerPrivate(ServiceTracker<S, T>* st,
                                   BundleContext const& context,
                                   LDAPFilter const& filter,
-                                  ServiceTrackerCustomizer<S, T>* customizer);
+                                  ServiceTrackerCustomizer<S, T>* customizer)
+                : context(context)
+                , filter(filter)
+                , customizer(customizer)
+                , listenerFilter(filter.ToString())
+                , listenerToken()
+                , trackReference()
+                , trackedService()
+                , cachedReference()
+                , cachedService()
+                , q_ptr(st)
+            {
+                this->customizer = customizer ? customizer : q_func();
+                if (!context)
+                {
+                    throw std::invalid_argument("The bundle context cannot be null.");
+                }
+            }
 
-            ~ServiceTrackerPrivate();
+            ~ServiceTrackerPrivate() = default;
 
             /**
              * Returns the list of initial <code>ServiceReference</code>s that will be
@@ -74,10 +151,31 @@ namespace cppmicroservices
              * @throws std::invalid_argument If the specified filterString has an
              *         invalid syntax.
              */
-            std::vector<ServiceReference<S>> GetInitialReferences(std::string const& className,
-                                                                  std::string const& filterString);
+            std::vector<ServiceReference<S>>
+            GetInitialReferences(std::string const& className, std::string const& filterString)
+            {
+                std::vector<ServiceReference<S>> result;
+                std::vector<ServiceReferenceU> refs = context.GetServiceReferences(className, filterString);
+                for (std::vector<ServiceReferenceU>::const_iterator iter = refs.begin(); iter != refs.end(); ++iter)
+                {
+                    ServiceReference<S> ref(*iter);
+                    if (ref)
+                    {
+                        result.push_back(ref);
+                    }
+                }
+                return result;
+            }
 
-            void GetServiceReferences_unlocked(std::vector<ServiceReference<S>>& refs, TrackedService<S, TTT>* t) const;
+            void
+            GetServiceReferences_unlocked(std::vector<ServiceReference<S>>& refs, TrackedService<S, TTT>* t) const
+            {
+                if (t->Size_unlocked() == 0)
+                {
+                    return;
+                }
+                t->GetTracked_unlocked(refs);
+            }
 
             /**
              * The Bundle Context used by this <code>ServiceTracker</code>.
@@ -133,7 +231,11 @@ namespace cppmicroservices
              *
              * @return The current Tracked object.
              */
-            std::shared_ptr<TrackedService<S, TTT>> Tracked() const;
+            std::shared_ptr<TrackedService<S, TTT>>
+            Tracked() const
+            {
+                return trackedService.Load();
+            }
 
             /**
              * Called by the TrackedService object whenever the set of tracked services is
@@ -144,7 +246,13 @@ namespace cppmicroservices
              * TrackedService is synchronized. We don't want synchronization interactions
              * between the listener thread and the user thread.
              */
-            void Modified();
+            void
+            Modified()
+            {
+                cachedReference.Store(ServiceReference<S>());             /* clear cached value */
+                cachedService.Store(std::shared_ptr<TrackedParamType>()); /* clear cached value */
+                DIAG_LOG(*context.GetLogSink()) << "ServiceTracker::Modified(): " << filter;
+            }
 
             /**
              * Cached ServiceReference for getServiceReference.
@@ -177,7 +285,5 @@ namespace cppmicroservices
     } // namespace detail
 
 } // namespace cppmicroservices
-
-#include "cppmicroservices/detail/ServiceTrackerPrivate.hpp"
 
 #endif // CPPMICROSERVICES_SERVICETRACKERPRIVATE_H

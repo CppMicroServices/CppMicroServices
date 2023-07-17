@@ -50,7 +50,13 @@ namespace cppmicroservices
             using T = typename TTT::TrackedType;
             using TrackedParamType = typename TTT::TrackedParamType;
 
-            TrackedService(ServiceTracker<S, T>* serviceTracker, ServiceTrackerCustomizer<S, T>* customizer);
+            TrackedService(ServiceTracker<S, T>* serviceTracker, ServiceTrackerCustomizer<S, T>* customizer)
+                : Superclass(serviceTracker->d->context)
+                , serviceTracker(serviceTracker)
+                , customizer(customizer)
+                , latch {}
+            {
+            }
 
             /**
              * Method connected to service events for the
@@ -59,9 +65,97 @@ namespace cppmicroservices
              *
              * @param event <code>ServiceEvent</code> object from the framework.
              */
-            void ServiceChanged(ServiceEvent const& event) override;
+            void
+            ServiceChanged(ServiceEvent const& event) override
+            {
+                (void)latch.CountUp();
+                ScopeGuard sg(
+                    [this]()
+                    {
+                        // By using try/catch here, we ensure that this lambda function doesn't
+                        // throw inside ScopeGuard's dtor.
+                        try
+                        {
+                            latch.CountDown();
+                        }
+                        catch (...)
+                        {
+                        }
+                    });
 
-            void WaitOnCustomizersToFinish();
+                ServiceReference<S> reference;
+                {
+                    auto l = this->Lock();
+                    US_UNUSED(l);
+                    /*
+                     * Check if we had a delayed call (which could happen when we
+                     * close).
+                     */
+                    if (this->closed)
+                    {
+                        return;
+                    }
+
+                    reference = event.GetServiceReference<S>();
+
+                    DIAG_LOG(*serviceTracker->d->context.GetLogSink())
+                        << "TrackedService::ServiceChanged[" << event.GetType() << "]: " << reference;
+                    if (!reference)
+                    {
+                        return;
+                    }
+                }
+
+                switch (event.GetType())
+                {
+                    case ServiceEvent::SERVICE_REGISTERED:
+                    case ServiceEvent::SERVICE_MODIFIED:
+                    {
+                        if (!serviceTracker->d->listenerFilter.empty())
+                        { // service listener added with filter
+                            this->Track(reference, event);
+                            /*
+                             * If the customizer throws an unchecked exception, it
+                             * is safe to let it propagate
+                             */
+                        }
+                        else
+                        { // service listener added without filter
+                            if (serviceTracker->d->filter.Match(reference))
+                            {
+                                this->Track(reference, event);
+                                /*
+                                 * If the customizer throws an unchecked exception,
+                                 * it is safe to let it propagate
+                                 */
+                            }
+                            else
+                            {
+                                this->Untrack(reference, event);
+                                /*
+                                 * If the customizer throws an unchecked exception,
+                                 * it is safe to let it propagate
+                                 */
+                            }
+                        }
+                        break;
+                    }
+                    case ServiceEvent::SERVICE_MODIFIED_ENDMATCH:
+                    case ServiceEvent::SERVICE_UNREGISTERING:
+                        this->Untrack(reference, event);
+                        /*
+                         * If the customizer throws an unchecked exception, it is
+                         * safe to let it propagate
+                         */
+                        break;
+                }
+            }
+
+            void
+            WaitOnCustomizersToFinish()
+            {
+                latch.Wait();
+            }
 
           private:
             using Superclass = BundleAbstractTracked<ServiceReference<S>, TTT, ServiceEvent>;
@@ -77,7 +171,12 @@ namespace cppmicroservices
              *
              * @GuardedBy this
              */
-            void Modified() override;
+            void
+            Modified() override
+            {
+                Superclass::Modified(); /* increment the modification count */
+                serviceTracker->d->Modified();
+            }
 
             /**
              * Call the specific customizer adding method. This method must not be
@@ -88,8 +187,11 @@ namespace cppmicroservices
              * @return Customized object for the tracked item or <code>null</code>
              *         if the item is not to be tracked.
              */
-            std::shared_ptr<TrackedParamType> CustomizerAdding(ServiceReference<S> item,
-                                                               ServiceEvent const& related) override;
+            std::shared_ptr<TrackedParamType>
+            CustomizerAdding(ServiceReference<S> item, ServiceEvent const& /*related*/) override
+            {
+                return customizer->AddingService(item);
+            }
 
             /**
              * Call the specific customizer modified method. This method must not be
@@ -99,9 +201,13 @@ namespace cppmicroservices
              * @param related Action related object.
              * @param object Customized object for the tracked item.
              */
-            void CustomizerModified(ServiceReference<S> item,
-                                    ServiceEvent const& related,
-                                    std::shared_ptr<TrackedParamType> const& object) override;
+            void
+            CustomizerModified(ServiceReference<S> item,
+                               ServiceEvent const& /*related*/,
+                               std::shared_ptr<TrackedParamType> const& object) override
+            {
+                customizer->ModifiedService(item, object);
+            }
 
             /**
              * Call the specific customizer removed method. This method must not be
@@ -111,15 +217,17 @@ namespace cppmicroservices
              * @param related Action related object.
              * @param object Customized object for the tracked item.
              */
-            void CustomizerRemoved(ServiceReference<S> item,
-                                   ServiceEvent const& related,
-                                   std::shared_ptr<TrackedParamType> const& object) override;
+            void
+            CustomizerRemoved(ServiceReference<S> item,
+                              ServiceEvent const& /*related*/,
+                              std::shared_ptr<TrackedParamType> const& object) override
+            {
+                customizer->RemovedService(item, object);
+            }
         };
 
     } // namespace detail
 
 } // namespace cppmicroservices
-
-#include "cppmicroservices/detail/TrackedService.hpp"
 
 #endif // CPPMICROSERVICES_TRACKEDSERVICE_H

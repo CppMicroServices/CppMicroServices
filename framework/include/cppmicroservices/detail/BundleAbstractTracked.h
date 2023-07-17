@@ -24,10 +24,13 @@
 #define CPPMICROSERVICES_BUNDLEABSTRACTTRACKED_H
 
 #include "cppmicroservices/Any.h"
+#include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/detail/Log.h"
 #include "cppmicroservices/detail/Threads.h"
 #include "cppmicroservices/detail/WaitCondition.h"
 
 #include <atomic>
+#include <iterator>
 #include <vector>
 
 namespace cppmicroservices
@@ -65,9 +68,9 @@ namespace cppmicroservices
             /**
              * BundleAbstractTracked constructor.
              */
-            BundleAbstractTracked(BundleContext bc);
+            BundleAbstractTracked(BundleContext bc) : closed(false), trackingCount(0), bc(bc) {}
 
-            virtual ~BundleAbstractTracked();
+            virtual ~BundleAbstractTracked() = default;
 
             /**
              * Set initial list of items into tracker before events begin to be
@@ -80,7 +83,19 @@ namespace cppmicroservices
              *        entries in the list are ignored.
              * @GuardedBy this
              */
-            void SetInitial(std::vector<S> const& list);
+            void
+            SetInitial(std::vector<S> const& list)
+            {
+                std::copy(list.begin(), list.end(), std::back_inserter(initial));
+
+                if (bc.GetLogSink()->Enabled())
+                {
+                    for (typename std::list<S>::const_iterator item = initial.begin(); item != initial.end(); ++item)
+                    {
+                        DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::setInitial: " << (*item);
+                    }
+                }
+            }
 
             /**
              * Track the initial list of items. This is called after events can begin to
@@ -90,12 +105,64 @@ namespace cppmicroservices
              * synchronized on this object after the add listener call.
              *
              */
-            void TrackInitial();
+            void
+            TrackInitial()
+            {
+                while (true)
+                {
+                    S item;
+                    {
+                        auto l = this->Lock();
+                        US_UNUSED(l);
+                        if (closed || (initial.size() == 0))
+                        {
+                            /*
+                             * if there are no more initial items
+                             */
+                            return; /* we are done */
+                        }
+                        /*
+                         * move the first item from the initial list to the adding list
+                         * within this synchronized block.
+                         */
+                        item = initial.front();
+                        initial.pop_front();
+                        if (tracked.end() != tracked.find(item))
+                        {
+                            /* if we are already tracking this item */
+                            DIAG_LOG(*bc.GetLogSink())
+                                << "BundleAbstractTracked::trackInitial[already tracked]: " << item;
+                            continue; /* skip this item */
+                        }
+                        if (std::find(adding.begin(), adding.end(), item) != adding.end())
+                        {
+                            /*
+                             * if this item is already in the process of being added.
+                             */
+                            DIAG_LOG(*bc.GetLogSink())
+                                << "BundleAbstractTracked::trackInitial[already adding]: " << item;
+                            continue; /* skip this item */
+                        }
+                        adding.push_back(item);
+                    }
+                    DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::trackInitial: " << item;
+                    TrackAdding(item, R());
+                    /*
+                     * Begin tracking it. We call trackAdding
+                     * since we have already put the item in the
+                     * adding list.
+                     */
+                }
+            }
 
             /**
              * Called by the owning Tracker object when it is closed.
              */
-            void Close();
+            void
+            Close()
+            {
+                closed = true;
+            }
 
             /**
              * Begin to track an item.
@@ -103,7 +170,53 @@ namespace cppmicroservices
              * @param item S to be tracked.
              * @param related Action related object.
              */
-            void Track(S item, R related);
+            void
+            Track(S item, R related)
+            {
+                std::shared_ptr<TrackedParamType> object;
+                {
+                    auto l = this->Lock();
+                    US_UNUSED(l);
+                    if (closed)
+                    {
+                        return;
+                    }
+                    auto trackedItemIter = tracked.find(item);
+                    if (trackedItemIter != tracked.end())
+                    {
+                        object = trackedItemIter->second;
+                    }
+                    if (!object)
+                    { /* we are not tracking the item */
+                        if (std::find(adding.begin(), adding.end(), item) != adding.end())
+                        {
+                            /* if this item is already in the process of being added. */
+                            DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::track[already adding]: " << item;
+                            return;
+                        }
+                        adding.push_back(item); /* mark this item is being added */
+                    }
+                    else
+                    { /* we are currently tracking this item */
+                        DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::track[modified]: " << item;
+                        Modified(); /* increment modification count */
+                    }
+                }
+
+                if (!object)
+                { /* we are not tracking the item */
+                    TrackAdding(item, related);
+                }
+                else
+                {
+                    /* Call customizer outside of synchronized region */
+                    CustomizerModified(item, related, object);
+                    /*
+                     * If the customizer throws an unchecked exception, it is safe to
+                     * let it propagate
+                     */
+                }
+            }
 
             /**
              * Discontinue tracking the item.
@@ -111,7 +224,59 @@ namespace cppmicroservices
              * @param item S to be untracked.
              * @param related Action related object.
              */
-            void Untrack(S item, R related);
+            void
+            Untrack(S item, R related)
+            {
+                std::shared_ptr<TrackedParamType> object;
+                {
+                    auto l = this->Lock();
+                    US_UNUSED(l);
+                    std::size_t initialSize = initial.size();
+                    initial.remove(item);
+                    if (initialSize != initial.size())
+                    { /* if this item is already in the list
+                       * of initial references to process
+                       */
+                        DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::untrack[removed from initial]: " << item;
+                        return; /* we have removed it from the list and it will not be
+                                 * processed
+                                 */
+                    }
+
+                    std::size_t addingSize = adding.size();
+                    adding.remove(item);
+                    if (addingSize != adding.size())
+                    { /* if the item is in the process of
+                       * being added
+                       */
+                        DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::untrack[being added]: " << item;
+                        return; /*
+                                 * in case the item is untracked while in the process of
+                                 * adding
+                                 */
+                    }
+                    auto trackedItemIter = tracked.find(item);
+                    // nothing to do, no item is being tracked.
+                    if (trackedItemIter == tracked.end())
+                    {
+                        return;
+                    }
+                    /*
+                     * must remove from tracker before
+                     * calling customizer callback
+                     */
+                    object = trackedItemIter->second;
+                    tracked.erase(item);
+                    Modified(); /* increment modification count */
+                }
+                DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::untrack[removed]: " << item;
+                /* Call customizer outside of synchronized region */
+                CustomizerRemoved(item, related, object);
+                /*
+                 * If the customizer throws an unchecked exception, it is safe to let it
+                 * propagate
+                 */
+            }
 
             /**
              * Returns the number of tracked items.
@@ -120,7 +285,11 @@ namespace cppmicroservices
              *
              * @GuardedBy this
              */
-            std::size_t Size_unlocked() const;
+            std::size_t
+            Size_unlocked() const
+            {
+                return tracked.size();
+            }
 
             /**
              * Returns if the tracker is empty.
@@ -129,7 +298,11 @@ namespace cppmicroservices
              *
              * @GuardedBy this
              */
-            bool IsEmpty_unlocked() const;
+            bool
+            IsEmpty_unlocked() const
+            {
+                return tracked.empty();
+            }
 
             /**
              * Return the customized object for the specified item
@@ -139,7 +312,16 @@ namespace cppmicroservices
              *
              * @GuardedBy this
              */
-            std::shared_ptr<TrackedParamType> GetCustomizedObject_unlocked(S item) const;
+            std::shared_ptr<TrackedParamType>
+            GetCustomizedObject_unlocked(S item) const
+            {
+                typename TrackingMap::const_iterator i = tracked.find(item);
+                if (i != tracked.end())
+                {
+                    return i->second;
+                }
+                return std::shared_ptr<TrackedParamType>();
+            }
 
             /**
              * Return the list of tracked items.
@@ -147,7 +329,14 @@ namespace cppmicroservices
              * @return The tracked items.
              * @GuardedBy this
              */
-            void GetTracked_unlocked(std::vector<S>& items) const;
+            void
+            GetTracked_unlocked(std::vector<S>& items) const
+            {
+                for (auto& i : tracked)
+                {
+                    items.push_back(i.first);
+                }
+            }
 
             /**
              * Increment the modification count. If this method is overridden, the
@@ -155,7 +344,12 @@ namespace cppmicroservices
              *
              * @GuardedBy this
              */
-            virtual void Modified();
+            virtual void
+            Modified()
+            {
+                // atomic
+                ++trackingCount;
+            }
 
             /**
              * Returns the tracking count for this <code>ServiceTracker</code> object.
@@ -167,7 +361,12 @@ namespace cppmicroservices
              * @GuardedBy this
              * @return The tracking count for this object.
              */
-            int GetTrackingCount() const;
+            int
+            GetTrackingCount() const
+            {
+                // atomic
+                return trackingCount;
+            }
 
             /**
              * Copy the tracked items and associated values into the specified map.
@@ -178,7 +377,11 @@ namespace cppmicroservices
              * @return The specified map.
              * @GuardedBy this
              */
-            void CopyEntries_unlocked(TrackingMap& map) const;
+            void
+            CopyEntries_unlocked(TrackingMap& map) const
+            {
+                map.insert(tracked.begin(), tracked.end());
+            }
 
             /**
              * Call the specific customizer adding method. This method must not be
@@ -261,7 +464,42 @@ namespace cppmicroservices
              * @param item S to be tracked.
              * @param related Action related object.
              */
-            void TrackAdding(S item, R related);
+            void
+            TrackAdding(S item, R related)
+            {
+                DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::trackAdding:" << item;
+                std::shared_ptr<TrackedParamType> object;
+                bool becameUntracked = false;
+                /* Call customizer outside of synchronized region */
+                try
+                {
+                    object = CustomizerAdding(item, related);
+                    becameUntracked = this->CustomizerAddingFinal(item, object);
+                }
+                catch (...)
+                {
+                    /*
+                     * If the customizer throws an exception, it will
+                     * propagate after the cleanup code.
+                     */
+                    this->CustomizerAddingFinal(item, object);
+                    throw;
+                }
+
+                /*
+                 * The item became untracked during the customizer callback.
+                 */
+                if (becameUntracked && object)
+                {
+                    DIAG_LOG(*bc.GetLogSink()) << "BundleAbstractTracked::trackAdding[removed]: " << item;
+                    /* Call customizer outside of synchronized region */
+                    CustomizerRemoved(item, related, object);
+                    /*
+                     * If the customizer throws an unchecked exception, it is safe to
+                     * let it propagate
+                     */
+                }
+            }
 
           private:
             using Self = BundleAbstractTracked<S, TTT, R>;
@@ -281,13 +519,36 @@ namespace cppmicroservices
 
             BundleContext bc;
 
-            bool CustomizerAddingFinal(S item, std::shared_ptr<TrackedParamType> const& custom);
+            bool
+            CustomizerAddingFinal(S item, std::shared_ptr<TrackedParamType> const& custom)
+            {
+                auto l = this->Lock();
+                US_UNUSED(l);
+                std::size_t addingSize = adding.size();
+                adding.remove(item);
+                if (addingSize != adding.size() && !closed)
+                {
+                    /*
+                     * if the item was not untracked during the customizer
+                     * callback
+                     */
+                    if (custom)
+                    {
+                        tracked[item] = custom;
+                        Modified();        /* increment modification count */
+                        this->NotifyAll(); /* notify any waiters */
+                    }
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
         };
 
     } // namespace detail
 
 } // namespace cppmicroservices
-
-#include "cppmicroservices/detail/BundleAbstractTracked.hpp"
 
 #endif // CPPMICROSERVICES_BUNDLEABSTRACTTRACKED_H

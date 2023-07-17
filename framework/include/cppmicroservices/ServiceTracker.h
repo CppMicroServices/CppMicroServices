@@ -26,9 +26,18 @@
 #include <chrono>
 #include <map>
 
+#include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/Constants.h"
 #include "cppmicroservices/LDAPFilter.h"
+#include "cppmicroservices/ServiceException.h"
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
+#include "cppmicroservices/detail/Log.h"
+
+#include <limits>
+#include <stdexcept>
+#include <string>
 
 namespace cppmicroservices
 {
@@ -103,7 +112,21 @@ namespace cppmicroservices
         /**
          * Automatically closes the <code>ServiceTracker</code>
          */
-        ~ServiceTracker() override;
+        ~ServiceTracker() override
+        {
+            try
+            {
+                Close();
+            }
+            catch (...)
+            {
+            }
+        }
+
+#ifdef _MSC_VER
+#    pragma warning(push)
+#    pragma warning(disable : 4355)
+#endif
 
         /**
          * Create a <code>ServiceTracker</code> on the specified
@@ -127,7 +150,10 @@ namespace cppmicroservices
          */
         ServiceTracker(BundleContext const& context,
                        ServiceReference<S> const& reference,
-                       ServiceTrackerCustomizer<S, T>* customizer = nullptr);
+                       ServiceTrackerCustomizer<S, T>* customizer = nullptr)
+            : d(new _ServiceTrackerPrivate(this, context, reference, customizer))
+        {
+        }
 
         /**
          * Create a <code>ServiceTracker</code> on the specified class name.
@@ -149,7 +175,10 @@ namespace cppmicroservices
          */
         ServiceTracker(BundleContext const& context,
                        std::string const& clazz,
-                       ServiceTrackerCustomizer<S, T>* customizer = nullptr);
+                       ServiceTrackerCustomizer<S, T>* customizer = nullptr)
+            : d(new _ServiceTrackerPrivate(this, context, clazz, customizer))
+        {
+        }
 
         /**
          * Create a <code>ServiceTracker</code> on the specified
@@ -172,7 +201,10 @@ namespace cppmicroservices
          */
         ServiceTracker(BundleContext const& context,
                        LDAPFilter const& filter,
-                       ServiceTrackerCustomizer<S, T>* customizer = nullptr);
+                       ServiceTrackerCustomizer<S, T>* customizer = nullptr)
+            : d(new _ServiceTrackerPrivate(this, context, filter, customizer))
+        {
+        }
 
         /**
          * Create a <code>ServiceTracker</code> on the class template
@@ -192,7 +224,20 @@ namespace cppmicroservices
          *        <code>ServiceTrackerCustomizer</code> methods on itself.
          * @throws ServiceException If the service interface name is empty.
          */
-        ServiceTracker(BundleContext const& context, ServiceTrackerCustomizer<S, T>* customizer = nullptr);
+        ServiceTracker(BundleContext const& context, ServiceTrackerCustomizer<S, T>* customizer = nullptr)
+            : d(new _ServiceTrackerPrivate(this, context, us_service_interface_iid<S>(), customizer))
+        {
+            std::string clazz = us_service_interface_iid<S>();
+            if (clazz.empty())
+            {
+                throw ServiceException("The service interface class has no "
+                                       "CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
+            }
+        }
+
+#ifdef _MSC_VER
+#    pragma warning(pop)
+#endif
 
         /**
          * Open this <code>ServiceTracker</code> and begin tracking services.
@@ -209,7 +254,59 @@ namespace cppmicroservices
          *         the <code>ServiceTracker</code> contains an invalid filter
          *         expression that cannot be parsed.
          */
-        virtual void Open();
+        virtual void
+        Open()
+        {
+            std::shared_ptr<_TrackedService> t;
+            {
+                auto l = d->Lock();
+                US_UNUSED(l);
+                if (d->trackedService.Load() && !d->Tracked()->closed)
+                {
+                    return;
+                }
+
+                DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::Open: " << d->filter;
+
+                t.reset(new _TrackedService(this, d->customizer));
+                try
+                {
+                    /* Remove if already exists. No-op if it's an invalid (default) token */
+                    d->context.RemoveListener(std::move(d->listenerToken));
+                    d->listenerToken = d->context.AddServiceListener(
+                        std::bind(&_TrackedService::ServiceChanged, t, std::placeholders::_1),
+                        d->listenerFilter);
+                    std::vector<ServiceReference<S>> references;
+                    if (!d->trackClass.empty())
+                    {
+                        references = d->GetInitialReferences(d->trackClass, std::string());
+                    }
+                    else
+                    {
+                        if (d->trackReference.GetBundle())
+                        {
+                            references.push_back(d->trackReference);
+                        }
+                        else
+                        { /* user supplied filter */
+                            references = d->GetInitialReferences(std::string(),
+                                                                 (d->listenerFilter.empty()) ? d->filter.ToString()
+                                                                                             : d->listenerFilter);
+                        }
+                    }
+                    /* set tracked with the initial references */
+                    t->SetInitial(references);
+                }
+                catch (std::invalid_argument const& e)
+                {
+                    d->context.RemoveListener(std::move(d->listenerToken));
+                    throw std::runtime_error(std::string("unexpected std::invalid_argument exception: ") + e.what());
+                }
+                d->trackedService.Store(t);
+            }
+            /* Call tracked outside of synchronized region */
+            t->TrackInitial(); /* process the initial references */
+        }
 
         /**
          * Close this <code>ServiceTracker</code>.
@@ -226,7 +323,80 @@ namespace cppmicroservices
          *         with which this <code>ServiceTracker</code> was created is no
          *         longer valid.
          */
-        virtual void Close();
+        virtual void
+        Close()
+        {
+
+            /*
+            The call to RemoveListener() below must be done while the ServiceTracker object is unlocked because of a
+            possibility for reentry from customer code. Therefore, we have to swap d->listenerToken to a local variable
+            and replace it with a default constructed ListenerToken object.
+            */
+            ListenerToken swappedToken;
+            {
+                auto l = d->Lock();
+                US_UNUSED(l);
+                std::swap(d->listenerToken, swappedToken);
+            }
+            try
+            {
+                d->context.RemoveListener(std::move(swappedToken));
+            }
+            catch (std::runtime_error const& /*e*/)
+            {
+                /* In case the context was stopped or invalid. */
+            }
+
+            std::shared_ptr<_TrackedService> outgoing = d->trackedService.Load();
+            {
+                auto l = d->Lock();
+                US_UNUSED(l);
+
+                if (outgoing == nullptr)
+                {
+                    return;
+                }
+
+                if (d->Tracked()->closed)
+                {
+                    return;
+                }
+
+                DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close:" << d->filter;
+                outgoing->Close();
+
+                d->Modified();         /* clear the cache */
+                outgoing->NotifyAll(); /* wake up any waiters */
+            }
+
+            try
+            {
+                outgoing->WaitOnCustomizersToFinish();
+            }
+            catch (std::exception const&)
+            {
+                // this can throw if the latch's count
+                // is negative, which means the latch
+                // cannot be used anymore. This can occur
+                // when multiple threads are opening
+                // and closing the same service tracker
+                // repeatedly.
+            }
+
+            auto references = GetServiceReferences();
+            for (auto& ref : references)
+            {
+                outgoing->Untrack(ref, ServiceEvent());
+            }
+
+            if (d->context.GetLogSink()->Enabled())
+            {
+                if (!d->cachedReference.Load().GetBundle() && d->cachedService.Load() == nullptr)
+                {
+                    DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close[cached cleared]:" << d->filter;
+                }
+            }
+        }
 
         /**
          * Wait for at least one service to be tracked by this
@@ -245,7 +415,11 @@ namespace cppmicroservices
          *
          * @return The result of GetService().
          */
-        std::shared_ptr<TrackedParamType> WaitForService();
+        std::shared_ptr<TrackedParamType>
+        WaitForService()
+        {
+            return WaitForService(std::chrono::milliseconds::zero());
+        }
 
         /**
          * Wait for at least one service to be tracked by this
@@ -268,7 +442,55 @@ namespace cppmicroservices
          * @return The result of GetService().
          */
         template <class Rep, class Period>
-        std::shared_ptr<TrackedParamType> WaitForService(std::chrono::duration<Rep, Period> const& rel_time);
+        std::shared_ptr<TrackedParamType>
+        WaitForService(std::chrono::duration<Rep, Period> const& rel_time)
+        {
+            if (rel_time.count() < 0)
+            {
+                throw std::invalid_argument("negative timeout");
+            }
+
+            auto object = GetService();
+            if (object)
+            {
+                return object;
+            }
+
+            using D = std::chrono::duration<Rep, Period>;
+
+            auto timeout = rel_time;
+            auto endTime = (rel_time == D::zero()) ? std::chrono::steady_clock::time_point()
+                                                   : (std::chrono::steady_clock::now() + rel_time);
+            do
+            {
+                auto t = d->Tracked();
+                if (!t)
+                { /* if ServiceTracker is not open */
+                    return std::shared_ptr<TrackedParamType>();
+                }
+
+                {
+                    auto l = t->Lock();
+                    if (t->Size_unlocked() == 0)
+                    {
+                        t->WaitFor(l, rel_time, [&t] { return t->Size_unlocked() > 0 || t->closed; });
+                    }
+                }
+                object = GetService();
+                // Adapt the timeout in case we "missed" the object after having
+                // been notified within the timeout.
+                if (!object && endTime > std::chrono::steady_clock::time_point())
+                {
+                    timeout = std::chrono::duration_cast<D>(endTime - std::chrono::steady_clock::now());
+                    if (timeout.count() <= 0)
+                    {
+                        break; // timed out
+                    }
+                }
+            } while (!object && !d->Tracked()->closed);
+
+            return object;
+        }
 
         /**
          * Return a list of <code>ServiceReference</code>s for all services being
@@ -276,7 +498,22 @@ namespace cppmicroservices
          *
          * @return A list of <code>ServiceReference</code> objects.
          */
-        virtual std::vector<ServiceReference<S>> GetServiceReferences() const;
+        virtual std::vector<ServiceReference<S>>
+        GetServiceReferences() const
+        {
+            std::vector<ServiceReference<S>> refs;
+            auto t = d->Tracked();
+            if (!t)
+            { /* if ServiceTracker is not open */
+                return refs;
+            }
+            {
+                auto l = t->Lock();
+                US_UNUSED(l);
+                d->GetServiceReferences_unlocked(refs, t.get());
+            }
+            return refs;
+        }
 
         /**
          * Returns a <code>ServiceReference</code> for one of the services being
@@ -297,7 +534,83 @@ namespace cppmicroservices
          * @return A <code>ServiceReference</code> for a tracked service.
          * @throws ServiceException if no services are being tracked.
          */
-        virtual ServiceReference<S> GetServiceReference() const;
+        virtual ServiceReference<S>
+        GetServiceReference() const
+        {
+            ServiceReference<S> reference = d->cachedReference.Load();
+            if (reference.GetBundle())
+            {
+                DIAG_LOG(*d->context.GetLogSink())
+                    << "ServiceTracker<S,TTT>::getServiceReference[cached]:" << d->filter;
+                return reference;
+            }
+            DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference:" << d->filter;
+            auto references = GetServiceReferences();
+            std::size_t length = references.size();
+            if (length == 0)
+            { /* if no service is being tracked */
+                throw ServiceException("No service is being tracked");
+            }
+            auto selectedRef = references.begin();
+            if (length > 1)
+            { /* if more than one service, select highest ranking */
+                std::vector<int> rankings(length);
+                int count = 0;
+                int maxRanking = (std::numeric_limits<int>::min)();
+                auto refIter = references.begin();
+                for (std::size_t i = 0; i < length; i++)
+                {
+                    Any rankingAny = refIter->GetProperty(Constants::SERVICE_RANKING);
+                    int ranking = 0;
+                    if (rankingAny.Type() == typeid(int))
+                    {
+                        ranking = any_cast<int>(rankingAny);
+                    }
+
+                    rankings[i] = ranking;
+                    if (ranking > maxRanking)
+                    {
+                        selectedRef = refIter;
+                        maxRanking = ranking;
+                        count = 1;
+                    }
+                    else
+                    {
+                        if (ranking == maxRanking)
+                        {
+                            count++;
+                        }
+                    }
+                    ++refIter;
+                }
+                if (count > 1)
+                { /* if still more than one service, select lowest id */
+                    long int minId = (std::numeric_limits<long int>::max)();
+                    refIter = references.begin();
+                    for (std::size_t i = 0; i < length; i++)
+                    {
+                        if (rankings[i] == maxRanking)
+                        {
+                            Any idAny = refIter->GetProperty(Constants::SERVICE_ID);
+                            long int id = 0;
+                            if (idAny.Type() == typeid(long int))
+                            {
+                                id = any_cast<long int>(idAny);
+                            }
+                            if (id < minId)
+                            {
+                                selectedRef = refIter;
+                                minId = id;
+                            }
+                        }
+                        ++refIter;
+                    }
+                }
+            }
+
+            d->cachedReference.Store(*selectedRef);
+            return *selectedRef;
+        }
 
         /**
          * Returns the service object for the specified
@@ -309,7 +622,16 @@ namespace cppmicroservices
          *         by the specified <code>ServiceReference</code> is not being
          *         tracked.
          */
-        virtual std::shared_ptr<TrackedParamType> GetService(ServiceReference<S> const& reference) const;
+        virtual std::shared_ptr<TrackedParamType>
+        GetService(ServiceReference<S> const& reference) const
+        {
+            auto t = d->Tracked();
+            if (!t)
+            { /* if ServiceTracker is not open */
+                return std::shared_ptr<TrackedParamType>();
+            }
+            return (t->Lock(), t->GetCustomizedObject_unlocked(reference));
+        }
 
         /**
          * Return a list of service objects for all services being tracked by this
@@ -324,7 +646,27 @@ namespace cppmicroservices
          * @return A list of service objects or an empty list if no services
          *         are being tracked.
          */
-        virtual std::vector<std::shared_ptr<TrackedParamType>> GetServices() const;
+        virtual std::vector<std::shared_ptr<TrackedParamType>>
+        GetServices() const
+        {
+            std::vector<std::shared_ptr<TrackedParamType>> services;
+            auto t = d->Tracked();
+            if (!t)
+            { /* if ServiceTracker is not open */
+                return services;
+            }
+            {
+                auto l = t->Lock();
+                US_UNUSED(l);
+                std::vector<ServiceReference<S>> references;
+                d->GetServiceReferences_unlocked(references, t.get());
+                for (auto& ref : references)
+                {
+                    services.push_back(t->GetCustomizedObject_unlocked(ref));
+                }
+            }
+            return services;
+        }
 
         /**
          * Returns a service object for one of the services being tracked by this
@@ -337,7 +679,33 @@ namespace cppmicroservices
          * @return A service object or <code>null</code> if no services are being
          *         tracked.
          */
-        virtual std::shared_ptr<TrackedParamType> GetService() const;
+        virtual std::shared_ptr<TrackedParamType>
+        GetService() const
+        {
+            auto service = d->cachedService.Load();
+            if (service)
+            {
+                DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService[cached]:" << d->filter;
+                return service;
+            }
+            DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService:" << d->filter;
+
+            try
+            {
+                auto reference = GetServiceReference();
+                if (!reference.GetBundle())
+                {
+                    return std::shared_ptr<TrackedParamType>();
+                }
+                service = GetService(reference);
+                d->cachedService.Store(service);
+                return service;
+            }
+            catch (ServiceException const&)
+            {
+                return std::shared_ptr<TrackedParamType>();
+            }
+        }
 
         /**
          * Remove a service from this <code>ServiceTracker</code>.
@@ -349,7 +717,16 @@ namespace cppmicroservices
          *
          * @param reference The reference to the service to be removed.
          */
-        virtual void Remove(ServiceReference<S> const& reference);
+        virtual void
+        Remove(ServiceReference<S> const& reference)
+        {
+            auto t = d->Tracked();
+            if (!t)
+            { /* if ServiceTracker is not open */
+                return;
+            }
+            t->Untrack(reference, ServiceEvent());
+        }
 
         /**
          * Return the number of services being tracked by this
@@ -357,7 +734,16 @@ namespace cppmicroservices
          *
          * @return The number of services being tracked.
          */
-        virtual int Size() const;
+        virtual int
+        Size() const
+        {
+            auto t = d->Tracked();
+            if (!t)
+            { /* if ServiceTracker is not open */
+                return 0;
+            }
+            return (t->Lock(), static_cast<int>(t->Size_unlocked()));
+        }
 
         /**
          * Returns the tracking count for this <code>ServiceTracker</code>.
@@ -378,7 +764,24 @@ namespace cppmicroservices
          * @return The tracking count for this <code>ServiceTracker</code> or -1 if
          *         this <code>ServiceTracker</code> is not open.
          */
-        virtual int GetTrackingCount() const;
+        virtual int
+        GetTrackingCount() const
+        {
+            auto t = d->Tracked();
+            if (!t)
+            { /* if ServiceTracker has not been opened */
+                return -1;
+            }
+            {
+                auto l = t->Lock();
+                US_UNUSED(l);
+                if (t->closed)
+                { /* if ServiceTracker was closed */
+                    return -1;
+                }
+                return t->GetTrackingCount();
+            }
+        }
 
         /**
          * Return a sorted map of the <code>ServiceReference</code>s and
@@ -392,7 +795,16 @@ namespace cppmicroservices
          *         <code>ServiceTracker</code>. If no services are being tracked,
          *         then the returned map is empty.
          */
-        virtual void GetTracked(TrackingMap& tracked) const;
+        virtual void
+        GetTracked(TrackingMap& map) const
+        {
+            auto t = d->Tracked();
+            if (!t)
+            { /* if ServiceTracker is not open */
+                return;
+            }
+            t->Lock(), t->CopyEntries_unlocked(map);
+        }
 
         /**
          * Return if this <code>ServiceTracker</code> is empty.
@@ -400,7 +812,16 @@ namespace cppmicroservices
          * @return <code>true</code> if this <code>ServiceTracker</code> is not tracking any
          *         services.
          */
-        virtual bool IsEmpty() const;
+        virtual bool
+        IsEmpty() const
+        {
+            auto t = d->Tracked();
+            if (!t)
+            { /* if ServiceTracker is not open */
+                return true;
+            }
+            return (t->Lock(), t->IsEmpty_unlocked());
+        }
 
       protected:
         /**
@@ -431,7 +852,11 @@ namespace cppmicroservices
          *         <code>ServiceReference</code> is invalid (default constructed).
          * @see ServiceTrackerCustomizer::AddingService(const ServiceReference&)
          */
-        std::shared_ptr<TrackedParamType> AddingService(ServiceReference<S> const& reference) override;
+        std::shared_ptr<TrackedParamType>
+        AddingService(ServiceReference<S> const& reference) override
+        {
+            return TypeTraits::ConvertToTrackedType(d->context.GetService(reference));
+        }
 
         /**
          * Default implementation of the
@@ -448,8 +873,12 @@ namespace cppmicroservices
          * @param service The service object for the modified service.
          * @see ServiceTrackerCustomizer::ModifiedService(const ServiceReference&, TrackedArgType)
          */
-        void ModifiedService(ServiceReference<S> const& reference,
-                             std::shared_ptr<TrackedParamType> const& service) override;
+        void
+        ModifiedService(ServiceReference<S> const& /*reference*/,
+                        std::shared_ptr<TrackedParamType> const& /*service*/) override
+        {
+            /* do nothing */
+        }
 
         /**
          * Default implementation of the
@@ -467,8 +896,12 @@ namespace cppmicroservices
          * @param service The service object for the removed service.
          * @see ServiceTrackerCustomizer::RemovedService(const ServiceReferenceType&, TrackedArgType)
          */
-        void RemovedService(ServiceReference<S> const& reference,
-                            std::shared_ptr<TrackedParamType> const& service) override;
+        void
+        RemovedService(ServiceReference<S> const& /*reference*/,
+                       std::shared_ptr<TrackedParamType> const& /*service*/) override
+        {
+            /* do nothing */
+        }
 
       private:
         using TypeTraits = typename ServiceTrackerCustomizer<S, T>::TypeTraits;
@@ -485,6 +918,8 @@ namespace cppmicroservices
     };
 } // namespace cppmicroservices
 
-#include "cppmicroservices/detail/ServiceTracker.hpp"
+// include statements at end because of dependencies on ServiceTracker.h
+#include "cppmicroservices/detail/ServiceTrackerPrivate.h"
+#include "cppmicroservices/detail/TrackedService.h"
 
 #endif // CPPMICROSERVICES_SERVICETRACKER_H

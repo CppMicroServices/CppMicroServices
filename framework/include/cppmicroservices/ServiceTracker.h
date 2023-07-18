@@ -30,6 +30,7 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/LDAPFilter.h"
+#include "cppmicroservices/ServiceEvent.h"
 #include "cppmicroservices/ServiceException.h"
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"

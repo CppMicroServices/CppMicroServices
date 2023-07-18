@@ -518,9 +518,7 @@ namespace cppmicroservices
             EXPECT_FALSE(bc.GetServiceReference<test::Interface2>()) << "Service should NOT be available";
             EXPECT_THROW(svc->ExtendedDescription(), std::runtime_error);
             testBundle.Stop();
-        }
-
-        
+        }        
 
         // test that:
         //  a new higher ranked service causes a re-bind
@@ -827,9 +825,6 @@ namespace cppmicroservices
             testBundle.Stop();
         }
 
-        
-
-
         // test that concurrent service registrations and unregistrations
         // do not cause crashes.
         TEST_F(BindingPolicyTest, TestConcurrentBindUnbind)
@@ -875,150 +870,113 @@ namespace cppmicroservices
             testBundle.Stop();
         }
 
-        // test that:
-        //  any new service causes a re-bind
-        //  unregistering services keeps other bound services intact
-        TEST_F(BindingPolicyTest, TestDynamicGreedyMandatoryMultipleReBind)
+        struct MultipleCardinalityDynamicPolicy {
+            metadata::ReferenceMetadata fakeMetadata;
+
+            int numBindNotifs[3];
+            int numUnbindNotifs[3];
+            int numLoggerCalls;
+
+            friend std::ostream&
+                operator<<(std::ostream& os, MultipleCardinalityDynamicPolicy const& obj)
+            {
+                return os << "Metadata name: " << obj.fakeMetadata.name << "\n"
+                    << "Bind notification count: " << obj.numBindNotifs << "\n"
+                    << "Unbind notification count: " << obj.numUnbindNotifs << "\n"
+                    << "Logger calls count: " << obj.numLoggerCalls << "\n";
+            }
+        };
+
+        class DynamicPolicyMultipleCardinalityTest : public ::testing::TestWithParam<MultipleCardinalityDynamicPolicy>
         {
-            auto bc = GetFramework().GetBundleContext();
-            auto fakeMetadata = CreateFakeReferenceMetadata("dynamic", "greedy", "1..n");
-            auto mockLogger = std::make_shared<MockLogger>();
-            ReferenceManagerImpl refManager(fakeMetadata,
-                bc,
-                mockLogger,
-                "foo");
+        protected:
+            DynamicPolicyMultipleCardinalityTest() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
 
-            EXPECT_CALL(*mockLogger.get(), Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, testing::_))
-                .Times(4);
+            virtual ~DynamicPolicyMultipleCardinalityTest() = default;
 
-            int satisfiedNotificationCount(0);
-            int unsatisfiedNotificationCount(0);
-            int bindNotificationCount(0);
-            int unbindNotificationCount(0);
+            virtual void
+                SetUp()
+            {
+                framework.Start();
+                mockLogger = std::make_shared<MockLogger>();
+            }
 
-            ListenerTokenId token = refManager.RegisterListener(
-                [&](RefChangeNotification const& notification)
-                {
-                    switch (notification.event)
+            virtual void
+                TearDown()
+            {
+                framework.Stop();
+                framework.WaitForStop(std::chrono::milliseconds::zero());
+            }
+
+            cppmicroservices::Framework&
+                GetFramework()
+            {
+                return framework;
+            }
+
+            ListenerTokenId CreateListener(ReferenceManagerImpl& refManager) {
+                return refManager.RegisterListener(
+                    [&](RefChangeNotification const& notification)
                     {
-                    case RefEvent::BECAME_SATISFIED:
-                        satisfiedNotificationCount++;
-                        break;
-                    case RefEvent::BECAME_UNSATISFIED:
-                        unsatisfiedNotificationCount++;
-                        break;
-                    case RefEvent::REBIND:
-                        if (notification.serviceRefToBind)
+                        switch (notification.event)
                         {
-                            bindNotificationCount++;
+                        case RefEvent::BECAME_SATISFIED:
+                            satisfiedNotificationCount++;
+                            break;
+                        case RefEvent::BECAME_UNSATISFIED:
+                            unsatisfiedNotificationCount++;
+                            break;
+                        case RefEvent::REBIND:
+                            if (notification.serviceRefToBind)
+                            {
+                                bindNotificationCount++;
+                            }
+                            if (notification.serviceRefToUnbind)
+                            {
+                                unbindNotificationCount++;
+                            }
+                            break;
+                        default:
+                            break;
                         }
-                        if (notification.serviceRefToUnbind)
-                        {
-                            unbindNotificationCount++;
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-                });
+                    });
+            }
 
-            auto depSvcReg = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(10000)}
-                });
-            ASSERT_TRUE(depSvcReg);
+            cppmicroservices::Framework framework;
+            std::shared_ptr<cppmicroservices::scrimpl::MockLogger> mockLogger;
+            ListenerTokenId listenerToken{ 0 };
 
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
-            EXPECT_EQ(satisfiedNotificationCount, 1);
+            int satisfiedNotificationCount{ 0 };
+            int unsatisfiedNotificationCount{ 0 };
+            int bindNotificationCount{ 0 };
+            int unbindNotificationCount{ 0 };
+        };
 
-            auto depSvcReg1 = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(1)}
-                });
-            ASSERT_TRUE(depSvcReg1);
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
-            EXPECT_EQ(bindNotificationCount, 1);
-
-            auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(100)}
-                });
-            ASSERT_TRUE(depSvcReg2);
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 3);
-            EXPECT_EQ(bindNotificationCount, 2);
-
-            depSvcReg2.Unregister();
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
-            EXPECT_EQ(unbindNotificationCount, 1);
-
-            depSvcReg1.Unregister();
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
-            EXPECT_EQ(unbindNotificationCount, 2);
-
-            depSvcReg.Unregister();
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 0);
-            EXPECT_EQ(unsatisfiedNotificationCount, 1);
-            EXPECT_EQ(unbindNotificationCount, 2);
-
-            refManager.UnregisterListener(token);
-        }
+        INSTANTIATE_TEST_SUITE_P(
+            MultipleCardinalityTests,
+            DynamicPolicyMultipleCardinalityTest,
+            testing::Values(
+                MultipleCardinalityDynamicPolicy{ CreateFakeReferenceMetadata("dynamic", "greedy", "1..n"), {0, 1, 2}, {1,2,2}, 4 },
+                MultipleCardinalityDynamicPolicy{ CreateFakeReferenceMetadata("dynamic", "greedy", "0..n"), {1, 2, 3}, {1,2,3}, 3 },
+                MultipleCardinalityDynamicPolicy{ CreateFakeReferenceMetadata("dynamic", "reluctant", "1..n"), {0, 1, 2}, {1, 2, 2}, 6 },
+                MultipleCardinalityDynamicPolicy{ CreateFakeReferenceMetadata("dynamic", "reluctant", "0..n"), {2, 3, 4}, {1, 2, 3}, 7 }));
 
         // test that:
         //  any new service causes a re-bind
         //  unregistering services keeps other bound services intact
-        TEST_F(BindingPolicyTest, TestDynamicGreedyOptionalMultipleReBind)
+        TEST_P(DynamicPolicyMultipleCardinalityTest, TestDynamicPolicyWithMultipleCardinality)
         {
             auto bc = GetFramework().GetBundleContext();
-            auto fakeMetadata = CreateFakeReferenceMetadata("dynamic", "greedy", "0..n");
-            auto mockLogger = std::make_shared<MockLogger>();
-            ReferenceManagerImpl refManager(fakeMetadata,
+
+            ReferenceManagerImpl refManager(GetParam().fakeMetadata,
                 bc,
                 mockLogger,
                 "foo");
 
-            EXPECT_CALL(*mockLogger.get(), Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, testing::_))
-                .Times(3);
+            CreateListener(refManager);
 
-            int satisfiedNotificationCount(0);
-            int unsatisfiedNotificationCount(0);
-            int bindNotificationCount(0);
-            int unbindNotificationCount(0);
-
-            ListenerTokenId token = refManager.RegisterListener(
-                [&](RefChangeNotification const& notification)
-                {
-                    switch (notification.event)
-                    {
-                    case RefEvent::BECAME_SATISFIED:
-                        satisfiedNotificationCount++;
-                        break;
-                    case RefEvent::BECAME_UNSATISFIED:
-                        unsatisfiedNotificationCount++;
-                        break;
-                    case RefEvent::REBIND:
-                        if (notification.serviceRefToBind)
-                        {
-                            bindNotificationCount++;
-                        }
-                        if (notification.serviceRefToUnbind)
-                        {
-                            unbindNotificationCount++;
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-                });
-
-            EXPECT_EQ(satisfiedNotificationCount, 1);
+            EXPECT_CALL(*(mockLogger).get(), Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, testing::_))
+                .Times(GetParam().numLoggerCalls);
 
             auto depSvcReg = bc.RegisterService<dummy::Reference1>(
                 std::make_shared<dummy::Reference1>(),
@@ -1028,7 +986,6 @@ namespace cppmicroservices
             ASSERT_TRUE(depSvcReg);
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
-            EXPECT_EQ(bindNotificationCount, 1);
 
             auto depSvcReg1 = bc.RegisterService<dummy::Reference1>(
                 std::make_shared<dummy::Reference1>(),
@@ -1038,7 +995,7 @@ namespace cppmicroservices
             ASSERT_TRUE(depSvcReg1);
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
-            EXPECT_EQ(bindNotificationCount, 2);
+            EXPECT_EQ(bindNotificationCount, GetParam().numBindNotifs[1]);
 
             auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(
                 std::make_shared<dummy::Reference1>(),
@@ -1048,253 +1005,120 @@ namespace cppmicroservices
             ASSERT_TRUE(depSvcReg2);
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 3);
-            EXPECT_EQ(bindNotificationCount, 3);
+            EXPECT_EQ(bindNotificationCount, GetParam().numBindNotifs[2]);
 
             depSvcReg2.Unregister();
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
-            EXPECT_EQ(unbindNotificationCount, 1);
+            EXPECT_EQ(unbindNotificationCount, GetParam().numUnbindNotifs[0]);
 
             depSvcReg1.Unregister();
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
-            EXPECT_EQ(unbindNotificationCount, 2);
+            EXPECT_EQ(unbindNotificationCount, GetParam().numUnbindNotifs[1]);
 
             depSvcReg.Unregister();
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 0);
-            EXPECT_EQ(unbindNotificationCount, 3);
+            EXPECT_EQ(unbindNotificationCount, GetParam().numUnbindNotifs[2]);
 
-            refManager.UnregisterListener(token);
+            refManager.UnregisterListener(listenerToken);
         }
 
-       // test that:
-       //  any new service causes a re-bind
-       //  unregistering services keeps other bound services intact
-        TEST_F(BindingPolicyTest, TestDynamicReluctantMandatoryMultipleReBind)
+        struct MultipleCardinalityStaticPolicy {
+            metadata::ReferenceMetadata fakeMetadata;
+
+            int numSatisfiedNotifs[6];
+            int numUnsatisfiedNotifs[6];
+            int numLoggerCalls;
+
+            friend std::ostream&
+                operator<<(std::ostream& os, MultipleCardinalityStaticPolicy const& obj)
+            {
+                return os << "Metadata name: " << obj.fakeMetadata.name << "\n"
+                    << "Bind notification count: " << obj.numSatisfiedNotifs << "\n"
+                    << "Unbind notification count: " << obj.numUnsatisfiedNotifs << "\n"
+                    << "Logger calls count: " << obj.numLoggerCalls << "\n";
+            }
+        };
+
+        class StaticPolicyMultipleCardinalityTest : public ::testing::TestWithParam<MultipleCardinalityStaticPolicy>
         {
-            auto bc = GetFramework().GetBundleContext();
-            auto fakeMetadata = CreateFakeReferenceMetadata("dynamic", "greedy", "1..n");
-            auto mockLogger = std::make_shared<MockLogger>();
-            ReferenceManagerImpl refManager(fakeMetadata,
-                bc,
-                mockLogger,
-                "foo");
+        protected:
+            StaticPolicyMultipleCardinalityTest() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
 
-            EXPECT_CALL(*mockLogger.get(), Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, testing::_))
-                .Times(4);
+            virtual ~StaticPolicyMultipleCardinalityTest() = default;
 
-            int satisfiedNotificationCount(0);
-            int unsatisfiedNotificationCount(0);
-            int bindNotificationCount(0);
-            int unbindNotificationCount(0);
+            virtual void
+                SetUp()
+            {
+                framework.Start();
+                mockLogger = std::make_shared<MockLogger>();
+            }
 
-            ListenerTokenId token = refManager.RegisterListener(
-                [&](RefChangeNotification const& notification)
-                {
-                    switch (notification.event)
+            virtual void
+                TearDown()
+            {
+                framework.Stop();
+                framework.WaitForStop(std::chrono::milliseconds::zero());
+            }
+
+            cppmicroservices::Framework&
+                GetFramework()
+            {
+                return framework;
+            }
+
+            ListenerTokenId CreateListener(ReferenceManagerImpl & refManager) {
+                return refManager.RegisterListener(
+                    [&](RefChangeNotification const& notification)
                     {
-                    case RefEvent::BECAME_SATISFIED:
-                        satisfiedNotificationCount++;
-                        break;
-                    case RefEvent::BECAME_UNSATISFIED:
-                        unsatisfiedNotificationCount++;
-                        break;
-                    case RefEvent::REBIND:
-                        if (notification.serviceRefToBind)
+                        switch (notification.event)
                         {
-                            bindNotificationCount++;
+                        case RefEvent::BECAME_SATISFIED:
+                            satisfiedNotificationCount++;
+                            break;
+                        case RefEvent::BECAME_UNSATISFIED:
+                            unsatisfiedNotificationCount++;
+                            break;
+                        default:
+                            break;
                         }
-                        if (notification.serviceRefToUnbind)
-                        {
-                            unbindNotificationCount++;
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-                });
+                    });
+            }
 
-            auto depSvcReg = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(10000)}
-                });
-            ASSERT_TRUE(depSvcReg);
+            cppmicroservices::Framework framework;
+            std::shared_ptr<cppmicroservices::scrimpl::MockLogger> mockLogger;
+            ListenerTokenId listenerToken{ 0 };
 
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
-            EXPECT_EQ(satisfiedNotificationCount, 1);
+            int satisfiedNotificationCount{ 0 };
+            int unsatisfiedNotificationCount{ 0 };
+        };
 
-            auto depSvcReg1 = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(1)}
-                });
-            ASSERT_TRUE(depSvcReg1);
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
-            EXPECT_EQ(bindNotificationCount, 1);
-
-            auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(100)}
-                });
-            ASSERT_TRUE(depSvcReg2);
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 3);
-            EXPECT_EQ(bindNotificationCount, 2);
-
-            depSvcReg2.Unregister();
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
-            EXPECT_EQ(unbindNotificationCount, 1);
-
-            depSvcReg1.Unregister();
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
-            EXPECT_EQ(unbindNotificationCount, 2);
-
-            depSvcReg.Unregister();
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 0);
-            EXPECT_EQ(unsatisfiedNotificationCount, 1);
-            EXPECT_EQ(unbindNotificationCount, 2);
-
-            refManager.UnregisterListener(token);
-        }
-
-        // test that:
-        //  any new service causes a re-bind
-        //  unregistering services keeps other bound services intact
-        TEST_F(BindingPolicyTest, TestDynamicReluctantOptionalMultipleReBind)
-        {
-            auto bc = GetFramework().GetBundleContext();
-            auto fakeMetadata = CreateFakeReferenceMetadata("dynamic", "reluctant", "0..n");
-            auto mockLogger = std::make_shared<MockLogger>();
-            ReferenceManagerImpl refManager(fakeMetadata,
-                bc,
-                mockLogger,
-                "foo");
-
-            EXPECT_CALL(*mockLogger.get(), Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, testing::_))
-                .Times(7);
-
-            int satisfiedNotificationCount(0);
-            int unsatisfiedNotificationCount(0);
-            int bindNotificationCount(0);
-            int unbindNotificationCount(0);
-
-            ListenerTokenId token = refManager.RegisterListener(
-                [&](RefChangeNotification const& notification)
-                {
-                    switch (notification.event)
-                    {
-                    case RefEvent::BECAME_SATISFIED:
-                        satisfiedNotificationCount++;
-                        break;
-                    case RefEvent::BECAME_UNSATISFIED:
-                        unsatisfiedNotificationCount++;
-                        break;
-                    case RefEvent::REBIND:
-                        if (notification.serviceRefToBind)
-                        {
-                            bindNotificationCount++;
-                        }
-                        if (notification.serviceRefToUnbind)
-                        {
-                            unbindNotificationCount++;
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-                });
-
-            EXPECT_EQ(satisfiedNotificationCount, 1);
-
-            auto depSvcReg = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(10000)}
-                });
-            ASSERT_TRUE(depSvcReg);
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
-            EXPECT_EQ(bindNotificationCount, 2);
-
-            auto depSvcReg1 = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(1)}
-                });
-            ASSERT_TRUE(depSvcReg1);
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
-            EXPECT_EQ(bindNotificationCount, 3);
-
-            auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(100)}
-                });
-            ASSERT_TRUE(depSvcReg2);
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 3);
-            EXPECT_EQ(bindNotificationCount, 4);
-
-            depSvcReg2.Unregister();
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
-            EXPECT_EQ(unbindNotificationCount, 1);
-
-            depSvcReg1.Unregister();
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
-            EXPECT_EQ(unbindNotificationCount, 2);
-
-            depSvcReg.Unregister();
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 0);
-            EXPECT_EQ(unbindNotificationCount, 3);
-
-            refManager.UnregisterListener(token);
-        }
+        INSTANTIATE_TEST_SUITE_P(
+            MultipleCardinalityTests,
+            StaticPolicyMultipleCardinalityTest,
+            testing::Values(
+                MultipleCardinalityStaticPolicy{ CreateFakeReferenceMetadata("static", "greedy", "1..n"), {1, 2, 3, 1, 2, 2}, {0, 1, 2, 1, 2, 3}, 10 },
+                MultipleCardinalityStaticPolicy{ CreateFakeReferenceMetadata("static", "greedy", "0..n"), {2, 3, 4, 1, 2, 3}, {1, 2, 3, 1, 2, 3}, 12 }
+                ));
 
         // test that:
         //  any new service causes a reactivation of component
         //  unregistering services keeps other bound services intact and reactivates component
-        TEST_F(BindingPolicyTest, TestStaticGreedyMandatoryMultiple) {
+        TEST_P(StaticPolicyMultipleCardinalityTest, TestStaticPolicyWithMultipleCardinality) {
 
             auto bc = GetFramework().GetBundleContext();
-            auto fakeMetadata = CreateFakeReferenceMetadata("static", "greedy", "1..n");
-            auto mockLogger = std::make_shared<MockLogger>();
-            ReferenceManagerImpl refManager(fakeMetadata,
+
+            ReferenceManagerImpl refManager(GetParam().fakeMetadata,
                 bc,
                 mockLogger,
                 "foo");
 
+            CreateListener(refManager);
+
             EXPECT_CALL(*mockLogger.get(), Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, testing::_))
-                .Times(10);
-
-            int satisfiedNotificationCount(0);
-            int unsatisfiedNotificationCount(0);
-
-            ListenerTokenId token = refManager.RegisterListener(
-                [&](RefChangeNotification const& notification)
-                {
-                    switch (notification.event)
-                    {
-                    case RefEvent::BECAME_SATISFIED:
-                        satisfiedNotificationCount++;
-                        break;
-                    case RefEvent::BECAME_UNSATISFIED:
-                        unsatisfiedNotificationCount++;
-                        break;
-                    default:
-                        break;
-                    }
-                });
+                .Times(GetParam().numLoggerCalls);
 
             auto depSvcReg = bc.RegisterService<dummy::Reference1>(
                 std::make_shared<dummy::Reference1>(),
@@ -1304,8 +1128,8 @@ namespace cppmicroservices
             ASSERT_TRUE(depSvcReg);
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
-            EXPECT_EQ(unsatisfiedNotificationCount, 0);
-            EXPECT_EQ(satisfiedNotificationCount, 1);
+            EXPECT_EQ(unsatisfiedNotificationCount, GetParam().numUnsatisfiedNotifs[0]);
+            EXPECT_EQ(satisfiedNotificationCount, GetParam().numSatisfiedNotifs[0]);
 
             auto depSvcReg1 = bc.RegisterService<dummy::Reference1>(
                 std::make_shared<dummy::Reference1>(),
@@ -1315,8 +1139,8 @@ namespace cppmicroservices
             ASSERT_TRUE(depSvcReg1);
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
-            EXPECT_EQ(unsatisfiedNotificationCount, 1);
-            EXPECT_EQ(satisfiedNotificationCount, 2);
+            EXPECT_EQ(unsatisfiedNotificationCount, GetParam().numUnsatisfiedNotifs[1]);
+            EXPECT_EQ(satisfiedNotificationCount, GetParam().numSatisfiedNotifs[1]);
 
             auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(
                 std::make_shared<dummy::Reference1>(),
@@ -1326,8 +1150,8 @@ namespace cppmicroservices
             ASSERT_TRUE(depSvcReg2);
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 3);
-            EXPECT_EQ(unsatisfiedNotificationCount, 2);
-            EXPECT_EQ(satisfiedNotificationCount, 3);
+            EXPECT_EQ(unsatisfiedNotificationCount, GetParam().numUnsatisfiedNotifs[2]);
+            EXPECT_EQ(satisfiedNotificationCount, GetParam().numSatisfiedNotifs[2]);
 
             satisfiedNotificationCount = 0;
             unsatisfiedNotificationCount = 0;
@@ -1335,113 +1159,22 @@ namespace cppmicroservices
             depSvcReg2.Unregister();
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
-            EXPECT_EQ(unsatisfiedNotificationCount, 1);
-            EXPECT_EQ(satisfiedNotificationCount, 1);
+            EXPECT_EQ(unsatisfiedNotificationCount, GetParam().numUnsatisfiedNotifs[3]);
+            EXPECT_EQ(satisfiedNotificationCount, GetParam().numSatisfiedNotifs[3]);
 
             depSvcReg1.Unregister();
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
-            EXPECT_EQ(unsatisfiedNotificationCount, 2);
-            EXPECT_EQ(satisfiedNotificationCount, 2);
+            EXPECT_EQ(unsatisfiedNotificationCount, GetParam().numUnsatisfiedNotifs[4]);
+            EXPECT_EQ(satisfiedNotificationCount, GetParam().numSatisfiedNotifs[4]);
 
             depSvcReg.Unregister();
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 0);
-            EXPECT_EQ(unsatisfiedNotificationCount, 3);
-            EXPECT_EQ(satisfiedNotificationCount, 2);
+            EXPECT_EQ(unsatisfiedNotificationCount, GetParam().numUnsatisfiedNotifs[5]);
+            EXPECT_EQ(satisfiedNotificationCount, GetParam().numSatisfiedNotifs[5]);
 
-            refManager.UnregisterListener(token);
-        }
-
-        // test that:
-        //  any new service causes a reactivation of component
-        //  unregistering services keeps other bound services intact and reactivates component
-        TEST_F(BindingPolicyTest, TestStaticGreedyOptionalMultiple) {
-            auto bc = GetFramework().GetBundleContext();
-            auto fakeMetadata = CreateFakeReferenceMetadata("static", "greedy", "0..n");
-            auto mockLogger = std::make_shared<MockLogger>();
-            ReferenceManagerImpl refManager(fakeMetadata,
-                bc,
-                mockLogger,
-                "foo");
-
-            EXPECT_CALL(*mockLogger.get(), Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, testing::_))
-                .Times(12);
-
-            int satisfiedNotificationCount(0);
-            int unsatisfiedNotificationCount(0);
-
-            ListenerTokenId token = refManager.RegisterListener(
-                [&](RefChangeNotification const& notification)
-                {
-                    switch (notification.event)
-                    {
-                    case RefEvent::BECAME_SATISFIED:
-                        satisfiedNotificationCount++;
-                        break;
-                    case RefEvent::BECAME_UNSATISFIED:
-                        unsatisfiedNotificationCount++;
-                        break;
-                    default:
-                        break;
-                    }
-                });
-
-            auto depSvcReg = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(10000)}
-                });
-            ASSERT_TRUE(depSvcReg);
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
-            EXPECT_EQ(unsatisfiedNotificationCount, 1);
-            EXPECT_EQ(satisfiedNotificationCount, 2);
-
-            auto depSvcReg1 = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(1)}
-                });
-            ASSERT_TRUE(depSvcReg1);
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
-            EXPECT_EQ(unsatisfiedNotificationCount, 2);
-            EXPECT_EQ(satisfiedNotificationCount, 3);
-
-            auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(100)}
-                });
-            ASSERT_TRUE(depSvcReg2);
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 3);
-            EXPECT_EQ(unsatisfiedNotificationCount, 3);
-            EXPECT_EQ(satisfiedNotificationCount, 4);
-
-            satisfiedNotificationCount = 0;
-            unsatisfiedNotificationCount = 0;
-
-            depSvcReg2.Unregister();
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
-            EXPECT_EQ(unsatisfiedNotificationCount, 1);
-            EXPECT_EQ(satisfiedNotificationCount, 1);
-
-            depSvcReg1.Unregister();
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
-            EXPECT_EQ(unsatisfiedNotificationCount, 2);
-            EXPECT_EQ(satisfiedNotificationCount, 2);
-
-            depSvcReg.Unregister();
-
-            EXPECT_EQ(refManager.GetBoundReferences().size(), 0);
-            EXPECT_EQ(unsatisfiedNotificationCount, 3);
-            EXPECT_EQ(satisfiedNotificationCount, 3);
-
-            refManager.UnregisterListener(token);
+            refManager.UnregisterListener(listenerToken);
         }
 
         TEST_P(BindingPolicyTest, TestMaxLimitOfMultipleReferences) {
@@ -1473,6 +1206,51 @@ namespace cppmicroservices
             else {
                 EXPECT_EQ(refManager.GetBoundReferences().size(), 10);
             }
+        }
+
+        // test that concurrent service registrations and unregistrations with multiple cardinality
+        // do not cause crashes
+        TEST_F(BindingPolicyTest, TestConcurrentBindUnbindWithMultipleCardinality)
+        {
+            auto bc = GetFramework().GetBundleContext();
+
+            auto fakeMetadata = CreateFakeReferenceMetadata("dynamic", "greedy", "0..n");
+            auto mockLogger = std::make_shared<MockLogger>();
+            ReferenceManagerImpl refManager(fakeMetadata,
+                bc,
+                mockLogger,
+                "foo");
+
+            std::function<bool()> func = [&bc]() -> bool
+            {
+                auto depSvcReg = bc.RegisterService<dummy::Reference1>(
+                    std::make_shared<dummy::Reference1>(),
+                    {
+                        {Constants::SERVICE_RANKING, Any(10000)}
+                    });
+
+
+                auto depSvcReg1 = bc.RegisterService<dummy::Reference1>(
+                    std::make_shared<dummy::Reference1>(),
+                    {
+                        {Constants::SERVICE_RANKING, Any(1)}
+                    });
+
+                auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(
+                    std::make_shared<dummy::Reference1>(),
+                    {
+                        {Constants::SERVICE_RANKING, Any(100)}
+                    });
+
+                depSvcReg.Unregister();
+                depSvcReg1.Unregister();
+                depSvcReg2.Unregister();
+                return true;
+            };
+
+            auto results = ConcurrentInvoke(func);
+            EXPECT_TRUE(!results.empty());
+            EXPECT_TRUE(std::all_of(results.cbegin(), results.cend(), [](bool result) { return result; }));
         }
 
     } // namespace scrimpl

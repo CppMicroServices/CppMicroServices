@@ -176,6 +176,10 @@ namespace cppmicroservices
              */
             void StopTracking() override;
 
+            bool IsUnary() const override;
+
+            bool IsMultiple() const override;
+
             class BindingPolicy
             {
               public:

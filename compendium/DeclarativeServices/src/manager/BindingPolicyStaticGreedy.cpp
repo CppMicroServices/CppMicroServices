@@ -58,18 +58,15 @@ namespace cppmicroservices
                     // old service and then bind to the new service.
                     if (!boundRefsHandle->empty())
                     {
-                        if (mgr.metadata_.maxCardinality == 1)
+                        ServiceReferenceBase const& minBound = *(boundRefsHandle->begin());
+                        if (mgr.IsUnary() && minBound < reference)
                         {
                             // We only need to unbind if there's actually a bound ref.
-                            ServiceReferenceBase const& minBound = *(boundRefsHandle->begin());
-                            if (minBound < reference)
-                            {
-                                // And we only need to unbind if the new reference is a better match than the
-                                // current best match (i.e. boundRefs are stored in reverse order with the best
-                                // match in the first position).
-                                replacementNeeded = true;
-                                serviceToUnbind = minBound; // remember which service to unbind.
-                            }
+                            // And we only need to unbind if the new reference is a better match than the
+                            // current best match (i.e. boundRefs are stored in reverse order with the best
+                            // match in the first position).
+                            replacementNeeded = true;
+                            serviceToUnbind = minBound; // remember which service to unbind.
                         }
                         else {
                             // in case of multiple cardinality, always bind if number of bound references
@@ -78,7 +75,7 @@ namespace cppmicroservices
                                 replacementNeeded = true;
                             }
                             else {
-                                Log("Number of multiple references has reached its maximum limit. New reference(s) will not be bound.");
+                                Log("Number of multiple references has reached its maximum limit. New reference(s) will not be bound.", SeverityLevel::LOG_WARNING);
                             }
                         }
                     }

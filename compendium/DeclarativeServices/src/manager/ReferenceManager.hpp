@@ -141,6 +141,10 @@ namespace cppmicroservices
              */
             virtual void StopTracking() = 0;
 
+            virtual bool IsUnary() const = 0;
+
+            virtual bool IsMultiple() const = 0;
+
           protected:
             ReferenceManager() = default;
         };

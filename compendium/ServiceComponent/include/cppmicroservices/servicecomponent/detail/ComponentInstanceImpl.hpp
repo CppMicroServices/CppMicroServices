@@ -572,9 +572,8 @@ namespace cppmicroservices
                     template <class R,
                               class IsNotVectorType = typename std::enable_if<is_vector_type<R>::value == false>::type
                               >
-                    R GetDependency(std::string const& name, bool val = true)
+                    R GetDependency(std::string const& name, bool = true)
                     {
-                        (void)val;
                         // Overload to be used for references using unary cardinality
                         using RefType = typename R::element_type;
                         return this->mContext->template LocateService<RefType>(name);

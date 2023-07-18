@@ -57,21 +57,6 @@ namespace codegen
         }
 
         std::string
-        GetCtorInjectedRefTypes(ComponentInfo const& compInfo)
-        {
-            std::string result;
-            auto sep = ", ";
-            for (auto const& reference : compInfo.references)
-            {
-                if ((true == compInfo.injectReferences) && (reference.policy == "static"))
-                {
-                    result += (sep + reference.interface);
-                }
-            }
-            return result;
-        }
-
-        std::string
         GetCtorInjectedRefParameters(ComponentInfo const& compInfo)
         {
             std::string result;

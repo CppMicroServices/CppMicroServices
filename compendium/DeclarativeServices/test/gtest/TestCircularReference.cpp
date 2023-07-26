@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "../..//src/manager/ComponentConfigurationImpl.hpp"
 #include "../../src/SCRExtensionRegistry.hpp"
+#include "../../src/manager/ComponentConfigurationImpl.hpp"
 #include "../../src/manager/ReferenceManager.hpp"
 #include "../../src/manager/SingletonComponentConfiguration.hpp"
 
@@ -20,7 +20,6 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
-
         metadata::ReferenceMetadata
         CreateFakeReferenceMetadata(std::string intName, std::string cardinality, int min, int max)
         {
@@ -46,13 +45,16 @@ namespace cppmicroservices
             auto componentAMetadata = std::make_shared<metadata::ComponentMetadata>();
             auto componentBMetadata = std::make_shared<metadata::ComponentMetadata>();
 
-            componentAMetadata->implClassName = us_service_interface_iid<dummy::Reference1>();
-            componentAMetadata->name = us_service_interface_iid<dummy::Reference1>();
-            componentBMetadata->implClassName = us_service_interface_iid<dummy::Reference2>();
-            componentBMetadata->name = us_service_interface_iid<dummy::Reference2>();
+            auto nameA = us_service_interface_iid<dummy::Reference1>();
+            auto nameB = us_service_interface_iid<dummy::Reference2>();
 
-            metadata::ReferenceMetadata referenceA = CreateFakeReferenceMetadata(us_service_interface_iid<dummy::Reference1>(), "1..1", 1, 1);
-            metadata::ReferenceMetadata referenceB = CreateFakeReferenceMetadata(us_service_interface_iid<dummy::Reference2>(), "0..1", 0, 1);
+            componentAMetadata->implClassName = nameA;
+            componentAMetadata->name = nameA;
+            componentBMetadata->implClassName = nameB;
+            componentBMetadata->name = nameB;
+
+            metadata::ReferenceMetadata referenceA = CreateFakeReferenceMetadata(nameA, "1..1", 1, 1);
+            metadata::ReferenceMetadata referenceB = CreateFakeReferenceMetadata(nameB, "0..1", 0, 1);
 
             componentAMetadata->refsMetadata.emplace_back(referenceB);
             componentBMetadata->refsMetadata.emplace_back(referenceA);
@@ -97,7 +99,6 @@ namespace cppmicroservices
 
         TEST(TestCircularReference, circularReferenceMandatoryTest)
         {
-
             auto mockRegistry = std::make_shared<MockComponentRegistry>();
             auto fakeLogger = std::make_shared<FakeLogger>();
 
@@ -108,13 +109,16 @@ namespace cppmicroservices
             auto componentAMetadata = std::make_shared<metadata::ComponentMetadata>();
             auto componentBMetadata = std::make_shared<metadata::ComponentMetadata>();
 
-            componentAMetadata->implClassName = us_service_interface_iid<dummy::Reference1>();
-            componentAMetadata->name = us_service_interface_iid<dummy::Reference1>();
-            componentBMetadata->implClassName = us_service_interface_iid<dummy::Reference2>();
-            componentBMetadata->name = us_service_interface_iid<dummy::Reference2>();
+            auto nameA = us_service_interface_iid<dummy::Reference1>();
+            auto nameB = us_service_interface_iid<dummy::Reference2>();
 
-            metadata::ReferenceMetadata referenceA = CreateFakeReferenceMetadata(us_service_interface_iid<dummy::Reference1>(), "1..1", 1, 1);
-            metadata::ReferenceMetadata referenceB = CreateFakeReferenceMetadata(us_service_interface_iid<dummy::Reference2>(), "1..1", 1, 1);
+            componentAMetadata->implClassName = nameA;
+            componentAMetadata->name = nameA;
+            componentBMetadata->implClassName = nameB;
+            componentBMetadata->name = nameB;
+
+            metadata::ReferenceMetadata referenceA = CreateFakeReferenceMetadata(nameA, "1..1", 1, 1);
+            metadata::ReferenceMetadata referenceB = CreateFakeReferenceMetadata(nameB, "1..1", 1, 1);
 
             componentAMetadata->refsMetadata.emplace_back(referenceB);
             componentBMetadata->refsMetadata.emplace_back(referenceA);

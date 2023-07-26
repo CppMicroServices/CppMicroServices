@@ -21,7 +21,7 @@ namespace cppmicroservices
     namespace scrimpl
     {
         metadata::ReferenceMetadata
-        CreateFakeReferenceMetadata(std::string intName, std::string cardinality, int min, int max)
+        CreateReferenceMetdata(std::string intName, std::string cardinality, int min, int max)
         {
             metadata::ReferenceMetadata fakeMetadata {};
             fakeMetadata.name = "ref";
@@ -53,8 +53,8 @@ namespace cppmicroservices
             componentBMetadata->implClassName = nameB;
             componentBMetadata->name = nameB;
 
-            metadata::ReferenceMetadata referenceA = CreateFakeReferenceMetadata(nameA, "1..1", 1, 1);
-            metadata::ReferenceMetadata referenceB = CreateFakeReferenceMetadata(nameB, "0..1", 0, 1);
+            metadata::ReferenceMetadata referenceA = CreateReferenceMetdata(nameA, "1..1", 1, 1);
+            metadata::ReferenceMetadata referenceB = CreateReferenceMetdata(nameB, "0..1", 0, 1);
 
             componentAMetadata->refsMetadata.emplace_back(referenceB);
             componentBMetadata->refsMetadata.emplace_back(referenceA);
@@ -117,8 +117,8 @@ namespace cppmicroservices
             componentBMetadata->implClassName = nameB;
             componentBMetadata->name = nameB;
 
-            metadata::ReferenceMetadata referenceA = CreateFakeReferenceMetadata(nameA, "1..1", 1, 1);
-            metadata::ReferenceMetadata referenceB = CreateFakeReferenceMetadata(nameB, "1..1", 1, 1);
+            metadata::ReferenceMetadata referenceA = CreateReferenceMetdata(nameA, "1..1", 1, 1);
+            metadata::ReferenceMetadata referenceB = CreateReferenceMetdata(nameB, "1..1", 1, 1);
 
             componentAMetadata->refsMetadata.emplace_back(referenceB);
             componentBMetadata->refsMetadata.emplace_back(referenceA);

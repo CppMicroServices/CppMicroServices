@@ -57,6 +57,7 @@ set(_declarativeservices_tests
   TestAsyncWorkService.cpp
   TestBundleValidation.cpp
   TestCCActiveState.cpp
+  TestCircularReference.cpp
   TestCCRegisteredState.cpp
   TestCCUnsatisfiedReferenceState.cpp
   TestComponentConfigurationImpl.cpp

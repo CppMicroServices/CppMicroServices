@@ -21,7 +21,7 @@ namespace cppmicroservices
     namespace scrimpl
     {
         metadata::ReferenceMetadata
-        CreateReferenceMetdata(std::string intName, std::string cardinality, int min, int max)
+        CreateReferenceMetadata(std::string intName, std::string cardinality, int min, int max)
         {
             metadata::ReferenceMetadata fakeMetadata {};
             fakeMetadata.name = "ref";
@@ -30,6 +30,16 @@ namespace cppmicroservices
             fakeMetadata.minCardinality = min;
             fakeMetadata.maxCardinality = max;
             return fakeMetadata;
+        }
+
+        std::shared_ptr<metadata::ComponentMetadata>
+        CreateComponentMetadata(std::string name)
+        {
+            auto ret = std::make_shared<metadata::ComponentMetadata>();
+            ret->implClassName = name;
+            ret->name = name;
+
+            return ret;
         }
 
         TEST(TestCircularReference, circularReferenceOptionalTest)
@@ -42,19 +52,14 @@ namespace cppmicroservices
             // requires a reference to a service from service component A.
             // Optional cardinality on B breaks the cycle and allows
             // the service components to be satisfied.
-            auto componentAMetadata = std::make_shared<metadata::ComponentMetadata>();
-            auto componentBMetadata = std::make_shared<metadata::ComponentMetadata>();
-
             auto nameA = us_service_interface_iid<dummy::Reference1>();
             auto nameB = us_service_interface_iid<dummy::Reference2>();
 
-            componentAMetadata->implClassName = nameA;
-            componentAMetadata->name = nameA;
-            componentBMetadata->implClassName = nameB;
-            componentBMetadata->name = nameB;
+            auto componentAMetadata = CreateComponentMetadata(nameA);
+            auto componentBMetadata = CreateComponentMetadata(nameB);
 
-            metadata::ReferenceMetadata referenceA = CreateReferenceMetdata(nameA, "1..1", 1, 1);
-            metadata::ReferenceMetadata referenceB = CreateReferenceMetdata(nameB, "0..1", 0, 1);
+            metadata::ReferenceMetadata referenceA = CreateReferenceMetadata(nameA, "1..1", 1, 1);
+            metadata::ReferenceMetadata referenceB = CreateReferenceMetadata(nameB, "0..1", 0, 1);
 
             componentAMetadata->refsMetadata.emplace_back(referenceB);
             componentBMetadata->refsMetadata.emplace_back(referenceA);
@@ -84,9 +89,17 @@ namespace cppmicroservices
                                                                                     mockRegistry,
                                                                                     fakeLogger,
                                                                                     configNotifier);
+            componentB->Initialize();
+            auto refB = context.GetServiceReference<dummy::Reference2>();
+            ASSERT_EQ(refB.operator bool(), false);
 
             componentA->Initialize();
-            componentB->Initialize();
+            auto refA = context.GetServiceReference<dummy::Reference1>();
+
+            refB = context.GetServiceReference<dummy::Reference2>();
+            // assert that references are invalid with unsatisfied configuration
+            ASSERT_EQ(refA.operator bool(), true);
+            ASSERT_EQ(refB.operator bool(), true);
 
             ASSERT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::SATISFIED,
                       componentA->GetState()->GetValue());
@@ -106,19 +119,14 @@ namespace cppmicroservices
             // requires a reference to a service from service component A.
             // In this case, neither A nor B will be satisfied and an error should be
             // logged about detecting a circular dependency.
-            auto componentAMetadata = std::make_shared<metadata::ComponentMetadata>();
-            auto componentBMetadata = std::make_shared<metadata::ComponentMetadata>();
-
             auto nameA = us_service_interface_iid<dummy::Reference1>();
             auto nameB = us_service_interface_iid<dummy::Reference2>();
 
-            componentAMetadata->implClassName = nameA;
-            componentAMetadata->name = nameA;
-            componentBMetadata->implClassName = nameB;
-            componentBMetadata->name = nameB;
+            auto componentAMetadata = CreateComponentMetadata(nameA);
+            auto componentBMetadata = CreateComponentMetadata(nameB);
 
-            metadata::ReferenceMetadata referenceA = CreateReferenceMetdata(nameA, "1..1", 1, 1);
-            metadata::ReferenceMetadata referenceB = CreateReferenceMetdata(nameB, "1..1", 1, 1);
+            metadata::ReferenceMetadata referenceA = CreateReferenceMetadata(nameA, "1..1", 1, 1);
+            metadata::ReferenceMetadata referenceB = CreateReferenceMetadata(nameB, "1..1", 1, 1);
 
             componentAMetadata->refsMetadata.emplace_back(referenceB);
             componentBMetadata->refsMetadata.emplace_back(referenceA);
@@ -152,6 +160,14 @@ namespace cppmicroservices
             componentA->Initialize();
             componentB->Initialize();
 
+            auto refA = context.GetServiceReference<dummy::Reference1>();
+            auto refB = context.GetServiceReference<dummy::Reference2>();
+
+            // assert that references are invalid with unsatisfied configuration
+            ASSERT_EQ(refA.operator bool(), false);
+            ASSERT_EQ(refB.operator bool(), false);
+
+            // component should not be satisfied
             ASSERT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE,
                       componentA->GetState()->GetValue());
             ASSERT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE,

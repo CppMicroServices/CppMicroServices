@@ -52,6 +52,12 @@ namespace cppmicroservices
 
         void Clear_unlocked();
 
+        AnyMap const&
+        GetPropsAnyMap() const
+        {
+            return props;
+        }
+
       private:
         // An AnyMap is used to store the properties rather than 2 vectors (one for keys
         // and the other for values) as previously done in the past. This reduces the number of

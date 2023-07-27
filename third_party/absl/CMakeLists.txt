@@ -18,6 +18,8 @@ set(_ABSL_SRCS
   "absl/strings/internal/charconv_bigint.cc"
   "absl/strings/internal/charconv_parse.cc"
   "absl/strings/internal/memutil.cc"
+
+  "absl/types/bad_optional_access.cc"
 )
 
 set(_ABSL_HDRS
@@ -34,11 +36,15 @@ set(_ABSL_HDRS
   "absl/base/internal/endian.h"
   "absl/base/internal/errno_saver.h"
   "absl/base/internal/identity.h"
+  "absl/base/internal/inline_variable.h"
+  "absl/base/internal/invoke.h"
   "absl/base/internal/raw_logging.h"
   "absl/base/internal/throw_delegate.h"
   "absl/base/internal/unaligned_access.h"
 
   "absl/meta/type_traits.h"
+
+  "absl/memory/memory.h"
 
   "absl/numeric/bits.h"
   "absl/numeric/int128.h"
@@ -58,6 +64,12 @@ set(_ABSL_HDRS
   "absl/strings/internal/ostringstream.h"
   "absl/strings/internal/resize_uninitialized.h"
   "absl/strings/internal/str_join_internal.h"
+
+  "absl/types/bad_optional_access.h"
+  "absl/types/internal/optional.h"
+  "absl/types/optional.h"
+
+  "absl/utility/utility.h"
 )
 
 add_library(absl OBJECT ${_ABSL_SRCS} ${_ABSL_HDRS})

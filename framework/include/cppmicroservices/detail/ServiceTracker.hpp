@@ -29,6 +29,7 @@
 
 #include <chrono>
 #include <limits>
+#include <optional>
 #include <stdexcept>
 #include <string>
 
@@ -151,21 +152,9 @@ namespace cppmicroservices
     void
     ServiceTracker<S, T>::Close()
     {
-
-        /*
-        The call to RemoveListener() below must be done while the ServiceTracker object is unlocked because of a
-        possibility for reentry from customer code. Therefore, we have to swap d->listenerToken to a local variable and
-        replace it with a default constructed ListenerToken object.
-        */
-        ListenerToken swappedToken;
-        {
-            auto l = d->Lock();
-            US_UNUSED(l);
-            std::swap(d->listenerToken, swappedToken);
-        }
         try
         {
-            d->context.RemoveListener(std::move(swappedToken));
+            d->context.RemoveListener(std::move(d->listenerToken));
         }
         catch (std::runtime_error const& /*e*/)
         {
@@ -387,7 +376,12 @@ namespace cppmicroservices
         { /* if ServiceTracker is not open */
             return std::shared_ptr<TrackedParamType>();
         }
-        return (t->Lock(), t->GetCustomizedObject_unlocked(reference));
+        {
+            auto l = t->Lock();
+            US_UNUSED(l);
+            auto customObject = t->GetCustomizedObject_unlocked(reference);
+            return customObject.value_or(nullptr);
+        }
     }
 
     template <class S, class T>
@@ -407,7 +401,7 @@ namespace cppmicroservices
             d->GetServiceReferences_unlocked(references, t.get());
             for (auto& ref : references)
             {
-                services.push_back(t->GetCustomizedObject_unlocked(ref));
+                services.push_back(t->GetCustomizedObject_unlocked(ref).value_or(nullptr));
             }
         }
         return services;

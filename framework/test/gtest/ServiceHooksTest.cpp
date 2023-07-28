@@ -33,10 +33,11 @@
 #include "cppmicroservices/ServiceEventListenerHook.h"
 #include "cppmicroservices/ServiceFindHook.h"
 #include "cppmicroservices/ServiceListenerHook.h"
+#include "gtest/gtest.h"
 
 #include "TestUtils.h"
 #include "TestingConfig.h"
-#include "gtest/gtest.h"
+#include "gmock/gmock.h"
 
 #include <unordered_set>
 
@@ -82,7 +83,6 @@ namespace
 
       public:
         TestServiceEventListenerHook(int id, BundleContext const& context) : id(id), bundleCtx(context) {}
-
         using MapType = ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
 
         void
@@ -149,13 +149,9 @@ namespace
             // One listener with LDAP filter should remain
             ASSERT_GE(static_cast<int>(listenerInfos.size()), 1);
 #endif
-
-            ordering.push_back(id);
         }
 
         ServiceListenerHook::ListenerInfo listenerInfo;
-
-        static std::vector<int> ordering;
     };
 
     class TestServiceEventListenerHookFailure : public ServiceEventListenerHook
@@ -170,16 +166,13 @@ namespace
         }
     };
 
-    std::vector<int> TestServiceEventListenerHook::ordering;
-
     class TestServiceFindHook : public ServiceFindHook
     {
       private:
-        int id;
         BundleContext bundleCtx;
 
       public:
-        TestServiceFindHook(int id, BundleContext const& context) : id(id), bundleCtx(context) {}
+        TestServiceFindHook(BundleContext const& context) : bundleCtx(context) {}
 
         void
         Find(BundleContext const& context,
@@ -190,13 +183,8 @@ namespace
             ASSERT_EQ(context, bundleCtx);
 
             references.clear();
-            ordering.push_back(id);
         }
-
-        static std::vector<int> ordering;
     };
-
-    std::vector<int> TestServiceFindHook::ordering;
 
     // Test failure modes for FindHook
     class TestServiceFindHookFailure : public ServiceFindHook
@@ -212,11 +200,10 @@ namespace
     class TestServiceListenerHook : public ServiceListenerHook
     {
       private:
-        int id;
         BundleContext bundleCtx;
 
       public:
-        TestServiceListenerHook(int id, BundleContext const& context) : id(id), bundleCtx(context) {}
+        TestServiceListenerHook(BundleContext const& context) : bundleCtx(context) {}
 
         void
         Added(std::vector<ListenerInfo> const& listeners)
@@ -224,10 +211,11 @@ namespace
             for (std::vector<ListenerInfo>::const_iterator iter = listeners.begin(); iter != listeners.end(); ++iter)
             {
                 if (iter->IsRemoved() || iter->GetBundleContext().GetBundle() != bundleCtx.GetBundle())
+                {
                     continue;
+                }
                 listenerInfos.insert(*iter);
                 lastAdded = listeners.back();
-                ordering.push_back(id);
             }
         }
 
@@ -237,19 +225,14 @@ namespace
             for (std::vector<ListenerInfo>::const_iterator iter = listeners.begin(); iter != listeners.end(); ++iter)
             {
                 listenerInfos.erase(*iter);
-                ordering.push_back(id * 10);
             }
             lastRemoved = listeners.back();
         }
-
-        static std::vector<int> ordering;
 
         std::unordered_set<ListenerInfo> listenerInfos;
         ListenerInfo lastAdded;
         ListenerInfo lastRemoved;
     };
-
-    std::vector<int> TestServiceListenerHook::ordering;
 
     class TestServiceListenerHookFailure : public ServiceListenerHook
     {
@@ -305,6 +288,39 @@ namespace
 
 } // end unnamed namespace
 
+class MockServiceEventListenerHook : public ServiceEventListenerHook
+{
+  public:
+    MockServiceEventListenerHook() = default;
+
+    using MapType = ShrinkableMap<BundleContext, ShrinkableVector<ServiceListenerHook::ListenerInfo>>;
+
+    MOCK_METHOD(void, Event, (ServiceEvent const& event, MapType& listeners), (override));
+};
+
+class MockServiceFindHook : public ServiceFindHook
+{
+  public:
+    MockServiceFindHook() = default;
+
+    MOCK_METHOD(void,
+                Find,
+                (BundleContext const& context,
+                 std::string const& name,
+                 std::string const& filter,
+                 ShrinkableVector<ServiceReferenceBase>& references),
+                (override));
+};
+
+class MockServiceListenerHook : public ServiceListenerHook
+{
+  public:
+    MockServiceListenerHook() = default;
+
+    MOCK_METHOD(void, Added, (std::vector<ListenerInfo> const& listeners));
+    MOCK_METHOD(void, Removed, (std::vector<ListenerInfo> const& listeners));
+};
+
 TEST_F(ServiceHooksTest, TestListenerHook)
 {
     TestServiceListener serviceListener1;
@@ -314,13 +330,13 @@ TEST_F(ServiceHooksTest, TestListenerHook)
                                &TestServiceListener::ServiceChanged,
                                LDAPProp(Constants::OBJECTCLASS) == "bla");
 
-    auto serviceListenerHook1 = std::make_shared<TestServiceListenerHook>(1, context);
+    auto serviceListenerHook1 = std::make_shared<TestServiceListenerHook>(context);
     ServiceProperties hookProps1;
     hookProps1[Constants::SERVICE_RANKING] = 0;
     ServiceRegistration<ServiceListenerHook> listenerHookReg1
         = context.RegisterService<ServiceListenerHook>(serviceListenerHook1, hookProps1);
 
-    auto serviceListenerHook2 = std::make_shared<TestServiceListenerHook>(2, context);
+    auto serviceListenerHook2 = std::make_shared<TestServiceListenerHook>(context);
     ServiceProperties hookProps2;
     hookProps2[Constants::SERVICE_RANKING] = 10;
     ServiceRegistration<ServiceListenerHook> listenerHookReg2
@@ -330,24 +346,11 @@ TEST_F(ServiceHooksTest, TestListenerHook)
     // check if hooks got notified about the existing listeners
     ASSERT_EQ(serviceListenerHook1->listenerInfos.size(), 2);
 #endif
+
     const std::size_t listenerInfoSizeOld = serviceListenerHook1->listenerInfos.size() - 2;
 
     context.AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
     auto lastAdded = serviceListenerHook1->lastAdded;
-
-#ifdef US_BUILD_SHARED_LIBS
-    std::vector<int> expectedOrdering;
-    expectedOrdering.push_back(1);
-    expectedOrdering.push_back(1);
-    expectedOrdering.push_back(2);
-    expectedOrdering.push_back(2);
-    expectedOrdering.push_back(20);
-    expectedOrdering.push_back(10);
-    expectedOrdering.push_back(2);
-    expectedOrdering.push_back(1);
-    // Check Listener hook call order
-    ASSERT_EQ(serviceListenerHook1->ordering, expectedOrdering);
-#endif
 
     context.AddServiceListener(&serviceListener1,
                                &TestServiceListener::ServiceChanged,
@@ -356,25 +359,8 @@ TEST_F(ServiceHooksTest, TestListenerHook)
     ASSERT_EQ(lastAdded, serviceListenerHook1->lastRemoved);
     ASSERT_FALSE(lastAdded == serviceListenerHook1->lastAdded);
 
-#ifdef US_BUILD_SHARED_LIBS
-    expectedOrdering.push_back(20);
-    expectedOrdering.push_back(10);
-    expectedOrdering.push_back(2);
-    expectedOrdering.push_back(1);
-    // Check Listener hook call order
-    ASSERT_EQ(serviceListenerHook1->ordering, expectedOrdering);
-#endif
-
     context.RemoveServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
     context.RemoveServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged);
-
-#ifdef US_BUILD_SHARED_LIBS
-    expectedOrdering.push_back(20);
-    expectedOrdering.push_back(10);
-    expectedOrdering.push_back(20);
-    expectedOrdering.push_back(10);
-    ASSERT_EQ(serviceListenerHook1->ordering, expectedOrdering);
-#endif
 
     // Removed listener infos
     ASSERT_EQ(serviceListenerHook1->listenerInfos.size(), listenerInfoSizeOld);
@@ -385,21 +371,17 @@ TEST_F(ServiceHooksTest, TestListenerHook)
 
 TEST_F(ServiceHooksTest, TestFindHook)
 {
-    auto serviceFindHook1 = std::make_shared<TestServiceFindHook>(1, context);
+    auto serviceFindHook1 = std::make_shared<TestServiceFindHook>(context);
     ServiceProperties hookProps1;
     hookProps1[Constants::SERVICE_RANKING] = 0;
     ServiceRegistration<ServiceFindHook> findHookReg1
         = context.RegisterService<ServiceFindHook>(serviceFindHook1, hookProps1);
 
-    auto serviceFindHook2 = std::make_shared<TestServiceFindHook>(2, context);
+    auto serviceFindHook2 = std::make_shared<TestServiceFindHook>(context);
     ServiceProperties hookProps2;
     hookProps2[Constants::SERVICE_RANKING] = 10;
     ServiceRegistration<ServiceFindHook> findHookReg2
         = context.RegisterService<ServiceFindHook>(serviceFindHook2, hookProps2);
-
-    std::vector<int> expectedOrdering;
-    // Find hook call order
-    ASSERT_EQ(serviceFindHook1->ordering, expectedOrdering);
 
     TestServiceListener serviceListener;
     context.AddServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
@@ -413,17 +395,10 @@ TEST_F(ServiceHooksTest, TestFindHook)
 
     std::vector<ServiceReferenceU> refs = context.GetServiceReferences("cppmicroservices::TestBundleAService");
     ASSERT_TRUE(refs.empty());
+
     ServiceReferenceU ref = context.GetServiceReference("cppmicroservices::TestBundleAService");
     // Invalid reference (filtered out)
     ASSERT_FALSE(ref);
-
-    expectedOrdering.push_back(2);
-    expectedOrdering.push_back(1);
-    expectedOrdering.push_back(2);
-    expectedOrdering.push_back(1);
-
-    // Find hook call order
-    ASSERT_EQ(serviceFindHook1->ordering, expectedOrdering);
 
     findHookReg2.Unregister();
     findHookReg1.Unregister();
@@ -431,6 +406,7 @@ TEST_F(ServiceHooksTest, TestFindHook)
     refs = context.GetServiceReferences("cppmicroservices::TestBundleAService");
     // Non-empty references
     ASSERT_FALSE(refs.empty());
+
     ref = context.GetServiceReference("cppmicroservices::TestBundleAService");
     ASSERT_TRUE(ref);
 
@@ -460,13 +436,6 @@ TEST_F(ServiceHooksTest, TestEventListenerHook)
     ServiceRegistration<ServiceEventListenerHook> eventListenerHookReg2
         = context.RegisterService<ServiceEventListenerHook>(serviceEventListenerHook2, hookProps2);
 
-    std::vector<int> expectedOrdering;
-    expectedOrdering.push_back(1);
-    expectedOrdering.push_back(1);
-    expectedOrdering.push_back(2);
-    // Event listener hook call order
-    ASSERT_EQ(serviceEventListenerHook1->ordering, expectedOrdering);
-
     // service event of service event listener hook
     ASSERT_TRUE(serviceListener1.events.empty());
     // no service event for filtered listener
@@ -474,12 +443,8 @@ TEST_F(ServiceHooksTest, TestEventListenerHook)
 
     auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleA");
     ASSERT_TRUE(bundle);
-    bundle.Start();
 
-    expectedOrdering.push_back(1);
-    expectedOrdering.push_back(2);
-    // Test Event listener hook call order
-    ASSERT_EQ(serviceEventListenerHook1->ordering, expectedOrdering);
+    bundle.Start();
 
     bundle.Stop();
 
@@ -600,6 +565,144 @@ TEST_F(ServiceHooksTest, TestListenerHookFailure)
 
     listenerHookReg.Unregister();
     framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
+}
+
+TEST_F(ServiceHooksTest, TestListenerHookCallbackOrdering)
+{
+    TestServiceListener serviceListener1;
+    TestServiceListener serviceListener2;
+    context.AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
+    context.AddServiceListener(&serviceListener2,
+                               &TestServiceListener::ServiceChanged,
+                               LDAPProp(Constants::OBJECTCLASS) == "bla");
+
+    auto serviceListenerHook1 = std::make_shared<MockServiceListenerHook>();
+    auto serviceListenerHook2 = std::make_shared<MockServiceListenerHook>();
+
+#ifdef US_BUILD_SHARED_LIBS
+    ::testing::InSequence s;
+    EXPECT_CALL(*serviceListenerHook1, Added(::testing::_));
+    EXPECT_CALL(*serviceListenerHook2, Added(::testing::_));
+    EXPECT_CALL(*serviceListenerHook2, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook1, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook2, Added(::testing::_));
+    EXPECT_CALL(*serviceListenerHook1, Added(::testing::_));
+
+    EXPECT_CALL(*serviceListenerHook2, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook1, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook2, Added(::testing::_));
+    EXPECT_CALL(*serviceListenerHook1, Added(::testing::_));
+
+    EXPECT_CALL(*serviceListenerHook2, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook1, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook2, Removed(::testing::_));
+    EXPECT_CALL(*serviceListenerHook1, Removed(::testing::_));
+#endif
+
+    ServiceProperties hookProps1;
+    hookProps1[Constants::SERVICE_RANKING] = 0;
+    ServiceRegistration<ServiceListenerHook> listenerHookReg1
+        = context.RegisterService<ServiceListenerHook>(serviceListenerHook1, hookProps1);
+
+    ServiceProperties hookProps2;
+    hookProps2[Constants::SERVICE_RANKING] = 10;
+    ServiceRegistration<ServiceListenerHook> listenerHookReg2
+        = context.RegisterService<ServiceListenerHook>(serviceListenerHook2, hookProps2);
+
+    context.AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
+
+    context.AddServiceListener(&serviceListener1,
+                               &TestServiceListener::ServiceChanged,
+                               LDAPProp(Constants::OBJECTCLASS) == "blub");
+
+    context.RemoveServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
+    context.RemoveServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged);
+
+    listenerHookReg2.Unregister();
+    listenerHookReg1.Unregister();
+}
+
+TEST_F(ServiceHooksTest, TestFindHookCallbackOrdering)
+{
+    auto serviceFindHook1 = std::make_shared<MockServiceFindHook>();
+    auto serviceFindHook2 = std::make_shared<MockServiceFindHook>();
+
+    ::testing::InSequence s;
+    EXPECT_CALL(*serviceFindHook2, Find(::testing::_, ::testing::_, ::testing::_, ::testing::_));
+    EXPECT_CALL(*serviceFindHook1, Find(::testing::_, ::testing::_, ::testing::_, ::testing::_));
+    EXPECT_CALL(*serviceFindHook2, Find(::testing::_, ::testing::_, ::testing::_, ::testing::_));
+    EXPECT_CALL(*serviceFindHook1, Find(::testing::_, ::testing::_, ::testing::_, ::testing::_));
+
+    ServiceProperties hookProps1;
+    hookProps1[Constants::SERVICE_RANKING] = 0;
+    ServiceRegistration<ServiceFindHook> findHookReg1
+        = context.RegisterService<ServiceFindHook>(serviceFindHook1, hookProps1);
+
+    ServiceProperties hookProps2;
+    hookProps2[Constants::SERVICE_RANKING] = 10;
+    ServiceRegistration<ServiceFindHook> findHookReg2
+        = context.RegisterService<ServiceFindHook>(serviceFindHook2, hookProps2);
+
+    TestServiceListener serviceListener;
+    context.AddServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
+
+    auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleA");
+
+    bundle.Start();
+
+    std::vector<ServiceReferenceU> refs = context.GetServiceReferences("cppmicroservices::TestBundleAService");
+    ServiceReferenceU ref = context.GetServiceReference("cppmicroservices::TestBundleAService");
+
+    findHookReg2.Unregister();
+    findHookReg1.Unregister();
+
+    bundle.Stop();
+
+    context.RemoveServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
+}
+
+TEST_F(ServiceHooksTest, TestEventListenerHookCallbackOrdering)
+{
+    TestServiceListener serviceListener1;
+    TestServiceListener serviceListener2;
+    context.AddServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
+    context.AddServiceListener(&serviceListener2,
+                               &TestServiceListener::ServiceChanged,
+                               LDAPProp(Constants::OBJECTCLASS) == "bla");
+
+    auto serviceEventListenerHook1 = std::make_shared<MockServiceEventListenerHook>();
+    auto serviceEventListenerHook2 = std::make_shared<MockServiceEventListenerHook>();
+
+    ::testing::InSequence s;
+    EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_)).Times(2);
+    EXPECT_CALL(*serviceEventListenerHook2, Event(::testing::_, ::testing::_));
+    EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_));
+    EXPECT_CALL(*serviceEventListenerHook2, Event(::testing::_, ::testing::_));
+    EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_));
+    EXPECT_CALL(*serviceEventListenerHook2, Event(::testing::_, ::testing::_));
+    EXPECT_CALL(*serviceEventListenerHook1, Event(::testing::_, ::testing::_));
+
+    ServiceProperties hookProps1;
+    hookProps1[Constants::SERVICE_RANKING] = 10;
+    ServiceRegistration<ServiceEventListenerHook> eventListenerHookReg1
+        = context.RegisterService<ServiceEventListenerHook>(serviceEventListenerHook1, hookProps1);
+
+    ServiceProperties hookProps2;
+    hookProps2[Constants::SERVICE_RANKING] = 0;
+    ServiceRegistration<ServiceEventListenerHook> eventListenerHookReg2
+        = context.RegisterService<ServiceEventListenerHook>(serviceEventListenerHook2, hookProps2);
+
+    auto bundle = cppmicroservices::testing::InstallLib(context, "TestBundleA");
+
+    bundle.Start();
+
+    bundle.Stop();
+
+    eventListenerHookReg2.Unregister();
+    eventListenerHookReg1.Unregister();
+
+    context.RemoveServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
+    context.RemoveServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged);
 }
 
 US_MSVC_POP_WARNING

@@ -284,6 +284,6 @@ namespace cppmicroservices
 
 } // namespace cppmicroservices
 
-#include "cppmicroservices/detail/BundleAbstractTracked.tpp"
+#include "cppmicroservices/detail/BundleAbstractTracked.hpp"
 
 #endif // CPPMICROSERVICES_BUNDLEABSTRACTTRACKED_H

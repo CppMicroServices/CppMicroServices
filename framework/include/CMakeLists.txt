@@ -37,11 +37,11 @@ set(_public_headers
   cppmicroservices/ServiceRegistrationBase.h
   cppmicroservices/ServiceTracker.h
   cppmicroservices/ServiceTrackerCustomizer.h
-  cppmicroservices/detail/ServiceTracker.tpp
+  cppmicroservices/detail/ServiceTracker.hpp
   cppmicroservices/detail/ServiceTrackerPrivate.h
-  cppmicroservices/detail/ServiceTrackerPrivate.tpp
+  cppmicroservices/detail/ServiceTrackerPrivate.hpp
   cppmicroservices/detail/TrackedService.h
-  cppmicroservices/detail/TrackedService.tpp
+  cppmicroservices/detail/TrackedService.hpp
   cppmicroservices/detail/TrackedServiceListener.h
 
   cppmicroservices/Bundle.h
@@ -61,7 +61,7 @@ set(_public_headers
   cppmicroservices/GetBundleContext.h
   cppmicroservices/detail/BundleTrackerPrivate.h
   cppmicroservices/detail/BundleAbstractTracked.h
-  cppmicroservices/detail/BundleAbstractTracked.tpp
+  cppmicroservices/detail/BundleAbstractTracked.hpp
   cppmicroservices/detail/BundleResourceBuffer.h
   cppmicroservices/detail/ScopeGuard.h
   cppmicroservices/detail/CounterLatch.h

@@ -26,26 +26,191 @@
 #include "cppmicroservices/Constants.h"
 
 #include "absl/strings/str_cat.h"
+#include "absl/types/optional.h"
 
 #include "Properties.h"
 
 #include "PropsCheck.h"
 
+#include <algorithm>
+#include <bitset>
 #include <cctype>
 #include <cerrno>
 #include <cmath>
 #include <cstdlib>
+#include <functional>
 #include <iterator>
 #include <limits>
 #include <stdexcept>
 #include <utility>
+#include <vector>
 
 namespace cppmicroservices
 {
+    namespace
+    {
+        /**
+         * @brief split a delimited string into a vector of values
+         *
+         * String split from: https://stackoverflow.com/a/5506223/13030801
+         * This is the fasted string split algorithm that we could find.
+         *
+         * @param input a delimited string to split
+         * @param delimiter_list a string_view of characters representing delimiters
+         *
+         * @return a std::vector<std::string> of the delimited items from input
+         */
+        std::vector<std::string>
+        string_split(std::string const& input, absl::string_view delimiter_list)
+        {
+            std::vector<std::string> result;
+
+            // Initialize a set of boolean flags indexed by ascii character value, one bit per
+            // character. If the bit is 1, that character is a delimiter.
+            std::bitset<255> delim;
+            std::for_each(std::begin(delimiter_list), std::end(delimiter_list), [&delim](char c) { delim[c] = true; });
+
+            std::string::const_iterator beg;
+            bool in_token = false;
+            // Loop through the input string and check each character for a delimiter. If a
+            // delimiter is found, add the string processed so far to the result container.
+            for (auto it = std::begin(input); it != std::end(input); std::advance(it, 1))
+            {
+                // If *it is a delimiter, the value marked by the delimiter is the string between
+                // "beg" and "it"... save it off into the result container.
+                if (delim[*it])
+                {
+                    if (in_token)
+                    {
+                        // Only store a token if we're actually parsing a token.
+                        result.push_back(std::string(beg, it));
+                        in_token = false;
+                    }
+                }
+                else if (!in_token)
+                {
+                    // Found a non-delimiter character. If we're not currently processing a token,
+                    // mark that we've found the beginning of a token so the next characters are
+                    // part of the token.
+                    beg = it;
+                    in_token = true;
+                }
+            }
+            // deal with the boundary condition... the last token in input.
+            if (in_token)
+            {
+                result.push_back(std::string(beg, std::end(input)));
+            }
+
+            return result;
+        }
+
+        /**
+         * @brief Find value for attrName in map
+         *
+         * @tparam MapT the underlying storage class for the AnyMap.
+         *
+         * @param map an AnyMap with data to look up
+         * @param attrName a string naming the attribute to find
+         * @param get_value_from_map a function used to lookup values in map. Required because this
+         *        algorithm does not know the underlying storage of the AnyMap
+         * @param end_iter a function which returns the end iterator for the map. Required because
+         *        this algorithm does not know the underlying storage of the AnyMap
+         *
+         * @return a absl::optional const_iterator pointing to the found value. If the correct value
+         *         is not found, and empty absl::optional is returned.
+         */
+        template <typename MapT>
+        absl::optional<typename MapT::const_iterator>
+        find_attr_value_in_map(
+            AnyMap const* pPtr,
+            std::string const& attrName,
+            std::function<typename MapT::const_iterator(AnyMap const* p, std::string const& name)> get_value_from_map,
+            std::function<typename MapT::const_iterator(AnyMap const* p)> end_iter)
+        {
+            // short ciruit check. See if the full attrName is defined at the top level and return
+            // quickly if it is. We match this first to preserve existing behavior and only proceed
+            // to "walk down" the JSON tree if we don't find the value at the top level.
+            {
+                auto lookup = get_value_from_map(pPtr, attrName);
+                if (lookup != end_iter(pPtr))
+                {
+                    return lookup;
+                }
+            }
+
+            // If not found at the full attrname, decompose the path and do a full check.
+            // First, split the m_attrName into a vector at the . separator and reverse it.
+            auto scope = string_split(attrName, ".");
+            std::reverse(std::begin(scope), std::end(scope));
+
+            // Now, the scope vector contains all the segments in the key in reverse
+            // order. We are trying to "walk down" the AnyMap to a value.
+            //
+            // If m_attrName = "a.b.c.d",
+            // 1. the scope vector is ["d","c","b","a"]
+            // 2. pop "a" off the vector which now contains ["d","c","b"]
+            // 3. check to see if "a" is a key in pPtr
+            //    a. if it is a key, AND it's an any_map value, update pPtr to point to that
+            //       nested any_map, and continue to walk down that any_map for the rest of
+            //       the scope
+            //    b. if it is a key, and it is NOT an any_map value, stop the map
+            //       walking. If we've reached the bottom, then itr->second is what we want to
+            //       compare. If not, m_attrName does not exist in the map
+            // 4. If "a" is not a key in pPtr, repeat the steps in #3, but with "a.b" as the key.
+            //
+            // Basically, we need to check if there's a value at: "a.b.c","d", or
+            // "a.b","c","d", or "a.b","c.d", or "a","b.c.d" or "a","b.c","d", or
+            // "a","b","c.d", or "a","b","c.d", or "a","b","c","d"
+            auto iter = end_iter(pPtr);
+            std::string key {};
+            std::string sep {};
+            while (!scope.empty() && (iter == end_iter(pPtr)))
+            {
+                key += sep + scope.back();
+                sep = ".";
+                scope.pop_back();
+                iter = get_value_from_map(pPtr, key);
+                if (iter != end_iter(pPtr))
+                {
+                    // Attempt to cast the found value to an AnyMap.
+                    pPtr = any_cast<AnyMap const>(&iter->second);
+
+                    // If the found value is not an AnyMap, we can't "go down" the json tree any
+                    // further, so break out of the loop
+                    if (!pPtr)
+                    {
+                        break;
+                    }
+
+                    // If we get here, we've "walked down" another level in the json tree.
+                    if (!scope.empty())
+                    {
+                        // If the scope is not yet empty, reset the key, sep, and iter variables to
+                        // continue the walk down the json tree to the next level.
+                        key = "";
+                        sep = "";
+                        iter = end_iter(pPtr);
+                    }
+                }
+            }
+            if (scope.empty() && !pPtr)
+            {
+                // If we get to this point, we have found the right value only if the entire attr
+                // path has been processed, indicated by an empty scope vector AND a null pointer to
+                // the map.
+                return iter;
+            }
+            else
+            {
+                // return an empty object... we did not find a named attrName in the map.
+                return absl::nullopt;
+            }
+        }
+    } // namespace
 
     namespace LDAPExprConstants
     {
-
         static LDAPExpr::Byte
         WILDCARD()
         {
@@ -191,10 +356,10 @@ namespace cppmicroservices
         }
     }
 
-    LDAPExpr::LDAPExpr(int op, std::vector<LDAPExpr> const& args) : d(new LDAPExprData(op, args)) {}
+    LDAPExpr::LDAPExpr(int op, std::vector<LDAPExpr> const& args) : d(std::make_shared<LDAPExprData>(op, args)) {}
 
     LDAPExpr::LDAPExpr(int op, std::string const& attrName, std::string const& attrValue)
-        : d(new LDAPExprData(op, attrName, attrValue))
+        : d(std::make_shared<LDAPExprData>(op, attrName, attrValue))
     {
     }
 
@@ -209,7 +374,7 @@ namespace cppmicroservices
     {
         str.erase(0, str.find_first_not_of(' '));
         auto const last_not_space = str.find_last_not_of(' ');
-        if(last_not_space != std::string::npos)
+        if (last_not_space != std::string::npos)
         {
             str.erase(last_not_space + 1);
         }
@@ -342,100 +507,101 @@ namespace cppmicroservices
     bool
     LDAPExpr::Evaluate(PropertiesHandle const& p, bool matchCase) const
     {
-        if ((d->m_operator & SIMPLE) != 0)
-        {
-            auto v = p->Value_unlocked(d->m_attrName, matchCase);
-            return (!v.second) ? false : Compare(v.first, d->m_operator, d->m_attrValue);
-        }
-        else
-        { // (d->m_operator & COMPLEX) != 0
-            switch (d->m_operator)
-            {
-                case AND:
-                    for (auto const& m_arg : d->m_args)
-                    {
-                        if (!m_arg.Evaluate(p, matchCase))
-                            return false;
-                    }
-                    return true;
-                case OR:
-                    for (auto const& m_arg : d->m_args)
-                    {
-                        if (m_arg.Evaluate(p, matchCase))
-                            return true;
-                    }
-                    return false;
-                case NOT:
-                    return !d->m_args[0].Evaluate(p, matchCase);
-                default:
-                    return false; // Cannot happen
-            }
-        }
+        return Evaluate(p->GetPropsAnyMap(), matchCase);
     }
 
     bool
     LDAPExpr::Evaluate(AnyMap const& p, bool matchCase) const
     {
+        // Use a ptr instead of a reference so we can "walk down" the json tree by reassigning it to
+        // a nested level. You can't reassign references to point to a different object.
+        AnyMap const* pPtr = &p;
         if ((d->m_operator & SIMPLE) != 0)
         {
-            if (p.GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
+            if (pPtr->GetType() == AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
             {
-                auto itr = p.findUOCI_TypeChecked(d->m_attrName);
-                if (!matchCase && itr != p.endUOCI_TypeChecked())
+                auto value_iter = find_attr_value_in_map<any_map::unordered_any_cimap>(
+                    pPtr,
+                    d->m_attrName,
+                    [](AnyMap const* p, std::string const& key) { return p->findUOCI_TypeChecked(key); },
+                    [](AnyMap const* p) { return p->endUOCI_TypeChecked(); });
+
+                if (!matchCase && value_iter)
                 {
-                    return Compare(itr->second, d->m_operator, d->m_attrValue);
+                    return Compare(value_iter.value()->second, d->m_operator, d->m_attrValue);
                 }
-                else if (matchCase && itr != p.endUOCI_TypeChecked() && itr->first == d->m_attrName)
+                else if (matchCase && value_iter && value_iter.value()->first == d->m_attrName)
                 {
-                    return Compare(itr->second, d->m_operator, d->m_attrValue);
+                    return Compare(value_iter.value()->second, d->m_operator, d->m_attrValue);
                 }
                 else
                 {
                     return false;
                 }
             }
-            else if (p.GetType() == AnyMap::UNORDERED_MAP)
+            else if (pPtr->GetType() == AnyMap::UNORDERED_MAP)
             {
-                auto itr = p.findUO_TypeChecked(d->m_attrName);
-                if (itr != p.endUO_TypeChecked())
-                {
-                    return Compare(itr->second, d->m_operator, d->m_attrValue);
-                }
-
-                if (!matchCase)
-                {
-                    std::string const lower = LDAPExpr::ToLower(d->m_attrName);
-                    for (auto itr = p.beginUO_TypeChecked(); itr != p.endUO_TypeChecked(); ++itr)
+                auto value_iter = find_attr_value_in_map<any_map::unordered_any_map>(
+                    pPtr,
+                    d->m_attrName,
+                    [matchCase](AnyMap const* p, std::string const& key)
                     {
-                        if (itr->first == lower)
+                        auto value_iter = p->findUO_TypeChecked(key);
+                        if (!matchCase && value_iter == p->endUO_TypeChecked())
                         {
-                            return Compare(p.findUO_TypeChecked(lower)->second, d->m_operator, d->m_attrValue);
+                            for (value_iter = p->beginUO_TypeChecked(); value_iter != p->endUO_TypeChecked();
+                                 ++value_iter)
+                            {
+                                std::string lower = LDAPExpr::ToLower(key);
+                                if (LDAPExpr::ToLower(value_iter->first) == lower)
+                                {
+                                    return value_iter;
+                                }
+                            }
+                            return p->endUO_TypeChecked();
                         }
-                    }
-                    return false;
+
+                        return value_iter;
+                    },
+                    [](AnyMap const* p) { return p->endUO_TypeChecked(); });
+
+                if (value_iter)
+                {
+                    return Compare(value_iter.value()->second, d->m_operator, d->m_attrValue);
                 }
 
                 return false;
             }
-            else if (p.GetType() == AnyMap::ORDERED_MAP)
+            else if (pPtr->GetType() == AnyMap::ORDERED_MAP)
             {
-                auto itr = p.findOM_TypeChecked(d->m_attrName);
-                if (itr != p.endOM_TypeChecked())
-                {
-                    return Compare(itr->second, d->m_operator, d->m_attrValue);
-                }
-
-                if (!matchCase)
-                {
-                    std::string const lower = LDAPExpr::ToLower(d->m_attrName);
-                    for (auto itr = p.beginOM_TypeChecked(); itr != p.endOM_TypeChecked(); ++itr)
+                auto value_iter = find_attr_value_in_map<any_map::ordered_any_map>(
+                    pPtr,
+                    d->m_attrName,
+                    [matchCase](AnyMap const* p, std::string const& key)
                     {
-                        if (itr->first == lower)
+                        auto value_iter = p->findOM_TypeChecked(key);
+                        if (!matchCase && value_iter == p->endOM_TypeChecked())
                         {
-                            return Compare(p.findOM_TypeChecked(lower)->second, d->m_operator, d->m_attrValue);
+                            for (auto value_iter = p->beginOM_TypeChecked(); value_iter != p->endOM_TypeChecked();
+                                 ++value_iter)
+                            {
+                                std::string lower = LDAPExpr::ToLower(key);
+                                if (LDAPExpr::ToLower(value_iter->first) == lower)
+                                {
+                                    return value_iter;
+                                }
+                            }
+
+                            return p->endOM_TypeChecked();
                         }
-                    }
-                    return false;
+
+                        return value_iter;
+                    },
+                    [](AnyMap const* p) { return p->endOM_TypeChecked(); });
+
+                if (value_iter)
+                {
+                    return Compare(value_iter.value()->second, d->m_operator, d->m_attrValue);
                 }
 
                 return false;

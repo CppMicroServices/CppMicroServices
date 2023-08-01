@@ -1,24 +1,24 @@
- /*=============================================================================
+/*=============================================================================
 
-  Library: CppMicroServices
+ Library: CppMicroServices
 
-  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
-  file at the top-level directory of this distribution and at
-  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
+ Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+ file at the top-level directory of this distribution and at
+ https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
 
-  =============================================================================*/
+ =============================================================================*/
 
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/SecurityException.h"
@@ -50,7 +50,6 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
-
         std::atomic<unsigned long> ComponentConfigurationImpl::idCounter(0);
 
         ComponentConfigurationImpl::ComponentConfigurationImpl(
@@ -71,7 +70,7 @@ namespace cppmicroservices
             , deleteCompInstanceFunc(nullptr)
         {
             if (!this->metadata || !this->bundle || !this->registry || !this->logger || !this->configNotifier)
-           {
+            {
                 throw std::invalid_argument("ComponentConfigurationImpl - Invalid arguments passed to constructor");
             }
 
@@ -141,7 +140,7 @@ namespace cppmicroservices
                         props.emplace(item.first, item.second);
                     }
                 }
-                else 
+                else
                 {
                     props = metadata->properties;
                 }
@@ -181,9 +180,24 @@ namespace cppmicroservices
             }
             else
             {
+                std::shared_ptr<std::set<unsigned long>> refSet = std::make_shared<std::set<unsigned long>>();
                 for (auto& kv : referenceManagers)
                 {
                     auto& refManager = kv.second;
+                    auto config = GetConfiguration(refManager);
+
+                    // ensure we don't visit this node twice
+                    refSet->insert(config->GetId());
+
+                    // check if current reference depends on this componentConfiguration
+                    bool circularRef = config->IsDependentOn(GetId(), refSet);
+                    if (circularRef)
+                    {
+                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                    "Circular Reference.",
+                                    std::current_exception());
+                        throw;
+                    }
                     auto token = refManager->RegisterListener(
                         std::bind(&ComponentConfigurationImpl::RefChangedState, this, std::placeholders::_1));
                     referenceManagerTokens.emplace(refManager, token);
@@ -547,6 +561,64 @@ namespace cppmicroservices
             }
             componentInstance->Activate();
             return std::make_pair(componentInstance, ctxt);
+        }
+
+        bool
+        ComponentConfigurationImpl::IsDependentOn(unsigned long serviceID,
+                                                  std::shared_ptr<std::set<unsigned long>> dependents)
+        {
+            auto metadata = GetMetadata();
+            // all referenced services
+            for (auto refMetadata : metadata->refsMetadata)
+            {
+                // get it's referenceManager
+                auto const refManager = GetDependencyManager(refMetadata.name);
+
+                auto configuration = GetConfiguration(refManager);
+
+                // get to a unique identifier
+                unsigned long uniqueID = configuration->GetId();
+
+                // check if this reference is the original service
+                if (uniqueID == serviceID)
+                {
+                    return true;
+                }
+
+                // if we have not visited this node in past
+                if (dependents->find(uniqueID) == dependents->end())
+                {
+                    // verify we don't visit twice
+                    dependents->insert(uniqueID);
+                    // be able to call IsDependentOn on an object
+                    if (configuration->IsDependentOn(serviceID, dependents))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        std::shared_ptr<ComponentConfiguration>
+        ComponentConfigurationImpl::GetConfiguration(std::shared_ptr<ReferenceManager> refManager)
+        {
+            auto const& refName = refManager->GetReferenceName();
+
+            // How can we get the bundleID from a reference manager
+            unsigned long bundleID = 0;
+
+            // Why can't I use the registry?
+
+            std::shared_ptr<ComponentRegistry> reg = GetRegistry();
+            auto compManager = reg->GetComponentManager(bundleID, refName);
+
+            // why is this a vector? why can a component have multiple componentConfiguratoinObjects?
+            auto configurations = compManager->GetComponentConfigurations();
+
+            auto configuration = configurations[0];
+
+            return configuration;
         }
     } // namespace scrimpl
 } // namespace cppmicroservices

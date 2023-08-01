@@ -41,6 +41,7 @@
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"
 #include "states/ComponentConfigurationState.hpp"
+#include "../ComponentRegistry.hpp"
 
 using cppmicroservices::scrimpl::ReferenceManager;
 using cppmicroservices::service::component::detail::ComponentInstance;
@@ -54,11 +55,7 @@ namespace cppmicroservices
             InstanceContextPair;
         struct ListenerToken final
         {
-            ListenerToken(std::string pid, const ListenerTokenId tokenId)
-                : pid(std::move(pid))
-                , tokenId(tokenId)
-            {
-            }
+            ListenerToken(std::string pid, const ListenerTokenId tokenId) : pid(std::move(pid)), tokenId(tokenId) {}
             std::string pid;
             ListenerTokenId tokenId;
         };
@@ -164,7 +161,6 @@ namespace cppmicroservices
                 return metadata;
             };
 
-            
             /**
              * Method to check if this component provides a service
              *
@@ -314,6 +310,8 @@ namespace cppmicroservices
              */
             virtual void UnbindReference(std::string const& refName, ServiceReferenceBase const& ref) = 0;
 
+            bool IsDependentOn(unsigned long service, std::shared_ptr<std::set<unsigned long>> dependents);
+
           protected:
             /**
              * This method is responsible for creating a {@link ComponentInstance} object
@@ -391,6 +389,8 @@ namespace cppmicroservices
              * and destroy the {@link ComponentInstance} objects from a bundle.
              */
             void LoadComponentCreatorDestructor();
+
+            std::shared_ptr<ComponentConfiguration> GetConfiguration(std::shared_ptr<ReferenceManager> refManager);
 
             /**
              * Friends used in unittests

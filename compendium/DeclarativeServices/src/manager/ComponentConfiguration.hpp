@@ -106,6 +106,8 @@ namespace cppmicroservices
              */
             virtual std::shared_ptr<const cppmicroservices::scrimpl::metadata::ComponentMetadata> GetMetadata() const
                 = 0;
+
+            virtual bool IsDependentOn(unsigned long service, std::shared_ptr<std::set<unsigned long>> dependents) = 0;
         };
     } // namespace scrimpl
 } // namespace cppmicroservices

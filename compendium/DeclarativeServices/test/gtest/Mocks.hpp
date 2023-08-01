@@ -265,6 +265,8 @@ namespace cppmicroservices
             MOCK_CONST_METHOD0(GetId, unsigned long(void));
             MOCK_CONST_METHOD0(GetConfigState, ComponentState(void));
             MOCK_CONST_METHOD0(GetMetadata, std::shared_ptr<const metadata::ComponentMetadata>(void));
+            MOCK_METHOD2(IsDependentOn,
+                               bool(unsigned long service, std::shared_ptr<std::set<unsigned long>> dependents));
         };
 
         class MockFactory : public cppmicroservices::ServiceFactory
@@ -336,7 +338,7 @@ namespace cppmicroservices
                                      std::shared_ptr<cppmicroservices::logservice::LogService> logger,
                                      std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
                                      std::shared_ptr<ConfigurationNotifier> notifier)
-               : ComponentManagerImpl(metadata, registry, bundleContext, logger, asyncWorkService, notifier)
+                : ComponentManagerImpl(metadata, registry, bundleContext, logger, asyncWorkService, notifier)
                 , statechangecount(0)
             {
             }

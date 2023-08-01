@@ -237,7 +237,8 @@ namespace cppmicroservices
                 {
                     GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                                      "Exception received from user code while binding "
-                                     "service reference" + refName + ".",
+                                     "service reference"
+                                         + refName + ".",
                                      std::current_exception());
                 }
             }
@@ -260,7 +261,8 @@ namespace cppmicroservices
                 {
                     GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                                      "Exception received from user code while unbinding "
-                                     "service reference" + refName + ".",
+                                     "service reference"
+                                         + refName + ".",
                                      std::current_exception());
                 }
 

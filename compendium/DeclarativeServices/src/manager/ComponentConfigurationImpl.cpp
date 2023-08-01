@@ -180,24 +180,9 @@ namespace cppmicroservices
             }
             else
             {
-                std::shared_ptr<std::set<unsigned long>> refSet = std::make_shared<std::set<unsigned long>>();
                 for (auto& kv : referenceManagers)
                 {
                     auto& refManager = kv.second;
-                    auto config = GetConfiguration(refManager);
-
-                    // ensure we don't visit this node twice
-                    refSet->insert(config->GetId());
-
-                    // check if current reference depends on this componentConfiguration
-                    bool circularRef = config->IsDependentOn(GetId(), refSet);
-                    if (circularRef)
-                    {
-                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                    "Circular Reference.",
-                                    std::current_exception());
-                        throw;
-                    }
                     auto token = refManager->RegisterListener(
                         std::bind(&ComponentConfigurationImpl::RefChangedState, this, std::placeholders::_1));
                     referenceManagerTokens.emplace(refManager, token);
@@ -397,6 +382,24 @@ namespace cppmicroservices
         {
             SatisfiedFunctor f
                 = std::for_each(referenceManagers.begin(), referenceManagers.end(), SatisfiedFunctor(refName));
+
+            std::shared_ptr<std::set<unsigned long>> refSet = std::make_shared<std::set<unsigned long>>();
+
+            auto refManager = GetDependencyManager(refName);
+            auto config = GetConfiguration(refManager);
+
+            // ensure we don't visit this node twice
+            refSet->insert(config->GetId());
+
+            // check if current reference depends on this componentConfiguration
+            bool circularRef = config->IsDependentOn(GetId(), refSet);
+            if (circularRef)
+            {
+                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                            "Circular Reference.",
+                            std::current_exception());
+                throw;
+            }
             if (configManager != nullptr)
             {
                 if (!configManager->IsConfigSatisfied())
@@ -606,7 +609,14 @@ namespace cppmicroservices
             auto const& refName = refManager->GetReferenceName();
 
             // How can we get the bundleID from a reference manager
-            unsigned long bundleID = 0;
+
+            auto references = refManager->GetTargetReferences();
+
+            auto exampleRef = *references.begin();
+
+            auto bundle = exampleRef.GetBundle();
+
+            unsigned long bundleID = bundle.GetBundleId();
 
             // Why can't I use the registry?
 

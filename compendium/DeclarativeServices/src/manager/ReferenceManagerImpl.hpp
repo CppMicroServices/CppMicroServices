@@ -103,6 +103,12 @@ namespace cppmicroservices
                 return metadata_.target;
             }
 
+            long
+            GetBundleId() const override
+            {
+                return bundleId;
+            }
+
             /**
              * Returns \c true if the dependency is satisfied, \c false otherwise
              */
@@ -269,11 +275,12 @@ namespace cppmicroservices
              */
             void BatchNotifyAllListeners(std::vector<RefChangeNotification> const& notification) noexcept;
 
-            const metadata::ReferenceMetadata metadata_;    ///< reference information from the component description
+            const metadata::ReferenceMetadata metadata_;   ///< reference information from the component description
             std::unique_ptr<ServiceTracker<void>> tracker; ///< used to track service availability
             std::shared_ptr<cppmicroservices::logservice::LogService> logger_; ///< logger for this runtime
             const std::string
                 configName_; ///< Keep track of which component configuration object this reference manager belongs to.
+            unsigned long bundleId;
 
             mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>>
                 boundRefs; ///< guarded set of bound references

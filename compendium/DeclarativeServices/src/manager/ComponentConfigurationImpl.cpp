@@ -387,7 +387,7 @@ namespace cppmicroservices
             std::shared_ptr<std::set<unsigned long>> refSet = std::make_shared<std::set<unsigned long>>();
 
             auto refManager = GetDependencyManager(refName);
-            if (!refManager->IsOptional())
+            if (!refManager->IsOptional() && true)
             {
                 auto config = GetConfiguration(refManager);
 
@@ -617,29 +617,28 @@ namespace cppmicroservices
         {
             auto const& refName = refManager->GetReferenceName();
 
+            // add bundleid to referenceManager
+            // get a component manager
+            // get the configurations (specific to the bundle)
+            // search through that array for the configuration with the proper name and bundlID
+
             // How can we get the bundleID from a reference manager
-
-            auto references = refManager->GetTargetReferences();
-
-            std::cout << references.size() << std::endl;
-
-            auto exampleRef = *references.begin();
-
-            auto bundle = exampleRef.GetBundle();
-
-            unsigned long bundleID = bundle.GetBundleId();
-
-            // Why can't I use the registry?
+            long bundleID = refManager->GetBundleId();
 
             std::shared_ptr<ComponentRegistry> reg = GetRegistry();
             auto compManager = reg->GetComponentManager(bundleID, refName);
 
             // why is this a vector? why can a component have multiple componentConfiguratoinObjects?
-            auto configurations = compManager->GetComponentConfigurations();
+            auto configs = compManager->GetComponentConfigurations();
 
-            auto configuration = configurations[0];
+            std::shared_ptr<ComponentConfiguration> config;
+            for (auto& c : configs) {
+                if (c->GetBundle().GetBundleId() == bundleID){
+                    config = c;
+                }
+            }
 
-            return configuration;
+            return config;
         }
     } // namespace scrimpl
 } // namespace cppmicroservices

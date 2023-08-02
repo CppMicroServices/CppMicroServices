@@ -227,6 +227,7 @@ namespace cppmicroservices
                          cppmicroservices::ListenerTokenId(std::function<void(RefChangeNotification const&)>));
             MOCK_METHOD1(UnregisterListener, void(cppmicroservices::ListenerTokenId));
             MOCK_METHOD0(StopTracking, void(void));
+            MOCK_CONST_METHOD0(GetBundleId, long(void));
         };
 
         class MockReferenceManagerBaseImpl : public ReferenceManagerBaseImpl
@@ -266,7 +267,7 @@ namespace cppmicroservices
             MOCK_CONST_METHOD0(GetConfigState, ComponentState(void));
             MOCK_CONST_METHOD0(GetMetadata, std::shared_ptr<const metadata::ComponentMetadata>(void));
             MOCK_METHOD2(IsDependentOn,
-                               bool(unsigned long service, std::shared_ptr<std::set<unsigned long>> dependents));
+                         bool(unsigned long service, std::shared_ptr<std::set<unsigned long>> dependents));
         };
 
         class MockFactory : public cppmicroservices::ServiceFactory

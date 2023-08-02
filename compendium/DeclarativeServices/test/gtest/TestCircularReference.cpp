@@ -44,8 +44,7 @@ namespace cppmicroservices
 
         TEST(TestCircularReference, circularReferenceOptionalTest)
         {
-
-            auto mockRegistry = std::make_shared<MockComponentRegistry>();
+            auto mockRegistry = std::make_shared<ComponentRegistry>();
             auto fakeLogger = std::make_shared<FakeLogger>();
 
             // service component A requires a reference to a service from service component B and B
@@ -112,7 +111,7 @@ namespace cppmicroservices
 
         TEST(TestCircularReference, circularReferenceMandatoryTest)
         {
-            auto mockRegistry = std::make_shared<MockComponentRegistry>();
+            auto mockRegistry = std::make_shared<ComponentRegistry>();
             auto fakeLogger = std::make_shared<FakeLogger>();
 
             // service component A requires a reference to a service from service component B and B

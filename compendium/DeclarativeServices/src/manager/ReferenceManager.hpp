@@ -103,6 +103,8 @@ namespace cppmicroservices
              */
             virtual std::string GetLDAPString() const = 0;
 
+            virtual long GetBundleId() const = 0;
+
             /**
              * Returns true if the reference is satisfied, false otherwise.
              */

@@ -1,0 +1,25 @@
+{
+  "bundle.symbolic_name": "TestBundleCircular01",
+  "bundle.activator": false,
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "enabled": true,
+        "immediate": false,
+        "implementation-class": "sample::ServiceComponentCircular1",
+        "configuration-policy": "optional",
+        "configuration-pid": [ "sample::ServiceComponentCircular1" ],
+        "service": {
+          "interfaces": [ "test::CircularInterface1" ],
+          "scope": "singleton"
+        },
+        "references": [{
+            "name": "ref",
+            "interface": "test::CircularInterface2",
+            "cardinality": "1..1"
+        }]
+      }
+    ]
+  }
+}

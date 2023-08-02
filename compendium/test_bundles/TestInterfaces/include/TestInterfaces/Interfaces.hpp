@@ -180,6 +180,18 @@ namespace test
         virtual bool isDependencyInjected() = 0;
         virtual ~CAInterface1();
     };
+
+    class US_TestInterfaces_EXPORT CircularInterface2
+    {
+      public:
+        virtual ~CircularInterface2();
+    };
+
+    class US_TestInterfaces_EXPORT CircularInterface1
+    {
+      public:
+        virtual ~CircularInterface1();
+    };
 } // namespace test
 
 #endif

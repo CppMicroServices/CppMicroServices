@@ -113,6 +113,9 @@ namespace test
             test::InstallLib(context, "TestBundleDSCA24");
             test::InstallLib(context, "TestBundleDSCA26");
             test::InstallLib(context, "TestBundleDSCA27");
+            test::InstallLib(context, "TestBundleCircular01");
+            test::InstallLib(context, "TestBundleCircular02");
+
 #endif
 
 #ifndef US_BUILD_SHARED_LIBS

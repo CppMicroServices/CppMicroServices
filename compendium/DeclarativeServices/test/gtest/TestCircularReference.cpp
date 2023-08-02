@@ -16,164 +16,81 @@
 
 namespace scr = cppmicroservices::service::component::runtime;
 
-namespace cppmicroservices
+/*=============================================================================
+
+  Library: CppMicroServices
+
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+  =============================================================================*/
+
+#include <chrono>
+
+#include <gtest/gtest.h>
+
+#include <TestInterfaces/Interfaces.hpp>
+#include <cppmicroservices/Bundle.h>
+#include <cppmicroservices/BundleContext.h>
+#include <cppmicroservices/BundleEvent.h>
+#include <cppmicroservices/Framework.h>
+#include <cppmicroservices/FrameworkEvent.h>
+#include <cppmicroservices/FrameworkFactory.h>
+#include <cppmicroservices/ServiceTracker.h>
+#include <cppmicroservices/servicecomponent/ComponentConstants.hpp>
+#include <cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp>
+
+#include "../TestUtils.hpp"
+
+namespace test
 {
-    namespace scrimpl
+
+    TEST(TestCircularReference, circularReferenceOptionalTest)
     {
-        metadata::ReferenceMetadata
-        CreateReferenceMetadata(std::string intName, std::string cardinality, int min, int max)
-        {
-            metadata::ReferenceMetadata fakeMetadata {};
-            fakeMetadata.name = "ref";
-            fakeMetadata.interfaceName = intName;
-            fakeMetadata.cardinality = cardinality;
-            fakeMetadata.minCardinality = min;
-            fakeMetadata.maxCardinality = max;
-            return fakeMetadata;
-        }
+        auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+        framework.Start();
+        EXPECT_TRUE(framework);
 
-        std::shared_ptr<metadata::ComponentMetadata>
-        CreateComponentMetadata(std::string name)
-        {
-            auto ret = std::make_shared<metadata::ComponentMetadata>();
-            ret->implClassName = name;
-            ret->name = name;
+        auto dsPluginPath = test::GetDSRuntimePluginFilePath();
+        auto context = framework.GetBundleContext();
 
-            return ret;
-        }
+        test::InstallAndStartDS(context);
 
-        TEST(TestCircularReference, circularReferenceOptionalTest)
-        {
-            auto mockRegistry = std::make_shared<ComponentRegistry>();
-            auto fakeLogger = std::make_shared<FakeLogger>();
+        // The names of the bundles do matter here. The bundle containing the dependency MUST
+        // be stopped after the one providing the dependency. CppMicroServices stores bundles
+        // in sorted order by path.
 
-            // service component A requires a reference to a service from service component B and B
-            // requires a reference to a service from service component A.
-            // Optional cardinality on B breaks the cycle and allows
-            // the service components to be satisfied.
-            auto nameA = us_service_interface_iid<dummy::Reference1>();
-            auto nameB = us_service_interface_iid<dummy::Reference2>();
+        auto bundleA = test::InstallAndStartBundle(context, "TestBundleCircular01");
+        ASSERT_TRUE(bundleA);
+        bundleA.Start();
 
-            auto componentAMetadata = CreateComponentMetadata(nameA);
-            auto componentBMetadata = CreateComponentMetadata(nameB);
+        auto bundleB = test::InstallAndStartBundle(context, "TestBundleCircular02");
+        ASSERT_TRUE(bundleB);
+        bundleB.Start();
 
-            metadata::ReferenceMetadata referenceA = CreateReferenceMetadata(nameA, "1..1", 1, 1);
-            metadata::ReferenceMetadata referenceB = CreateReferenceMetadata(nameB, "0..1", 0, 1);
+        auto refA = context.GetServiceReference<test::CircularInterface1>();
 
-            componentAMetadata->refsMetadata.emplace_back(referenceB);
-            componentBMetadata->refsMetadata.emplace_back(referenceA);
+        auto refB = context.GetServiceReference<test::CircularInterface2>();
 
-            componentAMetadata->serviceMetadata.interfaces.emplace_back(referenceA.interfaceName);
-            componentBMetadata->serviceMetadata.interfaces.emplace_back(referenceB.interfaceName);
+        // assert that references are invalid with unsatisfied configuration
+        ASSERT_EQ(refA.operator bool(), false);
+        ASSERT_EQ(refB.operator bool(), false);
 
-            auto framework = cppmicroservices::FrameworkFactory().NewFramework();
-            framework.Start();
-            auto context = framework.GetBundleContext();
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+    }
 
-            auto asyncWorkSvc = std::make_shared<SCRAsyncWorkService>(context, fakeLogger);
-
-            auto logger = std::make_shared<SCRLogger>(context);
-            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
-
-            auto configNotifier
-                = std::make_shared<ConfigurationNotifier>(context, fakeLogger, asyncWorkSvc, extRegistry);
-
-            auto componentA = std::make_shared<SingletonComponentConfigurationImpl>(componentAMetadata,
-                                                                                    framework,
-                                                                                    mockRegistry,
-                                                                                    fakeLogger,
-                                                                                    configNotifier);
-            auto componentB = std::make_shared<SingletonComponentConfigurationImpl>(componentBMetadata,
-                                                                                    framework,
-                                                                                    mockRegistry,
-                                                                                    fakeLogger,
-                                                                                    configNotifier);
-            componentB->Initialize();
-            auto refB = context.GetServiceReference<dummy::Reference2>();
-            ASSERT_EQ(refB.operator bool(), false);
-
-            componentA->Initialize();
-            auto refA = context.GetServiceReference<dummy::Reference1>();
-
-            refB = context.GetServiceReference<dummy::Reference2>();
-            // assert that references are invalid with unsatisfied configuration
-            ASSERT_EQ(refA.operator bool(), true);
-            ASSERT_EQ(refB.operator bool(), true);
-
-            ASSERT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::SATISFIED,
-                      componentA->GetState()->GetValue());
-            ASSERT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::SATISFIED,
-                      componentB->GetState()->GetValue());
-
-            framework.Stop();
-            framework.WaitForStop(std::chrono::milliseconds::zero());
-        }
-
-        TEST(TestCircularReference, circularReferenceMandatoryTest)
-        {
-            auto mockRegistry = std::make_shared<ComponentRegistry>();
-            auto fakeLogger = std::make_shared<FakeLogger>();
-
-            // service component A requires a reference to a service from service component B and B
-            // requires a reference to a service from service component A.
-            // In this case, neither A nor B will be satisfied and an error should be
-            // logged about detecting a circular dependency.
-            auto nameA = us_service_interface_iid<dummy::Reference1>();
-            auto nameB = us_service_interface_iid<dummy::Reference2>();
-
-            auto componentAMetadata = CreateComponentMetadata(nameA);
-            auto componentBMetadata = CreateComponentMetadata(nameB);
-
-            metadata::ReferenceMetadata referenceA = CreateReferenceMetadata(nameA, "1..1", 1, 1);
-            metadata::ReferenceMetadata referenceB = CreateReferenceMetadata(nameB, "1..1", 1, 1);
-
-            componentAMetadata->refsMetadata.emplace_back(referenceB);
-            componentBMetadata->refsMetadata.emplace_back(referenceA);
-
-            componentAMetadata->serviceMetadata.interfaces.emplace_back(referenceA.interfaceName);
-            componentBMetadata->serviceMetadata.interfaces.emplace_back(referenceB.interfaceName);
-
-            auto framework = cppmicroservices::FrameworkFactory().NewFramework();
-            framework.Start();
-            auto context = framework.GetBundleContext();
-
-            auto asyncWorkSvc = std::make_shared<SCRAsyncWorkService>(context, fakeLogger);
-
-            auto logger = std::make_shared<SCRLogger>(context);
-            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
-
-            auto configNotifier
-                = std::make_shared<ConfigurationNotifier>(context, fakeLogger, asyncWorkSvc, extRegistry);
-
-            auto componentA = std::make_shared<SingletonComponentConfigurationImpl>(componentAMetadata,
-                                                                                    framework,
-                                                                                    mockRegistry,
-                                                                                    fakeLogger,
-                                                                                    configNotifier);
-            auto componentB = std::make_shared<SingletonComponentConfigurationImpl>(componentBMetadata,
-                                                                                    framework,
-                                                                                    mockRegistry,
-                                                                                    fakeLogger,
-                                                                                    configNotifier);
-
-            componentA->Initialize();
-            componentB->Initialize();
-
-            auto refA = context.GetServiceReference<dummy::Reference1>();
-            auto refB = context.GetServiceReference<dummy::Reference2>();
-
-            // assert that references are invalid with unsatisfied configuration
-            ASSERT_EQ(refA.operator bool(), false);
-            ASSERT_EQ(refB.operator bool(), false);
-
-            // component should not be satisfied
-            ASSERT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE,
-                      componentA->GetState()->GetValue());
-            ASSERT_EQ(cppmicroservices::service::component::runtime::dto::ComponentState::UNSATISFIED_REFERENCE,
-                      componentB->GetState()->GetValue());
-
-            framework.Stop();
-            framework.WaitForStop(std::chrono::milliseconds::zero());
-        }
-    } // namespace scrimpl
-} // namespace cppmicroservices
+} // namespace test

@@ -383,23 +383,28 @@ namespace cppmicroservices
             SatisfiedFunctor f
                 = std::for_each(referenceManagers.begin(), referenceManagers.end(), SatisfiedFunctor(refName));
 
+            // map for tracking circularReferences
             std::shared_ptr<std::set<unsigned long>> refSet = std::make_shared<std::set<unsigned long>>();
 
             auto refManager = GetDependencyManager(refName);
-            auto config = GetConfiguration(refManager);
-
-            // ensure we don't visit this node twice
-            refSet->insert(config->GetId());
-
-            // check if current reference depends on this componentConfiguration
-            bool circularRef = config->IsDependentOn(GetId(), refSet);
-            if (circularRef)
+            if (!refManager->IsOptional())
             {
-                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                            "Circular Reference.",
-                            std::current_exception());
-                throw;
+                auto config = GetConfiguration(refManager);
+
+                // ensure we don't visit this node twice
+                refSet->insert(config->GetId());
+
+                // check if current reference depends on this componentConfiguration
+                bool circularRef = config->IsDependentOn(GetId(), refSet);
+                if (circularRef)
+                {
+                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                "Circular Reference.",
+                                std::current_exception());
+                    throw;
+                }
             }
+
             if (configManager != nullptr)
             {
                 if (!configManager->IsConfigSatisfied())
@@ -577,6 +582,10 @@ namespace cppmicroservices
                 // get it's referenceManager
                 auto const refManager = GetDependencyManager(refMetadata.name);
 
+                if (refManager->IsOptional())
+                {
+                    continue;
+                }
                 auto configuration = GetConfiguration(refManager);
 
                 // get to a unique identifier
@@ -611,6 +620,8 @@ namespace cppmicroservices
             // How can we get the bundleID from a reference manager
 
             auto references = refManager->GetTargetReferences();
+
+            std::cout << references.size() << std::endl;
 
             auto exampleRef = *references.begin();
 

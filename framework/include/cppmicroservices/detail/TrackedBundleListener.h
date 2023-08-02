@@ -35,16 +35,15 @@ namespace detail {
  */
 struct TrackedBundleListener
 {
-  virtual ~TrackedBundleListener() = default;
+    virtual ~TrackedBundleListener() = default;
 
-  /**
-   * Slot connected to bundle events for the
-   * <code>BundleTracker</code> class. This method must NOT be
-   * synchronized to avoid deadlock potential.
-   *
-   * @param event <code>BundleEvent</code> object from the framework.
-   */
-  virtual void BundleChanged(const BundleEvent& event) = 0;
+    /**
+     * Slot connected to bundle events for the
+     * <code>BundleTracker</code> class.
+     *
+     * @param event <code>BundleEvent</code> object from the framework.
+     */
+    virtual void BundleChanged(BundleEvent const& event) = 0;
 };
 
 } // namespace detail

@@ -46,16 +46,22 @@ namespace
     struct ServiceDependency2
     {
     };
+    struct ServiceDependency3
+    {
+    };
 
-    // Test class to simulate a servcie component
+    // Test class to simulate a service component
     class TestServiceImpl1 final
     {
       public:
         TestServiceImpl1() = default;
 
-        TestServiceImpl1(std::shared_ptr<ServiceDependency1> const& f, std::shared_ptr<ServiceDependency2> const& b)
+        TestServiceImpl1(std::shared_ptr<ServiceDependency1> const& f,
+                         std::shared_ptr<ServiceDependency2> const& b,
+                         std::vector<std::shared_ptr<ServiceDependency3>> const& c)
             : foo(f)
             , bar(b)
+            , baz(c)
         {
         }
 
@@ -86,11 +92,17 @@ namespace
         {
             return bar;
         }
+        std::vector<std::shared_ptr<ServiceDependency3>>
+        GetBaz() const
+        {
+            return baz;
+        }
 
       private:
         std::shared_ptr<ServiceDependency1> foo; // dynamic dependency - can change during the lifetime of this object
         const std::shared_ptr<ServiceDependency2>
             bar; // static dependency - does not change during the lifetime of this object
+        const std::vector<std::shared_ptr<ServiceDependency3>> baz; // static dependency with multiple cardinality
     };
 
     /**
@@ -111,9 +123,10 @@ namespace
         ComponentInstanceImpl<TestServiceImpl1,
                               std::tuple<>,
                               std::true_type,
-                              ServiceDependency2,
-                              ServiceDependency1>
-            compInstance(binders); // compile error
+                              std::shared_ptr<ServiceDependency2>,
+                              std::vector<std::shared_ptr<ServiceDependency3>>,
+                              std::shared_ptr<ServiceDependency1>>
+            compInstance({ "bar", "baz", "foo" }, binders); // compile error
     }
 } // namespace
 

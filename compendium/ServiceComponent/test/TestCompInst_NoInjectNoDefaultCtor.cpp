@@ -59,7 +59,7 @@ namespace
         ComponentInstanceImpl<TestServiceImpl,
                               std::tuple<>,
                               std::false_type,
-                              ServiceDependency>
+                              std::shared_ptr<ServiceDependency>>
             compInstance; // compile error
     }
 } // namespace

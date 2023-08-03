@@ -152,16 +152,18 @@ namespace
     // Test class to simulate a service component with service dependencies using multiple cardinality
     class TestServiceImpl2
     {
-    public:
-
-        TestServiceImpl2(std::vector<std::shared_ptr<ServiceDependency1>> const& d1, std::shared_ptr<ServiceDependency2> const& d2, std::vector<std::shared_ptr<ServiceDependency3>> const& d3)
+      public:
+        TestServiceImpl2(std::vector<std::shared_ptr<ServiceDependency1>> const& d1,
+                         std::shared_ptr<ServiceDependency2> const& d2,
+                         std::vector<std::shared_ptr<ServiceDependency3>> const& d3)
             : dep1Refs(d1)
             , dep2(d2)
             , dep3Refs(d3)
         {
         }
 
-        TestServiceImpl2(std::vector<std::shared_ptr<ServiceDependency1>> const& d1, std::shared_ptr<ServiceDependency2> const& d2)
+        TestServiceImpl2(std::vector<std::shared_ptr<ServiceDependency1>> const& d1,
+                         std::shared_ptr<ServiceDependency2> const& d2)
             : dep1Refs(d1)
             , dep2(d2)
             , dep3Refs({})
@@ -171,58 +173,59 @@ namespace
         virtual ~TestServiceImpl2() {}
 
         void
-            BindDep3(std::shared_ptr<ServiceDependency3> const& d3)
+        BindDep3(std::shared_ptr<ServiceDependency3> const& d3)
         {
-            if (std::find(dep3Refs.begin(), dep3Refs.end(), d3) == dep3Refs.end()) {
+            if (std::find(dep3Refs.begin(), dep3Refs.end(), d3) == dep3Refs.end())
+            {
                 dep3Refs.push_back(d3);
             }
         }
 
         void
-            UnbindDep3(std::shared_ptr<ServiceDependency3> const& d3)
+        UnbindDep3(std::shared_ptr<ServiceDependency3> const& d3)
         {
             auto pos = std::find(dep3Refs.begin(), dep3Refs.end(), d3);
-            if (pos != dep3Refs.end()) {
+            if (pos != dep3Refs.end())
+            {
                 *pos = nullptr;
                 dep3Refs.erase(pos);
             }
         }
 
         void
-            Activate(std::shared_ptr<ComponentContext> const&)
+        Activate(std::shared_ptr<ComponentContext> const&)
         {
-            //activated = true;
+            // activated = true;
         }
 
         void
-            Deactivate(std::shared_ptr<ComponentContext> const&)
+        Deactivate(std::shared_ptr<ComponentContext> const&)
         {
-            //activated = false;
+            // activated = false;
         }
 
         std::vector<std::shared_ptr<ServiceDependency1>>
-            GetDep1() const
+        GetDep1() const
         {
             return dep1Refs;
         }
 
         std::shared_ptr<ServiceDependency2>
-            GetDep2() const
+        GetDep2() const
         {
             return dep2;
         }
 
         std::vector<std::shared_ptr<ServiceDependency3>>
-            GetDep3() const
+        GetDep3() const
         {
             return dep3Refs;
         }
 
-    private:
+      private:
         const std::vector<std::shared_ptr<ServiceDependency1>> dep1Refs; // static dependency with multiple cardinality
-        const std::shared_ptr<ServiceDependency2> dep2; // static dependency with unary cardinality
-        std::vector<std::shared_ptr<ServiceDependency3>> dep3Refs; // dynamic dependency with multiple cardinality
-
+        const std::shared_ptr<ServiceDependency2> dep2;                  // static dependency with unary cardinality
+        std::vector<std::shared_ptr<ServiceDependency3>> dep3Refs;       // dynamic dependency with multiple cardinality
     };
 
     /**
@@ -381,9 +384,11 @@ namespace
         auto reg = fc.RegisterService<ServiceDependency1>(std::make_shared<ServiceDependency1>());
         auto reg1 = fc.RegisterService<ServiceDependency2>(std::make_shared<ServiceDependency2>());
 
-        ComponentInstanceImpl<TestServiceImpl1, std::tuple<>, std::shared_ptr<ServiceDependency1>, std::shared_ptr<ServiceDependency2>> compInstance(
-            { ("foo"), ("bar") },
-            {});
+        ComponentInstanceImpl<TestServiceImpl1,
+                              std::tuple<>,
+                              std::shared_ptr<ServiceDependency1>,
+                              std::shared_ptr<ServiceDependency2>>
+            compInstance({ ("foo"), ("bar") }, {});
         auto iMap = compInstance.GetInterfaceMap();
         ASSERT_FALSE(iMap);
 
@@ -449,7 +454,9 @@ namespace
                                                                                   &TestServiceImpl1::BindFoo,
                                                                                   &TestServiceImpl1::UnbindFoo));
 
-        ComponentInstanceImpl<TestServiceImpl1, std::tuple<>, std::shared_ptr<ServiceDependency2>> compInstance({ ("bar") }, binders);
+        ComponentInstanceImpl<TestServiceImpl1, std::tuple<>, std::shared_ptr<ServiceDependency2>> compInstance(
+            { ("bar") },
+            binders);
         auto iMap = compInstance.GetInterfaceMap();
         ASSERT_FALSE(iMap);
         ASSERT_EQ(compInstance.GetInstance(), nullptr);
@@ -557,10 +564,12 @@ namespace
         auto reg1 = fc.RegisterService<ServiceDependency2>(std::make_shared<ServiceDependency2>());
         auto reg2 = fc.RegisterService<ServiceDependency3>(std::make_shared<ServiceDependency3>());
 
-        ComponentInstanceImpl<TestServiceImpl2, std::tuple<>, std::vector<std::shared_ptr<ServiceDependency1>>, 
-            std::shared_ptr<ServiceDependency2>, std::vector<std::shared_ptr<ServiceDependency3>>> compInstance(
-            { ("dep1"), ("dep2"), ("dep3")},
-            {});
+        ComponentInstanceImpl<TestServiceImpl2,
+                              std::tuple<>,
+                              std::vector<std::shared_ptr<ServiceDependency1>>,
+                              std::shared_ptr<ServiceDependency2>,
+                              std::vector<std::shared_ptr<ServiceDependency3>>>
+            compInstance({ ("dep1"), ("dep2"), ("dep3") }, {});
         auto iMap = compInstance.GetInterfaceMap();
         ASSERT_FALSE(iMap);
 
@@ -620,17 +629,17 @@ namespace
         ASSERT_TRUE(compObj->GetDep3().size() > 0);
 
         EXPECT_THROW(compInstance.InvokeBindMethod("dep1", fc.GetServiceReference<ServiceDependency1>()),
-            std::out_of_range);
+                     std::out_of_range);
         EXPECT_THROW(compInstance.InvokeBindMethod("dep2", fc.GetServiceReference<ServiceDependency2>()),
-            std::out_of_range);
+                     std::out_of_range);
         EXPECT_THROW(compInstance.InvokeBindMethod("dep3", fc.GetServiceReference<ServiceDependency2>()),
-            std::out_of_range);
+                     std::out_of_range);
         EXPECT_THROW(compInstance.InvokeUnbindMethod("dep1", fc.GetServiceReference<ServiceDependency1>()),
-            std::out_of_range);
+                     std::out_of_range);
         EXPECT_THROW(compInstance.InvokeUnbindMethod("dep2", fc.GetServiceReference<ServiceDependency2>()),
-            std::out_of_range);
+                     std::out_of_range);
         EXPECT_THROW(compInstance.InvokeUnbindMethod("dep3", fc.GetServiceReference<ServiceDependency2>()),
-            std::out_of_range);
+                     std::out_of_range);
 
         f.Stop();
         f.WaitForStop(std::chrono::milliseconds::zero());
@@ -648,11 +657,14 @@ namespace
         std::vector<std::shared_ptr<Binder<TestServiceImpl2>>> binders;
         binders.push_back(
             std::make_shared<DynamicBinder<TestServiceImpl2, ServiceDependency3>>("dep3",
-                &TestServiceImpl2::BindDep3,
-                &TestServiceImpl2::UnbindDep3));
+                                                                                  &TestServiceImpl2::BindDep3,
+                                                                                  &TestServiceImpl2::UnbindDep3));
 
-        ComponentInstanceImpl<TestServiceImpl2, std::tuple<>, std::vector<std::shared_ptr<ServiceDependency1>>, 
-            std::shared_ptr<ServiceDependency2>> compInstance({ ("dep1"), ("dep2") }, binders);
+        ComponentInstanceImpl<TestServiceImpl2,
+                              std::tuple<>,
+                              std::vector<std::shared_ptr<ServiceDependency1>>,
+                              std::shared_ptr<ServiceDependency2>>
+            compInstance({ ("dep1"), ("dep2") }, binders);
         auto iMap = compInstance.GetInterfaceMap();
         ASSERT_FALSE(iMap);
         ASSERT_EQ(compInstance.GetInstance(), nullptr);
@@ -718,13 +730,13 @@ namespace
         // The runtime calls the wrapper object with the name of the reference and the ServiceReference object to use
         // for binding.
         EXPECT_THROW(compInstance.InvokeUnbindMethod("dep1", fc.GetServiceReference<ServiceDependency1>()),
-            std::out_of_range);
+                     std::out_of_range);
         EXPECT_THROW(compInstance.InvokeBindMethod("dep1", fc.GetServiceReference<ServiceDependency1>()),
-            std::out_of_range);
+                     std::out_of_range);
         EXPECT_THROW(compInstance.InvokeUnbindMethod("dep2", fc.GetServiceReference<ServiceDependency2>()),
-            std::out_of_range);
+                     std::out_of_range);
         EXPECT_THROW(compInstance.InvokeBindMethod("dep2", fc.GetServiceReference<ServiceDependency2>()),
-            std::out_of_range);
+                     std::out_of_range);
         EXPECT_NO_THROW(compInstance.InvokeUnbindMethod("dep3", fc.GetServiceReference<ServiceDependency3>()));
         ASSERT_EQ(compObj->GetDep3().size(), 0);
         EXPECT_NO_THROW(compInstance.InvokeBindMethod("dep3", fc.GetServiceReference<ServiceDependency3>()));

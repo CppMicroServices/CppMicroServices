@@ -102,7 +102,6 @@ namespace cppmicroservices
                 tracker.reset();
                 throw std::current_exception();
             }
-            bundleId = bc.GetBundle().GetBundleId();
         }
 
         void

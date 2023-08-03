@@ -31,7 +31,7 @@ namespace cppmicroservices
             if (!(this->logger))
             {
                 throw std::invalid_argument(" SCRExtensionRegistry Constructor "
-                "provided with invalid arguments");
+                                            "provided with invalid arguments");
             }
         }
 
@@ -46,12 +46,20 @@ namespace cppmicroservices
             return nullptr;
         }
 
+        std::unordered_map<long, std::shared_ptr<SCRBundleExtension>>
+        SCRExtensionRegistry::GetRegistry() noexcept
+        {
+            std::lock_guard<std::mutex> l(extensionRegMutex);
+
+            return extensionRegistry;
+        }
+
         void
         SCRExtensionRegistry::Add(long bundleId, std::shared_ptr<SCRBundleExtension> extension)
         {
             if (!extension)
             {
-                throw std::invalid_argument("SCRExtensionRegistry::Add invalid extension");	
+                throw std::invalid_argument("SCRExtensionRegistry::Add invalid extension");
             }
             std::lock_guard<std::mutex> l(extensionRegMutex);
             if (extensionRegistry.find(bundleId) == extensionRegistry.end())
@@ -72,6 +80,6 @@ namespace cppmicroservices
         {
             std::lock_guard<std::mutex> l(extensionRegMutex);
             extensionRegistry.clear();
-         }
+        }
     } // namespace scrimpl
 } // namespace cppmicroservices

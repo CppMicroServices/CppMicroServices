@@ -30,7 +30,10 @@
 #    define FRIEND_TEST(x, y)
 #endif
 #include "../ComponentContextImpl.hpp"
+#include "../ComponentRegistry.hpp"
 #include "../ConfigurationListenerImpl.hpp"
+#include "../SCRBundleExtension.hpp"
+#include "../SCRExtensionRegistry.hpp"
 #include "../metadata/ComponentMetadata.hpp"
 #include "ComponentConfiguration.hpp"
 #include "ComponentManager.hpp"
@@ -41,7 +44,6 @@
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"
 #include "states/ComponentConfigurationState.hpp"
-#include "../ComponentRegistry.hpp"
 
 using cppmicroservices::scrimpl::ReferenceManager;
 using cppmicroservices::service::component::detail::ComponentInstance;
@@ -310,7 +312,11 @@ namespace cppmicroservices
              */
             virtual void UnbindReference(std::string const& refName, ServiceReferenceBase const& ref) = 0;
 
-            bool IsDependentOn(unsigned long service, std::shared_ptr<std::set<unsigned long>> dependents);
+            bool DependsOnMe(metadata::ReferenceMetadata reference,
+                             std::shared_ptr<std::set<std::string>> dependents,
+                             std::shared_ptr<std::vector<metadata::ComponentMetadata>> metadatas);
+
+            void CheckCircular();
 
           protected:
             /**

@@ -60,7 +60,7 @@ namespace cppmicroservices
                                                                                     registry,
                                                                                     logger,
                                                                                     configNotifier);
-               configurations.push_back(cc);
+                configurations.push_back(cc);
             }
             catch (cppmicroservices::SharedLibraryException const&)
             {

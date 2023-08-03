@@ -104,6 +104,10 @@ namespace cppmicroservices
 
             void CreateFactoryComponent(std::string const& pid, std::shared_ptr<ComponentConfigurationImpl>& mgr);
 
+            std::shared_ptr<SCRExtensionRegistry> GetExtensionRegistry(){
+                return extensionRegistry;
+            }
+
           private:
             using TokenMap = std::unordered_map<ListenerTokenId, Listener>;
 

@@ -58,7 +58,7 @@ namespace scr = cppmicroservices::service::component::runtime;
 namespace test
 {
 
-    TEST(TestCircularReference, circularReferenceOptionalTest)
+    TEST(TestCircularReference, circularReferenceRequiredTest)
     {
         auto framework = cppmicroservices::FrameworkFactory().NewFramework();
         framework.Start();
@@ -88,6 +88,41 @@ namespace test
         // assert that references are invalid with unsatisfied configuration
         ASSERT_EQ(refA.operator bool(), false);
         ASSERT_EQ(refB.operator bool(), false);
+
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+    }
+
+    TEST(TestCircularReference, circularReferenceOptionalTest)
+    {
+        auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+        framework.Start();
+        EXPECT_TRUE(framework);
+
+        auto dsPluginPath = test::GetDSRuntimePluginFilePath();
+        auto context = framework.GetBundleContext();
+
+        test::InstallAndStartDS(context);
+
+        // The names of the bundles do matter here. The bundle containing the dependency MUST
+        // be stopped after the one providing the dependency. CppMicroServices stores bundles
+        // in sorted order by path.
+
+        auto bundleA = test::InstallAndStartBundle(context, "TestBundleCircular03");
+        ASSERT_TRUE(bundleA);
+        bundleA.Start();
+
+        auto bundleB = test::InstallAndStartBundle(context, "TestBundleCircular02");
+        ASSERT_TRUE(bundleB);
+        bundleB.Start();
+
+        auto refA = context.GetServiceReference<test::CircularInterface1>();
+
+        auto refB = context.GetServiceReference<test::CircularInterface2>();
+
+        // assert that references are invalid with unsatisfied configuration
+        ASSERT_EQ(refA.operator bool(), true);
+        ASSERT_EQ(refB.operator bool(), true);
 
         framework.Stop();
         framework.WaitForStop(std::chrono::milliseconds::zero());

@@ -180,6 +180,7 @@ namespace cppmicroservices
             }
             else
             {
+                CheckCircular();
                 for (auto& kv : referenceManagers)
                 {
                     auto& refManager = kv.second;
@@ -383,28 +384,6 @@ namespace cppmicroservices
             SatisfiedFunctor f
                 = std::for_each(referenceManagers.begin(), referenceManagers.end(), SatisfiedFunctor(refName));
 
-            // map for tracking circularReferences
-            std::shared_ptr<std::set<unsigned long>> refSet = std::make_shared<std::set<unsigned long>>();
-
-            auto refManager = GetDependencyManager(refName);
-            if (!refManager->IsOptional() && true)
-            {
-                auto config = GetConfiguration(refManager);
-
-                // ensure we don't visit this node twice
-                refSet->insert(config->GetId());
-
-                // check if current reference depends on this componentConfiguration
-                bool circularRef = config->IsDependentOn(GetId(), refSet);
-                if (circularRef)
-                {
-                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                "Circular Reference.",
-                                std::current_exception());
-                    throw;
-                }
-            }
-
             if (configManager != nullptr)
             {
                 if (!configManager->IsConfigSatisfied())
@@ -571,9 +550,51 @@ namespace cppmicroservices
             return std::make_pair(componentInstance, ctxt);
         }
 
+        void
+        ComponentConfigurationImpl::CheckCircular()
+        {
+            std::shared_ptr<SCRExtensionRegistry> scrExtReg = GetConfigNotifier()->GetExtensionRegistry();
+            std::unordered_map<long, std::shared_ptr<SCRBundleExtension>> bundExtMap = scrExtReg->GetRegistry();
+            std::shared_ptr<std::vector<metadata::ComponentMetadata>> allMetadata
+                = std::make_shared<std::vector<metadata::ComponentMetadata>>();
+
+            for (auto& it : bundExtMap)
+            {
+                auto managers = it.second->GetManagers();
+                for (auto& it2 : *managers)
+                {
+                    allMetadata->emplace_back(*((it2)->GetMetadata()));
+                }
+            }
+
+            // map for tracking circularReferences
+            std::shared_ptr<std::set<std::string>> refSet = std::make_shared<std::set<std::string>>();
+
+            for (auto& ref : metadata->refsMetadata)
+            {
+                // if not optional
+                if (ref.minCardinality > 0)
+                {
+                    // ensure we don't visit this node twice
+                    refSet->insert(ref.interfaceName);
+
+                    // check if current reference depends on this componentConfiguration
+                    bool circularRef = DependsOnMe(ref, refSet, allMetadata);
+                    if (circularRef)
+                    {
+                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                    "Circular Reference.",
+                                    std::current_exception());
+                        return;
+                    }
+                }
+            }
+        }
+
         bool
-        ComponentConfigurationImpl::IsDependentOn(unsigned long serviceID,
-                                                  std::shared_ptr<std::set<unsigned long>> dependents)
+        ComponentConfigurationImpl::DependsOnMe(metadata::ReferenceMetadata reference,
+                                                std::shared_ptr<std::set<std::string>> dependents,
+                                                std::shared_ptr<std::vector<metadata::ComponentMetadata>> metadatas)
         {
             auto metadata = GetMetadata();
             // all referenced services
@@ -610,35 +631,6 @@ namespace cppmicroservices
                 }
             }
             return false;
-        }
-
-        std::shared_ptr<ComponentConfiguration>
-        ComponentConfigurationImpl::GetConfiguration(std::shared_ptr<ReferenceManager> refManager)
-        {
-            auto const& refName = refManager->GetReferenceName();
-
-            // add bundleid to referenceManager
-            // get a component manager
-            // get the configurations (specific to the bundle)
-            // search through that array for the configuration with the proper name and bundlID
-
-            // How can we get the bundleID from a reference manager
-            long bundleID = refManager->GetBundleId();
-
-            std::shared_ptr<ComponentRegistry> reg = GetRegistry();
-            auto compManager = reg->GetComponentManager(bundleID, refName);
-
-            // why is this a vector? why can a component have multiple componentConfiguratoinObjects?
-            auto configs = compManager->GetComponentConfigurations();
-
-            std::shared_ptr<ComponentConfiguration> config;
-            for (auto& c : configs) {
-                if (c->GetBundle().GetBundleId() == bundleID){
-                    config = c;
-                }
-            }
-
-            return config;
         }
     } // namespace scrimpl
 } // namespace cppmicroservices

@@ -207,6 +207,7 @@ set(_test_bundles
   TestBundleDSCA27
   TestBundleCircular01
   TestBundleCircular02
+  TestBundleCircular03
   EnglishDictionary
   )
 

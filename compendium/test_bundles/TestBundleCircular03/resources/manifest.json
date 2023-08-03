@@ -1,5 +1,5 @@
 {
-    "bundle.symbolic_name": "TestBundleCircular02",
+    "bundle.symbolic_name": "TestBundleCircular03",
     "bundle.activator": false,
     "scr": {
         "version": 1,
@@ -7,22 +7,22 @@
             {
                 "enabled": true,
                 "immediate": false,
-                "implementation-class": "sample::ServiceComponentCircular2",
+                "implementation-class": "sample::ServiceComponentCircular3",
                 "configuration-policy": "optional",
                 "configuration-pid": [
-                    "sample::ServiceComponentCircular2"
+                    "sample::ServiceComponentCircular3"
                 ],
                 "service": {
                     "interfaces": [
-                        "test::CircularInterface2"
+                        "test::CircularInterface1"
                     ],
                     "scope": "singleton"
                 },
                 "references": [
                     {
                         "name": "ref",
-                        "interface": "test::CircularInterface1",
-                        "cardinality": "1..1"
+                        "interface": "test::CircularInterface2",
+                        "cardinality": "0..1"
                     }
                 ]
             }

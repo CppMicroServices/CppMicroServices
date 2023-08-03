@@ -90,6 +90,8 @@ namespace cppmicroservices
 
             void Initialize(cppmicroservices::AnyMap const& scrMetadata,
                             std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& asyncWorkService);
+
+            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> GetManagers();
  
           private:
             FRIEND_TEST(SCRBundleExtensionTest, CtorWithValidArgs);

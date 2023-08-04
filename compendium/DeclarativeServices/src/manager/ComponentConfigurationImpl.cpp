@@ -555,15 +555,19 @@ namespace cppmicroservices
         {
             std::shared_ptr<SCRExtensionRegistry> scrExtReg = GetConfigNotifier()->GetExtensionRegistry();
             std::unordered_map<long, std::shared_ptr<SCRBundleExtension>> bundExtMap = scrExtReg->GetRegistry();
-            std::shared_ptr<std::vector<metadata::ComponentMetadata>> allMetadata
-                = std::make_shared<std::vector<metadata::ComponentMetadata>>();
+            std::shared_ptr<std::unordered_map<std::string, metadata::ComponentMetadata>> allMetadata
+                = std::make_shared<std::unordered_map<std::string, metadata::ComponentMetadata>>();
 
             for (auto& it : bundExtMap)
             {
                 auto managers = it.second->GetManagers();
                 for (auto& it2 : *managers)
                 {
-                    allMetadata->emplace_back(*((it2)->GetMetadata()));
+                    auto data = ((it2)->GetMetadata());
+                    for (auto& interface : data->serviceMetadata.interfaces)
+                    {
+                        allMetadata->at(interface) = data;
+                    }
                 }
             }
 
@@ -596,7 +600,6 @@ namespace cppmicroservices
                                                 std::shared_ptr<std::set<std::string>> dependents,
                                                 std::shared_ptr<std::vector<metadata::ComponentMetadata>> metadatas)
         {
-            auto metadata = GetMetadata();
             // all referenced services
             for (auto refMetadata : metadata->refsMetadata)
             {

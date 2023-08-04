@@ -18,6 +18,7 @@ This branch is intended to continue to provide bugfixes and improvements while s
 
 Added
 -----
+- `[Declarative Services] Add benchmark test infrastructure to DS <https://github.com/CppMicroServices/CppMicroServices/pull/813>`_
 
 Changed
 -------

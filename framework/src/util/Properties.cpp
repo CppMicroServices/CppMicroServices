@@ -1,4 +1,4 @@
-/*=============================================================================
+ /*=============================================================================
 
   Library: CppMicroServices
 
@@ -36,20 +36,26 @@ namespace cppmicroservices
     const Any Properties::emptyAny;
 
     void
-    Properties::PopulateCaseInsensitiveLookupMap()
+    Properties::PopulateCaseInsensitiveLookupMap() const
     {
+        // already populated?
+        if (caseInsensitiveLookup.size() >= props.size())
+        {
+            return;
+        }
+
         if (props.GetType() == AnyMap::ORDERED_MAP)
         {
             for (auto itr = props.beginOM_TypeChecked(); itr != props.endOM_TypeChecked(); ++itr)
             {
-                caseInsensitiveLookup[props_check::ToLower(itr->first)] = itr->first;
+                caseInsensitiveLookup.insert(itr->first);
             }
         }
         else if (props.GetType() == AnyMap::UNORDERED_MAP)
         {
             for (auto itr = props.beginUO_TypeChecked(); itr != props.endUO_TypeChecked(); ++itr)
             {
-                caseInsensitiveLookup[props_check::ToLower(itr->first)] = itr->first;
+                caseInsensitiveLookup.insert(itr->first);
             }
         }
         else
@@ -69,8 +75,6 @@ namespace cppmicroservices
         if (p.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
         {
             props_check::ValidateAnyMap(p);
-
-            PopulateCaseInsensitiveLookupMap();
         }
     }
 
@@ -79,27 +83,17 @@ namespace cppmicroservices
         if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
         {
             props_check::ValidateAnyMap(props);
-
-            PopulateCaseInsensitiveLookupMap();
         }
     }
 
-    Properties::Properties(Properties&& o) noexcept : props(std::move(o.props))
-    {
-        if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
-        {
-            PopulateCaseInsensitiveLookupMap();
-        }
-    }
+    Properties::Properties(Properties&& o) noexcept : props(std::move(o.props)) {}
 
     Properties&
     Properties::operator=(Properties&& o) noexcept
     {
         props = std::move(o.props);
-        if (props.GetType() != AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
-        {
-            PopulateCaseInsensitiveLookupMap();
-        }
+        caseInsensitiveLookup = std::move(o.caseInsensitiveLookup);
+
         return *this;
     }
 
@@ -139,10 +133,12 @@ namespace cppmicroservices
 
             if (!matchCase)
             {
+                PopulateCaseInsensitiveLookupMap();
+
                 auto ciItr = caseInsensitiveLookup.find(key);
                 if (ciItr != caseInsensitiveLookup.end())
                 {
-                    return props.findUO_TypeChecked(ciItr->second.data())->second;
+                    return props.findUO_TypeChecked(*ciItr)->second;
                 }
                 else
                 {
@@ -162,10 +158,12 @@ namespace cppmicroservices
 
             if (!matchCase)
             {
+                PopulateCaseInsensitiveLookupMap();
+
                 auto ciItr = caseInsensitiveLookup.find(key);
                 if (ciItr != caseInsensitiveLookup.end())
                 {
-                    return props.findOM_TypeChecked(ciItr->second.data())->second;
+                    return props.findOM_TypeChecked(*ciItr)->second;
                 }
                 else
                 {
@@ -224,10 +222,12 @@ namespace cppmicroservices
 
             if (!matchCase)
             {
+                PopulateCaseInsensitiveLookupMap();
+
                 auto ciItr = caseInsensitiveLookup.find(key);
                 if (ciItr != caseInsensitiveLookup.end())
                 {
-                    return std::make_pair(props.findUO_TypeChecked(ciItr->second.data())->second, true);
+                    return std::make_pair(props.findUO_TypeChecked(*ciItr)->second, true);
                 }
                 else
                 {
@@ -247,10 +247,12 @@ namespace cppmicroservices
 
             if (!matchCase)
             {
+                PopulateCaseInsensitiveLookupMap();
+
                 auto ciItr = caseInsensitiveLookup.find(key);
                 if (ciItr != caseInsensitiveLookup.end())
                 {
-                    return std::make_pair(props.findOM_TypeChecked(ciItr->second.data())->second, true);
+                    return std::make_pair(props.findOM_TypeChecked(*ciItr)->second, true);
                 }
                 else
                 {

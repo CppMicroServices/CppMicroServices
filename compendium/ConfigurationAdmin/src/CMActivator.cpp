@@ -50,7 +50,7 @@ namespace cppmicroservices
             // manually
             for (auto const& bundle : context.GetBundles())
             {
-                if (cppmicroservices::Bundle::State::STATE_ACTIVE == bundle.GetState())
+                if (cppmicroservices::Bundle::State::STATE_ACTIVE & bundle.GetState())
                 {
                     cppmicroservices::BundleEvent evt(cppmicroservices::BundleEvent::BUNDLE_STARTED, bundle);
                     BundleChanged(evt);
@@ -178,11 +178,11 @@ namespace cppmicroservices
             }
 
             // TODO: revisit to include LAZY_ACTIVATION when supported by the framework
-            if (cppmicroservices::BundleEvent::BUNDLE_STARTED == eventType)
+            if (cppmicroservices::BundleEvent::BUNDLE_STARTED & eventType)
             {
                 CreateExtension(bundle);
             }
-            else if (cppmicroservices::BundleEvent::BUNDLE_STOPPING == eventType)
+            else if (cppmicroservices::BundleEvent::BUNDLE_STOPPING & eventType)
             {
                 RemoveExtension(bundle);
             }

@@ -36,9 +36,8 @@ namespace cppmicroservices
             cppmicroservices::Bundle const& bundle,
             std::shared_ptr<ComponentRegistry> registry,
             std::shared_ptr<logservice::LogService> logger,
-            std::shared_ptr<ConfigurationNotifier> configNotifier,
-            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
-        {
+            std::shared_ptr<ConfigurationNotifier> configNotifier)
+         {
             std::shared_ptr<ComponentConfigurationImpl> retVal;
             std::string scope = compDesc->serviceMetadata.scope;
             if (scope == cppmicroservices::Constants::SCOPE_SINGLETON)
@@ -47,8 +46,7 @@ namespace cppmicroservices
                                                                                bundle,
                                                                                registry,
                                                                                logger,
-                                                                               configNotifier,
-                                                                               managers);
+                                                                               configNotifier);
             }
             else if (scope == cppmicroservices::Constants::SCOPE_BUNDLE
                      || scope == cppmicroservices::Constants::SCOPE_PROTOTYPE)
@@ -57,8 +55,7 @@ namespace cppmicroservices
                                                                                        bundle,
                                                                                        registry,
                                                                                        logger,
-                                                                                       configNotifier,
-                                                                                       managers);
+                                                                                       configNotifier);
             }
             if (retVal)
             {

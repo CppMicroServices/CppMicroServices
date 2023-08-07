@@ -42,8 +42,7 @@ namespace cppmicroservices
             BundleContext bundleContext,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService,
-            std::shared_ptr<ConfigurationNotifier> configNotifier,
-            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers)
+            std::shared_ptr<ConfigurationNotifier> configNotifier)
             : registry(std::move(registry))
             , compDesc(std::move(metadata))
             , bundleContext(std::move(bundleContext))
@@ -51,10 +50,9 @@ namespace cppmicroservices
             , state(std::make_shared<CMDisabledState>())
             , asyncWorkService(std::move(asyncWorkService))
             , configNotifier(std::move(configNotifier))
-            , managers(std::move(managers))
         {
             if (!compDesc || !this->registry || !this->bundleContext || !this->logger || !this->asyncWorkService
-                || !this->configNotifier || !this->managers)
+                || !this->configNotifier)
             {
                 throw std::invalid_argument("Invalid arguments to ComponentManagerImpl constructor");
             }
@@ -167,14 +165,13 @@ namespace cppmicroservices
             auto reg = GetRegistry();
             auto logger = GetLogger();
             auto configNotifier = GetConfigNotifier();
-            auto managers = GetManagers();
 
             using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
             using PostTask = std::packaged_task<void()>;
 
-            ActualTask task([metadata, bundle, reg, logger, configNotifier, managers](
+            ActualTask task([metadata, bundle, reg, logger, configNotifier](
                                 std::shared_ptr<CMEnabledState> eState) mutable
-                            { eState->CreateConfigurations(metadata, bundle, reg, logger, configNotifier, managers); });
+                            { eState->CreateConfigurations(metadata, bundle, reg, logger, configNotifier); });
 
             std::shared_ptr<CMEnabledState> enabledState = std::make_shared<CMEnabledState>(task.get_future().share());
 

@@ -32,6 +32,7 @@
 #include "cppmicroservices/FrameworkFactory.h"
 
 #include "../../src/SCRAsyncWorkService.hpp"
+#include "../../src/SCRExtensionRegistry.hpp"
 #include "../../src/manager/ComponentManagerImpl.hpp"
 #include "../../src/manager/states/ComponentManagerState.hpp"
 #include "../../src/metadata/ComponentMetadata.hpp"
@@ -53,13 +54,13 @@ namespace cppmicroservices
             framework.Start();
             auto bc = framework.GetBundleContext();
             auto fakeLogger = std::make_shared<FakeLogger>();
-            auto managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
             auto mockRegistry = std::make_shared<MockComponentRegistry>();
             auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
             auto logger = std::make_shared<SCRLogger>(bc);
             auto asyncWorkService = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(bc, logger);
+            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
             auto notifier
-                = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(), fakeLogger, asyncWorkService);
+                = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(), fakeLogger, asyncWorkService, extRegistry);
             {
                 EXPECT_THROW(
                     {
@@ -68,8 +69,7 @@ namespace cppmicroservices
                                                                          bc,
                                                                          fakeLogger,
                                                                          asyncWorkService,
-                                                                         notifier,
-                                                                         managers));
+                                                                         notifier));
                     },
                     std::invalid_argument);
             }
@@ -81,9 +81,8 @@ namespace cppmicroservices
                                                                          bc,
                                                                          fakeLogger,
                                                                          asyncWorkService,
-                                                                         notifier,
-                                                                         managers));
-                    },
+                                                                         notifier));
+                   },
                     std::invalid_argument);
             }
             {
@@ -94,8 +93,7 @@ namespace cppmicroservices
                                                                          BundleContext(),
                                                                          fakeLogger,
                                                                          asyncWorkService,
-                                                                         notifier,
-                                                                         managers));
+                                                                         notifier));
                     },
                     std::invalid_argument);
             }
@@ -107,9 +105,8 @@ namespace cppmicroservices
                                                                          bc,
                                                                          nullptr,
                                                                          asyncWorkService,
-                                                                         notifier,
-                                                                         managers));
-                    },
+                                                                         notifier));
+                   },
                     std::invalid_argument);
             }
             {
@@ -119,8 +116,7 @@ namespace cppmicroservices
                                                                      bc,
                                                                      fakeLogger,
                                                                      asyncWorkService,
-                                                                     notifier,
-                                                                     managers));
+                                                                     notifier));
                 });
             }
         }
@@ -144,10 +140,11 @@ namespace cppmicroservices
                 asyncWorkService
                     = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(framework.GetBundleContext(),
                                                                                        logger);
+                extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
                 notifier = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(),
                                                                    fakeLogger,
-                                                                   asyncWorkService);
-                managers = std::make_shared<std::vector<std::shared_ptr<ComponentManager>>>();
+                                                                   asyncWorkService,
+                                                                   extRegistry);
             }
 
             virtual void
@@ -162,8 +159,8 @@ namespace cppmicroservices
             cppmicroservices::Framework framework;
             std::shared_ptr<logservice::LogService> fakeLogger;
             std::shared_ptr<MockComponentRegistry> mockRegistry;
+            std::shared_ptr<SCRExtensionRegistry> extRegistry;
             std::shared_ptr<ConfigurationNotifier> notifier;
-            std::shared_ptr<std::vector<std::shared_ptr<ComponentManager>>> managers;
             std::shared_ptr<cppmicroservices::scrimpl::SCRAsyncWorkService> asyncWorkService;
         };
 
@@ -175,9 +172,8 @@ namespace cppmicroservices
                                                                   framework.GetBundleContext(),
                                                                   fakeLogger,
                                                                   asyncWorkService,
-                                                                  notifier,
-                                                                  managers);
-            EXPECT_EQ(compMgr->IsEnabled(), false) << "Illegal state before Initialization";
+                                                                  notifier);
+           EXPECT_EQ(compMgr->IsEnabled(), false) << "Illegal state before Initialization";
             compMgr->Initialize();
             EXPECT_EQ(compMgr->IsEnabled(), compMgr->GetMetadata()->enabled) << "Illegal state after Initialization";
         }
@@ -190,8 +186,7 @@ namespace cppmicroservices
                                                                   framework.GetBundleContext(),
                                                                   fakeLogger,
                                                                   asyncWorkService,
-                                                                  notifier,
-                                                                  managers);
+                                                                  notifier);
             EXPECT_NO_THROW({
                 compMgr->Initialize();
                 compMgr->Enable();
@@ -209,8 +204,7 @@ namespace cppmicroservices
                                                                   framework.GetBundleContext(),
                                                                   fakeLogger,
                                                                   asyncWorkService,
-                                                                  notifier,
-                                                                  managers);
+                                                                  notifier);
             EXPECT_NO_THROW({
                 compMgr->Initialize();
                 compMgr->Disable();
@@ -228,8 +222,7 @@ namespace cppmicroservices
                                                                       framework.GetBundleContext(),
                                                                       fakeLogger,
                                                                       asyncWorkService,
-                                                                      notifier,
-                                                                      managers);
+                                                                      notifier);
             EXPECT_NO_THROW({
                 compMgr->Initialize();
                 compMgr->ResetCounter();
@@ -251,8 +244,7 @@ namespace cppmicroservices
                                                                       framework.GetBundleContext(),
                                                                       fakeLogger,
                                                                       asyncWorkService,
-                                                                      notifier,
-                                                                      managers);
+                                                                      notifier);
             EXPECT_NO_THROW({
                 auto prevState = compMgr->IsEnabled();
                 compMgr->Initialize();
@@ -289,8 +281,7 @@ namespace cppmicroservices
                                                                       framework.GetBundleContext(),
                                                                       fakeLogger,
                                                                       asyncWorkService,
-                                                                      notifier,
-                                                                      managers);
+                                                                      notifier);
 
             compMgr->Initialize();
             compMgr->Disable(); // ensure the component is in DISABLED state
@@ -322,8 +313,7 @@ namespace cppmicroservices
                                                                       framework.GetBundleContext(),
                                                                       fakeLogger,
                                                                       asyncWorkService,
-                                                                      notifier,
-                                                                      managers);
+                                                                      notifier);
 
             compMgr->Initialize();
             compMgr->Enable(); // ensure the component is in ENABLED state
@@ -356,9 +346,8 @@ namespace cppmicroservices
                                                                       framework.GetBundleContext(),
                                                                       fakeLogger,
                                                                       asyncWorkService,
-                                                                      notifier,
-                                                                      managers);
-            compMgr->Initialize();
+                                                                      notifier);
+           compMgr->Initialize();
             // test concurrent calls to enable and disable from multiple threads
             std::function<std::shared_future<void>()> func = [compMgr]() mutable
             {
@@ -390,8 +379,7 @@ namespace cppmicroservices
                                                                       framework.GetBundleContext(),
                                                                       fakeLogger,
                                                                       asyncWorkService,
-                                                                      notifier,
-                                                                      managers);
+                                                                      notifier);
 
             EXPECT_EQ(compMgr->disableFutures.size(), 0ul) << "Disabled futures list must be empty before any calls to "
                                                               "AccumulateFuture method";

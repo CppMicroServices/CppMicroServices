@@ -50,17 +50,16 @@ class BundleTrackerPrivate : MultiThreaded<>
 public:
   using BundleStateMaskType = std::underlying_type_t<Bundle::State>;
 
-  BundleTrackerPrivate(
-    BundleTracker<T>* _bundleTracker,
-    const BundleContext& _context,
-    const BundleStateMaskType _stateMask,
-    const std::shared_ptr<BundleTrackerCustomizer<T>> _customizer)
-    : context(_context)
-    , stateMask(_stateMask)
-    , customizer(_customizer)
-    , listenerToken()
-    , trackedBundle()
-    , bundleTracker(_bundleTracker)
+  BundleTrackerPrivate(BundleTracker<T>* _bundleTracker,
+                       BundleContext const& _context,
+                       const BundleStateMaskType _stateMask,
+                       const std::shared_ptr<BundleTrackerCustomizer<T>> _customizer)
+      : context(_context)
+      , stateMask(_stateMask)
+      , customizer(_customizer)
+      , listenerToken()
+      , trackedBundle()
+      , bundleTracker(_bundleTracker)
   {
     this->customizer = customizer;
   }
@@ -136,12 +135,8 @@ public:
    * Called by the TrackedBundle object whenever the set of tracked bundles is
    * modified.
    */
-  /*
-   * This method must not be synchronized since it is called by TrackedBundle while
-   * TrackedBundle is synchronized. We don't want synchronization interactions
-   * between the listener thread and the user thread.
-   */
-  void Modified()
+  void
+  Modified()
   {
     // No cache to clear
     // Log message to parallel ServiceTracker
@@ -155,7 +150,8 @@ private:
     return static_cast<BundleTrackerCustomizer<T>*>(bundleTracker);
   }
 
-  inline const BundleTrackerCustomizer<T>* getTrackerAsCustomizer() const
+  inline BundleTrackerCustomizer<T> const*
+  getTrackerAsCustomizer() const
   {
     return static_cast<BundleTrackerCustomizer<T>*>(bundleTracker);
   }

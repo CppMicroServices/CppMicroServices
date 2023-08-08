@@ -388,12 +388,10 @@ namespace cppmicroservices
         { /* if ServiceTracker is not open */
             return std::shared_ptr<TrackedParamType>();
         }
-        {
-            auto l = t->Lock();
-            US_UNUSED(l);
-            auto customObject = t->GetCustomizedObject_unlocked(reference);
-            return customObject.value_or(nullptr);
-        }
+        auto l = t->Lock();
+        US_UNUSED(l);
+        auto customObject = t->GetCustomizedObject_unlocked(reference);
+        return customObject.value_or(nullptr);
     }
 
     template <class S, class T>

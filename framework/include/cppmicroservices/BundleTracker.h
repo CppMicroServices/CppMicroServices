@@ -150,9 +150,15 @@ namespace cppmicroservices
         void
         Close() noexcept
         {
+            ListenerToken swappedToken;
+            {
+                auto l = d->Lock();
+                US_UNUSED(l);
+                std::swap(d->listenerToken, swappedToken);
+            }
             try
             {
-                d->context.RemoveListener(std::move(d->listenerToken));
+                d->context.RemoveListener(std::move(swappedToken));
             }
             catch (std::runtime_error const&)
             {

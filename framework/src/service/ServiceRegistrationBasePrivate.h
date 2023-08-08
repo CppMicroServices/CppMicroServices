@@ -28,6 +28,7 @@
 #include "cppmicroservices/detail/Threads.h"
 
 #include "Properties.h"
+#include "ServiceRegistrationCoreInfo.h"
 
 #include <atomic>
 
@@ -40,28 +41,13 @@ namespace cppmicroservices
     /**
      * \ingroup MicroServices
      */
-    class ServiceRegistrationBasePrivate : public detail::MultiThreaded<>
+    class ServiceRegistrationBasePrivate
+        : public detail::MultiThreaded<>
+        , public std::enable_shared_from_this<ServiceRegistrationBasePrivate>
     {
 
       protected:
         friend class ServiceRegistrationBase;
-
-        // The ServiceReferenceBasePrivate class holds a pointer to a
-        // ServiceRegistrationBasePrivate instance and needs to manipulate
-        // its reference count. This way it can keep the ServiceRegistrationBasePrivate
-        // instance alive and keep returning service properties for
-        // unregistered service instances.
-        friend class ServiceReferenceBasePrivate;
-
-        /**
-         * Reference count for implicitly shared private implementation.
-         */
-        std::atomic<int> ref;
-
-        /**
-         * Service or ServiceFactory object.
-         */
-        InterfaceMapConstPtr service;
 
       public:
         using BundleToRefsMap = std::unordered_map<BundlePrivate*, int>;
@@ -72,52 +58,21 @@ namespace cppmicroservices
         ServiceRegistrationBasePrivate& operator=(ServiceRegistrationBasePrivate const&) = delete;
 
         /**
-         * Bundles dependent on this service. Integer is used as
-         * reference counter, counting number of unbalanced getService().
-         */
-        BundleToRefsMap dependents;
-
-        /**
-         * Object instances that a prototype factory has produced.
-         */
-        BundleToServicesMap prototypeServiceInstances;
-
-        /**
-         * Object instance with bundle scope that a factory may have produced.
-         */
-        BundleToServiceMap bundleServiceInstance;
-
-        /**
-         * Bundle registering this service.
-         */
-        std::weak_ptr<BundlePrivate> bundle;
-
-        /**
          * Reference object to this service registration.
          */
         ServiceReferenceBase reference;
 
         /**
-         * Service properties.
+         * Pointer to CoreInfo object for this registration.
          */
-        Properties properties;
-
-        /**
-         * Is service available. I.e., if <code>true</code> then holders
-         * of a ServiceReference for the service are allowed to get it.
-         */
-        std::atomic<bool> available;
-
-        /**
-         * Avoid recursive unregistrations. I.e., if <code>true</code> then
-         * unregistration of this service has started but is not yet
-         * finished.
-         */
-        std::atomic<bool> unregistering;
+        std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo;
 
         ServiceRegistrationBasePrivate(BundlePrivate* bundle, InterfaceMapConstPtr service, Properties&& props);
 
         ~ServiceRegistrationBasePrivate();
+
+        // Avoid Weak Ptr errors creating reference
+        void CreateReference();
 
         /**
          * Check if a bundle uses this service

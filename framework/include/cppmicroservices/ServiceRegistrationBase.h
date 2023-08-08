@@ -1,22 +1,22 @@
- /*=============================================================================
+/*=============================================================================
 
-  Library: CppMicroServices
+ Library: CppMicroServices
 
-  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
-  file at the top-level directory of this distribution and at
-  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
+ Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+ file at the top-level directory of this distribution and at
+ https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
 
 =============================================================================*/
 
@@ -30,6 +30,7 @@
 namespace cppmicroservices
 {
 
+    class ServiceRegistrationLocks;
     class BundlePrivate;
     class ServiceRegistrationBasePrivate;
     class Properties;
@@ -196,11 +197,13 @@ namespace cppmicroservices
          */
         ServiceRegistrationBase();
 
-        ServiceRegistrationBase(ServiceRegistrationBasePrivate* registrationPrivate);
+        ServiceRegistrationBase(std::shared_ptr<ServiceRegistrationBasePrivate> registrationPrivate);
 
         ServiceRegistrationBase(BundlePrivate* bundle, InterfaceMapConstPtr const& service, Properties&& props);
 
-        ServiceRegistrationBasePrivate* d { nullptr };
+        std::shared_ptr<ServiceRegistrationLocks> LockServiceRegistration() const;
+
+        std::shared_ptr<ServiceRegistrationBasePrivate> d;
     };
 
     /**
@@ -224,7 +227,7 @@ namespace cppmicroservices
  */
 
 US_HASH_FUNCTION_BEGIN(cppmicroservices::ServiceRegistrationBase)
-return std::hash<cppmicroservices::ServiceRegistrationBasePrivate*>()(arg.d);
+return std::hash<std::shared_ptr<cppmicroservices::ServiceRegistrationBasePrivate>>()(arg.d);
 US_HASH_FUNCTION_END
 
 #endif // CPPMICROSERVICES_SERVICEREGISTRATIONBASE_H

@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1691427202522,
+  "lastUpdate": 1691494734086,
   "repoUrl": "https://github.com/CppMicroServices/CppMicroServices",
   "entries": {
     "C++ Benchmark": [
@@ -51806,6 +51806,1530 @@ window.BENCHMARK_DATA = {
             "value": 706.454464285652,
             "unit": "ns/iter",
             "extra": "iterations: 1120000\ncpu: 711.4955357142857 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "79453136+insi-eb@users.noreply.github.com",
+            "name": "Ingmar Sittl",
+            "username": "insi-eb"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "46a083e9b54c1f0198f75a83279f76a16cab212a",
+          "message": "Fixes #840: removes manual reference counting (#841) (#898)\n\n* converted registration\r\n\r\n* compiled, not passeD\r\n\r\n* fixed weak_ptr error, now leaking mock objects\r\n\r\n* fixed bug, need to decrement ref count\r\n\r\n* updats from last week, test cases failing because of out of date expectations\r\n\r\n* all tests are passing with shared and weak pointers to serviceRegistrationBasePrivate\r\n\r\n* still passing tests, updated comments and cleaned up\r\n\r\n* updating to share dependents\r\n\r\n* new issue with dying service\r\n\r\n* added coreInfo, maybe passing\r\n\r\n* passing tests, removed manual ref counting from referenceBasePrivate, repeated all fast tests to ensure no sporadic failures\r\n\r\n* updated comments\r\n\r\n* updates before PR\r\n\r\n* Removed manual reference counting\r\n\r\nThe manual reference counting in ServiceRegistrationBasePrivate and ServiceReferenceBasePrivate were removed. Additionally, some properties of ServiceRegistrationBasePrivate were offloaded to a new class ServiceRegistrationCoreInfo which both ServiceRegistrationBasePrivate and ServiceReferenceBasePrivate can access allowing ServiceReferenceBasePrivate to give up ownership of ServiceRegistrationBasePrivate.\r\n\r\n\r\n\r\n* Removed manual reference counting and merged with upstream (#840)\r\n\r\nThe manual reference counting in ServiceRegistrationBasePrivate and ServiceReferenceBasePrivate were removed. Additionally, some properties of ServiceRegistrationBasePrivate were offloaded to a new class ServiceRegistrationCoreInfo which both ServiceRegistrationBasePrivate and ServiceReferenceBasePrivate can access allowing ServiceReferenceBasePrivate to give up ownership of ServiceRegistrationBasePrivate.\r\n\r\n\r\n\r\n* ServiceRegistrationCoreInfo now default destructor\r\n\r\n* Updated based on Patty's comments #840\r\n\r\n* updated ServiceReferenceBase Constructors for clarity with shared_ptrs\r\n\r\n* removed 'move' from serviceRegistry\r\n\r\n* attempt at solving mac issue\r\n\r\n* updates for lock type and removing unneccessary functions from reference\r\n\r\n* lost lock\r\n\r\n* changed to custom atomic load\r\n\r\n* LockSet addition\r\n\r\n* threading support in LockSet\r\n\r\n* LockSet not threaded\r\n\r\n* no names in func dec\r\n\r\n* Incoorporated Jeff's Comments\r\n\r\n* Assignment operator didn't fail on my computer, did in github\r\n\r\n* updated for Jeff's 5/16 comments\r\n\r\n* clang update\r\n\r\n* mikes comments and fixes for multithreaded support\r\n\r\n* remove ifdefs from BundleRegistry, abide by rule of (0,3,5), and add comments\r\n\r\n---------\r\n\r\n\r\n\r\nadaptations for C++14:\r\n* move initialization statements out of if clauses\r\n\r\nSigned-off-by: Ingmar Sittl <ingmar.sittl@elektrobit.com>\r\nCo-authored-by: tcormackMW <113473781+tcormackMW@users.noreply.github.com>",
+          "timestamp": "2023-08-08T07:01:50-04:00",
+          "tree_id": "822f0e89603700d87ff8a3fe9e58a4821dc95387",
+          "url": "https://github.com/CppMicroServices/CppMicroServices/commit/46a083e9b54c1f0198f75a83279f76a16cab212a"
+        },
+        "date": 1691494721333,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/1/1/manual_time",
+            "value": 48017.95325083512,
+            "unit": "ns/iter",
+            "extra": "iterations: 15273\ncpu: 48083.218752046094 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/4/1/manual_time",
+            "value": 188956.49218218998,
+            "unit": "ns/iter",
+            "extra": "iterations: 4413\ncpu: 191196.46498980286 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/16/1/manual_time",
+            "value": 804350.4132231484,
+            "unit": "ns/iter",
+            "extra": "iterations: 1210\ncpu: 813533.0578512397 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/64/1/manual_time",
+            "value": 3026423.6514522876,
+            "unit": "ns/iter",
+            "extra": "iterations: 241\ncpu: 3047199.1701244814 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/256/1/manual_time",
+            "value": 12396570.000000065,
+            "unit": "ns/iter",
+            "extra": "iterations: 70\ncpu: 12500000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/1000/1/manual_time",
+            "value": 47713060.00000032,
+            "unit": "ns/iter",
+            "extra": "iterations: 15\ncpu: 48958333.333333336 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/1/4/manual_time",
+            "value": 142795.82712369625,
+            "unit": "ns/iter",
+            "extra": "iterations: 6039\ncpu: 142304.18943533697 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/4/4/manual_time",
+            "value": 537682.8999999986,
+            "unit": "ns/iter",
+            "extra": "iterations: 1000\ncpu: 531250 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/16/4/manual_time",
+            "value": 2255117.819148938,
+            "unit": "ns/iter",
+            "extra": "iterations: 376\ncpu: 2244015.9574468085 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/64/4/manual_time",
+            "value": 9101507.920792053,
+            "unit": "ns/iter",
+            "extra": "iterations: 101\ncpu: 9127475.247524753 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/256/4/manual_time",
+            "value": 37157657.14285716,
+            "unit": "ns/iter",
+            "extra": "iterations: 21\ncpu: 37202380.952380955 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/1000/4/manual_time",
+            "value": 143917916.66666642,
+            "unit": "ns/iter",
+            "extra": "iterations: 6\ncpu: 145833333.33333334 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/1/16/manual_time",
+            "value": 440883.26434062776,
+            "unit": "ns/iter",
+            "extra": "iterations: 1691\ncpu: 443524.5416913069 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/4/16/manual_time",
+            "value": 1779437.3225152132,
+            "unit": "ns/iter",
+            "extra": "iterations: 493\ncpu: 1806541.5821501014 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/16/16/manual_time",
+            "value": 7146962.000000006,
+            "unit": "ns/iter",
+            "extra": "iterations: 100\ncpu: 7187500 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/64/16/manual_time",
+            "value": 28770164.28571425,
+            "unit": "ns/iter",
+            "extra": "iterations: 28\ncpu: 29017857.14285714 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/256/16/manual_time",
+            "value": 122683955.55555572,
+            "unit": "ns/iter",
+            "extra": "iterations: 9\ncpu: 125000000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/1000/16/manual_time",
+            "value": 452476550.00000006,
+            "unit": "ns/iter",
+            "extra": "iterations: 2\ncpu: 453125000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/1/64/manual_time",
+            "value": 1559478.1976744183,
+            "unit": "ns/iter",
+            "extra": "iterations: 688\ncpu: 1567042.1511627906 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/4/64/manual_time",
+            "value": 5448638.999999999,
+            "unit": "ns/iter",
+            "extra": "iterations: 100\ncpu: 5468750 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/16/64/manual_time",
+            "value": 24405882.051282052,
+            "unit": "ns/iter",
+            "extra": "iterations: 39\ncpu: 24439102.564102564 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/64/64/manual_time",
+            "value": 99759638.46153846,
+            "unit": "ns/iter",
+            "extra": "iterations: 13\ncpu: 100961538.46153846 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/256/64/manual_time",
+            "value": 365757749.9999999,
+            "unit": "ns/iter",
+            "extra": "iterations: 2\ncpu: 375000000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/1000/64/manual_time",
+            "value": 1623993500.0000021,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 1640625000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/1/256/manual_time",
+            "value": 4558519.642857144,
+            "unit": "ns/iter",
+            "extra": "iterations: 168\ncpu: 4557291.666666667 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/4/256/manual_time",
+            "value": 19510576.78571428,
+            "unit": "ns/iter",
+            "extra": "iterations: 56\ncpu: 19810267.85714286 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/16/256/manual_time",
+            "value": 75606350.00000003,
+            "unit": "ns/iter",
+            "extra": "iterations: 10\ncpu: 76562500 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/64/256/manual_time",
+            "value": 316540533.3333333,
+            "unit": "ns/iter",
+            "extra": "iterations: 3\ncpu: 322916666.6666667 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/256/256/manual_time",
+            "value": 1301773100.0000002,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 1312500000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/1000/256/manual_time",
+            "value": 6593067500.000008,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 6640625000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/1/1000/manual_time",
+            "value": 16432101.030927833,
+            "unit": "ns/iter",
+            "extra": "iterations: 97\ncpu: 16430412.37113402 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/4/1000/manual_time",
+            "value": 50268330.00000001,
+            "unit": "ns/iter",
+            "extra": "iterations: 10\ncpu: 51562500 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/16/1000/manual_time",
+            "value": 247357080,
+            "unit": "ns/iter",
+            "extra": "iterations: 5\ncpu: 250000000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/64/1000/manual_time",
+            "value": 921205399.9999996,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 937500000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/256/1000/manual_time",
+            "value": 5074157200,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 5140625000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServices/1000/1000/manual_time",
+            "value": 25945359599.999996,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 26187500000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/1/1/manual_time",
+            "value": 45931.884620359575,
+            "unit": "ns/iter",
+            "extra": "iterations: 15462\ncpu: 46484.93079808563 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/4/1/manual_time",
+            "value": 236001.9465290803,
+            "unit": "ns/iter",
+            "extra": "iterations: 4264\ncpu: 238185.9756097561 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/16/1/manual_time",
+            "value": 1065484.0928632864,
+            "unit": "ns/iter",
+            "extra": "iterations: 1163\ncpu: 1074806.5348237318 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/64/1/manual_time",
+            "value": 4037416.157205263,
+            "unit": "ns/iter",
+            "extra": "iterations: 229\ncpu: 4093886.462882096 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/256/1/manual_time",
+            "value": 16943951.515151493,
+            "unit": "ns/iter",
+            "extra": "iterations: 66\ncpu: 17045454.545454547 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/1000/1/manual_time",
+            "value": 55480320,
+            "unit": "ns/iter",
+            "extra": "iterations: 10\ncpu: 56250000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/1/4/manual_time",
+            "value": 142190.4349125698,
+            "unit": "ns/iter",
+            "extra": "iterations: 6691\ncpu: 144784.0382603497 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/4/4/manual_time",
+            "value": 570664.3000000002,
+            "unit": "ns/iter",
+            "extra": "iterations: 1000\ncpu: 562500 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/16/4/manual_time",
+            "value": 2550072.112676053,
+            "unit": "ns/iter",
+            "extra": "iterations: 355\ncpu: 2596830.9859154928 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/64/4/manual_time",
+            "value": 10940999.090909084,
+            "unit": "ns/iter",
+            "extra": "iterations: 110\ncpu: 10937500 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/256/4/manual_time",
+            "value": 40575580.95238093,
+            "unit": "ns/iter",
+            "extra": "iterations: 21\ncpu: 40178571.428571425 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/1000/4/manual_time",
+            "value": 169465566.66666675,
+            "unit": "ns/iter",
+            "extra": "iterations: 6\ncpu: 169270833.33333334 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/1/16/manual_time",
+            "value": 453048.0471171727,
+            "unit": "ns/iter",
+            "extra": "iterations: 1613\ncpu: 455285.18288902665 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/4/16/manual_time",
+            "value": 1888278.947368421,
+            "unit": "ns/iter",
+            "extra": "iterations: 494\ncpu: 1929402.8340080972 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/16/16/manual_time",
+            "value": 7652042.000000007,
+            "unit": "ns/iter",
+            "extra": "iterations: 100\ncpu: 7656250 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/64/16/manual_time",
+            "value": 31296892.857142854,
+            "unit": "ns/iter",
+            "extra": "iterations: 28\ncpu: 31808035.714285713 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/256/16/manual_time",
+            "value": 126707424.99999979,
+            "unit": "ns/iter",
+            "extra": "iterations: 8\ncpu: 126953125 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/1000/16/manual_time",
+            "value": 473735200.00000006,
+            "unit": "ns/iter",
+            "extra": "iterations: 2\ncpu: 476562500 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/1/64/manual_time",
+            "value": 1557507.1322436845,
+            "unit": "ns/iter",
+            "extra": "iterations: 673\ncpu: 1578751.8573551264 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/4/64/manual_time",
+            "value": 5155318.000000002,
+            "unit": "ns/iter",
+            "extra": "iterations: 100\ncpu: 5156250 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/16/64/manual_time",
+            "value": 23046228.205128208,
+            "unit": "ns/iter",
+            "extra": "iterations: 39\ncpu: 23237179.487179488 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/64/64/manual_time",
+            "value": 101377549.99999994,
+            "unit": "ns/iter",
+            "extra": "iterations: 12\ncpu: 101562500 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/256/64/manual_time",
+            "value": 371039799.99999994,
+            "unit": "ns/iter",
+            "extra": "iterations: 2\ncpu: 382812500 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/1000/64/manual_time",
+            "value": 1601317800,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 1609375000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/1/256/manual_time",
+            "value": 4744545.341614906,
+            "unit": "ns/iter",
+            "extra": "iterations: 161\ncpu: 4755434.782608695 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/4/256/manual_time",
+            "value": 19333547.5409836,
+            "unit": "ns/iter",
+            "extra": "iterations: 61\ncpu: 19467213.1147541 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/16/256/manual_time",
+            "value": 71109810.00000001,
+            "unit": "ns/iter",
+            "extra": "iterations: 10\ncpu: 71875000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/64/256/manual_time",
+            "value": 294329899.9999999,
+            "unit": "ns/iter",
+            "extra": "iterations: 3\ncpu: 296875000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/256/256/manual_time",
+            "value": 1329753499.999999,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 1343750000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/1000/256/manual_time",
+            "value": 6604997899.999996,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 6656250000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/1/1000/manual_time",
+            "value": 16027994.680851066,
+            "unit": "ns/iter",
+            "extra": "iterations: 94\ncpu: 16123670.212765958 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/4/1000/manual_time",
+            "value": 50842781.25,
+            "unit": "ns/iter",
+            "extra": "iterations: 16\ncpu: 51757812.5 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/16/1000/manual_time",
+            "value": 229240600.00000006,
+            "unit": "ns/iter",
+            "extra": "iterations: 5\ncpu: 234375000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/64/1000/manual_time",
+            "value": 919760199.9999999,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 937500000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/256/1000/manual_time",
+            "value": 5319413399.999998,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 5375000000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/RegisterServicesWithRank/1000/1000/manual_time",
+            "value": 26558124900.000004,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 26812500000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/1/1",
+            "value": 3118.3572161829698,
+            "unit": "ns/iter",
+            "extra": "iterations: 213333\ncpu: 3149.4189834671615 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/4/1",
+            "value": 5816.475892856943,
+            "unit": "ns/iter",
+            "extra": "iterations: 112000\ncpu: 5719.866071428572 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/16/1",
+            "value": 16822.972475263803,
+            "unit": "ns/iter",
+            "extra": "iterations: 40727\ncpu: 16880.69339750043 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/64/1",
+            "value": 63355.741071445336,
+            "unit": "ns/iter",
+            "extra": "iterations: 11200\ncpu: 64174.107142857145 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/256/1",
+            "value": 236898.9062499338,
+            "unit": "ns/iter",
+            "extra": "iterations: 3200\ncpu: 234375 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/1000/1",
+            "value": 905470.1472554178,
+            "unit": "ns/iter",
+            "extra": "iterations: 747\ncpu: 920348.0589022757 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/1/4",
+            "value": 12551.187499996428,
+            "unit": "ns/iter",
+            "extra": "iterations: 56000\ncpu: 12555.80357142857 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/4/4",
+            "value": 23305.075836210846,
+            "unit": "ns/iter",
+            "extra": "iterations: 29867\ncpu: 22495.56366558409 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/16/4",
+            "value": 66777.64285715933,
+            "unit": "ns/iter",
+            "extra": "iterations: 11200\ncpu: 66964.28571428571 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/64/4",
+            "value": 240202.07566117283,
+            "unit": "ns/iter",
+            "extra": "iterations: 2987\ncpu: 240626.04620020086 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/256/4",
+            "value": 876524.8995986521,
+            "unit": "ns/iter",
+            "extra": "iterations: 747\ncpu: 878514.0562248996 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/1000/4",
+            "value": 3514504.812836308,
+            "unit": "ns/iter",
+            "extra": "iterations: 187\ncpu: 3509358.2887700535 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/1/16",
+            "value": 49938.650000012785,
+            "unit": "ns/iter",
+            "extra": "iterations: 10000\ncpu: 50000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/4/16",
+            "value": 94091.48252308305,
+            "unit": "ns/iter",
+            "extra": "iterations: 7467\ncpu: 94164.32302129369 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/16/16",
+            "value": 270314.95256162615,
+            "unit": "ns/iter",
+            "extra": "iterations: 2635\ncpu: 266840.6072106262 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/64/16",
+            "value": 952601.8741633396,
+            "unit": "ns/iter",
+            "extra": "iterations: 747\ncpu: 962182.0615796519 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/256/16",
+            "value": 3546046.1538465237,
+            "unit": "ns/iter",
+            "extra": "iterations: 195\ncpu: 3525641.0256410255 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/1000/16",
+            "value": 14354518.000000097,
+            "unit": "ns/iter",
+            "extra": "iterations: 50\ncpu: 14375000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/1/64",
+            "value": 205561.9268717815,
+            "unit": "ns/iter",
+            "extra": "iterations: 3446\ncpu: 204040.91700522345 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/4/64",
+            "value": 370958.59667910903,
+            "unit": "ns/iter",
+            "extra": "iterations: 1867\ncpu: 368237.81467595074 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/16/64",
+            "value": 1074327.9785807729,
+            "unit": "ns/iter",
+            "extra": "iterations: 747\ncpu: 1066767.0682730924 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/64/64",
+            "value": 3777343.315507709,
+            "unit": "ns/iter",
+            "extra": "iterations: 187\ncpu: 3760026.7379679144 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/256/64",
+            "value": 14487381.999997523,
+            "unit": "ns/iter",
+            "extra": "iterations: 50\ncpu: 14375000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/1000/64",
+            "value": 54555645.454539366,
+            "unit": "ns/iter",
+            "extra": "iterations: 11\ncpu: 55397727.27272727 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/1/256",
+            "value": 846576.6741073213,
+            "unit": "ns/iter",
+            "extra": "iterations: 896\ncpu: 837053.5714285715 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/4/256",
+            "value": 1593024.5700246256,
+            "unit": "ns/iter",
+            "extra": "iterations: 407\ncpu: 1574017.199017199 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/16/256",
+            "value": 4524442.2818791615,
+            "unit": "ns/iter",
+            "extra": "iterations: 149\ncpu: 4509228.187919463 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/64/256",
+            "value": 16232564.444443496,
+            "unit": "ns/iter",
+            "extra": "iterations: 45\ncpu: 16319444.444444444 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/256/256",
+            "value": 61100518.18181587,
+            "unit": "ns/iter",
+            "extra": "iterations: 11\ncpu: 61079545.45454545 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/1000/256",
+            "value": 243784666.66667008,
+            "unit": "ns/iter",
+            "extra": "iterations: 3\ncpu: 244791666.66666666 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/1/1000",
+            "value": 3409892.957746783,
+            "unit": "ns/iter",
+            "extra": "iterations: 213\ncpu: 3374413.145539906 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/4/1000",
+            "value": 6236380.35714131,
+            "unit": "ns/iter",
+            "extra": "iterations: 112\ncpu: 6277901.785714285 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/16/1000",
+            "value": 18088100.000002712,
+            "unit": "ns/iter",
+            "extra": "iterations: 41\ncpu: 17911585.36585366 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/64/1000",
+            "value": 65313290.90909243,
+            "unit": "ns/iter",
+            "extra": "iterations: 11\ncpu: 65340909.09090909 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/256/1000",
+            "value": 249339733.33342388,
+            "unit": "ns/iter",
+            "extra": "iterations: 3\ncpu: 244791666.66666666 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/FindServices/1000/1000",
+            "value": 988124900.0000025,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 968750000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/1/1/manual_time",
+            "value": 3730.0646024320667,
+            "unit": "ns/iter",
+            "extra": "iterations: 183894\ncpu: 10875.83064156525 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/4/1/manual_time",
+            "value": 14936.965816551603,
+            "unit": "ns/iter",
+            "extra": "iterations: 46543\ncpu: 60092.280256966675 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/16/1/manual_time",
+            "value": 61788.97651441098,
+            "unit": "ns/iter",
+            "extra": "iterations: 11539\ncpu: 333109.454892105 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/64/1/manual_time",
+            "value": 275508.6888453764,
+            "unit": "ns/iter",
+            "extra": "iterations: 2555\ncpu: 1724559.686888454 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/256/1/manual_time",
+            "value": 1413915.3361343828,
+            "unit": "ns/iter",
+            "extra": "iterations: 476\ncpu: 8862920.168067226 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/1000/1/manual_time",
+            "value": 9891847.826087134,
+            "unit": "ns/iter",
+            "extra": "iterations: 69\ncpu: 44384057.97101449 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/1/4/manual_time",
+            "value": 4455.1203425109225,
+            "unit": "ns/iter",
+            "extra": "iterations: 155556\ncpu: 12957.552264136388 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/4/4/manual_time",
+            "value": 17029.20088321027,
+            "unit": "ns/iter",
+            "extra": "iterations: 40307\ncpu: 108929.59039372814 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/16/4/manual_time",
+            "value": 72940.57377047105,
+            "unit": "ns/iter",
+            "extra": "iterations: 9760\ncpu: 765240.7786885246 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/64/4/manual_time",
+            "value": 345237.52991859964,
+            "unit": "ns/iter",
+            "extra": "iterations: 2089\ncpu: 4637386.309238871 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/256/4/manual_time",
+            "value": 2090546.706586836,
+            "unit": "ns/iter",
+            "extra": "iterations: 334\ncpu: 24466691.616766468 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/1000/4/manual_time",
+            "value": 19858672.222222127,
+            "unit": "ns/iter",
+            "extra": "iterations: 36\ncpu: 130642361.1111111 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/1/16/manual_time",
+            "value": 7442.967827783092,
+            "unit": "ns/iter",
+            "extra": "iterations: 93186\ncpu: 20624.0744317816 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/4/16/manual_time",
+            "value": 26197.83044058249,
+            "unit": "ns/iter",
+            "extra": "iterations: 26964\ncpu: 304804.5542204421 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/16/16/manual_time",
+            "value": 114334.17763157394,
+            "unit": "ns/iter",
+            "extra": "iterations: 6080\ncpu: 2469675.164473684 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/64/16/manual_time",
+            "value": 614609.9315068624,
+            "unit": "ns/iter",
+            "extra": "iterations: 1168\ncpu: 15946061.643835617 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/256/16/manual_time",
+            "value": 5186682.575757546,
+            "unit": "ns/iter",
+            "extra": "iterations: 132\ncpu: 88778409.0909091 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/1000/16/manual_time",
+            "value": 60890283.333333075,
+            "unit": "ns/iter",
+            "extra": "iterations: 12\ncpu: 484375000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/1/64/manual_time",
+            "value": 19743.948171156644,
+            "unit": "ns/iter",
+            "extra": "iterations: 35733\ncpu: 52472.50440769037 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/4/64/manual_time",
+            "value": 62685.421972422715,
+            "unit": "ns/iter",
+            "extra": "iterations: 11387\ncpu: 1078532.5371037147 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/16/64/manual_time",
+            "value": 278968.86085927987,
+            "unit": "ns/iter",
+            "extra": "iterations: 2537\ncpu: 9423039.022467481 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/64/64/manual_time",
+            "value": 1893041.5999999996,
+            "unit": "ns/iter",
+            "extra": "iterations: 375\ncpu: 62291666.666666664 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/256/64/manual_time",
+            "value": 17973792.30769225,
+            "unit": "ns/iter",
+            "extra": "iterations: 39\ncpu: 350160256.4102564 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/1000/64/manual_time",
+            "value": 209483500.00000027,
+            "unit": "ns/iter",
+            "extra": "iterations: 3\ncpu: 1854166666.6666667 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/1/256/manual_time",
+            "value": 117448.29943599446,
+            "unit": "ns/iter",
+            "extra": "iterations: 5851\ncpu: 299094.17193642113 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/4/256/manual_time",
+            "value": 404995.65972222254,
+            "unit": "ns/iter",
+            "extra": "iterations: 1728\ncpu: 4692925.347222222 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/16/256/manual_time",
+            "value": 1981821.8130311675,
+            "unit": "ns/iter",
+            "extra": "iterations: 353\ncpu: 40102691.21813031 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/64/256/manual_time",
+            "value": 10677543.749999981,
+            "unit": "ns/iter",
+            "extra": "iterations: 64\ncpu: 249511718.75 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/256/256/manual_time",
+            "value": 79638822.22222227,
+            "unit": "ns/iter",
+            "extra": "iterations: 9\ncpu: 1428819444.4444444 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/1000/256/manual_time",
+            "value": 881791900.0000019,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 7687500000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/1/1000/manual_time",
+            "value": 544786.992481203,
+            "unit": "ns/iter",
+            "extra": "iterations: 1330\ncpu: 1362781.954887218 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/4/1000/manual_time",
+            "value": 1960464.367816097,
+            "unit": "ns/iter",
+            "extra": "iterations: 348\ncpu: 19216954.022988506 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/16/1000/manual_time",
+            "value": 9178350.000000022,
+            "unit": "ns/iter",
+            "extra": "iterations: 76\ncpu: 159539473.68421054 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/64/1000/manual_time",
+            "value": 47097899.99999997,
+            "unit": "ns/iter",
+            "extra": "iterations: 15\ncpu: 1002083333.3333334 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/256/1000/manual_time",
+            "value": 342889600.0000005,
+            "unit": "ns/iter",
+            "extra": "iterations: 2\ncpu: 5609375000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/UnregisterServices/1000/1000/manual_time",
+            "value": 3616239999.9999986,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 29562500000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/1/1/manual_time",
+            "value": 7517.155223080422,
+            "unit": "ns/iter",
+            "extra": "iterations: 93575\ncpu: 8014.961261020571 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/4/1/manual_time",
+            "value": 29804.91089284802,
+            "unit": "ns/iter",
+            "extra": "iterations: 22501\ncpu: 30554.19759121817 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/16/1/manual_time",
+            "value": 129710.5688139244,
+            "unit": "ns/iter",
+            "extra": "iterations: 5573\ncpu: 128970.03409294815 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/64/1/manual_time",
+            "value": 490824.1980474199,
+            "unit": "ns/iter",
+            "extra": "iterations: 1434\ncpu: 490324.2677824268 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/256/1/manual_time",
+            "value": 2185131.306990882,
+            "unit": "ns/iter",
+            "extra": "iterations: 329\ncpu: 2184650.4559270516 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/1000/1/manual_time",
+            "value": 7992130,
+            "unit": "ns/iter",
+            "extra": "iterations: 90\ncpu: 7986111.111111111 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/1/4/manual_time",
+            "value": 7649.448496305362,
+            "unit": "ns/iter",
+            "extra": "iterations: 88848\ncpu: 8265.52088960922 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/4/4/manual_time",
+            "value": 30389.86921143378,
+            "unit": "ns/iter",
+            "extra": "iterations: 23473\ncpu: 30620.287138414347 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/16/4/manual_time",
+            "value": 124760.90744101672,
+            "unit": "ns/iter",
+            "extra": "iterations: 5510\ncpu: 124773.13974591652 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/64/4/manual_time",
+            "value": 541659.5100864555,
+            "unit": "ns/iter",
+            "extra": "iterations: 1388\ncpu: 540345.8213256485 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/256/4/manual_time",
+            "value": 2156547.352941176,
+            "unit": "ns/iter",
+            "extra": "iterations: 340\ncpu: 2113970.588235294 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/1000/4/manual_time",
+            "value": 8254883.5164835155,
+            "unit": "ns/iter",
+            "extra": "iterations: 91\ncpu: 8241758.241758241 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/1/16/manual_time",
+            "value": 8510.700444955282,
+            "unit": "ns/iter",
+            "extra": "iterations: 83604\ncpu: 9157.755609779437 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/4/16/manual_time",
+            "value": 34050.933056174516,
+            "unit": "ns/iter",
+            "extra": "iterations: 21167\ncpu: 35432.51287381301 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/16/16/manual_time",
+            "value": 146961.28160586735,
+            "unit": "ns/iter",
+            "extra": "iterations: 5181\ncpu: 147775.52596023935 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/64/16/manual_time",
+            "value": 601848.2974910386,
+            "unit": "ns/iter",
+            "extra": "iterations: 1116\ncpu: 602038.5304659498 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/256/16/manual_time",
+            "value": 2412554.4554455443,
+            "unit": "ns/iter",
+            "extra": "iterations: 303\ncpu: 2423679.8679867988 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/1000/16/manual_time",
+            "value": 9603764.000000006,
+            "unit": "ns/iter",
+            "extra": "iterations: 75\ncpu: 9583333.333333334 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/1/64/manual_time",
+            "value": 12176.349338515924,
+            "unit": "ns/iter",
+            "extra": "iterations: 54045\ncpu: 12720.88074752521 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/4/64/manual_time",
+            "value": 50652.55525834007,
+            "unit": "ns/iter",
+            "extra": "iterations: 14206\ncpu: 51694.70646205828 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/16/64/manual_time",
+            "value": 195462.2385528551,
+            "unit": "ns/iter",
+            "extra": "iterations: 3538\ncpu: 194318.82419446015 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/64/64/manual_time",
+            "value": 816751.7977528083,
+            "unit": "ns/iter",
+            "extra": "iterations: 890\ncpu: 825140.4494382022 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/256/64/manual_time",
+            "value": 3166577.4774774774,
+            "unit": "ns/iter",
+            "extra": "iterations: 222\ncpu: 3167229.7297297297 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/1000/64/manual_time",
+            "value": 12471686.274509802,
+            "unit": "ns/iter",
+            "extra": "iterations: 51\ncpu: 12561274.509803921 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/1/256/manual_time",
+            "value": 54551.964628348076,
+            "unit": "ns/iter",
+            "extra": "iterations: 11987\ncpu: 56050.304496537916 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/4/256/manual_time",
+            "value": 224153.40909090897,
+            "unit": "ns/iter",
+            "extra": "iterations: 3080\ncpu: 223214.2857142857 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/16/256/manual_time",
+            "value": 906775.9103641455,
+            "unit": "ns/iter",
+            "extra": "iterations: 714\ncpu: 919117.6470588235 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/64/256/manual_time",
+            "value": 3676300.000000002,
+            "unit": "ns/iter",
+            "extra": "iterations: 184\ncpu: 3651494.565217391 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/256/256/manual_time",
+            "value": 15469378.723404258,
+            "unit": "ns/iter",
+            "extra": "iterations: 47\ncpu: 15292553.191489361 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/1000/256/manual_time",
+            "value": 62881625,
+            "unit": "ns/iter",
+            "extra": "iterations: 12\ncpu: 62500000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/1/1000/manual_time",
+            "value": 253428.30668604656,
+            "unit": "ns/iter",
+            "extra": "iterations: 2752\ncpu: 255496.00290697673 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/4/1000/manual_time",
+            "value": 1042393.5937500003,
+            "unit": "ns/iter",
+            "extra": "iterations: 640\ncpu: 1049804.6875 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/16/1000/manual_time",
+            "value": 4185724.550898204,
+            "unit": "ns/iter",
+            "extra": "iterations: 167\ncpu: 4116766.4670658684 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/64/1000/manual_time",
+            "value": 17398376.190476187,
+            "unit": "ns/iter",
+            "extra": "iterations: 42\ncpu: 17485119.04761905 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/256/1000/manual_time",
+            "value": 69814389.99999999,
+            "unit": "ns/iter",
+            "extra": "iterations: 10\ncpu: 68750000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceRegistryFixture/ModifyServices/1000/1000/manual_time",
+            "value": 286781050,
+            "unit": "ns/iter",
+            "extra": "iterations: 2\ncpu: 281250000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceTrackerFixture/OpenServiceTrackerWithSvcRef/manual_time",
+            "value": 8144.108722990236,
+            "unit": "ns/iter",
+            "extra": "iterations: 86679\ncpu: 13699.973465314552 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceTrackerFixture/OpenServiceTrackerWithBundleContext/manual_time",
+            "value": 11620.199357444839,
+            "unit": "ns/iter",
+            "extra": "iterations: 60695\ncpu: 17248.12587527803 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceTrackerFixture/OpenServiceTrackerWithInterfaceName/manual_time",
+            "value": 10297.193753410007,
+            "unit": "ns/iter",
+            "extra": "iterations: 67813\ncpu: 16128.913335201216 ns\nthreads: 1"
+          },
+          {
+            "name": "CloseServiceTracker/1000",
+            "value": 8807.260044640941,
+            "unit": "ns/iter",
+            "extra": "iterations: 89600\ncpu: 8719.308035714286 ns\nthreads: 1"
+          },
+          {
+            "name": "CloseServiceTracker/1024",
+            "value": 9299.87031249624,
+            "unit": "ns/iter",
+            "extra": "iterations: 64000\ncpu: 9277.34375 ns\nthreads: 1"
+          },
+          {
+            "name": "CloseServiceTracker/2048",
+            "value": 9170.819196430304,
+            "unit": "ns/iter",
+            "extra": "iterations: 89600\ncpu: 9068.080357142857 ns\nthreads: 1"
+          },
+          {
+            "name": "CloseServiceTracker/4096",
+            "value": 9184.233998956975,
+            "unit": "ns/iter",
+            "extra": "iterations: 74667\ncpu: 8998.28572193874 ns\nthreads: 1"
+          },
+          {
+            "name": "CloseServiceTracker/8192",
+            "value": 9456.544390423347,
+            "unit": "ns/iter",
+            "extra": "iterations: 74667\ncpu: 9416.810639238218 ns\nthreads: 1"
+          },
+          {
+            "name": "CloseServiceTracker/16384",
+            "value": 9368.106392383033,
+            "unit": "ns/iter",
+            "extra": "iterations: 74667\ncpu: 9416.810639238218 ns\nthreads: 1"
+          },
+          {
+            "name": "CloseServiceTracker/32768",
+            "value": 9532.944196425522,
+            "unit": "ns/iter",
+            "extra": "iterations: 89600\ncpu: 9591.238839285714 ns\nthreads: 1"
+          },
+          {
+            "name": "CloseServiceTracker/65536",
+            "value": 9595.390199153757,
+            "unit": "ns/iter",
+            "extra": "iterations: 74667\ncpu: 9626.073097887956 ns\nthreads: 1"
+          },
+          {
+            "name": "CloseServiceTracker/131072",
+            "value": 9746.744880602148,
+            "unit": "ns/iter",
+            "extra": "iterations: 74667\ncpu: 9626.073097887956 ns\nthreads: 1"
+          },
+          {
+            "name": "CloseServiceTracker/262144",
+            "value": 9645.343994003597,
+            "unit": "ns/iter",
+            "extra": "iterations: 74667\ncpu: 9835.335556537693 ns\nthreads: 1"
+          },
+          {
+            "name": "CloseServiceTracker/524288",
+            "value": 9919.90437543187,
+            "unit": "ns/iter",
+            "extra": "iterations: 74667\ncpu: 9835.335556537693 ns\nthreads: 1"
+          },
+          {
+            "name": "CloseServiceTracker/1000000",
+            "value": 10563.418750002995,
+            "unit": "ns/iter",
+            "extra": "iterations: 64000\ncpu: 10498.046875 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceTrackerFixture/ServiceTrackerScalability/1",
+            "value": 52486.94999995678,
+            "unit": "ns/iter",
+            "extra": "iterations: 10000\ncpu: 53125 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceTrackerFixture/ServiceTrackerScalability/4000",
+            "value": 27736211.999999795,
+            "unit": "ns/iter",
+            "extra": "iterations: 25\ncpu: 28125000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceTrackerFixture/ServiceTrackerScalability/10000",
+            "value": 86943366.66667369,
+            "unit": "ns/iter",
+            "extra": "iterations: 9\ncpu: 86805555.55555555 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceTrackerFixture/MultipleImplOneInterfaceServiceTrackerScalability/1",
+            "value": 51387.32999998865,
+            "unit": "ns/iter",
+            "extra": "iterations: 10000\ncpu: 50000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceTrackerFixture/MultipleImplOneInterfaceServiceTrackerScalability/4000",
+            "value": 220442399.99998656,
+            "unit": "ns/iter",
+            "extra": "iterations: 3\ncpu: 218750000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceTrackerFixture/MultipleImplOneInterfaceServiceTrackerScalability/10000",
+            "value": 532905499.99974245,
+            "unit": "ns/iter",
+            "extra": "iterations: 1\ncpu: 531250000 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceTrackerFixture/ServiceTrackerScalabilityWithLDAPFilter/1",
+            "value": 49719.61427707685,
+            "unit": "ns/iter",
+            "extra": "iterations: 14933\ncpu: 49177.99504453225 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceTrackerFixture/ServiceTrackerScalabilityWithLDAPFilter/4000",
+            "value": 10676543.749994494,
+            "unit": "ns/iter",
+            "extra": "iterations: 64\ncpu: 10742187.5 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceTrackerFixture/ServiceTrackerScalabilityWithLDAPFilter/10000",
+            "value": 30485816.00000034,
+            "unit": "ns/iter",
+            "extra": "iterations: 25\ncpu: 30000000 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath/1",
+            "value": 568.0269642856015,
+            "unit": "ns/iter",
+            "extra": "iterations: 1120000\ncpu: 571.9866071428571 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath/3",
+            "value": 1659.2930803572665,
+            "unit": "ns/iter",
+            "extra": "iterations: 448000\ncpu: 1674.107142857143 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath/7",
+            "value": 3915.0240803134507,
+            "unit": "ns/iter",
+            "extra": "iterations: 186667\ncpu: 3934.1447604557848 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath/11",
+            "value": 6131.28035714031,
+            "unit": "ns/iter",
+            "extra": "iterations: 112000\ncpu: 6138.392857142857 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath/15",
+            "value": 8312.369419642657,
+            "unit": "ns/iter",
+            "extra": "iterations: 89600\ncpu: 8370.535714285714 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath/18",
+            "value": 10061.641689099508,
+            "unit": "ns/iter",
+            "extra": "iterations: 74667\ncpu: 10044.598015187432 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath/20",
+            "value": 11167.671875000451,
+            "unit": "ns/iter",
+            "extra": "iterations: 64000\ncpu: 11230.46875 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath/1",
+            "value": 6766.7723214291145,
+            "unit": "ns/iter",
+            "extra": "iterations: 112000\ncpu: 6835.9375 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath/3",
+            "value": 9793.682617488877,
+            "unit": "ns/iter",
+            "extra": "iterations: 74667\ncpu: 9835.335556537693 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath/7",
+            "value": 14944.18618666779,
+            "unit": "ns/iter",
+            "extra": "iterations: 49778\ncpu: 14753.00333480654 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath/11",
+            "value": 20672.453124987554,
+            "unit": "ns/iter",
+            "extra": "iterations: 32000\ncpu: 20996.09375 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath/15",
+            "value": 26380.901605138737,
+            "unit": "ns/iter",
+            "extra": "iterations: 26353\ncpu: 26681.02303343073 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath/18",
+            "value": 30318.90625000041,
+            "unit": "ns/iter",
+            "extra": "iterations: 22400\ncpu: 30691.964285714286 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath/20",
+            "value": 32629.606167738995,
+            "unit": "ns/iter",
+            "extra": "iterations: 20364\ncpu: 32225.987035945785 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath_NoThrowOverload/1",
+            "value": 863.4056413368471,
+            "unit": "ns/iter",
+            "extra": "iterations: 746667\ncpu: 857.9795276877109 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath_NoThrowOverload/3",
+            "value": 2378.2681249997495,
+            "unit": "ns/iter",
+            "extra": "iterations: 320000\ncpu: 2343.75 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath_NoThrowOverload/7",
+            "value": 5332.520535712806,
+            "unit": "ns/iter",
+            "extra": "iterations: 112000\ncpu: 5301.339285714285 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath_NoThrowOverload/11",
+            "value": 8188.902901784851,
+            "unit": "ns/iter",
+            "extra": "iterations: 89600\ncpu: 8196.14955357143 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath_NoThrowOverload/15",
+            "value": 11269.406250001168,
+            "unit": "ns/iter",
+            "extra": "iterations: 64000\ncpu: 11230.46875 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath_NoThrowOverload/18",
+            "value": 13225.07857143559,
+            "unit": "ns/iter",
+            "extra": "iterations: 56000\ncpu: 13392.857142857143 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/HappyPath_NoThrowOverload/20",
+            "value": 14884.23399895931,
+            "unit": "ns/iter",
+            "extra": "iterations: 49778\ncpu: 14753.00333480654 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath_NoThrowOverload/1",
+            "value": 577.5934000002962,
+            "unit": "ns/iter",
+            "extra": "iterations: 1000000\ncpu: 578.125 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath_NoThrowOverload/3",
+            "value": 2035.5530084304178,
+            "unit": "ns/iter",
+            "extra": "iterations: 344615\ncpu: 2085.6608098892966 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath_NoThrowOverload/7",
+            "value": 4982.931301723451,
+            "unit": "ns/iter",
+            "extra": "iterations: 144516\ncpu: 4973.497744194415 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath_NoThrowOverload/11",
+            "value": 8108.910228075938,
+            "unit": "ns/iter",
+            "extra": "iterations: 74667\ncpu: 8161.235887339789 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath_NoThrowOverload/15",
+            "value": 10780.14687499973,
+            "unit": "ns/iter",
+            "extra": "iterations: 64000\ncpu: 10742.1875 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath_NoThrowOverload/18",
+            "value": 12925.43214286265,
+            "unit": "ns/iter",
+            "extra": "iterations: 56000\ncpu: 12834.82142857143 ns\nthreads: 1"
+          },
+          {
+            "name": "AnyMapPerfTestFixture/ErrorPath_NoThrowOverload/20",
+            "value": 14503.272530025057,
+            "unit": "ns/iter",
+            "extra": "iterations: 49778\ncpu: 14439.109646831934 ns\nthreads: 1"
+          },
+          {
+            "name": "BundleInstallFixture/BundleInstallCppFramework/manual_time",
+            "value": 417500.0598086128,
+            "unit": "ns/iter",
+            "extra": "iterations: 1672\ncpu: 457909.6889952153 ns\nthreads: 1"
+          },
+          {
+            "name": "BundleInstallFixture/LargeBundleInstallCppFramework/manual_time",
+            "value": 393638.9544688031,
+            "unit": "ns/iter",
+            "extra": "iterations: 1779\ncpu: 439151.2085441259 ns\nthreads: 1"
+          },
+          {
+            "name": "ConstructFilterFromString",
+            "value": 858.6604202408091,
+            "unit": "ns/iter",
+            "extra": "iterations: 746667\ncpu: 857.9795276877109 ns\nthreads: 1"
+          },
+          {
+            "name": "ConstructNonTrivialFilterFromString",
+            "value": 1306.9885714287466,
+            "unit": "ns/iter",
+            "extra": "iterations: 560000\ncpu: 1311.3839285714287 ns\nthreads: 1"
+          },
+          {
+            "name": "MatchFilterWithAnyMap/Simple",
+            "value": 586.8040178569345,
+            "unit": "ns/iter",
+            "extra": "iterations: 1120000\ncpu: 585.9375 ns\nthreads: 1"
+          },
+          {
+            "name": "MatchFilterWithAnyMap/Complex",
+            "value": 626.0005357144596,
+            "unit": "ns/iter",
+            "extra": "iterations: 1120000\ncpu: 627.7901785714286 ns\nthreads: 1"
+          },
+          {
+            "name": "MatchFilterWithBundle/Simple",
+            "value": 265.03183326029426,
+            "unit": "ns/iter",
+            "extra": "iterations: 2635294\ncpu: 266.81083780405527 ns\nthreads: 1"
+          },
+          {
+            "name": "MatchFilterWithBundle/Complex",
+            "value": 437.6943125001276,
+            "unit": "ns/iter",
+            "extra": "iterations: 1600000\ncpu: 429.6875 ns\nthreads: 1"
+          },
+          {
+            "name": "MatchFilterWithServiceReference/Simple",
+            "value": 264.7285653895846,
+            "unit": "ns/iter",
+            "extra": "iterations: 2635294\ncpu: 260.88170807507623 ns\nthreads: 1"
+          },
+          {
+            "name": "MatchFilterWithServiceReference/Complex",
+            "value": 320.80986607131274,
+            "unit": "ns/iter",
+            "extra": "iterations: 2240000\ncpu: 320.8705357142857 ns\nthreads: 1"
+          },
+          {
+            "name": "ConstructFilterIncremental",
+            "value": 2782.174784741989,
+            "unit": "ns/iter",
+            "extra": "iterations: 248889\ncpu: 2762.2755525555567 ns\nthreads: 1"
+          },
+          {
+            "name": "ConstructFilterNotOperator",
+            "value": 1214.0657812494737,
+            "unit": "ns/iter",
+            "extra": "iterations: 640000\ncpu: 1220.703125 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceFixture/GetServiceReferenceByInterface",
+            "value": 1996.9375865515178,
+            "unit": "ns/iter",
+            "extra": "iterations: 373333\ncpu: 2008.9303651163975 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceFixture/GetServiceReferenceByClassName",
+            "value": 1646.1881833557616,
+            "unit": "ns/iter",
+            "extra": "iterations: 407273\ncpu: 1649.691975652695 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceFixture/GetAllServiceReferencesByInterface",
+            "value": 1688.7209821427568,
+            "unit": "ns/iter",
+            "extra": "iterations: 448000\ncpu: 1708.984375 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceFixture/GetAllServiceReferencesByClassName",
+            "value": 1332.5642857142027,
+            "unit": "ns/iter",
+            "extra": "iterations: 560000\ncpu: 1311.3839285714287 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceFixture/GetAllServiceReferencesByClassNameAndLDAPFilter",
+            "value": 943.565605551208,
+            "unit": "ns/iter",
+            "extra": "iterations: 746667\ncpu: 941.6848474621216 ns\nthreads: 1"
+          },
+          {
+            "name": "ServiceFixture/GetAllServiceReferencesByInterfaceAndLDAPFilter",
+            "value": 863.7894804511795,
+            "unit": "ns/iter",
+            "extra": "iterations: 746667\ncpu: 857.9795276877109 ns\nthreads: 1"
           }
         ]
       }

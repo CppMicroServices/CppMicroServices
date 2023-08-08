@@ -66,10 +66,9 @@ Recommended absolute minimum required compiler versions:
 Not all of the absolute minimum compiler versions are tested (as noted). We test and recommend
 the following compilers:
 
-- GCC 7.5.0
-- GCC 9.4.0
-- Clang 9.0
-- Clang from Xcode 12.0 and 13.0
+- GCC 11.3.0
+- Clang 11.0
+- Clang from Xcode 13.2 and 13.4
 - Visual Studio 2019 and 2022
 
 Recommended minimum required CMake version:
@@ -92,11 +91,11 @@ use, please see the following resources:
 
 Below is a list of tested compiler/OS combinations:
 
-- GCC 9.4.0 (Ubuntu 20.04)
-- GCC 9.5.0 (Ubuntu 22.04)
-- Clang 12.0.1 (Ubuntu 22.04)
-- Apple Clang, Xcode 13.2.0 (OS X 11.6.8)
-- Apple Clang, Xcode 13.4.0 (OS X 12.5.0)
+- GCC 7.5.0 (Ubuntu 20.04)
+- GCC 11.3.0 (Ubuntu 22.04)
+- Clang 11.0.0 (Ubuntu 20.04)
+- Apple Clang 13.0.0.13000029, Xcode 13.2.0 (OS X 11.7.6)
+- Apple Clang 14.0.0.14000029, Xcode 13.4.0 (OS X 12.6.5)
 - Visual Studio 2019
 - Visual Studio 2022
 - MinGW-w64

@@ -27,11 +27,11 @@ namespace cppmicroservices
     {
 
         template <class S, class TTT>
-        TrackedService<S, TTT>::TrackedService(ServiceTracker<S, T>* _serviceTracker,
-                                               ServiceTrackerCustomizer<S, T>* _customizer)
-            : Superclass(_serviceTracker->d->context)
-            , serviceTracker(_serviceTracker)
-            , customizer(_customizer)
+        TrackedService<S, TTT>::TrackedService(ServiceTracker<S, T>* tracker,
+                                               ServiceTrackerCustomizer<S, T>* customizer)
+            : Superclass(tracker->d->context)
+            , serviceTracker(tracker)
+            , customizer(customizer)
             , latch {}
         {
         }

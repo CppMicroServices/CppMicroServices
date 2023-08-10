@@ -306,7 +306,7 @@ namespace cppmicroservices
          * @see PrototypeServiceFactory
          */
 #ifdef __has_cpp_attribute
-#    if __has_cpp_attribute(nodiscard)
+#    if (__cplusplus >= 201703L) && __has_cpp_attribute(nodiscard)
         [[nodiscard]]
 #    elif __has_cpp_attribute(gnu::warn_unused_result)
         [[gnu::warn_unused_result]]

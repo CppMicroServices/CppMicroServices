@@ -118,7 +118,8 @@ TEST_F(ServiceReferenceTest, TestRegisterAndGetServiceReferenceTest)
 
     InterfaceMap im;
     im["ServiceNS::ITestServiceB"] = std::make_shared<TestServiceB>();
-    (void)context.RegisterService(std::make_shared<InterfaceMap const>(im));
+    auto reg = context.RegisterService(std::make_shared<InterfaceMap const>(im));
+    US_UNUSED(reg);
 
     auto sr3 = context.GetServiceReference("ServiceNS::ITestServiceB");
     ASSERT_EQ(sr3.GetInterfaceId(), "ServiceNS::ITestServiceB");

@@ -555,85 +555,115 @@ namespace cppmicroservices
         {
             std::shared_ptr<SCRExtensionRegistry> scrExtReg = GetConfigNotifier()->GetExtensionRegistry();
             std::unordered_map<long, std::shared_ptr<SCRBundleExtension>> bundExtMap = scrExtReg->GetRegistry();
-            std::shared_ptr<std::unordered_map<std::string, metadata::ComponentMetadata>> allMetadata
-                = std::make_shared<std::unordered_map<std::string, metadata::ComponentMetadata>>();
+            // links from interface name to all componentMetadata that implement that interface
+            std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> allMetadata
+                = std::make_shared<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>>();
 
             for (auto& it : bundExtMap)
             {
                 auto managers = it.second->GetManagers();
                 for (auto& it2 : *managers)
                 {
-                    auto data = ((it2)->GetMetadata());
+                    std::shared_ptr<const metadata::ComponentMetadata> data = ((it2)->GetMetadata());
+                    // add all component metadata objects to a map indexed by the interface they implement
                     for (auto& interface : data->serviceMetadata.interfaces)
                     {
-                        allMetadata->at(interface) = data;
+                        if (allMetadata->find(interface) == allMetadata->end())
+                        {
+                            allMetadata->insert(std::pair<std::string, std::vector<metadata::ComponentMetadata>>(
+                                interface,
+                                std::vector<metadata::ComponentMetadata> { *data }));
+                        }
+                        else
+                        {
+                            allMetadata->at(interface).push_back(*data);
+                        }
                     }
                 }
             }
 
-            // map for tracking circularReferences
+            // map for tracking visited nodes by interfaceName
             std::shared_ptr<std::set<std::string>> refSet = std::make_shared<std::set<std::string>>();
 
             for (auto& ref : metadata->refsMetadata)
             {
                 // if not optional
-                if (ref.minCardinality > 0)
+                if (ref.minCardinality < 1)
                 {
-                    // ensure we don't visit this node twice
-                    refSet->insert(ref.interfaceName);
+                    continue;
+                }
+                // ensure we don't visit this node twice
+                refSet->insert(ref.interfaceName);
 
-                    // check if current reference depends on this componentConfiguration
-                    bool circularRef = DependsOnMe(ref, refSet, allMetadata);
-                    if (circularRef)
-                    {
-                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                    "Circular Reference.",
-                                    std::current_exception());
-                        return;
-                    }
+                // check if current reference depends on this componentConfiguration
+                bool circularRef = DependsOnMe(ref.interfaceName, refSet, allMetadata);
+                if (circularRef)
+                {
+                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                "Circular Reference.",
+                                std::current_exception());
+                    return;
                 }
             }
         }
 
+        // check if the reference depends on this component
         bool
-        ComponentConfigurationImpl::DependsOnMe(metadata::ReferenceMetadata reference,
-                                                std::shared_ptr<std::set<std::string>> dependents,
-                                                std::shared_ptr<std::vector<metadata::ComponentMetadata>> metadatas)
+        ComponentConfigurationImpl::DependsOnMe(
+            std::string interfaceName,
+            std::shared_ptr<std::set<std::string>> visited,
+            std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> metadatas)
         {
-            // all referenced services
-            for (auto refMetadata : metadata->refsMetadata)
+            // all componentMetadata objects for components that implement this interface
+            std::vector<metadata::ComponentMetadata> components = metadatas->at(interfaceName);
+
+// this reference could be implemented by any of the components
+            for (metadata::ComponentMetadata comp : components)
             {
-                // get it's referenceManager
-                auto const refManager = GetDependencyManager(refMetadata.name);
-
-                if (refManager->IsOptional())
+                // for all references of the component that I reference
+                for (metadata::ReferenceMetadata newRef : comp.refsMetadata)
                 {
-                    continue;
-                }
-                auto configuration = GetConfiguration(refManager);
+                    if (newRef.minCardinality < 1)
+                    {
+                        continue;
+                    }
 
-                // get to a unique identifier
-                unsigned long uniqueID = configuration->GetId();
+                    auto myInterfaces = this->metadata->serviceMetadata.interfaces;
 
-                // check if this reference is the original service
-                if (uniqueID == serviceID)
-                {
-                    return true;
-                }
-
-                // if we have not visited this node in past
-                if (dependents->find(uniqueID) == dependents->end())
-                {
-                    // verify we don't visit twice
-                    dependents->insert(uniqueID);
-                    // be able to call IsDependentOn on an object
-                    if (configuration->IsDependentOn(serviceID, dependents))
+                    // check if this reference references my interface
+                    if (std::find(myInterfaces.begin(), myInterfaces.end(), newRef.interfaceName)
+                        != myInterfaces.end())
                     {
                         return true;
                     }
+
+                    // if we have not visited this node in past
+                    if (visited->find(newRef.interfaceName) == visited->end())
+                    {
+                        // verify we don't visit twice
+                        visited->insert(newRef.interfaceName);
+                        // be able to call IsDependentOn on an object
+                        if (this->DependsOnMe(newRef.interfaceName, visited, metadatas))
+                        {
+                            return true;
+                        }
+                    }
                 }
             }
+            // all referenced services
+
             return false;
         }
     } // namespace scrimpl
 } // namespace cppmicroservices
+
+
+/*
+from first component
+go through references
+each reference - verify it does not reference me
+call dependsonme on each of its references
+
+
+
+*/

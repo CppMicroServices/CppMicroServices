@@ -312,9 +312,9 @@ namespace cppmicroservices
              */
             virtual void UnbindReference(std::string const& refName, ServiceReferenceBase const& ref) = 0;
 
-            bool DependsOnMe(metadata::ReferenceMetadata reference,
-                             std::shared_ptr<std::set<std::string>> dependents,
-                             std::shared_ptr<std::vector<metadata::ComponentMetadata>> metadatas);
+            bool DependsOnMe(std::string interfaceName,
+                             std::shared_ptr<std::set<std::string>> visited,
+                             std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> metadatas);
 
             void CheckCircular();
 

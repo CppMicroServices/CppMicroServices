@@ -54,7 +54,7 @@ namespace cppmicroservices
             using T = typename TTT::TrackedType;
             using TrackedParamType = typename TTT::TrackedParamType;
 
-            TrackedService(ServiceTracker<S, T>* _serviceTracker, ServiceTrackerCustomizer<S, T>* _customizer);
+            TrackedService(ServiceTracker<S, T>* tracker, ServiceTrackerCustomizer<S, T>* customizer);
 
             /**
              * Method connected to service events for the

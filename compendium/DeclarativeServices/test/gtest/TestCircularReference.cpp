@@ -1,21 +1,3 @@
-#include <chrono>
-
-#include <gtest/gtest.h>
-
-#include "../../src/SCRExtensionRegistry.hpp"
-#include "../../src/manager/ComponentConfigurationImpl.hpp"
-#include "../../src/manager/ReferenceManager.hpp"
-#include "../../src/manager/SingletonComponentConfiguration.hpp"
-
-#include "cppmicroservices/Framework.h"
-#include "cppmicroservices/FrameworkEvent.h"
-#include "cppmicroservices/FrameworkFactory.h"
-
-#include "../TestUtils.hpp"
-#include "Mocks.hpp"
-
-namespace scr = cppmicroservices::service::component::runtime;
-
 /*=============================================================================
 
   Library: CppMicroServices
@@ -53,8 +35,16 @@ namespace scr = cppmicroservices::service::component::runtime;
 #include <cppmicroservices/servicecomponent/ComponentConstants.hpp>
 #include <cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp>
 
+#include "../../src/SCRExtensionRegistry.hpp"
+#include "../../src/manager/ComponentConfigurationImpl.hpp"
+#include "../../src/manager/ReferenceManager.hpp"
+#include "../../src/manager/SingletonComponentConfiguration.hpp"
 #include "../TestUtils.hpp"
+#include "cppmicroservices/logservice/LogService.hpp"
 
+#include "Mocks.hpp"
+
+namespace scr = cppmicroservices::service::component::runtime;
 namespace test
 {
 
@@ -63,9 +53,18 @@ namespace test
         auto framework = cppmicroservices::FrameworkFactory().NewFramework();
         framework.Start();
         EXPECT_TRUE(framework);
+        auto context = framework.GetBundleContext();
+
+        auto logger = std::make_shared<cppmicroservices::scrimpl::MockLogger>();
+        // The logger should receive 2 Log() calls as a result of the bundle being started.
+        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, ::testing::_)).Times(2);
+        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, ::testing::_)).Times(6);
+
+        // EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, ::testing::_)).Times(2);
+
+        auto loggerReg = context.RegisterService<LogService>(logger);
 
         auto dsPluginPath = test::GetDSRuntimePluginFilePath();
-        auto context = framework.GetBundleContext();
 
         test::InstallAndStartDS(context);
 
@@ -88,6 +87,8 @@ namespace test
         // assert that references are invalid with unsatisfied configuration
         ASSERT_EQ(refA.operator bool(), false);
         ASSERT_EQ(refB.operator bool(), false);
+
+        loggerReg.Unregister();
 
         framework.Stop();
         framework.WaitForStop(std::chrono::milliseconds::zero());

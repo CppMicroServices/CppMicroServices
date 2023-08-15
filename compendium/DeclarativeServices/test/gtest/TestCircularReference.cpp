@@ -131,7 +131,7 @@ namespace test
 
     // build graph with complex circuluar reference
     /*
-    [01, 02]       [03]    [05, 06]  [04]
+    [01, 02]       [03]    [05, 06]  [04] 07
      ||   \\        ||        ||      ||
      04    03       05        01      07
     */
@@ -143,21 +143,18 @@ namespace test
         EXPECT_TRUE(framework);
         auto logger = std::make_shared<cppmicroservices::scrimpl::MockLogger>();
         // The logger should receive 2 Log() calls as a result of the bundle being started.
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, ::testing::_)).Times(2);
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, ::testing::_)).Times(16);
+        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, ::testing::_)).Times(4);
+        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, ::testing::_)).Times(26);
 
         // set logging expectations
         auto CircularReference = testing::HasSubstr("Circular Reference: ");
-        auto other = testing::HasSubstr("Exception while initializing ConfigurationManager object");
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, other, testing::_)).Times(testing::AtLeast(1));
         EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
             .Times(1);
 
         auto loggerReg = context.RegisterService<LogService>(logger);
-        auto dsPluginPath = test::GetDSRuntimePluginFilePath();
 
+        test::InstallAndStartConfigAdmin(context);
         test::InstallAndStartDS(context);
-
         // The names of the bundles do matter here. The bundle containing the dependency MUST
         // be stopped after the one providing the dependency. CppMicroServices stores bundles
         // in sorted order by path.

@@ -208,6 +208,7 @@ set(_test_bundles
   TestBundleCircular01
   TestBundleCircular02
   TestBundleCircular03
+  TestBundleCircularComplex
   EnglishDictionary
   )
 

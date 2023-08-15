@@ -116,6 +116,7 @@ namespace test
             test::InstallLib(context, "TestBundleCircular01");
             test::InstallLib(context, "TestBundleCircular02");
             test::InstallLib(context, "TestBundleCircular03");
+            test::InstallLib(context, "TestBundleCircularComplex");
 
 #endif
 

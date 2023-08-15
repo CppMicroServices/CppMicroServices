@@ -129,4 +129,50 @@ namespace test
         framework.WaitForStop(std::chrono::milliseconds::zero());
     }
 
+    // build graph with complex circuluar reference
+    /*
+    [01, 02]       [03]    [05, 06]  [04]
+     ||   \\        ||        ||      ||
+     04    03       05        01      07
+    */
+    TEST(TestCircularReference, complexCircularReference)
+    {
+        auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+        framework.Start();
+        EXPECT_TRUE(framework);
+
+        auto dsPluginPath = test::GetDSRuntimePluginFilePath();
+        auto context = framework.GetBundleContext();
+
+        test::InstallAndStartDS(context);
+
+        // The names of the bundles do matter here. The bundle containing the dependency MUST
+        // be stopped after the one providing the dependency. CppMicroServices stores bundles
+        // in sorted order by path.
+
+        auto bundleA = test::InstallAndStartBundle(context, "TestBundleCircularComplex");
+        ASSERT_TRUE(bundleA);
+        bundleA.Start();
+
+        auto ref1 = context.GetServiceReference<test::DSGraph01>();
+        auto ref2 = context.GetServiceReference<test::DSGraph02>();
+        auto ref3 = context.GetServiceReference<test::DSGraph03>();
+        auto ref4 = context.GetServiceReference<test::DSGraph04>();
+        auto ref5 = context.GetServiceReference<test::DSGraph05>();
+        auto ref6 = context.GetServiceReference<test::DSGraph06>();
+        auto ref7 = context.GetServiceReference<test::DSGraph07>();
+
+        // assert that references are invalid with unsatisfied configuration
+        ASSERT_EQ(ref1.operator bool(), false);
+        ASSERT_EQ(ref2.operator bool(), false);
+        ASSERT_EQ(ref3.operator bool(), false);
+        ASSERT_EQ(ref5.operator bool(), false);
+        ASSERT_EQ(ref6.operator bool(), false);
+        ASSERT_EQ(ref7.operator bool(), true);
+        ASSERT_EQ(ref4.operator bool(), true);
+
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+    }
+
 } // namespace test

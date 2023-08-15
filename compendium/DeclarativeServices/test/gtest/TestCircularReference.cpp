@@ -146,7 +146,12 @@ namespace test
         EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, ::testing::_)).Times(2);
         EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, ::testing::_)).Times(16);
 
-        // EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, ::testing::_)).Times(2);
+        // set logging expectations
+        auto CircularReference = testing::HasSubstr("Circular Reference: ");
+        auto other = testing::HasSubstr("Exception while initializing ConfigurationManager object");
+        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, other, testing::_)).Times(testing::AtLeast(1));
+        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
+            .Times(1);
 
         auto loggerReg = context.RegisterService<LogService>(logger);
         auto dsPluginPath = test::GetDSRuntimePluginFilePath();
@@ -159,7 +164,6 @@ namespace test
 
         auto bundleA = test::InstallAndStartBundle(context, "TestBundleCircularComplex");
         ASSERT_TRUE(bundleA);
-        bundleA.Start();
 
         auto ref1 = context.GetServiceReference<test::DSGraph01>();
         auto ref2 = context.GetServiceReference<test::DSGraph02>();

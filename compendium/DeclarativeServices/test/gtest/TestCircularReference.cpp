@@ -139,10 +139,17 @@ namespace test
     {
         auto framework = cppmicroservices::FrameworkFactory().NewFramework();
         framework.Start();
-        EXPECT_TRUE(framework);
-
-        auto dsPluginPath = test::GetDSRuntimePluginFilePath();
         auto context = framework.GetBundleContext();
+        EXPECT_TRUE(framework);
+        auto logger = std::make_shared<cppmicroservices::scrimpl::MockLogger>();
+        // The logger should receive 2 Log() calls as a result of the bundle being started.
+        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, ::testing::_)).Times(2);
+        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, ::testing::_)).Times(16);
+
+        // EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, ::testing::_)).Times(2);
+
+        auto loggerReg = context.RegisterService<LogService>(logger);
+        auto dsPluginPath = test::GetDSRuntimePluginFilePath();
 
         test::InstallAndStartDS(context);
 

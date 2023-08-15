@@ -635,7 +635,13 @@ namespace cppmicroservices
             std::shared_ptr<std::vector<std::string>> path)
         {
             // all componentMetadata objects for components that implement this interface
-            std::vector<metadata::ComponentMetadata> components = metadatas->at(interfaceName);
+
+            // if the interface is not yet in the framework, return
+            if (metadatas->find(interfaceName) == metadatas->end())
+            {
+                return false;
+            }
+            std::vector<metadata::ComponentMetadata> components = (*metadatas).at(interfaceName);
 
             // this reference could be implemented by any of the components
             for (metadata::ComponentMetadata comp : components)

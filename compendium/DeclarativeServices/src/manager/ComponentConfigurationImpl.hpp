@@ -314,7 +314,8 @@ namespace cppmicroservices
 
             bool DependsOnMe(std::string interfaceName,
                              std::shared_ptr<std::set<std::string>> visited,
-                             std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> metadatas);
+                             std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> metadatas,
+                             std::shared_ptr<std::vector<std::string>> path);
 
             void CheckCircular();
 

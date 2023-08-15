@@ -584,6 +584,7 @@ namespace cppmicroservices
 
             // map for tracking visited nodes by interfaceName
             std::shared_ptr<std::set<std::string>> refSet = std::make_shared<std::set<std::string>>();
+            std::shared_ptr<std::vector<std::string>> path = std::make_shared<std::vector<std::string>>();
 
             for (auto& ref : metadata->refsMetadata)
             {
@@ -595,15 +596,33 @@ namespace cppmicroservices
                 // ensure we don't visit this node twice
                 refSet->insert(ref.interfaceName);
 
+                path->push_back(ref.interfaceName);
                 // check if current reference depends on this componentConfiguration
-                bool circularRef = DependsOnMe(ref.interfaceName, refSet, allMetadata);
+                bool circularRef = DependsOnMe(ref.interfaceName, refSet, allMetadata, path);
                 if (circularRef)
                 {
+                    std::string fullpath = "";
+
+                    for (size_t i = 0; i < this->metadata->serviceMetadata.interfaces.size(); ++i)
+                    {
+                        if (i == 0)
+                        {
+                            fullpath = "[" + this->metadata->serviceMetadata.interfaces[i];
+                            continue;
+                        }
+                        fullpath = fullpath + ", " + this->metadata->serviceMetadata.interfaces[i];
+                    }
+                    fullpath += "]";
+                    for (auto& step : *path)
+                    {
+                        fullpath = fullpath + "->" + step;
+                    }
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                "Circular Reference.",
+                                "Circular Reference: " + fullpath,
                                 std::current_exception());
                     return;
                 }
+                path->pop_back();
             }
         }
 
@@ -612,12 +631,13 @@ namespace cppmicroservices
         ComponentConfigurationImpl::DependsOnMe(
             std::string interfaceName,
             std::shared_ptr<std::set<std::string>> visited,
-            std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> metadatas)
+            std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> metadatas,
+            std::shared_ptr<std::vector<std::string>> path)
         {
             // all componentMetadata objects for components that implement this interface
             std::vector<metadata::ComponentMetadata> components = metadatas->at(interfaceName);
 
-// this reference could be implemented by any of the components
+            // this reference could be implemented by any of the components
             for (metadata::ComponentMetadata comp : components)
             {
                 // for all references of the component that I reference
@@ -629,10 +649,9 @@ namespace cppmicroservices
                     }
 
                     auto myInterfaces = this->metadata->serviceMetadata.interfaces;
-
+                    path->push_back(newRef.interfaceName);
                     // check if this reference references my interface
-                    if (std::find(myInterfaces.begin(), myInterfaces.end(), newRef.interfaceName)
-                        != myInterfaces.end())
+                    if (std::find(myInterfaces.begin(), myInterfaces.end(), newRef.interfaceName) != myInterfaces.end())
                     {
                         return true;
                     }
@@ -643,11 +662,12 @@ namespace cppmicroservices
                         // verify we don't visit twice
                         visited->insert(newRef.interfaceName);
                         // be able to call IsDependentOn on an object
-                        if (this->DependsOnMe(newRef.interfaceName, visited, metadatas))
+                        if (this->DependsOnMe(newRef.interfaceName, visited, metadatas, path))
                         {
                             return true;
                         }
                     }
+                    path->pop_back();
                 }
             }
             // all referenced services
@@ -656,7 +676,6 @@ namespace cppmicroservices
         }
     } // namespace scrimpl
 } // namespace cppmicroservices
-
 
 /*
 from first component

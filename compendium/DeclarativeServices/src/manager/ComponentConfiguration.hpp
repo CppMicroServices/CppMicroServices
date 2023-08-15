@@ -107,9 +107,11 @@ namespace cppmicroservices
             virtual std::shared_ptr<const cppmicroservices::scrimpl::metadata::ComponentMetadata> GetMetadata() const
                 = 0;
 
-            virtual bool DependsOnMe(std::string interfaceName,
-                                     std::shared_ptr<std::set<std::string>> visited,
-                                     std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> metadatas)
+            virtual bool DependsOnMe(
+                std::string interfaceName,
+                std::shared_ptr<std::set<std::string>> visited,
+                std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> metadatas,
+                std::shared_ptr<std::vector<std::string>> path)
                 = 0;
         };
     } // namespace scrimpl

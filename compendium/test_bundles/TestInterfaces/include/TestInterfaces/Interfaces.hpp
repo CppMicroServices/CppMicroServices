@@ -180,7 +180,6 @@ namespace test
         virtual bool isDependencyInjected() = 0;
         virtual ~CAInterface1();
     };
-
 } // namespace test
 
 #endif

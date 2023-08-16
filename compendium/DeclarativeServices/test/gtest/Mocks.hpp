@@ -227,8 +227,6 @@ namespace cppmicroservices
                          cppmicroservices::ListenerTokenId(std::function<void(RefChangeNotification const&)>));
             MOCK_METHOD1(UnregisterListener, void(cppmicroservices::ListenerTokenId));
             MOCK_METHOD0(StopTracking, void(void));
-            MOCK_CONST_METHOD0(GetBundleId, long(void));
-            MOCK_CONST_METHOD0(GetConfigName, std::string(void));
         };
 
         class MockReferenceManagerBaseImpl : public ReferenceManagerBaseImpl

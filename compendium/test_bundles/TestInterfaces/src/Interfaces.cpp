@@ -21,6 +21,4 @@ namespace test
     CAInterface::~CAInterface() = default;
     CAInterface1::~CAInterface1() = default;
 
-    CircularInterface2::~CircularInterface2() = default;
-    CircularInterface1::~CircularInterface1() = default;
 } // namespace test

@@ -209,6 +209,8 @@ set(_test_bundles
   TestBundleCircular02
   TestBundleCircular03
   TestBundleCircularComplex
+  TestBundleCircularDouble
+  TestBundleCircularOptReq
   EnglishDictionary
   )
 

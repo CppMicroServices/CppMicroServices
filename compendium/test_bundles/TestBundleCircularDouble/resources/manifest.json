@@ -1,0 +1,147 @@
+{
+    "bundle.symbolic_name": "TestBundleCircularDouble",
+    "bundle.activator": false,
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "implementation-class": "sample::ServiceComponentTwoCircles1",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentTwoCircles1"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph01"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref1",
+                        "interface": "test::DSGraph02",
+                        "cardinality": "1..1"
+                    }
+                ]
+            },
+            {
+                "implementation-class": "sample::ServiceComponentTwoCircles2",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentTwoCircles2"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph02"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph03",
+                        "cardinality": "0..1"
+                    }
+                ]
+            },
+            {
+                "implementation-class": "sample::ServiceComponentTwoCircles3",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentTwoCircles3"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph03"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph01",
+                        "cardinality": "1..1"
+                    }
+                ]
+            },
+            {
+                "implementation-class": "sample::ServiceComponentTwoCircles4",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentTwoCircles4"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph04"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph05",
+                        "cardinality": "1..1"
+                    }
+                ]
+            },
+            {
+                "implementation-class": "sample::ServiceComponentTwoCircles5",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentTwoCircles1"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph05"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph06",
+                        "cardinality": "1..1"
+                    }
+                ]
+            },
+            {
+                "implementation-class": "sample::ServiceComponentTwoCircles6",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentTwoCircles6"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph06"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph04",
+                        "cardinality": "1..1"
+                    },
+                    {
+                        "name": "ref1",
+                        "interface": "test::DSGraph07",
+                        "cardinality": "1..1"
+                    }
+                ]
+            },
+            {
+                "implementation-class": "sample::ServiceComponentTwoCircles7",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentTwoCircles7"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph07"
+                    ],
+                    "scope": "singleton"
+                }
+            }
+        ]
+    }
+}

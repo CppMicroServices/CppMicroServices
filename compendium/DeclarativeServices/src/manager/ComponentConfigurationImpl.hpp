@@ -443,6 +443,8 @@ namespace cppmicroservices
                 deleteCompInstanceFunc; ///< extern C function to delete an instance of the {@link ComponentInstance}
                                         ///< class from the component's bundle
         };
+        std::string
+        createPath(std::shared_ptr<const cppmicroservices::scrimpl::metadata::ComponentMetadata> metadata, std::shared_ptr<std::vector<std::string, std::allocator<std::string>>> path);
     } // namespace scrimpl
 } // namespace cppmicroservices
 #endif /* __COMPONENTCONFIGURATIONIMPL_HPP__ */

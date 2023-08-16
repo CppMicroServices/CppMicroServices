@@ -550,21 +550,23 @@ namespace cppmicroservices
             return std::make_pair(componentInstance, ctxt);
         }
 
+        /* Traverses a graph build using interfaces as nodes and dependencies between coomponents implementing those
+         * interfaces as edges */
         void
         ComponentConfigurationImpl::CheckCircular()
         {
-            std::shared_ptr<SCRExtensionRegistry> scrExtReg = GetConfigNotifier()->GetExtensionRegistry();
-            std::unordered_map<long, std::shared_ptr<SCRBundleExtension>> bundExtMap = scrExtReg->GetRegistry();
+            std::unordered_map<long, std::shared_ptr<SCRBundleExtension>> bundExtMap
+                = (GetConfigNotifier()->GetExtensionRegistry())->GetRegistry();
             // links from interface name to all componentMetadata that implement that interface
             std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> allMetadata
                 = std::make_shared<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>>();
 
-            for (auto& it : bundExtMap)
+            for (auto& it0 : bundExtMap)
             {
-                auto managers = it.second->GetManagers();
-                for (auto& it2 : *managers)
+                auto managers = it0.second->GetManagers();
+                for (auto& it1 : *managers)
                 {
-                    std::shared_ptr<const metadata::ComponentMetadata> data = ((it2)->GetMetadata());
+                    std::shared_ptr<const metadata::ComponentMetadata> data = ((it1)->GetMetadata());
                     // add all component metadata objects to a map indexed by the interface they implement
                     for (auto& interface : data->serviceMetadata.interfaces)
                     {
@@ -573,22 +575,23 @@ namespace cppmicroservices
                             allMetadata->insert(std::pair<std::string, std::vector<metadata::ComponentMetadata>>(
                                 interface,
                                 std::vector<metadata::ComponentMetadata> { *data }));
+                            continue;
                         }
-                        else
-                        {
-                            allMetadata->at(interface).push_back(*data);
-                        }
+                        allMetadata->at(interface).push_back(*data);
                     }
                 }
             }
 
             // map for tracking visited nodes by interfaceName
             std::shared_ptr<std::set<std::string>> refSet = std::make_shared<std::set<std::string>>();
+
+            // path taken for logging
             std::shared_ptr<std::vector<std::string>> path = std::make_shared<std::vector<std::string>>();
 
+            // traverse  component's references
             for (auto& ref : metadata->refsMetadata)
             {
-                // if not optional
+                // if optional, skip
                 if (ref.minCardinality < 1)
                 {
                     continue;
@@ -596,37 +599,25 @@ namespace cppmicroservices
                 // ensure we don't visit this node twice
                 refSet->insert(ref.interfaceName);
 
+                // track path
                 path->push_back(ref.interfaceName);
+
                 // check if current reference depends on this componentConfiguration
                 bool circularRef = DependsOnMe(ref.interfaceName, refSet, allMetadata, path);
                 if (circularRef)
                 {
-                    std::string fullpath = "";
-
-                    for (size_t i = 0; i < this->metadata->serviceMetadata.interfaces.size(); ++i)
-                    {
-                        if (i == 0)
-                        {
-                            fullpath = "[" + this->metadata->serviceMetadata.interfaces[i];
-                            continue;
-                        }
-                        fullpath = fullpath + ", " + this->metadata->serviceMetadata.interfaces[i];
-                    }
-                    fullpath += "]";
-                    for (auto& step : *path)
-                    {
-                        fullpath = fullpath + "->" + step;
-                    }
+                    std::string fullPath = createPath(metadata, path);
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                "Circular Reference: " + fullpath,
+                                "Circular Reference: " + fullPath,
                                 std::current_exception());
                     return;
                 }
+                // this  refence was not involved in circular dependency, remove it
                 path->pop_back();
             }
         }
 
-        // check if the reference depends on this component
+        // check if any component implementing this interfaceName depends on this component
         bool
         ComponentConfigurationImpl::DependsOnMe(
             std::string interfaceName,
@@ -634,29 +625,33 @@ namespace cppmicroservices
             std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> metadatas,
             std::shared_ptr<std::vector<std::string>> path)
         {
-            // all componentMetadata objects for components that implement this interface
-
-            // if the interface is not yet in the framework, return
+            // if the interface is not yet managed by DS, return
             if (metadatas->find(interfaceName) == metadatas->end())
             {
                 return false;
             }
+
+            // all componentMetadata objects for components that implement this interface
             std::vector<metadata::ComponentMetadata> components = (*metadatas).at(interfaceName);
 
             // this reference could be implemented by any of the components
             for (metadata::ComponentMetadata comp : components)
             {
-                // for all references of the component that I reference
+                // for all references of the component that comp references
                 for (metadata::ReferenceMetadata newRef : comp.refsMetadata)
                 {
+                    // if optional, skip
                     if (newRef.minCardinality < 1)
                     {
                         continue;
                     }
 
-                    auto myInterfaces = this->metadata->serviceMetadata.interfaces;
+                    // add to path
                     path->push_back(newRef.interfaceName);
-                    // check if this reference references my interface
+
+                    auto myInterfaces = this->metadata->serviceMetadata.interfaces;
+
+                    // check if this reference depends on myInterfaces
                     if (std::find(myInterfaces.begin(), myInterfaces.end(), newRef.interfaceName) != myInterfaces.end())
                     {
                         return true;
@@ -680,15 +675,32 @@ namespace cppmicroservices
 
             return false;
         }
+
+        // Helper to output dependency tree for ease of debugging
+        std::string
+        createPath(std::shared_ptr<const cppmicroservices::scrimpl::metadata::ComponentMetadata> metadata,
+                   std::shared_ptr<std::vector<std::string, std::allocator<std::string>>> path)
+        {
+            std::string fullpath = "";
+
+            // get all implemented interfaces from the root node
+            for (size_t i = 0; i < metadata->serviceMetadata.interfaces.size(); ++i)
+            {
+                if (i == 0)
+                {
+                    fullpath = "[" + metadata->serviceMetadata.interfaces[i];
+                    continue;
+                }
+                fullpath = fullpath + ", " + metadata->serviceMetadata.interfaces[i];
+            }
+            fullpath += "]";
+
+            // concatenate all additional steps
+            for (auto& step : *path)
+            {
+                fullpath = fullpath + "->" + step;
+            }
+            return fullpath;
+        }
     } // namespace scrimpl
 } // namespace cppmicroservices
-
-/*
-from first component
-go through references
-each reference - verify it does not reference me
-call dependsonme on each of its references
-
-
-
-*/

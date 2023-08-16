@@ -58,13 +58,7 @@ namespace cppmicroservices
         ComponentRegistry::GetComponentManager(unsigned long bundleId, std::string const& compName) const
         {
             std::lock_guard<std::mutex> lock(mMapsMutex);
-            for (auto& it : mComponentsByName){
-                auto tmp1 = it.first;
-                auto tmp2 = it.second;
-                std::cout << tmp1.first << " " << tmp1.second << " " << tmp2 << std::endl;
-            }
-            auto tmp = mComponentsByName.at(std::make_pair(bundleId, compName));
-            return tmp;
+            return mComponentsByName.at(std::make_pair(bundleId, compName));
         }
 
         bool

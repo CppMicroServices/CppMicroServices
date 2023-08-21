@@ -550,7 +550,7 @@ namespace cppmicroservices
             return std::make_pair(componentInstance, ctxt);
         }
 
-        /* Traverses a graph build using interfaces as nodes and dependencies between coomponents implementing those
+        /* Traverses a graph built using interfaces as nodes and dependencies between coomponents implementing those
          * interfaces as edges */
         void
         ComponentConfigurationImpl::CheckCircular()

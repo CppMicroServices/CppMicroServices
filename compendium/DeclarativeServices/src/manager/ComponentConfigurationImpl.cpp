@@ -637,11 +637,17 @@ namespace cppmicroservices
             // this reference could be implemented by any of the components
             for (metadata::ComponentMetadata comp : components)
             {
-                // for all references of the component that comp references
+                // for all references of the component comp
                 for (metadata::ReferenceMetadata newRef : comp.refsMetadata)
                 {
                     // if optional, skip
                     if (newRef.minCardinality < 1)
+                    {
+                        continue;
+                    }
+
+                    // if we have already visited this interface, continue
+                    if (visited->find(newRef.interfaceName) != visited->end())
                     {
                         continue;
                     }
@@ -651,27 +657,22 @@ namespace cppmicroservices
 
                     auto myInterfaces = this->metadata->serviceMetadata.interfaces;
 
-                    // check if this reference depends on myInterfaces
+                    // check if this reference is one of myInterfaces
                     if (std::find(myInterfaces.begin(), myInterfaces.end(), newRef.interfaceName) != myInterfaces.end())
                     {
                         return true;
                     }
 
-                    // if we have not visited this node in past
-                    if (visited->find(newRef.interfaceName) == visited->end())
+                    // verify we don't visit twice
+                    visited->insert(newRef.interfaceName);
+                    // if this reference depends on me, return true
+                    if (this->DependsOnMe(newRef.interfaceName, visited, metadatas, path))
                     {
-                        // verify we don't visit twice
-                        visited->insert(newRef.interfaceName);
-                        // be able to call IsDependentOn on an object
-                        if (this->DependsOnMe(newRef.interfaceName, visited, metadatas, path))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                     path->pop_back();
                 }
             }
-            // all referenced services
 
             return false;
         }

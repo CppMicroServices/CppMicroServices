@@ -61,11 +61,6 @@
                         "name": "ref",
                         "interface": "test::DSGraph04",
                         "cardinality": "1..1"
-                    },
-                    {
-                        "name": "ref1",
-                        "interface": "test::DSGraph05",
-                        "cardinality": "1..1"
                     }
                 ]
             },
@@ -73,7 +68,7 @@
                 "implementation-class": "sample::ServiceComponentOptReq4",
                 "configuration-policy": "optional",
                 "configuration-pid": [
-                    "sample::ServiceComponentOptReq1"
+                    "sample::ServiceComponentOptReq4"
                 ],
                 "service": {
                     "interfaces": [
@@ -93,11 +88,11 @@
                 "implementation-class": "sample::ServiceComponentOptReq5",
                 "configuration-policy": "optional",
                 "configuration-pid": [
-                    "sample::ServiceComponentOptReq1"
+                    "sample::ServiceComponentOptReq5"
                 ],
                 "service": {
                     "interfaces": [
-                        "test::DSGraph05"
+                        "test::DSGraph04"
                     ],
                     "scope": "singleton"
                 },

@@ -1,0 +1,69 @@
+{
+    "bundle.symbolic_name": "TestBundleCircularSelfDep",
+    "bundle.activator": false,
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "implementation-class": "sample::ServiceComponentSelfDep1",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentSelfDep1"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph01"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph02",
+                        "cardinality": "1..1"
+                    }
+                ]
+            },
+            {
+                "implementation-class": "sample::ServiceComponentSelfDep2",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentSelfDep2"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph02"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph02",
+                        "cardinality": "1..1"
+                    }
+                ]
+            },
+            {
+                "implementation-class": "sample::ServiceComponentSelfDep3",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentSelfDep3"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph02"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph01",
+                        "cardinality": "1..1"
+                    }
+                ]
+            }
+        ]
+    }
+}

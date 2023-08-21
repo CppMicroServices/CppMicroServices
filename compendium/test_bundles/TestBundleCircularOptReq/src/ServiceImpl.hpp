@@ -38,7 +38,7 @@ namespace sample
     class ServiceComponentOptReq3 : public test::DSGraph03
     {
       public:
-        ServiceComponentOptReq3(std::shared_ptr<test::DSGraph04> const& /*ref*/, std::shared_ptr<test::DSGraph05> const& /*ref*/) {}
+        ServiceComponentOptReq3(std::shared_ptr<test::DSGraph04> const& /*ref*/) {}
 
         std::string
         Description()
@@ -63,7 +63,7 @@ namespace sample
         ~ServiceComponentOptReq4() = default;
     };
 
-    class ServiceComponentOptReq5 : public test::DSGraph05
+    class ServiceComponentOptReq5 : public test::DSGraph04
     {
       public:
         ServiceComponentOptReq5(std::shared_ptr<test::DSGraph01> const& /*ref*/) {}

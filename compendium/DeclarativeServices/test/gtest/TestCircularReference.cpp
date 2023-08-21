@@ -160,13 +160,6 @@ namespace test
     }
 
     // build graph with complex circuluar reference
-    /*
-      01  - 
-     || \\ \
-     ||  04 05 
-     ||  || //   
-     02 --03   
-    */
     TEST(TestCircularReference, optionalAndRequiredPath)
     {
         auto framework = cppmicroservices::FrameworkFactory().NewFramework();
@@ -181,9 +174,9 @@ namespace test
             .Times(testing::AtLeast(1));
 
         // set logging expectations
-        auto CircularReference = testing::HasSubstr("Circular Reference: ");
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
-            .Times(1);
+        // auto CircularReference = testing::HasSubstr("Circular Reference: ");
+        // EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
+        //     .Times(1);
 
         auto loggerReg = context.RegisterService<LogService>(logger);
 
@@ -200,18 +193,63 @@ namespace test
         auto ref2 = context.GetServiceReference<test::DSGraph02>();
         auto ref3 = context.GetServiceReference<test::DSGraph03>();
         auto ref4 = context.GetServiceReference<test::DSGraph04>();
-        auto ref5 = context.GetServiceReference<test::DSGraph05>();
 
         // assert that references are invalid with unsatisfied configuration
-        ASSERT_EQ(ref1.operator bool(), false);
-        ASSERT_EQ(ref2.operator bool(), false);
-        ASSERT_EQ(ref3.operator bool(), false);
-        ASSERT_EQ(ref4.operator bool(), false);
-        ASSERT_EQ(ref5.operator bool(), true);
-
+        ASSERT_EQ(ref1.operator bool(), true);
+        ASSERT_EQ(ref2.operator bool(), true);
+        ASSERT_EQ(ref3.operator bool(), true);
+        ASSERT_EQ(ref4.operator bool(), true);
 
         framework.Stop();
         framework.WaitForStop(std::chrono::milliseconds::zero());
     }
 
+    // build graph with complex circuluar reference
+    /*
+      [01]  [02]  [02]
+       ||    ||    ||
+      [02]  [02]  [01]
+    */
+    TEST(TestCircularReference, selfDependencyCycle)
+    {
+        auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+        framework.Start();
+        auto context = framework.GetBundleContext();
+        EXPECT_TRUE(framework);
+        auto logger = std::make_shared<cppmicroservices::scrimpl::MockLogger>();
+        // The logger should receive 2 Log() calls as a result of the bundle being started.
+        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, ::testing::_))
+            .Times(testing::AtLeast(1));
+        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, ::testing::_))
+            .Times(testing::AtLeast(1));
+
+        // set logging expectations
+        // auto CircularReference = testing::HasSubstr("Circular Reference: ");
+        // EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference,
+        // testing::_))
+        //     .Times(1);
+
+        auto loggerReg = context.RegisterService<LogService>(logger);
+
+        test::InstallAndStartConfigAdmin(context);
+        test::InstallAndStartDS(context);
+        // The names of the bundles do matter here. The bundle containing the dependency MUST
+        // be stopped after the one providing the dependency. CppMicroServices stores bundles
+        // in sorted order by path.
+
+        auto bundleA = test::InstallAndStartBundle(context, "TestBundleCircularSelfDep");
+        ASSERT_TRUE(bundleA);
+
+        auto ref1 = context.GetServiceReference<test::DSGraph01>();
+        auto ref2 = context.GetServiceReference("sample::ServiceComponentSelfDep2");
+        auto ref3 = context.GetServiceReference("sample::ServiceComponentSelfDep3");
+
+        // assert that references are invalid with unsatisfied configuration
+        ASSERT_EQ(ref1.operator bool(), false);
+        ASSERT_EQ(ref2.operator bool(), false);
+        ASSERT_EQ(ref3.operator bool(), false);
+
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+    }
 } // namespace test

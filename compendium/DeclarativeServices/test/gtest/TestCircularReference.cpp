@@ -47,40 +47,67 @@
 namespace scr = cppmicroservices::service::component::runtime;
 namespace test
 {
+    class TestCircularReference : public ::testing::Test
+    {
+      protected:
+        TestCircularReference()
+            : framework(cppmicroservices::FrameworkFactory().NewFramework())
+            , logger(std::make_shared<::testing::NiceMock<cppmicroservices::scrimpl::MockLogger>>())
+        {
+        }
+        virtual ~TestCircularReference() = default;
+
+        virtual void
+        SetUp()
+        {
+            framework.Start();
+            context = framework.GetBundleContext();
+            EXPECT_TRUE(framework);
+        }
+
+        virtual void
+        ExpectCircular(std::string msg, int times)
+        {
+            // set logging expectations
+            auto CircularReference = testing::HasSubstr(msg);
+            EXPECT_CALL(*logger,
+                        Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
+                .Times(times);
+        }
+
+        virtual void
+        RegisterLoggerStartBundle(std::string bundleName)
+        {
+            context.RegisterService<LogService>(logger);
+
+            test::InstallAndStartConfigAdmin(context);
+            test::InstallAndStartDS(context);
+
+            ASSERT_TRUE(test::InstallAndStartBundle(context, bundleName));
+        }
+
+        virtual void
+        TearDown()
+        {
+            framework.Stop();
+            framework.WaitForStop(std::chrono::milliseconds::zero());
+        }
+
+        cppmicroservices::Framework framework;
+        std::shared_ptr<::testing::NiceMock<cppmicroservices::scrimpl::MockLogger>> logger;
+        cppmicroservices::BundleContext context;
+    };
+
     // build graph with complex circuluar reference
     /*
     [01, 02]       [03]    [05, 06]  [04] 07
      ||   \\        ||        ||      ||
      04    03       05        01      07
     */
-    TEST(TestCircularReference, singleLargeGraph)
+    TEST_F(TestCircularReference, singleLargeGraph)
     {
-        auto framework = cppmicroservices::FrameworkFactory().NewFramework();
-        framework.Start();
-        auto context = framework.GetBundleContext();
-        EXPECT_TRUE(framework);
-        auto logger = std::make_shared<cppmicroservices::scrimpl::MockLogger>();
-        // The logger should receive 2 Log() calls as a result of the bundle being started.
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, ::testing::_))
-            .Times(testing::AtLeast(1));
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, ::testing::_))
-            .Times(testing::AtLeast(1));
-
-        // set logging expectations
-        // auto CircularReference = testing::HasSubstr("Circular Reference: ");
-        // EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
-        //     .Times(1);
-
-        auto loggerReg = context.RegisterService<LogService>(logger);
-
-        test::InstallAndStartConfigAdmin(context);
-        test::InstallAndStartDS(context);
-        // The names of the bundles do matter here. The bundle containing the dependency MUST
-        // be stopped after the one providing the dependency. CppMicroServices stores bundles
-        // in sorted order by path.
-
-        auto bundleA = test::InstallAndStartBundle(context, "TestBundleCircularComplex");
-        ASSERT_TRUE(bundleA);
+        ExpectCircular("Circular Reference: ", 1);
+        RegisterLoggerStartBundle("TestBundleCircularComplex");
 
         auto ref1 = context.GetServiceReference<test::DSGraph01>();
         auto ref2 = context.GetServiceReference<test::DSGraph02>();
@@ -98,9 +125,6 @@ namespace test
         ASSERT_EQ(ref6.operator bool(), false);
         ASSERT_EQ(ref7.operator bool(), true);
         ASSERT_EQ(ref4.operator bool(), true);
-
-        framework.Stop();
-        framework.WaitForStop(std::chrono::milliseconds::zero());
     }
 
     // build graph with complex circuluar reference
@@ -109,34 +133,10 @@ namespace test
      || /     || //
       02       05
     */
-    TEST(TestCircularReference, twoSmallGraph)
+    TEST_F(TestCircularReference, twoSmallGraph)
     {
-        auto framework = cppmicroservices::FrameworkFactory().NewFramework();
-        framework.Start();
-        auto context = framework.GetBundleContext();
-        EXPECT_TRUE(framework);
-        auto logger = std::make_shared<cppmicroservices::scrimpl::MockLogger>();
-        // The logger should receive 2 Log() calls as a result of the bundle being started.
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, ::testing::_))
-            .Times(testing::AtLeast(1));
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, ::testing::_))
-            .Times(testing::AtLeast(1));
-
-        // set logging expectations
-        // auto CircularReference = testing::HasSubstr("Circular Reference: ");
-        // EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
-        //     .Times(1);
-
-        auto loggerReg = context.RegisterService<LogService>(logger);
-
-        test::InstallAndStartConfigAdmin(context);
-        test::InstallAndStartDS(context);
-        // The names of the bundles do matter here. The bundle containing the dependency MUST
-        // be stopped after the one providing the dependency. CppMicroServices stores bundles
-        // in sorted order by path.
-
-        auto bundleA = test::InstallAndStartBundle(context, "TestBundleCircularDouble");
-        ASSERT_TRUE(bundleA);
+        ExpectCircular("Circular Reference: ", 1);
+        RegisterLoggerStartBundle("TestBundleCircularDouble");
 
         auto ref1 = context.GetServiceReference<test::DSGraph01>();
         auto ref2 = context.GetServiceReference<test::DSGraph02>();
@@ -154,40 +154,13 @@ namespace test
         ASSERT_EQ(ref5.operator bool(), false);
         ASSERT_EQ(ref6.operator bool(), false);
         ASSERT_EQ(ref7.operator bool(), true);
-
-        framework.Stop();
-        framework.WaitForStop(std::chrono::milliseconds::zero());
     }
 
     // build graph with complex circuluar reference
-    TEST(TestCircularReference, optionalAndRequiredPath)
+    TEST_F(TestCircularReference, optionalAndRequiredPath)
     {
-        auto framework = cppmicroservices::FrameworkFactory().NewFramework();
-        framework.Start();
-        auto context = framework.GetBundleContext();
-        EXPECT_TRUE(framework);
-        auto logger = std::make_shared<cppmicroservices::scrimpl::MockLogger>();
-        // The logger should receive 2 Log() calls as a result of the bundle being started.
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, ::testing::_))
-            .Times(testing::AtLeast(1));
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, ::testing::_))
-            .Times(testing::AtLeast(1));
-
-        // set logging expectations
-        // auto CircularReference = testing::HasSubstr("Circular Reference: ");
-        // EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
-        //     .Times(1);
-
-        auto loggerReg = context.RegisterService<LogService>(logger);
-
-        test::InstallAndStartConfigAdmin(context);
-        test::InstallAndStartDS(context);
-        // The names of the bundles do matter here. The bundle containing the dependency MUST
-        // be stopped after the one providing the dependency. CppMicroServices stores bundles
-        // in sorted order by path.
-
-        auto bundleA = test::InstallAndStartBundle(context, "TestBundleCircularOptReq");
-        ASSERT_TRUE(bundleA);
+        ExpectCircular("Circular Reference: ", 1);
+        RegisterLoggerStartBundle("TestBundleCircularOptReq");
 
         auto ref1 = context.GetServiceReference<test::DSGraph01>();
         auto ref2 = context.GetServiceReference<test::DSGraph02>();
@@ -199,9 +172,6 @@ namespace test
         ASSERT_EQ(ref2.operator bool(), true);
         ASSERT_EQ(ref3.operator bool(), true);
         ASSERT_EQ(ref4.operator bool(), true);
-
-        framework.Stop();
-        framework.WaitForStop(std::chrono::milliseconds::zero());
     }
 
     // build graph with complex circuluar reference
@@ -210,35 +180,10 @@ namespace test
        ||    ||    ||
       [02]  [02]  [01]
     */
-    TEST(TestCircularReference, selfDependencyCycle)
+    TEST_F(TestCircularReference, selfDependencyCycle)
     {
-        auto framework = cppmicroservices::FrameworkFactory().NewFramework();
-        framework.Start();
-        auto context = framework.GetBundleContext();
-        EXPECT_TRUE(framework);
-        auto logger = std::make_shared<cppmicroservices::scrimpl::MockLogger>();
-        // The logger should receive 2 Log() calls as a result of the bundle being started.
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, ::testing::_))
-            .Times(testing::AtLeast(1));
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, ::testing::_))
-            .Times(testing::AtLeast(1));
-
-        // set logging expectations
-        // auto CircularReference = testing::HasSubstr("Circular Reference: ");
-        // EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference,
-        // testing::_))
-        //     .Times(1);
-
-        auto loggerReg = context.RegisterService<LogService>(logger);
-
-        test::InstallAndStartConfigAdmin(context);
-        test::InstallAndStartDS(context);
-        // The names of the bundles do matter here. The bundle containing the dependency MUST
-        // be stopped after the one providing the dependency. CppMicroServices stores bundles
-        // in sorted order by path.
-
-        auto bundleA = test::InstallAndStartBundle(context, "TestBundleCircularSelfDep");
-        ASSERT_TRUE(bundleA);
+        ExpectCircular("Circular Reference: ", 1);
+        RegisterLoggerStartBundle("TestBundleCircularSelfDep");
 
         auto ref1 = context.GetServiceReference<test::DSGraph01>();
         auto ref2 = context.GetServiceReference("sample::ServiceComponentSelfDep2");
@@ -248,8 +193,5 @@ namespace test
         ASSERT_EQ(ref1.operator bool(), false);
         ASSERT_EQ(ref2.operator bool(), false);
         ASSERT_EQ(ref3.operator bool(), false);
-
-        framework.Stop();
-        framework.WaitForStop(std::chrono::milliseconds::zero());
     }
 } // namespace test

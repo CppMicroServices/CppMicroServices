@@ -598,9 +598,6 @@ namespace cppmicroservices
                 // ensure we don't visit this node twice
                 refSet.insert(ref.interfaceName);
 
-                // track path
-                // path->push_back(ref.interfaceName);
-
                 // check if current reference depends on this componentConfiguration
                 bool circularRef = DependsOnMe(ref.interfaceName, refSet, allMetadata, path);
                 if (circularRef)
@@ -611,8 +608,6 @@ namespace cppmicroservices
                                 std::current_exception());
                     return;
                 }
-                // this  refence was not involved in circular dependency, remove it
-                // path->pop_back();
             }
         }
 

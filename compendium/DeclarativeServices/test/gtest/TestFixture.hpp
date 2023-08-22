@@ -113,7 +113,7 @@ namespace test
             test::InstallLib(context, "TestBundleDSCA24");
             test::InstallLib(context, "TestBundleDSCA26");
             test::InstallLib(context, "TestBundleDSCA27");
-            test::InstallLib(context, "TestBundleCircularComplex");
+            test::InstallLib(context, "TestBundleCircularBasic");
             test::InstallLib(context, "TestBundleCircularDouble");
             test::InstallLib(context, "TestBundleCircularOptReq");
             test::InstallLib(context, "TestBundleCircularSelfDep");

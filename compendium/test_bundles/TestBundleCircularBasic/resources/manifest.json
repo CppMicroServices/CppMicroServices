@@ -1,5 +1,5 @@
 {
-    "bundle.symbolic_name": "TestBundleCircularComplex",
+    "bundle.symbolic_name": "TestBundleCircularBasic",
     "bundle.activator": false,
     "scr": {
         "version": 1,

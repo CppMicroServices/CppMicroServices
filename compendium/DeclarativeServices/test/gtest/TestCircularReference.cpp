@@ -66,10 +66,15 @@ namespace test
         }
 
         virtual void
-        ExpectCircular(std::string msg, int times)
+        ExpectCircular(std::vector<std::string> msgs, int times)
         {
+            std::vector<testing::PolymorphicMatcher<testing::internal::HasSubstrMatcher<std::string>>> tmp;
+            for (auto msg : msgs)
+            {
+                tmp.push_back(testing::HasSubstr(msg));
+            }
             // set logging expectations
-            auto CircularReference = testing::HasSubstr(msg);
+            auto CircularReference = testing::AllOfArray(tmp.begin(), tmp.end());
             EXPECT_CALL(*logger,
                         Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
                 .Times(times);
@@ -104,10 +109,14 @@ namespace test
      ||   \\        ||        ||      ||
      04    03       05        01      07
     */
-    TEST_F(TestCircularReference, singleLargeGraph)
+    TEST_F(TestCircularReference, basicGraph)
     {
-        ExpectCircular("Circular Reference: ", 1);
-        RegisterLoggerStartBundle("TestBundleCircularComplex");
+        std::vector<std::string> vectorSubs { "Circular Reference: ",
+                                              "(sample::ServiceComponentComplexCircular56: test::DSGraph05)",
+                                              "(sample::ServiceComponentComplexCircular12: test::DSGraph01)",
+                                              "(sample::ServiceComponentComplexCircular3: test::DSGraph03)" };
+        ExpectCircular(vectorSubs, 1);
+        RegisterLoggerStartBundle("TestBundleCircularBasic");
 
         auto ref1 = context.GetServiceReference<test::DSGraph01>();
         auto ref2 = context.GetServiceReference<test::DSGraph02>();
@@ -135,7 +144,11 @@ namespace test
     */
     TEST_F(TestCircularReference, twoSmallGraph)
     {
-        ExpectCircular("Circular Reference: ", 1);
+        std::vector<std::string> vectorSubs { "Circular Reference: ",
+                                              "(sample::ServiceComponentTwoCircles6: test::DSGraph06)",
+                                              "(sample::ServiceComponentTwoCircles4: test::DSGraph04)",
+                                              "(sample::ServiceComponentTwoCircles5: test::DSGraph05)" };
+        ExpectCircular(vectorSubs, 1);
         RegisterLoggerStartBundle("TestBundleCircularDouble");
 
         auto ref1 = context.GetServiceReference<test::DSGraph01>();
@@ -159,7 +172,12 @@ namespace test
     // build graph with complex circuluar reference
     TEST_F(TestCircularReference, optionalAndRequiredPath)
     {
-        ExpectCircular("Circular Reference: ", 1);
+        std::vector<std::string> vectorSubs { "Circular Reference: ",
+                                              "(sample::ServiceComponentOptReq4: test::DSGraph04)",
+                                              "(sample::ServiceComponentOptReq1: test::DSGraph01)",
+                                              "(sample::ServiceComponentOptReq2: test::DSGraph02)",
+                                              "(sample::ServiceComponentOptReq3: test::DSGraph03)" };
+        ExpectCircular(vectorSubs, 1);
         RegisterLoggerStartBundle("TestBundleCircularOptReq");
 
         auto ref1 = context.GetServiceReference<test::DSGraph01>();
@@ -182,7 +200,10 @@ namespace test
     */
     TEST_F(TestCircularReference, selfDependencyCycle)
     {
-        ExpectCircular("Circular Reference: ", 1);
+        std::vector<std::string> vectorSubs { "Circular Reference: ",
+                                              "(sample::ServiceComponentSelfDep3: test::DSGraph02)",
+                                              "(sample::ServiceComponentSelfDep1: test::DSGraph01)" };
+        ExpectCircular(vectorSubs, 1);
         RegisterLoggerStartBundle("TestBundleCircularSelfDep");
 
         auto ref1 = context.GetServiceReference<test::DSGraph01>();

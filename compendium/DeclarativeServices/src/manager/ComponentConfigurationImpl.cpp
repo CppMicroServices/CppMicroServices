@@ -557,7 +557,7 @@ namespace cppmicroservices
         {
             std::unordered_map<long, std::shared_ptr<SCRBundleExtension>> bundExtMap
                 = (GetConfigNotifier()->GetExtensionRegistry())->GetRegistry();
-            // links from interface name to all componentMetadata that implement that interface
+            // maps from interface name to all componentMetadata that implement that interface
             std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>> allMetadata;
 
             for (auto& it0 : bundExtMap)
@@ -566,7 +566,6 @@ namespace cppmicroservices
                 for (auto& it1 : *managers)
                 {
                     std::shared_ptr<const metadata::ComponentMetadata> data = ((it1)->GetMetadata());
-                    // add all component metadata objects to a map indexed by the interface they implement
                     for (auto& interface : data->serviceMetadata.interfaces)
                     {
                         if (allMetadata.find(interface) == allMetadata.end())
@@ -584,23 +583,22 @@ namespace cppmicroservices
             // map for tracking visited nodes by interfaceName
             std::set<std::string> refSet;
 
-            // path taken for logging
+            // path taken for logging: <implementationClassName, problematicInterface>
             std::vector<std::pair<std::string, std::string>> path;
 
-            // traverse  component's references
+            // traverse component's references
             for (auto& ref : metadata->refsMetadata)
             {
-                // if optional, skip
                 if (ref.minCardinality < 1)
                 {
+                    // skip optional references
                     continue;
                 }
                 // ensure we don't visit this node twice
                 refSet.insert(ref.interfaceName);
 
-                // check if current reference depends on this componentConfiguration
-                bool circularRef = DependsOnMe(ref.interfaceName, refSet, allMetadata, path);
-                if (circularRef)
+                // check if ref depends on interfaces implemented by this
+                if (DependsOnMe(ref.interfaceName, refSet, allMetadata, path))
                 {
                     std::string fullPath = createPath(path);
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
@@ -625,32 +623,30 @@ namespace cppmicroservices
                 return false;
             }
 
-            // all componentMetadata objects for components that implement this interface
+            // check all components that implement interfaceName
             std::vector<metadata::ComponentMetadata> components = metadatas.at(interfaceName);
-
-            // this reference could be implemented by any of the components
             for (metadata::ComponentMetadata comp : components)
             {
-                // this component is next in the path
                 path.push_back(std::pair<std::string, std::string>(comp.implClassName, interfaceName));
-                // for all references of the component comp
+
+                // for all references of comp
                 for (metadata::ReferenceMetadata newRef : comp.refsMetadata)
                 {
-                    // if optional, skip
                     if (newRef.minCardinality < 1)
                     {
+                        // skip optional references
                         continue;
                     }
 
-                    // if we have already visited this interface, continue
                     if (visited.find(newRef.interfaceName) != visited.end())
                     {
+                        // skip already visited interfaces
                         continue;
                     }
 
                     auto myInterfaces = this->metadata->serviceMetadata.interfaces;
 
-                    // check if this reference is one of myInterfaces
+                    // check if newRef.interfaceName is one of this's implemented interfaces
                     auto it = std::find(myInterfaces.begin(), myInterfaces.end(), newRef.interfaceName);
                     if (it != myInterfaces.end())
                     {
@@ -658,14 +654,16 @@ namespace cppmicroservices
                         return true;
                     }
 
-                    // verify we don't visit twice
+                    // ensure we don't visit twice
                     visited.insert(newRef.interfaceName);
-                    // if this reference depends on me, return true
+
+                    // if any component implementing newRef.interfaceName depends on me, return true
                     if (this->DependsOnMe(newRef.interfaceName, visited, metadatas, path))
                     {
                         return true;
                     }
                 }
+                // didn't find a circle within this component, remove it from path
                 path.pop_back();
             }
 

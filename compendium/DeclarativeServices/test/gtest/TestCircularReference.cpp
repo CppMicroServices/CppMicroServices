@@ -112,9 +112,9 @@ namespace test
     TEST_F(TestCircularReference, basicGraph)
     {
         std::vector<std::string> vectorSubs { "Circular Reference: ",
-                                              "(sample::ServiceComponentComplexCircular56: test::DSGraph05)",
-                                              "(sample::ServiceComponentComplexCircular12: test::DSGraph01)",
-                                              "(sample::ServiceComponentComplexCircular3: test::DSGraph03)" };
+                                              "(sample::ServiceComponentBasicCircular56: test::DSGraph05)",
+                                              "(sample::ServiceComponentBasicCircular12: test::DSGraph01)",
+                                              "(sample::ServiceComponentBasicCircular3: test::DSGraph03)" };
         ExpectCircular(vectorSubs, 1);
         RegisterLoggerStartBundle("TestBundleCircularBasic");
 

@@ -5,10 +5,10 @@
         "version": 1,
         "components": [
             {
-                "implementation-class": "sample::ServiceComponentComplexCircular12",
+                "implementation-class": "sample::ServiceComponentBasicCircular12",
                 "configuration-policy": "optional",
                 "configuration-pid": [
-                    "sample::ServiceComponentComplexCircular12"
+                    "sample::ServiceComponentBasicCircular12"
                 ],
                 "service": {
                     "interfaces": [
@@ -31,10 +31,10 @@
                 ]
             },
             {
-                "implementation-class": "sample::ServiceComponentComplexCircular3",
+                "implementation-class": "sample::ServiceComponentBasicCircular3",
                 "configuration-policy": "optional",
                 "configuration-pid": [
-                    "sample::ServiceComponentComplexCircular3"
+                    "sample::ServiceComponentBasicCircular3"
                 ],
                 "service": {
                     "interfaces": [
@@ -51,10 +51,10 @@
                 ]
             },
             {
-                "implementation-class": "sample::ServiceComponentComplexCircular4",
+                "implementation-class": "sample::ServiceComponentBasicCircular4",
                 "configuration-policy": "optional",
                 "configuration-pid": [
-                    "sample::ServiceComponentComplexCircular4"
+                    "sample::ServiceComponentBasicCircular4"
                 ],
                 "service": {
                     "interfaces": [
@@ -71,10 +71,10 @@
                 ]
             },
             {
-                "implementation-class": "sample::ServiceComponentComplexCircular56",
+                "implementation-class": "sample::ServiceComponentBasicCircular56",
                 "configuration-policy": "optional",
                 "configuration-pid": [
-                    "sample::ServiceComponentComplexCircular56"
+                    "sample::ServiceComponentBasicCircular56"
                 ],
                 "service": {
                     "interfaces": [
@@ -92,10 +92,10 @@
                 ]
             },
             {
-                "implementation-class": "sample::ServiceComponentComplexCircular7",
+                "implementation-class": "sample::ServiceComponentBasicCircular7",
                 "configuration-policy": "optional",
                 "configuration-pid": [
-                    "sample::ServiceComponentComplexCircular7"
+                    "sample::ServiceComponentBasicCircular7"
                 ],
                 "service": {
                     "interfaces": [

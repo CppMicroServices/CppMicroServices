@@ -558,8 +558,7 @@ namespace cppmicroservices
             std::unordered_map<long, std::shared_ptr<SCRBundleExtension>> bundExtMap
                 = (GetConfigNotifier()->GetExtensionRegistry())->GetRegistry();
             // links from interface name to all componentMetadata that implement that interface
-            std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> allMetadata
-                = std::make_shared<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>>();
+            std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>> allMetadata;
 
             for (auto& it0 : bundExtMap)
             {
@@ -570,23 +569,23 @@ namespace cppmicroservices
                     // add all component metadata objects to a map indexed by the interface they implement
                     for (auto& interface : data->serviceMetadata.interfaces)
                     {
-                        if (allMetadata->find(interface) == allMetadata->end())
+                        if (allMetadata.find(interface) == allMetadata.end())
                         {
-                            allMetadata->insert(std::pair<std::string, std::vector<metadata::ComponentMetadata>>(
+                            allMetadata.insert(std::pair<std::string, std::vector<metadata::ComponentMetadata>>(
                                 interface,
                                 std::vector<metadata::ComponentMetadata> { *data }));
                             continue;
                         }
-                        allMetadata->at(interface).push_back(*data);
+                        allMetadata.at(interface).push_back(*data);
                     }
                 }
             }
 
             // map for tracking visited nodes by interfaceName
-            std::shared_ptr<std::set<std::string>> refSet = std::make_shared<std::set<std::string>>();
+            std::set<std::string> refSet;
 
             // path taken for logging
-            std::shared_ptr<std::vector<std::string>> path = std::make_shared<std::vector<std::string>>();
+            std::vector<std::pair<std::string, std::string>> path;
 
             // traverse  component's references
             for (auto& ref : metadata->refsMetadata)
@@ -597,23 +596,23 @@ namespace cppmicroservices
                     continue;
                 }
                 // ensure we don't visit this node twice
-                refSet->insert(ref.interfaceName);
+                refSet.insert(ref.interfaceName);
 
                 // track path
-                path->push_back(ref.interfaceName);
+                // path->push_back(ref.interfaceName);
 
                 // check if current reference depends on this componentConfiguration
                 bool circularRef = DependsOnMe(ref.interfaceName, refSet, allMetadata, path);
                 if (circularRef)
                 {
-                    std::string fullPath = createPath(metadata, path);
+                    std::string fullPath = createPath(path);
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                                 "Circular Reference: " + fullPath,
                                 std::current_exception());
                     return;
                 }
                 // this  refence was not involved in circular dependency, remove it
-                path->pop_back();
+                // path->pop_back();
             }
         }
 
@@ -621,22 +620,24 @@ namespace cppmicroservices
         bool
         ComponentConfigurationImpl::DependsOnMe(
             std::string interfaceName,
-            std::shared_ptr<std::set<std::string>> visited,
-            std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> metadatas,
-            std::shared_ptr<std::vector<std::string>> path)
+            std::set<std::string>& visited,
+            std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>& metadatas,
+            std::vector<std::pair<std::string, std::string>>& path)
         {
             // if the interface is not yet managed by DS, return
-            if (metadatas->find(interfaceName) == metadatas->end())
+            if (metadatas.find(interfaceName) == metadatas.end())
             {
                 return false;
             }
 
             // all componentMetadata objects for components that implement this interface
-            std::vector<metadata::ComponentMetadata> components = (*metadatas).at(interfaceName);
+            std::vector<metadata::ComponentMetadata> components = metadatas.at(interfaceName);
 
             // this reference could be implemented by any of the components
             for (metadata::ComponentMetadata comp : components)
             {
+                // this component is next in the path
+                path.push_back(std::pair<std::string, std::string>(comp.implClassName, interfaceName));
                 // for all references of the component comp
                 for (metadata::ReferenceMetadata newRef : comp.refsMetadata)
                 {
@@ -647,31 +648,30 @@ namespace cppmicroservices
                     }
 
                     // if we have already visited this interface, continue
-                    if (visited->find(newRef.interfaceName) != visited->end())
+                    if (visited.find(newRef.interfaceName) != visited.end())
                     {
                         continue;
                     }
 
-                    // add to path
-                    path->push_back(newRef.interfaceName);
-
                     auto myInterfaces = this->metadata->serviceMetadata.interfaces;
 
                     // check if this reference is one of myInterfaces
-                    if (std::find(myInterfaces.begin(), myInterfaces.end(), newRef.interfaceName) != myInterfaces.end())
+                    auto it = std::find(myInterfaces.begin(), myInterfaces.end(), newRef.interfaceName);
+                    if (it != myInterfaces.end())
                     {
+                        path.push_back(std::pair<std::string, std::string>(this->metadata->implClassName, *it));
                         return true;
                     }
 
                     // verify we don't visit twice
-                    visited->insert(newRef.interfaceName);
+                    visited.insert(newRef.interfaceName);
                     // if this reference depends on me, return true
                     if (this->DependsOnMe(newRef.interfaceName, visited, metadatas, path))
                     {
                         return true;
                     }
-                    path->pop_back();
                 }
+                path.pop_back();
             }
 
             return false;
@@ -679,29 +679,30 @@ namespace cppmicroservices
 
         // Helper to output dependency tree for ease of debugging
         std::string
-        createPath(std::shared_ptr<const cppmicroservices::scrimpl::metadata::ComponentMetadata> metadata,
-                   std::shared_ptr<std::vector<std::string, std::allocator<std::string>>> path)
+        createPath(std::vector<std::pair<std::string, std::string>>& path)
         {
             std::string fullpath = "";
 
-            // get all implemented interfaces from the root node
-            for (size_t i = 0; i < metadata->serviceMetadata.interfaces.size(); ++i)
-            {
-                if (i == 0)
-                {
-                    fullpath = "[" + metadata->serviceMetadata.interfaces[i];
-                    continue;
-                }
-                fullpath = fullpath + ", " + metadata->serviceMetadata.interfaces[i];
-            }
-            fullpath += "]";
-
+            addToPath(fullpath, path[path.size() - 1], false);
             // concatenate all additional steps
-            for (auto& step : *path)
+            for (size_t i = 0; i < path.size() - 1; ++i)
             {
-                fullpath = fullpath + "->" + step;
+                addToPath(fullpath, path[i], false);
             }
+
+            addToPath(fullpath, path[path.size() - 1], true);
+
             return fullpath;
+        }
+
+        void
+        addToPath(std::string& currPath, std::pair<std::string, std::string> const& currStep, bool lastElt)
+        {
+            currPath += "(" + currStep.first + ": " + currStep.second + ")";
+            if (!lastElt)
+            {
+                currPath += "->";
+            }
         }
     } // namespace scrimpl
 } // namespace cppmicroservices

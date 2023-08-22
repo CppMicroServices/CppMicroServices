@@ -109,9 +109,9 @@ namespace cppmicroservices
 
             virtual bool DependsOnMe(
                 std::string interfaceName,
-                std::shared_ptr<std::set<std::string>> visited,
-                std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> metadatas,
-                std::shared_ptr<std::vector<std::string>> path)
+                std::set<std::string>& visited,
+                std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>& metadatas,
+                std::vector<std::pair<std::string, std::string>>& path)
                 = 0;
         };
     } // namespace scrimpl

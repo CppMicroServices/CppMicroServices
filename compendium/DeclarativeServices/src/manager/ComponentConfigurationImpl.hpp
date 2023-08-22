@@ -313,9 +313,9 @@ namespace cppmicroservices
             virtual void UnbindReference(std::string const& refName, ServiceReferenceBase const& ref) = 0;
 
             bool DependsOnMe(std::string interfaceName,
-                             std::shared_ptr<std::set<std::string>> visited,
-                             std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>> metadatas,
-                             std::shared_ptr<std::vector<std::string>> path);
+                             std::set<std::string>& visited,
+                             std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>& metadatas,
+                             std::vector<std::pair<std::string, std::string>>& path);
 
             void CheckCircular();
 
@@ -443,8 +443,9 @@ namespace cppmicroservices
                 deleteCompInstanceFunc; ///< extern C function to delete an instance of the {@link ComponentInstance}
                                         ///< class from the component's bundle
         };
-        std::string
-        createPath(std::shared_ptr<const cppmicroservices::scrimpl::metadata::ComponentMetadata> metadata, std::shared_ptr<std::vector<std::string, std::allocator<std::string>>> path);
+        std::string createPath(std::vector<std::pair<std::string, std::string>>& path);
+
+        void addToPath(std::string& currPath, const std::pair<std::string, std::string> &currStep, bool lastElt);
     } // namespace scrimpl
 } // namespace cppmicroservices
 #endif /* __COMPONENTCONFIGURATIONIMPL_HPP__ */

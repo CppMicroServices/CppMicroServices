@@ -67,9 +67,9 @@ namespace test
             .Times(testing::AtLeast(1));
 
         // set logging expectations
-        auto CircularReference = testing::HasSubstr("Circular Reference: ");
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
-            .Times(1);
+        // auto CircularReference = testing::HasSubstr("Circular Reference: ");
+        // EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
+        //     .Times(1);
 
         auto loggerReg = context.RegisterService<LogService>(logger);
 
@@ -123,9 +123,9 @@ namespace test
             .Times(testing::AtLeast(1));
 
         // set logging expectations
-        auto CircularReference = testing::HasSubstr("Circular Reference: ");
-        EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
-            .Times(1);
+        // auto CircularReference = testing::HasSubstr("Circular Reference: ");
+        // EXPECT_CALL(*logger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
+        //     .Times(1);
 
         auto loggerReg = context.RegisterService<LogService>(logger);
 

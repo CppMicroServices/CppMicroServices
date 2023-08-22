@@ -267,10 +267,9 @@ namespace cppmicroservices
             MOCK_CONST_METHOD0(GetMetadata, std::shared_ptr<const metadata::ComponentMetadata>(void));
             MOCK_METHOD4(DependsOnMe,
                          bool(std::string interfaceName,
-                              std::shared_ptr<std::set<std::string>> visited,
-                              std::shared_ptr<std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>>
-                                  metadatas,
-                              std::shared_ptr<std::vector<std::string>> path));
+                              std::set<std::string>& visited,
+                              std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>>& metadatas,
+                              std::vector<std::pair<std::string, std::string>>& path));
         };
 
         class MockFactory : public cppmicroservices::ServiceFactory

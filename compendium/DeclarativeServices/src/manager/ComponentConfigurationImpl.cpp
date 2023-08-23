@@ -627,6 +627,12 @@ namespace cppmicroservices
             std::vector<metadata::ComponentMetadata> components = metadatas.at(interfaceName);
             for (metadata::ComponentMetadata comp : components)
             {
+                // edge case: component references same interface it implements
+                if (comp.implClassName == this->metadata->implClassName)
+                {
+                    continue;
+                }
+
                 path.push_back(std::pair<std::string, std::string>(comp.implClassName, interfaceName));
 
                 // for all references of comp
@@ -638,7 +644,8 @@ namespace cppmicroservices
                         continue;
                     }
 
-                    if (visited.find(newRef.interfaceName) != visited.end())
+                    // if visited and not currently being visited
+                    if (visited.find(newRef.interfaceName) != visited.end() && interfaceName != newRef.interfaceName)
                     {
                         // skip already visited interfaces
                         continue;

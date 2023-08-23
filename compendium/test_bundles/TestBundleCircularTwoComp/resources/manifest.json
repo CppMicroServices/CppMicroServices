@@ -1,0 +1,49 @@
+{
+    "bundle.symbolic_name": "TestBundleCircularTwoComp",
+    "bundle.activator": false,
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "implementation-class": "sample::ServiceComponentTwoComp1",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentTwoComp1"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph01"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph01",
+                        "cardinality": "1..1"
+                    }
+                ]
+            },
+            {
+                "implementation-class": "sample::ServiceComponentTwoComp2",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentTwoComp2"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph01"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph01",
+                        "cardinality": "1..1"
+                    }
+                ]
+            }
+        ]
+    }
+}

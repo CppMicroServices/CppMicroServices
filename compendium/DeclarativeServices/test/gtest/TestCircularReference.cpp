@@ -215,4 +215,20 @@ namespace test
         ASSERT_EQ(ref2.operator bool(), false);
         ASSERT_EQ(ref3.operator bool(), false);
     }
+
+    TEST_F(TestCircularReference, testTwoComp)
+    {
+        std::vector<std::string> vectorSubs { "Circular Reference: ",
+                                              "(sample::ServiceComponentTwoComp1: test::DSGraph01)",
+                                              "(sample::ServiceComponentTwoComp2: test::DSGraph01)" };
+        ExpectCircular(vectorSubs, 1);
+        RegisterLoggerStartBundle("TestBundleCircularTwoComp");
+
+        auto ref1 = context.GetServiceReference("sample::ServiceComponentTwoComp1");
+        auto ref2 = context.GetServiceReference("sample::ServiceComponentTwoComp2");
+
+        // assert that references are invalid with unsatisfied configuration
+        ASSERT_EQ(ref1.operator bool(), false);
+        ASSERT_EQ(ref2.operator bool(), false);
+    }
 } // namespace test

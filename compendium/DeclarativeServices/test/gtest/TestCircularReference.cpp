@@ -207,13 +207,11 @@ namespace test
         RegisterLoggerStartBundle("TestBundleCircularSelfDep");
 
         auto ref1 = context.GetServiceReference<test::DSGraph01>();
-        auto ref2 = context.GetServiceReference("sample::ServiceComponentSelfDep2");
-        auto ref3 = context.GetServiceReference("sample::ServiceComponentSelfDep3");
+        auto ref2 = context.GetServiceReference<test::DSGraph02>();
 
         // assert that references are invalid with unsatisfied configuration
         ASSERT_EQ(ref1.operator bool(), false);
         ASSERT_EQ(ref2.operator bool(), false);
-        ASSERT_EQ(ref3.operator bool(), false);
     }
 
     TEST_F(TestCircularReference, testTwoComp)
@@ -224,11 +222,9 @@ namespace test
         ExpectCircular(vectorSubs, 1);
         RegisterLoggerStartBundle("TestBundleCircularTwoComp");
 
-        auto ref1 = context.GetServiceReference("sample::ServiceComponentTwoComp1");
-        auto ref2 = context.GetServiceReference("sample::ServiceComponentTwoComp2");
+        auto ref1 = context.GetServiceReference<test::DSGraph01>();
 
         // assert that references are invalid with unsatisfied configuration
         ASSERT_EQ(ref1.operator bool(), false);
-        ASSERT_EQ(ref2.operator bool(), false);
     }
 } // namespace test

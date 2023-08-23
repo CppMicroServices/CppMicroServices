@@ -633,6 +633,14 @@ namespace cppmicroservices
                     continue;
                 }
 
+                // if we have visited this component with this interface, skip
+                if (std::find(path.begin(),
+                              path.end(),
+                              std::pair<std::string, std::string>(comp.implClassName, interfaceName))
+                    != path.end())
+                {
+                    continue;
+                }
                 path.push_back(std::pair<std::string, std::string>(comp.implClassName, interfaceName));
 
                 // for all references of comp

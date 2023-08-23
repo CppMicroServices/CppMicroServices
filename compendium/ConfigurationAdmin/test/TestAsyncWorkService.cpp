@@ -389,25 +389,24 @@ namespace test
             = { "DSGraph01", "DSGraph02", "DSGraph03", "DSGraph04", "DSGraph05", "DSGraph06", "DSGraph07" };
         std::vector<cppmicroservices::Bundle> installedBundles;
 
-        EXPECT_NO_THROW({
-            auto const& param = GetParam();
+        auto const& param = GetParam();
 
-            auto ctx = framework.GetBundleContext();
+        auto ctx = framework.GetBundleContext();
 
-            auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
+        auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
 
-            for (const auto& bundleName : bundlesToInstall)
-            {
-                std::string path = PathToLib(bundleName);
-                auto bundles = ctx.InstallBundles(path);
-                installedBundles.emplace_back(bundles.back());
-            }
+        for (auto const& bundleName : bundlesToInstall)
+        {
+            std::string path = PathToLib(bundleName);
+            auto bundles = ctx.InstallBundles(path);
+            installedBundles.emplace_back(bundles.back());
+            bundles.back().Start();
+        }
 
-            for (auto& bundle : installedBundles)
-            {
-                bundle.Stop();
-            }
-        });
+        for (auto& bundle : installedBundles)
+        {
+            bundle.Stop();
+        }
     }
 
 }; // namespace test

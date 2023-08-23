@@ -82,13 +82,15 @@ namespace test
 
         // Helper to output dependency tree for ease of debugging
         virtual std::string
-        createPath(testing::internal::Strings::iterator const begin, testing::internal::Strings::iterator  const end, testing::internal::Strings::iterator const middle)
+        createPath(testing::internal::Strings::iterator const begin,
+                   testing::internal::Strings::iterator const end,
+                   testing::internal::Strings::iterator const middle)
         {
             std::string fullpath = "";
 
             // concatenate all additional steps
             auto it = begin;
-            while(it != end)
+            while (it != end)
             {
                 addToPath(fullpath, *it, false);
                 ++it;
@@ -96,7 +98,8 @@ namespace test
 
             it = middle;
 
-            while(it != begin) {
+            while (it != begin)
+            {
                 addToPath(fullpath, *it, false);
                 ++it;
             }
@@ -257,5 +260,17 @@ namespace test
 
         // assert that references are invalid with unsatisfied configuration
         ASSERT_EQ(ref1.operator bool(), false);
+    }
+
+    TEST_F(TestCircularReference, testInfLoop)
+    {
+        RegisterLoggerStartBundle("TestBundleCircularInfLoop");
+
+        auto ref1 = context.GetServiceReference<test::DSGraph01>();
+        auto ref2 = context.GetServiceReference<test::DSGraph02>();
+
+        // assert that references are invalid with unsatisfied configuration
+        ASSERT_EQ(ref1.operator bool(), false);
+        ASSERT_EQ(ref2.operator bool(), false);
     }
 } // namespace test

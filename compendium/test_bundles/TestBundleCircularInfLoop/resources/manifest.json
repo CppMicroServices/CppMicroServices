@@ -1,0 +1,49 @@
+{
+    "bundle.symbolic_name": "TestBundleCircularInfLoop",
+    "bundle.activator": false,
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "implementation-class": "sample::ServiceComponentInfLoop2",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentInfLoop2"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph02"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph02",
+                        "cardinality": "1..1"
+                    }
+                ]
+            },
+            {
+                "implementation-class": "sample::ServiceComponentInfLoop1",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentInfLoop1"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph01"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph02",
+                        "cardinality": "1..1"
+                    }
+                ]
+            }
+        ]
+    }
+}

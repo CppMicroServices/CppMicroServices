@@ -69,15 +69,51 @@ namespace test
         ExpectCircular(std::vector<std::string> msgs, int times)
         {
             std::vector<testing::PolymorphicMatcher<testing::internal::HasSubstrMatcher<std::string>>> tmp;
-            for (auto msg : msgs)
+            for (auto it = msgs.begin(); it != msgs.end(); ++it)
             {
-                tmp.push_back(testing::HasSubstr(msg));
+                tmp.push_back(testing::HasSubstr("Circular Reference: " + createPath(it, msgs.end(), msgs.begin())));
             }
             // set logging expectations
-            auto CircularReference = testing::AllOfArray(tmp.begin(), tmp.end());
+            auto CircularReference = testing::AnyOfArray(tmp.begin(), tmp.end());
             EXPECT_CALL(*logger,
                         Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
                 .Times(times);
+        }
+
+        // Helper to output dependency tree for ease of debugging
+        virtual std::string
+        createPath(testing::internal::Strings::iterator const begin, testing::internal::Strings::iterator  const end, testing::internal::Strings::iterator const middle)
+        {
+            std::string fullpath = "";
+
+            // concatenate all additional steps
+            auto it = begin;
+            while(it != end)
+            {
+                addToPath(fullpath, *it, false);
+                ++it;
+            }
+
+            it = middle;
+
+            while(it != begin) {
+                addToPath(fullpath, *it, false);
+                ++it;
+            }
+
+            addToPath(fullpath, *begin, true);
+
+            return fullpath;
+        }
+
+        virtual void
+        addToPath(std::string& currPath, std::string const& currStep, bool lastElt)
+        {
+            currPath += currStep;
+            if (!lastElt)
+            {
+                currPath += "->";
+            }
         }
 
         virtual void
@@ -111,8 +147,7 @@ namespace test
     */
     TEST_F(TestCircularReference, basicGraph)
     {
-        std::vector<std::string> vectorSubs { "Circular Reference: ",
-                                              "(sample::ServiceComponentBasicCircular56: test::DSGraph05)",
+        std::vector<std::string> vectorSubs { "(sample::ServiceComponentBasicCircular56: test::DSGraph05)",
                                               "(sample::ServiceComponentBasicCircular12: test::DSGraph01)",
                                               "(sample::ServiceComponentBasicCircular3: test::DSGraph03)" };
         ExpectCircular(vectorSubs, 1);
@@ -144,8 +179,7 @@ namespace test
     */
     TEST_F(TestCircularReference, twoSmallGraph)
     {
-        std::vector<std::string> vectorSubs { "Circular Reference: ",
-                                              "(sample::ServiceComponentTwoCircles6: test::DSGraph06)",
+        std::vector<std::string> vectorSubs { "(sample::ServiceComponentTwoCircles6: test::DSGraph06)",
                                               "(sample::ServiceComponentTwoCircles4: test::DSGraph04)",
                                               "(sample::ServiceComponentTwoCircles5: test::DSGraph05)" };
         ExpectCircular(vectorSubs, 1);
@@ -172,8 +206,7 @@ namespace test
     // build graph with complex circuluar reference
     TEST_F(TestCircularReference, optionalAndRequiredPath)
     {
-        std::vector<std::string> vectorSubs { "Circular Reference: ",
-                                              "(sample::ServiceComponentOptReq4: test::DSGraph04)",
+        std::vector<std::string> vectorSubs { "(sample::ServiceComponentOptReq4: test::DSGraph04)",
                                               "(sample::ServiceComponentOptReq1: test::DSGraph01)",
                                               "(sample::ServiceComponentOptReq2: test::DSGraph02)",
                                               "(sample::ServiceComponentOptReq3: test::DSGraph03)" };
@@ -200,8 +233,7 @@ namespace test
     */
     TEST_F(TestCircularReference, selfDependencyCycle)
     {
-        std::vector<std::string> vectorSubs { "Circular Reference: ",
-                                              "(sample::ServiceComponentSelfDep3: test::DSGraph02)",
+        std::vector<std::string> vectorSubs { "(sample::ServiceComponentSelfDep3: test::DSGraph02)",
                                               "(sample::ServiceComponentSelfDep1: test::DSGraph01)" };
         ExpectCircular(vectorSubs, 1);
         RegisterLoggerStartBundle("TestBundleCircularSelfDep");
@@ -216,8 +248,7 @@ namespace test
 
     TEST_F(TestCircularReference, testTwoComp)
     {
-        std::vector<std::string> vectorSubs { "Circular Reference: ",
-                                              "(sample::ServiceComponentTwoComp1: test::DSGraph01)",
+        std::vector<std::string> vectorSubs { "(sample::ServiceComponentTwoComp1: test::DSGraph01)",
                                               "(sample::ServiceComponentTwoComp2: test::DSGraph01)" };
         ExpectCircular(vectorSubs, 1);
         RegisterLoggerStartBundle("TestBundleCircularTwoComp");

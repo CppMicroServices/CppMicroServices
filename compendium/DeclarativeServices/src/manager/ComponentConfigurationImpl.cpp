@@ -647,7 +647,6 @@ namespace cppmicroservices
                     // if visited and not currently being visited
                     if (visited.find(newRef.interfaceName) != visited.end() && interfaceName != newRef.interfaceName)
                     {
-                        // skip already visited interfaces
                         continue;
                     }
 

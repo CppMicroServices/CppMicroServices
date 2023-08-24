@@ -1,0 +1,71 @@
+{
+    "bundle.symbolic_name": "TestBundleCircularJeffExample",
+    "bundle.activator": false,
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "implementation-class": "sample::ServiceComponentJeffExample1",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentJeffExample1"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph01"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph02",
+                        "cardinality": "1..1"
+                    }
+                ]
+            },
+            {
+                "implementation-class": "sample::ServiceComponentJeffExample2",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentJeffExample2"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph02"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "policy": "dynamic",
+                        "policy-option": "greedy",
+                        "interface": "test::DSGraph03",
+                        "cardinality": "0..1"
+                    }
+                ]
+            },
+            {
+                "implementation-class": "sample::ServiceComponentJeffExample3",
+                "configuration-policy": "optional",
+                "configuration-pid": [
+                    "sample::ServiceComponentJeffExample3"
+                ],
+                "service": {
+                    "interfaces": [
+                        "test::DSGraph03"
+                    ],
+                    "scope": "singleton"
+                },
+                "references": [
+                    {
+                        "name": "ref",
+                        "interface": "test::DSGraph01",
+                        "cardinality": "1..1"
+                    }
+                ]
+            }
+        ]
+    }
+}

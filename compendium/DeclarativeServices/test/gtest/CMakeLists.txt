@@ -208,6 +208,7 @@ set(_test_bundles
   TestBundleCircularBasic
   TestBundleCircularDouble
   TestBundleCircularOptReq
+  TestBundleCircularJeffExample
   TestBundleCircularSelfDep
   TestBundleCircularTwoComp
   TestBundleCircularInfLoop

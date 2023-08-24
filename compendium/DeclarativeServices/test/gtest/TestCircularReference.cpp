@@ -64,6 +64,15 @@ namespace test
             context = framework.GetBundleContext();
             EXPECT_TRUE(framework);
         }
+        virtual void
+        ExpectNoCircular()
+        {
+            auto CircularReference = testing::HasSubstr("Circular Reference: ");
+
+            EXPECT_CALL(*logger,
+                        Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, CircularReference, testing::_))
+                .Times(0);
+        }
 
         virtual void
         ExpectCircular(std::vector<std::string> msgs, int times)
@@ -264,6 +273,7 @@ namespace test
 
     TEST_F(TestCircularReference, testInfLoop)
     {
+        ExpectNoCircular();
         RegisterLoggerStartBundle("TestBundleCircularInfLoop");
 
         auto ref1 = context.GetServiceReference<test::DSGraph01>();
@@ -272,5 +282,20 @@ namespace test
         // assert that references are invalid with unsatisfied configuration
         ASSERT_EQ(ref1.operator bool(), false);
         ASSERT_EQ(ref2.operator bool(), false);
+    }
+
+    TEST_F(TestCircularReference, testJeffExample)
+    {
+        ExpectNoCircular();
+        RegisterLoggerStartBundle("TestBundleCircularJeffExample");
+
+        auto ref1 = context.GetServiceReference<test::DSGraph01>();
+        auto ref2 = context.GetServiceReference<test::DSGraph02>();
+        auto ref3 = context.GetServiceReference<test::DSGraph03>();
+
+        // assert that references are invalid with unsatisfied configuration
+        ASSERT_EQ(ref1.operator bool(), true);
+        ASSERT_EQ(ref2.operator bool(), true);
+        ASSERT_EQ(ref3.operator bool(), true);
     }
 } // namespace test

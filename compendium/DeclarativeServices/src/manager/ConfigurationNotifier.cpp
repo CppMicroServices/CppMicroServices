@@ -116,7 +116,7 @@ namespace cppmicroservices
         ConfigurationNotifier::AnyListenersForPid(std::string const& pid) noexcept
         {
             std::string factoryName;
-            std::shared_ptr<ComponentConfigurationImpl> mgr;
+            std::vector<std::shared_ptr<ComponentConfigurationImpl>> mgrs;
             {
                 auto listenersMapHandle = listenersMap.lock();
                 if (listenersMapHandle->empty() || pid.empty())
@@ -148,16 +148,27 @@ namespace cppmicroservices
                 {
                     return false;
                 }
-                auto listener = iter->second->begin();
-
-                mgr = listener->second.mgr;
-                if (mgr->GetMetadata()->factoryComponentID.empty())
+                auto tokenMapPtr = iter->second;
+                for (auto const& tokenEntry : (*tokenMapPtr))
                 {
-                    // The component in our listener's map is not a factory component.
+                    auto listener = tokenEntry.second;
+
+                    if (!listener.mgr->GetMetadata()->factoryComponentID.empty())
+                    {
+                        // The component in our listeners map is a factory component.
+                        mgrs.emplace_back(listener.mgr);
+                    }
+                }
+                if (mgrs.empty())
+                {
+                    // None of the components in our listeners map is a factory component.
                     return false;
                 }
             } // release listenersMapHandle lock
-            CreateFactoryComponent(pid, mgr);
+            for (auto & mgr : mgrs)
+            {
+                CreateFactoryComponent(pid, mgr);
+            }
             return true;
         }
         void

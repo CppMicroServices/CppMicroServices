@@ -35,12 +35,18 @@ namespace cppmicroservices
     class ServiceRegistrationLocks final
     {
       public:
-        ServiceRegistrationLocks(std::shared_ptr<ServiceRegistrationBasePrivate> reg,
-                                 std::shared_ptr<ServiceRegistrationCoreInfo> coreInfo);
+        ServiceRegistrationLocks(const std::shared_ptr<ServiceRegistrationBasePrivate>& reg,
+                                 const std::shared_ptr<ServiceRegistrationCoreInfo>& coreInfo);
+
+        // Delete all copy and move to enforce that it is only ever constructed into one object -- avoids deadlocks
+        ServiceRegistrationLocks(ServiceRegistrationLocks const& lockObj) = delete;
+        ServiceRegistrationLocks(ServiceRegistrationLocks&& lockObj) = default;
+        ServiceRegistrationLocks& operator=(ServiceRegistrationLocks const& lockObj) = delete;
+        ServiceRegistrationLocks& operator=(ServiceRegistrationLocks&& lockObj) = delete;
 
       private:
-        cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock coreInfoL;
         cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock regL;
+        cppmicroservices::detail::MutexLockingStrategy<>::UniqueLock coreInfoL;
     };
 } // namespace cppmicroservices
 

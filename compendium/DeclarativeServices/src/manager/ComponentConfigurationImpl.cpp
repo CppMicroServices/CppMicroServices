@@ -560,12 +560,12 @@ namespace cppmicroservices
             // maps from interface name to all componentMetadata that implement that interface
             std::unordered_map<std::string, std::vector<metadata::ComponentMetadata>> allMetadata;
 
-            for (auto& it0 : bundExtMap)
+            for (auto& bundleExt : bundExtMap)
             {
-                auto managers = it0.second->GetManagers();
-                for (auto& it1 : *managers)
+                auto managers = bundleExt.second->GetManagers();
+                for (auto& compManager : *managers)
                 {
-                    std::shared_ptr<const metadata::ComponentMetadata> data = ((it1)->GetMetadata());
+                    std::shared_ptr<metadata::ComponentMetadata const> data = ((compManager)->GetMetadata());
                     for (auto& interface : data->serviceMetadata.interfaces)
                     {
                         if (allMetadata.find(interface) == allMetadata.end())
@@ -580,7 +580,7 @@ namespace cppmicroservices
                 }
             }
 
-            // map for tracking visited nodes by interfaceName
+            // set for tracking visited nodes by interfaceName
             std::set<std::string> refSet;
 
             // path taken for logging: <implementationClassName, problematicInterface>
@@ -625,10 +625,10 @@ namespace cppmicroservices
 
             // check all components that implement interfaceName
             std::vector<metadata::ComponentMetadata> components = metadatas.at(interfaceName);
-            for (metadata::ComponentMetadata comp : components)
+            for (auto const& comp : components)
             {
                 // edge case: component references same interface it implements
-                if (comp.implClassName == this->metadata->implClassName)
+                if (comp.implClassName == metadata->implClassName)
                 {
                     continue;
                 }
@@ -644,7 +644,7 @@ namespace cppmicroservices
                 path.push_back(std::pair<std::string, std::string>(comp.implClassName, interfaceName));
 
                 // for all references of comp
-                for (metadata::ReferenceMetadata newRef : comp.refsMetadata)
+                for (auto const& newRef : comp.refsMetadata)
                 {
                     if (newRef.minCardinality < 1)
                     {
@@ -658,13 +658,13 @@ namespace cppmicroservices
                         continue;
                     }
 
-                    auto myInterfaces = this->metadata->serviceMetadata.interfaces;
+                    auto myInterfaces = metadata->serviceMetadata.interfaces;
 
                     // check if newRef.interfaceName is one of this's implemented interfaces
                     auto it = std::find(myInterfaces.begin(), myInterfaces.end(), newRef.interfaceName);
                     if (it != myInterfaces.end())
                     {
-                        path.push_back(std::pair<std::string, std::string>(this->metadata->implClassName, *it));
+                        path.push_back(std::pair<std::string, std::string>(metadata->implClassName, *it));
                         return true;
                     }
 
@@ -672,7 +672,7 @@ namespace cppmicroservices
                     visited.insert(newRef.interfaceName);
 
                     // if any component implementing newRef.interfaceName depends on me, return true
-                    if (this->DependsOnMe(newRef.interfaceName, visited, metadatas, path))
+                    if (DependsOnMe(newRef.interfaceName, visited, metadatas, path))
                     {
                         return true;
                     }

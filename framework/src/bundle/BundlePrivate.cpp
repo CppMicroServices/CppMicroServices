@@ -54,6 +54,8 @@
 #include <cstring>
 #include <iterator>
 
+#include <absl/base/attributes.h>
+
 namespace cppmicroservices
 {
 
@@ -263,7 +265,7 @@ namespace cppmicroservices
                     return;
                 }
             }
-            // INTENTIONALLY FALLS THROUGH - in case of lazy activation.
+                ABSL_FALLTHROUGH_INTENDED;
             case Bundle::STATE_RESOLVED:
             {
                 state = Bundle::STATE_STARTING;
@@ -337,7 +339,7 @@ namespace cppmicroservices
                         }
                     }
                 }
-                // INTENTIONALLY FALLS THROUGH
+                    ABSL_FALLTHROUGH_INTENDED;
                 case Bundle::STATE_RESOLVED:
                 case Bundle::STATE_INSTALLED:
                 {

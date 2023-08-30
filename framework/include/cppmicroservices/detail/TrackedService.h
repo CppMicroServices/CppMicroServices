@@ -120,6 +120,6 @@ namespace cppmicroservices
 
 } // namespace cppmicroservices
 
-#include "cppmicroservices/detail/TrackedService.tpp"
+#include "cppmicroservices/detail/TrackedService.hpp"
 
 #endif // CPPMICROSERVICES_TRACKEDSERVICE_H

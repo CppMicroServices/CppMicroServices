@@ -2,7 +2,7 @@ name: PerformanceWindows
 
 on:
   push:
-    branches: [ development, c\+\+14-compliant, master ]
+    branches: [ development ]
   workflow_dispatch:
 
 permissions:

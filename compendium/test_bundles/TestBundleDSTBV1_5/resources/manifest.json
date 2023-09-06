@@ -1,0 +1,17 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSTBV1_5",
+    "scr" : {
+        "version" : 1,
+         "components" : [{
+            "enabled" : true,
+            "immediate": true,
+            "implementation-class": "sample::ServiceComponentBV1_5",
+            "configuration-policy" : "require",
+            "configuration-pid" : ["sample::ServiceComponentBV1_5"],
+            "inject-references" : false,
+            "service": {
+                "interfaces": ["test::CAInterface"]
+            }
+        }]
+    }
+}

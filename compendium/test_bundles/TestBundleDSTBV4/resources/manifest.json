@@ -1,0 +1,26 @@
+{
+  "bundle.symbolic_name": "TestBundleDSTBV4",
+  "bundle.name": "TestBundleDSTBV4",
+  "bundle.activator": false,
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "enabled": true,
+        "immediate": true,
+        "implementation-class": "sample::ServiceComponentBV41",
+        "service": {
+          "interfaces": [ "test::Interface1" ]
+        }
+      },
+      {
+        "enabled": true,
+        "immediate": true,
+        "implementation-class": "sample::ServiceComponentBV42",
+        "service": {
+          "interfaces": [ "test::Interface1" ]
+        }
+      }
+    ]
+  }
+}

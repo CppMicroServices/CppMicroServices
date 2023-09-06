@@ -114,7 +114,7 @@ namespace
                               std::shared_ptr<ServiceDependency1>,
                               std::shared_ptr<ServiceDependency2>,
                               std::shared_ptr<ServiceDependency2>>
-            compInstance({"foo", "bar", "bar2"}, binders); // compile error
+            compInstance({ "foo", "bar", "bar2" }, binders); // compile error
     }
 } // namespace
 

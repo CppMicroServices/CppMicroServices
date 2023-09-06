@@ -123,13 +123,13 @@ namespace
         binders.push_back(std::make_shared<StaticBinder<TestServiceImpl1, ServiceDependency2>>("bar"));
         binders.push_back(
             std::make_shared<DynamicBinder<TestServiceImpl1, ServiceDependency1>>("foo",
-                &TestServiceImpl1::BindFoo,
-                &TestServiceImpl1::UnbindFoo));
+                                                                                  &TestServiceImpl1::BindFoo,
+                                                                                  &TestServiceImpl1::UnbindFoo));
         ComponentInstanceImpl<TestServiceImpl1,
-            std::tuple<>,
-            std::true_type,
-            std::shared_ptr<ServiceDependency2>,
-            std::shared_ptr<ServiceDependency1>>
+                              std::tuple<>,
+                              std::true_type,
+                              std::shared_ptr<ServiceDependency2>,
+                              std::shared_ptr<ServiceDependency1>>
             compInstance({ "bar", "foo" }, binders); // compile error
     }
 
@@ -139,14 +139,14 @@ namespace
         binders.push_back(std::make_shared<StaticBinder<TestServiceImpl1, ServiceDependency2>>("bar"));
         binders.push_back(
             std::make_shared<DynamicBinder<TestServiceImpl1, ServiceDependency1>>("foo",
-                &TestServiceImpl1::BindFoo,
-                &TestServiceImpl1::UnbindFoo));
+                                                                                  &TestServiceImpl1::BindFoo,
+                                                                                  &TestServiceImpl1::UnbindFoo));
         ComponentInstanceImpl<TestServiceImpl1,
-            std::tuple<>,
-            std::true_type,
-            std::shared_ptr<ServiceDependency2>,
-            std::vector<std::shared_ptr<ServiceDependency3>>,
-            std::shared_ptr<ServiceDependency1>>
+                              std::tuple<>,
+                              std::true_type,
+                              std::shared_ptr<ServiceDependency2>,
+                              std::vector<std::shared_ptr<ServiceDependency3>>,
+                              std::shared_ptr<ServiceDependency1>>
             compInstance({ "bar", "baz", "foo" }, binders); // compile error
     }
 } // namespace

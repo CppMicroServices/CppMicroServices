@@ -263,7 +263,40 @@ namespace cppmicroservices
                 auto l = t->Lock();
                 if (t->Size_unlocked() == 0)
                 {
-                    t->WaitFor(l, rel_time, [&t] { return t->Size_unlocked() > 0 || t->closed; });
+                    BundleContext a = d->context;
+                    if (!a)
+                    {
+                        throw std::invalid_argument("The bundle context cannot be null.");
+                    }
+
+                    if (rel_time == std::chrono::milliseconds::zero())
+                    {
+                        // need to cycle on definite end time to check for invalid bundle
+                        while (true)
+                        {
+                            if (!t->WaitFor(l,
+                                            std::chrono::milliseconds(500),
+                                            [&t, &a] { return (t->Size_unlocked() > 0 || t->closed || !a); }))
+                            {
+                                // if timeout finished and (size ==0 AND t->closed == false AND a != false)
+                                continue;
+                            }
+                            else
+                            {
+                                // (t->Size_unlocked() > 0 OR t->closed == true OR a == true)
+                                if (!a)
+                                {
+                                    // bundle is invalid, break
+                                    throw std::invalid_argument("The bundle context became null.");
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        t->WaitFor(l, rel_time, [&t] { return (t->Size_unlocked() > 0 || t->closed); });
+                    }
                 }
             }
             object = GetService();

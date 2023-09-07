@@ -670,9 +670,6 @@ namespace
 
 TEST_F(ServiceTrackerTestFixture, TestFilterPropertiesTypes)
 {
-    auto framework = cppmicroservices::FrameworkFactory().NewFramework();
-    framework.Start();
-
     LDAPFilter filter("(tag=foo::bar::Baz)");
     ServiceTracker<foo::Bar> tracker(framework.GetBundleContext(), filter);
     tracker.Open();
@@ -687,6 +684,32 @@ TEST_F(ServiceTrackerTestFixture, TestFilterPropertiesTypes)
     ASSERT_EQ(tracker.GetTrackingCount(), 1);
 
     tracker.Close();
-    framework.Stop();
-    framework.WaitForStop(std::chrono::milliseconds::zero());
 }
+
+#ifdef US_ENABLE_THREADING_SUPPORT
+
+TEST(ServiceTrackerTests, TestServiceTrackerDeadlock)
+{
+    Framework framework = FrameworkFactory().NewFramework();
+    framework.Start();
+
+    ServiceTracker<MyInterfaceOne> tracker(framework.GetBundleContext());
+    tracker.Open();
+    auto f = std::async(
+        [&framework]
+        {
+            // technically there's a race here, so the async should ensure WaitForService is started prior to
+            // terminating the framework.
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            auto fooService = std::make_shared<MyInterfaceOne>();
+
+            // auto svc = framework.GetBundleContext().RegisterService<MyInterfaceOne>(fooService);
+
+            framework.Stop();
+            framework.WaitForStop(std::chrono::milliseconds::zero());
+        });
+
+    ASSERT_THROW(tracker.WaitForService(), std::invalid_argument);
+}
+
+#endif

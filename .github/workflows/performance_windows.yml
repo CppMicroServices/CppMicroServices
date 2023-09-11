@@ -53,6 +53,10 @@ jobs:
 
     - name: Run benchmark and store result in json format
       run: ${{ env.BUILD_DIR }}\bin\Release\usFrameworkBenchTests.exe  --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json
+      uses: actions/upload-artifact@v2
+        with:
+          name: Performance Results
+          path: ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json
 
     - name: Deploy results
       # Condition the step on the 'development' branch only

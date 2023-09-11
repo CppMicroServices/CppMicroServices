@@ -53,6 +53,8 @@ jobs:
 
     - name: Run benchmark and store result in json format
       run: ${{ env.BUILD_DIR }}\bin\Release\usFrameworkBenchTests.exe  --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json
+      
+    - name: Upload Performance Results as artifact
       uses: actions/upload-artifact@v2
         with:
           name: Performance Results

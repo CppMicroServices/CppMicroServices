@@ -278,17 +278,19 @@ namespace cppmicroservices
                                             std::chrono::milliseconds(500),
                                             [&t, &a] { return (t->Size_unlocked() > 0 || t->closed || !a); }))
                             {
-                                // if timeout finished and (size ==0 AND t->closed == false AND a != false)
+                                // if timeout finished and (size ==0 AND t->closed == false AND a == true)
                                 continue;
                             }
                             else
                             {
-                                // (t->Size_unlocked() > 0 OR t->closed == true OR a == true)
+                                // predicate evaluates to true
+                                // (t->Size_unlocked() > 0 OR t->closed == true OR a != true)
                                 if (!a)
                                 {
-                                    // bundle is invalid, break
+                                    // bundle is invalid, throw
                                     throw std::invalid_argument("The bundle context became null.");
                                 }
+                                // bundle is valid, other condition met, break
                                 break;
                             }
                         }

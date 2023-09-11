@@ -10,7 +10,6 @@ permissions:
   deployments: write
   # contents permission to update benchmark contents in gh-pages branch
   contents: write
-  if: github.ref == 'refs/heads/development'
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)

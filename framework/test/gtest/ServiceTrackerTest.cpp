@@ -701,9 +701,6 @@ TEST(ServiceTrackerTests, TestServiceTrackerDeadlock)
             // technically there's a race here, so the async should ensure WaitForService is started prior to
             // terminating the framework.
             std::this_thread::sleep_for(std::chrono::seconds(1));
-            auto fooService = std::make_shared<MyInterfaceOne>();
-
-            // auto svc = framework.GetBundleContext().RegisterService<MyInterfaceOne>(fooService);
 
             framework.Stop();
             framework.WaitForStop(std::chrono::milliseconds::zero());

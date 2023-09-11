@@ -25,7 +25,7 @@ namespace sample
     class ServiceComponentJeffExample2 : public test::DSGraph02
     {
       public:
-        ServiceComponentJeffExample2() {}
+        ServiceComponentJeffExample2() = default;
 
         std::string
         Description()
@@ -34,8 +34,14 @@ namespace sample
         };
         ~ServiceComponentJeffExample2() = default;
 
-        void Bindref(std::shared_ptr<test::DSGraph03> const&);
-        void Unbindref(std::shared_ptr<test::DSGraph03> const&);
+        void
+        Bindref(std::shared_ptr<test::DSGraph03> const&)
+        {
+        }
+        void
+        Unbindref(std::shared_ptr<test::DSGraph03> const&)
+        {
+        }
     };
 
     class ServiceComponentJeffExample3 : public test::DSGraph03

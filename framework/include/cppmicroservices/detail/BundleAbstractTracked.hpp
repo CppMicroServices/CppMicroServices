@@ -237,7 +237,9 @@ namespace cppmicroservices
         {
             typename TrackingMap::const_iterator i = tracked.find(item);
             if (i != tracked.end())
+            {
                 return i->second;
+            }
             return std::shared_ptr<TrackedParamType>();
         }
 

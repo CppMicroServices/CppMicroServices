@@ -2,7 +2,7 @@ name: PerformanceWindows
 
 on:
   push:
-    branches: [ development ]
+    branches: [ development, update-performance-workflow ]
   workflow_dispatch:
 
 permissions:

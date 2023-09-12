@@ -2,5 +2,34 @@
 race:cppmicroservices::ServiceListeners::RemoveServiceListener
 race:cppmicroservices::ServiceTracker*
 
+# BundleRegistry races and double lock false-positives
+# https://github.com/google/sanitizers/issues/1259
+# Calls to wait_for within BundleRegistry::Install, TSAN false-positive
+# Race condition on access of p.second.waitFlag within wait_for, TSAN false-positive
+mutex:TestSerialBundleInstall
+race:TestSerialBundleInstall
+
+# TestConfigurationAdminImpl race and double lock
+
+# CV and mutex used within test body, TSAN false-positive
+race:TestConfigurationAdminImpl_VerifyManagedServiceNotification_Test::TestBody
+mutex:TestConfigurationAdminImpl_VerifyManagedServiceNotification_Test::TestBody
+
+# CV and mutex used within test body, TSAN false-positive
+race:TestConfigurationAdminImpl_VerifyManagedServiceFactoryNotification_Test::TestBody
+mutex:TestConfigurationAdminImpl_VerifyManagedServiceFactoryNotification_Test::TestBody
+
+# CV and mutex used within test body, TSAN false-positive
+race:TestConfigurationAdminImpl_VerifyManagedServiceExceptionsAreLogged_Test::TestBody
+mutex:TestConfigurationAdminImpl_VerifyManagedServiceExceptionsAreLogged_Test::TestBody
+
+# Framework.LifeCycle
+mutex:cppmicroservices::FrameworkPrivate::Shutdown0
+mutex:Framework_LifeCycle_Test::TestBody
+
+# Assignment in FrameworkPrivate::WaitForStop and FrameworkPrivate::SystemShuttingdownDone_unlocked
+# to stopEvent, both protected, TSAN false-positive
+race:Framework_LifeCycle_Test::TestBody
+
 # Potential Deadlock in CCACtiveState
 deadlock:cppmicroservices::scrimpl::CCActiveState::Activate

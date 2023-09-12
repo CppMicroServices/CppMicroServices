@@ -95,7 +95,14 @@ namespace cppmicroservices
             throw std::runtime_error("The bundle context is no longer valid");
         }
 
-        d->CheckValid();
+        try
+        {
+            d->CheckValid();
+        }
+        catch (...)
+        {
+            return std::make_shared<detail::LogSink>(nullptr, false);
+        }
 
         if (auto bundle_ = d->bundle.lock())
         {
@@ -259,9 +266,9 @@ namespace cppmicroservices
     template <class S>
     struct ServiceHolder
     {
-        const std::weak_ptr<BundlePrivate> b;
-        const ServiceReferenceBase sref;
-        const std::shared_ptr<S> service;
+        std::weak_ptr<BundlePrivate> const b;
+        ServiceReferenceBase const sref;
+        std::shared_ptr<S> const service;
 
         ServiceHolder(std::shared_ptr<BundlePrivate> const& b, ServiceReferenceBase const& sr, std::shared_ptr<S> s)
             : b(b)

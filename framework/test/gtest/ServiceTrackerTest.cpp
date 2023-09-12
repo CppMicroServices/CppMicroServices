@@ -690,3 +690,24 @@ TEST_F(ServiceTrackerTestFixture, TestFilterPropertiesTypes)
     framework.Stop();
     framework.WaitForStop(std::chrono::milliseconds::zero());
 }
+
+TEST(ServiceTrackerTestFixture0, FrameworkTrackerCloseRace)
+{
+    auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+    framework.Start();
+
+    ServiceTracker<FooService> tracker(framework.GetBundleContext());
+    tracker.Open();
+
+    auto fooService = std::make_shared<FooService>();
+
+    auto svc = framework.GetBundleContext().RegisterService<FooService>(fooService);
+
+    auto fut = std::async(std::launch::async,
+                          [&framework]()
+                          {
+                              framework.Stop();
+                              framework.WaitForStop(std::chrono::milliseconds::zero());
+                          });
+    tracker.Close();
+}

@@ -2,7 +2,9 @@ name: PerformanceWindows
 
 on:
   push:
-    branches: [ development, update-performance-workflow ]
+    #This workflow runs only on developmentbranch
+    #Please add the branch_name if you want to run performance tests on a particular branch
+    branches: [ development, update-performance-workflow #, branch_name#]
   workflow_dispatch:
 
 permissions:

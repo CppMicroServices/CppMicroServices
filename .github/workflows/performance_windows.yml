@@ -59,7 +59,7 @@ jobs:
     - name: Upload Performance Results as Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: Performance Results
+        name: Performance Results - ${{ github.event.head_commit.author.name }} - ${{ github.sha.slice(0, 7) }}
         path: ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json
 
     - name: Deploy results

@@ -698,12 +698,12 @@ TEST(ServiceTrackerTests, FrameworkTrackerCloseRace)
     auto framework = cppmicroservices::FrameworkFactory().NewFramework();
     framework.Start();
 
-    ServiceTracker<FooService> tracker(framework.GetBundleContext());
+    ServiceTracker<MyInterfaceOne> tracker(framework.GetBundleContext());
     tracker.Open();
 
-    auto fooService = std::make_shared<FooService>();
+    auto interfaceOneService = std::make_shared<MyInterfaceOne>();
 
-    auto svc = framework.GetBundleContext().RegisterService<FooService>(fooService);
+    auto svc = framework.GetBundleContext().RegisterService<MyInterfaceOne>(interfaceOneService);
 
     auto fut = std::async(std::launch::async,
                           [&framework]()

@@ -691,7 +691,9 @@ TEST_F(ServiceTrackerTestFixture, TestFilterPropertiesTypes)
     framework.WaitForStop(std::chrono::milliseconds::zero());
 }
 
-TEST(ServiceTrackerTestFixture0, FrameworkTrackerCloseRace)
+// If the test doesn't throw, it is successful.
+// Intended to be run with many repititions to test for sporadic failures.
+TEST(ServiceTrackerTests, FrameworkTrackerCloseRace)
 {
     auto framework = cppmicroservices::FrameworkFactory().NewFramework();
     framework.Start();

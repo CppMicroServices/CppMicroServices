@@ -289,12 +289,6 @@ namespace cppmicroservices
         }
 
         auto data = d->archive->GetResourceContainer()->GetData(d->stat.index);
-        if (!data)
-        {
-            auto sink = GetBundleContext().GetLogSink();
-            DIAG_LOG(*sink) << "Error uncompressing resource data for " << this->GetResourcePath() << " from "
-                            << d->archive->GetBundleLocation();
-        }
 
         return data;
     }

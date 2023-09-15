@@ -223,8 +223,6 @@ namespace cppmicroservices
         }
         catch (std::exception const& ex)
         {
-            auto sink = GetBundleContext().GetLogSink();
-            DIAG_LOG(*sink) << "Exception thrown creating BundleFileObj : " << ex.what();
         }
 
         if (!rawBundleResourceData || !rawBundleResourceData->GetData()

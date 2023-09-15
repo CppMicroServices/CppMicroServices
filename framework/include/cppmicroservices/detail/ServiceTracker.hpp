@@ -266,34 +266,26 @@ namespace cppmicroservices
                     BundleContext a = d->context;
                     if (!a)
                     {
-                        throw std::invalid_argument("The bundle context cannot be null.");
+                        throw std::logic_error("The bundle context cannot be null.");
                     }
 
                     if (rel_time == std::chrono::milliseconds::zero())
                     {
                         // need to cycle on definite end time to check for invalid bundle
-                        while (true)
+                        while (!t->WaitFor(l,
+                                           std::chrono::milliseconds(500),
+                                           [&t, &a] { return (t->Size_unlocked() > 0 || t->closed || !a); }))
                         {
-                            if (!t->WaitFor(l,
-                                            std::chrono::milliseconds(500),
-                                            [&t, &a] { return (t->Size_unlocked() > 0 || t->closed || !a); }))
-                            {
-                                // if timeout finished and (size ==0 AND t->closed == false AND a == true)
-                                continue;
-                            }
-                            else
-                            {
-                                // predicate evaluates to true
-                                // (t->Size_unlocked() > 0 OR t->closed == true OR a != true)
-                                if (!a)
-                                {
-                                    // bundle is invalid, throw
-                                    throw std::invalid_argument("The bundle context became null.");
-                                }
-                                // bundle is valid, other condition met, break
-                                break;
-                            }
                         }
+
+                        // predicate evaluates to true
+                        // (t->Size_unlocked() > 0 OR t->closed == true OR a != true)
+                        if (!a)
+                        {
+                            // bundle is invalid, throw
+                            throw std::logic_error("The bundle context became null.");
+                        }
+                        // bundle is valid, other condition met
                     }
                     else
                     {

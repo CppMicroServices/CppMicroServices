@@ -706,7 +706,21 @@ TEST(ServiceTrackerTests, TestServiceTrackerDeadlock)
             framework.WaitForStop(std::chrono::milliseconds::zero());
         });
 
-    ASSERT_THROW(tracker.WaitForService(), std::invalid_argument);
+    ASSERT_THROW(tracker.WaitForService(), std::logic_error);
+}
+
+TEST(ServiceTrackerTests, TestServiceTrackerInvalidBundle)
+{
+    Framework framework = FrameworkFactory().NewFramework();
+    framework.Start();
+
+    ServiceTracker<MyInterfaceOne> tracker(framework.GetBundleContext());
+    tracker.Open();
+
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+
+    ASSERT_THROW(tracker.WaitForService(), std::runtime_error);
 }
 
 #endif

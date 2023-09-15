@@ -4,7 +4,7 @@
 #pragma once
 
 #ifdef _WIN32
-#error include tcp_client-windows.h instead
+#    error include tcp_client-windows.h instead
 #endif
 
 // tcp client helper
@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <netinet/tcp.h>
+#include <netinet/in.h>
 
 #include <string>
 
@@ -57,7 +58,7 @@ public:
         struct addrinfo hints
         {};
         memset(&hints, 0, sizeof(struct addrinfo));
-        hints.ai_family = AF_INET;       // IPv4
+        hints.ai_family = AF_UNSPEC;     // To work with IPv4, IPv6, and so on
         hints.ai_socktype = SOCK_STREAM; // TCP
         hints.ai_flags = AI_NUMERICSERV; // port passed as as numeric value
         hints.ai_protocol = 0;
@@ -67,15 +68,18 @@ public:
         auto rv = ::getaddrinfo(host.c_str(), port_str.c_str(), &hints, &addrinfo_result);
         if (rv != 0)
         {
-            auto msg = fmt::format("::getaddrinfo failed: {}", gai_strerror(rv));
-            throw_spdlog_ex(msg);
+            throw_spdlog_ex(fmt_lib::format("::getaddrinfo failed: {}", gai_strerror(rv)));
         }
 
         // Try each address until we successfully connect(2).
         int last_errno = 0;
         for (auto *rp = addrinfo_result; rp != nullptr; rp = rp->ai_next)
         {
-            int const flags = SOCK_CLOEXEC;
+#if defined(SOCK_CLOEXEC)
+            const int flags = SOCK_CLOEXEC;
+#else
+            const int flags = 0;
+#endif
             socket_ = ::socket(rp->ai_family, rp->ai_socktype | flags, rp->ai_protocol);
             if (socket_ == -1)
             {
@@ -87,12 +91,9 @@ public:
             {
                 break;
             }
-            else
-            {
-                last_errno = errno;
-                ::close(socket_);
-                socket_ = -1;
-            }
+            last_errno = errno;
+            ::close(socket_);
+            socket_ = -1;
         }
         ::freeaddrinfo(addrinfo_result);
         if (socket_ == -1)
@@ -102,15 +103,15 @@ public:
 
         // set TCP_NODELAY
         int enable_flag = 1;
-        ::setsockopt(socket_, IPPROTO_TCP, TCP_NODELAY, (char *)&enable_flag, sizeof(enable_flag));
+        ::setsockopt(socket_, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<char *>(&enable_flag), sizeof(enable_flag));
 
         // prevent sigpipe on systems where MSG_NOSIGNAL is not available
 #if defined(SO_NOSIGPIPE) && !defined(MSG_NOSIGNAL)
-        ::setsockopt(socket_, SOL_SOCKET, SO_NOSIGPIPE, (char *)&enable_flag, sizeof(enable_flag));
+        ::setsockopt(socket_, SOL_SOCKET, SO_NOSIGPIPE, reinterpret_cast<char *>(&enable_flag), sizeof(enable_flag));
 #endif
 
 #if !defined(SO_NOSIGPIPE) && !defined(MSG_NOSIGNAL)
-#error "tcp_sink would raise SIGPIPE since niether SO_NOSIGPIPE nor MSG_NOSIGNAL are available"
+#    error "tcp_sink would raise SIGPIPE since neither SO_NOSIGPIPE nor MSG_NOSIGNAL are available"
 #endif
     }
 

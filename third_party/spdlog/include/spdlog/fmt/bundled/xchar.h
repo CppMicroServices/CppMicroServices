@@ -12,30 +12,11 @@
 
 #include "format.h"
 
-#ifndef FMT_STATIC_THOUSANDS_SEPARATOR
-#  include <locale>
-#endif
-
 FMT_BEGIN_NAMESPACE
 namespace detail {
-
 template <typename T>
 using is_exotic_char = bool_constant<!std::is_same<T, char>::value>;
-
-inline auto write_loc(std::back_insert_iterator<detail::buffer<wchar_t>> out,
-                      loc_value value, const format_specs<wchar_t>& specs,
-                      locale_ref loc) -> bool {
-#ifndef FMT_STATIC_THOUSANDS_SEPARATOR
-  auto& numpunct =
-      std::use_facet<std::numpunct<wchar_t>>(loc.get<std::locale>());
-  auto separator = std::wstring();
-  auto grouping = numpunct.grouping();
-  if (!grouping.empty()) separator = std::wstring(1, numpunct.thousands_sep());
-  return value.visit(loc_writer<wchar_t>{out, specs, separator, grouping, {}});
-#endif
-  return false;
 }
-}  // namespace detail
 
 FMT_MODULE_EXPORT_BEGIN
 
@@ -52,9 +33,7 @@ inline auto runtime(wstring_view s) -> wstring_view { return s; }
 #else
 template <typename... Args>
 using wformat_string = basic_format_string<wchar_t, type_identity_t<Args>...>;
-inline auto runtime(wstring_view s) -> runtime_format_string<wchar_t> {
-  return {{s}};
-}
+inline auto runtime(wstring_view s) -> basic_runtime<wchar_t> { return {{s}}; }
 #endif
 
 template <> struct is_char<wchar_t> : std::true_type {};
@@ -147,7 +126,7 @@ auto vformat_to(OutputIt out, const S& format_str,
     -> OutputIt {
   auto&& buf = detail::get_buffer<Char>(out);
   detail::vformat_to(buf, detail::to_string_view(format_str), args);
-  return detail::get_iterator(buf, out);
+  return detail::get_iterator(buf);
 }
 
 template <typename OutputIt, typename S, typename... Args,
@@ -236,15 +215,6 @@ void print(std::FILE* f, wformat_string<T...> fmt, T&&... args) {
 
 template <typename... T> void print(wformat_string<T...> fmt, T&&... args) {
   return vprint(wstring_view(fmt), fmt::make_wformat_args(args...));
-}
-
-template <typename... T>
-void println(std::FILE* f, wformat_string<T...> fmt, T&&... args) {
-  return print(f, L"{}\n", fmt::format(fmt, std::forward<T>(args)...));
-}
-
-template <typename... T> void println(wformat_string<T...> fmt, T&&... args) {
-  return print(L"{}\n", fmt::format(fmt, std::forward<T>(args)...));
 }
 
 /**

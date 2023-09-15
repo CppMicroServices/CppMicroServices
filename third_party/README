@@ -168,11 +168,11 @@ spdlog
 See https://github.com/gabime/spdlog/blob/v1.x/LICENSE for license information
 
 https://github.com/gabime/spdlog
-v1.11.0
+v1.12.0
 
 * We only use the include folder since we aren't statically linking to the library
 * version reflects the version from which we copied the include folder
-* due to compiler errors on one older gcc, updated the bundled fmt to latest master (https://github.com/fmtlib/fmt/commit/05e3a9233ac1dd0c2d9643e046dbb5f788c39f61) and adapted spdlog's common.h to one incompatible change
+
 
 Boost
 ------

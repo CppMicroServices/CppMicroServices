@@ -58,10 +58,10 @@ on many different platforms.
 
 Recommended absolute minimum required compiler versions:
 
-- GCC 5.1
+- GCC 7
 - Clang 9.0
 - Clang from Xcode 10.0 (not tested)
-- Visual Studio 2017 (MSVC++ 15.0) (no longer tested in CI)
+- Visual Studio 2017 (MSVC++ 15.0) (not tested)
 
 Not all of the absolute minimum compiler versions are tested (as noted). We test and recommend
 the following compilers:

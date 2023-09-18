@@ -87,26 +87,6 @@ namespace cppmicroservices
         return *this;
     }
 
-    std::shared_ptr<detail::LogSink>
-    BundleContext::GetLogSink() const
-    {
-        if (!d)
-        {
-            throw std::runtime_error("The bundle context is no longer valid");
-        }
-
-        d->CheckValid();
-
-        if (auto bundle_ = d->bundle.lock())
-        {
-            return bundle_->coreCtx->sink->shared_from_this();
-        }
-        else
-        {
-            throw std::runtime_error("The bundle context is no longer valid");
-        }
-    }
-
     Any
     BundleContext::GetProperty(std::string const& key) const
     {
@@ -259,9 +239,9 @@ namespace cppmicroservices
     template <class S>
     struct ServiceHolder
     {
-        const std::weak_ptr<BundlePrivate> b;
-        const ServiceReferenceBase sref;
-        const std::shared_ptr<S> service;
+        std::weak_ptr<BundlePrivate> const b;
+        ServiceReferenceBase const sref;
+        std::shared_ptr<S> const service;
 
         ServiceHolder(std::shared_ptr<BundlePrivate> const& b, ServiceReferenceBase const& sr, std::shared_ptr<S> s)
             : b(b)

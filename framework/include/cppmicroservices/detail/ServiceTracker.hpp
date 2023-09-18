@@ -105,8 +105,6 @@ namespace cppmicroservices
                 return;
             }
 
-            DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::Open: " << d->filter;
-
             t.reset(new _TrackedService(this, d->customizer));
             try
             {
@@ -187,7 +185,6 @@ namespace cppmicroservices
                 return;
             }
 
-            DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close:" << d->filter;
             outgoing->Close();
 
             d->Modified();         /* clear the cache */
@@ -212,14 +209,6 @@ namespace cppmicroservices
         for (auto& ref : references)
         {
             outgoing->Untrack(ref, ServiceEvent());
-        }
-
-        if (d->context.GetLogSink()->Enabled())
-        {
-            if (!d->cachedReference.Load().GetBundle() && d->cachedService.Load() == nullptr)
-            {
-                DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::close[cached cleared]:" << d->filter;
-            }
         }
     }
 
@@ -307,10 +296,8 @@ namespace cppmicroservices
         ServiceReference<S> reference = d->cachedReference.Load();
         if (reference.GetBundle())
         {
-            DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference[cached]:" << d->filter;
             return reference;
         }
-        DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getServiceReference:" << d->filter;
         auto references = GetServiceReferences();
         std::size_t length = references.size();
         if (length == 0)
@@ -420,10 +407,8 @@ namespace cppmicroservices
         auto service = d->cachedService.Load();
         if (service)
         {
-            DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService[cached]:" << d->filter;
             return service;
         }
-        DIAG_LOG(*d->context.GetLogSink()) << "ServiceTracker<S,TTT>::getService:" << d->filter;
 
         try
         {

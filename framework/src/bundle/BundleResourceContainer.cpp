@@ -162,7 +162,9 @@ namespace cppmicroservices
         for (++iter; iter != m_SortedEntries.end(); ++iter)
         {
             if (resourcePath.size() > iter->first.size())
+            {
                 break;
+            }
             if (iter->first.compare(0, resourcePath.size(), resourcePath) == 0)
             {
                 std::size_t pos = iter->first.find_first_of('/', resourcePath.size());
@@ -221,10 +223,8 @@ namespace cppmicroservices
             m_ObjFile = BundleObjFactory().CreateBundleFileObj(m_Location);
             rawBundleResourceData = m_ObjFile->GetRawBundleResourceContainer();
         }
-        catch (std::exception const& ex)
+        catch (std::exception const&)
         {
-            auto sink = GetBundleContext().GetLogSink();
-            DIAG_LOG(*sink) << "Exception thrown creating BundleFileObj : " << ex.what();
         }
 
         if (!rawBundleResourceData || !rawBundleResourceData->GetData()

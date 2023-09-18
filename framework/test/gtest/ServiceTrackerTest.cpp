@@ -723,4 +723,25 @@ TEST(ServiceTrackerTests, TestServiceTrackerInvalidBundle)
     ASSERT_THROW(tracker.WaitForService(), std::runtime_error);
 }
 
-#endif
+// If the test doesn't throw, it is successful.
+// Intended to be run with many repititions to test for sporadic failures.
+TEST(ServiceTrackerTests, FrameworkTrackerCloseRace)
+{
+    auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+    framework.Start();
+
+    ServiceTracker<MyInterfaceOne> tracker(framework.GetBundleContext());
+    tracker.Open();
+
+    auto interfaceOneService = std::make_shared<MyInterfaceOne>();
+
+    auto svc = framework.GetBundleContext().RegisterService<MyInterfaceOne>(interfaceOneService);
+
+    auto fut = std::async(std::launch::async,
+                          [&framework]()
+                          {
+                              framework.Stop();
+                              framework.WaitForStop(std::chrono::milliseconds::zero());
+                          });
+    tracker.Close();
+}

@@ -179,3 +179,10 @@ Boost
 
 See https://www.boost.org/users/license.html for license information
 1.73.0
+
+Boost nowide
+------------
+
+See https://www.boost.org/users/license.html for license information
+https://github.com/boostorg/nowide/tree/standalone
+https://github.com/boostorg/nowide/commit/2a0543f8279f3f416b5c84fcf7e40db46c3a659a

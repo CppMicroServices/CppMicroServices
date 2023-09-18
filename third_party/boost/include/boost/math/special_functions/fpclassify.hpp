@@ -93,10 +93,10 @@ is used.
   namespace std{ using ::abs; using ::fabs; }
 #endif
 
-namespace boost{
+namespace cppmsboost{
 
 //
-// This must not be located in any namespace under boost::math
+// This must not be located in any namespace under cppmsboost::math
 // otherwise we can get into an infinite loop if isnan is
 // a #define for "isnan" !
 //
@@ -108,7 +108,7 @@ namespace math_detail{
 #endif
 
 template <class T>
-inline bool is_nan_helper(T t, const boost::true_type&)
+inline bool is_nan_helper(T t, const cppmsboost::true_type&)
 {
 #ifdef isnan
    return isnan(t);
@@ -125,21 +125,21 @@ inline bool is_nan_helper(T t, const boost::true_type&)
 #endif
 
 template <class T>
-inline bool is_nan_helper(T, const boost::false_type&)
+inline bool is_nan_helper(T, const cppmsboost::false_type&)
 {
    return false;
 }
 #if defined(BOOST_MATH_USE_FLOAT128) 
 #if defined(BOOST_MATH_HAS_QUADMATH_H)
-inline bool is_nan_helper(__float128 f, const boost::true_type&) { return ::isnanq(f); }
-inline bool is_nan_helper(__float128 f, const boost::false_type&) { return ::isnanq(f); }
+inline bool is_nan_helper(__float128 f, const cppmsboost::true_type&) { return ::isnanq(f); }
+inline bool is_nan_helper(__float128 f, const cppmsboost::false_type&) { return ::isnanq(f); }
 #elif defined(BOOST_GNU_STDLIB) && BOOST_GNU_STDLIB && \
       _GLIBCXX_USE_C99_MATH && !_GLIBCXX_USE_C99_FP_MACROS_DYNAMIC
-inline bool is_nan_helper(__float128 f, const boost::true_type&) { return std::isnan(static_cast<double>(f)); }
-inline bool is_nan_helper(__float128 f, const boost::false_type&) { return std::isnan(static_cast<double>(f)); }
+inline bool is_nan_helper(__float128 f, const cppmsboost::true_type&) { return std::isnan(static_cast<double>(f)); }
+inline bool is_nan_helper(__float128 f, const cppmsboost::false_type&) { return std::isnan(static_cast<double>(f)); }
 #else
-inline bool is_nan_helper(__float128 f, const boost::true_type&) { return ::isnan(static_cast<double>(f)); }
-inline bool is_nan_helper(__float128 f, const boost::false_type&) { return ::isnan(static_cast<double>(f)); }
+inline bool is_nan_helper(__float128 f, const cppmsboost::true_type&) { return ::isnan(static_cast<double>(f)); }
+inline bool is_nan_helper(__float128 f, const cppmsboost::false_type&) { return ::isnan(static_cast<double>(f)); }
 #endif
 #endif
 }
@@ -163,13 +163,13 @@ inline int fpclassify_imp BOOST_NO_MACRO_EXPAND(T t, const generic_tag<true>&)
 
    // whenever possible check for Nan's first:
 #if defined(BOOST_HAS_FPCLASSIFY)  && !defined(BOOST_MATH_DISABLE_STD_FPCLASSIFY)
-   if(::boost::math_detail::is_nan_helper(t, ::boost::is_floating_point<T>()))
+   if(::cppmsboost::math_detail::is_nan_helper(t, ::cppmsboost::is_floating_point<T>()))
       return FP_NAN;
 #elif defined(isnan)
-   if(boost::math_detail::is_nan_helper(t, ::boost::is_floating_point<T>()))
+   if(cppmsboost::math_detail::is_nan_helper(t, ::cppmsboost::is_floating_point<T>()))
       return FP_NAN;
 #elif defined(_MSC_VER) || defined(__BORLANDC__)
-   if(::_isnan(boost::math::tools::real_cast<double>(t)))
+   if(::_isnan(cppmsboost::math::tools::real_cast<double>(t)))
       return FP_NAN;
 #endif
    // std::fabs broken on a few systems especially for long long!!!!
@@ -267,7 +267,7 @@ int fpclassify_imp BOOST_NO_MACRO_EXPAND(T x, ieee_copy_leading_bits_tag)
 #if defined(BOOST_MATH_USE_STD_FPCLASSIFY) && (defined(BOOST_MATH_NO_NATIVE_LONG_DOUBLE_FP_CLASSIFY) || defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS))
 inline int fpclassify_imp BOOST_NO_MACRO_EXPAND(long double t, const native_tag&)
 {
-   return boost::math::detail::fpclassify_imp(t, generic_tag<true>());
+   return cppmsboost::math::detail::fpclassify_imp(t, generic_tag<true>());
 }
 #endif
 
@@ -346,7 +346,7 @@ namespace detail {
 #if defined(BOOST_MATH_USE_STD_FPCLASSIFY) && defined(BOOST_MATH_NO_NATIVE_LONG_DOUBLE_FP_CLASSIFY)
 inline bool isfinite_impl BOOST_NO_MACRO_EXPAND(long double t, const native_tag&)
 {
-   return boost::math::detail::isfinite_impl(t, generic_tag<true>());
+   return cppmsboost::math::detail::isfinite_impl(t, generic_tag<true>());
 }
 #endif
 
@@ -357,7 +357,7 @@ inline bool (isfinite)(T x)
 { //!< \brief return true if floating-point type t is finite.
    typedef typename detail::fp_traits<T>::type traits;
    typedef typename traits::method method;
-   // typedef typename boost::is_floating_point<T>::type fp_tag;
+   // typedef typename cppmsboost::is_floating_point<T>::type fp_tag;
    typedef typename tools::promote_args_permissive<T>::type value_type;
    return detail::isfinite_impl(static_cast<value_type>(x), method());
 }
@@ -368,7 +368,7 @@ inline bool (isfinite)(long double x)
 { //!< \brief return true if floating-point type t is finite.
    typedef detail::fp_traits<long double>::type traits;
    typedef traits::method method;
-   //typedef boost::is_floating_point<long double>::type fp_tag;
+   //typedef cppmsboost::is_floating_point<long double>::type fp_tag;
    typedef long double value_type;
    return detail::isfinite_impl(static_cast<value_type>(x), method());
 }
@@ -417,7 +417,7 @@ namespace detail {
 #if defined(BOOST_MATH_USE_STD_FPCLASSIFY) && defined(BOOST_MATH_NO_NATIVE_LONG_DOUBLE_FP_CLASSIFY)
 inline bool isnormal_impl BOOST_NO_MACRO_EXPAND(long double t, const native_tag&)
 {
-   return boost::math::detail::isnormal_impl(t, generic_tag<true>());
+   return cppmsboost::math::detail::isnormal_impl(t, generic_tag<true>());
 }
 #endif
 
@@ -428,7 +428,7 @@ inline bool (isnormal)(T x)
 {
    typedef typename detail::fp_traits<T>::type traits;
    typedef typename traits::method method;
-   //typedef typename boost::is_floating_point<T>::type fp_tag;
+   //typedef typename cppmsboost::is_floating_point<T>::type fp_tag;
    typedef typename tools::promote_args_permissive<T>::type value_type;
    return detail::isnormal_impl(static_cast<value_type>(x), method());
 }
@@ -439,7 +439,7 @@ inline bool (isnormal)(long double x)
 {
    typedef detail::fp_traits<long double>::type traits;
    typedef traits::method method;
-   //typedef boost::is_floating_point<long double>::type fp_tag;
+   //typedef cppmsboost::is_floating_point<long double>::type fp_tag;
    typedef long double value_type;
    return detail::isnormal_impl(static_cast<value_type>(x), method());
 }
@@ -506,7 +506,7 @@ namespace detail {
 #if defined(BOOST_MATH_USE_STD_FPCLASSIFY) && defined(BOOST_MATH_NO_NATIVE_LONG_DOUBLE_FP_CLASSIFY)
 inline bool isinf_impl BOOST_NO_MACRO_EXPAND(long double t, const native_tag&)
 {
-   return boost::math::detail::isinf_impl(t, generic_tag<true>());
+   return cppmsboost::math::detail::isinf_impl(t, generic_tag<true>());
 }
 #endif
 
@@ -517,7 +517,7 @@ inline bool (isinf)(T x)
 {
    typedef typename detail::fp_traits<T>::type traits;
    typedef typename traits::method method;
-   // typedef typename boost::is_floating_point<T>::type fp_tag;
+   // typedef typename cppmsboost::is_floating_point<T>::type fp_tag;
    typedef typename tools::promote_args_permissive<T>::type value_type;
    return detail::isinf_impl(static_cast<value_type>(x), method());
 }
@@ -528,7 +528,7 @@ inline bool (isinf)(long double x)
 {
    typedef detail::fp_traits<long double>::type traits;
    typedef traits::method method;
-   //typedef boost::is_floating_point<long double>::type fp_tag;
+   //typedef cppmsboost::is_floating_point<long double>::type fp_tag;
    typedef long double value_type;
    return detail::isinf_impl(static_cast<value_type>(x), method());
 }
@@ -607,21 +607,21 @@ inline bool (isnan)(T x)
 { //!< \brief return true if floating-point type t is NaN (Not A Number).
    typedef typename detail::fp_traits<T>::type traits;
    typedef typename traits::method method;
-   // typedef typename boost::is_floating_point<T>::type fp_tag;
+   // typedef typename cppmsboost::is_floating_point<T>::type fp_tag;
    return detail::isnan_impl(x, method());
 }
 
 #ifdef isnan
-template <> inline bool isnan BOOST_NO_MACRO_EXPAND<float>(float t){ return ::boost::math_detail::is_nan_helper(t, boost::true_type()); }
-template <> inline bool isnan BOOST_NO_MACRO_EXPAND<double>(double t){ return ::boost::math_detail::is_nan_helper(t, boost::true_type()); }
-template <> inline bool isnan BOOST_NO_MACRO_EXPAND<long double>(long double t){ return ::boost::math_detail::is_nan_helper(t, boost::true_type()); }
+template <> inline bool isnan BOOST_NO_MACRO_EXPAND<float>(float t){ return ::cppmsboost::math_detail::is_nan_helper(t, cppmsboost::true_type()); }
+template <> inline bool isnan BOOST_NO_MACRO_EXPAND<double>(double t){ return ::cppmsboost::math_detail::is_nan_helper(t, cppmsboost::true_type()); }
+template <> inline bool isnan BOOST_NO_MACRO_EXPAND<long double>(long double t){ return ::cppmsboost::math_detail::is_nan_helper(t, cppmsboost::true_type()); }
 #elif defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS)
 template<>
 inline bool (isnan)(long double x)
 { //!< \brief return true if floating-point type t is NaN (Not A Number).
    typedef detail::fp_traits<long double>::type traits;
    typedef traits::method method;
-   //typedef boost::is_floating_point<long double>::type fp_tag;
+   //typedef cppmsboost::is_floating_point<long double>::type fp_tag;
    return detail::isnan_impl(x, method());
 }
 #endif
@@ -634,7 +634,7 @@ inline bool (isnan)(__float128 x)
 #endif
 
 } // namespace math
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_MATH_FPCLASSIFY_HPP
 

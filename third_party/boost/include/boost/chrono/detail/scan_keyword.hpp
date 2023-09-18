@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <boost/throw_exception.hpp>
 
-namespace boost {
+namespace cppmsboost {
     using movelib::unique_ptr;
 
 namespace chrono {
@@ -66,7 +66,7 @@ scan_keyword(InputIterator& b, InputIterator e,
     unsigned char statbuf[100];
     unsigned char* status = statbuf;
     //  Change free by free_aux to avoid
-    // Error: Could not find a match for boost::interprocess::unique_ptr<unsigned char, void(*)(void*)>::unique_ptr(int, extern "C" void(void*))
+    // Error: Could not find a match for cppmsboost::interprocess::unique_ptr<unsigned char, void(*)(void*)>::unique_ptr(int, extern "C" void(void*))
     unique_ptr<unsigned char, void(*)(void*)> stat_hold(0, free_aux);
     if (nkw > sizeof(statbuf))
     {

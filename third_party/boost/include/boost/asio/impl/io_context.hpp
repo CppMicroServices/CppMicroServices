@@ -29,7 +29,7 @@
 
 #if !defined(GENERATING_DOCUMENTATION)
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 template <typename Service>
@@ -50,7 +50,7 @@ inline detail::io_context_impl& use_service<detail::io_context_impl>(
 }
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
@@ -64,7 +64,7 @@ inline detail::io_context_impl& use_service<detail::io_context_impl>(
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 inline io_context::executor_type
@@ -111,11 +111,11 @@ std::size_t io_context::run_one_until(
     if (rel_time > chrono::seconds(1))
       rel_time = chrono::seconds(1);
 
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = impl_.wait_one(
         static_cast<long>(chrono::duration_cast<
           chrono::microseconds>(rel_time).count()), ec);
-    boost::asio::detail::throw_error(ec);
+    cppmsboost::asio::detail::throw_error(ec);
 
     if (s || impl_.stopped())
       return s;
@@ -150,7 +150,7 @@ struct io_context::initiate_dispatch
     if (self->impl_.can_dispatch())
     {
       detail::fenced_block b(detail::fenced_block::full);
-      boost_asio_handler_invoke_helpers::invoke(
+      cppmsboost_asio_handler_invoke_helpers::invoke(
           handler2.value, handler2.value);
     }
     else
@@ -193,7 +193,7 @@ struct io_context::initiate_post
     detail::non_const_lvalue<LegacyCompletionHandler> handler2(handler);
 
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler2.value);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler2.value);
 
     // Allocate and construct an operation to wrap the handler.
     typedef detail::completion_handler<
@@ -262,7 +262,7 @@ void io_context::executor_type::dispatch(
     function_type tmp(BOOST_ASIO_MOVE_CAST(Function)(f));
 
     detail::fenced_block b(detail::fenced_block::full);
-    boost_asio_handler_invoke_helpers::invoke(tmp, tmp);
+    cppmsboost_asio_handler_invoke_helpers::invoke(tmp, tmp);
     return;
   }
 
@@ -321,7 +321,7 @@ io_context::executor_type::running_in_this_thread() const BOOST_ASIO_NOEXCEPT
 }
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
-inline io_context::work::work(boost::asio::io_context& io_context)
+inline io_context::work::work(cppmsboost::asio::io_context& io_context)
   : io_context_impl_(io_context.impl_)
 {
   io_context_impl_.work_started();
@@ -338,19 +338,19 @@ inline io_context::work::~work()
   io_context_impl_.work_finished();
 }
 
-inline boost::asio::io_context& io_context::work::get_io_context()
+inline cppmsboost::asio::io_context& io_context::work::get_io_context()
 {
-  return static_cast<boost::asio::io_context&>(io_context_impl_.context());
+  return static_cast<cppmsboost::asio::io_context&>(io_context_impl_.context());
 }
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
 
-inline boost::asio::io_context& io_context::service::get_io_context()
+inline cppmsboost::asio::io_context& io_context::service::get_io_context()
 {
-  return static_cast<boost::asio::io_context&>(context());
+  return static_cast<cppmsboost::asio::io_context&>(context());
 }
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

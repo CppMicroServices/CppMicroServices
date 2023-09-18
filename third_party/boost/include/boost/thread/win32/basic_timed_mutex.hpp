@@ -26,7 +26,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     namespace detail
     {
@@ -82,7 +82,7 @@ namespace boost
 
                     do
                     {
-                        if(winapi::WaitForSingleObjectEx(sem,::boost::detail::win32::infinite,0)==0)
+                        if(winapi::WaitForSingleObjectEx(sem,::cppmsboost::detail::win32::infinite,0)==0)
                         {
                             clear_waiting_and_try_lock(old_count);
                         }
@@ -194,7 +194,7 @@ namespace boost
         public:
 
 #if defined BOOST_THREAD_USES_DATETIME
-            bool timed_lock(::boost::system_time const& wait_until)
+            bool timed_lock(::cppmsboost::system_time const& wait_until)
             {
                 const detail::real_platform_timepoint t(wait_until);
                 return do_lock_until<detail::real_platform_clock>(t, detail::platform_milliseconds(BOOST_THREAD_POLL_INTERVAL_MILLISECONDS));
@@ -208,9 +208,9 @@ namespace boost
                 return do_lock_until<detail::mono_platform_clock>(t, detail::platform_duration::zero());
             }
 
-            bool timed_lock(boost::xtime const& timeout)
+            bool timed_lock(cppmsboost::xtime const& timeout)
             {
-                return timed_lock(boost::system_time(timeout));
+                return timed_lock(cppmsboost::system_time(timeout));
             }
 #endif
 #ifdef BOOST_THREAD_USES_CHRONO
@@ -258,7 +258,7 @@ namespace boost
             // The first thread to create the event wins and all other thread will use that event
             void* get_event()
             {
-                void* current_event=::boost::detail::interlocked_read_acquire(&event);
+                void* current_event=::cppmsboost::detail::interlocked_read_acquire(&event);
 
                 if(!current_event)
                 {

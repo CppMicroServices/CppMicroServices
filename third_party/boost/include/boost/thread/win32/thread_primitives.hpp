@@ -39,39 +39,39 @@
 #include <thread>
 #endif
 
-namespace boost
+namespace cppmsboost
 {
     namespace detail
     {
         namespace win32
         {
-            typedef ::boost::winapi::HANDLE_ handle;
-            typedef ::boost::winapi::SYSTEM_INFO_ system_info;
-            typedef ::boost::winapi::ULONGLONG_ ticks_type;
-            unsigned const infinite=::boost::winapi::INFINITE_;
-            unsigned const timeout=::boost::winapi::WAIT_TIMEOUT_;
-            handle const invalid_handle_value=::boost::winapi::INVALID_HANDLE_VALUE_;
-            unsigned const event_modify_state=::boost::winapi::EVENT_MODIFY_STATE_;
-            unsigned const synchronize=::boost::winapi::SYNCHRONIZE_;
-            unsigned const wait_abandoned=::boost::winapi::WAIT_ABANDONED_;
+            typedef ::cppmsboost::winapi::HANDLE_ handle;
+            typedef ::cppmsboost::winapi::SYSTEM_INFO_ system_info;
+            typedef ::cppmsboost::winapi::ULONGLONG_ ticks_type;
+            unsigned const infinite=::cppmsboost::winapi::INFINITE_;
+            unsigned const timeout=::cppmsboost::winapi::WAIT_TIMEOUT_;
+            handle const invalid_handle_value=::cppmsboost::winapi::INVALID_HANDLE_VALUE_;
+            unsigned const event_modify_state=::cppmsboost::winapi::EVENT_MODIFY_STATE_;
+            unsigned const synchronize=::cppmsboost::winapi::SYNCHRONIZE_;
+            unsigned const wait_abandoned=::cppmsboost::winapi::WAIT_ABANDONED_;
             unsigned const create_event_initial_set = 0x00000002;
             unsigned const create_event_manual_reset = 0x00000001;
-            unsigned const event_all_access = ::boost::winapi::EVENT_ALL_ACCESS_;
-            unsigned const semaphore_all_access = boost::winapi::SEMAPHORE_ALL_ACCESS_;
+            unsigned const event_all_access = ::cppmsboost::winapi::EVENT_ALL_ACCESS_;
+            unsigned const semaphore_all_access = cppmsboost::winapi::SEMAPHORE_ALL_ACCESS_;
         }
     }
 }
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     namespace detail
     {
         namespace win32
         {
             namespace detail { typedef ticks_type (BOOST_WINAPI_WINAPI_CC *gettickcount64_t)(); }
-            extern BOOST_THREAD_DECL boost::detail::win32::detail::gettickcount64_t gettickcount64;
+            extern BOOST_THREAD_DECL cppmsboost::detail::win32::detail::gettickcount64_t gettickcount64;
 
             enum event_type
             {
@@ -95,11 +95,11 @@ namespace boost
                 initial_event_state state)
             {
 #if !defined(BOOST_NO_ANSI_APIS)
-                handle const res = ::boost::winapi::CreateEventA(0, type, state, mutex_name);
+                handle const res = ::cppmsboost::winapi::CreateEventA(0, type, state, mutex_name);
 #elif BOOST_USE_WINAPI_VERSION < BOOST_WINAPI_VERSION_VISTA
-                handle const res = ::boost::winapi::CreateEventW(0, type, state, mutex_name);
+                handle const res = ::cppmsboost::winapi::CreateEventW(0, type, state, mutex_name);
 #else
-                handle const res = ::boost::winapi::CreateEventExW(
+                handle const res = ::cppmsboost::winapi::CreateEventExW(
                     0,
                     mutex_name,
                     (type ? create_event_manual_reset : 0) | (state ? create_event_initial_set : 0),
@@ -113,7 +113,7 @@ namespace boost
                 handle const res = create_event(0, type, state);
                 if(!res)
                 {
-                    boost::throw_exception(thread_resource_error());
+                    cppmsboost::throw_exception(thread_resource_error());
                 }
                 return res;
             }
@@ -121,12 +121,12 @@ namespace boost
             inline handle create_anonymous_semaphore_nothrow(long initial_count,long max_count)
             {
 #if !defined(BOOST_NO_ANSI_APIS)
-                handle const res=::boost::winapi::CreateSemaphoreA(0,initial_count,max_count,0);
+                handle const res=::cppmsboost::winapi::CreateSemaphoreA(0,initial_count,max_count,0);
 #else
 #if BOOST_USE_WINAPI_VERSION < BOOST_WINAPI_VERSION_VISTA
-                handle const res=::boost::winapi::CreateSemaphoreEx(0,initial_count,max_count,0,0);
+                handle const res=::cppmsboost::winapi::CreateSemaphoreEx(0,initial_count,max_count,0,0);
 #else
-                handle const res=::boost::winapi::CreateSemaphoreExW(0,initial_count,max_count,0,0,semaphore_all_access);
+                handle const res=::cppmsboost::winapi::CreateSemaphoreExW(0,initial_count,max_count,0,0,semaphore_all_access);
 #endif
 #endif
                 return res;
@@ -137,35 +137,35 @@ namespace boost
                 handle const res=create_anonymous_semaphore_nothrow(initial_count,max_count);
                 if(!res)
                 {
-                    boost::throw_exception(thread_resource_error());
+                    cppmsboost::throw_exception(thread_resource_error());
                 }
                 return res;
             }
 
             inline handle duplicate_handle(handle source)
             {
-                handle const current_process=::boost::winapi::GetCurrentProcess();
+                handle const current_process=::cppmsboost::winapi::GetCurrentProcess();
                 long const same_access_flag=2;
                 handle new_handle=0;
-                bool const success=::boost::winapi::DuplicateHandle(current_process,source,current_process,&new_handle,0,false,same_access_flag)!=0;
+                bool const success=::cppmsboost::winapi::DuplicateHandle(current_process,source,current_process,&new_handle,0,false,same_access_flag)!=0;
                 if(!success)
                 {
-                    boost::throw_exception(thread_resource_error());
+                    cppmsboost::throw_exception(thread_resource_error());
                 }
                 return new_handle;
             }
 
             inline void release_semaphore(handle semaphore,long count)
             {
-                BOOST_VERIFY(::boost::winapi::ReleaseSemaphore(semaphore,count,0)!=0);
+                BOOST_VERIFY(::cppmsboost::winapi::ReleaseSemaphore(semaphore,count,0)!=0);
             }
 
             inline void get_system_info(system_info *info)
             {
 #if BOOST_PLAT_WINDOWS_RUNTIME
-                ::boost::winapi::GetNativeSystemInfo(info);
+                ::cppmsboost::winapi::GetNativeSystemInfo(info);
 #else
-                ::boost::winapi::GetSystemInfo(info);
+                ::cppmsboost::winapi::GetSystemInfo(info);
 #endif
             }
 
@@ -176,15 +176,15 @@ namespace boost
 #if BOOST_PLAT_WINDOWS_RUNTIME
                     std::this_thread::yield();
 #else
-                    ::boost::winapi::Sleep(0);
+                    ::cppmsboost::winapi::Sleep(0);
 #endif
                 }
                 else
                 {
 #if BOOST_PLAT_WINDOWS_RUNTIME
-                    ::boost::winapi::WaitForSingleObjectEx(::boost::winapi::GetCurrentThread(), milliseconds, 0);
+                    ::cppmsboost::winapi::WaitForSingleObjectEx(::cppmsboost::winapi::GetCurrentThread(), milliseconds, 0);
 #else
-                    ::boost::winapi::Sleep(milliseconds);
+                    ::cppmsboost::winapi::Sleep(milliseconds);
 #endif
                 }
             }
@@ -198,9 +198,9 @@ namespace boost
 
                 ~scoped_winrt_thread()
                 {
-                    if (m_completionHandle != ::boost::detail::win32::invalid_handle_value)
+                    if (m_completionHandle != ::cppmsboost::detail::win32::invalid_handle_value)
                     {
-                        ::boost::winapi::CloseHandle(m_completionHandle);
+                        ::cppmsboost::winapi::CloseHandle(m_completionHandle);
                     }
                 }
 
@@ -209,7 +209,7 @@ namespace boost
 
                 handle waitable_handle() const
                 {
-                    BOOST_ASSERT(m_completionHandle != ::boost::detail::win32::invalid_handle_value);
+                    BOOST_ASSERT(m_completionHandle != ::cppmsboost::detail::win32::invalid_handle_value);
                     return m_completionHandle;
                 }
 
@@ -228,7 +228,7 @@ namespace boost
                 {
                     if(handle_to_manage && handle_to_manage!=invalid_handle_value)
                     {
-                        BOOST_VERIFY(::boost::winapi::CloseHandle(handle_to_manage));
+                        BOOST_VERIFY(::cppmsboost::winapi::CloseHandle(handle_to_manage));
                     }
                 }
 
@@ -285,7 +285,7 @@ namespace boost
 
 #if defined(BOOST_MSVC) && (_MSC_VER>=1400)  && !defined(UNDER_CE)
 
-namespace boost
+namespace cppmsboost
 {
     namespace detail
     {
@@ -317,7 +317,7 @@ namespace boost
 }
 #define BOOST_THREAD_BTS_DEFINED
 #elif (defined(BOOST_MSVC) || defined(BOOST_INTEL_WIN)) && defined(_M_IX86)
-namespace boost
+namespace cppmsboost
 {
     namespace detail
     {
@@ -377,7 +377,7 @@ namespace boost
 
 #ifndef BOOST_THREAD_BTS_DEFINED
 
-namespace boost
+namespace cppmsboost
 {
     namespace detail
     {

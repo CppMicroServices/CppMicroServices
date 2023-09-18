@@ -38,12 +38,12 @@
 #endif
 #include <boost/container/detail/iterator.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 
 template <class T, class Difference = std::ptrdiff_t>
 class constant_iterator
-  : public ::boost::container::iterator
+  : public ::cppmsboost::container::iterator
       <std::random_access_iterator_tag, T, Difference, const T*, const T &>
 {
    typedef  constant_iterator<T, Difference> this_type;
@@ -154,7 +154,7 @@ class constant_iterator
 
 template <class T, class Difference>
 class value_init_construct_iterator
-  : public ::boost::container::iterator
+  : public ::cppmsboost::container::iterator
       <std::random_access_iterator_tag, T, Difference, const T*, const T &>
 {
    typedef  value_init_construct_iterator<T, Difference> this_type;
@@ -229,7 +229,7 @@ class value_init_construct_iterator
    {  return *this + (-off);  }
 
    //This pseudo-iterator's dereference operations have no sense since value is not
-   //constructed until ::boost::container::construct_in_place is called.
+   //constructed until ::cppmsboost::container::construct_in_place is called.
    //So comment them to catch bad uses
    //const T& operator*() const;
    //const T& operator[](difference_type) const;
@@ -265,7 +265,7 @@ class value_init_construct_iterator
 
 template <class T, class Difference>
 class default_init_construct_iterator
-  : public ::boost::container::iterator
+  : public ::cppmsboost::container::iterator
       <std::random_access_iterator_tag, T, Difference, const T*, const T &>
 {
    typedef  default_init_construct_iterator<T, Difference> this_type;
@@ -340,7 +340,7 @@ class default_init_construct_iterator
    {  return *this + (-off);  }
 
    //This pseudo-iterator's dereference operations have no sense since value is not
-   //constructed until ::boost::container::construct_in_place is called.
+   //constructed until ::cppmsboost::container::construct_in_place is called.
    //So comment them to catch bad uses
    //const T& operator*() const;
    //const T& operator[](difference_type) const;
@@ -377,7 +377,7 @@ class default_init_construct_iterator
 
 template <class T, class Difference = std::ptrdiff_t>
 class repeat_iterator
-  : public ::boost::container::iterator
+  : public ::cppmsboost::container::iterator
       <std::random_access_iterator_tag, T, Difference, T*, T&>
 {
    typedef repeat_iterator<T, Difference> this_type;
@@ -487,7 +487,7 @@ class repeat_iterator
 
 template <class T, class EmplaceFunctor, class Difference /*= std::ptrdiff_t*/>
 class emplace_iterator
-  : public ::boost::container::iterator
+  : public ::cppmsboost::container::iterator
       <std::random_access_iterator_tag, T, Difference, const T*, const T &>
 {
    typedef emplace_iterator this_type;
@@ -563,7 +563,7 @@ class emplace_iterator
 
    private:
    //This pseudo-iterator's dereference operations have no sense since value is not
-   //constructed until ::boost::container::construct_in_place is called.
+   //constructed until ::cppmsboost::container::construct_in_place is called.
    //So comment them to catch bad uses
    const T& operator*() const;
    const T& operator[](difference_type) const;
@@ -631,15 +631,15 @@ struct emplace_functor
    BOOST_CONTAINER_FORCEINLINE void inplace_impl(Allocator &a, T* ptr, const dtl::index_tuple<IdxPack...>&)
    {
       allocator_traits<Allocator>::construct
-         (a, ptr, ::boost::forward<Args>(dtl::get<IdxPack>(args_))...);
+         (a, ptr, ::cppmsboost::forward<Args>(dtl::get<IdxPack>(args_))...);
    }
 
    template<class DestIt, std::size_t ...IdxPack>
    BOOST_CONTAINER_FORCEINLINE void inplace_impl(DestIt dest, const dtl::index_tuple<IdxPack...>&)
    {
-      typedef typename boost::container::iterator_traits<DestIt>::value_type value_type;
-      value_type && tmp= value_type(::boost::forward<Args>(dtl::get<IdxPack>(args_))...);
-      *dest = ::boost::move(tmp);
+      typedef typename cppmsboost::container::iterator_traits<DestIt>::value_type value_type;
+      value_type && tmp= value_type(::cppmsboost::forward<Args>(dtl::get<IdxPack>(args_))...);
+      *dest = ::cppmsboost::move(tmp);
    }
 
    dtl::tuple<Args&...> args_;
@@ -671,9 +671,9 @@ struct emplace_functor##N\
    template<class DestIt>\
    BOOST_CONTAINER_FORCEINLINE void operator()(DestIt dest)\
    {\
-      typedef typename boost::container::iterator_traits<DestIt>::value_type value_type;\
+      typedef typename cppmsboost::container::iterator_traits<DestIt>::value_type value_type;\
       BOOST_MOVE_IF(N, value_type tmp(BOOST_MOVE_MFWD##N), dtl::value_init<value_type> tmp) ;\
-      *dest = ::boost::move(const_cast<value_type &>(BOOST_MOVE_IF(N, tmp, tmp.get())));\
+      *dest = ::cppmsboost::move(const_cast<value_type &>(BOOST_MOVE_IF(N, tmp, tmp.get())));\
    }\
    \
    BOOST_MOVE_MREF##N\
@@ -761,15 +761,15 @@ struct iiterator_types
 {
    typedef typename IIterator::value_type                            it_value_type;
    typedef typename iiterator_node_value_type<it_value_type>::type   value_type;
-   typedef typename boost::container::iterator_traits<IIterator>::pointer         it_pointer;
-   typedef typename boost::container::iterator_traits<IIterator>::difference_type difference_type;
-   typedef typename ::boost::intrusive::pointer_traits<it_pointer>::
+   typedef typename cppmsboost::container::iterator_traits<IIterator>::pointer         it_pointer;
+   typedef typename cppmsboost::container::iterator_traits<IIterator>::difference_type difference_type;
+   typedef typename ::cppmsboost::intrusive::pointer_traits<it_pointer>::
       template rebind_pointer<value_type>::type                      pointer;
-   typedef typename ::boost::intrusive::pointer_traits<it_pointer>::
+   typedef typename ::cppmsboost::intrusive::pointer_traits<it_pointer>::
       template rebind_pointer<const value_type>::type                const_pointer;
-   typedef typename ::boost::intrusive::
+   typedef typename ::cppmsboost::intrusive::
       pointer_traits<pointer>::reference                             reference;
-   typedef typename ::boost::intrusive::
+   typedef typename ::cppmsboost::intrusive::
       pointer_traits<const_pointer>::reference                       const_reference;
    typedef typename IIterator::iterator_category                     iterator_category;
 };
@@ -777,7 +777,7 @@ struct iiterator_types
 template<class IIterator, bool IsConst>
 struct iterator_types
 {
-   typedef typename ::boost::container::iterator
+   typedef typename ::cppmsboost::container::iterator
       < typename iiterator_types<IIterator>::iterator_category
       , typename iiterator_types<IIterator>::value_type
       , typename iiterator_types<IIterator>::difference_type
@@ -788,7 +788,7 @@ struct iterator_types
 template<class IIterator>
 struct iterator_types<IIterator, false>
 {
-   typedef typename ::boost::container::iterator
+   typedef typename ::cppmsboost::container::iterator
       < typename iiterator_types<IIterator>::iterator_category
       , typename iiterator_types<IIterator>::value_type
       , typename iiterator_types<IIterator>::difference_type
@@ -870,7 +870,7 @@ class iterator_from_iiterator
    {  return this->m_iit->get_data();  }
 
    BOOST_CONTAINER_FORCEINLINE pointer   operator->() const BOOST_NOEXCEPT_OR_NOTHROW
-   {  return ::boost::intrusive::pointer_traits<pointer>::pointer_to(this->operator*());  }
+   {  return ::cppmsboost::intrusive::pointer_traits<pointer>::pointer_to(this->operator*());  }
 
    BOOST_CONTAINER_FORCEINLINE const IIterator &get() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return this->m_iit;   }
@@ -881,10 +881,10 @@ class iterator_from_iiterator
 
 }  //namespace dtl {
 
-using ::boost::intrusive::reverse_iterator;
+using ::cppmsboost::intrusive::reverse_iterator;
 
 }  //namespace container {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #include <boost/container/detail/config_end.hpp>
 

@@ -18,16 +18,16 @@
 
 #if !BOOST_WORKAROUND(BOOST_MSVC, <= 1800)
 
-namespace boost {
+namespace cppmsboost {
 
-template <class T> struct is_copy_constructible : public boost::is_constructible<T, const T&>{};
+template <class T> struct is_copy_constructible : public cppmsboost::is_constructible<T, const T&>{};
 
 template <> struct is_copy_constructible<void> : public false_type{};
 template <> struct is_copy_constructible<void const> : public false_type{};
 template <> struct is_copy_constructible<void const volatile> : public false_type{};
 template <> struct is_copy_constructible<void volatile> : public false_type{};
 
-} // namespace boost
+} // namespace cppmsboost
 
 #else
 //
@@ -35,16 +35,16 @@ template <> struct is_copy_constructible<void volatile> : public false_type{};
 // copy constructor.  In this case the compiler thinks there really is a copy-constructor and tries to
 // instantiate the deleted member.  std::is_copy_constructible has the same issue (or at least returns
 // an incorrect value, which just defers the issue into the users code) as well.  We can at least fix
-// boost::non_copyable as a base class as a special case:
+// cppmsboost::non_copyable as a base class as a special case:
 //
 #include <boost/type_traits/is_noncopyable.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
    namespace detail
    {
 
-      template <class T, bool b> struct is_copy_constructible_imp : public boost::is_constructible<T, const T&>{};
+      template <class T, bool b> struct is_copy_constructible_imp : public cppmsboost::is_constructible<T, const T&>{};
       template <class T> struct is_copy_constructible_imp<T, true> : public false_type{};
 
    }
@@ -56,7 +56,7 @@ namespace boost {
    template <> struct is_copy_constructible<void const volatile> : public false_type{};
    template <> struct is_copy_constructible<void volatile> : public false_type{};
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif
 
@@ -75,7 +75,7 @@ namespace boost {
 #pragma warning(disable:4181)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
    namespace detail{
 
@@ -85,7 +85,7 @@ namespace boost {
          // Intel compiler has problems with SFINAE for copy constructors and deleted functions:
          //
          // error: function *function_name* cannot be referenced -- it is a deleted function
-         // static boost::type_traits::yes_type test(T1&, decltype(T1(boost::declval<T1&>()))* = 0);
+         // static cppmsboost::type_traits::yes_type test(T1&, decltype(T1(cppmsboost::declval<T1&>()))* = 0);
          //                                                        ^ 
          //
          // MSVC 12.0 (Visual 2013) has problems when the copy constructor has been deleted. See:
@@ -94,17 +94,17 @@ namespace boost {
 
 #ifdef BOOST_NO_CXX11_DECLTYPE
          template <class T1>
-         static boost::type_traits::yes_type test(const T1&, boost::mpl::int_<sizeof(T1(boost::declval<const T1&>()))>* = 0);
+         static cppmsboost::type_traits::yes_type test(const T1&, cppmsboost::mpl::int_<sizeof(T1(cppmsboost::declval<const T1&>()))>* = 0);
 #else
          template <class T1>
-         static boost::type_traits::yes_type test(const T1&, decltype(T1(boost::declval<const T1&>()))* = 0);
+         static cppmsboost::type_traits::yes_type test(const T1&, decltype(T1(cppmsboost::declval<const T1&>()))* = 0);
 #endif
 
-         static boost::type_traits::no_type test(...);
+         static cppmsboost::type_traits::no_type test(...);
 #else
          template <class T1>
-         static boost::type_traits::no_type test(const T1&, typename T1::boost_move_no_copy_constructor_or_assign* = 0);
-         static boost::type_traits::yes_type test(...);
+         static cppmsboost::type_traits::no_type test(const T1&, typename T1::boost_move_no_copy_constructor_or_assign* = 0);
+         static cppmsboost::type_traits::yes_type test(...);
 #endif
 
          // If you see errors like this:
@@ -124,7 +124,7 @@ namespace boost {
          // To fix that you must modify your structure:
          //
          //      // C++03 and C++11 version
-         //      struct T: private boost::noncopyable {
+         //      struct T: private cppmsboost::noncopyable {
          //          ...
          //      private:
          //          T(const T &);
@@ -140,11 +140,11 @@ namespace boost {
          //      };
          BOOST_STATIC_CONSTANT(bool, value = (
             sizeof(test(
-            boost::declval<BOOST_DEDUCED_TYPENAME boost::add_reference<T const>::type>()
-            )) == sizeof(boost::type_traits::yes_type)
+            cppmsboost::declval<BOOST_DEDUCED_TYPENAME cppmsboost::add_reference<T const>::type>()
+            )) == sizeof(cppmsboost::type_traits::yes_type)
             &&
-            !boost::is_rvalue_reference<T>::value
-            && !boost::is_array<T>::value
+            !cppmsboost::is_rvalue_reference<T>::value
+            && !cppmsboost::is_array<T>::value
             ));
       };
 
@@ -157,8 +157,8 @@ namespace boost {
       struct is_copy_constructible_impl {
 
          BOOST_STATIC_CONSTANT(bool, value = (
-            boost::detail::is_copy_constructible_impl2<
-            boost::is_noncopyable<T>::value,
+            cppmsboost::detail::is_copy_constructible_impl2<
+            cppmsboost::is_noncopyable<T>::value,
             T
             >::value
             ));
@@ -166,7 +166,7 @@ namespace boost {
 
    } // namespace detail
 
-   template <class T> struct is_copy_constructible : public integral_constant<bool, ::boost::detail::is_copy_constructible_impl<T>::value>{};
+   template <class T> struct is_copy_constructible : public integral_constant<bool, ::cppmsboost::detail::is_copy_constructible_impl<T>::value>{};
    template <> struct is_copy_constructible<void> : public false_type{};
 #ifndef BOOST_NO_CV_VOID_SPECIALIZATIONS
    template <> struct is_copy_constructible<void const> : public false_type{};
@@ -174,7 +174,7 @@ namespace boost {
    template <> struct is_copy_constructible<void const volatile> : public false_type{};
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

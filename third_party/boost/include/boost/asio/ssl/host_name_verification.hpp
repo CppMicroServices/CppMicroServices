@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ssl {
 
@@ -34,8 +34,8 @@ namespace ssl {
  * The following example shows how to synchronously open a secure connection to
  * a given host name:
  * @code
- * using boost::asio::ip::tcp;
- * namespace ssl = boost::asio::ssl;
+ * using cppmsboost::asio::ip::tcp;
+ * namespace ssl = cppmsboost::asio::ssl;
  * typedef ssl::stream<tcp::socket> ssl_socket;
  *
  * // Create a context that uses the default paths for finding CA certificates.
@@ -43,11 +43,11 @@ namespace ssl {
  * ctx.set_default_verify_paths();
  *
  * // Open a socket and connect it to the remote host.
- * boost::asio::io_context io_context;
+ * cppmsboost::asio::io_context io_context;
  * ssl_socket sock(io_context, ctx);
  * tcp::resolver resolver(io_context);
  * tcp::resolver::query query("host.name", "https");
- * boost::asio::connect(sock.lowest_layer(), resolver.resolve(query));
+ * cppmsboost::asio::connect(sock.lowest_layer(), resolver.resolve(query));
  * sock.lowest_layer().set_option(tcp::no_delay(true));
  *
  * // Perform SSL handshake and verify the remote host's certificate.
@@ -81,7 +81,7 @@ private:
 
 } // namespace ssl
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

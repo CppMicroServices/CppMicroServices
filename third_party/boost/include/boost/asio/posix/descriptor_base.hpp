@@ -25,7 +25,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace posix {
 
@@ -57,9 +57,9 @@ public:
    *
    * @par Example
    * @code
-   * boost::asio::posix::stream_descriptor descriptor(my_context);
+   * cppmsboost::asio::posix::stream_descriptor descriptor(my_context);
    * ...
-   * boost::asio::descriptor_base::bytes_readable command(true);
+   * cppmsboost::asio::descriptor_base::bytes_readable command(true);
    * descriptor.io_control(command);
    * std::size_t bytes_readable = command.get();
    * @endcode
@@ -70,7 +70,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined bytes_readable;
 #else
-  typedef boost::asio::detail::io_control::bytes_readable bytes_readable;
+  typedef cppmsboost::asio::detail::io_control::bytes_readable bytes_readable;
 #endif
 
 protected:
@@ -82,7 +82,7 @@ protected:
 
 } // namespace posix
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -28,7 +28,7 @@ namespace std{
 #include <boost/archive/iterators/mb_from_wchar.hpp>
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
@@ -39,13 +39,13 @@ namespace archive {
 // copy chars to output escaping to xml and translating wide chars to mb chars
 template<class InputIterator>
 void save_iterator(std::ostream &os, InputIterator begin, InputIterator end){
-    typedef boost::archive::iterators::mb_from_wchar<
-        boost::archive::iterators::xml_escape<InputIterator>
+    typedef cppmsboost::archive::iterators::mb_from_wchar<
+        cppmsboost::archive::iterators::xml_escape<InputIterator>
     > translator;
     std::copy(
         translator(begin),
         translator(end),
-        boost::archive::iterators::ostream_iterator<char>(os)
+        cppmsboost::archive::iterators::ostream_iterator<char>(os)
     );
 }
 
@@ -75,26 +75,26 @@ BOOST_ARCHIVE_DECL void
 xml_oarchive_impl<Archive>::save(const std::string & s){
 //  at least one library doesn't typedef value_type for strings
 //  so rather than using string directly make a pointer iterator out of it
-    typedef boost::archive::iterators::xml_escape<
+    typedef cppmsboost::archive::iterators::xml_escape<
         const char * 
     > xml_escape_translator;
     std::copy(
         xml_escape_translator(s.data()),
         xml_escape_translator(s.data()+ s.size()),
-        boost::archive::iterators::ostream_iterator<char>(os)
+        cppmsboost::archive::iterators::ostream_iterator<char>(os)
     );
 }
 
 template<class Archive>
 BOOST_ARCHIVE_DECL void
 xml_oarchive_impl<Archive>::save(const char * s){
-    typedef boost::archive::iterators::xml_escape<
+    typedef cppmsboost::archive::iterators::xml_escape<
         const char * 
     > xml_escape_translator;
     std::copy(
         xml_escape_translator(s),
         xml_escape_translator(s + std::strlen(s)),
-        boost::archive::iterators::ostream_iterator<char>(os)
+        cppmsboost::archive::iterators::ostream_iterator<char>(os)
     );
 }
 
@@ -129,11 +129,11 @@ xml_oarchive_impl<Archive>::save_binary(const void *address, std::size_t count){
 template<class Archive>
 BOOST_ARCHIVE_DECL
 xml_oarchive_impl<Archive>::~xml_oarchive_impl(){
-    if(boost::core::uncaught_exceptions() > 0)
+    if(cppmsboost::core::uncaught_exceptions() > 0)
         return;
     if(0 == (this->get_flags() & no_header))
         this->windup();
 }
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost

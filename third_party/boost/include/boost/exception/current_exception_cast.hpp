@@ -19,7 +19,7 @@
 #endif
 
 namespace
-boost
+cppmsboost
     {
     template <class E>
     inline

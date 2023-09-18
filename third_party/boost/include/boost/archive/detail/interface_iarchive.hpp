@@ -24,7 +24,7 @@
 #include <boost/serialization/singleton.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 namespace detail {
 
@@ -50,7 +50,7 @@ public:
     const basic_pointer_iserializer *
     register_type(T * = NULL){
         const basic_pointer_iserializer & bpis =
-            boost::serialization::singleton<
+            cppmsboost::serialization::singleton<
                 pointer_iserializer<Archive, T>
             >::get_const_instance();
         this->This()->register_basic_serializer(bpis.get_basic_serializer());
@@ -78,7 +78,7 @@ public:
 
 } // namespace detail
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/archive/detail/abi_suffix.hpp> // pops abi_suffix.hpp pragmas
 

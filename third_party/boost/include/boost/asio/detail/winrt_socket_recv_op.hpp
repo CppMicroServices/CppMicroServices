@@ -30,7 +30,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -53,11 +53,11 @@ public:
   }
 
   static void do_complete(void* owner, operation* base,
-      const boost::system::error_code&, std::size_t)
+      const cppmsboost::system::error_code&, std::size_t)
   {
     // Take ownership of the operation object.
     winrt_socket_recv_op* o(static_cast<winrt_socket_recv_op*>(base));
-    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+    ptr p = { cppmsboost::asio::detail::addressof(o->handler_), o, o };
     handler_work<Handler, IoExecutor> w(o->handler_, o->io_executor_);
 
     BOOST_ASIO_HANDLER_COMPLETION((*o));
@@ -66,17 +66,17 @@ public:
     // Check whether buffers are still valid.
     if (owner)
     {
-      buffer_sequence_adapter<boost::asio::mutable_buffer,
+      buffer_sequence_adapter<cppmsboost::asio::mutable_buffer,
           MutableBufferSequence>::validate(o->buffers_);
     }
 #endif // defined(BOOST_ASIO_ENABLE_BUFFER_DEBUGGING)
 
     std::size_t bytes_transferred = o->result_ ? o->result_->Length : 0;
     if (bytes_transferred == 0 && !o->ec_ &&
-        !buffer_sequence_adapter<boost::asio::mutable_buffer,
+        !buffer_sequence_adapter<cppmsboost::asio::mutable_buffer,
           MutableBufferSequence>::all_empty(o->buffers_))
     {
-      o->ec_ = boost::asio::error::eof;
+      o->ec_ = cppmsboost::asio::error::eof;
     }
 
     // Make a copy of the handler so that the memory can be deallocated before
@@ -85,9 +85,9 @@ public:
     // with the handler. Consequently, a local copy of the handler is required
     // to ensure that any owning sub-object remains valid until after we have
     // deallocated the memory here.
-    detail::binder2<Handler, boost::system::error_code, std::size_t>
+    detail::binder2<Handler, cppmsboost::system::error_code, std::size_t>
       handler(o->handler_, o->ec_, bytes_transferred);
-    p.h = boost::asio::detail::addressof(handler.handler_);
+    p.h = cppmsboost::asio::detail::addressof(handler.handler_);
     p.reset();
 
     // Make the upcall if required.
@@ -108,7 +108,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

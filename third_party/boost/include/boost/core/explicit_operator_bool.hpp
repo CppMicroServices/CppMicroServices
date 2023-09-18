@@ -83,7 +83,7 @@
 
 #if !defined(BOOST_NO_UNSPECIFIED_BOOL)
 
-namespace boost {
+namespace cppmsboost {
 
 namespace detail {
 
@@ -116,24 +116,24 @@ namespace detail {
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #define BOOST_EXPLICIT_OPERATOR_BOOL()\
-    BOOST_FORCEINLINE operator boost::detail::unspecified_bool_type () const\
+    BOOST_FORCEINLINE operator cppmsboost::detail::unspecified_bool_type () const\
     {\
-        return (!this->operator! () ? &boost::detail::unspecified_bool::true_value : (boost::detail::unspecified_bool_type)0);\
+        return (!this->operator! () ? &cppmsboost::detail::unspecified_bool::true_value : (cppmsboost::detail::unspecified_bool_type)0);\
     }
 
 #define BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT()\
-    BOOST_FORCEINLINE operator boost::detail::unspecified_bool_type () const BOOST_NOEXCEPT\
+    BOOST_FORCEINLINE operator cppmsboost::detail::unspecified_bool_type () const BOOST_NOEXCEPT\
     {\
-        return (!this->operator! () ? &boost::detail::unspecified_bool::true_value : (boost::detail::unspecified_bool_type)0);\
+        return (!this->operator! () ? &cppmsboost::detail::unspecified_bool::true_value : (cppmsboost::detail::unspecified_bool_type)0);\
     }
 
 #define BOOST_CONSTEXPR_EXPLICIT_OPERATOR_BOOL()\
-    BOOST_FORCEINLINE BOOST_CONSTEXPR operator boost::detail::unspecified_bool_type () const BOOST_NOEXCEPT\
+    BOOST_FORCEINLINE BOOST_CONSTEXPR operator cppmsboost::detail::unspecified_bool_type () const BOOST_NOEXCEPT\
     {\
-        return (!this->operator! () ? &boost::detail::unspecified_bool::true_value : (boost::detail::unspecified_bool_type)0);\
+        return (!this->operator! () ? &cppmsboost::detail::unspecified_bool::true_value : (cppmsboost::detail::unspecified_bool_type)0);\
     }
 
 #else // !defined(BOOST_NO_UNSPECIFIED_BOOL)

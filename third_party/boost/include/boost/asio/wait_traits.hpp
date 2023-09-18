@@ -17,7 +17,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Wait traits suitable for use with the basic_waitable_timer class template.
@@ -51,7 +51,7 @@ struct wait_traits
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

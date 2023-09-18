@@ -95,7 +95,7 @@
     (defined(BOOST_CLANG) && !defined(__apple_build_version__) && ((__clang_major__+0) * 100 + (__clang_minor__+0)) < 302) ||\
     (defined(__clang__) && defined(__apple_build_version__) && ((__clang_major__+0) * 100 + (__clang_minor__+0)) < 402)
 // Intel compiler (at least 18.0 update 1) breaks if noexcept specification is used in defaulted function declarations:
-// error: the default constructor of "boost::atomics::atomic<T>" cannot be referenced -- it is a deleted function
+// error: the default constructor of "cppmsboost::atomics::atomic<T>" cannot be referenced -- it is a deleted function
 // GCC 4.6 doesn't seem to support that either. Clang 3.1 deduces wrong noexcept for the defaulted function and fails as well.
 #define BOOST_ATOMIC_DETAIL_DEF_NOEXCEPT_DECL
 #define BOOST_ATOMIC_DETAIL_DEF_NOEXCEPT_IMPL BOOST_NOEXCEPT

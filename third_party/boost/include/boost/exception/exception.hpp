@@ -10,10 +10,10 @@
 
 #ifdef BOOST_EXCEPTION_MINI_BOOST
 #include  <memory>
-namespace boost { namespace exception_detail { using std::shared_ptr; } }
+namespace cppmsboost { namespace exception_detail { using std::shared_ptr; } }
 #else
-namespace boost { template <class T> class shared_ptr; }
-namespace boost { namespace exception_detail { using boost::shared_ptr; } }
+namespace cppmsboost { template <class T> class shared_ptr; }
+namespace cppmsboost { namespace exception_detail { using cppmsboost::shared_ptr; } }
 #endif
 
 #if !defined(BOOST_EXCEPTION_ENABLE_WARNINGS)
@@ -30,7 +30,7 @@ namespace boost { namespace exception_detail { using boost::shared_ptr; } }
 #endif
 
 namespace
-boost
+cppmsboost
     {
     namespace
     exception_detail
@@ -237,7 +237,7 @@ boost
             }
 
 #ifdef __HP_aCC
-        //On HP aCC, this protected copy constructor prevents throwing boost::exception.
+        //On HP aCC, this protected copy constructor prevents throwing cppmsboost::exception.
         //On all other platforms, the same effect is achieved by the pure virtual destructor.
         exception( exception const & x ) BOOST_NOEXCEPT_OR_NOTHROW:
             data_(x.data_),

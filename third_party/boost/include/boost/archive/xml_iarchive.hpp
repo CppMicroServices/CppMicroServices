@@ -32,7 +32,7 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 namespace detail {
@@ -57,7 +57,7 @@ protected:
     friend class load_access;
 #endif
     // use boost:scoped_ptr to implement automatic deletion;
-    boost::scoped_ptr<xml_grammar> gimpl;
+    cppmsboost::scoped_ptr<xml_grammar> gimpl;
 
     std::istream & get_is(){
         return is;
@@ -73,10 +73,10 @@ protected:
         t = version_type(v);
     }
     void
-    load(boost::serialization::item_version_type & t){
+    load(cppmsboost::serialization::item_version_type & t){
         unsigned int v;
         load(v);
-        t = boost::serialization::item_version_type(v);
+        t = cppmsboost::serialization::item_version_type(v);
     }
     BOOST_ARCHIVE_DECL void
     load(char * t);
@@ -105,7 +105,7 @@ protected:
 };
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)
@@ -117,7 +117,7 @@ protected:
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 class BOOST_SYMBOL_VISIBLE xml_iarchive :
@@ -133,10 +133,10 @@ public:
 };
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 // required by export
-BOOST_SERIALIZATION_REGISTER_ARCHIVE(boost::archive::xml_iarchive)
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(cppmsboost::archive::xml_iarchive)
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

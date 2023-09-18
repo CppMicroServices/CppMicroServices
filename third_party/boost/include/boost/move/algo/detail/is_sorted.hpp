@@ -18,7 +18,7 @@
 #  pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace movelib {
 
 template<class ForwardIt, class Pred>
@@ -50,6 +50,6 @@ bool is_sorted_and_unique(ForwardIt first, ForwardIt last, Pred pred)
 }
 
 }  //namespace movelib {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif   //BOOST_MOVE_DETAIL_IS_SORTED_HPP

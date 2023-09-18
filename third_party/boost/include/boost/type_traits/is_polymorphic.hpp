@@ -20,7 +20,7 @@
 #pragma warning(disable:4250)
 #endif
 
-namespace boost{
+namespace cppmsboost{
 
 #ifndef BOOST_IS_POLYMORPHIC
 
@@ -97,7 +97,7 @@ struct is_polymorphic_selector<true>
 template <class T>
 struct is_polymorphic_imp
 {
-   typedef is_polymorphic_selector< ::boost::is_class<T>::value> selector;
+   typedef is_polymorphic_selector< ::cppmsboost::is_class<T>::value> selector;
    typedef typename selector::template rebind<T> binder;
    typedef typename binder::type imp_type;
    BOOST_STATIC_CONSTANT(bool, value = imp_type::value);
@@ -105,7 +105,7 @@ struct is_polymorphic_imp
 
 } // namespace detail
 
-template <class T> struct is_polymorphic : public integral_constant<bool, ::boost::detail::is_polymorphic_imp<T>::value> {};
+template <class T> struct is_polymorphic : public integral_constant<bool, ::cppmsboost::detail::is_polymorphic_imp<T>::value> {};
 
 #else // BOOST_IS_POLYMORPHIC
 
@@ -113,7 +113,7 @@ template <class T> struct is_polymorphic : public integral_constant<bool, BOOST_
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #if defined(BOOST_MSVC) && (BOOST_MSVC >= 1700)
 #pragma warning(pop)

@@ -24,7 +24,7 @@
 #include <boost/cstdint.hpp>
 #include <pthread.h>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -37,8 +37,8 @@ private:
     sp_counted_base( sp_counted_base const & );
     sp_counted_base & operator= ( sp_counted_base const & );
 
-    boost::int_least32_t use_count_;        // #shared
-    boost::int_least32_t weak_count_;       // #weak + (#shared != 0)
+    cppmsboost::int_least32_t use_count_;        // #shared
+    cppmsboost::int_least32_t weak_count_;       // #weak + (#shared != 0)
 
     mutable pthread_mutex_t m_;
 
@@ -94,7 +94,7 @@ public:
     void release() // nothrow
     {
         BOOST_VERIFY( pthread_mutex_lock( &m_ ) == 0 );
-        boost::int_least32_t new_use_count = --use_count_;
+        cppmsboost::int_least32_t new_use_count = --use_count_;
         BOOST_VERIFY( pthread_mutex_unlock( &m_ ) == 0 );
 
         if( new_use_count == 0 )
@@ -114,7 +114,7 @@ public:
     void weak_release() // nothrow
     {
         BOOST_VERIFY( pthread_mutex_lock( &m_ ) == 0 );
-        boost::int_least32_t new_weak_count = --weak_count_;
+        cppmsboost::int_least32_t new_weak_count = --weak_count_;
         BOOST_VERIFY( pthread_mutex_unlock( &m_ ) == 0 );
 
         if( new_weak_count == 0 )
@@ -126,7 +126,7 @@ public:
     long use_count() const // nothrow
     {
         BOOST_VERIFY( pthread_mutex_lock( &m_ ) == 0 );
-        boost::int_least32_t r = use_count_;
+        cppmsboost::int_least32_t r = use_count_;
         BOOST_VERIFY( pthread_mutex_unlock( &m_ ) == 0 );
 
         return r;
@@ -135,6 +135,6 @@ public:
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // #ifndef BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_PT_HPP_INCLUDED

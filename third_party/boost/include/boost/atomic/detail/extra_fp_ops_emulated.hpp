@@ -24,7 +24,7 @@
 #pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -102,6 +102,6 @@ struct extra_fp_operations< Base, Value, Size, false > :
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ATOMIC_DETAIL_EXTRA_FP_OPS_EMULATED_HPP_INCLUDED_

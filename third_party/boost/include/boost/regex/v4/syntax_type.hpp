@@ -19,7 +19,7 @@
 #ifndef BOOST_REGEX_SYNTAX_TYPE_HPP
 #define BOOST_REGEX_SYNTAX_TYPE_HPP
 
-namespace boost{
+namespace cppmsboost{
 namespace regex_constants{
 
 typedef unsigned char syntax_type;

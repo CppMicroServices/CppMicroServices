@@ -27,7 +27,7 @@
 #pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -555,6 +555,6 @@ struct gcc_dcas_x86_64
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ATOMIC_DETAIL_OPS_GCC_X86_DCAS_HPP_INCLUDED_

@@ -9,7 +9,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   struct defer_lock_t
   {

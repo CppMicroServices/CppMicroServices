@@ -18,7 +18,7 @@
 #include <boost/winapi/error_codes.hpp>
 #include <boost/assert.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 namespace chrono
 {
@@ -27,8 +27,8 @@ namespace chrono_detail
 
   BOOST_CHRONO_INLINE double get_nanosecs_per_tic() BOOST_NOEXCEPT
   {
-      boost::winapi::LARGE_INTEGER_ freq;
-      if ( !boost::winapi::QueryPerformanceFrequency( &freq ) )
+      cppmsboost::winapi::LARGE_INTEGER_ freq;
+      if ( !cppmsboost::winapi::QueryPerformanceFrequency( &freq ) )
           return 0.0L;
       return double(1000000000.0L / freq.QuadPart);
   }
@@ -39,14 +39,14 @@ namespace chrono_detail
   {
     double nanosecs_per_tic = chrono_detail::get_nanosecs_per_tic();
 
-    boost::winapi::LARGE_INTEGER_ pcount;
+    cppmsboost::winapi::LARGE_INTEGER_ pcount;
     if ( nanosecs_per_tic <= 0.0L )
     {
       BOOST_ASSERT(0 && "Boost::Chrono - get_nanosecs_per_tic Internal Error");
       return steady_clock::time_point();
     }
     unsigned times=0;
-    while ( ! boost::winapi::QueryPerformanceCounter( &pcount ) )
+    while ( ! cppmsboost::winapi::QueryPerformanceCounter( &pcount ) )
     {
       if ( ++times > 3 )
       {
@@ -65,29 +65,29 @@ namespace chrono_detail
   {
     double nanosecs_per_tic = chrono_detail::get_nanosecs_per_tic();
 
-    boost::winapi::LARGE_INTEGER_ pcount;
+    cppmsboost::winapi::LARGE_INTEGER_ pcount;
     if ( (nanosecs_per_tic <= 0.0L)
-            || (!boost::winapi::QueryPerformanceCounter( &pcount )) )
+            || (!cppmsboost::winapi::QueryPerformanceCounter( &pcount )) )
     {
-        boost::winapi::DWORD_ cause =
+        cppmsboost::winapi::DWORD_ cause =
             ((nanosecs_per_tic <= 0.0L)
-                    ? boost::winapi::ERROR_NOT_SUPPORTED_
-                    : boost::winapi::GetLastError());
-        if (::boost::chrono::is_throws(ec)) {
-            boost::throw_exception(
+                    ? cppmsboost::winapi::ERROR_NOT_SUPPORTED_
+                    : cppmsboost::winapi::GetLastError());
+        if (::cppmsboost::chrono::is_throws(ec)) {
+            cppmsboost::throw_exception(
                     system::system_error(
                             cause,
-                            ::boost::system::system_category(),
+                            ::cppmsboost::system::system_category(),
                             "chrono::steady_clock" ));
         }
         else
         {
-            ec.assign( cause, ::boost::system::system_category() );
+            ec.assign( cause, ::cppmsboost::system::system_category() );
             return steady_clock::time_point(duration(0));
         }
     }
 
-    if (!::boost::chrono::is_throws(ec))
+    if (!::cppmsboost::chrono::is_throws(ec))
     {
         ec.clear();
     }
@@ -99,8 +99,8 @@ namespace chrono_detail
   BOOST_CHRONO_INLINE
   system_clock::time_point system_clock::now() BOOST_NOEXCEPT
   {
-    boost::winapi::FILETIME_ ft;
-    boost::winapi::GetSystemTimeAsFileTime( &ft );  // never fails
+    cppmsboost::winapi::FILETIME_ ft;
+    cppmsboost::winapi::GetSystemTimeAsFileTime( &ft );  // never fails
     return system_clock::time_point(
       system_clock::duration(
         ((static_cast<__int64>( ft.dwHighDateTime ) << 32) | ft.dwLowDateTime)
@@ -114,9 +114,9 @@ namespace chrono_detail
   BOOST_CHRONO_INLINE
   system_clock::time_point system_clock::now( system::error_code & ec )
   {
-    boost::winapi::FILETIME_ ft;
-    boost::winapi::GetSystemTimeAsFileTime( &ft );  // never fails
-    if (!::boost::chrono::is_throws(ec))
+    cppmsboost::winapi::FILETIME_ ft;
+    cppmsboost::winapi::GetSystemTimeAsFileTime( &ft );  // never fails
+    if (!::cppmsboost::chrono::is_throws(ec))
     {
         ec.clear();
     }
@@ -146,6 +146,6 @@ namespace chrono_detail
   }
 
 }  // namespace chrono
-}  // namespace boost
+}  // namespace cppmsboost
 
 #endif

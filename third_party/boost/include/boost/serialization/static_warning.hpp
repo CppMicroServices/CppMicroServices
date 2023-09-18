@@ -69,7 +69,7 @@
 #include <boost/mpl/bool_fwd.hpp>
 #include <boost/static_assert.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 
 template<int L>
@@ -77,11 +77,11 @@ struct BOOST_SERIALIZATION_STATIC_WARNING_LINE{};
 
 template<bool B, int L>
 struct static_warning_test{
-    typename boost::mpl::eval_if_c<
+    typename cppmsboost::mpl::eval_if_c<
         B,
-        boost::mpl::true_,
-        typename boost::mpl::identity<
-            boost::mpl::print<
+        cppmsboost::mpl::true_,
+        typename cppmsboost::mpl::identity<
+            cppmsboost::mpl::print<
                 BOOST_SERIALIZATION_STATIC_WARNING_LINE<L>
             >
         >
@@ -95,8 +95,8 @@ struct BOOST_SERIALIZATION_SS {};
 } // boost
 
 #define BOOST_SERIALIZATION_BSW(B, L) \
-    typedef boost::serialization::BOOST_SERIALIZATION_SS< \
-        sizeof( boost::serialization::static_warning_test< B, L > ) \
+    typedef cppmsboost::serialization::BOOST_SERIALIZATION_SS< \
+        sizeof( cppmsboost::serialization::static_warning_test< B, L > ) \
     > BOOST_JOIN(STATIC_WARNING_LINE, L) BOOST_ATTRIBUTE_UNUSED;
 #define BOOST_STATIC_WARNING(B) BOOST_SERIALIZATION_BSW(B, __LINE__)
 

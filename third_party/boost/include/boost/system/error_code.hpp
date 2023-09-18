@@ -30,7 +30,7 @@
 #  error BOOST_POSIX_API or BOOST_WINDOWS_API must be defined
 #endif
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace system
@@ -190,7 +190,7 @@ private:
 
 private:
 
-    boost::ulong_long_type id_;
+    cppmsboost::ulong_long_type id_;
 
 protected:
 
@@ -213,7 +213,7 @@ protected:
     {
     }
 
-    explicit BOOST_SYSTEM_CONSTEXPR error_category( boost::ulong_long_type id ) BOOST_NOEXCEPT: id_( id )
+    explicit BOOST_SYSTEM_CONSTEXPR error_category( cppmsboost::ulong_long_type id ) BOOST_NOEXCEPT: id_( id )
     {
     }
 
@@ -283,7 +283,7 @@ public:
     // clang++ 3.8 and below: initialization of const object
     // requires a user-provided default constructor
     BOOST_SYSTEM_CONSTEXPR generic_error_category() BOOST_NOEXCEPT:
-        error_category( ( boost::ulong_long_type( 0xB2AB117A ) << 32 ) + 0x257EDF0D )
+        error_category( ( cppmsboost::ulong_long_type( 0xB2AB117A ) << 32 ) + 0x257EDF0D )
     {
     }
 
@@ -301,7 +301,7 @@ class BOOST_SYMBOL_VISIBLE system_error_category: public error_category
 public:
 
     BOOST_SYSTEM_CONSTEXPR system_error_category() BOOST_NOEXCEPT:
-        error_category( ( boost::ulong_long_type( 0x8FAFD21E ) << 32 ) + 0x25C5E09B )
+        error_category( ( cppmsboost::ulong_long_type( 0x8FAFD21E ) << 32 ) + 0x25C5E09B )
     {
     }
 
@@ -703,7 +703,7 @@ public:
 
 }  // namespace system
 
-// boost::throws()
+// cppmsboost::throws()
 
 namespace detail
 {
@@ -784,15 +784,15 @@ inline std::size_t hash_value( error_code const & ec )
 {
     error_category const & cat = ec.category();
 
-    boost::ulong_long_type id_ = cat.id_;
+    cppmsboost::ulong_long_type id_ = cat.id_;
 
     if( id_ == 0 )
     {
-        id_ = reinterpret_cast<boost::uintptr_t>( &cat );
+        id_ = reinterpret_cast<cppmsboost::uintptr_t>( &cat );
     }
 
-    boost::ulong_long_type hv = ( boost::ulong_long_type( 0xCBF29CE4 ) << 32 ) + 0x84222325;
-    boost::ulong_long_type const prime = ( boost::ulong_long_type( 0x00000100 ) << 32 ) + 0x000001B3;
+    cppmsboost::ulong_long_type hv = ( cppmsboost::ulong_long_type( 0xCBF29CE4 ) << 32 ) + 0x84222325;
+    cppmsboost::ulong_long_type const prime = ( cppmsboost::ulong_long_type( 0x00000100 ) << 32 ) + 0x000001B3;
 
     // id
 
@@ -898,18 +898,18 @@ inline bool error_category::failed( int ev ) const BOOST_NOEXCEPT
 
 } // namespace system
 
-} // namespace boost
+} // namespace cppmsboost
 
 // generic_error_category implementation
 
 #include <boost/system/detail/generic_category.hpp>
 
-inline std::string boost::system::detail::generic_error_category::message( int ev ) const
+inline std::string cppmsboost::system::detail::generic_error_category::message( int ev ) const
 {
     return generic_error_category_message( ev );
 }
 
-inline char const * boost::system::detail::generic_error_category::message( int ev, char * buffer, std::size_t len ) const BOOST_NOEXCEPT
+inline char const * cppmsboost::system::detail::generic_error_category::message( int ev, char * buffer, std::size_t len ) const BOOST_NOEXCEPT
 {
     return generic_error_category_message( ev, buffer, len );
 }
@@ -920,17 +920,17 @@ inline char const * boost::system::detail::generic_error_category::message( int 
 
 #include <boost/system/detail/system_category_win32.hpp>
 
-inline boost::system::error_condition boost::system::detail::system_error_category::default_error_condition( int ev ) const BOOST_NOEXCEPT
+inline cppmsboost::system::error_condition cppmsboost::system::detail::system_error_category::default_error_condition( int ev ) const BOOST_NOEXCEPT
 {
     return system_category_default_error_condition_win32( ev );
 }
 
-inline std::string boost::system::detail::system_error_category::message( int ev ) const
+inline std::string cppmsboost::system::detail::system_error_category::message( int ev ) const
 {
     return system_category_message_win32( ev );
 }
 
-inline char const * boost::system::detail::system_error_category::message( int ev, char * buffer, std::size_t len ) const BOOST_NOEXCEPT
+inline char const * cppmsboost::system::detail::system_error_category::message( int ev, char * buffer, std::size_t len ) const BOOST_NOEXCEPT
 {
     return system_category_message_win32( ev, buffer, len );
 }
@@ -939,17 +939,17 @@ inline char const * boost::system::detail::system_error_category::message( int e
 
 #include <boost/system/detail/system_category_posix.hpp>
 
-inline boost::system::error_condition boost::system::detail::system_error_category::default_error_condition( int ev ) const BOOST_NOEXCEPT
+inline cppmsboost::system::error_condition cppmsboost::system::detail::system_error_category::default_error_condition( int ev ) const BOOST_NOEXCEPT
 {
     return system_category_default_error_condition_posix( ev );
 }
 
-inline std::string boost::system::detail::system_error_category::message( int ev ) const
+inline std::string cppmsboost::system::detail::system_error_category::message( int ev ) const
 {
     return generic_error_category_message( ev );
 }
 
-inline char const * boost::system::detail::system_error_category::message( int ev, char * buffer, std::size_t len ) const BOOST_NOEXCEPT
+inline char const * cppmsboost::system::detail::system_error_category::message( int ev, char * buffer, std::size_t len ) const BOOST_NOEXCEPT
 {
     return generic_error_category_message( ev, buffer, len );
 }
@@ -962,9 +962,9 @@ inline char const * boost::system::detail::system_error_category::message( int e
 
 #include <boost/system/detail/std_interoperability.hpp>
 
-inline boost::system::error_category::operator std::error_category const & () const
+inline cppmsboost::system::error_category::operator std::error_category const & () const
 {
-    return boost::system::detail::to_std_category( *this );
+    return cppmsboost::system::detail::to_std_category( *this );
 }
 
 #endif // #if defined(BOOST_SYSTEM_HAS_SYSTEM_ERROR)

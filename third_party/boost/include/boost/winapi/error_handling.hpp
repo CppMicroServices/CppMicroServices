@@ -21,35 +21,35 @@
 #if !defined( BOOST_USE_WINDOWS_H )
 extern "C" {
 #if !defined( BOOST_NO_ANSI_APIS )
-BOOST_SYMBOL_IMPORT boost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
 FormatMessageA(
-    boost::winapi::DWORD_ dwFlags,
-    boost::winapi::LPCVOID_ lpSource,
-    boost::winapi::DWORD_ dwMessageId,
-    boost::winapi::DWORD_ dwLanguageId,
-    boost::winapi::LPSTR_ lpBuffer,
-    boost::winapi::DWORD_ nSize,
+    cppmsboost::winapi::DWORD_ dwFlags,
+    cppmsboost::winapi::LPCVOID_ lpSource,
+    cppmsboost::winapi::DWORD_ dwMessageId,
+    cppmsboost::winapi::DWORD_ dwLanguageId,
+    cppmsboost::winapi::LPSTR_ lpBuffer,
+    cppmsboost::winapi::DWORD_ nSize,
     va_list *Arguments);
 #endif
 
-BOOST_SYMBOL_IMPORT boost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
 FormatMessageW(
-    boost::winapi::DWORD_ dwFlags,
-    boost::winapi::LPCVOID_ lpSource,
-    boost::winapi::DWORD_ dwMessageId,
-    boost::winapi::DWORD_ dwLanguageId,
-    boost::winapi::LPWSTR_ lpBuffer,
-    boost::winapi::DWORD_ nSize,
+    cppmsboost::winapi::DWORD_ dwFlags,
+    cppmsboost::winapi::LPCVOID_ lpSource,
+    cppmsboost::winapi::DWORD_ dwMessageId,
+    cppmsboost::winapi::DWORD_ dwLanguageId,
+    cppmsboost::winapi::LPWSTR_ lpBuffer,
+    cppmsboost::winapi::DWORD_ nSize,
     va_list *Arguments);
 
 #if BOOST_WINAPI_PARTITION_DESKTOP || BOOST_WINAPI_PARTITION_SYSTEM
-BOOST_SYMBOL_IMPORT boost::winapi::UINT_ BOOST_WINAPI_WINAPI_CC
-SetErrorMode(boost::winapi::UINT_ uMode);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::UINT_ BOOST_WINAPI_WINAPI_CC
+SetErrorMode(cppmsboost::winapi::UINT_ uMode);
 #endif
 } // extern "C"
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 
 #if defined( BOOST_USE_WINDOWS_H )

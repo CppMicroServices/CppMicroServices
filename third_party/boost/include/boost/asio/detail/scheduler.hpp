@@ -30,7 +30,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -45,7 +45,7 @@ public:
 
   // Constructor. Specifies the number of concurrent threads that are likely to
   // run the scheduler. If set to 1 certain optimisation are performed.
-  BOOST_ASIO_DECL scheduler(boost::asio::execution_context& ctx,
+  BOOST_ASIO_DECL scheduler(cppmsboost::asio::execution_context& ctx,
       int concurrency_hint = 0, bool own_thread = true);
 
   // Destructor.
@@ -58,20 +58,20 @@ public:
   BOOST_ASIO_DECL void init_task();
 
   // Run the event loop until interrupted or no more work.
-  BOOST_ASIO_DECL std::size_t run(boost::system::error_code& ec);
+  BOOST_ASIO_DECL std::size_t run(cppmsboost::system::error_code& ec);
 
   // Run until interrupted or one operation is performed.
-  BOOST_ASIO_DECL std::size_t run_one(boost::system::error_code& ec);
+  BOOST_ASIO_DECL std::size_t run_one(cppmsboost::system::error_code& ec);
 
   // Run until timeout, interrupted, or one operation is performed.
   BOOST_ASIO_DECL std::size_t wait_one(
-      long usec, boost::system::error_code& ec);
+      long usec, cppmsboost::system::error_code& ec);
 
   // Poll for operations without blocking.
-  BOOST_ASIO_DECL std::size_t poll(boost::system::error_code& ec);
+  BOOST_ASIO_DECL std::size_t poll(cppmsboost::system::error_code& ec);
 
   // Poll for one operation without blocking.
-  BOOST_ASIO_DECL std::size_t poll_one(boost::system::error_code& ec);
+  BOOST_ASIO_DECL std::size_t poll_one(cppmsboost::system::error_code& ec);
 
   // Interrupt the event processing loop.
   BOOST_ASIO_DECL void stop();
@@ -144,15 +144,15 @@ private:
 
   // Run at most one operation. May block.
   BOOST_ASIO_DECL std::size_t do_run_one(mutex::scoped_lock& lock,
-      thread_info& this_thread, const boost::system::error_code& ec);
+      thread_info& this_thread, const cppmsboost::system::error_code& ec);
 
   // Run at most one operation with a timeout. May block.
   BOOST_ASIO_DECL std::size_t do_wait_one(mutex::scoped_lock& lock,
-      thread_info& this_thread, long usec, const boost::system::error_code& ec);
+      thread_info& this_thread, long usec, const cppmsboost::system::error_code& ec);
 
   // Poll for at most one operation.
   BOOST_ASIO_DECL std::size_t do_poll_one(mutex::scoped_lock& lock,
-      thread_info& this_thread, const boost::system::error_code& ec);
+      thread_info& this_thread, const cppmsboost::system::error_code& ec);
 
   // Stop the task and all idle threads.
   BOOST_ASIO_DECL void stop_all_threads(mutex::scoped_lock& lock);
@@ -210,12 +210,12 @@ private:
   const int concurrency_hint_;
 
   // The thread that is running the scheduler.
-  boost::asio::detail::thread* thread_;
+  cppmsboost::asio::detail::thread* thread_;
 };
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

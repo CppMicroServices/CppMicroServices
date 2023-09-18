@@ -32,7 +32,7 @@
 #pragma GCC diagnostic ignored "-Wclass-memaccess"
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -75,7 +75,7 @@ BOOST_FORCEINLINE To bitwise_cast(From const& from) BOOST_NOEXCEPT
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #if defined(BOOST_GCC) && BOOST_GCC >= 80000
 #pragma GCC diagnostic pop

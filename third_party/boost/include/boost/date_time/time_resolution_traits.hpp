@@ -15,7 +15,7 @@
 #include <boost/date_time/int_adapter.hpp>
 #include <boost/date_time/compiler_config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
   //! Simple function to calculate absolute value of a numeric type
@@ -29,32 +29,32 @@ namespace date_time {
 
   //! traits struct for time_resolution_traits implementation type
   struct time_resolution_traits_bi32_impl {
-    typedef boost::int32_t int_type;
-    typedef boost::int32_t impl_type;
+    typedef cppmsboost::int32_t int_type;
+    typedef cppmsboost::int32_t impl_type;
     static BOOST_CXX14_CONSTEXPR int_type as_number(impl_type i){ return i;}
     //! Used to determine if implemented type is int_adapter or int
     static BOOST_CXX14_CONSTEXPR bool is_adapted() { return false;}
   };
   //! traits struct for time_resolution_traits implementation type
   struct time_resolution_traits_adapted32_impl {
-    typedef boost::int32_t int_type;
-    typedef boost::date_time::int_adapter<boost::int32_t> impl_type;
+    typedef cppmsboost::int32_t int_type;
+    typedef cppmsboost::date_time::int_adapter<cppmsboost::int32_t> impl_type;
     static BOOST_CXX14_CONSTEXPR int_type as_number(impl_type i){ return i.as_number();}
     //! Used to determine if implemented type is int_adapter or int
     static BOOST_CXX14_CONSTEXPR bool is_adapted() { return true;}
   };
   //! traits struct for time_resolution_traits implementation type
   struct time_resolution_traits_bi64_impl {
-    typedef boost::int64_t int_type;
-    typedef boost::int64_t impl_type;
+    typedef cppmsboost::int64_t int_type;
+    typedef cppmsboost::int64_t impl_type;
     static BOOST_CXX14_CONSTEXPR int_type as_number(impl_type i){ return i;}
     //! Used to determine if implemented type is int_adapter or int
     static BOOST_CXX14_CONSTEXPR bool is_adapted() { return false;}
   };
   //! traits struct for time_resolution_traits implementation type
   struct time_resolution_traits_adapted64_impl {
-    typedef boost::int64_t int_type;
-    typedef boost::date_time::int_adapter<boost::int64_t> impl_type;
+    typedef cppmsboost::int64_t int_type;
+    typedef cppmsboost::date_time::int_adapter<cppmsboost::int64_t> impl_type;
     static BOOST_CXX14_CONSTEXPR int_type as_number(impl_type i){ return i.as_number();}
     //! Used to determine if implemented type is int_adapter or int
     static BOOST_CXX14_CONSTEXPR bool is_adapted() { return true;}
@@ -64,7 +64,7 @@ namespace date_time {
   // Note about var_type, which is used to define the variable that
   // stores hours, minutes, and seconds values:
   //
-  // In Boost 1.65.1 and earlier var_type was boost::int32_t which suffers
+  // In Boost 1.65.1 and earlier var_type was cppmsboost::int32_t which suffers
   // the year 2038 problem.  Binary serialization of posix_time uses
   // 32-bit values, and uses serialization version 0.
   //
@@ -77,7 +77,7 @@ namespace date_time {
   // versions.  Yes, it's a mess.  Static assertions were not present
   // in the serialization code to protect against this possibility.
   //
-  // In Boost 1.67.0 the var_type was changed to boost::int64_t, 
+  // In Boost 1.67.0 the var_type was changed to cppmsboost::int64_t, 
   // ensuring the output size is 64 bits, and the serialization version
   // was bumped.  Static assertions were added as well, protecting
   // future changes in this area.
@@ -86,12 +86,12 @@ namespace date_time {
   template<typename frac_sec_type,
            time_resolutions res,
 #if (defined(BOOST_MSVC) && (_MSC_VER < 1300))
-           boost::int64_t resolution_adjust,
+           cppmsboost::int64_t resolution_adjust,
 #else
            typename frac_sec_type::int_type resolution_adjust,
 #endif
            unsigned short frac_digits,
-           typename var_type = boost::int64_t >     // see note above
+           typename var_type = cppmsboost::int64_t >     // see note above
   class time_resolution_traits {
   public:
     typedef typename frac_sec_type::int_type fractional_seconds_type;
@@ -114,7 +114,7 @@ namespace date_time {
 
     //Would like this to be frac_sec_type, but some compilers complain
 #if (defined(BOOST_MSVC) && (_MSC_VER < 1300))
-    BOOST_STATIC_CONSTANT(boost::int64_t, ticks_per_second = resolution_adjust);
+    BOOST_STATIC_CONSTANT(cppmsboost::int64_t, ticks_per_second = resolution_adjust);
 #else
     BOOST_STATIC_CONSTANT(fractional_seconds_type, ticks_per_second = resolution_adjust);
 #endif

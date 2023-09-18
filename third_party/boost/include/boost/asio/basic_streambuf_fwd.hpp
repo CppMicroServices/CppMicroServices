@@ -21,7 +21,7 @@
 
 #include <memory>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 template <typename Allocator = std::allocator<char> >
@@ -31,7 +31,7 @@ template <typename Allocator = std::allocator<char> >
 class basic_streambuf_ref;
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // !defined(BOOST_ASIO_NO_IOSTREAM)
 

@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ssl {
 
@@ -176,7 +176,7 @@ public:
 #if !defined(GENERATING_DOCUMENTATION)
   // The following types and constants are preserved for backward compatibility.
   // New programs should use the equivalents of the same names that are defined
-  // in the boost::asio::ssl namespace.
+  // in the cppmsboost::asio::ssl namespace.
   typedef int verify_mode;
   BOOST_ASIO_STATIC_CONSTANT(int, verify_none = SSL_VERIFY_NONE);
   BOOST_ASIO_STATIC_CONSTANT(int, verify_peer = SSL_VERIFY_PEER);
@@ -204,7 +204,7 @@ protected:
 
 } // namespace ssl
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

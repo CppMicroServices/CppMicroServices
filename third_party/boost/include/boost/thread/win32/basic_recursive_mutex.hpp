@@ -19,7 +19,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     namespace detail
     {
@@ -44,13 +44,13 @@ namespace boost
 
             bool try_lock() BOOST_NOEXCEPT
             {
-                long const current_thread_id=boost::winapi::GetCurrentThreadId();
+                long const current_thread_id=cppmsboost::winapi::GetCurrentThreadId();
                 return try_recursive_lock(current_thread_id) || try_basic_lock(current_thread_id);
             }
 
             void lock()
             {
-                long const current_thread_id=boost::winapi::GetCurrentThreadId();
+                long const current_thread_id=cppmsboost::winapi::GetCurrentThreadId();
                 if(!try_recursive_lock(current_thread_id))
                 {
                     mutex.lock();
@@ -59,15 +59,15 @@ namespace boost
                 }
             }
 #if defined BOOST_THREAD_USES_DATETIME
-            bool timed_lock(::boost::system_time const& target)
+            bool timed_lock(::cppmsboost::system_time const& target)
             {
-                long const current_thread_id=boost::winapi::GetCurrentThreadId();
+                long const current_thread_id=cppmsboost::winapi::GetCurrentThreadId();
                 return try_recursive_lock(current_thread_id) || try_timed_lock(current_thread_id,target);
             }
             template<typename Duration>
             bool timed_lock(Duration const& target)
             {
-                long const current_thread_id=boost::winapi::GetCurrentThreadId();
+                long const current_thread_id=cppmsboost::winapi::GetCurrentThreadId();
                 return try_recursive_lock(current_thread_id) || try_timed_lock(current_thread_id,target);
             }
 #endif
@@ -76,13 +76,13 @@ namespace boost
             template <class Rep, class Period>
             bool try_lock_for(const chrono::duration<Rep, Period>& rel_time)
             {
-                long const current_thread_id=boost::winapi::GetCurrentThreadId();
+                long const current_thread_id=cppmsboost::winapi::GetCurrentThreadId();
                 return try_recursive_lock(current_thread_id) || try_timed_lock_for(current_thread_id,rel_time);
             }
             template <class Clock, class Duration>
             bool try_lock_until(const chrono::time_point<Clock, Duration>& t)
             {
-                long const current_thread_id=boost::winapi::GetCurrentThreadId();
+                long const current_thread_id=cppmsboost::winapi::GetCurrentThreadId();
                 return try_recursive_lock(current_thread_id) || try_timed_lock_until(current_thread_id,t);
             }
 #endif
@@ -98,7 +98,7 @@ namespace boost
         private:
             bool try_recursive_lock(long current_thread_id) BOOST_NOEXCEPT
             {
-                if(::boost::detail::interlocked_read_acquire(&locking_thread_id)==current_thread_id)
+                if(::cppmsboost::detail::interlocked_read_acquire(&locking_thread_id)==current_thread_id)
                 {
                     ++recursion_count;
                     return true;
@@ -118,7 +118,7 @@ namespace boost
             }
 
 #if defined BOOST_THREAD_USES_DATETIME
-            bool try_timed_lock(long current_thread_id,::boost::system_time const& target)
+            bool try_timed_lock(long current_thread_id,::cppmsboost::system_time const& target)
             {
                 if(mutex.timed_lock(target))
                 {

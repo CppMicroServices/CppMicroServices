@@ -28,7 +28,7 @@ namespace std{ using ::wcslen; }
 
 #include <boost/archive/text_oarchive.hpp>
 
-namespace boost { 
+namespace cppmsboost { 
 namespace archive {
 
 //////////////////////////////////////////////////////////////////////
@@ -112,5 +112,5 @@ text_oarchive_impl<Archive>::save_binary(const void *address, std::size_t count)
 }
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 

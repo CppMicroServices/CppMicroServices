@@ -26,7 +26,7 @@
 #endif
 
 namespace
-boost
+cppmsboost
     {
     namespace
     exception_detail
@@ -68,11 +68,11 @@ boost
             v_(x.v_)
             {
             }
-        error_info( T && v ) BOOST_NOEXCEPT_IF(boost::is_nothrow_move_constructible<T>::value):
+        error_info( T && v ) BOOST_NOEXCEPT_IF(cppmsboost::is_nothrow_move_constructible<T>::value):
             v_(std::move(v))
             {
             }
-        error_info( error_info && x ) BOOST_NOEXCEPT_IF(boost::is_nothrow_move_constructible<T>::value):
+        error_info( error_info && x ) BOOST_NOEXCEPT_IF(cppmsboost::is_nothrow_move_constructible<T>::value):
             v_(std::move(x.v_))
             {
             }

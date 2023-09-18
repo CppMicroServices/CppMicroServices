@@ -12,7 +12,7 @@
 /// \brief Includes minimal set of headers required to use the Boost.TypeIndex library.
 ///
 /// By inclusion of this file most optimal type index classes will be included and used 
-/// as a boost::typeindex::type_index and boost::typeindex::type_info.
+/// as a cppmsboost::typeindex::type_index and cppmsboost::typeindex::type_info.
 
 #include <boost/config.hpp>
 
@@ -49,21 +49,21 @@
 #define BOOST_TYPE_INDEX_REGISTER_CLASS
 #endif
 
-namespace boost { namespace typeindex {
+namespace cppmsboost { namespace typeindex {
 
 #if defined(BOOST_TYPE_INDEX_DOXYGEN_INVOKED)
 
 /// \def BOOST_TYPE_INDEX_FUNCTION_SIGNATURE
-/// BOOST_TYPE_INDEX_FUNCTION_SIGNATURE is used by boost::typeindex::ctti_type_index class to
+/// BOOST_TYPE_INDEX_FUNCTION_SIGNATURE is used by cppmsboost::typeindex::ctti_type_index class to
 /// deduce the name of a type. If your compiler is not recognized
-/// by the TypeIndex library and you wish to work with boost::typeindex::ctti_type_index, you may
+/// by the TypeIndex library and you wish to work with cppmsboost::typeindex::ctti_type_index, you may
 /// define this macro by yourself.
 ///
 /// BOOST_TYPE_INDEX_FUNCTION_SIGNATURE must be defined to a compiler specific macro
 /// that outputs the \b whole function signature \b including \b template \b parameters.
 ///
 /// If your compiler is not recognised and BOOST_TYPE_INDEX_FUNCTION_SIGNATURE is not defined,
-/// then a compile-time error will arise at any attempt to use boost::typeindex::ctti_type_index classes.
+/// then a compile-time error will arise at any attempt to use cppmsboost::typeindex::ctti_type_index classes.
 ///
 /// See BOOST_TYPE_INDEX_REGISTER_CTTI_PARSING_PARAMS and BOOST_TYPE_INDEX_CTTI_USER_DEFINED_PARSING
 /// for an information of how to tune the implementation to make a nice pretty_name() output.
@@ -79,20 +79,20 @@ namespace boost { namespace typeindex {
 /// \b Example:
 ///
 /// Imagine the situation when
-/// \code boost::typeindex::ctti_type_index::type_id<int>().pretty_name() \endcode
+/// \code cppmsboost::typeindex::ctti_type_index::type_id<int>().pretty_name() \endcode
 /// returns the following string:
-/// \code "static const char *boost::detail::ctti<int>::n() [T = int]" \endcode
-/// and \code boost::typeindex::ctti_type_index::type_id<short>().pretty_name() \endcode returns the following:
-/// \code "static const char *boost::detail::ctti<short>::n() [T = short]" \endcode
+/// \code "static const char *cppmsboost::detail::ctti<int>::n() [T = int]" \endcode
+/// and \code cppmsboost::typeindex::ctti_type_index::type_id<short>().pretty_name() \endcode returns the following:
+/// \code "static const char *cppmsboost::detail::ctti<short>::n() [T = short]" \endcode
 ///
-/// As we may see first 39 characters are "static const char *boost::detail::ctti<" and they do not depend on
+/// As we may see first 39 characters are "static const char *cppmsboost::detail::ctti<" and they do not depend on
 /// the type T. After first 39 characters we have a human readable type name which is duplicated at the end
 /// of a string. String always ends on ']', which consumes 1 character.
 ///
 /// Now if we define `BOOST_TYPE_INDEX_CTTI_USER_DEFINED_PARSING` to
 /// `(39, 1, false, "")` we'll be getting \code "int>::n() [T = int" \endcode
-/// for `boost::typeindex::ctti_type_index::type_id<int>().pretty_name()` and \code "short>::n() [T = short" \endcode
-/// for `boost::typeindex::ctti_type_index::type_id<short>().pretty_name()`.
+/// for `cppmsboost::typeindex::ctti_type_index::type_id<int>().pretty_name()` and \code "short>::n() [T = short" \endcode
+/// for `cppmsboost::typeindex::ctti_type_index::type_id<short>().pretty_name()`.
 ///
 /// Now we need to take additional care of the characters that go before the last mention of our type. We'll
 /// do that by telling the macro that we need to cut off everything that goes before the "T = " including the "T = "
@@ -119,25 +119,25 @@ namespace boost { namespace typeindex {
 
 
     /// Depending on a compiler flags, optimal implementation of type_index will be used 
-    /// as a default boost::typeindex::type_index.
+    /// as a default cppmsboost::typeindex::type_index.
     ///
-    /// Could be a boost::typeindex::stl_type_index, boost::typeindex::ctti_type_index or 
+    /// Could be a cppmsboost::typeindex::stl_type_index, cppmsboost::typeindex::ctti_type_index or 
     /// user defined type_index class.
     ///
-    /// \b See boost::typeindex::type_index_facade for a full description of type_index functions.
+    /// \b See cppmsboost::typeindex::type_index_facade for a full description of type_index functions.
     typedef platform_specific type_index;
 #elif defined(BOOST_TYPE_INDEX_USER_TYPEINDEX)
     // Nothing to do
 #elif (!defined(BOOST_NO_RTTI) && !defined(BOOST_TYPE_INDEX_FORCE_NO_RTTI_COMPATIBILITY)) || defined(BOOST_MSVC)
-    typedef boost::typeindex::stl_type_index type_index;
+    typedef cppmsboost::typeindex::stl_type_index type_index;
 #else 
-    typedef boost::typeindex::ctti_type_index type_index;
+    typedef cppmsboost::typeindex::ctti_type_index type_index;
 #endif
 
 /// Depending on a compiler flags, optimal implementation of type_info will be used 
-/// as a default boost::typeindex::type_info.
+/// as a default cppmsboost::typeindex::type_info.
 ///
-/// Could be a std::type_info, boost::typeindex::detail::ctti_data or 
+/// Could be a std::type_info, cppmsboost::typeindex::detail::ctti_data or 
 /// some user defined class.
 ///
 /// type_info \b is \b not copyable or default constructible. It is \b not assignable too!
@@ -181,7 +181,7 @@ typedef type_index::type_info_t type_info;
 ///
 /// C c1;
 /// A* pc1 = &c1;
-/// assert(boost::typeindex::type_id<C>() == boost::typeindex::type_id_runtime(*pc1));
+/// assert(cppmsboost::typeindex::type_id<C>() == cppmsboost::typeindex::type_id_runtime(*pc1));
 /// \endcode
 #define BOOST_TYPE_INDEX_REGISTER_CLASS nothing-or-some-virtual-functions
 
@@ -195,7 +195,7 @@ typedef type_index::type_info_t type_info;
 #endif // defined(BOOST_TYPE_INDEX_DOXYGEN_INVOKED)
 
 
-/// Function to get boost::typeindex::type_index for a type T.
+/// Function to get cppmsboost::typeindex::type_index for a type T.
 /// Removes const, volatile && and & modifiers from T.
 ///
 /// \b Example:
@@ -206,13 +206,13 @@ typedef type_index::type_info_t type_info;
 ///
 /// \tparam T Type for which type_index must be created.
 /// \throw Nothing.
-/// \return boost::typeindex::type_index with information about the specified type T.
+/// \return cppmsboost::typeindex::type_index with information about the specified type T.
 template <class T>
 inline type_index type_id() BOOST_NOEXCEPT {
     return type_index::type_id<T>();
 }
 
-/// Function for constructing boost::typeindex::type_index instance for type T. 
+/// Function for constructing cppmsboost::typeindex::type_index instance for type T. 
 /// Does not remove const, volatile, & and && modifiers from T.
 ///
 /// If T has no const, volatile, & and && modifiers, then returns exactly 
@@ -226,13 +226,13 @@ inline type_index type_id() BOOST_NOEXCEPT {
 ///
 /// \tparam T Type for which type_index must be created.
 /// \throw Nothing.
-/// \return boost::typeindex::type_index with information about the specified type T.
+/// \return cppmsboost::typeindex::type_index with information about the specified type T.
 template <class T>
 inline type_index type_id_with_cvr() BOOST_NOEXCEPT {
     return type_index::type_id_with_cvr<T>();
 }
 
-/// Function that works exactly like C++ typeid(rtti_val) call, but returns boost::type_index.
+/// Function that works exactly like C++ typeid(rtti_val) call, but returns cppmsboost::type_index.
 ///
 /// Returns runtime information about specified type.
 ///
@@ -251,13 +251,13 @@ inline type_index type_id_with_cvr() BOOST_NOEXCEPT {
 ///
 /// \param runtime_val Variable which runtime type must be returned.
 /// \throw Nothing.
-/// \return boost::typeindex::type_index with information about the specified variable.
+/// \return cppmsboost::typeindex::type_index with information about the specified variable.
 template <class T>
 inline type_index type_id_runtime(const T& runtime_val) BOOST_NOEXCEPT {
     return type_index::type_id_runtime(runtime_val);
 }
 
-}} // namespace boost::typeindex
+}} // namespace cppmsboost::typeindex
 
 
 

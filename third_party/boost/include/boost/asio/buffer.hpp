@@ -63,7 +63,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 class mutable_buffer;
@@ -80,7 +80,7 @@ class const_buffer;
  * The contents of a buffer may be accessed using the @c data() and @c size()
  * member functions:
  *
- * @code boost::asio::mutable_buffer b1 = ...;
+ * @code cppmsboost::asio::mutable_buffer b1 = ...;
  * std::size_t s1 = b1.size();
  * unsigned char* p1 = static_cast<unsigned char*>(b1.data());
  * @endcode
@@ -107,14 +107,14 @@ public:
 
 #if defined(BOOST_ASIO_ENABLE_BUFFER_DEBUGGING)
   mutable_buffer(void* data, std::size_t size,
-      boost::asio::detail::function<void()> debug_check)
+      cppmsboost::asio::detail::function<void()> debug_check)
     : data_(data),
       size_(size),
       debug_check_(debug_check)
   {
   }
 
-  const boost::asio::detail::function<void()>& get_debug_check() const
+  const cppmsboost::asio::detail::function<void()>& get_debug_check() const
   {
     return debug_check_;
   }
@@ -150,7 +150,7 @@ private:
   std::size_t size_;
 
 #if defined(BOOST_ASIO_ENABLE_BUFFER_DEBUGGING)
-  boost::asio::detail::function<void()> debug_check_;
+  cppmsboost::asio::detail::function<void()> debug_check_;
 #endif // BOOST_ASIO_ENABLE_BUFFER_DEBUGGING
 };
 
@@ -176,7 +176,7 @@ public:
 
 #if defined(BOOST_ASIO_ENABLE_BUFFER_DEBUGGING)
   mutable_buffers_1(void* data, std::size_t size,
-      boost::asio::detail::function<void()> debug_check)
+      cppmsboost::asio::detail::function<void()> debug_check)
     : mutable_buffer(data, size, debug_check)
   {
   }
@@ -214,7 +214,7 @@ public:
  * The contents of a buffer may be accessed using the @c data() and @c size()
  * member functions:
  *
- * @code boost::asio::const_buffer b1 = ...;
+ * @code cppmsboost::asio::const_buffer b1 = ...;
  * std::size_t s1 = b1.size();
  * const unsigned char* p1 = static_cast<const unsigned char*>(b1.data());
  * @endcode
@@ -251,14 +251,14 @@ public:
 
 #if defined(BOOST_ASIO_ENABLE_BUFFER_DEBUGGING)
   const_buffer(const void* data, std::size_t size,
-      boost::asio::detail::function<void()> debug_check)
+      cppmsboost::asio::detail::function<void()> debug_check)
     : data_(data),
       size_(size),
       debug_check_(debug_check)
   {
   }
 
-  const boost::asio::detail::function<void()>& get_debug_check() const
+  const cppmsboost::asio::detail::function<void()>& get_debug_check() const
   {
     return debug_check_;
   }
@@ -294,7 +294,7 @@ private:
   std::size_t size_;
 
 #if defined(BOOST_ASIO_ENABLE_BUFFER_DEBUGGING)
-  boost::asio::detail::function<void()> debug_check_;
+  cppmsboost::asio::detail::function<void()> debug_check_;
 #endif // BOOST_ASIO_ENABLE_BUFFER_DEBUGGING
 };
 
@@ -320,7 +320,7 @@ public:
 
 #if defined(BOOST_ASIO_ENABLE_BUFFER_DEBUGGING)
   const_buffers_1(const void* data, std::size_t size,
-      boost::asio::detail::function<void()> debug_check)
+      cppmsboost::asio::detail::function<void()> debug_check)
     : const_buffer(data, size, debug_check)
   {
   }
@@ -375,9 +375,9 @@ private:
   mutable_buffer buf_;
 };
 
-/** @defgroup buffer_sequence_begin boost::asio::buffer_sequence_begin
+/** @defgroup buffer_sequence_begin cppmsboost::asio::buffer_sequence_begin
  *
- * @brief The boost::asio::buffer_sequence_begin function returns an iterator
+ * @brief The cppmsboost::asio::buffer_sequence_begin function returns an iterator
  * pointing to the first element in a buffer sequence.
  */
 /*@{*/
@@ -452,9 +452,9 @@ inline typename C::const_iterator buffer_sequence_begin(const C& c,
 
 /*@}*/
 
-/** @defgroup buffer_sequence_end boost::asio::buffer_sequence_end
+/** @defgroup buffer_sequence_end cppmsboost::asio::buffer_sequence_end
  *
- * @brief The boost::asio::buffer_sequence_end function returns an iterator
+ * @brief The cppmsboost::asio::buffer_sequence_end function returns an iterator
  * pointing to one past the end element in a buffer sequence.
  */
 /*@{*/
@@ -578,8 +578,8 @@ inline std::size_t buffer_size(multiple_buffers,
  * buffer sequence, as if computed as follows:
  *
  * @code size_t total_size = 0;
- * auto i = boost::asio::buffer_sequence_begin(buffers);
- * auto end = boost::asio::buffer_sequence_end(buffers);
+ * auto i = cppmsboost::asio::buffer_sequence_begin(buffers);
+ * auto end = cppmsboost::asio::buffer_sequence_end(buffers);
  * for (; i != end; ++i)
  * {
  *   const_buffer b(*i);
@@ -595,31 +595,31 @@ inline std::size_t buffer_size(const BufferSequence& b) BOOST_ASIO_NOEXCEPT
 {
   return detail::buffer_size(
       detail::buffer_sequence_cardinality<BufferSequence>(),
-      boost::asio::buffer_sequence_begin(b),
-      boost::asio::buffer_sequence_end(b));
+      cppmsboost::asio::buffer_sequence_begin(b),
+      cppmsboost::asio::buffer_sequence_end(b));
 }
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
 
-/** @defgroup buffer_cast boost::asio::buffer_cast
+/** @defgroup buffer_cast cppmsboost::asio::buffer_cast
  *
  * @brief (Deprecated: Use the @c data() member function.) The
- * boost::asio::buffer_cast function is used to obtain a pointer to the
+ * cppmsboost::asio::buffer_cast function is used to obtain a pointer to the
  * underlying memory region associated with a buffer.
  *
  * @par Examples:
  *
  * To access the memory of a non-modifiable buffer, use:
- * @code boost::asio::const_buffer b1 = ...;
- * const unsigned char* p1 = boost::asio::buffer_cast<const unsigned char*>(b1);
+ * @code cppmsboost::asio::const_buffer b1 = ...;
+ * const unsigned char* p1 = cppmsboost::asio::buffer_cast<const unsigned char*>(b1);
  * @endcode
  *
  * To access the memory of a modifiable buffer, use:
- * @code boost::asio::mutable_buffer b2 = ...;
- * unsigned char* p2 = boost::asio::buffer_cast<unsigned char*>(b2);
+ * @code cppmsboost::asio::mutable_buffer b2 = ...;
+ * unsigned char* p2 = cppmsboost::asio::buffer_cast<unsigned char*>(b2);
  * @endcode
  *
- * The boost::asio::buffer_cast function permits violations of type safety, so
+ * The cppmsboost::asio::buffer_cast function permits violations of type safety, so
  * uses of it in application code should be carefully considered.
  */
 /*@{*/
@@ -730,9 +730,9 @@ private:
 } // namespace detail
 #endif // BOOST_ASIO_ENABLE_BUFFER_DEBUGGING
 
-/** @defgroup buffer boost::asio::buffer
+/** @defgroup buffer cppmsboost::asio::buffer
  *
- * @brief The boost::asio::buffer function is used to create a buffer object to
+ * @brief The cppmsboost::asio::buffer function is used to create a buffer object to
  * represent raw memory, an array of POD elements, a vector of POD elements,
  * or a std::string.
  *
@@ -748,28 +748,28 @@ private:
  * The simplest use case involves reading or writing a single buffer of a
  * specified size:
  *
- * @code sock.send(boost::asio::buffer(data, size)); @endcode
+ * @code sock.send(cppmsboost::asio::buffer(data, size)); @endcode
  *
- * In the above example, the return value of boost::asio::buffer meets the
+ * In the above example, the return value of cppmsboost::asio::buffer meets the
  * requirements of the ConstBufferSequence concept so that it may be directly
  * passed to the socket's write function. A buffer created for modifiable
  * memory also meets the requirements of the MutableBufferSequence concept.
  *
  * An individual buffer may be created from a builtin array, std::vector,
- * std::array or boost::array of POD elements. This helps prevent buffer
+ * std::array or cppmsboost::array of POD elements. This helps prevent buffer
  * overruns by automatically determining the size of the buffer:
  *
  * @code char d1[128];
- * size_t bytes_transferred = sock.receive(boost::asio::buffer(d1));
+ * size_t bytes_transferred = sock.receive(cppmsboost::asio::buffer(d1));
  *
  * std::vector<char> d2(128);
- * bytes_transferred = sock.receive(boost::asio::buffer(d2));
+ * bytes_transferred = sock.receive(cppmsboost::asio::buffer(d2));
  *
  * std::array<char, 128> d3;
- * bytes_transferred = sock.receive(boost::asio::buffer(d3));
+ * bytes_transferred = sock.receive(cppmsboost::asio::buffer(d3));
  *
- * boost::array<char, 128> d4;
- * bytes_transferred = sock.receive(boost::asio::buffer(d4)); @endcode
+ * cppmsboost::array<char, 128> d4;
+ * bytes_transferred = sock.receive(cppmsboost::asio::buffer(d4)); @endcode
  *
  * In all three cases above, the buffers created are exactly 128 bytes long.
  * Note that a vector is @e never automatically resized when creating or using
@@ -781,11 +781,11 @@ private:
  * The contents of a buffer may be accessed using the @c data() and @c size()
  * member functions:
  *
- * @code boost::asio::mutable_buffer b1 = ...;
+ * @code cppmsboost::asio::mutable_buffer b1 = ...;
  * std::size_t s1 = b1.size();
  * unsigned char* p1 = static_cast<unsigned char*>(b1.data());
  *
- * boost::asio::const_buffer b2 = ...;
+ * cppmsboost::asio::const_buffer b2 = ...;
  * std::size_t s2 = b2.size();
  * const void* p2 = b2.data(); @endcode
  *
@@ -808,8 +808,8 @@ private:
  *
  * @code vector<const_buffer> buffers = ...;
  *
- * vector<unsigned char> data(boost::asio::buffer_size(buffers));
- * boost::asio::buffer_copy(boost::asio::buffer(data), buffers); @endcode
+ * vector<unsigned char> data(cppmsboost::asio::buffer_size(buffers));
+ * cppmsboost::asio::buffer_copy(cppmsboost::asio::buffer(data), buffers); @endcode
  *
  * Note that @ref buffer_copy is implemented in terms of @c memcpy, and
  * consequently it cannot be used to copy between overlapping memory regions.
@@ -821,12 +821,12 @@ private:
  * valid until it is no longer required for an I/O operation. When the memory
  * is no longer available, the buffer is said to have been invalidated.
  *
- * For the boost::asio::buffer overloads that accept an argument of type
+ * For the cppmsboost::asio::buffer overloads that accept an argument of type
  * std::vector, the buffer objects returned are invalidated by any vector
  * operation that also invalidates all references, pointers and iterators
  * referring to the elements in the sequence (C++ Std, 23.2.4)
  *
- * For the boost::asio::buffer overloads that accept an argument of type
+ * For the cppmsboost::asio::buffer overloads that accept an argument of type
  * std::basic_string, the buffer objects returned are invalidated according to
  * the rules defined for invalidation of references, pointers and iterators
  * referring to elements of the sequence (C++ Std, 21.3).
@@ -837,17 +837,17 @@ private:
  * which helps prevent buffer overruns. Consider an array initialised as
  * follows:
  *
- * @code boost::array<char, 6> a = { 'a', 'b', 'c', 'd', 'e' }; @endcode
+ * @code cppmsboost::array<char, 6> a = { 'a', 'b', 'c', 'd', 'e' }; @endcode
  *
  * A buffer object @c b1 created using:
  *
- * @code b1 = boost::asio::buffer(a); @endcode
+ * @code b1 = cppmsboost::asio::buffer(a); @endcode
  *
  * represents the entire array, <tt>{ 'a', 'b', 'c', 'd', 'e' }</tt>. An
- * optional second argument to the boost::asio::buffer function may be used to
+ * optional second argument to the cppmsboost::asio::buffer function may be used to
  * limit the size, in bytes, of the buffer:
  *
- * @code b2 = boost::asio::buffer(a, 3); @endcode
+ * @code b2 = cppmsboost::asio::buffer(a, 3); @endcode
  *
  * such that @c b2 represents the data <tt>{ 'a', 'b', 'c' }</tt>. Even if the
  * size argument exceeds the actual size of the array, the size of the buffer
@@ -864,7 +864,7 @@ private:
  * Both an offset and size may be specified to create a buffer that corresponds
  * to a specific range of bytes within an existing buffer:
  *
- * @code b4 = boost::asio::buffer(b1 + 1, 3); @endcode
+ * @code b4 = cppmsboost::asio::buffer(b1 + 1, 3); @endcode
  *
  * so that @c b4 will refer to the bytes <tt>{ 'b', 'c', 'd' }</tt>.
  *
@@ -877,18 +877,18 @@ private:
  * @code
  * char d1[128];
  * std::vector<char> d2(128);
- * boost::array<char, 128> d3;
+ * cppmsboost::array<char, 128> d3;
  *
- * boost::array<mutable_buffer, 3> bufs1 = {
- *   boost::asio::buffer(d1),
- *   boost::asio::buffer(d2),
- *   boost::asio::buffer(d3) };
+ * cppmsboost::array<mutable_buffer, 3> bufs1 = {
+ *   cppmsboost::asio::buffer(d1),
+ *   cppmsboost::asio::buffer(d2),
+ *   cppmsboost::asio::buffer(d3) };
  * bytes_transferred = sock.receive(bufs1);
  *
  * std::vector<const_buffer> bufs2;
- * bufs2.push_back(boost::asio::buffer(d1));
- * bufs2.push_back(boost::asio::buffer(d2));
- * bufs2.push_back(boost::asio::buffer(d3));
+ * bufs2.push_back(cppmsboost::asio::buffer(d1));
+ * bufs2.push_back(cppmsboost::asio::buffer(d2));
+ * bufs2.push_back(cppmsboost::asio::buffer(d3));
  * bytes_transferred = sock.send(bufs2); @endcode
  */
 /*@{*/
@@ -1043,11 +1043,11 @@ inline BOOST_ASIO_CONST_BUFFER buffer(const PodType (&data)[N],
 
 // Borland C++ and Sun Studio think the overloads:
 //
-//   unspecified buffer(boost::array<PodType, N>& array ...);
+//   unspecified buffer(cppmsboost::array<PodType, N>& array ...);
 //
 // and
 //
-//   unspecified buffer(boost::array<const PodType, N>& array ...);
+//   unspecified buffer(cppmsboost::array<const PodType, N>& array ...);
 //
 // are ambiguous. This will be worked around by using a buffer_types traits
 // class that contains typedefs for the appropriate buffer and container
@@ -1082,11 +1082,11 @@ struct buffer_types
 
 template <typename PodType, std::size_t N>
 inline typename detail::buffer_types<PodType>::container_type
-buffer(boost::array<PodType, N>& data) BOOST_ASIO_NOEXCEPT
+buffer(cppmsboost::array<PodType, N>& data) BOOST_ASIO_NOEXCEPT
 {
-  typedef typename boost::asio::detail::buffer_types<PodType>::buffer_type
+  typedef typename cppmsboost::asio::detail::buffer_types<PodType>::buffer_type
     buffer_type;
-  typedef typename boost::asio::detail::buffer_types<PodType>::container_type
+  typedef typename cppmsboost::asio::detail::buffer_types<PodType>::container_type
     container_type;
   return container_type(
       buffer_type(data.c_array(), data.size() * sizeof(PodType)));
@@ -1094,12 +1094,12 @@ buffer(boost::array<PodType, N>& data) BOOST_ASIO_NOEXCEPT
 
 template <typename PodType, std::size_t N>
 inline typename detail::buffer_types<PodType>::container_type
-buffer(boost::array<PodType, N>& data,
+buffer(cppmsboost::array<PodType, N>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
-  typedef typename boost::asio::detail::buffer_types<PodType>::buffer_type
+  typedef typename cppmsboost::asio::detail::buffer_types<PodType>::buffer_type
     buffer_type;
-  typedef typename boost::asio::detail::buffer_types<PodType>::container_type
+  typedef typename cppmsboost::asio::detail::buffer_types<PodType>::container_type
     container_type;
   return container_type(
       buffer_type(data.c_array(),
@@ -1118,7 +1118,7 @@ buffer(boost::array<PodType, N>& data,
  */
 template <typename PodType, std::size_t N>
 inline BOOST_ASIO_MUTABLE_BUFFER buffer(
-    boost::array<PodType, N>& data) BOOST_ASIO_NOEXCEPT
+    cppmsboost::array<PodType, N>& data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(
       data.c_array(), data.size() * sizeof(PodType));
@@ -1132,7 +1132,7 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(
  *     min(data.size() * sizeof(PodType), max_size_in_bytes)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(boost::array<PodType, N>& data,
+inline BOOST_ASIO_MUTABLE_BUFFER buffer(cppmsboost::array<PodType, N>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(data.c_array(),
@@ -1149,7 +1149,7 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(boost::array<PodType, N>& data,
  */
 template <typename PodType, std::size_t N>
 inline BOOST_ASIO_CONST_BUFFER buffer(
-    boost::array<const PodType, N>& data) BOOST_ASIO_NOEXCEPT
+    cppmsboost::array<const PodType, N>& data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.data(), data.size() * sizeof(PodType));
 }
@@ -1162,7 +1162,7 @@ inline BOOST_ASIO_CONST_BUFFER buffer(
  *     min(data.size() * sizeof(PodType), max_size_in_bytes)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_CONST_BUFFER buffer(boost::array<const PodType, N>& data,
+inline BOOST_ASIO_CONST_BUFFER buffer(cppmsboost::array<const PodType, N>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.data(),
@@ -1181,7 +1181,7 @@ inline BOOST_ASIO_CONST_BUFFER buffer(boost::array<const PodType, N>& data,
  */
 template <typename PodType, std::size_t N>
 inline BOOST_ASIO_CONST_BUFFER buffer(
-    const boost::array<PodType, N>& data) BOOST_ASIO_NOEXCEPT
+    const cppmsboost::array<PodType, N>& data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.data(), data.size() * sizeof(PodType));
 }
@@ -1194,7 +1194,7 @@ inline BOOST_ASIO_CONST_BUFFER buffer(
  *     min(data.size() * sizeof(PodType), max_size_in_bytes)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_CONST_BUFFER buffer(const boost::array<PodType, N>& data,
+inline BOOST_ASIO_CONST_BUFFER buffer(const cppmsboost::array<PodType, N>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.data(),
@@ -1649,7 +1649,7 @@ public:
    */
   const_buffers_type data() const BOOST_ASIO_NOEXCEPT
   {
-    return const_buffers_type(boost::asio::buffer(string_, size_));
+    return const_buffers_type(cppmsboost::asio::buffer(string_, size_));
   }
 #endif // !defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
 
@@ -1670,8 +1670,8 @@ public:
    */
   mutable_buffers_type data(std::size_t pos, std::size_t n) BOOST_ASIO_NOEXCEPT
   {
-    return mutable_buffers_type(boost::asio::buffer(
-          boost::asio::buffer(string_, max_size_) + pos, n));
+    return mutable_buffers_type(cppmsboost::asio::buffer(
+          cppmsboost::asio::buffer(string_, max_size_) + pos, n));
   }
 
   /// @b DynamicBuffer_v2: Get a sequence of buffers that represents the
@@ -1689,8 +1689,8 @@ public:
   const_buffers_type data(std::size_t pos,
       std::size_t n) const BOOST_ASIO_NOEXCEPT
   {
-    return const_buffers_type(boost::asio::buffer(
-          boost::asio::buffer(string_, max_size_) + pos, n));
+    return const_buffers_type(cppmsboost::asio::buffer(
+          cppmsboost::asio::buffer(string_, max_size_) + pos, n));
   }
 
 #if !defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
@@ -1715,7 +1715,7 @@ public:
     if (size() > max_size() || max_size() - size() < n)
     {
       std::length_error ex("dynamic_string_buffer too long");
-      boost::asio::detail::throw_exception(ex);
+      cppmsboost::asio::detail::throw_exception(ex);
     }
 
     if (size_ == (std::numeric_limits<std::size_t>::max)())
@@ -1723,7 +1723,7 @@ public:
 
     string_.resize(size_ + n);
 
-    return boost::asio::buffer(boost::asio::buffer(string_) + size_, n);
+    return cppmsboost::asio::buffer(cppmsboost::asio::buffer(string_) + size_, n);
   }
 
   /// @b DynamicBuffer_v1: Move bytes from the output sequence to the input
@@ -1758,7 +1758,7 @@ public:
     if (size() > max_size() || max_size() - size() < n)
     {
       std::length_error ex("dynamic_string_buffer too long");
-      boost::asio::detail::throw_exception(ex);
+      cppmsboost::asio::detail::throw_exception(ex);
     }
 
     string_.resize(size() + n);
@@ -1922,7 +1922,7 @@ public:
    */
   const_buffers_type data() const BOOST_ASIO_NOEXCEPT
   {
-    return const_buffers_type(boost::asio::buffer(vector_, size_));
+    return const_buffers_type(cppmsboost::asio::buffer(vector_, size_));
   }
 #endif // !defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
 
@@ -1943,8 +1943,8 @@ public:
    */
   mutable_buffers_type data(std::size_t pos, std::size_t n) BOOST_ASIO_NOEXCEPT
   {
-    return mutable_buffers_type(boost::asio::buffer(
-          boost::asio::buffer(vector_, max_size_) + pos, n));
+    return mutable_buffers_type(cppmsboost::asio::buffer(
+          cppmsboost::asio::buffer(vector_, max_size_) + pos, n));
   }
 
   /// @b DynamicBuffer_v2: Get a sequence of buffers that represents the
@@ -1962,8 +1962,8 @@ public:
   const_buffers_type data(std::size_t pos,
       std::size_t n) const BOOST_ASIO_NOEXCEPT
   {
-    return const_buffers_type(boost::asio::buffer(
-          boost::asio::buffer(vector_, max_size_) + pos, n));
+    return const_buffers_type(cppmsboost::asio::buffer(
+          cppmsboost::asio::buffer(vector_, max_size_) + pos, n));
   }
 
 #if !defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
@@ -1988,7 +1988,7 @@ public:
     if (size () > max_size() || max_size() - size() < n)
     {
       std::length_error ex("dynamic_vector_buffer too long");
-      boost::asio::detail::throw_exception(ex);
+      cppmsboost::asio::detail::throw_exception(ex);
     }
 
     if (size_ == (std::numeric_limits<std::size_t>::max)())
@@ -1996,7 +1996,7 @@ public:
 
     vector_.resize(size_ + n);
 
-    return boost::asio::buffer(boost::asio::buffer(vector_) + size_, n);
+    return cppmsboost::asio::buffer(cppmsboost::asio::buffer(vector_) + size_, n);
   }
 
   /// @b DynamicBuffer_v1: Move bytes from the output sequence to the input
@@ -2031,7 +2031,7 @@ public:
     if (size() > max_size() || max_size() - size() < n)
     {
       std::length_error ex("dynamic_vector_buffer too long");
-      boost::asio::detail::throw_exception(ex);
+      cppmsboost::asio::detail::throw_exception(ex);
     }
 
     vector_.resize(size() + n);
@@ -2083,9 +2083,9 @@ private:
   const std::size_t max_size_;
 };
 
-/** @defgroup dynamic_buffer boost::asio::dynamic_buffer
+/** @defgroup dynamic_buffer cppmsboost::asio::dynamic_buffer
  *
- * @brief The boost::asio::dynamic_buffer function is used to create a
+ * @brief The cppmsboost::asio::dynamic_buffer function is used to create a
  * dynamically resized buffer from a @c std::basic_string or @c std::vector.
  */
 /*@{*/
@@ -2139,9 +2139,9 @@ inline dynamic_vector_buffer<Elem, Allocator> dynamic_buffer(
 
 /*@}*/
 
-/** @defgroup buffer_copy boost::asio::buffer_copy
+/** @defgroup buffer_copy cppmsboost::asio::buffer_copy
  *
- * @brief The boost::asio::buffer_copy function is used to copy bytes from a
+ * @brief The cppmsboost::asio::buffer_copy function is used to copy bytes from a
  * source buffer (or buffer sequence) to a target buffer (or buffer sequence).
  *
  * The @c buffer_copy function is available in two forms:
@@ -2196,7 +2196,7 @@ inline std::size_t buffer_copy(one_buffer, one_buffer,
     std::size_t max_bytes_to_copy) BOOST_ASIO_NOEXCEPT
 {
   return (buffer_copy_1)(*target_begin,
-      boost::asio::buffer(*source_begin, max_bytes_to_copy));
+      cppmsboost::asio::buffer(*source_begin, max_bytes_to_copy));
 }
 
 template <typename TargetIterator, typename SourceIterator>
@@ -2210,7 +2210,7 @@ std::size_t buffer_copy(one_buffer, multiple_buffers,
   SourceIterator source_iter = source_begin;
 
   for (mutable_buffer target_buffer(
-        boost::asio::buffer(*target_begin, max_bytes_to_copy));
+        cppmsboost::asio::buffer(*target_begin, max_bytes_to_copy));
       target_buffer.size() && source_iter != source_end; ++source_iter)
   {
     const_buffer source_buffer(*source_iter);
@@ -2233,7 +2233,7 @@ std::size_t buffer_copy(multiple_buffers, one_buffer,
   TargetIterator target_iter = target_begin;
 
   for (const_buffer source_buffer(
-        boost::asio::buffer(*source_begin, max_bytes_to_copy));
+        cppmsboost::asio::buffer(*source_begin, max_bytes_to_copy));
       source_buffer.size() && target_iter != target_end; ++target_iter)
   {
     mutable_buffer target_buffer(*target_iter);
@@ -2313,7 +2313,7 @@ std::size_t buffer_copy(multiple_buffers, multiple_buffers,
       const_buffer(*source_iter) + source_buffer_offset;
 
     std::size_t bytes_copied = (buffer_copy_1)(
-        target_buffer, boost::asio::buffer(source_buffer,
+        target_buffer, cppmsboost::asio::buffer(source_buffer,
           max_bytes_to_copy - total_bytes_copied));
     total_bytes_copied += bytes_copied;
 
@@ -2365,10 +2365,10 @@ inline std::size_t buffer_copy(const MutableBufferSequence& target,
   return detail::buffer_copy(
       detail::buffer_sequence_cardinality<MutableBufferSequence>(),
       detail::buffer_sequence_cardinality<ConstBufferSequence>(),
-      boost::asio::buffer_sequence_begin(target),
-      boost::asio::buffer_sequence_end(target),
-      boost::asio::buffer_sequence_begin(source),
-      boost::asio::buffer_sequence_end(source));
+      cppmsboost::asio::buffer_sequence_begin(target),
+      cppmsboost::asio::buffer_sequence_end(target),
+      cppmsboost::asio::buffer_sequence_begin(source),
+      cppmsboost::asio::buffer_sequence_end(source));
 }
 
 /// Copies a limited number of bytes from a source buffer sequence to a target
@@ -2403,22 +2403,22 @@ inline std::size_t buffer_copy(const MutableBufferSequence& target,
   return detail::buffer_copy(
       detail::buffer_sequence_cardinality<MutableBufferSequence>(),
       detail::buffer_sequence_cardinality<ConstBufferSequence>(),
-      boost::asio::buffer_sequence_begin(target),
-      boost::asio::buffer_sequence_end(target),
-      boost::asio::buffer_sequence_begin(source),
-      boost::asio::buffer_sequence_end(source), max_bytes_to_copy);
+      cppmsboost::asio::buffer_sequence_begin(target),
+      cppmsboost::asio::buffer_sequence_end(target),
+      cppmsboost::asio::buffer_sequence_begin(source),
+      cppmsboost::asio::buffer_sequence_end(source), max_bytes_to_copy);
 }
 
 /*@}*/
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 #include <boost/asio/detail/is_buffer_sequence.hpp>
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Trait to determine whether a type satisfies the MutableBufferSequence
@@ -2428,7 +2428,7 @@ struct is_mutable_buffer_sequence
 #if defined(GENERATING_DOCUMENTATION)
   : integral_constant<bool, automatically_determined>
 #else // defined(GENERATING_DOCUMENTATION)
-  : boost::asio::detail::is_buffer_sequence<T, mutable_buffer>
+  : cppmsboost::asio::detail::is_buffer_sequence<T, mutable_buffer>
 #endif // defined(GENERATING_DOCUMENTATION)
 {
 };
@@ -2440,7 +2440,7 @@ struct is_const_buffer_sequence
 #if defined(GENERATING_DOCUMENTATION)
   : integral_constant<bool, automatically_determined>
 #else // defined(GENERATING_DOCUMENTATION)
-  : boost::asio::detail::is_buffer_sequence<T, const_buffer>
+  : cppmsboost::asio::detail::is_buffer_sequence<T, const_buffer>
 #endif // defined(GENERATING_DOCUMENTATION)
 {
 };
@@ -2453,7 +2453,7 @@ struct is_dynamic_buffer_v1
 #if defined(GENERATING_DOCUMENTATION)
   : integral_constant<bool, automatically_determined>
 #else // defined(GENERATING_DOCUMENTATION)
-  : boost::asio::detail::is_dynamic_buffer_v1<T>
+  : cppmsboost::asio::detail::is_dynamic_buffer_v1<T>
 #endif // defined(GENERATING_DOCUMENTATION)
 {
 };
@@ -2466,7 +2466,7 @@ struct is_dynamic_buffer_v2
 #if defined(GENERATING_DOCUMENTATION)
   : integral_constant<bool, automatically_determined>
 #else // defined(GENERATING_DOCUMENTATION)
-  : boost::asio::detail::is_dynamic_buffer_v2<T>
+  : cppmsboost::asio::detail::is_dynamic_buffer_v2<T>
 #endif // defined(GENERATING_DOCUMENTATION)
 {
 };
@@ -2483,15 +2483,15 @@ struct is_dynamic_buffer
 #if defined(GENERATING_DOCUMENTATION)
   : integral_constant<bool, automatically_determined>
 #elif defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
-  : boost::asio::is_dynamic_buffer_v2<T>
+  : cppmsboost::asio::is_dynamic_buffer_v2<T>
 #else // defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
-  : boost::asio::is_dynamic_buffer_v1<T>
+  : cppmsboost::asio::is_dynamic_buffer_v1<T>
 #endif // defined(BOOST_ASIO_NO_DYNAMIC_BUFFER_V1)
 {
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -19,7 +19,7 @@
 #include "boost/lambda/detail/lambda_fwd.hpp"
 #include "boost/lambda/detail/lambda_traits.hpp"
 
-namespace boost { 
+namespace cppmsboost { 
 namespace lambda {
 
 #if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
@@ -39,14 +39,14 @@ public:
 
   // take all parameters as const references. Note that non-const references
   // stay as they are.
-  typedef typename boost::add_reference<
-    typename boost::add_const<T>::type
+  typedef typename cppmsboost::add_reference<
+    typename cppmsboost::add_const<T>::type
   >::type par_t;
 
   explicit identity(par_t t) : elem(t) {}
 
   template <typename SigArgs> 
-  struct sig { typedef typename boost::remove_const<element_t>::type type; };
+  struct sig { typedef typename cppmsboost::remove_const<element_t>::type type; };
 
   template<class RET, CALL_TEMPLATE_ARGS>
   RET call(CALL_FORMAL_ARGS) const { CALL_USE_ARGS; return elem; }
@@ -178,7 +178,7 @@ class deduce_argument_types_ {
   typedef typename lf_t::inherited::template sig<SigArgs>::type el_t;  
 public:
   typedef
-    boost::tuples::cons<
+    cppmsboost::tuples::cons<
       el_t, 
       typename deduce_argument_types_<typename Args::tail_type, SigArgs>::type
     > type;
@@ -195,8 +195,8 @@ public:
 //  // Hence, all other types will be non-const, except references to 
 //  // functions.
 //  template <class T> struct remove_reference_except_from_functions {
-//    typedef typename boost::remove_reference<T>::type t;
-//    typedef typename detail::IF<boost::is_function<t>::value, T, t>::RET type;
+//    typedef typename cppmsboost::remove_reference<T>::type t;
+//    typedef typename detail::IF<cppmsboost::is_function<t>::value, T, t>::RET type;
 //  };
 
 template<class Args, class SigArgs>
@@ -205,9 +205,9 @@ class deduce_non_ref_argument_types_ {
   typedef typename lf_t::inherited::template sig<SigArgs>::type el_t;  
 public:
   typedef
-    boost::tuples::cons<
+    cppmsboost::tuples::cons<
   //      typename detail::remove_reference_except_from_functions<el_t>::type, 
-      typename boost::remove_reference<el_t>::type, 
+      typename cppmsboost::remove_reference<el_t>::type, 
       typename deduce_non_ref_argument_types_<typename Args::tail_type, SigArgs>::type
     > type;
 };
@@ -247,7 +247,7 @@ template <int N, class Args, class SigArgs>
 struct nth_return_type_sig {
   typedef typename 
           as_lambda_functor<
-            typename boost::tuples::element<N, Args>::type 
+            typename cppmsboost::tuples::element<N, Args>::type 
   //            typename tuple_element_as_reference<N, Args>::type 
         >::type lf_type;
 
@@ -255,7 +255,7 @@ struct nth_return_type_sig {
 };
 
 template<int N, class Tuple> struct element_or_null {
-  typedef typename boost::tuples::element<N, Tuple>::type type;
+  typedef typename cppmsboost::tuples::element<N, Tuple>::type type;
 };
 
 template<int N> struct element_or_null<N, null_type> {
@@ -286,7 +286,7 @@ public:
   RET call(CALL_FORMAL_ARGS) const 
   {
     return detail::constify_rvals<RET>::go(
-     detail::r_select<RET>::go(boost::tuples::get<0>(args), CALL_ACTUAL_ARGS));
+     detail::r_select<RET>::go(cppmsboost::tuples::get<0>(args), CALL_ACTUAL_ARGS));
   }
 };
 
@@ -305,12 +305,12 @@ public:
   RET call(CALL_FORMAL_ARGS) const 
   {
      CALL_USE_ARGS;
-     return boost::tuples::get<0>(args);
+     return cppmsboost::tuples::get<0>(args);
   }
 
   template<class SigArgs> struct sig { 
     //    typedef typename detail::tuple_element_as_reference<0, SigArgs>::type type;
-    typedef typename boost::tuples::element<0, Args>::type type;
+    typedef typename cppmsboost::tuples::element<0, Args>::type type;
   };
 };
 
@@ -392,7 +392,7 @@ public:                                                                \
                                                                        \
   template<class RET, CALL_TEMPLATE_ARGS>                              \
   RET call(CALL_FORMAL_ARGS) const {                                   \
-    using boost::tuples::get;                                          \
+    using cppmsboost::tuples::get;                                          \
     using detail::constify_rvals;                                      \
     using detail::r_select;                                            \
     using detail::element_or_null;                                     \
@@ -610,6 +610,6 @@ BOOST_LAMBDA_LAMBDA_FUNCTOR_BASE_FIRST_PART(10)
 
 
 } // namespace lambda
-} // namespace boost
+} // namespace cppmsboost
 
 #endif

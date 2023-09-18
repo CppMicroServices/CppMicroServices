@@ -37,7 +37,7 @@ struct output_iterator_tag;
 BOOST_MOVE_STD_NS_END
 #include <boost/move/detail/std_ns_end.hpp>
 
-namespace boost{  namespace movelib{
+namespace cppmsboost{  namespace movelib{
 
 template<class Iterator>
 struct iterator_traits
@@ -47,7 +47,7 @@ struct iterator_traits
    typedef typename Iterator::pointer           pointer;
    typedef typename Iterator::reference         reference;
    typedef typename Iterator::iterator_category iterator_category;
-   typedef typename boost::move_detail::make_unsigned<difference_type>::type size_type;
+   typedef typename cppmsboost::move_detail::make_unsigned<difference_type>::type size_type;
 };
 
 template<class T>
@@ -58,7 +58,7 @@ struct iterator_traits<T*>
    typedef T*                                pointer;
    typedef T&                                reference;
    typedef std::random_access_iterator_tag   iterator_category;
-   typedef typename boost::move_detail::make_unsigned<difference_type>::type size_type;
+   typedef typename cppmsboost::move_detail::make_unsigned<difference_type>::type size_type;
 };
 
 template<class T>
@@ -69,9 +69,9 @@ struct iterator_traits<const T*>
    typedef const T*                          pointer;
    typedef const T&                          reference;
    typedef std::random_access_iterator_tag   iterator_category;
-   typedef typename boost::move_detail::make_unsigned<difference_type>::type size_type;
+   typedef typename cppmsboost::move_detail::make_unsigned<difference_type>::type size_type;
 };
 
-}} //namespace boost {  namespace movelib{
+}} //namespace cppmsboost {  namespace movelib{
 
 #endif //#ifndef BOOST_MOVE_DETAIL_ITERATOR_TRAITS_HPP

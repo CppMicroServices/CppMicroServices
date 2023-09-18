@@ -25,7 +25,7 @@
 #include <boost/archive/detail/auto_link_archive.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 #if defined(_MSC_VER)
@@ -44,7 +44,7 @@ private:
 public:
     library_version_type(): t(0) {};
     explicit library_version_type(const unsigned int & t_) : t(t_){
-        BOOST_ASSERT(t_ <= boost::integer_traits<base_type>::const_max);
+        BOOST_ASSERT(t_ <= cppmsboost::integer_traits<base_type>::const_max);
     }
     library_version_type(const library_version_type & t_) :
         t(t_.t)
@@ -80,7 +80,7 @@ public:
     // should be private - but MPI fails if it's not!!!
     version_type(): t(0) {};
     explicit version_type(const unsigned int & t_) : t(t_){
-        BOOST_ASSERT(t_ <= boost::integer_traits<base_type>::const_max);
+        BOOST_ASSERT(t_ <= cppmsboost::integer_traits<base_type>::const_max);
     }
     version_type(const version_type & t_) :
         t(t_.t)
@@ -113,10 +113,10 @@ public:
     // should be private - but then can't use BOOST_STRONG_TYPE below
     class_id_type() : t(0) {};
     explicit class_id_type(const int t_) : t(t_){
-        BOOST_ASSERT(t_ <= boost::integer_traits<base_type>::const_max);
+        BOOST_ASSERT(t_ <= cppmsboost::integer_traits<base_type>::const_max);
     }
     explicit class_id_type(const std::size_t t_) : t(t_){
- //       BOOST_ASSERT(t_ <= boost::integer_traits<base_type>::const_max);
+ //       BOOST_ASSERT(t_ <= cppmsboost::integer_traits<base_type>::const_max);
     }
     class_id_type(const class_id_type & t_) :
         t(t_.t)
@@ -142,7 +142,7 @@ public:
     }
 };
 
-#define BOOST_SERIALIZATION_NULL_POINTER_TAG boost::archive::class_id_type(-1)
+#define BOOST_SERIALIZATION_NULL_POINTER_TAG cppmsboost::archive::class_id_type(-1)
 
 class object_id_type {
 private:
@@ -155,7 +155,7 @@ public:
     explicit object_id_type(const std::size_t & t_) : t(static_cast<base_type>(t_)){
         // make quadriple sure that we haven't lost any real integer
         // precision
-        BOOST_ASSERT(t_ <= boost::integer_traits<base_type>::const_max);
+        BOOST_ASSERT(t_ <= cppmsboost::integer_traits<base_type>::const_max);
     }
     object_id_type(const object_id_type & t_) :
         t(t_.t)
@@ -215,7 +215,7 @@ struct tracking_type {
 };
 
 struct class_name_type :
-    private boost::noncopyable
+    private cppmsboost::noncopyable
 {
     char *t;
     operator const char * & () const {
@@ -270,7 +270,7 @@ BOOST_ARCHIVE_STRONG_TYPEDEF(class_id_type, class_id_optional_type)
 BOOST_ARCHIVE_STRONG_TYPEDEF(object_id_type, object_reference_type)
 
 }// namespace archive
-}// namespace boost
+}// namespace cppmsboost
 
 #include <boost/archive/detail/abi_suffix.hpp> // pops abi_suffix.hpp pragmas
 
@@ -279,29 +279,29 @@ BOOST_ARCHIVE_STRONG_TYPEDEF(object_id_type, object_reference_type)
 // set implementation level to primitive for all types
 // used internally by the serialization library
 
-BOOST_CLASS_IMPLEMENTATION(boost::archive::library_version_type, primitive_type)
-BOOST_CLASS_IMPLEMENTATION(boost::archive::version_type, primitive_type)
-BOOST_CLASS_IMPLEMENTATION(boost::archive::class_id_type, primitive_type)
-BOOST_CLASS_IMPLEMENTATION(boost::archive::class_id_reference_type, primitive_type)
-BOOST_CLASS_IMPLEMENTATION(boost::archive::class_id_optional_type, primitive_type)
-BOOST_CLASS_IMPLEMENTATION(boost::archive::class_name_type, primitive_type)
-BOOST_CLASS_IMPLEMENTATION(boost::archive::object_id_type, primitive_type)
-BOOST_CLASS_IMPLEMENTATION(boost::archive::object_reference_type, primitive_type)
-BOOST_CLASS_IMPLEMENTATION(boost::archive::tracking_type, primitive_type)
+BOOST_CLASS_IMPLEMENTATION(cppmsboost::archive::library_version_type, primitive_type)
+BOOST_CLASS_IMPLEMENTATION(cppmsboost::archive::version_type, primitive_type)
+BOOST_CLASS_IMPLEMENTATION(cppmsboost::archive::class_id_type, primitive_type)
+BOOST_CLASS_IMPLEMENTATION(cppmsboost::archive::class_id_reference_type, primitive_type)
+BOOST_CLASS_IMPLEMENTATION(cppmsboost::archive::class_id_optional_type, primitive_type)
+BOOST_CLASS_IMPLEMENTATION(cppmsboost::archive::class_name_type, primitive_type)
+BOOST_CLASS_IMPLEMENTATION(cppmsboost::archive::object_id_type, primitive_type)
+BOOST_CLASS_IMPLEMENTATION(cppmsboost::archive::object_reference_type, primitive_type)
+BOOST_CLASS_IMPLEMENTATION(cppmsboost::archive::tracking_type, primitive_type)
 
 #include <boost/serialization/is_bitwise_serializable.hpp>
 
 // set types used internally by the serialization library
 // to be bitwise serializable
 
-BOOST_IS_BITWISE_SERIALIZABLE(boost::archive::library_version_type)
-BOOST_IS_BITWISE_SERIALIZABLE(boost::archive::version_type)
-BOOST_IS_BITWISE_SERIALIZABLE(boost::archive::class_id_type)
-BOOST_IS_BITWISE_SERIALIZABLE(boost::archive::class_id_reference_type)
-BOOST_IS_BITWISE_SERIALIZABLE(boost::archive::class_id_optional_type)
-BOOST_IS_BITWISE_SERIALIZABLE(boost::archive::class_name_type)
-BOOST_IS_BITWISE_SERIALIZABLE(boost::archive::object_id_type)
-BOOST_IS_BITWISE_SERIALIZABLE(boost::archive::object_reference_type)
-BOOST_IS_BITWISE_SERIALIZABLE(boost::archive::tracking_type)
+BOOST_IS_BITWISE_SERIALIZABLE(cppmsboost::archive::library_version_type)
+BOOST_IS_BITWISE_SERIALIZABLE(cppmsboost::archive::version_type)
+BOOST_IS_BITWISE_SERIALIZABLE(cppmsboost::archive::class_id_type)
+BOOST_IS_BITWISE_SERIALIZABLE(cppmsboost::archive::class_id_reference_type)
+BOOST_IS_BITWISE_SERIALIZABLE(cppmsboost::archive::class_id_optional_type)
+BOOST_IS_BITWISE_SERIALIZABLE(cppmsboost::archive::class_name_type)
+BOOST_IS_BITWISE_SERIALIZABLE(cppmsboost::archive::object_id_type)
+BOOST_IS_BITWISE_SERIALIZABLE(cppmsboost::archive::object_reference_type)
+BOOST_IS_BITWISE_SERIALIZABLE(cppmsboost::archive::tracking_type)
 
 #endif //BOOST_ARCHIVE_BASIC_ARCHIVE_HPP

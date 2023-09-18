@@ -24,13 +24,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
 /// Represents an IPv4 network.
 /**
- * The boost::asio::ip::network_v4 class provides the ability to use and
+ * The cppmsboost::asio::ip::network_v4 class provides the ability to use and
  * manipulate IP version 4 networks.
  *
  * @par Thread Safety
@@ -139,7 +139,7 @@ public:
   BOOST_ASIO_DECL std::string to_string() const;
 
   /// Get the network as an address in dotted decimal format.
-  BOOST_ASIO_DECL std::string to_string(boost::system::error_code& ec) const;
+  BOOST_ASIO_DECL std::string to_string(cppmsboost::system::error_code& ec) const;
 
   /// Compare two networks for equality.
   friend bool operator==(const network_v4& a, const network_v4& b)
@@ -191,7 +191,7 @@ BOOST_ASIO_DECL network_v4 make_network_v4(const char* str);
  * @relates network_v4
  */
 BOOST_ASIO_DECL network_v4 make_network_v4(
-    const char* str, boost::system::error_code& ec);
+    const char* str, cppmsboost::system::error_code& ec);
 
 /// Create an IPv4 network from a string containing IP address and prefix
 /// length.
@@ -206,7 +206,7 @@ BOOST_ASIO_DECL network_v4 make_network_v4(const std::string& str);
  * @relates network_v4
  */
 BOOST_ASIO_DECL network_v4 make_network_v4(
-    const std::string& str, boost::system::error_code& ec);
+    const std::string& str, cppmsboost::system::error_code& ec);
 
 #if defined(BOOST_ASIO_HAS_STRING_VIEW) \
   || defined(GENERATING_DOCUMENTATION)
@@ -224,7 +224,7 @@ BOOST_ASIO_DECL network_v4 make_network_v4(string_view str);
  * @relates network_v4
  */
 BOOST_ASIO_DECL network_v4 make_network_v4(
-    string_view str, boost::system::error_code& ec);
+    string_view str, cppmsboost::system::error_code& ec);
 
 #endif // defined(BOOST_ASIO_HAS_STRING_VIEW)
        //  || defined(GENERATING_DOCUMENTATION)
@@ -241,7 +241,7 @@ BOOST_ASIO_DECL network_v4 make_network_v4(
  *
  * @return The output stream.
  *
- * @relates boost::asio::ip::address_v4
+ * @relates cppmsboost::asio::ip::address_v4
  */
 template <typename Elem, typename Traits>
 std::basic_ostream<Elem, Traits>& operator<<(
@@ -251,7 +251,7 @@ std::basic_ostream<Elem, Traits>& operator<<(
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

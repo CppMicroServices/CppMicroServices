@@ -23,7 +23,7 @@
 #include <boost/bind/arg.hpp>
 #include <boost/config.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace placeholders
@@ -31,32 +31,32 @@ namespace placeholders
 
 #if defined(__BORLANDC__) || defined(__GNUC__) && (__GNUC__ < 4)
 
-inline boost::arg<1> _1() { return boost::arg<1>(); }
-inline boost::arg<2> _2() { return boost::arg<2>(); }
-inline boost::arg<3> _3() { return boost::arg<3>(); }
-inline boost::arg<4> _4() { return boost::arg<4>(); }
-inline boost::arg<5> _5() { return boost::arg<5>(); }
-inline boost::arg<6> _6() { return boost::arg<6>(); }
-inline boost::arg<7> _7() { return boost::arg<7>(); }
-inline boost::arg<8> _8() { return boost::arg<8>(); }
-inline boost::arg<9> _9() { return boost::arg<9>(); }
+inline cppmsboost::arg<1> _1() { return cppmsboost::arg<1>(); }
+inline cppmsboost::arg<2> _2() { return cppmsboost::arg<2>(); }
+inline cppmsboost::arg<3> _3() { return cppmsboost::arg<3>(); }
+inline cppmsboost::arg<4> _4() { return cppmsboost::arg<4>(); }
+inline cppmsboost::arg<5> _5() { return cppmsboost::arg<5>(); }
+inline cppmsboost::arg<6> _6() { return cppmsboost::arg<6>(); }
+inline cppmsboost::arg<7> _7() { return cppmsboost::arg<7>(); }
+inline cppmsboost::arg<8> _8() { return cppmsboost::arg<8>(); }
+inline cppmsboost::arg<9> _9() { return cppmsboost::arg<9>(); }
 
 #else
 
-BOOST_STATIC_CONSTEXPR boost::arg<1> _1;
-BOOST_STATIC_CONSTEXPR boost::arg<2> _2;
-BOOST_STATIC_CONSTEXPR boost::arg<3> _3;
-BOOST_STATIC_CONSTEXPR boost::arg<4> _4;
-BOOST_STATIC_CONSTEXPR boost::arg<5> _5;
-BOOST_STATIC_CONSTEXPR boost::arg<6> _6;
-BOOST_STATIC_CONSTEXPR boost::arg<7> _7;
-BOOST_STATIC_CONSTEXPR boost::arg<8> _8;
-BOOST_STATIC_CONSTEXPR boost::arg<9> _9;
+BOOST_STATIC_CONSTEXPR cppmsboost::arg<1> _1;
+BOOST_STATIC_CONSTEXPR cppmsboost::arg<2> _2;
+BOOST_STATIC_CONSTEXPR cppmsboost::arg<3> _3;
+BOOST_STATIC_CONSTEXPR cppmsboost::arg<4> _4;
+BOOST_STATIC_CONSTEXPR cppmsboost::arg<5> _5;
+BOOST_STATIC_CONSTEXPR cppmsboost::arg<6> _6;
+BOOST_STATIC_CONSTEXPR cppmsboost::arg<7> _7;
+BOOST_STATIC_CONSTEXPR cppmsboost::arg<8> _8;
+BOOST_STATIC_CONSTEXPR cppmsboost::arg<9> _9;
 
 #endif
 
 } // namespace placeholders
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_BIND_PLACEHOLDERS_HPP_INCLUDED

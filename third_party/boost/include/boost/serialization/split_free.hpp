@@ -21,7 +21,7 @@
 #include <boost/mpl/identity.hpp>
 #include <boost/serialization/serialization.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
     namespace detail {
         template<class Archive> class interface_oarchive;
@@ -75,10 +75,10 @@ inline void split_free(
 }
 
 } // namespace serialization
-} // namespace boost
+} // namespace cppmsboost
 
 #define BOOST_SERIALIZATION_SPLIT_FREE(T)       \
-namespace boost { namespace serialization {     \
+namespace cppmsboost { namespace serialization {     \
 template<class Archive>                         \
 inline void serialize(                          \
         Archive & ar,                               \

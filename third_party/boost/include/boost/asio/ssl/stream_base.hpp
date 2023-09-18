@@ -19,11 +19,11 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ssl {
 
-/// The stream_base class is used as a base for the boost::asio::ssl::stream
+/// The stream_base class is used as a base for the cppmsboost::asio::ssl::stream
 /// class template so that we have a common place to define various enums.
 class stream_base
 {
@@ -47,7 +47,7 @@ protected:
 
 } // namespace ssl
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

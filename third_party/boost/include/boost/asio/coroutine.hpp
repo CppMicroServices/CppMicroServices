@@ -11,7 +11,7 @@
 #ifndef BOOST_ASIO_COROUTINE_HPP
 #define BOOST_ASIO_COROUTINE_HPP
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -228,7 +228,7 @@ class coroutine_ref;
  * Note that @c fork doesn't do the actual forking by itself. It is the
  * application's responsibility to create a clone of the coroutine and call it.
  * The clone can be called immediately, as above, or scheduled for delayed
- * execution using something like boost::asio::post().
+ * execution using something like cppmsboost::asio::post().
  *
  * @par Alternate macro names
  *
@@ -278,10 +278,10 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #define BOOST_ASIO_CORO_REENTER(c) \
-  switch (::boost::asio::detail::coroutine_ref _coro_value = c) \
+  switch (::cppmsboost::asio::detail::coroutine_ref _coro_value = c) \
     case -1: if (_coro_value) \
     { \
       goto terminate_coroutine; \

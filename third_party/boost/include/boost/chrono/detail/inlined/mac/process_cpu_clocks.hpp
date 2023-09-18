@@ -18,7 +18,7 @@
 #include <sys/times.h> //for times
 # include <unistd.h>
 
-namespace boost
+namespace cppmsboost
 {
   namespace chrono
   {
@@ -95,12 +95,12 @@ namespace boost
       clock_t c = ::times(&tm);
       if (c == clock_t(-1)) // error
       {
-        if (::boost::chrono::is_throws(ec))
+        if (::cppmsboost::chrono::is_throws(ec))
         {
-          boost::throw_exception(system::system_error(errno, ::boost::system::system_category(), "chrono::process_real_cpu_clock"));
+          cppmsboost::throw_exception(system::system_error(errno, ::cppmsboost::system::system_category(), "chrono::process_real_cpu_clock"));
         } else
         {
-          ec.assign(errno, ::boost::system::system_category());
+          ec.assign(errno, ::cppmsboost::system::system_category());
           return time_point();
         }
       } else
@@ -108,19 +108,19 @@ namespace boost
         long factor = chrono_detail::tick_factor();
         if (factor != -1)
         {
-          if (!::boost::chrono::is_throws(ec))
+          if (!::cppmsboost::chrono::is_throws(ec))
           {
             ec.clear();
           }
           return time_point(nanoseconds(c * factor));
         } else
         {
-          if (::boost::chrono::is_throws(ec))
+          if (::cppmsboost::chrono::is_throws(ec))
           {
-            boost::throw_exception(system::system_error(errno, ::boost::system::system_category(), "chrono::process_real_cpu_clock"));
+            cppmsboost::throw_exception(system::system_error(errno, ::cppmsboost::system::system_category(), "chrono::process_real_cpu_clock"));
           } else
           {
-            ec.assign(errno, ::boost::system::system_category());
+            ec.assign(errno, ::cppmsboost::system::system_category());
             return time_point();
           }
         }
@@ -129,12 +129,12 @@ namespace boost
       clock_t c = ::clock();
       if (c == clock_t(-1)) // error
       {
-        if (::boost::chrono::is_throws(ec))
+        if (::cppmsboost::chrono::is_throws(ec))
         {
-          boost::throw_exception(system::system_error(errno, ::boost::system::system_category(), "chrono::process_real_cpu_clock"));
+          cppmsboost::throw_exception(system::system_error(errno, ::cppmsboost::system::system_category(), "chrono::process_real_cpu_clock"));
         } else
         {
-          ec.assign(errno, ::boost::system::system_category());
+          ec.assign(errno, ::cppmsboost::system::system_category());
           return time_point();
         }
       } else
@@ -142,19 +142,19 @@ namespace boost
         long factor = chrono_detail::tick_factor();
         if (factor != -1)
         {
-          if (!::boost::chrono::is_throws(ec))
+          if (!::cppmsboost::chrono::is_throws(ec))
           {
             ec.clear();
           }
           return time_point(nanoseconds(c * factor));
         } else
         {
-          if (::boost::chrono::is_throws(ec))
+          if (::cppmsboost::chrono::is_throws(ec))
           {
-            boost::throw_exception(system::system_error(errno, ::boost::system::system_category(), "chrono::process_real_cpu_clock"));
+            cppmsboost::throw_exception(system::system_error(errno, ::cppmsboost::system::system_category(), "chrono::process_real_cpu_clock"));
           } else
           {
-            ec.assign(errno, ::boost::system::system_category());
+            ec.assign(errno, ::cppmsboost::system::system_category());
             return time_point();
           }
         }
@@ -171,12 +171,12 @@ namespace boost
       clock_t c = ::times(&tm);
       if (c == clock_t(-1)) // error
       {
-        if (::boost::chrono::is_throws(ec))
+        if (::cppmsboost::chrono::is_throws(ec))
         {
-          boost::throw_exception(system::system_error(errno, ::boost::system::system_category(), "chrono::process_user_cpu_clock"));
+          cppmsboost::throw_exception(system::system_error(errno, ::cppmsboost::system::system_category(), "chrono::process_user_cpu_clock"));
         } else
         {
-          ec.assign(errno, ::boost::system::system_category());
+          ec.assign(errno, ::cppmsboost::system::system_category());
           return time_point();
         }
       } else
@@ -184,19 +184,19 @@ namespace boost
         long factor = chrono_detail::tick_factor();
         if (factor != -1)
         {
-          if (!::boost::chrono::is_throws(ec))
+          if (!::cppmsboost::chrono::is_throws(ec))
           {
             ec.clear();
           }
           return time_point(nanoseconds((tm.tms_utime + tm.tms_cutime) * factor));
         } else
         {
-          if (::boost::chrono::is_throws(ec))
+          if (::cppmsboost::chrono::is_throws(ec))
           {
-            boost::throw_exception(system::system_error(errno, ::boost::system::system_category(), "chrono::process_user_cpu_clock"));
+            cppmsboost::throw_exception(system::system_error(errno, ::cppmsboost::system::system_category(), "chrono::process_user_cpu_clock"));
           } else
           {
-            ec.assign(errno, ::boost::system::system_category());
+            ec.assign(errno, ::cppmsboost::system::system_category());
             return time_point();
           }
         }
@@ -254,12 +254,12 @@ namespace boost
       clock_t c = ::times(&tm);
       if (c == clock_t(-1)) // error
       {
-        if (::boost::chrono::is_throws(ec))
+        if (::cppmsboost::chrono::is_throws(ec))
         {
-          boost::throw_exception(system::system_error(errno, ::boost::system::system_category(), "chrono::process_system_cpu_clock"));
+          cppmsboost::throw_exception(system::system_error(errno, ::cppmsboost::system::system_category(), "chrono::process_system_cpu_clock"));
         } else
         {
-          ec.assign(errno, ::boost::system::system_category());
+          ec.assign(errno, ::cppmsboost::system::system_category());
           return time_point();
         }
       } else
@@ -267,19 +267,19 @@ namespace boost
         long factor = chrono_detail::tick_factor();
         if (factor != -1)
         {
-          if (!::boost::chrono::is_throws(ec))
+          if (!::cppmsboost::chrono::is_throws(ec))
           {
             ec.clear();
           }
           return time_point(nanoseconds((tm.tms_stime + tm.tms_cstime) * factor));
         } else
         {
-          if (::boost::chrono::is_throws(ec))
+          if (::cppmsboost::chrono::is_throws(ec))
           {
-            boost::throw_exception(system::system_error(errno, ::boost::system::system_category(), "chrono::process_system_cpu_clock"));
+            cppmsboost::throw_exception(system::system_error(errno, ::cppmsboost::system::system_category(), "chrono::process_system_cpu_clock"));
           } else
           {
-            ec.assign(errno, ::boost::system::system_category());
+            ec.assign(errno, ::cppmsboost::system::system_category());
             return time_point();
           }
         }
@@ -319,12 +319,12 @@ namespace boost
       clock_t c = ::times(&tm);
       if (c == clock_t(-1)) // error
       {
-        if (::boost::chrono::is_throws(ec))
+        if (::cppmsboost::chrono::is_throws(ec))
         {
-          boost::throw_exception(system::system_error(errno, ::boost::system::system_category(), "chrono::process_clock"));
+          cppmsboost::throw_exception(system::system_error(errno, ::cppmsboost::system::system_category(), "chrono::process_clock"));
         } else
         {
-          ec.assign(errno, ::boost::system::system_category());
+          ec.assign(errno, ::cppmsboost::system::system_category());
           return time_point();
         }
       } else
@@ -338,12 +338,12 @@ namespace boost
           return time_point(duration(r));
         } else
         {
-          if (::boost::chrono::is_throws(ec))
+          if (::cppmsboost::chrono::is_throws(ec))
           {
-            boost::throw_exception(system::system_error(errno, ::boost::system::system_category(), "chrono::process_clock"));
+            cppmsboost::throw_exception(system::system_error(errno, ::cppmsboost::system::system_category(), "chrono::process_clock"));
           } else
           {
-            ec.assign(errno, ::boost::system::system_category());
+            ec.assign(errno, ::cppmsboost::system::system_category());
             return time_point();
           }
         }

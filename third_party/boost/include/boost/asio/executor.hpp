@@ -24,7 +24,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Exception thrown when trying to access an empty polymorphic executor.
@@ -306,7 +306,7 @@ private:
     if (!impl_)
     {
       bad_executor ex;
-      boost::asio::detail::throw_exception(ex);
+      cppmsboost::asio::detail::throw_exception(ex);
     }
     return impl_;
   }
@@ -329,9 +329,9 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
-BOOST_ASIO_USES_ALLOCATOR(boost::asio::executor)
+BOOST_ASIO_USES_ALLOCATOR(cppmsboost::asio::executor)
 
 #include <boost/asio/detail/pop_options.hpp>
 

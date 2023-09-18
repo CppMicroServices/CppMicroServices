@@ -9,7 +9,7 @@
 // Preprocessed version of "boost/mpl/list_c.hpp" header
 // -- DO NOT modify by hand!
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 namespace aux {
 template< int N >

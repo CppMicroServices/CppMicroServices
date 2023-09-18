@@ -18,7 +18,7 @@
 #include <string>
 #include <iterator>
 
-namespace boost {
+namespace cppmsboost {
 namespace gregorian {
 
   //! Return special_value from string argument

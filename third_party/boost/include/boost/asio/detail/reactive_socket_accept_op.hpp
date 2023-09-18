@@ -26,7 +26,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -107,12 +107,12 @@ public:
   }
 
   static void do_complete(void* owner, operation* base,
-      const boost::system::error_code& /*ec*/,
+      const cppmsboost::system::error_code& /*ec*/,
       std::size_t /*bytes_transferred*/)
   {
     // Take ownership of the handler object.
     reactive_socket_accept_op* o(static_cast<reactive_socket_accept_op*>(base));
-    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+    ptr p = { cppmsboost::asio::detail::addressof(o->handler_), o, o };
     handler_work<Handler, IoExecutor> w(o->handler_, o->io_executor_);
 
     // On success, assign new connection to peer socket object.
@@ -127,9 +127,9 @@ public:
     // with the handler. Consequently, a local copy of the handler is required
     // to ensure that any owning sub-object remains valid until after we have
     // deallocated the memory here.
-    detail::binder1<Handler, boost::system::error_code>
+    detail::binder1<Handler, cppmsboost::system::error_code>
       handler(o->handler_, o->ec_);
-    p.h = boost::asio::detail::addressof(handler.handler_);
+    p.h = cppmsboost::asio::detail::addressof(handler.handler_);
     p.reset();
 
     // Make the upcall if required.
@@ -175,13 +175,13 @@ public:
   }
 
   static void do_complete(void* owner, operation* base,
-      const boost::system::error_code& /*ec*/,
+      const cppmsboost::system::error_code& /*ec*/,
       std::size_t /*bytes_transferred*/)
   {
     // Take ownership of the handler object.
     reactive_socket_move_accept_op* o(
         static_cast<reactive_socket_move_accept_op*>(base));
-    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+    ptr p = { cppmsboost::asio::detail::addressof(o->handler_), o, o };
     handler_work<Handler, IoExecutor> w(o->handler_, o->io_executor_);
 
     // On success, assign new connection to peer socket object.
@@ -197,10 +197,10 @@ public:
     // to ensure that any owning sub-object remains valid until after we have
     // deallocated the memory here.
     detail::move_binder2<Handler,
-      boost::system::error_code, peer_socket_type>
+      cppmsboost::system::error_code, peer_socket_type>
         handler(0, BOOST_ASIO_MOVE_CAST(Handler)(o->handler_), o->ec_,
           BOOST_ASIO_MOVE_CAST(peer_socket_type)(*o));
-    p.h = boost::asio::detail::addressof(handler.handler_);
+    p.h = cppmsboost::asio::detail::addressof(handler.handler_);
     p.reset();
 
     // Make the upcall if required.
@@ -225,7 +225,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

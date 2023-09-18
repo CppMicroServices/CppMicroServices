@@ -22,7 +22,7 @@
 
 #include <iterator>
 
-namespace boost {
+namespace cppmsboost {
 namespace iterators {
 
 //
@@ -109,7 +109,7 @@ struct iterator_category_to_traversal
   : mpl::eval_if< // if already convertible to a traversal tag, we're done.
         is_convertible<Cat,incrementable_traversal_tag>
       , mpl::identity<Cat>
-      , boost::iterators::detail::old_category_to_traversal<Cat>
+      , cppmsboost::iterators::detail::old_category_to_traversal<Cat>
     >
 {};
 
@@ -209,7 +209,7 @@ namespace detail {
 using iterators::pure_traversal_tag;
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/iterator/detail/config_undef.hpp>
 

@@ -17,7 +17,7 @@
 
 #include <boost/asio/detail/config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
 template<class T, class TimeSystem>
@@ -29,6 +29,6 @@ namespace posix_time {
 class ptime;
 
 } // namespace posix_time
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_DETAIL_DATE_TIME_FWD_HPP

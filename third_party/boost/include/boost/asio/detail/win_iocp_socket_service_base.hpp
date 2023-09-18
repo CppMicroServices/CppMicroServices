@@ -45,7 +45,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -113,34 +113,34 @@ public:
   }
 
   // Destroy a socket implementation.
-  BOOST_ASIO_DECL boost::system::error_code close(
-      base_implementation_type& impl, boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code close(
+      base_implementation_type& impl, cppmsboost::system::error_code& ec);
 
   // Release ownership of the socket.
   BOOST_ASIO_DECL socket_type release(
-      base_implementation_type& impl, boost::system::error_code& ec);
+      base_implementation_type& impl, cppmsboost::system::error_code& ec);
 
   // Cancel all operations associated with the socket.
-  BOOST_ASIO_DECL boost::system::error_code cancel(
-      base_implementation_type& impl, boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code cancel(
+      base_implementation_type& impl, cppmsboost::system::error_code& ec);
 
   // Determine whether the socket is at the out-of-band data mark.
   bool at_mark(const base_implementation_type& impl,
-      boost::system::error_code& ec) const
+      cppmsboost::system::error_code& ec) const
   {
     return socket_ops::sockatmark(impl.socket_, ec);
   }
 
   // Determine the number of bytes available for reading.
   std::size_t available(const base_implementation_type& impl,
-      boost::system::error_code& ec) const
+      cppmsboost::system::error_code& ec) const
   {
     return socket_ops::available(impl.socket_, ec);
   }
 
   // Place the socket into the state where it will listen for new connections.
-  boost::system::error_code listen(base_implementation_type& impl,
-      int backlog, boost::system::error_code& ec)
+  cppmsboost::system::error_code listen(base_implementation_type& impl,
+      int backlog, cppmsboost::system::error_code& ec)
   {
     socket_ops::listen(impl.socket_, backlog, ec);
     return ec;
@@ -148,8 +148,8 @@ public:
 
   // Perform an IO control command on the socket.
   template <typename IO_Control_Command>
-  boost::system::error_code io_control(base_implementation_type& impl,
-      IO_Control_Command& command, boost::system::error_code& ec)
+  cppmsboost::system::error_code io_control(base_implementation_type& impl,
+      IO_Control_Command& command, cppmsboost::system::error_code& ec)
   {
     socket_ops::ioctl(impl.socket_, impl.state_, command.name(),
         static_cast<ioctl_arg_type*>(command.data()), ec);
@@ -163,8 +163,8 @@ public:
   }
 
   // Sets the non-blocking mode of the socket.
-  boost::system::error_code non_blocking(base_implementation_type& impl,
-      bool mode, boost::system::error_code& ec)
+  cppmsboost::system::error_code non_blocking(base_implementation_type& impl,
+      bool mode, cppmsboost::system::error_code& ec)
   {
     socket_ops::set_user_non_blocking(impl.socket_, impl.state_, mode, ec);
     return ec;
@@ -177,8 +177,8 @@ public:
   }
 
   // Sets the non-blocking mode of the native socket implementation.
-  boost::system::error_code native_non_blocking(base_implementation_type& impl,
-      bool mode, boost::system::error_code& ec)
+  cppmsboost::system::error_code native_non_blocking(base_implementation_type& impl,
+      bool mode, cppmsboost::system::error_code& ec)
   {
     socket_ops::set_internal_non_blocking(impl.socket_, impl.state_, mode, ec);
     return ec;
@@ -186,8 +186,8 @@ public:
 
   // Wait for the socket to become ready to read, ready to write, or to have
   // pending error conditions.
-  boost::system::error_code wait(base_implementation_type& impl,
-      socket_base::wait_type w, boost::system::error_code& ec)
+  cppmsboost::system::error_code wait(base_implementation_type& impl,
+      socket_base::wait_type w, cppmsboost::system::error_code& ec)
   {
     switch (w)
     {
@@ -201,7 +201,7 @@ public:
       socket_ops::poll_error(impl.socket_, impl.state_, -1, ec);
       break;
     default:
-      ec = boost::asio::error::invalid_argument;
+      ec = cppmsboost::asio::error::invalid_argument;
       break;
     }
 
@@ -215,11 +215,11 @@ public:
       socket_base::wait_type w, Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_wait_op<Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.cancel_token_, handler, io_ex);
 
@@ -238,7 +238,7 @@ public:
         start_reactor_op(impl, select_reactor::except_op, p.p);
         break;
       default:
-        p.p->ec_ = boost::asio::error::invalid_argument;
+        p.p->ec_ = cppmsboost::asio::error::invalid_argument;
         iocp_service_.post_immediate_completion(p.p, is_continuation);
         break;
     }
@@ -250,9 +250,9 @@ public:
   template <typename ConstBufferSequence>
   size_t send(base_implementation_type& impl,
       const ConstBufferSequence& buffers,
-      socket_base::message_flags flags, boost::system::error_code& ec)
+      socket_base::message_flags flags, cppmsboost::system::error_code& ec)
   {
-    buffer_sequence_adapter<boost::asio::const_buffer,
+    buffer_sequence_adapter<cppmsboost::asio::const_buffer,
         ConstBufferSequence> bufs(buffers);
 
     return socket_ops::sync_send(impl.socket_, impl.state_,
@@ -261,7 +261,7 @@ public:
 
   // Wait until data can be sent without blocking.
   size_t send(base_implementation_type& impl, const null_buffers&,
-      socket_base::message_flags, boost::system::error_code& ec)
+      socket_base::message_flags, cppmsboost::system::error_code& ec)
   {
     // Wait for socket to become ready.
     socket_ops::poll_write(impl.socket_, impl.state_, -1, ec);
@@ -279,14 +279,14 @@ public:
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_socket_send_op<
         ConstBufferSequence, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.cancel_token_, buffers, handler, io_ex);
 
     BOOST_ASIO_HANDLER_CREATION((context_, *p.p, "socket",
           &impl, impl.socket_, "async_send"));
 
-    buffer_sequence_adapter<boost::asio::const_buffer,
+    buffer_sequence_adapter<cppmsboost::asio::const_buffer,
         ConstBufferSequence> bufs(buffers);
 
     start_send_op(impl, bufs.buffers(), bufs.count(), flags,
@@ -302,7 +302,7 @@ public:
   {
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_null_buffers_op<Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.cancel_token_, handler, io_ex);
 
@@ -317,9 +317,9 @@ public:
   template <typename MutableBufferSequence>
   size_t receive(base_implementation_type& impl,
       const MutableBufferSequence& buffers,
-      socket_base::message_flags flags, boost::system::error_code& ec)
+      socket_base::message_flags flags, cppmsboost::system::error_code& ec)
   {
-    buffer_sequence_adapter<boost::asio::mutable_buffer,
+    buffer_sequence_adapter<cppmsboost::asio::mutable_buffer,
         MutableBufferSequence> bufs(buffers);
 
     return socket_ops::sync_recv(impl.socket_, impl.state_,
@@ -328,7 +328,7 @@ public:
 
   // Wait until data can be received without blocking.
   size_t receive(base_implementation_type& impl, const null_buffers&,
-      socket_base::message_flags, boost::system::error_code& ec)
+      socket_base::message_flags, cppmsboost::system::error_code& ec)
   {
     // Wait for socket to become ready.
     socket_ops::poll_read(impl.socket_, impl.state_, -1, ec);
@@ -347,7 +347,7 @@ public:
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_socket_recv_op<
         MutableBufferSequence, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.state_, impl.cancel_token_,
         buffers, handler, io_ex);
@@ -355,7 +355,7 @@ public:
     BOOST_ASIO_HANDLER_CREATION((context_, *p.p, "socket",
           &impl, impl.socket_, "async_receive"));
 
-    buffer_sequence_adapter<boost::asio::mutable_buffer,
+    buffer_sequence_adapter<cppmsboost::asio::mutable_buffer,
         MutableBufferSequence> bufs(buffers);
 
     start_receive_op(impl, bufs.buffers(), bufs.count(), flags,
@@ -372,7 +372,7 @@ public:
   {
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_null_buffers_op<Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.cancel_token_, handler, io_ex);
 
@@ -389,9 +389,9 @@ public:
   size_t receive_with_flags(base_implementation_type& impl,
       const MutableBufferSequence& buffers,
       socket_base::message_flags in_flags,
-      socket_base::message_flags& out_flags, boost::system::error_code& ec)
+      socket_base::message_flags& out_flags, cppmsboost::system::error_code& ec)
   {
-    buffer_sequence_adapter<boost::asio::mutable_buffer,
+    buffer_sequence_adapter<cppmsboost::asio::mutable_buffer,
         MutableBufferSequence> bufs(buffers);
 
     return socket_ops::sync_recvmsg(impl.socket_, impl.state_,
@@ -401,7 +401,7 @@ public:
   // Wait until data can be received without blocking.
   size_t receive_with_flags(base_implementation_type& impl,
       const null_buffers&, socket_base::message_flags,
-      socket_base::message_flags& out_flags, boost::system::error_code& ec)
+      socket_base::message_flags& out_flags, cppmsboost::system::error_code& ec)
   {
     // Wait for socket to become ready.
     socket_ops::poll_read(impl.socket_, impl.state_, -1, ec);
@@ -425,7 +425,7 @@ public:
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_socket_recvmsg_op<
         MutableBufferSequence, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.cancel_token_,
         buffers, out_flags, handler, io_ex);
@@ -433,7 +433,7 @@ public:
     BOOST_ASIO_HANDLER_CREATION((context_, *p.p, "socket",
           &impl, impl.socket_, "async_receive_with_flags"));
 
-    buffer_sequence_adapter<boost::asio::mutable_buffer,
+    buffer_sequence_adapter<cppmsboost::asio::mutable_buffer,
         MutableBufferSequence> bufs(buffers);
 
     start_receive_op(impl, bufs.buffers(), bufs.count(), in_flags, false, p.p);
@@ -449,7 +449,7 @@ public:
   {
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_null_buffers_op<Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.cancel_token_, handler, io_ex);
 
@@ -470,14 +470,14 @@ public:
 
 protected:
   // Open a new socket implementation.
-  BOOST_ASIO_DECL boost::system::error_code do_open(
+  BOOST_ASIO_DECL cppmsboost::system::error_code do_open(
       base_implementation_type& impl, int family, int type,
-      int protocol, boost::system::error_code& ec);
+      int protocol, cppmsboost::system::error_code& ec);
 
   // Assign a native socket to a socket implementation.
-  BOOST_ASIO_DECL boost::system::error_code do_assign(
+  BOOST_ASIO_DECL cppmsboost::system::error_code do_assign(
       base_implementation_type& impl, int type,
-      socket_type native_socket, boost::system::error_code& ec);
+      socket_type native_socket, cppmsboost::system::error_code& ec);
 
   // Helper function to start an asynchronous send operation.
   BOOST_ASIO_DECL void start_send_op(base_implementation_type& impl,
@@ -581,7 +581,7 @@ protected:
   void* nt_set_info_;
 
   // Mutex to protect access to the linked list of implementations. 
-  boost::asio::detail::mutex mutex_;
+  cppmsboost::asio::detail::mutex mutex_;
 
   // The head of a linked list of all implementations.
   base_implementation_type* impl_list_;
@@ -589,7 +589,7 @@ protected:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

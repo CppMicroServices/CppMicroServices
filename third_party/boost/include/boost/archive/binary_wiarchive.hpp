@@ -25,7 +25,7 @@
 #include <boost/archive/binary_iarchive_impl.hpp>
 #include <boost/archive/detail/register_archive.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 class binary_wiarchive :
@@ -47,10 +47,10 @@ public:
 };
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 // required by export
-BOOST_SERIALIZATION_REGISTER_ARCHIVE(boost::archive::binary_wiarchive)
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(cppmsboost::archive::binary_wiarchive)
 
 #endif // BOOST_NO_STD_WSTREAMBUF
 #endif // BOOST_ARCHIVE_BINARY_WIARCHIVE_HPP

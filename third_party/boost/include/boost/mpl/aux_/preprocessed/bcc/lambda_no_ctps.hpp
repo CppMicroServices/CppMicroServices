@@ -9,7 +9,7 @@
 // *Preprocessed* version of the main "lambda_no_ctps.hpp" header
 // -- DO NOT modify by hand!
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 namespace aux {
 

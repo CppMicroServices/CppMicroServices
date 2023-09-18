@@ -28,7 +28,7 @@
 #  pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace intrusive {
 namespace detail {
 
@@ -96,22 +96,22 @@ struct pointer_traits
       typedef Ptr                                                             pointer;
       //
       typedef BOOST_INTRUSIVE_OBTAIN_TYPE_WITH_EVAL_DEFAULT
-         ( boost::intrusive::detail::, Ptr, element_type
-         , boost::movelib::detail::first_param<Ptr>)                          element_type;
+         ( cppmsboost::intrusive::detail::, Ptr, element_type
+         , cppmsboost::movelib::detail::first_param<Ptr>)                          element_type;
       //
       typedef BOOST_INTRUSIVE_OBTAIN_TYPE_WITH_DEFAULT
-         (boost::intrusive::detail::, Ptr, difference_type, std::ptrdiff_t)   difference_type;
+         (cppmsboost::intrusive::detail::, Ptr, difference_type, std::ptrdiff_t)   difference_type;
 
       typedef BOOST_INTRUSIVE_OBTAIN_TYPE_WITH_DEFAULT
-         (boost::intrusive::detail::, Ptr, reference, typename boost::intrusive::detail::unvoid_ref<element_type>::type)   reference;
+         (cppmsboost::intrusive::detail::, Ptr, reference, typename cppmsboost::intrusive::detail::unvoid_ref<element_type>::type)   reference;
       //
       template <class U> struct rebind_pointer
       {
-         typedef typename boost::intrusive::pointer_rebind<Ptr, U>::type  type;
+         typedef typename cppmsboost::intrusive::pointer_rebind<Ptr, U>::type  type;
       };
 
       #if !defined(BOOST_NO_CXX11_TEMPLATE_ALIASES)
-         template <class U> using rebind = typename boost::intrusive::pointer_rebind<Ptr, U>::type;
+         template <class U> using rebind = typename cppmsboost::intrusive::pointer_rebind<Ptr, U>::type;
       #endif
    #endif   //#if !defined(BOOST_NO_CXX11_TEMPLATE_ALIASES)
 
@@ -127,10 +127,10 @@ struct pointer_traits
    {
       //Non-standard extension, it does not require Ptr::pointer_to. If not present
       //tries to converts &r to pointer.
-      const bool value = boost::intrusive::detail::
+      const bool value = cppmsboost::intrusive::detail::
          has_member_function_callable_with_pointer_to
             <Ptr, Ptr (*)(reference)>::value;
-      boost::intrusive::detail::bool_<value> flag;
+      cppmsboost::intrusive::detail::bool_<value> flag;
       return pointer_traits::priv_pointer_to(flag, r);
    }
 
@@ -146,13 +146,13 @@ struct pointer_traits
    BOOST_INTRUSIVE_FORCEINLINE static pointer static_cast_from(const UPtr &uptr)
    {
       typedef const UPtr &RefArg;
-      const bool value = boost::intrusive::detail::
+      const bool value = cppmsboost::intrusive::detail::
          has_member_function_callable_with_static_cast_from
             <pointer, pointer(*)(RefArg)>::value
-         || boost::intrusive::detail::
+         || cppmsboost::intrusive::detail::
                has_member_function_callable_with_static_cast_from
                   <pointer, pointer(*)(UPtr)>::value;
-      return pointer_traits::priv_static_cast_from(boost::intrusive::detail::bool_<value>(), uptr);
+      return pointer_traits::priv_static_cast_from(cppmsboost::intrusive::detail::bool_<value>(), uptr);
    }
 
    //! <b>Remark</b>: Non-standard extension.
@@ -167,13 +167,13 @@ struct pointer_traits
    BOOST_INTRUSIVE_FORCEINLINE static pointer const_cast_from(const UPtr &uptr)
    {
       typedef const UPtr &RefArg;
-      const bool value = boost::intrusive::detail::
+      const bool value = cppmsboost::intrusive::detail::
          has_member_function_callable_with_const_cast_from
             <pointer, pointer(*)(RefArg)>::value
-         || boost::intrusive::detail::
+         || cppmsboost::intrusive::detail::
                has_member_function_callable_with_const_cast_from
                   <pointer, pointer(*)(UPtr)>::value;
-      return pointer_traits::priv_const_cast_from(boost::intrusive::detail::bool_<value>(), uptr);
+      return pointer_traits::priv_const_cast_from(cppmsboost::intrusive::detail::bool_<value>(), uptr);
    }
 
    //! <b>Remark</b>: Non-standard extension.
@@ -188,13 +188,13 @@ struct pointer_traits
    BOOST_INTRUSIVE_FORCEINLINE static pointer dynamic_cast_from(const UPtr &uptr)
    {
       typedef const UPtr &RefArg;
-      const bool value = boost::intrusive::detail::
+      const bool value = cppmsboost::intrusive::detail::
          has_member_function_callable_with_dynamic_cast_from
             <pointer, pointer(*)(RefArg)>::value
-         || boost::intrusive::detail::
+         || cppmsboost::intrusive::detail::
                has_member_function_callable_with_dynamic_cast_from
                   <pointer, pointer(*)(UPtr)>::value;
-      return pointer_traits::priv_dynamic_cast_from(boost::intrusive::detail::bool_<value>(), uptr);
+      return pointer_traits::priv_dynamic_cast_from(cppmsboost::intrusive::detail::bool_<value>(), uptr);
    }
 
    ///@cond
@@ -210,37 +210,37 @@ struct pointer_traits
    {  return pointer_traits::to_raw_pointer(p.operator->());  }
 
    //priv_pointer_to
-   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_pointer_to(boost::intrusive::detail::true_, reference r)
+   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_pointer_to(cppmsboost::intrusive::detail::true_, reference r)
    { return Ptr::pointer_to(r); }
 
-   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_pointer_to(boost::intrusive::detail::false_, reference r)
-   { return pointer(boost::intrusive::detail::addressof(r)); }
+   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_pointer_to(cppmsboost::intrusive::detail::false_, reference r)
+   { return pointer(cppmsboost::intrusive::detail::addressof(r)); }
 
    //priv_static_cast_from
    template<class UPtr>
-   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_static_cast_from(boost::intrusive::detail::true_, const UPtr &uptr)
+   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_static_cast_from(cppmsboost::intrusive::detail::true_, const UPtr &uptr)
    { return Ptr::static_cast_from(uptr); }
 
    template<class UPtr>
-   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_static_cast_from(boost::intrusive::detail::false_, const UPtr &uptr)
+   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_static_cast_from(cppmsboost::intrusive::detail::false_, const UPtr &uptr)
    {  return uptr ? pointer_to(*static_cast<element_type*>(to_raw_pointer(uptr))) : pointer();  }
 
    //priv_const_cast_from
    template<class UPtr>
-   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_const_cast_from(boost::intrusive::detail::true_, const UPtr &uptr)
+   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_const_cast_from(cppmsboost::intrusive::detail::true_, const UPtr &uptr)
    { return Ptr::const_cast_from(uptr); }
 
    template<class UPtr>
-   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_const_cast_from(boost::intrusive::detail::false_, const UPtr &uptr)
+   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_const_cast_from(cppmsboost::intrusive::detail::false_, const UPtr &uptr)
    {  return uptr ? pointer_to(const_cast<element_type&>(*uptr)) : pointer();  }
 
    //priv_dynamic_cast_from
    template<class UPtr>
-   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_dynamic_cast_from(boost::intrusive::detail::true_, const UPtr &uptr)
+   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_dynamic_cast_from(cppmsboost::intrusive::detail::true_, const UPtr &uptr)
    { return Ptr::dynamic_cast_from(uptr); }
 
    template<class UPtr>
-   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_dynamic_cast_from(boost::intrusive::detail::false_, const UPtr &uptr)
+   BOOST_INTRUSIVE_FORCEINLINE static pointer priv_dynamic_cast_from(cppmsboost::intrusive::detail::false_, const UPtr &uptr)
    {  return uptr ? pointer_to(dynamic_cast<element_type&>(*uptr)) : pointer();  }
    ///@endcond
 };
@@ -277,7 +277,7 @@ struct pointer_traits<T*>
       //!shall be used instead of rebind<U> to obtain a pointer to U.
       template <class U> using rebind = U*;
    #else
-      typedef typename boost::intrusive::detail::unvoid_ref<element_type>::type reference;
+      typedef typename cppmsboost::intrusive::detail::unvoid_ref<element_type>::type reference;
       #if !defined(BOOST_NO_CXX11_TEMPLATE_ALIASES)
          template <class U> using rebind = U*;
       #endif
@@ -289,7 +289,7 @@ struct pointer_traits<T*>
    //! <b>Returns</b>: addressof(r)
    //!
    BOOST_INTRUSIVE_FORCEINLINE static pointer pointer_to(reference r)
-   { return boost::intrusive::detail::addressof(r); }
+   { return cppmsboost::intrusive::detail::addressof(r); }
 
    //! <b>Returns</b>: static_cast<pointer>(uptr)
    //!
@@ -311,7 +311,7 @@ struct pointer_traits<T*>
 };
 
 }  //namespace container {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #include <boost/intrusive/detail/config_end.hpp>
 

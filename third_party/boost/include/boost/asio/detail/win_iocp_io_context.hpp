@@ -35,7 +35,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -48,7 +48,7 @@ class win_iocp_io_context
 public:
   // Constructor. Specifies a concurrency hint that is passed through to the
   // underlying I/O completion port.
-  BOOST_ASIO_DECL win_iocp_io_context(boost::asio::execution_context& ctx,
+  BOOST_ASIO_DECL win_iocp_io_context(cppmsboost::asio::execution_context& ctx,
       int concurrency_hint = -1, bool own_thread = true);
 
   // Destructor.
@@ -63,23 +63,23 @@ public:
   }
 
   // Register a handle with the IO completion port.
-  BOOST_ASIO_DECL boost::system::error_code register_handle(
-      HANDLE handle, boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code register_handle(
+      HANDLE handle, cppmsboost::system::error_code& ec);
 
   // Run the event loop until stopped or no more work.
-  BOOST_ASIO_DECL size_t run(boost::system::error_code& ec);
+  BOOST_ASIO_DECL size_t run(cppmsboost::system::error_code& ec);
 
   // Run until stopped or one operation is performed.
-  BOOST_ASIO_DECL size_t run_one(boost::system::error_code& ec);
+  BOOST_ASIO_DECL size_t run_one(cppmsboost::system::error_code& ec);
 
   // Run until timeout, interrupted, or one operation is performed.
-  BOOST_ASIO_DECL size_t wait_one(long usec, boost::system::error_code& ec);
+  BOOST_ASIO_DECL size_t wait_one(long usec, cppmsboost::system::error_code& ec);
 
   // Poll for operations without blocking.
-  BOOST_ASIO_DECL size_t poll(boost::system::error_code& ec);
+  BOOST_ASIO_DECL size_t poll(cppmsboost::system::error_code& ec);
 
   // Poll for one operation without blocking.
-  BOOST_ASIO_DECL size_t poll_one(boost::system::error_code& ec);
+  BOOST_ASIO_DECL size_t poll_one(cppmsboost::system::error_code& ec);
 
   // Stop the event processing loop.
   BOOST_ASIO_DECL void stop();
@@ -174,7 +174,7 @@ public:
   // immediately. The caller must have already called work_started() prior to
   // starting the operation.
   BOOST_ASIO_DECL void on_completion(win_iocp_operation* op,
-      const boost::system::error_code& ec, DWORD bytes_transferred = 0);
+      const cppmsboost::system::error_code& ec, DWORD bytes_transferred = 0);
 
   // Add a new timer queue to the service.
   template <typename Time_Traits>
@@ -222,7 +222,7 @@ private:
   // Dequeues at most one operation from the I/O completion port, and then
   // executes it. Returns the number of operations that were dequeued (i.e.
   // either 0 or 1).
-  BOOST_ASIO_DECL size_t do_one(DWORD msec, boost::system::error_code& ec);
+  BOOST_ASIO_DECL size_t do_one(DWORD msec, cppmsboost::system::error_code& ec);
 
   // Helper to calculate the GetQueuedCompletionStatus timeout.
   BOOST_ASIO_DECL static DWORD get_gqcs_timeout();
@@ -326,7 +326,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

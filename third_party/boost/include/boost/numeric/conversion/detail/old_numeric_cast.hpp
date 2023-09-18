@@ -23,7 +23,7 @@
 //             vc-stlport.
 //  20 Jan 01  Moved BOOST_NO_LIMITS_COMPILE_TIME_CONSTANTS to config.hpp.
 //             Removed unused BOOST_EXPLICIT_TARGET macro. Moved
-//             boost::detail::type to boost/type.hpp. Made it compile with
+//             cppmsboost::detail::type to boost/type.hpp. Made it compile with
 //             stock gcc again (Dave Abrahams)
 //  29 Nov 00  Remove nested namespace cast, cleanup spacing before Formal
 //             Review (Beman Dawes)
@@ -55,7 +55,7 @@
 # include <boost/limits.hpp>
 # include <boost/numeric/conversion/converter_policies.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   using numeric::bad_numeric_cast;
 
@@ -81,7 +81,7 @@ namespace boost
          };
       };
 
-      // Move to namespace boost in utility.hpp?
+      // Move to namespace cppmsboost in utility.hpp?
       template <class T, bool specialized>
       struct fixed_numeric_limits_base
           : public if_true< std::numeric_limits<T>::is_signed >
@@ -100,11 +100,11 @@ namespace boost
       // long / unsigned long long. Not intended to be full
       // numeric_limits replacements, but good enough for numeric_cast<>
       template <>
-      struct fixed_numeric_limits_base< ::boost::long_long_type, false>
+      struct fixed_numeric_limits_base< ::cppmsboost::long_long_type, false>
       {
           BOOST_STATIC_CONSTANT(bool, is_specialized = true);
           BOOST_STATIC_CONSTANT(bool, is_signed = true);
-          static  ::boost::long_long_type max BOOST_PREVENT_MACRO_SUBSTITUTION ()
+          static  ::cppmsboost::long_long_type max BOOST_PREVENT_MACRO_SUBSTITUTION ()
           {
 #  ifdef LONGLONG_MAX
               return LONGLONG_MAX;
@@ -113,7 +113,7 @@ namespace boost
 #  endif
           }
 
-          static  ::boost::long_long_type min BOOST_PREVENT_MACRO_SUBSTITUTION ()
+          static  ::cppmsboost::long_long_type min BOOST_PREVENT_MACRO_SUBSTITUTION ()
           {
 #  ifdef LONGLONG_MIN
               return LONGLONG_MIN;
@@ -124,11 +124,11 @@ namespace boost
       };
 
       template <>
-      struct fixed_numeric_limits_base< ::boost::ulong_long_type, false>
+      struct fixed_numeric_limits_base< ::cppmsboost::ulong_long_type, false>
       {
           BOOST_STATIC_CONSTANT(bool, is_specialized = true);
           BOOST_STATIC_CONSTANT(bool, is_signed = false);
-          static  ::boost::ulong_long_type max BOOST_PREVENT_MACRO_SUBSTITUTION ()
+          static  ::cppmsboost::ulong_long_type max BOOST_PREVENT_MACRO_SUBSTITUTION ()
           {
 #  ifdef ULONGLONG_MAX
               return ULONGLONG_MAX;
@@ -137,7 +137,7 @@ namespace boost
 #  endif
           }
 
-          static  ::boost::ulong_long_type min BOOST_PREVENT_MACRO_SUBSTITUTION () { return 0; }
+          static  ::cppmsboost::ulong_long_type min BOOST_PREVENT_MACRO_SUBSTITUTION () { return 0; }
       };
 # endif
     } // namespace detail
@@ -235,7 +235,7 @@ namespace boost
 #  pragma option push -w-8041
 # endif
 
-       // Move to namespace boost in utility.hpp?
+       // Move to namespace cppmsboost in utility.hpp?
        template <class T>
        struct fixed_numeric_limits : public std::numeric_limits<T>
        {
@@ -303,6 +303,6 @@ namespace boost
         return static_cast<Target>(arg);
     } // numeric_cast
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // BOOST_OLD_NUMERIC_CAST_HPP

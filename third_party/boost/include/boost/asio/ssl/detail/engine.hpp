@@ -26,7 +26,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ssl {
 namespace detail {
@@ -66,46 +66,46 @@ public:
   BOOST_ASIO_DECL SSL* native_handle();
 
   // Set the peer verification mode.
-  BOOST_ASIO_DECL boost::system::error_code set_verify_mode(
-      verify_mode v, boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code set_verify_mode(
+      verify_mode v, cppmsboost::system::error_code& ec);
 
   // Set the peer verification depth.
-  BOOST_ASIO_DECL boost::system::error_code set_verify_depth(
-      int depth, boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code set_verify_depth(
+      int depth, cppmsboost::system::error_code& ec);
 
   // Set a peer certificate verification callback.
-  BOOST_ASIO_DECL boost::system::error_code set_verify_callback(
-      verify_callback_base* callback, boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code set_verify_callback(
+      verify_callback_base* callback, cppmsboost::system::error_code& ec);
 
   // Perform an SSL handshake using either SSL_connect (client-side) or
   // SSL_accept (server-side).
   BOOST_ASIO_DECL want handshake(
-      stream_base::handshake_type type, boost::system::error_code& ec);
+      stream_base::handshake_type type, cppmsboost::system::error_code& ec);
 
   // Perform a graceful shutdown of the SSL session.
-  BOOST_ASIO_DECL want shutdown(boost::system::error_code& ec);
+  BOOST_ASIO_DECL want shutdown(cppmsboost::system::error_code& ec);
 
   // Write bytes to the SSL session.
-  BOOST_ASIO_DECL want write(const boost::asio::const_buffer& data,
-      boost::system::error_code& ec, std::size_t& bytes_transferred);
+  BOOST_ASIO_DECL want write(const cppmsboost::asio::const_buffer& data,
+      cppmsboost::system::error_code& ec, std::size_t& bytes_transferred);
 
   // Read bytes from the SSL session.
-  BOOST_ASIO_DECL want read(const boost::asio::mutable_buffer& data,
-      boost::system::error_code& ec, std::size_t& bytes_transferred);
+  BOOST_ASIO_DECL want read(const cppmsboost::asio::mutable_buffer& data,
+      cppmsboost::system::error_code& ec, std::size_t& bytes_transferred);
 
   // Get output data to be written to the transport.
-  BOOST_ASIO_DECL boost::asio::mutable_buffer get_output(
-      const boost::asio::mutable_buffer& data);
+  BOOST_ASIO_DECL cppmsboost::asio::mutable_buffer get_output(
+      const cppmsboost::asio::mutable_buffer& data);
 
   // Put input data that was read from the transport.
-  BOOST_ASIO_DECL boost::asio::const_buffer put_input(
-      const boost::asio::const_buffer& data);
+  BOOST_ASIO_DECL cppmsboost::asio::const_buffer put_input(
+      const cppmsboost::asio::const_buffer& data);
 
   // Map an error::eof code returned by the underlying transport according to
   // the type and state of the SSL session. Returns a const reference to the
   // error code object, suitable for passing to a completion handler.
-  BOOST_ASIO_DECL const boost::system::error_code& map_error_code(
-      boost::system::error_code& ec) const;
+  BOOST_ASIO_DECL const cppmsboost::system::error_code& map_error_code(
+      cppmsboost::system::error_code& ec) const;
 
 private:
   // Disallow copying and assignment.
@@ -119,14 +119,14 @@ private:
 #if (OPENSSL_VERSION_NUMBER < 0x10000000L)
   // The SSL_accept function may not be thread safe. This mutex is used to
   // protect all calls to the SSL_accept function.
-  BOOST_ASIO_DECL static boost::asio::detail::static_mutex& accept_mutex();
+  BOOST_ASIO_DECL static cppmsboost::asio::detail::static_mutex& accept_mutex();
 #endif // (OPENSSL_VERSION_NUMBER < 0x10000000L)
 
   // Perform one operation. Returns >= 0 on success or error, want_read if the
   // operation needs more input, or want_write if it needs to write some output
   // before the operation can complete.
   BOOST_ASIO_DECL want perform(int (engine::* op)(void*, std::size_t),
-      void* data, std::size_t length, boost::system::error_code& ec,
+      void* data, std::size_t length, cppmsboost::system::error_code& ec,
       std::size_t* bytes_transferred);
 
   // Adapt the SSL_accept function to the signature needed for perform().
@@ -151,7 +151,7 @@ private:
 } // namespace detail
 } // namespace ssl
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

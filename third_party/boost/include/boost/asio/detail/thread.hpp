@@ -35,7 +35,7 @@
 # error Only Windows, POSIX and std::thread are supported!
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -57,6 +57,6 @@ typedef std_thread thread;
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_DETAIL_THREAD_HPP

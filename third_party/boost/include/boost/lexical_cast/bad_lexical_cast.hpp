@@ -27,7 +27,7 @@
 #include <exception>
 #include <boost/throw_exception.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     // exception used to indicate runtime lexical_cast failure
     class BOOST_SYMBOL_VISIBLE bad_lexical_cast :
@@ -91,18 +91,18 @@ namespace boost
 #ifdef BOOST_NO_TYPEID
         template <class S, class T>
         inline void throw_bad_cast() {
-            boost::throw_exception(bad_lexical_cast());
+            cppmsboost::throw_exception(bad_lexical_cast());
         }
 #else
         template <class S, class T>
         inline void throw_bad_cast() {
-            boost::throw_exception(bad_lexical_cast(typeid(S), typeid(T)));
+            cppmsboost::throw_exception(bad_lexical_cast(typeid(S), typeid(T)));
         }
 #endif
     }} // namespace conversion::detail
 
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_LEXICAL_CAST_BAD_LEXICAL_CAST_HPP
 

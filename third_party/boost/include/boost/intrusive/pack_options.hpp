@@ -19,7 +19,7 @@
 #  pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace intrusive {
 
 #ifndef BOOST_INTRUSIVE_DOXYGEN_INVOKED
@@ -318,7 +318,7 @@ struct pack_options
 //! \endcode
 //!
 //! ...that after being combined with
-//! <code>boost::intrusive::pack_options</code>,
+//! <code>cppmsboost::intrusive::pack_options</code>,
 //! will typedef TYPE as a typedef of name TYPEDEF_NAME. Example:
 //!
 //! \code
@@ -328,13 +328,13 @@ struct pack_options
 //!   //    template<class VoidPointer>
 //!   //    struct my_pointer
 //!   //    { unspecified_content };
-//!   BOOST_INTRUSIVE_OPTION_TYPE(my_pointer, VoidPointer, boost::remove_pointer<VoidPointer>::type, my_pointer_type)
+//!   BOOST_INTRUSIVE_OPTION_TYPE(my_pointer, VoidPointer, cppmsboost::remove_pointer<VoidPointer>::type, my_pointer_type)
 //!
 //!   struct empty_default{};
 //!
 //!   typedef pack_options< empty_default, typename my_pointer<void*> >::type::my_pointer_type type;
 //!
-//!   BOOST_STATIC_ASSERT(( boost::is_same<type, void>::value ));
+//!   BOOST_STATIC_ASSERT(( cppmsboost::is_same<type, void>::value ));
 //!
 //! \endcode
 #define BOOST_INTRUSIVE_OPTION_TYPE(OPTION_NAME, TYPE, TYPEDEF_EXPR, TYPEDEF_NAME)
@@ -348,7 +348,7 @@ struct pack_options
 //! \endcode
 //!
 //! ...that after being combined with
-//! <code>boost::intrusive::pack_options</code>,
+//! <code>cppmsboost::intrusive::pack_options</code>,
 //! will contain a CONSTANT_NAME static constant of value VALUE. Example:
 //!
 //! \code
@@ -373,7 +373,7 @@ struct pack_options
 
 
 }  //namespace intrusive {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #include <boost/intrusive/detail/config_end.hpp>
 

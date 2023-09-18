@@ -15,7 +15,7 @@
 #pragma once
 #endif
 
-namespace boost
+namespace cppmsboost
 {
    namespace math
    { 
@@ -34,9 +34,9 @@ namespace boost
    long ltrunc(const T& v);
 #ifdef BOOST_HAS_LONG_LONG
    template <class T, class Policy>
-   boost::long_long_type lltrunc(const T& v, const Policy& pol);
+   cppmsboost::long_long_type lltrunc(const T& v, const Policy& pol);
    template <class T>
-   boost::long_long_type lltrunc(const T& v);
+   cppmsboost::long_long_type lltrunc(const T& v);
 #endif
    template <class T, class Policy>
    typename tools::promote_args<T>::type round(const T& v, const Policy& pol);
@@ -52,9 +52,9 @@ namespace boost
    long lround(const T& v);
 #ifdef BOOST_HAS_LONG_LONG
    template <class T, class Policy>
-   boost::long_long_type llround(const T& v, const Policy& pol);
+   cppmsboost::long_long_type llround(const T& v, const Policy& pol);
    template <class T>
-   boost::long_long_type llround(const T& v);
+   cppmsboost::long_long_type llround(const T& v);
 #endif
    template <class T, class Policy>
    T modf(const T& v, T* ipart, const Policy& pol);
@@ -70,9 +70,9 @@ namespace boost
    T modf(const T& v, long* ipart);
 #ifdef BOOST_HAS_LONG_LONG
    template <class T, class Policy>
-   T modf(const T& v, boost::long_long_type* ipart, const Policy& pol);
+   T modf(const T& v, cppmsboost::long_long_type* ipart, const Policy& pol);
    template <class T>
-   T modf(const T& v, boost::long_long_type* ipart);
+   T modf(const T& v, cppmsboost::long_long_type* ipart);
 #endif
 
    }
@@ -80,13 +80,13 @@ namespace boost
 
 #undef BOOST_MATH_STD_USING
 #define BOOST_MATH_STD_USING BOOST_MATH_STD_USING_CORE\
-   using boost::math::round;\
-   using boost::math::iround;\
-   using boost::math::lround;\
-   using boost::math::trunc;\
-   using boost::math::itrunc;\
-   using boost::math::ltrunc;\
-   using boost::math::modf;
+   using cppmsboost::math::round;\
+   using cppmsboost::math::iround;\
+   using cppmsboost::math::lround;\
+   using cppmsboost::math::trunc;\
+   using cppmsboost::math::itrunc;\
+   using cppmsboost::math::ltrunc;\
+   using cppmsboost::math::modf;
 
 
 #endif // BOOST_MATH_SPECIAL_ROUND_FWD_HPP

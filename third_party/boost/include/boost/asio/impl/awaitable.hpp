@@ -29,7 +29,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -76,17 +76,17 @@ public:
 #if !defined(BOOST_ASIO_DISABLE_AWAITABLE_FRAME_RECYCLING)
   void* operator new(std::size_t size)
   {
-    return boost::asio::detail::thread_info_base::allocate(
-        boost::asio::detail::thread_info_base::awaitable_frame_tag(),
-        boost::asio::detail::thread_context::thread_call_stack::top(),
+    return cppmsboost::asio::detail::thread_info_base::allocate(
+        cppmsboost::asio::detail::thread_info_base::awaitable_frame_tag(),
+        cppmsboost::asio::detail::thread_context::thread_call_stack::top(),
         size);
   }
 
   void operator delete(void* pointer, std::size_t size)
   {
-    boost::asio::detail::thread_info_base::deallocate(
-        boost::asio::detail::thread_info_base::awaitable_frame_tag(),
-        boost::asio::detail::thread_context::thread_call_stack::top(),
+    cppmsboost::asio::detail::thread_info_base::deallocate(
+        cppmsboost::asio::detail::thread_info_base::awaitable_frame_tag(),
+        cppmsboost::asio::detail::thread_context::thread_call_stack::top(),
         pointer, size);
   }
 #endif // !defined(BOOST_ASIO_DISABLE_AWAITABLE_FRAME_RECYCLING)
@@ -128,9 +128,9 @@ public:
     pending_exception_ = e;
   }
 
-  void set_error(const boost::system::error_code& ec)
+  void set_error(const cppmsboost::system::error_code& ec)
   {
-    this->set_except(std::make_exception_ptr(boost::system::system_error(ec)));
+    this->set_except(std::make_exception_ptr(cppmsboost::system::system_error(ec)));
   }
 
   void unhandled_exception()
@@ -403,16 +403,16 @@ protected:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #if !defined(GENERATING_DOCUMENTATION)
 
 namespace std { namespace experimental {
 
 template <typename T, typename Executor, typename... Args>
-struct coroutine_traits<boost::asio::awaitable<T, Executor>, Args...>
+struct coroutine_traits<cppmsboost::asio::awaitable<T, Executor>, Args...>
 {
-  typedef boost::asio::detail::awaitable_frame<T, Executor> promise_type;
+  typedef cppmsboost::asio::detail::awaitable_frame<T, Executor> promise_type;
 };
 
 }} // namespace std::experimental

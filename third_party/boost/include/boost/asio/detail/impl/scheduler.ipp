@@ -27,7 +27,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -41,7 +41,7 @@ public:
 
   void operator()()
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     this_->run(ec);
   }
 
@@ -55,7 +55,7 @@ struct scheduler::task_cleanup
   {
     if (this_thread_->private_outstanding_work > 0)
     {
-      boost::asio::detail::increment(
+      cppmsboost::asio::detail::increment(
           scheduler_->outstanding_work_,
           this_thread_->private_outstanding_work);
     }
@@ -80,7 +80,7 @@ struct scheduler::work_cleanup
   {
     if (this_thread_->private_outstanding_work > 1)
     {
-      boost::asio::detail::increment(
+      cppmsboost::asio::detail::increment(
           scheduler_->outstanding_work_,
           this_thread_->private_outstanding_work - 1);
     }
@@ -104,9 +104,9 @@ struct scheduler::work_cleanup
   thread_info* this_thread_;
 };
 
-scheduler::scheduler(boost::asio::execution_context& ctx,
+scheduler::scheduler(cppmsboost::asio::execution_context& ctx,
     int concurrency_hint, bool own_thread)
-  : boost::asio::detail::execution_context_service_base<scheduler>(ctx),
+  : cppmsboost::asio::detail::execution_context_service_base<scheduler>(ctx),
     one_thread_(concurrency_hint == 1
         || !BOOST_ASIO_CONCURRENCY_HINT_IS_LOCKING(
           SCHEDULER, concurrency_hint)
@@ -127,8 +127,8 @@ scheduler::scheduler(boost::asio::execution_context& ctx,
   if (own_thread)
   {
     ++outstanding_work_;
-    boost::asio::detail::signal_blocker sb;
-    thread_ = new boost::asio::detail::thread(thread_function(this));
+    cppmsboost::asio::detail::signal_blocker sb;
+    thread_ = new cppmsboost::asio::detail::thread(thread_function(this));
   }
 }
 
@@ -181,9 +181,9 @@ void scheduler::init_task()
   }
 }
 
-std::size_t scheduler::run(boost::system::error_code& ec)
+std::size_t scheduler::run(cppmsboost::system::error_code& ec)
 {
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   if (outstanding_work_ == 0)
   {
     stop();
@@ -203,9 +203,9 @@ std::size_t scheduler::run(boost::system::error_code& ec)
   return n;
 }
 
-std::size_t scheduler::run_one(boost::system::error_code& ec)
+std::size_t scheduler::run_one(cppmsboost::system::error_code& ec)
 {
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   if (outstanding_work_ == 0)
   {
     stop();
@@ -221,9 +221,9 @@ std::size_t scheduler::run_one(boost::system::error_code& ec)
   return do_run_one(lock, this_thread, ec);
 }
 
-std::size_t scheduler::wait_one(long usec, boost::system::error_code& ec)
+std::size_t scheduler::wait_one(long usec, cppmsboost::system::error_code& ec)
 {
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   if (outstanding_work_ == 0)
   {
     stop();
@@ -239,9 +239,9 @@ std::size_t scheduler::wait_one(long usec, boost::system::error_code& ec)
   return do_wait_one(lock, this_thread, usec, ec);
 }
 
-std::size_t scheduler::poll(boost::system::error_code& ec)
+std::size_t scheduler::poll(cppmsboost::system::error_code& ec)
 {
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   if (outstanding_work_ == 0)
   {
     stop();
@@ -270,9 +270,9 @@ std::size_t scheduler::poll(boost::system::error_code& ec)
   return n;
 }
 
-std::size_t scheduler::poll_one(boost::system::error_code& ec)
+std::size_t scheduler::poll_one(cppmsboost::system::error_code& ec)
 {
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   if (outstanding_work_ == 0)
   {
     stop();
@@ -402,7 +402,7 @@ void scheduler::abandon_operations(
 
 std::size_t scheduler::do_run_one(mutex::scoped_lock& lock,
     scheduler::thread_info& this_thread,
-    const boost::system::error_code& ec)
+    const cppmsboost::system::error_code& ec)
 {
   while (!stopped_)
   {
@@ -461,7 +461,7 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock,
 
 std::size_t scheduler::do_wait_one(mutex::scoped_lock& lock,
     scheduler::thread_info& this_thread, long usec,
-    const boost::system::error_code& ec)
+    const cppmsboost::system::error_code& ec)
 {
   if (stopped_)
     return 0;
@@ -531,7 +531,7 @@ std::size_t scheduler::do_wait_one(mutex::scoped_lock& lock,
 
 std::size_t scheduler::do_poll_one(mutex::scoped_lock& lock,
     scheduler::thread_info& this_thread,
-    const boost::system::error_code& ec)
+    const cppmsboost::system::error_code& ec)
 {
   if (stopped_)
     return 0;
@@ -612,7 +612,7 @@ void scheduler::wake_one_thread_and_unlock(
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

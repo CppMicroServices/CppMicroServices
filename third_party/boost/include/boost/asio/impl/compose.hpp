@@ -27,7 +27,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 namespace detail
@@ -348,7 +348,7 @@ namespace detail
   inline void* asio_handler_allocate(std::size_t size,
       composed_op<Impl, Work, Handler, Signature>* this_handler)
   {
-    return boost_asio_handler_alloc_helpers::allocate(
+    return cppmsboost_asio_handler_alloc_helpers::allocate(
         size, this_handler->handler_);
   }
 
@@ -356,7 +356,7 @@ namespace detail
   inline void asio_handler_deallocate(void* pointer, std::size_t size,
       composed_op<Impl, Work, Handler, Signature>* this_handler)
   {
-    boost_asio_handler_alloc_helpers::deallocate(
+    cppmsboost_asio_handler_alloc_helpers::deallocate(
         pointer, size, this_handler->handler_);
   }
 
@@ -365,7 +365,7 @@ namespace detail
       composed_op<Impl, Work, Handler, Signature>* this_handler)
   {
     return this_handler->invocations_ > 1 ? true
-      : boost_asio_handler_cont_helpers::is_continuation(
+      : cppmsboost_asio_handler_cont_helpers::is_continuation(
           this_handler->handler_);
   }
 
@@ -374,7 +374,7 @@ namespace detail
   inline void asio_handler_invoke(Function& function,
       composed_op<Impl, Work, Handler, Signature>* this_handler)
   {
-    boost_asio_handler_invoke_helpers::invoke(
+    cppmsboost_asio_handler_invoke_helpers::invoke(
         function, this_handler->handler_);
   }
 
@@ -383,7 +383,7 @@ namespace detail
   inline void asio_handler_invoke(const Function& function,
       composed_op<Impl, Work, Handler, Signature>* this_handler)
   {
-    boost_asio_handler_invoke_helpers::invoke(
+    cppmsboost_asio_handler_invoke_helpers::invoke(
         function, this_handler->handler_);
   }
 
@@ -528,7 +528,7 @@ async_compose(BOOST_ASIO_MOVE_ARG(Implementation) implementation,
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

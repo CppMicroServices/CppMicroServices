@@ -26,7 +26,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 #if !defined(BOOST_ASIO_BASIC_RAW_SOCKET_FWD_DECL)
@@ -117,7 +117,7 @@ public:
    *
    * @param protocol An object specifying protocol parameters to be used.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   basic_raw_socket(const executor_type& ex, const protocol_type& protocol)
     : basic_socket<Protocol, Executor>(ex, protocol)
@@ -134,7 +134,7 @@ public:
    *
    * @param protocol An object specifying protocol parameters to be used.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_raw_socket(ExecutionContext& context, const protocol_type& protocol,
@@ -158,7 +158,7 @@ public:
    * @param endpoint An endpoint on the local machine to which the raw
    * socket will be bound.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   basic_raw_socket(const executor_type& ex, const endpoint_type& endpoint)
     : basic_socket<Protocol, Executor>(ex, endpoint)
@@ -179,7 +179,7 @@ public:
    * @param endpoint An endpoint on the local machine to which the raw
    * socket will be bound.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_raw_socket(ExecutionContext& context, const endpoint_type& endpoint,
@@ -202,7 +202,7 @@ public:
    *
    * @param native_socket The new underlying socket implementation.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   basic_raw_socket(const executor_type& ex,
       const protocol_type& protocol, const native_handle_type& native_socket)
@@ -223,7 +223,7 @@ public:
    *
    * @param native_socket The new underlying socket implementation.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_raw_socket(ExecutionContext& context,
@@ -332,25 +332,25 @@ public:
    *
    * @returns The number of bytes sent.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @note The send operation can only be used with a connected socket. Use
    * the send_to function to send data on an unconnected raw socket.
    *
    * @par Example
    * To send a single data buffer use the @ref buffer function as follows:
-   * @code socket.send(boost::asio::buffer(data, size)); @endcode
+   * @code socket.send(cppmsboost::asio::buffer(data, size)); @endcode
    * See the @ref buffer documentation for information on sending multiple
-   * buffers in one go, and how to use it with arrays, boost::array or
+   * buffers in one go, and how to use it with arrays, cppmsboost::array or
    * std::vector.
    */
   template <typename ConstBufferSequence>
   std::size_t send(const ConstBufferSequence& buffers)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = this->impl_.get_service().send(
         this->impl_.get_implementation(), buffers, 0, ec);
-    boost::asio::detail::throw_error(ec, "send");
+    cppmsboost::asio::detail::throw_error(ec, "send");
     return s;
   }
 
@@ -365,7 +365,7 @@ public:
    *
    * @returns The number of bytes sent.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @note The send operation can only be used with a connected socket. Use
    * the send_to function to send data on an unconnected raw socket.
@@ -374,10 +374,10 @@ public:
   std::size_t send(const ConstBufferSequence& buffers,
       socket_base::message_flags flags)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = this->impl_.get_service().send(
         this->impl_.get_implementation(), buffers, flags, ec);
-    boost::asio::detail::throw_error(ec, "send");
+    cppmsboost::asio::detail::throw_error(ec, "send");
     return s;
   }
 
@@ -399,7 +399,7 @@ public:
    */
   template <typename ConstBufferSequence>
   std::size_t send(const ConstBufferSequence& buffers,
-      socket_base::message_flags flags, boost::system::error_code& ec)
+      socket_base::message_flags flags, cppmsboost::system::error_code& ec)
   {
     return this->impl_.get_service().send(
         this->impl_.get_implementation(), buffers, flags, ec);
@@ -419,13 +419,13 @@ public:
    * Copies will be made of the handler as required. The function signature of
    * the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred           // Number of bytes sent.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * @note The async_send operation can only be used with a connected socket.
    * Use the async_send_to function to send data on an unconnected raw
@@ -434,24 +434,24 @@ public:
    * @par Example
    * To send a single data buffer use the @ref buffer function as follows:
    * @code
-   * socket.async_send(boost::asio::buffer(data, size), handler);
+   * socket.async_send(cppmsboost::asio::buffer(data, size), handler);
    * @endcode
    * See the @ref buffer documentation for information on sending multiple
-   * buffers in one go, and how to use it with arrays, boost::array or
+   * buffers in one go, and how to use it with arrays, cppmsboost::array or
    * std::vector.
    */
   template <typename ConstBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         std::size_t)) WriteHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-      void (boost::system::error_code, std::size_t))
+      void (cppmsboost::system::error_code, std::size_t))
   async_send(const ConstBufferSequence& buffers,
       BOOST_ASIO_MOVE_ARG(WriteHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
     return async_initiate<WriteHandler,
-      void (boost::system::error_code, std::size_t)>(
+      void (cppmsboost::system::error_code, std::size_t)>(
         initiate_async_send(this), handler,
         buffers, socket_base::message_flags(0));
   }
@@ -472,31 +472,31 @@ public:
    * Copies will be made of the handler as required. The function signature of
    * the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred           // Number of bytes sent.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * @note The async_send operation can only be used with a connected socket.
    * Use the async_send_to function to send data on an unconnected raw
    * socket.
    */
   template <typename ConstBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         std::size_t)) WriteHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-      void (boost::system::error_code, std::size_t))
+      void (cppmsboost::system::error_code, std::size_t))
   async_send(const ConstBufferSequence& buffers,
       socket_base::message_flags flags,
       BOOST_ASIO_MOVE_ARG(WriteHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
     return async_initiate<WriteHandler,
-      void (boost::system::error_code, std::size_t)>(
+      void (cppmsboost::system::error_code, std::size_t)>(
         initiate_async_send(this), handler, buffers, flags);
   }
 
@@ -512,27 +512,27 @@ public:
    *
    * @returns The number of bytes sent.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @par Example
    * To send a single data buffer use the @ref buffer function as follows:
    * @code
-   * boost::asio::ip::udp::endpoint destination(
-   *     boost::asio::ip::address::from_string("1.2.3.4"), 12345);
-   * socket.send_to(boost::asio::buffer(data, size), destination);
+   * cppmsboost::asio::ip::udp::endpoint destination(
+   *     cppmsboost::asio::ip::address::from_string("1.2.3.4"), 12345);
+   * socket.send_to(cppmsboost::asio::buffer(data, size), destination);
    * @endcode
    * See the @ref buffer documentation for information on sending multiple
-   * buffers in one go, and how to use it with arrays, boost::array or
+   * buffers in one go, and how to use it with arrays, cppmsboost::array or
    * std::vector.
    */
   template <typename ConstBufferSequence>
   std::size_t send_to(const ConstBufferSequence& buffers,
       const endpoint_type& destination)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = this->impl_.get_service().send_to(
         this->impl_.get_implementation(), buffers, destination, 0, ec);
-    boost::asio::detail::throw_error(ec, "send_to");
+    cppmsboost::asio::detail::throw_error(ec, "send_to");
     return s;
   }
 
@@ -550,16 +550,16 @@ public:
    *
    * @returns The number of bytes sent.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   template <typename ConstBufferSequence>
   std::size_t send_to(const ConstBufferSequence& buffers,
       const endpoint_type& destination, socket_base::message_flags flags)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = this->impl_.get_service().send_to(
         this->impl_.get_implementation(), buffers, destination, flags, ec);
-    boost::asio::detail::throw_error(ec, "send_to");
+    cppmsboost::asio::detail::throw_error(ec, "send_to");
     return s;
   }
 
@@ -582,7 +582,7 @@ public:
   template <typename ConstBufferSequence>
   std::size_t send_to(const ConstBufferSequence& buffers,
       const endpoint_type& destination, socket_base::message_flags flags,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     return this->impl_.get_service().send_to(this->impl_.get_implementation(),
         buffers, destination, flags, ec);
@@ -605,39 +605,39 @@ public:
    * Copies will be made of the handler as required. The function signature of
    * the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred           // Number of bytes sent.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * @par Example
    * To send a single data buffer use the @ref buffer function as follows:
    * @code
-   * boost::asio::ip::udp::endpoint destination(
-   *     boost::asio::ip::address::from_string("1.2.3.4"), 12345);
+   * cppmsboost::asio::ip::udp::endpoint destination(
+   *     cppmsboost::asio::ip::address::from_string("1.2.3.4"), 12345);
    * socket.async_send_to(
-   *     boost::asio::buffer(data, size), destination, handler);
+   *     cppmsboost::asio::buffer(data, size), destination, handler);
    * @endcode
    * See the @ref buffer documentation for information on sending multiple
-   * buffers in one go, and how to use it with arrays, boost::array or
+   * buffers in one go, and how to use it with arrays, cppmsboost::array or
    * std::vector.
    */
   template <typename ConstBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         std::size_t)) WriteHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-      void (boost::system::error_code, std::size_t))
+      void (cppmsboost::system::error_code, std::size_t))
   async_send_to(const ConstBufferSequence& buffers,
       const endpoint_type& destination,
       BOOST_ASIO_MOVE_ARG(WriteHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
     return async_initiate<WriteHandler,
-      void (boost::system::error_code, std::size_t)>(
+      void (cppmsboost::system::error_code, std::size_t)>(
         initiate_async_send_to(this), handler, buffers,
         destination, socket_base::message_flags(0));
   }
@@ -661,27 +661,27 @@ public:
    * Copies will be made of the handler as required. The function signature of
    * the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred           // Number of bytes sent.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    */
   template <typename ConstBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         std::size_t)) WriteHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-      void (boost::system::error_code, std::size_t))
+      void (cppmsboost::system::error_code, std::size_t))
   async_send_to(const ConstBufferSequence& buffers,
       const endpoint_type& destination, socket_base::message_flags flags,
       BOOST_ASIO_MOVE_ARG(WriteHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
     return async_initiate<WriteHandler,
-      void (boost::system::error_code, std::size_t)>(
+      void (cppmsboost::system::error_code, std::size_t)>(
         initiate_async_send_to(this), handler, buffers, destination, flags);
   }
 
@@ -695,7 +695,7 @@ public:
    *
    * @returns The number of bytes received.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @note The receive operation can only be used with a connected socket. Use
    * the receive_from function to receive data on an unconnected raw
@@ -704,18 +704,18 @@ public:
    * @par Example
    * To receive into a single data buffer use the @ref buffer function as
    * follows:
-   * @code socket.receive(boost::asio::buffer(data, size)); @endcode
+   * @code socket.receive(cppmsboost::asio::buffer(data, size)); @endcode
    * See the @ref buffer documentation for information on receiving into
-   * multiple buffers in one go, and how to use it with arrays, boost::array or
+   * multiple buffers in one go, and how to use it with arrays, cppmsboost::array or
    * std::vector.
    */
   template <typename MutableBufferSequence>
   std::size_t receive(const MutableBufferSequence& buffers)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = this->impl_.get_service().receive(
         this->impl_.get_implementation(), buffers, 0, ec);
-    boost::asio::detail::throw_error(ec, "receive");
+    cppmsboost::asio::detail::throw_error(ec, "receive");
     return s;
   }
 
@@ -731,7 +731,7 @@ public:
    *
    * @returns The number of bytes received.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @note The receive operation can only be used with a connected socket. Use
    * the receive_from function to receive data on an unconnected raw
@@ -741,10 +741,10 @@ public:
   std::size_t receive(const MutableBufferSequence& buffers,
       socket_base::message_flags flags)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = this->impl_.get_service().receive(
         this->impl_.get_implementation(), buffers, flags, ec);
-    boost::asio::detail::throw_error(ec, "receive");
+    cppmsboost::asio::detail::throw_error(ec, "receive");
     return s;
   }
 
@@ -768,7 +768,7 @@ public:
    */
   template <typename MutableBufferSequence>
   std::size_t receive(const MutableBufferSequence& buffers,
-      socket_base::message_flags flags, boost::system::error_code& ec)
+      socket_base::message_flags flags, cppmsboost::system::error_code& ec)
   {
     return this->impl_.get_service().receive(
         this->impl_.get_implementation(), buffers, flags, ec);
@@ -788,13 +788,13 @@ public:
    * completes. Copies will be made of the handler as required. The function
    * signature of the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred           // Number of bytes received.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * @note The async_receive operation can only be used with a connected socket.
    * Use the async_receive_from function to receive data on an unconnected
@@ -804,24 +804,24 @@ public:
    * To receive into a single data buffer use the @ref buffer function as
    * follows:
    * @code
-   * socket.async_receive(boost::asio::buffer(data, size), handler);
+   * socket.async_receive(cppmsboost::asio::buffer(data, size), handler);
    * @endcode
    * See the @ref buffer documentation for information on receiving into
-   * multiple buffers in one go, and how to use it with arrays, boost::array or
+   * multiple buffers in one go, and how to use it with arrays, cppmsboost::array or
    * std::vector.
    */
   template <typename MutableBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         std::size_t)) ReadHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-      void (boost::system::error_code, std::size_t))
+      void (cppmsboost::system::error_code, std::size_t))
   async_receive(const MutableBufferSequence& buffers,
       BOOST_ASIO_MOVE_ARG(ReadHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
     return async_initiate<ReadHandler,
-      void (boost::system::error_code, std::size_t)>(
+      void (cppmsboost::system::error_code, std::size_t)>(
         initiate_async_receive(this), handler,
         buffers, socket_base::message_flags(0));
   }
@@ -842,31 +842,31 @@ public:
    * completes. Copies will be made of the handler as required. The function
    * signature of the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred           // Number of bytes received.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * @note The async_receive operation can only be used with a connected socket.
    * Use the async_receive_from function to receive data on an unconnected
    * raw socket.
    */
   template <typename MutableBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         std::size_t)) ReadHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-      void (boost::system::error_code, std::size_t))
+      void (cppmsboost::system::error_code, std::size_t))
   async_receive(const MutableBufferSequence& buffers,
       socket_base::message_flags flags,
       BOOST_ASIO_MOVE_ARG(ReadHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
     return async_initiate<ReadHandler,
-      void (boost::system::error_code, std::size_t)>(
+      void (cppmsboost::system::error_code, std::size_t)>(
         initiate_async_receive(this), handler, buffers, flags);
   }
 
@@ -882,28 +882,28 @@ public:
    *
    * @returns The number of bytes received.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @par Example
    * To receive into a single data buffer use the @ref buffer function as
    * follows:
    * @code
-   * boost::asio::ip::udp::endpoint sender_endpoint;
+   * cppmsboost::asio::ip::udp::endpoint sender_endpoint;
    * socket.receive_from(
-   *     boost::asio::buffer(data, size), sender_endpoint);
+   *     cppmsboost::asio::buffer(data, size), sender_endpoint);
    * @endcode
    * See the @ref buffer documentation for information on receiving into
-   * multiple buffers in one go, and how to use it with arrays, boost::array or
+   * multiple buffers in one go, and how to use it with arrays, cppmsboost::array or
    * std::vector.
    */
   template <typename MutableBufferSequence>
   std::size_t receive_from(const MutableBufferSequence& buffers,
       endpoint_type& sender_endpoint)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = this->impl_.get_service().receive_from(
         this->impl_.get_implementation(), buffers, sender_endpoint, 0, ec);
-    boost::asio::detail::throw_error(ec, "receive_from");
+    cppmsboost::asio::detail::throw_error(ec, "receive_from");
     return s;
   }
   
@@ -921,16 +921,16 @@ public:
    *
    * @returns The number of bytes received.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   template <typename MutableBufferSequence>
   std::size_t receive_from(const MutableBufferSequence& buffers,
       endpoint_type& sender_endpoint, socket_base::message_flags flags)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = this->impl_.get_service().receive_from(
         this->impl_.get_implementation(), buffers, sender_endpoint, flags, ec);
-    boost::asio::detail::throw_error(ec, "receive_from");
+    cppmsboost::asio::detail::throw_error(ec, "receive_from");
     return s;
   }
   
@@ -953,7 +953,7 @@ public:
   template <typename MutableBufferSequence>
   std::size_t receive_from(const MutableBufferSequence& buffers,
       endpoint_type& sender_endpoint, socket_base::message_flags flags,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     return this->impl_.get_service().receive_from(
         this->impl_.get_implementation(), buffers, sender_endpoint, flags, ec);
@@ -978,36 +978,36 @@ public:
    * completes. Copies will be made of the handler as required. The function
    * signature of the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred           // Number of bytes received.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * @par Example
    * To receive into a single data buffer use the @ref buffer function as
    * follows:
    * @code socket.async_receive_from(
-   *     boost::asio::buffer(data, size), 0, sender_endpoint, handler); @endcode
+   *     cppmsboost::asio::buffer(data, size), 0, sender_endpoint, handler); @endcode
    * See the @ref buffer documentation for information on receiving into
-   * multiple buffers in one go, and how to use it with arrays, boost::array or
+   * multiple buffers in one go, and how to use it with arrays, cppmsboost::array or
    * std::vector.
    */
   template <typename MutableBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         std::size_t)) ReadHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-      void (boost::system::error_code, std::size_t))
+      void (cppmsboost::system::error_code, std::size_t))
   async_receive_from(const MutableBufferSequence& buffers,
       endpoint_type& sender_endpoint,
       BOOST_ASIO_MOVE_ARG(ReadHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
     return async_initiate<ReadHandler,
-      void (boost::system::error_code, std::size_t)>(
+      void (cppmsboost::system::error_code, std::size_t)>(
         initiate_async_receive_from(this), handler, buffers,
         &sender_endpoint, socket_base::message_flags(0));
   }
@@ -1033,27 +1033,27 @@ public:
    * completes. Copies will be made of the handler as required. The function
    * signature of the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred           // Number of bytes received.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    */
   template <typename MutableBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         std::size_t)) ReadHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-      void (boost::system::error_code, std::size_t))
+      void (cppmsboost::system::error_code, std::size_t))
   async_receive_from(const MutableBufferSequence& buffers,
       endpoint_type& sender_endpoint, socket_base::message_flags flags,
       BOOST_ASIO_MOVE_ARG(ReadHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
     return async_initiate<ReadHandler,
-      void (boost::system::error_code, std::size_t)>(
+      void (cppmsboost::system::error_code, std::size_t)>(
         initiate_async_receive_from(this), handler,
         buffers, &sender_endpoint, flags);
   }
@@ -1197,7 +1197,7 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

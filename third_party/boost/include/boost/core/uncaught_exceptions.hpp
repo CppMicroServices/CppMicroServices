@@ -82,13 +82,13 @@ extern "C" __cxa_eh_globals* __cxa_get_globals() BOOST_NOEXCEPT_OR_NOTHROW __att
 #if defined(_MSC_VER) && _MSC_VER >= 1400
 #include <cstring>
 #define BOOST_CORE_HAS_GETPTD
-namespace boost {
+namespace cppmsboost {
 namespace core {
 namespace detail {
 extern "C" void* _getptd();
 } // namespace detail
 } // namespace core
-} // namespace boost
+} // namespace cppmsboost
 #endif // defined(_MSC_VER) && _MSC_VER >= 1400
 
 #endif // !defined(BOOST_CORE_HAS_UNCAUGHT_EXCEPTIONS)
@@ -98,7 +98,7 @@ extern "C" void* _getptd();
 #define BOOST_CORE_UNCAUGHT_EXCEPTIONS_EMULATED
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 namespace core {
 
@@ -116,7 +116,7 @@ inline unsigned int uncaught_exceptions() BOOST_NOEXCEPT
 #elif defined(BOOST_CORE_HAS_GETPTD)
     // MSVC specific. Tested on {MSVC2005SP1,MSVC2008SP1,MSVC2010SP1,MSVC2012}x{x32,x64}.
     unsigned int count;
-    std::memcpy(&count, static_cast< const unsigned char* >(boost::core::detail::_getptd()) + (sizeof(void*) == 8u ? 0x100 : 0x90), sizeof(count)); // _tiddata::_ProcessingThrow, x32 offset - 0x90, x64 - 0x100
+    std::memcpy(&count, static_cast< const unsigned char* >(cppmsboost::core::detail::_getptd()) + (sizeof(void*) == 8u ? 0x100 : 0x90), sizeof(count)); // _tiddata::_ProcessingThrow, x32 offset - 0x90, x64 - 0x100
     return count;
 #else
     // Portable C++03 implementation. Does not allow to detect multiple nested exceptions.
@@ -126,7 +126,7 @@ inline unsigned int uncaught_exceptions() BOOST_NOEXCEPT
 
 } // namespace core
 
-} // namespace boost
+} // namespace cppmsboost
 
 #undef BOOST_CORE_HAS_CXXABI_H
 #undef BOOST_CORE_HAS_CXA_GET_GLOBALS

@@ -15,18 +15,18 @@
 #include <boost/date_time/compiler_config.hpp>
 #include <boost/date_time/int_adapter.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
 
   //! Duration type with date level resolution
   template<class duration_rep_traits>
   class BOOST_SYMBOL_VISIBLE date_duration : private
-              boost::less_than_comparable1< date_duration< duration_rep_traits >
-            , boost::equality_comparable1< date_duration< duration_rep_traits >
-            , boost::addable1< date_duration< duration_rep_traits >
-            , boost::subtractable1< date_duration< duration_rep_traits >
-            , boost::dividable2< date_duration< duration_rep_traits >, int
+              cppmsboost::less_than_comparable1< date_duration< duration_rep_traits >
+            , cppmsboost::equality_comparable1< date_duration< duration_rep_traits >
+            , cppmsboost::addable1< date_duration< duration_rep_traits >
+            , cppmsboost::subtractable1< date_duration< duration_rep_traits >
+            , cppmsboost::dividable2< date_duration< duration_rep_traits >, int
             > > > > >
   {
   public:
@@ -140,7 +140,7 @@ namespace date_time {
   struct BOOST_SYMBOL_VISIBLE duration_traits_adapted
   {
     typedef long int_type;
-    typedef boost::date_time::int_adapter<long> impl_type;
+    typedef cppmsboost::date_time::int_adapter<long> impl_type;
     static BOOST_CXX14_CONSTEXPR int_type as_number(impl_type i) { return i.as_number(); }
   };
 

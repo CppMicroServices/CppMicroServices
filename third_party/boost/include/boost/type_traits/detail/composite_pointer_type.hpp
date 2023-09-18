@@ -17,7 +17,7 @@
 #include <boost/config.hpp>
 #include <cstddef>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace type_traits_detail
@@ -81,33 +81,33 @@ template<class T, class U> struct has_common_pointee
 {
 private:
 
-    typedef typename boost::remove_cv<T>::type T2;
-    typedef typename boost::remove_cv<U>::type U2;
+    typedef typename cppmsboost::remove_cv<T>::type T2;
+    typedef typename cppmsboost::remove_cv<U>::type U2;
 
 public:
 
     BOOST_STATIC_CONSTANT( bool, value =
-        (boost::is_same<T2, U2>::value)
-        || boost::is_void<T2>::value
-        || boost::is_void<U2>::value
-        || (boost::is_base_of<T2, U2>::value)
-        || (boost::is_base_of<U2, T2>::value) );
+        (cppmsboost::is_same<T2, U2>::value)
+        || cppmsboost::is_void<T2>::value
+        || cppmsboost::is_void<U2>::value
+        || (cppmsboost::is_base_of<T2, U2>::value)
+        || (cppmsboost::is_base_of<U2, T2>::value) );
 };
 
 template<class T, class U> struct common_pointee
 {
 private:
 
-    typedef typename boost::remove_cv<T>::type T2;
-    typedef typename boost::remove_cv<U>::type U2;
+    typedef typename cppmsboost::remove_cv<T>::type T2;
+    typedef typename cppmsboost::remove_cv<U>::type U2;
 
 public:
 
-    typedef typename boost::conditional<
+    typedef typename cppmsboost::conditional<
 
-        boost::is_same<T2, U2>::value || boost::is_void<T2>::value || boost::is_base_of<T2, U2>::value,
-        typename boost::copy_cv<T, U>::type,
-        typename boost::copy_cv<U, T>::type
+        cppmsboost::is_same<T2, U2>::value || cppmsboost::is_void<T2>::value || cppmsboost::is_base_of<T2, U2>::value,
+        typename cppmsboost::copy_cv<T, U>::type,
+        typename cppmsboost::copy_cv<U, T>::type
 
     >::type type;
 };
@@ -116,15 +116,15 @@ template<class T, class U> struct composite_pointer_impl
 {
 private:
 
-    typedef typename boost::remove_cv<T>::type T2;
-    typedef typename boost::remove_cv<U>::type U2;
+    typedef typename cppmsboost::remove_cv<T>::type T2;
+    typedef typename cppmsboost::remove_cv<U>::type U2;
 
 public:
 
-    typedef typename boost::copy_cv<typename boost::copy_cv<typename composite_pointer_type<T2, U2>::type const, T>::type, U>::type type;
+    typedef typename cppmsboost::copy_cv<typename cppmsboost::copy_cv<typename composite_pointer_type<T2, U2>::type const, T>::type, U>::type type;
 };
 
-//Old compilers like MSVC-7.1 have problems using boost::conditional in
+//Old compilers like MSVC-7.1 have problems using cppmsboost::conditional in
 //composite_pointer_type. Partially specializing on has_common_pointee<T, U>::value
 //seems to make their life easier
 template<class T, class U, bool = has_common_pointee<T, U>::value >
@@ -148,6 +148,6 @@ template<class T, class U> struct composite_pointer_type<T*, U*>
 
 } // namespace type_traits_detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_TYPE_TRAITS_DETAIL_COMPOSITE_POINTER_TYPE_HPP_INCLUDED

@@ -288,9 +288,7 @@ namespace cppmicroservices
             return { nullptr, ::free };
         }
 
-        auto data = d->archive->GetResourceContainer()->GetData(d->stat.index);
-
-        return data;
+        return d->archive->GetResourceContainer()->GetData(d->stat.index);
     }
 
     std::ostream&

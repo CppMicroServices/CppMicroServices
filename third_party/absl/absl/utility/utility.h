@@ -161,8 +161,8 @@ using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
 
 #ifdef ABSL_USES_STD_OPTIONAL
 
-using std::in_place;
 using std::in_place_t;
+using std::in_place;
 
 #else  // ABSL_USES_STD_OPTIONAL
 

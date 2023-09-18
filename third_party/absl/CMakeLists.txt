@@ -17,7 +17,9 @@ set(_ABSL_SRCS
   "absl/strings/string_view.cc"
   "absl/strings/internal/charconv_bigint.cc"
   "absl/strings/internal/charconv_parse.cc"
+  "absl/strings/internal/has_absl_stringify.h"
   "absl/strings/internal/memutil.cc"
+  "absl/strings/internal/stringify_sink.h"
 
   "absl/types/bad_optional_access.cc"
 )

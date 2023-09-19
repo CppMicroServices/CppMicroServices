@@ -112,7 +112,7 @@ license you like.
  */
 
 namespace Json {
-static inline char getDecimalPoint() {
+char getDecimalPoint() {
 #ifdef JSONCPP_NO_LOCALE_SUPPORT
   return '\0';
 #else
@@ -2390,7 +2390,7 @@ ValueIterator::ValueIterator(const ValueConstIterator& other)
   throwRuntimeError("ConstIterator to Iterator should never be allowed.");
 }
 
-ValueIterator::ValueIterator(const ValueIterator& other) = default;
+ValueIterator::ValueIterator(const ValueIterator&) = default;
 
 ValueIterator& ValueIterator::operator=(const SelfType& other) {
   copy(other);

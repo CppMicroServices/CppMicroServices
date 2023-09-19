@@ -4,7 +4,7 @@
 #pragma once
 
 #ifndef SPDLOG_HEADER_ONLY
-#include <spdlog/details/backtracer.h>
+#    include <spdlog/details/backtracer.h>
 #endif
 namespace spdlog {
 namespace details {
@@ -52,6 +52,12 @@ SPDLOG_INLINE void backtracer::push_back(const log_msg &msg)
 {
     std::lock_guard<std::mutex> lock{mutex_};
     messages_.push_back(log_msg_buffer{msg});
+}
+
+SPDLOG_INLINE bool backtracer::empty() const
+{
+    std::lock_guard<std::mutex> lock{mutex_};
+    return messages_.empty();
 }
 
 // pop all items in the q and apply the given fun on each of them.

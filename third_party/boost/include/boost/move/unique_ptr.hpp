@@ -45,7 +45,7 @@
 //!   - <tt>unique_ptr<T[]></tt> is constructible and assignable from <tt>unique_ptr<U[]></tt> if
 //!      cv-less T and cv-less U are the same type and T is more CV qualified than U.
 
-namespace boost{
+namespace cppmsboost{
 // @cond
 namespace move_upd {
 
@@ -79,7 +79,7 @@ struct deleter_types
       < is_noncopyable<D>::value, bmupmu::nat, del_cref>::type       non_ref_deleter_arg1;
    typedef typename bmupmu::if_c< bmupmu::is_lvalue_reference<D>::value
                        , D, non_ref_deleter_arg1 >::type          deleter_arg_type1;
-   typedef ::boost::rv<D> &                                       deleter_arg_type2;
+   typedef ::cppmsboost::rv<D> &                                       deleter_arg_type2;
    #endif
 };
 
@@ -107,7 +107,7 @@ struct unique_ptr_data
 
    template <class U>
    BOOST_MOVE_FORCEINLINE unique_ptr_data(P p, BOOST_FWD_REF(U) d1) BOOST_NOEXCEPT
-      : m_p(p), d(::boost::forward<U>(d1))
+      : m_p(p), d(::cppmsboost::forward<U>(d1))
    {}
 
    BOOST_MOVE_FORCEINLINE del_ref deleter()       { return d; }
@@ -143,7 +143,7 @@ struct unique_ptr_data<P, D, false>
 
    template <class U>
    BOOST_MOVE_FORCEINLINE unique_ptr_data(P p, BOOST_FWD_REF(U) d) BOOST_NOEXCEPT
-      : D(::boost::forward<U>(d)), m_p(p)
+      : D(::cppmsboost::forward<U>(d)), m_p(p)
    {}
 
    BOOST_MOVE_FORCEINLINE del_ref deleter()        BOOST_NOEXCEPT   {  return static_cast<del_ref>(*this);   }
@@ -256,8 +256,8 @@ class is_rvalue_convertible
    typedef typename bmupmu::remove_reference<T>::type&& t_from;
    #else
    typedef typename bmupmu::if_c
-      < ::boost::has_move_emulation_enabled<T>::value && !bmupmu::is_reference<T>::value
-      , ::boost::rv<T>&
+      < ::cppmsboost::has_move_emulation_enabled<T>::value && !bmupmu::is_reference<T>::value
+      , ::cppmsboost::rv<T>&
       , typename bmupmu::add_lvalue_reference<T>::type
       >::type t_from;
    #endif
@@ -430,7 +430,7 @@ class unique_ptr
    {
       //If T is not an array type, element_type_t<Pointer> derives from T
       //it uses the default deleter and T has no virtual destructor, then you have a problem
-      BOOST_STATIC_ASSERT(( !::boost::move_upmu::missing_virtual_destructor
+      BOOST_STATIC_ASSERT(( !::cppmsboost::move_upmu::missing_virtual_destructor
                             <D, typename bmupd::get_element_type<Pointer>::type>::value ));
       //If this constructor is instantiated with a pointer type or reference type
       //for the template argument D, the program is ill-formed.
@@ -468,7 +468,7 @@ class unique_ptr
    {
       //If T is not an array type, element_type_t<Pointer> derives from T
       //it uses the default deleter and T has no virtual destructor, then you have a problem
-      BOOST_STATIC_ASSERT(( !::boost::move_upmu::missing_virtual_destructor
+      BOOST_STATIC_ASSERT(( !::cppmsboost::move_upmu::missing_virtual_destructor
                             <D, typename bmupd::get_element_type<Pointer>::type>::value ));
    }
 
@@ -502,18 +502,18 @@ class unique_ptr
    BOOST_MOVE_FORCEINLINE unique_ptr(Pointer p, BOOST_MOVE_SEEDOC(deleter_arg_type2) d2
       BOOST_MOVE_DOCIGN(BOOST_MOVE_I typename bmupd::enable_up_ptr<T BOOST_MOVE_I Pointer BOOST_MOVE_I pointer>::type* =0)
              ) BOOST_NOEXCEPT
-      : m_data(p, ::boost::move(d2))
+      : m_data(p, ::cppmsboost::move(d2))
    {
       //If T is not an array type, element_type_t<Pointer> derives from T
       //it uses the default deleter and T has no virtual destructor, then you have a problem
-      BOOST_STATIC_ASSERT(( !::boost::move_upmu::missing_virtual_destructor
+      BOOST_STATIC_ASSERT(( !::cppmsboost::move_upmu::missing_virtual_destructor
                             <D, typename bmupd::get_element_type<Pointer>::type>::value ));
    }
 
    //! <b>Effects</b>: Same effects as <tt>template<class Pointer> unique_ptr(Pointer p, deleter_arg_type2 d2)</tt>
    //!   and additionally <tt>get() == nullptr</tt>
    BOOST_MOVE_FORCEINLINE unique_ptr(BOOST_MOVE_DOC0PTR(bmupd::nullptr_type), BOOST_MOVE_SEEDOC(deleter_arg_type2) d2) BOOST_NOEXCEPT
-      : m_data(pointer(), ::boost::move(d2))
+      : m_data(pointer(), ::cppmsboost::move(d2))
    {}
 
    //! <b>Requires</b>: If D is not a reference type, D shall satisfy the requirements of MoveConstructible.
@@ -527,7 +527,7 @@ class unique_ptr
    //! returns a reference to the stored deleter that was constructed from u.get_deleter(). If D is a
    //! reference type then <tt>get_deleter()</tt> and <tt>u.get_deleter()</tt> both reference the same lvalue deleter.
    BOOST_MOVE_FORCEINLINE unique_ptr(BOOST_RV_REF(unique_ptr) u) BOOST_NOEXCEPT
-      : m_data(u.release(), ::boost::move_if_not_lvalue_reference<D>(u.get_deleter()))
+      : m_data(u.release(), ::cppmsboost::move_if_not_lvalue_reference<D>(u.get_deleter()))
    {}
 
    //! <b>Requires</b>: If E is not a reference type, construction of the deleter from an rvalue of type E shall be
@@ -549,11 +549,11 @@ class unique_ptr
    BOOST_MOVE_FORCEINLINE unique_ptr( BOOST_RV_REF_BEG_IF_CXX11 unique_ptr<U, E> BOOST_RV_REF_END_IF_CXX11 u
       BOOST_MOVE_DOCIGN(BOOST_MOVE_I typename bmupd::enable_up_moveconv_constr<T BOOST_MOVE_I D BOOST_MOVE_I U BOOST_MOVE_I E>::type* =0)
       ) BOOST_NOEXCEPT
-      : m_data(u.release(), ::boost::move_if_not_lvalue_reference<E>(u.get_deleter()))
+      : m_data(u.release(), ::cppmsboost::move_if_not_lvalue_reference<E>(u.get_deleter()))
    {
       //If T is not an array type, U derives from T
       //it uses the default deleter and T has no virtual destructor, then you have a problem
-      BOOST_STATIC_ASSERT(( !::boost::move_upmu::missing_virtual_destructor
+      BOOST_STATIC_ASSERT(( !::cppmsboost::move_upmu::missing_virtual_destructor
                             <D, typename unique_ptr<U, E>::pointer>::value ));
    }
 
@@ -578,7 +578,7 @@ class unique_ptr
    unique_ptr& operator=(BOOST_RV_REF(unique_ptr) u) BOOST_NOEXCEPT
    {
       this->reset(u.release());
-      m_data.deleter() = ::boost::move_if_not_lvalue_reference<D>(u.get_deleter());
+      m_data.deleter() = ::cppmsboost::move_if_not_lvalue_reference<D>(u.get_deleter());
       return *this;
    }
 
@@ -600,7 +600,7 @@ class unique_ptr
       operator=(BOOST_RV_REF_BEG unique_ptr<U, E> BOOST_RV_REF_END u) BOOST_NOEXCEPT
    {
       this->reset(u.release());
-      m_data.deleter() = ::boost::move_if_not_lvalue_reference<E>(u.get_deleter());
+      m_data.deleter() = ::cppmsboost::move_if_not_lvalue_reference<E>(u.get_deleter());
       return *this;
    }
 
@@ -711,7 +711,7 @@ class unique_ptr
    {
       //If T is not an array type, element_type_t<Pointer> derives from T
       //it uses the default deleter and T has no virtual destructor, then you have a problem
-      BOOST_STATIC_ASSERT(( !::boost::move_upmu::missing_virtual_destructor
+      BOOST_STATIC_ASSERT(( !::cppmsboost::move_upmu::missing_virtual_destructor
                             <D, typename bmupd::get_element_type<Pointer>::type>::value ));
       pointer tmp = m_data.m_p;
       m_data.m_p = p;
@@ -740,8 +740,8 @@ class unique_ptr
    //! <b>Effects</b>: Invokes swap on the stored pointers and on the stored deleters of *this and u.
    void swap(unique_ptr& u) BOOST_NOEXCEPT
    {
-      ::boost::adl_move_swap(m_data.m_p, u.m_data.m_p);
-      ::boost::adl_move_swap(m_data.deleter(), u.m_data.deleter());
+      ::cppmsboost::adl_move_swap(m_data.m_p, u.m_data.m_p);
+      ::cppmsboost::adl_move_swap(m_data.deleter(), u.m_data.deleter());
    }
 };
 
@@ -864,7 +864,7 @@ BOOST_MOVE_FORCEINLINE bool operator>=(BOOST_MOVE_DOC0PTR(bmupd::nullptr_type), 
 {  return !(bmupd::nullptr_type() < x);  }
 
 }  //namespace movelib {
-}  //namespace boost{
+}  //namespace cppmsboost{
 
 #include <boost/move/detail/config_end.hpp>
 

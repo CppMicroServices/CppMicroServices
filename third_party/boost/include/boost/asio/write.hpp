@@ -27,11 +27,11 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /**
- * @defgroup write boost::asio::write
+ * @defgroup write cppmsboost::asio::write
  *
  * @brief The @c write function is a composed operation that writes a certain
  * amount of data to a stream before returning.
@@ -60,19 +60,19 @@ namespace asio {
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
- * @code boost::asio::write(s, boost::asio::buffer(data, size)); @endcode
+ * @code cppmsboost::asio::write(s, cppmsboost::asio::buffer(data, size)); @endcode
  * See the @ref buffer documentation for information on writing multiple
- * buffers in one go, and how to use it with arrays, boost::array or
+ * buffers in one go, and how to use it with arrays, cppmsboost::array or
  * std::vector.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code cppmsboost::asio::write(
  *     s, buffers,
- *     boost::asio::transfer_all()); @endcode
+ *     cppmsboost::asio::transfer_all()); @endcode
  */
 template <typename SyncWriteStream, typename ConstBufferSequence>
 std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
@@ -106,19 +106,19 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
- * @code boost::asio::write(s, boost::asio::buffer(data, size), ec); @endcode
+ * @code cppmsboost::asio::write(s, cppmsboost::asio::buffer(data, size), ec); @endcode
  * See the @ref buffer documentation for information on writing multiple
- * buffers in one go, and how to use it with arrays, boost::array or
+ * buffers in one go, and how to use it with arrays, cppmsboost::array or
  * std::vector.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code cppmsboost::asio::write(
  *     s, buffers,
- *     boost::asio::transfer_all(), ec); @endcode
+ *     cppmsboost::asio::transfer_all(), ec); @endcode
  */
 template <typename SyncWriteStream, typename ConstBufferSequence>
 std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
-    boost::system::error_code& ec,
+    cppmsboost::system::error_code& ec,
     typename enable_if<
       is_const_buffer_sequence<ConstBufferSequence>::value
     >::type* = 0);
@@ -148,7 +148,7 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -159,14 +159,14 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
- * @code boost::asio::write(s, boost::asio::buffer(data, size),
- *     boost::asio::transfer_at_least(32)); @endcode
+ * @code cppmsboost::asio::write(s, cppmsboost::asio::buffer(data, size),
+ *     cppmsboost::asio::transfer_at_least(32)); @endcode
  * See the @ref buffer documentation for information on writing multiple
- * buffers in one go, and how to use it with arrays, boost::array or
+ * buffers in one go, and how to use it with arrays, cppmsboost::array or
  * std::vector.
  */
 template <typename SyncWriteStream, typename ConstBufferSequence,
@@ -202,7 +202,7 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -219,7 +219,7 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
 template <typename SyncWriteStream, typename ConstBufferSequence,
     typename CompletionCondition>
 std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
-    CompletionCondition completion_condition, boost::system::error_code& ec,
+    CompletionCondition completion_condition, cppmsboost::system::error_code& ec,
     typename enable_if<
       is_const_buffer_sequence<ConstBufferSequence>::value
     >::type* = 0);
@@ -246,12 +246,12 @@ std::size_t write(SyncWriteStream& s, const ConstBufferSequence& buffers,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code cppmsboost::asio::write(
  *     s, buffers,
- *     boost::asio::transfer_all()); @endcode
+ *     cppmsboost::asio::transfer_all()); @endcode
  */
 template <typename SyncWriteStream, typename DynamicBuffer_v1>
 std::size_t write(SyncWriteStream& s,
@@ -284,14 +284,14 @@ std::size_t write(SyncWriteStream& s,
  * @returns The number of bytes transferred.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code cppmsboost::asio::write(
  *     s, buffers,
- *     boost::asio::transfer_all(), ec); @endcode
+ *     cppmsboost::asio::transfer_all(), ec); @endcode
  */
 template <typename SyncWriteStream, typename DynamicBuffer_v1>
 std::size_t write(SyncWriteStream& s,
     BOOST_ASIO_MOVE_ARG(DynamicBuffer_v1) buffers,
-    boost::system::error_code& ec,
+    cppmsboost::system::error_code& ec,
     typename enable_if<
       is_dynamic_buffer_v1<typename decay<DynamicBuffer_v1>::type>::value
         && !is_dynamic_buffer_v2<typename decay<DynamicBuffer_v1>::type>::value
@@ -320,7 +320,7 @@ std::size_t write(SyncWriteStream& s,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -331,7 +331,7 @@ std::size_t write(SyncWriteStream& s,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  */
 template <typename SyncWriteStream, typename DynamicBuffer_v1,
     typename CompletionCondition>
@@ -366,7 +366,7 @@ std::size_t write(SyncWriteStream& s,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -384,7 +384,7 @@ template <typename SyncWriteStream, typename DynamicBuffer_v1,
     typename CompletionCondition>
 std::size_t write(SyncWriteStream& s,
     BOOST_ASIO_MOVE_ARG(DynamicBuffer_v1) buffers,
-    CompletionCondition completion_condition, boost::system::error_code& ec,
+    CompletionCondition completion_condition, cppmsboost::system::error_code& ec,
     typename enable_if<
       is_dynamic_buffer_v1<typename decay<DynamicBuffer_v1>::type>::value
         && !is_dynamic_buffer_v2<typename decay<DynamicBuffer_v1>::type>::value
@@ -412,12 +412,12 @@ std::size_t write(SyncWriteStream& s,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code cppmsboost::asio::write(
  *     s, b,
- *     boost::asio::transfer_all()); @endcode
+ *     cppmsboost::asio::transfer_all()); @endcode
  */
 template <typename SyncWriteStream, typename Allocator>
 std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b);
@@ -444,13 +444,13 @@ std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b);
  * @returns The number of bytes transferred.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code cppmsboost::asio::write(
  *     s, b,
- *     boost::asio::transfer_all(), ec); @endcode
+ *     cppmsboost::asio::transfer_all(), ec); @endcode
  */
 template <typename SyncWriteStream, typename Allocator>
 std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
-    boost::system::error_code& ec);
+    cppmsboost::system::error_code& ec);
 
 /// Write a certain amount of data to a stream before returning.
 /**
@@ -474,7 +474,7 @@ std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -485,7 +485,7 @@ std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  */
 template <typename SyncWriteStream, typename Allocator,
     typename CompletionCondition>
@@ -514,7 +514,7 @@ std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -531,7 +531,7 @@ std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
 template <typename SyncWriteStream, typename Allocator,
     typename CompletionCondition>
 std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
-    CompletionCondition completion_condition, boost::system::error_code& ec);
+    CompletionCondition completion_condition, cppmsboost::system::error_code& ec);
 
 #endif // !defined(BOOST_ASIO_NO_IOSTREAM)
 #endif // !defined(BOOST_ASIO_NO_EXTENSIONS)
@@ -557,12 +557,12 @@ std::size_t write(SyncWriteStream& s, basic_streambuf<Allocator>& b,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code cppmsboost::asio::write(
  *     s, buffers,
- *     boost::asio::transfer_all()); @endcode
+ *     cppmsboost::asio::transfer_all()); @endcode
  */
 template <typename SyncWriteStream, typename DynamicBuffer_v2>
 std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
@@ -593,13 +593,13 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  * @returns The number of bytes transferred.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write(
+ * @code cppmsboost::asio::write(
  *     s, buffers,
- *     boost::asio::transfer_all(), ec); @endcode
+ *     cppmsboost::asio::transfer_all(), ec); @endcode
  */
 template <typename SyncWriteStream, typename DynamicBuffer_v2>
 std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
-    boost::system::error_code& ec,
+    cppmsboost::system::error_code& ec,
     typename enable_if<
       is_dynamic_buffer_v2<DynamicBuffer_v2>::value
     >::type* = 0);
@@ -627,7 +627,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -638,7 +638,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  */
 template <typename SyncWriteStream, typename DynamicBuffer_v2,
     typename CompletionCondition>
@@ -671,7 +671,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -688,14 +688,14 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
 template <typename SyncWriteStream, typename DynamicBuffer_v2,
     typename CompletionCondition>
 std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
-    CompletionCondition completion_condition, boost::system::error_code& ec,
+    CompletionCondition completion_condition, cppmsboost::system::error_code& ec,
     typename enable_if<
       is_dynamic_buffer_v2<DynamicBuffer_v2>::value
     >::type* = 0);
 
 /*@}*/
 /**
- * @defgroup async_write boost::asio::async_write
+ * @defgroup async_write cppmsboost::asio::async_write
  *
  * @brief The @c async_write function is a composed asynchronous operation that
  * writes a certain amount of data to a stream before completion.
@@ -733,7 +733,7 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  * Copies will be made of the handler as required. The function signature of
  * the handler must be:
  * @code void handler(
- *   const boost::system::error_code& error, // Result of operation.
+ *   const cppmsboost::system::error_code& error, // Result of operation.
  *
  *   std::size_t bytes_transferred           // Number of bytes written from the
  *                                           // buffers. If an error occurred,
@@ -743,24 +743,24 @@ std::size_t write(SyncWriteStream& s, DynamicBuffer_v2 buffers,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
  * @code
- * boost::asio::async_write(s, boost::asio::buffer(data, size), handler);
+ * cppmsboost::asio::async_write(s, cppmsboost::asio::buffer(data, size), handler);
  * @endcode
  * See the @ref buffer documentation for information on writing multiple
- * buffers in one go, and how to use it with arrays, boost::array or
+ * buffers in one go, and how to use it with arrays, cppmsboost::array or
  * std::vector.
  */
 template <typename AsyncWriteStream, typename ConstBufferSequence,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) WriteHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncWriteStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
     BOOST_ASIO_MOVE_ARG(WriteHandler) handler
       BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(
@@ -801,7 +801,7 @@ async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest async_write_some operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -814,7 +814,7 @@ async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
  * Copies will be made of the handler as required. The function signature of the
  * handler must be:
  * @code void handler(
- *   const boost::system::error_code& error, // Result of operation.
+ *   const cppmsboost::system::error_code& error, // Result of operation.
  *
  *   std::size_t bytes_transferred           // Number of bytes written from the
  *                                           // buffers. If an error occurred,
@@ -824,24 +824,24 @@ async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
- * @code boost::asio::async_write(s,
- *     boost::asio::buffer(data, size),
- *     boost::asio::transfer_at_least(32),
+ * @code cppmsboost::asio::async_write(s,
+ *     cppmsboost::asio::buffer(data, size),
+ *     cppmsboost::asio::transfer_at_least(32),
  *     handler); @endcode
  * See the @ref buffer documentation for information on writing multiple
- * buffers in one go, and how to use it with arrays, boost::array or
+ * buffers in one go, and how to use it with arrays, cppmsboost::array or
  * std::vector.
  */
 template <typename AsyncWriteStream,
     typename ConstBufferSequence, typename CompletionCondition,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) WriteHandler>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
     CompletionCondition completion_condition,
     BOOST_ASIO_MOVE_ARG(WriteHandler) handler,
@@ -882,7 +882,7 @@ async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
  * Copies will be made of the handler as required. The function signature of the
  * handler must be:
  * @code void handler(
- *   const boost::system::error_code& error, // Result of operation.
+ *   const cppmsboost::system::error_code& error, // Result of operation.
  *
  *   std::size_t bytes_transferred           // Number of bytes written from the
  *                                           // buffers. If an error occurred,
@@ -892,15 +892,15 @@ async_write(AsyncWriteStream& s, const ConstBufferSequence& buffers,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  */
 template <typename AsyncWriteStream, typename DynamicBuffer_v1,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) WriteHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncWriteStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_write(AsyncWriteStream& s,
     BOOST_ASIO_MOVE_ARG(DynamicBuffer_v1) buffers,
     BOOST_ASIO_MOVE_ARG(WriteHandler) handler
@@ -943,7 +943,7 @@ async_write(AsyncWriteStream& s,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest async_write_some operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -956,7 +956,7 @@ async_write(AsyncWriteStream& s,
  * Copies will be made of the handler as required. The function signature of the
  * handler must be:
  * @code void handler(
- *   const boost::system::error_code& error, // Result of operation.
+ *   const cppmsboost::system::error_code& error, // Result of operation.
  *
  *   std::size_t bytes_transferred           // Number of bytes written from the
  *                                           // buffers. If an error occurred,
@@ -966,14 +966,14 @@ async_write(AsyncWriteStream& s,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  */
 template <typename AsyncWriteStream,
     typename DynamicBuffer_v1, typename CompletionCondition,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) WriteHandler>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_write(AsyncWriteStream& s,
     BOOST_ASIO_MOVE_ARG(DynamicBuffer_v1) buffers,
     CompletionCondition completion_condition,
@@ -1015,7 +1015,7 @@ async_write(AsyncWriteStream& s,
  * Copies will be made of the handler as required. The function signature of the
  * handler must be:
  * @code void handler(
- *   const boost::system::error_code& error, // Result of operation.
+ *   const cppmsboost::system::error_code& error, // Result of operation.
  *
  *   std::size_t bytes_transferred           // Number of bytes written from the
  *                                           // buffers. If an error occurred,
@@ -1025,15 +1025,15 @@ async_write(AsyncWriteStream& s,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  */
 template <typename AsyncWriteStream, typename Allocator,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) WriteHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncWriteStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
     BOOST_ASIO_MOVE_ARG(WriteHandler) handler
       BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(
@@ -1069,7 +1069,7 @@ async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest async_write_some operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -1082,7 +1082,7 @@ async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
  * Copies will be made of the handler as required. The function signature of the
  * handler must be:
  * @code void handler(
- *   const boost::system::error_code& error, // Result of operation.
+ *   const cppmsboost::system::error_code& error, // Result of operation.
  *
  *   std::size_t bytes_transferred           // Number of bytes written from the
  *                                           // buffers. If an error occurred,
@@ -1092,14 +1092,14 @@ async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  */
 template <typename AsyncWriteStream,
     typename Allocator, typename CompletionCondition,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) WriteHandler>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
     CompletionCondition completion_condition,
     BOOST_ASIO_MOVE_ARG(WriteHandler) handler);
@@ -1139,7 +1139,7 @@ async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
  * Copies will be made of the handler as required. The function signature of the
  * handler must be:
  * @code void handler(
- *   const boost::system::error_code& error, // Result of operation.
+ *   const cppmsboost::system::error_code& error, // Result of operation.
  *
  *   std::size_t bytes_transferred           // Number of bytes written from the
  *                                           // buffers. If an error occurred,
@@ -1149,15 +1149,15 @@ async_write(AsyncWriteStream& s, basic_streambuf<Allocator>& b,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  */
 template <typename AsyncWriteStream, typename DynamicBuffer_v2,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) WriteHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncWriteStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
     BOOST_ASIO_MOVE_ARG(WriteHandler) handler
       BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(
@@ -1198,7 +1198,7 @@ async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest async_write_some operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -1211,7 +1211,7 @@ async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
  * Copies will be made of the handler as required. The function signature of the
  * handler must be:
  * @code void handler(
- *   const boost::system::error_code& error, // Result of operation.
+ *   const cppmsboost::system::error_code& error, // Result of operation.
  *
  *   std::size_t bytes_transferred           // Number of bytes written from the
  *                                           // buffers. If an error occurred,
@@ -1221,14 +1221,14 @@ async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  */
 template <typename AsyncWriteStream,
     typename DynamicBuffer_v2, typename CompletionCondition,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) WriteHandler>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
     CompletionCondition completion_condition,
     BOOST_ASIO_MOVE_ARG(WriteHandler) handler,
@@ -1239,7 +1239,7 @@ async_write(AsyncWriteStream& s, DynamicBuffer_v2 buffers,
 /*@}*/
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

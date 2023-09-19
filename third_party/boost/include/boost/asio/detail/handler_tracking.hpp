@@ -17,13 +17,13 @@
 
 #include <boost/asio/detail/config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 class execution_context;
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #if defined(BOOST_ASIO_CUSTOM_HANDLER_TRACKING)
 # include BOOST_ASIO_CUSTOM_HANDLER_TRACKING
@@ -36,7 +36,7 @@ class execution_context;
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -110,19 +110,19 @@ public:
     BOOST_ASIO_DECL void invocation_begin();
 
     // Records that handler is to be invoked with one arguments.
-    BOOST_ASIO_DECL void invocation_begin(const boost::system::error_code& ec);
+    BOOST_ASIO_DECL void invocation_begin(const cppmsboost::system::error_code& ec);
 
     // Constructor records that handler is to be invoked with two arguments.
     BOOST_ASIO_DECL void invocation_begin(
-        const boost::system::error_code& ec, std::size_t bytes_transferred);
+        const cppmsboost::system::error_code& ec, std::size_t bytes_transferred);
 
     // Constructor records that handler is to be invoked with two arguments.
     BOOST_ASIO_DECL void invocation_begin(
-        const boost::system::error_code& ec, int signal_number);
+        const cppmsboost::system::error_code& ec, int signal_number);
 
     // Constructor records that handler is to be invoked with two arguments.
     BOOST_ASIO_DECL void invocation_begin(
-        const boost::system::error_code& ec, const char* arg);
+        const cppmsboost::system::error_code& ec, const char* arg);
 
     // Record that handler invocation has ended.
     BOOST_ASIO_DECL void invocation_end();
@@ -154,12 +154,12 @@ public:
   // Record a reactor-based operation that is associated with a handler.
   BOOST_ASIO_DECL static void reactor_operation(
       const tracked_handler& h, const char* op_name,
-      const boost::system::error_code& ec);
+      const cppmsboost::system::error_code& ec);
 
   // Record a reactor-based operation that is associated with a handler.
   BOOST_ASIO_DECL static void reactor_operation(
       const tracked_handler& h, const char* op_name,
-      const boost::system::error_code& ec, std::size_t bytes_transferred);
+      const cppmsboost::system::error_code& ec, std::size_t bytes_transferred);
 
   // Write a line of output.
   BOOST_ASIO_DECL static void write_line(const char* format, ...);
@@ -170,19 +170,19 @@ private:
 };
 
 # define BOOST_ASIO_INHERIT_TRACKED_HANDLER \
-  : public boost::asio::detail::handler_tracking::tracked_handler
+  : public cppmsboost::asio::detail::handler_tracking::tracked_handler
 
 # define BOOST_ASIO_ALSO_INHERIT_TRACKED_HANDLER \
-  , public boost::asio::detail::handler_tracking::tracked_handler
+  , public cppmsboost::asio::detail::handler_tracking::tracked_handler
 
 # define BOOST_ASIO_HANDLER_TRACKING_INIT \
-  boost::asio::detail::handler_tracking::init()
+  cppmsboost::asio::detail::handler_tracking::init()
 
 # define BOOST_ASIO_HANDLER_CREATION(args) \
-  boost::asio::detail::handler_tracking::creation args
+  cppmsboost::asio::detail::handler_tracking::creation args
 
 # define BOOST_ASIO_HANDLER_COMPLETION(args) \
-  boost::asio::detail::handler_tracking::completion tracked_completion args
+  cppmsboost::asio::detail::handler_tracking::completion tracked_completion args
 
 # define BOOST_ASIO_HANDLER_INVOCATION_BEGIN(args) \
   tracked_completion.invocation_begin args
@@ -191,23 +191,23 @@ private:
   tracked_completion.invocation_end()
 
 # define BOOST_ASIO_HANDLER_OPERATION(args) \
-  boost::asio::detail::handler_tracking::operation args
+  cppmsboost::asio::detail::handler_tracking::operation args
 
 # define BOOST_ASIO_HANDLER_REACTOR_REGISTRATION(args) \
-  boost::asio::detail::handler_tracking::reactor_registration args
+  cppmsboost::asio::detail::handler_tracking::reactor_registration args
 
 # define BOOST_ASIO_HANDLER_REACTOR_DEREGISTRATION(args) \
-  boost::asio::detail::handler_tracking::reactor_deregistration args
+  cppmsboost::asio::detail::handler_tracking::reactor_deregistration args
 
 # define BOOST_ASIO_HANDLER_REACTOR_READ_EVENT 1
 # define BOOST_ASIO_HANDLER_REACTOR_WRITE_EVENT 2
 # define BOOST_ASIO_HANDLER_REACTOR_ERROR_EVENT 4
 
 # define BOOST_ASIO_HANDLER_REACTOR_EVENTS(args) \
-  boost::asio::detail::handler_tracking::reactor_events args
+  cppmsboost::asio::detail::handler_tracking::reactor_events args
 
 # define BOOST_ASIO_HANDLER_REACTOR_OPERATION(args) \
-  boost::asio::detail::handler_tracking::reactor_operation args
+  cppmsboost::asio::detail::handler_tracking::reactor_operation args
 
 #else // defined(BOOST_ASIO_ENABLE_HANDLER_TRACKING)
 
@@ -231,7 +231,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

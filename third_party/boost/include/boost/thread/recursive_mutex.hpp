@@ -20,7 +20,7 @@
 
 #include <boost/thread/lockable_traits.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   namespace sync
   {

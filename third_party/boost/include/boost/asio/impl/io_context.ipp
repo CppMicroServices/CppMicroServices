@@ -31,7 +31,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 io_context::io_context()
@@ -48,8 +48,8 @@ io_context::io_context(int concurrency_hint)
 
 io_context::impl_type& io_context::add_impl(io_context::impl_type* impl)
 {
-  boost::asio::detail::scoped_ptr<impl_type> scoped_impl(impl);
-  boost::asio::add_service<impl_type>(*this, scoped_impl.get());
+  cppmsboost::asio::detail::scoped_ptr<impl_type> scoped_impl(impl);
+  cppmsboost::asio::add_service<impl_type>(*this, scoped_impl.get());
   return *scoped_impl.release();
 }
 
@@ -59,14 +59,14 @@ io_context::~io_context()
 
 io_context::count_type io_context::run()
 {
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   count_type s = impl_.run(ec);
-  boost::asio::detail::throw_error(ec);
+  cppmsboost::asio::detail::throw_error(ec);
   return s;
 }
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
-io_context::count_type io_context::run(boost::system::error_code& ec)
+io_context::count_type io_context::run(cppmsboost::system::error_code& ec)
 {
   return impl_.run(ec);
 }
@@ -74,14 +74,14 @@ io_context::count_type io_context::run(boost::system::error_code& ec)
 
 io_context::count_type io_context::run_one()
 {
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   count_type s = impl_.run_one(ec);
-  boost::asio::detail::throw_error(ec);
+  cppmsboost::asio::detail::throw_error(ec);
   return s;
 }
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
-io_context::count_type io_context::run_one(boost::system::error_code& ec)
+io_context::count_type io_context::run_one(cppmsboost::system::error_code& ec)
 {
   return impl_.run_one(ec);
 }
@@ -89,14 +89,14 @@ io_context::count_type io_context::run_one(boost::system::error_code& ec)
 
 io_context::count_type io_context::poll()
 {
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   count_type s = impl_.poll(ec);
-  boost::asio::detail::throw_error(ec);
+  cppmsboost::asio::detail::throw_error(ec);
   return s;
 }
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
-io_context::count_type io_context::poll(boost::system::error_code& ec)
+io_context::count_type io_context::poll(cppmsboost::system::error_code& ec)
 {
   return impl_.poll(ec);
 }
@@ -104,14 +104,14 @@ io_context::count_type io_context::poll(boost::system::error_code& ec)
 
 io_context::count_type io_context::poll_one()
 {
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   count_type s = impl_.poll_one(ec);
-  boost::asio::detail::throw_error(ec);
+  cppmsboost::asio::detail::throw_error(ec);
   return s;
 }
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
-io_context::count_type io_context::poll_one(boost::system::error_code& ec)
+io_context::count_type io_context::poll_one(cppmsboost::system::error_code& ec)
 {
   return impl_.poll_one(ec);
 }
@@ -132,7 +132,7 @@ void io_context::restart()
   impl_.restart();
 }
 
-io_context::service::service(boost::asio::io_context& owner)
+io_context::service::service(cppmsboost::asio::io_context& owner)
   : execution_context::service(owner)
 {
 }
@@ -170,7 +170,7 @@ void io_context::service::fork_service(io_context::fork_event)
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

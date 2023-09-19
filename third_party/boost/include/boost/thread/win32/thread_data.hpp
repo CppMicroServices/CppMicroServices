@@ -30,7 +30,7 @@
 #pragma warning(disable:4251)
 #endif
 
-namespace boost
+namespace cppmsboost
 {
   class condition_variable;
   class mutex;
@@ -108,9 +108,9 @@ namespace boost
             detail::win32::handle_manager thread_handle;
 #endif
 
-            boost::detail::thread_exit_callback_node* thread_exit_callbacks;
+            cppmsboost::detail::thread_exit_callback_node* thread_exit_callbacks;
             unsigned id;
-            std::map<void const*,boost::detail::tss_data_node> tss_data;
+            std::map<void const*,cppmsboost::detail::tss_data_node> tss_data;
             typedef std::vector<std::pair<condition_variable*, mutex*>
             //, hidden_allocator<std::pair<condition_variable*, mutex*> >
             > notify_list_t;
@@ -182,7 +182,7 @@ namespace boost
         };
         BOOST_THREAD_DECL thread_data_base* get_current_thread_data();
 
-        typedef boost::intrusive_ptr<detail::thread_data_base> thread_data_ptr;
+        typedef cppmsboost::intrusive_ptr<detail::thread_data_base> thread_data_ptr;
     }
 
     namespace this_thread

@@ -24,7 +24,7 @@
 #include <cstddef> // size_t
 #include <boost/type_traits/integral_constant.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 #if defined( __CODEGEARC__ )
 
@@ -41,7 +41,7 @@ namespace boost {
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_IS_CONST_HPP_INCLUDED
 

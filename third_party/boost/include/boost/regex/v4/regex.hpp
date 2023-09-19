@@ -13,7 +13,7 @@
   *   LOCATION:    see http://www.boost.org for most recent version.
   *   FILE         regex.cpp
   *   VERSION      see <boost/version.hpp>
-  *   DESCRIPTION: Declares boost::basic_regex<> and associated
+  *   DESCRIPTION: Declares cppmsboost::basic_regex<> and associated
   *                functions and classes. This header is the main
   *                entry point for the template regex code.
   */
@@ -125,7 +125,7 @@
 #endif
 
 
-namespace boost{
+namespace cppmsboost{
 #ifdef BOOST_REGEX_NO_FWD
 typedef basic_regex<char, regex_traits<char> > regex;
 #ifndef BOOST_NO_WREGEX
@@ -140,7 +140,7 @@ typedef match_results<const wchar_t*> wcmatch;
 typedef match_results<std::wstring::const_iterator> wsmatch;
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 #ifndef BOOST_REGEX_MATCH_HPP
 #include <boost/regex/v4/regex_match.hpp>
 #endif

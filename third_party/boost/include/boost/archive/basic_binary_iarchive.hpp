@@ -40,7 +40,7 @@
 
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 namespace detail {
@@ -89,15 +89,15 @@ protected:
 
     void load_override(tracking_type & t, int /*version*/){
         library_version_type lvt = this->get_library_version();
-        if(boost::archive::library_version_type(6) < lvt){
+        if(cppmsboost::archive::library_version_type(6) < lvt){
             int_least8_t x=0;
             * this->This() >> x;
-            t = boost::archive::tracking_type(x);
+            t = cppmsboost::archive::tracking_type(x);
         }
         else{
             bool x=0;
             * this->This() >> x;
-            t = boost::archive::tracking_type(x);
+            t = cppmsboost::archive::tracking_type(x);
         }
     }
     void load_override(class_id_type & t){
@@ -120,13 +120,13 @@ protected:
          *
          * the fix here decodes class_id_type on 16bit for all v <= 7, which seems to be the correct behaviour ...
          */
-        if(boost::archive::library_version_type(7) < lvt){
+        if(cppmsboost::archive::library_version_type(7) < lvt){
             this->detail_common_iarchive::load_override(t);
         }
         else{
             int_least16_t x=0;
             * this->This() >> x;
-            t = boost::archive::class_id_type(x);
+            t = cppmsboost::archive::class_id_type(x);
         }
     }
     void load_override(class_id_reference_type & t){
@@ -135,23 +135,23 @@ protected:
 
     void load_override(version_type & t){
         library_version_type lvt = this->get_library_version();
-        if(boost::archive::library_version_type(7) < lvt){
+        if(cppmsboost::archive::library_version_type(7) < lvt){
             this->detail_common_iarchive::load_override(t);
         }
         else
-        if(boost::archive::library_version_type(6) < lvt){
+        if(cppmsboost::archive::library_version_type(6) < lvt){
             uint_least8_t x=0;
             * this->This() >> x;
-            t = boost::archive::version_type(x);
+            t = cppmsboost::archive::version_type(x);
         }
         else
-        if(boost::archive::library_version_type(5) < lvt){
+        if(cppmsboost::archive::library_version_type(5) < lvt){
             uint_least16_t x=0;
             * this->This() >> x;
-            t = boost::archive::version_type(x);
+            t = cppmsboost::archive::version_type(x);
         }
         else
-        if(boost::archive::library_version_type(2) < lvt){
+        if(cppmsboost::archive::library_version_type(2) < lvt){
             // upto 255 versions
             unsigned char x=0;
             * this->This() >> x;
@@ -160,31 +160,31 @@ protected:
         else{
             unsigned int x=0;
             * this->This() >> x;
-            t = boost::archive::version_type(x);
+            t = cppmsboost::archive::version_type(x);
         }
     }
 
-    void load_override(boost::serialization::item_version_type & t){
+    void load_override(cppmsboost::serialization::item_version_type & t){
         library_version_type lvt = this->get_library_version();
-//        if(boost::archive::library_version_type(7) < lvt){
-        if(boost::archive::library_version_type(6) < lvt){
+//        if(cppmsboost::archive::library_version_type(7) < lvt){
+        if(cppmsboost::archive::library_version_type(6) < lvt){
             this->detail_common_iarchive::load_override(t);
         }
         else
-        if(boost::archive::library_version_type(6) < lvt){
+        if(cppmsboost::archive::library_version_type(6) < lvt){
             uint_least16_t x=0;
             * this->This() >> x;
-            t = boost::serialization::item_version_type(x);
+            t = cppmsboost::serialization::item_version_type(x);
         }
         else{
             unsigned int x=0;
             * this->This() >> x;
-            t = boost::serialization::item_version_type(x);
+            t = cppmsboost::serialization::item_version_type(x);
         }
     }
 
     void load_override(serialization::collection_size_type & t){
-        if(boost::archive::library_version_type(5) < this->get_library_version()){
+        if(cppmsboost::archive::library_version_type(5) < this->get_library_version()){
             this->detail_common_iarchive::load_override(t);
         }
         else{
@@ -205,7 +205,7 @@ protected:
 };
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

@@ -9,7 +9,7 @@
 // Preprocessed version of "boost/mpl/quote.hpp" header
 // -- DO NOT modify by hand!
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 template< typename T, bool has_type_ >
 struct quote_impl

@@ -18,7 +18,7 @@
 // 23/02/03 thw
 //
 
-namespace boost
+namespace cppmsboost
 {
 
   namespace iterators
@@ -76,7 +76,7 @@ namespace boost
 
   } // namespace iterators
 
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/iterator/detail/config_undef.hpp>
 

@@ -20,7 +20,7 @@
  composition operators.
 */
 
-namespace boost {
+namespace cppmsboost {
     namespace algorithm {
 
 //  predicate facade ------------------------------------------------------//
@@ -36,7 +36,7 @@ namespace boost {
         struct predicate_facade {};
 
     } // namespace algorithm
-} // namespace boost
+} // namespace cppmsboost
 
 
 #endif  // BOOST_STRING_CLASSIFICATION_DETAIL_HPP

@@ -25,20 +25,20 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace generic {
 
 /// Encapsulates the flags needed for a generic datagram-oriented socket.
 /**
- * The boost::asio::generic::datagram_protocol class contains flags necessary
+ * The cppmsboost::asio::generic::datagram_protocol class contains flags necessary
  * for datagram-oriented sockets of any address family and protocol.
  *
  * @par Examples
  * Constructing using a native address family and socket protocol:
  * @code datagram_protocol p(AF_INET, IPPROTO_UDP); @endcode
  * Constructing from a specific protocol type:
- * @code datagram_protocol p(boost::asio::ip::udp::v4()); @endcode
+ * @code datagram_protocol p(cppmsboost::asio::ip::udp::v4()); @endcode
  *
  * @par Thread Safety
  * @e Distinct @e objects: Safe.@n
@@ -69,7 +69,7 @@ public:
     if (source_protocol.type() != type())
     {
       std::bad_cast ex;
-      boost::asio::detail::throw_exception(ex);
+      cppmsboost::asio::detail::throw_exception(ex);
     }
   }
 
@@ -118,7 +118,7 @@ private:
 
 } // namespace generic
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -15,12 +15,12 @@
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/thread/detail/move.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   namespace thread_detail
   {
     template <typename T1, typename T2>
-    struct is_convertible : boost::is_convertible<T1,T2> {};
+    struct is_convertible : cppmsboost::is_convertible<T1,T2> {};
 
 #if defined  BOOST_NO_CXX11_RVALUE_REFERENCES
 
@@ -37,13 +37,13 @@ namespace boost
 #elif defined __GNUC__ && (__GNUC__ < 4 || ( __GNUC__ == 4 && __GNUC_MINOR__ <= 4 ))
 
     template <typename T1, typename T2>
-    struct is_convertible<T1&, T2&> : boost::is_convertible<T1, T2> {};
+    struct is_convertible<T1&, T2&> : cppmsboost::is_convertible<T1, T2> {};
 #endif
 
 #endif
   }
 
-} // namespace boost
+} // namespace cppmsboost
 
 
 #endif //  BOOST_THREAD_DETAIL_MEMORY_HPP

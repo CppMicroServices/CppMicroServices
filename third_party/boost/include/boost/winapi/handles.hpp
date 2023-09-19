@@ -17,29 +17,29 @@
 
 #if !defined( BOOST_USE_WINDOWS_H )
 extern "C" {
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
-CloseHandle(boost::winapi::HANDLE_ handle);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
+CloseHandle(cppmsboost::winapi::HANDLE_ handle);
 
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
 DuplicateHandle(
-    boost::winapi::HANDLE_ hSourceProcessHandle,
-    boost::winapi::HANDLE_ hSourceHandle,
-    boost::winapi::HANDLE_ hTargetProcessHandle,
-    boost::winapi::HANDLE_* lpTargetHandle,
-    boost::winapi::DWORD_ dwDesiredAccess,
-    boost::winapi::BOOL_ bInheritHandle,
-    boost::winapi::DWORD_ dwOptions);
+    cppmsboost::winapi::HANDLE_ hSourceProcessHandle,
+    cppmsboost::winapi::HANDLE_ hSourceHandle,
+    cppmsboost::winapi::HANDLE_ hTargetProcessHandle,
+    cppmsboost::winapi::HANDLE_* lpTargetHandle,
+    cppmsboost::winapi::DWORD_ dwDesiredAccess,
+    cppmsboost::winapi::BOOL_ bInheritHandle,
+    cppmsboost::winapi::DWORD_ dwOptions);
 
 #if BOOST_USE_WINAPI_VERSION >= BOOST_WINAPI_VERSION_WIN10
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
 CompareObjectHandles(
-    boost::winapi::HANDLE_ hFirstObjectHandle,
-    boost::winapi::HANDLE_ hSecondObjectHandle);
+    cppmsboost::winapi::HANDLE_ hFirstObjectHandle,
+    cppmsboost::winapi::HANDLE_ hSecondObjectHandle);
 #endif
 } // extern "C"
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 
 using ::CloseHandle;

@@ -22,9 +22,9 @@
 #include <boost/config.hpp>
 #include <boost/serialization/level.hpp>
 
-BOOST_CLASS_IMPLEMENTATION(std::string, boost::serialization::primitive_type)
+BOOST_CLASS_IMPLEMENTATION(std::string, cppmsboost::serialization::primitive_type)
 #ifndef BOOST_NO_STD_WSTRING
-BOOST_CLASS_IMPLEMENTATION(std::wstring, boost::serialization::primitive_type)
+BOOST_CLASS_IMPLEMENTATION(std::wstring, cppmsboost::serialization::primitive_type)
 #endif
 
 #endif // BOOST_SERIALIZATION_STRING_HPP

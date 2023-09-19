@@ -25,15 +25,15 @@
 #include <boost/type_traits/is_destructible.hpp>
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 template <typename T> struct has_trivial_destructor : public integral_constant<bool, BOOST_HAS_TRIVIAL_DESTRUCTOR(T)>{};
 #else
 #include <boost/type_traits/is_pod.hpp>
 
-namespace boost{
+namespace cppmsboost{
 
-template <typename T> struct has_trivial_destructor : public integral_constant<bool, ::boost::is_pod<T>::value>{};
+template <typename T> struct has_trivial_destructor : public integral_constant<bool, ::cppmsboost::is_pod<T>::value>{};
 #endif
 
 template <> struct has_trivial_destructor<void> : public false_type{};
@@ -43,6 +43,6 @@ template <> struct has_trivial_destructor<void const volatile> : public false_ty
 template <> struct has_trivial_destructor<void volatile> : public false_type{};
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_HAS_TRIVIAL_DESTRUCTOR_HPP_INCLUDED

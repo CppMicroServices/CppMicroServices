@@ -24,7 +24,7 @@
 #include <boost/config.hpp>
 #include <boost/static_assert.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   namespace detail
   {

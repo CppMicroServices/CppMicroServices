@@ -42,7 +42,7 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 namespace detail {
@@ -95,14 +95,14 @@ protected:
 
     // enable this if we decide to support generation of previous versions
     #if 0
-    void save_override(const boost::archive::version_type & t){
+    void save_override(const cppmsboost::archive::version_type & t){
         library_version_type lvt = this->get_library_version();
-        if(boost::archive::library_version_type(7) < lvt){
+        if(cppmsboost::archive::library_version_type(7) < lvt){
             this->detail_common_oarchive::save_override(t);
         }
         else
-        if(boost::archive::library_version_type(6) < lvt){
-            const boost::uint_least16_t x = t;
+        if(cppmsboost::archive::library_version_type(6) < lvt){
+            const cppmsboost::uint_least16_t x = t;
             * this->This() << x;
         }
         else{
@@ -110,14 +110,14 @@ protected:
             * this->This() << x;
         }
     }
-    void save_override(const boost::serialization::item_version_type & t){
+    void save_override(const cppmsboost::serialization::item_version_type & t){
         library_version_type lvt = this->get_library_version();
-        if(boost::archive::library_version_type(7) < lvt){
+        if(cppmsboost::archive::library_version_type(7) < lvt){
             this->detail_common_oarchive::save_override(t);
         }
         else
-        if(boost::archive::library_version_type(6) < lvt){
-            const boost::uint_least16_t x = t;
+        if(cppmsboost::archive::library_version_type(6) < lvt){
+            const cppmsboost::uint_least16_t x = t;
             * this->This() << x;
         }
         else{
@@ -128,12 +128,12 @@ protected:
 
     void save_override(class_id_type & t){
         library_version_type lvt = this->get_library_version();
-        if(boost::archive::library_version_type(7) < lvt){
+        if(cppmsboost::archive::library_version_type(7) < lvt){
             this->detail_common_oarchive::save_override(t);
         }
         else
-        if(boost::archive::library_version_type(6) < lvt){
-            const boost::int_least16_t x = t;
+        if(cppmsboost::archive::library_version_type(6) < lvt){
+            const cppmsboost::int_least16_t x = t;
             * this->This() << x;
         }
         else{
@@ -155,7 +155,7 @@ protected:
 
     #if 0
     void save_override(const serialization::collection_size_type & t){
-        if (get_library_version() < boost::archive::library_version_type(6)){
+        if (get_library_version() < cppmsboost::archive::library_version_type(6)){
             unsigned int x=0;
             * this->This() >> x;
             t = serialization::collection_size_type(x);
@@ -174,7 +174,7 @@ protected:
 };
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

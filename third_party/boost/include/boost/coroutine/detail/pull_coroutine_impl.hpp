@@ -24,7 +24,7 @@
 #  include BOOST_ABI_PREFIX
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace coroutines {
 
 struct stack_context;
@@ -125,7 +125,7 @@ public:
     R get() const
     {
         if ( ! has_result() )
-            boost::throw_exception(
+            cppmsboost::throw_exception(
                 invalid_result() );
         return * result_;
     }
@@ -133,7 +133,7 @@ public:
     R * get_pointer() const
     {
         if ( ! has_result() )
-            boost::throw_exception(
+            cppmsboost::throw_exception(
                 invalid_result() );
         return result_;
     }
@@ -235,7 +235,7 @@ public:
     R & get() const
     {
         if ( ! has_result() )
-            boost::throw_exception(
+            cppmsboost::throw_exception(
                 invalid_result() );
         return * result_;
     }
@@ -243,7 +243,7 @@ public:
     R * get_pointer() const
     {
         if ( ! has_result() )
-            boost::throw_exception(
+            cppmsboost::throw_exception(
                 invalid_result() );
         return result_;
     }

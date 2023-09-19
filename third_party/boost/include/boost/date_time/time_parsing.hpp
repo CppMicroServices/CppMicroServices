@@ -16,7 +16,7 @@
 #include "boost/cstdint.hpp"
 #include <iostream>
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
   //! computes exponential math like 2^8 => 256, only works with positive integers
@@ -51,15 +51,15 @@ namespace date_time {
     unsigned short min=0, sec =0;
     int hour =0; 
     bool is_neg = (s.at(0) == '-');
-    boost::int64_t fs=0;
+    cppmsboost::int64_t fs=0;
     int pos = 0;
       
     typedef typename std::basic_string<char_type>::traits_type traits_type;
-    typedef boost::char_separator<char_type, traits_type> char_separator_type;
-    typedef boost::tokenizer<char_separator_type,
+    typedef cppmsboost::char_separator<char_type, traits_type> char_separator_type;
+    typedef cppmsboost::tokenizer<char_separator_type,
                              typename std::basic_string<char_type>::const_iterator,
                              std::basic_string<char_type> > tokenizer;
-    typedef typename boost::tokenizer<char_separator_type,
+    typedef typename cppmsboost::tokenizer<char_separator_type,
                              typename std::basic_string<char_type>::const_iterator,
                              typename std::basic_string<char_type> >::iterator tokenizer_iterator;
    
@@ -69,15 +69,15 @@ namespace date_time {
     for(tokenizer_iterator beg=tok.begin(); beg!=tok.end();++beg){
       switch(pos) {
       case 0: {
-        hour = boost::lexical_cast<int>(*beg);
+        hour = cppmsboost::lexical_cast<int>(*beg);
         break;
       }
       case 1: {
-        min = boost::lexical_cast<unsigned short>(*beg);
+        min = cppmsboost::lexical_cast<unsigned short>(*beg);
         break;
       }
       case 2: {
-        sec = boost::lexical_cast<unsigned short>(*beg);
+        sec = cppmsboost::lexical_cast<unsigned short>(*beg);
         break;
       };
       case 3: {
@@ -102,10 +102,10 @@ namespace date_time {
         int precision = time_duration::num_fractional_digits();
         if(digits >= precision) {
           // drop excess digits
-          fs = boost::lexical_cast<boost::int64_t>(beg->substr(0, precision));
+          fs = cppmsboost::lexical_cast<cppmsboost::int64_t>(beg->substr(0, precision));
         }
         else {
-          fs = boost::lexical_cast<boost::int64_t>(*beg);
+          fs = cppmsboost::lexical_cast<cppmsboost::int64_t>(*beg);
         }
 #endif
         if(digits < precision){
@@ -202,7 +202,7 @@ namespace date_time {
     int pos = 0, sign = 0;
     int hours = 0;
     short min=0, sec=0;
-    boost::int64_t fs=0;
+    cppmsboost::int64_t fs=0;
     // increment one position if the string was "signed"
     if(s.at(sign) == '-')
     {
@@ -218,11 +218,11 @@ namespace date_time {
      * last characters if there were not enough provided in the input string. */
     bool wrap_off = false;
     bool ret_part = true;
-    boost::offset_separator osf(offsets, offsets+4, wrap_off, ret_part); 
-    typedef boost::tokenizer<boost::offset_separator,
+    cppmsboost::offset_separator osf(offsets, offsets+4, wrap_off, ret_part); 
+    typedef cppmsboost::tokenizer<cppmsboost::offset_separator,
                              std::basic_string<char>::const_iterator,
                              std::basic_string<char> > tokenizer;
-    typedef boost::tokenizer<boost::offset_separator,
+    typedef cppmsboost::tokenizer<cppmsboost::offset_separator,
                              std::basic_string<char>::const_iterator,
                              std::basic_string<char> >::iterator tokenizer_iterator;
     tokenizer tok(remain, osf);
@@ -230,17 +230,17 @@ namespace date_time {
       switch(pos) {
         case 0: 
           {
-            hours = boost::lexical_cast<int>(*ti); 
+            hours = cppmsboost::lexical_cast<int>(*ti); 
             break;
           }
         case 1: 
           {
-            min = boost::lexical_cast<short>(*ti); 
+            min = cppmsboost::lexical_cast<short>(*ti); 
             break;
           }
         case 2: 
           {
-            sec = boost::lexical_cast<short>(*ti); 
+            sec = cppmsboost::lexical_cast<short>(*ti); 
             break;
           }
         case 3:
@@ -265,13 +265,13 @@ namespace date_time {
 #else
             if(digits >= precision) {
               // drop excess digits
-              fs = boost::lexical_cast<boost::int64_t>(char_digits.substr(0, precision));
+              fs = cppmsboost::lexical_cast<cppmsboost::int64_t>(char_digits.substr(0, precision));
             }
             else if(digits == 0) {
               fs = 0; // lexical_cast doesn't like empty strings
             }
             else {
-              fs = boost::lexical_cast<boost::int64_t>(char_digits);
+              fs = cppmsboost::lexical_cast<cppmsboost::int64_t>(char_digits);
             }
 #endif
             if(digits < precision){

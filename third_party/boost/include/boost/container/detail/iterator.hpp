@@ -25,16 +25,16 @@
 #include <boost/move/utility_core.hpp>
 #include <boost/container/detail/mpl.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 
-using ::boost::intrusive::iterator_traits;
-using ::boost::intrusive::iterator_distance;
-using ::boost::intrusive::iterator_advance;
-using ::boost::intrusive::iterator;
-using ::boost::intrusive::iterator_enable_if_tag;
-using ::boost::intrusive::iterator_disable_if_tag;
-using ::boost::intrusive::iterator_arrow_result;
+using ::cppmsboost::intrusive::iterator_traits;
+using ::cppmsboost::intrusive::iterator_distance;
+using ::cppmsboost::intrusive::iterator_advance;
+using ::cppmsboost::intrusive::iterator;
+using ::cppmsboost::intrusive::iterator_enable_if_tag;
+using ::cppmsboost::intrusive::iterator_disable_if_tag;
+using ::cppmsboost::intrusive::iterator_arrow_result;
 
 template <class Container>
 class back_emplacer
@@ -56,7 +56,7 @@ class back_emplacer
    template<class U>
    back_emplacer& operator=(BOOST_FWD_REF(U) value)
    {
-      container.emplace_back(boost::forward<U>(value));
+      container.emplace_back(cppmsboost::forward<U>(value));
       return *this;
    }
    back_emplacer& operator*()    { return *this; }
@@ -81,6 +81,6 @@ using it_based_value_type_t = typename iterator_traits<InputIterator>::value_typ
 #endif
 
 }  //namespace container {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif   //#ifndef BOOST_CONTAINER_DETAIL_ITERATORS_HPP

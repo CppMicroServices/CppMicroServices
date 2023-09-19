@@ -74,12 +74,12 @@
 #include <cstddef>               // for NULL
 #include <stdexcept>             // for std::domain_error
 #include <string>                // for std::string implicit constructor
-#include <boost/operators.hpp>   // for boost::addable etc
+#include <boost/operators.hpp>   // for cppmsboost::addable etc
 #include <cstdlib>               // for std::abs
-#include <boost/call_traits.hpp> // for boost::call_traits
+#include <boost/call_traits.hpp> // for cppmsboost::call_traits
 #include <boost/detail/workaround.hpp> // for BOOST_WORKAROUND
 #include <boost/assert.hpp>      // for BOOST_ASSERT
-#include <boost/integer/common_factor_rt.hpp> // for boost::integer::gcd, lcm
+#include <boost/integer/common_factor_rt.hpp> // for cppmsboost::integer::gcd, lcm
 #include <limits>                // for std::numeric_limits
 #include <boost/static_assert.hpp>  // for BOOST_STATIC_ASSERT
 #include <boost/throw_exception.hpp>
@@ -94,7 +94,7 @@
 #define BOOST_CONTROL_RATIONAL_HAS_GCD  1
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 #if BOOST_CONTROL_RATIONAL_HAS_GCD
 template <typename IntType>
@@ -168,7 +168,7 @@ class rational
     BOOST_STATIC_ASSERT( ::std::numeric_limits<IntType>::is_specialized );
 
     // Helper types
-    typedef typename boost::call_traits<IntType>::param_type param_type;
+    typedef typename cppmsboost::call_traits<IntType>::param_type param_type;
 
     struct helper { IntType parts[2]; };
     typedef IntType (helper::* bool_type)[2];
@@ -290,19 +290,19 @@ public:
     BOOST_CXX14_CONSTEXPR rational& operator/= (const rational& r);
 
     template <class T>
-    BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, rational&>::type operator+= (const T& i)
+    BOOST_CXX14_CONSTEXPR typename cppmsboost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, rational&>::type operator+= (const T& i)
     {
        num += i * den;
        return *this;
     }
     template <class T>
-    BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, rational&>::type operator-= (const T& i)
+    BOOST_CXX14_CONSTEXPR typename cppmsboost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, rational&>::type operator-= (const T& i)
     {
        num -= i * den;
        return *this;
     }
     template <class T>
-    BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, rational&>::type operator*= (const T& i)
+    BOOST_CXX14_CONSTEXPR typename cppmsboost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, rational&>::type operator*= (const T& i)
     {
        // Avoid overflow and preserve normalization
        IntType gcd = integer::gcd(static_cast<IntType>(i), den);
@@ -311,7 +311,7 @@ public:
        return *this;
     }
     template <class T>
-    BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, rational&>::type operator/= (const T& i)
+    BOOST_CXX14_CONSTEXPR typename cppmsboost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, rational&>::type operator/= (const T& i)
     {
        // Avoid repeated construction
        IntType const zero(0);
@@ -376,7 +376,7 @@ public:
     bool operator== (const rational& r) const;
 
     template <class T>
-    BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, bool>::type operator< (const T& i) const
+    BOOST_CXX14_CONSTEXPR typename cppmsboost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, bool>::type operator< (const T& i) const
     {
        // Avoid repeated construction
        int_type const  zero(0);
@@ -393,12 +393,12 @@ public:
        return q < i;
     }
     template <class T>
-    BOOST_CXX14_CONSTEXPR typename boost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, bool>::type operator>(const T& i) const
+    BOOST_CXX14_CONSTEXPR typename cppmsboost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, bool>::type operator>(const T& i) const
     {
        return operator==(i) ? false : !operator<(i);
     }
     template <class T>
-    BOOST_CONSTEXPR typename boost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, bool>::type operator== (const T& i) const
+    BOOST_CONSTEXPR typename cppmsboost::enable_if_c<rational_detail::is_compatible_integer<T, IntType>::value, bool>::type operator== (const T& i) const
     {
        return ((den == IntType(1)) && (num == i));
     }
@@ -439,7 +439,7 @@ private:
     // (1) From an unsigned type with more digits than IntType:
     //
     template <class T>
-    BOOST_CONSTEXPR static typename boost::enable_if_c<(std::numeric_limits<T>::digits > std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == false), bool>::type is_safe_narrowing_conversion(const T& val)
+    BOOST_CONSTEXPR static typename cppmsboost::enable_if_c<(std::numeric_limits<T>::digits > std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == false), bool>::type is_safe_narrowing_conversion(const T& val)
     {
        return val < (T(1) << std::numeric_limits<IntType>::digits);
     }
@@ -447,7 +447,7 @@ private:
     // (2) From a signed type with more digits than IntType, and IntType also signed:
     //
     template <class T>
-    BOOST_CONSTEXPR static typename boost::enable_if_c<(std::numeric_limits<T>::digits > std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == true) && (std::numeric_limits<IntType>::is_signed == true), bool>::type is_safe_narrowing_conversion(const T& val)
+    BOOST_CONSTEXPR static typename cppmsboost::enable_if_c<(std::numeric_limits<T>::digits > std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == true) && (std::numeric_limits<IntType>::is_signed == true), bool>::type is_safe_narrowing_conversion(const T& val)
     {
        // Note that this check assumes IntType has a 2's complement representation,
        // we don't want to try to convert a std::numeric_limits<IntType>::min() to
@@ -459,7 +459,7 @@ private:
     // (3) From a signed type with more digits than IntType, and IntType unsigned:
     //
     template <class T>
-    BOOST_CONSTEXPR static typename boost::enable_if_c<(std::numeric_limits<T>::digits > std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == true) && (std::numeric_limits<IntType>::is_signed == false), bool>::type is_safe_narrowing_conversion(const T& val)
+    BOOST_CONSTEXPR static typename cppmsboost::enable_if_c<(std::numeric_limits<T>::digits > std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == true) && (std::numeric_limits<IntType>::is_signed == false), bool>::type is_safe_narrowing_conversion(const T& val)
     {
        return (val < (T(1) << std::numeric_limits<IntType>::digits)) && (val >= 0);
     }
@@ -467,7 +467,7 @@ private:
     // (4) From a signed type with fewer digits than IntType, and IntType unsigned:
     //
     template <class T>
-    BOOST_CONSTEXPR static typename boost::enable_if_c<(std::numeric_limits<T>::digits <= std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == true) && (std::numeric_limits<IntType>::is_signed == false), bool>::type is_safe_narrowing_conversion(const T& val)
+    BOOST_CONSTEXPR static typename cppmsboost::enable_if_c<(std::numeric_limits<T>::digits <= std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == true) && (std::numeric_limits<IntType>::is_signed == false), bool>::type is_safe_narrowing_conversion(const T& val)
     {
        return val >= 0;
     }
@@ -475,7 +475,7 @@ private:
     // (5) From an unsigned type with fewer digits than IntType, and IntType signed:
     //
     template <class T>
-    BOOST_CONSTEXPR static typename boost::enable_if_c<(std::numeric_limits<T>::digits <= std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == false) && (std::numeric_limits<IntType>::is_signed == true), bool>::type is_safe_narrowing_conversion(const T&)
+    BOOST_CONSTEXPR static typename cppmsboost::enable_if_c<(std::numeric_limits<T>::digits <= std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == false) && (std::numeric_limits<IntType>::is_signed == true), bool>::type is_safe_narrowing_conversion(const T&)
     {
        return true;
     }
@@ -483,7 +483,7 @@ private:
     // (6) From an unsigned type with fewer digits than IntType, and IntType unsigned:
     //
     template <class T>
-    BOOST_CONSTEXPR static typename boost::enable_if_c<(std::numeric_limits<T>::digits <= std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == false) && (std::numeric_limits<IntType>::is_signed == false), bool>::type is_safe_narrowing_conversion(const T&)
+    BOOST_CONSTEXPR static typename cppmsboost::enable_if_c<(std::numeric_limits<T>::digits <= std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == false) && (std::numeric_limits<IntType>::is_signed == false), bool>::type is_safe_narrowing_conversion(const T&)
     {
        return true;
     }
@@ -491,7 +491,7 @@ private:
     // (7) From an signed type with fewer digits than IntType, and IntType signed:
     //
     template <class T>
-    BOOST_CONSTEXPR static typename boost::enable_if_c<(std::numeric_limits<T>::digits <= std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == true) && (std::numeric_limits<IntType>::is_signed == true), bool>::type is_safe_narrowing_conversion(const T&)
+    BOOST_CONSTEXPR static typename cppmsboost::enable_if_c<(std::numeric_limits<T>::digits <= std::numeric_limits<IntType>::digits) && (std::numeric_limits<T>::is_signed == true) && (std::numeric_limits<IntType>::is_signed == true), bool>::type is_safe_narrowing_conversion(const T&)
     {
        return true;
     }
@@ -629,7 +629,7 @@ BOOST_CXX14_CONSTEXPR rational<IntType>& rational<IntType>::operator/= (const ra
 //
 template <class IntType, class Arg>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value || is_same<rational<IntType>, Arg>::value, rational<IntType> >::type
    operator + (const rational<IntType>& a, const Arg& b)
 {
@@ -638,7 +638,7 @@ inline typename boost::enable_if_c <
 }
 template <class Arg, class IntType>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value, rational<IntType> >::type
    operator + (const Arg& b, const rational<IntType>& a)
 {
@@ -648,7 +648,7 @@ inline typename boost::enable_if_c <
 
 template <class IntType, class Arg>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value || is_same<rational<IntType>, Arg>::value, rational<IntType> >::type
    operator - (const rational<IntType>& a, const Arg& b)
 {
@@ -657,7 +657,7 @@ inline typename boost::enable_if_c <
 }
 template <class Arg, class IntType>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value, rational<IntType> >::type
    operator - (const Arg& b, const rational<IntType>& a)
 {
@@ -667,7 +667,7 @@ inline typename boost::enable_if_c <
 
 template <class IntType, class Arg>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value || is_same<rational<IntType>, Arg>::value, rational<IntType> >::type
    operator * (const rational<IntType>& a, const Arg& b)
 {
@@ -676,7 +676,7 @@ inline typename boost::enable_if_c <
 }
 template <class Arg, class IntType>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value, rational<IntType> >::type
    operator * (const Arg& b, const rational<IntType>& a)
 {
@@ -686,7 +686,7 @@ inline typename boost::enable_if_c <
 
 template <class IntType, class Arg>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value || is_same<rational<IntType>, Arg>::value, rational<IntType> >::type
    operator / (const rational<IntType>& a, const Arg& b)
 {
@@ -695,7 +695,7 @@ inline typename boost::enable_if_c <
 }
 template <class Arg, class IntType>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value, rational<IntType> >::type
    operator / (const Arg& b, const rational<IntType>& a)
 {
@@ -705,7 +705,7 @@ inline typename boost::enable_if_c <
 
 template <class IntType, class Arg>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value || is_same<rational<IntType>, Arg>::value, bool>::type
    operator <= (const rational<IntType>& a, const Arg& b)
 {
@@ -713,7 +713,7 @@ inline typename boost::enable_if_c <
 }
 template <class Arg, class IntType>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value, bool>::type
    operator <= (const Arg& b, const rational<IntType>& a)
 {
@@ -722,7 +722,7 @@ inline typename boost::enable_if_c <
 
 template <class IntType, class Arg>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value || is_same<rational<IntType>, Arg>::value, bool>::type
    operator >= (const rational<IntType>& a, const Arg& b)
 {
@@ -730,7 +730,7 @@ inline typename boost::enable_if_c <
 }
 template <class Arg, class IntType>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value, bool>::type
    operator >= (const Arg& b, const rational<IntType>& a)
 {
@@ -739,7 +739,7 @@ inline typename boost::enable_if_c <
 
 template <class IntType, class Arg>
 BOOST_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value || is_same<rational<IntType>, Arg>::value, bool>::type
    operator != (const rational<IntType>& a, const Arg& b)
 {
@@ -747,7 +747,7 @@ inline typename boost::enable_if_c <
 }
 template <class Arg, class IntType>
 BOOST_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value, bool>::type
    operator != (const Arg& b, const rational<IntType>& a)
 {
@@ -756,7 +756,7 @@ inline typename boost::enable_if_c <
 
 template <class Arg, class IntType>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value, bool>::type
    operator < (const Arg& b, const rational<IntType>& a)
 {
@@ -764,7 +764,7 @@ inline typename boost::enable_if_c <
 }
 template <class Arg, class IntType>
 BOOST_CXX14_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value, bool>::type
    operator > (const Arg& b, const rational<IntType>& a)
 {
@@ -772,7 +772,7 @@ inline typename boost::enable_if_c <
 }
 template <class Arg, class IntType>
 BOOST_CONSTEXPR
-inline typename boost::enable_if_c <
+inline typename cppmsboost::enable_if_c <
    rational_detail::is_compatible_integer<Arg, IntType>::value, bool>::type
    operator == (const Arg& b, const rational<IntType>& a)
 {
@@ -1041,6 +1041,6 @@ struct lcm_evaluator< rational<IntType> >
 
 } // namespace integer
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // BOOST_RATIONAL_HPP

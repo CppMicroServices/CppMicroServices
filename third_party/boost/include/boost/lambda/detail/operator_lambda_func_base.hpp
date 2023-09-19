@@ -13,7 +13,7 @@
 #ifndef BOOST_LAMBDA_OPERATOR_LAMBDA_FUNC_BASE_HPP
 #define BOOST_LAMBDA_OPERATOR_LAMBDA_FUNC_BASE_HPP
 
-namespace boost { 
+namespace cppmsboost { 
 namespace lambda {
 
 
@@ -31,8 +31,8 @@ public:
 
   template<class RET, CALL_TEMPLATE_ARGS>
   RET call(CALL_FORMAL_ARGS) const {
-    return detail::select(boost::tuples::get<0>(args), CALL_ACTUAL_ARGS), 
-           detail::select(boost::tuples::get<1>(args), CALL_ACTUAL_ARGS); 
+    return detail::select(cppmsboost::tuples::get<0>(args), CALL_ACTUAL_ARGS), 
+           detail::select(cppmsboost::tuples::get<1>(args), CALL_ACTUAL_ARGS); 
   }
 
 
@@ -93,8 +93,8 @@ public:
 
   template<class RET, CALL_TEMPLATE_ARGS>
   RET call(CALL_FORMAL_ARGS) const {
-    return detail::select(boost::tuples::get<0>(args), CALL_ACTUAL_ARGS) && 
-           detail::select(boost::tuples::get<1>(args), CALL_ACTUAL_ARGS); 
+    return detail::select(cppmsboost::tuples::get<0>(args), CALL_ACTUAL_ARGS) && 
+           detail::select(cppmsboost::tuples::get<1>(args), CALL_ACTUAL_ARGS); 
   }
   template<class SigArgs> struct sig { 
     typedef typename
@@ -113,8 +113,8 @@ public:
 
   template<class RET, CALL_TEMPLATE_ARGS>
   RET call(CALL_FORMAL_ARGS) const {
-    return detail::select(boost::tuples::get<0>(args), CALL_ACTUAL_ARGS) || 
-           detail::select(boost::tuples::get<1>(args), CALL_ACTUAL_ARGS); 
+    return detail::select(cppmsboost::tuples::get<0>(args), CALL_ACTUAL_ARGS) || 
+           detail::select(cppmsboost::tuples::get<1>(args), CALL_ACTUAL_ARGS); 
   }
 
   template<class SigArgs> struct sig { 
@@ -133,8 +133,8 @@ public:
 
   template<class RET, CALL_TEMPLATE_ARGS>
   RET call(CALL_FORMAL_ARGS) const {
-    return detail::select(boost::tuples::get<0>(args), CALL_ACTUAL_ARGS) 
-           [detail::select(boost::tuples::get<1>(args), CALL_ACTUAL_ARGS)]; 
+    return detail::select(cppmsboost::tuples::get<0>(args), CALL_ACTUAL_ARGS) 
+           [detail::select(cppmsboost::tuples::get<1>(args), CALL_ACTUAL_ARGS)]; 
   }
 
   template<class SigArgs> struct sig { 
@@ -155,9 +155,9 @@ public:                                                                   \
                                                                           \
   template<class RET, CALL_TEMPLATE_ARGS>                                 \
   RET call(CALL_FORMAL_ARGS) const {                                      \
-    return detail::select(boost::tuples::get<0>(args), CALL_ACTUAL_ARGS)  \
+    return detail::select(cppmsboost::tuples::get<0>(args), CALL_ACTUAL_ARGS)  \
            SYMBOL                                                         \
-           detail::select(boost::tuples::get<1>(args), CALL_ACTUAL_ARGS); \
+           detail::select(cppmsboost::tuples::get<1>(args), CALL_ACTUAL_ARGS); \
   }                                                                       \
   template<class SigArgs> struct sig {                                    \
     typedef typename                                                      \
@@ -176,7 +176,7 @@ public:                                                                   \
   template<class RET, CALL_TEMPLATE_ARGS>                                 \
   RET call(CALL_FORMAL_ARGS) const {                                      \
     return SYMBOL                                                         \
-           detail::select(boost::tuples::get<0>(args), CALL_ACTUAL_ARGS); \
+           detail::select(cppmsboost::tuples::get<0>(args), CALL_ACTUAL_ARGS); \
   }                                                                       \
   template<class SigArgs> struct sig {                                    \
     typedef typename                                                      \
@@ -195,7 +195,7 @@ public:                                                                   \
   template<class RET, CALL_TEMPLATE_ARGS>                                 \
   RET call(CALL_FORMAL_ARGS) const {                                      \
     return                                                                \
-    detail::select(boost::tuples::get<0>(args), CALL_ACTUAL_ARGS) SYMBOL; \
+    detail::select(cppmsboost::tuples::get<0>(args), CALL_ACTUAL_ARGS) SYMBOL; \
   }                                                                       \
   template<class SigArgs> struct sig {                                    \
     typedef typename                                                      \
@@ -256,7 +256,7 @@ BOOST_LAMBDA_POSTFIX_UNARY_ACTION(--, post_increment_decrement_action<decrement_
 #undef BOOST_LAMBDA_BINARY_ACTION
 
 } // namespace lambda
-} // namespace boost
+} // namespace cppmsboost
 
 #endif
 

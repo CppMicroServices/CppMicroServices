@@ -9,7 +9,7 @@
 // Preprocessed version of "boost/mpl/aux_/advance_backward.hpp" header
 // -- DO NOT modify by hand!
 
-namespace boost { namespace mpl { namespace aux {
+namespace cppmsboost { namespace mpl { namespace aux {
 
 template< long N > struct advance_backward;
 template<>

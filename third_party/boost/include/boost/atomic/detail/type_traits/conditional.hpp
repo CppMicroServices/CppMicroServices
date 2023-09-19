@@ -25,18 +25,18 @@
 #pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
 #if !defined(BOOST_ATOMIC_DETAIL_NO_CXX11_BASIC_HDR_TYPE_TRAITS)
 using std::conditional;
 #else
-using boost::conditional;
+using cppmsboost::conditional;
 #endif
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ATOMIC_DETAIL_TYPE_TRAITS_CONDITIONAL_HPP_INCLUDED_

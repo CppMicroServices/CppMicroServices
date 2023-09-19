@@ -36,7 +36,7 @@
 #pragma warning(disable: 4800)
 #endif
 
-namespace boost{
+namespace cppmsboost{
 namespace BOOST_REGEX_DETAIL_NS{
 
 template <class BidiIterator>
@@ -87,7 +87,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_all_states()
       // Although this next line *should* be evaluated at compile time, in practice
       // some compilers (VC++) emit run-time initialisation which breaks thread
       // safety, so use a dispatch function instead:
-      //(::boost::is_random_access_iterator<BidiIterator>::value ? &perl_matcher<BidiIterator, Allocator, traits>::match_dot_repeat_fast : &perl_matcher<BidiIterator, Allocator, traits>::match_dot_repeat_slow),
+      //(::cppmsboost::is_random_access_iterator<BidiIterator>::value ? &perl_matcher<BidiIterator, Allocator, traits>::match_dot_repeat_fast : &perl_matcher<BidiIterator, Allocator, traits>::match_dot_repeat_slow),
       &perl_matcher<BidiIterator, Allocator, traits>::match_dot_repeat_dispatch,
       &perl_matcher<BidiIterator, Allocator, traits>::match_char_repeat,
       &perl_matcher<BidiIterator, Allocator, traits>::match_set_repeat,
@@ -497,7 +497,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_dot_repeat_fast()
 #pragma warning(disable:4267)
 #endif
    bool greedy = (rep->greedy) && (!(m_match_flags & regex_constants::match_any) || m_independent);   
-   std::size_t count = (std::min)(static_cast<std::size_t>(::boost::BOOST_REGEX_DETAIL_NS::distance(position, last)), greedy ? rep->max : rep->min);
+   std::size_t count = (std::min)(static_cast<std::size_t>(::cppmsboost::BOOST_REGEX_DETAIL_NS::distance(position, last)), greedy ? rep->max : rep->min);
    if(rep->min > count)
    {
       position = last;
@@ -559,12 +559,12 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_char_repeat()
    //
    bool greedy = (rep->greedy) && (!(m_match_flags & regex_constants::match_any) || m_independent);   
    std::size_t count, desired;
-   if(::boost::is_random_access_iterator<BidiIterator>::value)
+   if(::cppmsboost::is_random_access_iterator<BidiIterator>::value)
    {
       desired = 
          (std::min)(
             (std::size_t)(greedy ? rep->max : rep->min),
-            (std::size_t)::boost::BOOST_REGEX_DETAIL_NS::distance(position, last));
+            (std::size_t)::cppmsboost::BOOST_REGEX_DETAIL_NS::distance(position, last));
       count = desired;
       ++desired;
       if(icase)
@@ -663,12 +663,12 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_set_repeat()
    //
    bool greedy = (rep->greedy) && (!(m_match_flags & regex_constants::match_any) || m_independent);   
    std::size_t desired = greedy ? rep->max : rep->min;
-   if(::boost::is_random_access_iterator<BidiIterator>::value)
+   if(::cppmsboost::is_random_access_iterator<BidiIterator>::value)
    {
       BidiIterator end = position;
       // Move end forward by "desired", preferably without using distance or advance if we can
       // as these can be slow for some iterator types.
-      std::size_t len = (desired == (std::numeric_limits<std::size_t>::max)()) ? 0u : ::boost::BOOST_REGEX_DETAIL_NS::distance(position, last);
+      std::size_t len = (desired == (std::numeric_limits<std::size_t>::max)()) ? 0u : ::cppmsboost::BOOST_REGEX_DETAIL_NS::distance(position, last);
       if(desired >= len)
          end = last;
       else
@@ -678,7 +678,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_set_repeat()
       {
          ++position;
       }
-      count = (unsigned)::boost::BOOST_REGEX_DETAIL_NS::distance(origin, position);
+      count = (unsigned)::cppmsboost::BOOST_REGEX_DETAIL_NS::distance(origin, position);
    }
    else
    {
@@ -759,12 +759,12 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_long_set_repeat()
    //
    bool greedy = (rep->greedy) && (!(m_match_flags & regex_constants::match_any) || m_independent);   
    std::size_t desired = greedy ? rep->max : rep->min;
-   if(::boost::is_random_access_iterator<BidiIterator>::value)
+   if(::cppmsboost::is_random_access_iterator<BidiIterator>::value)
    {
       BidiIterator end = position;
       // Move end forward by "desired", preferably without using distance or advance if we can
       // as these can be slow for some iterator types.
-      std::size_t len = (desired == (std::numeric_limits<std::size_t>::max)()) ? 0u : ::boost::BOOST_REGEX_DETAIL_NS::distance(position, last);
+      std::size_t len = (desired == (std::numeric_limits<std::size_t>::max)()) ? 0u : ::cppmsboost::BOOST_REGEX_DETAIL_NS::distance(position, last);
       if(desired >= len)
          end = last;
       else
@@ -774,7 +774,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_long_set_repeat()
       {
          ++position;
       }
-      count = (unsigned)::boost::BOOST_REGEX_DETAIL_NS::distance(origin, position);
+      count = (unsigned)::cppmsboost::BOOST_REGEX_DETAIL_NS::distance(origin, position);
    }
    else
    {
@@ -1111,7 +1111,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::skip_until_paren(int index, 
 
 
 } // namespace BOOST_REGEX_DETAIL_NS
-} // namespace boost
+} // namespace cppmsboost
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif

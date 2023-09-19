@@ -20,7 +20,7 @@
 #include <boost/assert.hpp>
 #include <pthread.h>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -82,6 +82,6 @@ public:
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_SMART_PTR_DETAIL_LWM_PTHREADS_HPP_INCLUDED

@@ -43,7 +43,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -65,7 +65,7 @@ public:
   };
 
   // Constructor.
-  BOOST_ASIO_DECL select_reactor(boost::asio::execution_context& ctx);
+  BOOST_ASIO_DECL select_reactor(cppmsboost::asio::execution_context& ctx);
 
   // Destructor.
   BOOST_ASIO_DECL ~select_reactor();
@@ -75,7 +75,7 @@ public:
 
   // Recreate internal descriptors following a fork.
   BOOST_ASIO_DECL void notify_fork(
-      boost::asio::execution_context::fork_event fork_ev);
+      cppmsboost::asio::execution_context::fork_event fork_ev);
 
   // Initialise the task, but only if the reactor is not in its own thread.
   BOOST_ASIO_DECL void init_task();
@@ -179,7 +179,7 @@ private:
   // Cancel all operations associated with the given descriptor. This function
   // does not acquire the select_reactor's mutex.
   BOOST_ASIO_DECL void cancel_ops_unlocked(socket_type descriptor,
-      const boost::system::error_code& ec);
+      const cppmsboost::system::error_code& ec);
 
   // The scheduler implementation used to post completions.
 # if defined(BOOST_ASIO_HAS_IOCP)
@@ -190,7 +190,7 @@ private:
   scheduler_type& scheduler_;
 
   // Mutex to protect access to internal data.
-  boost::asio::detail::mutex mutex_;
+  cppmsboost::asio::detail::mutex mutex_;
 
   // The interrupter is used to break a blocking select call.
   select_interrupter interrupter_;
@@ -213,7 +213,7 @@ private:
   bool stop_thread_;
 
   // The thread that is running the reactor loop.
-  boost::asio::detail::thread* thread_;
+  cppmsboost::asio::detail::thread* thread_;
 #endif // defined(BOOST_ASIO_HAS_IOCP)
 
   // Whether the service has been shut down.
@@ -222,7 +222,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

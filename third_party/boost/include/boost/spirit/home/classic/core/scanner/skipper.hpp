@@ -17,7 +17,7 @@
 
 #include <boost/spirit/home/classic/core/scanner/skipper_fwd.hpp>
 
-namespace boost { namespace spirit {
+namespace cppmsboost { namespace spirit {
 
 BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 

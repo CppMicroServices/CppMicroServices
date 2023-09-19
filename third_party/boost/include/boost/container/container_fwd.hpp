@@ -21,37 +21,37 @@
 
 //! \file
 //! This header file forward declares the following containers:
-//!   - boost::container::vector
-//!   - boost::container::stable_vector
-//!   - boost::container::static_vector
-//!   - boost::container::small_vector_base
-//!   - boost::container::small_vector
-//!   - boost::container::slist
-//!   - boost::container::list
-//!   - boost::container::set
-//!   - boost::container::multiset
-//!   - boost::container::map
-//!   - boost::container::multimap
-//!   - boost::container::flat_set
-//!   - boost::container::flat_multiset
-//!   - boost::container::flat_map
-//!   - boost::container::flat_multimap
-//!   - boost::container::basic_string
-//!   - boost::container::string
-//!   - boost::container::wstring
+//!   - cppmsboost::container::vector
+//!   - cppmsboost::container::stable_vector
+//!   - cppmsboost::container::static_vector
+//!   - cppmsboost::container::small_vector_base
+//!   - cppmsboost::container::small_vector
+//!   - cppmsboost::container::slist
+//!   - cppmsboost::container::list
+//!   - cppmsboost::container::set
+//!   - cppmsboost::container::multiset
+//!   - cppmsboost::container::map
+//!   - cppmsboost::container::multimap
+//!   - cppmsboost::container::flat_set
+//!   - cppmsboost::container::flat_multiset
+//!   - cppmsboost::container::flat_map
+//!   - cppmsboost::container::flat_multimap
+//!   - cppmsboost::container::basic_string
+//!   - cppmsboost::container::string
+//!   - cppmsboost::container::wstring
 //!
 //! Forward declares the following allocators:
-//!   - boost::container::allocator
-//!   - boost::container::node_allocator
-//!   - boost::container::adaptive_pool
+//!   - cppmsboost::container::allocator
+//!   - cppmsboost::container::node_allocator
+//!   - cppmsboost::container::adaptive_pool
 //!
 //! Forward declares the following polymorphic resource classes:
-//!   - boost::container::pmr::memory_resource
-//!   - boost::container::pmr::polymorphic_allocator
-//!   - boost::container::pmr::monotonic_buffer_resource
-//!   - boost::container::pmr::pool_options
-//!   - boost::container::pmr::unsynchronized_pool_resource
-//!   - boost::container::pmr::synchronized_pool_resource
+//!   - cppmsboost::container::pmr::memory_resource
+//!   - cppmsboost::container::pmr::polymorphic_allocator
+//!   - cppmsboost::container::pmr::monotonic_buffer_resource
+//!   - cppmsboost::container::pmr::pool_options
+//!   - cppmsboost::container::pmr::unsynchronized_pool_resource
+//!   - cppmsboost::container::pmr::synchronized_pool_resource
 //!
 //! And finally it defines the following types
 
@@ -62,20 +62,20 @@
    #include <boost/container/detail/std_fwd.hpp>
 #endif
 
-namespace boost{
+namespace cppmsboost{
 namespace intrusive{
 namespace detail{
    //Create namespace to avoid compilation errors
 }}}
 
-namespace boost{ namespace container{ namespace dtl{
-   namespace bi = boost::intrusive;
-   namespace bid = boost::intrusive::detail;
+namespace cppmsboost{ namespace container{ namespace dtl{
+   namespace bi = cppmsboost::intrusive;
+   namespace bid = cppmsboost::intrusive::detail;
 }}}
 
-namespace boost{ namespace container{ namespace pmr{
-   namespace bi = boost::intrusive;
-   namespace bid = boost::intrusive::detail;
+namespace cppmsboost{ namespace container{ namespace pmr{
+   namespace bi = cppmsboost::intrusive;
+   namespace bid = cppmsboost::intrusive::detail;
 }}}
 
 #include <cstddef>
@@ -86,7 +86,7 @@ namespace boost{ namespace container{ namespace pmr{
 //                             Containers
 //////////////////////////////////////////////////////////////////////////////
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 
 #ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
@@ -296,6 +296,6 @@ struct dummy
 
 #endif   //#ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
 
-}}  //namespace boost { namespace container {
+}}  //namespace cppmsboost { namespace container {
 
 #endif //#ifndef BOOST_CONTAINER_CONTAINER_FWD_HPP

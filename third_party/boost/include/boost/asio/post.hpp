@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Submits a completion token or function object for execution.
@@ -116,7 +116,7 @@ BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken, void()) post(
       ExecutionContext&, execution_context&>::value>::type* = 0);
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

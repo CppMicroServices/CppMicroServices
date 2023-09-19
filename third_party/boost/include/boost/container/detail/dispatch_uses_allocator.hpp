@@ -33,7 +33,7 @@
 
 #include <boost/core/no_exceptions_support.hpp>
 
-namespace boost { namespace container {
+namespace cppmsboost { namespace container {
 
 namespace dtl {
 
@@ -57,7 +57,7 @@ namespace dtl {
       struct dummy;
 
       template<class X>
-      static decltype(X(boost::move_detail::declval<Args>()...), true_type()) test(int);
+      static decltype(X(cppmsboost::move_detail::declval<Args>()...), true_type()) test(int);
 
       template<class X>
       static no_type test(...);
@@ -118,7 +118,7 @@ inline typename dtl::enable_if_and
    ( ConstructAlloc & construct_alloc, BOOST_FWD_REF(ArgAlloc) arg_alloc, T* p, BOOST_FWD_REF(Args)...args)
 {
    (void)arg_alloc;
-   allocator_traits<ConstructAlloc>::construct(construct_alloc, p, ::boost::forward<Args>(args)...);
+   allocator_traits<ConstructAlloc>::construct(construct_alloc, p, ::cppmsboost::forward<Args>(args)...);
 }
 
 // allocator_arg_t
@@ -137,7 +137,7 @@ inline typename dtl::enable_if_and
 {
    allocator_traits<ConstructAlloc>::construct
       ( construct_alloc, p, allocator_arg
-      , ::boost::forward<ArgAlloc>(arg_alloc), ::boost::forward<Args>(args)...);
+      , ::cppmsboost::forward<ArgAlloc>(arg_alloc), ::cppmsboost::forward<Args>(args)...);
 }
 
 // allocator suffix
@@ -155,7 +155,7 @@ inline typename dtl::enable_if_and
    ( ConstructAlloc& construct_alloc, BOOST_FWD_REF(ArgAlloc) arg_alloc, T* p, BOOST_FWD_REF(Args)...args)
 {
    allocator_traits<ConstructAlloc>::construct
-      (construct_alloc, p, ::boost::forward<Args>(args)..., ::boost::forward<ArgAlloc>(arg_alloc));
+      (construct_alloc, p, ::cppmsboost::forward<Args>(args)..., ::cppmsboost::forward<ArgAlloc>(arg_alloc));
 }
 
 #else    //#if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
@@ -189,7 +189,7 @@ BOOST_MOVE_ITERATE_0TO9(BOOST_CONTAINER_SCOPED_ALLOCATOR_DISPATCH_USES_ALLOCATOR
       (ConstructAlloc& construct_alloc, BOOST_FWD_REF(ArgAlloc) arg_alloc, T* p BOOST_MOVE_I##N BOOST_MOVE_UREF##N)\
    {\
       allocator_traits<ConstructAlloc>::construct\
-         (construct_alloc, p, allocator_arg, ::boost::forward<ArgAlloc>(arg_alloc) BOOST_MOVE_I##N BOOST_MOVE_FWD##N);\
+         (construct_alloc, p, allocator_arg, ::cppmsboost::forward<ArgAlloc>(arg_alloc) BOOST_MOVE_I##N BOOST_MOVE_FWD##N);\
    }\
 //
 BOOST_MOVE_ITERATE_0TO9(BOOST_CONTAINER_SCOPED_ALLOCATOR_DISPATCH_USES_ALLOCATOR_CODE)
@@ -207,7 +207,7 @@ BOOST_MOVE_ITERATE_0TO9(BOOST_CONTAINER_SCOPED_ALLOCATOR_DISPATCH_USES_ALLOCATOR
       (ConstructAlloc& construct_alloc, BOOST_FWD_REF(ArgAlloc) arg_alloc, T* p BOOST_MOVE_I##N BOOST_MOVE_UREF##N)\
    {\
       allocator_traits<ConstructAlloc>::construct\
-         (construct_alloc, p BOOST_MOVE_I##N BOOST_MOVE_FWD##N, ::boost::forward<ArgAlloc>(arg_alloc));\
+         (construct_alloc, p BOOST_MOVE_I##N BOOST_MOVE_FWD##N, ::cppmsboost::forward<ArgAlloc>(arg_alloc));\
    }\
 //
 BOOST_MOVE_ITERATE_0TO9(BOOST_CONTAINER_SCOPED_ALLOCATOR_DISPATCH_USES_ALLOCATOR_CODE)
@@ -246,9 +246,9 @@ BOOST_CONTAINER_DOC1ST(void, typename dtl::enable_if<dtl::is_pair<Pair> BOOST_MO
    , BOOST_FWD_REF(ArgAlloc) arg_alloc
    , Pair* p, BOOST_FWD_REF(U) x, BOOST_FWD_REF(V) y)
 {
-   (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(p->first), ::boost::forward<U>(x));
+   (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(p->first), ::cppmsboost::forward<U>(x));
    BOOST_TRY{
-      (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(p->second), ::boost::forward<V>(y));
+      (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(p->second), ::cppmsboost::forward<V>(y));
    }
    BOOST_CATCH(...){
       allocator_traits<ConstructAlloc>::destroy(construct_alloc, dtl::addressof(p->first));
@@ -273,23 +273,23 @@ template < typename ConstructAlloc
 typename dtl::enable_if_and
    < void
    , dtl::is_pair<Pair>
-   , dtl::not_<boost::move_detail::is_reference<Pair2> > >::type //This is needed for MSVC10 and ambiguous overloads
+   , dtl::not_<cppmsboost::move_detail::is_reference<Pair2> > >::type //This is needed for MSVC10 and ambiguous overloads
    dispatch_uses_allocator
    (ConstructAlloc & construct_alloc
       , BOOST_FWD_REF(ArgAlloc) arg_alloc
       , Pair* p, BOOST_RV_REF_BEG Pair2 BOOST_RV_REF_END x)
-{  (dispatch_uses_allocator)(construct_alloc, arg_alloc, p, ::boost::move(x.first), ::boost::move(x.second));  }
+{  (dispatch_uses_allocator)(construct_alloc, arg_alloc, p, ::cppmsboost::move(x.first), ::cppmsboost::move(x.second));  }
 
 
-//piecewise construction from boost::tuple
+//piecewise construction from cppmsboost::tuple
 #define BOOST_DISPATCH_USES_ALLOCATOR_PIECEWISE_CONSTRUCT_BOOST_TUPLE_CODE(N,M)\
 template< typename ConstructAlloc, typename ArgAlloc, class Pair \
         , template<class, class, class, class, class, class, class, class, class, class> class BoostTuple \
          BOOST_MOVE_I_IF(BOOST_MOVE_OR(N,M)) BOOST_MOVE_CLASS##N BOOST_MOVE_I_IF(BOOST_MOVE_AND(N,M)) BOOST_MOVE_CLASSQ##M > \
 typename dtl::enable_if< dtl::is_pair<Pair> BOOST_MOVE_I void>::type\
    dispatch_uses_allocator( ConstructAlloc & construct_alloc, BOOST_FWD_REF(ArgAlloc) arg_alloc, Pair* pair, piecewise_construct_t\
-      , BoostTuple<BOOST_MOVE_TARG##N  BOOST_MOVE_I##N BOOST_MOVE_REPEAT(BOOST_MOVE_SUB(10,N),::boost::tuples::null_type)> p\
-      , BoostTuple<BOOST_MOVE_TARGQ##M BOOST_MOVE_I##M BOOST_MOVE_REPEAT(BOOST_MOVE_SUB(10,M),::boost::tuples::null_type)> q)\
+      , BoostTuple<BOOST_MOVE_TARG##N  BOOST_MOVE_I##N BOOST_MOVE_REPEAT(BOOST_MOVE_SUB(10,N),::cppmsboost::tuples::null_type)> p\
+      , BoostTuple<BOOST_MOVE_TARGQ##M BOOST_MOVE_I##M BOOST_MOVE_REPEAT(BOOST_MOVE_SUB(10,M),::cppmsboost::tuples::null_type)> q)\
 {\
    (void)p; (void)q;\
    (dispatch_uses_allocator)\
@@ -317,9 +317,9 @@ BOOST_MOVE_ITER2D_0TOMAX(9, BOOST_DISPATCH_USES_ALLOCATOR_PIECEWISE_CONSTRUCT_BO
                                     , Tuple<Args1...>& t1, Tuple<Args2...>& t2, index_tuple<Indexes1...>, index_tuple<Indexes2...>)
    {
       (void)t1; (void)t2;
-      (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(pair->first), ::boost::forward<Args1>(get<Indexes1>(t1))...);
+      (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(pair->first), ::cppmsboost::forward<Args1>(get<Indexes1>(t1))...);
       BOOST_TRY{
-         (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(pair->second), ::boost::forward<Args2>(get<Indexes2>(t2))...);
+         (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(pair->second), ::cppmsboost::forward<Args2>(get<Indexes2>(t2))...);
       }
       BOOST_CATCH(...){
          allocator_traits<ConstructAlloc>::destroy(construct_alloc, dtl::addressof(pair->first));
@@ -415,9 +415,9 @@ typename dtl::enable_if< dtl::is_pair<Pair>, void >::type
    dispatch_uses_allocator
    (ConstructAlloc & construct_alloc, BOOST_FWD_REF(ArgAlloc) arg_alloc, Pair* p, try_emplace_t, BOOST_FWD_REF(KeyType) k, BOOST_FWD_REF(Args) ...args)
 {
-   (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(p->first), ::boost::forward<KeyType>(k));
+   (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(p->first), ::cppmsboost::forward<KeyType>(k));
    BOOST_TRY{
-      (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(p->second), ::boost::forward<Args>(args)...);
+      (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(p->second), ::cppmsboost::forward<Args>(args)...);
    }
    BOOST_CATCH(...) {
       allocator_traits<ConstructAlloc>::destroy(construct_alloc, dtl::addressof(p->first));
@@ -436,7 +436,7 @@ typename dtl::enable_if< dtl::is_pair<Pair>, void >::type
       (ConstructAlloc &construct_alloc, BOOST_FWD_REF(ArgAlloc) arg_alloc, Pair* p, try_emplace_t, \
        BOOST_FWD_REF(KeyType) k BOOST_MOVE_I##N BOOST_MOVE_UREF##N)\
    {\
-      (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(p->first), ::boost::forward<KeyType>(k));\
+      (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(p->first), ::cppmsboost::forward<KeyType>(k));\
       BOOST_TRY{\
          (dispatch_uses_allocator)(construct_alloc, arg_alloc, dtl::addressof(p->second) BOOST_MOVE_I##N BOOST_MOVE_FWD##N);\
       }\
@@ -454,7 +454,7 @@ BOOST_MOVE_ITERATE_0TO9(BOOST_CONTAINER_DISPATCH_USES_ALLOCATOR_PAIR_TRY_EMPLACE
 
 }  //namespace dtl
 
-}} // namespace boost { namespace container {
+}} // namespace cppmsboost { namespace container {
 
 #include <boost/container/detail/config_end.hpp>
 

@@ -18,7 +18,7 @@
 
 #include <boost/config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 namespace archive {
 namespace detail {
@@ -42,7 +42,7 @@ namespace detail {
 } // namespace detail
 
 // use an "accessor class so that we can use:
-// "friend class boost::serialization::access;"
+// "friend class cppmsboost::serialization::access;"
 // in any serialized class to permit clean, safe access to private class members
 // by the serialization system
 
@@ -140,6 +140,6 @@ public:
 };
 
 } // namespace serialization
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_SERIALIZATION_ACCESS_HPP

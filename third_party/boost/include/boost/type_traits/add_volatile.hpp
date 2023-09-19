@@ -12,7 +12,7 @@
 
 #include <boost/config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 // * convert a type T to volatile type - add_volatile<T>
 // this is not required since the result is always
@@ -41,6 +41,6 @@ template <class T> struct add_volatile<T&>{ typedef T& type; };
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_ADD_VOLATILE_HPP_INCLUDED

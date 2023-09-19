@@ -14,7 +14,7 @@
 #pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 
 BOOST_CONSTEXPR_OR_CONST DWORD_ FACILITY_NULL_ = 0;
@@ -3173,6 +3173,6 @@ BOOST_CONSTEXPR_OR_CONST DWORD_ STORE_ERROR_PENDING_COM_TRANSACTION_ = 15863;
 BOOST_CONSTEXPR_OR_CONST DWORD_ STORE_ERROR_LICENSE_REVOKED_ = 15864;
 
 } // namespace winapi
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_WINAPI_ERROR_CODES_HPP_INCLUDED_

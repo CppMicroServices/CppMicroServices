@@ -13,7 +13,7 @@
 #ifndef BOOST_NONE_T_17SEP2003_HPP
 #define BOOST_NONE_T_17SEP2003_HPP
 
-namespace boost {
+namespace cppmsboost {
 
 #ifdef BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
 
@@ -34,6 +34,6 @@ struct none_t
 
 #endif // old implementation workarounds
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // header guard

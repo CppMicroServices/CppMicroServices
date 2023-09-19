@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -126,7 +126,7 @@ using associated_allocator_t
 #endif // defined(BOOST_ASIO_HAS_ALIAS_TEMPLATES)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

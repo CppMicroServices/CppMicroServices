@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -35,7 +35,7 @@ protected:
   }
 
   std::size_t check_for_completion(
-      const boost::system::error_code& ec,
+      const cppmsboost::system::error_code& ec,
       std::size_t total_transferred)
   {
     return detail::adapt_completion_condition_result(
@@ -55,7 +55,7 @@ protected:
   }
 
   static std::size_t check_for_completion(
-      const boost::system::error_code& ec,
+      const cppmsboost::system::error_code& ec,
       std::size_t total_transferred)
   {
     return transfer_all_t()(ec, total_transferred);
@@ -64,7 +64,7 @@ protected:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -25,7 +25,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
@@ -97,11 +97,11 @@ namespace boost
           typedef thread_exception base_type;
     public:
         lock_error()
-        : base_type(0, "boost::lock_error")
+        : base_type(0, "cppmsboost::lock_error")
         {}
 
         lock_error( int ev )
-        : base_type(ev, "boost::lock_error")
+        : base_type(ev, "cppmsboost::lock_error")
         {
         }
         lock_error( int ev, const char * what_arg )
@@ -124,11 +124,11 @@ namespace boost
           typedef thread_exception base_type;
     public:
           thread_resource_error()
-          : base_type(static_cast<int>(system::errc::resource_unavailable_try_again), "boost::thread_resource_error")
+          : base_type(static_cast<int>(system::errc::resource_unavailable_try_again), "cppmsboost::thread_resource_error")
           {}
 
           thread_resource_error( int ev )
-          : base_type(ev, "boost::thread_resource_error")
+          : base_type(ev, "cppmsboost::thread_resource_error")
           {
           }
           thread_resource_error( int ev, const char * what_arg )
@@ -152,11 +152,11 @@ namespace boost
           typedef thread_exception base_type;
     public:
           unsupported_thread_option()
-          : base_type(static_cast<int>(system::errc::invalid_argument), "boost::unsupported_thread_option")
+          : base_type(static_cast<int>(system::errc::invalid_argument), "cppmsboost::unsupported_thread_option")
           {}
 
           unsupported_thread_option( int ev )
-          : base_type(ev, "boost::unsupported_thread_option")
+          : base_type(ev, "cppmsboost::unsupported_thread_option")
           {
           }
           unsupported_thread_option( int ev, const char * what_arg )
@@ -176,11 +176,11 @@ namespace boost
           typedef thread_exception base_type;
     public:
         invalid_thread_argument()
-        : base_type(static_cast<int>(system::errc::invalid_argument), "boost::invalid_thread_argument")
+        : base_type(static_cast<int>(system::errc::invalid_argument), "cppmsboost::invalid_thread_argument")
         {}
 
         invalid_thread_argument( int ev )
-        : base_type(ev, "boost::invalid_thread_argument")
+        : base_type(ev, "cppmsboost::invalid_thread_argument")
         {
         }
         invalid_thread_argument( int ev, const char * what_arg )
@@ -200,11 +200,11 @@ namespace boost
           typedef thread_exception base_type;
     public:
           thread_permission_error()
-          : base_type(static_cast<int>(system::errc::permission_denied), "boost::thread_permission_error")
+          : base_type(static_cast<int>(system::errc::permission_denied), "cppmsboost::thread_permission_error")
           {}
 
           thread_permission_error( int ev )
-          : base_type(ev, "boost::thread_permission_error")
+          : base_type(ev, "cppmsboost::thread_permission_error")
           {
           }
           thread_permission_error( int ev, const char * what_arg )
@@ -218,7 +218,7 @@ namespace boost
 
     };
 
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/config/abi_suffix.hpp>
 

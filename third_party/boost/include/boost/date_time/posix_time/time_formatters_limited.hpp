@@ -17,7 +17,7 @@
 #include <boost/date_time/time_formatting_streams.hpp>
 #include <boost/date_time/time_resolution_traits.hpp> // absolute_value
 
-namespace boost {
+namespace cppmsboost {
 
 namespace posix_time {
 
@@ -58,7 +58,7 @@ namespace posix_time {
           << date_time::absolute_value(td.seconds());
       //TODO the following is totally non-generic, yelling FIXME
 #if (defined(BOOST_MSVC) && (_MSC_VER < 1300))
-      boost::int64_t frac_sec =
+      cppmsboost::int64_t frac_sec =
         date_time::absolute_value(td.fractional_seconds());
       // JDG [7/6/02 VC++ compatibility]
       char buff[32];
@@ -121,7 +121,7 @@ namespace posix_time {
           << date_time::absolute_value(td.seconds());
       //TODO the following is totally non-generic, yelling FIXME
 #if (defined(BOOST_MSVC) && (_MSC_VER < 1300))
-      boost::int64_t frac_sec =
+      cppmsboost::int64_t frac_sec =
         date_time::absolute_value(td.fractional_seconds());
       // JDG [7/6/02 VC++ compatibility]
       char buff[32];

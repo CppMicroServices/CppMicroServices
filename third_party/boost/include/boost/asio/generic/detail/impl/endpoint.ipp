@@ -27,7 +27,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace generic {
 namespace detail {
@@ -45,10 +45,10 @@ endpoint::endpoint(const void* sock_addr,
 
 void endpoint::resize(std::size_t new_size)
 {
-  if (new_size > sizeof(boost::asio::detail::sockaddr_storage_type))
+  if (new_size > sizeof(cppmsboost::asio::detail::sockaddr_storage_type))
   {
-    boost::system::error_code ec(boost::asio::error::invalid_argument);
-    boost::asio::detail::throw_error(ec);
+    cppmsboost::system::error_code ec(cppmsboost::asio::error::invalid_argument);
+    cppmsboost::asio::detail::throw_error(ec);
   }
   else
   {
@@ -87,14 +87,14 @@ bool operator<(const endpoint& e1, const endpoint& e2)
 void endpoint::init(const void* sock_addr,
     std::size_t sock_addr_size, int sock_protocol)
 {
-  if (sock_addr_size > sizeof(boost::asio::detail::sockaddr_storage_type))
+  if (sock_addr_size > sizeof(cppmsboost::asio::detail::sockaddr_storage_type))
   {
-    boost::system::error_code ec(boost::asio::error::invalid_argument);
-    boost::asio::detail::throw_error(ec);
+    cppmsboost::system::error_code ec(cppmsboost::asio::error::invalid_argument);
+    cppmsboost::asio::detail::throw_error(ec);
   }
 
   using namespace std; // For memset and memcpy.
-  memset(&data_.generic, 0, sizeof(boost::asio::detail::sockaddr_storage_type));
+  memset(&data_.generic, 0, sizeof(cppmsboost::asio::detail::sockaddr_storage_type));
   if (sock_addr_size > 0)
     memcpy(&data_.generic, sock_addr, sock_addr_size);
 
@@ -105,7 +105,7 @@ void endpoint::init(const void* sock_addr,
 } // namespace detail
 } // namespace generic
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

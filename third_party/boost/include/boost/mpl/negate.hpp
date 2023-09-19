@@ -22,7 +22,7 @@
 #include <boost/mpl/aux_/config/integral.hpp>
 #include <boost/mpl/aux_/config/static_constant.hpp>
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 template< typename Tag > struct negate_impl;
 

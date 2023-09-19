@@ -30,7 +30,7 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 namespace detail {
@@ -72,7 +72,7 @@ protected:
     typedef detail::common_iarchive<Archive> detail_common_iarchive;
     template<class T>
     void load_override(
-        const boost::serialization::nvp< T > & t
+        const cppmsboost::serialization::nvp< T > & t
     ){
         this->This()->load_start(t.name());
         this->detail_common_iarchive::load_override(t.value());
@@ -108,7 +108,7 @@ protected:
 };
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

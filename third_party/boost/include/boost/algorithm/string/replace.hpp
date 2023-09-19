@@ -29,7 +29,7 @@
     part(s) of the input according to set of searching and replace criteria.
 */
 
-namespace boost {
+namespace cppmsboost {
     namespace algorithm {
 
 //  replace_range --------------------------------------------------------------------//
@@ -61,11 +61,11 @@ namespace boost {
                     range_const_iterator<Range1T>::type>& SearchRange,
             const Range2T& Format)
         {
-            return ::boost::algorithm::find_format_copy(
+            return ::cppmsboost::algorithm::find_format_copy(
                 Output,
                 Input,
-                ::boost::algorithm::range_finder(SearchRange),
-                ::boost::algorithm::const_formatter(Format));
+                ::cppmsboost::algorithm::range_finder(SearchRange),
+                ::cppmsboost::algorithm::const_formatter(Format));
         }
 
         //! Replace range algorithm
@@ -80,10 +80,10 @@ namespace boost {
                     range_const_iterator<SequenceT>::type>& SearchRange,
             const RangeT& Format)
         {
-            return ::boost::algorithm::find_format_copy(
+            return ::cppmsboost::algorithm::find_format_copy(
                 Input,
-                ::boost::algorithm::range_finder(SearchRange),
-                ::boost::algorithm::const_formatter(Format));
+                ::cppmsboost::algorithm::range_finder(SearchRange),
+                ::cppmsboost::algorithm::const_formatter(Format));
         }
 
         //! Replace range algorithm
@@ -103,10 +103,10 @@ namespace boost {
                     range_iterator<SequenceT>::type>& SearchRange,
             const RangeT& Format)
         {
-            ::boost::algorithm::find_format(
+            ::cppmsboost::algorithm::find_format(
                 Input,
-                ::boost::algorithm::range_finder(SearchRange),
-                ::boost::algorithm::const_formatter(Format));
+                ::cppmsboost::algorithm::range_finder(SearchRange),
+                ::cppmsboost::algorithm::const_formatter(Format));
         }
 
 //  replace_first --------------------------------------------------------------------//
@@ -138,11 +138,11 @@ namespace boost {
             const Range2T& Search,
             const Range3T& Format)
         {
-            return ::boost::algorithm::find_format_copy(
+            return ::cppmsboost::algorithm::find_format_copy(
                 Output,
                 Input,
-                ::boost::algorithm::first_finder(Search),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::first_finder(Search),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace first algorithm
@@ -155,10 +155,10 @@ namespace boost {
             const Range1T& Search,
             const Range2T& Format )
         {
-            return ::boost::algorithm::find_format_copy( 
+            return ::cppmsboost::algorithm::find_format_copy( 
                 Input,
-                ::boost::algorithm::first_finder(Search),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::first_finder(Search),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace first algorithm
@@ -176,10 +176,10 @@ namespace boost {
             const Range1T& Search,
             const Range2T& Format )
         {
-            ::boost::algorithm::find_format( 
+            ::cppmsboost::algorithm::find_format( 
                 Input, 
-                ::boost::algorithm::first_finder(Search),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::first_finder(Search),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
 //  replace_first ( case insensitive ) ---------------------------------------------//
@@ -214,11 +214,11 @@ namespace boost {
             const Range3T& Format,
             const std::locale& Loc=std::locale() )
         {
-            return ::boost::algorithm::find_format_copy(
+            return ::cppmsboost::algorithm::find_format_copy(
                 Output,
                 Input,
-                ::boost::algorithm::first_finder(Search, is_iequal(Loc)),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::first_finder(Search, is_iequal(Loc)),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace first algorithm ( case insensitive )
@@ -232,10 +232,10 @@ namespace boost {
             const Range1T& Format,
             const std::locale& Loc=std::locale() )
         {
-            return ::boost::algorithm::find_format_copy( 
+            return ::cppmsboost::algorithm::find_format_copy( 
                 Input,
-                ::boost::algorithm::first_finder(Search, is_iequal(Loc)),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::first_finder(Search, is_iequal(Loc)),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace first algorithm ( case insensitive )
@@ -256,10 +256,10 @@ namespace boost {
             const Range2T& Format,
             const std::locale& Loc=std::locale() )
         {
-            ::boost::algorithm::find_format( 
+            ::cppmsboost::algorithm::find_format( 
                 Input, 
-                ::boost::algorithm::first_finder(Search, is_iequal(Loc)),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::first_finder(Search, is_iequal(Loc)),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
 //  replace_last --------------------------------------------------------------------//
@@ -291,11 +291,11 @@ namespace boost {
             const Range2T& Search,
             const Range3T& Format )
         {
-            return ::boost::algorithm::find_format_copy(
+            return ::cppmsboost::algorithm::find_format_copy(
                 Output,
                 Input,
-                ::boost::algorithm::last_finder(Search),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::last_finder(Search),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace last algorithm
@@ -308,10 +308,10 @@ namespace boost {
             const Range1T& Search,
             const Range2T& Format )
         {
-            return ::boost::algorithm::find_format_copy( 
+            return ::cppmsboost::algorithm::find_format_copy( 
                 Input,
-                ::boost::algorithm::last_finder(Search),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::last_finder(Search),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace last algorithm
@@ -329,10 +329,10 @@ namespace boost {
             const Range1T& Search,
             const Range2T& Format )
         {
-            ::boost::algorithm::find_format( 
+            ::cppmsboost::algorithm::find_format( 
                 Input, 
-                ::boost::algorithm::last_finder(Search),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::last_finder(Search),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
 //  replace_last ( case insensitive ) -----------------------------------------------//
@@ -367,11 +367,11 @@ namespace boost {
             const Range3T& Format,
             const std::locale& Loc=std::locale() )
         {
-            return ::boost::algorithm::find_format_copy(
+            return ::cppmsboost::algorithm::find_format_copy(
                 Output,
                 Input,
-                ::boost::algorithm::last_finder(Search, is_iequal(Loc)),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::last_finder(Search, is_iequal(Loc)),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace last algorithm ( case insensitive )
@@ -385,10 +385,10 @@ namespace boost {
             const Range2T& Format,
             const std::locale& Loc=std::locale() )
         {
-            return ::boost::algorithm::find_format_copy( 
+            return ::cppmsboost::algorithm::find_format_copy( 
                 Input,
-                ::boost::algorithm::last_finder(Search, is_iequal(Loc)),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::last_finder(Search, is_iequal(Loc)),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace last algorithm ( case insensitive )
@@ -409,10 +409,10 @@ namespace boost {
             const Range2T& Format,
             const std::locale& Loc=std::locale() )
         {
-            ::boost::algorithm::find_format( 
+            ::cppmsboost::algorithm::find_format( 
                 Input, 
-                ::boost::algorithm::last_finder(Search, is_iequal(Loc)),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::last_finder(Search, is_iequal(Loc)),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
 //  replace_nth --------------------------------------------------------------------//
@@ -447,11 +447,11 @@ namespace boost {
             int Nth,
             const Range3T& Format )
         {
-            return ::boost::algorithm::find_format_copy(
+            return ::cppmsboost::algorithm::find_format_copy(
                 Output,
                 Input,
-                ::boost::algorithm::nth_finder(Search, Nth),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::nth_finder(Search, Nth),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace nth algorithm
@@ -465,10 +465,10 @@ namespace boost {
             int Nth,
             const Range2T& Format )
         {
-            return ::boost::algorithm::find_format_copy( 
+            return ::cppmsboost::algorithm::find_format_copy( 
                 Input,
-                ::boost::algorithm::nth_finder(Search, Nth),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::nth_finder(Search, Nth),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace nth algorithm
@@ -489,10 +489,10 @@ namespace boost {
             int Nth,
             const Range2T& Format )
         {
-            ::boost::algorithm::find_format( 
+            ::cppmsboost::algorithm::find_format( 
                 Input, 
-                ::boost::algorithm::nth_finder(Search, Nth),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::nth_finder(Search, Nth),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
 //  replace_nth ( case insensitive ) -----------------------------------------------//
@@ -530,11 +530,11 @@ namespace boost {
             const Range3T& Format,
             const std::locale& Loc=std::locale() )
         {
-            return ::boost::algorithm::find_format_copy(
+            return ::cppmsboost::algorithm::find_format_copy(
                 Output,
                 Input,
-                ::boost::algorithm::nth_finder(Search, Nth, is_iequal(Loc) ),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::nth_finder(Search, Nth, is_iequal(Loc) ),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace nth algorithm ( case insensitive )
@@ -549,10 +549,10 @@ namespace boost {
             const Range2T& Format,
             const std::locale& Loc=std::locale() )
         {
-            return ::boost::algorithm::find_format_copy( 
+            return ::cppmsboost::algorithm::find_format_copy( 
                 Input,
-                ::boost::algorithm::nth_finder(Search, Nth, is_iequal(Loc)),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::nth_finder(Search, Nth, is_iequal(Loc)),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace nth algorithm ( case insensitive )
@@ -576,10 +576,10 @@ namespace boost {
             const Range2T& Format,
             const std::locale& Loc=std::locale() )
         {
-            ::boost::algorithm::find_format( 
+            ::cppmsboost::algorithm::find_format( 
                 Input, 
-                ::boost::algorithm::nth_finder(Search, Nth, is_iequal(Loc)),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::nth_finder(Search, Nth, is_iequal(Loc)),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
 //  replace_all --------------------------------------------------------------------//
@@ -611,11 +611,11 @@ namespace boost {
             const Range2T& Search,
             const Range3T& Format )
         {
-            return ::boost::algorithm::find_format_all_copy(
+            return ::cppmsboost::algorithm::find_format_all_copy(
                 Output,
                 Input,
-                ::boost::algorithm::first_finder(Search),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::first_finder(Search),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace all algorithm
@@ -628,10 +628,10 @@ namespace boost {
             const Range1T& Search,
             const Range2T& Format )
         {
-            return ::boost::algorithm::find_format_all_copy( 
+            return ::cppmsboost::algorithm::find_format_all_copy( 
                 Input,
-                ::boost::algorithm::first_finder(Search),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::first_finder(Search),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace all algorithm
@@ -649,10 +649,10 @@ namespace boost {
             const Range1T& Search,
             const Range2T& Format )
         {
-            ::boost::algorithm::find_format_all( 
+            ::cppmsboost::algorithm::find_format_all( 
                 Input, 
-                ::boost::algorithm::first_finder(Search),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::first_finder(Search),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
         
 //  replace_all ( case insensitive ) -----------------------------------------------//
@@ -687,11 +687,11 @@ namespace boost {
             const Range3T& Format,
             const std::locale& Loc=std::locale() )
         {
-            return ::boost::algorithm::find_format_all_copy(
+            return ::cppmsboost::algorithm::find_format_all_copy(
                 Output,
                 Input,
-                ::boost::algorithm::first_finder(Search, is_iequal(Loc)),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::first_finder(Search, is_iequal(Loc)),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace all algorithm ( case insensitive )
@@ -705,10 +705,10 @@ namespace boost {
             const Range2T& Format,
             const std::locale& Loc=std::locale() )
         {
-            return ::boost::algorithm::find_format_all_copy( 
+            return ::cppmsboost::algorithm::find_format_all_copy( 
                 Input,
-                ::boost::algorithm::first_finder(Search, is_iequal(Loc)),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::first_finder(Search, is_iequal(Loc)),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace all algorithm ( case insensitive )
@@ -729,10 +729,10 @@ namespace boost {
             const Range2T& Format,
             const std::locale& Loc=std::locale() )
         {
-            ::boost::algorithm::find_format_all( 
+            ::cppmsboost::algorithm::find_format_all( 
                 Input, 
-                ::boost::algorithm::first_finder(Search, is_iequal(Loc)),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::first_finder(Search, is_iequal(Loc)),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
         
 //  replace_head --------------------------------------------------------------------//
@@ -767,11 +767,11 @@ namespace boost {
             int N,
             const Range2T& Format )
         {
-            return ::boost::algorithm::find_format_copy(
+            return ::cppmsboost::algorithm::find_format_copy(
                 Output,
                 Input,
-                ::boost::algorithm::head_finder(N),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::head_finder(N),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace head algorithm
@@ -784,10 +784,10 @@ namespace boost {
             int N,
             const RangeT& Format )
         {
-            return ::boost::algorithm::find_format_copy( 
+            return ::cppmsboost::algorithm::find_format_copy( 
                 Input,
-                ::boost::algorithm::head_finder(N),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::head_finder(N),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace head algorithm
@@ -809,10 +809,10 @@ namespace boost {
             int N,
             const RangeT& Format )
         {
-            ::boost::algorithm::find_format( 
+            ::cppmsboost::algorithm::find_format( 
                 Input, 
-                ::boost::algorithm::head_finder(N),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::head_finder(N),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
 //  replace_tail --------------------------------------------------------------------//
@@ -847,11 +847,11 @@ namespace boost {
             int N,
             const Range2T& Format )
         {
-            return ::boost::algorithm::find_format_copy(
+            return ::cppmsboost::algorithm::find_format_copy(
                 Output,
                 Input,
-                ::boost::algorithm::tail_finder(N),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::tail_finder(N),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace tail algorithm
@@ -864,10 +864,10 @@ namespace boost {
             int N,
             const RangeT& Format )
         {
-            return ::boost::algorithm::find_format_copy( 
+            return ::cppmsboost::algorithm::find_format_copy( 
                 Input,
-                ::boost::algorithm::tail_finder(N),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::tail_finder(N),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
         //! Replace tail algorithm
@@ -889,10 +889,10 @@ namespace boost {
             int N,
             const RangeT& Format )
         {
-            ::boost::algorithm::find_format( 
+            ::cppmsboost::algorithm::find_format( 
                 Input, 
-                ::boost::algorithm::tail_finder(N),
-                ::boost::algorithm::const_formatter(Format) );
+                ::cppmsboost::algorithm::tail_finder(N),
+                ::cppmsboost::algorithm::const_formatter(Format) );
         }
 
     } // namespace algorithm
@@ -921,6 +921,6 @@ namespace boost {
     using algorithm::replace_tail_copy;
     using algorithm::replace_tail;
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // BOOST_REPLACE_HPP

@@ -26,7 +26,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
@@ -38,7 +38,7 @@ address::address() BOOST_ASIO_NOEXCEPT
 }
 
 address::address(
-    const boost::asio::ip::address_v4& ipv4_address) BOOST_ASIO_NOEXCEPT
+    const cppmsboost::asio::ip::address_v4& ipv4_address) BOOST_ASIO_NOEXCEPT
   : type_(ipv4),
     ipv4_address_(ipv4_address),
     ipv6_address_()
@@ -46,7 +46,7 @@ address::address(
 }
 
 address::address(
-    const boost::asio::ip::address_v6& ipv6_address) BOOST_ASIO_NOEXCEPT
+    const cppmsboost::asio::ip::address_v6& ipv6_address) BOOST_ASIO_NOEXCEPT
   : type_(ipv6),
     ipv4_address_(),
     ipv6_address_(ipv6_address)
@@ -88,41 +88,41 @@ address& address::operator=(address&& other) BOOST_ASIO_NOEXCEPT
 #endif // defined(BOOST_ASIO_HAS_MOVE)
 
 address& address::operator=(
-    const boost::asio::ip::address_v4& ipv4_address) BOOST_ASIO_NOEXCEPT
+    const cppmsboost::asio::ip::address_v4& ipv4_address) BOOST_ASIO_NOEXCEPT
 {
   type_ = ipv4;
   ipv4_address_ = ipv4_address;
-  ipv6_address_ = boost::asio::ip::address_v6();
+  ipv6_address_ = cppmsboost::asio::ip::address_v6();
   return *this;
 }
 
 address& address::operator=(
-    const boost::asio::ip::address_v6& ipv6_address) BOOST_ASIO_NOEXCEPT
+    const cppmsboost::asio::ip::address_v6& ipv6_address) BOOST_ASIO_NOEXCEPT
 {
   type_ = ipv6;
-  ipv4_address_ = boost::asio::ip::address_v4();
+  ipv4_address_ = cppmsboost::asio::ip::address_v4();
   ipv6_address_ = ipv6_address;
   return *this;
 }
 
 address make_address(const char* str)
 {
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   address addr = make_address(str, ec);
-  boost::asio::detail::throw_error(ec);
+  cppmsboost::asio::detail::throw_error(ec);
   return addr;
 }
 
 address make_address(const char* str,
-    boost::system::error_code& ec) BOOST_ASIO_NOEXCEPT
+    cppmsboost::system::error_code& ec) BOOST_ASIO_NOEXCEPT
 {
-  boost::asio::ip::address_v6 ipv6_address =
-    boost::asio::ip::make_address_v6(str, ec);
+  cppmsboost::asio::ip::address_v6 ipv6_address =
+    cppmsboost::asio::ip::make_address_v6(str, ec);
   if (!ec)
     return address(ipv6_address);
 
-  boost::asio::ip::address_v4 ipv4_address =
-    boost::asio::ip::make_address_v4(str, ec);
+  cppmsboost::asio::ip::address_v4 ipv4_address =
+    cppmsboost::asio::ip::make_address_v4(str, ec);
   if (!ec)
     return address(ipv4_address);
 
@@ -135,7 +135,7 @@ address make_address(const std::string& str)
 }
 
 address make_address(const std::string& str,
-    boost::system::error_code& ec) BOOST_ASIO_NOEXCEPT
+    cppmsboost::system::error_code& ec) BOOST_ASIO_NOEXCEPT
 {
   return make_address(str.c_str(), ec);
 }
@@ -148,29 +148,29 @@ address make_address(string_view str)
 }
 
 address make_address(string_view str,
-    boost::system::error_code& ec) BOOST_ASIO_NOEXCEPT
+    cppmsboost::system::error_code& ec) BOOST_ASIO_NOEXCEPT
 {
   return make_address(static_cast<std::string>(str), ec);
 }
 
 #endif // defined(BOOST_ASIO_HAS_STRING_VIEW)
 
-boost::asio::ip::address_v4 address::to_v4() const
+cppmsboost::asio::ip::address_v4 address::to_v4() const
 {
   if (type_ != ipv4)
   {
     bad_address_cast ex;
-    boost::asio::detail::throw_exception(ex);
+    cppmsboost::asio::detail::throw_exception(ex);
   }
   return ipv4_address_;
 }
 
-boost::asio::ip::address_v6 address::to_v6() const
+cppmsboost::asio::ip::address_v6 address::to_v6() const
 {
   if (type_ != ipv6)
   {
     bad_address_cast ex;
-    boost::asio::detail::throw_exception(ex);
+    cppmsboost::asio::detail::throw_exception(ex);
   }
   return ipv6_address_;
 }
@@ -183,7 +183,7 @@ std::string address::to_string() const
 }
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
-std::string address::to_string(boost::system::error_code& ec) const
+std::string address::to_string(cppmsboost::system::error_code& ec) const
 {
   if (type_ == ipv6)
     return ipv6_address_.to_string(ec);
@@ -234,7 +234,7 @@ bool operator<(const address& a1, const address& a2) BOOST_ASIO_NOEXCEPT
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

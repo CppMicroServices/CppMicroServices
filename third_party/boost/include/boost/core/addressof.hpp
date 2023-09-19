@@ -31,7 +31,7 @@ http://www.boost.org/LICENSE_1_0.txt)
 #define BOOST_CORE_NO_CONSTEXPR_ADDRESSOF
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 template<class T>
 BOOST_CONSTEXPR inline T*
@@ -45,7 +45,7 @@ addressof(T& o) BOOST_NOEXCEPT
 #include <boost/config/workaround.hpp>
 #include <cstddef>
 
-namespace boost {
+namespace cppmsboost {
 namespace detail {
 
 template<class T>
@@ -127,9 +127,9 @@ addressof(T& o) BOOST_NOEXCEPT
 {
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x610)) || \
     BOOST_WORKAROUND(__SUNPRO_CC, <= 0x5120)
-    return boost::detail::addrof<T>::get(o, 0);
+    return cppmsboost::detail::addrof<T>::get(o, 0);
 #else
-    return boost::detail::addrof<T>::get(boost::detail::addrof_ref<T>(o), 0);
+    return cppmsboost::detail::addrof<T>::get(cppmsboost::detail::addrof_ref<T>(o), 0);
 #endif
 }
 
@@ -144,7 +144,7 @@ struct addrof_result {
 } /* detail */
 
 template<class T, std::size_t N>
-BOOST_FORCEINLINE typename boost::detail::addrof_result<T[N]>::type
+BOOST_FORCEINLINE typename cppmsboost::detail::addrof_result<T[N]>::type
 addressof(T (&o)[N]) BOOST_NOEXCEPT
 {
     return &o;
@@ -254,7 +254,7 @@ template<class T>
 constexpr BOOST_FORCEINLINE T*
 addressof(T& o) BOOST_NOEXCEPT
 {
-    return boost::detail::addressof(o);
+    return cppmsboost::detail::addressof(o);
 }
 #endif
 
@@ -263,7 +263,7 @@ addressof(T& o) BOOST_NOEXCEPT
 
 #if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && \
     !defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
-namespace boost {
+namespace cppmsboost {
 
 template<class T>
 const T* addressof(const T&&) = delete;

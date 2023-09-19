@@ -9,7 +9,7 @@
 // *Preprocessed* version of the main "full_lambda.hpp" header
 // -- DO NOT modify by hand!
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 namespace aux {
 

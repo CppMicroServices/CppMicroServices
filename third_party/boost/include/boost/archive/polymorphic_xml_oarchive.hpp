@@ -20,7 +20,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/detail/polymorphic_oarchive_route.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 class BOOST_SYMBOL_VISIBLE polymorphic_xml_oarchive :
@@ -33,11 +33,11 @@ public:
     ~polymorphic_xml_oarchive(){}
 };
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 // required by export
 BOOST_SERIALIZATION_REGISTER_ARCHIVE(
-    boost::archive::polymorphic_xml_oarchive
+    cppmsboost::archive::polymorphic_xml_oarchive
 )
 
 #endif // BOOST_ARCHIVE_POLYMORPHIC_XML_OARCHIVE_HPP

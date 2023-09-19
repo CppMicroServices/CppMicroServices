@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// A special type, similar to std::nothrow_t, used to disambiguate
@@ -43,7 +43,7 @@ struct executor_arg_t
 /// A special value, similar to std::nothrow, used to disambiguate constructors
 /// that accept executor arguments.
 /**
- * See boost::asio::executor_arg_t and boost::asio::uses_executor
+ * See cppmsboost::asio::executor_arg_t and cppmsboost::asio::uses_executor
  * for more information.
  */
 #if defined(BOOST_ASIO_HAS_CONSTEXPR) || defined(GENERATING_DOCUMENTATION)
@@ -66,7 +66,7 @@ template <typename T, typename Executor>
 struct uses_executor : false_type {};
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

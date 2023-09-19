@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 class mutable_buffer;
@@ -62,7 +62,7 @@ char buffer_sequence_begin_helper(...);
 template <typename T>
 char (&buffer_sequence_begin_helper(T* t,
     typename enable_if<!is_same<
-      decltype(boost::asio::buffer_sequence_begin(*t)),
+      decltype(cppmsboost::asio::buffer_sequence_begin(*t)),
         void>::value>::type*))[2];
 
 #else // defined(BOOST_ASIO_HAS_DECLTYPE)
@@ -86,7 +86,7 @@ char buffer_sequence_end_helper(...);
 template <typename T>
 char (&buffer_sequence_end_helper(T* t,
     typename enable_if<!is_same<
-      decltype(boost::asio::buffer_sequence_end(*t)),
+      decltype(cppmsboost::asio::buffer_sequence_end(*t)),
         void>::value>::type*))[2];
 
 #else // defined(BOOST_ASIO_HAS_DECLTYPE)
@@ -191,7 +191,7 @@ char (&buffer_sequence_element_type_helper(...))[2];
 template <typename T, typename Buffer>
 char buffer_sequence_element_type_helper(T* t,
     typename enable_if<is_convertible<
-      decltype(*boost::asio::buffer_sequence_begin(*t)),
+      decltype(*cppmsboost::asio::buffer_sequence_begin(*t)),
         Buffer>::value>::type*);
 
 #else // defined(BOOST_ASIO_HAS_DECLTYPE)
@@ -307,7 +307,7 @@ struct is_dynamic_buffer_v2
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

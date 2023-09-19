@@ -25,7 +25,7 @@
 #pragma warning(push, 1)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace chrono {
 namespace detail {
 

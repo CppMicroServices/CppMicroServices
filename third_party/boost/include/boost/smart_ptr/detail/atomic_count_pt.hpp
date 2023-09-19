@@ -22,7 +22,7 @@
 //  Users can detect this situation by checking BOOST_AC_USE_PTHREADS.
 //
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -92,6 +92,6 @@ private:
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_SMART_PTR_DETAIL_ATOMIC_COUNT_PTHREADS_HPP_INCLUDED

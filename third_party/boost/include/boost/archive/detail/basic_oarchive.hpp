@@ -26,7 +26,7 @@
 #include <boost/archive/detail/helper_collection.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
     class extended_type_info;
 } // namespace serialization
@@ -41,12 +41,12 @@ class basic_pointer_oserializer;
 //////////////////////////////////////////////////////////////////////
 // class basic_oarchive - write serialized objects to an output stream
 class BOOST_SYMBOL_VISIBLE basic_oarchive :
-    private boost::noncopyable,
-    public boost::archive::detail::helper_collection
+    private cppmsboost::noncopyable,
+    public cppmsboost::archive::detail::helper_collection
 {
     friend class basic_oarchive_impl;
     // hide implementation of this class to minimize header conclusion
-    boost::scoped_ptr<basic_oarchive_impl> pimpl;
+    cppmsboost::scoped_ptr<basic_oarchive_impl> pimpl;
 
     // overload these to bracket object attributes. Used to implement
     // xml archives
@@ -60,7 +60,7 @@ class BOOST_SYMBOL_VISIBLE basic_oarchive :
     virtual void vsave(const tracking_type t) = 0;
 protected:
     BOOST_ARCHIVE_DECL basic_oarchive(unsigned int flags = 0);
-    BOOST_ARCHIVE_DECL boost::archive::detail::helper_collection &
+    BOOST_ARCHIVE_DECL cppmsboost::archive::detail::helper_collection &
     get_helper_collection();
     virtual BOOST_ARCHIVE_DECL ~basic_oarchive();
 public:
@@ -87,7 +87,7 @@ public:
 
 } // namespace detail
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/archive/detail/abi_suffix.hpp> // pops abi_suffix.hpp pragmas
 

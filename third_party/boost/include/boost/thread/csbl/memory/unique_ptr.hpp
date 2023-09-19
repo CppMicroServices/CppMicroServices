@@ -16,12 +16,12 @@
 #include <boost/move/unique_ptr.hpp>
 #include <boost/move/make_unique.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   namespace csbl
   {
-    using ::boost::movelib::unique_ptr;
-    using ::boost::movelib::make_unique;
+    using ::cppmsboost::movelib::unique_ptr;
+    using ::cppmsboost::movelib::make_unique;
 
   }
 }

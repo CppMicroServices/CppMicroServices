@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 class executor;
@@ -72,7 +72,7 @@ public:
 
   // Construct an I/O object using an executor.
   explicit io_object_impl(const executor_type& ex)
-    : service_(&boost::asio::use_service<IoObjectService>(ex.context())),
+    : service_(&cppmsboost::asio::use_service<IoObjectService>(ex.context())),
       implementation_executor_(ex, (is_native_io_executor)(ex))
   {
     service_->construct(implementation_);
@@ -83,7 +83,7 @@ public:
   explicit io_object_impl(ExecutionContext& context,
       typename enable_if<is_convertible<
         ExecutionContext&, execution_context&>::value>::type* = 0)
-    : service_(&boost::asio::use_service<IoObjectService>(context)),
+    : service_(&cppmsboost::asio::use_service<IoObjectService>(context)),
       implementation_executor_(context.get_executor(),
         is_same<ExecutionContext, io_context>::value)
   {
@@ -102,7 +102,7 @@ public:
   // Perform a converting move-construction of an I/O object.
   template <typename IoObjectService1, typename Executor1>
   io_object_impl(io_object_impl<IoObjectService1, Executor1>&& other)
-    : service_(&boost::asio::use_service<IoObjectService>(
+    : service_(&cppmsboost::asio::use_service<IoObjectService>(
             other.get_implementation_executor().context())),
       implementation_executor_(other.get_implementation_executor())
   {
@@ -188,7 +188,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

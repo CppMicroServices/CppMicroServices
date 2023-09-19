@@ -29,7 +29,7 @@
     desired case using provided locales.
 */
 
-namespace boost {
+namespace cppmsboost {
     namespace algorithm {
 
 //  to_lower  -----------------------------------------------//
@@ -57,10 +57,10 @@ namespace boost {
             const RangeT& Input,
             const std::locale& Loc=std::locale())
         {
-            return ::boost::algorithm::detail::transform_range_copy( 
+            return ::cppmsboost::algorithm::detail::transform_range_copy( 
                Output,
-               ::boost::as_literal(Input),
-               ::boost::algorithm::detail::to_lowerF<
+               ::cppmsboost::as_literal(Input),
+               ::cppmsboost::algorithm::detail::to_lowerF<
                     typename range_value<RangeT>::type >(Loc));
         }
 
@@ -73,9 +73,9 @@ namespace boost {
             const SequenceT& Input, 
             const std::locale& Loc=std::locale())
         {
-            return ::boost::algorithm::detail::transform_range_copy<SequenceT>(
+            return ::cppmsboost::algorithm::detail::transform_range_copy<SequenceT>(
                 Input,
-                ::boost::algorithm::detail::to_lowerF<
+                ::cppmsboost::algorithm::detail::to_lowerF<
                     typename range_value<SequenceT>::type >(Loc));
         }
 
@@ -92,9 +92,9 @@ namespace boost {
             WritableRangeT& Input, 
             const std::locale& Loc=std::locale())
         {
-            ::boost::algorithm::detail::transform_range(
-                ::boost::as_literal(Input),
-                ::boost::algorithm::detail::to_lowerF<
+            ::cppmsboost::algorithm::detail::transform_range(
+                ::cppmsboost::as_literal(Input),
+                ::cppmsboost::algorithm::detail::to_lowerF<
                     typename range_value<WritableRangeT>::type >(Loc));
         }
         
@@ -122,10 +122,10 @@ namespace boost {
             const RangeT& Input,
             const std::locale& Loc=std::locale())
         {
-            return ::boost::algorithm::detail::transform_range_copy( 
+            return ::cppmsboost::algorithm::detail::transform_range_copy( 
                Output,
-               ::boost::as_literal(Input),
-               ::boost::algorithm::detail::to_upperF<
+               ::cppmsboost::as_literal(Input),
+               ::cppmsboost::algorithm::detail::to_upperF<
                     typename range_value<RangeT>::type >(Loc));
         }
 
@@ -138,9 +138,9 @@ namespace boost {
             const SequenceT& Input, 
             const std::locale& Loc=std::locale())
         {
-            return ::boost::algorithm::detail::transform_range_copy<SequenceT>(
+            return ::cppmsboost::algorithm::detail::transform_range_copy<SequenceT>(
                 Input,
-                ::boost::algorithm::detail::to_upperF<
+                ::cppmsboost::algorithm::detail::to_upperF<
                     typename range_value<SequenceT>::type >(Loc));
         }
 
@@ -157,9 +157,9 @@ namespace boost {
             WritableRangeT& Input, 
             const std::locale& Loc=std::locale())
         {
-            ::boost::algorithm::detail::transform_range(
-                ::boost::as_literal(Input),
-                ::boost::algorithm::detail::to_upperF<
+            ::cppmsboost::algorithm::detail::transform_range(
+                ::cppmsboost::as_literal(Input),
+                ::cppmsboost::algorithm::detail::to_upperF<
                     typename range_value<WritableRangeT>::type >(Loc));
         }
 
@@ -171,6 +171,6 @@ namespace boost {
     using algorithm::to_upper;
     using algorithm::to_upper_copy;
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // BOOST_STRING_CASE_CONV_HPP

@@ -17,7 +17,7 @@
 #  include BOOST_ABI_PREFIX
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace context {
 
 #if ! defined(BOOST_CONTEXT_NO_CXX11)

@@ -23,18 +23,18 @@
 # include <boost/function.hpp>
 #endif // !defined(BOOST_ASIO_HAS_STD_FUNCTION)
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
 #if defined(BOOST_ASIO_HAS_STD_FUNCTION)
 using std::function;
 #else // defined(BOOST_ASIO_HAS_STD_FUNCTION)
-using boost::function;
+using cppmsboost::function;
 #endif // defined(BOOST_ASIO_HAS_STD_FUNCTION)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_DETAIL_FUNCTIONAL_HPP

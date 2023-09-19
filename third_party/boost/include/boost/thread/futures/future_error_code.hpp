@@ -13,7 +13,7 @@
 #include <boost/system/error_code.hpp>
 #include <boost/type_traits/integral_constant.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
   //enum class future_errc
@@ -29,11 +29,11 @@ namespace boost
   namespace system
   {
     template <>
-    struct BOOST_SYMBOL_VISIBLE is_error_code_enum< ::boost::future_errc> : public true_type {};
+    struct BOOST_SYMBOL_VISIBLE is_error_code_enum< ::cppmsboost::future_errc> : public true_type {};
 
     #ifdef BOOST_NO_CXX11_SCOPED_ENUMS
     template <>
-    struct BOOST_SYMBOL_VISIBLE is_error_code_enum< ::boost::future_errc::enum_type> : public true_type { };
+    struct BOOST_SYMBOL_VISIBLE is_error_code_enum< ::cppmsboost::future_errc::enum_type> : public true_type { };
     #endif
   } // system
 
@@ -46,14 +46,14 @@ namespace boost
     error_code
     make_error_code(future_errc e) BOOST_NOEXCEPT
     {
-        return error_code(underlying_cast<int>(e), boost::future_category());
+        return error_code(underlying_cast<int>(e), cppmsboost::future_category());
     }
 
     inline
     error_condition
     make_error_condition(future_errc e) BOOST_NOEXCEPT
     {
-        return error_condition(underlying_cast<int>(e), boost::future_category());
+        return error_condition(underlying_cast<int>(e), cppmsboost::future_category());
     }
   } // system
 } // boost

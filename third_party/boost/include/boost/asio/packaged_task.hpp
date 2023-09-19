@@ -27,7 +27,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 #if defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES) \
@@ -118,7 +118,7 @@ private:
        //   || defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

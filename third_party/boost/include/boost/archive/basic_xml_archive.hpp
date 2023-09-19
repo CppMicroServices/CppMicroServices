@@ -21,7 +21,7 @@
 #include <boost/archive/detail/auto_link_archive.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 // constant strings used in xml i/o
@@ -59,7 +59,7 @@ BOOST_ARCHIVE_DECL const char *
 BOOST_ARCHIVE_XML_SIGNATURE();
 
 }// namespace archive
-}// namespace boost
+}// namespace cppmsboost
 
 #include <boost/archive/detail/abi_suffix.hpp> // pops abi_suffix.hpp pragmas
 

@@ -25,7 +25,7 @@
 #pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -178,6 +178,6 @@ struct operations :
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ATOMIC_DETAIL_OPS_EMULATED_HPP_INCLUDED_

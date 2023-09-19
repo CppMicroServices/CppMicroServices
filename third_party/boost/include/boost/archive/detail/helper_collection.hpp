@@ -27,7 +27,7 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/make_shared.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 namespace archive {
 namespace detail {
@@ -42,13 +42,13 @@ class helper_collection
 
     typedef std::pair<
         const void *,
-        boost::shared_ptr<void>
+        cppmsboost::shared_ptr<void>
     > helper_value_type;
     template<class T>
-    boost::shared_ptr<void> make_helper_ptr(){
-        // use boost::shared_ptr rather than std::shared_ptr to maintain
+    cppmsboost::shared_ptr<void> make_helper_ptr(){
+        // use cppmsboost::shared_ptr rather than std::shared_ptr to maintain
         // c++03 compatibility
-        return boost::make_shared<T>();
+        return cppmsboost::make_shared<T>();
     }
 
     typedef std::vector<helper_value_type> collection;
@@ -94,6 +94,6 @@ public:
 
 } // namespace detail
 } // namespace serialization
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ARCHIVE_DETAIL_HELPER_COLLECTION_HPP

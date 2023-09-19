@@ -16,12 +16,12 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/make_shared.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   namespace csbl
   {
-    using ::boost::shared_ptr;
-    using ::boost::make_shared;
+    using ::cppmsboost::shared_ptr;
+    using ::cppmsboost::make_shared;
   }
 }
 
@@ -29,7 +29,7 @@ namespace boost
 
 #include <boost/shared_ptr.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   namespace csbl
   {

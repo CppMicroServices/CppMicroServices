@@ -24,7 +24,7 @@
 #include <boost/archive/detail/auto_link_archive.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 
 namespace serialization {
     class extended_type_info;
@@ -41,13 +41,13 @@ public:
     static BOOST_ARCHIVE_OR_WARCHIVE_DECL bool insert(const basic_serializer * bs);
     static BOOST_ARCHIVE_OR_WARCHIVE_DECL void erase(const basic_serializer * bs);
     static BOOST_ARCHIVE_OR_WARCHIVE_DECL const basic_serializer * find(
-        const boost::serialization::extended_type_info & type_
+        const cppmsboost::serialization::extended_type_info & type_
     );
 };
 
 } // namespace detail
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/archive/detail/abi_suffix.hpp> // must be the last header
 

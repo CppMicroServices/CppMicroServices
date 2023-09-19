@@ -21,13 +21,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
 /// An entry produced by a resolver.
 /**
- * The boost::asio::ip::basic_resolver_entry class template describes an entry
+ * The cppmsboost::asio::ip::basic_resolver_entry class template describes an entry
  * as returned by a resolver.
  *
  * @par Thread Safety
@@ -108,7 +108,7 @@ private:
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

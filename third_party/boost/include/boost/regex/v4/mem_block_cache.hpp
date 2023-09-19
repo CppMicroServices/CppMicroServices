@@ -35,7 +35,7 @@
   #endif
 #endif
 
-namespace boost{
+namespace cppmsboost{
 namespace BOOST_REGEX_DETAIL_NS{
 
 #ifdef BOOST_REGEX_MEM_BLOCK_CACHE_LOCK_FREE /* lock free implementation */
@@ -86,7 +86,7 @@ struct mem_block_cache
    mem_block_node* next;
    unsigned cached_blocks;
 #ifdef BOOST_HAS_THREADS
-   boost::static_mutex mut;
+   cppmsboost::static_mutex mut;
 #endif
 
    ~mem_block_cache()
@@ -101,7 +101,7 @@ struct mem_block_cache
    void* get()
    {
 #ifdef BOOST_HAS_THREADS
-      boost::static_mutex::scoped_lock g(mut);
+      cppmsboost::static_mutex::scoped_lock g(mut);
 #endif
      if(next)
       {
@@ -115,7 +115,7 @@ struct mem_block_cache
    void put(void* p)
    {
 #ifdef BOOST_HAS_THREADS
-      boost::static_mutex::scoped_lock g(mut);
+      cppmsboost::static_mutex::scoped_lock g(mut);
 #endif
       if(cached_blocks >= BOOST_REGEX_MAX_CACHE_BLOCKS)
       {
@@ -135,7 +135,7 @@ struct mem_block_cache
 extern mem_block_cache block_cache;
 
 }
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_SUFFIX

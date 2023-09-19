@@ -32,7 +32,7 @@
 
 #if !defined( BOOST_SP_NO_SP_CONVERTIBLE )
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -85,7 +85,7 @@ template< class Y, class T > struct sp_enable_if_convertible: public sp_enable_i
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // !defined( BOOST_SP_NO_SP_CONVERTIBLE )
 

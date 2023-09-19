@@ -24,7 +24,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -32,7 +32,7 @@ class win_iocp_handle_service::overlapped_wrapper
   : public OVERLAPPED
 {
 public:
-  explicit overlapped_wrapper(boost::system::error_code& ec)
+  explicit overlapped_wrapper(cppmsboost::system::error_code& ec)
   {
     Internal = 0;
     InternalHigh = 0;
@@ -52,8 +52,8 @@ public:
     else
     {
       DWORD last_error = ::GetLastError();
-      ec = boost::system::error_code(last_error,
-          boost::asio::error::get_system_category());
+      ec = cppmsboost::system::error_code(last_error,
+          cppmsboost::asio::error::get_system_category());
     }
   }
 
@@ -68,7 +68,7 @@ public:
 
 win_iocp_handle_service::win_iocp_handle_service(execution_context& context)
   : execution_context_service_base<win_iocp_handle_service>(context),
-    iocp_service_(boost::asio::use_service<win_iocp_io_context>(context)),
+    iocp_service_(cppmsboost::asio::use_service<win_iocp_io_context>(context)),
     mutex_(),
     impl_list_(0)
 {
@@ -77,7 +77,7 @@ win_iocp_handle_service::win_iocp_handle_service(execution_context& context)
 void win_iocp_handle_service::shutdown()
 {
   // Close all implementations, causing all operations to complete.
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   implementation_type* impl = impl_list_;
   while (impl)
   {
@@ -93,7 +93,7 @@ void win_iocp_handle_service::construct(
   impl.safe_cancellation_thread_id_ = 0;
 
   // Insert implementation into linked list of all implementations.
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   impl.next_ = impl_list_;
   impl.prev_ = 0;
   if (impl_list_)
@@ -112,7 +112,7 @@ void win_iocp_handle_service::move_construct(
   other_impl.safe_cancellation_thread_id_ = 0;
 
   // Insert implementation into linked list of all implementations.
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   impl.next_ = impl_list_;
   impl.prev_ = 0;
   if (impl_list_)
@@ -130,7 +130,7 @@ void win_iocp_handle_service::move_assign(
   if (this != &other_service)
   {
     // Remove implementation from linked list of all implementations.
-    boost::asio::detail::mutex::scoped_lock lock(mutex_);
+    cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
     if (impl_list_ == &impl)
       impl_list_ = impl.next_;
     if (impl.prev_)
@@ -150,7 +150,7 @@ void win_iocp_handle_service::move_assign(
   if (this != &other_service)
   {
     // Insert implementation into linked list of all implementations.
-    boost::asio::detail::mutex::scoped_lock lock(other_service.mutex_);
+    cppmsboost::asio::detail::mutex::scoped_lock lock(other_service.mutex_);
     impl.next_ = other_service.impl_list_;
     impl.prev_ = 0;
     if (other_service.impl_list_)
@@ -165,7 +165,7 @@ void win_iocp_handle_service::destroy(
   close_for_destruction(impl);
   
   // Remove implementation from linked list of all implementations.
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   if (impl_list_ == &impl)
     impl_list_ = impl.next_;
   if (impl.prev_)
@@ -176,13 +176,13 @@ void win_iocp_handle_service::destroy(
   impl.prev_ = 0;
 }
 
-boost::system::error_code win_iocp_handle_service::assign(
+cppmsboost::system::error_code win_iocp_handle_service::assign(
     win_iocp_handle_service::implementation_type& impl,
-    const native_handle_type& handle, boost::system::error_code& ec)
+    const native_handle_type& handle, cppmsboost::system::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = boost::asio::error::already_open;
+    ec = cppmsboost::asio::error::already_open;
     return ec;
   }
 
@@ -190,13 +190,13 @@ boost::system::error_code win_iocp_handle_service::assign(
     return ec;
 
   impl.handle_ = handle;
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   return ec;
 }
 
-boost::system::error_code win_iocp_handle_service::close(
+cppmsboost::system::error_code win_iocp_handle_service::close(
     win_iocp_handle_service::implementation_type& impl,
-    boost::system::error_code& ec)
+    cppmsboost::system::error_code& ec)
 {
   if (is_open(impl))
   {
@@ -206,12 +206,12 @@ boost::system::error_code win_iocp_handle_service::close(
     if (!::CloseHandle(impl.handle_))
     {
       DWORD last_error = ::GetLastError();
-      ec = boost::system::error_code(last_error,
-          boost::asio::error::get_system_category());
+      ec = cppmsboost::system::error_code(last_error,
+          cppmsboost::asio::error::get_system_category());
     }
     else
     {
-      ec = boost::system::error_code();
+      ec = cppmsboost::system::error_code();
     }
 
     impl.handle_ = INVALID_HANDLE_VALUE;
@@ -219,19 +219,19 @@ boost::system::error_code win_iocp_handle_service::close(
   }
   else
   {
-    ec = boost::system::error_code();
+    ec = cppmsboost::system::error_code();
   }
 
   return ec;
 }
 
-boost::system::error_code win_iocp_handle_service::cancel(
+cppmsboost::system::error_code win_iocp_handle_service::cancel(
     win_iocp_handle_service::implementation_type& impl,
-    boost::system::error_code& ec)
+    cppmsboost::system::error_code& ec)
 {
   if (!is_open(impl))
   {
-    ec = boost::asio::error::bad_descriptor;
+    ec = cppmsboost::asio::error::bad_descriptor;
     return ec;
   }
 
@@ -253,23 +253,23 @@ boost::system::error_code win_iocp_handle_service::cancel(
         // ERROR_NOT_FOUND means that there were no operations to be
         // cancelled. We swallow this error to match the behaviour on other
         // platforms.
-        ec = boost::system::error_code();
+        ec = cppmsboost::system::error_code();
       }
       else
       {
-        ec = boost::system::error_code(last_error,
-            boost::asio::error::get_system_category());
+        ec = cppmsboost::system::error_code(last_error,
+            cppmsboost::asio::error::get_system_category());
       }
     }
     else
     {
-      ec = boost::system::error_code();
+      ec = cppmsboost::system::error_code();
     }
   }
   else if (impl.safe_cancellation_thread_id_ == 0)
   {
     // No operations have been started, so there's nothing to cancel.
-    ec = boost::system::error_code();
+    ec = cppmsboost::system::error_code();
   }
   else if (impl.safe_cancellation_thread_id_ == ::GetCurrentThreadId())
   {
@@ -278,19 +278,19 @@ boost::system::error_code win_iocp_handle_service::cancel(
     if (!::CancelIo(impl.handle_))
     {
       DWORD last_error = ::GetLastError();
-      ec = boost::system::error_code(last_error,
-          boost::asio::error::get_system_category());
+      ec = cppmsboost::system::error_code(last_error,
+          cppmsboost::asio::error::get_system_category());
     }
     else
     {
-      ec = boost::system::error_code();
+      ec = cppmsboost::system::error_code();
     }
   }
   else
   {
     // Asynchronous operations have been started from more than one thread,
     // so cancellation is not safe.
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
   }
 
   return ec;
@@ -298,18 +298,18 @@ boost::system::error_code win_iocp_handle_service::cancel(
 
 size_t win_iocp_handle_service::do_write(
     win_iocp_handle_service::implementation_type& impl, uint64_t offset,
-    const boost::asio::const_buffer& buffer, boost::system::error_code& ec)
+    const cppmsboost::asio::const_buffer& buffer, cppmsboost::system::error_code& ec)
 {
   if (!is_open(impl))
   {
-    ec = boost::asio::error::bad_descriptor;
+    ec = cppmsboost::asio::error::bad_descriptor;
     return 0;
   }
 
   // A request to write 0 bytes on a handle is a no-op.
   if (buffer.size() == 0)
   {
-    ec = boost::system::error_code();
+    ec = cppmsboost::system::error_code();
     return 0;
   }
 
@@ -329,8 +329,8 @@ size_t win_iocp_handle_service::do_write(
     DWORD last_error = ::GetLastError();
     if (last_error != ERROR_IO_PENDING)
     {
-      ec = boost::system::error_code(last_error,
-          boost::asio::error::get_system_category());
+      ec = cppmsboost::system::error_code(last_error,
+          cppmsboost::asio::error::get_system_category());
       return 0;
     }
   }
@@ -342,25 +342,25 @@ size_t win_iocp_handle_service::do_write(
   if (!ok)
   {
     DWORD last_error = ::GetLastError();
-    ec = boost::system::error_code(last_error,
-        boost::asio::error::get_system_category());
+    ec = cppmsboost::system::error_code(last_error,
+        cppmsboost::asio::error::get_system_category());
     return 0;
   }
 
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   return bytes_transferred;
 }
 
 void win_iocp_handle_service::start_write_op(
     win_iocp_handle_service::implementation_type& impl, uint64_t offset,
-    const boost::asio::const_buffer& buffer, operation* op)
+    const cppmsboost::asio::const_buffer& buffer, operation* op)
 {
   update_cancellation_thread_id(impl);
   iocp_service_.work_started();
 
   if (!is_open(impl))
   {
-    iocp_service_.on_completion(op, boost::asio::error::bad_descriptor);
+    iocp_service_.on_completion(op, cppmsboost::asio::error::bad_descriptor);
   }
   else if (buffer.size() == 0)
   {
@@ -390,18 +390,18 @@ void win_iocp_handle_service::start_write_op(
 
 size_t win_iocp_handle_service::do_read(
     win_iocp_handle_service::implementation_type& impl, uint64_t offset,
-    const boost::asio::mutable_buffer& buffer, boost::system::error_code& ec)
+    const cppmsboost::asio::mutable_buffer& buffer, cppmsboost::system::error_code& ec)
 {
   if (!is_open(impl))
   {
-    ec = boost::asio::error::bad_descriptor;
+    ec = cppmsboost::asio::error::bad_descriptor;
     return 0;
   }
   
   // A request to read 0 bytes on a stream handle is a no-op.
   if (buffer.size() == 0)
   {
-    ec = boost::system::error_code();
+    ec = cppmsboost::system::error_code();
     return 0;
   }
 
@@ -423,12 +423,12 @@ size_t win_iocp_handle_service::do_read(
     {
       if (last_error == ERROR_HANDLE_EOF)
       {
-        ec = boost::asio::error::eof;
+        ec = cppmsboost::asio::error::eof;
       }
       else
       {
-        ec = boost::system::error_code(last_error,
-            boost::asio::error::get_system_category());
+        ec = cppmsboost::system::error_code(last_error,
+            cppmsboost::asio::error::get_system_category());
       }
       return 0;
     }
@@ -443,30 +443,30 @@ size_t win_iocp_handle_service::do_read(
     DWORD last_error = ::GetLastError();
     if (last_error == ERROR_HANDLE_EOF)
     {
-      ec = boost::asio::error::eof;
+      ec = cppmsboost::asio::error::eof;
     }
     else
     {
-      ec = boost::system::error_code(last_error,
-          boost::asio::error::get_system_category());
+      ec = cppmsboost::system::error_code(last_error,
+          cppmsboost::asio::error::get_system_category());
     }
     return (last_error == ERROR_MORE_DATA) ? bytes_transferred : 0;
   }
 
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   return bytes_transferred;
 }
 
 void win_iocp_handle_service::start_read_op(
     win_iocp_handle_service::implementation_type& impl, uint64_t offset,
-    const boost::asio::mutable_buffer& buffer, operation* op)
+    const cppmsboost::asio::mutable_buffer& buffer, operation* op)
 {
   update_cancellation_thread_id(impl);
   iocp_service_.work_started();
 
   if (!is_open(impl))
   {
-    iocp_service_.on_completion(op, boost::asio::error::bad_descriptor);
+    iocp_service_.on_completion(op, cppmsboost::asio::error::bad_descriptor);
   }
   else if (buffer.size() == 0)
   {
@@ -518,7 +518,7 @@ void win_iocp_handle_service::close_for_destruction(implementation_type& impl)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

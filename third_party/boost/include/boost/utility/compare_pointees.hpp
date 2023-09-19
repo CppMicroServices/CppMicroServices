@@ -14,7 +14,7 @@
 
 #include<functional>
 
-namespace boost {
+namespace cppmsboost {
 
 // template<class OP> bool equal_pointees(OP const& x, OP const& y);
 // template<class OP> struct equal_pointees_t;
@@ -70,7 +70,7 @@ struct less_pointees_t
     { return less_pointees(x,y) ; }
 } ;
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif
 

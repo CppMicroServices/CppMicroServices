@@ -28,7 +28,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Context object the represents the currently executing coroutine.
@@ -63,9 +63,9 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined callee_type;
 #elif defined(BOOST_COROUTINES_UNIDIRECT) || defined(BOOST_COROUTINES_V2)
-  typedef boost::coroutines::push_coroutine<void> callee_type;
+  typedef cppmsboost::coroutines::push_coroutine<void> callee_type;
 #else
-  typedef boost::coroutines::coroutine<void()> callee_type;
+  typedef cppmsboost::coroutines::coroutine<void()> callee_type;
 #endif
   
   /// The coroutine caller type, used by the implementation.
@@ -78,9 +78,9 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined caller_type;
 #elif defined(BOOST_COROUTINES_UNIDIRECT) || defined(BOOST_COROUTINES_V2)
-  typedef boost::coroutines::pull_coroutine<void> caller_type;
+  typedef cppmsboost::coroutines::pull_coroutine<void> caller_type;
 #else
-  typedef boost::coroutines::coroutine<void()>::caller_type caller_type;
+  typedef cppmsboost::coroutines::coroutine<void()>::caller_type caller_type;
 #endif
 
   /// Construct a yield context to represent the specified coroutine.
@@ -131,7 +131,7 @@ public:
    *   ...
    * } @endcode
    */
-  basic_yield_context operator[](boost::system::error_code& ec) const
+  basic_yield_context operator[](cppmsboost::system::error_code& ec) const
   {
     basic_yield_context tmp(*this);
     tmp.ec_ = &ec;
@@ -144,7 +144,7 @@ private:
   detail::weak_ptr<callee_type> coro_;
   caller_type& ca_;
   Handler handler_;
-  boost::system::error_code* ec_;
+  cppmsboost::system::error_code* ec_;
 };
 
 #if defined(GENERATING_DOCUMENTATION)
@@ -156,7 +156,7 @@ typedef basic_yield_context<
 #endif // defined(GENERATING_DOCUMENTATION)
 
 /**
- * @defgroup spawn boost::asio::spawn
+ * @defgroup spawn cppmsboost::asio::spawn
  *
  * @brief Start a new stackful coroutine.
  *
@@ -164,11 +164,11 @@ typedef basic_yield_context<
  * library. This function enables programs to implement asynchronous logic in a
  * synchronous manner, as illustrated by the following example:
  *
- * @code boost::asio::spawn(my_strand, do_echo);
+ * @code cppmsboost::asio::spawn(my_strand, do_echo);
  *
  * // ...
  *
- * void do_echo(boost::asio::yield_context yield)
+ * void do_echo(cppmsboost::asio::yield_context yield)
  * {
  *   try
  *   {
@@ -177,10 +177,10 @@ typedef basic_yield_context<
  *     {
  *       std::size_t length =
  *         my_socket.async_read_some(
- *           boost::asio::buffer(data), yield);
+ *           cppmsboost::asio::buffer(data), yield);
  *
- *       boost::asio::async_write(my_socket,
- *           boost::asio::buffer(data, length), yield);
+ *       cppmsboost::asio::async_write(my_socket,
+ *           cppmsboost::asio::buffer(data, length), yield);
  *     }
  *   }
  *   catch (std::exception& e)
@@ -203,8 +203,8 @@ typedef basic_yield_context<
  */
 template <typename Function>
 void spawn(BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes
-      = boost::coroutines::attributes());
+    const cppmsboost::coroutines::attributes& attributes
+      = cppmsboost::coroutines::attributes());
 
 /// Start a new stackful coroutine, calling the specified handler when it
 /// completes.
@@ -224,8 +224,8 @@ void spawn(BOOST_ASIO_MOVE_ARG(Function) function,
 template <typename Handler, typename Function>
 void spawn(BOOST_ASIO_MOVE_ARG(Handler) handler,
     BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes
-      = boost::coroutines::attributes(),
+    const cppmsboost::coroutines::attributes& attributes
+      = cppmsboost::coroutines::attributes(),
     typename enable_if<!is_executor<typename decay<Handler>::type>::value &&
       !is_convertible<Handler&, execution_context&>::value>::type* = 0);
 
@@ -247,8 +247,8 @@ void spawn(BOOST_ASIO_MOVE_ARG(Handler) handler,
 template <typename Handler, typename Function>
 void spawn(basic_yield_context<Handler> ctx,
     BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes
-      = boost::coroutines::attributes());
+    const cppmsboost::coroutines::attributes& attributes
+      = cppmsboost::coroutines::attributes());
 
 /// Start a new stackful coroutine that executes on a given executor.
 /**
@@ -265,8 +265,8 @@ void spawn(basic_yield_context<Handler> ctx,
 template <typename Function, typename Executor>
 void spawn(const Executor& ex,
     BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes
-      = boost::coroutines::attributes(),
+    const cppmsboost::coroutines::attributes& attributes
+      = cppmsboost::coroutines::attributes(),
     typename enable_if<is_executor<Executor>::value>::type* = 0);
 
 /// Start a new stackful coroutine that executes on a given strand.
@@ -283,8 +283,8 @@ void spawn(const Executor& ex,
 template <typename Function, typename Executor>
 void spawn(const strand<Executor>& ex,
     BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes
-      = boost::coroutines::attributes());
+    const cppmsboost::coroutines::attributes& attributes
+      = cppmsboost::coroutines::attributes());
 
 /// Start a new stackful coroutine that executes in the context of a strand.
 /**
@@ -300,10 +300,10 @@ void spawn(const strand<Executor>& ex,
  * @param attributes Boost.Coroutine attributes used to customise the coroutine.
  */
 template <typename Function>
-void spawn(const boost::asio::io_context::strand& s,
+void spawn(const cppmsboost::asio::io_context::strand& s,
     BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes
-      = boost::coroutines::attributes());
+    const cppmsboost::coroutines::attributes& attributes
+      = cppmsboost::coroutines::attributes());
 
 /// Start a new stackful coroutine that executes on a given execution context.
 /**
@@ -321,15 +321,15 @@ void spawn(const boost::asio::io_context::strand& s,
 template <typename Function, typename ExecutionContext>
 void spawn(ExecutionContext& ctx,
     BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes
-      = boost::coroutines::attributes(),
+    const cppmsboost::coroutines::attributes& attributes
+      = cppmsboost::coroutines::attributes(),
     typename enable_if<is_convertible<
       ExecutionContext&, execution_context&>::value>::type* = 0);
 
 /*@}*/
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

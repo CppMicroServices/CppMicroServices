@@ -42,7 +42,7 @@
 #include <boost/type_traits/is_same.hpp>
 #endif // BOOST_IS_CONVERTIBLE
 
-namespace boost {
+namespace cppmsboost {
 
 #ifndef BOOST_IS_CONVERTIBLE
 
@@ -70,7 +70,7 @@ namespace detail {
       static const bool value = (A::value || B::value || C::value);
    };
 
-   template<typename From, typename To, bool b = or_helper<boost::is_void<From>, boost::is_function<To>, boost::is_array<To> >::value>
+   template<typename From, typename To, bool b = or_helper<cppmsboost::is_void<From>, cppmsboost::is_function<To>, cppmsboost::is_array<To> >::value>
    struct is_convertible_basic_impl
    {
       // Nothing converts to function or array, but void converts to void:
@@ -87,7 +87,7 @@ namespace detail {
       static void test_aux(To1);
 
       template<typename From1, typename To1>
-      static decltype(test_aux<To1>(boost::declval<From1>()), one()) test(int);
+      static decltype(test_aux<To1>(cppmsboost::declval<From1>()), one()) test(int);
 
       template<typename, typename>
       static two test(...);
@@ -110,13 +110,13 @@ struct is_convertible_impl
     // so we only use it for Borland.
     template <typename T> struct checker
     {
-        static ::boost::type_traits::no_type BOOST_TT_DECL _m_check(...);
-        static ::boost::type_traits::yes_type BOOST_TT_DECL _m_check(T);
+        static ::cppmsboost::type_traits::no_type BOOST_TT_DECL _m_check(...);
+        static ::cppmsboost::type_traits::yes_type BOOST_TT_DECL _m_check(T);
     };
 
     static typename add_lvalue_reference<From>::type  _m_from;
     static bool const value = sizeof( checker<To>::_m_check(_m_from) )
-        == sizeof(::boost::type_traits::yes_type);
+        == sizeof(::cppmsboost::type_traits::yes_type);
 #pragma option pop
 };
 
@@ -134,8 +134,8 @@ struct any_conversion
 
 template <typename T> struct checker
 {
-    static boost::type_traits::no_type _m_check(any_conversion ...);
-    static boost::type_traits::yes_type _m_check(T, int);
+    static cppmsboost::type_traits::no_type _m_check(any_conversion ...);
+    static cppmsboost::type_traits::yes_type _m_check(T, int);
 };
 
 template <typename From, typename To>
@@ -146,12 +146,12 @@ struct is_convertible_basic_impl
     static lvalue_type _m_from;
 #if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 6)))
     static bool const value =
-        sizeof( boost::detail::checker<To>::_m_check(static_cast<rvalue_type>(_m_from), 0) )
-        == sizeof(::boost::type_traits::yes_type);
+        sizeof( cppmsboost::detail::checker<To>::_m_check(static_cast<rvalue_type>(_m_from), 0) )
+        == sizeof(::cppmsboost::type_traits::yes_type);
 #else
     static bool const value =
-        sizeof( boost::detail::checker<To>::_m_check(_m_from, 0) )
-        == sizeof(::boost::type_traits::yes_type);
+        sizeof( cppmsboost::detail::checker<To>::_m_check(_m_from, 0) )
+        == sizeof(::cppmsboost::type_traits::yes_type);
 #endif
 };
 
@@ -180,19 +180,19 @@ struct any_conversion
 template <typename From, typename To>
 struct is_convertible_basic_impl
 {
-    static ::boost::type_traits::no_type BOOST_TT_DECL _m_check(any_conversion ...);
-    static ::boost::type_traits::yes_type BOOST_TT_DECL _m_check(To, int);
+    static ::cppmsboost::type_traits::no_type BOOST_TT_DECL _m_check(any_conversion ...);
+    static ::cppmsboost::type_traits::yes_type BOOST_TT_DECL _m_check(To, int);
     typedef typename add_lvalue_reference<From>::type lvalue_type;
     typedef typename add_rvalue_reference<From>::type rvalue_type; 
     static lvalue_type _m_from;
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
     BOOST_STATIC_CONSTANT(bool, value =
-        sizeof( _m_check(static_cast<rvalue_type>(_m_from), 0) ) == sizeof(::boost::type_traits::yes_type)
+        sizeof( _m_check(static_cast<rvalue_type>(_m_from), 0) ) == sizeof(::cppmsboost::type_traits::yes_type)
         );
 #else
     BOOST_STATIC_CONSTANT(bool, value =
-        sizeof( _m_check(_m_from, 0) ) == sizeof(::boost::type_traits::yes_type)
+        sizeof( _m_check(_m_from, 0) ) == sizeof(::cppmsboost::type_traits::yes_type)
         );
 #endif
 };
@@ -214,8 +214,8 @@ struct is_convertible_basic_impl
 {
     // Using '...' doesn't always work on Digital Mars. This version seems to.
     template <class T>
-    static ::boost::type_traits::no_type BOOST_TT_DECL _m_check(any_conversion,  float, T);
-    static ::boost::type_traits::yes_type BOOST_TT_DECL _m_check(To, int, int);
+    static ::cppmsboost::type_traits::no_type BOOST_TT_DECL _m_check(any_conversion,  float, T);
+    static ::cppmsboost::type_traits::yes_type BOOST_TT_DECL _m_check(To, int, int);
     typedef typename add_lvalue_reference<From>::type lvalue_type;
     typedef typename add_rvalue_reference<From>::type rvalue_type;
     static lvalue_type _m_from;
@@ -224,11 +224,11 @@ struct is_convertible_basic_impl
     // called. This doesn't happen with an enum.
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
     enum { value =
-        sizeof( _m_check(static_cast<rvalue_type>(_m_from), 0, 0) ) == sizeof(::boost::type_traits::yes_type)
+        sizeof( _m_check(static_cast<rvalue_type>(_m_from), 0, 0) ) == sizeof(::cppmsboost::type_traits::yes_type)
         };
 #else
     enum { value =
-        sizeof( _m_check(_m_from, 0, 0) ) == sizeof(::boost::type_traits::yes_type)
+        sizeof( _m_check(_m_from, 0, 0) ) == sizeof(::cppmsboost::type_traits::yes_type)
         };
 #endif
 };
@@ -255,19 +255,19 @@ struct any_conversion
 template <typename From, typename To>
 struct is_convertible_basic_impl_aux<From,To,false /*FromIsFunctionRef*/>
 {
-    static ::boost::type_traits::no_type BOOST_TT_DECL _m_check(any_conversion ...);
-    static ::boost::type_traits::yes_type BOOST_TT_DECL _m_check(To, int);
+    static ::cppmsboost::type_traits::no_type BOOST_TT_DECL _m_check(any_conversion ...);
+    static ::cppmsboost::type_traits::yes_type BOOST_TT_DECL _m_check(To, int);
     typedef typename add_lvalue_reference<From>::type lvalue_type;
     typedef typename add_rvalue_reference<From>::type rvalue_type; 
     static lvalue_type _m_from;
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
     BOOST_STATIC_CONSTANT(bool, value =
-        sizeof( _m_check(static_cast<rvalue_type>(_m_from), 0) ) == sizeof(::boost::type_traits::yes_type)
+        sizeof( _m_check(static_cast<rvalue_type>(_m_from), 0) ) == sizeof(::cppmsboost::type_traits::yes_type)
         );
 #else
     BOOST_STATIC_CONSTANT(bool, value =
-        sizeof( _m_check(_m_from, 0) ) == sizeof(::boost::type_traits::yes_type)
+        sizeof( _m_check(_m_from, 0) ) == sizeof(::cppmsboost::type_traits::yes_type)
         );
 #endif
 };
@@ -275,18 +275,18 @@ struct is_convertible_basic_impl_aux<From,To,false /*FromIsFunctionRef*/>
 template <typename From, typename To>
 struct is_convertible_basic_impl_aux<From,To,true /*FromIsFunctionRef*/>
 {
-    static ::boost::type_traits::no_type BOOST_TT_DECL _m_check(...);
-    static ::boost::type_traits::yes_type BOOST_TT_DECL _m_check(To);
+    static ::cppmsboost::type_traits::no_type BOOST_TT_DECL _m_check(...);
+    static ::cppmsboost::type_traits::yes_type BOOST_TT_DECL _m_check(To);
     typedef typename add_lvalue_reference<From>::type lvalue_type;
     typedef typename add_rvalue_reference<From>::type rvalue_type;
     static lvalue_type _m_from;
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
     BOOST_STATIC_CONSTANT(bool, value =
-        sizeof( _m_check(static_cast<rvalue_type>(_m_from)) ) == sizeof(::boost::type_traits::yes_type)
+        sizeof( _m_check(static_cast<rvalue_type>(_m_from)) ) == sizeof(::cppmsboost::type_traits::yes_type)
         );
 #else
     BOOST_STATIC_CONSTANT(bool, value =
-        sizeof( _m_check(_m_from) ) == sizeof(::boost::type_traits::yes_type)
+        sizeof( _m_check(_m_from) ) == sizeof(::cppmsboost::type_traits::yes_type)
         );
 #endif
 };
@@ -295,7 +295,7 @@ template <typename From, typename To>
 struct is_convertible_basic_impl:
   is_convertible_basic_impl_aux<
     From,To,
-    ::boost::is_function<typename ::boost::remove_reference<From>::type>::value
+    ::cppmsboost::is_function<typename ::cppmsboost::remove_reference<From>::type>::value
   >
 {};
 
@@ -321,8 +321,8 @@ struct is_convertible_basic_impl_add_lvalue_reference<From[]>
 template <typename From, typename To>
 struct is_convertible_basic_impl
 {
-    static ::boost::type_traits::no_type BOOST_TT_DECL _m_check(...);
-    static ::boost::type_traits::yes_type BOOST_TT_DECL _m_check(To);
+    static ::cppmsboost::type_traits::no_type BOOST_TT_DECL _m_check(...);
+    static ::cppmsboost::type_traits::yes_type BOOST_TT_DECL _m_check(To);
     typedef typename is_convertible_basic_impl_add_lvalue_reference<From>::type lvalue_type;
     static lvalue_type _m_from;
 #ifdef BOOST_MSVC
@@ -335,11 +335,11 @@ struct is_convertible_basic_impl
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
     typedef typename add_rvalue_reference<From>::type rvalue_type; 
     BOOST_STATIC_CONSTANT(bool, value =
-        sizeof( _m_check(static_cast<rvalue_type>(_m_from)) ) == sizeof(::boost::type_traits::yes_type)
+        sizeof( _m_check(static_cast<rvalue_type>(_m_from)) ) == sizeof(::cppmsboost::type_traits::yes_type)
         );
 #else
     BOOST_STATIC_CONSTANT(bool, value =
-        sizeof( _m_check(_m_from) ) == sizeof(::boost::type_traits::yes_type)
+        sizeof( _m_check(_m_from) ) == sizeof(::cppmsboost::type_traits::yes_type)
         );
 #endif
 #ifdef BOOST_MSVC
@@ -355,14 +355,14 @@ template <typename From, typename To>
 struct is_convertible_impl
 {
     enum { 
-       value = ( ::boost::detail::is_convertible_basic_impl<From,To>::value && ! ::boost::is_array<To>::value && ! ::boost::is_function<To>::value) 
+       value = ( ::cppmsboost::detail::is_convertible_basic_impl<From,To>::value && ! ::cppmsboost::is_array<To>::value && ! ::cppmsboost::is_function<To>::value) 
     };
 };
 #elif !defined(__BORLANDC__) || __BORLANDC__ > 0x551
 template <typename From, typename To>
 struct is_convertible_impl
 {
-   BOOST_STATIC_CONSTANT(bool, value = ( ::boost::detail::is_convertible_basic_impl<From, To>::value && !::boost::is_array<To>::value && !::boost::is_function<To>::value));
+   BOOST_STATIC_CONSTANT(bool, value = ( ::cppmsboost::detail::is_convertible_basic_impl<From, To>::value && !::cppmsboost::is_array<To>::value && !::cppmsboost::is_function<To>::value));
 };
 #endif
 
@@ -411,11 +411,11 @@ struct is_convertible_impl_dispatch_base
 {
 #if !BOOST_WORKAROUND(__HP_aCC, < 60700)
    typedef is_convertible_impl_select< 
-      ::boost::is_arithmetic<From>::value, 
-      ::boost::is_arithmetic<To>::value,
+      ::cppmsboost::is_arithmetic<From>::value, 
+      ::cppmsboost::is_arithmetic<To>::value,
 #if !defined(BOOST_NO_IS_ABSTRACT) && !defined(BOOST_TT_CXX11_IS_CONVERTIBLE)
       // We need to filter out abstract types, only if we don't have a strictly conforming C++11 version:
-      ::boost::is_abstract<To>::value
+      ::cppmsboost::is_abstract<To>::value
 #else
       false
 #endif
@@ -478,10 +478,10 @@ template <class From> struct is_convertible_impl_dispatch<From, void volatile> :
 } // namespace detail
 
 template <class From, class To> 
-struct is_convertible : public integral_constant<bool, ::boost::detail::is_convertible_impl_dispatch<From, To>::value> 
+struct is_convertible : public integral_constant<bool, ::cppmsboost::detail::is_convertible_impl_dispatch<From, To>::value> 
 {
-   BOOST_STATIC_ASSERT_MSG(boost::is_complete<To>::value || boost::is_void<To>::value || boost::is_array<To>::value, "Destination argument type to is_convertible must be a complete type");
-   BOOST_STATIC_ASSERT_MSG(boost::is_complete<From>::value || boost::is_void<From>::value || boost::is_array<From>::value, "From argument type to is_convertible must be a complete type");
+   BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<To>::value || cppmsboost::is_void<To>::value || cppmsboost::is_array<To>::value, "Destination argument type to is_convertible must be a complete type");
+   BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<From>::value || cppmsboost::is_void<From>::value || cppmsboost::is_array<From>::value, "From argument type to is_convertible must be a complete type");
 };
 
 #else
@@ -490,17 +490,17 @@ template <class From, class To>
 struct is_convertible : public integral_constant<bool, BOOST_IS_CONVERTIBLE(From, To)> 
 {
 #if BOOST_WORKAROUND(BOOST_MSVC, <= 1900)
-   BOOST_STATIC_ASSERT_MSG(boost::is_complete<From>::value || boost::is_void<From>::value || boost::is_array<From>::value || boost::is_reference<From>::value, "From argument type to is_convertible must be a complete type");
+   BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<From>::value || cppmsboost::is_void<From>::value || cppmsboost::is_array<From>::value || cppmsboost::is_reference<From>::value, "From argument type to is_convertible must be a complete type");
 #endif
 #if defined(__clang__)
    // clang's intrinsic doesn't assert on incomplete types:
-   BOOST_STATIC_ASSERT_MSG(boost::is_complete<To>::value || boost::is_void<To>::value || boost::is_array<To>::value, "Destination argument type to is_convertible must be a complete type");
-   BOOST_STATIC_ASSERT_MSG(boost::is_complete<From>::value || boost::is_void<From>::value || boost::is_array<From>::value, "From argument type to is_convertible must be a complete type");
+   BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<To>::value || cppmsboost::is_void<To>::value || cppmsboost::is_array<To>::value, "Destination argument type to is_convertible must be a complete type");
+   BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<From>::value || cppmsboost::is_void<From>::value || cppmsboost::is_array<From>::value, "From argument type to is_convertible must be a complete type");
 #endif
 };
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_IS_CONVERTIBLE_HPP_INCLUDED

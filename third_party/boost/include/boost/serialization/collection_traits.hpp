@@ -50,15 +50,15 @@ struct implementation_level< C < T > > {                            \
 
 #if defined(BOOST_HAS_LONG_LONG)
     #define BOOST_SERIALIZATION_COLLECTION_TRAITS_HELPER_INT64(C)    \
-    BOOST_SERIALIZATION_COLLECTION_TRAITS_HELPER(boost::long_long_type, C)  \
-    BOOST_SERIALIZATION_COLLECTION_TRAITS_HELPER(boost::ulong_long_type, C) \
+    BOOST_SERIALIZATION_COLLECTION_TRAITS_HELPER(cppmsboost::long_long_type, C)  \
+    BOOST_SERIALIZATION_COLLECTION_TRAITS_HELPER(cppmsboost::ulong_long_type, C) \
     /**/
 #else
     #define BOOST_SERIALIZATION_COLLECTION_TRAITS_HELPER_INT64(C)
 #endif
 
 #define BOOST_SERIALIZATION_COLLECTION_TRAITS(C)                     \
-    namespace boost { namespace serialization {                      \
+    namespace cppmsboost { namespace serialization {                      \
     BOOST_SERIALIZATION_COLLECTION_TRAITS_HELPER(bool, C)            \
     BOOST_SERIALIZATION_COLLECTION_TRAITS_HELPER(char, C)            \
     BOOST_SERIALIZATION_COLLECTION_TRAITS_HELPER(signed char, C)     \

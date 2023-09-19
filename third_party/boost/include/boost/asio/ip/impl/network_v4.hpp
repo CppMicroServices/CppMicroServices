@@ -22,7 +22,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
@@ -30,12 +30,12 @@ template <typename Elem, typename Traits>
 std::basic_ostream<Elem, Traits>& operator<<(
     std::basic_ostream<Elem, Traits>& os, const network_v4& addr)
 {
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   std::string s = addr.to_string(ec);
   if (ec)
   {
     if (os.exceptions() & std::basic_ostream<Elem, Traits>::failbit)
-      boost::asio::detail::throw_error(ec);
+      cppmsboost::asio::detail::throw_error(ec);
     else
       os.setstate(std::basic_ostream<Elem, Traits>::failbit);
   }
@@ -47,7 +47,7 @@ std::basic_ostream<Elem, Traits>& operator<<(
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

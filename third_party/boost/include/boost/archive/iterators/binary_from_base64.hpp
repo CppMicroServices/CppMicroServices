@@ -24,7 +24,7 @@
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/archive/iterators/dataflow_exception.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 namespace iterators {
 
@@ -55,7 +55,7 @@ struct to_6_bit {
         if((unsigned)t <= 127)
             value = lookup_table[(unsigned)t];
         if(-1 == value)
-            boost::serialization::throw_exception(
+            cppmsboost::serialization::throw_exception(
                 dataflow_exception(dataflow_exception::invalid_base64_character)
             );
         return value;
@@ -79,7 +79,7 @@ struct to_6_bit {
 
 template<
     class Base,
-    class CharType = typename boost::iterator_value<Base>::type
+    class CharType = typename cppmsboost::iterator_value<Base>::type
 >
 class binary_from_base64 : public
     transform_iterator<
@@ -87,7 +87,7 @@ class binary_from_base64 : public
         Base
     >
 {
-    friend class boost::iterator_core_access;
+    friend class cppmsboost::iterator_core_access;
     typedef transform_iterator<
         detail::to_6_bit<CharType>,
         Base
@@ -113,6 +113,6 @@ public:
 
 } // namespace iterators
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ARCHIVE_ITERATORS_BINARY_FROM_BASE64_HPP

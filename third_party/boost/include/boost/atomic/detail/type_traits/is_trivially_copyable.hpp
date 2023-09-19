@@ -20,7 +20,7 @@
 #else
 // For std::is_trivially_copyable we require a genuine support from the compiler.
 // Fallback to is_pod or a false negative result in Boost.TypeTraits is not acceptable
-// as this trait will be used in a static assert and may deny valid uses of boost::atomic/atomic_ref.
+// as this trait will be used in a static assert and may deny valid uses of cppmsboost::atomic/atomic_ref.
 #define BOOST_ATOMIC_DETAIL_NO_CXX11_IS_TRIVIALLY_COPYABLE
 #endif
 
@@ -30,7 +30,7 @@
 
 #if !defined(BOOST_ATOMIC_DETAIL_NO_CXX11_IS_TRIVIALLY_COPYABLE)
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -38,7 +38,7 @@ using std::is_trivially_copyable;
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // !defined(BOOST_ATOMIC_DETAIL_NO_CXX11_IS_TRIVIALLY_COPYABLE)
 

@@ -28,7 +28,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace local {
 namespace detail {
@@ -58,10 +58,10 @@ endpoint::endpoint(string_view path_name)
 
 void endpoint::resize(std::size_t new_size)
 {
-  if (new_size > sizeof(boost::asio::detail::sockaddr_un_type))
+  if (new_size > sizeof(cppmsboost::asio::detail::sockaddr_un_type))
   {
-    boost::system::error_code ec(boost::asio::error::invalid_argument);
-    boost::asio::detail::throw_error(ec);
+    cppmsboost::system::error_code ec(cppmsboost::asio::error::invalid_argument);
+    cppmsboost::asio::detail::throw_error(ec);
   }
   else if (new_size == 0)
   {
@@ -70,7 +70,7 @@ void endpoint::resize(std::size_t new_size)
   else
   {
     path_length_ = new_size
-      - offsetof(boost::asio::detail::sockaddr_un_type, sun_path);
+      - offsetof(cppmsboost::asio::detail::sockaddr_un_type, sun_path);
 
     // The path returned by the operating system may be NUL-terminated.
     if (path_length_ > 0 && data_.local.sun_path[path_length_ - 1] == 0)
@@ -109,12 +109,12 @@ void endpoint::init(const char* path_name, std::size_t path_length)
   if (path_length > sizeof(data_.local.sun_path) - 1)
   {
     // The buffer is not large enough to store this address.
-    boost::system::error_code ec(boost::asio::error::name_too_long);
-    boost::asio::detail::throw_error(ec);
+    cppmsboost::system::error_code ec(cppmsboost::asio::error::name_too_long);
+    cppmsboost::asio::detail::throw_error(ec);
   }
 
   using namespace std; // For memcpy.
-  data_.local = boost::asio::detail::sockaddr_un_type();
+  data_.local = cppmsboost::asio::detail::sockaddr_un_type();
   data_.local.sun_family = AF_UNIX;
   if (path_length > 0)
     memcpy(data_.local.sun_path, path_name, path_length);
@@ -129,7 +129,7 @@ void endpoint::init(const char* path_name, std::size_t path_length)
 } // namespace detail
 } // namespace local
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

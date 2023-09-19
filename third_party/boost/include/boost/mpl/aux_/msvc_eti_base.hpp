@@ -19,7 +19,7 @@
 #include <boost/mpl/aux_/config/gcc.hpp>
 #include <boost/mpl/aux_/config/workaround.hpp>
 
-namespace boost { namespace mpl { namespace aux {
+namespace cppmsboost { namespace mpl { namespace aux {
 
 #if defined(BOOST_MPL_CFG_MSVC_70_ETI_BUG)
 

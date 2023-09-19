@@ -24,7 +24,7 @@
 // Calls to asio_handler_invoke must be made from a namespace that does not
 // contain overloads of this function. The boost_asio_handler_invoke_helpers
 // namespace is defined here for that purpose.
-namespace boost_asio_handler_invoke_helpers {
+namespace cppmsboost_asio_handler_invoke_helpers {
 
 template <typename Function, typename Context>
 inline void invoke(Function& function, Context& context)
@@ -33,8 +33,8 @@ inline void invoke(Function& function, Context& context)
   Function tmp(function);
   tmp();
 #else
-  using boost::asio::asio_handler_invoke;
-  asio_handler_invoke(function, boost::asio::detail::addressof(context));
+  using cppmsboost::asio::asio_handler_invoke;
+  asio_handler_invoke(function, cppmsboost::asio::detail::addressof(context));
 #endif
 }
 
@@ -45,12 +45,12 @@ inline void invoke(const Function& function, Context& context)
   Function tmp(function);
   tmp();
 #else
-  using boost::asio::asio_handler_invoke;
-  asio_handler_invoke(function, boost::asio::detail::addressof(context));
+  using cppmsboost::asio::asio_handler_invoke;
+  asio_handler_invoke(function, cppmsboost::asio::detail::addressof(context));
 #endif
 }
 
-} // namespace boost_asio_handler_invoke_helpers
+} // namespace cppmsboost_asio_handler_invoke_helpers
 
 #include <boost/asio/detail/pop_options.hpp>
 

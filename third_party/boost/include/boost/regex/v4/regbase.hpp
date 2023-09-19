@@ -30,7 +30,7 @@
 #pragma warning(pop)
 #endif
 
-namespace boost{
+namespace cppmsboost{
 //
 // class regbase
 // handles error codes and flags
@@ -126,44 +126,44 @@ namespace regex_constants{
    enum flag_type_
    {
 
-      no_except = ::boost::regbase::no_except,
-      failbit = ::boost::regbase::failbit,
-      literal = ::boost::regbase::literal,
-      icase = ::boost::regbase::icase,
-      nocollate = ::boost::regbase::nocollate,
-      collate = ::boost::regbase::collate,
-      nosubs = ::boost::regbase::nosubs,
-      optimize = ::boost::regbase::optimize,
-      bk_plus_qm = ::boost::regbase::bk_plus_qm,
-      bk_vbar = ::boost::regbase::bk_vbar,
-      no_intervals = ::boost::regbase::no_intervals,
-      no_char_classes = ::boost::regbase::no_char_classes,
-      no_escape_in_lists = ::boost::regbase::no_escape_in_lists,
-      no_mod_m = ::boost::regbase::no_mod_m,
-      mod_x = ::boost::regbase::mod_x,
-      mod_s = ::boost::regbase::mod_s,
-      no_mod_s = ::boost::regbase::no_mod_s,
-      save_subexpression_location = ::boost::regbase::save_subexpression_location,
-      no_empty_expressions = ::boost::regbase::no_empty_expressions,
+      no_except = ::cppmsboost::regbase::no_except,
+      failbit = ::cppmsboost::regbase::failbit,
+      literal = ::cppmsboost::regbase::literal,
+      icase = ::cppmsboost::regbase::icase,
+      nocollate = ::cppmsboost::regbase::nocollate,
+      collate = ::cppmsboost::regbase::collate,
+      nosubs = ::cppmsboost::regbase::nosubs,
+      optimize = ::cppmsboost::regbase::optimize,
+      bk_plus_qm = ::cppmsboost::regbase::bk_plus_qm,
+      bk_vbar = ::cppmsboost::regbase::bk_vbar,
+      no_intervals = ::cppmsboost::regbase::no_intervals,
+      no_char_classes = ::cppmsboost::regbase::no_char_classes,
+      no_escape_in_lists = ::cppmsboost::regbase::no_escape_in_lists,
+      no_mod_m = ::cppmsboost::regbase::no_mod_m,
+      mod_x = ::cppmsboost::regbase::mod_x,
+      mod_s = ::cppmsboost::regbase::mod_s,
+      no_mod_s = ::cppmsboost::regbase::no_mod_s,
+      save_subexpression_location = ::cppmsboost::regbase::save_subexpression_location,
+      no_empty_expressions = ::cppmsboost::regbase::no_empty_expressions,
 
-      basic = ::boost::regbase::basic,
-      extended = ::boost::regbase::extended,
-      normal = ::boost::regbase::normal,
-      emacs = ::boost::regbase::emacs,
-      awk = ::boost::regbase::awk,
-      grep = ::boost::regbase::grep,
-      egrep = ::boost::regbase::egrep,
+      basic = ::cppmsboost::regbase::basic,
+      extended = ::cppmsboost::regbase::extended,
+      normal = ::cppmsboost::regbase::normal,
+      emacs = ::cppmsboost::regbase::emacs,
+      awk = ::cppmsboost::regbase::awk,
+      grep = ::cppmsboost::regbase::grep,
+      egrep = ::cppmsboost::regbase::egrep,
       sed = basic,
       perl = normal,
       ECMAScript = normal,
       JavaScript = normal,
       JScript = normal
    };
-   typedef ::boost::regbase::flag_type syntax_option_type;
+   typedef ::cppmsboost::regbase::flag_type syntax_option_type;
 
 } // namespace regex_constants
 
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(push)

@@ -21,7 +21,7 @@
 
 #include <boost/move/detail/workaround.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace move_detail {
 
 template <typename T> struct unvoid { typedef T type; };
@@ -29,13 +29,13 @@ template <> struct unvoid<void> { struct type { }; };
 template <> struct unvoid<const void> { struct type { }; };
 
 }  //namespace move_detail {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
 
 #if defined(BOOST_MOVE_MSVC_10_MEMBER_RVALUE_REF_BUG)
 
-namespace boost {
+namespace cppmsboost {
 namespace move_detail {
 
    template<class T>
@@ -54,11 +54,11 @@ namespace move_detail {
    {
       explicit mref(T &&t) : t_(t) {}
       T &t_;
-      T &&get() {  return ::boost::move(t_);   }
+      T &&get() {  return ::cppmsboost::move(t_);   }
    };
 
 }  //namespace move_detail {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif   //BOOST_MOVE_MSVC_10_MEMBER_RVALUE_REF_BUG
 #endif   //!defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
@@ -83,27 +83,27 @@ namespace move_detail {
 
 //BOOST_MOVE_FWDN
 #define BOOST_MOVE_FWD0
-#define BOOST_MOVE_FWD1                  ::boost::forward<P0>(p0)
-#define BOOST_MOVE_FWD2 BOOST_MOVE_FWD1, ::boost::forward<P1>(p1)
-#define BOOST_MOVE_FWD3 BOOST_MOVE_FWD2, ::boost::forward<P2>(p2)
-#define BOOST_MOVE_FWD4 BOOST_MOVE_FWD3, ::boost::forward<P3>(p3)
-#define BOOST_MOVE_FWD5 BOOST_MOVE_FWD4, ::boost::forward<P4>(p4)
-#define BOOST_MOVE_FWD6 BOOST_MOVE_FWD5, ::boost::forward<P5>(p5)
-#define BOOST_MOVE_FWD7 BOOST_MOVE_FWD6, ::boost::forward<P6>(p6)
-#define BOOST_MOVE_FWD8 BOOST_MOVE_FWD7, ::boost::forward<P7>(p7)
-#define BOOST_MOVE_FWD9 BOOST_MOVE_FWD8, ::boost::forward<P8>(p8)
+#define BOOST_MOVE_FWD1                  ::cppmsboost::forward<P0>(p0)
+#define BOOST_MOVE_FWD2 BOOST_MOVE_FWD1, ::cppmsboost::forward<P1>(p1)
+#define BOOST_MOVE_FWD3 BOOST_MOVE_FWD2, ::cppmsboost::forward<P2>(p2)
+#define BOOST_MOVE_FWD4 BOOST_MOVE_FWD3, ::cppmsboost::forward<P3>(p3)
+#define BOOST_MOVE_FWD5 BOOST_MOVE_FWD4, ::cppmsboost::forward<P4>(p4)
+#define BOOST_MOVE_FWD6 BOOST_MOVE_FWD5, ::cppmsboost::forward<P5>(p5)
+#define BOOST_MOVE_FWD7 BOOST_MOVE_FWD6, ::cppmsboost::forward<P6>(p6)
+#define BOOST_MOVE_FWD8 BOOST_MOVE_FWD7, ::cppmsboost::forward<P7>(p7)
+#define BOOST_MOVE_FWD9 BOOST_MOVE_FWD8, ::cppmsboost::forward<P8>(p8)
 
 //BOOST_MOVE_FWDQN
 #define BOOST_MOVE_FWDQ0
-#define BOOST_MOVE_FWDQ1                   ::boost::forward<Q0>(q0)
-#define BOOST_MOVE_FWDQ2 BOOST_MOVE_FWDQ1, ::boost::forward<Q1>(q1)
-#define BOOST_MOVE_FWDQ3 BOOST_MOVE_FWDQ2, ::boost::forward<Q2>(q2)
-#define BOOST_MOVE_FWDQ4 BOOST_MOVE_FWDQ3, ::boost::forward<Q3>(q3)
-#define BOOST_MOVE_FWDQ5 BOOST_MOVE_FWDQ4, ::boost::forward<Q4>(q4)
-#define BOOST_MOVE_FWDQ6 BOOST_MOVE_FWDQ5, ::boost::forward<Q5>(q5)
-#define BOOST_MOVE_FWDQ7 BOOST_MOVE_FWDQ6, ::boost::forward<Q6>(q6)
-#define BOOST_MOVE_FWDQ8 BOOST_MOVE_FWDQ7, ::boost::forward<Q7>(q7)
-#define BOOST_MOVE_FWDQ9 BOOST_MOVE_FWDQ8, ::boost::forward<Q8>(q8)
+#define BOOST_MOVE_FWDQ1                   ::cppmsboost::forward<Q0>(q0)
+#define BOOST_MOVE_FWDQ2 BOOST_MOVE_FWDQ1, ::cppmsboost::forward<Q1>(q1)
+#define BOOST_MOVE_FWDQ3 BOOST_MOVE_FWDQ2, ::cppmsboost::forward<Q2>(q2)
+#define BOOST_MOVE_FWDQ4 BOOST_MOVE_FWDQ3, ::cppmsboost::forward<Q3>(q3)
+#define BOOST_MOVE_FWDQ5 BOOST_MOVE_FWDQ4, ::cppmsboost::forward<Q4>(q4)
+#define BOOST_MOVE_FWDQ6 BOOST_MOVE_FWDQ5, ::cppmsboost::forward<Q5>(q5)
+#define BOOST_MOVE_FWDQ7 BOOST_MOVE_FWDQ6, ::cppmsboost::forward<Q6>(q6)
+#define BOOST_MOVE_FWDQ8 BOOST_MOVE_FWDQ7, ::cppmsboost::forward<Q7>(q7)
+#define BOOST_MOVE_FWDQ9 BOOST_MOVE_FWDQ8, ::cppmsboost::forward<Q8>(q8)
 
 //BOOST_MOVE_TMPL_GETN
 #define BOOST_MOVE_TMPL_GET0
@@ -179,36 +179,36 @@ namespace move_detail {
 
 //BOOST_MOVE_DECLVALN
 #define BOOST_MOVE_DECLVAL0
-#define BOOST_MOVE_DECLVAL1                      ::boost::move_detail::declval<P0>()
-#define BOOST_MOVE_DECLVAL2 BOOST_MOVE_DECLVAL1, ::boost::move_detail::declval<P1>()
-#define BOOST_MOVE_DECLVAL3 BOOST_MOVE_DECLVAL2, ::boost::move_detail::declval<P2>()
-#define BOOST_MOVE_DECLVAL4 BOOST_MOVE_DECLVAL3, ::boost::move_detail::declval<P3>()
-#define BOOST_MOVE_DECLVAL5 BOOST_MOVE_DECLVAL4, ::boost::move_detail::declval<P4>()
-#define BOOST_MOVE_DECLVAL6 BOOST_MOVE_DECLVAL5, ::boost::move_detail::declval<P5>()
-#define BOOST_MOVE_DECLVAL7 BOOST_MOVE_DECLVAL6, ::boost::move_detail::declval<P6>()
-#define BOOST_MOVE_DECLVAL8 BOOST_MOVE_DECLVAL7, ::boost::move_detail::declval<P7>()
-#define BOOST_MOVE_DECLVAL9 BOOST_MOVE_DECLVAL8, ::boost::move_detail::declval<P8>()
+#define BOOST_MOVE_DECLVAL1                      ::cppmsboost::move_detail::declval<P0>()
+#define BOOST_MOVE_DECLVAL2 BOOST_MOVE_DECLVAL1, ::cppmsboost::move_detail::declval<P1>()
+#define BOOST_MOVE_DECLVAL3 BOOST_MOVE_DECLVAL2, ::cppmsboost::move_detail::declval<P2>()
+#define BOOST_MOVE_DECLVAL4 BOOST_MOVE_DECLVAL3, ::cppmsboost::move_detail::declval<P3>()
+#define BOOST_MOVE_DECLVAL5 BOOST_MOVE_DECLVAL4, ::cppmsboost::move_detail::declval<P4>()
+#define BOOST_MOVE_DECLVAL6 BOOST_MOVE_DECLVAL5, ::cppmsboost::move_detail::declval<P5>()
+#define BOOST_MOVE_DECLVAL7 BOOST_MOVE_DECLVAL6, ::cppmsboost::move_detail::declval<P6>()
+#define BOOST_MOVE_DECLVAL8 BOOST_MOVE_DECLVAL7, ::cppmsboost::move_detail::declval<P7>()
+#define BOOST_MOVE_DECLVAL9 BOOST_MOVE_DECLVAL8, ::cppmsboost::move_detail::declval<P8>()
 
 //BOOST_MOVE_DECLVALQN
 #define BOOST_MOVE_DECLVALQ0
-#define BOOST_MOVE_DECLVALQ1                       ::boost::move_detail::declval<Q0>()
-#define BOOST_MOVE_DECLVALQ2 BOOST_MOVE_DECLVALQ1, ::boost::move_detail::declval<Q1>()
-#define BOOST_MOVE_DECLVALQ3 BOOST_MOVE_DECLVALQ2, ::boost::move_detail::declval<Q2>()
-#define BOOST_MOVE_DECLVALQ4 BOOST_MOVE_DECLVALQ3, ::boost::move_detail::declval<Q3>()
-#define BOOST_MOVE_DECLVALQ5 BOOST_MOVE_DECLVALQ4, ::boost::move_detail::declval<Q4>()
-#define BOOST_MOVE_DECLVALQ6 BOOST_MOVE_DECLVALQ5, ::boost::move_detail::declval<Q5>()
-#define BOOST_MOVE_DECLVALQ7 BOOST_MOVE_DECLVALQ6, ::boost::move_detail::declval<Q6>()
-#define BOOST_MOVE_DECLVALQ8 BOOST_MOVE_DECLVALQ7, ::boost::move_detail::declval<Q7>()
-#define BOOST_MOVE_DECLVALQ9 BOOST_MOVE_DECLVALQ8, ::boost::move_detail::declval<Q8>()
+#define BOOST_MOVE_DECLVALQ1                       ::cppmsboost::move_detail::declval<Q0>()
+#define BOOST_MOVE_DECLVALQ2 BOOST_MOVE_DECLVALQ1, ::cppmsboost::move_detail::declval<Q1>()
+#define BOOST_MOVE_DECLVALQ3 BOOST_MOVE_DECLVALQ2, ::cppmsboost::move_detail::declval<Q2>()
+#define BOOST_MOVE_DECLVALQ4 BOOST_MOVE_DECLVALQ3, ::cppmsboost::move_detail::declval<Q3>()
+#define BOOST_MOVE_DECLVALQ5 BOOST_MOVE_DECLVALQ4, ::cppmsboost::move_detail::declval<Q4>()
+#define BOOST_MOVE_DECLVALQ6 BOOST_MOVE_DECLVALQ5, ::cppmsboost::move_detail::declval<Q5>()
+#define BOOST_MOVE_DECLVALQ7 BOOST_MOVE_DECLVALQ6, ::cppmsboost::move_detail::declval<Q6>()
+#define BOOST_MOVE_DECLVALQ8 BOOST_MOVE_DECLVALQ7, ::cppmsboost::move_detail::declval<Q7>()
+#define BOOST_MOVE_DECLVALQ9 BOOST_MOVE_DECLVALQ8, ::cppmsboost::move_detail::declval<Q8>()
 
 #ifdef BOOST_MOVE_MSVC_10_MEMBER_RVALUE_REF_BUG
-   #define BOOST_MOVE_MREF(T)    ::boost::move_detail::mref<T>
-   #define BOOST_MOVE_MFWD(N)    ::boost::forward<P##N>(this->m_p##N.get())
-   #define BOOST_MOVE_MFWDQ(N)   ::boost::forward<Q##N>(this->m_q##N.get())
+   #define BOOST_MOVE_MREF(T)    ::cppmsboost::move_detail::mref<T>
+   #define BOOST_MOVE_MFWD(N)    ::cppmsboost::forward<P##N>(this->m_p##N.get())
+   #define BOOST_MOVE_MFWDQ(N)   ::cppmsboost::forward<Q##N>(this->m_q##N.get())
 #else
    #define BOOST_MOVE_MREF(T)    BOOST_FWD_REF(T)
-   #define BOOST_MOVE_MFWD(N)    ::boost::forward<P##N>(this->m_p##N)
-   #define BOOST_MOVE_MFWDQ(N)   ::boost::forward<Q##N>(this->m_q##N)
+   #define BOOST_MOVE_MFWD(N)    ::cppmsboost::forward<P##N>(this->m_p##N)
+   #define BOOST_MOVE_MFWDQ(N)   ::cppmsboost::forward<Q##N>(this->m_q##N)
 #endif
 #define BOOST_MOVE_MITFWD(N)  *this->m_p##N
 #define BOOST_MOVE_MINC(N)    ++this->m_p##N
@@ -290,27 +290,27 @@ namespace move_detail {
 
 //BOOST_MOVE_FWD_INITN
 #define BOOST_MOVE_FWD_INIT0
-#define BOOST_MOVE_FWD_INIT1                       m_p0(::boost::forward<P0>(p0))
-#define BOOST_MOVE_FWD_INIT2 BOOST_MOVE_FWD_INIT1, m_p1(::boost::forward<P1>(p1))
-#define BOOST_MOVE_FWD_INIT3 BOOST_MOVE_FWD_INIT2, m_p2(::boost::forward<P2>(p2))
-#define BOOST_MOVE_FWD_INIT4 BOOST_MOVE_FWD_INIT3, m_p3(::boost::forward<P3>(p3))
-#define BOOST_MOVE_FWD_INIT5 BOOST_MOVE_FWD_INIT4, m_p4(::boost::forward<P4>(p4))
-#define BOOST_MOVE_FWD_INIT6 BOOST_MOVE_FWD_INIT5, m_p5(::boost::forward<P5>(p5))
-#define BOOST_MOVE_FWD_INIT7 BOOST_MOVE_FWD_INIT6, m_p6(::boost::forward<P6>(p6))
-#define BOOST_MOVE_FWD_INIT8 BOOST_MOVE_FWD_INIT7, m_p7(::boost::forward<P7>(p7))
-#define BOOST_MOVE_FWD_INIT9 BOOST_MOVE_FWD_INIT8, m_p8(::boost::forward<P8>(p8))
+#define BOOST_MOVE_FWD_INIT1                       m_p0(::cppmsboost::forward<P0>(p0))
+#define BOOST_MOVE_FWD_INIT2 BOOST_MOVE_FWD_INIT1, m_p1(::cppmsboost::forward<P1>(p1))
+#define BOOST_MOVE_FWD_INIT3 BOOST_MOVE_FWD_INIT2, m_p2(::cppmsboost::forward<P2>(p2))
+#define BOOST_MOVE_FWD_INIT4 BOOST_MOVE_FWD_INIT3, m_p3(::cppmsboost::forward<P3>(p3))
+#define BOOST_MOVE_FWD_INIT5 BOOST_MOVE_FWD_INIT4, m_p4(::cppmsboost::forward<P4>(p4))
+#define BOOST_MOVE_FWD_INIT6 BOOST_MOVE_FWD_INIT5, m_p5(::cppmsboost::forward<P5>(p5))
+#define BOOST_MOVE_FWD_INIT7 BOOST_MOVE_FWD_INIT6, m_p6(::cppmsboost::forward<P6>(p6))
+#define BOOST_MOVE_FWD_INIT8 BOOST_MOVE_FWD_INIT7, m_p7(::cppmsboost::forward<P7>(p7))
+#define BOOST_MOVE_FWD_INIT9 BOOST_MOVE_FWD_INIT8, m_p8(::cppmsboost::forward<P8>(p8))
 
 //BOOST_MOVE_FWD_INITQN
 #define BOOST_MOVE_FWD_INITQ0
-#define BOOST_MOVE_FWD_INITQ1                        m_q0(::boost::forward<Q0>(q0))
-#define BOOST_MOVE_FWD_INITQ2 BOOST_MOVE_FWD_INITQ1, m_q1(::boost::forward<Q1>(q1))
-#define BOOST_MOVE_FWD_INITQ3 BOOST_MOVE_FWD_INITQ2, m_q2(::boost::forward<Q2>(q2))
-#define BOOST_MOVE_FWD_INITQ4 BOOST_MOVE_FWD_INITQ3, m_q3(::boost::forward<Q3>(q3))
-#define BOOST_MOVE_FWD_INITQ5 BOOST_MOVE_FWD_INITQ4, m_q4(::boost::forward<Q4>(q4))
-#define BOOST_MOVE_FWD_INITQ6 BOOST_MOVE_FWD_INITQ5, m_q5(::boost::forward<Q5>(q5))
-#define BOOST_MOVE_FWD_INITQ7 BOOST_MOVE_FWD_INITQ6, m_q6(::boost::forward<Q6>(q6))
-#define BOOST_MOVE_FWD_INITQ8 BOOST_MOVE_FWD_INITQ7, m_q7(::boost::forward<Q7>(q7))
-#define BOOST_MOVE_FWD_INITQ9 BOOST_MOVE_FWD_INITQ8, m_q8(::boost::forward<Q8>(q8))
+#define BOOST_MOVE_FWD_INITQ1                        m_q0(::cppmsboost::forward<Q0>(q0))
+#define BOOST_MOVE_FWD_INITQ2 BOOST_MOVE_FWD_INITQ1, m_q1(::cppmsboost::forward<Q1>(q1))
+#define BOOST_MOVE_FWD_INITQ3 BOOST_MOVE_FWD_INITQ2, m_q2(::cppmsboost::forward<Q2>(q2))
+#define BOOST_MOVE_FWD_INITQ4 BOOST_MOVE_FWD_INITQ3, m_q3(::cppmsboost::forward<Q3>(q3))
+#define BOOST_MOVE_FWD_INITQ5 BOOST_MOVE_FWD_INITQ4, m_q4(::cppmsboost::forward<Q4>(q4))
+#define BOOST_MOVE_FWD_INITQ6 BOOST_MOVE_FWD_INITQ5, m_q5(::cppmsboost::forward<Q5>(q5))
+#define BOOST_MOVE_FWD_INITQ7 BOOST_MOVE_FWD_INITQ6, m_q6(::cppmsboost::forward<Q6>(q6))
+#define BOOST_MOVE_FWD_INITQ8 BOOST_MOVE_FWD_INITQ7, m_q7(::cppmsboost::forward<Q7>(q7))
+#define BOOST_MOVE_FWD_INITQ9 BOOST_MOVE_FWD_INITQ8, m_q8(::cppmsboost::forward<Q8>(q8))
 
 //BOOST_MOVE_VAL_INITN
 #define BOOST_MOVE_VAL_INIT0
@@ -385,7 +385,7 @@ namespace move_detail {
 #define BOOST_MOVE_VALQ9 BOOST_MOVE_VALQ8, BOOST_FWD_REF(Q8) q8
 
 
-#define BOOST_MOVE_UNVOIDCREF(T) const typename boost::move_detail::unvoid<T>::type&
+#define BOOST_MOVE_UNVOIDCREF(T) const typename cppmsboost::move_detail::unvoid<T>::type&
 //BOOST_MOVE_CREFN
 #define BOOST_MOVE_CREF0
 #define BOOST_MOVE_CREF1                   BOOST_MOVE_UNVOIDCREF(P0) p0
@@ -509,27 +509,27 @@ namespace move_detail {
 
 //BOOST_MOVE_FWD_TN
 #define BOOST_MOVE_FWD_T0
-#define BOOST_MOVE_FWD_T1                    typename ::boost::move_detail::forward_type<P0>::type
-#define BOOST_MOVE_FWD_T2 BOOST_MOVE_FWD_T1, typename ::boost::move_detail::forward_type<P1>::type
-#define BOOST_MOVE_FWD_T3 BOOST_MOVE_FWD_T2, typename ::boost::move_detail::forward_type<P2>::type
-#define BOOST_MOVE_FWD_T4 BOOST_MOVE_FWD_T3, typename ::boost::move_detail::forward_type<P3>::type
-#define BOOST_MOVE_FWD_T5 BOOST_MOVE_FWD_T4, typename ::boost::move_detail::forward_type<P4>::type
-#define BOOST_MOVE_FWD_T6 BOOST_MOVE_FWD_T5, typename ::boost::move_detail::forward_type<P5>::type
-#define BOOST_MOVE_FWD_T7 BOOST_MOVE_FWD_T6, typename ::boost::move_detail::forward_type<P6>::type
-#define BOOST_MOVE_FWD_T8 BOOST_MOVE_FWD_T7, typename ::boost::move_detail::forward_type<P7>::type
-#define BOOST_MOVE_FWD_T9 BOOST_MOVE_FWD_T8, typename ::boost::move_detail::forward_type<P8>::type
+#define BOOST_MOVE_FWD_T1                    typename ::cppmsboost::move_detail::forward_type<P0>::type
+#define BOOST_MOVE_FWD_T2 BOOST_MOVE_FWD_T1, typename ::cppmsboost::move_detail::forward_type<P1>::type
+#define BOOST_MOVE_FWD_T3 BOOST_MOVE_FWD_T2, typename ::cppmsboost::move_detail::forward_type<P2>::type
+#define BOOST_MOVE_FWD_T4 BOOST_MOVE_FWD_T3, typename ::cppmsboost::move_detail::forward_type<P3>::type
+#define BOOST_MOVE_FWD_T5 BOOST_MOVE_FWD_T4, typename ::cppmsboost::move_detail::forward_type<P4>::type
+#define BOOST_MOVE_FWD_T6 BOOST_MOVE_FWD_T5, typename ::cppmsboost::move_detail::forward_type<P5>::type
+#define BOOST_MOVE_FWD_T7 BOOST_MOVE_FWD_T6, typename ::cppmsboost::move_detail::forward_type<P6>::type
+#define BOOST_MOVE_FWD_T8 BOOST_MOVE_FWD_T7, typename ::cppmsboost::move_detail::forward_type<P7>::type
+#define BOOST_MOVE_FWD_T9 BOOST_MOVE_FWD_T8, typename ::cppmsboost::move_detail::forward_type<P8>::type
 
 //BOOST_MOVE_FWD_TQN
 #define BOOST_MOVE_FWD_TQ0
-#define BOOST_MOVE_FWD_TQ1                     typename ::boost::move_detail::forward_type<Q0>::type
-#define BOOST_MOVE_FWD_TQ2 BOOST_MOVE_FWD_TQ1, typename ::boost::move_detail::forward_type<Q1>::type
-#define BOOST_MOVE_FWD_TQ3 BOOST_MOVE_FWD_TQ2, typename ::boost::move_detail::forward_type<Q2>::type
-#define BOOST_MOVE_FWD_TQ4 BOOST_MOVE_FWD_TQ3, typename ::boost::move_detail::forward_type<Q3>::type
-#define BOOST_MOVE_FWD_TQ5 BOOST_MOVE_FWD_TQ4, typename ::boost::move_detail::forward_type<Q4>::type
-#define BOOST_MOVE_FWD_TQ6 BOOST_MOVE_FWD_TQ5, typename ::boost::move_detail::forward_type<Q5>::type
-#define BOOST_MOVE_FWD_TQ7 BOOST_MOVE_FWD_TQ6, typename ::boost::move_detail::forward_type<Q6>::type
-#define BOOST_MOVE_FWD_TQ8 BOOST_MOVE_FWD_TQ7, typename ::boost::move_detail::forward_type<Q7>::type
-#define BOOST_MOVE_FWD_TQ9 BOOST_MOVE_FWD_TQ8, typename ::boost::move_detail::forward_type<Q8>::type
+#define BOOST_MOVE_FWD_TQ1                     typename ::cppmsboost::move_detail::forward_type<Q0>::type
+#define BOOST_MOVE_FWD_TQ2 BOOST_MOVE_FWD_TQ1, typename ::cppmsboost::move_detail::forward_type<Q1>::type
+#define BOOST_MOVE_FWD_TQ3 BOOST_MOVE_FWD_TQ2, typename ::cppmsboost::move_detail::forward_type<Q2>::type
+#define BOOST_MOVE_FWD_TQ4 BOOST_MOVE_FWD_TQ3, typename ::cppmsboost::move_detail::forward_type<Q3>::type
+#define BOOST_MOVE_FWD_TQ5 BOOST_MOVE_FWD_TQ4, typename ::cppmsboost::move_detail::forward_type<Q4>::type
+#define BOOST_MOVE_FWD_TQ6 BOOST_MOVE_FWD_TQ5, typename ::cppmsboost::move_detail::forward_type<Q5>::type
+#define BOOST_MOVE_FWD_TQ7 BOOST_MOVE_FWD_TQ6, typename ::cppmsboost::move_detail::forward_type<Q6>::type
+#define BOOST_MOVE_FWD_TQ8 BOOST_MOVE_FWD_TQ7, typename ::cppmsboost::move_detail::forward_type<Q7>::type
+#define BOOST_MOVE_FWD_TQ9 BOOST_MOVE_FWD_TQ8, typename ::cppmsboost::move_detail::forward_type<Q8>::type
 
 //BOOST_MOVE_MREFX
 #define BOOST_MOVE_MREF0

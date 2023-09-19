@@ -86,7 +86,7 @@
    #define BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(L)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace movelib {
 
 #if defined(BOOST_MOVE_ADAPTIVE_SORT_INVARIANTS)
@@ -113,7 +113,7 @@ static const std::size_t AdaptiveSortInsertionSortThreshold = 16;
 BOOST_STATIC_ASSERT((AdaptiveSortInsertionSortThreshold&(AdaptiveSortInsertionSortThreshold-1)) == 0);
 
 #if defined BOOST_HAS_INTPTR_T
-   typedef ::boost::uintptr_t uintptr_t;
+   typedef ::cppmsboost::uintptr_t uintptr_t;
 #else
    typedef std::size_t uintptr_t;
 #endif
@@ -166,8 +166,8 @@ void swap_and_update_key
    , RandIt const with)
 {
    if(begin != with){
-      ::boost::adl_move_swap_ranges(begin, end, with);
-      ::boost::adl_move_swap(*key_next, *key_range2);
+      ::cppmsboost::adl_move_swap_ranges(begin, end, with);
+      ::cppmsboost::adl_move_swap(*key_next, *key_range2);
       if(key_next == key_mid){
          key_mid = key_range2;
       }
@@ -184,7 +184,7 @@ void update_key
    , RandItKeys &key_mid)
 {
    if (key_next != key_range2) {
-      ::boost::adl_move_swap(*key_next, *key_range2);
+      ::cppmsboost::adl_move_swap(*key_next, *key_range2);
       if (key_next == key_mid) {
          key_mid = key_range2;
       }
@@ -209,7 +209,7 @@ RandIt2 buffer_and_update_key
       while(begin != end) {
          op(three_way_t(), begin++, with++, buffer++);
       }
-      ::boost::adl_move_swap(*key_next, *key_range2);
+      ::cppmsboost::adl_move_swap(*key_next, *key_range2);
       if (key_next == key_mid) {
          key_mid = key_range2;
       }
@@ -238,7 +238,7 @@ RandIt partial_merge_bufferless_impl
    if(first1 != last1 && comp(*last1, last1[-1])){
       do{
          RandIt const old_last1 = last1;
-         last1  = boost::movelib::lower_bound(last1, last2, *first1, comp);
+         last1  = cppmsboost::movelib::lower_bound(last1, last2, *first1, comp);
          first1 = rotate_gcd(first1, old_last1, last1);//old_last1 == last1 supported
          if(last1 == last2){
             return first1;
@@ -314,7 +314,7 @@ void merge_blocks_bufferless
    typedef typename iterator_traits<RandIt>::size_type size_type;
    size_type const key_count = needed_keys_count(n_block_a, n_block_b); (void)key_count;
    //BOOST_ASSERT(n_block_a || n_block_b);
-   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted_and_unique(key_first, key_first + key_count, key_comp));
+   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted_and_unique(key_first, key_first + key_count, key_comp));
    BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(!n_block_b || n_block_a == count_if_with(key_first, key_first + key_count, key_comp, key_first[n_block_a]));
 
    size_type n_bef_irreg2 = 0;
@@ -344,12 +344,12 @@ void merge_blocks_bufferless
          n_bef_irreg2 += l_irreg_pos_count;
 
          swap_and_update_key(key_next, key_range2, key_mid, f, f + l_block, first_min);
-         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(f, f+l_block, comp));
-         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first_min, first_min + l_block, comp));
+         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(f, f+l_block, comp));
+         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first_min, first_min + l_block, comp));
          BOOST_MOVE_ADAPTIVE_SORT_INVARIANT((f == (first+l_irreg1)) || !comp(*f, *(f-l_block)));
       }
    }
-   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first+l_irreg1+n_bef_irreg2*l_block, first_irr2, comp));
+   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first+l_irreg1+n_bef_irreg2*l_block, first_irr2, comp));
 
    RandIt first1 = first;
    RandIt last1  = first+l_irreg1;
@@ -361,11 +361,11 @@ void merge_blocks_bufferless
       first1 = is_range1_A == is_range2_A
          ? last1 : partial_merge_bufferless(first1, last1, last1 + l_block, &is_range1_A, comp);
       last1 += l_block;
-      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first, first1, comp));
+      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first, first1, comp));
    }
 
    merge_bufferless(is_range1_A ? first1 : last1, first_irr2, last_irr2, comp);
-   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first, last_irr2, comp));
+   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first, last_irr2, comp));
 }
 
 // Complexity: 2*distance(first, last)+max_collected^2/2
@@ -392,10 +392,10 @@ typename iterator_traits<RandIt>::size_type
       if(xbuf.capacity() >= max_collected){
          typename XBuf::iterator const ph0 = xbuf.add(first);
          while(u != last && h < max_collected){
-            typename XBuf::iterator const r = boost::movelib::lower_bound(ph0, xbuf.end(), *u, comp);
+            typename XBuf::iterator const r = cppmsboost::movelib::lower_bound(ph0, xbuf.end(), *u, comp);
             //If key not found add it to [h, h+h0)
             if(r == xbuf.end() || comp(*u, *r) ){
-               RandIt const new_h0 = boost::move(search_end, u, h0);
+               RandIt const new_h0 = cppmsboost::move(search_end, u, h0);
                search_end = u;
                ++search_end;
                ++h;
@@ -404,12 +404,12 @@ typename iterator_traits<RandIt>::size_type
             }
             ++u;
          }
-         boost::move_backward(first, h0, h0+h);
-         boost::move(xbuf.data(), xbuf.end(), first);
+         cppmsboost::move_backward(first, h0, h0+h);
+         cppmsboost::move(xbuf.data(), xbuf.end(), first);
       }
       else{
          while(u != last && h < max_collected){
-            RandIt const r = boost::movelib::lower_bound(h0, search_end, *u, comp);
+            RandIt const r = cppmsboost::movelib::lower_bound(h0, search_end, *u, comp);
             //If key not found add it to [h, h+h0)
             if(r == search_end || comp(*u, *r) ){
                RandIt const new_h0 = rotate_gcd(h0, search_end, u);
@@ -508,7 +508,7 @@ template<class RandIt, class Compare>
 void slow_stable_sort
    ( RandIt const first, RandIt const last, Compare comp)
 {
-   boost::movelib::inplace_stable_sort(first, last, comp);
+   cppmsboost::movelib::inplace_stable_sort(first, last, comp);
 }
 
 #else //ADAPTIVE_SORT_MERGE_SLOW_STABLE_SORT_IS_NLOGN
@@ -624,7 +624,7 @@ void stable_merge
       //merge_bufferless(first, middle, last, comp);
       merge_adaptive_ONlogN(first, middle, last, comp, xbuf.begin(), xbuf.capacity());
    }
-   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first, last, boost::movelib::unantistable(comp)));
+   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first, last, cppmsboost::movelib::unantistable(comp)));
 }
 
 template<class RandIt, class Comp, class XBuf>
@@ -633,7 +633,7 @@ void initialize_keys( RandIt first, RandIt last
                     , XBuf & xbuf)
 {
    unstable_sort(first, last, comp, xbuf);
-   BOOST_ASSERT(boost::movelib::is_sorted_and_unique(first, last, comp));
+   BOOST_ASSERT(cppmsboost::movelib::is_sorted_and_unique(first, last, comp));
 }
 
 template<class RandIt, class U>
@@ -945,17 +945,17 @@ OutputIt op_merge_blocks_with_irreg
       RandIt first_min = first_reg + next_key_idx*l_block;
       RandIt const last_min  = first_min + l_block; (void)last_min;
 
-      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first_reg, last_reg, comp));
-      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(!next_key_idx || boost::movelib::is_sorted(first_min, last_min, comp));
+      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first_reg, last_reg, comp));
+      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(!next_key_idx || cppmsboost::movelib::is_sorted(first_min, last_min, comp));
       BOOST_MOVE_ADAPTIVE_SORT_INVARIANT((!next_key_idx || !comp(*first_reg, *first_min )));
 
       OutputIt orig_dest = dest; (void)orig_dest;
       dest = next_key_idx ? op_partial_merge_and_swap(first_irr, last_irr, first_reg, last_reg, first_min, dest, comp, op, is_stable)
                           : op_partial_merge         (first_irr, last_irr, first_reg, last_reg, dest, comp, op, is_stable);
-      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(orig_dest, dest, comp));
+      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(orig_dest, dest, comp));
 
       if(first_reg == dest){
-         dest = next_key_idx ? ::boost::adl_move_swap_ranges(first_min, last_min, first_reg)
+         dest = next_key_idx ? ::cppmsboost::adl_move_swap_ranges(first_min, last_min, first_reg)
                              : last_reg;
       }
       else{
@@ -966,7 +966,7 @@ OutputIt op_merge_blocks_with_irreg
       RandItKeys const key_next(key_first + next_key_idx);
       swap_and_update_key(key_next, key_first, key_mid, last_reg, last_reg, first_min);
 
-      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(orig_dest, dest, comp));
+      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(orig_dest, dest, comp));
       first_reg = last_reg;
    }
    return dest;
@@ -997,7 +997,7 @@ void op_merge_blocks_left
    typedef typename iterator_traits<RandIt>::size_type size_type;
    size_type const key_count = needed_keys_count(n_block_a, n_block_b); (void)key_count;
 //   BOOST_ASSERT(n_block_a || n_block_b);
-   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted_and_unique(key_first, key_first + key_count, key_comp));
+   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted_and_unique(key_first, key_first + key_count, key_comp));
    BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(!n_block_b || n_block_a == count_if_with(key_first, key_first + key_count, key_comp, key_first[n_block_a]));
 
    size_type n_block_b_left = n_block_b;
@@ -1026,9 +1026,9 @@ void op_merge_blocks_left
       RandIt const last_min  = first_min + l_block; (void)last_min;
       RandIt const last2  = first2 + l_block;
 
-      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first1, last1, comp));
-      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first2, last2, comp));
-      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(!n_block_left || boost::movelib::is_sorted(first_min, last_min, comp));
+      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first1, last1, comp));
+      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first2, last2, comp));
+      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(!n_block_left || cppmsboost::movelib::is_sorted(first_min, last_min, comp));
 
       //Check if irregular b block should go here.
       //If so, break to the special code handling the irregular block
@@ -1069,7 +1069,7 @@ void op_merge_blocks_left
                (buffer, buffer+(last1-first1), first2, last2, first_min, buf_beg, buf_end, comp, op, is_range1_A);
          }
          (void)unmerged;
-         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first-l_block, unmerged, comp));
+         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first-l_block, unmerged, comp));
 
          swap_and_update_key( key_next, key_range2, key_mid, first2, last2
                             , last_min - size_type(last2 - first2));
@@ -1118,7 +1118,7 @@ void op_merge_blocks_left
    else if(!is_buffer_middle){
       buffer = op(forward_t(), first1, last1, buffer);
    }
-   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first-l_block, buffer, comp));
+   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first-l_block, buffer, comp));
 
    ////////////////////////////////////////////////////////////////////////////
    //Process irregular B block and remaining A blocks
@@ -1127,7 +1127,7 @@ void op_merge_blocks_left
       ( key_range2, key_mid, key_comp, first2, first_irr2, last_irr2
       , buffer, l_block, n_block_left, min_check, max_check, comp, false, op);
    buffer = op(forward_t(), first_irr2, last_irr2, buffer);(void)buffer;
-   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first-l_block, buffer, comp));
+   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first-l_block, buffer, comp));
 }
 
 // first - first element to merge.
@@ -1218,7 +1218,7 @@ void op_merge_blocks_with_buf
    typedef typename iterator_traits<RandIt>::size_type size_type;
    size_type const key_count = needed_keys_count(n_block_a, n_block_b); (void)key_count;
    //BOOST_ASSERT(n_block_a || n_block_b);
-   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted_and_unique(key_first, key_first + key_count, key_comp));
+   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted_and_unique(key_first, key_first + key_count, key_comp));
    BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(!n_block_b || n_block_a == count_if_with(key_first, key_first + key_count, key_comp, key_first[n_block_a]));
 
    size_type n_block_b_left = n_block_b;
@@ -1250,9 +1250,9 @@ void op_merge_blocks_with_buf
       RandIt const last2  = first2 + l_block;
 
       bool const buffer_empty = buffer == buffer_end; (void)buffer_empty;
-      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(buffer_empty ? boost::movelib::is_sorted(first1, last1, comp) : boost::movelib::is_sorted(buffer, buffer_end, comp));
-      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first2, last2, comp));
-      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(!n_block_left || boost::movelib::is_sorted(first_min, last_min, comp));
+      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(buffer_empty ? cppmsboost::movelib::is_sorted(first1, last1, comp) : cppmsboost::movelib::is_sorted(buffer, buffer_end, comp));
+      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first2, last2, comp));
+      BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(!n_block_left || cppmsboost::movelib::is_sorted(first_min, last_min, comp));
 
       //Check if irregular b block should go here.
       //If so, break to the special code handling the irregular block
@@ -1274,10 +1274,10 @@ void op_merge_blocks_with_buf
          //swap_and_update_key(key_next, key_range2, key_mid, first2, last2, first_min);
          buffer_end = buffer_and_update_key(key_next, key_range2, key_mid, first2, last2, first_min, buffer = buf_first, op);
          BOOST_MOVE_ADAPTIVE_SORT_PRINT_L2("   merge_blocks_w_swp: ", len);
-         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first2, last2, comp));
-         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first_min, last_min, comp));
+         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first2, last2, comp));
+         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first_min, last_min, comp));
          first1 = first2;
-         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first, first1, comp));
+         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first, first1, comp));
       }
       else {
          RandIt const unmerged = op_partial_merge_and_save(first1, last1, first2, last2, first_min, buffer, buffer_end, comp, op, is_range1_A);
@@ -1297,10 +1297,10 @@ void op_merge_blocks_with_buf
          }
          BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(!is_range_1_empty || (last_min-first_min) == (last2-unmerged));
          BOOST_MOVE_ADAPTIVE_SORT_PRINT_L2("   merge_blocks_w_swp: ", len);
-         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first_min, last_min, comp));
+         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first_min, last_min, comp));
          is_range1_A ^= is_range_1_empty;
          first1 = unmerged;
-         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first, unmerged, comp));
+         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first, unmerged, comp));
       }
       BOOST_ASSERT( (is_range2_A && n_block_a_left) || (!is_range2_A && n_block_b_left));
       is_range2_A ? --n_block_a_left : --n_block_b_left;
@@ -1308,7 +1308,7 @@ void op_merge_blocks_with_buf
       first2 = last2;
    }
    RandIt res = op(forward_t(), buffer, buffer_end, first1); (void)res;
-   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first, res, comp));
+   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first, res, comp));
    BOOST_MOVE_ADAPTIVE_SORT_PRINT_L2("   merge_blocks_w_fwd: ", len);
 
    ////////////////////////////////////////////////////////////////////////////
@@ -1326,14 +1326,14 @@ void op_merge_blocks_with_buf
       , (make_reverse_iterator)(first_irr2), rbuf_beg, (make_reverse_iterator)(buffer), (make_reverse_iterator)(last_irr2)
       , l_block, n_block_left, 0, n_block_left
       , inverse<Compare>(comp), true, op).base();
-   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(dest, last_irr2, comp));
+   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(dest, last_irr2, comp));
    BOOST_MOVE_ADAPTIVE_SORT_PRINT_L2("   merge_blocks_w_irg: ", len);
 
    buffer_end = rbuf_beg.base();
    BOOST_ASSERT((dest-last1) == (buffer_end-buffer));
    op_merge_with_left_placed(is_range1_A ? first1 : last1, last1, dest, buffer, buffer_end, comp, op);
    BOOST_MOVE_ADAPTIVE_SORT_PRINT_L2("   merge_with_left_plc:", len);
-   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(first, last_irr2, comp));
+   BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(first, last_irr2, comp));
 }
 
 //////////////////////////////////
@@ -1447,17 +1447,17 @@ typename iterator_traits<RandIt>::size_type
       RandIt pos = first_block;
       while((elements_in_blocks - p0) > 2*l_merged) {
          op_merge_left(pos-l_merged, pos, pos+l_merged, pos+2*l_merged, comp, op);
-         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(pos-l_merged, pos+l_merged, comp));
+         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(pos-l_merged, pos+l_merged, comp));
          p0 += 2*l_merged;
          pos = first_block+p0;
       }
       if((elements_in_blocks-p0) > l_merged) {
          op_merge_left(pos-l_merged, pos, pos+l_merged, first_block+elements_in_blocks, comp, op);
-         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(pos-l_merged, pos-l_merged+(first_block+elements_in_blocks-pos), comp));
+         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(pos-l_merged, pos-l_merged+(first_block+elements_in_blocks-pos), comp));
       }
       else {
          op(forward_t(), pos, first_block+elements_in_blocks, pos-l_merged);
-         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(boost::movelib::is_sorted(pos-l_merged, first_block+elements_in_blocks-l_merged, comp));
+         BOOST_MOVE_ADAPTIVE_SORT_INVARIANT(cppmsboost::movelib::is_sorted(pos-l_merged, first_block+elements_in_blocks-l_merged, comp));
       }
       first_block -= l_merged;
       l_left_space -= l_merged;
@@ -1468,7 +1468,7 @@ typename iterator_traits<RandIt>::size_type
 
 }  //namespace detail_adaptive {
 }  //namespace movelib {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #include <boost/move/detail/config_end.hpp>
 

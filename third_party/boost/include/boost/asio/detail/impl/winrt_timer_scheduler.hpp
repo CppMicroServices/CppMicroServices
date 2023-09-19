@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -43,7 +43,7 @@ void winrt_timer_scheduler::schedule_timer(timer_queue<Time_Traits>& queue,
     const typename Time_Traits::time_type& time,
     typename timer_queue<Time_Traits>::per_timer_data& timer, wait_op* op)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
 
   if (shutdown_)
   {
@@ -62,7 +62,7 @@ std::size_t winrt_timer_scheduler::cancel_timer(timer_queue<Time_Traits>& queue,
     typename timer_queue<Time_Traits>::per_timer_data& timer,
     std::size_t max_cancelled)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   op_queue<operation> ops;
   std::size_t n = queue.cancel_timer(timer, ops, max_cancelled);
   lock.unlock();
@@ -75,7 +75,7 @@ void winrt_timer_scheduler::move_timer(timer_queue<Time_Traits>& queue,
     typename timer_queue<Time_Traits>::per_timer_data& to,
     typename timer_queue<Time_Traits>::per_timer_data& from)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   op_queue<operation> ops;
   queue.cancel_timer(to, ops);
   queue.move_timer(to, from);
@@ -85,7 +85,7 @@ void winrt_timer_scheduler::move_timer(timer_queue<Time_Traits>& queue,
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

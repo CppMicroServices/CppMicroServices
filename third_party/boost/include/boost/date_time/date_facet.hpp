@@ -25,7 +25,7 @@
 #include <boost/date_time/date_generator_parser.hpp>
 #include <boost/date_time/format_date_parser.hpp>
 
-namespace boost { namespace date_time {
+namespace cppmsboost { namespace date_time {
 
 
   /*! Class that provides format based I/O facet for date types.
@@ -53,11 +53,11 @@ namespace boost { namespace date_time {
     typedef typename date_type::day_of_week_type day_of_week_type;
     typedef typename date_type::day_type day_type;
     typedef typename date_type::month_type month_type;
-    typedef boost::date_time::period<date_type,duration_type> period_type;
+    typedef cppmsboost::date_time::period<date_type,duration_type> period_type;
     typedef std::basic_string<CharT> string_type;
     typedef CharT                    char_type;
-    typedef boost::date_time::period_formatter<CharT>  period_formatter_type;
-    typedef boost::date_time::special_values_formatter<CharT>  special_values_formatter_type;
+    typedef cppmsboost::date_time::period_formatter<CharT>  period_formatter_type;
+    typedef cppmsboost::date_time::special_values_formatter<CharT>  special_values_formatter_type;
     typedef std::vector<std::basic_string<CharT> > input_collection_type;
     // used for the output of the date_generators
     typedef date_generator_formatter<date_type, CharT> date_gen_formatter_type;
@@ -304,7 +304,7 @@ namespace boost { namespace date_time {
     virtual OutItrT do_put_special(OutItrT next,
                                    std::ios_base& /*a_ios*/,
                                    char_type /*fill_char*/,
-                                   const boost::date_time::special_values sv) const
+                                   const cppmsboost::date_time::special_values sv) const
     {
       m_special_values_formatter.put_special(next, sv);
       return next;
@@ -317,23 +317,23 @@ namespace boost { namespace date_time {
     {
       // update format string with custom names
       if (m_weekday_long_names.size()) {
-        boost::algorithm::replace_all(a_format,
+        cppmsboost::algorithm::replace_all(a_format,
                                       long_weekday_format,
                                       m_weekday_long_names[tm_value.tm_wday]);
       }
       if (m_weekday_short_names.size()) {
-        boost::algorithm::replace_all(a_format,
+        cppmsboost::algorithm::replace_all(a_format,
                                       short_weekday_format,
                                       m_weekday_short_names[tm_value.tm_wday]);
 
       }
       if (m_month_long_names.size()) {
-        boost::algorithm::replace_all(a_format,
+        cppmsboost::algorithm::replace_all(a_format,
                                       long_month_format,
                                       m_month_long_names[tm_value.tm_mon]);
       }
       if (m_month_short_names.size()) {
-        boost::algorithm::replace_all(a_format,
+        cppmsboost::algorithm::replace_all(a_format,
                                       short_month_format,
                                       m_month_short_names[tm_value.tm_mon]);
       }
@@ -416,11 +416,11 @@ namespace boost { namespace date_time {
     typedef typename date_type::day_type day_type;
     typedef typename date_type::month_type month_type;
     typedef typename date_type::year_type year_type;
-    typedef boost::date_time::period<date_type,duration_type> period_type;
+    typedef cppmsboost::date_time::period<date_type,duration_type> period_type;
     typedef std::basic_string<CharT> string_type;
     typedef CharT                    char_type;
-    typedef boost::date_time::period_parser<date_type, CharT>  period_parser_type;
-    typedef boost::date_time::special_values_parser<date_type,CharT> special_values_parser_type;
+    typedef cppmsboost::date_time::period_parser<date_type, CharT>  period_parser_type;
+    typedef cppmsboost::date_time::special_values_parser<date_type,CharT> special_values_parser_type;
     typedef std::vector<std::basic_string<CharT> > input_collection_type;
     typedef format_date_parser<date_type, CharT> format_date_parser_type;
     // date_generators stuff goes here
@@ -629,7 +629,7 @@ namespace boost { namespace date_time {
         }
         m_sv_parser.match(from, to, mr);
         if(mr.current_match == match_results::PARSE_ERROR) {
-          boost::throw_exception(std::ios_base::failure("Parse failed. No match found for '" + mr.cache + "'"));
+          cppmsboost::throw_exception(std::ios_base::failure("Parse failed. No match found for '" + mr.cache + "'"));
           BOOST_DATE_TIME_UNREACHABLE_EXPRESSION(return from); // should never reach
         }
         dd = duration_type(static_cast<special_values>(mr.current_match));

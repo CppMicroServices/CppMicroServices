@@ -33,7 +33,7 @@
 # pragma warning(disable:4355)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace coroutines {
 namespace detail {
 
@@ -96,7 +96,7 @@ public:
 #ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
         fn_( fn),
 #else
-        fn_( boost::forward< Fn >( fn) ),
+        fn_( cppmsboost::forward< Fn >( fn) ),
 #endif
         stack_ctx_( palloc.sctx),
         stack_alloc_( stack_alloc)
@@ -183,7 +183,7 @@ public:
 #ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
         fn_( fn),
 #else
-        fn_( boost::forward< Fn >( fn) ),
+        fn_( cppmsboost::forward< Fn >( fn) ),
 #endif
         stack_ctx_( palloc.sctx),
         stack_alloc_( stack_alloc)
@@ -270,7 +270,7 @@ public:
 #ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
         fn_( fn),
 #else
-        fn_( boost::forward< Fn >( fn) ),
+        fn_( cppmsboost::forward< Fn >( fn) ),
 #endif
         stack_ctx_( palloc.sctx),
         stack_alloc_( stack_alloc)

@@ -22,7 +22,7 @@
 
 // todo make use of integral_constant, true_type and false_type
 
-namespace boost
+namespace cppmsboost
 {
   namespace sync
   {
@@ -40,7 +40,7 @@ namespace boost
     {
 #ifdef BOOST_NO_CXX11_SFINAE_EXPR
 #define BOOST_THREAD_DEFINE_HAS_MEMBER_CALLED(member_name)                     \
-        template<typename T, bool=boost::is_class<T>::value>            \
+        template<typename T, bool=cppmsboost::is_class<T>::value>            \
         struct has_member_called_##member_name                          \
         {                                                               \
             BOOST_STATIC_CONSTANT(bool, value=false);                   \
@@ -154,7 +154,7 @@ namespace boost
 
       template<typename T>
       struct has_member_lock<T,
-          decltype(void(boost::declval<T&>().lock()))
+          decltype(void(cppmsboost::declval<T&>().lock()))
       > : true_type {};
 
       template<typename T,typename Enabled=void>
@@ -162,7 +162,7 @@ namespace boost
 
       template<typename T>
       struct has_member_unlock<T,
-          decltype(void(boost::declval<T&>().unlock()))
+          decltype(void(cppmsboost::declval<T&>().unlock()))
       > : true_type {};
 
       template<typename T,typename Enabled=bool>
@@ -170,7 +170,7 @@ namespace boost
 
       template<typename T>
       struct has_member_try_lock<T,
-          decltype(bool(boost::declval<T&>().try_lock()))
+          decltype(bool(cppmsboost::declval<T&>().try_lock()))
       > : true_type {};
 #endif
 

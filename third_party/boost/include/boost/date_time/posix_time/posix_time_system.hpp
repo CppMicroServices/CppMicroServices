@@ -16,7 +16,7 @@
 #include "boost/date_time/compiler_config.hpp"
 
 
-namespace boost {
+namespace cppmsboost {
 namespace posix_time { 
 
 #ifdef BOOST_DATE_TIME_POSIX_TIME_STD_CONFIG

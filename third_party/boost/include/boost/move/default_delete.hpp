@@ -30,11 +30,11 @@
 //!\file
 //! Describes the default deleter (destruction policy) of <tt>unique_ptr</tt>: <tt>default_delete</tt>.
 
-namespace boost{
+namespace cppmsboost{
 // @cond
 namespace move_upd {
 
-namespace bmupmu = ::boost::move_upmu;
+namespace bmupmu = ::cppmsboost::move_upmu;
 
 ////////////////////////////////////////
 ////        enable_def_del
@@ -117,8 +117,8 @@ void call_delete(T *p, is_array_del<false>)
 
 namespace movelib {
 
-namespace bmupd = boost::move_upd;
-namespace bmupmu = ::boost::move_upmu;
+namespace bmupd = cppmsboost::move_upd;
+namespace bmupmu = ::cppmsboost::move_upmu;
 
 //!The class template <tt>default_delete</tt> serves as the default deleter
 //!(destruction policy) for the class template <tt>unique_ptr</tt>.
@@ -163,7 +163,7 @@ struct default_delete
    {
       //If T is not an array type, U derives from T
       //and T has no virtual destructor, then you have a problem
-      BOOST_STATIC_ASSERT(( !::boost::move_upmu::missing_virtual_destructor<default_delete, U>::value ));
+      BOOST_STATIC_ASSERT(( !::cppmsboost::move_upmu::missing_virtual_destructor<default_delete, U>::value ));
    }
 
    //! <b>Effects</b>: Constructs a default_delete object from another <tt>default_delete<U></tt> object.
@@ -178,7 +178,7 @@ struct default_delete
    {
       //If T is not an array type, U derives from T
       //and T has no virtual destructor, then you have a problem
-      BOOST_STATIC_ASSERT(( !::boost::move_upmu::missing_virtual_destructor<default_delete, U>::value ));
+      BOOST_STATIC_ASSERT(( !::cppmsboost::move_upmu::missing_virtual_destructor<default_delete, U>::value ));
       return *this;
    }
 
@@ -198,7 +198,7 @@ struct default_delete
       BOOST_STATIC_ASSERT(sizeof(U) > 0);
       //If T is not an array type, U derives from T
       //and T has no virtual destructor, then you have a problem
-      BOOST_STATIC_ASSERT(( !::boost::move_upmu::missing_virtual_destructor<default_delete, U>::value ));
+      BOOST_STATIC_ASSERT(( !::cppmsboost::move_upmu::missing_virtual_destructor<default_delete, U>::value ));
       element_type * const p = static_cast<element_type*>(ptr);
       move_upd::call_delete(p, move_upd::is_array_del<bmupmu::is_array<T>::value>());
    }
@@ -210,7 +210,7 @@ struct default_delete
 };
 
 }  //namespace movelib {
-}  //namespace boost{
+}  //namespace cppmsboost{
 
 #include <boost/move/detail/config_end.hpp>
 

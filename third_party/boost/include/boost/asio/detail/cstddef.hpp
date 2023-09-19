@@ -18,7 +18,7 @@
 #include <boost/asio/detail/config.hpp>
 #include <cstddef>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 #if defined(BOOST_ASIO_HAS_NULLPTR)
@@ -28,6 +28,6 @@ struct nullptr_t {};
 #endif // defined(BOOST_ASIO_HAS_NULLPTR)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_DETAIL_CSTDDEF_HPP

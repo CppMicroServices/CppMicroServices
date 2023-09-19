@@ -24,7 +24,7 @@
 
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
     class extended_type_info;
 }
@@ -36,7 +36,7 @@ class basic_serializer;
 
 class BOOST_SYMBOL_VISIBLE
 basic_serializer_map : public
-    boost::noncopyable
+    cppmsboost::noncopyable
 {
     struct type_info_pointer_compare
     {
@@ -53,7 +53,7 @@ public:
     BOOST_ARCHIVE_DECL bool insert(const basic_serializer * bs);
     BOOST_ARCHIVE_DECL void erase(const basic_serializer * bs);
     BOOST_ARCHIVE_DECL const basic_serializer * find(
-        const boost::serialization::extended_type_info & type_
+        const cppmsboost::serialization::extended_type_info & type_
     ) const;
 private:
     // cw 8.3 requires this
@@ -62,7 +62,7 @@ private:
 
 } // namespace detail
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/archive/detail/abi_suffix.hpp> // must be the last header
 

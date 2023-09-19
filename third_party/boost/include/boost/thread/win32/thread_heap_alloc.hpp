@@ -16,7 +16,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     namespace detail
     {
@@ -25,7 +25,7 @@ namespace boost
             void* const heap_memory=winapi::HeapAlloc(winapi::GetProcessHeap(),0,size);
             if(!heap_memory)
             {
-                boost::throw_exception(std::bad_alloc());
+                cppmsboost::throw_exception(std::bad_alloc());
             }
             return heap_memory;
         }

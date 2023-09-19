@@ -19,7 +19,7 @@
 #include <boost/asio/detail/scoped_ptr.hpp>
 #include <boost/asio/detail/thread.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -82,7 +82,7 @@ private:
     {
     }
 
-    boost::asio::detail::thread thread_;
+    cppmsboost::asio::detail::thread thread_;
     item* next_;
   };
 
@@ -92,6 +92,6 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_DETAIL_THREAD_GROUP_HPP

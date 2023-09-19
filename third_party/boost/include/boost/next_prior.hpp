@@ -25,15 +25,15 @@
 #include <boost/iterator/advance.hpp>
 #include <boost/iterator/reverse_iterator.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 //  Helper functions for classes like bidirectional iterators not supporting
 //  operator+ and operator-
 //
 //  Usage:
 //    const std::list<T>::iterator p = get_some_iterator();
-//    const std::list<T>::iterator prev = boost::prior(p);
-//    const std::list<T>::iterator next = boost::next(prev, 2);
+//    const std::list<T>::iterator prev = cppmsboost::prior(p);
+//    const std::list<T>::iterator next = cppmsboost::next(prev, 2);
 
 //  Contributed by Dave Abrahams
 
@@ -118,7 +118,7 @@ struct next_advance_impl< T, Distance, true >
 {
     static T call(T x, Distance n)
     {
-        boost::iterators::advance(x, n);
+        cppmsboost::iterators::advance(x, n);
         return x;
     }
 };
@@ -164,8 +164,8 @@ struct prior_advance_impl< T, Distance, true >
     static T call(T x, Distance n)
     {
         // Avoid negating n to sidestep possible integer overflow
-        boost::iterators::reverse_iterator< T > rx(x);
-        boost::iterators::advance(rx, n);
+        cppmsboost::iterators::reverse_iterator< T > rx(x);
+        cppmsboost::iterators::advance(rx, n);
         return rx.base();
     }
 };
@@ -190,6 +190,6 @@ inline T prior(T x, Distance n)
     return next_prior_detail::prior_advance_impl< T, Distance >::call(x, n);
 }
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // BOOST_NEXT_PRIOR_HPP_INCLUDED

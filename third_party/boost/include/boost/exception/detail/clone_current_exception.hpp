@@ -23,7 +23,7 @@
 #endif
 
 namespace
-boost
+cppmsboost
     {
     namespace
     exception_detail

@@ -19,10 +19,10 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
-/** @defgroup asio_handler_invoke boost::asio::asio_handler_invoke
+/** @defgroup asio_handler_invoke cppmsboost::asio::asio_handler_invoke
  *
  * @brief Default invoke function for handlers.
  *
@@ -80,7 +80,7 @@ inline void asio_handler_invoke(const Function& function, ...)
 /*@}*/
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

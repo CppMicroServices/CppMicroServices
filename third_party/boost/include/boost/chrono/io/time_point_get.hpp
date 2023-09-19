@@ -19,7 +19,7 @@
 /**
  * Duration formatting facet for input.
  */
-namespace boost
+namespace cppmsboost
 {
   namespace chrono
   {

@@ -23,7 +23,7 @@
 #pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -73,6 +73,6 @@ struct classify< T U::*, false, false > { typedef void type; };
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ATOMIC_DETAIL_CLASSIFY_HPP_INCLUDED_

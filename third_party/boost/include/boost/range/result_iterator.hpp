@@ -17,7 +17,7 @@
 
 #include <boost/range/iterator.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     //
     // This interface is deprecated, use range_iterator<T>
@@ -27,7 +27,7 @@ namespace boost
     struct range_result_iterator : range_iterator<C>
     { };
     
-} // namespace boost
+} // namespace cppmsboost
 
 
 #endif

@@ -59,7 +59,7 @@
  * details about concept checks.
  */
 
-namespace boost {
+namespace cppmsboost {
 
     namespace range_detail {
 
@@ -116,8 +116,8 @@ namespace boost {
         // Iterators that contains a functor that is not assignable therefore
         // are not correct models of the standard iterator concepts,
         // despite being adequate for most algorithms. An example of this
-        // use case is the combination of the boost::adaptors::filtered
-        // class with a boost::lambda::bind generated functor.
+        // use case is the combination of the cppmsboost::adaptors::filtered
+        // class with a cppmsboost::lambda::bind generated functor.
         // Ultimately modeling the range concepts using composition
         // with the Boost.Iterator concepts would render the library
         // incompatible with many common Boost.Lambda expressions.
@@ -158,7 +158,7 @@ namespace boost {
             BOOST_CONCEPT_USAGE(SinglePassIteratorConcept)
             {
                 Iterator i2(++i);
-                boost::ignore_unused_variable_warning(i2);
+                cppmsboost::ignore_unused_variable_warning(i2);
 
                 // deliberately we are loose with the postfix version for the single pass
                 // iterator due to the commonly poor adherence to the specification means that
@@ -167,10 +167,10 @@ namespace boost {
                 (void)(i++);
 
                 BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::reference r1(*i);
-                boost::ignore_unused_variable_warning(r1);
+                cppmsboost::ignore_unused_variable_warning(r1);
 
                 BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::reference r2(*(++i));
-                boost::ignore_unused_variable_warning(r2);
+                cppmsboost::ignore_unused_variable_warning(r2);
             }
         private:
             Iterator i;
@@ -201,9 +201,9 @@ namespace boost {
                 // for a proxy, we can sensibly require that the dereference result
                 // is convertible to reference.
                 Iterator i2(i++);
-                boost::ignore_unused_variable_warning(i2);
+                cppmsboost::ignore_unused_variable_warning(i2);
                 BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::reference r(*(i++));
-                boost::ignore_unused_variable_warning(r);
+                cppmsboost::ignore_unused_variable_warning(r);
             }
         private:
             Iterator i;
@@ -286,11 +286,11 @@ namespace boost {
             // This has been modified from assigning to this->i
             // (where i was a member variable) to improve
             // compatibility with Boost.Lambda
-            iterator i1 = boost::begin(*m_range);
-            iterator i2 = boost::end(*m_range);
+            iterator i1 = cppmsboost::begin(*m_range);
+            iterator i2 = cppmsboost::end(*m_range);
 
-            boost::ignore_unused_variable_warning(i1);
-            boost::ignore_unused_variable_warning(i2);
+            cppmsboost::ignore_unused_variable_warning(i1);
+            cppmsboost::ignore_unused_variable_warning(i2);
 
             const_constraints(*m_range);
         }
@@ -298,11 +298,11 @@ namespace boost {
     private:
         void const_constraints(const Rng& const_range)
         {
-            const_iterator ci1 = boost::begin(const_range);
-            const_iterator ci2 = boost::end(const_range);
+            const_iterator ci1 = cppmsboost::begin(const_range);
+            const_iterator ci2 = cppmsboost::end(const_range);
 
-            boost::ignore_unused_variable_warning(ci1);
-            boost::ignore_unused_variable_warning(ci2);
+            cppmsboost::ignore_unused_variable_warning(ci1);
+            cppmsboost::ignore_unused_variable_warning(ci2);
         }
 
        // Rationale:
@@ -383,6 +383,6 @@ namespace boost {
     {
     };
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_RANGE_CONCEPTS_HPP

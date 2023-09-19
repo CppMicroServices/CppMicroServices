@@ -21,11 +21,11 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 execution_context::execution_context()
-  : service_registry_(new boost::asio::detail::service_registry(*this))
+  : service_registry_(new cppmsboost::asio::detail::service_registry(*this))
 {
 }
 
@@ -47,7 +47,7 @@ void execution_context::destroy()
 }
 
 void execution_context::notify_fork(
-    boost::asio::execution_context::fork_event event)
+    cppmsboost::asio::execution_context::fork_event event)
 {
   service_registry_->notify_fork(event);
 }
@@ -77,7 +77,7 @@ invalid_service_owner::invalid_service_owner()
 }
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

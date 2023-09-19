@@ -10,7 +10,7 @@
  */
 
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
   //! An enumeration of weekday names

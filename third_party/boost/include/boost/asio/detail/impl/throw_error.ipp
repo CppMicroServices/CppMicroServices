@@ -22,25 +22,25 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
-void do_throw_error(const boost::system::error_code& err)
+void do_throw_error(const cppmsboost::system::error_code& err)
 {
-  boost::system::system_error e(err);
-  boost::asio::detail::throw_exception(e);
+  cppmsboost::system::system_error e(err);
+  cppmsboost::asio::detail::throw_exception(e);
 }
 
-void do_throw_error(const boost::system::error_code& err, const char* location)
+void do_throw_error(const cppmsboost::system::error_code& err, const char* location)
 {
-  boost::system::system_error e(err, location);
-  boost::asio::detail::throw_exception(e);
+  cppmsboost::system::system_error e(err, location);
+  cppmsboost::asio::detail::throw_exception(e);
 }
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

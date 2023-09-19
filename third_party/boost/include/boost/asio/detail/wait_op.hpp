@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -29,7 +29,7 @@ class wait_op
 {
 public:
   // The error code to be passed to the completion handler.
-  boost::system::error_code ec_;
+  cppmsboost::system::error_code ec_;
 
 protected:
   wait_op(func_type func)
@@ -40,7 +40,7 @@ protected:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -28,40 +28,40 @@
 
 #include <cstddef>
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 namespace dtl {
 
-using boost::move_detail::integral_constant;
-using boost::move_detail::true_type;
-using boost::move_detail::false_type;
-using boost::move_detail::enable_if_c;
-using boost::move_detail::enable_if;
-using boost::move_detail::enable_if_convertible;
-using boost::move_detail::disable_if_c;
-using boost::move_detail::disable_if;
-using boost::move_detail::disable_if_convertible;
-using boost::move_detail::is_convertible;
-using boost::move_detail::if_c;
-using boost::move_detail::if_;
-using boost::move_detail::identity;
-using boost::move_detail::bool_;
-using boost::move_detail::true_;
-using boost::move_detail::false_;
-using boost::move_detail::yes_type;
-using boost::move_detail::no_type;
-using boost::move_detail::bool_;
-using boost::move_detail::true_;
-using boost::move_detail::false_;
-using boost::move_detail::unvoid_ref;
-using boost::move_detail::and_;
-using boost::move_detail::or_;
-using boost::move_detail::not_;
-using boost::move_detail::enable_if_and;
-using boost::move_detail::disable_if_and;
-using boost::move_detail::enable_if_or;
-using boost::move_detail::disable_if_or;
-using boost::move_detail::remove_const;
+using cppmsboost::move_detail::integral_constant;
+using cppmsboost::move_detail::true_type;
+using cppmsboost::move_detail::false_type;
+using cppmsboost::move_detail::enable_if_c;
+using cppmsboost::move_detail::enable_if;
+using cppmsboost::move_detail::enable_if_convertible;
+using cppmsboost::move_detail::disable_if_c;
+using cppmsboost::move_detail::disable_if;
+using cppmsboost::move_detail::disable_if_convertible;
+using cppmsboost::move_detail::is_convertible;
+using cppmsboost::move_detail::if_c;
+using cppmsboost::move_detail::if_;
+using cppmsboost::move_detail::identity;
+using cppmsboost::move_detail::bool_;
+using cppmsboost::move_detail::true_;
+using cppmsboost::move_detail::false_;
+using cppmsboost::move_detail::yes_type;
+using cppmsboost::move_detail::no_type;
+using cppmsboost::move_detail::bool_;
+using cppmsboost::move_detail::true_;
+using cppmsboost::move_detail::false_;
+using cppmsboost::move_detail::unvoid_ref;
+using cppmsboost::move_detail::and_;
+using cppmsboost::move_detail::or_;
+using cppmsboost::move_detail::not_;
+using cppmsboost::move_detail::enable_if_and;
+using cppmsboost::move_detail::disable_if_and;
+using cppmsboost::move_detail::enable_if_or;
+using cppmsboost::move_detail::disable_if_or;
+using cppmsboost::move_detail::remove_const;
 
 template <class FirstType>
 struct select1st
@@ -100,7 +100,7 @@ struct is_transparent
 
 template <typename C, class /*Dummy*/, typename R>
 struct enable_if_transparent
-   : boost::move_detail::enable_if_c<dtl::is_transparent<C>::value, R>
+   : cppmsboost::move_detail::enable_if_c<dtl::is_transparent<C>::value, R>
 {};
 
 #ifndef BOOST_CONTAINER_NO_CXX17_CTAD
@@ -136,7 +136,7 @@ using require_nonallocator_t = typename enable_if_c<!is_allocator<T>::value, T>:
 
 }  //namespace dtl {
 }  //namespace container {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #include <boost/container/detail/config_end.hpp>
 

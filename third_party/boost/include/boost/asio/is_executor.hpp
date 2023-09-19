@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// The is_executor trait detects whether a type T meets the Executor type
@@ -35,13 +35,13 @@ struct is_executor
 #if defined(GENERATING_DOCUMENTATION)
   : integral_constant<bool, automatically_determined>
 #else // defined(GENERATING_DOCUMENTATION)
-  : boost::asio::detail::is_executor<T>
+  : cppmsboost::asio::detail::is_executor<T>
 #endif // defined(GENERATING_DOCUMENTATION)
 {
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

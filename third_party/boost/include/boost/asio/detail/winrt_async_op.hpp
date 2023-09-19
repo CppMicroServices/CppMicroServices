@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -30,7 +30,7 @@ class winrt_async_op
 {
 public:
   // The error code to be passed to the completion handler.
-  boost::system::error_code ec_;
+  cppmsboost::system::error_code ec_;
 
   // The result of the operation, to be passed to the completion handler.
   TResult result_;
@@ -49,7 +49,7 @@ class winrt_async_op<void>
 {
 public:
   // The error code to be passed to the completion handler.
-  boost::system::error_code ec_;
+  cppmsboost::system::error_code ec_;
 
 protected:
   winrt_async_op(func_type complete_func)
@@ -60,7 +60,7 @@ protected:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

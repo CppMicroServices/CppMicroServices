@@ -18,7 +18,7 @@
 #include <boost/mpl/aux_/config/msvc.hpp>
 #include <boost/mpl/identity.hpp>
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
   
 namespace aux {
 #if defined(BOOST_MSVC)

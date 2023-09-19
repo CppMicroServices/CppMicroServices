@@ -21,33 +21,33 @@
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/date_time/gregorian/conversion.hpp> // to_tm will be needed in the facets
 
-namespace boost {
+namespace cppmsboost {
 namespace gregorian {
 
 
-  typedef boost::date_time::period_formatter<wchar_t> wperiod_formatter;
-  typedef boost::date_time::period_formatter<char>    period_formatter;
+  typedef cppmsboost::date_time::period_formatter<wchar_t> wperiod_formatter;
+  typedef cppmsboost::date_time::period_formatter<char>    period_formatter;
   
-  typedef boost::date_time::date_facet<date,wchar_t> wdate_facet;
-  typedef boost::date_time::date_facet<date,char>    date_facet;
+  typedef cppmsboost::date_time::date_facet<date,wchar_t> wdate_facet;
+  typedef cppmsboost::date_time::date_facet<date,char>    date_facet;
 
-  typedef boost::date_time::period_parser<date,char>       period_parser;
-  typedef boost::date_time::period_parser<date,wchar_t>    wperiod_parser;
+  typedef cppmsboost::date_time::period_parser<date,char>       period_parser;
+  typedef cppmsboost::date_time::period_parser<date,wchar_t>    wperiod_parser;
     
-  typedef boost::date_time::special_values_formatter<char> special_values_formatter; 
-  typedef boost::date_time::special_values_formatter<wchar_t> wspecial_values_formatter; 
+  typedef cppmsboost::date_time::special_values_formatter<char> special_values_formatter; 
+  typedef cppmsboost::date_time::special_values_formatter<wchar_t> wspecial_values_formatter; 
   
-  typedef boost::date_time::special_values_parser<date,char> special_values_parser; 
-  typedef boost::date_time::special_values_parser<date,wchar_t> wspecial_values_parser; 
+  typedef cppmsboost::date_time::special_values_parser<date,char> special_values_parser; 
+  typedef cppmsboost::date_time::special_values_parser<date,wchar_t> wspecial_values_parser; 
   
-  typedef boost::date_time::date_input_facet<date,char>    date_input_facet;
-  typedef boost::date_time::date_input_facet<date,wchar_t> wdate_input_facet;
+  typedef cppmsboost::date_time::date_input_facet<date,char>    date_input_facet;
+  typedef cppmsboost::date_time::date_input_facet<date,wchar_t> wdate_input_facet;
 
   template <class CharT, class TraitsT>
   inline std::basic_ostream<CharT, TraitsT>&
-  operator<<(std::basic_ostream<CharT, TraitsT>& os, const boost::gregorian::date& d) {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::date_facet<date, CharT> custom_date_facet;
+  operator<<(std::basic_ostream<CharT, TraitsT>& os, const cppmsboost::gregorian::date& d) {
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::date_facet<date, CharT> custom_date_facet;
     std::ostreambuf_iterator<CharT> output_itr(os);
     if (std::has_facet<custom_date_facet>(os.getloc()))
       std::use_facet<custom_date_facet>(os.getloc()).put(output_itr, os, os.fill(), d);
@@ -73,7 +73,7 @@ namespace gregorian {
   std::basic_istream<CharT, Traits>&
   operator>>(std::basic_istream<CharT, Traits>& is, date& d)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false); 
     if (strm_sentry) {
       try {
@@ -112,9 +112,9 @@ namespace gregorian {
 
   template <class CharT, class TraitsT>
   inline std::basic_ostream<CharT, TraitsT>&
-  operator<<(std::basic_ostream<CharT, TraitsT>& os, const boost::gregorian::date_duration& dd) {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::date_facet<date, CharT> custom_date_facet;
+  operator<<(std::basic_ostream<CharT, TraitsT>& os, const cppmsboost::gregorian::date_duration& dd) {
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::date_facet<date, CharT> custom_date_facet;
     std::ostreambuf_iterator<CharT> output_itr(os);
     if (std::has_facet<custom_date_facet>(os.getloc()))
       std::use_facet<custom_date_facet>(os.getloc()).put(output_itr, os, os.fill(), dd);
@@ -134,7 +134,7 @@ namespace gregorian {
   std::basic_istream<CharT, Traits>&
   operator>>(std::basic_istream<CharT, Traits>& is, date_duration& dd)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false); 
     if (strm_sentry) {
       try {
@@ -169,9 +169,9 @@ namespace gregorian {
 
   template <class CharT, class TraitsT>
   inline std::basic_ostream<CharT, TraitsT>&
-  operator<<(std::basic_ostream<CharT, TraitsT>& os, const boost::gregorian::date_period& dp) {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::date_facet<date, CharT> custom_date_facet;
+  operator<<(std::basic_ostream<CharT, TraitsT>& os, const cppmsboost::gregorian::date_period& dp) {
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::date_facet<date, CharT> custom_date_facet;
     std::ostreambuf_iterator<CharT> output_itr(os);
     if (std::has_facet<custom_date_facet>(os.getloc()))
       std::use_facet<custom_date_facet>(os.getloc()).put(output_itr, os, os.fill(), dp);
@@ -198,7 +198,7 @@ namespace gregorian {
   std::basic_istream<CharT, Traits>&
   operator>>(std::basic_istream<CharT, Traits>& is, date_period& dp)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false); 
     if (strm_sentry) {
       try {
@@ -235,9 +235,9 @@ namespace gregorian {
   
   template <class CharT, class TraitsT>
   inline std::basic_ostream<CharT, TraitsT>&
-  operator<<(std::basic_ostream<CharT, TraitsT>& os, const boost::gregorian::greg_month& gm) {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::date_facet<date, CharT> custom_date_facet;
+  operator<<(std::basic_ostream<CharT, TraitsT>& os, const cppmsboost::gregorian::greg_month& gm) {
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::date_facet<date, CharT> custom_date_facet;
     std::ostreambuf_iterator<CharT> output_itr(os);
     if (std::has_facet<custom_date_facet>(os.getloc()))
       std::use_facet<custom_date_facet>(os.getloc()).put(output_itr, os, os.fill(), gm);
@@ -257,7 +257,7 @@ namespace gregorian {
   std::basic_istream<CharT, Traits>&
   operator>>(std::basic_istream<CharT, Traits>& is, greg_month& m)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false); 
     if (strm_sentry) {
       try {
@@ -293,9 +293,9 @@ namespace gregorian {
 
   template <class CharT, class TraitsT>
   inline std::basic_ostream<CharT, TraitsT>&
-  operator<<(std::basic_ostream<CharT, TraitsT>& os, const boost::gregorian::greg_weekday& gw) {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::date_facet<date, CharT> custom_date_facet;
+  operator<<(std::basic_ostream<CharT, TraitsT>& os, const cppmsboost::gregorian::greg_weekday& gw) {
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::date_facet<date, CharT> custom_date_facet;
     std::ostreambuf_iterator<CharT> output_itr(os);
     if (std::has_facet<custom_date_facet>(os.getloc()))
       std::use_facet<custom_date_facet>(os.getloc()).put(output_itr, os, os.fill(), gw);
@@ -314,7 +314,7 @@ namespace gregorian {
   std::basic_istream<CharT, Traits>&
   operator>>(std::basic_istream<CharT, Traits>& is, greg_weekday& wd)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false); 
     if (strm_sentry) {
       try {
@@ -355,7 +355,7 @@ namespace gregorian {
   std::basic_istream<CharT, Traits>&
   operator>>(std::basic_istream<CharT, Traits>& is, greg_day& gd)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false); 
     if (strm_sentry) {
       try {
@@ -396,7 +396,7 @@ namespace gregorian {
   std::basic_istream<CharT, Traits>&
   operator>>(std::basic_istream<CharT, Traits>& is, greg_year& gy)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false); 
     if (strm_sentry) {
       try {
@@ -433,9 +433,9 @@ namespace gregorian {
   
   template <class CharT, class TraitsT>
   inline std::basic_ostream<CharT, TraitsT>&
-  operator<<(std::basic_ostream<CharT, TraitsT>& os, const boost::gregorian::partial_date& pd) {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::date_facet<date, CharT> custom_date_facet;
+  operator<<(std::basic_ostream<CharT, TraitsT>& os, const cppmsboost::gregorian::partial_date& pd) {
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::date_facet<date, CharT> custom_date_facet;
     std::ostreambuf_iterator<CharT> output_itr(os);
     if (std::has_facet<custom_date_facet>(os.getloc()))
       std::use_facet<custom_date_facet>(os.getloc()).put(output_itr, os, os.fill(), pd);
@@ -454,7 +454,7 @@ namespace gregorian {
   std::basic_istream<CharT, Traits>&
   operator>>(std::basic_istream<CharT, Traits>& is, partial_date& pd)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false); 
     if (strm_sentry) {
       try {
@@ -489,9 +489,9 @@ namespace gregorian {
 
   template <class CharT, class TraitsT>
   inline std::basic_ostream<CharT, TraitsT>&
-  operator<<(std::basic_ostream<CharT, TraitsT>& os, const boost::gregorian::nth_day_of_the_week_in_month& nkd) {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::date_facet<date, CharT> custom_date_facet;
+  operator<<(std::basic_ostream<CharT, TraitsT>& os, const cppmsboost::gregorian::nth_day_of_the_week_in_month& nkd) {
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::date_facet<date, CharT> custom_date_facet;
     std::ostreambuf_iterator<CharT> output_itr(os);
     if (std::has_facet<custom_date_facet>(os.getloc()))
       std::use_facet<custom_date_facet>(os.getloc()).put(output_itr, os, os.fill(), nkd);
@@ -511,7 +511,7 @@ namespace gregorian {
   operator>>(std::basic_istream<CharT, Traits>& is, 
              nth_day_of_the_week_in_month& nday)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false); 
     if (strm_sentry) {
       try {
@@ -547,9 +547,9 @@ namespace gregorian {
 
   template <class CharT, class TraitsT>
   inline std::basic_ostream<CharT, TraitsT>&
-  operator<<(std::basic_ostream<CharT, TraitsT>& os, const boost::gregorian::first_day_of_the_week_in_month& fkd) {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::date_facet<date, CharT> custom_date_facet;
+  operator<<(std::basic_ostream<CharT, TraitsT>& os, const cppmsboost::gregorian::first_day_of_the_week_in_month& fkd) {
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::date_facet<date, CharT> custom_date_facet;
     std::ostreambuf_iterator<CharT> output_itr(os);
     if (std::has_facet<custom_date_facet>(os.getloc()))
       std::use_facet<custom_date_facet>(os.getloc()).put(output_itr, os, os.fill(), fkd);
@@ -569,7 +569,7 @@ namespace gregorian {
   operator>>(std::basic_istream<CharT, Traits>& is, 
              first_day_of_the_week_in_month& fkd)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false); 
     if (strm_sentry) {
       try {
@@ -605,9 +605,9 @@ namespace gregorian {
 
   template <class CharT, class TraitsT>
   inline std::basic_ostream<CharT, TraitsT>&
-  operator<<(std::basic_ostream<CharT, TraitsT>& os, const boost::gregorian::last_day_of_the_week_in_month& lkd) {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::date_facet<date, CharT> custom_date_facet;
+  operator<<(std::basic_ostream<CharT, TraitsT>& os, const cppmsboost::gregorian::last_day_of_the_week_in_month& lkd) {
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::date_facet<date, CharT> custom_date_facet;
     std::ostreambuf_iterator<CharT> output_itr(os);
     if (std::has_facet<custom_date_facet>(os.getloc()))
       std::use_facet<custom_date_facet>(os.getloc()).put(output_itr, os, os.fill(), lkd);
@@ -627,7 +627,7 @@ namespace gregorian {
   operator>>(std::basic_istream<CharT, Traits>& is, 
              last_day_of_the_week_in_month& lkd)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false); 
     if (strm_sentry) {
       try {
@@ -663,9 +663,9 @@ namespace gregorian {
 
   template <class CharT, class TraitsT>
   inline std::basic_ostream<CharT, TraitsT>&
-  operator<<(std::basic_ostream<CharT, TraitsT>& os, const boost::gregorian::first_day_of_the_week_after& fda) {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::date_facet<date, CharT> custom_date_facet;
+  operator<<(std::basic_ostream<CharT, TraitsT>& os, const cppmsboost::gregorian::first_day_of_the_week_after& fda) {
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::date_facet<date, CharT> custom_date_facet;
     std::ostreambuf_iterator<CharT> output_itr(os);
     if (std::has_facet<custom_date_facet>(os.getloc())) {
       std::use_facet<custom_date_facet>(os.getloc()).put(output_itr, os, os.fill(), fda);
@@ -686,7 +686,7 @@ namespace gregorian {
   operator>>(std::basic_istream<CharT, Traits>& is, 
              first_day_of_the_week_after& fka)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false); 
     if (strm_sentry) {
       try {
@@ -722,9 +722,9 @@ namespace gregorian {
 
   template <class CharT, class TraitsT>
   inline std::basic_ostream<CharT, TraitsT>&
-  operator<<(std::basic_ostream<CharT, TraitsT>& os, const boost::gregorian::first_day_of_the_week_before& fdb) {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::date_facet<date, CharT> custom_date_facet;
+  operator<<(std::basic_ostream<CharT, TraitsT>& os, const cppmsboost::gregorian::first_day_of_the_week_before& fdb) {
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::date_facet<date, CharT> custom_date_facet;
     std::ostreambuf_iterator<CharT> output_itr(os);
     if (std::has_facet<custom_date_facet>(os.getloc())) {
       std::use_facet<custom_date_facet>(os.getloc()).put(output_itr, os, os.fill(), fdb);
@@ -745,7 +745,7 @@ namespace gregorian {
   operator>>(std::basic_istream<CharT, Traits>& is, 
              first_day_of_the_week_before& fkb)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false); 
     if (strm_sentry) {
       try {

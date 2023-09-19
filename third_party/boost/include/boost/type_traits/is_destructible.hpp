@@ -20,23 +20,23 @@
 #include <boost/type_traits/detail/yes_no_type.hpp>
 #include <boost/type_traits/declval.hpp>
 
-namespace boost{
+namespace cppmsboost{
 
    namespace detail{
 
       struct is_destructible_imp
       {
-         template<typename T, typename = decltype(boost::declval<T&>().~T())>
-         static boost::type_traits::yes_type test(int);
+         template<typename T, typename = decltype(cppmsboost::declval<T&>().~T())>
+         static cppmsboost::type_traits::yes_type test(int);
          template<typename>
-         static boost::type_traits::no_type test(...);
+         static cppmsboost::type_traits::no_type test(...);
       };
 
    }
 
-   template <class T> struct is_destructible : public integral_constant<bool, sizeof(boost::detail::is_destructible_imp::test<T>(0)) == sizeof(boost::type_traits::yes_type)>
+   template <class T> struct is_destructible : public integral_constant<bool, sizeof(cppmsboost::detail::is_destructible_imp::test<T>(0)) == sizeof(cppmsboost::type_traits::yes_type)>
    {
-      BOOST_STATIC_ASSERT_MSG(boost::is_complete<T>::value, "Arguments to is_destructible must be complete types");
+      BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<T>::value, "Arguments to is_destructible must be complete types");
    };
 
 #else
@@ -44,12 +44,12 @@ namespace boost{
 #include <boost/type_traits/is_pod.hpp>
 #include <boost/type_traits/is_class.hpp>
 
-namespace boost{
+namespace cppmsboost{
 
    // We don't know how to implement this:
    template <class T> struct is_destructible : public integral_constant<bool, is_pod<T>::value || is_class<T>::value>
    {
-      BOOST_STATIC_ASSERT_MSG(boost::is_complete<T>::value, "Arguments to is_destructible must be complete types");
+      BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<T>::value, "Arguments to is_destructible must be complete types");
    };
 #endif
 
@@ -64,6 +64,6 @@ namespace boost{
    template <class T, std::size_t N> struct is_destructible<T[N]> : public is_destructible<T>{};
    template <class T> struct is_destructible<T[]> : public is_destructible<T>{};
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_IS_DESTRUCTIBLE_HPP_INCLUDED

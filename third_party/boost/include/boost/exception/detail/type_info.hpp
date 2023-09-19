@@ -25,7 +25,7 @@
 #endif
 
 namespace
-boost
+cppmsboost
     {
     template <class T>
     inline
@@ -75,10 +75,10 @@ boost
         }
     }
 
-#define BOOST_EXCEPTION_STATIC_TYPEID(T) ::boost::exception_detail::type_info_(BOOST_CORE_TYPEID(T))
+#define BOOST_EXCEPTION_STATIC_TYPEID(T) ::cppmsboost::exception_detail::type_info_(BOOST_CORE_TYPEID(T))
 
 #ifndef BOOST_NO_RTTI
-#define BOOST_EXCEPTION_DYNAMIC_TYPEID(x) ::boost::exception_detail::type_info_(typeid(x))
+#define BOOST_EXCEPTION_DYNAMIC_TYPEID(x) ::cppmsboost::exception_detail::type_info_(typeid(x))
 #endif
 
 #if defined(_MSC_VER) && !defined(BOOST_EXCEPTION_ENABLE_WARNINGS)

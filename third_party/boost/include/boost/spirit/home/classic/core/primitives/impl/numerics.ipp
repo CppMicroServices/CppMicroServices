@@ -13,7 +13,7 @@
 #include <boost/config/no_tr1/cmath.hpp>
 #include <limits>
 
-namespace boost { namespace spirit {
+namespace cppmsboost { namespace spirit {
 
 BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 
@@ -473,6 +473,6 @@ BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 ///////////////////////////////////////////////////////////////////////////////
 BOOST_SPIRIT_CLASSIC_NAMESPACE_END
 
-}} // namespace boost::spirit
+}} // namespace cppmsboost::spirit
 
 #endif

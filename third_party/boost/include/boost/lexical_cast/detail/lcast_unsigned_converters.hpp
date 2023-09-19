@@ -43,7 +43,7 @@
         // but beware: lexical_cast will understand only 'C' locale delimeters and thousands
         // separators.
 #       error "Unable to use <locale> header. Define BOOST_LEXICAL_CAST_ASSUME_C_LOCALE to force "
-#       error "boost::lexical_cast to use only 'C' locale during conversions."
+#       error "cppmsboost::lexical_cast to use only 'C' locale during conversions."
 #   endif
 #endif
 
@@ -52,14 +52,14 @@
 #include <boost/type_traits/is_signed.hpp>
 #include <boost/noncopyable.hpp>
 
-namespace boost 
+namespace cppmsboost 
 {
     namespace detail // lcast_to_unsigned
     {
         template<class T>
         inline
-        BOOST_DEDUCED_TYPENAME boost::make_unsigned<T>::type lcast_to_unsigned(const T value) BOOST_NOEXCEPT {
-            typedef BOOST_DEDUCED_TYPENAME boost::make_unsigned<T>::type result_type;
+        BOOST_DEDUCED_TYPENAME cppmsboost::make_unsigned<T>::type lcast_to_unsigned(const T value) BOOST_NOEXCEPT {
+            typedef BOOST_DEDUCED_TYPENAME cppmsboost::make_unsigned<T>::type result_type;
             return value < 0 
                 ? static_cast<result_type>(0u - static_cast<result_type>(value)) 
                 : static_cast<result_type>(value);
@@ -69,9 +69,9 @@ namespace boost
     namespace detail // lcast_put_unsigned
     {
         template <class Traits, class T, class CharT>
-        class lcast_put_unsigned: boost::noncopyable {
+        class lcast_put_unsigned: cppmsboost::noncopyable {
             typedef BOOST_DEDUCED_TYPENAME Traits::int_type int_type;
-            BOOST_DEDUCED_TYPENAME boost::conditional<
+            BOOST_DEDUCED_TYPENAME cppmsboost::conditional<
                     (sizeof(unsigned) > sizeof(T))
                     , unsigned
                     , T
@@ -156,7 +156,7 @@ namespace boost
     namespace detail // lcast_ret_unsigned
     {
         template <class Traits, class T, class CharT>
-        class lcast_ret_unsigned: boost::noncopyable {
+        class lcast_ret_unsigned: cppmsboost::noncopyable {
             bool m_multiplier_overflowed;
             T m_multiplier;
             T& m_value;
@@ -176,7 +176,7 @@ namespace boost
                 //
                 // http://gcc.gnu.org/bugzilla/show_bug.cgi?id=40856
                 BOOST_STATIC_ASSERT_MSG(std::numeric_limits<T>::is_specialized,
-                    "std::numeric_limits are not specialized for integral type passed to boost::lexical_cast"
+                    "std::numeric_limits are not specialized for integral type passed to cppmsboost::lexical_cast"
                 );
 #endif
             }
@@ -288,7 +288,7 @@ namespace boost
             }
         };
     }
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_LEXICAL_CAST_DETAIL_LCAST_UNSIGNED_CONVERTERS_HPP
 

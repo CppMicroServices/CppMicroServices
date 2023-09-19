@@ -24,7 +24,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -72,8 +72,8 @@ public:
   // the reactor's event demultiplexing function may need to be interrupted and
   // restarted.
   bool cancel_operations(iterator i, op_queue<operation>& ops,
-      const boost::system::error_code& ec =
-        boost::asio::error::operation_aborted)
+      const cppmsboost::system::error_code& ec =
+        cppmsboost::asio::error::operation_aborted)
   {
     if (i != operations_.end())
     {
@@ -95,8 +95,8 @@ public:
   // operations were cancelled, in which case the reactor's event
   // demultiplexing function may need to be interrupted and restarted.
   bool cancel_operations(Descriptor descriptor, op_queue<operation>& ops,
-      const boost::system::error_code& ec =
-        boost::asio::error::operation_aborted)
+      const cppmsboost::system::error_code& ec =
+        cppmsboost::asio::error::operation_aborted)
   {
     return this->cancel_operations(operations_.find(descriptor), ops, ec);
   }
@@ -163,7 +163,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

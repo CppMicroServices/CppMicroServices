@@ -39,7 +39,7 @@ namespace std{
 
 #include <iostream>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 namespace iterators {
 
@@ -48,7 +48,7 @@ namespace iterators {
 // strings of the currently selected locale
 template<class Base>
 class wchar_from_mb
-    : public boost::iterator_adaptor<
+    : public cppmsboost::iterator_adaptor<
         wchar_from_mb<Base>,
         Base,
         wchar_t,
@@ -56,8 +56,8 @@ class wchar_from_mb
         wchar_t
     >
 {
-    friend class boost::iterator_core_access;
-    typedef typename boost::iterator_adaptor<
+    friend class cppmsboost::iterator_core_access;
+    typedef typename cppmsboost::iterator_adaptor<
         wchar_from_mb<Base>,
         Base,
         wchar_t,
@@ -89,14 +89,14 @@ class wchar_from_mb
         return dereference() == rhs.dereference();
     }
 
-    boost::archive::detail::utf8_codecvt_facet m_codecvt_facet;
+    cppmsboost::archive::detail::utf8_codecvt_facet m_codecvt_facet;
     std::mbstate_t m_mbs;
 
     template<typename T>
     struct sliding_buffer {
-        boost::array<T, 32> m_buffer;
-        typename boost::array<T, 32>::const_iterator m_next_available;
-        typename boost::array<T, 32>::iterator m_next;
+        cppmsboost::array<T, 32> m_buffer;
+        typename cppmsboost::array<T, 32>::const_iterator m_next_available;
+        typename cppmsboost::array<T, 32>::iterator m_next;
         bool m_done;
         // default ctor
         sliding_buffer() :
@@ -149,7 +149,7 @@ template<class Base>
 void wchar_from_mb<Base>::drain(){
     BOOST_ASSERT(! m_input.m_done);
     for(;;){
-        typename boost::iterators::iterator_reference<Base>::type c = *(this->base_reference());
+        typename cppmsboost::iterators::iterator_reference<Base>::type c = *(this->base_reference());
         // a null character in a multibyte stream is takes as end of string
         if(0 == c){
             m_input.m_done = true;
@@ -163,7 +163,7 @@ void wchar_from_mb<Base>::drain(){
         if(m_input.m_buffer.end() == m_input.m_next_available)
             break;
     }
-    const typename boost::iterators::iterator_value<Base>::type * input_new_start;
+    const typename cppmsboost::iterators::iterator_value<Base>::type * input_new_start;
     typename iterator_value<this_t>::type * next_available;
 
     BOOST_ATTRIBUTE_UNUSED // redundant with ignore_unused below but clarifies intention
@@ -191,6 +191,6 @@ void wchar_from_mb<Base>::drain(){
 
 } // namespace iterators
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ARCHIVE_ITERATORS_WCHAR_FROM_MB_HPP

@@ -58,7 +58,7 @@ namespace std{
 #include <boost/archive/detail/auto_link_archive.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -85,7 +85,7 @@ public:
     // d) use stream buffer
     // e) change locale back to original
     // f) destroy new codecvt facet
-    boost::archive::codecvt_null<Elem> codecvt_null_facet;
+    cppmsboost::archive::codecvt_null<Elem> codecvt_null_facet;
     basic_streambuf_locale_saver<Elem, Tr> locale_saver;
     std::locale archive_locale;
     #endif
@@ -134,10 +134,10 @@ public:
         template <class T>
         #if defined(BOOST_NO_DEPENDENT_NESTED_DERIVATIONS)
             struct apply {
-                typedef typename boost::serialization::is_bitwise_serializable< T >::type type;
+                typedef typename cppmsboost::serialization::is_bitwise_serializable< T >::type type;
             };
         #else
-            struct apply : public boost::serialization::is_bitwise_serializable< T > {};
+            struct apply : public cppmsboost::serialization::is_bitwise_serializable< T > {};
         #endif
     };
 
@@ -161,7 +161,7 @@ basic_binary_iprimitive<Archive, Elem, Tr>::load_binary(
     // note: an optimizer should eliminate the following for char files
     BOOST_ASSERT(
         static_cast<std::streamsize>(count / sizeof(Elem))
-        <= boost::integer_traits<std::streamsize>::const_max
+        <= cppmsboost::integer_traits<std::streamsize>::const_max
     );
     std::streamsize s = static_cast<std::streamsize>(count / sizeof(Elem));
     std::streamsize scount = m_sb.sgetn(
@@ -169,21 +169,21 @@ basic_binary_iprimitive<Archive, Elem, Tr>::load_binary(
         s
     );
     if(scount != s)
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(archive_exception::input_stream_error)
         );
     // note: an optimizer should eliminate the following for char files
-    BOOST_ASSERT(count % sizeof(Elem) <= boost::integer_traits<std::streamsize>::const_max);
+    BOOST_ASSERT(count % sizeof(Elem) <= cppmsboost::integer_traits<std::streamsize>::const_max);
     s = static_cast<std::streamsize>(count % sizeof(Elem));
     if(0 < s){
 //        if(is.fail())
-//            boost::serialization::throw_exception(
+//            cppmsboost::serialization::throw_exception(
 //                archive_exception(archive_exception::stream_error)
 //        );
         Elem t;
         scount = m_sb.sgetn(& t, 1);
         if(scount != 1)
-            boost::serialization::throw_exception(
+            cppmsboost::serialization::throw_exception(
                 archive_exception(archive_exception::input_stream_error)
             );
         std::memcpy(static_cast<char*>(address) + (count - s), &t, static_cast<std::size_t>(s));
@@ -191,7 +191,7 @@ basic_binary_iprimitive<Archive, Elem, Tr>::load_binary(
 }
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/archive/detail/abi_suffix.hpp> // pop pragmas
 

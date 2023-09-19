@@ -40,7 +40,7 @@
 
 #include <boost/core/no_exceptions_support.hpp>
 
-namespace boost { namespace container {
+namespace cppmsboost { namespace container {
 
 #ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
 
@@ -166,7 +166,7 @@ class scoped_allocator_adaptor_base
 
    template <class OuterA2>
    scoped_allocator_adaptor_base(BOOST_FWD_REF(OuterA2) outerAlloc, const InnerAllocs &...args)
-      : outer_allocator_type(::boost::forward<OuterA2>(outerAlloc))
+      : outer_allocator_type(::cppmsboost::forward<OuterA2>(outerAlloc))
       , m_inner(args...)
       {}
 
@@ -176,8 +176,8 @@ class scoped_allocator_adaptor_base
       {}
 
    scoped_allocator_adaptor_base(BOOST_RV_REF(scoped_allocator_adaptor_base) other)
-      : outer_allocator_type(::boost::move(other.outer_allocator()))
-      , m_inner(::boost::move(other.inner_allocator()))
+      : outer_allocator_type(::cppmsboost::move(other.outer_allocator()))
+      , m_inner(::cppmsboost::move(other.inner_allocator()))
       {}
 
    template <class OuterA2>
@@ -203,7 +203,7 @@ class scoped_allocator_adaptor_base
       ( internal_type_t
       , BOOST_FWD_REF(OuterA2) outerAlloc
       , const inner_allocator_type &inner)
-      : outer_allocator_type(::boost::forward<OuterA2>(outerAlloc))
+      : outer_allocator_type(::cppmsboost::forward<OuterA2>(outerAlloc))
       , m_inner(inner)
    {}
 
@@ -219,15 +219,15 @@ class scoped_allocator_adaptor_base
 
    scoped_allocator_adaptor_base &operator=(BOOST_RV_REF(scoped_allocator_adaptor_base) other)
    {
-      outer_allocator_type::operator=(boost::move(other.outer_allocator()));
-      m_inner = ::boost::move(other.inner_allocator());
+      outer_allocator_type::operator=(cppmsboost::move(other.outer_allocator()));
+      m_inner = ::cppmsboost::move(other.inner_allocator());
       return *this;
    }
 
    void swap(scoped_allocator_adaptor_base &r)
    {
-      boost::adl_move_swap(this->outer_allocator(), r.outer_allocator());
-      boost::adl_move_swap(this->m_inner, r.inner_allocator());
+      cppmsboost::adl_move_swap(this->outer_allocator(), r.outer_allocator());
+      cppmsboost::adl_move_swap(this->m_inner, r.inner_allocator());
    }
 
    friend void swap(scoped_allocator_adaptor_base &l, scoped_allocator_adaptor_base &r)
@@ -308,7 +308,7 @@ class scoped_allocator_adaptor_base<OuterAlloc, true, BOOST_MOVE_TARG##N>\
    \
    template <class OuterA2>\
    scoped_allocator_adaptor_base(BOOST_FWD_REF(OuterA2) outerAlloc, BOOST_MOVE_CREF##N)\
-      : outer_allocator_type(::boost::forward<OuterA2>(outerAlloc))\
+      : outer_allocator_type(::cppmsboost::forward<OuterA2>(outerAlloc))\
       , m_inner(BOOST_MOVE_ARG##N)\
       {}\
    \
@@ -318,8 +318,8 @@ class scoped_allocator_adaptor_base<OuterAlloc, true, BOOST_MOVE_TARG##N>\
       {}\
    \
    scoped_allocator_adaptor_base(BOOST_RV_REF(scoped_allocator_adaptor_base) other)\
-      : outer_allocator_type(::boost::move(other.outer_allocator()))\
-      , m_inner(::boost::move(other.inner_allocator()))\
+      : outer_allocator_type(::cppmsboost::move(other.outer_allocator()))\
+      , m_inner(::cppmsboost::move(other.inner_allocator()))\
       {}\
    \
    template <class OuterA2>\
@@ -342,7 +342,7 @@ class scoped_allocator_adaptor_base<OuterAlloc, true, BOOST_MOVE_TARG##N>\
    template <class OuterA2>\
    scoped_allocator_adaptor_base\
       ( internal_type_t, BOOST_FWD_REF(OuterA2) outerAlloc, const inner_allocator_type &inner)\
-      : outer_allocator_type(::boost::forward<OuterA2>(outerAlloc))\
+      : outer_allocator_type(::cppmsboost::forward<OuterA2>(outerAlloc))\
       , m_inner(inner)\
    {}\
    \
@@ -357,15 +357,15 @@ class scoped_allocator_adaptor_base<OuterAlloc, true, BOOST_MOVE_TARG##N>\
    \
    scoped_allocator_adaptor_base &operator=(BOOST_RV_REF(scoped_allocator_adaptor_base) other)\
    {\
-      outer_allocator_type::operator=(boost::move(other.outer_allocator()));\
-      m_inner = ::boost::move(other.inner_allocator());\
+      outer_allocator_type::operator=(cppmsboost::move(other.outer_allocator()));\
+      m_inner = ::cppmsboost::move(other.inner_allocator());\
       return *this;\
    }\
    \
    void swap(scoped_allocator_adaptor_base &r)\
    {\
-      boost::adl_move_swap(this->outer_allocator(), r.outer_allocator());\
-      boost::adl_move_swap(this->m_inner, r.inner_allocator());\
+      cppmsboost::adl_move_swap(this->outer_allocator(), r.outer_allocator());\
+      cppmsboost::adl_move_swap(this->m_inner, r.inner_allocator());\
    }\
    \
    friend void swap(scoped_allocator_adaptor_base &l, scoped_allocator_adaptor_base &r)\
@@ -445,7 +445,7 @@ class scoped_allocator_adaptor_base< OuterAlloc BOOST_CONTAINER_SCOPEDALLOC_DUMM
 
    template <class OuterA2>
    scoped_allocator_adaptor_base(BOOST_FWD_REF(OuterA2) outerAlloc)
-      : outer_allocator_type(::boost::forward<OuterA2>(outerAlloc))
+      : outer_allocator_type(::cppmsboost::forward<OuterA2>(outerAlloc))
       {}
 
    scoped_allocator_adaptor_base(const scoped_allocator_adaptor_base& other)
@@ -453,7 +453,7 @@ class scoped_allocator_adaptor_base< OuterAlloc BOOST_CONTAINER_SCOPEDALLOC_DUMM
       {}
 
    scoped_allocator_adaptor_base(BOOST_RV_REF(scoped_allocator_adaptor_base) other)
-      : outer_allocator_type(::boost::move(other.outer_allocator()))
+      : outer_allocator_type(::cppmsboost::move(other.outer_allocator()))
       {}
 
    template <class OuterA2>
@@ -473,7 +473,7 @@ class scoped_allocator_adaptor_base< OuterAlloc BOOST_CONTAINER_SCOPEDALLOC_DUMM
 
    template <class OuterA2>
    scoped_allocator_adaptor_base(internal_type_t, BOOST_FWD_REF(OuterA2) outerAlloc, const inner_allocator_type &)
-      : outer_allocator_type(::boost::forward<OuterA2>(outerAlloc))
+      : outer_allocator_type(::cppmsboost::forward<OuterA2>(outerAlloc))
       {}
 
    public:
@@ -485,13 +485,13 @@ class scoped_allocator_adaptor_base< OuterAlloc BOOST_CONTAINER_SCOPEDALLOC_DUMM
 
    scoped_allocator_adaptor_base &operator=(BOOST_RV_REF(scoped_allocator_adaptor_base) other)
    {
-      outer_allocator_type::operator=(boost::move(other.outer_allocator()));
+      outer_allocator_type::operator=(cppmsboost::move(other.outer_allocator()));
       return *this;
    }
 
    void swap(scoped_allocator_adaptor_base &r)
    {
-      boost::adl_move_swap(this->outer_allocator(), r.outer_allocator());
+      cppmsboost::adl_move_swap(this->outer_allocator(), r.outer_allocator());
    }
 
    friend void swap(scoped_allocator_adaptor_base &l, scoped_allocator_adaptor_base &r)
@@ -656,26 +656,26 @@ class scoped_allocator_adaptor
    //! <b>Effects</b>: move constructs each allocator within the adaptor with
    //! the corresponding allocator from other.
    scoped_allocator_adaptor(BOOST_RV_REF(scoped_allocator_adaptor) other)
-      : base_type(::boost::move(other.base()))
+      : base_type(::cppmsboost::move(other.base()))
       {}
 
    #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) || defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
 
    //! <b>Requires</b>: OuterAlloc shall be constructible from OuterA2.
    //!
-   //! <b>Effects</b>: initializes the OuterAlloc base class with boost::forward<OuterA2>(outerAlloc) and inner
+   //! <b>Effects</b>: initializes the OuterAlloc base class with cppmsboost::forward<OuterA2>(outerAlloc) and inner
    //! with innerAllocs...(hence recursively initializing each allocator within the adaptor with the
    //! corresponding allocator from the argument list).
    template <class OuterA2>
    scoped_allocator_adaptor(BOOST_FWD_REF(OuterA2) outerAlloc, const InnerAllocs & ...innerAllocs)
-      : base_type(::boost::forward<OuterA2>(outerAlloc), innerAllocs...)
+      : base_type(::cppmsboost::forward<OuterA2>(outerAlloc), innerAllocs...)
       {}
    #else // #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) || defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
 
    #define BOOST_CONTAINER_SCOPED_ALLOCATOR_ADAPTOR_RELATED_ALLOCATOR_CONSTRUCTOR_CODE(N)\
    template <class OuterA2>\
    scoped_allocator_adaptor(BOOST_FWD_REF(OuterA2) outerAlloc BOOST_MOVE_I##N BOOST_MOVE_CREF##N)\
-      : base_type(::boost::forward<OuterA2>(outerAlloc) BOOST_MOVE_I##N BOOST_MOVE_ARG##N)\
+      : base_type(::cppmsboost::forward<OuterA2>(outerAlloc) BOOST_MOVE_I##N BOOST_MOVE_ARG##N)\
       {}\
    //
    BOOST_MOVE_ITERATE_0TO9(BOOST_CONTAINER_SCOPED_ALLOCATOR_ADAPTOR_RELATED_ALLOCATOR_CONSTRUCTOR_CODE)
@@ -698,14 +698,14 @@ class scoped_allocator_adaptor
    template <class OuterA2>
    scoped_allocator_adaptor(BOOST_RV_REF_BEG scoped_allocator_adaptor
       <OuterA2, BOOST_CONTAINER_SCOPEDALLOC_ALLINNER> BOOST_RV_REF_END other)
-      : base_type(::boost::move(other.base()))
+      : base_type(::cppmsboost::move(other.base()))
       {}
 
    scoped_allocator_adaptor &operator=(BOOST_COPY_ASSIGN_REF(scoped_allocator_adaptor) other)
    {  return static_cast<scoped_allocator_adaptor&>(base_type::operator=(static_cast<const base_type &>(other))); }
 
    scoped_allocator_adaptor &operator=(BOOST_RV_REF(scoped_allocator_adaptor) other)
-   {  return static_cast<scoped_allocator_adaptor&>(base_type::operator=(boost::move(other.base()))); }
+   {  return static_cast<scoped_allocator_adaptor&>(base_type::operator=(cppmsboost::move(other.base()))); }
 
    #ifdef BOOST_CONTAINER_DOXYGEN_INVOKED
    //! <b>Effects</b>: swaps *this with r.
@@ -812,7 +812,7 @@ class scoped_allocator_adaptor
    {
       dtl::dispatch_uses_allocator
          ( (get_outermost_allocator)(this->outer_allocator())
-         , this->inner_allocator(), p, ::boost::forward<Args>(args)...);
+         , this->inner_allocator(), p, ::cppmsboost::forward<Args>(args)...);
    }
 
    #else // #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) || defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
@@ -839,7 +839,7 @@ class scoped_allocator_adaptor
    //Internal function
    template <class OuterA2>
    scoped_allocator_adaptor(internal_type_t, BOOST_FWD_REF(OuterA2) outer, const inner_allocator_type& inner)
-      : base_type(internal_type_t(), ::boost::forward<OuterA2>(outer), inner)
+      : base_type(internal_type_t(), ::cppmsboost::forward<OuterA2>(outer), inner)
    {}
 
    #endif   //#ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
@@ -888,7 +888,7 @@ inline bool operator==(const scoped_allocator_adaptor<OuterA1, BOOST_CONTAINER_S
    #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) || defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
    const bool has_zero_inner = sizeof...(InnerAllocs) == 0u;
    #else
-   const bool has_zero_inner = boost::container::dtl::is_same<P0, void>::value;
+   const bool has_zero_inner = cppmsboost::container::dtl::is_same<P0, void>::value;
    #endif
    typedef scoped_allocator_operator_equal<has_zero_inner> equal_t;
    return equal_t::equal_outer(a.outer_allocator(), b.outer_allocator()) &&
@@ -900,7 +900,7 @@ inline bool operator!=(const scoped_allocator_adaptor<OuterA1, BOOST_CONTAINER_S
                       ,const scoped_allocator_adaptor<OuterA2, BOOST_CONTAINER_SCOPEDALLOC_ALLINNER>& b)
 {  return !(a == b);   }
 
-}} // namespace boost { namespace container {
+}} // namespace cppmsboost { namespace container {
 
 #include <boost/container/detail/config_end.hpp>
 

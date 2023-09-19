@@ -20,7 +20,7 @@
 #include <boost/regex_fwd.hpp>
 #include <boost/regex/v4/match_flags.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 template <class BidiIterator>
 struct sub_match;
@@ -28,7 +28,7 @@ struct sub_match;
 template <class BidiIterator, class Allocator>
 class match_results;
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // defined(BOOST_ASIO_HAS_BOOST_REGEX)
 

@@ -16,7 +16,7 @@
 #include <iomanip>
 
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
   //! Formats a month as as string into an ostream

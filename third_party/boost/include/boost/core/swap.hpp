@@ -17,9 +17,9 @@
 // because some compilers (including MSVC 7.1, Borland 5.9.3, and
 // Intel 8.1) don't do argument-dependent lookup when it has a
 // using-declaration instead.
-// - boost::swap has two template arguments, instead of one, to
+// - cppmsboost::swap has two template arguments, instead of one, to
 // avoid ambiguity when swapping objects of a Boost type that does
-// not have its own boost::swap overload.
+// not have its own cppmsboost::swap overload.
 
 #include <boost/core/enable_if.hpp>
 #include <boost/config.hpp>
@@ -30,7 +30,7 @@
 #endif
 #include <cstddef> //for std::size_t
 
-namespace boost_swap_impl
+namespace cppmsboost_swap_impl
 {
   // we can't use type_traits here
 
@@ -51,19 +51,19 @@ namespace boost_swap_impl
   {
     for (std::size_t i = 0; i < N; ++i)
     {
-      ::boost_swap_impl::swap_impl(left[i], right[i]);
+      ::cppmsboost_swap_impl::swap_impl(left[i], right[i]);
     }
   }
 }
 
-namespace boost
+namespace cppmsboost
 {
   template<class T1, class T2>
   BOOST_GPU_ENABLED
-  typename enable_if_c< !boost_swap_impl::is_const<T1>::value && !boost_swap_impl::is_const<T2>::value >::type
+  typename enable_if_c< !cppmsboost_swap_impl::is_const<T1>::value && !cppmsboost_swap_impl::is_const<T2>::value >::type
   swap(T1& left, T2& right)
   {
-    ::boost_swap_impl::swap_impl(left, right);
+    ::cppmsboost_swap_impl::swap_impl(left, right);
   }
 }
 

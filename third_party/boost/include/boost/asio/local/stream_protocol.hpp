@@ -28,13 +28,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace local {
 
 /// Encapsulates the flags needed for stream-oriented UNIX sockets.
 /**
- * The boost::asio::local::stream_protocol class contains flags necessary for
+ * The cppmsboost::asio::local::stream_protocol class contains flags necessary for
  * stream-oriented UNIX domain sockets.
  *
  * @par Thread Safety
@@ -82,7 +82,7 @@ public:
 
 } // namespace local
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

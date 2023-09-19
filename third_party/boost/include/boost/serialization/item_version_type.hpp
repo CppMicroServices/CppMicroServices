@@ -14,7 +14,7 @@
 // fixes broken example build on x86_64-linux-gnu-gcc-4.6.0
 #include <boost/assert.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 
 #if defined(_MSC_VER)
@@ -30,7 +30,7 @@ public:
     // should be private - but MPI fails if it's not!!!
     item_version_type(): t(0) {};
     explicit item_version_type(const unsigned int t_) : t(t_){
-        BOOST_ASSERT(t_ <= boost::integer_traits<base_type>::const_max);
+        BOOST_ASSERT(t_ <= cppmsboost::integer_traits<base_type>::const_max);
     }
     item_version_type(const item_version_type & t_) :
         t(t_.t)
@@ -59,7 +59,7 @@ public:
 #pragma warning( pop )
 #endif
 
-} } // end namespace boost::serialization
+} } // end namespace cppmsboost::serialization
 
 BOOST_IS_BITWISE_SERIALIZABLE(item_version_type)
 

@@ -27,7 +27,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace local {
 namespace detail {
@@ -66,13 +66,13 @@ public:
   }
 
   // Get the underlying endpoint in the native type.
-  boost::asio::detail::socket_addr_type* data()
+  cppmsboost::asio::detail::socket_addr_type* data()
   {
     return &data_.base;
   }
 
   // Get the underlying endpoint in the native type.
-  const boost::asio::detail::socket_addr_type* data() const
+  const cppmsboost::asio::detail::socket_addr_type* data() const
   {
     return &data_.base;
   }
@@ -81,7 +81,7 @@ public:
   std::size_t size() const
   {
     return path_length_
-      + offsetof(boost::asio::detail::sockaddr_un_type, sun_path);
+      + offsetof(cppmsboost::asio::detail::sockaddr_un_type, sun_path);
   }
 
   // Set the underlying size of the endpoint in the native type.
@@ -90,7 +90,7 @@ public:
   // Get the capacity of the endpoint in the native type.
   std::size_t capacity() const
   {
-    return sizeof(boost::asio::detail::sockaddr_un_type);
+    return sizeof(cppmsboost::asio::detail::sockaddr_un_type);
   }
 
   // Get the path associated with the endpoint.
@@ -114,8 +114,8 @@ private:
   // The underlying UNIX socket address.
   union data_union
   {
-    boost::asio::detail::socket_addr_type base;
-    boost::asio::detail::sockaddr_un_type local;
+    cppmsboost::asio::detail::socket_addr_type base;
+    cppmsboost::asio::detail::sockaddr_un_type local;
   } data_;
 
   // The length of the path associated with the endpoint.
@@ -128,7 +128,7 @@ private:
 } // namespace detail
 } // namespace local
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -21,16 +21,16 @@
 
 #if !defined( BOOST_USE_WINDOWS_H )
 extern "C" {
-BOOST_SYMBOL_IMPORT boost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
 SleepEx(
-    boost::winapi::DWORD_ dwMilliseconds,
-    boost::winapi::BOOL_ bAlertable);
-BOOST_SYMBOL_IMPORT boost::winapi::VOID_ BOOST_WINAPI_WINAPI_CC Sleep(boost::winapi::DWORD_ dwMilliseconds);
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC SwitchToThread(BOOST_WINAPI_DETAIL_VOID);
+    cppmsboost::winapi::DWORD_ dwMilliseconds,
+    cppmsboost::winapi::BOOL_ bAlertable);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::VOID_ BOOST_WINAPI_WINAPI_CC Sleep(cppmsboost::winapi::DWORD_ dwMilliseconds);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC SwitchToThread(BOOST_WINAPI_DETAIL_VOID);
 } // extern "C"
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 using ::SleepEx;
 using ::Sleep;

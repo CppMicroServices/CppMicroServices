@@ -30,7 +30,7 @@
 #pragma warning(pop)
 #endif
 
-namespace boost{
+namespace cppmsboost{
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable : 4251)
@@ -167,7 +167,7 @@ public:
          const sub_match<BidiIterator>& s = m_subs[sub];
          if(s.matched || (sub == 2))
          {
-            return ::boost::BOOST_REGEX_DETAIL_NS::distance((BidiIterator)(m_base), (BidiIterator)(s.first));
+            return ::cppmsboost::BOOST_REGEX_DETAIL_NS::distance((BidiIterator)(m_base), (BidiIterator)(s.first));
          }
       }
       return ~static_cast<difference_type>(0);
@@ -381,7 +381,7 @@ public:
    {
       if(m_is_singular)
          raise_logic_error();
-      typedef ::boost::regex_traits_wrapper<typename RegexT::traits_type> traits_type;
+      typedef ::cppmsboost::regex_traits_wrapper<typename RegexT::traits_type> traits_type;
       typedef typename BOOST_REGEX_DETAIL_NS::compute_functor_type<Functor, match_results<BidiIterator, Allocator>, OutputIterator, traits_type>::type F;
       F func(fmt);
       return func(*this, out, flags, re.get_traits());
@@ -393,7 +393,7 @@ public:
    {
       if(m_is_singular)
          raise_logic_error();
-      typedef ::boost::regex_traits_wrapper<typename RegexT::traits_type> traits_type;
+      typedef ::cppmsboost::regex_traits_wrapper<typename RegexT::traits_type> traits_type;
       std::basic_string<char_type> result;
       BOOST_REGEX_DETAIL_NS::string_out_iterator<std::basic_string<char_type> > i(result);
 
@@ -561,7 +561,7 @@ public:
    }
    void BOOST_REGEX_CALL maybe_assign(const match_results<BidiIterator, Allocator>& m);
 
-   void BOOST_REGEX_CALL set_named_subs(boost::shared_ptr<named_sub_type> subs)
+   void BOOST_REGEX_CALL set_named_subs(cppmsboost::shared_ptr<named_sub_type> subs)
    {
       m_named_subs = subs;
    }
@@ -572,15 +572,15 @@ private:
    //
    static void raise_logic_error()
    {
-      std::logic_error e("Attempt to access an uninitialized boost::match_results<> class.");
-      boost::throw_exception(e);
+      std::logic_error e("Attempt to access an uninitialized cppmsboost::match_results<> class.");
+      cppmsboost::throw_exception(e);
    }
 
 
    vector_type            m_subs;                      // subexpressions
    BidiIterator   m_base;                              // where the search started from
    sub_match<BidiIterator> m_null;                     // a null match
-   boost::shared_ptr<named_sub_type> m_named_subs;     // Shared copy of named subs in the regex object
+   cppmsboost::shared_ptr<named_sub_type> m_named_subs;     // Shared copy of named subs in the regex object
    int m_last_closed_paren;                            // Last ) to be seen - used for formatting
    bool m_is_singular;                                 // True if our stored iterators are singular
 };
@@ -648,15 +648,15 @@ void BOOST_REGEX_CALL match_results<BidiIterator, Allocator>::maybe_assign(const
          // p1 better than p2, and no need to calculate distances:
          return;
       }
-      base1 = ::boost::BOOST_REGEX_DETAIL_NS::distance(l_base, p1->first);
-      base2 = ::boost::BOOST_REGEX_DETAIL_NS::distance(l_base, p2->first);
+      base1 = ::cppmsboost::BOOST_REGEX_DETAIL_NS::distance(l_base, p1->first);
+      base2 = ::cppmsboost::BOOST_REGEX_DETAIL_NS::distance(l_base, p2->first);
       BOOST_ASSERT(base1 >= 0);
       BOOST_ASSERT(base2 >= 0);
       if(base1 < base2) return;
       if(base2 < base1) break;
 
-      len1 = ::boost::BOOST_REGEX_DETAIL_NS::distance((BidiIterator)p1->first, (BidiIterator)p1->second);
-      len2 = ::boost::BOOST_REGEX_DETAIL_NS::distance((BidiIterator)p2->first, (BidiIterator)p2->second);
+      len1 = ::cppmsboost::BOOST_REGEX_DETAIL_NS::distance((BidiIterator)p1->first, (BidiIterator)p1->second);
+      len2 = ::cppmsboost::BOOST_REGEX_DETAIL_NS::distance((BidiIterator)p2->first, (BidiIterator)p2->second);
       BOOST_ASSERT(len1 >= 0);
       BOOST_ASSERT(len2 >= 0);
       if((len1 != len2) || ((p1->matched == false) && (p2->matched == true)))
@@ -698,7 +698,7 @@ std::ostream& operator << (std::ostream& os,
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(push)

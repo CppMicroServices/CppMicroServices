@@ -18,13 +18,13 @@
 #include <boost/asio/detail/config.hpp>
 #include <boost/asio/basic_signal_set.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Typedef for the typical usage of a signal set.
 typedef basic_signal_set<> signal_set;
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_SIGNAL_SET_HPP

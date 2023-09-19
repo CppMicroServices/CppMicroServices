@@ -29,7 +29,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -82,7 +82,7 @@ public:
     win_iocp_io_context* iocp_service = this->get_iocp_service(ex);
 
     typedef win_iocp_overlapped_op<Handler, io_object_executor<Executor> > op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(handler, io_object_executor<Executor>(ex, native));
 
@@ -121,7 +121,7 @@ public:
   }
 
   // Post completion notification for overlapped operation. Releases ownership.
-  void complete(const boost::system::error_code& ec,
+  void complete(const cppmsboost::system::error_code& ec,
       std::size_t bytes_transferred)
   {
     if (ptr_)
@@ -152,7 +152,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

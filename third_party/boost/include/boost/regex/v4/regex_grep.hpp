@@ -20,7 +20,7 @@
 #define BOOST_REGEX_V4_REGEX_GREP_HPP
 
 
-namespace boost{
+namespace cppmsboost{
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -149,7 +149,7 @@ inline unsigned int regex_grep(bool (*foo)(const match_results<std::basic_string
 #pragma warning(pop)
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // BOOST_REGEX_V4_REGEX_GREP_HPP
 

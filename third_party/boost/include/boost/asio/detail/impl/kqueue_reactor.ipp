@@ -40,11 +40,11 @@
     EV_SET(ev, ident, filt, flags, fflags, data, udata)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
-kqueue_reactor::kqueue_reactor(boost::asio::execution_context& ctx)
+kqueue_reactor::kqueue_reactor(cppmsboost::asio::execution_context& ctx)
   : execution_context_service_base<kqueue_reactor>(ctx),
     scheduler_(use_service<scheduler>(ctx)),
     mutex_(BOOST_ASIO_CONCURRENCY_HINT_IS_LOCKING(
@@ -59,9 +59,9 @@ kqueue_reactor::kqueue_reactor(boost::asio::execution_context& ctx)
       EVFILT_READ, EV_ADD, 0, 0, &interrupter_);
   if (::kevent(kqueue_fd_, events, 1, 0, 0, 0) == -1)
   {
-    boost::system::error_code error(errno,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(error);
+    cppmsboost::system::error_code error(errno,
+        cppmsboost::asio::error::get_system_category());
+    cppmsboost::asio::detail::throw_error(error);
   }
 }
 
@@ -92,9 +92,9 @@ void kqueue_reactor::shutdown()
 }
 
 void kqueue_reactor::notify_fork(
-    boost::asio::execution_context::fork_event fork_ev)
+    cppmsboost::asio::execution_context::fork_event fork_ev)
 {
-  if (fork_ev == boost::asio::execution_context::fork_child)
+  if (fork_ev == cppmsboost::asio::execution_context::fork_child)
   {
     // The kqueue descriptor is automatically closed in the child.
     kqueue_fd_ = -1;
@@ -107,9 +107,9 @@ void kqueue_reactor::notify_fork(
         EVFILT_READ, EV_ADD, 0, 0, &interrupter_);
     if (::kevent(kqueue_fd_, events, 1, 0, 0, 0) == -1)
     {
-      boost::system::error_code ec(errno,
-          boost::asio::error::get_system_category());
-      boost::asio::detail::throw_error(ec, "kqueue interrupter registration");
+      cppmsboost::system::error_code ec(errno,
+          cppmsboost::asio::error::get_system_category());
+      cppmsboost::asio::detail::throw_error(ec, "kqueue interrupter registration");
     }
 
     // Re-register all descriptors with kqueue.
@@ -125,9 +125,9 @@ void kqueue_reactor::notify_fork(
             EVFILT_WRITE, EV_ADD | EV_CLEAR, 0, 0, state);
         if (::kevent(kqueue_fd_, events, state->num_kevents_, 0, 0, 0) == -1)
         {
-          boost::system::error_code ec(errno,
-              boost::asio::error::get_system_category());
-          boost::asio::detail::throw_error(ec, "kqueue re-registration");
+          cppmsboost::system::error_code ec(errno,
+              cppmsboost::asio::error::get_system_category());
+          cppmsboost::asio::detail::throw_error(ec, "kqueue re-registration");
         }
       }
     }
@@ -197,7 +197,7 @@ void kqueue_reactor::start_op(int op_type, socket_type descriptor,
 {
   if (!descriptor_data)
   {
-    op->ec_ = boost::asio::error::bad_descriptor;
+    op->ec_ = cppmsboost::asio::error::bad_descriptor;
     post_immediate_completion(op, is_continuation);
     return;
   }
@@ -238,8 +238,8 @@ void kqueue_reactor::start_op(int op_type, socket_type descriptor,
         }
         else
         {
-          op->ec_ = boost::system::error_code(errno,
-              boost::asio::error::get_system_category());
+          op->ec_ = cppmsboost::system::error_code(errno,
+              cppmsboost::asio::error::get_system_category());
           scheduler_.post_immediate_completion(op, is_continuation);
           return;
         }
@@ -276,7 +276,7 @@ void kqueue_reactor::cancel_ops(socket_type,
   {
     while (reactor_op* op = descriptor_data->op_queue_[i].front())
     {
-      op->ec_ = boost::asio::error::operation_aborted;
+      op->ec_ = cppmsboost::asio::error::operation_aborted;
       descriptor_data->op_queue_[i].pop();
       ops.push(op);
     }
@@ -317,7 +317,7 @@ void kqueue_reactor::deregister_descriptor(socket_type descriptor,
     {
       while (reactor_op* op = descriptor_data->op_queue_[i].front())
       {
-        op->ec_ = boost::asio::error::operation_aborted;
+        op->ec_ = cppmsboost::asio::error::operation_aborted;
         descriptor_data->op_queue_[i].pop();
         ops.push(op);
       }
@@ -481,9 +481,9 @@ void kqueue_reactor::run(long usec, op_queue<operation>& ops)
             {
               if (events[i].flags & EV_ERROR)
               {
-                op->ec_ = boost::system::error_code(
+                op->ec_ = cppmsboost::system::error_code(
                     static_cast<int>(events[i].data),
-                    boost::asio::error::get_system_category());
+                    cppmsboost::asio::error::get_system_category());
                 descriptor_data->op_queue_[j].pop();
                 ops.push(op);
               }
@@ -515,9 +515,9 @@ int kqueue_reactor::do_kqueue_create()
   int fd = ::kqueue();
   if (fd == -1)
   {
-    boost::system::error_code ec(errno,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "kqueue");
+    cppmsboost::system::error_code ec(errno,
+        cppmsboost::asio::error::get_system_category());
+    cppmsboost::asio::detail::throw_error(ec, "kqueue");
   }
   return fd;
 }
@@ -561,7 +561,7 @@ timespec* kqueue_reactor::get_timeout(long usec, timespec& ts)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #undef BOOST_ASIO_KQUEUE_EV_SET
 

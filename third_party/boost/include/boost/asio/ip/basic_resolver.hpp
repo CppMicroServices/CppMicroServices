@@ -42,7 +42,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
@@ -182,7 +182,7 @@ public:
   /**
    * This function forces the completion of any pending asynchronous
    * operations on the host resolver. The handler for each cancelled operation
-   * will be invoked with the boost::asio::error::operation_aborted error code.
+   * will be invoked with the cppmsboost::asio::error::operation_aborted error code.
    */
   void cancel()
   {
@@ -201,14 +201,14 @@ public:
    * successful call to this function is guaranteed to return a non-empty
    * range.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   results_type resolve(const query& q)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     results_type r = impl_.get_service().resolve(
         impl_.get_implementation(), q, ec);
-    boost::asio::detail::throw_error(ec, "resolve");
+    cppmsboost::asio::detail::throw_error(ec, "resolve");
     return r;
   }
 
@@ -225,7 +225,7 @@ public:
    * empty range is returned if an error occurs. A successful call to this
    * function is guaranteed to return a non-empty range.
    */
-  results_type resolve(const query& q, boost::system::error_code& ec)
+  results_type resolve(const query& q, cppmsboost::system::error_code& ec)
   {
     return impl_.get_service().resolve(impl_.get_implementation(), q, ec);
   }
@@ -251,7 +251,7 @@ public:
    * successful call to this function is guaranteed to return a non-empty
    * range.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @note On POSIX systems, host names may be locally defined in the file
    * <tt>/etc/hosts</tt>. On Windows, host names may be defined in the file
@@ -304,7 +304,7 @@ public:
    * may use additional locations when resolving service names.
    */
   results_type resolve(BOOST_ASIO_STRING_VIEW_PARAM host,
-      BOOST_ASIO_STRING_VIEW_PARAM service, boost::system::error_code& ec)
+      BOOST_ASIO_STRING_VIEW_PARAM service, cppmsboost::system::error_code& ec)
   {
     return resolve(host, service, resolver_base::flags(), ec);
   }
@@ -334,7 +334,7 @@ public:
    * successful call to this function is guaranteed to return a non-empty
    * range.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @note On POSIX systems, host names may be locally defined in the file
    * <tt>/etc/hosts</tt>. On Windows, host names may be defined in the file
@@ -350,12 +350,12 @@ public:
   results_type resolve(BOOST_ASIO_STRING_VIEW_PARAM host,
       BOOST_ASIO_STRING_VIEW_PARAM service, resolver_base::flags resolve_flags)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     basic_resolver_query<protocol_type> q(static_cast<std::string>(host),
         static_cast<std::string>(service), resolve_flags);
     results_type r = impl_.get_service().resolve(
         impl_.get_implementation(), q, ec);
-    boost::asio::detail::throw_error(ec, "resolve");
+    cppmsboost::asio::detail::throw_error(ec, "resolve");
     return r;
   }
 
@@ -399,7 +399,7 @@ public:
    */
   results_type resolve(BOOST_ASIO_STRING_VIEW_PARAM host,
       BOOST_ASIO_STRING_VIEW_PARAM service, resolver_base::flags resolve_flags,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     basic_resolver_query<protocol_type> q(static_cast<std::string>(host),
         static_cast<std::string>(service), resolve_flags);
@@ -429,7 +429,7 @@ public:
    * successful call to this function is guaranteed to return a non-empty
    * range.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @note On POSIX systems, host names may be locally defined in the file
    * <tt>/etc/hosts</tt>. On Windows, host names may be defined in the file
@@ -486,7 +486,7 @@ public:
    */
   results_type resolve(const protocol_type& protocol,
       BOOST_ASIO_STRING_VIEW_PARAM host, BOOST_ASIO_STRING_VIEW_PARAM service,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     return resolve(protocol, host, service, resolver_base::flags(), ec);
   }
@@ -519,7 +519,7 @@ public:
    * successful call to this function is guaranteed to return a non-empty
    * range.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @note On POSIX systems, host names may be locally defined in the file
    * <tt>/etc/hosts</tt>. On Windows, host names may be defined in the file
@@ -536,13 +536,13 @@ public:
       BOOST_ASIO_STRING_VIEW_PARAM host, BOOST_ASIO_STRING_VIEW_PARAM service,
       resolver_base::flags resolve_flags)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     basic_resolver_query<protocol_type> q(
         protocol, static_cast<std::string>(host),
         static_cast<std::string>(service), resolve_flags);
     results_type r = impl_.get_service().resolve(
         impl_.get_implementation(), q, ec);
-    boost::asio::detail::throw_error(ec, "resolve");
+    cppmsboost::asio::detail::throw_error(ec, "resolve");
     return r;
   }
 
@@ -589,7 +589,7 @@ public:
    */
   results_type resolve(const protocol_type& protocol,
       BOOST_ASIO_STRING_VIEW_PARAM host, BOOST_ASIO_STRING_VIEW_PARAM service,
-      resolver_base::flags resolve_flags, boost::system::error_code& ec)
+      resolver_base::flags resolve_flags, cppmsboost::system::error_code& ec)
   {
     basic_resolver_query<protocol_type> q(
         protocol, static_cast<std::string>(host),
@@ -610,29 +610,29 @@ public:
    * completes. Copies will be made of the handler as required. The function
    * signature of the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   resolver::results_type results // Resolved endpoints as a range.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * A successful resolve operation is guaranteed to pass a non-empty range to
    * the handler.
    */
   template <
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         results_type)) ResolveHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ResolveHandler,
-      void (boost::system::error_code, results_type))
+      void (cppmsboost::system::error_code, results_type))
   async_resolve(const query& q,
       BOOST_ASIO_MOVE_ARG(ResolveHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
-    return boost::asio::async_initiate<ResolveHandler,
-      void (boost::system::error_code, results_type)>(
+    return cppmsboost::asio::async_initiate<ResolveHandler,
+      void (cppmsboost::system::error_code, results_type)>(
         initiate_async_resolve(this), handler, q);
   }
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
@@ -657,13 +657,13 @@ public:
    * completes. Copies will be made of the handler as required. The function
    * signature of the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   resolver::results_type results // Resolved endpoints as a range.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * A successful resolve operation is guaranteed to pass a non-empty range to
    * the handler.
@@ -680,11 +680,11 @@ public:
    * may use additional locations when resolving service names.
    */
   template <
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         results_type)) ResolveHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ResolveHandler,
-      void (boost::system::error_code, results_type))
+      void (cppmsboost::system::error_code, results_type))
   async_resolve(BOOST_ASIO_STRING_VIEW_PARAM host,
       BOOST_ASIO_STRING_VIEW_PARAM service,
       BOOST_ASIO_MOVE_ARG(ResolveHandler) handler
@@ -719,13 +719,13 @@ public:
    * completes. Copies will be made of the handler as required. The function
    * signature of the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   resolver::results_type results // Resolved endpoints as a range.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * A successful resolve operation is guaranteed to pass a non-empty range to
    * the handler.
@@ -742,11 +742,11 @@ public:
    * may use additional locations when resolving service names.
    */
   template <
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         results_type)) ResolveHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ResolveHandler,
-      void (boost::system::error_code, results_type))
+      void (cppmsboost::system::error_code, results_type))
   async_resolve(BOOST_ASIO_STRING_VIEW_PARAM host,
       BOOST_ASIO_STRING_VIEW_PARAM service,
       resolver_base::flags resolve_flags,
@@ -756,8 +756,8 @@ public:
     basic_resolver_query<protocol_type> q(static_cast<std::string>(host),
         static_cast<std::string>(service), resolve_flags);
 
-    return boost::asio::async_initiate<ResolveHandler,
-      void (boost::system::error_code, results_type)>(
+    return cppmsboost::asio::async_initiate<ResolveHandler,
+      void (cppmsboost::system::error_code, results_type)>(
         initiate_async_resolve(this), handler, q);
   }
 
@@ -784,13 +784,13 @@ public:
    * completes. Copies will be made of the handler as required. The function
    * signature of the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   resolver::results_type results // Resolved endpoints as a range.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * A successful resolve operation is guaranteed to pass a non-empty range to
    * the handler.
@@ -807,11 +807,11 @@ public:
    * may use additional locations when resolving service names.
    */
   template <
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         results_type)) ResolveHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ResolveHandler,
-      void (boost::system::error_code, results_type))
+      void (cppmsboost::system::error_code, results_type))
   async_resolve(const protocol_type& protocol,
       BOOST_ASIO_STRING_VIEW_PARAM host, BOOST_ASIO_STRING_VIEW_PARAM service,
       BOOST_ASIO_MOVE_ARG(ResolveHandler) handler
@@ -849,13 +849,13 @@ public:
    * completes. Copies will be made of the handler as required. The function
    * signature of the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   resolver::results_type results // Resolved endpoints as a range.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * A successful resolve operation is guaranteed to pass a non-empty range to
    * the handler.
@@ -872,11 +872,11 @@ public:
    * may use additional locations when resolving service names.
    */
   template <
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         results_type)) ResolveHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ResolveHandler,
-      void (boost::system::error_code, results_type))
+      void (cppmsboost::system::error_code, results_type))
   async_resolve(const protocol_type& protocol,
       BOOST_ASIO_STRING_VIEW_PARAM host, BOOST_ASIO_STRING_VIEW_PARAM service,
       resolver_base::flags resolve_flags,
@@ -887,8 +887,8 @@ public:
         protocol, static_cast<std::string>(host),
         static_cast<std::string>(service), resolve_flags);
 
-    return boost::asio::async_initiate<ResolveHandler,
-      void (boost::system::error_code, results_type)>(
+    return cppmsboost::asio::async_initiate<ResolveHandler,
+      void (cppmsboost::system::error_code, results_type)>(
         initiate_async_resolve(this), handler, q);
   }
 
@@ -904,14 +904,14 @@ public:
    * successful call to this function is guaranteed to return a non-empty
    * range.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   results_type resolve(const endpoint_type& e)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     results_type i = impl_.get_service().resolve(
         impl_.get_implementation(), e, ec);
-    boost::asio::detail::throw_error(ec, "resolve");
+    cppmsboost::asio::detail::throw_error(ec, "resolve");
     return i;
   }
 
@@ -929,7 +929,7 @@ public:
    * empty range is returned if an error occurs. A successful call to this
    * function is guaranteed to return a non-empty range.
    */
-  results_type resolve(const endpoint_type& e, boost::system::error_code& ec)
+  results_type resolve(const endpoint_type& e, cppmsboost::system::error_code& ec)
   {
     return impl_.get_service().resolve(impl_.get_implementation(), e, ec);
   }
@@ -947,29 +947,29 @@ public:
    * completes. Copies will be made of the handler as required. The function
    * signature of the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   resolver::results_type results // Resolved endpoints as a range.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * A successful resolve operation is guaranteed to pass a non-empty range to
    * the handler.
    */
   template <
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         results_type)) ResolveHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ResolveHandler,
-      void (boost::system::error_code, results_type))
+      void (cppmsboost::system::error_code, results_type))
   async_resolve(const endpoint_type& e,
       BOOST_ASIO_MOVE_ARG(ResolveHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
-    return boost::asio::async_initiate<ResolveHandler,
-      void (boost::system::error_code, results_type)>(
+    return cppmsboost::asio::async_initiate<ResolveHandler,
+      void (cppmsboost::system::error_code, results_type)>(
         initiate_async_resolve(this), handler, e);
   }
 
@@ -1002,7 +1002,7 @@ private:
       BOOST_ASIO_RESOLVE_HANDLER_CHECK(
           ResolveHandler, handler, results_type) type_check;
 
-      boost::asio::detail::non_const_lvalue<ResolveHandler> handler2(handler);
+      cppmsboost::asio::detail::non_const_lvalue<ResolveHandler> handler2(handler);
       self_->impl_.get_service().async_resolve(
           self_->impl_.get_implementation(), q, handler2.value,
           self_->impl_.get_implementation_executor());
@@ -1013,19 +1013,19 @@ private:
   };
 
 # if defined(BOOST_ASIO_WINDOWS_RUNTIME)
-  boost::asio::detail::io_object_impl<
-    boost::asio::detail::winrt_resolver_service<InternetProtocol>,
+  cppmsboost::asio::detail::io_object_impl<
+    cppmsboost::asio::detail::winrt_resolver_service<InternetProtocol>,
     Executor> impl_;
 # else
-  boost::asio::detail::io_object_impl<
-    boost::asio::detail::resolver_service<InternetProtocol>,
+  cppmsboost::asio::detail::io_object_impl<
+    cppmsboost::asio::detail::resolver_service<InternetProtocol>,
     Executor> impl_;
 # endif
 };
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

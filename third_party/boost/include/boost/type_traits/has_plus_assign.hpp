@@ -49,7 +49,7 @@
 #include <boost/type_traits/remove_cv.hpp>
 #include <utility>
 
-namespace boost
+namespace cppmsboost
 {
 
    namespace binary_op_detail {
@@ -57,42 +57,42 @@ namespace boost
       struct dont_care;
 
       template <class T, class U, class Ret, class = void>
-      struct has_plus_assign_ret_imp : public boost::false_type {};
+      struct has_plus_assign_ret_imp : public cppmsboost::false_type {};
 
       template <class T, class U, class Ret>
-      struct has_plus_assign_ret_imp<T, U, Ret, typename boost::make_void<decltype(std::declval<typename add_reference<T>::type>() += std::declval<typename add_reference<U>::type>())>::type>
-         : public boost::integral_constant<bool, ::boost::is_convertible<decltype(std::declval<typename add_reference<T>::type>() += std::declval<typename add_reference<U>::type>()), Ret>::value> {};
+      struct has_plus_assign_ret_imp<T, U, Ret, typename cppmsboost::make_void<decltype(std::declval<typename add_reference<T>::type>() += std::declval<typename add_reference<U>::type>())>::type>
+         : public cppmsboost::integral_constant<bool, ::cppmsboost::is_convertible<decltype(std::declval<typename add_reference<T>::type>() += std::declval<typename add_reference<U>::type>()), Ret>::value> {};
 
       template <class T, class U, class = void >
-      struct has_plus_assign_void_imp : public boost::false_type {};
+      struct has_plus_assign_void_imp : public cppmsboost::false_type {};
 
       template <class T, class U>
-      struct has_plus_assign_void_imp<T, U, typename boost::make_void<decltype(std::declval<typename add_reference<T>::type>() += std::declval<typename add_reference<U>::type>())>::type>
-         : public boost::integral_constant<bool, ::boost::is_void<decltype(std::declval<typename add_reference<T>::type>() += std::declval<typename add_reference<U>::type>())>::value> {};
+      struct has_plus_assign_void_imp<T, U, typename cppmsboost::make_void<decltype(std::declval<typename add_reference<T>::type>() += std::declval<typename add_reference<U>::type>())>::type>
+         : public cppmsboost::integral_constant<bool, ::cppmsboost::is_void<decltype(std::declval<typename add_reference<T>::type>() += std::declval<typename add_reference<U>::type>())>::value> {};
 
       template <class T, class U, class = void>
-      struct has_plus_assign_dc_imp : public boost::false_type {};
+      struct has_plus_assign_dc_imp : public cppmsboost::false_type {};
 
       template <class T, class U>
-      struct has_plus_assign_dc_imp<T, U, typename boost::make_void<decltype(std::declval<typename add_reference<T>::type>() += std::declval<typename add_reference<U>::type>())>::type>
-         : public boost::true_type {};
+      struct has_plus_assign_dc_imp<T, U, typename cppmsboost::make_void<decltype(std::declval<typename add_reference<T>::type>() += std::declval<typename add_reference<U>::type>())>::type>
+         : public cppmsboost::true_type {};
 
       template <class T, class U, class Ret>
-      struct has_plus_assign_filter_ret : public boost::binary_op_detail:: has_plus_assign_ret_imp <T, U, Ret> {};
+      struct has_plus_assign_filter_ret : public cppmsboost::binary_op_detail:: has_plus_assign_ret_imp <T, U, Ret> {};
       template <class T, class U>
-      struct has_plus_assign_filter_ret<T, U, void> : public boost::binary_op_detail:: has_plus_assign_void_imp <T, U> {};
+      struct has_plus_assign_filter_ret<T, U, void> : public cppmsboost::binary_op_detail:: has_plus_assign_void_imp <T, U> {};
       template <class T, class U>
-      struct has_plus_assign_filter_ret<T, U, boost::binary_op_detail::dont_care> : public boost::binary_op_detail:: has_plus_assign_dc_imp <T, U> {};
+      struct has_plus_assign_filter_ret<T, U, cppmsboost::binary_op_detail::dont_care> : public cppmsboost::binary_op_detail:: has_plus_assign_dc_imp <T, U> {};
 
       template <class T, class U, class Ret, bool f>
-      struct has_plus_assign_filter_impossible : public boost::binary_op_detail:: has_plus_assign_filter_ret <T, U, Ret> {};
+      struct has_plus_assign_filter_impossible : public cppmsboost::binary_op_detail:: has_plus_assign_filter_ret <T, U, Ret> {};
       template <class T, class U, class Ret>
-      struct has_plus_assign_filter_impossible<T, U, Ret, true> : public boost::false_type {};
+      struct has_plus_assign_filter_impossible<T, U, Ret, true> : public cppmsboost::false_type {};
 
    }
 
-   template <class T, class U = T, class Ret = boost::binary_op_detail::dont_care>
-   struct has_plus_assign : public boost::binary_op_detail:: has_plus_assign_filter_impossible <T, U, Ret, boost::is_arithmetic<typename boost::remove_reference<T>::type>::value && boost::is_pointer<typename remove_reference<U>::type>::value && !boost::is_same<bool, typename boost::remove_cv<typename remove_reference<T>::type>::type>::value> {};
+   template <class T, class U = T, class Ret = cppmsboost::binary_op_detail::dont_care>
+   struct has_plus_assign : public cppmsboost::binary_op_detail:: has_plus_assign_filter_impossible <T, U, Ret, cppmsboost::is_arithmetic<typename cppmsboost::remove_reference<T>::type>::value && cppmsboost::is_pointer<typename remove_reference<U>::type>::value && !cppmsboost::is_same<bool, typename cppmsboost::remove_cv<typename remove_reference<T>::type>::type>::value> {};
 
 }
 
@@ -104,44 +104,44 @@ namespace boost
    (\
       /* Lhs==pointer and Rhs==pointer */\
       (\
-         ::boost::is_pointer< Lhs_noref >::value && \
-         ::boost::is_pointer< Rhs_noref >::value\
+         ::cppmsboost::is_pointer< Lhs_noref >::value && \
+         ::cppmsboost::is_pointer< Rhs_noref >::value\
       ) || \
       /* Lhs==void* and Rhs==fundamental */\
       (\
-         ::boost::is_pointer< Lhs_noref >::value && \
-         ::boost::is_void< Lhs_noptr >::value && \
-         ::boost::is_fundamental< Rhs_nocv >::value\
+         ::cppmsboost::is_pointer< Lhs_noref >::value && \
+         ::cppmsboost::is_void< Lhs_noptr >::value && \
+         ::cppmsboost::is_fundamental< Rhs_nocv >::value\
       ) || \
       /* Rhs==void* and Lhs==fundamental */\
       (\
-         ::boost::is_pointer< Rhs_noref >::value && \
-         ::boost::is_void< Rhs_noptr >::value && \
-         ::boost::is_fundamental< Lhs_nocv >::value\
+         ::cppmsboost::is_pointer< Rhs_noref >::value && \
+         ::cppmsboost::is_void< Rhs_noptr >::value && \
+         ::cppmsboost::is_fundamental< Lhs_nocv >::value\
       ) || \
       /* Lhs==pointer and Rhs==fundamental and Rhs!=integral */\
       (\
-         ::boost::is_pointer< Lhs_noref >::value && \
-         ::boost::is_fundamental< Rhs_nocv >::value && \
-         (!  ::boost::is_integral< Rhs_noref >::value )\
+         ::cppmsboost::is_pointer< Lhs_noref >::value && \
+         ::cppmsboost::is_fundamental< Rhs_nocv >::value && \
+         (!  ::cppmsboost::is_integral< Rhs_noref >::value )\
       ) || \
       /* Rhs==pointer and Lhs==fundamental and Lhs!=bool */\
       (\
-         ::boost::is_pointer< Rhs_noref >::value && \
-         ::boost::is_fundamental< Lhs_nocv >::value && \
-         (!  ::boost::is_same< Lhs_nocv, bool >::value )\
+         ::cppmsboost::is_pointer< Rhs_noref >::value && \
+         ::cppmsboost::is_fundamental< Lhs_nocv >::value && \
+         (!  ::cppmsboost::is_same< Lhs_nocv, bool >::value )\
       ) || \
       /* (Lhs==fundamental or Lhs==pointer) and (Rhs==fundamental or Rhs==pointer) and (Lhs==const) */\
       (\
          (\
-            ::boost::is_fundamental< Lhs_nocv >::value || \
-            ::boost::is_pointer< Lhs_noref >::value\
+            ::cppmsboost::is_fundamental< Lhs_nocv >::value || \
+            ::cppmsboost::is_pointer< Lhs_noref >::value\
           ) && \
          ( \
-            ::boost::is_fundamental< Rhs_nocv >::value || \
-            ::boost::is_pointer< Rhs_noref >::value\
+            ::cppmsboost::is_fundamental< Rhs_nocv >::value || \
+            ::cppmsboost::is_pointer< Rhs_noref >::value\
           ) && \
-         ::boost::is_const< Lhs_noref >::value\
+         ::cppmsboost::is_const< Lhs_noref >::value\
       )\
       )
 

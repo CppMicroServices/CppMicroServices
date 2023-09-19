@@ -24,7 +24,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 namespace detail {
@@ -41,7 +41,7 @@ public:
       unsigned short port_num) BOOST_ASIO_NOEXCEPT;
 
   // Construct an endpoint using an address and port number.
-  BOOST_ASIO_DECL endpoint(const boost::asio::ip::address& addr,
+  BOOST_ASIO_DECL endpoint(const cppmsboost::asio::ip::address& addr,
       unsigned short port_num) BOOST_ASIO_NOEXCEPT;
 
   // Copy constructor.
@@ -58,13 +58,13 @@ public:
   }
 
   // Get the underlying endpoint in the native type.
-  boost::asio::detail::socket_addr_type* data() BOOST_ASIO_NOEXCEPT
+  cppmsboost::asio::detail::socket_addr_type* data() BOOST_ASIO_NOEXCEPT
   {
     return &data_.base;
   }
 
   // Get the underlying endpoint in the native type.
-  const boost::asio::detail::socket_addr_type* data() const BOOST_ASIO_NOEXCEPT
+  const cppmsboost::asio::detail::socket_addr_type* data() const BOOST_ASIO_NOEXCEPT
   {
     return &data_.base;
   }
@@ -73,9 +73,9 @@ public:
   std::size_t size() const BOOST_ASIO_NOEXCEPT
   {
     if (is_v4())
-      return sizeof(boost::asio::detail::sockaddr_in4_type);
+      return sizeof(cppmsboost::asio::detail::sockaddr_in4_type);
     else
-      return sizeof(boost::asio::detail::sockaddr_in6_type);
+      return sizeof(cppmsboost::asio::detail::sockaddr_in6_type);
   }
 
   // Set the underlying size of the endpoint in the native type.
@@ -94,11 +94,11 @@ public:
   BOOST_ASIO_DECL void port(unsigned short port_num) BOOST_ASIO_NOEXCEPT;
 
   // Get the IP address associated with the endpoint.
-  BOOST_ASIO_DECL boost::asio::ip::address address() const BOOST_ASIO_NOEXCEPT;
+  BOOST_ASIO_DECL cppmsboost::asio::ip::address address() const BOOST_ASIO_NOEXCEPT;
 
   // Set the IP address associated with the endpoint.
   BOOST_ASIO_DECL void address(
-      const boost::asio::ip::address& addr) BOOST_ASIO_NOEXCEPT;
+      const cppmsboost::asio::ip::address& addr) BOOST_ASIO_NOEXCEPT;
 
   // Compare two endpoints for equality.
   BOOST_ASIO_DECL friend bool operator==(const endpoint& e1,
@@ -123,16 +123,16 @@ private:
   // The underlying IP socket address.
   union data_union
   {
-    boost::asio::detail::socket_addr_type base;
-    boost::asio::detail::sockaddr_in4_type v4;
-    boost::asio::detail::sockaddr_in6_type v6;
+    cppmsboost::asio::detail::socket_addr_type base;
+    cppmsboost::asio::detail::sockaddr_in4_type v4;
+    cppmsboost::asio::detail::sockaddr_in6_type v6;
   } data_;
 };
 
 } // namespace detail
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

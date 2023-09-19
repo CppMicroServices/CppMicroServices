@@ -21,7 +21,7 @@
 
 #if !defined( BOOST_USE_WINDOWS_H )
 extern "C" {
-namespace boost { namespace winapi {
+namespace cppmsboost { namespace winapi {
 #ifdef _WIN64
 typedef INT_PTR_ (BOOST_WINAPI_WINAPI_CC *FARPROC_)();
 typedef INT_PTR_ (BOOST_WINAPI_WINAPI_CC *NEARPROC_)();
@@ -31,83 +31,83 @@ typedef int (BOOST_WINAPI_WINAPI_CC *FARPROC_)();
 typedef int (BOOST_WINAPI_WINAPI_CC *NEARPROC_)();
 typedef int (BOOST_WINAPI_WINAPI_CC *PROC_)();
 #endif // _WIN64
-}} // namespace boost::winapi
+}} // namespace cppmsboost::winapi
 
 #if !defined( BOOST_NO_ANSI_APIS )
-BOOST_SYMBOL_IMPORT boost::winapi::HMODULE_ BOOST_WINAPI_WINAPI_CC
-LoadLibraryA(boost::winapi::LPCSTR_ lpFileName);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HMODULE_ BOOST_WINAPI_WINAPI_CC
+LoadLibraryA(cppmsboost::winapi::LPCSTR_ lpFileName);
 
-BOOST_SYMBOL_IMPORT boost::winapi::HMODULE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HMODULE_ BOOST_WINAPI_WINAPI_CC
 LoadLibraryExA(
-    boost::winapi::LPCSTR_ lpFileName,
-    boost::winapi::HANDLE_ hFile,
-    boost::winapi::DWORD_ dwFlags
+    cppmsboost::winapi::LPCSTR_ lpFileName,
+    cppmsboost::winapi::HANDLE_ hFile,
+    cppmsboost::winapi::DWORD_ dwFlags
 );
 
-BOOST_SYMBOL_IMPORT boost::winapi::HMODULE_ BOOST_WINAPI_WINAPI_CC
-GetModuleHandleA(boost::winapi::LPCSTR_ lpFileName);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HMODULE_ BOOST_WINAPI_WINAPI_CC
+GetModuleHandleA(cppmsboost::winapi::LPCSTR_ lpFileName);
 
-BOOST_SYMBOL_IMPORT boost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
 GetModuleFileNameA(
-    boost::winapi::HMODULE_ hModule,
-    boost::winapi::LPSTR_ lpFilename,
-    boost::winapi::DWORD_ nSize
+    cppmsboost::winapi::HMODULE_ hModule,
+    cppmsboost::winapi::LPSTR_ lpFilename,
+    cppmsboost::winapi::DWORD_ nSize
 );
 #endif
 
-BOOST_SYMBOL_IMPORT boost::winapi::HMODULE_ BOOST_WINAPI_WINAPI_CC
-LoadLibraryW(boost::winapi::LPCWSTR_ lpFileName);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HMODULE_ BOOST_WINAPI_WINAPI_CC
+LoadLibraryW(cppmsboost::winapi::LPCWSTR_ lpFileName);
 
-BOOST_SYMBOL_IMPORT boost::winapi::HMODULE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HMODULE_ BOOST_WINAPI_WINAPI_CC
 LoadLibraryExW(
-    boost::winapi::LPCWSTR_ lpFileName,
-    boost::winapi::HANDLE_ hFile,
-    boost::winapi::DWORD_ dwFlags
+    cppmsboost::winapi::LPCWSTR_ lpFileName,
+    cppmsboost::winapi::HANDLE_ hFile,
+    cppmsboost::winapi::DWORD_ dwFlags
 );
 
-BOOST_SYMBOL_IMPORT boost::winapi::HMODULE_ BOOST_WINAPI_WINAPI_CC
-GetModuleHandleW(boost::winapi::LPCWSTR_ lpFileName);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HMODULE_ BOOST_WINAPI_WINAPI_CC
+GetModuleHandleW(cppmsboost::winapi::LPCWSTR_ lpFileName);
 
-BOOST_SYMBOL_IMPORT boost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
 GetModuleFileNameW(
-    boost::winapi::HMODULE_ hModule,
-    boost::winapi::LPWSTR_ lpFilename,
-    boost::winapi::DWORD_ nSize
+    cppmsboost::winapi::HMODULE_ hModule,
+    cppmsboost::winapi::LPWSTR_ lpFilename,
+    cppmsboost::winapi::DWORD_ nSize
 );
 
 #if !defined( UNDER_CE )
-BOOST_SYMBOL_IMPORT boost::winapi::FARPROC_ BOOST_WINAPI_WINAPI_CC
-GetProcAddress(boost::winapi::HMODULE_ hModule, boost::winapi::LPCSTR_ lpProcName);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::FARPROC_ BOOST_WINAPI_WINAPI_CC
+GetProcAddress(cppmsboost::winapi::HMODULE_ hModule, cppmsboost::winapi::LPCSTR_ lpProcName);
 #else
 // On Windows CE there are two functions: GetProcAddressA (since Windows CE 3.0) and GetProcAddressW.
 // GetProcAddress is a macro that is _always_ defined to GetProcAddressW.
-BOOST_SYMBOL_IMPORT boost::winapi::FARPROC_ BOOST_WINAPI_WINAPI_CC
-GetProcAddressA(boost::winapi::HMODULE_ hModule, boost::winapi::LPCSTR_ lpProcName);
-BOOST_SYMBOL_IMPORT boost::winapi::FARPROC_ BOOST_WINAPI_WINAPI_CC
-GetProcAddressW(boost::winapi::HMODULE_ hModule, boost::winapi::LPCWSTR_ lpProcName);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::FARPROC_ BOOST_WINAPI_WINAPI_CC
+GetProcAddressA(cppmsboost::winapi::HMODULE_ hModule, cppmsboost::winapi::LPCSTR_ lpProcName);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::FARPROC_ BOOST_WINAPI_WINAPI_CC
+GetProcAddressW(cppmsboost::winapi::HMODULE_ hModule, cppmsboost::winapi::LPCWSTR_ lpProcName);
 #endif
 
 struct _MEMORY_BASIC_INFORMATION;
 
 #if !defined( BOOST_WINAPI_IS_MINGW )
-BOOST_SYMBOL_IMPORT boost::winapi::SIZE_T_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::SIZE_T_ BOOST_WINAPI_WINAPI_CC
 VirtualQuery(
-    boost::winapi::LPCVOID_ lpAddress,
+    cppmsboost::winapi::LPCVOID_ lpAddress,
     ::_MEMORY_BASIC_INFORMATION* lpBuffer,
-    boost::winapi::SIZE_T_ dwLength
+    cppmsboost::winapi::SIZE_T_ dwLength
 );
 #else // !defined( BOOST_WINAPI_IS_MINGW )
-BOOST_SYMBOL_IMPORT boost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
 VirtualQuery(
-    boost::winapi::LPCVOID_ lpAddress,
+    cppmsboost::winapi::LPCVOID_ lpAddress,
     ::_MEMORY_BASIC_INFORMATION* lpBuffer,
-    boost::winapi::DWORD_ dwLength
+    cppmsboost::winapi::DWORD_ dwLength
 );
 #endif // !defined( BOOST_WINAPI_IS_MINGW )
 } // extern "C"
 #endif // #if !defined( BOOST_USE_WINDOWS_H )
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 
 typedef struct BOOST_MAY_ALIAS MEMORY_BASIC_INFORMATION_ {
@@ -211,7 +211,7 @@ BOOST_FORCEINLINE DWORD_ get_module_file_name(HMODULE_ hModule, LPWSTR_ lpFilena
 }
 
 } // namespace winapi
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_WINAPI_PARTITION_DESKTOP || BOOST_WINAPI_PARTITION_SYSTEM
 
@@ -223,12 +223,12 @@ BOOST_FORCEINLINE DWORD_ get_module_file_name(HMODULE_ hModule, LPWSTR_ lpFilena
 
 #if !defined(BOOST_USE_WINDOWS_H)
 extern "C" {
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
-FreeLibrary(boost::winapi::HMODULE_ hModule);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
+FreeLibrary(cppmsboost::winapi::HMODULE_ hModule);
 }
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 using ::FreeLibrary;
 }

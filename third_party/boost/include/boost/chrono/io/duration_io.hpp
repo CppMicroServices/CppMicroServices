@@ -24,7 +24,7 @@
 #include <iosfwd>
 #include <sstream>
 
-namespace boost
+namespace cppmsboost
 {
   namespace chrono
   {
@@ -130,7 +130,7 @@ namespace boost
      */
 
     template <class CharT, class Traits, class Rep, class Period>
-    typename boost::enable_if_c< ! duration_put_enabled<Rep>::value, std::basic_ostream<CharT, Traits>& >::type
+    typename cppmsboost::enable_if_c< ! duration_put_enabled<Rep>::value, std::basic_ostream<CharT, Traits>& >::type
     operator<<(std::basic_ostream<CharT, Traits>& os, const duration<Rep, Period>& d)
     {
       std::basic_ostringstream<CharT, Traits> ostr;
@@ -188,7 +188,7 @@ namespace boost
     }
 
     template <class CharT, class Traits, class Rep, class Period>
-    typename boost::enable_if_c< duration_put_enabled<Rep>::value, std::basic_ostream<CharT, Traits>& >::type
+    typename cppmsboost::enable_if_c< duration_put_enabled<Rep>::value, std::basic_ostream<CharT, Traits>& >::type
     operator<<(std::basic_ostream<CharT, Traits>& os, const duration<Rep, Period>& d)
     {
       bool failed = false;

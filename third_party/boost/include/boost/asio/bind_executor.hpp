@@ -27,7 +27,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -575,7 +575,7 @@ struct associated_executor<executor_binder<T, Executor>, Executor1>
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

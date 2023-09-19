@@ -25,7 +25,7 @@
 #include <boost/get_pointer.hpp>
 #include <boost/detail/workaround.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 #if defined(BOOST_NO_VOID_RETURNS)
@@ -398,6 +398,6 @@ template<class R, class T> _mfi::dm<R, T> mem_fn(R T::*f)
     return _mfi::dm<R, T>(f);
 }
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_BIND_MEM_FN_HPP_INCLUDED

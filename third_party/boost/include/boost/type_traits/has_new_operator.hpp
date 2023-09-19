@@ -25,7 +25,7 @@
 #  endif
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace detail {
     template <class U, U x> 
     struct test;
@@ -136,9 +136,9 @@ namespace detail {
     };
 } // namespace detail
 
-template <class T> struct has_new_operator : public integral_constant<bool, ::boost::detail::has_new_operator_impl<T>::value>{};
+template <class T> struct has_new_operator : public integral_constant<bool, ::cppmsboost::detail::has_new_operator_impl<T>::value>{};
 
-} // namespace boost
+} // namespace cppmsboost
 
 #if defined(BOOST_TT_AUX_MACRO_NEW_DEFINED)
 #  pragma pop_macro("new")

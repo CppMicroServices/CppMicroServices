@@ -15,7 +15,7 @@
 #include <boost/chrono/io/timezone.hpp>
 #include <boost/chrono/io/utility/ios_base_state_ptr.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   namespace chrono
   {

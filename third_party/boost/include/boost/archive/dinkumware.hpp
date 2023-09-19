@@ -30,7 +30,7 @@ namespace std {
 // define i/o operators for 64 bit integers
 template<class CharType>
 basic_ostream<CharType> &
-operator<<(basic_ostream<CharType> & os, boost::uint64_t t){
+operator<<(basic_ostream<CharType> & os, cppmsboost::uint64_t t){
     // octal rendering of 64 bit number would be 22 octets + eos
     CharType d[23];
     unsigned int radix;
@@ -67,9 +67,9 @@ operator<<(basic_ostream<CharType> & os, boost::uint64_t t){
 
 template<class CharType>
 basic_ostream<CharType> &
-operator<<(basic_ostream<CharType> &os, boost::int64_t t){
+operator<<(basic_ostream<CharType> &os, cppmsboost::int64_t t){
     if(0 <= t){
-        os << static_cast<boost::uint64_t>(t);
+        os << static_cast<cppmsboost::uint64_t>(t);
     }
     else{
         os.put('-');
@@ -80,7 +80,7 @@ operator<<(basic_ostream<CharType> &os, boost::int64_t t){
 
 template<class CharType>
 basic_istream<CharType> &
-operator>>(basic_istream<CharType> &is, boost::int64_t & t){
+operator>>(basic_istream<CharType> &is, cppmsboost::int64_t & t){
     CharType d;
     do{
         d = is.get();
@@ -120,8 +120,8 @@ operator>>(basic_istream<CharType> &is, boost::int64_t & t){
 
 template<class CharType>
 basic_istream<CharType> &
-operator>>(basic_istream<CharType> &is, boost::uint64_t & t){
-    boost::int64_t it;
+operator>>(basic_istream<CharType> &is, cppmsboost::uint64_t & t){
+    cppmsboost::int64_t it;
     is >> it;
     t = it;
     return is;

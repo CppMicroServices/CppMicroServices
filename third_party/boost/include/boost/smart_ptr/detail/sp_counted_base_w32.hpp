@@ -29,7 +29,7 @@
 #include <boost/config/workaround.hpp>
 #include <boost/config.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -128,6 +128,6 @@ public:
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // #ifndef BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_W32_HPP_INCLUDED

@@ -24,7 +24,7 @@
 #pragma warning(disable: 4127)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
 

@@ -15,7 +15,7 @@
 #include <boost/type_traits/is_complete.hpp>
 #include <boost/static_assert.hpp>
 
-namespace boost{
+namespace cppmsboost{
 
    template <class T, class U = T> struct is_assignable;
 
@@ -26,24 +26,24 @@ namespace boost{
 #include <boost/type_traits/detail/yes_no_type.hpp>
 #include <boost/type_traits/declval.hpp>
 
-namespace boost{
+namespace cppmsboost{
 
    namespace detail{
 
       struct is_assignable_imp
       {
-         template<typename T, typename U, typename = decltype(boost::declval<T>() = boost::declval<U>())>
-         static boost::type_traits::yes_type test(int);
+         template<typename T, typename U, typename = decltype(cppmsboost::declval<T>() = cppmsboost::declval<U>())>
+         static cppmsboost::type_traits::yes_type test(int);
 
          template<typename, typename>
-         static boost::type_traits::no_type test(...);
+         static cppmsboost::type_traits::no_type test(...);
       };
 
    }
 
-   template <class T, class U> struct is_assignable : public integral_constant<bool, sizeof(detail::is_assignable_imp::test<T, U>(0)) == sizeof(boost::type_traits::yes_type)>
+   template <class T, class U> struct is_assignable : public integral_constant<bool, sizeof(detail::is_assignable_imp::test<T, U>(0)) == sizeof(cppmsboost::type_traits::yes_type)>
    {
-      BOOST_STATIC_ASSERT_MSG(boost::is_complete<T>::value, "Arguments to is_assignable must be complete types");
+      BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<T>::value, "Arguments to is_assignable must be complete types");
    };
    template <class T, std::size_t N, class U> struct is_assignable<T[N], U> : public is_assignable<T, U>{};
    template <class T, std::size_t N, class U> struct is_assignable<T(&)[N], U> : public is_assignable<T&, U>{};
@@ -59,12 +59,12 @@ namespace boost{
 #include <boost/type_traits/has_trivial_assign.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
-namespace boost{
+namespace cppmsboost{
 
    // We don't know how to implement this:
    template <class T, class U> struct is_assignable : public integral_constant<bool, false>
    {
-      BOOST_STATIC_ASSERT_MSG(boost::is_complete<T>::value, "Arguments to is_assignable must be complete types");
+      BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<T>::value, "Arguments to is_assignable must be complete types");
    };
    template <class T, class U> struct is_assignable<T&, U> : public integral_constant<bool, is_pod<T>::value && is_pod<typename remove_reference<U>::type>::value>{};
    template <class T, class U> struct is_assignable<const T&, U> : public integral_constant<bool, false>{};
@@ -80,6 +80,6 @@ namespace boost{
    */
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_IS_ASSIGNABLE_HPP_INCLUDED

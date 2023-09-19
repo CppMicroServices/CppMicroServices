@@ -38,7 +38,7 @@
 #  pragma warning(disable : 4251 4231 4660 4275)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 
 class extended_type_info;
@@ -91,18 +91,18 @@ void_downcast(
 namespace void_cast_detail {
 
 class BOOST_SYMBOL_VISIBLE void_caster :
-    private boost::noncopyable
+    private cppmsboost::noncopyable
 {
     friend
     BOOST_SERIALIZATION_DECL void const *
-    boost::serialization::void_upcast(
+    cppmsboost::serialization::void_upcast(
         extended_type_info const & derived,
         extended_type_info const & base,
         void const * const
     );
     friend
     BOOST_SERIALIZATION_DECL void const *
-    boost::serialization::void_downcast(
+    cppmsboost::serialization::void_downcast(
         extended_type_info const & derived,
         extended_type_info const & base,
         void const * const
@@ -157,14 +157,14 @@ class BOOST_SYMBOL_VISIBLE void_caster_primitive :
 {
     virtual void const * downcast(void const * const t) const {
         const Derived * d =
-            boost::serialization::smart_cast<const Derived *, const Base *>(
+            cppmsboost::serialization::smart_cast<const Derived *, const Base *>(
                 static_cast<const Base *>(t)
             );
         return d;
     }
     virtual void const * upcast(void const * const t) const {
         const Base * b =
-            boost::serialization::smart_cast<const Base *, const Derived *>(
+            cppmsboost::serialization::smart_cast<const Base *, const Derived *>(
                 static_cast<const Derived *>(t)
             );
         return b;
@@ -178,7 +178,7 @@ public:
 
 private:
     static std::ptrdiff_t base_offset() {
-        typename boost::aligned_storage<sizeof(Derived)>::type data;
+        typename cppmsboost::aligned_storage<sizeof(Derived)>::type data;
         return reinterpret_cast<char*>(&data)
              - reinterpret_cast<char*>(
                    static_cast<Base*>(
@@ -252,7 +252,7 @@ struct BOOST_SYMBOL_VISIBLE void_caster_base :
     public void_caster
 {
     typedef
-        typename mpl::eval_if<boost::is_virtual_base_of<Base,Derived>,
+        typename mpl::eval_if<cppmsboost::is_virtual_base_of<Base,Derived>,
             mpl::identity<
                 void_cast_detail::void_caster_virtual_base<Derived, Base>
             >
@@ -272,7 +272,7 @@ inline const void_cast_detail::void_caster & void_cast_register(
     Base const * /* bnull = NULL */
 ){
     typedef
-        typename mpl::eval_if<boost::is_virtual_base_of<Base,Derived>,
+        typename mpl::eval_if<cppmsboost::is_virtual_base_of<Base,Derived>,
             mpl::identity<
                 void_cast_detail::void_caster_virtual_base<Derived, Base>
             >
@@ -291,7 +291,7 @@ class BOOST_SYMBOL_VISIBLE void_caster :
 };
 
 } // namespace serialization
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #  pragma warning(pop)

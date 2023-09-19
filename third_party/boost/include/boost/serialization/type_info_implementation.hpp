@@ -26,7 +26,7 @@
 #include <boost/type_traits/is_base_and_derived.hpp>
 #include <boost/serialization/traits.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 
 // note that T and const T are folded into const T so that
@@ -41,7 +41,7 @@ struct type_info_implementation {
     // on basic traits below
     typedef
         typename mpl::eval_if<
-            is_base_and_derived<boost::serialization::basic_traits, T>,
+            is_base_and_derived<cppmsboost::serialization::basic_traits, T>,
             traits_class_typeinfo_implementation< T >,
         //else
             mpl::identity<
@@ -51,12 +51,12 @@ struct type_info_implementation {
 };
 
 } // namespace serialization
-} // namespace boost
+} // namespace cppmsboost
 
 // define a macro to assign a particular derivation of extended_type_info
 // to a specified a class.
 #define BOOST_CLASS_TYPE_INFO(T, ETI)              \
-namespace boost {                                  \
+namespace cppmsboost {                                  \
 namespace serialization {                          \
 template<>                                         \
 struct type_info_implementation< T > {             \

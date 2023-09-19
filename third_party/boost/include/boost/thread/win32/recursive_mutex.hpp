@@ -19,20 +19,20 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     class recursive_mutex:
-        public ::boost::detail::basic_recursive_mutex
+        public ::cppmsboost::detail::basic_recursive_mutex
     {
     public:
         BOOST_THREAD_NO_COPYABLE(recursive_mutex)
         recursive_mutex()
         {
-            ::boost::detail::basic_recursive_mutex::initialize();
+            ::cppmsboost::detail::basic_recursive_mutex::initialize();
         }
         ~recursive_mutex()
         {
-            ::boost::detail::basic_recursive_mutex::destroy();
+            ::cppmsboost::detail::basic_recursive_mutex::destroy();
         }
 
 #if defined BOOST_THREAD_PROVIDES_NESTED_LOCKS
@@ -44,17 +44,17 @@ namespace boost
     typedef recursive_mutex recursive_try_mutex;
 
     class recursive_timed_mutex:
-        public ::boost::detail::basic_recursive_timed_mutex
+        public ::cppmsboost::detail::basic_recursive_timed_mutex
     {
     public:
         BOOST_THREAD_NO_COPYABLE(recursive_timed_mutex)
         recursive_timed_mutex()
         {
-            ::boost::detail::basic_recursive_timed_mutex::initialize();
+            ::cppmsboost::detail::basic_recursive_timed_mutex::initialize();
         }
         ~recursive_timed_mutex()
         {
-            ::boost::detail::basic_recursive_timed_mutex::destroy();
+            ::cppmsboost::detail::basic_recursive_timed_mutex::destroy();
         }
 
 #if defined BOOST_THREAD_PROVIDES_NESTED_LOCKS

@@ -61,7 +61,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace error {
 
@@ -225,27 +225,27 @@ enum misc_errors
   fd_set_failure
 };
 
-inline const boost::system::error_category& get_system_category()
+inline const cppmsboost::system::error_category& get_system_category()
 {
-  return boost::system::system_category();
+  return cppmsboost::system::system_category();
 }
 
 #if !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
 
 extern BOOST_ASIO_DECL
-const boost::system::error_category& get_netdb_category();
+const cppmsboost::system::error_category& get_netdb_category();
 
 extern BOOST_ASIO_DECL
-const boost::system::error_category& get_addrinfo_category();
+const cppmsboost::system::error_category& get_addrinfo_category();
 
 #else // !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
 
-inline const boost::system::error_category& get_netdb_category()
+inline const cppmsboost::system::error_category& get_netdb_category()
 {
   return get_system_category();
 }
 
-inline const boost::system::error_category& get_addrinfo_category()
+inline const cppmsboost::system::error_category& get_addrinfo_category()
 {
   return get_system_category();
 }
@@ -253,76 +253,76 @@ inline const boost::system::error_category& get_addrinfo_category()
 #endif // !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
 
 extern BOOST_ASIO_DECL
-const boost::system::error_category& get_misc_category();
+const cppmsboost::system::error_category& get_misc_category();
 
-static const boost::system::error_category&
+static const cppmsboost::system::error_category&
   system_category BOOST_ASIO_UNUSED_VARIABLE
-  = boost::asio::error::get_system_category();
-static const boost::system::error_category&
+  = cppmsboost::asio::error::get_system_category();
+static const cppmsboost::system::error_category&
   netdb_category BOOST_ASIO_UNUSED_VARIABLE
-  = boost::asio::error::get_netdb_category();
-static const boost::system::error_category&
+  = cppmsboost::asio::error::get_netdb_category();
+static const cppmsboost::system::error_category&
   addrinfo_category BOOST_ASIO_UNUSED_VARIABLE
-  = boost::asio::error::get_addrinfo_category();
-static const boost::system::error_category&
+  = cppmsboost::asio::error::get_addrinfo_category();
+static const cppmsboost::system::error_category&
   misc_category BOOST_ASIO_UNUSED_VARIABLE
-  = boost::asio::error::get_misc_category();
+  = cppmsboost::asio::error::get_misc_category();
 
 } // namespace error
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
-namespace boost {
+namespace cppmsboost {
 namespace system {
 
-template<> struct is_error_code_enum<boost::asio::error::basic_errors>
+template<> struct is_error_code_enum<cppmsboost::asio::error::basic_errors>
 {
   static const bool value = true;
 };
 
-template<> struct is_error_code_enum<boost::asio::error::netdb_errors>
+template<> struct is_error_code_enum<cppmsboost::asio::error::netdb_errors>
 {
   static const bool value = true;
 };
 
-template<> struct is_error_code_enum<boost::asio::error::addrinfo_errors>
+template<> struct is_error_code_enum<cppmsboost::asio::error::addrinfo_errors>
 {
   static const bool value = true;
 };
 
-template<> struct is_error_code_enum<boost::asio::error::misc_errors>
+template<> struct is_error_code_enum<cppmsboost::asio::error::misc_errors>
 {
   static const bool value = true;
 };
 
 } // namespace system
-} // namespace boost
+} // namespace cppmsboost
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace error {
 
-inline boost::system::error_code make_error_code(basic_errors e)
+inline cppmsboost::system::error_code make_error_code(basic_errors e)
 {
-  return boost::system::error_code(
+  return cppmsboost::system::error_code(
       static_cast<int>(e), get_system_category());
 }
 
-inline boost::system::error_code make_error_code(netdb_errors e)
+inline cppmsboost::system::error_code make_error_code(netdb_errors e)
 {
-  return boost::system::error_code(
+  return cppmsboost::system::error_code(
       static_cast<int>(e), get_netdb_category());
 }
 
-inline boost::system::error_code make_error_code(addrinfo_errors e)
+inline cppmsboost::system::error_code make_error_code(addrinfo_errors e)
 {
-  return boost::system::error_code(
+  return cppmsboost::system::error_code(
       static_cast<int>(e), get_addrinfo_category());
 }
 
-inline boost::system::error_code make_error_code(misc_errors e)
+inline cppmsboost::system::error_code make_error_code(misc_errors e)
 {
-  return boost::system::error_code(
+  return cppmsboost::system::error_code(
       static_cast<int>(e), get_misc_category());
 }
 
@@ -344,7 +344,7 @@ namespace resolver_errc {
   using error::service_not_found;
 } // namespace resolver_errc
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

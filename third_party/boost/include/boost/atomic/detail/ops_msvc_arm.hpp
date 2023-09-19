@@ -40,7 +40,7 @@
 #define BOOST_ATOMIC_DETAIL_ARM_STORE32(p, v) __iso_volatile_store32((volatile __int32*)(p), (__int32)(v))
 #define BOOST_ATOMIC_DETAIL_ARM_STORE64(p, v) __iso_volatile_store64((volatile __int64*)(p), (__int64)(v))
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -112,7 +112,7 @@ struct msvc_arm_operations :
 
     static BOOST_FORCEINLINE storage_type fetch_sub(storage_type volatile& storage, storage_type v, memory_order order) BOOST_NOEXCEPT
     {
-        typedef typename boost::atomics::detail::make_signed< storage_type >::type signed_storage_type;
+        typedef typename cppmsboost::atomics::detail::make_signed< storage_type >::type signed_storage_type;
         return Derived::fetch_add(storage, static_cast< storage_type >(-static_cast< signed_storage_type >(v)), order);
     }
 
@@ -810,7 +810,7 @@ BOOST_FORCEINLINE void signal_fence(memory_order order) BOOST_NOEXCEPT
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #undef BOOST_ATOMIC_DETAIL_ARM_LOAD8
 #undef BOOST_ATOMIC_DETAIL_ARM_LOAD16

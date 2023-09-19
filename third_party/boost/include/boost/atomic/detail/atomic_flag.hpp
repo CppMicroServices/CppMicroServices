@@ -31,7 +31,7 @@
  *                      see comment for convert_memory_order_to_gcc in ops_gcc_atomic.hpp.
  */
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 
 #if defined(BOOST_ATOMIC_DETAIL_NO_CXX11_CONSTEXPR_UNION_INIT) || defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
@@ -52,7 +52,7 @@ struct atomic_flag
     union
     {
         storage_type m_storage;
-        boost::type_with_alignment< operations::storage_alignment >::type m_aligner;
+        cppmsboost::type_with_alignment< operations::storage_alignment >::type m_aligner;
     };
 #endif
 
@@ -85,6 +85,6 @@ struct atomic_flag
 };
 
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ATOMIC_DETAIL_ATOMIC_FLAG_HPP_INCLUDED_

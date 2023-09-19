@@ -21,7 +21,7 @@
 #include <boost/date_time/compiler_config.hpp>
 
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
   //!Provides generalized period type useful in date-time systems
   /*!This template uses a class to represent a time point within the period
@@ -50,8 +50,8 @@ namespace date_time {
    */
   template<class point_rep, class duration_rep>
   class BOOST_SYMBOL_VISIBLE period : private
-      boost::less_than_comparable<period<point_rep, duration_rep> 
-    , boost::equality_comparable< period<point_rep, duration_rep> 
+      cppmsboost::less_than_comparable<period<point_rep, duration_rep> 
+    , cppmsboost::equality_comparable< period<point_rep, duration_rep> 
     > >
   {
   public:

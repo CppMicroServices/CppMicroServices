@@ -24,7 +24,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Time traits suitable for use with the deadline timer.
@@ -33,21 +33,21 @@ struct time_traits;
 
 /// Time traits specialised for posix_time.
 template <>
-struct time_traits<boost::posix_time::ptime>
+struct time_traits<cppmsboost::posix_time::ptime>
 {
   /// The time type.
-  typedef boost::posix_time::ptime time_type;
+  typedef cppmsboost::posix_time::ptime time_type;
 
   /// The duration type.
-  typedef boost::posix_time::time_duration duration_type;
+  typedef cppmsboost::posix_time::time_duration duration_type;
 
   /// Get the current time.
   static time_type now()
   {
 #if defined(BOOST_DATE_TIME_HAS_HIGH_PRECISION_CLOCK)
-    return boost::posix_time::microsec_clock::universal_time();
+    return cppmsboost::posix_time::microsec_clock::universal_time();
 #else // defined(BOOST_DATE_TIME_HAS_HIGH_PRECISION_CLOCK)
-    return boost::posix_time::second_clock::universal_time();
+    return cppmsboost::posix_time::second_clock::universal_time();
 #endif // defined(BOOST_DATE_TIME_HAS_HIGH_PRECISION_CLOCK)
   }
 
@@ -70,7 +70,7 @@ struct time_traits<boost::posix_time::ptime>
   }
 
   /// Convert to POSIX duration type.
-  static boost::posix_time::time_duration to_posix_duration(
+  static cppmsboost::posix_time::time_duration to_posix_duration(
       const duration_type& d)
   {
     return d;
@@ -78,7 +78,7 @@ struct time_traits<boost::posix_time::ptime>
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -24,7 +24,7 @@
  * formatters_limited.hpp
  */
 
-namespace boost {
+namespace cppmsboost {
 namespace gregorian {
 
   // wrapper function for to_simple_(w)string(date)

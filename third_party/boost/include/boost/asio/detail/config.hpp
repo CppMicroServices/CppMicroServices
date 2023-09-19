@@ -1426,7 +1426,7 @@
 # define BOOST_ASIO_SYNC_OP_VOID void
 # define BOOST_ASIO_SYNC_OP_VOID_RETURN(e) return
 #else // defined(BOOST_ASIO_NO_DEPRECATED)
-# define BOOST_ASIO_SYNC_OP_VOID boost::system::error_code
+# define BOOST_ASIO_SYNC_OP_VOID cppmsboost::system::error_code
 # define BOOST_ASIO_SYNC_OP_VOID_RETURN(e) return e
 #endif // defined(BOOST_ASIO_NO_DEPRECATED)
 

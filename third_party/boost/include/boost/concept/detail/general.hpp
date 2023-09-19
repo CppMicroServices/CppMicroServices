@@ -15,7 +15,7 @@
 
 // This implementation works on Comeau and GCC, all the way back to
 // 2.95
-namespace boost { namespace concepts {
+namespace cppmsboost { namespace concepts {
 
 template <class ModelFn>
 struct requirement_;
@@ -49,7 +49,7 @@ struct constraint
   
 template <class Model>
 struct requirement_<void(*)(Model)>
-  : boost::conditional<
+  : cppmsboost::conditional<
         concepts::not_satisfied<Model>::value
       , constraint<Model>
       , requirement<failed ************ Model::************>
@@ -67,8 +67,8 @@ struct requirement_<void(*)(Model)>
 # endif
 
 #  define BOOST_CONCEPT_ASSERT_FN( ModelFnPtr )             \
-    typedef ::boost::concepts::detail::instantiate<          \
-    &::boost::concepts::requirement_<ModelFnPtr>::failed>    \
+    typedef ::cppmsboost::concepts::detail::instantiate<          \
+    &::cppmsboost::concepts::requirement_<ModelFnPtr>::failed>    \
       BOOST_PP_CAT(boost_concept_check,__LINE__)             \
       BOOST_ATTRIBUTE_UNUSED
 

@@ -22,7 +22,7 @@
 #include <boost/config.hpp>
 #include <boost/is_placeholder.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 template<bool Eq> struct _arg_eq
@@ -64,6 +64,6 @@ template< int I > struct is_placeholder< arg<I> (*) () >
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_BIND_ARG_HPP_INCLUDED

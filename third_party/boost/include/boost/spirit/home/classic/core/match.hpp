@@ -21,7 +21,7 @@
 #include <boost/type_traits/conditional.hpp>
 #include <boost/type_traits/is_reference.hpp>
 
-namespace boost { namespace spirit {
+namespace cppmsboost { namespace spirit {
 
 BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 
@@ -75,7 +75,7 @@ BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 
     public:
 
-        typedef typename boost::optional<T> optional_type;
+        typedef typename cppmsboost::optional<T> optional_type;
         typedef attr_ref_t ctor_param_t;
         typedef attr_ref_t return_t;
         typedef T attr_t;

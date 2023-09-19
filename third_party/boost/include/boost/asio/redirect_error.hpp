@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Completion token type used to specify that an error produced by an
@@ -37,7 +37,7 @@ public:
   /// Constructor. 
   template <typename T>
   redirect_error_t(BOOST_ASIO_MOVE_ARG(T) completion_token,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
     : token_(BOOST_ASIO_MOVE_CAST(T)(completion_token)),
       ec_(ec)
   {
@@ -45,21 +45,21 @@ public:
 
 //private:
   CompletionToken token_;
-  boost::system::error_code& ec_;
+  cppmsboost::system::error_code& ec_;
 };
 
 /// Create a completion token to capture error_code values to a variable.
 template <typename CompletionToken>
 inline redirect_error_t<typename decay<CompletionToken>::type> redirect_error(
     BOOST_ASIO_MOVE_ARG(CompletionToken) completion_token,
-    boost::system::error_code& ec)
+    cppmsboost::system::error_code& ec)
 {
   return redirect_error_t<typename decay<CompletionToken>::type>(
       BOOST_ASIO_MOVE_CAST(CompletionToken)(completion_token), ec);
 }
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

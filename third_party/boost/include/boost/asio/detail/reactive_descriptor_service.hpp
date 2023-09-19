@@ -38,7 +38,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -51,7 +51,7 @@ public:
 
   // The implementation type of the descriptor.
   class implementation_type
-    : private boost::asio::detail::noncopyable
+    : private cppmsboost::asio::detail::noncopyable
   {
   public:
     // Default constructor.
@@ -97,9 +97,9 @@ public:
   BOOST_ASIO_DECL void destroy(implementation_type& impl);
 
   // Assign a native descriptor to a descriptor implementation.
-  BOOST_ASIO_DECL boost::system::error_code assign(implementation_type& impl,
+  BOOST_ASIO_DECL cppmsboost::system::error_code assign(implementation_type& impl,
       const native_handle_type& native_descriptor,
-      boost::system::error_code& ec);
+      cppmsboost::system::error_code& ec);
 
   // Determine whether the descriptor is open.
   bool is_open(const implementation_type& impl) const
@@ -108,8 +108,8 @@ public:
   }
 
   // Destroy a descriptor implementation.
-  BOOST_ASIO_DECL boost::system::error_code close(implementation_type& impl,
-      boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code close(implementation_type& impl,
+      cppmsboost::system::error_code& ec);
 
   // Get the native descriptor representation.
   native_handle_type native_handle(const implementation_type& impl) const
@@ -121,13 +121,13 @@ public:
   BOOST_ASIO_DECL native_handle_type release(implementation_type& impl);
 
   // Cancel all operations associated with the descriptor.
-  BOOST_ASIO_DECL boost::system::error_code cancel(implementation_type& impl,
-      boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code cancel(implementation_type& impl,
+      cppmsboost::system::error_code& ec);
 
   // Perform an IO control command on the descriptor.
   template <typename IO_Control_Command>
-  boost::system::error_code io_control(implementation_type& impl,
-      IO_Control_Command& command, boost::system::error_code& ec)
+  cppmsboost::system::error_code io_control(implementation_type& impl,
+      IO_Control_Command& command, cppmsboost::system::error_code& ec)
   {
     descriptor_ops::ioctl(impl.descriptor_, impl.state_,
         command.name(), static_cast<ioctl_arg_type*>(command.data()), ec);
@@ -141,8 +141,8 @@ public:
   }
 
   // Sets the non-blocking mode of the descriptor.
-  boost::system::error_code non_blocking(implementation_type& impl,
-      bool mode, boost::system::error_code& ec)
+  cppmsboost::system::error_code non_blocking(implementation_type& impl,
+      bool mode, cppmsboost::system::error_code& ec)
   {
     descriptor_ops::set_user_non_blocking(
         impl.descriptor_, impl.state_, mode, ec);
@@ -156,8 +156,8 @@ public:
   }
 
   // Sets the non-blocking mode of the native descriptor implementation.
-  boost::system::error_code native_non_blocking(implementation_type& impl,
-      bool mode, boost::system::error_code& ec)
+  cppmsboost::system::error_code native_non_blocking(implementation_type& impl,
+      bool mode, cppmsboost::system::error_code& ec)
   {
     descriptor_ops::set_internal_non_blocking(
         impl.descriptor_, impl.state_, mode, ec);
@@ -166,8 +166,8 @@ public:
 
   // Wait for the descriptor to become ready to read, ready to write, or to have
   // pending error conditions.
-  boost::system::error_code wait(implementation_type& impl,
-      posix::descriptor_base::wait_type w, boost::system::error_code& ec)
+  cppmsboost::system::error_code wait(implementation_type& impl,
+      posix::descriptor_base::wait_type w, cppmsboost::system::error_code& ec)
   {
     switch (w)
     {
@@ -181,7 +181,7 @@ public:
       descriptor_ops::poll_error(impl.descriptor_, impl.state_, ec);
       break;
     default:
-      ec = boost::asio::error::invalid_argument;
+      ec = cppmsboost::asio::error::invalid_argument;
       break;
     }
 
@@ -196,11 +196,11 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_wait_op<Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(handler, io_ex);
 
@@ -220,7 +220,7 @@ public:
         op_type = reactor::except_op;
         break;
       default:
-        p.p->ec_ = boost::asio::error::invalid_argument;
+        p.p->ec_ = cppmsboost::asio::error::invalid_argument;
         reactor_.post_immediate_completion(p.p, is_continuation);
         p.v = p.p = 0;
         return;
@@ -233,9 +233,9 @@ public:
   // Write some data to the descriptor.
   template <typename ConstBufferSequence>
   size_t write_some(implementation_type& impl,
-      const ConstBufferSequence& buffers, boost::system::error_code& ec)
+      const ConstBufferSequence& buffers, cppmsboost::system::error_code& ec)
   {
-    buffer_sequence_adapter<boost::asio::const_buffer,
+    buffer_sequence_adapter<cppmsboost::asio::const_buffer,
         ConstBufferSequence> bufs(buffers);
 
     return descriptor_ops::sync_write(impl.descriptor_, impl.state_,
@@ -244,7 +244,7 @@ public:
 
   // Wait until data can be written without blocking.
   size_t write_some(implementation_type& impl,
-      const null_buffers&, boost::system::error_code& ec)
+      const null_buffers&, cppmsboost::system::error_code& ec)
   {
     // Wait for descriptor to become ready.
     descriptor_ops::poll_write(impl.descriptor_, impl.state_, ec);
@@ -260,11 +260,11 @@ public:
       const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef descriptor_write_op<ConstBufferSequence, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.descriptor_, buffers, handler, io_ex);
 
@@ -272,7 +272,7 @@ public:
           &impl, impl.descriptor_, "async_write_some"));
 
     start_op(impl, reactor::write_op, p.p, is_continuation, true,
-        buffer_sequence_adapter<boost::asio::const_buffer,
+        buffer_sequence_adapter<cppmsboost::asio::const_buffer,
           ConstBufferSequence>::all_empty(buffers));
     p.v = p.p = 0;
   }
@@ -283,11 +283,11 @@ public:
       const null_buffers&, Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_null_buffers_op<Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(handler, io_ex);
 
@@ -301,9 +301,9 @@ public:
   // Read some data from the stream. Returns the number of bytes read.
   template <typename MutableBufferSequence>
   size_t read_some(implementation_type& impl,
-      const MutableBufferSequence& buffers, boost::system::error_code& ec)
+      const MutableBufferSequence& buffers, cppmsboost::system::error_code& ec)
   {
-    buffer_sequence_adapter<boost::asio::mutable_buffer,
+    buffer_sequence_adapter<cppmsboost::asio::mutable_buffer,
         MutableBufferSequence> bufs(buffers);
 
     return descriptor_ops::sync_read(impl.descriptor_, impl.state_,
@@ -312,7 +312,7 @@ public:
 
   // Wait until data can be read without blocking.
   size_t read_some(implementation_type& impl,
-      const null_buffers&, boost::system::error_code& ec)
+      const null_buffers&, cppmsboost::system::error_code& ec)
   {
     // Wait for descriptor to become ready.
     descriptor_ops::poll_read(impl.descriptor_, impl.state_, ec);
@@ -329,11 +329,11 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef descriptor_read_op<MutableBufferSequence, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.descriptor_, buffers, handler, io_ex);
 
@@ -341,7 +341,7 @@ public:
           &impl, impl.descriptor_, "async_read_some"));
 
     start_op(impl, reactor::read_op, p.p, is_continuation, true,
-        buffer_sequence_adapter<boost::asio::mutable_buffer,
+        buffer_sequence_adapter<cppmsboost::asio::mutable_buffer,
           MutableBufferSequence>::all_empty(buffers));
     p.v = p.p = 0;
   }
@@ -352,11 +352,11 @@ public:
       const null_buffers&, Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_null_buffers_op<Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(handler, io_ex);
 
@@ -378,7 +378,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

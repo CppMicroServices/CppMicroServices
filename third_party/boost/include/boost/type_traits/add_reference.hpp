@@ -12,7 +12,7 @@
 #include <boost/detail/workaround.hpp>
 #include <boost/config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 namespace detail {
 
@@ -39,7 +39,7 @@ struct add_reference_impl<T&&>
 
 template <class T> struct add_reference
 {
-   typedef typename boost::detail::add_reference_impl<T>::type type;
+   typedef typename cppmsboost::detail::add_reference_impl<T>::type type;
 };
 template <class T> struct add_reference<T&>
 {
@@ -61,6 +61,6 @@ template <class T> using add_reference_t = typename add_reference<T>::type;
 #endif
 
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_ADD_REFERENCE_HPP_INCLUDED

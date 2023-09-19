@@ -26,7 +26,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace windows {
 
@@ -123,7 +123,7 @@ public:
   }
 
   /// Post completion notification for overlapped operation. Releases ownership.
-  void complete(const boost::system::error_code& ec,
+  void complete(const cppmsboost::system::error_code& ec,
       std::size_t bytes_transferred)
   {
     impl_.complete(ec, bytes_transferred);
@@ -135,7 +135,7 @@ private:
 
 } // namespace windows
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

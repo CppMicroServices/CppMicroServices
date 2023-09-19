@@ -55,7 +55,7 @@
 #pragma warning(disable:4251)
 #endif
 
-namespace boost
+namespace cppmsboost
 {
 
     namespace detail
@@ -70,7 +70,7 @@ namespace boost
       public:
           BOOST_THREAD_NO_COPYABLE(thread_data)
             thread_data(BOOST_THREAD_RV_REF(F) f_, BOOST_THREAD_RV_REF(ArgTypes)... args_):
-              fp(boost::forward<F>(f_), boost::forward<ArgTypes>(args_)...)
+              fp(cppmsboost::forward<F>(f_), cppmsboost::forward<ArgTypes>(args_)...)
             {}
           template <std::size_t ...Indices>
           void run2(tuple_indices<Indices...>)
@@ -98,7 +98,7 @@ namespace boost
             BOOST_THREAD_NO_COPYABLE(thread_data)
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
               thread_data(BOOST_THREAD_RV_REF(F) f_):
-                f(boost::forward<F>(f_))
+                f(cppmsboost::forward<F>(f_))
               {}
 // This overloading must be removed if we want the packaged_task's tests to pass.
 //            thread_data(F& f_):
@@ -125,14 +125,14 @@ namespace boost
         };
 
         template<typename F>
-        class thread_data<boost::reference_wrapper<F> >:
+        class thread_data<cppmsboost::reference_wrapper<F> >:
             public detail::thread_data_base
         {
         private:
             F& f;
         public:
             BOOST_THREAD_NO_COPYABLE(thread_data)
-            thread_data(boost::reference_wrapper<F> f_):
+            thread_data(cppmsboost::reference_wrapper<F> f_):
                 f(f_)
             {}
             void run()
@@ -142,14 +142,14 @@ namespace boost
         };
 
         template<typename F>
-        class thread_data<const boost::reference_wrapper<F> >:
+        class thread_data<const cppmsboost::reference_wrapper<F> >:
             public detail::thread_data_base
         {
         private:
             F& f;
         public:
             BOOST_THREAD_NO_COPYABLE(thread_data)
-            thread_data(const boost::reference_wrapper<F> f_):
+            thread_data(const cppmsboost::reference_wrapper<F> f_):
                 f(f_)
             {}
             void run()
@@ -181,14 +181,14 @@ namespace boost
         {
           if (!start_thread_noexcept())
           {
-            boost::throw_exception(thread_resource_error());
+            cppmsboost::throw_exception(thread_resource_error());
           }
         }
         void start_thread(const attributes& attr)
         {
           if (!start_thread_noexcept(attr))
           {
-            boost::throw_exception(thread_resource_error());
+            cppmsboost::throw_exception(thread_resource_error());
           }
         }
 
@@ -202,9 +202,9 @@ namespace boost
         static inline detail::thread_data_ptr make_thread_info(BOOST_THREAD_RV_REF(F) f, BOOST_THREAD_RV_REF(ArgTypes)... args)
         {
             return detail::thread_data_ptr(detail::heap_new<
-                  detail::thread_data<typename boost::remove_reference<F>::type, ArgTypes...>
+                  detail::thread_data<typename cppmsboost::remove_reference<F>::type, ArgTypes...>
                   >(
-                    boost::forward<F>(f), boost::forward<ArgTypes>(args)...
+                    cppmsboost::forward<F>(f), cppmsboost::forward<ArgTypes>(args)...
                   )
                 );
         }
@@ -212,20 +212,20 @@ namespace boost
         template<typename F>
         static inline detail::thread_data_ptr make_thread_info(BOOST_THREAD_RV_REF(F) f)
         {
-            return detail::thread_data_ptr(detail::heap_new<detail::thread_data<typename boost::remove_reference<F>::type> >(
-                boost::forward<F>(f)));
+            return detail::thread_data_ptr(detail::heap_new<detail::thread_data<typename cppmsboost::remove_reference<F>::type> >(
+                cppmsboost::forward<F>(f)));
         }
 #endif
         static inline detail::thread_data_ptr make_thread_info(void (*f)())
         {
             return detail::thread_data_ptr(detail::heap_new<detail::thread_data<void(*)()> >(
-                boost::forward<void(*)()>(f)));
+                cppmsboost::forward<void(*)()>(f)));
         }
 #else
         template<typename F>
         static inline detail::thread_data_ptr make_thread_info(F f
             , typename disable_if_c<
-                //boost::thread_detail::is_convertible<F&,BOOST_THREAD_RV_REF(F)>::value ||
+                //cppmsboost::thread_detail::is_convertible<F&,BOOST_THREAD_RV_REF(F)>::value ||
                 is_same<typename decay<F>::type, thread>::value,
                 dummy* >::type=0
                 )
@@ -264,7 +264,7 @@ namespace boost
         explicit thread(BOOST_THREAD_RV_REF(F) f
         //, typename disable_if<is_same<typename decay<F>::type, thread>, dummy* >::type=0
         ):
-          thread_info(make_thread_info(thread_detail::decay_copy(boost::forward<F>(f))))
+          thread_info(make_thread_info(thread_detail::decay_copy(cppmsboost::forward<F>(f))))
         {
             start_thread();
         }
@@ -272,7 +272,7 @@ namespace boost
           class F
         >
         thread(attributes const& attrs, BOOST_THREAD_RV_REF(F) f):
-          thread_info(make_thread_info(thread_detail::decay_copy(boost::forward<F>(f))))
+          thread_info(make_thread_info(thread_detail::decay_copy(cppmsboost::forward<F>(f))))
         {
             start_thread(attrs);
         }
@@ -295,8 +295,8 @@ namespace boost
         template <class F>
         explicit thread(F f
         , typename disable_if_c<
-        boost::thread_detail::is_rv<F>::value // todo as a thread_detail::is_rv
-        //boost::thread_detail::is_convertible<F&,BOOST_THREAD_RV_REF(F)>::value
+        cppmsboost::thread_detail::is_rv<F>::value // todo as a thread_detail::is_rv
+        //cppmsboost::thread_detail::is_convertible<F&,BOOST_THREAD_RV_REF(F)>::value
             //|| is_same<typename decay<F>::type, thread>::value
            , dummy* >::type=0
         ):
@@ -306,8 +306,8 @@ namespace boost
         }
         template <class F>
         thread(attributes const& attrs, F f
-            , typename disable_if<boost::thread_detail::is_rv<F>, dummy* >::type=0
-            //, typename disable_if<boost::thread_detail::is_convertible<F&,BOOST_THREAD_RV_REF(F) >, dummy* >::type=0
+            , typename disable_if<cppmsboost::thread_detail::is_rv<F>, dummy* >::type=0
+            //, typename disable_if<cppmsboost::thread_detail::is_convertible<F&,BOOST_THREAD_RV_REF(F) >, dummy* >::type=0
         ):
             thread_info(make_thread_info(f))
         {
@@ -319,7 +319,7 @@ namespace boost
         , typename disable_if<is_same<typename decay<F>::type, thread>, dummy* >::type=0
         ):
 #ifdef BOOST_THREAD_USES_MOVE
-        thread_info(make_thread_info(boost::move<F>(f))) // todo : Add forward
+        thread_info(make_thread_info(cppmsboost::move<F>(f))) // todo : Add forward
 #else
         thread_info(make_thread_info(f)) // todo : Add forward
 #endif
@@ -330,7 +330,7 @@ namespace boost
         template <class F>
         thread(attributes const& attrs, BOOST_THREAD_RV_REF(F) f):
 #ifdef BOOST_THREAD_USES_MOVE
-            thread_info(make_thread_info(boost::move<F>(f))) // todo : Add forward
+            thread_info(make_thread_info(cppmsboost::move<F>(f))) // todo : Add forward
 #else
             thread_info(make_thread_info(f)) // todo : Add forward
 #endif
@@ -370,9 +370,9 @@ namespace boost
         template <class F, class Arg, class ...Args>
         thread(F&& f, Arg&& arg, Args&&... args) :
           thread_info(make_thread_info(
-              thread_detail::decay_copy(boost::forward<F>(f)),
-              thread_detail::decay_copy(boost::forward<Arg>(arg)),
-              thread_detail::decay_copy(boost::forward<Args>(args))...)
+              thread_detail::decay_copy(cppmsboost::forward<F>(f)),
+              thread_detail::decay_copy(cppmsboost::forward<Arg>(arg)),
+              thread_detail::decay_copy(cppmsboost::forward<Args>(args))...)
           )
 
         {
@@ -381,9 +381,9 @@ namespace boost
         template <class F, class Arg, class ...Args>
         thread(attributes const& attrs, F&& f, Arg&& arg, Args&&... args) :
           thread_info(make_thread_info(
-              thread_detail::decay_copy(boost::forward<F>(f)),
-              thread_detail::decay_copy(boost::forward<Arg>(arg)),
-              thread_detail::decay_copy(boost::forward<Args>(args))...)
+              thread_detail::decay_copy(cppmsboost::forward<F>(f)),
+              thread_detail::decay_copy(cppmsboost::forward<Arg>(arg)),
+              thread_detail::decay_copy(cppmsboost::forward<Args>(args))...)
           )
 
         {
@@ -391,63 +391,63 @@ namespace boost
         }
 #else
         template <class F,class A1>
-        thread(F f,A1 a1,typename disable_if<boost::thread_detail::is_convertible<F&,thread_attributes >, dummy* >::type=0):
-            thread_info(make_thread_info(boost::bind(boost::type<void>(),f,a1)))
+        thread(F f,A1 a1,typename disable_if<cppmsboost::thread_detail::is_convertible<F&,thread_attributes >, dummy* >::type=0):
+            thread_info(make_thread_info(cppmsboost::bind(cppmsboost::type<void>(),f,a1)))
         {
             start_thread();
         }
         template <class F,class A1,class A2>
         thread(F f,A1 a1,A2 a2):
-            thread_info(make_thread_info(boost::bind(boost::type<void>(),f,a1,a2)))
+            thread_info(make_thread_info(cppmsboost::bind(cppmsboost::type<void>(),f,a1,a2)))
         {
             start_thread();
         }
 
         template <class F,class A1,class A2,class A3>
         thread(F f,A1 a1,A2 a2,A3 a3):
-            thread_info(make_thread_info(boost::bind(boost::type<void>(),f,a1,a2,a3)))
+            thread_info(make_thread_info(cppmsboost::bind(cppmsboost::type<void>(),f,a1,a2,a3)))
         {
             start_thread();
         }
 
         template <class F,class A1,class A2,class A3,class A4>
         thread(F f,A1 a1,A2 a2,A3 a3,A4 a4):
-            thread_info(make_thread_info(boost::bind(boost::type<void>(),f,a1,a2,a3,a4)))
+            thread_info(make_thread_info(cppmsboost::bind(cppmsboost::type<void>(),f,a1,a2,a3,a4)))
         {
             start_thread();
         }
 
         template <class F,class A1,class A2,class A3,class A4,class A5>
         thread(F f,A1 a1,A2 a2,A3 a3,A4 a4,A5 a5):
-            thread_info(make_thread_info(boost::bind(boost::type<void>(),f,a1,a2,a3,a4,a5)))
+            thread_info(make_thread_info(cppmsboost::bind(cppmsboost::type<void>(),f,a1,a2,a3,a4,a5)))
         {
             start_thread();
         }
 
         template <class F,class A1,class A2,class A3,class A4,class A5,class A6>
         thread(F f,A1 a1,A2 a2,A3 a3,A4 a4,A5 a5,A6 a6):
-            thread_info(make_thread_info(boost::bind(boost::type<void>(),f,a1,a2,a3,a4,a5,a6)))
+            thread_info(make_thread_info(cppmsboost::bind(cppmsboost::type<void>(),f,a1,a2,a3,a4,a5,a6)))
         {
             start_thread();
         }
 
         template <class F,class A1,class A2,class A3,class A4,class A5,class A6,class A7>
         thread(F f,A1 a1,A2 a2,A3 a3,A4 a4,A5 a5,A6 a6,A7 a7):
-            thread_info(make_thread_info(boost::bind(boost::type<void>(),f,a1,a2,a3,a4,a5,a6,a7)))
+            thread_info(make_thread_info(cppmsboost::bind(cppmsboost::type<void>(),f,a1,a2,a3,a4,a5,a6,a7)))
         {
             start_thread();
         }
 
         template <class F,class A1,class A2,class A3,class A4,class A5,class A6,class A7,class A8>
         thread(F f,A1 a1,A2 a2,A3 a3,A4 a4,A5 a5,A6 a6,A7 a7,A8 a8):
-            thread_info(make_thread_info(boost::bind(boost::type<void>(),f,a1,a2,a3,a4,a5,a6,a7,a8)))
+            thread_info(make_thread_info(cppmsboost::bind(cppmsboost::type<void>(),f,a1,a2,a3,a4,a5,a6,a7,a8)))
         {
             start_thread();
         }
 
         template <class F,class A1,class A2,class A3,class A4,class A5,class A6,class A7,class A8,class A9>
         thread(F f,A1 a1,A2 a2,A3 a3,A4 a4,A5 a5,A6 a6,A7 a7,A8 a8,A9 a9):
-            thread_info(make_thread_info(boost::bind(boost::type<void>(),f,a1,a2,a3,a4,a5,a6,a7,a8,a9)))
+            thread_info(make_thread_info(cppmsboost::bind(cppmsboost::type<void>(),f,a1,a2,a3,a4,a5,a6,a7,a8,a9)))
         {
             start_thread();
         }
@@ -472,7 +472,7 @@ namespace boost
         template <class Duration>
         bool try_join_until(const chrono::time_point<detail::internal_chrono_clock, Duration>& t)
         {
-          return do_try_join_until(boost::detail::internal_platform_timepoint(t));
+          return do_try_join_until(cppmsboost::detail::internal_platform_timepoint(t));
         }
 
         template <class Clock, class Duration>
@@ -591,7 +591,7 @@ namespace boost
 #endif
 
 #if defined BOOST_THREAD_USES_DATETIME
-        inline BOOST_SYMBOL_VISIBLE void sleep(::boost::xtime const& abs_time)
+        inline BOOST_SYMBOL_VISIBLE void sleep(::cppmsboost::xtime const& abs_time)
         {
             sleep(system_time(abs_time));
         }
@@ -723,7 +723,7 @@ namespace boost
         #if defined BOOST_THREAD_PROVIDES_BASIC_THREAD_ID
              return pthread_self();
         #else
-            boost::detail::thread_data_base* const thread_info=get_or_make_current_thread_data();
+            cppmsboost::detail::thread_data_base* const thread_info=get_or_make_current_thread_data();
             return (thread_info?thread::id(thread_info->shared_from_this()):thread::id());
         #endif
         }
@@ -731,7 +731,7 @@ namespace boost
 #endif
     inline void thread::join() {
         if (this_thread::get_id() == get_id())
-          boost::throw_exception(thread_resource_error(static_cast<int>(system::errc::resource_deadlock_would_occur), "boost thread: trying joining itself"));
+          cppmsboost::throw_exception(thread_resource_error(static_cast<int>(system::errc::resource_deadlock_would_occur), "boost thread: trying joining itself"));
 
         BOOST_THREAD_VERIFY_PRECONDITION( join_noexcept(),
             thread_resource_error(static_cast<int>(system::errc::invalid_argument), "boost thread: thread not joinable")
@@ -741,7 +741,7 @@ namespace boost
     inline bool thread::do_try_join_until(detail::internal_platform_timepoint const &timeout)
     {
         if (this_thread::get_id() == get_id())
-          boost::throw_exception(thread_resource_error(static_cast<int>(system::errc::resource_deadlock_would_occur), "boost thread: trying joining itself"));
+          cppmsboost::throw_exception(thread_resource_error(static_cast<int>(system::errc::resource_deadlock_would_occur), "boost thread: trying joining itself"));
         bool res;
         if (do_try_join_until_noexcept(timeout, res))
         {
@@ -824,7 +824,7 @@ namespace boost
     namespace this_thread
     {
         template<typename F>
-        void at_thread_exit(F f)
+        void cppmsboostat_thread_exit(F f)
         {
             detail::thread_exit_function_base* const thread_exit_func=detail::heap_new<detail::thread_exit_function<F> >(f);
             detail::add_thread_exit_function(thread_exit_func);

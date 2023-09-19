@@ -25,13 +25,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
 /// Encapsulates the flags needed for UDP.
 /**
- * The boost::asio::ip::udp class contains flags necessary for UDP sockets.
+ * The cppmsboost::asio::ip::udp class contains flags necessary for UDP sockets.
  *
  * @par Thread Safety
  * @e Distinct @e objects: Safe.@n
@@ -106,7 +106,7 @@ private:
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

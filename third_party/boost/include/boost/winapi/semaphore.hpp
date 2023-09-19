@@ -21,74 +21,74 @@ extern "C" {
 #if BOOST_WINAPI_PARTITION_APP_SYSTEM
 #if !defined( BOOST_NO_ANSI_APIS )
 
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 CreateSemaphoreA(
     ::_SECURITY_ATTRIBUTES* lpSemaphoreAttributes,
-    boost::winapi::LONG_ lInitialCount,
-    boost::winapi::LONG_ lMaximumCount,
-    boost::winapi::LPCSTR_ lpName);
+    cppmsboost::winapi::LONG_ lInitialCount,
+    cppmsboost::winapi::LONG_ lMaximumCount,
+    cppmsboost::winapi::LPCSTR_ lpName);
 
 #if BOOST_USE_WINAPI_VERSION >= BOOST_WINAPI_VERSION_WIN6
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 CreateSemaphoreExA(
     ::_SECURITY_ATTRIBUTES* lpSemaphoreAttributes,
-    boost::winapi::LONG_ lInitialCount,
-    boost::winapi::LONG_ lMaximumCount,
-    boost::winapi::LPCSTR_ lpName,
-    boost::winapi::DWORD_ dwFlags,
-    boost::winapi::DWORD_ dwDesiredAccess);
+    cppmsboost::winapi::LONG_ lInitialCount,
+    cppmsboost::winapi::LONG_ lMaximumCount,
+    cppmsboost::winapi::LPCSTR_ lpName,
+    cppmsboost::winapi::DWORD_ dwFlags,
+    cppmsboost::winapi::DWORD_ dwDesiredAccess);
 #endif
 
 #endif // !defined( BOOST_NO_ANSI_APIS )
 
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 CreateSemaphoreW(
     ::_SECURITY_ATTRIBUTES* lpSemaphoreAttributes,
-    boost::winapi::LONG_ lInitialCount,
-    boost::winapi::LONG_ lMaximumCount,
-    boost::winapi::LPCWSTR_ lpName);
+    cppmsboost::winapi::LONG_ lInitialCount,
+    cppmsboost::winapi::LONG_ lMaximumCount,
+    cppmsboost::winapi::LPCWSTR_ lpName);
 
 #if BOOST_USE_WINAPI_VERSION >= BOOST_WINAPI_VERSION_WIN6
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 CreateSemaphoreExW(
     ::_SECURITY_ATTRIBUTES* lpSemaphoreAttributes,
-    boost::winapi::LONG_ lInitialCount,
-    boost::winapi::LONG_ lMaximumCount,
-    boost::winapi::LPCWSTR_ lpName,
-    boost::winapi::DWORD_ dwFlags,
-    boost::winapi::DWORD_ dwDesiredAccess);
+    cppmsboost::winapi::LONG_ lInitialCount,
+    cppmsboost::winapi::LONG_ lMaximumCount,
+    cppmsboost::winapi::LPCWSTR_ lpName,
+    cppmsboost::winapi::DWORD_ dwFlags,
+    cppmsboost::winapi::DWORD_ dwDesiredAccess);
 #endif
 
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
 ReleaseSemaphore(
-    boost::winapi::HANDLE_ hSemaphore,
-    boost::winapi::LONG_ lReleaseCount,
-    boost::winapi::LPLONG_ lpPreviousCount);
+    cppmsboost::winapi::HANDLE_ hSemaphore,
+    cppmsboost::winapi::LONG_ lReleaseCount,
+    cppmsboost::winapi::LPLONG_ lpPreviousCount);
 
 #endif // BOOST_WINAPI_PARTITION_APP_SYSTEM
 
 #if BOOST_WINAPI_PARTITION_DESKTOP_SYSTEM
 
 #if !defined( BOOST_NO_ANSI_APIS )
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 OpenSemaphoreA(
-    boost::winapi::DWORD_ dwDesiredAccess,
-    boost::winapi::BOOL_ bInheritHandle,
-    boost::winapi::LPCSTR_ lpName);
+    cppmsboost::winapi::DWORD_ dwDesiredAccess,
+    cppmsboost::winapi::BOOL_ bInheritHandle,
+    cppmsboost::winapi::LPCSTR_ lpName);
 #endif // !defined( BOOST_NO_ANSI_APIS )
 
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 OpenSemaphoreW(
-    boost::winapi::DWORD_ dwDesiredAccess,
-    boost::winapi::BOOL_ bInheritHandle,
-    boost::winapi::LPCWSTR_ lpName);
+    cppmsboost::winapi::DWORD_ dwDesiredAccess,
+    cppmsboost::winapi::BOOL_ bInheritHandle,
+    cppmsboost::winapi::LPCWSTR_ lpName);
 
 #endif // BOOST_WINAPI_PARTITION_DESKTOP_SYSTEM
 
 } // extern "C"
 #endif // !defined( BOOST_USE_WINDOWS_H )
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 
 #if BOOST_WINAPI_PARTITION_APP_SYSTEM

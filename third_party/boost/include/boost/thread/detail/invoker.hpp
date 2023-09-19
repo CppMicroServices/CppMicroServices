@@ -34,7 +34,7 @@
 
 #include <boost/thread/detail/variadic_header.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   namespace detail
   {
@@ -58,11 +58,11 @@ namespace boost
       template <class F, class ... As>
       BOOST_SYMBOL_VISIBLE
       explicit invoker(BOOST_THREAD_FWD_REF(F) f, BOOST_THREAD_FWD_REF(As)... args)
-      : f_(boost::forward<F>(f), boost::forward<As>(args)...)
+      : f_(cppmsboost::forward<F>(f), cppmsboost::forward<As>(args)...)
       {}
 
       BOOST_SYMBOL_VISIBLE
-      invoker(BOOST_THREAD_RV_REF(invoker) f) : f_(boost::move(BOOST_THREAD_RV(f).f_))
+      invoker(BOOST_THREAD_RV_REF(invoker) f) : f_(cppmsboost::move(BOOST_THREAD_RV(f).f_))
       {}
 
       BOOST_SYMBOL_VISIBLE
@@ -74,7 +74,7 @@ namespace boost
       {
         if (this != &f)
         {
-          f_ = boost::move(BOOST_THREAD_RV(f).f_);
+          f_ = cppmsboost::move(BOOST_THREAD_RV(f).f_);
         }
         return *this;
       }
@@ -99,7 +99,7 @@ namespace boost
       result_type
       execute(tuple_indices<Indices...>)
       {
-        return detail::invoke(boost::move(csbl::get<0>(f_)), boost::move(csbl::get<Indices>(f_))...);
+        return detail::invoke(cppmsboost::move(csbl::get<0>(f_)), cppmsboost::move(csbl::get<Indices>(f_))...);
       }
     };
 
@@ -119,11 +119,11 @@ namespace boost
       template <class F, class ... As>
       BOOST_SYMBOL_VISIBLE
       explicit invoker_ret(BOOST_THREAD_FWD_REF(F) f, BOOST_THREAD_FWD_REF(As)... args)
-      : f_(boost::forward<F>(f), boost::forward<As>(args)...)
+      : f_(cppmsboost::forward<F>(f), cppmsboost::forward<As>(args)...)
       {}
 
       BOOST_SYMBOL_VISIBLE
-      invoker_ret(BOOST_THREAD_RV_REF(invoker_ret) f) : f_(boost::move(BOOST_THREAD_RV(f).f_))
+      invoker_ret(BOOST_THREAD_RV_REF(invoker_ret) f) : f_(cppmsboost::move(BOOST_THREAD_RV(f).f_))
       {}
 
       result_type operator()()
@@ -136,7 +136,7 @@ namespace boost
       result_type
       execute(tuple_indices<Indices...>)
       {
-        return detail::invoke<R>(boost::move(csbl::get<0>(f_)), boost::move(csbl::get<Indices>(f_))...);
+        return detail::invoke<R>(cppmsboost::move(csbl::get<0>(f_)), cppmsboost::move(csbl::get<Indices>(f_))...);
       }
     };
   //BOOST_THREAD_DCL_MOVABLE_BEG(X) invoker<Fp> BOOST_THREAD_DCL_MOVABLE_END
@@ -149,14 +149,14 @@ namespace boost
 #define BOOST_THREAD_RV_REF_ARG(z, n, unused) , BOOST_THREAD_RV_REF(Arg##n) arg##n
 #define BOOST_THREAD_FWD_REF_A(z, n, unused)   , BOOST_THREAD_FWD_REF(A##n) arg##n
 #define BOOST_THREAD_FWD_REF_ARG(z, n, unused) , BOOST_THREAD_FWD_REF(Arg##n) arg##n
-#define BOOST_THREAD_FWD_PARAM(z, n, unused) , boost::forward<Arg##n>(arg##n)
-#define BOOST_THREAD_FWD_PARAM_A(z, n, unused) , boost::forward<A##n>(arg##n)
+#define BOOST_THREAD_FWD_PARAM(z, n, unused) , cppmsboost::forward<Arg##n>(arg##n)
+#define BOOST_THREAD_FWD_PARAM_A(z, n, unused) , cppmsboost::forward<A##n>(arg##n)
 #define BOOST_THREAD_DCL(z, n, unused) Arg##n v##n;
-#define BOOST_THREAD_MOVE_PARAM(z, n, unused) , v##n(boost::move(arg##n))
-#define BOOST_THREAD_FORWARD_PARAM_A(z, n, unused) , v##n(boost::forward<A##n>(arg##n))
-#define BOOST_THREAD_MOVE_RHS_PARAM(z, n, unused) , v##n(boost::move(x.v##n))
-#define BOOST_THREAD_MOVE_DCL(z, n, unused) , boost::move(v##n)
-#define BOOST_THREAD_MOVE_DCL_T(z, n, unused) BOOST_PP_COMMA_IF(n) boost::move(v##n)
+#define BOOST_THREAD_MOVE_PARAM(z, n, unused) , v##n(cppmsboost::move(arg##n))
+#define BOOST_THREAD_FORWARD_PARAM_A(z, n, unused) , v##n(cppmsboost::forward<A##n>(arg##n))
+#define BOOST_THREAD_MOVE_RHS_PARAM(z, n, unused) , v##n(cppmsboost::move(x.v##n))
+#define BOOST_THREAD_MOVE_DCL(z, n, unused) , cppmsboost::move(v##n)
+#define BOOST_THREAD_MOVE_DCL_T(z, n, unused) BOOST_PP_COMMA_IF(n) cppmsboost::move(v##n)
 #define BOOST_THREAD_ARG_DEF(z, n, unused) , class Arg##n = tuples::null_type
 
   template  <class Fp, class Arg = tuples::null_type
@@ -179,18 +179,18 @@ namespace boost
       explicit invoker(BOOST_THREAD_FWD_REF(F) f \
           BOOST_PP_REPEAT(n, BOOST_THREAD_FWD_REF_A, ~) \
       ) \
-      : fp_(boost::forward<F>(f)) \
+      : fp_(cppmsboost::forward<F>(f)) \
       BOOST_PP_REPEAT(n, BOOST_THREAD_FORWARD_PARAM_A, ~) \
       {} \
       \
       BOOST_SYMBOL_VISIBLE \
       invoker(BOOST_THREAD_RV_REF(invoker) x) \
-      : fp_(boost::move(x.fp_)) \
+      : fp_(cppmsboost::move(x.fp_)) \
       BOOST_PP_REPEAT(n, BOOST_THREAD_MOVE_RHS_PARAM, ~) \
       {} \
       \
       result_type operator()() { \
-        return detail::invoke(boost::move(fp_) \
+        return detail::invoke(cppmsboost::move(fp_) \
             BOOST_PP_REPEAT(n, BOOST_THREAD_MOVE_DCL, ~) \
         ); \
       } \
@@ -269,7 +269,7 @@ namespace boost
       T6 v6_;
       T7 v7_;
       T8 v8_;
-      //::boost::tuple<Fp, T0, T1, T2, T3, T4, T5, T6, T7, T8> f_;
+      //::cppmsboost::tuple<Fp, T0, T1, T2, T3, T4, T5, T6, T7, T8> f_;
 
     public:
       BOOST_THREAD_COPYABLE_AND_MOVABLE(invoker)
@@ -287,44 +287,44 @@ namespace boost
           , BOOST_THREAD_RV_REF(T7) a7
           , BOOST_THREAD_RV_REF(T8) a8
       )
-      : fp_(boost::move(f))
-      , v0_(boost::move(a0))
-      , v1_(boost::move(a1))
-      , v2_(boost::move(a2))
-      , v3_(boost::move(a3))
-      , v4_(boost::move(a4))
-      , v5_(boost::move(a5))
-      , v6_(boost::move(a6))
-      , v7_(boost::move(a7))
-      , v8_(boost::move(a8))
+      : fp_(cppmsboost::move(f))
+      , v0_(cppmsboost::move(a0))
+      , v1_(cppmsboost::move(a1))
+      , v2_(cppmsboost::move(a2))
+      , v3_(cppmsboost::move(a3))
+      , v4_(cppmsboost::move(a4))
+      , v5_(cppmsboost::move(a5))
+      , v6_(cppmsboost::move(a6))
+      , v7_(cppmsboost::move(a7))
+      , v8_(cppmsboost::move(a8))
       {}
 
       BOOST_SYMBOL_VISIBLE
       invoker(BOOST_THREAD_RV_REF(invoker) f)
-      : fp_(boost::move(BOOST_THREAD_RV(f).fp))
-      , v0_(boost::move(BOOST_THREAD_RV(f).v0_))
-      , v1_(boost::move(BOOST_THREAD_RV(f).v1_))
-      , v2_(boost::move(BOOST_THREAD_RV(f).v2_))
-      , v3_(boost::move(BOOST_THREAD_RV(f).v3_))
-      , v4_(boost::move(BOOST_THREAD_RV(f).v4_))
-      , v5_(boost::move(BOOST_THREAD_RV(f).v5_))
-      , v6_(boost::move(BOOST_THREAD_RV(f).v6_))
-      , v7_(boost::move(BOOST_THREAD_RV(f).v7_))
-      , v8_(boost::move(BOOST_THREAD_RV(f).v8_))
+      : fp_(cppmsboost::move(BOOST_THREAD_RV(f).fp))
+      , v0_(cppmsboost::move(BOOST_THREAD_RV(f).v0_))
+      , v1_(cppmsboost::move(BOOST_THREAD_RV(f).v1_))
+      , v2_(cppmsboost::move(BOOST_THREAD_RV(f).v2_))
+      , v3_(cppmsboost::move(BOOST_THREAD_RV(f).v3_))
+      , v4_(cppmsboost::move(BOOST_THREAD_RV(f).v4_))
+      , v5_(cppmsboost::move(BOOST_THREAD_RV(f).v5_))
+      , v6_(cppmsboost::move(BOOST_THREAD_RV(f).v6_))
+      , v7_(cppmsboost::move(BOOST_THREAD_RV(f).v7_))
+      , v8_(cppmsboost::move(BOOST_THREAD_RV(f).v8_))
       {}
 
       result_type operator()()
       {
-        return detail::invoke(boost::move(fp_)
-            , boost::move(v0_)
-            , boost::move(v1_)
-            , boost::move(v2_)
-            , boost::move(v3_)
-            , boost::move(v4_)
-            , boost::move(v5_)
-            , boost::move(v6_)
-            , boost::move(v7_)
-            , boost::move(v8_)
+        return detail::invoke(cppmsboost::move(fp_)
+            , cppmsboost::move(v0_)
+            , cppmsboost::move(v1_)
+            , cppmsboost::move(v2_)
+            , cppmsboost::move(v3_)
+            , cppmsboost::move(v4_)
+            , cppmsboost::move(v5_)
+            , cppmsboost::move(v6_)
+            , cppmsboost::move(v7_)
+            , cppmsboost::move(v8_)
         );
       }
     };
@@ -355,41 +355,41 @@ namespace boost
           , BOOST_THREAD_RV_REF(T6) a6
           , BOOST_THREAD_RV_REF(T7) a7
       )
-      : fp_(boost::move(f))
-      , v0_(boost::move(a0))
-      , v1_(boost::move(a1))
-      , v2_(boost::move(a2))
-      , v3_(boost::move(a3))
-      , v4_(boost::move(a4))
-      , v5_(boost::move(a5))
-      , v6_(boost::move(a6))
-      , v7_(boost::move(a7))
+      : fp_(cppmsboost::move(f))
+      , v0_(cppmsboost::move(a0))
+      , v1_(cppmsboost::move(a1))
+      , v2_(cppmsboost::move(a2))
+      , v3_(cppmsboost::move(a3))
+      , v4_(cppmsboost::move(a4))
+      , v5_(cppmsboost::move(a5))
+      , v6_(cppmsboost::move(a6))
+      , v7_(cppmsboost::move(a7))
       {}
 
       BOOST_SYMBOL_VISIBLE
       invoker(BOOST_THREAD_RV_REF(invoker) f)
-      : fp_(boost::move(BOOST_THREAD_RV(f).fp))
-      , v0_(boost::move(BOOST_THREAD_RV(f).v0_))
-      , v1_(boost::move(BOOST_THREAD_RV(f).v1_))
-      , v2_(boost::move(BOOST_THREAD_RV(f).v2_))
-      , v3_(boost::move(BOOST_THREAD_RV(f).v3_))
-      , v4_(boost::move(BOOST_THREAD_RV(f).v4_))
-      , v5_(boost::move(BOOST_THREAD_RV(f).v5_))
-      , v6_(boost::move(BOOST_THREAD_RV(f).v6_))
-      , v7_(boost::move(BOOST_THREAD_RV(f).v7_))
+      : fp_(cppmsboost::move(BOOST_THREAD_RV(f).fp))
+      , v0_(cppmsboost::move(BOOST_THREAD_RV(f).v0_))
+      , v1_(cppmsboost::move(BOOST_THREAD_RV(f).v1_))
+      , v2_(cppmsboost::move(BOOST_THREAD_RV(f).v2_))
+      , v3_(cppmsboost::move(BOOST_THREAD_RV(f).v3_))
+      , v4_(cppmsboost::move(BOOST_THREAD_RV(f).v4_))
+      , v5_(cppmsboost::move(BOOST_THREAD_RV(f).v5_))
+      , v6_(cppmsboost::move(BOOST_THREAD_RV(f).v6_))
+      , v7_(cppmsboost::move(BOOST_THREAD_RV(f).v7_))
       {}
 
       result_type operator()()
       {
-        return detail::invoke(boost::move(fp_)
-            , boost::move(v0_)
-            , boost::move(v1_)
-            , boost::move(v2_)
-            , boost::move(v3_)
-            , boost::move(v4_)
-            , boost::move(v5_)
-            , boost::move(v6_)
-            , boost::move(v7_)
+        return detail::invoke(cppmsboost::move(fp_)
+            , cppmsboost::move(v0_)
+            , cppmsboost::move(v1_)
+            , cppmsboost::move(v2_)
+            , cppmsboost::move(v3_)
+            , cppmsboost::move(v4_)
+            , cppmsboost::move(v5_)
+            , cppmsboost::move(v6_)
+            , cppmsboost::move(v7_)
         );
       }
     };
@@ -418,38 +418,38 @@ namespace boost
           , BOOST_THREAD_RV_REF(T5) a5
           , BOOST_THREAD_RV_REF(T6) a6
       )
-      : fp_(boost::move(f))
-      , v0_(boost::move(a0))
-      , v1_(boost::move(a1))
-      , v2_(boost::move(a2))
-      , v3_(boost::move(a3))
-      , v4_(boost::move(a4))
-      , v5_(boost::move(a5))
-      , v6_(boost::move(a6))
+      : fp_(cppmsboost::move(f))
+      , v0_(cppmsboost::move(a0))
+      , v1_(cppmsboost::move(a1))
+      , v2_(cppmsboost::move(a2))
+      , v3_(cppmsboost::move(a3))
+      , v4_(cppmsboost::move(a4))
+      , v5_(cppmsboost::move(a5))
+      , v6_(cppmsboost::move(a6))
       {}
 
       BOOST_SYMBOL_VISIBLE
       invoker(BOOST_THREAD_RV_REF(invoker) f)
-      : fp_(boost::move(BOOST_THREAD_RV(f).fp))
-      , v0_(boost::move(BOOST_THREAD_RV(f).v0_))
-      , v1_(boost::move(BOOST_THREAD_RV(f).v1_))
-      , v2_(boost::move(BOOST_THREAD_RV(f).v2_))
-      , v3_(boost::move(BOOST_THREAD_RV(f).v3_))
-      , v4_(boost::move(BOOST_THREAD_RV(f).v4_))
-      , v5_(boost::move(BOOST_THREAD_RV(f).v5_))
-      , v6_(boost::move(BOOST_THREAD_RV(f).v6_))
+      : fp_(cppmsboost::move(BOOST_THREAD_RV(f).fp))
+      , v0_(cppmsboost::move(BOOST_THREAD_RV(f).v0_))
+      , v1_(cppmsboost::move(BOOST_THREAD_RV(f).v1_))
+      , v2_(cppmsboost::move(BOOST_THREAD_RV(f).v2_))
+      , v3_(cppmsboost::move(BOOST_THREAD_RV(f).v3_))
+      , v4_(cppmsboost::move(BOOST_THREAD_RV(f).v4_))
+      , v5_(cppmsboost::move(BOOST_THREAD_RV(f).v5_))
+      , v6_(cppmsboost::move(BOOST_THREAD_RV(f).v6_))
       {}
 
       result_type operator()()
       {
-        return detail::invoke(boost::move(fp_)
-            , boost::move(v0_)
-            , boost::move(v1_)
-            , boost::move(v2_)
-            , boost::move(v3_)
-            , boost::move(v4_)
-            , boost::move(v5_)
-            , boost::move(v6_)
+        return detail::invoke(cppmsboost::move(fp_)
+            , cppmsboost::move(v0_)
+            , cppmsboost::move(v1_)
+            , cppmsboost::move(v2_)
+            , cppmsboost::move(v3_)
+            , cppmsboost::move(v4_)
+            , cppmsboost::move(v5_)
+            , cppmsboost::move(v6_)
         );
       }
     };
@@ -476,35 +476,35 @@ namespace boost
           , BOOST_THREAD_RV_REF(T4) a4
           , BOOST_THREAD_RV_REF(T5) a5
       )
-      : fp_(boost::move(f))
-      , v0_(boost::move(a0))
-      , v1_(boost::move(a1))
-      , v2_(boost::move(a2))
-      , v3_(boost::move(a3))
-      , v4_(boost::move(a4))
-      , v5_(boost::move(a5))
+      : fp_(cppmsboost::move(f))
+      , v0_(cppmsboost::move(a0))
+      , v1_(cppmsboost::move(a1))
+      , v2_(cppmsboost::move(a2))
+      , v3_(cppmsboost::move(a3))
+      , v4_(cppmsboost::move(a4))
+      , v5_(cppmsboost::move(a5))
       {}
 
       BOOST_SYMBOL_VISIBLE
       invoker(BOOST_THREAD_RV_REF(invoker) f)
-      : fp_(boost::move(BOOST_THREAD_RV(f).fp))
-      , v0_(boost::move(BOOST_THREAD_RV(f).v0_))
-      , v1_(boost::move(BOOST_THREAD_RV(f).v1_))
-      , v2_(boost::move(BOOST_THREAD_RV(f).v2_))
-      , v3_(boost::move(BOOST_THREAD_RV(f).v3_))
-      , v4_(boost::move(BOOST_THREAD_RV(f).v4_))
-      , v5_(boost::move(BOOST_THREAD_RV(f).v5_))
+      : fp_(cppmsboost::move(BOOST_THREAD_RV(f).fp))
+      , v0_(cppmsboost::move(BOOST_THREAD_RV(f).v0_))
+      , v1_(cppmsboost::move(BOOST_THREAD_RV(f).v1_))
+      , v2_(cppmsboost::move(BOOST_THREAD_RV(f).v2_))
+      , v3_(cppmsboost::move(BOOST_THREAD_RV(f).v3_))
+      , v4_(cppmsboost::move(BOOST_THREAD_RV(f).v4_))
+      , v5_(cppmsboost::move(BOOST_THREAD_RV(f).v5_))
       {}
 
       result_type operator()()
       {
-        return detail::invoke(boost::move(fp_)
-            , boost::move(v0_)
-            , boost::move(v1_)
-            , boost::move(v2_)
-            , boost::move(v3_)
-            , boost::move(v4_)
-            , boost::move(v5_)
+        return detail::invoke(cppmsboost::move(fp_)
+            , cppmsboost::move(v0_)
+            , cppmsboost::move(v1_)
+            , cppmsboost::move(v2_)
+            , cppmsboost::move(v3_)
+            , cppmsboost::move(v4_)
+            , cppmsboost::move(v5_)
         );
       }
     };
@@ -529,32 +529,32 @@ namespace boost
           , BOOST_THREAD_RV_REF(T3) a3
           , BOOST_THREAD_RV_REF(T4) a4
       )
-      : fp_(boost::move(f))
-      , v0_(boost::move(a0))
-      , v1_(boost::move(a1))
-      , v2_(boost::move(a2))
-      , v3_(boost::move(a3))
-      , v4_(boost::move(a4))
+      : fp_(cppmsboost::move(f))
+      , v0_(cppmsboost::move(a0))
+      , v1_(cppmsboost::move(a1))
+      , v2_(cppmsboost::move(a2))
+      , v3_(cppmsboost::move(a3))
+      , v4_(cppmsboost::move(a4))
       {}
 
       BOOST_SYMBOL_VISIBLE
       invoker(BOOST_THREAD_RV_REF(invoker) f)
-      : fp_(boost::move(BOOST_THREAD_RV(f).fp))
-      , v0_(boost::move(BOOST_THREAD_RV(f).v0_))
-      , v1_(boost::move(BOOST_THREAD_RV(f).v1_))
-      , v2_(boost::move(BOOST_THREAD_RV(f).v2_))
-      , v3_(boost::move(BOOST_THREAD_RV(f).v3_))
-      , v4_(boost::move(BOOST_THREAD_RV(f).v4_))
+      : fp_(cppmsboost::move(BOOST_THREAD_RV(f).fp))
+      , v0_(cppmsboost::move(BOOST_THREAD_RV(f).v0_))
+      , v1_(cppmsboost::move(BOOST_THREAD_RV(f).v1_))
+      , v2_(cppmsboost::move(BOOST_THREAD_RV(f).v2_))
+      , v3_(cppmsboost::move(BOOST_THREAD_RV(f).v3_))
+      , v4_(cppmsboost::move(BOOST_THREAD_RV(f).v4_))
       {}
 
       result_type operator()()
       {
-        return detail::invoke(boost::move(fp_)
-            , boost::move(v0_)
-            , boost::move(v1_)
-            , boost::move(v2_)
-            , boost::move(v3_)
-            , boost::move(v4_)
+        return detail::invoke(cppmsboost::move(fp_)
+            , cppmsboost::move(v0_)
+            , cppmsboost::move(v1_)
+            , cppmsboost::move(v2_)
+            , cppmsboost::move(v3_)
+            , cppmsboost::move(v4_)
         );
       }
     };
@@ -577,29 +577,29 @@ namespace boost
           , BOOST_THREAD_RV_REF(T2) a2
           , BOOST_THREAD_RV_REF(T3) a3
       )
-      : fp_(boost::move(f))
-      , v0_(boost::move(a0))
-      , v1_(boost::move(a1))
-      , v2_(boost::move(a2))
-      , v3_(boost::move(a3))
+      : fp_(cppmsboost::move(f))
+      , v0_(cppmsboost::move(a0))
+      , v1_(cppmsboost::move(a1))
+      , v2_(cppmsboost::move(a2))
+      , v3_(cppmsboost::move(a3))
       {}
 
       BOOST_SYMBOL_VISIBLE
       invoker(BOOST_THREAD_RV_REF(invoker) f)
-      : fp_(boost::move(BOOST_THREAD_RV(f).fp))
-      , v0_(boost::move(BOOST_THREAD_RV(f).v0_))
-      , v1_(boost::move(BOOST_THREAD_RV(f).v1_))
-      , v2_(boost::move(BOOST_THREAD_RV(f).v2_))
-      , v3_(boost::move(BOOST_THREAD_RV(f).v3_))
+      : fp_(cppmsboost::move(BOOST_THREAD_RV(f).fp))
+      , v0_(cppmsboost::move(BOOST_THREAD_RV(f).v0_))
+      , v1_(cppmsboost::move(BOOST_THREAD_RV(f).v1_))
+      , v2_(cppmsboost::move(BOOST_THREAD_RV(f).v2_))
+      , v3_(cppmsboost::move(BOOST_THREAD_RV(f).v3_))
       {}
 
       result_type operator()()
       {
-        return detail::invoke(boost::move(fp_)
-            , boost::move(v0_)
-            , boost::move(v1_)
-            , boost::move(v2_)
-            , boost::move(v3_)
+        return detail::invoke(cppmsboost::move(fp_)
+            , cppmsboost::move(v0_)
+            , cppmsboost::move(v1_)
+            , cppmsboost::move(v2_)
+            , cppmsboost::move(v3_)
         );
       }
     };
@@ -620,26 +620,26 @@ namespace boost
           , BOOST_THREAD_RV_REF(T1) a1
           , BOOST_THREAD_RV_REF(T2) a2
       )
-      : fp_(boost::move(f))
-      , v0_(boost::move(a0))
-      , v1_(boost::move(a1))
-      , v2_(boost::move(a2))
+      : fp_(cppmsboost::move(f))
+      , v0_(cppmsboost::move(a0))
+      , v1_(cppmsboost::move(a1))
+      , v2_(cppmsboost::move(a2))
       {}
 
       BOOST_SYMBOL_VISIBLE
       invoker(BOOST_THREAD_RV_REF(invoker) f)
-      : fp_(boost::move(BOOST_THREAD_RV(f).fp))
-      , v0_(boost::move(BOOST_THREAD_RV(f).v0_))
-      , v1_(boost::move(BOOST_THREAD_RV(f).v1_))
-      , v2_(boost::move(BOOST_THREAD_RV(f).v2_))
+      : fp_(cppmsboost::move(BOOST_THREAD_RV(f).fp))
+      , v0_(cppmsboost::move(BOOST_THREAD_RV(f).v0_))
+      , v1_(cppmsboost::move(BOOST_THREAD_RV(f).v1_))
+      , v2_(cppmsboost::move(BOOST_THREAD_RV(f).v2_))
       {}
 
       result_type operator()()
       {
-        return detail::invoke(boost::move(fp_)
-            , boost::move(v0_)
-            , boost::move(v1_)
-            , boost::move(v2_)
+        return detail::invoke(cppmsboost::move(fp_)
+            , cppmsboost::move(v0_)
+            , cppmsboost::move(v1_)
+            , cppmsboost::move(v2_)
         );
       }
     };
@@ -658,23 +658,23 @@ namespace boost
           , BOOST_THREAD_RV_REF(T0) a0
           , BOOST_THREAD_RV_REF(T1) a1
       )
-      : fp_(boost::move(f))
-      , v0_(boost::move(a0))
-      , v1_(boost::move(a1))
+      : fp_(cppmsboost::move(f))
+      , v0_(cppmsboost::move(a0))
+      , v1_(cppmsboost::move(a1))
       {}
 
       BOOST_SYMBOL_VISIBLE
       invoker(BOOST_THREAD_RV_REF(invoker) f)
-      : fp_(boost::move(BOOST_THREAD_RV(f).fp))
-      , v0_(boost::move(BOOST_THREAD_RV(f).v0_))
-      , v1_(boost::move(BOOST_THREAD_RV(f).v1_))
+      : fp_(cppmsboost::move(BOOST_THREAD_RV(f).fp))
+      , v0_(cppmsboost::move(BOOST_THREAD_RV(f).v0_))
+      , v1_(cppmsboost::move(BOOST_THREAD_RV(f).v1_))
       {}
 
       result_type operator()()
       {
-        return detail::invoke(boost::move(fp_)
-            , boost::move(v0_)
-            , boost::move(v1_)
+        return detail::invoke(cppmsboost::move(fp_)
+            , cppmsboost::move(v0_)
+            , cppmsboost::move(v1_)
         );
       }
     };
@@ -691,20 +691,20 @@ namespace boost
       explicit invoker(BOOST_THREAD_FWD_REF(Fp) f
           , BOOST_THREAD_RV_REF(T0) a0
       )
-      : fp_(boost::move(f))
-      , v0_(boost::move(a0))
+      : fp_(cppmsboost::move(f))
+      , v0_(cppmsboost::move(a0))
       {}
 
       BOOST_SYMBOL_VISIBLE
       invoker(BOOST_THREAD_RV_REF(invoker) f)
-      : fp_(boost::move(BOOST_THREAD_RV(f).fp))
-      , v0_(boost::move(BOOST_THREAD_RV(f).v0_))
+      : fp_(cppmsboost::move(BOOST_THREAD_RV(f).fp))
+      , v0_(cppmsboost::move(BOOST_THREAD_RV(f).v0_))
       {}
 
       result_type operator()()
       {
-        return detail::invoke(boost::move(fp_)
-            , boost::move(v0_)
+        return detail::invoke(cppmsboost::move(fp_)
+            , cppmsboost::move(v0_)
         );
       }
     };
@@ -717,12 +717,12 @@ namespace boost
       typedef typename result_of<Fp()>::type result_type;
       BOOST_SYMBOL_VISIBLE
       explicit invoker(BOOST_THREAD_FWD_REF(Fp) f)
-      : fp_(boost::move(f))
+      : fp_(cppmsboost::move(f))
       {}
 
       BOOST_SYMBOL_VISIBLE
       invoker(BOOST_THREAD_RV_REF(invoker) f)
-      : fp_(boost::move(f.fp_))
+      : fp_(cppmsboost::move(f.fp_))
       {}
       result_type operator()()
       {

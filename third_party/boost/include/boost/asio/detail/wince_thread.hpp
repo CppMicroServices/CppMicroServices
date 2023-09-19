@@ -27,7 +27,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -48,9 +48,9 @@ public:
     if (!thread_)
     {
       DWORD last_error = ::GetLastError();
-      boost::system::error_code ec(last_error,
-          boost::asio::error::get_system_category());
-      boost::asio::detail::throw_error(ec, "thread");
+      cppmsboost::system::error_code ec(last_error,
+          cppmsboost::asio::error::get_system_category());
+      cppmsboost::asio::detail::throw_error(ec, "thread");
     }
     arg.release();
   }
@@ -117,7 +117,7 @@ inline DWORD WINAPI wince_thread_function(LPVOID arg)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

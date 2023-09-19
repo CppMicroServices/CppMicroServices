@@ -24,7 +24,7 @@
 #include <boost/config/abi_prefix.hpp> // must be the last #include
 #endif
 
-namespace boost { namespace chrono {
+namespace cppmsboost { namespace chrono {
 
 class BOOST_CHRONO_DECL thread_clock {
 public:
@@ -61,7 +61,7 @@ struct clock_string<thread_clock, CharT>
 };
 
 } // namespace chrono
-} // namespace boost
+} // namespace cppmsboost
 
 
 #ifndef BOOST_CHRONO_HEADER_ONLY

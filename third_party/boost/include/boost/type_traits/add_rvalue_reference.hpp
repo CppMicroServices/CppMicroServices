@@ -28,7 +28,7 @@
 // reference. -end note ]
 //----------------------------------------------------------------------------//
 
-namespace boost {
+namespace cppmsboost {
 
 namespace type_traits_detail {
 
@@ -47,7 +47,7 @@ namespace type_traits_detail {
     template <typename T>
     struct add_rvalue_reference_imp
     {
-       typedef typename boost::type_traits_detail::add_rvalue_reference_helper
+       typedef typename cppmsboost::type_traits_detail::add_rvalue_reference_helper
                   <T, (is_void<T>::value == false && is_reference<T>::value == false) >::type type;
     };
 
@@ -55,7 +55,7 @@ namespace type_traits_detail {
 
 template <class T> struct add_rvalue_reference
 {
-   typedef typename boost::type_traits_detail::add_rvalue_reference_imp<T>::type type;
+   typedef typename cppmsboost::type_traits_detail::add_rvalue_reference_imp<T>::type type;
 };
 
 #if !defined(BOOST_NO_CXX11_TEMPLATE_ALIASES)
@@ -64,7 +64,7 @@ template <class T> struct add_rvalue_reference
 
 #endif
 
-}  // namespace boost
+}  // namespace cppmsboost
 
 #endif  // BOOST_TYPE_TRAITS_EXT_ADD_RVALUE_REFERENCE__HPP
 

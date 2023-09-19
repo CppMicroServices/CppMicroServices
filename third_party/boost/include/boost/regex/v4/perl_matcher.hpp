@@ -32,13 +32,13 @@
 #endif
 #endif
 
-namespace boost{
+namespace cppmsboost{
 namespace BOOST_REGEX_DETAIL_NS{
 
 //
 // error checking API:
 //
-BOOST_REGEX_DECL void BOOST_REGEX_CALL verify_options(boost::regex_constants::syntax_option_type ef, match_flag_type mf);
+BOOST_REGEX_DECL void BOOST_REGEX_CALL verify_options(cppmsboost::regex_constants::syntax_option_type ef, match_flag_type mf);
 //
 // function can_start:
 //
@@ -149,7 +149,7 @@ iterator BOOST_REGEX_CALL re_is_set_member(iterator next,
    if(next == last) return next;
 
    typedef typename traits_type::string_type traits_string_type;
-   const ::boost::regex_traits_wrapper<traits_type>& traits_inst = *(e.m_ptraits);
+   const ::cppmsboost::regex_traits_wrapper<traits_type>& traits_inst = *(e.m_ptraits);
    
    // dwa 9/13/00 suppress incorrect MSVC warning - it claims this is never
    // referenced
@@ -443,7 +443,7 @@ private:
    bool match_dot_repeat_slow();
    bool match_dot_repeat_dispatch()
    {
-      return ::boost::is_random_access_iterator<BidiIterator>::value ? match_dot_repeat_fast() : match_dot_repeat_slow();
+      return ::cppmsboost::is_random_access_iterator<BidiIterator>::value ? match_dot_repeat_fast() : match_dot_repeat_slow();
    }
    bool match_backstep();
    bool match_assert_backref();
@@ -487,7 +487,7 @@ private:
    // the expression being examined:
    const basic_regex<char_type, traits>& re;
    // the expression's traits class:
-   const ::boost::regex_traits_wrapper<traits>& traits_inst;
+   const ::cppmsboost::regex_traits_wrapper<traits>& traits_inst;
    // the next state in the machine being matched:
    const re_syntax_base* pstate;
    // matching flags in use:
@@ -605,7 +605,7 @@ private:
 #pragma warning(pop)
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #  pragma warning(pop)

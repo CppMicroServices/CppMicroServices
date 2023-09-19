@@ -19,7 +19,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace this_coro {
 
@@ -40,7 +40,7 @@ __declspec(selectany) executor_t executor;
 
 } // namespace this_coro
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

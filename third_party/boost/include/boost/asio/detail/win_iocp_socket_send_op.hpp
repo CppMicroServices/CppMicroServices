@@ -31,7 +31,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -54,14 +54,14 @@ public:
   }
 
   static void do_complete(void* owner, operation* base,
-      const boost::system::error_code& result_ec,
+      const cppmsboost::system::error_code& result_ec,
       std::size_t bytes_transferred)
   {
-    boost::system::error_code ec(result_ec);
+    cppmsboost::system::error_code ec(result_ec);
 
     // Take ownership of the operation object.
     win_iocp_socket_send_op* o(static_cast<win_iocp_socket_send_op*>(base));
-    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+    ptr p = { cppmsboost::asio::detail::addressof(o->handler_), o, o };
     handler_work<Handler, IoExecutor> w(o->handler_, o->io_executor_);
 
     BOOST_ASIO_HANDLER_COMPLETION((*o));
@@ -70,7 +70,7 @@ public:
     // Check whether buffers are still valid.
     if (owner)
     {
-      buffer_sequence_adapter<boost::asio::const_buffer,
+      buffer_sequence_adapter<cppmsboost::asio::const_buffer,
           ConstBufferSequence>::validate(o->buffers_);
     }
 #endif // defined(BOOST_ASIO_ENABLE_BUFFER_DEBUGGING)
@@ -83,9 +83,9 @@ public:
     // with the handler. Consequently, a local copy of the handler is required
     // to ensure that any owning sub-object remains valid until after we have
     // deallocated the memory here.
-    detail::binder2<Handler, boost::system::error_code, std::size_t>
+    detail::binder2<Handler, cppmsboost::system::error_code, std::size_t>
       handler(o->handler_, ec, bytes_transferred);
-    p.h = boost::asio::detail::addressof(handler.handler_);
+    p.h = cppmsboost::asio::detail::addressof(handler.handler_);
     p.reset();
 
     // Make the upcall if required.
@@ -107,7 +107,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

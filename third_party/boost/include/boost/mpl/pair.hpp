@@ -19,7 +19,7 @@
 #include <boost/mpl/aux_/lambda_support.hpp>
 #include <boost/mpl/aux_/config/eti.hpp>
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 template<
       typename BOOST_MPL_AUX_NA_PARAM(T1)

@@ -25,7 +25,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -35,7 +35,7 @@ class posix_mutex
   : private noncopyable
 {
 public:
-  typedef boost::asio::detail::scoped_lock<posix_mutex> scoped_lock;
+  typedef cppmsboost::asio::detail::scoped_lock<posix_mutex> scoped_lock;
 
   // Constructor.
   BOOST_ASIO_DECL posix_mutex();
@@ -65,7 +65,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

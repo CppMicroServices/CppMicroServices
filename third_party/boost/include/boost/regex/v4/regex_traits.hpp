@@ -67,7 +67,7 @@
 #pragma warning(pop)
 #endif
 
-namespace boost{
+namespace cppmsboost{
 
 template <class charT, class implementationT >
 struct regex_traits : public implementationT
@@ -97,21 +97,21 @@ template <class BaseT>
 struct default_wrapper : public BaseT
 {
    typedef typename BaseT::char_type char_type;
-   std::string error_string(::boost::regex_constants::error_type e)const
+   std::string error_string(::cppmsboost::regex_constants::error_type e)const
    {
-      return ::boost::BOOST_REGEX_DETAIL_NS::get_default_error_string(e);
+      return ::cppmsboost::BOOST_REGEX_DETAIL_NS::get_default_error_string(e);
    }
-   ::boost::regex_constants::syntax_type syntax_type(char_type c)const
+   ::cppmsboost::regex_constants::syntax_type syntax_type(char_type c)const
    {
-      return ((c & 0x7f) == c) ? get_default_syntax_type(static_cast<char>(c)) : ::boost::regex_constants::syntax_char;
+      return ((c & 0x7f) == c) ? get_default_syntax_type(static_cast<char>(c)) : ::cppmsboost::regex_constants::syntax_char;
    }
-   ::boost::regex_constants::escape_syntax_type escape_syntax_type(char_type c)const
+   ::cppmsboost::regex_constants::escape_syntax_type escape_syntax_type(char_type c)const
    {
-      return ((c & 0x7f) == c) ? get_default_escape_syntax_type(static_cast<char>(c)) : ::boost::regex_constants::escape_type_identity;
+      return ((c & 0x7f) == c) ? get_default_escape_syntax_type(static_cast<char>(c)) : ::cppmsboost::regex_constants::escape_type_identity;
    }
-   boost::intmax_t toi(const char_type*& p1, const char_type* p2, int radix)const
+   cppmsboost::intmax_t toi(const char_type*& p1, const char_type* p2, int radix)const
    {
-      return ::boost::BOOST_REGEX_DETAIL_NS::global_toi(p1, p2, radix, *this);
+      return ::cppmsboost::BOOST_REGEX_DETAIL_NS::global_toi(p1, p2, radix, *this);
    }
    char_type translate(char_type c, bool icase)const
    {
@@ -123,11 +123,11 @@ struct default_wrapper : public BaseT
    }
    char_type tolower(char_type c)const
    {
-      return ::boost::BOOST_REGEX_DETAIL_NS::global_lower(c);
+      return ::cppmsboost::BOOST_REGEX_DETAIL_NS::global_lower(c);
    }
    char_type toupper(char_type c)const
    {
-      return ::boost::BOOST_REGEX_DETAIL_NS::global_upper(c);
+      return ::cppmsboost::BOOST_REGEX_DETAIL_NS::global_upper(c);
    }
 };
 
@@ -161,9 +161,9 @@ struct compute_wrapper_base<c_regex_traits<wchar_t>, false>
 
 template <class BaseT>
 struct regex_traits_wrapper 
-   : public ::boost::BOOST_REGEX_DETAIL_NS::compute_wrapper_base<
+   : public ::cppmsboost::BOOST_REGEX_DETAIL_NS::compute_wrapper_base<
                BaseT, 
-               ::boost::BOOST_REGEX_DETAIL_NS::has_boost_extensions_tag<BaseT>::value
+               ::cppmsboost::BOOST_REGEX_DETAIL_NS::has_boost_extensions_tag<BaseT>::value
             >::type
 {
    regex_traits_wrapper(){}
@@ -172,7 +172,7 @@ private:
    regex_traits_wrapper& operator=(const regex_traits_wrapper&);
 };
 
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(push)

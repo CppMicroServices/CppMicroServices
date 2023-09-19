@@ -25,7 +25,7 @@
 #include <boost/config.hpp>
 #include <boost/config/workaround.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 #if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
@@ -120,11 +120,11 @@ inline BOOST_DEDUCED_TYPENAME range_iterator<const T>::type begin( const T& r )
 }
 
     } // namespace range_adl_barrier
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_NO_FUNCTION_TEMPLATE_ORDERING
 
-namespace boost
+namespace cppmsboost
 {
     namespace range_adl_barrier
     {
@@ -132,12 +132,12 @@ namespace boost
         inline BOOST_DEDUCED_TYPENAME range_iterator<const T>::type
         const_begin( const T& r )
         {
-            return boost::range_adl_barrier::begin( r );
+            return cppmsboost::range_adl_barrier::begin( r );
         }
     } // namespace range_adl_barrier
 
     using namespace range_adl_barrier;
-} // namespace boost
+} // namespace cppmsboost
 
 #endif
 

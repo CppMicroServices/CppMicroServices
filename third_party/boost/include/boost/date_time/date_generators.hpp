@@ -19,7 +19,7 @@
 #include <boost/date_time/date.hpp>
 #include <boost/date_time/compiler_config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
   //! Base class for all generators that take a year and produce a date.
@@ -103,7 +103,7 @@ namespace date_time {
      if((day_ == 29) && (month_ == 2) && !(calendar_type::is_leap_year(y))) {
        std::ostringstream ss;
        ss << "No Feb 29th in given year of " << y << ".";
-       boost::throw_exception(std::invalid_argument(ss.str()));
+       cppmsboost::throw_exception(std::invalid_argument(ss.str()));
      }
      return date_type(y, month_, day_);
    }
@@ -375,7 +375,7 @@ namespace date_time {
   //! Calculate something like "First Sunday after Jan 1,2002
   /*! Date generator that takes a date and finds kday after
    *@code
-     typedef boost::date_time::first_kday_after<date> firstkdayafter;
+     typedef cppmsboost::date_time::first_kday_after<date> firstkdayafter;
      firstkdayafter fkaf(Monday);
      fkaf.get_date(date(2002,Feb,1));
    @endcode
@@ -413,7 +413,7 @@ namespace date_time {
   //! Calculate something like "First Sunday before Jan 1,2002
   /*! Date generator that takes a date and finds kday after
    *@code
-     typedef boost::date_time::first_kday_before<date> firstkdaybefore;
+     typedef cppmsboost::date_time::first_kday_before<date> firstkdaybefore;
      firstkdaybefore fkbf(Monday);
      fkbf.get_date(date(2002,Feb,1));
    @endcode

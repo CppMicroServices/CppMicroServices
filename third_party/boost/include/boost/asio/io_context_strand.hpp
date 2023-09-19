@@ -27,7 +27,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Provides serialised handler execution.
@@ -96,9 +96,9 @@ public:
    * @param io_context The io_context object that the strand will use to
    * dispatch handlers that are ready to be run.
    */
-  explicit strand(boost::asio::io_context& io_context)
-    : service_(boost::asio::use_service<
-        boost::asio::detail::strand_service>(io_context))
+  explicit strand(cppmsboost::asio::io_context& io_context)
+    : service_(cppmsboost::asio::use_service<
+        cppmsboost::asio::detail::strand_service>(io_context))
   {
     service_.construct(impl_);
   }
@@ -115,7 +115,7 @@ public:
   }
 
   /// Obtain the underlying execution context.
-  boost::asio::io_context& context() const BOOST_ASIO_NOEXCEPT
+  cppmsboost::asio::io_context& context() const BOOST_ASIO_NOEXCEPT
   {
     return service_.get_io_context();
   }
@@ -162,7 +162,7 @@ public:
   }
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use boost::asio::dispatch().) Request the strand to invoke
+  /// (Deprecated: Use cppmsboost::asio::dispatch().) Request the strand to invoke
   /// the given handler.
   /**
    * This function is used to ask the strand to execute the given handler.
@@ -213,7 +213,7 @@ public:
   }
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use boost::asio::post().) Request the strand to invoke the
+  /// (Deprecated: Use cppmsboost::asio::post().) Request the strand to invoke the
   /// given handler and return immediately.
   /**
    * This function is used to ask the strand to execute the given handler, but
@@ -260,7 +260,7 @@ public:
   }
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use boost::asio::bind_executor().) Create a new handler that
+  /// (Deprecated: Use cppmsboost::asio::bind_executor().) Create a new handler that
   /// automatically dispatches the wrapped handler on the strand.
   /**
    * This function is used to create a new handler function object that, when
@@ -279,7 +279,7 @@ public:
    * then the return value is a function object with the signature
    * @code void g(A1 a1, ... An an); @endcode
    * that, when invoked, executes code equivalent to:
-   * @code strand.dispatch(boost::bind(f, a1, ... an)); @endcode
+   * @code strand.dispatch(cppmsboost::bind(f, a1, ... an)); @endcode
    */
   template <typename Handler>
 #if defined(GENERATING_DOCUMENTATION)
@@ -362,12 +362,12 @@ private:
   };
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
 
-  boost::asio::detail::strand_service& service_;
-  mutable boost::asio::detail::strand_service::implementation_type impl_;
+  cppmsboost::asio::detail::strand_service& service_;
+  mutable cppmsboost::asio::detail::strand_service::implementation_type impl_;
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

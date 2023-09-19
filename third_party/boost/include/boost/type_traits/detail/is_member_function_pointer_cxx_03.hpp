@@ -27,14 +27,14 @@
 #   include <boost/type_traits/detail/is_mem_fun_pointer_tester.hpp>
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 #if defined( __CODEGEARC__ )
 template <class T> struct is_member_function_pointer : public integral_constant<bool, __is_member_function_pointer( T )> {};
 #elif !BOOST_WORKAROUND(__BORLANDC__, < 0x600) && !defined(BOOST_TT_TEST_MS_FUNC_SIGS)
 
 template <class T> struct is_member_function_pointer 
-   : public ::boost::integral_constant<bool, ::boost::type_traits::is_mem_fun_pointer_impl<typename remove_cv<T>::type>::value>{};
+   : public ::cppmsboost::integral_constant<bool, ::cppmsboost::type_traits::is_mem_fun_pointer_impl<typename remove_cv<T>::type>::value>{};
 
 #else
 
@@ -62,7 +62,7 @@ struct is_mem_fun_pointer_select<false>
 
         BOOST_STATIC_CONSTANT(
             bool, value = (
-                1 == sizeof(::boost::type_traits::is_mem_fun_pointer_tester(self_type::make_t))
+                1 == sizeof(::cppmsboost::type_traits::is_mem_fun_pointer_tester(self_type::make_t))
             ));
 #if BOOST_WORKAROUND(BOOST_MSVC_FULL_VER, >= 140050000)
 #pragma warning(pop)
@@ -73,7 +73,7 @@ struct is_mem_fun_pointer_select<false>
 template <typename T>
 struct is_member_function_pointer_impl
     : public is_mem_fun_pointer_select< 
-      ::boost::is_reference<T>::value || ::boost::is_array<T>::value>::template result_<T>{};
+      ::cppmsboost::is_reference<T>::value || ::cppmsboost::is_array<T>::value>::template result_<T>{};
 
 template <typename T>
 struct is_member_function_pointer_impl<T&> : public false_type{};
@@ -108,10 +108,10 @@ template<> struct is_member_function_pointer_impl<void volatile> : public false_
 
 template <class T>
 struct is_member_function_pointer
-   : public integral_constant<bool, ::boost::detail::is_member_function_pointer_impl<T>::value>{};
+   : public integral_constant<bool, ::cppmsboost::detail::is_member_function_pointer_impl<T>::value>{};
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_IS_MEMBER_FUNCTION_POINTER_HPP_INCLUDED

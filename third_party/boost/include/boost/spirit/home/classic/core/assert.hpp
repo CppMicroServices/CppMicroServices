@@ -24,7 +24,7 @@
     #include <boost/throw_exception.hpp>
     #define BOOST_SPIRIT_ASSERT_AUX(f, l, x) BOOST_SPIRIT_ASSERT_AUX2(f, l, x)
     #define BOOST_SPIRIT_ASSERT_AUX2(f, l, x)                                   \
-    ( (x) ? (void)0 : boost::throw_exception(                                   \
+    ( (x) ? (void)0 : cppmsboost::throw_exception(                                   \
         BOOST_SPIRIT_ASSERT_EXCEPTION(f "(" #l "): " #x)) )
     #define BOOST_SPIRIT_ASSERT(x) BOOST_SPIRIT_ASSERT_AUX(__FILE__, __LINE__, x)
 #else

@@ -37,7 +37,7 @@ namespace std{
 #include <boost/archive/detail/decl.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
     class extended_type_info;
 } // namespace serialization
@@ -77,8 +77,8 @@ public:
     virtual void load(unsigned long & t) = 0;
 
     #if defined(BOOST_HAS_LONG_LONG)
-    virtual void load(boost::long_long_type & t) = 0;
-    virtual void load(boost::ulong_long_type & t) = 0;
+    virtual void load(cppmsboost::long_long_type & t) = 0;
+    virtual void load(cppmsboost::ulong_long_type & t) = 0;
     #elif defined(BOOST_HAS_MS_INT64)
     virtual void load(__int64 & t) = 0;
     virtual void load(unsigned __int64 & t) = 0;
@@ -109,7 +109,7 @@ public:
     // special treatment for name-value pairs.
     template<class T>
     void load_override(
-        const boost::serialization::nvp< T > & t
+        const cppmsboost::serialization::nvp< T > & t
     ){
         load_start(t.name());
         archive::load(* this->This(), t.value());
@@ -139,17 +139,17 @@ public:
         void * & t,
         const detail::basic_pointer_iserializer * bpis_ptr,
         const detail::basic_pointer_iserializer * (*finder)(
-            const boost::serialization::extended_type_info & type
+            const cppmsboost::serialization::extended_type_info & type
         )
     ) = 0;
 };
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/archive/detail/abi_suffix.hpp> // pops abi_suffix.hpp pragmas
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 class BOOST_SYMBOL_VISIBLE polymorphic_iarchive :
@@ -160,9 +160,9 @@ public:
 };
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 // required by export
-BOOST_SERIALIZATION_REGISTER_ARCHIVE(boost::archive::polymorphic_iarchive)
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(cppmsboost::archive::polymorphic_iarchive)
 
 #endif // BOOST_ARCHIVE_POLYMORPHIC_IARCHIVE_HPP

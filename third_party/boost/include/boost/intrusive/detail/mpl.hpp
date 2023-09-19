@@ -26,46 +26,46 @@
 #include <boost/move/detail/type_traits.hpp>
 #include <cstddef>
 
-namespace boost {
+namespace cppmsboost {
 namespace intrusive {
 namespace detail {
    
-using boost::move_detail::is_same;
-using boost::move_detail::add_const;
-using boost::move_detail::remove_const;
-using boost::move_detail::remove_cv;
-using boost::move_detail::remove_reference;
-using boost::move_detail::add_reference;
-using boost::move_detail::remove_pointer;
-using boost::move_detail::add_pointer;
-using boost::move_detail::true_type;
-using boost::move_detail::false_type;
-using boost::move_detail::voider;
-using boost::move_detail::enable_if_c;
-using boost::move_detail::enable_if;
-using boost::move_detail::disable_if_c;
-using boost::move_detail::disable_if;
-using boost::move_detail::is_convertible;
-using boost::move_detail::if_c;
-using boost::move_detail::if_;
-using boost::move_detail::is_const;
-using boost::move_detail::identity;
-using boost::move_detail::alignment_of;
-using boost::move_detail::is_empty;
-using boost::move_detail::addressof;
-using boost::move_detail::integral_constant;
-using boost::move_detail::enable_if_convertible;
-using boost::move_detail::disable_if_convertible;
-using boost::move_detail::bool_;
-using boost::move_detail::true_;
-using boost::move_detail::false_;
-using boost::move_detail::yes_type;
-using boost::move_detail::no_type;
-using boost::move_detail::apply;
-using boost::move_detail::eval_if_c;
-using boost::move_detail::eval_if;
-using boost::move_detail::unvoid_ref;
-using boost::move_detail::add_const_if_c;
+using cppmsboost::move_detail::is_same;
+using cppmsboost::move_detail::add_const;
+using cppmsboost::move_detail::remove_const;
+using cppmsboost::move_detail::remove_cv;
+using cppmsboost::move_detail::remove_reference;
+using cppmsboost::move_detail::add_reference;
+using cppmsboost::move_detail::remove_pointer;
+using cppmsboost::move_detail::add_pointer;
+using cppmsboost::move_detail::true_type;
+using cppmsboost::move_detail::false_type;
+using cppmsboost::move_detail::voider;
+using cppmsboost::move_detail::enable_if_c;
+using cppmsboost::move_detail::enable_if;
+using cppmsboost::move_detail::disable_if_c;
+using cppmsboost::move_detail::disable_if;
+using cppmsboost::move_detail::is_convertible;
+using cppmsboost::move_detail::if_c;
+using cppmsboost::move_detail::if_;
+using cppmsboost::move_detail::is_const;
+using cppmsboost::move_detail::identity;
+using cppmsboost::move_detail::alignment_of;
+using cppmsboost::move_detail::is_empty;
+using cppmsboost::move_detail::addressof;
+using cppmsboost::move_detail::integral_constant;
+using cppmsboost::move_detail::enable_if_convertible;
+using cppmsboost::move_detail::disable_if_convertible;
+using cppmsboost::move_detail::bool_;
+using cppmsboost::move_detail::true_;
+using cppmsboost::move_detail::false_;
+using cppmsboost::move_detail::yes_type;
+using cppmsboost::move_detail::no_type;
+using cppmsboost::move_detail::apply;
+using cppmsboost::move_detail::eval_if_c;
+using cppmsboost::move_detail::eval_if;
+using cppmsboost::move_detail::unvoid_ref;
+using cppmsboost::move_detail::add_const_if_c;
 
 template<std::size_t S>
 struct ls_zeros
@@ -105,7 +105,7 @@ struct ls_zeros<1>
       struct DefaultWrap { typedef DefaultType TNAME; };          \
                                                                   \
       typedef typename                                            \
-         ::boost::intrusive::detail::if_c                         \
+         ::cppmsboost::intrusive::detail::if_c                         \
             < boost_intrusive_has_type_ ## TNAME<T>::value        \
             , T, DefaultWrap>::type::TNAME type;                  \
    };                                                             \
@@ -137,10 +137,10 @@ struct ls_zeros<1>
       static const bool value = (1 == sizeof(test<T>(0, 0)));     \
                                                                   \
       typedef typename                                            \
-         ::boost::intrusive::detail::eval_if_c                    \
+         ::cppmsboost::intrusive::detail::eval_if_c                    \
             < value                                               \
-            , ::boost::intrusive::detail::identity<T>             \
-            , ::boost::intrusive::detail::identity<DefaultWrap>   \
+            , ::cppmsboost::intrusive::detail::identity<T>             \
+            , ::cppmsboost::intrusive::detail::identity<DefaultWrap>   \
             >::type::TNAME type;                                  \
    };                                                             \
 //
@@ -175,10 +175,10 @@ struct TRAITS_PREFIX##_bool_is_true\
   private: \
   template<Signature> struct helper;\
   template<typename T> \
-  static ::boost::intrusive::detail::yes_type test(helper<&T::FUNC_NAME>*); \
-  template<typename T> static ::boost::intrusive::detail::no_type test(...); \
+  static ::cppmsboost::intrusive::detail::yes_type test(helper<&T::FUNC_NAME>*); \
+  template<typename T> static ::cppmsboost::intrusive::detail::no_type test(...); \
   public: \
-  static const bool value = sizeof(test<U>(0)) == sizeof(::boost::intrusive::detail::yes_type); \
+  static const bool value = sizeof(test<U>(0)) == sizeof(::cppmsboost::intrusive::detail::yes_type); \
   }; \
 //
 
@@ -193,9 +193,9 @@ struct TRAITS_NAME \
    struct Base : public Type, public BaseMixin { Base(); }; \
    template <typename T, T t> class Helper{}; \
    template <typename U> \
-   static ::boost::intrusive::detail::no_type  test(U*, Helper<void (BaseMixin::*)(), &U::FUNC_NAME>* = 0); \
-   static ::boost::intrusive::detail::yes_type test(...); \
-   static const bool value = sizeof(::boost::intrusive::detail::yes_type) == sizeof(test((Base*)(0))); \
+   static ::cppmsboost::intrusive::detail::no_type  test(U*, Helper<void (BaseMixin::*)(), &U::FUNC_NAME>* = 0); \
+   static ::cppmsboost::intrusive::detail::yes_type test(...); \
+   static const bool value = sizeof(::cppmsboost::intrusive::detail::yes_type) == sizeof(test((Base*)(0))); \
 };\
 //
 
@@ -210,7 +210,7 @@ struct TRAITS_NAME \
 
 } //namespace detail
 } //namespace intrusive
-} //namespace boost
+} //namespace cppmsboost
 
 #include <boost/intrusive/detail/config_end.hpp>
 

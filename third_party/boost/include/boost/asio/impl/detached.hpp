@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -67,7 +67,7 @@ namespace detail {
 template <typename Signature>
 struct async_result<detached_t, Signature>
 {
-  typedef boost::asio::detail::detached_handler completion_handler_type;
+  typedef cppmsboost::asio::detail::detached_handler completion_handler_type;
 
   typedef void return_type;
 
@@ -125,7 +125,7 @@ struct async_result<detached_t, Signature>
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

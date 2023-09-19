@@ -11,7 +11,7 @@
 #include <boost/iterator/iterator_categories.hpp>
 #include <boost/iterator/iterator_traits.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace iterators {
 
     namespace detail {
@@ -60,6 +60,6 @@ namespace iterators {
 
 using namespace iterators::distance_adl_barrier;
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif

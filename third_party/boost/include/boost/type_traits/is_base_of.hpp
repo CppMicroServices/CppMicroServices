@@ -13,7 +13,7 @@
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_class.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
    namespace detail{
       template <class B, class D>
@@ -22,18 +22,18 @@ namespace boost {
           typedef typename remove_cv<B>::type ncvB;
           typedef typename remove_cv<D>::type ncvD;
           BOOST_STATIC_CONSTANT(bool, value = (
-            (::boost::detail::is_base_and_derived_impl<ncvB,ncvD>::value) ||
-            (::boost::is_same<ncvB,ncvD>::value && ::boost::is_class<ncvB>::value)));
+            (::cppmsboost::detail::is_base_and_derived_impl<ncvB,ncvD>::value) ||
+            (::cppmsboost::is_same<ncvB,ncvD>::value && ::cppmsboost::is_class<ncvB>::value)));
       };
    }
 
    template <class Base, class Derived> struct is_base_of
-      : public integral_constant<bool, (::boost::detail::is_base_of_imp<Base, Derived>::value)> {};
+      : public integral_constant<bool, (::cppmsboost::detail::is_base_of_imp<Base, Derived>::value)> {};
 
    template <class Base, class Derived> struct is_base_of<Base, Derived&> : false_type{};
    template <class Base, class Derived> struct is_base_of<Base&, Derived&> : false_type{};
    template <class Base, class Derived> struct is_base_of<Base&, Derived> : false_type{};
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_IS_BASE_AND_DERIVED_HPP_INCLUDED

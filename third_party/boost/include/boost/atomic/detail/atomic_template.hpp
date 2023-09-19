@@ -51,7 +51,7 @@
 
 #if defined(BOOST_MSVC)
 #pragma warning(push)
-// 'boost::atomics::atomic<T>' : multiple assignment operators specified
+// 'cppmsboost::atomics::atomic<T>' : multiple assignment operators specified
 #pragma warning(disable: 4522)
 #endif
 
@@ -60,7 +60,7 @@
  *                      see comment for convert_memory_order_to_gcc in ops_gcc_atomic.hpp.
  */
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -86,7 +86,7 @@ protected:
     union
     {
         storage_type m_storage;
-        typename boost::type_with_alignment< storage_alignment >::type m_aligner;
+        typename cppmsboost::type_with_alignment< storage_alignment >::type m_aligner;
     };
 #endif
 
@@ -1092,9 +1092,9 @@ public:
     BOOST_ATOMIC_DETAIL_STORAGE_DEPRECATED
     typedef typename base_type::storage_type storage_type;
 
-    BOOST_STATIC_ASSERT_MSG(sizeof(value_type) > 0u, "boost::atomic<T> requires T to be a complete type");
+    BOOST_STATIC_ASSERT_MSG(sizeof(value_type) > 0u, "cppmsboost::atomic<T> requires T to be a complete type");
 #if !defined(BOOST_ATOMIC_DETAIL_NO_CXX11_IS_TRIVIALLY_COPYABLE)
-    BOOST_STATIC_ASSERT_MSG(atomics::detail::is_trivially_copyable< value_type >::value, "boost::atomic<T> requires T to be a trivially copyable type");
+    BOOST_STATIC_ASSERT_MSG(atomics::detail::is_trivially_copyable< value_type >::value, "cppmsboost::atomic<T> requires T to be a trivially copyable type");
 #endif
 
 public:
@@ -1165,8 +1165,8 @@ typedef atomic< long > atomic_long;
 typedef atomic< uint64_t > atomic_uint64_t;
 typedef atomic< int64_t > atomic_int64_t;
 #ifdef BOOST_HAS_LONG_LONG
-typedef atomic< boost::ulong_long_type > atomic_ullong;
-typedef atomic< boost::long_long_type > atomic_llong;
+typedef atomic< cppmsboost::ulong_long_type > atomic_ullong;
+typedef atomic< cppmsboost::long_long_type > atomic_llong;
 #endif
 typedef atomic< void* > atomic_address;
 typedef atomic< bool > atomic_bool;
@@ -1210,12 +1210,12 @@ typedef atomic< std::size_t > atomic_size_t;
 typedef atomic< std::ptrdiff_t > atomic_ptrdiff_t;
 
 #if defined(BOOST_HAS_INTPTR_T)
-typedef atomic< boost::intptr_t > atomic_intptr_t;
-typedef atomic< boost::uintptr_t > atomic_uintptr_t;
+typedef atomic< cppmsboost::intptr_t > atomic_intptr_t;
+typedef atomic< cppmsboost::uintptr_t > atomic_uintptr_t;
 #endif
 
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #if defined(BOOST_MSVC)
 #pragma warning(pop)

@@ -26,7 +26,7 @@
 #include <boost/intrusive/pack_options.hpp>
 #include <boost/static_assert.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 
 ////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ enum tree_type_enum
 template<tree_type_enum TreeType, bool OptimizeSize>
 struct tree_opt
 {
-   static const boost::container::tree_type_enum tree_type = TreeType;
+   static const cppmsboost::container::tree_type_enum tree_type = TreeType;
    static const bool optimize_size = OptimizeSize;
 };
 
@@ -69,9 +69,9 @@ BOOST_INTRUSIVE_OPTION_CONSTANT(tree_type, tree_type_enum, TreeType, tree_type)
 BOOST_INTRUSIVE_OPTION_CONSTANT(optimize_size, bool, Enabled, optimize_size)
 
 //! Helper metafunction to combine options into a single type to be used
-//! by \c boost::container::set, \c boost::container::multiset
-//! \c boost::container::map and \c boost::container::multimap.
-//! Supported options are: \c boost::container::optimize_size and \c boost::container::tree_type
+//! by \c cppmsboost::container::set, \c cppmsboost::container::multiset
+//! \c cppmsboost::container::map and \c cppmsboost::container::multimap.
+//! Supported options are: \c cppmsboost::container::optimize_size and \c cppmsboost::container::tree_type
 #if defined(BOOST_CONTAINER_DOXYGEN_INVOKED) || defined(BOOST_CONTAINER_VARIADIC_TEMPLATES)
 template<class ...Options>
 #else
@@ -80,7 +80,7 @@ template<class O1 = void, class O2 = void, class O3 = void, class O4 = void>
 struct tree_assoc_options
 {
    /// @cond
-   typedef typename ::boost::intrusive::pack_options
+   typedef typename ::cppmsboost::intrusive::pack_options
       < tree_assoc_defaults,
       #if !defined(BOOST_CONTAINER_VARIADIC_TEMPLATES)
       O1, O2, O3, O4
@@ -98,7 +98,7 @@ struct tree_assoc_options
 //! Helper alias metafunction to combine options into a single type to be used
 //! by tree-based associative containers
 template<class ...Options>
-using tree_assoc_options_t = typename boost::container::tree_assoc_options<Options...>::type;
+using tree_assoc_options_t = typename cppmsboost::container::tree_assoc_options<Options...>::type;
 
 #endif
 
@@ -128,9 +128,9 @@ typedef hash_opt<false> hash_assoc_defaults;
 BOOST_INTRUSIVE_OPTION_CONSTANT(store_hash, bool, Enabled, store_hash)
 
 //! Helper metafunction to combine options into a single type to be used
-//! by \c boost::container::hash_set, \c boost::container::hash_multiset
-//! \c boost::container::hash_map and \c boost::container::hash_multimap.
-//! Supported options are: \c boost::container::store_hash
+//! by \c cppmsboost::container::hash_set, \c cppmsboost::container::hash_multiset
+//! \c cppmsboost::container::hash_map and \c cppmsboost::container::hash_multimap.
+//! Supported options are: \c cppmsboost::container::store_hash
 #if defined(BOOST_CONTAINER_DOXYGEN_INVOKED) || defined(BOOST_CONTAINER_VARIADIC_TEMPLATES)
 template<class ...Options>
 #else
@@ -139,7 +139,7 @@ template<class O1 = void, class O2 = void, class O3 = void, class O4 = void>
 struct hash_assoc_options
 {
    /// @cond
-   typedef typename ::boost::intrusive::pack_options
+   typedef typename ::cppmsboost::intrusive::pack_options
       < hash_assoc_defaults,
       #if !defined(BOOST_CONTAINER_VARIADIC_TEMPLATES)
       O1, O2, O3, O4
@@ -157,7 +157,7 @@ struct hash_assoc_options
 //! Helper alias metafunction to combine options into a single type to be used
 //! by hash-based associative containers
 template<class ...Options>
-using hash_assoc_options_t = typename boost::container::hash_assoc_options<Options...>::type;
+using hash_assoc_options_t = typename cppmsboost::container::hash_assoc_options<Options...>::type;
 
 #endif
 
@@ -243,9 +243,9 @@ struct growth_factor_100{};
 //! but the implementation should handle wraparound produced by the growth factor.
 //!
 //!Predefined growth factors that can be passed as arguments to this option are:
-//!\c boost::container::growth_factor_50
-//!\c boost::container::growth_factor_60
-//!\c boost::container::growth_factor_100
+//!\c cppmsboost::container::growth_factor_50
+//!\c cppmsboost::container::growth_factor_60
+//!\c cppmsboost::container::growth_factor_100
 //!
 //!If this option is not specified, a default will be used by the container.
 BOOST_INTRUSIVE_OPTION_TYPE(growth_factor, GrowthFactor, GrowthFactor, growth_factor_type)
@@ -278,8 +278,8 @@ BOOST_INTRUSIVE_OPTION_TYPE(growth_factor, GrowthFactor, GrowthFactor, growth_fa
 BOOST_INTRUSIVE_OPTION_TYPE(stored_size, StoredSizeType, StoredSizeType, stored_size_type)
 
 //! Helper metafunction to combine options into a single type to be used
-//! by \c boost::container::vector.
-//! Supported options are: \c boost::container::growth_factor and \c boost::container::stored_size
+//! by \c cppmsboost::container::vector.
+//! Supported options are: \c cppmsboost::container::growth_factor and \c cppmsboost::container::stored_size
 #if defined(BOOST_CONTAINER_DOXYGEN_INVOKED) || defined(BOOST_CONTAINER_VARIADIC_TEMPLATES)
 template<class ...Options>
 #else
@@ -288,7 +288,7 @@ template<class O1 = void, class O2 = void, class O3 = void, class O4 = void>
 struct vector_options
 {
    /// @cond
-   typedef typename ::boost::intrusive::pack_options
+   typedef typename ::cppmsboost::intrusive::pack_options
       < vector_null_opt,
       #if !defined(BOOST_CONTAINER_VARIADIC_TEMPLATES)
       O1, O2, O3, O4
@@ -305,10 +305,10 @@ struct vector_options
 #if !defined(BOOST_NO_CXX11_TEMPLATE_ALIASES)
 
 //! Helper alias metafunction to combine options into a single type to be used
-//! by \c boost::container::vector.
-//! Supported options are: \c boost::container::growth_factor and \c boost::container::stored_size
+//! by \c cppmsboost::container::vector.
+//! Supported options are: \c cppmsboost::container::growth_factor and \c cppmsboost::container::stored_size
 template<class ...Options>
-using vector_options_t = typename boost::container::vector_options<Options...>::type;
+using vector_options_t = typename cppmsboost::container::vector_options<Options...>::type;
 
 #endif
 
@@ -341,8 +341,8 @@ typedef small_vector_opt<void, 0u> small_vector_null_opt;
 #endif    //!defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
 
 //! Helper metafunction to combine options into a single type to be used
-//! by \c boost::container::small_vector.
-//! Supported options are: \c boost::container::growth_factor and \c boost::container::inplace_alignment
+//! by \c cppmsboost::container::small_vector.
+//! Supported options are: \c cppmsboost::container::growth_factor and \c cppmsboost::container::inplace_alignment
 #if defined(BOOST_CONTAINER_DOXYGEN_INVOKED) || defined(BOOST_CONTAINER_VARIADIC_TEMPLATES)
 template<class ...Options>
 #else
@@ -351,7 +351,7 @@ template<class O1 = void, class O2 = void, class O3 = void, class O4 = void>
 struct small_vector_options
 {
    /// @cond
-   typedef typename ::boost::intrusive::pack_options
+   typedef typename ::cppmsboost::intrusive::pack_options
       < small_vector_null_opt,
       #if !defined(BOOST_CONTAINER_VARIADIC_TEMPLATES)
       O1, O2, O3, O4
@@ -368,10 +368,10 @@ struct small_vector_options
 #if !defined(BOOST_NO_CXX11_TEMPLATE_ALIASES)
 
 //! Helper alias metafunction to combine options into a single type to be used
-//! by \c boost::container::small_vector.
-//! Supported options are: \c boost::container::growth_factor and \c boost::container::stored_size
+//! by \c cppmsboost::container::small_vector.
+//! Supported options are: \c cppmsboost::container::growth_factor and \c cppmsboost::container::stored_size
 template<class ...Options>
-using small_vector_options_t = typename boost::container::small_vector_options<Options...>::type;
+using small_vector_options_t = typename cppmsboost::container::small_vector_options<Options...>::type;
 
 #endif
 
@@ -408,8 +408,8 @@ typedef static_vector_opt<true, 0u> static_vector_null_opt;
 #endif    //!defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
 
 //! Helper metafunction to combine options into a single type to be used
-//! by \c boost::container::static_vector.
-//! Supported options are: \c boost::container::throw_on_overflow and \c boost::container::inplace_alignment
+//! by \c cppmsboost::container::static_vector.
+//! Supported options are: \c cppmsboost::container::throw_on_overflow and \c cppmsboost::container::inplace_alignment
 #if defined(BOOST_CONTAINER_DOXYGEN_INVOKED) || defined(BOOST_CONTAINER_VARIADIC_TEMPLATES)
 template<class ...Options>
 #else
@@ -418,7 +418,7 @@ template<class O1 = void, class O2 = void, class O3 = void, class O4 = void>
 struct static_vector_options
 {
    /// @cond
-   typedef typename ::boost::intrusive::pack_options
+   typedef typename ::cppmsboost::intrusive::pack_options
       < static_vector_null_opt,
       #if !defined(BOOST_CONTAINER_VARIADIC_TEMPLATES)
       O1, O2, O3, O4
@@ -435,10 +435,10 @@ struct static_vector_options
 #if !defined(BOOST_NO_CXX11_TEMPLATE_ALIASES)
 
 //! Helper alias metafunction to combine options into a single type to be used
-//! by \c boost::container::static_vector.
-//! Supported options are: \c boost::container::growth_factor and \c boost::container::stored_size
+//! by \c cppmsboost::container::static_vector.
+//! Supported options are: \c cppmsboost::container::growth_factor and \c cppmsboost::container::stored_size
 template<class ...Options>
-using static_vector_options_t = typename boost::container::static_vector_options<Options...>::type;
+using static_vector_options_t = typename cppmsboost::container::static_vector_options<Options...>::type;
 
 #endif
 
@@ -466,8 +466,8 @@ typedef deque_opt<0u, 0u> deque_null_opt;
 #endif
 
 //! Helper metafunction to combine options into a single type to be used
-//! by \c boost::container::deque.
-//! Supported options are: \c boost::container::block_bytes
+//! by \c cppmsboost::container::deque.
+//! Supported options are: \c cppmsboost::container::block_bytes
 #if defined(BOOST_CONTAINER_DOXYGEN_INVOKED) || defined(BOOST_CONTAINER_VARIADIC_TEMPLATES)
 template<class ...Options>
 #else
@@ -476,7 +476,7 @@ template<class O1 = void, class O2 = void, class O3 = void, class O4 = void>
 struct deque_options
 {
    /// @cond
-   typedef typename ::boost::intrusive::pack_options
+   typedef typename ::cppmsboost::intrusive::pack_options
       < deque_null_opt,
       #if !defined(BOOST_CONTAINER_VARIADIC_TEMPLATES)
       O1, O2, O3, O4
@@ -492,10 +492,10 @@ struct deque_options
 #if !defined(BOOST_NO_CXX11_TEMPLATE_ALIASES)
 
 //! Helper alias metafunction to combine options into a single type to be used
-//! by \c boost::container::deque.
-//! Supported options are: \c boost::container::block_bytes
+//! by \c cppmsboost::container::deque.
+//! Supported options are: \c cppmsboost::container::block_bytes
 template<class ...Options>
-using deque_options_t = typename boost::container::deque_options<Options...>::type;
+using deque_options_t = typename cppmsboost::container::deque_options<Options...>::type;
 
 #endif
 
@@ -514,7 +514,7 @@ BOOST_INTRUSIVE_OPTION_CONSTANT(block_bytes, std::size_t, BlockBytes, block_byte
 BOOST_INTRUSIVE_OPTION_CONSTANT(block_size, std::size_t, BlockSize, block_size)
 
 }  //namespace container {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #include <boost/container/detail/config_end.hpp>
 

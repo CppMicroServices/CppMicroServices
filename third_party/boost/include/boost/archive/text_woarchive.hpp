@@ -44,7 +44,7 @@ namespace std{
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 namespace detail {
@@ -80,7 +80,7 @@ protected:
     void save(const version_type & t){
         save(static_cast<unsigned int>(t));
     }
-    void save(const boost::serialization::item_version_type & t){
+    void save(const cppmsboost::serialization::item_version_type & t){
         save(static_cast<unsigned int>(t));
     }
     BOOST_WARCHIVE_DECL void
@@ -140,10 +140,10 @@ public:
 };
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 // required by export
-BOOST_SERIALIZATION_REGISTER_ARCHIVE(boost::archive::text_woarchive)
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(cppmsboost::archive::text_woarchive)
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

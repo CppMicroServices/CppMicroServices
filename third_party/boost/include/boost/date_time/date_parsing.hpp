@@ -26,7 +26,7 @@
 #include <locale> // std::tolower(char, locale)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
   //! A function to replace the std::transform( , , ,tolower) construct
@@ -61,7 +61,7 @@ namespace date_time {
     inline unsigned short
     month_str_to_ushort(std::string const& s) {
       if((s.at(0) >= '0') && (s.at(0) <= '9')) {
-        return boost::lexical_cast<unsigned short>(s);
+        return cppmsboost::lexical_cast<unsigned short>(s);
       }
       else {
         std::string str = convert_to_lower(s);
@@ -143,11 +143,11 @@ namespace date_time {
       unsigned pos = 0;
       unsigned short year(0), month(0), day(0);
       typedef typename std::basic_string<char>::traits_type traits_type;
-      typedef boost::char_separator<char, traits_type> char_separator_type;
-      typedef boost::tokenizer<char_separator_type,
+      typedef cppmsboost::char_separator<char, traits_type> char_separator_type;
+      typedef cppmsboost::tokenizer<char_separator_type,
                                std::basic_string<char>::const_iterator,
                                std::basic_string<char> > tokenizer;
-      typedef boost::tokenizer<char_separator_type,
+      typedef cppmsboost::tokenizer<char_separator_type,
                                std::basic_string<char>::const_iterator,
                                std::basic_string<char> >::iterator tokenizer_iterator;
       // may need more delimiters, these work for the regression tests
@@ -160,7 +160,7 @@ namespace date_time {
         switch(spec_str.at(pos)) {
           case 'y':
           {
-            year = boost::lexical_cast<unsigned short>(*beg);
+            year = cppmsboost::lexical_cast<unsigned short>(*beg);
             break;
           }
           case 'm':
@@ -170,7 +170,7 @@ namespace date_time {
           }
           case 'd':
           {
-            day = boost::lexical_cast<unsigned short>(*beg);
+            day = cppmsboost::lexical_cast<unsigned short>(*beg);
             break;
           }
           default: break;
@@ -193,14 +193,14 @@ namespace date_time {
        * strings will not be parsed.
        * Ex:
        * "2005121" will parse 2005 & 12, but not the "1" */
-      boost::offset_separator osf(offsets, offsets+3, false, false);
+      cppmsboost::offset_separator osf(offsets, offsets+3, false, false);
 
-      typedef typename boost::tokenizer<boost::offset_separator,
+      typedef typename cppmsboost::tokenizer<cppmsboost::offset_separator,
                                         std::basic_string<char>::const_iterator,
                                         std::basic_string<char> > tokenizer_type;
       tokenizer_type tok(s, osf);
       for(typename tokenizer_type::iterator ti=tok.begin(); ti!=tok.end();++ti) {
-        unsigned short i = boost::lexical_cast<unsigned short>(*ti);
+        unsigned short i = cppmsboost::lexical_cast<unsigned short>(*ti);
         switch(pos) {
         case 0: y = i; break;
         case 1: m = i; break;
@@ -312,8 +312,8 @@ namespace date_time {
     period<date_type, typename date_type::duration_type>
     from_simple_string_type(const std::basic_string<charT>& s){
       typedef typename std::basic_string<charT>::traits_type traits_type;
-      typedef typename boost::char_separator<charT, traits_type> char_separator;
-      typedef typename boost::tokenizer<char_separator,
+      typedef typename cppmsboost::char_separator<charT, traits_type> char_separator;
+      typedef typename cppmsboost::tokenizer<char_separator,
                                         typename std::basic_string<charT>::const_iterator,
                                         std::basic_string<charT> > tokenizer;
       const charT sep_list[4] = {'[','/',']','\0'};

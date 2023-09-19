@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 namespace socket_option {
@@ -122,7 +122,7 @@ public:
     default:
       {
         std::length_error ex("boolean socket option resize");
-        boost::asio::detail::throw_exception(ex);
+        cppmsboost::asio::detail::throw_exception(ex);
       }
     }
   }
@@ -203,7 +203,7 @@ public:
     if (s != sizeof(value_))
     {
       std::length_error ex("integer socket option resize");
-      boost::asio::detail::throw_exception(ex);
+      cppmsboost::asio::detail::throw_exception(ex);
     }
   }
 
@@ -300,7 +300,7 @@ public:
     if (s != sizeof(value_))
     {
       std::length_error ex("linger socket option resize");
-      boost::asio::detail::throw_exception(ex);
+      cppmsboost::asio::detail::throw_exception(ex);
     }
   }
 
@@ -311,7 +311,7 @@ private:
 } // namespace socket_option
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

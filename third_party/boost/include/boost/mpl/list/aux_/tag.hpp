@@ -14,7 +14,7 @@
 // $Date$
 // $Revision$
 
-namespace boost { namespace mpl { namespace aux {
+namespace cppmsboost { namespace mpl { namespace aux {
 
 struct list_tag;
 struct l_iter_tag;

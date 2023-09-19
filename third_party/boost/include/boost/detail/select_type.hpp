@@ -13,7 +13,7 @@
 #ifndef SELECT_TYPE_DWA20010206_HPP
 # define SELECT_TYPE_DWA20010206_HPP
 
-namespace boost { namespace detail {
+namespace cppmsboost { namespace detail {
 
   // Template class if_true -- select among 2 types based on a bool constant expression
   // Usage:

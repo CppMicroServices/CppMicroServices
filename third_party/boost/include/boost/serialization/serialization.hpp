@@ -38,7 +38,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // layer 1 - layer that routes member access through the access class.
 // this is what permits us to grant access to private class member functions
-// by specifying friend class boost::serialization::access
+// by specifying friend class cppmsboost::serialization::access
 
 #include <boost/serialization/access.hpp>
 
@@ -55,7 +55,7 @@
 // will be converted to "const unsigned long" and a match will be made with
 // one of the default template functions below.
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 
 BOOST_STRONG_TYPEDEF(unsigned int, version_type)
@@ -97,14 +97,14 @@ inline void load_construct_data(
 // in the manner we desire.
 //
 // on compilers which don't implement ADL. only the current namespace
-// i.e. boost::serialization will be searched.
+// i.e. cppmsboost::serialization will be searched.
 //
 // on compilers which DO implement ADL
 // serialize overrides can be in any of the following
 //
 // 1) same namepace as Archive
 // 2) same namespace as T
-// 3) boost::serialization
+// 3) cppmsboost::serialization
 //
 // Due to Martin Ecker
 
@@ -141,6 +141,6 @@ inline void load_construct_data_adl(
 }
 
 } // namespace serialization
-} // namespace boost
+} // namespace cppmsboost
 
 #endif //BOOST_SERIALIZATION_SERIALIZATION_HPP

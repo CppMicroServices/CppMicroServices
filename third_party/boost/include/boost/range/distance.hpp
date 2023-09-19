@@ -20,7 +20,7 @@
 #include <boost/range/end.hpp>
 #include <boost/range/difference_type.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
     namespace range_distance_adl_barrier
@@ -29,7 +29,7 @@ namespace boost
         inline BOOST_CXX14_CONSTEXPR BOOST_DEDUCED_TYPENAME range_difference<T>::type
         distance( const T& r )
         {
-            return boost::iterators::distance( boost::begin( r ), boost::end( r ) );
+            return cppmsboost::iterators::distance( cppmsboost::begin( r ), cppmsboost::end( r ) );
         }
     }
 

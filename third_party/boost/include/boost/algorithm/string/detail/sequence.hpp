@@ -19,7 +19,7 @@
 
 #include <boost/algorithm/string/sequence_traits.hpp>
 
-namespace boost {
+namespace cppmsboost {
     namespace algorithm {
         namespace detail {
 
@@ -41,7 +41,7 @@ namespace boost {
                 BOOST_STRING_TYPENAME InputT::iterator At,
                 const InsertT& Insert )
             {
-                ::boost::algorithm::detail::insert( Input, At, ::boost::begin(Insert), ::boost::end(Insert) );
+                ::cppmsboost::algorithm::detail::insert( Input, At, ::cppmsboost::begin(Insert), ::cppmsboost::end(Insert) );
             }
            
 //  erase helper  ---------------------------------------------------//
@@ -138,7 +138,7 @@ namespace boost {
                     ForwardIteratorT End ) 
                 {
                     replace_const_time_helper< 
-                        boost::mpl::and_<
+                        cppmsboost::mpl::and_<
                             has_const_time_insert<InputT>,
                             has_const_time_erase<InputT> >::value >()(
                         Input, From, To, Begin, End );
@@ -184,17 +184,17 @@ namespace boost {
             {
                 if(From!=To)
                 {
-                    ::boost::algorithm::detail::replace( Input, From, To, ::boost::begin(Insert), ::boost::end(Insert) );
+                    ::cppmsboost::algorithm::detail::replace( Input, From, To, ::cppmsboost::begin(Insert), ::cppmsboost::end(Insert) );
                 }
                 else
                 {
-                    ::boost::algorithm::detail::insert( Input, From, ::boost::begin(Insert), ::boost::end(Insert) );
+                    ::cppmsboost::algorithm::detail::insert( Input, From, ::cppmsboost::begin(Insert), ::cppmsboost::end(Insert) );
                 }
             }
 
         } // namespace detail
     } // namespace algorithm
-} // namespace boost
+} // namespace cppmsboost
 
 
 #endif  // BOOST_STRING_DETAIL_SEQUENCE_HPP

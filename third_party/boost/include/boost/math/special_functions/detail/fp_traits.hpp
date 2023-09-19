@@ -78,7 +78,7 @@ With these techniques, the code could be simplified.
 
 //------------------------------------------------------------------------------
 
-namespace boost {
+namespace cppmsboost {
 namespace math {
 namespace detail {
 
@@ -525,7 +525,7 @@ template<> struct size_to_precision<16, true>
 template <class T>
 struct select_native
 {
-    typedef BOOST_DEDUCED_TYPENAME size_to_precision<sizeof(T), ::boost::is_floating_point<T>::value>::type precision;
+    typedef BOOST_DEDUCED_TYPENAME size_to_precision<sizeof(T), ::cppmsboost::is_floating_point<T>::value>::type precision;
     typedef fp_traits_non_native<T, precision> type;
 };
 template<>
@@ -563,7 +563,7 @@ struct select_native<long double>
 
 template<class T> struct fp_traits
 {
-    typedef BOOST_DEDUCED_TYPENAME size_to_precision<sizeof(T), ::boost::is_floating_point<T>::value>::type precision;
+    typedef BOOST_DEDUCED_TYPENAME size_to_precision<sizeof(T), ::cppmsboost::is_floating_point<T>::value>::type precision;
 #if defined(BOOST_MATH_USE_STD_FPCLASSIFY) && !defined(BOOST_MATH_DISABLE_STD_FPCLASSIFY)
     typedef typename select_native<T>::type type;
 #else
@@ -576,6 +576,6 @@ template<class T> struct fp_traits
 
 }   // namespace detail
 }   // namespace math
-}   // namespace boost
+}   // namespace cppmsboost
 
 #endif

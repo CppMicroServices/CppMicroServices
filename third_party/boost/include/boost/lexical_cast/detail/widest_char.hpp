@@ -26,18 +26,18 @@
 
 #include <boost/type_traits/conditional.hpp>
 
-namespace boost { namespace detail {
+namespace cppmsboost { namespace detail {
 
     template <typename TargetChar, typename SourceChar>
     struct widest_char {
-        typedef BOOST_DEDUCED_TYPENAME boost::conditional<
+        typedef BOOST_DEDUCED_TYPENAME cppmsboost::conditional<
             (sizeof(TargetChar) > sizeof(SourceChar))
             , TargetChar
             , SourceChar
         >::type type;
     };
 
-}} // namespace boost::detail
+}} // namespace cppmsboost::detail
 
 #endif // BOOST_LEXICAL_CAST_DETAIL_WIDEST_CHAR_HPP
 

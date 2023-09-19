@@ -31,7 +31,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 namespace detail
@@ -59,15 +59,15 @@ struct is_match_condition
 #else
   enum
   {
-    value = boost::asio::is_function<
-        typename boost::asio::remove_pointer<T>::type>::value
+    value = cppmsboost::asio::is_function<
+        typename cppmsboost::asio::remove_pointer<T>::type>::value
       || detail::has_result_type<T>::value
   };
 #endif
 };
 
 /**
- * @defgroup read_until boost::asio::read_until
+ * @defgroup read_until cppmsboost::asio::read_until
  *
  * @brief The @c read_until function is a composed operation that reads data
  * into a dynamic buffer sequence, or into a streambuf, until it contains a
@@ -105,7 +105,7 @@ struct is_match_condition
  * @returns The number of bytes in the dynamic buffer sequence's get area up to
  * and including the delimiter.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note After a successful read_until operation, the dynamic buffer sequence
  * may contain additional data beyond the delimiter. An application will
@@ -115,8 +115,8 @@ struct is_match_condition
  * @par Example
  * To read data into a @c std::string until a newline is encountered:
  * @code std::string data;
- * std::string n = boost::asio::read_until(s,
- *     boost::asio::dynamic_buffer(data), '\n');
+ * std::string n = cppmsboost::asio::read_until(s,
+ *     cppmsboost::asio::dynamic_buffer(data), '\n');
  * std::string line = data.substr(0, n);
  * data.erase(0, n); @endcode
  * After the @c read_until operation completes successfully, the string @c data
@@ -176,7 +176,7 @@ std::size_t read_until(SyncReadStream& s,
 template <typename SyncReadStream, typename DynamicBuffer_v1>
 std::size_t read_until(SyncReadStream& s,
     BOOST_ASIO_MOVE_ARG(DynamicBuffer_v1) buffers,
-    char delim, boost::system::error_code& ec,
+    char delim, cppmsboost::system::error_code& ec,
     typename enable_if<
       is_dynamic_buffer_v1<typename decay<DynamicBuffer_v1>::type>::value
         && !is_dynamic_buffer_v2<typename decay<DynamicBuffer_v1>::type>::value
@@ -217,8 +217,8 @@ std::size_t read_until(SyncReadStream& s,
  * @par Example
  * To read data into a @c std::string until a CR-LF sequence is encountered:
  * @code std::string data;
- * std::string n = boost::asio::read_until(s,
- *     boost::asio::dynamic_buffer(data), "\r\n");
+ * std::string n = cppmsboost::asio::read_until(s,
+ *     cppmsboost::asio::dynamic_buffer(data), "\r\n");
  * std::string line = data.substr(0, n);
  * data.erase(0, n); @endcode
  * After the @c read_until operation completes successfully, the string @c data
@@ -280,7 +280,7 @@ template <typename SyncReadStream, typename DynamicBuffer_v1>
 std::size_t read_until(SyncReadStream& s,
     BOOST_ASIO_MOVE_ARG(DynamicBuffer_v1) buffers,
     BOOST_ASIO_STRING_VIEW_PARAM delim,
-    boost::system::error_code& ec,
+    cppmsboost::system::error_code& ec,
     typename enable_if<
       is_dynamic_buffer_v1<typename decay<DynamicBuffer_v1>::type>::value
         && !is_dynamic_buffer_v2<typename decay<DynamicBuffer_v1>::type>::value
@@ -318,7 +318,7 @@ std::size_t read_until(SyncReadStream& s,
  * @returns The number of bytes in the dynamic buffer sequence's get area up to
  * and including the substring that matches the regular expression.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note After a successful read_until operation, the dynamic buffer sequence
  * may contain additional data beyond that which matched the regular
@@ -328,8 +328,8 @@ std::size_t read_until(SyncReadStream& s,
  * @par Example
  * To read data into a @c std::string until a CR-LF sequence is encountered:
  * @code std::string data;
- * std::string n = boost::asio::read_until(s,
- *     boost::asio::dynamic_buffer(data), boost::regex("\r\n"));
+ * std::string n = cppmsboost::asio::read_until(s,
+ *     cppmsboost::asio::dynamic_buffer(data), cppmsboost::regex("\r\n"));
  * std::string line = data.substr(0, n);
  * data.erase(0, n); @endcode
  * After the @c read_until operation completes successfully, the string @c data
@@ -347,7 +347,7 @@ std::size_t read_until(SyncReadStream& s,
 template <typename SyncReadStream, typename DynamicBuffer_v1>
 std::size_t read_until(SyncReadStream& s,
     BOOST_ASIO_MOVE_ARG(DynamicBuffer_v1) buffers,
-    const boost::regex& expr,
+    const cppmsboost::regex& expr,
     typename enable_if<
       is_dynamic_buffer_v1<typename decay<DynamicBuffer_v1>::type>::value
         && !is_dynamic_buffer_v2<typename decay<DynamicBuffer_v1>::type>::value
@@ -392,7 +392,7 @@ std::size_t read_until(SyncReadStream& s,
 template <typename SyncReadStream, typename DynamicBuffer_v1>
 std::size_t read_until(SyncReadStream& s,
     BOOST_ASIO_MOVE_ARG(DynamicBuffer_v1) buffers,
-    const boost::regex& expr, boost::system::error_code& ec,
+    const cppmsboost::regex& expr, cppmsboost::system::error_code& ec,
     typename enable_if<
       is_dynamic_buffer_v1<typename decay<DynamicBuffer_v1>::type>::value
         && !is_dynamic_buffer_v2<typename decay<DynamicBuffer_v1>::type>::value
@@ -442,7 +442,7 @@ std::size_t read_until(SyncReadStream& s,
  * @returns The number of bytes in the dynamic_buffer's get area that
  * have been fully consumed by the match function.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note After a successful read_until operation, the dynamic buffer sequence
  * may contain additional data beyond that which matched the function object.
@@ -456,8 +456,8 @@ std::size_t read_until(SyncReadStream& s,
  *
  * @par Examples
  * To read data into a dynamic buffer sequence until whitespace is encountered:
- * @code typedef boost::asio::buffers_iterator<
- *     boost::asio::const_buffers_1> iterator;
+ * @code typedef cppmsboost::asio::buffers_iterator<
+ *     cppmsboost::asio::const_buffers_1> iterator;
  *
  * std::pair<iterator, bool>
  * match_whitespace(iterator begin, iterator end)
@@ -470,7 +470,7 @@ std::size_t read_until(SyncReadStream& s,
  * }
  * ...
  * std::string data;
- * boost::asio::read_until(s, data, match_whitespace);
+ * cppmsboost::asio::read_until(s, data, match_whitespace);
  * @endcode
  *
  * To read data into a @c std::string until a matching character is found:
@@ -496,11 +496,11 @@ std::size_t read_until(SyncReadStream& s,
  *
  * namespace asio {
  *   template <> struct is_match_condition<match_char>
- *     : public boost::true_type {};
+ *     : public cppmsboost::true_type {};
  * } // namespace asio
  * ...
  * std::string data;
- * boost::asio::read_until(s, data, match_char('a'));
+ * cppmsboost::asio::read_until(s, data, match_char('a'));
  * @endcode
  */
 template <typename SyncReadStream,
@@ -571,7 +571,7 @@ template <typename SyncReadStream,
     typename DynamicBuffer_v1, typename MatchCondition>
 std::size_t read_until(SyncReadStream& s,
     BOOST_ASIO_MOVE_ARG(DynamicBuffer_v1) buffers,
-    MatchCondition match_condition, boost::system::error_code& ec,
+    MatchCondition match_condition, cppmsboost::system::error_code& ec,
     typename enable_if<
       is_match_condition<MatchCondition>::value
         && is_dynamic_buffer_v1<typename decay<DynamicBuffer_v1>::type>::value
@@ -604,7 +604,7 @@ std::size_t read_until(SyncReadStream& s,
  * @returns The number of bytes in the streambuf's get area up to and including
  * the delimiter.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note After a successful read_until operation, the streambuf may contain
  * additional data beyond the delimiter. An application will typically leave
@@ -612,8 +612,8 @@ std::size_t read_until(SyncReadStream& s,
  *
  * @par Example
  * To read data into a streambuf until a newline is encountered:
- * @code boost::asio::streambuf b;
- * boost::asio::read_until(s, b, '\n');
+ * @code cppmsboost::asio::streambuf b;
+ * cppmsboost::asio::read_until(s, b, '\n');
  * std::istream is(&b);
  * std::string line;
  * std::getline(is, line); @endcode
@@ -630,7 +630,7 @@ std::size_t read_until(SyncReadStream& s,
  */
 template <typename SyncReadStream, typename Allocator>
 std::size_t read_until(SyncReadStream& s,
-    boost::asio::basic_streambuf<Allocator>& b, char delim);
+    cppmsboost::asio::basic_streambuf<Allocator>& b, char delim);
 
 /// Read data into a streambuf until it contains a specified delimiter.
 /**
@@ -664,8 +664,8 @@ std::size_t read_until(SyncReadStream& s,
  */
 template <typename SyncReadStream, typename Allocator>
 std::size_t read_until(SyncReadStream& s,
-    boost::asio::basic_streambuf<Allocator>& b, char delim,
-    boost::system::error_code& ec);
+    cppmsboost::asio::basic_streambuf<Allocator>& b, char delim,
+    cppmsboost::system::error_code& ec);
 
 /// Read data into a streambuf until it contains a specified delimiter.
 /**
@@ -691,7 +691,7 @@ std::size_t read_until(SyncReadStream& s,
  * @returns The number of bytes in the streambuf's get area up to and including
  * the delimiter.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note After a successful read_until operation, the streambuf may contain
  * additional data beyond the delimiter. An application will typically leave
@@ -699,8 +699,8 @@ std::size_t read_until(SyncReadStream& s,
  *
  * @par Example
  * To read data into a streambuf until a newline is encountered:
- * @code boost::asio::streambuf b;
- * boost::asio::read_until(s, b, "\r\n");
+ * @code cppmsboost::asio::streambuf b;
+ * cppmsboost::asio::read_until(s, b, "\r\n");
  * std::istream is(&b);
  * std::string line;
  * std::getline(is, line); @endcode
@@ -717,7 +717,7 @@ std::size_t read_until(SyncReadStream& s,
  */
 template <typename SyncReadStream, typename Allocator>
 std::size_t read_until(SyncReadStream& s,
-    boost::asio::basic_streambuf<Allocator>& b,
+    cppmsboost::asio::basic_streambuf<Allocator>& b,
     BOOST_ASIO_STRING_VIEW_PARAM delim);
 
 /// Read data into a streambuf until it contains a specified delimiter.
@@ -752,8 +752,8 @@ std::size_t read_until(SyncReadStream& s,
  */
 template <typename SyncReadStream, typename Allocator>
 std::size_t read_until(SyncReadStream& s,
-    boost::asio::basic_streambuf<Allocator>& b,
-    BOOST_ASIO_STRING_VIEW_PARAM delim, boost::system::error_code& ec);
+    cppmsboost::asio::basic_streambuf<Allocator>& b,
+    BOOST_ASIO_STRING_VIEW_PARAM delim, cppmsboost::system::error_code& ec);
 
 #if defined(BOOST_ASIO_HAS_BOOST_REGEX) \
   || defined(GENERATING_DOCUMENTATION)
@@ -783,7 +783,7 @@ std::size_t read_until(SyncReadStream& s,
  * @returns The number of bytes in the streambuf's get area up to and including
  * the substring that matches the regular expression.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note After a successful read_until operation, the streambuf may contain
  * additional data beyond that which matched the regular expression. An
@@ -792,8 +792,8 @@ std::size_t read_until(SyncReadStream& s,
  *
  * @par Example
  * To read data into a streambuf until a CR-LF sequence is encountered:
- * @code boost::asio::streambuf b;
- * boost::asio::read_until(s, b, boost::regex("\r\n"));
+ * @code cppmsboost::asio::streambuf b;
+ * cppmsboost::asio::read_until(s, b, cppmsboost::regex("\r\n"));
  * std::istream is(&b);
  * std::string line;
  * std::getline(is, line); @endcode
@@ -810,7 +810,7 @@ std::size_t read_until(SyncReadStream& s,
  */
 template <typename SyncReadStream, typename Allocator>
 std::size_t read_until(SyncReadStream& s,
-    boost::asio::basic_streambuf<Allocator>& b, const boost::regex& expr);
+    cppmsboost::asio::basic_streambuf<Allocator>& b, const cppmsboost::regex& expr);
 
 /// Read data into a streambuf until some part of the data it contains matches
 /// a regular expression.
@@ -847,8 +847,8 @@ std::size_t read_until(SyncReadStream& s,
  */
 template <typename SyncReadStream, typename Allocator>
 std::size_t read_until(SyncReadStream& s,
-    boost::asio::basic_streambuf<Allocator>& b, const boost::regex& expr,
-    boost::system::error_code& ec);
+    cppmsboost::asio::basic_streambuf<Allocator>& b, const cppmsboost::regex& expr,
+    cppmsboost::system::error_code& ec);
 
 #endif // defined(BOOST_ASIO_HAS_BOOST_REGEX)
        // || defined(GENERATING_DOCUMENTATION)
@@ -892,7 +892,7 @@ std::size_t read_until(SyncReadStream& s,
  * @returns The number of bytes in the streambuf's get area that have been fully
  * consumed by the match function.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note After a successful read_until operation, the streambuf may contain
  * additional data beyond that which matched the function object. An application
@@ -906,8 +906,8 @@ std::size_t read_until(SyncReadStream& s,
  *
  * @par Examples
  * To read data into a streambuf until whitespace is encountered:
- * @code typedef boost::asio::buffers_iterator<
- *     boost::asio::streambuf::const_buffers_type> iterator;
+ * @code typedef cppmsboost::asio::buffers_iterator<
+ *     cppmsboost::asio::streambuf::const_buffers_type> iterator;
  *
  * std::pair<iterator, bool>
  * match_whitespace(iterator begin, iterator end)
@@ -919,8 +919,8 @@ std::size_t read_until(SyncReadStream& s,
  *   return std::make_pair(i, false);
  * }
  * ...
- * boost::asio::streambuf b;
- * boost::asio::read_until(s, b, match_whitespace);
+ * cppmsboost::asio::streambuf b;
+ * cppmsboost::asio::read_until(s, b, match_whitespace);
  * @endcode
  *
  * To read data into a streambuf until a matching character is found:
@@ -946,16 +946,16 @@ std::size_t read_until(SyncReadStream& s,
  *
  * namespace asio {
  *   template <> struct is_match_condition<match_char>
- *     : public boost::true_type {};
+ *     : public cppmsboost::true_type {};
  * } // namespace asio
  * ...
- * boost::asio::streambuf b;
- * boost::asio::read_until(s, b, match_char('a'));
+ * cppmsboost::asio::streambuf b;
+ * cppmsboost::asio::read_until(s, b, match_char('a'));
  * @endcode
  */
 template <typename SyncReadStream, typename Allocator, typename MatchCondition>
 std::size_t read_until(SyncReadStream& s,
-    boost::asio::basic_streambuf<Allocator>& b, MatchCondition match_condition,
+    cppmsboost::asio::basic_streambuf<Allocator>& b, MatchCondition match_condition,
     typename enable_if<is_match_condition<MatchCondition>::value>::type* = 0);
 
 /// Read data into a streambuf until a function object indicates a match.
@@ -1011,8 +1011,8 @@ std::size_t read_until(SyncReadStream& s,
  */
 template <typename SyncReadStream, typename Allocator, typename MatchCondition>
 std::size_t read_until(SyncReadStream& s,
-    boost::asio::basic_streambuf<Allocator>& b,
-    MatchCondition match_condition, boost::system::error_code& ec,
+    cppmsboost::asio::basic_streambuf<Allocator>& b,
+    MatchCondition match_condition, cppmsboost::system::error_code& ec,
     typename enable_if<is_match_condition<MatchCondition>::value>::type* = 0);
 
 #endif // !defined(BOOST_ASIO_NO_IOSTREAM)
@@ -1046,7 +1046,7 @@ std::size_t read_until(SyncReadStream& s,
  * @returns The number of bytes in the dynamic buffer sequence's get area up to
  * and including the delimiter.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note After a successful read_until operation, the dynamic buffer sequence
  * may contain additional data beyond the delimiter. An application will
@@ -1056,8 +1056,8 @@ std::size_t read_until(SyncReadStream& s,
  * @par Example
  * To read data into a @c std::string until a newline is encountered:
  * @code std::string data;
- * std::string n = boost::asio::read_until(s,
- *     boost::asio::dynamic_buffer(data), '\n');
+ * std::string n = cppmsboost::asio::read_until(s,
+ *     cppmsboost::asio::dynamic_buffer(data), '\n');
  * std::string line = data.substr(0, n);
  * data.erase(0, n); @endcode
  * After the @c read_until operation completes successfully, the string @c data
@@ -1114,7 +1114,7 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers, char delim,
  */
 template <typename SyncReadStream, typename DynamicBuffer_v2>
 std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
-    char delim, boost::system::error_code& ec,
+    char delim, cppmsboost::system::error_code& ec,
     typename enable_if<
       is_dynamic_buffer_v2<DynamicBuffer_v2>::value
     >::type* = 0);
@@ -1154,8 +1154,8 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  * @par Example
  * To read data into a @c std::string until a CR-LF sequence is encountered:
  * @code std::string data;
- * std::string n = boost::asio::read_until(s,
- *     boost::asio::dynamic_buffer(data), "\r\n");
+ * std::string n = cppmsboost::asio::read_until(s,
+ *     cppmsboost::asio::dynamic_buffer(data), "\r\n");
  * std::string line = data.substr(0, n);
  * data.erase(0, n); @endcode
  * After the @c read_until operation completes successfully, the string @c data
@@ -1213,7 +1213,7 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  */
 template <typename SyncReadStream, typename DynamicBuffer_v2>
 std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
-    BOOST_ASIO_STRING_VIEW_PARAM delim, boost::system::error_code& ec,
+    BOOST_ASIO_STRING_VIEW_PARAM delim, cppmsboost::system::error_code& ec,
     typename enable_if<
       is_dynamic_buffer_v2<DynamicBuffer_v2>::value
     >::type* = 0);
@@ -1250,7 +1250,7 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  * @returns The number of bytes in the dynamic buffer sequence's get area up to
  * and including the substring that matches the regular expression.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note After a successful read_until operation, the dynamic buffer sequence
  * may contain additional data beyond that which matched the regular
@@ -1260,8 +1260,8 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  * @par Example
  * To read data into a @c std::string until a CR-LF sequence is encountered:
  * @code std::string data;
- * std::string n = boost::asio::read_until(s,
- *     boost::asio::dynamic_buffer(data), boost::regex("\r\n"));
+ * std::string n = cppmsboost::asio::read_until(s,
+ *     cppmsboost::asio::dynamic_buffer(data), cppmsboost::regex("\r\n"));
  * std::string line = data.substr(0, n);
  * data.erase(0, n); @endcode
  * After the @c read_until operation completes successfully, the string @c data
@@ -1278,7 +1278,7 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  */
 template <typename SyncReadStream, typename DynamicBuffer_v2>
 std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
-    const boost::regex& expr,
+    const cppmsboost::regex& expr,
     typename enable_if<
       is_dynamic_buffer_v2<DynamicBuffer_v2>::value
     >::type* = 0);
@@ -1321,7 +1321,7 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  */
 template <typename SyncReadStream, typename DynamicBuffer_v2>
 std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
-    const boost::regex& expr, boost::system::error_code& ec,
+    const cppmsboost::regex& expr, cppmsboost::system::error_code& ec,
     typename enable_if<
         is_dynamic_buffer_v2<DynamicBuffer_v2>::value
     >::type* = 0);
@@ -1370,7 +1370,7 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  * @returns The number of bytes in the dynamic_buffer's get area that
  * have been fully consumed by the match function.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note After a successful read_until operation, the dynamic buffer sequence
  * may contain additional data beyond that which matched the function object.
@@ -1384,8 +1384,8 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  *
  * @par Examples
  * To read data into a dynamic buffer sequence until whitespace is encountered:
- * @code typedef boost::asio::buffers_iterator<
- *     boost::asio::const_buffers_1> iterator;
+ * @code typedef cppmsboost::asio::buffers_iterator<
+ *     cppmsboost::asio::const_buffers_1> iterator;
  *
  * std::pair<iterator, bool>
  * match_whitespace(iterator begin, iterator end)
@@ -1398,7 +1398,7 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  * }
  * ...
  * std::string data;
- * boost::asio::read_until(s, data, match_whitespace);
+ * cppmsboost::asio::read_until(s, data, match_whitespace);
  * @endcode
  *
  * To read data into a @c std::string until a matching character is found:
@@ -1424,11 +1424,11 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  *
  * namespace asio {
  *   template <> struct is_match_condition<match_char>
- *     : public boost::true_type {};
+ *     : public cppmsboost::true_type {};
  * } // namespace asio
  * ...
  * std::string data;
- * boost::asio::read_until(s, data, match_char('a'));
+ * cppmsboost::asio::read_until(s, data, match_char('a'));
  * @endcode
  */
 template <typename SyncReadStream,
@@ -1496,7 +1496,7 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
 template <typename SyncReadStream,
     typename DynamicBuffer_v2, typename MatchCondition>
 std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
-    MatchCondition match_condition, boost::system::error_code& ec,
+    MatchCondition match_condition, cppmsboost::system::error_code& ec,
     typename enable_if<
       is_match_condition<MatchCondition>::value
         && is_dynamic_buffer_v2<DynamicBuffer_v2>::value
@@ -1506,7 +1506,7 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
 
 /*@}*/
 /**
- * @defgroup async_read_until boost::asio::async_read_until
+ * @defgroup async_read_until cppmsboost::asio::async_read_until
  *
  * @brief The @c async_read_until function is a composed asynchronous operation
  * that reads data into a dynamic buffer sequence, or into a streambuf, until
@@ -1554,7 +1554,7 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // The number of bytes in the dynamic buffer sequence's
  *   // get area up to and including the delimiter.
@@ -1564,7 +1564,7 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @note After a successful async_read_until operation, the dynamic buffer
  * sequence may contain additional data beyond the delimiter. An application
@@ -1576,7 +1576,7 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  * encountered:
  * @code std::string data;
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size)
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size)
  * {
  *   if (!e)
  *   {
@@ -1586,7 +1586,7 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  *   }
  * }
  * ...
- * boost::asio::async_read_until(s, data, '\n', handler); @endcode
+ * cppmsboost::asio::async_read_until(s, data, '\n', handler); @endcode
  * After the @c async_read_until operation completes successfully, the buffer
  * @c data contains the delimiter:
  * @code { 'a', 'b', ..., 'c', '\n', 'd', 'e', ... } @endcode
@@ -1600,12 +1600,12 @@ std::size_t read_until(SyncReadStream& s, DynamicBuffer_v2 buffers,
  * @c async_read_until operation.
  */
 template <typename AsyncReadStream, typename DynamicBuffer_v1,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) ReadHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncReadStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_read_until(AsyncReadStream& s,
     BOOST_ASIO_MOVE_ARG(DynamicBuffer_v1) buffers, char delim,
     BOOST_ASIO_MOVE_ARG(ReadHandler) handler
@@ -1653,7 +1653,7 @@ async_read_until(AsyncReadStream& s,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // The number of bytes in the dynamic buffer sequence's
  *   // get area up to and including the delimiter.
@@ -1663,7 +1663,7 @@ async_read_until(AsyncReadStream& s,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @note After a successful async_read_until operation, the dynamic buffer
  * sequence may contain additional data beyond the delimiter. An application
@@ -1675,7 +1675,7 @@ async_read_until(AsyncReadStream& s,
  * encountered:
  * @code std::string data;
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size)
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size)
  * {
  *   if (!e)
  *   {
@@ -1685,7 +1685,7 @@ async_read_until(AsyncReadStream& s,
  *   }
  * }
  * ...
- * boost::asio::async_read_until(s, data, "\r\n", handler); @endcode
+ * cppmsboost::asio::async_read_until(s, data, "\r\n", handler); @endcode
  * After the @c async_read_until operation completes successfully, the string
  * @c data contains the delimiter:
  * @code { 'a', 'b', ..., 'c', '\r', '\n', 'd', 'e', ... } @endcode
@@ -1699,12 +1699,12 @@ async_read_until(AsyncReadStream& s,
  * @c async_read_until operation.
  */
 template <typename AsyncReadStream, typename DynamicBuffer_v1,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) ReadHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncReadStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_read_until(AsyncReadStream& s,
     BOOST_ASIO_MOVE_ARG(DynamicBuffer_v1) buffers,
     BOOST_ASIO_STRING_VIEW_PARAM delim,
@@ -1758,7 +1758,7 @@ async_read_until(AsyncReadStream& s,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // The number of bytes in the dynamic buffer
  *   // sequence's get area up to and including the
@@ -1769,7 +1769,7 @@ async_read_until(AsyncReadStream& s,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @note After a successful async_read_until operation, the dynamic buffer
  * sequence may contain additional data beyond that which matched the regular
@@ -1781,7 +1781,7 @@ async_read_until(AsyncReadStream& s,
  * encountered:
  * @code std::string data;
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size)
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size)
  * {
  *   if (!e)
  *   {
@@ -1791,8 +1791,8 @@ async_read_until(AsyncReadStream& s,
  *   }
  * }
  * ...
- * boost::asio::async_read_until(s, data,
- *     boost::regex("\r\n"), handler); @endcode
+ * cppmsboost::asio::async_read_until(s, data,
+ *     cppmsboost::regex("\r\n"), handler); @endcode
  * After the @c async_read_until operation completes successfully, the string
  * @c data contains the data which matched the regular expression:
  * @code { 'a', 'b', ..., 'c', '\r', '\n', 'd', 'e', ... } @endcode
@@ -1806,15 +1806,15 @@ async_read_until(AsyncReadStream& s,
  * @c async_read_until operation.
  */
 template <typename AsyncReadStream, typename DynamicBuffer_v1,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) ReadHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncReadStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_read_until(AsyncReadStream& s,
     BOOST_ASIO_MOVE_ARG(DynamicBuffer_v1) buffers,
-    const boost::regex& expr,
+    const cppmsboost::regex& expr,
     BOOST_ASIO_MOVE_ARG(ReadHandler) handler
       BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(
         typename AsyncReadStream::executor_type),
@@ -1877,7 +1877,7 @@ async_read_until(AsyncReadStream& s,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // The number of bytes in the dynamic buffer sequence's
  *   // get area that have been fully consumed by the match
@@ -1887,7 +1887,7 @@ async_read_until(AsyncReadStream& s,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @note After a successful async_read_until operation, the dynamic buffer
  * sequence may contain additional data beyond that which matched the function
@@ -1902,8 +1902,8 @@ async_read_until(AsyncReadStream& s,
  * @par Examples
  * To asynchronously read data into a @c std::string until whitespace is
  * encountered:
- * @code typedef boost::asio::buffers_iterator<
- *     boost::asio::const_buffers_1> iterator;
+ * @code typedef cppmsboost::asio::buffers_iterator<
+ *     cppmsboost::asio::const_buffers_1> iterator;
  *
  * std::pair<iterator, bool>
  * match_whitespace(iterator begin, iterator end)
@@ -1915,10 +1915,10 @@ async_read_until(AsyncReadStream& s,
  *   return std::make_pair(i, false);
  * }
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size);
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size);
  * ...
  * std::string data;
- * boost::asio::async_read_until(s, data, match_whitespace, handler);
+ * cppmsboost::asio::async_read_until(s, data, match_whitespace, handler);
  * @endcode
  *
  * To asynchronously read data into a @c std::string until a matching character
@@ -1945,23 +1945,23 @@ async_read_until(AsyncReadStream& s,
  *
  * namespace asio {
  *   template <> struct is_match_condition<match_char>
- *     : public boost::true_type {};
+ *     : public cppmsboost::true_type {};
  * } // namespace asio
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size);
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size);
  * ...
  * std::string data;
- * boost::asio::async_read_until(s, data, match_char('a'), handler);
+ * cppmsboost::asio::async_read_until(s, data, match_char('a'), handler);
  * @endcode
  */
 template <typename AsyncReadStream,
     typename DynamicBuffer_v1, typename MatchCondition,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) ReadHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncReadStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_read_until(AsyncReadStream& s,
     BOOST_ASIO_MOVE_ARG(DynamicBuffer_v1) buffers,
     MatchCondition match_condition,
@@ -2010,7 +2010,7 @@ async_read_until(AsyncReadStream& s,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // The number of bytes in the streambuf's get
  *   // area up to and including the delimiter.
@@ -2020,7 +2020,7 @@ async_read_until(AsyncReadStream& s,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @note After a successful async_read_until operation, the streambuf may
  * contain additional data beyond the delimiter. An application will typically
@@ -2029,9 +2029,9 @@ async_read_until(AsyncReadStream& s,
  *
  * @par Example
  * To asynchronously read data into a streambuf until a newline is encountered:
- * @code boost::asio::streambuf b;
+ * @code cppmsboost::asio::streambuf b;
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size)
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size)
  * {
  *   if (!e)
  *   {
@@ -2042,7 +2042,7 @@ async_read_until(AsyncReadStream& s,
  *   }
  * }
  * ...
- * boost::asio::async_read_until(s, b, '\n', handler); @endcode
+ * cppmsboost::asio::async_read_until(s, b, '\n', handler); @endcode
  * After the @c async_read_until operation completes successfully, the buffer
  * @c b contains the delimiter:
  * @code { 'a', 'b', ..., 'c', '\n', 'd', 'e', ... } @endcode
@@ -2055,14 +2055,14 @@ async_read_until(AsyncReadStream& s,
  * @c async_read_until operation.
  */
 template <typename AsyncReadStream, typename Allocator,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) ReadHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncReadStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_read_until(AsyncReadStream& s,
-    boost::asio::basic_streambuf<Allocator>& b, char delim,
+    cppmsboost::asio::basic_streambuf<Allocator>& b, char delim,
     BOOST_ASIO_MOVE_ARG(ReadHandler) handler
       BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(
         typename AsyncReadStream::executor_type));
@@ -2101,7 +2101,7 @@ async_read_until(AsyncReadStream& s,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // The number of bytes in the streambuf's get
  *   // area up to and including the delimiter.
@@ -2111,7 +2111,7 @@ async_read_until(AsyncReadStream& s,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @note After a successful async_read_until operation, the streambuf may
  * contain additional data beyond the delimiter. An application will typically
@@ -2120,9 +2120,9 @@ async_read_until(AsyncReadStream& s,
  *
  * @par Example
  * To asynchronously read data into a streambuf until a newline is encountered:
- * @code boost::asio::streambuf b;
+ * @code cppmsboost::asio::streambuf b;
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size)
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size)
  * {
  *   if (!e)
  *   {
@@ -2133,7 +2133,7 @@ async_read_until(AsyncReadStream& s,
  *   }
  * }
  * ...
- * boost::asio::async_read_until(s, b, "\r\n", handler); @endcode
+ * cppmsboost::asio::async_read_until(s, b, "\r\n", handler); @endcode
  * After the @c async_read_until operation completes successfully, the buffer
  * @c b contains the delimiter:
  * @code { 'a', 'b', ..., 'c', '\r', '\n', 'd', 'e', ... } @endcode
@@ -2146,14 +2146,14 @@ async_read_until(AsyncReadStream& s,
  * @c async_read_until operation.
  */
 template <typename AsyncReadStream, typename Allocator,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) ReadHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncReadStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_read_until(AsyncReadStream& s,
-    boost::asio::basic_streambuf<Allocator>& b,
+    cppmsboost::asio::basic_streambuf<Allocator>& b,
     BOOST_ASIO_STRING_VIEW_PARAM delim,
     BOOST_ASIO_MOVE_ARG(ReadHandler) handler
       BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(
@@ -2198,7 +2198,7 @@ async_read_until(AsyncReadStream& s,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // The number of bytes in the streambuf's get
  *   // area up to and including the substring
@@ -2209,7 +2209,7 @@ async_read_until(AsyncReadStream& s,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @note After a successful async_read_until operation, the streambuf may
  * contain additional data beyond that which matched the regular expression. An
@@ -2219,9 +2219,9 @@ async_read_until(AsyncReadStream& s,
  * @par Example
  * To asynchronously read data into a streambuf until a CR-LF sequence is
  * encountered:
- * @code boost::asio::streambuf b;
+ * @code cppmsboost::asio::streambuf b;
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size)
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size)
  * {
  *   if (!e)
  *   {
@@ -2232,7 +2232,7 @@ async_read_until(AsyncReadStream& s,
  *   }
  * }
  * ...
- * boost::asio::async_read_until(s, b, boost::regex("\r\n"), handler); @endcode
+ * cppmsboost::asio::async_read_until(s, b, cppmsboost::regex("\r\n"), handler); @endcode
  * After the @c async_read_until operation completes successfully, the buffer
  * @c b contains the data which matched the regular expression:
  * @code { 'a', 'b', ..., 'c', '\r', '\n', 'd', 'e', ... } @endcode
@@ -2245,14 +2245,14 @@ async_read_until(AsyncReadStream& s,
  * @c async_read_until operation.
  */
 template <typename AsyncReadStream, typename Allocator,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) ReadHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncReadStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_read_until(AsyncReadStream& s,
-    boost::asio::basic_streambuf<Allocator>& b, const boost::regex& expr,
+    cppmsboost::asio::basic_streambuf<Allocator>& b, const cppmsboost::regex& expr,
     BOOST_ASIO_MOVE_ARG(ReadHandler) handler
       BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(
         typename AsyncReadStream::executor_type));
@@ -2307,7 +2307,7 @@ async_read_until(AsyncReadStream& s,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // The number of bytes in the streambuf's get
  *   // area that have been fully consumed by the
@@ -2317,7 +2317,7 @@ async_read_until(AsyncReadStream& s,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @note After a successful async_read_until operation, the streambuf may
  * contain additional data beyond that which matched the function object. An
@@ -2331,8 +2331,8 @@ async_read_until(AsyncReadStream& s,
  *
  * @par Examples
  * To asynchronously read data into a streambuf until whitespace is encountered:
- * @code typedef boost::asio::buffers_iterator<
- *     boost::asio::streambuf::const_buffers_type> iterator;
+ * @code typedef cppmsboost::asio::buffers_iterator<
+ *     cppmsboost::asio::streambuf::const_buffers_type> iterator;
  *
  * std::pair<iterator, bool>
  * match_whitespace(iterator begin, iterator end)
@@ -2344,10 +2344,10 @@ async_read_until(AsyncReadStream& s,
  *   return std::make_pair(i, false);
  * }
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size);
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size);
  * ...
- * boost::asio::streambuf b;
- * boost::asio::async_read_until(s, b, match_whitespace, handler);
+ * cppmsboost::asio::streambuf b;
+ * cppmsboost::asio::async_read_until(s, b, match_whitespace, handler);
  * @endcode
  *
  * To asynchronously read data into a streambuf until a matching character is
@@ -2374,24 +2374,24 @@ async_read_until(AsyncReadStream& s,
  *
  * namespace asio {
  *   template <> struct is_match_condition<match_char>
- *     : public boost::true_type {};
+ *     : public cppmsboost::true_type {};
  * } // namespace asio
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size);
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size);
  * ...
- * boost::asio::streambuf b;
- * boost::asio::async_read_until(s, b, match_char('a'), handler);
+ * cppmsboost::asio::streambuf b;
+ * cppmsboost::asio::async_read_until(s, b, match_char('a'), handler);
  * @endcode
  */
 template <typename AsyncReadStream, typename Allocator, typename MatchCondition,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) ReadHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncReadStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_read_until(AsyncReadStream& s,
-    boost::asio::basic_streambuf<Allocator>& b,
+    cppmsboost::asio::basic_streambuf<Allocator>& b,
     MatchCondition match_condition,
     BOOST_ASIO_MOVE_ARG(ReadHandler) handler
       BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(
@@ -2439,7 +2439,7 @@ async_read_until(AsyncReadStream& s,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // The number of bytes in the dynamic buffer sequence's
  *   // get area up to and including the delimiter.
@@ -2449,7 +2449,7 @@ async_read_until(AsyncReadStream& s,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @note After a successful async_read_until operation, the dynamic buffer
  * sequence may contain additional data beyond the delimiter. An application
@@ -2461,7 +2461,7 @@ async_read_until(AsyncReadStream& s,
  * encountered:
  * @code std::string data;
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size)
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size)
  * {
  *   if (!e)
  *   {
@@ -2471,7 +2471,7 @@ async_read_until(AsyncReadStream& s,
  *   }
  * }
  * ...
- * boost::asio::async_read_until(s, data, '\n', handler); @endcode
+ * cppmsboost::asio::async_read_until(s, data, '\n', handler); @endcode
  * After the @c async_read_until operation completes successfully, the buffer
  * @c data contains the delimiter:
  * @code { 'a', 'b', ..., 'c', '\n', 'd', 'e', ... } @endcode
@@ -2485,12 +2485,12 @@ async_read_until(AsyncReadStream& s,
  * @c async_read_until operation.
  */
 template <typename AsyncReadStream, typename DynamicBuffer_v2,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) ReadHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncReadStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers, char delim,
     BOOST_ASIO_MOVE_ARG(ReadHandler) handler
       BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(
@@ -2536,7 +2536,7 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers, char delim,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // The number of bytes in the dynamic buffer sequence's
  *   // get area up to and including the delimiter.
@@ -2546,7 +2546,7 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers, char delim,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @note After a successful async_read_until operation, the dynamic buffer
  * sequence may contain additional data beyond the delimiter. An application
@@ -2558,7 +2558,7 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers, char delim,
  * encountered:
  * @code std::string data;
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size)
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size)
  * {
  *   if (!e)
  *   {
@@ -2568,7 +2568,7 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers, char delim,
  *   }
  * }
  * ...
- * boost::asio::async_read_until(s, data, "\r\n", handler); @endcode
+ * cppmsboost::asio::async_read_until(s, data, "\r\n", handler); @endcode
  * After the @c async_read_until operation completes successfully, the string
  * @c data contains the delimiter:
  * @code { 'a', 'b', ..., 'c', '\r', '\n', 'd', 'e', ... } @endcode
@@ -2582,12 +2582,12 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers, char delim,
  * @c async_read_until operation.
  */
 template <typename AsyncReadStream, typename DynamicBuffer_v2,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) ReadHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncReadStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
     BOOST_ASIO_STRING_VIEW_PARAM delim,
     BOOST_ASIO_MOVE_ARG(ReadHandler) handler
@@ -2639,7 +2639,7 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // The number of bytes in the dynamic buffer
  *   // sequence's get area up to and including the
@@ -2650,7 +2650,7 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @note After a successful async_read_until operation, the dynamic buffer
  * sequence may contain additional data beyond that which matched the regular
@@ -2662,7 +2662,7 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
  * encountered:
  * @code std::string data;
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size)
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size)
  * {
  *   if (!e)
  *   {
@@ -2672,8 +2672,8 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
  *   }
  * }
  * ...
- * boost::asio::async_read_until(s, data,
- *     boost::regex("\r\n"), handler); @endcode
+ * cppmsboost::asio::async_read_until(s, data,
+ *     cppmsboost::regex("\r\n"), handler); @endcode
  * After the @c async_read_until operation completes successfully, the string
  * @c data contains the data which matched the regular expression:
  * @code { 'a', 'b', ..., 'c', '\r', '\n', 'd', 'e', ... } @endcode
@@ -2687,14 +2687,14 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
  * @c async_read_until operation.
  */
 template <typename AsyncReadStream, typename DynamicBuffer_v2,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) ReadHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncReadStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
-    const boost::regex& expr,
+    const cppmsboost::regex& expr,
     BOOST_ASIO_MOVE_ARG(ReadHandler) handler
       BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(
         typename AsyncReadStream::executor_type),
@@ -2756,7 +2756,7 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // The number of bytes in the dynamic buffer sequence's
  *   // get area that have been fully consumed by the match
@@ -2766,7 +2766,7 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @note After a successful async_read_until operation, the dynamic buffer
  * sequence may contain additional data beyond that which matched the function
@@ -2781,8 +2781,8 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
  * @par Examples
  * To asynchronously read data into a @c std::string until whitespace is
  * encountered:
- * @code typedef boost::asio::buffers_iterator<
- *     boost::asio::const_buffers_1> iterator;
+ * @code typedef cppmsboost::asio::buffers_iterator<
+ *     cppmsboost::asio::const_buffers_1> iterator;
  *
  * std::pair<iterator, bool>
  * match_whitespace(iterator begin, iterator end)
@@ -2794,10 +2794,10 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
  *   return std::make_pair(i, false);
  * }
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size);
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size);
  * ...
  * std::string data;
- * boost::asio::async_read_until(s, data, match_whitespace, handler);
+ * cppmsboost::asio::async_read_until(s, data, match_whitespace, handler);
  * @endcode
  *
  * To asynchronously read data into a @c std::string until a matching character
@@ -2824,23 +2824,23 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
  *
  * namespace asio {
  *   template <> struct is_match_condition<match_char>
- *     : public boost::true_type {};
+ *     : public cppmsboost::true_type {};
  * } // namespace asio
  * ...
- * void handler(const boost::system::error_code& e, std::size_t size);
+ * void handler(const cppmsboost::system::error_code& e, std::size_t size);
  * ...
  * std::string data;
- * boost::asio::async_read_until(s, data, match_char('a'), handler);
+ * cppmsboost::asio::async_read_until(s, data, match_char('a'), handler);
  * @endcode
  */
 template <typename AsyncReadStream,
     typename DynamicBuffer_v2, typename MatchCondition,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) ReadHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncReadStream::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
     MatchCondition match_condition,
     BOOST_ASIO_MOVE_ARG(ReadHandler) handler
@@ -2856,7 +2856,7 @@ async_read_until(AsyncReadStream& s, DynamicBuffer_v2 buffers,
 /*@}*/
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

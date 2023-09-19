@@ -11,14 +11,14 @@
 
 #include <boost/type_traits/is_fundamental.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 #if defined( __CODEGEARC__ )
    template <class T> struct is_compound : public integral_constant<bool, __is_compound(T)> {};
 #else
-   template <class T> struct is_compound : public integral_constant<bool, ! ::boost::is_fundamental<T>::value> {};
+   template <class T> struct is_compound : public integral_constant<bool, ! ::cppmsboost::is_fundamental<T>::value> {};
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_IS_COMPOUND_HPP_INCLUDED

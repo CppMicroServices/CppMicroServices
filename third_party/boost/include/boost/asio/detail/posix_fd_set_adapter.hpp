@@ -28,7 +28,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -69,7 +69,7 @@ public:
       reactor_op_queue<socket_type>::iterator op_iter = i++;
       if (!set(op_iter->first))
       {
-        boost::system::error_code ec(error::fd_set_failure);
+        cppmsboost::system::error_code ec(error::fd_set_failure);
         operations.cancel_operations(op_iter, ops, ec);
       }
     }
@@ -109,7 +109,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

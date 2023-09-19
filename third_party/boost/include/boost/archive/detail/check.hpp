@@ -41,7 +41,7 @@
 #include <boost/serialization/tracking.hpp>
 #include <boost/serialization/wrapper.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 namespace detail {
 
@@ -82,7 +82,7 @@ template<class T>
 inline void check_object_tracking(){
     // presume it has already been determined that
     // T is not a const
-    BOOST_STATIC_ASSERT(! boost::is_const< T >::value);
+    BOOST_STATIC_ASSERT(! cppmsboost::is_const< T >::value);
     typedef typename mpl::equal_to<
         serialization::tracking_level< T >,
         mpl::int_<serialization::track_never>
@@ -152,9 +152,9 @@ template<class T>
 inline void check_const_loading(){
     typedef
         typename mpl::or_<
-            typename boost::serialization::is_wrapper< T >,
+            typename cppmsboost::serialization::is_wrapper< T >,
             typename mpl::not_<
-                typename boost::is_const< T >
+                typename cppmsboost::is_const< T >
             >
         >::type typex;
     // cannot load data into a "const" object unless it's a

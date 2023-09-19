@@ -21,7 +21,7 @@
  * date_formatting_limited.hpp
  */
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
   //! Formats a month as as string into an ostream
@@ -52,7 +52,7 @@ namespace date_time {
         }
         case month_as_integer: 
         { 
-          boost::io::basic_ios_fill_saver<charT> ifs(os);
+          cppmsboost::io::basic_ios_fill_saver<charT> ifs(os);
           os << std::setw(2) << std::setfill(os.widen('0')) << month.as_number();
           break;
         }

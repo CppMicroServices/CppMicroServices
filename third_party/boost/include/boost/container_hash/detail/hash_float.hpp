@@ -48,7 +48,7 @@
 #  define BOOST_HASH_USE_FPCLASSIFY 0
 #endif
 
-namespace boost
+namespace cppmsboost
 {
     namespace hash_detail
     {
@@ -102,7 +102,7 @@ namespace boost
 
         template <typename Float>
         inline std::size_t float_hash_impl(Float v,
-            BOOST_DEDUCED_TYPENAME boost::enable_if_c<
+            BOOST_DEDUCED_TYPENAME cppmsboost::enable_if_c<
                 enable_binary_hash<Float, 24, 128>::value,
                 std::size_t>::type)
         {
@@ -112,7 +112,7 @@ namespace boost
 
         template <typename Float>
         inline std::size_t float_hash_impl(Float v,
-            BOOST_DEDUCED_TYPENAME boost::enable_if_c<
+            BOOST_DEDUCED_TYPENAME cppmsboost::enable_if_c<
                 enable_binary_hash<Float, 53, 1024>::value,
                 std::size_t>::type)
         {
@@ -121,7 +121,7 @@ namespace boost
 
         template <typename Float>
         inline std::size_t float_hash_impl(Float v,
-            BOOST_DEDUCED_TYPENAME boost::enable_if_c<
+            BOOST_DEDUCED_TYPENAME cppmsboost::enable_if_c<
                 enable_binary_hash<Float, 64, 16384>::value,
                 std::size_t>::type)
         {
@@ -130,7 +130,7 @@ namespace boost
 
         template <typename Float>
         inline std::size_t float_hash_impl(Float v,
-            BOOST_DEDUCED_TYPENAME boost::enable_if_c<
+            BOOST_DEDUCED_TYPENAME cppmsboost::enable_if_c<
                 enable_binary_hash<Float, 113, 16384>::value,
                 std::size_t>::type)
         {
@@ -145,8 +145,8 @@ namespace boost
         template <class T>
         inline std::size_t float_hash_impl2(T v)
         {
-            boost::hash_detail::call_frexp<T> frexp;
-            boost::hash_detail::call_ldexp<T> ldexp;
+            cppmsboost::hash_detail::call_frexp<T> frexp;
+            cppmsboost::hash_detail::call_ldexp<T> ldexp;
 
             int exp = 0;
 
@@ -167,7 +167,7 @@ namespace boost
             // ceiling(digits(T) * log2(radix(T))/ digits(size_t)) - 1;
             std::size_t const length
                 = (limits<T>::digits *
-                        boost::static_log2<limits<T>::radix>::value
+                        cppmsboost::static_log2<limits<T>::radix>::value
                         + limits<std::size_t>::digits - 1)
                 / limits<std::size_t>::digits;
 
@@ -199,7 +199,7 @@ namespace boost
 
 #include <boost/config/no_tr1/cmath.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     namespace hash_detail
     {
@@ -234,7 +234,7 @@ namespace boost
 
 #else // !BOOST_HASH_USE_FPCLASSIFY
 
-namespace boost
+namespace cppmsboost
 {
     namespace hash_detail
     {
@@ -255,7 +255,7 @@ namespace boost
         template <class T>
         inline std::size_t float_hash_value(T v)
         {
-            return boost::hash_detail::is_zero(v) ? 0 : float_hash_impl(v, 0);
+            return cppmsboost::hash_detail::is_zero(v) ? 0 : float_hash_impl(v, 0);
         }
     }
 }

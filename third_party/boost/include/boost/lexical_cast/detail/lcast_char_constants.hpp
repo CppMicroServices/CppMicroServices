@@ -23,7 +23,7 @@
 #   pragma once
 #endif
 
-namespace boost 
+namespace cppmsboost 
 {
     namespace detail // '0', '-', '+', 'e', 'E' and '.' constants
     {
@@ -39,7 +39,7 @@ namespace boost
             BOOST_STATIC_CONSTANT(Char, c_decimal_separator = static_cast<Char>('.'));
         };
     }
-} // namespace boost
+} // namespace cppmsboost
 
 
 #endif // BOOST_LEXICAL_CAST_DETAIL_LCAST_CHAR_CONSTANTS_HPP

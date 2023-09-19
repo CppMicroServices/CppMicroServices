@@ -16,7 +16,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 namespace executors
 {
@@ -39,7 +39,7 @@ namespace executors
      */
 #if ! defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
     template <typename ...Args>
-    executor_adaptor(BOOST_THREAD_RV_REF(Args) ... args) : ex(boost::forward<Args>(args)...) {}
+    executor_adaptor(BOOST_THREAD_RV_REF(Args) ... args) : ex(cppmsboost::forward<Args>(args)...) {}
 #else
     /**
      * executor_adaptor constructor
@@ -51,7 +51,7 @@ namespace executors
         BOOST_THREAD_FWD_REF(A1) a1
         ) :
       ex(
-          boost::forward<A1>(a1)
+          cppmsboost::forward<A1>(a1)
           ) {}
     template <typename A1, typename A2>
     executor_adaptor(
@@ -59,8 +59,8 @@ namespace executors
         BOOST_THREAD_FWD_REF(A2) a2
         ) :
       ex(
-          boost::forward<A1>(a1),
-          boost::forward<A2>(a2)
+          cppmsboost::forward<A1>(a1),
+          cppmsboost::forward<A2>(a2)
           ) {}
     template <typename A1, typename A2, typename A3>
     executor_adaptor(
@@ -69,9 +69,9 @@ namespace executors
         BOOST_THREAD_FWD_REF(A3) a3
         ) :
       ex(
-          boost::forward<A1>(a1),
-          boost::forward<A2>(a2),
-          boost::forward<A3>(a3)
+          cppmsboost::forward<A1>(a1),
+          cppmsboost::forward<A2>(a2),
+          cppmsboost::forward<A3>(a3)
           ) {}
 #endif
     Executor& underlying_executor() { return ex; }
@@ -97,7 +97,7 @@ namespace executors
      * Whatever exception that can be throw while storing the closure.
      */
     void submit(BOOST_THREAD_RV_REF(work) closure)  {
-      return ex.submit(boost::move(closure));
+      return ex.submit(cppmsboost::move(closure));
     }
 
 #if defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
@@ -115,9 +115,9 @@ namespace executors
     template <typename Closure>
     void submit(BOOST_THREAD_FWD_REF(Closure) closure)
     {
-      //submit(work(boost::forward<Closure>(closure)));
-      work w((boost::forward<Closure>(closure)));
-      submit(boost::move(w));
+      //submit(work(cppmsboost::forward<Closure>(closure)));
+      work w((cppmsboost::forward<Closure>(closure)));
+      submit(cppmsboost::move(w));
     }
 
     /**

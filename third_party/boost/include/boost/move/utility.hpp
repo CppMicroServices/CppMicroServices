@@ -31,7 +31,7 @@
 
 #if defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && !defined(BOOST_MOVE_DOXYGEN_INVOKED)
 
-   namespace boost {
+   namespace cppmsboost {
 
    //////////////////////////////////////////////////////////////////////////////
    //
@@ -40,9 +40,9 @@
    //////////////////////////////////////////////////////////////////////////////
 
    template <class T>
-   BOOST_MOVE_FORCEINLINE typename ::boost::move_detail::enable_if_c
+   BOOST_MOVE_FORCEINLINE typename ::cppmsboost::move_detail::enable_if_c
       < enable_move_utility_emulation<T>::value && !has_move_emulation_enabled<T>::value
-      , typename ::boost::move_detail::add_const<T>::type &
+      , typename ::cppmsboost::move_detail::add_const<T>::type &
       >::type
          move_if_noexcept(T& x) BOOST_NOEXCEPT
    {
@@ -50,18 +50,18 @@
    }
 
    template <class T>
-   BOOST_MOVE_FORCEINLINE typename ::boost::move_detail::enable_if_c
+   BOOST_MOVE_FORCEINLINE typename ::cppmsboost::move_detail::enable_if_c
       < enable_move_utility_emulation<T>::value && has_move_emulation_enabled<T>::value
-            && ::boost::move_detail::is_nothrow_move_constructible_or_uncopyable<T>::value, rv<T>&>::type
+            && ::cppmsboost::move_detail::is_nothrow_move_constructible_or_uncopyable<T>::value, rv<T>&>::type
          move_if_noexcept(T& x) BOOST_NOEXCEPT
    {
-      return *static_cast<rv<T>* >(::boost::move_detail::addressof(x));
+      return *static_cast<rv<T>* >(::cppmsboost::move_detail::addressof(x));
    }
 
    template <class T>
-   BOOST_MOVE_FORCEINLINE typename ::boost::move_detail::enable_if_c
+   BOOST_MOVE_FORCEINLINE typename ::cppmsboost::move_detail::enable_if_c
       < enable_move_utility_emulation<T>::value && has_move_emulation_enabled<T>::value
-            && ::boost::move_detail::is_nothrow_move_constructible_or_uncopyable<T>::value
+            && ::cppmsboost::move_detail::is_nothrow_move_constructible_or_uncopyable<T>::value
       , rv<T>&
       >::type
          move_if_noexcept(rv<T>& x) BOOST_NOEXCEPT
@@ -70,10 +70,10 @@
    }
 
    template <class T>
-   BOOST_MOVE_FORCEINLINE typename ::boost::move_detail::enable_if_c
+   BOOST_MOVE_FORCEINLINE typename ::cppmsboost::move_detail::enable_if_c
       < enable_move_utility_emulation<T>::value && has_move_emulation_enabled<T>::value
-            && !::boost::move_detail::is_nothrow_move_constructible_or_uncopyable<T>::value
-      , typename ::boost::move_detail::add_const<T>::type &
+            && !::cppmsboost::move_detail::is_nothrow_move_constructible_or_uncopyable<T>::value
+      , typename ::cppmsboost::move_detail::add_const<T>::type &
       >::type
          move_if_noexcept(T& x) BOOST_NOEXCEPT
    {
@@ -81,32 +81,32 @@
    }
 
    template <class T>
-   BOOST_MOVE_FORCEINLINE typename ::boost::move_detail::enable_if_c
+   BOOST_MOVE_FORCEINLINE typename ::cppmsboost::move_detail::enable_if_c
       < enable_move_utility_emulation<T>::value && has_move_emulation_enabled<T>::value
-            && !::boost::move_detail::is_nothrow_move_constructible_or_uncopyable<T>::value
-      , typename ::boost::move_detail::add_const<T>::type &
+            && !::cppmsboost::move_detail::is_nothrow_move_constructible_or_uncopyable<T>::value
+      , typename ::cppmsboost::move_detail::add_const<T>::type &
       >::type
          move_if_noexcept(rv<T>& x) BOOST_NOEXCEPT
    {
       return x;
    }
 
-   }  //namespace boost
+   }  //namespace cppmsboost
 
 #else    //#if defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && !defined(BOOST_MOVE_DOXYGEN_INVOKED)
 
    #if defined(BOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
       #include <utility>
 
-      namespace boost{
+      namespace cppmsboost{
 
       using ::std::move_if_noexcept;
 
-      }  //namespace boost
+      }  //namespace cppmsboost
 
    #else //!BOOST_MOVE_USE_STANDARD_LIBRARY_MOVE
 
-      namespace boost {
+      namespace cppmsboost {
 
       //////////////////////////////////////////////////////////////////////////////
       //
@@ -116,7 +116,7 @@
       #if defined(BOOST_MOVE_DOXYGEN_INVOKED)
          //! This function provides a way to convert a reference into a rvalue reference
          //! in compilers with rvalue references. For other compilers converts T & into
-         //! <i>::boost::rv<T> &</i> so that move emulation is activated. Reference
+         //! <i>::cppmsboost::rv<T> &</i> so that move emulation is activated. Reference
          //! would be converted to rvalue reference only if input type is nothrow move
          //! constructible or if it has no copy constructor. In all other cases const
          //! reference would be returned
@@ -126,20 +126,20 @@
       #else //BOOST_MOVE_DOXYGEN_INVOKED
 
          template <class T>
-         BOOST_MOVE_FORCEINLINE typename ::boost::move_detail::enable_if_c
-            < ::boost::move_detail::is_nothrow_move_constructible_or_uncopyable<T>::value, T&&>::type
+         BOOST_MOVE_FORCEINLINE typename ::cppmsboost::move_detail::enable_if_c
+            < ::cppmsboost::move_detail::is_nothrow_move_constructible_or_uncopyable<T>::value, T&&>::type
                move_if_noexcept(T& x) BOOST_NOEXCEPT
-         {  return ::boost::move(x);   }
+         {  return ::cppmsboost::move(x);   }
 
          template <class T>
-         BOOST_MOVE_FORCEINLINE typename ::boost::move_detail::enable_if_c
-            < !::boost::move_detail::is_nothrow_move_constructible_or_uncopyable<T>::value, const T&>::type
+         BOOST_MOVE_FORCEINLINE typename ::cppmsboost::move_detail::enable_if_c
+            < !::cppmsboost::move_detail::is_nothrow_move_constructible_or_uncopyable<T>::value, const T&>::type
                move_if_noexcept(T& x) BOOST_NOEXCEPT
          {  return x;  }
 
       #endif //BOOST_MOVE_DOXYGEN_INVOKED
 
-      }  //namespace boost {
+      }  //namespace cppmsboost {
 
    #endif   //#if defined(BOOST_MOVE_USE_STANDARD_LIBRARY_MOVE)
 

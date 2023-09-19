@@ -21,7 +21,7 @@
 #  pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace intrusive {
 
 struct algo_pred_equal
@@ -85,6 +85,6 @@ template <class InputIterator1, class InputIterator2>
 {  return (algo_lexicographical_compare)(first1, last1, first2, last2, algo_pred_less());  }
 
 }  //namespace intrusive {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif   //#ifndef BOOST_INTRUSIVE_DETAIL_ALGORITHM_HPP

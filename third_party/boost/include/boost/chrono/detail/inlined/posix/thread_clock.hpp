@@ -21,7 +21,7 @@
 # include <pthread.h>
 # include <unistd.h>
 
-namespace boost { namespace chrono {
+namespace cppmsboost { namespace chrono {
 
     thread_clock::time_point thread_clock::now( ) BOOST_NOEXCEPT
     {
@@ -65,21 +65,21 @@ namespace boost { namespace chrono {
         if ( ::clock_gettime( clock_id, &ts ) )
 #endif
         {
-            if (::boost::chrono::is_throws(ec))
+            if (::cppmsboost::chrono::is_throws(ec))
             {
-                boost::throw_exception(
+                cppmsboost::throw_exception(
                         system::system_error(
                                 errno,
-                                ::boost::system::system_category(),
+                                ::cppmsboost::system::system_category(),
                                 "chrono::thread_clock" ));
             }
             else
             {
-                ec.assign( errno, ::boost::system::system_category() );
+                ec.assign( errno, ::cppmsboost::system::system_category() );
                 return time_point();
             }
         }
-        if (!::boost::chrono::is_throws(ec))
+        if (!::cppmsboost::chrono::is_throws(ec))
         {
             ec.clear();
         }

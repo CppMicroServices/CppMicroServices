@@ -16,7 +16,7 @@
 #include <boost/type_traits/conditional.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 //! Namespace containing constrained_value template and types
 namespace CV {
@@ -115,7 +115,7 @@ namespace CV {
 
     static void on_error(rep_type, rep_type, violation_enum)
     {
-      boost::throw_exception(actual_exception_type());
+      cppmsboost::throw_exception(actual_exception_type());
     }
   };
 

@@ -27,7 +27,7 @@
 #include <pthread.h>
 #include <csignal>
 
-namespace boost
+namespace cppmsboost
 {
 
   struct once_flag;
@@ -36,7 +36,7 @@ namespace boost
 
   namespace thread_detail
   {
-    typedef boost::uint32_t  uintmax_atomic_t;
+    typedef cppmsboost::uint32_t  uintmax_atomic_t;
     #define BOOST_THREAD_DETAIL_UINTMAX_ATOMIC_C2(value) value##u
     #define BOOST_THREAD_DETAIL_UINTMAX_ATOMIC_MAX_C BOOST_THREAD_DETAIL_UINTMAX_ATOMIC_C2(~0)
 
@@ -103,7 +103,7 @@ namespace boost
 #define BOOST_THREAD_INVOKE_RET_VOID detail::invoke<void>
 #define BOOST_THREAD_INVOKE_RET_VOID_CALL
 #else
-#define BOOST_THREAD_INVOKE_RET_VOID boost::bind
+#define BOOST_THREAD_INVOKE_RET_VOID cppmsboost::bind
 #define BOOST_THREAD_INVOKE_RET_VOID_CALL ()
 #endif
 
@@ -143,8 +143,8 @@ namespace boost
                 {
                     pthread::pthread_mutex_scoped_unlock relocker(&thread_detail::once_epoch_mutex);
                     BOOST_THREAD_INVOKE_RET_VOID(
-                        thread_detail::decay_copy(boost::forward<Function>(f)),
-                        thread_detail::decay_copy(boost::forward<ArgTypes>(args))...
+                        thread_detail::decay_copy(cppmsboost::forward<Function>(f)),
+                        thread_detail::decay_copy(cppmsboost::forward<ArgTypes>(args))...
                     ) BOOST_THREAD_INVOKE_RET_VOID_CALL;
                 }
                 BOOST_CATCH (...)
@@ -410,8 +410,8 @@ namespace boost
                 {
                     pthread::pthread_mutex_scoped_unlock relocker(&thread_detail::once_epoch_mutex);
                     BOOST_THREAD_INVOKE_RET_VOID(
-                        thread_detail::decay_copy(boost::forward<Function>(f)),
-                        thread_detail::decay_copy(boost::forward<T1>(p1))
+                        thread_detail::decay_copy(cppmsboost::forward<Function>(f)),
+                        thread_detail::decay_copy(cppmsboost::forward<T1>(p1))
                     ) BOOST_THREAD_INVOKE_RET_VOID_CALL;
                 }
                 BOOST_CATCH (...)
@@ -456,9 +456,9 @@ namespace boost
                 {
                     pthread::pthread_mutex_scoped_unlock relocker(&thread_detail::once_epoch_mutex);
                     BOOST_THREAD_INVOKE_RET_VOID(
-                        thread_detail::decay_copy(boost::forward<Function>(f)),
-                        thread_detail::decay_copy(boost::forward<T1>(p1)),
-                        thread_detail::decay_copy(boost::forward<T1>(p2))
+                        thread_detail::decay_copy(cppmsboost::forward<Function>(f)),
+                        thread_detail::decay_copy(cppmsboost::forward<T1>(p1)),
+                        thread_detail::decay_copy(cppmsboost::forward<T1>(p2))
                     ) BOOST_THREAD_INVOKE_RET_VOID_CALL;
                 }
                 BOOST_CATCH (...)
@@ -504,10 +504,10 @@ namespace boost
                 {
                     pthread::pthread_mutex_scoped_unlock relocker(&thread_detail::once_epoch_mutex);
                     BOOST_THREAD_INVOKE_RET_VOID(
-                        thread_detail::decay_copy(boost::forward<Function>(f)),
-                        thread_detail::decay_copy(boost::forward<T1>(p1)),
-                        thread_detail::decay_copy(boost::forward<T1>(p2)),
-                        thread_detail::decay_copy(boost::forward<T1>(p3))
+                        thread_detail::decay_copy(cppmsboost::forward<Function>(f)),
+                        thread_detail::decay_copy(cppmsboost::forward<T1>(p1)),
+                        thread_detail::decay_copy(cppmsboost::forward<T1>(p2)),
+                        thread_detail::decay_copy(cppmsboost::forward<T1>(p3))
                     ) BOOST_THREAD_INVOKE_RET_VOID_CALL;
                 }
                 BOOST_CATCH (...)

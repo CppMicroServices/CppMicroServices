@@ -14,7 +14,7 @@
 #include <boost/date_time/year_month_day.hpp>
 #include <boost/date_time/special_defs.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
   //!Representation of timepoint at the one day level resolution.
@@ -52,8 +52,8 @@ namespace date_time {
 
   template<class T, class calendar, class duration_type_>
   class BOOST_SYMBOL_VISIBLE date : private
-       boost::less_than_comparable<T
-     , boost::equality_comparable<T
+       cppmsboost::less_than_comparable<T
+     , cppmsboost::equality_comparable<T
     > >
   {
   public:

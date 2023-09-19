@@ -39,7 +39,7 @@
 #define BOOST_GCD_NOEXCEPT(T)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
    template <class I>
    class rational;
@@ -266,13 +266,13 @@ namespace boost {
          }
       };
       template <>
-      struct gcd_traits<boost::ulong_long_type> : public gcd_traits_defaults<boost::ulong_long_type>
+      struct gcd_traits<cppmsboost::ulong_long_type> : public gcd_traits_defaults<cppmsboost::ulong_long_type>
       {
-         BOOST_FORCEINLINE static BOOST_CXX14_CONSTEXPR unsigned find_lsb(boost::ulong_long_type mask)BOOST_NOEXCEPT
+         BOOST_FORCEINLINE static BOOST_CXX14_CONSTEXPR unsigned find_lsb(cppmsboost::ulong_long_type mask)BOOST_NOEXCEPT
          {
             return __builtin_ctzll(mask);
          }
-         BOOST_FORCEINLINE static BOOST_CXX14_CONSTEXPR unsigned make_odd(boost::ulong_long_type& val)BOOST_NOEXCEPT
+         BOOST_FORCEINLINE static BOOST_CXX14_CONSTEXPR unsigned make_odd(cppmsboost::ulong_long_type& val)BOOST_NOEXCEPT
          {
             unsigned result = find_lsb(val);
             val >>= result;
@@ -284,9 +284,9 @@ namespace boost {
       // this works for signed types too, as by the time these functions
       // are called, all values are > 0.
       //
-      template <> struct gcd_traits<boost::long_long_type> : public gcd_traits_defaults<boost::long_long_type>
+      template <> struct gcd_traits<cppmsboost::long_long_type> : public gcd_traits_defaults<cppmsboost::long_long_type>
       {
-         BOOST_FORCEINLINE static BOOST_CXX14_CONSTEXPR unsigned make_odd(boost::long_long_type& val)BOOST_NOEXCEPT { unsigned result = gcd_traits<boost::ulong_long_type>::find_lsb(val); val >>= result; return result; }
+         BOOST_FORCEINLINE static BOOST_CXX14_CONSTEXPR unsigned make_odd(cppmsboost::long_long_type& val)BOOST_NOEXCEPT { unsigned result = gcd_traits<cppmsboost::ulong_long_type>::find_lsb(val); val >>= result; return result; }
       };
       template <> struct gcd_traits<long> : public gcd_traits_defaults<long>
       {
@@ -430,7 +430,7 @@ namespace boost {
     template <class T>
     inline BOOST_CXX14_CONSTEXPR T lcm_imp(const T& a, const T& b) BOOST_GCD_NOEXCEPT(T)
     {
-       T temp = boost::integer::gcd_detail::optimal_gcd_select(a, b);
+       T temp = cppmsboost::integer::gcd_detail::optimal_gcd_select(a, b);
 #if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40500)
        return (temp != T(0)) ? T(a / temp * b) : T(0);
 #else
@@ -445,9 +445,9 @@ template <typename Integer>
 inline BOOST_CXX14_CONSTEXPR Integer gcd(Integer const &a, Integer const &b) BOOST_GCD_NOEXCEPT(Integer)
 {
     if(a == (std::numeric_limits<Integer>::min)())
-       return a == static_cast<Integer>(0) ? gcd_detail::gcd_traits<Integer>::abs(b) : boost::integer::gcd(static_cast<Integer>(a % b), b);
+       return a == static_cast<Integer>(0) ? gcd_detail::gcd_traits<Integer>::abs(b) : cppmsboost::integer::gcd(static_cast<Integer>(a % b), b);
     else if (b == (std::numeric_limits<Integer>::min)())
-       return b == static_cast<Integer>(0) ? gcd_detail::gcd_traits<Integer>::abs(a) : boost::integer::gcd(a, static_cast<Integer>(b % a));
+       return b == static_cast<Integer>(0) ? gcd_detail::gcd_traits<Integer>::abs(a) : cppmsboost::integer::gcd(a, static_cast<Integer>(b % a));
     return gcd_detail::optimal_gcd_select(static_cast<Integer>(gcd_detail::gcd_traits<Integer>::abs(a)), static_cast<Integer>(gcd_detail::gcd_traits<Integer>::abs(b)));
 }
 
@@ -478,15 +478,15 @@ inline BOOST_CXX14_CONSTEXPR Integer lcm(Integer const &a, Integer const &b, Int
 // Special handling for rationals:
 //
 template <typename Integer>
-inline typename boost::enable_if_c<std::numeric_limits<Integer>::is_specialized, boost::rational<Integer> >::type gcd(boost::rational<Integer> const &a, boost::rational<Integer> const &b)
+inline typename cppmsboost::enable_if_c<std::numeric_limits<Integer>::is_specialized, cppmsboost::rational<Integer> >::type gcd(cppmsboost::rational<Integer> const &a, cppmsboost::rational<Integer> const &b)
 {
-   return boost::rational<Integer>(static_cast<Integer>(gcd(a.numerator(), b.numerator())), static_cast<Integer>(lcm(a.denominator(), b.denominator())));
+   return cppmsboost::rational<Integer>(static_cast<Integer>(gcd(a.numerator(), b.numerator())), static_cast<Integer>(lcm(a.denominator(), b.denominator())));
 }
 
 template <typename Integer>
-inline typename boost::enable_if_c<std::numeric_limits<Integer>::is_specialized, boost::rational<Integer> >::type lcm(boost::rational<Integer> const &a, boost::rational<Integer> const &b)
+inline typename cppmsboost::enable_if_c<std::numeric_limits<Integer>::is_specialized, cppmsboost::rational<Integer> >::type lcm(cppmsboost::rational<Integer> const &a, cppmsboost::rational<Integer> const &b)
 {
-   return boost::rational<Integer>(static_cast<Integer>(lcm(a.numerator(), b.numerator())), static_cast<Integer>(gcd(a.denominator(), b.denominator())));
+   return cppmsboost::rational<Integer>(static_cast<Integer>(lcm(a.numerator(), b.numerator())), static_cast<Integer>(gcd(a.denominator(), b.denominator())));
 }
 /**
  * Knuth, The Art of Computer Programming: Volume 2, Third edition, 1998
@@ -548,7 +548,7 @@ public:
 #endif
    IntegerType operator()(IntegerType const &a, IntegerType const &b) const
    {
-      return boost::integer::gcd(a, b);
+      return cppmsboost::integer::gcd(a, b);
    }
 };
 
@@ -566,12 +566,12 @@ public:
 #endif
    IntegerType operator()(IntegerType const &a, IntegerType const &b)const
    {
-      return boost::integer::lcm(a, b);
+      return cppmsboost::integer::lcm(a, b);
    }
 };
 
 }  // namespace integer
-}  // namespace boost
+}  // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

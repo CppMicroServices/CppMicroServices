@@ -23,7 +23,7 @@
 # include <boost/chrono/system_clocks.hpp>
 #endif // defined(BOOST_ASIO_HAS_BOOST_CHRONO)
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace chrono {
 
@@ -46,23 +46,23 @@ using std::chrono::steady_clock;
 using std::chrono::system_clock;
 using std::chrono::high_resolution_clock;
 #elif defined(BOOST_ASIO_HAS_BOOST_CHRONO)
-using boost::chrono::duration;
-using boost::chrono::time_point;
-using boost::chrono::duration_cast;
-using boost::chrono::nanoseconds;
-using boost::chrono::microseconds;
-using boost::chrono::milliseconds;
-using boost::chrono::seconds;
-using boost::chrono::minutes;
-using boost::chrono::hours;
-using boost::chrono::time_point_cast;
-using boost::chrono::system_clock;
-using boost::chrono::steady_clock;
-using boost::chrono::high_resolution_clock;
+using cppmsboost::chrono::duration;
+using cppmsboost::chrono::time_point;
+using cppmsboost::chrono::duration_cast;
+using cppmsboost::chrono::nanoseconds;
+using cppmsboost::chrono::microseconds;
+using cppmsboost::chrono::milliseconds;
+using cppmsboost::chrono::seconds;
+using cppmsboost::chrono::minutes;
+using cppmsboost::chrono::hours;
+using cppmsboost::chrono::time_point_cast;
+using cppmsboost::chrono::system_clock;
+using cppmsboost::chrono::steady_clock;
+using cppmsboost::chrono::high_resolution_clock;
 #endif // defined(BOOST_ASIO_HAS_BOOST_CHRONO)
 
 } // namespace chrono
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_DETAIL_CHRONO_HPP

@@ -25,21 +25,21 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
 posix_mutex::posix_mutex()
 {
   int error = ::pthread_mutex_init(&mutex_, 0);
-  boost::system::error_code ec(error,
-      boost::asio::error::get_system_category());
-  boost::asio::detail::throw_error(ec, "mutex");
+  cppmsboost::system::error_code ec(error,
+      cppmsboost::asio::error::get_system_category());
+  cppmsboost::asio::detail::throw_error(ec, "mutex");
 }
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

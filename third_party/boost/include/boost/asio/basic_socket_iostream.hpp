@@ -74,7 +74,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -118,7 +118,7 @@ protected:
 template <typename Protocol,
 #if defined(BOOST_ASIO_HAS_BOOST_DATE_TIME) \
   && defined(BOOST_ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
-    typename Clock = boost::posix_time::ptime,
+    typename Clock = cppmsboost::posix_time::ptime,
     typename WaitTraits = time_traits<Clock> >
 #else // defined(BOOST_ASIO_HAS_BOOST_DATE_TIME)
       // && defined(BOOST_ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
@@ -307,7 +307,7 @@ public:
    *   std::cout << "Error: " << s.error().message() << std::endl;
    * } @endcode
    */
-  const boost::system::error_code& error() const
+  const cppmsboost::system::error_code& error() const
   {
     return rdbuf()->error();
   }
@@ -338,7 +338,7 @@ public:
    * This function sets the expiry time associated with the stream. Stream
    * operations performed after this time (where the operations cannot be
    * completed using the internal buffers) will fail with the error
-   * boost::asio::error::operation_aborted.
+   * cppmsboost::asio::error::operation_aborted.
    *
    * @param expiry_time The expiry time to be used for the stream.
    */
@@ -352,7 +352,7 @@ public:
    * This function sets the expiry time associated with the stream. Stream
    * operations performed after this time (where the operations cannot be
    * completed using the internal buffers) will fail with the error
-   * boost::asio::error::operation_aborted.
+   * cppmsboost::asio::error::operation_aborted.
    *
    * @param expiry_time The expiry time to be used for the timer.
    */
@@ -377,7 +377,7 @@ public:
    * This function sets the expiry time associated with the stream. Stream
    * operations performed after this time (where the operations cannot be
    * completed using the internal buffers) will fail with the error
-   * boost::asio::error::operation_aborted.
+   * cppmsboost::asio::error::operation_aborted.
    *
    * @param expiry_time The expiry time to be used for the timer.
    */
@@ -395,7 +395,7 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -25,7 +25,7 @@ namespace std{
 #include <boost/archive/archive_exception.hpp>
 #include <boost/archive/basic_binary_iprimitive.hpp> 
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 //////////////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ basic_binary_iprimitive<Archive, Elem, Tr>::init()
     unsigned char size;
     this->This()->load(size);
     if(sizeof(int) != size)
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(
                 archive_exception::incompatible_native_format,
                 "size of int"
@@ -49,7 +49,7 @@ basic_binary_iprimitive<Archive, Elem, Tr>::init()
         );
     this->This()->load(size);
     if(sizeof(long) != size)
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(
                 archive_exception::incompatible_native_format,
                 "size of long"
@@ -57,7 +57,7 @@ basic_binary_iprimitive<Archive, Elem, Tr>::init()
         );
     this->This()->load(size);
     if(sizeof(float) != size)
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(
                 archive_exception::incompatible_native_format,
                 "size of float"
@@ -65,7 +65,7 @@ basic_binary_iprimitive<Archive, Elem, Tr>::init()
         );
     this->This()->load(size);
     if(sizeof(double) != size)
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(
                 archive_exception::incompatible_native_format,
                 "size of double"
@@ -76,7 +76,7 @@ basic_binary_iprimitive<Archive, Elem, Tr>::init()
     int i;
     this->This()->load(i);
     if(1 != i)
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(
                 archive_exception::incompatible_native_format,
                 "endian setting"
@@ -170,4 +170,4 @@ BOOST_ARCHIVE_OR_WARCHIVE_DECL
 basic_binary_iprimitive<Archive, Elem, Tr>::~basic_binary_iprimitive(){}
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost

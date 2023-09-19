@@ -21,15 +21,15 @@
 #include <tuple>
 #endif
 
-namespace boost
+namespace cppmsboost
 {
   namespace csbl
   {
 #if defined BOOST_THREAD_USES_BOOST_TUPLE
-    using ::boost::tuple;
-    using ::boost::get;
-    using ::boost::make_tuple;
-    //using ::boost::tuple_size;
+    using ::cppmsboost::tuple;
+    using ::cppmsboost::get;
+    using ::cppmsboost::make_tuple;
+    //using ::cppmsboost::tuple_size;
 #else
     // 20.4.2, class template tuple:
     using ::std::tuple;

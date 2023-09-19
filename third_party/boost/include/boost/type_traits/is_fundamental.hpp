@@ -12,15 +12,15 @@
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/type_traits/is_void.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 //* is a type T a fundamental type described in the standard (3.9.1)
 #if defined( __CODEGEARC__ )
 template <class T> struct is_fundamental : public integral_constant<bool, __is_fundamental(T)> {};
 #else
-template <class T> struct is_fundamental : public integral_constant<bool, ::boost::is_arithmetic<T>::value || ::boost::is_void<T>::value> {};
+template <class T> struct is_fundamental : public integral_constant<bool, ::cppmsboost::is_arithmetic<T>::value || ::cppmsboost::is_void<T>::value> {};
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_IS_FUNDAMENTAL_HPP_INCLUDED

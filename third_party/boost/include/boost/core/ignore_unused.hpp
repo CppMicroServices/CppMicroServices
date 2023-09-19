@@ -9,7 +9,7 @@
 
 #include <boost/config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 #ifndef BOOST_NO_CXX11_VARIADIC_TEMPLATES
 
@@ -65,6 +65,6 @@ BOOST_FORCEINLINE BOOST_CXX14_CONSTEXPR void ignore_unused()
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_CORE_IGNORE_UNUSED_HPP

@@ -19,28 +19,28 @@ extern "C" {
 
 BOOST_SYMBOL_IMPORT int BOOST_WINAPI_WINAPI_CC
 MultiByteToWideChar(
-    boost::winapi::UINT_ CodePage,
-    boost::winapi::DWORD_ dwFlags,
-    boost::winapi::LPCSTR_ lpMultiByteStr,
+    cppmsboost::winapi::UINT_ CodePage,
+    cppmsboost::winapi::DWORD_ dwFlags,
+    cppmsboost::winapi::LPCSTR_ lpMultiByteStr,
     int cbMultiByte,
-    boost::winapi::LPWSTR_ lpWideCharStr,
+    cppmsboost::winapi::LPWSTR_ lpWideCharStr,
     int cchWideChar);
 
 BOOST_SYMBOL_IMPORT int BOOST_WINAPI_WINAPI_CC
 WideCharToMultiByte(
-    boost::winapi::UINT_ CodePage,
-    boost::winapi::DWORD_ dwFlags,
-    boost::winapi::LPCWSTR_ lpWideCharStr,
+    cppmsboost::winapi::UINT_ CodePage,
+    cppmsboost::winapi::DWORD_ dwFlags,
+    cppmsboost::winapi::LPCWSTR_ lpWideCharStr,
     int cchWideChar,
-    boost::winapi::LPSTR_ lpMultiByteStr,
+    cppmsboost::winapi::LPSTR_ lpMultiByteStr,
     int cbMultiByte,
-    boost::winapi::LPCSTR_ lpDefaultChar,
-    boost::winapi::LPBOOL_ lpUsedDefaultChar);
+    cppmsboost::winapi::LPCSTR_ lpDefaultChar,
+    cppmsboost::winapi::LPBOOL_ lpUsedDefaultChar);
 
 } // extern "C"
 #endif // #if !defined( BOOST_USE_WINDOWS_H )
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 
 #if defined( BOOST_USE_WINDOWS_H )
@@ -100,6 +100,6 @@ using ::MultiByteToWideChar;
 using ::WideCharToMultiByte;
 
 } // namespace winapi
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_WINAPI_CHARACTER_CODE_CONVERSION_HPP_INCLUDED_

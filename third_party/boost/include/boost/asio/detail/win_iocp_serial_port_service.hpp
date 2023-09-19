@@ -27,7 +27,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -77,12 +77,12 @@ public:
   }
 
   // Open the serial port using the specified device name.
-  BOOST_ASIO_DECL boost::system::error_code open(implementation_type& impl,
-      const std::string& device, boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code open(implementation_type& impl,
+      const std::string& device, cppmsboost::system::error_code& ec);
 
   // Assign a native handle to a serial port implementation.
-  boost::system::error_code assign(implementation_type& impl,
-      const native_handle_type& handle, boost::system::error_code& ec)
+  cppmsboost::system::error_code assign(implementation_type& impl,
+      const native_handle_type& handle, cppmsboost::system::error_code& ec)
   {
     return handle_service_.assign(impl, handle, ec);
   }
@@ -94,8 +94,8 @@ public:
   }
 
   // Destroy a serial port implementation.
-  boost::system::error_code close(implementation_type& impl,
-      boost::system::error_code& ec)
+  cppmsboost::system::error_code close(implementation_type& impl,
+      cppmsboost::system::error_code& ec)
   {
     return handle_service_.close(impl, ec);
   }
@@ -107,16 +107,16 @@ public:
   }
 
   // Cancel all operations associated with the handle.
-  boost::system::error_code cancel(implementation_type& impl,
-      boost::system::error_code& ec)
+  cppmsboost::system::error_code cancel(implementation_type& impl,
+      cppmsboost::system::error_code& ec)
   {
     return handle_service_.cancel(impl, ec);
   }
 
   // Set an option on the serial port.
   template <typename SettableSerialPortOption>
-  boost::system::error_code set_option(implementation_type& impl,
-      const SettableSerialPortOption& option, boost::system::error_code& ec)
+  cppmsboost::system::error_code set_option(implementation_type& impl,
+      const SettableSerialPortOption& option, cppmsboost::system::error_code& ec)
   {
     return do_set_option(impl,
         &win_iocp_serial_port_service::store_option<SettableSerialPortOption>,
@@ -125,8 +125,8 @@ public:
 
   // Get an option from the serial port.
   template <typename GettableSerialPortOption>
-  boost::system::error_code get_option(const implementation_type& impl,
-      GettableSerialPortOption& option, boost::system::error_code& ec) const
+  cppmsboost::system::error_code get_option(const implementation_type& impl,
+      GettableSerialPortOption& option, cppmsboost::system::error_code& ec) const
   {
     return do_get_option(impl,
         &win_iocp_serial_port_service::load_option<GettableSerialPortOption>,
@@ -134,17 +134,17 @@ public:
   }
 
   // Send a break sequence to the serial port.
-  boost::system::error_code send_break(implementation_type&,
-      boost::system::error_code& ec)
+  cppmsboost::system::error_code send_break(implementation_type&,
+      cppmsboost::system::error_code& ec)
   {
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
     return ec;
   }
 
   // Write the given data. Returns the number of bytes sent.
   template <typename ConstBufferSequence>
   size_t write_some(implementation_type& impl,
-      const ConstBufferSequence& buffers, boost::system::error_code& ec)
+      const ConstBufferSequence& buffers, cppmsboost::system::error_code& ec)
   {
     return handle_service_.write_some(impl, buffers, ec);
   }
@@ -162,7 +162,7 @@ public:
   // Read some data. Returns the number of bytes received.
   template <typename MutableBufferSequence>
   size_t read_some(implementation_type& impl,
-      const MutableBufferSequence& buffers, boost::system::error_code& ec)
+      const MutableBufferSequence& buffers, cppmsboost::system::error_code& ec)
   {
     return handle_service_.read_some(impl, buffers, ec);
   }
@@ -180,40 +180,40 @@ public:
 
 private:
   // Function pointer type for storing a serial port option.
-  typedef boost::system::error_code (*store_function_type)(
-      const void*, ::DCB&, boost::system::error_code&);
+  typedef cppmsboost::system::error_code (*store_function_type)(
+      const void*, ::DCB&, cppmsboost::system::error_code&);
 
   // Helper function template to store a serial port option.
   template <typename SettableSerialPortOption>
-  static boost::system::error_code store_option(const void* option,
-      ::DCB& storage, boost::system::error_code& ec)
+  static cppmsboost::system::error_code store_option(const void* option,
+      ::DCB& storage, cppmsboost::system::error_code& ec)
   {
     static_cast<const SettableSerialPortOption*>(option)->store(storage, ec);
     return ec;
   }
 
   // Helper function to set a serial port option.
-  BOOST_ASIO_DECL boost::system::error_code do_set_option(
+  BOOST_ASIO_DECL cppmsboost::system::error_code do_set_option(
       implementation_type& impl, store_function_type store,
-      const void* option, boost::system::error_code& ec);
+      const void* option, cppmsboost::system::error_code& ec);
 
   // Function pointer type for loading a serial port option.
-  typedef boost::system::error_code (*load_function_type)(
-      void*, const ::DCB&, boost::system::error_code&);
+  typedef cppmsboost::system::error_code (*load_function_type)(
+      void*, const ::DCB&, cppmsboost::system::error_code&);
 
   // Helper function template to load a serial port option.
   template <typename GettableSerialPortOption>
-  static boost::system::error_code load_option(void* option,
-      const ::DCB& storage, boost::system::error_code& ec)
+  static cppmsboost::system::error_code load_option(void* option,
+      const ::DCB& storage, cppmsboost::system::error_code& ec)
   {
     static_cast<GettableSerialPortOption*>(option)->load(storage, ec);
     return ec;
   }
 
   // Helper function to get a serial port option.
-  BOOST_ASIO_DECL boost::system::error_code do_get_option(
+  BOOST_ASIO_DECL cppmsboost::system::error_code do_get_option(
       const implementation_type& impl, load_function_type load,
-      void* option, boost::system::error_code& ec) const;
+      void* option, cppmsboost::system::error_code& ec) const;
 
   // The implementation used for initiating asynchronous operations.
   win_iocp_handle_service handle_service_;
@@ -221,7 +221,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

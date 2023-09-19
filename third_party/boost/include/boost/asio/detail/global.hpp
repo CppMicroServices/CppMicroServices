@@ -29,7 +29,7 @@
 # error Only Windows, POSIX and std::call_once are supported!
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -49,6 +49,6 @@ inline T& global()
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_DETAIL_GLOBAL_HPP

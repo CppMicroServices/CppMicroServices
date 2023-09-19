@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
@@ -29,11 +29,11 @@ namespace ip {
 BOOST_ASIO_DECL std::string host_name();
 
 /// Get the current host name.
-BOOST_ASIO_DECL std::string host_name(boost::system::error_code& ec);
+BOOST_ASIO_DECL std::string host_name(cppmsboost::system::error_code& ec);
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

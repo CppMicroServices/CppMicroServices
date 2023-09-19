@@ -29,7 +29,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -47,10 +47,10 @@ public:
   typedef typename Protocol::endpoint endpoint_type;
 
   // The query type.
-  typedef boost::asio::ip::basic_resolver_query<Protocol> query_type;
+  typedef cppmsboost::asio::ip::basic_resolver_query<Protocol> query_type;
 
   // The results type.
-  typedef boost::asio::ip::basic_resolver_results<Protocol> results_type;
+  typedef cppmsboost::asio::ip::basic_resolver_results<Protocol> results_type;
 
   // Constructor.
   resolver_service(execution_context& context)
@@ -73,9 +73,9 @@ public:
 
   // Resolve a query to a list of entries.
   results_type resolve(implementation_type&, const query_type& query,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
-    boost::asio::detail::addrinfo_type* address_info = 0;
+    cppmsboost::asio::detail::addrinfo_type* address_info = 0;
 
     socket_ops::getaddrinfo(query.host_name().c_str(),
         query.service_name().c_str(), query.hints(), &address_info, ec);
@@ -92,7 +92,7 @@ public:
   {
     // Allocate and construct an operation to wrap the handler.
     typedef resolve_query_op<Protocol, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl, query, scheduler_, handler, io_ex);
 
@@ -105,7 +105,7 @@ public:
 
   // Resolve an endpoint to a list of entries.
   results_type resolve(implementation_type&,
-      const endpoint_type& endpoint, boost::system::error_code& ec)
+      const endpoint_type& endpoint, cppmsboost::system::error_code& ec)
   {
     char host_name[NI_MAXHOST];
     char service_name[NI_MAXSERV];
@@ -124,7 +124,7 @@ public:
   {
     // Allocate and construct an operation to wrap the handler.
     typedef resolve_endpoint_op<Protocol, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl, endpoint, scheduler_, handler, io_ex);
 
@@ -138,7 +138,7 @@ public:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

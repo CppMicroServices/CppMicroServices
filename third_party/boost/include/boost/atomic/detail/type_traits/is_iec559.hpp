@@ -21,7 +21,7 @@
 #pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -34,7 +34,7 @@ struct is_iec559
 #if defined(BOOST_HAS_FLOAT128)
 // libstdc++ does not specialize numeric_limits for __float128
 template< >
-struct is_iec559< boost::float128_type >
+struct is_iec559< cppmsboost::float128_type >
 {
     static BOOST_CONSTEXPR_OR_CONST bool value = true;
 };
@@ -42,6 +42,6 @@ struct is_iec559< boost::float128_type >
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ATOMIC_DETAIL_TYPE_TRAITS_IS_IEC559_HPP_INCLUDED_

@@ -43,7 +43,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -55,12 +55,12 @@ struct handler_tracking_timestamp
   handler_tracking_timestamp()
   {
 #if defined(BOOST_ASIO_HAS_BOOST_DATE_TIME)
-    boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
-    boost::posix_time::time_duration now =
-      boost::posix_time::microsec_clock::universal_time() - epoch;
+    cppmsboost::posix_time::ptime epoch(cppmsboost::gregorian::date(1970, 1, 1));
+    cppmsboost::posix_time::time_duration now =
+      cppmsboost::posix_time::microsec_clock::universal_time() - epoch;
 #elif defined(BOOST_ASIO_HAS_CHRONO)
     typedef chrono_time_traits<chrono::system_clock,
-        boost::asio::wait_traits<chrono::system_clock> > traits_helper;
+        cppmsboost::asio::wait_traits<chrono::system_clock> > traits_helper;
     traits_helper::posix_time_duration now(
         chrono::system_clock::now().time_since_epoch());
 #endif
@@ -164,7 +164,7 @@ void handler_tracking::completion::invocation_begin()
 }
 
 void handler_tracking::completion::invocation_begin(
-    const boost::system::error_code& ec)
+    const cppmsboost::system::error_code& ec)
 {
   handler_tracking_timestamp timestamp;
 
@@ -181,7 +181,7 @@ void handler_tracking::completion::invocation_begin(
 }
 
 void handler_tracking::completion::invocation_begin(
-    const boost::system::error_code& ec, std::size_t bytes_transferred)
+    const cppmsboost::system::error_code& ec, std::size_t bytes_transferred)
 {
   handler_tracking_timestamp timestamp;
 
@@ -199,7 +199,7 @@ void handler_tracking::completion::invocation_begin(
 }
 
 void handler_tracking::completion::invocation_begin(
-    const boost::system::error_code& ec, int signal_number)
+    const cppmsboost::system::error_code& ec, int signal_number)
 {
   handler_tracking_timestamp timestamp;
 
@@ -216,7 +216,7 @@ void handler_tracking::completion::invocation_begin(
 }
 
 void handler_tracking::completion::invocation_begin(
-    const boost::system::error_code& ec, const char* arg)
+    const cppmsboost::system::error_code& ec, const char* arg)
 {
   handler_tracking_timestamp timestamp;
 
@@ -289,7 +289,7 @@ void handler_tracking::reactor_events(execution_context& /*context*/,
 
 void handler_tracking::reactor_operation(
     const tracked_handler& h, const char* op_name,
-    const boost::system::error_code& ec)
+    const cppmsboost::system::error_code& ec)
 {
   handler_tracking_timestamp timestamp;
 
@@ -305,7 +305,7 @@ void handler_tracking::reactor_operation(
 
 void handler_tracking::reactor_operation(
     const tracked_handler& h, const char* op_name,
-    const boost::system::error_code& ec, std::size_t bytes_transferred)
+    const cppmsboost::system::error_code& ec, std::size_t bytes_transferred)
 {
   handler_tracking_timestamp timestamp;
 
@@ -351,7 +351,7 @@ void handler_tracking::write_line(const char* format, ...)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -26,7 +26,7 @@ namespace std{ using ::memcpy; }
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/iterator/iterator_traits.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 namespace iterators {
 
@@ -35,7 +35,7 @@ namespace iterators {
 template<
     class Base,
     int N,
-    class CharType = typename boost::iterator_value<Base>::type
+    class CharType = typename cppmsboost::iterator_value<Base>::type
 >
 class insert_linebreaks :
     public iterator_adaptor<
@@ -47,7 +47,7 @@ class insert_linebreaks :
     >
 {
 private:
-    friend class boost::iterator_core_access;
+    friend class cppmsboost::iterator_core_access;
     typedef iterator_adaptor<
         insert_linebreaks<Base, N, CharType>,
         Base,
@@ -94,6 +94,6 @@ public:
 
 } // namespace iterators
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ARCHIVE_ITERATORS_INSERT_LINEBREAKS_HPP

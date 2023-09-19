@@ -47,7 +47,7 @@ namespace std{
 }
 #endif
 
-namespace boost{ namespace BOOST_REGEX_DETAIL_NS{
+namespace cppmsboost{ namespace BOOST_REGEX_DETAIL_NS{
 
 
 //
@@ -125,9 +125,9 @@ inline bool is_separator(charT c)
       (c == static_cast<charT>('\n'))
       || (c == static_cast<charT>('\r'))
       || (c == static_cast<charT>('\f'))
-      || (static_cast<boost::uint16_t>(c) == 0x2028u)
-      || (static_cast<boost::uint16_t>(c) == 0x2029u)
-      || (static_cast<boost::uint16_t>(c) == 0x85u));
+      || (static_cast<cppmsboost::uint16_t>(c) == 0x2028u)
+      || (static_cast<cppmsboost::uint16_t>(c) == 0x2029u)
+      || (static_cast<cppmsboost::uint16_t>(c) == 0x85u));
 }
 template <>
 inline bool is_separator<char>(char c)
@@ -305,14 +305,14 @@ int global_value(charT c)
    return -1;
 }
 template <class charT, class traits>
-boost::intmax_t global_toi(const charT*& p1, const charT* p2, int radix, const traits& t)
+cppmsboost::intmax_t global_toi(const charT*& p1, const charT* p2, int radix, const traits& t)
 {
    (void)t; // warning suppression
-   boost::intmax_t limit = (std::numeric_limits<boost::intmax_t>::max)() / radix;
-   boost::intmax_t next_value = t.value(*p1, radix);
+   cppmsboost::intmax_t limit = (std::numeric_limits<cppmsboost::intmax_t>::max)() / radix;
+   cppmsboost::intmax_t next_value = t.value(*p1, radix);
    if((p1 == p2) || (next_value < 0) || (next_value >= radix))
       return -1;
-   boost::intmax_t result = 0;
+   cppmsboost::intmax_t result = 0;
    while(p1 != p2)
    {
       next_value = t.value(*p1, radix);
@@ -328,7 +328,7 @@ boost::intmax_t global_toi(const charT*& p1, const charT* p2, int radix, const t
 }
 
 template <class charT>
-inline typename boost::enable_if_c<(sizeof(charT) > 1), const charT*>::type get_escape_R_string()
+inline typename cppmsboost::enable_if_c<(sizeof(charT) > 1), const charT*>::type get_escape_R_string()
 {
 #ifdef BOOST_MSVC
 #  pragma warning(push)
@@ -350,7 +350,7 @@ inline typename boost::enable_if_c<(sizeof(charT) > 1), const charT*>::type get_
 }
 
 template <class charT>
-inline typename boost::disable_if_c<(sizeof(charT) > 1), const charT*>::type get_escape_R_string()
+inline typename cppmsboost::disable_if_c<(sizeof(charT) > 1), const charT*>::type get_escape_R_string()
 {
 #ifdef BOOST_MSVC
 #  pragma warning(push)

@@ -15,7 +15,7 @@
 #include <boost/chrono/duration.hpp>
 //#include <boost/chrono/typeof/boost/chrono/chrono.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   namespace chrono
   {
@@ -54,6 +54,6 @@ namespace boost
     }
 
   } // namespace chrono
-} // namespace boost
+} // namespace cppmsboost
 
 #endif

@@ -20,47 +20,47 @@
 extern "C" {
 
 #if BOOST_WINAPI_PARTITION_DESKTOP_SYSTEM
-BOOST_SYMBOL_IMPORT boost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
-GetProcessHeaps(boost::winapi::DWORD_ NumberOfHeaps, boost::winapi::PHANDLE_ ProcessHeaps);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
+GetProcessHeaps(cppmsboost::winapi::DWORD_ NumberOfHeaps, cppmsboost::winapi::PHANDLE_ ProcessHeaps);
 #endif // BOOST_WINAPI_PARTITION_DESKTOP_SYSTEM
 
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 GetProcessHeap(BOOST_WINAPI_DETAIL_VOID);
 
-BOOST_SYMBOL_IMPORT boost::winapi::LPVOID_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::LPVOID_ BOOST_WINAPI_WINAPI_CC
 HeapAlloc(
-    boost::winapi::HANDLE_ hHeap,
-    boost::winapi::DWORD_ dwFlags,
-    boost::winapi::SIZE_T_ dwBytes);
+    cppmsboost::winapi::HANDLE_ hHeap,
+    cppmsboost::winapi::DWORD_ dwFlags,
+    cppmsboost::winapi::SIZE_T_ dwBytes);
 
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
 HeapFree(
-    boost::winapi::HANDLE_ hHeap,
-    boost::winapi::DWORD_ dwFlags,
-    boost::winapi::LPVOID_ lpMem);
+    cppmsboost::winapi::HANDLE_ hHeap,
+    cppmsboost::winapi::DWORD_ dwFlags,
+    cppmsboost::winapi::LPVOID_ lpMem);
 
-BOOST_SYMBOL_IMPORT boost::winapi::LPVOID_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::LPVOID_ BOOST_WINAPI_WINAPI_CC
 HeapReAlloc(
-    boost::winapi::HANDLE_ hHeap,
-    boost::winapi::DWORD_ dwFlags,
-    boost::winapi::LPVOID_ lpMem,
-    boost::winapi::SIZE_T_ dwBytes);
+    cppmsboost::winapi::HANDLE_ hHeap,
+    cppmsboost::winapi::DWORD_ dwFlags,
+    cppmsboost::winapi::LPVOID_ lpMem,
+    cppmsboost::winapi::SIZE_T_ dwBytes);
 
 #if BOOST_WINAPI_PARTITION_APP_SYSTEM
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 HeapCreate(
-    boost::winapi::DWORD_ flOptions,
-    boost::winapi::SIZE_T_ dwInitialSize,
-    boost::winapi::SIZE_T_ dwMaximumSize);
+    cppmsboost::winapi::DWORD_ flOptions,
+    cppmsboost::winapi::SIZE_T_ dwInitialSize,
+    cppmsboost::winapi::SIZE_T_ dwMaximumSize);
 
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
-HeapDestroy(boost::winapi::HANDLE_ hHeap);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
+HeapDestroy(cppmsboost::winapi::HANDLE_ hHeap);
 #endif // BOOST_WINAPI_PARTITION_APP_SYSTEM
 
 } // extern "C"
 #endif // !defined( BOOST_USE_WINDOWS_H )
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 
 #if BOOST_WINAPI_PARTITION_DESKTOP_SYSTEM

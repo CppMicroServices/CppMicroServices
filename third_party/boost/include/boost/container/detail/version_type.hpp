@@ -30,7 +30,7 @@
 #include <boost/container/detail/mpl.hpp>
 #include <boost/container/detail/type_traits.hpp>
 
-namespace boost{
+namespace cppmsboost{
 namespace container {
 namespace dtl {
 
@@ -94,7 +94,7 @@ typedef dtl::integral_constant<unsigned, 1> version_1;
 typedef dtl::integral_constant<unsigned, 2> version_2;
 
 }  //namespace container {
-}  //namespace boost{
+}  //namespace cppmsboost{
 
 #include <boost/container/detail/config_end.hpp>
 

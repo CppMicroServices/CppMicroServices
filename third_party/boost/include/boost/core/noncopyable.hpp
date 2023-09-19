@@ -11,7 +11,7 @@
 
 #include <boost/config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 //  Private copy constructor and copy assignment ensure classes derived from
 //  class noncopyable cannot be copied.
@@ -58,6 +58,6 @@ namespace noncopyable_  // protection from unintended ADL
 
 typedef noncopyable_::noncopyable noncopyable;
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // BOOST_CORE_NONCOPYABLE_HPP

@@ -13,7 +13,7 @@
   *   LOCATION:    see http://www.boost.org/libs/regex for documentation.
   *   FILE         regex_fwd.cpp
   *   VERSION      see <boost/version.hpp>
-  *   DESCRIPTION: Forward declares boost::basic_regex<> and
+  *   DESCRIPTION: Forward declares cppmsboost::basic_regex<> and
   *                associated typedefs.
   */
 

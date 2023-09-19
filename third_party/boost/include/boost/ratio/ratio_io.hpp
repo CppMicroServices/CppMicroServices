@@ -19,7 +19,7 @@
 #include <ratio>
 #include <string>
 
-namespace boost
+namespace cppmsboost
 {
 
 template <class Ratio, class CharT>
@@ -53,7 +53,7 @@ struct ratio_string
 #define BOOST_RATIO_HAS_UNICODE_SUPPORT 1
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 //template <class Ratio>
 //struct ratio_string_is_localizable : false_type {};

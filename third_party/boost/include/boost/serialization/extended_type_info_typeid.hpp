@@ -45,7 +45,7 @@
 #  pragma warning(disable : 4251 4231 4660 4275 4511 4512)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 namespace typeid_system {
 
@@ -85,7 +85,7 @@ class extended_type_info_typeid :
 public:
     extended_type_info_typeid() :
         typeid_system::extended_type_info_typeid_0(
-            boost::serialization::guid< T >()
+            cppmsboost::serialization::guid< T >()
         )
     {
         type_register(typeid(T));
@@ -101,14 +101,14 @@ public:
     get_derived_extended_type_info(const T & t) const {
         // note: this implementation - based on usage of typeid (rtti)
         // only does something if the class has at least one virtual function.
-        BOOST_STATIC_WARNING(boost::is_polymorphic< T >::value);
+        BOOST_STATIC_WARNING(cppmsboost::is_polymorphic< T >::value);
         return
             typeid_system::extended_type_info_typeid_0::get_extended_type_info(
                 typeid(t)
             );
     }
     const char * get_key() const {
-        return boost::serialization::guid< T >();
+        return cppmsboost::serialization::guid< T >();
     }
     virtual void * construct(unsigned int count, ...) const{
         // count up the arguments
@@ -116,15 +116,15 @@ public:
         va_start(ap, count);
         switch(count){
         case 0:
-            return factory<typename boost::remove_const< T >::type, 0>(ap);
+            return factory<typename cppmsboost::remove_const< T >::type, 0>(ap);
         case 1:
-            return factory<typename boost::remove_const< T >::type, 1>(ap);
+            return factory<typename cppmsboost::remove_const< T >::type, 1>(ap);
         case 2:
-            return factory<typename boost::remove_const< T >::type, 2>(ap);
+            return factory<typename cppmsboost::remove_const< T >::type, 2>(ap);
         case 3:
-            return factory<typename boost::remove_const< T >::type, 3>(ap);
+            return factory<typename cppmsboost::remove_const< T >::type, 3>(ap);
         case 4:
-            return factory<typename boost::remove_const< T >::type, 4>(ap);
+            return factory<typename cppmsboost::remove_const< T >::type, 4>(ap);
         default:
             BOOST_ASSERT(false); // too many arguments
             // throw exception here?
@@ -132,7 +132,7 @@ public:
         }
     }
     virtual void destroy(void const * const p) const {
-        boost::serialization::access::destroy(
+        cppmsboost::serialization::access::destroy(
             static_cast<T const *>(p)
         );
         //delete static_cast<T const * const>(p);
@@ -140,7 +140,7 @@ public:
 };
 
 } // namespace serialization
-} // namespace boost
+} // namespace cppmsboost
 
 ///////////////////////////////////////////////////////////////////////////////
 // If no other implementation has been designated as default,
@@ -148,15 +148,15 @@ public:
 // before any of the other headers.
 #ifndef BOOST_SERIALIZATION_DEFAULT_TYPE_INFO
     #define BOOST_SERIALIZATION_DEFAULT_TYPE_INFO
-    namespace boost {
+    namespace cppmsboost {
     namespace serialization {
     template<class T>
     struct extended_type_info_impl {
         typedef typename
-            boost::serialization::extended_type_info_typeid< T > type;
+            cppmsboost::serialization::extended_type_info_typeid< T > type;
     };
     } // namespace serialization
-    } // namespace boost
+    } // namespace cppmsboost
 #endif
 
 #ifdef BOOST_MSVC

@@ -13,7 +13,7 @@
 #include <boost/thread/detail/nullary_function.hpp>
 #include <boost/thread/csbl/functional.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   namespace executors
   {
@@ -26,7 +26,7 @@ namespace boost
     typedef csbl::function<void()> work_pq;
 #endif
   }
-} // namespace boost
+} // namespace cppmsboost
 
 #endif
 #endif //  BOOST_THREAD_EXECUTORS_WORK_HPP

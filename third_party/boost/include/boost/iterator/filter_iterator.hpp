@@ -13,7 +13,7 @@
 #include <boost/type_traits/is_class.hpp>
 #include <boost/static_assert.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace iterators {
 
   template <class Predicate, class Iterator>
@@ -131,6 +131,6 @@ namespace iterators {
 using iterators::filter_iterator;
 using iterators::make_filter_iterator;
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_FILTER_ITERATOR_23022003THW_HPP

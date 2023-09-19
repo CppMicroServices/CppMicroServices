@@ -17,7 +17,7 @@
 #  include BOOST_ABI_PREFIX
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace context {
 
 struct BOOST_CONTEXT_DECL stack_traits

@@ -31,7 +31,7 @@
 #pragma warning(pop)
 #endif
 
-namespace boost{
+namespace cppmsboost{
    namespace BOOST_REGEX_DETAIL_NS{
 
 
@@ -123,7 +123,7 @@ unsigned find_sort_syntax(const traits* pt, charT* delim)
 
 
    } // namespace BOOST_REGEX_DETAIL_NS
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(push)

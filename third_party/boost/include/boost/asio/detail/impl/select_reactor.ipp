@@ -30,7 +30,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -53,7 +53,7 @@ private:
 };
 #endif // defined(BOOST_ASIO_HAS_IOCP)
 
-select_reactor::select_reactor(boost::asio::execution_context& ctx)
+select_reactor::select_reactor(cppmsboost::asio::execution_context& ctx)
   : execution_context_service_base<select_reactor>(ctx),
     scheduler_(use_service<scheduler_type>(ctx)),
     mutex_(),
@@ -65,8 +65,8 @@ select_reactor::select_reactor(boost::asio::execution_context& ctx)
     shutdown_(false)
 {
 #if defined(BOOST_ASIO_HAS_IOCP)
-  boost::asio::detail::signal_blocker sb;
-  thread_ = new boost::asio::detail::thread(thread_function(this));
+  cppmsboost::asio::detail::signal_blocker sb;
+  thread_ = new cppmsboost::asio::detail::thread(thread_function(this));
 #endif // defined(BOOST_ASIO_HAS_IOCP)
 }
 
@@ -77,7 +77,7 @@ select_reactor::~select_reactor()
 
 void select_reactor::shutdown()
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   shutdown_ = true;
 #if defined(BOOST_ASIO_HAS_IOCP)
   stop_thread_ = true;
@@ -106,9 +106,9 @@ void select_reactor::shutdown()
 }
 
 void select_reactor::notify_fork(
-    boost::asio::execution_context::fork_event fork_ev)
+    cppmsboost::asio::execution_context::fork_event fork_ev)
 {
-  if (fork_ev == boost::asio::execution_context::fork_child)
+  if (fork_ev == cppmsboost::asio::execution_context::fork_child)
     interrupter_.recreate();
 }
 
@@ -127,7 +127,7 @@ int select_reactor::register_internal_descriptor(
     int op_type, socket_type descriptor,
     select_reactor::per_descriptor_data&, reactor_op* op)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
 
   op_queue_[op_type].enqueue_operation(descriptor, op);
   interrupter_.interrupt();
@@ -145,7 +145,7 @@ void select_reactor::start_op(int op_type, socket_type descriptor,
     select_reactor::per_descriptor_data&, reactor_op* op,
     bool is_continuation, bool)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
 
   if (shutdown_)
   {
@@ -162,21 +162,21 @@ void select_reactor::start_op(int op_type, socket_type descriptor,
 void select_reactor::cancel_ops(socket_type descriptor,
     select_reactor::per_descriptor_data&)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
-  cancel_ops_unlocked(descriptor, boost::asio::error::operation_aborted);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cancel_ops_unlocked(descriptor, cppmsboost::asio::error::operation_aborted);
 }
 
 void select_reactor::deregister_descriptor(socket_type descriptor,
     select_reactor::per_descriptor_data&, bool)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
-  cancel_ops_unlocked(descriptor, boost::asio::error::operation_aborted);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cancel_ops_unlocked(descriptor, cppmsboost::asio::error::operation_aborted);
 }
 
 void select_reactor::deregister_internal_descriptor(
     socket_type descriptor, select_reactor::per_descriptor_data&)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   op_queue<operation> ops;
   for (int i = 0; i < max_ops; ++i)
     op_queue_[i].cancel_operations(descriptor, ops);
@@ -189,7 +189,7 @@ void select_reactor::cleanup_descriptor_data(
 
 void select_reactor::run(long usec, op_queue<operation>& ops)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
 
 #if defined(BOOST_ASIO_HAS_IOCP)
   // Check if the thread is supposed to stop.
@@ -234,7 +234,7 @@ void select_reactor::run(long usec, op_queue<operation>& ops)
   lock.unlock();
 
   // Block on the select call until descriptors become ready.
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   int retval = socket_ops::select(static_cast<int>(max_fd + 1),
       fd_sets_[read_op], fd_sets_[write_op], fd_sets_[except_op], tv, ec);
 
@@ -276,7 +276,7 @@ void select_reactor::interrupt()
 #if defined(BOOST_ASIO_HAS_IOCP)
 void select_reactor::run_thread()
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   while (!stop_thread_)
   {
     lock.unlock();
@@ -313,7 +313,7 @@ timeval* select_reactor::get_timeout(long usec, timeval& tv)
 }
 
 void select_reactor::cancel_ops_unlocked(socket_type descriptor,
-    const boost::system::error_code& ec)
+    const cppmsboost::system::error_code& ec)
 {
   bool need_interrupt = false;
   op_queue<operation> ops;
@@ -327,7 +327,7 @@ void select_reactor::cancel_ops_unlocked(socket_type descriptor,
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

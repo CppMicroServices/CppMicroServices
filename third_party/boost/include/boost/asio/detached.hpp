@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Class used to specify that an asynchronous operation is detached.
@@ -30,9 +30,9 @@ namespace asio {
  * detached. That is, there is no completion handler waiting for the
  * operation's result. A detached_t object may be passed as a handler to an
  * asynchronous operation, typically using the special value
- * @c boost::asio::detached. For example:
+ * @c cppmsboost::asio::detached. For example:
 
- * @code my_socket.async_send(my_buffer, boost::asio::detached);
+ * @code my_socket.async_send(my_buffer, cppmsboost::asio::detached);
  * @endcode
  */
 class detached_t
@@ -46,7 +46,7 @@ public:
 
 /// A special value, similar to std::nothrow.
 /**
- * See the documentation for boost::asio::detached_t for a usage example.
+ * See the documentation for cppmsboost::asio::detached_t for a usage example.
  */
 #if defined(BOOST_ASIO_HAS_CONSTEXPR) || defined(GENERATING_DOCUMENTATION)
 constexpr detached_t detached;
@@ -55,7 +55,7 @@ __declspec(selectany) detached_t detached;
 #endif
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

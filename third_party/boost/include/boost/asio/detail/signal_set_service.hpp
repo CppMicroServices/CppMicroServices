@@ -40,7 +40,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -126,7 +126,7 @@ public:
 
   // Perform fork-related housekeeping.
   BOOST_ASIO_DECL void notify_fork(
-      boost::asio::execution_context::fork_event fork_ev);
+      cppmsboost::asio::execution_context::fork_event fork_ev);
 
   // Construct a new signal_set implementation.
   BOOST_ASIO_DECL void construct(implementation_type& impl);
@@ -135,20 +135,20 @@ public:
   BOOST_ASIO_DECL void destroy(implementation_type& impl);
 
   // Add a signal to a signal_set.
-  BOOST_ASIO_DECL boost::system::error_code add(implementation_type& impl,
-      int signal_number, boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code add(implementation_type& impl,
+      int signal_number, cppmsboost::system::error_code& ec);
 
   // Remove a signal to a signal_set.
-  BOOST_ASIO_DECL boost::system::error_code remove(implementation_type& impl,
-      int signal_number, boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code remove(implementation_type& impl,
+      int signal_number, cppmsboost::system::error_code& ec);
 
   // Remove all signals from a signal_set.
-  BOOST_ASIO_DECL boost::system::error_code clear(implementation_type& impl,
-      boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code clear(implementation_type& impl,
+      cppmsboost::system::error_code& ec);
 
   // Cancel all operations associated with the signal set.
-  BOOST_ASIO_DECL boost::system::error_code cancel(implementation_type& impl,
-      boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code cancel(implementation_type& impl,
+      cppmsboost::system::error_code& ec);
 
   // Start an asynchronous operation to wait for a signal to be delivered.
   template <typename Handler, typename IoExecutor>
@@ -157,7 +157,7 @@ public:
   {
     // Allocate and construct an operation to wrap the handler.
     typedef signal_handler<Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(handler, io_ex);
 
@@ -220,7 +220,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

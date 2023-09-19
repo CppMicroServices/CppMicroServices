@@ -20,7 +20,7 @@
 
 #include <boost/type_traits/is_same.hpp>
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 template< typename T1 >
 struct same_as

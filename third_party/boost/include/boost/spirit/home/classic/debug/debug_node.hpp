@@ -24,7 +24,7 @@
 #include <boost/spirit/home/classic/namespace.hpp>
 #include <boost/spirit/home/classic/core/primitives/primitives.hpp> // for iscntrl_
 
-namespace boost { namespace spirit {
+namespace cppmsboost { namespace spirit {
 
 BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 

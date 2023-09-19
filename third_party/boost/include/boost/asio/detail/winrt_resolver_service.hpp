@@ -37,7 +37,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -55,10 +55,10 @@ public:
   typedef typename Protocol::endpoint endpoint_type;
 
   // The query type.
-  typedef boost::asio::ip::basic_resolver_query<Protocol> query_type;
+  typedef cppmsboost::asio::ip::basic_resolver_query<Protocol> query_type;
 
   // The results type.
-  typedef boost::asio::ip::basic_resolver_results<Protocol> results_type;
+  typedef cppmsboost::asio::ip::basic_resolver_results<Protocol> results_type;
 
   // Constructor.
   winrt_resolver_service(execution_context& context)
@@ -113,7 +113,7 @@ public:
 
   // Resolve a query to a list of entries.
   results_type resolve(implementation_type&,
-      const query_type& query, boost::system::error_code& ec)
+      const query_type& query, cppmsboost::system::error_code& ec)
   {
     try
     {
@@ -132,8 +132,8 @@ public:
     }
     catch (Platform::Exception^ e)
     {
-      ec = boost::system::error_code(e->HResult,
-          boost::system::system_category());
+      ec = cppmsboost::system::error_code(e->HResult,
+          cppmsboost::system::system_category());
       return results_type();
     }
   }
@@ -144,11 +144,11 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef winrt_resolve_op<Protocol, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(query, handler, io_ex);
 
@@ -166,8 +166,8 @@ public:
     }
     catch (Platform::Exception^ e)
     {
-      p.p->ec_ = boost::system::error_code(
-          e->HResult, boost::system::system_category());
+      p.p->ec_ = cppmsboost::system::error_code(
+          e->HResult, cppmsboost::system::system_category());
       scheduler_.post_immediate_completion(p.p, is_continuation);
       p.v = p.p = 0;
     }
@@ -175,9 +175,9 @@ public:
 
   // Resolve an endpoint to a list of entries.
   results_type resolve(implementation_type&,
-      const endpoint_type&, boost::system::error_code& ec)
+      const endpoint_type&, cppmsboost::system::error_code& ec)
   {
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
     return results_type();
   }
 
@@ -186,9 +186,9 @@ public:
   void async_resolve(implementation_type&, const endpoint_type&,
       Handler& handler, const IoExecutor& io_ex)
   {
-    boost::system::error_code ec = boost::asio::error::operation_not_supported;
+    cppmsboost::system::error_code ec = cppmsboost::asio::error::operation_not_supported;
     const results_type results;
-    boost::asio::post(io_ex, detail::bind_handler(handler, ec, results));
+    cppmsboost::asio::post(io_ex, detail::bind_handler(handler, ec, results));
   }
 
 private:
@@ -205,7 +205,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

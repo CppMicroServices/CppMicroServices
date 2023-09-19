@@ -1,6 +1,6 @@
 //  boost/memory_order.hpp
 //
-//  Defines enum boost::memory_order per the C++0x working draft
+//  Defines enum cppmsboost::memory_order per the C++0x working draft
 //
 //  Copyright (c) 2008, 2009 Peter Dimov
 //  Copyright (c) 2018 Andrey Semashev
@@ -18,7 +18,7 @@
 # pragma once
 #endif
 
-namespace boost
+namespace cppmsboost
 {
 
 //
@@ -77,6 +77,6 @@ enum memory_order
 
 #endif // !defined(BOOST_NO_CXX11_SCOPED_ENUMS)
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_MEMORY_ORDER_HPP_INCLUDED

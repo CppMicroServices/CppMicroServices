@@ -28,7 +28,7 @@
 #include <boost/archive/detail/helper_collection.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
     class extended_type_info;
 } // namespace serialization
@@ -43,12 +43,12 @@ class basic_pointer_iserializer;
 //////////////////////////////////////////////////////////////////////
 // class basic_iarchive - read serialized objects from a input stream
 class BOOST_SYMBOL_VISIBLE basic_iarchive :
-    private boost::noncopyable,
-    public boost::archive::detail::helper_collection
+    private cppmsboost::noncopyable,
+    public cppmsboost::archive::detail::helper_collection
 {
     friend class basic_iarchive_impl;
     // hide implementation of this class to minimize header conclusion
-    boost::scoped_ptr<basic_iarchive_impl> pimpl;
+    cppmsboost::scoped_ptr<basic_iarchive_impl> pimpl;
 
     virtual void vload(version_type &t) =  0;
     virtual void vload(object_id_type &t) =  0;
@@ -58,7 +58,7 @@ class BOOST_SYMBOL_VISIBLE basic_iarchive :
     virtual void vload(tracking_type &t) = 0;
 protected:
     BOOST_ARCHIVE_DECL basic_iarchive(unsigned int flags);
-    boost::archive::detail::helper_collection &
+    cppmsboost::archive::detail::helper_collection &
     get_helper_collection(){
         return *this;
     }
@@ -80,7 +80,7 @@ public:
         void * & t,
         const basic_pointer_iserializer * bpis_ptr,
         const basic_pointer_iserializer * (*finder)(
-            const boost::serialization::extended_type_info & eti
+            const cppmsboost::serialization::extended_type_info & eti
         )
     );
     // real public API starts here
@@ -98,7 +98,7 @@ public:
 
 } // namespace detail
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/archive/detail/abi_suffix.hpp> // pops abi_suffix.hpp pragmas
 

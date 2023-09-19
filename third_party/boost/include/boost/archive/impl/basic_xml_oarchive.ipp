@@ -22,7 +22,7 @@ namespace std{
 #include <boost/archive/xml_archive_exception.hpp>
 #include <boost/core/no_exceptions_support.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 namespace detail {
@@ -44,7 +44,7 @@ struct XML_name {
         if((unsigned)t > 127)
             return;
         if(0 == lookup_table[(unsigned)t])
-            boost::serialization::throw_exception(
+            cppmsboost::serialization::throw_exception(
                 xml_archive_exception(
                     xml_archive_exception::xml_archive_tag_name_error
                 )
@@ -269,4 +269,4 @@ basic_xml_oarchive<Archive>::~basic_xml_oarchive(){
 }
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost

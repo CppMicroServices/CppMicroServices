@@ -14,7 +14,7 @@
  * http://www.boost.org/LICENSE_1_0.txt)
  *
  *  9 Jan 2013 - (mtc) Added constexpr
- * 14 Apr 2012 - (mtc) Added support for boost::hash
+ * 14 Apr 2012 - (mtc) Added support for cppmsboost::hash
  * 28 Dec 2010 - (mtc) Added cbegin and cend (and crbegin and crend) for C++Ox compatibility.
  * 10 Mar 2010 - (mtc) fill method added, matching resolution of the standard library working group.
  *      See <http://www.open-std.org/jtc1/sc22/wg21/docs/lwg-defects.html#776> or Trac issue #3168
@@ -36,8 +36,8 @@
 #if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)  
 # pragma warning(push)  
 # pragma warning(disable:4996) // 'std::equal': Function call with parameters that may be unsafe
-# pragma warning(disable:4510) // boost::array<T,N>' : default constructor could not be generated 
-# pragma warning(disable:4610) // warning C4610: class 'boost::array<T,N>' can never be instantiated - user defined constructor required 
+# pragma warning(disable:4510) // cppmsboost::array<T,N>' : default constructor could not be generated 
+# pragma warning(disable:4610) // warning C4610: class 'cppmsboost::array<T,N>' can never be instantiated - user defined constructor required 
 #endif
 
 #include <cstddef>
@@ -55,7 +55,7 @@
 #include <boost/config.hpp>
 
 
-namespace boost {
+namespace cppmsboost {
 
     template<class T, std::size_t N>
     class array {
@@ -157,7 +157,7 @@ namespace boost {
         // swap (note: linear complexity)
         void swap (array<T,N>& y) {
             for (size_type i = 0; i < N; ++i)
-                boost::swap(elems[i],y.elems[i]);
+                cppmsboost::swap(elems[i],y.elems[i]);
         }
 
         // direct access to data (read-only)
@@ -183,7 +183,7 @@ namespace boost {
 
         // check range (may be private because it is static)
         static BOOST_CONSTEXPR bool rangecheck (size_type i) {
-            return i >= size() ? boost::throw_exception(std::out_of_range ("array<>: index out of range")), true : true;
+            return i >= size() ? cppmsboost::throw_exception(std::out_of_range ("array<>: index out of range")), true : true;
         }
 
     };
@@ -306,7 +306,7 @@ namespace boost {
         // check range (may be private because it is static)
         static reference failed_rangecheck () {
                 std::out_of_range e("attempt to access element of an empty array");
-                boost::throw_exception(e);
+                cppmsboost::throw_exception(e);
 #if defined(BOOST_NO_EXCEPTIONS) || (!defined(BOOST_MSVC) && !defined(__PATHSCALE__))
                 //
                 // We need to return something here to keep
@@ -353,7 +353,7 @@ namespace boost {
 
 #if defined(__SUNPRO_CC)
 //  Trac ticket #4757; the Sun Solaris compiler can't handle
-//  syntax like 'T(&get_c_array(boost::array<T,N>& arg))[N]'
+//  syntax like 'T(&get_c_array(cppmsboost::array<T,N>& arg))[N]'
 //  
 //  We can't just use this for all compilers, because the 
 //      borland compilers can't handle this form. 
@@ -364,30 +364,30 @@ namespace boost {
        };
     }
     
-   // Specific for boost::array: simply returns its elems data member.
+   // Specific for cppmsboost::array: simply returns its elems data member.
    template <typename T, std::size_t N>
-   typename detail::c_array<T,N>::type& get_c_array(boost::array<T,N>& arg)
+   typename detail::c_array<T,N>::type& get_c_array(cppmsboost::array<T,N>& arg)
    {
        return arg.elems;
    }
 
-   // Specific for boost::array: simply returns its elems data member.
+   // Specific for cppmsboost::array: simply returns its elems data member.
    template <typename T, std::size_t N>
-   typename detail::c_array<T,N>::type const& get_c_array(const boost::array<T,N>& arg)
+   typename detail::c_array<T,N>::type const& get_c_array(const cppmsboost::array<T,N>& arg)
    {
        return arg.elems;
    }
 #else
-// Specific for boost::array: simply returns its elems data member.
+// Specific for cppmsboost::array: simply returns its elems data member.
     template <typename T, std::size_t N>
-    T(&get_c_array(boost::array<T,N>& arg))[N]
+    T(&get_c_array(cppmsboost::array<T,N>& arg))[N]
     {
         return arg.elems;
     }
     
     // Const version.
     template <typename T, std::size_t N>
-    const T(&get_c_array(const boost::array<T,N>& arg))[N]
+    const T(&get_c_array(const cppmsboost::array<T,N>& arg))[N]
     {
         return arg.elems;
     }
@@ -416,35 +416,35 @@ namespace boost {
     template<class T, std::size_t N>
     std::size_t hash_value(const array<T,N>& arr)
     {
-        return boost::hash_range(arr.begin(), arr.end());
+        return cppmsboost::hash_range(arr.begin(), arr.end());
     }
 
    template <size_t Idx, typename T, size_t N>
-   T &get(boost::array<T,N> &arr) BOOST_NOEXCEPT {
-       BOOST_STATIC_ASSERT_MSG ( Idx < N, "boost::get<>(boost::array &) index out of range" );
+   T &get(cppmsboost::array<T,N> &arr) BOOST_NOEXCEPT {
+       BOOST_STATIC_ASSERT_MSG ( Idx < N, "cppmsboost::get<>(cppmsboost::array &) index out of range" );
        return arr[Idx];
        }
     
    template <size_t Idx, typename T, size_t N>
-   const T &get(const boost::array<T,N> &arr) BOOST_NOEXCEPT {
-       BOOST_STATIC_ASSERT_MSG ( Idx < N, "boost::get<>(const boost::array &) index out of range" );
+   const T &get(const cppmsboost::array<T,N> &arr) BOOST_NOEXCEPT {
+       BOOST_STATIC_ASSERT_MSG ( Idx < N, "cppmsboost::get<>(const cppmsboost::array &) index out of range" );
        return arr[Idx];
        }
 
-} /* namespace boost */
+} /* namespace cppmsboost */
 
 #ifndef BOOST_NO_CXX11_HDR_ARRAY
 //  If we don't have std::array, I'm assuming that we don't have std::get
 namespace std {
    template <size_t Idx, typename T, size_t N>
-   T &get(boost::array<T,N> &arr) BOOST_NOEXCEPT {
-       BOOST_STATIC_ASSERT_MSG ( Idx < N, "std::get<>(boost::array &) index out of range" );
+   T &get(cppmsboost::array<T,N> &arr) BOOST_NOEXCEPT {
+       BOOST_STATIC_ASSERT_MSG ( Idx < N, "std::get<>(cppmsboost::array &) index out of range" );
        return arr[Idx];
        }
     
    template <size_t Idx, typename T, size_t N>
-   const T &get(const boost::array<T,N> &arr) BOOST_NOEXCEPT {
-       BOOST_STATIC_ASSERT_MSG ( Idx < N, "std::get<>(const boost::array &) index out of range" );
+   const T &get(const cppmsboost::array<T,N> &arr) BOOST_NOEXCEPT {
+       BOOST_STATIC_ASSERT_MSG ( Idx < N, "std::get<>(const cppmsboost::array &) index out of range" );
        return arr[Idx];
        }
 }

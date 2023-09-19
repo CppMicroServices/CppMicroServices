@@ -30,7 +30,7 @@ namespace std{ using ::wcslen; }
 #include <boost/archive/basic_binary_oprimitive.hpp>
 #include <boost/core/no_exceptions_support.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 //////////////////////////////////////////////////////////////////////
@@ -123,4 +123,4 @@ BOOST_ARCHIVE_OR_WARCHIVE_DECL
 basic_binary_oprimitive<Archive, Elem, Tr>::~basic_binary_oprimitive(){}
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost

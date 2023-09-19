@@ -31,7 +31,7 @@
 #include <boost/move/utility_core.hpp>
 #include <boost/move/detail/fwd_macros.hpp>
 
-namespace boost_intrusive_hmfcw {
+namespace cppmsboost_intrusive_hmfcw {
 
 typedef char yes_type;
 struct no_type{ char dummy[2]; };
@@ -74,7 +74,7 @@ template<typename T> struct remove_cv<volatile T>        {  typedef T type;   };
 
 #endif
 
-}  //namespace boost_intrusive_hmfcw {
+}  //namespace cppmsboost_intrusive_hmfcw {
 
 #endif  //BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_CALLABLE_WITH_HPP
 
@@ -116,12 +116,12 @@ BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_NS_BEG
    struct BOOST_MOVE_CAT(has_member_function_callable_with_,BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME)
    {
       template<class U>
-      static decltype(boost::move_detail::declval<U>().
-         BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME(::boost::move_detail::declval<Args>()...)
-            , boost_intrusive_hmfcw::yes_type()) Test(U* f);
+      static decltype(cppmsboost::move_detail::declval<U>().
+         BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME(::cppmsboost::move_detail::declval<Args>()...)
+            , cppmsboost_intrusive_hmfcw::yes_type()) Test(U* f);
       template<class U>
-      static boost_intrusive_hmfcw::no_type Test(...);
-      static const bool value = sizeof(Test<Fun>((Fun*)0)) == sizeof(boost_intrusive_hmfcw::yes_type);
+      static cppmsboost_intrusive_hmfcw::no_type Test(...);
+      static const bool value = sizeof(Test<Fun>((Fun*)0)) == sizeof(cppmsboost_intrusive_hmfcw::yes_type);
    };
 
 #else //defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) || defined(BOOST_NO_CXX11_DECLTYPE)
@@ -144,19 +144,19 @@ BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_NS_BEG
       };
 
       struct Base
-         : public boost_intrusive_hmfcw::remove_cv<Type>::type, public BaseMixin
+         : public cppmsboost_intrusive_hmfcw::remove_cv<Type>::type, public BaseMixin
       {  //Declare the unneeded default constructor as some old compilers wrongly require it with is_convertible
          Base(){}
       };
       template <typename T, T t> class Helper{};
 
       template <typename U>
-      static boost_intrusive_hmfcw::no_type  deduce
+      static cppmsboost_intrusive_hmfcw::no_type  deduce
          (U*, Helper<void (BaseMixin::*)(), &U::BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME>* = 0);
-      static boost_intrusive_hmfcw::yes_type deduce(...);
+      static cppmsboost_intrusive_hmfcw::yes_type deduce(...);
 
       public:
-      static const bool value = sizeof(boost_intrusive_hmfcw::yes_type) == sizeof(deduce((Base*)0));
+      static const bool value = sizeof(cppmsboost_intrusive_hmfcw::yes_type) == sizeof(deduce((Base*)0));
    };
 
    #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
@@ -175,7 +175,7 @@ BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_NS_BEG
          using Fun::BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME;
          FunWrapTmpl();
          template<class ...DontCares>
-         boost_intrusive_hmfcw::private_type BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME(DontCares...) const;
+         cppmsboost_intrusive_hmfcw::private_type BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME(DontCares...) const;
       };
 
       template<typename Fun, bool HasFunc, class ...Args>
@@ -192,10 +192,10 @@ BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_NS_BEG
       template<typename Fun, class ...Args>
       struct BOOST_MOVE_CAT(has_member_function_callable_with_impl_,BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME)<Fun, true, Args...>
       {
-         static bool const value = (sizeof(boost_intrusive_hmfcw::no_type) == sizeof(boost_intrusive_hmfcw::is_private_type
-                                             ( (::boost::move_detail::declval
+         static bool const value = (sizeof(cppmsboost_intrusive_hmfcw::no_type) == sizeof(cppmsboost_intrusive_hmfcw::is_private_type
+                                             ( (::cppmsboost::move_detail::declval
                                                    < FunWrapTmpl<Fun> >().
-                                                   BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME(::boost::move_detail::declval<Args>()...), 0) )
+                                                   BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME(::cppmsboost::move_detail::declval<Args>()...), 0) )
                                           )
                                     );
       };
@@ -235,29 +235,29 @@ BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_NS_BEG
             struct BOOST_MOVE_CAT(has_member_function_callable_with_impl_, BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME)<Fun, true>
             {
                template<class U>
-               static decltype(boost::move_detail::declval<U>().BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME()
-                  , boost_intrusive_hmfcw::yes_type()) Test(U* f);
+               static decltype(cppmsboost::move_detail::declval<U>().BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME()
+                  , cppmsboost_intrusive_hmfcw::yes_type()) Test(U* f);
 
                template<class U>
-               static boost_intrusive_hmfcw::no_type Test(...);
-               static const bool value = sizeof(Test<Fun>((Fun*)0)) == sizeof(boost_intrusive_hmfcw::yes_type);
+               static cppmsboost_intrusive_hmfcw::no_type Test(...);
+               static const bool value = sizeof(Test<Fun>((Fun*)0)) == sizeof(cppmsboost_intrusive_hmfcw::yes_type);
             };
 
          #else //defined(BOOST_NO_CXX11_DECLTYPE)
 
             #if !defined(BOOST_INTRUSIVE_DETAIL_HAS_MEMBER_FUNCTION_CALLABLE_WITH_0_ARGS_UNSUPPORTED)
 
-               template<class F, std::size_t N = sizeof(boost::move_detail::declval<F>().BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME(), 0)>
+               template<class F, std::size_t N = sizeof(cppmsboost::move_detail::declval<F>().BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME(), 0)>
                struct BOOST_MOVE_CAT(zeroarg_checker_, BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME)
-               {  boost_intrusive_hmfcw::yes_type dummy[N ? 1 : 2];   };
+               {  cppmsboost_intrusive_hmfcw::yes_type dummy[N ? 1 : 2];   };
 
                template<typename Fun>
                struct BOOST_MOVE_CAT(has_member_function_callable_with_impl_, BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME)<Fun, true>
                {
                   template<class U> static BOOST_MOVE_CAT(zeroarg_checker_, BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME)<U>
                      Test(BOOST_MOVE_CAT(zeroarg_checker_, BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME)<U>*);
-                  template<class U> static boost_intrusive_hmfcw::no_type Test(...);
-                  static const bool value = sizeof(Test< Fun >(0)) == sizeof(boost_intrusive_hmfcw::yes_type);
+                  template<class U> static cppmsboost_intrusive_hmfcw::no_type Test(...);
+                  static const bool value = sizeof(Test< Fun >(0)) == sizeof(cppmsboost_intrusive_hmfcw::yes_type);
                };
 
             #else //defined(BOOST_INTRUSIVE_DETAIL_HAS_MEMBER_FUNCTION_CALLABLE_WITH_0_ARGS_UNSUPPORTED)
@@ -284,15 +284,15 @@ BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_NS_BEG
             {\
                using Fun::BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME;\
                BOOST_MOVE_CAT(FunWrap##N, BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME)();\
-               boost_intrusive_hmfcw::private_type BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME\
-                  (BOOST_MOVE_REPEAT##N(boost_intrusive_hmfcw::dont_care)) const;\
+               cppmsboost_intrusive_hmfcw::private_type BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME\
+                  (BOOST_MOVE_REPEAT##N(cppmsboost_intrusive_hmfcw::dont_care)) const;\
             };\
             \
             template<typename Fun, BOOST_MOVE_CLASS##N>\
             struct BOOST_MOVE_CAT(has_member_function_callable_with_impl_, BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME)<Fun, true, BOOST_MOVE_TARG##N>\
             {\
-               static bool const value = (sizeof(boost_intrusive_hmfcw::no_type) == sizeof(boost_intrusive_hmfcw::is_private_type\
-                                                   ( (::boost::move_detail::declval\
+               static bool const value = (sizeof(cppmsboost_intrusive_hmfcw::no_type) == sizeof(cppmsboost_intrusive_hmfcw::is_private_type\
+                                                   ( (::cppmsboost::move_detail::declval\
                                                          < BOOST_MOVE_CAT(FunWrap##N, BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME)<Fun> >().\
                                                       BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME(BOOST_MOVE_DECLVAL##N), 0) )\
                                                 )\
@@ -306,12 +306,12 @@ BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_NS_BEG
                <Fun, true, BOOST_MOVE_TARG##N>\
             {\
                template<class U>\
-               static decltype(boost::move_detail::declval<U>().\
+               static decltype(cppmsboost::move_detail::declval<U>().\
                   BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME(BOOST_MOVE_DECLVAL##N)\
-                     , boost_intrusive_hmfcw::yes_type()) Test(U* f);\
+                     , cppmsboost_intrusive_hmfcw::yes_type()) Test(U* f);\
                template<class U>\
-               static boost_intrusive_hmfcw::no_type Test(...);\
-               static const bool value = sizeof(Test<Fun>((Fun*)0)) == sizeof(boost_intrusive_hmfcw::yes_type);\
+               static cppmsboost_intrusive_hmfcw::no_type Test(...);\
+               static const bool value = sizeof(Test<Fun>((Fun*)0)) == sizeof(cppmsboost_intrusive_hmfcw::yes_type);\
             };\
             //
          #endif

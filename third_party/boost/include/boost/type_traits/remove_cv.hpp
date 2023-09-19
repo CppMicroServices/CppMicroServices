@@ -15,7 +15,7 @@
 #include <boost/detail/workaround.hpp>
 #include <cstddef> // size_t
 
-namespace boost {
+namespace cppmsboost {
 
    //  convert a type T to a non-cv-qualified type - remove_cv<T>
 template <class T> struct remove_cv{ typedef T type; };
@@ -40,6 +40,6 @@ template <class T> struct remove_cv<T volatile[]>{ typedef T type[]; };
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_REMOVE_CV_HPP_INCLUDED

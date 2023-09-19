@@ -40,7 +40,7 @@
 #include <algorithm>
 #include <cstddef>
 
-namespace boost
+namespace cppmsboost
 {
 
 #ifndef _STLP_NO_IOSTREAMS
@@ -82,7 +82,7 @@ namespace boost
 # endif
 #endif // _STLP_NO_IOSTREAMS
 
-} // namespace boost
+} // namespace cppmsboost
 
 #undef BOOST_OLD_IOSTREAMS
 

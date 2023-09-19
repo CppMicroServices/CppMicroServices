@@ -25,7 +25,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     namespace thread_cv_detail
     {
@@ -66,7 +66,7 @@ namespace boost
 #if defined BOOST_THREAD_THROW_IF_PRECONDITION_NOT_SATISFIED
         if(! m.owns_lock())
         {
-            boost::throw_exception(condition_error(-1, "boost::condition_variable::wait() failed precondition mutex not owned"));
+            cppmsboost::throw_exception(condition_error(-1, "cppmsboost::condition_variable::wait() failed precondition mutex not owned"));
         }
 #endif
         int res=0;
@@ -89,7 +89,7 @@ namespace boost
 #endif
         if(res)
         {
-            boost::throw_exception(condition_error(res, "boost::condition_variable::wait failed in pthread_cond_wait"));
+            cppmsboost::throw_exception(condition_error(res, "cppmsboost::condition_variable::wait failed in pthread_cond_wait"));
         }
     }
 
@@ -109,7 +109,7 @@ namespace boost
 #if defined BOOST_THREAD_THROW_IF_PRECONDITION_NOT_SATISFIED
         if (!m.owns_lock())
         {
-            boost::throw_exception(condition_error(EPERM, "boost::condition_variable::do_wait_until() failed precondition mutex not owned"));
+            cppmsboost::throw_exception(condition_error(EPERM, "cppmsboost::condition_variable::do_wait_until() failed precondition mutex not owned"));
         }
 #endif
         int cond_res;
@@ -136,7 +136,7 @@ namespace boost
         }
         if(cond_res)
         {
-            boost::throw_exception(condition_error(cond_res, "boost::condition_variable::do_wait_until failed in pthread_cond_timedwait"));
+            cppmsboost::throw_exception(condition_error(cond_res, "cppmsboost::condition_variable::do_wait_until failed in pthread_cond_timedwait"));
         }
         return true;
     }
@@ -144,7 +144,7 @@ namespace boost
     inline void condition_variable::notify_one() BOOST_NOEXCEPT
     {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-        boost::pthread::pthread_mutex_scoped_lock internal_lock(&internal_mutex);
+        cppmsboost::pthread::pthread_mutex_scoped_lock internal_lock(&internal_mutex);
 #endif
         BOOST_VERIFY(!posix::pthread_cond_signal(&cond));
     }
@@ -152,7 +152,7 @@ namespace boost
     inline void condition_variable::notify_all() BOOST_NOEXCEPT
     {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-        boost::pthread::pthread_mutex_scoped_lock internal_lock(&internal_mutex);
+        cppmsboost::pthread::pthread_mutex_scoped_lock internal_lock(&internal_mutex);
 #endif
         BOOST_VERIFY(!posix::pthread_cond_broadcast(&cond));
     }
@@ -169,13 +169,13 @@ namespace boost
             int const res=posix::pthread_mutex_init(&internal_mutex);
             if(res)
             {
-                boost::throw_exception(thread_resource_error(res, "boost::condition_variable_any::condition_variable_any() failed in pthread_mutex_init"));
+                cppmsboost::throw_exception(thread_resource_error(res, "cppmsboost::condition_variable_any::condition_variable_any() failed in pthread_mutex_init"));
             }
             int const res2 = posix::pthread_cond_init(&cond);
             if(res2)
             {
                 BOOST_VERIFY(!posix::pthread_mutex_destroy(&internal_mutex));
-                boost::throw_exception(thread_resource_error(res2, "boost::condition_variable_any::condition_variable_any() failed in pthread_cond_init"));
+                cppmsboost::throw_exception(thread_resource_error(res2, "cppmsboost::condition_variable_any::condition_variable_any() failed in pthread_cond_init"));
             }
         }
         ~condition_variable_any()
@@ -193,7 +193,7 @@ namespace boost
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
                 detail::interruption_checker check_for_interruption(&internal_mutex,&cond);
 #else
-                boost::pthread::pthread_mutex_scoped_lock check_for_interruption(&internal_mutex);
+                cppmsboost::pthread::pthread_mutex_scoped_lock check_for_interruption(&internal_mutex);
 #endif
                 guard.activate(m);
                 res=posix::pthread_cond_wait(&cond,&internal_mutex);
@@ -205,7 +205,7 @@ namespace boost
 #endif
             if(res)
             {
-                boost::throw_exception(condition_error(res, "boost::condition_variable_any::wait() failed in pthread_cond_wait"));
+                cppmsboost::throw_exception(condition_error(res, "cppmsboost::condition_variable_any::wait() failed in pthread_cond_wait"));
             }
         }
 
@@ -220,7 +220,7 @@ namespace boost
 
 #if defined BOOST_THREAD_USES_DATETIME
         template<typename lock_type>
-        bool timed_wait(lock_type& m,boost::system_time const& abs_time)
+        bool timed_wait(lock_type& m,cppmsboost::system_time const& abs_time)
         {
 #if defined BOOST_THREAD_WAIT_BUG
             const detail::real_platform_timepoint ts(abs_time + BOOST_THREAD_WAIT_BUG);
@@ -243,7 +243,7 @@ namespace boost
 #endif
         }
         template<typename lock_type>
-        bool timed_wait(lock_type& m,::boost::xtime const& abs_time)
+        bool timed_wait(lock_type& m,::cppmsboost::xtime const& abs_time)
         {
             return timed_wait(m,system_time(abs_time));
         }
@@ -278,7 +278,7 @@ namespace boost
         }
 
         template<typename lock_type,typename predicate_type>
-        bool timed_wait(lock_type& m,boost::system_time const& abs_time, predicate_type pred)
+        bool timed_wait(lock_type& m,cppmsboost::system_time const& abs_time, predicate_type pred)
         {
 #if defined BOOST_THREAD_WAIT_BUG
             const detail::real_platform_timepoint ts(abs_time + BOOST_THREAD_WAIT_BUG);
@@ -303,7 +303,7 @@ namespace boost
         }
 
         template<typename lock_type,typename predicate_type>
-        bool timed_wait(lock_type& m,::boost::xtime const& abs_time, predicate_type pred)
+        bool timed_wait(lock_type& m,::cppmsboost::xtime const& abs_time, predicate_type pred)
         {
             return timed_wait(m,system_time(abs_time),pred);
         }
@@ -354,7 +354,7 @@ namespace boost
                 lock_type& lock,
                 const chrono::time_point<detail::internal_chrono_clock, Duration>& t)
         {
-            const boost::detail::internal_platform_timepoint ts(t);
+            const cppmsboost::detail::internal_platform_timepoint ts(t);
             if (do_wait_until(lock, ts)) return cv_status::no_timeout;
             else return cv_status::timeout;
         }
@@ -431,19 +431,19 @@ namespace boost
                 const chrono::duration<Rep, Period>& d,
                 Predicate pred)
         {
-            return wait_until(lock, chrono::steady_clock::now() + d, boost::move(pred));
+            return wait_until(lock, chrono::steady_clock::now() + d, cppmsboost::move(pred));
         }
 #endif
 
         void notify_one() BOOST_NOEXCEPT
         {
-            boost::pthread::pthread_mutex_scoped_lock internal_lock(&internal_mutex);
+            cppmsboost::pthread::pthread_mutex_scoped_lock internal_lock(&internal_mutex);
             BOOST_VERIFY(!posix::pthread_cond_signal(&cond));
         }
 
         void notify_all() BOOST_NOEXCEPT
         {
-            boost::pthread::pthread_mutex_scoped_lock internal_lock(&internal_mutex);
+            cppmsboost::pthread::pthread_mutex_scoped_lock internal_lock(&internal_mutex);
             BOOST_VERIFY(!posix::pthread_cond_broadcast(&cond));
         }
     private:
@@ -468,7 +468,7 @@ namespace boost
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
               detail::interruption_checker check_for_interruption(&internal_mutex,&cond);
 #else
-              boost::pthread::pthread_mutex_scoped_lock check_for_interruption(&internal_mutex);
+              cppmsboost::pthread::pthread_mutex_scoped_lock check_for_interruption(&internal_mutex);
 #endif
               guard.activate(m);
               res=posix::pthread_cond_timedwait(&cond,&internal_mutex,&timeout.getTs());
@@ -484,7 +484,7 @@ namespace boost
           }
           if(res)
           {
-              boost::throw_exception(condition_error(res, "boost::condition_variable_any::do_wait_until() failed in pthread_cond_timedwait"));
+              cppmsboost::throw_exception(condition_error(res, "cppmsboost::condition_variable_any::do_wait_until() failed in pthread_cond_timedwait"));
           }
           return true;
         }

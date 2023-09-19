@@ -26,7 +26,7 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 // do not derive from this class.  If you want to extend this functionality
@@ -55,11 +55,11 @@ public:
 };
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 // required by export
-BOOST_SERIALIZATION_REGISTER_ARCHIVE(boost::archive::binary_oarchive)
-BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(boost::archive::binary_oarchive)
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(cppmsboost::archive::binary_oarchive)
+BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(cppmsboost::archive::binary_oarchive)
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

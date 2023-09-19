@@ -22,7 +22,7 @@
 #  include BOOST_ABI_PREFIX
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace coroutines {
 namespace detail {
 
@@ -41,7 +41,7 @@ struct setup
            coroutine_context * caller_,
            coroutine_context * callee_,
            attributes const& attr_) :
-        fn( boost::forward< Fn >( fn_) ),
+        fn( cppmsboost::forward< Fn >( fn_) ),
         caller( caller_),
         callee( callee_),
         attr( attr_)
@@ -58,7 +58,7 @@ struct setup
 #ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
         fn( fn_),
 #else
-        fn( boost::forward< Fn >( fn_) ),
+        fn( cppmsboost::forward< Fn >( fn_) ),
 #endif
         caller( caller_),
         callee( callee_),

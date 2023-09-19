@@ -37,7 +37,7 @@
 # include <boost/utility/result_of.hpp>
 #endif // defined(BOOST_ASIO_HAS_STD_TYPE_TRAITS)
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 #if defined(BOOST_ASIO_HAS_STD_TYPE_TRAITS)
@@ -65,27 +65,27 @@ using std::result_of;
 #endif // defined(BOOST_ASIO_HAS_STD_INVOKE_RESULT)
 using std::true_type;
 #else // defined(BOOST_ASIO_HAS_STD_TYPE_TRAITS)
-using boost::add_const;
+using cppmsboost::add_const;
 template <bool Condition, typename Type = void>
-struct enable_if : boost::enable_if_c<Condition, Type> {};
-using boost::conditional;
-using boost::decay;
-using boost::declval;
-using boost::false_type;
-using boost::integral_constant;
-using boost::is_base_of;
-using boost::is_class;
-using boost::is_const;
-using boost::is_convertible;
-using boost::is_function;
-using boost::is_same;
-using boost::remove_pointer;
-using boost::remove_reference;
-using boost::result_of;
-using boost::true_type;
+struct enable_if : cppmsboost::enable_if_c<Condition, Type> {};
+using cppmsboost::conditional;
+using cppmsboost::decay;
+using cppmsboost::declval;
+using cppmsboost::false_type;
+using cppmsboost::integral_constant;
+using cppmsboost::is_base_of;
+using cppmsboost::is_class;
+using cppmsboost::is_const;
+using cppmsboost::is_convertible;
+using cppmsboost::is_function;
+using cppmsboost::is_same;
+using cppmsboost::remove_pointer;
+using cppmsboost::remove_reference;
+using cppmsboost::result_of;
+using cppmsboost::true_type;
 #endif // defined(BOOST_ASIO_HAS_STD_TYPE_TRAITS)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_DETAIL_TYPE_TRAITS_HPP

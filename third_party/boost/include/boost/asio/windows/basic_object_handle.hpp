@@ -35,7 +35,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace windows {
 
@@ -67,7 +67,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined native_handle_type;
 #else
-  typedef boost::asio::detail::win_object_handle_service::native_handle_type
+  typedef cppmsboost::asio::detail::win_object_handle_service::native_handle_type
     native_handle_type;
 #endif
 
@@ -116,15 +116,15 @@ public:
    *
    * @param native_handle The new underlying handle implementation.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   basic_object_handle(const executor_type& ex,
       const native_handle_type& native_handle)
     : impl_(ex)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(), native_handle, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    cppmsboost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Construct an object handle on an existing native handle.
@@ -138,7 +138,7 @@ public:
    *
    * @param native_handle The new underlying handle implementation.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_object_handle(ExecutionContext& context,
@@ -148,9 +148,9 @@ public:
       >::type* = 0)
     : impl_(context)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(), native_handle, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    cppmsboost::asio::detail::throw_error(ec, "assign");
   }
 
 #if defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
@@ -228,13 +228,13 @@ public:
    *
    * @param handle A native handle.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   void assign(const native_handle_type& handle)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(), handle, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    cppmsboost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Assign an existing native handle to the handle.
@@ -246,7 +246,7 @@ public:
    * @param ec Set to indicate what error occurred, if any.
    */
   BOOST_ASIO_SYNC_OP_VOID assign(const native_handle_type& handle,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     impl_.get_service().assign(impl_.get_implementation(), handle, ec);
     BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
@@ -262,26 +262,26 @@ public:
   /**
    * This function is used to close the handle. Any asynchronous read or write
    * operations will be cancelled immediately, and will complete with the
-   * boost::asio::error::operation_aborted error.
+   * cppmsboost::asio::error::operation_aborted error.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   void close()
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().close(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "close");
+    cppmsboost::asio::detail::throw_error(ec, "close");
   }
 
   /// Close the handle.
   /**
    * This function is used to close the handle. Any asynchronous read or write
    * operations will be cancelled immediately, and will complete with the
-   * boost::asio::error::operation_aborted error.
+   * cppmsboost::asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID close(boost::system::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID close(cppmsboost::system::error_code& ec)
   {
     impl_.get_service().close(impl_.get_implementation(), ec);
     BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
@@ -302,26 +302,26 @@ public:
   /**
    * This function causes all outstanding asynchronous read or write operations
    * to finish immediately, and the handlers for cancelled operations will be
-   * passed the boost::asio::error::operation_aborted error.
+   * passed the cppmsboost::asio::error::operation_aborted error.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   void cancel()
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().cancel(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "cancel");
+    cppmsboost::asio::detail::throw_error(ec, "cancel");
   }
 
   /// Cancel all asynchronous operations associated with the handle.
   /**
    * This function causes all outstanding asynchronous read or write operations
    * to finish immediately, and the handlers for cancelled operations will be
-   * passed the boost::asio::error::operation_aborted error.
+   * passed the cppmsboost::asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID cancel(boost::system::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID cancel(cppmsboost::system::error_code& ec)
   {
     impl_.get_service().cancel(impl_.get_implementation(), ec);
     BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
@@ -333,13 +333,13 @@ public:
    * signalled state. This function blocks and does not return until the object
    * handle has been set to the signalled state.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   void wait()
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().wait(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "wait");
+    cppmsboost::asio::detail::throw_error(ec, "wait");
   }
 
   /// Perform a blocking wait on the object handle.
@@ -350,7 +350,7 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  void wait(boost::system::error_code& ec)
+  void wait(cppmsboost::system::error_code& ec)
   {
     impl_.get_service().wait(impl_.get_implementation(), ec);
   }
@@ -364,23 +364,23 @@ public:
    * the signalled state. Copies will be made of the handler as required. The
    * function signature of the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error // Result of operation.
+   *   const cppmsboost::system::error_code& error // Result of operation.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    */
   template <
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code))
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code))
         WaitHandler BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WaitHandler,
-      void (boost::system::error_code))
+      void (cppmsboost::system::error_code))
   async_wait(
       BOOST_ASIO_MOVE_ARG(WaitHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
-    return async_initiate<WaitHandler, void (boost::system::error_code)>(
+    return async_initiate<WaitHandler, void (cppmsboost::system::error_code)>(
         initiate_async_wait(this), handler);
   }
 
@@ -421,13 +421,13 @@ private:
     basic_object_handle* self_;
   };
 
-  boost::asio::detail::io_object_impl<
-    boost::asio::detail::win_object_handle_service, Executor> impl_;
+  cppmsboost::asio::detail::io_object_impl<
+    cppmsboost::asio::detail::win_object_handle_service, Executor> impl_;
 };
 
 } // namespace windows
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

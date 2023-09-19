@@ -17,7 +17,7 @@
 
 #include <pthread.h>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -72,7 +72,7 @@ public:
 };
 
 } // namespace detail
-} // namespace boost
+} // namespace cppmsboost
 
 #define BOOST_DETAIL_SPINLOCK_INIT { PTHREAD_MUTEX_INITIALIZER }
 

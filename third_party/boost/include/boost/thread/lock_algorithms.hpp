@@ -16,14 +16,14 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   namespace detail
   {
     template <typename MutexType1, typename MutexType2>
     unsigned try_lock_internal(MutexType1& m1, MutexType2& m2)
     {
-      boost::unique_lock<MutexType1> l1(m1, boost::try_to_lock);
+      cppmsboost::unique_lock<MutexType1> l1(m1, cppmsboost::try_to_lock);
       if (!l1)
       {
         return 1;
@@ -39,7 +39,7 @@ namespace boost
     template <typename MutexType1, typename MutexType2, typename MutexType3>
     unsigned try_lock_internal(MutexType1& m1, MutexType2& m2, MutexType3& m3)
     {
-      boost::unique_lock<MutexType1> l1(m1, boost::try_to_lock);
+      cppmsboost::unique_lock<MutexType1> l1(m1, cppmsboost::try_to_lock);
       if (!l1)
       {
         return 1;
@@ -55,7 +55,7 @@ namespace boost
     template <typename MutexType1, typename MutexType2, typename MutexType3, typename MutexType4>
     unsigned try_lock_internal(MutexType1& m1, MutexType2& m2, MutexType3& m3, MutexType4& m4)
     {
-      boost::unique_lock<MutexType1> l1(m1, boost::try_to_lock);
+      cppmsboost::unique_lock<MutexType1> l1(m1, cppmsboost::try_to_lock);
       if (!l1)
       {
         return 1;
@@ -71,7 +71,7 @@ namespace boost
     template <typename MutexType1, typename MutexType2, typename MutexType3, typename MutexType4, typename MutexType5>
     unsigned try_lock_internal(MutexType1& m1, MutexType2& m2, MutexType3& m3, MutexType4& m4, MutexType5& m5)
     {
-      boost::unique_lock<MutexType1> l1(m1, boost::try_to_lock);
+      cppmsboost::unique_lock<MutexType1> l1(m1, cppmsboost::try_to_lock);
       if (!l1)
       {
         return 1;
@@ -87,7 +87,7 @@ namespace boost
     template <typename MutexType1, typename MutexType2>
     unsigned lock_helper(MutexType1& m1, MutexType2& m2)
     {
-      boost::unique_lock<MutexType1> l1(m1);
+      cppmsboost::unique_lock<MutexType1> l1(m1);
       if (!m2.try_lock())
       {
         return 1;
@@ -99,7 +99,7 @@ namespace boost
     template <typename MutexType1, typename MutexType2, typename MutexType3>
     unsigned lock_helper(MutexType1& m1, MutexType2& m2, MutexType3& m3)
     {
-      boost::unique_lock<MutexType1> l1(m1);
+      cppmsboost::unique_lock<MutexType1> l1(m1);
       if (unsigned const failed_lock=try_lock_internal(m2,m3))
       {
         return failed_lock;
@@ -111,7 +111,7 @@ namespace boost
     template <typename MutexType1, typename MutexType2, typename MutexType3, typename MutexType4>
     unsigned lock_helper(MutexType1& m1, MutexType2& m2, MutexType3& m3, MutexType4& m4)
     {
-      boost::unique_lock<MutexType1> l1(m1);
+      cppmsboost::unique_lock<MutexType1> l1(m1);
       if (unsigned const failed_lock=try_lock_internal(m2,m3,m4))
       {
         return failed_lock;
@@ -123,7 +123,7 @@ namespace boost
     template <typename MutexType1, typename MutexType2, typename MutexType3, typename MutexType4, typename MutexType5>
     unsigned lock_helper(MutexType1& m1, MutexType2& m2, MutexType3& m3, MutexType4& m4, MutexType5& m5)
     {
-      boost::unique_lock<MutexType1> l1(m1);
+      cppmsboost::unique_lock<MutexType1> l1(m1);
       if (unsigned const failed_lock=try_lock_internal(m2,m3,m4,m5))
       {
         return failed_lock;
@@ -363,7 +363,7 @@ namespace boost
       range_lock_guard(Iterator begin_, Iterator end_) :
         begin(begin_), end(end_)
       {
-        boost::lock(begin, end);
+        cppmsboost::lock(begin, end);
       }
 
       void release()
@@ -395,7 +395,7 @@ namespace boost
       {
         return begin;
       }
-      Iterator const failed = boost::try_lock(++begin, end);
+      Iterator const failed = cppmsboost::try_lock(++begin, end);
       if (failed == end)
       {
         guard.release();
@@ -427,7 +427,7 @@ namespace boost
         if (start_with_begin)
         {
           begin_lock.lock();
-          Iterator const failed_lock = boost::try_lock(next, end);
+          Iterator const failed_lock = cppmsboost::try_lock(next, end);
           if (failed_lock == end)
           {
             begin_lock.release();
@@ -441,7 +441,7 @@ namespace boost
           detail::range_lock_guard<Iterator> guard(next, end);
           if (begin_lock.try_lock())
           {
-            Iterator const failed_lock = boost::try_lock(second, next);
+            Iterator const failed_lock = cppmsboost::try_lock(second, next);
             if (failed_lock == next)
             {
               begin_lock.release();

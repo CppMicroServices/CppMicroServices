@@ -20,7 +20,7 @@
 #endif
 
 #if BOOST_WORKAROUND(BOOST_MSVC, <= 1600)
-namespace boost
+namespace cppmsboost
 {
 namespace cb_details
 {
@@ -40,7 +40,7 @@ namespace type_erasure
     template<
         class Traversal,
         class T                 /*= _self*/,
-        class Reference         /*= ::boost::use_default*/,
+        class Reference         /*= ::cppmsboost::use_default*/,
         class DifferenceType    /*= ::std::ptrdiff_t*/,
         class ValueType         /*= typename deduced<iterator_value_type<T> >::type*/
     >
@@ -68,62 +68,62 @@ namespace spirit { namespace lex { namespace lexertl
 namespace range_detail
 {
     template <class Buff, class Traits>
-    struct has_iterator< ::boost::cb_details::iterator<Buff, Traits> >
+    struct has_iterator< ::cppmsboost::cb_details::iterator<Buff, Traits> >
       : mpl::false_
     {};
 
     template <class Buff, class Traits>
-    struct has_iterator< ::boost::cb_details::iterator<Buff, Traits> const>
+    struct has_iterator< ::cppmsboost::cb_details::iterator<Buff, Traits> const>
       : mpl::false_
     {};
 
     template <class Container, class NextPolicies>
-    struct has_iterator< ::boost::python::iterator<Container, NextPolicies> >
+    struct has_iterator< ::cppmsboost::python::iterator<Container, NextPolicies> >
       : mpl::false_
     {};
 
     template <class Container, class NextPolicies>
-    struct has_iterator< ::boost::python::iterator<Container, NextPolicies> const>
+    struct has_iterator< ::cppmsboost::python::iterator<Container, NextPolicies> const>
       : mpl::false_
     {};
 
     template<class Traversal, class T, class Reference, class DifferenceType, class ValueType>
-    struct has_iterator< ::boost::type_erasure::iterator<Traversal, T, Reference, DifferenceType, ValueType> >
+    struct has_iterator< ::cppmsboost::type_erasure::iterator<Traversal, T, Reference, DifferenceType, ValueType> >
       : mpl::false_
     {};
 
     template<class Traversal, class T, class Reference, class DifferenceType, class ValueType>
-    struct has_iterator< ::boost::type_erasure::iterator<Traversal, T, Reference, DifferenceType, ValueType> const>
+    struct has_iterator< ::cppmsboost::type_erasure::iterator<Traversal, T, Reference, DifferenceType, ValueType> const>
       : mpl::false_
     {};
 
     template <typename Node>
-    struct has_iterator< ::boost::unordered::iterator_detail::iterator<Node> >
+    struct has_iterator< ::cppmsboost::unordered::iterator_detail::iterator<Node> >
       : mpl::false_
     {};
 
     template <typename Node>
-    struct has_iterator< ::boost::unordered::iterator_detail::iterator<Node> const>
+    struct has_iterator< ::cppmsboost::unordered::iterator_detail::iterator<Node> const>
       : mpl::false_
     {};
 
     template<class IIterator, bool IsConst>
-    struct has_iterator< ::boost::container::container_detail::iterator<IIterator, IsConst> >
+    struct has_iterator< ::cppmsboost::container::container_detail::iterator<IIterator, IsConst> >
       : mpl::false_
     {};
 
     template<class IIterator, bool IsConst>
-    struct has_iterator< ::boost::container::container_detail::iterator<IIterator, IsConst> const>
+    struct has_iterator< ::cppmsboost::container::container_detail::iterator<IIterator, IsConst> const>
       : mpl::false_
     {};
 
     template <typename Functor>
-    struct has_iterator< ::boost::spirit::lex::lexertl::iterator<Functor> >
+    struct has_iterator< ::cppmsboost::spirit::lex::lexertl::iterator<Functor> >
       : mpl::false_
     {};
 
     template <typename Functor>
-    struct has_iterator< ::boost::spirit::lex::lexertl::iterator<Functor> const>
+    struct has_iterator< ::cppmsboost::spirit::lex::lexertl::iterator<Functor> const>
       : mpl::false_
     {};
 }

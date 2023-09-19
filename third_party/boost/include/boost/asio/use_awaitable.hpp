@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// A completion token that represents the currently executing coroutine.
@@ -92,7 +92,7 @@ struct use_awaitable_t
 
 /// A completion token object that represents the currently executing coroutine.
 /**
- * See the documentation for boost::asio::use_awaitable_t for a usage example.
+ * See the documentation for cppmsboost::asio::use_awaitable_t for a usage example.
  */
 #if defined(BOOST_ASIO_HAS_CONSTEXPR) || defined(GENERATING_DOCUMENTATION)
 constexpr use_awaitable_t<> use_awaitable;
@@ -101,7 +101,7 @@ __declspec(selectany) use_awaitable_t<> use_awaitable;
 #endif
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

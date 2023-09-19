@@ -22,7 +22,7 @@ namespace std{
 #include <boost/serialization/string.hpp>
 #include <boost/archive/basic_text_iarchive.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
@@ -35,7 +35,7 @@ basic_text_iarchive<Archive>::load_override(class_name_type & t){
     cn.reserve(BOOST_SERIALIZATION_MAX_KEY_SIZE);
     load_override(cn);
     if(cn.size() > (BOOST_SERIALIZATION_MAX_KEY_SIZE - 1))
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(archive_exception::invalid_class_name)
         );
     std::memcpy(t, cn.data(), cn.size());
@@ -50,7 +50,7 @@ basic_text_iarchive<Archive>::init(void){
     std::string file_signature;
     * this->This() >> file_signature;
     if(file_signature != BOOST_ARCHIVE_SIGNATURE())
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(archive_exception::invalid_signature)
         );
 
@@ -67,10 +67,10 @@ basic_text_iarchive<Archive>::init(void){
 
     // extra little .t is to get around borland quirk
     if(BOOST_ARCHIVE_VERSION() < input_library_version)
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(archive_exception::unsupported_version)
         );
 }
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost

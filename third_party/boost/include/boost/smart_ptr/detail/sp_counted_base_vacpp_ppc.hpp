@@ -29,7 +29,7 @@ extern "builtin" void __isync(void);
 extern "builtin" int __fetch_and_add(volatile int* addr, int val);
 extern "builtin" int __compare_and_swap(volatile int*, int*, int);
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -148,6 +148,6 @@ public:
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // #ifndef BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_VACPP_PPC_HPP_INCLUDED

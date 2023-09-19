@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -42,7 +42,7 @@ win_iocp_socket_service_base::win_iocp_socket_service_base(
 void win_iocp_socket_service_base::base_shutdown()
 {
   // Close all implementations, causing all operations to complete.
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   base_implementation_type* impl = impl_list_;
   while (impl)
   {
@@ -62,7 +62,7 @@ void win_iocp_socket_service_base::construct(
 #endif // defined(BOOST_ASIO_ENABLE_CANCELIO)
 
   // Insert implementation into linked list of all implementations.
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   impl.next_ = impl_list_;
   impl.prev_ = 0;
   if (impl_list_)
@@ -90,7 +90,7 @@ void win_iocp_socket_service_base::base_move_construct(
 #endif // defined(BOOST_ASIO_ENABLE_CANCELIO)
 
   // Insert implementation into linked list of all implementations.
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   impl.next_ = impl_list_;
   impl.prev_ = 0;
   if (impl_list_)
@@ -108,7 +108,7 @@ void win_iocp_socket_service_base::base_move_assign(
   if (this != &other_service)
   {
     // Remove implementation from linked list of all implementations.
-    boost::asio::detail::mutex::scoped_lock lock(mutex_);
+    cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
     if (impl_list_ == &impl)
       impl_list_ = impl.next_;
     if (impl.prev_)
@@ -136,7 +136,7 @@ void win_iocp_socket_service_base::base_move_assign(
   if (this != &other_service)
   {
     // Insert implementation into linked list of all implementations.
-    boost::asio::detail::mutex::scoped_lock lock(other_service.mutex_);
+    cppmsboost::asio::detail::mutex::scoped_lock lock(other_service.mutex_);
     impl.next_ = other_service.impl_list_;
     impl.prev_ = 0;
     if (other_service.impl_list_)
@@ -151,7 +151,7 @@ void win_iocp_socket_service_base::destroy(
   close_for_destruction(impl);
 
   // Remove implementation from linked list of all implementations.
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   if (impl_list_ == &impl)
     impl_list_ = impl.next_;
   if (impl.prev_)
@@ -162,9 +162,9 @@ void win_iocp_socket_service_base::destroy(
   impl.prev_ = 0;
 }
 
-boost::system::error_code win_iocp_socket_service_base::close(
+cppmsboost::system::error_code win_iocp_socket_service_base::close(
     win_iocp_socket_service_base::base_implementation_type& impl,
-    boost::system::error_code& ec)
+    cppmsboost::system::error_code& ec)
 {
   if (is_open(impl))
   {
@@ -187,7 +187,7 @@ boost::system::error_code win_iocp_socket_service_base::close(
   }
   else
   {
-    ec = boost::system::error_code();
+    ec = cppmsboost::system::error_code();
   }
 
   impl.socket_ = invalid_socket;
@@ -202,7 +202,7 @@ boost::system::error_code win_iocp_socket_service_base::close(
 
 socket_type win_iocp_socket_service_base::release(
     win_iocp_socket_service_base::base_implementation_type& impl,
-    boost::system::error_code& ec)
+    cppmsboost::system::error_code& ec)
 {
   if (!is_open(impl))
     return invalid_socket;
@@ -214,7 +214,7 @@ socket_type win_iocp_socket_service_base::release(
   nt_set_info_fn fn = get_nt_set_info();
   if (fn == 0)
   {
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
     return invalid_socket;
   }
 
@@ -224,7 +224,7 @@ socket_type win_iocp_socket_service_base::release(
   if (fn(sock_as_handle, iosb, &info, sizeof(info),
         61 /* FileReplaceCompletionInformation */))
   {
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
     return invalid_socket;
   }
 
@@ -233,13 +233,13 @@ socket_type win_iocp_socket_service_base::release(
   return tmp;
 }
 
-boost::system::error_code win_iocp_socket_service_base::cancel(
+cppmsboost::system::error_code win_iocp_socket_service_base::cancel(
     win_iocp_socket_service_base::base_implementation_type& impl,
-    boost::system::error_code& ec)
+    cppmsboost::system::error_code& ec)
 {
   if (!is_open(impl))
   {
-    ec = boost::asio::error::bad_descriptor;
+    ec = cppmsboost::asio::error::bad_descriptor;
     return ec;
   }
 
@@ -263,24 +263,24 @@ boost::system::error_code win_iocp_socket_service_base::cancel(
         // ERROR_NOT_FOUND means that there were no operations to be
         // cancelled. We swallow this error to match the behaviour on other
         // platforms.
-        ec = boost::system::error_code();
+        ec = cppmsboost::system::error_code();
       }
       else
       {
-        ec = boost::system::error_code(last_error,
-            boost::asio::error::get_system_category());
+        ec = cppmsboost::system::error_code(last_error,
+            cppmsboost::asio::error::get_system_category());
       }
     }
     else
     {
-      ec = boost::system::error_code();
+      ec = cppmsboost::system::error_code();
     }
   }
 #if defined(BOOST_ASIO_ENABLE_CANCELIO)
   else if (impl.safe_cancellation_thread_id_ == 0)
   {
     // No operations have been started, so there's nothing to cancel.
-    ec = boost::system::error_code();
+    ec = cppmsboost::system::error_code();
   }
   else if (impl.safe_cancellation_thread_id_ == ::GetCurrentThreadId())
   {
@@ -291,25 +291,25 @@ boost::system::error_code win_iocp_socket_service_base::cancel(
     if (!::CancelIo(sock_as_handle))
     {
       DWORD last_error = ::GetLastError();
-      ec = boost::system::error_code(last_error,
-          boost::asio::error::get_system_category());
+      ec = cppmsboost::system::error_code(last_error,
+          cppmsboost::asio::error::get_system_category());
     }
     else
     {
-      ec = boost::system::error_code();
+      ec = cppmsboost::system::error_code();
     }
   }
   else
   {
     // Asynchronous operations have been started from more than one thread,
     // so cancellation is not safe.
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
   }
 #else // defined(BOOST_ASIO_ENABLE_CANCELIO)
   else
   {
     // Cancellation is not supported as CancelIo may not be used.
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
   }
 #endif // defined(BOOST_ASIO_ENABLE_CANCELIO)
 
@@ -326,13 +326,13 @@ boost::system::error_code win_iocp_socket_service_base::cancel(
   return ec;
 }
 
-boost::system::error_code win_iocp_socket_service_base::do_open(
+cppmsboost::system::error_code win_iocp_socket_service_base::do_open(
     win_iocp_socket_service_base::base_implementation_type& impl,
-    int family, int type, int protocol, boost::system::error_code& ec)
+    int family, int type, int protocol, cppmsboost::system::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = boost::asio::error::already_open;
+    ec = cppmsboost::asio::error::already_open;
     return ec;
   }
 
@@ -352,17 +352,17 @@ boost::system::error_code win_iocp_socket_service_base::do_open(
   default: impl.state_ = 0; break;
   }
   impl.cancel_token_.reset(static_cast<void*>(0), socket_ops::noop_deleter());
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   return ec;
 }
 
-boost::system::error_code win_iocp_socket_service_base::do_assign(
+cppmsboost::system::error_code win_iocp_socket_service_base::do_assign(
     win_iocp_socket_service_base::base_implementation_type& impl,
-    int type, socket_type native_socket, boost::system::error_code& ec)
+    int type, socket_type native_socket, cppmsboost::system::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = boost::asio::error::already_open;
+    ec = cppmsboost::asio::error::already_open;
     return ec;
   }
 
@@ -378,7 +378,7 @@ boost::system::error_code win_iocp_socket_service_base::do_assign(
   default: impl.state_ = 0; break;
   }
   impl.cancel_token_.reset(static_cast<void*>(0), socket_ops::noop_deleter());
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   return ec;
 }
 
@@ -393,7 +393,7 @@ void win_iocp_socket_service_base::start_send_op(
   if (noop)
     iocp_service_.on_completion(op);
   else if (!is_open(impl))
-    iocp_service_.on_completion(op, boost::asio::error::bad_descriptor);
+    iocp_service_.on_completion(op, cppmsboost::asio::error::bad_descriptor);
   else
   {
     DWORD bytes_transferred = 0;
@@ -419,7 +419,7 @@ void win_iocp_socket_service_base::start_send_to_op(
   iocp_service_.work_started();
 
   if (!is_open(impl))
-    iocp_service_.on_completion(op, boost::asio::error::bad_descriptor);
+    iocp_service_.on_completion(op, cppmsboost::asio::error::bad_descriptor);
   else
   {
     DWORD bytes_transferred = 0;
@@ -447,7 +447,7 @@ void win_iocp_socket_service_base::start_receive_op(
   if (noop)
     iocp_service_.on_completion(op);
   else if (!is_open(impl))
-    iocp_service_.on_completion(op, boost::asio::error::bad_descriptor);
+    iocp_service_.on_completion(op, cppmsboost::asio::error::bad_descriptor);
   else
   {
     DWORD bytes_transferred = 0;
@@ -496,7 +496,7 @@ void win_iocp_socket_service_base::start_receive_from_op(
   iocp_service_.work_started();
 
   if (!is_open(impl))
-    iocp_service_.on_completion(op, boost::asio::error::bad_descriptor);
+    iocp_service_.on_completion(op, cppmsboost::asio::error::bad_descriptor);
   else
   {
     DWORD bytes_transferred = 0;
@@ -523,12 +523,12 @@ void win_iocp_socket_service_base::start_accept_op(
   iocp_service_.work_started();
 
   if (!is_open(impl))
-    iocp_service_.on_completion(op, boost::asio::error::bad_descriptor);
+    iocp_service_.on_completion(op, cppmsboost::asio::error::bad_descriptor);
   else if (peer_is_open)
-    iocp_service_.on_completion(op, boost::asio::error::already_open);
+    iocp_service_.on_completion(op, cppmsboost::asio::error::already_open);
   else
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     new_socket.reset(socket_ops::socket(family, type, protocol, ec));
     if (new_socket.get() == invalid_socket)
       iocp_service_.on_completion(op, ec);
@@ -553,7 +553,7 @@ void win_iocp_socket_service_base::restart_accept_op(
   new_socket.reset();
   iocp_service_.work_started();
 
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   new_socket.reset(socket_ops::socket(family, type, protocol, ec));
   if (new_socket.get() == invalid_socket)
     iocp_service_.on_completion(op, ec);
@@ -583,7 +583,7 @@ void win_iocp_socket_service_base::start_reactor_op(
     return;
   }
   else
-    op->ec_ = boost::asio::error::bad_descriptor;
+    op->ec_ = cppmsboost::asio::error::bad_descriptor;
 
   iocp_service_.post_immediate_completion(op, false);
 }
@@ -613,7 +613,7 @@ void win_iocp_socket_service_base::start_connect_op(
       socket_ops::bind(impl.socket_, &a.base,
           family == BOOST_ASIO_OS_DEF(AF_INET)
           ? sizeof(a.v4) : sizeof(a.v6), op->ec_);
-      if (op->ec_ && op->ec_ != boost::asio::error::invalid_argument)
+      if (op->ec_ && op->ec_ != cppmsboost::asio::error::invalid_argument)
       {
         iocp_service_.post_immediate_completion(op, false);
         return;
@@ -644,10 +644,10 @@ void win_iocp_socket_service_base::start_connect_op(
   {
     if (socket_ops::connect(impl.socket_, addr, addrlen, op->ec_) != 0)
     {
-      if (op->ec_ == boost::asio::error::in_progress
-          || op->ec_ == boost::asio::error::would_block)
+      if (op->ec_ == cppmsboost::asio::error::in_progress
+          || op->ec_ == cppmsboost::asio::error::would_block)
       {
-        op->ec_ = boost::system::error_code();
+        op->ec_ = cppmsboost::system::error_code();
         r.start_op(select_reactor::connect_op, impl.socket_,
             impl.reactor_data_, op, false, false);
         return;
@@ -675,7 +675,7 @@ void win_iocp_socket_service_base::close_for_destruction(
     if (r)
       r->deregister_descriptor(impl.socket_, impl.reactor_data_, true);
 
-    boost::system::error_code ignored_ec;
+    cppmsboost::system::error_code ignored_ec;
     socket_ops::close(impl.socket_, impl.state_, true, ignored_ec);
 
     if (r)
@@ -794,7 +794,7 @@ void* win_iocp_socket_service_base::interlocked_exchange_pointer(
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

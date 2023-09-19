@@ -17,7 +17,7 @@
 
 #include <boost/mpl/aux_/config/ctps.hpp>
 
-namespace boost { namespace mpl { namespace aux {
+namespace cppmsboost { namespace mpl { namespace aux {
 
 template< typename T > struct type_wrapper
 {

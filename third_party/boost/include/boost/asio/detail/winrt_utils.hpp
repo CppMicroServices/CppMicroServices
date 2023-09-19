@@ -33,7 +33,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 namespace winrt_utils {
@@ -83,7 +83,7 @@ inline Windows::Storage::Streams::IBuffer^ buffer_dup(
     const ConstBufferSequence& buffers)
 {
   using Microsoft::WRL::ComPtr;
-  using boost::asio::buffer_size;
+  using cppmsboost::asio::buffer_size;
   std::size_t size = buffer_size(buffers);
   auto b = ref new Windows::Storage::Streams::Buffer(size);
   ComPtr<IInspectable> insp = reinterpret_cast<IInspectable*>(b);
@@ -91,7 +91,7 @@ inline Windows::Storage::Streams::IBuffer^ buffer_dup(
   insp.As(&bacc);
   byte* bytes = nullptr;
   bacc->Buffer(&bytes);
-  boost::asio::buffer_copy(boost::asio::buffer(bytes, size), buffers);
+  cppmsboost::asio::buffer_copy(cppmsboost::asio::buffer(bytes, size), buffers);
   b->Length = size;
   return b;
 }
@@ -99,7 +99,7 @@ inline Windows::Storage::Streams::IBuffer^ buffer_dup(
 } // namespace winrt_utils
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

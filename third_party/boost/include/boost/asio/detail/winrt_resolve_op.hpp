@@ -30,7 +30,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -44,8 +44,8 @@ public:
   BOOST_ASIO_DEFINE_HANDLER_PTR(winrt_resolve_op);
 
   typedef typename Protocol::endpoint endpoint_type;
-  typedef boost::asio::ip::basic_resolver_query<Protocol> query_type;
-  typedef boost::asio::ip::basic_resolver_results<Protocol> results_type;
+  typedef cppmsboost::asio::ip::basic_resolver_query<Protocol> query_type;
+  typedef cppmsboost::asio::ip::basic_resolver_results<Protocol> results_type;
 
   winrt_resolve_op(const query_type& query,
       Handler& handler, const IoExecutor& io_ex)
@@ -61,11 +61,11 @@ public:
   }
 
   static void do_complete(void* owner, operation* base,
-      const boost::system::error_code&, std::size_t)
+      const cppmsboost::system::error_code&, std::size_t)
   {
     // Take ownership of the operation object.
     winrt_resolve_op* o(static_cast<winrt_resolve_op*>(base));
-    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+    ptr p = { cppmsboost::asio::detail::addressof(o->handler_), o, o };
     handler_work<Handler, IoExecutor> w(o->handler_, o->io_executor_);
 
     BOOST_ASIO_HANDLER_COMPLETION((*o));
@@ -80,8 +80,8 @@ public:
       }
       catch (Platform::Exception^ e)
       {
-        o->ec_ = boost::system::error_code(e->HResult,
-            boost::system::system_category());
+        o->ec_ = cppmsboost::system::error_code(e->HResult,
+            cppmsboost::system::system_category());
       }
     }
 
@@ -91,9 +91,9 @@ public:
     // with the handler. Consequently, a local copy of the handler is required
     // to ensure that any owning sub-object remains valid until after we have
     // deallocated the memory here.
-    detail::binder2<Handler, boost::system::error_code, results_type>
+    detail::binder2<Handler, cppmsboost::system::error_code, results_type>
       handler(o->handler_, o->ec_, results);
-    p.h = boost::asio::detail::addressof(handler.handler_);
+    p.h = cppmsboost::asio::detail::addressof(handler.handler_);
     p.reset();
 
     // Make the upcall if required.
@@ -114,7 +114,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

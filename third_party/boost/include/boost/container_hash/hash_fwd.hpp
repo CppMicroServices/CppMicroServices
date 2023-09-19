@@ -18,7 +18,7 @@
 #endif
 
 
-namespace boost
+namespace cppmsboost
 {
     template <class T> struct hash;
 

@@ -17,7 +17,7 @@
    || defined(BOOST_MPL_CFG_NO_ADL_BARRIER_NAMESPACE)
 
 
-namespace boost{
+namespace cppmsboost{
    namespace mpl
    {
       template <bool B> struct bool_;
@@ -35,7 +35,7 @@ namespace mpl_{
    struct integral_c_tag;
 }
 
-namespace boost
+namespace cppmsboost
 {
    namespace mpl
    {
@@ -47,7 +47,7 @@ namespace boost
 
 #endif
 
-namespace boost{
+namespace cppmsboost{
 
    template <class T, T val>
    struct integral_constant

@@ -25,21 +25,21 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
 void posix_tss_ptr_create(pthread_key_t& key)
 {
   int error = ::pthread_key_create(&key, 0);
-  boost::system::error_code ec(error,
-      boost::asio::error::get_system_category());
-  boost::asio::detail::throw_error(ec, "tss");
+  cppmsboost::system::error_code ec(error,
+      cppmsboost::asio::error::get_system_category());
+  cppmsboost::asio::detail::throw_error(ec, "tss");
 }
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

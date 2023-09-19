@@ -26,7 +26,7 @@
 #endif
 
 namespace
-boost
+cppmsboost
     {
     namespace
     exception_detail
@@ -107,14 +107,14 @@ boost
     template <class ErrorInfo>
     inline
     typename ErrorInfo::value_type const *
-    get_error_info( boost::exception const & x )
+    get_error_info( cppmsboost::exception const & x )
         {
         return exception_detail::get_info<ErrorInfo>::get(x);
         }
     template <class ErrorInfo>
     inline
     typename ErrorInfo::value_type *
-    get_error_info( boost::exception & x )
+    get_error_info( cppmsboost::exception & x )
         {
         return exception_detail::get_info<ErrorInfo>::get(x);
         }

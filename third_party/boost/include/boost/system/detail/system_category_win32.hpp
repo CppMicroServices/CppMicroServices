@@ -17,7 +17,7 @@
 
 //
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace system
@@ -55,15 +55,15 @@ inline char const * unknown_message_win32( int ev, char * buffer, std::size_t le
 
 #endif
 
-inline boost::winapi::UINT_ message_cp_win32()
+inline cppmsboost::winapi::UINT_ message_cp_win32()
 {
 #if defined(BOOST_SYSTEM_USE_UTF8)
 
-    return boost::winapi::CP_UTF8_;
+    return cppmsboost::winapi::CP_UTF8_;
 
 #else
 
-    return boost::winapi::CP_ACP_;
+    return cppmsboost::winapi::CP_ACP_;
 
 #endif
 }
@@ -81,17 +81,17 @@ inline char const * system_category_message_win32( int ev, char * buffer, std::s
         return buffer;
     }
 
-    boost::winapi::UINT_ const code_page = message_cp_win32();
+    cppmsboost::winapi::UINT_ const code_page = message_cp_win32();
 
     int r = 0;
 
 #if !defined(BOOST_NO_ANSI_APIS)
 
-    if( code_page == boost::winapi::CP_ACP_ )
+    if( code_page == cppmsboost::winapi::CP_ACP_ )
     {
-        using namespace boost::winapi;
+        using namespace cppmsboost::winapi;
 
-        DWORD_ retval = boost::winapi::FormatMessageA(
+        DWORD_ retval = cppmsboost::winapi::FormatMessageA(
             FORMAT_MESSAGE_FROM_SYSTEM_ | FORMAT_MESSAGE_IGNORE_INSERTS_,
             NULL,
             ev,
@@ -108,11 +108,11 @@ inline char const * system_category_message_win32( int ev, char * buffer, std::s
 #endif
 
     {
-        using namespace boost::winapi;
+        using namespace cppmsboost::winapi;
 
         wchar_t * lpMsgBuf = 0;
 
-        DWORD_ retval = boost::winapi::FormatMessageW(
+        DWORD_ retval = cppmsboost::winapi::FormatMessageW(
             FORMAT_MESSAGE_ALLOCATE_BUFFER_ | FORMAT_MESSAGE_FROM_SYSTEM_ | FORMAT_MESSAGE_IGNORE_INSERTS_,
             NULL,
             ev,
@@ -124,8 +124,8 @@ inline char const * system_category_message_win32( int ev, char * buffer, std::s
 
         if( retval != 0 )
         {
-            r = boost::winapi::WideCharToMultiByte( code_page, 0, lpMsgBuf, -1, buffer, static_cast<int>( len ), NULL, NULL );
-            boost::winapi::LocalFree( lpMsgBuf );
+            r = cppmsboost::winapi::WideCharToMultiByte( code_page, 0, lpMsgBuf, -1, buffer, static_cast<int>( len ), NULL, NULL );
+            cppmsboost::winapi::LocalFree( lpMsgBuf );
             if ( r != 0 ) --r; // exclude null terminator
         }
     }
@@ -154,7 +154,7 @@ struct local_free
 
     ~local_free()
     {
-        boost::winapi::LocalFree( p_ );
+        cppmsboost::winapi::LocalFree( p_ );
     }
 };
 
@@ -166,11 +166,11 @@ inline std::string unknown_message_win32( int ev )
 
 inline std::string system_category_message_win32( int ev )
 {
-    using namespace boost::winapi;
+    using namespace cppmsboost::winapi;
 
     wchar_t * lpMsgBuf = 0;
 
-    DWORD_ retval = boost::winapi::FormatMessageW(
+    DWORD_ retval = cppmsboost::winapi::FormatMessageW(
         FORMAT_MESSAGE_ALLOCATE_BUFFER_ | FORMAT_MESSAGE_FROM_SYSTEM_ | FORMAT_MESSAGE_IGNORE_INSERTS_,
         NULL,
         ev,
@@ -190,7 +190,7 @@ inline std::string system_category_message_win32( int ev )
 
     UINT_ const code_page = message_cp_win32();
 
-    int r = boost::winapi::WideCharToMultiByte( code_page, 0, lpMsgBuf, -1, 0, 0, NULL, NULL );
+    int r = cppmsboost::winapi::WideCharToMultiByte( code_page, 0, lpMsgBuf, -1, 0, 0, NULL, NULL );
 
     if( r == 0 )
     {
@@ -199,7 +199,7 @@ inline std::string system_category_message_win32( int ev )
 
     std::string buffer( r, char() );
 
-    r = boost::winapi::WideCharToMultiByte( code_page, 0, lpMsgBuf, -1, &buffer[0], r, NULL, NULL );
+    r = cppmsboost::winapi::WideCharToMultiByte( code_page, 0, lpMsgBuf, -1, &buffer[0], r, NULL, NULL );
 
     if( r == 0 )
     {
@@ -244,7 +244,7 @@ inline error_condition system_category_default_error_condition_win32( int ev ) B
 #undef BOOST_SYSTEM_HRESULT_CODE
 #undef BOOST_SYSTEM_FACILITY_WIN32
 
-    using namespace boost::winapi;
+    using namespace cppmsboost::winapi;
     using namespace errc;
 
     // Windows system -> posix_errno decode table
@@ -338,4 +338,4 @@ inline error_condition system_category_default_error_condition_win32( int ev ) B
 
 } // namespace system
 
-} // namespace boost
+} // namespace cppmsboost

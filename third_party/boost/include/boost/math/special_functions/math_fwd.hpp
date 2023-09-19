@@ -33,7 +33,7 @@
 
 #define BOOST_NO_MACRO_EXPAND /**/
 
-namespace boost
+namespace cppmsboost
 {
    namespace math
    { // Math functions (in roughly alphabetic order).
@@ -195,10 +195,10 @@ namespace boost
 
 #if !BOOST_WORKAROUND(BOOST_MSVC, <= 1310)
    template <class T, class Policy>
-   typename boost::enable_if_c<policies::is_policy<Policy>::value, typename tools::promote_args<T>::type>::type
+   typename cppmsboost::enable_if_c<policies::is_policy<Policy>::value, typename tools::promote_args<T>::type>::type
          legendre_p(int l, T x, const Policy& pol);
    template <class T, class Policy>
-   inline typename boost::enable_if_c<policies::is_policy<Policy>::value, typename tools::promote_args<T>::type>::type
+   inline typename cppmsboost::enable_if_c<policies::is_policy<Policy>::value, typename tools::promote_args<T>::type>::type
       legendre_p_prime(int l, T x, const Policy& pol);
 #endif
    template <class T>
@@ -206,7 +206,7 @@ namespace boost
          legendre_q(unsigned l, T x);
 #if !BOOST_WORKAROUND(BOOST_MSVC, <= 1310)
    template <class T, class Policy>
-   typename boost::enable_if_c<policies::is_policy<Policy>::value, typename tools::promote_args<T>::type>::type
+   typename cppmsboost::enable_if_c<policies::is_policy<Policy>::value, typename tools::promote_args<T>::type>::type
          legendre_q(unsigned l, T x, const Policy& pol);
 #endif
    template <class T1, class T2, class T3>
@@ -639,9 +639,9 @@ namespace boost
 
    namespace detail{
 
-      typedef boost::integral_constant<int, 0> bessel_no_int_tag;      // No integer optimisation possible.
-      typedef boost::integral_constant<int, 1> bessel_maybe_int_tag;   // Maybe integer optimisation.
-      typedef boost::integral_constant<int, 2> bessel_int_tag;         // Definite integer optimisation.
+      typedef cppmsboost::integral_constant<int, 0> bessel_no_int_tag;      // No integer optimisation possible.
+      typedef cppmsboost::integral_constant<int, 1> bessel_maybe_int_tag;   // Maybe integer optimisation.
+      typedef cppmsboost::integral_constant<int, 2> bessel_int_tag;         // Definite integer optimisation.
 
       template <class T1, class T2, class Policy>
       struct bessel_traits
@@ -656,8 +656,8 @@ namespace boost
 
          typedef typename mpl::if_<
             mpl::or_<
-               mpl::less_equal<precision_type, boost::integral_constant<int, 0> >,
-               mpl::greater<precision_type, boost::integral_constant<int, 64> > >,
+               mpl::less_equal<precision_type, cppmsboost::integral_constant<int, 0> >,
+               mpl::greater<precision_type, cppmsboost::integral_constant<int, 64> > >,
             bessel_no_int_tag,
             typename mpl::if_<
                is_integral<T1>,
@@ -667,8 +667,8 @@ namespace boost
          >::type optimisation_tag;
          typedef typename mpl::if_<
             mpl::or_<
-               mpl::less_equal<precision_type, boost::integral_constant<int, 0> >,
-               mpl::greater<precision_type, boost::integral_constant<int, 113> > >,
+               mpl::less_equal<precision_type, cppmsboost::integral_constant<int, 0> >,
+               mpl::greater<precision_type, cppmsboost::integral_constant<int, 113> > >,
             bessel_no_int_tag,
             typename mpl::if_<
                is_integral<T1>,
@@ -1087,21 +1087,21 @@ namespace boost
 
    // Lambert W:
    template <class T, class Policy>
-   typename boost::math::tools::promote_args<T>::type lambert_w0(T z, const Policy& pol);
+   typename cppmsboost::math::tools::promote_args<T>::type lambert_w0(T z, const Policy& pol);
    template <class T>
-   typename boost::math::tools::promote_args<T>::type lambert_w0(T z);
+   typename cppmsboost::math::tools::promote_args<T>::type lambert_w0(T z);
    template <class T, class Policy>
-   typename boost::math::tools::promote_args<T>::type lambert_wm1(T z, const Policy& pol);
+   typename cppmsboost::math::tools::promote_args<T>::type lambert_wm1(T z, const Policy& pol);
    template <class T>
-   typename boost::math::tools::promote_args<T>::type lambert_wm1(T z);
+   typename cppmsboost::math::tools::promote_args<T>::type lambert_wm1(T z);
    template <class T, class Policy>
-   typename boost::math::tools::promote_args<T>::type lambert_w0_prime(T z, const Policy& pol);
+   typename cppmsboost::math::tools::promote_args<T>::type lambert_w0_prime(T z, const Policy& pol);
    template <class T>
-   typename boost::math::tools::promote_args<T>::type lambert_w0_prime(T z);
+   typename cppmsboost::math::tools::promote_args<T>::type lambert_w0_prime(T z);
    template <class T, class Policy>
-   typename boost::math::tools::promote_args<T>::type lambert_wm1_prime(T z, const Policy& pol);
+   typename cppmsboost::math::tools::promote_args<T>::type lambert_wm1_prime(T z, const Policy& pol);
    template <class T>
-   typename boost::math::tools::promote_args<T>::type lambert_wm1_prime(T z);
+   typename cppmsboost::math::tools::promote_args<T>::type lambert_wm1_prime(T z);
 
    // Hypergeometrics:
    template <class T1, class T2> typename tools::promote_args<T1, T2>::type hypergeometric_1F0(T1 a, T2 z);
@@ -1118,19 +1118,19 @@ namespace boost
 
 
     } // namespace math
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_HAS_LONG_LONG
 #define BOOST_MATH_DETAIL_LL_FUNC(Policy)\
    \
    template <class T>\
-   inline T modf(const T& v, boost::long_long_type* ipart){ using boost::math::modf; return modf(v, ipart, Policy()); }\
+   inline T modf(const T& v, cppmsboost::long_long_type* ipart){ using cppmsboost::math::modf; return modf(v, ipart, Policy()); }\
    \
    template <class T>\
-   inline boost::long_long_type lltrunc(const T& v){ using boost::math::lltrunc; return lltrunc(v, Policy()); }\
+   inline cppmsboost::long_long_type lltrunc(const T& v){ using cppmsboost::math::lltrunc; return lltrunc(v, Policy()); }\
    \
    template <class T>\
-   inline boost::long_long_type llround(const T& v){ using boost::math::llround; return llround(v, Policy()); }\
+   inline cppmsboost::long_long_type llround(const T& v){ using cppmsboost::math::llround; return llround(v, Policy()); }\
 
 #else
 #define BOOST_MATH_DETAIL_LL_FUNC(Policy)
@@ -1139,8 +1139,8 @@ namespace boost
 #if !defined(BOOST_NO_CXX11_DECLTYPE) && !defined(BOOST_NO_CXX11_AUTO_DECLARATIONS) && !defined(BOOST_NO_CXX11_HDR_ARRAY)
 #  define BOOST_MATH_DETAIL_11_FUNC(Policy)\
    template <class T, class U, class V>\
-   inline typename boost::math::tools::promote_args<T, U>::type hypergeometric_1F1(const T& a, const U& b, const V& z)\
-   { return boost::math::hypergeometric_1F1(a, b, z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type hypergeometric_1F1(const T& a, const U& b, const V& z)\
+   { return cppmsboost::math::hypergeometric_1F1(a, b, z, Policy()); }\
 
 #else
 #  define BOOST_MATH_DETAIL_11_FUNC(Policy)
@@ -1152,556 +1152,556 @@ namespace boost
    BOOST_MATH_DETAIL_11_FUNC(Policy)\
    \
    template <class RT1, class RT2>\
-   inline typename boost::math::tools::promote_args<RT1, RT2>::type \
-   beta(RT1 a, RT2 b) { return ::boost::math::beta(a, b, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2>::type \
+   beta(RT1 a, RT2 b) { return ::cppmsboost::math::beta(a, b, Policy()); }\
 \
    template <class RT1, class RT2, class A>\
-   inline typename boost::math::tools::promote_args<RT1, RT2, A>::type \
-   beta(RT1 a, RT2 b, A x){ return ::boost::math::beta(a, b, x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2, A>::type \
+   beta(RT1 a, RT2 b, A x){ return ::cppmsboost::math::beta(a, b, x, Policy()); }\
 \
    template <class RT1, class RT2, class RT3>\
-   inline typename boost::math::tools::promote_args<RT1, RT2, RT3>::type \
-   betac(RT1 a, RT2 b, RT3 x) { return ::boost::math::betac(a, b, x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2, RT3>::type \
+   betac(RT1 a, RT2 b, RT3 x) { return ::cppmsboost::math::betac(a, b, x, Policy()); }\
 \
    template <class RT1, class RT2, class RT3>\
-   inline typename boost::math::tools::promote_args<RT1, RT2, RT3>::type \
-   ibeta(RT1 a, RT2 b, RT3 x){ return ::boost::math::ibeta(a, b, x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2, RT3>::type \
+   ibeta(RT1 a, RT2 b, RT3 x){ return ::cppmsboost::math::ibeta(a, b, x, Policy()); }\
 \
    template <class RT1, class RT2, class RT3>\
-   inline typename boost::math::tools::promote_args<RT1, RT2, RT3>::type \
-   ibetac(RT1 a, RT2 b, RT3 x){ return ::boost::math::ibetac(a, b, x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2, RT3>::type \
+   ibetac(RT1 a, RT2 b, RT3 x){ return ::cppmsboost::math::ibetac(a, b, x, Policy()); }\
 \
    template <class T1, class T2, class T3, class T4>\
-   inline typename boost::math::tools::promote_args<T1, T2, T3, T4>::type  \
-   ibeta_inv(T1 a, T2 b, T3 p, T4* py){ return ::boost::math::ibeta_inv(a, b, p, py, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2, T3, T4>::type  \
+   ibeta_inv(T1 a, T2 b, T3 p, T4* py){ return ::cppmsboost::math::ibeta_inv(a, b, p, py, Policy()); }\
 \
    template <class RT1, class RT2, class RT3>\
-   inline typename boost::math::tools::promote_args<RT1, RT2, RT3>::type \
-   ibeta_inv(RT1 a, RT2 b, RT3 p){ return ::boost::math::ibeta_inv(a, b, p, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2, RT3>::type \
+   ibeta_inv(RT1 a, RT2 b, RT3 p){ return ::cppmsboost::math::ibeta_inv(a, b, p, Policy()); }\
 \
    template <class T1, class T2, class T3, class T4>\
-   inline typename boost::math::tools::promote_args<T1, T2, T3, T4>::type \
-   ibetac_inv(T1 a, T2 b, T3 q, T4* py){ return ::boost::math::ibetac_inv(a, b, q, py, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2, T3, T4>::type \
+   ibetac_inv(T1 a, T2 b, T3 q, T4* py){ return ::cppmsboost::math::ibetac_inv(a, b, q, py, Policy()); }\
 \
    template <class RT1, class RT2, class RT3>\
-   inline typename boost::math::tools::promote_args<RT1, RT2, RT3>::type \
-   ibeta_inva(RT1 a, RT2 b, RT3 p){ return ::boost::math::ibeta_inva(a, b, p, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2, RT3>::type \
+   ibeta_inva(RT1 a, RT2 b, RT3 p){ return ::cppmsboost::math::ibeta_inva(a, b, p, Policy()); }\
 \
    template <class T1, class T2, class T3>\
-   inline typename boost::math::tools::promote_args<T1, T2, T3>::type \
-   ibetac_inva(T1 a, T2 b, T3 q){ return ::boost::math::ibetac_inva(a, b, q, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2, T3>::type \
+   ibetac_inva(T1 a, T2 b, T3 q){ return ::cppmsboost::math::ibetac_inva(a, b, q, Policy()); }\
 \
    template <class RT1, class RT2, class RT3>\
-   inline typename boost::math::tools::promote_args<RT1, RT2, RT3>::type \
-   ibeta_invb(RT1 a, RT2 b, RT3 p){ return ::boost::math::ibeta_invb(a, b, p, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2, RT3>::type \
+   ibeta_invb(RT1 a, RT2 b, RT3 p){ return ::cppmsboost::math::ibeta_invb(a, b, p, Policy()); }\
 \
    template <class T1, class T2, class T3>\
-   inline typename boost::math::tools::promote_args<T1, T2, T3>::type \
-   ibetac_invb(T1 a, T2 b, T3 q){ return ::boost::math::ibetac_invb(a, b, q, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2, T3>::type \
+   ibetac_invb(T1 a, T2 b, T3 q){ return ::cppmsboost::math::ibetac_invb(a, b, q, Policy()); }\
 \
    template <class RT1, class RT2, class RT3>\
-   inline typename boost::math::tools::promote_args<RT1, RT2, RT3>::type \
-   ibetac_inv(RT1 a, RT2 b, RT3 q){ return ::boost::math::ibetac_inv(a, b, q, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2, RT3>::type \
+   ibetac_inv(RT1 a, RT2 b, RT3 q){ return ::cppmsboost::math::ibetac_inv(a, b, q, Policy()); }\
 \
    template <class RT1, class RT2, class RT3>\
-   inline typename boost::math::tools::promote_args<RT1, RT2, RT3>::type \
-   ibeta_derivative(RT1 a, RT2 b, RT3 x){ return ::boost::math::ibeta_derivative(a, b, x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2, RT3>::type \
+   ibeta_derivative(RT1 a, RT2 b, RT3 x){ return ::cppmsboost::math::ibeta_derivative(a, b, x, Policy()); }\
 \
-   template <class T> T binomial_coefficient(unsigned n, unsigned k){ return ::boost::math::binomial_coefficient<T, Policy>(n, k, Policy()); }\
-\
-   template <class RT>\
-   inline typename boost::math::tools::promote_args<RT>::type erf(RT z) { return ::boost::math::erf(z, Policy()); }\
+   template <class T> T binomial_coefficient(unsigned n, unsigned k){ return ::cppmsboost::math::binomial_coefficient<T, Policy>(n, k, Policy()); }\
 \
    template <class RT>\
-   inline typename boost::math::tools::promote_args<RT>::type erfc(RT z){ return ::boost::math::erfc(z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT>::type erf(RT z) { return ::cppmsboost::math::erf(z, Policy()); }\
 \
    template <class RT>\
-   inline typename boost::math::tools::promote_args<RT>::type erf_inv(RT z) { return ::boost::math::erf_inv(z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT>::type erfc(RT z){ return ::cppmsboost::math::erfc(z, Policy()); }\
 \
    template <class RT>\
-   inline typename boost::math::tools::promote_args<RT>::type erfc_inv(RT z){ return ::boost::math::erfc_inv(z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT>::type erf_inv(RT z) { return ::cppmsboost::math::erf_inv(z, Policy()); }\
 \
-   using boost::math::legendre_next;\
+   template <class RT>\
+   inline typename cppmsboost::math::tools::promote_args<RT>::type erfc_inv(RT z){ return ::cppmsboost::math::erfc_inv(z, Policy()); }\
 \
-   template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type \
-   legendre_p(int l, T x){ return ::boost::math::legendre_p(l, x, Policy()); }\
-\
-   template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type \
-   legendre_p_prime(int l, T x){ return ::boost::math::legendre_p(l, x, Policy()); }\
+   using cppmsboost::math::legendre_next;\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type \
-   legendre_q(unsigned l, T x){ return ::boost::math::legendre_q(l, x, Policy()); }\
-\
-   using ::boost::math::legendre_next;\
+   inline typename cppmsboost::math::tools::promote_args<T>::type \
+   legendre_p(int l, T x){ return ::cppmsboost::math::legendre_p(l, x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type \
-   legendre_p(int l, int m, T x){ return ::boost::math::legendre_p(l, m, x, Policy()); }\
-\
-   using ::boost::math::laguerre_next;\
+   inline typename cppmsboost::math::tools::promote_args<T>::type \
+   legendre_p_prime(int l, T x){ return ::cppmsboost::math::legendre_p(l, x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type \
-   laguerre(unsigned n, T x){ return ::boost::math::laguerre(n, x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type \
+   legendre_q(unsigned l, T x){ return ::cppmsboost::math::legendre_q(l, x, Policy()); }\
+\
+   using ::cppmsboost::math::legendre_next;\
+\
+   template <class T>\
+   inline typename cppmsboost::math::tools::promote_args<T>::type \
+   legendre_p(int l, int m, T x){ return ::cppmsboost::math::legendre_p(l, m, x, Policy()); }\
+\
+   using ::cppmsboost::math::laguerre_next;\
+\
+   template <class T>\
+   inline typename cppmsboost::math::tools::promote_args<T>::type \
+   laguerre(unsigned n, T x){ return ::cppmsboost::math::laguerre(n, x, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::laguerre_result<T1, T2>::type \
-   laguerre(unsigned n, T1 m, T2 x) { return ::boost::math::laguerre(n, m, x, Policy()); }\
+   inline typename cppmsboost::math::laguerre_result<T1, T2>::type \
+   laguerre(unsigned n, T1 m, T2 x) { return ::cppmsboost::math::laguerre(n, m, x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type \
-   hermite(unsigned n, T x){ return ::boost::math::hermite(n, x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type \
+   hermite(unsigned n, T x){ return ::cppmsboost::math::hermite(n, x, Policy()); }\
 \
-   using boost::math::hermite_next;\
+   using cppmsboost::math::hermite_next;\
 \
-   using boost::math::chebyshev_next;\
+   using cppmsboost::math::chebyshev_next;\
 \
   template<class Real>\
-  Real chebyshev_t(unsigned n, Real const & x){ return ::boost::math::chebyshev_t(n, x, Policy()); }\
+  Real chebyshev_t(unsigned n, Real const & x){ return ::cppmsboost::math::chebyshev_t(n, x, Policy()); }\
 \
   template<class Real>\
-  Real chebyshev_u(unsigned n, Real const & x){ return ::boost::math::chebyshev_u(n, x, Policy()); }\
+  Real chebyshev_u(unsigned n, Real const & x){ return ::cppmsboost::math::chebyshev_u(n, x, Policy()); }\
 \
   template<class Real>\
-  Real chebyshev_t_prime(unsigned n, Real const & x){ return ::boost::math::chebyshev_t_prime(n, x, Policy()); }\
+  Real chebyshev_t_prime(unsigned n, Real const & x){ return ::cppmsboost::math::chebyshev_t_prime(n, x, Policy()); }\
 \
-  using ::boost::math::chebyshev_clenshaw_recurrence;\
-\
-   template <class T1, class T2>\
-   inline std::complex<typename boost::math::tools::promote_args<T1, T2>::type> \
-   spherical_harmonic(unsigned n, int m, T1 theta, T2 phi){ return boost::math::spherical_harmonic(n, m, theta, phi, Policy()); }\
+  using ::cppmsboost::math::chebyshev_clenshaw_recurrence;\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type \
-   spherical_harmonic_r(unsigned n, int m, T1 theta, T2 phi){ return ::boost::math::spherical_harmonic_r(n, m, theta, phi, Policy()); }\
+   inline std::complex<typename cppmsboost::math::tools::promote_args<T1, T2>::type> \
+   spherical_harmonic(unsigned n, int m, T1 theta, T2 phi){ return cppmsboost::math::spherical_harmonic(n, m, theta, phi, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type \
-   spherical_harmonic_i(unsigned n, int m, T1 theta, T2 phi){ return boost::math::spherical_harmonic_i(n, m, theta, phi, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type \
+   spherical_harmonic_r(unsigned n, int m, T1 theta, T2 phi){ return ::cppmsboost::math::spherical_harmonic_r(n, m, theta, phi, Policy()); }\
+\
+   template <class T1, class T2>\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type \
+   spherical_harmonic_i(unsigned n, int m, T1 theta, T2 phi){ return cppmsboost::math::spherical_harmonic_i(n, m, theta, phi, Policy()); }\
 \
    template <class T1, class T2, class Policy>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type \
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type \
       spherical_harmonic_i(unsigned n, int m, T1 theta, T2 phi, const Policy& pol);\
 \
    template <class T1, class T2, class T3>\
-   inline typename boost::math::tools::promote_args<T1, T2, T3>::type \
-   ellint_rf(T1 x, T2 y, T3 z){ return ::boost::math::ellint_rf(x, y, z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2, T3>::type \
+   ellint_rf(T1 x, T2 y, T3 z){ return ::cppmsboost::math::ellint_rf(x, y, z, Policy()); }\
 \
    template <class T1, class T2, class T3>\
-   inline typename boost::math::tools::promote_args<T1, T2, T3>::type \
-   ellint_rd(T1 x, T2 y, T3 z){ return ::boost::math::ellint_rd(x, y, z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2, T3>::type \
+   ellint_rd(T1 x, T2 y, T3 z){ return ::cppmsboost::math::ellint_rd(x, y, z, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type \
-   ellint_rc(T1 x, T2 y){ return ::boost::math::ellint_rc(x, y, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type \
+   ellint_rc(T1 x, T2 y){ return ::cppmsboost::math::ellint_rc(x, y, Policy()); }\
 \
    template <class T1, class T2, class T3, class T4>\
-   inline typename boost::math::tools::promote_args<T1, T2, T3, T4>::type \
-   ellint_rj(T1 x, T2 y, T3 z, T4 p){ return boost::math::ellint_rj(x, y, z, p, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2, T3, T4>::type \
+   ellint_rj(T1 x, T2 y, T3 z, T4 p){ return cppmsboost::math::ellint_rj(x, y, z, p, Policy()); }\
 \
    template <class T1, class T2, class T3>\
-   inline typename boost::math::tools::promote_args<T1, T2, T3>::type \
-   ellint_rg(T1 x, T2 y, T3 z){ return ::boost::math::ellint_rg(x, y, z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2, T3>::type \
+   ellint_rg(T1 x, T2 y, T3 z){ return ::cppmsboost::math::ellint_rg(x, y, z, Policy()); }\
    \
    template <typename T>\
-   inline typename boost::math::tools::promote_args<T>::type ellint_2(T k){ return boost::math::ellint_2(k, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type ellint_2(T k){ return cppmsboost::math::ellint_2(k, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type ellint_2(T1 k, T2 phi){ return boost::math::ellint_2(k, phi, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type ellint_2(T1 k, T2 phi){ return cppmsboost::math::ellint_2(k, phi, Policy()); }\
 \
    template <typename T>\
-   inline typename boost::math::tools::promote_args<T>::type ellint_d(T k){ return boost::math::ellint_d(k, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type ellint_d(T k){ return cppmsboost::math::ellint_d(k, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type ellint_d(T1 k, T2 phi){ return boost::math::ellint_d(k, phi, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type ellint_d(T1 k, T2 phi){ return cppmsboost::math::ellint_d(k, phi, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type jacobi_zeta(T1 k, T2 phi){ return boost::math::jacobi_zeta(k, phi, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type jacobi_zeta(T1 k, T2 phi){ return cppmsboost::math::jacobi_zeta(k, phi, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type heuman_lambda(T1 k, T2 phi){ return boost::math::heuman_lambda(k, phi, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type heuman_lambda(T1 k, T2 phi){ return cppmsboost::math::heuman_lambda(k, phi, Policy()); }\
 \
    template <typename T>\
-   inline typename boost::math::tools::promote_args<T>::type ellint_1(T k){ return boost::math::ellint_1(k, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type ellint_1(T k){ return cppmsboost::math::ellint_1(k, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type ellint_1(T1 k, T2 phi){ return boost::math::ellint_1(k, phi, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type ellint_1(T1 k, T2 phi){ return cppmsboost::math::ellint_1(k, phi, Policy()); }\
 \
    template <class T1, class T2, class T3>\
-   inline typename boost::math::tools::promote_args<T1, T2, T3>::type ellint_3(T1 k, T2 v, T3 phi){ return boost::math::ellint_3(k, v, phi, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2, T3>::type ellint_3(T1 k, T2 v, T3 phi){ return cppmsboost::math::ellint_3(k, v, phi, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type ellint_3(T1 k, T2 v){ return boost::math::ellint_3(k, v, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type ellint_3(T1 k, T2 v){ return cppmsboost::math::ellint_3(k, v, Policy()); }\
 \
-   using boost::math::max_factorial;\
+   using cppmsboost::math::max_factorial;\
    template <class RT>\
-   inline RT factorial(unsigned int i) { return boost::math::factorial<RT>(i, Policy()); }\
-   using boost::math::unchecked_factorial;\
+   inline RT factorial(unsigned int i) { return cppmsboost::math::factorial<RT>(i, Policy()); }\
+   using cppmsboost::math::unchecked_factorial;\
    template <class RT>\
-   inline RT double_factorial(unsigned i){ return boost::math::double_factorial<RT>(i, Policy()); }\
+   inline RT double_factorial(unsigned i){ return cppmsboost::math::double_factorial<RT>(i, Policy()); }\
    template <class RT>\
-   inline typename boost::math::tools::promote_args<RT>::type falling_factorial(RT x, unsigned n){ return boost::math::falling_factorial(x, n, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT>::type falling_factorial(RT x, unsigned n){ return cppmsboost::math::falling_factorial(x, n, Policy()); }\
    template <class RT>\
-   inline typename boost::math::tools::promote_args<RT>::type rising_factorial(RT x, unsigned n){ return boost::math::rising_factorial(x, n, Policy()); }\
-\
-   template <class RT>\
-   inline typename boost::math::tools::promote_args<RT>::type tgamma(RT z){ return boost::math::tgamma(z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT>::type rising_factorial(RT x, unsigned n){ return cppmsboost::math::rising_factorial(x, n, Policy()); }\
 \
    template <class RT>\
-   inline typename boost::math::tools::promote_args<RT>::type tgamma1pm1(RT z){ return boost::math::tgamma1pm1(z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT>::type tgamma(RT z){ return cppmsboost::math::tgamma(z, Policy()); }\
+\
+   template <class RT>\
+   inline typename cppmsboost::math::tools::promote_args<RT>::type tgamma1pm1(RT z){ return cppmsboost::math::tgamma1pm1(z, Policy()); }\
 \
    template <class RT1, class RT2>\
-   inline typename boost::math::tools::promote_args<RT1, RT2>::type tgamma(RT1 a, RT2 z){ return boost::math::tgamma(a, z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2>::type tgamma(RT1 a, RT2 z){ return cppmsboost::math::tgamma(a, z, Policy()); }\
 \
    template <class RT>\
-   inline typename boost::math::tools::promote_args<RT>::type lgamma(RT z, int* sign){ return boost::math::lgamma(z, sign, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT>::type lgamma(RT z, int* sign){ return cppmsboost::math::lgamma(z, sign, Policy()); }\
 \
    template <class RT>\
-   inline typename boost::math::tools::promote_args<RT>::type lgamma(RT x){ return boost::math::lgamma(x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT>::type lgamma(RT x){ return cppmsboost::math::lgamma(x, Policy()); }\
 \
    template <class RT1, class RT2>\
-   inline typename boost::math::tools::promote_args<RT1, RT2>::type tgamma_lower(RT1 a, RT2 z){ return boost::math::tgamma_lower(a, z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2>::type tgamma_lower(RT1 a, RT2 z){ return cppmsboost::math::tgamma_lower(a, z, Policy()); }\
 \
    template <class RT1, class RT2>\
-   inline typename boost::math::tools::promote_args<RT1, RT2>::type gamma_q(RT1 a, RT2 z){ return boost::math::gamma_q(a, z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2>::type gamma_q(RT1 a, RT2 z){ return cppmsboost::math::gamma_q(a, z, Policy()); }\
 \
    template <class RT1, class RT2>\
-   inline typename boost::math::tools::promote_args<RT1, RT2>::type gamma_p(RT1 a, RT2 z){ return boost::math::gamma_p(a, z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2>::type gamma_p(RT1 a, RT2 z){ return cppmsboost::math::gamma_p(a, z, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type tgamma_delta_ratio(T1 z, T2 delta){ return boost::math::tgamma_delta_ratio(z, delta, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type tgamma_delta_ratio(T1 z, T2 delta){ return cppmsboost::math::tgamma_delta_ratio(z, delta, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type tgamma_ratio(T1 a, T2 b) { return boost::math::tgamma_ratio(a, b, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type tgamma_ratio(T1 a, T2 b) { return cppmsboost::math::tgamma_ratio(a, b, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type gamma_p_derivative(T1 a, T2 x){ return boost::math::gamma_p_derivative(a, x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type gamma_p_derivative(T1 a, T2 x){ return cppmsboost::math::gamma_p_derivative(a, x, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type gamma_p_inv(T1 a, T2 p){ return boost::math::gamma_p_inv(a, p, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type gamma_p_inv(T1 a, T2 p){ return cppmsboost::math::gamma_p_inv(a, p, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type gamma_p_inva(T1 a, T2 p){ return boost::math::gamma_p_inva(a, p, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type gamma_p_inva(T1 a, T2 p){ return cppmsboost::math::gamma_p_inva(a, p, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type gamma_q_inv(T1 a, T2 q){ return boost::math::gamma_q_inv(a, q, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type gamma_q_inv(T1 a, T2 q){ return cppmsboost::math::gamma_q_inv(a, q, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type gamma_q_inva(T1 a, T2 q){ return boost::math::gamma_q_inva(a, q, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type gamma_q_inva(T1 a, T2 q){ return cppmsboost::math::gamma_q_inva(a, q, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type digamma(T x){ return boost::math::digamma(x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type digamma(T x){ return cppmsboost::math::digamma(x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type trigamma(T x){ return boost::math::trigamma(x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type trigamma(T x){ return cppmsboost::math::trigamma(x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type polygamma(int n, T x){ return boost::math::polygamma(n, x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type polygamma(int n, T x){ return cppmsboost::math::polygamma(n, x, Policy()); }\
    \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type \
-   hypot(T1 x, T2 y){ return boost::math::hypot(x, y, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type \
+   hypot(T1 x, T2 y){ return cppmsboost::math::hypot(x, y, Policy()); }\
 \
    template <class RT>\
-   inline typename boost::math::tools::promote_args<RT>::type cbrt(RT z){ return boost::math::cbrt(z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT>::type cbrt(RT z){ return cppmsboost::math::cbrt(z, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type log1p(T x){ return boost::math::log1p(x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type log1p(T x){ return cppmsboost::math::log1p(x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type log1pmx(T x){ return boost::math::log1pmx(x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type log1pmx(T x){ return cppmsboost::math::log1pmx(x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type expm1(T x){ return boost::math::expm1(x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type expm1(T x){ return cppmsboost::math::expm1(x, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::tools::promote_args<T1, T2>::type \
-   powm1(const T1 a, const T2 z){ return boost::math::powm1(a, z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T1, T2>::type \
+   powm1(const T1 a, const T2 z){ return cppmsboost::math::powm1(a, z, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type sqrt1pm1(const T& val){ return boost::math::sqrt1pm1(val, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type sqrt1pm1(const T& val){ return cppmsboost::math::sqrt1pm1(val, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type sinc_pi(T x){ return boost::math::sinc_pi(x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type sinc_pi(T x){ return cppmsboost::math::sinc_pi(x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type sinhc_pi(T x){ return boost::math::sinhc_pi(x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type sinhc_pi(T x){ return cppmsboost::math::sinhc_pi(x, Policy()); }\
 \
    template<typename T>\
-   inline typename boost::math::tools::promote_args<T>::type asinh(const T x){ return boost::math::asinh(x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type asinh(const T x){ return cppmsboost::math::asinh(x, Policy()); }\
 \
    template<typename T>\
-   inline typename boost::math::tools::promote_args<T>::type acosh(const T x){ return boost::math::acosh(x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type acosh(const T x){ return cppmsboost::math::acosh(x, Policy()); }\
 \
    template<typename T>\
-   inline typename boost::math::tools::promote_args<T>::type atanh(const T x){ return boost::math::atanh(x, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type atanh(const T x){ return cppmsboost::math::atanh(x, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::detail::bessel_traits<T1, T2, Policy >::result_type cyl_bessel_j(T1 v, T2 x)\
-   { return boost::math::cyl_bessel_j(v, x, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T1, T2, Policy >::result_type cyl_bessel_j(T1 v, T2 x)\
+   { return cppmsboost::math::cyl_bessel_j(v, x, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::detail::bessel_traits<T1, T2, Policy >::result_type cyl_bessel_j_prime(T1 v, T2 x)\
-   { return boost::math::cyl_bessel_j_prime(v, x, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T1, T2, Policy >::result_type cyl_bessel_j_prime(T1 v, T2 x)\
+   { return cppmsboost::math::cyl_bessel_j_prime(v, x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::detail::bessel_traits<T, T, Policy >::result_type sph_bessel(unsigned v, T x)\
-   { return boost::math::sph_bessel(v, x, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T, T, Policy >::result_type sph_bessel(unsigned v, T x)\
+   { return cppmsboost::math::sph_bessel(v, x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::detail::bessel_traits<T, T, Policy >::result_type sph_bessel_prime(unsigned v, T x)\
-   { return boost::math::sph_bessel_prime(v, x, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T, T, Policy >::result_type sph_bessel_prime(unsigned v, T x)\
+   { return cppmsboost::math::sph_bessel_prime(v, x, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::detail::bessel_traits<T1, T2, Policy >::result_type \
-   cyl_bessel_i(T1 v, T2 x) { return boost::math::cyl_bessel_i(v, x, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T1, T2, Policy >::result_type \
+   cyl_bessel_i(T1 v, T2 x) { return cppmsboost::math::cyl_bessel_i(v, x, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::detail::bessel_traits<T1, T2, Policy >::result_type \
-   cyl_bessel_i_prime(T1 v, T2 x) { return boost::math::cyl_bessel_i_prime(v, x, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T1, T2, Policy >::result_type \
+   cyl_bessel_i_prime(T1 v, T2 x) { return cppmsboost::math::cyl_bessel_i_prime(v, x, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::detail::bessel_traits<T1, T2, Policy >::result_type \
-   cyl_bessel_k(T1 v, T2 x) { return boost::math::cyl_bessel_k(v, x, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T1, T2, Policy >::result_type \
+   cyl_bessel_k(T1 v, T2 x) { return cppmsboost::math::cyl_bessel_k(v, x, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::detail::bessel_traits<T1, T2, Policy >::result_type \
-   cyl_bessel_k_prime(T1 v, T2 x) { return boost::math::cyl_bessel_k_prime(v, x, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T1, T2, Policy >::result_type \
+   cyl_bessel_k_prime(T1 v, T2 x) { return cppmsboost::math::cyl_bessel_k_prime(v, x, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::detail::bessel_traits<T1, T2, Policy >::result_type \
-   cyl_neumann(T1 v, T2 x){ return boost::math::cyl_neumann(v, x, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T1, T2, Policy >::result_type \
+   cyl_neumann(T1 v, T2 x){ return cppmsboost::math::cyl_neumann(v, x, Policy()); }\
 \
    template <class T1, class T2>\
-   inline typename boost::math::detail::bessel_traits<T1, T2, Policy >::result_type \
-   cyl_neumann_prime(T1 v, T2 x){ return boost::math::cyl_neumann_prime(v, x, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T1, T2, Policy >::result_type \
+   cyl_neumann_prime(T1 v, T2 x){ return cppmsboost::math::cyl_neumann_prime(v, x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::detail::bessel_traits<T, T, Policy >::result_type \
-   sph_neumann(unsigned v, T x){ return boost::math::sph_neumann(v, x, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T, T, Policy >::result_type \
+   sph_neumann(unsigned v, T x){ return cppmsboost::math::sph_neumann(v, x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::detail::bessel_traits<T, T, Policy >::result_type \
-   sph_neumann_prime(unsigned v, T x){ return boost::math::sph_neumann_prime(v, x, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T, T, Policy >::result_type \
+   sph_neumann_prime(unsigned v, T x){ return cppmsboost::math::sph_neumann_prime(v, x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::detail::bessel_traits<T, T, Policy >::result_type cyl_bessel_j_zero(T v, int m)\
-   { return boost::math::cyl_bessel_j_zero(v, m, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T, T, Policy >::result_type cyl_bessel_j_zero(T v, int m)\
+   { return cppmsboost::math::cyl_bessel_j_zero(v, m, Policy()); }\
 \
 template <class OutputIterator, class T>\
    inline void cyl_bessel_j_zero(T v,\
                                  int start_index,\
                                  unsigned number_of_zeros,\
                                  OutputIterator out_it)\
-   { boost::math::cyl_bessel_j_zero(v, start_index, number_of_zeros, out_it, Policy()); }\
+   { cppmsboost::math::cyl_bessel_j_zero(v, start_index, number_of_zeros, out_it, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::detail::bessel_traits<T, T, Policy >::result_type cyl_neumann_zero(T v, int m)\
-   { return boost::math::cyl_neumann_zero(v, m, Policy()); }\
+   inline typename cppmsboost::math::detail::bessel_traits<T, T, Policy >::result_type cyl_neumann_zero(T v, int m)\
+   { return cppmsboost::math::cyl_neumann_zero(v, m, Policy()); }\
 \
 template <class OutputIterator, class T>\
    inline void cyl_neumann_zero(T v,\
                                 int start_index,\
                                 unsigned number_of_zeros,\
                                 OutputIterator out_it)\
-   { boost::math::cyl_neumann_zero(v, start_index, number_of_zeros, out_it, Policy()); }\
+   { cppmsboost::math::cyl_neumann_zero(v, start_index, number_of_zeros, out_it, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type sin_pi(T x){ return boost::math::sin_pi(x); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type sin_pi(T x){ return cppmsboost::math::sin_pi(x); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type cos_pi(T x){ return boost::math::cos_pi(x); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type cos_pi(T x){ return cppmsboost::math::cos_pi(x); }\
 \
-   using boost::math::fpclassify;\
-   using boost::math::isfinite;\
-   using boost::math::isinf;\
-   using boost::math::isnan;\
-   using boost::math::isnormal;\
-   using boost::math::signbit;\
-   using boost::math::sign;\
-   using boost::math::copysign;\
-   using boost::math::changesign;\
+   using cppmsboost::math::fpclassify;\
+   using cppmsboost::math::isfinite;\
+   using cppmsboost::math::isinf;\
+   using cppmsboost::math::isnan;\
+   using cppmsboost::math::isnormal;\
+   using cppmsboost::math::signbit;\
+   using cppmsboost::math::sign;\
+   using cppmsboost::math::copysign;\
+   using cppmsboost::math::changesign;\
    \
    template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T,U>::type expint(T const& z, U const& u)\
-   { return boost::math::expint(z, u, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T,U>::type expint(T const& z, U const& u)\
+   { return cppmsboost::math::expint(z, u, Policy()); }\
    \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type expint(T z){ return boost::math::expint(z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type expint(T z){ return cppmsboost::math::expint(z, Policy()); }\
    \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type zeta(T s){ return boost::math::zeta(s, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type zeta(T s){ return cppmsboost::math::zeta(s, Policy()); }\
    \
    template <class T>\
-   inline T round(const T& v){ using boost::math::round; return round(v, Policy()); }\
+   inline T round(const T& v){ using cppmsboost::math::round; return round(v, Policy()); }\
    \
    template <class T>\
-   inline int iround(const T& v){ using boost::math::iround; return iround(v, Policy()); }\
+   inline int iround(const T& v){ using cppmsboost::math::iround; return iround(v, Policy()); }\
    \
    template <class T>\
-   inline long lround(const T& v){ using boost::math::lround; return lround(v, Policy()); }\
+   inline long lround(const T& v){ using cppmsboost::math::lround; return lround(v, Policy()); }\
    \
    template <class T>\
-   inline T trunc(const T& v){ using boost::math::trunc; return trunc(v, Policy()); }\
+   inline T trunc(const T& v){ using cppmsboost::math::trunc; return trunc(v, Policy()); }\
    \
    template <class T>\
-   inline int itrunc(const T& v){ using boost::math::itrunc; return itrunc(v, Policy()); }\
+   inline int itrunc(const T& v){ using cppmsboost::math::itrunc; return itrunc(v, Policy()); }\
    \
    template <class T>\
-   inline long ltrunc(const T& v){ using boost::math::ltrunc; return ltrunc(v, Policy()); }\
+   inline long ltrunc(const T& v){ using cppmsboost::math::ltrunc; return ltrunc(v, Policy()); }\
    \
    template <class T>\
-   inline T modf(const T& v, T* ipart){ using boost::math::modf; return modf(v, ipart, Policy()); }\
+   inline T modf(const T& v, T* ipart){ using cppmsboost::math::modf; return modf(v, ipart, Policy()); }\
    \
    template <class T>\
-   inline T modf(const T& v, int* ipart){ using boost::math::modf; return modf(v, ipart, Policy()); }\
+   inline T modf(const T& v, int* ipart){ using cppmsboost::math::modf; return modf(v, ipart, Policy()); }\
    \
    template <class T>\
-   inline T modf(const T& v, long* ipart){ using boost::math::modf; return modf(v, ipart, Policy()); }\
+   inline T modf(const T& v, long* ipart){ using cppmsboost::math::modf; return modf(v, ipart, Policy()); }\
    \
    template <int N, class T>\
-   inline typename boost::math::tools::promote_args<T>::type pow(T v){ return boost::math::pow<N>(v, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type pow(T v){ return cppmsboost::math::pow<N>(v, Policy()); }\
    \
-   template <class T> T nextafter(const T& a, const T& b){ return boost::math::nextafter(a, b, Policy()); }\
-   template <class T> T float_next(const T& a){ return boost::math::float_next(a, Policy()); }\
-   template <class T> T float_prior(const T& a){ return boost::math::float_prior(a, Policy()); }\
-   template <class T> T float_distance(const T& a, const T& b){ return boost::math::float_distance(a, b, Policy()); }\
-   template <class T> T ulp(const T& a){ return boost::math::ulp(a, Policy()); }\
+   template <class T> T nextafter(const T& a, const T& b){ return cppmsboost::math::nextafter(a, b, Policy()); }\
+   template <class T> T float_next(const T& a){ return cppmsboost::math::float_next(a, Policy()); }\
+   template <class T> T float_prior(const T& a){ return cppmsboost::math::float_prior(a, Policy()); }\
+   template <class T> T float_distance(const T& a, const T& b){ return cppmsboost::math::float_distance(a, b, Policy()); }\
+   template <class T> T ulp(const T& a){ return cppmsboost::math::ulp(a, Policy()); }\
    \
    template <class RT1, class RT2>\
-   inline typename boost::math::tools::promote_args<RT1, RT2>::type owens_t(RT1 a, RT2 z){ return boost::math::owens_t(a, z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<RT1, RT2>::type owens_t(RT1 a, RT2 z){ return cppmsboost::math::owens_t(a, z, Policy()); }\
    \
    template <class T1, class T2>\
-   inline std::complex<typename boost::math::detail::bessel_traits<T1, T2, Policy >::result_type> cyl_hankel_1(T1 v, T2 x)\
-   {  return boost::math::cyl_hankel_1(v, x, Policy()); }\
+   inline std::complex<typename cppmsboost::math::detail::bessel_traits<T1, T2, Policy >::result_type> cyl_hankel_1(T1 v, T2 x)\
+   {  return cppmsboost::math::cyl_hankel_1(v, x, Policy()); }\
    \
    template <class T1, class T2>\
-   inline std::complex<typename boost::math::detail::bessel_traits<T1, T2, Policy >::result_type> cyl_hankel_2(T1 v, T2 x)\
-   { return boost::math::cyl_hankel_2(v, x, Policy()); }\
+   inline std::complex<typename cppmsboost::math::detail::bessel_traits<T1, T2, Policy >::result_type> cyl_hankel_2(T1 v, T2 x)\
+   { return cppmsboost::math::cyl_hankel_2(v, x, Policy()); }\
    \
    template <class T1, class T2>\
-   inline std::complex<typename boost::math::detail::bessel_traits<T1, T2, Policy >::result_type> sph_hankel_1(T1 v, T2 x)\
-   { return boost::math::sph_hankel_1(v, x, Policy()); }\
+   inline std::complex<typename cppmsboost::math::detail::bessel_traits<T1, T2, Policy >::result_type> sph_hankel_1(T1 v, T2 x)\
+   { return cppmsboost::math::sph_hankel_1(v, x, Policy()); }\
    \
    template <class T1, class T2>\
-   inline std::complex<typename boost::math::detail::bessel_traits<T1, T2, Policy >::result_type> sph_hankel_2(T1 v, T2 x)\
-   { return boost::math::sph_hankel_2(v, x, Policy()); }\
+   inline std::complex<typename cppmsboost::math::detail::bessel_traits<T1, T2, Policy >::result_type> sph_hankel_2(T1 v, T2 x)\
+   { return cppmsboost::math::sph_hankel_2(v, x, Policy()); }\
    \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type jacobi_elliptic(T k, T theta, T* pcn, T* pdn)\
-   { return boost::math::jacobi_elliptic(k, theta, pcn, pdn, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type jacobi_elliptic(T k, T theta, T* pcn, T* pdn)\
+   { return cppmsboost::math::jacobi_elliptic(k, theta, pcn, pdn, Policy()); }\
    \
    template <class U, class T>\
-   inline typename boost::math::tools::promote_args<T, U>::type jacobi_sn(U k, T theta)\
-   { return boost::math::jacobi_sn(k, theta, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type jacobi_sn(U k, T theta)\
+   { return cppmsboost::math::jacobi_sn(k, theta, Policy()); }\
    \
    template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T, U>::type jacobi_cn(T k, U theta)\
-   { return boost::math::jacobi_cn(k, theta, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type jacobi_cn(T k, U theta)\
+   { return cppmsboost::math::jacobi_cn(k, theta, Policy()); }\
    \
    template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T, U>::type jacobi_dn(T k, U theta)\
-   { return boost::math::jacobi_dn(k, theta, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type jacobi_dn(T k, U theta)\
+   { return cppmsboost::math::jacobi_dn(k, theta, Policy()); }\
    \
    template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T, U>::type jacobi_cd(T k, U theta)\
-   { return boost::math::jacobi_cd(k, theta, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type jacobi_cd(T k, U theta)\
+   { return cppmsboost::math::jacobi_cd(k, theta, Policy()); }\
    \
    template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T, U>::type jacobi_dc(T k, U theta)\
-   { return boost::math::jacobi_dc(k, theta, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type jacobi_dc(T k, U theta)\
+   { return cppmsboost::math::jacobi_dc(k, theta, Policy()); }\
    \
    template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T, U>::type jacobi_ns(T k, U theta)\
-   { return boost::math::jacobi_ns(k, theta, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type jacobi_ns(T k, U theta)\
+   { return cppmsboost::math::jacobi_ns(k, theta, Policy()); }\
    \
    template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T, U>::type jacobi_sd(T k, U theta)\
-   { return boost::math::jacobi_sd(k, theta, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type jacobi_sd(T k, U theta)\
+   { return cppmsboost::math::jacobi_sd(k, theta, Policy()); }\
    \
    template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T, U>::type jacobi_ds(T k, U theta)\
-   { return boost::math::jacobi_ds(k, theta, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type jacobi_ds(T k, U theta)\
+   { return cppmsboost::math::jacobi_ds(k, theta, Policy()); }\
    \
    template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T, U>::type jacobi_nc(T k, U theta)\
-   { return boost::math::jacobi_nc(k, theta, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type jacobi_nc(T k, U theta)\
+   { return cppmsboost::math::jacobi_nc(k, theta, Policy()); }\
    \
    template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T, U>::type jacobi_nd(T k, U theta)\
-   { return boost::math::jacobi_nd(k, theta, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type jacobi_nd(T k, U theta)\
+   { return cppmsboost::math::jacobi_nd(k, theta, Policy()); }\
    \
    template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T, U>::type jacobi_sc(T k, U theta)\
-   { return boost::math::jacobi_sc(k, theta, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type jacobi_sc(T k, U theta)\
+   { return cppmsboost::math::jacobi_sc(k, theta, Policy()); }\
    \
    template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T, U>::type jacobi_cs(T k, U theta)\
-   { return boost::math::jacobi_cs(k, theta, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type jacobi_cs(T k, U theta)\
+   { return cppmsboost::math::jacobi_cs(k, theta, Policy()); }\
    \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type airy_ai(T x)\
-   {  return boost::math::airy_ai(x, Policy());  }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type airy_ai(T x)\
+   {  return cppmsboost::math::airy_ai(x, Policy());  }\
    \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type airy_bi(T x)\
-   {  return boost::math::airy_bi(x, Policy());  }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type airy_bi(T x)\
+   {  return cppmsboost::math::airy_bi(x, Policy());  }\
    \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type airy_ai_prime(T x)\
-   {  return boost::math::airy_ai_prime(x, Policy());  }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type airy_ai_prime(T x)\
+   {  return cppmsboost::math::airy_ai_prime(x, Policy());  }\
    \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type airy_bi_prime(T x)\
-   {  return boost::math::airy_bi_prime(x, Policy());  }\
+   inline typename cppmsboost::math::tools::promote_args<T>::type airy_bi_prime(T x)\
+   {  return cppmsboost::math::airy_bi_prime(x, Policy());  }\
    \
    template <class T>\
    inline T airy_ai_zero(int m)\
-   { return boost::math::airy_ai_zero<T>(m, Policy()); }\
+   { return cppmsboost::math::airy_ai_zero<T>(m, Policy()); }\
    template <class T, class OutputIterator>\
    OutputIterator airy_ai_zero(int start_index, unsigned number_of_zeros, OutputIterator out_it)\
-   { return boost::math::airy_ai_zero<T>(start_index, number_of_zeros, out_it, Policy()); }\
+   { return cppmsboost::math::airy_ai_zero<T>(start_index, number_of_zeros, out_it, Policy()); }\
    \
    template <class T>\
    inline T airy_bi_zero(int m)\
-   { return boost::math::airy_bi_zero<T>(m, Policy()); }\
+   { return cppmsboost::math::airy_bi_zero<T>(m, Policy()); }\
    template <class T, class OutputIterator>\
    OutputIterator airy_bi_zero(int start_index, unsigned number_of_zeros, OutputIterator out_it)\
-   { return boost::math::airy_bi_zero<T>(start_index, number_of_zeros, out_it, Policy()); }\
+   { return cppmsboost::math::airy_bi_zero<T>(start_index, number_of_zeros, out_it, Policy()); }\
    \
    template <class T>\
    T bernoulli_b2n(const int i)\
-   { return boost::math::bernoulli_b2n<T>(i, Policy()); }\
+   { return cppmsboost::math::bernoulli_b2n<T>(i, Policy()); }\
    template <class T, class OutputIterator>\
    OutputIterator bernoulli_b2n(int start_index, unsigned number_of_bernoullis_b2n, OutputIterator out_it)\
-   { return boost::math::bernoulli_b2n<T>(start_index, number_of_bernoullis_b2n, out_it, Policy()); }\
+   { return cppmsboost::math::bernoulli_b2n<T>(start_index, number_of_bernoullis_b2n, out_it, Policy()); }\
    \
    template <class T>\
    T tangent_t2n(const int i)\
-   { return boost::math::tangent_t2n<T>(i, Policy()); }\
+   { return cppmsboost::math::tangent_t2n<T>(i, Policy()); }\
    template <class T, class OutputIterator>\
    OutputIterator tangent_t2n(int start_index, unsigned number_of_bernoullis_b2n, OutputIterator out_it)\
-   { return boost::math::tangent_t2n<T>(start_index, number_of_bernoullis_b2n, out_it, Policy()); }\
+   { return cppmsboost::math::tangent_t2n<T>(start_index, number_of_bernoullis_b2n, out_it, Policy()); }\
    \
-   template <class T> inline typename boost::math::tools::promote_args<T>::type lambert_w0(T z) { return boost::math::lambert_w0(z, Policy()); }\
-   template <class T> inline typename boost::math::tools::promote_args<T>::type lambert_wm1(T z) { return boost::math::lambert_w0(z, Policy()); }\
-   template <class T> inline typename boost::math::tools::promote_args<T>::type lambert_w0_prime(T z) { return boost::math::lambert_w0(z, Policy()); }\
-   template <class T> inline typename boost::math::tools::promote_args<T>::type lambert_wm1_prime(T z) { return boost::math::lambert_w0(z, Policy()); }\
-   \
-   template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T, U>::type hypergeometric_1F0(const T& a, const U& z)\
-   { return boost::math::hypergeometric_1F0(a, z, Policy()); }\
+   template <class T> inline typename cppmsboost::math::tools::promote_args<T>::type lambert_w0(T z) { return cppmsboost::math::lambert_w0(z, Policy()); }\
+   template <class T> inline typename cppmsboost::math::tools::promote_args<T>::type lambert_wm1(T z) { return cppmsboost::math::lambert_w0(z, Policy()); }\
+   template <class T> inline typename cppmsboost::math::tools::promote_args<T>::type lambert_w0_prime(T z) { return cppmsboost::math::lambert_w0(z, Policy()); }\
+   template <class T> inline typename cppmsboost::math::tools::promote_args<T>::type lambert_wm1_prime(T z) { return cppmsboost::math::lambert_w0(z, Policy()); }\
    \
    template <class T, class U>\
-   inline typename boost::math::tools::promote_args<T, U>::type hypergeometric_0F1(const T& a, const U& z)\
-   { return boost::math::hypergeometric_0F1(a, z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type hypergeometric_1F0(const T& a, const U& z)\
+   { return cppmsboost::math::hypergeometric_1F0(a, z, Policy()); }\
+   \
+   template <class T, class U>\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type hypergeometric_0F1(const T& a, const U& z)\
+   { return cppmsboost::math::hypergeometric_0F1(a, z, Policy()); }\
    \
    template <class T, class U, class V>\
-   inline typename boost::math::tools::promote_args<T, U>::type hypergeometric_2F0(const T& a1, const U& a2, const V& z)\
-   { return boost::math::hypergeometric_2F0(a1, a2, z, Policy()); }\
+   inline typename cppmsboost::math::tools::promote_args<T, U>::type hypergeometric_2F0(const T& a1, const U& a2, const V& z)\
+   { return cppmsboost::math::hypergeometric_2F0(a1, a2, z, Policy()); }\
    \
 
 

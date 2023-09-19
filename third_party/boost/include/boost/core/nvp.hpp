@@ -11,7 +11,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <boost/core/addressof.hpp>
 #include <boost/config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 
 template<class T>
@@ -19,7 +19,7 @@ class nvp {
 public:
     nvp(const char* n, T& v) BOOST_NOEXCEPT
         : n_(n)
-        , v_(boost::addressof(v)) { }
+        , v_(cppmsboost::addressof(v)) { }
 
     const char* name() const BOOST_NOEXCEPT {
         return n_;
@@ -52,6 +52,6 @@ using serialization::make_nvp;
 
 } /* boost */
 
-#define BOOST_NVP(v) boost::make_nvp(BOOST_STRINGIZE(v), v)
+#define BOOST_NVP(v) cppmsboost::make_nvp(BOOST_STRINGIZE(v), v)
 
 #endif

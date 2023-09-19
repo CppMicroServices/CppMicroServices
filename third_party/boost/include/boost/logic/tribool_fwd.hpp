@@ -10,6 +10,6 @@
 #ifndef BOOST_LOGIC_TRIBOOL_FWD_HPP
 #define BOOST_LOGIC_TRIBOOL_FWD_HPP
 
-namespace boost { namespace logic { class tribool; } }
+namespace cppmsboost { namespace logic { class tribool; } }
 
 #endif // BOOST_LOGIC_TRIBOOL_FWD_HPP

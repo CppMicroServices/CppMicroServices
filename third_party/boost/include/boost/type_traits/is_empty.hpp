@@ -23,7 +23,7 @@
 #define BOOST_INTERNAL_IS_EMPTY(T) BOOST_IS_EMPTY(T)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 namespace detail {
 
@@ -72,7 +72,7 @@ struct is_empty_impl
     typedef typename remove_cv<T>::type cvt;
     BOOST_STATIC_CONSTANT(
         bool, 
-        value = ( ::boost::detail::empty_helper<cvt,::boost::is_class<T>::value>::value || BOOST_INTERNAL_IS_EMPTY(cvt)));
+        value = ( ::cppmsboost::detail::empty_helper<cvt,::cppmsboost::is_class<T>::value>::value || BOOST_INTERNAL_IS_EMPTY(cvt)));
 };
 
 #else // __BORLANDC__
@@ -99,10 +99,10 @@ struct is_empty_impl
 
    BOOST_STATIC_CONSTANT(
        bool, value = (
-              ::boost::detail::empty_helper<
+              ::cppmsboost::detail::empty_helper<
                   cvt
-                , ::boost::is_class<T>::value
-                , ::boost::is_convertible< r_type,int>::value
+                , ::cppmsboost::is_class<T>::value
+                , ::cppmsboost::is_convertible< r_type,int>::value
               >::value || BOOST_INTERNAL_IS_EMPTY(cvt));
 };
 
@@ -110,9 +110,9 @@ struct is_empty_impl
 
 } // namespace detail
 
-template <class T> struct is_empty : integral_constant<bool, ::boost::detail::is_empty_impl<T>::value> {};
+template <class T> struct is_empty : integral_constant<bool, ::cppmsboost::detail::is_empty_impl<T>::value> {};
 
-} // namespace boost
+} // namespace cppmsboost
 
 #undef BOOST_INTERNAL_IS_EMPTY
 

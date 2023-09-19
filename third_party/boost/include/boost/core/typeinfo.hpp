@@ -23,7 +23,7 @@
 #include <functional>
 #include <cstring>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace core
@@ -94,7 +94,7 @@ namespace detail
 
 template<class T> struct BOOST_SYMBOL_VISIBLE core_typeid_
 {
-    static boost::core::typeinfo ti_;
+    static cppmsboost::core::typeinfo ti_;
 
     static char const * name()
     {
@@ -106,7 +106,7 @@ BOOST_SYMBOL_VISIBLE inline void core_typeid_lib_id()
 {
 }
 
-template<class T> boost::core::typeinfo core_typeid_< T >::ti_( core_typeid_< T >::name(), &core_typeid_lib_id );
+template<class T> cppmsboost::core::typeinfo core_typeid_< T >::ti_( core_typeid_< T >::name(), &core_typeid_lib_id );
 
 template<class T> struct core_typeid_< T & >: core_typeid_< T >
 {
@@ -126,16 +126,16 @@ template<class T> struct core_typeid_< T const volatile >: core_typeid_< T >
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
-#define BOOST_CORE_TYPEID(T) (boost::detail::core_typeid_<T>::ti_)
+#define BOOST_CORE_TYPEID(T) (cppmsboost::detail::core_typeid_<T>::ti_)
 
 #else
 
 #include <boost/core/demangle.hpp>
 #include <typeinfo>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace core
@@ -158,7 +158,7 @@ inline std::string demangled_name( core::typeinfo const & ti )
 
 } // namespace core
 
-} // namespace boost
+} // namespace cppmsboost
 
 #define BOOST_CORE_TYPEID(T) typeid(T)
 

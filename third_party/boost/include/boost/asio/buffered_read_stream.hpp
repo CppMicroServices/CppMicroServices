@@ -29,7 +29,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Adds buffering to the read-related operations of a stream.
@@ -112,7 +112,7 @@ public:
   }
 
   /// Close the stream.
-  BOOST_ASIO_SYNC_OP_VOID close(boost::system::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID close(cppmsboost::system::error_code& ec)
   {
     next_layer_.close(ec);
     BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
@@ -130,7 +130,7 @@ public:
   /// or 0 if an error occurred.
   template <typename ConstBufferSequence>
   std::size_t write_some(const ConstBufferSequence& buffers,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     return next_layer_.write_some(buffers, ec);
   }
@@ -138,11 +138,11 @@ public:
   /// Start an asynchronous write. The data being written must be valid for the
   /// lifetime of the asynchronous operation.
   template <typename ConstBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         std::size_t)) WriteHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-      void (boost::system::error_code, std::size_t))
+      void (cppmsboost::system::error_code, std::size_t))
   async_write_some(const ConstBufferSequence& buffers,
       BOOST_ASIO_MOVE_ARG(WriteHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
@@ -157,15 +157,15 @@ public:
 
   /// Fill the buffer with some data. Returns the number of bytes placed in the
   /// buffer as a result of the operation, or 0 if an error occurred.
-  std::size_t fill(boost::system::error_code& ec);
+  std::size_t fill(cppmsboost::system::error_code& ec);
 
   /// Start an asynchronous fill.
   template <
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         std::size_t)) ReadHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-      void (boost::system::error_code, std::size_t))
+      void (cppmsboost::system::error_code, std::size_t))
   async_fill(
       BOOST_ASIO_MOVE_ARG(ReadHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type));
@@ -179,16 +179,16 @@ public:
   /// an error occurred.
   template <typename MutableBufferSequence>
   std::size_t read_some(const MutableBufferSequence& buffers,
-      boost::system::error_code& ec);
+      cppmsboost::system::error_code& ec);
 
   /// Start an asynchronous read. The buffer into which the data will be read
   /// must be valid for the lifetime of the asynchronous operation.
   template <typename MutableBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         std::size_t)) ReadHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-      void (boost::system::error_code, std::size_t))
+      void (cppmsboost::system::error_code, std::size_t))
   async_read_some(const MutableBufferSequence& buffers,
       BOOST_ASIO_MOVE_ARG(ReadHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type));
@@ -202,7 +202,7 @@ public:
   /// or 0 if an error occurred.
   template <typename MutableBufferSequence>
   std::size_t peek(const MutableBufferSequence& buffers,
-      boost::system::error_code& ec);
+      cppmsboost::system::error_code& ec);
 
   /// Determine the amount of data that may be read without blocking.
   std::size_t in_avail()
@@ -211,9 +211,9 @@ public:
   }
 
   /// Determine the amount of data that may be read without blocking.
-  std::size_t in_avail(boost::system::error_code& ec)
+  std::size_t in_avail(cppmsboost::system::error_code& ec)
   {
-    ec = boost::system::error_code();
+    ec = cppmsboost::system::error_code();
     return storage_.size();
   }
 
@@ -223,7 +223,7 @@ private:
   template <typename MutableBufferSequence>
   std::size_t copy(const MutableBufferSequence& buffers)
   {
-    std::size_t bytes_copied = boost::asio::buffer_copy(
+    std::size_t bytes_copied = cppmsboost::asio::buffer_copy(
         buffers, storage_.data(), storage_.size());
     storage_.consume(bytes_copied);
     return bytes_copied;
@@ -235,7 +235,7 @@ private:
   template <typename MutableBufferSequence>
   std::size_t peek_copy(const MutableBufferSequence& buffers)
   {
-    return boost::asio::buffer_copy(buffers, storage_.data(), storage_.size());
+    return cppmsboost::asio::buffer_copy(buffers, storage_.data(), storage_.size());
   }
 
   /// The next layer.
@@ -246,7 +246,7 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

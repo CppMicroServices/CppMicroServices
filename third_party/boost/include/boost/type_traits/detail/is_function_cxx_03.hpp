@@ -26,7 +26,7 @@
 // except that some compilers erroneously allow conversions from
 // function pointers to void*.
 
-namespace boost {
+namespace cppmsboost {
 
 #if !defined( __CODEGEARC__ )
 
@@ -44,12 +44,12 @@ template <>
 struct is_function_chooser<false>
 {
     template< typename T > struct result_
-        : public ::boost::type_traits::is_function_ptr_helper<T*> {};
+        : public ::cppmsboost::type_traits::is_function_ptr_helper<T*> {};
 };
 
 template <typename T>
 struct is_function_impl
-    : public is_function_chooser< ::boost::is_reference<T>::value >
+    : public is_function_chooser< ::cppmsboost::is_reference<T>::value >
         ::BOOST_NESTED_TEMPLATE result_<T>
 {
 };
@@ -65,8 +65,8 @@ struct is_function_impl
 #endif
     static T* t;
     BOOST_STATIC_CONSTANT(
-        bool, value = sizeof(::boost::type_traits::is_function_ptr_tester(t))
-        == sizeof(::boost::type_traits::yes_type)
+        bool, value = sizeof(::cppmsboost::type_traits::is_function_ptr_tester(t))
+        == sizeof(::cppmsboost::type_traits::yes_type)
         );
 #if BOOST_WORKAROUND(BOOST_MSVC_FULL_VER, >= 140050000)
 #pragma warning(pop)
@@ -91,7 +91,7 @@ struct is_function_impl<T&&> : public false_type
 #if defined( __CODEGEARC__ )
 template <class T> struct is_function : integral_constant<bool, __is_function(T)> {};
 #else
-template <class T> struct is_function : integral_constant<bool, ::boost::detail::is_function_impl<T>::value> {};
+template <class T> struct is_function : integral_constant<bool, ::cppmsboost::detail::is_function_impl<T>::value> {};
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 template <class T> struct is_function<T&&> : public false_type {};
 #endif
@@ -99,7 +99,7 @@ template <class T> struct is_function<T&&> : public false_type {};
 template <class T> struct is_function<T&> : public false_type {};
 #endif
 #endif
-} // namespace boost
+} // namespace cppmsboost
 
 #if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && defined(BOOST_MSVC) && BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
 #include <boost/type_traits/detail/is_function_msvc10_fix.hpp>

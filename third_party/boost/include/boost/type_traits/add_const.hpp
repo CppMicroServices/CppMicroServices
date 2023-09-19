@@ -12,7 +12,7 @@
 
 #include <boost/type_traits/detail/config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 // * convert a type T to const type - add_const<T>
 // this is not required since the result is always
@@ -47,6 +47,6 @@ namespace boost {
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_ADD_CONST_HPP_INCLUDED

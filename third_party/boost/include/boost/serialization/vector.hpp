@@ -41,14 +41,14 @@
 #endif
 
 // function specializations must be defined in the appropriate
-// namespace - boost::serialization
+// namespace - cppmsboost::serialization
 #if defined(__SGI_STL_PORT) || defined(_STLPORT_VERSION)
 #define STD _STLP_STD
 #else
 #define STD std
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
@@ -63,7 +63,7 @@ inline void save(
     const unsigned int /* file_version */,
     mpl::false_
 ){
-    boost::serialization::stl::save_collection<Archive, STD::vector<U, Allocator> >(
+    cppmsboost::serialization::stl::save_collection<Archive, STD::vector<U, Allocator> >(
         ar, t
     );
 }
@@ -75,14 +75,14 @@ inline void load(
     const unsigned int /* file_version */,
     mpl::false_
 ){
-    const boost::archive::library_version_type library_version(
+    const cppmsboost::archive::library_version_type library_version(
         ar.get_library_version()
     );
     // retrieve number of elements
     item_version_type item_version(0);
     collection_size_type count;
     ar >> BOOST_SERIALIZATION_NVP(count);
-    if(boost::archive::library_version_type(3) < library_version){
+    if(cppmsboost::archive::library_version_type(3) < library_version){
         ar >> BOOST_SERIALIZATION_NVP(item_version);
     }
     t.reserve(count);
@@ -139,7 +139,7 @@ inline void save(
     const unsigned int file_version
 ){
     typedef typename
-    boost::serialization::use_array_optimization<Archive>::template apply<
+    cppmsboost::serialization::use_array_optimization<Archive>::template apply<
         typename remove_const<U>::type
     >::type use_optimized;
     save(ar,t,file_version, use_optimized());
@@ -152,14 +152,14 @@ inline void load(
     const unsigned int file_version
 ){
 #ifdef BOOST_SERIALIZATION_VECTOR_135_HPP
-    if (ar.get_library_version()==boost::archive::library_version_type(5))
+    if (ar.get_library_version()==cppmsboost::archive::library_version_type(5))
     {
-      load(ar,t,file_version, boost::is_arithmetic<U>());
+      load(ar,t,file_version, cppmsboost::is_arithmetic<U>());
       return;
     }
 #endif
     typedef typename
-    boost::serialization::use_array_optimization<Archive>::template apply<
+    cppmsboost::serialization::use_array_optimization<Archive>::template apply<
         typename remove_const<U>::type
     >::type use_optimized;
     load(ar,t,file_version, use_optimized());
@@ -173,7 +173,7 @@ inline void serialize(
     std::vector<U, Allocator> & t,
     const unsigned int file_version
 ){
-    boost::serialization::split_free(ar, t, file_version);
+    cppmsboost::serialization::split_free(ar, t, file_version);
 }
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
@@ -190,7 +190,7 @@ inline void save(
     std::vector<bool>::const_iterator it = t.begin();
     while(count-- > 0){
         bool tb = *it++;
-        ar << boost::serialization::make_nvp("item", tb);
+        ar << cppmsboost::serialization::make_nvp("item", tb);
     }
 }
 
@@ -206,7 +206,7 @@ inline void load(
     t.resize(count);
     for(collection_size_type i = collection_size_type(0); i < count; ++i){
         bool b;
-        ar >> boost::serialization::make_nvp("item", b);
+        ar >> cppmsboost::serialization::make_nvp("item", b);
         t[i] = b;
     }
 }
@@ -219,11 +219,11 @@ inline void serialize(
     std::vector<bool, Allocator> & t,
     const unsigned int file_version
 ){
-    boost::serialization::split_free(ar, t, file_version);
+    cppmsboost::serialization::split_free(ar, t, file_version);
 }
 
 } // serialization
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/serialization/collection_traits.hpp>
 

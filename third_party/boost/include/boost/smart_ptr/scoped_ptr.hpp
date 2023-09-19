@@ -27,7 +27,7 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
-namespace boost
+namespace cppmsboost
 {
 
 // Debug hooks
@@ -65,7 +65,7 @@ public:
     explicit scoped_ptr( T * p = 0 ) BOOST_SP_NOEXCEPT : px( p )
     {
 #if defined(BOOST_SP_ENABLE_DEBUG_HOOKS)
-        boost::sp_scalar_constructor_hook( px );
+        cppmsboost::sp_scalar_constructor_hook( px );
 #endif
     }
 
@@ -74,7 +74,7 @@ public:
     explicit scoped_ptr( std::auto_ptr<T> p ) BOOST_SP_NOEXCEPT : px( p.release() )
     {
 #if defined(BOOST_SP_ENABLE_DEBUG_HOOKS)
-        boost::sp_scalar_constructor_hook( px );
+        cppmsboost::sp_scalar_constructor_hook( px );
 #endif
     }
 
@@ -83,9 +83,9 @@ public:
     ~scoped_ptr() BOOST_SP_NOEXCEPT
     {
 #if defined(BOOST_SP_ENABLE_DEBUG_HOOKS)
-        boost::sp_scalar_destructor_hook( px );
+        cppmsboost::sp_scalar_destructor_hook( px );
 #endif
-        boost::checked_delete( px );
+        cppmsboost::checked_delete( px );
     }
 
     void reset(T * p = 0) BOOST_SP_NOEXCEPT_WITH_ASSERT
@@ -124,22 +124,22 @@ public:
 
 #if !defined( BOOST_NO_CXX11_NULLPTR )
 
-template<class T> inline bool operator==( scoped_ptr<T> const & p, boost::detail::sp_nullptr_t ) BOOST_SP_NOEXCEPT
+template<class T> inline bool operator==( scoped_ptr<T> const & p, cppmsboost::detail::sp_nullptr_t ) BOOST_SP_NOEXCEPT
 {
     return p.get() == 0;
 }
 
-template<class T> inline bool operator==( boost::detail::sp_nullptr_t, scoped_ptr<T> const & p ) BOOST_SP_NOEXCEPT
+template<class T> inline bool operator==( cppmsboost::detail::sp_nullptr_t, scoped_ptr<T> const & p ) BOOST_SP_NOEXCEPT
 {
     return p.get() == 0;
 }
 
-template<class T> inline bool operator!=( scoped_ptr<T> const & p, boost::detail::sp_nullptr_t ) BOOST_SP_NOEXCEPT
+template<class T> inline bool operator!=( scoped_ptr<T> const & p, cppmsboost::detail::sp_nullptr_t ) BOOST_SP_NOEXCEPT
 {
     return p.get() != 0;
 }
 
-template<class T> inline bool operator!=( boost::detail::sp_nullptr_t, scoped_ptr<T> const & p ) BOOST_SP_NOEXCEPT
+template<class T> inline bool operator!=( cppmsboost::detail::sp_nullptr_t, scoped_ptr<T> const & p ) BOOST_SP_NOEXCEPT
 {
     return p.get() != 0;
 }
@@ -158,7 +158,7 @@ template<class T> inline T * get_pointer(scoped_ptr<T> const & p) BOOST_SP_NOEXC
     return p.get();
 }
 
-} // namespace boost
+} // namespace cppmsboost
 
 #if defined( BOOST_SP_DISABLE_DEPRECATED )
 #pragma GCC diagnostic pop

@@ -20,7 +20,7 @@
 
 #include <cstddef>            // for std::ptrdiff_t
 
-namespace boost
+namespace cppmsboost
 {
 
 // Debug hooks
@@ -57,16 +57,16 @@ public:
     explicit scoped_array( T * p = 0 ) BOOST_SP_NOEXCEPT : px( p )
     {
 #if defined(BOOST_SP_ENABLE_DEBUG_HOOKS)
-        boost::sp_array_constructor_hook( px );
+        cppmsboost::sp_array_constructor_hook( px );
 #endif
     }
 
     ~scoped_array() BOOST_SP_NOEXCEPT
     {
 #if defined(BOOST_SP_ENABLE_DEBUG_HOOKS)
-        boost::sp_array_destructor_hook( px );
+        cppmsboost::sp_array_destructor_hook( px );
 #endif
-        boost::checked_array_delete( px );
+        cppmsboost::checked_array_delete( px );
     }
 
     void reset(T * p = 0) BOOST_SP_NOEXCEPT_WITH_ASSERT
@@ -100,22 +100,22 @@ public:
 
 #if !defined( BOOST_NO_CXX11_NULLPTR )
 
-template<class T> inline bool operator==( scoped_array<T> const & p, boost::detail::sp_nullptr_t ) BOOST_SP_NOEXCEPT
+template<class T> inline bool operator==( scoped_array<T> const & p, cppmsboost::detail::sp_nullptr_t ) BOOST_SP_NOEXCEPT
 {
     return p.get() == 0;
 }
 
-template<class T> inline bool operator==( boost::detail::sp_nullptr_t, scoped_array<T> const & p ) BOOST_SP_NOEXCEPT
+template<class T> inline bool operator==( cppmsboost::detail::sp_nullptr_t, scoped_array<T> const & p ) BOOST_SP_NOEXCEPT
 {
     return p.get() == 0;
 }
 
-template<class T> inline bool operator!=( scoped_array<T> const & p, boost::detail::sp_nullptr_t ) BOOST_SP_NOEXCEPT
+template<class T> inline bool operator!=( scoped_array<T> const & p, cppmsboost::detail::sp_nullptr_t ) BOOST_SP_NOEXCEPT
 {
     return p.get() != 0;
 }
 
-template<class T> inline bool operator!=( boost::detail::sp_nullptr_t, scoped_array<T> const & p ) BOOST_SP_NOEXCEPT
+template<class T> inline bool operator!=( cppmsboost::detail::sp_nullptr_t, scoped_array<T> const & p ) BOOST_SP_NOEXCEPT
 {
     return p.get() != 0;
 }
@@ -127,6 +127,6 @@ template<class T> inline void swap(scoped_array<T> & a, scoped_array<T> & b) BOO
     a.swap(b);
 }
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // #ifndef BOOST_SMART_PTR_SCOPED_ARRAY_HPP_INCLUDED

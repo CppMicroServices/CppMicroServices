@@ -23,14 +23,14 @@
 
 #include <boost/asio/basic_serial_port.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Typedef for the typical usage of a serial port.
 typedef basic_serial_port<> serial_port;
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // defined(BOOST_ASIO_HAS_SERIAL_PORT)
        //   || defined(GENERATING_DOCUMENTATION)

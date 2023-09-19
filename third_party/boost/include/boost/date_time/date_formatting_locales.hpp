@@ -23,7 +23,7 @@
 #include <iomanip>
 
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
   //! Formats a month as as string into an ostream
@@ -57,7 +57,7 @@ namespace date_time {
         }
         case month_as_integer:
         {
-          boost::io::basic_ios_fill_saver<charT> ifs(os);
+          cppmsboost::io::basic_ios_fill_saver<charT> ifs(os);
           os << std::setw(2) << std::setfill(os.widen('0')) << month.as_number();
           break;
         }
@@ -133,7 +133,7 @@ namespace date_time {
                         ostream_type& os,
                         const facet_type& f)
     {
-      boost::io::basic_ios_fill_saver<charT> ifs(os);
+      cppmsboost::io::basic_ios_fill_saver<charT> ifs(os);
       std::ostreambuf_iterator<charT> oitr(os);
       switch (f.date_order()) {
         case ymd_order_iso: {

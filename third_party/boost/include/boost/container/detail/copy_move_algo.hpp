@@ -50,7 +50,7 @@
 #  pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 namespace dtl {
 
@@ -75,7 +75,7 @@ struct are_elements_contiguous<T*>
 /////////////////////////
 
 template<class It>
-struct are_elements_contiguous< ::boost::move_iterator<It> >
+struct are_elements_contiguous< ::cppmsboost::move_iterator<It> >
    : are_elements_contiguous<It>
 {};
 
@@ -106,7 +106,7 @@ namespace dtl {
 /////////////////////////
 
 template <class Pointer, bool IsConst>
-struct are_elements_contiguous<boost::container::vec_iterator<Pointer, IsConst> >
+struct are_elements_contiguous<cppmsboost::container::vec_iterator<Pointer, IsConst> >
 {
    static const bool value = true;
 };
@@ -116,35 +116,35 @@ struct are_elements_contiguous<boost::container::vec_iterator<Pointer, IsConst> 
 /////////////////////////
 
 template <class PointedType, class DifferenceType, class OffsetType, std::size_t OffsetAlignment>
-struct are_elements_contiguous< ::boost::interprocess::offset_ptr<PointedType, DifferenceType, OffsetType, OffsetAlignment> >
+struct are_elements_contiguous< ::cppmsboost::interprocess::offset_ptr<PointedType, DifferenceType, OffsetType, OffsetAlignment> >
 {
    static const bool value = true;
 };
 
 template <typename I, typename O>
 struct are_contiguous_and_same
-   : boost::move_detail::and_
+   : cppmsboost::move_detail::and_
       < are_elements_contiguous<I>
       , are_elements_contiguous<O>
-      , is_same< typename remove_const< typename ::boost::container::iterator_traits<I>::value_type >::type
-               , typename ::boost::container::iterator_traits<O>::value_type
+      , is_same< typename remove_const< typename ::cppmsboost::container::iterator_traits<I>::value_type >::type
+               , typename ::cppmsboost::container::iterator_traits<O>::value_type
                >
       >
 {};
 
 template <typename I, typename O>
 struct is_memtransfer_copy_assignable
-   : boost::move_detail::and_
+   : cppmsboost::move_detail::and_
       < are_contiguous_and_same<I, O>
-      , dtl::is_trivially_copy_assignable< typename ::boost::container::iterator_traits<I>::value_type >
+      , dtl::is_trivially_copy_assignable< typename ::cppmsboost::container::iterator_traits<I>::value_type >
       >
 {};
 
 template <typename I, typename O>
 struct is_memtransfer_copy_constructible
-   : boost::move_detail::and_
+   : cppmsboost::move_detail::and_
       < are_contiguous_and_same<I, O>
-      , dtl::is_trivially_copy_constructible< typename ::boost::container::iterator_traits<I>::value_type >
+      , dtl::is_trivially_copy_constructible< typename ::cppmsboost::container::iterator_traits<I>::value_type >
       >
 {};
 
@@ -173,14 +173,14 @@ template
     typename F> // F models ForwardIterator
 inline F memmove(I f, I l, F r) BOOST_NOEXCEPT_OR_NOTHROW
 {
-   typedef typename boost::container::iterator_traits<I>::value_type value_type;
-   value_type *const dest_raw = boost::movelib::iterator_to_raw_pointer(r);
-   const value_type *const beg_raw = boost::movelib::iterator_to_raw_pointer(f);
-   const value_type *const end_raw = boost::movelib::iterator_to_raw_pointer(l);
+   typedef typename cppmsboost::container::iterator_traits<I>::value_type value_type;
+   value_type *const dest_raw = cppmsboost::movelib::iterator_to_raw_pointer(r);
+   const value_type *const beg_raw = cppmsboost::movelib::iterator_to_raw_pointer(f);
+   const value_type *const end_raw = cppmsboost::movelib::iterator_to_raw_pointer(l);
    if(BOOST_LIKELY(beg_raw != end_raw && dest_raw && beg_raw)){
-      const typename boost::container::iterator_traits<I>::difference_type n = end_raw - beg_raw;
+      const typename cppmsboost::container::iterator_traits<I>::difference_type n = end_raw - beg_raw;
       std::memmove(dest_raw, beg_raw, sizeof(value_type)*n);
-      boost::container::iterator_advance(r, n);
+      cppmsboost::container::iterator_advance(r, n);
    }
    return r;
 }
@@ -191,10 +191,10 @@ template
     typename F> // F models ForwardIterator
 F memmove_n(I f, U n, F r) BOOST_NOEXCEPT_OR_NOTHROW
 {
-   typedef typename boost::container::iterator_traits<I>::value_type value_type;
+   typedef typename cppmsboost::container::iterator_traits<I>::value_type value_type;
    if(BOOST_LIKELY(n)){
-      std::memmove(boost::movelib::iterator_to_raw_pointer(r), boost::movelib::iterator_to_raw_pointer(f), sizeof(value_type)*n);
-      boost::container::iterator_advance(r, n);
+      std::memmove(cppmsboost::movelib::iterator_to_raw_pointer(r), cppmsboost::movelib::iterator_to_raw_pointer(f), sizeof(value_type)*n);
+      cppmsboost::container::iterator_advance(r, n);
    }
 
    return r;
@@ -207,9 +207,9 @@ template
 I memmove_n_source(I f, U n, F r) BOOST_NOEXCEPT_OR_NOTHROW
 {
    if(BOOST_LIKELY(n)){
-      typedef typename boost::container::iterator_traits<I>::value_type value_type;
-      std::memmove(boost::movelib::iterator_to_raw_pointer(r), boost::movelib::iterator_to_raw_pointer(f), sizeof(value_type)*n);
-      boost::container::iterator_advance(f, n);
+      typedef typename cppmsboost::container::iterator_traits<I>::value_type value_type;
+      std::memmove(cppmsboost::movelib::iterator_to_raw_pointer(r), cppmsboost::movelib::iterator_to_raw_pointer(f), sizeof(value_type)*n);
+      cppmsboost::container::iterator_advance(f, n);
    }
    return f;
 }
@@ -220,11 +220,11 @@ template
     typename F> // F models ForwardIterator
 I memmove_n_source_dest(I f, U n, F &r) BOOST_NOEXCEPT_OR_NOTHROW
 {
-   typedef typename boost::container::iterator_traits<I>::value_type value_type;
+   typedef typename cppmsboost::container::iterator_traits<I>::value_type value_type;
    if(BOOST_LIKELY(n)){
-      std::memmove(boost::movelib::iterator_to_raw_pointer(r), boost::movelib::iterator_to_raw_pointer(f), sizeof(value_type)*n);
-      boost::container::iterator_advance(f, n);
-      boost::container::iterator_advance(r, n);
+      std::memmove(cppmsboost::movelib::iterator_to_raw_pointer(r), cppmsboost::movelib::iterator_to_raw_pointer(f), sizeof(value_type)*n);
+      cppmsboost::container::iterator_advance(f, n);
+      cppmsboost::container::iterator_advance(r, n);
    }
    return f;
 }
@@ -232,7 +232,7 @@ I memmove_n_source_dest(I f, U n, F &r) BOOST_NOEXCEPT_OR_NOTHROW
 template <typename O>
 struct is_memzero_initializable
 {
-   typedef typename ::boost::container::iterator_traits<O>::value_type value_type;
+   typedef typename ::cppmsboost::container::iterator_traits<O>::value_type value_type;
    static const bool value = are_elements_contiguous<O>::value &&
       (  dtl::is_integral<value_type>::value || dtl::is_enum<value_type>::value
       #if defined(BOOST_CONTAINER_MEMZEROED_POINTER_IS_NULL)
@@ -260,14 +260,14 @@ struct disable_if_memzero_initializable
 template <typename I, typename R>
 struct enable_if_trivially_destructible
    : enable_if_c < dtl::is_trivially_destructible
-                  <typename boost::container::iterator_traits<I>::value_type>::value
+                  <typename cppmsboost::container::iterator_traits<I>::value_type>::value
                , R>
 {};
 
 template <typename I, typename R>
 struct disable_if_trivially_destructible
    : enable_if_c <!dtl::is_trivially_destructible
-                  <typename boost::container::iterator_traits<I>::value_type>::value
+                  <typename cppmsboost::container::iterator_traits<I>::value_type>::value
                , R>
 {};
 
@@ -283,7 +283,7 @@ struct disable_if_trivially_destructible
 //! <b>Effects</b>:
 //!   \code
 //!   for (; f != l; ++r, ++f)
-//!      allocator_traits::construct(a, &*r, boost::move(*f));
+//!      allocator_traits::construct(a, &*r, cppmsboost::move(*f));
 //!   \endcode
 //!
 //! <b>Returns</b>: r
@@ -297,13 +297,13 @@ inline typename dtl::disable_if_memtransfer_copy_constructible<I, F, F>::type
    F back = r;
    BOOST_TRY{
       while (f != l) {
-         allocator_traits<Allocator>::construct(a, boost::movelib::iterator_to_raw_pointer(r), boost::move(*f));
+         allocator_traits<Allocator>::construct(a, cppmsboost::movelib::iterator_to_raw_pointer(r), cppmsboost::move(*f));
          ++f; ++r;
       }
    }
    BOOST_CATCH(...){
       for (; back != r; ++back){
-         allocator_traits<Allocator>::destroy(a, boost::movelib::iterator_to_raw_pointer(back));
+         allocator_traits<Allocator>::destroy(a, cppmsboost::movelib::iterator_to_raw_pointer(back));
       }
       BOOST_RETHROW;
    }
@@ -328,7 +328,7 @@ inline typename dtl::enable_if_memtransfer_copy_constructible<I, F, F>::type
 //! <b>Effects</b>:
 //!   \code
 //!   for (; n--; ++r, ++f)
-//!      allocator_traits::construct(a, &*r, boost::move(*f));
+//!      allocator_traits::construct(a, &*r, cppmsboost::move(*f));
 //!   \endcode
 //!
 //! <b>Returns</b>: r
@@ -337,18 +337,18 @@ template
     typename I, // I models InputIterator
     typename F> // F models ForwardIterator
 inline typename dtl::disable_if_memtransfer_copy_constructible<I, F, F>::type
-   uninitialized_move_alloc_n(Allocator &a, I f, typename boost::container::allocator_traits<Allocator>::size_type n, F r)
+   uninitialized_move_alloc_n(Allocator &a, I f, typename cppmsboost::container::allocator_traits<Allocator>::size_type n, F r)
 {
    F back = r;
    BOOST_TRY{
       while (n--) {
-         allocator_traits<Allocator>::construct(a, boost::movelib::iterator_to_raw_pointer(r), boost::move(*f));
+         allocator_traits<Allocator>::construct(a, cppmsboost::movelib::iterator_to_raw_pointer(r), cppmsboost::move(*f));
          ++f; ++r;
       }
    }
    BOOST_CATCH(...){
       for (; back != r; ++back){
-         allocator_traits<Allocator>::destroy(a, boost::movelib::iterator_to_raw_pointer(back));
+         allocator_traits<Allocator>::destroy(a, cppmsboost::movelib::iterator_to_raw_pointer(back));
       }
       BOOST_RETHROW;
    }
@@ -361,7 +361,7 @@ template
     typename I, // I models InputIterator
     typename F> // F models ForwardIterator
 inline typename dtl::enable_if_memtransfer_copy_constructible<I, F, F>::type
-   uninitialized_move_alloc_n(Allocator &, I f, typename boost::container::allocator_traits<Allocator>::size_type n, F r) BOOST_NOEXCEPT_OR_NOTHROW
+   uninitialized_move_alloc_n(Allocator &, I f, typename cppmsboost::container::allocator_traits<Allocator>::size_type n, F r) BOOST_NOEXCEPT_OR_NOTHROW
 {  return dtl::memmove_n(f, n, r); }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -373,7 +373,7 @@ inline typename dtl::enable_if_memtransfer_copy_constructible<I, F, F>::type
 //! <b>Effects</b>:
 //!   \code
 //!   for (; n--; ++r, ++f)
-//!      allocator_traits::construct(a, &*r, boost::move(*f));
+//!      allocator_traits::construct(a, &*r, cppmsboost::move(*f));
 //!   \endcode
 //!
 //! <b>Returns</b>: f (after incremented)
@@ -382,18 +382,18 @@ template
     typename I, // I models InputIterator
     typename F> // F models ForwardIterator
 inline typename dtl::disable_if_memtransfer_copy_constructible<I, F, I>::type
-   uninitialized_move_alloc_n_source(Allocator &a, I f, typename boost::container::allocator_traits<Allocator>::size_type n, F r)
+   uninitialized_move_alloc_n_source(Allocator &a, I f, typename cppmsboost::container::allocator_traits<Allocator>::size_type n, F r)
 {
    F back = r;
    BOOST_TRY{
       while (n--) {
-         allocator_traits<Allocator>::construct(a, boost::movelib::iterator_to_raw_pointer(r), boost::move(*f));
+         allocator_traits<Allocator>::construct(a, cppmsboost::movelib::iterator_to_raw_pointer(r), cppmsboost::move(*f));
          ++f; ++r;
       }
    }
    BOOST_CATCH(...){
       for (; back != r; ++back){
-         allocator_traits<Allocator>::destroy(a, boost::movelib::iterator_to_raw_pointer(back));
+         allocator_traits<Allocator>::destroy(a, cppmsboost::movelib::iterator_to_raw_pointer(back));
       }
       BOOST_RETHROW;
    }
@@ -406,7 +406,7 @@ template
     typename I, // I models InputIterator
     typename F> // F models ForwardIterator
 inline typename dtl::enable_if_memtransfer_copy_constructible<I, F, I>::type
-   uninitialized_move_alloc_n_source(Allocator &, I f, typename boost::container::allocator_traits<Allocator>::size_type n, F r) BOOST_NOEXCEPT_OR_NOTHROW
+   uninitialized_move_alloc_n_source(Allocator &, I f, typename cppmsboost::container::allocator_traits<Allocator>::size_type n, F r) BOOST_NOEXCEPT_OR_NOTHROW
 {  return dtl::memmove_n_source(f, n, r); }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -432,13 +432,13 @@ inline typename dtl::disable_if_memtransfer_copy_constructible<I, F, F>::type
    F back = r;
    BOOST_TRY{
       while (f != l) {
-         allocator_traits<Allocator>::construct(a, boost::movelib::iterator_to_raw_pointer(r), *f);
+         allocator_traits<Allocator>::construct(a, cppmsboost::movelib::iterator_to_raw_pointer(r), *f);
          ++f; ++r;
       }
    }
    BOOST_CATCH(...){
       for (; back != r; ++back){
-         allocator_traits<Allocator>::destroy(a, boost::movelib::iterator_to_raw_pointer(back));
+         allocator_traits<Allocator>::destroy(a, cppmsboost::movelib::iterator_to_raw_pointer(back));
       }
       BOOST_RETHROW;
    }
@@ -472,18 +472,18 @@ template
     typename I, // I models InputIterator
     typename F> // F models ForwardIterator
 inline typename dtl::disable_if_memtransfer_copy_constructible<I, F, F>::type
-   uninitialized_copy_alloc_n(Allocator &a, I f, typename boost::container::allocator_traits<Allocator>::size_type n, F r)
+   uninitialized_copy_alloc_n(Allocator &a, I f, typename cppmsboost::container::allocator_traits<Allocator>::size_type n, F r)
 {
    F back = r;
    BOOST_TRY{
       while (n--) {
-         allocator_traits<Allocator>::construct(a, boost::movelib::iterator_to_raw_pointer(r), *f);
+         allocator_traits<Allocator>::construct(a, cppmsboost::movelib::iterator_to_raw_pointer(r), *f);
          ++f; ++r;
       }
    }
    BOOST_CATCH(...){
       for (; back != r; ++back){
-         allocator_traits<Allocator>::destroy(a, boost::movelib::iterator_to_raw_pointer(back));
+         allocator_traits<Allocator>::destroy(a, cppmsboost::movelib::iterator_to_raw_pointer(back));
       }
       BOOST_RETHROW;
    }
@@ -496,7 +496,7 @@ template
     typename I, // I models InputIterator
     typename F> // F models ForwardIterator
 inline typename dtl::enable_if_memtransfer_copy_constructible<I, F, F>::type
-   uninitialized_copy_alloc_n(Allocator &, I f, typename boost::container::allocator_traits<Allocator>::size_type n, F r) BOOST_NOEXCEPT_OR_NOTHROW
+   uninitialized_copy_alloc_n(Allocator &, I f, typename cppmsboost::container::allocator_traits<Allocator>::size_type n, F r) BOOST_NOEXCEPT_OR_NOTHROW
 {  return dtl::memmove_n(f, n, r); }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -517,18 +517,18 @@ template
     typename I, // I models InputIterator
     typename F> // F models ForwardIterator
 inline typename dtl::disable_if_memtransfer_copy_constructible<I, F, I>::type
-   uninitialized_copy_alloc_n_source(Allocator &a, I f, typename boost::container::allocator_traits<Allocator>::size_type n, F r)
+   uninitialized_copy_alloc_n_source(Allocator &a, I f, typename cppmsboost::container::allocator_traits<Allocator>::size_type n, F r)
 {
    F back = r;
    BOOST_TRY{
       while (n) {
-         boost::container::construct_in_place(a, boost::movelib::iterator_to_raw_pointer(r), f);
+         cppmsboost::container::construct_in_place(a, cppmsboost::movelib::iterator_to_raw_pointer(r), f);
          ++f; ++r; --n;
       }
    }
    BOOST_CATCH(...){
       for (; back != r; ++back){
-         allocator_traits<Allocator>::destroy(a, boost::movelib::iterator_to_raw_pointer(back));
+         allocator_traits<Allocator>::destroy(a, cppmsboost::movelib::iterator_to_raw_pointer(back));
       }
       BOOST_RETHROW;
    }
@@ -541,7 +541,7 @@ template
     typename I, // I models InputIterator
     typename F> // F models ForwardIterator
 inline typename dtl::enable_if_memtransfer_copy_constructible<I, F, I>::type
-   uninitialized_copy_alloc_n_source(Allocator &, I f, typename boost::container::allocator_traits<Allocator>::size_type n, F r) BOOST_NOEXCEPT_OR_NOTHROW
+   uninitialized_copy_alloc_n_source(Allocator &, I f, typename cppmsboost::container::allocator_traits<Allocator>::size_type n, F r) BOOST_NOEXCEPT_OR_NOTHROW
 {  return dtl::memmove_n_source(f, n, r); }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -561,18 +561,18 @@ template
    <typename Allocator,
     typename F> // F models ForwardIterator
 inline typename dtl::disable_if_memzero_initializable<F, F>::type
-   uninitialized_value_init_alloc_n(Allocator &a, typename boost::container::allocator_traits<Allocator>::size_type n, F r)
+   uninitialized_value_init_alloc_n(Allocator &a, typename cppmsboost::container::allocator_traits<Allocator>::size_type n, F r)
 {
    F back = r;
    BOOST_TRY{
       while (n--) {
-         allocator_traits<Allocator>::construct(a, boost::movelib::iterator_to_raw_pointer(r));
+         allocator_traits<Allocator>::construct(a, cppmsboost::movelib::iterator_to_raw_pointer(r));
          ++r;
       }
    }
    BOOST_CATCH(...){
       for (; back != r; ++back){
-         allocator_traits<Allocator>::destroy(a, boost::movelib::iterator_to_raw_pointer(back));
+         allocator_traits<Allocator>::destroy(a, cppmsboost::movelib::iterator_to_raw_pointer(back));
       }
       BOOST_RETHROW;
    }
@@ -584,11 +584,11 @@ template
    <typename Allocator,
     typename F> // F models ForwardIterator
 inline typename dtl::enable_if_memzero_initializable<F, F>::type
-   uninitialized_value_init_alloc_n(Allocator &, typename boost::container::allocator_traits<Allocator>::size_type n, F r)
+   uninitialized_value_init_alloc_n(Allocator &, typename cppmsboost::container::allocator_traits<Allocator>::size_type n, F r)
 {
-   typedef typename boost::container::iterator_traits<F>::value_type value_type;
-   std::memset((void*)boost::movelib::iterator_to_raw_pointer(r), 0, sizeof(value_type)*n);
-   boost::container::iterator_advance(r, n);
+   typedef typename cppmsboost::container::iterator_traits<F>::value_type value_type;
+   std::memset((void*)cppmsboost::movelib::iterator_to_raw_pointer(r), 0, sizeof(value_type)*n);
+   cppmsboost::container::iterator_advance(r, n);
    return r;
 }
 
@@ -608,18 +608,18 @@ inline typename dtl::enable_if_memzero_initializable<F, F>::type
 template
    <typename Allocator,
     typename F> // F models ForwardIterator
-inline F uninitialized_default_init_alloc_n(Allocator &a, typename boost::container::allocator_traits<Allocator>::size_type n, F r)
+inline F uninitialized_default_init_alloc_n(Allocator &a, typename cppmsboost::container::allocator_traits<Allocator>::size_type n, F r)
 {
    F back = r;
    BOOST_TRY{
       while (n--) {
-         allocator_traits<Allocator>::construct(a, boost::movelib::iterator_to_raw_pointer(r), default_init);
+         allocator_traits<Allocator>::construct(a, cppmsboost::movelib::iterator_to_raw_pointer(r), default_init);
          ++r;
       }
    }
    BOOST_CATCH(...){
       for (; back != r; ++back){
-         allocator_traits<Allocator>::destroy(a, boost::movelib::iterator_to_raw_pointer(back));
+         allocator_traits<Allocator>::destroy(a, cppmsboost::movelib::iterator_to_raw_pointer(back));
       }
       BOOST_RETHROW;
    }
@@ -649,13 +649,13 @@ inline void uninitialized_fill_alloc(Allocator &a, F f, F l, const T &t)
    F back = f;
    BOOST_TRY{
       while (f != l) {
-         allocator_traits<Allocator>::construct(a, boost::movelib::iterator_to_raw_pointer(f), t);
+         allocator_traits<Allocator>::construct(a, cppmsboost::movelib::iterator_to_raw_pointer(f), t);
          ++f;
       }
    }
    BOOST_CATCH(...){
       for (; back != l; ++back){
-         allocator_traits<Allocator>::destroy(a, boost::movelib::iterator_to_raw_pointer(back));
+         allocator_traits<Allocator>::destroy(a, cppmsboost::movelib::iterator_to_raw_pointer(back));
       }
       BOOST_RETHROW;
    }
@@ -680,18 +680,18 @@ template
    <typename Allocator,
     typename T,
     typename F> // F models ForwardIterator
-inline F uninitialized_fill_alloc_n(Allocator &a, const T &v, typename boost::container::allocator_traits<Allocator>::size_type n, F r)
+inline F uninitialized_fill_alloc_n(Allocator &a, const T &v, typename cppmsboost::container::allocator_traits<Allocator>::size_type n, F r)
 {
    F back = r;
    BOOST_TRY{
       while (n--) {
-         allocator_traits<Allocator>::construct(a, boost::movelib::iterator_to_raw_pointer(r), v);
+         allocator_traits<Allocator>::construct(a, cppmsboost::movelib::iterator_to_raw_pointer(r), v);
          ++r;
       }
    }
    BOOST_CATCH(...){
       for (; back != r; ++back){
-         allocator_traits<Allocator>::destroy(a, boost::movelib::iterator_to_raw_pointer(back));
+         allocator_traits<Allocator>::destroy(a, cppmsboost::movelib::iterator_to_raw_pointer(back));
       }
       BOOST_RETHROW;
    }
@@ -768,7 +768,7 @@ inline typename dtl::disable_if_memtransfer_copy_assignable<I, F, I>::type
    copy_n_source(I f, U n, F r)
 {
    while (n--) {
-      boost::container::assign_in_place(r, f);
+      cppmsboost::container::assign_in_place(r, f);
       ++f; ++r;
    }
    return f;
@@ -823,7 +823,7 @@ inline typename dtl::disable_if_memtransfer_copy_assignable<I, F, F>::type
    move(I f, I l, F r)
 {
    while (f != l) {
-      *r = ::boost::move(*f);
+      *r = ::cppmsboost::move(*f);
       ++f; ++r;
    }
    return r;
@@ -850,7 +850,7 @@ inline typename dtl::disable_if_memtransfer_copy_assignable<I, F, F>::type
    move_n(I f, U n, F r)
 {
    while (n--) {
-      *r = ::boost::move(*f);
+      *r = ::cppmsboost::move(*f);
       ++f; ++r;
    }
    return r;
@@ -879,7 +879,7 @@ inline typename dtl::disable_if_memtransfer_copy_assignable<I, F, F>::type
 {
    while (f != l) {
       --l; --r;
-      *r = ::boost::move(*l);
+      *r = ::cppmsboost::move(*l);
    }
    return r;
 }
@@ -890,10 +890,10 @@ typename F>   // F models ForwardIterator
 inline typename dtl::enable_if_memtransfer_copy_assignable<I, F, F>::type
    move_backward(I f, I l, F r) BOOST_NOEXCEPT_OR_NOTHROW
 {
-   typedef typename boost::container::iterator_traits<I>::value_type value_type;
-   const typename boost::container::iterator_traits<I>::difference_type n = boost::container::iterator_distance(f, l);
+   typedef typename cppmsboost::container::iterator_traits<I>::value_type value_type;
+   const typename cppmsboost::container::iterator_traits<I>::difference_type n = cppmsboost::container::iterator_distance(f, l);
    r -= n;
-   std::memmove((boost::movelib::iterator_to_raw_pointer)(r), (boost::movelib::iterator_to_raw_pointer)(f), sizeof(value_type)*n);
+   std::memmove((cppmsboost::movelib::iterator_to_raw_pointer)(r), (cppmsboost::movelib::iterator_to_raw_pointer)(f), sizeof(value_type)*n);
    return r;
 }
 
@@ -911,7 +911,7 @@ inline typename dtl::disable_if_memtransfer_copy_assignable<I, F, I>::type
    move_n_source_dest(I f, U n, F &r)
 {
    while (n--) {
-      *r = ::boost::move(*f);
+      *r = ::cppmsboost::move(*f);
       ++f; ++r;
    }
    return f;
@@ -939,7 +939,7 @@ inline typename dtl::disable_if_memtransfer_copy_assignable<I, F, I>::type
    move_n_source(I f, U n, F r)
 {
    while (n--) {
-      *r = ::boost::move(*f);
+      *r = ::cppmsboost::move(*f);
       ++f; ++r;
    }
    return f;
@@ -968,7 +968,7 @@ inline typename dtl::disable_if_trivially_destructible<I, void>::type
 {
    while(n){
       --n;
-      allocator_traits<Allocator>::destroy(a, boost::movelib::iterator_to_raw_pointer(f));
+      allocator_traits<Allocator>::destroy(a, cppmsboost::movelib::iterator_to_raw_pointer(f));
       ++f;
    }
 }
@@ -999,10 +999,10 @@ inline typename dtl::disable_if_memtransfer_copy_assignable<F, G, void>::type
 {
    typename allocator_traits<Allocator>::size_type n = 0;
    for (; n != n_i ; ++short_range_f, ++large_range_f, ++n){
-      boost::adl_move_swap(*short_range_f, *large_range_f);
+      cppmsboost::adl_move_swap(*short_range_f, *large_range_f);
    }
-   boost::container::uninitialized_move_alloc_n(a, large_range_f, n_j - n_i, short_range_f);  // may throw
-   boost::container::destroy_alloc_n(a, large_range_f, n_j - n_i);
+   cppmsboost::container::uninitialized_move_alloc_n(a, large_range_f, n_j - n_i, short_range_f);  // may throw
+   cppmsboost::container::destroy_alloc_n(a, large_range_f, n_j - n_i);
 }
 
 static const std::size_t DeepSwapAllocNMaxStorage = std::size_t(1) << std::size_t(11); //2K bytes
@@ -1025,16 +1025,16 @@ inline typename dtl::enable_if_c
    storage_type storage;
 
    const std::size_t n_i_bytes = sizeof(value_type)*n_i;
-   void *const large_ptr = static_cast<void*>(boost::movelib::iterator_to_raw_pointer(large_range_f));
-   void *const short_ptr = static_cast<void*>(boost::movelib::iterator_to_raw_pointer(short_range_f));
-   void *const stora_ptr = static_cast<void*>(boost::movelib::iterator_to_raw_pointer(storage.data));
+   void *const large_ptr = static_cast<void*>(cppmsboost::movelib::iterator_to_raw_pointer(large_range_f));
+   void *const short_ptr = static_cast<void*>(cppmsboost::movelib::iterator_to_raw_pointer(short_range_f));
+   void *const stora_ptr = static_cast<void*>(cppmsboost::movelib::iterator_to_raw_pointer(storage.data));
    std::memcpy(stora_ptr, large_ptr, n_i_bytes);
    std::memcpy(large_ptr, short_ptr, n_i_bytes);
    std::memcpy(short_ptr, stora_ptr, n_i_bytes);
-   boost::container::iterator_advance(large_range_f, n_i);
-   boost::container::iterator_advance(short_range_f, n_i);
-   boost::container::uninitialized_move_alloc_n(a, large_range_f, n_j - n_i, short_range_f);  // may throw
-   boost::container::destroy_alloc_n(a, large_range_f, n_j - n_i);
+   cppmsboost::container::iterator_advance(large_range_f, n_i);
+   cppmsboost::container::iterator_advance(short_range_f, n_i);
+   cppmsboost::container::uninitialized_move_alloc_n(a, large_range_f, n_j - n_i, short_range_f);  // may throw
+   cppmsboost::container::destroy_alloc_n(a, large_range_f, n_j - n_i);
 }
 
 template
@@ -1056,8 +1056,8 @@ inline typename dtl::enable_if_c
    const std::size_t sizeof_storage = sizeof(storage);
 
    std::size_t n_i_bytes = sizeof(value_type)*n_i;
-   char *large_ptr = static_cast<char*>(static_cast<void*>(boost::movelib::iterator_to_raw_pointer(large_range_f)));
-   char *short_ptr = static_cast<char*>(static_cast<void*>(boost::movelib::iterator_to_raw_pointer(short_range_f)));
+   char *large_ptr = static_cast<char*>(static_cast<void*>(cppmsboost::movelib::iterator_to_raw_pointer(large_range_f)));
+   char *short_ptr = static_cast<char*>(static_cast<void*>(cppmsboost::movelib::iterator_to_raw_pointer(short_range_f)));
    char *stora_ptr = static_cast<char*>(static_cast<void*>(storage.data));
 
    std::size_t szt_times = n_i_bytes/sizeof_storage;
@@ -1102,10 +1102,10 @@ inline typename dtl::enable_if_c
    std::memcpy(stora_ptr, large_ptr, szt_rem);
    std::memcpy(large_ptr, short_ptr, szt_rem);
    std::memcpy(short_ptr, stora_ptr, szt_rem);
-   boost::container::iterator_advance(large_range_f, n_i);
-   boost::container::iterator_advance(short_range_f, n_i);
-   boost::container::uninitialized_move_alloc_n(a, large_range_f, n_j - n_i, short_range_f);  // may throw
-   boost::container::destroy_alloc_n(a, large_range_f, n_j - n_i);
+   cppmsboost::container::iterator_advance(large_range_f, n_i);
+   cppmsboost::container::iterator_advance(short_range_f, n_i);
+   cppmsboost::container::uninitialized_move_alloc_n(a, large_range_f, n_j - n_i, short_range_f);  // may throw
+   cppmsboost::container::destroy_alloc_n(a, large_range_f, n_j - n_i);
 }
 
 
@@ -1124,12 +1124,12 @@ void copy_assign_range_alloc_n( Allocator &a, I inp_start, typename allocator_tr
                               , O out_start, typename allocator_traits<Allocator>::size_type n_o )
 {
    if (n_o < n_i){
-      inp_start = boost::container::copy_n_source_dest(inp_start, n_o, out_start);     // may throw
-      boost::container::uninitialized_copy_alloc_n(a, inp_start, n_i - n_o, out_start);// may throw
+      inp_start = cppmsboost::container::copy_n_source_dest(inp_start, n_o, out_start);     // may throw
+      cppmsboost::container::uninitialized_copy_alloc_n(a, inp_start, n_i - n_o, out_start);// may throw
    }
    else{
-      out_start = boost::container::copy_n(inp_start, n_i, out_start);  // may throw
-      boost::container::destroy_alloc_n(a, out_start, n_o - n_i);
+      out_start = cppmsboost::container::copy_n(inp_start, n_i, out_start);  // may throw
+      cppmsboost::container::destroy_alloc_n(a, out_start, n_o - n_i);
    }
 }
 
@@ -1148,17 +1148,17 @@ void move_assign_range_alloc_n( Allocator &a, I inp_start, typename allocator_tr
                               , O out_start, typename allocator_traits<Allocator>::size_type n_o )
 {
    if (n_o < n_i){
-      inp_start = boost::container::move_n_source_dest(inp_start, n_o, out_start);  // may throw
-      boost::container::uninitialized_move_alloc_n(a, inp_start, n_i - n_o, out_start);  // may throw
+      inp_start = cppmsboost::container::move_n_source_dest(inp_start, n_o, out_start);  // may throw
+      cppmsboost::container::uninitialized_move_alloc_n(a, inp_start, n_i - n_o, out_start);  // may throw
    }
    else{
-      out_start = boost::container::move_n(inp_start, n_i, out_start);  // may throw
-      boost::container::destroy_alloc_n(a, out_start, n_o - n_i);
+      out_start = cppmsboost::container::move_n(inp_start, n_i, out_start);  // may throw
+      cppmsboost::container::destroy_alloc_n(a, out_start, n_o - n_i);
    }
 }
 
 }  //namespace container {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 //#pragma GCC diagnostic ignored "-Wclass-memaccess"
 #if defined(BOOST_GCC) && (BOOST_GCC >= 40600)

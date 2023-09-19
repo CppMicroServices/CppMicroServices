@@ -24,7 +24,7 @@
 
 //Small meta-typetraits to support move
 
-namespace boost {
+namespace cppmsboost {
 namespace move_detail {
 
 template<typename T>
@@ -132,6 +132,6 @@ template <class T, class U, class R = enable_if_nat>
 struct disable_if_same : disable_if<is_same<T, U>, R> {};
 
 }  //namespace move_detail {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif //#ifndef BOOST_MOVE_DETAIL_META_UTILS_CORE_HPP

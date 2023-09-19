@@ -8,7 +8,7 @@ Distributed under the Boost Software License, Version 1.0.
 #ifndef BOOST_CORE_USE_DEFAULT_HPP
 #define BOOST_CORE_USE_DEFAULT_HPP
 
-namespace boost {
+namespace cppmsboost {
 
 struct use_default { };
 

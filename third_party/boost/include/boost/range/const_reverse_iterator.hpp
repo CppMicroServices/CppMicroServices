@@ -18,7 +18,7 @@
 #include <boost/range/reverse_iterator.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     //
     // This interface is deprecated, use range_reverse_iterator<const T>
@@ -30,6 +30,6 @@ namespace boost
                 const BOOST_DEDUCED_TYPENAME remove_reference<C>::type>
     { };
     
-} // namespace boost
+} // namespace cppmsboost
 
 #endif

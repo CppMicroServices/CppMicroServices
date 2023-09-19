@@ -24,7 +24,7 @@
 #include <boost/type_traits/conditional.hpp>
 #endif
 
-namespace boost {
+namespace cppmsboost {
 #ifndef __BORLANDC__
    namespace detail{
 
@@ -35,10 +35,10 @@ namespace boost {
          int i;
          long l;
 #ifndef BOOST_NO_LONG_LONG
-         boost::long_long_type ll;
+         cppmsboost::long_long_type ll;
 #endif
 #ifdef BOOST_HAS_INT128
-         boost::int128_type i128;
+         cppmsboost::int128_type i128;
 #endif
          float f;
          double d;
@@ -49,38 +49,38 @@ namespace boost {
       };
 
 template <std::size_t Target, bool check> struct long_double_alignment{ typedef long double type; };
-template <std::size_t Target> struct long_double_alignment<Target, false>{ typedef boost::detail::max_align type; };
+template <std::size_t Target> struct long_double_alignment<Target, false>{ typedef cppmsboost::detail::max_align type; };
 
 template <std::size_t Target, bool check> struct double_alignment{ typedef double type; };
-template <std::size_t Target> struct double_alignment<Target, false>{ typedef typename long_double_alignment<Target, boost::alignment_of<long double>::value >= Target>::type type; };
+template <std::size_t Target> struct double_alignment<Target, false>{ typedef typename long_double_alignment<Target, cppmsboost::alignment_of<long double>::value >= Target>::type type; };
 
 #ifndef BOOST_NO_LONG_LONG
-template <std::size_t Target, bool check> struct long_long_alignment{ typedef boost::long_long_type type; };
-template <std::size_t Target> struct long_long_alignment<Target, false>{ typedef typename double_alignment<Target, boost::alignment_of<double>::value >= Target>::type type; };
+template <std::size_t Target, bool check> struct long_long_alignment{ typedef cppmsboost::long_long_type type; };
+template <std::size_t Target> struct long_long_alignment<Target, false>{ typedef typename double_alignment<Target, cppmsboost::alignment_of<double>::value >= Target>::type type; };
 #endif
 
 template <std::size_t Target, bool check> struct long_alignment{ typedef long type; };
 #ifndef BOOST_NO_LONG_LONG
-template <std::size_t Target> struct long_alignment<Target, false>{ typedef typename long_long_alignment<Target, boost::alignment_of<boost::long_long_type>::value >= Target>::type type; };
+template <std::size_t Target> struct long_alignment<Target, false>{ typedef typename long_long_alignment<Target, cppmsboost::alignment_of<cppmsboost::long_long_type>::value >= Target>::type type; };
 #else
-template <std::size_t Target> struct long_alignment<Target, false>{ typedef typename double_alignment<Target, boost::alignment_of<double>::value >= Target>::type type; };
+template <std::size_t Target> struct long_alignment<Target, false>{ typedef typename double_alignment<Target, cppmsboost::alignment_of<double>::value >= Target>::type type; };
 #endif
 
 template <std::size_t Target, bool check> struct int_alignment{ typedef int type; };
-template <std::size_t Target> struct int_alignment<Target, false>{ typedef typename long_alignment<Target, boost::alignment_of<long>::value >= Target>::type type; };
+template <std::size_t Target> struct int_alignment<Target, false>{ typedef typename long_alignment<Target, cppmsboost::alignment_of<long>::value >= Target>::type type; };
 
 template <std::size_t Target, bool check> struct short_alignment{ typedef short type; };
-template <std::size_t Target> struct short_alignment<Target, false>{ typedef typename int_alignment<Target, boost::alignment_of<int>::value >= Target>::type type; };
+template <std::size_t Target> struct short_alignment<Target, false>{ typedef typename int_alignment<Target, cppmsboost::alignment_of<int>::value >= Target>::type type; };
 
 template <std::size_t Target, bool check> struct char_alignment{ typedef char type; };
-template <std::size_t Target> struct char_alignment<Target, false>{ typedef typename short_alignment<Target, boost::alignment_of<short>::value >= Target>::type type; };
+template <std::size_t Target> struct char_alignment<Target, false>{ typedef typename short_alignment<Target, cppmsboost::alignment_of<short>::value >= Target>::type type; };
 
 } // namespace detail
 
 template <std::size_t Align>
 struct type_with_alignment 
 {
-   typedef typename boost::detail::char_alignment<Align, boost::alignment_of<char>::value >= Align>::type type;
+   typedef typename cppmsboost::detail::char_alignment<Align, cppmsboost::alignment_of<char>::value >= Align>::type type;
 };
 
 #if (defined(__GNUC__) || (defined (__SUNPRO_CC) &&  (__SUNPRO_CC >= 0x5130)) || defined(__clang__)) && !defined(BOOST_TT_DISABLE_INTRINSICS)
@@ -103,13 +103,13 @@ template<> struct type_with_alignment<32> { public: typedef tt_align_ns::a32 typ
 template<> struct type_with_alignment<64> { public: typedef tt_align_ns::a64 type; };
 template<> struct type_with_alignment<128> { public: typedef tt_align_ns::a128 type; };
 
-template<> struct is_pod< ::boost::tt_align_ns::a2> : public true_type{};
-template<> struct is_pod< ::boost::tt_align_ns::a4> : public true_type{};
-template<> struct is_pod< ::boost::tt_align_ns::a8> : public true_type{};
-template<> struct is_pod< ::boost::tt_align_ns::a16> : public true_type{};
-template<> struct is_pod< ::boost::tt_align_ns::a32> : public true_type{};
-template<> struct is_pod< ::boost::tt_align_ns::a64> : public true_type{};
-template<> struct is_pod< ::boost::tt_align_ns::a128> : public true_type{};
+template<> struct is_pod< ::cppmsboost::tt_align_ns::a2> : public true_type{};
+template<> struct is_pod< ::cppmsboost::tt_align_ns::a4> : public true_type{};
+template<> struct is_pod< ::cppmsboost::tt_align_ns::a8> : public true_type{};
+template<> struct is_pod< ::cppmsboost::tt_align_ns::a16> : public true_type{};
+template<> struct is_pod< ::cppmsboost::tt_align_ns::a32> : public true_type{};
+template<> struct is_pod< ::cppmsboost::tt_align_ns::a64> : public true_type{};
+template<> struct is_pod< ::cppmsboost::tt_align_ns::a128> : public true_type{};
 
 #endif
 #if (defined(BOOST_MSVC) || (defined(BOOST_INTEL) && defined(_MSC_VER))) && !defined(BOOST_TT_DISABLE_INTRINSICS)
@@ -155,53 +155,53 @@ struct __declspec(align(128)) a128 {
 
 template<> struct type_with_alignment<8>  
 { 
-   typedef boost::conditional<
-      ::boost::alignment_of<boost::detail::max_align>::value < 8,
+   typedef cppmsboost::conditional<
+      ::cppmsboost::alignment_of<cppmsboost::detail::max_align>::value < 8,
       tt_align_ns::a8,
-      boost::detail::char_alignment<8, false> >::type t1;
+      cppmsboost::detail::char_alignment<8, false> >::type t1;
 public: 
    typedef t1::type type;
 };
 template<> struct type_with_alignment<16> 
 { 
-   typedef boost::conditional<
-      ::boost::alignment_of<boost::detail::max_align>::value < 16,
+   typedef cppmsboost::conditional<
+      ::cppmsboost::alignment_of<cppmsboost::detail::max_align>::value < 16,
       tt_align_ns::a16,
-      boost::detail::char_alignment<16, false> >::type t1;
+      cppmsboost::detail::char_alignment<16, false> >::type t1;
 public: 
    typedef t1::type type;
 };
 template<> struct type_with_alignment<32> 
 { 
-   typedef boost::conditional<
-      ::boost::alignment_of<boost::detail::max_align>::value < 32,
+   typedef cppmsboost::conditional<
+      ::cppmsboost::alignment_of<cppmsboost::detail::max_align>::value < 32,
       tt_align_ns::a32,
-      boost::detail::char_alignment<32, false> >::type t1;
+      cppmsboost::detail::char_alignment<32, false> >::type t1;
 public: 
    typedef t1::type type;
 };
 template<> struct type_with_alignment<64> {
-   typedef boost::conditional<
-      ::boost::alignment_of<boost::detail::max_align>::value < 64,
+   typedef cppmsboost::conditional<
+      ::cppmsboost::alignment_of<cppmsboost::detail::max_align>::value < 64,
       tt_align_ns::a64,
-      boost::detail::char_alignment<64, false> >::type t1;
+      cppmsboost::detail::char_alignment<64, false> >::type t1;
 public: 
    typedef t1::type type;
 };
 template<> struct type_with_alignment<128> {
-   typedef boost::conditional<
-      ::boost::alignment_of<boost::detail::max_align>::value < 128,
+   typedef cppmsboost::conditional<
+      ::cppmsboost::alignment_of<cppmsboost::detail::max_align>::value < 128,
       tt_align_ns::a128,
-      boost::detail::char_alignment<128, false> >::type t1;
+      cppmsboost::detail::char_alignment<128, false> >::type t1;
 public: 
    typedef t1::type type;
 };
 
-template<> struct is_pod< ::boost::tt_align_ns::a8> : public true_type{};
-template<> struct is_pod< ::boost::tt_align_ns::a16> : public true_type{};
-template<> struct is_pod< ::boost::tt_align_ns::a32> : public true_type{};
-template<> struct is_pod< ::boost::tt_align_ns::a64> : public true_type{};
-template<> struct is_pod< ::boost::tt_align_ns::a128> : public true_type{};
+template<> struct is_pod< ::cppmsboost::tt_align_ns::a8> : public true_type{};
+template<> struct is_pod< ::cppmsboost::tt_align_ns::a16> : public true_type{};
+template<> struct is_pod< ::cppmsboost::tt_align_ns::a32> : public true_type{};
+template<> struct is_pod< ::cppmsboost::tt_align_ns::a64> : public true_type{};
+template<> struct is_pod< ::cppmsboost::tt_align_ns::a128> : public true_type{};
 
 #endif
 
@@ -224,14 +224,14 @@ struct a16{ long double s; };
 
 namespace detail {
 
-typedef ::boost::tt_align_ns::a16 max_align;
+typedef ::cppmsboost::tt_align_ns::a16 max_align;
 
 }
 //#if ! BOOST_WORKAROUND(__CODEGEARC__, BOOST_TESTED_AT(0x610))
-template <> struct is_pod< ::boost::tt_align_ns::a2> : public true_type{};
-template <> struct is_pod< ::boost::tt_align_ns::a4> : public true_type{};
-template <> struct is_pod< ::boost::tt_align_ns::a8> : public true_type{};
-template <> struct is_pod< ::boost::tt_align_ns::a16> : public true_type{};
+template <> struct is_pod< ::cppmsboost::tt_align_ns::a2> : public true_type{};
+template <> struct is_pod< ::cppmsboost::tt_align_ns::a4> : public true_type{};
+template <> struct is_pod< ::cppmsboost::tt_align_ns::a8> : public true_type{};
+template <> struct is_pod< ::cppmsboost::tt_align_ns::a16> : public true_type{};
 //#endif
 
 template <std::size_t N> struct type_with_alignment
@@ -249,7 +249,7 @@ template <> struct type_with_alignment<16>{ typedef tt_align_ns::a16 type; };
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #   pragma warning(pop)

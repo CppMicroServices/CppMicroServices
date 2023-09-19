@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -35,7 +35,7 @@ struct prepared_buffers_max
 };
 
 template <typename Elem, std::size_t N>
-struct prepared_buffers_max<boost::array<Elem, N> >
+struct prepared_buffers_max<cppmsboost::array<Elem, N> >
 {
   enum { value = N };
 };
@@ -82,7 +82,7 @@ public:
       next_elem_(0),
       next_elem_offset_(0)
   {
-    using boost::asio::buffer_size;
+    using cppmsboost::asio::buffer_size;
     total_size_ = buffer_size(buffers);
   }
 
@@ -97,15 +97,15 @@ public:
   {
     prepared_buffers_type result;
 
-    Buffer_Iterator next = boost::asio::buffer_sequence_begin(buffers_);
-    Buffer_Iterator end = boost::asio::buffer_sequence_end(buffers_);
+    Buffer_Iterator next = cppmsboost::asio::buffer_sequence_begin(buffers_);
+    Buffer_Iterator end = cppmsboost::asio::buffer_sequence_end(buffers_);
 
     std::advance(next, next_elem_);
     std::size_t elem_offset = next_elem_offset_;
     while (next != end && max_size > 0 && (result.count) < result.max_buffers)
     {
       Buffer next_buf = Buffer(*next) + elem_offset;
-      result.elems[result.count] = boost::asio::buffer(next_buf, max_size);
+      result.elems[result.count] = cppmsboost::asio::buffer(next_buf, max_size);
       max_size -= result.elems[result.count].size();
       elem_offset = 0;
       if (result.elems[result.count].size() > 0)
@@ -121,8 +121,8 @@ public:
   {
     total_consumed_ += size;
 
-    Buffer_Iterator next = boost::asio::buffer_sequence_begin(buffers_);
-    Buffer_Iterator end = boost::asio::buffer_sequence_end(buffers_);
+    Buffer_Iterator next = cppmsboost::asio::buffer_sequence_begin(buffers_);
+    Buffer_Iterator end = cppmsboost::asio::buffer_sequence_end(buffers_);
 
     std::advance(next, next_elem_);
     while (next != end && size > 0)
@@ -179,7 +179,7 @@ public:
   // Get the buffer for a single transfer, with a size.
   Buffer prepare(std::size_t max_size)
   {
-    return boost::asio::buffer(buffer_ + total_consumed_, max_size);
+    return cppmsboost::asio::buffer(buffer_ + total_consumed_, max_size);
   }
 
   // Consume the specified number of bytes from the buffers.
@@ -271,12 +271,12 @@ public:
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
 
 template <typename Buffer, typename Elem>
-class consuming_buffers<Buffer, boost::array<Elem, 2>,
-    typename boost::array<Elem, 2>::const_iterator>
+class consuming_buffers<Buffer, cppmsboost::array<Elem, 2>,
+    typename cppmsboost::array<Elem, 2>::const_iterator>
 {
 public:
   // Construct to represent the entire list of buffers.
-  explicit consuming_buffers(const boost::array<Elem, 2>& buffers)
+  explicit consuming_buffers(const cppmsboost::array<Elem, 2>& buffers)
     : buffers_(buffers),
       total_consumed_(0)
   {
@@ -290,13 +290,13 @@ public:
   }
 
   // Get the buffer for a single transfer, with a size.
-  boost::array<Buffer, 2> prepare(std::size_t max_size)
+  cppmsboost::array<Buffer, 2> prepare(std::size_t max_size)
   {
-    boost::array<Buffer, 2> result = {{
+    cppmsboost::array<Buffer, 2> result = {{
       Buffer(buffers_[0]), Buffer(buffers_[1]) }};
     std::size_t buffer0_size = result[0].size();
-    result[0] = boost::asio::buffer(result[0] + total_consumed_, max_size);
-    result[1] = boost::asio::buffer(
+    result[0] = cppmsboost::asio::buffer(result[0] + total_consumed_, max_size);
+    result[1] = cppmsboost::asio::buffer(
         result[1] + (total_consumed_ < buffer0_size
           ? 0 : total_consumed_ - buffer0_size),
         max_size - result[0].size());
@@ -316,7 +316,7 @@ public:
   }
 
 private:
-  boost::array<Elem, 2> buffers_;
+  cppmsboost::array<Elem, 2> buffers_;
   std::size_t total_consumed_;
 };
 
@@ -347,8 +347,8 @@ public:
     std::array<Buffer, 2> result = {{
       Buffer(buffers_[0]), Buffer(buffers_[1]) }};
     std::size_t buffer0_size = result[0].size();
-    result[0] = boost::asio::buffer(result[0] + total_consumed_, max_size);
-    result[1] = boost::asio::buffer(
+    result[0] = cppmsboost::asio::buffer(result[0] + total_consumed_, max_size);
+    result[1] = cppmsboost::asio::buffer(
         result[1] + (total_consumed_ < buffer0_size
           ? 0 : total_consumed_ - buffer0_size),
         max_size - result[0].size());
@@ -378,7 +378,7 @@ private:
 // always passed through to the underlying read or write operation.
 template <typename Buffer>
 class consuming_buffers<Buffer, null_buffers, const mutable_buffer*>
-  : public boost::asio::null_buffers
+  : public cppmsboost::asio::null_buffers
 {
 public:
   consuming_buffers(const null_buffers&)
@@ -409,7 +409,7 @@ public:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

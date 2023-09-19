@@ -14,7 +14,7 @@
 
 //
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace system
@@ -27,11 +27,11 @@ class BOOST_SYMBOL_VISIBLE std_category: public std::error_category
 {
 private:
 
-    boost::system::error_category const * pc_;
+    cppmsboost::system::error_category const * pc_;
 
 public:
 
-    explicit std_category( boost::system::error_category const * pc, unsigned id ): pc_( pc )
+    explicit std_category( cppmsboost::system::error_category const * pc, unsigned id ): pc_( pc )
     {
         if( id != 0 )
         {
@@ -67,32 +67,32 @@ public:
 };
 
 #if !defined(__SUNPRO_CC) // trailing __global is not supported
-inline std::error_category const & to_std_category( boost::system::error_category const & cat ) BOOST_SYMBOL_VISIBLE;
+inline std::error_category const & to_std_category( cppmsboost::system::error_category const & cat ) BOOST_SYMBOL_VISIBLE;
 #endif
 
 struct cat_ptr_less
 {
-    bool operator()( boost::system::error_category const * p1, boost::system::error_category const * p2 ) const BOOST_NOEXCEPT
+    bool operator()( cppmsboost::system::error_category const * p1, cppmsboost::system::error_category const * p2 ) const BOOST_NOEXCEPT
     {
         return *p1 < *p2;
     }
 };
 
-inline std::error_category const & to_std_category( boost::system::error_category const & cat )
+inline std::error_category const & to_std_category( cppmsboost::system::error_category const & cat )
 {
-    if( cat == boost::system::system_category() )
+    if( cat == cppmsboost::system::system_category() )
     {
         static const std_category system_instance( &cat, 0x1F4D7 );
         return system_instance;
     }
-    else if( cat == boost::system::generic_category() )
+    else if( cat == cppmsboost::system::generic_category() )
     {
         static const std_category generic_instance( &cat, 0x1F4D3 );
         return generic_instance;
     }
     else
     {
-        typedef std::map< boost::system::error_category const *, std::unique_ptr<std_category>, cat_ptr_less > map_type;
+        typedef std::map< cppmsboost::system::error_category const *, std::unique_ptr<std_category>, cat_ptr_less > map_type;
 
         static map_type map_;
         static std::mutex map_mx_;
@@ -118,12 +118,12 @@ inline bool std_category::equivalent( int code, const std::error_condition & con
 {
     if( condition.category() == *this )
     {
-        boost::system::error_condition bn( condition.value(), *pc_ );
+        cppmsboost::system::error_condition bn( condition.value(), *pc_ );
         return pc_->equivalent( code, bn );
     }
-    else if( condition.category() == std::generic_category() || condition.category() == boost::system::generic_category() )
+    else if( condition.category() == std::generic_category() || condition.category() == cppmsboost::system::generic_category() )
     {
-        boost::system::error_condition bn( condition.value(), boost::system::generic_category() );
+        cppmsboost::system::error_condition bn( condition.value(), cppmsboost::system::generic_category() );
         return pc_->equivalent( code, bn );
     }
 
@@ -131,7 +131,7 @@ inline bool std_category::equivalent( int code, const std::error_condition & con
 
     else if( std_category const* pc2 = dynamic_cast< std_category const* >( &condition.category() ) )
     {
-        boost::system::error_condition bn( condition.value(), *pc2->pc_ );
+        cppmsboost::system::error_condition bn( condition.value(), *pc2->pc_ );
         return pc_->equivalent( code, bn );
     }
 
@@ -147,12 +147,12 @@ inline bool std_category::equivalent( const std::error_code & code, int conditio
 {
     if( code.category() == *this )
     {
-        boost::system::error_code bc( code.value(), *pc_ );
+        cppmsboost::system::error_code bc( code.value(), *pc_ );
         return pc_->equivalent( bc, condition );
     }
-    else if( code.category() == std::generic_category() || code.category() == boost::system::generic_category() )
+    else if( code.category() == std::generic_category() || code.category() == cppmsboost::system::generic_category() )
     {
-        boost::system::error_code bc( code.value(), boost::system::generic_category() );
+        cppmsboost::system::error_code bc( code.value(), cppmsboost::system::generic_category() );
         return pc_->equivalent( bc, condition );
     }
 
@@ -160,12 +160,12 @@ inline bool std_category::equivalent( const std::error_code & code, int conditio
 
     else if( std_category const* pc2 = dynamic_cast< std_category const* >( &code.category() ) )
     {
-        boost::system::error_code bc( code.value(), *pc2->pc_ );
+        cppmsboost::system::error_code bc( code.value(), *pc2->pc_ );
         return pc_->equivalent( bc, condition );
     }
 #endif
 
-    else if( *pc_ == boost::system::generic_category() )
+    else if( *pc_ == cppmsboost::system::generic_category() )
     {
         return std::generic_category().equivalent( code, condition );
     }
@@ -179,4 +179,4 @@ inline bool std_category::equivalent( const std::error_code & code, int conditio
 
 } // namespace system
 
-} // namespace boost
+} // namespace cppmsboost

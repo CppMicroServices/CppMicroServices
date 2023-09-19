@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace error {
 
@@ -31,11 +31,11 @@ enum ssl_errors
 };
 
 extern BOOST_ASIO_DECL
-const boost::system::error_category& get_ssl_category();
+const cppmsboost::system::error_category& get_ssl_category();
 
-static const boost::system::error_category&
+static const cppmsboost::system::error_category&
   ssl_category BOOST_ASIO_UNUSED_VARIABLE
-  = boost::asio::error::get_ssl_category();
+  = cppmsboost::asio::error::get_ssl_category();
 
 } // namespace error
 namespace ssl {
@@ -68,40 +68,40 @@ enum stream_errors
 };
 
 extern BOOST_ASIO_DECL
-const boost::system::error_category& get_stream_category();
+const cppmsboost::system::error_category& get_stream_category();
 
-static const boost::system::error_category&
+static const cppmsboost::system::error_category&
   stream_category BOOST_ASIO_UNUSED_VARIABLE
-  = boost::asio::ssl::error::get_stream_category();
+  = cppmsboost::asio::ssl::error::get_stream_category();
 
 } // namespace error
 } // namespace ssl
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
-namespace boost {
+namespace cppmsboost {
 namespace system {
 
-template<> struct is_error_code_enum<boost::asio::error::ssl_errors>
+template<> struct is_error_code_enum<cppmsboost::asio::error::ssl_errors>
 {
   static const bool value = true;
 };
 
-template<> struct is_error_code_enum<boost::asio::ssl::error::stream_errors>
+template<> struct is_error_code_enum<cppmsboost::asio::ssl::error::stream_errors>
 {
   static const bool value = true;
 };
 
 } // namespace system
-} // namespace boost
+} // namespace cppmsboost
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace error {
 
-inline boost::system::error_code make_error_code(ssl_errors e)
+inline cppmsboost::system::error_code make_error_code(ssl_errors e)
 {
-  return boost::system::error_code(
+  return cppmsboost::system::error_code(
       static_cast<int>(e), get_ssl_category());
 }
 
@@ -109,16 +109,16 @@ inline boost::system::error_code make_error_code(ssl_errors e)
 namespace ssl {
 namespace error {
 
-inline boost::system::error_code make_error_code(stream_errors e)
+inline cppmsboost::system::error_code make_error_code(stream_errors e)
 {
-  return boost::system::error_code(
+  return cppmsboost::system::error_code(
       static_cast<int>(e), get_stream_category());
 }
 
 } // namespace error
 } // namespace ssl
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -34,7 +34,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -107,8 +107,8 @@ public:
   BOOST_ASIO_DECL void destroy(implementation_type& impl);
 
   // Assign a native handle to a handle implementation.
-  BOOST_ASIO_DECL boost::system::error_code assign(implementation_type& impl,
-      const native_handle_type& handle, boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code assign(implementation_type& impl,
+      const native_handle_type& handle, cppmsboost::system::error_code& ec);
 
   // Determine whether the handle is open.
   bool is_open(const implementation_type& impl) const
@@ -117,8 +117,8 @@ public:
   }
 
   // Destroy a handle implementation.
-  BOOST_ASIO_DECL boost::system::error_code close(implementation_type& impl,
-      boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code close(implementation_type& impl,
+      cppmsboost::system::error_code& ec);
 
   // Get the native handle representation.
   native_handle_type native_handle(const implementation_type& impl) const
@@ -127,12 +127,12 @@ public:
   }
 
   // Cancel all operations associated with the handle.
-  BOOST_ASIO_DECL boost::system::error_code cancel(implementation_type& impl,
-      boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code cancel(implementation_type& impl,
+      cppmsboost::system::error_code& ec);
 
   // Perform a synchronous wait for the object to enter a signalled state.
   BOOST_ASIO_DECL void wait(implementation_type& impl,
-      boost::system::error_code& ec);
+      cppmsboost::system::error_code& ec);
 
   /// Start an asynchronous wait.
   template <typename Handler, typename IoExecutor>
@@ -141,7 +141,7 @@ public:
   {
     // Allocate and construct an operation to wrap the handler.
     typedef wait_handler<Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(handler, io_ex);
 
@@ -184,7 +184,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

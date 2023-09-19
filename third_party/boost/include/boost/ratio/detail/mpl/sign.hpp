@@ -29,7 +29,7 @@
 
 #endif
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 template< typename Tag > struct sign_impl;
 

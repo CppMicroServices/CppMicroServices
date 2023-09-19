@@ -19,7 +19,7 @@
 
 #include <boost/smart_ptr/detail/sp_interlocked.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -58,6 +58,6 @@ private:
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_SMART_PTR_DETAIL_ATOMIC_COUNT_WIN32_HPP_INCLUDED

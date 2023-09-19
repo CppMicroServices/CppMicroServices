@@ -27,7 +27,7 @@
 // Calls to asio_handler_allocate and asio_handler_deallocate must be made from
 // a namespace that does not contain any overloads of these functions. The
 // boost_asio_handler_alloc_helpers namespace is defined here for that purpose.
-namespace boost_asio_handler_alloc_helpers {
+namespace cppmsboost_asio_handler_alloc_helpers {
 
 template <typename Handler>
 inline void* allocate(std::size_t s, Handler& h)
@@ -35,8 +35,8 @@ inline void* allocate(std::size_t s, Handler& h)
 #if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
   return ::operator new(s);
 #else
-  using boost::asio::asio_handler_allocate;
-  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+  using cppmsboost::asio::asio_handler_allocate;
+  return asio_handler_allocate(s, cppmsboost::asio::detail::addressof(h));
 #endif
 }
 
@@ -46,14 +46,14 @@ inline void deallocate(void* p, std::size_t s, Handler& h)
 #if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
   ::operator delete(p);
 #else
-  using boost::asio::asio_handler_deallocate;
-  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+  using cppmsboost::asio::asio_handler_deallocate;
+  asio_handler_deallocate(p, s, cppmsboost::asio::detail::addressof(h));
 #endif
 }
 
-} // namespace boost_asio_handler_alloc_helpers
+} // namespace cppmsboost_asio_handler_alloc_helpers
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -83,12 +83,12 @@ public:
   T* allocate(std::size_t n)
   {
     return static_cast<T*>(
-        boost_asio_handler_alloc_helpers::allocate(sizeof(T) * n, handler_));
+        cppmsboost_asio_handler_alloc_helpers::allocate(sizeof(T) * n, handler_));
   }
 
   void deallocate(T* p, std::size_t n)
   {
-    boost_asio_handler_alloc_helpers::deallocate(p, sizeof(T) * n, handler_);
+    cppmsboost_asio_handler_alloc_helpers::deallocate(p, sizeof(T) * n, handler_);
   }
 
 //private:
@@ -146,7 +146,7 @@ struct get_hook_allocator<Handler, std::allocator<T> >
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #define BOOST_ASIO_DEFINE_HANDLER_PTR(op) \
   struct ptr \
@@ -160,14 +160,14 @@ struct get_hook_allocator<Handler, std::allocator<T> >
     } \
     static op* allocate(Handler& handler) \
     { \
-      typedef typename ::boost::asio::associated_allocator< \
+      typedef typename ::cppmsboost::asio::associated_allocator< \
         Handler>::type associated_allocator_type; \
-      typedef typename ::boost::asio::detail::get_hook_allocator< \
+      typedef typename ::cppmsboost::asio::detail::get_hook_allocator< \
         Handler, associated_allocator_type>::type hook_allocator_type; \
       BOOST_ASIO_REBIND_ALLOC(hook_allocator_type, op) a( \
-            ::boost::asio::detail::get_hook_allocator< \
+            ::cppmsboost::asio::detail::get_hook_allocator< \
               Handler, associated_allocator_type>::get( \
-                handler, ::boost::asio::get_associated_allocator(handler))); \
+                handler, ::cppmsboost::asio::get_associated_allocator(handler))); \
       return a.allocate(1); \
     } \
     void reset() \
@@ -179,14 +179,14 @@ struct get_hook_allocator<Handler, std::allocator<T> >
       } \
       if (v) \
       { \
-        typedef typename ::boost::asio::associated_allocator< \
+        typedef typename ::cppmsboost::asio::associated_allocator< \
           Handler>::type associated_allocator_type; \
-        typedef typename ::boost::asio::detail::get_hook_allocator< \
+        typedef typename ::cppmsboost::asio::detail::get_hook_allocator< \
           Handler, associated_allocator_type>::type hook_allocator_type; \
         BOOST_ASIO_REBIND_ALLOC(hook_allocator_type, op) a( \
-              ::boost::asio::detail::get_hook_allocator< \
+              ::cppmsboost::asio::detail::get_hook_allocator< \
                 Handler, associated_allocator_type>::get( \
-                  *h, ::boost::asio::get_associated_allocator(*h))); \
+                  *h, ::cppmsboost::asio::get_associated_allocator(*h))); \
         a.deallocate(static_cast<op*>(v), 1); \
         v = 0; \
       } \
@@ -206,10 +206,10 @@ struct get_hook_allocator<Handler, std::allocator<T> >
     } \
     static op* allocate(const Alloc& a) \
     { \
-      typedef typename ::boost::asio::detail::get_recycling_allocator< \
+      typedef typename ::cppmsboost::asio::detail::get_recycling_allocator< \
         Alloc, purpose>::type recycling_allocator_type; \
       BOOST_ASIO_REBIND_ALLOC(recycling_allocator_type, op) a1( \
-            ::boost::asio::detail::get_recycling_allocator< \
+            ::cppmsboost::asio::detail::get_recycling_allocator< \
               Alloc, purpose>::get(a)); \
       return a1.allocate(1); \
     } \
@@ -222,10 +222,10 @@ struct get_hook_allocator<Handler, std::allocator<T> >
       } \
       if (v) \
       { \
-        typedef typename ::boost::asio::detail::get_recycling_allocator< \
+        typedef typename ::cppmsboost::asio::detail::get_recycling_allocator< \
           Alloc, purpose>::type recycling_allocator_type; \
         BOOST_ASIO_REBIND_ALLOC(recycling_allocator_type, op) a1( \
-              ::boost::asio::detail::get_recycling_allocator< \
+              ::cppmsboost::asio::detail::get_recycling_allocator< \
                 Alloc, purpose>::get(*a)); \
         a1.deallocate(static_cast<op*>(v), 1); \
         v = 0; \
@@ -236,7 +236,7 @@ struct get_hook_allocator<Handler, std::allocator<T> >
 
 #define BOOST_ASIO_DEFINE_HANDLER_ALLOCATOR_PTR(op) \
   BOOST_ASIO_DEFINE_TAGGED_HANDLER_ALLOCATOR_PTR( \
-      ::boost::asio::detail::thread_info_base::default_tag, op ) \
+      ::cppmsboost::asio::detail::thread_info_base::default_tag, op ) \
   /**/
 
 #include <boost/asio/detail/pop_options.hpp>

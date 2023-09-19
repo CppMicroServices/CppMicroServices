@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// A simple fixed-size thread pool.
@@ -33,8 +33,8 @@ namespace asio {
  *
  * @par Submitting tasks to the pool
  *
- * To submit functions to the thread_pool, use the @ref boost::asio::dispatch,
- * @ref boost::asio::post or @ref boost::asio::defer free functions.
+ * To submit functions to the thread_pool, use the @ref cppmsboost::asio::dispatch,
+ * @ref cppmsboost::asio::post or @ref cppmsboost::asio::defer free functions.
  *
  * For example:
  *
@@ -46,13 +46,13 @@ namespace asio {
  * ...
  *
  * // Launch the pool with four threads.
- * boost::asio::thread_pool pool(4);
+ * cppmsboost::asio::thread_pool pool(4);
  *
  * // Submit a function to the pool.
- * boost::asio::post(pool, my_task);
+ * cppmsboost::asio::post(pool, my_task);
  *
  * // Submit a lambda object to the pool.
- * boost::asio::post(pool,
+ * cppmsboost::asio::post(pool,
  *     []()
  *     {
  *       ...
@@ -225,7 +225,7 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

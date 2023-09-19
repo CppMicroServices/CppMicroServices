@@ -28,7 +28,7 @@
  *
 */
 
-namespace boost {
+namespace cppmsboost {
 
 
 //
@@ -50,7 +50,7 @@ namespace boost {
    }
 
    template <class T> struct is_complete
-      : public integral_constant<bool, ::boost::is_function<typename boost::remove_reference<T>::type>::value || (sizeof(boost::detail::check_is_complete<T>(0)) != sizeof(char))> {};
+      : public integral_constant<bool, ::cppmsboost::is_function<typename cppmsboost::remove_reference<T>::type>::value || (sizeof(cppmsboost::detail::check_is_complete<T>(0)) != sizeof(char))> {};
 
 #elif !defined(BOOST_NO_SFINAE) && !defined(BOOST_NO_CXX11_FUNCTION_TEMPLATE_DEFAULT_ARGS) && !BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40500)
 
@@ -60,7 +60,7 @@ namespace boost {
       template <class T>
       struct is_complete_imp
       {
-         template <class U, class = decltype(sizeof(boost::declval< U >())) >
+         template <class U, class = decltype(sizeof(cppmsboost::declval< U >())) >
          static type_traits::yes_type check(U*);
 
          template <class U>
@@ -73,20 +73,20 @@ namespace boost {
 
 
    template <class T>
-   struct is_complete : boost::integral_constant<bool, ::boost::is_function<typename boost::remove_reference<T>::type>::value || ::boost::detail::is_complete_imp<T>::value>
+   struct is_complete : cppmsboost::integral_constant<bool, ::cppmsboost::is_function<typename cppmsboost::remove_reference<T>::type>::value || ::cppmsboost::detail::is_complete_imp<T>::value>
    {};
    template <class T>
-   struct is_complete<T&> : boost::is_complete<T> {};
+   struct is_complete<T&> : cppmsboost::is_complete<T> {};
    
 #else
 
       template <class T> struct is_complete
-         : public boost::integral_constant<bool, true> {};
+         : public cppmsboost::integral_constant<bool, true> {};
 
 #undef BOOST_TT_HAS_WORKING_IS_COMPLETE
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_IS_COMPLETE_HPP_INCLUDED

@@ -24,7 +24,7 @@
 #  include BOOST_ABI_PREFIX
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace coroutines {
 namespace detail {
 
@@ -65,7 +65,7 @@ public:
 
     symmetric_coroutine_yield & operator=( BOOST_RV_REF( symmetric_coroutine_yield) other) BOOST_NOEXCEPT
     {
-        symmetric_coroutine_yield tmp( boost::move( other) );
+        symmetric_coroutine_yield tmp( cppmsboost::move( other) );
         swap( tmp);
         return * this;
     }
@@ -116,7 +116,7 @@ public:
     R get() const
     {
         if ( 0 == result_)
-            boost::throw_exception(
+            cppmsboost::throw_exception(
                 invalid_result() );
 
         return * result_; 
@@ -160,7 +160,7 @@ public:
 
     symmetric_coroutine_yield & operator=( BOOST_RV_REF( symmetric_coroutine_yield) other) BOOST_NOEXCEPT
     {
-        symmetric_coroutine_yield tmp( boost::move( other) );
+        symmetric_coroutine_yield tmp( cppmsboost::move( other) );
         swap( tmp);
         return * this;
     }
@@ -211,7 +211,7 @@ public:
     R & get() const
     {
         if ( 0 == result_)
-            boost::throw_exception(
+            cppmsboost::throw_exception(
                 invalid_result() );
 
         return * result_; 
@@ -248,7 +248,7 @@ public:
 
     symmetric_coroutine_yield & operator=( BOOST_RV_REF( symmetric_coroutine_yield) other) BOOST_NOEXCEPT
     {
-        symmetric_coroutine_yield tmp( boost::move( other) );
+        symmetric_coroutine_yield tmp( cppmsboost::move( other) );
         swap( tmp);
         return * this;
     }

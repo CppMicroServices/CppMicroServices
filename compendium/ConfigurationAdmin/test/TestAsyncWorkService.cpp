@@ -176,7 +176,7 @@ namespace test
       public:
         AsyncWorkServiceThreadPool(int nThreads) : cppmicroservices::async::AsyncWorkService()
         {
-            threadpool = std::make_shared<boost::asio::thread_pool>(nThreads);
+            threadpool = std::make_shared<cppmsboost::asio::thread_pool>(nThreads);
         }
 
         ~AsyncWorkServiceThreadPool() override
@@ -205,17 +205,17 @@ namespace test
         post(std::packaged_task<void()>&& task) override
         {
             using Sig = void();
-            using Result = boost::asio::async_result<decltype(task), Sig>;
+            using Result = cppmsboost::asio::async_result<decltype(task), Sig>;
             using Handler = typename Result::completion_handler_type;
 
             Handler handler(std::forward<decltype(task)>(task));
             Result result(handler);
 
-            boost::asio::post(threadpool->get_executor(), [handler = std::move(handler)]() mutable { handler(); });
+            cppmsboost::asio::post(threadpool->get_executor(), [handler = std::move(handler)]() mutable { handler(); });
         }
 
       private:
-        std::shared_ptr<boost::asio::thread_pool> threadpool;
+        std::shared_ptr<cppmsboost::asio::thread_pool> threadpool;
     };
 
     TEST_F(tGenericDSAndCASuite, TestAsyncWorkServiceWithoutUserService)

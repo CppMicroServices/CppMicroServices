@@ -53,7 +53,7 @@ namespace std{
 #include <boost/archive/detail/auto_link_archive.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 /////////////////////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@ public:
     // d) use stream buffer
     // e) change locale back to original
     // f) destroy new codecvt facet
-    boost::archive::codecvt_null<Elem> codecvt_null_facet;
+    cppmsboost::archive::codecvt_null<Elem> codecvt_null_facet;
     basic_streambuf_locale_saver<Elem, Tr> locale_saver;
     std::locale archive_locale;
     #endif
@@ -131,16 +131,16 @@ public:
         template <class T>
         #if defined(BOOST_NO_DEPENDENT_NESTED_DERIVATIONS)
             struct apply {
-                typedef typename boost::serialization::is_bitwise_serializable< T >::type type;
+                typedef typename cppmsboost::serialization::is_bitwise_serializable< T >::type type;
             };
         #else
-            struct apply : public boost::serialization::is_bitwise_serializable< T > {};
+            struct apply : public cppmsboost::serialization::is_bitwise_serializable< T > {};
         #endif
     };
 
     // the optimized save_array dispatches to save_binary
     template <class ValueType>
-    void save_array(boost::serialization::array_wrapper<ValueType> const& a, unsigned int)
+    void save_array(cppmsboost::serialization::array_wrapper<ValueType> const& a, unsigned int)
     {
       save_binary(a.address(),a.count()*sizeof(ValueType));
     }
@@ -154,13 +154,13 @@ basic_binary_oprimitive<Archive, Elem, Tr>::save_binary(
     const void *address,
     std::size_t count
 ){
-    // BOOST_ASSERT(count <= std::size_t(boost::integer_traits<std::streamsize>::const_max));
+    // BOOST_ASSERT(count <= std::size_t(cppmsboost::integer_traits<std::streamsize>::const_max));
     // note: if the following assertions fail
     // a likely cause is that the output stream is set to "text"
     // mode where by cr characters recieve special treatment.
     // be sure that the output stream is opened with ios::binary
     //if(os.fail())
-    //    boost::serialization::throw_exception(
+    //    cppmsboost::serialization::throw_exception(
     //        archive_exception(archive_exception::output_stream_error)
     //    );
     // figure number of elements to output - round up
@@ -170,7 +170,7 @@ basic_binary_oprimitive<Archive, Elem, Tr>::save_binary(
         static_cast<std::streamsize>(count)
     );
     if(count != static_cast<std::size_t>(scount))
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(archive_exception::output_stream_error)
         );
     //os.write(
@@ -180,7 +180,7 @@ basic_binary_oprimitive<Archive, Elem, Tr>::save_binary(
     //BOOST_ASSERT(os.good());
 }
 
-} //namespace boost
+} //namespace cppmsboost
 } //namespace archive
 
 #include <boost/archive/detail/abi_suffix.hpp> // pop pragmas

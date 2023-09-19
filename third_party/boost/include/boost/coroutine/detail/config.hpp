@@ -28,7 +28,7 @@
 #endif
 
 #if ! defined(BOOST_COROUTINES_SOURCE) && ! defined(BOOST_ALL_NO_LIB) && ! defined(BOOST_COROUTINES_NO_LIB)
-# define BOOST_LIB_NAME boost_coroutine
+# define BOOST_LIB_NAME cppmsboost_coroutine
 # if defined(BOOST_ALL_DYN_LINK) || defined(BOOST_COROUTINES_DYN_LINK)
 #  define BOOST_DYN_LINK
 # endif

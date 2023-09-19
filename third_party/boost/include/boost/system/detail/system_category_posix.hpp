@@ -7,7 +7,7 @@
 //
 // See library home page at http://www.boost.org/libs/system
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace system
@@ -129,4 +129,4 @@ inline error_condition system_category_default_error_condition_posix( int ev ) B
 
 } // namespace system
 
-} // namespace boost
+} // namespace cppmsboost

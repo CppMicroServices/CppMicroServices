@@ -16,7 +16,7 @@ Distributed under the Boost Software License, Version 1.0.
 #define BOOST_CORE_NO_CXX11_ALLOCATOR
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 #if defined(BOOST_NO_EXCEPTIONS)
 BOOST_NORETURN void throw_exception(const std::exception&);
@@ -106,11 +106,11 @@ struct default_allocator {
 #else
     T* allocate(std::size_t n) {
         if (n > max_size()) {
-            boost::throw_exception(std::bad_alloc());
+            cppmsboost::throw_exception(std::bad_alloc());
         }
         void* p = ::operator new(sizeof(T) * n, std::nothrow);
         if (!p) {
-            boost::throw_exception(std::bad_alloc());
+            cppmsboost::throw_exception(std::bad_alloc());
         }
         return static_cast<T*>(p);
     }

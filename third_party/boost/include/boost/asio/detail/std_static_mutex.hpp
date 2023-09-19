@@ -25,7 +25,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -35,7 +35,7 @@ class std_static_mutex
   : private noncopyable
 {
 public:
-  typedef boost::asio::detail::scoped_lock<std_static_mutex> scoped_lock;
+  typedef cppmsboost::asio::detail::scoped_lock<std_static_mutex> scoped_lock;
 
   // Constructor.
   std_static_mutex(int)
@@ -74,7 +74,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

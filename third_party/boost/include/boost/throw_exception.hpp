@@ -29,7 +29,7 @@
 # define BOOST_EXCEPTION_DISABLE
 #endif
 
-namespace boost
+namespace cppmsboost
 {
 
 // All boost exceptions are required to derive from std::exception,
@@ -37,21 +37,21 @@ namespace boost
 
 inline void throw_exception_assert_compatibility( std::exception const & ) {}
 
-} // namespace boost
+} // namespace cppmsboost
 
 #if defined( BOOST_NO_EXCEPTIONS )
 
-namespace boost
+namespace cppmsboost
 {
 
 BOOST_NORETURN void throw_exception( std::exception const & e ); // user defined
-BOOST_NORETURN void throw_exception( std::exception const & e, boost::source_location const & loc ); // user defined
+BOOST_NORETURN void throw_exception( std::exception const & e, cppmsboost::source_location const & loc ); // user defined
 
-} // namespace boost
+} // namespace cppmsboost
 
 #elif defined( BOOST_EXCEPTION_DISABLE )
 
-namespace boost
+namespace cppmsboost
 {
 
 template<class E> BOOST_NORETURN void throw_exception( E const & e )
@@ -60,22 +60,22 @@ template<class E> BOOST_NORETURN void throw_exception( E const & e )
     throw e;
 }
 
-template<class E> BOOST_NORETURN void throw_exception( E const & e, boost::source_location const & )
+template<class E> BOOST_NORETURN void throw_exception( E const & e, cppmsboost::source_location const & )
 {
     throw_exception_assert_compatibility( e );
     throw e;
 }
 
-} // namespace boost
+} // namespace cppmsboost
 
 #else // !defined( BOOST_NO_EXCEPTIONS ) && !defined( BOOST_EXCEPTION_DISABLE )
 
 #include <boost/exception/exception.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
-// boost::wrapexcept<E>
+// cppmsboost::wrapexcept<E>
 
 namespace detail
 {
@@ -101,9 +101,9 @@ template<class E, class B> struct wrapexcept_add_base<E, B, 2>
 } // namespace detail
 
 template<class E> struct BOOST_SYMBOL_VISIBLE wrapexcept:
-    public detail::wrapexcept_add_base<E, boost::exception_detail::clone_base>::type,
+    public detail::wrapexcept_add_base<E, cppmsboost::exception_detail::clone_base>::type,
     public E,
-    public detail::wrapexcept_add_base<E, boost::exception>::type
+    public detail::wrapexcept_add_base<E, cppmsboost::exception>::type
 {
 private:
 
@@ -119,9 +119,9 @@ private:
     {
     }
 
-    void copy_from( boost::exception const* p )
+    void copy_from( cppmsboost::exception const* p )
     {
-        static_cast<boost::exception&>( *this ) = *p;
+        static_cast<cppmsboost::exception&>( *this ) = *p;
     }
 
 public:
@@ -131,7 +131,7 @@ public:
         copy_from( &e );
     }
 
-    explicit wrapexcept( E const & e, boost::source_location const & loc ): E( e )
+    explicit wrapexcept( E const & e, cppmsboost::source_location const & loc ): E( e )
     {
         copy_from( &e );
 
@@ -140,12 +140,12 @@ public:
         set_info( *this, throw_function( loc.function_name() ) );
     }
 
-    virtual boost::exception_detail::clone_base const * clone() const
+    virtual cppmsboost::exception_detail::clone_base const * clone() const
     {
         wrapexcept * p = new wrapexcept( *this );
         deleter del = { p };
 
-        boost::exception_detail::copy_boost_exception( p, this );
+        cppmsboost::exception_detail::copy_boost_exception( p, this );
 
         del.p_ = 0;
         return p;
@@ -157,7 +157,7 @@ public:
     }
 };
 
-// boost::throw_exception
+// cppmsboost::throw_exception
 
 template<class E> BOOST_NORETURN void throw_exception( E const & e )
 {
@@ -165,18 +165,18 @@ template<class E> BOOST_NORETURN void throw_exception( E const & e )
     throw wrapexcept<E>( e );
 }
 
-template<class E> BOOST_NORETURN void throw_exception( E const & e, boost::source_location const & loc )
+template<class E> BOOST_NORETURN void throw_exception( E const & e, cppmsboost::source_location const & loc )
 {
     throw_exception_assert_compatibility( e );
     throw wrapexcept<E>( e, loc );
 }
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif
 
 // BOOST_THROW_EXCEPTION
 
-#define BOOST_THROW_EXCEPTION(x) ::boost::throw_exception(x, BOOST_CURRENT_LOCATION)
+#define BOOST_THROW_EXCEPTION(x) ::cppmsboost::throw_exception(x, BOOST_CURRENT_LOCATION)
 
 #endif // #ifndef BOOST_THROW_EXCEPTION_HPP_INCLUDED

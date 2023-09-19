@@ -28,7 +28,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -47,7 +47,7 @@ public:
   }
 
   template <typename RedirectedHandler>
-  redirect_error_handler(boost::system::error_code& ec,
+  redirect_error_handler(cppmsboost::system::error_code& ec,
       BOOST_ASIO_MOVE_ARG(RedirectedHandler) h)
     : ec_(ec),
       handler_(BOOST_ASIO_MOVE_CAST(RedirectedHandler)(h))
@@ -63,7 +63,7 @@ public:
 
   template <typename Arg, typename... Args>
   typename enable_if<
-    !is_same<typename decay<Arg>::type, boost::system::error_code>::value
+    !is_same<typename decay<Arg>::type, cppmsboost::system::error_code>::value
   >::type
   operator()(BOOST_ASIO_MOVE_ARG(Arg) arg, BOOST_ASIO_MOVE_ARG(Args)... args)
   {
@@ -72,7 +72,7 @@ public:
   }
 
   template <typename... Args>
-  void operator()(const boost::system::error_code& ec,
+  void operator()(const cppmsboost::system::error_code& ec,
       BOOST_ASIO_MOVE_ARG(Args)... args)
   {
     ec_ = ec;
@@ -83,14 +83,14 @@ public:
 
   template <typename Arg>
   typename enable_if<
-    !is_same<typename decay<Arg>::type, boost::system::error_code>::value
+    !is_same<typename decay<Arg>::type, cppmsboost::system::error_code>::value
   >::type
   operator()(BOOST_ASIO_MOVE_ARG(Arg) arg)
   {
     handler_(BOOST_ASIO_MOVE_CAST(Arg)(arg));
   }
 
-  void operator()(const boost::system::error_code& ec)
+  void operator()(const cppmsboost::system::error_code& ec)
   {
     ec_ = ec;
     handler_();
@@ -99,7 +99,7 @@ public:
 #define BOOST_ASIO_PRIVATE_REDIRECT_ERROR_DEF(n) \
   template <typename Arg, BOOST_ASIO_VARIADIC_TPARAMS(n)> \
   typename enable_if< \
-    !is_same<typename decay<Arg>::type, boost::system::error_code>::value \
+    !is_same<typename decay<Arg>::type, cppmsboost::system::error_code>::value \
   >::type \
   operator()(BOOST_ASIO_MOVE_ARG(Arg) arg, BOOST_ASIO_VARIADIC_MOVE_PARAMS(n)) \
   { \
@@ -108,7 +108,7 @@ public:
   } \
   \
   template <BOOST_ASIO_VARIADIC_TPARAMS(n)> \
-  void operator()(const boost::system::error_code& ec, \
+  void operator()(const cppmsboost::system::error_code& ec, \
       BOOST_ASIO_VARIADIC_MOVE_PARAMS(n)) \
   { \
     ec_ = ec; \
@@ -121,7 +121,7 @@ public:
 #endif // defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
 
 //private:
-  boost::system::error_code& ec_;
+  cppmsboost::system::error_code& ec_;
   Handler handler_;
 };
 
@@ -129,7 +129,7 @@ template <typename Handler>
 inline void* asio_handler_allocate(std::size_t size,
     redirect_error_handler<Handler>* this_handler)
 {
-  return boost_asio_handler_alloc_helpers::allocate(
+  return cppmsboost_asio_handler_alloc_helpers::allocate(
       size, this_handler->handler_);
 }
 
@@ -137,7 +137,7 @@ template <typename Handler>
 inline void asio_handler_deallocate(void* pointer, std::size_t size,
     redirect_error_handler<Handler>* this_handler)
 {
-  boost_asio_handler_alloc_helpers::deallocate(
+  cppmsboost_asio_handler_alloc_helpers::deallocate(
       pointer, size, this_handler->handler_);
 }
 
@@ -145,7 +145,7 @@ template <typename Handler>
 inline bool asio_handler_is_continuation(
     redirect_error_handler<Handler>* this_handler)
 {
-  return boost_asio_handler_cont_helpers::is_continuation(
+  return cppmsboost_asio_handler_cont_helpers::is_continuation(
         this_handler->handler_);
 }
 
@@ -153,7 +153,7 @@ template <typename Function, typename Handler>
 inline void asio_handler_invoke(Function& function,
     redirect_error_handler<Handler>* this_handler)
 {
-  boost_asio_handler_invoke_helpers::invoke(
+  cppmsboost_asio_handler_invoke_helpers::invoke(
       function, this_handler->handler_);
 }
 
@@ -161,7 +161,7 @@ template <typename Function, typename Handler>
 inline void asio_handler_invoke(const Function& function,
     redirect_error_handler<Handler>* this_handler)
 {
-  boost_asio_handler_invoke_helpers::invoke(
+  cppmsboost_asio_handler_invoke_helpers::invoke(
       function, this_handler->handler_);
 }
 
@@ -174,13 +174,13 @@ struct redirect_error_signature
 #if defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
 
 template <typename R, typename... Args>
-struct redirect_error_signature<R(boost::system::error_code, Args...)>
+struct redirect_error_signature<R(cppmsboost::system::error_code, Args...)>
 {
   typedef R type(Args...);
 };
 
 template <typename R, typename... Args>
-struct redirect_error_signature<R(const boost::system::error_code&, Args...)>
+struct redirect_error_signature<R(const cppmsboost::system::error_code&, Args...)>
 {
   typedef R type(Args...);
 };
@@ -188,13 +188,13 @@ struct redirect_error_signature<R(const boost::system::error_code&, Args...)>
 #else // defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
 
 template <typename R>
-struct redirect_error_signature<R(boost::system::error_code)>
+struct redirect_error_signature<R(cppmsboost::system::error_code)>
 {
   typedef R type();
 };
 
 template <typename R>
-struct redirect_error_signature<R(const boost::system::error_code&)>
+struct redirect_error_signature<R(const cppmsboost::system::error_code&)>
 {
   typedef R type();
 };
@@ -202,14 +202,14 @@ struct redirect_error_signature<R(const boost::system::error_code&)>
 #define BOOST_ASIO_PRIVATE_REDIRECT_ERROR_DEF(n) \
   template <typename R, BOOST_ASIO_VARIADIC_TPARAMS(n)> \
   struct redirect_error_signature< \
-      R(boost::system::error_code, BOOST_ASIO_VARIADIC_TARGS(n))> \
+      R(cppmsboost::system::error_code, BOOST_ASIO_VARIADIC_TARGS(n))> \
   { \
     typedef R type(BOOST_ASIO_VARIADIC_TARGS(n)); \
   }; \
   \
   template <typename R, BOOST_ASIO_VARIADIC_TPARAMS(n)> \
   struct redirect_error_signature< \
-      R(const boost::system::error_code&, BOOST_ASIO_VARIADIC_TARGS(n))> \
+      R(const cppmsboost::system::error_code&, BOOST_ASIO_VARIADIC_TARGS(n))> \
   { \
     typedef R type(BOOST_ASIO_VARIADIC_TARGS(n)); \
   }; \
@@ -234,7 +234,7 @@ struct async_result<redirect_error_t<CompletionToken>, Signature>
   struct init_wrapper
   {
     template <typename Init>
-    init_wrapper(boost::system::error_code& ec, BOOST_ASIO_MOVE_ARG(Init) init)
+    init_wrapper(cppmsboost::system::error_code& ec, BOOST_ASIO_MOVE_ARG(Init) init)
       : ec_(ec),
         initiation_(BOOST_ASIO_MOVE_CAST(Init)(init))
     {
@@ -284,7 +284,7 @@ struct async_result<redirect_error_t<CompletionToken>, Signature>
 
 #endif // defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
 
-    boost::system::error_code& ec_;
+    cppmsboost::system::error_code& ec_;
     Initiation initiation_;
   };
 
@@ -367,7 +367,7 @@ struct associated_allocator<detail::redirect_error_handler<Handler>, Allocator>
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

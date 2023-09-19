@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 namespace detail {
@@ -118,11 +118,11 @@ private:
  * @par Example
  * Reading until a buffer is full:
  * @code
- * boost::array<char, 128> buf;
- * boost::system::error_code ec;
- * std::size_t n = boost::asio::read(
- *     sock, boost::asio::buffer(buf),
- *     boost::asio::transfer_all(), ec);
+ * cppmsboost::array<char, 128> buf;
+ * cppmsboost::system::error_code ec;
+ * std::size_t n = cppmsboost::asio::read(
+ *     sock, cppmsboost::asio::buffer(buf),
+ *     cppmsboost::asio::transfer_all(), ec);
  * if (ec)
  * {
  *   // An error occurred.
@@ -152,11 +152,11 @@ inline detail::transfer_all_t transfer_all()
  * @par Example
  * Reading until a buffer is full or contains at least 64 bytes:
  * @code
- * boost::array<char, 128> buf;
- * boost::system::error_code ec;
- * std::size_t n = boost::asio::read(
- *     sock, boost::asio::buffer(buf),
- *     boost::asio::transfer_at_least(64), ec);
+ * cppmsboost::array<char, 128> buf;
+ * cppmsboost::system::error_code ec;
+ * std::size_t n = cppmsboost::asio::read(
+ *     sock, cppmsboost::asio::buffer(buf),
+ *     cppmsboost::asio::transfer_at_least(64), ec);
  * if (ec)
  * {
  *   // An error occurred.
@@ -186,11 +186,11 @@ inline detail::transfer_at_least_t transfer_at_least(std::size_t minimum)
  * @par Example
  * Reading until a buffer is full or contains exactly 64 bytes:
  * @code
- * boost::array<char, 128> buf;
- * boost::system::error_code ec;
- * std::size_t n = boost::asio::read(
- *     sock, boost::asio::buffer(buf),
- *     boost::asio::transfer_exactly(64), ec);
+ * cppmsboost::array<char, 128> buf;
+ * cppmsboost::system::error_code ec;
+ * std::size_t n = cppmsboost::asio::read(
+ *     sock, cppmsboost::asio::buffer(buf),
+ *     cppmsboost::asio::transfer_exactly(64), ec);
  * if (ec)
  * {
  *   // An error occurred.
@@ -213,7 +213,7 @@ inline detail::transfer_exactly_t transfer_exactly(std::size_t size)
 /*@}*/
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

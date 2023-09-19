@@ -24,7 +24,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     class shared_mutex
     {
@@ -142,10 +142,10 @@ namespace boost
 
 
         state_data state;
-        boost::mutex state_change;
-        boost::condition_variable shared_cond;
-        boost::condition_variable exclusive_cond;
-        boost::condition_variable upgrade_cond;
+        cppmsboost::mutex state_change;
+        cppmsboost::condition_variable shared_cond;
+        cppmsboost::condition_variable exclusive_cond;
+        cppmsboost::condition_variable upgrade_cond;
 
         void release_waiters()
         {
@@ -168,16 +168,16 @@ namespace boost
         void lock_shared()
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-            boost::this_thread::disable_interruption do_not_disturb;
+            cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-            boost::unique_lock<boost::mutex> lk(state_change);
-            shared_cond.wait(lk, boost::bind(&state_data::can_lock_shared, boost::ref(state)));
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
+            shared_cond.wait(lk, cppmsboost::bind(&state_data::can_lock_shared, cppmsboost::ref(state)));
             state.lock_shared();
         }
 
         bool try_lock_shared()
         {
-            boost::unique_lock<boost::mutex> lk(state_change);
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
 
             if(!state.can_lock_shared())
             {
@@ -191,10 +191,10 @@ namespace boost
         bool timed_lock_shared(system_time const& timeout)
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-            boost::this_thread::disable_interruption do_not_disturb;
+            cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-            boost::unique_lock<boost::mutex> lk(state_change);
-            if(!shared_cond.timed_wait(lk, timeout, boost::bind(&state_data::can_lock_shared, boost::ref(state))))
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
+            if(!shared_cond.timed_wait(lk, timeout, cppmsboost::bind(&state_data::can_lock_shared, cppmsboost::ref(state))))
             {
                 return false;
             }
@@ -206,10 +206,10 @@ namespace boost
         bool timed_lock_shared(TimeDuration const & relative_time)
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-            boost::this_thread::disable_interruption do_not_disturb;
+            cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-            boost::unique_lock<boost::mutex> lk(state_change);
-            if(!shared_cond.timed_wait(lk, relative_time, boost::bind(&state_data::can_lock_shared, boost::ref(state))))
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
+            if(!shared_cond.timed_wait(lk, relative_time, cppmsboost::bind(&state_data::can_lock_shared, cppmsboost::ref(state))))
             {
                 return false;
             }
@@ -227,10 +227,10 @@ namespace boost
         bool try_lock_shared_until(const chrono::time_point<Clock, Duration>& abs_time)
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-          boost::this_thread::disable_interruption do_not_disturb;
+          cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-          boost::unique_lock<boost::mutex> lk(state_change);
-          if(!shared_cond.wait_until(lk, abs_time, boost::bind(&state_data::can_lock_shared, boost::ref(state))))
+          cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
+          if(!shared_cond.wait_until(lk, abs_time, cppmsboost::bind(&state_data::can_lock_shared, cppmsboost::ref(state))))
           {
               return false;
           }
@@ -240,7 +240,7 @@ namespace boost
 #endif
         void unlock_shared()
         {
-            boost::unique_lock<boost::mutex> lk(state_change);
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
             state.assert_lock_shared();
             state.unlock_shared();
             if (state.no_shared())
@@ -266,11 +266,11 @@ namespace boost
         void lock()
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-            boost::this_thread::disable_interruption do_not_disturb;
+            cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-            boost::unique_lock<boost::mutex> lk(state_change);
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
             state.exclusive_waiting_blocked=true;
-            exclusive_cond.wait(lk, boost::bind(&state_data::can_lock, boost::ref(state)));
+            exclusive_cond.wait(lk, cppmsboost::bind(&state_data::can_lock, cppmsboost::ref(state)));
             state.exclusive=true;
         }
 
@@ -278,11 +278,11 @@ namespace boost
         bool timed_lock(system_time const& timeout)
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-            boost::this_thread::disable_interruption do_not_disturb;
+            cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-            boost::unique_lock<boost::mutex> lk(state_change);
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
             state.exclusive_waiting_blocked=true;
-            if(!exclusive_cond.timed_wait(lk, timeout, boost::bind(&state_data::can_lock, boost::ref(state))))
+            if(!exclusive_cond.timed_wait(lk, timeout, cppmsboost::bind(&state_data::can_lock, cppmsboost::ref(state))))
             {
                 state.exclusive_waiting_blocked=false;
                 release_waiters();
@@ -296,11 +296,11 @@ namespace boost
         bool timed_lock(TimeDuration const & relative_time)
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-            boost::this_thread::disable_interruption do_not_disturb;
+            cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-            boost::unique_lock<boost::mutex> lk(state_change);
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
             state.exclusive_waiting_blocked=true;
-            if(!exclusive_cond.timed_wait(lk, relative_time, boost::bind(&state_data::can_lock, boost::ref(state))))
+            if(!exclusive_cond.timed_wait(lk, relative_time, cppmsboost::bind(&state_data::can_lock, cppmsboost::ref(state))))
             {
                 state.exclusive_waiting_blocked=false;
                 release_waiters();
@@ -320,11 +320,11 @@ namespace boost
         bool try_lock_until(const chrono::time_point<Clock, Duration>& abs_time)
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-          boost::this_thread::disable_interruption do_not_disturb;
+          cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-          boost::unique_lock<boost::mutex> lk(state_change);
+          cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
           state.exclusive_waiting_blocked=true;
-          if(!exclusive_cond.wait_until(lk, abs_time, boost::bind(&state_data::can_lock, boost::ref(state))))
+          if(!exclusive_cond.wait_until(lk, abs_time, cppmsboost::bind(&state_data::can_lock, cppmsboost::ref(state))))
           {
               state.exclusive_waiting_blocked=false;
               release_waiters();
@@ -337,7 +337,7 @@ namespace boost
 
         bool try_lock()
         {
-            boost::unique_lock<boost::mutex> lk(state_change);
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
             if(!state.can_lock())
             {
                 return false;
@@ -348,7 +348,7 @@ namespace boost
 
         void unlock()
         {
-            boost::unique_lock<boost::mutex> lk(state_change);
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
             state.assert_locked();
             state.exclusive=false;
             state.exclusive_waiting_blocked=false;
@@ -359,10 +359,10 @@ namespace boost
         void lock_upgrade()
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-            boost::this_thread::disable_interruption do_not_disturb;
+            cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-            boost::unique_lock<boost::mutex> lk(state_change);
-            shared_cond.wait(lk, boost::bind(&state_data::can_lock_upgrade, boost::ref(state)));
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
+            shared_cond.wait(lk, cppmsboost::bind(&state_data::can_lock_upgrade, cppmsboost::ref(state)));
             state.lock_shared();
             state.upgrade=true;
         }
@@ -371,10 +371,10 @@ namespace boost
         bool timed_lock_upgrade(system_time const& timeout)
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-            boost::this_thread::disable_interruption do_not_disturb;
+            cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-            boost::unique_lock<boost::mutex> lk(state_change);
-            if(!shared_cond.timed_wait(lk, timeout, boost::bind(&state_data::can_lock_upgrade, boost::ref(state))))
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
+            if(!shared_cond.timed_wait(lk, timeout, cppmsboost::bind(&state_data::can_lock_upgrade, cppmsboost::ref(state))))
             {
                 return false;
             }
@@ -387,10 +387,10 @@ namespace boost
         bool timed_lock_upgrade(TimeDuration const & relative_time)
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-            boost::this_thread::disable_interruption do_not_disturb;
+            cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-            boost::unique_lock<boost::mutex> lk(state_change);
-            if(!shared_cond.timed_wait(lk, relative_time, boost::bind(&state_data::can_lock_upgrade, boost::ref(state))))
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
+            if(!shared_cond.timed_wait(lk, relative_time, cppmsboost::bind(&state_data::can_lock_upgrade, cppmsboost::ref(state))))
             {
                 return false;
             }
@@ -409,10 +409,10 @@ namespace boost
         bool try_lock_upgrade_until(const chrono::time_point<Clock, Duration>& abs_time)
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-          boost::this_thread::disable_interruption do_not_disturb;
+          cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-          boost::unique_lock<boost::mutex> lk(state_change);
-          if(!shared_cond.wait_until(lk, abs_time, boost::bind(&state_data::can_lock_upgrade, boost::ref(state))))
+          cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
+          if(!shared_cond.wait_until(lk, abs_time, cppmsboost::bind(&state_data::can_lock_upgrade, cppmsboost::ref(state))))
           {
               return false;
           }
@@ -423,7 +423,7 @@ namespace boost
 #endif
         bool try_lock_upgrade()
         {
-            boost::unique_lock<boost::mutex> lk(state_change);
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
             if(!state.can_lock_upgrade())
             {
                 return false;
@@ -436,7 +436,7 @@ namespace boost
 
         void unlock_upgrade()
         {
-            boost::unique_lock<boost::mutex> lk(state_change);
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
             //state.upgrade=false;
             state.unlock_upgrade();
             if(state.no_shared())
@@ -452,12 +452,12 @@ namespace boost
         void unlock_upgrade_and_lock()
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-            boost::this_thread::disable_interruption do_not_disturb;
+            cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-            boost::unique_lock<boost::mutex> lk(state_change);
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
             state.assert_lock_upgraded();
             state.unlock_shared();
-            upgrade_cond.wait(lk, boost::bind(&state_data::no_shared, boost::ref(state)));
+            upgrade_cond.wait(lk, cppmsboost::bind(&state_data::no_shared, cppmsboost::ref(state)));
             state.upgrade=false;
             state.exclusive=true;
             state.assert_locked();
@@ -465,7 +465,7 @@ namespace boost
 
         void unlock_and_lock_upgrade()
         {
-            boost::unique_lock<boost::mutex> lk(state_change);
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
             state.assert_locked();
             state.exclusive=false;
             state.upgrade=true;
@@ -477,7 +477,7 @@ namespace boost
 
         bool try_unlock_upgrade_and_lock()
         {
-          boost::unique_lock<boost::mutex> lk(state_change);
+          cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
           state.assert_lock_upgraded();
           if(    !state.exclusive
               && !state.exclusive_waiting_blocked
@@ -507,11 +507,11 @@ namespace boost
                           const chrono::time_point<Clock, Duration>& abs_time)
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-          boost::this_thread::disable_interruption do_not_disturb;
+          cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-          boost::unique_lock<boost::mutex> lk(state_change);
+          cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
           state.assert_lock_upgraded();
-          if(!shared_cond.wait_until(lk, abs_time, boost::bind(&state_data::one_shared, boost::ref(state))))
+          if(!shared_cond.wait_until(lk, abs_time, cppmsboost::bind(&state_data::one_shared, cppmsboost::ref(state))))
           {
               return false;
           }
@@ -526,7 +526,7 @@ namespace boost
         // Shared <-> Exclusive
         void unlock_and_lock_shared()
         {
-            boost::unique_lock<boost::mutex> lk(state_change);
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
             state.assert_locked();
             state.exclusive=false;
             state.lock_shared();
@@ -537,7 +537,7 @@ namespace boost
 #ifdef BOOST_THREAD_PROVIDES_SHARED_MUTEX_UPWARDS_CONVERSIONS
         bool try_unlock_shared_and_lock()
         {
-          boost::unique_lock<boost::mutex> lk(state_change);
+          cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
           state.assert_lock_shared();
           if(    !state.exclusive
               && !state.exclusive_waiting_blocked
@@ -565,11 +565,11 @@ namespace boost
                           const chrono::time_point<Clock, Duration>& abs_time)
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-          boost::this_thread::disable_interruption do_not_disturb;
+          cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-          boost::unique_lock<boost::mutex> lk(state_change);
+          cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
           state.assert_lock_shared();
-          if(!shared_cond.wait_until(lk, abs_time, boost::bind(&state_data::one_shared, boost::ref(state))))
+          if(!shared_cond.wait_until(lk, abs_time, cppmsboost::bind(&state_data::one_shared, cppmsboost::ref(state))))
           {
               return false;
           }
@@ -585,7 +585,7 @@ namespace boost
         // Shared <-> Upgrade
         void unlock_upgrade_and_lock_shared()
         {
-            boost::unique_lock<boost::mutex> lk(state_change);
+            cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
             state.assert_lock_upgraded();
             state.upgrade=false;
             state.exclusive_waiting_blocked=false;
@@ -595,7 +595,7 @@ namespace boost
 #ifdef BOOST_THREAD_PROVIDES_SHARED_MUTEX_UPWARDS_CONVERSIONS
         bool try_unlock_shared_and_lock_upgrade()
         {
-          boost::unique_lock<boost::mutex> lk(state_change);
+          cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
           state.assert_lock_shared();
           if(state.can_lock_upgrade())
           {
@@ -619,11 +619,11 @@ namespace boost
                           const chrono::time_point<Clock, Duration>& abs_time)
         {
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-          boost::this_thread::disable_interruption do_not_disturb;
+          cppmsboost::this_thread::disable_interruption do_not_disturb;
 #endif
-          boost::unique_lock<boost::mutex> lk(state_change);
+          cppmsboost::unique_lock<cppmsboost::mutex> lk(state_change);
           state.assert_lock_shared();
-          if(!exclusive_cond.wait_until(lk, abs_time, boost::bind(&state_data::can_lock_upgrade, boost::ref(state))))
+          if(!exclusive_cond.wait_until(lk, abs_time, cppmsboost::bind(&state_data::can_lock_upgrade, cppmsboost::ref(state))))
           {
               return false;
           }

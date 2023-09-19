@@ -24,13 +24,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
 struct posix_static_mutex
 {
-  typedef boost::asio::detail::scoped_lock<posix_static_mutex> scoped_lock;
+  typedef cppmsboost::asio::detail::scoped_lock<posix_static_mutex> scoped_lock;
 
   // Initialise the mutex.
   void init()
@@ -57,7 +57,7 @@ struct posix_static_mutex
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

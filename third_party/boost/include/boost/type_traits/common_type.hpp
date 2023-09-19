@@ -26,7 +26,7 @@
 #include <boost/type_traits/detail/mp_defer.hpp>
 #endif
 
-namespace boost
+namespace cppmsboost
 {
 
 // variadic common_type
@@ -77,9 +77,9 @@ struct common_type: common_type<typename common_type<T1, T2>::type, T3, T4, T5, 
 
 // one argument
 
-template<class T> struct common_type<T>: boost::decay<T>
+template<class T> struct common_type<T>: cppmsboost::decay<T>
 {
-   BOOST_STATIC_ASSERT_MSG(::boost::is_complete<T>::value || ::boost::is_void<T>::value || ::boost::is_array<T>::value, "Arguments to common_type must both be complete types");
+   BOOST_STATIC_ASSERT_MSG(::cppmsboost::is_complete<T>::value || ::cppmsboost::is_void<T>::value || ::cppmsboost::is_array<T>::value, "Arguments to common_type must both be complete types");
 };
 
 // two arguments
@@ -97,7 +97,7 @@ namespace type_traits_detail
 
 // internal compiler error on msvc-12.0
 
-template<class T1, class T2> using builtin_common_type = typename boost::decay<decltype( boost::declval<bool>()? boost::declval<T1>(): boost::declval<T2>() )>::type;
+template<class T1, class T2> using builtin_common_type = typename cppmsboost::decay<decltype( cppmsboost::declval<bool>()? cppmsboost::declval<T1>(): cppmsboost::declval<T2>() )>::type;
 
 template<class T1, class T2> struct common_type_impl: mp_defer<builtin_common_type, T1, T2>
 {
@@ -105,13 +105,13 @@ template<class T1, class T2> struct common_type_impl: mp_defer<builtin_common_ty
 
 #else
 
-template<class T1, class T2> using builtin_common_type = decltype( boost::declval<bool>()? boost::declval<T1>(): boost::declval<T2>() );
+template<class T1, class T2> using builtin_common_type = decltype( cppmsboost::declval<bool>()? cppmsboost::declval<T1>(): cppmsboost::declval<T2>() );
 
 template<class T1, class T2> struct common_type_impl_2: mp_defer<builtin_common_type, T1, T2>
 {
 };
 
-template<class T1, class T2> using decay_common_type = typename boost::decay<typename common_type_impl_2<T1, T2>::type>::type;
+template<class T1, class T2> using decay_common_type = typename cppmsboost::decay<typename common_type_impl_2<T1, T2>::type>::type;
 
 template<class T1, class T2> struct common_type_impl: mp_defer<decay_common_type, T1, T2>
 {
@@ -121,7 +121,7 @@ template<class T1, class T2> struct common_type_impl: mp_defer<decay_common_type
 
 #else
 
-template<class T1, class T2> struct common_type_impl: boost::decay<decltype( boost::declval<bool>()? boost::declval<T1>(): boost::declval<T2>() )>
+template<class T1, class T2> struct common_type_impl: cppmsboost::decay<decltype( cppmsboost::declval<bool>()? cppmsboost::declval<T1>(): cppmsboost::declval<T2>() )>
 {
 };
 
@@ -131,7 +131,7 @@ template<class T1, class T2> struct common_type_impl: boost::decay<decltype( boo
 
 // decay helper
 
-template<class T1, class T2, class T1d = typename boost::decay<T1>::type, class T2d = typename boost::decay<T2>::type> struct common_type_decay_helper: boost::common_type<T1d, T2d>
+template<class T1, class T2, class T1d = typename cppmsboost::decay<T1>::type, class T2d = typename cppmsboost::decay<T2>::type> struct common_type_decay_helper: cppmsboost::common_type<T1d, T2d>
 {
 };
 
@@ -143,10 +143,10 @@ template<class T1, class T2> struct common_type_decay_helper<T1, T2, T1, T2>: co
 
 template<class T1, class T2> struct common_type<T1, T2>: type_traits_detail::common_type_decay_helper<T1, T2>
 {
-   BOOST_STATIC_ASSERT_MSG(::boost::is_complete<T1>::value || ::boost::is_void<T1>::value || ::boost::is_array<T1>::value, "Arguments to common_type must both be complete types");
-   BOOST_STATIC_ASSERT_MSG(::boost::is_complete<T2>::value || ::boost::is_void<T2>::value || ::boost::is_array<T2>::value, "Arguments to common_type must both be complete types");
+   BOOST_STATIC_ASSERT_MSG(::cppmsboost::is_complete<T1>::value || ::cppmsboost::is_void<T1>::value || ::cppmsboost::is_array<T1>::value, "Arguments to common_type must both be complete types");
+   BOOST_STATIC_ASSERT_MSG(::cppmsboost::is_complete<T2>::value || ::cppmsboost::is_void<T2>::value || ::cppmsboost::is_array<T2>::value, "Arguments to common_type must both be complete types");
 };
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_TYPE_TRAITS_COMMON_TYPE_HPP_INCLUDED

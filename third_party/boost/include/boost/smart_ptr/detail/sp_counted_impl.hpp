@@ -39,7 +39,7 @@
 
 #include <cstddef>          // std::size_t
 
-namespace boost
+namespace cppmsboost
 {
 
 #if defined(BOOST_SP_ENABLE_DEBUG_HOOKS)
@@ -81,16 +81,16 @@ public:
     explicit sp_counted_impl_p( X * px ): px_( px )
     {
 #if defined(BOOST_SP_ENABLE_DEBUG_HOOKS)
-        boost::sp_scalar_constructor_hook( px, sizeof(X), this );
+        cppmsboost::sp_scalar_constructor_hook( px, sizeof(X), this );
 #endif
     }
 
     virtual void dispose() BOOST_SP_NOEXCEPT
     {
 #if defined(BOOST_SP_ENABLE_DEBUG_HOOKS)
-        boost::sp_scalar_destructor_hook( px_, sizeof(X), this );
+        cppmsboost::sp_scalar_destructor_hook( px_, sizeof(X), this );
 #endif
-        boost::checked_delete( px_ );
+        cppmsboost::checked_delete( px_ );
     }
 
     virtual void * get_deleter( sp_typeinfo_ const & ) BOOST_SP_NOEXCEPT
@@ -180,7 +180,7 @@ public:
 
     virtual void * get_local_deleter( sp_typeinfo_ const & ti ) BOOST_SP_NOEXCEPT
     {
-        return ti == BOOST_SP_TYPEID_(D)? boost::detail::get_local_deleter( boost::addressof( del ) ): 0;
+        return ti == BOOST_SP_TYPEID_(D)? cppmsboost::detail::get_local_deleter( cppmsboost::addressof( del ) ): 0;
     }
 
     virtual void * get_untyped_deleter() BOOST_SP_NOEXCEPT
@@ -273,7 +273,7 @@ public:
 
     virtual void * get_local_deleter( sp_typeinfo_ const & ti ) BOOST_SP_NOEXCEPT
     {
-        return ti == BOOST_SP_TYPEID_( D )? boost::detail::get_local_deleter( boost::addressof( d_ ) ): 0;
+        return ti == BOOST_SP_TYPEID_( D )? cppmsboost::detail::get_local_deleter( cppmsboost::addressof( d_ ) ): 0;
     }
 
     virtual void * get_untyped_deleter() BOOST_SP_NOEXCEPT
@@ -288,6 +288,6 @@ public:
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // #ifndef BOOST_SMART_PTR_DETAIL_SP_COUNTED_IMPL_HPP_INCLUDED

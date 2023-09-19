@@ -28,13 +28,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
 /// Encapsulates the flags needed for TCP.
 /**
- * The boost::asio::ip::tcp class contains flags necessary for TCP sockets.
+ * The cppmsboost::asio::ip::tcp class contains flags necessary for TCP sockets.
  *
  * @par Thread Safety
  * @e Distinct @e objects: Safe.@n
@@ -100,18 +100,18 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * boost::asio::ip::tcp::socket socket(my_context);
+   * cppmsboost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * boost::asio::ip::tcp::no_delay option(true);
+   * cppmsboost::asio::ip::tcp::no_delay option(true);
    * socket.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * boost::asio::ip::tcp::socket socket(my_context);
+   * cppmsboost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * boost::asio::ip::tcp::no_delay option;
+   * cppmsboost::asio::ip::tcp::no_delay option;
    * socket.get_option(option);
    * bool is_set = option.value();
    * @endcode
@@ -122,7 +122,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined no_delay;
 #else
-  typedef boost::asio::detail::socket_option::boolean<
+  typedef cppmsboost::asio::detail::socket_option::boolean<
     BOOST_ASIO_OS_DEF(IPPROTO_TCP), BOOST_ASIO_OS_DEF(TCP_NODELAY)> no_delay;
 #endif
 
@@ -150,7 +150,7 @@ private:
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

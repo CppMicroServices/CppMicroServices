@@ -30,7 +30,7 @@
 #include <boost/iterator/detail/config_def.hpp>
 
 
-namespace boost {
+namespace cppmsboost {
 namespace iterators {
 
   template <class UnaryFunction, class Iterator, class Reference = use_default, class Value = use_default>
@@ -77,10 +77,10 @@ namespace iterators {
 
   template <class UnaryFunc, class Iterator, class Reference, class Value>
   class transform_iterator
-    : public boost::iterators::detail::transform_iterator_base<UnaryFunc, Iterator, Reference, Value>::type
+    : public cppmsboost::iterators::detail::transform_iterator_base<UnaryFunc, Iterator, Reference, Value>::type
   {
     typedef typename
-    boost::iterators::detail::transform_iterator_base<UnaryFunc, Iterator, Reference, Value>::type
+    cppmsboost::iterators::detail::transform_iterator_base<UnaryFunc, Iterator, Reference, Value>::type
     super_t;
 
     friend class iterator_core_access;
@@ -168,7 +168,7 @@ namespace iterators {
 using iterators::transform_iterator;
 using iterators::make_transform_iterator;
 
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/iterator/detail/config_undef.hpp>
 

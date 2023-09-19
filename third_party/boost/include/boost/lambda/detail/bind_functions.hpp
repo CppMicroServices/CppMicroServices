@@ -14,7 +14,7 @@
 #define BOOST_LAMBDA_BIND_FUNCTIONS_HPP
 
 
-namespace boost { 
+namespace cppmsboost { 
 namespace lambda {
 
 #ifdef BOOST_LAMBDA_INCORRECT_BIND_OVERLOADING
@@ -27,9 +27,9 @@ namespace detail {
 
 template<class T> struct constify_non_funcs {
   typedef typename 
-  detail::IF_type<boost::is_function<T>::value,
-    boost::add_reference<T>,
-    boost::add_const<T>
+  detail::IF_type<cppmsboost::is_function<T>::value,
+    cppmsboost::add_reference<T>,
+    cppmsboost::add_const<T>
   >::type type;
 };
 
@@ -1874,6 +1874,6 @@ bind(Result(* const & a1)(Par1, Par2, Par3, Par4, Par5, Par6, Par7, Par8,
  #endif 
 
 } // namespace lambda 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif

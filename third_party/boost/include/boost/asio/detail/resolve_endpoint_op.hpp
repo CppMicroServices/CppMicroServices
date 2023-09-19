@@ -34,7 +34,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -45,7 +45,7 @@ public:
   BOOST_ASIO_DEFINE_HANDLER_PTR(resolve_endpoint_op);
 
   typedef typename Protocol::endpoint endpoint_type;
-  typedef boost::asio::ip::basic_resolver_results<Protocol> results_type;
+  typedef cppmsboost::asio::ip::basic_resolver_results<Protocol> results_type;
 
 #if defined(BOOST_ASIO_HAS_IOCP)
   typedef class win_iocp_io_context scheduler_impl;
@@ -67,12 +67,12 @@ public:
   }
 
   static void do_complete(void* owner, operation* base,
-      const boost::system::error_code& /*ec*/,
+      const cppmsboost::system::error_code& /*ec*/,
       std::size_t /*bytes_transferred*/)
   {
     // Take ownership of the operation object.
     resolve_endpoint_op* o(static_cast<resolve_endpoint_op*>(base));
-    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+    ptr p = { cppmsboost::asio::detail::addressof(o->handler_), o, o };
 
     if (owner && owner != &o->scheduler_)
     {
@@ -107,9 +107,9 @@ public:
       // associated with the handler. Consequently, a local copy of the handler
       // is required to ensure that any owning sub-object remains valid until
       // after we have deallocated the memory here.
-      detail::binder2<Handler, boost::system::error_code, results_type>
+      detail::binder2<Handler, cppmsboost::system::error_code, results_type>
         handler(o->handler_, o->ec_, o->results_);
-      p.h = boost::asio::detail::addressof(handler.handler_);
+      p.h = cppmsboost::asio::detail::addressof(handler.handler_);
       p.reset();
 
       if (owner)
@@ -133,7 +133,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

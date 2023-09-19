@@ -18,7 +18,7 @@
 #  pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 namespace dtl {
 
@@ -32,6 +32,6 @@ const T &min_value(const T &a, const T &b)
 
 }  //namespace dtl {
 }  //namespace container {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif   //#ifndef BOOST_CONTAINER_DETAIL_MIN_MAX_HPP

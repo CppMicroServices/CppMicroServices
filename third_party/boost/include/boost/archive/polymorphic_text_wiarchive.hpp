@@ -29,7 +29,7 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 class BOOST_SYMBOL_VISIBLE polymorphic_text_wiarchive :
@@ -43,7 +43,7 @@ public:
 };
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)
@@ -51,7 +51,7 @@ public:
 
 // required by export
 BOOST_SERIALIZATION_REGISTER_ARCHIVE(
-    boost::archive::polymorphic_text_wiarchive
+    cppmsboost::archive::polymorphic_text_wiarchive
 )
 
 #endif // BOOST_NO_STD_WSTREAMBUF

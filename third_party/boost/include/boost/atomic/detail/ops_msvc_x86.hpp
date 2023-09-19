@@ -50,7 +50,7 @@ extern "C" void _mm_mfence(void);
 #endif
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -141,7 +141,7 @@ struct msvc_x86_operations :
 
     static BOOST_FORCEINLINE storage_type fetch_sub(storage_type volatile& storage, storage_type v, memory_order order) BOOST_NOEXCEPT
     {
-        typedef typename boost::atomics::detail::make_signed< storage_type >::type signed_storage_type;
+        typedef typename cppmsboost::atomics::detail::make_signed< storage_type >::type signed_storage_type;
         return Derived::fetch_add(storage, static_cast< storage_type >(-static_cast< signed_storage_type >(v)), order);
     }
 
@@ -899,7 +899,7 @@ BOOST_FORCEINLINE void signal_fence(memory_order order) BOOST_NOEXCEPT
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #if defined(BOOST_MSVC)
 #pragma warning(pop)

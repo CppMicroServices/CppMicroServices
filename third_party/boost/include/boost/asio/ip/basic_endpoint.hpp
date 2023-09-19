@@ -25,13 +25,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
 /// Describes an endpoint for a version-independent IP socket.
 /**
- * The boost::asio::ip::basic_endpoint class template describes an endpoint that
+ * The cppmsboost::asio::ip::basic_endpoint class template describes an endpoint that
  * may be associated with a particular socket.
  *
  * @par Thread Safety
@@ -53,7 +53,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined data_type;
 #else
-  typedef boost::asio::detail::socket_addr_type data_type;
+  typedef cppmsboost::asio::detail::socket_addr_type data_type;
 #endif
 
   /// Default constructor.
@@ -70,12 +70,12 @@ public:
    * @par Examples
    * To initialise an IPv4 TCP endpoint for port 1234, use:
    * @code
-   * boost::asio::ip::tcp::endpoint ep(boost::asio::ip::tcp::v4(), 1234);
+   * cppmsboost::asio::ip::tcp::endpoint ep(cppmsboost::asio::ip::tcp::v4(), 1234);
    * @endcode
    *
    * To specify an IPv6 UDP endpoint for port 9876, use:
    * @code
-   * boost::asio::ip::udp::endpoint ep(boost::asio::ip::udp::v6(), 9876);
+   * cppmsboost::asio::ip::udp::endpoint ep(cppmsboost::asio::ip::udp::v6(), 9876);
    * @endcode
    */
   basic_endpoint(const InternetProtocol& internet_protocol,
@@ -87,7 +87,7 @@ public:
   /// Construct an endpoint using a port number and an IP address. This
   /// constructor may be used for accepting connections on a specific interface
   /// or for making a connection to a remote endpoint.
-  basic_endpoint(const boost::asio::ip::address& addr,
+  basic_endpoint(const cppmsboost::asio::ip::address& addr,
       unsigned short port_num) BOOST_ASIO_NOEXCEPT
     : impl_(addr, port_num)
   {
@@ -176,13 +176,13 @@ public:
   }
 
   /// Get the IP address associated with the endpoint.
-  boost::asio::ip::address address() const BOOST_ASIO_NOEXCEPT
+  cppmsboost::asio::ip::address address() const BOOST_ASIO_NOEXCEPT
   {
     return impl_.address();
   }
 
   /// Set the IP address associated with the endpoint.
-  void address(const boost::asio::ip::address& addr) BOOST_ASIO_NOEXCEPT
+  void address(const cppmsboost::asio::ip::address& addr) BOOST_ASIO_NOEXCEPT
   {
     impl_.address(addr);
   }
@@ -231,7 +231,7 @@ public:
 
 private:
   // The underlying IP endpoint.
-  boost::asio::ip::detail::endpoint impl_;
+  cppmsboost::asio::ip::detail::endpoint impl_;
 };
 
 #if !defined(BOOST_ASIO_NO_IOSTREAM)
@@ -246,7 +246,7 @@ private:
  *
  * @return The output stream.
  *
- * @relates boost::asio::ip::basic_endpoint
+ * @relates cppmsboost::asio::ip::basic_endpoint
  */
 template <typename Elem, typename Traits, typename InternetProtocol>
 std::basic_ostream<Elem, Traits>& operator<<(
@@ -257,7 +257,7 @@ std::basic_ostream<Elem, Traits>& operator<<(
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

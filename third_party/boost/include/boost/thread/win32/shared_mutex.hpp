@@ -24,7 +24,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     class shared_mutex
     {
@@ -97,14 +97,14 @@ namespace boost
             if (!semaphores[exclusive_sem])
             {
               detail::win32::release_semaphore(semaphores[unlock_sem],LONG_MAX);
-              boost::throw_exception(thread_resource_error());
+              cppmsboost::throw_exception(thread_resource_error());
             }
             upgrade_sem=detail::win32::create_anonymous_semaphore_nothrow(0,LONG_MAX);
             if (!upgrade_sem)
             {
               detail::win32::release_semaphore(semaphores[unlock_sem],LONG_MAX);
               detail::win32::release_semaphore(semaphores[exclusive_sem],LONG_MAX);
-              boost::throw_exception(thread_resource_error());
+              cppmsboost::throw_exception(thread_resource_error());
             }
             state_data state_={0,0,0,0,0,0};
             state=state_;
@@ -155,7 +155,7 @@ namespace boost
                         ++new_state.shared_waiting;
                         if(!new_state.shared_waiting)
                         {
-                            boost::throw_exception(boost::lock_error());
+                            cppmsboost::throw_exception(cppmsboost::lock_error());
                         }
                     }
                     else
@@ -163,7 +163,7 @@ namespace boost
                         ++new_state.shared_count;
                         if(!new_state.shared_count)
                         {
-                            boost::throw_exception(boost::lock_error());
+                            cppmsboost::throw_exception(cppmsboost::lock_error());
                         }
                     }
 
@@ -180,7 +180,7 @@ namespace boost
                     return;
                 }
 
-                BOOST_VERIFY(winapi::WaitForSingleObjectEx(semaphores[unlock_sem],::boost::detail::win32::infinite,0)==0);
+                BOOST_VERIFY(winapi::WaitForSingleObjectEx(semaphores[unlock_sem],::cppmsboost::detail::win32::infinite,0)==0);
             }
         }
 
@@ -210,7 +210,7 @@ namespace boost
                         ++new_state.shared_waiting;
                         if(!new_state.shared_waiting)
                         {
-                            boost::throw_exception(boost::lock_error());
+                            cppmsboost::throw_exception(cppmsboost::lock_error());
                         }
                     }
                     else
@@ -218,7 +218,7 @@ namespace boost
                         ++new_state.shared_count;
                         if(!new_state.shared_count)
                         {
-                            boost::throw_exception(boost::lock_error());
+                            cppmsboost::throw_exception(cppmsboost::lock_error());
                         }
                     }
 
@@ -308,7 +308,7 @@ namespace boost
             // The reference clock is steady and so no need to poll periodically, thus 0 ms max (i.e. no max)
             return do_lock_shared_until<detail::mono_platform_clock>(t, detail::platform_duration::zero());
         }
-        bool timed_lock_shared(boost::system_time const& wait_until)
+        bool timed_lock_shared(cppmsboost::system_time const& wait_until)
         {
             const detail::real_platform_timepoint t(wait_until);
             return do_lock_shared_until<detail::real_platform_clock>(t, detail::platform_milliseconds(BOOST_THREAD_POLL_INTERVAL_MILLISECONDS));
@@ -424,7 +424,7 @@ namespace boost
                         ++new_state.exclusive_waiting;
                         if(!new_state.exclusive_waiting)
                         {
-                            boost::throw_exception(boost::lock_error());
+                            cppmsboost::throw_exception(cppmsboost::lock_error());
                         }
 
                         new_state.exclusive_waiting_blocked=true;
@@ -452,7 +452,7 @@ namespace boost
                 #else
                 const bool wait_all = false;
                 #endif
-                BOOST_VERIFY(winapi::WaitForMultipleObjectsEx(2,semaphores,wait_all,::boost::detail::win32::infinite,0)<2);
+                BOOST_VERIFY(winapi::WaitForMultipleObjectsEx(2,semaphores,wait_all,::cppmsboost::detail::win32::infinite,0)<2);
             }
         }
 
@@ -471,7 +471,7 @@ namespace boost
                         ++new_state.exclusive_waiting;
                         if(!new_state.exclusive_waiting)
                         {
-                            boost::throw_exception(boost::lock_error());
+                            cppmsboost::throw_exception(cppmsboost::lock_error());
                         }
 
                         new_state.exclusive_waiting_blocked=true;
@@ -571,7 +571,7 @@ namespace boost
     public:
 
 #if defined BOOST_THREAD_USES_DATETIME
-        bool timed_lock(boost::system_time const& wait_until)
+        bool timed_lock(cppmsboost::system_time const& wait_until)
         {
             const detail::real_platform_timepoint t(wait_until);
             return do_lock_until<detail::real_platform_clock>(t, detail::platform_milliseconds(BOOST_THREAD_POLL_INTERVAL_MILLISECONDS));
@@ -646,7 +646,7 @@ namespace boost
                         ++new_state.shared_waiting;
                         if(!new_state.shared_waiting)
                         {
-                            boost::throw_exception(boost::lock_error());
+                            cppmsboost::throw_exception(cppmsboost::lock_error());
                         }
                     }
                     else
@@ -654,7 +654,7 @@ namespace boost
                         ++new_state.shared_count;
                         if(!new_state.shared_count)
                         {
-                            boost::throw_exception(boost::lock_error());
+                            cppmsboost::throw_exception(cppmsboost::lock_error());
                         }
                         new_state.upgrade=true;
                     }

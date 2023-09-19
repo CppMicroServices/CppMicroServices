@@ -21,14 +21,14 @@
 #include <boost/type_traits/is_complete.hpp>
 #include <boost/static_assert.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 #ifdef BOOST_IS_NOTHROW_MOVE_ASSIGN
 
 template <class T>
 struct is_nothrow_move_assignable : public integral_constant<bool, BOOST_IS_NOTHROW_MOVE_ASSIGN(T)>
 {
-   BOOST_STATIC_ASSERT_MSG(boost::is_complete<T>::value, "Arguments to is_nothrow_move_assignable must be complete types");
+   BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<T>::value, "Arguments to is_nothrow_move_assignable must be complete types");
 };
 template <class T> struct is_nothrow_move_assignable<T const> : public false_type{};
 template <class T> struct is_nothrow_move_assignable<T volatile> : public false_type{};
@@ -43,38 +43,38 @@ template <class T> struct is_nothrow_move_assignable<T&&> : public false_type{};
 namespace detail{
 
 template <class T, class Enable = void>
-struct false_or_cpp11_noexcept_move_assignable: public ::boost::false_type {};
+struct false_or_cpp11_noexcept_move_assignable: public ::cppmsboost::false_type {};
 
 template <class T>
 struct false_or_cpp11_noexcept_move_assignable <
         T,
-        typename ::boost::enable_if_<sizeof(T) && BOOST_NOEXCEPT_EXPR(::boost::declval<T&>() = ::boost::declval<T>())>::type
-    > : public ::boost::integral_constant<bool, BOOST_NOEXCEPT_EXPR(::boost::declval<T&>() = ::boost::declval<T>())>
+        typename ::cppmsboost::enable_if_<sizeof(T) && BOOST_NOEXCEPT_EXPR(::cppmsboost::declval<T&>() = ::cppmsboost::declval<T>())>::type
+    > : public ::cppmsboost::integral_constant<bool, BOOST_NOEXCEPT_EXPR(::cppmsboost::declval<T&>() = ::cppmsboost::declval<T>())>
 {};
 
 }
 
 template <class T>
-struct is_nothrow_move_assignable : public integral_constant<bool, ::boost::detail::false_or_cpp11_noexcept_move_assignable<T>::value>
+struct is_nothrow_move_assignable : public integral_constant<bool, ::cppmsboost::detail::false_or_cpp11_noexcept_move_assignable<T>::value>
 {
-   BOOST_STATIC_ASSERT_MSG(boost::is_complete<T>::value, "Arguments to is_nothrow_move_assignable must be complete types");
+   BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<T>::value, "Arguments to is_nothrow_move_assignable must be complete types");
 };
 
-template <class T> struct is_nothrow_move_assignable<T const> : public ::boost::false_type {};
-template <class T> struct is_nothrow_move_assignable<T const volatile> : public ::boost::false_type{};
-template <class T> struct is_nothrow_move_assignable<T volatile> : public ::boost::false_type{};
-template <class T> struct is_nothrow_move_assignable<T&> : public ::boost::false_type{};
+template <class T> struct is_nothrow_move_assignable<T const> : public ::cppmsboost::false_type {};
+template <class T> struct is_nothrow_move_assignable<T const volatile> : public ::cppmsboost::false_type{};
+template <class T> struct is_nothrow_move_assignable<T volatile> : public ::cppmsboost::false_type{};
+template <class T> struct is_nothrow_move_assignable<T&> : public ::cppmsboost::false_type{};
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-template <class T> struct is_nothrow_move_assignable<T&&> : public ::boost::false_type{};
+template <class T> struct is_nothrow_move_assignable<T&&> : public ::cppmsboost::false_type{};
 #endif
 
 #else
 
 template <class T>
 struct is_nothrow_move_assignable : public integral_constant<bool,
-   (::boost::has_trivial_move_assign<T>::value || ::boost::has_nothrow_assign<T>::value) &&  ! ::boost::is_array<T>::value>
+   (::cppmsboost::has_trivial_move_assign<T>::value || ::cppmsboost::has_nothrow_assign<T>::value) &&  ! ::cppmsboost::is_array<T>::value>
 {
-   BOOST_STATIC_ASSERT_MSG(boost::is_complete<T>::value, "Arguments to is_nothrow_move_assignable must be complete types");
+   BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<T>::value, "Arguments to is_nothrow_move_assignable must be complete types");
 };
 
 #endif
@@ -87,6 +87,6 @@ template <> struct is_nothrow_move_assignable<void const volatile> : public fals
 template <> struct is_nothrow_move_assignable<void volatile> : public false_type{};
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_IS_NOTHROW_MOVE_ASSIGNABLE_HPP_INCLUDED

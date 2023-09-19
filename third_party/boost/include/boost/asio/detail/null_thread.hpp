@@ -25,7 +25,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -37,8 +37,8 @@ public:
   template <typename Function>
   null_thread(Function, unsigned int = 0)
   {
-    boost::asio::detail::throw_error(
-        boost::asio::error::operation_not_supported, "thread");
+    cppmsboost::asio::detail::throw_error(
+        cppmsboost::asio::error::operation_not_supported, "thread");
   }
 
   // Destructor.
@@ -60,7 +60,7 @@ public:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

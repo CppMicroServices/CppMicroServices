@@ -24,22 +24,22 @@
 
 // Boost type traits:
 #include <boost/math/tools/config.hpp>
-#include <boost/type_traits/is_floating_point.hpp> // for boost::is_floating_point;
-#include <boost/type_traits/is_integral.hpp> // for boost::is_integral
-#include <boost/type_traits/is_convertible.hpp> // for boost::is_convertible
-#include <boost/type_traits/is_same.hpp>// for boost::is_same
-#include <boost/type_traits/remove_cv.hpp>// for boost::remove_cv
+#include <boost/type_traits/is_floating_point.hpp> // for cppmsboost::is_floating_point;
+#include <boost/type_traits/is_integral.hpp> // for cppmsboost::is_integral
+#include <boost/type_traits/is_convertible.hpp> // for cppmsboost::is_convertible
+#include <boost/type_traits/is_same.hpp>// for cppmsboost::is_same
+#include <boost/type_traits/remove_cv.hpp>// for cppmsboost::remove_cv
 // Boost Template meta programming:
-#include <boost/mpl/if.hpp> // for boost::mpl::if_c.
-#include <boost/mpl/and.hpp> // for boost::mpl::if_c.
-#include <boost/mpl/or.hpp> // for boost::mpl::if_c.
-#include <boost/mpl/not.hpp> // for boost::mpl::if_c.
+#include <boost/mpl/if.hpp> // for cppmsboost::mpl::if_c.
+#include <boost/mpl/and.hpp> // for cppmsboost::mpl::if_c.
+#include <boost/mpl/or.hpp> // for cppmsboost::mpl::if_c.
+#include <boost/mpl/not.hpp> // for cppmsboost::mpl::if_c.
 
 #ifdef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
 #include <boost/static_assert.hpp>
 #endif
 
-namespace boost
+namespace cppmsboost
 {
   namespace math
   {
@@ -101,7 +101,7 @@ namespace boost
 #endif
              >::type,
           // else one or the other is a user-defined type:
-          typename mpl::if_c<!is_floating_point<T2P>::value && ::boost::is_convertible<T1P, T2P>::value, T2P, T1P>::type>::type type;
+          typename mpl::if_c<!is_floating_point<T2P>::value && ::cppmsboost::is_convertible<T1P, T2P>::value, T2P, T1P>::type>::type type;
       }; // promote_arg2
       // These full specialisations reduce mpl::if_ usage and speed up
       // compilation:
@@ -145,7 +145,7 @@ namespace boost
          //
          // Guard against use of long double if it's not supported:
          //
-         BOOST_STATIC_ASSERT_MSG((0 == ::boost::is_same<type, long double>::value), "Sorry, but this platform does not have sufficient long double support for the special functions to be reliably implemented.");
+         BOOST_STATIC_ASSERT_MSG((0 == ::cppmsboost::is_same<type, long double>::value), "Sorry, but this platform does not have sufficient long double support for the special functions to be reliably implemented.");
 #endif
       };
 
@@ -176,7 +176,7 @@ namespace boost
 
     } // namespace tools
   } // namespace math
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_MATH_PROMOTION_HPP
 

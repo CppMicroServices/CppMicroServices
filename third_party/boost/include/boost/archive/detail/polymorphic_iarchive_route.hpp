@@ -32,7 +32,7 @@ namespace std{
 #include <boost/archive/polymorphic_iarchive.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
     class extended_type_info;
 } // namespace serialization
@@ -66,7 +66,7 @@ private:
         void * & t,
         const basic_pointer_iserializer * bpis_ptr,
         const basic_pointer_iserializer * (*finder)(
-            const boost::serialization::extended_type_info & type
+            const cppmsboost::serialization::extended_type_info & type
         )
     ){
         return ArchiveImplementation::load_pointer(t, bpis_ptr, finder);
@@ -131,10 +131,10 @@ private:
         ArchiveImplementation::load(t);
     }
     #if defined(BOOST_HAS_LONG_LONG)
-    virtual void load(boost::long_long_type & t){
+    virtual void load(cppmsboost::long_long_type & t){
         ArchiveImplementation::load(t);
     }
-    virtual void load(boost::ulong_long_type & t){
+    virtual void load(cppmsboost::ulong_long_type & t){
         ArchiveImplementation::load(t);
     }
     #elif defined(BOOST_HAS_MS_INT64)
@@ -207,7 +207,7 @@ public:
 
 } // namespace detail
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

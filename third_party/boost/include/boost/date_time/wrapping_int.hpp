@@ -11,7 +11,7 @@
 
 #include "boost/config.hpp"
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
 //! A wrapping integer used to support time durations (WARNING: only instantiate with a signed type)

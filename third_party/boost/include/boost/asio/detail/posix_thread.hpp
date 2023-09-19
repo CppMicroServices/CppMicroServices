@@ -25,13 +25,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
 extern "C"
 {
-  BOOST_ASIO_DECL void* boost_asio_detail_posix_thread_function(void* arg);
+  BOOST_ASIO_DECL void* cppmsboost_asio_detail_posix_thread_function(void* arg);
 }
 
 class posix_thread
@@ -56,7 +56,7 @@ public:
   BOOST_ASIO_DECL static std::size_t hardware_concurrency();
 
 private:
-  friend void* boost_asio_detail_posix_thread_function(void* arg);
+  friend void* cppmsboost_asio_detail_posix_thread_function(void* arg);
 
   class func_base
   {
@@ -98,7 +98,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

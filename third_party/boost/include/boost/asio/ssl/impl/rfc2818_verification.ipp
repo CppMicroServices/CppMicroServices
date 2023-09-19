@@ -27,7 +27,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ssl {
 
@@ -47,7 +47,7 @@ bool rfc2818_verification::operator()(
 
   // Try converting the host name to an address. If it is an address then we
   // need to look for an IP address in the certificate rather than a host name.
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   ip::address address = ip::make_address(host_, ec);
   bool is_address = !ec;
 
@@ -157,7 +157,7 @@ bool rfc2818_verification::match_pattern(const char* pattern,
 
 } // namespace ssl
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

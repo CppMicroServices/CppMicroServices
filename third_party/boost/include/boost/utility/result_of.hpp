@@ -56,7 +56,7 @@
 #  endif
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 template<typename F> struct result_of;
 template<typename F> struct tr1_result_of; // a TR1-style implementation of result_of
@@ -74,7 +74,7 @@ template<class T> struct result_of_has_result_type_impl
     template<class U> static result_of_yes_type f( result_of_has_type<typename U::result_type>* );
     template<class U> static result_of_no_type f( ... );
 
-    typedef boost::integral_constant<bool, sizeof(f<T>(0)) == sizeof(result_of_yes_type)> type;
+    typedef cppmsboost::integral_constant<bool, sizeof(f<T>(0)) == sizeof(result_of_yes_type)> type;
 };
 
 template<class T> struct result_of_has_result_type: result_of_has_result_type_impl<T>::type
@@ -91,7 +91,7 @@ template<class T> struct result_of_has_result_impl
     template<class U> static result_of_yes_type f( result_of_has_template<U::template result>* );
     template<class U> static result_of_no_type f( ... );
 
-    typedef boost::integral_constant<bool, sizeof(f<T>(0)) == sizeof(result_of_yes_type)> type;
+    typedef cppmsboost::integral_constant<bool, sizeof(f<T>(0)) == sizeof(result_of_yes_type)> type;
 };
 
 template<class T> struct result_of_has_result: result_of_has_result_impl<T>::type

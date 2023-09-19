@@ -26,7 +26,7 @@
 #include <boost/container/detail/type_traits.hpp>
 #include <cstddef>   //std::size_t
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 namespace dtl {
 
@@ -49,7 +49,7 @@ class tuple<Head, Tail...>
 
    template<class U, class ...Args>
    tuple(U &&u, Args && ...args)
-      : inherited(::boost::forward<Args>(args)...), m_head(::boost::forward<U>(u))
+      : inherited(::cppmsboost::forward<Args>(args)...), m_head(::cppmsboost::forward<U>(u))
    {}
 
    // Construct tuple from another tuple.
@@ -79,7 +79,7 @@ class tuple<Head, Tail...>
 
 template<typename... Values>
 tuple<Values&&...> forward_as_tuple_impl(Values&&... values)
-{ return tuple<Values&&...>(::boost::forward<Values>(values)...); }
+{ return tuple<Values&&...>(::cppmsboost::forward<Values>(values)...); }
 
 template<int I, typename Tuple>
 struct tuple_element;
@@ -156,7 +156,7 @@ struct build_number_seq
 template<> struct build_number_seq<0> : index_tuple<>{};
 template<> struct build_number_seq<1> : index_tuple<0>{};
 
-}}}   //namespace boost { namespace container { namespace dtl {
+}}}   //namespace cppmsboost { namespace container { namespace dtl {
 
 #include <boost/container/detail/config_end.hpp>
 

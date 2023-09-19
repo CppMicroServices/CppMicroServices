@@ -14,7 +14,7 @@
 #include <boost/spirit/home/classic/core/scanner/scanner.hpp>
 #include <boost/spirit/home/classic/core/nil.hpp>
 
-namespace boost { namespace spirit {
+namespace cppmsboost { namespace spirit {
 
 BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 
@@ -59,7 +59,7 @@ BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
     template <typename ParserT, typename ScannerT>
     struct parser_result
     {
-        typedef typename boost::remove_reference<ParserT>::type parser_type;
+        typedef typename cppmsboost::remove_reference<ParserT>::type parser_type;
         typedef typename parser_type::template result<ScannerT>::type type;
     };
 

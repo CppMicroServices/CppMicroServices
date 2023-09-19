@@ -25,16 +25,16 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
 win_mutex::win_mutex()
 {
   int error = do_init();
-  boost::system::error_code ec(error,
-      boost::asio::error::get_system_category());
-  boost::asio::detail::throw_error(ec, "mutex");
+  cppmsboost::system::error_code ec(error,
+      cppmsboost::asio::error::get_system_category());
+  cppmsboost::asio::detail::throw_error(ec, "mutex");
 }
 
 int win_mutex::do_init()
@@ -77,7 +77,7 @@ int win_mutex::do_init()
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

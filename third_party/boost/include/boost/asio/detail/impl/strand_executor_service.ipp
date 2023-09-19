@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -36,7 +36,7 @@ void strand_executor_service::shutdown()
 {
   op_queue<scheduler_operation> ops;
 
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
 
   strand_impl* impl = impl_list_;
   while (impl)
@@ -57,7 +57,7 @@ strand_executor_service::create_implementation()
   new_impl->locked_ = false;
   new_impl->shutdown_ = false;
 
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
 
   // Select a mutex from the pool of shared mutexes.
   std::size_t salt = salt_++;
@@ -82,7 +82,7 @@ strand_executor_service::create_implementation()
 
 strand_executor_service::strand_impl::~strand_impl()
 {
-  boost::asio::detail::mutex::scoped_lock lock(service_->mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(service_->mutex_);
 
   // Remove implementation from linked list of all implementations.
   if (service_->impl_list_ == this)
@@ -129,7 +129,7 @@ bool strand_executor_service::running_in_this_thread(
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

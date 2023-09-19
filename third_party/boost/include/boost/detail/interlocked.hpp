@@ -220,7 +220,7 @@ extern "C" void* BOOST_INTERLOCKED_CLRCALL_PURE_OR_CDECL _InterlockedExchangePoi
 
 #define BOOST_INTERLOCKED_IMPORT __declspec(dllimport)
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -239,24 +239,24 @@ extern "C" BOOST_INTERLOCKED_IMPORT void* __stdcall InterlockedExchangePointer( 
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 # define BOOST_INTERLOCKED_INCREMENT(dest) \
-    ::boost::detail::InterlockedIncrement((BOOST_INTERLOCKED_LONG32*)(dest))
+    ::cppmsboost::detail::InterlockedIncrement((BOOST_INTERLOCKED_LONG32*)(dest))
 # define BOOST_INTERLOCKED_DECREMENT(dest) \
-    ::boost::detail::InterlockedDecrement((BOOST_INTERLOCKED_LONG32*)(dest))
+    ::cppmsboost::detail::InterlockedDecrement((BOOST_INTERLOCKED_LONG32*)(dest))
 # define BOOST_INTERLOCKED_COMPARE_EXCHANGE(dest, exchange, compare) \
-    ::boost::detail::InterlockedCompareExchange((BOOST_INTERLOCKED_LONG32*)(dest), (BOOST_INTERLOCKED_LONG32)(exchange), (BOOST_INTERLOCKED_LONG32)(compare))
+    ::cppmsboost::detail::InterlockedCompareExchange((BOOST_INTERLOCKED_LONG32*)(dest), (BOOST_INTERLOCKED_LONG32)(exchange), (BOOST_INTERLOCKED_LONG32)(compare))
 # define BOOST_INTERLOCKED_EXCHANGE(dest, exchange) \
-    ::boost::detail::InterlockedExchange((BOOST_INTERLOCKED_LONG32*)(dest), (BOOST_INTERLOCKED_LONG32)(exchange))
+    ::cppmsboost::detail::InterlockedExchange((BOOST_INTERLOCKED_LONG32*)(dest), (BOOST_INTERLOCKED_LONG32)(exchange))
 # define BOOST_INTERLOCKED_EXCHANGE_ADD(dest, add) \
-    ::boost::detail::InterlockedExchangeAdd((BOOST_INTERLOCKED_LONG32*)(dest), (BOOST_INTERLOCKED_LONG32)(add))
+    ::cppmsboost::detail::InterlockedExchangeAdd((BOOST_INTERLOCKED_LONG32*)(dest), (BOOST_INTERLOCKED_LONG32)(add))
 
 # if defined(_M_IA64) || defined(_M_AMD64) || defined(_M_ARM64)
 #  define BOOST_INTERLOCKED_COMPARE_EXCHANGE_POINTER(dest, exchange, compare) \
-     ::boost::detail::InterlockedCompareExchangePointer((void**)(dest), (void*)(exchange), (void*)(compare))
+     ::cppmsboost::detail::InterlockedCompareExchangePointer((void**)(dest), (void*)(exchange), (void*)(compare))
 #  define BOOST_INTERLOCKED_EXCHANGE_POINTER(dest, exchange) \
-     ::boost::detail::InterlockedExchangePointer((void**)(dest), (void*)(exchange))
+     ::cppmsboost::detail::InterlockedExchangePointer((void**)(dest), (void*)(exchange))
 # else
 #  define BOOST_INTERLOCKED_COMPARE_EXCHANGE_POINTER(dest, exchange, compare) \
     ((void*)BOOST_INTERLOCKED_COMPARE_EXCHANGE((BOOST_INTERLOCKED_LONG32 volatile*)(dest),(BOOST_INTERLOCKED_LONG32)(exchange),(BOOST_INTERLOCKED_LONG32)(compare)))

@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 #if defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES) \
@@ -49,12 +49,12 @@ namespace asio {
  * @code struct async_echo_implementation
  * {
  *   tcp::socket& socket_;
- *   boost::asio::mutable_buffer buffer_;
+ *   cppmsboost::asio::mutable_buffer buffer_;
  *   enum { starting, reading, writing } state_;
  *
  *   template <typename Self>
  *   void operator()(Self& self,
- *       boost::system::error_code error = {},
+ *       cppmsboost::system::error_code error = {},
  *       std::size_t n = 0)
  *   {
  *     switch (state_)
@@ -72,8 +72,8 @@ namespace asio {
  *       else
  *       {
  *         state_ = writing;
- *         boost::asio::async_write(socket_, buffer_,
- *             boost::asio::transfer_exactly(n),
+ *         cppmsboost::asio::async_write(socket_, buffer_,
+ *             cppmsboost::asio::transfer_exactly(n),
  *             std::move(self));
  *       }
  *       break;
@@ -86,14 +86,14 @@ namespace asio {
  *
  * template <typename CompletionToken>
  * auto async_echo(tcp::socket& socket,
- *     boost::asio::mutable_buffer buffer,
+ *     cppmsboost::asio::mutable_buffer buffer,
  *     CompletionToken&& token) ->
- *   typename boost::asio::async_result<
+ *   typename cppmsboost::asio::async_result<
  *     typename std::decay<CompletionToken>::type,
- *       void(boost::system::error_code, std::size_t)>::return_type
+ *       void(cppmsboost::system::error_code, std::size_t)>::return_type
  * {
- *   return boost::asio::async_compose<CompletionToken,
- *     void(boost::system::error_code, std::size_t)>(
+ *   return cppmsboost::asio::async_compose<CompletionToken,
+ *     void(cppmsboost::system::error_code, std::size_t)>(
  *       async_echo_implementation{socket, buffer,
  *         async_echo_implementation::starting},
  *       token, socket);
@@ -129,7 +129,7 @@ async_compose(BOOST_ASIO_MOVE_ARG(Implementation) implementation,
        //   || defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -18,7 +18,7 @@
 #include <boost/move/detail/destruct_n.hpp>
 #include <boost/assert.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace movelib {
 
 template<class Comp>
@@ -96,6 +96,6 @@ class inverse
 };
 
 }  //namespace movelib {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif   //#define BOOST_MOVE_ALGO_PREDICATE_HPP

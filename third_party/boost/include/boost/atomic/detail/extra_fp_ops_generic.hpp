@@ -33,7 +33,7 @@
 #pragma GCC diagnostic ignored "-Wignored-attributes"
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -180,7 +180,7 @@ struct extra_fp_operations< Base, Value, Size, true > :
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #if defined(BOOST_GCC) && (BOOST_GCC+0) >= 60000
 #pragma GCC diagnostic pop

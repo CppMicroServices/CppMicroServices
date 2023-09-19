@@ -57,7 +57,7 @@ namespace std{
 #include <boost/archive/archive_exception.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 /////////////////////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@ protected:
     // d) use stream buffer
     // e) change locale back to original
     // f) destroy new codecvt facet
-    boost::archive::codecvt_null<typename OStream::char_type> codecvt_null_facet;
+    cppmsboost::archive::codecvt_null<typename OStream::char_type> codecvt_null_facet;
     std::locale archive_locale;
     basic_ostream_locale_saver<
         typename OStream::char_type,
@@ -93,7 +93,7 @@ protected:
         // otherwise crash on load.
         BOOST_ASSERT(0 == static_cast<int>(t) || 1 == static_cast<int>(t));
         if(os.fail())
-            boost::serialization::throw_exception(
+            cppmsboost::serialization::throw_exception(
                 archive_exception(archive_exception::output_stream_error)
             );
         os << t;
@@ -122,9 +122,9 @@ protected:
     // saving of any types not listed above
 
     template<class T>
-    void save_impl(const T &t, boost::mpl::bool_<false> &){
+    void save_impl(const T &t, cppmsboost::mpl::bool_<false> &){
         if(os.fail())
-            boost::serialization::throw_exception(
+            cppmsboost::serialization::throw_exception(
                 archive_exception(archive_exception::output_stream_error)
             );
         os << t;
@@ -143,7 +143,7 @@ protected:
     template<class T>
     struct is_float {
         typedef typename mpl::bool_<
-            boost::is_floating_point<T>::value
+            cppmsboost::is_floating_point<T>::value
             || (std::numeric_limits<T>::is_specialized
             && !std::numeric_limits<T>::is_integer
             && !std::numeric_limits<T>::is_exact
@@ -152,10 +152,10 @@ protected:
     };
 
     template<class T>
-    void save_impl(const T &t, boost::mpl::bool_<true> &){
+    void save_impl(const T &t, cppmsboost::mpl::bool_<true> &){
         // must be a user mistake - can't serialize un-initialized data
         if(os.fail()){
-            boost::serialization::throw_exception(
+            cppmsboost::serialization::throw_exception(
                 archive_exception(archive_exception::output_stream_error)
             );
         }
@@ -188,7 +188,7 @@ public:
     // unformatted append of one character
     void put(typename OStream::char_type c){
         if(os.fail())
-            boost::serialization::throw_exception(
+            cppmsboost::serialization::throw_exception(
                 archive_exception(archive_exception::output_stream_error)
             );
         os.put(c);
@@ -202,7 +202,7 @@ public:
     save_binary(const void *address, std::size_t count);
 };
 
-} //namespace boost
+} //namespace cppmsboost
 } //namespace archive
 
 #include <boost/archive/detail/abi_suffix.hpp> // pops abi_suffix.hpp pragmas

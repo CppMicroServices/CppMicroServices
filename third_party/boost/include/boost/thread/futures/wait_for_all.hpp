@@ -13,10 +13,10 @@
 
 #include <boost/core/enable_if.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   template<typename Iterator>
-  typename boost::disable_if<is_future_type<Iterator>,void>::type wait_for_all(Iterator begin,Iterator end)
+  typename cppmsboost::disable_if<is_future_type<Iterator>,void>::type wait_for_all(Iterator begin,Iterator end)
   {
       for(Iterator current=begin;current!=end;++current)
       {
@@ -26,7 +26,7 @@ namespace boost
 
 #ifdef BOOST_NO_CXX11_VARIADIC_TEMPLATES
     template<typename F1,typename F2>
-    typename boost::enable_if<is_future_type<F1>,void>::type wait_for_all(F1& f1,F2& f2)
+    typename cppmsboost::enable_if<is_future_type<F1>,void>::type wait_for_all(F1& f1,F2& f2)
     {
         f1.wait();
         f2.wait();
@@ -60,7 +60,7 @@ namespace boost
     }
 #else
     template<typename F1, typename... Fs>
-    typename boost::enable_if<is_future_type<F1>,void>::type wait_for_all(F1& f1, Fs&... fs)
+    typename cppmsboost::enable_if<is_future_type<F1>,void>::type wait_for_all(F1& f1, Fs&... fs)
     {
         bool dummy[] = { (f1.wait(), true), (fs.wait(), true)... };
 

@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 bad_executor::bad_executor() BOOST_ASIO_NOEXCEPT
@@ -33,7 +33,7 @@ const char* bad_executor::what() const BOOST_ASIO_NOEXCEPT_OR_NOTHROW
 }
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -28,7 +28,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
@@ -39,7 +39,7 @@ network_v4::network_v4(const address_v4& addr, unsigned short prefix_len)
   if (prefix_len > 32)
   {
     std::out_of_range ex("prefix length too large");
-    boost::asio::detail::throw_exception(ex);
+    cppmsboost::asio::detail::throw_exception(ex);
   }
 }
 
@@ -56,7 +56,7 @@ network_v4::network_v4(const address_v4& addr, const address_v4& mask)
       if (mask_bytes[i])
       {
         std::invalid_argument ex("non-contiguous netmask");
-        boost::asio::detail::throw_exception(ex);
+        cppmsboost::asio::detail::throw_exception(ex);
       }
       continue;
     }
@@ -86,7 +86,7 @@ network_v4::network_v4(const address_v4& addr, const address_v4& mask)
         break;
       default:
         std::out_of_range ex("non-contiguous netmask");
-        boost::asio::detail::throw_exception(ex);
+        cppmsboost::asio::detail::throw_exception(ex);
       }
     }
   }
@@ -119,16 +119,16 @@ bool network_v4::is_subnet_of(const network_v4& other) const
 
 std::string network_v4::to_string() const
 {
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   std::string addr = to_string(ec);
-  boost::asio::detail::throw_error(ec);
+  cppmsboost::asio::detail::throw_error(ec);
   return addr;
 }
 
-std::string network_v4::to_string(boost::system::error_code& ec) const
+std::string network_v4::to_string(cppmsboost::system::error_code& ec) const
 {
   using namespace std; // For sprintf.
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   char prefix_len[16];
 #if defined(BOOST_ASIO_HAS_SECURE_RTL)
   sprintf_s(prefix_len, sizeof(prefix_len), "/%u", prefix_length_);
@@ -143,40 +143,40 @@ network_v4 make_network_v4(const char* str)
   return make_network_v4(std::string(str));
 }
 
-network_v4 make_network_v4(const char* str, boost::system::error_code& ec)
+network_v4 make_network_v4(const char* str, cppmsboost::system::error_code& ec)
 {
   return make_network_v4(std::string(str), ec);
 }
 
 network_v4 make_network_v4(const std::string& str)
 {
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   network_v4 net = make_network_v4(str, ec);
-  boost::asio::detail::throw_error(ec);
+  cppmsboost::asio::detail::throw_error(ec);
   return net;
 }
 
 network_v4 make_network_v4(const std::string& str,
-    boost::system::error_code& ec)
+    cppmsboost::system::error_code& ec)
 {
   std::string::size_type pos = str.find_first_of("/");
 
   if (pos == std::string::npos)
   {
-    ec = boost::asio::error::invalid_argument;
+    ec = cppmsboost::asio::error::invalid_argument;
     return network_v4();
   }
 
   if (pos == str.size() - 1)
   {
-    ec = boost::asio::error::invalid_argument;
+    ec = cppmsboost::asio::error::invalid_argument;
     return network_v4();
   }
 
   std::string::size_type end = str.find_first_not_of("0123456789", pos + 1);
   if (end != std::string::npos)
   {
-    ec = boost::asio::error::invalid_argument;
+    ec = cppmsboost::asio::error::invalid_argument;
     return network_v4();
   }
 
@@ -187,7 +187,7 @@ network_v4 make_network_v4(const std::string& str,
   const int prefix_len = std::atoi(str.substr(pos + 1).c_str());
   if (prefix_len < 0 || prefix_len > 32)
   {
-    ec = boost::asio::error::invalid_argument;
+    ec = cppmsboost::asio::error::invalid_argument;
     return network_v4();
   }
 
@@ -202,7 +202,7 @@ network_v4 make_network_v4(string_view str)
 }
 
 network_v4 make_network_v4(string_view str,
-    boost::system::error_code& ec)
+    cppmsboost::system::error_code& ec)
 {
   return make_network_v4(static_cast<std::string>(str), ec);
 }
@@ -211,7 +211,7 @@ network_v4 make_network_v4(string_view str,
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

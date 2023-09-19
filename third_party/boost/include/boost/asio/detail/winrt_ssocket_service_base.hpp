@@ -38,7 +38,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -95,12 +95,12 @@ public:
   }
 
   // Destroy a socket implementation.
-  BOOST_ASIO_DECL boost::system::error_code close(
-      base_implementation_type& impl, boost::system::error_code& ec);
+  BOOST_ASIO_DECL cppmsboost::system::error_code close(
+      base_implementation_type& impl, cppmsboost::system::error_code& ec);
 
   // Release ownership of the socket.
   BOOST_ASIO_DECL native_handle_type release(
-      base_implementation_type& impl, boost::system::error_code& ec);
+      base_implementation_type& impl, cppmsboost::system::error_code& ec);
 
   // Get the native socket representation.
   native_handle_type native_handle(base_implementation_type& impl)
@@ -109,35 +109,35 @@ public:
   }
 
   // Cancel all operations associated with the socket.
-  boost::system::error_code cancel(base_implementation_type&,
-      boost::system::error_code& ec)
+  cppmsboost::system::error_code cancel(base_implementation_type&,
+      cppmsboost::system::error_code& ec)
   {
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
     return ec;
   }
 
   // Determine whether the socket is at the out-of-band data mark.
   bool at_mark(const base_implementation_type&,
-      boost::system::error_code& ec) const
+      cppmsboost::system::error_code& ec) const
   {
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
     return false;
   }
 
   // Determine the number of bytes available for reading.
   std::size_t available(const base_implementation_type&,
-      boost::system::error_code& ec) const
+      cppmsboost::system::error_code& ec) const
   {
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
     return 0;
   }
 
   // Perform an IO control command on the socket.
   template <typename IO_Control_Command>
-  boost::system::error_code io_control(base_implementation_type&,
-      IO_Control_Command&, boost::system::error_code& ec)
+  cppmsboost::system::error_code io_control(base_implementation_type&,
+      IO_Control_Command&, cppmsboost::system::error_code& ec)
   {
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
     return ec;
   }
 
@@ -148,10 +148,10 @@ public:
   }
 
   // Sets the non-blocking mode of the socket.
-  boost::system::error_code non_blocking(base_implementation_type&,
-      bool, boost::system::error_code& ec)
+  cppmsboost::system::error_code non_blocking(base_implementation_type&,
+      bool, cppmsboost::system::error_code& ec)
   {
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
     return ec;
   }
 
@@ -162,10 +162,10 @@ public:
   }
 
   // Sets the non-blocking mode of the native socket implementation.
-  boost::system::error_code native_non_blocking(base_implementation_type&,
-      bool, boost::system::error_code& ec)
+  cppmsboost::system::error_code native_non_blocking(base_implementation_type&,
+      bool, cppmsboost::system::error_code& ec)
   {
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
     return ec;
   }
 
@@ -173,18 +173,18 @@ public:
   template <typename ConstBufferSequence>
   std::size_t send(base_implementation_type& impl,
       const ConstBufferSequence& buffers,
-      socket_base::message_flags flags, boost::system::error_code& ec)
+      socket_base::message_flags flags, cppmsboost::system::error_code& ec)
   {
     return do_send(impl,
-        buffer_sequence_adapter<boost::asio::const_buffer,
+        buffer_sequence_adapter<cppmsboost::asio::const_buffer,
           ConstBufferSequence>::first(buffers), flags, ec);
   }
 
   // Wait until data can be sent without blocking.
   std::size_t send(base_implementation_type&, const null_buffers&,
-      socket_base::message_flags, boost::system::error_code& ec)
+      socket_base::message_flags, cppmsboost::system::error_code& ec)
   {
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
     return 0;
   }
 
@@ -196,11 +196,11 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef winrt_socket_send_op<ConstBufferSequence, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(buffers, handler, io_ex);
 
@@ -208,7 +208,7 @@ public:
           *p.p, "socket", &impl, 0, "async_send"));
 
     start_send_op(impl,
-        buffer_sequence_adapter<boost::asio::const_buffer,
+        buffer_sequence_adapter<cppmsboost::asio::const_buffer,
           ConstBufferSequence>::first(buffers),
         flags, p.p, is_continuation);
     p.v = p.p = 0;
@@ -219,9 +219,9 @@ public:
   void async_send(base_implementation_type&, const null_buffers&,
       socket_base::message_flags, Handler& handler, const IoExecutor& io_ex)
   {
-    boost::system::error_code ec = boost::asio::error::operation_not_supported;
+    cppmsboost::system::error_code ec = cppmsboost::asio::error::operation_not_supported;
     const std::size_t bytes_transferred = 0;
-    boost::asio::post(io_ex,
+    cppmsboost::asio::post(io_ex,
         detail::bind_handler(handler, ec, bytes_transferred));
   }
 
@@ -229,18 +229,18 @@ public:
   template <typename MutableBufferSequence>
   std::size_t receive(base_implementation_type& impl,
       const MutableBufferSequence& buffers,
-      socket_base::message_flags flags, boost::system::error_code& ec)
+      socket_base::message_flags flags, cppmsboost::system::error_code& ec)
   {
     return do_receive(impl,
-        buffer_sequence_adapter<boost::asio::mutable_buffer,
+        buffer_sequence_adapter<cppmsboost::asio::mutable_buffer,
           MutableBufferSequence>::first(buffers), flags, ec);
   }
 
   // Wait until data can be received without blocking.
   std::size_t receive(base_implementation_type&, const null_buffers&,
-      socket_base::message_flags, boost::system::error_code& ec)
+      socket_base::message_flags, cppmsboost::system::error_code& ec)
   {
-    ec = boost::asio::error::operation_not_supported;
+    ec = cppmsboost::asio::error::operation_not_supported;
     return 0;
   }
 
@@ -253,11 +253,11 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef winrt_socket_recv_op<MutableBufferSequence, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(buffers, handler, io_ex);
 
@@ -265,7 +265,7 @@ public:
           *p.p, "socket", &impl, 0, "async_receive"));
 
     start_receive_op(impl,
-        buffer_sequence_adapter<boost::asio::mutable_buffer,
+        buffer_sequence_adapter<cppmsboost::asio::mutable_buffer,
           MutableBufferSequence>::first(buffers),
         flags, p.p, is_continuation);
     p.v = p.p = 0;
@@ -276,9 +276,9 @@ public:
   void async_receive(base_implementation_type&, const null_buffers&,
       socket_base::message_flags, Handler& handler, const IoExecutor& io_ex)
   {
-    boost::system::error_code ec = boost::asio::error::operation_not_supported;
+    cppmsboost::system::error_code ec = cppmsboost::asio::error::operation_not_supported;
     const std::size_t bytes_transferred = 0;
-    boost::asio::post(io_ex,
+    cppmsboost::asio::post(io_ex,
         detail::bind_handler(handler, ec, bytes_transferred));
   }
 
@@ -286,24 +286,24 @@ protected:
   // Helper function to obtain endpoints associated with the connection.
   BOOST_ASIO_DECL std::size_t do_get_endpoint(
       const base_implementation_type& impl, bool local,
-      void* addr, std::size_t addr_len, boost::system::error_code& ec) const;
+      void* addr, std::size_t addr_len, cppmsboost::system::error_code& ec) const;
 
   // Helper function to set a socket option.
-  BOOST_ASIO_DECL boost::system::error_code do_set_option(
+  BOOST_ASIO_DECL cppmsboost::system::error_code do_set_option(
       base_implementation_type& impl,
       int level, int optname, const void* optval,
-      std::size_t optlen, boost::system::error_code& ec);
+      std::size_t optlen, cppmsboost::system::error_code& ec);
 
   // Helper function to get a socket option.
   BOOST_ASIO_DECL void do_get_option(
       const base_implementation_type& impl,
       int level, int optname, void* optval,
-      std::size_t* optlen, boost::system::error_code& ec) const;
+      std::size_t* optlen, cppmsboost::system::error_code& ec) const;
 
   // Helper function to perform a synchronous connect.
-  BOOST_ASIO_DECL boost::system::error_code do_connect(
+  BOOST_ASIO_DECL cppmsboost::system::error_code do_connect(
       base_implementation_type& impl,
-      const void* addr, boost::system::error_code& ec);
+      const void* addr, cppmsboost::system::error_code& ec);
 
   // Helper function to start an asynchronous connect.
   BOOST_ASIO_DECL void start_connect_op(
@@ -312,22 +312,22 @@ protected:
 
   // Helper function to perform a synchronous send.
   BOOST_ASIO_DECL std::size_t do_send(
-      base_implementation_type& impl, const boost::asio::const_buffer& data,
-      socket_base::message_flags flags, boost::system::error_code& ec);
+      base_implementation_type& impl, const cppmsboost::asio::const_buffer& data,
+      socket_base::message_flags flags, cppmsboost::system::error_code& ec);
 
   // Helper function to start an asynchronous send.
   BOOST_ASIO_DECL void start_send_op(base_implementation_type& impl,
-      const boost::asio::const_buffer& data, socket_base::message_flags flags,
+      const cppmsboost::asio::const_buffer& data, socket_base::message_flags flags,
       winrt_async_op<unsigned int>* op, bool is_continuation);
 
   // Helper function to perform a synchronous receive.
   BOOST_ASIO_DECL std::size_t do_receive(
-      base_implementation_type& impl, const boost::asio::mutable_buffer& data,
-      socket_base::message_flags flags, boost::system::error_code& ec);
+      base_implementation_type& impl, const cppmsboost::asio::mutable_buffer& data,
+      socket_base::message_flags flags, cppmsboost::system::error_code& ec);
 
   // Helper function to start an asynchronous receive.
   BOOST_ASIO_DECL void start_receive_op(base_implementation_type& impl,
-      const boost::asio::mutable_buffer& data, socket_base::message_flags flags,
+      const cppmsboost::asio::mutable_buffer& data, socket_base::message_flags flags,
       winrt_async_op<Windows::Storage::Streams::IBuffer^>* op,
       bool is_continuation);
 
@@ -343,7 +343,7 @@ protected:
   winrt_async_manager& async_manager_;
 
   // Mutex to protect access to the linked list of implementations. 
-  boost::asio::detail::mutex mutex_;
+  cppmsboost::asio::detail::mutex mutex_;
 
   // The head of a linked list of all implementations.
   base_implementation_type* impl_list_;
@@ -351,7 +351,7 @@ protected:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

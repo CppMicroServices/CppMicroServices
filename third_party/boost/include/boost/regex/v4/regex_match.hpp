@@ -22,7 +22,7 @@
 #ifndef BOOST_REGEX_MATCH_HPP
 #define BOOST_REGEX_MATCH_HPP
 
-namespace boost{
+namespace cppmsboost{
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -359,7 +359,7 @@ inline bool regex_match(const std::basic_string<wchar_t>& s,
 #pragma warning(pop)
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif   // BOOST_REGEX_MATCH_HPP
 

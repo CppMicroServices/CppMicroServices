@@ -21,18 +21,18 @@
 #if !defined( BOOST_USE_WINDOWS_H )
 extern "C" {
 #if BOOST_WINAPI_PARTITION_DESKTOP
-typedef boost::winapi::VOID_ (BOOST_WINAPI_NTAPI_CC *WAITORTIMERCALLBACKFUNC)
-    (boost::winapi::PVOID_, boost::winapi::BOOLEAN_);
+typedef cppmsboost::winapi::VOID_ (BOOST_WINAPI_NTAPI_CC *WAITORTIMERCALLBACKFUNC)
+    (cppmsboost::winapi::PVOID_, cppmsboost::winapi::BOOLEAN_);
 typedef WAITORTIMERCALLBACKFUNC WAITORTIMERCALLBACK;
 
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
 RegisterWaitForSingleObject(
-    boost::winapi::PHANDLE_ phNewWaitObject,
-    boost::winapi::HANDLE_ hObject,
+    cppmsboost::winapi::PHANDLE_ phNewWaitObject,
+    cppmsboost::winapi::HANDLE_ hObject,
     WAITORTIMERCALLBACK Callback,
-    boost::winapi::PVOID_ Context,
-    boost::winapi::ULONG_ dwMilliseconds,
-    boost::winapi::ULONG_ dwFlags);
+    cppmsboost::winapi::PVOID_ Context,
+    cppmsboost::winapi::ULONG_ dwMilliseconds,
+    cppmsboost::winapi::ULONG_ dwFlags);
 #endif
 } // extern "C"
 #endif
@@ -41,20 +41,20 @@ RegisterWaitForSingleObject(
 #if !defined( BOOST_USE_WINDOWS_H ) || (defined(BOOST_WINAPI_IS_MINGW) && BOOST_USE_WINAPI_VERSION < BOOST_WINAPI_VERSION_WINXP)
 extern "C" {
 #if BOOST_WINAPI_PARTITION_DESKTOP
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
-UnregisterWait(boost::winapi::HANDLE_ WaitHandle);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
+UnregisterWait(cppmsboost::winapi::HANDLE_ WaitHandle);
 #endif
 
 #if BOOST_WINAPI_PARTITION_DESKTOP || BOOST_WINAPI_PARTITION_SYSTEM
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
 UnregisterWaitEx(
-    boost::winapi::HANDLE_ WaitHandle,
-    boost::winapi::HANDLE_ CompletionEvent);
+    cppmsboost::winapi::HANDLE_ WaitHandle,
+    cppmsboost::winapi::HANDLE_ CompletionEvent);
 #endif
 } // extern "C"
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 
 #if BOOST_WINAPI_PARTITION_DESKTOP

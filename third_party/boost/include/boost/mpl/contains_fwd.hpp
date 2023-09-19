@@ -15,7 +15,7 @@
 // $Date$
 // $Revision$
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 template< typename Tag > struct contains_impl;
 template< typename Sequence, typename T > struct contains;

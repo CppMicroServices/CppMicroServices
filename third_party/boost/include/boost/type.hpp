@@ -6,7 +6,7 @@
 #ifndef BOOST_TYPE_DWA20010120_HPP
 # define BOOST_TYPE_DWA20010120_HPP
 
-namespace boost {
+namespace cppmsboost {
 
   // Just a simple "type envelope". Useful in various contexts, mostly to work
   // around some MSVC deficiencies.

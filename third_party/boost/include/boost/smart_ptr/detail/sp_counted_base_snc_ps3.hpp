@@ -23,7 +23,7 @@
 #include <boost/config.hpp>
 #include <inttypes.h> // uint32_t
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -159,6 +159,6 @@ public:
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // #ifndef BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_SNC_PS3_HPP_INCLUDED

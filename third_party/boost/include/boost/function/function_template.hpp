@@ -79,11 +79,11 @@
 #  define BOOST_FUNCTION_VOID_RETURN_TYPE void
 #  define BOOST_FUNCTION_RETURN(X) X
 #else
-#  define BOOST_FUNCTION_VOID_RETURN_TYPE boost::detail::function::unusable
+#  define BOOST_FUNCTION_VOID_RETURN_TYPE cppmsboost::detail::function::unusable
 #  define BOOST_FUNCTION_RETURN(X) X; return BOOST_FUNCTION_VOID_RETURN_TYPE ()
 #endif
 
-namespace boost {
+namespace cppmsboost {
   namespace detail {
     namespace function {
       template<
@@ -209,7 +209,7 @@ namespace boost {
         {
           MemberPtr* f =
             reinterpret_cast<MemberPtr*>(function_obj_ptr.data);
-          return boost::mem_fn(*f)(BOOST_FUNCTION_ARGS);
+          return cppmsboost::mem_fn(*f)(BOOST_FUNCTION_ARGS);
         }
       };
 
@@ -227,7 +227,7 @@ namespace boost {
         {
           MemberPtr* f =
             reinterpret_cast<MemberPtr*>(function_obj_ptr.data);
-          BOOST_FUNCTION_RETURN(boost::mem_fn(*f)(BOOST_FUNCTION_ARGS));
+          BOOST_FUNCTION_RETURN(cppmsboost::mem_fn(*f)(BOOST_FUNCTION_ARGS));
         }
       };
 #endif
@@ -467,9 +467,9 @@ namespace boost {
 
 
       /**
-       * vtable for a specific boost::function instance. This
+       * vtable for a specific cppmsboost::function instance. This
        * structure must be an aggregate so that we can use static
-       * initialization in boost::function's assign_to and assign_to_a
+       * initialization in cppmsboost::function's assign_to and assign_to_a
        * members. It therefore cannot have any constructors,
        * destructors, base classes, etc.
        */
@@ -537,7 +537,7 @@ namespace boost {
           // objects, so we invoke through mem_fn() but we retain the
           // right target_type() values.
           if (f) {
-            this->assign_to(boost::mem_fn(f), functor);
+            this->assign_to(cppmsboost::mem_fn(f), functor);
             return true;
           } else {
             return false;
@@ -550,7 +550,7 @@ namespace boost {
           // objects, so we invoke through mem_fn() but we retain the
           // right target_type() values.
           if (f) {
-            this->assign_to_a(boost::mem_fn(f), functor, a);
+            this->assign_to_a(cppmsboost::mem_fn(f), functor, a);
             return true;
           } else {
             return false;
@@ -608,7 +608,7 @@ namespace boost {
         bool
         assign_to(FunctionObj f, function_buffer& functor, function_obj_tag) const
         {
-          if (!boost::detail::function::has_empty_target(boost::addressof(f))) {
+          if (!cppmsboost::detail::function::has_empty_target(cppmsboost::addressof(f))) {
             assign_functor(f, functor,
                            integral_constant<bool, (function_allows_small_object_optimization<FunctionObj>::value)>());
             return true;
@@ -620,7 +620,7 @@ namespace boost {
         bool
         assign_to_a(FunctionObj f, function_buffer& functor, Allocator a, function_obj_tag) const
         {
-          if (!boost::detail::function::has_empty_target(boost::addressof(f))) {
+          if (!cppmsboost::detail::function::has_empty_target(cppmsboost::addressof(f))) {
             assign_functor_a(f, functor, a,
                            integral_constant<bool, (function_allows_small_object_optimization<FunctionObj>::value)>());
             return true;
@@ -665,12 +665,12 @@ namespace boost {
 #ifndef BOOST_NO_VOID_RETURNS
     typedef R         result_type;
 #else
-    typedef  typename boost::detail::function::function_return_type<R>::type
+    typedef  typename cppmsboost::detail::function::function_return_type<R>::type
       result_type;
 #endif // BOOST_NO_VOID_RETURNS
 
   private:
-    typedef boost::detail::function::BOOST_FUNCTION_VTABLE<
+    typedef cppmsboost::detail::function::BOOST_FUNCTION_VTABLE<
               R BOOST_FUNCTION_COMMA BOOST_FUNCTION_TEMPLATE_ARGS>
       vtable_type;
 
@@ -684,7 +684,7 @@ namespace boost {
   public:
     BOOST_STATIC_CONSTANT(int, args = BOOST_FUNCTION_NUM_ARGS);
 
-    // add signature for boost::lambda
+    // add signature for cppmsboost::lambda
     template<typename Args>
     struct sig
     {
@@ -710,7 +710,7 @@ namespace boost {
     template<typename Functor>
     BOOST_FUNCTION_FUNCTION(Functor BOOST_FUNCTION_TARGET_FIX(const &) f
 #ifndef BOOST_NO_SFINAE
-                            ,typename boost::enable_if_<
+                            ,typename cppmsboost::enable_if_<
                              !(is_integral<Functor>::value),
                                         int>::type = 0
 #endif // BOOST_NO_SFINAE
@@ -722,7 +722,7 @@ namespace boost {
     template<typename Functor,typename Allocator>
     BOOST_FUNCTION_FUNCTION(Functor BOOST_FUNCTION_TARGET_FIX(const &) f, Allocator a
 #ifndef BOOST_NO_SFINAE
-                            ,typename boost::enable_if_<
+                            ,typename cppmsboost::enable_if_<
                               !(is_integral<Functor>::value),
                                         int>::type = 0
 #endif // BOOST_NO_SFINAE
@@ -758,7 +758,7 @@ namespace boost {
     result_type operator()(BOOST_FUNCTION_PARMS) const
     {
       if (this->empty())
-        boost::throw_exception(bad_function_call());
+        cppmsboost::throw_exception(bad_function_call());
 
       return get_vtable()->invoker
                (this->functor BOOST_FUNCTION_COMMA BOOST_FUNCTION_ARGS);
@@ -771,7 +771,7 @@ namespace boost {
     // construct.
     template<typename Functor>
 #ifndef BOOST_NO_SFINAE
-    typename boost::enable_if_<
+    typename cppmsboost::enable_if_<
                   !(is_integral<Functor>::value),
                BOOST_FUNCTION_FUNCTION&>::type
 #else
@@ -907,23 +907,23 @@ namespace boost {
             // just to silence a warning: https://github.com/boostorg/function/issues/27
 #           pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #         endif
-          std::memcpy(this->functor.data, f.functor.data, sizeof(boost::detail::function::function_buffer));
+          std::memcpy(this->functor.data, f.functor.data, sizeof(cppmsboost::detail::function::function_buffer));
 #         if defined(BOOST_GCC) && (BOOST_GCC >= 40700)
 #           pragma GCC diagnostic pop
 #         endif
         } else
           get_vtable()->base.manager(f.functor, this->functor,
-                                     boost::detail::function::clone_functor_tag);
+                                     cppmsboost::detail::function::clone_functor_tag);
       }
     }
 
     template<typename Functor>
     void assign_to(Functor f)
     {
-      using boost::detail::function::vtable_base;
+      using cppmsboost::detail::function::vtable_base;
 
-      typedef typename boost::detail::function::get_function_tag<Functor>::type tag;
-      typedef boost::detail::function::BOOST_FUNCTION_GET_INVOKER<tag> get_invoker;
+      typedef typename cppmsboost::detail::function::get_function_tag<Functor>::type tag;
+      typedef cppmsboost::detail::function::BOOST_FUNCTION_GET_INVOKER<tag> get_invoker;
       typedef typename get_invoker::
                          template apply<Functor, R BOOST_FUNCTION_COMMA
                         BOOST_FUNCTION_TEMPLATE_ARGS>
@@ -942,11 +942,11 @@ namespace boost {
       if (stored_vtable.assign_to(f, functor)) {
         std::size_t value = reinterpret_cast<std::size_t>(&stored_vtable.base);
         // coverity[pointless_expression]: suppress coverity warnings on apparant if(const).
-        if (boost::has_trivial_copy_constructor<Functor>::value &&
-            boost::has_trivial_destructor<Functor>::value &&
-            boost::detail::function::function_allows_small_object_optimization<Functor>::value)
+        if (cppmsboost::has_trivial_copy_constructor<Functor>::value &&
+            cppmsboost::has_trivial_destructor<Functor>::value &&
+            cppmsboost::detail::function::function_allows_small_object_optimization<Functor>::value)
           value |= static_cast<std::size_t>(0x01);
-        vtable = reinterpret_cast<boost::detail::function::vtable_base *>(value);
+        vtable = reinterpret_cast<cppmsboost::detail::function::vtable_base *>(value);
       } else
         vtable = 0;
     }
@@ -954,10 +954,10 @@ namespace boost {
     template<typename Functor,typename Allocator>
     void assign_to_a(Functor f,Allocator a)
     {
-      using boost::detail::function::vtable_base;
+      using cppmsboost::detail::function::vtable_base;
 
-      typedef typename boost::detail::function::get_function_tag<Functor>::type tag;
-      typedef boost::detail::function::BOOST_FUNCTION_GET_INVOKER<tag> get_invoker;
+      typedef typename cppmsboost::detail::function::get_function_tag<Functor>::type tag;
+      typedef cppmsboost::detail::function::BOOST_FUNCTION_GET_INVOKER<tag> get_invoker;
       typedef typename get_invoker::
                          template apply_a<Functor, Allocator, R BOOST_FUNCTION_COMMA
                          BOOST_FUNCTION_TEMPLATE_ARGS>
@@ -976,11 +976,11 @@ namespace boost {
       if (stored_vtable.assign_to_a(f, functor, a)) {
         std::size_t value = reinterpret_cast<std::size_t>(&stored_vtable.base);
         // coverity[pointless_expression]: suppress coverity warnings on apparant if(const).
-        if (boost::has_trivial_copy_constructor<Functor>::value &&
-            boost::has_trivial_destructor<Functor>::value &&
-            boost::detail::function::function_allows_small_object_optimization<Functor>::value)
+        if (cppmsboost::has_trivial_copy_constructor<Functor>::value &&
+            cppmsboost::has_trivial_destructor<Functor>::value &&
+            cppmsboost::detail::function::function_allows_small_object_optimization<Functor>::value)
           value |= static_cast<std::size_t>(0x01);
-        vtable = reinterpret_cast<boost::detail::function::vtable_base *>(value);
+        vtable = reinterpret_cast<cppmsboost::detail::function::vtable_base *>(value);
       } else
         vtable = 0;
     }
@@ -1011,7 +1011,7 @@ namespace boost {
 #           endif
           } else
             get_vtable()->base.manager(f.functor, this->functor,
-                                     boost::detail::function::move_functor_tag);
+                                     cppmsboost::detail::function::move_functor_tag);
           f.vtable = 0;
         } else {
           clear();
@@ -1037,7 +1037,7 @@ namespace boost {
     f1.swap(f2);
   }
 
-// Poison comparisons between boost::function objects of the same type.
+// Poison comparisons between cppmsboost::function objects of the same type.
 template<typename R BOOST_FUNCTION_COMMA BOOST_FUNCTION_TEMPLATE_PARMS>
   void operator==(const BOOST_FUNCTION_FUNCTION<
                           R BOOST_FUNCTION_COMMA
@@ -1078,7 +1078,7 @@ public:
   template<typename Functor>
   function(Functor f
 #ifndef BOOST_NO_SFINAE
-           ,typename boost::enable_if_<
+           ,typename cppmsboost::enable_if_<
                           !(is_integral<Functor>::value),
                        int>::type = 0
 #endif
@@ -1089,7 +1089,7 @@ public:
   template<typename Functor,typename Allocator>
   function(Functor f, Allocator a
 #ifndef BOOST_NO_SFINAE
-           ,typename boost::enable_if_<
+           ,typename cppmsboost::enable_if_<
                            !(is_integral<Functor>::value),
                        int>::type = 0
 #endif
@@ -1128,7 +1128,7 @@ public:
 
   template<typename Functor>
 #ifndef BOOST_NO_SFINAE
-  typename boost::enable_if_<
+  typename cppmsboost::enable_if_<
                          !(is_integral<Functor>::value),
                       self_type&>::type
 #else
@@ -1166,7 +1166,7 @@ public:
 #undef BOOST_FUNCTION_PARTIAL_SPEC
 #endif // have partial specialization
 
-} // end namespace boost
+} // end namespace cppmsboost
 
 // Cleanup after ourselves...
 #undef BOOST_FUNCTION_VTABLE

@@ -20,7 +20,7 @@
 
 #if ! defined(BOOST_NO_CXX11_HDR_TYPE_TRAITS)
     #include <type_traits>
-    namespace boost{
+    namespace cppmsboost{
     namespace serialization {
     namespace detail {
 
@@ -32,17 +32,17 @@
     } // boost
 #else
     // we don't have standard library support for is_default_constructible
-    // so we fake it by using boost::has_trivial_construtor.  But this is not
+    // so we fake it by using cppmsboost::has_trivial_construtor.  But this is not
     // actually correct because it's possible that a default constructor
     // to be non trivial. So when using this, make sure you're not using your
     // own definition of of T() but are using the actual default one!
     #include <boost/type_traits/has_trivial_constructor.hpp>
-    namespace boost{
+    namespace cppmsboost{
     namespace serialization {
     namespace detail {
 
     template<typename T>
-    struct is_default_constructible : public boost::has_trivial_constructor<T> {};
+    struct is_default_constructible : public cppmsboost::has_trivial_constructor<T> {};
 
     } // detail
     } // serializaition

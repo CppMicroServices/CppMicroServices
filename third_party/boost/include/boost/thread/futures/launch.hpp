@@ -11,7 +11,7 @@
 #include <boost/thread/detail/config.hpp>
 #include <boost/core/scoped_enum.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   //enum class launch
   BOOST_SCOPED_ENUM_DECLARE_BEGIN(launch)

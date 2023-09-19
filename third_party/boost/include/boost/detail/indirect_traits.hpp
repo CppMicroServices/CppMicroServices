@@ -21,29 +21,29 @@
 # include <boost/detail/select_type.hpp>
 
 
-namespace boost { namespace detail {
+namespace cppmsboost { namespace detail {
 
 namespace indirect_traits {
 
 template <class T>
-struct is_reference_to_const : boost::false_type
+struct is_reference_to_const : cppmsboost::false_type
 {
 };
 
 template <class T>
-struct is_reference_to_const<T const&> : boost::true_type
+struct is_reference_to_const<T const&> : cppmsboost::true_type
 {
 };
 
 #   if defined(BOOST_MSVC) && _MSC_FULL_VER <= 13102140 // vc7.01 alpha workaround
 template<class T>
-struct is_reference_to_const<T const volatile&> : boost::true_type
+struct is_reference_to_const<T const volatile&> : cppmsboost::true_type
 {
 };
 #   endif
 
 template <class T>
-struct is_reference_to_function : boost::false_type
+struct is_reference_to_function : cppmsboost::false_type
 {
 };
 
@@ -53,7 +53,7 @@ struct is_reference_to_function<T&> : is_function<T>
 };
 
 template <class T>
-struct is_pointer_to_function : boost::false_type
+struct is_pointer_to_function : cppmsboost::false_type
 {
 };
 
@@ -65,7 +65,7 @@ struct is_pointer_to_function<T*> : is_function<T>
 };
 
 template <class T>
-struct is_reference_to_member_function_pointer_impl : boost::false_type
+struct is_reference_to_member_function_pointer_impl : cppmsboost::false_type
 {
 };
 
@@ -84,7 +84,7 @@ struct is_reference_to_member_function_pointer
 
 template <class T>
 struct is_reference_to_function_pointer_aux
-    : boost::integral_constant<bool,
+    : cppmsboost::integral_constant<bool,
           is_reference<T>::value &&
           is_pointer_to_function<
               typename remove_cv<
@@ -98,10 +98,10 @@ struct is_reference_to_function_pointer_aux
 
 template <class T>
 struct is_reference_to_function_pointer
-    : boost::detail::if_true<
+    : cppmsboost::detail::if_true<
           is_reference_to_function<T>::value
       >::template then<
-          boost::false_type
+          cppmsboost::false_type
         , is_reference_to_function_pointer_aux<T>
       >::type
 {
@@ -109,7 +109,7 @@ struct is_reference_to_function_pointer
 
 template <class T>
 struct is_reference_to_non_const
-    : boost::integral_constant<bool,
+    : cppmsboost::integral_constant<bool,
           is_reference<T>::value &&
           !is_reference_to_const<T>::value
       >
@@ -117,51 +117,51 @@ struct is_reference_to_non_const
 };
 
 template <class T>
-struct is_reference_to_volatile : boost::false_type
+struct is_reference_to_volatile : cppmsboost::false_type
 {
 };
 
 template <class T>
-struct is_reference_to_volatile<T volatile&> : boost::true_type
+struct is_reference_to_volatile<T volatile&> : cppmsboost::true_type
 {
 };
 
 #   if defined(BOOST_MSVC) && _MSC_FULL_VER <= 13102140 // vc7.01 alpha workaround
 template <class T>
-struct is_reference_to_volatile<T const volatile&> : boost::true_type
+struct is_reference_to_volatile<T const volatile&> : cppmsboost::true_type
 {
 };
 #   endif
 
 
 template <class T>
-struct is_reference_to_pointer : boost::false_type
+struct is_reference_to_pointer : cppmsboost::false_type
 {
 };
 
 template <class T>
-struct is_reference_to_pointer<T*&> : boost::true_type
+struct is_reference_to_pointer<T*&> : cppmsboost::true_type
 {
 };
 
 template <class T>
-struct is_reference_to_pointer<T* const&> : boost::true_type
+struct is_reference_to_pointer<T* const&> : cppmsboost::true_type
 {
 };
 
 template <class T>
-struct is_reference_to_pointer<T* volatile&> : boost::true_type
+struct is_reference_to_pointer<T* volatile&> : cppmsboost::true_type
 {
 };
 
 template <class T>
-struct is_reference_to_pointer<T* const volatile&> : boost::true_type
+struct is_reference_to_pointer<T* const volatile&> : cppmsboost::true_type
 {
 };
 
 template <class T>
 struct is_reference_to_class
-    : boost::integral_constant<bool,
+    : cppmsboost::integral_constant<bool,
           is_reference<T>::value &&
           is_class<
               typename remove_cv<
@@ -174,7 +174,7 @@ struct is_reference_to_class
 
 template <class T>
 struct is_pointer_to_class
-    : boost::integral_constant<bool,
+    : cppmsboost::integral_constant<bool,
           is_pointer<T>::value &&
           is_class<
               typename remove_cv<
@@ -190,6 +190,6 @@ struct is_pointer_to_class
 
 using namespace indirect_traits;
 
-}} // namespace boost::python::detail
+}} // namespace cppmsboost::python::detail
 
 #endif // INDIRECT_TRAITS_DWA2002131_HPP

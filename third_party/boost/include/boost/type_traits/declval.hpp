@@ -34,11 +34,11 @@
 // see class template common_type (20.9.7.6). -end example ]
 //----------------------------------------------------------------------------//
 
-namespace boost {
+namespace cppmsboost {
 
     template <typename T>
     typename add_rvalue_reference<T>::type declval() BOOST_NOEXCEPT; // as unevaluated operand
 
-}  // namespace boost
+}  // namespace cppmsboost
 
 #endif  // BOOST_TYPE_TRAITS_DECLVAL_HPP_INCLUDED

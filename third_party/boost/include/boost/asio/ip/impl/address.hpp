@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
@@ -29,24 +29,24 @@ namespace ip {
 
 inline address address::from_string(const char* str)
 {
-  return boost::asio::ip::make_address(str);
+  return cppmsboost::asio::ip::make_address(str);
 }
 
 inline address address::from_string(
-    const char* str, boost::system::error_code& ec)
+    const char* str, cppmsboost::system::error_code& ec)
 {
-  return boost::asio::ip::make_address(str, ec);
+  return cppmsboost::asio::ip::make_address(str, ec);
 }
 
 inline address address::from_string(const std::string& str)
 {
-  return boost::asio::ip::make_address(str);
+  return cppmsboost::asio::ip::make_address(str);
 }
 
 inline address address::from_string(
-    const std::string& str, boost::system::error_code& ec)
+    const std::string& str, cppmsboost::system::error_code& ec)
 {
-  return boost::asio::ip::make_address(str, ec);
+  return cppmsboost::asio::ip::make_address(str, ec);
 }
 
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
@@ -60,7 +60,7 @@ std::basic_ostream<Elem, Traits>& operator<<(
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

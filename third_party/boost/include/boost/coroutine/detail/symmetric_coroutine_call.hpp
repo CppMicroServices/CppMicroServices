@@ -25,7 +25,7 @@
 #  include BOOST_ABI_PREFIX
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace coroutines {
 namespace detail {
 
@@ -75,7 +75,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                    boost::forward< coroutine_fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
+                    cppmsboost::forward< coroutine_fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
     }
 
@@ -99,7 +99,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                    boost::forward< coroutine_fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
+                    cppmsboost::forward< coroutine_fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
     }
 # endif
@@ -123,7 +123,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                    boost::forward< Fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
+                    cppmsboost::forward< Fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
     }
 
@@ -147,7 +147,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                    boost::forward< Fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
+                    cppmsboost::forward< Fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
     }
 #else
@@ -263,7 +263,7 @@ public:
 
     symmetric_coroutine_call & operator=( BOOST_RV_REF( symmetric_coroutine_call) other) BOOST_NOEXCEPT
     {
-        symmetric_coroutine_call tmp( boost::move( other) );
+        symmetric_coroutine_call tmp( cppmsboost::move( other) );
         swap( tmp);
         return * this;
     }
@@ -331,7 +331,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                    boost::forward< coroutine_fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
+                    cppmsboost::forward< coroutine_fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
     }
 
@@ -355,7 +355,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                    boost::forward< coroutine_fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
+                    cppmsboost::forward< coroutine_fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
     }
 # endif
@@ -379,7 +379,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                    boost::forward< Fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
+                    cppmsboost::forward< Fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
     }
 
@@ -403,7 +403,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                    boost::forward< Fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
+                    cppmsboost::forward< Fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
     }
 #else
@@ -519,7 +519,7 @@ public:
 
     symmetric_coroutine_call & operator=( BOOST_RV_REF( symmetric_coroutine_call) other) BOOST_NOEXCEPT
     {
-        symmetric_coroutine_call tmp( boost::move( other) );
+        symmetric_coroutine_call tmp( cppmsboost::move( other) );
         swap( tmp);
         return * this;
     }
@@ -587,7 +587,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                    boost::forward< coroutine_fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
+                    cppmsboost::forward< coroutine_fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
     }
 
@@ -611,7 +611,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                    boost::forward< coroutine_fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
+                    cppmsboost::forward< coroutine_fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
     }
 # endif
@@ -635,7 +635,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                    boost::forward< Fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
+                    cppmsboost::forward< Fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
     }
 
@@ -659,7 +659,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                    boost::forward< Fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
+                    cppmsboost::forward< Fn >( fn), attrs, preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
     }
 #else
@@ -775,7 +775,7 @@ public:
 
     inline symmetric_coroutine_call & operator=( BOOST_RV_REF( symmetric_coroutine_call) other) BOOST_NOEXCEPT
     {
-        symmetric_coroutine_call tmp( boost::move( other) );
+        symmetric_coroutine_call tmp( cppmsboost::move( other) );
         swap( tmp);
         return * this;
     }

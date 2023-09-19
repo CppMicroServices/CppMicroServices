@@ -30,7 +30,7 @@
 #include <boost/move/detail/meta_utils.hpp>
 #include <boost/move/detail/type_traits.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 //! If this trait yields to true
 //! (<i>has_trivial_destructor_after_move &lt;T&gt;::value == true</i>)
@@ -43,18 +43,18 @@ namespace boost {
 //! when inserted in containers.
 template <class T>
 struct has_trivial_destructor_after_move
-   : ::boost::move_detail::is_trivially_destructible<T>
+   : ::cppmsboost::move_detail::is_trivially_destructible<T>
 {};
 
 //! By default this traits returns
-//! <pre>boost::is_nothrow_move_constructible<T>::value && boost::is_nothrow_move_assignable<T>::value </pre>.
+//! <pre>cppmsboost::is_nothrow_move_constructible<T>::value && cppmsboost::is_nothrow_move_assignable<T>::value </pre>.
 //! Classes with non-throwing move constructor
 //! and assignment can specialize this trait to obtain some performance improvements.
 template <class T>
 struct has_nothrow_move
 {
-   static const bool value = boost::move_detail::is_nothrow_move_constructible<T>::value &&
-                             boost::move_detail::is_nothrow_move_assignable<T>::value;
+   static const bool value = cppmsboost::move_detail::is_nothrow_move_constructible<T>::value &&
+                             cppmsboost::move_detail::is_nothrow_move_assignable<T>::value;
 };
 
 namespace move_detail {
@@ -70,7 +70,7 @@ struct is_nothrow_move_constructible_or_uncopyable
 };
 
 }  //move_detail {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #include <boost/move/detail/config_end.hpp>
 

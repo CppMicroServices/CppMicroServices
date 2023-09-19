@@ -47,7 +47,7 @@
 # pragma warning(disable: 4702)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace context {
 namespace detail {
 
@@ -232,7 +232,7 @@ public:
         try {
             // invoke context-function
 #if defined(BOOST_NO_CXX17_STD_INVOKE)
-            c = boost::context::detail::invoke( fn_, std::move( c) );
+            c = cppmsboost::context::detail::invoke( fn_, std::move( c) );
 #else
             c = std::invoke( fn_, std::move( c) );
 #endif  

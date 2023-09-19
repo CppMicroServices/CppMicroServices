@@ -17,7 +17,7 @@
 #  include BOOST_ABI_PREFIX
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace coroutines {
 
 struct BOOST_COROUTINES_DECL stack_traits

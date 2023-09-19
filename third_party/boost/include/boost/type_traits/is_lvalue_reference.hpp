@@ -23,7 +23,7 @@
 
 #include <boost/type_traits/integral_constant.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 #if defined( __CODEGEARC__ )
    template <class T> struct is_lvalue_reference : public integral_constant<bool, __is_reference(T)>{};
@@ -44,7 +44,7 @@ namespace boost {
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_IS_REFERENCE_HPP_INCLUDED
 

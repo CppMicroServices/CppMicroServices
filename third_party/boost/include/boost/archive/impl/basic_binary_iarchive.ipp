@@ -26,7 +26,7 @@ namespace std{
 
 #include <boost/archive/basic_binary_iarchive.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
@@ -38,7 +38,7 @@ basic_binary_iarchive<Archive>::load_override(class_name_type & t){
     cn.reserve(BOOST_SERIALIZATION_MAX_KEY_SIZE);
     load_override(cn);
     if(cn.size() > (BOOST_SERIALIZATION_MAX_KEY_SIZE - 1))
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(archive_exception::invalid_class_name)
         );
     std::memcpy(t, cn.data(), cn.size());
@@ -78,7 +78,7 @@ basic_binary_iarchive<Archive>::init(void){
     #endif
 
     if(file_signature != BOOST_ARCHIVE_SIGNATURE())
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(archive_exception::invalid_signature)
         );
 
@@ -125,10 +125,10 @@ basic_binary_iarchive<Archive>::init(void){
     #endif
     
     if(BOOST_ARCHIVE_VERSION() < input_library_version)
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(archive_exception::unsupported_version)
         );
 }
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost

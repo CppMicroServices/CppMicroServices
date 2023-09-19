@@ -35,7 +35,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -86,9 +86,9 @@ void eventfd_select_interrupter::open_descriptors()
     }
     else
     {
-      boost::system::error_code ec(errno,
-          boost::asio::error::get_system_category());
-      boost::asio::detail::throw_error(ec, "eventfd_select_interrupter");
+      cppmsboost::system::error_code ec(errno,
+          cppmsboost::asio::error::get_system_category());
+      cppmsboost::asio::detail::throw_error(ec, "eventfd_select_interrupter");
     }
   }
 }
@@ -162,7 +162,7 @@ bool eventfd_select_interrupter::reset()
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -24,7 +24,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -55,13 +55,13 @@ public:
   // Return a pointer to the beginning of the unread data.
   mutable_buffer data()
   {
-    return boost::asio::buffer(buffer_) + begin_offset_;
+    return cppmsboost::asio::buffer(buffer_) + begin_offset_;
   }
 
   // Return a pointer to the beginning of the unread data.
   const_buffer data() const
   {
-    return boost::asio::buffer(buffer_) + begin_offset_;
+    return cppmsboost::asio::buffer(buffer_) + begin_offset_;
   }
 
   // Is there no unread data in the buffer.
@@ -121,7 +121,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

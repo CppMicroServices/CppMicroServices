@@ -14,15 +14,15 @@
 #include <boost/type_traits/is_void.hpp>
 #include <boost/type_traits/is_function.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 template <class T> struct is_object
    : public 
       integral_constant<
          bool, 
-         ! ::boost::is_reference<T>::value && ! ::boost::is_void<T>::value && ! ::boost::is_function<T>::value > 
+         ! ::cppmsboost::is_reference<T>::value && ! ::cppmsboost::is_void<T>::value && ! ::cppmsboost::is_function<T>::value > 
 {};
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_IS_OBJECT_HPP_INCLUDED

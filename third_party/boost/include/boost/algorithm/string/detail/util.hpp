@@ -15,7 +15,7 @@
 #include <functional>
 #include <boost/range/iterator_range_core.hpp>
 
-namespace boost {
+namespace cppmsboost {
     namespace algorithm {
         namespace detail {
 
@@ -101,7 +101,7 @@ namespace boost {
 
         } // namespace detail
     } // namespace algorithm
-} // namespace boost
+} // namespace cppmsboost
 
 
 #endif  // BOOST_STRING_UTIL_DETAIL_HPP

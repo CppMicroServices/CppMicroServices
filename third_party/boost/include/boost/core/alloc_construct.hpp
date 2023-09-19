@@ -10,7 +10,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include <boost/core/noinit_adaptor.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 #if !defined(BOOST_NO_CXX11_ALLOCATOR)
 template<class A, class T>
@@ -57,7 +57,7 @@ public:
           n_(0) { }
 
     ~alloc_destroyer() {
-        boost::alloc_destroy_n(a_, p_, n_);
+        cppmsboost::alloc_destroy_n(a_, p_, n_);
     }
 
     std::size_t& size() BOOST_NOEXCEPT {

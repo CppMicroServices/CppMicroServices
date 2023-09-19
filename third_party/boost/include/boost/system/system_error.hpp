@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <cassert>
 
-namespace boost
+namespace cppmsboost
 {
   namespace system
   {
@@ -77,7 +77,7 @@ namespace boost
     }
 
   } // namespace system
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_SYSTEM_SYSTEM_ERROR_HPP
 

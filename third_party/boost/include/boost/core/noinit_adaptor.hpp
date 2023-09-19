@@ -17,7 +17,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <utility>
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 template<class A>
 struct noinit_adaptor

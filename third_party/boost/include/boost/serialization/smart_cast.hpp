@@ -58,7 +58,7 @@
 
 #include <boost/serialization/throw_exception.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 namespace smart_cast_impl {
 
@@ -124,7 +124,7 @@ namespace smart_cast_impl {
         template<class U>
         static T cast(U & u){
             typedef typename mpl::eval_if<
-                boost::is_polymorphic<U>,
+                cppmsboost::is_polymorphic<U>,
                 mpl::identity<polymorphic>,
                 mpl::identity<non_polymorphic>
             >::type typex;
@@ -200,7 +200,7 @@ namespace smart_cast_impl {
         template<class U>
         static T cast(U * u){
             typedef typename mpl::eval_if<
-                boost::is_polymorphic<U>,
+                cppmsboost::is_polymorphic<U>,
                 mpl::identity<polymorphic>,
                 mpl::identity<non_polymorphic>
             >::type typex;
@@ -241,17 +241,17 @@ T smart_cast(U u) {
     typedef
         typename mpl::eval_if<
             typename mpl::or_<
-                boost::is_same<void *, U>,
-                boost::is_same<void *, T>,
-                boost::is_same<const void *, U>,
-                boost::is_same<const void *, T>
+                cppmsboost::is_same<void *, U>,
+                cppmsboost::is_same<void *, T>,
+                cppmsboost::is_same<const void *, U>,
+                cppmsboost::is_same<const void *, T>
             >,
             mpl::identity<smart_cast_impl::void_pointer< T > >,
         // else
-        typename mpl::eval_if<boost::is_pointer<U>,
+        typename mpl::eval_if<cppmsboost::is_pointer<U>,
             mpl::identity<smart_cast_impl::pointer< T > >,
         // else
-        typename mpl::eval_if<boost::is_reference<U>,
+        typename mpl::eval_if<cppmsboost::is_reference<U>,
             mpl::identity<smart_cast_impl::reference< T > >,
         // else
             mpl::identity<smart_cast_impl::error< T >
@@ -270,6 +270,6 @@ T smart_cast_reference(U & u) {
 }
 
 } // namespace serialization
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_SERIALIZATION_SMART_CAST_HPP

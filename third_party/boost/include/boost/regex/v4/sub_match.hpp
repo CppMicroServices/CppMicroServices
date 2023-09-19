@@ -30,7 +30,7 @@
 #pragma warning(pop)
 #endif
 
-namespace boost{
+namespace cppmsboost{
 
 template <class BidiIterator>
 struct sub_match : public std::pair<BidiIterator, BidiIterator>
@@ -65,7 +65,7 @@ struct sub_match : public std::pair<BidiIterator, BidiIterator>
 #endif
    difference_type BOOST_REGEX_CALL length()const
    {
-      difference_type n = matched ? ::boost::BOOST_REGEX_DETAIL_NS::distance((BidiIterator)this->first, (BidiIterator)this->second) : 0;
+      difference_type n = matched ? ::cppmsboost::BOOST_REGEX_DETAIL_NS::distance((BidiIterator)this->first, (BidiIterator)this->second) : 0;
       return n;
    }
    std::basic_string<value_type> str()const
@@ -73,7 +73,7 @@ struct sub_match : public std::pair<BidiIterator, BidiIterator>
       std::basic_string<value_type> result;
       if(matched)
       {
-         std::size_t len = ::boost::BOOST_REGEX_DETAIL_NS::distance((BidiIterator)this->first, (BidiIterator)this->second);
+         std::size_t len = ::cppmsboost::BOOST_REGEX_DETAIL_NS::distance((BidiIterator)this->first, (BidiIterator)this->second);
          result.reserve(len);
          BidiIterator i = this->first;
          while(i != this->second)
@@ -132,7 +132,7 @@ struct sub_match : public std::pair<BidiIterator, BidiIterator>
    }
 
 private:
-   mutable boost::scoped_ptr<capture_sequence_type> m_captures;
+   mutable cppmsboost::scoped_ptr<capture_sequence_type> m_captures;
 public:
 
 #endif
@@ -499,7 +499,7 @@ sub_match<BidiIterator>::operator unsigned int()const
 }
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(push)

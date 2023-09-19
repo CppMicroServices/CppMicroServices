@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 #if defined(BOOST_ASIO_HAS_MOVE)
@@ -78,7 +78,7 @@ public:
    * @return A reference to the io_context object that the I/O object will use
    * to dispatch handlers. Ownership is not transferred to the caller.
    */
-  boost::asio::io_context& get_io_context()
+  cppmsboost::asio::io_context& get_io_context()
   {
     return service_.get_io_context();
   }
@@ -92,14 +92,14 @@ public:
    * @return A reference to the io_context object that the I/O object will use
    * to dispatch handlers. Ownership is not transferred to the caller.
    */
-  boost::asio::io_context& get_io_service()
+  cppmsboost::asio::io_context& get_io_service()
   {
     return service_.get_io_context();
   }
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
 
   /// The type of the executor associated with the object.
-  typedef boost::asio::io_context::executor_type executor_type;
+  typedef cppmsboost::asio::io_context::executor_type executor_type;
 
   /// Get the executor associated with the object.
   executor_type get_executor() BOOST_ASIO_NOEXCEPT
@@ -113,8 +113,8 @@ protected:
    * Performs:
    * @code get_service().construct(get_implementation()); @endcode
    */
-  explicit basic_io_object(boost::asio::io_context& io_context)
-    : service_(boost::asio::use_service<IoObjectService>(io_context))
+  explicit basic_io_object(cppmsboost::asio::io_context& io_context)
+    : service_(cppmsboost::asio::use_service<IoObjectService>(io_context))
   {
     service_.construct(implementation_);
   }
@@ -201,18 +201,18 @@ public:
   typedef typename service_type::implementation_type implementation_type;
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
-  boost::asio::io_context& get_io_context()
+  cppmsboost::asio::io_context& get_io_context()
   {
     return service_->get_io_context();
   }
 
-  boost::asio::io_context& get_io_service()
+  cppmsboost::asio::io_context& get_io_service()
   {
     return service_->get_io_context();
   }
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
 
-  typedef boost::asio::io_context::executor_type executor_type;
+  typedef cppmsboost::asio::io_context::executor_type executor_type;
 
   executor_type get_executor() BOOST_ASIO_NOEXCEPT
   {
@@ -220,8 +220,8 @@ public:
   }
 
 protected:
-  explicit basic_io_object(boost::asio::io_context& io_context)
-    : service_(&boost::asio::use_service<IoObjectService>(io_context))
+  explicit basic_io_object(cppmsboost::asio::io_context& io_context)
+    : service_(&cppmsboost::asio::use_service<IoObjectService>(io_context))
   {
     service_->construct(implementation_);
   }
@@ -235,7 +235,7 @@ protected:
   template <typename IoObjectService1>
   basic_io_object(IoObjectService1& other_service,
       typename IoObjectService1::implementation_type& other_implementation)
-    : service_(&boost::asio::use_service<IoObjectService>(
+    : service_(&cppmsboost::asio::use_service<IoObjectService>(
           other_service.get_io_context()))
   {
     service_->converting_move_construct(implementation_,
@@ -285,7 +285,7 @@ private:
 #endif // defined(BOOST_ASIO_HAS_MOVE)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

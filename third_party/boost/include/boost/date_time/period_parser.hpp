@@ -20,7 +20,7 @@
 #include <boost/date_time/string_convert.hpp>
 
 
-namespace boost { namespace date_time {
+namespace cppmsboost { namespace date_time {
 
 
   //! Not a facet, but a class used to specify and control period parsing
@@ -176,7 +176,7 @@ namespace boost { namespace date_time {
         ++sitr;
       }
       if(s != delim) {
-        boost::throw_exception(std::ios_base::failure("Parse failed. Expected '"
+        cppmsboost::throw_exception(std::ios_base::failure("Parse failed. Expected '"
           + convert_string_type<char_type,char>(delim) + "' but found '" + convert_string_type<char_type,char>(s) + "'"));
       }
     }
@@ -198,6 +198,6 @@ namespace boost { namespace date_time {
   const typename period_parser<date_type, char_type>::char_type
   period_parser<date_type, char_type>::default_period_closed_range_end_delimeter[2] = {']'};
 
- } } //namespace boost::date_time
+ } } //namespace cppmsboost::date_time
 
 #endif // DATETIME_PERIOD_PARSER_HPP___

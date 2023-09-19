@@ -73,7 +73,7 @@
 // The standard library is known to be compliant, so don't use the
 // configuration mechanism.
 
-namespace boost {
+namespace cppmsboost {
     namespace hash_detail {
         template <typename Float>
         struct call_ldexp {
@@ -108,7 +108,7 @@ namespace boost {
 //
 // The following tries to automatically detect which are available.
 
-namespace boost {
+namespace cppmsboost {
     namespace hash_detail {
 
         // Returned by dummy versions of the float functions.
@@ -127,7 +127,7 @@ namespace boost {
         template <> struct is<float> { char x[10]; };
         template <> struct is<double> { char x[20]; };
         template <> struct is<long double> { char x[30]; };
-        template <> struct is<boost::hash_detail::not_found> { char x[40]; };
+        template <> struct is<cppmsboost::hash_detail::not_found> { char x[40]; };
             
         // Used to convert the return type of a function to a type for sizeof.
 
@@ -172,9 +172,9 @@ namespace boost {
 // the boost namespace they'll always be preferable to any other function
 // (since the arguments are built in types, ADL can't be used).
 
-namespace boost_hash_detect_float_functions {
-    template <class Float> boost::hash_detail::not_found ldexp(Float, int);
-    template <class Float> boost::hash_detail::not_found frexp(Float, int*);    
+namespace cppmsboost_hash_detect_float_functions {
+    template <class Float> cppmsboost::hash_detail::not_found ldexp(Float, int);
+    template <class Float> cppmsboost::hash_detail::not_found frexp(Float, int*);    
 }
 
 // Macros for generating specializations of call_ldexp and call_frexp.
@@ -191,16 +191,16 @@ namespace boost_hash_detect_float_functions {
 // happen mainly when there's a template in the same namesapce.
 
 #define BOOST_HASH_CALL_FLOAT_FUNC(cpp_func, c99_func, type1, type2)    \
-namespace boost_hash_detect_float_functions {                           \
+namespace cppmsboost_hash_detect_float_functions {                           \
     template <class Float>                                              \
-    boost::hash_detail::not_found c99_func(Float, type2);               \
+    cppmsboost::hash_detail::not_found c99_func(Float, type2);               \
 }                                                                       \
                                                                         \
-namespace boost {                                                       \
+namespace cppmsboost {                                                       \
     namespace hash_detail {                                             \
         namespace c99_func##_detect {                                   \
             using namespace std;                                        \
-            using namespace boost_hash_detect_float_functions;          \
+            using namespace cppmsboost_hash_detect_float_functions;          \
                                                                         \
             struct check {                                              \
                 static type1 x;                                         \
@@ -216,7 +216,7 @@ namespace boost {                                                       \
                                                                         \
         template <bool x>                                               \
         struct call_c99_##c99_func :                                    \
-            boost::hash_detail::call_##cpp_func<double> {};             \
+            cppmsboost::hash_detail::call_##cpp_func<double> {};             \
                                                                         \
         template <>                                                     \
         struct call_c99_##c99_func<true> {                              \
@@ -233,7 +233,7 @@ namespace boost {                                                       \
         template <bool x>                                               \
         struct call_cpp_##c99_func :                                    \
             call_c99_##c99_func<                                        \
-                ::boost::hash_detail::c99_func##_detect::check::c99     \
+                ::cppmsboost::hash_detail::c99_func##_detect::check::c99     \
             > {};                                                       \
                                                                         \
         template <>                                                     \
@@ -251,13 +251,13 @@ namespace boost {                                                       \
         template <>                                                     \
         struct call_##cpp_func<type1> :                                 \
             call_cpp_##c99_func<                                        \
-                ::boost::hash_detail::c99_func##_detect::check::cpp     \
+                ::cppmsboost::hash_detail::c99_func##_detect::check::cpp     \
             > {};                                                       \
     }                                                                   \
 }
 
 #define BOOST_HASH_CALL_FLOAT_MACRO(cpp_func, c99_func, type1, type2)   \
-namespace boost {                                                       \
+namespace cppmsboost {                                                       \
     namespace hash_detail {                                             \
                                                                         \
         template <>                                                     \
@@ -298,7 +298,7 @@ BOOST_HASH_CALL_FLOAT_FUNC(frexp, frexpl, long double, int*)
 #undef BOOST_HASH_CALL_FLOAT_FUNC
 
 
-namespace boost
+namespace cppmsboost
 {
     namespace hash_detail
     {

@@ -37,7 +37,7 @@
 #include <boost/serialization/force_include.hpp>
 #include <boost/serialization/void_cast_fwd.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 
 namespace detail
@@ -95,6 +95,6 @@ base_object(Derived &d)
 }
 
 } // namespace serialization
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_SERIALIZATION_BASE_OBJECT_HPP

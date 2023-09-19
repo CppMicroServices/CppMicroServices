@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -47,7 +47,7 @@ public:
   {
     if (socket_ != invalid_socket)
     {
-      boost::system::error_code ec;
+      cppmsboost::system::error_code ec;
       socket_ops::state_type state = 0;
       socket_ops::close(socket_, state, true, ec);
     }
@@ -64,7 +64,7 @@ public:
   {
     if (socket_ != invalid_socket)
     {
-      boost::system::error_code ec;
+      cppmsboost::system::error_code ec;
       socket_ops::state_type state = 0;
       socket_ops::close(socket_, state, true, ec);
       socket_ = invalid_socket;
@@ -93,7 +93,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

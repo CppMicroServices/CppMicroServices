@@ -26,7 +26,7 @@
 
 #ifdef BOOST_DATE_TIME_HAS_HIGH_PRECISION_CLOCK
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
   //! A clock providing microsecond level resolution
@@ -85,24 +85,24 @@ namespace date_time {
       timeval tv;
       gettimeofday(&tv, 0); //gettimeofday does not support TZ adjust on Linux.
       std::time_t t = tv.tv_sec;
-      boost::uint32_t sub_sec = tv.tv_usec;
+      cppmsboost::uint32_t sub_sec = tv.tv_usec;
 #elif defined(BOOST_HAS_FTIME)
-      boost::winapi::FILETIME_ ft;
-      boost::winapi::GetSystemTimeAsFileTime(&ft);
+      cppmsboost::winapi::FILETIME_ ft;
+      cppmsboost::winapi::GetSystemTimeAsFileTime(&ft);
 #if BOOST_WORKAROUND(__MWERKS__, BOOST_TESTED_AT(0x3205))
       // Some runtime library implementations expect local times as the norm for ctime functions.
       {
-        boost::winapi::FILETIME_ local_ft;
-        boost::winapi::FileTimeToLocalFileTime(&ft, &local_ft);
+        cppmsboost::winapi::FILETIME_ local_ft;
+        cppmsboost::winapi::FileTimeToLocalFileTime(&ft, &local_ft);
         ft = local_ft;
       }
 #endif
 
-      boost::uint64_t micros = file_time_to_microseconds(ft); // it will not wrap, since ft is the current time
+      cppmsboost::uint64_t micros = file_time_to_microseconds(ft); // it will not wrap, since ft is the current time
                                                               // and cannot be before 1970-Jan-01
       std::time_t t = static_cast<std::time_t>(micros / 1000000UL); // seconds since epoch
       // microseconds -- static casts suppress warnings
-      boost::uint32_t sub_sec = static_cast<boost::uint32_t>(micros % 1000000UL);
+      cppmsboost::uint32_t sub_sec = static_cast<cppmsboost::uint32_t>(micros % 1000000UL);
 #else
 #error Internal Boost.DateTime error: BOOST_DATE_TIME_HAS_HIGH_PRECISION_CLOCK is defined, however neither gettimeofday nor FILETIME support is detected.
 #endif
@@ -133,14 +133,14 @@ namespace date_time {
      *
      * \note Only dates after 1970-Jan-01 are supported. Dates before will be wrapped.
      */
-    static boost::uint64_t file_time_to_microseconds(boost::winapi::FILETIME_ const& ft)
+    static cppmsboost::uint64_t file_time_to_microseconds(cppmsboost::winapi::FILETIME_ const& ft)
     {
       // shift is difference between 1970-Jan-01 & 1601-Jan-01
       // in 100-nanosecond units
-      const boost::uint64_t shift = 116444736000000000ULL; // (27111902 << 32) + 3577643008
+      const cppmsboost::uint64_t shift = 116444736000000000ULL; // (27111902 << 32) + 3577643008
 
       // 100-nanos since 1601-Jan-01
-      boost::uint64_t ft_as_integer = (static_cast< boost::uint64_t >(ft.dwHighDateTime) << 32) | static_cast< boost::uint64_t >(ft.dwLowDateTime);
+      cppmsboost::uint64_t ft_as_integer = (static_cast< cppmsboost::uint64_t >(ft.dwHighDateTime) << 32) | static_cast< cppmsboost::uint64_t >(ft.dwLowDateTime);
 
       ft_as_integer -= shift; // filetime is now 100-nanos since 1970-Jan-01
       return (ft_as_integer / 10U); // truncate to microseconds

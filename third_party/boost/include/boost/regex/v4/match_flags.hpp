@@ -24,7 +24,7 @@
 #endif
 
 #ifdef __cplusplus
-namespace boost{
+namespace cppmsboost{
    namespace regex_constants{
 #endif
 
@@ -90,13 +90,13 @@ typedef match_flags match_flag_type;
 
 #ifdef __cplusplus
 inline match_flags operator&(match_flags m1, match_flags m2)
-{ return static_cast<match_flags>(static_cast<boost::int32_t>(m1) & static_cast<boost::int32_t>(m2)); }
+{ return static_cast<match_flags>(static_cast<cppmsboost::int32_t>(m1) & static_cast<cppmsboost::int32_t>(m2)); }
 inline match_flags operator|(match_flags m1, match_flags m2)
-{ return static_cast<match_flags>(static_cast<boost::int32_t>(m1) | static_cast<boost::int32_t>(m2)); }
+{ return static_cast<match_flags>(static_cast<cppmsboost::int32_t>(m1) | static_cast<cppmsboost::int32_t>(m2)); }
 inline match_flags operator^(match_flags m1, match_flags m2)
-{ return static_cast<match_flags>(static_cast<boost::int32_t>(m1) ^ static_cast<boost::int32_t>(m2)); }
+{ return static_cast<match_flags>(static_cast<cppmsboost::int32_t>(m1) ^ static_cast<cppmsboost::int32_t>(m2)); }
 inline match_flags operator~(match_flags m1)
-{ return static_cast<match_flags>(~static_cast<boost::int32_t>(m1)); }
+{ return static_cast<match_flags>(~static_cast<cppmsboost::int32_t>(m1)); }
 inline match_flags& operator&=(match_flags& m1, match_flags m2)
 { m1 = m1&m2; return m1; }
 inline match_flags& operator|=(match_flags& m1, match_flags m2)
@@ -143,7 +143,7 @@ using regex_constants::format_no_copy;
 using regex_constants::format_first_only;
 /*using regex_constants::format_is_if;*/
 
-} /* namespace boost */
+} /* namespace cppmsboost */
 #endif /* __cplusplus */
 #endif /* include guard */
 

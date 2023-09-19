@@ -23,10 +23,10 @@
 #pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 using atomics::atomic_flag;
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ATOMIC_ATOMIC_FLAG_HPP_INCLUDED_

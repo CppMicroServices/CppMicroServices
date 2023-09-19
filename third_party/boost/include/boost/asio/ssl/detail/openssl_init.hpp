@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ssl {
 namespace detail {
@@ -40,7 +40,7 @@ protected:
   // main, and therefore before any other threads can get started. The do_init
   // instance must be static in this function to ensure that it gets
   // initialised before any other global objects try to use it.
-  BOOST_ASIO_DECL static boost::asio::detail::shared_ptr<do_init> instance();
+  BOOST_ASIO_DECL static cppmsboost::asio::detail::shared_ptr<do_init> instance();
 
 #if !defined(SSL_OP_NO_COMPRESSION) \
   && (OPENSSL_VERSION_NUMBER >= 0x00908000L)
@@ -83,7 +83,7 @@ private:
 
   // Reference to singleton do_init object to ensure that openssl does not get
   // cleaned up until the last user has finished with it.
-  boost::asio::detail::shared_ptr<do_init> ref_;
+  cppmsboost::asio::detail::shared_ptr<do_init> ref_;
 };
 
 template <bool Do_Init>
@@ -92,7 +92,7 @@ openssl_init<Do_Init> openssl_init<Do_Init>::instance_;
 } // namespace detail
 } // namespace ssl
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

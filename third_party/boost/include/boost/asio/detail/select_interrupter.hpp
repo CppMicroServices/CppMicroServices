@@ -27,7 +27,7 @@
 # include <boost/asio/detail/pipe_select_interrupter.hpp>
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -41,7 +41,7 @@ typedef pipe_select_interrupter select_interrupter;
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // !defined(BOOST_ASIO_WINDOWS_RUNTIME)
 

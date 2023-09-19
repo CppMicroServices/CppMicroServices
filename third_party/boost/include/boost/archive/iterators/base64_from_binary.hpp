@@ -28,7 +28,7 @@ namespace std{
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/archive/iterators/dataflow_exception.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 namespace iterators {
 
@@ -69,7 +69,7 @@ struct from_6_bit {
 //template<class Base, class CharType = typename Base::value_type>
 template<
     class Base,
-    class CharType = typename boost::iterator_value<Base>::type
+    class CharType = typename cppmsboost::iterator_value<Base>::type
 >
 class base64_from_binary :
     public transform_iterator<
@@ -77,7 +77,7 @@ class base64_from_binary :
         Base
     >
 {
-    friend class boost::iterator_core_access;
+    friend class cppmsboost::iterator_core_access;
     typedef transform_iterator<
         typename detail::from_6_bit<CharType>,
         Base
@@ -104,6 +104,6 @@ public:
 
 } // namespace iterators
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ARCHIVE_ITERATORS_BASE64_FROM_BINARY_HPP

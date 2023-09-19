@@ -26,7 +26,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -42,13 +42,13 @@ void reactive_serial_port_service::shutdown()
   descriptor_service_.shutdown();
 }
 
-boost::system::error_code reactive_serial_port_service::open(
+cppmsboost::system::error_code reactive_serial_port_service::open(
     reactive_serial_port_service::implementation_type& impl,
-    const std::string& device, boost::system::error_code& ec)
+    const std::string& device, cppmsboost::system::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = boost::asio::error::already_open;
+    ec = cppmsboost::asio::error::already_open;
     return ec;
   }
 
@@ -63,7 +63,7 @@ boost::system::error_code reactive_serial_port_service::open(
     s = descriptor_ops::fcntl(fd, F_SETFL, s | O_NONBLOCK, ec);
   if (s < 0)
   {
-    boost::system::error_code ignored_ec;
+    cppmsboost::system::error_code ignored_ec;
     descriptor_ops::close(fd, state, ignored_ec);
     return ec;
   }
@@ -91,7 +91,7 @@ boost::system::error_code reactive_serial_port_service::open(
   }
   if (s < 0)
   {
-    boost::system::error_code ignored_ec;
+    cppmsboost::system::error_code ignored_ec;
     descriptor_ops::close(fd, state, ignored_ec);
     return ec;
   }
@@ -99,17 +99,17 @@ boost::system::error_code reactive_serial_port_service::open(
   // We're done. Take ownership of the serial port descriptor.
   if (descriptor_service_.assign(impl, fd, ec))
   {
-    boost::system::error_code ignored_ec;
+    cppmsboost::system::error_code ignored_ec;
     descriptor_ops::close(fd, state, ignored_ec);
   }
 
   return ec;
 }
 
-boost::system::error_code reactive_serial_port_service::do_set_option(
+cppmsboost::system::error_code reactive_serial_port_service::do_set_option(
     reactive_serial_port_service::implementation_type& impl,
     reactive_serial_port_service::store_function_type store,
-    const void* option, boost::system::error_code& ec)
+    const void* option, cppmsboost::system::error_code& ec)
 {
   termios ios;
   errno = 0;
@@ -127,10 +127,10 @@ boost::system::error_code reactive_serial_port_service::do_set_option(
   return ec;
 }
 
-boost::system::error_code reactive_serial_port_service::do_get_option(
+cppmsboost::system::error_code reactive_serial_port_service::do_get_option(
     const reactive_serial_port_service::implementation_type& impl,
     reactive_serial_port_service::load_function_type load,
-    void* option, boost::system::error_code& ec) const
+    void* option, cppmsboost::system::error_code& ec) const
 {
   termios ios;
   errno = 0;
@@ -144,7 +144,7 @@ boost::system::error_code reactive_serial_port_service::do_get_option(
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

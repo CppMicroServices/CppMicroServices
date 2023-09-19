@@ -47,7 +47,7 @@
 
 #if defined(BOOST_MSVC)
 #pragma warning(push)
-// 'boost::atomics::atomic_ref<T>' : multiple assignment operators specified
+// 'cppmsboost::atomics::atomic_ref<T>' : multiple assignment operators specified
 #pragma warning(disable: 4522)
 #endif
 
@@ -56,7 +56,7 @@
  *                      see comment for convert_memory_order_to_gcc in ops_gcc_atomic.hpp.
  */
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -815,12 +815,12 @@ private:
 
     BOOST_FORCEINLINE void clear_padding_bits(atomics::detail::true_type) const BOOST_NOEXCEPT
     {
-        storage_type old_value = operations::load(this->storage(), boost::memory_order_relaxed);
+        storage_type old_value = operations::load(this->storage(), cppmsboost::memory_order_relaxed);
         while (true)
         {
             storage_type new_value = old_value;
             atomics::detail::clear_tail_padding_bits< atomics::detail::value_sizeof< value_type >::value >(new_value);
-            bool res = operations::compare_exchange_weak(this->storage(), old_value, new_value, boost::memory_order_relaxed, boost::memory_order_relaxed);
+            bool res = operations::compare_exchange_weak(this->storage(), old_value, new_value, cppmsboost::memory_order_relaxed, cppmsboost::memory_order_relaxed);
             if (BOOST_LIKELY(res))
                 break;
         }
@@ -1069,9 +1069,9 @@ private:
 public:
     typedef typename base_type::value_type value_type;
 
-    BOOST_STATIC_ASSERT_MSG(sizeof(value_type) > 0u, "boost::atomic_ref<T> requires T to be a complete type");
+    BOOST_STATIC_ASSERT_MSG(sizeof(value_type) > 0u, "cppmsboost::atomic_ref<T> requires T to be a complete type");
 #if !defined(BOOST_ATOMIC_DETAIL_NO_CXX11_IS_TRIVIALLY_COPYABLE)
-    BOOST_STATIC_ASSERT_MSG(atomics::detail::is_trivially_copyable< value_type >::value, "boost::atomic_ref<T> requires T to be a trivially copyable type");
+    BOOST_STATIC_ASSERT_MSG(atomics::detail::is_trivially_copyable< value_type >::value, "cppmsboost::atomic_ref<T> requires T to be a trivially copyable type");
 #endif
 
 private:
@@ -1110,7 +1110,7 @@ public:
 };
 
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #if defined(BOOST_MSVC)
 #pragma warning(pop)

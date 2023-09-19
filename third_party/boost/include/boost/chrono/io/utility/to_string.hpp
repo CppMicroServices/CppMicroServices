@@ -12,7 +12,7 @@
 #include <string>
 #include <sstream>
 
-namespace boost
+namespace cppmsboost
 {
   namespace chrono
   {

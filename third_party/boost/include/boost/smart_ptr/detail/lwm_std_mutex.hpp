@@ -8,7 +8,7 @@
 #include <boost/assert.hpp>
 #include <mutex>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -57,6 +57,6 @@ public:
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_SMART_PTR_DETAIL_LWM_STD_MUTEX_HPP_INCLUDED

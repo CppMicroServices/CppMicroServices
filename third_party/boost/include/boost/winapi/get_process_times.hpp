@@ -24,9 +24,9 @@
 
 #if !defined( BOOST_USE_WINDOWS_H )
 extern "C" {
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
 GetProcessTimes(
-    boost::winapi::HANDLE_ hProcess,
+    cppmsboost::winapi::HANDLE_ hProcess,
     ::_FILETIME* lpCreationTime,
     ::_FILETIME* lpExitTime,
     ::_FILETIME* lpKernelTime,
@@ -34,7 +34,7 @@ GetProcessTimes(
 }
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 
 BOOST_FORCEINLINE BOOL_ GetProcessTimes(

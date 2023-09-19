@@ -21,17 +21,17 @@
 
 #include <boost/core/typeinfo.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
 {
 
-typedef boost::core::typeinfo sp_typeinfo_;
+typedef cppmsboost::core::typeinfo sp_typeinfo_;
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #define BOOST_SP_TYPEID_(T) BOOST_CORE_TYPEID(T)
 
@@ -39,7 +39,7 @@ typedef boost::core::typeinfo sp_typeinfo_;
 
 #include <typeinfo>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -49,7 +49,7 @@ typedef std::type_info sp_typeinfo_;
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #define BOOST_SP_TYPEID_(T) typeid(T)
 

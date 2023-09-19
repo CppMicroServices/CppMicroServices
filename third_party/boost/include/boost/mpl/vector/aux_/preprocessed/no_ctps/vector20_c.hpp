@@ -9,7 +9,7 @@
 // Preprocessed version of "boost/mpl/vector/vector20_c.hpp" header
 // -- DO NOT modify by hand!
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 template<
       typename T

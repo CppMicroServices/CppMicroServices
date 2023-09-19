@@ -20,7 +20,7 @@
 
 #include <cstddef>
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 namespace dtl {
 
@@ -36,6 +36,6 @@ BOOST_CONTAINER_FORCEINLINE T* addressof(T& obj)
 
 }  //namespace dtl {
 }  //namespace container {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif   //#ifndef BOOST_CONTAINER_DETAIL_ADDRESSOF_HPP

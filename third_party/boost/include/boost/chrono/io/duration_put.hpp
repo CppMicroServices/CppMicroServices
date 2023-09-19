@@ -17,7 +17,7 @@
 #include <boost/assert.hpp>
 #include <locale>
 
-namespace boost
+namespace cppmsboost
 {
   namespace chrono
   {
@@ -29,8 +29,8 @@ namespace boost
         typedef T type;
       };
       template <>
-      struct propagate<boost::int_least32_t> {
-        typedef boost::int_least64_t type;
+      struct propagate<cppmsboost::int_least32_t> {
+        typedef cppmsboost::int_least64_t type;
       };
     }
     /**

@@ -20,13 +20,13 @@ Distributed under the Boost Software License, Version 1.0.
 #include <boost/type_traits/remove_extent.hpp>
 #include <boost/type_traits/type_with_alignment.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace detail {
 
 template<class T>
 struct sp_array_element {
-    typedef typename boost::remove_cv<typename
-        boost::remove_extent<T>::type>::type type;
+    typedef typename cppmsboost::remove_cv<typename
+        cppmsboost::remove_extent<T>::type>::type type;
 };
 
 template<class T>
@@ -123,8 +123,8 @@ private:
 template<class T, class U>
 struct sp_array_alignment {
     enum {
-        value = sp_max_size<boost::alignment_of<T>::value,
-            boost::alignment_of<U>::value>::value
+        value = sp_max_size<cppmsboost::alignment_of<T>::value,
+            cppmsboost::alignment_of<U>::value>::value
     };
 };
 
@@ -153,7 +153,7 @@ class sp_array_creator {
         offset = sp_array_offset<T, element>::value
     };
 
-    typedef typename boost::type_with_alignment<sp_array_alignment<T,
+    typedef typename cppmsboost::type_with_alignment<sp_array_alignment<T,
         element>::value>::type type;
 
 public:
@@ -186,8 +186,8 @@ public:
     template<class A>
     sp_array_base(const A& other, type* start, std::size_t size)
         : state_(other, size) {
-        boost::alloc_construct_n(state_.allocator(),
-            boost::first_scalar(start),
+        cppmsboost::alloc_construct_n(state_.allocator(),
+            cppmsboost::first_scalar(start),
             state_.size() * sp_array_count<type>::value);
     }
 
@@ -197,9 +197,9 @@ public:
         enum {
             count = sp_array_count<type>::value
         };
-        boost::alloc_construct_n(state_.allocator(),
-            boost::first_scalar(start), state_.size() * count,
-            boost::first_scalar(&list), count);
+        cppmsboost::alloc_construct_n(state_.allocator(),
+            cppmsboost::first_scalar(start), state_.size() * count,
+            cppmsboost::first_scalar(&list), count);
     }
 
     T& state() BOOST_SP_NOEXCEPT {
@@ -207,8 +207,8 @@ public:
     }
 
     virtual void dispose() BOOST_SP_NOEXCEPT {
-        boost::alloc_destroy_n(state_.allocator(),
-            boost::first_scalar(sp_array_start<type>(this)),
+        cppmsboost::alloc_destroy_n(state_.allocator(),
+            cppmsboost::first_scalar(sp_array_start<type>(this)),
             state_.size() * sp_array_count<type>::value);
     }
 
@@ -347,14 +347,14 @@ template<class T, class A>
 inline typename enable_if_<is_unbounded_array<T>::value, shared_ptr<T> >::type
 allocate_shared_noinit(const A& allocator, std::size_t count)
 {
-    return boost::allocate_shared<T>(boost::noinit_adapt(allocator), count);
+    return cppmsboost::allocate_shared<T>(cppmsboost::noinit_adapt(allocator), count);
 }
 
 template<class T, class A>
 inline typename enable_if_<is_bounded_array<T>::value, shared_ptr<T> >::type
 allocate_shared_noinit(const A& allocator)
 {
-    return boost::allocate_shared<T>(boost::noinit_adapt(allocator));
+    return cppmsboost::allocate_shared<T>(cppmsboost::noinit_adapt(allocator));
 }
 
 } /* boost */

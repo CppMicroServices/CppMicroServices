@@ -25,7 +25,7 @@
 #include "boost/date_time/posix_time/time_period.hpp"
 #include "boost/date_time/time_parsing.hpp"
 
-namespace boost {
+namespace cppmsboost {
 namespace posix_time {
 
 
@@ -38,7 +38,7 @@ namespace posix_time {
   std::basic_ostream<charT, traits>&
   operator<<(std::basic_ostream<charT, traits>& os, const time_duration& td)
   {
-    typedef boost::date_time::ostream_time_duration_formatter<time_duration, charT> duration_formatter;
+    typedef cppmsboost::date_time::ostream_time_duration_formatter<time_duration, charT> duration_formatter;
     duration_formatter::duration_put(td, os);
     return os;
   }
@@ -49,7 +49,7 @@ namespace posix_time {
   std::basic_ostream<charT, traits>&
   operator<<(std::basic_ostream<charT, traits>& os, const ptime& t)
   {
-    typedef boost::date_time::ostream_time_formatter<ptime, charT> time_formatter;
+    typedef cppmsboost::date_time::ostream_time_formatter<ptime, charT> time_formatter;
     time_formatter::time_put(t, os);
     return os;
   }
@@ -60,7 +60,7 @@ namespace posix_time {
   std::basic_ostream<charT, traits>&
   operator<<(std::basic_ostream<charT, traits>& os, const time_period& tp)
   {
-    typedef boost::date_time::ostream_time_period_formatter<time_period, charT> period_formatter;
+    typedef cppmsboost::date_time::ostream_time_period_formatter<time_period, charT> period_formatter;
     period_formatter::period_put(tp, os);
     return os;
   }

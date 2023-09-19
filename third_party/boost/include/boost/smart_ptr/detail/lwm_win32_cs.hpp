@@ -27,7 +27,7 @@ struct _RTL_CRITICAL_SECTION;
 
 #endif
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -82,12 +82,12 @@ public:
 
     lightweight_mutex()
     {
-        boost::detail::InitializeCriticalSection(reinterpret_cast< rtl_critical_section* >(&cs_));
+        cppmsboost::detail::InitializeCriticalSection(reinterpret_cast< rtl_critical_section* >(&cs_));
     }
 
     ~lightweight_mutex()
     {
-        boost::detail::DeleteCriticalSection(reinterpret_cast< rtl_critical_section* >(&cs_));
+        cppmsboost::detail::DeleteCriticalSection(reinterpret_cast< rtl_critical_section* >(&cs_));
     }
 
     class scoped_lock;
@@ -106,18 +106,18 @@ public:
 
         explicit scoped_lock(lightweight_mutex & m): m_(m)
         {
-            boost::detail::EnterCriticalSection(reinterpret_cast< rtl_critical_section* >(&m_.cs_));
+            cppmsboost::detail::EnterCriticalSection(reinterpret_cast< rtl_critical_section* >(&m_.cs_));
         }
 
         ~scoped_lock()
         {
-            boost::detail::LeaveCriticalSection(reinterpret_cast< rtl_critical_section* >(&m_.cs_));
+            cppmsboost::detail::LeaveCriticalSection(reinterpret_cast< rtl_critical_section* >(&m_.cs_));
         }
     };
 };
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_SMART_PTR_DETAIL_LWM_WIN32_CS_HPP_INCLUDED

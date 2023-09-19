@@ -36,7 +36,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace windows {
 
@@ -70,7 +70,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined native_handle_type;
 #else
-  typedef boost::asio::detail::win_iocp_handle_service::native_handle_type
+  typedef cppmsboost::asio::detail::win_iocp_handle_service::native_handle_type
     native_handle_type;
 #endif
 
@@ -119,15 +119,15 @@ public:
    *
    * @param native_handle The new underlying handle implementation.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   basic_overlapped_handle(const executor_type& ex,
       const native_handle_type& native_handle)
     : impl_(ex)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(), native_handle, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    cppmsboost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Construct an overlapped handle on an existing native handle.
@@ -141,7 +141,7 @@ public:
    *
    * @param native_handle The new underlying handle implementation.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_overlapped_handle(ExecutionContext& context,
@@ -151,9 +151,9 @@ public:
       >::type* = 0)
     : impl_(context)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(), native_handle, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    cppmsboost::asio::detail::throw_error(ec, "assign");
   }
 
 #if defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
@@ -231,13 +231,13 @@ public:
    *
    * @param handle A native handle.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   void assign(const native_handle_type& handle)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(), handle, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    cppmsboost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Assign an existing native handle to the handle.
@@ -249,7 +249,7 @@ public:
    * @param ec Set to indicate what error occurred, if any.
    */
   BOOST_ASIO_SYNC_OP_VOID assign(const native_handle_type& handle,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     impl_.get_service().assign(impl_.get_implementation(), handle, ec);
     BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
@@ -265,26 +265,26 @@ public:
   /**
    * This function is used to close the handle. Any asynchronous read or write
    * operations will be cancelled immediately, and will complete with the
-   * boost::asio::error::operation_aborted error.
+   * cppmsboost::asio::error::operation_aborted error.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   void close()
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().close(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "close");
+    cppmsboost::asio::detail::throw_error(ec, "close");
   }
 
   /// Close the handle.
   /**
    * This function is used to close the handle. Any asynchronous read or write
    * operations will be cancelled immediately, and will complete with the
-   * boost::asio::error::operation_aborted error.
+   * cppmsboost::asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID close(boost::system::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID close(cppmsboost::system::error_code& ec)
   {
     impl_.get_service().close(impl_.get_implementation(), ec);
     BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
@@ -305,26 +305,26 @@ public:
   /**
    * This function causes all outstanding asynchronous read or write operations
    * to finish immediately, and the handlers for cancelled operations will be
-   * passed the boost::asio::error::operation_aborted error.
+   * passed the cppmsboost::asio::error::operation_aborted error.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   void cancel()
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().cancel(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "cancel");
+    cppmsboost::asio::detail::throw_error(ec, "cancel");
   }
 
   /// Cancel all asynchronous operations associated with the handle.
   /**
    * This function causes all outstanding asynchronous read or write operations
    * to finish immediately, and the handlers for cancelled operations will be
-   * passed the boost::asio::error::operation_aborted error.
+   * passed the cppmsboost::asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID cancel(boost::system::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID cancel(cppmsboost::system::error_code& ec)
   {
     impl_.get_service().cancel(impl_.get_implementation(), ec);
     BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
@@ -340,8 +340,8 @@ protected:
   {
   }
 
-  boost::asio::detail::io_object_impl<
-    boost::asio::detail::win_iocp_handle_service, Executor> impl_;
+  cppmsboost::asio::detail::io_object_impl<
+    cppmsboost::asio::detail::win_iocp_handle_service, Executor> impl_;
 
 private:
   // Disallow copying and assignment.
@@ -352,7 +352,7 @@ private:
 
 } // namespace windows
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

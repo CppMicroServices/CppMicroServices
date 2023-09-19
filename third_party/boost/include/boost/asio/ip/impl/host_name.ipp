@@ -23,33 +23,33 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
 std::string host_name()
 {
   char name[1024];
-  boost::system::error_code ec;
-  if (boost::asio::detail::socket_ops::gethostname(name, sizeof(name), ec) != 0)
+  cppmsboost::system::error_code ec;
+  if (cppmsboost::asio::detail::socket_ops::gethostname(name, sizeof(name), ec) != 0)
   {
-    boost::asio::detail::throw_error(ec);
+    cppmsboost::asio::detail::throw_error(ec);
     return std::string();
   }
   return std::string(name);
 }
 
-std::string host_name(boost::system::error_code& ec)
+std::string host_name(cppmsboost::system::error_code& ec)
 {
   char name[1024];
-  if (boost::asio::detail::socket_ops::gethostname(name, sizeof(name), ec) != 0)
+  if (cppmsboost::asio::detail::socket_ops::gethostname(name, sizeof(name), ec) != 0)
     return std::string();
   return std::string(name);
 }
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

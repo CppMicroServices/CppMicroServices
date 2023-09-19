@@ -26,7 +26,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -300,13 +300,13 @@ class promise_handler_ec_0
   : public promise_creator<void>
 {
 public:
-  void operator()(const boost::system::error_code& ec)
+  void operator()(const cppmsboost::system::error_code& ec)
   {
     if (ec)
     {
       this->p_->set_exception(
           std::make_exception_ptr(
-            boost::system::system_error(ec)));
+            cppmsboost::system::system_error(ec)));
     }
     else
     {
@@ -353,14 +353,14 @@ class promise_handler_ec_1
 {
 public:
   template <typename Arg>
-  void operator()(const boost::system::error_code& ec,
+  void operator()(const cppmsboost::system::error_code& ec,
       BOOST_ASIO_MOVE_ARG(Arg) arg)
   {
     if (ec)
     {
       this->p_->set_exception(
           std::make_exception_ptr(
-            boost::system::system_error(ec)));
+            cppmsboost::system::system_error(ec)));
     }
     else
       this->p_->set_value(BOOST_ASIO_MOVE_CAST(Arg)(arg));
@@ -426,14 +426,14 @@ public:
 #if defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
 
   template <typename... Args>
-  void operator()(const boost::system::error_code& ec,
+  void operator()(const cppmsboost::system::error_code& ec,
       BOOST_ASIO_MOVE_ARG(Args)... args)
   {
     if (ec)
     {
       this->p_->set_exception(
           std::make_exception_ptr(
-            boost::system::system_error(ec)));
+            cppmsboost::system::system_error(ec)));
     }
     else
     {
@@ -447,14 +447,14 @@ public:
 
 #define BOOST_ASIO_PRIVATE_CALL_OP_DEF(n) \
   template <BOOST_ASIO_VARIADIC_TPARAMS(n)> \
-  void operator()(const boost::system::error_code& ec, \
+  void operator()(const cppmsboost::system::error_code& ec, \
       BOOST_ASIO_VARIADIC_MOVE_PARAMS(n)) \
   {\
     if (ec) \
     { \
       this->p_->set_exception( \
           std::make_exception_ptr( \
-            boost::system::system_error(ec))); \
+            cppmsboost::system::system_error(ec))); \
     } \
     else \
     { \
@@ -524,7 +524,7 @@ class promise_handler_selector<void()>
   : public promise_handler_0 {};
 
 template <>
-class promise_handler_selector<void(boost::system::error_code)>
+class promise_handler_selector<void(cppmsboost::system::error_code)>
   : public promise_handler_ec_0 {};
 
 template <>
@@ -536,7 +536,7 @@ class promise_handler_selector<void(Arg)>
   : public promise_handler_1<Arg> {};
 
 template <typename Arg>
-class promise_handler_selector<void(boost::system::error_code, Arg)>
+class promise_handler_selector<void(cppmsboost::system::error_code, Arg)>
   : public promise_handler_ec_1<Arg> {};
 
 template <typename Arg>
@@ -550,7 +550,7 @@ class promise_handler_selector<void(Arg...)>
   : public promise_handler_n<std::tuple<Arg...> > {};
 
 template <typename... Arg>
-class promise_handler_selector<void(boost::system::error_code, Arg...)>
+class promise_handler_selector<void(cppmsboost::system::error_code, Arg...)>
   : public promise_handler_ec_n<std::tuple<Arg...> > {};
 
 template <typename... Arg>
@@ -568,7 +568,7 @@ class promise_handler_selector<void(std::exception_ptr, Arg...)>
   \
   template <typename Arg, BOOST_ASIO_VARIADIC_TPARAMS(n)> \
   class promise_handler_selector< \
-    void(boost::system::error_code, Arg, BOOST_ASIO_VARIADIC_TARGS(n))> \
+    void(cppmsboost::system::error_code, Arg, BOOST_ASIO_VARIADIC_TARGS(n))> \
       : public promise_handler_ec_n< \
         std::tuple<Arg, BOOST_ASIO_VARIADIC_TARGS(n)> > {}; \
   \
@@ -882,7 +882,7 @@ public:
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

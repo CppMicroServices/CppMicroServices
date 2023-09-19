@@ -30,13 +30,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
 /// Implements IP version 4 style addresses.
 /**
- * The boost::asio::ip::address_v4 class provides the ability to use and
+ * The cppmsboost::asio::ip::address_v4 class provides the ability to use and
  * manipulate IP version 4 addresses.
  *
  * @par Thread Safety
@@ -57,7 +57,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef array<unsigned char, 4> bytes_type;
 #else
-  typedef boost::asio::detail::array<unsigned char, 4> bytes_type;
+  typedef cppmsboost::asio::detail::array<unsigned char, 4> bytes_type;
 #endif
 
   /// Default constructor.
@@ -119,7 +119,7 @@ public:
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
   /// (Deprecated: Use other overload.) Get the address as a string in dotted
   /// decimal format.
-  BOOST_ASIO_DECL std::string to_string(boost::system::error_code& ec) const;
+  BOOST_ASIO_DECL std::string to_string(cppmsboost::system::error_code& ec) const;
 
   /// (Deprecated: Use make_address_v4().) Create an address from an IP address
   /// string in dotted decimal form.
@@ -128,7 +128,7 @@ public:
   /// (Deprecated: Use make_address_v4().) Create an address from an IP address
   /// string in dotted decimal form.
   static address_v4 from_string(
-      const char* str, boost::system::error_code& ec);
+      const char* str, cppmsboost::system::error_code& ec);
 
   /// (Deprecated: Use make_address_v4().) Create an address from an IP address
   /// string in dotted decimal form.
@@ -137,7 +137,7 @@ public:
   /// (Deprecated: Use make_address_v4().) Create an address from an IP address
   /// string in dotted decimal form.
   static address_v4 from_string(
-      const std::string& str, boost::system::error_code& ec);
+      const std::string& str, cppmsboost::system::error_code& ec);
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
 
   /// Determine whether the address is a loopback address.
@@ -237,7 +237,7 @@ public:
 
 private:
   // The underlying IPv4 address.
-  boost::asio::detail::in4_addr_type addr_;
+  cppmsboost::asio::detail::in4_addr_type addr_;
 };
 
 /// Create an IPv4 address from raw bytes in network order.
@@ -269,7 +269,7 @@ BOOST_ASIO_DECL address_v4 make_address_v4(const char* str);
  * @relates address_v4
  */
 BOOST_ASIO_DECL address_v4 make_address_v4(const char* str,
-    boost::system::error_code& ec) BOOST_ASIO_NOEXCEPT;
+    cppmsboost::system::error_code& ec) BOOST_ASIO_NOEXCEPT;
 
 /// Create an IPv4 address from an IP address string in dotted decimal form.
 /**
@@ -282,7 +282,7 @@ BOOST_ASIO_DECL address_v4 make_address_v4(const std::string& str);
  * @relates address_v4
  */
 BOOST_ASIO_DECL address_v4 make_address_v4(const std::string& str,
-    boost::system::error_code& ec) BOOST_ASIO_NOEXCEPT;
+    cppmsboost::system::error_code& ec) BOOST_ASIO_NOEXCEPT;
 
 #if defined(BOOST_ASIO_HAS_STRING_VIEW) \
   || defined(GENERATING_DOCUMENTATION)
@@ -298,7 +298,7 @@ BOOST_ASIO_DECL address_v4 make_address_v4(string_view str);
  * @relates address_v4
  */
 BOOST_ASIO_DECL address_v4 make_address_v4(string_view str,
-    boost::system::error_code& ec) BOOST_ASIO_NOEXCEPT;
+    cppmsboost::system::error_code& ec) BOOST_ASIO_NOEXCEPT;
 
 #endif // defined(BOOST_ASIO_HAS_STRING_VIEW)
        //  || defined(GENERATING_DOCUMENTATION)
@@ -315,7 +315,7 @@ BOOST_ASIO_DECL address_v4 make_address_v4(string_view str,
  *
  * @return The output stream.
  *
- * @relates boost::asio::ip::address_v4
+ * @relates cppmsboost::asio::ip::address_v4
  */
 template <typename Elem, typename Traits>
 std::basic_ostream<Elem, Traits>& operator<<(
@@ -325,7 +325,7 @@ std::basic_ostream<Elem, Traits>& operator<<(
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

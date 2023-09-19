@@ -21,7 +21,7 @@
 #include <boost/config.hpp>
 #include <utility>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -56,7 +56,7 @@ public:
 
     virtual void local_cb_destroy() BOOST_SP_NOEXCEPT = 0;
 
-    virtual boost::detail::shared_count local_cb_get_shared_count() const BOOST_SP_NOEXCEPT = 0;
+    virtual cppmsboost::detail::shared_count local_cb_get_shared_count() const BOOST_SP_NOEXCEPT = 0;
 
     void add_ref() BOOST_SP_NOEXCEPT
     {
@@ -118,7 +118,7 @@ public:
         delete this;
     }
 
-    virtual boost::detail::shared_count local_cb_get_shared_count() const BOOST_SP_NOEXCEPT
+    virtual cppmsboost::detail::shared_count local_cb_get_shared_count() const BOOST_SP_NOEXCEPT
     {
         return pn_;
     }
@@ -135,7 +135,7 @@ public:
         shared_count().swap( pn_ );
     }
 
-    virtual boost::detail::shared_count local_cb_get_shared_count() const BOOST_SP_NOEXCEPT
+    virtual cppmsboost::detail::shared_count local_cb_get_shared_count() const BOOST_SP_NOEXCEPT
     {
         return pn_;
     }
@@ -143,6 +143,6 @@ public:
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // #ifndef BOOST_SMART_PTR_DETAIL_LOCAL_COUNTED_BASE_HPP_INCLUDED

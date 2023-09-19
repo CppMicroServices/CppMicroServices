@@ -20,7 +20,7 @@
 
 #include "boost/mpl/integral_c.hpp"
 
-namespace boost { namespace numeric { namespace convdetail
+namespace cppmsboost { namespace numeric { namespace convdetail
 {
   // Integral Constants representing rounding modes
   typedef mpl::integral_c<std::float_round_style, std::round_toward_zero>         round2zero_c ;
@@ -586,7 +586,7 @@ namespace boost { namespace numeric { namespace convdetail
     typedef typename mpl::eval_if<trivial,TrivialQ,NonTrivialQ>::type type ;
   } ;
 
-} } } // namespace boost::numeric::convdetail
+} } } // namespace cppmsboost::numeric::convdetail
 
 #endif
 

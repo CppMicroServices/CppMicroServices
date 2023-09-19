@@ -24,7 +24,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -59,13 +59,13 @@ void strand_service::dispatch(strand_service::implementation_type& impl,
   if (call_stack<strand_impl>::contains(impl))
   {
     fenced_block b(fenced_block::full);
-    boost_asio_handler_invoke_helpers::invoke(handler, handler);
+    cppmsboost_asio_handler_invoke_helpers::invoke(handler, handler);
     return;
   }
 
   // Allocate and construct an operation to wrap the handler.
   typedef completion_handler<Handler> op;
-  typename op::ptr p = { boost::asio::detail::addressof(handler),
+  typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
     op::ptr::allocate(handler), 0 };
   p.p = new (p.v) op(handler);
 
@@ -86,7 +86,7 @@ void strand_service::dispatch(strand_service::implementation_type& impl,
     (void)on_exit;
 
     completion_handler<Handler>::do_complete(
-        &io_context_, o, boost::system::error_code(), 0);
+        &io_context_, o, cppmsboost::system::error_code(), 0);
   }
 }
 
@@ -96,11 +96,11 @@ void strand_service::post(strand_service::implementation_type& impl,
     Handler& handler)
 {
   bool is_continuation =
-    boost_asio_handler_cont_helpers::is_continuation(handler);
+    cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
   // Allocate and construct an operation to wrap the handler.
   typedef completion_handler<Handler> op;
-  typename op::ptr p = { boost::asio::detail::addressof(handler),
+  typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
     op::ptr::allocate(handler), 0 };
   p.p = new (p.v) op(handler);
 
@@ -113,7 +113,7 @@ void strand_service::post(strand_service::implementation_type& impl,
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

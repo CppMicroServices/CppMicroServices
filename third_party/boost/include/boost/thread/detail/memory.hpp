@@ -19,7 +19,7 @@
 #include <boost/thread/csbl/memory/allocator_traits.hpp>
 #include <boost/thread/csbl/memory/scoped_allocator.hpp>
 
-namespace boost
+namespace cppmsboost
 {
   namespace thread_detail
   {

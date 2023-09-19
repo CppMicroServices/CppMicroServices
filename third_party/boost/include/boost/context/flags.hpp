@@ -13,7 +13,7 @@
 #  include BOOST_ABI_PREFIX
 # endif
 
-namespace boost {
+namespace cppmsboost {
 namespace context {
 
 struct exec_ontop_arg_t {};

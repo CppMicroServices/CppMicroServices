@@ -23,16 +23,16 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ssl {
 namespace detail {
 
 template <typename Stream, typename Operation>
 std::size_t io(Stream& next_layer, stream_core& core,
-    const Operation& op, boost::system::error_code& ec)
+    const Operation& op, cppmsboost::system::error_code& ec)
 {
-  boost::system::error_code io_ec;
+  cppmsboost::system::error_code io_ec;
   std::size_t bytes_transferred = 0;
   do switch (op(core.engine_, ec, bytes_transferred))
   {
@@ -42,7 +42,7 @@ std::size_t io(Stream& next_layer, stream_core& core,
     // the underlying transport.
     if (core.input_.size() == 0)
     {
-      core.input_ = boost::asio::buffer(core.input_buffer_,
+      core.input_ = cppmsboost::asio::buffer(core.input_buffer_,
           next_layer.read_some(core.input_buffer_, io_ec));
       if (!ec)
         ec = io_ec;
@@ -58,7 +58,7 @@ std::size_t io(Stream& next_layer, stream_core& core,
 
     // Get output data from the engine and write it to the underlying
     // transport.
-    boost::asio::write(next_layer,
+    cppmsboost::asio::write(next_layer,
         core.engine_.get_output(core.output_buffer_), io_ec);
     if (!ec)
       ec = io_ec;
@@ -70,7 +70,7 @@ std::size_t io(Stream& next_layer, stream_core& core,
 
     // Get output data from the engine and write it to the underlying
     // transport.
-    boost::asio::write(next_layer,
+    cppmsboost::asio::write(next_layer,
         core.engine_.get_output(core.output_buffer_), io_ec);
     if (!ec)
       ec = io_ec;
@@ -134,7 +134,7 @@ public:
   }
 #endif // defined(BOOST_ASIO_HAS_MOVE)
 
-  void operator()(boost::system::error_code ec,
+  void operator()(cppmsboost::system::error_code ec,
       std::size_t bytes_transferred = ~std::size_t(0), int start = 0)
   {
     switch (start_ = start)
@@ -165,7 +165,7 @@ public:
 
             // Start reading some data from the underlying transport.
             next_layer_.async_read_some(
-                boost::asio::buffer(core_.input_buffer_),
+                cppmsboost::asio::buffer(core_.input_buffer_),
                 BOOST_ASIO_MOVE_CAST(io_op)(*this));
           }
           else
@@ -191,7 +191,7 @@ public:
             core_.pending_write_.expires_at(core_.pos_infin());
 
             // Start writing all the data to the underlying transport.
-            boost::asio::async_write(next_layer_,
+            cppmsboost::asio::async_write(next_layer_,
                 core_.engine_.get_output(core_.output_buffer_),
                 BOOST_ASIO_MOVE_CAST(io_op)(*this));
           }
@@ -215,7 +215,7 @@ public:
           if (start)
           {
             next_layer_.async_read_some(
-                boost::asio::buffer(core_.input_buffer_, 0),
+                cppmsboost::asio::buffer(core_.input_buffer_, 0),
                 BOOST_ASIO_MOVE_CAST(io_op)(*this));
 
             // Yield control until asynchronous operation completes. Control
@@ -240,7 +240,7 @@ public:
         case engine::want_input_and_retry:
 
           // Add received data to the engine's input.
-          core_.input_ = boost::asio::buffer(
+          core_.input_ = cppmsboost::asio::buffer(
               core_.input_buffer_, bytes_transferred);
           core_.input_ = core_.engine_.put_input(core_.input_);
 
@@ -288,7 +288,7 @@ public:
   Operation op_;
   int start_;
   engine::want want_;
-  boost::system::error_code ec_;
+  cppmsboost::system::error_code ec_;
   std::size_t bytes_transferred_;
   Handler handler_;
 };
@@ -297,7 +297,7 @@ template <typename Stream, typename Operation, typename Handler>
 inline void* asio_handler_allocate(std::size_t size,
     io_op<Stream, Operation, Handler>* this_handler)
 {
-  return boost_asio_handler_alloc_helpers::allocate(
+  return cppmsboost_asio_handler_alloc_helpers::allocate(
       size, this_handler->handler_);
 }
 
@@ -305,7 +305,7 @@ template <typename Stream, typename Operation, typename Handler>
 inline void asio_handler_deallocate(void* pointer, std::size_t size,
     io_op<Stream, Operation, Handler>* this_handler)
 {
-  boost_asio_handler_alloc_helpers::deallocate(
+  cppmsboost_asio_handler_alloc_helpers::deallocate(
       pointer, size, this_handler->handler_);
 }
 
@@ -314,7 +314,7 @@ inline bool asio_handler_is_continuation(
     io_op<Stream, Operation, Handler>* this_handler)
 {
   return this_handler->start_ == 0 ? true
-    : boost_asio_handler_cont_helpers::is_continuation(this_handler->handler_);
+    : cppmsboost_asio_handler_cont_helpers::is_continuation(this_handler->handler_);
 }
 
 template <typename Function, typename Stream,
@@ -322,7 +322,7 @@ template <typename Function, typename Stream,
 inline void asio_handler_invoke(Function& function,
     io_op<Stream, Operation, Handler>* this_handler)
 {
-  boost_asio_handler_invoke_helpers::invoke(
+  cppmsboost_asio_handler_invoke_helpers::invoke(
       function, this_handler->handler_);
 }
 
@@ -331,7 +331,7 @@ template <typename Function, typename Stream,
 inline void asio_handler_invoke(const Function& function,
     io_op<Stream, Operation, Handler>* this_handler)
 {
-  boost_asio_handler_invoke_helpers::invoke(
+  cppmsboost_asio_handler_invoke_helpers::invoke(
       function, this_handler->handler_);
 }
 
@@ -341,7 +341,7 @@ inline void async_io(Stream& next_layer, stream_core& core,
 {
   io_op<Stream, Operation, Handler>(
     next_layer, core, op, handler)(
-      boost::system::error_code(), 0, 1);
+      cppmsboost::system::error_code(), 0, 1);
 }
 
 } // namespace detail
@@ -376,7 +376,7 @@ struct associated_executor<
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

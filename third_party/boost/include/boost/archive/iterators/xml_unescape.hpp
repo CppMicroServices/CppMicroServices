@@ -25,7 +25,7 @@
 #include <boost/archive/iterators/unescape.hpp>
 #include <boost/archive/iterators/dataflow_exception.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 namespace iterators {
 
@@ -35,10 +35,10 @@ template<class Base>
 class xml_unescape
     : public unescape<xml_unescape<Base>, Base>
 {
-    friend class boost::iterator_core_access;
+    friend class cppmsboost::iterator_core_access;
     typedef xml_unescape<Base> this_t;
     typedef unescape<this_t, Base> super_t;
-    typedef typename boost::iterator_reference<this_t> reference_type;
+    typedef typename cppmsboost::iterator_reference<this_t> reference_type;
 
     reference_type dereference() const {
         return unescape<xml_unescape<Base>, Base>::dereference();
@@ -68,7 +68,7 @@ template<class Base>
 void xml_unescape<Base>::drain_residue(const char * literal){
     do{
         if(* literal != * ++(this->base_reference()))
-            boost::serialization::throw_exception(
+            cppmsboost::serialization::throw_exception(
                 dataflow_exception(
                     dataflow_exception::invalid_xml_escape_sequence
                 )
@@ -122,6 +122,6 @@ xml_unescape<Base>::drain(){
 
 } // namespace iterators
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ARCHIVE_ITERATORS_XML_UNESCAPE_HPP

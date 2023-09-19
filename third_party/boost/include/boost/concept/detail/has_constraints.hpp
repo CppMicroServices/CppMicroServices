@@ -8,7 +8,7 @@
 # include <boost/config/workaround.hpp>
 # include <boost/concept/detail/backward_compatibility.hpp>
 
-namespace boost { namespace concepts {
+namespace cppmsboost { namespace concepts {
 
 namespace detail
 { 
@@ -42,9 +42,9 @@ struct not_satisfied
     BOOST_STATIC_CONSTANT(
         bool
       , value = sizeof( detail::has_constraints_((Model*)0) ) == sizeof(detail::yes) );
-    typedef boost::integral_constant<bool, value> type;
+    typedef cppmsboost::integral_constant<bool, value> type;
 };
 
-}} // namespace boost::concepts::detail
+}} // namespace cppmsboost::concepts::detail
 
 #endif // BOOST_CONCEPT_DETAIL_HAS_CONSTRAINTS_DWA2006429_HPP

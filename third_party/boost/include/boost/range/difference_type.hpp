@@ -22,7 +22,7 @@
 #include <boost/iterator/iterator_traits.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     namespace range_detail
     {

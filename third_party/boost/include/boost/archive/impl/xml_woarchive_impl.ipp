@@ -43,7 +43,7 @@ namespace std{
 #include <boost/archive/iterators/ostream_iterator.hpp>
 #include <boost/archive/iterators/dataflow_exception.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
@@ -58,7 +58,7 @@ void save_iterator(std::wostream &os, InputIterator begin, InputIterator end){
     std::copy(
         xmbtows(begin),
         xmbtows(end),
-        boost::archive::iterators::ostream_iterator<wchar_t>(os)
+        cppmsboost::archive::iterators::ostream_iterator<wchar_t>(os)
     );
 }
 
@@ -82,14 +82,14 @@ xml_woarchive_impl<Archive>::save(const std::wstring & ws){
     std::copy(
         xmbtows(ws.begin()),
         xmbtows(ws.end()),
-        boost::archive::iterators::ostream_iterator<wchar_t>(os)
+        cppmsboost::archive::iterators::ostream_iterator<wchar_t>(os)
     );
 #endif
     typedef iterators::xml_escape<const wchar_t *> xmbtows;
     std::copy(
         xmbtows(ws.data()),
         xmbtows(ws.data() + ws.size()),
-        boost::archive::iterators::ostream_iterator<wchar_t>(os)
+        cppmsboost::archive::iterators::ostream_iterator<wchar_t>(os)
     );
 }
 #endif //BOOST_NO_STD_WSTRING
@@ -108,7 +108,7 @@ xml_woarchive_impl<Archive>::save(const wchar_t * ws){
     std::copy(
         xmbtows(ws),
         xmbtows(ws + std::wcslen(ws)),
-        boost::archive::iterators::ostream_iterator<wchar_t>(os)
+        cppmsboost::archive::iterators::ostream_iterator<wchar_t>(os)
     );
 }
 #endif
@@ -128,7 +128,7 @@ xml_woarchive_impl<Archive>::xml_woarchive_impl(
     if(0 == (flags & no_codecvt)){
         archive_locale = std::locale(
             os_.getloc(),
-            new boost::archive::detail::utf8_codecvt_facet
+            new cppmsboost::archive::detail::utf8_codecvt_facet
         );
         os_.flush();
         os_.imbue(archive_locale);
@@ -138,7 +138,7 @@ xml_woarchive_impl<Archive>::xml_woarchive_impl(
 template<class Archive>
 BOOST_WARCHIVE_DECL
 xml_woarchive_impl<Archive>::~xml_woarchive_impl(){
-    if(boost::core::uncaught_exceptions() > 0)
+    if(cppmsboost::core::uncaught_exceptions() > 0)
         return;
     if(0 == (this->get_flags() & no_header)){
         os << L"</boost_serialization>";
@@ -164,6 +164,6 @@ xml_woarchive_impl<Archive>::save_binary(
 }
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #endif //BOOST_NO_STD_WSTREAMBUF

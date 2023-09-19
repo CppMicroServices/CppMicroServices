@@ -21,7 +21,7 @@
 #include <boost/assert.hpp>
 #include <cstddef>
 
-namespace boost {
+namespace cppmsboost {
 namespace movelib {
 
 template<class T, class RandRawIt = T*, class SizeType = typename iterator_traits<RandRawIt>::size_type>
@@ -50,7 +50,7 @@ class adaptive_xbuf
    void move_assign(RandIt first, size_type n)
    {
       if(n <= m_size){
-         boost::move(first, first+n, m_ptr);
+         cppmsboost::move(first, first+n, m_ptr);
          size_type size = m_size;
          while(size-- != n){
             m_ptr[size].~T();
@@ -58,8 +58,8 @@ class adaptive_xbuf
          m_size = n;
       }
       else{
-         RandRawIt result = boost::move(first, first+m_size, m_ptr);
-         boost::uninitialized_move(first+m_size, first+n, result);
+         RandRawIt result = cppmsboost::move(first, first+m_size, m_ptr);
+         cppmsboost::uninitialized_move(first+m_size, first+n, result);
          m_size = n;
       }
    }
@@ -68,7 +68,7 @@ class adaptive_xbuf
    void push_back(RandIt first, size_type n)
    {
       BOOST_ASSERT(m_capacity - m_size >= n);
-      boost::uninitialized_move(first, first+n, m_ptr+m_size);
+      cppmsboost::uninitialized_move(first, first+n, m_ptr+m_size);
       m_size += n;
    }
 
@@ -77,7 +77,7 @@ class adaptive_xbuf
    {
       BOOST_ASSERT(m_size < m_capacity);
       RandRawIt p_ret = m_ptr + m_size;
-      ::new(&*p_ret) T(::boost::move(*it));
+      ::new(&*p_ret) T(::cppmsboost::move(*it));
       ++m_size;
       return p_ret;
    }
@@ -91,8 +91,8 @@ class adaptive_xbuf
       else{
          this->add(m_ptr+m_size-1);
          //m_size updated
-         boost::move_backward(pos, m_ptr+m_size-2, m_ptr+m_size-1);
-         *pos = boost::move(*it);
+         cppmsboost::move_backward(pos, m_ptr+m_size-2, m_ptr+m_size-1);
+         *pos = cppmsboost::move(*it);
       }
    }
 
@@ -117,12 +117,12 @@ class adaptive_xbuf
       if(m_size < size){
          BOOST_TRY
          {
-            ::new((void*)&m_ptr[m_size]) T(::boost::move(t));
+            ::new((void*)&m_ptr[m_size]) T(::cppmsboost::move(t));
             ++m_size;
             for(; m_size != size; ++m_size){
-               ::new((void*)&m_ptr[m_size]) T(::boost::move(m_ptr[m_size-1]));
+               ::new((void*)&m_ptr[m_size]) T(::cppmsboost::move(m_ptr[m_size-1]));
             }
-            t = ::boost::move(m_ptr[m_size-1]);
+            t = ::cppmsboost::move(m_ptr[m_size-1]);
          }
          BOOST_CATCH(...)
          {
@@ -257,7 +257,7 @@ class range_xbuf
    iterator add(RandIt it)
    {
       Iterator pos(m_last);
-      *pos = boost::move(*it);
+      *pos = cppmsboost::move(*it);
       ++m_last;
       return pos;
    }
@@ -336,23 +336,23 @@ RandIt rotate_gcd(RandIt first, RandIt middle, RandIt last)
    const size_type middle_pos = size_type(middle - first);
    RandIt ret = last - middle_pos;
    if (middle == ret){
-      boost::adl_move_swap_ranges(first, middle, middle);
+      cppmsboost::adl_move_swap_ranges(first, middle, middle);
    }
    else{
       const size_type length = size_type(last - first);
       for( RandIt it_i(first), it_gcd(it_i + gcd(length, middle_pos))
          ; it_i != it_gcd
          ; ++it_i){
-         value_type temp(boost::move(*it_i));
+         value_type temp(cppmsboost::move(*it_i));
          RandIt it_j = it_i;
          RandIt it_k = it_j+middle_pos;
          do{
-            *it_j = boost::move(*it_k);
+            *it_j = cppmsboost::move(*it_k);
             it_j = it_k;
             size_type const left = size_type(last - it_j);
             it_k = left > middle_pos ? it_j + middle_pos : first + (middle_pos - left);
          } while(it_k != it_i);
-         *it_j = boost::move(temp);
+         *it_j = cppmsboost::move(temp);
       }
    }
    return ret;
@@ -525,13 +525,13 @@ void op_buffered_merge
       size_type const len1 = size_type(middle-first);
       size_type const len2 = size_type(last-middle);
       if(len1 <= len2){
-         first = boost::movelib::upper_bound(first, middle, *middle, comp);
+         first = cppmsboost::movelib::upper_bound(first, middle, *middle, comp);
          xbuf.move_assign(first, size_type(middle-first));
          op_merge_with_right_placed
             (xbuf.data(), xbuf.end(), first, middle, last, comp, op);
       }
       else{
-         last = boost::movelib::lower_bound(middle, last, middle[-1], comp);
+         last = cppmsboost::movelib::lower_bound(middle, last, middle[-1], comp);
          xbuf.move_assign(middle, size_type(last-middle));
          op_merge_with_left_placed
             (first, middle, last, xbuf.data(), xbuf.end(), comp, op);
@@ -555,7 +555,7 @@ void merge_bufferless_ON2(RandIt first, RandIt middle, RandIt last, Compare comp
    if((middle - first) < (last - middle)){
       while(first != middle){
          RandIt const old_last1 = middle;
-         middle = boost::movelib::lower_bound(middle, last, *first, comp);
+         middle = cppmsboost::movelib::lower_bound(middle, last, *first, comp);
          first = rotate_gcd(first, old_last1, middle);
          if(middle == last){
             break;
@@ -567,7 +567,7 @@ void merge_bufferless_ON2(RandIt first, RandIt middle, RandIt last, Compare comp
    }
    else{
       while(middle != last){
-         RandIt p = boost::movelib::upper_bound(first, middle, last[-1], comp);
+         RandIt p = cppmsboost::movelib::upper_bound(first, middle, last[-1], comp);
          last = rotate_gcd(p, middle, last);
          middle = p;
          if(middle == first){
@@ -617,13 +617,13 @@ void merge_bufferless_ONlogN_recursive
       if (len1 > len2) {
          len11 = len1 / 2;
          first_cut +=  len11;
-         second_cut = boost::movelib::lower_bound(middle, last, *first_cut, comp);
+         second_cut = cppmsboost::movelib::lower_bound(middle, last, *first_cut, comp);
          len22 = size_type(second_cut - middle);
       }
       else {
          len22 = len2 / 2;
          second_cut += len22;
-         first_cut = boost::movelib::upper_bound(first, middle, *second_cut, comp);
+         first_cut = cppmsboost::movelib::upper_bound(first, middle, *second_cut, comp);
          len11 = size_type(first_cut - first);
       }
       RandIt new_middle = rotate_gcd(first_cut, middle, second_cut);
@@ -775,22 +775,22 @@ void uninitialized_merge_with_right_placed
    while ( first != last && dest_first != original_r_first ) {
       if (r_first == r_last) {
          for(; dest_first != original_r_first; ++dest_first, ++first){
-            ::new((iterator_to_raw_pointer)(dest_first)) value_type(::boost::move(*first));
+            ::new((iterator_to_raw_pointer)(dest_first)) value_type(::cppmsboost::move(*first));
             d.incr();
          }
          d.release();
-         InputOutIterator end = ::boost::move(first, last, original_r_first);
+         InputOutIterator end = ::cppmsboost::move(first, last, original_r_first);
          BOOST_ASSERT(end == r_last);
          (void)end;
          return;
       }
       else if (comp(*r_first, *first)) {
-         ::new((iterator_to_raw_pointer)(dest_first)) value_type(::boost::move(*r_first));
+         ::new((iterator_to_raw_pointer)(dest_first)) value_type(::cppmsboost::move(*r_first));
          d.incr();
          ++r_first;
       }
       else {
-         ::new((iterator_to_raw_pointer)(dest_first)) value_type(::boost::move(*first));
+         ::new((iterator_to_raw_pointer)(dest_first)) value_type(::cppmsboost::move(*first));
          d.incr();
          ++first;
       }
@@ -818,22 +818,22 @@ void uninitialized_merge_with_left_placed
    while ( first != last && dest_first != original_r_first ) {
       if (r_first == r_last) {
          for(; dest_first != original_r_first; ++dest_first, ++first){
-            ::new(&*dest_first) value_type(::boost::move(*first));
+            ::new(&*dest_first) value_type(::cppmsboost::move(*first));
             d.incr();
          }
          d.release();
-         BidirOutIterator end = ::boost::move(first, last, original_r_first);
+         BidirOutIterator end = ::cppmsboost::move(first, last, original_r_first);
          BOOST_ASSERT(end == r_last);
          (void)end;
          return;
       }
       else if (comp(*r_first, *first)) {
-         ::new(&*dest_first) value_type(::boost::move(*r_first));
+         ::new(&*dest_first) value_type(::cppmsboost::move(*r_first));
          d.incr();
          ++r_first;
       }
       else {
-         ::new(&*dest_first) value_type(::boost::move(*first));
+         ::new(&*dest_first) value_type(::cppmsboost::move(*first));
          d.incr();
          ++first;
       }
@@ -860,9 +860,9 @@ template<typename BidirectionalIterator1, typename BidirectionalIterator2>
    {
       if(len2) //Protect against self-move ranges
       {
-         BidirectionalIterator2 buffer_end = boost::move(middle, last, buffer);
-         boost::move_backward(first, middle, last);
-         return boost::move(buffer, buffer_end, first);
+         BidirectionalIterator2 buffer_end = cppmsboost::move(middle, last, buffer);
+         cppmsboost::move_backward(first, middle, last);
+         return cppmsboost::move(buffer, buffer_end, first);
       }
       else
          return first;
@@ -871,9 +871,9 @@ template<typename BidirectionalIterator1, typename BidirectionalIterator2>
    {
       if(len1) //Protect against self-move ranges
       {
-         BidirectionalIterator2 buffer_end = boost::move(first, middle, buffer);
-         BidirectionalIterator1 ret = boost::move(middle, last, first);
-         boost::move(buffer, buffer_end, ret);
+         BidirectionalIterator2 buffer_end = cppmsboost::move(first, middle, buffer);
+         BidirectionalIterator1 ret = cppmsboost::move(middle, last, first);
+         cppmsboost::move(buffer, buffer_end, ret);
          return ret;
       }
       else
@@ -922,14 +922,14 @@ template<typename BidirectionalIterator,
    {
       len11 = len1 / 2;
       first_cut += len11;
-      second_cut = boost::movelib::lower_bound(middle, last, *first_cut, comp);
+      second_cut = cppmsboost::movelib::lower_bound(middle, last, *first_cut, comp);
       len22 = second_cut - middle;
    }
    else
    {
       len22 = len2 / 2;
       second_cut += len22;
-      first_cut = boost::movelib::upper_bound(first, middle, *second_cut, comp);
+      first_cut = cppmsboost::movelib::upper_bound(first, middle, *second_cut, comp);
       len11 = first_cut - first;
    }
 
@@ -963,7 +963,7 @@ void merge_adaptive_ONlogN(BidirectionalIterator first,
       const size_type len1 = size_type(middle - first);
       const size_type len2 = size_type(last - middle);
 
-      ::boost::movelib::adaptive_xbuf<value_type, RandRawIt> xbuf(uninitialized, uninitialized_len);
+      ::cppmsboost::movelib::adaptive_xbuf<value_type, RandRawIt> xbuf(uninitialized, uninitialized_len);
       xbuf.initialize_until(uninitialized_len, *first);
 	   merge_adaptive_ONlogN_recursive(first, middle, last, len1, len2, xbuf.begin(), uninitialized_len, comp);
    }
@@ -975,6 +975,6 @@ void merge_adaptive_ONlogN(BidirectionalIterator first,
 
 
 }  //namespace movelib {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif   //#define BOOST_MOVE_MERGE_HPP

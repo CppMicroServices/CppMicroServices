@@ -26,20 +26,20 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace generic {
 
 /// Encapsulates the flags needed for a generic stream-oriented socket.
 /**
- * The boost::asio::generic::stream_protocol class contains flags necessary for
+ * The cppmsboost::asio::generic::stream_protocol class contains flags necessary for
  * stream-oriented sockets of any address family and protocol.
  *
  * @par Examples
  * Constructing using a native address family and socket protocol:
  * @code stream_protocol p(AF_INET, IPPROTO_TCP); @endcode
  * Constructing from a specific protocol type:
- * @code stream_protocol p(boost::asio::ip::tcp::v4()); @endcode
+ * @code stream_protocol p(cppmsboost::asio::ip::tcp::v4()); @endcode
  *
  * @par Thread Safety
  * @e Distinct @e objects: Safe.@n
@@ -70,7 +70,7 @@ public:
     if (source_protocol.type() != type())
     {
       std::bad_cast ex;
-      boost::asio::detail::throw_exception(ex);
+      cppmsboost::asio::detail::throw_exception(ex);
     }
   }
 
@@ -122,7 +122,7 @@ private:
 
 } // namespace generic
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

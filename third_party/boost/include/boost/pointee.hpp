@@ -22,7 +22,7 @@
 
 #include <iterator>
 
-namespace boost {
+namespace cppmsboost {
 
 namespace detail
 {
@@ -51,7 +51,7 @@ namespace detail
 
       typedef typename mpl::if_c<
 #  if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x551))
-          ::boost::detail::iterator_pointee<Iterator>::is_constant
+          ::cppmsboost::detail::iterator_pointee<Iterator>::is_constant
 #  else
           is_constant
 #  endif
@@ -71,6 +71,6 @@ struct pointee
 {
 };
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // POINTEE_DWA200415_HPP

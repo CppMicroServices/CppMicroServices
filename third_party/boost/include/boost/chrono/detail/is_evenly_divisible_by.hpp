@@ -13,15 +13,15 @@
 #include <boost/mpl/logical.hpp>
 #include <boost/ratio/detail/overflow_helpers.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace chrono {
 namespace chrono_detail {
 
 //  template <class R1, class R2>
-//  struct is_evenly_divisible_by : public boost::mpl::bool_ < ratio_divide<R1, R2>::type::den == 1 >
+//  struct is_evenly_divisible_by : public cppmsboost::mpl::bool_ < ratio_divide<R1, R2>::type::den == 1 >
 //  {};
   template <class R1, class R2>
-  struct is_evenly_divisible_by : public boost::ratio_detail::is_evenly_divisible_by<R1, R2>
+  struct is_evenly_divisible_by : public cppmsboost::ratio_detail::is_evenly_divisible_by<R1, R2>
   {};
 
 } // namespace chrono_detail

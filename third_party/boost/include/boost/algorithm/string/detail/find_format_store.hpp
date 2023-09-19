@@ -14,7 +14,7 @@
 #include <boost/algorithm/string/config.hpp>
 #include <boost/range/iterator_range_core.hpp>
 
-namespace boost {
+namespace cppmsboost {
     namespace algorithm {
         namespace detail {
 
@@ -84,6 +84,6 @@ namespace boost {
 #endif
         } // namespace detail
     } // namespace algorithm
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // BOOST_STRING_FIND_FORMAT_STORE_DETAIL_HPP

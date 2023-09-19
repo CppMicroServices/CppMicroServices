@@ -22,27 +22,27 @@
 #include <boost/type_traits/add_volatile.hpp>
 #include <boost/static_assert.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 template <class T>
 struct make_unsigned
 {
 private:
-   BOOST_STATIC_ASSERT_MSG((::boost::is_integral<T>::value || ::boost::is_enum<T>::value), "The template argument to make_unsigned must be an integer or enum type.");
-   BOOST_STATIC_ASSERT_MSG((! ::boost::is_same<typename remove_cv<T>::type, bool>::value), "The template argument to make_unsigned must not be the type bool");
+   BOOST_STATIC_ASSERT_MSG((::cppmsboost::is_integral<T>::value || ::cppmsboost::is_enum<T>::value), "The template argument to make_unsigned must be an integer or enum type.");
+   BOOST_STATIC_ASSERT_MSG((! ::cppmsboost::is_same<typename remove_cv<T>::type, bool>::value), "The template argument to make_unsigned must not be the type bool");
 
    typedef typename remove_cv<T>::type t_no_cv;
    typedef typename conditional<
-      (::boost::is_unsigned<T>::value && ::boost::is_integral<T>::value 
-      && ! ::boost::is_same<t_no_cv, char>::value
-      && ! ::boost::is_same<t_no_cv, wchar_t>::value
-      && ! ::boost::is_same<t_no_cv, bool>::value),
+      (::cppmsboost::is_unsigned<T>::value && ::cppmsboost::is_integral<T>::value 
+      && ! ::cppmsboost::is_same<t_no_cv, char>::value
+      && ! ::cppmsboost::is_same<t_no_cv, wchar_t>::value
+      && ! ::cppmsboost::is_same<t_no_cv, bool>::value),
       T,
       typename conditional<
-         (::boost::is_integral<T>::value 
-         && ! ::boost::is_same<t_no_cv, char>::value
-         && ! ::boost::is_same<t_no_cv, wchar_t>::value
-         && ! ::boost::is_same<t_no_cv, bool>::value),
+         (::cppmsboost::is_integral<T>::value 
+         && ! ::cppmsboost::is_same<t_no_cv, char>::value
+         && ! ::cppmsboost::is_same<t_no_cv, wchar_t>::value
+         && ! ::cppmsboost::is_same<t_no_cv, bool>::value),
          typename conditional<
             is_same<t_no_cv, signed char>::value,
             unsigned char,
@@ -58,12 +58,12 @@ private:
 #if defined(BOOST_HAS_LONG_LONG)
 #ifdef BOOST_HAS_INT128
                      typename conditional<
-                        sizeof(t_no_cv) == sizeof(boost::ulong_long_type), 
-                        boost::ulong_long_type, 
-                        boost::uint128_type
+                        sizeof(t_no_cv) == sizeof(cppmsboost::ulong_long_type), 
+                        cppmsboost::ulong_long_type, 
+                        cppmsboost::uint128_type
                      >::type
 #else
-                     boost::ulong_long_type
+                     cppmsboost::ulong_long_type
 #endif
 #elif defined(BOOST_HAS_MS_INT64)
                      unsigned __int64
@@ -90,12 +90,12 @@ private:
 #if defined(BOOST_HAS_LONG_LONG)
 #ifdef BOOST_HAS_INT128
                      typename conditional<
-                        sizeof(t_no_cv) == sizeof(boost::ulong_long_type), 
-                        boost::ulong_long_type, 
-                        boost::uint128_type
+                        sizeof(t_no_cv) == sizeof(cppmsboost::ulong_long_type), 
+                        cppmsboost::ulong_long_type, 
+                        cppmsboost::uint128_type
                      >::type
 #else
-                     boost::ulong_long_type
+                     cppmsboost::ulong_long_type
 #endif
 #elif defined(BOOST_HAS_MS_INT64)
                      unsigned __int64
@@ -130,7 +130,7 @@ public:
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_ADD_REFERENCE_HPP_INCLUDED
 

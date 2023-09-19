@@ -36,7 +36,7 @@ namespace std{
 #include <boost/archive/detail/decl.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
     class extended_type_info;
 } // namespace serialization
@@ -76,8 +76,8 @@ public:
     virtual void save(const unsigned long t) = 0;
 
     #if defined(BOOST_HAS_LONG_LONG)
-    virtual void save(const boost::long_long_type t) = 0;
-    virtual void save(const boost::ulong_long_type t) = 0;
+    virtual void save(const cppmsboost::long_long_type t) = 0;
+    virtual void save(const cppmsboost::ulong_long_type t) = 0;
     #elif defined(BOOST_HAS_MS_INT64)
     virtual void save(const __int64 t) = 0;
     virtual void save(const unsigned __int64 t) = 0;
@@ -111,7 +111,7 @@ public:
     // special treatment for name-value pairs.
     template<class T>
     void save_override(
-            const ::boost::serialization::nvp< T > & t
+            const ::cppmsboost::serialization::nvp< T > & t
         ){
         save_start(t.name());
         archive::save(* this->This(), t.const_value());
@@ -144,10 +144,10 @@ public:
 };
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 // required by export
-BOOST_SERIALIZATION_REGISTER_ARCHIVE(boost::archive::polymorphic_oarchive)
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(cppmsboost::archive::polymorphic_oarchive)
 
 #include <boost/archive/detail/abi_suffix.hpp> // pops abi_suffix.hpp pragmas
 

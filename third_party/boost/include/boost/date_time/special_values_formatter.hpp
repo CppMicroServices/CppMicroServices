@@ -14,7 +14,7 @@
 #include <string>
 #include "boost/date_time/special_defs.hpp"
 
-namespace boost { namespace date_time {
+namespace cppmsboost { namespace date_time {
 
 
   //! Class that provides generic formmatting ostream formatting for special values
@@ -65,7 +65,7 @@ namespace boost { namespace date_time {
     }
 
     OutItrT put_special(OutItrT next, 
-                        const boost::date_time::special_values& value) const 
+                        const cppmsboost::date_time::special_values& value) const 
     {
       
       unsigned int index = value;
@@ -91,6 +91,6 @@ namespace boost { namespace date_time {
     {'-','i','n','f','i','n','i','t','y'},
     {'+','i','n','f','i','n','i','t','y'} };
 
- } } //namespace boost::date_time
+ } } //namespace cppmsboost::date_time
 
 #endif

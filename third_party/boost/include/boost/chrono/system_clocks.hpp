@@ -74,9 +74,9 @@ TODO:
 
 #ifdef BOOST_CHRONO_WINDOWS_API
 // The system_clock tick is 100 nanoseconds
-# define BOOST_SYSTEM_CLOCK_DURATION boost::chrono::duration<boost::int_least64_t, ratio<BOOST_RATIO_INTMAX_C(1), BOOST_RATIO_INTMAX_C(10000000)> >
+# define BOOST_SYSTEM_CLOCK_DURATION cppmsboost::chrono::duration<cppmsboost::int_least64_t, ratio<BOOST_RATIO_INTMAX_C(1), BOOST_RATIO_INTMAX_C(10000000)> >
 #else
-# define BOOST_SYSTEM_CLOCK_DURATION boost::chrono::nanoseconds
+# define BOOST_SYSTEM_CLOCK_DURATION cppmsboost::chrono::nanoseconds
 #endif
 
 // this must occur after all of the includes and before any code appears:
@@ -92,7 +92,7 @@ TODO:
 //                                                                            //
 //----------------------------------------------------------------------------//
 
-namespace boost {
+namespace cppmsboost {
 namespace chrono {
 
   // Clocks
@@ -221,7 +221,7 @@ namespace chrono {
 #endif
 
 } // namespace chrono
-} // namespace boost
+} // namespace cppmsboost
 
 #ifndef BOOST_CHRONO_HEADER_ONLY
 // the suffix header occurs after all of our code:

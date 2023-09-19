@@ -9,7 +9,7 @@
 	
 	
 	
-namespace boost { namespace numeric {
+namespace cppmsboost { namespace numeric {
     
     template <>
     struct numeric_cast_traits

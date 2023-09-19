@@ -16,7 +16,7 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 
 // for each class used in the program, specify which level
@@ -50,6 +50,6 @@ enum level_type
 };
 
 } // namespace serialization
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_SERIALIZATION_LEVEL_ENUM_HPP

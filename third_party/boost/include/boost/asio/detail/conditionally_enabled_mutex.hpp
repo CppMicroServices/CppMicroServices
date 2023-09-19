@@ -22,7 +22,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -93,7 +93,7 @@ public:
     }
 
     // Get the underlying mutex.
-    boost::asio::detail::mutex& mutex()
+    cppmsboost::asio::detail::mutex& mutex()
     {
       return mutex_.mutex_;
     }
@@ -138,13 +138,13 @@ public:
 private:
   friend class scoped_lock;
   friend class conditionally_enabled_event;
-  boost::asio::detail::mutex mutex_;
+  cppmsboost::asio::detail::mutex mutex_;
   const bool enabled_;
 };
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

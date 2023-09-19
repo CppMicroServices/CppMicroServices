@@ -23,11 +23,11 @@
 
 #include <boost/intrusive/detail/algorithm.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 
-using boost::intrusive::algo_equal;
-using boost::intrusive::algo_lexicographical_compare;
+using cppmsboost::intrusive::algo_equal;
+using cppmsboost::intrusive::algo_lexicographical_compare;
 
 template<class Func>
 class binder1st
@@ -53,7 +53,7 @@ class binder1st
 
 template<class Func, class T> 
 inline binder1st<Func> bind1st(const Func& func, const T& arg)
-{	return boost::container::binder1st<Func>(func, arg);  }
+{	return cppmsboost::container::binder1st<Func>(func, arg);  }
 
 template<class Func>
 class binder2nd
@@ -80,7 +80,7 @@ class binder2nd
 template<class Func, class T>
 inline binder2nd<Func> bind2nd(const Func& func, const T& arg)
 {
-   return (boost::container::binder2nd<Func>(func, arg));
+   return (cppmsboost::container::binder2nd<Func>(func, arg));
 }
 
 template<class Func>
@@ -104,7 +104,7 @@ class unary_negate
 template<class Func> inline
 unary_negate<Func> not1(const Func& func)
 {
-   return boost::container::unary_negate<Func>(func);
+   return cppmsboost::container::unary_negate<Func>(func);
 }
 
 template<class InputIt, class UnaryPredicate>
@@ -152,6 +152,6 @@ ForwardIt1 search(ForwardIt1 first1, ForwardIt1 last1,
 }
 
 }  //namespace container {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif   //#ifndef BOOST_CONTAINER_DETAIL_ALGORITHM_HPP

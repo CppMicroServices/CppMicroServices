@@ -33,7 +33,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
     class BOOST_THREAD_CAPABILITY("mutex") mutex
@@ -48,7 +48,7 @@ namespace boost
             int const res=posix::pthread_mutex_init(&m);
             if(res)
             {
-                boost::throw_exception(thread_resource_error(res, "boost:: mutex constructor failed in pthread_mutex_init"));
+                cppmsboost::throw_exception(thread_resource_error(res, "cppmsboost:: mutex constructor failed in pthread_mutex_init"));
             }
         }
         ~mutex()
@@ -61,7 +61,7 @@ namespace boost
             int res = posix::pthread_mutex_lock(&m);
             if (res)
             {
-                boost::throw_exception(lock_error(res,"boost: mutex lock failed in pthread_mutex_lock"));
+                cppmsboost::throw_exception(lock_error(res,"boost: mutex lock failed in pthread_mutex_lock"));
             }
         }
 
@@ -111,14 +111,14 @@ namespace boost
             int const res=posix::pthread_mutex_init(&m);
             if(res)
             {
-                boost::throw_exception(thread_resource_error(res, "boost:: timed_mutex constructor failed in pthread_mutex_init"));
+                cppmsboost::throw_exception(thread_resource_error(res, "cppmsboost:: timed_mutex constructor failed in pthread_mutex_init"));
             }
 #ifndef BOOST_THREAD_USES_PTHREAD_TIMEDLOCK
             int const res2=posix::pthread_cond_init(&cond);
             if(res2)
             {
                 BOOST_VERIFY(!posix::pthread_mutex_destroy(&m));
-                boost::throw_exception(thread_resource_error(res2, "boost:: timed_mutex constructor failed in pthread_cond_init"));
+                cppmsboost::throw_exception(thread_resource_error(res2, "cppmsboost:: timed_mutex constructor failed in pthread_cond_init"));
             }
             is_locked=false;
 #endif
@@ -159,7 +159,7 @@ namespace boost
             return do_try_lock_until(detail::internal_platform_clock::now() + d);
 #endif
         }
-        bool timed_lock(boost::xtime const & absolute_time)
+        bool timed_lock(cppmsboost::xtime const & absolute_time)
         {
             return timed_lock(system_time(absolute_time));
         }
@@ -170,7 +170,7 @@ namespace boost
             int res = posix::pthread_mutex_lock(&m);
             if (res)
             {
-                boost::throw_exception(lock_error(res,"boost: mutex lock failed in pthread_mutex_lock"));
+                cppmsboost::throw_exception(lock_error(res,"boost: mutex lock failed in pthread_mutex_lock"));
             }
         }
 
@@ -203,7 +203,7 @@ namespace boost
 #else
         void lock()
         {
-            boost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
+            cppmsboost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
             while(is_locked)
             {
                 BOOST_VERIFY(!posix::pthread_cond_wait(&cond,&m));
@@ -213,14 +213,14 @@ namespace boost
 
         void unlock()
         {
-            boost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
+            cppmsboost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
             is_locked=false;
             BOOST_VERIFY(!posix::pthread_cond_signal(&cond));
         }
 
         bool try_lock()
         {
-            boost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
+            cppmsboost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
             if(is_locked)
             {
                 return false;
@@ -232,7 +232,7 @@ namespace boost
     private:
         bool do_try_lock_until(detail::internal_platform_timepoint const &timeout)
         {
-            boost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
+            cppmsboost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
             while(is_locked)
             {
                 int const cond_res=posix::pthread_cond_timedwait(&cond,&m,&timeout.getTs());

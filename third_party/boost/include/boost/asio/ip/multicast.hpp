@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 namespace multicast {
@@ -33,11 +33,11 @@ namespace multicast {
  * @par Examples
  * Setting the option to join a multicast group:
  * @code
- * boost::asio::ip::udp::socket socket(my_context);
+ * cppmsboost::asio::ip::udp::socket socket(my_context);
  * ...
- * boost::asio::ip::address multicast_address =
- *   boost::asio::ip::address::from_string("225.0.0.1");
- * boost::asio::ip::multicast::join_group option(multicast_address);
+ * cppmsboost::asio::ip::address multicast_address =
+ *   cppmsboost::asio::ip::address::from_string("225.0.0.1");
+ * cppmsboost::asio::ip::multicast::join_group option(multicast_address);
  * socket.set_option(option);
  * @endcode
  *
@@ -47,7 +47,7 @@ namespace multicast {
 #if defined(GENERATING_DOCUMENTATION)
 typedef implementation_defined join_group;
 #else
-typedef boost::asio::ip::detail::socket_option::multicast_request<
+typedef cppmsboost::asio::ip::detail::socket_option::multicast_request<
   BOOST_ASIO_OS_DEF(IPPROTO_IP),
   BOOST_ASIO_OS_DEF(IP_ADD_MEMBERSHIP),
   BOOST_ASIO_OS_DEF(IPPROTO_IPV6),
@@ -61,11 +61,11 @@ typedef boost::asio::ip::detail::socket_option::multicast_request<
  * @par Examples
  * Setting the option to leave a multicast group:
  * @code
- * boost::asio::ip::udp::socket socket(my_context);
+ * cppmsboost::asio::ip::udp::socket socket(my_context);
  * ...
- * boost::asio::ip::address multicast_address =
- *   boost::asio::ip::address::from_string("225.0.0.1");
- * boost::asio::ip::multicast::leave_group option(multicast_address);
+ * cppmsboost::asio::ip::address multicast_address =
+ *   cppmsboost::asio::ip::address::from_string("225.0.0.1");
+ * cppmsboost::asio::ip::multicast::leave_group option(multicast_address);
  * socket.set_option(option);
  * @endcode
  *
@@ -75,7 +75,7 @@ typedef boost::asio::ip::detail::socket_option::multicast_request<
 #if defined(GENERATING_DOCUMENTATION)
 typedef implementation_defined leave_group;
 #else
-typedef boost::asio::ip::detail::socket_option::multicast_request<
+typedef cppmsboost::asio::ip::detail::socket_option::multicast_request<
   BOOST_ASIO_OS_DEF(IPPROTO_IP),
   BOOST_ASIO_OS_DEF(IP_DROP_MEMBERSHIP),
   BOOST_ASIO_OS_DEF(IPPROTO_IPV6),
@@ -89,11 +89,11 @@ typedef boost::asio::ip::detail::socket_option::multicast_request<
  * @par Examples
  * Setting the option:
  * @code
- * boost::asio::ip::udp::socket socket(my_context);
+ * cppmsboost::asio::ip::udp::socket socket(my_context);
  * ...
- * boost::asio::ip::address_v4 local_interface =
- *   boost::asio::ip::address_v4::from_string("1.2.3.4");
- * boost::asio::ip::multicast::outbound_interface option(local_interface);
+ * cppmsboost::asio::ip::address_v4 local_interface =
+ *   cppmsboost::asio::ip::address_v4::from_string("1.2.3.4");
+ * cppmsboost::asio::ip::multicast::outbound_interface option(local_interface);
  * socket.set_option(option);
  * @endcode
  *
@@ -103,7 +103,7 @@ typedef boost::asio::ip::detail::socket_option::multicast_request<
 #if defined(GENERATING_DOCUMENTATION)
 typedef implementation_defined outbound_interface;
 #else
-typedef boost::asio::ip::detail::socket_option::network_interface<
+typedef cppmsboost::asio::ip::detail::socket_option::network_interface<
   BOOST_ASIO_OS_DEF(IPPROTO_IP),
   BOOST_ASIO_OS_DEF(IP_MULTICAST_IF),
   BOOST_ASIO_OS_DEF(IPPROTO_IPV6),
@@ -117,18 +117,18 @@ typedef boost::asio::ip::detail::socket_option::network_interface<
  * @par Examples
  * Setting the option:
  * @code
- * boost::asio::ip::udp::socket socket(my_context);
+ * cppmsboost::asio::ip::udp::socket socket(my_context);
  * ...
- * boost::asio::ip::multicast::hops option(4);
+ * cppmsboost::asio::ip::multicast::hops option(4);
  * socket.set_option(option);
  * @endcode
  *
  * @par
  * Getting the current option value:
  * @code
- * boost::asio::ip::udp::socket socket(my_context);
+ * cppmsboost::asio::ip::udp::socket socket(my_context);
  * ...
- * boost::asio::ip::multicast::hops option;
+ * cppmsboost::asio::ip::multicast::hops option;
  * socket.get_option(option);
  * int ttl = option.value();
  * @endcode
@@ -139,7 +139,7 @@ typedef boost::asio::ip::detail::socket_option::network_interface<
 #if defined(GENERATING_DOCUMENTATION)
 typedef implementation_defined hops;
 #else
-typedef boost::asio::ip::detail::socket_option::multicast_hops<
+typedef cppmsboost::asio::ip::detail::socket_option::multicast_hops<
   BOOST_ASIO_OS_DEF(IPPROTO_IP),
   BOOST_ASIO_OS_DEF(IP_MULTICAST_TTL),
   BOOST_ASIO_OS_DEF(IPPROTO_IPV6),
@@ -154,18 +154,18 @@ typedef boost::asio::ip::detail::socket_option::multicast_hops<
  * @par Examples
  * Setting the option:
  * @code
- * boost::asio::ip::udp::socket socket(my_context);
+ * cppmsboost::asio::ip::udp::socket socket(my_context);
  * ...
- * boost::asio::ip::multicast::enable_loopback option(true);
+ * cppmsboost::asio::ip::multicast::enable_loopback option(true);
  * socket.set_option(option);
  * @endcode
  *
  * @par
  * Getting the current option value:
  * @code
- * boost::asio::ip::udp::socket socket(my_context);
+ * cppmsboost::asio::ip::udp::socket socket(my_context);
  * ...
- * boost::asio::ip::multicast::enable_loopback option;
+ * cppmsboost::asio::ip::multicast::enable_loopback option;
  * socket.get_option(option);
  * bool is_set = option.value();
  * @endcode
@@ -176,7 +176,7 @@ typedef boost::asio::ip::detail::socket_option::multicast_hops<
 #if defined(GENERATING_DOCUMENTATION)
 typedef implementation_defined enable_loopback;
 #else
-typedef boost::asio::ip::detail::socket_option::multicast_enable_loopback<
+typedef cppmsboost::asio::ip::detail::socket_option::multicast_enable_loopback<
   BOOST_ASIO_OS_DEF(IPPROTO_IP),
   BOOST_ASIO_OS_DEF(IP_MULTICAST_LOOP),
   BOOST_ASIO_OS_DEF(IPPROTO_IPV6),
@@ -186,7 +186,7 @@ typedef boost::asio::ip::detail::socket_option::multicast_enable_loopback<
 } // namespace multicast
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

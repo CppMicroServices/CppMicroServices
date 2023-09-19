@@ -16,7 +16,7 @@
 #pragma once
 #endif
 
-namespace boost
+namespace cppmsboost
 {
 
 #ifdef BOOST_NO_CXX11_SCOPED_ENUMS

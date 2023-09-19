@@ -9,7 +9,7 @@
 
 #include <cstring>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace system
@@ -98,4 +98,4 @@ inline char const * generic_error_category_message( int ev, char * buffer, std::
 
 } // namespace system
 
-} // namespace boost
+} // namespace cppmsboost

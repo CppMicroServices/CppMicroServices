@@ -38,7 +38,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 namespace detail {
@@ -55,10 +55,10 @@ namespace detail {
  * The io_context class provides the core I/O functionality for users of the
  * asynchronous I/O objects, including:
  *
- * @li boost::asio::ip::tcp::socket
- * @li boost::asio::ip::tcp::acceptor
- * @li boost::asio::ip::udp::socket
- * @li boost::asio::deadline_timer.
+ * @li cppmsboost::asio::ip::tcp::socket
+ * @li cppmsboost::asio::ip::tcp::acceptor
+ * @li cppmsboost::asio::ip::udp::socket
+ * @li cppmsboost::asio::deadline_timer.
  *
  * The io_context class also includes facilities intended for developers of
  * custom asynchronous services.
@@ -103,7 +103,7 @@ namespace detail {
  * For example:
  *
  * @code
- * boost::asio::io_context io_context;
+ * cppmsboost::asio::io_context io_context;
  * ...
  * for (;;)
  * {
@@ -121,8 +121,8 @@ namespace detail {
  *
  * @par Submitting arbitrary tasks to the io_context
  *
- * To submit functions to the io_context, use the @ref boost::asio::dispatch,
- * @ref boost::asio::post or @ref boost::asio::defer free functions.
+ * To submit functions to the io_context, use the @ref cppmsboost::asio::dispatch,
+ * @ref cppmsboost::asio::post or @ref cppmsboost::asio::defer free functions.
  *
  * For example:
  *
@@ -133,13 +133,13 @@ namespace detail {
  *
  * ...
  *
- * boost::asio::io_context io_context;
+ * cppmsboost::asio::io_context io_context;
  *
  * // Submit a function to the io_context.
- * boost::asio::post(io_context, my_task);
+ * cppmsboost::asio::post(io_context, my_task);
  *
  * // Submit a lambda object to the io_context.
- * boost::asio::post(io_context,
+ * cppmsboost::asio::post(io_context,
  *     []()
  *     {
  *       ...
@@ -155,11 +155,11 @@ namespace detail {
  * be being run in a background thread that is launched prior to the
  * application's asynchronous operations. The run() call may be kept running by
  * creating an object of type
- * boost::asio::executor_work_guard<io_context::executor_type>:
+ * cppmsboost::asio::executor_work_guard<io_context::executor_type>:
  *
- * @code boost::asio::io_context io_context;
- * boost::asio::executor_work_guard<boost::asio::io_context::executor_type>
- *   = boost::asio::make_work_guard(io_context);
+ * @code cppmsboost::asio::io_context io_context;
+ * cppmsboost::asio::executor_work_guard<cppmsboost::asio::io_context::executor_type>
+ *   = cppmsboost::asio::make_work_guard(io_context);
  * ... @endcode
  *
  * To effect a shutdown, the application will then need to call the io_context
@@ -170,9 +170,9 @@ namespace detail {
  * Alternatively, if the application requires that all operations and handlers
  * be allowed to finish normally, the work object may be explicitly reset.
  *
- * @code boost::asio::io_context io_context;
- * boost::asio::executor_work_guard<boost::asio::io_context::executor_type>
- *   = boost::asio::make_work_guard(io_context);
+ * @code cppmsboost::asio::io_context io_context;
+ * cppmsboost::asio::executor_work_guard<cppmsboost::asio::io_context::executor_type>
+ *   = cppmsboost::asio::make_work_guard(io_context);
  * ...
  * work.reset(); // Allow run() to exit. @endcode
  */
@@ -308,7 +308,7 @@ public:
    * The poll() function may also be used to dispatch ready handlers, but
    * without blocking.
    */
-  BOOST_ASIO_DECL count_type run(boost::system::error_code& ec);
+  BOOST_ASIO_DECL count_type run(cppmsboost::system::error_code& ec);
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
 
 #if defined(BOOST_ASIO_HAS_CHRONO) || defined(GENERATING_DOCUMENTATION)
@@ -379,7 +379,7 @@ public:
    * poll_one() on the same io_context object may introduce the potential for
    * deadlock. It is the caller's reponsibility to avoid this.
    */
-  BOOST_ASIO_DECL count_type run_one(boost::system::error_code& ec);
+  BOOST_ASIO_DECL count_type run_one(cppmsboost::system::error_code& ec);
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
 
 #if defined(BOOST_ASIO_HAS_CHRONO) || defined(GENERATING_DOCUMENTATION)
@@ -434,7 +434,7 @@ public:
    *
    * @return The number of handlers that were executed.
    */
-  BOOST_ASIO_DECL count_type poll(boost::system::error_code& ec);
+  BOOST_ASIO_DECL count_type poll(cppmsboost::system::error_code& ec);
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
 
   /// Run the io_context object's event processing loop to execute one ready
@@ -458,7 +458,7 @@ public:
    *
    * @return The number of handlers that were executed.
    */
-  BOOST_ASIO_DECL count_type poll_one(boost::system::error_code& ec);
+  BOOST_ASIO_DECL count_type poll_one(cppmsboost::system::error_code& ec);
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
 
   /// Stop the io_context object's event processing loop.
@@ -510,7 +510,7 @@ public:
    */
   void reset();
 
-  /// (Deprecated: Use boost::asio::dispatch().) Request the io_context to
+  /// (Deprecated: Use cppmsboost::asio::dispatch().) Request the io_context to
   /// invoke the given handler.
   /**
    * This function is used to ask the io_context to execute the given handler.
@@ -536,7 +536,7 @@ public:
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(LegacyCompletionHandler, void ())
   dispatch(BOOST_ASIO_MOVE_ARG(LegacyCompletionHandler) handler);
 
-  /// (Deprecated: Use boost::asio::post().) Request the io_context to invoke
+  /// (Deprecated: Use cppmsboost::asio::post().) Request the io_context to invoke
   /// the given handler and return immediately.
   /**
    * This function is used to ask the io_context to execute the given handler,
@@ -563,7 +563,7 @@ public:
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(LegacyCompletionHandler, void ())
   post(BOOST_ASIO_MOVE_ARG(LegacyCompletionHandler) handler);
 
-  /// (Deprecated: Use boost::asio::bind_executor().) Create a new handler that
+  /// (Deprecated: Use cppmsboost::asio::bind_executor().) Create a new handler that
   /// automatically dispatches the wrapped handler on the io_context.
   /**
    * This function is used to create a new handler function object that, when
@@ -583,7 +583,7 @@ public:
    * then the return value is a function object with the signature
    * @code void g(A1 a1, ... An an); @endcode
    * that, when invoked, executes code equivalent to:
-   * @code io_context.dispatch(boost::bind(f, a1, ... an)); @endcode
+   * @code io_context.dispatch(cppmsboost::bind(f, a1, ... an)); @endcode
    */
   template <typename Handler>
 #if defined(GENERATING_DOCUMENTATION)
@@ -753,7 +753,7 @@ public:
    * This ensures that the io_context object's run() function will not exit
    * while the work is underway.
    */
-  explicit work(boost::asio::io_context& io_context);
+  explicit work(cppmsboost::asio::io_context& io_context);
 
   /// Copy constructor notifies the io_context that work is starting.
   /**
@@ -772,7 +772,7 @@ public:
   ~work();
 
   /// Get the io_context associated with the work.
-  boost::asio::io_context& get_io_context();
+  cppmsboost::asio::io_context& get_io_context();
 
 private:
   // Prevent assignment.
@@ -789,7 +789,7 @@ class io_context::service
 {
 public:
   /// Get the io_context object that owns the service.
-  boost::asio::io_context& get_io_context();
+  cppmsboost::asio::io_context& get_io_context();
 
 private:
   /// Destroy all user-defined handler objects owned by the service.
@@ -826,7 +826,7 @@ protected:
   /**
    * @param owner The io_context object that owns the service.
    */
-  BOOST_ASIO_DECL service(boost::asio::io_context& owner);
+  BOOST_ASIO_DECL service(cppmsboost::asio::io_context& owner);
 
   /// Destructor.
   BOOST_ASIO_DECL virtual ~service();
@@ -837,24 +837,24 @@ namespace detail {
 // Special service base class to keep classes header-file only.
 template <typename Type>
 class service_base
-  : public boost::asio::io_context::service
+  : public cppmsboost::asio::io_context::service
 {
 public:
-  static boost::asio::detail::service_id<Type> id;
+  static cppmsboost::asio::detail::service_id<Type> id;
 
   // Constructor.
-  service_base(boost::asio::io_context& io_context)
-    : boost::asio::io_context::service(io_context)
+  service_base(cppmsboost::asio::io_context& io_context)
+    : cppmsboost::asio::io_context::service(io_context)
   {
   }
 };
 
 template <typename Type>
-boost::asio::detail::service_id<Type> service_base<Type>::id;
+cppmsboost::asio::detail::service_id<Type> service_base<Type>::id;
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

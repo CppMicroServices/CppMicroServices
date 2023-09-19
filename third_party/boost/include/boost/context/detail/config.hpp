@@ -31,7 +31,7 @@
 #endif
 
 #if ! defined(BOOST_CONTEXT_SOURCE) && ! defined(BOOST_ALL_NO_LIB) && ! defined(BOOST_CONTEXT_NO_LIB)
-# define BOOST_LIB_NAME boost_context
+# define BOOST_LIB_NAME cppmsboost_context
 # if defined(BOOST_ALL_DYN_LINK) || defined(BOOST_CONTEXT_DYN_LINK)
 #  define BOOST_DYN_LINK
 # endif

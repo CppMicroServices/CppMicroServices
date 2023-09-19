@@ -28,7 +28,7 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
     class extended_type_info;
 } // namespace serialization
@@ -44,7 +44,7 @@ class BOOST_SYMBOL_VISIBLE basic_pointer_oserializer :
 {
 protected:
     explicit BOOST_ARCHIVE_DECL basic_pointer_oserializer(
-        const boost::serialization::extended_type_info & type_
+        const cppmsboost::serialization::extended_type_info & type_
     );
 public:
     virtual BOOST_ARCHIVE_DECL ~basic_pointer_oserializer();
@@ -57,7 +57,7 @@ public:
 
 } // namespace detail
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

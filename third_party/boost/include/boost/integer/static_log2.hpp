@@ -16,9 +16,9 @@
 #ifndef BOOST_INTEGER_STATIC_LOG2_HPP
 #define BOOST_INTEGER_STATIC_LOG2_HPP
 
-#include "boost/integer_fwd.hpp" // for boost::intmax_t
+#include "boost/integer_fwd.hpp" // for cppmsboost::intmax_t
 
-namespace boost {
+namespace cppmsboost {
 
  namespace detail {
 
@@ -41,8 +41,8 @@ namespace boost {
      // terminates with x = 1 and n = 0 (see the algorithm's
      // invariant).
 
-     typedef boost::static_log2_argument_type argument_type;
-     typedef boost::static_log2_result_type result_type;
+     typedef cppmsboost::static_log2_argument_type argument_type;
+     typedef cppmsboost::static_log2_result_type result_type;
 
      template <result_type n>
      struct choose_initial_n {

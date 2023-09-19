@@ -31,7 +31,7 @@
 #include <boost/type_traits/is_array.hpp>
 #endif
 
-namespace boost{
+namespace cppmsboost{
 
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_PREFIX
@@ -69,7 +69,7 @@ public:
       : end(last), re(*p), flags(f)
    {
       // assert that T really is an array:
-      BOOST_STATIC_ASSERT(::boost::is_array<T>::value);
+      BOOST_STATIC_ASSERT(::cppmsboost::is_array<T>::value);
       const std::size_t array_size = sizeof(T) / sizeof(submatches[0]);
       for(std::size_t i = 0; i < array_size; ++i)
       {
@@ -351,7 +351,7 @@ inline u32regex_token_iterator<const UChar*> make_u32regex_token_iterator(const 
 #  include BOOST_ABI_SUFFIX
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_REGEX_V4_REGEX_TOKEN_ITERATOR_HPP
 

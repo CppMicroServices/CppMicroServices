@@ -15,7 +15,7 @@
 
 #include "boost/lambda/detail/is_instance_of.hpp"
 
-namespace boost { 
+namespace cppmsboost { 
 namespace lambda {
 
 #if defined BOOST_LAMBDA_BE1
@@ -347,6 +347,6 @@ BOOST_LAMBDA_POSTFIX_UE(operator--, post_increment_decrement_action<decrement_ac
 #undef BOOST_LAMBDA_POSTFIX_UE
 
 } // namespace lambda
-} // namespace boost
+} // namespace cppmsboost
 
 #endif

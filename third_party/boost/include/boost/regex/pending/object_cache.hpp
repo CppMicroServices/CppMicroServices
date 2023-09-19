@@ -29,22 +29,22 @@
 #include <boost/regex/pending/static_mutex.hpp>
 #endif
 
-namespace boost{
+namespace cppmsboost{
 
 template <class Key, class Object>
 class object_cache
 {
 public:
-   typedef std::pair< ::boost::shared_ptr<Object const>, Key const*> value_type;
+   typedef std::pair< ::cppmsboost::shared_ptr<Object const>, Key const*> value_type;
    typedef std::list<value_type> list_type;
    typedef typename list_type::iterator list_iterator;
    typedef std::map<Key, list_iterator> map_type;
    typedef typename map_type::iterator map_iterator;
    typedef typename list_type::size_type size_type;
-   static boost::shared_ptr<Object const> get(const Key& k, size_type l_max_cache_size);
+   static cppmsboost::shared_ptr<Object const> get(const Key& k, size_type l_max_cache_size);
 
 private:
-   static boost::shared_ptr<Object const> do_get(const Key& k, size_type l_max_cache_size);
+   static cppmsboost::shared_ptr<Object const> do_get(const Key& k, size_type l_max_cache_size);
 
    struct data
    {
@@ -58,12 +58,12 @@ private:
 };
 
 template <class Key, class Object>
-boost::shared_ptr<Object const> object_cache<Key, Object>::get(const Key& k, size_type l_max_cache_size)
+cppmsboost::shared_ptr<Object const> object_cache<Key, Object>::get(const Key& k, size_type l_max_cache_size)
 {
 #ifdef BOOST_HAS_THREADS
-   static boost::static_mutex mut = BOOST_STATIC_MUTEX_INIT;
+   static cppmsboost::static_mutex mut = BOOST_STATIC_MUTEX_INIT;
 
-   boost::static_mutex::scoped_lock l(mut);
+   cppmsboost::static_mutex::scoped_lock l(mut);
    if(l)
    {
       return do_get(k, l_max_cache_size);
@@ -72,9 +72,9 @@ boost::shared_ptr<Object const> object_cache<Key, Object>::get(const Key& k, siz
    // what do we do if the lock fails?
    // for now just throw, but we should never really get here...
    //
-   ::boost::throw_exception(std::runtime_error("Error in thread safety code: could not acquire a lock"));
+   ::cppmsboost::throw_exception(std::runtime_error("Error in thread safety code: could not acquire a lock"));
 #if defined(BOOST_NO_UNREACHABLE_RETURN_DETECTION) || defined(BOOST_NO_EXCEPTIONS)
-   return boost::shared_ptr<Object>();
+   return cppmsboost::shared_ptr<Object>();
 #endif
 #else
    return do_get(k, l_max_cache_size);
@@ -82,7 +82,7 @@ boost::shared_ptr<Object const> object_cache<Key, Object>::get(const Key& k, siz
 }
 
 template <class Key, class Object>
-boost::shared_ptr<Object const> object_cache<Key, Object>::do_get(const Key& k, size_type l_max_cache_size)
+cppmsboost::shared_ptr<Object const> object_cache<Key, Object>::do_get(const Key& k, size_type l_max_cache_size)
 {
    typedef typename object_cache<Key, Object>::data object_data;
    typedef typename map_type::size_type map_size_type;
@@ -117,7 +117,7 @@ boost::shared_ptr<Object const> object_cache<Key, Object>::do_get(const Key& k, 
    // if we get here then the item is not in the cache,
    // so create it:
    //
-   boost::shared_ptr<Object const> result(new Object(k));
+   cppmsboost::shared_ptr<Object const> result(new Object(k));
    //
    // Add it to the list, and index it:
    //

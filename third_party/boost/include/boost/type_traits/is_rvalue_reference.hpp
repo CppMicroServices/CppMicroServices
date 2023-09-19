@@ -12,14 +12,14 @@
 #include <boost/config.hpp>
 #include <boost/type_traits/integral_constant.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 template <class T> struct is_rvalue_reference : public false_type {};
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 template <class T> struct is_rvalue_reference<T&&> : public true_type {};
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && defined(BOOST_MSVC) && BOOST_WORKAROUND(BOOST_MSVC, <= 1700)
 #include <boost/type_traits/detail/is_rvalue_reference_msvc10_fix.hpp>

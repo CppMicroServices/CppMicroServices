@@ -15,7 +15,7 @@
 #include <boost/move/iterator.hpp>
 #include <boost/move/utility_core.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 namespace move_detail{
 
@@ -47,7 +47,7 @@ OutputIt set_difference
 {
    while (first1 != last1) {
       if (first2 == last2)
-         return boost::move_detail::copy(first1, last1, result);
+         return cppmsboost::move_detail::copy(first1, last1, result);
 
       if (comp(*first1, *first2)) {
          *result = *first1;
@@ -85,9 +85,9 @@ InputOutputIt1 inplace_set_difference
          if (!comp(*first2, *first1)) {
             InputOutputIt1 result = first1;
             //An element from range 1 must be skipped, no longer an inplace operation
-            return boost::movelib::set_difference
-               ( boost::make_move_iterator(++first1)
-               , boost::make_move_iterator(last1)
+            return cppmsboost::movelib::set_difference
+               ( cppmsboost::make_move_iterator(++first1)
+               , cppmsboost::make_move_iterator(last1)
                , ++first2, last2, result, comp);
          }
          ++first2;
@@ -165,7 +165,7 @@ ForwardOutputIt1 inplace_set_unique_difference
          ForwardOutputIt1 result = first1;
          while (++first1 != last1) {
             if (comp(*result, *first1) && ++result != first1) {
-               *result = boost::move(*first1);
+               *result = cppmsboost::move(*first1);
             }
          }
          return ++result;
@@ -179,9 +179,9 @@ ForwardOutputIt1 inplace_set_unique_difference
          if (++first1 != last1 && !comp(*result, *first1)) {
             //Some elements from range 1 must be skipped, no longer an inplace operation
             while (++first1 != last1 && !comp(*result, *first1)){}
-            return boost::movelib::set_unique_difference
-               ( boost::make_move_iterator(first1)
-               , boost::make_move_iterator(last1)
+            return cppmsboost::movelib::set_unique_difference
+               ( cppmsboost::make_move_iterator(first1)
+               , cppmsboost::make_move_iterator(last1)
                , first2, last2, ++result, comp);
          }
       }
@@ -190,9 +190,9 @@ ForwardOutputIt1 inplace_set_unique_difference
          //Some elements from range 1 must be skipped, no longer an inplace operation
          while (++first1 != last1 && !comp(*result, *first1)){}
          //An element from range 1 must be skipped, no longer an inplace operation
-         return boost::movelib::set_unique_difference
-            ( boost::make_move_iterator(first1)
-            , boost::make_move_iterator(last1)
+         return cppmsboost::movelib::set_unique_difference
+            ( cppmsboost::make_move_iterator(first1)
+            , cppmsboost::make_move_iterator(last1)
             , first2, last2, result, comp);
       }
    }
@@ -202,6 +202,6 @@ ForwardOutputIt1 inplace_set_unique_difference
 
 
 }  //namespace movelib {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif   //#define BOOST_MOVE_SET_DIFFERENCE_HPP

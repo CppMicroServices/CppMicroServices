@@ -21,7 +21,7 @@ namespace std{
 
 #include <boost/archive/basic_binary_oarchive.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
@@ -39,4 +39,4 @@ basic_binary_oarchive<Archive>::init(){
 }
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost

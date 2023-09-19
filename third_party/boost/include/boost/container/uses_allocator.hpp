@@ -14,7 +14,7 @@
 #include <boost/container/uses_allocator_fwd.hpp>
 #include <boost/container/detail/type_traits.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 
 //! <b>Remark</b>: if a specialization constructible_with_allocator_suffix<X>::value is true, indicates that T may be constructed
@@ -164,6 +164,6 @@ struct uses_allocator
    : dtl::uses_allocator_imp<T, Allocator>
 {};
 
-}} //namespace boost::container
+}} //namespace cppmsboost::container
 
 #endif   //BOOST_CONTAINER_USES_ALLOCATOR_HPP

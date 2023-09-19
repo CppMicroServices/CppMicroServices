@@ -27,11 +27,11 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /**
- * @defgroup write_at boost::asio::write_at
+ * @defgroup write_at cppmsboost::asio::write_at
  *
  * @brief The @c write_at function is a composed operation that writes a
  * certain amount of data at a specified offset before returning.
@@ -63,19 +63,19 @@ namespace asio {
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
- * @code boost::asio::write_at(d, 42, boost::asio::buffer(data, size)); @endcode
+ * @code cppmsboost::asio::write_at(d, 42, cppmsboost::asio::buffer(data, size)); @endcode
  * See the @ref buffer documentation for information on writing multiple
- * buffers in one go, and how to use it with arrays, boost::array or
+ * buffers in one go, and how to use it with arrays, cppmsboost::array or
  * std::vector.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write_at(
+ * @code cppmsboost::asio::write_at(
  *     d, offset, buffers,
- *     boost::asio::transfer_all()); @endcode
+ *     cppmsboost::asio::transfer_all()); @endcode
  */
 template <typename SyncRandomAccessWriteDevice, typename ConstBufferSequence>
 std::size_t write_at(SyncRandomAccessWriteDevice& d,
@@ -110,21 +110,21 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d,
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
- * @code boost::asio::write_at(d, 42,
- *     boost::asio::buffer(data, size), ec); @endcode
+ * @code cppmsboost::asio::write_at(d, 42,
+ *     cppmsboost::asio::buffer(data, size), ec); @endcode
  * See the @ref buffer documentation for information on writing multiple
- * buffers in one go, and how to use it with arrays, boost::array or
+ * buffers in one go, and how to use it with arrays, cppmsboost::array or
  * std::vector.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write_at(
+ * @code cppmsboost::asio::write_at(
  *     d, offset, buffers,
- *     boost::asio::transfer_all(), ec); @endcode
+ *     cppmsboost::asio::transfer_all(), ec); @endcode
  */
 template <typename SyncRandomAccessWriteDevice, typename ConstBufferSequence>
 std::size_t write_at(SyncRandomAccessWriteDevice& d,
     uint64_t offset, const ConstBufferSequence& buffers,
-    boost::system::error_code& ec);
+    cppmsboost::system::error_code& ec);
 
 /// Write a certain amount of data at a specified offset before returning.
 /**
@@ -154,7 +154,7 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some_at operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -165,14 +165,14 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
- * @code boost::asio::write_at(d, 42, boost::asio::buffer(data, size),
- *     boost::asio::transfer_at_least(32)); @endcode
+ * @code cppmsboost::asio::write_at(d, 42, cppmsboost::asio::buffer(data, size),
+ *     cppmsboost::asio::transfer_at_least(32)); @endcode
  * See the @ref buffer documentation for information on writing multiple
- * buffers in one go, and how to use it with arrays, boost::array or
+ * buffers in one go, and how to use it with arrays, cppmsboost::array or
  * std::vector.
  */
 template <typename SyncRandomAccessWriteDevice, typename ConstBufferSequence,
@@ -209,7 +209,7 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some_at operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -227,7 +227,7 @@ template <typename SyncRandomAccessWriteDevice, typename ConstBufferSequence,
     typename CompletionCondition>
 std::size_t write_at(SyncRandomAccessWriteDevice& d,
     uint64_t offset, const ConstBufferSequence& buffers,
-    CompletionCondition completion_condition, boost::system::error_code& ec);
+    CompletionCondition completion_condition, cppmsboost::system::error_code& ec);
 
 #if !defined(BOOST_ASIO_NO_EXTENSIONS)
 #if !defined(BOOST_ASIO_NO_IOSTREAM)
@@ -254,12 +254,12 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write_at(
+ * @code cppmsboost::asio::write_at(
  *     d, 42, b,
- *     boost::asio::transfer_all()); @endcode
+ *     cppmsboost::asio::transfer_all()); @endcode
  */
 template <typename SyncRandomAccessWriteDevice, typename Allocator>
 std::size_t write_at(SyncRandomAccessWriteDevice& d,
@@ -290,14 +290,14 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d,
  * @returns The number of bytes transferred.
  *
  * @note This overload is equivalent to calling:
- * @code boost::asio::write_at(
+ * @code cppmsboost::asio::write_at(
  *     d, 42, b,
- *     boost::asio::transfer_all(), ec); @endcode
+ *     cppmsboost::asio::transfer_all(), ec); @endcode
  */
 template <typename SyncRandomAccessWriteDevice, typename Allocator>
 std::size_t write_at(SyncRandomAccessWriteDevice& d,
     uint64_t offset, basic_streambuf<Allocator>& b,
-    boost::system::error_code& ec);
+    cppmsboost::system::error_code& ec);
 
 /// Write a certain amount of data at a specified offset before returning.
 /**
@@ -324,7 +324,7 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some_at operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -335,7 +335,7 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d,
  *
  * @returns The number of bytes transferred.
  *
- * @throws boost::system::system_error Thrown on failure.
+ * @throws cppmsboost::system::system_error Thrown on failure.
  */
 template <typename SyncRandomAccessWriteDevice, typename Allocator,
     typename CompletionCondition>
@@ -367,7 +367,7 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d, uint64_t offset,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest write_some_at operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -385,14 +385,14 @@ template <typename SyncRandomAccessWriteDevice, typename Allocator,
     typename CompletionCondition>
 std::size_t write_at(SyncRandomAccessWriteDevice& d, uint64_t offset,
     basic_streambuf<Allocator>& b, CompletionCondition completion_condition,
-    boost::system::error_code& ec);
+    cppmsboost::system::error_code& ec);
 
 #endif // !defined(BOOST_ASIO_NO_IOSTREAM)
 #endif // !defined(BOOST_ASIO_NO_EXTENSIONS)
 
 /*@}*/
 /**
- * @defgroup async_write_at boost::asio::async_write_at
+ * @defgroup async_write_at cppmsboost::asio::async_write_at
  *
  * @brief The @c async_write_at function is a composed asynchronous operation
  * that writes a certain amount of data at the specified offset before
@@ -436,7 +436,7 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d, uint64_t offset,
  * the handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes written from the buffers. If an error
  *   // occurred, this will be less than the sum of the buffer sizes.
@@ -445,24 +445,24 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d, uint64_t offset,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
  * @code
- * boost::asio::async_write_at(d, 42, boost::asio::buffer(data, size), handler);
+ * cppmsboost::asio::async_write_at(d, 42, cppmsboost::asio::buffer(data, size), handler);
  * @endcode
  * See the @ref buffer documentation for information on writing multiple
- * buffers in one go, and how to use it with arrays, boost::array or
+ * buffers in one go, and how to use it with arrays, cppmsboost::array or
  * std::vector.
  */
 template <typename AsyncRandomAccessWriteDevice, typename ConstBufferSequence,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) WriteHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncRandomAccessWriteDevice::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_write_at(AsyncRandomAccessWriteDevice& d, uint64_t offset,
     const ConstBufferSequence& buffers,
     BOOST_ASIO_MOVE_ARG(WriteHandler) handler
@@ -505,7 +505,7 @@ async_write_at(AsyncRandomAccessWriteDevice& d, uint64_t offset,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest async_write_some_at operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -519,7 +519,7 @@ async_write_at(AsyncRandomAccessWriteDevice& d, uint64_t offset,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes written from the buffers. If an error
  *   // occurred, this will be less than the sum of the buffer sizes.
@@ -528,26 +528,26 @@ async_write_at(AsyncRandomAccessWriteDevice& d, uint64_t offset,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  *
  * @par Example
  * To write a single data buffer use the @ref buffer function as follows:
- * @code boost::asio::async_write_at(d, 42,
- *     boost::asio::buffer(data, size),
- *     boost::asio::transfer_at_least(32),
+ * @code cppmsboost::asio::async_write_at(d, 42,
+ *     cppmsboost::asio::buffer(data, size),
+ *     cppmsboost::asio::transfer_at_least(32),
  *     handler); @endcode
  * See the @ref buffer documentation for information on writing multiple
- * buffers in one go, and how to use it with arrays, boost::array or
+ * buffers in one go, and how to use it with arrays, cppmsboost::array or
  * std::vector.
  */
 template <typename AsyncRandomAccessWriteDevice,
     typename ConstBufferSequence, typename CompletionCondition,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) WriteHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncRandomAccessWriteDevice::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_write_at(AsyncRandomAccessWriteDevice& d,
     uint64_t offset, const ConstBufferSequence& buffers,
     CompletionCondition completion_condition,
@@ -592,7 +592,7 @@ async_write_at(AsyncRandomAccessWriteDevice& d,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes written from the buffers. If an error
  *   // occurred, this will be less than the sum of the buffer sizes.
@@ -601,15 +601,15 @@ async_write_at(AsyncRandomAccessWriteDevice& d,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  */
 template <typename AsyncRandomAccessWriteDevice, typename Allocator,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) WriteHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncRandomAccessWriteDevice::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_write_at(AsyncRandomAccessWriteDevice& d,
     uint64_t offset, basic_streambuf<Allocator>& b,
     BOOST_ASIO_MOVE_ARG(WriteHandler) handler
@@ -650,7 +650,7 @@ async_write_at(AsyncRandomAccessWriteDevice& d,
  * must be:
  * @code std::size_t completion_condition(
  *   // Result of latest async_write_some_at operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes transferred so far.
  *   std::size_t bytes_transferred
@@ -664,7 +664,7 @@ async_write_at(AsyncRandomAccessWriteDevice& d,
  * handler must be:
  * @code void handler(
  *   // Result of operation.
- *   const boost::system::error_code& error,
+ *   const cppmsboost::system::error_code& error,
  *
  *   // Number of bytes written from the buffers. If an error
  *   // occurred, this will be less than the sum of the buffer sizes.
@@ -673,16 +673,16 @@ async_write_at(AsyncRandomAccessWriteDevice& d,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the handler will not be invoked from within this function. On
  * immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using boost::asio::post().
+ * manner equivalent to using cppmsboost::asio::post().
  */
 template <typename AsyncRandomAccessWriteDevice,
     typename Allocator, typename CompletionCondition,
-    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+    BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
       std::size_t)) WriteHandler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(
           typename AsyncRandomAccessWriteDevice::executor_type)>
 BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-    void (boost::system::error_code, std::size_t))
+    void (cppmsboost::system::error_code, std::size_t))
 async_write_at(AsyncRandomAccessWriteDevice& d, uint64_t offset,
     basic_streambuf<Allocator>& b, CompletionCondition completion_condition,
     BOOST_ASIO_MOVE_ARG(WriteHandler) handler
@@ -695,7 +695,7 @@ async_write_at(AsyncRandomAccessWriteDevice& d, uint64_t offset,
 /*@}*/
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

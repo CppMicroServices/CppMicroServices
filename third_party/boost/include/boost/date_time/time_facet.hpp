@@ -30,7 +30,7 @@
 #include <boost/date_time/special_defs.hpp>
 #include <boost/date_time/time_resolution_traits.hpp> // absolute_value
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
   template <class CharT>
@@ -201,13 +201,13 @@ namespace date_time {
             class CharT,
             class OutItrT = std::ostreambuf_iterator<CharT, std::char_traits<CharT> > >
   class BOOST_SYMBOL_VISIBLE time_facet :
-    public boost::date_time::date_facet<typename time_type::date_type , CharT, OutItrT> {
+    public cppmsboost::date_time::date_facet<typename time_type::date_type , CharT, OutItrT> {
     typedef time_formats< CharT > formats_type;
    public:
     typedef typename time_type::date_type date_type;
     typedef typename time_type::time_duration_type time_duration_type;
-    typedef boost::date_time::period<time_type,time_duration_type> period_type;
-    typedef boost::date_time::date_facet<typename time_type::date_type, CharT, OutItrT> base_type;
+    typedef cppmsboost::date_time::period<time_type,time_duration_type> period_type;
+    typedef cppmsboost::date_time::date_facet<typename time_type::date_type, CharT, OutItrT> base_type;
     typedef typename base_type::string_type string_type;
     typedef typename base_type::char_type   char_type;
     typedef typename base_type::period_formatter_type period_formatter_type;
@@ -290,12 +290,12 @@ namespace date_time {
       string_type local_format(this->m_format);
 
       // %T and %R have to be replaced here since they are not standard
-      boost::algorithm::replace_all(local_format,
-        boost::as_literal(formats_type::full_24_hour_time_format),
-        boost::as_literal(formats_type::full_24_hour_time_expanded_format));
-      boost::algorithm::replace_all(local_format,
-        boost::as_literal(formats_type::short_24_hour_time_format),
-        boost::as_literal(formats_type::short_24_hour_time_expanded_format));
+      cppmsboost::algorithm::replace_all(local_format,
+        cppmsboost::as_literal(formats_type::full_24_hour_time_format),
+        cppmsboost::as_literal(formats_type::full_24_hour_time_expanded_format));
+      cppmsboost::algorithm::replace_all(local_format,
+        cppmsboost::as_literal(formats_type::short_24_hour_time_format),
+        cppmsboost::as_literal(formats_type::short_24_hour_time_expanded_format));
 
       string_type frac_str;
       if (local_format.find(seconds_with_fractional_seconds_format) != string_type::npos) {
@@ -307,7 +307,7 @@ namespace date_time {
         string_type replace_string(seconds_format);
         replace_string += sep;
         replace_string += frac_str;
-        boost::algorithm::replace_all(local_format,
+        cppmsboost::algorithm::replace_all(local_format,
                                       seconds_with_fractional_seconds_format,
                                       replace_string);
       }
@@ -318,10 +318,10 @@ namespace date_time {
         if(time_arg.zone_abbrev().empty()) {
           // if zone_abbrev() returns an empty string, we want to
           // erase posix_zone_string_format from format
-          boost::algorithm::erase_all(local_format, posix_zone_string_format);
+          cppmsboost::algorithm::erase_all(local_format, posix_zone_string_format);
         }
         else{
-          boost::algorithm::replace_all(local_format,
+          cppmsboost::algorithm::replace_all(local_format,
                                         posix_zone_string_format,
                                         time_arg.zone_as_posix_string());
         }
@@ -336,10 +336,10 @@ namespace date_time {
           // erase zone_name_format & one preceeding space
           std::basic_ostringstream<char_type> ss;
           ss << ' ' << zone_name_format;
-          boost::algorithm::erase_all(local_format, ss.str());
+          cppmsboost::algorithm::erase_all(local_format, ss.str());
         }
         else{
-          boost::algorithm::replace_all(local_format,
+          cppmsboost::algorithm::replace_all(local_format,
                                         zone_name_format,
                                         time_arg.zone_name());
         }
@@ -354,10 +354,10 @@ namespace date_time {
           // erase zone_abbrev_format & one preceeding space
           std::basic_ostringstream<char_type> ss;
           ss << ' ' << zone_abbrev_format;
-          boost::algorithm::erase_all(local_format, ss.str());
+          cppmsboost::algorithm::erase_all(local_format, ss.str());
         }
         else{
-          boost::algorithm::replace_all(local_format,
+          cppmsboost::algorithm::replace_all(local_format,
                                         zone_abbrev_format,
                                         time_arg.zone_abbrev(false));
         }
@@ -370,10 +370,10 @@ namespace date_time {
 
           // if zone_name() returns an empty string, we want to
           // erase zone_iso_extended_format from format
-          boost::algorithm::erase_all(local_format, zone_iso_extended_format);
+          cppmsboost::algorithm::erase_all(local_format, zone_iso_extended_format);
         }
         else{
-          boost::algorithm::replace_all(local_format,
+          cppmsboost::algorithm::replace_all(local_format,
                                         zone_iso_extended_format,
                                         time_arg.zone_name(true));
         }
@@ -387,10 +387,10 @@ namespace date_time {
 
           // if zone_abbrev() returns an empty string, we want to
           // erase zone_iso_format from format
-          boost::algorithm::erase_all(local_format, zone_iso_format);
+          cppmsboost::algorithm::erase_all(local_format, zone_iso_format);
         }
         else{
-          boost::algorithm::replace_all(local_format,
+          cppmsboost::algorithm::replace_all(local_format,
                                         zone_iso_format,
                                         time_arg.zone_abbrev(true));
         }
@@ -400,7 +400,7 @@ namespace date_time {
         if (frac_str.empty()) {
           frac_str = fractional_seconds_as_string(time_arg.time_of_day(), false);
         }
-        boost::algorithm::replace_all(local_format,
+        cppmsboost::algorithm::replace_all(local_format,
                                       fractional_seconds_format,
                                       frac_str);
       }
@@ -414,12 +414,12 @@ namespace date_time {
           string_type replace_string;
           replace_string += sep;
           replace_string += frac_str;
-          boost::algorithm::replace_all(local_format,
+          cppmsboost::algorithm::replace_all(local_format,
                                         fractional_seconds_or_none_format,
                                         replace_string);
         }
         else {
-          boost::algorithm::erase_all(local_format,
+          cppmsboost::algorithm::erase_all(local_format,
                                       fractional_seconds_or_none_format);
         }
       }
@@ -442,30 +442,30 @@ namespace date_time {
       string_type format(m_time_duration_format);
       if (time_dur_arg.is_negative()) {
         // replace %- with minus sign.  Should we use the numpunct facet?
-        boost::algorithm::replace_all(format,
+        cppmsboost::algorithm::replace_all(format,
                                       duration_sign_negative_only,
                                       negative_sign);
           // remove all the %+ in the string with '-'
-        boost::algorithm::replace_all(format,
+        cppmsboost::algorithm::replace_all(format,
                                       duration_sign_always,
                                       negative_sign);
       }
       else { //duration is positive
         // remove all the %- combos from the string
-        boost::algorithm::erase_all(format, duration_sign_negative_only);
+        cppmsboost::algorithm::erase_all(format, duration_sign_negative_only);
         // remove all the %+ in the string with '+'
-        boost::algorithm::replace_all(format,
+        cppmsboost::algorithm::replace_all(format,
                                       duration_sign_always,
                                       positive_sign);
       }
 
       // %T and %R have to be replaced here since they are not standard
-      boost::algorithm::replace_all(format,
-        boost::as_literal(formats_type::full_24_hour_time_format),
-        boost::as_literal(formats_type::full_24_hour_time_expanded_format));
-      boost::algorithm::replace_all(format,
-        boost::as_literal(formats_type::short_24_hour_time_format),
-        boost::as_literal(formats_type::short_24_hour_time_expanded_format));
+      cppmsboost::algorithm::replace_all(format,
+        cppmsboost::as_literal(formats_type::full_24_hour_time_format),
+        cppmsboost::as_literal(formats_type::full_24_hour_time_expanded_format));
+      cppmsboost::algorithm::replace_all(format,
+        cppmsboost::as_literal(formats_type::short_24_hour_time_format),
+        cppmsboost::as_literal(formats_type::short_24_hour_time_expanded_format));
 
       /*
        * It is possible for a time duration to span more then 24 hours.
@@ -478,7 +478,7 @@ namespace date_time {
       string_type hours_str;
       if (format.find(unrestricted_hours_format) != string_type::npos) {
         hours_str = hours_as_string(time_dur_arg);
-        boost::algorithm::replace_all(format, unrestricted_hours_format, hours_str);
+        cppmsboost::algorithm::replace_all(format, unrestricted_hours_format, hours_str);
       }
       // We still have to process restricted hours format specifier. In order to
       // support parseability of durations in ISO format (%H%M%S), we'll have to
@@ -487,7 +487,7 @@ namespace date_time {
         if (hours_str.empty())
           hours_str = hours_as_string(time_dur_arg);
         BOOST_ASSERT(hours_str.length() <= 2);
-        boost::algorithm::replace_all(format, hours_format, hours_str);
+        cppmsboost::algorithm::replace_all(format, hours_format, hours_str);
       }
 
       string_type frac_str;
@@ -500,7 +500,7 @@ namespace date_time {
         string_type replace_string(seconds_format);
         replace_string += sep;
         replace_string += frac_str;
-        boost::algorithm::replace_all(format,
+        cppmsboost::algorithm::replace_all(format,
                                       seconds_with_fractional_seconds_format,
                                       replace_string);
       }
@@ -509,7 +509,7 @@ namespace date_time {
         if (!frac_str.size()) {
           frac_str = fractional_seconds_as_string(time_dur_arg, false);
         }
-        boost::algorithm::replace_all(format,
+        cppmsboost::algorithm::replace_all(format,
                                       fractional_seconds_format,
                                       frac_str);
       }
@@ -523,12 +523,12 @@ namespace date_time {
           string_type replace_string;
           replace_string += sep;
           replace_string += frac_str;
-          boost::algorithm::replace_all(format,
+          cppmsboost::algorithm::replace_all(format,
                                         fractional_seconds_or_none_format,
                                         replace_string);
         }
         else {
-          boost::algorithm::erase_all(format,
+          cppmsboost::algorithm::erase_all(format,
                                       fractional_seconds_or_none_format);
         }
       }
@@ -583,7 +583,7 @@ namespace date_time {
 #if (defined(BOOST_MSVC) && (_MSC_VER < 1300))
       // JDG [7/6/02 VC++ compatibility]
       char_type buff[34];
-      ss << _i64toa(static_cast<boost::int64_t>(val), buff, 10);
+      ss << _i64toa(static_cast<cppmsboost::int64_t>(val), buff, 10);
 #else
       ss << val;
 #endif
@@ -694,13 +694,13 @@ namespace date_time {
             class CharT,
             class InItrT = std::istreambuf_iterator<CharT, std::char_traits<CharT> > >
   class BOOST_SYMBOL_VISIBLE time_input_facet :
-    public boost::date_time::date_input_facet<typename time_type::date_type , CharT, InItrT> {
+    public cppmsboost::date_time::date_input_facet<typename time_type::date_type , CharT, InItrT> {
     public:
       typedef typename time_type::date_type date_type;
       typedef typename time_type::time_duration_type time_duration_type;
       typedef typename time_duration_type::fractional_seconds_type fracional_seconds_type;
-      typedef boost::date_time::period<time_type,time_duration_type> period_type;
-      typedef boost::date_time::date_input_facet<typename time_type::date_type, CharT, InItrT> base_type;
+      typedef cppmsboost::date_time::period<time_type,time_duration_type> period_type;
+      typedef cppmsboost::date_time::date_input_facet<typename time_type::date_type, CharT, InItrT> base_type;
       typedef typename base_type::duration_type date_duration_type;
       typedef typename base_type::year_type year_type;
       typedef typename base_type::month_type month_type;
@@ -1258,7 +1258,7 @@ namespace date_time {
         (void)this->m_sv_parser.match(sitr, stream_end, mr);
         if(mr.current_match == match_results::PARSE_ERROR) {
           std::string tmp = convert_string_type<char_type, char>(mr.cache);
-          boost::throw_exception(std::ios_base::failure("Parse failed. No match found for '" + tmp + "'"));
+          cppmsboost::throw_exception(std::ios_base::failure("Parse failed. No match found for '" + tmp + "'"));
           BOOST_DATE_TIME_UNREACHABLE_EXPRESSION(return sitr); // should never reach
         }
         tt = temporal_type(static_cast<special_values>(mr.current_match));

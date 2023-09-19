@@ -16,7 +16,7 @@
 #include <boost/config.hpp>
 #include <cstddef>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace type_traits_detail
@@ -75,11 +75,11 @@ template<class C> struct common_member_class<C, C>
 
 template<class C1, class C2> struct common_member_class
 {
-    typedef typename boost::conditional<
+    typedef typename cppmsboost::conditional<
 
-        boost::is_base_of<C1, C2>::value,
+        cppmsboost::is_base_of<C1, C2>::value,
         C2,
-        typename boost::conditional<boost::is_base_of<C2, C1>::value, C1, void>::type
+        typename cppmsboost::conditional<cppmsboost::is_base_of<C2, C1>::value, C1, void>::type
 
     >::type type;
 };
@@ -97,7 +97,7 @@ template<class C1, class T1, class C2, class T2> struct composite_member_pointer
 private:
 
     typedef typename composite_pointer_type<T1*, T2*>::type CPT;
-    typedef typename boost::remove_pointer<CPT>::type CT;
+    typedef typename cppmsboost::remove_pointer<CPT>::type CT;
 
     typedef typename common_member_class<C1, C2>::type CB;
 
@@ -108,6 +108,6 @@ public:
 
 } // namespace type_traits_detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_TYPE_TRAITS_DETAIL_COMPOSITE_MEMBER_POINTER_TYPE_HPP_INCLUDED

@@ -22,7 +22,7 @@
 #  pragma warning(disable:4800)
 #endif
 
-namespace boost { namespace spirit {
+namespace cppmsboost { namespace spirit {
 
 BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 
@@ -387,7 +387,7 @@ BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 
 BOOST_SPIRIT_CLASSIC_NAMESPACE_END
 
-}} // namespace boost::spirit::impl
+}} // namespace cppmsboost::spirit::impl
 
 #ifdef BOOST_MSVC
 #pragma warning (pop)

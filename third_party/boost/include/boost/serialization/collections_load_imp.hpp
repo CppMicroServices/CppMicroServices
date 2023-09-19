@@ -42,7 +42,7 @@ namespace std{
 #include <boost/utility/enable_if.hpp>
 #include <boost/move/utility_core.hpp>
 
-namespace boost{
+namespace cppmsboost{
 namespace serialization {
 namespace stl {
 
@@ -54,7 +54,7 @@ template<
     class Archive,
     class T
 >
-typename boost::enable_if<
+typename cppmsboost::enable_if<
     typename detail::is_default_constructible<
         typename T::value_type
     >,
@@ -70,7 +70,7 @@ collection_load_impl(
     typename T::iterator hint;
     hint = t.begin();
     while(count-- > 0){
-        ar >> boost::serialization::make_nvp("item", *hint++);
+        ar >> cppmsboost::serialization::make_nvp("item", *hint++);
     }
 }
 
@@ -78,7 +78,7 @@ template<
     class Archive,
     class T
 >
-typename boost::disable_if<
+typename cppmsboost::disable_if<
     typename detail::is_default_constructible<
         typename T::value_type
     >,
@@ -93,14 +93,14 @@ collection_load_impl(
     t.clear();
     while(count-- > 0){
         detail::stack_construct<Archive, typename T::value_type> u(ar, item_version);
-        ar >> boost::serialization::make_nvp("item", u.reference());
-        t.push_back(boost::move(u.reference()));
+        ar >> cppmsboost::serialization::make_nvp("item", u.reference());
+        t.push_back(cppmsboost::move(u.reference()));
         ar.reset_object_address(& t.back() , u.address());
      }
 }
 
 } // namespace stl
 } // namespace serialization
-} // namespace boost
+} // namespace cppmsboost
 
 #endif //BOOST_SERIALIZATION_COLLECTIONS_LOAD_IMP_HPP

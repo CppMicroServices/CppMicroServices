@@ -15,7 +15,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/type_traits/is_integral.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace posix_time {
 
   //! Allows expression of durations as an hour count
@@ -27,7 +27,7 @@ namespace posix_time {
   public:
       template <typename T>
       BOOST_CXX14_CONSTEXPR explicit hours(T const& h,
-          typename boost::enable_if<boost::is_integral<T>, void>::type* = BOOST_DATE_TIME_NULLPTR) :
+          typename cppmsboost::enable_if<cppmsboost::is_integral<T>, void>::type* = BOOST_DATE_TIME_NULLPTR) :
       time_duration(numeric_cast<hour_type>(h), 0, 0)
     {}
   };
@@ -41,7 +41,7 @@ namespace posix_time {
   public:
       template <typename T>
       BOOST_CXX14_CONSTEXPR explicit minutes(T const& m,
-          typename boost::enable_if<boost::is_integral<T>, void>::type* = BOOST_DATE_TIME_NULLPTR) :
+          typename cppmsboost::enable_if<cppmsboost::is_integral<T>, void>::type* = BOOST_DATE_TIME_NULLPTR) :
       time_duration(0, numeric_cast<min_type>(m),0)
     {}
   };
@@ -55,7 +55,7 @@ namespace posix_time {
   public:
       template <typename T>
       BOOST_CXX14_CONSTEXPR explicit seconds(T const& s,
-          typename boost::enable_if<boost::is_integral<T>, void>::type* = BOOST_DATE_TIME_NULLPTR) :
+          typename cppmsboost::enable_if<cppmsboost::is_integral<T>, void>::type* = BOOST_DATE_TIME_NULLPTR) :
       time_duration(0,0, numeric_cast<sec_type>(s))
     {}
   };

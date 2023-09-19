@@ -48,7 +48,7 @@ class tc_optional_base : public optional_tag
       :
       m_initialized(false)
     {
-      construct(boost::forward<Expr>(expr),tag);
+      construct(cppmsboost::forward<Expr>(expr),tag);
     }
 
 #else
@@ -113,7 +113,7 @@ class tc_optional_base : public optional_tag
     template<class Expr, class ExprPtr>
     void assign_expr ( Expr&& expr, ExprPtr const* tag )
     {
-       construct(boost::forward<Expr>(expr),tag);
+       construct(cppmsboost::forward<Expr>(expr),tag);
     }
 #else
     template<class Expr>
@@ -157,14 +157,14 @@ class tc_optional_base : public optional_tag
     template<class... Args>
     void construct ( in_place_init_t, Args&&... args )
     {
-      m_storage = value_type( boost::forward<Args>(args)... ) ;
+      m_storage = value_type( cppmsboost::forward<Args>(args)... ) ;
       m_initialized = true ;
     }
 
     template<class... Args>
     void emplace_assign ( Args&&... args )
     {
-      construct(in_place_init, boost::forward<Args>(args)...);
+      construct(in_place_init, cppmsboost::forward<Args>(args)...);
     }
      
     template<class... Args>
@@ -172,7 +172,7 @@ class tc_optional_base : public optional_tag
       :
       m_initialized(false)
     {
-      construct(in_place_init, boost::forward<Args>(args)...);
+      construct(in_place_init, cppmsboost::forward<Args>(args)...);
     }
     
     template<class... Args>
@@ -181,13 +181,13 @@ class tc_optional_base : public optional_tag
       m_initialized(false)
     {
       if ( cond )
-        construct(in_place_init, boost::forward<Args>(args)...);
+        construct(in_place_init, cppmsboost::forward<Args>(args)...);
     }
 #elif (!defined BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES)
     template<class Arg>
     void construct ( in_place_init_t, Arg&& arg )
      {
-       m_storage = value_type( boost::forward<Arg>(arg) );
+       m_storage = value_type( cppmsboost::forward<Arg>(arg) );
        m_initialized = true ;
      }
      
@@ -200,7 +200,7 @@ class tc_optional_base : public optional_tag
     template<class Arg>
     void emplace_assign ( Arg&& arg )
      {
-       construct(in_place_init, boost::forward<Arg>(arg)) ;
+       construct(in_place_init, cppmsboost::forward<Arg>(arg)) ;
      }
      
     void emplace_assign ()
@@ -213,7 +213,7 @@ class tc_optional_base : public optional_tag
       :
       m_initialized(false)
     {
-      construct(in_place_init, boost::forward<Arg>(arg));
+      construct(in_place_init, cppmsboost::forward<Arg>(arg));
     }
     
     explicit tc_optional_base ( in_place_init_t )
@@ -226,7 +226,7 @@ class tc_optional_base : public optional_tag
       m_initialized(false)
     {
       if ( cond )
-        construct(in_place_init, boost::forward<Arg>(arg));
+        construct(in_place_init, cppmsboost::forward<Arg>(arg));
     }
     
     explicit tc_optional_base ( in_place_init_if_t, bool cond )
@@ -327,7 +327,7 @@ class tc_optional_base : public optional_tag
     template<class Expr>
     void construct ( Expr&& factory, in_place_factory_base const* )
      {
-       boost_optional_detail::construct<value_type>(factory, boost::addressof(m_storage));
+       cppmsboost_optional_detail::construct<value_type>(factory, cppmsboost::addressof(m_storage));
        m_initialized = true ;
      }
 
@@ -335,7 +335,7 @@ class tc_optional_base : public optional_tag
     template<class Expr>
     void construct ( Expr&& factory, typed_in_place_factory_base const* )
      {
-       factory.apply(boost::addressof(m_storage)) ;
+       factory.apply(cppmsboost::addressof(m_storage)) ;
        m_initialized = true ;
      }
 
@@ -359,7 +359,7 @@ class tc_optional_base : public optional_tag
     template<class Expr>
     void construct ( Expr const& factory, in_place_factory_base const* )
      {
-       boost_optional_detail::construct<value_type>(factory, boost::addressof(m_storage));
+       cppmsboost_optional_detail::construct<value_type>(factory, cppmsboost::addressof(m_storage));
        m_initialized = true ;
      }
 
@@ -367,7 +367,7 @@ class tc_optional_base : public optional_tag
     template<class Expr>
     void construct ( Expr const& factory, typed_in_place_factory_base const* )
      {
-       factory.apply(boost::addressof(m_storage)) ;
+       factory.apply(cppmsboost::addressof(m_storage)) ;
        m_initialized = true ;
      }
 
@@ -397,7 +397,7 @@ class tc_optional_base : public optional_tag
     template<class Expr>
     void construct ( Expr&& expr, void const* )
     {
-      m_storage = value_type(boost::forward<Expr>(expr)) ;
+      m_storage = value_type(cppmsboost::forward<Expr>(expr)) ;
       m_initialized = true ;
     }
 
@@ -408,7 +408,7 @@ class tc_optional_base : public optional_tag
     template<class Expr>
     void assign_expr_to_initialized ( Expr&& expr, void const* )
     {
-      assign_value( boost::forward<Expr>(expr) );
+      assign_value( cppmsboost::forward<Expr>(expr) );
     }
 #else
     // Constructs using any expression implicitly convertible to the single argument
@@ -456,7 +456,7 @@ class tc_optional_base : public optional_tag
        {
          // An exception can be thrown here.
          // It it happens, THIS will be left uninitialized.
-         m_storage = value_type(boost::move(expr.get())) ;
+         m_storage = value_type(cppmsboost::move(expr.get())) ;
          m_initialized = true ;
        }
      }
@@ -489,8 +489,8 @@ class tc_optional_base : public optional_tag
     reference_const_type get_impl() const { return m_storage ; }
     reference_type       get_impl()       { return m_storage ; }
 
-    pointer_const_type get_ptr_impl() const { return boost::addressof(m_storage); }
-    pointer_type       get_ptr_impl()       { return boost::addressof(m_storage); }
+    pointer_const_type get_ptr_impl() const { return cppmsboost::addressof(m_storage); }
+    pointer_type       get_ptr_impl()       { return cppmsboost::addressof(m_storage); }
 
   private :
 

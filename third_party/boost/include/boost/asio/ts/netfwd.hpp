@@ -29,7 +29,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 class execution_context;
@@ -120,7 +120,7 @@ class basic_socket_acceptor;
 template <typename Protocol,
 #if defined(BOOST_ASIO_HAS_BOOST_DATE_TIME) \
   || defined(GENERATING_DOCUMENTATION)
-    typename Clock = boost::posix_time::ptime,
+    typename Clock = cppmsboost::posix_time::ptime,
     typename WaitTraits = time_traits<Clock> >
 #else
     typename Clock = chrono::steady_clock,
@@ -137,7 +137,7 @@ class basic_socket_streambuf;
 template <typename Protocol,
 #if defined(BOOST_ASIO_HAS_BOOST_DATE_TIME) \
   || defined(GENERATING_DOCUMENTATION)
-    typename Clock = boost::posix_time::ptime,
+    typename Clock = cppmsboost::posix_time::ptime,
     typename WaitTraits = time_traits<Clock> >
 #else
     typename Clock = chrono::steady_clock,
@@ -196,7 +196,7 @@ class udp;
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

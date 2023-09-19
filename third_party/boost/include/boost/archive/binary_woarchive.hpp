@@ -25,7 +25,7 @@
 #include <boost/archive/binary_oarchive_impl.hpp>
 #include <boost/archive/detail/register_archive.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 // do not derive from this class.  If you want to extend this functionality
@@ -50,10 +50,10 @@ public:
 };
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 // required by export
-BOOST_SERIALIZATION_REGISTER_ARCHIVE(boost::archive::binary_woarchive)
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(cppmsboost::archive::binary_woarchive)
 
 #endif // BOOST_NO_STD_WSTREAMBUF
 #endif // BOOST_ARCHIVE_BINARY_WOARCHIVE_HPP

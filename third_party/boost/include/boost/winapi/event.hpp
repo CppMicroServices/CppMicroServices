@@ -18,20 +18,20 @@
 #if !defined( BOOST_USE_WINDOWS_H ) && BOOST_WINAPI_PARTITION_APP_SYSTEM
 extern "C" {
 #if !defined( BOOST_NO_ANSI_APIS )
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 CreateEventA(
     ::_SECURITY_ATTRIBUTES* lpEventAttributes,
-    boost::winapi::BOOL_ bManualReset,
-    boost::winapi::BOOL_ bInitialState,
-    boost::winapi::LPCSTR_ lpName);
+    cppmsboost::winapi::BOOL_ bManualReset,
+    cppmsboost::winapi::BOOL_ bInitialState,
+    cppmsboost::winapi::LPCSTR_ lpName);
 #endif
 
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 CreateEventW(
     ::_SECURITY_ATTRIBUTES* lpEventAttributes,
-    boost::winapi::BOOL_ bManualReset,
-    boost::winapi::BOOL_ bInitialState,
-    boost::winapi::LPCWSTR_ lpName);
+    cppmsboost::winapi::BOOL_ bManualReset,
+    cppmsboost::winapi::BOOL_ bInitialState,
+    cppmsboost::winapi::LPCWSTR_ lpName);
 } // extern "C"
 #endif // !defined( BOOST_USE_WINDOWS_H ) && BOOST_WINAPI_PARTITION_APP_SYSTEM
 
@@ -39,48 +39,48 @@ CreateEventW(
 extern "C" {
 #if !defined( BOOST_NO_ANSI_APIS )
 #if BOOST_USE_WINAPI_VERSION >= BOOST_WINAPI_VERSION_WIN6
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 CreateEventExA(
     ::_SECURITY_ATTRIBUTES *lpEventAttributes,
-    boost::winapi::LPCSTR_ lpName,
-    boost::winapi::DWORD_ dwFlags,
-    boost::winapi::DWORD_ dwDesiredAccess);
+    cppmsboost::winapi::LPCSTR_ lpName,
+    cppmsboost::winapi::DWORD_ dwFlags,
+    cppmsboost::winapi::DWORD_ dwDesiredAccess);
 #endif
 
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 OpenEventA(
-    boost::winapi::DWORD_ dwDesiredAccess,
-    boost::winapi::BOOL_ bInheritHandle,
-    boost::winapi::LPCSTR_ lpName);
+    cppmsboost::winapi::DWORD_ dwDesiredAccess,
+    cppmsboost::winapi::BOOL_ bInheritHandle,
+    cppmsboost::winapi::LPCSTR_ lpName);
 #endif // !defined( BOOST_NO_ANSI_APIS )
 
 #if BOOST_USE_WINAPI_VERSION >= BOOST_WINAPI_VERSION_WIN6
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 CreateEventExW(
     ::_SECURITY_ATTRIBUTES *lpEventAttributes,
-    boost::winapi::LPCWSTR_ lpName,
-    boost::winapi::DWORD_ dwFlags,
-    boost::winapi::DWORD_ dwDesiredAccess);
+    cppmsboost::winapi::LPCWSTR_ lpName,
+    cppmsboost::winapi::DWORD_ dwFlags,
+    cppmsboost::winapi::DWORD_ dwDesiredAccess);
 #endif
 
-BOOST_SYMBOL_IMPORT boost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::HANDLE_ BOOST_WINAPI_WINAPI_CC
 OpenEventW(
-    boost::winapi::DWORD_ dwDesiredAccess,
-    boost::winapi::BOOL_ bInheritHandle,
-    boost::winapi::LPCWSTR_ lpName);
+    cppmsboost::winapi::DWORD_ dwDesiredAccess,
+    cppmsboost::winapi::BOOL_ bInheritHandle,
+    cppmsboost::winapi::LPCWSTR_ lpName);
 
 // Windows CE define SetEvent/ResetEvent as inline functions in kfuncs.h
 #if !defined( UNDER_CE )
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
-SetEvent(boost::winapi::HANDLE_ hEvent);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
+SetEvent(cppmsboost::winapi::HANDLE_ hEvent);
 
-BOOST_SYMBOL_IMPORT boost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
-ResetEvent(boost::winapi::HANDLE_ hEvent);
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::BOOL_ BOOST_WINAPI_WINAPI_CC
+ResetEvent(cppmsboost::winapi::HANDLE_ hEvent);
 #endif
 } // extern "C"
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 
 #if !defined( BOOST_NO_ANSI_APIS )

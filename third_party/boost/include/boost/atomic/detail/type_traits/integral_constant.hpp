@@ -25,7 +25,7 @@
 #pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -34,13 +34,13 @@ using std::integral_constant;
 using std::true_type;
 using std::false_type;
 #else
-using boost::integral_constant;
-using boost::true_type;
-using boost::false_type;
+using cppmsboost::integral_constant;
+using cppmsboost::true_type;
+using cppmsboost::false_type;
 #endif
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ATOMIC_DETAIL_TYPE_TRAITS_INTEGRAL_CONSTANT_HPP_INCLUDED_

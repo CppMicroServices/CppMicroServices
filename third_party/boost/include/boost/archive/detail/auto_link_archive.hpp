@@ -32,7 +32,7 @@
     // Set the name of our library, this will get undef'ed by auto_link.hpp
     // once it's done with it:
     //
-    #define BOOST_LIB_NAME boost_serialization
+    #define BOOST_LIB_NAME cppmsboost_serialization
     //
     // If we're importing code from a dll, then tell auto_link.hpp about it:
     //

@@ -33,7 +33,7 @@
 #undef PPI
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace type_traits {
 
 no_type BOOST_TT_DECL is_mem_fun_pointer_tester(...);
@@ -1508,7 +1508,7 @@ yes_type is_mem_fun_pointer_tester(R(__cdecl T::*const volatile*)(T0, T1, T2, T3
 #endif // BOOST_TT_PREPROCESSING_MODE
 
 } // namespace type_traits
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_DETAIL_IS_MEM_FUN_POINTER_TESTER_HPP_INCLUDED
 

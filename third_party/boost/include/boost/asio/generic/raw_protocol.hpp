@@ -25,20 +25,20 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace generic {
 
 /// Encapsulates the flags needed for a generic raw socket.
 /**
- * The boost::asio::generic::raw_protocol class contains flags necessary for
+ * The cppmsboost::asio::generic::raw_protocol class contains flags necessary for
  * raw sockets of any address family and protocol.
  *
  * @par Examples
  * Constructing using a native address family and socket protocol:
  * @code raw_protocol p(AF_INET, IPPROTO_ICMP); @endcode
  * Constructing from a specific protocol type:
- * @code raw_protocol p(boost::asio::ip::icmp::v4()); @endcode
+ * @code raw_protocol p(cppmsboost::asio::ip::icmp::v4()); @endcode
  *
  * @par Thread Safety
  * @e Distinct @e objects: Safe.@n
@@ -69,7 +69,7 @@ public:
     if (source_protocol.type() != type())
     {
       std::bad_cast ex;
-      boost::asio::detail::throw_exception(ex);
+      cppmsboost::asio::detail::throw_exception(ex);
     }
   }
 
@@ -116,7 +116,7 @@ private:
 
 } // namespace generic
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

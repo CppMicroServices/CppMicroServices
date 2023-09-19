@@ -11,7 +11,7 @@
 
 #include <string>
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
 

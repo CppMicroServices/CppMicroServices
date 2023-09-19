@@ -37,7 +37,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace posix {
 
@@ -118,16 +118,16 @@ public:
    *
    * @param native_descriptor A native descriptor.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   basic_descriptor(const executor_type& ex,
       const native_handle_type& native_descriptor)
     : impl_(ex)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(),
         native_descriptor, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    cppmsboost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Construct a descriptor on an existing native descriptor.
@@ -141,7 +141,7 @@ public:
    *
    * @param native_descriptor A native descriptor.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_descriptor(ExecutionContext& context,
@@ -151,10 +151,10 @@ public:
       >::type* = 0)
     : impl_(context)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(),
         native_descriptor, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    cppmsboost::asio::detail::throw_error(ec, "assign");
   }
 
 #if defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
@@ -232,14 +232,14 @@ public:
    *
    * @param native_descriptor A native descriptor.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   void assign(const native_handle_type& native_descriptor)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(),
         native_descriptor, ec);
-    boost::asio::detail::throw_error(ec, "assign");
+    cppmsboost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Assign an existing native descriptor to the descriptor.
@@ -251,7 +251,7 @@ public:
    * @param ec Set to indicate what error occurred, if any.
    */
   BOOST_ASIO_SYNC_OP_VOID assign(const native_handle_type& native_descriptor,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     impl_.get_service().assign(
         impl_.get_implementation(), native_descriptor, ec);
@@ -268,28 +268,28 @@ public:
   /**
    * This function is used to close the descriptor. Any asynchronous read or
    * write operations will be cancelled immediately, and will complete with the
-   * boost::asio::error::operation_aborted error.
+   * cppmsboost::asio::error::operation_aborted error.
    *
-   * @throws boost::system::system_error Thrown on failure. Note that, even if
+   * @throws cppmsboost::system::system_error Thrown on failure. Note that, even if
    * the function indicates an error, the underlying descriptor is closed.
    */
   void close()
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().close(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "close");
+    cppmsboost::asio::detail::throw_error(ec, "close");
   }
 
   /// Close the descriptor.
   /**
    * This function is used to close the descriptor. Any asynchronous read or
    * write operations will be cancelled immediately, and will complete with the
-   * boost::asio::error::operation_aborted error.
+   * cppmsboost::asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any. Note that, even if
    * the function indicates an error, the underlying descriptor is closed.
    */
-  BOOST_ASIO_SYNC_OP_VOID close(boost::system::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID close(cppmsboost::system::error_code& ec)
   {
     impl_.get_service().close(impl_.get_implementation(), ec);
     BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
@@ -314,7 +314,7 @@ public:
    *
    * All outstanding asynchronous read or write operations will finish
    * immediately, and the handlers for cancelled operations will be passed the
-   * boost::asio::error::operation_aborted error.
+   * cppmsboost::asio::error::operation_aborted error.
    */
   native_handle_type release()
   {
@@ -325,26 +325,26 @@ public:
   /**
    * This function causes all outstanding asynchronous read or write operations
    * to finish immediately, and the handlers for cancelled operations will be
-   * passed the boost::asio::error::operation_aborted error.
+   * passed the cppmsboost::asio::error::operation_aborted error.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   void cancel()
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().cancel(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "cancel");
+    cppmsboost::asio::detail::throw_error(ec, "cancel");
   }
 
   /// Cancel all asynchronous operations associated with the descriptor.
   /**
    * This function causes all outstanding asynchronous read or write operations
    * to finish immediately, and the handlers for cancelled operations will be
-   * passed the boost::asio::error::operation_aborted error.
+   * passed the cppmsboost::asio::error::operation_aborted error.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  BOOST_ASIO_SYNC_OP_VOID cancel(boost::system::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID cancel(cppmsboost::system::error_code& ec)
   {
     impl_.get_service().cancel(impl_.get_implementation(), ec);
     BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
@@ -356,18 +356,18 @@ public:
    *
    * @param command The IO control command to be performed on the descriptor.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @sa IoControlCommand @n
-   * boost::asio::posix::descriptor_base::bytes_readable @n
-   * boost::asio::posix::descriptor_base::non_blocking_io
+   * cppmsboost::asio::posix::descriptor_base::bytes_readable @n
+   * cppmsboost::asio::posix::descriptor_base::non_blocking_io
    *
    * @par Example
    * Getting the number of bytes ready to read:
    * @code
-   * boost::asio::posix::stream_descriptor descriptor(my_context);
+   * cppmsboost::asio::posix::stream_descriptor descriptor(my_context);
    * ...
-   * boost::asio::posix::stream_descriptor::bytes_readable command;
+   * cppmsboost::asio::posix::stream_descriptor::bytes_readable command;
    * descriptor.io_control(command);
    * std::size_t bytes_readable = command.get();
    * @endcode
@@ -375,9 +375,9 @@ public:
   template <typename IoControlCommand>
   void io_control(IoControlCommand& command)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().io_control(impl_.get_implementation(), command, ec);
-    boost::asio::detail::throw_error(ec, "io_control");
+    cppmsboost::asio::detail::throw_error(ec, "io_control");
   }
 
   /// Perform an IO control command on the descriptor.
@@ -389,16 +389,16 @@ public:
    * @param ec Set to indicate what error occurred, if any.
    *
    * @sa IoControlCommand @n
-   * boost::asio::posix::descriptor_base::bytes_readable @n
-   * boost::asio::posix::descriptor_base::non_blocking_io
+   * cppmsboost::asio::posix::descriptor_base::bytes_readable @n
+   * cppmsboost::asio::posix::descriptor_base::non_blocking_io
    *
    * @par Example
    * Getting the number of bytes ready to read:
    * @code
-   * boost::asio::posix::stream_descriptor descriptor(my_context);
+   * cppmsboost::asio::posix::stream_descriptor descriptor(my_context);
    * ...
-   * boost::asio::posix::stream_descriptor::bytes_readable command;
-   * boost::system::error_code ec;
+   * cppmsboost::asio::posix::stream_descriptor::bytes_readable command;
+   * cppmsboost::system::error_code ec;
    * descriptor.io_control(command, ec);
    * if (ec)
    * {
@@ -409,7 +409,7 @@ public:
    */
   template <typename IoControlCommand>
   BOOST_ASIO_SYNC_OP_VOID io_control(IoControlCommand& command,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     impl_.get_service().io_control(impl_.get_implementation(), command, ec);
     BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
@@ -418,13 +418,13 @@ public:
   /// Gets the non-blocking mode of the descriptor.
   /**
    * @returns @c true if the descriptor's synchronous operations will fail with
-   * boost::asio::error::would_block if they are unable to perform the requested
+   * cppmsboost::asio::error::would_block if they are unable to perform the requested
    * operation immediately. If @c false, synchronous operations will block
    * until complete.
    *
    * @note The non-blocking mode has no effect on the behaviour of asynchronous
    * operations. Asynchronous operations will never fail with the error
-   * boost::asio::error::would_block.
+   * cppmsboost::asio::error::would_block.
    */
   bool non_blocking() const
   {
@@ -434,27 +434,27 @@ public:
   /// Sets the non-blocking mode of the descriptor.
   /**
    * @param mode If @c true, the descriptor's synchronous operations will fail
-   * with boost::asio::error::would_block if they are unable to perform the
+   * with cppmsboost::asio::error::would_block if they are unable to perform the
    * requested operation immediately. If @c false, synchronous operations will
    * block until complete.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @note The non-blocking mode has no effect on the behaviour of asynchronous
    * operations. Asynchronous operations will never fail with the error
-   * boost::asio::error::would_block.
+   * cppmsboost::asio::error::would_block.
    */
   void non_blocking(bool mode)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().non_blocking(impl_.get_implementation(), mode, ec);
-    boost::asio::detail::throw_error(ec, "non_blocking");
+    cppmsboost::asio::detail::throw_error(ec, "non_blocking");
   }
 
   /// Sets the non-blocking mode of the descriptor.
   /**
    * @param mode If @c true, the descriptor's synchronous operations will fail
-   * with boost::asio::error::would_block if they are unable to perform the
+   * with cppmsboost::asio::error::would_block if they are unable to perform the
    * requested operation immediately. If @c false, synchronous operations will
    * block until complete.
    *
@@ -462,10 +462,10 @@ public:
    *
    * @note The non-blocking mode has no effect on the behaviour of asynchronous
    * operations. Asynchronous operations will never fail with the error
-   * boost::asio::error::would_block.
+   * cppmsboost::asio::error::would_block.
    */
   BOOST_ASIO_SYNC_OP_VOID non_blocking(
-      bool mode, boost::system::error_code& ec)
+      bool mode, cppmsboost::system::error_code& ec)
   {
     impl_.get_service().non_blocking(impl_.get_implementation(), mode, ec);
     BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
@@ -478,7 +478,7 @@ public:
    * descriptor object's synchronous operations.
    *
    * @returns @c true if the underlying descriptor is in non-blocking mode and
-   * direct system calls may fail with boost::asio::error::would_block (or the
+   * direct system calls may fail with cppmsboost::asio::error::would_block (or the
    * equivalent system error).
    *
    * @note The current non-blocking mode is cached by the descriptor object.
@@ -498,20 +498,20 @@ public:
    * object's synchronous operations.
    *
    * @param mode If @c true, the underlying descriptor is put into non-blocking
-   * mode and direct system calls may fail with boost::asio::error::would_block
+   * mode and direct system calls may fail with cppmsboost::asio::error::would_block
    * (or the equivalent system error).
    *
-   * @throws boost::system::system_error Thrown on failure. If the @c mode is
+   * @throws cppmsboost::system::system_error Thrown on failure. If the @c mode is
    * @c false, but the current value of @c non_blocking() is @c true, this
-   * function fails with boost::asio::error::invalid_argument, as the
+   * function fails with cppmsboost::asio::error::invalid_argument, as the
    * combination does not make sense.
    */
   void native_non_blocking(bool mode)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().native_non_blocking(
         impl_.get_implementation(), mode, ec);
-    boost::asio::detail::throw_error(ec, "native_non_blocking");
+    cppmsboost::asio::detail::throw_error(ec, "native_non_blocking");
   }
 
   /// Sets the non-blocking mode of the native descriptor implementation.
@@ -521,16 +521,16 @@ public:
    * object's synchronous operations.
    *
    * @param mode If @c true, the underlying descriptor is put into non-blocking
-   * mode and direct system calls may fail with boost::asio::error::would_block
+   * mode and direct system calls may fail with cppmsboost::asio::error::would_block
    * (or the equivalent system error).
    *
    * @param ec Set to indicate what error occurred, if any. If the @c mode is
    * @c false, but the current value of @c non_blocking() is @c true, this
-   * function fails with boost::asio::error::invalid_argument, as the
+   * function fails with cppmsboost::asio::error::invalid_argument, as the
    * combination does not make sense.
    */
   BOOST_ASIO_SYNC_OP_VOID native_non_blocking(
-      bool mode, boost::system::error_code& ec)
+      bool mode, cppmsboost::system::error_code& ec)
   {
     impl_.get_service().native_non_blocking(
         impl_.get_implementation(), mode, ec);
@@ -548,16 +548,16 @@ public:
    * @par Example
    * Waiting for a descriptor to become readable.
    * @code
-   * boost::asio::posix::stream_descriptor descriptor(my_context);
+   * cppmsboost::asio::posix::stream_descriptor descriptor(my_context);
    * ...
-   * descriptor.wait(boost::asio::posix::stream_descriptor::wait_read);
+   * descriptor.wait(cppmsboost::asio::posix::stream_descriptor::wait_read);
    * @endcode
    */
   void wait(wait_type w)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().wait(impl_.get_implementation(), w, ec);
-    boost::asio::detail::throw_error(ec, "wait");
+    cppmsboost::asio::detail::throw_error(ec, "wait");
   }
 
   /// Wait for the descriptor to become ready to read, ready to write, or to
@@ -573,13 +573,13 @@ public:
    * @par Example
    * Waiting for a descriptor to become readable.
    * @code
-   * boost::asio::posix::stream_descriptor descriptor(my_context);
+   * cppmsboost::asio::posix::stream_descriptor descriptor(my_context);
    * ...
-   * boost::system::error_code ec;
-   * descriptor.wait(boost::asio::posix::stream_descriptor::wait_read, ec);
+   * cppmsboost::system::error_code ec;
+   * descriptor.wait(cppmsboost::asio::posix::stream_descriptor::wait_read, ec);
    * @endcode
    */
-  BOOST_ASIO_SYNC_OP_VOID wait(wait_type w, boost::system::error_code& ec)
+  BOOST_ASIO_SYNC_OP_VOID wait(wait_type w, cppmsboost::system::error_code& ec)
   {
     impl_.get_service().wait(impl_.get_implementation(), w, ec);
     BOOST_ASIO_SYNC_OP_VOID_RETURN(ec);
@@ -597,16 +597,16 @@ public:
    * Copies will be made of the handler as required. The function signature of
    * the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error // Result of operation
+   *   const cppmsboost::system::error_code& error // Result of operation
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * @par Example
    * @code
-   * void wait_handler(const boost::system::error_code& error)
+   * void wait_handler(const cppmsboost::system::error_code& error)
    * {
    *   if (!error)
    *   {
@@ -616,23 +616,23 @@ public:
    *
    * ...
    *
-   * boost::asio::posix::stream_descriptor descriptor(my_context);
+   * cppmsboost::asio::posix::stream_descriptor descriptor(my_context);
    * ...
    * descriptor.async_wait(
-   *     boost::asio::posix::stream_descriptor::wait_read,
+   *     cppmsboost::asio::posix::stream_descriptor::wait_read,
    *     wait_handler);
    * @endcode
    */
   template <
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code))
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code))
         WaitHandler BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WaitHandler,
-      void (boost::system::error_code))
+      void (cppmsboost::system::error_code))
   async_wait(wait_type w,
       BOOST_ASIO_MOVE_ARG(WaitHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
-    return async_initiate<WaitHandler, void (boost::system::error_code)>(
+    return async_initiate<WaitHandler, void (cppmsboost::system::error_code)>(
         initiate_async_wait(this), handler, w);
   }
 
@@ -689,7 +689,7 @@ private:
 
 } // namespace posix
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

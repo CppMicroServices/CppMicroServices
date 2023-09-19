@@ -19,7 +19,7 @@
 #include <boost/range/iterator.hpp>
 #include <boost/iterator/iterator_traits.hpp>
 
-namespace boost
+namespace cppmsboost
 {
     template< class T >
     struct range_category : iterator_category< typename range_iterator<T>::type >

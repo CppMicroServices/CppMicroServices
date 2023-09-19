@@ -32,7 +32,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -43,11 +43,11 @@ socket_select_interrupter::socket_select_interrupter()
 
 void socket_select_interrupter::open_descriptors()
 {
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   socket_holder acceptor(socket_ops::socket(
         AF_INET, SOCK_STREAM, IPPROTO_TCP, ec));
   if (acceptor.get() == invalid_socket)
-    boost::asio::detail::throw_error(ec, "socket_select_interrupter");
+    cppmsboost::asio::detail::throw_error(ec, "socket_select_interrupter");
 
   int opt = 1;
   socket_ops::state_type acceptor_state = 0;
@@ -63,11 +63,11 @@ void socket_select_interrupter::open_descriptors()
   addr.sin_port = 0;
   if (socket_ops::bind(acceptor.get(), (const socket_addr_type*)&addr,
         addr_len, ec) == socket_error_retval)
-    boost::asio::detail::throw_error(ec, "socket_select_interrupter");
+    cppmsboost::asio::detail::throw_error(ec, "socket_select_interrupter");
 
   if (socket_ops::getsockname(acceptor.get(), (socket_addr_type*)&addr,
         &addr_len, ec) == socket_error_retval)
-    boost::asio::detail::throw_error(ec, "socket_select_interrupter");
+    cppmsboost::asio::detail::throw_error(ec, "socket_select_interrupter");
 
   // Some broken firewalls on Windows will intermittently cause getsockname to
   // return 0.0.0.0 when the socket is actually bound to 127.0.0.1. We
@@ -77,26 +77,26 @@ void socket_select_interrupter::open_descriptors()
 
   if (socket_ops::listen(acceptor.get(),
         SOMAXCONN, ec) == socket_error_retval)
-    boost::asio::detail::throw_error(ec, "socket_select_interrupter");
+    cppmsboost::asio::detail::throw_error(ec, "socket_select_interrupter");
 
   socket_holder client(socket_ops::socket(
         AF_INET, SOCK_STREAM, IPPROTO_TCP, ec));
   if (client.get() == invalid_socket)
-    boost::asio::detail::throw_error(ec, "socket_select_interrupter");
+    cppmsboost::asio::detail::throw_error(ec, "socket_select_interrupter");
 
   if (socket_ops::connect(client.get(), (const socket_addr_type*)&addr,
         addr_len, ec) == socket_error_retval)
-    boost::asio::detail::throw_error(ec, "socket_select_interrupter");
+    cppmsboost::asio::detail::throw_error(ec, "socket_select_interrupter");
 
   socket_holder server(socket_ops::accept(acceptor.get(), 0, 0, ec));
   if (server.get() == invalid_socket)
-    boost::asio::detail::throw_error(ec, "socket_select_interrupter");
+    cppmsboost::asio::detail::throw_error(ec, "socket_select_interrupter");
   
   ioctl_arg_type non_blocking = 1;
   socket_ops::state_type client_state = 0;
   if (socket_ops::ioctl(client.get(), client_state,
         FIONBIO, &non_blocking, ec))
-    boost::asio::detail::throw_error(ec, "socket_select_interrupter");
+    cppmsboost::asio::detail::throw_error(ec, "socket_select_interrupter");
 
   opt = 1;
   socket_ops::setsockopt(client.get(), client_state,
@@ -106,7 +106,7 @@ void socket_select_interrupter::open_descriptors()
   socket_ops::state_type server_state = 0;
   if (socket_ops::ioctl(server.get(), server_state,
         FIONBIO, &non_blocking, ec))
-    boost::asio::detail::throw_error(ec, "socket_select_interrupter");
+    cppmsboost::asio::detail::throw_error(ec, "socket_select_interrupter");
 
   opt = 1;
   socket_ops::setsockopt(server.get(), server_state,
@@ -123,7 +123,7 @@ socket_select_interrupter::~socket_select_interrupter()
 
 void socket_select_interrupter::close_descriptors()
 {
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   socket_ops::state_type state = socket_ops::internal_non_blocking;
   if (read_descriptor_ != invalid_socket)
     socket_ops::close(read_descriptor_, state, true, ec);
@@ -146,7 +146,7 @@ void socket_select_interrupter::interrupt()
   char byte = 0;
   socket_ops::buf b;
   socket_ops::init_buf(b, &byte, 1);
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   socket_ops::send(write_descriptor_, &b, 1, 0, ec);
 }
 
@@ -155,7 +155,7 @@ bool socket_select_interrupter::reset()
   char data[1024];
   socket_ops::buf b;
   socket_ops::init_buf(b, data, sizeof(data));
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   for (;;)
   {
     int bytes_read = socket_ops::recv(read_descriptor_, &b, 1, 0, ec);
@@ -165,8 +165,8 @@ bool socket_select_interrupter::reset()
       return true;
     if (bytes_read == 0)
       return false;
-    if (ec == boost::asio::error::would_block
-        || ec == boost::asio::error::try_again)
+    if (ec == cppmsboost::asio::error::would_block
+        || ec == cppmsboost::asio::error::try_again)
       return true;
     return false;
   }
@@ -174,7 +174,7 @@ bool socket_select_interrupter::reset()
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

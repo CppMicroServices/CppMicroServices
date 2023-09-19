@@ -28,7 +28,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -182,7 +182,7 @@ public:
       while (wait_op* op = (num_cancelled != max_cancelled)
           ? timer.op_queue_.front() : 0)
       {
-        op->ec_ = boost::asio::error::operation_aborted;
+        op->ec_ = cppmsboost::asio::error::operation_aborted;
         timer.op_queue_.pop();
         ops.push(op);
         ++num_cancelled;
@@ -304,7 +304,7 @@ private:
   // Determine if the specified absolute time is positive infinity.
   template <typename T, typename TimeSystem>
   static bool is_positive_infinity(
-      const boost::date_time::base_time<T, TimeSystem>& time)
+      const cppmsboost::date_time::base_time<T, TimeSystem>& time)
   {
     return time.is_pos_infinity();
   }
@@ -355,7 +355,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -14,7 +14,7 @@
 #include <boost/config.hpp> // BOOST_MSVC
 #include <boost/range/iterator.hpp>
 
-namespace boost 
+namespace cppmsboost 
 {
     
     namespace range_detail
@@ -138,7 +138,7 @@ namespace boost
 #include <boost/range/detail/value_type.hpp>
 #include <boost/range/detail/common.hpp>
 
-namespace boost 
+namespace cppmsboost 
 {
     
     namespace range_detail
@@ -201,7 +201,7 @@ namespace boost
             template< typename T, std::size_t sz >
             static T* fun( T BOOST_RANGE_ARRAY_REF()[sz] )
             {
-                return boost::range_detail::array_end( boost_range_array );
+                return cppmsboost::range_detail::array_end( boost_range_array );
             }
         };
         
@@ -211,7 +211,7 @@ namespace boost
             template< typename T, std::size_t sz >
             static T* fun( T BOOST_RANGE_ARRAY_REF()[sz] )
             {
-                return boost::range_detail::array_end( boost_range_array );
+                return cppmsboost::range_detail::array_end( boost_range_array );
             }
         };
         
@@ -220,7 +220,7 @@ namespace boost
         {
             static char* fun( char* s )
             {
-                return boost::range_detail::str_end( s );
+                return cppmsboost::range_detail::str_end( s );
             }
         };
 
@@ -229,7 +229,7 @@ namespace boost
         {
             static const char* fun( const char* s )
             {
-                return boost::range_detail::str_end( s );
+                return cppmsboost::range_detail::str_end( s );
             }
         };
 
@@ -238,7 +238,7 @@ namespace boost
         {
             static wchar_t* fun( wchar_t* s )
             {
-                return boost::range_detail::str_end( s );
+                return cppmsboost::range_detail::str_end( s );
             }
         };
 
@@ -248,7 +248,7 @@ namespace boost
         {
             static const wchar_t* fun( const wchar_t* s )
             {
-                return boost::range_detail::str_end( s );
+                return cppmsboost::range_detail::str_end( s );
             }
         };
 

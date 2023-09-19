@@ -8,18 +8,18 @@
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt
 //
-//  is_noncopyable<T> returns whether T is derived from boost::noncopyable
+//  is_noncopyable<T> returns whether T is derived from cppmsboost::noncopyable
 //
 
 #include <boost/type_traits/is_base_and_derived.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 #ifndef BOOST_NONCOPYABLE_BASE_TOKEN_DEFINED
 #define BOOST_NONCOPYABLE_BASE_TOKEN_DEFINED
 
-// boost::noncopyable derives from noncopyable_::base_token to enable us
+// cppmsboost::noncopyable derives from noncopyable_::base_token to enable us
 // to recognize it. The definition is macro-guarded so that we can replicate
 // it here without including boost/core/noncopyable.hpp, which is in Core.
 
@@ -34,6 +34,6 @@ template<class T> struct is_noncopyable: is_base_and_derived<noncopyable_::base_
 {
 };
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_TYPE_TRAITS_IS_NONCOPYABLE_HPP_INCLUDED

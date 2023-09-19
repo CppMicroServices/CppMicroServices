@@ -20,7 +20,7 @@
 // (bcc<=5.64 cannot include instance data in a precompiled header)
 //  -- * To be verified, now that there's no unnamed namespace
 
-namespace boost {
+namespace cppmsboost {
 
 #ifdef BOOST_OPTIONAL_USE_OLD_DEFINITION_OF_NONE
 
@@ -30,7 +30,7 @@ BOOST_INLINE_VARIABLE none_t const none = (static_cast<none_t>(0)) ;
 
 namespace detail { namespace optional_detail {
 
-  // the trick here is to make boost::none defined once as a global but in a header file
+  // the trick here is to make cppmsboost::none defined once as a global but in a header file
   template <typename T>
   struct none_instance
   {
@@ -54,7 +54,7 @@ BOOST_INLINE_VARIABLE const none_t none ((none_t::init_tag()));
 
 #endif // older definitions
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // header guard
 

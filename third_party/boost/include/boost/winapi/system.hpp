@@ -27,20 +27,20 @@ extern "C" {
 struct _SYSTEM_INFO;
 
 #if BOOST_WINAPI_PARTITION_APP_SYSTEM
-BOOST_SYMBOL_IMPORT boost::winapi::VOID_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::VOID_ BOOST_WINAPI_WINAPI_CC
 GetSystemInfo(::_SYSTEM_INFO* lpSystemInfo);
 #endif
 
 #if BOOST_WINAPI_PARTITION_APP || BOOST_WINAPI_PARTITION_SYSTEM
 #if BOOST_USE_WINAPI_VERSION >= BOOST_WINAPI_VERSION_WINXP
-BOOST_SYMBOL_IMPORT boost::winapi::VOID_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT cppmsboost::winapi::VOID_ BOOST_WINAPI_WINAPI_CC
 GetNativeSystemInfo(::_SYSTEM_INFO* lpSystemInfo);
 #endif
 #endif
 }
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 
 typedef struct BOOST_MAY_ALIAS _SYSTEM_INFO {

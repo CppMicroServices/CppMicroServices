@@ -28,9 +28,9 @@
 // BOOST_IS_EMPTY(T) should evaluate to true if T is an empty class type (and not a union)
 // BOOST_HAS_TRIVIAL_CONSTRUCTOR(T) should evaluate to true if "T x;" has no effect
 // BOOST_HAS_TRIVIAL_COPY(T) should evaluate to true if T(t) <==> memcpy
-// BOOST_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T) should evaluate to true if T(boost::move(t)) <==> memcpy
+// BOOST_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T) should evaluate to true if T(cppmsboost::move(t)) <==> memcpy
 // BOOST_HAS_TRIVIAL_ASSIGN(T) should evaluate to true if t = u <==> memcpy
-// BOOST_HAS_TRIVIAL_MOVE_ASSIGN(T) should evaluate to true if t = boost::move(u) <==> memcpy
+// BOOST_HAS_TRIVIAL_MOVE_ASSIGN(T) should evaluate to true if t = cppmsboost::move(u) <==> memcpy
 // BOOST_HAS_TRIVIAL_DESTRUCTOR(T) should evaluate to true if ~T() has no effect
 // BOOST_HAS_NOTHROW_CONSTRUCTOR(T) should evaluate to true if "T x;" can not throw
 // BOOST_HAS_NOTHROW_COPY(T) should evaluate to true if T(t) can not throw
@@ -64,11 +64,11 @@
 #   else
 #    include <type_traits.h>
 #   endif
-#   define BOOST_IS_POD(T) ::boost::is_same< typename ::__type_traits<T>::is_POD_type, ::__true_type>::value
-#   define BOOST_HAS_TRIVIAL_CONSTRUCTOR(T) ::boost::is_same< typename ::__type_traits<T>::has_trivial_default_constructor, ::__true_type>::value
-#   define BOOST_HAS_TRIVIAL_COPY(T) ::boost::is_same< typename ::__type_traits<T>::has_trivial_copy_constructor, ::__true_type>::value
-#   define BOOST_HAS_TRIVIAL_ASSIGN(T) ::boost::is_same< typename ::__type_traits<T>::has_trivial_assignment_operator, ::__true_type>::value
-#   define BOOST_HAS_TRIVIAL_DESTRUCTOR(T) ::boost::is_same< typename ::__type_traits<T>::has_trivial_destructor, ::__true_type>::value
+#   define BOOST_IS_POD(T) ::cppmsboost::is_same< typename ::__type_traits<T>::is_POD_type, ::__true_type>::value
+#   define BOOST_HAS_TRIVIAL_CONSTRUCTOR(T) ::cppmsboost::is_same< typename ::__type_traits<T>::has_trivial_default_constructor, ::__true_type>::value
+#   define BOOST_HAS_TRIVIAL_COPY(T) ::cppmsboost::is_same< typename ::__type_traits<T>::has_trivial_copy_constructor, ::__true_type>::value
+#   define BOOST_HAS_TRIVIAL_ASSIGN(T) ::cppmsboost::is_same< typename ::__type_traits<T>::has_trivial_assignment_operator, ::__true_type>::value
+#   define BOOST_HAS_TRIVIAL_DESTRUCTOR(T) ::cppmsboost::is_same< typename ::__type_traits<T>::has_trivial_destructor, ::__true_type>::value
 
 #   ifdef __sgi
 #      define BOOST_HAS_TYPE_TRAITS_INTRINSICS
@@ -101,17 +101,17 @@
 #   define BOOST_IS_POD(T) (__is_pod(T) && __has_trivial_constructor(T))
 #   define BOOST_IS_EMPTY(T) __is_empty(T)
 #   define BOOST_HAS_TRIVIAL_CONSTRUCTOR(T) __has_trivial_constructor(T)
-#   define BOOST_HAS_TRIVIAL_ASSIGN(T) (__has_trivial_assign(T) || ( ::boost::is_pod<T>::value && ! ::boost::is_const<T>::value && !::boost::is_volatile<T>::value))
-#   define BOOST_HAS_TRIVIAL_DESTRUCTOR(T) (__has_trivial_destructor(T) || ::boost::is_pod<T>::value)
-#   define BOOST_HAS_NOTHROW_CONSTRUCTOR(T) (__has_nothrow_constructor(T) || ::boost::has_trivial_constructor<T>::value)
+#   define BOOST_HAS_TRIVIAL_ASSIGN(T) (__has_trivial_assign(T) || ( ::cppmsboost::is_pod<T>::value && ! ::cppmsboost::is_const<T>::value && !::cppmsboost::is_volatile<T>::value))
+#   define BOOST_HAS_TRIVIAL_DESTRUCTOR(T) (__has_trivial_destructor(T) || ::cppmsboost::is_pod<T>::value)
+#   define BOOST_HAS_NOTHROW_CONSTRUCTOR(T) (__has_nothrow_constructor(T) || ::cppmsboost::has_trivial_constructor<T>::value)
 #if !defined(BOOST_INTEL)
-#   define BOOST_HAS_NOTHROW_COPY(T) ((__has_nothrow_copy(T) || ::boost::has_trivial_copy<T>::value) && !is_array<T>::value)
-#   define BOOST_HAS_TRIVIAL_COPY(T) (__has_trivial_copy(T) || ::boost::is_pod<T>::value)
+#   define BOOST_HAS_NOTHROW_COPY(T) ((__has_nothrow_copy(T) || ::cppmsboost::has_trivial_copy<T>::value) && !is_array<T>::value)
+#   define BOOST_HAS_TRIVIAL_COPY(T) (__has_trivial_copy(T) || ::cppmsboost::is_pod<T>::value)
 #elif (_MSC_VER >= 1900)
 #   define BOOST_HAS_NOTHROW_COPY(T) ((__is_nothrow_constructible(T, typename add_lvalue_reference<typename add_const<T>::type>::type)) && !is_array<T>::value)
 #   define BOOST_HAS_TRIVIAL_COPY(T) (__is_trivially_constructible(T, typename add_lvalue_reference<typename add_const<T>::type>::type))
 #endif
-#   define BOOST_HAS_NOTHROW_ASSIGN(T) (__has_nothrow_assign(T) || ::boost::has_trivial_assign<T>::value)
+#   define BOOST_HAS_NOTHROW_ASSIGN(T) (__has_nothrow_assign(T) || ::cppmsboost::has_trivial_assign<T>::value)
 #   define BOOST_HAS_VIRTUAL_DESTRUCTOR(T) __has_virtual_destructor(T)
 
 #   define BOOST_IS_ABSTRACT(T) __is_abstract(T)
@@ -123,11 +123,11 @@
 //  #   define BOOST_ALIGNMENT_OF(T) __alignof(T)
 
 #   if defined(_MSC_VER) && (_MSC_VER >= 1800)
-#       define BOOST_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T) ((__is_trivially_constructible(T, T&&) || boost::is_pod<T>::value) && ! ::boost::is_volatile<T>::value && ! ::boost::is_reference<T>::value)
-#       define BOOST_HAS_TRIVIAL_MOVE_ASSIGN(T) ((__is_trivially_assignable(T, T&&) || boost::is_pod<T>::value) && ! ::boost::is_const<T>::value && !::boost::is_volatile<T>::value && ! ::boost::is_reference<T>::value)
+#       define BOOST_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T) ((__is_trivially_constructible(T, T&&) || cppmsboost::is_pod<T>::value) && ! ::cppmsboost::is_volatile<T>::value && ! ::cppmsboost::is_reference<T>::value)
+#       define BOOST_HAS_TRIVIAL_MOVE_ASSIGN(T) ((__is_trivially_assignable(T, T&&) || cppmsboost::is_pod<T>::value) && ! ::cppmsboost::is_const<T>::value && !::cppmsboost::is_volatile<T>::value && ! ::cppmsboost::is_reference<T>::value)
 #   elif defined(_MSC_VER) && (_MSC_VER >= 1700)
-#       define BOOST_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T) ((__has_trivial_move_constructor(T) || boost::is_pod<T>::value) && ! ::boost::is_volatile<T>::value && ! ::boost::is_reference<T>::value)
-#       define BOOST_HAS_TRIVIAL_MOVE_ASSIGN(T) ((__has_trivial_move_assign(T) || boost::is_pod<T>::value) && ! ::boost::is_const<T>::value && !::boost::is_volatile<T>::value && ! ::boost::is_reference<T>::value)
+#       define BOOST_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T) ((__has_trivial_move_constructor(T) || cppmsboost::is_pod<T>::value) && ! ::cppmsboost::is_volatile<T>::value && ! ::cppmsboost::is_reference<T>::value)
+#       define BOOST_HAS_TRIVIAL_MOVE_ASSIGN(T) ((__has_trivial_move_assign(T) || cppmsboost::is_pod<T>::value) && ! ::cppmsboost::is_const<T>::value && !::cppmsboost::is_volatile<T>::value && ! ::cppmsboost::is_reference<T>::value)
 #   endif
 #ifndef BOOST_NO_CXX11_FINAL
 //  This one doesn't quite always do the right thing on older VC++ versions
@@ -227,10 +227,10 @@
 #   endif
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 #   if __has_extension(is_trivially_constructible)
-#     define BOOST_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T) (__is_trivially_constructible(T, T&&) && is_constructible<T, T&&>::value && !::boost::is_volatile<T>::value)
+#     define BOOST_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T) (__is_trivially_constructible(T, T&&) && is_constructible<T, T&&>::value && !::cppmsboost::is_volatile<T>::value)
 #   endif
 #   if __has_extension(is_trivially_assignable)
-#     define BOOST_HAS_TRIVIAL_MOVE_ASSIGN(T) (__is_trivially_assignable(T&, T&&) && is_assignable<T&, T&&>::value && !::boost::is_volatile<T>::value)
+#     define BOOST_HAS_TRIVIAL_MOVE_ASSIGN(T) (__is_trivially_assignable(T&, T&&) && is_assignable<T&, T&&>::value && !::cppmsboost::is_volatile<T>::value)
 #   endif
 #endif
 #   if (!defined(unix) && !defined(__unix__)) || defined(__LP64__) || !defined(__GNUC__)
@@ -262,16 +262,16 @@
 #   define BOOST_IS_UNION(T) __is_union(T)
 #   define BOOST_IS_POD(T) __is_pod(T)
 #   define BOOST_IS_EMPTY(T) __is_empty(T)
-#   define BOOST_HAS_TRIVIAL_CONSTRUCTOR(T) ((__has_trivial_constructor(T) BOOST_INTEL_TT_OPTS) && ! ::boost::is_volatile<T>::value)
+#   define BOOST_HAS_TRIVIAL_CONSTRUCTOR(T) ((__has_trivial_constructor(T) BOOST_INTEL_TT_OPTS) && ! ::cppmsboost::is_volatile<T>::value)
 #   define BOOST_HAS_TRIVIAL_COPY(T) ((__has_trivial_copy(T) BOOST_INTEL_TT_OPTS) && !is_reference<T>::value)
 #if (__GNUC__ * 100 + __GNUC_MINOR__) >= 409
-#   define BOOST_HAS_TRIVIAL_ASSIGN(T) ((__has_trivial_assign(T) BOOST_INTEL_TT_OPTS) && ! ::boost::is_volatile<T>::value && ! ::boost::is_const<T>::value && is_assignable<T&, const T&>::value)
+#   define BOOST_HAS_TRIVIAL_ASSIGN(T) ((__has_trivial_assign(T) BOOST_INTEL_TT_OPTS) && ! ::cppmsboost::is_volatile<T>::value && ! ::cppmsboost::is_const<T>::value && is_assignable<T&, const T&>::value)
 #   define BOOST_HAS_TRIVIAL_DESTRUCTOR(T) (__has_trivial_destructor(T) BOOST_INTEL_TT_OPTS && is_destructible<T>::value)
 #   define BOOST_HAS_NOTHROW_CONSTRUCTOR(T) (__has_nothrow_constructor(T) && is_default_constructible<T>::value BOOST_INTEL_TT_OPTS)
 #   define BOOST_HAS_NOTHROW_COPY(T) ((__has_nothrow_copy(T) BOOST_INTEL_TT_OPTS) && !is_volatile<T>::value && !is_reference<T>::value && is_copy_constructible<T>::value)
 #   define BOOST_HAS_NOTHROW_ASSIGN(T) ((__has_nothrow_assign(T) BOOST_INTEL_TT_OPTS) && !is_volatile<T>::value && !is_const<T>::value && is_assignable<T&, const T&>::value)
 #else
-#   define BOOST_HAS_TRIVIAL_ASSIGN(T) ((__has_trivial_assign(T) BOOST_INTEL_TT_OPTS) && ! ::boost::is_volatile<T>::value && ! ::boost::is_const<T>::value)
+#   define BOOST_HAS_TRIVIAL_ASSIGN(T) ((__has_trivial_assign(T) BOOST_INTEL_TT_OPTS) && ! ::cppmsboost::is_volatile<T>::value && ! ::cppmsboost::is_const<T>::value)
 #   define BOOST_HAS_TRIVIAL_DESTRUCTOR(T) (__has_trivial_destructor(T) BOOST_INTEL_TT_OPTS)
 #   define BOOST_HAS_NOTHROW_CONSTRUCTOR(T) (__has_nothrow_constructor(T) BOOST_INTEL_TT_OPTS)
 #if ((__GNUC__ * 100 + __GNUC_MINOR__) != 407) && ((__GNUC__ * 100 + __GNUC_MINOR__) != 408)
@@ -298,8 +298,8 @@
 #   endif
 
 #   if (__GNUC__ >= 5) && (__cplusplus >= 201103)
-#     define BOOST_HAS_TRIVIAL_MOVE_ASSIGN(T) (__is_trivially_assignable(T&, T&&) && is_assignable<T&, T&&>::value && !::boost::is_volatile<T>::value)
-#     define BOOST_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T) (__is_trivially_constructible(T, T&&) && is_constructible<T, T&&>::value && !::boost::is_volatile<T>::value)
+#     define BOOST_HAS_TRIVIAL_MOVE_ASSIGN(T) (__is_trivially_assignable(T&, T&&) && is_assignable<T&, T&&>::value && !::cppmsboost::is_volatile<T>::value)
+#     define BOOST_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T) (__is_trivially_constructible(T, T&&) && is_constructible<T, T&&>::value && !::cppmsboost::is_volatile<T>::value)
 #   endif
 
 #   define BOOST_HAS_TYPE_TRAITS_INTRINSICS
@@ -309,9 +309,9 @@
 #   define BOOST_IS_UNION(T) __oracle_is_union(T)
 #   define BOOST_IS_POD(T) (__oracle_is_pod(T) && !is_function<T>::value)
 #   define BOOST_IS_EMPTY(T) __oracle_is_empty(T)
-#   define BOOST_HAS_TRIVIAL_CONSTRUCTOR(T) (__oracle_has_trivial_constructor(T) && ! ::boost::is_volatile<T>::value)
+#   define BOOST_HAS_TRIVIAL_CONSTRUCTOR(T) (__oracle_has_trivial_constructor(T) && ! ::cppmsboost::is_volatile<T>::value)
 #   define BOOST_HAS_TRIVIAL_COPY(T) (__oracle_has_trivial_copy(T) && !is_reference<T>::value)
-#   define BOOST_HAS_TRIVIAL_ASSIGN(T) ((__oracle_has_trivial_assign(T) || __oracle_is_trivial(T)) && ! ::boost::is_volatile<T>::value && ! ::boost::is_const<T>::value && is_assignable<T&, const T&>::value)
+#   define BOOST_HAS_TRIVIAL_ASSIGN(T) ((__oracle_has_trivial_assign(T) || __oracle_is_trivial(T)) && ! ::cppmsboost::is_volatile<T>::value && ! ::cppmsboost::is_const<T>::value && is_assignable<T&, const T&>::value)
 #   define BOOST_HAS_TRIVIAL_DESTRUCTOR(T) (__oracle_has_trivial_destructor(T) && is_destructible<T>::value)
 #   define BOOST_HAS_NOTHROW_CONSTRUCTOR(T) ((__oracle_has_nothrow_constructor(T) || __oracle_has_trivial_constructor(T) || __oracle_is_trivial(T)) && is_default_constructible<T>::value)
 //  __oracle_has_nothrow_copy appears to behave the same as __oracle_has_nothrow_assign, disabled for now:

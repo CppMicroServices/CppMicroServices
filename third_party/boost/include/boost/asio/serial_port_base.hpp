@@ -38,7 +38,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// The serial_port_base class is used as a base for the basic_serial_port class
@@ -57,10 +57,10 @@ public:
     unsigned int value() const;
     BOOST_ASIO_DECL BOOST_ASIO_SYNC_OP_VOID store(
         BOOST_ASIO_OPTION_STORAGE& storage,
-        boost::system::error_code& ec) const;
+        cppmsboost::system::error_code& ec) const;
     BOOST_ASIO_DECL BOOST_ASIO_SYNC_OP_VOID load(
         const BOOST_ASIO_OPTION_STORAGE& storage,
-        boost::system::error_code& ec);
+        cppmsboost::system::error_code& ec);
   private:
     unsigned int value_;
   };
@@ -77,10 +77,10 @@ public:
     type value() const;
     BOOST_ASIO_DECL BOOST_ASIO_SYNC_OP_VOID store(
         BOOST_ASIO_OPTION_STORAGE& storage,
-        boost::system::error_code& ec) const;
+        cppmsboost::system::error_code& ec) const;
     BOOST_ASIO_DECL BOOST_ASIO_SYNC_OP_VOID load(
         const BOOST_ASIO_OPTION_STORAGE& storage,
-        boost::system::error_code& ec);
+        cppmsboost::system::error_code& ec);
   private:
     type value_;
   };
@@ -97,10 +97,10 @@ public:
     type value() const;
     BOOST_ASIO_DECL BOOST_ASIO_SYNC_OP_VOID store(
         BOOST_ASIO_OPTION_STORAGE& storage,
-        boost::system::error_code& ec) const;
+        cppmsboost::system::error_code& ec) const;
     BOOST_ASIO_DECL BOOST_ASIO_SYNC_OP_VOID load(
         const BOOST_ASIO_OPTION_STORAGE& storage,
-        boost::system::error_code& ec);
+        cppmsboost::system::error_code& ec);
   private:
     type value_;
   };
@@ -117,10 +117,10 @@ public:
     type value() const;
     BOOST_ASIO_DECL BOOST_ASIO_SYNC_OP_VOID store(
         BOOST_ASIO_OPTION_STORAGE& storage,
-        boost::system::error_code& ec) const;
+        cppmsboost::system::error_code& ec) const;
     BOOST_ASIO_DECL BOOST_ASIO_SYNC_OP_VOID load(
         const BOOST_ASIO_OPTION_STORAGE& storage,
-        boost::system::error_code& ec);
+        cppmsboost::system::error_code& ec);
   private:
     type value_;
   };
@@ -136,10 +136,10 @@ public:
     unsigned int value() const;
     BOOST_ASIO_DECL BOOST_ASIO_SYNC_OP_VOID store(
         BOOST_ASIO_OPTION_STORAGE& storage,
-        boost::system::error_code& ec) const;
+        cppmsboost::system::error_code& ec) const;
     BOOST_ASIO_DECL BOOST_ASIO_SYNC_OP_VOID load(
         const BOOST_ASIO_OPTION_STORAGE& storage,
-        boost::system::error_code& ec);
+        cppmsboost::system::error_code& ec);
   private:
     unsigned int value_;
   };
@@ -152,7 +152,7 @@ protected:
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

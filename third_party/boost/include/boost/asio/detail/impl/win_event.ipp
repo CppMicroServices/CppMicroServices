@@ -25,7 +25,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -41,9 +41,9 @@ win_event::win_event()
   if (!events_[0])
   {
     DWORD last_error = ::GetLastError();
-    boost::system::error_code ec(last_error,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "event");
+    cppmsboost::system::error_code ec(last_error,
+        cppmsboost::asio::error::get_system_category());
+    cppmsboost::asio::detail::throw_error(ec, "event");
   }
 
 #if defined(BOOST_ASIO_WINDOWS_APP)
@@ -55,9 +55,9 @@ win_event::win_event()
   {
     DWORD last_error = ::GetLastError();
     ::CloseHandle(events_[0]);
-    boost::system::error_code ec(last_error,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "event");
+    cppmsboost::system::error_code ec(last_error,
+        cppmsboost::asio::error::get_system_category());
+    cppmsboost::asio::detail::throw_error(ec, "event");
   }
 }
 
@@ -69,7 +69,7 @@ win_event::~win_event()
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

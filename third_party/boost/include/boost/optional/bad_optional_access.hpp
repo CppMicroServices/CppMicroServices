@@ -17,7 +17,7 @@
 #include <string> // to make converting-ctor std::string(char const*) visible
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 #if defined(__clang__)
 # pragma clang diagnostic push
@@ -36,6 +36,6 @@ public:
 # pragma clang diagnostic pop
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif

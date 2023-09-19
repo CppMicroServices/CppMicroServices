@@ -25,13 +25,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
 /// Encapsulates the flags needed for ICMP.
 /**
- * The boost::asio::ip::icmp class contains flags necessary for ICMP sockets.
+ * The cppmsboost::asio::ip::icmp class contains flags necessary for ICMP sockets.
  *
  * @par Thread Safety
  * @e Distinct @e objects: Safe.@n
@@ -110,7 +110,7 @@ private:
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

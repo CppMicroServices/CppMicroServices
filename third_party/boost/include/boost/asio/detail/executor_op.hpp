@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -43,7 +43,7 @@ public:
   }
 
   static void do_complete(void* owner, Operation* base,
-      const boost::system::error_code& /*ec*/,
+      const cppmsboost::system::error_code& /*ec*/,
       std::size_t /*bytes_transferred*/)
   {
     // Take ownership of the handler object.
@@ -67,7 +67,7 @@ public:
     {
       fenced_block b(fenced_block::half);
       BOOST_ASIO_HANDLER_INVOCATION_BEGIN(());
-      boost_asio_handler_invoke_helpers::invoke(handler, handler);
+      cppmsboost_asio_handler_invoke_helpers::invoke(handler, handler);
       BOOST_ASIO_HANDLER_INVOCATION_END;
     }
   }
@@ -79,7 +79,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

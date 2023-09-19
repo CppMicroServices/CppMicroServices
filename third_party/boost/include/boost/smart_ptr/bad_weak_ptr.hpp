@@ -24,7 +24,7 @@
 # pragma warn -8026     // Functions with excep. spec. are not expanded inline
 #endif
 
-namespace boost
+namespace cppmsboost
 {
 
 // The standard library that comes with Borland C++ 5.5.1, 5.6.4
@@ -61,7 +61,7 @@ public:
 # pragma option pop
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef __BORLANDC__
 # pragma warn .8026     // Functions with excep. spec. are not expanded inline

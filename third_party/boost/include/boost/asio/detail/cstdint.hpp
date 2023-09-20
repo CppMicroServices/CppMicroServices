@@ -23,7 +23,7 @@
 # include <boost/cstdint.hpp>
 #endif // defined(BOOST_ASIO_HAS_CSTDINT)
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 #if defined(BOOST_ASIO_HAS_CSTDINT)
@@ -41,22 +41,22 @@ using std::uint64_t;
 using std::uint_least64_t;
 using std::uintmax_t;
 #else // defined(BOOST_ASIO_HAS_CSTDINT)
-using boost::int16_t;
-using boost::int_least16_t;
-using boost::uint16_t;
-using boost::uint_least16_t;
-using boost::int32_t;
-using boost::int_least32_t;
-using boost::uint32_t;
-using boost::uint_least32_t;
-using boost::int64_t;
-using boost::int_least64_t;
-using boost::uint64_t;
-using boost::uint_least64_t;
-using boost::uintmax_t;
+using cppmsboost::int16_t;
+using cppmsboost::int_least16_t;
+using cppmsboost::uint16_t;
+using cppmsboost::uint_least16_t;
+using cppmsboost::int32_t;
+using cppmsboost::int_least32_t;
+using cppmsboost::uint32_t;
+using cppmsboost::uint_least32_t;
+using cppmsboost::int64_t;
+using cppmsboost::int_least64_t;
+using cppmsboost::uint64_t;
+using cppmsboost::uint_least64_t;
+using cppmsboost::uintmax_t;
 #endif // defined(BOOST_ASIO_HAS_CSTDINT)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_DETAIL_CSTDINT_HPP

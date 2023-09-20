@@ -24,7 +24,7 @@ namespace std{
 
 #include <boost/archive/text_iarchive.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 template<class Archive>
@@ -118,4 +118,4 @@ text_iarchive_impl<Archive>::text_iarchive_impl(
 {}
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost

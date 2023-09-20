@@ -28,7 +28,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
@@ -48,7 +48,7 @@ address_v6::address_v6(const address_v6::bytes_type& bytes,
     if (bytes[i] > 0xFF)
     {
       std::out_of_range ex("address_v6 from bytes_type");
-      boost::asio::detail::throw_exception(ex);
+      cppmsboost::asio::detail::throw_exception(ex);
     }
   }
 #endif // UCHAR_MAX > 0xFF
@@ -101,25 +101,25 @@ address_v6::bytes_type address_v6::to_bytes() const BOOST_ASIO_NOEXCEPT
 
 std::string address_v6::to_string() const
 {
-  boost::system::error_code ec;
-  char addr_str[boost::asio::detail::max_addr_v6_str_len];
+  cppmsboost::system::error_code ec;
+  char addr_str[cppmsboost::asio::detail::max_addr_v6_str_len];
   const char* addr =
-    boost::asio::detail::socket_ops::inet_ntop(
+    cppmsboost::asio::detail::socket_ops::inet_ntop(
         BOOST_ASIO_OS_DEF(AF_INET6), &addr_, addr_str,
-        boost::asio::detail::max_addr_v6_str_len, scope_id_, ec);
+        cppmsboost::asio::detail::max_addr_v6_str_len, scope_id_, ec);
   if (addr == 0)
-    boost::asio::detail::throw_error(ec);
+    cppmsboost::asio::detail::throw_error(ec);
   return addr;
 }
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
-std::string address_v6::to_string(boost::system::error_code& ec) const
+std::string address_v6::to_string(cppmsboost::system::error_code& ec) const
 {
-  char addr_str[boost::asio::detail::max_addr_v6_str_len];
+  char addr_str[cppmsboost::asio::detail::max_addr_v6_str_len];
   const char* addr =
-    boost::asio::detail::socket_ops::inet_ntop(
+    cppmsboost::asio::detail::socket_ops::inet_ntop(
         BOOST_ASIO_OS_DEF(AF_INET6), &addr_, addr_str,
-        boost::asio::detail::max_addr_v6_str_len, scope_id_, ec);
+        cppmsboost::asio::detail::max_addr_v6_str_len, scope_id_, ec);
   if (addr == 0)
     return std::string();
   return addr;
@@ -130,7 +130,7 @@ address_v4 address_v6::to_v4() const
   if (!is_v4_mapped() && !is_v4_compatible())
   {
     bad_address_cast ex;
-    boost::asio::detail::throw_exception(ex);
+    cppmsboost::asio::detail::throw_exception(ex);
   }
 
   address_v4::bytes_type v4_bytes = { { addr_.s6_addr[12],
@@ -233,7 +233,7 @@ bool operator==(const address_v6& a1, const address_v6& a2) BOOST_ASIO_NOEXCEPT
 {
   using namespace std; // For memcmp.
   return memcmp(&a1.addr_, &a2.addr_,
-      sizeof(boost::asio::detail::in6_addr_type)) == 0
+      sizeof(cppmsboost::asio::detail::in6_addr_type)) == 0
     && a1.scope_id_ == a2.scope_id_;
 }
 
@@ -241,7 +241,7 @@ bool operator<(const address_v6& a1, const address_v6& a2) BOOST_ASIO_NOEXCEPT
 {
   using namespace std; // For memcmp.
   int memcmp_result = memcmp(&a1.addr_, &a2.addr_,
-      sizeof(boost::asio::detail::in6_addr_type));
+      sizeof(cppmsboost::asio::detail::in6_addr_type));
   if (memcmp_result < 0)
     return true;
   if (memcmp_result > 0)
@@ -276,18 +276,18 @@ address_v6 address_v6::v4_compatible(const address_v4& addr)
 
 address_v6 make_address_v6(const char* str)
 {
-  boost::system::error_code ec;
+  cppmsboost::system::error_code ec;
   address_v6 addr = make_address_v6(str, ec);
-  boost::asio::detail::throw_error(ec);
+  cppmsboost::asio::detail::throw_error(ec);
   return addr;
 }
 
 address_v6 make_address_v6(const char* str,
-    boost::system::error_code& ec) BOOST_ASIO_NOEXCEPT
+    cppmsboost::system::error_code& ec) BOOST_ASIO_NOEXCEPT
 {
   address_v6::bytes_type bytes;
   unsigned long scope_id = 0;
-  if (boost::asio::detail::socket_ops::inet_pton(
+  if (cppmsboost::asio::detail::socket_ops::inet_pton(
         BOOST_ASIO_OS_DEF(AF_INET6), str, &bytes[0], &scope_id, ec) <= 0)
     return address_v6();
   return address_v6(bytes, scope_id);
@@ -299,7 +299,7 @@ address_v6 make_address_v6(const std::string& str)
 }
 
 address_v6 make_address_v6(const std::string& str,
-    boost::system::error_code& ec) BOOST_ASIO_NOEXCEPT
+    cppmsboost::system::error_code& ec) BOOST_ASIO_NOEXCEPT
 {
   return make_address_v6(str.c_str(), ec);
 }
@@ -312,7 +312,7 @@ address_v6 make_address_v6(string_view str)
 }
 
 address_v6 make_address_v6(string_view str,
-    boost::system::error_code& ec) BOOST_ASIO_NOEXCEPT
+    cppmsboost::system::error_code& ec) BOOST_ASIO_NOEXCEPT
 {
   return make_address_v6(static_cast<std::string>(str), ec);
 }
@@ -325,7 +325,7 @@ address_v4 make_address_v4(
   if (!v6_addr.is_v4_mapped())
   {
     bad_address_cast ex;
-    boost::asio::detail::throw_exception(ex);
+    cppmsboost::asio::detail::throw_exception(ex);
   }
 
   address_v6::bytes_type v6_bytes = v6_addr.to_bytes();
@@ -345,7 +345,7 @@ address_v6 make_address_v6(
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

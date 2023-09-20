@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -83,7 +83,7 @@ public:
 
     // Run all ready handlers. No lock is required since the ready queue is
     // accessed only within the strand.
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     while (scheduler_operation* o = impl_->ready_queue_.front())
     {
       impl_->ready_queue_.pop();
@@ -109,7 +109,7 @@ void strand_executor_service::dispatch(const implementation_type& impl,
     function_type tmp(BOOST_ASIO_MOVE_CAST(Function)(function));
 
     fenced_block b(fenced_block::full);
-    boost_asio_handler_invoke_helpers::invoke(tmp, tmp);
+    cppmsboost_asio_handler_invoke_helpers::invoke(tmp, tmp);
     return;
   }
 
@@ -174,7 +174,7 @@ void strand_executor_service::defer(const implementation_type& impl,
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

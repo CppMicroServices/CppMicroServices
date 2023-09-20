@@ -88,11 +88,11 @@ typedef HINSTANCE HMODULE;
 #define BOOST_WINAPI_DETAIL_EXTENSION
 #endif
 
-// MinGW64 gcc 4.8.2 fails to compile function declarations with boost::winapi::VOID_ arguments even though
+// MinGW64 gcc 4.8.2 fails to compile function declarations with cppmsboost::winapi::VOID_ arguments even though
 // the typedef expands to void. In Windows SDK, VOID is a macro which unfolds to void. We use our own macro in such cases.
 #define BOOST_WINAPI_DETAIL_VOID void
 
-namespace boost {
+namespace cppmsboost {
 namespace winapi {
 #if defined(BOOST_USE_WINDOWS_H)
 

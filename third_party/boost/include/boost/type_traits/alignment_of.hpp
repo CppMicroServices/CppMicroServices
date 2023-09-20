@@ -23,7 +23,7 @@
 #pragma option push -Vx- -Ve-
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 template <typename T> struct alignment_of;
 
@@ -62,14 +62,14 @@ struct alignment_of_impl
     // Using a combination of the two seems to make the most of a bad job:
     //
     BOOST_STATIC_CONSTANT(std::size_t, value =
-        (::boost::detail::alignment_logic<
-            sizeof(::boost::detail::alignment_of_hack<T>) - sizeof(T),
+        (::cppmsboost::detail::alignment_logic<
+            sizeof(::cppmsboost::detail::alignment_of_hack<T>) - sizeof(T),
             __alignof(T)
         >::value));
 #elif !defined(BOOST_ALIGNMENT_OF)
     BOOST_STATIC_CONSTANT(std::size_t, value =
-        (::boost::detail::alignment_logic<
-            sizeof(::boost::detail::alignment_of_hack<T>) - sizeof(T),
+        (::cppmsboost::detail::alignment_logic<
+            sizeof(::cppmsboost::detail::alignment_of_hack<T>) - sizeof(T),
             sizeof(T)
         >::value));
 #else
@@ -85,7 +85,7 @@ struct alignment_of_impl
 
 } // namespace detail
 
-template <class T> struct alignment_of : public integral_constant<std::size_t, ::boost::detail::alignment_of_impl<T>::value>{};
+template <class T> struct alignment_of : public integral_constant<std::size_t, ::cppmsboost::detail::alignment_of_impl<T>::value>{};
 
 // references have to be treated specially, assume
 // that a reference is just a special pointer:
@@ -106,7 +106,7 @@ template<> struct alignment_of<void const volatile> : integral_constant<std::siz
 template<> struct alignment_of<void volatile> : integral_constant<std::size_t, 0>{};
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #if defined(__BORLANDC__) && (__BORLANDC__ < 0x600)
 #pragma option pop

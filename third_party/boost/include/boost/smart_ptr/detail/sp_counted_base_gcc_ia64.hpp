@@ -19,7 +19,7 @@
 #include <boost/smart_ptr/detail/sp_typeinfo_.hpp>
 #include <boost/config.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -155,6 +155,6 @@ public:
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // #ifndef BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_GCC_IA64_HPP_INCLUDED

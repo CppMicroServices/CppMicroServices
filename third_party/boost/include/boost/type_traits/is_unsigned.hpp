@@ -16,7 +16,7 @@
 
 #include <climits>
 
-namespace boost {
+namespace cppmsboost {
 
 #if !defined( __CODEGEARC__ )
 
@@ -42,7 +42,7 @@ struct is_unsigned_values
 template <class T>
 struct is_ununsigned_helper
 {
-   BOOST_STATIC_CONSTANT(bool, value = (::boost::detail::is_unsigned_values<T>::minus_one > ::boost::detail::is_unsigned_values<T>::zero));
+   BOOST_STATIC_CONSTANT(bool, value = (::cppmsboost::detail::is_unsigned_values<T>::minus_one > ::cppmsboost::detail::is_unsigned_values<T>::zero));
 };
 
 template <bool integral_type>
@@ -68,7 +68,7 @@ struct is_unsigned_select_helper<false>
 template <class T>
 struct is_unsigned
 {
-   typedef ::boost::detail::is_unsigned_select_helper< ::boost::is_integral<T>::value || ::boost::is_enum<T>::value > selector;
+   typedef ::cppmsboost::detail::is_unsigned_select_helper< ::cppmsboost::is_integral<T>::value || ::cppmsboost::is_enum<T>::value > selector;
    typedef typename selector::template rebind<T> binder;
    typedef typename binder::type type;
    BOOST_STATIC_CONSTANT(bool, value = type::value);
@@ -76,7 +76,7 @@ struct is_unsigned
 
 } // namespace detail
 
-template <class T> struct is_unsigned : public integral_constant<bool, boost::detail::is_unsigned<T>::value> {};
+template <class T> struct is_unsigned : public integral_constant<bool, cppmsboost::detail::is_unsigned<T>::value> {};
 
 #else
 
@@ -122,15 +122,15 @@ template <> struct is_unsigned<const  long> : public false_type{};
 template <> struct is_unsigned<volatile  long> : public false_type{};
 template <> struct is_unsigned<const volatile  long> : public false_type{};
 #ifdef BOOST_HAS_LONG_LONG
-template <> struct is_unsigned< ::boost::ulong_long_type> : public true_type{};
-template <> struct is_unsigned<const ::boost::ulong_long_type> : public true_type{};
-template <> struct is_unsigned<volatile ::boost::ulong_long_type> : public true_type{};
-template <> struct is_unsigned<const volatile ::boost::ulong_long_type> : public true_type{};
+template <> struct is_unsigned< ::cppmsboost::ulong_long_type> : public true_type{};
+template <> struct is_unsigned<const ::cppmsboost::ulong_long_type> : public true_type{};
+template <> struct is_unsigned<volatile ::cppmsboost::ulong_long_type> : public true_type{};
+template <> struct is_unsigned<const volatile ::cppmsboost::ulong_long_type> : public true_type{};
 
-template <> struct is_unsigned< ::boost::long_long_type> : public false_type{};
-template <> struct is_unsigned<const ::boost::long_long_type> : public false_type{};
-template <> struct is_unsigned<volatile ::boost::long_long_type> : public false_type{};
-template <> struct is_unsigned<const volatile ::boost::long_long_type> : public false_type{};
+template <> struct is_unsigned< ::cppmsboost::long_long_type> : public false_type{};
+template <> struct is_unsigned<const ::cppmsboost::long_long_type> : public false_type{};
+template <> struct is_unsigned<volatile ::cppmsboost::long_long_type> : public false_type{};
+template <> struct is_unsigned<const volatile ::cppmsboost::long_long_type> : public false_type{};
 #endif
 #if defined(CHAR_MIN) 
 #if CHAR_MIN == 0
@@ -158,6 +158,6 @@ template <> struct is_unsigned<volatile wchar_t> : public false_type{};
 template <> struct is_unsigned<const volatile wchar_t> : public false_type{};
 #endif
 #endif
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_IS_MEMBER_FUNCTION_POINTER_HPP_INCLUDED

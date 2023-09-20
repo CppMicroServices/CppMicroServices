@@ -34,7 +34,7 @@ void __splitstack_block_signals_context( void * [BOOST_CONTEXT_SEGMENTS],
                                          int * new_value, int * old_value);
 }
 
-namespace boost {
+namespace cppmsboost {
 namespace context {
 
 template< typename traitsT >

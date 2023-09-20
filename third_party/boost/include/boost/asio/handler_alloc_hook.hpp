@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Default allocation function for handlers.
@@ -72,7 +72,7 @@ BOOST_ASIO_DECL void asio_handler_deallocate(
     void* pointer, std::size_t size, ...);
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -21,12 +21,12 @@
 # include <boost/throw_exception.hpp>
 #endif // defined(BOOST_ASIO_BOOST_THROW_EXCEPTION)
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
 #if defined(BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION)
-using boost::throw_exception;
+using cppmsboost::throw_exception;
 #else // defined(BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION)
 
 // Declare the throw_exception function for all targets.
@@ -48,6 +48,6 @@ void throw_exception(const Exception& e)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_DETAIL_THROW_EXCEPTION_HPP

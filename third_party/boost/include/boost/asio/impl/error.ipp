@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace error {
 
@@ -29,7 +29,7 @@ namespace error {
 
 namespace detail {
 
-class netdb_category : public boost::system::error_category
+class netdb_category : public cppmsboost::system::error_category
 {
 public:
   const char* name() const BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT
@@ -53,7 +53,7 @@ public:
 
 } // namespace detail
 
-const boost::system::error_category& get_netdb_category()
+const cppmsboost::system::error_category& get_netdb_category()
 {
   static detail::netdb_category instance;
   return instance;
@@ -61,7 +61,7 @@ const boost::system::error_category& get_netdb_category()
 
 namespace detail {
 
-class addrinfo_category : public boost::system::error_category
+class addrinfo_category : public cppmsboost::system::error_category
 {
 public:
   const char* name() const BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT
@@ -81,7 +81,7 @@ public:
 
 } // namespace detail
 
-const boost::system::error_category& get_addrinfo_category()
+const cppmsboost::system::error_category& get_addrinfo_category()
 {
   static detail::addrinfo_category instance;
   return instance;
@@ -91,7 +91,7 @@ const boost::system::error_category& get_addrinfo_category()
 
 namespace detail {
 
-class misc_category : public boost::system::error_category
+class misc_category : public cppmsboost::system::error_category
 {
 public:
   const char* name() const BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT
@@ -115,7 +115,7 @@ public:
 
 } // namespace detail
 
-const boost::system::error_category& get_misc_category()
+const cppmsboost::system::error_category& get_misc_category()
 {
   static detail::misc_category instance;
   return instance;
@@ -123,7 +123,7 @@ const boost::system::error_category& get_misc_category()
 
 } // namespace error
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

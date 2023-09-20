@@ -38,7 +38,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -76,14 +76,14 @@ public:
     BOOST_ASIO_DECL operation* perform_io(uint32_t events);
     BOOST_ASIO_DECL static void do_complete(
         void* owner, operation* base,
-        const boost::system::error_code& ec, std::size_t bytes_transferred);
+        const cppmsboost::system::error_code& ec, std::size_t bytes_transferred);
   };
 
   // Per-descriptor data.
   typedef descriptor_state* per_descriptor_data;
 
   // Constructor.
-  BOOST_ASIO_DECL epoll_reactor(boost::asio::execution_context& ctx);
+  BOOST_ASIO_DECL epoll_reactor(cppmsboost::asio::execution_context& ctx);
 
   // Destructor.
   BOOST_ASIO_DECL ~epoll_reactor();
@@ -93,7 +93,7 @@ public:
 
   // Recreate internal descriptors following a fork.
   BOOST_ASIO_DECL void notify_fork(
-      boost::asio::execution_context::fork_event fork_ev);
+      cppmsboost::asio::execution_context::fork_event fork_ev);
 
   // Initialise the task.
   BOOST_ASIO_DECL void init_task();
@@ -254,7 +254,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

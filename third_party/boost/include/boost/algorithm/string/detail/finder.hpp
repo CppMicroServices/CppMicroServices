@@ -21,7 +21,7 @@
 #include <boost/range/empty.hpp>
 #include <boost/range/as_literal.hpp>
 
-namespace boost {
+namespace cppmsboost {
     namespace algorithm {
         namespace detail {
 
@@ -41,7 +41,7 @@ namespace boost {
                 // Construction
                 template< typename SearchT >
                 first_finderF( const SearchT& Search, PredicateT Comp ) :
-                    m_Search(::boost::begin(Search), ::boost::end(Search)), m_Comp(Comp) {}
+                    m_Search(::cppmsboost::begin(Search), ::cppmsboost::end(Search)), m_Comp(Comp) {}
                 first_finderF(
                         search_iterator_type SearchBegin,
                         search_iterator_type SearchEnd,
@@ -64,7 +64,7 @@ namespace boost {
                         ++OuterIt)
                     {
                         // Sanity check
-                        if( boost::empty(m_Search) )
+                        if( cppmsboost::empty(m_Search) )
                             return result_type( End, End );
 
                         input_iterator_type InnerIt=OuterIt;
@@ -108,7 +108,7 @@ namespace boost {
                 // Construction
                 template< typename SearchT >
                 last_finderF( const SearchT& Search, PredicateT Comp ) :
-                    m_Search(::boost::begin(Search), ::boost::end(Search)), m_Comp(Comp) {}
+                    m_Search(::cppmsboost::begin(Search), ::cppmsboost::end(Search)), m_Comp(Comp) {}
                 last_finderF(
                         search_iterator_type SearchBegin,
                         search_iterator_type SearchEnd,
@@ -124,10 +124,10 @@ namespace boost {
                 {
                     typedef iterator_range<ForwardIteratorT> result_type;
 
-                    if( boost::empty(m_Search) )
+                    if( cppmsboost::empty(m_Search) )
                         return result_type( End, End );
 
-                    typedef BOOST_STRING_TYPENAME boost::detail::
+                    typedef BOOST_STRING_TYPENAME cppmsboost::detail::
                         iterator_traits<ForwardIteratorT>::iterator_category category;
 
                     return findit( Begin, End, category() );
@@ -153,7 +153,7 @@ namespace boost {
                     while( M )
                     {
                         Last=M;
-                        M=first_finder( ::boost::end(M), End );
+                        M=first_finder( ::cppmsboost::end(M), End );
                     }
 
                     return Last;
@@ -223,7 +223,7 @@ namespace boost {
                         const SearchT& Search,
                         int Nth,
                         PredicateT Comp) :
-                    m_Search(::boost::begin(Search), ::boost::end(Search)),
+                    m_Search(::cppmsboost::begin(Search), ::cppmsboost::end(Search)),
                     m_Nth(Nth),
                     m_Comp(Comp) {}
                 nth_finderF(
@@ -265,7 +265,7 @@ namespace boost {
                     typedef iterator_range<ForwardIteratorT> result_type;
 
                     // Sanity check
-                    if( boost::empty(m_Search) )
+                    if( cppmsboost::empty(m_Search) )
                         return result_type( End, End );
 
                     // Instantiate find functor
@@ -277,7 +277,7 @@ namespace boost {
                     for( unsigned int n=0; n<=N; ++n )
                     {
                         // find next match
-                        M=first_finder( ::boost::end(M), End );
+                        M=first_finder( ::cppmsboost::end(M), End );
 
                         if ( !M )
                         {
@@ -299,7 +299,7 @@ namespace boost {
                     typedef iterator_range<ForwardIteratorT> result_type;
 
                     // Sanity check
-                    if( boost::empty(m_Search) )
+                    if( cppmsboost::empty(m_Search) )
                         return result_type( End, End );
 
                     // Instantiate find functor
@@ -311,7 +311,7 @@ namespace boost {
                     for( unsigned int n=1; n<=N; ++n )
                     {
                         // find next match
-                        M=last_finder( Begin, ::boost::begin(M) );
+                        M=last_finder( Begin, ::cppmsboost::begin(M) );
 
                         if ( !M )
                         {
@@ -375,10 +375,10 @@ namespace boost {
                 ForwardIteratorT End,
                 unsigned int N )
             {
-                typedef BOOST_STRING_TYPENAME boost::detail::
+                typedef BOOST_STRING_TYPENAME cppmsboost::detail::
                     iterator_traits<ForwardIteratorT>::iterator_category category;
 
-                return ::boost::algorithm::detail::find_head_impl( Begin, End, N, category() );
+                return ::cppmsboost::algorithm::detail::find_head_impl( Begin, End, N, category() );
             }
 
             template< typename ForwardIteratorT >
@@ -448,10 +448,10 @@ namespace boost {
                 ForwardIteratorT End,
                 unsigned int N )
             {
-                typedef BOOST_STRING_TYPENAME boost::detail::
+                typedef BOOST_STRING_TYPENAME cppmsboost::detail::
                     iterator_traits<ForwardIteratorT>::iterator_category category;
 
-                return ::boost::algorithm::detail::find_tail_impl( Begin, End, N, category() );
+                return ::cppmsboost::algorithm::detail::find_tail_impl( Begin, End, N, category() );
             }
 
 
@@ -479,14 +479,14 @@ namespace boost {
                 {
                     if(m_N>=0)
                     {
-                        return ::boost::algorithm::detail::find_head_impl( Begin, End, m_N );
+                        return ::cppmsboost::algorithm::detail::find_head_impl( Begin, End, m_N );
                     }
                     else
                     {
                         iterator_range<ForwardIteratorT> Res=
-                            ::boost::algorithm::detail::find_tail_impl( Begin, End, -m_N );
+                            ::cppmsboost::algorithm::detail::find_tail_impl( Begin, End, -m_N );
 
-                        return ::boost::make_iterator_range(Begin, Res.begin());
+                        return ::cppmsboost::make_iterator_range(Begin, Res.begin());
                     }
                 }
 
@@ -517,14 +517,14 @@ namespace boost {
                 {
                     if(m_N>=0)
                     {
-                        return ::boost::algorithm::detail::find_tail_impl( Begin, End, m_N );
+                        return ::cppmsboost::algorithm::detail::find_tail_impl( Begin, End, m_N );
                     }
                     else
                     {
                         iterator_range<ForwardIteratorT> Res=
-                            ::boost::algorithm::detail::find_head_impl( Begin, End, -m_N );
+                            ::cppmsboost::algorithm::detail::find_head_impl( Begin, End, -m_N );
 
-                        return ::boost::make_iterator_range(Res.end(), End);
+                        return ::cppmsboost::make_iterator_range(Res.end(), End);
                     }
                 }
 
@@ -634,6 +634,6 @@ namespace boost {
 
         } // namespace detail
     } // namespace algorithm
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // BOOST_STRING_FINDER_DETAIL_HPP

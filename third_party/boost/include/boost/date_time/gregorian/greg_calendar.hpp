@@ -17,7 +17,7 @@
 #include <boost/date_time/gregorian/greg_ymd.hpp>
 #include <boost/date_time/int_adapter.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace gregorian {
 
   //!An internal date representation that includes infinities, not a date

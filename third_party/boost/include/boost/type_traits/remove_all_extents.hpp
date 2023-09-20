@@ -13,7 +13,7 @@
 #include <cstddef> // size_t
 #include <boost/detail/workaround.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 template <class T> struct remove_all_extents{ typedef T type; };
 
@@ -36,6 +36,6 @@ template <class T> struct remove_all_extents<T const volatile[]> : public remove
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_REMOVE_BOUNDS_HPP_INCLUDED

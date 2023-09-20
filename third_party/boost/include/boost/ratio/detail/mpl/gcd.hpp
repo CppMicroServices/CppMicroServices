@@ -33,7 +33,7 @@
 
 #endif
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 template< typename Tag1, typename Tag2 > struct gcd_impl;
 
@@ -74,17 +74,17 @@ namespace aux {
     // Note: this solution could be wrong for n1 or n2 = [2**63 .. 2**64-1]
 #if defined(BOOST_MPL_CFG_NO_DEPENDENT_NONTYPE_PARAMETER_IN_PARTIAL_SPEC)
 
-  template< typename T1, boost::intmax_t n1, bool n1_is_0
-                  , typename T2, boost::intmax_t n2, bool n2_is_0 >
+  template< typename T1, cppmsboost::intmax_t n1, bool n1_is_0
+                  , typename T2, cppmsboost::intmax_t n2, bool n2_is_0 >
       struct gcd_aux
           : gcd_aux<T2, n2, n2==0, T1, (n1 % n2), (n1 % n2)==0>
       {};
 
-      template <typename T1, boost::intmax_t n1, typename T2, boost::intmax_t n2>
+      template <typename T1, cppmsboost::intmax_t n1, typename T2, cppmsboost::intmax_t n2>
       struct gcd_aux<T1, n1, false, T2, n2, true> : integral_c<T1, n1>
       {};
 
-      template <typename T1, boost::intmax_t n1, typename T2, boost::intmax_t n2, bool C>
+      template <typename T1, cppmsboost::intmax_t n1, typename T2, cppmsboost::intmax_t n2, bool C>
       struct gcd_aux<T1, n1, true, T2, n2, C> : integral_c<T2, n2>
       {};
 

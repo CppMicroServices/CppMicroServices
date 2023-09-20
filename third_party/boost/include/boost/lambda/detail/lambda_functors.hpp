@@ -38,7 +38,7 @@
 
 #endif
 
-namespace boost { 
+namespace cppmsboost { 
 namespace lambda {
 
 // -- lambda_functor --------------------------------------------
@@ -82,7 +82,7 @@ template<> struct placeholder<FIRST> {
 
   template<class RET, CALL_TEMPLATE_ARGS> 
   RET call(CALL_FORMAL_ARGS) const { 
-    BOOST_STATIC_ASSERT(boost::is_reference<RET>::value); 
+    BOOST_STATIC_ASSERT(cppmsboost::is_reference<RET>::value); 
     CALL_USE_ARGS; // does nothing, prevents warnings for unused args
     return a; 
   }
@@ -162,7 +162,7 @@ public:
     inherited::template sig<null_type>::type
       nullary_return_type;
 
-  // Support for boost::result_of.
+  // Support for cppmsboost::result_of.
   template <class Sig> struct result;
   template <class F>
   struct result<F()> {
@@ -265,28 +265,28 @@ public:
   template<class A>
   const lambda_functor<lambda_functor_base<
                   other_action<assignment_action>,
-                  boost::tuple<lambda_functor,
+                  cppmsboost::tuple<lambda_functor,
                   typename const_copy_argument <const A>::type> > >
   operator=(const A& a) const {
     return lambda_functor_base<
                   other_action<assignment_action>,
-                  boost::tuple<lambda_functor,
+                  cppmsboost::tuple<lambda_functor,
                   typename const_copy_argument <const A>::type> >
-     (  boost::tuple<lambda_functor,
+     (  cppmsboost::tuple<lambda_functor,
              typename const_copy_argument <const A>::type>(*this, a) );
   }
 
   template<class A> 
   const lambda_functor<lambda_functor_base< 
                   other_action<subscript_action>, 
-                  boost::tuple<lambda_functor, 
+                  cppmsboost::tuple<lambda_functor, 
                         typename const_copy_argument <const A>::type> > > 
   operator[](const A& a) const { 
     return lambda_functor_base< 
                   other_action<subscript_action>, 
-                  boost::tuple<lambda_functor, 
+                  cppmsboost::tuple<lambda_functor, 
                         typename const_copy_argument <const A>::type> >
-     ( boost::tuple<lambda_functor, 
+     ( cppmsboost::tuple<lambda_functor, 
              typename const_copy_argument <const A>::type>(*this, a ) ); 
   } 
 };
@@ -296,36 +296,36 @@ public:
 #endif
 
 } // namespace lambda
-} // namespace boost
+} // namespace cppmsboost
 
-namespace boost {
+namespace cppmsboost {
 
 #if !defined(BOOST_RESULT_OF_USE_DECLTYPE) || defined(BOOST_NO_CXX11_DECLTYPE)
 
 template<class T>
-struct result_of<boost::lambda::lambda_functor<T>()>
+struct result_of<cppmsboost::lambda::lambda_functor<T>()>
 {
-    typedef typename boost::lambda::lambda_functor<T>::nullary_return_type type;
+    typedef typename cppmsboost::lambda::lambda_functor<T>::nullary_return_type type;
 };
 
 template<class T>
-struct result_of<const boost::lambda::lambda_functor<T>()>
+struct result_of<const cppmsboost::lambda::lambda_functor<T>()>
 {
-    typedef typename boost::lambda::lambda_functor<T>::nullary_return_type type;
+    typedef typename cppmsboost::lambda::lambda_functor<T>::nullary_return_type type;
 };
 
 #endif
 
 template<class T>
-struct tr1_result_of<boost::lambda::lambda_functor<T>()>
+struct tr1_result_of<cppmsboost::lambda::lambda_functor<T>()>
 {
-    typedef typename boost::lambda::lambda_functor<T>::nullary_return_type type;
+    typedef typename cppmsboost::lambda::lambda_functor<T>::nullary_return_type type;
 };
 
 template<class T>
-struct tr1_result_of<const boost::lambda::lambda_functor<T>()>
+struct tr1_result_of<const cppmsboost::lambda::lambda_functor<T>()>
 {
-    typedef typename boost::lambda::lambda_functor<T>::nullary_return_type type;
+    typedef typename cppmsboost::lambda::lambda_functor<T>::nullary_return_type type;
 };
 
 }
@@ -334,7 +334,7 @@ struct tr1_result_of<const boost::lambda::lambda_functor<T>()>
 
 #include <boost/is_placeholder.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 template<> struct is_placeholder< lambda::lambda_functor< lambda::placeholder<lambda::FIRST> > >
@@ -352,6 +352,6 @@ template<> struct is_placeholder< lambda::lambda_functor< lambda::placeholder<la
     enum _vt { value = 3 };
 };
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif

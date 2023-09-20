@@ -20,7 +20,7 @@
 //
 // We don't need or use this, just define a dummy class:
 //
-namespace boost{ namespace type_traits_detail{
+namespace cppmsboost{ namespace type_traits_detail{
 
 template<typename T>
 struct is_likely_stateless_lambda : public false_type {};
@@ -33,7 +33,7 @@ struct is_likely_stateless_lambda : public false_type {};
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/enable_if.hpp>
 
-namespace boost{
+namespace cppmsboost{
 
 namespace type_traits_detail{
 
@@ -45,8 +45,8 @@ namespace type_traits_detail{
 template<typename T>
 struct has_one_operator_call_helper
 {
-  template<typename Q> static boost::true_type  test(decltype(&Q::operator())*);
-  template<typename>   static boost::false_type test(...);
+  template<typename Q> static cppmsboost::true_type  test(decltype(&Q::operator())*);
+  template<typename>   static cppmsboost::false_type test(...);
 
   using type=decltype(test<T>(nullptr));
 };
@@ -71,23 +71,23 @@ struct is_likely_stateless_lambda : false_type{};
 template<typename T>
 struct is_likely_stateless_lambda<
   T,
-  typename boost::enable_if_<has_one_operator_call<T>::value>::type> :
-     boost::is_convertible<T, typename equivalent_function_pointer<T>::type
+  typename cppmsboost::enable_if_<has_one_operator_call<T>::value>::type> :
+     cppmsboost::is_convertible<T, typename equivalent_function_pointer<T>::type
 >{};
 
 } /* namespace type_traits_detail */
 
-} /* namespace boost */
+} /* namespace cppmsboost */
 
 #else
  //
  // Can't implement this:
  //
-namespace boost {
+namespace cppmsboost {
    namespace type_traits_detail {
 
       template<typename T>
-      struct is_likely_stateless_lambda : public boost::integral_constant<bool, false> {};
+      struct is_likely_stateless_lambda : public cppmsboost::integral_constant<bool, false> {};
 }}
 
 #endif

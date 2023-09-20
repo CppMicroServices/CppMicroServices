@@ -24,19 +24,19 @@
 #include <boost/mpl/bool_fwd.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
     template<class T>
     struct is_bitwise_serializable
      : public is_arithmetic< T >
     {};
 } // namespace serialization
-} // namespace boost
+} // namespace cppmsboost
 
 
 // define a macro to make explicit designation of this more transparent
 #define BOOST_IS_BITWISE_SERIALIZABLE(T)              \
-namespace boost {                                     \
+namespace cppmsboost {                                     \
 namespace serialization {                             \
 template<>                                            \
 struct is_bitwise_serializable< T > : mpl::true_ {};  \

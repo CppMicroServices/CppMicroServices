@@ -18,7 +18,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 inline serial_port_base::baud_rate::baud_rate(unsigned int rate)
@@ -54,7 +54,7 @@ inline unsigned int serial_port_base::character_size::value() const
 }
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

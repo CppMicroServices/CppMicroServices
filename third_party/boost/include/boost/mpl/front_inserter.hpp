@@ -18,7 +18,7 @@
 #include <boost/mpl/push_front.hpp>
 #include <boost/mpl/inserter.hpp>
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 template<
       typename Sequence

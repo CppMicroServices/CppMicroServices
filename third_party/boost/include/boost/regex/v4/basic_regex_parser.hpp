@@ -30,7 +30,7 @@
 #pragma warning(pop)
 #endif
 
-namespace boost{
+namespace cppmsboost{
 namespace BOOST_REGEX_DETAIL_NS{
 
 #ifdef BOOST_MSVC
@@ -41,19 +41,19 @@ namespace BOOST_REGEX_DETAIL_NS{
 #endif
 #endif
 
-inline boost::intmax_t umax(mpl::false_ const&)
+inline cppmsboost::intmax_t umax(mpl::false_ const&)
 {
    // Get out clause here, just in case numeric_limits is unspecialized:
-   return std::numeric_limits<boost::intmax_t>::is_specialized ? (std::numeric_limits<boost::intmax_t>::max)() : INT_MAX;
+   return std::numeric_limits<cppmsboost::intmax_t>::is_specialized ? (std::numeric_limits<cppmsboost::intmax_t>::max)() : INT_MAX;
 }
-inline boost::intmax_t umax(mpl::true_ const&)
+inline cppmsboost::intmax_t umax(mpl::true_ const&)
 {
    return (std::numeric_limits<std::size_t>::max)();
 }
 
-inline boost::intmax_t umax()
+inline cppmsboost::intmax_t umax()
 {
-   return umax(mpl::bool_<std::numeric_limits<boost::intmax_t>::digits >= std::numeric_limits<std::size_t>::digits>());
+   return umax(mpl::bool_<std::numeric_limits<cppmsboost::intmax_t>::digits >= std::numeric_limits<std::size_t>::digits>());
 }
 
 template <class charT, class traits>
@@ -186,7 +186,7 @@ void basic_regex_parser<charT, traits>::parse(const charT* p1, const charT* p2, 
    // have had an unexpected ')' :
    if(!result)
    {
-      fail(regex_constants::error_paren, ::boost::BOOST_REGEX_DETAIL_NS::distance(m_base, m_position), "Found a closing ) with no corresponding opening parenthesis.");
+      fail(regex_constants::error_paren, ::cppmsboost::BOOST_REGEX_DETAIL_NS::distance(m_base, m_position), "Found a closing ) with no corresponding opening parenthesis.");
       return;
    }
    // if an error has been set then give up now:
@@ -238,7 +238,7 @@ void basic_regex_parser<charT, traits>::fail(regex_constants::error_type error_c
 #ifndef BOOST_NO_EXCEPTIONS
    if(0 == (this->flags() & regex_constants::no_except))
    {
-      boost::regex_error e(message, error_code, position);
+      cppmsboost::regex_error e(message, error_code, position);
       e.raise();
    }
 #else
@@ -252,7 +252,7 @@ bool basic_regex_parser<charT, traits>::parse_all()
    if (++m_recursion_count > 400)
    {
       // exceeded internal limits
-      fail(boost::regex_constants::error_complexity, m_position - m_base, "Exceeded nested brace limit.");
+      fail(cppmsboost::regex_constants::error_complexity, m_position - m_base, "Exceeded nested brace limit.");
    }
    bool result = true;
    while(result && (m_position != m_end))
@@ -518,7 +518,7 @@ bool basic_regex_parser<charT, traits>::parse_open_paren()
    //
    if(m_position == m_end)
    {
-      this->fail(regex_constants::error_paren, ::boost::BOOST_REGEX_DETAIL_NS::distance(m_base, m_end));
+      this->fail(regex_constants::error_paren, ::cppmsboost::BOOST_REGEX_DETAIL_NS::distance(m_base, m_end));
       return false;
    }
    if(this->m_traits.syntax_type(*m_position) != regex_constants::syntax_close_mark)
@@ -898,7 +898,7 @@ escape_type_class_jump:
             return false;
          }
          const charT* pc = m_position;
-         boost::intmax_t i = this->m_traits.toi(pc, m_end, 10);
+         cppmsboost::intmax_t i = this->m_traits.toi(pc, m_end, 10);
          if((i < 0) && syn_end)
          {
             // Check for a named capture, get the leftmost one if there is more than one:
@@ -912,7 +912,7 @@ escape_type_class_jump:
          }
          if(negative)
             i = 1 + m_mark_count - i;
-         if(((i > 0) && (i < std::numeric_limits<unsigned>::digits) && (i - 1 < static_cast<boost::intmax_t>(sizeof(unsigned) * CHAR_BIT)) && (this->m_backrefs & (1u << (i-1)))) || ((i > 10000) && (this->m_pdata->get_id(i) > 0) && (this->m_pdata->get_id(i)-1 < static_cast<boost::intmax_t>(sizeof(unsigned) * CHAR_BIT)) && (this->m_backrefs & (1u << (this->m_pdata->get_id(i)-1)))))
+         if(((i > 0) && (i < std::numeric_limits<unsigned>::digits) && (i - 1 < static_cast<cppmsboost::intmax_t>(sizeof(unsigned) * CHAR_BIT)) && (this->m_backrefs & (1u << (i-1)))) || ((i > 10000) && (this->m_pdata->get_id(i) > 0) && (this->m_pdata->get_id(i)-1 < static_cast<cppmsboost::intmax_t>(sizeof(unsigned) * CHAR_BIT)) && (this->m_backrefs & (1u << (this->m_pdata->get_id(i)-1)))))
          {
             m_position = pc;
             re_brace* pb = static_cast<re_brace*>(this->append_state(syntax_element_backref, sizeof(re_brace)));
@@ -1003,7 +1003,7 @@ bool basic_regex_parser<charT, traits>::parse_repeat(std::size_t low, std::size_
    }
    if(0 == this->m_last_state)
    {
-      fail(regex_constants::error_badrepeat, ::boost::BOOST_REGEX_DETAIL_NS::distance(m_base, m_position), "Nothing to repeat.");
+      fail(regex_constants::error_badrepeat, ::cppmsboost::BOOST_REGEX_DETAIL_NS::distance(m_base, m_position), "Nothing to repeat.");
       return false;
    }
    if(this->m_last_state->type == syntax_element_endmark)
@@ -1138,7 +1138,7 @@ bool basic_regex_parser<charT, traits>::parse_repeat_range(bool isbasic)
    // parse a repeat-range:
    //
    std::size_t min, max;
-   boost::intmax_t v;
+   cppmsboost::intmax_t v;
    // skip whitespace:
    while((m_position != m_end) && this->m_traits.isctype(*m_position, this->m_mask_space))
       ++m_position;
@@ -1728,19 +1728,19 @@ digraph<charT> basic_regex_parser<charT, traits>::get_next_set_literal(basic_cha
 // does a value fit in the specified charT type?
 //
 template <class charT>
-bool valid_value(charT, boost::intmax_t v, const mpl::true_&)
+bool valid_value(charT, cppmsboost::intmax_t v, const mpl::true_&)
 {
    return (v >> (sizeof(charT) * CHAR_BIT)) == 0;
 }
 template <class charT>
-bool valid_value(charT, boost::intmax_t, const mpl::false_&)
+bool valid_value(charT, cppmsboost::intmax_t, const mpl::false_&)
 {
    return true; // v will alsways fit in a charT
 }
 template <class charT>
-bool valid_value(charT c, boost::intmax_t v)
+bool valid_value(charT c, cppmsboost::intmax_t v)
 {
-   return valid_value(c, v, mpl::bool_<(sizeof(charT) < sizeof(boost::intmax_t))>());
+   return valid_value(c, v, mpl::bool_<(sizeof(charT) < sizeof(cppmsboost::intmax_t))>());
 }
 
 template <class charT, class traits>
@@ -1816,10 +1816,10 @@ charT basic_regex_parser<charT, traits>::unescape_character()
             fail(regex_constants::error_escape, m_position - m_base, "Missing } in hexadecimal escape sequence.");
             return result;
          }
-         boost::intmax_t i = this->m_traits.toi(m_position, m_end, 16);
+         cppmsboost::intmax_t i = this->m_traits.toi(m_position, m_end, 16);
          if((m_position == m_end)
             || (i < 0)
-            || ((std::numeric_limits<charT>::is_specialized) && (i > (boost::intmax_t)(std::numeric_limits<charT>::max)()))
+            || ((std::numeric_limits<charT>::is_specialized) && (i > (cppmsboost::intmax_t)(std::numeric_limits<charT>::max)()))
             || (this->m_traits.syntax_type(*m_position) != regex_constants::syntax_close_brace))
          {
             // Rewind to start of escape:
@@ -1834,7 +1834,7 @@ charT basic_regex_parser<charT, traits>::unescape_character()
       else
       {
          std::ptrdiff_t len = (std::min)(static_cast<std::ptrdiff_t>(2), static_cast<std::ptrdiff_t>(m_end - m_position));
-         boost::intmax_t i = this->m_traits.toi(m_position, m_position + len, 16);
+         cppmsboost::intmax_t i = this->m_traits.toi(m_position, m_position + len, 16);
          if((i < 0)
             || !valid_value(charT(0), i))
          {
@@ -1851,9 +1851,9 @@ charT basic_regex_parser<charT, traits>::unescape_character()
       {
       // an octal escape sequence, the first character must be a zero
       // followed by up to 3 octal digits:
-      std::ptrdiff_t len = (std::min)(::boost::BOOST_REGEX_DETAIL_NS::distance(m_position, m_end), static_cast<std::ptrdiff_t>(4));
+      std::ptrdiff_t len = (std::min)(::cppmsboost::BOOST_REGEX_DETAIL_NS::distance(m_position, m_end), static_cast<std::ptrdiff_t>(4));
       const charT* bp = m_position;
-      boost::intmax_t val = this->m_traits.toi(bp, bp + 1, 8);
+      cppmsboost::intmax_t val = this->m_traits.toi(bp, bp + 1, 8);
       if(val != 0)
       {
          // Rewind to start of escape:
@@ -1864,7 +1864,7 @@ charT basic_regex_parser<charT, traits>::unescape_character()
          return result;
       }
       val = this->m_traits.toi(m_position, m_position + len, 8);
-      if((val < 0) || (val > (boost::intmax_t)(std::numeric_limits<charT>::max)()))
+      if((val < 0) || (val > (cppmsboost::intmax_t)(std::numeric_limits<charT>::max)()))
       {
          // Rewind to start of escape:
          --m_position;
@@ -1937,7 +1937,7 @@ bool basic_regex_parser<charT, traits>::parse_backref()
 {
    BOOST_ASSERT(m_position != m_end);
    const charT* pc = m_position;
-   boost::intmax_t i = this->m_traits.toi(pc, pc + 1, 10);
+   cppmsboost::intmax_t i = this->m_traits.toi(pc, pc + 1, 10);
    if((i == 0) || (((this->flags() & regbase::main_option_type) == regbase::perl_syntax_group) && (this->flags() & regbase::no_bk_refs)))
    {
       // not a backref at all but an octal escape sequence:
@@ -2059,7 +2059,7 @@ bool basic_regex_parser<charT, traits>::parse_perl_extension()
    int max_mark = m_max_mark;
    m_mark_reset = -1;
    m_max_mark = m_mark_count;
-   boost::intmax_t v;
+   cppmsboost::intmax_t v;
    //
    // select the actual extension used:
    //
@@ -2113,7 +2113,7 @@ insert_recursion:
          fail(regex_constants::error_perl_extension, m_position - m_base, "An invalid or unterminated recursive sub-expression.");
          return false;
       }
-      if ((std::numeric_limits<boost::intmax_t>::max)() - m_mark_count < v)
+      if ((std::numeric_limits<cppmsboost::intmax_t>::max)() - m_mark_count < v)
       {
          fail(regex_constants::error_perl_extension, m_position - m_base, "An invalid or unterminated recursive sub-expression.");
          return false;
@@ -2593,7 +2593,7 @@ option_group_jump:
       // Rewind to start of (? sequence:
       --m_position;
       while(this->m_traits.syntax_type(*m_position) != regex_constants::syntax_open_mark) --m_position;
-      this->fail(regex_constants::error_paren, ::boost::BOOST_REGEX_DETAIL_NS::distance(m_base, m_end));
+      this->fail(regex_constants::error_paren, ::cppmsboost::BOOST_REGEX_DETAIL_NS::distance(m_base, m_end));
       return false;
    }
    BOOST_ASSERT(this->m_traits.syntax_type(*m_position) == regex_constants::syntax_close_mark);
@@ -3127,7 +3127,7 @@ bool basic_regex_parser<charT, traits>::unwind_alts(std::ptrdiff_t last_paren_st
 #endif
 
 } // namespace BOOST_REGEX_DETAIL_NS
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(push)

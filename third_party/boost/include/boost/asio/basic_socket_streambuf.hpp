@@ -71,7 +71,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -116,7 +116,7 @@ protected:
 template <typename Protocol,
 #if defined(BOOST_ASIO_HAS_BOOST_DATE_TIME) \
   && defined(BOOST_ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
-    typename Clock = boost::posix_time::ptime,
+    typename Clock = cppmsboost::posix_time::ptime,
     typename WaitTraits = time_traits<Clock> >
 #else // defined(BOOST_ASIO_HAS_BOOST_DATE_TIME)
       // && defined(BOOST_ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
@@ -219,7 +219,7 @@ public:
     put_buffer_.swap(other.put_buffer_);
     setg(other.eback(), other.gptr(), other.egptr());
     setp(other.pptr(), other.epptr());
-    other.ec_ = boost::system::error_code();
+    other.ec_ = cppmsboost::system::error_code();
     other.expiry_time_ = max_expiry_time();
     other.init_buffers();
   }
@@ -236,7 +236,7 @@ public:
     put_buffer_.swap(other.put_buffer_);
     setg(other.eback(), other.gptr(), other.egptr());
     setp(other.pptr(), other.epptr());
-    other.ec_ = boost::system::error_code();
+    other.ec_ = cppmsboost::system::error_code();
     other.expiry_time_ = max_expiry_time();
     other.put_buffer_.resize(buffer_size);
     other.init_buffers();
@@ -261,7 +261,7 @@ public:
   basic_socket_streambuf* connect(const endpoint_type& endpoint)
   {
     init_buffers();
-    ec_ = boost::system::error_code();
+    ec_ = cppmsboost::system::error_code();
     this->connect_to_endpoints(&endpoint, &endpoint + 1);
     return !ec_ ? this : 0;
   }
@@ -317,7 +317,7 @@ public:
    * @return An \c error_code corresponding to the last error from the stream
    * buffer.
    */
-  const boost::system::error_code& error() const
+  const cppmsboost::system::error_code& error() const
   {
     return ec_;
   }
@@ -329,7 +329,7 @@ public:
    * @return An \c error_code corresponding to the last error from the stream
    * buffer.
    */
-  const boost::system::error_code& puberror() const
+  const cppmsboost::system::error_code& puberror() const
   {
     return error();
   }
@@ -361,7 +361,7 @@ public:
    * This function sets the expiry time associated with the stream. Stream
    * operations performed after this time (where the operations cannot be
    * completed using the internal buffers) will fail with the error
-   * boost::asio::error::operation_aborted.
+   * cppmsboost::asio::error::operation_aborted.
    *
    * @param expiry_time The expiry time to be used for the stream.
    */
@@ -375,7 +375,7 @@ public:
    * This function sets the expiry time associated with the stream. Stream
    * operations performed after this time (where the operations cannot be
    * completed using the internal buffers) will fail with the error
-   * boost::asio::error::operation_aborted.
+   * cppmsboost::asio::error::operation_aborted.
    *
    * @param expiry_time The expiry time to be used for the timer.
    */
@@ -401,7 +401,7 @@ public:
    * This function sets the expiry time associated with the stream. Stream
    * operations performed after this time (where the operations cannot be
    * completed using the internal buffers) will fail with the error
-   * boost::asio::error::operation_aborted.
+   * cppmsboost::asio::error::operation_aborted.
    *
    * @param expiry_time The expiry time to be used for the timer.
    */
@@ -415,7 +415,7 @@ protected:
   int_type underflow()
   {
 #if defined(BOOST_ASIO_WINDOWS_RUNTIME)
-    ec_ = boost::asio::error::operation_not_supported;
+    ec_ = cppmsboost::asio::error::operation_not_supported;
     return traits_type::eof();
 #else // defined(BOOST_ASIO_WINDOWS_RUNTIME)
     if (gptr() != egptr())
@@ -426,7 +426,7 @@ protected:
       // Check if we are past the expiry time.
       if (traits_helper::less_than(expiry_time_, traits_helper::now()))
       {
-        ec_ = boost::asio::error::timed_out;
+        ec_ = cppmsboost::asio::error::timed_out;
         return traits_type::eof();
       }
 
@@ -434,7 +434,7 @@ protected:
       if (!socket().native_non_blocking())
         socket().native_non_blocking(true, ec_);
       detail::buffer_sequence_adapter<mutable_buffer, mutable_buffer>
-        bufs(boost::asio::buffer(get_buffer_) + putback_max);
+        bufs(cppmsboost::asio::buffer(get_buffer_) + putback_max);
       detail::signed_size_type bytes = detail::socket_ops::recv(
           socket().native_handle(), bufs.buffers(), bufs.count(), 0, ec_);
 
@@ -449,13 +449,13 @@ protected:
       // Check for EOF.
       if (bytes == 0)
       {
-        ec_ = boost::asio::error::eof;
+        ec_ = cppmsboost::asio::error::eof;
         return traits_type::eof();
       }
 
       // Operation failed.
-      if (ec_ != boost::asio::error::would_block
-          && ec_ != boost::asio::error::try_again)
+      if (ec_ != cppmsboost::asio::error::would_block
+          && ec_ != cppmsboost::asio::error::try_again)
         return traits_type::eof();
 
       // Wait for socket to become ready.
@@ -469,7 +469,7 @@ protected:
   int_type overflow(int_type c)
   {
 #if defined(BOOST_ASIO_WINDOWS_RUNTIME)
-    ec_ = boost::asio::error::operation_not_supported;
+    ec_ = cppmsboost::asio::error::operation_not_supported;
     return traits_type::eof();
 #else // defined(BOOST_ASIO_WINDOWS_RUNTIME)
     char_type ch = traits_type::to_char_type(c);
@@ -480,11 +480,11 @@ protected:
     {
       if (traits_type::eq_int_type(c, traits_type::eof()))
         return traits_type::not_eof(c); // Nothing to do.
-      output_buffer = boost::asio::buffer(&ch, sizeof(char_type));
+      output_buffer = cppmsboost::asio::buffer(&ch, sizeof(char_type));
     }
     else
     {
-      output_buffer = boost::asio::buffer(pbase(),
+      output_buffer = cppmsboost::asio::buffer(pbase(),
           (pptr() - pbase()) * sizeof(char_type));
     }
 
@@ -493,7 +493,7 @@ protected:
       // Check if we are past the expiry time.
       if (traits_helper::less_than(expiry_time_, traits_helper::now()))
       {
-        ec_ = boost::asio::error::timed_out;
+        ec_ = cppmsboost::asio::error::timed_out;
         return traits_type::eof();
       }
 
@@ -513,8 +513,8 @@ protected:
       }
 
       // Operation failed.
-      if (ec_ != boost::asio::error::would_block
-          && ec_ != boost::asio::error::try_again)
+      if (ec_ != cppmsboost::asio::error::would_block
+          && ec_ != cppmsboost::asio::error::try_again)
         return traits_type::eof();
 
       // Wait for socket to become ready.
@@ -598,18 +598,18 @@ private:
   void connect_to_endpoints(EndpointIterator begin, EndpointIterator end)
   {
 #if defined(BOOST_ASIO_WINDOWS_RUNTIME)
-    ec_ = boost::asio::error::operation_not_supported;
+    ec_ = cppmsboost::asio::error::operation_not_supported;
 #else // defined(BOOST_ASIO_WINDOWS_RUNTIME)
     if (ec_)
       return;
 
-    ec_ = boost::asio::error::not_found;
+    ec_ = cppmsboost::asio::error::not_found;
     for (EndpointIterator i = begin; i != end; ++i)
     {
       // Check if we are past the expiry time.
       if (traits_helper::less_than(expiry_time_, traits_helper::now()))
       {
-        ec_ = boost::asio::error::timed_out;
+        ec_ = cppmsboost::asio::error::timed_out;
         return;
       }
 
@@ -631,8 +631,8 @@ private:
         return;
 
       // Operation failed.
-      if (ec_ != boost::asio::error::in_progress
-          && ec_ != boost::asio::error::would_block)
+      if (ec_ != cppmsboost::asio::error::in_progress
+          && ec_ != cppmsboost::asio::error::would_block)
         continue;
 
       // Wait for socket to become ready.
@@ -649,8 +649,8 @@ private:
         return;
 
       // Check the result of the connect operation.
-      ec_ = boost::system::error_code(connect_error,
-          boost::asio::error::get_system_category());
+      ec_ = cppmsboost::system::error_code(connect_error,
+          cppmsboost::asio::error::get_system_category());
       if (!ec_)
         return;
     }
@@ -662,7 +662,7 @@ private:
   {
 #if defined(BOOST_ASIO_HAS_BOOST_DATE_TIME) \
   && defined(BOOST_ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
-    return boost::posix_time::pos_infin;
+    return cppmsboost::posix_time::pos_infin;
 #else // defined(BOOST_ASIO_HAS_BOOST_DATE_TIME)
       // && defined(BOOST_ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
     return (time_point::max)();
@@ -671,12 +671,12 @@ private:
   }
 
   enum { putback_max = 8 };
-  boost::system::error_code ec_;
+  cppmsboost::system::error_code ec_;
   time_point expiry_time_;
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

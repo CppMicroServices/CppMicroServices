@@ -14,7 +14,7 @@
 // $Date$
 // $Revision$
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 template< typename Tag > struct O1_size_impl;
 template< typename Sequence > struct O1_size;

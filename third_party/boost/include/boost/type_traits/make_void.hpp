@@ -12,7 +12,7 @@ or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
 template<class...>

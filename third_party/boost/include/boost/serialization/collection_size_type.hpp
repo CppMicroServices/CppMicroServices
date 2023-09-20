@@ -12,7 +12,7 @@
 #include <boost/serialization/split_free.hpp>
 #include <boost/serialization/is_bitwise_serializable.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 
 //BOOST_STRONG_TYPEDEF(std::size_t, collection_size_type)
@@ -54,7 +54,7 @@ public:
 };
 
 
-} } // end namespace boost::serialization
+} } // end namespace cppmsboost::serialization
 
 BOOST_CLASS_IMPLEMENTATION(collection_size_type, primitive_type)
 BOOST_IS_BITWISE_SERIALIZABLE(collection_size_type)

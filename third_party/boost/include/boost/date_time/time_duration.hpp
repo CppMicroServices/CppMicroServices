@@ -18,7 +18,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_integral.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
 
@@ -34,8 +34,8 @@ namespace date_time {
   */
   template<class T, typename rep_type>
   class BOOST_SYMBOL_VISIBLE time_duration : private
-      boost::less_than_comparable<T
-    , boost::equality_comparable<T
+      cppmsboost::less_than_comparable<T
+    , cppmsboost::equality_comparable<T
     > >
   /* dividable, addable, and subtractable operator templates
    * won't work with this class (MSVC++ 6.0). return type
@@ -282,7 +282,7 @@ namespace date_time {
   /* These templates are designed to work with multiples of
    * 10 for frac_of_second and resolution adjustment
    */
-  template<class base_duration, boost::int64_t frac_of_second>
+  template<class base_duration, cppmsboost::int64_t frac_of_second>
   class BOOST_SYMBOL_VISIBLE subsecond_duration : public base_duration
   {
   public:
@@ -293,13 +293,13 @@ namespace date_time {
     // To avoid integer overflow we precompute the duration resolution conversion coefficient (ticket #3471)
     BOOST_STATIC_ASSERT_MSG((traits_type::ticks_per_second >= frac_of_second ? traits_type::ticks_per_second % frac_of_second : frac_of_second % traits_type::ticks_per_second) == 0,\
       "The base duration resolution must be a multiple of the subsecond duration resolution");
-    BOOST_STATIC_CONSTANT(boost::int64_t, adjustment_ratio = (traits_type::ticks_per_second >= frac_of_second ? traits_type::ticks_per_second / frac_of_second : frac_of_second / traits_type::ticks_per_second));
+    BOOST_STATIC_CONSTANT(cppmsboost::int64_t, adjustment_ratio = (traits_type::ticks_per_second >= frac_of_second ? traits_type::ticks_per_second / frac_of_second : frac_of_second / traits_type::ticks_per_second));
 
   public:
     // The argument (ss) must be an integral type
     template <typename T>
     BOOST_CXX14_CONSTEXPR explicit subsecond_duration(T const& ss,
-                                                      typename boost::enable_if<boost::is_integral<T>,
+                                                      typename cppmsboost::enable_if<cppmsboost::is_integral<T>,
                                                         void>::type* = BOOST_DATE_TIME_NULLPTR) :
       base_duration(impl_type(traits_type::ticks_per_second >= frac_of_second ? ss * adjustment_ratio : ss / adjustment_ratio))
     {

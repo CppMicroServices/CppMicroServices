@@ -12,7 +12,7 @@
 #include <boost/cstdint.hpp>
 #include <iosfwd>
 
-namespace boost
+namespace cppmsboost
 {
 
 struct source_location
@@ -21,8 +21,8 @@ private:
 
     char const * file_;
     char const * function_;
-    boost::uint_least32_t line_;
-    boost::uint_least32_t column_;
+    cppmsboost::uint_least32_t line_;
+    cppmsboost::uint_least32_t column_;
 
 public:
 
@@ -30,7 +30,7 @@ public:
     {
     }
 
-    BOOST_CONSTEXPR source_location( char const * file, boost::uint_least32_t ln, char const * function, boost::uint_least32_t col = 0 ) BOOST_NOEXCEPT: file_( file ), function_( function ), line_( ln ), column_( col )
+    BOOST_CONSTEXPR source_location( char const * file, cppmsboost::uint_least32_t ln, char const * function, cppmsboost::uint_least32_t col = 0 ) BOOST_NOEXCEPT: file_( file ), function_( function ), line_( ln ), column_( col )
     {
     }
 
@@ -44,12 +44,12 @@ public:
         return function_;
     }
 
-    BOOST_CONSTEXPR boost::uint_least32_t line() const BOOST_NOEXCEPT
+    BOOST_CONSTEXPR cppmsboost::uint_least32_t line() const BOOST_NOEXCEPT
     {
         return line_;
     }
 
-    BOOST_CONSTEXPR boost::uint_least32_t column() const BOOST_NOEXCEPT
+    BOOST_CONSTEXPR cppmsboost::uint_least32_t column() const BOOST_NOEXCEPT
     {
         return column_;
     }
@@ -78,15 +78,15 @@ template<class E, class T> std::basic_ostream<E, T> & operator<<( std::basic_ost
     return os;
 }
 
-} // namespace boost
+} // namespace cppmsboost
 
 #if defined( BOOST_DISABLE_CURRENT_LOCATION )
 
-#  define BOOST_CURRENT_LOCATION ::boost::source_location()
+#  define BOOST_CURRENT_LOCATION ::cppmsboost::source_location()
 
 #else
 
-#  define BOOST_CURRENT_LOCATION ::boost::source_location(__FILE__, __LINE__, BOOST_CURRENT_FUNCTION)
+#  define BOOST_CURRENT_LOCATION ::cppmsboost::source_location(__FILE__, __LINE__, BOOST_CURRENT_FUNCTION)
 
 #endif
 

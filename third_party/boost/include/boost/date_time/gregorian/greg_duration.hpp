@@ -14,19 +14,19 @@
 #include <boost/date_time/int_adapter.hpp>
 #include <boost/date_time/special_defs.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace gregorian {
 
   //!An internal date representation that includes infinities, not a date
-  typedef boost::date_time::duration_traits_adapted date_duration_rep;
+  typedef cppmsboost::date_time::duration_traits_adapted date_duration_rep;
 
   //! Durations in days for gregorian system
   /*! \ingroup date_basics
    */
   class BOOST_SYMBOL_VISIBLE date_duration :
-    public boost::date_time::date_duration< date_duration_rep >
+    public cppmsboost::date_time::date_duration< date_duration_rep >
   {
-    typedef boost::date_time::date_duration< date_duration_rep > base_type;
+    typedef cppmsboost::date_time::date_duration< date_duration_rep > base_type;
 
   public:
     typedef base_type::duration_rep duration_rep;

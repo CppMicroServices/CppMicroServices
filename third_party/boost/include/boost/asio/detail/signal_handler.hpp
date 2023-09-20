@@ -26,7 +26,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -45,12 +45,12 @@ public:
   }
 
   static void do_complete(void* owner, operation* base,
-      const boost::system::error_code& /*ec*/,
+      const cppmsboost::system::error_code& /*ec*/,
       std::size_t /*bytes_transferred*/)
   {
     // Take ownership of the handler object.
     signal_handler* h(static_cast<signal_handler*>(base));
-    ptr p = { boost::asio::detail::addressof(h->handler_), h, h };
+    ptr p = { cppmsboost::asio::detail::addressof(h->handler_), h, h };
     handler_work<Handler, IoExecutor> w(h->handler_, h->io_executor_);
 
     BOOST_ASIO_HANDLER_COMPLETION((*h));
@@ -61,9 +61,9 @@ public:
     // with the handler. Consequently, a local copy of the handler is required
     // to ensure that any owning sub-object remains valid until after we have
     // deallocated the memory here.
-    detail::binder2<Handler, boost::system::error_code, int>
+    detail::binder2<Handler, cppmsboost::system::error_code, int>
       handler(h->handler_, h->ec_, h->signal_number_);
-    p.h = boost::asio::detail::addressof(handler.handler_);
+    p.h = cppmsboost::asio::detail::addressof(handler.handler_);
     p.reset();
 
     // Make the upcall if required.
@@ -83,7 +83,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

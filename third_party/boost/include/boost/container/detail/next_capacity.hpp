@@ -25,7 +25,7 @@
 
 #include <boost/static_assert.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 namespace dtl {
 
@@ -72,6 +72,6 @@ struct growth_factor_100
 {};
 
 }  //namespace container {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif   //#ifndef BOOST_CONTAINER_DETAIL_NEXT_CAPACITY_HPP

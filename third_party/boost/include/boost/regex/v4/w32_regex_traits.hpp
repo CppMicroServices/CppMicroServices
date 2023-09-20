@@ -56,7 +56,7 @@
 #endif
 #endif
 
-namespace boost{ 
+namespace cppmsboost{ 
 
 //
 // forward declaration is needed by some compilers:
@@ -69,8 +69,8 @@ namespace BOOST_REGEX_DETAIL_NS{
 //
 // start by typedeffing the types we'll need:
 //
-typedef ::boost::uint32_t lcid_type;   // placeholder for LCID.
-typedef ::boost::shared_ptr<void> cat_type; // placeholder for dll HANDLE.
+typedef ::cppmsboost::uint32_t lcid_type;   // placeholder for LCID.
+typedef ::cppmsboost::shared_ptr<void> cat_type; // placeholder for dll HANDLE.
 
 //
 // then add wrappers around the actual Win32 API's (ie implementation hiding):
@@ -116,11 +116,11 @@ BOOST_REGEX_DECL char BOOST_REGEX_CALL w32_toupper(char c, lcid_type);
 #ifndef BOOST_NO_WREGEX
 BOOST_REGEX_DECL wchar_t BOOST_REGEX_CALL w32_toupper(wchar_t c, lcid_type);
 #endif
-BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is(lcid_type, boost::uint32_t mask, char c);
+BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is(lcid_type, cppmsboost::uint32_t mask, char c);
 #ifndef BOOST_NO_WREGEX
-BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is(lcid_type, boost::uint32_t mask, wchar_t c);
+BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is(lcid_type, cppmsboost::uint32_t mask, wchar_t c);
 #ifdef BOOST_REGEX_HAS_OTHER_WCHAR_T
-BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is(lcid_type state_id, boost::uint32_t m, unsigned short c);
+BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is(lcid_type state_id, cppmsboost::uint32_t m, unsigned short c);
 #endif
 #endif
 //
@@ -168,19 +168,19 @@ public:
       map_iterator_type i = m_char_map.find(c);
       if(i == m_char_map.end())
       {
-         if(::boost::BOOST_REGEX_DETAIL_NS::w32_is_lower(c, this->m_locale)) return regex_constants::escape_type_class;
-         if(::boost::BOOST_REGEX_DETAIL_NS::w32_is_upper(c, this->m_locale)) return regex_constants::escape_type_not_class;
+         if(::cppmsboost::BOOST_REGEX_DETAIL_NS::w32_is_lower(c, this->m_locale)) return regex_constants::escape_type_class;
+         if(::cppmsboost::BOOST_REGEX_DETAIL_NS::w32_is_upper(c, this->m_locale)) return regex_constants::escape_type_not_class;
          return 0;
       }
       return i->second;
    }
    charT tolower(charT c)const
    {
-      return ::boost::BOOST_REGEX_DETAIL_NS::w32_tolower(c, this->m_locale);
+      return ::cppmsboost::BOOST_REGEX_DETAIL_NS::w32_tolower(c, this->m_locale);
    }
-   bool isctype(boost::uint32_t mask, charT c)const
+   bool isctype(cppmsboost::uint32_t mask, charT c)const
    {
-      return ::boost::BOOST_REGEX_DETAIL_NS::w32_is(this->m_locale, mask, c);
+      return ::cppmsboost::BOOST_REGEX_DETAIL_NS::w32_is(this->m_locale, mask, c);
    }
 
 private:
@@ -190,7 +190,7 @@ private:
 };
 
 template <class charT>
-w32_regex_traits_char_layer<charT>::w32_regex_traits_char_layer(::boost::BOOST_REGEX_DETAIL_NS::lcid_type l) 
+w32_regex_traits_char_layer<charT>::w32_regex_traits_char_layer(::cppmsboost::BOOST_REGEX_DETAIL_NS::lcid_type l) 
    : w32_regex_traits_base<charT>(l)
 {
    // we need to start by initialising our syntax map so we know which
@@ -199,12 +199,12 @@ w32_regex_traits_char_layer<charT>::w32_regex_traits_char_layer(::boost::BOOST_R
    std::string cat_name(w32_regex_traits<charT>::get_catalog_name());
    if(cat_name.size())
    {
-      cat = ::boost::BOOST_REGEX_DETAIL_NS::w32_cat_open(cat_name);
+      cat = ::cppmsboost::BOOST_REGEX_DETAIL_NS::w32_cat_open(cat_name);
       if(!cat)
       {
          std::string m("Unable to open message catalog: ");
          std::runtime_error err(m + cat_name);
-         boost::BOOST_REGEX_DETAIL_NS::raise_runtime_error(err);
+         cppmsboost::BOOST_REGEX_DETAIL_NS::raise_runtime_error(err);
       }
    }
    //
@@ -214,7 +214,7 @@ w32_regex_traits_char_layer<charT>::w32_regex_traits_char_layer(::boost::BOOST_R
    {
       for(regex_constants::syntax_type i = 1; i < regex_constants::syntax_max; ++i)
       {
-         string_type mss = ::boost::BOOST_REGEX_DETAIL_NS::w32_cat_get(cat, this->m_locale, i, get_default_message(i));
+         string_type mss = ::cppmsboost::BOOST_REGEX_DETAIL_NS::w32_cat_get(cat, this->m_locale, i, get_default_message(i));
          for(typename string_type::size_type j = 0; j < mss.size(); ++j)
          {
             this->m_char_map[mss[j]] = i;
@@ -257,7 +257,7 @@ class BOOST_REGEX_DECL w32_regex_traits_char_layer<char> : public w32_regex_trai
 {
    typedef std::string string_type;
 public:
-   w32_regex_traits_char_layer(::boost::BOOST_REGEX_DETAIL_NS::lcid_type l)
+   w32_regex_traits_char_layer(::cppmsboost::BOOST_REGEX_DETAIL_NS::lcid_type l)
    : w32_regex_traits_base<char>(l)
    {
       init();
@@ -275,7 +275,7 @@ public:
    {
       return m_lower_map[static_cast<unsigned char>(c)];
    }
-   bool isctype(boost::uint32_t mask, char c)const
+   bool isctype(cppmsboost::uint32_t mask, char c)const
    {
       return m_type_map[static_cast<unsigned char>(c)] & mask;
    }
@@ -283,7 +283,7 @@ public:
 private:
    regex_constants::syntax_type m_char_map[1u << CHAR_BIT];
    char m_lower_map[1u << CHAR_BIT];
-   boost::uint16_t m_type_map[1u << CHAR_BIT];
+   cppmsboost::uint16_t m_type_map[1u << CHAR_BIT];
    void init();
 };
 
@@ -304,7 +304,7 @@ public:
 
    typedef std::basic_string<charT> string_type;
    typedef charT char_type;
-   w32_regex_traits_implementation(::boost::BOOST_REGEX_DETAIL_NS::lcid_type l);
+   w32_regex_traits_implementation(::cppmsboost::BOOST_REGEX_DETAIL_NS::lcid_type l);
    std::string error_string(regex_constants::error_type n) const
    {
       if(!m_error_strings.empty())
@@ -331,7 +331,7 @@ public:
    string_type transform_primary(const charT* p1, const charT* p2) const;
    string_type transform(const charT* p1, const charT* p2) const
    {
-      return ::boost::BOOST_REGEX_DETAIL_NS::w32_transform(this->m_locale, p1, p2);
+      return ::cppmsboost::BOOST_REGEX_DETAIL_NS::w32_transform(this->m_locale, p1, p2);
    }
 private:
    std::map<int, std::string>     m_error_strings;   // error messages indexed by numberic ID
@@ -434,19 +434,19 @@ typename w32_regex_traits_implementation<charT>::string_type
 }
 
 template <class charT>
-w32_regex_traits_implementation<charT>::w32_regex_traits_implementation(::boost::BOOST_REGEX_DETAIL_NS::lcid_type l)
+w32_regex_traits_implementation<charT>::w32_regex_traits_implementation(::cppmsboost::BOOST_REGEX_DETAIL_NS::lcid_type l)
 : w32_regex_traits_char_layer<charT>(l)
 {
    cat_type cat;
    std::string cat_name(w32_regex_traits<charT>::get_catalog_name());
    if(cat_name.size())
    {
-      cat = ::boost::BOOST_REGEX_DETAIL_NS::w32_cat_open(cat_name);
+      cat = ::cppmsboost::BOOST_REGEX_DETAIL_NS::w32_cat_open(cat_name);
       if(!cat)
       {
          std::string m("Unable to open message catalog: ");
          std::runtime_error err(m + cat_name);
-         boost::BOOST_REGEX_DETAIL_NS::raise_runtime_error(err);
+         cppmsboost::BOOST_REGEX_DETAIL_NS::raise_runtime_error(err);
       }
    }
    //
@@ -457,9 +457,9 @@ w32_regex_traits_implementation<charT>::w32_regex_traits_implementation(::boost:
       //
       // Error messages:
       //
-      for(boost::regex_constants::error_type i = static_cast<boost::regex_constants::error_type>(0); 
-         i <= boost::regex_constants::error_unknown; 
-         i = static_cast<boost::regex_constants::error_type>(i + 1))
+      for(cppmsboost::regex_constants::error_type i = static_cast<cppmsboost::regex_constants::error_type>(0); 
+         i <= cppmsboost::regex_constants::error_unknown; 
+         i = static_cast<cppmsboost::regex_constants::error_type>(i + 1))
       {
          const char* p = get_default_error_string(i);
          string_type default_message;
@@ -468,7 +468,7 @@ w32_regex_traits_implementation<charT>::w32_regex_traits_implementation(::boost:
             default_message.append(1, static_cast<charT>(*p));
             ++p;
          }
-         string_type s = ::boost::BOOST_REGEX_DETAIL_NS::w32_cat_get(cat, this->m_locale, i+200, default_message);
+         string_type s = ::cppmsboost::BOOST_REGEX_DETAIL_NS::w32_cat_get(cat, this->m_locale, i+200, default_message);
          std::string result;
          for(std::string::size_type j = 0; j < s.size(); ++j)
          {
@@ -499,7 +499,7 @@ w32_regex_traits_implementation<charT>::w32_regex_traits_implementation(::boost:
       static const string_type null_string;
       for(unsigned int j = 0; j <= 13; ++j)
       {
-         string_type s(::boost::BOOST_REGEX_DETAIL_NS::w32_cat_get(cat, this->m_locale, j+300, null_string));
+         string_type s(::cppmsboost::BOOST_REGEX_DETAIL_NS::w32_cat_get(cat, this->m_locale, j+300, null_string));
          if(s.size())
             this->m_custom_class_names[s] = masks[j];
       }
@@ -554,10 +554,10 @@ typename w32_regex_traits_implementation<charT>::char_class_type
 
 
 template <class charT>
-boost::shared_ptr<const w32_regex_traits_implementation<charT> > create_w32_regex_traits(::boost::BOOST_REGEX_DETAIL_NS::lcid_type l)
+cppmsboost::shared_ptr<const w32_regex_traits_implementation<charT> > create_w32_regex_traits(::cppmsboost::BOOST_REGEX_DETAIL_NS::lcid_type l)
 {
    // TODO: create a cache for previously constructed objects.
-   return boost::object_cache< ::boost::BOOST_REGEX_DETAIL_NS::lcid_type, w32_regex_traits_implementation<charT> >::get(l, 5);
+   return cppmsboost::object_cache< ::cppmsboost::BOOST_REGEX_DETAIL_NS::lcid_type, w32_regex_traits_implementation<charT> >::get(l, 5);
 }
 
 } // BOOST_REGEX_DETAIL_NS
@@ -569,13 +569,13 @@ public:
    typedef charT                         char_type;
    typedef std::size_t                   size_type;
    typedef std::basic_string<char_type>  string_type;
-   typedef ::boost::BOOST_REGEX_DETAIL_NS::lcid_type locale_type;
-   typedef boost::uint_least32_t         char_class_type;
+   typedef ::cppmsboost::BOOST_REGEX_DETAIL_NS::lcid_type locale_type;
+   typedef cppmsboost::uint_least32_t         char_class_type;
 
    struct boost_extensions_tag{};
 
    w32_regex_traits()
-      : m_pimpl(BOOST_REGEX_DETAIL_NS::create_w32_regex_traits<charT>(::boost::BOOST_REGEX_DETAIL_NS::w32_get_default_locale()))
+      : m_pimpl(BOOST_REGEX_DETAIL_NS::create_w32_regex_traits<charT>(::cppmsboost::BOOST_REGEX_DETAIL_NS::w32_get_default_locale()))
    { }
    static size_type length(const char_type* p)
    {
@@ -607,11 +607,11 @@ public:
    }
    charT toupper(charT c) const
    {
-      return ::boost::BOOST_REGEX_DETAIL_NS::w32_toupper(c, this->m_pimpl->m_locale);
+      return ::cppmsboost::BOOST_REGEX_DETAIL_NS::w32_toupper(c, this->m_pimpl->m_locale);
    }
    string_type transform(const charT* p1, const charT* p2) const
    {
-      return ::boost::BOOST_REGEX_DETAIL_NS::w32_transform(this->m_pimpl->m_locale, p1, p2);
+      return ::cppmsboost::BOOST_REGEX_DETAIL_NS::w32_transform(this->m_pimpl->m_locale, p1, p2);
    }
    string_type transform_primary(const charT* p1, const charT* p2) const
    {
@@ -635,25 +635,25 @@ public:
       else if((f & BOOST_REGEX_DETAIL_NS::w32_regex_traits_implementation<charT>::mask_word) && (c == '_'))
          return true;
       else if((f & BOOST_REGEX_DETAIL_NS::w32_regex_traits_implementation<charT>::mask_vertical)
-         && (::boost::BOOST_REGEX_DETAIL_NS::is_separator(c) || (c == '\v')))
+         && (::cppmsboost::BOOST_REGEX_DETAIL_NS::is_separator(c) || (c == '\v')))
          return true;
       else if((f & BOOST_REGEX_DETAIL_NS::w32_regex_traits_implementation<charT>::mask_horizontal) 
          && this->isctype(c, 0x0008u) && !this->isctype(c, BOOST_REGEX_DETAIL_NS::w32_regex_traits_implementation<charT>::mask_vertical))
          return true;
       return false;
    }
-   boost::intmax_t toi(const charT*& p1, const charT* p2, int radix)const
+   cppmsboost::intmax_t toi(const charT*& p1, const charT* p2, int radix)const
    {
-      return ::boost::BOOST_REGEX_DETAIL_NS::global_toi(p1, p2, radix, *this);
+      return ::cppmsboost::BOOST_REGEX_DETAIL_NS::global_toi(p1, p2, radix, *this);
    }
    int value(charT c, int radix)const
    {
-      int result = (int)::boost::BOOST_REGEX_DETAIL_NS::global_value(c);
+      int result = (int)::cppmsboost::BOOST_REGEX_DETAIL_NS::global_value(c);
       return result < radix ? result : -1;
    }
    locale_type imbue(locale_type l)
    {
-      ::boost::BOOST_REGEX_DETAIL_NS::lcid_type result(getloc());
+      ::cppmsboost::BOOST_REGEX_DETAIL_NS::lcid_type result(getloc());
       m_pimpl = BOOST_REGEX_DETAIL_NS::create_w32_regex_traits<charT>(l);
       return result;
    }
@@ -674,7 +674,7 @@ public:
    static std::string get_catalog_name();
 
 private:
-   boost::shared_ptr<const BOOST_REGEX_DETAIL_NS::w32_regex_traits_implementation<charT> > m_pimpl;
+   cppmsboost::shared_ptr<const BOOST_REGEX_DETAIL_NS::w32_regex_traits_implementation<charT> > m_pimpl;
    //
    // catalog name handler:
    //

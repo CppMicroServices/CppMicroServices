@@ -24,7 +24,7 @@
 #   include <boost/mpl/aux_/lambda_arity_param.hpp>
 #   include <boost/mpl/aux_/template_arity_fwd.hpp>
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 template< 
       typename T = na
@@ -41,7 +41,7 @@ struct lambda;
 
 #   include <boost/mpl/bool.hpp>
 
-namespace boost { namespace mpl {
+namespace cppmsboost { namespace mpl {
 
 template< 
       typename T = na

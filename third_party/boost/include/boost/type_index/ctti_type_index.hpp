@@ -10,9 +10,9 @@
 #define BOOST_TYPE_INDEX_CTTI_TYPE_INDEX_HPP
 
 /// \file ctti_type_index.hpp
-/// \brief Contains boost::typeindex::ctti_type_index class that is constexpr if C++14 constexpr is supported by compiler.
+/// \brief Contains cppmsboost::typeindex::ctti_type_index class that is constexpr if C++14 constexpr is supported by compiler.
 ///
-/// boost::typeindex::ctti_type_index class can be used as a drop-in replacement
+/// cppmsboost::typeindex::ctti_type_index class can be used as a drop-in replacement
 /// for std::type_index.
 ///
 /// It is used in situations when typeid() method is not available or 
@@ -31,7 +31,7 @@
 # pragma once
 #endif
 
-namespace boost { namespace typeindex {
+namespace cppmsboost { namespace typeindex {
 
 namespace detail {
 
@@ -86,7 +86,7 @@ inline const detail::ctti_data& ctti_construct() BOOST_NOEXCEPT {
     // value.
     //
     // Alignments are checked in `type_index_test_ctti_alignment.cpp` test.
-    return *reinterpret_cast<const detail::ctti_data*>(boost::detail::ctti<T>::n());
+    return *reinterpret_cast<const detail::ctti_data*>(cppmsboost::detail::ctti<T>::n());
 }
 
 /// \class ctti_type_index
@@ -115,7 +115,7 @@ public:
     typedef detail::ctti_data type_info_t;
 
     BOOST_CXX14_CONSTEXPR inline ctti_type_index() BOOST_NOEXCEPT
-        : data_(boost::detail::ctti<void>::n())
+        : data_(cppmsboost::detail::ctti<void>::n())
     {}
 
     inline ctti_type_index(const type_info_t& data) BOOST_NOEXCEPT
@@ -150,28 +150,28 @@ inline const ctti_type_index::type_info_t& ctti_type_index::type_info() const BO
 BOOST_CXX14_CONSTEXPR inline bool ctti_type_index::equal(const ctti_type_index& rhs) const BOOST_NOEXCEPT {
     const char* const left = raw_name();
     const char* const right = rhs.raw_name();
-    return /*left == right ||*/ !boost::typeindex::detail::constexpr_strcmp(left, right);
+    return /*left == right ||*/ !cppmsboost::typeindex::detail::constexpr_strcmp(left, right);
 }
 
 BOOST_CXX14_CONSTEXPR inline bool ctti_type_index::before(const ctti_type_index& rhs) const BOOST_NOEXCEPT {
     const char* const left = raw_name();
     const char* const right = rhs.raw_name();
-    return /*left != right &&*/ boost::typeindex::detail::constexpr_strcmp(left, right) < 0;
+    return /*left != right &&*/ cppmsboost::typeindex::detail::constexpr_strcmp(left, right) < 0;
 }
 
 
 template <class T>
 BOOST_CXX14_CONSTEXPR inline ctti_type_index ctti_type_index::type_id() BOOST_NOEXCEPT {
-    typedef BOOST_DEDUCED_TYPENAME boost::remove_reference<T>::type no_ref_t;
-    typedef BOOST_DEDUCED_TYPENAME boost::remove_cv<no_ref_t>::type no_cvr_t;
-    return ctti_type_index(boost::detail::ctti<no_cvr_t>::n());
+    typedef BOOST_DEDUCED_TYPENAME cppmsboost::remove_reference<T>::type no_ref_t;
+    typedef BOOST_DEDUCED_TYPENAME cppmsboost::remove_cv<no_ref_t>::type no_cvr_t;
+    return ctti_type_index(cppmsboost::detail::ctti<no_cvr_t>::n());
 }
 
 
 
 template <class T>
 BOOST_CXX14_CONSTEXPR inline ctti_type_index ctti_type_index::type_id_with_cvr() BOOST_NOEXCEPT {
-    return ctti_type_index(boost::detail::ctti<T>::n());
+    return ctti_type_index(cppmsboost::detail::ctti<T>::n());
 }
 
 
@@ -203,11 +203,11 @@ inline std::string ctti_type_index::pretty_name() const {
 
 
 inline std::size_t ctti_type_index::hash_code() const BOOST_NOEXCEPT {
-    return boost::hash_range(raw_name(), raw_name() + get_raw_name_length());
+    return cppmsboost::hash_range(raw_name(), raw_name() + get_raw_name_length());
 }
 
 
-}} // namespace boost::typeindex
+}} // namespace cppmsboost::typeindex
 
 #endif // BOOST_TYPE_INDEX_CTTI_TYPE_INDEX_HPP
 

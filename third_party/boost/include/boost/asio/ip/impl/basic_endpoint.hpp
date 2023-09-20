@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
@@ -30,13 +30,13 @@ std::basic_ostream<Elem, Traits>& operator<<(
     std::basic_ostream<Elem, Traits>& os,
     const basic_endpoint<InternetProtocol>& endpoint)
 {
-  boost::asio::ip::detail::endpoint tmp_ep(endpoint.address(), endpoint.port());
+  cppmsboost::asio::ip::detail::endpoint tmp_ep(endpoint.address(), endpoint.port());
   return os << tmp_ep.to_string().c_str();
 }
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

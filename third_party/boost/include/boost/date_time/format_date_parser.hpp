@@ -31,7 +31,7 @@ namespace std {
   using ::isdigit;
 }
 #endif
-namespace boost { namespace date_time {
+namespace cppmsboost { namespace date_time {
 
 //! Helper function for parsing fixed length strings into integers
 /*! Will consume 'length' number of characters from stream. Consumed
@@ -69,7 +69,7 @@ fixed_string_to_int(std::istreambuf_iterator<charT>& itr,
     return i;
   }
   try {
-    i = boost::lexical_cast<int_type>(mr.cache);
+    i = cppmsboost::lexical_cast<int_type>(mr.cache);
   }catch(bad_lexical_cast&){
     // we want to return -1 if the cast fails so nothing to do here
   }
@@ -113,7 +113,7 @@ var_string_to_int(std::istreambuf_iterator<charT>& itr,
   }
   int_type i = static_cast<int_type>(-1);
   if(!s.empty()) {
-    i = boost::lexical_cast<int_type>(s);
+    i = cppmsboost::lexical_cast<int_type>(s);
   }
   return i;
 }

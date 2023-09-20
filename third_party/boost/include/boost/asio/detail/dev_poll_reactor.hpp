@@ -37,7 +37,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -54,7 +54,7 @@ public:
   };
 
   // Constructor.
-  BOOST_ASIO_DECL dev_poll_reactor(boost::asio::execution_context& ctx);
+  BOOST_ASIO_DECL dev_poll_reactor(cppmsboost::asio::execution_context& ctx);
 
   // Destructor.
   BOOST_ASIO_DECL ~dev_poll_reactor();
@@ -64,7 +64,7 @@ public:
 
   // Recreate internal descriptors following a fork.
   BOOST_ASIO_DECL void notify_fork(
-      boost::asio::execution_context::fork_event fork_ev);
+      cppmsboost::asio::execution_context::fork_event fork_ev);
 
   // Initialise the task.
   BOOST_ASIO_DECL void init_task();
@@ -171,7 +171,7 @@ private:
   // function of the handler objects will be invoked. This function does not
   // acquire the dev_poll_reactor's mutex.
   BOOST_ASIO_DECL void cancel_ops_unlocked(socket_type descriptor,
-      const boost::system::error_code& ec);
+      const cppmsboost::system::error_code& ec);
 
   // Add a pending event entry for the given descriptor.
   BOOST_ASIO_DECL ::pollfd& add_pending_event_change(int descriptor);
@@ -180,7 +180,7 @@ private:
   scheduler& scheduler_;
 
   // Mutex to protect access to internal data.
-  boost::asio::detail::mutex mutex_;
+  cppmsboost::asio::detail::mutex mutex_;
 
   // The /dev/poll file descriptor.
   int dev_poll_fd_;
@@ -206,7 +206,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 inline system_context& system_executor::context() const BOOST_ASIO_NOEXCEPT
@@ -36,7 +36,7 @@ void system_executor::dispatch(
     BOOST_ASIO_MOVE_ARG(Function) f, const Allocator&) const
 {
   typename decay<Function>::type tmp(BOOST_ASIO_MOVE_CAST(Function)(f));
-  boost_asio_handler_invoke_helpers::invoke(tmp, tmp);
+  cppmsboost_asio_handler_invoke_helpers::invoke(tmp, tmp);
 }
 
 template <typename Function, typename Allocator>
@@ -80,7 +80,7 @@ void system_executor::defer(
 }
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

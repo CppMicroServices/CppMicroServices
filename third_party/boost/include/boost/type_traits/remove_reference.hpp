@@ -12,7 +12,7 @@
 #include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 
 namespace detail{
@@ -35,7 +35,7 @@ struct remove_rvalue_ref<T&&>
 
 } // namespace detail
 
-template <class T> struct remove_reference{ typedef typename boost::detail::remove_rvalue_ref<T>::type type; };
+template <class T> struct remove_reference{ typedef typename cppmsboost::detail::remove_rvalue_ref<T>::type type; };
 template <class T> struct remove_reference<T&>{ typedef T type; };
 
 #if defined(BOOST_ILLEGAL_CV_REFERENCES)
@@ -54,6 +54,6 @@ template <class T> struct remove_reference<T&const volatile>{ typedef T type; };
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_REMOVE_REFERENCE_HPP_INCLUDED

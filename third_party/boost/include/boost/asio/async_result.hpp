@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 #if defined(BOOST_ASIO_HAS_CONCEPTS) \
@@ -64,7 +64,7 @@ BOOST_ASIO_CONCEPT completion_signature =
   detail::is_completion_signature<T>::value;
 
 #define BOOST_ASIO_COMPLETION_SIGNATURE \
-  ::boost::asio::completion_signature
+  ::cppmsboost::asio::completion_signature
 
 template <typename T, typename Signature>
 BOOST_ASIO_CONCEPT completion_handler_for =
@@ -72,7 +72,7 @@ BOOST_ASIO_CONCEPT completion_handler_for =
     && detail::is_completion_handler_for<T, Signature>::value;
 
 #define BOOST_ASIO_COMPLETION_HANDLER_FOR(s) \
-  ::boost::asio::completion_handler_for<s>
+  ::cppmsboost::asio::completion_handler_for<s>
 
 #else // defined(BOOST_ASIO_HAS_CONCEPTS)
       //   && defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
@@ -207,9 +207,8 @@ template <typename CompletionToken, BOOST_ASIO_COMPLETION_SIGNATURE Signature>
 struct async_completion
 {
   /// The real handler type to be used for the asynchronous operation.
-  typedef typename boost::asio::async_result<
-    typename decay<CompletionToken>::type,
-      Signature>::completion_handler_type completion_handler_type;
+  typedef typename cppmsboost::asio::async_result<
+    typename decay<CompletionToken>::type, Signature>::completion_handler_type completion_handler_type;
 
 #if defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Constructor.
@@ -299,18 +298,18 @@ struct async_result_has_initiate_memfn
   void_or_deduced
 #elif defined(_MSC_VER) && (_MSC_VER < 1500)
 # define BOOST_ASIO_INITFN_RESULT_TYPE(ct, sig) \
-  typename ::boost::asio::detail::async_result_helper< \
+  typename ::cppmsboost::asio::detail::async_result_helper< \
     ct, sig>::return_type
 #define BOOST_ASIO_HANDLER_TYPE(ct, sig) \
-  typename ::boost::asio::detail::async_result_helper< \
+  typename ::cppmsboost::asio::detail::async_result_helper< \
     ct, sig>::completion_handler_type
 #else
 # define BOOST_ASIO_INITFN_RESULT_TYPE(ct, sig) \
-  typename ::boost::asio::async_result< \
-    typename ::boost::asio::decay<ct>::type, sig>::return_type
+  typename ::cppmsboost::asio::async_result< \
+    typename ::cppmsboost::asio::decay<ct>::type, sig>::return_type
 #define BOOST_ASIO_HANDLER_TYPE(ct, sig) \
-  typename ::boost::asio::async_result< \
-    typename ::boost::asio::decay<ct>::type, sig>::completion_handler_type
+  typename ::cppmsboost::asio::async_result< \
+    typename ::cppmsboost::asio::decay<ct>::type, sig>::completion_handler_type
 #endif
 
 #if defined(GENERATION_DOCUMENTATION)
@@ -499,7 +498,7 @@ BOOST_ASIO_CONCEPT completion_token_for =
   };
 
 #define BOOST_ASIO_COMPLETION_TOKEN_FOR(s) \
-  ::boost::asio::completion_token_for<s>
+  ::cppmsboost::asio::completion_token_for<s>
 
 #else // defined(BOOST_ASIO_HAS_CONCEPTS)
       //   && defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
@@ -572,9 +571,9 @@ using default_completion_token_t = typename default_completion_token<T>::type;
 #if defined(BOOST_ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS)
 
 #define BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(e) \
-  = typename ::boost::asio::default_completion_token<e>::type
+  = typename ::cppmsboost::asio::default_completion_token<e>::type
 #define BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(e) \
-  = typename ::boost::asio::default_completion_token<e>::type()
+  = typename ::cppmsboost::asio::default_completion_token<e>::type()
 
 #else // defined(BOOST_ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS)
 
@@ -584,7 +583,7 @@ using default_completion_token_t = typename default_completion_token<T>::type;
 #endif // defined(BOOST_ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

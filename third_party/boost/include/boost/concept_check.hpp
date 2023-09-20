@@ -37,7 +37,7 @@
 # pragma warning( disable : 4610 ) // object 'class' can never be instantiated - user-defined constructor required
 #endif
 
-namespace boost
+namespace cppmsboost
 {
 
   //
@@ -87,8 +87,8 @@ namespace boost
   template <> struct Integer<long> {};
   template <> struct Integer<unsigned long> {};
 # if defined(BOOST_HAS_LONG_LONG)
-  template <> struct Integer< ::boost::long_long_type> {};
-  template <> struct Integer< ::boost::ulong_long_type> {};
+  template <> struct Integer< ::cppmsboost::long_long_type> {};
+  template <> struct Integer< ::cppmsboost::ulong_long_type> {};
 # elif defined(BOOST_HAS_MS_INT64)
   template <> struct Integer<__int64> {};
   template <> struct Integer<unsigned __int64> {};
@@ -106,7 +106,7 @@ namespace boost
   template <> struct SignedInteger<int> {};
   template <> struct SignedInteger<long> {};
 # if defined(BOOST_HAS_LONG_LONG)
-  template <> struct SignedInteger< ::boost::long_long_type> {};
+  template <> struct SignedInteger< ::cppmsboost::long_long_type> {};
 # elif defined(BOOST_HAS_MS_INT64)
   template <> struct SignedInteger<__int64> {};
 # endif
@@ -124,7 +124,7 @@ namespace boost
   template <> struct UnsignedInteger<unsigned int> {};
   template <> struct UnsignedInteger<unsigned long> {};
 # if defined(BOOST_HAS_LONG_LONG)
-  template <> struct UnsignedInteger< ::boost::ulong_long_type> {};
+  template <> struct UnsignedInteger< ::cppmsboost::ulong_long_type> {};
 # elif defined(BOOST_HAS_MS_INT64)
   template <> struct UnsignedInteger<unsigned __int64> {};
 # endif
@@ -301,14 +301,14 @@ namespace boost
       BOOST_CONCEPT_USAGE(Generator) { test(is_void<Return>()); }
 
    private:
-      void test(boost::false_type)
+      void test(cppmsboost::false_type)
       {
           // Do we really want a reference here?
           const Return& r = f();
           ignore_unused_variable_warning(r);
       }
 
-      void test(boost::true_type)
+      void test(cppmsboost::true_type)
       {
           f();
       }
@@ -321,14 +321,14 @@ namespace boost
       BOOST_CONCEPT_USAGE(UnaryFunction) { test(is_void<Return>()); }
 
    private:
-      void test(boost::false_type)
+      void test(cppmsboost::false_type)
       {
           f(arg);               // "priming the pump" this way keeps msvc6 happy (ICE)
           Return r = f(arg);
           ignore_unused_variable_warning(r);
       }
 
-      void test(boost::true_type)
+      void test(cppmsboost::true_type)
       {
           f(arg);
       }
@@ -337,7 +337,7 @@ namespace boost
                       && BOOST_WORKAROUND(__GNUC__, > 3)))
       // Declare a dummy constructor to make gcc happy.
       // It seems the compiler can not generate a sensible constructor when this is instantiated with a reference type.
-      // (warning: non-static reference "const double& boost::UnaryFunction<YourClassHere>::arg"
+      // (warning: non-static reference "const double& cppmsboost::UnaryFunction<YourClassHere>::arg"
       // in class without a constructor [-Wuninitialized])
       UnaryFunction();
 #endif
@@ -350,14 +350,14 @@ namespace boost
   {
       BOOST_CONCEPT_USAGE(BinaryFunction) { test(is_void<Return>()); }
    private:
-      void test(boost::false_type)
+      void test(cppmsboost::false_type)
       {
           f(first,second);
           Return r = f(first, second); // require operator()
           (void)r;
       }
 
-      void test(boost::true_type)
+      void test(cppmsboost::true_type)
       {
           f(first,second);
       }
@@ -366,7 +366,7 @@ namespace boost
                       && BOOST_WORKAROUND(__GNUC__, > 3)))
       // Declare a dummy constructor to make gcc happy.
       // It seems the compiler can not generate a sensible constructor when this is instantiated with a reference type.
-      // (warning: non-static reference "const double& boost::BinaryFunction<YourClassHere>::arg"
+      // (warning: non-static reference "const double& cppmsboost::BinaryFunction<YourClassHere>::arg"
       // in class without a constructor [-Wuninitialized])
       BinaryFunction();
 #endif
@@ -386,7 +386,7 @@ namespace boost
                       && BOOST_WORKAROUND(__GNUC__, > 3)))
       // Declare a dummy constructor to make gcc happy.
       // It seems the compiler can not generate a sensible constructor when this is instantiated with a reference type.
-      // (warning: non-static reference "const double& boost::UnaryPredicate<YourClassHere>::arg"
+      // (warning: non-static reference "const double& cppmsboost::UnaryPredicate<YourClassHere>::arg"
       // in class without a constructor [-Wuninitialized])
       UnaryPredicate();
 #endif
@@ -405,7 +405,7 @@ namespace boost
                       && BOOST_WORKAROUND(__GNUC__, > 3)))
       // Declare a dummy constructor to make gcc happy.
       // It seems the compiler can not generate a sensible constructor when this is instantiated with a reference type.
-      // (warning: non-static reference "const double& boost::BinaryPredicate<YourClassHere>::arg"
+      // (warning: non-static reference "const double& cppmsboost::BinaryPredicate<YourClassHere>::arg"
       // in class without a constructor [-Wuninitialized])
       BinaryPredicate();
 #endif
@@ -430,7 +430,7 @@ namespace boost
                       && BOOST_WORKAROUND(__GNUC__, > 3)))
       // Declare a dummy constructor to make gcc happy.
       // It seems the compiler can not generate a sensible constructor when this is instantiated with a reference type.
-      // (warning: non-static reference "const double& boost::Const_BinaryPredicate<YourClassHere>::arg"
+      // (warning: non-static reference "const double& cppmsboost::Const_BinaryPredicate<YourClassHere>::arg"
       // in class without a constructor [-Wuninitialized])
       Const_BinaryPredicate();
 #endif
@@ -966,7 +966,7 @@ namespace boost
       {
           typedef typename C::key_type key_type;
           typedef typename C::value_type value_type;
-          BOOST_STATIC_ASSERT((boost::is_same<key_type,value_type>::value));
+          BOOST_STATIC_ASSERT((cppmsboost::is_same<key_type,value_type>::value));
       }
   };
 
@@ -979,7 +979,7 @@ namespace boost
           typedef typename C::value_type value_type;
           typedef typename C::mapped_type mapped_type;
           typedef std::pair<const key_type, mapped_type> required_value_type;
-          BOOST_STATIC_ASSERT((boost::is_same<value_type,required_value_type>::value));
+          BOOST_STATIC_ASSERT((cppmsboost::is_same<value_type,required_value_type>::value));
       }
   };
 
@@ -1038,9 +1038,9 @@ namespace boost
   {
       BOOST_CONCEPT_USAGE(Collection)
       {
-        boost::function_requires<boost::InputIteratorConcept<iterator> >();
-        boost::function_requires<boost::InputIteratorConcept<const_iterator> >();
-        boost::function_requires<boost::CopyConstructibleConcept<value_type> >();
+        cppmsboost::function_requires<cppmsboost::InputIteratorConcept<iterator> >();
+        cppmsboost::function_requires<cppmsboost::InputIteratorConcept<const_iterator> >();
+        cppmsboost::function_requires<cppmsboost::CopyConstructibleConcept<value_type> >();
         const_constraints(c);
         i = c.begin();
         i = c.end();
@@ -1070,7 +1070,7 @@ namespace boost
       const_iterator ci;
       size_type n;
   };
-} // namespace boost
+} // namespace cppmsboost
 
 #if (defined _MSC_VER)
 # pragma warning( pop )

@@ -28,7 +28,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 namespace descriptor_ops {
@@ -53,62 +53,62 @@ typedef unsigned char state_type;
 
 template <typename ReturnType>
 inline ReturnType error_wrapper(ReturnType return_value,
-    boost::system::error_code& ec)
+    cppmsboost::system::error_code& ec)
 {
-  ec = boost::system::error_code(errno,
-      boost::asio::error::get_system_category());
+  ec = cppmsboost::system::error_code(errno,
+      cppmsboost::asio::error::get_system_category());
   return return_value;
 }
 
 BOOST_ASIO_DECL int open(const char* path, int flags,
-    boost::system::error_code& ec);
+    cppmsboost::system::error_code& ec);
 
 BOOST_ASIO_DECL int close(int d, state_type& state,
-    boost::system::error_code& ec);
+    cppmsboost::system::error_code& ec);
 
 BOOST_ASIO_DECL bool set_user_non_blocking(int d,
-    state_type& state, bool value, boost::system::error_code& ec);
+    state_type& state, bool value, cppmsboost::system::error_code& ec);
 
 BOOST_ASIO_DECL bool set_internal_non_blocking(int d,
-    state_type& state, bool value, boost::system::error_code& ec);
+    state_type& state, bool value, cppmsboost::system::error_code& ec);
 
 typedef iovec buf;
 
 BOOST_ASIO_DECL std::size_t sync_read(int d, state_type state, buf* bufs,
-    std::size_t count, bool all_empty, boost::system::error_code& ec);
+    std::size_t count, bool all_empty, cppmsboost::system::error_code& ec);
 
 BOOST_ASIO_DECL bool non_blocking_read(int d, buf* bufs, std::size_t count,
-    boost::system::error_code& ec, std::size_t& bytes_transferred);
+    cppmsboost::system::error_code& ec, std::size_t& bytes_transferred);
 
 BOOST_ASIO_DECL std::size_t sync_write(int d, state_type state,
     const buf* bufs, std::size_t count, bool all_empty,
-    boost::system::error_code& ec);
+    cppmsboost::system::error_code& ec);
 
 BOOST_ASIO_DECL bool non_blocking_write(int d,
     const buf* bufs, std::size_t count,
-    boost::system::error_code& ec, std::size_t& bytes_transferred);
+    cppmsboost::system::error_code& ec, std::size_t& bytes_transferred);
 
 BOOST_ASIO_DECL int ioctl(int d, state_type& state, long cmd,
-    ioctl_arg_type* arg, boost::system::error_code& ec);
+    ioctl_arg_type* arg, cppmsboost::system::error_code& ec);
 
-BOOST_ASIO_DECL int fcntl(int d, int cmd, boost::system::error_code& ec);
+BOOST_ASIO_DECL int fcntl(int d, int cmd, cppmsboost::system::error_code& ec);
 
 BOOST_ASIO_DECL int fcntl(int d, int cmd,
-    long arg, boost::system::error_code& ec);
+    long arg, cppmsboost::system::error_code& ec);
 
 BOOST_ASIO_DECL int poll_read(int d,
-    state_type state, boost::system::error_code& ec);
+    state_type state, cppmsboost::system::error_code& ec);
 
 BOOST_ASIO_DECL int poll_write(int d,
-    state_type state, boost::system::error_code& ec);
+    state_type state, cppmsboost::system::error_code& ec);
 
 BOOST_ASIO_DECL int poll_error(int d,
-    state_type state, boost::system::error_code& ec);
+    state_type state, cppmsboost::system::error_code& ec);
 
 } // namespace descriptor_ops
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

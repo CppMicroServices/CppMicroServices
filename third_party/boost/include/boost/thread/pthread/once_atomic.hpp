@@ -21,7 +21,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
   struct once_flag;
@@ -44,7 +44,7 @@ namespace boost
     typedef unsigned int atomic_int_type;
 #endif
 
-    typedef boost::atomic<atomic_int_type> atomic_type;
+    typedef cppmsboost::atomic<atomic_int_type> atomic_type;
 
     BOOST_THREAD_DECL bool enter_once_region(once_flag& flag) BOOST_NOEXCEPT;
     BOOST_THREAD_DECL void commit_once_region(once_flag& flag) BOOST_NOEXCEPT;
@@ -70,7 +70,7 @@ namespace boost
     friend thread_detail::atomic_type& thread_detail::get_atomic_storage(once_flag& flag) BOOST_NOEXCEPT;
   };
 
-#define BOOST_ONCE_INIT boost::once_flag()
+#define BOOST_ONCE_INIT cppmsboost::once_flag()
 
   namespace thread_detail
   {
@@ -110,7 +110,7 @@ namespace boost
 #define BOOST_THREAD_INVOKE_RET_VOID detail::invoke<void>
 #define BOOST_THREAD_INVOKE_RET_VOID_CALL
 #else
-#define BOOST_THREAD_INVOKE_RET_VOID boost::bind
+#define BOOST_THREAD_INVOKE_RET_VOID cppmsboost::bind
 #define BOOST_THREAD_INVOKE_RET_VOID_CALL ()
 #endif
 
@@ -125,8 +125,8 @@ namespace boost
       BOOST_TRY
       {
         BOOST_THREAD_INVOKE_RET_VOID(
-                        thread_detail::decay_copy(boost::forward<Function>(f)),
-                        thread_detail::decay_copy(boost::forward<ArgTypes>(args))...
+                        thread_detail::decay_copy(cppmsboost::forward<Function>(f)),
+                        thread_detail::decay_copy(cppmsboost::forward<ArgTypes>(args))...
         ) BOOST_THREAD_INVOKE_RET_VOID_CALL;
       }
       BOOST_CATCH (...)
@@ -242,8 +242,8 @@ namespace boost
       BOOST_TRY
       {
         BOOST_THREAD_INVOKE_RET_VOID(
-            thread_detail::decay_copy(boost::forward<Function>(f)),
-            thread_detail::decay_copy(boost::forward<T1>(p1))
+            thread_detail::decay_copy(cppmsboost::forward<Function>(f)),
+            thread_detail::decay_copy(cppmsboost::forward<T1>(p1))
         ) BOOST_THREAD_INVOKE_RET_VOID_CALL;
       }
       BOOST_CATCH (...)
@@ -263,9 +263,9 @@ namespace boost
       BOOST_TRY
       {
         BOOST_THREAD_INVOKE_RET_VOID(
-            thread_detail::decay_copy(boost::forward<Function>(f)),
-            thread_detail::decay_copy(boost::forward<T1>(p1)),
-            thread_detail::decay_copy(boost::forward<T1>(p2))
+            thread_detail::decay_copy(cppmsboost::forward<Function>(f)),
+            thread_detail::decay_copy(cppmsboost::forward<T1>(p1)),
+            thread_detail::decay_copy(cppmsboost::forward<T1>(p2))
         ) BOOST_THREAD_INVOKE_RET_VOID_CALL;
       }
       BOOST_CATCH (...)
@@ -285,10 +285,10 @@ namespace boost
       BOOST_TRY
       {
         BOOST_THREAD_INVOKE_RET_VOID(
-            thread_detail::decay_copy(boost::forward<Function>(f)),
-            thread_detail::decay_copy(boost::forward<T1>(p1)),
-            thread_detail::decay_copy(boost::forward<T1>(p2)),
-            thread_detail::decay_copy(boost::forward<T1>(p3))
+            thread_detail::decay_copy(cppmsboost::forward<Function>(f)),
+            thread_detail::decay_copy(cppmsboost::forward<T1>(p1)),
+            thread_detail::decay_copy(cppmsboost::forward<T1>(p2)),
+            thread_detail::decay_copy(cppmsboost::forward<T1>(p3))
         ) BOOST_THREAD_INVOKE_RET_VOID_CALL;
 
       }

@@ -28,13 +28,13 @@
 #include <boost/move/algo/detail/is_sorted.hpp>
 #include <boost/move/utility_core.hpp>
 
-namespace boost {  namespace movelib{
+namespace cppmsboost {  namespace movelib{
 
 template <class RandomAccessIterator, class Compare>
 class heap_sort_helper
 {
-   typedef typename boost::movelib::iterator_traits<RandomAccessIterator>::size_type  size_type;
-   typedef typename boost::movelib::iterator_traits<RandomAccessIterator>::value_type value_type;
+   typedef typename cppmsboost::movelib::iterator_traits<RandomAccessIterator>::size_type  size_type;
+   typedef typename cppmsboost::movelib::iterator_traits<RandomAccessIterator>::value_type value_type;
 
    static void adjust_heap(RandomAccessIterator first, size_type hole_index, size_type const len, value_type &value, Compare comp)
    {
@@ -44,23 +44,23 @@ class heap_sort_helper
       while (second_child < len) {
          if (comp(*(first + second_child), *(first + (second_child - 1))))
             second_child--;
-         *(first + hole_index) = boost::move(*(first + second_child));
+         *(first + hole_index) = cppmsboost::move(*(first + second_child));
          hole_index = second_child;
          second_child = 2 * (second_child + 1);
       }
       if (second_child == len) {
-         *(first + hole_index) = boost::move(*(first + (second_child - 1)));
+         *(first + hole_index) = cppmsboost::move(*(first + (second_child - 1)));
          hole_index = second_child - 1;
       }
 
       {  //push_heap-like ending
          size_type parent = (hole_index - 1) / 2;
          while (hole_index > top_index && comp(*(first + parent), value)) {
-            *(first + hole_index) = boost::move(*(first + parent));
+            *(first + hole_index) = cppmsboost::move(*(first + parent));
             hole_index = parent;
             parent = (hole_index - 1) / 2;
          }    
-         *(first + hole_index) = boost::move(value);
+         *(first + hole_index) = cppmsboost::move(value);
       }
    }
 
@@ -71,7 +71,7 @@ class heap_sort_helper
          size_type parent = len/2u - 1u;
 
          do {
-            value_type v(boost::move(*(first + parent)));
+            value_type v(cppmsboost::move(*(first + parent)));
             adjust_heap(first, parent, len, v, comp);
          }while (parent--);
       }
@@ -83,8 +83,8 @@ class heap_sort_helper
       while (len > 1) {
          //move biggest to the safe zone
          --last;
-         value_type v(boost::move(*last));
-         *last = boost::move(*first);
+         value_type v(cppmsboost::move(*last));
+         *last = cppmsboost::move(*first);
          adjust_heap(first, size_type(0), --len, v, comp);
       }
    }
@@ -94,7 +94,7 @@ class heap_sort_helper
    {
       make_heap(first, last, comp);
       sort_heap(first, last, comp);
-      BOOST_ASSERT(boost::movelib::is_sorted(first, last, comp));
+      BOOST_ASSERT(cppmsboost::movelib::is_sorted(first, last, comp));
    }
 };
 
@@ -104,7 +104,7 @@ BOOST_MOVE_FORCEINLINE void heap_sort(RandomAccessIterator first, RandomAccessIt
    heap_sort_helper<RandomAccessIterator, Compare>::sort(first, last, comp);
 }
 
-}} //namespace boost {  namespace movelib{
+}} //namespace cppmsboost {  namespace movelib{
 
 #include <boost/move/detail/config_end.hpp>
 

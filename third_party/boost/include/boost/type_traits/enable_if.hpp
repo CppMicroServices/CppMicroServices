@@ -17,7 +17,7 @@ or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 template<bool B, class T = void>
 struct enable_if_ {

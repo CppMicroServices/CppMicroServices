@@ -12,7 +12,7 @@
 #include "boost/date_time/c_time.hpp"
 
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
   //! A clock providing day level services based on C time_t capabilities

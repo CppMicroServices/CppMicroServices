@@ -30,11 +30,11 @@
 #include "boost/tuple/tuple.hpp"
 
 // inject some of the tuple names into lambda 
-namespace boost {
+namespace cppmsboost {
 namespace lambda {
 
-using ::boost::tuples::tuple;
-using ::boost::tuples::null_type;
+using ::cppmsboost::tuples::tuple;
+using ::cppmsboost::tuples::null_type;
 
 } // lambda
 } // boost
@@ -58,19 +58,19 @@ using ::boost::tuples::null_type;
 
 #include "boost/lambda/detail/ret.hpp"
 
-namespace boost {
+namespace cppmsboost {
 namespace lambda {
 
 namespace {
 
   // These are constants types and need to be initialised
-  boost::lambda::placeholder1_type free1 = boost::lambda::placeholder1_type();
-  boost::lambda::placeholder2_type free2 = boost::lambda::placeholder2_type();
-  boost::lambda::placeholder3_type free3 = boost::lambda::placeholder3_type();
+  cppmsboost::lambda::placeholder1_type free1 = cppmsboost::lambda::placeholder1_type();
+  cppmsboost::lambda::placeholder2_type free2 = cppmsboost::lambda::placeholder2_type();
+  cppmsboost::lambda::placeholder3_type free3 = cppmsboost::lambda::placeholder3_type();
 
-  boost::lambda::placeholder1_type& BOOST_ATTRIBUTE_UNUSED _1 = free1;
-  boost::lambda::placeholder2_type& BOOST_ATTRIBUTE_UNUSED _2 = free2;
-  boost::lambda::placeholder3_type& BOOST_ATTRIBUTE_UNUSED _3 = free3;
+  cppmsboost::lambda::placeholder1_type& BOOST_ATTRIBUTE_UNUSED _1 = free1;
+  cppmsboost::lambda::placeholder2_type& BOOST_ATTRIBUTE_UNUSED _2 = free2;
+  cppmsboost::lambda::placeholder3_type& BOOST_ATTRIBUTE_UNUSED _3 = free3;
   // _1, _2, ... naming scheme by Peter Dimov
 } // unnamed
    

@@ -20,7 +20,7 @@
 #include <boost/smart_ptr/detail/local_counted_base.hpp>
 #include <boost/config.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -62,7 +62,7 @@ public:
 
 #if !defined( BOOST_NO_CXX11_NULLPTR )
 
-    void operator()( boost::detail::sp_nullptr_t p ) BOOST_SP_NOEXCEPT
+    void operator()( cppmsboost::detail::sp_nullptr_t p ) BOOST_SP_NOEXCEPT
     {
         d_( p );
     }
@@ -86,6 +86,6 @@ inline void * get_local_deleter( local_sp_deleter<void> * /*p*/ ) BOOST_SP_NOEXC
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // #ifndef BOOST_SMART_PTR_DETAIL_LOCAL_SP_DELETER_HPP_INCLUDED

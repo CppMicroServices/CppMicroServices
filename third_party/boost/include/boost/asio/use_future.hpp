@@ -26,7 +26,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -43,10 +43,10 @@ class packaged_handler;
  * The use_future_t class is used to indicate that an asynchronous operation
  * should return a std::future object. A use_future_t object may be passed as a
  * handler to an asynchronous operation, typically using the special value @c
- * boost::asio::use_future. For example:
+ * cppmsboost::asio::use_future. For example:
  *
  * @code std::future<std::size_t> my_future
- *   = my_socket.async_read_some(my_buffer, boost::asio::use_future); @endcode
+ *   = my_socket.async_read_some(my_buffer, cppmsboost::asio::use_future); @endcode
  *
  * The initiating function (async_read_some in the above example) returns a
  * future that will receive the result of the operation. If the operation
@@ -104,7 +104,7 @@ public:
    *
    * @code std::future<std::size_t> fut =
    *   my_socket.async_read_some(buffer,
-   *     use_future([](boost::system::error_code ec, std::size_t n)
+   *     use_future([](cppmsboost::system::error_code ec, std::size_t n)
    *       {
    *         return ec ? 0 : n;
    *       }));
@@ -141,7 +141,7 @@ private:
 
 /// A special value, similar to std::nothrow.
 /**
- * See the documentation for boost::asio::use_future_t for a usage example.
+ * See the documentation for cppmsboost::asio::use_future_t for a usage example.
  */
 #if defined(BOOST_ASIO_HAS_CONSTEXPR) || defined(GENERATING_DOCUMENTATION)
 constexpr use_future_t<> use_future;
@@ -150,7 +150,7 @@ __declspec(selectany) use_future_t<> use_future;
 #endif
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -38,7 +38,7 @@
 #include <boost/move/utility_core.hpp>
 #include <boost/move/detail/fwd_macros.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace tuples {
 
 struct null_type;
@@ -51,9 +51,9 @@ template <
 class tuple;
 
 }  //namespace tuples {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 namespace pair_impl {
 
@@ -68,14 +68,14 @@ template <
   class T3, class T4, class T5,
   class T6, class T7, class T8,
   class T9>
-struct is_boost_tuple< boost::tuples::tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >
+struct is_boost_tuple< cppmsboost::tuples::tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >
 {
    static const bool value = true;
 };
 
 template<class Tuple>
 struct disable_if_boost_tuple
-   : boost::container::dtl::disable_if< is_boost_tuple<Tuple> >
+   : cppmsboost::container::dtl::disable_if< is_boost_tuple<Tuple> >
 {};
 
 template<class T>
@@ -85,7 +85,7 @@ struct is_tuple_null
 };
 
 template<>
-struct is_tuple_null<boost::tuples::null_type>
+struct is_tuple_null<cppmsboost::tuples::null_type>
 {
    static const bool value = true;
 };
@@ -101,7 +101,7 @@ namespace std { struct _Nil; }
 #endif
 
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 
 #ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
@@ -140,7 +140,7 @@ struct piecewise_construct_use
 {
    //Avoid warnings of unused "piecewise_construct"
    piecewise_construct_use()
-   {  (void)&::boost::container::piecewise_construct;   }
+   {  (void)&::cppmsboost::container::piecewise_construct;   }
 };
 
 template <class T1, class T2>
@@ -246,7 +246,7 @@ struct pair
 
    //pair move constructor
    pair(BOOST_RV_REF(pair) p)
-      : first(::boost::move(p.first)), second(::boost::move(p.second))
+      : first(::cppmsboost::move(p.first)), second(::cppmsboost::move(p.second))
    {
       BOOST_STATIC_ASSERT((sizeof(std::pair<T1, T2>) == sizeof(pair<T1, T2>)));
    }
@@ -260,7 +260,7 @@ struct pair
 
    template <class D, class S>
    pair(BOOST_RV_REF_BEG pair<D, S> BOOST_RV_REF_END p)
-      : first(::boost::move(p.first)), second(::boost::move(p.second))
+      : first(::cppmsboost::move(p.first)), second(::cppmsboost::move(p.second))
    {
       BOOST_STATIC_ASSERT((sizeof(std::pair<T1, T2>) == sizeof(pair<T1, T2>)));
    }
@@ -275,8 +275,8 @@ struct pair
 
    template<class U, class V>
    pair(BOOST_FWD_REF(U) u, BOOST_FWD_REF(V) v)
-      : first(::boost::forward<U>(u))
-      , second(::boost::forward<V>(v))
+      : first(::cppmsboost::forward<U>(u))
+      , second(::cppmsboost::forward<V>(v))
    {
       BOOST_STATIC_ASSERT((sizeof(std::pair<T1, T2>) == sizeof(pair<T1, T2>)));
    }
@@ -296,14 +296,14 @@ struct pair
    }
 
    pair(BOOST_RV_REF_BEG std::pair<T1, T2> BOOST_RV_REF_END p)
-      : first(::boost::move(p.first)), second(::boost::move(p.second))
+      : first(::cppmsboost::move(p.first)), second(::cppmsboost::move(p.second))
    {
       BOOST_STATIC_ASSERT((sizeof(std::pair<T1, T2>) == sizeof(pair<T1, T2>)));
    }
 
    template <class D, class S>
    pair(BOOST_RV_REF_BEG std::pair<D, S> BOOST_RV_REF_END p)
-      : first(::boost::move(p.first)), second(::boost::move(p.second))
+      : first(::cppmsboost::move(p.first)), second(::cppmsboost::move(p.second))
    {
       BOOST_STATIC_ASSERT((sizeof(std::pair<T1, T2>) == sizeof(pair<T1, T2>)));
    }
@@ -311,17 +311,17 @@ struct pair
    #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
    template< class KeyType, class ...Args>
    pair(try_emplace_t, BOOST_FWD_REF(KeyType) k, Args && ...args)
-      : first(boost::forward<KeyType>(k)), second(::boost::forward<Args>(args)...)\
+      : first(cppmsboost::forward<KeyType>(k)), second(::cppmsboost::forward<Args>(args)...)\
    {
       BOOST_STATIC_ASSERT((sizeof(std::pair<T1, T2>) == sizeof(pair<T1, T2>)));
    }
    #else
 
-   //piecewise construction from boost::tuple
+   //piecewise construction from cppmsboost::tuple
    #define BOOST_PAIR_TRY_EMPLACE_CONSTRUCT_CODE(N)\
    template< class KeyType BOOST_MOVE_I##N BOOST_MOVE_CLASS##N > \
    pair( try_emplace_t, BOOST_FWD_REF(KeyType) k BOOST_MOVE_I##N BOOST_MOVE_UREF##N )\
-      : first(boost::forward<KeyType>(k)), second(BOOST_MOVE_FWD##N)\
+      : first(cppmsboost::forward<KeyType>(k)), second(BOOST_MOVE_FWD##N)\
    {\
       BOOST_STATIC_ASSERT((sizeof(std::pair<T1, T2>) == sizeof(pair<T1, T2>)));\
    }\
@@ -331,15 +331,15 @@ struct pair
 
    #endif   //BOOST_NO_CXX11_VARIADIC_TEMPLATES
 
-   //piecewise construction from boost::tuple
+   //piecewise construction from cppmsboost::tuple
    #define BOOST_PAIR_PIECEWISE_CONSTRUCT_BOOST_TUPLE_CODE(N,M)\
    template< template<class, class, class, class, class, class, class, class, class, class> class BoostTuple \
             BOOST_MOVE_I_IF(BOOST_MOVE_OR(N,M)) BOOST_MOVE_CLASS##N BOOST_MOVE_I_IF(BOOST_MOVE_AND(N,M)) BOOST_MOVE_CLASSQ##M > \
    pair( piecewise_construct_t\
-       , BoostTuple<BOOST_MOVE_TARG##N  BOOST_MOVE_I##N BOOST_MOVE_REPEAT(BOOST_MOVE_SUB(10,N),::boost::tuples::null_type)> p\
-       , BoostTuple<BOOST_MOVE_TARGQ##M BOOST_MOVE_I##M BOOST_MOVE_REPEAT(BOOST_MOVE_SUB(10,M),::boost::tuples::null_type)> q\
+       , BoostTuple<BOOST_MOVE_TARG##N  BOOST_MOVE_I##N BOOST_MOVE_REPEAT(BOOST_MOVE_SUB(10,N),::cppmsboost::tuples::null_type)> p\
+       , BoostTuple<BOOST_MOVE_TARGQ##M BOOST_MOVE_I##M BOOST_MOVE_REPEAT(BOOST_MOVE_SUB(10,M),::cppmsboost::tuples::null_type)> q\
        , typename dtl::enable_if_c\
-         < pair_impl::is_boost_tuple< BoostTuple<BOOST_MOVE_TARG##N  BOOST_MOVE_I##N BOOST_MOVE_REPEAT(BOOST_MOVE_SUB(10,N),::boost::tuples::null_type)> >::value &&\
+         < pair_impl::is_boost_tuple< BoostTuple<BOOST_MOVE_TARG##N  BOOST_MOVE_I##N BOOST_MOVE_REPEAT(BOOST_MOVE_SUB(10,N),::cppmsboost::tuples::null_type)> >::value &&\
            !(pair_impl::is_tuple_null<BOOST_MOVE_LAST_TARG##N>::value || pair_impl::is_tuple_null<BOOST_MOVE_LAST_TARGQ##M>::value) \
          >::type* = 0\
        )\
@@ -357,8 +357,8 @@ struct pair
       private:
       template<template<class ...> class Tuple, class... Args1, class... Args2, size_t... Indexes1, size_t... Indexes2>
       pair(Tuple<Args1...>& t1, Tuple<Args2...>& t2, index_tuple<Indexes1...>, index_tuple<Indexes2...>)
-         : first (::boost::forward<Args1>(get<Indexes1>(t1))...)
-         , second(::boost::forward<Args2>(get<Indexes2>(t2))...)
+         : first (::cppmsboost::forward<Args1>(get<Indexes1>(t1))...)
+         , second(::cppmsboost::forward<Args2>(get<Indexes2>(t2))...)
       {  (void) t1; (void)t2; }
 
       public:
@@ -374,18 +374,18 @@ struct pair
       private:
       template<typename T, template<class ...> class Tuple, typename... Args>
       static T build_from_args(Tuple<Args...>&& t)
-      {  return do_build_from_args<T>(::boost::move(t), typename build_number_seq<sizeof...(Args)>::type());   }
+      {  return do_build_from_args<T>(::cppmsboost::move(t), typename build_number_seq<sizeof...(Args)>::type());   }
 
       template<typename T, template<class ...> class Tuple, typename... Args, std::size_t... Indexes>
       static T do_build_from_args(Tuple<Args...> && t, const index_tuple<Indexes...>&)
-      {  (void)t; return T(::boost::forward<Args>(get<Indexes>(t))...);  }
+      {  (void)t; return T(::cppmsboost::forward<Args>(get<Indexes>(t))...);  }
 
       public:
       template< template<class ...> class Tuple, class... Args1, class... Args2
               , class = typename pair_impl::disable_if_boost_tuple< Tuple<Args1...> >::type>
       pair(piecewise_construct_t, Tuple<Args1...> t1, Tuple<Args2...> t2)
-         : first  (build_from_args<first_type> (::boost::move(t1)))
-         , second (build_from_args<second_type>(::boost::move(t2)))
+         : first  (build_from_args<first_type> (::cppmsboost::move(t1)))
+         , second (build_from_args<second_type>(::cppmsboost::move(t2)))
       {
          BOOST_STATIC_ASSERT((sizeof(std::pair<T1, T2>) == sizeof(pair<T1, T2>)));
       }
@@ -440,16 +440,16 @@ struct pair
    //pair move assignment
    pair& operator=(BOOST_RV_REF(pair) p)
    {
-      first  = ::boost::move(p.first);
-      second = ::boost::move(p.second);
+      first  = ::cppmsboost::move(p.first);
+      second = ::cppmsboost::move(p.second);
       return *this;
    }
 
    template <class D, class S>
-   typename ::boost::container::dtl::disable_if_or
+   typename ::cppmsboost::container::dtl::disable_if_or
       < pair &
-      , ::boost::container::dtl::is_same<T1, D>
-      , ::boost::container::dtl::is_same<T2, S>
+      , ::cppmsboost::container::dtl::is_same<T1, D>
+      , ::cppmsboost::container::dtl::is_same<T2, S>
       >::type
       operator=(const pair<D, S>&p)
    {
@@ -459,15 +459,15 @@ struct pair
    }
 
    template <class D, class S>
-   typename ::boost::container::dtl::disable_if_or
+   typename ::cppmsboost::container::dtl::disable_if_or
       < pair &
-      , ::boost::container::dtl::is_same<T1, D>
-      , ::boost::container::dtl::is_same<T2, S>
+      , ::cppmsboost::container::dtl::is_same<T1, D>
+      , ::cppmsboost::container::dtl::is_same<T2, S>
       >::type
       operator=(BOOST_RV_REF_BEG pair<D, S> BOOST_RV_REF_END p)
    {
-      first  = ::boost::move(p.first);
-      second = ::boost::move(p.second);
+      first  = ::cppmsboost::move(p.first);
+      second = ::cppmsboost::move(p.second);
       return *this;
    }
 //std::pair copy assignment
@@ -481,32 +481,32 @@ struct pair
    template <class D, class S>
    pair& operator=(const std::pair<D, S> &p)
    {
-      first  = ::boost::move(p.first);
-      second = ::boost::move(p.second);
+      first  = ::cppmsboost::move(p.first);
+      second = ::cppmsboost::move(p.second);
       return *this;
    }
 
    //std::pair move assignment
    pair& operator=(BOOST_RV_REF_BEG std::pair<T1, T2> BOOST_RV_REF_END p)
    {
-      first  = ::boost::move(p.first);
-      second = ::boost::move(p.second);
+      first  = ::cppmsboost::move(p.first);
+      second = ::cppmsboost::move(p.second);
       return *this;
    }
 
    template <class D, class S>
    pair& operator=(BOOST_RV_REF_BEG std::pair<D, S> BOOST_RV_REF_END p)
    {
-      first  = ::boost::move(p.first);
-      second = ::boost::move(p.second);
+      first  = ::cppmsboost::move(p.first);
+      second = ::cppmsboost::move(p.second);
       return *this;
    }
 
    //swap
    void swap(pair& p)
    {
-      ::boost::adl_move_swap(this->first, p.first);
-      ::boost::adl_move_swap(this->second, p.second);
+      ::cppmsboost::adl_move_swap(this->first, p.first);
+      ::cppmsboost::adl_move_swap(this->second, p.second);
    }
 };
 
@@ -549,7 +549,7 @@ inline void swap(pair<T1, T2>& x, pair<T1, T2>& y)
 #ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
 
 template<class T1, class T2>
-struct has_move_emulation_enabled< ::boost::container::dtl::pair<T1, T2> >
+struct has_move_emulation_enabled< ::cppmsboost::container::dtl::pair<T1, T2> >
 {
    static const bool value = true;
 };
@@ -562,7 +562,7 @@ template<class T>
 struct is_class_or_union;
 
 template <class T1, class T2>
-struct is_class_or_union< ::boost::container::dtl::pair<T1, T2> >
+struct is_class_or_union< ::cppmsboost::container::dtl::pair<T1, T2> >
 //This specialization is needed to avoid instantiation of pair in
 //is_class, and allow recursive maps.
 {
@@ -581,7 +581,7 @@ template<class T>
 struct is_union;
 
 template <class T1, class T2>
-struct is_union< ::boost::container::dtl::pair<T1, T2> >
+struct is_union< ::cppmsboost::container::dtl::pair<T1, T2> >
 //This specialization is needed to avoid instantiation of pair in
 //is_class, and allow recursive maps.
 {
@@ -600,7 +600,7 @@ template<class T>
 struct is_class;
 
 template <class T1, class T2>
-struct is_class< ::boost::container::dtl::pair<T1, T2> >
+struct is_class< ::cppmsboost::container::dtl::pair<T1, T2> >
 //This specialization is needed to avoid instantiation of pair in
 //is_class, and allow recursive maps.
 {
@@ -622,10 +622,10 @@ struct is_trivially_copy_constructible;
 
 template<class A, class B>
 struct is_trivially_copy_assignable
-   <boost::container::dtl::pair<A,B> >
+   <cppmsboost::container::dtl::pair<A,B> >
 {
-   static const bool value = boost::move_detail::is_trivially_copy_assignable<A>::value &&
-                             boost::move_detail::is_trivially_copy_assignable<B>::value ;
+   static const bool value = cppmsboost::move_detail::is_trivially_copy_assignable<A>::value &&
+                             cppmsboost::move_detail::is_trivially_copy_assignable<B>::value ;
 };
 
 template<class T>
@@ -633,46 +633,46 @@ struct is_trivially_move_constructible;
 
 template<class A, class B>
 struct is_trivially_move_assignable
-   <boost::container::dtl::pair<A,B> >
+   <cppmsboost::container::dtl::pair<A,B> >
 {
-   static const bool value = boost::move_detail::is_trivially_move_assignable<A>::value &&
-                             boost::move_detail::is_trivially_move_assignable<B>::value ;
+   static const bool value = cppmsboost::move_detail::is_trivially_move_assignable<A>::value &&
+                             cppmsboost::move_detail::is_trivially_move_assignable<B>::value ;
 };
 
 template<class T>
 struct is_trivially_copy_assignable;
 
 template<class A, class B>
-struct is_trivially_copy_constructible<boost::container::dtl::pair<A,B> >
+struct is_trivially_copy_constructible<cppmsboost::container::dtl::pair<A,B> >
 {
-   static const bool value = boost::move_detail::is_trivially_copy_constructible<A>::value &&
-                             boost::move_detail::is_trivially_copy_constructible<B>::value ;
+   static const bool value = cppmsboost::move_detail::is_trivially_copy_constructible<A>::value &&
+                             cppmsboost::move_detail::is_trivially_copy_constructible<B>::value ;
 };
 
 template<class T>
 struct is_trivially_move_assignable;
 
 template<class A, class B>
-struct is_trivially_move_constructible<boost::container::dtl::pair<A,B> >
+struct is_trivially_move_constructible<cppmsboost::container::dtl::pair<A,B> >
 {
-   static const bool value = boost::move_detail::is_trivially_move_constructible<A>::value &&
-                             boost::move_detail::is_trivially_move_constructible<B>::value ;
+   static const bool value = cppmsboost::move_detail::is_trivially_move_constructible<A>::value &&
+                             cppmsboost::move_detail::is_trivially_move_constructible<B>::value ;
 };
 
 template<class T>
 struct is_trivially_destructible;
 
 template<class A, class B>
-struct is_trivially_destructible<boost::container::dtl::pair<A,B> >
+struct is_trivially_destructible<cppmsboost::container::dtl::pair<A,B> >
 {
-   static const bool value = boost::move_detail::is_trivially_destructible<A>::value &&
-                             boost::move_detail::is_trivially_destructible<B>::value ;
+   static const bool value = cppmsboost::move_detail::is_trivially_destructible<A>::value &&
+                             cppmsboost::move_detail::is_trivially_destructible<B>::value ;
 };
 
 
 }  //namespace move_detail{
 
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #include <boost/container/detail/config_end.hpp>
 

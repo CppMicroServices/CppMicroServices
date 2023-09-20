@@ -44,7 +44,7 @@ time2_demo contained this comment:
 //                                                                            //
 //----------------------------------------------------------------------------//
 
-namespace boost {
+namespace cppmsboost {
 namespace chrono {
 
   template <class Clock, class Duration = typename Clock::duration>
@@ -154,7 +154,7 @@ namespace chrono {
     template <class Clock, class Duration>
     class time_point
     {
-        BOOST_CHRONO_STATIC_ASSERT(boost::chrono::detail::is_duration<Duration>::value,
+        BOOST_CHRONO_STATIC_ASSERT(cppmsboost::chrono::detail::is_duration<Duration>::value,
                 BOOST_CHRONO_SECOND_TEMPLATE_PARAMETER_OF_TIME_POINT_MUST_BE_A_BOOST_CHRONO_DURATION, (Duration));
     public:
         typedef Clock                     clock;
@@ -179,9 +179,9 @@ namespace chrono {
         template <class Duration2>
         BOOST_FORCEINLINE BOOST_CONSTEXPR
         time_point(const time_point<clock, Duration2>& t
-                , typename boost::enable_if
+                , typename cppmsboost::enable_if
                 <
-                    boost::is_convertible<Duration2, duration>
+                    cppmsboost::is_convertible<Duration2, duration>
                 >::type* = 0
         )
             : d_(t.time_since_epoch())
@@ -369,7 +369,7 @@ namespace chrono {
     }
 
 } // namespace chrono
-} // namespace boost
+} // namespace cppmsboost
 
 #ifndef BOOST_CHRONO_HEADER_ONLY
 // the suffix header occurs after all of our code:

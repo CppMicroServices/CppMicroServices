@@ -24,13 +24,13 @@
 #pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
 #if !defined(BOOST_HAS_INTPTR_T)
-using boost::uintptr_t;
-using boost::intptr_t;
+using cppmsboost::uintptr_t;
+using cppmsboost::intptr_t;
 #else
 typedef std::size_t uintptr_t;
 typedef std::ptrdiff_t intptr_t;
@@ -38,6 +38,6 @@ typedef std::ptrdiff_t intptr_t;
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ATOMIC_DETAIL_INTPTR_HPP_INCLUDED_

@@ -22,7 +22,7 @@
 #  include BOOST_ABI_PREFIX
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace coroutines {
 namespace detail {
 

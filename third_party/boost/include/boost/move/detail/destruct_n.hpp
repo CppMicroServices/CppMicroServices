@@ -24,7 +24,7 @@
 
 #include <cstddef>
 
-namespace boost {
+namespace cppmsboost {
 namespace movelib{
 
 template<class T, class RandItUninit>
@@ -61,6 +61,6 @@ class destruct_n
    std::size_t m_size;
 };
 
-}} //namespace boost {  namespace movelib{
+}} //namespace cppmsboost {  namespace movelib{
 
 #endif //#ifndef BOOST_MOVE_DETAIL_DESTRUCT_N_HPP

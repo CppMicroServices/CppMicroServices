@@ -26,7 +26,7 @@
 
 //Small meta-typetraits to support move
 
-namespace boost {
+namespace cppmsboost {
 
 namespace movelib {
 
@@ -36,7 +36,7 @@ struct default_delete;
 }  //namespace movelib {
 
 #ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
-//Forward declare boost::rv
+//Forward declare cppmsboost::rv
 template <class T> class rv;
 #endif
 
@@ -581,11 +581,11 @@ struct missing_virtual_destructor
 {  static const bool value = false;  };
 
 template<class T, class U>
-struct missing_virtual_destructor< ::boost::movelib::default_delete<T>, U >
+struct missing_virtual_destructor< ::cppmsboost::movelib::default_delete<T>, U >
    : missing_virtual_destructor_default_delete<T, U>
 {};
 
 }  //namespace move_upmu {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif //#ifndef BOOST_MOVE_UNIQUE_PTR_DETAIL_META_UTILS_HPP

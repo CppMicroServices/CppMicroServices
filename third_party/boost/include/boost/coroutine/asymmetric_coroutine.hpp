@@ -36,7 +36,7 @@
 #  include BOOST_ABI_PREFIX
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace coroutines {
 
 template< typename R >
@@ -123,7 +123,7 @@ public:
 
     push_coroutine & operator=( BOOST_RV_REF( push_coroutine) other) BOOST_NOEXCEPT
     {
-        push_coroutine tmp( boost::move( other) );
+        push_coroutine tmp( cppmsboost::move( other) );
         swap( tmp);
         return * this;
     }
@@ -268,7 +268,7 @@ public:
 
     push_coroutine & operator=( BOOST_RV_REF( push_coroutine) other) BOOST_NOEXCEPT
     {
-        push_coroutine tmp( boost::move( other) );
+        push_coroutine tmp( cppmsboost::move( other) );
         swap( tmp);
         return * this;
     }
@@ -413,7 +413,7 @@ public:
 
     inline push_coroutine & operator=( BOOST_RV_REF( push_coroutine) other) BOOST_NOEXCEPT
     {
-        push_coroutine tmp( boost::move( other) );
+        push_coroutine tmp( cppmsboost::move( other) );
         swap( tmp);
         return * this;
     }
@@ -491,7 +491,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                boost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+                cppmsboost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
         impl_->pull();
     }
@@ -518,7 +518,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                boost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+                cppmsboost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
         impl_->pull();
     }
@@ -545,7 +545,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                boost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+                cppmsboost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
         impl_->pull();
     }
@@ -572,7 +572,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                boost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+                cppmsboost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
         impl_->pull();
     }
@@ -701,7 +701,7 @@ public:
 
     pull_coroutine & operator=( BOOST_RV_REF( pull_coroutine) other) BOOST_NOEXCEPT
     {
-        pull_coroutine tmp( boost::move( other) );
+        pull_coroutine tmp( cppmsboost::move( other) );
         swap( tmp);
         return * this;
     }
@@ -804,7 +804,7 @@ public:
         reference_t operator*() const
         {
             if ( ! val_)
-                boost::throw_exception(
+                cppmsboost::throw_exception(
                     invalid_result() );
             return * val_;
         }
@@ -812,7 +812,7 @@ public:
         pointer_t operator->() const
         {
             if ( ! val_)
-                boost::throw_exception(
+                cppmsboost::throw_exception(
                     invalid_result() );
             return val_;
         }
@@ -894,7 +894,7 @@ public:
         reference_t operator*() const
         {
             if ( ! val_)
-                boost::throw_exception(
+                cppmsboost::throw_exception(
                     invalid_result() );
             return * val_;
         }
@@ -902,7 +902,7 @@ public:
         pointer_t operator->() const
         {
             if ( ! val_)
-                boost::throw_exception(
+                cppmsboost::throw_exception(
                     invalid_result() );
             return val_;
         }
@@ -963,7 +963,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                boost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+                cppmsboost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
         impl_->pull();
     }
@@ -990,7 +990,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                boost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+                cppmsboost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
         impl_->pull();
     }
@@ -1017,7 +1017,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                boost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+                cppmsboost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
         impl_->pull();
     }
@@ -1044,7 +1044,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                boost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+                cppmsboost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
         impl_->pull();
     }
@@ -1173,7 +1173,7 @@ public:
 
     pull_coroutine & operator=( BOOST_RV_REF( pull_coroutine) other) BOOST_NOEXCEPT
     {
-        pull_coroutine tmp( boost::move( other) );
+        pull_coroutine tmp( cppmsboost::move( other) );
         swap( tmp);
         return * this;
     }
@@ -1272,7 +1272,7 @@ public:
         reference_t operator*() const
         {
             if ( ! val_)
-                boost::throw_exception(
+                cppmsboost::throw_exception(
                     invalid_result() );
             return * val_;
         }
@@ -1280,7 +1280,7 @@ public:
         pointer_t operator->() const
         {
             if ( ! val_)
-                boost::throw_exception(
+                cppmsboost::throw_exception(
                     invalid_result() );
             return val_;
         }
@@ -1362,7 +1362,7 @@ public:
         reference_t operator*() const
         {
             if ( ! val_)
-                boost::throw_exception(
+                cppmsboost::throw_exception(
                     invalid_result() );
             return * val_;
         }
@@ -1370,7 +1370,7 @@ public:
         pointer_t operator->() const
         {
             if ( ! val_)
-                boost::throw_exception(
+                cppmsboost::throw_exception(
                     invalid_result() );
             return val_;
         }
@@ -1431,7 +1431,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                boost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+                cppmsboost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
         impl_->pull();
     }
@@ -1458,7 +1458,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                boost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+                cppmsboost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
         impl_->pull();
     }
@@ -1485,7 +1485,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                boost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+                cppmsboost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
         impl_->pull();
     }
@@ -1512,7 +1512,7 @@ public:
         BOOST_ASSERT( 0 != sp);
         // placement new for internal coroutine
         impl_ = new ( sp) object_t(
-                boost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+                cppmsboost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
         BOOST_ASSERT( impl_);
         impl_->pull();
     }
@@ -1641,7 +1641,7 @@ public:
 
     inline pull_coroutine & operator=( BOOST_RV_REF( pull_coroutine) other) BOOST_NOEXCEPT
     {
-        pull_coroutine tmp( boost::move( other) );
+        pull_coroutine tmp( cppmsboost::move( other) );
         swap( tmp);
         return * this;
     }
@@ -1690,7 +1690,7 @@ push_coroutine< Arg >::push_coroutine( coroutine_fn fn,
     BOOST_ASSERT( 0 != sp);
     // placement new for internal coroutine
     impl_ = new ( sp) object_t(
-            boost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+            cppmsboost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
     BOOST_ASSERT( impl_);
 }
 
@@ -1717,7 +1717,7 @@ push_coroutine< Arg >::push_coroutine( coroutine_fn fn,
     BOOST_ASSERT( 0 != sp);
     // placement new for internal coroutine
     impl_ = new ( sp) object_t(
-            boost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+            cppmsboost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
     BOOST_ASSERT( impl_);
 }
 
@@ -1743,7 +1743,7 @@ push_coroutine< Arg & >::push_coroutine( coroutine_fn fn,
     BOOST_ASSERT( 0 != sp);
     // placement new for internal coroutine
     impl_ = new ( sp) object_t(
-            boost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+            cppmsboost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
     BOOST_ASSERT( impl_);
 }
 
@@ -1770,7 +1770,7 @@ push_coroutine< Arg & >::push_coroutine( coroutine_fn fn,
     BOOST_ASSERT( 0 != sp);
     // placement new for internal coroutine
     impl_ = new ( sp) object_t(
-            boost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+            cppmsboost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
     BOOST_ASSERT( impl_);
 }
 
@@ -1795,7 +1795,7 @@ inline push_coroutine< void >::push_coroutine( coroutine_fn fn,
     BOOST_ASSERT( 0 != sp);
     // placement new for internal coroutine
     impl_ = new ( sp) object_t(
-            boost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+            cppmsboost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
     BOOST_ASSERT( impl_);
 }
 
@@ -1821,7 +1821,7 @@ push_coroutine< void >::push_coroutine( coroutine_fn fn,
     BOOST_ASSERT( 0 != sp);
     // placement new for internal coroutine
     impl_ = new ( sp) object_t(
-            boost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+            cppmsboost::forward< coroutine_fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
     BOOST_ASSERT( impl_);
 }
 # endif
@@ -1848,7 +1848,7 @@ push_coroutine< Arg >::push_coroutine( BOOST_RV_REF( Fn) fn,
     BOOST_ASSERT( 0 != sp);
     // placement new for internal coroutine
     impl_ = new ( sp) object_t(
-            boost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+            cppmsboost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
     BOOST_ASSERT( impl_);
 }
 
@@ -1875,7 +1875,7 @@ push_coroutine< Arg >::push_coroutine( BOOST_RV_REF( Fn) fn,
     BOOST_ASSERT( 0 != sp);
     // placement new for internal coroutine
     impl_ = new ( sp) object_t(
-            boost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+            cppmsboost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
     BOOST_ASSERT( impl_);
 }
 
@@ -1902,7 +1902,7 @@ push_coroutine< Arg & >::push_coroutine( BOOST_RV_REF( Fn) fn,
     BOOST_ASSERT( 0 != sp);
     // placement new for internal coroutine
     impl_ = new ( sp) object_t(
-            boost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+            cppmsboost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
     BOOST_ASSERT( impl_);
 }
 
@@ -1929,7 +1929,7 @@ push_coroutine< Arg & >::push_coroutine( BOOST_RV_REF( Fn) fn,
     BOOST_ASSERT( 0 != sp);
     // placement new for internal coroutine
     impl_ = new ( sp) object_t(
-            boost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+            cppmsboost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
     BOOST_ASSERT( impl_);
 }
 
@@ -1955,7 +1955,7 @@ push_coroutine< void >::push_coroutine( BOOST_RV_REF( Fn) fn,
     BOOST_ASSERT( 0 != sp);
     // placement new for internal coroutine
     impl_ = new ( sp) object_t(
-            boost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+            cppmsboost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
     BOOST_ASSERT( impl_);
 }
 
@@ -1981,7 +1981,7 @@ push_coroutine< void >::push_coroutine( BOOST_RV_REF( Fn) fn,
     BOOST_ASSERT( 0 != sp);
     // placement new for internal coroutine
     impl_ = new ( sp) object_t(
-            boost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
+            cppmsboost::forward< Fn >( fn), attrs, detail::preallocated( sp, size, stack_ctx), stack_alloc); 
     BOOST_ASSERT( impl_);
 }
 #else
@@ -2362,32 +2362,32 @@ struct coroutine
 template< typename R >
 typename pull_coroutine< R >::iterator
 begin( pull_coroutine< R > & c)
-{ return boost::begin( c); }
+{ return cppmsboost::begin( c); }
 
 template< typename R >
 typename pull_coroutine< R >::const_iterator
 begin( pull_coroutine< R > const& c)
-{ return boost::begin( c); }
+{ return cppmsboost::begin( c); }
 
 template< typename R >
 typename pull_coroutine< R >::iterator
 end( pull_coroutine< R > & c)
-{ return boost::end( c); }
+{ return cppmsboost::end( c); }
 
 template< typename R >
 typename pull_coroutine< R >::const_iterator
 end( pull_coroutine< R > const& c)
-{ return boost::end( c); }
+{ return cppmsboost::end( c); }
 
 template< typename R >
 typename push_coroutine< R >::iterator
 begin( push_coroutine< R > & c)
-{ return boost::begin( c); }
+{ return cppmsboost::begin( c); }
 
 template< typename R >
 typename push_coroutine< R >::iterator
 end( push_coroutine< R > & c)
-{ return boost::end( c); }
+{ return cppmsboost::end( c); }
 
 }
 

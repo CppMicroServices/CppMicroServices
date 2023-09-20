@@ -34,7 +34,7 @@
 
 #define BOOST_SERIALIZATION_MAX_KEY_SIZE 128
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 
 namespace void_cast_detail{
@@ -42,10 +42,10 @@ namespace void_cast_detail{
 }
 
 class BOOST_SYMBOL_VISIBLE extended_type_info :
-    private boost::noncopyable
+    private cppmsboost::noncopyable
 {
 private:
-    friend class boost::serialization::void_cast_detail::void_caster;
+    friend class cppmsboost::serialization::void_cast_detail::void_caster;
 
     // used to uniquely identify the type of class derived from this one
     // so that different derivations of this class can be simultaneously
@@ -86,7 +86,7 @@ public:
 };
 
 template<class T>
-struct guid_defined : boost::mpl::false_ {};
+struct guid_defined : cppmsboost::mpl::false_ {};
 
 namespace ext {
     template <typename T>
@@ -105,7 +105,7 @@ inline const char * guid(){
 }
 
 } // namespace serialization
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

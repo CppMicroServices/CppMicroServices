@@ -23,18 +23,18 @@
 # include <boost/array.hpp>
 #endif // defined(BOOST_ASIO_HAS_STD_ARRAY)
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
 #if defined(BOOST_ASIO_HAS_STD_ARRAY)
 using std::array;
 #else // defined(BOOST_ASIO_HAS_STD_ARRAY)
-using boost::array;
+using cppmsboost::array;
 #endif // defined(BOOST_ASIO_HAS_STD_ARRAY)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_DETAIL_ARRAY_HPP

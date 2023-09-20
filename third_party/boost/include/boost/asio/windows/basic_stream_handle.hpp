@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace windows {
 
@@ -59,7 +59,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined native_handle_type;
 #else
-  typedef boost::asio::detail::win_iocp_handle_service::native_handle_type
+  typedef cppmsboost::asio::detail::win_iocp_handle_service::native_handle_type
     native_handle_type;
 #endif
 
@@ -106,7 +106,7 @@ public:
    *
    * @param handle The new underlying handle implementation.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   basic_stream_handle(const executor_type& ex, const native_handle_type& handle)
     : basic_overlapped_handle<Executor>(ex, handle)
@@ -124,7 +124,7 @@ public:
    *
    * @param handle The new underlying handle implementation.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   template <typename ExecutionContext>
   basic_stream_handle(ExecutionContext& context,
@@ -181,8 +181,8 @@ public:
    *
    * @returns The number of bytes written.
    *
-   * @throws boost::system::system_error Thrown on failure. An error code of
-   * boost::asio::error::eof indicates that the connection was closed by the
+   * @throws cppmsboost::system::system_error Thrown on failure. An error code of
+   * cppmsboost::asio::error::eof indicates that the connection was closed by the
    * peer.
    *
    * @note The write_some operation may not transmit all of the data to the
@@ -192,19 +192,19 @@ public:
    * @par Example
    * To write a single data buffer use the @ref buffer function as follows:
    * @code
-   * handle.write_some(boost::asio::buffer(data, size));
+   * handle.write_some(cppmsboost::asio::buffer(data, size));
    * @endcode
    * See the @ref buffer documentation for information on writing multiple
-   * buffers in one go, and how to use it with arrays, boost::array or
+   * buffers in one go, and how to use it with arrays, cppmsboost::array or
    * std::vector.
    */
   template <typename ConstBufferSequence>
   std::size_t write_some(const ConstBufferSequence& buffers)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = this->impl_.get_service().write_some(
         this->impl_.get_implementation(), buffers, ec);
-    boost::asio::detail::throw_error(ec, "write_some");
+    cppmsboost::asio::detail::throw_error(ec, "write_some");
     return s;
   }
 
@@ -226,7 +226,7 @@ public:
    */
   template <typename ConstBufferSequence>
   std::size_t write_some(const ConstBufferSequence& buffers,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     return this->impl_.get_service().write_some(
         this->impl_.get_implementation(), buffers, ec);
@@ -246,13 +246,13 @@ public:
    * Copies will be made of the handler as required. The function signature of
    * the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred           // Number of bytes written.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * @note The write operation may not transmit all of the data to the peer.
    * Consider using the @ref async_write function if you need to ensure that all
@@ -261,24 +261,24 @@ public:
    * @par Example
    * To write a single data buffer use the @ref buffer function as follows:
    * @code
-   * handle.async_write_some(boost::asio::buffer(data, size), handler);
+   * handle.async_write_some(cppmsboost::asio::buffer(data, size), handler);
    * @endcode
    * See the @ref buffer documentation for information on writing multiple
-   * buffers in one go, and how to use it with arrays, boost::array or
+   * buffers in one go, and how to use it with arrays, cppmsboost::array or
    * std::vector.
    */
   template <typename ConstBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         std::size_t)) WriteHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
-      void (boost::system::error_code, std::size_t))
+      void (cppmsboost::system::error_code, std::size_t))
   async_write_some(const ConstBufferSequence& buffers,
       BOOST_ASIO_MOVE_ARG(WriteHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
     return async_initiate<WriteHandler,
-      void (boost::system::error_code, std::size_t)>(
+      void (cppmsboost::system::error_code, std::size_t)>(
         initiate_async_write_some(this), handler, buffers);
   }
 
@@ -292,8 +292,8 @@ public:
    *
    * @returns The number of bytes read.
    *
-   * @throws boost::system::system_error Thrown on failure. An error code of
-   * boost::asio::error::eof indicates that the connection was closed by the
+   * @throws cppmsboost::system::system_error Thrown on failure. An error code of
+   * cppmsboost::asio::error::eof indicates that the connection was closed by the
    * peer.
    *
    * @note The read_some operation may not read all of the requested number of
@@ -304,19 +304,19 @@ public:
    * @par Example
    * To read into a single data buffer use the @ref buffer function as follows:
    * @code
-   * handle.read_some(boost::asio::buffer(data, size));
+   * handle.read_some(cppmsboost::asio::buffer(data, size));
    * @endcode
    * See the @ref buffer documentation for information on reading into multiple
-   * buffers in one go, and how to use it with arrays, boost::array or
+   * buffers in one go, and how to use it with arrays, cppmsboost::array or
    * std::vector.
    */
   template <typename MutableBufferSequence>
   std::size_t read_some(const MutableBufferSequence& buffers)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = this->impl_.get_service().read_some(
         this->impl_.get_implementation(), buffers, ec);
-    boost::asio::detail::throw_error(ec, "read_some");
+    cppmsboost::asio::detail::throw_error(ec, "read_some");
     return s;
   }
 
@@ -339,7 +339,7 @@ public:
    */
   template <typename MutableBufferSequence>
   std::size_t read_some(const MutableBufferSequence& buffers,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     return this->impl_.get_service().read_some(
         this->impl_.get_implementation(), buffers, ec);
@@ -359,13 +359,13 @@ public:
    * Copies will be made of the handler as required. The function signature of
    * the handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error, // Result of operation.
+   *   const cppmsboost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred           // Number of bytes read.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    *
    * @note The read operation may not read all of the requested number of bytes.
    * Consider using the @ref async_read function if you need to ensure that the
@@ -375,24 +375,24 @@ public:
    * @par Example
    * To read into a single data buffer use the @ref buffer function as follows:
    * @code
-   * handle.async_read_some(boost::asio::buffer(data, size), handler);
+   * handle.async_read_some(cppmsboost::asio::buffer(data, size), handler);
    * @endcode
    * See the @ref buffer documentation for information on reading into multiple
-   * buffers in one go, and how to use it with arrays, boost::array or
+   * buffers in one go, and how to use it with arrays, cppmsboost::array or
    * std::vector.
    */
   template <typename MutableBufferSequence,
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code,
         std::size_t)) ReadHandler
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
-      void (boost::system::error_code, std::size_t))
+      void (cppmsboost::system::error_code, std::size_t))
   async_read_some(const MutableBufferSequence& buffers,
       BOOST_ASIO_MOVE_ARG(ReadHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
     return async_initiate<ReadHandler,
-      void (boost::system::error_code, std::size_t)>(
+      void (cppmsboost::system::error_code, std::size_t)>(
         initiate_async_read_some(this), handler, buffers);
   }
 
@@ -466,7 +466,7 @@ private:
 
 } // namespace windows
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

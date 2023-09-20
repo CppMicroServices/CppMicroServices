@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -71,13 +71,13 @@ public:
 };
 
 template <typename Executor>
-class awaitable_handler<Executor, boost::system::error_code>
+class awaitable_handler<Executor, cppmsboost::system::error_code>
   : public awaitable_handler_base<Executor, void>
 {
 public:
   using awaitable_handler_base<Executor, void>::awaitable_handler_base;
 
-  void operator()(const boost::system::error_code& ec)
+  void operator()(const cppmsboost::system::error_code& ec)
   {
     this->frame()->attach_thread(this);
     if (ec)
@@ -126,14 +126,14 @@ public:
 };
 
 template <typename Executor, typename T>
-class awaitable_handler<Executor, boost::system::error_code, T>
+class awaitable_handler<Executor, cppmsboost::system::error_code, T>
   : public awaitable_handler_base<Executor, T>
 {
 public:
   using awaitable_handler_base<Executor, T>::awaitable_handler_base;
 
   template <typename Arg>
-  void operator()(const boost::system::error_code& ec, Arg&& arg)
+  void operator()(const cppmsboost::system::error_code& ec, Arg&& arg)
   {
     this->frame()->attach_thread(this);
     if (ec)
@@ -184,7 +184,7 @@ public:
 };
 
 template <typename Executor, typename... Ts>
-class awaitable_handler<Executor, boost::system::error_code, Ts...>
+class awaitable_handler<Executor, cppmsboost::system::error_code, Ts...>
   : public awaitable_handler_base<Executor, std::tuple<Ts...>>
 {
 public:
@@ -192,7 +192,7 @@ public:
     std::tuple<Ts...>>::awaitable_handler_base;
 
   template <typename... Args>
-  void operator()(const boost::system::error_code& ec, Args&&... args)
+  void operator()(const cppmsboost::system::error_code& ec, Args&&... args)
   {
     this->frame()->attach_thread(this);
     if (ec)
@@ -271,7 +271,7 @@ public:
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

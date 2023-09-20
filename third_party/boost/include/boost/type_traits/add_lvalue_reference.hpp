@@ -8,11 +8,11 @@
 
 #include <boost/type_traits/add_reference.hpp>
 
-namespace boost{
+namespace cppmsboost{
 
 template <class T> struct add_lvalue_reference
 {
-   typedef typename boost::add_reference<T>::type type; 
+   typedef typename cppmsboost::add_reference<T>::type type; 
 };
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES

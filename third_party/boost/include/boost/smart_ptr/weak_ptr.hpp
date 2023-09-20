@@ -18,7 +18,7 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/detail/sp_noexcept.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 template<class T> class weak_ptr
@@ -30,7 +30,7 @@ private:
 
 public:
 
-    typedef typename boost::detail::sp_element< T >::type element_type;
+    typedef typename cppmsboost::detail::sp_element< T >::type element_type;
 
     BOOST_CONSTEXPR weak_ptr() BOOST_SP_NOEXCEPT : px(0), pn()
     {
@@ -75,7 +75,7 @@ public:
     template<class Y>
 #if !defined( BOOST_SP_NO_SP_CONVERTIBLE )
 
-    weak_ptr( weak_ptr<Y> const & r, typename boost::detail::sp_enable_if_convertible<Y,T>::type = boost::detail::sp_empty() )
+    weak_ptr( weak_ptr<Y> const & r, typename cppmsboost::detail::sp_enable_if_convertible<Y,T>::type = cppmsboost::detail::sp_empty() )
 
 #else
 
@@ -84,7 +84,7 @@ public:
 #endif
     BOOST_SP_NOEXCEPT : px(r.lock().get()), pn(r.pn)
     {
-        boost::detail::sp_assert_convertible< Y, T >();
+        cppmsboost::detail::sp_assert_convertible< Y, T >();
     }
 
 #if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
@@ -92,22 +92,22 @@ public:
     template<class Y>
 #if !defined( BOOST_SP_NO_SP_CONVERTIBLE )
 
-    weak_ptr( weak_ptr<Y> && r, typename boost::detail::sp_enable_if_convertible<Y,T>::type = boost::detail::sp_empty() )
+    weak_ptr( weak_ptr<Y> && r, typename cppmsboost::detail::sp_enable_if_convertible<Y,T>::type = cppmsboost::detail::sp_empty() )
 
 #else
 
     weak_ptr( weak_ptr<Y> && r )
 
 #endif
-    BOOST_SP_NOEXCEPT : px( r.lock().get() ), pn( static_cast< boost::detail::weak_count && >( r.pn ) )
+    BOOST_SP_NOEXCEPT : px( r.lock().get() ), pn( static_cast< cppmsboost::detail::weak_count && >( r.pn ) )
     {
-        boost::detail::sp_assert_convertible< Y, T >();
+        cppmsboost::detail::sp_assert_convertible< Y, T >();
         r.px = 0;
     }
 
     // for better efficiency in the T == Y case
     weak_ptr( weak_ptr && r )
-    BOOST_SP_NOEXCEPT : px( r.px ), pn( static_cast< boost::detail::weak_count && >( r.pn ) )
+    BOOST_SP_NOEXCEPT : px( r.px ), pn( static_cast< cppmsboost::detail::weak_count && >( r.pn ) )
     {
         r.px = 0;
     }
@@ -125,7 +125,7 @@ public:
     template<class Y>
 #if !defined( BOOST_SP_NO_SP_CONVERTIBLE )
 
-    weak_ptr( shared_ptr<Y> const & r, typename boost::detail::sp_enable_if_convertible<Y,T>::type = boost::detail::sp_empty() )
+    weak_ptr( shared_ptr<Y> const & r, typename cppmsboost::detail::sp_enable_if_convertible<Y,T>::type = cppmsboost::detail::sp_empty() )
 
 #else
 
@@ -134,7 +134,7 @@ public:
 #endif
     BOOST_SP_NOEXCEPT : px( r.px ), pn( r.pn )
     {
-        boost::detail::sp_assert_convertible< Y, T >();
+        cppmsboost::detail::sp_assert_convertible< Y, T >();
     }
 
     // aliasing
@@ -159,7 +159,7 @@ public:
     template<class Y>
     weak_ptr & operator=( weak_ptr<Y> const & r ) BOOST_SP_NOEXCEPT
     {
-        boost::detail::sp_assert_convertible< Y, T >();
+        cppmsboost::detail::sp_assert_convertible< Y, T >();
 
         px = r.lock().get();
         pn = r.pn;
@@ -181,7 +181,7 @@ public:
     template<class Y>
     weak_ptr & operator=( shared_ptr<Y> const & r ) BOOST_SP_NOEXCEPT
     {
-        boost::detail::sp_assert_convertible< Y, T >();
+        cppmsboost::detail::sp_assert_convertible< Y, T >();
 
         px = r.px;
         pn = r.pn;
@@ -193,7 +193,7 @@ public:
 
     shared_ptr<T> lock() const BOOST_SP_NOEXCEPT
     {
-        return shared_ptr<T>( *this, boost::detail::sp_nothrow_tag() );
+        return shared_ptr<T>( *this, cppmsboost::detail::sp_nothrow_tag() );
     }
 
     long use_count() const BOOST_SP_NOEXCEPT
@@ -250,7 +250,7 @@ private:
 #endif
 
     element_type * px;            // contained pointer
-    boost::detail::weak_count pn; // reference counter
+    cppmsboost::detail::weak_count pn; // reference counter
 
 };  // weak_ptr
 
@@ -270,6 +270,6 @@ template<class T> weak_ptr( shared_ptr<T> ) -> weak_ptr<T>;
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif  // #ifndef BOOST_SMART_PTR_WEAK_PTR_HPP_INCLUDED

@@ -24,7 +24,7 @@
 #include <boost/token_functions.hpp>
 #include <utility>
 
-namespace boost
+namespace cppmsboost
 {
   template <class TokenizerFunc, class Iterator, class Type>
   class token_iterator
@@ -40,7 +40,7 @@ namespace boost
   {
 
 #ifdef __DCC__ 
-      friend class boost::iterator_core_access; 
+      friend class cppmsboost::iterator_core_access; 
 #else 
       friend class iterator_core_access; 
 #endif  
@@ -126,6 +126,6 @@ namespace boost
         return ret_type(fun,begin,end);
     }
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif

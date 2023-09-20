@@ -28,7 +28,7 @@
 #include <boost/move/detail/to_raw_pointer.hpp>
 #include <boost/container/detail/version_type.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace container {
 namespace dtl {
 
@@ -40,7 +40,7 @@ struct scoped_deallocator
    typedef allocator_traits<Allocator> allocator_traits_type;
    typedef typename allocator_traits_type::pointer pointer;
    typedef dtl::integral_constant<unsigned,
-      boost::container::dtl::
+      cppmsboost::container::dtl::
          version<Allocator>::value>                   alloc_version;
 
    private:
@@ -81,7 +81,7 @@ struct scoped_deallocator
 template <class Allocator>
 struct null_scoped_deallocator
 {
-   typedef boost::container::allocator_traits<Allocator> AllocTraits;
+   typedef cppmsboost::container::allocator_traits<Allocator> AllocTraits;
    typedef typename AllocTraits::pointer    pointer;
    typedef typename AllocTraits::size_type  size_type;
 
@@ -103,7 +103,7 @@ struct null_scoped_deallocator
 template <class Allocator>
 struct scoped_array_deallocator
 {
-   typedef boost::container::allocator_traits<Allocator> AllocTraits;
+   typedef cppmsboost::container::allocator_traits<Allocator> AllocTraits;
    typedef typename AllocTraits::pointer    pointer;
    typedef typename AllocTraits::size_type  size_type;
 
@@ -125,7 +125,7 @@ struct scoped_array_deallocator
 template <class Allocator>
 struct null_scoped_array_deallocator
 {
-   typedef boost::container::allocator_traits<Allocator> AllocTraits;
+   typedef cppmsboost::container::allocator_traits<Allocator> AllocTraits;
    typedef typename AllocTraits::pointer    pointer;
    typedef typename AllocTraits::size_type  size_type;
 
@@ -139,11 +139,11 @@ struct null_scoped_array_deallocator
 template <class Allocator>
 struct scoped_destroy_deallocator
 {
-   typedef boost::container::allocator_traits<Allocator> AllocTraits;
+   typedef cppmsboost::container::allocator_traits<Allocator> AllocTraits;
    typedef typename AllocTraits::pointer    pointer;
    typedef typename AllocTraits::size_type  size_type;
    typedef dtl::integral_constant<unsigned,
-      boost::container::dtl::
+      cppmsboost::container::dtl::
          version<Allocator>::value>                          alloc_version;
 
    scoped_destroy_deallocator(pointer p, Allocator& a)
@@ -152,7 +152,7 @@ struct scoped_destroy_deallocator
    ~scoped_destroy_deallocator()
    {
       if(m_ptr){
-         AllocTraits::destroy(m_alloc, boost::movelib::to_raw_pointer(m_ptr));
+         AllocTraits::destroy(m_alloc, cppmsboost::movelib::to_raw_pointer(m_ptr));
          priv_deallocate(m_ptr, alloc_version());
       }
    }
@@ -178,7 +178,7 @@ struct scoped_destroy_deallocator
 template <class Allocator>
 struct scoped_destructor_n
 {
-   typedef boost::container::allocator_traits<Allocator> AllocTraits;
+   typedef cppmsboost::container::allocator_traits<Allocator> AllocTraits;
    typedef typename AllocTraits::pointer    pointer;
    typedef typename AllocTraits::value_type value_type;
    typedef typename AllocTraits::size_type  size_type;
@@ -202,7 +202,7 @@ struct scoped_destructor_n
    ~scoped_destructor_n()
    {
       if(!m_p) return;
-      value_type *raw_ptr = boost::movelib::to_raw_pointer(m_p);
+      value_type *raw_ptr = cppmsboost::movelib::to_raw_pointer(m_p);
       while(m_n--){
          AllocTraits::destroy(m_a, raw_ptr++);
       }
@@ -219,7 +219,7 @@ struct scoped_destructor_n
 template <class Allocator>
 struct null_scoped_destructor_n
 {
-   typedef boost::container::allocator_traits<Allocator> AllocTraits;
+   typedef cppmsboost::container::allocator_traits<Allocator> AllocTraits;
    typedef typename AllocTraits::pointer pointer;
    typedef typename AllocTraits::size_type size_type;
 
@@ -242,7 +242,7 @@ struct null_scoped_destructor_n
 template<class Allocator>
 class scoped_destructor
 {
-   typedef boost::container::allocator_traits<Allocator> AllocTraits;
+   typedef cppmsboost::container::allocator_traits<Allocator> AllocTraits;
    public:
    typedef typename Allocator::value_type value_type;
    scoped_destructor(Allocator &a, value_type *pv)
@@ -273,7 +273,7 @@ class scoped_destructor
 template<class Allocator, class Value = typename Allocator::value_type>
 class value_destructor
 {
-   typedef boost::container::allocator_traits<Allocator> AllocTraits;
+   typedef cppmsboost::container::allocator_traits<Allocator> AllocTraits;
    public:
    typedef Value value_type;
    value_destructor(Allocator &a, value_type &rv)
@@ -293,11 +293,11 @@ class value_destructor
 template <class Allocator>
 class allocator_destroyer
 {
-   typedef boost::container::allocator_traits<Allocator> AllocTraits;
+   typedef cppmsboost::container::allocator_traits<Allocator> AllocTraits;
    typedef typename AllocTraits::value_type value_type;
    typedef typename AllocTraits::pointer    pointer;
    typedef dtl::integral_constant<unsigned,
-      boost::container::dtl::
+      cppmsboost::container::dtl::
          version<Allocator>::value>                           alloc_version;
 
    private:
@@ -317,7 +317,7 @@ class allocator_destroyer
 
    void operator()(const pointer &p)
    {
-      AllocTraits::destroy(a_, boost::movelib::to_raw_pointer(p));
+      AllocTraits::destroy(a_, cppmsboost::movelib::to_raw_pointer(p));
       this->priv_deallocate(p, alloc_version());
    }
 };
@@ -339,7 +339,7 @@ class allocator_destroyer_and_chain_builder
 
    void operator()(const typename Allocator::pointer &p)
    {
-      allocator_traits<Allocator>::destroy(a_, boost::movelib::to_raw_pointer(p));
+      allocator_traits<Allocator>::destroy(a_, cppmsboost::movelib::to_raw_pointer(p));
       c_.push_back(p);
    }
 };
@@ -371,7 +371,7 @@ class allocator_multialloc_chain_node_deallocator
 
 }  //namespace dtl {
 }  //namespace container {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #include <boost/container/detail/config_end.hpp>
 

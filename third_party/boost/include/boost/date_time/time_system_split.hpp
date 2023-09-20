@@ -17,12 +17,12 @@
 #include <boost/date_time/special_defs.hpp>
 #include <boost/date_time/wrapping_int.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
 
   //! An unadjusted time system implementation.
 #if (defined(BOOST_DATE_TIME_NO_MEMBER_INIT))
-  template<typename config, boost::int32_t ticks_per_second>
+  template<typename config, cppmsboost::int32_t ticks_per_second>
 #else
   template<typename config>
 #endif

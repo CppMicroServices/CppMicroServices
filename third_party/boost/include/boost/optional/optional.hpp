@@ -60,7 +60,7 @@
 #include <boost/optional/detail/optional_factory_support.hpp>
 #include <boost/optional/detail/optional_aligned_storage.hpp>
 
-namespace boost { namespace optional_detail {
+namespace cppmsboost { namespace optional_detail {
 
 template <typename T>
 struct optional_value_type
@@ -68,17 +68,17 @@ struct optional_value_type
 };
 
 template <typename T>
-struct optional_value_type< ::boost::optional<T> >
+struct optional_value_type< ::cppmsboost::optional<T> >
 {
   typedef T type;
 };
 
-}} // namespace boost::optional_detail
+}} // namespace cppmsboost::optional_detail
 
 #ifdef BOOST_OPTIONAL_CONFIG_USE_OLD_IMPLEMENTATION_OF_OPTIONAL
 #include <boost/optional/detail/old_optional_implementation.hpp>
 #else
-namespace boost {
+namespace cppmsboost {
 
 namespace optional_ns {
 
@@ -163,7 +163,7 @@ class optional_base : public optional_tag
       :
       m_initialized(false)
     {
-      construct( boost::move(val) );
+      construct( cppmsboost::move(val) );
     }
 #endif
 
@@ -185,7 +185,7 @@ class optional_base : public optional_tag
       m_initialized(false)
     {
       if ( cond )
-        construct(boost::move(val));
+        construct(cppmsboost::move(val));
     }
 #endif
 
@@ -203,12 +203,12 @@ class optional_base : public optional_tag
     // Creates a deep move of another optional<T>
     // Can throw if T::T(T&&) does
     optional_base ( optional_base&& rhs )
-    BOOST_NOEXCEPT_IF(::boost::is_nothrow_move_constructible<T>::value)
+    BOOST_NOEXCEPT_IF(::cppmsboost::is_nothrow_move_constructible<T>::value)
       :
       m_initialized(false)
     {
       if ( rhs.is_initialized() )
-        construct( boost::move(rhs.get_impl()) );
+        construct( cppmsboost::move(rhs.get_impl()) );
     }
 #endif
 
@@ -219,7 +219,7 @@ class optional_base : public optional_tag
       :
       m_initialized(false)
     {
-      construct(boost::forward<Expr>(expr),tag);
+      construct(cppmsboost::forward<Expr>(expr),tag);
     }
 
 #else
@@ -244,7 +244,7 @@ class optional_base : public optional_tag
 
 #ifndef BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
     optional_base& operator= ( optional_base && rhs )
-    BOOST_NOEXCEPT_IF(::boost::is_nothrow_move_constructible<T>::value && ::boost::is_nothrow_move_assignable<T>::value)
+    BOOST_NOEXCEPT_IF(::cppmsboost::is_nothrow_move_constructible<T>::value && ::cppmsboost::is_nothrow_move_assignable<T>::value)
     {
       this->assign(static_cast<optional_base&&>(rhs));
       return *this;
@@ -277,13 +277,13 @@ class optional_base : public optional_tag
       if (is_initialized())
       {
         if ( rhs.is_initialized() )
-             assign_value( boost::move(rhs.get_impl()) );
+             assign_value( cppmsboost::move(rhs.get_impl()) );
         else destroy();
       }
       else
       {
         if ( rhs.is_initialized() )
-          construct(boost::move(rhs.get_impl()));
+          construct(cppmsboost::move(rhs.get_impl()));
       }
     }
 #endif
@@ -347,8 +347,8 @@ class optional_base : public optional_tag
     void assign ( rval_reference_type val )
     {
       if (is_initialized())
-           assign_value( boost::move(val) );
-      else construct( boost::move(val) );
+           assign_value( cppmsboost::move(val) );
+      else construct( cppmsboost::move(val) );
     }
 #endif
 
@@ -363,8 +363,8 @@ class optional_base : public optional_tag
     void assign_expr ( Expr&& expr, ExprPtr const* tag )
     {
       if (is_initialized())
-        assign_expr_to_initialized(boost::forward<Expr>(expr),tag);
-      else construct(boost::forward<Expr>(expr),tag);
+        assign_expr_to_initialized(cppmsboost::forward<Expr>(expr),tag);
+      else construct(cppmsboost::forward<Expr>(expr),tag);
     }
 #else
     template<class Expr>
@@ -406,7 +406,7 @@ class optional_base : public optional_tag
 #ifndef  BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
     void construct ( rval_reference_type val )
      {
-       ::new (m_storage.address()) value_type( boost::move(val) ) ;
+       ::new (m_storage.address()) value_type( cppmsboost::move(val) ) ;
        m_initialized = true ;
      }
 #endif
@@ -418,7 +418,7 @@ class optional_base : public optional_tag
     template<class... Args>
     void construct ( in_place_init_t, Args&&... args )
     {
-      ::new (m_storage.address()) value_type( boost::forward<Args>(args)... ) ;
+      ::new (m_storage.address()) value_type( cppmsboost::forward<Args>(args)... ) ;
       m_initialized = true ;
     }
 
@@ -426,7 +426,7 @@ class optional_base : public optional_tag
     void emplace_assign ( Args&&... args )
     {
       destroy();
-      construct(in_place_init, boost::forward<Args>(args)...);
+      construct(in_place_init, cppmsboost::forward<Args>(args)...);
     }
 
     template<class... Args>
@@ -434,7 +434,7 @@ class optional_base : public optional_tag
       :
       m_initialized(false)
     {
-      construct(in_place_init, boost::forward<Args>(args)...);
+      construct(in_place_init, cppmsboost::forward<Args>(args)...);
     }
 
     template<class... Args>
@@ -443,13 +443,13 @@ class optional_base : public optional_tag
       m_initialized(false)
     {
       if ( cond )
-        construct(in_place_init, boost::forward<Args>(args)...);
+        construct(in_place_init, cppmsboost::forward<Args>(args)...);
     }
 #elif (!defined BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES)
     template<class Arg>
     void construct ( in_place_init_t, Arg&& arg )
      {
-       ::new (m_storage.address()) value_type( boost::forward<Arg>(arg) );
+       ::new (m_storage.address()) value_type( cppmsboost::forward<Arg>(arg) );
        m_initialized = true ;
      }
 
@@ -463,7 +463,7 @@ class optional_base : public optional_tag
     void emplace_assign ( Arg&& arg )
      {
        destroy();
-       construct(in_place_init, boost::forward<Arg>(arg)) ;
+       construct(in_place_init, cppmsboost::forward<Arg>(arg)) ;
      }
 
     void emplace_assign ()
@@ -477,7 +477,7 @@ class optional_base : public optional_tag
       :
       m_initialized(false)
     {
-      construct(in_place_init, boost::forward<Arg>(arg));
+      construct(in_place_init, cppmsboost::forward<Arg>(arg));
     }
 
     explicit optional_base ( in_place_init_t )
@@ -493,7 +493,7 @@ class optional_base : public optional_tag
       m_initialized(false)
     {
       if ( cond )
-        construct(in_place_init, boost::forward<Arg>(arg));
+        construct(in_place_init, cppmsboost::forward<Arg>(arg));
     }
 
     explicit optional_base ( in_place_init_if_t, bool cond )
@@ -597,7 +597,7 @@ class optional_base : public optional_tag
     template<class Expr>
     void construct ( Expr&& factory, in_place_factory_base const* )
      {
-       boost_optional_detail::construct<value_type>(factory, m_storage.address());
+       cppmsboost_optional_detail::construct<value_type>(factory, m_storage.address());
        m_initialized = true ;
      }
 
@@ -629,7 +629,7 @@ class optional_base : public optional_tag
     template<class Expr>
     void construct ( Expr const& factory, in_place_factory_base const* )
      {
-       boost_optional_detail::construct<value_type>(factory, m_storage.address());
+       cppmsboost_optional_detail::construct<value_type>(factory, m_storage.address());
        m_initialized = true ;
      }
 
@@ -667,7 +667,7 @@ class optional_base : public optional_tag
     template<class Expr>
     void construct ( Expr&& expr, void const* )
     {
-      new (m_storage.address()) value_type(boost::forward<Expr>(expr)) ;
+      new (m_storage.address()) value_type(cppmsboost::forward<Expr>(expr)) ;
       m_initialized = true ;
     }
 
@@ -678,7 +678,7 @@ class optional_base : public optional_tag
     template<class Expr>
     void assign_expr_to_initialized ( Expr&& expr, void const* )
     {
-      assign_value( boost::forward<Expr>(expr) );
+      assign_value( cppmsboost::forward<Expr>(expr) );
     }
 #else
     // Constructs using any expression implicitly convertible to the single argument
@@ -726,7 +726,7 @@ class optional_base : public optional_tag
        {
          // An exception can be thrown here.
          // It it happens, THIS will be left uninitialized.
-         new (m_storage.address()) value_type(boost::move(expr.get())) ;
+         new (m_storage.address()) value_type(cppmsboost::move(expr.get())) ;
          m_initialized = true ;
        }
      }
@@ -780,48 +780,48 @@ class optional_base : public optional_tag
 // definition of metafunction is_optional_val_init_candidate
 template <typename U>
 struct is_optional_related
-  : boost::conditional< boost::is_base_of<optional_detail::optional_tag, BOOST_DEDUCED_TYPENAME boost::decay<U>::type>::value
-                     || boost::is_same<BOOST_DEDUCED_TYPENAME boost::decay<U>::type, none_t>::value
-                     || boost::is_same<BOOST_DEDUCED_TYPENAME boost::decay<U>::type, in_place_init_t>::value
-                     || boost::is_same<BOOST_DEDUCED_TYPENAME boost::decay<U>::type, in_place_init_if_t>::value,
-    boost::true_type, boost::false_type>::type
+  : cppmsboost::conditional< cppmsboost::is_base_of<optional_detail::optional_tag, BOOST_DEDUCED_TYPENAME cppmsboost::decay<U>::type>::value
+                     || cppmsboost::is_same<BOOST_DEDUCED_TYPENAME cppmsboost::decay<U>::type, none_t>::value
+                     || cppmsboost::is_same<BOOST_DEDUCED_TYPENAME cppmsboost::decay<U>::type, in_place_init_t>::value
+                     || cppmsboost::is_same<BOOST_DEDUCED_TYPENAME cppmsboost::decay<U>::type, in_place_init_if_t>::value,
+    cppmsboost::true_type, cppmsboost::false_type>::type
 {};
 
 #if !defined(BOOST_OPTIONAL_DETAIL_NO_IS_CONSTRUCTIBLE_TRAIT)
 
 template <typename T, typename U>
 struct is_convertible_to_T_or_factory
-  : boost::conditional< boost::is_base_of<boost::in_place_factory_base, BOOST_DEDUCED_TYPENAME boost::decay<U>::type>::value
-                     || boost::is_base_of<boost::typed_in_place_factory_base, BOOST_DEDUCED_TYPENAME boost::decay<U>::type>::value
-                     || (boost::is_constructible<T, U&&>::value && !boost::is_same<T, BOOST_DEDUCED_TYPENAME boost::decay<U>::type>::value)
-                      , boost::true_type, boost::false_type>::type
+  : cppmsboost::conditional< cppmsboost::is_base_of<cppmsboost::in_place_factory_base, BOOST_DEDUCED_TYPENAME cppmsboost::decay<U>::type>::value
+                     || cppmsboost::is_base_of<cppmsboost::typed_in_place_factory_base, BOOST_DEDUCED_TYPENAME cppmsboost::decay<U>::type>::value
+                     || (cppmsboost::is_constructible<T, U&&>::value && !cppmsboost::is_same<T, BOOST_DEDUCED_TYPENAME cppmsboost::decay<U>::type>::value)
+                      , cppmsboost::true_type, cppmsboost::false_type>::type
 {};
 
 template <typename T, typename U>
-struct is_optional_constructible : boost::is_constructible<T, U>
+struct is_optional_constructible : cppmsboost::is_constructible<T, U>
 {};
 
 #else
 
 template <typename, typename>
-struct is_convertible_to_T_or_factory : boost::true_type
+struct is_convertible_to_T_or_factory : cppmsboost::true_type
 {};
 
 template <typename T, typename U>
-struct is_optional_constructible : boost::true_type
+struct is_optional_constructible : cppmsboost::true_type
 {};
 
 #endif // is_convertible condition
 
 template <typename T, typename U, bool = is_optional_related<U>::value>
 struct is_optional_val_init_candidate
-  : boost::false_type
+  : cppmsboost::false_type
 {};
 
 template <typename T, typename U>
 struct is_optional_val_init_candidate<T, U, false>
-  : boost::conditional< is_convertible_to_T_or_factory<T, U>::value
-                      , boost::true_type, boost::false_type>::type
+  : cppmsboost::conditional< is_convertible_to_T_or_factory<T, U>::value
+                      , cppmsboost::true_type, cppmsboost::false_type>::type
 {};
 
 } // namespace optional_detail
@@ -830,15 +830,15 @@ namespace optional_config {
 
 template <typename T>
 struct optional_uses_direct_storage_for
-  : boost::conditional<(boost::is_scalar<T>::value && !boost::is_const<T>::value && !boost::is_volatile<T>::value)
-                      , boost::true_type, boost::false_type>::type
+  : cppmsboost::conditional<(cppmsboost::is_scalar<T>::value && !cppmsboost::is_const<T>::value && !cppmsboost::is_volatile<T>::value)
+                      , cppmsboost::true_type, cppmsboost::false_type>::type
 {};
 
 } // namespace optional_config
 
 
 #ifndef BOOST_OPTIONAL_DETAIL_NO_DIRECT_STORAGE_SPEC
-#  define BOOST_OPTIONAL_BASE_TYPE(T) boost::conditional< optional_config::optional_uses_direct_storage_for<T>::value, \
+#  define BOOST_OPTIONAL_BASE_TYPE(T) cppmsboost::conditional< optional_config::optional_uses_direct_storage_for<T>::value, \
                                       optional_detail::tc_optional_base<T>, \
                                       optional_detail::optional_base<T> \
                                       >::type
@@ -882,7 +882,7 @@ class optional
 #ifndef  BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
     // Creates an optional<T> initialized with 'move(val)'.
     // Can throw if T::T(T &&) does
-    optional ( rval_reference_type val ) : base(optional_detail::init_value_tag(), boost::forward<T>(val))
+    optional ( rval_reference_type val ) : base(optional_detail::init_value_tag(), cppmsboost::forward<T>(val))
       {}
 #endif
 
@@ -893,7 +893,7 @@ class optional
 #ifndef  BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
     /// Creates an optional<T> initialized with 'val' IFF cond is true, otherwise creates an uninitialized optional.
     // Can throw if T::T(T &&) does
-    optional ( bool cond, rval_reference_type val ) : base( cond, boost::forward<T>(val) )
+    optional ( bool cond, rval_reference_type val ) : base( cond, cppmsboost::forward<T>(val) )
       {}
 #endif
 
@@ -905,7 +905,7 @@ class optional
     template<class U>
     explicit optional ( optional<U> const& rhs
 #ifndef BOOST_OPTIONAL_DETAIL_NO_SFINAE_FRIENDLY_CONSTRUCTORS
-                        ,BOOST_DEDUCED_TYPENAME boost::enable_if< optional_detail::is_optional_constructible<T, U const&>, bool>::type = true
+                        ,BOOST_DEDUCED_TYPENAME cppmsboost::enable_if< optional_detail::is_optional_constructible<T, U const&>, bool>::type = true
 #endif
                       )
       :
@@ -922,14 +922,14 @@ class optional
     template<class U>
     explicit optional ( optional<U> && rhs
 #ifndef BOOST_OPTIONAL_DETAIL_NO_SFINAE_FRIENDLY_CONSTRUCTORS
-                        ,BOOST_DEDUCED_TYPENAME boost::enable_if< optional_detail::is_optional_constructible<T, U>, bool>::type = true
+                        ,BOOST_DEDUCED_TYPENAME cppmsboost::enable_if< optional_detail::is_optional_constructible<T, U>, bool>::type = true
 #endif
                       )
       :
       base()
     {
       if ( rhs.is_initialized() )
-        this->construct( boost::move(rhs.get()) );
+        this->construct( cppmsboost::move(rhs.get()) );
     }
 #endif
 
@@ -948,14 +948,14 @@ class optional
 
   template<class Expr>
   explicit optional ( Expr&& expr,
-                      BOOST_DEDUCED_TYPENAME boost::enable_if< optional_detail::is_optional_val_init_candidate<T, Expr>, bool>::type = true
+                      BOOST_DEDUCED_TYPENAME cppmsboost::enable_if< optional_detail::is_optional_val_init_candidate<T, Expr>, bool>::type = true
   )
-    : base(boost::forward<Expr>(expr),boost::addressof(expr))
+    : base(cppmsboost::forward<Expr>(expr),cppmsboost::addressof(expr))
     {}
 
 #else
     template<class Expr>
-    explicit optional ( Expr const& expr ) : base(expr,boost::addressof(expr)) {}
+    explicit optional ( Expr const& expr ) : base(expr,cppmsboost::addressof(expr)) {}
 #endif // !defined BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
 #endif // !defined BOOST_OPTIONAL_NO_INPLACE_FACTORY_SUPPORT
 
@@ -975,8 +975,8 @@ class optional
     optional ( optional && ) = default;
 #else
     optional ( optional && rhs )
-      BOOST_NOEXCEPT_IF(::boost::is_nothrow_move_constructible<T>::value)
-      : base( boost::move(rhs) )
+      BOOST_NOEXCEPT_IF(::cppmsboost::is_nothrow_move_constructible<T>::value)
+      : base( cppmsboost::move(rhs) )
     {}
 #endif
 
@@ -994,10 +994,10 @@ class optional
 #ifndef  BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
 
     template<class Expr>
-    BOOST_DEDUCED_TYPENAME boost::enable_if<optional_detail::is_optional_val_init_candidate<T, Expr>, optional&>::type
+    BOOST_DEDUCED_TYPENAME cppmsboost::enable_if<optional_detail::is_optional_val_init_candidate<T, Expr>, optional&>::type
     operator= ( Expr&& expr )
       {
-        this->assign_expr(boost::forward<Expr>(expr),boost::addressof(expr));
+        this->assign_expr(cppmsboost::forward<Expr>(expr),cppmsboost::addressof(expr));
         return *this ;
       }
 
@@ -1005,7 +1005,7 @@ class optional
     template<class Expr>
     optional& operator= ( Expr const& expr )
       {
-        this->assign_expr(expr,boost::addressof(expr));
+        this->assign_expr(expr,cppmsboost::addressof(expr));
         return *this ;
       }
 #endif // !defined  BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
@@ -1028,7 +1028,7 @@ class optional
     template<class U>
     optional& operator= ( optional<U> && rhs )
       {
-        this->assign(boost::move(rhs));
+        this->assign(cppmsboost::move(rhs));
         return *this ;
       }
 #endif
@@ -1052,7 +1052,7 @@ class optional
     optional& operator= ( optional && ) = default;
 #else
     optional& operator= ( optional && rhs )
-      BOOST_NOEXCEPT_IF(::boost::is_nothrow_move_constructible<T>::value && ::boost::is_nothrow_move_assignable<T>::value)
+      BOOST_NOEXCEPT_IF(::cppmsboost::is_nothrow_move_constructible<T>::value && ::cppmsboost::is_nothrow_move_assignable<T>::value)
       {
         this->assign( static_cast<base &&>(rhs) ) ;
         return *this ;
@@ -1065,10 +1065,10 @@ class optional
 
     // Assigns from a T (deep-moves/copies the rhs value)
     template <typename T_>
-    BOOST_DEDUCED_TYPENAME boost::enable_if<boost::is_same<T, BOOST_DEDUCED_TYPENAME boost::decay<T_>::type>, optional&>::type
+    BOOST_DEDUCED_TYPENAME cppmsboost::enable_if<cppmsboost::is_same<T, BOOST_DEDUCED_TYPENAME cppmsboost::decay<T_>::type>, optional&>::type
     operator= ( T_&& val )
       {
-        this->assign( boost::forward<T_>(val) ) ;
+        this->assign( cppmsboost::forward<T_>(val) ) ;
         return *this ;
       }
 
@@ -1086,7 +1086,7 @@ class optional
     // Assigns from a T (deep-moves the rhs value)
     optional& operator= ( rval_reference_type val )
       {
-        this->assign( boost::move(val) ) ;
+        this->assign( cppmsboost::move(val) ) ;
         return *this ;
       }
 #endif
@@ -1108,24 +1108,24 @@ class optional
     template<class... Args>
     void emplace ( Args&&... args )
     {
-      this->emplace_assign( boost::forward<Args>(args)... );
+      this->emplace_assign( cppmsboost::forward<Args>(args)... );
     }
 
     template<class... Args>
     explicit optional ( in_place_init_t, Args&&... args )
-    : base( in_place_init, boost::forward<Args>(args)... )
+    : base( in_place_init, cppmsboost::forward<Args>(args)... )
     {}
 
     template<class... Args>
     explicit optional ( in_place_init_if_t, bool cond, Args&&... args )
-    : base( in_place_init_if, cond, boost::forward<Args>(args)... )
+    : base( in_place_init_if, cond, cppmsboost::forward<Args>(args)... )
     {}
 
 #elif (!defined BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES)
     template<class Arg>
     void emplace ( Arg&& arg )
      {
-       this->emplace_assign( boost::forward<Arg>(arg) );
+       this->emplace_assign( cppmsboost::forward<Arg>(arg) );
      }
 
     void emplace ()
@@ -1135,7 +1135,7 @@ class optional
 
     template<class Args>
     explicit optional ( in_place_init_t, Args&& args )
-    : base( in_place_init, boost::forward<Args>(args) )
+    : base( in_place_init, cppmsboost::forward<Args>(args) )
     {}
 
     explicit optional ( in_place_init_t )
@@ -1144,7 +1144,7 @@ class optional
 
     template<class Args>
     explicit optional ( in_place_init_if_t, bool cond, Args&& args )
-    : base( in_place_init_if, cond, boost::forward<Args>(args) )
+    : base( in_place_init_if, cond, cppmsboost::forward<Args>(args) )
     {}
 
     explicit optional ( in_place_init_if_t, bool cond )
@@ -1198,10 +1198,10 @@ class optional
 #endif
 
     void swap( optional & arg )
-      BOOST_NOEXCEPT_IF(::boost::is_nothrow_move_constructible<T>::value && ::boost::is_nothrow_move_assignable<T>::value)
+      BOOST_NOEXCEPT_IF(::cppmsboost::is_nothrow_move_constructible<T>::value && ::cppmsboost::is_nothrow_move_assignable<T>::value)
       {
         // allow for Koenig lookup
-        boost::swap(*this, arg);
+        cppmsboost::swap(*this, arg);
       }
 
 
@@ -1227,7 +1227,7 @@ class optional
 #if (!defined BOOST_NO_CXX11_REF_QUALIFIERS) && (!defined BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES)
     reference_const_type operator *() const& { return this->get() ; }
     reference_type       operator *() &      { return this->get() ; }
-    reference_type_of_temporary_wrapper operator *() && { return boost::move(this->get()) ; }
+    reference_type_of_temporary_wrapper operator *() && { return cppmsboost::move(this->get()) ; }
 #else
     reference_const_type operator *() const { return this->get() ; }
     reference_type       operator *()       { return this->get() ; }
@@ -1253,7 +1253,7 @@ class optional
     reference_type_of_temporary_wrapper value() &&
       {
         if (this->is_initialized())
-          return boost::move(this->get()) ;
+          return cppmsboost::move(this->get()) ;
         else
           throw_exception(bad_optional_access());
       }
@@ -1284,16 +1284,16 @@ class optional
         if (this->is_initialized())
           return get();
         else
-          return boost::forward<U>(v);
+          return cppmsboost::forward<U>(v);
       }
 
     template <class U>
     value_type value_or ( U&& v ) &&
       {
         if (this->is_initialized())
-          return boost::move(get());
+          return cppmsboost::move(get());
         else
-          return boost::forward<U>(v);
+          return cppmsboost::forward<U>(v);
       }
 #elif !defined BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
     template <class U>
@@ -1302,7 +1302,7 @@ class optional
         if (this->is_initialized())
           return get();
         else
-          return boost::forward<U>(v);
+          return cppmsboost::forward<U>(v);
       }
 #else
     template <class U>
@@ -1339,13 +1339,13 @@ class optional
     value_type value_or_eval ( F f ) &&
       {
         if (this->is_initialized())
-          return boost::move(get());
+          return cppmsboost::move(get());
         else
           return f();
       }
 
     template <typename F>
-    optional<typename boost::result_of<F(reference_type)>::type> map(F f) &
+    optional<typename cppmsboost::result_of<F(reference_type)>::type> map(F f) &
       {
         if (this->has_value())
           return f(get());
@@ -1354,7 +1354,7 @@ class optional
       }
 
     template <typename F>
-    optional<typename boost::result_of<F(reference_const_type)>::type> map(F f) const&
+    optional<typename cppmsboost::result_of<F(reference_const_type)>::type> map(F f) const&
       {
         if (this->has_value())
           return f(get());
@@ -1363,16 +1363,16 @@ class optional
       }
 
     template <typename F>
-    optional<typename boost::result_of<F(reference_type_of_temporary_wrapper)>::type> map(F f) &&
+    optional<typename cppmsboost::result_of<F(reference_type_of_temporary_wrapper)>::type> map(F f) &&
       {
         if (this->has_value())
-          return f(boost::move(this->get()));
+          return f(cppmsboost::move(this->get()));
         else
           return none;
       }
 
     template <typename F>
-    optional<typename optional_detail::optional_value_type<typename boost::result_of<F(reference_type)>::type>::type> flat_map(F f) &
+    optional<typename optional_detail::optional_value_type<typename cppmsboost::result_of<F(reference_type)>::type>::type> flat_map(F f) &
       {
         if (this->has_value())
           return f(get());
@@ -1381,7 +1381,7 @@ class optional
       }
 
     template <typename F>
-    optional<typename optional_detail::optional_value_type<typename boost::result_of<F(reference_const_type)>::type>::type> flat_map(F f) const&
+    optional<typename optional_detail::optional_value_type<typename cppmsboost::result_of<F(reference_const_type)>::type>::type> flat_map(F f) const&
       {
         if (this->has_value())
           return f(get());
@@ -1390,10 +1390,10 @@ class optional
       }
 
     template <typename F>
-    optional<typename optional_detail::optional_value_type<typename boost::result_of<F(reference_type_of_temporary_wrapper)>::type>::type> flat_map(F f) &&
+    optional<typename optional_detail::optional_value_type<typename cppmsboost::result_of<F(reference_type_of_temporary_wrapper)>::type>::type> flat_map(F f) &&
       {
         if (this->has_value())
-          return f(boost::move(get()));
+          return f(cppmsboost::move(get()));
         else
           return none;
       }
@@ -1409,7 +1409,7 @@ class optional
       }
 
     template <typename F>
-    optional<typename boost::result_of<F(reference_type)>::type> map(F f)
+    optional<typename cppmsboost::result_of<F(reference_type)>::type> map(F f)
       {
         if (this->has_value())
           return f(get());
@@ -1418,7 +1418,7 @@ class optional
       }
 
     template <typename F>
-    optional<typename boost::result_of<F(reference_const_type)>::type> map(F f) const
+    optional<typename cppmsboost::result_of<F(reference_const_type)>::type> map(F f) const
       {
         if (this->has_value())
           return f(get());
@@ -1427,7 +1427,7 @@ class optional
       }
 
     template <typename F>
-    optional<typename optional_detail::optional_value_type<typename boost::result_of<F(reference_type)>::type>::type> flat_map(F f)
+    optional<typename optional_detail::optional_value_type<typename cppmsboost::result_of<F(reference_type)>::type>::type> flat_map(F f)
       {
         if (this->has_value())
           return f(get());
@@ -1436,7 +1436,7 @@ class optional
       }
 
     template <typename F>
-    optional<typename optional_detail::optional_value_type<typename boost::result_of<F(reference_const_type)>::type>::type> flat_map(F f) const
+    optional<typename optional_detail::optional_value_type<typename cppmsboost::result_of<F(reference_const_type)>::type>::type> flat_map(F f) const
       {
         if (this->has_value())
           return f(get());
@@ -1453,11 +1453,11 @@ class optional
     BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT()
 } ;
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_OPTIONAL_CONFIG_USE_OLD_IMPLEMENTATION_OF_OPTIONAL
 
-namespace boost {
+namespace cppmsboost {
 
 #ifndef  BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
 template<class T>
@@ -1467,29 +1467,29 @@ class optional<T&&>
 } ;
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #ifndef BOOST_OPTIONAL_CONFIG_DONT_SPECIALIZE_OPTIONAL_REFS
 # include <boost/optional/detail/optional_reference_spec.hpp>
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 #ifndef BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
 
 template<class T>
 inline
-optional<BOOST_DEDUCED_TYPENAME boost::decay<T>::type> make_optional ( T && v  )
+optional<BOOST_DEDUCED_TYPENAME cppmsboost::decay<T>::type> make_optional ( T && v  )
 {
-  return optional<BOOST_DEDUCED_TYPENAME boost::decay<T>::type>(boost::forward<T>(v));
+  return optional<BOOST_DEDUCED_TYPENAME cppmsboost::decay<T>::type>(cppmsboost::forward<T>(v));
 }
 
 // Returns optional<T>(cond,v)
 template<class T>
 inline
-optional<BOOST_DEDUCED_TYPENAME boost::decay<T>::type> make_optional ( bool cond, T && v )
+optional<BOOST_DEDUCED_TYPENAME cppmsboost::decay<T>::type> make_optional ( bool cond, T && v )
 {
-  return optional<BOOST_DEDUCED_TYPENAME boost::decay<T>::type>(cond,boost::forward<T>(v));
+  return optional<BOOST_DEDUCED_TYPENAME cppmsboost::decay<T>::type>(cond,cppmsboost::forward<T>(v));
 }
 
 #else
@@ -1584,20 +1584,20 @@ get_pointer ( optional<T>& opt )
   return opt.get_ptr() ;
 }
 
-} // namespace boost
+} // namespace cppmsboost
 
-namespace boost {
+namespace cppmsboost {
 
 // The following declaration prevents a bug where operator safe-bool is used upon streaming optional object if you forget the IO header.
 template<class CharType, class CharTrait>
 std::basic_ostream<CharType, CharTrait>&
 operator<<(std::basic_ostream<CharType, CharTrait>& os, optional_detail::optional_tag const&)
 {
-  BOOST_STATIC_ASSERT_MSG(sizeof(CharType) == 0, "If you want to output boost::optional, include header <boost/optional/optional_io.hpp>");
+  BOOST_STATIC_ASSERT_MSG(sizeof(CharType) == 0, "If you want to output cppmsboost::optional, include header <boost/optional/optional_io.hpp>");
   return os;
 }
 
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/optional/detail/optional_relops.hpp>
 #include <boost/optional/detail/optional_swap.hpp>

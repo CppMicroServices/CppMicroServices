@@ -54,7 +54,7 @@ namespace std{
 }
 #endif
 
-namespace boost{ namespace BOOST_REGEX_DETAIL_NS{
+namespace cppmsboost{ namespace BOOST_REGEX_DETAIL_NS{
 #ifdef BOOST_NO_STD_DISTANCE
 template <class T>
 std::ptrdiff_t distance(const T& x, const T& y)
@@ -96,7 +96,7 @@ namespace std{
  ****************************************************************************/
 
 #ifdef __cplusplus
-namespace boost{ namespace BOOST_REGEX_DETAIL_NS{
+namespace cppmsboost{ namespace BOOST_REGEX_DETAIL_NS{
 
 #ifdef BOOST_MSVC
 #pragma warning (push)
@@ -125,7 +125,7 @@ inline void pointer_construct(T* p, const T& t)
  ****************************************************************************/
 
 #ifdef __cplusplus
-namespace boost{ namespace BOOST_REGEX_DETAIL_NS{
+namespace cppmsboost{ namespace BOOST_REGEX_DETAIL_NS{
 #if BOOST_WORKAROUND(BOOST_MSVC,>=1400) && BOOST_WORKAROUND(BOOST_MSVC, <1600) && defined(_CPPLIB_VER) && defined(BOOST_DINKUMWARE_STDLIB) && !(defined(__SGI_STL_PORT) || defined(_STLPORT_VERSION))
    //
    // MSVC 8 will either emit warnings or else refuse to compile
@@ -225,7 +225,7 @@ namespace boost{ namespace BOOST_REGEX_DETAIL_NS{
       if(i)
       {
          std::overflow_error e("String buffer too small");
-         boost::throw_exception(e);
+         cppmsboost::throw_exception(e);
       }
    }
 

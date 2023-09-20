@@ -19,7 +19,7 @@
 # include <ia64intrin.h>
 #endif
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -56,6 +56,6 @@ private:
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // #ifndef BOOST_SMART_PTR_DETAIL_ATOMIC_COUNT_SYNC_HPP_INCLUDED

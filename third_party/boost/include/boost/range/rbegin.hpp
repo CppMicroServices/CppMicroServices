@@ -18,7 +18,7 @@
 #include <boost/range/end.hpp>
 #include <boost/range/reverse_iterator.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 #ifdef BOOST_NO_FUNCTION_TEMPLATE_ORDERING
@@ -27,7 +27,7 @@ template< class C >
 inline BOOST_DEDUCED_TYPENAME range_reverse_iterator<C>::type
 rbegin( C& c )
 {
-    return BOOST_DEDUCED_TYPENAME range_reverse_iterator<C>::type( boost::end( c ) );
+    return BOOST_DEDUCED_TYPENAME range_reverse_iterator<C>::type( cppmsboost::end( c ) );
 }
 
 #else
@@ -38,7 +38,7 @@ rbegin( C& c )
 {
     typedef BOOST_DEDUCED_TYPENAME range_reverse_iterator<C>::type
         iter_type;
-    return iter_type( boost::end( c ) );
+    return iter_type( cppmsboost::end( c ) );
 }
 
 template< class C >
@@ -47,7 +47,7 @@ rbegin( const C& c )
 {
     typedef BOOST_DEDUCED_TYPENAME range_reverse_iterator<const C>::type
         iter_type;
-    return iter_type( boost::end( c ) );
+    return iter_type( cppmsboost::end( c ) );
 }
 
 #endif // BOOST_NO_FUNCTION_TEMPLATE_ORDERING
@@ -56,7 +56,7 @@ template< class T >
 inline BOOST_DEDUCED_TYPENAME range_reverse_iterator<const T>::type
 const_rbegin( const T& r )
 {
-    return boost::rbegin( r );
+    return cppmsboost::rbegin( r );
 }
 
 } // namespace 'boost'

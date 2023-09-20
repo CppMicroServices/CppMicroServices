@@ -74,7 +74,7 @@ struct remove_whitespace_predicate<wchar_t>
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // convert base64 file data (including whitespace and padding) to binary
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 namespace iterators {
 
@@ -83,15 +83,15 @@ namespace iterators {
 
 template<class Predicate, class Base>
 class filter_iterator
-    : public boost::iterator_adaptor<
+    : public cppmsboost::iterator_adaptor<
         filter_iterator<Predicate, Base>,
         Base,
         use_default,
         single_pass_traversal_tag
     >
 {
-    friend class boost::iterator_core_access;
-    typedef typename boost::iterator_adaptor<
+    friend class cppmsboost::iterator_core_access;
+    typedef typename cppmsboost::iterator_adaptor<
         filter_iterator<Predicate, Base>,
         Base,
         use_default,
@@ -133,16 +133,16 @@ template<class Base>
 class remove_whitespace :
     public filter_iterator<
         remove_whitespace_predicate<
-            typename boost::iterator_value<Base>::type
+            typename cppmsboost::iterator_value<Base>::type
             //typename Base::value_type
         >,
         Base
     >
 {
-    friend class boost::iterator_core_access;
+    friend class cppmsboost::iterator_core_access;
     typedef filter_iterator<
         remove_whitespace_predicate<
-            typename boost::iterator_value<Base>::type
+            typename cppmsboost::iterator_value<Base>::type
             //typename Base::value_type
         >,
         Base
@@ -162,6 +162,6 @@ public:
 
 } // namespace iterators
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ARCHIVE_ITERATORS_REMOVE_WHITESPACE_HPP

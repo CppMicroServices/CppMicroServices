@@ -49,7 +49,7 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace movelib
@@ -79,7 +79,7 @@ template< class T > class sp_reference_wrapper
 { 
 public:
 
-    explicit sp_reference_wrapper( T & t): t_( boost::addressof( t ) )
+    explicit sp_reference_wrapper( T & t): t_( cppmsboost::addressof( t ) )
     {
     }
 
@@ -146,7 +146,7 @@ public:
         }
         catch(...)
         {
-            boost::checked_delete( p );
+            cppmsboost::checked_delete( p );
             throw;
         }
 
@@ -156,8 +156,8 @@ public:
 
         if( pi_ == 0 )
         {
-            boost::checked_delete( p );
-            boost::throw_exception( std::bad_alloc() );
+            cppmsboost::checked_delete( p );
+            cppmsboost::throw_exception( std::bad_alloc() );
         }
 
 #endif
@@ -194,7 +194,7 @@ public:
         if(pi_ == 0)
         {
             d(p); // delete p
-            boost::throw_exception(std::bad_alloc());
+            cppmsboost::throw_exception(std::bad_alloc());
         }
 
 #endif
@@ -226,7 +226,7 @@ public:
         if( pi_ == 0 )
         {
             D::operator_fn( p ); // delete p
-            boost::throw_exception( std::bad_alloc() );
+            cppmsboost::throw_exception( std::bad_alloc() );
         }
 
 #endif // #ifndef BOOST_NO_EXCEPTIONS
@@ -283,7 +283,7 @@ public:
         else
         {
             d( p );
-            boost::throw_exception( std::bad_alloc() );
+            cppmsboost::throw_exception( std::bad_alloc() );
         }
 
 #endif
@@ -340,7 +340,7 @@ public:
         else
         {
             D::operator_fn( p );
-            boost::throw_exception( std::bad_alloc() );
+            cppmsboost::throw_exception( std::bad_alloc() );
         }
 
 #endif // #ifndef BOOST_NO_EXCEPTIONS
@@ -362,7 +362,7 @@ public:
 
         if( pi_ == 0 )
         {
-            boost::throw_exception(std::bad_alloc());
+            cppmsboost::throw_exception(std::bad_alloc());
         }
 
 #endif
@@ -389,7 +389,7 @@ public:
 
         if( pi_ == 0 )
         {
-            boost::throw_exception( std::bad_alloc() );
+            cppmsboost::throw_exception( std::bad_alloc() );
         }
 
 #endif
@@ -400,7 +400,7 @@ public:
 #endif
 
     template<class Y, class D>
-    explicit shared_count( boost::movelib::unique_ptr<Y, D> & r ): pi_( 0 )
+    explicit shared_count( cppmsboost::movelib::unique_ptr<Y, D> & r ): pi_( 0 )
 #if defined(BOOST_SP_ENABLE_DEBUG_HOOKS)
         , id_(shared_count_id)
 #endif
@@ -408,13 +408,13 @@ public:
         typedef typename sp_convert_reference<D>::type D2;
 
         D2 d2( r.get_deleter() );
-        pi_ = new sp_counted_impl_pd< typename boost::movelib::unique_ptr<Y, D>::pointer, D2 >( r.get(), d2 );
+        pi_ = new sp_counted_impl_pd< typename cppmsboost::movelib::unique_ptr<Y, D>::pointer, D2 >( r.get(), d2 );
 
 #ifdef BOOST_NO_EXCEPTIONS
 
         if( pi_ == 0 )
         {
-            boost::throw_exception( std::bad_alloc() );
+            cppmsboost::throw_exception( std::bad_alloc() );
         }
 
 #endif
@@ -638,7 +638,7 @@ inline shared_count::shared_count( weak_count const & r ): pi_( r.pi_ )
 {
     if( pi_ == 0 || !pi_->add_ref_lock() )
     {
-        boost::throw_exception( boost::bad_weak_ptr() );
+        cppmsboost::throw_exception( cppmsboost::bad_weak_ptr() );
     }
 }
 
@@ -655,7 +655,7 @@ inline shared_count::shared_count( weak_count const & r, sp_nothrow_tag ) BOOST_
 
 } // namespace detail
 
-} // namespace boost
+} // namespace cppmsboost
 
 #if defined( BOOST_SP_DISABLE_DEPRECATED )
 #pragma GCC diagnostic pop

@@ -14,7 +14,7 @@
 #include <boost/type_traits/make_void.hpp>
 #include <utility>
 
-namespace boost {
+namespace cppmsboost {
    namespace detail {
 
 
@@ -44,7 +44,7 @@ namespace boost {
       // They can also fall back to the behaviour of reinterpret_cast, which allows is_virtual_base_of to work on non-class types too.
       // Note that because we are casting pointers there can be no user-defined operators to interfere.
       template<class T, class U,
-         typename boost::make_void<decltype((U*)(std::declval<T*>()))>::type* =
+         typename cppmsboost::make_void<decltype((U*)(std::declval<T*>()))>::type* =
          nullptr>
          constexpr bool is_virtual_base_impl(int) { return false; }
 
@@ -52,9 +52,9 @@ namespace boost {
 
    template<class T, class U>
    struct is_virtual_base_of : public
-      boost::integral_constant<
+      cppmsboost::integral_constant<
       bool,
-      boost::is_base_of<T, U>::value &&
+      cppmsboost::is_base_of<T, U>::value &&
       detail::is_virtual_base_impl<T, U>(0) &&
       !detail::is_virtual_base_impl<U, T>(0)
       > {};
@@ -122,14 +122,14 @@ namespace boost {
    template<typename Base, typename Derived>
    struct is_virtual_base_of_impl2
    {
-      typedef boost::integral_constant<bool, (boost::is_base_of<Base, Derived>::value && !boost::is_same<Base, Derived>::value)> tag_type;
+      typedef cppmsboost::integral_constant<bool, (cppmsboost::is_base_of<Base, Derived>::value && !cppmsboost::is_same<Base, Derived>::value)> tag_type;
       typedef is_virtual_base_of_impl<Base, Derived, tag_type> imp;
       BOOST_STATIC_CONSTANT(bool, value = imp::value);
    };
 
 } // namespace detail
 
-template <class Base, class Derived> struct is_virtual_base_of : public integral_constant<bool, (::boost::detail::is_virtual_base_of_impl2<Base, Derived>::value)> {};
+template <class Base, class Derived> struct is_virtual_base_of : public integral_constant<bool, (::cppmsboost::detail::is_virtual_base_of_impl2<Base, Derived>::value)> {};
 
 #endif
 
@@ -141,6 +141,6 @@ template <class Base, class Derived> struct is_virtual_base_of<Base&, Derived&> 
 #pragma warning( pop )
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif

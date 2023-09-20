@@ -33,7 +33,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Provides waitable timer functionality.
@@ -45,7 +45,7 @@ namespace asio {
  * If the wait() or async_wait() function is called on an expired timer, the
  * wait operation will complete immediately.
  *
- * Most applications will use the boost::asio::deadline_timer typedef.
+ * Most applications will use the cppmsboost::asio::deadline_timer typedef.
  *
  * @par Thread Safety
  * @e Distinct @e objects: Safe.@n
@@ -55,10 +55,10 @@ namespace asio {
  * Performing a blocking wait:
  * @code
  * // Construct a timer without setting an expiry time.
- * boost::asio::deadline_timer timer(my_context);
+ * cppmsboost::asio::deadline_timer timer(my_context);
  *
  * // Set an expiry time relative to now.
- * timer.expires_from_now(boost::posix_time::seconds(5));
+ * timer.expires_from_now(cppmsboost::posix_time::seconds(5));
  *
  * // Wait for the timer to expire.
  * timer.wait();
@@ -67,7 +67,7 @@ namespace asio {
  * @par 
  * Performing an asynchronous wait:
  * @code
- * void handler(const boost::system::error_code& error)
+ * void handler(const cppmsboost::system::error_code& error)
  * {
  *   if (!error)
  *   {
@@ -78,8 +78,8 @@ namespace asio {
  * ...
  *
  * // Construct a timer with an absolute expiry time.
- * boost::asio::deadline_timer timer(my_context,
- *     boost::posix_time::time_from_string("2005-12-07 23:59:59.000"));
+ * cppmsboost::asio::deadline_timer timer(my_context,
+ *     cppmsboost::posix_time::time_from_string("2005-12-07 23:59:59.000"));
  *
  * // Start an asynchronous wait.
  * timer.async_wait(handler);
@@ -106,26 +106,26 @@ namespace asio {
  *   }
  * }
  *
- * void on_timeout(const boost::system::error_code& e)
+ * void on_timeout(const cppmsboost::system::error_code& e)
  * {
- *   if (e != boost::asio::error::operation_aborted)
+ *   if (e != cppmsboost::asio::error::operation_aborted)
  *   {
  *     // Timer was not cancelled, take necessary action.
  *   }
  * }
  * @endcode
  *
- * @li The boost::asio::basic_deadline_timer::expires_from_now() function
+ * @li The cppmsboost::asio::basic_deadline_timer::expires_from_now() function
  * cancels any pending asynchronous waits, and returns the number of
  * asynchronous waits that were cancelled. If it returns 0 then you were too
  * late and the wait handler has already been executed, or will soon be
  * executed. If it returns 1 then the wait handler was successfully cancelled.
  *
- * @li If a wait handler is cancelled, the boost::system::error_code passed to
- * it contains the value boost::asio::error::operation_aborted.
+ * @li If a wait handler is cancelled, the cppmsboost::system::error_code passed to
+ * it contains the value cppmsboost::asio::error::operation_aborted.
  */
 template <typename Time,
-    typename TimeTraits = boost::asio::time_traits<Time>,
+    typename TimeTraits = cppmsboost::asio::time_traits<Time>,
     typename Executor = executor>
 class basic_deadline_timer
 {
@@ -196,9 +196,9 @@ public:
   basic_deadline_timer(const executor_type& ex, const time_type& expiry_time)
     : impl_(ex)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().expires_at(impl_.get_implementation(), expiry_time, ec);
-    boost::asio::detail::throw_error(ec, "expires_at");
+    cppmsboost::asio::detail::throw_error(ec, "expires_at");
   }
 
   /// Constructor to set a particular expiry time as an absolute time.
@@ -219,9 +219,9 @@ public:
       >::type* = 0)
     : impl_(context)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().expires_at(impl_.get_implementation(), expiry_time, ec);
-    boost::asio::detail::throw_error(ec, "expires_at");
+    cppmsboost::asio::detail::throw_error(ec, "expires_at");
   }
 
   /// Constructor to set a particular expiry time relative to now.
@@ -238,10 +238,10 @@ public:
       const duration_type& expiry_time)
     : impl_(ex)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().expires_from_now(
         impl_.get_implementation(), expiry_time, ec);
-    boost::asio::detail::throw_error(ec, "expires_from_now");
+    cppmsboost::asio::detail::throw_error(ec, "expires_from_now");
   }
 
   /// Constructor to set a particular expiry time relative to now.
@@ -263,10 +263,10 @@ public:
       >::type* = 0)
     : impl_(context)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().expires_from_now(
         impl_.get_implementation(), expiry_time, ec);
-    boost::asio::detail::throw_error(ec, "expires_from_now");
+    cppmsboost::asio::detail::throw_error(ec, "expires_from_now");
   }
 
 #if defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
@@ -324,13 +324,13 @@ public:
   /**
    * This function forces the completion of any pending asynchronous wait
    * operations against the timer. The handler for each cancelled operation will
-   * be invoked with the boost::asio::error::operation_aborted error code.
+   * be invoked with the cppmsboost::asio::error::operation_aborted error code.
    *
    * Cancelling the timer does not change the expiry time.
    *
    * @return The number of asynchronous operations that were cancelled.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @note If the timer has already expired when cancel() is called, then the
    * handlers for asynchronous wait operations will:
@@ -344,9 +344,9 @@ public:
    */
   std::size_t cancel()
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = impl_.get_service().cancel(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "cancel");
+    cppmsboost::asio::detail::throw_error(ec, "cancel");
     return s;
   }
 
@@ -354,7 +354,7 @@ public:
   /**
    * This function forces the completion of any pending asynchronous wait
    * operations against the timer. The handler for each cancelled operation will
-   * be invoked with the boost::asio::error::operation_aborted error code.
+   * be invoked with the cppmsboost::asio::error::operation_aborted error code.
    *
    * Cancelling the timer does not change the expiry time.
    *
@@ -372,7 +372,7 @@ public:
    * These handlers can no longer be cancelled, and therefore are passed an
    * error code that indicates the successful completion of the wait operation.
    */
-  std::size_t cancel(boost::system::error_code& ec)
+  std::size_t cancel(cppmsboost::system::error_code& ec)
   {
     return impl_.get_service().cancel(impl_.get_implementation(), ec);
   }
@@ -382,14 +382,14 @@ public:
    * This function forces the completion of one pending asynchronous wait
    * operation against the timer. Handlers are cancelled in FIFO order. The
    * handler for the cancelled operation will be invoked with the
-   * boost::asio::error::operation_aborted error code.
+   * cppmsboost::asio::error::operation_aborted error code.
    *
    * Cancelling the timer does not change the expiry time.
    *
    * @return The number of asynchronous operations that were cancelled. That is,
    * either 0 or 1.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @note If the timer has already expired when cancel_one() is called, then
    * the handlers for asynchronous wait operations will:
@@ -403,10 +403,10 @@ public:
    */
   std::size_t cancel_one()
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = impl_.get_service().cancel_one(
         impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "cancel_one");
+    cppmsboost::asio::detail::throw_error(ec, "cancel_one");
     return s;
   }
 
@@ -415,7 +415,7 @@ public:
    * This function forces the completion of one pending asynchronous wait
    * operation against the timer. Handlers are cancelled in FIFO order. The
    * handler for the cancelled operation will be invoked with the
-   * boost::asio::error::operation_aborted error code.
+   * cppmsboost::asio::error::operation_aborted error code.
    *
    * Cancelling the timer does not change the expiry time.
    *
@@ -434,7 +434,7 @@ public:
    * These handlers can no longer be cancelled, and therefore are passed an
    * error code that indicates the successful completion of the wait operation.
    */
-  std::size_t cancel_one(boost::system::error_code& ec)
+  std::size_t cancel_one(cppmsboost::system::error_code& ec)
   {
     return impl_.get_service().cancel_one(impl_.get_implementation(), ec);
   }
@@ -453,13 +453,13 @@ public:
   /**
    * This function sets the expiry time. Any pending asynchronous wait
    * operations will be cancelled. The handler for each cancelled operation will
-   * be invoked with the boost::asio::error::operation_aborted error code.
+   * be invoked with the cppmsboost::asio::error::operation_aborted error code.
    *
    * @param expiry_time The expiry time to be used for the timer.
    *
    * @return The number of asynchronous operations that were cancelled.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @note If the timer has already expired when expires_at() is called, then
    * the handlers for asynchronous wait operations will:
@@ -473,10 +473,10 @@ public:
    */
   std::size_t expires_at(const time_type& expiry_time)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = impl_.get_service().expires_at(
         impl_.get_implementation(), expiry_time, ec);
-    boost::asio::detail::throw_error(ec, "expires_at");
+    cppmsboost::asio::detail::throw_error(ec, "expires_at");
     return s;
   }
 
@@ -484,7 +484,7 @@ public:
   /**
    * This function sets the expiry time. Any pending asynchronous wait
    * operations will be cancelled. The handler for each cancelled operation will
-   * be invoked with the boost::asio::error::operation_aborted error code.
+   * be invoked with the cppmsboost::asio::error::operation_aborted error code.
    *
    * @param expiry_time The expiry time to be used for the timer.
    *
@@ -503,7 +503,7 @@ public:
    * error code that indicates the successful completion of the wait operation.
    */
   std::size_t expires_at(const time_type& expiry_time,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     return impl_.get_service().expires_at(
         impl_.get_implementation(), expiry_time, ec);
@@ -523,13 +523,13 @@ public:
   /**
    * This function sets the expiry time. Any pending asynchronous wait
    * operations will be cancelled. The handler for each cancelled operation will
-   * be invoked with the boost::asio::error::operation_aborted error code.
+   * be invoked with the cppmsboost::asio::error::operation_aborted error code.
    *
    * @param expiry_time The expiry time to be used for the timer.
    *
    * @return The number of asynchronous operations that were cancelled.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    *
    * @note If the timer has already expired when expires_from_now() is called,
    * then the handlers for asynchronous wait operations will:
@@ -543,10 +543,10 @@ public:
    */
   std::size_t expires_from_now(const duration_type& expiry_time)
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     std::size_t s = impl_.get_service().expires_from_now(
         impl_.get_implementation(), expiry_time, ec);
-    boost::asio::detail::throw_error(ec, "expires_from_now");
+    cppmsboost::asio::detail::throw_error(ec, "expires_from_now");
     return s;
   }
 
@@ -554,7 +554,7 @@ public:
   /**
    * This function sets the expiry time. Any pending asynchronous wait
    * operations will be cancelled. The handler for each cancelled operation will
-   * be invoked with the boost::asio::error::operation_aborted error code.
+   * be invoked with the cppmsboost::asio::error::operation_aborted error code.
    *
    * @param expiry_time The expiry time to be used for the timer.
    *
@@ -573,7 +573,7 @@ public:
    * error code that indicates the successful completion of the wait operation.
    */
   std::size_t expires_from_now(const duration_type& expiry_time,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     return impl_.get_service().expires_from_now(
         impl_.get_implementation(), expiry_time, ec);
@@ -584,13 +584,13 @@ public:
    * This function is used to wait for the timer to expire. This function
    * blocks and does not return until the timer has expired.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws cppmsboost::system::system_error Thrown on failure.
    */
   void wait()
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     impl_.get_service().wait(impl_.get_implementation(), ec);
-    boost::asio::detail::throw_error(ec, "wait");
+    cppmsboost::asio::detail::throw_error(ec, "wait");
   }
 
   /// Perform a blocking wait on the timer.
@@ -600,7 +600,7 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  void wait(boost::system::error_code& ec)
+  void wait(cppmsboost::system::error_code& ec)
   {
     impl_.get_service().wait(impl_.get_implementation(), ec);
   }
@@ -616,29 +616,29 @@ public:
    * @li The timer has expired.
    *
    * @li The timer was cancelled, in which case the handler is passed the error
-   * code boost::asio::error::operation_aborted.
+   * code cppmsboost::asio::error::operation_aborted.
    *
    * @param handler The handler to be called when the timer expires. Copies
    * will be made of the handler as required. The function signature of the
    * handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error // Result of operation.
+   *   const cppmsboost::system::error_code& error // Result of operation.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the handler will not be invoked from within this function. On
    * immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using boost::asio::post().
+   * manner equivalent to using cppmsboost::asio::post().
    */
   template <
-      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code))
+      BOOST_ASIO_COMPLETION_TOKEN_FOR(void (cppmsboost::system::error_code))
         WaitHandler BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
   BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WaitHandler,
-      void (boost::system::error_code))
+      void (cppmsboost::system::error_code))
   async_wait(
       BOOST_ASIO_MOVE_ARG(WaitHandler) handler
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
-    return async_initiate<WaitHandler, void (boost::system::error_code)>(
+    return async_initiate<WaitHandler, void (cppmsboost::system::error_code)>(
         initiate_async_wait(this), handler);
   }
 
@@ -685,7 +685,7 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

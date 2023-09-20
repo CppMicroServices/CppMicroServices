@@ -24,9 +24,9 @@
 
 //Small meta-typetraits to support move
 
-namespace boost {
+namespace cppmsboost {
 
-//Forward declare boost::rv
+//Forward declare cppmsboost::rv
 template <class T> class rv;
 
 namespace move_detail {
@@ -268,8 +268,8 @@ struct addressof_impl
 template<class T>
 BOOST_MOVE_FORCEINLINE T * addressof( T & v )
 {
-   return ::boost::move_detail::addressof_impl<T>::f
-      ( ::boost::move_detail::addr_impl_ref<T>( v ), 0 );
+   return ::cppmsboost::move_detail::addressof_impl<T>::f
+      ( ::cppmsboost::move_detail::addr_impl_ref<T>( v ), 0 );
 }
 
 //////////////////////////////////////
@@ -466,7 +466,7 @@ struct disable_if_or
 //////////////////////////////////////////////////////////////////////////////
 template<class T>
 struct has_move_emulation_enabled_impl
-   : is_convertible< T, ::boost::rv<T>& >
+   : is_convertible< T, ::cppmsboost::rv<T>& >
 {};
 
 template<class T>
@@ -474,7 +474,7 @@ struct has_move_emulation_enabled_impl<T&>
 {  static const bool value = false;  };
 
 template<class T>
-struct has_move_emulation_enabled_impl< ::boost::rv<T> >
+struct has_move_emulation_enabled_impl< ::cppmsboost::rv<T> >
 {  static const bool value = false;  };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -510,11 +510,11 @@ struct is_rvalue_reference< T&& >
 #else // #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 
 template< class T >
-struct is_rvalue_reference< boost::rv<T>& >
+struct is_rvalue_reference< cppmsboost::rv<T>& >
 {  static const bool value = true;  };
 
 template< class T >
-struct is_rvalue_reference< const boost::rv<T>& >
+struct is_rvalue_reference< const cppmsboost::rv<T>& >
 {  static const bool value = true;  };
 
 #endif // #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
@@ -538,7 +538,7 @@ namespace detail_add_rvalue_reference
    struct add_rvalue_reference_impl< T, emulation, true > { typedef T & type; };
 
    template< class T, bool rv >
-   struct add_rvalue_reference_impl< T, true, rv > { typedef ::boost::rv<T>& type; };
+   struct add_rvalue_reference_impl< T, true, rv > { typedef ::cppmsboost::rv<T>& type; };
 } // namespace detail_add_rvalue_reference
 
 template< class T >
@@ -580,7 +580,7 @@ template< class T > struct remove_rvalue_reference { typedef T type; };
 //  rvalue references in C++03.  This may be necessary to prevent "accidental moves".
 
 }  //namespace move_detail {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #include <boost/move/detail/config_end.hpp>
 

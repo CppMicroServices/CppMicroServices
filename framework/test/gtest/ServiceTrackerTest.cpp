@@ -720,7 +720,7 @@ TEST(ServiceTrackerTests, TestServiceTrackerInvalidBundle)
     framework.Stop();
     framework.WaitForStop(std::chrono::milliseconds::zero());
 
-    ASSERT_THROW(tracker.WaitForService(), std::runtime_error);
+    ASSERT_THROW(tracker.WaitForService(), std::logic_error);
 }
 
 // If the test doesn't throw, it is successful.

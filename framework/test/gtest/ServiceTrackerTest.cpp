@@ -745,3 +745,5 @@ TEST(ServiceTrackerTests, FrameworkTrackerCloseRace)
                           });
     tracker.Close();
 }
+
+#endif

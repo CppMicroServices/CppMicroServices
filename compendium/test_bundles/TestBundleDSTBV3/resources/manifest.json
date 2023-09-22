@@ -1,0 +1,18 @@
+{
+  "bundle.symbolic_name": "TestBundleDSTBV3",
+  "bundle.name": "TestBundleDSTBV3",
+  "bundle.activator": false,
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "enabled": true,
+        "immediate": true,
+        "implementation-class": "sample::ServiceComponentBV3",
+        "service": {
+          "interfaces": [ "test::Interface1" ]
+        }
+      }
+    ]
+  }
+}

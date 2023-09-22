@@ -1,0 +1,13 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSTBV1_3",
+    "scr" : {
+        "version" : 1,
+        "components" : [{
+            "implementation-class": "sample::ServiceComponentBV1_3",
+            "service" : {
+                "scope" : "prototype",
+                "interfaces" : ["test::Interface1"]
+            }
+        }]
+    }
+}

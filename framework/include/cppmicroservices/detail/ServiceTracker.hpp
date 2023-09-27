@@ -270,7 +270,6 @@ namespace cppmicroservices
                         }
 
                         // predicate evaluates to true
-                        // (t->Size_unlocked() > 0 OR t->closed == true OR a != true)
                         if (!a)
                         {
                             // bundle is invalid, throw

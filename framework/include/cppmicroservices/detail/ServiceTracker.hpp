@@ -252,7 +252,35 @@ namespace cppmicroservices
                 auto l = t->Lock();
                 if (t->Size_unlocked() == 0)
                 {
-                    t->WaitFor(l, rel_time, [&t] { return t->Size_unlocked() > 0 || t->closed; });
+                    BundleContext a = d->context;
+                    if (!a)
+                    {
+                        throw std::logic_error("The bundle context cannot be null.");
+                    }
+
+                    if (rel_time == std::chrono::milliseconds::zero())
+                    {
+                        while (!t->WaitFor(l,
+                                           std::chrono::milliseconds(500),
+                                           [&t, &a] { return (t->Size_unlocked() > 0 || t->closed || !a); }))
+                        {
+                            // if bundle becomes invalid while waiting for service, an indefinite time WaitFor will
+                            // never be woken and will thus deadlock. So, we wait on definite time and check for invalid
+                            // bundle periodically.
+                        }
+
+                        // predicate evaluates to true
+                        if (!a)
+                        {
+                            // bundle is invalid, throw
+                            throw std::logic_error("The bundle context became null.");
+                        }
+                        // bundle is valid, other condition met
+                    }
+                    else
+                    {
+                        t->WaitFor(l, rel_time, [&t] { return (t->Size_unlocked() > 0 || t->closed); });
+                    }
                 }
             }
             object = GetService();

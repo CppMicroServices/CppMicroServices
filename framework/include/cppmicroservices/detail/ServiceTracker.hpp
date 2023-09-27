@@ -260,11 +260,13 @@ namespace cppmicroservices
 
                     if (rel_time == std::chrono::milliseconds::zero())
                     {
-                        // need to cycle on definite end time to check for invalid bundle
                         while (!t->WaitFor(l,
                                            std::chrono::milliseconds(500),
                                            [&t, &a] { return (t->Size_unlocked() > 0 || t->closed || !a); }))
                         {
+                            // if bundle becomes invalid while waiting for service, an indefinite time WaitFor will
+                            // never be woken and will thus deadlock. So, we wait on definite time and check for invalid
+                            // bundle periodically.
                         }
 
                         // predicate evaluates to true

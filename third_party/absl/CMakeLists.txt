@@ -17,9 +17,7 @@ set(_ABSL_SRCS
   "absl/strings/string_view.cc"
   "absl/strings/internal/charconv_bigint.cc"
   "absl/strings/internal/charconv_parse.cc"
-  "absl/strings/internal/has_absl_stringify.h"
   "absl/strings/internal/memutil.cc"
-  "absl/strings/internal/stringify_sink.h"
 
   "absl/types/bad_optional_access.cc"
 )
@@ -62,10 +60,12 @@ set(_ABSL_HDRS
   "absl/strings/string_view.h"
   "absl/strings/internal/charconv_bigint.h"
   "absl/strings/internal/charconv_parse.h"
+  "absl/strings/internal/has_absl_stringify.h"
   "absl/strings/internal/memutil.h"
   "absl/strings/internal/ostringstream.h"
   "absl/strings/internal/resize_uninitialized.h"
   "absl/strings/internal/str_join_internal.h"
+  "absl/strings/internal/stringify_sink.h"
 
   "absl/types/bad_optional_access.h"
   "absl/types/internal/optional.h"

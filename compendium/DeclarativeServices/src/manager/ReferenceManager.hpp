@@ -141,8 +141,14 @@ namespace cppmicroservices
              */
             virtual void StopTracking() = 0;
 
+            /**
+             * Method returns true if maxCardinality is unary (1)
+             */
             virtual bool IsUnary() const = 0;
 
+            /**
+             * Method returns true if maxCardinality is multiple (n)
+             */
             virtual bool IsMultiple() const = 0;
 
           protected:

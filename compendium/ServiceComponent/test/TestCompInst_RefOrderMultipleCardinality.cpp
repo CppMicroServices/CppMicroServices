@@ -45,6 +45,9 @@ namespace
     struct ServiceDependency2
     {
     };
+    struct ServiceDependency3
+    {
+    };
 
     // Test class to simulate a service component
     class TestServiceImpl1 final
@@ -52,9 +55,12 @@ namespace
       public:
         TestServiceImpl1() = default;
 
-        TestServiceImpl1(std::shared_ptr<ServiceDependency1> const& f, std::shared_ptr<ServiceDependency2> const& b)
+        TestServiceImpl1(std::shared_ptr<ServiceDependency1> const& f,
+                         std::shared_ptr<ServiceDependency2> const& b,
+                         std::vector<std::shared_ptr<ServiceDependency3>> const& c)
             : foo(f)
             , bar(b)
+            , baz(c)
         {
         }
 
@@ -85,11 +91,17 @@ namespace
         {
             return bar;
         }
+        std::vector<std::shared_ptr<ServiceDependency3>>
+        GetBaz() const
+        {
+            return baz;
+        }
 
       private:
         std::shared_ptr<ServiceDependency1> foo; // dynamic dependency - can change during the lifetime of this object
         const std::shared_ptr<ServiceDependency2>
             bar; // static dependency - does not change during the lifetime of this object
+        const std::vector<std::shared_ptr<ServiceDependency3>> baz; // static dependency with multiple cardinality
     };
 
     /**
@@ -99,7 +111,8 @@ namespace
      *
      * CMake tests will build this file to catch the expected compile time error
      */
-    TEST(ComponentInstance, VerifyDependencyOrder)
+
+    TEST(ComponentInstance, VerifyDependencyOrder_MultipleCardinality)
     {
         std::vector<std::shared_ptr<Binder<TestServiceImpl1>>> binders;
         binders.push_back(std::make_shared<StaticBinder<TestServiceImpl1, ServiceDependency2>>("bar"));
@@ -111,8 +124,9 @@ namespace
                               std::tuple<>,
                               std::true_type,
                               std::shared_ptr<ServiceDependency2>,
+                              std::vector<std::shared_ptr<ServiceDependency3>>,
                               std::shared_ptr<ServiceDependency1>>
-            compInstance({ "bar", "foo" }, binders); // compile error
+            compInstance({ "bar", "baz", "foo" }, binders); // compile error
     }
 } // namespace
 

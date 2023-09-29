@@ -19,7 +19,7 @@
   limitations under the License.
 
   =============================================================================*/
-#if NEVER
+
 #    include <algorithm>
 #    include <chrono>
 #    include <cstdio>
@@ -53,7 +53,7 @@ namespace
      * This test point is used to verify a compile error is generated when a service component
      * description specifies an interface that is not implemented by the implementation class
      *
-     * @todo Automate this test point. Currently interactive is the only way to verify compilation failures.
+     * CMake tests will build this file to catch the expected compile time error
      */
     TEST(ComponentInstance, ValidateInheritance)
     {
@@ -67,5 +67,3 @@ main(int argc, char** argv)
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-
-#endif

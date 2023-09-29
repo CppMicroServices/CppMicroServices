@@ -146,6 +146,16 @@ namespace cppmicroservices
             return (boundRefs.lock()->size() >= metadata_.minCardinality);
         }
 
+        bool ReferenceManagerBaseImpl::IsUnary() const
+        {
+            return (metadata_.maxCardinality == 1);
+        }
+
+        bool ReferenceManagerBaseImpl::IsMultiple() const
+        {
+            return (metadata_.maxCardinality > 1);
+        }
+
         ReferenceManagerBaseImpl::~ReferenceManagerBaseImpl() { StopTracking(); }
 
         struct dummyRefObj

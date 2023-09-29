@@ -455,17 +455,17 @@ namespace cppmicroservices
                               class I = Injection,
                               class InjectionTrue = typename std::enable_if<I::value == true>::type,
                               class HasNoConstructorWithReferences = typename std::enable_if<
-                                  std::is_constructible<C, std::shared_ptr<CtorInjectedRefs> const&...>::value
+                                  std::is_constructible<C, CtorInjectedRefs const&...>::value
                                   == false>::type,
                               class HasNoConstructorWithRefAndConfig = typename std::enable_if<
                                   std::is_constructible<C,
                                                         std::shared_ptr<cppmicroservices::AnyMap> const&,
-                                                        std::shared_ptr<CtorInjectedRefs> const&...>::value
+                                                        CtorInjectedRefs const&...>::value
                                   == false>::type>
                     std::shared_ptr<T>
                     DoCreate(bool const&)
                     {
-                        static_assert(std::is_constructible<C, std::shared_ptr<CtorInjectedRefs> const&...>::value,
+                        static_assert(std::is_constructible<C, CtorInjectedRefs const&...>::value,
                                       "An appropriate constructor was not found "
                                       "and/or the service implementation does not implement all of the "
                                       "service interface's methods. A constructor with service reference "
@@ -481,11 +481,11 @@ namespace cppmicroservices
                               class I = Injection,
                               class InjectionTrue = typename std::enable_if<I::value == true>::type,
                               class HasConstructorWithReferences = typename std::enable_if<
-                                  std::is_constructible<C, std::shared_ptr<CtorInjectedRefs> const&...>::value>::type>
+                                  std::is_constructible<C, CtorInjectedRefs const&...>::value>::type>
                     std::shared_ptr<T>
                     DoCreate(bool& injected)
                     {
-                        std::tuple<std::shared_ptr<CtorInjectedRefs>...> depObjs = GetAllDependencies(
+                        std::tuple<CtorInjectedRefs...> depObjs = GetAllDependencies(
                             std::make_index_sequence<std::tuple_size<std::tuple<CtorInjectedRefs...>>::value> {});
                         std::shared_ptr<T> implObj = call_make_shared_with_tuple(
                             depObjs,
@@ -503,11 +503,11 @@ namespace cppmicroservices
                               class HasConstructorWithRefAndConfig = typename std::enable_if<
                                   std::is_constructible<C,
                                                         std::shared_ptr<cppmicroservices::AnyMap> const&,
-                                                        std::shared_ptr<CtorInjectedRefs> const&...>::value>::type>
+                                                        CtorInjectedRefs const&...>::value>::type>
                     std::shared_ptr<T>
                     DoCreate(bool& injected, bool = true)
                     {
-                        std::tuple<std::shared_ptr<CtorInjectedRefs>...> depObjs = GetAllDependencies(
+                        std::tuple<CtorInjectedRefs...> depObjs = GetAllDependencies(
                             std::make_index_sequence<std::tuple_size<std::tuple<CtorInjectedRefs...>>::value> {});
                         auto props = std::make_shared<cppmicroservices::AnyMap>(this->mContext->GetProperties());
                         std::shared_ptr<T> implObj = call_make_shared_with_tuple_and_props(
@@ -521,7 +521,7 @@ namespace cppmicroservices
 
                     template <std::size_t... Is>
                     std::shared_ptr<T>
-                    call_make_shared_with_tuple(std::tuple<std::shared_ptr<CtorInjectedRefs> const&...> const& tuple,
+                    call_make_shared_with_tuple(std::tuple<CtorInjectedRefs...> const& tuple,
                                                 std::index_sequence<Is...>)
                     {
                         return std::make_shared<T>(std::get<Is>(tuple)...);
@@ -531,14 +531,26 @@ namespace cppmicroservices
                     std::shared_ptr<T>
                     call_make_shared_with_tuple_and_props(
                         std::shared_ptr<cppmicroservices::AnyMap> const& props,
-                        std::tuple<std::shared_ptr<CtorInjectedRefs> const&...> const& tuple,
+                        std::tuple<CtorInjectedRefs const&...> const& tuple,
                         std::index_sequence<Is...>)
                     {
                         return std::make_shared<T>(props, std::get<Is>(tuple)...);
                     }
 
+                    // Type detector to see if given template parameter is std::vector type (multiple cardinality reference)
+                    // or not (unary cardinality reference)
+                    template <typename RefType>
+                    struct is_vector_type {
+                        static const bool value = false;
+                    };
+
+                    template <typename RefType>
+                    struct is_vector_type<std::vector<RefType> > {
+                        static const bool value = true;
+                    };
+
                     template <std::size_t... Is>
-                    std::tuple<std::shared_ptr<CtorInjectedRefs>...>
+                    std::tuple<CtorInjectedRefs...>
                     GetAllDependencies(std::index_sequence<Is...>)
                     {
                         return std::make_tuple(
@@ -546,11 +558,25 @@ namespace cppmicroservices
                                 std::get<Is>(mStaticRefNames))...);
                     }
 
-                    template <class R>
-                    std::shared_ptr<R>
-                    GetDependency(std::string const& name)
+                    template <class R,
+                              class IsVectorType = typename std::enable_if<is_vector_type<R>::value == true>::type
+                              >
+                    R GetDependency(std::string const& name)
                     {
-                        return this->mContext->template LocateService<R>(name);
+                        // Overload to be invoked for references using multiple cardinality
+                        using VectorElementType = typename R::value_type;
+                        using RefType = typename VectorElementType::element_type;
+                        return this->mContext->template LocateServices<RefType>(name);
+                    }
+
+                    template <class R,
+                              class IsNotVectorType = typename std::enable_if<is_vector_type<R>::value == false>::type
+                              >
+                    R GetDependency(std::string const& name, bool = true)
+                    {
+                        // Overload to be used for references using unary cardinality
+                        using RefType = typename R::element_type;
+                        return this->mContext->template LocateService<RefType>(name);
                     }
 
                   private:

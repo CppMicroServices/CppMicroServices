@@ -22,7 +22,7 @@
 #include <boost/move/adl_move_swap.hpp>
 #include <boost/move/utility_core.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace container {
 namespace dtl {
 
@@ -33,7 +33,7 @@ inline void swap_alloc(AllocatorType &, AllocatorType &, dtl::false_type)
 
 template<class AllocatorType>
 inline void swap_alloc(AllocatorType &l, AllocatorType &r, dtl::true_type)
-{  cppmsboost::adl_move_swap(l, r);   }
+{  boost::adl_move_swap(l, r);   }
 
 template<class AllocatorType>
 inline void assign_alloc(AllocatorType &, const AllocatorType &, dtl::false_type)
@@ -51,10 +51,10 @@ inline void move_alloc(AllocatorType &, AllocatorType &, dtl::false_type)
 
 template<class AllocatorType>
 inline void move_alloc(AllocatorType &l, AllocatorType &r, dtl::true_type)
-{  l = ::cppmsboost::move(r);   }
+{  l = ::boost::move(r);   }
 
 }  //namespace dtl {
 }  //namespace container {
-}  //namespace cppmsboost {
+}  //namespace boost {
 
 #endif   //#ifndef BOOST_CONTAINER_DETAIL_ALLOC_TRAITS_HPP

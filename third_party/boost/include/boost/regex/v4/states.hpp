@@ -30,7 +30,7 @@
 #pragma warning(pop)
 #endif
 
-namespace cppmsboost{
+namespace boost{
 namespace BOOST_REGEX_DETAIL_NS{
 
 /*** mask_type *******************************************************
@@ -303,7 +303,7 @@ iterator BOOST_REGEX_CALL re_is_set_member(iterator next,
 
 } // namespace BOOST_REGEX_DETAIL_NS
 
-} // namespace cppmsboost
+} // namespace boost
 
 #ifdef BOOST_MSVC
 #pragma warning(push)

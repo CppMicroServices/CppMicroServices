@@ -27,7 +27,7 @@
 # error BOOST_ASIO_HAS_STRING_VIEW is set but no string_view is available
 #endif // defined(BOOST_ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 
 #if defined(BOOST_ASIO_HAS_STD_STRING_VIEW)
@@ -39,9 +39,9 @@ using std::experimental::string_view;
 #endif // defined(BOOST_ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
 
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
-# define BOOST_ASIO_STRING_VIEW_PARAM cppmsboost::asio::string_view
+# define BOOST_ASIO_STRING_VIEW_PARAM boost::asio::string_view
 #else // defined(BOOST_ASIO_HAS_STRING_VIEW)
 # define BOOST_ASIO_STRING_VIEW_PARAM const std::string&
 #endif // defined(BOOST_ASIO_HAS_STRING_VIEW)

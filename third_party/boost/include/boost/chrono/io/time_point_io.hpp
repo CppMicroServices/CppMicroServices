@@ -53,7 +53,7 @@
 
 #define  BOOST_CHRONO_USES_INTERNAL_TIME_GET
 
-namespace cppmsboost
+namespace boost
 {
   namespace chrono
   {

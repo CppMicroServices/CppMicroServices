@@ -26,7 +26,7 @@
 
 //!\file
 
-namespace cppmsboost {
+namespace boost {
 namespace container {
 
 /// @cond
@@ -187,7 +187,7 @@ class new_allocator
 };
 
 }  //namespace container {
-}  //namespace cppmsboost {
+}  //namespace boost {
 
 #include <boost/container/detail/config_end.hpp>
 

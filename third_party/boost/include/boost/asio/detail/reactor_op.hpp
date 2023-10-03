@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -29,7 +29,7 @@ class reactor_op
 {
 public:
   // The error code to be passed to the completion handler.
-  cppmsboost::system::error_code ec_;
+  boost::system::error_code ec_;
 
   // The number of bytes transferred, to be passed to the completion handler.
   std::size_t bytes_transferred_;
@@ -60,7 +60,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

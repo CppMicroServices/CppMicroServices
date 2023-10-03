@@ -44,7 +44,7 @@
 # include <boost/asio/detail/null_fenced_block.hpp>
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -77,6 +77,6 @@ typedef null_fenced_block fenced_block;
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ASIO_DETAIL_FENCED_BLOCK_HPP

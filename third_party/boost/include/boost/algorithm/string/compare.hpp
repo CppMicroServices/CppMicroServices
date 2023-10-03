@@ -21,7 +21,7 @@
     of the algorithms.
 */
 
-namespace cppmsboost {
+namespace boost {
     namespace algorithm {
 
         //  is_equal functor  -----------------------------------------------//
@@ -193,7 +193,7 @@ namespace cppmsboost {
     using algorithm::is_not_greater;
     using algorithm::is_not_igreater;
 
-} // namespace cppmsboost
+} // namespace boost
 
 
 #endif  // BOOST_STRING_COMPARE_HPP

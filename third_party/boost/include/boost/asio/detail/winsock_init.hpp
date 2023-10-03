@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -82,7 +82,7 @@ public:
   //   #pragma warning(push)
   //   #pragma warning(disable:4073)
   //   #pragma init_seg(lib)
-  //   cppmsboost::asio::detail::winsock_init<>::manual manual_winsock_init;
+  //   boost::asio::detail::winsock_init<>::manual manual_winsock_init;
   //   #pragma warning(pop)
   class manual
   {
@@ -117,7 +117,7 @@ static const winsock_init<>& winsock_init_instance = winsock_init<>(false);
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

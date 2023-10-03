@@ -13,7 +13,7 @@
 #endif
 #include <boost/config/abi_prefix.hpp>
 
-namespace cppmsboost
+namespace boost
 {
 
 #if ! defined BOOST_THREAD_NO_CXX11_HDR_INITIALIZER_LIST

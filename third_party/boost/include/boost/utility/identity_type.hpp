@@ -40,7 +40,7 @@ add and remove a reference to the specified type.
 */
 #define BOOST_IDENTITY_TYPE(parenthesized_type) \
     /* must NOT prefix this with `::` to work with parenthesized syntax */ \
-    cppmsboost::function_traits< void parenthesized_type >::arg1_type
+    boost::function_traits< void parenthesized_type >::arg1_type
 
 #endif // #include guard
 

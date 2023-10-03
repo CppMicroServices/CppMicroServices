@@ -17,7 +17,7 @@
 #include <boost/type_traits/integral_constant.hpp>
 #include <cstddef> // size_t
 
-namespace cppmsboost {
+namespace boost {
 
 #if defined( __CODEGEARC__ )
    template <class T> struct is_array : public integral_constant<bool, __is_array(T)> {};
@@ -38,6 +38,6 @@ namespace cppmsboost {
 
 #endif
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_TT_IS_ARRAY_HPP_INCLUDED

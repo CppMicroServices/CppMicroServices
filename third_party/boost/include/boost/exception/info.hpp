@@ -26,7 +26,7 @@
 #endif
 
 namespace
-cppmsboost
+boost
     {
     template <class Tag,class T>
     inline
@@ -113,7 +113,7 @@ cppmsboost
 
             private:
 
-            friend class cppmsboost::exception;
+            friend class boost::exception;
 
             typedef std::map< type_info_, shared_ptr<error_info_base> > error_info_map;
             error_info_map info_;

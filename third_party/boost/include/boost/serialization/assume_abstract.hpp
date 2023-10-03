@@ -16,7 +16,7 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
-// this is useful for compilers which don't support the cppmsboost::is_abstract
+// this is useful for compilers which don't support the boost::is_abstract
 
 #include <boost/type_traits/is_abstract.hpp>
 #include <boost/mpl/bool_fwd.hpp>
@@ -27,31 +27,31 @@
 #define BOOST_SERIALIZATION_ASSUME_ABSTRACT(T)
 
 // but forward to the "official" is_abstract
-namespace cppmsboost {
+namespace boost {
 namespace serialization {
     template<class T>
-    struct is_abstract : cppmsboost::is_abstract< T > {} ;
+    struct is_abstract : boost::is_abstract< T > {} ;
 } // namespace serialization
-} // namespace cppmsboost
+} // namespace boost
 
 #else
 // we have to "make" one
 
-namespace cppmsboost {
+namespace boost {
 namespace serialization {
     template<class T>
-    struct is_abstract : cppmsboost::false_type {};
+    struct is_abstract : boost::false_type {};
 } // namespace serialization
-} // namespace cppmsboost
+} // namespace boost
 
 // define a macro to make explicit designation of this more transparent
 #define BOOST_SERIALIZATION_ASSUME_ABSTRACT(T)        \
-namespace cppmsboost {                                     \
+namespace boost {                                     \
 namespace serialization {                             \
 template<>                                            \
-struct is_abstract< T > : cppmsboost::true_type {};        \
+struct is_abstract< T > : boost::true_type {};        \
 template<>                                            \
-struct is_abstract< const T > : cppmsboost::true_type {};  \
+struct is_abstract< const T > : boost::true_type {};  \
 }}                                                    \
 /**/
 

@@ -21,13 +21,13 @@
 #include <exception>
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace serialization {
 
 #ifdef BOOST_NO_EXCEPTIONS
 
 BOOST_NORETURN inline void throw_exception(std::exception const & e) {
-    ::cppmsboost::throw_exception(e);
+    ::boost::throw_exception(e);
 }
 
 #else
@@ -39,6 +39,6 @@ template<class E> BOOST_NORETURN inline void throw_exception(E const & e){
 #endif
 
 } // namespace serialization
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // #ifndef BOOST_SERIALIZATION_THROW_EXCEPTION_HPP_INCLUDED

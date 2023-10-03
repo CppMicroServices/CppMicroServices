@@ -29,7 +29,7 @@
 
 #include <algorithm> // std::min
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 namespace iterators {
 
@@ -40,10 +40,10 @@ template<
     class Base,
     int BitsOut,
     int BitsIn,
-    class CharType = typename cppmsboost::iterator_value<Base>::type // output character
+    class CharType = typename boost::iterator_value<Base>::type // output character
 >
 class transform_width :
-    public cppmsboost::iterator_adaptor<
+    public boost::iterator_adaptor<
         transform_width<Base, BitsOut, BitsIn, CharType>,
         Base,
         CharType,
@@ -51,8 +51,8 @@ class transform_width :
         CharType
     >
 {
-    friend class cppmsboost::iterator_core_access;
-    typedef typename cppmsboost::iterator_adaptor<
+    friend class boost::iterator_core_access;
+    typedef typename boost::iterator_adaptor<
         transform_width<Base, BitsOut, BitsIn, CharType>,
         Base,
         CharType,
@@ -172,6 +172,6 @@ void transform_width<Base, BitsOut, BitsIn, CharType>::fill() {
 
 } // namespace iterators
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ARCHIVE_ITERATORS_TRANSFORM_WIDTH_HPP

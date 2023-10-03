@@ -15,7 +15,7 @@
 #include <boost/move/detail/config_begin.hpp>
 #include <boost/move/utility_core.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace movelib {
 
 //! <b>Requires</b>: The comparison function shall be an equivalence relation. The type of *first shall satisfy
@@ -38,7 +38,7 @@ ForwardIterator unique(ForwardIterator first, ForwardIterator last, BinaryPredic
          if (pred(*first, *next)) { //Find first equal element
             while (++next != last)
                if (!pred(*first, *next))
-                  *++first = ::cppmsboost::move(*next);
+                  *++first = ::boost::move(*next);
             break;
          }
       }
@@ -48,7 +48,7 @@ ForwardIterator unique(ForwardIterator first, ForwardIterator last, BinaryPredic
 }
 
 }  //namespace movelib {
-}  //namespace cppmsboost {
+}  //namespace boost {
 
 #include <boost/move/detail/config_end.hpp>
 

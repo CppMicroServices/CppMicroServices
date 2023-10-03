@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace ssl {
 namespace detail {
@@ -34,22 +34,22 @@ public:
       const ConstBufferSequence& buffers)
     : type_(type),
       buffers_(buffers),
-      total_buffer_size_(cppmsboost::asio::buffer_size(buffers_))
+      total_buffer_size_(boost::asio::buffer_size(buffers_))
   {
   }
 
   engine::want operator()(engine& eng,
-      cppmsboost::system::error_code& ec,
+      boost::system::error_code& ec,
       std::size_t& bytes_transferred) const
   {
     return this->process(eng, ec, bytes_transferred,
-        cppmsboost::asio::buffer_sequence_begin(buffers_),
-        cppmsboost::asio::buffer_sequence_end(buffers_));
+        boost::asio::buffer_sequence_begin(buffers_),
+        boost::asio::buffer_sequence_end(buffers_));
   }
 
   template <typename Handler>
   void call_handler(Handler& handler,
-      const cppmsboost::system::error_code& ec,
+      const boost::system::error_code& ec,
       const std::size_t& bytes_transferred) const
   {
     handler(ec, bytes_transferred);
@@ -58,7 +58,7 @@ public:
 private:
   template <typename Iterator>
   engine::want process(engine& eng,
-      cppmsboost::system::error_code& ec,
+      boost::system::error_code& ec,
       std::size_t& bytes_transferred,
       Iterator begin, Iterator end) const
   {
@@ -109,7 +109,7 @@ private:
 } // namespace detail
 } // namespace ssl
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

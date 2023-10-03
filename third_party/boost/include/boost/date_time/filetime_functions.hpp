@@ -23,7 +23,7 @@
 #include <boost/date_time/time.hpp>
 #include <boost/date_time/date_defs.hpp>
 
-namespace cppmsboost {
+namespace boost {
 
 namespace date_time {
 
@@ -36,7 +36,7 @@ namespace date_time {
  *
  * \note The function is templated on the FILETIME type, so that
  *       it can be used with both native FILETIME and the ad-hoc
- *       cppmsboost::detail::winapi::FILETIME_ type.
+ *       boost::detail::winapi::FILETIME_ type.
  */
 template< typename TimeT, typename FileTimeT >
 inline
@@ -77,7 +77,7 @@ TimeT time_from_ftime(const FileTimeT& ft)
     return TimeT(d, time_duration_type(hours, minutes, seconds, sub_sec));
 }
 
-}} // cppmsboost::date_time
+}} // boost::date_time
 
 #endif // BOOST_HAS_FTIME
 

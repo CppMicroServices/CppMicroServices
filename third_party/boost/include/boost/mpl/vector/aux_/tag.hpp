@@ -17,7 +17,7 @@
 #include <boost/mpl/aux_/config/typeof.hpp>
 #include <boost/mpl/aux_/nttp_decl.hpp>
 
-namespace cppmsboost { namespace mpl { namespace aux {
+namespace boost { namespace mpl { namespace aux {
 
 struct v_iter_tag;
 

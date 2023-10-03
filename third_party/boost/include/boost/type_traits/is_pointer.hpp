@@ -23,7 +23,7 @@
 
 #include <boost/type_traits/integral_constant.hpp>
 
-namespace cppmsboost {
+namespace boost {
 
 #if defined( __CODEGEARC__ )
 template <class T> struct is_pointer : public integral_constant<bool, __is_pointer(T)>{};
@@ -42,6 +42,6 @@ template <class T> struct is_pointer<T volatile> : public is_pointer<T>{};
 
 #endif
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_TT_IS_POINTER_HPP_INCLUDED

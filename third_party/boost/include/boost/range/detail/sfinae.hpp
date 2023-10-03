@@ -17,7 +17,7 @@
 #include <utility>
 
 
-namespace cppmsboost 
+namespace boost 
 {
     namespace range_detail
     {          

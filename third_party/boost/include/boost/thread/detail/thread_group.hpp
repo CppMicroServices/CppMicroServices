@@ -18,7 +18,7 @@
 #pragma warning(disable:4251)
 #endif
 
-namespace cppmsboost
+namespace boost
 {
     class thread_group
     {
@@ -40,7 +40,7 @@ namespace cppmsboost
         bool is_this_thread_in()
         {
             thread::id id = this_thread::get_id();
-            cppmsboost::shared_lock<shared_mutex> guard(m);
+            boost::shared_lock<shared_mutex> guard(m);
             for(std::list<thread*>::iterator it=threads.begin(),end=threads.end();
                 it!=end;
                 ++it)
@@ -56,7 +56,7 @@ namespace cppmsboost
           if(thrd)
           {
             thread::id id = thrd->get_id();
-            cppmsboost::shared_lock<shared_mutex> guard(m);
+            boost::shared_lock<shared_mutex> guard(m);
             for(std::list<thread*>::iterator it=threads.begin(),end=threads.end();
                 it!=end;
                 ++it)
@@ -75,8 +75,8 @@ namespace cppmsboost
         template<typename F>
         thread* create_thread(F threadfunc)
         {
-            cppmsboost::lock_guard<shared_mutex> guard(m);
-            cppmsboost::csbl::unique_ptr<thread> new_thread(new thread(threadfunc));
+            boost::lock_guard<shared_mutex> guard(m);
+            boost::csbl::unique_ptr<thread> new_thread(new thread(threadfunc));
             threads.push_back(new_thread.get());
             return new_thread.release();
         }
@@ -86,17 +86,17 @@ namespace cppmsboost
             if(thrd)
             {
                 BOOST_THREAD_ASSERT_PRECONDITION( ! is_thread_in(thrd) ,
-                    thread_resource_error(static_cast<int>(system::errc::resource_deadlock_would_occur), "cppmsboost::thread_group: trying to add a duplicated thread")
+                    thread_resource_error(static_cast<int>(system::errc::resource_deadlock_would_occur), "boost::thread_group: trying to add a duplicated thread")
                 );
 
-                cppmsboost::lock_guard<shared_mutex> guard(m);
+                boost::lock_guard<shared_mutex> guard(m);
                 threads.push_back(thrd);
             }
         }
 
         void remove_thread(thread* thrd)
         {
-            cppmsboost::lock_guard<shared_mutex> guard(m);
+            boost::lock_guard<shared_mutex> guard(m);
             std::list<thread*>::iterator const it=std::find(threads.begin(),threads.end(),thrd);
             if(it!=threads.end())
             {
@@ -107,9 +107,9 @@ namespace cppmsboost
         void join_all()
         {
             BOOST_THREAD_ASSERT_PRECONDITION( ! is_this_thread_in() ,
-                thread_resource_error(static_cast<int>(system::errc::resource_deadlock_would_occur), "cppmsboost::thread_group: trying joining itself")
+                thread_resource_error(static_cast<int>(system::errc::resource_deadlock_would_occur), "boost::thread_group: trying joining itself")
             );
-            cppmsboost::shared_lock<shared_mutex> guard(m);
+            boost::shared_lock<shared_mutex> guard(m);
 
             for(std::list<thread*>::iterator it=threads.begin(),end=threads.end();
                 it!=end;
@@ -123,7 +123,7 @@ namespace cppmsboost
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
         void interrupt_all()
         {
-            cppmsboost::shared_lock<shared_mutex> guard(m);
+            boost::shared_lock<shared_mutex> guard(m);
 
             for(std::list<thread*>::iterator it=threads.begin(),end=threads.end();
                 it!=end;
@@ -136,7 +136,7 @@ namespace cppmsboost
 
         size_t size() const
         {
-            cppmsboost::shared_lock<shared_mutex> guard(m);
+            boost::shared_lock<shared_mutex> guard(m);
             return threads.size();
         }
 

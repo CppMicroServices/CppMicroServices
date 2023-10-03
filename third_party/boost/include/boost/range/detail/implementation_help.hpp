@@ -21,7 +21,7 @@
 #include <wchar.h>
 #endif
 
-namespace cppmsboost
+namespace boost
 {
     namespace range_detail
     {

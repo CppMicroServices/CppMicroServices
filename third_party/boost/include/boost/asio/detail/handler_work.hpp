@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -36,26 +36,26 @@ class handler_work
 public:
   explicit handler_work(Handler& handler) BOOST_ASIO_NOEXCEPT
     : io_executor_(),
-      executor_(cppmsboost::asio::get_associated_executor(handler, io_executor_))
+      executor_(boost::asio::get_associated_executor(handler, io_executor_))
   {
   }
 
   handler_work(Handler& handler, const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
     : io_executor_(io_ex),
-      executor_(cppmsboost::asio::get_associated_executor(handler, io_executor_))
+      executor_(boost::asio::get_associated_executor(handler, io_executor_))
   {
   }
 
   static void start(Handler& handler) BOOST_ASIO_NOEXCEPT
   {
-    HandlerExecutor ex(cppmsboost::asio::get_associated_executor(handler));
+    HandlerExecutor ex(boost::asio::get_associated_executor(handler));
     ex.on_work_started();
   }
 
   static void start(Handler& handler,
       const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
   {
-    HandlerExecutor ex(cppmsboost::asio::get_associated_executor(handler, io_ex));
+    HandlerExecutor ex(boost::asio::get_associated_executor(handler, io_ex));
     ex.on_work_started();
     io_ex.on_work_started();
   }
@@ -70,7 +70,7 @@ public:
   void complete(Function& function, Handler& handler)
   {
     executor_.dispatch(BOOST_ASIO_MOVE_CAST(Function)(function),
-        cppmsboost::asio::get_associated_allocator(handler));
+        boost::asio::get_associated_allocator(handler));
   }
 
 private:
@@ -97,7 +97,7 @@ public:
   template <typename Function>
   void complete(Function& function, Handler& handler)
   {
-    cppmsboost_asio_handler_invoke_helpers::invoke(function, handler);
+    boost_asio_handler_invoke_helpers::invoke(function, handler);
   }
 
 private:
@@ -108,7 +108,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

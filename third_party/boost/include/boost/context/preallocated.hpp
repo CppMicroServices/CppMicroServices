@@ -17,7 +17,7 @@
 # include BOOST_ABI_PREFIX
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace context {
 
 struct preallocated {

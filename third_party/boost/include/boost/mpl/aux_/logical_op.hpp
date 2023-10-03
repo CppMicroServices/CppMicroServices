@@ -33,7 +33,7 @@
 #include <boost/preprocessor/inc.hpp>
 #include <boost/preprocessor/cat.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 #   define AUX778076_PARAMS(param, sub) \
     BOOST_MPL_PP_PARAMS( \

@@ -20,7 +20,7 @@
     Defines concepts used in string_algo library
 */
 
-namespace cppmsboost {
+namespace boost {
     namespace algorithm {
 
         //! Finder concept
@@ -65,8 +65,8 @@ namespace cppmsboost {
             void constraints()
             {
                 // Operation
-                ::cppmsboost::begin((*pFo)( (*pF)(i,i) ));
-                ::cppmsboost::end((*pFo)( (*pF)(i,i) ));
+                ::boost::begin((*pFo)( (*pF)(i,i) ));
+                ::boost::end((*pFo)( (*pF)(i,i) ));
             }
         private:
             IteratorT i;
@@ -75,7 +75,7 @@ namespace cppmsboost {
         }; // FormatterConcept;
 
     } // namespace algorithm
-} // namespace cppmsboost
+} // namespace boost
 
 
 

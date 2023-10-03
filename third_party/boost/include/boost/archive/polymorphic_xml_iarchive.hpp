@@ -25,7 +25,7 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 class BOOST_SYMBOL_VISIBLE polymorphic_xml_iarchive :
@@ -39,7 +39,7 @@ public:
 };
 
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)
@@ -47,7 +47,7 @@ public:
 
 // required by export
 BOOST_SERIALIZATION_REGISTER_ARCHIVE(
-    cppmsboost::archive::polymorphic_xml_iarchive
+    boost::archive::polymorphic_xml_iarchive
 )
 
 #endif // BOOST_ARCHIVE_POLYMORPHIC_XML_IARCHIVE_HPP

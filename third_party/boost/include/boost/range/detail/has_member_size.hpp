@@ -17,7 +17,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/cstdint.hpp>
 
-namespace cppmsboost
+namespace boost
 {
     namespace range_detail
     {
@@ -32,17 +32,17 @@ private:
     };
 
     template<class C>
-    static cppmsboost::uint8_t f(check<std::size_t(C::*)(void) const, &C::size>*);
+    static boost::uint8_t f(check<std::size_t(C::*)(void) const, &C::size>*);
 
     template<class C>
-    static cppmsboost::uint16_t f(...);
+    static boost::uint16_t f(...);
 
 public:
     static const bool value =
-        (sizeof(f<T>(0)) == sizeof(cppmsboost::uint8_t));
+        (sizeof(f<T>(0)) == sizeof(boost::uint8_t));
 
     typedef typename mpl::if_c<
-        (sizeof(f<T>(0)) == sizeof(cppmsboost::uint8_t)),
+        (sizeof(f<T>(0)) == sizeof(boost::uint8_t)),
         mpl::true_,
         mpl::false_
     >::type type;
@@ -61,6 +61,6 @@ struct has_member_size
 };
 
     } // namespace range_detail
-}// namespace cppmsboost
+}// namespace boost
  
 #endif // include guard

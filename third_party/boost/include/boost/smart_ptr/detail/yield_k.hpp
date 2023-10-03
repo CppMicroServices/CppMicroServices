@@ -47,7 +47,7 @@ extern "C" void _mm_pause();
 # include <windows.h>
 #endif
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace detail
@@ -95,7 +95,7 @@ inline void yield( unsigned k ) BOOST_NOEXCEPT
 
 } // namespace detail
 
-} // namespace cppmsboost
+} // namespace boost
 
 #elif defined( BOOST_HAS_PTHREADS )
 
@@ -108,7 +108,7 @@ inline void yield( unsigned k ) BOOST_NOEXCEPT
 
 #include <time.h>
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace detail
@@ -146,11 +146,11 @@ inline void yield( unsigned k )
 
 } // namespace detail
 
-} // namespace cppmsboost
+} // namespace boost
 
 #else
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace detail
@@ -162,7 +162,7 @@ inline void yield( unsigned )
 
 } // namespace detail
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif
 

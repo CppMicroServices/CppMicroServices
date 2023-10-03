@@ -23,7 +23,7 @@
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace detail
@@ -36,8 +36,8 @@ private:
     sp_counted_base( sp_counted_base const & );
     sp_counted_base & operator= ( sp_counted_base const & );
 
-    cppmsboost::int_least32_t use_count_;        // #shared
-    cppmsboost::int_least32_t weak_count_;       // #weak + (#shared != 0)
+    boost::int_least32_t use_count_;        // #shared
+    boost::int_least32_t weak_count_;       // #weak + (#shared != 0)
 
 public:
 
@@ -107,6 +107,6 @@ public:
 
 } // namespace detail
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // #ifndef BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_NT_HPP_INCLUDED

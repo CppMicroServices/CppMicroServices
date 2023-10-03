@@ -19,7 +19,7 @@
 #include <boost/mpl/aux_/config/integral.hpp>
 #include <boost/config.hpp>
 
-namespace cppmsboost { namespace mpl { namespace aux {
+namespace boost { namespace mpl { namespace aux {
 
 template< typename T > struct integral_rank;
 

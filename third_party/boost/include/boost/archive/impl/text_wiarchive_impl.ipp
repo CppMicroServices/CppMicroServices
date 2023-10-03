@@ -22,7 +22,7 @@ namespace std{
 #ifndef BOOST_NO_STD_WSTREAMBUF
 #include <boost/archive/basic_text_iprimitive.hpp>
 
-namespace cppmsboost { 
+namespace boost { 
 namespace archive {
 
 //////////////////////////////////////////////////////////////////////

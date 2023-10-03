@@ -29,7 +29,7 @@ namespace std{
     #endif
 } // namespace std
 
-namespace cppmsboost {
+namespace boost {
 namespace serialization {
 
 // default implementation does nothing.
@@ -41,10 +41,10 @@ T * factory(std::va_list){
 }
 
 } // namespace serialization
-} // namespace cppmsboost
+} // namespace boost
 
 #define BOOST_SERIALIZATION_FACTORY(N, T, A0, A1, A2, A3) \
-namespace cppmsboost {                                         \
+namespace boost {                                         \
 namespace serialization {                                 \
     template<>                                            \
     T * factory<T, N>(std::va_list ap){                   \
@@ -89,7 +89,7 @@ namespace serialization {                                 \
     BOOST_SERIALIZATION_FACTORY(1, T, A0, 0, 0, 0)
 
 #define BOOST_SERIALIZATION_FACTORY_0(T)                 \
-namespace cppmsboost {                                        \
+namespace boost {                                        \
 namespace serialization {                                \
     template<>                                           \
     T * factory<T, 0>(std::va_list){                     \

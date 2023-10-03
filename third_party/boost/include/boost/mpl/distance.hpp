@@ -28,7 +28,7 @@
 #include <boost/mpl/aux_/config/static_constant.hpp>
 
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 // default implementation for forward/bidirectional iterators
 template< typename Tag > struct distance_impl

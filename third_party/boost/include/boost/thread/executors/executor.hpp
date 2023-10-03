@@ -18,7 +18,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace cppmsboost
+namespace boost
 {
   namespace executors
   {
@@ -90,21 +90,21 @@ namespace cppmsboost
     void submit(Closure & closure)
     {
       work w ((closure));
-      submit(cppmsboost::move(w));
+      submit(boost::move(w));
     }
 #endif
     void submit(void (*closure)())
     {
       work w ((closure));
-      submit(cppmsboost::move(w));
+      submit(boost::move(w));
     }
 
     template <typename Closure>
     void submit(BOOST_THREAD_FWD_REF(Closure) closure)
     {
-      //submit(work(cppmsboost::forward<Closure>(closure)));
-      work w((cppmsboost::forward<Closure>(closure)));
-      submit(cppmsboost::move(w));
+      //submit(work(boost::forward<Closure>(closure)));
+      work w((boost::forward<Closure>(closure)));
+      submit(boost::move(w));
     }
 
     /**

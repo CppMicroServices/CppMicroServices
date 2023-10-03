@@ -34,7 +34,7 @@
 #include <boost/move/algo/detail/insertion_sort.hpp>
 #include <cassert>
 
-namespace cppmsboost {
+namespace boost {
 namespace movelib {
 
 // @cond
@@ -193,14 +193,14 @@ void stable_sort_adaptive_ONlogN2(BidirectionalIterator first,
 {
    typedef typename iterator_traits<BidirectionalIterator>::value_type  value_type;
 
-   ::cppmsboost::movelib::adaptive_xbuf<value_type, RandRawIt> xbuf(uninitialized, uninitialized_len);
+   ::boost::movelib::adaptive_xbuf<value_type, RandRawIt> xbuf(uninitialized, uninitialized_len);
    xbuf.initialize_until(uninitialized_len, *first);
    stable_sort_ONlogN_recursive(first, last, uninitialized, uninitialized_len, comp);
 }
 
 ///@endcond
 
-}} //namespace cppmsboost {  namespace movelib{
+}} //namespace boost {  namespace movelib{
 
 #include <boost/move/detail/config_end.hpp>
 

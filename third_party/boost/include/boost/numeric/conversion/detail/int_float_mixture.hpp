@@ -18,7 +18,7 @@
 
 #include "boost/mpl/integral_c.hpp"
 
-namespace cppmsboost { namespace numeric { namespace convdetail
+namespace boost { namespace numeric { namespace convdetail
 {
   // Integral Constants for 'IntFloatMixture'
   typedef mpl::integral_c<int_float_mixture_enum, integral_to_integral> int2int_c ;
@@ -63,7 +63,7 @@ namespace cppmsboost { namespace numeric { namespace convdetail
         type ;
   } ;
 
-} } } // namespace cppmsboost::numeric::convdetail
+} } } // namespace boost::numeric::convdetail
 
 #endif
 //

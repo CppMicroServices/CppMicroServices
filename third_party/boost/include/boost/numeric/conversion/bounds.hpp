@@ -12,13 +12,13 @@
 
 #include "boost/numeric/conversion/detail/bounds.hpp"
 
-namespace cppmsboost { namespace numeric 
+namespace boost { namespace numeric 
 {
 
 template<class N>
 struct bounds : boundsdetail::get_impl<N>::type
 {} ;
 
-} } // namespace cppmsboost::numeric
+} } // namespace boost::numeric
 
 #endif

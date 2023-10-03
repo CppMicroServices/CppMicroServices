@@ -10,7 +10,7 @@
 // Preprocessed version of "boost/mpl/bind.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 namespace aux {
 

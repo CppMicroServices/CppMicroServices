@@ -25,7 +25,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -57,17 +57,17 @@ std::size_t posix_thread::hardware_concurrency()
 void posix_thread::start_thread(func_base* arg)
 {
   int error = ::pthread_create(&thread_, 0,
-        cppmsboost_asio_detail_posix_thread_function, arg);
+        boost_asio_detail_posix_thread_function, arg);
   if (error != 0)
   {
     delete arg;
-    cppmsboost::system::error_code ec(error,
-        cppmsboost::asio::error::get_system_category());
-    cppmsboost::asio::detail::throw_error(ec, "thread");
+    boost::system::error_code ec(error,
+        boost::asio::error::get_system_category());
+    boost::asio::detail::throw_error(ec, "thread");
   }
 }
 
-void* cppmsboost_asio_detail_posix_thread_function(void* arg)
+void* boost_asio_detail_posix_thread_function(void* arg)
 {
   posix_thread::auto_func_base_ptr func = {
       static_cast<posix_thread::func_base*>(arg) };
@@ -77,7 +77,7 @@ void* cppmsboost_asio_detail_posix_thread_function(void* arg)
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

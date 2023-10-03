@@ -22,7 +22,7 @@
 #define BOOST_REGEX_V4_REGEX_REPLACE_HPP
 
 
-namespace cppmsboost{
+namespace boost{
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -92,7 +92,7 @@ std::basic_string<charT> regex_replace(const std::basic_string<charT>& s,
 #pragma warning(pop)
 #endif
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // BOOST_REGEX_V4_REGEX_REPLACE_HPP
 

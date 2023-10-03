@@ -19,7 +19,7 @@
 #include <boost/assert.hpp>
 #include <boost/archive/iterators/escape.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 namespace iterators {
 
@@ -30,7 +30,7 @@ template<class Base>
 class xml_escape
     : public escape<xml_escape<Base>, Base>
 {
-    friend class cppmsboost::iterator_core_access;
+    friend class boost::iterator_core_access;
 
     typedef escape<xml_escape<Base>, Base> super_t;
 
@@ -116,6 +116,6 @@ wchar_t xml_escape<Base>::fill(
 
 } // namespace iterators
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ARCHIVE_ITERATORS_XML_ESCAPE_HPP

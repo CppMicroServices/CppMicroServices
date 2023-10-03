@@ -18,7 +18,7 @@
 #include <boost/algorithm/string/detail/find_format_store.hpp>
 #include <boost/algorithm/string/detail/replace_storage.hpp>
 
-namespace cppmsboost {
+namespace boost {
     namespace algorithm {
         namespace detail {
 
@@ -49,17 +49,17 @@ namespace cppmsboost {
                 if ( !M )
                 {
                     // Match not found - return original sequence
-                    Output = std::copy( ::cppmsboost::begin(Input), ::cppmsboost::end(Input), Output );
+                    Output = std::copy( ::boost::begin(Input), ::boost::end(Input), Output );
                     return Output;
                 }
 
                 // Copy the beginning of the sequence
-                Output = std::copy( ::cppmsboost::begin(Input), ::cppmsboost::begin(M), Output );
+                Output = std::copy( ::boost::begin(Input), ::boost::begin(M), Output );
                 // Format find result
                 // Copy formatted result
-                Output = std::copy( ::cppmsboost::begin(M.format_result()), ::cppmsboost::end(M.format_result()), Output );
+                Output = std::copy( ::boost::begin(M.format_result()), ::boost::end(M.format_result()), Output );
                 // Copy the rest of the sequence
-                Output = std::copy( M.end(), ::cppmsboost::end(Input), Output );
+                Output = std::copy( M.end(), ::boost::end(Input), Output );
 
                 return Output;
             }
@@ -75,15 +75,15 @@ namespace cppmsboost {
                 FormatterT Formatter,
                 const FindResultT& FindResult )
             {   
-                if( ::cppmsboost::algorithm::detail::check_find_result(Input, FindResult) ) {
-                    return ::cppmsboost::algorithm::detail::find_format_copy_impl2( 
+                if( ::boost::algorithm::detail::check_find_result(Input, FindResult) ) {
+                    return ::boost::algorithm::detail::find_format_copy_impl2( 
                         Output,
                         Input,
                         Formatter,
                         FindResult,
                         Formatter(FindResult) );
                 } else {
-                    return std::copy( ::cppmsboost::begin(Input), ::cppmsboost::end(Input), Output );
+                    return std::copy( ::boost::begin(Input), ::boost::end(Input), Output );
                 }
             }
 
@@ -118,11 +118,11 @@ namespace cppmsboost {
 
                 InputT Output;
                 // Copy the beginning of the sequence
-                cppmsboost::algorithm::detail::insert( Output, ::cppmsboost::end(Output), ::cppmsboost::begin(Input), M.begin() );
+                boost::algorithm::detail::insert( Output, ::boost::end(Output), ::boost::begin(Input), M.begin() );
                 // Copy formatted result
-                cppmsboost::algorithm::detail::insert( Output, ::cppmsboost::end(Output), M.format_result() );
+                boost::algorithm::detail::insert( Output, ::boost::end(Output), M.format_result() );
                 // Copy the rest of the sequence
-                cppmsboost::algorithm::detail::insert( Output, ::cppmsboost::end(Output), M.end(), ::cppmsboost::end(Input) );
+                boost::algorithm::detail::insert( Output, ::boost::end(Output), M.end(), ::boost::end(Input) );
 
                 return Output;
             }
@@ -136,8 +136,8 @@ namespace cppmsboost {
                 FormatterT Formatter,
                 const FindResultT& FindResult)
             {
-                if( ::cppmsboost::algorithm::detail::check_find_result(Input, FindResult) ) {
-                    return ::cppmsboost::algorithm::detail::find_format_copy_impl2(
+                if( ::boost::algorithm::detail::check_find_result(Input, FindResult) ) {
+                    return ::boost::algorithm::detail::find_format_copy_impl2(
                         Input,
                         Formatter,
                         FindResult,
@@ -176,7 +176,7 @@ namespace cppmsboost {
                 }
 
                 // Replace match
-                ::cppmsboost::algorithm::detail::replace( Input, M.begin(), M.end(), M.format_result() );
+                ::boost::algorithm::detail::replace( Input, M.begin(), M.end(), M.format_result() );
             }
 
             template<
@@ -188,8 +188,8 @@ namespace cppmsboost {
                 FormatterT Formatter,
                 const FindResultT& FindResult)
             {
-                if( ::cppmsboost::algorithm::detail::check_find_result(Input, FindResult) ) {
-                    ::cppmsboost::algorithm::detail::find_format_impl2(
+                if( ::boost::algorithm::detail::check_find_result(Input, FindResult) ) {
+                    ::boost::algorithm::detail::find_format_impl2(
                         Input,
                         Formatter,
                         FindResult,
@@ -199,6 +199,6 @@ namespace cppmsboost {
 
         } // namespace detail
     } // namespace algorithm
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // BOOST_STRING_FIND_FORMAT_DETAIL_HPP

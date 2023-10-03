@@ -27,7 +27,7 @@
 #include <boost/mpl/list/aux_/begin_end.hpp>
 #include <boost/mpl/list/aux_/item.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template< typename Dummy = na > struct list0;
 

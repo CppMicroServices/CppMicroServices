@@ -13,7 +13,7 @@
 
 #include <boost/type_traits/integral_constant.hpp>
 
-namespace cppmsboost {
+namespace boost {
 
 #ifdef _MSC_VER
 #define BOOST_TT_DEF_CALL __thiscall

@@ -14,7 +14,7 @@
 #include <boost/range/size_type.hpp>
 #include <boost/range/iterator.hpp>
 
-namespace cppmsboost
+namespace boost
 {
     template< class T >
     struct range_mutable_iterator<T*>

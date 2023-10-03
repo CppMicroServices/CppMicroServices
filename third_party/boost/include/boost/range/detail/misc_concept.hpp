@@ -10,7 +10,7 @@
 
 #include <boost/concept_check.hpp>
 
-namespace cppmsboost
+namespace boost
 {
     namespace range_detail
     {

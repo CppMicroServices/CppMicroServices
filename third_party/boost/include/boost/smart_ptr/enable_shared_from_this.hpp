@@ -19,7 +19,7 @@
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
 
-namespace cppmsboost
+namespace boost
 {
 
 template<class T> class enable_shared_from_this
@@ -85,6 +85,6 @@ private:
     mutable weak_ptr<T> weak_this_;
 };
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // #ifndef BOOST_SMART_PTR_ENABLE_SHARED_FROM_THIS_HPP_INCLUDED

@@ -17,7 +17,7 @@
 #include <boost/mpl/list/list0.hpp>
 #include <boost/mpl/integral_c.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template< typename T > struct list0_c
     : l_end

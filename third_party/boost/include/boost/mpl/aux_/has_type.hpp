@@ -16,7 +16,7 @@
 
 #include <boost/mpl/has_xxx.hpp>
 
-namespace cppmsboost { namespace mpl { namespace aux {
+namespace boost { namespace mpl { namespace aux {
 BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(has_type, type, true)
 }}}
 

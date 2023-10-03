@@ -21,7 +21,7 @@
 #endif
 
 namespace
-cppmsboost
+boost
     {
     namespace
     to_string_detail

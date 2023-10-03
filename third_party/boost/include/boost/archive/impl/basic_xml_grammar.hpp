@@ -57,7 +57,7 @@
 #include <boost/serialization/tracking.hpp>
 #include <boost/serialization/version.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
@@ -74,12 +74,12 @@ public:
 private:
     typedef typename std::basic_istream<CharType> IStream;
     typedef typename std::basic_string<CharType> StringType;
-    typedef typename cppmsboost::spirit::classic::chset<CharType> chset_t;
-    typedef typename cppmsboost::spirit::classic::chlit<CharType> chlit_t;
-    typedef typename cppmsboost::spirit::classic::scanner<
+    typedef typename boost::spirit::classic::chset<CharType> chset_t;
+    typedef typename boost::spirit::classic::chlit<CharType> chlit_t;
+    typedef typename boost::spirit::classic::scanner<
         typename  std::basic_string<CharType>::iterator
     > scanner_t;
-    typedef typename cppmsboost::spirit::classic::rule<scanner_t> rule_t;
+    typedef typename boost::spirit::classic::rule<scanner_t> rule_t;
     // Start grammar definition
     rule_t
         Reference,
@@ -168,6 +168,6 @@ public:
 };
 
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ARCHIVE_BASIC_XML_GRAMMAR_HPP

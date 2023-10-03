@@ -22,7 +22,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 
 /// The socket_base class is used as a base for the basic_stream_socket and
@@ -99,18 +99,18 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * cppmsboost::asio::ip::udp::socket socket(my_context);
+   * boost::asio::ip::udp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::broadcast option(true);
+   * boost::asio::socket_base::broadcast option(true);
    * socket.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * cppmsboost::asio::ip::udp::socket socket(my_context);
+   * boost::asio::ip::udp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::broadcast option;
+   * boost::asio::socket_base::broadcast option;
    * socket.get_option(option);
    * bool is_set = option.value();
    * @endcode
@@ -121,7 +121,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined broadcast;
 #else
-  typedef cppmsboost::asio::detail::socket_option::boolean<
+  typedef boost::asio::detail::socket_option::boolean<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_BROADCAST)>
       broadcast;
 #endif
@@ -133,18 +133,18 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::debug option(true);
+   * boost::asio::socket_base::debug option(true);
    * socket.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::debug option;
+   * boost::asio::socket_base::debug option;
    * socket.get_option(option);
    * bool is_set = option.value();
    * @endcode
@@ -155,7 +155,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined debug;
 #else
-  typedef cppmsboost::asio::detail::socket_option::boolean<
+  typedef boost::asio::detail::socket_option::boolean<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_DEBUG)> debug;
 #endif
 
@@ -166,18 +166,18 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * cppmsboost::asio::ip::udp::socket socket(my_context);
+   * boost::asio::ip::udp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::do_not_route option(true);
+   * boost::asio::socket_base::do_not_route option(true);
    * socket.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * cppmsboost::asio::ip::udp::socket socket(my_context);
+   * boost::asio::ip::udp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::do_not_route option;
+   * boost::asio::socket_base::do_not_route option;
    * socket.get_option(option);
    * bool is_set = option.value();
    * @endcode
@@ -188,7 +188,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined do_not_route;
 #else
-  typedef cppmsboost::asio::detail::socket_option::boolean<
+  typedef boost::asio::detail::socket_option::boolean<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_DONTROUTE)>
       do_not_route;
 #endif
@@ -200,18 +200,18 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::keep_alive option(true);
+   * boost::asio::socket_base::keep_alive option(true);
    * socket.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::keep_alive option;
+   * boost::asio::socket_base::keep_alive option;
    * socket.get_option(option);
    * bool is_set = option.value();
    * @endcode
@@ -222,7 +222,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined keep_alive;
 #else
-  typedef cppmsboost::asio::detail::socket_option::boolean<
+  typedef boost::asio::detail::socket_option::boolean<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_KEEPALIVE)> keep_alive;
 #endif
 
@@ -233,18 +233,18 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::send_buffer_size option(8192);
+   * boost::asio::socket_base::send_buffer_size option(8192);
    * socket.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::send_buffer_size option;
+   * boost::asio::socket_base::send_buffer_size option;
    * socket.get_option(option);
    * int size = option.value();
    * @endcode
@@ -255,7 +255,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined send_buffer_size;
 #else
-  typedef cppmsboost::asio::detail::socket_option::integer<
+  typedef boost::asio::detail::socket_option::integer<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_SNDBUF)>
       send_buffer_size;
 #endif
@@ -267,18 +267,18 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::send_low_watermark option(1024);
+   * boost::asio::socket_base::send_low_watermark option(1024);
    * socket.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::send_low_watermark option;
+   * boost::asio::socket_base::send_low_watermark option;
    * socket.get_option(option);
    * int size = option.value();
    * @endcode
@@ -289,7 +289,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined send_low_watermark;
 #else
-  typedef cppmsboost::asio::detail::socket_option::integer<
+  typedef boost::asio::detail::socket_option::integer<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_SNDLOWAT)>
       send_low_watermark;
 #endif
@@ -301,18 +301,18 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::receive_buffer_size option(8192);
+   * boost::asio::socket_base::receive_buffer_size option(8192);
    * socket.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::receive_buffer_size option;
+   * boost::asio::socket_base::receive_buffer_size option;
    * socket.get_option(option);
    * int size = option.value();
    * @endcode
@@ -323,7 +323,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined receive_buffer_size;
 #else
-  typedef cppmsboost::asio::detail::socket_option::integer<
+  typedef boost::asio::detail::socket_option::integer<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_RCVBUF)>
       receive_buffer_size;
 #endif
@@ -335,18 +335,18 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::receive_low_watermark option(1024);
+   * boost::asio::socket_base::receive_low_watermark option(1024);
    * socket.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::receive_low_watermark option;
+   * boost::asio::socket_base::receive_low_watermark option;
    * socket.get_option(option);
    * int size = option.value();
    * @endcode
@@ -357,7 +357,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined receive_low_watermark;
 #else
-  typedef cppmsboost::asio::detail::socket_option::integer<
+  typedef boost::asio::detail::socket_option::integer<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_RCVLOWAT)>
       receive_low_watermark;
 #endif
@@ -370,18 +370,18 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * cppmsboost::asio::ip::tcp::acceptor acceptor(my_context);
+   * boost::asio::ip::tcp::acceptor acceptor(my_context);
    * ...
-   * cppmsboost::asio::socket_base::reuse_address option(true);
+   * boost::asio::socket_base::reuse_address option(true);
    * acceptor.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * cppmsboost::asio::ip::tcp::acceptor acceptor(my_context);
+   * boost::asio::ip::tcp::acceptor acceptor(my_context);
    * ...
-   * cppmsboost::asio::socket_base::reuse_address option;
+   * boost::asio::socket_base::reuse_address option;
    * acceptor.get_option(option);
    * bool is_set = option.value();
    * @endcode
@@ -392,7 +392,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined reuse_address;
 #else
-  typedef cppmsboost::asio::detail::socket_option::boolean<
+  typedef boost::asio::detail::socket_option::boolean<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_REUSEADDR)>
       reuse_address;
 #endif
@@ -405,18 +405,18 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::linger option(true, 30);
+   * boost::asio::socket_base::linger option(true, 30);
    * socket.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::linger option;
+   * boost::asio::socket_base::linger option;
    * socket.get_option(option);
    * bool is_set = option.enabled();
    * unsigned short timeout = option.timeout();
@@ -428,7 +428,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined linger;
 #else
-  typedef cppmsboost::asio::detail::socket_option::linger<
+  typedef boost::asio::detail::socket_option::linger<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_LINGER)>
       linger;
 #endif
@@ -440,18 +440,18 @@ public:
    * @par Examples
    * Setting the option:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::out_of_band_inline option(true);
+   * boost::asio::socket_base::out_of_band_inline option(true);
    * socket.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::out_of_band_inline option;
+   * boost::asio::socket_base::out_of_band_inline option;
    * socket.get_option(option);
    * bool value = option.value();
    * @endcode
@@ -462,7 +462,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined out_of_band_inline;
 #else
-  typedef cppmsboost::asio::detail::socket_option::boolean<
+  typedef boost::asio::detail::socket_option::boolean<
     BOOST_ASIO_OS_DEF(SOL_SOCKET), BOOST_ASIO_OS_DEF(SO_OOBINLINE)>
       out_of_band_inline;
 #endif
@@ -470,24 +470,24 @@ public:
   /// Socket option to report aborted connections on accept.
   /**
    * Implements a custom socket option that determines whether or not an accept
-   * operation is permitted to fail with cppmsboost::asio::error::connection_aborted.
+   * operation is permitted to fail with boost::asio::error::connection_aborted.
    * By default the option is false.
    *
    * @par Examples
    * Setting the option:
    * @code
-   * cppmsboost::asio::ip::tcp::acceptor acceptor(my_context);
+   * boost::asio::ip::tcp::acceptor acceptor(my_context);
    * ...
-   * cppmsboost::asio::socket_base::enable_connection_aborted option(true);
+   * boost::asio::socket_base::enable_connection_aborted option(true);
    * acceptor.set_option(option);
    * @endcode
    *
    * @par
    * Getting the current option value:
    * @code
-   * cppmsboost::asio::ip::tcp::acceptor acceptor(my_context);
+   * boost::asio::ip::tcp::acceptor acceptor(my_context);
    * ...
-   * cppmsboost::asio::socket_base::enable_connection_aborted option;
+   * boost::asio::socket_base::enable_connection_aborted option;
    * acceptor.get_option(option);
    * bool is_set = option.value();
    * @endcode
@@ -498,9 +498,9 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined enable_connection_aborted;
 #else
-  typedef cppmsboost::asio::detail::socket_option::boolean<
-    cppmsboost::asio::detail::custom_socket_option_level,
-    cppmsboost::asio::detail::enable_connection_aborted_option>
+  typedef boost::asio::detail::socket_option::boolean<
+    boost::asio::detail::custom_socket_option_level,
+    boost::asio::detail::enable_connection_aborted_option>
     enable_connection_aborted;
 #endif
 
@@ -511,9 +511,9 @@ public:
    *
    * @par Example
    * @code
-   * cppmsboost::asio::ip::tcp::socket socket(my_context);
+   * boost::asio::ip::tcp::socket socket(my_context);
    * ...
-   * cppmsboost::asio::socket_base::bytes_readable command(true);
+   * boost::asio::socket_base::bytes_readable command(true);
    * socket.io_control(command);
    * std::size_t bytes_readable = command.get();
    * @endcode
@@ -524,7 +524,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined bytes_readable;
 #else
-  typedef cppmsboost::asio::detail::io_control::bytes_readable bytes_readable;
+  typedef boost::asio::detail::io_control::bytes_readable bytes_readable;
 #endif
 
   /// The maximum length of the queue of pending incoming connections.
@@ -554,7 +554,7 @@ protected:
 };
 
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

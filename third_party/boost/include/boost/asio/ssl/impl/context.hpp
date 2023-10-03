@@ -22,21 +22,21 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace ssl {
 
 template <typename VerifyCallback>
 void context::set_verify_callback(VerifyCallback callback)
 {
-  cppmsboost::system::error_code ec;
+  boost::system::error_code ec;
   this->set_verify_callback(callback, ec);
-  cppmsboost::asio::detail::throw_error(ec, "set_verify_callback");
+  boost::asio::detail::throw_error(ec, "set_verify_callback");
 }
 
 template <typename VerifyCallback>
 BOOST_ASIO_SYNC_OP_VOID context::set_verify_callback(
-    VerifyCallback callback, cppmsboost::system::error_code& ec)
+    VerifyCallback callback, boost::system::error_code& ec)
 {
   do_set_verify_callback(
       new detail::verify_callback<VerifyCallback>(callback), ec);
@@ -46,14 +46,14 @@ BOOST_ASIO_SYNC_OP_VOID context::set_verify_callback(
 template <typename PasswordCallback>
 void context::set_password_callback(PasswordCallback callback)
 {
-  cppmsboost::system::error_code ec;
+  boost::system::error_code ec;
   this->set_password_callback(callback, ec);
-  cppmsboost::asio::detail::throw_error(ec, "set_password_callback");
+  boost::asio::detail::throw_error(ec, "set_password_callback");
 }
 
 template <typename PasswordCallback>
 BOOST_ASIO_SYNC_OP_VOID context::set_password_callback(
-    PasswordCallback callback, cppmsboost::system::error_code& ec)
+    PasswordCallback callback, boost::system::error_code& ec)
 {
   do_set_password_callback(
       new detail::password_callback<PasswordCallback>(callback), ec);
@@ -62,7 +62,7 @@ BOOST_ASIO_SYNC_OP_VOID context::set_password_callback(
 
 } // namespace ssl
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

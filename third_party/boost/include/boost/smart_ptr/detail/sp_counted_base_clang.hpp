@@ -20,31 +20,31 @@
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace detail
 {
 
-typedef _Atomic( cppmsboost::int_least32_t ) atomic_int_least32_t;
+typedef _Atomic( boost::int_least32_t ) atomic_int_least32_t;
 
 inline void atomic_increment( atomic_int_least32_t * pw ) BOOST_SP_NOEXCEPT
 {
     __c11_atomic_fetch_add( pw, 1, __ATOMIC_RELAXED );
 }
 
-inline cppmsboost::int_least32_t atomic_decrement( atomic_int_least32_t * pw ) BOOST_SP_NOEXCEPT
+inline boost::int_least32_t atomic_decrement( atomic_int_least32_t * pw ) BOOST_SP_NOEXCEPT
 {
     return __c11_atomic_fetch_sub( pw, 1, __ATOMIC_ACQ_REL );
 }
 
-inline cppmsboost::int_least32_t atomic_conditional_increment( atomic_int_least32_t * pw ) BOOST_SP_NOEXCEPT
+inline boost::int_least32_t atomic_conditional_increment( atomic_int_least32_t * pw ) BOOST_SP_NOEXCEPT
 {
     // long r = *pw;
     // if( r != 0 ) ++*pw;
     // return r;
 
-    cppmsboost::int_least32_t r = __c11_atomic_load( pw, __ATOMIC_RELAXED );
+    boost::int_least32_t r = __c11_atomic_load( pw, __ATOMIC_RELAXED );
 
     for( ;; )
     {
@@ -147,6 +147,6 @@ public:
 
 } // namespace detail
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // #ifndef BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_CLANG_HPP_INCLUDED

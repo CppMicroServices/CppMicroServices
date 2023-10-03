@@ -32,7 +32,7 @@
 #pragma warning(disable: 4146)
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace atomics {
 namespace detail {
 
@@ -393,7 +393,7 @@ struct extra_operations< Base, Size, Signed, true > :
 
 } // namespace detail
 } // namespace atomics
-} // namespace cppmsboost
+} // namespace boost
 
 #if defined(BOOST_MSVC)
 #pragma warning(pop)

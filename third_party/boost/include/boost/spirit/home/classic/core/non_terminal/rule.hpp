@@ -37,7 +37,7 @@ BOOST_STATIC_ASSERT(BOOST_SPIRIT_RULE_SCANNERTYPE_LIMIT > 0);
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace cppmsboost { namespace spirit {
+namespace boost { namespace spirit {
 
 BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 

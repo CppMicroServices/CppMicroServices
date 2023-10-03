@@ -33,7 +33,7 @@
 
 #include <boost/thread/lockable_traits.hpp>
 
-namespace cppmsboost
+namespace boost
 {
   typedef shared_mutex shared_timed_mutex;
   namespace sync

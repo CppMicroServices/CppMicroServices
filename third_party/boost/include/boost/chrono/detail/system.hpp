@@ -10,9 +10,9 @@
 
 #include <boost/system/error_code.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace chrono {
-    inline bool is_throws(system::error_code  & ec) { return (&ec==&cppmsboost::throws()); }
+    inline bool is_throws(system::error_code  & ec) { return (&ec==&boost::throws()); }
 }
 }
 

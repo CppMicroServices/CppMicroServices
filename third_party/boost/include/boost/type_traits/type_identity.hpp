@@ -11,7 +11,7 @@
 
 #include <boost/config.hpp>
 
-namespace cppmsboost
+namespace boost
 {
 
 template<class T> struct type_identity
@@ -26,6 +26,6 @@ template <class T> using type_identity_t = typename type_identity<T>::type;
 #endif
 
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // #ifndef BOOST_TYPE_TRAITS_TYPE_IDENTITY_HPP_INCLUDED

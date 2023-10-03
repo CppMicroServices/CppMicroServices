@@ -14,7 +14,7 @@
 #include "boost/detail/workaround.hpp"
 #include "boost/config.hpp"
 
-namespace cppmsboost { namespace numeric
+namespace boost { namespace numeric
 {
 
 template<class T, class S>
@@ -23,7 +23,7 @@ struct conversion_traits
 {
 } ;
 
-} } // namespace cppmsboost::numeric
+} } // namespace boost::numeric
 
 #endif
 //

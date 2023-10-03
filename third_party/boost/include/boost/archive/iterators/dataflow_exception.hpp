@@ -23,7 +23,7 @@
 
 #include <boost/assert.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 namespace iterators {
 
@@ -75,6 +75,6 @@ public:
 
 } // namespace iterators
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #endif //BOOST_ARCHIVE_ITERATORS_DATAFLOW_EXCEPTION_HPP

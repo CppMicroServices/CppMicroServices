@@ -22,13 +22,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace ip {
 
 /// An query to be passed to a resolver.
 /**
- * The cppmsboost::asio::ip::basic_resolver_query class template describes a query
+ * The boost::asio::ip::basic_resolver_query class template describes a query
  * that can be passed to a resolver.
  *
  * @par Thread Safety
@@ -214,7 +214,7 @@ public:
   }
 
   /// Get the hints associated with the query.
-  const cppmsboost::asio::detail::addrinfo_type& hints() const
+  const boost::asio::detail::addrinfo_type& hints() const
   {
     return hints_;
   }
@@ -232,14 +232,14 @@ public:
   }
 
 private:
-  cppmsboost::asio::detail::addrinfo_type hints_;
+  boost::asio::detail::addrinfo_type hints_;
   std::string host_name_;
   std::string service_name_;
 };
 
 } // namespace ip
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

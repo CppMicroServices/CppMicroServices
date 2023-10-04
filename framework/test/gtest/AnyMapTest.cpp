@@ -60,8 +60,7 @@ TEST(AnyMapTest, IteratorTest)
     AnyMap::const_iter uociter1(uo.cbegin());
 
     AnyMap uoci {
-        {"do", 1},
-        {"re", 2},
+        {{ "do", 1 }, { "re", 2 }}
     };
     AnyMap::const_iter uoccciiter(uoci.begin());
     AnyMap::const_iter uoccciiter1(uoci.cbegin());
@@ -136,8 +135,7 @@ TEST(AnyMapTest, IteratorTest)
 TEST(AnyMapTest, AnyMap)
 {
     AnyMap::ordered_any_map o {
-        {"do", 1},
-        {"re", 2}
+        {{ "do", 1 }, { "re", 2 }}
     };
     AnyMap o_anymap(o);
     AnyMap o_anymap_copy(o_anymap);
@@ -378,15 +376,11 @@ TEST(AnyMapTest, ManifestFromCache)
     AnyMap cache {};
     AnyMap cache_bundles {};
     AnyMap cache_bundle1 {
-        {"a", std::string("A")}, //
-        {"b", std::string("B")}, //
-        {"c", std::string("C")}  //
+        {{ "a", std::string("A") }, { "b", std::string("B") }, { "c", std::string("C") }}
     };
 
     AnyMap cache_bundle2 {
-        {"d", std::string("D")}, //
-        {"e", std::string("E")}, //
-        {"f", std::string("F")}  //
+        {{ "d", std::string("D") }, { "e", std::string("E") }, { "f", std::string("F") }}
     };
 
     auto cache_bundle1_copy = cache_bundle1;

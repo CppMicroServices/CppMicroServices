@@ -400,7 +400,7 @@ namespace cppmicroservices
          * @param l a std::initializer_list<value_type> used to initialize the content of the AnyMap.
          *
          */
-        AnyMap(std::initializer_list<value_type> l = {});
+        AnyMap(std::initializer_list<any_map::value_type> l = {});
         /**
          * @brief initializer_list constructor
          *
@@ -420,7 +420,7 @@ namespace cppmicroservices
          * @param l a std::initializer_list<value_type> used to initialize the content of the AnyMap.
          *
          */
-        AnyMap(map_type type, std::initializer_list<value_type> l = {});
+        AnyMap(map_type type, std::initializer_list<any_map::value_type> l = {});
         AnyMap(ordered_any_map const& m);
         AnyMap(ordered_any_map&& m);
         AnyMap(unordered_any_map const& m);

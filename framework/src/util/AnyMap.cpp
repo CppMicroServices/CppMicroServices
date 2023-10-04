@@ -603,7 +603,7 @@ namespace cppmicroservices
     // ----------------------------------------------------------
     // ------------------------  any_map  -----------------------
 
-    any_map::any_map(map_type type, std::initializer_list<value_type> l) : type(type)
+    any_map::any_map(map_type type, std::initializer_list<any_map::value_type> l) : type(type)
     {
         switch (type)
         {

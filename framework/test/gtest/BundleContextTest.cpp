@@ -192,4 +192,115 @@ TEST(BundleContextTest, NoSegfaultWithServiceFactory)
     }
     thread.join();
 }
+
+template <typename ServiceT>
+bool
+verifyOrdering(std::vector<cppmicroservices::ServiceReference<ServiceT>>& refs)
+{
+    if (refs.size() > 0)
+    {
+        auto last = refs[0];
+        for (auto ref : refs)
+        {
+            if (!(any_cast<int>(ref.GetProperty(Constants::SERVICE_RANKING))
+                  <= any_cast<int>(last.GetProperty(Constants::SERVICE_RANKING))))
+            {
+                return false;
+            }
+
+            last = ref;
+        }
+    }
+    return true;
+}
+
+TEST(BundleContextTest, TestGetServiceReferenceOrderingBasic)
+{
+    cppmicroservices::Framework framework = cppmicroservices::FrameworkFactory().NewFramework();
+    framework.Start();
+
+    auto context = framework.GetBundleContext();
+
+    // Create Services
+    (void)context.RegisterService<bc_tests::TestService>(std::make_shared<bc_tests::TestService>(),
+                                                         ServiceProperties {
+                                                             {Constants::SERVICE_RANKING, 2}
+    });
+    (void)context.RegisterService<bc_tests::TestService>(std::make_shared<bc_tests::TestService>(),
+                                                         ServiceProperties {
+                                                             {Constants::SERVICE_RANKING, 0}
+    });
+    (void)context.RegisterService<bc_tests::TestService>(std::make_shared<bc_tests::TestService>(),
+                                                         ServiceProperties {
+                                                             {Constants::SERVICE_RANKING, 4}
+    });
+
+    (void)context.RegisterService<bc_tests::TestService>(std::make_shared<bc_tests::TestService>(),
+                                                         ServiceProperties {
+                                                             {Constants::SERVICE_RANKING, 1}
+    });
+
+    (void)context.RegisterService<bc_tests::TestService>(std::make_shared<bc_tests::TestService>(),
+                                                         ServiceProperties {
+                                                             {Constants::SERVICE_RANKING, 3}
+    });
+
+    auto refs = context.GetServiceReferences<bc_tests::TestService>();
+
+    ASSERT_TRUE(verifyOrdering(refs));
+    ASSERT_TRUE(refs.size() == 5);
+
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+}
+
+TEST(BundleContextTest, TestGetServiceReferenceOrderingTwoKeys)
+{
+    cppmicroservices::Framework framework = cppmicroservices::FrameworkFactory().NewFramework();
+    framework.Start();
+
+    auto context = framework.GetBundleContext();
+
+    // Create Services
+    ServiceProperties props0;
+    props0.insert(std::make_pair(Constants::SERVICE_RANKING, 2000));
+    props0.insert(std::make_pair("Key1", "Val1"));
+    (void)context.RegisterService<bc_tests::TestService>(std::make_shared<bc_tests::TestService>(), props0);
+
+    ServiceProperties props1;
+    props1.insert(std::make_pair(Constants::SERVICE_RANKING, 15));
+    props1.insert(std::make_pair("Key1", "Val2"));
+    (void)context.RegisterService<bc_tests::TestService>(std::make_shared<bc_tests::TestService>(), props1);
+
+    ServiceProperties props2;
+    props2.insert(std::make_pair(Constants::SERVICE_RANKING, 0));
+    props2.insert(std::make_pair("Key1", "Val2"));
+    (void)context.RegisterService<bc_tests::TestService>(std::make_shared<bc_tests::TestService>(), props2);
+
+    ServiceProperties props3;
+    props3.insert(std::make_pair(Constants::SERVICE_RANKING, 1506));
+    props3.insert(std::make_pair("Key2", "Val1"));
+    (void)context.RegisterService<bc_tests::TestService>(std::make_shared<bc_tests::TestService>(), props3);
+
+    ServiceProperties props4;
+    props4.insert(std::make_pair(Constants::SERVICE_RANKING, 905));
+    props4.insert(std::make_pair("Key2", "Val1"));
+    (void)context.RegisterService<bc_tests::TestService>(std::make_shared<bc_tests::TestService>(), props4);
+
+    auto refs0 = context.GetServiceReferences<bc_tests::TestService>();
+    ASSERT_TRUE(verifyOrdering(refs0));
+    ASSERT_TRUE(refs0.size() == 5);
+
+    auto refs1 = context.GetServiceReferences<bc_tests::TestService>("(Key1=Val*)");
+    ASSERT_TRUE(verifyOrdering(refs1));
+    ASSERT_TRUE(refs1.size() == 3);
+
+    auto refs2 = context.GetServiceReferences<bc_tests::TestService>("(Key2=Val*)");
+    ASSERT_TRUE(verifyOrdering(refs2));
+    ASSERT_TRUE(refs2.size() == 2);
+
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+}
+
 #endif

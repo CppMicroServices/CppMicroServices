@@ -104,7 +104,7 @@ namespace cppmicroservices
         struct concatenate_impl<String>
         {
             static size_t
-            size(String&& s)
+            size(String s)
             {
                 return string_size(s);
             }
@@ -119,7 +119,7 @@ namespace cppmicroservices
         struct concatenate_impl<String, Rest...>
         {
             static size_t
-            size(String&& s, Rest&&... rest)
+            size(String s, Rest... rest)
             {
                 return string_size(s) + concatenate_impl<Rest...>::size(std::forward<Rest>(rest)...);
             }
@@ -137,7 +137,7 @@ namespace cppmicroservices
     StringCatFast(Strings&&... strings)
     {
         std::string result;
-        result.reserve(stringCatFast::concatenate_impl<Strings...>::size(std::forward<Strings>(strings)...));
+        result.reserve(stringCatFast::concatenate_impl<Strings...>::size((strings)...));
         stringCatFast::concatenate_impl<Strings...>::concatenate(result, std::forward<Strings>(strings)...);
         return result;
     }

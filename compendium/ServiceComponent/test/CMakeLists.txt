@@ -1,7 +1,6 @@
 #-----------------------------------------------------------------------------
 # Build and run the GTest Suite of tests
 #-----------------------------------------------------------------------------
-
 set(us_servicecomponent_test_exe_name usServiceComponentTests)
 
 include_directories(
@@ -20,11 +19,6 @@ endif()
 # Add test source files
 #-----------------------------------------------------------------------------
 set(_servicecomponent_tests
-  TestCompInst_InvalidInheritance.cpp
-  TestCompInst_NoDepsNoDefaultCtor.cpp
-  TestCompInst_NoInjectNoDefaultCtor.cpp
-  TestCompInst_RefCount.cpp
-  TestCompInst_RefOrder.cpp
   TestComponentInstance.cpp             
   suite_registration.cpp
 )
@@ -112,3 +106,47 @@ if (WIN32 AND US_USE_SYSTEM_GTEST)
         $<TARGET_FILE_DIR:${us_servicecomponent_test_exe_name}>)
   endforeach(lib_fullpath)
 endif()
+
+#Compile-only tests addition
+#Adding executables for compile-only test files
+add_executable(usServiceComponentRefOrderTest TestCompInst_RefOrder.cpp)
+add_executable(usServiceComponentRefOrderMultipleCardinalityTest TestCompInst_RefOrderMultipleCardinality.cpp)
+add_executable(usServiceComponentInvalidInheritanceTest TestCompInst_InvalidInheritance.cpp)
+add_executable(usServiceComponentNoDepsNoDefaultCtorTest TestCompInst_NoDepsNoDefaultCtor.cpp)
+add_executable(usServiceComponentNoDefaultCtorTest TestCompInst_NoInjectNoDefaultCtor.cpp)
+add_executable(usServiceComponentRefCountTest TestCompInst_RefCount.cpp)
+
+set(compile_only_exe_names usServiceComponentRefOrderTest usServiceComponentRefOrderMultipleCardinalityTest usServiceComponentInvalidInheritanceTest usServiceComponentNoDepsNoDefaultCtorTest usServiceComponentNoDefaultCtorTest usServiceComponentRefCountTest)
+
+foreach(exe_name ${compile_only_exe_names})
+    
+    if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
+        target_compile_options(${exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
+    endif()
+
+    target_link_libraries(${exe_name} 
+	PRIVATE
+		${GTEST_BOTH_LIBRARIES}
+		${GMOCK_BOTH_LIBRARIES}
+        CppMicroServices
+        usServiceComponent
+    )
+
+    #Excluding compile-only tests from default build to avoid build failure
+    set_target_properties(${exe_name} PROPERTIES EXCLUDE_FROM_ALL TRUE EXCLUDE_FROM_DEFAULT_BUILD TRUE)
+
+    #For compile-only tests we add a test with Cmake command to build the target only as we expect a build failure
+    add_test(NAME ${exe_name}
+    COMMAND ${CMAKE_COMMAND} --build . --target ${exe_name}
+    WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR}
+    )
+
+endforeach()
+
+#Set test properties for compile-only tests to check if compilation fails and corresponding errors are generated in the log
+set_tests_properties(usServiceComponentRefOrderTest PROPERTIES PASS_REGULAR_EXPRESSION ".*An appropriate constructor was not found and/or the service implementation does not implement all of the service interface's methods. A constructor with service reference input parameters or a constructor with an AnyMap input parameter for configuration properties and service reference input parameters is required when inject-references is true.*")
+set_tests_properties(usServiceComponentRefOrderMultipleCardinalityTest PROPERTIES PASS_REGULAR_EXPRESSION ".*An appropriate constructor was not found and/or the service implementation does not implement all of the service interface's methods. A constructor with service reference input parameters or a constructor with an AnyMap input parameter for configuration properties and service reference input parameters is required when inject-references is true.*")
+set_tests_properties(usServiceComponentInvalidInheritanceTest PROPERTIES PASS_REGULAR_EXPRESSION ".*['static_cast' cannot convert].* [Types pointed to are unrelated] .* [conversion requires reinterpret_cast, C-style cast or function-style cast] .*")
+set_tests_properties(usServiceComponentNoDepsNoDefaultCtorTest PROPERTIES PASS_REGULAR_EXPRESSION ".*An appropriate constructor was not found and/or the service implementation does not implement all of the service interface's methods. A default constructor or a constructor with an AnyMap input parameter for the configuration properties is required when inject-references is false..*")
+set_tests_properties(usServiceComponentNoDefaultCtorTest PROPERTIES PASS_REGULAR_EXPRESSION ".*An appropriate constructor was not found and/or the service implementation does not implement all of the service interface's methods. A constructor with service reference input parameters or a constructor with an AnyMap input parameter for configuration properties and service reference input parameters is required when inject-references is true.*")
+set_tests_properties(usServiceComponentRefCountTest PROPERTIES PASS_REGULAR_EXPRESSION ".*An appropriate constructor was not found and/or the service implementation does not implement all of the service interface's methods. A constructor with service reference input parameters or a constructor with an AnyMap input parameter for configuration properties and service reference input parameters is required when inject-references is true.*")

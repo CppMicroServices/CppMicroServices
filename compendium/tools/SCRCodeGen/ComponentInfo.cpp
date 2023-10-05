@@ -58,7 +58,7 @@ namespace codegen
         }
 
         std::string
-        GetCtorInjectedRefTypes(ComponentInfo const& compInfo)
+        GetCtorInjectedRefParameters(ComponentInfo const& compInfo)
         {
             std::string result;
             auto sep = ", ";
@@ -66,7 +66,12 @@ namespace codegen
             {
                 if ((true == compInfo.injectReferences) && (reference.policy == "static"))
                 {
-                    result += (sep + reference.interface);
+                    if (reference.cardinality == "0..n" || reference.cardinality == "1..n") {
+                        result += (sep + std::string("std::vector<std::shared_ptr<") + reference.interface + ">>");
+                    }
+                    else {
+                        result += (sep + std::string("std::shared_ptr<") + reference.interface + ">");
+                    }
                 }
             }
             return result;

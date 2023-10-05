@@ -104,7 +104,7 @@ namespace cppmicroservices
         struct concatenate_impl<String>
         {
             static size_t
-            size(String s)
+            size(String const& s)
             {
                 return string_size(s);
             }
@@ -119,9 +119,9 @@ namespace cppmicroservices
         struct concatenate_impl<String, Rest...>
         {
             static size_t
-            size(String s, Rest... rest)
+            size(String const& s, Rest... rest)
             {
-                return string_size(s) + concatenate_impl<Rest...>::size(std::forward<Rest>(rest)...);
+                return string_size(s) + concatenate_impl<Rest...>::size((rest)...);
             }
             static void
             concatenate(std::string& result, String&& s, Rest&&... rest)

@@ -6,10 +6,10 @@ All notable changes to this project branch will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-`Unreleased C++14-branch based on 3.6.2 <https://github.com/cppmicroservices/cppmicroservices/tree/c++14-compliant>`_
+`Unreleased C++14-branch based on 3.6.3 <https://github.com/cppmicroservices/cppmicroservices/tree/c++14-compliant>`_
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/CppMicroServices/CppMicroServices/compare/v3.6.2...c++14-compliant>`_
+`Full Changelog <https://github.com/CppMicroServices/CppMicroServices/compare/c++14-compliant...v3.6.3>`_
 
 General Note
 ------------
@@ -18,7 +18,6 @@ This branch is intended to continue to provide bugfixes and improvements while s
 
 Added
 -----
-- `[Declarative Services] Add benchmark test infrastructure to DS <https://github.com/CppMicroServices/CppMicroServices/pull/813>`_
 
 Changed
 -------
@@ -31,6 +30,57 @@ Deprecated
 
 Fixed
 -----
+
+`v3.6.3 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.6.3>`_ (2023-10-05)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/CppMicroServices/CppMicroServices/compare/v3.6.3...v3.6.2>`_
+
+General Note
+------------
+
+This entry in the change log captures the relevant changes that were made between v3.6.2 and v3.6.3.
+This version contains all changes between v3.7.5 and v3.7.6 plus additional changes from `development` after the v3.7.6 release.
+Additionally there have been 3rd-party dependency updates and some compiler warning/include statement fixes.
+
+
+Added
+-----
+- `[Declarative Services] Add benchmark test infrastructure to DS <https://github.com/CppMicroServices/CppMicroServices/pull/813>`_
+- `[Core Framework] Make nested JSON queries using LDAP build-time configurable <https://github.com/CppMicroServices/CppMicroServices/pull/811>`_
+- `[Core Framework] Support nested JSON queries using LDAP <https://github.com/CppMicroServices/CppMicroServices/pull/794>`_
+- `[Declarative Services] Support for multiple cardinality for service references <https://github.com/CppMicroServices/CppMicroServices/pull/871>`_
+
+Changed
+-------
+- `Upgrade GitHub Actions to use Ubuntu 22.04 and remove use of Ubuntu 18.04 <https://github.com/CppMicroServices/CppMicroServices/pull/810>`_
+- `[Core Framework] Remove manual reference counting from ServiceRegistrationBasePrivate and ServiceReferenceBasePrivate <https://github.com/CppMicroServices/CppMicroServices/pull/841>`_
+- `Update 3rd party components <https://github.com/CppMicroServices/CppMicroServices/pull/927>`_
+  - update absl to Abseil LTS 20230125.3
+  - update googletest to release 1.14.0
+  - update spdlog to version 1.12.0
+  - update boost nowide to latest commit from standalone branch (conforming to Release v11.3.0)
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Core Framework] clang-tidy improvement for CMakeResourceDependencies <https://github.com/CppMicroServices/CppMicroServices/pull/812>`_
+- `[Core Framework] GetService performance micro-optimizations <https://github.com/CppMicroServices/CppMicroServices/pull/833>`_
+- `[Declarative Services] Fix sporadic crash caused by concurrent access to ComponentMgrImpl vector <https://github.com/CppMicroServices/CppMicroServices/pull/834>`_
+- `[Core Framework] Data Race Condition fix for Bundles dataStorage location <https://github.com/CppMicroServices/CppMicroServices/pull/845>`_
+- `[Core Framework] Fix undefined behavior in LDAPExpr::Trim <https://github.com/CppMicroServices/CppMicroServices/pull/835>`_
+- `[Declarative Services] Ensure multiple listeners for the same factory PID are honoured by ConfigurationNotifier::AnyListenersForPid <https://github.com/CppMicroServices/CppMicroServices/pull/865>`_
+- `[Declarative Services] Fix race condition when concurrently adding to SCRExtensionRegistry <https://github.com/CppMicroServices/CppMicroServices/pull/870>`_
+- `[Core Framework] Fix #489 service trackers using filters aren't notified of a service if it's service properties are constructed with a const char* value <https://github.com/CppMicroServices/CppMicroServices/pull/877>`_
+- `[Core Framework] Fix #920 serviceTracker segfault on concurrent tracker.Close() and framework.Stop() <https://github.com/CppMicroServices/CppMicroServices/pull/922>`_
+- `[Declarative Services] Fix #901 Redundant Bundle Validation checks <https://github.com/CppMicroServices/CppMicroServices/pull/901>`_
+- `[Core Framework] Fix #913 ServiceTracker deadlock <https://github.com/CppMicroServices/CppMicroServices/pull/915>`_
+
 
 `v3.6.2 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.6.2>`_ (2023-03-16)
 ---------------------------------------------------------------------------------------------------------

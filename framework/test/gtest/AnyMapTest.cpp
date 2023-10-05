@@ -46,16 +46,17 @@ TEST(AnyMapTest, AtCompoundKey)
 
 TEST(AnyMapTest, IteratorTest)
 {
-    AnyMap o {
+    AnyMap o = {
         any_map::ORDERED_MAP,
         {{ "a", 1 }, { "b", 2 }, { "c", 3 }}
     };
     AnyMap::const_iter ociter(o.begin());
     AnyMap::const_iter ociter1(o.cbegin());
 
-    AnyMap uo(AnyMap::UNORDERED_MAP);
-    uo["1"] = 1;
-    uo["2"] = 2;
+    AnyMap uo = {
+        AnyMap::UNORDERED_MAP,
+        {{ "1", 1 }, { "2", 2 }}
+    };
     AnyMap::const_iter uociter(uo.begin());
     AnyMap::const_iter uociter1(uo.cbegin());
 
@@ -140,7 +141,7 @@ TEST(AnyMapTest, AnyMap)
     AnyMap o_anymap(o);
     AnyMap o_anymap_copy(o_anymap);
 
-    AnyMap uo_anymap {
+    AnyMap uo_anymap = {
         AnyMap::UNORDERED_MAP,
         {{ "do", 1 }, { "re", 2 }}
     };
@@ -199,7 +200,7 @@ TEST(AnyMapTest, AnyMap)
 TEST(AnyMapTest, MoveConstructor)
 {
     testing::FLAGS_gtest_death_test_style = "threadsafe";
-    AnyMap o {
+    AnyMap o = {
         AnyMap::ORDERED_MAP,
         {{ "do", 1 }, { "re", 2 }}
     };
@@ -375,11 +376,11 @@ TEST(AnyMapTest, ManifestFromCache)
 {
     AnyMap cache {};
     AnyMap cache_bundles {};
-    AnyMap cache_bundle1 {
+    AnyMap cache_bundle1 = {
         {{ "a", std::string("A") }, { "b", std::string("B") }, { "c", std::string("C") }}
     };
 
-    AnyMap cache_bundle2 {
+    AnyMap cache_bundle2 = {
         {{ "d", std::string("D") }, { "e", std::string("E") }, { "f", std::string("F") }}
     };
 

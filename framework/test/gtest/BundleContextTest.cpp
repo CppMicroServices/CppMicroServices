@@ -200,7 +200,7 @@ verifyOrdering(std::vector<cppmicroservices::ServiceReference<ServiceT>>& refs)
     if (refs.size() > 0)
     {
         auto last = refs[0];
-        for (auto ref : refs)
+        for (auto const& ref : refs)
         {
             if (!(any_cast<int>(ref.GetProperty(Constants::SERVICE_RANKING))
                   <= any_cast<int>(last.GetProperty(Constants::SERVICE_RANKING))))

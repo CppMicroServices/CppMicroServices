@@ -100,9 +100,6 @@ public:
       if (this->closed) {
         return;
       }
-
-      DIAG_LOG(*bundleTracker->d->context.GetLogSink())
-        << "TrackedService::BundleChanged[" << state << "]: " << bundle;
     }
 
     // Track iff state in mask

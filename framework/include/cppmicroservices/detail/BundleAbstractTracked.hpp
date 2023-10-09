@@ -131,7 +131,7 @@ namespace cppmicroservices
                     adding.push_back(item); /* mark this item is being added */
                 }
                 else
-                { /* we are currently tracking this item */
+                {               /* we are currently tracking this item */
                     Modified(); /* increment modification count */
                 }
             }
@@ -162,9 +162,9 @@ namespace cppmicroservices
                 std::size_t initialSize = initial.size();
                 initial.remove(item);
                 if (initialSize != initial.size())
-                { /* if this item is already in the list
-                   * of initial references to process
-                   */
+                {           /* if this item is already in the list
+                             * of initial references to process
+                             */
                     return; /* we have removed it from the list and it will not be
                              * processed
                              */
@@ -173,9 +173,9 @@ namespace cppmicroservices
                 std::size_t addingSize = adding.size();
                 adding.remove(item);
                 if (addingSize != adding.size())
-                { /* if the item is in the process of
-                   * being added
-                   */
+                {           /* if the item is in the process of
+                             * being added
+                             */
                     return; /*
                              * in case the item is untracked while in the process of
                              * adding
@@ -295,7 +295,7 @@ namespace cppmicroservices
         void
         BundleAbstractTracked<S, T, R>::TrackAdding(S item, R related)
         {
-            std::shared_ptr<TrackedParamType> object;
+            std::optional<T> object;
             bool becameUntracked = false;
             /* Call customizer outside of synchronized region */
             try

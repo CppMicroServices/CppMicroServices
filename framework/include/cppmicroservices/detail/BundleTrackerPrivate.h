@@ -139,9 +139,6 @@ public:
   Modified()
   {
     // No cache to clear
-    // Log message to parallel ServiceTracker
-    DIAG_LOG(*context.GetLogSink())
-      << "BundleTracker::Modified(): " << stateMask;
   }
 
 private:

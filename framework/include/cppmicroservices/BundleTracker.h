@@ -181,8 +181,6 @@ namespace cppmicroservices
                     return;
                 }
 
-                DIAG_LOG(*d->context.GetLogSink()) << "BundleTracker<T>::close:" << d->stateMask;
-
                 outgoing->Close();
                 d->Modified();         /* log message */
                 outgoing->NotifyAll(); /* wake up any waiters */
@@ -334,8 +332,6 @@ namespace cppmicroservices
                 { /* If BundleTracker is open */
                     return;
                 }
-
-                DIAG_LOG(*d->context.GetLogSink()) << "BundleTracker<T>::Open: " << d->stateMask;
 
                 t = std::make_shared<detail::TrackedBundle<T>>(this,
                                                                d->customizer ? d->customizer.get()

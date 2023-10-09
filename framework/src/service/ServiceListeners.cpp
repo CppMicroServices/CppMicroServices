@@ -417,8 +417,6 @@ namespace cppmicroservices
                                      ServiceEvent const& evt,
                                      ServiceListenerEntries& matchBefore)
     {
-        int n = 0;
-
         if (!matchBefore.empty())
         {
             for (auto& l : receivers)
@@ -433,7 +431,6 @@ namespace cppmicroservices
             {
                 try
                 {
-                    ++n;
                     l.CallDelegate(evt);
                 }
                 catch (...)

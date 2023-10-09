@@ -24,7 +24,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -38,7 +38,7 @@ winrt_timer_scheduler::winrt_timer_scheduler(execution_context& context)
     stop_thread_(false),
     shutdown_(false)
 {
-  thread_ = new boost::asio::detail::thread(
+  thread_ = new cppmsboost::asio::detail::thread(
       bind_handler(&winrt_timer_scheduler::call_run_thread, this));
 }
 
@@ -49,7 +49,7 @@ winrt_timer_scheduler::~winrt_timer_scheduler()
 
 void winrt_timer_scheduler::shutdown()
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   shutdown_ = true;
   stop_thread_ = true;
   event_.signal(lock);
@@ -77,7 +77,7 @@ void winrt_timer_scheduler::init_task()
 
 void winrt_timer_scheduler::run_thread()
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
   while (!stop_thread_)
   {
     const long max_wait_duration = 5 * 60 * 1000000;
@@ -114,7 +114,7 @@ void winrt_timer_scheduler::do_remove_timer_queue(timer_queue_base& queue)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

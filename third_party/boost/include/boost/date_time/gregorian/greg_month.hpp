@@ -15,7 +15,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace boost {
+namespace cppmsboost {
 namespace gregorian {
 
   typedef date_time::months_of_year months_of_year;

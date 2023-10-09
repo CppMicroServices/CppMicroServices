@@ -27,7 +27,7 @@ namespace std{
 #include <boost/archive/iterators/binary_from_base64.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 namespace detail {
@@ -66,7 +66,7 @@ basic_text_iprimitive<IStream>::load_binary(
     );
         
     if(is.fail())
-        boost::serialization::throw_exception(
+        cppmsboost::serialization::throw_exception(
             archive_exception(archive_exception::input_stream_error)
         );
     // convert from base64 to binary
@@ -134,4 +134,4 @@ basic_text_iprimitive<IStream>::~basic_text_iprimitive(){
 }
 
 } // namespace archive
-} // namespace boost
+} // namespace cppmsboost

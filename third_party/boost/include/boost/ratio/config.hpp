@@ -71,7 +71,7 @@
 #include <boost/mpl/assert.hpp>
 #include <boost/mpl/bool.hpp>
 #define BOOST_RATIO_STATIC_ASSERT(CND, MSG, TYPES)                                 \
-    BOOST_MPL_ASSERT_MSG(boost::mpl::bool_< (CND) >::type::value, MSG, TYPES)
+    BOOST_MPL_ASSERT_MSG(cppmsboost::mpl::bool_< (CND) >::type::value, MSG, TYPES)
 #else
 //~ #elif defined(BOOST_RATIO_USES_ARRAY_ASSERT)
 #define BOOST_RATIO_CONCAT(A,B) A##B

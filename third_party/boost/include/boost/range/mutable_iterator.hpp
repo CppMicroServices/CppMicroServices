@@ -24,7 +24,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace boost
+namespace cppmsboost
 {
 
     //////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ struct range_mutable_iterator
 {
 };
 
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/range/detail/msvc_has_iterator_workaround.hpp>
 

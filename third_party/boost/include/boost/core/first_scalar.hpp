@@ -11,7 +11,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <boost/config.hpp>
 #include <cstddef>
 
-namespace boost {
+namespace cppmsboost {
 namespace detail {
 
 template<class T>
@@ -37,7 +37,7 @@ template<class T, std::size_t N>
 BOOST_CONSTEXPR inline typename detail::make_scalar<T>::type*
 first_scalar(T (*p)[N]) BOOST_NOEXCEPT
 {
-    return boost::first_scalar(&(*p)[0]);
+    return cppmsboost::first_scalar(&(*p)[0]);
 }
 
 } /* boost */

@@ -14,7 +14,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace boost {
+namespace cppmsboost {
 namespace gregorian {
 
   //! Exception type for gregorian year

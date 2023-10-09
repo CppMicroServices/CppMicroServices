@@ -7,7 +7,7 @@
  */
 
 
-namespace boost {
+namespace cppmsboost {
 namespace date_time {
   //! Return the day of the week (0==Sunday, 1==Monday, etc)
   /*! Converts a year-month-day into a day of the week number

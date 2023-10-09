@@ -13,7 +13,7 @@
 #include <boost/date_time/time.hpp>
 #include <boost/date_time/compiler_config.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 namespace posix_time {
  

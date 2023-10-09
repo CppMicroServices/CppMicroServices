@@ -19,7 +19,7 @@
 #include <boost/config.hpp>
 #include <atomic>
 
-namespace boost
+namespace cppmsboost
 {
 
 namespace detail
@@ -42,7 +42,7 @@ public:
     {
         for( unsigned k = 0; !try_lock(); ++k )
         {
-            boost::detail::yield( k );
+            cppmsboost::detail::yield( k );
         }
     }
 
@@ -77,7 +77,7 @@ public:
 };
 
 } // namespace detail
-} // namespace boost
+} // namespace cppmsboost
 
 #define BOOST_DETAIL_SPINLOCK_INIT { ATOMIC_FLAG_INIT }
 

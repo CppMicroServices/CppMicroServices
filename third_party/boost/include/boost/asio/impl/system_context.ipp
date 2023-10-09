@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 struct system_context::thread_function
@@ -29,7 +29,7 @@ struct system_context::thread_function
 
   void operator()()
   {
-    boost::system::error_code ec;
+    cppmsboost::system::error_code ec;
     scheduler_->run(ec);
   }
 };
@@ -70,12 +70,12 @@ void system_context::join()
 detail::scheduler& system_context::add_scheduler(detail::scheduler* s)
 {
   detail::scoped_ptr<detail::scheduler> scoped_impl(s);
-  boost::asio::add_service<detail::scheduler>(*this, scoped_impl.get());
+  cppmsboost::asio::add_service<detail::scheduler>(*this, scoped_impl.get());
   return *scoped_impl.release();
 }
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

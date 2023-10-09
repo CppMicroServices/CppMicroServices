@@ -44,7 +44,7 @@
 #if !defined(BOOST_ATOMIC_SOURCE) && !defined(BOOST_ALL_NO_LIB) && \
     !defined(BOOST_ATOMIC_NO_LIB)
 
-#define BOOST_LIB_NAME boost_atomic
+#define BOOST_LIB_NAME cppmsboost_atomic
 
 // tell the auto-link code to select a dll when required:
 #if defined(BOOST_ALL_DYN_LINK) || defined(BOOST_ATOMIC_DYN_LINK)

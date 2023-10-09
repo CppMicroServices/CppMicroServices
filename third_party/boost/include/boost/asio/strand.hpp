@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Provides serialised function invocation for any executor type.
@@ -273,9 +273,9 @@ private:
   implementation_type impl_;
 };
 
-/** @defgroup make_strand boost::asio::make_strand
+/** @defgroup make_strand cppmsboost::asio::make_strand
  *
- * @brief The boost::asio::make_strand function creates a @ref strand object for
+ * @brief The cppmsboost::asio::make_strand function creates a @ref strand object for
  * an executor or execution context.
  */
 /*@{*/
@@ -301,7 +301,7 @@ make_strand(ExecutionContext& ctx,
 /*@}*/
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

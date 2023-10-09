@@ -42,7 +42,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -115,16 +115,16 @@ private:
   scheduler_impl& scheduler_;
 
   // Mutex used to protect internal variables.
-  boost::asio::detail::mutex mutex_;
+  cppmsboost::asio::detail::mutex mutex_;
 
   // Event used to wake up background thread.
-  boost::asio::detail::event event_;
+  cppmsboost::asio::detail::event event_;
 
   // The timer queues.
   timer_queue_set timer_queues_;
 
   // The background thread that is waiting for timers to expire.
-  boost::asio::detail::thread* thread_;
+  cppmsboost::asio::detail::thread* thread_;
 
   // Does the background thread need to stop.
   bool stop_thread_;
@@ -135,7 +135,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

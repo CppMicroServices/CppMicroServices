@@ -38,12 +38,12 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace boost{
+namespace cppmsboost{
 namespace archive{
 
 template < typename Ch, class Tr >
 class basic_streambuf_locale_saver :
-    private boost::noncopyable
+    private cppmsboost::noncopyable
 {
 public:
     explicit basic_streambuf_locale_saver(std::basic_streambuf<Ch, Tr> &s) :
@@ -61,7 +61,7 @@ private:
 
 template < typename Ch, class Tr >
 class basic_istream_locale_saver :
-    private boost::noncopyable
+    private cppmsboost::noncopyable
 {
 public:
     explicit basic_istream_locale_saver(std::basic_istream<Ch, Tr> &s) :
@@ -80,7 +80,7 @@ private:
 
 template < typename Ch, class Tr >
 class basic_ostream_locale_saver :
-    private boost::noncopyable
+    private cppmsboost::noncopyable
 {
 public:
     explicit basic_ostream_locale_saver(std::basic_ostream<Ch, Tr> &s) :

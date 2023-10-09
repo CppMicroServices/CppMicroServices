@@ -20,7 +20,7 @@
 #include <boost/mpl/aux_/config/workaround.hpp>
 
 
-namespace boost { namespace mpl { namespace aux {
+namespace cppmsboost { namespace mpl { namespace aux {
 
 typedef char (&no_tag)[1];
 typedef char (&yes_tag)[2];

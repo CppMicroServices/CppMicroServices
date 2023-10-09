@@ -44,7 +44,7 @@ struct nothrow_t;
 
 }  //namespace std {
 
-namespace boost{
+namespace cppmsboost{
 namespace move_upmu {
 
 //Compile time switch between
@@ -53,13 +53,13 @@ namespace move_upmu {
 template<class T>
 struct unique_ptr_if
 {
-   typedef ::boost::movelib::unique_ptr<T> t_is_not_array;
+   typedef ::cppmsboost::movelib::unique_ptr<T> t_is_not_array;
 };
 
 template<class T>
 struct unique_ptr_if<T[]>
 {
-   typedef ::boost::movelib::unique_ptr<T[]> t_is_array_of_unknown_bound;
+   typedef ::cppmsboost::movelib::unique_ptr<T[]> t_is_array_of_unknown_bound;
 };
 
 template<class T, std::size_t N>
@@ -79,11 +79,11 @@ std::nothrow_t *nothrow_holder<Dummy>::pnothrow =
    reinterpret_cast<std::nothrow_t *>(0x1234);  //Avoid reference to null errors in sanitizers
 
 }  //namespace move_upmu {
-}  //namespace boost{
+}  //namespace cppmsboost{
 
 #endif   //!defined(BOOST_MOVE_DOXYGEN_INVOKED)
 
-namespace boost{
+namespace cppmsboost{
 namespace movelib {
 
 #if defined(BOOST_MOVE_DOXYGEN_INVOKED) || !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
@@ -93,30 +93,30 @@ namespace movelib {
 //! <b>Returns</b>: <tt>unique_ptr<T>(new T(std::forward<Args>(args)...))</tt>.
 template<class T, class... Args>
 inline BOOST_MOVE_DOC1ST(unique_ptr<T>, 
-   typename ::boost::move_upmu::unique_ptr_if<T>::t_is_not_array)
+   typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_not_array)
       make_unique(BOOST_FWD_REF(Args)... args)
-{  return unique_ptr<T>(new T(::boost::forward<Args>(args)...));  }
+{  return unique_ptr<T>(new T(::cppmsboost::forward<Args>(args)...));  }
 
 //! <b>Remarks</b>: This function shall not participate in overload resolution unless T is not an array.
 //!
 //! <b>Returns</b>: <tt>unique_ptr<T>(new T(std::nothrow)(std::forward<Args>(args)...))</tt>.
 template<class T, class... Args>
 inline BOOST_MOVE_DOC1ST(unique_ptr<T>, 
-   typename ::boost::move_upmu::unique_ptr_if<T>::t_is_not_array)
+   typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_not_array)
       make_unique_nothrow(BOOST_FWD_REF(Args)... args)
-{  return unique_ptr<T>(new (*boost::move_upmu::nothrow_holder<>::pnothrow)T(::boost::forward<Args>(args)...));  }
+{  return unique_ptr<T>(new (*cppmsboost::move_upmu::nothrow_holder<>::pnothrow)T(::cppmsboost::forward<Args>(args)...));  }
 
 #else
    #define BOOST_MOVE_MAKE_UNIQUE_CODE(N)\
       template<class T BOOST_MOVE_I##N BOOST_MOVE_CLASS##N>\
-      typename ::boost::move_upmu::unique_ptr_if<T>::t_is_not_array\
+      typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_not_array\
          make_unique( BOOST_MOVE_UREF##N)\
       {  return unique_ptr<T>( new T( BOOST_MOVE_FWD##N ) );  }\
       \
       template<class T BOOST_MOVE_I##N BOOST_MOVE_CLASS##N>\
-      typename ::boost::move_upmu::unique_ptr_if<T>::t_is_not_array\
+      typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_not_array\
          make_unique_nothrow( BOOST_MOVE_UREF##N)\
-      {  return unique_ptr<T>( new (*boost::move_upmu::nothrow_holder<>::pnothrow)T ( BOOST_MOVE_FWD##N ) );  }\
+      {  return unique_ptr<T>( new (*cppmsboost::move_upmu::nothrow_holder<>::pnothrow)T ( BOOST_MOVE_FWD##N ) );  }\
       //
    BOOST_MOVE_ITERATE_0TO9(BOOST_MOVE_MAKE_UNIQUE_CODE)
    #undef BOOST_MOVE_MAKE_UNIQUE_CODE
@@ -128,7 +128,7 @@ inline BOOST_MOVE_DOC1ST(unique_ptr<T>,
 //! <b>Returns</b>: <tt>unique_ptr<T>(new T)</tt> (default initialization)
 template<class T>
 inline BOOST_MOVE_DOC1ST(unique_ptr<T>, 
-   typename ::boost::move_upmu::unique_ptr_if<T>::t_is_not_array)
+   typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_not_array)
       make_unique_definit()
 {
     return unique_ptr<T>(new T);
@@ -139,10 +139,10 @@ inline BOOST_MOVE_DOC1ST(unique_ptr<T>,
 //! <b>Returns</b>: <tt>unique_ptr<T>(new T(std::nothrow)</tt> (default initialization)
 template<class T>
 inline BOOST_MOVE_DOC1ST(unique_ptr<T>, 
-   typename ::boost::move_upmu::unique_ptr_if<T>::t_is_not_array)
+   typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_not_array)
       make_unique_nothrow_definit()
 {
-    return unique_ptr<T>(new (*boost::move_upmu::nothrow_holder<>::pnothrow)T);
+    return unique_ptr<T>(new (*cppmsboost::move_upmu::nothrow_holder<>::pnothrow)T);
 }
 
 //! <b>Remarks</b>: This function shall not participate in overload resolution unless T is an array of 
@@ -151,10 +151,10 @@ inline BOOST_MOVE_DOC1ST(unique_ptr<T>,
 //! <b>Returns</b>: <tt>unique_ptr<T>(new remove_extent_t<T>[n]())</tt> (value initialization)
 template<class T>
 inline BOOST_MOVE_DOC1ST(unique_ptr<T>, 
-   typename ::boost::move_upmu::unique_ptr_if<T>::t_is_array_of_unknown_bound)
+   typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_array_of_unknown_bound)
       make_unique(std::size_t n)
 {
-    typedef typename ::boost::move_upmu::remove_extent<T>::type U;
+    typedef typename ::cppmsboost::move_upmu::remove_extent<T>::type U;
     return unique_ptr<T>(new U[n]());
 }
 
@@ -164,11 +164,11 @@ inline BOOST_MOVE_DOC1ST(unique_ptr<T>,
 //! <b>Returns</b>: <tt>unique_ptr<T>(new (std::nothrow)remove_extent_t<T>[n]())</tt> (value initialization)
 template<class T>
 inline BOOST_MOVE_DOC1ST(unique_ptr<T>, 
-   typename ::boost::move_upmu::unique_ptr_if<T>::t_is_array_of_unknown_bound)
+   typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_array_of_unknown_bound)
       make_unique_nothrow(std::size_t n)
 {
-    typedef typename ::boost::move_upmu::remove_extent<T>::type U;
-    return unique_ptr<T>(new (*boost::move_upmu::nothrow_holder<>::pnothrow)U[n]());
+    typedef typename ::cppmsboost::move_upmu::remove_extent<T>::type U;
+    return unique_ptr<T>(new (*cppmsboost::move_upmu::nothrow_holder<>::pnothrow)U[n]());
 }
 
 //! <b>Remarks</b>: This function shall not participate in overload resolution unless T is an array of 
@@ -177,10 +177,10 @@ inline BOOST_MOVE_DOC1ST(unique_ptr<T>,
 //! <b>Returns</b>: <tt>unique_ptr<T>(new remove_extent_t<T>[n])</tt> (default initialization)
 template<class T>
 inline BOOST_MOVE_DOC1ST(unique_ptr<T>, 
-   typename ::boost::move_upmu::unique_ptr_if<T>::t_is_array_of_unknown_bound)
+   typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_array_of_unknown_bound)
       make_unique_definit(std::size_t n)
 {
-    typedef typename ::boost::move_upmu::remove_extent<T>::type U;
+    typedef typename ::cppmsboost::move_upmu::remove_extent<T>::type U;
     return unique_ptr<T>(new U[n]);
 }
 
@@ -190,11 +190,11 @@ inline BOOST_MOVE_DOC1ST(unique_ptr<T>,
 //! <b>Returns</b>: <tt>unique_ptr<T>(new (std::nothrow)remove_extent_t<T>[n])</tt> (default initialization)
 template<class T>
 inline BOOST_MOVE_DOC1ST(unique_ptr<T>, 
-   typename ::boost::move_upmu::unique_ptr_if<T>::t_is_array_of_unknown_bound)
+   typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_array_of_unknown_bound)
       make_unique_nothrow_definit(std::size_t n)
 {
-    typedef typename ::boost::move_upmu::remove_extent<T>::type U;
-    return unique_ptr<T>(new (*boost::move_upmu::nothrow_holder<>::pnothrow) U[n]);
+    typedef typename ::cppmsboost::move_upmu::remove_extent<T>::type U;
+    return unique_ptr<T>(new (*cppmsboost::move_upmu::nothrow_holder<>::pnothrow) U[n]);
 }
 
 #if !defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
@@ -203,35 +203,35 @@ inline BOOST_MOVE_DOC1ST(unique_ptr<T>,
 //!   an array of known bound.
 template<class T, class... Args>
 inline BOOST_MOVE_DOC1ST(unspecified, 
-   typename ::boost::move_upmu::unique_ptr_if<T>::t_is_array_of_known_bound)
+   typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_array_of_known_bound)
       make_unique(BOOST_FWD_REF(Args) ...) = delete;
 
 //! <b>Remarks</b>: This function shall not participate in overload resolution unless T is
 //!   an array of known bound.
 template<class T, class... Args>
 inline BOOST_MOVE_DOC1ST(unspecified, 
-   typename ::boost::move_upmu::unique_ptr_if<T>::t_is_array_of_known_bound)
+   typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_array_of_known_bound)
       make_unique_definit(BOOST_FWD_REF(Args) ...) = delete;
 
 //! <b>Remarks</b>: This function shall not participate in overload resolution unless T is
 //!   an array of known bound.
 template<class T, class... Args>
 inline BOOST_MOVE_DOC1ST(unspecified, 
-   typename ::boost::move_upmu::unique_ptr_if<T>::t_is_array_of_known_bound)
+   typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_array_of_known_bound)
       make_unique_nothrow(BOOST_FWD_REF(Args) ...) = delete;
 
 //! <b>Remarks</b>: This function shall not participate in overload resolution unless T is
 //!   an array of known bound.
 template<class T, class... Args>
 inline BOOST_MOVE_DOC1ST(unspecified, 
-   typename ::boost::move_upmu::unique_ptr_if<T>::t_is_array_of_known_bound)
+   typename ::cppmsboost::move_upmu::unique_ptr_if<T>::t_is_array_of_known_bound)
       make_unique_nothrow_definit(BOOST_FWD_REF(Args) ...) = delete;
 
 #endif
 
 }  //namespace movelib {
 
-}  //namespace boost{
+}  //namespace cppmsboost{
 
 #include <boost/move/detail/config_end.hpp>
 

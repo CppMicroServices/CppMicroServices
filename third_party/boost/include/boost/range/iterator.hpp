@@ -23,7 +23,7 @@
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/mpl/eval_if.hpp>
 
-namespace boost
+namespace cppmsboost
 {
 
 #if BOOST_WORKAROUND(BOOST_MSVC, == 1310)  
@@ -69,6 +69,6 @@ namespace boost
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif

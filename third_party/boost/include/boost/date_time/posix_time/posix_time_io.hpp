@@ -20,33 +20,33 @@
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/date_time/posix_time/conversion.hpp> // to_tm will be needed in the facets
 
-namespace boost {
+namespace cppmsboost {
 namespace posix_time {
 
 
   //! wptime_facet is depricated and will be phased out. use wtime_facet instead
-  //typedef boost::date_time::time_facet<ptime, wchar_t> wptime_facet;
+  //typedef cppmsboost::date_time::time_facet<ptime, wchar_t> wptime_facet;
   //! ptime_facet is depricated and will be phased out. use time_facet instead
-  //typedef boost::date_time::time_facet<ptime, char>     ptime_facet;
+  //typedef cppmsboost::date_time::time_facet<ptime, char>     ptime_facet;
 
   //! wptime_input_facet is depricated and will be phased out. use wtime_input_facet instead
-  //typedef boost::date_time::time_input_facet<ptime,wchar_t> wptime_input_facet;
+  //typedef cppmsboost::date_time::time_input_facet<ptime,wchar_t> wptime_input_facet;
   //! ptime_input_facet is depricated and will be phased out. use time_input_facet instead
-  //typedef boost::date_time::time_input_facet<ptime,char>     ptime_input_facet;
+  //typedef cppmsboost::date_time::time_input_facet<ptime,char>     ptime_input_facet;
 
-  typedef boost::date_time::time_facet<ptime, wchar_t>     wtime_facet;
-  typedef boost::date_time::time_facet<ptime, char>         time_facet;
+  typedef cppmsboost::date_time::time_facet<ptime, wchar_t>     wtime_facet;
+  typedef cppmsboost::date_time::time_facet<ptime, char>         time_facet;
 
-  typedef boost::date_time::time_input_facet<ptime, wchar_t>     wtime_input_facet;
-  typedef boost::date_time::time_input_facet<ptime, char>         time_input_facet;
+  typedef cppmsboost::date_time::time_input_facet<ptime, wchar_t>     wtime_input_facet;
+  typedef cppmsboost::date_time::time_input_facet<ptime, char>         time_input_facet;
 
   template <class CharT, class TraitsT>
   inline
   std::basic_ostream<CharT, TraitsT>&
   operator<<(std::basic_ostream<CharT, TraitsT>& os,
              const ptime& p) {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::time_facet<ptime, CharT> custom_ptime_facet;
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::time_facet<ptime, CharT> custom_ptime_facet;
     std::ostreambuf_iterator<CharT> oitr(os);
     if (std::has_facet<custom_ptime_facet>(os.getloc()))
       std::use_facet<custom_ptime_facet>(os.getloc()).put(oitr, os, os.fill(), p);
@@ -70,7 +70,7 @@ namespace posix_time {
   std::basic_istream<CharT, Traits>&
   operator>>(std::basic_istream<CharT, Traits>& is, ptime& pt)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false);
     if (strm_sentry) {
       try {
@@ -110,9 +110,9 @@ namespace posix_time {
   inline 
   std::basic_ostream<CharT, TraitsT>&
   operator<<(std::basic_ostream<CharT, TraitsT>& os,
-             const boost::posix_time::time_period& p) {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::time_facet<ptime, CharT> custom_ptime_facet;
+             const cppmsboost::posix_time::time_period& p) {
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::time_facet<ptime, CharT> custom_ptime_facet;
     std::ostreambuf_iterator<CharT> oitr(os);
     if (std::has_facet<custom_ptime_facet>(os.getloc())) {
       std::use_facet<custom_ptime_facet>(os.getloc()).put(oitr, os, os.fill(), p);
@@ -137,7 +137,7 @@ namespace posix_time {
   std::basic_istream<CharT, Traits>&
   operator>>(std::basic_istream<CharT, Traits>& is, time_period& tp)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false);
     if (strm_sentry) {
       try {
@@ -176,8 +176,8 @@ namespace posix_time {
   std::basic_ostream<CharT, Traits>&
   operator<<(std::basic_ostream<CharT, Traits>& os, const time_duration& td)
   {
-    boost::io::ios_flags_saver iflags(os);
-    typedef boost::date_time::time_facet<ptime, CharT> custom_ptime_facet;
+    cppmsboost::io::ios_flags_saver iflags(os);
+    typedef cppmsboost::date_time::time_facet<ptime, CharT> custom_ptime_facet;
     std::ostreambuf_iterator<CharT> oitr(os);
     if (std::has_facet<custom_ptime_facet>(os.getloc()))
       std::use_facet<custom_ptime_facet>(os.getloc()).put(oitr, os, os.fill(), td);
@@ -201,7 +201,7 @@ namespace posix_time {
   std::basic_istream<CharT, Traits>&
   operator>>(std::basic_istream<CharT, Traits>& is, time_duration& td)
   {
-    boost::io::ios_flags_saver iflags(is);
+    cppmsboost::io::ios_flags_saver iflags(is);
     typename std::basic_istream<CharT, Traits>::sentry strm_sentry(is, false);
     if (strm_sentry) {
       try {

@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -34,7 +34,7 @@ class scheduler_operation BOOST_ASIO_INHERIT_TRACKED_HANDLER
 public:
   typedef scheduler_operation operation_type;
 
-  void complete(void* owner, const boost::system::error_code& ec,
+  void complete(void* owner, const cppmsboost::system::error_code& ec,
       std::size_t bytes_transferred)
   {
     func_(owner, this, ec, bytes_transferred);
@@ -42,13 +42,13 @@ public:
 
   void destroy()
   {
-    func_(0, this, boost::system::error_code(), 0);
+    func_(0, this, cppmsboost::system::error_code(), 0);
   }
 
 protected:
   typedef void (*func_type)(void*,
       scheduler_operation*,
-      const boost::system::error_code&, std::size_t);
+      const cppmsboost::system::error_code&, std::size_t);
 
   scheduler_operation(func_type func)
     : next_(0),
@@ -73,7 +73,7 @@ protected:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

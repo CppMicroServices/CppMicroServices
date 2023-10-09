@@ -16,7 +16,7 @@
 // use boost's utf8 codecvt facet
 #include <boost/archive/detail/decl.hpp>
 #define BOOST_UTF8_BEGIN_NAMESPACE \
-     namespace boost { namespace archive { namespace detail {
+     namespace cppmsboost { namespace archive { namespace detail {
 #define BOOST_UTF8_DECL BOOST_ARCHIVE_DECL
 #define BOOST_UTF8_END_NAMESPACE }}}
 

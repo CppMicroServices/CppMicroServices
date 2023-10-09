@@ -10,7 +10,7 @@
 #include <boost/config.hpp>
 #include <boost/iterator/iterator_categories.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace iterators {
 
     namespace detail {
@@ -79,6 +79,6 @@ namespace iterators {
 
 using namespace iterators::advance_adl_barrier;
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif

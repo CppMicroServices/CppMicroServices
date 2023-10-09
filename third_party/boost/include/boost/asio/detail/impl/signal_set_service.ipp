@@ -27,7 +27,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -108,7 +108,7 @@ public:
   }
 
   static void do_complete(void* /*owner*/, operation* base,
-      const boost::system::error_code& /*ec*/,
+      const cppmsboost::system::error_code& /*ec*/,
       std::size_t /*bytes_transferred*/)
   {
     pipe_read_op* o(static_cast<pipe_read_op*>(base));
@@ -121,11 +121,11 @@ public:
 
 signal_set_service::signal_set_service(execution_context& context)
   : execution_context_service_base<signal_set_service>(context),
-    scheduler_(boost::asio::use_service<scheduler_impl>(context)),
+    scheduler_(cppmsboost::asio::use_service<scheduler_impl>(context)),
 #if !defined(BOOST_ASIO_WINDOWS) \
   && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
   && !defined(__CYGWIN__)
-    reactor_(boost::asio::use_service<reactor>(context)),
+    reactor_(cppmsboost::asio::use_service<reactor>(context)),
 #endif // !defined(BOOST_ASIO_WINDOWS)
        //   && !defined(BOOST_ASIO_WINDOWS_RUNTIME)
        //   && !defined(__CYGWIN__)
@@ -204,7 +204,7 @@ void signal_set_service::notify_fork(execution_context::fork_event fork_ev)
   case execution_context::fork_child:
     if (state->fork_prepared_)
     {
-      boost::asio::detail::signal_blocker blocker;
+      cppmsboost::asio::detail::signal_blocker blocker;
       close_descriptors();
       open_descriptors();
       int read_descriptor = state->read_descriptor_;
@@ -235,19 +235,19 @@ void signal_set_service::construct(
 void signal_set_service::destroy(
     signal_set_service::implementation_type& impl)
 {
-  boost::system::error_code ignored_ec;
+  cppmsboost::system::error_code ignored_ec;
   clear(impl, ignored_ec);
   cancel(impl, ignored_ec);
 }
 
-boost::system::error_code signal_set_service::add(
+cppmsboost::system::error_code signal_set_service::add(
     signal_set_service::implementation_type& impl,
-    int signal_number, boost::system::error_code& ec)
+    int signal_number, cppmsboost::system::error_code& ec)
 {
   // Check that the signal number is valid.
   if (signal_number < 0 || signal_number >= max_signal_number)
   {
-    ec = boost::asio::error::invalid_argument;
+    ec = cppmsboost::asio::error::invalid_argument;
     return ec;
   }
 
@@ -284,10 +284,10 @@ boost::system::error_code signal_set_service::add(
 # endif // defined(BOOST_ASIO_HAS_SIGACTION)
       {
 # if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
-        ec = boost::asio::error::invalid_argument;
+        ec = cppmsboost::asio::error::invalid_argument;
 # else // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
-        ec = boost::system::error_code(errno,
-            boost::asio::error::get_system_category());
+        ec = cppmsboost::system::error_code(errno,
+            cppmsboost::asio::error::get_system_category());
 # endif // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
         delete new_registration;
         return ec;
@@ -310,18 +310,18 @@ boost::system::error_code signal_set_service::add(
     ++state->registration_count_[signal_number];
   }
 
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   return ec;
 }
 
-boost::system::error_code signal_set_service::remove(
+cppmsboost::system::error_code signal_set_service::remove(
     signal_set_service::implementation_type& impl,
-    int signal_number, boost::system::error_code& ec)
+    int signal_number, cppmsboost::system::error_code& ec)
 {
   // Check that the signal number is valid.
   if (signal_number < 0 || signal_number >= max_signal_number)
   {
-    ec = boost::asio::error::invalid_argument;
+    ec = cppmsboost::asio::error::invalid_argument;
     return ec;
   }
 
@@ -354,10 +354,10 @@ boost::system::error_code signal_set_service::remove(
 # endif // defined(BOOST_ASIO_HAS_SIGACTION)
       {
 # if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
-        ec = boost::asio::error::invalid_argument;
+        ec = cppmsboost::asio::error::invalid_argument;
 # else // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
-        ec = boost::system::error_code(errno,
-            boost::asio::error::get_system_category());
+        ec = cppmsboost::system::error_code(errno,
+            cppmsboost::asio::error::get_system_category());
 # endif // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
         return ec;
       }
@@ -380,13 +380,13 @@ boost::system::error_code signal_set_service::remove(
     delete reg;
   }
 
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   return ec;
 }
 
-boost::system::error_code signal_set_service::clear(
+cppmsboost::system::error_code signal_set_service::clear(
     signal_set_service::implementation_type& impl,
-    boost::system::error_code& ec)
+    cppmsboost::system::error_code& ec)
 {
   signal_state* state = get_signal_state();
   static_mutex::scoped_lock lock(state->mutex_);
@@ -408,10 +408,10 @@ boost::system::error_code signal_set_service::clear(
 # endif // defined(BOOST_ASIO_HAS_SIGACTION)
       {
 # if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
-        ec = boost::asio::error::invalid_argument;
+        ec = cppmsboost::asio::error::invalid_argument;
 # else // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
-        ec = boost::system::error_code(errno,
-            boost::asio::error::get_system_category());
+        ec = cppmsboost::system::error_code(errno,
+            cppmsboost::asio::error::get_system_category());
 # endif // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
         return ec;
       }
@@ -432,13 +432,13 @@ boost::system::error_code signal_set_service::clear(
     delete reg;
   }
 
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   return ec;
 }
 
-boost::system::error_code signal_set_service::cancel(
+cppmsboost::system::error_code signal_set_service::cancel(
     signal_set_service::implementation_type& impl,
-    boost::system::error_code& ec)
+    cppmsboost::system::error_code& ec)
 {
   BOOST_ASIO_HANDLER_OPERATION((scheduler_.context(),
         "signal_set", &impl, 0, "cancel"));
@@ -450,7 +450,7 @@ boost::system::error_code signal_set_service::cancel(
 
     while (signal_op* op = impl.queue_.front())
     {
-      op->ec_ = boost::asio::error::operation_aborted;
+      op->ec_ = cppmsboost::asio::error::operation_aborted;
       impl.queue_.pop();
       ops.push(op);
     }
@@ -458,7 +458,7 @@ boost::system::error_code signal_set_service::cancel(
 
   scheduler_.post_deferred_completions(ops);
 
-  ec = boost::system::error_code();
+  ec = cppmsboost::system::error_code();
   return ec;
 }
 
@@ -521,7 +521,7 @@ void signal_set_service::add_service(signal_set_service* service)
       std::logic_error ex(
           "Thread-unsafe execution context objects require "
           "exclusive access to signal handling.");
-      boost::asio::detail::throw_exception(ex);
+      cppmsboost::asio::detail::throw_exception(ex);
     }
   }
 
@@ -607,9 +607,9 @@ void signal_set_service::open_descriptors()
   }
   else
   {
-    boost::system::error_code ec(errno,
-        boost::asio::error::get_system_category());
-    boost::asio::detail::throw_error(ec, "signal_set_service pipe");
+    cppmsboost::system::error_code ec(errno,
+        cppmsboost::asio::error::get_system_category());
+    cppmsboost::asio::detail::throw_error(ec, "signal_set_service pipe");
   }
 #endif // !defined(BOOST_ASIO_WINDOWS)
        //   && !defined(BOOST_ASIO_WINDOWS_RUNTIME)
@@ -662,7 +662,7 @@ void signal_set_service::start_wait_op(
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

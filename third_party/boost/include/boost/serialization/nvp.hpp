@@ -20,13 +20,13 @@
 #include <boost/preprocessor/stringize.hpp>
 
 #define BOOST_SERIALIZATION_NVP(name)                       \
-    boost::serialization::make_nvp(BOOST_PP_STRINGIZE(name), name)
+    cppmsboost::serialization::make_nvp(BOOST_PP_STRINGIZE(name), name)
 /**/
 
 #define BOOST_SERIALIZATION_BASE_OBJECT_NVP(name)           \
-    boost::serialization::make_nvp(                         \
+    cppmsboost::serialization::make_nvp(                         \
         BOOST_PP_STRINGIZE(name),                           \
-        boost::serialization::base_object<name >(*this)     \
+        cppmsboost::serialization::base_object<name >(*this)     \
     )
 /**/
 
@@ -36,7 +36,7 @@
 #include <boost/serialization/wrapper.hpp>
 #include <boost/serialization/base_object.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace serialization {
 
 template<class Archive, class T>
@@ -118,11 +118,11 @@ struct extended_type_info_impl<const nvp< T > > {
 
 template<class T>
 struct is_wrapper<const nvp<T> > {
-    typedef boost::mpl::true_ type;
+    typedef cppmsboost::mpl::true_ type;
 };
 template<class T>
 struct is_wrapper<nvp<T> > {
-    typedef boost::mpl::true_ type;
+    typedef cppmsboost::mpl::true_ type;
 };
 
 

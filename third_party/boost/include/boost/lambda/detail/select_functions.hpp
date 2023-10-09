@@ -12,7 +12,7 @@
 #ifndef BOOST_LAMBDA_SELECT_FUNCTIONS_HPP
 #define BOOST_LAMBDA_SELECT_FUNCTIONS_HPP
 
-namespace boost { 
+namespace cppmsboost { 
 namespace lambda {
 namespace detail {
 
@@ -69,6 +69,6 @@ template<class RET> struct r_select {
    
 } // namespace detail
 } // namespace lambda
-} // namespace boost
+} // namespace cppmsboost
 
 #endif

@@ -29,7 +29,7 @@
 #pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -48,7 +48,7 @@ struct BOOST_ATOMIC_DETAIL_MAY_ALIAS buffer_storage
     union
     {
         unsigned char data[Size];
-        typename boost::type_with_alignment< Alignment >::type aligner;
+        typename cppmsboost::type_with_alignment< Alignment >::type aligner;
     };
 #endif
 
@@ -88,7 +88,7 @@ struct storage_traits
 template< >
 struct storage_traits< 1u >
 {
-    typedef boost::uint8_t BOOST_ATOMIC_DETAIL_MAY_ALIAS type;
+    typedef cppmsboost::uint8_t BOOST_ATOMIC_DETAIL_MAY_ALIAS type;
 
     static BOOST_CONSTEXPR_OR_CONST std::size_t native_alignment = 1u;
     static BOOST_CONSTEXPR_OR_CONST std::size_t alignment = 1u;
@@ -97,27 +97,27 @@ struct storage_traits< 1u >
 template< >
 struct storage_traits< 2u >
 {
-    typedef boost::uint16_t BOOST_ATOMIC_DETAIL_MAY_ALIAS type;
+    typedef cppmsboost::uint16_t BOOST_ATOMIC_DETAIL_MAY_ALIAS type;
 
-    static BOOST_CONSTEXPR_OR_CONST std::size_t native_alignment = atomics::detail::alignment_of< boost::uint16_t >::value;
+    static BOOST_CONSTEXPR_OR_CONST std::size_t native_alignment = atomics::detail::alignment_of< cppmsboost::uint16_t >::value;
     static BOOST_CONSTEXPR_OR_CONST std::size_t alignment = 2u;
 };
 
 template< >
 struct storage_traits< 4u >
 {
-    typedef boost::uint32_t BOOST_ATOMIC_DETAIL_MAY_ALIAS type;
+    typedef cppmsboost::uint32_t BOOST_ATOMIC_DETAIL_MAY_ALIAS type;
 
-    static BOOST_CONSTEXPR_OR_CONST std::size_t native_alignment = atomics::detail::alignment_of< boost::uint32_t >::value;
+    static BOOST_CONSTEXPR_OR_CONST std::size_t native_alignment = atomics::detail::alignment_of< cppmsboost::uint32_t >::value;
     static BOOST_CONSTEXPR_OR_CONST std::size_t alignment = 4u;
 };
 
 template< >
 struct storage_traits< 8u >
 {
-    typedef boost::uint64_t BOOST_ATOMIC_DETAIL_MAY_ALIAS type;
+    typedef cppmsboost::uint64_t BOOST_ATOMIC_DETAIL_MAY_ALIAS type;
 
-    static BOOST_CONSTEXPR_OR_CONST std::size_t native_alignment = atomics::detail::alignment_of< boost::uint64_t >::value;
+    static BOOST_CONSTEXPR_OR_CONST std::size_t native_alignment = atomics::detail::alignment_of< cppmsboost::uint64_t >::value;
     static BOOST_CONSTEXPR_OR_CONST std::size_t alignment = 8u;
 };
 
@@ -126,9 +126,9 @@ struct storage_traits< 8u >
 template< >
 struct storage_traits< 16u >
 {
-    typedef boost::uint128_type BOOST_ATOMIC_DETAIL_MAY_ALIAS type;
+    typedef cppmsboost::uint128_type BOOST_ATOMIC_DETAIL_MAY_ALIAS type;
 
-    static BOOST_CONSTEXPR_OR_CONST std::size_t native_alignment = atomics::detail::alignment_of< boost::uint128_type >::value;
+    static BOOST_CONSTEXPR_OR_CONST std::size_t native_alignment = atomics::detail::alignment_of< cppmsboost::uint128_type >::value;
     static BOOST_CONSTEXPR_OR_CONST std::size_t alignment = 16u;
 };
 
@@ -155,10 +155,10 @@ union max_align_t
     long long ll;
     long double ld;
 #if defined(BOOST_HAS_INT128)
-    boost::int128_type i128;
+    cppmsboost::int128_type i128;
 #endif
 #if defined(BOOST_HAS_FLOAT128)
-    boost::float128_type f128;
+    cppmsboost::float128_type f128;
 #endif
 };
 
@@ -188,6 +188,6 @@ struct storage_size_of
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ATOMIC_DETAIL_STORAGE_TRAITS_HPP_INCLUDED_

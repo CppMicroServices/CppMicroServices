@@ -46,7 +46,7 @@
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace tuples {
 
 // -- null_type --------------------------------------------------------
@@ -143,7 +143,7 @@ public:
 #if BOOST_WORKAROUND(__BORLANDC__,<0x600)
   typedef const unqualified_type type;
 #else
-  typedef BOOST_DEDUCED_TYPENAME boost::add_const<unqualified_type>::type type;
+  typedef BOOST_DEDUCED_TYPENAME cppmsboost::add_const<unqualified_type>::type type;
 #endif
 };
 #else // def BOOST_NO_CV_SPECIALIZATIONS
@@ -170,7 +170,7 @@ struct element_impl<N, T, true /* IsConst */>
 
 template<int N, class T>
 struct element:
-  public detail::element_impl<N, T, ::boost::is_const<T>::value>
+  public detail::element_impl<N, T, ::cppmsboost::is_const<T>::value>
 {
 };
 
@@ -190,7 +190,7 @@ template <class T> struct access_traits {
   typedef const T& const_type;
   typedef T& non_const_type;
 
-  typedef const typename boost::remove_cv<T>::type& parameter_type;
+  typedef const typename cppmsboost::remove_cv<T>::type& parameter_type;
 
 // used as the tuple constructors parameter types
 // Rationale: non-reference tuple element types can be cv-qualified.
@@ -248,7 +248,7 @@ template <class T> class non_storeable_type {
 
 template <class T> struct wrap_non_storeable_type {
   typedef typename IF<
-    ::boost::is_function<T>::value, non_storeable_type<T>, T
+    ::cppmsboost::is_function<T>::value, non_storeable_type<T>, T
   >::RET type;
 };
 template <> struct wrap_non_storeable_type<void> {
@@ -336,7 +336,7 @@ struct cons {
              typename element<N, cons<HT, TT> >::type
            >::non_const_type
   get() {
-    return boost::tuples::get<N>(*this); // delegate to non-member get
+    return cppmsboost::tuples::get<N>(*this); // delegate to non-member get
   }
 
   template <int N>
@@ -344,7 +344,7 @@ struct cons {
              typename element<N, cons<HT, TT> >::type
            >::const_type
   get() const {
-    return boost::tuples::get<N>(*this); // delegate to non-member get
+    return cppmsboost::tuples::get<N>(*this); // delegate to non-member get
   }
 };
 
@@ -404,7 +404,7 @@ struct cons<HT, null_type> {
              typename element<N, self_type>::type
             >::non_const_type
   get() {
-    return boost::tuples::get<N>(*this);
+    return cppmsboost::tuples::get<N>(*this);
   }
 
   template <int N>
@@ -412,7 +412,7 @@ struct cons<HT, null_type> {
              typename element<N, self_type>::type
            >::const_type
   get() const {
-    return boost::tuples::get<N>(*this);
+    return cppmsboost::tuples::get<N>(*this);
   }
 
 };
@@ -643,7 +643,7 @@ struct make_tuple_traits {
 
   // commented away, see below  (JJ)
   //  typedef typename IF<
-  //  boost::is_function<T>::value,
+  //  cppmsboost::is_function<T>::value,
   //  T&,
   //  T>::RET type;
 
@@ -959,12 +959,12 @@ void swap(tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>& lhs,
 inline void swap(null_type&, null_type&) {}
 template<class HH>
 inline void swap(cons<HH, null_type>& lhs, cons<HH, null_type>& rhs) {
-  ::boost::swap(lhs.head, rhs.head);
+  ::cppmsboost::swap(lhs.head, rhs.head);
 }
 template<class HH, class TT>
 inline void swap(cons<HH, TT>& lhs, cons<HH, TT>& rhs) {
-  ::boost::swap(lhs.head, rhs.head);
-  ::boost::tuples::swap(lhs.tail, rhs.tail);
+  ::cppmsboost::swap(lhs.head, rhs.head);
+  ::cppmsboost::tuples::swap(lhs.tail, rhs.tail);
 }
 template <class T0, class T1, class T2, class T3, class T4,
           class T5, class T6, class T7, class T8, class T9>
@@ -972,11 +972,11 @@ inline void swap(tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>& lhs,
           tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>& rhs) {
   typedef tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> tuple_type;
   typedef typename tuple_type::inherited base;
-  ::boost::tuples::swap(static_cast<base&>(lhs), static_cast<base&>(rhs));
+  ::cppmsboost::tuples::swap(static_cast<base&>(lhs), static_cast<base&>(rhs));
 }
 
 } // end of namespace tuples
-} // end of namespace boost
+} // end of namespace cppmsboost
 
 
 #if defined(BOOST_GCC) && (BOOST_GCC >= 40700)

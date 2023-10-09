@@ -31,7 +31,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -58,14 +58,14 @@ public:
   }
 
   static void do_complete(void* owner, operation* base,
-      const boost::system::error_code& result_ec,
+      const cppmsboost::system::error_code& result_ec,
       std::size_t /*bytes_transferred*/)
   {
-    boost::system::error_code ec(result_ec);
+    cppmsboost::system::error_code ec(result_ec);
 
     // Take ownership of the operation object.
     win_iocp_wait_op* o(static_cast<win_iocp_wait_op*>(base));
-    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+    ptr p = { cppmsboost::asio::detail::addressof(o->handler_), o, o };
     handler_work<Handler, IoExecutor> w(o->handler_, o->io_executor_);
 
     BOOST_ASIO_HANDLER_COMPLETION((*o));
@@ -78,13 +78,13 @@ public:
     if (ec.value() == ERROR_NETNAME_DELETED)
     {
       if (o->cancel_token_.expired())
-        ec = boost::asio::error::operation_aborted;
+        ec = cppmsboost::asio::error::operation_aborted;
       else
-        ec = boost::asio::error::connection_reset;
+        ec = cppmsboost::asio::error::connection_reset;
     }
     else if (ec.value() == ERROR_PORT_UNREACHABLE)
     {
-      ec = boost::asio::error::connection_refused;
+      ec = cppmsboost::asio::error::connection_refused;
     }
 
     // Make a copy of the handler so that the memory can be deallocated before
@@ -93,9 +93,9 @@ public:
     // with the handler. Consequently, a local copy of the handler is required
     // to ensure that any owning sub-object remains valid until after we have
     // deallocated the memory here.
-    detail::binder1<Handler, boost::system::error_code>
+    detail::binder1<Handler, cppmsboost::system::error_code>
       handler(o->handler_, ec);
-    p.h = boost::asio::detail::addressof(handler.handler_);
+    p.h = cppmsboost::asio::detail::addressof(handler.handler_);
     p.reset();
 
     // Make the upcall if required.
@@ -116,7 +116,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

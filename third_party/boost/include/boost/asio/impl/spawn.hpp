@@ -31,7 +31,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -51,13 +51,13 @@ namespace detail {
 
     void operator()(T value)
     {
-      *ec_ = boost::system::error_code();
+      *ec_ = cppmsboost::system::error_code();
       *value_ = BOOST_ASIO_MOVE_CAST(T)(value);
       if (--*ready_ == 0)
         (*coro_)();
     }
 
-    void operator()(boost::system::error_code ec, T value)
+    void operator()(cppmsboost::system::error_code ec, T value)
     {
       *ec_ = ec;
       *value_ = BOOST_ASIO_MOVE_CAST(T)(value);
@@ -70,7 +70,7 @@ namespace detail {
     typename basic_yield_context<Handler>::caller_type& ca_;
     Handler handler_;
     atomic_count* ready_;
-    boost::system::error_code* ec_;
+    cppmsboost::system::error_code* ec_;
     T* value_;
   };
 
@@ -89,12 +89,12 @@ namespace detail {
 
     void operator()()
     {
-      *ec_ = boost::system::error_code();
+      *ec_ = cppmsboost::system::error_code();
       if (--*ready_ == 0)
         (*coro_)();
     }
 
-    void operator()(boost::system::error_code ec)
+    void operator()(cppmsboost::system::error_code ec)
     {
       *ec_ = ec;
       if (--*ready_ == 0)
@@ -106,14 +106,14 @@ namespace detail {
     typename basic_yield_context<Handler>::caller_type& ca_;
     Handler handler_;
     atomic_count* ready_;
-    boost::system::error_code* ec_;
+    cppmsboost::system::error_code* ec_;
   };
 
   template <typename Handler, typename T>
   inline void* asio_handler_allocate(std::size_t size,
       coro_handler<Handler, T>* this_handler)
   {
-    return boost_asio_handler_alloc_helpers::allocate(
+    return cppmsboost_asio_handler_alloc_helpers::allocate(
         size, this_handler->handler_);
   }
 
@@ -121,7 +121,7 @@ namespace detail {
   inline void asio_handler_deallocate(void* pointer, std::size_t size,
       coro_handler<Handler, T>* this_handler)
   {
-    boost_asio_handler_alloc_helpers::deallocate(
+    cppmsboost_asio_handler_alloc_helpers::deallocate(
         pointer, size, this_handler->handler_);
   }
 
@@ -135,7 +135,7 @@ namespace detail {
   inline void asio_handler_invoke(Function& function,
       coro_handler<Handler, T>* this_handler)
   {
-    boost_asio_handler_invoke_helpers::invoke(
+    cppmsboost_asio_handler_invoke_helpers::invoke(
         function, this_handler->handler_);
   }
 
@@ -143,7 +143,7 @@ namespace detail {
   inline void asio_handler_invoke(const Function& function,
       coro_handler<Handler, T>* this_handler)
   {
-    boost_asio_handler_invoke_helpers::invoke(
+    cppmsboost_asio_handler_invoke_helpers::invoke(
         function, this_handler->handler_);
   }
 
@@ -172,7 +172,7 @@ namespace detail {
 
       if (--ready_ != 0)
         ca_();
-      if (!out_ec_ && ec_) throw boost::system::system_error(ec_);
+      if (!out_ec_ && ec_) throw cppmsboost::system::system_error(ec_);
       return BOOST_ASIO_MOVE_CAST(return_type)(value_);
     }
 
@@ -180,8 +180,8 @@ namespace detail {
     completion_handler_type& handler_;
     typename basic_yield_context<Handler>::caller_type& ca_;
     atomic_count ready_;
-    boost::system::error_code* out_ec_;
-    boost::system::error_code ec_;
+    cppmsboost::system::error_code* out_ec_;
+    cppmsboost::system::error_code ec_;
     return_type value_;
   };
 
@@ -209,15 +209,15 @@ namespace detail {
 
       if (--ready_ != 0)
         ca_();
-      if (!out_ec_ && ec_) throw boost::system::system_error(ec_);
+      if (!out_ec_ && ec_) throw cppmsboost::system::system_error(ec_);
     }
 
   private:
     completion_handler_type& handler_;
     typename basic_yield_context<Handler>::caller_type& ca_;
     atomic_count ready_;
-    boost::system::error_code* out_ec_;
-    boost::system::error_code ec_;
+    cppmsboost::system::error_code* out_ec_;
+    cppmsboost::system::error_code ec_;
   };
 
 } // namespace detail
@@ -252,7 +252,7 @@ public:
 
 template <typename Handler, typename ReturnType>
 class async_result<basic_yield_context<Handler>,
-    ReturnType(boost::system::error_code)>
+    ReturnType(cppmsboost::system::error_code)>
   : public detail::coro_async_result<Handler, void>
 {
 public:
@@ -266,7 +266,7 @@ public:
 
 template <typename Handler, typename ReturnType, typename Arg2>
 class async_result<basic_yield_context<Handler>,
-    ReturnType(boost::system::error_code, Arg2)>
+    ReturnType(cppmsboost::system::error_code, Arg2)>
   : public detail::coro_async_result<Handler, typename decay<Arg2>::type>
 {
 public:
@@ -355,14 +355,14 @@ namespace detail {
     }
 
     shared_ptr<spawn_data<Handler, Function> > data_;
-    boost::coroutines::attributes attributes_;
+    cppmsboost::coroutines::attributes attributes_;
   };
 
   template <typename Function, typename Handler, typename Function1>
   inline void asio_handler_invoke(Function& function,
       spawn_helper<Handler, Function1>* this_handler)
   {
-    boost_asio_handler_invoke_helpers::invoke(
+    cppmsboost_asio_handler_invoke_helpers::invoke(
         function, this_handler->data_->handler_);
   }
 
@@ -370,7 +370,7 @@ namespace detail {
   inline void asio_handler_invoke(const Function& function,
       spawn_helper<Handler, Function1>* this_handler)
   {
-    boost_asio_handler_invoke_helpers::invoke(
+    cppmsboost_asio_handler_invoke_helpers::invoke(
         function, this_handler->data_->handler_);
   }
 
@@ -380,20 +380,20 @@ namespace detail {
 
 template <typename Function>
 inline void spawn(BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes)
+    const cppmsboost::coroutines::attributes& attributes)
 {
   typedef typename decay<Function>::type function_type;
 
   typename associated_executor<function_type>::type ex(
       (get_associated_executor)(function));
 
-  boost::asio::spawn(ex, BOOST_ASIO_MOVE_CAST(Function)(function), attributes);
+  cppmsboost::asio::spawn(ex, BOOST_ASIO_MOVE_CAST(Function)(function), attributes);
 }
 
 template <typename Handler, typename Function>
 void spawn(BOOST_ASIO_MOVE_ARG(Handler) handler,
     BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes,
+    const cppmsboost::coroutines::attributes& attributes,
     typename enable_if<!is_executor<typename decay<Handler>::type>::value &&
       !is_convertible<Handler&, execution_context&>::value>::type*)
 {
@@ -419,7 +419,7 @@ void spawn(BOOST_ASIO_MOVE_ARG(Handler) handler,
 template <typename Handler, typename Function>
 void spawn(basic_yield_context<Handler> ctx,
     BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes)
+    const cppmsboost::coroutines::attributes& attributes)
 {
   typedef typename decay<Function>::type function_type;
 
@@ -444,29 +444,29 @@ void spawn(basic_yield_context<Handler> ctx,
 template <typename Function, typename Executor>
 inline void spawn(const Executor& ex,
     BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes,
+    const cppmsboost::coroutines::attributes& attributes,
     typename enable_if<is_executor<Executor>::value>::type*)
 {
-  boost::asio::spawn(boost::asio::strand<Executor>(ex),
+  cppmsboost::asio::spawn(cppmsboost::asio::strand<Executor>(ex),
       BOOST_ASIO_MOVE_CAST(Function)(function), attributes);
 }
 
 template <typename Function, typename Executor>
 inline void spawn(const strand<Executor>& ex,
     BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes)
+    const cppmsboost::coroutines::attributes& attributes)
 {
-  boost::asio::spawn(boost::asio::bind_executor(
+  cppmsboost::asio::spawn(cppmsboost::asio::bind_executor(
         ex, &detail::default_spawn_handler),
       BOOST_ASIO_MOVE_CAST(Function)(function), attributes);
 }
 
 template <typename Function>
-inline void spawn(const boost::asio::io_context::strand& s,
+inline void spawn(const cppmsboost::asio::io_context::strand& s,
     BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes)
+    const cppmsboost::coroutines::attributes& attributes)
 {
-  boost::asio::spawn(boost::asio::bind_executor(
+  cppmsboost::asio::spawn(cppmsboost::asio::bind_executor(
         s, &detail::default_spawn_handler),
       BOOST_ASIO_MOVE_CAST(Function)(function), attributes);
 }
@@ -474,18 +474,18 @@ inline void spawn(const boost::asio::io_context::strand& s,
 template <typename Function, typename ExecutionContext>
 inline void spawn(ExecutionContext& ctx,
     BOOST_ASIO_MOVE_ARG(Function) function,
-    const boost::coroutines::attributes& attributes,
+    const cppmsboost::coroutines::attributes& attributes,
     typename enable_if<is_convertible<
       ExecutionContext&, execution_context&>::value>::type*)
 {
-  boost::asio::spawn(ctx.get_executor(),
+  cppmsboost::asio::spawn(ctx.get_executor(),
       BOOST_ASIO_MOVE_CAST(Function)(function), attributes);
 }
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

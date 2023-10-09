@@ -104,7 +104,9 @@ namespace cppmicroservices
                     ServiceReference<void> svcRefToBind;
                     {
                         auto boundRefsHandle = mgr.boundRefs.lock(); // acquires lock on boundRefs
-                        if (!boundRefsHandle->empty())
+                        // we only need to rebind if maxCardinality is unary, in case of multiple
+                        // bound references remain as is after removing current reference
+                        if (!boundRefsHandle->empty() && mgr.IsUnary())
                         {
                             svcRefToBind = *(boundRefsHandle->begin());
                             Log("Notify BIND for reference " + mgr.metadata_.name);

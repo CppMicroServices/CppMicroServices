@@ -24,7 +24,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -33,7 +33,7 @@ class null_reactor
 {
 public:
   // Constructor.
-  null_reactor(boost::asio::execution_context& ctx)
+  null_reactor(cppmsboost::asio::execution_context& ctx)
     : execution_context_service_base<null_reactor>(ctx)
   {
   }
@@ -61,7 +61,7 @@ public:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -26,7 +26,7 @@ namespace std{
 #include <boost/mpl/bool_fwd.hpp>
 #include <boost/type_traits/remove_const.hpp>
 
-namespace boost { namespace serialization {
+namespace cppmsboost { namespace serialization {
 
 template<class T>
 class array_wrapper :
@@ -37,7 +37,7 @@ private:
     // note: I would like to make the copy constructor private but this breaks
     // make_array.  So I make make_array a friend
     template<class Tx, class S>
-    friend const boost::serialization::array_wrapper<Tx> make_array(Tx * t, S s);
+    friend const cppmsboost::serialization::array_wrapper<Tx> make_array(Tx * t, S s);
 public:
 
     array_wrapper(const array_wrapper & rhs) :
@@ -58,14 +58,14 @@ public:
       std::size_t c = count();
       T * t = address();
       while(0 < c--)
-            ar & boost::serialization::make_nvp("item", *t++);
+            ar & cppmsboost::serialization::make_nvp("item", *t++);
     }
 
     // optimized implementation
     template<class Archive>
     void serialize_optimized(Archive &ar, const unsigned int version, mpl::true_ )
     {
-      boost::serialization::split_member(ar, *this, version);
+      cppmsboost::serialization::split_member(ar, *this, version);
     }
 
     // default implementation
@@ -87,7 +87,7 @@ public:
     void serialize(Archive &ar, const unsigned int version)
     {
       typedef typename
-          boost::serialization::use_array_optimization<Archive>::template apply<
+          cppmsboost::serialization::use_array_optimization<Archive>::template apply<
                     typename remove_const< T >::type
                 >::type use_optimized;
       serialize_optimized(ar,version,use_optimized());
@@ -115,7 +115,7 @@ const array_wrapper< T > make_array(T* t, S s){
     return a;
 }
 
-} } // end namespace boost::serialization
+} } // end namespace cppmsboost::serialization
 
 
 #endif //BOOST_SERIALIZATION_ARRAY_WRAPPER_HPP

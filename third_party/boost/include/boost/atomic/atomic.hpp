@@ -23,7 +23,7 @@
 #pragma once
 #endif
 
-namespace boost {
+namespace cppmsboost {
 
 using atomics::atomic;
 
@@ -91,6 +91,6 @@ using atomics::atomic_intptr_t;
 using atomics::atomic_uintptr_t;
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ATOMIC_ATOMIC_HPP_INCLUDED_

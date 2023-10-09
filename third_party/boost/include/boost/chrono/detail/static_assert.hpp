@@ -20,7 +20,7 @@
 #include <boost/mpl/assert.hpp>
 #include <boost/mpl/bool.hpp>
 #define BOOST_CHRONO_STATIC_ASSERT(CND, MSG, TYPES)                                 \
-    BOOST_MPL_ASSERT_MSG(boost::mpl::bool_< (CND) >::type::value, MSG, TYPES)
+    BOOST_MPL_ASSERT_MSG(cppmsboost::mpl::bool_< (CND) >::type::value, MSG, TYPES)
 #else
 //~ #elif defined(BOOST_CHRONO_USES_ARRAY_ASSERT)
 #define BOOST_CHRONO_STATIC_ASSERT(CND, MSG, TYPES) static char BOOST_JOIN(boost_chrono_test_,__LINE__)[(CND)?1:-1]

@@ -8,7 +8,7 @@
 /*!
  * \file   atomic/detail/addressof.hpp
  *
- * This header defines \c addressof helper function. It is similar to \c boost::addressof but it is more
+ * This header defines \c addressof helper function. It is similar to \c cppmsboost::addressof but it is more
  * lightweight and also contains a workaround for some compiler warnings.
  */
 
@@ -32,7 +32,7 @@
 #endif
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace atomics {
 namespace detail {
 
@@ -53,6 +53,6 @@ BOOST_FORCEINLINE T* addressof(T& value) BOOST_NOEXCEPT
 
 } // namespace detail
 } // namespace atomics
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ATOMIC_DETAIL_ADDRESSOF_HPP_INCLUDED_

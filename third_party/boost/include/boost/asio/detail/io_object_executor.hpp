@@ -22,7 +22,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -116,12 +116,12 @@ public:
 #if defined(BOOST_ASIO_HAS_MOVE)
       if (is_same<F, typename decay<F>::type>::value)
       {
-        boost_asio_handler_invoke_helpers::invoke(f, f);
+        cppmsboost_asio_handler_invoke_helpers::invoke(f, f);
         return;
       }
 #endif // defined(BOOST_ASIO_HAS_MOVE)
       typename decay<F>::type function(BOOST_ASIO_MOVE_CAST(F)(f));
-      boost_asio_handler_invoke_helpers::invoke(function, function);
+      cppmsboost_asio_handler_invoke_helpers::invoke(function, function);
     }
     else
     {
@@ -162,7 +162,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

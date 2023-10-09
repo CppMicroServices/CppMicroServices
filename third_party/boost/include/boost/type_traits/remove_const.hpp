@@ -15,7 +15,7 @@
 #include <cstddef> // size_t
 #include <boost/detail/workaround.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
    //  convert a type T to a non-cv-qualified type - remove_const<T>
    template <class T> struct remove_const{ typedef T type; };
@@ -34,6 +34,6 @@ namespace boost {
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_TT_REMOVE_CONST_HPP_INCLUDED

@@ -25,14 +25,14 @@
 
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace boost {
+namespace cppmsboost {
 namespace archive {
 
 //////////////////////////////////////////////////////////////////////
 // exceptions thrown by xml archives
 //
 class BOOST_SYMBOL_VISIBLE xml_archive_exception :
-    public virtual boost::archive::archive_exception
+    public virtual cppmsboost::archive::archive_exception
 {
 public:
     typedef enum {
@@ -50,7 +50,7 @@ public:
 };
 
 }// namespace archive
-}// namespace boost
+}// namespace cppmsboost
 
 #include <boost/archive/detail/abi_suffix.hpp> // pops abi_suffix.hpp pragmas
 

@@ -39,7 +39,7 @@
 // Borland-specific bug, visit_each() silently fails to produce code
 
 #if defined(__BORLANDC__)
-#  define BOOST_BIND_VISIT_EACH boost::visit_each
+#  define BOOST_BIND_VISIT_EACH cppmsboost::visit_each
 #else
 #  define BOOST_BIND_VISIT_EACH visit_each
 #endif
@@ -51,7 +51,7 @@
 # pragma warning(disable: 4512) // assignment operator could not be generated
 #endif
 
-namespace boost
+namespace cppmsboost
 {
 
 template<class T> class weak_ptr;
@@ -230,9 +230,9 @@ public:
 
     explicit list1( A1 a1 ): base_type( a1 ) {}
 
-    A1 operator[] (boost::arg<1>) const { return base_type::a1_; }
+    A1 operator[] (cppmsboost::arg<1>) const { return base_type::a1_; }
 
-    A1 operator[] (boost::arg<1> (*) ()) const { return base_type::a1_; }
+    A1 operator[] (cppmsboost::arg<1> (*) ()) const { return base_type::a1_; }
 
     template<class T> T & operator[] ( _bi::value<T> & v ) const { return v.get(); }
 
@@ -288,11 +288,11 @@ public:
 
     list2( A1 a1, A2 a2 ): base_type( a1, a2 ) {}
 
-    A1 operator[] (boost::arg<1>) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2>) const { return base_type::a2_; }
+    A1 operator[] (cppmsboost::arg<1>) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2>) const { return base_type::a2_; }
 
-    A1 operator[] (boost::arg<1> (*) ()) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2> (*) ()) const { return base_type::a2_; }
+    A1 operator[] (cppmsboost::arg<1> (*) ()) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2> (*) ()) const { return base_type::a2_; }
 
     template<class T> T & operator[] (_bi::value<T> & v) const { return v.get(); }
 
@@ -365,13 +365,13 @@ public:
 
     list3( A1 a1, A2 a2, A3 a3 ): base_type( a1, a2, a3 ) {}
 
-    A1 operator[] (boost::arg<1>) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2>) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3>) const { return base_type::a3_; }
+    A1 operator[] (cppmsboost::arg<1>) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2>) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3>) const { return base_type::a3_; }
 
-    A1 operator[] (boost::arg<1> (*) ()) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2> (*) ()) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3> (*) ()) const { return base_type::a3_; }
+    A1 operator[] (cppmsboost::arg<1> (*) ()) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2> (*) ()) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3> (*) ()) const { return base_type::a3_; }
 
     template<class T> T & operator[] (_bi::value<T> & v) const { return v.get(); }
 
@@ -428,15 +428,15 @@ public:
 
     list4( A1 a1, A2 a2, A3 a3, A4 a4 ): base_type( a1, a2, a3, a4 ) {}
 
-    A1 operator[] (boost::arg<1>) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2>) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3>) const { return base_type::a3_; }
-    A4 operator[] (boost::arg<4>) const { return base_type::a4_; }
+    A1 operator[] (cppmsboost::arg<1>) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2>) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3>) const { return base_type::a3_; }
+    A4 operator[] (cppmsboost::arg<4>) const { return base_type::a4_; }
 
-    A1 operator[] (boost::arg<1> (*) ()) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2> (*) ()) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3> (*) ()) const { return base_type::a3_; }
-    A4 operator[] (boost::arg<4> (*) ()) const { return base_type::a4_; }
+    A1 operator[] (cppmsboost::arg<1> (*) ()) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2> (*) ()) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3> (*) ()) const { return base_type::a3_; }
+    A4 operator[] (cppmsboost::arg<4> (*) ()) const { return base_type::a4_; }
 
     template<class T> T & operator[] (_bi::value<T> & v) const { return v.get(); }
 
@@ -494,17 +494,17 @@ public:
 
     list5( A1 a1, A2 a2, A3 a3, A4 a4, A5 a5 ): base_type( a1, a2, a3, a4, a5 ) {}
 
-    A1 operator[] (boost::arg<1>) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2>) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3>) const { return base_type::a3_; }
-    A4 operator[] (boost::arg<4>) const { return base_type::a4_; }
-    A5 operator[] (boost::arg<5>) const { return base_type::a5_; }
+    A1 operator[] (cppmsboost::arg<1>) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2>) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3>) const { return base_type::a3_; }
+    A4 operator[] (cppmsboost::arg<4>) const { return base_type::a4_; }
+    A5 operator[] (cppmsboost::arg<5>) const { return base_type::a5_; }
 
-    A1 operator[] (boost::arg<1> (*) ()) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2> (*) ()) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3> (*) ()) const { return base_type::a3_; }
-    A4 operator[] (boost::arg<4> (*) ()) const { return base_type::a4_; }
-    A5 operator[] (boost::arg<5> (*) ()) const { return base_type::a5_; }
+    A1 operator[] (cppmsboost::arg<1> (*) ()) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2> (*) ()) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3> (*) ()) const { return base_type::a3_; }
+    A4 operator[] (cppmsboost::arg<4> (*) ()) const { return base_type::a4_; }
+    A5 operator[] (cppmsboost::arg<5> (*) ()) const { return base_type::a5_; }
 
     template<class T> T & operator[] (_bi::value<T> & v) const { return v.get(); }
 
@@ -563,19 +563,19 @@ public:
 
     list6( A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6 ): base_type( a1, a2, a3, a4, a5, a6 ) {}
 
-    A1 operator[] (boost::arg<1>) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2>) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3>) const { return base_type::a3_; }
-    A4 operator[] (boost::arg<4>) const { return base_type::a4_; }
-    A5 operator[] (boost::arg<5>) const { return base_type::a5_; }
-    A6 operator[] (boost::arg<6>) const { return base_type::a6_; }
+    A1 operator[] (cppmsboost::arg<1>) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2>) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3>) const { return base_type::a3_; }
+    A4 operator[] (cppmsboost::arg<4>) const { return base_type::a4_; }
+    A5 operator[] (cppmsboost::arg<5>) const { return base_type::a5_; }
+    A6 operator[] (cppmsboost::arg<6>) const { return base_type::a6_; }
 
-    A1 operator[] (boost::arg<1> (*) ()) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2> (*) ()) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3> (*) ()) const { return base_type::a3_; }
-    A4 operator[] (boost::arg<4> (*) ()) const { return base_type::a4_; }
-    A5 operator[] (boost::arg<5> (*) ()) const { return base_type::a5_; }
-    A6 operator[] (boost::arg<6> (*) ()) const { return base_type::a6_; }
+    A1 operator[] (cppmsboost::arg<1> (*) ()) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2> (*) ()) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3> (*) ()) const { return base_type::a3_; }
+    A4 operator[] (cppmsboost::arg<4> (*) ()) const { return base_type::a4_; }
+    A5 operator[] (cppmsboost::arg<5> (*) ()) const { return base_type::a5_; }
+    A6 operator[] (cppmsboost::arg<6> (*) ()) const { return base_type::a6_; }
 
     template<class T> T & operator[] (_bi::value<T> & v) const { return v.get(); }
 
@@ -635,21 +635,21 @@ public:
 
     list7( A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7 ): base_type( a1, a2, a3, a4, a5, a6, a7 ) {}
 
-    A1 operator[] (boost::arg<1>) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2>) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3>) const { return base_type::a3_; }
-    A4 operator[] (boost::arg<4>) const { return base_type::a4_; }
-    A5 operator[] (boost::arg<5>) const { return base_type::a5_; }
-    A6 operator[] (boost::arg<6>) const { return base_type::a6_; }
-    A7 operator[] (boost::arg<7>) const { return base_type::a7_; }
+    A1 operator[] (cppmsboost::arg<1>) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2>) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3>) const { return base_type::a3_; }
+    A4 operator[] (cppmsboost::arg<4>) const { return base_type::a4_; }
+    A5 operator[] (cppmsboost::arg<5>) const { return base_type::a5_; }
+    A6 operator[] (cppmsboost::arg<6>) const { return base_type::a6_; }
+    A7 operator[] (cppmsboost::arg<7>) const { return base_type::a7_; }
 
-    A1 operator[] (boost::arg<1> (*) ()) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2> (*) ()) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3> (*) ()) const { return base_type::a3_; }
-    A4 operator[] (boost::arg<4> (*) ()) const { return base_type::a4_; }
-    A5 operator[] (boost::arg<5> (*) ()) const { return base_type::a5_; }
-    A6 operator[] (boost::arg<6> (*) ()) const { return base_type::a6_; }
-    A7 operator[] (boost::arg<7> (*) ()) const { return base_type::a7_; }
+    A1 operator[] (cppmsboost::arg<1> (*) ()) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2> (*) ()) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3> (*) ()) const { return base_type::a3_; }
+    A4 operator[] (cppmsboost::arg<4> (*) ()) const { return base_type::a4_; }
+    A5 operator[] (cppmsboost::arg<5> (*) ()) const { return base_type::a5_; }
+    A6 operator[] (cppmsboost::arg<6> (*) ()) const { return base_type::a6_; }
+    A7 operator[] (cppmsboost::arg<7> (*) ()) const { return base_type::a7_; }
 
     template<class T> T & operator[] (_bi::value<T> & v) const { return v.get(); }
 
@@ -710,23 +710,23 @@ public:
 
     list8( A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8 ): base_type( a1, a2, a3, a4, a5, a6, a7, a8 ) {}
 
-    A1 operator[] (boost::arg<1>) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2>) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3>) const { return base_type::a3_; }
-    A4 operator[] (boost::arg<4>) const { return base_type::a4_; }
-    A5 operator[] (boost::arg<5>) const { return base_type::a5_; }
-    A6 operator[] (boost::arg<6>) const { return base_type::a6_; }
-    A7 operator[] (boost::arg<7>) const { return base_type::a7_; }
-    A8 operator[] (boost::arg<8>) const { return base_type::a8_; }
+    A1 operator[] (cppmsboost::arg<1>) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2>) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3>) const { return base_type::a3_; }
+    A4 operator[] (cppmsboost::arg<4>) const { return base_type::a4_; }
+    A5 operator[] (cppmsboost::arg<5>) const { return base_type::a5_; }
+    A6 operator[] (cppmsboost::arg<6>) const { return base_type::a6_; }
+    A7 operator[] (cppmsboost::arg<7>) const { return base_type::a7_; }
+    A8 operator[] (cppmsboost::arg<8>) const { return base_type::a8_; }
 
-    A1 operator[] (boost::arg<1> (*) ()) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2> (*) ()) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3> (*) ()) const { return base_type::a3_; }
-    A4 operator[] (boost::arg<4> (*) ()) const { return base_type::a4_; }
-    A5 operator[] (boost::arg<5> (*) ()) const { return base_type::a5_; }
-    A6 operator[] (boost::arg<6> (*) ()) const { return base_type::a6_; }
-    A7 operator[] (boost::arg<7> (*) ()) const { return base_type::a7_; }
-    A8 operator[] (boost::arg<8> (*) ()) const { return base_type::a8_; }
+    A1 operator[] (cppmsboost::arg<1> (*) ()) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2> (*) ()) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3> (*) ()) const { return base_type::a3_; }
+    A4 operator[] (cppmsboost::arg<4> (*) ()) const { return base_type::a4_; }
+    A5 operator[] (cppmsboost::arg<5> (*) ()) const { return base_type::a5_; }
+    A6 operator[] (cppmsboost::arg<6> (*) ()) const { return base_type::a6_; }
+    A7 operator[] (cppmsboost::arg<7> (*) ()) const { return base_type::a7_; }
+    A8 operator[] (cppmsboost::arg<8> (*) ()) const { return base_type::a8_; }
 
     template<class T> T & operator[] (_bi::value<T> & v) const { return v.get(); }
 
@@ -788,25 +788,25 @@ public:
 
     list9( A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9 ): base_type( a1, a2, a3, a4, a5, a6, a7, a8, a9 ) {}
 
-    A1 operator[] (boost::arg<1>) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2>) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3>) const { return base_type::a3_; }
-    A4 operator[] (boost::arg<4>) const { return base_type::a4_; }
-    A5 operator[] (boost::arg<5>) const { return base_type::a5_; }
-    A6 operator[] (boost::arg<6>) const { return base_type::a6_; }
-    A7 operator[] (boost::arg<7>) const { return base_type::a7_; }
-    A8 operator[] (boost::arg<8>) const { return base_type::a8_; }
-    A9 operator[] (boost::arg<9>) const { return base_type::a9_; }
+    A1 operator[] (cppmsboost::arg<1>) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2>) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3>) const { return base_type::a3_; }
+    A4 operator[] (cppmsboost::arg<4>) const { return base_type::a4_; }
+    A5 operator[] (cppmsboost::arg<5>) const { return base_type::a5_; }
+    A6 operator[] (cppmsboost::arg<6>) const { return base_type::a6_; }
+    A7 operator[] (cppmsboost::arg<7>) const { return base_type::a7_; }
+    A8 operator[] (cppmsboost::arg<8>) const { return base_type::a8_; }
+    A9 operator[] (cppmsboost::arg<9>) const { return base_type::a9_; }
 
-    A1 operator[] (boost::arg<1> (*) ()) const { return base_type::a1_; }
-    A2 operator[] (boost::arg<2> (*) ()) const { return base_type::a2_; }
-    A3 operator[] (boost::arg<3> (*) ()) const { return base_type::a3_; }
-    A4 operator[] (boost::arg<4> (*) ()) const { return base_type::a4_; }
-    A5 operator[] (boost::arg<5> (*) ()) const { return base_type::a5_; }
-    A6 operator[] (boost::arg<6> (*) ()) const { return base_type::a6_; }
-    A7 operator[] (boost::arg<7> (*) ()) const { return base_type::a7_; }
-    A8 operator[] (boost::arg<8> (*) ()) const { return base_type::a8_; }
-    A9 operator[] (boost::arg<9> (*) ()) const { return base_type::a9_; }
+    A1 operator[] (cppmsboost::arg<1> (*) ()) const { return base_type::a1_; }
+    A2 operator[] (cppmsboost::arg<2> (*) ()) const { return base_type::a2_; }
+    A3 operator[] (cppmsboost::arg<3> (*) ()) const { return base_type::a3_; }
+    A4 operator[] (cppmsboost::arg<4> (*) ()) const { return base_type::a4_; }
+    A5 operator[] (cppmsboost::arg<5> (*) ()) const { return base_type::a5_; }
+    A6 operator[] (cppmsboost::arg<6> (*) ()) const { return base_type::a6_; }
+    A7 operator[] (cppmsboost::arg<7> (*) ()) const { return base_type::a7_; }
+    A8 operator[] (cppmsboost::arg<8> (*) ()) const { return base_type::a8_; }
+    A9 operator[] (cppmsboost::arg<9> (*) ()) const { return base_type::a9_; }
 
     template<class T> T & operator[] (_bi::value<T> & v) const { return v.get(); }
 
@@ -877,9 +877,9 @@ public:
 
     explicit rrlist1( A1 & a1 ): a1_( a1 ) {}
 
-    A1 && operator[] (boost::arg<1>) const { return std::forward<A1>( a1_ ); } // not static_cast because of g++ 4.9
+    A1 && operator[] (cppmsboost::arg<1>) const { return std::forward<A1>( a1_ ); } // not static_cast because of g++ 4.9
 
-    A1 && operator[] (boost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
+    A1 && operator[] (cppmsboost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
 
     template<class T> T & operator[] ( _bi::value<T> & v ) const { return v.get(); }
 
@@ -911,11 +911,11 @@ public:
 
     rrlist2( A1 & a1, A2 & a2 ): a1_( a1 ), a2_( a2 ) {}
 
-    A1 && operator[] (boost::arg<1>) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2>) const { return std::forward<A2>( a2_ ); }
+    A1 && operator[] (cppmsboost::arg<1>) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2>) const { return std::forward<A2>( a2_ ); }
 
-    A1 && operator[] (boost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
+    A1 && operator[] (cppmsboost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
 
     template<class T> T & operator[] ( _bi::value<T> & v ) const { return v.get(); }
 
@@ -948,13 +948,13 @@ public:
 
     rrlist3( A1 & a1, A2 & a2, A3 & a3 ): a1_( a1 ), a2_( a2 ), a3_( a3 ) {}
 
-    A1 && operator[] (boost::arg<1>) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2>) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3>) const { return std::forward<A3>( a3_ ); }
+    A1 && operator[] (cppmsboost::arg<1>) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2>) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3>) const { return std::forward<A3>( a3_ ); }
 
-    A1 && operator[] (boost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
+    A1 && operator[] (cppmsboost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
 
     template<class T> T & operator[] ( _bi::value<T> & v ) const { return v.get(); }
 
@@ -988,15 +988,15 @@ public:
 
     rrlist4( A1 & a1, A2 & a2, A3 & a3, A4 & a4 ): a1_( a1 ), a2_( a2 ), a3_( a3 ), a4_( a4 ) {}
 
-    A1 && operator[] (boost::arg<1>) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2>) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3>) const { return std::forward<A3>( a3_ ); }
-    A4 && operator[] (boost::arg<4>) const { return std::forward<A4>( a4_ ); }
+    A1 && operator[] (cppmsboost::arg<1>) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2>) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3>) const { return std::forward<A3>( a3_ ); }
+    A4 && operator[] (cppmsboost::arg<4>) const { return std::forward<A4>( a4_ ); }
 
-    A1 && operator[] (boost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
-    A4 && operator[] (boost::arg<4> (*) ()) const { return std::forward<A4>( a4_ ); }
+    A1 && operator[] (cppmsboost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
+    A4 && operator[] (cppmsboost::arg<4> (*) ()) const { return std::forward<A4>( a4_ ); }
 
     template<class T> T & operator[] ( _bi::value<T> & v ) const { return v.get(); }
 
@@ -1031,17 +1031,17 @@ public:
 
     rrlist5( A1 & a1, A2 & a2, A3 & a3, A4 & a4, A5 & a5 ): a1_( a1 ), a2_( a2 ), a3_( a3 ), a4_( a4 ), a5_( a5 ) {}
 
-    A1 && operator[] (boost::arg<1>) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2>) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3>) const { return std::forward<A3>( a3_ ); }
-    A4 && operator[] (boost::arg<4>) const { return std::forward<A4>( a4_ ); }
-    A5 && operator[] (boost::arg<5>) const { return std::forward<A5>( a5_ ); }
+    A1 && operator[] (cppmsboost::arg<1>) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2>) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3>) const { return std::forward<A3>( a3_ ); }
+    A4 && operator[] (cppmsboost::arg<4>) const { return std::forward<A4>( a4_ ); }
+    A5 && operator[] (cppmsboost::arg<5>) const { return std::forward<A5>( a5_ ); }
 
-    A1 && operator[] (boost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
-    A4 && operator[] (boost::arg<4> (*) ()) const { return std::forward<A4>( a4_ ); }
-    A5 && operator[] (boost::arg<5> (*) ()) const { return std::forward<A5>( a5_ ); }
+    A1 && operator[] (cppmsboost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
+    A4 && operator[] (cppmsboost::arg<4> (*) ()) const { return std::forward<A4>( a4_ ); }
+    A5 && operator[] (cppmsboost::arg<5> (*) ()) const { return std::forward<A5>( a5_ ); }
 
     template<class T> T & operator[] ( _bi::value<T> & v ) const { return v.get(); }
 
@@ -1077,19 +1077,19 @@ public:
 
     rrlist6( A1 & a1, A2 & a2, A3 & a3, A4 & a4, A5 & a5, A6 & a6 ): a1_( a1 ), a2_( a2 ), a3_( a3 ), a4_( a4 ), a5_( a5 ), a6_( a6 ) {}
 
-    A1 && operator[] (boost::arg<1>) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2>) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3>) const { return std::forward<A3>( a3_ ); }
-    A4 && operator[] (boost::arg<4>) const { return std::forward<A4>( a4_ ); }
-    A5 && operator[] (boost::arg<5>) const { return std::forward<A5>( a5_ ); }
-    A6 && operator[] (boost::arg<6>) const { return std::forward<A6>( a6_ ); }
+    A1 && operator[] (cppmsboost::arg<1>) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2>) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3>) const { return std::forward<A3>( a3_ ); }
+    A4 && operator[] (cppmsboost::arg<4>) const { return std::forward<A4>( a4_ ); }
+    A5 && operator[] (cppmsboost::arg<5>) const { return std::forward<A5>( a5_ ); }
+    A6 && operator[] (cppmsboost::arg<6>) const { return std::forward<A6>( a6_ ); }
 
-    A1 && operator[] (boost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
-    A4 && operator[] (boost::arg<4> (*) ()) const { return std::forward<A4>( a4_ ); }
-    A5 && operator[] (boost::arg<5> (*) ()) const { return std::forward<A5>( a5_ ); }
-    A6 && operator[] (boost::arg<6> (*) ()) const { return std::forward<A6>( a6_ ); }
+    A1 && operator[] (cppmsboost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
+    A4 && operator[] (cppmsboost::arg<4> (*) ()) const { return std::forward<A4>( a4_ ); }
+    A5 && operator[] (cppmsboost::arg<5> (*) ()) const { return std::forward<A5>( a5_ ); }
+    A6 && operator[] (cppmsboost::arg<6> (*) ()) const { return std::forward<A6>( a6_ ); }
 
     template<class T> T & operator[] ( _bi::value<T> & v ) const { return v.get(); }
 
@@ -1126,21 +1126,21 @@ public:
 
     rrlist7( A1 & a1, A2 & a2, A3 & a3, A4 & a4, A5 & a5, A6 & a6, A7 & a7 ): a1_( a1 ), a2_( a2 ), a3_( a3 ), a4_( a4 ), a5_( a5 ), a6_( a6 ), a7_( a7 ) {}
 
-    A1 && operator[] (boost::arg<1>) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2>) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3>) const { return std::forward<A3>( a3_ ); }
-    A4 && operator[] (boost::arg<4>) const { return std::forward<A4>( a4_ ); }
-    A5 && operator[] (boost::arg<5>) const { return std::forward<A5>( a5_ ); }
-    A6 && operator[] (boost::arg<6>) const { return std::forward<A6>( a6_ ); }
-    A7 && operator[] (boost::arg<7>) const { return std::forward<A7>( a7_ ); }
+    A1 && operator[] (cppmsboost::arg<1>) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2>) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3>) const { return std::forward<A3>( a3_ ); }
+    A4 && operator[] (cppmsboost::arg<4>) const { return std::forward<A4>( a4_ ); }
+    A5 && operator[] (cppmsboost::arg<5>) const { return std::forward<A5>( a5_ ); }
+    A6 && operator[] (cppmsboost::arg<6>) const { return std::forward<A6>( a6_ ); }
+    A7 && operator[] (cppmsboost::arg<7>) const { return std::forward<A7>( a7_ ); }
 
-    A1 && operator[] (boost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
-    A4 && operator[] (boost::arg<4> (*) ()) const { return std::forward<A4>( a4_ ); }
-    A5 && operator[] (boost::arg<5> (*) ()) const { return std::forward<A5>( a5_ ); }
-    A6 && operator[] (boost::arg<6> (*) ()) const { return std::forward<A6>( a6_ ); }
-    A7 && operator[] (boost::arg<7> (*) ()) const { return std::forward<A7>( a7_ ); }
+    A1 && operator[] (cppmsboost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
+    A4 && operator[] (cppmsboost::arg<4> (*) ()) const { return std::forward<A4>( a4_ ); }
+    A5 && operator[] (cppmsboost::arg<5> (*) ()) const { return std::forward<A5>( a5_ ); }
+    A6 && operator[] (cppmsboost::arg<6> (*) ()) const { return std::forward<A6>( a6_ ); }
+    A7 && operator[] (cppmsboost::arg<7> (*) ()) const { return std::forward<A7>( a7_ ); }
 
     template<class T> T & operator[] ( _bi::value<T> & v ) const { return v.get(); }
 
@@ -1178,23 +1178,23 @@ public:
 
     rrlist8( A1 & a1, A2 & a2, A3 & a3, A4 & a4, A5 & a5, A6 & a6, A7 & a7, A8 & a8 ): a1_( a1 ), a2_( a2 ), a3_( a3 ), a4_( a4 ), a5_( a5 ), a6_( a6 ), a7_( a7 ), a8_( a8 ) {}
 
-    A1 && operator[] (boost::arg<1>) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2>) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3>) const { return std::forward<A3>( a3_ ); }
-    A4 && operator[] (boost::arg<4>) const { return std::forward<A4>( a4_ ); }
-    A5 && operator[] (boost::arg<5>) const { return std::forward<A5>( a5_ ); }
-    A6 && operator[] (boost::arg<6>) const { return std::forward<A6>( a6_ ); }
-    A7 && operator[] (boost::arg<7>) const { return std::forward<A7>( a7_ ); }
-    A8 && operator[] (boost::arg<8>) const { return std::forward<A8>( a8_ ); }
+    A1 && operator[] (cppmsboost::arg<1>) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2>) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3>) const { return std::forward<A3>( a3_ ); }
+    A4 && operator[] (cppmsboost::arg<4>) const { return std::forward<A4>( a4_ ); }
+    A5 && operator[] (cppmsboost::arg<5>) const { return std::forward<A5>( a5_ ); }
+    A6 && operator[] (cppmsboost::arg<6>) const { return std::forward<A6>( a6_ ); }
+    A7 && operator[] (cppmsboost::arg<7>) const { return std::forward<A7>( a7_ ); }
+    A8 && operator[] (cppmsboost::arg<8>) const { return std::forward<A8>( a8_ ); }
 
-    A1 && operator[] (boost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
-    A4 && operator[] (boost::arg<4> (*) ()) const { return std::forward<A4>( a4_ ); }
-    A5 && operator[] (boost::arg<5> (*) ()) const { return std::forward<A5>( a5_ ); }
-    A6 && operator[] (boost::arg<6> (*) ()) const { return std::forward<A6>( a6_ ); }
-    A7 && operator[] (boost::arg<7> (*) ()) const { return std::forward<A7>( a7_ ); }
-    A8 && operator[] (boost::arg<8> (*) ()) const { return std::forward<A8>( a8_ ); }
+    A1 && operator[] (cppmsboost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
+    A4 && operator[] (cppmsboost::arg<4> (*) ()) const { return std::forward<A4>( a4_ ); }
+    A5 && operator[] (cppmsboost::arg<5> (*) ()) const { return std::forward<A5>( a5_ ); }
+    A6 && operator[] (cppmsboost::arg<6> (*) ()) const { return std::forward<A6>( a6_ ); }
+    A7 && operator[] (cppmsboost::arg<7> (*) ()) const { return std::forward<A7>( a7_ ); }
+    A8 && operator[] (cppmsboost::arg<8> (*) ()) const { return std::forward<A8>( a8_ ); }
 
     template<class T> T & operator[] ( _bi::value<T> & v ) const { return v.get(); }
 
@@ -1233,25 +1233,25 @@ public:
 
     rrlist9( A1 & a1, A2 & a2, A3 & a3, A4 & a4, A5 & a5, A6 & a6, A7 & a7, A8 & a8, A9 & a9 ): a1_( a1 ), a2_( a2 ), a3_( a3 ), a4_( a4 ), a5_( a5 ), a6_( a6 ), a7_( a7 ), a8_( a8 ), a9_( a9 ) {}
 
-    A1 && operator[] (boost::arg<1>) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2>) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3>) const { return std::forward<A3>( a3_ ); }
-    A4 && operator[] (boost::arg<4>) const { return std::forward<A4>( a4_ ); }
-    A5 && operator[] (boost::arg<5>) const { return std::forward<A5>( a5_ ); }
-    A6 && operator[] (boost::arg<6>) const { return std::forward<A6>( a6_ ); }
-    A7 && operator[] (boost::arg<7>) const { return std::forward<A7>( a7_ ); }
-    A8 && operator[] (boost::arg<8>) const { return std::forward<A8>( a8_ ); }
-    A9 && operator[] (boost::arg<9>) const { return std::forward<A9>( a9_ ); }
+    A1 && operator[] (cppmsboost::arg<1>) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2>) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3>) const { return std::forward<A3>( a3_ ); }
+    A4 && operator[] (cppmsboost::arg<4>) const { return std::forward<A4>( a4_ ); }
+    A5 && operator[] (cppmsboost::arg<5>) const { return std::forward<A5>( a5_ ); }
+    A6 && operator[] (cppmsboost::arg<6>) const { return std::forward<A6>( a6_ ); }
+    A7 && operator[] (cppmsboost::arg<7>) const { return std::forward<A7>( a7_ ); }
+    A8 && operator[] (cppmsboost::arg<8>) const { return std::forward<A8>( a8_ ); }
+    A9 && operator[] (cppmsboost::arg<9>) const { return std::forward<A9>( a9_ ); }
 
-    A1 && operator[] (boost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
-    A2 && operator[] (boost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
-    A3 && operator[] (boost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
-    A4 && operator[] (boost::arg<4> (*) ()) const { return std::forward<A4>( a4_ ); }
-    A5 && operator[] (boost::arg<5> (*) ()) const { return std::forward<A5>( a5_ ); }
-    A6 && operator[] (boost::arg<6> (*) ()) const { return std::forward<A6>( a6_ ); }
-    A7 && operator[] (boost::arg<7> (*) ()) const { return std::forward<A7>( a7_ ); }
-    A8 && operator[] (boost::arg<8> (*) ()) const { return std::forward<A8>( a8_ ); }
-    A9 && operator[] (boost::arg<9> (*) ()) const { return std::forward<A9>( a9_ ); }
+    A1 && operator[] (cppmsboost::arg<1> (*) ()) const { return std::forward<A1>( a1_ ); }
+    A2 && operator[] (cppmsboost::arg<2> (*) ()) const { return std::forward<A2>( a2_ ); }
+    A3 && operator[] (cppmsboost::arg<3> (*) ()) const { return std::forward<A3>( a3_ ); }
+    A4 && operator[] (cppmsboost::arg<4> (*) ()) const { return std::forward<A4>( a4_ ); }
+    A5 && operator[] (cppmsboost::arg<5> (*) ()) const { return std::forward<A5>( a5_ ); }
+    A6 && operator[] (cppmsboost::arg<6> (*) ()) const { return std::forward<A6>( a6_ ); }
+    A7 && operator[] (cppmsboost::arg<7> (*) ()) const { return std::forward<A7>( a7_ ); }
+    A8 && operator[] (cppmsboost::arg<8> (*) ()) const { return std::forward<A8>( a8_ ); }
+    A9 && operator[] (cppmsboost::arg<9> (*) ()) const { return std::forward<A9>( a9_ ); }
 
     template<class T> T & operator[] ( _bi::value<T> & v ) const { return v.get(); }
 
@@ -1423,7 +1423,7 @@ public:
     template<class V> void accept( V & v ) const
     {
 #if !defined( BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP ) && !defined( __BORLANDC__ )
-        using boost::visit_each;
+        using cppmsboost::visit_each;
 #endif
 
         BOOST_BIND_VISIT_EACH( v, f_, 0 );
@@ -1570,7 +1570,7 @@ template<class T> struct add_value
 
 template< class T, int I > struct add_value_2
 {
-    typedef boost::arg<I> type;
+    typedef cppmsboost::arg<I> type;
 };
 
 template< class T > struct add_value_2< T, 0 >
@@ -1580,7 +1580,7 @@ template< class T > struct add_value_2< T, 0 >
 
 template<class T> struct add_value
 {
-    typedef typename add_value_2< T, boost::is_placeholder< T >::value >::type type;
+    typedef typename add_value_2< T, cppmsboost::is_placeholder< T >::value >::type type;
 };
 
 #endif
@@ -1597,12 +1597,12 @@ template<class T> struct add_value< reference_wrapper<T> >
 
 template<int I> struct add_value< arg<I> >
 {
-    typedef boost::arg<I> type;
+    typedef cppmsboost::arg<I> type;
 };
 
 template<int I> struct add_value< arg<I> (*) () >
 {
-    typedef boost::arg<I> (*type) ();
+    typedef cppmsboost::arg<I> (*type) ();
 };
 
 template<class R, class F, class L> struct add_value< bind_t<R, F, L> >
@@ -1816,7 +1816,7 @@ BOOST_BIND_OPERATOR( >=, greater_equal )
 
 template<class V, class T> void visit_each( V & v, value<T> const & t, int )
 {
-    using boost::visit_each;
+    using cppmsboost::visit_each;
     BOOST_BIND_VISIT_EACH( v, t.get(), 0 );
 }
 
@@ -1954,7 +1954,7 @@ template<class R, class F, class A1, class A2, class A3, class A4, class A5, cla
 
 template<class R, class F>
     _bi::bind_t<R, F, _bi::list0>
-    BOOST_BIND(boost::type<R>, F f)
+    BOOST_BIND(cppmsboost::type<R>, F f)
 {
     typedef _bi::list0 list_type;
     return _bi::bind_t<R, F, list_type> (f, list_type());
@@ -1962,7 +1962,7 @@ template<class R, class F>
 
 template<class R, class F, class A1>
     _bi::bind_t<R, F, typename _bi::list_av_1<A1>::type>
-    BOOST_BIND(boost::type<R>, F f, A1 a1)
+    BOOST_BIND(cppmsboost::type<R>, F f, A1 a1)
 {
     typedef typename _bi::list_av_1<A1>::type list_type;
     return _bi::bind_t<R, F, list_type> (f, list_type(a1));
@@ -1970,7 +1970,7 @@ template<class R, class F, class A1>
 
 template<class R, class F, class A1, class A2>
     _bi::bind_t<R, F, typename _bi::list_av_2<A1, A2>::type>
-    BOOST_BIND(boost::type<R>, F f, A1 a1, A2 a2)
+    BOOST_BIND(cppmsboost::type<R>, F f, A1 a1, A2 a2)
 {
     typedef typename _bi::list_av_2<A1, A2>::type list_type;
     return _bi::bind_t<R, F, list_type> (f, list_type(a1, a2));
@@ -1978,7 +1978,7 @@ template<class R, class F, class A1, class A2>
 
 template<class R, class F, class A1, class A2, class A3>
     _bi::bind_t<R, F, typename _bi::list_av_3<A1, A2, A3>::type>
-    BOOST_BIND(boost::type<R>, F f, A1 a1, A2 a2, A3 a3)
+    BOOST_BIND(cppmsboost::type<R>, F f, A1 a1, A2 a2, A3 a3)
 {
     typedef typename _bi::list_av_3<A1, A2, A3>::type list_type;
     return _bi::bind_t<R, F, list_type>(f, list_type(a1, a2, a3));
@@ -1986,7 +1986,7 @@ template<class R, class F, class A1, class A2, class A3>
 
 template<class R, class F, class A1, class A2, class A3, class A4>
     _bi::bind_t<R, F, typename _bi::list_av_4<A1, A2, A3, A4>::type>
-    BOOST_BIND(boost::type<R>, F f, A1 a1, A2 a2, A3 a3, A4 a4)
+    BOOST_BIND(cppmsboost::type<R>, F f, A1 a1, A2 a2, A3 a3, A4 a4)
 {
     typedef typename _bi::list_av_4<A1, A2, A3, A4>::type list_type;
     return _bi::bind_t<R, F, list_type>(f, list_type(a1, a2, a3, a4));
@@ -1994,7 +1994,7 @@ template<class R, class F, class A1, class A2, class A3, class A4>
 
 template<class R, class F, class A1, class A2, class A3, class A4, class A5>
     _bi::bind_t<R, F, typename _bi::list_av_5<A1, A2, A3, A4, A5>::type>
-    BOOST_BIND(boost::type<R>, F f, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5)
+    BOOST_BIND(cppmsboost::type<R>, F f, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5)
 {
     typedef typename _bi::list_av_5<A1, A2, A3, A4, A5>::type list_type;
     return _bi::bind_t<R, F, list_type>(f, list_type(a1, a2, a3, a4, a5));
@@ -2002,7 +2002,7 @@ template<class R, class F, class A1, class A2, class A3, class A4, class A5>
 
 template<class R, class F, class A1, class A2, class A3, class A4, class A5, class A6>
     _bi::bind_t<R, F, typename _bi::list_av_6<A1, A2, A3, A4, A5, A6>::type>
-    BOOST_BIND(boost::type<R>, F f, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6)
+    BOOST_BIND(cppmsboost::type<R>, F f, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6)
 {
     typedef typename _bi::list_av_6<A1, A2, A3, A4, A5, A6>::type list_type;
     return _bi::bind_t<R, F, list_type>(f, list_type(a1, a2, a3, a4, a5, a6));
@@ -2010,7 +2010,7 @@ template<class R, class F, class A1, class A2, class A3, class A4, class A5, cla
 
 template<class R, class F, class A1, class A2, class A3, class A4, class A5, class A6, class A7>
     _bi::bind_t<R, F, typename _bi::list_av_7<A1, A2, A3, A4, A5, A6, A7>::type>
-    BOOST_BIND(boost::type<R>, F f, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7)
+    BOOST_BIND(cppmsboost::type<R>, F f, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7)
 {
     typedef typename _bi::list_av_7<A1, A2, A3, A4, A5, A6, A7>::type list_type;
     return _bi::bind_t<R, F, list_type>(f, list_type(a1, a2, a3, a4, a5, a6, a7));
@@ -2018,7 +2018,7 @@ template<class R, class F, class A1, class A2, class A3, class A4, class A5, cla
 
 template<class R, class F, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8>
     _bi::bind_t<R, F, typename _bi::list_av_8<A1, A2, A3, A4, A5, A6, A7, A8>::type>
-    BOOST_BIND(boost::type<R>, F f, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8)
+    BOOST_BIND(cppmsboost::type<R>, F f, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8)
 {
     typedef typename _bi::list_av_8<A1, A2, A3, A4, A5, A6, A7, A8>::type list_type;
     return _bi::bind_t<R, F, list_type>(f, list_type(a1, a2, a3, a4, a5, a6, a7, a8));
@@ -2026,7 +2026,7 @@ template<class R, class F, class A1, class A2, class A3, class A4, class A5, cla
 
 template<class R, class F, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
     _bi::bind_t<R, F, typename _bi::list_av_9<A1, A2, A3, A4, A5, A6, A7, A8, A9>::type>
-    BOOST_BIND(boost::type<R>, F f, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9)
+    BOOST_BIND(cppmsboost::type<R>, F f, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6, A7 a7, A8 a8, A9 a9)
 {
     typedef typename _bi::list_av_9<A1, A2, A3, A4, A5, A6, A7, A8, A9>::type list_type;
     return _bi::bind_t<R, F, list_type>(f, list_type(a1, a2, a3, a4, a5, a6, a7, a8, a9));
@@ -2349,7 +2349,7 @@ BOOST_BIND( M T::*f, A1 a1 )
 
 #endif
 
-} // namespace boost
+} // namespace cppmsboost
 
 #ifndef BOOST_BIND_NO_PLACEHOLDERS
 

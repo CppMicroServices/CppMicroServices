@@ -29,7 +29,7 @@
 # error Only Windows, POSIX and std::mutex are supported!
 #endif
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -45,6 +45,6 @@ typedef std_mutex mutex;
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_DETAIL_MUTEX_HPP

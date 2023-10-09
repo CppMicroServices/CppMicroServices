@@ -22,7 +22,7 @@
 #include <boost/asio/basic_waitable_timer.hpp>
 #include <boost/asio/detail/chrono.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Typedef for a timer based on the system clock.
@@ -31,13 +31,13 @@ namespace asio {
  * available. Otherwise, it may use the Boost.Chrono library. To explicitly
  * utilise Boost.Chrono, use the basic_waitable_timer template directly:
  * @code
- * typedef basic_waitable_timer<boost::chrono::system_clock> timer;
+ * typedef basic_waitable_timer<cppmsboost::chrono::system_clock> timer;
  * @endcode
  */
 typedef basic_waitable_timer<chrono::system_clock> system_timer;
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // defined(BOOST_ASIO_HAS_CHRONO) || defined(GENERATING_DOCUMENTATION)
 

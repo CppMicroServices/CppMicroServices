@@ -29,13 +29,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace local {
 
 /// Describes an endpoint for a UNIX socket.
 /**
- * The boost::asio::local::basic_endpoint class template describes an endpoint
+ * The cppmsboost::asio::local::basic_endpoint class template describes an endpoint
  * that may be associated with a particular UNIX socket.
  *
  * @par Thread Safety
@@ -57,7 +57,7 @@ public:
 #if defined(GENERATING_DOCUMENTATION)
   typedef implementation_defined data_type;
 #else
-  typedef boost::asio::detail::socket_addr_type data_type;
+  typedef cppmsboost::asio::detail::socket_addr_type data_type;
 #endif
 
   /// Default constructor.
@@ -213,7 +213,7 @@ public:
 
 private:
   // The underlying UNIX domain endpoint.
-  boost::asio::local::detail::endpoint impl_;
+  cppmsboost::asio::local::detail::endpoint impl_;
 };
 
 /// Output an endpoint as a string.
@@ -226,7 +226,7 @@ private:
  *
  * @return The output stream.
  *
- * @relates boost::asio::local::basic_endpoint
+ * @relates cppmsboost::asio::local::basic_endpoint
  */
 template <typename Elem, typename Traits, typename Protocol>
 std::basic_ostream<Elem, Traits>& operator<<(
@@ -239,7 +239,7 @@ std::basic_ostream<Elem, Traits>& operator<<(
 
 } // namespace local
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

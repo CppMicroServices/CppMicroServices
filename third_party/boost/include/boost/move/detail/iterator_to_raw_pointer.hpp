@@ -22,7 +22,7 @@
 #include <boost/move/detail/to_raw_pointer.hpp>
 #include <boost/move/detail/pointer_element.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace movelib {
 namespace detail {
 
@@ -31,29 +31,29 @@ inline T* iterator_to_pointer(T* i)
 {  return i; }
 
 template <class Iterator>
-inline typename boost::movelib::iterator_traits<Iterator>::pointer
+inline typename cppmsboost::movelib::iterator_traits<Iterator>::pointer
    iterator_to_pointer(const Iterator &i)
 {  return i.operator->();  }
 
 template <class Iterator>
 struct iterator_to_element_ptr
 {
-   typedef typename boost::movelib::iterator_traits<Iterator>::pointer  pointer;
-   typedef typename boost::movelib::pointer_element<pointer>::type      element_type;
+   typedef typename cppmsboost::movelib::iterator_traits<Iterator>::pointer  pointer;
+   typedef typename cppmsboost::movelib::pointer_element<pointer>::type      element_type;
    typedef element_type* type;
 };
 
 }  //namespace detail {
 
 template <class Iterator>
-inline typename boost::movelib::detail::iterator_to_element_ptr<Iterator>::type
+inline typename cppmsboost::movelib::detail::iterator_to_element_ptr<Iterator>::type
    iterator_to_raw_pointer(const Iterator &i)
 {
-   return ::boost::movelib::to_raw_pointer
-      (  ::boost::movelib::detail::iterator_to_pointer(i)   );
+   return ::cppmsboost::movelib::to_raw_pointer
+      (  ::cppmsboost::movelib::detail::iterator_to_pointer(i)   );
 }
 
 }  //namespace movelib {
-}  //namespace boost {
+}  //namespace cppmsboost {
 
 #endif   //#ifndef BOOST_MOVE_DETAIL_ITERATOR_TO_RAW_POINTER_HPP

@@ -32,7 +32,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 /// Automatically resizable buffer class based on std::streambuf.
@@ -76,7 +76,7 @@ namespace asio {
  * @par Examples
  * Writing directly from an streambuf to a socket:
  * @code
- * boost::asio::streambuf b;
+ * cppmsboost::asio::streambuf b;
  * std::ostream os(&b);
  * os << "Hello, World!\n";
  *
@@ -88,10 +88,10 @@ namespace asio {
  *
  * Reading from a socket directly into a streambuf:
  * @code
- * boost::asio::streambuf b;
+ * cppmsboost::asio::streambuf b;
  *
  * // reserve 512 bytes in output sequence
- * boost::asio::streambuf::mutable_buffers_type bufs = b.prepare(512);
+ * cppmsboost::asio::streambuf::mutable_buffers_type bufs = b.prepare(512);
  *
  * size_t n = sock.receive(bufs);
  *
@@ -192,7 +192,7 @@ public:
    */
   const_buffers_type data() const BOOST_ASIO_NOEXCEPT
   {
-    return boost::asio::buffer(boost::asio::const_buffer(gptr(),
+    return cppmsboost::asio::buffer(cppmsboost::asio::const_buffer(gptr(),
           (pptr() - gptr()) * sizeof(char_type)));
   }
 
@@ -215,7 +215,7 @@ public:
   mutable_buffers_type prepare(std::size_t n)
   {
     reserve(n);
-    return boost::asio::buffer(boost::asio::mutable_buffer(
+    return cppmsboost::asio::buffer(cppmsboost::asio::mutable_buffer(
           pptr(), n * sizeof(char_type)));
   }
 
@@ -336,8 +336,8 @@ protected:
       }
       else
       {
-        std::length_error ex("boost::asio::streambuf too long");
-        boost::asio::detail::throw_exception(ex);
+        std::length_error ex("cppmsboost::asio::streambuf too long");
+        cppmsboost::asio::detail::throw_exception(ex);
       }
     }
 
@@ -445,7 +445,7 @@ private:
 };
 
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

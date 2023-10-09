@@ -24,7 +24,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 
 class io_context;
@@ -143,7 +143,7 @@ private:
       const execution_context::service::key& key) const;
 
   // Mutex to protect access to internal data.
-  mutable boost::asio::detail::mutex mutex_;
+  mutable cppmsboost::asio::detail::mutex mutex_;
 
   // The owner of this service registry and the services it contains.
   execution_context& owner_;
@@ -154,7 +154,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

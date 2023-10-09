@@ -21,7 +21,7 @@
 #include "boost/type_traits/add_volatile.hpp"
 #include "boost/utility/result_of.hpp"
 
-namespace boost { 
+namespace cppmsboost { 
 namespace lambda {
 
 namespace detail {
@@ -30,15 +30,15 @@ BOOST_MPL_HAS_XXX_TEMPLATE_DEF(sig)
 
 template<class Tuple>
 struct remove_references_from_elements {
-  typedef typename boost::tuples::cons<
-    typename boost::remove_reference<typename Tuple::head_type>::type,
+  typedef typename cppmsboost::tuples::cons<
+    typename cppmsboost::remove_reference<typename Tuple::head_type>::type,
     typename remove_references_from_elements<typename Tuple::tail_type>::type
   > type;
 };
 
 template<>
-struct remove_references_from_elements<boost::tuples::null_type> {
-  typedef boost::tuples::null_type type;
+struct remove_references_from_elements<cppmsboost::tuples::null_type> {
+  typedef cppmsboost::tuples::null_type type;
 };
 
 }
@@ -48,7 +48,7 @@ template <class Func> struct function_adaptor {
   typedef typename detail::remove_reference_and_cv<Func>::type plainF;
 
 #if !defined(BOOST_NO_RESULT_OF)
-  // Support functors that use the boost::result_of return type convention.
+  // Support functors that use the cppmsboost::result_of return type convention.
   template<class Tuple, int Length, bool HasSig>
   struct result_converter;
   template<class Tuple, int Length>
@@ -239,26 +239,26 @@ struct function_adaptor<T Object::*> {
   // We get the return type by adding const, if the object through which
   // the data member is accessed is const, and finally adding a reference
   template<class Args> class sig { 
-    typedef typename boost::tuples::element<1, Args>::type argument_type;
-    typedef typename boost::remove_reference<
+    typedef typename cppmsboost::tuples::element<1, Args>::type argument_type;
+    typedef typename cppmsboost::remove_reference<
       argument_type
     >::type unref_type;
 
-    typedef typename detail::IF<boost::is_const<unref_type>::value,
-      typename boost::add_const<T>::type,
+    typedef typename detail::IF<cppmsboost::is_const<unref_type>::value,
+      typename cppmsboost::add_const<T>::type,
       T
     >::RET properly_consted_return_type;
 
-    typedef typename detail::IF<boost::is_volatile<unref_type>::value,
-      typename boost::add_volatile<properly_consted_return_type>::type,
+    typedef typename detail::IF<cppmsboost::is_volatile<unref_type>::value,
+      typename cppmsboost::add_volatile<properly_consted_return_type>::type,
       properly_consted_return_type
     >::RET properly_cvd_return_type;
 
 
   public:
-    typedef typename detail::IF<boost::is_reference<argument_type>::value,
-      typename boost::add_reference<properly_cvd_return_type>::type,
-      typename boost::remove_cv<T>::type
+    typedef typename detail::IF<cppmsboost::is_reference<argument_type>::value,
+      typename cppmsboost::add_reference<properly_cvd_return_type>::type,
+      typename cppmsboost::remove_cv<T>::type
     >::RET type;
   };
 
@@ -771,7 +771,7 @@ struct function_adaptor<Result (*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg
 };
 
 } // namespace lambda
-} // namespace boost
+} // namespace cppmsboost
 
 #endif
 

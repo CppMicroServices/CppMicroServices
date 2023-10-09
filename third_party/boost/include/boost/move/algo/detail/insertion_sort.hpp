@@ -33,7 +33,7 @@
 #include <boost/move/detail/placement_new.hpp>
 #include <boost/move/detail/iterator_to_raw_pointer.hpp>
 
-namespace boost {  namespace movelib{
+namespace cppmsboost {  namespace movelib{
 
 // @cond
 
@@ -75,18 +75,18 @@ void insertion_sort_copy(ForwardIterator first1, ForwardIterator last1, Birdirec
 template <class Compare, class BirdirectionalIterator>
 void insertion_sort(BirdirectionalIterator first, BirdirectionalIterator last, Compare comp)
 {
-   typedef typename boost::movelib::iterator_traits<BirdirectionalIterator>::value_type value_type;
+   typedef typename cppmsboost::movelib::iterator_traits<BirdirectionalIterator>::value_type value_type;
    if (first != last){
       BirdirectionalIterator i = first;
       for (++i; i != last; ++i){
          BirdirectionalIterator j = i;
          if (comp(*i,  *--j)) {
-            value_type tmp(::boost::move(*i));
-            *i = ::boost::move(*j);
+            value_type tmp(::cppmsboost::move(*i));
+            *i = ::cppmsboost::move(*j);
             for (BirdirectionalIterator k = j; k != first && comp(tmp,  *--k); --j) {
-               *j = ::boost::move(*k);
+               *j = ::cppmsboost::move(*k);
             }
-            *j = ::boost::move(tmp);
+            *j = ::cppmsboost::move(tmp);
          }
       }
    }
@@ -101,21 +101,21 @@ void insertion_sort_uninitialized_copy
    typedef typename iterator_traits<BirdirectionalIterator>::value_type value_type;
    if (first1 != last1){
       BirdirectionalRawIterator last2 = first2;
-      ::new((iterator_to_raw_pointer)(last2), boost_move_new_t()) value_type(::boost::move(*first1));
+      ::new((iterator_to_raw_pointer)(last2), boost_move_new_t()) value_type(::cppmsboost::move(*first1));
       destruct_n<value_type, BirdirectionalRawIterator> d(first2);
       d.incr();
       for (++last2; ++first1 != last1; ++last2){
          BirdirectionalRawIterator j2 = last2;
          BirdirectionalRawIterator k2 = j2;
          if (comp(*first1, *--k2)){
-            ::new((iterator_to_raw_pointer)(j2), boost_move_new_t()) value_type(::boost::move(*k2));
+            ::new((iterator_to_raw_pointer)(j2), boost_move_new_t()) value_type(::cppmsboost::move(*k2));
             d.incr();
             for (--j2; k2 != first2 && comp(*first1, *--k2); --j2)
-               *j2 = ::boost::move(*k2);
-            *j2 = ::boost::move(*first1);
+               *j2 = ::cppmsboost::move(*k2);
+            *j2 = ::cppmsboost::move(*first1);
          }
          else{
-            ::new((iterator_to_raw_pointer)(j2), boost_move_new_t()) value_type(::boost::move(*first1));
+            ::new((iterator_to_raw_pointer)(j2), boost_move_new_t()) value_type(::cppmsboost::move(*first1));
             d.incr();
          }
       }
@@ -123,6 +123,6 @@ void insertion_sort_uninitialized_copy
    }
 }
 
-}} //namespace boost {  namespace movelib{
+}} //namespace cppmsboost {  namespace movelib{
 
 #endif //#ifndef BOOST_MOVE_DETAIL_INSERT_SORT_HPP

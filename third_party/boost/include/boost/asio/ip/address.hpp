@@ -31,13 +31,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace ip {
 
 /// Implements version-independent IP addresses.
 /**
- * The boost::asio::ip::address class provides the ability to use either IP
+ * The cppmsboost::asio::ip::address class provides the ability to use either IP
  * version 4 or version 6 addresses.
  *
  * @par Thread Safety
@@ -52,11 +52,11 @@ public:
 
   /// Construct an address from an IPv4 address.
   BOOST_ASIO_DECL address(
-      const boost::asio::ip::address_v4& ipv4_address) BOOST_ASIO_NOEXCEPT;
+      const cppmsboost::asio::ip::address_v4& ipv4_address) BOOST_ASIO_NOEXCEPT;
 
   /// Construct an address from an IPv6 address.
   BOOST_ASIO_DECL address(
-      const boost::asio::ip::address_v6& ipv6_address) BOOST_ASIO_NOEXCEPT;
+      const cppmsboost::asio::ip::address_v6& ipv6_address) BOOST_ASIO_NOEXCEPT;
 
   /// Copy constructor.
   BOOST_ASIO_DECL address(const address& other) BOOST_ASIO_NOEXCEPT;
@@ -76,11 +76,11 @@ public:
 
   /// Assign from an IPv4 address.
   BOOST_ASIO_DECL address& operator=(
-      const boost::asio::ip::address_v4& ipv4_address) BOOST_ASIO_NOEXCEPT;
+      const cppmsboost::asio::ip::address_v4& ipv4_address) BOOST_ASIO_NOEXCEPT;
 
   /// Assign from an IPv6 address.
   BOOST_ASIO_DECL address& operator=(
-      const boost::asio::ip::address_v6& ipv6_address) BOOST_ASIO_NOEXCEPT;
+      const cppmsboost::asio::ip::address_v6& ipv6_address) BOOST_ASIO_NOEXCEPT;
 
   /// Get whether the address is an IP version 4 address.
   bool is_v4() const BOOST_ASIO_NOEXCEPT
@@ -95,17 +95,17 @@ public:
   }
 
   /// Get the address as an IP version 4 address.
-  BOOST_ASIO_DECL boost::asio::ip::address_v4 to_v4() const;
+  BOOST_ASIO_DECL cppmsboost::asio::ip::address_v4 to_v4() const;
 
   /// Get the address as an IP version 6 address.
-  BOOST_ASIO_DECL boost::asio::ip::address_v6 to_v6() const;
+  BOOST_ASIO_DECL cppmsboost::asio::ip::address_v6 to_v6() const;
 
   /// Get the address as a string.
   BOOST_ASIO_DECL std::string to_string() const;
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
   /// (Deprecated: Use other overload.) Get the address as a string.
-  BOOST_ASIO_DECL std::string to_string(boost::system::error_code& ec) const;
+  BOOST_ASIO_DECL std::string to_string(cppmsboost::system::error_code& ec) const;
 
   /// (Deprecated: Use make_address().) Create an address from an IPv4 address
   /// string in dotted decimal form, or from an IPv6 address in hexadecimal
@@ -115,7 +115,7 @@ public:
   /// (Deprecated: Use make_address().) Create an address from an IPv4 address
   /// string in dotted decimal form, or from an IPv6 address in hexadecimal
   /// notation.
-  static address from_string(const char* str, boost::system::error_code& ec);
+  static address from_string(const char* str, cppmsboost::system::error_code& ec);
 
   /// (Deprecated: Use make_address().) Create an address from an IPv4 address
   /// string in dotted decimal form, or from an IPv6 address in hexadecimal
@@ -126,7 +126,7 @@ public:
   /// string in dotted decimal form, or from an IPv6 address in hexadecimal
   /// notation.
   static address from_string(
-      const std::string& str, boost::system::error_code& ec);
+      const std::string& str, cppmsboost::system::error_code& ec);
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
 
   /// Determine whether the address is a loopback address.
@@ -179,10 +179,10 @@ private:
   enum { ipv4, ipv6 } type_;
 
   // The underlying IPv4 address.
-  boost::asio::ip::address_v4 ipv4_address_;
+  cppmsboost::asio::ip::address_v4 ipv4_address_;
 
   // The underlying IPv6 address.
-  boost::asio::ip::address_v6 ipv6_address_;
+  cppmsboost::asio::ip::address_v6 ipv6_address_;
 };
 
 /// Create an address from an IPv4 address string in dotted decimal form,
@@ -198,7 +198,7 @@ BOOST_ASIO_DECL address make_address(const char* str);
  * @relates address
  */
 BOOST_ASIO_DECL address make_address(const char* str,
-    boost::system::error_code& ec) BOOST_ASIO_NOEXCEPT;
+    cppmsboost::system::error_code& ec) BOOST_ASIO_NOEXCEPT;
 
 /// Create an address from an IPv4 address string in dotted decimal form,
 /// or from an IPv6 address in hexadecimal notation.
@@ -213,7 +213,7 @@ BOOST_ASIO_DECL address make_address(const std::string& str);
  * @relates address
  */
 BOOST_ASIO_DECL address make_address(const std::string& str,
-    boost::system::error_code& ec) BOOST_ASIO_NOEXCEPT;
+    cppmsboost::system::error_code& ec) BOOST_ASIO_NOEXCEPT;
 
 #if defined(BOOST_ASIO_HAS_STRING_VIEW) \
   || defined(GENERATING_DOCUMENTATION)
@@ -231,7 +231,7 @@ BOOST_ASIO_DECL address make_address(string_view str);
  * @relates address
  */
 BOOST_ASIO_DECL address make_address(string_view str,
-    boost::system::error_code& ec) BOOST_ASIO_NOEXCEPT;
+    cppmsboost::system::error_code& ec) BOOST_ASIO_NOEXCEPT;
 
 #endif // defined(BOOST_ASIO_HAS_STRING_VIEW)
        //  || defined(GENERATING_DOCUMENTATION)
@@ -248,7 +248,7 @@ BOOST_ASIO_DECL address make_address(string_view str,
  *
  * @return The output stream.
  *
- * @relates boost::asio::ip::address
+ * @relates cppmsboost::asio::ip::address
  */
 template <typename Elem, typename Traits>
 std::basic_ostream<Elem, Traits>& operator<<(
@@ -258,7 +258,7 @@ std::basic_ostream<Elem, Traits>& operator<<(
 
 } // namespace ip
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

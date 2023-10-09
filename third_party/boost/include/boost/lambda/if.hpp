@@ -21,7 +21,7 @@
 #include "boost/lambda/detail/operator_actions.hpp"
 #include "boost/lambda/detail/operator_return_type_traits.hpp"
 
-namespace boost { 
+namespace cppmsboost { 
 namespace lambda {
 
 // -- if control construct actions ----------------------
@@ -42,8 +42,8 @@ public:
 
   template<class RET, CALL_TEMPLATE_ARGS>
   RET call(CALL_FORMAL_ARGS) const {
-    if (detail::select(boost::tuples::get<0>(args), CALL_ACTUAL_ARGS)) 
-      detail::select(boost::tuples::get<1>(args), CALL_ACTUAL_ARGS); 
+    if (detail::select(cppmsboost::tuples::get<0>(args), CALL_ACTUAL_ARGS)) 
+      detail::select(cppmsboost::tuples::get<1>(args), CALL_ACTUAL_ARGS); 
   }
 };
 
@@ -78,10 +78,10 @@ public:
 
   template<class RET, CALL_TEMPLATE_ARGS>
   RET call(CALL_FORMAL_ARGS) const {
-    if (detail::select(boost::tuples::get<0>(args), CALL_ACTUAL_ARGS)) 
-      detail::select(boost::tuples::get<1>(args), CALL_ACTUAL_ARGS); 
+    if (detail::select(cppmsboost::tuples::get<0>(args), CALL_ACTUAL_ARGS)) 
+      detail::select(cppmsboost::tuples::get<1>(args), CALL_ACTUAL_ARGS); 
     else 
-      detail::select(boost::tuples::get<2>(args), CALL_ACTUAL_ARGS);
+      detail::select(cppmsboost::tuples::get<2>(args), CALL_ACTUAL_ARGS);
   }
 };
 
@@ -177,16 +177,16 @@ struct return_type_2_ifthenelsereturn<1, false, false, false, A, B> {
   // it is safe to add const, since the result will be an rvalue and thus
   // const anyway. The const are needed eg. if the types 
   // are 'const int*' and 'void *'. The remaining type should be 'const void*'
-  typedef const typename boost::remove_reference<A>::type plainA; 
-  typedef const typename boost::remove_reference<B>::type plainB; 
+  typedef const typename cppmsboost::remove_reference<A>::type plainA; 
+  typedef const typename cppmsboost::remove_reference<B>::type plainB; 
   // TODO: Add support for volatile ?
 
   typedef typename
        return_type_2_ifthenelsereturn<
          2,
-         boost::is_convertible<plainA,plainB>::value, 
-         boost::is_convertible<plainB,plainA>::value,
-         boost::is_same<plainA,plainB>::value,
+         cppmsboost::is_convertible<plainA,plainB>::value, 
+         cppmsboost::is_convertible<plainB,plainA>::value,
+         cppmsboost::is_same<plainA,plainB>::value,
          plainA, 
          plainB>::type type;
 };
@@ -278,7 +278,7 @@ struct return_type_2<other_action<ifthenelsereturn_action>, A, B> {
   typedef typename detail::array_to_pointer<B>::type B1;
 
   typedef typename 
-    boost::add_const<typename detail::same_or_not<A1, B1>::type>::type type;
+    cppmsboost::add_const<typename detail::same_or_not<A1, B1>::type>::type type;
 };
 
 // PHASE 1 : Deduction is based on the second and third operand
@@ -309,10 +309,10 @@ public:
 
   template<class RET, CALL_TEMPLATE_ARGS>
   RET call(CALL_FORMAL_ARGS) const {
-    return (detail::select(boost::tuples::get<0>(args), CALL_ACTUAL_ARGS)) ?
-       detail::select(boost::tuples::get<1>(args), CALL_ACTUAL_ARGS) 
+    return (detail::select(cppmsboost::tuples::get<0>(args), CALL_ACTUAL_ARGS)) ?
+       detail::select(cppmsboost::tuples::get<1>(args), CALL_ACTUAL_ARGS) 
     : 
-       detail::select(boost::tuples::get<2>(args), CALL_ACTUAL_ARGS);
+       detail::select(cppmsboost::tuples::get<2>(args), CALL_ACTUAL_ARGS);
   }
 };
 

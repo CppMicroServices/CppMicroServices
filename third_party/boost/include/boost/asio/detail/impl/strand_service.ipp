@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -42,9 +42,9 @@ struct strand_service::on_do_complete_exit
   }
 };
 
-strand_service::strand_service(boost::asio::io_context& io_context)
-  : boost::asio::detail::service_base<strand_service>(io_context),
-    io_context_(boost::asio::use_service<io_context_impl>(io_context)),
+strand_service::strand_service(cppmsboost::asio::io_context& io_context)
+  : cppmsboost::asio::detail::service_base<strand_service>(io_context),
+    io_context_(cppmsboost::asio::use_service<io_context_impl>(io_context)),
     mutex_(),
     salt_(0)
 {
@@ -54,7 +54,7 @@ void strand_service::shutdown()
 {
   op_queue<operation> ops;
 
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
 
   for (std::size_t i = 0; i < num_implementations; ++i)
   {
@@ -68,7 +68,7 @@ void strand_service::shutdown()
 
 void strand_service::construct(strand_service::implementation_type& impl)
 {
-  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
 
   std::size_t salt = salt_++;
 #if defined(BOOST_ASIO_ENABLE_SEQUENTIAL_STRAND_ALLOCATION)
@@ -146,7 +146,7 @@ void strand_service::do_post(implementation_type& impl,
 }
 
 void strand_service::do_complete(void* owner, operation* base,
-    const boost::system::error_code& ec, std::size_t /*bytes_transferred*/)
+    const cppmsboost::system::error_code& ec, std::size_t /*bytes_transferred*/)
 {
   if (owner)
   {
@@ -172,7 +172,7 @@ void strand_service::do_complete(void* owner, operation* base,
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

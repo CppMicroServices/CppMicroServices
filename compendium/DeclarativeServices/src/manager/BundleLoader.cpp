@@ -20,6 +20,8 @@
 
   =============================================================================*/
 
+#include "cppmicroservices/SecurityException.h"
+
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/SharedLibrary.h"
@@ -102,6 +104,26 @@ namespace cppmicroservices
             }
             else
             {
+                Any func = fromBundle.GetBundleContext().GetProperty(
+                    cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
+                try
+                {
+                    if (!func.Empty()
+                        && !any_cast<std::function<bool(cppmicroservices::Bundle const&)>>(func)(fromBundle))
+                    {
+                        std::string errMsg("Bundle at location " + bundleLoc + " failed bundle validation.");
+                        throw SecurityException{ std::move(errMsg), fromBundle };
+                    }
+                }
+                catch (cppmicroservices::SecurityException const&)
+                {
+                    throw;
+                }
+                catch (...)
+                {
+                    throw SecurityException { "The bundle validation callback threw an exception", fromBundle};
+                }
+
                 SharedLibrary sh(bundleLoc);
                 try
                 {

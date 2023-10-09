@@ -30,7 +30,7 @@
 #pragma warning(pop)
 #endif
 
-namespace boost{
+namespace cppmsboost{
 namespace BOOST_REGEX_DETAIL_NS{
 
 #if defined(BOOST_NO_STD_ITERATOR_TRAITS)
@@ -118,7 +118,7 @@ struct regex_iterator_traits : public std::iterator_traits<T> {};
 #endif
 
 } // namespace BOOST_REGEX_DETAIL_NS
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(push)

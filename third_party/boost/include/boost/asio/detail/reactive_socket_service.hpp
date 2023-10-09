@@ -40,7 +40,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -122,8 +122,8 @@ public:
   }
 
   // Open a new socket implementation.
-  boost::system::error_code open(implementation_type& impl,
-      const protocol_type& protocol, boost::system::error_code& ec)
+  cppmsboost::system::error_code open(implementation_type& impl,
+      const protocol_type& protocol, cppmsboost::system::error_code& ec)
   {
     if (!do_open(impl, protocol.family(),
           protocol.type(), protocol.protocol(), ec))
@@ -132,9 +132,9 @@ public:
   }
 
   // Assign a native socket to a socket implementation.
-  boost::system::error_code assign(implementation_type& impl,
+  cppmsboost::system::error_code assign(implementation_type& impl,
       const protocol_type& protocol, const native_handle_type& native_socket,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     if (!do_assign(impl, protocol.type(), native_socket, ec))
       impl.protocol_ = protocol;
@@ -148,8 +148,8 @@ public:
   }
 
   // Bind the socket to the specified local endpoint.
-  boost::system::error_code bind(implementation_type& impl,
-      const endpoint_type& endpoint, boost::system::error_code& ec)
+  cppmsboost::system::error_code bind(implementation_type& impl,
+      const endpoint_type& endpoint, cppmsboost::system::error_code& ec)
   {
     socket_ops::bind(impl.socket_, endpoint.data(), endpoint.size(), ec);
     return ec;
@@ -157,8 +157,8 @@ public:
 
   // Set a socket option.
   template <typename Option>
-  boost::system::error_code set_option(implementation_type& impl,
-      const Option& option, boost::system::error_code& ec)
+  cppmsboost::system::error_code set_option(implementation_type& impl,
+      const Option& option, cppmsboost::system::error_code& ec)
   {
     socket_ops::setsockopt(impl.socket_, impl.state_,
         option.level(impl.protocol_), option.name(impl.protocol_),
@@ -168,8 +168,8 @@ public:
 
   // Set a socket option.
   template <typename Option>
-  boost::system::error_code get_option(const implementation_type& impl,
-      Option& option, boost::system::error_code& ec) const
+  cppmsboost::system::error_code get_option(const implementation_type& impl,
+      Option& option, cppmsboost::system::error_code& ec) const
   {
     std::size_t size = option.size(impl.protocol_);
     socket_ops::getsockopt(impl.socket_, impl.state_,
@@ -182,7 +182,7 @@ public:
 
   // Get the local endpoint.
   endpoint_type local_endpoint(const implementation_type& impl,
-      boost::system::error_code& ec) const
+      cppmsboost::system::error_code& ec) const
   {
     endpoint_type endpoint;
     std::size_t addr_len = endpoint.capacity();
@@ -194,7 +194,7 @@ public:
 
   // Get the remote endpoint.
   endpoint_type remote_endpoint(const implementation_type& impl,
-      boost::system::error_code& ec) const
+      cppmsboost::system::error_code& ec) const
   {
     endpoint_type endpoint;
     std::size_t addr_len = endpoint.capacity();
@@ -206,8 +206,8 @@ public:
   }
 
   // Disable sends or receives on the socket.
-  boost::system::error_code shutdown(base_implementation_type& impl,
-      socket_base::shutdown_type what, boost::system::error_code& ec)
+  cppmsboost::system::error_code shutdown(base_implementation_type& impl,
+      socket_base::shutdown_type what, cppmsboost::system::error_code& ec)
   {
     socket_ops::shutdown(impl.socket_, what, ec);
     return ec;
@@ -218,9 +218,9 @@ public:
   template <typename ConstBufferSequence>
   size_t send_to(implementation_type& impl, const ConstBufferSequence& buffers,
       const endpoint_type& destination, socket_base::message_flags flags,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
-    buffer_sequence_adapter<boost::asio::const_buffer,
+    buffer_sequence_adapter<cppmsboost::asio::const_buffer,
         ConstBufferSequence> bufs(buffers);
 
     return socket_ops::sync_sendto(impl.socket_, impl.state_,
@@ -231,7 +231,7 @@ public:
   // Wait until data can be sent without blocking.
   size_t send_to(implementation_type& impl, const null_buffers&,
       const endpoint_type&, socket_base::message_flags,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     // Wait for socket to become ready.
     socket_ops::poll_write(impl.socket_, impl.state_, -1, ec);
@@ -248,12 +248,12 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_socket_sendto_op<ConstBufferSequence,
         endpoint_type, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.socket_, buffers,
         destination, flags, handler, io_ex);
@@ -272,11 +272,11 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_null_buffers_op<Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(handler, io_ex);
 
@@ -293,9 +293,9 @@ public:
   size_t receive_from(implementation_type& impl,
       const MutableBufferSequence& buffers,
       endpoint_type& sender_endpoint, socket_base::message_flags flags,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
-    buffer_sequence_adapter<boost::asio::mutable_buffer,
+    buffer_sequence_adapter<cppmsboost::asio::mutable_buffer,
         MutableBufferSequence> bufs(buffers);
 
     std::size_t addr_len = sender_endpoint.capacity();
@@ -312,7 +312,7 @@ public:
   // Wait until data can be received without blocking.
   size_t receive_from(implementation_type& impl, const null_buffers&,
       endpoint_type& sender_endpoint, socket_base::message_flags,
-      boost::system::error_code& ec)
+      cppmsboost::system::error_code& ec)
   {
     // Wait for socket to become ready.
     socket_ops::poll_read(impl.socket_, impl.state_, -1, ec);
@@ -334,12 +334,12 @@ public:
       const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_socket_recvfrom_op<MutableBufferSequence,
         endpoint_type, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     int protocol = impl.protocol_.type();
     p.p = new (p.v) op(impl.socket_, protocol, buffers,
@@ -362,11 +362,11 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_null_buffers_op<Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(handler, io_ex);
 
@@ -385,13 +385,13 @@ public:
 
   // Accept a new connection.
   template <typename Socket>
-  boost::system::error_code accept(implementation_type& impl,
-      Socket& peer, endpoint_type* peer_endpoint, boost::system::error_code& ec)
+  cppmsboost::system::error_code accept(implementation_type& impl,
+      Socket& peer, endpoint_type* peer_endpoint, cppmsboost::system::error_code& ec)
   {
     // We cannot accept a socket that is already open.
     if (peer.is_open())
     {
-      ec = boost::asio::error::already_open;
+      ec = cppmsboost::asio::error::already_open;
       return ec;
     }
 
@@ -420,11 +420,11 @@ public:
       endpoint_type* peer_endpoint, Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_socket_accept_op<Socket, Protocol, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.socket_, impl.state_, peer,
         impl.protocol_, peer_endpoint, handler, io_ex);
@@ -445,12 +445,12 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_socket_move_accept_op<Protocol,
         PeerIoExecutor, Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(peer_io_ex, impl.socket_, impl.state_,
         impl.protocol_, peer_endpoint, handler, io_ex);
@@ -464,8 +464,8 @@ public:
 #endif // defined(BOOST_ASIO_HAS_MOVE)
 
   // Connect the socket to the specified endpoint.
-  boost::system::error_code connect(implementation_type& impl,
-      const endpoint_type& peer_endpoint, boost::system::error_code& ec)
+  cppmsboost::system::error_code connect(implementation_type& impl,
+      const endpoint_type& peer_endpoint, cppmsboost::system::error_code& ec)
   {
     socket_ops::sync_connect(impl.socket_,
         peer_endpoint.data(), peer_endpoint.size(), ec);
@@ -479,11 +479,11 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      boost_asio_handler_cont_helpers::is_continuation(handler);
+      cppmsboost_asio_handler_cont_helpers::is_continuation(handler);
 
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_socket_connect_op<Handler, IoExecutor> op;
-    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    typename op::ptr p = { cppmsboost::asio::detail::addressof(handler),
       op::ptr::allocate(handler), 0 };
     p.p = new (p.v) op(impl.socket_, handler, io_ex);
 
@@ -498,7 +498,7 @@ public:
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -481,7 +481,7 @@ namespace std {
 // (with -pedantic -ansi) unless it's use is prefixed by __extension__
 //
 #if defined(BOOST_HAS_LONG_LONG) && defined(__cplusplus)
-namespace boost{
+namespace cppmsboost{
 #  ifdef __GNUC__
    __extension__ typedef long long long_long_type;
    __extension__ typedef unsigned long long ulong_long_type;
@@ -493,7 +493,7 @@ namespace boost{
 #endif
 // same again for __int128:
 #if defined(BOOST_HAS_INT128) && defined(__cplusplus)
-namespace boost{
+namespace cppmsboost{
 #  ifdef __GNUC__
    __extension__ typedef __int128 int128_type;
    __extension__ typedef unsigned __int128 uint128_type;
@@ -505,7 +505,7 @@ namespace boost{
 #endif
 // same again for __float128:
 #if defined(BOOST_HAS_FLOAT128) && defined(__cplusplus)
-namespace boost {
+namespace cppmsboost {
 #  ifdef __GNUC__
    __extension__ typedef __float128 float128_type;
 #  else

@@ -31,7 +31,7 @@
 #pragma warning(pop)
 #endif
 
-namespace boost{
+namespace cppmsboost{
 
 namespace deprecated{
 //
@@ -64,7 +64,7 @@ public:
 };
 #endif
 } // namespace deprecated
-} // namespace boost
+} // namespace cppmsboost
 
 #ifdef BOOST_MSVC
 #pragma warning(push)

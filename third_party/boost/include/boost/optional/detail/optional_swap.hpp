@@ -16,7 +16,7 @@
 #include <boost/core/swap.hpp>
 #include <boost/optional/optional_fwd.hpp>
 
-namespace boost {
+namespace cppmsboost {
 
 namespace optional_detail {
 
@@ -40,12 +40,12 @@ struct swap_selector<true>
             y.emplace();
 
         // Boost.Utility.Swap will take care of ADL and workarounds for broken compilers
-        boost::swap(x.get(), y.get());
+        cppmsboost::swap(x.get(), y.get());
 
         if( !hasX )
-            y = boost::none ;
+            y = cppmsboost::none ;
         else if( !hasY )
-            x = boost::none ;
+            x = cppmsboost::none ;
     }
 };
 
@@ -54,7 +54,7 @@ struct swap_selector<true>
 #endif
 
 #ifndef BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
-# define BOOST_OPTIONAL_DETAIL_MOVE(EXPR_) boost::move(EXPR_)
+# define BOOST_OPTIONAL_DETAIL_MOVE(EXPR_) cppmsboost::move(EXPR_)
 #else
 # define BOOST_OPTIONAL_DETAIL_MOVE(EXPR_) EXPR_
 #endif
@@ -64,18 +64,18 @@ struct swap_selector<false>
 {
     template <class T>
     static void optional_swap ( optional<T>& x, optional<T>& y ) 
-    //BOOST_NOEXCEPT_IF(::boost::is_nothrow_move_constructible<T>::value && BOOST_NOEXCEPT_EXPR(boost::swap(*x, *y)))
+    //BOOST_NOEXCEPT_IF(::cppmsboost::is_nothrow_move_constructible<T>::value && BOOST_NOEXCEPT_EXPR(cppmsboost::swap(*x, *y)))
     {
         if (x)
         {
             if (y)
             {
-                boost::swap(*x, *y);
+                cppmsboost::swap(*x, *y);
             }
             else
             {
                 y = BOOST_OPTIONAL_DETAIL_MOVE(*x);
-                x = boost::none;
+                x = cppmsboost::none;
             }
         }
         else
@@ -83,7 +83,7 @@ struct swap_selector<false>
             if (y)
             {
                 x = BOOST_OPTIONAL_DETAIL_MOVE(*y);
-                y = boost::none;
+                y = cppmsboost::none;
             }
         }
     }
@@ -94,7 +94,7 @@ struct swap_selector<false>
 #if (!defined BOOST_NO_CXX11_RVALUE_REFERENCES) && (!defined BOOST_CONFIG_RESTORE_OBSOLETE_SWAP_IMPLEMENTATION)
 
 template<class T>
-struct optional_swap_should_use_default_constructor : boost::false_type {} ;
+struct optional_swap_should_use_default_constructor : cppmsboost::false_type {} ;
 
 #else
 
@@ -105,12 +105,12 @@ struct optional_swap_should_use_default_constructor : has_nothrow_default_constr
 
 template <class T>
 inline void swap ( optional<T>& x, optional<T>& y )
-//BOOST_NOEXCEPT_IF(::boost::is_nothrow_move_constructible<T>::value && BOOST_NOEXCEPT_EXPR(boost::swap(*x, *y)))
+//BOOST_NOEXCEPT_IF(::cppmsboost::is_nothrow_move_constructible<T>::value && BOOST_NOEXCEPT_EXPR(cppmsboost::swap(*x, *y)))
 {
     optional_detail::swap_selector<optional_swap_should_use_default_constructor<T>::value>::optional_swap(x, y);
 }
 
-} // namespace boost
+} // namespace cppmsboost
 
 #undef BOOST_OPTIONAL_DETAIL_MOVE
 

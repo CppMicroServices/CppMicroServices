@@ -22,7 +22,7 @@
 
 #include <boost/asio/windows/basic_random_access_handle.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace windows {
 
@@ -31,7 +31,7 @@ typedef basic_random_access_handle<> random_access_handle;
 
 } // namespace windows
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // defined(BOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE)
        //   || defined(GENERATING_DOCUMENTATION)

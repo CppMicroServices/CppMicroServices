@@ -8,10 +8,10 @@
 
 #ifdef BOOST_EXCEPTION_MINI_BOOST
 #include  <memory>
-namespace boost { namespace exception_detail { using std::shared_ptr; } }
+namespace cppmsboost { namespace exception_detail { using std::shared_ptr; } }
 #else
 #include <boost/shared_ptr.hpp>
-namespace boost { namespace exception_detail { using boost::shared_ptr; } }
+namespace cppmsboost { namespace exception_detail { using cppmsboost::shared_ptr; } }
 #endif
 
 #endif

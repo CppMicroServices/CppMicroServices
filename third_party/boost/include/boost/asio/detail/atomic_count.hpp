@@ -25,7 +25,7 @@
 # include <boost/detail/atomic_count.hpp>
 #endif // defined(BOOST_ASIO_HAS_STD_ATOMIC)
 
-namespace boost {
+namespace cppmsboost {
 namespace asio {
 namespace detail {
 
@@ -36,12 +36,12 @@ inline void increment(atomic_count& a, long b) { a += b; }
 typedef std::atomic<long> atomic_count;
 inline void increment(atomic_count& a, long b) { a += b; }
 #else // defined(BOOST_ASIO_HAS_STD_ATOMIC)
-typedef boost::detail::atomic_count atomic_count;
+typedef cppmsboost::detail::atomic_count atomic_count;
 inline void increment(atomic_count& a, long b) { while (b > 0) ++a, --b; }
 #endif // defined(BOOST_ASIO_HAS_STD_ATOMIC)
 
 } // namespace detail
 } // namespace asio
-} // namespace boost
+} // namespace cppmsboost
 
 #endif // BOOST_ASIO_DETAIL_ATOMIC_COUNT_HPP

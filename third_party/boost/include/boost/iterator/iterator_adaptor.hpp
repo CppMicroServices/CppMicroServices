@@ -31,13 +31,13 @@
 
 #include <boost/iterator/iterator_traits.hpp>
 
-namespace boost {
+namespace cppmsboost {
 namespace iterators {
 
   // Used as a default template argument internally, merely to
   // indicate "use the default", this can also be passed by users
   // explicitly in order to specify that the default should be used.
-  using boost::use_default;
+  using cppmsboost::use_default;
 
 } // namespace iterators
 
@@ -90,7 +90,7 @@ namespace iterators {
   // enable_if_convertible is used to remove those overloads from the overload
   // set that cannot be instantiated. For all practical purposes only overloads
   // for constant/mutable interaction will remain. This has the advantage that
-  // meta functions like boost::is_convertible do not return false positives,
+  // meta functions like cppmsboost::is_convertible do not return false positives,
   // as they can only look at the signature of the conversion constructor
   // and not at the actual instantiation.
   //
@@ -98,7 +98,7 @@ namespace iterators {
   // always enabled for compilers that don't support enable_if or is_convertible.
   // There is no need for compiler specific workarounds in user code.
   //
-  // The operators implementation relies on boost::is_convertible not returning
+  // The operators implementation relies on cppmsboost::is_convertible not returning
   // false positives for user/library defined iterator types. See comments
   // on operator implementation for consequences.
   //
@@ -107,7 +107,7 @@ namespace iterators {
   template <class From, class To>
   struct enable_if_convertible
   {
-      typedef boost::iterators::detail::enable_type type;
+      typedef cppmsboost::iterators::detail::enable_type type;
   };
 
 #  elif BOOST_WORKAROUND(_MSC_FULL_VER, BOOST_TESTED_AT(13102292))
@@ -121,7 +121,7 @@ namespace iterators {
             is_same<From,To>
           , is_convertible<From, To>
         >
-      , boost::iterators::detail::enable_type
+      , cppmsboost::iterators::detail::enable_type
     >
   {};
 
@@ -131,7 +131,7 @@ namespace iterators {
   struct enable_if_convertible
     : iterators::enable_if<
           is_convertible<From, To>
-        , boost::iterators::detail::enable_type
+        , cppmsboost::iterators::detail::enable_type
       >
   {};
 
@@ -170,7 +170,7 @@ namespace iterators {
             Derived
 
 # ifdef BOOST_ITERATOR_REF_CONSTNESS_KILLS_WRITABILITY
-          , typename boost::iterators::detail::ia_dflt_help<
+          , typename cppmsboost::iterators::detail::ia_dflt_help<
                 Value
               , mpl::eval_if<
                     is_same<Reference,use_default>
@@ -179,17 +179,17 @@ namespace iterators {
                 >
             >::type
 # else
-          , typename boost::iterators::detail::ia_dflt_help<
+          , typename cppmsboost::iterators::detail::ia_dflt_help<
                 Value, iterator_value<Base>
             >::type
 # endif
 
-          , typename boost::iterators::detail::ia_dflt_help<
+          , typename cppmsboost::iterators::detail::ia_dflt_help<
                 Traversal
               , iterator_traversal<Base>
             >::type
 
-          , typename boost::iterators::detail::ia_dflt_help<
+          , typename cppmsboost::iterators::detail::ia_dflt_help<
                 Reference
               , mpl::eval_if<
                     is_same<Value,use_default>
@@ -198,7 +198,7 @@ namespace iterators {
                 >
             >::type
 
-          , typename boost::iterators::detail::ia_dflt_help<
+          , typename cppmsboost::iterators::detail::ia_dflt_help<
                 Difference, iterator_difference<Base>
             >::type
         >
@@ -247,14 +247,14 @@ namespace iterators {
     , class Difference   = use_default
   >
   class iterator_adaptor
-    : public boost::iterators::detail::iterator_adaptor_base<
+    : public cppmsboost::iterators::detail::iterator_adaptor_base<
         Derived, Base, Value, Traversal, Reference, Difference
       >::type
   {
       friend class iterator_core_access;
 
    protected:
-      typedef typename boost::iterators::detail::iterator_adaptor_base<
+      typedef typename cppmsboost::iterators::detail::iterator_adaptor_base<
           Derived, Base, Value, Traversal, Reference, Difference
       >::type super_t;
    public:
@@ -310,7 +310,7 @@ namespace iterators {
       >::type my_traversal;
 
 # define BOOST_ITERATOR_ADAPTOR_ASSERT_TRAVERSAL(cat) \
-      boost::iterators::detail::iterator_adaptor_assert_traversal<my_traversal, cat>();
+      cppmsboost::iterators::detail::iterator_adaptor_assert_traversal<my_traversal, cat>();
 
       void advance(typename super_t::difference_type n)
       {
@@ -351,7 +351,7 @@ namespace iterators {
 using iterators::iterator_adaptor;
 using iterators::enable_if_convertible;
 
-} // namespace boost
+} // namespace cppmsboost
 
 #include <boost/iterator/detail/config_undef.hpp>
 

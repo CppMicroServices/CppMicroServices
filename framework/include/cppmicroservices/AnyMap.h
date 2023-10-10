@@ -222,7 +222,7 @@ namespace cppmicroservices
         /**
          * @brief initializer_list constructor
          *
-         * Construct an AnyMap of type "type"with the content of the
+         * Construct an AnyMap of type "type" with the content of the
          * initialized with the content of the the initializer list. Allows for inline
          * initialization akin to:
          *
@@ -404,7 +404,7 @@ namespace cppmicroservices
         /**
          * @brief initializer_list constructor
          *
-         * Construct an AnyMap of type "type"with the content of the
+         * Construct an AnyMap of type "type" with the content of the
          * initialized with the content of the the initializer list. Allows for inline
          * initialization akin to:
          *

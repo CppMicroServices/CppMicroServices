@@ -263,6 +263,26 @@ namespace test
         EXPECT_FALSE(static_cast<bool>(sRef2)) << "Service must not be available after it's dependency is removed";
     }
 
+    /**
+     * Verify that Declarative Services data stored in the bundle is initialized for an immediate component
+     * Currently the only applicable data is the BundleContextPrivate used by GetBundleContext
+     */
+    TEST_F(tServiceComponent, testImmediateComponent_Initialization) {
+        auto testBundle = StartTestBundle("TestBundleDSTOI20");
+        auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent20");
+        auto compConfigDTOs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+        EXPECT_EQ(compConfigDTOs.size(), 1ul);
+
+        auto ctxt = testBundle.GetBundleContext();
+        ASSERT_TRUE(ctxt);
+        auto sRef = ctxt.GetServiceReference<test::TestInitialization>();
+        auto service = ctxt.GetService(sRef);
+        std::vector<cppmicroservices::BundleContext> ctxt2 = service->GetContexts();
+        ASSERT_EQ(ctxt2.size(), 2);
+        EXPECT_TRUE(ctxt == ctxt2[0]) << "Service's activator must be provided with its bundle context";
+        EXPECT_TRUE(ctxt == ctxt2[1]) << "Service's US_GET_CTX_FUNC must return the bundle context";
+    }
+
     TEST_F(tServiceComponent, testDependencyInjection) // DS_TOI_18
     {
         auto testBundle = StartTestBundle("TestBundleDSTOI18");

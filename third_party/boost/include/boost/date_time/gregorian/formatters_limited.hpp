@@ -15,7 +15,7 @@
 #include "boost/date_time/date_format_simple.hpp"
 #include "boost/date_time/compiler_config.hpp"
 
-namespace cppmsboost {
+namespace boost {
 namespace gregorian {
 
   //! To YYYY-mmm-DD string where mmm 3 char month name. Example:  2002-Jan-01

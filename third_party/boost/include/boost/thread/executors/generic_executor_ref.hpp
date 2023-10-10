@@ -18,7 +18,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace cppmsboost
+namespace boost
 {
   namespace executors
   {
@@ -70,7 +70,7 @@ namespace cppmsboost
      * Whatever exception that can be throw while storing the closure.
      */
     void submit(BOOST_THREAD_RV_REF(work) closure) {
-      ex.submit(cppmsboost::move(closure));
+      ex.submit(boost::move(closure));
     }
 //    void submit(work& closure) {
 //      ex.submit(closure);
@@ -140,7 +140,7 @@ namespace cppmsboost
 
     void submit(BOOST_THREAD_RV_REF(work) closure)
     {
-      ex->submit(cppmsboost::move(closure));
+      ex->submit(boost::move(closure));
     }
 
 #if defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
@@ -148,22 +148,22 @@ namespace cppmsboost
     void submit(Closure & closure)
     {
       //work w ((closure));
-      //submit(cppmsboost::move(w));
+      //submit(boost::move(w));
       submit(work(closure));
     }
 #endif
     void submit(void (*closure)())
     {
       work w ((closure));
-      submit(cppmsboost::move(w));
+      submit(boost::move(w));
       //submit(work(closure));
     }
 
     template <typename Closure>
     void submit(BOOST_THREAD_FWD_REF(Closure) closure)
     {
-      work w((cppmsboost::forward<Closure>(closure)));
-      submit(cppmsboost::move(w));
+      work w((boost::forward<Closure>(closure)));
+      submit(boost::move(w));
     }
 
 //    size_t num_pending_closures() const

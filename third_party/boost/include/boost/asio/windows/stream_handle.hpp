@@ -22,7 +22,7 @@
 
 #include <boost/asio/windows/basic_stream_handle.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace windows {
 
@@ -31,7 +31,7 @@ typedef basic_stream_handle<> stream_handle;
 
 } // namespace windows
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // defined(BOOST_ASIO_HAS_WINDOWS_STREAM_HANDLE)
        //   || defined(GENERATING_DOCUMENTATION)

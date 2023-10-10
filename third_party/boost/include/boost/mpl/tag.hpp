@@ -19,7 +19,7 @@
 #include <boost/mpl/aux_/has_tag.hpp>
 #include <boost/mpl/aux_/config/eti.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 namespace aux {
 template< typename T > struct tag_impl

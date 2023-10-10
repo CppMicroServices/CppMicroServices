@@ -22,7 +22,7 @@
 #include <boost/mpl/aux_/config/ctps.hpp>
 #include <boost/mpl/aux_/config/workaround.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
 

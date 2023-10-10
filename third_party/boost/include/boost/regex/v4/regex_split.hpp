@@ -21,7 +21,7 @@
 #ifndef BOOST_REGEX_SPLIT_HPP
 #define BOOST_REGEX_SPLIT_HPP
 
-namespace cppmsboost{
+namespace boost{
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -167,7 +167,7 @@ inline std::size_t regex_split(OutputIterator out,
 #pragma warning(pop)
 #endif
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif
 

@@ -31,7 +31,7 @@
     header which contains specializations for all stl containers.
 */
 
-namespace cppmsboost {
+namespace boost {
     namespace algorithm {
 
 //  sequence traits  -----------------------------------------------//
@@ -114,7 +114,7 @@ namespace cppmsboost {
         };
 
     } // namespace algorithm
-} // namespace cppmsboost
+} // namespace boost
 
 
 #endif  // BOOST_STRING_SEQUENCE_TRAITS_HPP

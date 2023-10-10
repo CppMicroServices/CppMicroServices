@@ -25,9 +25,8 @@
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Constants.h"
 
-#include "absl/strings/str_cat.h"
-
 #include "Properties.h"
+#include "Utils.h"
 
 #include "PropsCheck.h"
 
@@ -347,7 +346,7 @@ namespace cppmicroservices
 
             if (!Trim(ps.rest()).empty())
             {
-                ps.error(absl::StrCat(LDAPExprConstants::GARBAGE(), " '", ps.rest(), "'"));
+                ps.error(StringCatFast(LDAPExprConstants::GARBAGE(), " '", ps.rest(), "'"));
             }
 
             d = expr.d;
@@ -1191,7 +1190,7 @@ namespace cppmicroservices
     void
     LDAPExpr::ParseState::error(std::string const& m) const
     {
-        std::string errorStr = absl::StrCat(m, ": ", (m_str.empty() ? "" : m_str.substr(m_pos)));
+        std::string errorStr = StringCatFast(m, ": ", (m_str.empty() ? "" : m_str.substr(m_pos)));
         throw std::invalid_argument(errorStr);
     }
 } // namespace cppmicroservices

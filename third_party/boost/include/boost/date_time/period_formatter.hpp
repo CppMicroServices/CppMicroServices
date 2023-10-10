@@ -15,7 +15,7 @@
 #include <vector>
 #include <iterator>
 
-namespace cppmsboost { namespace date_time {
+namespace boost { namespace date_time {
 
 
   //! Not a facet, but a class used to specify and control period formats
@@ -195,6 +195,6 @@ namespace cppmsboost { namespace date_time {
   const typename period_formatter<CharT, OutItrT>::char_type
   period_formatter<CharT, OutItrT>::default_period_closed_range_end_delimeter[2] = {']'};
 
- } } //namespace cppmsboost::date_time
+ } } //namespace boost::date_time
 
 #endif

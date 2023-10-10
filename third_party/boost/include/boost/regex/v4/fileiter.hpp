@@ -48,7 +48,7 @@
 
 #include <cstddef>
 
-namespace cppmsboost{
+namespace boost{
    namespace BOOST_REGEX_DETAIL_NS{
 
 #ifndef BOOST_NO_ANSI_APIS
@@ -60,7 +60,7 @@ typedef HANDLE _fi_find_handle;
 
    } // namespace BOOST_REGEX_DETAIL_NS
 
-} // namespace cppmsboost
+} // namespace boost
 
 #define _fi_invalid_handle INVALID_HANDLE_VALUE
 #define _fi_dir FILE_ATTRIBUTE_DIRECTORY
@@ -83,7 +83,7 @@ using std::list;
 #define MAX_PATH 256
 #endif
 
-namespace cppmsboost{
+namespace boost{
    namespace BOOST_REGEX_DETAIL_NS{
 
 #ifdef BOOST_HAS_ABI_HEADERS
@@ -111,7 +111,7 @@ bool _fi_FindClose(_fi_find_handle hFindFile);
 #endif
 
    } // namespace BOOST_REGEX_DETAIL_NS
-} // namespace cppmsboost
+} // namespace boost
 
 #ifdef FindFirstFile
  #undef FindFirstFile
@@ -129,7 +129,7 @@ bool _fi_FindClose(_fi_find_handle hFindFile);
 
 #endif
 
-namespace cppmsboost{
+namespace boost{
    namespace BOOST_REGEX_DETAIL_NS{
 
 #ifdef BOOST_HAS_ABI_HEADERS
@@ -425,10 +425,10 @@ inline bool operator < (const directory_iterator&, const directory_iterator&)
 
 
 } // namespace BOOST_REGEX_DETAIL_NS
-using cppmsboost::BOOST_REGEX_DETAIL_NS::directory_iterator;
-using cppmsboost::BOOST_REGEX_DETAIL_NS::file_iterator;
-using cppmsboost::BOOST_REGEX_DETAIL_NS::mapfile;
-} // namespace cppmsboost
+using boost::BOOST_REGEX_DETAIL_NS::directory_iterator;
+using boost::BOOST_REGEX_DETAIL_NS::file_iterator;
+using boost::BOOST_REGEX_DETAIL_NS::mapfile;
+} // namespace boost
 
 #endif     // BOOST_REGEX_NO_FILEITER
 #endif     // BOOST_RE_FILEITER_HPP

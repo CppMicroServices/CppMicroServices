@@ -17,7 +17,7 @@
 
 #include <boost/asio/detail/config.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -37,6 +37,6 @@ typedef class select_reactor reactor;
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ASIO_DETAIL_REACTOR_FWD_HPP

@@ -25,18 +25,18 @@
 #pragma once
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace atomics {
 namespace detail {
 
 #if !defined(BOOST_ATOMIC_DETAIL_NO_CXX11_BASIC_HDR_TYPE_TRAITS)
 using std::is_function;
 #else
-using cppmsboost::is_function;
+using boost::is_function;
 #endif
 
 } // namespace detail
 } // namespace atomics
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ATOMIC_DETAIL_TYPE_TRAITS_IS_FUNCTION_HPP_INCLUDED_

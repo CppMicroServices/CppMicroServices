@@ -10,7 +10,7 @@
 #define BOOST_SPIRIT_MATCH_IPP
 #include <algorithm>
 
-namespace cppmsboost { namespace spirit {
+namespace boost { namespace spirit {
 
 BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 
@@ -107,7 +107,7 @@ BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 
 BOOST_SPIRIT_CLASSIC_NAMESPACE_END
 
-}} // namespace cppmsboost::spirit
+}} // namespace boost::spirit
 
 #endif
 

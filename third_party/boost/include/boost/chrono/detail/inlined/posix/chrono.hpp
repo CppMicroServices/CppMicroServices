@@ -14,7 +14,7 @@
 #include <boost/assert.hpp>
 #include <boost/predef/os.h>
 
-namespace cppmsboost
+namespace boost
 {
 namespace chrono
 {
@@ -37,22 +37,22 @@ namespace chrono
     timespec ts;
     if ( ::clock_gettime( CLOCK_REALTIME, &ts ) )
     {
-        if (::cppmsboost::chrono::is_throws(ec))
+        if (::boost::chrono::is_throws(ec))
         {
-            cppmsboost::throw_exception(
+            boost::throw_exception(
                     system::system_error(
                             errno,
-                            ::cppmsboost::system::system_category(),
+                            ::boost::system::system_category(),
                             "chrono::system_clock" ));
         }
         else
         {
-            ec.assign( errno, ::cppmsboost::system::system_category() );
+            ec.assign( errno, ::boost::system::system_category() );
             return time_point();
         }
     }
 
-    if (!::cppmsboost::chrono::is_throws(ec))
+    if (!::boost::chrono::is_throws(ec))
     {
         ec.clear();
     }
@@ -107,17 +107,17 @@ namespace chrono
 #endif
       if ( ::clock_gettime( CLOCK_MONOTONIC, &ts ) )
       {
-        if (::cppmsboost::chrono::is_throws(ec))
+        if (::boost::chrono::is_throws(ec))
         {
-            cppmsboost::throw_exception(
+            boost::throw_exception(
                     system::system_error(
                             errno,
-                            ::cppmsboost::system::system_category(),
+                            ::boost::system::system_category(),
                             "chrono::steady_clock" ));
         }
         else
         {
-            ec.assign( errno, ::cppmsboost::system::system_category() );
+            ec.assign( errno, ::boost::system::system_category() );
             return time_point();
         }
       }
@@ -125,7 +125,7 @@ namespace chrono
     } while (ts.tv_sec == 0 && ts.tv_nsec == 0);
 #endif
 
-    if (!::cppmsboost::chrono::is_throws(ec))
+    if (!::boost::chrono::is_throws(ec))
     {
         ec.clear();
     }
@@ -136,6 +136,6 @@ namespace chrono
 #endif
 
 }  // namespace chrono
-}  // namespace cppmsboost
+}  // namespace boost
 
 

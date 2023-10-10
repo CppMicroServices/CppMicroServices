@@ -17,7 +17,7 @@
 #include <boost/archive/basic_xml_iarchive.hpp>
 #include <boost/serialization/tracking.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
@@ -31,7 +31,7 @@ basic_xml_iarchive<Archive>::load_start(const char *name){
         return;
     bool result = this->This()->gimpl->parse_start_tag(this->This()->get_is());
     if(true != result){
-        cppmsboost::serialization::throw_exception(
+        boost::serialization::throw_exception(
             archive_exception(archive_exception::input_stream_error)
         );
     }
@@ -48,7 +48,7 @@ basic_xml_iarchive<Archive>::load_end(const char *name){
         return;
     bool result = this->This()->gimpl->parse_end_tag(this->This()->get_is());
     if(true != result){
-        cppmsboost::serialization::throw_exception(
+        boost::serialization::throw_exception(
             archive_exception(archive_exception::input_stream_error)
         );
     }
@@ -66,7 +66,7 @@ basic_xml_iarchive<Archive>::load_end(const char *name){
                 name
             )
         ){
-            cppmsboost::serialization::throw_exception(
+            boost::serialization::throw_exception(
                 xml_archive_exception(
                     xml_archive_exception::xml_archive_tag_mismatch,
                     name
@@ -112,4 +112,4 @@ basic_xml_iarchive<Archive>::~basic_xml_iarchive(){
 }
 
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost

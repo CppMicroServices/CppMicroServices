@@ -18,7 +18,7 @@
 #include <boost/mpl/next_prior.hpp>
 #include <boost/mpl/list/aux_/tag.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<>
 struct pop_front_impl< aux::list_tag >

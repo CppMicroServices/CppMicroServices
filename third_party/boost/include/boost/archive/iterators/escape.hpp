@@ -22,7 +22,7 @@
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/iterator/iterator_traits.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 namespace iterators {
 
@@ -31,19 +31,19 @@ namespace iterators {
 
 template<class Derived, class Base>
 class escape :
-    public cppmsboost::iterator_adaptor<
+    public boost::iterator_adaptor<
         Derived,
         Base,
-        typename cppmsboost::iterator_value<Base>::type,
+        typename boost::iterator_value<Base>::type,
         single_pass_traversal_tag,
-        typename cppmsboost::iterator_value<Base>::type
+        typename boost::iterator_value<Base>::type
     >
 {
-    typedef typename cppmsboost::iterator_value<Base>::type base_value_type;
-    typedef typename cppmsboost::iterator_reference<Base>::type reference_type;
-    friend class cppmsboost::iterator_core_access;
+    typedef typename boost::iterator_value<Base>::type base_value_type;
+    typedef typename boost::iterator_reference<Base>::type reference_type;
+    friend class boost::iterator_core_access;
 
-    typedef typename cppmsboost::iterator_adaptor<
+    typedef typename boost::iterator_adaptor<
         Derived,
         Base,
         base_value_type,
@@ -110,6 +110,6 @@ public:
 
 } // namespace iterators
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ARCHIVE_ITERATORS_ESCAPE_HPP

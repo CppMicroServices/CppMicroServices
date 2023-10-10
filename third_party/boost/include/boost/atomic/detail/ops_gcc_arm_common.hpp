@@ -24,7 +24,7 @@
 #pragma once
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace atomics {
 namespace detail {
 
@@ -129,6 +129,6 @@ struct gcc_arm_operations_base
 
 } // namespace detail
 } // namespace atomics
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ATOMIC_DETAIL_OPS_GCC_ARM_COMMON_HPP_INCLUDED_

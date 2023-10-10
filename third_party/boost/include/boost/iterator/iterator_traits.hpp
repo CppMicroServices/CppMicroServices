@@ -9,7 +9,7 @@
 
 #include <iterator>
 
-namespace cppmsboost {
+namespace boost {
 namespace iterators {
 
 // Macro for supporting old compilers, no longer needed but kept
@@ -56,6 +56,6 @@ using iterators::iterator_pointer;
 using iterators::iterator_difference;
 using iterators::iterator_category;
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // ITERATOR_TRAITS_DWA200347_HPP

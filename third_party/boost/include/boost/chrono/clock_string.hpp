@@ -10,7 +10,7 @@
 
 #include <string>
 
-namespace cppmsboost
+namespace boost
 {
   namespace chrono
   {

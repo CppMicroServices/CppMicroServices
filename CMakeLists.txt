@@ -252,6 +252,7 @@ us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
+us_cache_var(US_USE_SYSTEM_BOOST OFF BOOL "Build using an external Boost installation" ADVANCED)
 
 set(_us_build_shared ${BUILD_SHARED_LIBS})
 
@@ -359,6 +360,14 @@ if (APPLE AND US_COMPILER_APPLE_CLANG)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+endif()
+
+#-----------------------------------------------------------------------------
+# 3rd Party Library configuration
+#-----------------------------------------------------------------------------
+
+if(US_USE_SYSTEM_BOOST)
+    find_package(Boost 1.74.0 REQUIRED)
 endif()
 
 #-----------------------------------------------------------------------------

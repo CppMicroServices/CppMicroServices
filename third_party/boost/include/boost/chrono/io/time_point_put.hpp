@@ -17,7 +17,7 @@
 #include <boost/assert.hpp>
 #include <locale>
 
-namespace cppmsboost
+namespace boost
 {
   namespace chrono
   {

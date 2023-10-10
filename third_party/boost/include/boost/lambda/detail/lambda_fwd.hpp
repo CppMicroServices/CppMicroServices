@@ -13,7 +13,7 @@
 #ifndef BOOST_LAMBDA_FWD_HPP
 #define BOOST_LAMBDA_FWD_HPP
 
-namespace cppmsboost { 
+namespace boost { 
 namespace lambda { 
 
 namespace detail {
@@ -38,7 +38,7 @@ template <class Act, class Args>
 class lambda_functor_base;
 
 } // namespace lambda
-} // namespace cppmsboost
+} // namespace boost
 
 
 //  #define CALL_TEMPLATE_ARGS class A, class Env
@@ -54,7 +54,7 @@ class lambda_functor_base;
 #define CALL_REFERENCE_TYPES A&, B&, C&, Env&
 #define CALL_PLAIN_TYPES A, B, C, Env
 
-namespace cppmsboost {
+namespace boost {
 namespace lambda {
 namespace detail {
 
@@ -67,7 +67,7 @@ void do_nothing(A1&, A2&, A3&, A4&) {}
 
 // prevent the warnings from unused arguments
 #define CALL_USE_ARGS \
-::cppmsboost::lambda::detail::do_nothing(a, b, c, env)
+::boost::lambda::detail::do_nothing(a, b, c, env)
 
 
 

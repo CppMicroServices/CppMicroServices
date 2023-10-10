@@ -11,10 +11,10 @@
 // should be the last #include
 #include <boost/type_traits/is_floating_point.hpp>
 
-namespace cppmsboost {
+namespace boost {
 
 //* is a type T a floating-point type described in the standard (3.9.1p8)
    template <class T> struct is_float : public is_floating_point<T> {};
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_TYPE_TRAITS_IS_FLOAT_HPP_INCLUDED

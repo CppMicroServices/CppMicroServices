@@ -21,14 +21,14 @@
 
 #include <boost/asio/basic_streambuf.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 
 /// Typedef for the typical usage of basic_streambuf.
 typedef basic_streambuf<> streambuf;
 
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // !defined(BOOST_ASIO_NO_IOSTREAM)
 

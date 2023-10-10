@@ -9,7 +9,7 @@
 // *Preprocessed* version of the main "apply_fwd.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<
       typename F, typename T1 = na, typename T2 = na, typename T3 = na

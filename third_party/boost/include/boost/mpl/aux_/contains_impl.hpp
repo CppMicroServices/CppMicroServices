@@ -25,7 +25,7 @@
 
 #include <boost/type_traits/is_same.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template< typename Tag >
 struct contains_impl

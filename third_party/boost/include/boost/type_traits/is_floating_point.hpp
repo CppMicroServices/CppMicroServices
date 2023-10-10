@@ -10,7 +10,7 @@
 
 #include <boost/type_traits/integral_constant.hpp>
 
-namespace cppmsboost {
+namespace boost {
 
 //* is a type T a floating-point type described in the standard (3.9.1p8)
    template <class T> struct is_floating_point : public false_type{};
@@ -25,6 +25,6 @@ namespace cppmsboost {
    template<> struct is_floating_point<__float128> : public true_type{};
 #endif
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_TYPE_TRAITS_IS_FLOAT_HPP_INCLUDED

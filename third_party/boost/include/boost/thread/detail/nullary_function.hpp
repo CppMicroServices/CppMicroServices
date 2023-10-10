@@ -17,7 +17,7 @@
 #include <boost/type_traits/decay.hpp>
 #include <boost/type_traits/is_same.hpp>
 
-namespace cppmsboost
+namespace boost
 {
   namespace detail
   {
@@ -45,7 +45,7 @@ namespace cppmsboost
         {}
 #endif
         impl_type(BOOST_THREAD_RV_REF(F) f_)
-          : f(cppmsboost::move(f_))
+          : f(boost::move(f_))
         {}
 
         void call()
@@ -83,7 +83,7 @@ namespace cppmsboost
       nullary_function(BOOST_THREAD_RV_REF(F) f
                        , typename disable_if<is_same<typename decay<F>::type, nullary_function>, int* >::type=0
                        ):
-      impl(new impl_type<typename decay<F>::type>(thread_detail::decay_copy(cppmsboost::forward<F>(f))))
+      impl(new impl_type<typename decay<F>::type>(thread_detail::decay_copy(boost::forward<F>(f))))
       {}
 
       nullary_function()
@@ -101,7 +101,7 @@ namespace cppmsboost
         BOOST_THREAD_RV(other).impl.reset();
       }
 #else
-      impl(cppmsboost::move(other.impl))
+      impl(boost::move(other.impl))
       {
       }
 #endif
@@ -120,7 +120,7 @@ namespace cppmsboost
         impl=BOOST_THREAD_RV(other).impl;
         BOOST_THREAD_RV(other).impl.reset();
 #else
-        impl = cppmsboost::move(other.impl);
+        impl = boost::move(other.impl);
 #endif
         return *this;
       }
@@ -152,7 +152,7 @@ namespace cppmsboost
         {}
 #endif
         impl_type(BOOST_THREAD_RV_REF(F) f_)
-          : f(cppmsboost::move(f_))
+          : f(boost::move(f_))
         {}
 
         R call()
@@ -186,7 +186,7 @@ namespace cppmsboost
 #endif
       template<typename F>
       nullary_function(BOOST_THREAD_RV_REF(F) f):
-      impl(new impl_type<typename decay<F>::type>(thread_detail::decay_copy(cppmsboost::forward<F>(f))))
+      impl(new impl_type<typename decay<F>::type>(thread_detail::decay_copy(boost::forward<F>(f))))
       {}
 
       nullary_function(nullary_function const& other) BOOST_NOEXCEPT :
@@ -200,7 +200,7 @@ namespace cppmsboost
         BOOST_THREAD_RV(other).impl.reset();
       }
 #else
-      impl(cppmsboost::move(other.impl))
+      impl(boost::move(other.impl))
       {
       }
 #endif
@@ -223,7 +223,7 @@ namespace cppmsboost
         impl=BOOST_THREAD_RV(other).impl;
         BOOST_THREAD_RV(other).impl.reset();
 #else
-        impl = cppmsboost::move(other.impl);
+        impl = boost::move(other.impl);
 #endif
         return *this;
       }

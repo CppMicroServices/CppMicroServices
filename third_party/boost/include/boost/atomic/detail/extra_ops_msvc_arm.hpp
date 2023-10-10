@@ -27,7 +27,7 @@
 #pragma once
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace atomics {
 namespace detail {
 
@@ -101,6 +101,6 @@ struct extra_operations< Base, 4u, Signed, true > :
 
 } // namespace detail
 } // namespace atomics
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ATOMIC_DETAIL_EXTRA_OPS_MSVC_ARM_HPP_INCLUDED_

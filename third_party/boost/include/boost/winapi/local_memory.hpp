@@ -18,27 +18,27 @@
 #if BOOST_WINAPI_PARTITION_APP_SYSTEM
 
 #if !defined( BOOST_USE_WINDOWS_H )
-namespace cppmsboost { namespace winapi {
+namespace boost { namespace winapi {
 typedef HANDLE_ HLOCAL_;
 }}
 
 extern "C" {
-BOOST_SYMBOL_IMPORT cppmsboost::winapi::HLOCAL_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT boost::winapi::HLOCAL_ BOOST_WINAPI_WINAPI_CC
 LocalAlloc(
-    cppmsboost::winapi::UINT_ uFlags,
-    cppmsboost::winapi::SIZE_T_ uBytes);
+    boost::winapi::UINT_ uFlags,
+    boost::winapi::SIZE_T_ uBytes);
 
-BOOST_SYMBOL_IMPORT cppmsboost::winapi::HLOCAL_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT boost::winapi::HLOCAL_ BOOST_WINAPI_WINAPI_CC
 LocalReAlloc(
-    cppmsboost::winapi::HLOCAL_ hMem,
-    cppmsboost::winapi::SIZE_T_ uBytes,
-    cppmsboost::winapi::UINT_ uFlags);
+    boost::winapi::HLOCAL_ hMem,
+    boost::winapi::SIZE_T_ uBytes,
+    boost::winapi::UINT_ uFlags);
 
-BOOST_SYMBOL_IMPORT cppmsboost::winapi::HLOCAL_ BOOST_WINAPI_WINAPI_CC LocalFree(cppmsboost::winapi::HLOCAL_ hMem);
+BOOST_SYMBOL_IMPORT boost::winapi::HLOCAL_ BOOST_WINAPI_WINAPI_CC LocalFree(boost::winapi::HLOCAL_ hMem);
 } // extern "C"
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace winapi {
 #if defined( BOOST_USE_WINDOWS_H )
 typedef ::HLOCAL HLOCAL_;

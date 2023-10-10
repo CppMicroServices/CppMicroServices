@@ -16,7 +16,7 @@
 #include <locale>
 #include <iterator>
 
-namespace cppmsboost { namespace date_time {
+namespace boost { namespace date_time {
 
 //! This function gathers up all the month strings from a std::locale
 /*! Using the time_put facet, this function creates a collection of

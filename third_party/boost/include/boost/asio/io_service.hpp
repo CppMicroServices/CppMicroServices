@@ -19,7 +19,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
@@ -28,7 +28,7 @@ typedef io_context io_service;
 #endif // !defined(BOOST_ASIO_NO_DEPRECATED)
 
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

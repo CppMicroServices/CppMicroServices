@@ -14,7 +14,7 @@
 #ifndef BOOST_OPTIONAL_OPTIONAL_DETAIL_OPTIONAL_ALIGNED_STORAGE_AJK_12FEB2016_HPP
 #define BOOST_OPTIONAL_OPTIONAL_DETAIL_OPTIONAL_ALIGNED_STORAGE_AJK_12FEB2016_HPP
 
-namespace cppmsboost {
+namespace boost {
 
 namespace optional_detail {
 // This local class is used instead of that in "aligned_storage.hpp"
@@ -30,7 +30,7 @@ class aligned_storage
     {
         char data[ sizeof(T) ];
         BOOST_DEDUCED_TYPENAME type_with_alignment<
-          ::cppmsboost::alignment_of<T>::value >::type aligner_;
+          ::boost::alignment_of<T>::value >::type aligner_;
     } dummy_ ;
 
   public:
@@ -66,6 +66,6 @@ class aligned_storage
 } ;
 
 } // namespace optional_detail
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // header guard

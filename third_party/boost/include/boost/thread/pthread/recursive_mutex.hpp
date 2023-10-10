@@ -40,7 +40,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace cppmsboost
+namespace boost
 {
     class recursive_mutex
     {
@@ -62,33 +62,33 @@ namespace cppmsboost
             int const init_attr_res=pthread_mutexattr_init(&attr);
             if(init_attr_res)
             {
-                cppmsboost::throw_exception(thread_resource_error(init_attr_res, "cppmsboost:: recursive_mutex constructor failed in pthread_mutexattr_init"));
+                boost::throw_exception(thread_resource_error(init_attr_res, "boost:: recursive_mutex constructor failed in pthread_mutexattr_init"));
             }
             int const set_attr_res=pthread_mutexattr_settype(&attr,PTHREAD_MUTEX_RECURSIVE);
             if(set_attr_res)
             {
                 BOOST_VERIFY(!pthread_mutexattr_destroy(&attr));
-                cppmsboost::throw_exception(thread_resource_error(set_attr_res, "cppmsboost:: recursive_mutex constructor failed in pthread_mutexattr_settype"));
+                boost::throw_exception(thread_resource_error(set_attr_res, "boost:: recursive_mutex constructor failed in pthread_mutexattr_settype"));
             }
 
             int const res=posix::pthread_mutex_init(&m,&attr);
             if(res)
             {
                 BOOST_VERIFY(!pthread_mutexattr_destroy(&attr));
-                cppmsboost::throw_exception(thread_resource_error(res, "cppmsboost:: recursive_mutex constructor failed in pthread_mutex_init"));
+                boost::throw_exception(thread_resource_error(res, "boost:: recursive_mutex constructor failed in pthread_mutex_init"));
             }
             BOOST_VERIFY(!pthread_mutexattr_destroy(&attr));
 #else
             int const res=posix::pthread_mutex_init(&m);
             if(res)
             {
-                cppmsboost::throw_exception(thread_resource_error(res, "cppmsboost:: recursive_mutex constructor failed in pthread_mutex_init"));
+                boost::throw_exception(thread_resource_error(res, "boost:: recursive_mutex constructor failed in pthread_mutex_init"));
             }
             int const res2=posix::pthread_cond_init(&cond);
             if(res2)
             {
                 BOOST_VERIFY(!posix::pthread_mutex_destroy(&m));
-                cppmsboost::throw_exception(thread_resource_error(res2, "cppmsboost:: recursive_mutex constructor failed in pthread_cond_init"));
+                boost::throw_exception(thread_resource_error(res2, "boost:: recursive_mutex constructor failed in pthread_cond_init"));
             }
             is_locked=false;
             count=0;
@@ -129,7 +129,7 @@ namespace cppmsboost
 #else
         void lock()
         {
-            cppmsboost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
+            boost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
             if(is_locked && pthread_equal(owner,pthread_self()))
             {
                 ++count;
@@ -147,7 +147,7 @@ namespace cppmsboost
 
         void unlock()
         {
-            cppmsboost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
+            boost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
             if(!--count)
             {
                 is_locked=false;
@@ -157,7 +157,7 @@ namespace cppmsboost
 
         bool try_lock()
         {
-            cppmsboost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
+            boost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
             if(is_locked && !pthread_equal(owner,pthread_self()))
             {
                 return false;
@@ -198,32 +198,32 @@ namespace cppmsboost
             int const init_attr_res=pthread_mutexattr_init(&attr);
             if(init_attr_res)
             {
-                cppmsboost::throw_exception(thread_resource_error(init_attr_res, "cppmsboost:: recursive_timed_mutex constructor failed in pthread_mutexattr_init"));
+                boost::throw_exception(thread_resource_error(init_attr_res, "boost:: recursive_timed_mutex constructor failed in pthread_mutexattr_init"));
             }
             int const set_attr_res=pthread_mutexattr_settype(&attr,PTHREAD_MUTEX_RECURSIVE);
             if(set_attr_res)
             {
-                cppmsboost::throw_exception(thread_resource_error(set_attr_res, "cppmsboost:: recursive_timed_mutex constructor failed in pthread_mutexattr_settype"));
+                boost::throw_exception(thread_resource_error(set_attr_res, "boost:: recursive_timed_mutex constructor failed in pthread_mutexattr_settype"));
             }
 
             int const res=posix::pthread_mutex_init(&m,&attr);
             if(res)
             {
                 BOOST_VERIFY(!pthread_mutexattr_destroy(&attr));
-                cppmsboost::throw_exception(thread_resource_error(res, "cppmsboost:: recursive_timed_mutex constructor failed in pthread_mutex_init"));
+                boost::throw_exception(thread_resource_error(res, "boost:: recursive_timed_mutex constructor failed in pthread_mutex_init"));
             }
             BOOST_VERIFY(!pthread_mutexattr_destroy(&attr));
 #else
             int const res=posix::pthread_mutex_init(&m);
             if(res)
             {
-                cppmsboost::throw_exception(thread_resource_error(res, "cppmsboost:: recursive_timed_mutex constructor failed in pthread_mutex_init"));
+                boost::throw_exception(thread_resource_error(res, "boost:: recursive_timed_mutex constructor failed in pthread_mutex_init"));
             }
             int const res2=posix::pthread_cond_init(&cond);
             if(res2)
             {
                 BOOST_VERIFY(!posix::pthread_mutex_destroy(&m));
-                cppmsboost::throw_exception(thread_resource_error(res2, "cppmsboost:: recursive_timed_mutex constructor failed in pthread_cond_init"));
+                boost::throw_exception(thread_resource_error(res2, "boost:: recursive_timed_mutex constructor failed in pthread_cond_init"));
             }
             is_locked=false;
             count=0;
@@ -297,7 +297,7 @@ namespace cppmsboost
 #else
         void lock()
         {
-            cppmsboost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
+            boost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
             if(is_locked && pthread_equal(owner,pthread_self()))
             {
                 ++count;
@@ -315,7 +315,7 @@ namespace cppmsboost
 
         void unlock()
         {
-            cppmsboost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
+            boost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
             if(!--count)
             {
                 is_locked=false;
@@ -325,7 +325,7 @@ namespace cppmsboost
 
         bool try_lock() BOOST_NOEXCEPT
         {
-            cppmsboost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
+            boost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
             if(is_locked && !pthread_equal(owner,pthread_self()))
             {
                 return false;
@@ -339,7 +339,7 @@ namespace cppmsboost
     private:
         bool do_try_lock_until(detail::internal_platform_timepoint const &timeout)
         {
-            cppmsboost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
+            boost::pthread::pthread_mutex_scoped_lock const local_lock(&m);
             if(is_locked && pthread_equal(owner,pthread_self()))
             {
                 ++count;

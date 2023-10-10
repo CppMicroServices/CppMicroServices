@@ -23,7 +23,7 @@ extern "C" void _mm_pause(void);
 #endif
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace atomics {
 namespace detail {
 
@@ -38,6 +38,6 @@ BOOST_FORCEINLINE void pause() BOOST_NOEXCEPT
 
 } // namespace detail
 } // namespace atomics
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ATOMIC_DETAIL_PAUSE_HPP_INCLUDED_

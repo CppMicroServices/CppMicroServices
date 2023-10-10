@@ -18,7 +18,7 @@
 #include <boost/mpl/aux_/config/eti.hpp>
 #include <boost/mpl/aux_/config/static_constant.hpp>
 
-namespace cppmsboost { namespace mpl { namespace aux {
+namespace boost { namespace mpl { namespace aux {
 
 #if defined(BOOST_MPL_CFG_MSVC_ETI_BUG)
 

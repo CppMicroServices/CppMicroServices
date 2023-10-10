@@ -11,7 +11,7 @@
 
 #include "boost/date_time/parse_format_base.hpp"
 
-namespace cppmsboost {
+namespace boost {
 namespace date_time {
 
 //! Class to provide simple basic formatting rules

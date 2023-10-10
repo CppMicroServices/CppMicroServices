@@ -26,7 +26,7 @@ namespace std{
 #include <boost/archive/iterators/transform_width.hpp>
 #include <boost/archive/iterators/ostream_iterator.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 // translate to base64 and copy in to buffer.
@@ -42,16 +42,16 @@ basic_text_oprimitive<OStream>::save_binary(
         return;
     
     if(os.fail())
-        cppmsboost::serialization::throw_exception(
+        boost::serialization::throw_exception(
             archive_exception(archive_exception::output_stream_error)
         );
         
     os.put('\n');
     
     typedef 
-        cppmsboost::archive::iterators::insert_linebreaks<
-            cppmsboost::archive::iterators::base64_from_binary<
-                cppmsboost::archive::iterators::transform_width<
+        boost::archive::iterators::insert_linebreaks<
+            boost::archive::iterators::base64_from_binary<
+                boost::archive::iterators::transform_width<
                     const char *,
                     6,
                     8
@@ -62,7 +62,7 @@ basic_text_oprimitive<OStream>::save_binary(
         > 
         base64_text;
 
-    cppmsboost::archive::iterators::ostream_iterator<CharType> oi(os);
+    boost::archive::iterators::ostream_iterator<CharType> oi(os);
     std::copy(
         base64_text(static_cast<const char *>(address)),
         base64_text(
@@ -107,10 +107,10 @@ basic_text_oprimitive<OStream>::basic_text_oprimitive(
 template<class OStream>
 BOOST_ARCHIVE_OR_WARCHIVE_DECL
 basic_text_oprimitive<OStream>::~basic_text_oprimitive(){
-    if(cppmsboost::core::uncaught_exceptions() > 0)
+    if(boost::core::uncaught_exceptions() > 0)
         return;
     os << std::endl;
 }
 
-} //namespace cppmsboost 
+} //namespace boost 
 } //namespace archive 

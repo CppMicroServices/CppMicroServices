@@ -15,7 +15,7 @@
 #include <algorithm>
 #include "boost/date_time/date_generators.hpp"
 
-namespace cppmsboost {
+namespace boost {
 namespace date_time {
 
   //! Formats date_generators for output

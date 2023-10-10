@@ -18,7 +18,7 @@
 #  pragma once
 #endif
 
-namespace cppmsboost { namespace logic {
+namespace boost { namespace logic {
 
 /// INTERNAL ONLY
 namespace detail {
@@ -433,10 +433,10 @@ BOOST_CONSTEXPR inline tribool operator!=(indeterminate_keyword_t, tribool x) BO
 BOOST_CONSTEXPR inline tribool operator!=(tribool x, indeterminate_keyword_t) BOOST_NOEXCEPT
 { return x != tribool(indeterminate); }
 
-} } // end namespace cppmsboost::logic
+} } // end namespace boost::logic
 
 // Pull tribool and indeterminate into namespace "boost"
-namespace cppmsboost {
+namespace boost {
   using logic::tribool;
   using logic::indeterminate;
 }
@@ -460,10 +460,10 @@ namespace cppmsboost {
  */
 #define BOOST_TRIBOOL_THIRD_STATE(Name)                                 \
 inline bool                                                             \
-Name(cppmsboost::logic::tribool x,                                           \
-     cppmsboost::logic::detail::indeterminate_t =                            \
-       cppmsboost::logic::detail::indeterminate_t())                         \
-{ return x.value == cppmsboost::logic::tribool::indeterminate_value; }
+Name(boost::logic::tribool x,                                           \
+     boost::logic::detail::indeterminate_t =                            \
+       boost::logic::detail::indeterminate_t())                         \
+{ return x.value == boost::logic::tribool::indeterminate_value; }
 
 #endif // BOOST_LOGIC_TRIBOOL_HPP
 

@@ -9,7 +9,7 @@
 // *Preprocessed* version of the main "apply_wrap.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<
       int N, typename F
@@ -117,7 +117,7 @@ template<
     >
 struct apply_wrap0
     : apply_wrap_impl0<
-          ::cppmsboost::mpl::aux::arity< F,0 >::value
+          ::boost::mpl::aux::arity< F,0 >::value
         , F
        
         >::type
@@ -212,7 +212,7 @@ template<
     >
 struct apply_wrap1
     : apply_wrap_impl1<
-          ::cppmsboost::mpl::aux::arity< F,1 >::value
+          ::boost::mpl::aux::arity< F,1 >::value
         , F
         , T1
         >::type
@@ -295,7 +295,7 @@ template<
     >
 struct apply_wrap2
     : apply_wrap_impl2<
-          ::cppmsboost::mpl::aux::arity< F,2 >::value
+          ::boost::mpl::aux::arity< F,2 >::value
         , F
         , T1, T2
         >::type
@@ -361,7 +361,7 @@ template<
     >
 struct apply_wrap3
     : apply_wrap_impl3<
-          ::cppmsboost::mpl::aux::arity< F,3 >::value
+          ::boost::mpl::aux::arity< F,3 >::value
         , F
         , T1, T2, T3
         >::type
@@ -410,7 +410,7 @@ template<
     >
 struct apply_wrap4
     : apply_wrap_impl4<
-          ::cppmsboost::mpl::aux::arity< F,4 >::value
+          ::boost::mpl::aux::arity< F,4 >::value
         , F
         , T1, T2, T3, T4
         >::type
@@ -445,7 +445,7 @@ template<
     >
 struct apply_wrap5
     : apply_wrap_impl5<
-          ::cppmsboost::mpl::aux::arity< F,5 >::value
+          ::boost::mpl::aux::arity< F,5 >::value
         , F
         , T1, T2, T3, T4, T5
         >::type

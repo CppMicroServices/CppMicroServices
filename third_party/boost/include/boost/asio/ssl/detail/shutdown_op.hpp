@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace ssl {
 namespace detail {
@@ -30,7 +30,7 @@ class shutdown_op
 {
 public:
   engine::want operator()(engine& eng,
-      cppmsboost::system::error_code& ec,
+      boost::system::error_code& ec,
       std::size_t& bytes_transferred) const
   {
     bytes_transferred = 0;
@@ -39,15 +39,15 @@ public:
 
   template <typename Handler>
   void call_handler(Handler& handler,
-      const cppmsboost::system::error_code& ec,
+      const boost::system::error_code& ec,
       const std::size_t&) const
   {
-    if (ec == cppmsboost::asio::error::eof)
+    if (ec == boost::asio::error::eof)
     {
       // The engine only generates an eof when the shutdown notification has
       // been received from the peer. This indicates that the shutdown has
       // completed successfully, and thus need not be passed on to the handler.
-      handler(cppmsboost::system::error_code());
+      handler(boost::system::error_code());
     }
     else
     {
@@ -59,7 +59,7 @@ public:
 } // namespace detail
 } // namespace ssl
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

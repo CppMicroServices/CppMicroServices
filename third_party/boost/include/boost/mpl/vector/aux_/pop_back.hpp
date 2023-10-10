@@ -22,7 +22,7 @@
 #   include <boost/mpl/vector/aux_/item.hpp>
 #   include <boost/mpl/vector/aux_/tag.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<>
 struct pop_back_impl< aux::vector_tag >

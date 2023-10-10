@@ -24,7 +24,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 
 class execution_context;
@@ -167,7 +167,7 @@ public:
    *
    * @param event A fork-related event.
    *
-   * @throws cppmsboost::system::system_error Thrown on failure. If the notification
+   * @throws boost::system::system_error Thrown on failure. If the notification
    * fails the execution_context object should no longer be used and should be
    * destroyed.
    *
@@ -236,7 +236,7 @@ public:
    * @param args Zero or more arguments to be passed to the service
    * constructor.
    *
-   * @throws cppmsboost::asio::service_already_exists Thrown if a service of the
+   * @throws boost::asio::service_already_exists Thrown if a service of the
    * given type is already present in the execution_context.
    */
   template <typename Service, typename... Args>
@@ -275,10 +275,10 @@ public:
    * is destroyed, it will destroy the service object by performing: @code
    * delete static_cast<execution_context::service*>(svc) @endcode
    *
-   * @throws cppmsboost::asio::service_already_exists Thrown if a service of the
+   * @throws boost::asio::service_already_exists Thrown if a service of the
    * given type is already present in the execution_context.
    *
-   * @throws cppmsboost::asio::invalid_service_owner Thrown if the service's owning
+   * @throws boost::asio::invalid_service_owner Thrown if the service's owning
    * execution_context is not the execution_context object specified by the
    * @c e parameter.
    */
@@ -300,7 +300,7 @@ public:
 
 private:
   // The service registry.
-  cppmsboost::asio::detail::service_registry* service_registry_;
+  boost::asio::detail::service_registry* service_registry_;
 };
 
 /// Class used to uniquely identify a service.
@@ -343,7 +343,7 @@ private:
   BOOST_ASIO_DECL virtual void notify_fork(
       execution_context::fork_event event);
 
-  friend class cppmsboost::asio::detail::service_registry;
+  friend class boost::asio::detail::service_registry;
   struct key
   {
     key() : type_info_(0), id_(0) {}
@@ -402,7 +402,7 @@ service_id<Type> execution_context_service_base<Type>::id;
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -29,7 +29,7 @@
 # error Only Windows, POSIX and std::condition_variable are supported!
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -45,6 +45,6 @@ typedef std_event event;
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ASIO_DETAIL_EVENT_HPP

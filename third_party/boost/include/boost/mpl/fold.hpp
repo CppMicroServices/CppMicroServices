@@ -21,7 +21,7 @@
 #include <boost/mpl/aux_/na_spec.hpp>
 #include <boost/mpl/aux_/lambda_support.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<
       typename BOOST_MPL_AUX_NA_PARAM(Sequence)
@@ -31,7 +31,7 @@ template<
 struct fold
 {
     typedef typename aux::fold_impl<
-          ::cppmsboost::mpl::O1_size<Sequence>::value
+          ::boost::mpl::O1_size<Sequence>::value
         , typename begin<Sequence>::type
         , typename end<Sequence>::type
         , State

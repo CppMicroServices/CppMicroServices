@@ -46,7 +46,7 @@
     BOOST_PP_CAT(AUX778076_FOLD_IMPL_NAME_PREFIX,_chunk) \
     /**/
 
-namespace cppmsboost { namespace mpl { namespace aux {
+namespace boost { namespace mpl { namespace aux {
 
 /// forward declaration
 template<

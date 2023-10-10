@@ -17,7 +17,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <streambuf>
 #include <string>
 
-namespace cppmsboost {
+namespace boost {
 namespace io {
 
 class ios_flags_saver {

@@ -7,7 +7,7 @@
 # include <boost/preprocessor/cat.hpp>
 # include <boost/concept/detail/backward_compatibility.hpp>
 
-namespace cppmsboost { namespace concepts {
+namespace boost { namespace concepts {
 
 template <class ModelFnPtr>
 struct require;
@@ -22,9 +22,9 @@ struct require<void(*)(Model)>
   enum                                                  \
   {                                                     \
       BOOST_PP_CAT(boost_concept_check,__LINE__) =      \
-      cppmsboost::concepts::require<ModelFnPtr>::instantiate  \
+      boost::concepts::require<ModelFnPtr>::instantiate  \
   }
 
-}} // namespace cppmsboost::concept
+}} // namespace boost::concept
 
 #endif // BOOST_CONCEPT_DETAIL_BORLAND_DWA2006429_HPP

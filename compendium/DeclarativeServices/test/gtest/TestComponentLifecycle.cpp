@@ -264,13 +264,13 @@ namespace test
     }
 
     /**
-     * Verify that Declarative Services data stored in the bundle is initialized for an immediate component
+     * Verify that Declarative Services data stored in the bundle is initialized when a component is loaded
      * Currently the only applicable data is the BundleContextPrivate used by GetBundleContext
      */
-    TEST_F(tServiceComponent, testImmediateComponent_Initialization) {
-        auto testBundle = StartTestBundle("TestBundleDSTOI20");
-        auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent20");
-        auto compConfigDTOs = dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
+    void testComponentHelper_Initialization(tServiceComponent* t, std::string const& bundle) {
+        auto testBundle = t->StartTestBundle(bundle);
+        auto compDescDTO = t->dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent20");
+        auto compConfigDTOs = t->dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
         EXPECT_EQ(compConfigDTOs.size(), 1ul);
 
         auto ctxt = testBundle.GetBundleContext();
@@ -281,6 +281,18 @@ namespace test
         ASSERT_EQ(ctxt2.size(), 2);
         EXPECT_TRUE(ctxt == ctxt2[0]) << "Service's activator must be provided with its bundle context";
         EXPECT_TRUE(ctxt == ctxt2[1]) << "Service's US_GET_CTX_FUNC must return the bundle context";
+    }
+
+    /** Tests DS data initialization for an immediate component */
+    TEST_F(tServiceComponent, testImmediateComponent_Initialization) {
+        testComponentHelper_Initialization(this, "TestBundleDSTOI20");
+        if (HasFatalFailure()) return;
+    }
+
+    /** Tests DS data initialization for a delayed component */
+    TEST_F(tServiceComponent, testDelayedComponent_Initialization) {
+        testComponentHelper_Initialization(this, "TestBundleDSTOI21");
+        if (HasFatalFailure()) return;
     }
 
     TEST_F(tServiceComponent, testDependencyInjection) // DS_TOI_18

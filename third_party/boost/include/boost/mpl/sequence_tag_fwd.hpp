@@ -14,7 +14,7 @@
 // $Date$
 // $Revision$
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 struct nested_begin_end_tag;
 struct non_sequence_tag;

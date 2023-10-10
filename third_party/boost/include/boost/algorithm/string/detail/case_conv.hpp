@@ -17,7 +17,7 @@
 
 #include <boost/type_traits/make_unsigned.hpp>
 
-namespace cppmsboost {
+namespace boost {
     namespace algorithm {
         namespace detail {
 
@@ -41,7 +41,7 @@ namespace cppmsboost {
                 CharT operator ()( CharT Ch ) const
                 {
                     #if defined(__BORLANDC__) && (__BORLANDC__ >= 0x560) && (__BORLANDC__ <= 0x564) && !defined(_USE_OLD_RW_STL)
-                        return std::tolower( static_cast<typename cppmsboost::make_unsigned <CharT>::type> ( Ch ));
+                        return std::tolower( static_cast<typename boost::make_unsigned <CharT>::type> ( Ch ));
                     #else
                         return std::tolower<CharT>( Ch, *m_Loc );
                     #endif
@@ -63,7 +63,7 @@ namespace cppmsboost {
                 CharT operator ()( CharT Ch ) const
                 {
                     #if defined(__BORLANDC__) && (__BORLANDC__ >= 0x560) && (__BORLANDC__ <= 0x564) && !defined(_USE_OLD_RW_STL)
-                        return std::toupper( static_cast<typename cppmsboost::make_unsigned <CharT>::type> ( Ch ));
+                        return std::toupper( static_cast<typename boost::make_unsigned <CharT>::type> ( Ch ));
                     #else
                         return std::toupper<CharT>( Ch, *m_Loc );
                     #endif
@@ -86,8 +86,8 @@ namespace cppmsboost {
                 FunctorT Functor)
             {
                 return std::transform( 
-                    ::cppmsboost::begin(Input), 
-                    ::cppmsboost::end(Input), 
+                    ::boost::begin(Input), 
+                    ::boost::end(Input), 
                     Output,
                     Functor);
             }
@@ -99,9 +99,9 @@ namespace cppmsboost {
                 FunctorT Functor)
             {
                 std::transform( 
-                    ::cppmsboost::begin(Input), 
-                    ::cppmsboost::end(Input), 
-                    ::cppmsboost::begin(Input),
+                    ::boost::begin(Input), 
+                    ::boost::end(Input), 
+                    ::boost::begin(Input),
                     Functor);
             }
 
@@ -111,17 +111,17 @@ namespace cppmsboost {
                 FunctorT Functor)
             {
                 return SequenceT(
-                    ::cppmsboost::make_transform_iterator(
-                        ::cppmsboost::begin(Input),
+                    ::boost::make_transform_iterator(
+                        ::boost::begin(Input),
                         Functor),
-                    ::cppmsboost::make_transform_iterator(
-                        ::cppmsboost::end(Input), 
+                    ::boost::make_transform_iterator(
+                        ::boost::end(Input), 
                         Functor));
             }
 
         } // namespace detail
     } // namespace algorithm
-} // namespace cppmsboost
+} // namespace boost
 
 
 #endif  // BOOST_STRING_CASE_CONV_DETAIL_HPP

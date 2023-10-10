@@ -37,7 +37,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace cppmsboost
+namespace boost
 {
     class thread_attributes {
     public:
@@ -107,20 +107,20 @@ namespace cppmsboost
         };
 
         struct thread_data_base;
-        typedef cppmsboost::shared_ptr<thread_data_base> thread_data_ptr;
+        typedef boost::shared_ptr<thread_data_base> thread_data_ptr;
 
         struct BOOST_THREAD_DECL thread_data_base:
             enable_shared_from_this<thread_data_base>
         {
             thread_data_ptr self;
             pthread_t thread_handle;
-            cppmsboost::mutex data_mutex;
-            cppmsboost::condition_variable done_condition;
+            boost::mutex data_mutex;
+            boost::condition_variable done_condition;
             bool done;
             bool join_started;
             bool joined;
-            cppmsboost::detail::thread_exit_callback_node* thread_exit_callbacks;
-            std::map<void const*,cppmsboost::detail::tss_data_node> tss_data;
+            boost::detail::thread_exit_callback_node* thread_exit_callbacks;
+            std::map<void const*,boost::detail::tss_data_node> tss_data;
 
 //#if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
             // These data must be at the end so that the access to the other fields doesn't change

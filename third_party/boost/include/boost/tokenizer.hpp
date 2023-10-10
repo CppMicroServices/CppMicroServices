@@ -19,7 +19,7 @@
 
 #include <boost/token_iterator.hpp>
 
-namespace cppmsboost {
+namespace boost {
 
   
   //===========================================================================
@@ -93,6 +93,6 @@ namespace cppmsboost {
   };
 
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif

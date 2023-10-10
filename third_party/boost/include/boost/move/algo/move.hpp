@@ -29,7 +29,7 @@
 #include <boost/move/detail/iterator_to_raw_pointer.hpp>
 #include <boost/core/no_exceptions_support.hpp>
 
-namespace cppmsboost {
+namespace boost {
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -41,7 +41,7 @@ namespace cppmsboost {
 
    //! <b>Effects</b>: Moves elements in the range [first,last) into the range [result,result + (last -
    //!   first)) starting from first and proceeding to last. For each non-negative integer n < (last-first),
-   //!   performs *(result + n) = ::cppmsboost::move (*(first + n)).
+   //!   performs *(result + n) = ::boost::move (*(first + n)).
    //!
    //! <b>Effects</b>: result + (last - first).
    //!
@@ -53,7 +53,7 @@ namespace cppmsboost {
    O move(I f, I l, O result)
    {
       while (f != l) {
-         *result = ::cppmsboost::move(*f);
+         *result = ::boost::move(*f);
          ++f; ++result;
       }
       return result;
@@ -68,7 +68,7 @@ namespace cppmsboost {
    //! <b>Effects</b>: Moves elements in the range [first,last) into the range
    //!   [result - (last-first),result) starting from last - 1 and proceeding to
    //!   first. For each positive integer n <= (last - first),
-   //!   performs *(result - n) = ::cppmsboost::move(*(last - n)).
+   //!   performs *(result - n) = ::boost::move(*(last - n)).
    //!
    //! <b>Requires</b>: result shall not be in the range [first,last).
    //!
@@ -81,7 +81,7 @@ namespace cppmsboost {
    {
       while (f != l) {
          --l; --result;
-         *result = ::cppmsboost::move(*l);
+         *result = ::boost::move(*l);
       }
       return result;
    }
@@ -102,7 +102,7 @@ namespace cppmsboost {
 //!   \code
 //!   for (; first != last; ++result, ++first)
 //!      new (static_cast<void*>(&*result))
-//!         typename iterator_traits<ForwardIterator>::value_type(cppmsboost::move(*first));
+//!         typename iterator_traits<ForwardIterator>::value_type(boost::move(*first));
 //!   \endcode
 //!
 //! <b>Returns</b>: result
@@ -111,23 +111,23 @@ template
     typename F> // F models ForwardIterator
 F uninitialized_move(I f, I l, F r
    /// @cond
-//   ,typename ::cppmsboost::move_detail::enable_if<has_move_emulation_enabled<typename cppmsboost::movelib::iterator_traits<I>::value_type> >::type* = 0
+//   ,typename ::boost::move_detail::enable_if<has_move_emulation_enabled<typename boost::movelib::iterator_traits<I>::value_type> >::type* = 0
    /// @endcond
    )
 {
-   typedef typename cppmsboost::movelib::iterator_traits<I>::value_type input_value_type;
+   typedef typename boost::movelib::iterator_traits<I>::value_type input_value_type;
 
    F back = r;
    BOOST_TRY{
       while (f != l) {
-         void * const addr = static_cast<void*>(::cppmsboost::move_detail::addressof(*r));
-         ::new(addr) input_value_type(::cppmsboost::move(*f));
+         void * const addr = static_cast<void*>(::boost::move_detail::addressof(*r));
+         ::new(addr) input_value_type(::boost::move(*f));
          ++f; ++r;
       }
    }
    BOOST_CATCH(...){
       for (; back != r; ++back){
-         cppmsboost::movelib::iterator_to_raw_pointer(back)->~input_value_type();
+         boost::movelib::iterator_to_raw_pointer(back)->~input_value_type();
       }
       BOOST_RETHROW;
    }
@@ -141,7 +141,7 @@ template
    <typename I,   // I models InputIterator
     typename F>   // F models ForwardIterator
 F uninitialized_move(I f, I l, F r,
-   typename ::cppmsboost::move_detail::disable_if<has_move_emulation_enabled<typename cppmsboost::movelib::iterator_traits<I>::value_type> >::type* = 0)
+   typename ::boost::move_detail::disable_if<has_move_emulation_enabled<typename boost::movelib::iterator_traits<I>::value_type> >::type* = 0)
 {
    return std::uninitialized_copy(f, l, r);
 }
@@ -149,7 +149,7 @@ F uninitialized_move(I f, I l, F r,
 
 /// @endcond
 
-}  //namespace cppmsboost {
+}  //namespace boost {
 
 #include <boost/move/detail/config_end.hpp>
 

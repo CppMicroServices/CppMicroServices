@@ -19,7 +19,7 @@
 //  http://www.boost.org/libs/assert
 //
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace detail
@@ -70,6 +70,6 @@ inline void current_function_helper()
 
 } // namespace detail
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // #ifndef BOOST_CURRENT_FUNCTION_HPP_INCLUDED

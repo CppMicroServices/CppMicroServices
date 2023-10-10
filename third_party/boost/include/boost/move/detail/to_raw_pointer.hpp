@@ -25,7 +25,7 @@
 #include <boost/move/detail/workaround.hpp>
 #include <boost/move/detail/pointer_element.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace movelib {
 
 template <class T>
@@ -33,12 +33,12 @@ BOOST_MOVE_FORCEINLINE T* to_raw_pointer(T* p)
 {  return p; }
 
 template <class Pointer>
-BOOST_MOVE_FORCEINLINE typename cppmsboost::movelib::pointer_element<Pointer>::type*
+BOOST_MOVE_FORCEINLINE typename boost::movelib::pointer_element<Pointer>::type*
 to_raw_pointer(const Pointer &p)
-{  return ::cppmsboost::movelib::to_raw_pointer(p.operator->());  }
+{  return ::boost::movelib::to_raw_pointer(p.operator->());  }
 
 } //namespace movelib
-} //namespace cppmsboost
+} //namespace boost
 
 #include <boost/move/detail/config_end.hpp>
 

@@ -20,7 +20,7 @@
 #define BOOST_REGEX_V4_REGEX_SEARCH_HPP
 
 
-namespace cppmsboost{
+namespace boost{
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -210,7 +210,7 @@ inline bool regex_search(const std::basic_string<wchar_t>& s,
 #pragma warning(pop)
 #endif
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // BOOST_REGEX_V4_REGEX_SEARCH_HPP
 

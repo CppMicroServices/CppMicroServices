@@ -20,7 +20,7 @@
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 
-namespace cppmsboost
+namespace boost
 {
     namespace range_detail
     {
@@ -28,39 +28,39 @@ namespace cppmsboost
 
         template<class T, class Enabler = void>
         struct has_range_iterator_impl
-            : cppmsboost::mpl::false_
+            : boost::mpl::false_
         {
         };
 
         template<class T>
         struct has_range_iterator_impl<
             T,
-            BOOST_DEDUCED_TYPENAME ::cppmsboost::enable_if<
+            BOOST_DEDUCED_TYPENAME ::boost::enable_if<
                 BOOST_DEDUCED_TYPENAME mpl::eval_if<is_const<T>,
-                    has_type<cppmsboost::range_const_iterator<
+                    has_type<boost::range_const_iterator<
                                 BOOST_DEDUCED_TYPENAME remove_const<T>::type> >,
-                    has_type<cppmsboost::range_mutable_iterator<T> >
+                    has_type<boost::range_mutable_iterator<T> >
                 >::type
             >::type
         >
-            : cppmsboost::mpl::true_
+            : boost::mpl::true_
         {
         };
 
         template<class T, class Enabler = void>
         struct has_range_const_iterator_impl
-            : cppmsboost::mpl::false_
+            : boost::mpl::false_
         {
         };
 
         template<class T>
         struct has_range_const_iterator_impl<
             T,
-            BOOST_DEDUCED_TYPENAME ::cppmsboost::enable_if<
-                has_type<cppmsboost::range_const_iterator<T> >
+            BOOST_DEDUCED_TYPENAME ::boost::enable_if<
+                has_type<boost::range_const_iterator<T> >
             >::type
         >
-            : cppmsboost::mpl::true_
+            : boost::mpl::true_
         {
         };
 
@@ -77,7 +77,7 @@ namespace cppmsboost
         : range_detail::has_range_const_iterator_impl<
             BOOST_DEDUCED_TYPENAME remove_reference<T>::type>
     {};
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // include guard
 

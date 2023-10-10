@@ -22,7 +22,7 @@
 #include <boost/asio/detail/posix_fd_set_adapter.hpp>
 #include <boost/asio/detail/win_fd_set_adapter.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -34,7 +34,7 @@ typedef posix_fd_set_adapter fd_set_adapter;
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // !defined(BOOST_ASIO_WINDOWS_RUNTIME)
 

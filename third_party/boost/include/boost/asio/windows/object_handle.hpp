@@ -23,7 +23,7 @@
 
 #include <boost/asio/windows/basic_object_handle.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace windows {
 
@@ -32,7 +32,7 @@ typedef basic_object_handle<> object_handle;
 
 } // namespace windows
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // defined(BOOST_ASIO_HAS_WINDOWS_OBJECT_HANDLE)
        //   || defined(GENERATING_DOCUMENTATION)

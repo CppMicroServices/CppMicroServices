@@ -19,7 +19,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 
 /// Default continuation function for handlers.
@@ -49,7 +49,7 @@ inline bool asio_handler_is_continuation(...)
 }
 
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

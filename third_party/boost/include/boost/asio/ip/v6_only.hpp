@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace ip {
 
@@ -32,18 +32,18 @@ namespace ip {
  * @par Examples
  * Setting the option:
  * @code
- * cppmsboost::asio::ip::tcp::socket socket(my_context);
+ * boost::asio::ip::tcp::socket socket(my_context);
  * ...
- * cppmsboost::asio::ip::v6_only option(true);
+ * boost::asio::ip::v6_only option(true);
  * socket.set_option(option);
  * @endcode
  *
  * @par
  * Getting the current option value:
  * @code
- * cppmsboost::asio::ip::tcp::socket socket(my_context);
+ * boost::asio::ip::tcp::socket socket(my_context);
  * ...
- * cppmsboost::asio::ip::v6_only option;
+ * boost::asio::ip::v6_only option;
  * socket.get_option(option);
  * bool v6_only = option.value();
  * @endcode
@@ -54,17 +54,17 @@ namespace ip {
 #if defined(GENERATING_DOCUMENTATION)
 typedef implementation_defined v6_only;
 #elif defined(IPV6_V6ONLY)
-typedef cppmsboost::asio::detail::socket_option::boolean<
+typedef boost::asio::detail::socket_option::boolean<
     IPPROTO_IPV6, IPV6_V6ONLY> v6_only;
 #else
-typedef cppmsboost::asio::detail::socket_option::boolean<
-    cppmsboost::asio::detail::custom_socket_option_level,
-    cppmsboost::asio::detail::always_fail_option> v6_only;
+typedef boost::asio::detail::socket_option::boolean<
+    boost::asio::detail::custom_socket_option_level,
+    boost::asio::detail::always_fail_option> v6_only;
 #endif
 
 } // namespace ip
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

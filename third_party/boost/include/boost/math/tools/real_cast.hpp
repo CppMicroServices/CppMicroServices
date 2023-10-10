@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-namespace cppmsboost{ namespace math
+namespace boost{ namespace math
 {
   namespace tools
   {
@@ -23,7 +23,7 @@ namespace cppmsboost{ namespace math
     }
   } // namespace tools
 } // namespace math
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_MATH_TOOLS_REAL_CAST_HPP
 

@@ -17,7 +17,7 @@
 #include <boost/mpl/front_fwd.hpp>
 #include <boost/mpl/list/aux_/tag.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<>
 struct front_impl< aux::list_tag >

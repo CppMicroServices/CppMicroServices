@@ -20,7 +20,7 @@ namespace std{
 
 #include <boost/archive/basic_text_oarchive.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
@@ -59,4 +59,4 @@ basic_text_oarchive<Archive>::init(){
 }
 
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost

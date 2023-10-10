@@ -17,7 +17,7 @@
 #include <boost/mpl/apply.hpp>
 #include <boost/mpl/deref.hpp>
 
-namespace cppmsboost { namespace mpl { namespace aux {
+namespace boost { namespace mpl { namespace aux {
 
 template<
       typename F

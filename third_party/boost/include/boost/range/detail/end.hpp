@@ -18,7 +18,7 @@
 #include <boost/range/iterator.hpp>
 #include <boost/range/detail/common.hpp>
 
-namespace cppmsboost
+namespace boost
 {
     namespace range_detail
     {

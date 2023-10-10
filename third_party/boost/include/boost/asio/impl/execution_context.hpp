@@ -21,7 +21,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 
 #if !defined(GENERATING_DOCUMENTATION)
@@ -104,7 +104,7 @@ inline execution_context& execution_context::service::context()
 }
 
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

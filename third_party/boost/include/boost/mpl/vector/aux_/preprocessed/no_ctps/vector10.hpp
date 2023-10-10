@@ -9,7 +9,7 @@
 // Preprocessed version of "boost/mpl/vector/vector10.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 namespace aux {
 template<> struct v_at_impl<0>

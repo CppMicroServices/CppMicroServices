@@ -16,7 +16,7 @@
 #include <atomic>
 #include <cstdint>
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace detail
@@ -55,6 +55,6 @@ private:
 
 } // namespace detail
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // #ifndef BOOST_SMART_PTR_DETAIL_ATOMIC_COUNT_STD_ATOMIC_HPP_INCLUDED

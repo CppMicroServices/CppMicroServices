@@ -7,7 +7,7 @@
 #ifndef BOOST_COROUTINES_FLAGS_H
 #define BOOST_COROUTINES_FLAGS_H
 
-namespace cppmsboost {
+namespace boost {
 namespace coroutines {
 
 enum flag_unwind_t

@@ -27,7 +27,7 @@
 #include <cstddef>
 #include <boost/regex/v4/error_type.hpp>
 
-namespace cppmsboost{
+namespace boost{
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -72,7 +72,7 @@ void raise_error(const traits& t, regex_constants::error_type code)
 {
    (void)t;  // warning suppression
    std::runtime_error e(t.error_string(code));
-   ::cppmsboost::BOOST_REGEX_DETAIL_NS::raise_runtime_error(e);
+   ::boost::BOOST_REGEX_DETAIL_NS::raise_runtime_error(e);
 }
 
 }
@@ -92,7 +92,7 @@ void raise_error(const traits& t, regex_constants::error_type code)
 #pragma warning(pop)
 #endif
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif
 

@@ -41,7 +41,7 @@
 # endif
 #endif
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace core
@@ -119,7 +119,7 @@ inline std::string demangle( char const * name )
 
 } // namespace core
 
-} // namespace cppmsboost
+} // namespace boost
 
 #undef BOOST_CORE_HAS_CXXABI_H
 

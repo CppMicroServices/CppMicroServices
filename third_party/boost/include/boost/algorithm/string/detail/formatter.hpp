@@ -21,7 +21,7 @@
 
 //  generic replace functors -----------------------------------------------//
 
-namespace cppmsboost {
+namespace boost {
     namespace algorithm {
         namespace detail {
 
@@ -39,7 +39,7 @@ namespace cppmsboost {
             public:
                 // Construction
                 const_formatF(const RangeT& Format) :
-                    m_Format(::cppmsboost::begin(Format), ::cppmsboost::end(Format)) {}
+                    m_Format(::boost::begin(Format), ::boost::end(Format)) {}
 
                 // Operation
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
@@ -70,7 +70,7 @@ namespace cppmsboost {
                 template< typename Range2T >
                 const RangeT& operator()(const Range2T& Replace) const
                 {
-                    return RangeT(::cppmsboost::begin(Replace), ::cppmsboost::end(Replace));
+                    return RangeT(::boost::begin(Replace), ::boost::end(Replace));
                 }
             };
 
@@ -104,7 +104,7 @@ namespace cppmsboost {
                       BOOST_STRING_TYPENAME range_const_iterator<RangeT>::type>
                   operator()(const RangeT& Replace) const
                   {
-                      return m_Finder(::cppmsboost::begin(Replace), ::cppmsboost::end(Replace));
+                      return m_Finder(::boost::begin(Replace), ::boost::end(Replace));
                   }
 
             private:
@@ -114,6 +114,6 @@ namespace cppmsboost {
 
         } // namespace detail
     } // namespace algorithm
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // BOOST_STRING_FORMATTER_DETAIL_HPP

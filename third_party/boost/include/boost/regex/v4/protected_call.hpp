@@ -31,7 +31,7 @@
 #pragma warning(pop)
 #endif
 
-namespace cppmsboost{
+namespace boost{
 namespace BOOST_REGEX_DETAIL_NS{
 
 class BOOST_REGEX_DECL abstract_protected_call
@@ -65,7 +65,7 @@ bool concrete_protected_call<T>::call()const
 }
 
 }
-} // namespace cppmsboost
+} // namespace boost
 
 #ifdef BOOST_MSVC
 #pragma warning(push)

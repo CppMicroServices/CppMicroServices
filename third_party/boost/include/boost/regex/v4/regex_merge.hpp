@@ -22,7 +22,7 @@
 #define BOOST_REGEX_V4_REGEX_MERGE_HPP
 
 
-namespace cppmsboost{
+namespace boost{
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -86,7 +86,7 @@ inline std::basic_string<charT> regex_merge(const std::basic_string<charT>& s,
 #pragma warning(pop)
 #endif
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // BOOST_REGEX_V4_REGEX_MERGE_HPP
 

@@ -19,7 +19,7 @@
 #include <boost/date_time/date_generators.hpp>
 #include <boost/date_time/format_date_parser.hpp>
 
-namespace cppmsboost { namespace date_time {
+namespace boost { namespace date_time {
 
   //! Class for date_generator parsing 
   /*! The elements of a date_generator "phrase" are parsed from the input stream in a 
@@ -174,7 +174,7 @@ namespace cppmsboost { namespace date_time {
         case fifth  : { wn = nth_kday_type::fifth; break; }
         default:
         {
-          cppmsboost::throw_exception(std::ios_base::failure("Parse failed. No match found for '" + mr.cache + "'"));
+          boost::throw_exception(std::ios_base::failure("Parse failed. No match found for '" + mr.cache + "'"));
           BOOST_DATE_TIME_UNREACHABLE_EXPRESSION(wn = nth_kday_type::first);
         }
       }                                         // week num
@@ -281,7 +281,7 @@ namespace cppmsboost { namespace date_time {
       while(std::isspace(*sitr) && sitr != stream_end) { ++sitr; }
       match_results mr = m_element_strings.match(sitr, stream_end);
       if(mr.current_match != ele) {
-        cppmsboost::throw_exception(std::ios_base::failure("Parse failed. No match found for '" + mr.cache + "'"));
+        boost::throw_exception(std::ios_base::failure("Parse failed. No match found for '" + mr.cache + "'"));
       }
     }
 

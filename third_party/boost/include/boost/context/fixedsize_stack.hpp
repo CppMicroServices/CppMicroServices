@@ -32,7 +32,7 @@ extern "C" {
 #  include BOOST_ABI_PREFIX
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace context {
 
 template< typename traitsT >

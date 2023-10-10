@@ -18,19 +18,19 @@ namespace std{
 #include <boost/mpl/apply.hpp>
 #include <boost/type_traits/remove_const.hpp>
 
-namespace cppmsboost { namespace serialization {
+namespace boost { namespace serialization {
 
 template <class Archive>
-struct use_array_optimization : cppmsboost::mpl::always<cppmsboost::mpl::false_> {};
+struct use_array_optimization : boost::mpl::always<boost::mpl::false_> {};
 
-} } // end namespace cppmsboost::serialization
+} } // end namespace boost::serialization
 
 #define BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(Archive)           \
-namespace cppmsboost { namespace serialization {                           \
+namespace boost { namespace serialization {                           \
 template <> struct use_array_optimization<Archive> {                  \
   template <class ValueType>                                          \
-  struct apply : cppmsboost::mpl::apply1<Archive::use_array_optimization   \
-      , typename cppmsboost::remove_const<ValueType>::type                 \
+  struct apply : boost::mpl::apply1<Archive::use_array_optimization   \
+      , typename boost::remove_const<ValueType>::type                 \
     >::type {};                                                       \
 }; }}
 

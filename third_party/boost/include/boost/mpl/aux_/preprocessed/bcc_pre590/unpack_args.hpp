@@ -9,7 +9,7 @@
 // *Preprocessed* version of the main "unpack_args.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 namespace aux {
 

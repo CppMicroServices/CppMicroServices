@@ -39,7 +39,7 @@ extern "C" void _ReadWriteBarrier(void);
 // as far as uarch is concerned. To prevent compiler reordering code around the load/store we add
 // compiler barriers.
 
-namespace cppmsboost
+namespace boost
 {
     namespace detail
     {
@@ -73,7 +73,7 @@ namespace cppmsboost
 
 #include <intrin.h>
 
-namespace cppmsboost
+namespace boost
 {
     namespace detail
     {
@@ -122,7 +122,7 @@ namespace cppmsboost
 
 #elif defined(__GNUC__) && (((__GNUC__ * 100 + __GNUC_MINOR__) >= 407) || (defined(__clang__) && (__clang_major__ * 100 + __clang_minor__) >= 302))
 
-namespace cppmsboost
+namespace boost
 {
     namespace detail
     {
@@ -148,7 +148,7 @@ namespace cppmsboost
 
 #elif defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
 
-namespace cppmsboost
+namespace boost
 {
     namespace detail
     {
@@ -186,7 +186,7 @@ namespace cppmsboost
 
 #else
 
-namespace cppmsboost
+namespace boost
 {
     namespace detail
     {

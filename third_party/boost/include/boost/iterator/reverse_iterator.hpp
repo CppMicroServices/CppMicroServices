@@ -9,7 +9,7 @@
 
 #include <boost/iterator/iterator_adaptor.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace iterators {
 
   //
@@ -72,6 +72,6 @@ namespace iterators {
 using iterators::reverse_iterator;
 using iterators::make_reverse_iterator;
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_REVERSE_ITERATOR_23022003THW_HPP

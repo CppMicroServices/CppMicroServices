@@ -34,7 +34,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -83,10 +83,10 @@ protected:
 #if !defined(BOOST_ASIO_WINDOWS_RUNTIME)
   // Helper class to perform exception-safe cleanup of addrinfo objects.
   class auto_addrinfo
-    : private cppmsboost::asio::detail::noncopyable
+    : private boost::asio::detail::noncopyable
   {
   public:
-    explicit auto_addrinfo(cppmsboost::asio::detail::addrinfo_type* ai)
+    explicit auto_addrinfo(boost::asio::detail::addrinfo_type* ai)
       : ai_(ai)
     {
     }
@@ -97,13 +97,13 @@ protected:
         socket_ops::freeaddrinfo(ai_);
     }
 
-    operator cppmsboost::asio::detail::addrinfo_type*()
+    operator boost::asio::detail::addrinfo_type*()
     {
       return ai_;
     }
 
   private:
-    cppmsboost::asio::detail::addrinfo_type* ai_;
+    boost::asio::detail::addrinfo_type* ai_;
   };
 #endif // !defined(BOOST_ASIO_WINDOWS_RUNTIME)
 
@@ -123,18 +123,18 @@ protected:
 
 private:
   // Mutex to protect access to internal data.
-  cppmsboost::asio::detail::mutex mutex_;
+  boost::asio::detail::mutex mutex_;
 
   // Private scheduler used for performing asynchronous host resolution.
-  cppmsboost::asio::detail::scoped_ptr<scheduler_impl> work_scheduler_;
+  boost::asio::detail::scoped_ptr<scheduler_impl> work_scheduler_;
 
   // Thread used for running the work io_context's run loop.
-  cppmsboost::asio::detail::scoped_ptr<cppmsboost::asio::detail::thread> work_thread_;
+  boost::asio::detail::scoped_ptr<boost::asio::detail::thread> work_thread_;
 };
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

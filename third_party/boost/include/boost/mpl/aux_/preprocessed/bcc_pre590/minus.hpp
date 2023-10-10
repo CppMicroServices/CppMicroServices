@@ -9,7 +9,7 @@
 // *Preprocessed* version of the main "minus.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<
       typename Tag1
@@ -124,7 +124,7 @@ BOOST_MPL_AUX_NA_SPEC2(2, 5, minus)
 
 }}
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 template<>
 struct minus_impl< integral_c_tag,integral_c_tag >
 {

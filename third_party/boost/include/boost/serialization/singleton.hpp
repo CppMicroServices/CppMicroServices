@@ -50,7 +50,7 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace serialization {
 
 //////////////////////////////////////////////////////////////////////
@@ -98,7 +98,7 @@ namespace serialization {
 // This usage is not related to autolinking.
 
 class BOOST_SYMBOL_VISIBLE singleton_module :
-    public cppmsboost::noncopyable
+    public boost::noncopyable
 {
 private:
     BOOST_DLLEXPORT bool & get_lock() BOOST_USED {
@@ -207,7 +207,7 @@ template<class T>
 T * singleton< T >::m_instance = & singleton< T >::get_instance();
 
 } // namespace serialization
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/archive/detail/abi_suffix.hpp> // pops abi_suffix.hpp pragmas
 

@@ -842,7 +842,7 @@ namespace cppmicroservices
     }
 
     bool
-    LDAPExpr::CompareString(const absl::string_view s1, int op, const absl::string_view s2)
+    LDAPExpr::CompareString(absl::string_view const s1, int op, absl::string_view const s2)
     {
         switch (op)
         {
@@ -860,7 +860,7 @@ namespace cppmicroservices
     }
 
     std::string
-    LDAPExpr::FixupString(const absl::string_view s)
+    LDAPExpr::FixupString(absl::string_view const s)
     {
         std::string sb;
         sb.reserve(s.size());
@@ -881,7 +881,7 @@ namespace cppmicroservices
     }
 
     bool
-    LDAPExpr::PatSubstr(const absl::string_view s, int si, const absl::string_view pat, int pi)
+    LDAPExpr::PatSubstr(absl::string_view const s, int si, absl::string_view const pat, int pi)
     {
         if (pat.size() - pi == 0)
         {
@@ -918,7 +918,7 @@ namespace cppmicroservices
     }
 
     bool
-    LDAPExpr::PatSubstr(const absl::string_view s, const absl::string_view pat)
+    LDAPExpr::PatSubstr(absl::string_view const s, absl::string_view const pat)
     {
         return PatSubstr(s, 0, pat, 0);
     }
@@ -1007,7 +1007,7 @@ namespace cppmicroservices
         return LDAPExpr(op, attrName, attrValue);
     }
 
-    const std::string
+    std::string const
     LDAPExpr::ToString() const
     {
         std::string res;

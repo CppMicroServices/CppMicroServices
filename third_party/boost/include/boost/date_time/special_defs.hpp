@@ -9,7 +9,7 @@
  * $Date$
  */
 
-namespace cppmsboost {
+namespace boost {
 namespace date_time {
 
     enum special_values {not_a_date_time, 

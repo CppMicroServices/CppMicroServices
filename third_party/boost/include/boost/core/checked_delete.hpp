@@ -23,7 +23,7 @@
 //  See http://www.boost.org/libs/core/doc/html/core/checked_delete.html for documentation.
 //
 
-namespace cppmsboost
+namespace boost
 {
 
 // verify that types are complete for increased safety
@@ -50,8 +50,8 @@ template<class T> struct checked_deleter
 
     void operator()(T * x) const BOOST_NOEXCEPT
     {
-        // cppmsboost:: disables ADL
-        cppmsboost::checked_delete(x);
+        // boost:: disables ADL
+        boost::checked_delete(x);
     }
 };
 
@@ -62,10 +62,10 @@ template<class T> struct checked_array_deleter
 
     void operator()(T * x) const BOOST_NOEXCEPT
     {
-        cppmsboost::checked_array_delete(x);
+        boost::checked_array_delete(x);
     }
 };
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // #ifndef BOOST_CORE_CHECKED_DELETE_HPP

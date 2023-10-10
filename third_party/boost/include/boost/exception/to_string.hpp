@@ -23,7 +23,7 @@
 #endif
 
 namespace
-cppmsboost
+boost
     {
     template <class T,class U>
     std::string to_string( std::pair<T,U> const & );
@@ -34,7 +34,7 @@ cppmsboost
         {
         template <class T>
         typename disable_if<is_output_streamable<T>,char>::type to_string( T const & );
-        using cppmsboost::to_string;
+        using boost::to_string;
 
         template <class,bool IsOutputStreamable>
         struct has_to_string_impl;

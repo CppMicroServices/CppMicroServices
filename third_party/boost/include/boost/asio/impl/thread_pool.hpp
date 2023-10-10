@@ -23,7 +23,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 
 inline thread_pool::executor_type
@@ -63,7 +63,7 @@ void thread_pool::executor_type::dispatch(
     function_type tmp(BOOST_ASIO_MOVE_CAST(Function)(f));
 
     detail::fenced_block b(detail::fenced_block::full);
-    cppmsboost_asio_handler_invoke_helpers::invoke(tmp, tmp);
+    boost_asio_handler_invoke_helpers::invoke(tmp, tmp);
     return;
   }
 
@@ -122,7 +122,7 @@ thread_pool::executor_type::running_in_this_thread() const BOOST_ASIO_NOEXCEPT
 }
 
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

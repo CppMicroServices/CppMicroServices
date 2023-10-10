@@ -43,7 +43,7 @@ namespace std {
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 template<class Ch>
@@ -100,7 +100,7 @@ public:
 };
 
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #ifdef BOOST_MSVC
 #  pragma warning(pop)

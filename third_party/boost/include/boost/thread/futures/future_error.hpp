@@ -15,7 +15,7 @@
 
 #include <stdexcept>
 
-namespace cppmsboost
+namespace boost
 {
   class BOOST_SYMBOL_VISIBLE future_error
       : public std::logic_error

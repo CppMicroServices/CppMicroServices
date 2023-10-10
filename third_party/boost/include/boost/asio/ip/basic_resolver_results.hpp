@@ -28,13 +28,13 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace ip {
 
 /// A range of entries produced by a resolver.
 /**
- * The cppmsboost::asio::ip::basic_resolver_results class template is used to define
+ * The boost::asio::ip::basic_resolver_results class template is used to define
  * a range over the results returned by a resolver.
  *
  * The iterator's value_type, obtained when a results iterator is dereferenced,
@@ -123,7 +123,7 @@ public:
 #if !defined(GENERATING_DOCUMENTATION)
   // Create results from an addrinfo list returned by getaddrinfo.
   static basic_resolver_results create(
-      cppmsboost::asio::detail::addrinfo_type* address_info,
+      boost::asio::detail::addrinfo_type* address_info,
       const std::string& host_name, const std::string& service_name)
   {
     basic_resolver_results results;
@@ -193,7 +193,7 @@ public:
   static basic_resolver_results create(
       Windows::Foundation::Collections::IVectorView<
         Windows::Networking::EndpointPair^>^ endpoints,
-      const cppmsboost::asio::detail::addrinfo_type& hints,
+      const boost::asio::detail::addrinfo_type& hints,
       const std::string& host_name, const std::string& service_name)
   {
     basic_resolver_results results;
@@ -218,9 +218,9 @@ public:
             basic_resolver_entry<InternetProtocol>(
               typename InternetProtocol::endpoint(
                 ip::make_address(
-                  cppmsboost::asio::detail::winrt_utils::string(
+                  boost::asio::detail::winrt_utils::string(
                     pair->RemoteHostName->CanonicalName)),
-                cppmsboost::asio::detail::winrt_utils::integer(
+                boost::asio::detail::winrt_utils::integer(
                   pair->RemoteServiceName)),
               host_name, service_name));
       }
@@ -306,7 +306,7 @@ private:
 
 } // namespace ip
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

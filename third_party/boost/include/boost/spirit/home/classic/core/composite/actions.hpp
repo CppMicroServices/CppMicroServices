@@ -13,7 +13,7 @@
 #include <boost/spirit/home/classic/core/composite/composite.hpp>
 #include <boost/core/ignore_unused.hpp>
 
-namespace cppmsboost { namespace spirit {
+namespace boost { namespace spirit {
 
 BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 

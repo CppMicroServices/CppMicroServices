@@ -26,7 +26,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace cppmsboost
+namespace boost
 {
     namespace detail
     {
@@ -62,7 +62,7 @@ namespace cppmsboost
         template<typename C>
         struct range_size_<
             C,
-            BOOST_DEDUCED_TYPENAME ::cppmsboost::enable_if<has_size_type<C>, void>::type
+            BOOST_DEDUCED_TYPENAME ::boost::enable_if<has_size_type<C>, void>::type
         >
         {
             typedef BOOST_DEDUCED_TYPENAME C::size_type type;
@@ -83,7 +83,7 @@ namespace cppmsboost
         detail::range_size<T>
     { };
 
-} // namespace cppmsboost
+} // namespace boost
 
 
 

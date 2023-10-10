@@ -13,7 +13,7 @@
 
 #include <boost/type_traits/integral_constant.hpp>
 
-namespace cppmsboost {
+namespace boost {
 
    template <class T>
    struct is_function : public false_type {};

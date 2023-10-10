@@ -21,10 +21,10 @@
 #pragma once
 #endif
 
-namespace cppmsboost {
+namespace boost {
 
 using atomics::atomic_ref;
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ATOMIC_ATOMIC_REF_HPP_INCLUDED_

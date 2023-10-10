@@ -20,7 +20,7 @@
 #include <boost/mpl/aux_/nttp_decl.hpp>
 #include <boost/mpl/aux_/na_spec.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<
       typename BOOST_MPL_AUX_NA_PARAM(T)

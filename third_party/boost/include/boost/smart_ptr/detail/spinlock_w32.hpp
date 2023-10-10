@@ -43,7 +43,7 @@ extern "C" void _ReadWriteBarrier();
 
 //
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace detail
@@ -70,7 +70,7 @@ public:
     {
         for( unsigned k = 0; !try_lock(); ++k )
         {
-            cppmsboost::detail::yield( k );
+            boost::detail::yield( k );
         }
     }
 
@@ -106,7 +106,7 @@ public:
 };
 
 } // namespace detail
-} // namespace cppmsboost
+} // namespace boost
 
 #define BOOST_DETAIL_SPINLOCK_INIT {0}
 

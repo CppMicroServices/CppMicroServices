@@ -26,14 +26,14 @@
 #include <boost/type_traits/add_lvalue_reference.hpp>
 #endif
 
-namespace cppmsboost {
+namespace boost {
 
 template <typename T> struct has_trivial_copy 
 : public integral_constant<bool, 
 #ifdef BOOST_HAS_TRIVIAL_COPY
    BOOST_HAS_TRIVIAL_COPY(T) BOOST_TT_TRIVIAL_CONSTRUCT_FIX
 #else
-   ::cppmsboost::is_pod<T>::value
+   ::boost::is_pod<T>::value
 #endif
 >{};
 // Arrays are not explicitly copyable:
@@ -58,6 +58,6 @@ template <class T> struct has_trivial_copy_constructor : public has_trivial_copy
 
 #undef BOOST_TT_TRIVIAL_CONSTRUCT_FIX
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_TT_HAS_TRIVIAL_COPY_HPP_INCLUDED

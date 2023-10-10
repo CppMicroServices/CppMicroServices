@@ -17,7 +17,7 @@
 
  */
 
-namespace cppmsboost
+namespace boost
 {
   namespace chrono
   {
@@ -96,6 +96,6 @@ namespace cppmsboost
     }
 
   } // namespace chrono
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // header

@@ -24,7 +24,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace cppmsboost
+namespace boost
 {
     //////////////////////////////////////////////////////////////////////////
     // default
@@ -70,7 +70,7 @@ struct range_const_iterator
 {
 };
 
-} // namespace cppmsboost
+} // namespace boost
 
 
 #endif

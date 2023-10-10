@@ -21,12 +21,12 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace error {
 namespace detail {
 
-class ssl_category : public cppmsboost::system::error_category
+class ssl_category : public boost::system::error_category
 {
 public:
   const char* name() const BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT
@@ -43,7 +43,7 @@ public:
 
 } // namespace detail
 
-const cppmsboost::system::error_category& get_ssl_category()
+const boost::system::error_category& get_ssl_category()
 {
   static detail::ssl_category instance;
   return instance;
@@ -55,16 +55,16 @@ namespace error {
 
 #if (OPENSSL_VERSION_NUMBER < 0x10100000L) && !defined(OPENSSL_IS_BORINGSSL)
 
-const cppmsboost::system::error_category& get_stream_category()
+const boost::system::error_category& get_stream_category()
 {
-  return cppmsboost::asio::error::get_ssl_category();
+  return boost::asio::error::get_ssl_category();
 }
 
 #else
 
 namespace detail {
 
-class stream_category : public cppmsboost::system::error_category
+class stream_category : public boost::system::error_category
 {
 public:
   const char* name() const BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT
@@ -86,7 +86,7 @@ public:
 
 } // namespace detail
 
-const cppmsboost::system::error_category& get_stream_category()
+const boost::system::error_category& get_stream_category()
 {
   static detail::stream_category instance;
   return instance;
@@ -97,7 +97,7 @@ const cppmsboost::system::error_category& get_stream_category()
 } // namespace error
 } // namespace ssl
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

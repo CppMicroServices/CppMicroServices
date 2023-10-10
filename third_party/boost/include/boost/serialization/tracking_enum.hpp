@@ -16,7 +16,7 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
-namespace cppmsboost {
+namespace boost {
 namespace serialization {
 
 // addresses of serialized objects may be tracked to avoid saving/loading
@@ -36,6 +36,6 @@ enum tracking_type
 };
 
 } // namespace serialization
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_SERIALIZATION_TRACKING_ENUM_HPP

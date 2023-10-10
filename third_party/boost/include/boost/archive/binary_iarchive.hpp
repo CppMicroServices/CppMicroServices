@@ -25,7 +25,7 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 // do not derive from this class.  If you want to extend this functionality
@@ -33,7 +33,7 @@ namespace archive {
 // preserve correct static polymorphism.
 class BOOST_SYMBOL_VISIBLE binary_iarchive :
     public binary_iarchive_impl<
-        cppmsboost::archive::binary_iarchive,
+        boost::archive::binary_iarchive,
         std::istream::char_type,
         std::istream::traits_type
     >{
@@ -55,11 +55,11 @@ public:
 };
 
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 // required by export
-BOOST_SERIALIZATION_REGISTER_ARCHIVE(cppmsboost::archive::binary_iarchive)
-BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(cppmsboost::archive::binary_iarchive)
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(boost::archive::binary_iarchive)
+BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(boost::archive::binary_iarchive)
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

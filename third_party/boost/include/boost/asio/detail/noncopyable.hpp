@@ -19,7 +19,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -35,10 +35,10 @@ private:
 
 } // namespace detail
 
-using cppmsboost::asio::detail::noncopyable;
+using boost::asio::detail::noncopyable;
 
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

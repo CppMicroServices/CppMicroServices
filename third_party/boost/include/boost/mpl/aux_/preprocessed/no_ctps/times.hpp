@@ -9,7 +9,7 @@
 // Preprocessed version of "boost/mpl/times.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<
       typename Tag1
@@ -111,7 +111,7 @@ BOOST_MPL_AUX_NA_SPEC2(2, 5, times)
 
 }}
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 template<>
 struct times_impl< integral_c_tag,integral_c_tag >
 {

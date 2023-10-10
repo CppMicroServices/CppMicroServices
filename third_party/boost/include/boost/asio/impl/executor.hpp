@@ -26,7 +26,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 
 #if !defined(GENERATING_DOCUMENTATION)
@@ -382,7 +382,7 @@ const Executor* executor::target() const BOOST_ASIO_NOEXCEPT
 #endif // !defined(GENERATING_DOCUMENTATION)
 
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

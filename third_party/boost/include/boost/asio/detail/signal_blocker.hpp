@@ -27,7 +27,7 @@
 # error Only Windows and POSIX are supported!
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -41,6 +41,6 @@ typedef posix_signal_blocker signal_blocker;
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ASIO_DETAIL_SIGNAL_BLOCKER_HPP

@@ -28,10 +28,10 @@
     of the matches (in a compatible structure like std::string) or
     a reference to it (e.g. using the iterator range class).
     Examples of such a container are \c std::vector<std::string>
-    or \c std::list<cppmsboost::iterator_range<std::string::iterator>>
+    or \c std::list<boost::iterator_range<std::string::iterator>>
 */
 
-namespace cppmsboost {
+namespace boost {
     namespace algorithm {
 
 //  find_all  ------------------------------------------------------------//
@@ -47,7 +47,7 @@ namespace cppmsboost {
             of the matches (in a compatible structure like std::string) or
             a reference to it (e.g. using the iterator range class).
             Examples of such a container are \c std::vector<std::string>
-            or \c std::list<cppmsboost::iterator_range<std::string::iterator>>
+            or \c std::list<boost::iterator_range<std::string::iterator>>
 
             \param Result A container that can hold copies of references to the substrings
             \param Input A container which will be searched.
@@ -68,10 +68,10 @@ namespace cppmsboost {
 #endif
             const Range2T& Search)
         {
-            return ::cppmsboost::algorithm::iter_find(
+            return ::boost::algorithm::iter_find(
                 Result,
                 Input,
-                ::cppmsboost::algorithm::first_finder(Search) );        
+                ::boost::algorithm::first_finder(Search) );        
         }
 
         //! Find all algorithm ( case insensitive ) 
@@ -83,7 +83,7 @@ namespace cppmsboost {
             of the matches (in a compatible structure like std::string) or
             a reference to it (e.g. using the iterator range class).
             Examples of such a container are \c std::vector<std::string>
-            or \c std::list<cppmsboost::iterator_range<std::string::iterator>>
+            or \c std::list<boost::iterator_range<std::string::iterator>>
 
             Searching is case insensitive.
 
@@ -108,10 +108,10 @@ namespace cppmsboost {
             const Range2T& Search,
             const std::locale& Loc=std::locale() )
         {
-            return ::cppmsboost::algorithm::iter_find(
+            return ::boost::algorithm::iter_find(
                 Result,
                 Input,
-                ::cppmsboost::algorithm::first_finder(Search, is_iequal(Loc) ) );        
+                ::boost::algorithm::first_finder(Search, is_iequal(Loc) ) );        
         }
 
 
@@ -129,7 +129,7 @@ namespace cppmsboost {
             of the matches (in a compatible structure like std::string) or
             a reference to it (e.g. using the iterator range class).
             Examples of such a container are \c std::vector<std::string>
-            or \c std::list<cppmsboost::iterator_range<std::string::iterator>>
+            or \c std::list<boost::iterator_range<std::string::iterator>>
     
             \param Result A container that can hold copies of references to the substrings          
             \param Input A container which will be searched.
@@ -155,10 +155,10 @@ namespace cppmsboost {
             PredicateT Pred,
             token_compress_mode_type eCompress=token_compress_off )
         {
-            return ::cppmsboost::algorithm::iter_split(
+            return ::boost::algorithm::iter_split(
                 Result,
                 Input,
-                ::cppmsboost::algorithm::token_finder( Pred, eCompress ) );         
+                ::boost::algorithm::token_finder( Pred, eCompress ) );         
         }
 
     } // namespace algorithm
@@ -168,7 +168,7 @@ namespace cppmsboost {
     using algorithm::ifind_all;
     using algorithm::split;    
 
-} // namespace cppmsboost
+} // namespace boost
 
 
 #endif  // BOOST_STRING_SPLIT_HPP

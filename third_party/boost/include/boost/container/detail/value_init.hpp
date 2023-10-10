@@ -24,7 +24,7 @@
 #include <boost/container/detail/config_begin.hpp>
 #include <boost/container/detail/workaround.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace container {
 namespace dtl {
 
@@ -44,7 +44,7 @@ struct value_init
 
 }  //namespace dtl {
 }  //namespace container {
-}  //namespace cppmsboost {
+}  //namespace boost {
 
 #include <boost/container/detail/config_end.hpp>
 

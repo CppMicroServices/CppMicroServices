@@ -17,7 +17,7 @@
 #include <boost/iterator/iterator_categories.hpp>
 #include <boost/function.hpp>
 
-namespace cppmsboost {
+namespace boost {
     namespace algorithm { 
         namespace detail {
 
@@ -81,7 +81,7 @@ namespace cppmsboost {
 
        } // namespace detail
     } // namespace algorithm
-} // namespace cppmsboost
+} // namespace boost
 
 
 #endif  // BOOST_STRING_FIND_ITERATOR_DETAIL_HPP

@@ -34,7 +34,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -60,9 +60,9 @@ void pipe_select_interrupter::open_descriptors()
   }
   else
   {
-    cppmsboost::system::error_code ec(errno,
-        cppmsboost::asio::error::get_system_category());
-    cppmsboost::asio::detail::throw_error(ec, "pipe_select_interrupter");
+    boost::system::error_code ec(errno,
+        boost::asio::error::get_system_category());
+    boost::asio::detail::throw_error(ec, "pipe_select_interrupter");
   }
 }
 
@@ -118,7 +118,7 @@ bool pipe_select_interrupter::reset()
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

@@ -19,7 +19,7 @@
 #include <boost/date_time/date_formatting_locales.hpp>
 #include <boost/date_time/time_resolution_traits.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace date_time {
 
 

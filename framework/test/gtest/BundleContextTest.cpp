@@ -221,6 +221,8 @@ TEST_F(BundleContextTest, NoSegfaultWithServiceFactory)
     thread.join();
 }
 
+#endif
+
 template <typename ServiceT>
 bool
 verifyOrdering(std::vector<cppmicroservices::ServiceReference<ServiceT>> const& refs)
@@ -230,7 +232,7 @@ verifyOrdering(std::vector<cppmicroservices::ServiceReference<ServiceT>> const& 
         for (size_t i = 1; i < refs.size(); ++i)
         {
             if ((any_cast<int>(refs[i].GetProperty(Constants::SERVICE_RANKING))
-                  >= any_cast<int>(refs[i - 1].GetProperty(Constants::SERVICE_RANKING))))
+                 >= any_cast<int>(refs[i - 1].GetProperty(Constants::SERVICE_RANKING))))
             {
                 return false;
             }
@@ -277,5 +279,3 @@ TEST_P(BundleContextTestParam, TestGetServiceReferenceOrdering)
         ASSERT_TRUE(refs.size() == pair.second);
     }
 }
-
-#endif

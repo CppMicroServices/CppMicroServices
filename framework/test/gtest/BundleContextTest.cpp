@@ -242,36 +242,26 @@ verifyOrdering(std::vector<cppmicroservices::ServiceReference<ServiceT>> const& 
     }
     return true;
 }
-std::vector<ServiceProperties> props1 { { { "service.ranking", 2 } },
-                                        { { "service.ranking", 0 } },
-                                        { { "service.ranking", 4 } },
-                                        { { "service.ranking", 1 } },
-                                        { { "service.ranking", 3 } } };
-std::vector<std::pair<std::string, size_t>> vec1 {
-    {"", 5}
-};
 
-std::vector<ServiceProperties> props2 {
-    {{ "service.ranking", 2000 }, { "Key1", std::string("Val1") }},
-    {  { "service.ranking", 15 }, { "Key1", std::string("Val2") }},
-    {   { "service.ranking", 0 }, { "Key1", std::string("Val2") }},
-    {{ "service.ranking", 1506 }, { "Key2", std::string("Val1") }},
-    { { "service.ranking", 905 }, { "Key2", std::string("Val1") }}
-};
-std::vector<std::pair<std::string, size_t>> vec2 {
-    {           "", 5},
-    {"(Key1=Val*)", 3},
-    {"(Key2=Val*)", 2}
-};
-
-std::vector<std::pair<std::vector<std::pair<std::string, size_t>>, std::vector<ServiceProperties>>> parameterizedInputs {
-    {vec1, props1},
-    {vec2, props2}
-};
-
+using BundleContParamType = std::pair<std::vector<std::pair<std::string, size_t>>, std::vector<ServiceProperties>>;
 INSTANTIATE_TEST_SUITE_P(BundleContextTestParameterized,
                          BundleContextTestParam,
-                         ::testing::ValuesIn(parameterizedInputs.begin(), parameterizedInputs.end()));
+                         ::testing::Values(
+                             BundleContParamType {
+                                 { { "", 5 } },
+                                 { { { "service.ranking", 2 } },
+                                  { { "service.ranking", 0 } },
+                                  { { "service.ranking", 4 } },
+                                  { { "service.ranking", 1 } },
+                                  { { "service.ranking", 3 } } }
+},
+                             BundleContParamType {
+                                 { { "", 5 }, { "(Key1=Val*)", 3 }, { "(Key2=Val*)", 2 } },
+                                 { { { "service.ranking", 2000 }, { "Key1", std::string("Val1") } },
+                                   { { "service.ranking", 15 }, { "Key1", std::string("Val2") } },
+                                   { { "service.ranking", 0 }, { "Key1", std::string("Val2") } },
+                                   { { "service.ranking", 1506 }, { "Key2", std::string("Val1") } },
+                                   { { "service.ranking", 905 }, { "Key2", std::string("Val1") } } } }));
 
 TEST_P(BundleContextTestParam, TestGetServiceReferenceOrdering)
 {

@@ -405,3 +405,41 @@ TEST(AnyMapTest, ManifestFromCache)
     EXPECT_EQ(cache_bundle2_copy, bundle2);
     EXPECT_EQ(0, bundles.size());
 }
+
+TEST(AnyMapTest, InitializerList)
+{
+    AnyMap noType {
+        {{ "a", 1 }, { "b", 2 }}
+    };
+    EXPECT_EQ(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS, noType.GetType());
+    EXPECT_EQ(2, noType.size());
+    EXPECT_EQ(Any(1), noType.at("a"));
+    EXPECT_EQ(Any(2), noType.at("b"));
+
+    AnyMap ordered_any_map {
+        any_map::ORDERED_MAP,
+        {{ "c", 3 }, { "d", 4 }}
+    };
+    EXPECT_EQ(any_map::ORDERED_MAP, ordered_any_map.GetType());
+    EXPECT_EQ(2, ordered_any_map.size());
+    EXPECT_EQ(Any(3), ordered_any_map.at("c"));
+    EXPECT_EQ(Any(4), ordered_any_map.at("d"));
+
+    AnyMap unordered_any_map {
+        any_map::UNORDERED_MAP,
+        {{ "e", 5 }, { "f", 6 }}
+    };
+    EXPECT_EQ(any_map::UNORDERED_MAP, unordered_any_map.GetType());
+    EXPECT_EQ(2, unordered_any_map.size());
+    EXPECT_EQ(Any(5), unordered_any_map.at("e"));
+    EXPECT_EQ(Any(6), unordered_any_map.at("f"));
+
+    AnyMap unordered_any_cimap {
+        any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS,
+        {{ "g", 7 }, { "h", 8 }}
+    };
+    EXPECT_EQ(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS, unordered_any_cimap.GetType());
+    EXPECT_EQ(2, unordered_any_cimap.size());
+    EXPECT_EQ(Any(7), unordered_any_cimap.at("g"));
+    EXPECT_EQ(Any(8), unordered_any_cimap.at("h"));
+}

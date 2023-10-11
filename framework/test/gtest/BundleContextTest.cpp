@@ -80,9 +80,8 @@ class BundleContextTest : public ::testing::Test
     cppmicroservices::BundleContext context;
 };
 
-class BundleContextTestParam
-    : public ::testing::TestWithParam<
-          std::pair<std::vector<std::pair<std::string, size_t>>, std::vector<ServiceProperties>>>
+using BundleContParamType = std::pair<std::vector<std::pair<std::string, size_t>>, std::vector<ServiceProperties>>;
+class BundleContextTestParam : public ::testing::TestWithParam<BundleContParamType>
 {
   public:
     BundleContextTestParam() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
@@ -243,7 +242,6 @@ verifyOrdering(std::vector<cppmicroservices::ServiceReference<ServiceT>> const& 
     return true;
 }
 
-using BundleContParamType = std::pair<std::vector<std::pair<std::string, size_t>>, std::vector<ServiceProperties>>;
 INSTANTIATE_TEST_SUITE_P(BundleContextTestParameterized,
                          BundleContextTestParam,
                          ::testing::Values(

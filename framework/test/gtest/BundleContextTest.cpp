@@ -225,18 +225,15 @@ template <typename ServiceT>
 bool
 verifyOrdering(std::vector<cppmicroservices::ServiceReference<ServiceT>> const& refs)
 {
-    if (refs.size() > 0)
+    if (refs.size() > 1)
     {
-        auto last = refs[0];
-        for (auto const& ref : refs)
+        for (size_t i = 1; i < refs.size(); ++i)
         {
-            if (!(any_cast<int>(ref.GetProperty(Constants::SERVICE_RANKING))
-                  <= any_cast<int>(last.GetProperty(Constants::SERVICE_RANKING))))
+            if ((any_cast<int>(refs[i].GetProperty(Constants::SERVICE_RANKING))
+                  >= any_cast<int>(refs[i - 1].GetProperty(Constants::SERVICE_RANKING))))
             {
                 return false;
             }
-
-            last = ref;
         }
     }
     return true;

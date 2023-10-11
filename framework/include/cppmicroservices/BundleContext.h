@@ -387,9 +387,9 @@ namespace cppmicroservices
         }
 
         /**
-         * Returns a list of <code>ServiceReference</code> objects. The returned
-         * list contains services that were registered under the specified class
-         * and match the specified filter expression.
+         * Returns a list of <code>ServiceReference</code> objects ordered
+         * by rank. The returned list contains services that were registered under
+         * the specified class and match the specified filter expression.
          *
          * <p>
          * The list is valid at the time of the call to this method. However, since
@@ -425,7 +425,7 @@ namespace cppmicroservices
          *        services.
          * @return A list of <code>ServiceReference</code> objects or
          *         an empty list if no services are registered that satisfy the
-         *         search.
+         *         search. These objects will be in decreasing order of their rank.
          * @throws std::invalid_argument If the specified <code>filter</code>
          *         contains an invalid filter expression that cannot be parsed.
          * @throws std::runtime_error If this BundleContext is no longer valid.
@@ -436,10 +436,9 @@ namespace cppmicroservices
                                                             std::string const& filter = std::string());
 
         /**
-         * Returns a list of <code>ServiceReference</code> objects. The returned
-         * list contains services that
-         * were registered under the interface id of the template argument <code>S</code>
-         * and match the specified filter expression.
+         * Returns a list of <code>ServiceReference</code> objects ordered by rank. The returned
+         * list contains services that were registered under the interface id of
+         * the template argument <code>S</code> and match the specified filter expression.
          *
          * <p>
          * This method is identical to GetServiceReferences(const std::string&, const std::string&) except that
@@ -450,7 +449,7 @@ namespace cppmicroservices
          *        services.
          * @return A list of <code>ServiceReference</code> objects or
          *         an empty list if no services are registered which satisfy the
-         *         search.
+         *         search. These objects will be in decreasing order of their rank.
          * @throws std::invalid_argument If the specified <code>filter</code>
          *         contains an invalid filter expression that cannot be parsed.
          * @throws std::runtime_error If this BundleContext is no longer valid.

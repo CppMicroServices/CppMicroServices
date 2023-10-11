@@ -267,9 +267,9 @@ namespace test
      * Verify that Declarative Services data stored in the bundle is initialized when a component is loaded
      * Currently the only applicable data is the BundleContextPrivate used by GetBundleContext
      */
-    void testComponentHelper_Initialization(tServiceComponent* t, std::string const& bundle) {
+    void testComponentHelper_Initialization(tServiceComponent* t, std::string const& bundle, std::string const& component) {
         auto testBundle = t->StartTestBundle(bundle);
-        auto compDescDTO = t->dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent20");
+        auto compDescDTO = t->dsRuntimeService->GetComponentDescriptionDTO(testBundle, component);
         auto compConfigDTOs = t->dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);
         EXPECT_EQ(compConfigDTOs.size(), 1ul);
 
@@ -278,20 +278,30 @@ namespace test
         auto sRef = ctxt.GetServiceReference<test::TestInitialization>();
         auto service = ctxt.GetService(sRef);
         std::vector<cppmicroservices::BundleContext> ctxt2 = service->GetContexts();
-        ASSERT_EQ(ctxt2.size(), 2);
+        int items = ctxt2.size();
+        ASSERT_TRUE(items == 2 || items == 3);
         EXPECT_TRUE(ctxt == ctxt2[0]) << "Service's activator must be provided with its bundle context";
         EXPECT_TRUE(ctxt == ctxt2[1]) << "Service's US_GET_CTX_FUNC must return the bundle context";
+        if (items == 3) {
+            EXPECT_TRUE(ctxt == ctxt2[2]) << "Service's bundle activator must be provided with its bundle context";
+        }
     }
 
-    /** Tests DS data initialization for an immediate component */
+    /** Tests DS data initialization for an immediate component without a bundle activator */
     TEST_F(tServiceComponent, testImmediateComponent_Initialization) {
-        testComponentHelper_Initialization(this, "TestBundleDSTOI20");
+        testComponentHelper_Initialization(this, "TestBundleDSTOI20", "sample::ServiceComponent20");
+        if (HasFatalFailure()) return;
+    }
+
+    /** Tests DS data initialization for an immediate component with a bundle activator */
+    TEST_F(tServiceComponent, testImmediateComponent_Initialization_Activator) {
+        testComponentHelper_Initialization(this, "TestBundleDSTOI22", "sample::ServiceComponent22");
         if (HasFatalFailure()) return;
     }
 
     /** Tests DS data initialization for a delayed component */
     TEST_F(tServiceComponent, testDelayedComponent_Initialization) {
-        testComponentHelper_Initialization(this, "TestBundleDSTOI21");
+        testComponentHelper_Initialization(this, "TestBundleDSTOI21", "sample::ServiceComponent21");
         if (HasFatalFailure()) return;
     }
 

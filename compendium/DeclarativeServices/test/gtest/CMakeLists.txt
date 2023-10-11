@@ -191,6 +191,7 @@ set(_test_bundles
   TestBundleDSTOI19
   TestBundleDSTOI20
   TestBundleDSTOI21
+  TestBundleDSTOI22
   TestBundleDSCA01
   TestBundleDSCA02
   TestBundleDSCA03

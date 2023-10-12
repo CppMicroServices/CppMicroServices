@@ -151,23 +151,11 @@ namespace cppmicroservices
             inline BundleTrackerCustomizer<T>*
             GetCustomizer_unlocked()
             {
-                return (_customizer ? _customizer.get() : getTrackerAsCustomizer());
+                return (_customizer ? _customizer.get() : static_cast<BundleTrackerCustomizer<T>*>(_bundleTracker));
             }
 
           private:
-            inline BundleTrackerCustomizer<T>*
-            getTrackerAsCustomizer()
-            {
-                return static_cast<BundleTrackerCustomizer<T>*>(_bundleTracker);
-            }
-
-            inline BundleTrackerCustomizer<T> const*
-            getTrackerAsCustomizer() const
-            {
-                return static_cast<BundleTrackerCustomizer<T>*>(_bundleTracker);
-            }
-
-              friend class BundleTracker<T>;
+            friend class BundleTracker<T>;
 
             BundleTracker<T>* const _bundleTracker;
         };

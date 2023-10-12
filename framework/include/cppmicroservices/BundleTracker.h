@@ -333,9 +333,7 @@ namespace cppmicroservices
                     return;
                 }
 
-                t = std::make_shared<detail::TrackedBundle<T>>(this,
-                                                               d->_customizer ? d->_customizer.get()
-                                                                             : d->getTrackerAsCustomizer());
+                t = std::make_shared<detail::TrackedBundle<T>>(this, d->GetCustomizer_unlocked());
                 try
                 {
                     // Attempt to drop old listener

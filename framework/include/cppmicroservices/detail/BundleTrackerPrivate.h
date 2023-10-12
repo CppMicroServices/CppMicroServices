@@ -33,131 +33,146 @@
 #include <stdexcept>
 #include <utility>
 
-namespace cppmicroservices {
-
-template<class T>
-class BundleTracker;
-
-namespace detail {
-
-/**
- * \ingroup MicroServices
- */
-template<class T>
-class BundleTrackerPrivate : MultiThreaded<>
+namespace cppmicroservices
 {
 
-public:
-  using BundleStateMaskType = std::underlying_type_t<Bundle::State>;
+    template <class T>
+    class BundleTracker;
 
-  BundleTrackerPrivate(BundleTracker<T>* bundleTracker,
-                       BundleContext const& context,
-                       const BundleStateMaskType stateMask,
-                       const std::shared_ptr<BundleTrackerCustomizer<T>> customizer)
-      : _context(context)
-      , _stateMask(stateMask)
-      , _customizer(customizer)
-      , listenerToken()
-      , trackedBundle()
-      , _bundleTracker(bundleTracker)
-  {
-  }
-  ~BundleTrackerPrivate() = default;
+    namespace detail
+    {
 
-  /**
-   * Returns the list of initial <code>Bundle</code>s that will be
-   * tracked by the <code>BundleTracker</code>.
-   * 
-   * @param stateMask The mask of states to filter bundles
-   * 
-   * @return The list of initial <code>Bundle</code>s.
-   */
-  std::vector<Bundle> GetInitialBundles(BundleStateMaskType stateMask)
-  {
-    std::vector<Bundle> result;
-    auto contextBundles = _context.GetBundles();
-    for (Bundle bundle : contextBundles) {
-      if (bundle.GetState() & stateMask) {
-        result.push_back(bundle);
-      }
-    }
-    return result;
-  }
+        /**
+         * \ingroup MicroServices
+         */
+        template <class T>
+        class BundleTrackerPrivate : MultiThreaded<>
+        {
 
-  void GetBundles_unlocked(std::vector<Bundle>& refs, TrackedBundle<T>* t) const
-  {
-    if (t->Size_unlocked() == 0) {
-      return;
-    }
-    t->GetTracked_unlocked(refs);
-  }
+          public:
+            using BundleStateMaskType = std::underlying_type_t<Bundle::State>;
 
-  /**
-   * The Bundle Context used by this <code>BundleTracker</code>.
-   */
-  BundleContext _context;
+            BundleTrackerPrivate(BundleTracker<T>* bundleTracker,
+                                 BundleContext const& context,
+                                 BundleStateMaskType const stateMask,
+                                 std::shared_ptr<BundleTrackerCustomizer<T>> const customizer)
+                : _context(context)
+                , _stateMask(stateMask)
+                , _customizer(customizer)
+                , listenerToken()
+                , trackedBundle()
+                , _bundleTracker(bundleTracker)
+            {
+            }
+            ~BundleTrackerPrivate() = default;
 
-  /**
-   * State mask for tracked bundles.
-   */
-  const BundleStateMaskType _stateMask;
+            /**
+             * Returns the list of initial <code>Bundle</code>s that will be
+             * tracked by the <code>BundleTracker</code>.
+             *
+             * @param stateMask The mask of states to filter bundles
+             *
+             * @return The list of initial <code>Bundle</code>s.
+             */
+            std::vector<Bundle>
+            GetInitialBundles(BundleStateMaskType stateMask)
+            {
+                std::vector<Bundle> result;
+                auto contextBundles = _context.GetBundles();
+                for (Bundle bundle : contextBundles)
+                {
+                    if (bundle.GetState() & stateMask)
+                    {
+                        result.push_back(bundle);
+                    }
+                }
+                return result;
+            }
 
-  /**
-   * The <code>BundleTrackerCustomizer</code> for this tracker.
-   */
-  std::shared_ptr<BundleTrackerCustomizer<T>> _customizer;
+            void
+            GetBundles_unlocked(std::vector<Bundle>& refs, TrackedBundle<T>* t) const
+            {
+                if (t->Size_unlocked() == 0)
+                {
+                    return;
+                }
+                t->GetTracked_unlocked(refs);
+            }
 
-  /**
-   * This token corresponds to the BundleListener, whenever it is added.
-   * Otherwise, it represents an invalid token.
-   */
-  ListenerToken listenerToken;
+            /**
+             * The Bundle Context used by this <code>BundleTracker</code>.
+             */
+            BundleContext _context;
 
-  /**
-   * Tracked bundles: <code>Bundle</code> -> custom Object
-   */
-  Atomic<std::shared_ptr<TrackedBundle<T>>> trackedBundle;
+            /**
+             * State mask for tracked bundles.
+             */
+            BundleStateMaskType const _stateMask;
 
-  /**
-   * Accessor method for the current TrackedBundle object. This method is only
-   * intended to be used by the unsynchronized methods which do not modify the
-   * trackedBundle field.
-   *
-   * @return The current Tracked object.
-   */
-  std::shared_ptr<TrackedBundle<T>> Tracked() const
-  {
-    return trackedBundle.Load();
-  }
+            /**
+             * The <code>BundleTrackerCustomizer</code> for this tracker.
+             */
+            std::shared_ptr<BundleTrackerCustomizer<T>> _customizer;
 
-  /**
-   * Called by the TrackedBundle object whenever the set of tracked bundles is
-   * modified.
-   */
-  void
-  Modified()
-  {
-    // No cache to clear
-  }
+            /**
+             * This token corresponds to the BundleListener, whenever it is added.
+             * Otherwise, it represents an invalid token.
+             */
+            ListenerToken listenerToken;
 
-private:
-  inline BundleTrackerCustomizer<T>* getTrackerAsCustomizer()
-  {
-    return static_cast<BundleTrackerCustomizer<T>*>(_bundleTracker);
-  }
+            /**
+             * Tracked bundles: <code>Bundle</code> -> custom Object
+             */
+            Atomic<std::shared_ptr<TrackedBundle<T>>> trackedBundle;
 
-  inline BundleTrackerCustomizer<T> const*
-  getTrackerAsCustomizer() const
-  {
-    return static_cast<BundleTrackerCustomizer<T>*>(_bundleTracker);
-  }
+            /**
+             * Accessor method for the current TrackedBundle object. This method is only
+             * intended to be used by the unsynchronized methods which do not modify the
+             * trackedBundle field.
+             *
+             * @return The current Tracked object.
+             */
+            std::shared_ptr<TrackedBundle<T>>
+            Tracked() const
+            {
+                return trackedBundle.Load();
+            }
 
-  friend class BundleTracker<T>;
+            /**
+             * Called by the TrackedBundle object whenever the set of tracked bundles is
+             * modified.
+             */
+            void
+            Modified()
+            {
+                // No cache to clear
+            }
 
-  BundleTracker<T>* const _bundleTracker;
-};
+            inline BundleTrackerCustomizer<T>*
+            GetCustomizer_unlocked()
+            {
+                return (_customizer ? _customizer.get() : getTrackerAsCustomizer());
+            }
 
-} // namespace detail
+          private:
+            inline BundleTrackerCustomizer<T>*
+            getTrackerAsCustomizer()
+            {
+                return static_cast<BundleTrackerCustomizer<T>*>(_bundleTracker);
+            }
+
+            inline BundleTrackerCustomizer<T> const*
+            getTrackerAsCustomizer() const
+            {
+                return static_cast<BundleTrackerCustomizer<T>*>(_bundleTracker);
+            }
+
+              friend class BundleTracker<T>;
+
+            BundleTracker<T>* const _bundleTracker;
+        };
+
+    } // namespace detail
 
 } // namespace cppmicroservices
 

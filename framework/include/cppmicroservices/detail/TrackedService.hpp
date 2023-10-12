@@ -27,10 +27,10 @@ namespace cppmicroservices
     {
 
         template <class S, class TTT>
-        TrackedService<S, TTT>::TrackedService(ServiceTracker<S, T>* serviceTracker,
+        TrackedService<S, TTT>::TrackedService(ServiceTracker<S, T>* tracker,
                                                ServiceTrackerCustomizer<S, T>* customizer)
-            : Superclass(serviceTracker->d->context)
-            , serviceTracker(serviceTracker)
+            : Superclass(tracker->d->context)
+            , serviceTracker(tracker)
             , customizer(customizer)
             , latch {}
         {
@@ -137,10 +137,15 @@ namespace cppmicroservices
         }
 
         template <class S, class TTT>
-        std::shared_ptr<typename TrackedService<S, TTT>::TrackedParamType>
+        std::optional<std::shared_ptr<typename TrackedService<S, TTT>::TrackedParamType>>
         TrackedService<S, TTT>::CustomizerAdding(ServiceReference<S> item, ServiceEvent const& /*related*/)
         {
-            return customizer->AddingService(item);
+            auto serviceObjectPointer = customizer->AddingService(item);
+
+            // Convert the shared pointer to an optional
+            return serviceObjectPointer ? std::optional<
+                       std::shared_ptr<typename TrackedService<S, TTT>::TrackedParamType>> { serviceObjectPointer }
+                                        : std::nullopt;
         }
 
         template <class S, class TTT>

@@ -29,6 +29,7 @@
 
 #include <chrono>
 #include <limits>
+#include <optional>
 #include <stdexcept>
 #include <string>
 
@@ -402,7 +403,10 @@ namespace cppmicroservices
         { /* if ServiceTracker is not open */
             return std::shared_ptr<TrackedParamType>();
         }
-        return (t->Lock(), t->GetCustomizedObject_unlocked(reference));
+        auto l = t->Lock();
+        US_UNUSED(l);
+        auto customObject = t->GetCustomizedObject_unlocked(reference);
+        return customObject.value_or(nullptr);
     }
 
     template <class S, class T>
@@ -422,7 +426,7 @@ namespace cppmicroservices
             d->GetServiceReferences_unlocked(references, t.get());
             for (auto& ref : references)
             {
-                services.push_back(t->GetCustomizedObject_unlocked(ref));
+                services.push_back(t->GetCustomizedObject_unlocked(ref).value_or(nullptr));
             }
         }
         return services;

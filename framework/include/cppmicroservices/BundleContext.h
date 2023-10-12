@@ -49,6 +49,10 @@ namespace cppmicroservices
         class ServiceTrackerPrivate;
         template <class S, class TTT>
         class TrackedService;
+        template <class TTT>
+        class BundleTrackerPrivate;
+        template <class TTT>
+        class TrackedBundle;
     } // namespace detail
 
     template <class S>
@@ -1132,6 +1136,12 @@ namespace cppmicroservices
         friend class detail::ServiceTrackerPrivate;
         template <class S, class TTT>
         friend class detail::TrackedService;
+        template <class T>
+        friend class BundleTracker;
+        template <class TTT>
+        friend class detail::BundleTrackerPrivate;
+        template <class TTT>
+        friend class detail::TrackedBundle;
         friend class BundleResource;
         friend class BundleResourceContainer;
 

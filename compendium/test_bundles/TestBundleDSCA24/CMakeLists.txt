@@ -1,6 +1,6 @@
 usFunctionCreateDSTestBundle(TestBundleDSCA24)
 
-usFunctionCreateTestBundleWithResources(TestBundleDSCA24
+usFunctionCreateTestBundleWithResources(TestBundleDSCA24 USES_DS
   SOURCES src/ServiceImpl.cpp ${_glue_file}
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME TestBundleDSCA24

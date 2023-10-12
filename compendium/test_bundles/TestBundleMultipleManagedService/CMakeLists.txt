@@ -1,6 +1,6 @@
 usFunctionCreateDSTestBundle(TestBundleMultipleManagedService)
 
-usFunctionCreateTestBundleWithResources(TestBundleMultipleManagedService
+usFunctionCreateTestBundleWithResources(TestBundleMultipleManagedService USES_DS
   SOURCES src/ManagedServiceImpl.cpp ${_glue_file}
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME TestBundleMultipleManagedService

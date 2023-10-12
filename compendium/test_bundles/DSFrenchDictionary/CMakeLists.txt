@@ -1,6 +1,6 @@
 usFunctionCreateDSTestBundle(DSFrenchDictionary)
 
-usFunctionCreateTestBundleWithResources(DSFrenchDictionary
+usFunctionCreateTestBundleWithResources(DSFrenchDictionary USES_DS
   SOURCES src/FrenchDictionary.cpp ${_glue_file}
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME DSFrenchDictionary

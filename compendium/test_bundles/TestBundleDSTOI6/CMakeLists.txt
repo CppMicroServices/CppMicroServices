@@ -1,6 +1,6 @@
 usFunctionCreateDSTestBundle(TestBundleDSTOI6)
 
-usFunctionCreateTestBundleWithResources(TestBundleDSTOI6
+usFunctionCreateTestBundleWithResources(TestBundleDSTOI6 USES_DS
   SOURCES src/ServiceImpl.cpp ${_glue_file}
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME TestBundleDSTOI6

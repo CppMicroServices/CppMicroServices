@@ -74,7 +74,8 @@ namespace codegen
             mStrStream << std::endl
                        << R"(#include <vector>)" << std::endl
                        << R"(#include <cppmicroservices/ServiceInterface.h>)" << std::endl
-                       << R"(#include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp")"
+                       << R"(#include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp")" << std::endl
+                       << R"(#include "cppmicroservices/BundleInitialization.h")"
                        << std::endl;
 
             for (auto const& header : mHeaderIncludes)
@@ -84,6 +85,8 @@ namespace codegen
             mStrStream << std::endl
                        << "namespace sc = cppmicroservices::service::component;" << std::endl
                        << "namespace scd = cppmicroservices::service::component::detail;" << std::endl;
+            mStrStream << std::endl
+                       << "CPPMICROSERVICES_INITIALIZE_BUNDLE" << std::endl;
         }
 
         void

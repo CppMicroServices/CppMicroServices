@@ -1,6 +1,6 @@
 usFunctionCreateDSTestBundle(TestBundleManagedServiceDeadlock)
 
-usFunctionCreateTestBundleWithResources(TestBundleManagedServiceDeadlock
+usFunctionCreateTestBundleWithResources(TestBundleManagedServiceDeadlock USES_DS
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME TestBundleManagedServiceDeadlock
   OTHER_LIBRARIES usTestInterfaces usServiceComponent cm)

@@ -1,6 +1,6 @@
 usFunctionCreateDSTestBundle(TestBundleDSDRMU)
 
-usFunctionCreateTestBundleWithResources(TestBundleDSDRMU
+usFunctionCreateTestBundleWithResources(TestBundleDSDRMU USES_DS
   SOURCES src/ServiceComponentDynamicReluctantMandatoryUnary.cpp ${_glue_file}
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME TestBundleDSDRMU

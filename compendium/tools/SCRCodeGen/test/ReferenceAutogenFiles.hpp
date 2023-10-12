@@ -57,10 +57,13 @@ extern "C" US_ABI_EXPORT void DeleteInstance_DSSpellCheck_SpellCheckImpl(scd::Co
 #include <vector>
 #include <cppmicroservices/ServiceInterface.h>
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#include "cppmicroservices/BundleInitialization.h"
 #include "SpellCheckerImpl.hpp"
 
 namespace sc = cppmicroservices::service::component;
 namespace scd = cppmicroservices::service::component::detail;
+
+CPPMICROSERVICES_INITIALIZE_BUNDLE
 
 extern "C" US_ABI_EXPORT scd::ComponentInstance* NewInstance_DSSpellCheck_SpellCheckImpl()
 {
@@ -82,10 +85,13 @@ extern "C" US_ABI_EXPORT void DeleteInstance_DSSpellCheck_SpellCheckImpl(scd::Co
 #include <vector>
 #include <cppmicroservices/ServiceInterface.h>
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#include "cppmicroservices/BundleInitialization.h"
 #include "SpellCheckerImpl.hpp"
 
 namespace sc = cppmicroservices::service::component;
 namespace scd = cppmicroservices::service::component::detail;
+
+CPPMICROSERVICES_INITIALIZE_BUNDLE
 
 extern "C" US_ABI_EXPORT scd::ComponentInstance* NewInstance_DSSpellCheck_SpellCheckImpl()
 {
@@ -107,12 +113,15 @@ extern "C" US_ABI_EXPORT void DeleteInstance_DSSpellCheck_SpellCheckImpl(scd::Co
 #include <vector>
 #include <cppmicroservices/ServiceInterface.h>
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#include "cppmicroservices/BundleInitialization.h"
 #include "A.hpp"
 #include "B.hpp"
 #include "C.hpp"
 
 namespace sc = cppmicroservices::service::component;
 namespace scd = cppmicroservices::service::component::detail;
+
+CPPMICROSERVICES_INITIALIZE_BUNDLE
 
 extern "C" US_ABI_EXPORT scd::ComponentInstance* NewInstance_Foo_Impl1()
 {
@@ -145,12 +154,15 @@ extern "C" US_ABI_EXPORT void DeleteInstance_Foo_Impl2(scd::ComponentInstance* c
 #include <vector>
 #include <cppmicroservices/ServiceInterface.h>
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#include "cppmicroservices/BundleInitialization.h"
 #include "A.hpp"
 #include "B.hpp"
 #include "C.hpp"
 
 namespace sc = cppmicroservices::service::component;
 namespace scd = cppmicroservices::service::component::detail;
+
+CPPMICROSERVICES_INITIALIZE_BUNDLE
 
 extern "C" US_ABI_EXPORT scd::ComponentInstance* NewInstance_FooImpl1()
 {

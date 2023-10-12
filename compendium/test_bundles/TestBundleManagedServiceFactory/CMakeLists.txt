@@ -1,6 +1,6 @@
 usFunctionCreateDSTestBundle(TestBundleManagedServiceFactory)
 
-usFunctionCreateTestBundleWithResources(TestBundleManagedServiceFactory
+usFunctionCreateTestBundleWithResources(TestBundleManagedServiceFactory USES_DS
   SOURCES src/ManagedServiceFactoryImpl2.cpp src/ManagedServiceFactoryServiceImpl2.cpp ${_glue_file}
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME TestBundleManagedServiceFactory

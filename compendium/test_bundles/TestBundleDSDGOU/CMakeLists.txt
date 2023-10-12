@@ -1,6 +1,6 @@
 usFunctionCreateDSTestBundle(TestBundleDSDGOU)
 
-usFunctionCreateTestBundleWithResources(TestBundleDSDGOU
+usFunctionCreateTestBundleWithResources(TestBundleDSDGOU USES_DS
   SOURCES src/ServiceComponentDynamicGreedyOptionalUnary.cpp ${_glue_file}
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME TestBundleDSDGOU

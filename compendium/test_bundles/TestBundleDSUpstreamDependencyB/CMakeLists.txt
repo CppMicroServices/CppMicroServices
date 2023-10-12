@@ -1,6 +1,6 @@
 usFunctionCreateDSTestBundle(TestBundleDSUpstreamDependencyB)
 
-usFunctionCreateTestBundleWithResources(TestBundleDSUpstreamDependencyB
+usFunctionCreateTestBundleWithResources(TestBundleDSUpstreamDependencyB USES_DS
   SOURCES src/ServiceImpl.cpp ${_glue_file}
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME TestBundleDSUpstreamDependencyB

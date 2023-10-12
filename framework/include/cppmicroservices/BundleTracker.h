@@ -158,7 +158,7 @@ namespace cppmicroservices
             }
             try
             {
-                d->context.RemoveListener(std::move(swappedToken));
+                d->_context.RemoveListener(std::move(swappedToken));
             }
             catch (std::runtime_error const&)
             {
@@ -241,7 +241,7 @@ namespace cppmicroservices
                 /* If BundleTracker is not open or if bundle is invalid */
                 return std::nullopt;
             }
-            return (t->Lock(), t->GetCustomizedObject_unlocked(bundle));
+            return t->Lock(), t->GetCustomizedObject_unlocked(bundle);
         }
         /**
          * Returns an unordered map containing all of the currently tracked Bundles to their custom objects.
@@ -334,23 +334,23 @@ namespace cppmicroservices
                 }
 
                 t = std::make_shared<detail::TrackedBundle<T>>(this,
-                                                               d->customizer ? d->customizer.get()
+                                                               d->_customizer ? d->_customizer.get()
                                                                              : d->getTrackerAsCustomizer());
                 try
                 {
                     // Attempt to drop old listener
-                    d->context.RemoveListener(std::move(d->listenerToken));
+                    d->_context.RemoveListener(std::move(d->listenerToken));
                     // Make new listener
-                    d->listenerToken = d->context.AddBundleListener(
+                    d->listenerToken = d->_context.AddBundleListener(
                         std::bind(&detail::TrackedBundle<T>::BundleChanged, t, std::placeholders::_1));
 
-                    std::vector<Bundle> bundles = d->GetInitialBundles(d->stateMask);
+                    std::vector<Bundle> bundles = d->GetInitialBundles(d->_stateMask);
                     t->SetInitial(bundles);
                 }
                 catch (std::invalid_argument const& e)
                 {
                     // Remove listener and rethrow
-                    d->context.RemoveListener(std::move(d->listenerToken));
+                    d->_context.RemoveListener(std::move(d->listenerToken));
                     throw std::runtime_error(std::string("unexpected std::invalid_argument exception: ") + e.what());
                 }
                 d->trackedBundle.Store(t);

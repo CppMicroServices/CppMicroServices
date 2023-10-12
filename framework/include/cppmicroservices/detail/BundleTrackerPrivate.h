@@ -50,18 +50,17 @@ class BundleTrackerPrivate : MultiThreaded<>
 public:
   using BundleStateMaskType = std::underlying_type_t<Bundle::State>;
 
-  BundleTrackerPrivate(BundleTracker<T>* _bundleTracker,
-                       BundleContext const& _context,
-                       const BundleStateMaskType _stateMask,
-                       const std::shared_ptr<BundleTrackerCustomizer<T>> _customizer)
-      : context(_context)
-      , stateMask(_stateMask)
-      , customizer(_customizer)
+  BundleTrackerPrivate(BundleTracker<T>* bundleTracker,
+                       BundleContext const& context,
+                       const BundleStateMaskType stateMask,
+                       const std::shared_ptr<BundleTrackerCustomizer<T>> customizer)
+      : _context(context)
+      , _stateMask(stateMask)
+      , _customizer(customizer)
       , listenerToken()
       , trackedBundle()
-      , bundleTracker(_bundleTracker)
+      , _bundleTracker(bundleTracker)
   {
-    this->customizer = customizer;
   }
   ~BundleTrackerPrivate() = default;
 
@@ -76,7 +75,7 @@ public:
   std::vector<Bundle> GetInitialBundles(BundleStateMaskType stateMask)
   {
     std::vector<Bundle> result;
-    auto contextBundles = context.GetBundles();
+    auto contextBundles = _context.GetBundles();
     for (Bundle bundle : contextBundles) {
       if (bundle.GetState() & stateMask) {
         result.push_back(bundle);
@@ -96,17 +95,17 @@ public:
   /**
    * The Bundle Context used by this <code>BundleTracker</code>.
    */
-  BundleContext context;
+  BundleContext _context;
 
   /**
    * State mask for tracked bundles.
    */
-  const BundleStateMaskType stateMask;
+  const BundleStateMaskType _stateMask;
 
   /**
    * The <code>BundleTrackerCustomizer</code> for this tracker.
    */
-  std::shared_ptr<BundleTrackerCustomizer<T>> customizer;
+  std::shared_ptr<BundleTrackerCustomizer<T>> _customizer;
 
   /**
    * This token corresponds to the BundleListener, whenever it is added.
@@ -144,18 +143,18 @@ public:
 private:
   inline BundleTrackerCustomizer<T>* getTrackerAsCustomizer()
   {
-    return static_cast<BundleTrackerCustomizer<T>*>(bundleTracker);
+    return static_cast<BundleTrackerCustomizer<T>*>(_bundleTracker);
   }
 
   inline BundleTrackerCustomizer<T> const*
   getTrackerAsCustomizer() const
   {
-    return static_cast<BundleTrackerCustomizer<T>*>(bundleTracker);
+    return static_cast<BundleTrackerCustomizer<T>*>(_bundleTracker);
   }
 
   friend class BundleTracker<T>;
 
-  BundleTracker<T>* const bundleTracker;
+  BundleTracker<T>* const _bundleTracker;
 };
 
 } // namespace detail

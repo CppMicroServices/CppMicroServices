@@ -48,11 +48,11 @@ class TrackedBundle
 {
 
 public:
-  TrackedBundle(BundleTracker<T>* _bundleTracker,
-                BundleTrackerCustomizer<T>* _customizer)
-    : BundleAbstractTracked<Bundle, T, BundleEvent>(_bundleTracker->d->context)
-    , bundleTracker(_bundleTracker)
-    , customizer(_customizer)
+  TrackedBundle(BundleTracker<T>* bundleTracker,
+                BundleTrackerCustomizer<T>* customizer)
+    : BundleAbstractTracked<Bundle, T, BundleEvent>(bundleTracker->d->_context)
+    , _bundleTracker(bundleTracker)
+    , _customizer(customizer)
     , latch{}
   {}
 
@@ -103,7 +103,7 @@ public:
     }
 
     // Track iff state in mask
-    if (state & bundleTracker->d->stateMask) {
+    if (state & _bundleTracker->d->_stateMask) {
       /*
      * The below method will throw if a customizer throws,
      * and the exception will propagate to the listener.
@@ -121,8 +121,8 @@ public:
   void WaitOnCustomizersToFinish() { latch.Wait(); }
 
 private:
-  BundleTracker<T>* bundleTracker;
-  BundleTrackerCustomizer<T>* customizer;
+  BundleTracker<T>* _bundleTracker;
+  BundleTrackerCustomizer<T>* _customizer;
 
   CounterLatch latch;
 
@@ -136,7 +136,7 @@ private:
   {
     BundleAbstractTracked<Bundle, T, BundleEvent>::
       Modified(); /* increment the modification count */
-    bundleTracker->d->Modified();
+    _bundleTracker->d->Modified();
   }
 
   /**
@@ -153,7 +153,7 @@ private:
   std::optional<T> CustomizerAdding(Bundle bundle,
                                     const BundleEvent& related) override
   {
-    return customizer->AddingBundle(bundle, related);
+    return _customizer->AddingBundle(bundle, related);
   }
 
   /**
@@ -170,7 +170,7 @@ private:
                           const BundleEvent& related,
                           const T& object) override
   {
-    customizer->ModifiedBundle(bundle, related, object);
+    _customizer->ModifiedBundle(bundle, related, object);
   }
 
   /**
@@ -187,7 +187,7 @@ private:
                          const BundleEvent& related,
                          const T& object) override
   {
-    customizer->RemovedBundle(bundle, related, object);
+    _customizer->RemovedBundle(bundle, related, object);
   }
 };
 

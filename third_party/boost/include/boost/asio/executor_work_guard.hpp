@@ -22,7 +22,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 
 /// An object of type @c executor_work_guard controls ownership of executor work
@@ -165,7 +165,7 @@ make_work_guard(const T& t, ExecutionContext& ctx,
 }
 
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

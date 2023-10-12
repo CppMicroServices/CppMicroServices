@@ -18,7 +18,7 @@
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/list/aux_/tag.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<>
 struct empty_impl< aux::list_tag >

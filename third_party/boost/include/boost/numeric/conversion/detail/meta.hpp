@@ -20,7 +20,7 @@
 #include "boost/mpl/bool.hpp"
 #include "boost/mpl/identity.hpp"
 
-namespace cppmsboost { namespace numeric { namespace convdetail
+namespace boost { namespace numeric { namespace convdetail
 {
    template< class T1, class T2>
    struct equal_to
@@ -113,7 +113,7 @@ namespace cppmsboost { namespace numeric { namespace convdetail
     typedef typename mpl::eval_if<caseTT,TT_Q,choose_TF_FT_FF_Q>::type type ;
   } ;
 
-} } } // namespace cppmsboost::numeric::convdetail
+} } } // namespace boost::numeric::convdetail
 
 #endif
 

@@ -34,7 +34,7 @@
 // simple wrap around a pthread_mutex_t initialized with
 // PTHREAD_MUTEX_INITIALIZER.
 //
-namespace cppmsboost{
+namespace boost{
 
 class static_mutex;
 
@@ -67,7 +67,7 @@ public:
    pthread_mutex_t m_mutex;
 };
 
-} // namespace cppmsboost
+} // namespace boost
 #elif defined(BOOST_HAS_WINTHREADS)
 //
 // Win32 version:
@@ -77,7 +77,7 @@ public:
 
 #include <boost/cstdint.hpp>
 
-namespace cppmsboost{
+namespace boost{
 
 class BOOST_REGEX_DECL scoped_static_mutex_lock;
 
@@ -85,7 +85,7 @@ class static_mutex
 {
 public:
    typedef scoped_static_mutex_lock scoped_lock;
-   cppmsboost::int32_t m_mutex;
+   boost::int32_t m_mutex;
 };
 
 #define BOOST_STATIC_MUTEX_INIT { 0, }
@@ -118,7 +118,7 @@ private:
 //
 // Portable version of a static mutex based on Boost.Thread library:
 // This has to use a single mutex shared by all instances of static_mutex
-// because cppmsboost::call_once doesn't alow us to pass instance information
+// because boost::call_once doesn't alow us to pass instance information
 // down to the initialisation proceedure.  In fact the initialisation routine
 // may need to be called more than once - but only once per instance.
 //
@@ -135,18 +135,18 @@ private:
 #undef BOOST_REGEX_H2
 #undef BOOST_REGEX_H3
 
-namespace cppmsboost{
+namespace boost{
 
 class BOOST_REGEX_DECL scoped_static_mutex_lock;
-extern "C" BOOST_REGEX_DECL void cppmsboost_regex_free_static_mutex();
+extern "C" BOOST_REGEX_DECL void boost_regex_free_static_mutex();
 
 class BOOST_REGEX_DECL static_mutex
 {
 public:
    typedef scoped_static_mutex_lock scoped_lock;
    static void init();
-   static cppmsboost::recursive_mutex* m_pmutex;
-   static cppmsboost::once_flag m_once;
+   static boost::recursive_mutex* m_pmutex;
+   static boost::once_flag m_once;
 };
 
 #define BOOST_STATIC_MUTEX_INIT {  }
@@ -161,7 +161,7 @@ public:
    void lock();
    void unlock();
 private:
-   cppmsboost::unique_lock<cppmsboost::recursive_mutex>* m_plock;
+   boost::unique_lock<boost::recursive_mutex>* m_plock;
    bool m_have_lock;
 };
 

@@ -22,7 +22,7 @@
 #pragma once
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace atomics {
 namespace detail {
 
@@ -102,6 +102,6 @@ struct cas_based_operations :
 
 } // namespace detail
 } // namespace atomics
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ATOMIC_DETAIL_OPS_CAS_BASED_HPP_INCLUDED_

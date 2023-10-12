@@ -18,7 +18,7 @@
 
 #include "boost/mpl/integral_c.hpp"
 
-namespace cppmsboost { namespace numeric { namespace convdetail
+namespace boost { namespace numeric { namespace convdetail
 {
   // Integral Constants for 'SignMixture'
   typedef mpl::integral_c<sign_mixture_enum, unsigned_to_unsigned> unsig2unsig_c ;
@@ -63,7 +63,7 @@ namespace cppmsboost { namespace numeric { namespace convdetail
         type ;
   } ;
 
-} } } // namespace cppmsboost::numeric::convdetail
+} } } // namespace boost::numeric::convdetail
 
 #endif
 //

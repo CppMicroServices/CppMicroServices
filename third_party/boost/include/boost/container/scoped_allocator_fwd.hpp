@@ -12,7 +12,7 @@
 #define BOOST_CONTAINER_ALLOCATOR_SCOPED_ALLOCATOR_FWD_HPP
 
 //! \file
-//! This header file forward declares cppmsboost::container::scoped_allocator_adaptor
+//! This header file forward declares boost::container::scoped_allocator_adaptor
 
 #ifndef BOOST_CONFIG_HPP
 #  include <boost/config.hpp>
@@ -31,7 +31,7 @@
 #include <boost/move/detail/fwd_macros.hpp>
 #endif
 
-namespace cppmsboost { namespace container {
+namespace boost { namespace container {
 
 #ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
 
@@ -64,7 +64,7 @@ namespace cppmsboost { namespace container {
 
 #endif   //#ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
 
-}} // namespace cppmsboost { namespace container {
+}} // namespace boost { namespace container {
 
 #include <boost/container/detail/config_end.hpp>
 

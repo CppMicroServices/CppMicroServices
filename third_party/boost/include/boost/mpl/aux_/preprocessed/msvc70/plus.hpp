@@ -9,7 +9,7 @@
 // Preprocessed version of "boost/mpl/plus.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<
       typename Tag1
@@ -118,7 +118,7 @@ BOOST_MPL_AUX_NA_SPEC2(2, 5, plus)
 
 }}
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 namespace aux {
 template< typename T, T n1, T n2 >

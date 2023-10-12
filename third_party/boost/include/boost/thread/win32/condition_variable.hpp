@@ -34,7 +34,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace cppmsboost
+namespace boost
 {
     namespace detail
     {
@@ -59,7 +59,7 @@ namespace cppmsboost
                 waiters(1),notified(false),references(0)
             {}
 
-            static bool no_waiters(cppmsboost::intrusive_ptr<basic_cv_list_entry> const& entry)
+            static bool no_waiters(boost::intrusive_ptr<basic_cv_list_entry> const& entry)
             {
                 return !detail::interlocked_read_acquire(&entry->waiters);
             }
@@ -121,13 +121,13 @@ namespace cppmsboost
 
         class basic_condition_variable
         {
-            cppmsboost::mutex internal_mutex;
+            boost::mutex internal_mutex;
             long total_count;
             unsigned active_generation_count;
 
             typedef basic_cv_list_entry list_entry;
 
-            typedef cppmsboost::intrusive_ptr<list_entry> entry_ptr;
+            typedef boost::intrusive_ptr<list_entry> entry_ptr;
             typedef std::vector<entry_ptr> generation_list;
 
             generation_list generations;
@@ -174,7 +174,7 @@ namespace cppmsboost
 
             entry_ptr get_wait_entry()
             {
-                cppmsboost::lock_guard<cppmsboost::mutex> lk(internal_mutex);
+                boost::lock_guard<boost::mutex> lk(internal_mutex);
                 if(!wake_sem)
                 {
                     wake_sem=detail::win32::create_anonymous_semaphore(0,LONG_MAX);
@@ -198,16 +198,16 @@ namespace cppmsboost
             struct entry_manager
             {
                 entry_ptr entry;
-                cppmsboost::mutex& internal_mutex;
+                boost::mutex& internal_mutex;
 
 
                 BOOST_THREAD_NO_COPYABLE(entry_manager)
 #if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
-                entry_manager(entry_ptr&& entry_, cppmsboost::mutex& mutex_):
+                entry_manager(entry_ptr&& entry_, boost::mutex& mutex_):
                     entry(static_cast< entry_ptr&& >(entry_)), internal_mutex(mutex_)
                 {}
 #else
-                entry_manager(entry_ptr const& entry_, cppmsboost::mutex& mutex_):
+                entry_manager(entry_ptr const& entry_, boost::mutex& mutex_):
                     entry(entry_), internal_mutex(mutex_)
                 {}
 #endif
@@ -215,7 +215,7 @@ namespace cppmsboost
                 void remove_waiter_and_reset()
                 {
                   if (entry) {
-                    cppmsboost::lock_guard<cppmsboost::mutex> internal_lock(internal_mutex);
+                    boost::lock_guard<boost::mutex> internal_lock(internal_mutex);
                     entry->remove_waiter();
                     entry.reset();
                   }
@@ -279,7 +279,7 @@ namespace cppmsboost
             {
                 if(detail::interlocked_read_acquire(&total_count))
                 {
-                    cppmsboost::lock_guard<cppmsboost::mutex> internal_lock(internal_mutex);
+                    boost::lock_guard<boost::mutex> internal_lock(internal_mutex);
                     if(!total_count)
                     {
                         return;
@@ -300,7 +300,7 @@ namespace cppmsboost
             {
                 if(detail::interlocked_read_acquire(&total_count))
                 {
-                    cppmsboost::lock_guard<cppmsboost::mutex> internal_lock(internal_mutex);
+                    boost::lock_guard<boost::mutex> internal_lock(internal_mutex);
                     if(!total_count)
                     {
                         return;
@@ -347,7 +347,7 @@ namespace cppmsboost
         }
 
 #if defined BOOST_THREAD_USES_DATETIME
-        bool timed_wait(unique_lock<mutex>& m,cppmsboost::system_time const& abs_time)
+        bool timed_wait(unique_lock<mutex>& m,boost::system_time const& abs_time)
         {
             // The system time may jump while this function is waiting. To compensate for this and time
             // out near the correct time, we could call do_wait_until() in a loop with a short timeout
@@ -361,7 +361,7 @@ namespace cppmsboost
             do_wait_until(m, detail::internal_platform_clock::now() + d);
             return ts > detail::real_platform_clock::now();
         }
-        bool timed_wait(unique_lock<mutex>& m,cppmsboost::xtime const& abs_time)
+        bool timed_wait(unique_lock<mutex>& m,boost::xtime const& abs_time)
         {
             return timed_wait(m, system_time(abs_time));
         }
@@ -382,7 +382,7 @@ namespace cppmsboost
         }
 
         template<typename predicate_type>
-        bool timed_wait(unique_lock<mutex>& m,cppmsboost::system_time const& abs_time,predicate_type pred)
+        bool timed_wait(unique_lock<mutex>& m,boost::system_time const& abs_time,predicate_type pred)
         {
             // The system time may jump while this function is waiting. To compensate for this
             // and time out near the correct time, we call do_wait_until() in a loop with a
@@ -398,7 +398,7 @@ namespace cppmsboost
             return pred();
         }
         template<typename predicate_type>
-        bool timed_wait(unique_lock<mutex>& m,cppmsboost::xtime const& abs_time,predicate_type pred)
+        bool timed_wait(unique_lock<mutex>& m,boost::xtime const& abs_time,predicate_type pred)
         {
             return timed_wait(m, system_time(abs_time), pred);
         }
@@ -510,7 +510,7 @@ namespace cppmsboost
                 const chrono::duration<Rep, Period>& d,
                 Predicate pred)
         {
-            return wait_until(lock, chrono::steady_clock::now() + d, cppmsboost::move(pred));
+            return wait_until(lock, chrono::steady_clock::now() + d, boost::move(pred));
         }
 #endif
     };
@@ -544,7 +544,7 @@ namespace cppmsboost
 
 #if defined BOOST_THREAD_USES_DATETIME
         template<typename lock_type>
-        bool timed_wait(lock_type& m,cppmsboost::system_time const& abs_time)
+        bool timed_wait(lock_type& m,boost::system_time const& abs_time)
         {
             // The system time may jump while this function is waiting. To compensate for this and time
             // out near the correct time, we could call do_wait_until() in a loop with a short timeout
@@ -560,7 +560,7 @@ namespace cppmsboost
         }
 
         template<typename lock_type>
-        bool timed_wait(lock_type& m,cppmsboost::xtime const& abs_time)
+        bool timed_wait(lock_type& m,boost::xtime const& abs_time)
         {
             return timed_wait(m, system_time(abs_time));
         }
@@ -582,7 +582,7 @@ namespace cppmsboost
         }
 
         template<typename lock_type,typename predicate_type>
-        bool timed_wait(lock_type& m,cppmsboost::system_time const& abs_time,predicate_type pred)
+        bool timed_wait(lock_type& m,boost::system_time const& abs_time,predicate_type pred)
         {
             // The system time may jump while this function is waiting. To compensate for this
             // and time out near the correct time, we call do_wait_until() in a loop with a
@@ -599,7 +599,7 @@ namespace cppmsboost
         }
 
         template<typename lock_type,typename predicate_type>
-        bool timed_wait(lock_type& m,cppmsboost::xtime const& abs_time,predicate_type pred)
+        bool timed_wait(lock_type& m,boost::xtime const& abs_time,predicate_type pred)
         {
             return timed_wait(m, system_time(abs_time), pred);
         }
@@ -712,7 +712,7 @@ namespace cppmsboost
                 const chrono::duration<Rep, Period>& d,
                 Predicate pred)
         {
-            return wait_until(lock, chrono::steady_clock::now() + d, cppmsboost::move(pred));
+            return wait_until(lock, chrono::steady_clock::now() + d, boost::move(pred));
         }
 #endif
     };

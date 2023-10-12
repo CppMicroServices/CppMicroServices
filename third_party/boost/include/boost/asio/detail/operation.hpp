@@ -23,7 +23,7 @@
 # include <boost/asio/detail/scheduler_operation.hpp>
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -35,6 +35,6 @@ typedef scheduler_operation operation;
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ASIO_DETAIL_OPERATION_HPP

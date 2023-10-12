@@ -17,12 +17,12 @@
 
 #include <boost/asio/detail/config.hpp>
 
-namespace cppmsboost {
+namespace boost {
 
 template<class T, std::size_t N>
 class array;
 
-} // namespace cppmsboost
+} // namespace boost
 
 // Standard library components can't be forward declared, so we'll have to
 // include the array header. Fortunately, it's fairly lightweight and doesn't

@@ -23,7 +23,7 @@
 #include <iterator>
 #include <vector>
 
-namespace cppmsboost
+namespace boost
 {
   namespace detail
   {
@@ -56,20 +56,20 @@ namespace cppmsboost
         typedef count_type count_type_portable;
 #endif
         count_type_portable count;
-        cppmsboost::scoped_array<cppmsboost::unique_lock<cppmsboost::mutex> > locks;
+        boost::scoped_array<boost::unique_lock<boost::mutex> > locks;
 
         all_futures_lock(std::vector<registered_waiter>& waiters) :
-          count(waiters.size()), locks(new cppmsboost::unique_lock<cppmsboost::mutex>[count])
+          count(waiters.size()), locks(new boost::unique_lock<boost::mutex>[count])
         {
           for (count_type_portable i = 0; i < count; ++i)
           {
-            locks[i] = BOOST_THREAD_MAKE_RV_REF(cppmsboost::unique_lock<cppmsboost::mutex>(waiters[i].future_->mutex()));
+            locks[i] = BOOST_THREAD_MAKE_RV_REF(boost::unique_lock<boost::mutex>(waiters[i].future_->mutex()));
           }
         }
 
         void lock()
         {
-          cppmsboost::lock(locks.get(), locks.get() + count);
+          boost::lock(locks.get(), locks.get() + count);
         }
 
         void unlock()
@@ -81,7 +81,7 @@ namespace cppmsboost
         }
       };
 
-      cppmsboost::condition_variable_any cv;
+      boost::condition_variable_any cv;
       std::vector<registered_waiter> waiters_;
       count_type future_count;
 
@@ -146,7 +146,7 @@ namespace cppmsboost
   }
 
   template <typename Iterator>
-  typename cppmsboost::disable_if<is_future_type<Iterator> , Iterator>::type wait_for_any(Iterator begin, Iterator end)
+  typename boost::disable_if<is_future_type<Iterator> , Iterator>::type wait_for_any(Iterator begin, Iterator end)
   {
     if (begin == end) return end;
 
@@ -155,7 +155,7 @@ namespace cppmsboost
     {
       waiter.add(*current);
     }
-    return cppmsboost::next(begin, waiter.wait());
+    return boost::next(begin, waiter.wait());
   }
 }
 

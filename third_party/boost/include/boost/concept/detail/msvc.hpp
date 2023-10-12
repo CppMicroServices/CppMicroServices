@@ -18,7 +18,7 @@
 #  pragma warning(disable:4100)
 # endif
 
-namespace cppmsboost { namespace concepts {
+namespace boost { namespace concepts {
 
 
 template <class Model>
@@ -54,7 +54,7 @@ namespace detail
 
 template <class Model>
 struct require
-  : cppmsboost::conditional<
+  : boost::conditional<
         not_satisfied<Model>::value
       , detail::constraint
 # ifndef BOOST_NO_PARTIAL_SPECIALIZATION
@@ -97,7 +97,7 @@ struct require<void(*)(Model)>
 enum                                                \
 {                                                   \
     BOOST_PP_CAT(boost_concept_check,__LINE__) =    \
-    sizeof(::cppmsboost::concepts::require<ModelFnPtr>)    \
+    sizeof(::boost::concepts::require<ModelFnPtr>)    \
 }
   
 # else // Not vc-7.1
@@ -110,7 +110,7 @@ require_(void(*)(Model));
 enum                                                    \
 {                                                       \
     BOOST_PP_CAT(boost_concept_check,__LINE__) =        \
-      sizeof(::cppmsboost::concepts::require_((ModelFnPtr)0)) \
+      sizeof(::boost::concepts::require_((ModelFnPtr)0)) \
 }
   
 # endif

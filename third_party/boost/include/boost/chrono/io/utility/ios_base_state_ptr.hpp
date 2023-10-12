@@ -18,7 +18,7 @@
 
 
  */
-namespace cppmsboost
+namespace boost
 {
   namespace chrono
   {
@@ -432,6 +432,6 @@ namespace cppmsboost
     //detail::xalloc_key_initializer<Final> ios_flags<Final>::xalloc_key_initializer_;
 
   } // namespace chrono
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // header

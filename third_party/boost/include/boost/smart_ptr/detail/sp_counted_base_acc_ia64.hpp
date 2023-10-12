@@ -19,7 +19,7 @@
 #include <boost/config.hpp>
 #include <machine/sys/inline.h>
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace detail
@@ -148,6 +148,6 @@ public:
 
 } // namespace detail
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // #ifndef BOOST_SMART_PTR_DETAIL_SP_COUNTED_BASE_ACC_IA64_HPP_INCLUDED

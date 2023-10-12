@@ -32,7 +32,7 @@
 #include <boost/serialization/level_enum.hpp>
 #include <boost/serialization/tracking_enum.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace serialization {
 
 // common base class used to detect appended traits class
@@ -60,6 +60,6 @@ struct traits : public basic_traits {
 };
 
 } // namespace serialization
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_SERIALIZATION_TRAITS_HPP

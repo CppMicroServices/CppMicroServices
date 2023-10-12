@@ -19,7 +19,7 @@
 #include <locale>
 #include <algorithm>
 
-namespace cppmsboost
+namespace boost
 {
   namespace chrono
   {

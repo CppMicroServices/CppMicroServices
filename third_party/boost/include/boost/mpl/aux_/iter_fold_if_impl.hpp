@@ -40,7 +40,7 @@
 #   include <boost/preprocessor/dec.hpp>
 #   include <boost/preprocessor/cat.hpp>
 
-namespace cppmsboost { namespace mpl { namespace aux {
+namespace boost { namespace mpl { namespace aux {
 
 template< typename Iterator, typename State >
 struct iter_fold_if_null_step

@@ -50,7 +50,7 @@ namespace std{
 #include <boost/archive/basic_streambuf_locale_saver.hpp>
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 /////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ protected:
     // d) use stream buffer
     // e) change locale back to original
     // f) destroy new codecvt facet
-    cppmsboost::archive::codecvt_null<typename IStream::char_type> codecvt_null_facet;
+    boost::archive::codecvt_null<typename IStream::char_type> codecvt_null_facet;
     std::locale archive_locale;
     basic_istream_locale_saver<
         typename IStream::char_type,
@@ -88,7 +88,7 @@ protected:
     {
         if(is >> t)
             return;
-        cppmsboost::serialization::throw_exception(
+        boost::serialization::throw_exception(
             archive_exception(archive_exception::input_stream_error)
         );
     }
@@ -135,7 +135,7 @@ public:
 #endif
 
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/archive/detail/abi_suffix.hpp> // pop pragmas
 

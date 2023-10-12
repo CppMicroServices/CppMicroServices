@@ -17,7 +17,7 @@
 #include <boost/archive/detail/basic_serializer_map.hpp>
 #include <boost/serialization/singleton.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 namespace detail {
 
@@ -39,7 +39,7 @@ namespace extra_detail { // anon
 template<class Archive>
 BOOST_ARCHIVE_OR_WARCHIVE_DECL bool
 archive_serializer_map<Archive>::insert(const basic_serializer * bs){
-    return cppmsboost::serialization::singleton<
+    return boost::serialization::singleton<
         extra_detail::map<Archive>
     >::get_mutable_instance().insert(bs);
 }
@@ -51,11 +51,11 @@ archive_serializer_map<Archive>::erase(const basic_serializer * bs){
     // BOOST_ASSERT.  We've changed it because we've discovered that at
     // least one platform is not guaranteed to destroy singletons in
     // reverse order of distruction.
-    if(cppmsboost::serialization::singleton<
+    if(boost::serialization::singleton<
         extra_detail::map<Archive>
     >::is_destroyed())
         return;
-    cppmsboost::serialization::singleton<
+    boost::serialization::singleton<
         extra_detail::map<Archive>
     >::get_mutable_instance().erase(bs);
 }
@@ -63,13 +63,13 @@ archive_serializer_map<Archive>::erase(const basic_serializer * bs){
 template<class Archive>
 BOOST_ARCHIVE_OR_WARCHIVE_DECL const basic_serializer *
 archive_serializer_map<Archive>::find(
-    const cppmsboost::serialization::extended_type_info & eti
+    const boost::serialization::extended_type_info & eti
 ) {
-    return cppmsboost::serialization::singleton<
+    return boost::serialization::singleton<
         extra_detail::map<Archive>
     >::get_const_instance().find(eti);
 }
 
 } // namespace detail
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost

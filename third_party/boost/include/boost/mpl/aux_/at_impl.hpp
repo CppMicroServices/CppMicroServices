@@ -19,7 +19,7 @@
 #include <boost/mpl/deref.hpp>
 #include <boost/mpl/aux_/traits_lambda_spec.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 // default implementation; conrete sequences might override it by 
 // specializing either the 'at_impl' or the primary 'at' template

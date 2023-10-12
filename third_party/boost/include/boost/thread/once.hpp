@@ -33,7 +33,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace cppmsboost
+namespace boost
 {
   // template<class Callable, class ...Args> void
   // call_once(once_flag& flag, Callable&& func, Args&&... args);

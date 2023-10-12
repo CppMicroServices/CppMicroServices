@@ -24,7 +24,7 @@
 #include <boost/mpl/apply.hpp>
 #include <boost/mpl/aux_/inserter_algorithm.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 namespace aux {
 

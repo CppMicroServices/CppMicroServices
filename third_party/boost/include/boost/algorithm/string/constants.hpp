@@ -11,7 +11,7 @@
 #ifndef BOOST_STRING_CONSTANTS_HPP
 #define BOOST_STRING_CONSTANTS_HPP
 
-namespace cppmsboost {
+namespace boost {
     namespace algorithm {
 
     //! Token compression mode 
@@ -30,7 +30,7 @@ namespace cppmsboost {
     using algorithm::token_compress_on;
     using algorithm::token_compress_off;
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // BOOST_STRING_CONSTANTS_HPP
 

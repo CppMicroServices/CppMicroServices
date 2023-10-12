@@ -28,7 +28,7 @@
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/detail/workaround.hpp>
 
-namespace cppmsboost{
+namespace boost{
 
 namespace detail{
 
@@ -83,11 +83,11 @@ public:
    // however compiler bugs prevent this - instead pass three bool's to
    // ct_imp<T,bool,bool,bool> and add an extra partial specialisation
    // of ct_imp to handle the logic. (JM)
-   typedef typename cppmsboost::detail::ct_imp<
+   typedef typename boost::detail::ct_imp<
       T,
-      ::cppmsboost::is_pointer<T>::value,
-      ::cppmsboost::is_arithmetic<T>::value,
-      ::cppmsboost::is_enum<T>::value
+      ::boost::is_pointer<T>::value,
+      ::boost::is_arithmetic<T>::value,
+      ::boost::is_enum<T>::value
    >::param_type param_type;
 };
 

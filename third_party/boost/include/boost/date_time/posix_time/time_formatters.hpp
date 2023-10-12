@@ -23,7 +23,7 @@
  * formatters_limited.hpp
  */
 
-namespace cppmsboost {
+namespace boost {
 
 namespace posix_time {
 
@@ -65,7 +65,7 @@ namespace posix_time {
           << date_time::absolute_value(td.seconds());
       //TODO the following is totally non-generic, yelling FIXME
 #if (defined(BOOST_MSVC) && (_MSC_VER < 1300))
-      cppmsboost::int64_t frac_sec =
+      boost::int64_t frac_sec =
         date_time::absolute_value(td.fractional_seconds());
       // JDG [7/6/02 VC++ compatibility]
       charT buff[32];
@@ -134,7 +134,7 @@ namespace posix_time {
           << date_time::absolute_value(td.seconds());
       //TODO the following is totally non-generic, yelling FIXME
 #if (defined(BOOST_MSVC) && (_MSC_VER < 1300))
-      cppmsboost::int64_t frac_sec =
+      boost::int64_t frac_sec =
         date_time::absolute_value(td.fractional_seconds());
       // JDG [7/6/02 VC++ compatibility]
       charT buff[32];

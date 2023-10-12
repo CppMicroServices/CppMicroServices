@@ -11,7 +11,7 @@
 
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
 
-namespace cppmsboost
+namespace boost
 {
     namespace this_thread
     {

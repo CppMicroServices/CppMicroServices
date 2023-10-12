@@ -23,73 +23,73 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace placeholders {
 
 #if defined(GENERATING_DOCUMENTATION)
 
-/// An argument placeholder, for use with cppmsboost::bind(), that corresponds to
+/// An argument placeholder, for use with boost::bind(), that corresponds to
 /// the error argument of a handler for any of the asynchronous functions.
 unspecified error;
 
-/// An argument placeholder, for use with cppmsboost::bind(), that corresponds to
+/// An argument placeholder, for use with boost::bind(), that corresponds to
 /// the bytes_transferred argument of a handler for asynchronous functions such
-/// as cppmsboost::asio::basic_stream_socket::async_write_some or
-/// cppmsboost::asio::async_write.
+/// as boost::asio::basic_stream_socket::async_write_some or
+/// boost::asio::async_write.
 unspecified bytes_transferred;
 
-/// An argument placeholder, for use with cppmsboost::bind(), that corresponds to
+/// An argument placeholder, for use with boost::bind(), that corresponds to
 /// the iterator argument of a handler for asynchronous functions such as
-/// cppmsboost::asio::async_connect.
+/// boost::asio::async_connect.
 unspecified iterator;
 
-/// An argument placeholder, for use with cppmsboost::bind(), that corresponds to
+/// An argument placeholder, for use with boost::bind(), that corresponds to
 /// the results argument of a handler for asynchronous functions such as
-/// cppmsboost::asio::basic_resolver::async_resolve.
+/// boost::asio::basic_resolver::async_resolve.
 unspecified results;
 
-/// An argument placeholder, for use with cppmsboost::bind(), that corresponds to
+/// An argument placeholder, for use with boost::bind(), that corresponds to
 /// the results argument of a handler for asynchronous functions such as
-/// cppmsboost::asio::async_connect.
+/// boost::asio::async_connect.
 unspecified endpoint;
 
-/// An argument placeholder, for use with cppmsboost::bind(), that corresponds to
+/// An argument placeholder, for use with boost::bind(), that corresponds to
 /// the signal_number argument of a handler for asynchronous functions such as
-/// cppmsboost::asio::signal_set::async_wait.
+/// boost::asio::signal_set::async_wait.
 unspecified signal_number;
 
 #elif defined(BOOST_ASIO_HAS_BOOST_BIND)
 # if defined(__BORLANDC__) || defined(__GNUC__)
 
-inline cppmsboost::arg<1> error()
+inline boost::arg<1> error()
 {
-  return cppmsboost::arg<1>();
+  return boost::arg<1>();
 }
 
-inline cppmsboost::arg<2> bytes_transferred()
+inline boost::arg<2> bytes_transferred()
 {
-  return cppmsboost::arg<2>();
+  return boost::arg<2>();
 }
 
-inline cppmsboost::arg<2> iterator()
+inline boost::arg<2> iterator()
 {
-  return cppmsboost::arg<2>();
+  return boost::arg<2>();
 }
 
-inline cppmsboost::arg<2> results()
+inline boost::arg<2> results()
 {
-  return cppmsboost::arg<2>();
+  return boost::arg<2>();
 }
 
-inline cppmsboost::arg<2> endpoint()
+inline boost::arg<2> endpoint()
 {
-  return cppmsboost::arg<2>();
+  return boost::arg<2>();
 }
 
-inline cppmsboost::arg<2> signal_number()
+inline boost::arg<2> signal_number()
 {
-  return cppmsboost::arg<2>();
+  return boost::arg<2>();
 }
 
 # else
@@ -99,9 +99,9 @@ namespace detail
   template <int Number>
   struct placeholder
   {
-    static cppmsboost::arg<Number>& get()
+    static boost::arg<Number>& get()
     {
-      static cppmsboost::arg<Number> result;
+      static boost::arg<Number> result;
       return result;
     }
   };
@@ -109,35 +109,35 @@ namespace detail
 
 #  if defined(BOOST_ASIO_MSVC) && (BOOST_ASIO_MSVC < 1400)
 
-static cppmsboost::arg<1>& error
-  = cppmsboost::asio::placeholders::detail::placeholder<1>::get();
-static cppmsboost::arg<2>& bytes_transferred
-  = cppmsboost::asio::placeholders::detail::placeholder<2>::get();
-static cppmsboost::arg<2>& iterator
-  = cppmsboost::asio::placeholders::detail::placeholder<2>::get();
-static cppmsboost::arg<2>& results
-  = cppmsboost::asio::placeholders::detail::placeholder<2>::get();
-static cppmsboost::arg<2>& endpoint
-  = cppmsboost::asio::placeholders::detail::placeholder<2>::get();
-static cppmsboost::arg<2>& signal_number
-  = cppmsboost::asio::placeholders::detail::placeholder<2>::get();
+static boost::arg<1>& error
+  = boost::asio::placeholders::detail::placeholder<1>::get();
+static boost::arg<2>& bytes_transferred
+  = boost::asio::placeholders::detail::placeholder<2>::get();
+static boost::arg<2>& iterator
+  = boost::asio::placeholders::detail::placeholder<2>::get();
+static boost::arg<2>& results
+  = boost::asio::placeholders::detail::placeholder<2>::get();
+static boost::arg<2>& endpoint
+  = boost::asio::placeholders::detail::placeholder<2>::get();
+static boost::arg<2>& signal_number
+  = boost::asio::placeholders::detail::placeholder<2>::get();
 
 #  else
 
 namespace
 {
-  cppmsboost::arg<1>& error
-    = cppmsboost::asio::placeholders::detail::placeholder<1>::get();
-  cppmsboost::arg<2>& bytes_transferred
-    = cppmsboost::asio::placeholders::detail::placeholder<2>::get();
-  cppmsboost::arg<2>& iterator
-    = cppmsboost::asio::placeholders::detail::placeholder<2>::get();
-  cppmsboost::arg<2>& results
-    = cppmsboost::asio::placeholders::detail::placeholder<2>::get();
-  cppmsboost::arg<2>& endpoint
-    = cppmsboost::asio::placeholders::detail::placeholder<2>::get();
-  cppmsboost::arg<2>& signal_number
-    = cppmsboost::asio::placeholders::detail::placeholder<2>::get();
+  boost::arg<1>& error
+    = boost::asio::placeholders::detail::placeholder<1>::get();
+  boost::arg<2>& bytes_transferred
+    = boost::asio::placeholders::detail::placeholder<2>::get();
+  boost::arg<2>& iterator
+    = boost::asio::placeholders::detail::placeholder<2>::get();
+  boost::arg<2>& results
+    = boost::asio::placeholders::detail::placeholder<2>::get();
+  boost::arg<2>& endpoint
+    = boost::asio::placeholders::detail::placeholder<2>::get();
+  boost::arg<2>& signal_number
+    = boost::asio::placeholders::detail::placeholder<2>::get();
 } // namespace
 
 #  endif
@@ -146,7 +146,7 @@ namespace
 
 } // namespace placeholders
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

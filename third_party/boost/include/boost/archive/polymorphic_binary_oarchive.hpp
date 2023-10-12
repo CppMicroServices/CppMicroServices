@@ -20,7 +20,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/detail/polymorphic_oarchive_route.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 class BOOST_SYMBOL_VISIBLE polymorphic_binary_oarchive :
@@ -34,11 +34,11 @@ public:
 };
 
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 // required by export
 BOOST_SERIALIZATION_REGISTER_ARCHIVE(
-    cppmsboost::archive::polymorphic_binary_oarchive
+    boost::archive::polymorphic_binary_oarchive
 )
 
 #endif // BOOST_ARCHIVE_POLYMORPHIC_BINARY_OARCHIVE_HPP

@@ -26,23 +26,23 @@
 
 #include <boost/type_traits/detail/yes_no_type.hpp>
 
-namespace cppmsboost{
+namespace boost{
 
    namespace detail{
 
       struct is_default_constructible_imp
       {
          template<typename _Tp, typename = decltype(_Tp())>
-         static cppmsboost::type_traits::yes_type test(int);
+         static boost::type_traits::yes_type test(int);
 
          template<typename>
-         static cppmsboost::type_traits::no_type test(...);
+         static boost::type_traits::no_type test(...);
       };
 #if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40700)
       template<class T, bool b> 
       struct is_default_constructible_abstract_filter
       {
-          static const bool value = sizeof(is_default_constructible_imp::test<T>(0)) == sizeof(cppmsboost::type_traits::yes_type);
+          static const bool value = sizeof(is_default_constructible_imp::test<T>(0)) == sizeof(boost::type_traits::yes_type);
       };
       template<class T> 
       struct is_default_constructible_abstract_filter<T, true>
@@ -53,14 +53,14 @@ namespace cppmsboost{
    }
 
 #if BOOST_WORKAROUND(BOOST_GCC_VERSION, < 40700)
-   template <class T> struct is_default_constructible : public integral_constant<bool, detail::is_default_constructible_abstract_filter<T, cppmsboost::is_abstract<T>::value>::value>
+   template <class T> struct is_default_constructible : public integral_constant<bool, detail::is_default_constructible_abstract_filter<T, boost::is_abstract<T>::value>::value>
    {
-      BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<T>::value, "Arguments to is_default_constructible must be complete types");
+      BOOST_STATIC_ASSERT_MSG(boost::is_complete<T>::value, "Arguments to is_default_constructible must be complete types");
    };
 #else
-   template <class T> struct is_default_constructible : public integral_constant<bool, sizeof(cppmsboost::detail::is_default_constructible_imp::test<T>(0)) == sizeof(cppmsboost::type_traits::yes_type)>
+   template <class T> struct is_default_constructible : public integral_constant<bool, sizeof(boost::detail::is_default_constructible_imp::test<T>(0)) == sizeof(boost::type_traits::yes_type)>
    {
-      BOOST_STATIC_ASSERT_MSG(cppmsboost::is_complete<T>::value, "Arguments to is_default_constructible must be complete types");
+      BOOST_STATIC_ASSERT_MSG(boost::is_complete<T>::value, "Arguments to is_default_constructible must be complete types");
    };
 #endif
    template <class T, std::size_t N> struct is_default_constructible<T[N]> : public is_default_constructible<T>{};
@@ -81,7 +81,7 @@ namespace cppmsboost{
 
 #include <boost/type_traits/is_pod.hpp>
 
-namespace cppmsboost{
+namespace boost{
 
    // We don't know how to implement this, note we can not use has_trivial_constructor here
    // because the correct implementation of that trait requires this one:
@@ -93,6 +93,6 @@ namespace cppmsboost{
 
 #endif
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_TT_IS_DEFAULT_CONSTRUCTIBLE_HPP_INCLUDED

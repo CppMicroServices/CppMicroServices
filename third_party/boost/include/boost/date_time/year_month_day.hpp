@@ -11,7 +11,7 @@
 
 #include <boost/date_time/compiler_config.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace date_time {
 
   //! Allow rapid creation of ymd triples of different types

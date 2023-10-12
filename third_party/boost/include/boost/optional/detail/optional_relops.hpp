@@ -13,7 +13,7 @@
 #ifndef BOOST_OPTIONAL_DETAIL_OPTIONAL_RELOPS_AJK_03OCT2015_HPP
 #define BOOST_OPTIONAL_DETAIL_OPTIONAL_RELOPS_AJK_03OCT2015_HPP
 
-namespace cppmsboost {
+namespace boost {
 
 // optional's relational operators ( ==, !=, <, >, <=, >= ) have deep-semantics (compare values).
 // WARNING: This is UNLIKE pointers. Use equal_pointees()/less_pointess() in generic code instead.
@@ -190,7 +190,7 @@ inline
 bool operator >= ( none_t x, optional<T> const& y )
 { return !( x < y ) ; }
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // header guard
 

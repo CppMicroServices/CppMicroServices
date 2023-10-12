@@ -24,23 +24,23 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
-struct forwarding_posix_time_traits : time_traits<cppmsboost::posix_time::ptime> {};
+struct forwarding_posix_time_traits : time_traits<boost::posix_time::ptime> {};
 
 // Template specialisation for the commonly used instantation.
 template <>
-class timer_queue<time_traits<cppmsboost::posix_time::ptime> >
+class timer_queue<time_traits<boost::posix_time::ptime> >
   : public timer_queue_base
 {
 public:
   // The time type.
-  typedef cppmsboost::posix_time::ptime time_type;
+  typedef boost::posix_time::ptime time_type;
 
   // The duration type.
-  typedef cppmsboost::posix_time::time_duration duration_type;
+  typedef boost::posix_time::time_duration duration_type;
 
   // Per-timer data.
   typedef timer_queue<forwarding_posix_time_traits>::per_timer_data
@@ -88,7 +88,7 @@ private:
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

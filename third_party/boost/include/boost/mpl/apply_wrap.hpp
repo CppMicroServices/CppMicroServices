@@ -52,7 +52,7 @@
 #   include <boost/preprocessor/iterate.hpp>
 
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 // local macros, #undef-ined at the end of the header
 #   define AUX778076_APPLY_WRAP_PARAMS(n, param) \
@@ -122,7 +122,7 @@ template<
     >
 struct BOOST_PP_CAT(apply_wrap,i_)
     : BOOST_PP_CAT(apply_wrap_impl,i_)<
-          ::cppmsboost::mpl::aux::arity<F,i_>::value
+          ::boost::mpl::aux::arity<F,i_>::value
         , F
         BOOST_PP_COMMA_IF(i_) AUX778076_APPLY_WRAP_PARAMS(i_, T)
         >::type

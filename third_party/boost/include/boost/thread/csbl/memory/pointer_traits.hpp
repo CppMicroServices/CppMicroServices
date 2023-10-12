@@ -15,15 +15,15 @@
 #if defined BOOST_NO_CXX11_ALLOCATOR
 #include <boost/intrusive/pointer_traits.hpp>
 
-namespace cppmsboost
+namespace boost
 {
   namespace csbl
   {
-    using ::cppmsboost::intrusive::pointer_traits;
+    using ::boost::intrusive::pointer_traits;
   }
 }
 #else
-namespace cppmsboost
+namespace boost
 {
   namespace csbl
   {

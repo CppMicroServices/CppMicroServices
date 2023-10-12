@@ -39,7 +39,7 @@
 #   include <boost/preprocessor/cat.hpp>
 
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 #if defined(BOOST_MPL_CFG_NO_NESTED_VALUE_ARITHMETIC)
 namespace aux {

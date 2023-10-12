@@ -32,10 +32,10 @@
 // iterator_category deduction for iterator_facade
 //
 
-namespace cppmsboost {
+namespace boost {
 namespace iterators {
 
-using cppmsboost::use_default;
+using boost::use_default;
 
 namespace detail {
 
@@ -64,7 +64,7 @@ struct iterator_writability_disabled
 # ifdef BOOST_ITERATOR_REF_CONSTNESS_KILLS_WRITABILITY // Adding Thomas' logic?
   : mpl::or_<
         is_const<Reference>
-      , cppmsboost::detail::indirect_traits::is_reference_to_const<Reference>
+      , boost::detail::indirect_traits::is_reference_to_const<Reference>
       , is_const<ValueParam>
     >
 # else
@@ -187,7 +187,7 @@ struct facade_iterator_category
 {
 };
 
-}}} // namespace cppmsboost::iterators::detail
+}}} // namespace boost::iterators::detail
 
 # include <boost/iterator/detail/config_undef.hpp>
 

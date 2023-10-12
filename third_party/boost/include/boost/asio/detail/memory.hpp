@@ -27,7 +27,7 @@
 # include <boost/utility/addressof.hpp>
 #endif // !defined(BOOST_ASIO_HAS_STD_ADDRESSOF)
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -35,14 +35,14 @@ namespace detail {
 using std::shared_ptr;
 using std::weak_ptr;
 #else // defined(BOOST_ASIO_HAS_STD_SHARED_PTR)
-using cppmsboost::shared_ptr;
-using cppmsboost::weak_ptr;
+using boost::shared_ptr;
+using boost::weak_ptr;
 #endif // defined(BOOST_ASIO_HAS_STD_SHARED_PTR)
 
 #if defined(BOOST_ASIO_HAS_STD_ADDRESSOF)
 using std::addressof;
 #else // defined(BOOST_ASIO_HAS_STD_ADDRESSOF)
-using cppmsboost::addressof;
+using boost::addressof;
 #endif // defined(BOOST_ASIO_HAS_STD_ADDRESSOF)
 
 } // namespace detail
@@ -67,6 +67,6 @@ struct allocator_arg_t {};
 #endif // defined(BOOST_ASIO_HAS_CXX11_ALLOCATORS)
 
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ASIO_DETAIL_MEMORY_HPP

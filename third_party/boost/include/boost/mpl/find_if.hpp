@@ -21,7 +21,7 @@
 #include <boost/mpl/aux_/na_spec.hpp>
 #include <boost/mpl/aux_/lambda_support.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 BOOST_MPL_AUX_COMMON_NAME_WKND(find_if)
 

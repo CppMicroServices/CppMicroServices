@@ -14,7 +14,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace cppmsboost {
+namespace boost {
 namespace gregorian {
 
   //! Exception type for gregorian day of month (1..31)

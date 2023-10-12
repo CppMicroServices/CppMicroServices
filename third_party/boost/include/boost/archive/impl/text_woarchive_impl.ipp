@@ -24,7 +24,7 @@ namespace std{
 
 #include <boost/archive/text_woarchive.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 //////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ text_woarchive_impl<Archive>::save(const std::wstring &ws)
 #endif
 
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #endif
 

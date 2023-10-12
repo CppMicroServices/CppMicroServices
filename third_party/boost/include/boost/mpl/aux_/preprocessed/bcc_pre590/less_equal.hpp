@@ -9,7 +9,7 @@
 // *Preprocessed* version of the main "less_equal.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<
       typename Tag1
@@ -79,7 +79,7 @@ BOOST_MPL_AUX_NA_SPEC2(2, 2, less_equal)
 
 }}
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<>
 struct less_equal_impl< integral_c_tag,integral_c_tag >

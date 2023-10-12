@@ -9,7 +9,7 @@
 // *Preprocessed* version of the main "and.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 namespace aux {
 

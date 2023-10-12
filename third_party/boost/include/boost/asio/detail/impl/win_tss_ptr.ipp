@@ -25,7 +25,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -41,16 +41,16 @@ DWORD win_tss_ptr_create()
   if (tss_key == out_of_indexes)
   {
     DWORD last_error = ::GetLastError();
-    cppmsboost::system::error_code ec(last_error,
-        cppmsboost::asio::error::get_system_category());
-    cppmsboost::asio::detail::throw_error(ec, "tss");
+    boost::system::error_code ec(last_error,
+        boost::asio::error::get_system_category());
+    boost::asio::detail::throw_error(ec, "tss");
   }
   return tss_key;
 }
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

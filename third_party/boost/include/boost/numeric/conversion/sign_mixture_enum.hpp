@@ -10,7 +10,7 @@
 #ifndef BOOST_NUMERIC_CONVERSION_SIGN_MIXTURE_ENUM_FLC_12NOV2002_HPP
 #define BOOST_NUMERIC_CONVERSION_SIGN_MIXTURE_ENUM_FLC_12NOV2002_HPP
 
-namespace cppmsboost { namespace numeric
+namespace boost { namespace numeric
 {
   enum sign_mixture_enum
   {
@@ -20,7 +20,7 @@ namespace cppmsboost { namespace numeric
     ,unsigned_to_signed
   } ;
 
-} } // namespace cppmsboost::numeric
+} } // namespace boost::numeric
 
 #endif
 //

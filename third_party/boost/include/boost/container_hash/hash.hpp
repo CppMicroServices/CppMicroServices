@@ -115,7 +115,7 @@
 #   include <variant>
 #endif
 
-namespace cppmsboost
+namespace boost
 {
     namespace hash_detail
     {
@@ -139,39 +139,39 @@ namespace cppmsboost
         template <typename T> struct float_numbers {};
 
         template <> struct basic_numbers<bool> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
         template <> struct basic_numbers<char> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
         template <> struct basic_numbers<unsigned char> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
         template <> struct basic_numbers<signed char> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
         template <> struct basic_numbers<short> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
         template <> struct basic_numbers<unsigned short> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
         template <> struct basic_numbers<int> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
         template <> struct basic_numbers<unsigned int> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
         template <> struct basic_numbers<long> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
         template <> struct basic_numbers<unsigned long> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
 
 #if !defined(BOOST_NO_INTRINSIC_WCHAR_T)
         template <> struct basic_numbers<wchar_t> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
 #endif
 
 #if !defined(BOOST_NO_CXX11_CHAR16_T)
         template <> struct basic_numbers<char16_t> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
 #endif
 
 #if !defined(BOOST_NO_CXX11_CHAR32_T)
         template <> struct basic_numbers<char32_t> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
 #endif
 
         // long_numbers is defined like this to allow for separate
@@ -183,36 +183,36 @@ namespace cppmsboost
         template <typename T> struct ulong_numbers : ulong_numbers2<T> {};
 
 #if !defined(BOOST_NO_LONG_LONG)
-        template <> struct long_numbers<cppmsboost::long_long_type> :
-            cppmsboost::hash_detail::enable_hash_value {};
-        template <> struct ulong_numbers<cppmsboost::ulong_long_type> :
-            cppmsboost::hash_detail::enable_hash_value {};
+        template <> struct long_numbers<boost::long_long_type> :
+            boost::hash_detail::enable_hash_value {};
+        template <> struct ulong_numbers<boost::ulong_long_type> :
+            boost::hash_detail::enable_hash_value {};
 #endif
 
 #if defined(BOOST_HAS_INT128)
-        template <> struct long_numbers2<cppmsboost::int128_type> :
-            cppmsboost::hash_detail::enable_hash_value {};
-        template <> struct ulong_numbers2<cppmsboost::uint128_type> :
-            cppmsboost::hash_detail::enable_hash_value {};
+        template <> struct long_numbers2<boost::int128_type> :
+            boost::hash_detail::enable_hash_value {};
+        template <> struct ulong_numbers2<boost::uint128_type> :
+            boost::hash_detail::enable_hash_value {};
 #endif
 
         template <> struct float_numbers<float> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
         template <> struct float_numbers<double> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
         template <> struct float_numbers<long double> :
-            cppmsboost::hash_detail::enable_hash_value {};
+            boost::hash_detail::enable_hash_value {};
     }
 
     template <typename T>
-    typename cppmsboost::hash_detail::basic_numbers<T>::type hash_value(T);
+    typename boost::hash_detail::basic_numbers<T>::type hash_value(T);
     template <typename T>
-    typename cppmsboost::hash_detail::long_numbers<T>::type hash_value(T);
+    typename boost::hash_detail::long_numbers<T>::type hash_value(T);
     template <typename T>
-    typename cppmsboost::hash_detail::ulong_numbers<T>::type hash_value(T);
+    typename boost::hash_detail::ulong_numbers<T>::type hash_value(T);
 
     template <typename T>
-    typename cppmsboost::enable_if<cppmsboost::is_enum<T>, std::size_t>::type
+    typename boost::enable_if<boost::is_enum<T>, std::size_t>::type
         hash_value(T);
 
 #if !BOOST_WORKAROUND(__DMC__, <= 0x848)
@@ -240,7 +240,7 @@ namespace cppmsboost
 #endif
 
     template <typename T>
-    typename cppmsboost::hash_detail::float_numbers<T>::type hash_value(T);
+    typename boost::hash_detail::float_numbers<T>::type hash_value(T);
 
 #if BOOST_HASH_HAS_OPTIONAL
     template <typename T>
@@ -313,8 +313,8 @@ namespace cppmsboost
             seed ^= value + 0x9e3779b9 + (seed<<6) + (seed>>2);
         }
 
-        inline void hash_combine_impl(cppmsboost::uint32_t& h1,
-                cppmsboost::uint32_t k1)
+        inline void hash_combine_impl(boost::uint32_t& h1,
+                boost::uint32_t k1)
         {
             const uint32_t c1 = 0xcc9e2d51;
             const uint32_t c2 = 0x1b873593;
@@ -334,10 +334,10 @@ namespace cppmsboost
 #if !defined(BOOST_NO_INT64_T) && \
         !(defined(__GNUC__) && ULONG_MAX == 0xffffffff)
 
-        inline void hash_combine_impl(cppmsboost::uint64_t& h,
-                cppmsboost::uint64_t k)
+        inline void hash_combine_impl(boost::uint64_t& h,
+                boost::uint64_t k)
         {
-            const cppmsboost::uint64_t m = UINT64_C(0xc6a4a7935bd1e995);
+            const boost::uint64_t m = UINT64_C(0xc6a4a7935bd1e995);
             const int r = 47;
 
             k *= m;
@@ -356,25 +356,25 @@ namespace cppmsboost
     }
 
     template <typename T>
-    typename cppmsboost::hash_detail::basic_numbers<T>::type hash_value(T v)
+    typename boost::hash_detail::basic_numbers<T>::type hash_value(T v)
     {
         return static_cast<std::size_t>(v);
     }
 
     template <typename T>
-    typename cppmsboost::hash_detail::long_numbers<T>::type hash_value(T v)
+    typename boost::hash_detail::long_numbers<T>::type hash_value(T v)
     {
         return hash_detail::hash_value_signed(v);
     }
 
     template <typename T>
-    typename cppmsboost::hash_detail::ulong_numbers<T>::type hash_value(T v)
+    typename boost::hash_detail::ulong_numbers<T>::type hash_value(T v)
     {
         return hash_detail::hash_value_unsigned(v);
     }
 
     template <typename T>
-    typename cppmsboost::enable_if<cppmsboost::is_enum<T>, std::size_t>::type
+    typename boost::enable_if<boost::is_enum<T>, std::size_t>::type
         hash_value(T v)
     {
         return static_cast<std::size_t>(v);
@@ -412,8 +412,8 @@ namespace cppmsboost
     template <class T>
     inline void hash_combine(std::size_t& seed, T const& v)
     {
-        cppmsboost::hash<T> hasher;
-        return cppmsboost::hash_detail::hash_combine_impl(seed, hasher(v));
+        boost::hash<T> hasher;
+        return boost::hash_detail::hash_combine_impl(seed, hasher(v));
     }
 
 #if defined(BOOST_MSVC)
@@ -450,7 +450,7 @@ namespace cppmsboost
 
         for(; first != last; ++first)
         {
-            cppmsboost::hash<T> hasher;
+            boost::hash<T> hasher;
             seed ^= hasher(*first) + 0x9e3779b9 + (seed<<6) + (seed>>2);
         }
 
@@ -462,7 +462,7 @@ namespace cppmsboost
     {
         for(; first != last; ++first)
         {
-            cppmsboost::hash<T> hasher;
+            boost::hash<T> hasher;
             seed ^= hasher(*first) + 0x9e3779b9 + (seed<<6) + (seed>>2);
         }
     }
@@ -499,9 +499,9 @@ namespace cppmsboost
 #endif
 
     template <typename T>
-    typename cppmsboost::hash_detail::float_numbers<T>::type hash_value(T v)
+    typename boost::hash_detail::float_numbers<T>::type hash_value(T v)
     {
-        return cppmsboost::hash_detail::float_hash_value(v);
+        return boost::hash_detail::float_hash_value(v);
     }
 
 #if BOOST_HASH_HAS_OPTIONAL
@@ -511,7 +511,7 @@ namespace cppmsboost
             // Arbitray value for empty optional.
             return 0x12345678;
         } else {
-            cppmsboost::hash<T> hf;
+            boost::hash<T> hf;
             return hf(*v);
         }
     }
@@ -556,11 +556,11 @@ namespace cppmsboost
 #endif
 
     //
-    // cppmsboost::hash
+    // boost::hash
     //
 
     // Define the specializations required by the standard. The general purpose
-    // cppmsboost::hash is defined later in extensions.hpp if
+    // boost::hash is defined later in extensions.hpp if
     // BOOST_HASH_NO_EXTENSIONS is not defined.
 
     // BOOST_HASH_SPECIALIZE - define a specialization for a type which is
@@ -573,31 +573,31 @@ namespace cppmsboost
 
 #define BOOST_HASH_SPECIALIZE(type) \
     template <> struct hash<type> \
-         : public cppmsboost::hash_detail::hash_base<type> \
+         : public boost::hash_detail::hash_base<type> \
     { \
         std::size_t operator()(type v) const \
         { \
-            return cppmsboost::hash_value(v); \
+            return boost::hash_value(v); \
         } \
     };
 
 #define BOOST_HASH_SPECIALIZE_REF(type) \
     template <> struct hash<type> \
-         : public cppmsboost::hash_detail::hash_base<type> \
+         : public boost::hash_detail::hash_base<type> \
     { \
         std::size_t operator()(type const& v) const \
         { \
-            return cppmsboost::hash_value(v); \
+            return boost::hash_value(v); \
         } \
     };
 
 #define BOOST_HASH_SPECIALIZE_TEMPLATE_REF(type) \
     struct hash<type> \
-         : public cppmsboost::hash_detail::hash_base<type> \
+         : public boost::hash_detail::hash_base<type> \
     { \
         std::size_t operator()(type const& v) const \
         { \
-            return cppmsboost::hash_value(v); \
+            return boost::hash_value(v); \
         } \
     };
 
@@ -650,13 +650,13 @@ namespace cppmsboost
 #endif
 
 #if !defined(BOOST_NO_LONG_LONG)
-    BOOST_HASH_SPECIALIZE(cppmsboost::long_long_type)
-    BOOST_HASH_SPECIALIZE(cppmsboost::ulong_long_type)
+    BOOST_HASH_SPECIALIZE(boost::long_long_type)
+    BOOST_HASH_SPECIALIZE(boost::ulong_long_type)
 #endif
 
 #if defined(BOOST_HAS_INT128)
-    BOOST_HASH_SPECIALIZE(cppmsboost::int128_type)
-    BOOST_HASH_SPECIALIZE(cppmsboost::uint128_type)
+    BOOST_HASH_SPECIALIZE(boost::int128_type)
+    BOOST_HASH_SPECIALIZE(boost::uint128_type)
 #endif
 
 #if BOOST_HASH_HAS_OPTIONAL
@@ -678,18 +678,18 @@ namespace cppmsboost
 #undef BOOST_HASH_SPECIALIZE_REF
 #undef BOOST_HASH_SPECIALIZE_TEMPLATE_REF
 
-// Specializing cppmsboost::hash for pointers.
+// Specializing boost::hash for pointers.
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
 
     template <class T>
     struct hash<T*>
-        : public cppmsboost::hash_detail::hash_base<T*>
+        : public boost::hash_detail::hash_base<T*>
     {
         std::size_t operator()(T* v) const
         {
 #if !BOOST_WORKAROUND(__SUNPRO_CC, <= 0x590)
-            return cppmsboost::hash_value(v);
+            return boost::hash_value(v);
 #else
             std::size_t x = static_cast<std::size_t>(
                 reinterpret_cast<std::ptrdiff_t>(v));
@@ -702,7 +702,7 @@ namespace cppmsboost
 #else
 
     // For compilers without partial specialization, we define a
-    // cppmsboost::hash for all remaining types. But hash_impl is only defined
+    // boost::hash for all remaining types. But hash_impl is only defined
     // for pointers in 'extensions.hpp' - so when BOOST_HASH_NO_EXTENSIONS
     // is defined there will still be a compile error for types not supported
     // in the standard.
@@ -717,12 +717,12 @@ namespace cppmsboost
         {
             template <class T>
             struct inner
-                : public cppmsboost::hash_detail::hash_base<T>
+                : public boost::hash_detail::hash_base<T>
             {
                 std::size_t operator()(T val) const
                 {
 #if !BOOST_WORKAROUND(__SUNPRO_CC, <= 590)
-                    return cppmsboost::hash_value(val);
+                    return boost::hash_value(val);
 #else
                     std::size_t x = static_cast<std::size_t>(
                         reinterpret_cast<std::ptrdiff_t>(val));
@@ -735,7 +735,7 @@ namespace cppmsboost
     }
 
     template <class T> struct hash
-        : public cppmsboost::hash_detail::hash_impl<cppmsboost::is_pointer<T>::value>
+        : public boost::hash_detail::hash_impl<boost::is_pointer<T>::value>
             ::BOOST_NESTED_TEMPLATE inner<T>
     {
     };

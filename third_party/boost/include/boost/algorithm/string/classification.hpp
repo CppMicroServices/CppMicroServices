@@ -26,7 +26,7 @@
     into generic functors. 
 */
 
-namespace cppmsboost {
+namespace boost {
     namespace algorithm {
 
 //  classification functor generator -------------------------------------//
@@ -202,7 +202,7 @@ namespace cppmsboost {
             BOOST_STRING_TYPENAME range_value<RangeT>::type> 
         is_any_of( const RangeT& Set )
         {
-            iterator_range<BOOST_STRING_TYPENAME range_const_iterator<RangeT>::type> lit_set(cppmsboost::as_literal(Set));
+            iterator_range<BOOST_STRING_TYPENAME range_const_iterator<RangeT>::type> lit_set(boost::as_literal(Set));
             return detail::is_any_ofF<BOOST_STRING_TYPENAME range_value<RangeT>::type>(lit_set); 
         }
 
@@ -307,6 +307,6 @@ namespace cppmsboost {
     using algorithm::is_any_of;
     using algorithm::is_from_range;
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // BOOST_STRING_PREDICATE_HPP

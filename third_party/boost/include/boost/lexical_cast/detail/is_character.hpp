@@ -26,7 +26,7 @@
 #include <boost/type_traits/integral_constant.hpp>
 #include <boost/type_traits/is_same.hpp>
 
-namespace cppmsboost {
+namespace boost {
 
     namespace detail // is_character<...>
     {
@@ -34,20 +34,20 @@ namespace cppmsboost {
         template < typename T >
         struct is_character
         {
-            typedef BOOST_DEDUCED_TYPENAME cppmsboost::integral_constant<
+            typedef BOOST_DEDUCED_TYPENAME boost::integral_constant<
                 bool,
-                cppmsboost::is_same< T, char >::value ||
+                boost::is_same< T, char >::value ||
                     #if !defined(BOOST_NO_STRINGSTREAM) && !defined(BOOST_NO_STD_WSTRING)
-                        cppmsboost::is_same< T, wchar_t >::value ||
+                        boost::is_same< T, wchar_t >::value ||
                     #endif
                     #ifndef BOOST_NO_CXX11_CHAR16_T
-                        cppmsboost::is_same< T, char16_t >::value ||
+                        boost::is_same< T, char16_t >::value ||
                     #endif
                     #ifndef BOOST_NO_CXX11_CHAR32_T
-                        cppmsboost::is_same< T, char32_t >::value ||
+                        boost::is_same< T, char32_t >::value ||
                     #endif
-                        cppmsboost::is_same< T, unsigned char >::value ||
-                        cppmsboost::is_same< T, signed char >::value
+                        boost::is_same< T, unsigned char >::value ||
+                        boost::is_same< T, signed char >::value
             > type;
 
             BOOST_STATIC_CONSTANT(bool, value = (type::value) );

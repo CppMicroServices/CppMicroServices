@@ -22,7 +22,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -144,7 +144,7 @@ using associated_executor_t = typename associated_executor<T, Executor>::type;
 #endif // defined(BOOST_ASIO_HAS_ALIAS_TEMPLATES)
 
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

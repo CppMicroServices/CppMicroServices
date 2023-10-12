@@ -31,7 +31,7 @@ namespace std{
 #include <boost/archive/detail/utf8_codecvt_facet.hpp>
 #include <boost/iterator/iterator_adaptor.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 namespace iterators {
 
@@ -40,7 +40,7 @@ namespace iterators {
 // strings of the currently selected locale
 template<class Base>    // the input iterator
 class mb_from_wchar
-    : public cppmsboost::iterator_adaptor<
+    : public boost::iterator_adaptor<
         mb_from_wchar<Base>,
         Base,
         wchar_t,
@@ -48,9 +48,9 @@ class mb_from_wchar
         char
     >
 {
-    friend class cppmsboost::iterator_core_access;
+    friend class boost::iterator_core_access;
 
-    typedef typename cppmsboost::iterator_adaptor<
+    typedef typename boost::iterator_adaptor<
         mb_from_wchar<Base>,
         Base,
         wchar_t,
@@ -108,7 +108,7 @@ class mb_from_wchar
         m_full = false;
     }
 
-    cppmsboost::archive::detail::utf8_codecvt_facet m_codecvt_facet;
+    boost::archive::detail::utf8_codecvt_facet m_codecvt_facet;
     std::mbstate_t m_mbs;
     // buffer to handle pending characters
     char m_buffer[9 /* MB_CUR_MAX */];
@@ -137,6 +137,6 @@ public:
 
 } // namespace iterators
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ARCHIVE_ITERATORS_MB_FROM_WCHAR_HPP

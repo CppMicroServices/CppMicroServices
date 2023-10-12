@@ -13,7 +13,7 @@
 #include <cstddef>
 #endif
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace detail
@@ -34,6 +34,6 @@ inline typename std::iterator_traits< T* >::difference_type distance(T (&left)[N
 
 } // namespace detail
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // ITERATOR_DWA122600_HPP_

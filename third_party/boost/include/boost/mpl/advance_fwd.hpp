@@ -16,7 +16,7 @@
 
 #include <boost/mpl/aux_/common_name_wknd.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 BOOST_MPL_AUX_COMMON_NAME_WKND(advance)
 

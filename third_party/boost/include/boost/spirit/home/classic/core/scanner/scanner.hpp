@@ -16,7 +16,7 @@
 
 #include <boost/spirit/home/classic/core/scanner/scanner_fwd.hpp>
 
-namespace cppmsboost { namespace spirit {
+namespace boost { namespace spirit {
 
 BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
 
@@ -222,7 +222,7 @@ BOOST_SPIRIT_CLASSIC_NAMESPACE_BEGIN
             iterator_traits<IteratorT>::value_type value_t;
         typedef typename std::
             iterator_traits<IteratorT>::reference ref_t;
-        typedef typename cppmsboost::
+        typedef typename boost::
             call_traits<IteratorT>::param_type iter_param_t;
 
         scanner(

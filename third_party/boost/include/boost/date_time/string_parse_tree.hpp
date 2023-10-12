@@ -19,7 +19,7 @@
 #include <iterator>
 #include <algorithm>
 
-namespace cppmsboost { namespace date_time {
+namespace boost { namespace date_time {
 
 
 template<typename charT>
@@ -107,7 +107,7 @@ struct string_parse_tree
     // iterate thru all the elements and build the tree
     unsigned short index = 0;
     while (index != names.size() ) {
-      string_type s = cppmsboost::algorithm::to_lower_copy(names[index]);
+      string_type s = boost::algorithm::to_lower_copy(names[index]);
       insert(s, static_cast<unsigned short>(index + starting_point));
       index++;
     }

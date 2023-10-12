@@ -11,7 +11,7 @@
 
 #include <boost/config.hpp>
 
-namespace cppmsboost {
+namespace boost {
 
 template <bool b, class T, class U> struct conditional { typedef T type; };
 template <class T, class U> struct conditional<false, T, U> { typedef U type; };
@@ -22,7 +22,7 @@ template <class T, class U> struct conditional<false, T, U> { typedef U type; };
 
 #endif
 
-} // namespace cppmsboost
+} // namespace boost
 
 
 #endif // BOOST_TT_CONDITIONAL_HPP_INCLUDED

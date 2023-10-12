@@ -38,7 +38,7 @@ time2_demo contained this comment:
 #pragma GCC system_header
 #endif
 
-namespace cppmsboost
+namespace boost
 {
 
 //----------------------------------------------------------------------------//
@@ -48,7 +48,7 @@ namespace cppmsboost
 //----------------------------------------------------------------------------//
 
 // ratio
-template <cppmsboost::intmax_t N, cppmsboost::intmax_t D = 1> class ratio;
+template <boost::intmax_t N, boost::intmax_t D = 1> class ratio;
 
 // ratio arithmetic
 template <class R1, class R2> struct ratio_add;
@@ -103,7 +103,7 @@ typedef ratio<                 BOOST_RATIO_1024*BOOST_RATIO_1024*BOOST_RATIO_102
 typedef ratio<BOOST_RATIO_1024*BOOST_RATIO_1024*BOOST_RATIO_1024*BOOST_RATIO_1024*BOOST_RATIO_1024*BOOST_RATIO_1024> exbi;
 
 #endif
-}  // namespace cppmsboost
+}  // namespace boost
 
 
 #endif  // BOOST_RATIO_HPP

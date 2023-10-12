@@ -16,7 +16,7 @@
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/type_traits/remove_cv.hpp>
 
-namespace cppmsboost 
+namespace boost 
 {
 
    namespace detail
@@ -34,7 +34,7 @@ namespace cppmsboost
     private:
         typedef typename remove_reference<T>::type Ty;
     public:
-       typedef typename cppmsboost::detail::decay_imp<Ty, cppmsboost::is_array<Ty>::value, cppmsboost::is_function<Ty>::value>::type type;
+       typedef typename boost::detail::decay_imp<Ty, boost::is_array<Ty>::value, boost::is_function<Ty>::value>::type type;
     };
     
 #if !defined(BOOST_NO_CXX11_TEMPLATE_ALIASES)
@@ -43,7 +43,7 @@ namespace cppmsboost
 
 #endif
 
-} // namespace cppmsboost
+} // namespace boost
 
 
 #endif // BOOST_TT_DECAY_HPP_INCLUDED

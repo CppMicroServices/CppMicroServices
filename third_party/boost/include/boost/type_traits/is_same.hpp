@@ -23,7 +23,7 @@
 
 #include <boost/type_traits/integral_constant.hpp>
 
-namespace cppmsboost {
+namespace boost {
 
 
    template <class T, class U> struct is_same : public false_type {};
@@ -35,7 +35,7 @@ namespace cppmsboost {
 #endif
 
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // BOOST_TT_IS_SAME_HPP_INCLUDED
 

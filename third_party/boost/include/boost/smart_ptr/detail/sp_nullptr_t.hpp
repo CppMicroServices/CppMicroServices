@@ -20,7 +20,7 @@
 
 #if !defined( BOOST_NO_CXX11_NULLPTR )
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace detail
@@ -38,7 +38,7 @@ namespace detail
 
 } // namespace detail
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // !defined( BOOST_NO_CXX11_NULLPTR )
 

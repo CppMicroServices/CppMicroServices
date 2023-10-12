@@ -13,7 +13,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace detail
@@ -72,6 +72,6 @@ private:
 
 } // namespace detail
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // #ifndef BOOST_SMART_PTR_DETAIL_ATOMIC_COUNT_GCC_X86_HPP_INCLUDED

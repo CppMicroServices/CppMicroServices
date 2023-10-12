@@ -23,7 +23,7 @@
 #include <boost/mpl/vector/aux_/tag.hpp>
 #include <boost/mpl/aux_/config/typeof.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template< typename Dummy = na > struct vector0;
 

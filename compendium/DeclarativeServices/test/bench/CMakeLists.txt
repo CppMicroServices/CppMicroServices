@@ -23,12 +23,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/third_party/benchmark/include
   )
 
-set(_boost_library)
-if (US_USE_SYSTEM_BOOST)
-    set(_boost_library ${BOOST_INCLUDEDIR})
-else()
-    set(_boost_library ${CppMicroServices_SOURCE_DIR}/third_party/boost/include)
-endif()
+usFunctionBoostPath(BOOST_SYSTEM ${US_USE_SYSTEM_BOOST} CPPMS_SOURCE_DIR ${CppMicroServices_SOURCE_DIR} BOOST_DIR ${BOOST_INCLUDEDIR})
 
 # There are warnings in the boost asio headers which are flagged as errors. Include the boost
 # asio headers as system headers to ignore these warnings and not treat them as errors.

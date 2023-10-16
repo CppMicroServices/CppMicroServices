@@ -171,6 +171,7 @@ include(usFunctionGenerateBundleInit)
 include(usMacroCreateBundle)
 include(usFunctionCreateTestBundle)
 include(usFunctionCreateDSTestBundle)
+include(usFunctionBoostPath)
 
 if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   check_cxx_compiler_flag(-Wno-missing-braces HAS_MISSING_BRACES_FLAG)
@@ -879,6 +880,7 @@ install(EXPORT ${PROJECT_NAME}Targets
     ${US_CMAKE_DIR}/usFunctionGetResourceSource.cmake
     ${US_CMAKE_DIR}/usFunctionCheckResourceLinking.cmake
     ${US_CMAKE_DIR}/usFunctionCheckCompilerFlags.cmake
+    ${US_CMAKE_DIR}/usFunctionBoostPath.cmake
     )
 
   install(FILES ${_install_cmake_scripts}

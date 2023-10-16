@@ -46,6 +46,13 @@ target_include_directories(ConfigurationAdminObjs PRIVATE
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )
 
-# There are warnings in the boost asio headers which are flagged as errors. Include the boost
-# asio headers as system headers to ignore these warnings and not treat them as errors.
-include_directories(SYSTEM ${CppMicroServices_SOURCE_DIR}/third_party/boost/include)
+  set(_boost_library)
+  if (US_USE_SYSTEM_BOOST)
+      set(_boost_library ${BOOST_INCLUDEDIR})
+  else()
+      set(_boost_library ${CppMicroServices_SOURCE_DIR}/third_party/boost/include)
+  endif()
+  
+  # There are warnings in the boost asio headers which are flagged as errors. Include the boost
+  # asio headers as system headers to ignore these warnings and not treat them as errors.
+  include_directories(SYSTEM ${_boost_library})

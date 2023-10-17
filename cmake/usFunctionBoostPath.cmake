@@ -7,7 +7,7 @@
 
 
 function(usFunctionBoostPath)
-  cmake_parse_arguments(Boost_Path "BOOST_SYSTEM" "CPPMS_SOURCE_DIR;BOOST_DIR" "" ${ARGN})
+  cmake_parse_arguments(Boost_Path "" "BOOST_SYSTEM;CPPMS_SOURCE_DIR;BOOST_DIR" "" ${ARGN})
 
   if (Boost_Path_BOOST_SYSTEM)
       set(_boost_library ${Boost_Path_BOOST_DIR} PARENT_SCOPE)

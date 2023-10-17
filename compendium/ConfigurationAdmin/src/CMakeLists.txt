@@ -47,7 +47,7 @@ target_include_directories(ConfigurationAdminObjs PRIVATE
   )
 
 usFunctionBoostPath(BOOST_SYSTEM ${US_USE_SYSTEM_BOOST} CPPMS_SOURCE_DIR ${CppMicroServices_SOURCE_DIR} BOOST_DIR ${BOOST_INCLUDEDIR})
-  
-  # There are warnings in the boost asio headers which are flagged as errors. Include the boost
-  # asio headers as system headers to ignore these warnings and not treat them as errors.
-  include_directories(SYSTEM ${_boost_library})
+
+# There are warnings in the boost asio headers which are flagged as errors. Include the boost
+# asio headers as system headers to ignore these warnings and not treat them as errors.
+include_directories(SYSTEM ${_boost_library})

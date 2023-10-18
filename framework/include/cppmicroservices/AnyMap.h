@@ -389,8 +389,7 @@ namespace cppmicroservices
          * @brief initializer_list constructor
          *
          * Construct an AnyMap of type UNORDERED_MAP_CASEINSENSITIVE_KEYS with the content of the
-         * initialized with the content of the the initializer list. Allows for inline
-         * initialization akin to:
+         * the initializer list. Allows for inline initialization akin to:
          *
          *     AnyMap cache_bundle1 {
          *         {"a", std::string("A")},
@@ -404,9 +403,8 @@ namespace cppmicroservices
         /**
          * @brief initializer_list constructor
          *
-         * Construct an AnyMap of type "type" with the content of the
-         * initialized with the content of the the initializer list. Allows for inline
-         * initialization akin to:
+         * Construct an AnyMap of type "type" with the content of the the initializer list. Allows
+         * for inline initialization akin to:
          *
          *     AnyMap cache_bundle1 {
          *         AnyMap::ORDERED_MAP, {

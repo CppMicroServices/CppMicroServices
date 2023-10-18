@@ -69,6 +69,7 @@ include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGenerateBundleInit.cmake")
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionAddResources.cmake")
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionCheckCompilerFlags.cmake")
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionEmbedResources.cmake")
+include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionBoostPath.cmake")
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionCheckResourceLinking.cmake")
 include("@PACKAGE_CONFIG_CMAKE_DIR@/usFunctionGetResourceSource.cmake")
 

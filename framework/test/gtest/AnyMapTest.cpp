@@ -39,31 +39,30 @@ TEST(AnyMapTest, CheckExceptions)
 TEST(AnyMapTest, AtCompoundKey)
 {
     // Testing nested vector<Any> compound access
-    AnyMap uo(AnyMap::UNORDERED_MAP);
     std::vector<Any> child { Any(1), Any(2) };
-    std::vector<Any> parent { Any(child) };
-    uo["hi"] = parent;
+    AnyMap uo { AnyMap::UNORDERED_MAP, { { "hi", std::vector<Any> { Any { std::vector<Any> { 1, 2 } } } } } };
     ASSERT_EQ(uo.AtCompoundKey("hi.0.0"), 1);
 }
 
 TEST(AnyMapTest, IteratorTest)
 {
-    AnyMap o(AnyMap::ORDERED_MAP);
-    o["a"] = 1;
-    o["b"] = 2;
-    o["c"] = 3;
+    AnyMap o = {
+        any_map::ORDERED_MAP,
+        {{ "a", 1 }, { "b", 2 }, { "c", 3 }}
+    };
     AnyMap::const_iter ociter(o.begin());
     AnyMap::const_iter ociter1(o.cbegin());
 
-    AnyMap uo(AnyMap::UNORDERED_MAP);
-    uo["1"] = 1;
-    uo["2"] = 2;
+    AnyMap uo = {
+        AnyMap::UNORDERED_MAP,
+        {{ "1", 1 }, { "2", 2 }}
+    };
     AnyMap::const_iter uociter(uo.begin());
     AnyMap::const_iter uociter1(uo.cbegin());
 
-    AnyMap uoci(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-    uoci["do"] = 1;
-    uoci["re"] = 2;
+    AnyMap uoci {
+        {{ "do", 1 }, { "re", 2 }}
+    };
     AnyMap::const_iter uoccciiter(uoci.begin());
     AnyMap::const_iter uoccciiter1(uoci.cbegin());
 
@@ -136,15 +135,16 @@ TEST(AnyMapTest, IteratorTest)
 
 TEST(AnyMapTest, AnyMap)
 {
-    AnyMap::ordered_any_map o;
-    o["do"] = Any(1);
-    o["re"] = Any(2);
+    AnyMap::ordered_any_map o {
+        {{ "do", 1 }, { "re", 2 }}
+    };
     AnyMap o_anymap(o);
     AnyMap o_anymap_copy(o_anymap);
 
-    AnyMap uo_anymap(AnyMap::UNORDERED_MAP);
-    uo_anymap["do"] = 1;
-    uo_anymap["re"] = 2;
+    AnyMap uo_anymap = {
+        AnyMap::UNORDERED_MAP,
+        {{ "do", 1 }, { "re", 2 }}
+    };
 
     AnyMap::unordered_any_cimap uco;
     AnyMap uco_anymap(uco);
@@ -200,9 +200,11 @@ TEST(AnyMapTest, AnyMap)
 TEST(AnyMapTest, MoveConstructor)
 {
     testing::FLAGS_gtest_death_test_style = "threadsafe";
-    AnyMap o(AnyMap::ORDERED_MAP);
-    o["do"] = Any(1);
-    o["re"] = Any(2);
+    AnyMap o = {
+        AnyMap::ORDERED_MAP,
+        {{ "do", 1 }, { "re", 2 }}
+    };
+
     AnyMap o_anymap_move_ctor(std::move(o));
     ASSERT_EQ(any_cast<int>(o_anymap_move_ctor.at("do")), 1);
     ASSERT_DEATH({ o.size(); }, ".*") << "This call should result in a crash because "
@@ -220,9 +222,11 @@ TEST(AnyMapTest, MoveConstructor)
 TEST(AnyMapTest, MoveAssignment)
 {
     testing::FLAGS_gtest_death_test_style = "threadsafe";
-    AnyMap o(AnyMap::ORDERED_MAP);
-    o["do"] = Any(1);
-    o["re"] = Any(2);
+    AnyMap o {
+        AnyMap::ORDERED_MAP,
+        {{ "do", 1 }, { "re", 2 }}
+    };
+
     AnyMap uo_anymap_move_assign(AnyMap::UNORDERED_MAP);
     uo_anymap_move_assign = std::move(o);
     ASSERT_EQ(any_cast<int>(uo_anymap_move_assign.at("re")), 2);
@@ -370,19 +374,17 @@ manifest_from_cache(cppmicroservices::any_map::key_type const& key, cppmicroserv
 
 TEST(AnyMapTest, ManifestFromCache)
 {
-    AnyMap cache(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-    AnyMap cache_bundles(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-    AnyMap cache_bundle1(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-    AnyMap cache_bundle2(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+    AnyMap cache {};
+    AnyMap cache_bundles {};
+    AnyMap cache_bundle1 = {
+        {{ "a", std::string("A") }, { "b", std::string("B") }, { "c", std::string("C") }}
+    };
 
-    cache_bundle1["a"] = std::string("A");
-    cache_bundle1["b"] = std::string("B");
-    cache_bundle1["c"] = std::string("C");
+    AnyMap cache_bundle2 = {
+        {{ "d", std::string("D") }, { "e", std::string("E") }, { "f", std::string("F") }}
+    };
+
     auto cache_bundle1_copy = cache_bundle1;
-
-    cache_bundle2["d"] = std::string("D");
-    cache_bundle2["e"] = std::string("E");
-    cache_bundle2["f"] = std::string("F");
     auto cache_bundle2_copy = cache_bundle2;
 
     cache_bundles.emplace(std::string("bundle1"), std::move(cache_bundle1));
@@ -402,4 +404,42 @@ TEST(AnyMapTest, ManifestFromCache)
     auto bundle2 = manifest_from_cache(std::string("bundle2"), cache);
     EXPECT_EQ(cache_bundle2_copy, bundle2);
     EXPECT_EQ(0, bundles.size());
+}
+
+TEST(AnyMapTest, InitializerList)
+{
+    AnyMap noType {
+        {{ "a", 1 }, { "b", 2 }}
+    };
+    EXPECT_EQ(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS, noType.GetType());
+    EXPECT_EQ(2, noType.size());
+    EXPECT_EQ(Any(1), noType.at("a"));
+    EXPECT_EQ(Any(2), noType.at("b"));
+
+    AnyMap ordered_any_map {
+        any_map::ORDERED_MAP,
+        {{ "c", 3 }, { "d", 4 }}
+    };
+    EXPECT_EQ(any_map::ORDERED_MAP, ordered_any_map.GetType());
+    EXPECT_EQ(2, ordered_any_map.size());
+    EXPECT_EQ(Any(3), ordered_any_map.at("c"));
+    EXPECT_EQ(Any(4), ordered_any_map.at("d"));
+
+    AnyMap unordered_any_map {
+        any_map::UNORDERED_MAP,
+        {{ "e", 5 }, { "f", 6 }}
+    };
+    EXPECT_EQ(any_map::UNORDERED_MAP, unordered_any_map.GetType());
+    EXPECT_EQ(2, unordered_any_map.size());
+    EXPECT_EQ(Any(5), unordered_any_map.at("e"));
+    EXPECT_EQ(Any(6), unordered_any_map.at("f"));
+
+    AnyMap unordered_any_cimap {
+        any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS,
+        {{ "g", 7 }, { "h", 8 }}
+    };
+    EXPECT_EQ(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS, unordered_any_cimap.GetType());
+    EXPECT_EQ(2, unordered_any_cimap.size());
+    EXPECT_EQ(Any(7), unordered_any_cimap.at("g"));
+    EXPECT_EQ(Any(8), unordered_any_cimap.at("h"));
 }

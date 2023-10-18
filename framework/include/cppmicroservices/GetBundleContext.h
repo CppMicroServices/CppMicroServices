@@ -49,7 +49,8 @@ namespace cppmicroservices
     static inline BundleContext
     GetBundleContext()
     {
-        return *US_GET_CTX_FUNC(US_BUNDLE_NAME)();
+        BundleContext* ctx = US_GET_CTX_FUNC(US_BUNDLE_NAME)();
+        return ctx ? *ctx : BundleContext();
     }
 } // namespace cppmicroservices
 

@@ -32,7 +32,7 @@
 namespace cppmicroservices
 {
     class BundleContext;
-    // Using a raw pointer and an ownership flag because C++ types like shared_ptr can't go across an extern C interface.
+    // Using a raw pointer because smart pointers can't go across an extern C interface.
     // THIS IS A TRANSFER OF OWNERSHIP. Make and pass in a copy if you want to retain yours.
     using SetBundleContextHook = std::function<void(BundleContext*)>;
 }

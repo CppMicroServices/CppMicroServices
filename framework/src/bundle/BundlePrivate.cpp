@@ -37,6 +37,7 @@
 #include "cppmicroservices/ServiceRegistration.h"
 #include "cppmicroservices/SharedLibraryException.h"
 
+#include "cppmicroservices/util/BundleHandles.h"
 #include "cppmicroservices/util/Error.h"
 #include "cppmicroservices/util/FileSystem.h"
 #include "cppmicroservices/util/String.h"
@@ -44,7 +45,6 @@
 #include "BundleArchive.h"
 #include "BundleContextPrivate.h"
 #include "BundleResourceContainer.h"
-#include "BundleUtils.h"
 #include "CoreBundleContext.h"
 #include "ServiceReferenceBasePrivate.h"
 
@@ -512,7 +512,7 @@ namespace cppmicroservices
                 void* libHandle = nullptr;
                 if ((lib.GetFilePath() == util::GetExecutablePath()))
                 {
-                    libHandle = BundleUtils::GetExecutableHandle();
+                    libHandle = util::GetExecutableHandle();
                 }
                 else
                 {
@@ -534,28 +534,37 @@ namespace cppmicroservices
                 // save this bundle's context so that it can be accessible anywhere
                 // from within this bundle's code.
                 std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + symbolicName;
-                BundleUtils::GetSymbol(SetBundleContext, libHandle, set_bundle_context_func);
+                std::string set_bundle_context_err;
+                util::GetSymbol(SetBundleContext, libHandle, set_bundle_context_func, &set_bundle_context_err);
 
                 if (SetBundleContext)
                 {
-                    SetBundleContext(ctx.get());
+                    SetBundleContext(MakeNewBundleContext(ctx));
+                }
+                else
+                {
+                    coreCtx->logger->Log(logservice::SeverityLevel::LOG_WARNING, set_bundle_context_err);
                 }
 
                 // get the create/destroy activator callbacks
                 std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
                 std::function<BundleActivator*(void)> createActivatorHook;
-                BundleUtils::GetSymbol(createActivatorHook, libHandle, create_activator_func);
+                std::string create_activator_err;
+                util::GetSymbol(createActivatorHook, libHandle, create_activator_func, &create_activator_err);
 
                 std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
-                BundleUtils::GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func);
+                std::string destroy_activator_err;
+                util::GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func, &destroy_activator_err);
 
                 if (!createActivatorHook)
                 {
+                    coreCtx->logger->Log(logservice::SeverityLevel::LOG_ERROR, create_activator_err);
                     throw std::runtime_error("Bundle #" + util::ToString(id) + " (location=" + location
                                              + ") activator constructor not found");
                 }
                 if (!destroyActivatorHook)
                 {
+                    coreCtx->logger->Log(logservice::SeverityLevel::LOG_ERROR, destroy_activator_err);
                     throw std::runtime_error("Bundle #" + util::ToString(id) + " (location=" + location
                                              + ") activator destructor not found");
                 }

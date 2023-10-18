@@ -1,5 +1,6 @@
 add_library(util OBJECT
   include/cppmicroservices/util/BundleElfFile.h
+  include/cppmicroservices/util/BundleHandles.h
   include/cppmicroservices/util/BundleMachOFile.h
   include/cppmicroservices/util/BundleObjFactory.h
   include/cppmicroservices/util/BundleObjFile.h
@@ -10,6 +11,7 @@ add_library(util OBJECT
   include/cppmicroservices/util/MappedFile.h
   include/cppmicroservices/util/String.h
   
+  src/BundleHandles.cpp
   src/BundleObjFactory.cpp
   src/BundleObjFile.cpp
   src/Error.cpp

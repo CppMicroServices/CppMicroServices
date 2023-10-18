@@ -20,21 +20,25 @@
 
 =============================================================================*/
 
-#ifndef US_BUNDLE_NAME
-#    error Missing US_BUNDLE_NAME preprocessor define
-#endif
-
 #ifndef CPPMICROSERVICES_BUNDLEINITIALIZATION_H
-#    define CPPMICROSERVICES_BUNDLEINITIALIZATION_H
+#define CPPMICROSERVICES_BUNDLEINITIALIZATION_H
 
-#    include "cppmicroservices/GlobalConfig.h"
+#include "cppmicroservices/GlobalConfig.h"
 
-#    include <atomic>
+#include <atomic>
+#include <functional>
+#include <mutex>
 
 namespace cppmicroservices
 {
-    class BundleContextPrivate;
+    class BundleContext;
+    // Using a raw pointer and an ownership flag because C++ types like shared_ptr can't go across an extern C interface.
+    // THIS IS A TRANSFER OF OWNERSHIP. Make and pass in a copy if you want to retain yours.
+    using SetBundleContextHook = std::function<void(BundleContext*)>;
 }
+
+// Header file may be included just for the hook data type
+#ifdef US_BUNDLE_NAME
 
 /**
  * \ingroup MicroServices
@@ -57,19 +61,26 @@ namespace cppmicroservices
  *    :cmake:command:`usFunctionGenerateBundleInit`.
  * \endrststar
  */
-#    define CPPMICROSERVICES_INITIALIZE_BUNDLE                                                                       \
-        std::atomic<cppmicroservices::BundleContextPrivate*> US_CTX_INS(US_BUNDLE_NAME) {};                          \
-                                                                                                                     \
-        extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)();                        \
-        extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)()                         \
-        {                                                                                                            \
-            return US_CTX_INS(US_BUNDLE_NAME).load();                                                                \
-        }                                                                                                            \
-                                                                                                                     \
-        extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContextPrivate * ctx); \
-        extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContextPrivate * ctx)  \
-        {                                                                                                            \
-            US_CTX_INS(US_BUNDLE_NAME).store(ctx);                                                                   \
+#    define CPPMICROSERVICES_INITIALIZE_BUNDLE                                                               \
+        struct {                                                                                             \
+            std::mutex mut;                                                                                  \
+            cppmicroservices::BundleContext* ctx = nullptr;                                                  \
+        } US_CTX_INS(US_BUNDLE_NAME);                                                                        \
+                                                                                                             \
+        extern "C" cppmicroservices::BundleContext* US_GET_CTX_FUNC(US_BUNDLE_NAME)(void);                   \
+        extern "C" cppmicroservices::BundleContext* US_GET_CTX_FUNC(US_BUNDLE_NAME)()                        \
+        {                                                                                                    \
+            std::lock_guard<std::mutex> lock(US_CTX_INS(US_BUNDLE_NAME).mut);                                \
+            return US_CTX_INS(US_BUNDLE_NAME).ctx;                                                           \
+        }                                                                                                    \
+                                                                                                             \
+        extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContext* ctx); \
+        extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContext* ctx)  \
+        {                                                                                                    \
+            std::lock_guard<std::mutex> lock(US_CTX_INS(US_BUNDLE_NAME).mut);                                \
+            if (US_CTX_INS(US_BUNDLE_NAME).ctx) delete US_CTX_INS(US_BUNDLE_NAME).ctx;                       \
+            US_CTX_INS(US_BUNDLE_NAME).ctx = ctx;                                                            \
         }
 
+#endif // US_BUNDLE_NAME
 #endif // CPPMICROSERVICES_BUNDLEINITIALIZATION_H

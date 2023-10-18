@@ -1,6 +1,3 @@
-#-----------------------------------------------------------------------------
-# Source files
-#-----------------------------------------------------------------------------
 
 set(_srcs
   util/Any.cpp
@@ -55,7 +52,6 @@ set(_srcs
   bundle/BundleResourceStream.cpp
   bundle/BundleStorageFile.cpp
   bundle/BundleStorageMemory.cpp
-  bundle/BundleUtils.cpp
   bundle/BundleVersion.cpp
   bundle/Constants.cpp
   bundle/CoreBundleContext.cpp
@@ -91,7 +87,8 @@ set(_private_headers
   bundle/BundleStorage.h
   bundle/BundleStorageFile.h
   bundle/BundleStorageMemory.h
-  bundle/BundleUtils.h
   bundle/CoreBundleContext.h
   bundle/Resolver.h
 )
+
+include_directories(${CppMicroServices_SOURCE_DIR}/util/include)

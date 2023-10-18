@@ -101,6 +101,7 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_SOURCE_DIR}/compendium/CM/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googletest/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
+  ${CppMicroServices_SOURCE_DIR}/util/include
   )
 
 # There are warnings in the boost asio headers which are flagged as errors. Include the boost

@@ -21,9 +21,11 @@
   =============================================================================*/
 
 #include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/BundleInitialization.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/util/BundleHandles.h"
 
 #include "BundleLoader.hpp"
 #include <regex>
@@ -110,7 +112,23 @@ namespace cppmicroservices
                     logger->Log(logservice::SeverityLevel::LOG_INFO,
                                 "Loading shared library for Bundle #" + ToString(fromBundle.GetBundleId())
                                     + " (location=" + bundleLoc + ")");
+
                     sh.Load(any_cast<int>(opts));
+
+                    std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + fromBundle.GetSymbolicName();
+                    SetBundleContextHook hook;
+                    std::string set_bundle_context_err;
+                    util::GetSymbol(hook, sh.GetHandle(), set_bundle_context_func, &set_bundle_context_err);
+                    if (hook)
+                    {
+                        BundleContext* ctx_copy = new BundleContext(fromBundle.GetBundleContext());
+                        hook(ctx_copy);
+                    }
+                    else
+                    {
+                        logger->Log(logservice::SeverityLevel::LOG_WARNING, set_bundle_context_err);
+                    }
+
                     logger->Log(logservice::SeverityLevel::LOG_INFO,
                                 "Finished loading shared library for Bundle #" + ToString(fromBundle.GetBundleId())
                                     + " (location=" + bundleLoc + ")");

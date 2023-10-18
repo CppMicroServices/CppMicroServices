@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLEUTILS_H
-#define CPPMICROSERVICES_BUNDLEUTILS_H
+#ifndef CPPMICROSERVICES_UTIL_BUNDLEHANDLES_H
+#define CPPMICROSERVICES_UTIL_BUNDLEHANDLES_H
 
 #include <functional>
 #include <string>
@@ -30,23 +30,23 @@
 namespace cppmicroservices
 {
 
-    namespace BundleUtils
+    namespace util
     {
         // returns the handle to the current executable
         void* GetExecutableHandle();
 
         // returns the address of the symbol in library libHandle
-        void* GetSymbol(void* libHandle, char const* symbol);
+        void* GetSymbol(void* libHandle, char const* symbol, std::string* errmsg);
 
         template <typename T>
         void
-        GetSymbol(std::function<T>& fptr, void* libHandle, std::string const& symbol)
+        GetSymbol(std::function<T>& fptr, void* libHandle, std::string const& symbol, std::string* errmsg)
         {
-            void* f = GetSymbol(libHandle, symbol.c_str());
+            void* f = GetSymbol(libHandle, symbol.c_str(), errmsg);
             fptr = reinterpret_cast<T*>(f);
         }
 
-    } // namespace BundleUtils
+    } // namespace util
 
 } // namespace cppmicroservices
 

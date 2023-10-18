@@ -60,6 +60,7 @@ namespace cppmicroservices
     // The following method is exported for the GetBundleContext() method
     US_Framework_EXPORT BundleContext MakeBundleContext(BundleContextPrivate* d);
     BundleContext MakeBundleContext(std::shared_ptr<BundleContextPrivate> const& d);
+    BundleContext* MakeNewBundleContext(std::shared_ptr<BundleContextPrivate> const& d);
     std::shared_ptr<BundleContextPrivate> GetPrivate(BundleContext const& c);
 } // namespace cppmicroservices
 

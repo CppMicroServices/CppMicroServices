@@ -137,7 +137,7 @@ foreach(exe_name ${compile_only_exe_names})
 
     #For compile-only tests we add a test with Cmake command to build the target only as we expect a build failure
     add_test(NAME ${exe_name}
-    COMMAND ${CMAKE_COMMAND} --build . --target ${exe_name}
+    COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target ${exe_name}
     WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR}
     )
 

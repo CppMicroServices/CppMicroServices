@@ -172,6 +172,7 @@ include(usMacroCreateBundle)
 include(usFunctionCreateTestBundle)
 include(usFunctionCreateDSTestBundle)
 include(usFunctionBoostPath)
+include(CheckIPOSupported)
 
 if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   check_cxx_compiler_flag(-Wno-missing-braces HAS_MISSING_BRACES_FLAG)
@@ -254,6 +255,7 @@ us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
 us_cache_var(US_USE_SYSTEM_BOOST OFF BOOL "Build using an external Boost installation" ADVANCED)
+us_cache_var(US_USE_LTO ON BOOL "Use link time optimization if supported" ADVANCED)
 
 set(_us_build_shared ${BUILD_SHARED_LIBS})
 
@@ -363,6 +365,10 @@ if (APPLE AND US_COMPILER_APPLE_CLANG)
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
 endif()
 
+#-----------------------------------------------------------------------------
+# LTO configuration
+#-----------------------------------------------------------------------------
+check_ipo_supported(RESULT CMAKE_ENABLE_LTO OUTPUT error)
 #-----------------------------------------------------------------------------
 # 3rd Party Library configuration
 #-----------------------------------------------------------------------------

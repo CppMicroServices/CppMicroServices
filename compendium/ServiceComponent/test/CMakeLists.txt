@@ -134,6 +134,7 @@ foreach(exe_name ${compile_only_exe_names})
 
     #Excluding compile-only tests from default build to avoid build failure
     set_target_properties(${exe_name} PROPERTIES EXCLUDE_FROM_ALL TRUE EXCLUDE_FROM_DEFAULT_BUILD TRUE)
+    set_property(TARGET ${exe_name} PROPERTY INTERPROCEDURAL_OPTIMIZATION ${CMAKE_ENABLE_LTO})
 
     #For compile-only tests we add a test with Cmake command to build the target only as we expect a build failure
     add_test(NAME ${exe_name}

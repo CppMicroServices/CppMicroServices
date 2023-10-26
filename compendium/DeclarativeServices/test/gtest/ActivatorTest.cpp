@@ -157,4 +157,6 @@ namespace cppmicroservices
     } // namespace scrimpl
 } // namespace cppmicroservices
 
+#ifndef US_BUILD_SHARED_LIBS
 CPPMICROSERVICES_IMPORT_BUNDLE(US_BUNDLE_NAME);
+#endif

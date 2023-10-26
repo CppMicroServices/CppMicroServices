@@ -182,6 +182,7 @@ set(_test_bundles
   TestBundleDSTOI1
   TestBundleDSTOI2
   TestBundleDSTOI3
+  TestBundleDSTOI4
   TestBundleDSTOI5
   TestBundleDSTOI6
   TestBundleDSTOI7
@@ -194,6 +195,7 @@ set(_test_bundles
   TestBundleDSTOI16
   TestBundleDSTOI18
   TestBundleDSTOI19
+  TestBundleDSTOI20
   TestBundleDSCA01
   TestBundleDSCA02
   TestBundleDSCA03

@@ -58,16 +58,16 @@ namespace test
      */
     TEST_F(tServiceComponent, testComponentLoad_CustomComponentName) // DS_TOI_3
     {
-        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSTOI3");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSTOI4");
         scr::dto::ComponentDescriptionDTO compDescDTO
             = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sampleServiceComponent");
         EXPECT_NE(compDescDTO.name, compDescDTO.implementationClass)
             << "component name and implementation class must be different";
         EXPECT_EQ(compDescDTO.name, "sampleServiceComponent") << "Name in the returned component description must be "
                                                                  "sampleServiceComponent";
-        EXPECT_EQ(compDescDTO.implementationClass, "sample::ServiceComponent3")
+        EXPECT_EQ(compDescDTO.implementationClass, "sample::ServiceComponent4")
             << "Implementation class in the returned component description must be "
-               "sample::ServiceComponent3";
+               "sample::ServiceComponent4";
         EXPECT_EQ(dsRuntimeService->IsComponentEnabled(compDescDTO), true)
             << "current state reported by the runtime service must match the initial "
                "state in component description";

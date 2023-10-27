@@ -53,6 +53,6 @@ namespace cppmicroservices
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::FrameworkTestActivator)
 
-#ifndef US_BUILD_SHARED_LIBS
-CPPMICROSERVICES_IMPORT_BUNDLE(main)
-#endif
+// #ifndef US_BUILD_SHARED_LIBS
+// CPPMICROSERVICES_IMPORT_BUNDLE(US_BUNDLE_NAME)
+// #endif

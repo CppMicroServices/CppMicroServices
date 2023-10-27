@@ -24,7 +24,7 @@
 #define CPPMICROSERVICES_ANYMAP_H
 
 #include "cppmicroservices/Any.h"
-
+#include <initializer_list>
 #include <string>
 #include <unordered_map>
 
@@ -219,7 +219,28 @@ namespace cppmicroservices
         using iterator = iter;
         using const_iterator = const_iter;
 
-        any_map(map_type type);
+        /**
+         * @brief initializer_list constructor
+         *
+         * Construct an AnyMap of type "type" with the content of the
+         * initialized with the content of the the initializer list. Allows for inline
+         * initialization akin to:
+         *
+         *     any_map cache_bundle1 {
+         *         any_map::ORDERED_MAP, {
+         *             {"a", std::string("A")},
+         *             {"b", std::string("B")},
+         *             {"c", std::string("C")}
+         *         }
+         *     };
+         *
+         *  The primary purpose of this constructor in any_map is in support of the initializer_list
+         *  constructors in the AnyMap subclass.
+         *
+         * @param type the map_type of the AnyMap
+         * @param l a std::initializer_list<value_type> used to initialize the content of the AnyMap.
+         */
+        any_map(map_type type, std::initializer_list<value_type> l = {});
         any_map(ordered_any_map const& m);
         any_map(ordered_any_map&& m);
         any_map(unordered_any_map const& m);
@@ -364,7 +385,40 @@ namespace cppmicroservices
     class US_Framework_EXPORT AnyMap : public any_map
     {
       public:
-        AnyMap(map_type type = any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+        /**
+         * @brief initializer_list constructor
+         *
+         * Construct an AnyMap of type UNORDERED_MAP_CASEINSENSITIVE_KEYS with the content of the
+         * the initializer list. Allows for inline initialization akin to:
+         *
+         *     AnyMap cache_bundle1 {
+         *         {"a", std::string("A")},
+         *         {"b", std::string("B")},
+         *         {"c", std::string("C")}
+         *     };
+         * @param l a std::initializer_list<value_type> used to initialize the content of the AnyMap.
+         *
+         */
+        AnyMap(std::initializer_list<any_map::value_type> l = {});
+        /**
+         * @brief initializer_list constructor
+         *
+         * Construct an AnyMap of type "type" with the content of the the initializer list. Allows
+         * for inline initialization akin to:
+         *
+         *     AnyMap cache_bundle1 {
+         *         AnyMap::ORDERED_MAP, {
+         *             {"a", std::string("A")},
+         *             {"b", std::string("B")},
+         *             {"c", std::string("C")}
+         *         }
+         *     };
+         *
+         * @param type the map_type of the AnyMap
+         * @param l a std::initializer_list<value_type> used to initialize the content of the AnyMap.
+         *
+         */
+        AnyMap(map_type type, std::initializer_list<any_map::value_type> l = {});
         AnyMap(ordered_any_map const& m);
         AnyMap(ordered_any_map&& m);
         AnyMap(unordered_any_map const& m);

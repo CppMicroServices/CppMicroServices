@@ -124,14 +124,14 @@ namespace cppmicroservices
 
     template <typename T>
     std::ostream&
-    any_value_to_string(std::ostream& os, std::function<bool(const T&)> const&)
+    any_value_to_string(std::ostream& os, std::function<bool(T const&)> const&)
     {
         return os;
     }
 
     template <typename T>
     std::ostream&
-    any_value_to_json(std::ostream& os, std::function<bool(const T&)> const&, const uint8_t, const int32_t)
+    any_value_to_json(std::ostream& os, std::function<bool(T const&)> const&, const uint8_t, const int32_t)
     {
         return os;
     }

@@ -299,9 +299,9 @@ namespace cppmicroservices
         uint32_t GetCrc32() const;
 
       private:
-        BundleResource(std::string const& file, std::shared_ptr<const BundleArchive> const& archive);
+        BundleResource(std::string const& file, std::shared_ptr<BundleArchive const> const& archive);
 
-        BundleResource(int index, std::shared_ptr<const BundleArchive> const& archive);
+        BundleResource(int index, std::shared_ptr<BundleArchive const> const& archive);
 
         /// Helper function which initializes the childNodes member in BundleResourcePrivate;
         /// this is called during BundleResource construction.

@@ -19,7 +19,7 @@
   limitations under the License.
 
   =============================================================================*/
-#if NEVER
+
 #    include <algorithm>
 #    include <chrono>
 #    include <cstdio>
@@ -52,14 +52,14 @@ namespace
      * This test point is used to verify a compile error is generated when a service component
      * has dependencies, opted out of constructor injection and it does not provide a default constructor.
      *
-     * @todo Automate this test point. Currently interactive is the only way to verify compilation failures.
+     * CMake tests will build this file to catch the expected compile time error
      */
     TEST(ComponentInstance, CheckNoDefaultCtorNoInjection)
     {
         ComponentInstanceImpl<TestServiceImpl,
                               std::tuple<>,
                               std::false_type,
-                              ServiceDependency>
+                              std::shared_ptr<ServiceDependency>>
             compInstance; // compile error
     }
 } // namespace
@@ -70,4 +70,3 @@ main(int argc, char** argv)
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-#endif

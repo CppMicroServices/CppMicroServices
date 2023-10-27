@@ -19,6 +19,7 @@ set(_srcs
   util/SharedLibrary.cpp
   util/SharedLibraryException.cpp
   util/Utils.cpp
+  util/ServiceRegistrationLocks.cpp
 
   service/ListenerToken.cpp
   service/ServiceException.cpp
@@ -34,6 +35,7 @@ set(_srcs
   service/ServiceReferenceBasePrivate.cpp
   service/ServiceRegistrationBase.cpp
   service/ServiceRegistrationBasePrivate.cpp
+  service/ServiceRegistrationCoreInfo.cpp
   service/ServiceRegistry.cpp
 
   bundle/Bundle.cpp
@@ -57,7 +59,6 @@ set(_srcs
   bundle/BundleVersion.cpp
   bundle/Constants.cpp
   bundle/CoreBundleContext.cpp
-  ../../third_party/jsoncpp.cpp
   ../../third_party/miniz.c
 )
 
@@ -68,6 +69,7 @@ set(_private_headers
   util/Properties.h
   util/PropsCheck.h
   util/Utils.h
+  util/ServiceRegistrationLocks.h
 
   service/ServiceHooks.h
   service/ServiceListenerEntry.h
@@ -75,6 +77,7 @@ set(_private_headers
   service/ServiceListeners.h
   service/ServiceReferenceBasePrivate.h
   service/ServiceRegistrationBasePrivate.h
+  service/ServiceRegistrationCoreInfo.h
   service/ServiceRegistry.h
 
   bundle/BundleArchive.h

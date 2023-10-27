@@ -19,7 +19,7 @@
  limitations under the License.
 
  =============================================================================*/
-#if NEVER
+
 #    include <algorithm>
 #    include <chrono>
 #    include <cstdio>
@@ -97,7 +97,7 @@ namespace
      * the service component description does not match the dependencies in the service component implementation
      * class constructor.
      *
-     * @todo Automate this test point. Currently interactive is the only way to verify compilation failures.
+     * CMake tests will build this file to catch the expected compile time error
      */
     TEST(ComponentInstance, VerifyDependencyCount)
     {
@@ -111,10 +111,10 @@ namespace
         ComponentInstanceImpl<TestServiceImpl1,
                               std::tuple<>,
                               std::true_type,
-                              ServiceDependency1,
-                              ServiceDependency2,
-                              ServiceDependency2>
-            compInstance(binders); // compile error
+                              std::shared_ptr<ServiceDependency1>,
+                              std::shared_ptr<ServiceDependency2>,
+                              std::shared_ptr<ServiceDependency2>>
+            compInstance({ "foo", "bar", "bar2" }, binders); // compile error
     }
 } // namespace
 
@@ -124,4 +124,3 @@ main(int argc, char** argv)
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-#endif

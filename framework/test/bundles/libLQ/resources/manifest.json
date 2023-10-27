@@ -1,8 +1,24 @@
 {
-  "bundle.symbolic_name" : "TestBundleLQ",
-  "bundle.testproperty" : "YES",
-  "bundle.activator" : true,
-  "hosed" : "1",
-  "hosedd" : "2",
-  "hose" : "3"
+    "bundle.symbolic_name" : "TestBundleLQ",
+    "bundle.testproperty" : "YES",
+    "bundle.nestedproperty" : {
+        "foo" : "bar"
+    },
+    "bundle.activator" : true,
+    "hosed" : "1",
+    "hosedd" : "2",
+    "hose" : "3",
+    "a" : {
+        "b" : {
+            "c" : {
+                "d" : 5
+            }
+        },
+        "e.f.g" : 6
+    },
+    "h.i" : {
+        "j.k" : 12,
+        "l.m.n" : false
+    },
+    "h.i.l.m.n" : true
 }

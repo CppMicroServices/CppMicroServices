@@ -5,6 +5,7 @@ set(_srcs
   ComponentRegistry.cpp
   SCRAsyncWorkService.cpp
   SCRBundleExtension.cpp
+  SCRExtensionRegistry.cpp
   SCRLogger.cpp
   ServiceComponentRuntimeImpl.cpp
   ComponentContextImpl.cpp
@@ -42,6 +43,7 @@ set(_private_headers
   SCRActivator.hpp
   SCRAsyncWorkService.hpp
   SCRBundleExtension.hpp
+  SCRExtensionRegistry.hpp
   SCRLogger.hpp
   ServiceComponentRuntimeImpl.hpp
   ServiceReferenceComparator.hpp
@@ -101,6 +103,8 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )
 
+usFunctionBoostPath(BOOST_SYSTEM ${US_USE_SYSTEM_BOOST} CPPMS_SOURCE_DIR ${CppMicroServices_SOURCE_DIR} BOOST_DIR ${BOOST_INCLUDEDIR})
+
 # There are warnings in the boost asio headers which are flagged as errors. Include the boost
 # asio headers as system headers to ignore these warnings and not treat them as errors.
-include_directories(SYSTEM ${CppMicroServices_SOURCE_DIR}/third_party/boost/include)
+include_directories(SYSTEM ${_boost_library})

@@ -29,6 +29,7 @@
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
+#include "../SCRExtensionRegistry.hpp"
 
 namespace cppmicroservices
 {
@@ -39,13 +40,15 @@ namespace cppmicroservices
         ConfigurationNotifier::ConfigurationNotifier(
             cppmicroservices::BundleContext const& context,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService_)
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
+            std::shared_ptr<SCRExtensionRegistry> extensionReg)
             : tokenCounter(0)
             , bundleContext(context)
             , logger(std::move(logger))
-            , asyncWorkService(asyncWorkService_)
+            , asyncWorkService(asyncWorkSvc)
+            , extensionRegistry(extensionReg)
         {
-            if (!bundleContext || !(this->logger) || (!this->asyncWorkService))
+            if (!bundleContext || !(this->logger) || (!this->asyncWorkService) || (!this->extensionRegistry))
             {
                 throw std::invalid_argument("ConfigurationNotifier Constructor "
                                             "provided with invalid arguments");
@@ -113,7 +116,7 @@ namespace cppmicroservices
         ConfigurationNotifier::AnyListenersForPid(std::string const& pid) noexcept
         {
             std::string factoryName;
-            std::shared_ptr<ComponentConfigurationImpl> mgr;
+            std::vector<std::shared_ptr<ComponentConfigurationImpl>> mgrs;
             {
                 auto listenersMapHandle = listenersMap.lock();
                 if (listenersMapHandle->empty() || pid.empty())
@@ -145,16 +148,27 @@ namespace cppmicroservices
                 {
                     return false;
                 }
-                auto listener = iter->second->begin();
-
-                mgr = listener->second.mgr;
-                if (mgr->GetMetadata()->factoryComponentID.empty())
+                auto tokenMapPtr = iter->second;
+                for (auto const& tokenEntry : (*tokenMapPtr))
                 {
-                    // The component in our listener's map is not a factory component.
+                    auto listener = tokenEntry.second;
+
+                    if (!listener.mgr->GetMetadata()->factoryComponentID.empty())
+                    {
+                        // The component in our listeners map is a factory component.
+                        mgrs.emplace_back(listener.mgr);
+                    }
+                }
+                if (mgrs.empty())
+                {
+                    // None of the components in our listeners map is a factory component.
                     return false;
                 }
             } // release listenersMapHandle lock
-            CreateFactoryComponent(pid, mgr);
+            for (auto & mgr : mgrs)
+            {
+                CreateFactoryComponent(pid, mgr);
+            }
             return true;
         }
         void
@@ -183,8 +197,6 @@ namespace cppmicroservices
             auto registry = mgr->GetRegistry();
             auto logger = mgr->GetLogger();
             auto configNotifier = mgr->GetConfigNotifier();
-            auto managers = mgr->GetManagers();
-
             try
             {
                 auto compManager = std::make_shared<ComponentManagerImpl>(newMetadata,
@@ -192,12 +204,22 @@ namespace cppmicroservices
                                                                           bundle.GetBundleContext(),
                                                                           logger,
                                                                           asyncWorkService,
-                                                                          configNotifier,
-                                                                          managers);
+                                                                          configNotifier);
                 if (registry->AddComponentManager(compManager))
                 {
-                    managers->push_back(compManager);
-                    compManager->Initialize();
+                    auto const& extension = extensionRegistry->Find(bundle.GetBundleId());
+                    if (extension)
+                    {
+                        extension->AddComponentManager(compManager);
+                        compManager->Initialize();
+                    }
+                    else
+                    {
+                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                    "Failed to find ComponentManager with name " + newMetadata->name
+                                        + " from bundle with Id "
+                                        + std::to_string(bundleContext.GetBundle().GetBundleId()));
+                    }
                 }
             }
             catch (cppmicroservices::SharedLibraryException const&)

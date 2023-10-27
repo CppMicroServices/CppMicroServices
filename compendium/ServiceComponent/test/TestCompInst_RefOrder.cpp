@@ -35,7 +35,6 @@ using cppmicroservices::service::component::detail::ComponentInstanceImpl;
 using cppmicroservices::service::component::detail::DynamicBinder;
 using cppmicroservices::service::component::detail::StaticBinder;
 
-#if NEVER
 namespace
 {
 
@@ -47,7 +46,7 @@ namespace
     {
     };
 
-    // Test class to simulate a servcie component
+    // Test class to simulate a service component
     class TestServiceImpl1 final
     {
       public:
@@ -94,11 +93,11 @@ namespace
     };
 
     /**
-     * This test point is used to verify a compile error is generated when the order of dependencies specified in
+     * This test points are used to verify a compile error is generated when the order of dependencies specified in
      * the service component description does not match the dependencies in the service component implementation
      * class constructor.
      *
-     * @todo Automate this test point. Currently interactive is the only way to verify compilation failures.
+     * CMake tests will build this file to catch the expected compile time error
      */
     TEST(ComponentInstance, VerifyDependencyOrder)
     {
@@ -111,9 +110,9 @@ namespace
         ComponentInstanceImpl<TestServiceImpl1,
                               std::tuple<>,
                               std::true_type,
-                              ServiceDependency2,
-                              ServiceDependency1>
-            compInstance(binders); // compile error
+                              std::shared_ptr<ServiceDependency2>,
+                              std::shared_ptr<ServiceDependency1>>
+            compInstance({ "bar", "foo" }, binders); // compile error
     }
 } // namespace
 
@@ -123,4 +122,3 @@ main(int argc, char** argv)
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-#endif

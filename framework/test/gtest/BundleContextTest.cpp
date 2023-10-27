@@ -61,15 +61,54 @@ namespace cppmicroservices
     };
 } // namespace cppmicroservices
 
-TEST(BundleContextTest, BundleContextThrowWhenInvalid)
+class BundleContextTest : public ::testing::Test
 {
-    cppmicroservices::Framework framework = cppmicroservices::FrameworkFactory().NewFramework();
-    ASSERT_TRUE(framework) << "The framework was not created successfully.";
-    framework.Start();
+  protected:
+    BundleContextTest() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
 
-    auto context = framework.GetBundleContext();
-    ASSERT_TRUE(context) << "The bundle context is not valid.";
+    void
+    SetUp() override
+    {
+        ASSERT_TRUE(framework) << "The framework was not created successfully.";
+        framework.Start();
+        context = framework.GetBundleContext();
+        ASSERT_TRUE(context) << "The bundle context is not valid.";
+    }
 
+  public:
+    cppmicroservices::Framework framework;
+    cppmicroservices::BundleContext context;
+};
+
+using BundleContParamType = std::pair<std::vector<std::pair<std::string, size_t>>, std::vector<ServiceProperties>>;
+class BundleContextTestParam : public ::testing::TestWithParam<BundleContParamType>
+{
+  public:
+    BundleContextTestParam() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
+
+    void
+    SetUp() override
+    {
+        ASSERT_TRUE(framework) << "The framework was not created successfully.";
+        framework.Start();
+        context = framework.GetBundleContext();
+        ASSERT_TRUE(context) << "The bundle context is not valid.";
+    }
+
+    void
+    TearDown() override
+    {
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+    }
+
+  public:
+    cppmicroservices::Framework framework;
+    cppmicroservices::BundleContext context;
+};
+
+TEST_F(BundleContextTest, BundleContextThrowWhenInvalid)
+{
     // Register a service and get a service reference for testing
     // GetService() later.
     (void)context.RegisterService<bc_tests::TestService>(std::make_shared<bc_tests::TestService>());
@@ -107,7 +146,7 @@ TEST(BundleContextTest, BundleContextThrowWhenInvalid)
         << "GetServiceReference(string) on invalid BundleContext did not throw.";
     EXPECT_THROW({ (void)context2.GetServiceReference<bc_tests::TestService>(); }, std::runtime_error)
         << "GetServiceReference() on invalid BundleContext did not throw.";
-    EXPECT_THROW({ (void)context2.GetService<bc_tests::TestService>(sRef); }, std::runtime_error)
+    EXPECT_THROW({ (void)context2.GetService<bc_tests::TestService>(sRef); }, std::invalid_argument)
         << "GetService() on invalid BundleContext did not throw.";
     EXPECT_THROW({ (void)context2.GetServiceObjects<bc_tests::TestService>(sRef); }, std::runtime_error)
         << "GetServiceObjects() on invalid BundleContext did not throw.";
@@ -127,17 +166,11 @@ TEST(BundleContextTest, BundleContextThrowWhenInvalid)
         << "InstallBundles() on invalid BundleContext did not throw.";
 }
 
-TEST(BundleContextTest, NoSegfaultWithRegisterServiceShutdownRace)
+#if defined(US_ENABLE_THREADING_SUPPORT)
+TEST_F(BundleContextTest, NoSegfaultWithRegisterServiceShutdownRace)
 {
-    cppmicroservices::Framework framework = cppmicroservices::FrameworkFactory().NewFramework();
-    ASSERT_TRUE(framework) << "The framework was not created successfully.";
-    framework.Start();
-
-    auto context = framework.GetBundleContext();
-    ASSERT_TRUE(context) << "The bundle context is not valid.";
-
     std::thread thread(
-        [&framework]()
+        [&framework = framework]()
         {
             framework.Stop();
             framework.WaitForStop(std::chrono::milliseconds::zero());
@@ -157,12 +190,8 @@ TEST(BundleContextTest, NoSegfaultWithRegisterServiceShutdownRace)
     thread.join();
 }
 
-TEST(BundleContextTest, NoSegfaultWithServiceFactory)
+TEST_F(BundleContextTest, NoSegfaultWithServiceFactory)
 {
-    cppmicroservices::Framework framework = FrameworkFactory().NewFramework();
-    framework.Start();
-    auto context = framework.GetBundleContext();
-
     InstallLib(context, "TestBundleH").Start();
 
     std::string getServiceThrowsFilter(LDAPProp("getservice_exception") == true);
@@ -172,13 +201,81 @@ TEST(BundleContextTest, NoSegfaultWithServiceFactory)
     ASSERT_EQ("1", svcGetServiceThrowsRefs[0].GetProperty(std::string("getservice_exception")).ToString());
 
     std::thread thread(
-        [&framework]()
+        [&framework = framework]()
         {
             framework.Stop();
             framework.WaitForStop(std::chrono::milliseconds::zero());
         });
 
-    ASSERT_EQ(nullptr, context.GetService(svcGetServiceThrowsRefs[0]));
-
+    // Have to wrap call in a try catch. Without one, if the program throws the main thread will exit without calling
+    // .join() and when the spawned thread is destructed, it will call terminate because it was not joined.
+    try
+    {
+        // Framework may throw as the registration is no longer valid (depending on thread ordering) but we care that no
+        // thread segfaults
+        context.GetService(svcGetServiceThrowsRefs[0]);
+    }
+    catch (...)
+    {
+    }
     thread.join();
+}
+
+#endif
+
+template <typename ServiceT>
+bool
+verifyOrdering(std::vector<cppmicroservices::ServiceReference<ServiceT>> const& refs)
+{
+    if (refs.size() > 1)
+    {
+        for (size_t i = 1; i < refs.size(); ++i)
+        {
+            if ((any_cast<int>(refs[i].GetProperty(Constants::SERVICE_RANKING))
+                 >= any_cast<int>(refs[i - 1].GetProperty(Constants::SERVICE_RANKING))))
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+INSTANTIATE_TEST_SUITE_P(BundleContextTestParameterized,
+                         BundleContextTestParam,
+                         ::testing::Values(
+                             BundleContParamType {
+                                 { { "", 5 } },
+                                 { { { "service.ranking", 2 } },
+                                  { { "service.ranking", 0 } },
+                                  { { "service.ranking", 4 } },
+                                  { { "service.ranking", 1 } },
+                                  { { "service.ranking", 3 } } }
+},
+                             BundleContParamType {
+                                 { { "", 5 }, { "(Key1=Val*)", 3 }, { "(Key2=Val*)", 2 } },
+                                 { { { "service.ranking", 2000 }, { "Key1", std::string("Val1") } },
+                                   { { "service.ranking", 15 }, { "Key1", std::string("Val2") } },
+                                   { { "service.ranking", 0 }, { "Key1", std::string("Val2") } },
+                                   { { "service.ranking", 1506 }, { "Key2", std::string("Val1") } },
+                                   { { "service.ranking", 905 }, { "Key2", std::string("Val1") } } } }));
+
+TEST_P(BundleContextTestParam, TestGetServiceReferenceOrdering)
+{
+    auto params = GetParam();
+    auto props = params.second;
+    for (auto const& prop : props)
+    {
+        (void)context.RegisterService<bc_tests::TestService>(std::make_shared<bc_tests::TestService>(), prop);
+    }
+
+    auto filterPairs = params.first;
+    for (auto const& pair : filterPairs)
+    {
+        auto filt = pair.first;
+        auto refs = context.GetServiceReferences<bc_tests::TestService>(filt);
+
+        ASSERT_TRUE(verifyOrdering(refs));
+        ASSERT_TRUE(refs.size() == pair.second);
+    }
 }

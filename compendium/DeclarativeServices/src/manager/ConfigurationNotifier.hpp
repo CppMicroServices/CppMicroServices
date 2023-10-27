@@ -33,6 +33,7 @@ namespace cppmicroservices
     namespace scrimpl
     {
         class ComponentConfigurationImpl;
+        class SCRExtensionRegistry;
 
         /** ConfigChangeNotification
          * This class is used by ConfigurationListener to notify ComponentConfigurationImpl
@@ -76,7 +77,8 @@ namespace cppmicroservices
              */
             ConfigurationNotifier(cppmicroservices::BundleContext const& context,
                                   std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-                                  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService_);
+                                  std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
+                                  std::shared_ptr<SCRExtensionRegistry> extensionReg);
 
             ConfigurationNotifier(ConfigurationNotifier const&) = delete;
             ConfigurationNotifier(ConfigurationNotifier&&) = delete;
@@ -115,6 +117,7 @@ namespace cppmicroservices
             cppmicroservices::BundleContext bundleContext;
             std::shared_ptr<cppmicroservices::logservice::LogService> logger;
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
+            std::shared_ptr<SCRExtensionRegistry> extensionRegistry;
         };
 
     } // namespace scrimpl

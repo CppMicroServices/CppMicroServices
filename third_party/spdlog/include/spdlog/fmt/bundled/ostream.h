@@ -84,8 +84,8 @@ inline bool write_ostream_unicode(std::ostream& os, fmt::string_view data) {
 #elif defined(_WIN32) && defined(__GLIBCXX__)
   auto* rdbuf = os.rdbuf();
   FILE* c_file;
-  if (auto* sfbuf = dynamic_cast<__gnu_cxx::stdio_sync_filebuf<char>*>(rdbuf))
-    c_file = sfbuf->file();
+  if (auto* fbuf = dynamic_cast<__gnu_cxx::stdio_sync_filebuf<char>*>(rdbuf))
+    c_file = fbuf->file();
   else if (auto* fbuf = dynamic_cast<__gnu_cxx::stdio_filebuf<char>*>(rdbuf))
     c_file = fbuf->file();
   else
@@ -230,19 +230,6 @@ void print(std::wostream& os,
            basic_format_string<wchar_t, type_identity_t<Args>...> fmt,
            Args&&... args) {
   vprint(os, fmt, fmt::make_format_args<buffer_context<wchar_t>>(args...));
-}
-
-FMT_MODULE_EXPORT template <typename... T>
-void println(std::ostream& os, format_string<T...> fmt, T&&... args) {
-  print(os, "{}\n", fmt::format(fmt, std::forward<T>(args)...));
-}
-
-FMT_MODULE_EXPORT
-template <typename... Args>
-void println(std::wostream& os,
-             basic_format_string<wchar_t, type_identity_t<Args>...> fmt,
-             Args&&... args) {
-  print(os, L"{}\n", fmt::format(fmt, std::forward<Args>(args)...));
 }
 
 FMT_END_NAMESPACE

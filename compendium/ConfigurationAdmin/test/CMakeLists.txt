@@ -22,9 +22,11 @@ include_directories(
   ${GMOCK_INCLUDE_DIRS}
   )
 
+usFunctionBoostPath(BOOST_SYSTEM ${US_USE_SYSTEM_BOOST} CPPMS_SOURCE_DIR ${CppMicroServices_SOURCE_DIR} BOOST_DIR ${BOOST_INCLUDEDIR})
+
 # There are warnings in the boost asio headers which are flagged as errors. Include the boost
 # asio headers as system headers to ignore these warnings and not treat them as errors.
-include_directories(SYSTEM ${CppMicroServices_SOURCE_DIR}/third_party/boost/include)
+include_directories(SYSTEM ${_boost_library})
 
 if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   check_cxx_compiler_flag(-Wno-inconsistent-missing-override HAS_MISSING_OVERRIDE_FLAG)

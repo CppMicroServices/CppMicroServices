@@ -54,6 +54,8 @@
 #include <cstring>
 #include <iterator>
 
+#include <absl/base/attributes.h>
+
 namespace cppmicroservices
 {
 
@@ -263,7 +265,7 @@ namespace cppmicroservices
                     return;
                 }
             }
-            // INTENTIONALLY FALLS THROUGH - in case of lazy activation.
+                ABSL_FALLTHROUGH_INTENDED;
             case Bundle::STATE_RESOLVED:
             {
                 state = Bundle::STATE_STARTING;
@@ -337,7 +339,7 @@ namespace cppmicroservices
                         }
                     }
                 }
-                // INTENTIONALLY FALLS THROUGH
+                    ABSL_FALLTHROUGH_INTENDED;
                 case Bundle::STATE_RESOLVED:
                 case Bundle::STATE_INSTALLED:
                 {
@@ -384,7 +386,9 @@ namespace cppmicroservices
                         try
                         {
                             if (util::Exists(bundleDir))
+                            {
                                 util::RemoveDirectoryRecursive(bundleDir);
+                            }
                         }
                         catch (...)
                         {
@@ -823,7 +827,8 @@ namespace cppmicroservices
         coreCtx->services.GetUsedByBundle(this, srs);
         for (std::vector<ServiceRegistrationBase>::const_iterator i = srs.begin(); i != srs.end(); ++i)
         {
-            i->GetReference(std::string()).d.load()->UngetService(this->shared_from_this(), false);
+            auto ref = i->GetReference(std::string());
+            ref.d.Load()->UngetService(this->shared_from_this(), false);
         }
     }
 

@@ -100,7 +100,7 @@ namespace cppmicroservices
 
     BundleResource::BundleResource(BundleResource const& resource) : d(resource.d) {}
 
-    BundleResource::BundleResource(std::string const& file, std::shared_ptr<const BundleArchive> const& archive)
+    BundleResource::BundleResource(std::string const& file, std::shared_ptr<BundleArchive const> const& archive)
         : d(std::make_shared<BundleResourcePrivate>(archive))
     {
         d->InitFilePath(file);
@@ -112,7 +112,7 @@ namespace cppmicroservices
         InitializeChildren();
     }
 
-    BundleResource::BundleResource(int index, std::shared_ptr<const BundleArchive> const& archive)
+    BundleResource::BundleResource(int index, std::shared_ptr<BundleArchive const> const& archive)
         : d(std::make_shared<BundleResourcePrivate>(archive))
     {
         d->archive->GetResourceContainer()->GetStat(index, d->stat);
@@ -288,15 +288,7 @@ namespace cppmicroservices
             return { nullptr, ::free };
         }
 
-        auto data = d->archive->GetResourceContainer()->GetData(d->stat.index);
-        if (!data)
-        {
-            auto sink = GetBundleContext().GetLogSink();
-            DIAG_LOG(*sink) << "Error uncompressing resource data for " << this->GetResourcePath() << " from "
-                            << d->archive->GetBundleLocation();
-        }
-
-        return data;
+        return d->archive->GetResourceContainer()->GetData(d->stat.index);
     }
 
     std::ostream&

@@ -68,7 +68,7 @@ namespace cppmicroservices
                 UniqueLock(UniqueLock&& o) noexcept : m_Lock(std::move(o.m_Lock)) {}
 
                 UniqueLock&
-                operator=(UniqueLock&& o)
+                operator=(UniqueLock&& o) noexcept
                 {
                     m_Lock = std::move(o.m_Lock);
                     return *this;
@@ -106,6 +106,7 @@ namespace cppmicroservices
                 UniqueLock&
                 operator=(UniqueLock&&)
                 {
+                    return *this;
                 }
                 explicit UniqueLock(MutexLockingStrategy const&) {}
                 explicit UniqueLock(MutexLockingStrategy const*) {}

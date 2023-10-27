@@ -31,7 +31,7 @@ Deprecated
 Fixed
 -----
 
-`v3.6.3 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.6.3>`_ (2023-10-05)
+`v3.6.3 <https://github.com/cppmicroservices/cppmicroservices/tree/v3.6.3>`_ (2023-10-30)
 ---------------------------------------------------------------------------------------------------------
 
 `Full Changelog <https://github.com/CppMicroServices/CppMicroServices/compare/v3.6.3...v3.6.2>`_
@@ -50,16 +50,19 @@ Added
 - `[Core Framework] Make nested JSON queries using LDAP build-time configurable <https://github.com/CppMicroServices/CppMicroServices/pull/811>`_
 - `[Core Framework] Support nested JSON queries using LDAP <https://github.com/CppMicroServices/CppMicroServices/pull/794>`_
 - `[Declarative Services] Support for multiple cardinality for service references <https://github.com/CppMicroServices/CppMicroServices/pull/871>`_
+- `[Core Framework] GetServiceReferences ordering guarantee - Fix #937 <https://github.com/CppMicroServices/CppMicroServices/pull/943>`_
+- `[Core Framework] Initializer list support for AnyMap <https://github.com/CppMicroServices/CppMicroServices/pull/942>`_
 
 Changed
 -------
 - `Upgrade GitHub Actions to use Ubuntu 22.04 and remove use of Ubuntu 18.04 <https://github.com/CppMicroServices/CppMicroServices/pull/810>`_
 - `[Core Framework] Remove manual reference counting from ServiceRegistrationBasePrivate and ServiceReferenceBasePrivate <https://github.com/CppMicroServices/CppMicroServices/pull/841>`_
 - `Update 3rd party components <https://github.com/CppMicroServices/CppMicroServices/pull/927>`_
-  - update absl to Abseil LTS 20230125.3
-  - update googletest to release 1.14.0
-  - update spdlog to version 1.12.0
-  - update boost nowide to latest commit from standalone branch (conforming to Release v11.3.0)
+    - update absl to Abseil LTS 20230125.3
+    - update googletest to release 1.14.0
+    - update spdlog to version 1.12.0
+    - update boost nowide to latest commit from standalone branch (conforming to Release v11.3.0)
+- `Allow building with an external Boost installation <https://github.com/CppMicroServices/CppMicroServices/pull/944>`_
 
 Removed
 -------

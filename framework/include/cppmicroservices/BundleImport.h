@@ -66,7 +66,7 @@ namespace cppmicroservices
  * \endrststar
  */
 #define CPPMICROSERVICES_INITIALIZE_STATIC_BUNDLE(_bundle_name)                             \
-    extern "C" cppmicroservices::BundleContext* US_GET_CTX_FUNC(_bundle_name)();            \
+    extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(_bundle_name)();     \
     extern "C" void US_SET_CTX_FUNC(_bundle_name)(cppmicroservices::BundleContextPrivate*); \
     void _dummy_reference_to_##_bundle_name##_bundle_context()                              \
     {                                                                                       \

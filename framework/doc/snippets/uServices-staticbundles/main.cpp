@@ -38,7 +38,7 @@ extern "C" void
 _us_import_bundle_initializer_MyStaticBundle2()
 {
 }
-extern "C" BundleContext*
+extern "C" BundleContextPrivate*
 _us_get_bundle_context_instance_MyStaticBundle1()
 {
     return nullptr;
@@ -47,7 +47,7 @@ extern "C" void
 _us_set_bundle_context_instance_MyStaticBundle1(BundleContextPrivate*)
 {
 }
-extern "C" BundleContext*
+extern "C" BundleContextPrivate*
 _us_get_bundle_context_instance_MyStaticBundle2()
 {
     return nullptr;
@@ -56,7 +56,7 @@ extern "C" void
 _us_set_bundle_context_instance_MyStaticBundle2(BundleContextPrivate*)
 {
 }
-extern "C" BundleContext*
+extern "C" BundleContextPrivate*
 _us_get_bundle_context_instance_main()
 {
     return nullptr;

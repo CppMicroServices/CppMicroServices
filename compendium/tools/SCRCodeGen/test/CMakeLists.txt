@@ -67,7 +67,6 @@ add_test(NAME ${scrcodegen_test_exe_name}
   WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR}
 )
 set_property(TEST ${scrcodegen_test_exe_name} PROPERTY LABELS regular)
-set_property(TARGET ${scrcodegen_test_exe_name} PROPERTY INTERPROCEDURAL_OPTIMIZATION ${CMAKE_ENABLE_LTO})
 
 # Run the GTest EXE from valgrind
 if(US_MEMCHECK_COMMAND)

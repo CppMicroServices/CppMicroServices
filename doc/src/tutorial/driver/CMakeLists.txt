@@ -34,7 +34,6 @@ if(NOT BUILD_SHARED_LIBS)
 
   add_executable(usTutorialDriver ${_srcs})
   target_link_libraries(usTutorialDriver ${_target_zip_archives})
-  set_property(TARGET usTutorialDriver PROPERTY INTERPROCEDURAL_OPTIMIZATION ${CMAKE_ENABLE_LTO})
 
 
   # Merge all resources from the static bundles and embed them into the executable.
@@ -44,5 +43,4 @@ if(NOT BUILD_SHARED_LIBS)
 else()
   add_executable(usTutorialDriver main.cpp)
   target_link_libraries(usTutorialDriver ${CppMicroServices_LIBRARIES})
-  set_property(TARGET usTutorialDriver PROPERTY INTERPROCEDURAL_OPTIMIZATION ${CMAKE_ENABLE_LTO})
 endif()

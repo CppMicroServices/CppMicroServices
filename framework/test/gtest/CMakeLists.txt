@@ -115,7 +115,6 @@ usFunctionGenerateBundleInit(TARGET ${us_gtest_test_exe_name} OUT _additional_sr
 usFunctionGetResourceSource(TARGET ${us_gtest_test_exe_name} OUT _additional_srcs)
 
 add_executable(${us_gtest_test_exe_name} ${_gtest_tests} ${_additional_srcs} ${_third_party_srcs})
-set_property(TARGET ${us_gtest_test_exe_name} PROPERTY INTERPROCEDURAL_OPTIMIZATION ${CMAKE_ENABLE_LTO})
 
 if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
   target_compile_options(${us_gtest_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)

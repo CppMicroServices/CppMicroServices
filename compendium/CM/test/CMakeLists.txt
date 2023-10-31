@@ -63,7 +63,6 @@ add_test(NAME ${us_cm_test_exe_name}
   )
 
 set_property(TEST ${us_cm_test_exe_name} PROPERTY LABELS regular)
-set_property(TARGET ${us_cm_test_exe_name} PROPERTY INTERPROCEDURAL_OPTIMIZATION ${CMAKE_ENABLE_LTO})
 
 # Run the GTest EXE from valgrind
 if(US_MEMCHECK_COMMAND)

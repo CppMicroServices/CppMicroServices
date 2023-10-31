@@ -46,9 +46,6 @@ target_link_libraries(${us_bench_test_exe_name} ${Framework_TARGET})
 
 set_property(TARGET ${us_bench_test_exe_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
 set_property(TARGET ${us_bench_test_exe_name} PROPERTY US_BUNDLE_NAME main)
-set_property(TARGET ${us_bench_test_exe_name} PROPERTY INTERPROCEDURAL_OPTIMIZATION ${CMAKE_ENABLE_LTO})
-
-
 
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)

@@ -115,7 +115,6 @@ add_test(NAME ${us_logservice_test_exe_name}
   WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR}
 )
 set_property(TEST ${us_logservice_test_exe_name} PROPERTY LABELS regular)
-set_property(TARGET ${us_logservice_test_exe_name} PROPERTY INTERPROCEDURAL_OPTIMIZATION ${CMAKE_ENABLE_LTO})
 set_tests_properties(${us_logservice_test_exe_name} PROPERTIES TIMEOUT 1200)
 
 # Run the GTest EXE from valgrind

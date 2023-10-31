@@ -95,8 +95,6 @@ set_property(
   APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main
   )
 
-set_property(TARGET ${us_declarativeservices_bench_test_exe_name} PROPERTY INTERPROCEDURAL_OPTIMIZATION ${CMAKE_ENABLE_LTO})
-
 set_property(
   TARGET ${us_declarativeservices_bench_test_exe_name}
   PROPERTY US_BUNDLE_NAME main

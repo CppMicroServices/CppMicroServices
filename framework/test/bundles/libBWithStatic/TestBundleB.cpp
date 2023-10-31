@@ -63,20 +63,6 @@ namespace cppmicroservices
     };
 } // namespace cppmicroservices
 
-#ifndef US_BUILD_SHARED_LIBS
 CPPMICROSERVICES_IMPORT_BUNDLE(TestBundleImportedByB)
-#endif
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleBActivator)
 
-extern "C" US_ABI_EXPORT cppmicroservices::BundleActivator* US_CREATE_ACTIVATOR_FUNC(TestBundleImportedByB)();
-extern "C" US_ABI_EXPORT cppmicroservices::BundleActivator*
-US_CREATE_ACTIVATOR_FUNC(TestBundleImportedByB)()
-{
-    return new cppmicroservices::TestBundleBActivator();
-}
-extern "C" US_ABI_EXPORT void US_DESTROY_ACTIVATOR_FUNC(TestBundleImportedByB)(cppmicroservices::BundleActivator* activator);
-extern "C" US_ABI_EXPORT void
-US_DESTROY_ACTIVATOR_FUNC(TestBundleImportedByB)(cppmicroservices::BundleActivator* activator)
-{
-    delete activator;
-}
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestBundleBActivator)

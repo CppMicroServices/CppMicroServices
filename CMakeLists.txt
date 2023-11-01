@@ -368,6 +368,7 @@ endif()
 #-----------------------------------------------------------------------------
 # LTO configuration
 #-----------------------------------------------------------------------------
+cmake_policy(SET CMP0069 NEW)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION off)
 if(US_USE_IPO)
   check_ipo_supported(RESULT CMAKE_INTERPROCEDURAL_OPTIMIZATION OUTPUT error)

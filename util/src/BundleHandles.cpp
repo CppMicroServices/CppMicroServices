@@ -85,13 +85,13 @@ namespace cppmicroservices
         }
 
         void*
-        GetSymbol(void* libHandle, char const* symbol, std::string* errmsg)
+        GetSymbol(void* libHandle, char const* symbol, std::string& errmsg)
         {
             void* addr = libHandle ? dlsym(libHandle, symbol) : nullptr;
             if (!addr)
             {
                 const std::string dlerrorMsg = dlerror();
-                *errmsg += "GetSymbol() failed to find (" + std::string{symbol} +
+                errmsg += "GetSymbol() failed to find (" + std::string{symbol} +
                     ") with error : " + (!dlerrorMsg.empty() ? dlerrorMsg : "unknown");
             }
             return addr;

@@ -115,6 +115,11 @@ namespace cppmicroservices
 
                     sh.Load(any_cast<int>(opts));
 
+                    // Message timestamps are used for approximately measuring the time it takes to load the library file
+                    logger->Log(logservice::SeverityLevel::LOG_INFO,
+                                "Finished loading shared library for Bundle #" + ToString(fromBundle.GetBundleId())
+                                    + " (location=" + bundleLoc + ")");
+
                     std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + fromBundle.GetSymbolicName();
                     SetBundleContextHook hook;
                     std::string set_bundle_context_err;
@@ -129,9 +134,6 @@ namespace cppmicroservices
                         logger->Log(logservice::SeverityLevel::LOG_WARNING, set_bundle_context_err);
                     }
 
-                    logger->Log(logservice::SeverityLevel::LOG_INFO,
-                                "Finished loading shared library for Bundle #" + ToString(fromBundle.GetBundleId())
-                                    + " (location=" + bundleLoc + ")");
                 }
                 catch (std::system_error const& ex)
                 {

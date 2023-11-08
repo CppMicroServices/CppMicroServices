@@ -195,10 +195,13 @@ extern "C" US_ABI_EXPORT void DeleteInstance_FooImpl2(scd::ComponentInstance* co
 #include <vector>
 #include <cppmicroservices/ServiceInterface.h>
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#include "cppmicroservices/BundleInitialization.h"
 #include "SpellCheckerImpl.hpp"
 
 namespace sc = cppmicroservices::service::component;
 namespace scd = cppmicroservices::service::component::detail;
+
+CPPMICROSERVICES_INITIALIZE_BUNDLE
 
 extern "C" US_ABI_EXPORT scd::ComponentInstance* NewInstance_DSSpellCheck_SpellCheckImpl()
 {

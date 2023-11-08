@@ -535,7 +535,7 @@ namespace cppmicroservices
                 // from within this bundle's code.
                 std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + symbolicName;
                 std::string set_bundle_context_err;
-                util::GetSymbol(SetBundleContext, libHandle, set_bundle_context_func, &set_bundle_context_err);
+                util::GetSymbol(SetBundleContext, libHandle, set_bundle_context_func, set_bundle_context_err);
 
                 if (SetBundleContext)
                 {
@@ -550,11 +550,11 @@ namespace cppmicroservices
                 std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
                 std::function<BundleActivator*(void)> createActivatorHook;
                 std::string create_activator_err;
-                util::GetSymbol(createActivatorHook, libHandle, create_activator_func, &create_activator_err);
+                util::GetSymbol(createActivatorHook, libHandle, create_activator_func, create_activator_err);
 
                 std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
                 std::string destroy_activator_err;
-                util::GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func, &destroy_activator_err);
+                util::GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func, destroy_activator_err);
 
                 if (!createActivatorHook)
                 {

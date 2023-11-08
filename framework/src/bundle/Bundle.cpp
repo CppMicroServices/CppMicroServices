@@ -358,7 +358,7 @@ namespace cppmicroservices
 
         // Utility function that fetches the symbol or nullptr
         std::string errmsg;
-        void* symbol = util::GetSymbol(handle, symname.c_str(), &errmsg);
+        void* symbol = util::GetSymbol(handle, symname.c_str(), errmsg);
         if (!symbol)
         {
             d->coreCtx->logger->Log(logservice::SeverityLevel::LOG_WARNING, errmsg);

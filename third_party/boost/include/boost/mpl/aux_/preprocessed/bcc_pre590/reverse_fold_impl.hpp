@@ -9,7 +9,7 @@
 // *Preprocessed* version of the main "reverse_fold_impl.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl { namespace aux {
+namespace boost { namespace mpl { namespace aux {
 
 /// forward declaration
 

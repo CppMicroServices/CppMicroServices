@@ -171,6 +171,7 @@ include(usFunctionGenerateBundleInit)
 include(usMacroCreateBundle)
 include(usFunctionCreateTestBundle)
 include(usFunctionCreateDSTestBundle)
+include(usFunctionBoostPath)
 
 if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   check_cxx_compiler_flag(-Wno-missing-braces HAS_MISSING_BRACES_FLAG)
@@ -201,7 +202,7 @@ endforeach()
 # Set a default build type if none was specified
 #-----------------------------------------------------------------------------
 
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Setting build type to 'Debug' as none was specified.")
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
 
@@ -252,6 +253,7 @@ us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
+us_cache_var(US_USE_SYSTEM_BOOST OFF BOOL "Build using an external Boost installation" ADVANCED)
 
 set(_us_build_shared ${BUILD_SHARED_LIBS})
 
@@ -359,6 +361,14 @@ if (APPLE AND US_COMPILER_APPLE_CLANG)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
+endif()
+
+#-----------------------------------------------------------------------------
+# 3rd Party Library configuration
+#-----------------------------------------------------------------------------
+
+if(US_USE_SYSTEM_BOOST)
+    find_package(Boost 1.74.0 REQUIRED)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -870,6 +880,7 @@ install(EXPORT ${PROJECT_NAME}Targets
     ${US_CMAKE_DIR}/usFunctionGetResourceSource.cmake
     ${US_CMAKE_DIR}/usFunctionCheckResourceLinking.cmake
     ${US_CMAKE_DIR}/usFunctionCheckCompilerFlags.cmake
+    ${US_CMAKE_DIR}/usFunctionBoostPath.cmake
     )
 
   install(FILES ${_install_cmake_scripts}

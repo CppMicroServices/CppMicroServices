@@ -11,7 +11,7 @@
 #include "boost/date_time/compiler_config.hpp"
 #include <string>
 
-namespace cppmsboost {
+namespace boost {
 namespace date_time {
 
   //! Converts a string from one value_type to another
@@ -27,6 +27,6 @@ namespace date_time {
     return result;
   }
   
-}} // namespace cppmsboost::date_time
+}} // namespace boost::date_time
 
 #endif // _STRING_CONVERT_HPP___

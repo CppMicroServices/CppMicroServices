@@ -25,7 +25,7 @@
 /**
  * Duration formatting facet for input.
  */
-namespace cppmsboost
+namespace boost
 {
   namespace chrono
   {

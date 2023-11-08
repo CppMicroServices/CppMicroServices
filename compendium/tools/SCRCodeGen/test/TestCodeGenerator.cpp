@@ -119,6 +119,30 @@ namespace codegen
   }
   )manifest";
 
+    const std::string manifest_multiple_cardinality_ref = R"manifest(
+ {
+    "scr" : { "version" : 1,
+              "components": [{
+                       "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                       "inject-references" : true,
+                       "service": {
+                       "interfaces": ["SpellCheck::ISpellCheckService"]
+                       },
+                       "references": [{
+                         "name": "dictionary",
+                         "interface": "DictionaryService::IDictionaryService",
+                         "cardinality": "1..n"
+                       },
+                       {
+                         "name": "foo",
+                         "interface": "Foo::Interface",
+                         "cardinality": "1..1"
+                       }]
+                       }]
+            }
+  }
+  )manifest";
+
     const std::string manifest_no_scr = R"manifest(
   {
   }
@@ -623,8 +647,9 @@ namespace codegen
             CodegenValidManifestState(manifest_mult_comp, { "A.hpp", "B.hpp", "C.hpp" }, REF_MULT_COMPS),
             // valid manifest with multiple components of the same implementation class
             CodegenValidManifestState(manifest_mult_comp_same_impl,
-                                      { "A.hpp", "B.hpp", "C.hpp" },
-                                      REF_MULT_COMPS_SAME_IMPL)));
+                { "A.hpp", "B.hpp", "C.hpp" },
+                REF_MULT_COMPS_SAME_IMPL),
+            CodegenValidManifestState(manifest_multiple_cardinality_ref, { "SpellCheckerImpl.hpp" }, REF_MULT_CARD)));
 
     // For the manifest specified in the member manifest, we expect the exception message
     // output by the code-generator to be exactly errorOutput.

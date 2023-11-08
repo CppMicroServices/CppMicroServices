@@ -21,7 +21,7 @@
 #include <boost/iterator/reverse_iterator.hpp>
 
 
-namespace cppmsboost
+namespace boost
 {
     //////////////////////////////////////////////////////////////////////////
     // default
@@ -36,7 +36,7 @@ namespace cppmsboost
     };
     
 
-} // namespace cppmsboost
+} // namespace boost
 
 
 #endif

@@ -23,7 +23,7 @@
 #  pragma once
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace intrusive {
 
 ///////////////////////////
@@ -183,6 +183,6 @@ struct pointer_rebind<T*, U>
 {  typedef U* type; };
 
 }  //namespace container {
-}  //namespace cppmsboost {
+}  //namespace boost {
 
 #endif // defined(BOOST_INTRUSIVE_POINTER_REBIND_HPP)

@@ -36,7 +36,7 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 namespace detail {
@@ -71,10 +71,10 @@ protected:
         load(v);
         t = version_type(v);
     }
-    void load(cppmsboost::serialization::item_version_type & t){
+    void load(boost::serialization::item_version_type & t){
         unsigned int v;
         load(v);
-        t = cppmsboost::serialization::item_version_type(v);
+        t = boost::serialization::item_version_type(v);
     }
     BOOST_WARCHIVE_DECL void
     load(char * t);
@@ -98,7 +98,7 @@ protected:
 };
 
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)
@@ -111,7 +111,7 @@ protected:
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 class BOOST_SYMBOL_VISIBLE text_wiarchive :
@@ -127,10 +127,10 @@ public:
 };
 
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 // required by export
-BOOST_SERIALIZATION_REGISTER_ARCHIVE(cppmsboost::archive::text_wiarchive)
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(boost::archive::text_wiarchive)
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

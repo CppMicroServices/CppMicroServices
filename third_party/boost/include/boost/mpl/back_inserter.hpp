@@ -18,7 +18,7 @@
 #include <boost/mpl/push_back.hpp>
 #include <boost/mpl/inserter.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace mpl {
 
 template<

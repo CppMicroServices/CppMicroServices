@@ -19,7 +19,7 @@
 #include <boost/range/iterator.hpp>
 #include <boost/iterator/iterator_traits.hpp>
 
-namespace cppmsboost
+namespace boost
 {
     template< class T >
     struct range_pointer

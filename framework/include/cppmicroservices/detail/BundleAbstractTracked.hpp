@@ -31,27 +31,27 @@ namespace cppmicroservices
     namespace detail
     {
 
-        template <class S, class TTT, class R>
-        BundleAbstractTracked<S, TTT, R>::BundleAbstractTracked(BundleContext bc)
+        template <class S, class T, class R>
+        BundleAbstractTracked<S, T, R>::BundleAbstractTracked(BundleContext context)
             : closed(false)
             , trackingCount(0)
-            , bc(bc)
+            , bc(std::move(context))
         {
         }
 
-        template <class S, class TTT, class R>
-        BundleAbstractTracked<S, TTT, R>::~BundleAbstractTracked() = default;
+        template <class S, class T, class R>
+        BundleAbstractTracked<S, T, R>::~BundleAbstractTracked() = default;
 
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         void
-        BundleAbstractTracked<S, TTT, R>::SetInitial(std::vector<S> const& initiallist)
+        BundleAbstractTracked<S, T, R>::SetInitial(std::vector<S> const& initiallist)
         {
             std::copy(initiallist.begin(), initiallist.end(), std::back_inserter(initial));
         }
 
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         void
-        BundleAbstractTracked<S, TTT, R>::TrackInitial()
+        BundleAbstractTracked<S, T, R>::TrackInitial()
         {
             while (true)
             {
@@ -95,18 +95,19 @@ namespace cppmicroservices
             }
         }
 
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         void
-        BundleAbstractTracked<S, TTT, R>::Close()
+        BundleAbstractTracked<S, T, R>::Close()
         {
             closed = true;
         }
 
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         void
-        BundleAbstractTracked<S, TTT, R>::Track(S item, R related)
+        BundleAbstractTracked<S, T, R>::Track(S item, R related)
         {
-            std::shared_ptr<TrackedParamType> object;
+            bool isInMap = false;
+            T object;
             {
                 auto l = this->Lock();
                 US_UNUSED(l);
@@ -118,8 +119,9 @@ namespace cppmicroservices
                 if (trackedItemIter != tracked.end())
                 {
                     object = trackedItemIter->second;
+                    isInMap = true;
                 }
-                if (!object)
+                if (!isInMap)
                 { /* we are not tracking the item */
                     if (std::find(adding.begin(), adding.end(), item) != adding.end())
                     {
@@ -129,12 +131,12 @@ namespace cppmicroservices
                     adding.push_back(item); /* mark this item is being added */
                 }
                 else
-                { /* we are currently tracking this item */
+                {               /* we are currently tracking this item */
                     Modified(); /* increment modification count */
                 }
             }
 
-            if (!object)
+            if (!isInMap)
             { /* we are not tracking the item */
                 TrackAdding(item, related);
             }
@@ -149,20 +151,20 @@ namespace cppmicroservices
             }
         }
 
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         void
-        BundleAbstractTracked<S, TTT, R>::Untrack(S item, R related)
+        BundleAbstractTracked<S, T, R>::Untrack(S item, R related)
         {
-            std::shared_ptr<TrackedParamType> object;
+            T object;
             {
                 auto l = this->Lock();
                 US_UNUSED(l);
                 std::size_t initialSize = initial.size();
                 initial.remove(item);
                 if (initialSize != initial.size())
-                { /* if this item is already in the list
-                   * of initial references to process
-                   */
+                {           /* if this item is already in the list
+                             * of initial references to process
+                             */
                     return; /* we have removed it from the list and it will not be
                              * processed
                              */
@@ -171,9 +173,9 @@ namespace cppmicroservices
                 std::size_t addingSize = adding.size();
                 adding.remove(item);
                 if (addingSize != adding.size())
-                { /* if the item is in the process of
-                   * being added
-                   */
+                {           /* if the item is in the process of
+                             * being added
+                             */
                     return; /*
                              * in case the item is untracked while in the process of
                              * adding
@@ -201,35 +203,36 @@ namespace cppmicroservices
              */
         }
 
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         std::size_t
-        BundleAbstractTracked<S, TTT, R>::Size_unlocked() const
+        BundleAbstractTracked<S, T, R>::Size_unlocked() const
         {
             return tracked.size();
         }
 
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         bool
-        BundleAbstractTracked<S, TTT, R>::IsEmpty_unlocked() const
+        BundleAbstractTracked<S, T, R>::IsEmpty_unlocked() const
         {
             return tracked.empty();
         }
 
-        template <class S, class TTT, class R>
-        std::shared_ptr<typename BundleAbstractTracked<S, TTT, R>::TrackedParamType>
-        BundleAbstractTracked<S, TTT, R>::GetCustomizedObject_unlocked(S item) const
+        template <class S, class T, class R>
+        std::optional<T>
+        BundleAbstractTracked<S, T, R>::GetCustomizedObject_unlocked(S item) const
         {
             typename TrackingMap::const_iterator i = tracked.find(item);
             if (i != tracked.end())
             {
-                return i->second;
+                return std::optional<T>(i->second);
             }
-            return std::shared_ptr<TrackedParamType>();
+
+            return std::nullopt;
         }
 
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         void
-        BundleAbstractTracked<S, TTT, R>::GetTracked_unlocked(std::vector<S>& items) const
+        BundleAbstractTracked<S, T, R>::GetTracked_unlocked(std::vector<S>& items) const
         {
             for (auto& i : tracked)
             {
@@ -237,32 +240,32 @@ namespace cppmicroservices
             }
         }
 
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         void
-        BundleAbstractTracked<S, TTT, R>::Modified()
+        BundleAbstractTracked<S, T, R>::Modified()
         {
             // atomic
             ++trackingCount;
         }
 
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         int
-        BundleAbstractTracked<S, TTT, R>::GetTrackingCount() const
+        BundleAbstractTracked<S, T, R>::GetTrackingCount() const
         {
             // atomic
             return trackingCount;
         }
 
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         void
-        BundleAbstractTracked<S, TTT, R>::CopyEntries_unlocked(TrackingMap& map) const
+        BundleAbstractTracked<S, T, R>::CopyEntries_unlocked(TrackingMap& map) const
         {
             map.insert(tracked.begin(), tracked.end());
         }
 
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         bool
-        BundleAbstractTracked<S, TTT, R>::CustomizerAddingFinal(S item, std::shared_ptr<TrackedParamType> const& custom)
+        BundleAbstractTracked<S, T, R>::CustomizerAddingFinal(S item, std::optional<T> const& custom)
         {
             auto l = this->Lock();
             US_UNUSED(l);
@@ -276,7 +279,7 @@ namespace cppmicroservices
                  */
                 if (custom)
                 {
-                    tracked[item] = custom;
+                    tracked[item] = custom.value();
                     Modified();        /* increment modification count */
                     this->NotifyAll(); /* notify any waiters */
                 }
@@ -288,11 +291,11 @@ namespace cppmicroservices
             }
         }
 
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         void
-        BundleAbstractTracked<S, TTT, R>::TrackAdding(S item, R related)
+        BundleAbstractTracked<S, T, R>::TrackAdding(S item, R related)
         {
-            std::shared_ptr<TrackedParamType> object;
+            std::optional<T> object;
             bool becameUntracked = false;
             /* Call customizer outside of synchronized region */
             try
@@ -316,7 +319,7 @@ namespace cppmicroservices
             if (becameUntracked && object)
             {
                 /* Call customizer outside of synchronized region */
-                CustomizerRemoved(item, related, object);
+                CustomizerRemoved(item, related, object.value());
                 /*
                  * If the customizer throws an unchecked exception, it is safe to
                  * let it propagate

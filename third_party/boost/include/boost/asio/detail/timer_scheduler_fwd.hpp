@@ -17,7 +17,7 @@
 
 #include <boost/asio/detail/config.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -37,6 +37,6 @@ typedef class select_reactor timer_scheduler;
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ASIO_DETAIL_TIMER_SCHEDULER_FWD_HPP

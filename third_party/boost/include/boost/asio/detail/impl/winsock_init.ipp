@@ -26,7 +26,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -67,15 +67,15 @@ void winsock_init_base::throw_on_error(data& d)
   long result = ::InterlockedExchangeAdd(&d.result_, 0);
   if (result != 0)
   {
-    cppmsboost::system::error_code ec(result,
-        cppmsboost::asio::error::get_system_category());
-    cppmsboost::asio::detail::throw_error(ec, "winsock");
+    boost::system::error_code ec(result,
+        boost::asio::error::get_system_category());
+    boost::asio::detail::throw_error(ec, "winsock");
   }
 }
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

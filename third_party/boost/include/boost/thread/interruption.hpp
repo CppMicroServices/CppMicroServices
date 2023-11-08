@@ -9,7 +9,7 @@
 
 #include <boost/thread/detail/config.hpp>
 
-namespace cppmsboost
+namespace boost
 {
     namespace this_thread
     {

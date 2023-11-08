@@ -9,7 +9,7 @@
 // Preprocessed version of "boost/mpl/greater_equal.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<
       typename Tag1
@@ -77,7 +77,7 @@ BOOST_MPL_AUX_NA_SPEC2(2, 2, greater_equal)
 
 }}
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<>
 struct greater_equal_impl< integral_c_tag,integral_c_tag >

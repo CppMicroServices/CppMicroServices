@@ -11,7 +11,7 @@
 #ifndef BOOST_LAMBDA_OPERATOR_ACTIONS_HPP
 #define BOOST_LAMBDA_OPERATOR_ACTIONS_HPP
 
-namespace cppmsboost { 
+namespace boost { 
 namespace lambda {
 
 
@@ -127,7 +127,7 @@ template<> struct is_protectable<other_action<assignment_action> > {
 
 
 } // namespace lambda 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif
 

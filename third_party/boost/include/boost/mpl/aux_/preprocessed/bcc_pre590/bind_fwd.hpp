@@ -9,7 +9,7 @@
 // *Preprocessed* version of the main "bind_fwd.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<
       typename F

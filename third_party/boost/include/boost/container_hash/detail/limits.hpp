@@ -24,7 +24,7 @@
 #include <float.h>
 #endif
 
-namespace cppmsboost
+namespace boost
 {
     namespace hash_detail
     {

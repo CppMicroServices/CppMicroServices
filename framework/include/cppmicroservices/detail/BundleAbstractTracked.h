@@ -28,6 +28,7 @@
 #include "cppmicroservices/detail/WaitCondition.h"
 
 #include <atomic>
+#include <optional>
 #include <vector>
 
 namespace cppmicroservices
@@ -48,19 +49,16 @@ namespace cppmicroservices
          * implementation of the Tracker class.
          *
          * @tparam S The tracked item. It is the key.
-         * @tparam TTT Type traits with TTT::TrackedType representing the value type mapped to the tracked item.
+         * @tparam T the value type mapped to the tracked item.
          * @tparam R The reason the tracked item is  being tracked or untracked.
          * @remarks This class is thread safe.
          */
-        template <class S, class TTT, class R>
+        template <class S, class T, class R>
         class BundleAbstractTracked : public MultiThreaded<MutexLockingStrategy<>, WaitCondition>
         {
 
           public:
-            using T = typename TTT::TrackedType;
-            using TrackedParamType = typename TTT::TrackedParamType;
-
-            using TrackingMap = std::unordered_map<S, std::shared_ptr<TrackedParamType>>;
+            using TrackingMap = std::unordered_map<S, T>;
 
             /**
              * BundleAbstractTracked constructor.
@@ -139,7 +137,7 @@ namespace cppmicroservices
              *
              * @GuardedBy this
              */
-            std::shared_ptr<TrackedParamType> GetCustomizedObject_unlocked(S item) const;
+            std::optional<T> GetCustomizedObject_unlocked(S item) const;
 
             /**
              * Return the list of tracked items.
@@ -189,7 +187,7 @@ namespace cppmicroservices
              * @return Customized object for the tracked item or <code>null</code> if
              *         the item is not to be tracked.
              */
-            virtual std::shared_ptr<TrackedParamType> CustomizerAdding(S item, R const& related) = 0;
+            virtual std::optional<T> CustomizerAdding(S item, R const& related) = 0;
 
             /**
              * Call the specific customizer modified method. This method must not be
@@ -199,8 +197,7 @@ namespace cppmicroservices
              * @param related Action related object.
              * @param object Customized object for the tracked item.
              */
-            virtual void CustomizerModified(S item, R const& related, std::shared_ptr<TrackedParamType> const& object)
-                = 0;
+            virtual void CustomizerModified(S item, R const& related, T const& object) = 0;
 
             /**
              * Call the specific customizer removed method. This method must not be
@@ -210,8 +207,7 @@ namespace cppmicroservices
              * @param related Action related object.
              * @param object Customized object for the tracked item.
              */
-            virtual void CustomizerRemoved(S item, R const& related, std::shared_ptr<TrackedParamType> const& object)
-                = 0;
+            virtual void CustomizerRemoved(S item, R const& related, T const& object) = 0;
 
             /**
              * List of items in the process of being added. This is used to deal with
@@ -264,7 +260,7 @@ namespace cppmicroservices
             void TrackAdding(S item, R related);
 
           private:
-            using Self = BundleAbstractTracked<S, TTT, R>;
+            using Self = BundleAbstractTracked<S, T, R>;
 
             /**
              * Map of tracked items to customized objects.
@@ -281,7 +277,7 @@ namespace cppmicroservices
 
             BundleContext bc;
 
-            bool CustomizerAddingFinal(S item, std::shared_ptr<TrackedParamType> const& custom);
+            bool CustomizerAddingFinal(S item, std::optional<T> const& custom);
         };
 
     } // namespace detail

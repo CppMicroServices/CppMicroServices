@@ -17,7 +17,7 @@
 #include <boost/algorithm/string/sequence_traits.hpp>
 #include <boost/algorithm/string/detail/sequence.hpp>
 
-namespace cppmsboost {
+namespace boost {
     namespace algorithm {
         namespace detail {
 
@@ -46,7 +46,7 @@ namespace cppmsboost {
                 StorageT& Storage,
                 const WhatT& What )
             {
-                Storage.insert( Storage.end(), ::cppmsboost::begin(What), ::cppmsboost::end(What) );
+                Storage.insert( Storage.end(), ::boost::begin(What), ::boost::end(What) );
             }
 
 
@@ -68,7 +68,7 @@ namespace cppmsboost {
                     ForwardIteratorT SegmentEnd )
                 {
                     // Copy data from the storage until the beginning of the segment
-                    ForwardIteratorT It=::cppmsboost::algorithm::detail::move_from_storage( Storage, InsertIt, SegmentBegin );
+                    ForwardIteratorT It=::boost::algorithm::detail::move_from_storage( Storage, InsertIt, SegmentBegin );
 
                     // 3 cases are possible :
                     //   a) Storage is empty, It==SegmentBegin
@@ -125,7 +125,7 @@ namespace cppmsboost {
 
                 {
                     // Call replace to do the job
-                    ::cppmsboost::algorithm::detail::replace( Input, InsertIt, SegmentBegin, Storage );
+                    ::boost::algorithm::detail::replace( Input, InsertIt, SegmentBegin, Storage );
                     // Empty the storage
                     Storage.clear();
                     // Iterators were not changed, simply return the end of segment
@@ -154,6 +154,6 @@ namespace cppmsboost {
 
         } // namespace detail
     } // namespace algorithm
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // BOOST_STRING_REPLACE_STORAGE_DETAIL_HPP

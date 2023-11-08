@@ -21,7 +21,7 @@
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/pointee.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 namespace iterators {
 
@@ -30,7 +30,7 @@ namespace iterators {
 // strings of the currently selected locale
 template<class Derived, class Base>
 class unescape
-    : public cppmsboost::iterator_adaptor<
+    : public boost::iterator_adaptor<
         unescape<Derived, Base>,
         Base,
         typename pointee<Base>::type,
@@ -38,8 +38,8 @@ class unescape
         typename pointee<Base>::type
     >
 {
-    friend class cppmsboost::iterator_core_access;
-    typedef typename cppmsboost::iterator_adaptor<
+    friend class boost::iterator_core_access;
+    typedef typename boost::iterator_adaptor<
         unescape<Derived, Base>,
         Base,
         typename pointee<Base>::type,
@@ -84,6 +84,6 @@ public:
 
 } // namespace iterators
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ARCHIVE_ITERATORS_UNESCAPE_HPP

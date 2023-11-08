@@ -12,7 +12,7 @@
 
 #include <boost/detail/scoped_enum_emulation.hpp>
 
-namespace cppmsboost
+namespace boost
 {
   namespace chrono
   {

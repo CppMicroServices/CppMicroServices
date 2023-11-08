@@ -20,7 +20,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -29,7 +29,7 @@ class signal_op
 {
 public:
   // The error code to be passed to the completion handler.
-  cppmsboost::system::error_code ec_;
+  boost::system::error_code ec_;
 
   // The signal number to be passed to the completion handler.
   int signal_number_;
@@ -44,7 +44,7 @@ protected:
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

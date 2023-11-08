@@ -24,7 +24,7 @@ extern "C" {
 #  include BOOST_ABI_PREFIX
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace coroutines {
 
 struct stack_context;

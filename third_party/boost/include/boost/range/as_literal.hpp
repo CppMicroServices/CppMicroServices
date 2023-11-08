@@ -34,7 +34,7 @@
 #include <cwchar>
 #endif
 
-namespace cppmsboost
+namespace boost
 {
     namespace range_detail
     {
@@ -133,7 +133,7 @@ namespace cppmsboost
         inline iterator_range<BOOST_DEDUCED_TYPENAME range_iterator<T>::type>
         make_range( T& r, long )
         {
-            return cppmsboost::make_iterator_range( r );
+            return boost::make_iterator_range( r );
         }
 
     }

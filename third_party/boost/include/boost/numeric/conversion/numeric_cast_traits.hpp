@@ -11,7 +11,7 @@
 
 #include <boost/numeric/conversion/converter_policies.hpp>
 
-namespace cppmsboost { namespace numeric {
+namespace boost { namespace numeric {
 
     template <typename Target, typename Source, typename EnableIf = void>
     struct numeric_cast_traits
@@ -21,7 +21,7 @@ namespace cppmsboost { namespace numeric {
         typedef Trunc<Source>           rounding_policy;
     };
 
-}}//namespace cppmsboost::numeric;
+}}//namespace boost::numeric;
 
 #if !defined( BOOST_NUMERIC_CONVERSION_RELAX_BUILT_IN_CAST_TRAITS )
 #include <boost/cstdint.hpp>

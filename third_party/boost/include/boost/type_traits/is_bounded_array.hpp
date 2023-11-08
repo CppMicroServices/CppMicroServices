@@ -13,7 +13,7 @@ or copy at http://www.boost.org/LICENSE_1_0.txt)
 #include <boost/type_traits/integral_constant.hpp>
 #include <cstddef>
 
-namespace cppmsboost {
+namespace boost {
 
 template<class T>
 struct is_bounded_array

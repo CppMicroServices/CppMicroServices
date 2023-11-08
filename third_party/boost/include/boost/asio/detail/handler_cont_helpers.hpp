@@ -24,7 +24,7 @@
 // Calls to asio_handler_is_continuation must be made from a namespace that
 // does not contain overloads of this function. This namespace is defined here
 // for that purpose.
-namespace cppmsboost_asio_handler_cont_helpers {
+namespace boost_asio_handler_cont_helpers {
 
 template <typename Context>
 inline bool is_continuation(Context& context)
@@ -32,13 +32,13 @@ inline bool is_continuation(Context& context)
 #if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
   return false;
 #else
-  using cppmsboost::asio::asio_handler_is_continuation;
+  using boost::asio::asio_handler_is_continuation;
   return asio_handler_is_continuation(
-      cppmsboost::asio::detail::addressof(context));
+      boost::asio::detail::addressof(context));
 #endif
 }
 
-} // namespace cppmsboost_asio_handler_cont_helpers
+} // namespace boost_asio_handler_cont_helpers
 
 #include <boost/asio/detail/pop_options.hpp>
 

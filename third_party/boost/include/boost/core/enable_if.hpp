@@ -21,7 +21,7 @@
 
 #ifndef BOOST_NO_SFINAE
 
-namespace cppmsboost
+namespace boost
 {
   template<typename T, typename R=void>
   struct enable_if_has_type
@@ -74,11 +74,11 @@ namespace cppmsboost
   template <class Cond, class T> 
   struct lazy_disable_if : public lazy_disable_if_c<Cond::value, T> {};
 
-} // namespace cppmsboost
+} // namespace boost
 
 #else
 
-namespace cppmsboost {
+namespace boost {
 
   namespace detail { typedef void enable_if_default_T; }
 
@@ -121,7 +121,7 @@ namespace cppmsboost {
   struct lazy_disable_if : enable_if_does_not_work_on_this_compiler<T>
   { };
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_NO_SFINAE
 

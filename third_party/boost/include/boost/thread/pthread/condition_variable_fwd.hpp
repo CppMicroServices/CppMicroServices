@@ -31,7 +31,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace cppmsboost
+namespace boost
 {
     class condition_variable
     {
@@ -42,7 +42,7 @@ namespace cppmsboost
         pthread_cond_t cond;
 
     public:
-    //private: // used by cppmsboost::thread::try_join_until
+    //private: // used by boost::thread::try_join_until
 
         bool do_wait_until(
             unique_lock<mutex>& lock,
@@ -61,7 +61,7 @@ namespace cppmsboost
             res=posix::pthread_mutex_init(&internal_mutex);
             if(res)
             {
-                cppmsboost::throw_exception(thread_resource_error(res, "cppmsboost::condition_variable::condition_variable() constructor failed in pthread_mutex_init"));
+                boost::throw_exception(thread_resource_error(res, "boost::condition_variable::condition_variable() constructor failed in pthread_mutex_init"));
             }
 //#endif
             res = posix::pthread_cond_init(&cond);
@@ -71,7 +71,7 @@ namespace cppmsboost
                 // ditto
                 BOOST_VERIFY(!posix::pthread_mutex_destroy(&internal_mutex));
 //#endif
-                cppmsboost::throw_exception(thread_resource_error(res, "cppmsboost::condition_variable::condition_variable() constructor failed in pthread_cond_init"));
+                boost::throw_exception(thread_resource_error(res, "boost::condition_variable::condition_variable() constructor failed in pthread_cond_init"));
             }
         }
         ~condition_variable()
@@ -97,7 +97,7 @@ namespace cppmsboost
 #if defined BOOST_THREAD_USES_DATETIME
         bool timed_wait(
             unique_lock<mutex>& m,
-            cppmsboost::system_time const& abs_time)
+            boost::system_time const& abs_time)
         {
 #if defined BOOST_THREAD_WAIT_BUG
             const detail::real_platform_timepoint ts(abs_time + BOOST_THREAD_WAIT_BUG);
@@ -121,7 +121,7 @@ namespace cppmsboost
         }
         bool timed_wait(
             unique_lock<mutex>& m,
-            ::cppmsboost::xtime const& abs_time)
+            ::boost::xtime const& abs_time)
         {
             return timed_wait(m,system_time(abs_time));
         }
@@ -160,7 +160,7 @@ namespace cppmsboost
         template<typename predicate_type>
         bool timed_wait(
             unique_lock<mutex>& m,
-            cppmsboost::system_time const& abs_time,predicate_type pred)
+            boost::system_time const& abs_time,predicate_type pred)
         {
 #if defined BOOST_THREAD_WAIT_BUG
             const detail::real_platform_timepoint ts(abs_time + BOOST_THREAD_WAIT_BUG);
@@ -187,7 +187,7 @@ namespace cppmsboost
         template<typename predicate_type>
         bool timed_wait(
             unique_lock<mutex>& m,
-            ::cppmsboost::xtime const& abs_time,predicate_type pred)
+            ::boost::xtime const& abs_time,predicate_type pred)
         {
             return timed_wait(m,system_time(abs_time),pred);
         }
@@ -318,7 +318,7 @@ namespace cppmsboost
                 const chrono::duration<Rep, Period>& d,
                 Predicate pred)
         {
-            return wait_until(lock, chrono::steady_clock::now() + d, cppmsboost::move(pred));
+            return wait_until(lock, chrono::steady_clock::now() + d, boost::move(pred));
         }
 #endif
 

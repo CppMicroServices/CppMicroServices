@@ -9,7 +9,7 @@
 // Preprocessed version of "boost/mpl/apply_fwd.hpp" header
 // -- DO NOT modify by hand!
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 namespace aux {
 template< BOOST_AUX_NTTP_DECL(int, arity_) > struct apply_chooser;

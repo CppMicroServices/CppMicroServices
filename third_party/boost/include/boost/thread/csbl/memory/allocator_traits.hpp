@@ -15,15 +15,15 @@
 #if defined BOOST_NO_CXX11_ALLOCATOR
 #include <boost/container/allocator_traits.hpp>
 
-namespace cppmsboost
+namespace boost
 {
   namespace csbl
   {
-    using ::cppmsboost::container::allocator_traits;
+    using ::boost::container::allocator_traits;
   }
 }
 #else
-namespace cppmsboost
+namespace boost
 {
   namespace csbl
   {

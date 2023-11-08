@@ -51,7 +51,7 @@ namespace cppmicroservices
             void
             Initialize()
             {
-                threadpool = std::make_shared<cppmsboost::asio::thread_pool>(2);
+                threadpool = std::make_shared<boost::asio::thread_pool>(2);
             }
 
             void
@@ -84,18 +84,18 @@ namespace cppmicroservices
                 if (threadpool)
                 {
                     using Sig = void();
-                    using Result = cppmsboost::asio::async_result<decltype(task), Sig>;
+                    using Result = boost::asio::async_result<decltype(task), Sig>;
                     using Handler = typename Result::completion_handler_type;
 
                     Handler handler(std::forward<decltype(task)>(task));
 
-                    cppmsboost::asio::post(threadpool->get_executor(),
+                    boost::asio::post(threadpool->get_executor(),
                                       [handler = std::move(handler)]() mutable { handler(); });
                 }
             }
 
           private:
-            std::shared_ptr<cppmsboost::asio::thread_pool> threadpool;
+            std::shared_ptr<boost::asio::thread_pool> threadpool;
             std::shared_ptr<cppmicroservices::logservice::LogService> logger;
         };
 

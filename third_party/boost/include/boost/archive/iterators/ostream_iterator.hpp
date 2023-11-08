@@ -24,21 +24,21 @@
 #include <ostream>
 #include <boost/iterator/iterator_facade.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 namespace iterators {
 
 // given a type, make an input iterator based on a pointer to that type
 template<class Elem>
 class ostream_iterator :
-    public cppmsboost::iterator_facade<
+    public boost::iterator_facade<
         ostream_iterator<Elem>,
         Elem,
         std::output_iterator_tag,
         ostream_iterator<Elem> &
     >
 {
-    friend class cppmsboost::iterator_core_access;
+    friend class boost::iterator_core_access;
     typedef ostream_iterator this_t ;
     typedef Elem char_type;
     typedef std::basic_ostream<char_type> ostream_type;
@@ -78,6 +78,6 @@ public:
 
 } // namespace iterators
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ARCHIVE_ITERATORS_OSTREAM_ITERATOR_HPP

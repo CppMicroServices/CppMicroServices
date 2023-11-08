@@ -28,17 +28,17 @@
 #  pragma warning(disable : 4511 4512)
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 namespace detail {
 
 class basic_serializer :
-    private cppmsboost::noncopyable
+    private boost::noncopyable
 {
-    const cppmsboost::serialization::extended_type_info * m_eti;
+    const boost::serialization::extended_type_info * m_eti;
 protected:
     explicit basic_serializer(
-        const cppmsboost::serialization::extended_type_info & eti
+        const boost::serialization::extended_type_info & eti
     ) :
         m_eti(& eti)
     {}
@@ -54,7 +54,7 @@ public:
     const char * get_debug_info() const {
         return m_eti->get_debug_info();
     }
-    const cppmsboost::serialization::extended_type_info & get_eti() const {
+    const boost::serialization::extended_type_info & get_eti() const {
         return * m_eti;
     }
 };
@@ -68,7 +68,7 @@ public:
 
 } // namespace detail
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 #ifdef BOOST_MSVC
 #pragma warning(pop)

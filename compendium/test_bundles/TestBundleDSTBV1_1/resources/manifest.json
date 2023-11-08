@@ -1,0 +1,21 @@
+{
+  "bundle.symbolic_name": "TestBundleDSTBV1_1",
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "implementation-class": "sample::ServiceComponentBV1_1",
+        "service": {
+          "interfaces": [ "test::Interface2" ]
+        },
+        "references": [
+          {
+            "name": "foo",
+            "interface": "test::Interface1"
+          }
+        ],
+        "inject-references": false
+      }
+    ]
+  }
+}

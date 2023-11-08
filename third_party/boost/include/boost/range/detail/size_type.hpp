@@ -17,7 +17,7 @@
 // missing partial specialization  workaround.
 //////////////////////////////////////////////////////////////////////////////
 
-namespace cppmsboost
+namespace boost
 {
     namespace range_detail
     {

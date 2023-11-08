@@ -58,15 +58,25 @@ namespace cppmicroservices
                     // old service and then bind to the new service.
                     if (!boundRefsHandle->empty())
                     {
-                        // We only need to unbind if there's actually a bound ref.
                         ServiceReferenceBase const& minBound = *(boundRefsHandle->begin());
-                        if (minBound < reference)
+                        if (mgr.IsUnary() && minBound < reference)
                         {
+                            // We only need to unbind if there's actually a bound ref.
                             // And we only need to unbind if the new reference is a better match than the
                             // current best match (i.e. boundRefs are stored in reverse order with the best
                             // match in the first position).
                             replacementNeeded = true;
                             serviceToUnbind = minBound; // remember which service to unbind.
+                        }
+                        else {
+                            // in case of multiple cardinality, always bind if number of bound references
+                            // is within limit of maxCardinality value
+                            if (boundRefsHandle->size() < mgr.metadata_.maxCardinality) {
+                                replacementNeeded = true;
+                            }
+                            else {
+                                Log("Number of multiple references has reached its maximum limit. New reference(s) will not be bound.", SeverityLevel::LOG_WARNING);
+                            }
                         }
                     }
                     else

@@ -17,7 +17,7 @@
 
 #include <boost/config/abi_prefix.hpp>
 
-namespace cppmsboost {
+namespace boost {
 
 enum xtime_clock_types
 {
@@ -46,28 +46,28 @@ struct xtime
 
     operator system_time() const
     {
-        return cppmsboost::posix_time::from_time_t(0)+
-            cppmsboost::posix_time::seconds(static_cast<long>(sec))+
+        return boost::posix_time::from_time_t(0)+
+            boost::posix_time::seconds(static_cast<long>(sec))+
 #ifdef BOOST_DATE_TIME_HAS_NANOSECONDS
-            cppmsboost::posix_time::nanoseconds(nsec);
+            boost::posix_time::nanoseconds(nsec);
 #else
-        cppmsboost::posix_time::microseconds((nsec+500)/1000);
+        boost::posix_time::microseconds((nsec+500)/1000);
 #endif
     }
 
 };
 
-inline ::cppmsboost::xtime get_xtime(cppmsboost::system_time const& abs_time)
+inline ::boost::xtime get_xtime(boost::system_time const& abs_time)
 {
-    ::cppmsboost::xtime res;
-    cppmsboost::posix_time::time_duration const time_since_epoch=abs_time-cppmsboost::posix_time::from_time_t(0);
+    ::boost::xtime res;
+    boost::posix_time::time_duration const time_since_epoch=abs_time-boost::posix_time::from_time_t(0);
 
-    res.sec=static_cast< ::cppmsboost::xtime::xtime_sec_t>(time_since_epoch.total_seconds());
-    res.nsec=static_cast< ::cppmsboost::xtime::xtime_nsec_t>(time_since_epoch.fractional_seconds()*(1000000000/time_since_epoch.ticks_per_second()));
+    res.sec=static_cast< ::boost::xtime::xtime_sec_t>(time_since_epoch.total_seconds());
+    res.nsec=static_cast< ::boost::xtime::xtime_nsec_t>(time_since_epoch.fractional_seconds()*(1000000000/time_since_epoch.ticks_per_second()));
     return res;
 }
 
-inline int xtime_get(struct ::cppmsboost::xtime* xtp, int clock_type)
+inline int xtime_get(struct ::boost::xtime* xtp, int clock_type)
 {
     if (clock_type == TIME_UTC_)
     {
@@ -78,7 +78,7 @@ inline int xtime_get(struct ::cppmsboost::xtime* xtp, int clock_type)
 }
 
 
-inline int xtime_cmp(const ::cppmsboost::xtime& xt1, const ::cppmsboost::xtime& xt2)
+inline int xtime_cmp(const ::boost::xtime& xt1, const ::boost::xtime& xt2)
 {
     if (xt1.sec == xt2.sec)
         return (int)(xt1.nsec - xt2.nsec);
@@ -86,7 +86,7 @@ inline int xtime_cmp(const ::cppmsboost::xtime& xt1, const ::cppmsboost::xtime& 
         return (xt1.sec > xt2.sec) ? 1 : -1;
 }
 
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/config/abi_suffix.hpp>
 #endif

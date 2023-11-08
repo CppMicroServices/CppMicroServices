@@ -18,7 +18,7 @@
 #define BOOST_THREAD_HAS_EINTR_BUG
 #endif
 
-namespace cppmsboost
+namespace boost
 {
   namespace posix
   {

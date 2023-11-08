@@ -26,7 +26,7 @@
 #include <boost/serialization/collection_size_type.hpp>
 #include <boost/serialization/item_version_type.hpp>
 
-namespace cppmsboost{
+namespace boost{
 namespace serialization {
 namespace stl {
 
@@ -46,10 +46,10 @@ inline void save_collection(
         version<typename Container::value_type>::value
     );
     #if 0
-        cppmsboost::archive::library_version_type library_version(
+        boost::archive::library_version_type library_version(
             ar.get_library_version()
         );
-        if(cppmsboost::archive::library_version_type(3) < library_version){
+        if(boost::archive::library_version_type(3) < library_version){
             ar << BOOST_SERIALIZATION_NVP(item_version);
         }
     #else
@@ -59,12 +59,12 @@ inline void save_collection(
     typename Container::const_iterator it = s.begin();
     while(count-- > 0){
         // note borland emits a no-op without the explicit namespace
-        cppmsboost::serialization::save_construct_data_adl(
+        boost::serialization::save_construct_data_adl(
             ar,
-            cppmsboost::addressof(*it),
+            boost::addressof(*it),
             item_version
         );
-        ar << cppmsboost::serialization::make_nvp("item", *it++);
+        ar << boost::serialization::make_nvp("item", *it++);
     }
 }
 
@@ -78,6 +78,6 @@ inline void save_collection(Archive & ar, const Container &s)
 
 } // namespace stl
 } // namespace serialization
-} // namespace cppmsboost
+} // namespace boost
 
 #endif //BOOST_SERIALIZATION_COLLECTIONS_SAVE_IMP_HPP

@@ -22,7 +22,7 @@
 
 #include <boost/asio/posix/basic_stream_descriptor.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace posix {
 
@@ -31,7 +31,7 @@ typedef basic_stream_descriptor<> stream_descriptor;
 
 } // namespace posix
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // defined(BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR)
        //   || defined(GENERATING_DOCUMENTATION)

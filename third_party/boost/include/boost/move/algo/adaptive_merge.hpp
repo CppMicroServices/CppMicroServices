@@ -15,7 +15,7 @@
 #include <boost/move/detail/config_begin.hpp>
 #include <boost/move/algo/detail/adaptive_sort_merge.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace movelib {
 
 ///@cond
@@ -340,12 +340,12 @@ void adaptive_merge( RandIt first, RandIt middle, RandIt last, Compare comp
          return;
    } while(1);
 
-   ::cppmsboost::movelib::adaptive_xbuf<value_type, value_type*, size_type> xbuf(uninitialized, size_type(uninitialized_len));
-   ::cppmsboost::movelib::detail_adaptive::adaptive_merge_impl(first, size_type(middle - first), size_type(last - middle), comp, xbuf);
+   ::boost::movelib::adaptive_xbuf<value_type, value_type*, size_type> xbuf(uninitialized, size_type(uninitialized_len));
+   ::boost::movelib::detail_adaptive::adaptive_merge_impl(first, size_type(middle - first), size_type(last - middle), comp, xbuf);
 }
 
 }  //namespace movelib {
-}  //namespace cppmsboost {
+}  //namespace boost {
 
 #include <boost/move/detail/config_end.hpp>
 

@@ -33,7 +33,7 @@
 
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 //////////////////////////////////////////////////////////////////////
@@ -93,7 +93,7 @@ public:
 };
 
 }// namespace archive
-}// namespace cppmsboost
+}// namespace boost
 
 #include <boost/archive/detail/abi_suffix.hpp> // pops abi_suffix.hpp pragmas
 

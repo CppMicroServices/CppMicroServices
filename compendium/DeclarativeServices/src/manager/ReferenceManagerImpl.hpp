@@ -176,6 +176,16 @@ namespace cppmicroservices
              */
             void StopTracking() override;
 
+            /**
+             * Method returns true if maxCardinality is unary (1)
+             */
+            bool IsUnary() const override;
+
+            /**
+             * Method returns true if maxCardinality is multiple (n)
+             */
+            bool IsMultiple() const override;
+
             class BindingPolicy
             {
               public:

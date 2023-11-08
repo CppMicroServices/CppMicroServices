@@ -19,7 +19,7 @@
 #include <boost/mpl/list/aux_/item.hpp>
 #include <boost/mpl/list/aux_/tag.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<>
 struct push_front_impl< aux::list_tag >

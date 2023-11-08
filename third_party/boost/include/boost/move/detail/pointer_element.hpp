@@ -23,7 +23,7 @@
 #include <boost/move/detail/workaround.hpp>
 #endif   //BOOST_MOVE_DETAIL_WORKAROUND_HPP
 
-namespace cppmsboost {
+namespace boost {
 namespace movelib {
 namespace detail{
 
@@ -147,7 +147,7 @@ struct pointer_element_impl
 template<class Ptr>
 struct pointer_element_impl<Ptr, false>
 {
-   typedef typename cppmsboost::movelib::detail::first_param<Ptr>::type type;
+   typedef typename boost::movelib::detail::first_param<Ptr>::type type;
 };
 
 }  //namespace detail{
@@ -155,7 +155,7 @@ struct pointer_element_impl<Ptr, false>
 template <typename Ptr>
 struct pointer_element
 {
-   typedef typename ::cppmsboost::movelib::detail::pointer_element_impl<Ptr>::type type;
+   typedef typename ::boost::movelib::detail::pointer_element_impl<Ptr>::type type;
 };
 
 template <typename T>
@@ -163,6 +163,6 @@ struct pointer_element<T*>
 {  typedef T type; };
 
 }  //namespace movelib {
-}  //namespace cppmsboost {
+}  //namespace boost {
 
 #endif // defined(BOOST_MOVE_DETAIL_POINTER_ELEMENT_HPP)

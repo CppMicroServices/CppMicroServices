@@ -25,7 +25,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -40,13 +40,13 @@ void win_iocp_serial_port_service::shutdown()
 {
 }
 
-cppmsboost::system::error_code win_iocp_serial_port_service::open(
+boost::system::error_code win_iocp_serial_port_service::open(
     win_iocp_serial_port_service::implementation_type& impl,
-    const std::string& device, cppmsboost::system::error_code& ec)
+    const std::string& device, boost::system::error_code& ec)
 {
   if (is_open(impl))
   {
-    ec = cppmsboost::asio::error::already_open;
+    ec = boost::asio::error::already_open;
     return ec;
   }
 
@@ -60,8 +60,8 @@ cppmsboost::system::error_code win_iocp_serial_port_service::open(
   if (handle == INVALID_HANDLE_VALUE)
   {
     DWORD last_error = ::GetLastError();
-    ec = cppmsboost::system::error_code(last_error,
-        cppmsboost::asio::error::get_system_category());
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
     return ec;
   }
 
@@ -74,8 +74,8 @@ cppmsboost::system::error_code win_iocp_serial_port_service::open(
   {
     DWORD last_error = ::GetLastError();
     ::CloseHandle(handle);
-    ec = cppmsboost::system::error_code(last_error,
-        cppmsboost::asio::error::get_system_category());
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
     return ec;
   }
 
@@ -100,8 +100,8 @@ cppmsboost::system::error_code win_iocp_serial_port_service::open(
   {
     DWORD last_error = ::GetLastError();
     ::CloseHandle(handle);
-    ec = cppmsboost::system::error_code(last_error,
-        cppmsboost::asio::error::get_system_category());
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
     return ec;
   }
 
@@ -118,8 +118,8 @@ cppmsboost::system::error_code win_iocp_serial_port_service::open(
   {
     DWORD last_error = ::GetLastError();
     ::CloseHandle(handle);
-    ec = cppmsboost::system::error_code(last_error,
-        cppmsboost::asio::error::get_system_category());
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
     return ec;
   }
 
@@ -129,10 +129,10 @@ cppmsboost::system::error_code win_iocp_serial_port_service::open(
   return ec;
 }
 
-cppmsboost::system::error_code win_iocp_serial_port_service::do_set_option(
+boost::system::error_code win_iocp_serial_port_service::do_set_option(
     win_iocp_serial_port_service::implementation_type& impl,
     win_iocp_serial_port_service::store_function_type store,
-    const void* option, cppmsboost::system::error_code& ec)
+    const void* option, boost::system::error_code& ec)
 {
   using namespace std; // For memcpy.
 
@@ -142,8 +142,8 @@ cppmsboost::system::error_code win_iocp_serial_port_service::do_set_option(
   if (!::GetCommState(handle_service_.native_handle(impl), &dcb))
   {
     DWORD last_error = ::GetLastError();
-    ec = cppmsboost::system::error_code(last_error,
-        cppmsboost::asio::error::get_system_category());
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
     return ec;
   }
 
@@ -153,19 +153,19 @@ cppmsboost::system::error_code win_iocp_serial_port_service::do_set_option(
   if (!::SetCommState(handle_service_.native_handle(impl), &dcb))
   {
     DWORD last_error = ::GetLastError();
-    ec = cppmsboost::system::error_code(last_error,
-        cppmsboost::asio::error::get_system_category());
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
     return ec;
   }
 
-  ec = cppmsboost::system::error_code();
+  ec = boost::system::error_code();
   return ec;
 }
 
-cppmsboost::system::error_code win_iocp_serial_port_service::do_get_option(
+boost::system::error_code win_iocp_serial_port_service::do_get_option(
     const win_iocp_serial_port_service::implementation_type& impl,
     win_iocp_serial_port_service::load_function_type load,
-    void* option, cppmsboost::system::error_code& ec) const
+    void* option, boost::system::error_code& ec) const
 {
   using namespace std; // For memset.
 
@@ -175,8 +175,8 @@ cppmsboost::system::error_code win_iocp_serial_port_service::do_get_option(
   if (!::GetCommState(handle_service_.native_handle(impl), &dcb))
   {
     DWORD last_error = ::GetLastError();
-    ec = cppmsboost::system::error_code(last_error,
-        cppmsboost::asio::error::get_system_category());
+    ec = boost::system::error_code(last_error,
+        boost::asio::error::get_system_category());
     return ec;
   }
 
@@ -185,7 +185,7 @@ cppmsboost::system::error_code win_iocp_serial_port_service::do_get_option(
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

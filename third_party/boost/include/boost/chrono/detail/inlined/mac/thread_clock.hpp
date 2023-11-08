@@ -19,7 +19,7 @@
 # include <pthread.h>
 # include <mach/thread_act.h>
 
-namespace cppmsboost { namespace chrono {
+namespace boost { namespace chrono {
 
     thread_clock::time_point thread_clock::now( ) BOOST_NOEXCEPT
     {
@@ -58,21 +58,21 @@ namespace cppmsboost { namespace chrono {
         mach_msg_type_number_t count = THREAD_BASIC_INFO_COUNT;
         if ( thread_info(port, THREAD_BASIC_INFO, (thread_info_t)&info, &count) != KERN_SUCCESS )
         {
-            if (::cppmsboost::chrono::is_throws(ec))
+            if (::boost::chrono::is_throws(ec))
             {
-                cppmsboost::throw_exception(
+                boost::throw_exception(
                         system::system_error(
                                 EINVAL,
-                                ::cppmsboost::system::system_category(),
+                                ::boost::system::system_category(),
                                 "chrono::thread_clock" ));
             }
             else
             {
-                ec.assign( errno, ::cppmsboost::system::system_category() );
+                ec.assign( errno, ::boost::system::system_category() );
                 return time_point();
             }
         }
-        if (!::cppmsboost::chrono::is_throws(ec))
+        if (!::boost::chrono::is_throws(ec))
         {
             ec.clear();
         }

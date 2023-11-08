@@ -242,6 +242,10 @@ namespace cppmicroservices
          * <p>
          * This implementation calls GetService() to determine if a service
          * is being tracked.
+         * 
+         * @throws std::logic_error If the <code>BundleContext</code>
+         *         with which this <code>ServiceTracker</code> was created is no
+         *         longer valid or became invalid while waiting on Service.
          *
          * @return The result of GetService().
          */
@@ -265,6 +269,9 @@ namespace cppmicroservices
          * @param rel_time The relative time duration to wait for a service. If
          *        zero, the method will wait indefinitely.
          * @throws std::invalid_argument exception if \c rel_time is negative.
+         * @throws std::logic_error If the <code>BundleContext</code>
+         *         with which this <code>ServiceTracker</code> was created is no
+         *         longer valid or became invalid while waiting on Service.
          * @return The result of GetService().
          */
         template <class Rep, class Period>

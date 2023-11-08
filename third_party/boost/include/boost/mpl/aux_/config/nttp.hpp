@@ -26,7 +26,7 @@
 //
 //    void foo(std::string<char>);
 //
-//    namespace cppmsboost { namespace mpl {
+//    namespace boost { namespace mpl {
 //    template< int > struct arg;
 //    }}
 

@@ -22,7 +22,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace ssl {
 namespace detail {
@@ -37,11 +37,11 @@ public:
   }
 
   engine::want operator()(engine& eng,
-      cppmsboost::system::error_code& ec,
+      boost::system::error_code& ec,
       std::size_t& bytes_transferred) const
   {
-    cppmsboost::asio::mutable_buffer buffer =
-      cppmsboost::asio::detail::buffer_sequence_adapter<cppmsboost::asio::mutable_buffer,
+    boost::asio::mutable_buffer buffer =
+      boost::asio::detail::buffer_sequence_adapter<boost::asio::mutable_buffer,
         MutableBufferSequence>::first(buffers_);
 
     return eng.read(buffer, ec, bytes_transferred);
@@ -49,7 +49,7 @@ public:
 
   template <typename Handler>
   void call_handler(Handler& handler,
-      const cppmsboost::system::error_code& ec,
+      const boost::system::error_code& ec,
       const std::size_t& bytes_transferred) const
   {
     handler(ec, bytes_transferred);
@@ -62,7 +62,7 @@ private:
 } // namespace detail
 } // namespace ssl
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

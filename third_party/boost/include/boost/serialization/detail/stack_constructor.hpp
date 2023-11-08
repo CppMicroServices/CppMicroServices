@@ -19,7 +19,7 @@
 #include <boost/aligned_storage.hpp>
 #include <boost/serialization/serialization.hpp>
 
-namespace cppmsboost{
+namespace boost{
 namespace serialization {
 namespace detail {
 
@@ -35,9 +35,9 @@ struct stack_allocate
         return * address();
     }
 private:
-    typedef typename cppmsboost::aligned_storage<
+    typedef typename boost::aligned_storage<
         sizeof(T),
-        cppmsboost::alignment_of<T>::value
+        boost::alignment_of<T>::value
     > type;
     type storage_;
 };
@@ -48,7 +48,7 @@ struct stack_construct : public stack_allocate<T>
 {
     stack_construct(Archive & ar, const unsigned int version){
         // note borland emits a no-op without the explicit namespace
-        cppmsboost::serialization::load_construct_data_adl(
+        boost::serialization::load_construct_data_adl(
             ar,
             this->address(),
             version

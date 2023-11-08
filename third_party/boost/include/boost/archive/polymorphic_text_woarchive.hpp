@@ -24,7 +24,7 @@
 #include <boost/archive/text_woarchive.hpp>
 #include <boost/archive/detail/polymorphic_oarchive_route.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace archive {
 
 class BOOST_SYMBOL_VISIBLE polymorphic_text_woarchive :
@@ -38,11 +38,11 @@ public:
 };
 
 } // namespace archive
-} // namespace cppmsboost
+} // namespace boost
 
 // required by export
 BOOST_SERIALIZATION_REGISTER_ARCHIVE(
-    cppmsboost::archive::polymorphic_text_woarchive
+    boost::archive::polymorphic_text_woarchive
 )
 
 #endif // BOOST_NO_STD_WSTREAMBUF

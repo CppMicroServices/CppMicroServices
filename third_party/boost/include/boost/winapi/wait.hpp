@@ -20,50 +20,50 @@
 extern "C" {
 
 #if BOOST_WINAPI_PARTITION_APP || BOOST_WINAPI_PARTITION_SYSTEM
-BOOST_SYMBOL_IMPORT cppmsboost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT boost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
 WaitForSingleObjectEx(
-    cppmsboost::winapi::HANDLE_ hHandle,
-    cppmsboost::winapi::DWORD_ dwMilliseconds,
-    cppmsboost::winapi::BOOL_ bAlertable);
+    boost::winapi::HANDLE_ hHandle,
+    boost::winapi::DWORD_ dwMilliseconds,
+    boost::winapi::BOOL_ bAlertable);
 #endif
 
 #if BOOST_WINAPI_PARTITION_DESKTOP || BOOST_WINAPI_PARTITION_SYSTEM
 #if BOOST_USE_WINAPI_VERSION >= BOOST_WINAPI_VERSION_NT4
-BOOST_SYMBOL_IMPORT cppmsboost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT boost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
 SignalObjectAndWait(
-    cppmsboost::winapi::HANDLE_ hObjectToSignal,
-    cppmsboost::winapi::HANDLE_ hObjectToWaitOn,
-    cppmsboost::winapi::DWORD_ dwMilliseconds,
-    cppmsboost::winapi::BOOL_ bAlertable);
+    boost::winapi::HANDLE_ hObjectToSignal,
+    boost::winapi::HANDLE_ hObjectToWaitOn,
+    boost::winapi::DWORD_ dwMilliseconds,
+    boost::winapi::BOOL_ bAlertable);
 #endif
 #endif
 
 #if BOOST_WINAPI_PARTITION_APP_SYSTEM
-BOOST_SYMBOL_IMPORT cppmsboost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT boost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
 WaitForSingleObject(
-    cppmsboost::winapi::HANDLE_ hHandle,
-    cppmsboost::winapi::DWORD_ dwMilliseconds);
+    boost::winapi::HANDLE_ hHandle,
+    boost::winapi::DWORD_ dwMilliseconds);
 
-BOOST_SYMBOL_IMPORT cppmsboost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT boost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
 WaitForMultipleObjects(
-    cppmsboost::winapi::DWORD_ nCount,
-    cppmsboost::winapi::HANDLE_ const* lpHandles,
-    cppmsboost::winapi::BOOL_ bWaitAll,
-    cppmsboost::winapi::DWORD_ dwMilliseconds);
+    boost::winapi::DWORD_ nCount,
+    boost::winapi::HANDLE_ const* lpHandles,
+    boost::winapi::BOOL_ bWaitAll,
+    boost::winapi::DWORD_ dwMilliseconds);
 
-BOOST_SYMBOL_IMPORT cppmsboost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
+BOOST_SYMBOL_IMPORT boost::winapi::DWORD_ BOOST_WINAPI_WINAPI_CC
 WaitForMultipleObjectsEx(
-    cppmsboost::winapi::DWORD_ nCount,
-    cppmsboost::winapi::HANDLE_ const* lpHandles,
-    cppmsboost::winapi::BOOL_ bWaitAll,
-    cppmsboost::winapi::DWORD_ dwMilliseconds,
-    cppmsboost::winapi::BOOL_ bAlertable);
+    boost::winapi::DWORD_ nCount,
+    boost::winapi::HANDLE_ const* lpHandles,
+    boost::winapi::BOOL_ bWaitAll,
+    boost::winapi::DWORD_ dwMilliseconds,
+    boost::winapi::BOOL_ bAlertable);
 #endif // BOOST_WINAPI_PARTITION_APP_SYSTEM
 
 } // extern "C"
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace winapi {
 
 #if BOOST_WINAPI_PARTITION_APP || BOOST_WINAPI_PARTITION_SYSTEM

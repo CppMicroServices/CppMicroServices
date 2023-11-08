@@ -14,7 +14,7 @@
 #include "boost/date_time/posix_time/posix_time_types.hpp"
 
  
-namespace cppmsboost {
+namespace boost {
 
 namespace posix_time {
 

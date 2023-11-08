@@ -17,7 +17,7 @@
 #include <boost/mpl/O1_size_fwd.hpp>
 #include <boost/mpl/list/aux_/tag.hpp>
 
-namespace cppmsboost { namespace mpl {
+namespace boost { namespace mpl {
 
 template<>
 struct O1_size_impl< aux::list_tag >

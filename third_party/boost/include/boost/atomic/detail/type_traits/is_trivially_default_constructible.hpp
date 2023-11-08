@@ -25,7 +25,7 @@
 #pragma once
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace atomics {
 namespace detail {
 
@@ -33,14 +33,14 @@ namespace detail {
 using std::is_trivially_default_constructible;
 #elif !defined(BOOST_NO_CXX11_TEMPLATE_ALIASES)
 template< typename T >
-using is_trivially_default_constructible = cppmsboost::has_trivial_constructor< T >;
+using is_trivially_default_constructible = boost::has_trivial_constructor< T >;
 #else
 template< typename T >
-struct is_trivially_default_constructible : public cppmsboost::has_trivial_constructor< T > {};
+struct is_trivially_default_constructible : public boost::has_trivial_constructor< T > {};
 #endif
 
 } // namespace detail
 } // namespace atomics
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ATOMIC_DETAIL_TYPE_TRAITS_IS_TRIVIALLY_DEFAULT_CONSTRUCTIBLE_HPP_INCLUDED_

@@ -35,7 +35,7 @@
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/identity.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace serialization {
 
 template<class T>
@@ -43,7 +43,7 @@ template<class T>
 //  - POD or object semantic (cannot be reference, function, ...)
 //  - copy constructor
 //  - operator = (no-throw one preferred)
-class state_saver : private cppmsboost::noncopyable
+class state_saver : private boost::noncopyable
 {
 private:
     const T previous_value;

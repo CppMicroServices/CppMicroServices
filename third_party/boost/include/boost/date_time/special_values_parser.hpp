@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-namespace cppmsboost { namespace date_time {
+namespace boost { namespace date_time {
 
   //! Class for special_value parsing 
   /*! 

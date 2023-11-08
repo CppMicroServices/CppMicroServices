@@ -24,7 +24,7 @@
 #pragma once
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace atomics {
 namespace detail {
 namespace lock_pool {
@@ -58,6 +58,6 @@ public:
 } // namespace lock_pool
 } // namespace detail
 } // namespace atomics
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_ATOMIC_DETAIL_LOCK_POOL_HPP_INCLUDED_

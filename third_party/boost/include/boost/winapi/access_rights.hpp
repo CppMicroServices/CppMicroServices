@@ -14,7 +14,7 @@
 #pragma once
 #endif
 
-namespace cppmsboost {
+namespace boost {
 namespace winapi {
 
 #if defined( BOOST_USE_WINDOWS_H )

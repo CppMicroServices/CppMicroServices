@@ -17,7 +17,7 @@
 
 #include <boost/config.hpp>
 
-namespace cppmsboost
+namespace boost
 {
 
 namespace detail
@@ -47,6 +47,6 @@ template< class T > T&& sp_forward( T & t ) BOOST_NOEXCEPT
 
 } // namespace detail
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif  // #ifndef BOOST_SMART_PTR_DETAIL_SP_FORWARD_HPP_INCLUDED

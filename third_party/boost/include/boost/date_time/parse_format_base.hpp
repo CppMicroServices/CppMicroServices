@@ -9,7 +9,7 @@
  * $Date$
  */
 
-namespace cppmsboost {
+namespace boost {
 namespace date_time {
 
   //! Enum for distinguishing parsing and formatting options

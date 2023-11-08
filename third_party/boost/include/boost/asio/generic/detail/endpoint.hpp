@@ -22,7 +22,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace generic {
 namespace detail {
@@ -68,13 +68,13 @@ public:
   }
 
   // Get the underlying endpoint in the native type.
-  cppmsboost::asio::detail::socket_addr_type* data()
+  boost::asio::detail::socket_addr_type* data()
   {
     return &data_.base;
   }
 
   // Get the underlying endpoint in the native type.
-  const cppmsboost::asio::detail::socket_addr_type* data() const
+  const boost::asio::detail::socket_addr_type* data() const
   {
     return &data_.base;
   }
@@ -91,7 +91,7 @@ public:
   // Get the capacity of the endpoint in the native type.
   std::size_t capacity() const
   {
-    return sizeof(cppmsboost::asio::detail::sockaddr_storage_type);
+    return sizeof(boost::asio::detail::sockaddr_storage_type);
   }
 
   // Compare two endpoints for equality.
@@ -106,8 +106,8 @@ private:
   // The underlying socket address.
   union data_union
   {
-    cppmsboost::asio::detail::socket_addr_type base;
-    cppmsboost::asio::detail::sockaddr_storage_type generic;
+    boost::asio::detail::socket_addr_type base;
+    boost::asio::detail::sockaddr_storage_type generic;
   } data_;
 
   // The length of the socket address stored in the endpoint.
@@ -124,7 +124,7 @@ private:
 } // namespace detail
 } // namespace generic
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

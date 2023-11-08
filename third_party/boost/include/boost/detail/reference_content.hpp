@@ -18,7 +18,7 @@
 #   include "boost/type_traits/integral_constant.hpp"
 #   include "boost/type_traits/has_nothrow_copy.hpp"
 
-namespace cppmsboost {
+namespace boost {
 
 namespace detail {
 
@@ -108,13 +108,13 @@ struct make_reference_content< void_type >
 
 template <typename T>
 struct has_nothrow_copy<
-      ::cppmsboost::detail::reference_content< T& >
+      ::boost::detail::reference_content< T& >
     >
-    : cppmsboost::true_type
+    : boost::true_type
 {
 };
 
 
-} // namespace cppmsboost
+} // namespace boost
 
 #endif // BOOST_DETAIL_REFERENCE_CONTENT_HPP

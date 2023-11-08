@@ -22,7 +22,7 @@
 
 #include <boost/asio/detail/push_options.hpp>
 
-namespace cppmsboost {
+namespace boost {
 namespace asio {
 namespace detail {
 
@@ -63,7 +63,7 @@ void service_registry::notify_fork(execution_context::fork_event fork_ev)
   // back into this class.
   std::vector<execution_context::service*> services;
   {
-    cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
+    boost::asio::detail::mutex::scoped_lock lock(mutex_);
     execution_context::service* service = first_service_;
     while (service)
     {
@@ -114,7 +114,7 @@ execution_context::service* service_registry::do_use_service(
     const execution_context::service::key& key,
     factory_type factory, void* owner)
 {
-  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
+  boost::asio::detail::mutex::scoped_lock lock(mutex_);
 
   // First see if there is an existing service object with the given key.
   execution_context::service* service = first_service_;
@@ -155,16 +155,16 @@ void service_registry::do_add_service(
     execution_context::service* new_service)
 {
   if (&owner_ != &new_service->context())
-    cppmsboost::asio::detail::throw_exception(invalid_service_owner());
+    boost::asio::detail::throw_exception(invalid_service_owner());
 
-  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
+  boost::asio::detail::mutex::scoped_lock lock(mutex_);
 
   // Check if there is an existing service object with the given key.
   execution_context::service* service = first_service_;
   while (service)
   {
     if (keys_match(service->key_, key))
-      cppmsboost::asio::detail::throw_exception(service_already_exists());
+      boost::asio::detail::throw_exception(service_already_exists());
     service = service->next_;
   }
 
@@ -177,7 +177,7 @@ void service_registry::do_add_service(
 bool service_registry::do_has_service(
     const execution_context::service::key& key) const
 {
-  cppmsboost::asio::detail::mutex::scoped_lock lock(mutex_);
+  boost::asio::detail::mutex::scoped_lock lock(mutex_);
 
   execution_context::service* service = first_service_;
   while (service)
@@ -192,7 +192,7 @@ bool service_registry::do_has_service(
 
 } // namespace detail
 } // namespace asio
-} // namespace cppmsboost
+} // namespace boost
 
 #include <boost/asio/detail/pop_options.hpp>
 

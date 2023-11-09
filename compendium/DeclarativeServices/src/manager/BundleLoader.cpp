@@ -142,14 +142,13 @@ namespace cppmicroservices
                                 "Finished loading shared library for Bundle #" + ToString(fromBundle.GetBundleId())
                                     + " (location=" + bundleLoc + ")");
 
-                    std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + fromBundle.GetSymbolicName();
-                    SetBundleContextHook hook;
+                    std::string set_bundle_context_func = US_STR(US_SET_PUBLIC_CTX_PREFIX) + fromBundle.GetSymbolicName();
+                    SetBundleContextPublicHook hook;
                     std::string set_bundle_context_err;
                     util::GetSymbol(hook, sh.GetHandle(), set_bundle_context_func, set_bundle_context_err);
                     if (hook)
                     {
-                        BundleContext* ctx_copy = new BundleContext(fromBundle.GetBundleContext());
-                        hook(ctx_copy);
+                        hook(ctx.NewBundleContext());
                     }
                     else
                     {

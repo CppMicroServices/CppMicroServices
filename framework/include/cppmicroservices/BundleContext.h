@@ -126,6 +126,11 @@ namespace cppmicroservices
         BundleContext(const BundleContext& o);
 
         /**
+         * Allocates a new %BundleContext object that is a copy of an existing one.
+         */
+        BundleContext* NewBundleContext();
+
+        /**
          * Compares this \c BundleContext object with the specified
          * bundle context.
          *
@@ -1126,7 +1131,6 @@ namespace cppmicroservices
       private:
         friend US_Framework_EXPORT BundleContext MakeBundleContext(BundleContextPrivate*);
         friend BundleContext MakeBundleContext(std::shared_ptr<BundleContextPrivate> const&);
-        friend BundleContext* MakeNewBundleContext(std::shared_ptr<BundleContextPrivate> const& d);
         friend std::shared_ptr<BundleContextPrivate> GetPrivate(BundleContext const&);
 
         BundleContext(std::shared_ptr<BundleContextPrivate> ctx);

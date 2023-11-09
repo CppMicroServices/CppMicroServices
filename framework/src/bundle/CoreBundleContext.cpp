@@ -165,7 +165,7 @@ namespace cppmicroservices
         }
 
         systemBundle->InitSystemBundle();
-        US_SET_CTX_FUNC(system_bundle)(MakeNewBundleContext(systemBundle->bundleContext.Load()));
+        US_SET_CTX_FUNC(system_bundle)(systemBundle->bundleContext.Load().get());
 
         bundleRegistry.Init();
 

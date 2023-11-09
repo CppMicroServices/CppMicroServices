@@ -54,12 +54,6 @@ namespace cppmicroservices
         return BundleContext(d);
     }
 
-    BundleContext*
-    MakeNewBundleContext(std::shared_ptr<BundleContextPrivate> const& d)
-    {
-        return new BundleContext(d);
-    }
-
     std::shared_ptr<BundleContextPrivate>
     GetPrivate(BundleContext const& c)
     {

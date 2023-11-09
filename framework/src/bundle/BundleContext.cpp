@@ -60,7 +60,11 @@ namespace cppmicroservices
 
     BundleContext::BundleContext() = default;
 
-    BundleContext::BundleContext(const BundleContext& o) : d(o.d) {}
+    BundleContext*
+    BundleContext::NewBundleContext()
+    {
+        return new BundleContext(this->d);
+    }
 
     bool
     BundleContext::operator==(BundleContext const& rhs) const

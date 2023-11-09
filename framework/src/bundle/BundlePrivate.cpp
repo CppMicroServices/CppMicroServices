@@ -539,7 +539,7 @@ namespace cppmicroservices
 
                 if (SetBundleContext)
                 {
-                    SetBundleContext(MakeNewBundleContext(ctx));
+                    SetBundleContext(ctx.get());
                 }
                 else
                 {

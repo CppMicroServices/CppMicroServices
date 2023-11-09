@@ -269,7 +269,7 @@ namespace cppmicroservices
          */
         SharedLibrary lib;
 
-        SetBundleContextHook SetBundleContext;
+        SetBundleContextPrivateHook SetBundleContext;
     };
 
     Bundle MakeBundle(std::shared_ptr<BundlePrivate> const& d);

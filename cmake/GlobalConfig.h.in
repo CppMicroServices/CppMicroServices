@@ -159,10 +159,12 @@ std::size_t operator()(const type& arg) const {
 
 #define US_GET_CTX_PREFIX _us_get_bundle_context_instance_
 #define US_SET_CTX_PREFIX _us_set_bundle_context_instance_
+#define US_SET_PUBLIC_CTX_PREFIX _us_set_public_bundle_context_instance_
 #define US_CTX_INS_PREFIX _us_bundle_context_instance_
 
 #define US_GET_CTX_FUNC(bsn) US_CONCAT(US_GET_CTX_PREFIX, bsn)
 #define US_SET_CTX_FUNC(bsn) US_CONCAT(US_SET_CTX_PREFIX, bsn)
+#define US_SET_PUBLIC_CTX_FUNC(bsn) US_CONCAT(US_SET_PUBLIC_CTX_PREFIX, bsn)
 #define US_CTX_INS(bsn) US_CONCAT(US_CTX_INS_PREFIX, bsn)
 
 #define US_CREATE_ACTIVATOR_PREFIX _us_create_activator_

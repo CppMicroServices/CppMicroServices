@@ -123,8 +123,6 @@ namespace cppmicroservices
          */
         BundleContext();
 
-        BundleContext(const BundleContext& o);
-
         /**
          * Allocates a new %BundleContext object that is a copy of an existing one.
          */

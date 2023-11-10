@@ -89,7 +89,7 @@ namespace cppmicroservices
     extern "C" US_ABI_EXPORT void US_SET_PUBLIC_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContext* ctx)  \
     {                                                                                                           \
         US_CTX_INS(US_BUNDLE_NAME).usingPubCtx = true;                                                          \
-        US_CTX_INS(US_BUNDLE_NAME).ctx = (BundleContextPrivate*)ctx;                                            \
+        US_CTX_INS(US_BUNDLE_NAME).ctx = (cppmicroservices::BundleContextPrivate*)ctx;                          \
     }
 
 #endif // CPPMICROSERVICES_BUNDLEINITIALIZATION_H_MACRO

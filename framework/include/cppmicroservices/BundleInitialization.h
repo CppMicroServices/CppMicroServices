@@ -31,10 +31,11 @@ namespace cppmicroservices
 {
     class BundleContext;
     class BundleContextPrivate;
-    // THIS IS NOT A TRANSFER OF OWNERSHIP. The pointed object must be kept alive for the lifetime
-    // of the bundle, and then destroyed. Avoid calling this twice with different values, as you
-    // could leak memory.
+    // THIS IS A TRANSFER OF OWNERSHIP. The pointed object will be deleted when the bundle is
+    // unloaded by the core framework.
     using SetBundleContextPublicHook = std::function<void(BundleContext*)>;
+    // THIS IS NOT A TRANSFER OF OWNERSHIP. The pointed object must be kept alive for the lifetime
+    // of the bundle, and then destroyed.
     using SetBundleContextPrivateHook = std::function<void(BundleContextPrivate*)>;
 }
 
@@ -44,6 +45,8 @@ namespace cppmicroservices
 #ifdef US_BUNDLE_NAME
 #ifndef CPPMICROSERVICES_BUNDLEINITIALIZATION_H_MACRO
 #define CPPMICROSERVICES_BUNDLEINITIALIZATION_H_MACRO
+
+#    include "cppmicroservices/BundleContext.h"
 
 /**
  * \ingroup MicroServices
@@ -66,31 +69,35 @@ namespace cppmicroservices
  *    :cmake:command:`usFunctionGenerateBundleInit`.
  * \endrststar
  */
-#define CPPMICROSERVICES_INITIALIZE_BUNDLE                                                                      \
-    struct {                                                                                                    \
-        bool usingPubCtx = false;                                                                               \
-        cppmicroservices::BundleContextPrivate* ctx = nullptr;                                                  \
-    } US_CTX_INS(US_BUNDLE_NAME);                                                                               \
-                                                                                                                \
-    extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)(bool* isPublic);         \
-    extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)(bool* isPublic)          \
-    {                                                                                                           \
-        *isPublic = US_CTX_INS(US_BUNDLE_NAME).usingPubCtx;                                                     \
-        return US_CTX_INS(US_BUNDLE_NAME).ctx;                                                                  \
-    }                                                                                                           \
-                                                                                                                \
-    extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContextPrivate* ctx); \
-    extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContextPrivate* ctx)  \
-    {                                                                                                           \
-        US_CTX_INS(US_BUNDLE_NAME).usingPubCtx = false;                                                         \
-        US_CTX_INS(US_BUNDLE_NAME).ctx = ctx;                                                                   \
-    }                                                                                                           \
-    extern "C" US_ABI_EXPORT void US_SET_PUBLIC_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContext* ctx); \
-    extern "C" US_ABI_EXPORT void US_SET_PUBLIC_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContext* ctx)  \
-    {                                                                                                           \
-        US_CTX_INS(US_BUNDLE_NAME).usingPubCtx = true;                                                          \
-        US_CTX_INS(US_BUNDLE_NAME).ctx = (cppmicroservices::BundleContextPrivate*)ctx;                          \
-    }
+#    define CPPMICROSERVICES_INITIALIZE_BUNDLE                                                                      \
+        struct {                                                                                                    \
+            bool usingPubCtx = false;                                                                               \
+            cppmicroservices::BundleContextPrivate* ctx = nullptr;                                                  \
+        } US_CTX_INS(US_BUNDLE_NAME);                                                                               \
+                                                                                                                    \
+        extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)(bool* isPublic);         \
+        extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)(bool* isPublic)          \
+        {                                                                                                           \
+            *isPublic = US_CTX_INS(US_BUNDLE_NAME).usingPubCtx;                                                     \
+            return US_CTX_INS(US_BUNDLE_NAME).ctx;                                                                  \
+        }                                                                                                           \
+                                                                                                                    \
+        extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContextPrivate* ctx); \
+        extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContextPrivate* ctx)  \
+        {                                                                                                           \
+            if (ctx == nullptr && US_CTX_INS(US_BUNDLE_NAME).usingPubCtx == true)                                   \
+            { /* CF is going to unload the bundle, but the ctx is in allocated memory */                            \
+                delete reinterpret_cast<cppmicroservices::BundleContext*>(US_CTX_INS(US_BUNDLE_NAME).ctx);          \
+            }                                                                                                       \
+            US_CTX_INS(US_BUNDLE_NAME).usingPubCtx = false;                                                         \
+            US_CTX_INS(US_BUNDLE_NAME).ctx = ctx;                                                                   \
+        }                                                                                                           \
+        extern "C" US_ABI_EXPORT void US_SET_PUBLIC_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContext* ctx); \
+        extern "C" US_ABI_EXPORT void US_SET_PUBLIC_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContext* ctx)  \
+        {                                                                                                           \
+            US_CTX_INS(US_BUNDLE_NAME).usingPubCtx = true;                                                          \
+            US_CTX_INS(US_BUNDLE_NAME).ctx = reinterpret_cast<cppmicroservices::BundleContextPrivate*>(ctx);        \
+        }
 
 #endif // CPPMICROSERVICES_BUNDLEINITIALIZATION_H_MACRO
 #endif // US_BUNDLE_NAME

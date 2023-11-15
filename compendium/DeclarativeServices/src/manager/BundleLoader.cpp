@@ -27,7 +27,6 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
-#include "cppmicroservices/util/BundleHandles.h"
 
 #include "BundleLoader.hpp"
 #include <regex>
@@ -143,19 +142,13 @@ namespace cppmicroservices
                                     + " (location=" + bundleLoc + ")");
 
                     std::string set_bundle_context_func = US_STR(US_SET_PUBLIC_CTX_PREFIX) + fromBundle.GetSymbolicName();
-                    SetBundleContextPublicHook set_bundle_context_handle;
+                    SetBundleContextPublicHook set_bundle_context;
                     std::string set_bundle_context_err;
-                    util::GetSymbol(set_bundle_context_handle,
-                                    sh.GetHandle(),
-                                    set_bundle_context_func,
-                                    set_bundle_context_err);
-                    if (set_bundle_context_handle)
+                    void* set_bundle_context_f = fromBundle.GetSymbol(sh.GetHandle(), set_bundle_context_func);
+                    set_bundle_context = reinterpret_cast<void (*)(BundleContext*)>(set_bundle_context_f);
+                    if (set_bundle_context)
                     {
-                        set_bundle_context_handle(ctx.NewBundleContext());
-                    }
-                    else
-                    {
-                        logger->Log(logservice::SeverityLevel::LOG_WARNING, set_bundle_context_err);
+                        set_bundle_context(ctx.NewBundleContext());
                     }
 
                 }

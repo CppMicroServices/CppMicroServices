@@ -20,7 +20,7 @@
 
 =============================================================================*/
 
-#include "cppmicroservices/util/BundleHandles.h"
+#include "BundleUtils.h"
 #include <cppmicroservices/GlobalConfig.h>
 
 #ifdef US_PLATFORM_WINDOWS
@@ -74,7 +74,7 @@ dlsym(void* handle, char const* symbol)
 namespace cppmicroservices
 {
 
-    namespace util
+    namespace BundleUtils
     {
 
         void*
@@ -91,12 +91,12 @@ namespace cppmicroservices
             if (!addr)
             {
                 const std::string dlerrorMsg = dlerror();
-                errmsg += "GetSymbol() failed to find (" + std::string{symbol} +
-                    ") with error : " + (!dlerrorMsg.empty() ? dlerrorMsg : "unknown");
+                errmsg += "GetSymbol() failed to find (" + std::string { symbol }
+                          + ") with error : " + (!dlerrorMsg.empty() ? dlerrorMsg : "unknown");
             }
             return addr;
         }
 
-    } // namespace util
+    } // namespace BundleUtils
 
 } // namespace cppmicroservices

@@ -27,11 +27,11 @@
 #include "cppmicroservices/FrameworkConfig.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/SharedLibrary.h"
-#include "cppmicroservices/util/BundleHandles.h"
 
 #include "BundleArchive.h"
 #include "BundleContextPrivate.h"
 #include "BundlePrivate.h"
+#include "BundleUtils.h"
 #include "CoreBundleContext.h"
 #include "Resolver.h"
 #include "Utils.h"
@@ -358,7 +358,7 @@ namespace cppmicroservices
 
         // Utility function that fetches the symbol or nullptr
         std::string errmsg;
-        void* symbol = util::GetSymbol(handle, symname.c_str(), errmsg);
+        void* symbol = BundleUtils::GetSymbol(handle, symname.c_str(), errmsg);
         if (!symbol)
         {
             d->coreCtx->logger->Log(logservice::SeverityLevel::LOG_WARNING, errmsg);

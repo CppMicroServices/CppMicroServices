@@ -30,7 +30,7 @@
 namespace cppmicroservices
 {
 
-    namespace util
+    namespace BundleUtils
     {
         // returns the handle to the current executable
         void* GetExecutableHandle();
@@ -46,7 +46,7 @@ namespace cppmicroservices
             fptr = reinterpret_cast<T*>(f);
         }
 
-    } // namespace util
+    } // namespace BundleUtils
 
 } // namespace cppmicroservices
 

@@ -124,7 +124,11 @@ namespace cppmicroservices
         BundleContext();
 
         /**
-         * Allocates a new %BundleContext object that is a copy of an existing one.
+         * Allocates a new \c BundleContext object that is a copy of an existing one.
+         *
+         * You should not need to use this function. \c BundleContext objects
+         * are only ever used by reference inside Declarative Services during
+         * bundle initialization. Pass by value instead.
          */
         BundleContext* NewBundleContext();
 

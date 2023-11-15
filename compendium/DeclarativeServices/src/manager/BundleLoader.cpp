@@ -143,12 +143,15 @@ namespace cppmicroservices
                                     + " (location=" + bundleLoc + ")");
 
                     std::string set_bundle_context_func = US_STR(US_SET_PUBLIC_CTX_PREFIX) + fromBundle.GetSymbolicName();
-                    SetBundleContextPublicHook hook;
+                    SetBundleContextPublicHook set_bundle_context_handle;
                     std::string set_bundle_context_err;
-                    util::GetSymbol(hook, sh.GetHandle(), set_bundle_context_func, set_bundle_context_err);
-                    if (hook)
+                    util::GetSymbol(set_bundle_context_handle,
+                                    sh.GetHandle(),
+                                    set_bundle_context_func,
+                                    set_bundle_context_err);
+                    if (set_bundle_context_handle)
                     {
-                        hook(ctx.NewBundleContext());
+                        set_bundle_context_handle(ctx.NewBundleContext());
                     }
                     else
                     {

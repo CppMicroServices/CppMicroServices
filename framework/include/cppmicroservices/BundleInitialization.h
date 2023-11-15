@@ -31,11 +31,23 @@ namespace cppmicroservices
 {
     class BundleContext;
     class BundleContextPrivate;
-    // THIS IS A TRANSFER OF OWNERSHIP. The pointed object will be deleted when the bundle is
-    // unloaded by the core framework.
+    /**
+     * The public interface for a bundle's context setter function. This is used by Declarative
+     * Services when loading a new bundle. Function definition is inside the
+     * \c CPPMICROSERVICES_INITIALIZE_BUNDLE macro.
+     *
+     * @note THIS IS A TRANSFER OF OWNERSHIP. The pointed object will be deleted when the bundle is
+     * unloaded by the core framework.
+     */
     using SetBundleContextPublicHook = std::function<void(BundleContext*)>;
-    // THIS IS NOT A TRANSFER OF OWNERSHIP. The pointed object must be kept alive for the lifetime
-    // of the bundle, and then destroyed.
+    /**
+     * The interface for a bundle's private context setter function. This is used by the Core
+     * Framework when loading a new bundle. Function definition is inside the
+     * \c CPPMICROSERVICES_INITIALIZE_BUNDLE macro.
+     *
+     * @note THIS IS NOT A TRANSFER OF OWNERSHIP. The pointed object must be kept alive for the
+     * lifetime of the bundle, and then destroyed.
+     */
     using SetBundleContextPrivateHook = std::function<void(BundleContextPrivate*)>;
 }
 

@@ -54,7 +54,7 @@ namespace cppmicroservices
         return BundleContext(d);
     }
 
-    std::shared_ptr<BundleContextPrivate>
+    US_Framework_EXPORT std::shared_ptr<BundleContextPrivate>
     GetPrivate(BundleContext const& c)
     {
         return c.d;

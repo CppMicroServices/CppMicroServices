@@ -30,7 +30,7 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/BundleInitialization.h"
 
-extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)(bool* isPublic);
+extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)(void);
 
 namespace cppmicroservices
 {
@@ -53,20 +53,8 @@ namespace cppmicroservices
     static inline BundleContext
     GetBundleContext()
     {
-        bool isPublic;
-        BundleContextPrivate* ctx = US_GET_CTX_FUNC(US_BUNDLE_NAME)(&isPublic);
-        if (!ctx)
-        {
-            return BundleContext();
-        }
-        else if (isPublic)
-        {
-            return *reinterpret_cast<BundleContext*>(ctx);
-        }
-        else
-        {
-            return detail::MakeBundleContext(ctx);
-        }
+        BundleContextPrivate* ctx = US_GET_CTX_FUNC(US_BUNDLE_NAME)();
+        return ctx ? detail::MakeBundleContext(ctx) : BundleContext();
     }
 } // namespace cppmicroservices
 

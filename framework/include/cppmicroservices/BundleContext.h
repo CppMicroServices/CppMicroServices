@@ -124,15 +124,6 @@ namespace cppmicroservices
         BundleContext();
 
         /**
-         * Allocates a new \c BundleContext object that is a copy of an existing one.
-         *
-         * You should not need to use this function. \c BundleContext objects
-         * are only ever used by reference inside Declarative Services during
-         * bundle initialization. Pass by value instead.
-         */
-        BundleContext* NewBundleContext();
-
-        /**
          * Compares this \c BundleContext object with the specified
          * bundle context.
          *
@@ -1133,7 +1124,7 @@ namespace cppmicroservices
       private:
         friend US_Framework_EXPORT BundleContext MakeBundleContext(BundleContextPrivate*);
         friend BundleContext MakeBundleContext(std::shared_ptr<BundleContextPrivate> const&);
-        friend std::shared_ptr<BundleContextPrivate> GetPrivate(BundleContext const&);
+        friend US_Framework_EXPORT std::shared_ptr<BundleContextPrivate> GetPrivate(BundleContext const&);
 
         BundleContext(std::shared_ptr<BundleContextPrivate> ctx);
         // allow templated code to use the internal logger

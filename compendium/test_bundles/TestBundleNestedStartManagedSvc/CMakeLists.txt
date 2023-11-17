@@ -1,6 +1,6 @@
 usFunctionCreateDSTestBundle(TestBundleNestedBundleStartManagedService)
 
-usFunctionCreateTestBundleWithResources(TestBundleNestedBundleStartManagedService USES_DS
+usFunctionCreateTestBundleWithResources(TestBundleNestedBundleStartManagedService
   SOURCES src/ManagedServiceImpl.cpp src/ManagedServiceFactoryImpl.cpp ${_glue_file}
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME TestBundleNestedBundleStartManagedService

@@ -1,6 +1,6 @@
 usFunctionCreateDSTestBundle(TestBindUnbindThrows)
 
-usFunctionCreateTestBundleWithResources(TestBindUnbindThrows USES_DS
+usFunctionCreateTestBundleWithResources(TestBindUnbindThrows
   SOURCES src/ServiceImpl.cpp ${_glue_file}
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME TestBindUnbindThrows

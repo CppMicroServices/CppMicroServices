@@ -1,6 +1,6 @@
 usFunctionCreateDSTestBundle(TestBundleDSDependentOptional)
 
-usFunctionCreateTestBundleWithResources(TestBundleDSDependentOptional USES_DS
+usFunctionCreateTestBundleWithResources(TestBundleDSDependentOptional
   SOURCES src/ServiceImpl.cpp ${_glue_file}
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME TestBundleDSDependentOptional

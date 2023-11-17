@@ -1,6 +1,6 @@
 usFunctionCreateDSTestBundle(DSGraph06)
 
-usFunctionCreateTestBundleWithResources(DSGraph06 USES_DS
+usFunctionCreateTestBundleWithResources(DSGraph06
   SOURCES src/ServiceImpl.cpp ${_glue_file}
   RESOURCES manifest.json
   BUNDLE_SYMBOLIC_NAME DSGraph06

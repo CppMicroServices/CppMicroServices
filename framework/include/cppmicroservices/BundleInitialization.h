@@ -20,13 +20,17 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_BUNDLEINITIALIZATION_H_TYPES
-#define CPPMICROSERVICES_BUNDLEINITIALIZATION_H_TYPES
+#ifndef US_BUNDLE_NAME
+#    error Missing US_BUNDLE_NAME preprocessor define
+#endif
 
-#include "cppmicroservices/GlobalConfig.h"
+#ifndef CPPMICROSERVICES_BUNDLEINITIALIZATION_H
+#    define CPPMICROSERVICES_BUNDLEINITIALIZATION_H
 
-#include <atomic>
-#include <functional>
+#    include "cppmicroservices/GlobalConfig.h"
+
+#    include <atomic>
+#    include <functional>
 
 namespace cppmicroservices
 {
@@ -41,15 +45,6 @@ namespace cppmicroservices
      */
     using SetBundleContextFn = std::function<void(BundleContextPrivate*)>;
 } // namespace cppmicroservices
-
-#endif // CPPMICROSERVICES_BUNDLEINITIALIZATION_H_TYPES
-
-// Header file may be included just for the hook data type
-#ifdef US_BUNDLE_NAME
-#ifndef CPPMICROSERVICES_BUNDLEINITIALIZATION_H_MACRO
-#define CPPMICROSERVICES_BUNDLEINITIALIZATION_H_MACRO
-
-#    include "cppmicroservices/BundleContext.h"
 
 /**
  * \ingroup MicroServices
@@ -87,5 +82,4 @@ namespace cppmicroservices
             US_CTX_INS(US_BUNDLE_NAME).store(ctx);                                                                   \
         }
 
-#endif // CPPMICROSERVICES_BUNDLEINITIALIZATION_H_MACRO
-#endif // US_BUNDLE_NAME
+#endif // CPPMICROSERVICES_BUNDLEINITIALIZATION_H

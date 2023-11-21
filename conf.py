@@ -90,7 +90,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'C++ Micro Services'
-copyright = u'2017-2021, CppMicroServices Contributors'
+copyright = u'2017-2023, CppMicroServices Contributors'
 author = u'CppMicroServices Team'
 
 # The version info for the project you're documenting, acts as replacement for

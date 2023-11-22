@@ -20,8 +20,8 @@
 
 =============================================================================*/
 
-#ifndef CPPMICROSERVICES_UTIL_BUNDLEHANDLES_H
-#define CPPMICROSERVICES_UTIL_BUNDLEHANDLES_H
+#ifndef CPPMICROSERVICES_BUNDLEUTILS_H
+#define CPPMICROSERVICES_BUNDLEUTILS_H
 
 #include <functional>
 #include <string>

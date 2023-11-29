@@ -571,7 +571,7 @@ else()
   endif()
 
   if(_have_visibility_c)
-    set(US_C_FLAGS "${US_C_FLAGS} -fvisibility=hidden")
+    set(US_C_FLAGS "${US_C_FLAGS} ${_have_visibility_c}")
   endif()
 
   usFunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)

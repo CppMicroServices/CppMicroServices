@@ -562,16 +562,12 @@ else()
     usFunctionCheckCompilerFlags("-fvisibility-ms-compat" _have_visibility)
   else()
     usFunctionCheckCompilerFlags("-fvisibility=hidden -fvisibility-inlines-hidden" _have_visibility)
-    usFunctionCheckCompilerFlags("-fvisibility=hidden" _have_visibility_c)
   endif()
 
   if(_have_visibility)
     set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
-  endif()
-
-  if(_have_visibility_c)
-    set(US_C_FLAGS "${US_C_FLAGS} ${_have_visibility_c}")
+    set(US_C_FLAGS "${US_C_FLAGS} -fvisibility=hidden")
   endif()
 
   usFunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)

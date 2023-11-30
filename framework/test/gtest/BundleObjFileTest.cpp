@@ -70,6 +70,22 @@ TEST(BundleObjFile, NonStandardBundleExt)
 #endif
 }
 
+/// <summary>
+/// Tests that cppmicroservices::BundleObjFactory().CreateBundleFileObj will throw for shared libraries
+/// which don't embed their metadata zip file via linker/windows resources.
+/// </summary>
+TEST(BundleObjFile, NoLinkTimeEmbeddedResourceZip) 
+{
+#if defined(US_BUILD_SHARED_LIBS)
+    std::string bundlePathWithAppendedResource(cppmicroservices::testing::LIB_PATH + cppmicroservices::util::DIR_SEP
+                                               + US_LIB_PREFIX + "TestBundleA" + US_LIB_POSTFIX + US_LIB_EXT);
+    ASSERT_TRUE(cppmicroservices::util::Exists(bundlePathWithAppendedResource))
+        << bundlePathWithAppendedResource + " should exist on disk.";
+    ASSERT_THROW(cppmicroservices::BundleObjFactory().CreateBundleFileObj(bundlePathWithAppendedResource),
+                 cppmicroservices::InvalidObjFileException);
+#endif
+}
+
 TEST(BundleObjFile, GetRawBundleResourceContainer)
 {
 #if defined(US_BUILD_SHARED_LIBS)

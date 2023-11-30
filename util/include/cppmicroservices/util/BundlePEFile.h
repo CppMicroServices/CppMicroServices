@@ -110,33 +110,25 @@ namespace cppmicroservices
             // RAII - automatically free the library handle on object destruction
             auto loadLibraryHandle = std::unique_ptr<HMODULE, hModuleDeleter>(hBundleResources, hModuleDeleter {});
             HRSRC hResource = FindResourceA(hBundleResources, "US_RESOURCES", MAKEINTRESOURCEA(300));
-            if (!hResource)
+            if (hResource)
             {
-                throw InvalidPEException("Failed to find embedded resource within " + location + ". Windows Error Message: "
-                                         + cppmicroservices::util::GetLastWin32ErrorStr());
+                HGLOBAL hRes = LoadResource(hBundleResources, hResource);
+                if (hRes)
+                {
+                    const LPVOID res = LockResource(hRes);
+                    if (res)
+                    {
+                        const DWORD zipSizeInBytes = SizeofResource(hBundleResources, hResource);
+                        if (0 < zipSizeInBytes)
+                        {
+                            m_rawData = std::make_shared<RawBundleResources>(
+                                std::make_unique<ResDataContainer>(std::move(loadLibraryHandle), res, zipSizeInBytes));
+                        }
+                    }
+                }
             }
 
-            HGLOBAL hRes = LoadResource(hBundleResources, hResource);
-            if (!hRes) 
-            {
-                throw InvalidPEException("Failed to access the embedded resource within " + location
-                                         + ". Windows Error Message: " + cppmicroservices::util::GetLastWin32ErrorStr());
-            }
-
-            const LPVOID res = LockResource(hRes);
-            if (!res)
-            {
-                throw InvalidPEException("LockResource failed to access the embedded resource within " + location
-                                         + ". Windows Error Message: "
-                                         + cppmicroservices::util::GetLastWin32ErrorStr());
-            }
-
-            const DWORD zipSizeInBytes = SizeofResource(hBundleResources, hResource);
-            if (0 < zipSizeInBytes)
-            {
-                m_rawData = std::make_shared<RawBundleResources>(
-                    std::make_unique<ResDataContainer>(std::move(loadLibraryHandle), res, zipSizeInBytes));
-            }
+            
         };
         ~BundlePEFile() = default;
 

@@ -166,7 +166,7 @@ namespace cppmicroservices
                 ociter* o;
                 uociter* uo;
                 uocciiter* uoci;
-            } it;
+            } it = { nullptr };
         };
 
         class US_Framework_EXPORT iter : public iterator_base
@@ -213,7 +213,7 @@ namespace cppmicroservices
                 oiter* o;
                 uoiter* uo;
                 uociiter* uoci;
-            } it;
+            } it = { nullptr };
         };
 
         using iterator = iter;

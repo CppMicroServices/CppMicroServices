@@ -19,40 +19,17 @@
   limitations under the License.
 
 =============================================================================*/
-
-#include "FrameworkTestActivator.h"
-
-#include "cppmicroservices/BundleImport.h"
-
-namespace cppmicroservices
+#ifndef _SERVICE_IMPL_HPP_
+#define _SERVICE_IMPL_HPP_
+#include "TestInterfaces/Interfaces.hpp"
+namespace sample
 {
-
-    FrameworkTestActivator* FrameworkTestActivator::m_Instance = nullptr;
-
-    FrameworkTestActivator::FrameworkTestActivator() : m_StartCalled(false) {}
-
-    bool
-    FrameworkTestActivator::StartCalled()
+    class ServiceComponent4 : public test::Interface1
     {
-        return m_Instance ? m_Instance->m_StartCalled : false;
-    }
+      public:
+        ~ServiceComponent4() override;
+        std::string Description() override;
+    };
+} // namespace sample
 
-    void
-    FrameworkTestActivator::Start(BundleContext)
-    {
-        this->m_Instance = this;
-        this->m_StartCalled = true;
-    }
-
-    void
-    FrameworkTestActivator::Stop(BundleContext)
-    {
-        this->m_Instance = nullptr;
-    }
-} // namespace cppmicroservices
-
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::FrameworkTestActivator)
-
-#ifndef US_BUILD_SHARED_LIBS
-CPPMICROSERVICES_IMPORT_BUNDLE(US_BUNDLE_NAME)
-#endif
+#endif // _SERVICE_IMPL_HPP_

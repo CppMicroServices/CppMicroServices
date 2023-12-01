@@ -128,7 +128,7 @@ namespace cppmicroservices
                                                                                        mockRegistry,
                                                                                        fakeLogger,
                                                                                        notifier);
-                 EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
+                EXPECT_EQ(fakeCompConfig->GetConfigState(), ComponentState::UNSATISFIED_REFERENCE);
                 EXPECT_EQ(fakeCompConfig->regManager, nullptr);
                 EXPECT_EQ(fakeCompConfig->referenceManagers.size(), static_cast<size_t>(0));
             });
@@ -147,9 +147,9 @@ namespace cppmicroservices
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
                                                                     asyncWorkService,
-                                                                    extRegistry); 
+                                                                    extRegistry);
             std::set<unsigned long> idSet;
-            const size_t iterCount = 10;
+            size_t const iterCount = 10;
             for (size_t i = 0; i < iterCount; ++i)
             {
                 EXPECT_NO_THROW({
@@ -201,7 +201,7 @@ namespace cppmicroservices
                                                                                    mockRegistry,
                                                                                    fakeLogger,
                                                                                    notifier);
-           EXPECT_CALL(*fakeCompConfig, GetFactory()).Times(1).WillOnce(testing::Return(mockFactory));
+            EXPECT_CALL(*fakeCompConfig, GetFactory()).Times(1).WillOnce(testing::Return(mockFactory));
             // add the mock reference managers to the config object
             fakeCompConfig->referenceManagers.insert(std::make_pair("ref1", refMgr1));
             fakeCompConfig->referenceManagers.insert(std::make_pair("ref2", refMgr2));
@@ -225,7 +225,7 @@ namespace cppmicroservices
             auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
             auto mockRegistry = std::make_shared<MockComponentRegistry>();
             auto fakeLogger = std::make_shared<FakeLogger>();
- 
+
             auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
             auto asyncWorkService
                 = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
@@ -270,7 +270,7 @@ namespace cppmicroservices
             auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
             auto mockRegistry = std::make_shared<MockComponentRegistry>();
             auto fakeLogger = std::make_shared<FakeLogger>();
- 
+
             // Test that a call to Register with a component containing both a service
             // and a reference to the same service interface will not cause a state change.
             scrimpl::metadata::ReferenceMetadata refMetadata {};
@@ -473,7 +473,7 @@ namespace cppmicroservices
             auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                     fakeLogger,
                                                                     asyncWorkService,
-                                                                    extRegistry); 
+                                                                    extRegistry);
             // Test for exception from user code
             auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
                                                                                    GetFramework(),
@@ -710,7 +710,7 @@ namespace cppmicroservices
                 auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
                                                                         fakeLogger,
                                                                         asyncWorkService,
-                                                                        extRegistry); 
+                                                                        extRegistry);
                 mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
                 mockMetadata->immediate = false;
                 auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
@@ -718,7 +718,7 @@ namespace cppmicroservices
                                                                                        mockRegistry,
                                                                                        fakeLogger,
                                                                                        notifier);
-                 EXPECT_CALL(*fakeCompConfig, GetFactory())
+                EXPECT_CALL(*fakeCompConfig, GetFactory())
                     .Times(testing::AtLeast(1)) // 2
                     .WillRepeatedly(testing::Return(mockFactory));
                 fakeCompConfig->Initialize();
@@ -843,14 +843,14 @@ namespace cppmicroservices
                                                                         std::make_shared<MockComponentRegistry>(),
                                                                         fakeLogger,
                                                                         notifier);
- 
+
             auto fakeBundleProtoCompConfig = std::make_shared<BundleOrPrototypeComponentConfigurationImpl>(
                 mockMetadata,
                 GetFramework(),
                 std::make_shared<MockComponentRegistry>(),
                 fakeLogger,
                 notifier);
- 
+
             auto svcReg = GetFramework().GetBundleContext().RegisterService<dummy::ServiceImpl>(
                 std::make_shared<dummy::ServiceImpl>());
 
@@ -953,7 +953,7 @@ namespace cppmicroservices
             // load the library until GetService is called. The logger is created after
             // this InstallAndStart so in the event that the log messages for loading the
             // shared library are sent when the library is loaded, the test will fail.
-            test::InstallAndStartBundle(context, "TestBundleDSTOI14");
+            auto bundle = test::InstallAndStartBundle(context, "TestBundleDSTOI14");
 
             // The logger should receive 2 Log() calls from the code which actually invokes
             // SharedLibrary::Load()
@@ -977,6 +977,7 @@ namespace cppmicroservices
             (void)context.GetService<test::Interface1>(sRef);
 
             loggerReg.Unregister();
+            ASSERT_NO_THROW(bundle.Uninstall());
 
             framework.Stop();
             framework.WaitForStop(std::chrono::milliseconds::zero());

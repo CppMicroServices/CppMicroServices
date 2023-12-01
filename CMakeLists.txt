@@ -172,6 +172,7 @@ include(usMacroCreateBundle)
 include(usFunctionCreateTestBundle)
 include(usFunctionCreateDSTestBundle)
 include(usFunctionBoostPath)
+include(CheckIPOSupported)
 
 if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   check_cxx_compiler_flag(-Wno-missing-braces HAS_MISSING_BRACES_FLAG)
@@ -254,6 +255,7 @@ us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
 us_cache_var(US_USE_SYSTEM_BOOST OFF BOOL "Build using an external Boost installation" ADVANCED)
+us_cache_var(US_USE_IPO ON BOOL "Use interprocedural optimization if supported" ADVANCED)
 
 set(_us_build_shared ${BUILD_SHARED_LIBS})
 
@@ -363,6 +365,14 @@ if (APPLE AND US_COMPILER_APPLE_CLANG)
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
 endif()
 
+#-----------------------------------------------------------------------------
+# LTO configuration
+#-----------------------------------------------------------------------------
+cmake_policy(SET CMP0069 NEW)
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION off)
+if(US_USE_IPO)
+  check_ipo_supported(RESULT CMAKE_INTERPROCEDURAL_OPTIMIZATION OUTPUT error)
+endif()
 #-----------------------------------------------------------------------------
 # 3rd Party Library configuration
 #-----------------------------------------------------------------------------
@@ -658,7 +668,7 @@ endif()
 #-----------------------------------------------------------------------------
 # Compile libraries here if you do not want -Werror or /WX on
 #-----------------------------------------------------------------------------
-add_subdirectory(third_party/absl)
+# add_subdirectory(third_party/absl)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
 add_subdirectory(third_party/boost/nowide)
 set(BUILD_SHARED_LIBS ${_us_build_shared} CACHE BOOL "Build shared libraries" FORCE)

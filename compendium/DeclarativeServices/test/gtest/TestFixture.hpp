@@ -85,6 +85,7 @@ namespace test
             test::InstallLib(context, "TestBundleDSTOI1");
             test::InstallLib(context, "TestBundleDSTOI2");
             test::InstallLib(context, "TestBundleDSTOI3");
+            test::InstallLib(context, "TestBundleDSTOI4");
             test::InstallLib(context, "TestBundleDSTOI5");
             test::InstallLib(context, "TestBundleDSTOI6");
             test::InstallLib(context, "TestBundleDSTOI7");
@@ -96,6 +97,7 @@ namespace test
             test::InstallLib(context, "TestBundleDSTOI16");
             test::InstallLib(context, "TestBundleDSTOI18");
             test::InstallLib(context, "TestBundleDSTOI19");
+            test::InstallLib(context, "TestBundleDSTOI20");
             test::InstallLib(context, "TestBundleDSCA01");
             test::InstallLib(context, "TestBundleDSCA02");
             test::InstallLib(context, "TestBundleDSCA03");

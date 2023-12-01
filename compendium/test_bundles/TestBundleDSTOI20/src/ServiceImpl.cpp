@@ -19,40 +19,15 @@
   limitations under the License.
 
 =============================================================================*/
+#include "ServiceImpl.hpp"
 
-#include "FrameworkTestActivator.h"
-
-#include "cppmicroservices/BundleImport.h"
-
-namespace cppmicroservices
+namespace sample
 {
+    ServiceComponent20::~ServiceComponent20() {}
 
-    FrameworkTestActivator* FrameworkTestActivator::m_Instance = nullptr;
-
-    FrameworkTestActivator::FrameworkTestActivator() : m_StartCalled(false) {}
-
-    bool
-    FrameworkTestActivator::StartCalled()
+    std::string
+    ServiceComponent20::Description()
     {
-        return m_Instance ? m_Instance->m_StartCalled : false;
+        return STRINGIZE(US_BUNDLE_NAME);
     }
-
-    void
-    FrameworkTestActivator::Start(BundleContext)
-    {
-        this->m_Instance = this;
-        this->m_StartCalled = true;
-    }
-
-    void
-    FrameworkTestActivator::Stop(BundleContext)
-    {
-        this->m_Instance = nullptr;
-    }
-} // namespace cppmicroservices
-
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::FrameworkTestActivator)
-
-#ifndef US_BUILD_SHARED_LIBS
-CPPMICROSERVICES_IMPORT_BUNDLE(US_BUNDLE_NAME)
-#endif
+} // namespace sample

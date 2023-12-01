@@ -35,6 +35,7 @@ if(NOT BUILD_SHARED_LIBS)
   add_executable(usTutorialDriver ${_srcs})
   target_link_libraries(usTutorialDriver ${_target_zip_archives})
 
+
   # Merge all resources from the static bundles and embed them into the executable.
   usFunctionEmbedResources(TARGET usTutorialDriver
                            BUNDLE_NAME main

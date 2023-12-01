@@ -155,9 +155,9 @@ namespace test
      */
     TEST_F(tServiceComponent, testBundleScope) // DS_TOI_14
     {
-        auto testBundle = StartTestBundle("TestBundleDSTOI14");
+        auto testBundle = StartTestBundle("TestBundleDSTOI20");
         auto helperBundle = StartTestBundle("TestBundleDSTOI1");
-        auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent14");
+        auto compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, "sample::ServiceComponent20");
         EXPECT_EQ(compDescDTO.scope, cppmicroservices::Constants::SCOPE_BUNDLE);
         auto ctxt = framework.GetBundleContext();
         cppmicroservices::ServiceReference<test::Interface1> sRef = ctxt.GetServiceReference<test::Interface1>();

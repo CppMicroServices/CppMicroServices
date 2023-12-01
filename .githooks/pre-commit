@@ -2,3 +2,4 @@
 
 # Run clang-format pre-commit hook
 sh .githooks/pre-commit-clang-format-hook
+bash .githooks/pre-commit-clang-tidy-hook

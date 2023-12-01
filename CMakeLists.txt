@@ -826,6 +826,9 @@ set(global_config_h_file "${PROJECT_BINARY_DIR}/include/${PROJECT_NAME_LOWER}/Gl
 set(US_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 configure_file(${US_CMAKE_DIR}/GlobalConfig.h.in ${global_config_h_file})
 
+#Export the compilation database for clang-tidy pre-commit hook.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Version information
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in

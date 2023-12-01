@@ -1,0 +1,24 @@
+#!/bin/bash
+##clang-tidy tests
+
+printf "Running clang-tidy pre-commit hook... \n";
+
+set -eu pipefail
+
+CHANGED_FILES=$(git diff --name-only --cached --diff-filter=ACMR)
+ 
+get_pattern_files() {
+    pattern=$(echo "$*" | sed "s/ /\$\\\|/g")
+    echo "$CHANGED_FILES" | { grep "$pattern$" || true; }
+}
+ 
+CPP_FILES=$(get_pattern_files .cpp)
+ 
+if [[ -n "$CPP_FILES" ]]
+then
+    # Run clang-tidy against changed C++ files for this commit
+    clang-tidy -p ./build/compilation_commands.json $CPP_FILES
+    echo "clang-tidy check completed for C++ files.\n"
+    # Additional checks or actions can be added for C++ files
+fi
+#EOF

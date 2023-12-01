@@ -29,6 +29,7 @@ limitations under the License.
 #include "cppmicroservices/ServiceRegistration.h"
 #include "gtest/gtest.h"
 #include <array>
+#include <unordered_set>
 
 using namespace cppmicroservices;
 
@@ -245,4 +246,27 @@ TEST_F(ServiceReferenceTest, TestGetServiceReferenceWithModifiedProperties)
         {Constants::SERVICE_RANKING, 10}
     });
     ASSERT_EQ(context.GetServiceReference<ServiceNS::ITestServiceA>(), regArr[1].GetReference());
+}
+
+TEST_F(ServiceReferenceTest, TestRegisterUnregisterCompareReference)
+{
+    auto context = framework.GetBundleContext();
+    std::unordered_set<cppmicroservices::ServiceReference<ServiceNS::ITestServiceA>> set;
+    cppmicroservices::ServiceReference<ServiceNS::ITestServiceA> sr1;
+    cppmicroservices::ServiceReference<ServiceNS::ITestServiceA> sr2;
+
+    auto impl = std::make_shared<TestServiceA>();
+    {
+        auto reg = context.RegisterService<ServiceNS::ITestServiceA>(impl);
+
+        sr1 = context.GetServiceReference<ServiceNS::ITestServiceA>();
+        sr2 = context.GetServiceReference<ServiceNS::ITestServiceA>();
+
+        set.insert(sr1);
+        ASSERT_NE(set.find(sr2), set.end());
+
+        reg.Unregister();
+    }
+
+    ASSERT_NE(set.find(sr2), set.end());
 }

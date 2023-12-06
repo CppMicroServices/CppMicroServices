@@ -6,19 +6,31 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-`(UNRELEASED) vX.X.X <https://github.com/cppmicroservices/cppmicroservices/tree/development>`_ (20XX-XX-XX)
+`v3.8.0 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.0>`_ (2023-12-06)
 ---------------------------------------------------------------------------------------------------------
 
-`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.6...development>`_
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.7.6...3.8.0>`_
 
 Added
 -----
+- `[Core Framework] Guarentee ordering by rank from GetServiceReferences <https://github.com/CppMicroServices/CppMicroServices/pull/943>`_
+- `[Core Framework] Add BundleTracker <https://github.com/CppMicroServices/CppMicroServices/pull/726>`_
+- `[Core Framework] Initializer list support for AnyMap <https://github.com/CppMicroServices/CppMicroServices/pull/942>`_
 
 Changed
 -------
+- `[Core Framework] Remove manual reference counting for serviceRegistrations <https://github.com/CppMicroServices/CppMicroServices/pull/841>`_
+- `[Core Framework] Ensure ServiceRegistrationU objects are not discarded from call to RegisterService <https://github.com/CppMicroServices/CppMicroServices/pull/863>`_
+- `[Core Framework] Update README to reflect correct compiler/OS versions <https://github.com/CppMicroServices/CppMicroServices/pull/862>`_
+- `[Declarative Services] Ensure multiple listeners for same factory PID are honored <https://github.com/CppMicroServices/CppMicroServices/pull/865>`_
+- `Update github workflows <https://github.com/CppMicroServices/CppMicroServices/pull/902>`_
+- `Use custom boost namespace to avoid symbol collision <https://github.com/CppMicroServices/CppMicroServices/pull/929>`_
+- `Update 3rd party dependency versions <https://github.com/CppMicroServices/CppMicroServices/pull/930>`_
+- `[Core Framework] Guarentee hash of serviceReference is conserved after destruction of serviceRegistrationBase object <https://github.com/CppMicroServices/CppMicroServices/pull/962>`_
 
 Removed
 -------
+- `Update to allow custom boost namespace and remove absl dependency <https://github.com/CppMicroServices/CppMicroServices/pull/939>`_
 
 Deprecated
 ----------
@@ -26,6 +38,25 @@ Deprecated
 Fixed
 -----
 - `[Core Framework] Data Race Condition fix for Bundles dataStorage location <https://github.com/CppMicroServices/CppMicroServices/pull/845>`_
+- `[Core Framework] Remove problematic std::move calls. <https://github.com/CppMicroServices/CppMicroServices/pull/848>`_
+- `[Core Framework] Flag Checking <https://github.com/CppMicroServices/CppMicroServices/pull/849>`_
+- `[Core Framework] Include cstdint in FileSystem.cpp <https://github.com/CppMicroServices/CppMicroServices/pull/850>`_
+- `[Core Framework] Fix code scanning alerts <https://github.com/CppMicroServices/CppMicroServices/pull/861>`_
+- `[Config Admin, Declarative Services] Fix code scanning alerts <https://github.com/CppMicroServices/CppMicroServices/pull/866>`_
+- `[Declarative Services] Fix race condition when addint SCRExtensionRegistry <https://github.com/CppMicroServices/CppMicroServices/pull/870>`_
+- `[Core Framework] Recoup performance losses <https://github.com/CppMicroServices/CppMicroServices/pull/869>`_
+- `[Core Framework] Recoup performance losses <https://github.com/CppMicroServices/CppMicroServices/pull/874>`_
+- `[Core Framework] BundleContextTest.NoSegfaultWithServiceFactory sporadic failure fix <https://github.com/CppMicroServices/CppMicroServices/pull/876>`_
+- `[Core Framework] Allow char const* properties in LDAPFilters <https://github.com/CppMicroServices/CppMicroServices/pull/877>`_
+- `[Core Framework] Reformat hpp FileSystem <https://github.com/CppMicroServices/CppMicroServices/pull/880>`_
+- `[Core Framework] Disable incorrect TSAN warnings <https://github.com/CppMicroServices/CppMicroServices/pull/878>`_
+- `[Core Framework] Fix potential deadlock in ServiceTracker <https://github.com/CppMicroServices/CppMicroServices/pull/883>`_
+- `[Core Framework] Update tests to remove unnecessary globals <https://github.com/CppMicroServices/CppMicroServices/pull/875>`_
+- `[Core Framework] Fix serviceTracker deadlock on close() <https://github.com/CppMicroServices/CppMicroServices/pull/922>`_
+- `[Core Framework] Update github workflows <https://github.com/CppMicroServices/CppMicroServices/pull/916>`_
+- `[Core Framework] Remove unused variable and add missing include <https://github.com/CppMicroServices/CppMicroServices/pull/932>`_
+- `[Declarative Services] Fix redundant bundle validation checks <https://github.com/CppMicroServices/CppMicroServices/pull/921>`_
+- `[Core Framework] Fix serviceTracker deadlock <https://github.com/CppMicroServices/CppMicroServices/pull/915>`_
 
 `v3.7.6 <https://github.com/cppmicroservices/cppmicroservices/tree/3.7.6>`_ (2023-04-25)
 ---------------------------------------------------------------------------------------------------------

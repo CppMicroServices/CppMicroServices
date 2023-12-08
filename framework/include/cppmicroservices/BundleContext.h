@@ -49,6 +49,10 @@ namespace cppmicroservices
         class ServiceTrackerPrivate;
         template <class S, class TTT>
         class TrackedService;
+        template <class TTT>
+        class BundleTrackerPrivate;
+        template <class TTT>
+        class TrackedBundle;
     } // namespace detail
 
     template <class S>
@@ -292,7 +296,9 @@ namespace cppmicroservices
          *        no properties.
          * @return A <code>ServiceRegistration</code> object for use by the bundle
          *         registering the service to update the service's properties or to
-         *         unregister the service.
+         *         unregister the service. This object cannot be called from a discard-value
+         *         expression as the intent is for the <code>ServiceRegistration</code>
+         *         object is intended to be stored by the caller
          *
          * @throws std::runtime_error If this BundleContext is no longer valid, or if there are
                    case variants of the same key in the supplied properties map.
@@ -303,8 +309,8 @@ namespace cppmicroservices
          * @see ServiceFactory
          * @see PrototypeServiceFactory
          */
-        ServiceRegistrationU RegisterService(InterfaceMapConstPtr const& service,
-                                             ServiceProperties const& properties = ServiceProperties());
+        [[nodiscard]] ServiceRegistrationU RegisterService(InterfaceMapConstPtr const& service,
+                                                           ServiceProperties const& properties = ServiceProperties());
 
         /**
          * Registers the specified service object with the specified properties
@@ -378,9 +384,9 @@ namespace cppmicroservices
         }
 
         /**
-         * Returns a list of <code>ServiceReference</code> objects. The returned
-         * list contains services that were registered under the specified class
-         * and match the specified filter expression.
+         * Returns a list of <code>ServiceReference</code> objects ordered
+         * by rank. The returned list contains services that were registered under
+         * the specified class and match the specified filter expression.
          *
          * <p>
          * The list is valid at the time of the call to this method. However, since
@@ -416,7 +422,7 @@ namespace cppmicroservices
          *        services.
          * @return A list of <code>ServiceReference</code> objects or
          *         an empty list if no services are registered that satisfy the
-         *         search.
+         *         search. These objects will be in decreasing order of their rank.
          * @throws std::invalid_argument If the specified <code>filter</code>
          *         contains an invalid filter expression that cannot be parsed.
          * @throws std::runtime_error If this BundleContext is no longer valid.
@@ -427,10 +433,9 @@ namespace cppmicroservices
                                                             std::string const& filter = std::string());
 
         /**
-         * Returns a list of <code>ServiceReference</code> objects. The returned
-         * list contains services that
-         * were registered under the interface id of the template argument <code>S</code>
-         * and match the specified filter expression.
+         * Returns a list of <code>ServiceReference</code> objects ordered by rank. The returned
+         * list contains services that were registered under the interface id of
+         * the template argument <code>S</code> and match the specified filter expression.
          *
          * <p>
          * This method is identical to GetServiceReferences(const std::string&, const std::string&) except that
@@ -441,7 +446,7 @@ namespace cppmicroservices
          *        services.
          * @return A list of <code>ServiceReference</code> objects or
          *         an empty list if no services are registered which satisfy the
-         *         search.
+         *         search. These objects will be in decreasing order of their rank.
          * @throws std::invalid_argument If the specified <code>filter</code>
          *         contains an invalid filter expression that cannot be parsed.
          * @throws std::runtime_error If this BundleContext is no longer valid.
@@ -455,8 +460,10 @@ namespace cppmicroservices
         {
             auto& clazz = us_service_interface_iid<S>();
             if (clazz.empty())
+            {
                 throw ServiceException("The service interface class has no "
                                        "CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
+            }
             using BaseVectorT = std::vector<ServiceReferenceU>;
             BaseVectorT serviceRefs = GetServiceReferences(clazz, filter);
             std::vector<ServiceReference<S>> result;
@@ -521,8 +528,10 @@ namespace cppmicroservices
         {
             auto& clazz = us_service_interface_iid<S>();
             if (clazz.empty())
+            {
                 throw ServiceException("The service interface class has no "
                                        "CPPMICROSERVICES_DECLARE_SERVICE_INTERFACE macro");
+            }
             return ServiceReference<S>(GetServiceReference(clazz));
         }
 
@@ -1127,13 +1136,14 @@ namespace cppmicroservices
         friend class detail::ServiceTrackerPrivate;
         template <class S, class TTT>
         friend class detail::TrackedService;
+        template <class T>
+        friend class BundleTracker;
+        template <class TTT>
+        friend class detail::BundleTrackerPrivate;
+        template <class TTT>
+        friend class detail::TrackedBundle;
         friend class BundleResource;
         friend class BundleResourceContainer;
-
-        // Not for use by clients of the Framework.
-        // Provides access to the Framework's log sink to allow templated code
-        // to log diagnostic information.
-        std::shared_ptr<detail::LogSink> GetLogSink() const;
 
         ListenerToken AddServiceListener(ServiceListener const& delegate, void* data, std::string const& filter);
         void RemoveServiceListener(ServiceListener const& delegate, void* data);

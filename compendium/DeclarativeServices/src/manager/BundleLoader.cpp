@@ -20,6 +20,8 @@
 
   =============================================================================*/
 
+#include "cppmicroservices/SecurityException.h"
+
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/SharedLibrary.h"
@@ -78,7 +80,7 @@ namespace cppmicroservices
             wchar_count = MultiByteToWideChar(CP_UTF8, 0, inStr.c_str(), -1, wBuf.get(), wchar_count);
             if (wchar_count == 0)
             {
-                std::invalid_argument("Failed to convert " + inStr + " to UTF16.");
+                throw std::invalid_argument("Failed to convert " + inStr + " to UTF16.");
             }
             return wBuf.get();
         }
@@ -102,6 +104,26 @@ namespace cppmicroservices
             }
             else
             {
+                Any func = fromBundle.GetBundleContext().GetProperty(
+                    cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
+                try
+                {
+                    if (!func.Empty()
+                        && !any_cast<std::function<bool(cppmicroservices::Bundle const&)>>(func)(fromBundle))
+                    {
+                        std::string errMsg("Bundle at location " + bundleLoc + " failed bundle validation.");
+                        throw SecurityException{ std::move(errMsg), fromBundle };
+                    }
+                }
+                catch (cppmicroservices::SecurityException const&)
+                {
+                    throw;
+                }
+                catch (...)
+                {
+                    throw SecurityException { "The bundle validation callback threw an exception", fromBundle};
+                }
+
                 SharedLibrary sh(bundleLoc);
                 try
                 {

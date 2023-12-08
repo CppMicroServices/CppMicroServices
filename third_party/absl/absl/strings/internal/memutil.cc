@@ -17,6 +17,7 @@
 #include <cstdlib>
 
 namespace absl {
+ABSL_NAMESPACE_BEGIN
 namespace strings_internal {
 
 int memcasecmp(const char* s1, const char* s2, size_t len) {
@@ -53,10 +54,11 @@ size_t memspn(const char* s, size_t slen, const char* accept) {
 
 cont:
   c = *p++;
-  if (slen-- == 0) return p - 1 - s;
+  if (slen-- == 0)
+    return static_cast<size_t>(p - 1 - s);
   for (spanp = accept; (sc = *spanp++) != '\0';)
     if (sc == c) goto cont;
-  return p - 1 - s;
+  return static_cast<size_t>(p - 1 - s);
 }
 
 size_t memcspn(const char* s, size_t slen, const char* reject) {
@@ -67,9 +69,10 @@ size_t memcspn(const char* s, size_t slen, const char* reject) {
   while (slen-- != 0) {
     c = *p++;
     for (spanp = reject; (sc = *spanp++) != '\0';)
-      if (sc == c) return p - 1 - s;
+      if (sc == c)
+        return static_cast<size_t>(p - 1 - s);
   }
-  return p - s;
+  return static_cast<size_t>(p - s);
 }
 
 char* mempbrk(const char* s, size_t slen, const char* accept) {
@@ -96,8 +99,9 @@ const char* memmatch(const char* phaystack, size_t haylen, const char* pneedle,
   const char* hayend = phaystack + haylen - neelen + 1;
   // A static cast is used here to work around the fact that memchr returns
   // a void* on Posix-compliant systems and const void* on Windows.
-  while ((match = static_cast<const char*>(
-              memchr(phaystack, pneedle[0], hayend - phaystack)))) {
+  while (
+      (match = static_cast<const char*>(memchr(
+           phaystack, pneedle[0], static_cast<size_t>(hayend - phaystack))))) {
     if (memcmp(match, pneedle, neelen) == 0)
       return match;
     else
@@ -107,4 +111,5 @@ const char* memmatch(const char* phaystack, size_t haylen, const char* pneedle,
 }
 
 }  // namespace strings_internal
+ABSL_NAMESPACE_END
 }  // namespace absl

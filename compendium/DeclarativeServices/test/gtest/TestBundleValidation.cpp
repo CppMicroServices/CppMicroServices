@@ -40,6 +40,8 @@ limitations under the License.
 
 #include "gtest/gtest.h"
 
+#include <unordered_set>
+
 TEST(TestBundleValidation, BundleValidationFailure)
 {
     using validationFuncType = std::function<bool(cppmicroservices::Bundle const&)>;
@@ -71,12 +73,12 @@ TEST(TestBundleValidation, BundleValidationFailure)
 
     // test starting an "immediate" ds component
     // in this case, starting the bundle causes the shared library to load
-    test::InstallLib(f.GetBundleContext(), "TestBundleDSTOI1");
+    test::InstallLib(f.GetBundleContext(), "TestBundleDSTBV1");
     auto bundles = f.GetBundleContext().GetBundles();
     auto bundleIter
         = std::find_if(bundles.begin(),
                        bundles.end(),
-                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTOI1"); });
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV1"); });
 
     ASSERT_THROW(bundleIter->Start(), cppmicroservices::SecurityException);
     // a bundle validation function which returns false must cause the
@@ -87,12 +89,12 @@ TEST(TestBundleValidation, BundleValidationFailure)
     // test starting a delayed activation ds component with a service dependency
     // in this case, starting the bundle does not cause the shared library to load
     // the shared library is loaded on the first call to "GetService"
-    test::InstallLib(f.GetBundleContext(), "TestBundleDSTOI6");
+    test::InstallLib(f.GetBundleContext(), "TestBundleDSTBV1_1");
     bundles = f.GetBundleContext().GetBundles();
     bundleIter
         = std::find_if(bundles.begin(),
                        bundles.end(),
-                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTOI6"); });
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV1_1"); });
 
     ASSERT_NO_THROW(bundleIter->Start());
 
@@ -112,7 +114,7 @@ TEST(TestBundleValidation, BundleValidationFailure)
 
     // a bundle validation function which returns false must cause the
     // service component not to be enabled
-    auto compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponent6");
+    auto compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentBV1_1");
     ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
 
     // delayed components won't throw when enabled. they should throw on first
@@ -124,23 +126,23 @@ TEST(TestBundleValidation, BundleValidationFailure)
     ASSERT_TRUE(svcRef);
     ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef), cppmicroservices::SecurityException);
 
-    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponent6");
+    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentBV1_1");
     ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
     Interface1SvcReg.Unregister();
 
     // test starting an immediate activation ds component with a service reference
-    test::InstallLib(f.GetBundleContext(), "TestBundleDSTOI7");
+    test::InstallLib(f.GetBundleContext(), "TestBundleDSTBV1_2");
     bundles = f.GetBundleContext().GetBundles();
     bundleIter
         = std::find_if(bundles.begin(),
                        bundles.end(),
-                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTOI7"); });
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV1_2"); });
 
     // on bundle start, the ds component will not be activated immediately since
     // it's service reference is unsatisfied. Registering a service which satisfies
     // the reference should cause an exception and no service should be registered.
     ASSERT_NO_THROW(bundleIter->Start());
-    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponent7");
+    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentBV1_2");
     ASSERT_TRUE(dsRuntimeService->IsComponentEnabled(compDesc));
     // trying to enable the component will result in an exception from
     // the future since the ds component was immediately activated
@@ -154,14 +156,14 @@ TEST(TestBundleValidation, BundleValidationFailure)
     Interface1SvcReg.Unregister();
 
     // test starting a prototype scope service component
-    test::InstallLib(f.GetBundleContext(), "TestBundleDSTOI15");
+    test::InstallLib(f.GetBundleContext(), "TestBundleDSTBV1_3");
     bundles = f.GetBundleContext().GetBundles();
     bundleIter
         = std::find_if(bundles.begin(),
                        bundles.end(),
-                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTOI15"); });
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV1_3"); });
     ASSERT_NO_THROW(bundleIter->Start());
-    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponent15");
+    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentBV1_3");
     ASSERT_TRUE(dsRuntimeService->IsComponentEnabled(compDesc));
     svcRef = f.GetBundleContext().GetServiceReference<test::Interface1>();
     ASSERT_TRUE(svcRef);
@@ -169,14 +171,14 @@ TEST(TestBundleValidation, BundleValidationFailure)
     ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
 
     // test starting a delayed activation ds component with a required configuration policy
-    test::InstallLib(f.GetBundleContext(), "TestBundleDSCA02");
+    test::InstallLib(f.GetBundleContext(), "TestBundleDSTBV1_4");
     bundles = f.GetBundleContext().GetBundles();
     bundleIter
         = std::find_if(bundles.begin(),
                        bundles.end(),
-                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSCA02"); });
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV1_4"); });
     ASSERT_NO_THROW(bundleIter->Start());
-    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentCA02");
+    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentBV1_4");
     ASSERT_TRUE(dsRuntimeService->IsComponentEnabled(compDesc));
 
     auto cmBundlePath = test::GetConfigAdminRuntimePluginFilePath();
@@ -190,7 +192,7 @@ TEST(TestBundleValidation, BundleValidationFailure)
         = f.GetBundleContext().GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sCMSvcRef);
     ASSERT_TRUE(cmRuntimeService);
 
-    auto config = cmRuntimeService->GetConfiguration("sample::ServiceComponentCA02");
+    auto config = cmRuntimeService->GetConfiguration("sample::ServiceComponentBV1_4");
     cppmicroservices::AnyMap configObj(cppmicroservices::AnyMap::UNORDERED_MAP);
     configObj["foo"] = std::string("bar");
     auto updateFuture = config->Update(configObj);
@@ -204,21 +206,21 @@ TEST(TestBundleValidation, BundleValidationFailure)
     ASSERT_TRUE(svcRef);
     ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef), cppmicroservices::SecurityException);
 
-    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentCA02");
+    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentBV1_4");
     ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
     config->Remove().get();
 
     // test starting an immediate activation ds component with a required configuration policy
-    test::InstallLib(f.GetBundleContext(), "TestBundleDSCA03");
+    test::InstallLib(f.GetBundleContext(), "TestBundleDSTBV1_5");
     bundles = f.GetBundleContext().GetBundles();
     bundleIter
         = std::find_if(bundles.begin(),
                        bundles.end(),
-                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSCA03"); });
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV1_5"); });
     ASSERT_NO_THROW(bundleIter->Start());
-    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentCA03");
+    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentBV1_5");
     ASSERT_TRUE(dsRuntimeService->IsComponentEnabled(compDesc));
-    config = cmRuntimeService->GetConfiguration("sample::ServiceComponentCA03");
+    config = cmRuntimeService->GetConfiguration("sample::ServiceComponentBV1_5");
     configObj.clear();
     configObj["foo"] = std::string("bar");
     ASSERT_THROW(config->Update(configObj).get(), cppmicroservices::SecurityException);
@@ -230,7 +232,7 @@ TEST(TestBundleValidation, BundleValidationFailure)
     ASSERT_TRUE(svcRef);
     ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef), cppmicroservices::SecurityException);
 
-    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentCA03");
+    compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentBV1_5");
     ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
 
     f.Stop();
@@ -251,12 +253,12 @@ TEST(TestBundleValidation, BundleValidationSuccess)
 
     test::InstallAndStartDS(f.GetBundleContext());
 
-    test::InstallLib(f.GetBundleContext(), "TestBundleDSTOI1");
+    test::InstallLib(f.GetBundleContext(), "TestBundleDSTBV2");
     auto bundles = f.GetBundleContext().GetBundles();
     auto bundleIter
         = std::find_if(bundles.begin(),
                        bundles.end(),
-                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTOI1"); });
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV2"); });
 
     ASSERT_NO_THROW(bundleIter->Start());
     // a bundle validation function which returns true must cause the
@@ -294,13 +296,13 @@ TEST(TestBundleValidation, BundleValidationFunctionException)
          &receivedSecondBundleValidationErrorEvent](cppmicroservices::FrameworkEvent const& evt)
         {
             if (evt.GetType() == cppmicroservices::FrameworkEvent::Type::FRAMEWORK_ERROR
-                && evt.GetBundle().GetSymbolicName() == "TestBundleDSTOI1")
+                && evt.GetBundle().GetSymbolicName() == "TestBundleDSTBV3")
             {
                 receivedBundleValidationErrorEvent = true;
             }
 
             if (evt.GetType() == cppmicroservices::FrameworkEvent::Type::FRAMEWORK_ERROR
-                && evt.GetBundle().GetSymbolicName() == "TestBundleDSTOI6")
+                && evt.GetBundle().GetSymbolicName() == "TestBundleDSTBV3_1")
             {
                 receivedSecondBundleValidationErrorEvent = true;
             }
@@ -316,12 +318,12 @@ TEST(TestBundleValidation, BundleValidationFunctionException)
             sDSSvcRef);
     ASSERT_TRUE(dsRuntimeService);
 
-    test::InstallLib(f.GetBundleContext(), "TestBundleDSTOI1");
+    test::InstallLib(f.GetBundleContext(), "TestBundleDSTBV3");
     auto bundles = f.GetBundleContext().GetBundles();
     auto bundleIter
         = std::find_if(bundles.begin(),
                        bundles.end(),
-                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTOI1"); });
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV3"); });
 
     ASSERT_THROW(bundleIter->Start(), cppmicroservices::SecurityException);
     // a bundle validation function which returns false must cause the
@@ -333,12 +335,12 @@ TEST(TestBundleValidation, BundleValidationFunctionException)
     // test starting a delayed activation ds component
     // in this case, starting the bundle does not cause the shared library to load
     // the shared library is loaded on the first call to "GetService"
-    test::InstallLib(f.GetBundleContext(), "TestBundleDSTOI6");
+    test::InstallLib(f.GetBundleContext(), "TestBundleDSTBV3_1");
     bundles = f.GetBundleContext().GetBundles();
     bundleIter
         = std::find_if(bundles.begin(),
                        bundles.end(),
-                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTOI6"); });
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV3_1"); });
 
     ASSERT_NO_THROW(bundleIter->Start());
 
@@ -358,11 +360,112 @@ TEST(TestBundleValidation, BundleValidationFunctionException)
 
     // a bundle validation function which returns false must cause the
     // service component not to be enabled
-    auto compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponent6");
+    auto compDesc = dsRuntimeService->GetComponentDescriptionDTO(*bundleIter, "sample::ServiceComponentBV3_1");
     ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));
     ASSERT_TRUE(receivedSecondBundleValidationErrorEvent);
 
     f.GetBundleContext().RemoveListener(std::move(token));
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
+}
+
+/*
+* Verify the absence of redundant bundle validation checks by installing a
+* bundle with two services.
+*/
+TEST(TestBundleValidation, BundleValidationMultipleSrc)
+{
+    using validationFuncType = std::function<bool(cppmicroservices::Bundle const&)>;
+
+    // Check for multiple calls for the same bundle
+    validationFuncType validationFunc = [](cppmicroservices::Bundle const& bundle) -> bool {
+        static std::unordered_set<std::string> validBundles;
+        auto const bundleLoc = bundle.GetLocation();
+
+        if (validBundles.count(bundleLoc) == 1) {
+            return false;
+        }
+        else {
+            validBundles.emplace(bundleLoc);
+            return true;
+        }
+    };
+    cppmicroservices::FrameworkConfiguration frameworkConfiguration {
+        {cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc}
+    };
+    auto framework = cppmicroservices::FrameworkFactory().NewFramework(std::move(frameworkConfiguration));
+
+    ASSERT_NO_THROW(framework.Start());
+
+    test::InstallAndStartDS(framework.GetBundleContext());
+    test::InstallLib(framework.GetBundleContext(), "TestBundleDSTBV4");
+
+    auto bundles = framework.GetBundleContext().GetBundles();
+    auto bundleIter
+        = std::find_if(bundles.begin(),
+                       bundles.end(),
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV4"); });
+
+    ASSERT_NO_THROW(bundleIter->Start());
+    ASSERT_EQ(bundleIter->GetState(), cppmicroservices::Bundle::State::STATE_ACTIVE);
+
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+}
+
+/*
+* Verfiy the absence of redundant bundle validation on reinstalling a bundle.
+*/
+TEST(TestBundleValidation, BundleValidationReinstall) {
+    using validationFuncType = std::function<bool(cppmicroservices::Bundle const&)>;
+
+    // Check for multiple calls for the same bundle
+    validationFuncType validationFunc = [](cppmicroservices::Bundle const& bundle) -> bool {
+        static std::unordered_set<std::string> validBundles;
+        auto const bundleLoc = bundle.GetLocation();
+
+        if (validBundles.count(bundleLoc) == 1) {
+            return false;
+        }
+        else {
+            validBundles.emplace(bundleLoc);
+            return true;
+        }
+    };
+    cppmicroservices::FrameworkConfiguration frameworkConfiguration {
+        {cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc}
+    };
+    auto framework = cppmicroservices::FrameworkFactory().NewFramework(std::move(frameworkConfiguration));
+
+    ASSERT_NO_THROW(framework.Start());
+
+    test::InstallAndStartDS(framework.GetBundleContext());
+    test::InstallLib(framework.GetBundleContext(), "TestBundleDSTBV5");
+
+    auto bundles = framework.GetBundleContext().GetBundles();
+    auto bundleIter
+        = std::find_if(bundles.begin(),
+                       bundles.end(),
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV5"); });
+
+    ASSERT_NO_THROW(bundleIter->Start());
+    ASSERT_EQ(bundleIter->GetState(), cppmicroservices::Bundle::State::STATE_ACTIVE);
+    // Uninstalling Bundle
+    ASSERT_NO_THROW(bundleIter->Uninstall());
+    ASSERT_EQ(bundleIter->GetState(), cppmicroservices::Bundle::State::STATE_UNINSTALLED);
+
+    test::InstallLib(framework.GetBundleContext(), "TestBundleDSTBV5");
+
+    bundles = framework.GetBundleContext().GetBundles();
+    bundleIter
+        = std::find_if(bundles.begin(),
+                       bundles.end(),
+                       [](cppmicroservices::Bundle const& b) { return (b.GetSymbolicName() == "TestBundleDSTBV5"); });
+
+    // Reinstalling Bundle
+    ASSERT_NO_THROW(bundleIter->Start());
+    ASSERT_EQ(bundleIter->GetState(), cppmicroservices::Bundle::State::STATE_ACTIVE);
+
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
 }

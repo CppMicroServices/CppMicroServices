@@ -30,11 +30,21 @@
 #    include "cppmicroservices/GlobalConfig.h"
 
 #    include <atomic>
+#    include <functional>
 
 namespace cppmicroservices
 {
     class BundleContextPrivate;
-}
+    /**
+     * The interface for a bundle's private context setter function. This is used by the Core
+     * Framework when loading a new bundle. Function definition is inside the
+     * \c CPPMICROSERVICES_INITIALIZE_BUNDLE macro.
+     *
+     * @note THIS IS NOT A TRANSFER OF OWNERSHIP. The pointed object must be kept alive for the
+     * lifetime of the bundle, and then destroyed.
+     */
+    using SetBundleContextFn = std::function<void(BundleContextPrivate*)>;
+} // namespace cppmicroservices
 
 /**
  * \ingroup MicroServices
@@ -60,7 +70,7 @@ namespace cppmicroservices
 #    define CPPMICROSERVICES_INITIALIZE_BUNDLE                                                                       \
         std::atomic<cppmicroservices::BundleContextPrivate*> US_CTX_INS(US_BUNDLE_NAME) {};                          \
                                                                                                                      \
-        extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)();                        \
+        extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)(void);                    \
         extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)()                         \
         {                                                                                                            \
             return US_CTX_INS(US_BUNDLE_NAME).load();                                                                \

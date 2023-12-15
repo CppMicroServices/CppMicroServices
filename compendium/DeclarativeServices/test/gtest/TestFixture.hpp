@@ -97,6 +97,9 @@ namespace test
             test::InstallLib(context, "TestBundleDSTOI16");
             test::InstallLib(context, "TestBundleDSTOI18");
             test::InstallLib(context, "TestBundleDSTOI19");
+            test::InstallLib(context, "TestBundleDSTOI20");
+            test::InstallLib(context, "TestBundleDSTOI21");
+            test::InstallLib(context, "TestBundleDSTOI22");
             test::InstallLib(context, "TestBundleDSCA01");
             test::InstallLib(context, "TestBundleDSCA02");
             test::InstallLib(context, "TestBundleDSCA03");

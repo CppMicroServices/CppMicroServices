@@ -357,7 +357,13 @@ namespace cppmicroservices
         }
 
         // Utility function that fetches the symbol or nullptr
-        return BundleUtils::GetSymbol(handle, symname.c_str());
+        std::string errmsg;
+        void* symbol = BundleUtils::GetSymbol(handle, symname.c_str(), errmsg);
+        if (!symbol)
+        {
+            d->coreCtx->logger->Log(logservice::SeverityLevel::LOG_WARNING, errmsg);
+        }
+        return symbol;
     }
 
     std::ostream&

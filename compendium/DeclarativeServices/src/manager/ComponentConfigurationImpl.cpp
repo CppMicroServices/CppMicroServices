@@ -235,7 +235,9 @@ namespace cppmicroservices
                         {
                             for (auto const& config : configs)
                             {
-                                configNotifier->CreateFactoryComponent(config->GetPid(), mgr);
+                                auto properties = std::make_shared<cppmicroservices::AnyMap>(config->GetProperties());
+                                auto componentFactory = configNotifier->GetComponentFactory();
+                                componentFactory->CreateFactoryComponent(config->GetPid(), mgr, properties );
                             }
                         }
                     }

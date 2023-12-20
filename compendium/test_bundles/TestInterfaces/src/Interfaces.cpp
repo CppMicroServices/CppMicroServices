@@ -20,5 +20,6 @@ namespace test
     LifeCycleValidation::~LifeCycleValidation() = default;
     CAInterface::~CAInterface() = default;
     CAInterface1::~CAInterface1() = default;
-
+    ServiceAInt::~ServiceAInt() = default;
+    ServiceBInt::~ServiceBInt() = default;
 } // namespace test

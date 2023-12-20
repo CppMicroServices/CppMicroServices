@@ -13,6 +13,7 @@ set(_srcs
   manager/BundleOrPrototypeComponentConfiguration.cpp
   manager/ComponentConfigurationFactory.cpp
   manager/ComponentConfigurationImpl.cpp
+  manager/ComponentFactoryImpl.cpp
   manager/ComponentManagerImpl.cpp
   manager/ConfigurationManager.cpp
   manager/ConfigurationNotifier.cpp
@@ -52,6 +53,7 @@ set(_private_headers
   manager/ComponentConfiguration.hpp
   manager/ComponentConfigurationFactory.hpp
   manager/ComponentConfigurationImpl.hpp
+  manager/ComponentFactoryImpl.hpp
   manager/ComponentManager.hpp
   manager/ComponentManagerImpl.hpp
   manager/ConfigurationManager.hpp

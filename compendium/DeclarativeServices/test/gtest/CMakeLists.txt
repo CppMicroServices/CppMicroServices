@@ -69,6 +69,7 @@ set(_declarativeservices_tests
   TestConfigPolicies.cpp
   TestConfigurationPropertiesWithMultipleConfigurations.cpp
   TestFactoryPid.cpp
+  TestFactoryTarget.cpp
   TestFailedBoundServiceActivation.cpp
   TestMetadataParserFactory.cpp
   TestMetadataParserImplV1.cpp
@@ -203,6 +204,7 @@ set(_test_bundles
   TestBundleDSCA24
   TestBundleDSCA26
   TestBundleDSCA27
+  TestBundleDSFAC1
   EnglishDictionary
   )
 

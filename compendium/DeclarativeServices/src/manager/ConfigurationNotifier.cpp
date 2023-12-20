@@ -43,15 +43,17 @@ namespace cppmicroservices
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
             std::shared_ptr<SCRExtensionRegistry> extensionReg)
             : tokenCounter(0)
-            , bundleContext(context)
-            , logger(std::move(logger))
-            , asyncWorkService(asyncWorkSvc)
-            , extensionRegistry(extensionReg)
-        {
-            if (!bundleContext || !(this->logger) || (!this->asyncWorkService) || (!this->extensionRegistry))
+            , componentFactory(std::make_shared<ComponentFactoryImpl>(context, logger, asyncWorkSvc, extensionReg))
+            , logger(logger)
+          {
+            if (!context || !(this->logger) || !asyncWorkSvc || !extensionReg)
             {
                 throw std::invalid_argument("ConfigurationNotifier Constructor "
                                             "provided with invalid arguments");
+            }
+            if (!componentFactory) {
+                throw std::runtime_error("ConfigurationNotifier Constructor "
+                    "failed to create componentFactory");
             }
         }
 
@@ -113,7 +115,7 @@ namespace cppmicroservices
             }
         }
         bool
-        ConfigurationNotifier::AnyListenersForPid(std::string const& pid) noexcept
+        ConfigurationNotifier::AnyListenersForPid(std::string const& pid, std::shared_ptr<cppmicroservices::AnyMap> properties) noexcept
         {
             std::string factoryName;
             std::shared_ptr<ComponentConfigurationImpl> mgr;
@@ -157,75 +159,10 @@ namespace cppmicroservices
                     return false;
                 }
             } // release listenersMapHandle lock
-            CreateFactoryComponent(pid, mgr);
+            componentFactory->CreateFactoryComponent(pid, mgr, properties);
             return true;
         }
-        void
-        ConfigurationNotifier::CreateFactoryComponent(std::string const& pid,
-                                                      std::shared_ptr<ComponentConfigurationImpl>& mgr)
-        {
-            auto oldMetadata = mgr->GetMetadata();
-            auto newMetadata = std::make_shared<ComponentMetadata>(*oldMetadata);
-
-            newMetadata->name = pid;
-            // this is a factory instance not a factory component
-            newMetadata->factoryComponentID = "";
-
-            // Factory instance is dependent on the same configurationPids as the factory
-            // component except the factory component itself.
-            newMetadata->configurationPids.clear();
-            for (auto const& basePid : oldMetadata->configurationPids)
-            {
-                if (basePid != oldMetadata->configurationPids[0])
-                {
-                    newMetadata->configurationPids.emplace_back(basePid);
-                }
-            }
-            newMetadata->configurationPids.emplace_back(pid);
-            auto bundle = mgr->GetBundle();
-            auto registry = mgr->GetRegistry();
-            auto logger = mgr->GetLogger();
-            auto configNotifier = mgr->GetConfigNotifier();
-            try
-            {
-                auto compManager = std::make_shared<ComponentManagerImpl>(newMetadata,
-                                                                          registry,
-                                                                          bundle.GetBundleContext(),
-                                                                          logger,
-                                                                          asyncWorkService,
-                                                                          configNotifier);
-                if (registry->AddComponentManager(compManager))
-                {
-                    if (auto const& extension = extensionRegistry->Find(bundle.GetBundleId()); extension)
-                    {
-                        extension->AddComponentManager(compManager);
-                        compManager->Initialize();
-                    }
-                    else
-                    {
-                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                    "Failed to find ComponentManager with name " + newMetadata->name
-                                        + " from bundle with Id "
-                                        + std::to_string(bundleContext.GetBundle().GetBundleId()));
-                    }
-                }
-            }
-            catch (cppmicroservices::SharedLibraryException const&)
-            {
-                throw;
-            }
-            catch (cppmicroservices::SecurityException const&)
-            {
-                throw;
-            }
-            catch (std::exception const&)
-            {
-                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                            "Failed to create ComponentManager with name " + newMetadata->name + " from bundle with Id "
-                                + std::to_string(bundleContext.GetBundle().GetBundleId()),
-                            std::current_exception());
-            }
-        }
+        
 
         void
         ConfigurationNotifier::NotifyAllListeners(std::string const& pid,
@@ -248,6 +185,9 @@ namespace cppmicroservices
             {
                 return;
             }
+        }
+        std::shared_ptr<ComponentFactoryImpl>  ConfigurationNotifier::GetComponentFactory() {
+            return componentFactory;
         }
 
     } // namespace scrimpl

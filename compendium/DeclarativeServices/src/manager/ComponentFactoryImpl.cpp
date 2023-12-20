@@ -1,0 +1,156 @@
+ /*=============================================================================
+
+  Library: CppMicroServices
+
+  Copyright (c) The CppMicroServices developers. See the COPYRIGHT
+  file at the top-level directory of this distribution and at
+  https://github.com/CppMicroServices/CppMicroServices/COPYRIGHT .
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+  =============================================================================*/
+
+#include "ComponentFactoryImpl.hpp"
+#include "../ComponentRegistry.hpp"
+#include "../metadata/ComponentMetadata.hpp"
+#include "ComponentConfigurationImpl.hpp"
+#include "ComponentManagerImpl.hpp"
+#include "cppmicroservices/SecurityException.h"
+#include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
+#include "cppmicroservices/cm/ConfigurationAdmin.hpp"
+#include "../SCRExtensionRegistry.hpp"
+
+namespace cppmicroservices
+{
+    namespace scrimpl
+    {
+        using cppmicroservices::scrimpl::metadata::ComponentMetadata;
+
+        ComponentFactoryImpl::ComponentFactoryImpl(
+            cppmicroservices::BundleContext const& context,
+            std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
+            std::shared_ptr<SCRExtensionRegistry> extensionReg)
+            : bundleContext(context)
+            , logger(std::move(logger))
+            , asyncWorkService(asyncWorkSvc)
+            , extensionRegistry(extensionReg)
+        {
+            if (!bundleContext || !(this->logger) || (!this->asyncWorkService) || (!this->extensionRegistry))
+            {
+                throw std::invalid_argument("ComponentFactoryImpl Constructor "
+                                            "provided with invalid arguments");
+            }
+        }
+
+
+        void
+        ComponentFactoryImpl::CreateFactoryComponent(std::string const& pid,
+                                                     std::shared_ptr<ComponentConfigurationImpl>& mgr,
+                                                     std::shared_ptr<cppmicroservices::AnyMap> properties)
+        {
+            // Create the virtual metadata for the factory instance. 
+            // Start with the metadata from the factory 
+            auto oldMetadata = mgr->GetMetadata();
+            auto newMetadata = std::make_shared<ComponentMetadata>(*oldMetadata);
+
+            newMetadata->name = pid;
+            // this is a factory instance not a factory component
+            newMetadata->factoryComponentID = "";
+
+            // Factory instance is dependent on the same configurationPids as the factory
+            // component except the factory component itself.
+            newMetadata->configurationPids.clear();
+            for (auto const& basePid : oldMetadata->configurationPids)
+            {
+                if (basePid != oldMetadata->configurationPids[0])
+                {
+                    newMetadata->configurationPids.emplace_back(basePid);
+                }
+            }
+            newMetadata->configurationPids.emplace_back(pid);
+
+            // Look for dynamic targets in the references.
+            // A dynamic target will appear in the properties for the configuration object
+            // with the interface name as the key and the target as the value. 
+            for (auto& ref : newMetadata->refsMetadata)
+            {
+               auto interface = ref.interfaceName;
+                auto iter = properties->find(interface);
+                if (iter != properties->end()) {
+                    // This reference has a dynamic target
+                    ref.target = cppmicroservices::ref_any_cast<std::string>(iter->second);
+                    // Verify that the ref.target is a valid LDAPFilter
+                    try
+                    {
+                        LDAPFilter(ref.target);
+                    }
+                    catch (std::exception const& e)
+                    {
+                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                    "CreateFactoryComponent failed because of invalid target ldap filter"
+                                        + newMetadata->name + " target= " + ref.target);
+                        throw std::invalid_argument(e.what());
+                    }
+                 }
+            }
+
+            auto bundle = mgr->GetBundle();
+            auto registry = mgr->GetRegistry();
+            auto logger = mgr->GetLogger();
+            auto configNotifier = mgr->GetConfigNotifier();
+            try
+            {
+                auto compManager = std::make_shared<ComponentManagerImpl>(newMetadata,
+                                                                          registry,
+                                                                          bundle.GetBundleContext(),
+                                                                          logger,
+                                                                          asyncWorkService,
+                                                                          configNotifier);
+                if (registry->AddComponentManager(compManager))
+                {
+                    if (auto const& extension = extensionRegistry->Find(bundle.GetBundleId()); extension)
+                    {
+                        extension->AddComponentManager(compManager);
+                        compManager->Initialize();
+                    }
+                    else
+                    {
+                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                    "Failed to find ComponentManager with name " + newMetadata->name
+                                        + " from bundle with Id "
+                                        + std::to_string(bundleContext.GetBundle().GetBundleId()));
+                    }
+                }
+            }
+            catch (cppmicroservices::SharedLibraryException const&)
+            {
+                throw;
+            }
+            catch (cppmicroservices::SecurityException const&)
+            {
+                throw;
+            }
+            catch (std::exception const&)
+            {
+                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                            "Failed to create ComponentManager with name " + newMetadata->name + " from bundle with Id "
+                                + std::to_string(bundleContext.GetBundle().GetBundleId()),
+                            std::current_exception());
+            }
+        }
+
+ 
+    } // namespace scrimpl
+} // namespace cppmicroservices

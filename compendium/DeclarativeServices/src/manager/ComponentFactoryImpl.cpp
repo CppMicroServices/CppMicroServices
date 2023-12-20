@@ -94,7 +94,7 @@ namespace cppmicroservices
                     // Verify that the ref.target is a valid LDAPFilter
                     try
                     {
-                        LDAPFilter(ref.target);
+                        LDAPFilter filter(ref.target);
                     }
                     catch (std::exception const& e)
                     {

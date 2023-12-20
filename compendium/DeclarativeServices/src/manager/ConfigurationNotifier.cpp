@@ -46,16 +46,12 @@ namespace cppmicroservices
             , componentFactory(std::make_shared<ComponentFactoryImpl>(context, logger, asyncWorkSvc, extensionReg))
             , logger(logger)
           {
-            if (!context || !(this->logger) || !asyncWorkSvc || !extensionReg)
+            if (!context || !(this->logger) || !asyncWorkSvc || !extensionReg || !componentFactory)
             {
                 throw std::invalid_argument("ConfigurationNotifier Constructor "
                                             "provided with invalid arguments");
             }
-            if (!componentFactory) {
-                throw std::runtime_error("ConfigurationNotifier Constructor "
-                    "failed to create componentFactory");
-            }
-        }
+         }
 
         cppmicroservices::ListenerTokenId
         ConfigurationNotifier::RegisterListener(std::string const& pid,
@@ -115,7 +111,7 @@ namespace cppmicroservices
             }
         }
         bool
-        ConfigurationNotifier::AnyListenersForPid(std::string const& pid, std::shared_ptr<cppmicroservices::AnyMap> properties) noexcept
+        ConfigurationNotifier::AnyListenersForPid(std::string const& pid, cppmicroservices::AnyMap const& properties) noexcept
         {
             std::string factoryName;
             std::vector<std::shared_ptr<ComponentConfigurationImpl>> mgrs;

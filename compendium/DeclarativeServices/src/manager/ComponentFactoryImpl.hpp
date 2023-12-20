@@ -24,7 +24,6 @@
 #define __CPPMICROSERVICES_SCRIMPL_COMPONENTFACTORYIMPL_HPP__
 
 #include "../SCRLogger.hpp"
-#include "ConcurrencyUtil.hpp"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 
@@ -63,7 +62,7 @@ namespace cppmicroservices
              */
             void CreateFactoryComponent(std::string const& pid,
                                         std::shared_ptr<ComponentConfigurationImpl>& mgr,
-                                        std::shared_ptr<cppmicroservices::AnyMap> properties);
+                                        cppmicroservices::AnyMap const& properties);
 
           private:
             cppmicroservices::BundleContext bundleContext;

@@ -84,12 +84,11 @@ namespace cppmicroservices
                             properties = configObject->GetProperties();
                         }
                     }
-                    auto ptr = std::make_shared<cppmicroservices::AnyMap>(properties);
-                    if (!configNotifier->AnyListenersForPid(pid, ptr))
+                    if (!configNotifier->AnyListenersForPid(pid, properties))
                     {
                         return;
                     }
-
+                    auto ptr = std::make_shared<cppmicroservices::AnyMap>(properties);
                     configNotifier->NotifyAllListeners(pid, type, ptr);
                 }
                 catch (cppmicroservices::SecurityException const&)

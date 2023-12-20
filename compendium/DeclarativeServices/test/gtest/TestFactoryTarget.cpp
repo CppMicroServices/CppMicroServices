@@ -48,27 +48,27 @@ namespace test
             ::test::InstallAndStartConfigAdmin(context);
             auto svcRef = context.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
             ASSERT_TRUE(svcRef);
-            configAdminSvc = context.GetService(svcRef);
-            ASSERT_TRUE(configAdminSvc);
+            configAdmin = context.GetService(svcRef);
+            ASSERT_TRUE(configAdmin);
         }
         template <typename ServiceInterfaceT>
         std::shared_ptr<ServiceInterfaceT>
-        getFactoryService(std::string factoryPid, std::string factoryInstance, cppmicroservices::AnyMap& props)
+        getFactoryService(std::string factoryPid, std::string factoryInstance, cppmicroservices::AnyMap const& props)
         {
 
             // Get a service reference to ConfigAdmin to create the factory component instance.
 
-            if (configAdminSvc)
+            if (configAdmin)
             {
                 std::shared_ptr<cppmicroservices::service::cm::Configuration> factoryConfig;
                 // Create factory configuration object
                 if (factoryInstance.empty())
                 {
-                    factoryConfig = configAdminSvc->CreateFactoryConfiguration(factoryPid);
+                    factoryConfig = configAdmin->CreateFactoryConfiguration(factoryPid);
                 }
                 else
                 {
-                    factoryConfig = configAdminSvc->GetFactoryConfiguration(factoryPid, factoryInstance);
+                    factoryConfig = configAdmin->GetFactoryConfiguration(factoryPid, factoryInstance);
                 }
 
                 if (factoryConfig)
@@ -87,7 +87,7 @@ namespace test
         }
 
       public:
-        std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin> configAdminSvc;
+        std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin> configAdmin;
     };
 
     class MockServiceBImpl : public test::ServiceBInt

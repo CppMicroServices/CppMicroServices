@@ -20,6 +20,7 @@
 
   =============================================================================*/
 
+#include "ConcurrencyUtil.hpp"
 #include "ComponentFactoryImpl.hpp"
 #include "../ComponentRegistry.hpp"
 #include "../metadata/ComponentMetadata.hpp"
@@ -58,7 +59,7 @@ namespace cppmicroservices
         void
         ComponentFactoryImpl::CreateFactoryComponent(std::string const& pid,
                                                      std::shared_ptr<ComponentConfigurationImpl>& mgr,
-                                                     std::shared_ptr<cppmicroservices::AnyMap> properties)
+                                                     cppmicroservices::AnyMap const& properties)
         {
             // Create the virtual metadata for the factory instance. 
             // Start with the metadata from the factory 
@@ -87,8 +88,8 @@ namespace cppmicroservices
             for (auto& ref : newMetadata->refsMetadata)
             {
                auto interface = ref.interfaceName;
-                auto iter = properties->find(interface);
-                if (iter != properties->end()) {
+                auto iter = properties.find(interface);
+                if (iter != properties.end()) {
                     // This reference has a dynamic target
                     ref.target = cppmicroservices::ref_any_cast<std::string>(iter->second);
                     // Verify that the ref.target is a valid LDAPFilter

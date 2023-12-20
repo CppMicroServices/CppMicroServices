@@ -56,6 +56,8 @@ namespace cppmicroservices
     BundleArchive::BundleArchive()
         : storage(nullptr)
         , bundleId(0)
+        , lastModified(now())
+        , autostartSetting(-1)
         , manifest(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS)
     {
     }

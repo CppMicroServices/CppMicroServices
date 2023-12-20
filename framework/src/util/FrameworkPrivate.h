@@ -102,8 +102,8 @@ namespace cppmicroservices
          */
         struct FrameworkEventInternal
         {
-            bool valid;
-            FrameworkEvent::Type type;
+            bool valid { false };
+            FrameworkEvent::Type type { FrameworkEvent::FRAMEWORK_ERROR };
             std::string msg;
             std::exception_ptr excPtr;
         } stopEvent;

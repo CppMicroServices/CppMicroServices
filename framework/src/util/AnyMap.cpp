@@ -184,7 +184,7 @@ namespace cppmicroservices
 
     any_map::const_iter::const_iter() = default;
 
-    any_map::const_iter::const_iter(any_map::const_iter const& it) : iterator_base(it.type)
+    any_map::const_iter::const_iter(any_map::const_iter const& it) : iterator_base(it.type), it { nullptr }
     {
         switch (type)
         {
@@ -204,7 +204,7 @@ namespace cppmicroservices
         }
     }
 
-    any_map::const_iter::const_iter(any_map::iterator const& it) : iterator_base(it.type)
+    any_map::const_iter::const_iter(any_map::iterator const& it) : iterator_base(it.type), it { nullptr }
     {
         switch (type)
         {
@@ -406,7 +406,7 @@ namespace cppmicroservices
 
     any_map::iter::iter() = default;
 
-    any_map::iter::iter(iter const& it) : iterator_base(it.type)
+    any_map::iter::iter(iter const& it) : iterator_base(it.type), it { nullptr }
     {
         switch (type)
         {

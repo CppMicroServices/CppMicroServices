@@ -85,7 +85,9 @@ namespace cppmicroservices
             tracker->Close();
 
             if (count != 0)
+            {
                 throw std::logic_error("Not unregistered all services");
+            }
         }
 
         void
@@ -104,7 +106,9 @@ namespace cppmicroservices
                 regs.Lock(), regs.v.emplace_back(std::move(reg));
                 count++;
                 if (i % 5 == 0)
+                {
                     regs.NotifyAll();
+                }
             }
         }
 
@@ -115,12 +119,6 @@ namespace cppmicroservices
             {
                 std::vector<ServiceRegistrationU> currRegs;
                 regs.Lock(), std::swap(currRegs, regs.v);
-                if (currRegs.empty())
-                {
-                    auto l = regs.Lock();
-                    regs.WaitFor(l, std::chrono::milliseconds(100), [this] { return !regs.v.empty(); });
-                    std::swap(currRegs, regs.v);
-                }
 
                 for (auto& reg : currRegs)
                 {
@@ -138,6 +136,13 @@ namespace cppmicroservices
                         count--;
                     }
                 }
+                /*
+                Rather than a condition variable, we are looping until regs is non-empty.
+                This sleep stops this function from looping too quickly and causing slow downs.
+                While this is less efficent than a condition variable, we are doing this in order to eliminate a
+                false-positive TSAN warning coming from the function wait_for.
+                */
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
         }
 
@@ -164,7 +169,9 @@ namespace cppmicroservices
         ModifiedService(ServiceReferenceU const& reference, InterfaceMapConstPtr const& /*service*/)
         {
             if (reference.GetProperty("i") != 5)
+            {
                 throw std::logic_error("modified end match: wrong property");
+            }
             context.GetService(reference);
         }
 
@@ -173,7 +180,9 @@ namespace cppmicroservices
         {
             auto l = additionalReg.Lock();
             if (additionalReg.v)
+            {
                 additionalReg.v.Unregister();
+            }
         }
 
       private:

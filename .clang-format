@@ -33,6 +33,7 @@ Cpp11BracedListStyle: false
 IndentCaseLabels: true
 IndentGotoLabels: false
 IndentPPDirectives: AfterHash
+InsertBraces: true
 NamespaceIndentation: All
 PackConstructorInitializers: CurrentLine
 PointerAlignment: Left

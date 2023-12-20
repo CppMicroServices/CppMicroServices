@@ -651,3 +651,99 @@ TEST_F(ServiceTrackerTestFixture, TestReOpenServiceTrackerWithCustomizer)
     });
     tracker->Close();
 }
+
+namespace
+{
+    namespace foo
+    {
+        class Bar
+        {
+          public:
+            virtual ~Bar() {}
+        };
+    } // namespace foo
+
+    class MockFooBar : public foo::Bar
+    {
+    };
+} // namespace
+
+TEST_F(ServiceTrackerTestFixture, TestFilterPropertiesTypes)
+{
+    LDAPFilter filter("(tag=foo::bar::Baz)");
+    ServiceTracker<foo::Bar> tracker(framework.GetBundleContext(), filter);
+    tracker.Open();
+
+    auto fooService = std::make_shared<MockFooBar>();
+    cppmicroservices::ServiceProperties props
+        = std::initializer_list<cppmicroservices::ServiceProperties::value_type> { std::make_pair("tag",
+                                                                                                  ("foo::bar::Baz")) };
+
+    auto svc = framework.GetBundleContext().RegisterService<foo::Bar>(fooService, std::move(props));
+
+    ASSERT_EQ(tracker.GetTrackingCount(), 1);
+
+    tracker.Close();
+}
+
+#ifdef US_ENABLE_THREADING_SUPPORT
+
+TEST(ServiceTrackerTests, TestServiceTrackerDeadlock)
+{
+    Framework framework = FrameworkFactory().NewFramework();
+    framework.Start();
+
+    ServiceTracker<MyInterfaceOne> tracker(framework.GetBundleContext());
+    tracker.Open();
+    auto f = std::async(
+        [&framework]
+        {
+            // technically there's a race here, so the async should ensure WaitForService is started prior to
+            // terminating the framework.
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+
+            framework.Stop();
+            framework.WaitForStop(std::chrono::milliseconds::zero());
+        });
+
+    ASSERT_THROW(tracker.WaitForService(), std::logic_error);
+}
+
+TEST(ServiceTrackerTests, TestServiceTrackerInvalidBundle)
+{
+    Framework framework = FrameworkFactory().NewFramework();
+    framework.Start();
+
+    ServiceTracker<MyInterfaceOne> tracker(framework.GetBundleContext());
+    tracker.Open();
+
+    framework.Stop();
+    framework.WaitForStop(std::chrono::milliseconds::zero());
+
+    ASSERT_THROW(tracker.WaitForService(), std::logic_error);
+}
+
+// If the test doesn't throw, it is successful.
+// Intended to be run with many repititions to test for sporadic failures.
+TEST(ServiceTrackerTests, FrameworkTrackerCloseRace)
+{
+    auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+    framework.Start();
+
+    ServiceTracker<MyInterfaceOne> tracker(framework.GetBundleContext());
+    tracker.Open();
+
+    auto interfaceOneService = std::make_shared<MyInterfaceOne>();
+
+    auto svc = framework.GetBundleContext().RegisterService<MyInterfaceOne>(interfaceOneService);
+
+    auto fut = std::async(std::launch::async,
+                          [&framework]()
+                          {
+                              framework.Stop();
+                              framework.WaitForStop(std::chrono::milliseconds::zero());
+                          });
+    tracker.Close();
+}
+
+#endif

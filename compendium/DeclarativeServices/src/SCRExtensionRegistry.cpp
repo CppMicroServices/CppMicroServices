@@ -25,7 +25,7 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
-        SCRExtensionRegistry::SCRExtensionRegistry(std::shared_ptr<SCRLogger> logger)
+        SCRExtensionRegistry::SCRExtensionRegistry(std::shared_ptr<cppmicroservices::logservice::LogService> logger)
             : logger(std::move(logger))
         {
             if (!(this->logger))
@@ -49,11 +49,13 @@ namespace cppmicroservices
         void
         SCRExtensionRegistry::Add(long bundleId, std::shared_ptr<SCRBundleExtension> extension)
         {
-            if (!extension) {
+            if (!extension)
+            {
                 throw std::invalid_argument("SCRExtensionRegistry::Add invalid extension");	
             }
-            if (extensionRegistry.find(bundleId) == extensionRegistry.end()){
-                std::lock_guard<std::mutex> l(extensionRegMutex);
+            std::lock_guard<std::mutex> l(extensionRegMutex);
+            if (extensionRegistry.find(bundleId) == extensionRegistry.end())
+            {
                 extensionRegistry.insert(std::make_pair(bundleId, std::move(extension)));
             }
         }

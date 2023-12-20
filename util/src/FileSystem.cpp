@@ -25,6 +25,7 @@
 #include "cppmicroservices/util/String.h"
 #include <cppmicroservices/GlobalConfig.h>
 
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 #include <vector>

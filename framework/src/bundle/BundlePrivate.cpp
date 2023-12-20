@@ -263,7 +263,7 @@ namespace cppmicroservices
                     return;
                 }
             }
-            // INTENTIONALLY FALLS THROUGH - in case of lazy activation.
+            [[fallthrough]];
             case Bundle::STATE_RESOLVED:
             {
                 state = Bundle::STATE_STARTING;
@@ -337,7 +337,7 @@ namespace cppmicroservices
                         }
                     }
                 }
-                // INTENTIONALLY FALLS THROUGH
+                [[fallthrough]];
                 case Bundle::STATE_RESOLVED:
                 case Bundle::STATE_INSTALLED:
                 {
@@ -384,7 +384,9 @@ namespace cppmicroservices
                         try
                         {
                             if (util::Exists(bundleDir))
+                            {
                                 util::RemoveDirectoryRecursive(bundleDir);
+                            }
                         }
                         catch (...)
                         {
@@ -532,28 +534,37 @@ namespace cppmicroservices
                 // save this bundle's context so that it can be accessible anywhere
                 // from within this bundle's code.
                 std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + symbolicName;
-                BundleUtils::GetSymbol(SetBundleContext, libHandle, set_bundle_context_func);
+                std::string set_bundle_context_err;
+                BundleUtils::GetSymbol(SetBundleContext, libHandle, set_bundle_context_func, set_bundle_context_err);
 
                 if (SetBundleContext)
                 {
                     SetBundleContext(ctx.get());
                 }
+                else
+                {
+                    coreCtx->logger->Log(logservice::SeverityLevel::LOG_WARNING, set_bundle_context_err);
+                }
 
                 // get the create/destroy activator callbacks
                 std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
                 std::function<BundleActivator*(void)> createActivatorHook;
-                BundleUtils::GetSymbol(createActivatorHook, libHandle, create_activator_func);
+                std::string create_activator_err;
+                BundleUtils::GetSymbol(createActivatorHook, libHandle, create_activator_func, create_activator_err);
 
                 std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
-                BundleUtils::GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func);
+                std::string destroy_activator_err;
+                BundleUtils::GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func, destroy_activator_err);
 
                 if (!createActivatorHook)
                 {
+                    coreCtx->logger->Log(logservice::SeverityLevel::LOG_ERROR, create_activator_err);
                     throw std::runtime_error("Bundle #" + util::ToString(id) + " (location=" + location
                                              + ") activator constructor not found");
                 }
                 if (!destroyActivatorHook)
                 {
+                    coreCtx->logger->Log(logservice::SeverityLevel::LOG_ERROR, destroy_activator_err);
                     throw std::runtime_error("Bundle #" + util::ToString(id) + " (location=" + location
                                              + ") activator destructor not found");
                 }
@@ -823,7 +834,8 @@ namespace cppmicroservices
         coreCtx->services.GetUsedByBundle(this, srs);
         for (std::vector<ServiceRegistrationBase>::const_iterator i = srs.begin(); i != srs.end(); ++i)
         {
-            i->GetReference(std::string()).d.load()->UngetService(this->shared_from_this(), false);
+            auto ref = i->GetReference(std::string());
+            ref.d.Load()->UngetService(this->shared_from_this(), false);
         }
     }
 

@@ -129,9 +129,10 @@ namespace codegen
                 }
                 else
                 {
-                    mStrStream << datamodel::GetCtorInjectedRefTypes(componentInfo) << ">("
-                               << datamodel::GetCtorInjectedRefNames(componentInfo) << ", binders"
-                               << ");";
+
+                    mStrStream << datamodel::GetCtorInjectedRefParameters(componentInfo) << ">("
+                        << datamodel::GetCtorInjectedRefNames(componentInfo) << ", binders"
+                        << ");";
                 }
 
                 mStrStream << std::endl << std::endl << "  return componentInstance;" << std::endl << "}" << std::endl;

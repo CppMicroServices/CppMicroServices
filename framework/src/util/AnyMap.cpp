@@ -23,6 +23,7 @@
 #include "cppmicroservices/AnyMap.h"
 
 #include <cassert>
+#include <iostream>
 #include <stdexcept>
 
 namespace cppmicroservices
@@ -180,7 +181,7 @@ namespace cppmicroservices
 
     any_map::const_iter::const_iter() = default;
 
-    any_map::const_iter::const_iter(any_map::const_iter const& it) : iterator_base(it.type)
+    any_map::const_iter::const_iter(any_map::const_iter const& it) : iterator_base(it.type), it { nullptr }
     {
         switch (type)
         {
@@ -200,7 +201,7 @@ namespace cppmicroservices
         }
     }
 
-    any_map::const_iter::const_iter(any_map::iterator const& it) : iterator_base(it.type)
+    any_map::const_iter::const_iter(any_map::iterator const& it) : iterator_base(it.type), it { nullptr }
     {
         switch (type)
         {
@@ -402,7 +403,7 @@ namespace cppmicroservices
 
     any_map::iter::iter() = default;
 
-    any_map::iter::iter(iter const& it) : iterator_base(it.type)
+    any_map::iter::iter(iter const& it) : iterator_base(it.type), it { nullptr }
     {
         switch (type)
         {
@@ -602,18 +603,18 @@ namespace cppmicroservices
     // ----------------------------------------------------------
     // ------------------------  any_map  -----------------------
 
-    any_map::any_map(map_type type) : type(type)
+    any_map::any_map(map_type type, std::initializer_list<any_map::value_type> l) : type(type)
     {
         switch (type)
         {
             case map_type::ORDERED_MAP:
-                map.o = new ordered_any_map();
+                map.o = new ordered_any_map(l);
                 break;
             case map_type::UNORDERED_MAP:
-                map.uo = new unordered_any_map();
+                map.uo = new unordered_any_map(l);
                 break;
             case map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-                map.uoci = new unordered_any_cimap();
+                map.uoci = new unordered_any_cimap(l);
                 break;
             default:
                 throw std::logic_error("invalid map type");
@@ -647,7 +648,9 @@ namespace cppmicroservices
     any_map::operator=(any_map const& m)
     {
         if (this == &m)
+        {
             return *this;
+        }
 
         destroy();
         type = m.type;
@@ -1105,7 +1108,11 @@ namespace cppmicroservices
     // ----------------------------------------------------------
     // ------------------------  AnyMap  ------------------------
 
-    AnyMap::AnyMap(map_type type) : any_map(type) {}
+    AnyMap::AnyMap(std::initializer_list<any_map::value_type> l)
+        : any_map(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS, l)
+    {
+    }
+    AnyMap::AnyMap(map_type type, std::initializer_list<any_map::value_type> l) : any_map(type, l) {}
 
     AnyMap::AnyMap(ordered_any_map const& m) : any_map(m) {}
 
@@ -1149,9 +1156,13 @@ namespace cppmicroservices
         for (; i1 != end; ++i1)
         {
             if (i1 == begin)
+            {
                 os << i1->first << " : " << i1->second.ToString();
+            }
             else
+            {
                 os << ", " << i1->first << " : " << i1->second.ToString();
+            }
         }
         os << "}";
         return os;

@@ -109,7 +109,7 @@ namespace cppmicroservices
     // Framework storage
     //-------------------------------------------------------------------
 
-    const std::string FWDIR_DEFAULT = "fwdir";
+    std::string const FWDIR_DEFAULT = "fwdir";
 
     std::string
     GetFrameworkDir(CoreBundleContext* ctx)
@@ -126,12 +126,12 @@ namespace cppmicroservices
     GetPersistentStoragePath(CoreBundleContext* ctx, std::string const& leafDir, bool create)
     {
         // See if we have a storage directory
-        const std::string fwdir(GetFrameworkDir(ctx));
+        std::string const fwdir(GetFrameworkDir(ctx));
         if (fwdir.empty())
         {
             return fwdir;
         }
-        const std::string dir = util::GetAbsolute(fwdir, ctx->workingDir) + util::DIR_SEP + leafDir;
+        std::string const dir = util::GetAbsolute(fwdir, ctx->workingDir) + util::DIR_SEP + leafDir;
         if (!dir.empty())
         {
             if (util::Exists(dir))
@@ -160,7 +160,7 @@ namespace cppmicroservices
     }
 
     void
-    TerminateForDebug(const std::exception_ptr ex)
+    TerminateForDebug(std::exception_ptr const ex)
     {
 #if defined(_MSC_VER) && !defined(NDEBUG) && defined(_DEBUG) && defined(_CRT_ERROR)
         std::string message = util::GetLastExceptionStr();
@@ -170,9 +170,13 @@ namespace cppmicroservices
         _CrtSetReportMode(_CRT_ERROR, reportMode);
         int ret = _CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, CppMicroServices_VERSION_STR, message.c_str());
         if (ret == 0 && reportMode & _CRTDBG_MODE_WNDW)
+        {
             return; // ignore
+        }
         else if (ret == 1)
+        {
             _CrtDbgBreak();
+        }
 #else
         (void)ex;
 #endif

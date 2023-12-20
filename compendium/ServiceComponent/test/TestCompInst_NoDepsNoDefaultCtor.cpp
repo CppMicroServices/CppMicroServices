@@ -19,7 +19,7 @@
   limitations under the License.
 
   =============================================================================*/
-#if NEVER
+
 #    include <algorithm>
 #    include <chrono>
 #    include <cstdio>
@@ -48,7 +48,7 @@ namespace
      * This test point is used to verify a compile error is generated when a service component
      * does not have any dependencies and it does not provide a default constructor.
      *
-     * @todo Automate this test point. Currently interactive is the only way to verify compilation failures.
+     * CMake tests will build this file to catch the expected compile time error
      */
     TEST(ComponentInstance, CheckNoDefaultCtor)
     {
@@ -62,4 +62,3 @@ main(int argc, char** argv)
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-#endif

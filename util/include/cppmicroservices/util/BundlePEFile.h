@@ -102,25 +102,33 @@ namespace cppmicroservices
             std::wstring wpath(cppmicroservices::util::ToWString(location));
             HMODULE hBundleResources
                 = LoadLibraryExW(wpath.c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE | LOAD_LIBRARY_AS_IMAGE_RESOURCE);
-            if (hBundleResources)
-            {
-                // RAII - automatically free the library handle on object destruction
-                auto loadLibraryHandle = std::unique_ptr<HMODULE, hModuleDeleter>(hBundleResources, hModuleDeleter {});
-                HRSRC hResource = FindResourceA(hBundleResources, "US_RESOURCES", MAKEINTRESOURCEA(300));
-                HGLOBAL hRes = LoadResource(hBundleResources, hResource);
-                const LPVOID res = LockResource(hRes);
-                const DWORD zipSizeInBytes = SizeofResource(hBundleResources, hResource);
-                if (0 < zipSizeInBytes)
-                {
-                    m_rawData = std::make_shared<RawBundleResources>(
-                        std::make_unique<ResDataContainer>(std::move(loadLibraryHandle), res, zipSizeInBytes));
-                }
-            }
-            else
+            if (!hBundleResources)
             {
                 throw InvalidPEException("LoadLibrary failed for path " + location + " with error "
                                          + cppmicroservices::util::GetLastWin32ErrorStr());
             }
+            // RAII - automatically free the library handle on object destruction
+            auto loadLibraryHandle = std::unique_ptr<HMODULE, hModuleDeleter>(hBundleResources, hModuleDeleter {});
+            HRSRC hResource = FindResourceA(hBundleResources, "US_RESOURCES", MAKEINTRESOURCEA(300));
+            if (hResource)
+            {
+                HGLOBAL hRes = LoadResource(hBundleResources, hResource);
+                if (hRes)
+                {
+                    const LPVOID res = LockResource(hRes);
+                    if (res)
+                    {
+                        const DWORD zipSizeInBytes = SizeofResource(hBundleResources, hResource);
+                        if (0 < zipSizeInBytes)
+                        {
+                            m_rawData = std::make_shared<RawBundleResources>(
+                                std::make_unique<ResDataContainer>(std::move(loadLibraryHandle), res, zipSizeInBytes));
+                        }
+                    }
+                }
+            }
+
+            
         };
         ~BundlePEFile() = default;
 

@@ -246,7 +246,12 @@ namespace
       public:
         MultipleListenersTest() : framework(FrameworkFactory().NewFramework()) {}
 
-        ~MultipleListenersTest() override = default;
+        ~MultipleListenersTest() override
+        {
+            // when using gtest_repeat flag, this clears count within the
+            // namespace to avoid failures on repetition.
+            count = 0;
+        }
 
         void
         SetUp() override

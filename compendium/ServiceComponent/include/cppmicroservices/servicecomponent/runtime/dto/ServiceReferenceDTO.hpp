@@ -54,14 +54,14 @@ namespace cppmicroservices
                  *
                  * @see Constants#SERVICE_ID
                  */
-                unsigned long id;
+                unsigned long id = 0;
 
                 /**
                  * The id of the bundle that registered the service.
                  *
                  * @see ServiceReference#GetBundle()
                  */
-                unsigned long bundle;
+                unsigned long bundle = 0;
 
                 /**
                  * The properties for the service.

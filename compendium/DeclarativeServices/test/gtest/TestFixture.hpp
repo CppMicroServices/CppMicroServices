@@ -314,7 +314,22 @@ namespace test
         cppmicroservices::Framework framework;
         cppmicroservices::BundleContext context;
     };
+    class tGenericDSAndCASuite : public tGenericDSSuite
+    {
+      public:
+        void SetUp() override
+        {
+            tGenericDSSuite::SetUp();
+            ::test::InstallAndStartConfigAdmin(context);
+            auto svcRef = context.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+            ASSERT_TRUE(svcRef);
+            configAdmin = context.GetService(svcRef);
+            ASSERT_TRUE(configAdmin);
+        }
 
+      public:
+        std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin> configAdmin;
+    };
 } // namespace test
 
 #endif /* TestFixture_h */

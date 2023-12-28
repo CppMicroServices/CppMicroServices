@@ -20,37 +20,18 @@
 
   =============================================================================*/
 
+#include "ConcurrencyTestUtil.hpp"
+#include "cppmicroservices/LDAPFilter.h"
+#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
+#include "cppmicroservices/ServiceTracker.h"
+#include "gtest/gtest.h"
 #include "TestFixture.hpp"
 #include "TestInterfaces/Interfaces.hpp"
-#include "cppmicroservices/LDAPFilter.h"
-#include "cppmicroservices/LDAPProp.h"
-#include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
-#include "gtest/gtest.h"
-
 namespace test
 {
-
-    class tFactoryTarget : public tGenericDSSuite
+    class tFactoryTarget : public tGenericDSAndCASuite
     {
       public:
-        void
-        SetUp() override
-        {
-            framework.Start();
-            context = framework.GetBundleContext();
-
-            ::test::InstallAndStartDS(context);
-            auto sRef = context.GetServiceReference<scr::ServiceComponentRuntime>();
-            ASSERT_TRUE(sRef);
-            dsRuntimeService = context.GetService<scr::ServiceComponentRuntime>(sRef);
-            ASSERT_TRUE(dsRuntimeService);
-
-            ::test::InstallAndStartConfigAdmin(context);
-            auto svcRef = context.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
-            ASSERT_TRUE(svcRef);
-            configAdmin = context.GetService(svcRef);
-            ASSERT_TRUE(configAdmin);
-        }
         template <typename ServiceInterfaceT>
         std::shared_ptr<ServiceInterfaceT>
         getFactoryService(std::string factoryPid, std::string factoryInstance, cppmicroservices::AnyMap const& props)
@@ -79,23 +60,42 @@ namespace test
                     std::string filter = "(" + cppmicroservices::service::component::ComponentConstants::COMPONENT_NAME
                                          + "=" + componentName + ")";
                     auto services = context.GetServiceReferences<ServiceInterfaceT>(filter);
-                    EXPECT_EQ(services.size(), 1u);
-                    return context.GetService<ServiceInterfaceT>(services.at(0));
-                }
+                    if (services.size() >= 1)
+                    {
+                        return context.GetService<ServiceInterfaceT>(services.at(0));
+                    }
+                 }
             }
             return std::shared_ptr<ServiceInterfaceT>();
         }
-
-      public:
-        std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin> configAdmin;
+        template <typename ServiceInterfaceT, typename ServiceImplT>
+        cppmicroservices::ServiceRegistration<ServiceInterfaceT>
+        registerSvc(std::string const name, std::string const property, std::string const propertyValue)
+        {
+            auto mockService = std::make_shared<ServiceImplT>();
+            cppmicroservices::ServiceProperties serviceProps {
+                {std::string(cppmicroservices::service::component::ComponentConstants::COMPONENT_NAME),name},
+                {property, propertyValue}
+            };
+            return context.RegisterService<ServiceInterfaceT>(mockService, serviceProps);
+        }    
     };
 
     class MockServiceBImpl : public test::ServiceBInt
     {
       public:
         MockServiceBImpl() = default;
+        cppmicroservices::AnyMap GetProperties() { return cppmicroservices::AnyMap(); }
         ~MockServiceBImpl() = default;
     };
+
+    class MockServiceCImpl : public test::ServiceCInt
+    {
+      public:
+        MockServiceCImpl() = default;
+        cppmicroservices::AnyMap GetProperties() { return cppmicroservices::AnyMap(); }
+        ~MockServiceCImpl() = default;
+    }; 
 
     /* tFactoryTarget.dependencyExistsBefore.
      * ServiceA and ServiceB are both factory instances.
@@ -107,13 +107,8 @@ namespace test
     TEST_F(tFactoryTarget, dependencyExistsBefore)
     {
         // Register the ServiceB~123 factory service with a mock implementation
-        auto mockServiceB = std::make_shared<MockServiceBImpl>();
-        cppmicroservices::ServiceProperties serviceBProps {
-            {std::string("component.name"), std::string("ServiceB~123")},
-            {    std::string("ServiceBId"), std::string("ServiceB~123")}
-        };
-        auto serviceBReg = context.RegisterService<test::ServiceBInt>(mockServiceB, serviceBProps);
-
+        auto serviceBReg = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "ServiceBId", "ServiceB~123");
+  
         // Install and start the bundle containing the ServiceA factory.
         // DS is now listening for factory configuration objects of the form
         // ServiceA~<instance>
@@ -131,5 +126,377 @@ namespace test
         // Clean up
         serviceBReg.Unregister();
     }
+    /* tFactoryTarget.dependencyExistsAfter.
+     * ServiceA and ServiceB are both factory instances.
+     * ServiceA~1 is dependent on ServiceB~123.
+     * ServiceB~123 is registered after the bundle containing ServiceA is
+     * started.
+     */
 
+    TEST_F(tFactoryTarget, dependencyExistsAfter)
+    {
+        // Install and start the bundle containing the ServiceA factory.
+        // DS is now listening for factory configuration objects of the form
+        // ServiceA~<instance>
+        test::InstallLib(context, "TestBundleDSFAC1");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC1");
+ 
+        // Create the ServiceA~1 configuration object. Specify a dynamic target
+        // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
+        // satisfied by ServiceB~123 instance.
+        cppmicroservices::AnyMap props;
+        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
+        // Service cannot be instantiated because it's dependencies are not yet satisfied.
+        ASSERT_TRUE(!service);
+
+        // Create a service tracker for ServiceA. 
+        std::unique_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>> tracker(new cppmicroservices::ServiceTracker<test::ServiceAInt>(context, nullptr));
+        tracker->Open();
+
+        // Register the ServiceB~123 factory service with a mock implementation
+        auto serviceBReg = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "ServiceBId", "ServiceB~123");
+   
+        auto serviceA = tracker->WaitForService(std::chrono::milliseconds(500));
+        ASSERT_TRUE(serviceA) << "ServiceA not registered";
+  
+        // Clean up
+        tracker->Close();
+        serviceBReg.Unregister();
+    }
+    /* tFactoryTarget.multipleTargetsExistBefore.
+     * ServiceA, ServiceB and ServiceC are all factory instances.
+     * ServiceA~1 is dependent on ServiceB~123 and ServiceC~123
+     * ServiceB~123 and ServiceC~123 are registered before the bundle containing ServiceA is
+     * started.
+     */
+
+    TEST_F(tFactoryTarget, multipleTargetsExistBefore)
+    {
+        // Register the ServiceB~123 factory service with a mock implementation
+        auto serviceBReg = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "ServiceBId", "ServiceB~123");
+ 
+        // Register the ServiceC~123 factory service with a mock implementation
+        auto serviceCReg = registerSvc<test::ServiceCInt, MockServiceCImpl>("ServiceC~123", "ServiceCId", "ServiceC~123");
+ 
+        // Install and start the bundle containing the ServiceA factory.
+        // DS is now listening for factory configuration objects of the form
+        // ServiceA~<instance>
+        test::InstallLib(context, "TestBundleDSFAC2");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC2");
+
+        // Create the ServiceA~1 configuration object. Specify a two dynamic targets
+        // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
+        // satisfied by ServiceB~123 instance and the test::ServiceCInt will only 
+        // be satisfied by ServiceC~123
+        cppmicroservices::AnyMap props;
+        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        props["test::ServiceCInt"] = std::string("(ServiceCId=ServiceC~123)");
+        auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
+        ASSERT_TRUE(service);
+
+        // Clean up
+        serviceBReg.Unregister();
+        serviceCReg.Unregister();
+    }
+    /* tFactoryTarget.multipleTargetsExistsAfter.
+     * ServiceA, ServiceB and ServiceC are all factory instances.
+     * ServiceA~1 is dependent on ServiceB~123 and ServiceC~123
+     * ServiceB~123 and ServiceC~123 are registered after the bundle containing ServiceA is
+     * started.
+     */
+
+    TEST_F(tFactoryTarget,multipleTargetsExistAfter)
+    {
+        // Install and start the bundle containing the ServiceA factory.
+        // DS is now listening for factory configuration objects of the form
+        // ServiceA~<instance>
+        test::InstallLib(context, "TestBundleDSFAC2");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC2");
+
+        // Create the ServiceA~1 configuration object. Specify a dynamic target
+        // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
+        // satisfied by ServiceB~123 instance.
+        cppmicroservices::AnyMap props;
+        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        props["test::ServiceCInt"] = std::string("(ServiceCId=ServiceC~123)");
+        auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
+        // Service cannot be instantiated because it's dependencies are not yet satisfied.
+        ASSERT_TRUE(!service);
+
+        // Create a service tracker for ServiceA.
+        std::unique_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>> tracker(
+            new cppmicroservices::ServiceTracker<test::ServiceAInt>(context, nullptr));
+        tracker->Open();
+
+        // Register the ServiceB~123 factory service with a mock implementation
+        auto serviceBReg = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "ServiceBId", "ServiceB~123");
+
+        // Register the ServiceC~123 factory service with a mock implementation
+        auto serviceCReg = registerSvc<test::ServiceCInt, MockServiceCImpl>("ServiceC~123", "ServiceCId", "ServiceC~123");
+  
+        auto serviceA = tracker->WaitForService(std::chrono::milliseconds(500));
+        ASSERT_TRUE(serviceA) << "ServiceA not registered";
+
+        // Clean up
+        tracker->Close();
+        serviceBReg.Unregister();
+    }
+    /* tFactoryTarget.correctTarget.
+     * ServiceA and ServiceB are both factory instances.
+     * ServiceA~1 is dependent on ServiceB~123.
+     * Several instances of ServiceB are registered. Verify that ServiceA~1 is 
+     * satisfied by ServiceB~123 and not by any other instances of ServiceB.
+     */
+    TEST_F(tFactoryTarget, correctTarget)
+    {
+        // Register the ServiceB~1 factory service with a mock implementation
+        auto serviceBReg = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~1", "ServiceBId", "ServiceB~1");
+
+        // Install and start the bundle containing the ServiceA factory.
+        // DS is now listening for factory configuration objects of the form
+        // ServiceA~<instance>
+        test::InstallLib(context, "TestBundleDSFAC1");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC1");
+
+        // Create the ServiceA~1 configuration object. Specify a dynamic target
+        // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
+        // satisfied by ServiceB~123 instance.
+        cppmicroservices::AnyMap props;
+        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
+        ASSERT_TRUE(!service);  //ServiceA~1 is not satisfied so this should be nullptr
+   
+       // Create a service tracker for ServiceA.
+        std::unique_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>> tracker(
+            new cppmicroservices::ServiceTracker<test::ServiceAInt>(context, nullptr));
+        tracker->Open();
+        
+        // Register the ServiceB~123 factory service with a mock implementation
+        auto serviceBReg2 = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "ServiceBId", "ServiceB~123");
+ 
+        // ServiceA~1 should now be satisfied.
+        auto serviceA = tracker->WaitForService(std::chrono::milliseconds(500));
+        ASSERT_TRUE(serviceA) << "ServiceA not registered";
+
+ 
+        // Clean up
+        tracker->Close();
+        serviceBReg.Unregister();
+        serviceBReg2.Unregister();
+    }
+    /* tFactoryTarget.targetByProperty
+     * ServiceA and ServiceB are both factory instances.
+     * ServiceA~1 is dependent on the ServiceB with a target property user-ServiceB set 
+     * equal to true.
+     * Several instances of ServiceB are registered. Verify that ServiceA~1 is
+     * satisfied by the ServiceB with the correct property and not by any other instances of ServiceB.
+     */
+    TEST_F(tFactoryTarget, targetByProperty)
+    {
+        // Register the ServiceB~1 factory service with a mock implementation
+        auto serviceBReg = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~1", "ServiceBId", "ServiceB~1");
+
+        // Install and start the bundle containing the ServiceA factory.
+        // DS is now listening for factory configuration objects of the form
+        // ServiceA~<instance>
+        test::InstallLib(context, "TestBundleDSFAC1");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC1");
+
+        // Create the ServiceA~1 configuration object. Specify a dynamic target
+        // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
+        // satisfied by ServiceB~123 instance.
+        cppmicroservices::AnyMap props;
+        props["test::ServiceBInt"] = std::string("(user-ServiceB=true)");
+        auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
+        ASSERT_TRUE(!service); // ServiceA~1 is not satisfied so this should be nullptr
+
+        // Create a service tracker for ServiceA.
+        std::unique_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>> tracker(
+            new cppmicroservices::ServiceTracker<test::ServiceAInt>(context, nullptr));
+        tracker->Open();
+
+        // Register the ServiceB~123 factory service with a mock implementation
+        auto serviceBReg2 = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "user-ServiceB", "true");
+
+        // ServiceA~1 should now be satisfied.
+        auto serviceA = tracker->WaitForService(std::chrono::milliseconds(500));
+        ASSERT_TRUE(serviceA) << "ServiceA not registered";
+
+        // Clean up
+        tracker->Close();
+        serviceBReg.Unregister();
+        serviceBReg2.Unregister();
+    }
+    /* tFactoryTarget.multipleToOneBefore.
+     * ServiceA and ServiceB are both factory instances.
+     * Five instances of ServiceA will be created which are all dependent on ServiceB~123.
+     * ServiceB~123 is registered before the bundle containing ServiceA is
+     * started.
+     */
+    TEST_F(tFactoryTarget, multipleToOneBefore)
+    {
+        // Register the ServiceB~123 factory service with a mock implementation
+        auto serviceBReg
+            = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "ServiceBId", "ServiceB~123");
+
+        // Install and start the bundle containing the ServiceA factory.
+        // DS is now listening for factory configuration objects of the form
+        // ServiceA~<instance>
+        test::InstallLib(context, "TestBundleDSFAC1");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC1");
+
+        // Create ServiceA~1, ServiceA~2, ServiceA~3, ServiceA~4, ServiceA~5 configuration objects. 
+        // Specify a dynamic target so that the test::ServiceBInt dependency for  
+        // ServiceA~1 will only be satisfied by ServiceB~123 instance.
+        cppmicroservices::AnyMap props;
+        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        auto range = { "1", "2", "3", "4", "5" };
+        for (auto const& i : range) {
+            auto service = getFactoryService<test::ServiceAInt>("ServiceA", i, props);
+            ASSERT_TRUE(service);
+        }
+
+        // Clean up
+        serviceBReg.Unregister();
+    }
+    /* tFactoryTarget.multipleToOneAfter
+     * ServiceA and ServiceB are both factory instances.
+     * Five instances of ServiceA will be created which are all dependent on ServiceB~123.
+     * ServiceB~123 is registered after the bundle containing ServiceA is
+     * started.
+     */
+    TEST_F(tFactoryTarget, multipleToOneAfter)
+    {
+        // Install and start the bundle containing the ServiceA factory.
+        // DS is now listening for factory configuration objects of the form
+        // ServiceA~<instance>
+        test::InstallLib(context, "TestBundleDSFAC1");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC1");
+
+        // Create ServiceA~1, ServiceA~2, ServiceA~3, ServiceA~4, ServiceA~5 configuration objects.
+        // Specify a dynamic target so that the test::ServiceBInt dependency for
+        // ServiceA~1 will only be satisfied by ServiceB~123 instance.
+        cppmicroservices::AnyMap props;
+        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        auto range = { "1", "2", "3", "4", "5" };
+        std::vector<std::shared_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>>> trackers;
+ 
+        for (auto const& i : range)
+        {
+            auto service = getFactoryService<test::ServiceAInt>("ServiceA", i, props);
+            ASSERT_TRUE(!service);
+
+            // Create a service tracker for each instance of ServiceA.
+            std::string filterString = "(" + cppmicroservices::service::component::ComponentConstants::COMPONENT_NAME + "="
+                                 + "ServiceA~" + std::string(i) + ")";
+            cppmicroservices::LDAPFilter filter { filterString };             
+            auto tracker = std::make_shared<cppmicroservices::ServiceTracker<test::ServiceAInt>>
+                      (context, filter, nullptr);
+            trackers.push_back (tracker);
+            tracker->Open();
+        }
+
+  
+        // Register the ServiceB~123 factory service with a mock implementation
+        auto serviceBReg
+            = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "ServiceBId", "ServiceB~123");
+
+        for (auto const& tracker : trackers) {
+            auto service = tracker->WaitForService(std::chrono::milliseconds(500));
+            ASSERT_TRUE(service) << "ServiceA not registered";
+            tracker->Close();
+        }
+ 
+        // Clean up
+        serviceBReg.Unregister();
+    }
+    /* tFactoryTarget.multipleToOneUnregistered
+     * ServiceA and ServiceB are both factory instances.
+     * Five instances of ServiceA will be created which are all dependent on ServiceB~123.
+     * ServiceB~123 is registered before the bundle containing ServiceA is
+     * started. One all the instances of ServiceA are created, ServiceB 
+     * is unregistered. This shouild result in all the ServiceA instances becoming
+     * unsatisfied.
+     */
+    TEST_F(tFactoryTarget, multipleToOneUnregistered)
+    {
+        // Register the ServiceB~123 factory service with a mock implementation
+        auto serviceBReg
+            = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "ServiceBId", "ServiceB~123");
+
+        // Install and start the bundle containing the ServiceA factory.
+        // DS is now listening for factory configuration objects of the form
+        // ServiceA~<instance>
+        test::InstallLib(context, "TestBundleDSFAC1");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC1");
+
+        auto tracker = std::make_shared<cppmicroservices::ServiceTracker<test::ServiceAInt>>(context,nullptr);
+        tracker->Open();
+        EXPECT_EQ(tracker->GetTrackingCount(), 0) << "No ServiceA instances yet. Tracking Count should be 0";
+
+        // Create ServiceA~1, ServiceA~2, ServiceA~3, ServiceA~4, ServiceA~5 configuration objects.
+        // Specify a dynamic target so that the test::ServiceBInt dependency for
+        // ServiceA~1 will only be satisfied by ServiceB~123 instance.
+        int instanceCount = 5;
+        cppmicroservices::AnyMap props;
+        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        auto range = { "1", "2", "3", "4", "5" };
+        for (auto const& i : range)
+        {
+            auto service = getFactoryService<test::ServiceAInt>("ServiceA", i, props);
+            ASSERT_TRUE(service);
+        }
+        auto sRefs = tracker->GetServiceReferences();           
+        EXPECT_EQ(sRefs.size(), instanceCount) << "All instances of ServiceA should be created.";
+
+        serviceBReg.Unregister();  
+        auto fut = std::async(std::launch::async,
+                              [&]()
+                              {
+                                  while (!tracker->IsEmpty()) {};
+                                  return;
+                              });
+        fut.wait_for(std::chrono::milliseconds(500));
+ 
+        ASSERT_TRUE(tracker->IsEmpty()) << "All ServiceA instances should have been destroyed.";       
+    }
+    /* tFactoryTarget.multipleToOneConcurrent
+     * ServiceA and ServiceB are both factory instances.
+     * Many instances of ServiceA will be created which are all dependent on ServiceB~123.
+     * ServiceB~123 is registered before the bundle containing ServiceA is
+     * started.
+     */
+    TEST_F(tFactoryTarget, multipleToOneConcurrent)
+    {
+        // Register the ServiceB~123 factory service with a mock implementation
+        auto serviceBReg
+            = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "ServiceBId", "ServiceB~123");
+
+        // Install and start the bundle containing the ServiceA factory.
+        // DS is now listening for factory configuration objects of the form
+        // ServiceA~<instance>
+        test::InstallLib(context, "TestBundleDSFAC1");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC1");
+
+        // Create configuration objects for ServicA instances configuration objects
+        // concurrently.
+        // Specify a dynamic target so that the test::ServiceBInt dependency for
+        // ServiceA~1 will only be satisfied by ServiceB~123 instance.
+        cppmicroservices::AnyMap props;
+        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        
+        std::function<bool()> createFunc = [&]() -> bool
+        {
+            auto service = getFactoryService<test::ServiceAInt>("ServiceA", "", props);
+            return service ? true : false;
+        };
+        auto results = ConcurrentInvoke(createFunc);
+        EXPECT_TRUE(!results.empty());
+        EXPECT_TRUE(std::all_of(results.cbegin(), results.cend(), [](bool result) { return result; }));
+
+        // Clean up
+        serviceBReg.Unregister();
+    };
+ 
 }; // namespace test

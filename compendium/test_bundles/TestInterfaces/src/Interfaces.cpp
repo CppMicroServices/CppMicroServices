@@ -22,4 +22,5 @@ namespace test
     CAInterface1::~CAInterface1() = default;
     ServiceAInt::~ServiceAInt() = default;
     ServiceBInt::~ServiceBInt() = default;
+    ServiceCInt::~ServiceCInt() = default;
 } // namespace test

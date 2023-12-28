@@ -43,8 +43,9 @@ namespace cppmicroservices
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
             std::shared_ptr<SCRExtensionRegistry> extensionReg)
             : tokenCounter(0)
-            , componentFactory(std::make_shared<ComponentFactoryImpl>(context, logger, asyncWorkSvc, extensionReg))
             , logger(logger)
+            , componentFactory(std::make_shared<ComponentFactoryImpl>(context, logger, asyncWorkSvc, extensionReg))
+ 
           {
             if (!context || !(this->logger) || !asyncWorkSvc || !extensionReg || !componentFactory)
             {

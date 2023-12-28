@@ -93,7 +93,9 @@ namespace cppmicroservices
     {
         auto bc = bundleContext.Exchange(std::shared_ptr<BundleContextPrivate>());
         if (bc)
+        {
             bc->Invalidate();
+        }
     }
 
     FrameworkEvent
@@ -165,6 +167,7 @@ namespace cppmicroservices
 #else
                 Shutdown0(restart, wa);
 #endif
+                coreCtx->StopFramework();
                 break;
             }
             case Bundle::STATE_UNINSTALLED:
@@ -199,6 +202,7 @@ namespace cppmicroservices
                     throw std::runtime_error("INTERNAL ERROR, Illegal state, " + ss.str());
             }
             bundlesToStart = coreCtx->storage->GetStartOnLaunchBundles();
+            coreCtx->StartFramework();
         }
 
         // Start bundles according to their autostart setting.
@@ -207,7 +211,7 @@ namespace cppmicroservices
             auto b = coreCtx->bundleRegistry.GetBundle(i);
             try
             {
-                const int32_t autostartSetting = b->barchive->GetAutostartSetting();
+                int32_t const autostartSetting = b->barchive->GetAutostartSetting();
                 // Launch must not change the autostart setting of a bundle
                 int option = Bundle::START_TRANSIENT;
                 if (Bundle::START_ACTIVATION_POLICY == autostartSetting)

@@ -187,6 +187,11 @@ namespace cppmicroservices
 
         void Uninit1();
 
+        void StopFramework();
+
+        void StartFramework();
+
+        bool FrameworkStopped() const;
         /**
          * Get private bundle data storage file handle.
          *
@@ -197,6 +202,7 @@ namespace cppmicroservices
         // The core context is exclusively constructed by the FrameworkFactory class
         friend class FrameworkFactory;
 
+        bool stopped;
         /**
          * Construct a core context
          *

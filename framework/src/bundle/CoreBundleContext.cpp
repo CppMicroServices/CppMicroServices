@@ -94,6 +94,7 @@ namespace cppmicroservices
         , firstInit(true)
         , initCount(0)
         , libraryLoadOptions(0)
+        , stopped(false)
     {
         auto enableDiagLog = any_cast<bool>(frameworkProperties.at(Constants::FRAMEWORK_LOG));
         std::ostream* diagnosticLogger = (diagLogger) ? diagLogger : &std::clog;
@@ -249,5 +250,17 @@ namespace cppmicroservices
             return dataStorage + util::DIR_SEP + util::ToString(id);
         }
         return std::string();
+    }
+
+    void CoreBundleContext::StopFramework() {
+        this->self.Lock(), stopped = true;
+    }
+
+    void CoreBundleContext::StartFramework() {
+        this->self.Lock(), stopped = false;
+    }
+
+    bool CoreBundleContext::FrameworkStopped() const {
+        return this->self.Lock(), stopped;
     }
 } // namespace cppmicroservices

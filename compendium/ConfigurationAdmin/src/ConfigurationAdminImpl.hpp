@@ -245,6 +245,7 @@ namespace cppmicroservices
 
             // Used to generate a random instance name for CreateFactoryConfiguration
             std::string RandomInstanceName();
+            std::mutex randomInstanceMutex;
 
             // Used to keep track of the instances of each ManagedServiceFactory
             void AddFactoryInstanceIfRequired(std::string const& pid, std::string const& factoryPid);

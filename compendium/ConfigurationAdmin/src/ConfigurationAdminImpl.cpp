@@ -1071,13 +1071,16 @@ namespace cppmicroservices
         ConfigurationAdminImpl::RandomInstanceName()
         {
             static auto const characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-            std::uniform_int_distribution<> dist(0, 61);
-            std::string randomString(6, '\0');
-            for (auto& c : randomString)
             {
-                c = characters[dist(randomGenerator)];
+                std::lock_guard<std::mutex> lk { randomInstanceMutex };
+                std::uniform_int_distribution<> dist(0, 61);
+                std::string randomString(6, '\0');
+                for (auto& c : randomString)
+                {
+                    c = characters[dist(randomGenerator)];
+                }
+                return randomString;
             }
-            return randomString;
         }
 
         void

@@ -483,15 +483,17 @@ TEST(Framework, BundleStartAfterFrameworkStop)
 {
     auto f = FrameworkFactory().NewFramework();
     f.Start();
-    f.Stop();
+
 #if defined(US_BUILD_SHARED_LIBS)
     auto bundle = cppmicroservices::testing::InstallLib(f.GetBundleContext(), "TestBundleA");
 #else
     auto bundle = cppmicroservices::testing::GetBundle("TestBundleA", f.GetBundleContext());
 #endif
     ASSERT_TRUE(bundle); // "Non-null bundle"
-    ASSERT_THROW(bundle.Start(), std::runtime_error);
 
+    f.Stop();
+    f.WaitForStop(std::chrono::milliseconds::zero());
+    ASSERT_THROW(bundle.Start(), std::runtime_error);
 }
 
 #ifdef US_ENABLE_THREADING_SUPPORT

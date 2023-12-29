@@ -125,6 +125,7 @@ namespace test
 
         // Clean up
         serviceBReg.Unregister();
+        testBundle.Stop();
     }
     /* tFactoryTarget.dependencyExistsAfter.
      * ServiceA and ServiceB are both factory instances.
@@ -163,7 +164,8 @@ namespace test
         // Clean up
         tracker->Close();
         serviceBReg.Unregister();
-    }
+        testBundle.Stop();
+     }
     /* tFactoryTarget.multipleTargetsExistBefore.
      * ServiceA, ServiceB and ServiceC are all factory instances.
      * ServiceA~1 is dependent on ServiceB~123 and ServiceC~123
@@ -198,6 +200,7 @@ namespace test
         // Clean up
         serviceBReg.Unregister();
         serviceCReg.Unregister();
+        testBundle.Stop();
     }
     /* tFactoryTarget.multipleTargetsExistsAfter.
      * ServiceA, ServiceB and ServiceC are all factory instances.
@@ -241,6 +244,7 @@ namespace test
         // Clean up
         tracker->Close();
         serviceBReg.Unregister();
+        testBundle.Stop();
     }
     /* tFactoryTarget.correctTarget.
      * ServiceA and ServiceB are both factory instances.
@@ -284,6 +288,7 @@ namespace test
         tracker->Close();
         serviceBReg.Unregister();
         serviceBReg2.Unregister();
+        testBundle.Stop();
     }
     /* tFactoryTarget.targetByProperty
      * ServiceA and ServiceB are both factory instances.
@@ -327,6 +332,7 @@ namespace test
         tracker->Close();
         serviceBReg.Unregister();
         serviceBReg2.Unregister();
+        testBundle.Stop();
     }
     /* tFactoryTarget.multipleToOneBefore.
      * ServiceA and ServiceB are both factory instances.
@@ -359,6 +365,7 @@ namespace test
 
         // Clean up
         serviceBReg.Unregister();
+        testBundle.Stop();
     }
     /* tFactoryTarget.multipleToOneAfter
      * ServiceA and ServiceB are both factory instances.
@@ -410,6 +417,7 @@ namespace test
  
         // Clean up
         serviceBReg.Unregister();
+        testBundle.Stop();
     }
     /* tFactoryTarget.multipleToOneUnregistered
      * ServiceA and ServiceB are both factory instances.
@@ -460,6 +468,7 @@ namespace test
         fut.wait_for(std::chrono::milliseconds(500));
  
         ASSERT_TRUE(tracker->IsEmpty()) << "All ServiceA instances should have been destroyed.";       
+        testBundle.Stop();
     }
     /* tFactoryTarget.multipleToOneConcurrent
      * ServiceA and ServiceB are both factory instances.
@@ -497,6 +506,7 @@ namespace test
 
         // Clean up
         serviceBReg.Unregister();
+        testBundle.Stop();
     };
  
 }; // namespace test

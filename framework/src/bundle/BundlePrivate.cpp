@@ -421,8 +421,8 @@ namespace cppmicroservices
         auto l = this->Lock();
         US_UNUSED(l);
         if(coreCtx->FrameworkStopped()){
-            throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" + location
-                                               + ") is part of a stopped Framework");
+            throw std::runtime_error("Bundle #" + util::ToString(id) + " (location=" + location
+                                               + ") belongs to a stopped framework");
         }
         if (state == Bundle::STATE_UNINSTALLED)
         {

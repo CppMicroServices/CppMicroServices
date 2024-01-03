@@ -936,7 +936,7 @@ namespace cppmicroservices
             framework.WaitForStop(std::chrono::milliseconds::zero());
         }
 
-        TEST(TestConcurrentStop, test1)
+        TEST(ComponentConfigurationTests, TestConcurrentStop)
         {
             auto framework = cppmicroservices::FrameworkFactory().NewFramework();
             framework.Start();

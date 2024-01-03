@@ -109,9 +109,9 @@ namespace cppmicroservices
              * Returns the id of the {@link Bundle} which contains the component managed by this object
              */
             unsigned long
-            GetBundleId() override
+            GetBundleId() const override
             {
-                return GetBundle().GetBundleId();;
+                return GetBundle().GetBundleId();
             }
 
             /**
@@ -206,7 +206,6 @@ namespace cppmicroservices
           private:
             FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
 
-            unsigned long bundleId;
             std::shared_ptr<ComponentRegistry> const
                 registry; ///< component registry associated with the current runtime
             std::shared_ptr<metadata::ComponentMetadata const> const compDesc; ///< the component description

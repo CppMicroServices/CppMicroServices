@@ -58,7 +58,7 @@ namespace cppmicroservices
             /**
              * Returns the Id of the Bundle this component belongs to.
              */
-            virtual unsigned long GetBundleId() const = 0;
+            virtual unsigned long GetBundleId() = 0;
 
             /**
              * Returns true if the component is enabled, false otherwise

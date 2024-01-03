@@ -63,7 +63,7 @@ namespace cppmicroservices
             FakeComponentManager() : ComponentManager(), mBundleId(++id), mName(GenRandomString()) {}
             ~FakeComponentManager() {};
             unsigned long
-            GetBundleId() const override
+            GetBundleId() override
             {
                 return mBundleId;
             }

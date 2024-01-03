@@ -182,7 +182,7 @@ namespace cppmicroservices
           public:
             MOCK_CONST_METHOD0(GetName, std::string(void));
             MOCK_CONST_METHOD0(GetBundle, cppmicroservices::Bundle(void));
-            MOCK_CONST_METHOD0(GetBundleId, unsigned long(void));
+            MOCK_METHOD0(GetBundleId, unsigned long(void));
             MOCK_METHOD0(Initialize, void(void));
             MOCK_CONST_METHOD0(IsEnabled, bool(void));
             MOCK_METHOD0(Enable, std::shared_future<void>(void));

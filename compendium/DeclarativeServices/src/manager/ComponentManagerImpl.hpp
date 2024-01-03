@@ -111,11 +111,7 @@ namespace cppmicroservices
             unsigned long
             GetBundleId() override
             {
-                if (bundleId == 0)
-                {
-                    bundleId = GetBundle().GetBundleId();
-                }
-                return bundleId;
+                return GetBundle().GetBundleId();;
             }
 
             /**

@@ -253,6 +253,9 @@ namespace test
         void
         TearDown() override
         {
+            if (dsRuntimeService) {
+                dsRuntimeService.reset();
+            }
             framework.Stop();
             framework.WaitForStop(std::chrono::milliseconds::zero());
         }
@@ -326,7 +329,15 @@ namespace test
             configAdmin = context.GetService(svcRef);
             ASSERT_TRUE(configAdmin);
         }
-
+        void
+        TearDown() override
+        {
+            if (configAdmin)
+            {
+                configAdmin.reset();
+            };
+            tGenericDSSuite::TearDown();
+        }
       public:
         std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin> configAdmin;
     };

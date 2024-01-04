@@ -20,17 +20,18 @@
 
   =============================================================================*/
 
-#include "ConcurrencyUtil.hpp"
-#include "ComponentFactoryImpl.hpp"
 #include "../ComponentRegistry.hpp"
 #include "../metadata/ComponentMetadata.hpp"
+#include "../SCRExtensionRegistry.hpp"
 #include "ComponentConfigurationImpl.hpp"
+#include "ComponentFactoryImpl.hpp"
 #include "ComponentManagerImpl.hpp"
+#include "ConcurrencyUtil.hpp"
 #include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
-#include "../SCRExtensionRegistry.hpp"
+
 
 namespace cppmicroservices
 {
@@ -70,16 +71,8 @@ namespace cppmicroservices
             // this is a factory instance not a factory component
             newMetadata->factoryComponentID = "";
 
-            // Factory instance is dependent on the same configurationPids as the factory
-            // component except the factory component itself.
+            // Factory instance is dependent on the factory instance pid
             newMetadata->configurationPids.clear();
-            for (auto const& basePid : oldMetadata->configurationPids)
-            {
-                if (basePid != oldMetadata->configurationPids[0])
-                {
-                    newMetadata->configurationPids.emplace_back(basePid);
-                }
-            }
             newMetadata->configurationPids.emplace_back(pid);
 
             // Look for dynamic targets in the references.
@@ -87,7 +80,7 @@ namespace cppmicroservices
             // with the interface name as the key and the target as the value. 
             for (auto& ref : newMetadata->refsMetadata)
             {
-               auto interface = ref.interfaceName;
+                auto interface = ref.interfaceName;
                 auto iter = properties.find(interface);
                 if (iter != properties.end()) {
                     // This reference has a dynamic target
@@ -143,13 +136,7 @@ namespace cppmicroservices
             {
                 throw;
             }
-            catch (std::exception const&)
-            {
-                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                            "Failed to create ComponentManager with name " + newMetadata->name + " from bundle with Id "
-                                + std::to_string(bundleContext.GetBundle().GetBundleId()),
-                            std::current_exception());
-            }
+ 
         }
 
  

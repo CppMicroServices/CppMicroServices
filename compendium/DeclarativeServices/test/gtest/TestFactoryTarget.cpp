@@ -20,11 +20,20 @@
 
   =============================================================================*/
 
+#include "../../src/manager/ComponentFactoryImpl.hpp"
+#include "../../src/manager/ConfigurationNotifier.hpp"
+#include "../../src/manager/SingletonComponentConfiguration.hpp"
+#include "../../src/metadata/ComponentMetadata.hpp"
+#include "../../src/SCRExtensionRegistry.hpp"
+#include "../../src/SCRAsyncWorkService.hpp"
+#include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "ConcurrencyTestUtil.hpp"
 #include "cppmicroservices/LDAPFilter.h"
+#include "cppmicroservices/logservice/LogService.hpp"
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/ServiceTracker.h"
 #include "gtest/gtest.h"
+#include "Mocks.hpp"
 #include "TestFixture.hpp"
 #include "TestInterfaces/Interfaces.hpp"
 namespace test
@@ -508,5 +517,66 @@ namespace test
         serviceBReg.Unregister();
         testBundle.Stop();
     };
- 
+    // Test ComponentFactoryImpl constructor with invalid arguments
+    TEST_F(tFactoryTarget, ctorInvalidArgs)
+    {
+        std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+        std::shared_ptr <cppmicroservices::scrimpl::SCRAsyncWorkService> asyncWorkService;
+        std::shared_ptr<cppmicroservices::scrimpl::SCRExtensionRegistry> bundleRegistry;
+        EXPECT_THROW({ cppmicroservices::scrimpl::ComponentFactoryImpl componentFactory(context,
+                                                                                logger,
+                                                                                asyncWorkService,
+                                                                                bundleRegistry);
+        }, std::invalid_argument);
+    };
+    /* This test verifies that if an invalid LDAP filter is received in the properties for a configuration 
+     * object then DS intercepts the exception and logs it. Also, if a std::exception occurs while creating
+     * the factory instance DS intercepts the exception and logs it. 
+     */
+    TEST_F(tFactoryTarget, testExceptionLogging)
+    {
+        // Create a mock ComponentFactoryImpl object. We will call the CreateFactoryComponent method for this object.
+        auto mockLogger = std::make_shared<cppmicroservices::scrimpl::MockLogger>();
+        auto asyncWorkService = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(context, mockLogger);
+        auto bundleRegistry = std::make_shared<cppmicroservices::scrimpl::SCRExtensionRegistry>(mockLogger);
+        cppmicroservices::scrimpl::ComponentFactoryImpl componentFactory(context,
+                                                                         mockLogger,
+                                                                         asyncWorkService,
+                                                                         bundleRegistry);
+
+        // Create some component meta data and insert a reference into the refsMetadata vector
+        auto mockMetadata = std::make_shared<cppmicroservices::scrimpl::metadata::ComponentMetadata>();      
+        cppmicroservices::scrimpl::metadata::ReferenceMetadata reference;
+        reference.interfaceName = "ServiceBInt";
+        mockMetadata->refsMetadata.push_back(reference);
+        auto notifier = std::make_shared<cppmicroservices::scrimpl::ConfigurationNotifier>(context,
+                                                                mockLogger,
+                                                                asyncWorkService,
+                                                                bundleRegistry);
+    
+        //Create a mock ComponentConfigurationImpl object with the metadata containing the 
+        //reference for ServiceBInt.
+        auto fakeRegistry = std::make_shared<cppmicroservices::scrimpl::ComponentRegistry>();
+        auto fakeCompConfig = std::make_shared<cppmicroservices::scrimpl::SingletonComponentConfigurationImpl>(mockMetadata,
+                                                                              framework,
+                                                                              fakeRegistry,
+                                                                              mockLogger,
+                                                                              notifier);
+        
+         std::shared_ptr<cppmicroservices::scrimpl::ComponentConfigurationImpl> mgr = fakeCompConfig;
+        // set logging expectations
+        auto exceptionLDAPFilter
+            = testing::AllOf(testing::HasSubstr("CreateFactoryComponent failed because of invalid target ldap filter"));
+        EXPECT_CALL(*mockLogger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, exceptionLDAPFilter)).Times(1);
+
+        //Create properties with a bad LDAPFilter (It's missing a close parenthesis after 123).
+        cppmicroservices::AnyMap props;
+        props["ServiceBInt"] = std::string("(ServiceBId=ServiceB~123");      
+
+        // When the ComponentFactoryImpl CreateFactoryComponent method is called it will log an error 
+        // exceptionLDAPFilter and throw an invalid_argument exception
+         EXPECT_THROW({ componentFactory.CreateFactoryComponent("serviceA~123", mgr, props); },
+                     std::invalid_argument);
+
+    }
 }; // namespace test

@@ -947,27 +947,24 @@ namespace cppmicroservices
 
             test::InstallAndStartDS(context);
 
-            std::vector<std::string> bundlesToInstall
-                = { "DSGraph01", "DSGraph02", "DSGraph03", "DSGraph04", "DSGraph05", "DSGraph06", "DSGraph07" };
-            std::vector<cppmicroservices::ServiceReferenceU> interfaces;
-            std::vector<cppmicroservices::Bundle> installedBundles;
+            std::vector<cppmicroservices::Bundle> installedBundles
+                = { ::test::InstallAndStartBundle(context, "DSGraph01"),
+                    ::test::InstallAndStartBundle(context, "DSGraph02"),
+                    ::test::InstallAndStartBundle(context, "DSGraph03"),
+                    ::test::InstallAndStartBundle(context, "DSGraph04"),
+                    ::test::InstallAndStartBundle(context, "DSGraph05"),
+                    ::test::InstallAndStartBundle(context, "DSGraph06"),
+                    ::test::InstallAndStartBundle(context, "DSGraph07") };
 
-            for (auto const& bundleName : bundlesToInstall)
+            std::vector<cppmicroservices::ServiceReferenceU> const interfaces {
+                context.GetServiceReference<test::DSGraph01>(), context.GetServiceReference<test::DSGraph02>(),
+                context.GetServiceReference<test::DSGraph03>(), context.GetServiceReference<test::DSGraph04>(),
+                context.GetServiceReference<test::DSGraph05>(), context.GetServiceReference<test::DSGraph06>(),
+                context.GetServiceReference<test::DSGraph07>()
+            };
+
+            for (auto const& sref : interfaces)
             {
-                installedBundles.emplace_back(::test::InstallAndStartBundle(context, bundleName));
-            }
-
-            interfaces.push_back(context.GetServiceReference<test::DSGraph01>());
-            interfaces.push_back(context.GetServiceReference<test::DSGraph02>());
-            interfaces.push_back(context.GetServiceReference<test::DSGraph03>());
-            interfaces.push_back(context.GetServiceReference<test::DSGraph04>());
-            interfaces.push_back(context.GetServiceReference<test::DSGraph05>());
-            interfaces.push_back(context.GetServiceReference<test::DSGraph06>());
-            interfaces.push_back(context.GetServiceReference<test::DSGraph07>());
-
-            for (size_t i = 0; i < interfaces.size(); ++i)
-            {
-                auto sref = interfaces[i];
                 ASSERT_TRUE(static_cast<bool>(sref));
                 auto service = context.GetService(sref);
                 ASSERT_NE(service, nullptr);

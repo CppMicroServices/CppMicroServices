@@ -263,7 +263,7 @@ namespace cppmicroservices
                     return;
                 }
             }
-            [[fallthrough]];
+                [[fallthrough]];
             case Bundle::STATE_RESOLVED:
             {
                 state = Bundle::STATE_STARTING;
@@ -337,7 +337,7 @@ namespace cppmicroservices
                         }
                     }
                 }
-                [[fallthrough]];
+                    [[fallthrough]];
                 case Bundle::STATE_RESOLVED:
                 case Bundle::STATE_INSTALLED:
                 {
@@ -825,8 +825,20 @@ namespace cppmicroservices
         coreCtx->services.GetUsedByBundle(this, srs);
         for (std::vector<ServiceRegistrationBase>::const_iterator i = srs.begin(); i != srs.end(); ++i)
         {
-            auto ref = i->GetReference(std::string());
-            ref.d.Load()->UngetService(this->shared_from_this(), false);
+            // wrap in try-catch to catch failures if service is already unregistered
+            // if service is unregistered, all work in UngetService is already done by Unregister() previously
+            try
+            {
+                auto ref = i->GetReference(std::string());
+                ref.d.Load()->UngetService(this->shared_from_this(), false);
+            }
+            catch (...)
+            {
+                coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
+                                     "Some services already unregistered in Bundle #" + util::ToString(id)
+                                         + " (location=" + location + ")",
+                                     std::current_exception());
+            }
         }
     }
 

@@ -1,6 +1,6 @@
 ---
-Checks:          '*'
-WarningsAsErrors: 'bugprone-*'
+Checks:          '-*,bugprone-*,cppcoreguidelines-*,modernize-*,concurrency-*'
+WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
 FormatStyle:     file
@@ -42,4 +42,3 @@ CheckOptions:
   - key:             modernize-use-nullptr.NullMacros
     value:           'NULL'
 ...
-

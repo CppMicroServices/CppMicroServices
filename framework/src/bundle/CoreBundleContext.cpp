@@ -132,7 +132,7 @@ namespace cppmicroservices
         }
 
         // We use a "pseudo" random UUID.
-        const std::string sid_base = "04f4f884-31bb-45c0-b176-";
+        std::string const sid_base = "04f4f884-31bb-45c0-b176-";
         std::stringstream ss;
         ss << sid_base << std::setfill('0') << std::setw(8) << std::hex << static_cast<int32_t>(id * 65536 + initCount);
 
@@ -252,15 +252,26 @@ namespace cppmicroservices
         return std::string();
     }
 
-    void CoreBundleContext::StopFramework() {
-        this->self.Lock(), stopped = true;
+    WriteLock
+    CoreBundleContext::SetFrameworkStopped()
+    {
+        WriteLock lock(stoppedLock);
+        stopped = true;
+        return lock;
     }
 
-    void CoreBundleContext::StartFramework() {
-        this->self.Lock(), stopped = false;
+    WriteLock
+    CoreBundleContext::SetFrameworkStarted()
+    {
+        WriteLock lock(stoppedLock);
+        stopped = false;
+        return lock;
     }
 
-    bool CoreBundleContext::FrameworkStopped() const {
-        return this->self.Lock(), stopped;
+    std::unique_ptr<stoppedStruct>
+    CoreBundleContext::GetFrameworkStopped() const
+    {
+        ReadLock lock(stoppedLock);
+        return std::make_unique<stoppedStruct>(stopped, std::move(lock));
     }
 } // namespace cppmicroservices

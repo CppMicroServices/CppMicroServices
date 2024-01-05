@@ -56,10 +56,22 @@ as specified in the OSGi R4.2 specifications.
 
 #include <map>
 #include <ostream>
+#include <shared_mutex>
 #include <string>
 
 namespace cppmicroservices
 {
+    using shared_lock = std::shared_mutex;
+    using WriteLock = std::unique_lock<shared_lock>;
+    using ReadLock = std::shared_lock<shared_lock>;
+
+    struct stoppedStruct
+    {
+        bool stopped;
+        ReadLock lock;
+
+        stoppedStruct(bool s, ReadLock l) : stopped(s), lock(std::move(l)) {}
+    };
 
     struct BundleStorage;
     class FrameworkPrivate;
@@ -187,11 +199,11 @@ namespace cppmicroservices
 
         void Uninit1();
 
-        void StopFramework();
+        WriteLock SetFrameworkStopped();
 
-        void StartFramework();
+        WriteLock SetFrameworkStarted();
 
-        bool FrameworkStopped() const;
+        std::unique_ptr<stoppedStruct> GetFrameworkStopped() const;
         /**
          * Get private bundle data storage file handle.
          *
@@ -201,6 +213,8 @@ namespace cppmicroservices
       private:
         // The core context is exclusively constructed by the FrameworkFactory class
         friend class FrameworkFactory;
+
+        mutable shared_lock stoppedLock;
 
         bool stopped;
         /**

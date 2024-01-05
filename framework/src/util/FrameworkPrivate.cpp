@@ -146,6 +146,7 @@ namespace cppmicroservices
     {
         auto l = Lock();
         US_UNUSED(l);
+        auto writerLock = coreCtx->SetFrameworkStopped();
         bool wasActive = false;
         switch (static_cast<Bundle::State>(state.load()))
         {
@@ -167,7 +168,6 @@ namespace cppmicroservices
 #else
                 Shutdown0(restart, wa);
 #endif
-                coreCtx->StopFramework();
                 break;
             }
             case Bundle::STATE_UNINSTALLED:
@@ -184,6 +184,7 @@ namespace cppmicroservices
         {
             auto l = Lock();
             US_UNUSED(l);
+            auto writerLock = coreCtx->SetFrameworkStarted();
 
             switch (state.load())
             {
@@ -199,10 +200,10 @@ namespace cppmicroservices
                 default:
                     std::stringstream ss;
                     ss << state;
+
                     throw std::runtime_error("INTERNAL ERROR, Illegal state, " + ss.str());
             }
             bundlesToStart = coreCtx->storage->GetStartOnLaunchBundles();
-            coreCtx->StartFramework();
         }
 
         // Start bundles according to their autostart setting.

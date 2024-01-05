@@ -268,10 +268,10 @@ namespace cppmicroservices
         return lock;
     }
 
-    std::unique_ptr<stoppedStruct>
+    std::unique_ptr<BlockFrameworkShutdown>
     CoreBundleContext::GetFrameworkStopped() const
     {
         ReadLock lock(stoppedLock);
-        return std::make_unique<stoppedStruct>(stopped, std::move(lock));
+        return std::make_unique<BlockFrameworkShutdown>(stopped, std::move(lock));
     }
 } // namespace cppmicroservices

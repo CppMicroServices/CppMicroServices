@@ -420,8 +420,8 @@ namespace cppmicroservices
     {
         auto l = this->Lock();
         US_UNUSED(l);
-        auto frameworkStopped = coreCtx->GetFrameworkStopped();
-        if (frameworkStopped->stopped)
+        auto frameworkBlock = coreCtx->GetFrameworkStopped();
+        if (frameworkBlock->frameworkHasStopped)
         {
             throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
                                      + ") belongs to a stopped framework");

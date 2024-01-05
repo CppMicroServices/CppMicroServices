@@ -65,12 +65,12 @@ namespace cppmicroservices
     using WriteLock = std::unique_lock<shared_lock>;
     using ReadLock = std::shared_lock<shared_lock>;
 
-    struct stoppedStruct
+    struct BlockFrameworkShutdown
     {
-        bool stopped;
+        bool frameworkHasStopped;
         ReadLock lock;
 
-        stoppedStruct(bool s, ReadLock l) : stopped(s), lock(std::move(l)) {}
+        BlockFrameworkShutdown(bool s, ReadLock l) : frameworkHasStopped(s), lock(std::move(l)) {}
     };
 
     struct BundleStorage;
@@ -203,7 +203,7 @@ namespace cppmicroservices
 
         WriteLock SetFrameworkStarted();
 
-        std::unique_ptr<stoppedStruct> GetFrameworkStopped() const;
+        std::unique_ptr<BlockFrameworkShutdown> GetFrameworkStopped() const;
         /**
          * Get private bundle data storage file handle.
          *

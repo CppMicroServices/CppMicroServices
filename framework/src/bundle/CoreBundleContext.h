@@ -64,12 +64,12 @@ namespace cppmicroservices
     using WriteLock = std::unique_lock<std::shared_mutex>;
     using ReadLock = std::shared_lock<std::shared_mutex>;
 
-    struct BlockFrameworkShutdown
+    struct FrameworkShutdownBlocker
     {
         bool frameworkHasStopped;
         ReadLock lock;
 
-        BlockFrameworkShutdown(bool s, ReadLock l) : frameworkHasStopped(s), lock(std::move(l)) {}
+        FrameworkShutdownBlocker(bool s, ReadLock l) : frameworkHasStopped(s), lock(std::move(l)) {}
     };
 
     struct BundleStorage;
@@ -200,23 +200,23 @@ namespace cppmicroservices
 
         /**
          * Called when framework shutdown has started.
-         * This blocks other calls to shutdown the framework as well as
+         * This blocks other calls to start or stop the framework as well as
          * calls to start bundles as long as returned object is held.
          */
-        WriteLock BlockForFrameworkShutdown();
+        WriteLock BlockWhileFrameworkShutdown();
 
         /**
          * Called when framework is started.
          * This blocks other calls to start or stop the framework as well as
          * calls to start bundles as long as returned object is held.
          */
-        WriteLock BlockForFrameworkStartup();
+        WriteLock BlockWhileFrameworkStartup();
 
         /**
          * Blocks the framework from starting or shutting down while
          * the returned object is held
          */
-        std::unique_ptr<BlockFrameworkShutdown> StopFrameworkFromShuttingDown() const;
+        std::unique_ptr<FrameworkShutdownBlocker> BlockFrameworkShutdown() const;
 
         /**
          * Get private bundle data storage file handle.
@@ -228,8 +228,11 @@ namespace cppmicroservices
         // The core context is exclusively constructed by the FrameworkFactory class
         friend class FrameworkFactory;
 
+        // Mutex required to be held when changing stopped. 
+        // ReadLock or WriteLock construction is done using this mutex.
         mutable std::shared_mutex stoppedLock;
 
+        // Flag for whether the Framework has been stopped. Seee mutex stoppedLock
         bool stopped;
         /**
          * Construct a core context

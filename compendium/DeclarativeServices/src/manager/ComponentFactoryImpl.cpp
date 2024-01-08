@@ -64,8 +64,7 @@ namespace cppmicroservices
         {
             // Create the virtual metadata for the factory instance. 
             // Start with the metadata from the factory 
-            auto oldMetadata = mgr->GetMetadata();
-            auto newMetadata = std::make_shared<ComponentMetadata>(*oldMetadata);
+           auto newMetadata = std::make_shared<ComponentMetadata>(*mgr->GetMetadata());
 
             newMetadata->name = pid;
             // this is a factory instance not a factory component

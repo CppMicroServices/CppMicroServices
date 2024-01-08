@@ -181,7 +181,6 @@ namespace test
      * ServiceB~123 and ServiceC~123 are registered before the bundle containing ServiceA is
      * started.
      */
-
     TEST_F(tFactoryTarget, multipleTargetsExistBefore)
     {
         // Register the ServiceB~123 factory service with a mock implementation

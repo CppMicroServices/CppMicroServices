@@ -61,9 +61,8 @@ as specified in the OSGi R4.2 specifications.
 
 namespace cppmicroservices
 {
-    using shared_lock = std::shared_mutex;
-    using WriteLock = std::unique_lock<shared_lock>;
-    using ReadLock = std::shared_lock<shared_lock>;
+    using WriteLock = std::unique_lock<std::shared_mutex>;
+    using ReadLock = std::shared_lock<std::shared_mutex>;
 
     struct BlockFrameworkShutdown
     {
@@ -199,11 +198,26 @@ namespace cppmicroservices
 
         void Uninit1();
 
-        WriteLock SetFrameworkStopped();
+        /**
+         * Called when framework shutdown has started.
+         * This blocks other calls to shutdown the framework as well as
+         * calls to start bundles as long as returned object is held.
+         */
+        WriteLock BlockForFrameworkShutdown();
 
-        WriteLock SetFrameworkStarted();
+        /**
+         * Called when framework is started.
+         * This blocks other calls to start or stop the framework as well as
+         * calls to start bundles as long as returned object is held.
+         */
+        WriteLock BlockForFrameworkStartup();
 
-        std::unique_ptr<BlockFrameworkShutdown> GetFrameworkStopped() const;
+        /**
+         * Blocks the framework from starting or shutting down while
+         * the returned object is held
+         */
+        std::unique_ptr<BlockFrameworkShutdown> StopFrameworkFromShuttingDown() const;
+
         /**
          * Get private bundle data storage file handle.
          *
@@ -214,7 +228,7 @@ namespace cppmicroservices
         // The core context is exclusively constructed by the FrameworkFactory class
         friend class FrameworkFactory;
 
-        mutable shared_lock stoppedLock;
+        mutable std::shared_mutex stoppedLock;
 
         bool stopped;
         /**

@@ -253,7 +253,7 @@ namespace cppmicroservices
     }
 
     WriteLock
-    CoreBundleContext::SetFrameworkStopped()
+    CoreBundleContext::BlockForFrameworkShutdown()
     {
         WriteLock lock(stoppedLock);
         stopped = true;
@@ -261,7 +261,7 @@ namespace cppmicroservices
     }
 
     WriteLock
-    CoreBundleContext::SetFrameworkStarted()
+    CoreBundleContext::BlockForFrameworkStartup()
     {
         WriteLock lock(stoppedLock);
         stopped = false;
@@ -269,7 +269,7 @@ namespace cppmicroservices
     }
 
     std::unique_ptr<BlockFrameworkShutdown>
-    CoreBundleContext::GetFrameworkStopped() const
+    CoreBundleContext::StopFrameworkFromShuttingDown() const
     {
         ReadLock lock(stoppedLock);
         return std::make_unique<BlockFrameworkShutdown>(stopped, std::move(lock));

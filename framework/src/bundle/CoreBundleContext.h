@@ -199,22 +199,27 @@ namespace cppmicroservices
         void Uninit1();
 
         /**
-         * Called when framework shutdown has started.
-         * This blocks other calls to start or stop the framework as well as
-         * calls to start bundles as long as returned object is held.
+         * Called when framework shutdown has begun.
+         * This blocks (while returned object is held):
+         *     - other calls to start or stop the framework
+         *     - calls to start bundles
          */
-        WriteLock BlockWhileFrameworkShutdown();
+        WriteLock BlockDuringFrameworkShutdown();
 
         /**
-         * Called when framework is started.
-         * This blocks other calls to start or stop the framework as well as
-         * calls to start bundles as long as returned object is held.
+         * Called when framework startup has begun.
+         * This blocks (while returned object is held):
+         *     - other calls to start or stop the framework
+         *     - calls to start bundles
          */
-        WriteLock BlockWhileFrameworkStartup();
+        WriteLock BlockDuringFrameworkStartup();
 
         /**
-         * Blocks the framework from starting or shutting down while
-         * the returned object is held
+         * Called when bundle startup is occuring
+         * This blocks (while returned object is held):
+         *    - calls to start or stop the framework
+         * And allows:
+         *    - concurrent calls for bundle startup on other bundles
          */
         std::unique_ptr<FrameworkShutdownBlocker> BlockFrameworkShutdown() const;
 
@@ -228,12 +233,13 @@ namespace cppmicroservices
         // The core context is exclusively constructed by the FrameworkFactory class
         friend class FrameworkFactory;
 
-        // Mutex required to be held when changing stopped. 
+        // Mutex required to be held when changing stopped.
         // ReadLock or WriteLock construction is done using this mutex.
         mutable std::shared_mutex stoppedLock;
 
-        // Flag for whether the Framework has been stopped. Seee mutex stoppedLock
+        // Flag for whether the Framework has been stopped. See mutex stoppedLock
         bool stopped;
+
         /**
          * Construct a core context
          *

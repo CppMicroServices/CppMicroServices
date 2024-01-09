@@ -1,32 +1,30 @@
 name: cpp-linter
 
-on: pull_request
+on:
+  pull_request:
+  workflow_dispatch:  # Allows the workflow to be triggered manually
 
 jobs:
   cpp-linter:
-    runs-on: ubuntu-20.04  # Match the version used in BuildAndTestNix for consistency
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
-          submodules: true  # Assuming you also want to check out submodules for linting
+          submodules: true
 
-      # Add the Install Dependencies step from the BuildAndTestNix workflow
       - name: Install Dependencies
         run: |
           sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
           sudo apt-get update
           sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-7 g++-7 valgrind
-          # Add any other dependencies your project may need here
 
-      # Add the CMake build step to generate the compilation database
       - name: Generate Compilation Database
         run: |
           mkdir build
           cd build
           cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
-          # You might need additional CMake options depending on your project
         env:
-          BUILD_TYPE: Release  # Or Debug, or whatever you need
+          BUILD_TYPE: Release
 
       - uses: cpp-linter/cpp-linter-action@v2.7.5
         id: linter
@@ -35,7 +33,8 @@ jobs:
         with:
           style: file
           tidy-checks: ''
-          lines-changed-only: diff
+          lines-changed-only: ${{ github.event_name == 'workflow_dispatch' && 'false' || 'diff' }}
+          files-changed-only: ${{ github.event_name == 'workflow_dispatch' && 'false' || 'true' }}
           database: build
           thread-comments: update
 

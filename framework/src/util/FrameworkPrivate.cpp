@@ -146,7 +146,7 @@ namespace cppmicroservices
     {
         auto l = Lock();
         US_UNUSED(l);
-        auto writerLock = coreCtx->BlockDuringFrameworkShutdown();
+        auto writerLock = coreCtx->SetFrameworkStateAndBlockUntilComplete(true);
         bool wasActive = false;
         switch (static_cast<Bundle::State>(state.load()))
         {
@@ -184,7 +184,7 @@ namespace cppmicroservices
         {
             auto l = Lock();
             US_UNUSED(l);
-            auto writerLock = coreCtx->BlockDuringFrameworkStartup();
+            auto writerLock = coreCtx->SetFrameworkStateAndBlockUntilComplete(false);
 
             switch (state.load())
             {

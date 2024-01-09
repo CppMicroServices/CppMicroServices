@@ -253,18 +253,10 @@ namespace cppmicroservices
     }
 
     WriteLock
-    CoreBundleContext::BlockDuringFrameworkShutdown()
+    CoreBundleContext::SetFrameworkStateAndBlockUntilComplete(bool desiredState)
     {
         WriteLock lock(stoppedLock);
-        stopped = true;
-        return lock;
-    }
-
-    WriteLock
-    CoreBundleContext::BlockDuringFrameworkStartup()
-    {
-        WriteLock lock(stoppedLock);
-        stopped = false;
+        stopped = desiredState;
         return lock;
     }
 

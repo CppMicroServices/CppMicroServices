@@ -199,20 +199,12 @@ namespace cppmicroservices
         void Uninit1();
 
         /**
-         * Called when framework shutdown has begun.
+         * Called when framework shutdown/startup has begun.
          * This blocks (while returned object is held):
          *     - other calls to start or stop the framework
          *     - calls to start bundles
          */
-        WriteLock BlockDuringFrameworkShutdown();
-
-        /**
-         * Called when framework startup has begun.
-         * This blocks (while returned object is held):
-         *     - other calls to start or stop the framework
-         *     - calls to start bundles
-         */
-        WriteLock BlockDuringFrameworkStartup();
+        WriteLock SetFrameworkStateAndBlockUntilComplete(bool desiredState);
 
         /**
          * Called when bundle startup is occuring

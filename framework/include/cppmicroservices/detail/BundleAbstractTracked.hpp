@@ -46,6 +46,9 @@ namespace cppmicroservices
         void
         BundleAbstractTracked<S, T, R>::SetInitial(std::vector<S> const& initiallist)
         {
+            if (initiallist.size() != 0){
+                std::cout << "HERE" << std::endl;
+            }
             std::copy(initiallist.begin(), initiallist.end(), std::back_inserter(initial));
         }
 

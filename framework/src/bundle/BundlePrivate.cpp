@@ -420,7 +420,7 @@ namespace cppmicroservices
     {
         auto l = this->Lock();
         US_UNUSED(l);
-        auto frameworkBlock = coreCtx->BlockFrameworkShutdown();
+        auto frameworkBlock = coreCtx->GetFrameworkStateAndBlock();
         if (frameworkBlock->frameworkHasStopped)
         {
             throw std::runtime_error("Bundle " + symbolicName + " (location=" + location

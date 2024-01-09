@@ -261,7 +261,7 @@ namespace cppmicroservices
     }
 
     std::unique_ptr<FrameworkShutdownBlocker>
-    CoreBundleContext::BlockFrameworkShutdown() const
+    CoreBundleContext::GetFrameworkStateAndBlock() const
     {
         ReadLock lock(stoppedLock);
         return std::make_unique<FrameworkShutdownBlocker>(stopped, std::move(lock));

@@ -213,7 +213,7 @@ namespace cppmicroservices
          * And allows:
          *    - concurrent calls for bundle startup on other bundles
          */
-        std::unique_ptr<FrameworkShutdownBlocker> BlockFrameworkShutdown() const;
+        std::unique_ptr<FrameworkShutdownBlocker> GetFrameworkStateAndBlock() const;
 
         /**
          * Get private bundle data storage file handle.

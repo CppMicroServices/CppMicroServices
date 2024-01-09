@@ -76,7 +76,7 @@ namespace cppmicroservices
 
             if (state == Bundle::STATE_UNINSTALLED)
             {
-                throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" + location + ") is uninstalled");
+                throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is uninstalled");
             }
 
             if ((options & Bundle::STOP_TRANSIENT) == 0)
@@ -138,7 +138,7 @@ namespace cppmicroservices
             catch (...)
             {
                 res = std::make_exception_ptr(
-                    std::runtime_error("Bundle #" + util::ToString(id) + " (location=" + location
+                    std::runtime_error("Bundle " + symbolicName + " (location=" + location
                                        + "), BundleActivator::Stop() failed: " + util::GetLastExceptionStr()));
             }
 
@@ -167,8 +167,8 @@ namespace cppmicroservices
                 }
                 if (!cause.empty())
                 {
-                    res = std::make_exception_ptr(std::runtime_error(
-                        "Bundle #" + util::ToString(id) + " (location=" + location + ") stop failed: " + cause));
+                    res = std::make_exception_ptr(std::runtime_error("Bundle " + symbolicName + " (location=" + location
+                                                                     + ") stop failed: " + cause));
                 }
             }
             bactivator = nullptr;
@@ -288,10 +288,10 @@ namespace cppmicroservices
                 // This happens if call start from inside the BundleActivator.stop
                 // method.
                 // Don't allow it.
-                throw std::runtime_error("Bundle #" + util::ToString(id) + " (location=" + location
+                throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
                                          + "), start called from BundleActivator::Stop");
             case Bundle::STATE_UNINSTALLED:
-                throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" + location
+                throw std::logic_error("Bundle " + symbolicName + " (location=" + location
                                        + ") is in UNINSTALLED state");
         }
     }
@@ -306,7 +306,7 @@ namespace cppmicroservices
             switch (static_cast<Bundle::State>(state.load()))
             {
                 case Bundle::STATE_UNINSTALLED:
-                    throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" + location
+                    throw std::logic_error("Bundle " + symbolicName + " (location=" + location
                                            + ") is in BUNDLE_UNINSTALLED state");
                 case Bundle::STATE_STARTING: // Lazy start
                 case Bundle::STATE_ACTIVE:
@@ -368,7 +368,7 @@ namespace cppmicroservices
                     if (state == Bundle::STATE_UNINSTALLED)
                     {
                         operation = BundlePrivate::OP_IDLE;
-                        throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" + location
+                        throw std::logic_error("Bundle " + symbolicName + " (location=" + location
                                                + ") is in BUNDLE_UNINSTALLED state");
                     }
 
@@ -422,9 +422,15 @@ namespace cppmicroservices
     {
         auto l = this->Lock();
         US_UNUSED(l);
+        auto frameworkBlock = coreCtx->GetFrameworkStateAndBlock();
+        if (frameworkBlock->frameworkHasStopped)
+        {
+            throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
+                                     + ") belongs to a stopped framework");
+        }
         if (state == Bundle::STATE_UNINSTALLED)
         {
-            throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" + location + ") is uninstalled");
+            throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is uninstalled");
         }
 
         if (state == Bundle::STATE_ACTIVE)
@@ -494,7 +500,7 @@ namespace cppmicroservices
                 {
                     StartFailed();
                     return std::make_exception_ptr(SecurityException {
-                        "Bundle #" + util::ToString(id) + " (location=" + location + ") failed bundle validation.",
+                        "Bundle " + symbolicName + " (location=" + location + ") failed bundle validation.",
                         thisBundle });
                 }
             }
@@ -521,11 +527,11 @@ namespace cppmicroservices
                     if (!lib.IsLoaded())
                     {
                         coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
-                                             "Loading shared library for Bundle #" + util::ToString(id)
+                                             "Loading shared library for Bundle " + symbolicName
                                                  + " (location=" + location + ")");
                         lib.Load(coreCtx->libraryLoadOptions);
                         coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
-                                             "Finished loading shared library for Bundle #" + util::ToString(id)
+                                             "Finished loading shared library for Bundle " + symbolicName
                                                  + " (location=" + location + ")");
                     }
                     libHandle = lib.GetHandle();
@@ -561,13 +567,13 @@ namespace cppmicroservices
                 if (!createActivatorHook)
                 {
                     coreCtx->logger->Log(logservice::SeverityLevel::LOG_ERROR, create_activator_err);
-                    throw std::runtime_error("Bundle #" + util::ToString(id) + " (location=" + location
+                    throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
                                              + ") activator constructor not found");
                 }
                 if (!destroyActivatorHook)
                 {
                     coreCtx->logger->Log(logservice::SeverityLevel::LOG_ERROR, destroy_activator_err);
-                    throw std::runtime_error("Bundle #" + util::ToString(id) + " (location=" + location
+                    throw std::runtime_error("Bundle " + symbolicName + " (location=" + location
                                              + ") activator destructor not found");
                 }
 
@@ -586,10 +592,9 @@ namespace cppmicroservices
             catch (...)
             {
                 coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
-                                     "Failed to start Bundle #" + util::ToString(id) + " (location=" + location + ")",
+                                     "Failed to start Bundle " + symbolicName + " (location=" + location + ")",
                                      std::current_exception());
-                res = std::make_exception_ptr(std::runtime_error("Bundle #" + util::ToString(id)
-                                                                 + " (location= " + location
+                res = std::make_exception_ptr(std::runtime_error("Bundle " + symbolicName + " (location= " + location
                                                                  + ") start failed: " + util::GetLastExceptionStr()));
             }
         }
@@ -626,8 +631,8 @@ namespace cppmicroservices
             }
             if (!cause.empty())
             {
-                res = std::make_exception_ptr(std::runtime_error(
-                    "Bundle #" + util::ToString(id) + " (location= " + location + ") start failed: " + cause));
+                res = std::make_exception_ptr(std::runtime_error("Bundle " + symbolicName + " (location= " + location
+                                                                 + ") start failed: " + cause));
             }
         }
 
@@ -793,7 +798,7 @@ namespace cppmicroservices
         auto snbl = coreCtx->bundleRegistry.GetBundles(symbolicName, version);
         if (!snbl.empty())
         {
-            throw std::invalid_argument("Bundle #" + util::ToString(id) + " (location=" + location
+            throw std::invalid_argument("Bundle " + symbolicName + " (location=" + location
                                         + "), a bundle with same symbolic name and version " + "is already installed ("
                                         + symbolicName + ", " + version.ToString() + ")");
         }
@@ -806,8 +811,7 @@ namespace cppmicroservices
     {
         if (state == Bundle::STATE_UNINSTALLED)
         {
-            throw std::logic_error("Bundle #" + util::ToString(id) + " (location=" + location
-                                   + ") is in UNINSTALLED state");
+            throw std::logic_error("Bundle " + symbolicName + " (location=" + location + ") is in UNINSTALLED state");
         }
     }
 

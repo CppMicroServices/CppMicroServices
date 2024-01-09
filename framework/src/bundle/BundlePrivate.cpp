@@ -834,8 +834,8 @@ namespace cppmicroservices
             }
             catch (...)
             {
-                coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
-                                     "Some services already unregistered in Bundle #" + util::ToString(id)
+                coreCtx->logger->Log(logservice::SeverityLevel::LOG_WARNING,
+                                     "Some services already unregistered in Bundle " + symbolicName
                                          + " (location=" + location + ")",
                                      std::current_exception());
             }

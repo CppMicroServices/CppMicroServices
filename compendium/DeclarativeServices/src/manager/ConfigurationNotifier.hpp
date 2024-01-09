@@ -103,6 +103,8 @@ namespace cppmicroservices
                                     cppmicroservices::service::cm::ConfigurationEventType type,
                                     std::shared_ptr<cppmicroservices::AnyMap> properties);
             std::shared_ptr<ComponentFactoryImpl> GetComponentFactory();
+            void VerifyProperties(cppmicroservices::AnyMap const& properties,
+                                  std::shared_ptr<ComponentConfigurationImpl> mgr) const noexcept;
  
           private:
             using TokenMap = std::unordered_map<ListenerTokenId, Listener>;

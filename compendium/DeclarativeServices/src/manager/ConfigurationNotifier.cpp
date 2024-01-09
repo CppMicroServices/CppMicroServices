@@ -126,6 +126,14 @@ namespace cppmicroservices
                 auto iter = listenersMapHandle->find(pid);
                 if (iter != listenersMapHandle->end())
                 {
+                    // Make sure the properties does not contain any dynamic targets
+                    auto tokenMapPtr = iter->second;
+                    for (auto const& tokenEntry : (*tokenMapPtr))
+                    {
+                        auto listener = tokenEntry.second;
+                        VerifyProperties(properties, listener.mgr);               
+                    }
+ 
                     return true;
                 }
 
@@ -198,6 +206,27 @@ namespace cppmicroservices
         std::shared_ptr<ComponentFactoryImpl>  ConfigurationNotifier::GetComponentFactory() {
             return componentFactory;
         }
-
+        void
+        ConfigurationNotifier::VerifyProperties(cppmicroservices::AnyMap const& properties,
+                                                std::shared_ptr<ComponentConfigurationImpl> mgr) const noexcept
+        {
+            // Look for dynamic targets in the references.
+            // A dynamic target will appear in the properties for the configuration object
+            // with the interface name as the key and the target as the value.
+            auto metadata = mgr->GetMetadata();
+            for (auto& ref : metadata->refsMetadata)
+            {
+                auto interface = ref.interfaceName;
+                auto iter = properties.find(interface);
+                if (iter != properties.end())
+                {
+                    // This reference has a dynamic target
+                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                "Properties for component " + metadata->name + "contains a dynamic target for interface "
+                                    + ref.interfaceName + " target= " + ref.target
+                                    + " Dynamic targets are only valid for factory components");
+                }
+            }
+        }
     } // namespace scrimpl
 } // namespace cppmicroservices

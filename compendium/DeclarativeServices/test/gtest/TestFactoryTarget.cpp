@@ -112,7 +112,6 @@ namespace test
      * ServiceB~123 is registered before the bundle containing ServiceA is
      * started.
      */
-
     TEST_F(tFactoryTarget, dependencyExistsBefore)
     {
         // Register the ServiceB~123 factory service with a mock implementation
@@ -136,13 +135,13 @@ namespace test
         serviceBReg.Unregister();
         testBundle.Stop();
     }
+
     /* tFactoryTarget.dependencyExistsAfter.
      * ServiceA and ServiceB are both factory instances.
      * ServiceA~1 is dependent on ServiceB~123.
      * ServiceB~123 is registered after the bundle containing ServiceA is
      * started.
      */
-
     TEST_F(tFactoryTarget, dependencyExistsAfter)
     {
         // Install and start the bundle containing the ServiceA factory.
@@ -175,6 +174,7 @@ namespace test
         serviceBReg.Unregister();
         testBundle.Stop();
      }
+
     /* tFactoryTarget.multipleTargetsExistBefore.
      * ServiceA, ServiceB and ServiceC are all factory instances.
      * ServiceA~1 is dependent on ServiceB~123 and ServiceC~123
@@ -210,13 +210,13 @@ namespace test
         serviceCReg.Unregister();
         testBundle.Stop();
     }
+
     /* tFactoryTarget.multipleTargetsExistsAfter.
      * ServiceA, ServiceB and ServiceC are all factory instances.
      * ServiceA~1 is dependent on ServiceB~123 and ServiceC~123
      * ServiceB~123 and ServiceC~123 are registered after the bundle containing ServiceA is
      * started.
      */
-
     TEST_F(tFactoryTarget,multipleTargetsExistAfter)
     {
         // Install and start the bundle containing the ServiceA factory.
@@ -254,6 +254,7 @@ namespace test
         serviceBReg.Unregister();
         testBundle.Stop();
     }
+
     /* tFactoryTarget.correctTarget.
      * ServiceA and ServiceB are both factory instances.
      * ServiceA~1 is dependent on ServiceB~123.
@@ -298,6 +299,7 @@ namespace test
         serviceBReg2.Unregister();
         testBundle.Stop();
     }
+
     /* tFactoryTarget.targetByProperty
      * ServiceA and ServiceB are both factory instances.
      * ServiceA~1 is dependent on the ServiceB with a target property user-ServiceB set 
@@ -342,6 +344,7 @@ namespace test
         serviceBReg2.Unregister();
         testBundle.Stop();
     }
+
     /* tFactoryTarget.multipleToOneBefore.
      * ServiceA and ServiceB are both factory instances.
      * Five instances of ServiceA will be created which are all dependent on ServiceB~123.
@@ -375,6 +378,7 @@ namespace test
         serviceBReg.Unregister();
         testBundle.Stop();
     }
+
     /* tFactoryTarget.multipleToOneAfter
      * ServiceA and ServiceB are both factory instances.
      * Five instances of ServiceA will be created which are all dependent on ServiceB~123.
@@ -411,7 +415,6 @@ namespace test
             trackers.push_back (tracker);
             tracker->Open();
         }
-
   
         // Register the ServiceB~123 factory service with a mock implementation
         auto serviceBReg
@@ -427,6 +430,7 @@ namespace test
         serviceBReg.Unregister();
         testBundle.Stop();
     }
+
     /* tFactoryTarget.multipleToOneUnregistered
      * ServiceA and ServiceB are both factory instances.
      * Five instances of ServiceA will be created which are all dependent on ServiceB~123.
@@ -478,6 +482,7 @@ namespace test
         ASSERT_TRUE(tracker->IsEmpty()) << "All ServiceA instances should have been destroyed.";       
         testBundle.Stop();
     }
+
     /* tFactoryTarget.multipleToOneConcurrent
      * ServiceA and ServiceB are both factory instances.
      * Many instances of ServiceA will be created which are all dependent on ServiceB~123.
@@ -515,7 +520,8 @@ namespace test
         // Clean up
         serviceBReg.Unregister();
         testBundle.Stop();
-    };
+    }
+
     // Test ComponentFactoryImpl constructor with invalid arguments
     TEST_F(tFactoryTarget, ctorInvalidArgs)
     {
@@ -527,7 +533,8 @@ namespace test
                                                                                 asyncWorkService,
                                                                                 bundleRegistry);
         }, std::invalid_argument);
-    };
+    }
+
     /* This test verifies that if an invalid LDAP filter is received in the properties for a configuration 
      * object then DS intercepts the exception and logs it. Also, if a std::exception occurs while creating
      * the factory instance DS intercepts the exception and logs it. 
@@ -577,5 +584,99 @@ namespace test
          EXPECT_THROW({ componentFactory.CreateFactoryComponent("serviceA~123", mgr, props); },
                      std::invalid_argument);
 
+    }
+
+    /* testInvalidDynamicTargetLogging.
+     * This test verifies that if a dynamic target is specified in the properties of a singletone component,
+     * DS logs the error. Dyanmic targets are only allowed for factory instance construction.
+     */
+    TEST_F(tFactoryTarget, testInvalidDynamicTargetLogging)
+    {
+        // Create a ConfigurationNotifier with a mock Logger.
+         auto mockLogger = std::make_shared<cppmicroservices::scrimpl::MockLogger>();
+         auto asyncWorkService = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(context, mockLogger);
+         auto bundleRegistry = std::make_shared<cppmicroservices::scrimpl::SCRExtensionRegistry>(mockLogger);
+         auto notifier = std::make_shared<cppmicroservices::scrimpl::ConfigurationNotifier>(context,
+                                                                                            mockLogger,
+                                                                                            asyncWorkService,
+                                                                                            bundleRegistry);
+
+         // Create some component meta data and insert a reference into the refsMetadata vector
+         auto mockMetadata = std::make_shared<cppmicroservices::scrimpl::metadata::ComponentMetadata>();
+         cppmicroservices::scrimpl::metadata::ReferenceMetadata reference;
+         reference.interfaceName = "ServiceBInt";
+         mockMetadata->refsMetadata.push_back(reference);
+
+         // Create a mock ComponentConfigurationImpl object with the metadata containing the
+         // reference for ServiceBInt.
+         auto fakeRegistry = std::make_shared<cppmicroservices::scrimpl::ComponentRegistry>();
+         auto fakeCompConfig
+             = std::make_shared<cppmicroservices::scrimpl::SingletonComponentConfigurationImpl>(mockMetadata,
+                                                                                                framework,
+                                                                                                fakeRegistry,
+                                                                                                mockLogger,
+                                                                                                notifier);
+         std::shared_ptr<cppmicroservices::scrimpl::ComponentConfigurationImpl> mgr = fakeCompConfig;
+
+        // set logging expectations
+        auto invalidTarget = testing::AllOf(
+             testing::HasSubstr("Properties for component"), 
+             testing::HasSubstr("contains a dynamic target for interface"));
+        EXPECT_CALL(*mockLogger, Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR, invalidTarget))
+             .Times(1);
+
+        // Create properties with a dynamic target for interface ServiceBInt
+        cppmicroservices::AnyMap props;
+        props["ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");    
+        notifier->VerifyProperties(props, mgr);
+    }    
+
+    /* tFactoryTarget.dynamicTargetForSingleton.
+     * ServiceA and ServiceB are both factory instances.
+     * ServiceA~1 is dependent on ServiceB~123.
+     * Construct ServiceA~1. 
+     * Verify it exists and it's properties can be read
+     * Update ServiceA~1 properties including a dynamic target.
+     * Verify that dynamic target had no effect (GetService still succeeds) 
+     * Verify that the properties have been updated.
+     */
+    TEST_F(tFactoryTarget, dynamicTargetForSingleton)
+    {
+        // Register the ServiceB~123 factory service with a mock implementation
+        auto serviceBReg
+            = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "ServiceBId", "ServiceB~123");
+
+        // Install and start the bundle containing the ServiceA factory.
+        // DS is now listening for factory configuration objects of the form
+        // ServiceA~<instance>
+        test::InstallLib(context, "TestBundleDSFAC1");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC1");
+
+        // Create the ServiceA~1 configuration object. Specify a dynamic target
+        // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
+        // satisfied by ServiceB~123 instance.
+        cppmicroservices::AnyMap props;
+        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
+        ASSERT_TRUE(service);
+
+        const std::string fooValue { "123" };
+        props["foo"] = fooValue;
+        auto config = configAdmin->GetFactoryConfiguration("ServiceA", "1");
+        auto fut = config->Update(props);
+        fut.get();
+
+        auto instance = GetInstance<test::ServiceAInt>();
+        ASSERT_TRUE(instance) << "ServiceA~1 instance not found";
+        auto properties = instance->GetProperties();
+        ASSERT_TRUE(properties.size() > 1) << "ServiceA~1 properties should have two entries.";
+ 
+        auto iter = properties.find("foo");
+        ASSERT_TRUE(iter != properties.end()) << "The foo key does not exist in the properties.";
+        EXPECT_EQ(iter->second, fooValue);
+
+        // Clean up
+        serviceBReg.Unregister();
+        testBundle.Stop();
     }
 }; // namespace test

@@ -38,6 +38,11 @@ jobs:
           database: build
           thread-comments: update
 
+      - name: Display Clang-Tidy Report
+        run: cat clang_tidy_report.txt
+        # This assumes that the report is at the root of the working directory.
+        # If the report is generated elsewhere, provide the correct path.
+
       - name: Fail fast?!
         if: steps.linter.outputs.checks-failed > 0
         run: exit 1

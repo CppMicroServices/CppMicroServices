@@ -4,17 +4,29 @@ on: pull_request
 
 jobs:
   cpp-linter:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04  # Match the version used in BuildAndTestNix for consistency
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: true  # Assuming you also want to check out submodules for linting
 
-      # Add a new step here to run CMake and generate the compilation database
+      # Add the Install Dependencies step from the BuildAndTestNix workflow
+      - name: Install Dependencies
+        run: |
+          sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+          sudo apt-get update
+          sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-7 g++-7 valgrind
+          # Add any other dependencies your project may need here
+
+      # Add the CMake build step to generate the compilation database
       - name: Generate Compilation Database
         run: |
           mkdir build
           cd build
-          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+          cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
           # You might need additional CMake options depending on your project
+        env:
+          BUILD_TYPE: Release  # Or Debug, or whatever you need
 
       - uses: cpp-linter/cpp-linter-action@v2.7.5
         id: linter
@@ -26,7 +38,6 @@ jobs:
           lines-changed-only: diff
           database: build
           thread-comments: update
-          step-summary: true
 
       - name: Fail fast?!
         if: steps.linter.outputs.checks-failed > 0

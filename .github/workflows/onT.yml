@@ -8,7 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          submodules: true
+          
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -18,6 +20,12 @@ jobs:
       - uses: Swatinem/rust-cache@v1
 
       - run: cargo install clang-tidy-sarif sarif-fmt
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+          sudo apt-get update
+          sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-7 g++-7 valgrind
 
       - name: Generate Compilation Database
         run: |

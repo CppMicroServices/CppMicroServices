@@ -13,7 +13,7 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
       - run: cargo install clang-tidy-sarif sarif-fmt
       - run: clang-tidy -checks=cert-* -warnings-as-errors=* util/src/Error.cpp -- | clang-tidy-sarif | sarif-fmt | tee results.sarif 
       - name: Upload SARIF file

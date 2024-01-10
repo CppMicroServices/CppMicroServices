@@ -19,7 +19,13 @@ jobs:
 
       - run: cargo install clang-tidy-sarif sarif-fmt
 
-      - run: clang-tidy -checks=cert-* util/src/Error.cpp -- | clang-tidy-sarif | tee results.sarif
+      - name: Generate Compilation Database
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+
+      - run: clang-tidy -p=build -checks=cert-* util/src/Error.cpp -- | clang-tidy-sarif | tee results.sarif
 
       # New step to modify the SARIF file
       - name: Make SARIF paths relative

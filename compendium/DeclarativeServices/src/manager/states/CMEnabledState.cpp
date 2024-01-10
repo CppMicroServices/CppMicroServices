@@ -47,7 +47,7 @@ namespace cppmicroservices
         }
 
         void
-        CMEnabledState::CreateConfigurations(std::shared_ptr<const metadata::ComponentMetadata> compDesc,
+        CMEnabledState::CreateConfigurations(std::shared_ptr<metadata::ComponentMetadata const> compDesc,
                                              cppmicroservices::Bundle const& bundle,
                                              std::shared_ptr<ComponentRegistry> registry,
                                              std::shared_ptr<logservice::LogService> logger,
@@ -60,7 +60,7 @@ namespace cppmicroservices
                                                                                     registry,
                                                                                     logger,
                                                                                     configNotifier);
-               configurations.push_back(cc);
+                configurations.push_back(cc);
             }
             catch (cppmicroservices::SharedLibraryException const&)
             {

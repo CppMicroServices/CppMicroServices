@@ -30,11 +30,9 @@ jobs:
           cd build
           cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 
-      - run: clang-tidy -p=build -checks=cert-* util/src/String.cpp -- | clang-tidy-sarif | tee results.sarif
-
       - run: SOURCE=$(find . -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.h" -o -name "*.hh" -o -name "*.hxx" \) | xargs echo)
 
-      - run: echo $SOURCE
+      - run: clang-tidy -p=build -checks=cert-* $SOURCE -- | clang-tidy-sarif | tee results.sarif
 
       # New step to modify the SARIF file
       - name: Make SARIF paths relative

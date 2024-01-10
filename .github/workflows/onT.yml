@@ -24,12 +24,6 @@ jobs:
 
       - run: cargo install clang-tidy-sarif sarif-fmt
 
-      - name: Install Dependencies
-        run: |
-          sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
-          sudo apt-get update
-          sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-7 g++-7 valgrind
-
       - name: Generate Compilation Database
         run: |
           mkdir build

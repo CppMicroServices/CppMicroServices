@@ -30,7 +30,7 @@ jobs:
           cd build
           cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 
-      - run: clang-tidy -p=build -checks=cert-* util/src/Error.cpp -- | clang-tidy-sarif | tee results.sarif
+      - run: clang-tidy -p=build -checks=cert-* util/src/String.cpp -- | clang-tidy-sarif | tee results.sarif
 
       # New step to modify the SARIF file
       - name: Make SARIF paths relative

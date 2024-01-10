@@ -53,7 +53,7 @@ jobs:
                       {
                         "physicalLocation": {
                           "artifactLocation": {
-                            "uri": "file:///path/to/code/file.js"
+                            "uri": "file:///path/to/code/file2.js"
                           },
                           "region": {
                             "startLine": 42,

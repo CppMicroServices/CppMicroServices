@@ -222,10 +222,8 @@ namespace cppmicroservices
         // if unavailable
         if (!d->coreInfo->available)
         {
-            // reset isUnregistering to true
-            isUnregistering = true;
             // set unregistering to false
-            atomic_compare_exchange_strong(&d->coreInfo->unregistering, &isUnregistering, false);
+            d->coreInfo->unregistering = false;
             throw std::logic_error("Service is unregistered");
         }
 
@@ -334,8 +332,7 @@ namespace cppmicroservices
             d->reference = nullptr;
 
             // reset d->coreInfo->unregistering to false
-            isUnregistering = true;
-            atomic_compare_exchange_strong(&d->coreInfo->unregistering, &isUnregistering, false);
+            d->coreInfo->unregistering = false;
         }
     }
 

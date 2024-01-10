@@ -8,14 +8,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           override: true
+
       - uses: Swatinem/rust-cache@v1
+
       - run: cargo install clang-tidy-sarif sarif-fmt
-      - run: clang-tidy -checks=cert-* util/src/Error.cpp -- | clang-tidy-sarif | tee results.sarif 
+
+      - run: clang-tidy -checks=cert-* util/src/Error.cpp -- | clang-tidy-sarif | tee results.sarif
+
+      # New step to modify the SARIF file
+      - name: Make SARIF paths relative
+        run: |
+          SARIF_FILE="results.sarif"
+          # Use jq to update the uri to be relative to GITHUB_WORKSPACE
+          jq --arg base "$GITHUB_WORKSPACE/" '.runs[].results[].locations[].physicalLocation.artifactLocation.uri |= sub($base; "")' "$SARIF_FILE" > "updated_$SARIF_FILE"
+          mv "updated_$SARIF_FILE" "$SARIF_FILE"
+
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v2
         with:

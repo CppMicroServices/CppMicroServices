@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       # Add steps for your static analysis tool to generate a SARIF file
       # For demonstration, we create a dummy SARIF file with random content
@@ -72,6 +72,6 @@ jobs:
           cat dummy.sarif
 
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v1
+        uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: dummy.sarif

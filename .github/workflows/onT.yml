@@ -37,10 +37,11 @@ jobs:
           for FILE in $SOURCE_FILES; do
             BASENAME=$(basename -- "$FILE")
             SARIF_FILE="sarif_results/${BASENAME%.*}.sarif"
-            clang-tidy -p=build -checks=cert-* "$FILE" -- | clang-tidy-sarif | tee "$SARIF_FILE"
+            USARIF_FILE="sarif_results/updated_${SARIF_BASENAME}.sarif"
+            clang-tidy -p=build "$FILE" -- | clang-tidy-sarif | tee "$SARIF_FILE"
             # Make SARIF paths relative
-            jq --arg base "$GITHUB_WORKSPACE/" '.runs[].results[].locations[].physicalLocation.artifactLocation.uri |= sub($base; "")' "$SARIF_FILE" > "temp_$SARIF_FILE"
-            mv "temp_$SARIF_FILE" "$SARIF_FILE"
+            jq --arg base "$GITHUB_WORKSPACE/" '.runs[].results[].locations[].physicalLocation.artifactLocation.uri |= sub($base; "")' "$SARIF_FILE" > "$USARIF_FILE"
+            mv "$USARIF_FILE" "$SARIF_FILE"
           done
 
       - name: Upload SARIF files

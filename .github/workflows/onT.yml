@@ -30,8 +30,6 @@ jobs:
           cd build
           cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 
-      - run: echo "SOURCE=$(find $GITHUB_WORKSPACE -type f \( -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' -o -name '*.cxx' -o -name '*.h' -o -name '*.hh' -o -name '*.hxx' \) | xargs echo)" >> $GITHUB_ENV
-
       - run: |
           SOURCE_FILES=$(find $GITHUB_WORKSPACE -type f \( -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' -o -name '*.cxx' -o -name '*.h' -o -name '*.hh' -o -name '*.hxx' \))
           clang-tidy -p=build -checks=cert-* $SOURCE_FILES -- | clang-tidy-sarif | tee results.sarif

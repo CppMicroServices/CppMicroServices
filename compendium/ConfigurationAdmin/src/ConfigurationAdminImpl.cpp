@@ -192,6 +192,7 @@ namespace cppmicroservices
 {
     namespace cmimpl
     {
+        thread_local std::mt19937 ConfigurationAdminImpl::randomGenerator(std::random_device {}());
 
         ConfigurationAdminImpl::ConfigurationAdminImpl(
             cppmicroservices::BundleContext context,
@@ -203,7 +204,6 @@ namespace cppmicroservices
             , futuresID { 0u }
             , managedServiceTracker(cmContext, this)
             , managedServiceFactoryTracker(cmContext, this)
-            , randomGenerator(std::random_device {}())
             , configListenerTracker(cmContext)
         {
             managedServiceTracker.Open();
@@ -1071,16 +1071,14 @@ namespace cppmicroservices
         ConfigurationAdminImpl::RandomInstanceName()
         {
             static auto const characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+            std::uniform_int_distribution<> dist(0, 61);
+            std::string randomString(6, '\0');
+            for (auto& c : randomString)
             {
-                std::lock_guard<std::mutex> lk { randomInstanceMutex };
-                std::uniform_int_distribution<> dist(0, 61);
-                std::string randomString(6, '\0');
-                for (auto& c : randomString)
-                {
-                    c = characters[dist(randomGenerator)];
-                }
-                return randomString;
+                c = characters[dist(randomGenerator)];
             }
+            return randomString;
+ 
         }
 
         void

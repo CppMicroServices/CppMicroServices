@@ -131,7 +131,7 @@ namespace cppmicroservices
                     for (auto const& tokenEntry : (*tokenMapPtr))
                     {
                         auto listener = tokenEntry.second;
-                        VerifyProperties(properties, listener.mgr);               
+                        LogInvalidDynamicTargetInProperties(properties, listener.mgr);               
                     }
  
                     return true;
@@ -175,7 +175,7 @@ namespace cppmicroservices
 
             for (auto & mgr : mgrs)
             {
-            componentFactory->CreateFactoryComponent(pid, mgr, properties);
+                componentFactory->CreateFactoryComponent(pid, mgr, properties);
             }
             return true;
         }
@@ -207,17 +207,18 @@ namespace cppmicroservices
             return componentFactory;
         }
         void
-        ConfigurationNotifier::VerifyProperties(cppmicroservices::AnyMap const& properties,
+        ConfigurationNotifier::LogInvalidDynamicTargetInProperties(
+            cppmicroservices::AnyMap const& properties,
                                                 std::shared_ptr<ComponentConfigurationImpl> mgr) const noexcept
         {
             // Look for dynamic targets in the references.
             // A dynamic target will appear in the properties for the configuration object
             // with the interface name as the key and the target as the value.
-            auto metadata = mgr->GetMetadata();
-            for (auto& ref : metadata->refsMetadata)
+            auto const metadata = mgr->GetMetadata();
+            for (auto const& ref : metadata->refsMetadata)
             {
-                auto interface = ref.interfaceName;
-                auto iter = properties.find(interface);
+                auto target = ref.name + ".target";
+                auto const iter = properties.find(target);
                 if (iter != properties.end())
                 {
                     // This reference has a dynamic target

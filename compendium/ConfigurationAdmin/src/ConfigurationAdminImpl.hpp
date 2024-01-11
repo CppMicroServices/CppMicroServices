@@ -245,7 +245,6 @@ namespace cppmicroservices
 
             // Used to generate a random instance name for CreateFactoryConfiguration
             std::string RandomInstanceName();
-            std::mutex randomInstanceMutex;
 
             // Used to keep track of the instances of each ManagedServiceFactory
             void AddFactoryInstanceIfRequired(std::string const& pid, std::string const& factoryPid);
@@ -269,7 +268,7 @@ namespace cppmicroservices
                 cppmicroservices::service::cm::ManagedServiceFactory,
                 TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>>
                 managedServiceFactoryTracker;
-            std::mt19937 randomGenerator;
+            thread_local static std::mt19937 randomGenerator;
             cppmicroservices::ServiceTracker<cppmicroservices::service::cm::ConfigurationListener>
                 configListenerTracker;
 

@@ -76,11 +76,11 @@ namespace cppmicroservices
 
             // Look for dynamic targets in the references.
             // A dynamic target will appear in the properties for the configuration object
-            // with the interface name as the key and the target as the value. 
+            // with the referenceName.target as the key and the target as the value. 
             for (auto& ref : newMetadata->refsMetadata)
             {
-                auto interface = ref.interfaceName;
-                auto iter = properties.find(interface);
+                auto target = ref.name + ".target";
+                auto iter = properties.find(target);
                 if (iter != properties.end()) {
                     // This reference has a dynamic target
                     ref.target = cppmicroservices::ref_any_cast<std::string>(iter->second);

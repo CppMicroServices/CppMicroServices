@@ -127,7 +127,7 @@ namespace test
         // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
         // satisfied by ServiceB~123 instance.
         cppmicroservices::AnyMap props;
-        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        props["ServiceB.target"] = std::string("(ServiceBId=ServiceB~123)");
         auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
         ASSERT_TRUE(service);
 
@@ -154,7 +154,7 @@ namespace test
         // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
         // satisfied by ServiceB~123 instance.
         cppmicroservices::AnyMap props;
-        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        props["ServiceB.target"] = std::string("(ServiceBId=ServiceB~123)");
         auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
         // Service cannot be instantiated because it's dependencies are not yet satisfied.
         ASSERT_TRUE(!service);
@@ -200,8 +200,8 @@ namespace test
         // satisfied by ServiceB~123 instance and the test::ServiceCInt will only 
         // be satisfied by ServiceC~123
         cppmicroservices::AnyMap props;
-        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
-        props["test::ServiceCInt"] = std::string("(ServiceCId=ServiceC~123)");
+        props["ServiceB.target"] = std::string("(ServiceBId=ServiceB~123)");
+        props["ServiceC.target"] = std::string("(ServiceCId=ServiceC~123)");
         auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
         ASSERT_TRUE(service);
 
@@ -229,8 +229,8 @@ namespace test
         // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
         // satisfied by ServiceB~123 instance.
         cppmicroservices::AnyMap props;
-        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
-        props["test::ServiceCInt"] = std::string("(ServiceCId=ServiceC~123)");
+        props["ServiceB.target"] = std::string("(ServiceBId=ServiceB~123)");
+        props["ServiceC.target"] = std::string("(ServiceCId=ServiceC~123)");
         auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
         // Service cannot be instantiated because it's dependencies are not yet satisfied.
         ASSERT_TRUE(!service);
@@ -276,7 +276,7 @@ namespace test
         // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
         // satisfied by ServiceB~123 instance.
         cppmicroservices::AnyMap props;
-        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        props["ServiceB.target"] = std::string("(ServiceBId=ServiceB~123)");
         auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
         ASSERT_TRUE(!service);  //ServiceA~1 is not satisfied so this should be nullptr
    
@@ -322,7 +322,7 @@ namespace test
         // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
         // satisfied by ServiceB~123 instance.
         cppmicroservices::AnyMap props;
-        props["test::ServiceBInt"] = std::string("(user-ServiceB=true)");
+        props["ServiceB.target"] = std::string("(user-ServiceB=true)");
         auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
         ASSERT_TRUE(!service); // ServiceA~1 is not satisfied so this should be nullptr
 
@@ -367,7 +367,7 @@ namespace test
         // Specify a dynamic target so that the test::ServiceBInt dependency for  
         // ServiceA~1 will only be satisfied by ServiceB~123 instance.
         cppmicroservices::AnyMap props;
-        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        props["ServiceB.target"] = std::string("(ServiceBId=ServiceB~123)");
         auto range = { "1", "2", "3", "4", "5" };
         for (auto const& i : range) {
             auto service = getFactoryService<test::ServiceAInt>("ServiceA", i, props);
@@ -397,7 +397,7 @@ namespace test
         // Specify a dynamic target so that the test::ServiceBInt dependency for
         // ServiceA~1 will only be satisfied by ServiceB~123 instance.
         cppmicroservices::AnyMap props;
-        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        props["ServiceB.target"] = std::string("(ServiceBId=ServiceB~123)");
         auto range = { "1", "2", "3", "4", "5" };
         std::vector<std::shared_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>>> trackers;
  
@@ -460,7 +460,7 @@ namespace test
         // ServiceA~1 will only be satisfied by ServiceB~123 instance.
         int instanceCount = 5;
         cppmicroservices::AnyMap props;
-        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        props["ServiceB.target"] = std::string("(ServiceBId=ServiceB~123)");
         auto range = { "1", "2", "3", "4", "5" };
         for (auto const& i : range)
         {
@@ -506,7 +506,7 @@ namespace test
         // Specify a dynamic target so that the test::ServiceBInt dependency for
         // ServiceA~1 will only be satisfied by ServiceB~123 instance.
         cppmicroservices::AnyMap props;
-        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        props["ServiceB.target"] = std::string("(ServiceBId=ServiceB~123)");
         
         std::function<bool()> createFunc = [&]() -> bool
         {
@@ -553,6 +553,7 @@ namespace test
         // Create some component meta data and insert a reference into the refsMetadata vector
         auto mockMetadata = std::make_shared<cppmicroservices::scrimpl::metadata::ComponentMetadata>();      
         cppmicroservices::scrimpl::metadata::ReferenceMetadata reference;
+        reference.name = "ServiceB";
         reference.interfaceName = "ServiceBInt";
         mockMetadata->refsMetadata.push_back(reference);
         auto notifier = std::make_shared<cppmicroservices::scrimpl::ConfigurationNotifier>(context,
@@ -577,7 +578,7 @@ namespace test
 
         //Create properties with a bad LDAPFilter (It's missing a close parenthesis after 123).
         cppmicroservices::AnyMap props;
-        props["ServiceBInt"] = std::string("(ServiceBId=ServiceB~123");      
+        props["ServiceB.target"] = std::string("(ServiceBId=ServiceB~123");      
 
         // When the ComponentFactoryImpl CreateFactoryComponent method is called it will log an error 
         // exceptionLDAPFilter and throw an invalid_argument exception
@@ -604,6 +605,7 @@ namespace test
          // Create some component meta data and insert a reference into the refsMetadata vector
          auto mockMetadata = std::make_shared<cppmicroservices::scrimpl::metadata::ComponentMetadata>();
          cppmicroservices::scrimpl::metadata::ReferenceMetadata reference;
+         reference.name = "ServiceB";
          reference.interfaceName = "ServiceBInt";
          mockMetadata->refsMetadata.push_back(reference);
 
@@ -627,8 +629,8 @@ namespace test
 
         // Create properties with a dynamic target for interface ServiceBInt
         cppmicroservices::AnyMap props;
-        props["ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");    
-        notifier->VerifyProperties(props, mgr);
+        props["ServiceB.target"] = std::string("(ServiceBId=ServiceB~123)");    
+        notifier->LogInvalidDynamicTargetInProperties(props, mgr);
     }    
 
     /* tFactoryTarget.dynamicTargetForSingleton.
@@ -656,7 +658,7 @@ namespace test
         // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
         // satisfied by ServiceB~123 instance.
         cppmicroservices::AnyMap props;
-        props["test::ServiceBInt"] = std::string("(ServiceBId=ServiceB~123)");
+        props["ServiceB.target"] = std::string("(ServiceBId=ServiceB~123)");
         auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
         ASSERT_TRUE(service);
 

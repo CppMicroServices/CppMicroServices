@@ -103,7 +103,7 @@ namespace cppmicroservices
                                     cppmicroservices::service::cm::ConfigurationEventType type,
                                     std::shared_ptr<cppmicroservices::AnyMap> properties);
             std::shared_ptr<ComponentFactoryImpl> GetComponentFactory();
-            void VerifyProperties(cppmicroservices::AnyMap const& properties,
+            void LogInvalidDynamicTargetInProperties(cppmicroservices::AnyMap const& properties,
                                   std::shared_ptr<ComponentConfigurationImpl> mgr) const noexcept;
  
           private:

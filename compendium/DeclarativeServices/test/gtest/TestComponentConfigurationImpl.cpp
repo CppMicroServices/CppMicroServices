@@ -1062,10 +1062,10 @@ namespace cppmicroservices
                 [&configAdminService]()
                 {
                     auto configuration = configAdminService->GetConfiguration("sample::config");
-                    auto fut1
-                        = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                            {"foo", true}
+                    auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
+                        {"foo", true}
                     });
+                    fut.second.wait();
                 });
 
             bundleT.join();

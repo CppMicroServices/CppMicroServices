@@ -79,7 +79,7 @@ namespace cppmicroservices
             // with the referenceName.target as the key and the target as the value. 
             for (auto& ref : newMetadata->refsMetadata)
             {
-                auto target = ref.name + ".target";
+                auto target = ref.name + "";
                 auto iter = properties.find(target);
                 if (iter != properties.end()) {
                     // This reference has a dynamic target

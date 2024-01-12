@@ -1077,7 +1077,6 @@ namespace cppmicroservices
                 c = characters[dist(randomGenerator)];
             }
             return randomString;
- 
         }
 
         void

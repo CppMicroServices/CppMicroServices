@@ -209,7 +209,7 @@ namespace cppmicroservices
         void
         ConfigurationNotifier::LogInvalidDynamicTargetInProperties(
             cppmicroservices::AnyMap const& properties,
-                                                std::shared_ptr<ComponentConfigurationImpl> mgr) const noexcept
+            std::shared_ptr<ComponentConfigurationImpl> mgr) const noexcept
         {
             // Look for dynamic targets in the references.
             // A dynamic target will appear in the properties for the configuration object

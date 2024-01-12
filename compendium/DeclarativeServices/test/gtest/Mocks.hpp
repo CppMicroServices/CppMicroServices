@@ -414,41 +414,6 @@ namespace cppmicroservices
             std::atomic<int> statechangecount;
         };
 
-        class MockComponentConfigurationImpl2 : public ComponentConfigurationImpl
-        {
-          public:
-            MockComponentConfigurationImpl2(std::shared_ptr<metadata::ComponentMetadata const> metadata,
-                                            Bundle const& bundle,
-                                            std::shared_ptr<ComponentRegistry> registry,
-                                            std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-                                            std::shared_ptr<ConfigurationNotifier> notifier)
-                : ComponentConfigurationImpl(metadata, bundle, registry, logger, notifier)
-            {
-            }
-            virtual ~MockComponentConfigurationImpl2() = default;
-            MOCK_METHOD0(GetFactory, std::shared_ptr<ServiceFactory>(void));
-            MOCK_METHOD1(CreateAndActivateComponentInstance,
-                         std::shared_ptr<ComponentInstance>(cppmicroservices::Bundle const&));
-            MOCK_METHOD1(UnbindAndDeactivateComponentInstance, void(std::shared_ptr<ComponentInstance>));
-            MOCK_METHOD0(DestroyComponentInstances, void());
-            MOCK_METHOD2(BindReference, void(std::string const&, ServiceReferenceBase const&));
-            MOCK_METHOD2(UnbindReference, void(std::string const&, ServiceReferenceBase const&));
-            MOCK_METHOD0(ModifyComponentInstanceProperties, bool());
-
-            void
-            SetState(std::shared_ptr<ComponentConfigurationState> const& newState)
-            {
-                ComponentConfigurationImpl::SetState(newState);
-            }
-
-            bool
-            CompareAndSetState(std::shared_ptr<ComponentConfigurationState>* expectedState,
-                               std::shared_ptr<ComponentConfigurationState> desiredState) override
-            {
-                return ComponentConfigurationImpl::CompareAndSetState(expectedState, desiredState);
-            }
-        };
-
     } // namespace scrimpl
 
     namespace async

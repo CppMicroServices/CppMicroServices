@@ -22,6 +22,7 @@
 
 #include <random>
 
+#include "../../src/ConfigurationListenerImpl.hpp"
 #include "../../src/SCRAsyncWorkService.hpp"
 #include "../../src/SCRExtensionRegistry.hpp"
 #include "../../src/SCRLogger.hpp"
@@ -39,6 +40,7 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/ServiceInterface.h"
+#include "cppmicroservices/logservice/LogService.hpp"
 
 #include "../TestUtils.hpp"
 #include <TestInterfaces/Interfaces.hpp>
@@ -981,17 +983,19 @@ namespace cppmicroservices
             framework.Stop();
             framework.WaitForStop(std::chrono::milliseconds::zero());
         }
+
         /**
          * Test that the Modified method on a component configuration that is
          * lazily loaded and requires a configuration object to activate is never
          * called if the configuration is only created once and updated once.
+         * Expected to be run repeatedly to verify race condition does not occur
          */
-        TEST_F(ComponentConfigurationImplTest, TestModifiedIsNeverCalled)
+        TEST_F(ComponentConfigurationImplTest, TestModifiedIsNeverCalled1)
         {
-            auto mockMetadata = std::make_shared<metadata::ComponentMetadata>();
+            auto Metadata = std::make_shared<metadata::ComponentMetadata>();
             auto mockRegistry = std::make_shared<MockComponentRegistry>();
             auto fakeLogger = std::make_shared<FakeLogger>();
-            auto mockCompInstance = std::make_shared<MockComponentInstance>();
+
             auto mockFactory = std::make_shared<MockFactory>();
 
             auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
@@ -1005,6 +1009,13 @@ namespace cppmicroservices
                                                                     asyncWorkService,
                                                                     extRegistry);
 
+            auto context = GetFramework().GetBundleContext();
+            // Publish ConfigurationListener
+            auto configListener
+                = std::make_shared<cppmicroservices::service::cm::ConfigurationListenerImpl>(context, logger, notifier);
+            auto configListenerReg = context.RegisterService<cppmicroservices::service::cm::ConfigurationListener>(
+                std::move(configListener));
+
 #    if defined(US_BUILD_SHARED_LIBS)
             auto const caPluginPath = test::GetConfigAdminRuntimePluginFilePath();
             auto cabundles = GetFramework().GetBundleContext().InstallBundles(caPluginPath);
@@ -1013,8 +1024,6 @@ namespace cppmicroservices
                 bundle.Start();
             }
 #    endif
-            ::test::InstallAndStartDS(GetFramework().GetBundleContext());
-
             // Get a service reference to ConfigAdmin to create the configuration object.
             auto configAdminServiceRef = GetFramework()
                                              .GetBundleContext()
@@ -1023,34 +1032,38 @@ namespace cppmicroservices
             auto configAdminService = GetFramework().GetBundleContext().GetService(configAdminServiceRef);
             ASSERT_TRUE(configAdminService);
 
-            mockMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
-            mockMetadata->immediate = false;
-            mockMetadata->configurationPolicy = "require";
-            mockMetadata->configurationPids = { "sample::config" };
+            Metadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
+            Metadata->immediate = true;
+            Metadata->configurationPolicy = "require";
+            Metadata->configurationPids = { "sample::config" };
 
-            auto fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                                   GetFramework(),
-                                                                                   mockRegistry,
-                                                                                   fakeLogger,
-                                                                                   notifier);
+            auto compConfig = std::make_shared<SingletonComponentConfigurationImpl>(Metadata,
+                                                                                        GetFramework(),
+                                                                                        mockRegistry,
+                                                                                        fakeLogger,
+                                                                                        notifier);
+            auto mockCompContext = std::make_shared<MockComponentContextImpl>(compConfig);
+            auto mockCompInstance = std::make_shared<MockComponentInstance>();
+            compConfig->SetComponentInstancePair(InstanceContextPair(mockCompInstance, mockCompContext));
 
-            EXPECT_CALL(*fakeCompConfig, ModifyComponentInstanceProperties()).Times(0);
             EXPECT_CALL(*mockCompInstance, Modified()).Times(0);
+            EXPECT_CALL(*mockCompInstance, DoesModifiedMethodExist()).WillRepeatedly(testing::Return(true));
+#    include <thread>
+            auto bundleT = std::thread([&compConfig]() { compConfig->Initialize(); });
+            auto frameworkT = std::thread(
+                [&configAdminService]()
+                {
+                    auto configuration = configAdminService->GetConfiguration("sample::config");
+                    auto fut1
+                        = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
+                            {"foo", true}
+                    });
+                });
 
-            fakeCompConfig->Initialize();
-            // fakeCompConfig->Register();
+            bundleT.join();
+            frameworkT.join();
 
-            std::this_thread::sleep_for(std::chrono::seconds(5));
-
-            auto configuration = configAdminService->GetConfiguration("sample::config");
-            configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", true}
-            });
-
-            configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", false}
-            });
-            fakeCompConfig->Deactivate();
+            compConfig->Deactivate();
             fakeCompConfig->Stop();
         }
 #endif

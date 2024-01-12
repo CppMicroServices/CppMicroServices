@@ -122,6 +122,7 @@ namespace cppmicroservices
             FRIEND_TEST(SingletonComponentConfigurationTest, TestModifiedMethodExceptionLogging);
             FRIEND_TEST(SingletonComponentConfigurationTest, TestGetService);
             FRIEND_TEST(SingletonComponentConfigurationTest, TestDestroyComponentInstances_DeactivateFailure);
+            FRIEND_TEST(ComponentConfigurationImplTest, TestModifiedIsNeverCalled1);
 
             /**
              * Set the member data, only used in tests

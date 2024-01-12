@@ -43,16 +43,19 @@ namespace cppmicroservices
         {
             ConfigChangeNotification(std::string pid,
                                      std::shared_ptr<cppmicroservices::AnyMap> properties,
-                                     cppmicroservices::service::cm::ConfigurationEventType evt)
+                                     cppmicroservices::service::cm::ConfigurationEventType evt,
+                                     int changeCount_)
                 : pid(std::move(pid))
                 , event(std::move(evt))
                 , newProperties(properties)
+                , newChangeCount(changeCount_)
             {
             }
 
             std::string pid;
             cppmicroservices::service::cm::ConfigurationEventType event;
             std::shared_ptr<cppmicroservices::AnyMap> newProperties;
+            int newChangeCount;
         };
 
         struct Listener final
@@ -94,13 +97,14 @@ namespace cppmicroservices
                 std::function<void(ConfigChangeNotification const&)> notify,
                 std::shared_ptr<ComponentConfigurationImpl> mgr);
 
-            void UnregisterListener(std::string const& pid, const cppmicroservices::ListenerTokenId token) noexcept;
+            void UnregisterListener(std::string const& pid, cppmicroservices::ListenerTokenId const token) noexcept;
 
             bool AnyListenersForPid(std::string const& pid) noexcept;
 
             void NotifyAllListeners(std::string const& pid,
                                     cppmicroservices::service::cm::ConfigurationEventType type,
-                                    std::shared_ptr<cppmicroservices::AnyMap> properties);
+                                    std::shared_ptr<cppmicroservices::AnyMap> properties,
+                                    int changeCount);
 
             void CreateFactoryComponent(std::string const& pid, std::shared_ptr<ComponentConfigurationImpl>& mgr);
 

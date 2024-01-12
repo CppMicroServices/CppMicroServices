@@ -241,10 +241,11 @@ namespace cppmicroservices
         void
         ConfigurationNotifier::NotifyAllListeners(std::string const& pid,
                                                   cppmicroservices::service::cm::ConfigurationEventType type,
-                                                  std::shared_ptr<cppmicroservices::AnyMap> properties)
+                                                  std::shared_ptr<cppmicroservices::AnyMap> properties,
+                                                  int changeCount)
         {
             ConfigChangeNotification notification
-                = ConfigChangeNotification(pid, std::move(properties), std::move(type));
+                = ConfigChangeNotification(pid, std::move(properties), std::move(type), changeCount);
 
             auto listenersMapHandle = listenersMap.lock();
             auto iter = listenersMapHandle->find(pid);

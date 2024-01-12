@@ -29,13 +29,14 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
-        ConfigurationManager::ConfigurationManager(std::shared_ptr<const metadata::ComponentMetadata> const& metadata,
+        ConfigurationManager::ConfigurationManager(std::shared_ptr<metadata::ComponentMetadata const> const& metadata,
                                                    cppmicroservices::BundleContext const& bc,
                                                    std::shared_ptr<cppmicroservices::logservice::LogService> logger)
             : logger(std::move(logger))
             , metadata(metadata)
             , bundleContext(bc)
             , mergedProperties(metadata->properties)
+            , changeCount(0)
         {
             if (!this->metadata || !this->bundleContext || !this->logger)
             {
@@ -73,6 +74,7 @@ namespace cppmicroservices
                         auto config = configAdmin->ListConfigurations("(pid=" + pid + ")");
                         if (config.size() > 0)
                         {
+                            changeCount = config.front()->GetChangeCount();
                             auto properties = config.front()->GetProperties();
                             configProperties.emplace(pid, properties);
                             for (auto const& item : properties)
@@ -98,8 +100,10 @@ namespace cppmicroservices
         ConfigurationManager::UpdateMergedProperties(std::string const& pid,
                                                      std::shared_ptr<cppmicroservices::AnyMap> props,
                                                      cppmicroservices::service::cm::ConfigurationEventType const& type,
+                                                     int const& newChangeCount,
                                                      bool& configWasSatisfied,
-                                                     bool& configNowSatisfied)
+                                                     bool& configNowSatisfied,
+                                                     bool& changeCountDifferent)
         {
             std::lock_guard<std::mutex> lock(propertiesMutex);
             configWasSatisfied = isConfigSatisfied();
@@ -120,6 +124,12 @@ namespace cppmicroservices
             //  lowest precedence properties from the metadata
             //  next precedence each pid in meta-data configuration-pids with first one
             //  in the list having lower precedence than the last one in the list.
+
+            if (newChangeCount != changeCount)
+            {
+                changeCountDifferent = true;
+                changeCount = newChangeCount;
+            }
 
             mergedProperties = metadata->properties;
 

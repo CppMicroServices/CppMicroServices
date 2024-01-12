@@ -1017,20 +1017,6 @@ namespace cppmicroservices
             {
                 bundle.Start();
             }
-#    else
-            auto dsbundles = frameworkContext.GetBundles();
-            for (auto& bundle : dsbundles)
-            {
-                try
-                {
-                    bundle.Start();
-                }
-                catch (std::exception& e)
-                {
-                    std::cerr << "    " << e.what();
-                }
-                std::cerr << std::endl;
-            }
 #    endif
 
             // Get a service reference to ConfigAdmin to create the configuration object.

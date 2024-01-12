@@ -127,7 +127,7 @@ namespace cppmicroservices
                 if (iter != listenersMapHandle->end())
                 {
                     // Make sure the properties does not contain any dynamic targets
-                    auto tokenMapPtr = iter->second;
+                    auto const tokenMapPtr = iter->second;
                     for (auto const& tokenEntry : (*tokenMapPtr))
                     {
                         auto listener = tokenEntry.second;

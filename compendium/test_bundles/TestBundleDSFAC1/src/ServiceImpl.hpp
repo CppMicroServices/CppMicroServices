@@ -22,7 +22,7 @@ namespace sample
 
       private:
         std::mutex propertiesLock;
-        std::shared_ptr<cppmicroservices::AnyMap> properties;
+        cppmicroservices::AnyMap properties;
  
     };
 } // namespace sample

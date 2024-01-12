@@ -192,9 +192,7 @@ namespace cppmicroservices
 {
     namespace cmimpl
     {
-        thread_local std::mt19937 ConfigurationAdminImpl::randomGenerator(std::random_device {}());
-
-        ConfigurationAdminImpl::ConfigurationAdminImpl(
+         ConfigurationAdminImpl::ConfigurationAdminImpl(
             cppmicroservices::BundleContext context,
             std::shared_ptr<cppmicroservices::logservice::LogService> const& lggr,
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& asyncWS)
@@ -1070,6 +1068,7 @@ namespace cppmicroservices
         std::string
         ConfigurationAdminImpl::RandomInstanceName()
         {
+            thread_local static std::mt19937 randomGenerator(std::random_device {}());
             static auto const characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
             std::uniform_int_distribution<> dist(0, 61);
             std::string randomString(6, '\0');

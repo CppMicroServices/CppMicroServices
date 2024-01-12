@@ -104,12 +104,10 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
         {
             auto factoryComponentID
                 = JsonValueValidator(jsonComponent, "factory", Json::ValueType::stringValue).GetString();
-            if (!factoryComponentID.empty()) {
-                if (duplicatePids.size() != 1)
-                {
-                    throw std::runtime_error("Error: For factory components, the configuration-pid array "
+            if (!factoryComponentID.empty() && (duplicatePids.size() != 1))
+            {
+                throw std::runtime_error("Error: For factory components, the configuration-pid array "
                         "may only contain one entry");
-                }
             }
         }
 

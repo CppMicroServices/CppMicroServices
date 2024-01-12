@@ -268,8 +268,7 @@ namespace cppmicroservices
                 cppmicroservices::service::cm::ManagedServiceFactory,
                 TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>>
                 managedServiceFactoryTracker;
-            thread_local static std::mt19937 randomGenerator;
-            cppmicroservices::ServiceTracker<cppmicroservices::service::cm::ConfigurationListener>
+             cppmicroservices::ServiceTracker<cppmicroservices::service::cm::ConfigurationListener>
                 configListenerTracker;
 
             // used instead of querying the service trackers since a race exists between when the service tracker

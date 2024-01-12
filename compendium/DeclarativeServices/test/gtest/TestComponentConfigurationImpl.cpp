@@ -21,6 +21,7 @@
   =============================================================================*/
 
 #include <random>
+#include <thread>
 
 #include "../../src/ConfigurationListenerImpl.hpp"
 #include "../../src/SCRAsyncWorkService.hpp"
@@ -990,65 +991,73 @@ namespace cppmicroservices
          * called if the configuration is only created once and updated once.
          * Expected to be run repeatedly to verify race condition does not occur
          */
-        TEST_F(ComponentConfigurationImplTest, TestModifiedIsNeverCalled1)
+        TEST_F(ComponentConfigurationImplTest, TestModifiedIsNeverCalled)
         {
-            auto Metadata = std::make_shared<metadata::ComponentMetadata>();
+            auto frameworkContext = GetFramework().GetBundleContext();
+            auto compMetadata = std::make_shared<metadata::ComponentMetadata>();
             auto mockRegistry = std::make_shared<MockComponentRegistry>();
             auto fakeLogger = std::make_shared<FakeLogger>();
-
-            auto mockFactory = std::make_shared<MockFactory>();
-
-            auto logger = std::make_shared<SCRLogger>(GetFramework().GetBundleContext());
+            auto logger = std::make_shared<SCRLogger>(frameworkContext);
             auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
+            auto asyncWorkService = std::make_shared<SCRAsyncWorkService>(frameworkContext, logger);
+            auto notifier
+                = std::make_shared<ConfigurationNotifier>(frameworkContext, fakeLogger, asyncWorkService, extRegistry);
 
-            auto asyncWorkService
-                = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(GetFramework().GetBundleContext(),
-                                                                                   logger);
-            auto notifier = std::make_shared<ConfigurationNotifier>(GetFramework().GetBundleContext(),
-                                                                    fakeLogger,
-                                                                    asyncWorkService,
-                                                                    extRegistry);
-
-            auto context = GetFramework().GetBundleContext();
             // Publish ConfigurationListener
             auto configListener
-                = std::make_shared<cppmicroservices::service::cm::ConfigurationListenerImpl>(context, logger, notifier);
-            auto configListenerReg = context.RegisterService<cppmicroservices::service::cm::ConfigurationListener>(
-                std::move(configListener));
+                = std::make_shared<cppmicroservices::service::cm::ConfigurationListenerImpl>(frameworkContext,
+                                                                                             logger,
+                                                                                             notifier);
+            auto configListenerReg
+                = frameworkContext.RegisterService<cppmicroservices::service::cm::ConfigurationListener>(
+                    std::move(configListener));
 
 #    if defined(US_BUILD_SHARED_LIBS)
-            auto const caPluginPath = test::GetConfigAdminRuntimePluginFilePath();
-            auto cabundles = GetFramework().GetBundleContext().InstallBundles(caPluginPath);
+            auto cabundles = frameworkContext.InstallBundles(test::GetConfigAdminRuntimePluginFilePath());
             for (auto& bundle : cabundles)
             {
                 bundle.Start();
             }
+#    else
+            auto dsbundles = frameworkContext.GetBundles();
+            for (auto& bundle : dsbundles)
+            {
+                try
+                {
+                    bundle.Start();
+                }
+                catch (std::exception& e)
+                {
+                    std::cerr << "    " << e.what();
+                }
+                std::cerr << std::endl;
+            }
 #    endif
+
             // Get a service reference to ConfigAdmin to create the configuration object.
-            auto configAdminServiceRef = GetFramework()
-                                             .GetBundleContext()
-                                             .GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+            auto configAdminServiceRef
+                = frameworkContext.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
             ASSERT_TRUE(configAdminServiceRef) << "GetService failed for ConfigurationAdmin.";
-            auto configAdminService = GetFramework().GetBundleContext().GetService(configAdminServiceRef);
+            auto configAdminService = frameworkContext.GetService(configAdminServiceRef);
             ASSERT_TRUE(configAdminService);
 
-            Metadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
-            Metadata->immediate = true;
-            Metadata->configurationPolicy = "require";
-            Metadata->configurationPids = { "sample::config" };
+            compMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
+            compMetadata->immediate = true;
+            compMetadata->configurationPolicy = "require";
+            compMetadata->configurationPids = { "sample::config" };
 
-            auto compConfig = std::make_shared<SingletonComponentConfigurationImpl>(Metadata,
-                                                                                        GetFramework(),
-                                                                                        mockRegistry,
-                                                                                        fakeLogger,
-                                                                                        notifier);
+            auto compConfig = std::make_shared<SingletonComponentConfigurationImpl>(compMetadata,
+                                                                                    GetFramework(),
+                                                                                    mockRegistry,
+                                                                                    fakeLogger,
+                                                                                    notifier);
             auto mockCompContext = std::make_shared<MockComponentContextImpl>(compConfig);
             auto mockCompInstance = std::make_shared<MockComponentInstance>();
             compConfig->SetComponentInstancePair(InstanceContextPair(mockCompInstance, mockCompContext));
 
             EXPECT_CALL(*mockCompInstance, Modified()).Times(0);
             EXPECT_CALL(*mockCompInstance, DoesModifiedMethodExist()).WillRepeatedly(testing::Return(true));
-#    include <thread>
+
             auto bundleT = std::thread([&compConfig]() { compConfig->Initialize(); });
             auto frameworkT = std::thread(
                 [&configAdminService]()
@@ -1064,7 +1073,7 @@ namespace cppmicroservices
             frameworkT.join();
 
             compConfig->Deactivate();
-            fakeCompConfig->Stop();
+            compConfig->Stop();
         }
 #endif
     } // namespace scrimpl

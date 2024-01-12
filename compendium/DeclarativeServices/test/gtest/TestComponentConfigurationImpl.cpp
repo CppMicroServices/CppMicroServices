@@ -41,7 +41,6 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/ServiceInterface.h"
-#include "cppmicroservices/logservice/LogService.hpp"
 
 #include "../TestUtils.hpp"
 #include <TestInterfaces/Interfaces.hpp>

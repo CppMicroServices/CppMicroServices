@@ -13,6 +13,8 @@ jobs:
         submodules: true
 
     # Optionally generate compile_commands.json
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
 
     - uses: ZedThree/clang-tidy-review@v0.14.0
       id: review

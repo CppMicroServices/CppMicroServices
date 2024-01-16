@@ -990,15 +990,30 @@ namespace cppmicroservices
          * called if the configuration is only created once and updated once.
          * Expected to be run repeatedly to verify race condition does not occur
          */
-        TEST_F(ComponentConfigurationImplTest, TestModifiedIsNeverCalled)
+        TEST(ConfigAdminComponentCreationRace, TestModifiedIsNeverCalled)
         {
-            auto frameworkContext = GetFramework().GetBundleContext();
+            std::mutex bundlePrivateMutex;
+            auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+            framework.Start();
+
+            auto frameworkContext = framework.GetBundleContext();
             auto compMetadata = std::make_shared<metadata::ComponentMetadata>();
             auto mockRegistry = std::make_shared<MockComponentRegistry>();
             auto fakeLogger = std::make_shared<FakeLogger>();
             auto logger = std::make_shared<SCRLogger>(frameworkContext);
             auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
-            auto asyncWorkService = std::make_shared<SCRAsyncWorkService>(frameworkContext, logger);
+            std::shared_ptr<SCRAsyncWorkService> asyncWorkService;
+            {
+
+                /**
+                 * In actuallity, the FrameworkPrivate locks its mutex before creating the SCRAsyncWorkService.
+                 * This protects a lock inversion that happens within construction of the serviceRegistry and
+                 * serviceTracker and the shutdown of the framework. To recreate this without having to build a bundle,
+                 * we create a mutex here and lock it on SCRAsyncWorkService construction and framework stopping.
+                 */
+                std::unique_lock<std::mutex> ul { bundlePrivateMutex };
+                asyncWorkService = std::make_shared<SCRAsyncWorkService>(frameworkContext, logger);
+            }
             auto notifier
                 = std::make_shared<ConfigurationNotifier>(frameworkContext, fakeLogger, asyncWorkService, extRegistry);
 
@@ -1032,7 +1047,7 @@ namespace cppmicroservices
             compMetadata->configurationPids = { "sample::config" };
 
             auto compConfig = std::make_shared<SingletonComponentConfigurationImpl>(compMetadata,
-                                                                                    GetFramework(),
+                                                                                    framework,
                                                                                     mockRegistry,
                                                                                     fakeLogger,
                                                                                     notifier);
@@ -1059,6 +1074,12 @@ namespace cppmicroservices
 
             compConfig->Deactivate();
             compConfig->Stop();
+
+            {
+                std::unique_lock<std::mutex> ul { bundlePrivateMutex };
+                framework.Stop();
+                framework.WaitForStop(std::chrono::milliseconds::zero());
+            }
         }
 #endif
     } // namespace scrimpl

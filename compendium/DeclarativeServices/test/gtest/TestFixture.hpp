@@ -253,6 +253,9 @@ namespace test
         void
         TearDown() override
         {
+            if (dsRuntimeService) {
+                dsRuntimeService.reset();
+            }
             framework.Stop();
             framework.WaitForStop(std::chrono::milliseconds::zero());
         }
@@ -329,6 +332,9 @@ namespace test
         void
         TearDown() override
         {
+            if (configAdmin) {
+                configAdmin.reset();
+            }
             tGenericDSSuite::TearDown();
         }
       public:

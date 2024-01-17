@@ -992,7 +992,9 @@ namespace cppmicroservices
          */
         TEST(ConfigAdminComponentCreationRace, TestModifiedIsNeverCalled)
         {
-            std::mutex bundlePrivateMutex;
+
+            /** LSAN is throwing an error about a lock inversion that is incorrect when this test is part of the
+             * TestComponentConfigurationImpl test fixture. We have therefore not included in that fixture*/
             auto framework = cppmicroservices::FrameworkFactory().NewFramework();
             framework.Start();
 
@@ -1002,18 +1004,8 @@ namespace cppmicroservices
             auto fakeLogger = std::make_shared<FakeLogger>();
             auto logger = std::make_shared<SCRLogger>(frameworkContext);
             auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
-            std::shared_ptr<SCRAsyncWorkService> asyncWorkService;
-            {
 
-                /**
-                 * In actuallity, the FrameworkPrivate locks its mutex before creating the SCRAsyncWorkService.
-                 * This protects a lock inversion that happens within construction of the serviceRegistry and
-                 * serviceTracker and the shutdown of the framework. To recreate this without having to build a bundle,
-                 * we create a mutex here and lock it on SCRAsyncWorkService construction and framework stopping.
-                 */
-                std::unique_lock<std::mutex> ul { bundlePrivateMutex };
-                asyncWorkService = std::make_shared<SCRAsyncWorkService>(frameworkContext, logger);
-            }
+            auto asyncWorkService = std::make_shared<SCRAsyncWorkService>(frameworkContext, logger);
             auto notifier
                 = std::make_shared<ConfigurationNotifier>(frameworkContext, fakeLogger, asyncWorkService, extRegistry);
 
@@ -1075,11 +1067,8 @@ namespace cppmicroservices
             compConfig->Deactivate();
             compConfig->Stop();
 
-            {
-                std::unique_lock<std::mutex> ul { bundlePrivateMutex };
-                framework.Stop();
-                framework.WaitForStop(std::chrono::milliseconds::zero());
-            }
+            framework.Stop();
+            framework.WaitForStop(std::chrono::milliseconds::zero());
         }
 #endif
     } // namespace scrimpl

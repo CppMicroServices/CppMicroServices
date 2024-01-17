@@ -993,8 +993,11 @@ namespace cppmicroservices
         TEST(ConfigAdminComponentCreationRace, TestModifiedIsNeverCalled)
         {
 
-            /** LSAN is throwing an error about a lock inversion that is incorrect when this test is part of the
-             * TestComponentConfigurationImpl test fixture. We have therefore not included in that fixture*/
+            /** 
+             * LSAN is incorrectly flagging a lock inversion while using the
+             * TestComponentConfigurationImpl fixture. We have therefore 
+             * intentionally not used that fixture
+            */
             auto framework = cppmicroservices::FrameworkFactory().NewFramework();
             framework.Start();
 

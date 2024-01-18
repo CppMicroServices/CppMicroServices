@@ -22,6 +22,7 @@
 
 #include "ConfigurationNotifier.hpp"
 #include "../ComponentRegistry.hpp"
+#include "../SCRExtensionRegistry.hpp"
 #include "../metadata/ComponentMetadata.hpp"
 #include "ComponentConfigurationImpl.hpp"
 #include "ComponentManagerImpl.hpp"
@@ -29,7 +30,6 @@
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
-#include "../SCRExtensionRegistry.hpp"
 
 namespace cppmicroservices
 {
@@ -84,7 +84,7 @@ namespace cppmicroservices
 
         void
         ConfigurationNotifier::UnregisterListener(std::string const& pid,
-                                                  const cppmicroservices::ListenerTokenId token) noexcept
+                                                  cppmicroservices::ListenerTokenId const token) noexcept
         {
             auto listenersMapHandle = listenersMap.lock();
             if (listenersMapHandle->empty() || pid.empty())
@@ -165,7 +165,7 @@ namespace cppmicroservices
                     return false;
                 }
             } // release listenersMapHandle lock
-            for (auto & mgr : mgrs)
+            for (auto& mgr : mgrs)
             {
                 CreateFactoryComponent(pid, mgr);
             }
@@ -242,7 +242,7 @@ namespace cppmicroservices
         ConfigurationNotifier::NotifyAllListeners(std::string const& pid,
                                                   cppmicroservices::service::cm::ConfigurationEventType type,
                                                   std::shared_ptr<cppmicroservices::AnyMap> properties,
-                                                  int changeCount)
+                                                  unsigned long const& changeCount)
         {
             ConfigChangeNotification notification
                 = ConfigChangeNotification(pid, std::move(properties), std::move(type), changeCount);

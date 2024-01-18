@@ -55,7 +55,7 @@ namespace cppmicroservices
             std::string pid;
             cppmicroservices::service::cm::ConfigurationEventType event;
             std::shared_ptr<cppmicroservices::AnyMap> newProperties;
-            int newChangeCount;
+            unsigned long newChangeCount;
         };
 
         struct Listener final
@@ -104,7 +104,7 @@ namespace cppmicroservices
             void NotifyAllListeners(std::string const& pid,
                                     cppmicroservices::service::cm::ConfigurationEventType type,
                                     std::shared_ptr<cppmicroservices::AnyMap> properties,
-                                    int changeCount);
+                                    unsigned long const& changeCount);
 
             void CreateFactoryComponent(std::string const& pid, std::shared_ptr<ComponentConfigurationImpl>& mgr);
 

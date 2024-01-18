@@ -81,7 +81,7 @@ namespace cppmicroservices
             void UpdateMergedProperties(std::string const& pid,
                                         std::shared_ptr<cppmicroservices::AnyMap> props,
                                         cppmicroservices::service::cm::ConfigurationEventType const& type,
-                                        int const& newChangeCount,
+                                        unsigned long const& newChangeCount,
                                         bool& configWasSatisfied,
                                         bool& configIsNowSatisfied,
                                         bool& changeCountDifferent);
@@ -102,7 +102,7 @@ namespace cppmicroservices
             std::unordered_map<std::string, cppmicroservices::AnyMap>
                 configProperties; // properties for available configuration objects.
             cppmicroservices::AnyMap mergedProperties;
-            int changeCount;
+            unsigned long changeCount;
         };
     } // namespace scrimpl
 } // namespace cppmicroservices

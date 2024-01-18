@@ -100,7 +100,7 @@ namespace cppmicroservices
         ConfigurationManager::UpdateMergedProperties(std::string const& pid,
                                                      std::shared_ptr<cppmicroservices::AnyMap> props,
                                                      cppmicroservices::service::cm::ConfigurationEventType const& type,
-                                                     int const& newChangeCount,
+                                                     unsigned long const& newChangeCount,
                                                      bool& configWasSatisfied,
                                                      bool& configNowSatisfied,
                                                      bool& changeCountDifferent)

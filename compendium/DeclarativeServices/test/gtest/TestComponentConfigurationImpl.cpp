@@ -993,11 +993,11 @@ namespace cppmicroservices
         TEST(ConfigAdminComponentCreationRace, TestModifiedIsNeverCalled)
         {
 
-            /** 
+            /**
              * LSAN is incorrectly flagging a lock inversion while using the
-             * TestComponentConfigurationImpl fixture. We have therefore 
+             * TestComponentConfigurationImpl fixture. We have therefore
              * intentionally not used that fixture
-            */
+             */
             auto framework = cppmicroservices::FrameworkFactory().NewFramework();
             framework.Start();
 
@@ -1050,8 +1050,13 @@ namespace cppmicroservices
             auto mockCompInstance = std::make_shared<MockComponentInstance>();
             compConfig->SetComponentInstancePair(InstanceContextPair(mockCompInstance, mockCompContext));
 
-            EXPECT_CALL(*mockCompInstance, Modified()).Times(0);
-            EXPECT_CALL(*mockCompInstance, DoesModifiedMethodExist()).WillRepeatedly(testing::Return(true));
+            /**
+             * Rather than testing a component with and without a modified method, we can just verify that
+             * DoesModifiedMethodExist is never called. This is only, and always, called if we deem it acceptable to
+             * either a) modify or b) deactivate the ComponentInstance. Therefore if we just block from calling this
+             * check, it verifies behavior for ComponentInstance's with and without the modified method.
+             */
+            EXPECT_CALL(*mockCompInstance, DoesModifiedMethodExist()).Times(0);
 
             auto bundleT = std::thread([&compConfig]() { compConfig->Initialize(); });
             auto frameworkT = std::thread(

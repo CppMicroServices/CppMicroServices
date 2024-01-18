@@ -44,11 +44,11 @@ namespace cppmicroservices
             ConfigChangeNotification(std::string pid,
                                      std::shared_ptr<cppmicroservices::AnyMap> properties,
                                      cppmicroservices::service::cm::ConfigurationEventType evt,
-                                     int changeCount_)
+                                     unsigned long changeCount)
                 : pid(std::move(pid))
                 , event(std::move(evt))
                 , newProperties(properties)
-                , newChangeCount(changeCount_)
+                , newChangeCount(changeCount)
             {
             }
 

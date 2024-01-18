@@ -80,7 +80,7 @@ namespace cppmicroservices
                     }
                     auto properties = cppmicroservices::AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
                     auto type = event.getType();
-                    auto changeCount = 0;
+                    unsigned long changeCount = 0;
                     if (type == ConfigurationEventType::CM_UPDATED)
                     {
                         auto configObject = configAdmin->GetConfiguration(pid);

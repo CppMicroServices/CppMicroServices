@@ -102,7 +102,7 @@ namespace cppmicroservices
             std::unordered_map<std::string, cppmicroservices::AnyMap>
                 configProperties; // properties for available configuration objects.
             cppmicroservices::AnyMap mergedProperties;
-            unsigned long changeCount;
+            std::unordered_map<std::string, unsigned long> changeCount;
         };
     } // namespace scrimpl
 } // namespace cppmicroservices

@@ -36,11 +36,14 @@ namespace cppmicroservices
             , metadata(metadata)
             , bundleContext(bc)
             , mergedProperties(metadata->properties)
-            , changeCount(0)
         {
             if (!this->metadata || !this->bundleContext || !this->logger)
             {
                 throw std::invalid_argument("ConfigurationManagerImpl - Invalid arguments passed to constructor");
+            }
+            for (auto const& pid : metadata->configurationPids)
+            {
+                changeCount[pid] = 0;
             }
         }
 
@@ -74,7 +77,7 @@ namespace cppmicroservices
                         auto config = configAdmin->ListConfigurations("(pid=" + pid + ")");
                         if (config.size() > 0)
                         {
-                            changeCount = config.front()->GetChangeCount();
+                            changeCount[pid] = config.front()->GetChangeCount();
                             auto properties = config.front()->GetProperties();
                             configProperties.emplace(pid, properties);
                             for (auto const& item : properties)
@@ -125,10 +128,10 @@ namespace cppmicroservices
             //  next precedence each pid in meta-data configuration-pids with first one
             //  in the list having lower precedence than the last one in the list.
 
-            if (newChangeCount != changeCount)
+            if (newChangeCount != changeCount[pid])
             {
                 changeCountDifferent = true;
-                changeCount = newChangeCount;
+                changeCount[pid] = newChangeCount;
             }
 
             mergedProperties = metadata->properties;

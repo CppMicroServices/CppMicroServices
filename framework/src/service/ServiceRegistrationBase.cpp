@@ -209,28 +209,32 @@ namespace cppmicroservices
 
         CoreBundleContext* coreContext = nullptr;
 
-        if (!d->coreInfo->available)
-        {
-            throw std::logic_error("Service is unregistered");
-        }
         bool isUnregistering(false); // expected state
-        if (atomic_compare_exchange_strong(&d->coreInfo->unregistering, &isUnregistering, true))
+
+        if (!atomic_compare_exchange_strong(&d->coreInfo->unregistering, &isUnregistering, true))
         {
-            if (auto bundle = d->coreInfo->bundle_.lock())
-            {
-                {
-                    auto l1 = bundle->coreCtx->services.Lock();
-                    US_UNUSED(l1);
-                    bundle->coreCtx->services.RemoveServiceRegistration_unlocked(*this);
-                }
-                coreContext = bundle->coreCtx;
-            }
+            // someone else is unregistering
+            return;
         }
 
-        if (isUnregistering)
+        // d->coreInfo->unregistering is now true
+
+        // if unavailable
+        if (!d->coreInfo->available)
         {
-            // another thread has changed the state to UNREGISTERING
-            return;
+            // set unregistering to false
+            d->coreInfo->unregistering = false;
+            throw std::logic_error("Service is unregistered");
+        }
+
+        if (auto bundle = d->coreInfo->bundle_.lock())
+        {
+            {
+                auto l1 = bundle->coreCtx->services.Lock();
+                US_UNUSED(l1);
+                bundle->coreCtx->services.RemoveServiceRegistration_unlocked(*this);
+            }
+            coreContext = bundle->coreCtx;
         }
 
         if (coreContext)
@@ -326,6 +330,8 @@ namespace cppmicroservices
             d->coreInfo->bundleServiceInstance.clear();
 
             d->reference = nullptr;
+
+            // reset d->coreInfo->unregistering to false
             d->coreInfo->unregistering = false;
         }
     }

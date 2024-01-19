@@ -105,7 +105,16 @@ namespace cppmicroservices
                     // the latch counts down to 0, thereby allowing all Activate, Rebind and Modified
                     // activities to complete.
                     currentState->WaitForTransitionTask(); // wait for the previous transition to finish
-                    mgr.UnregisterService();
+                    try
+                    {
+                        mgr.UnregisterService();
+                    }
+                    catch (...)
+                    {
+                        mgr.GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
+                                             "Failed to unregister the service.",
+                                             std::current_exception());
+                    }
                     mgr.DestroyComponentInstances();
                     transitionAction.set_value();
                 }

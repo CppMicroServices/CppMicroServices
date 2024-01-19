@@ -33,7 +33,7 @@ jobs:
       - name: Run clang-tidy and generate SARIF files
         run: |
           mkdir sarif_results
-          SOURCE_FILES=$(find $GITHUB_WORKSPACE -path "$GITHUB_WORKSPACE/third_party" -prune -type f \( -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' -o -name '*.cxx' -o -name '*.h' -o -name '*.hh' -o -name '*.hxx' \))
+          SOURCE_FILES=$(find $GITHUB_WORKSPACE -path "$GITHUB_WORKSPACE/third_party" -prune -o -type f \( -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' -o -name '*.cxx' -o -name '*.h' -o -name '*.hh' -o -name '*.hxx' \) -print)
           for FILE in $SOURCE_FILES; do
             BASENAME=$(basename -- "$FILE")
             SARIF_FILE="sarif_results/${BASENAME%.*}.sarif"

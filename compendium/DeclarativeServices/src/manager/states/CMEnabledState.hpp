@@ -66,7 +66,7 @@ namespace cppmicroservices
              * \return a future object representing the actions performed due to the
              *         previous state change from \c DISABLED to \c ENABLED
              */
-            std::shared_future<void> Enable(ComponentManagerImpl& cm) override;
+            std::shared_future<void> Enable(ComponentManagerImpl& cm, std::atomic<bool>* /*nonce*/) override;
 
             /**
              * This method changes the state of the {@link ComponentManagerImpl} object
@@ -74,7 +74,7 @@ namespace cppmicroservices
              * \param cm is the component manager which needs to be disabled
              * \return a future object representing the actions performed due to the state change
              */
-            std::shared_future<void> Disable(ComponentManagerImpl& cm) override;
+            std::shared_future<void> Disable(ComponentManagerImpl& cm, std::atomic<bool>* nonce) override;
 
             /**
              * This method waits for the configurations to be created and then returns the
@@ -114,7 +114,7 @@ namespace cppmicroservices
              * \param registry is the runtime's component registry
              * \param logger is the runtime's logger
              */
-            void CreateConfigurations(std::shared_ptr<const metadata::ComponentMetadata> compDesc,
+            void CreateConfigurations(std::shared_ptr<metadata::ComponentMetadata const> compDesc,
                                       cppmicroservices::Bundle const& bundle,
                                       std::shared_ptr<ComponentRegistry> registry,
                                       std::shared_ptr<logservice::LogService> logger,

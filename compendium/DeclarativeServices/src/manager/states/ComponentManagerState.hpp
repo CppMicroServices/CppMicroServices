@@ -52,12 +52,12 @@ namespace cppmicroservices
             /**
              * Implementation of this method must handle the Enable state transition for current state
              */
-            virtual std::shared_future<void> Enable(ComponentManagerImpl& cm) = 0;
+            virtual std::shared_future<void> Enable(ComponentManagerImpl& cm, std::atomic<bool>* nonce) = 0;
 
             /**
              * Implementation of this method must handle the Disable state transition for current state
              */
-            virtual std::shared_future<void> Disable(ComponentManagerImpl& cm) = 0;
+            virtual std::shared_future<void> Disable(ComponentManagerImpl& cm, std::atomic<bool>* nonce) = 0;
 
             /**
              * Implementation returns true if the current state is enabled state, false otherwise

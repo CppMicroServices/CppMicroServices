@@ -25,7 +25,6 @@
 #include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "states/CMDisabledState.hpp"
-#include "states/CMEnabledState.hpp"
 #include "states/ComponentManagerState.hpp"
 #include <cassert>
 #include <future>
@@ -37,7 +36,7 @@ namespace cppmicroservices
     {
 
         ComponentManagerImpl::ComponentManagerImpl(
-            std::shared_ptr<const metadata::ComponentMetadata> metadata,
+            std::shared_ptr<metadata::ComponentMetadata const> metadata,
             std::shared_ptr<ComponentRegistry> registry,
             BundleContext bundleContext,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
@@ -60,7 +59,8 @@ namespace cppmicroservices
 
         ComponentManagerImpl::~ComponentManagerImpl()
         {
-            GetState()->Disable(*this);
+
+            GetState()->Disable(*this, nullptr);
             for (auto& fut : disableFutures)
             {
                 try
@@ -81,10 +81,25 @@ namespace cppmicroservices
         {
             if (compDesc->enabled)
             {
-                auto fut = Enable();
+                std::atomic<bool>* nonce = new std::atomic<bool>(false);
+                auto fut = Enable(nonce);
                 try
                 {
-                    fut.get();
+                    auto f = fut.wait_for(std::chrono::milliseconds(50)) == std::future_status::timeout;
+                    US_UNUSED(f);
+                    while (fut.wait_for(std::chrono::milliseconds(50)) == std::future_status::timeout)
+                    {
+                        auto expected = false;
+                        auto desired = true;
+                        if (std::atomic_compare_exchange_strong(nonce, &expected, desired))
+                        {
+                            auto task = taskMap[nonce];
+                            std::shared_ptr<CMEnabledState> enabledState
+                                = std::make_shared<CMEnabledState>((*task).get_future().share());
+                            (*task)(enabledState);
+                        }
+                    }
+                    delete nonce;
                 }
                 catch (cppmicroservices::SharedLibraryException const&)
                 {
@@ -110,15 +125,15 @@ namespace cppmicroservices
         }
 
         std::shared_future<void>
-        ComponentManagerImpl::Enable()
+        ComponentManagerImpl::Enable(std::atomic<bool>* nonce)
         {
-            return GetState()->Enable(*this);
+            return GetState()->Enable(*this, nonce);
         }
 
         std::shared_future<void>
-        ComponentManagerImpl::Disable()
+        ComponentManagerImpl::Disable(std::atomic<bool>* nonce)
         {
-            return GetState()->Disable(*this);
+            return GetState()->Disable(*this, nonce);
         }
 
         std::vector<std::shared_ptr<ComponentConfiguration>>
@@ -158,7 +173,8 @@ namespace cppmicroservices
 
         std::shared_future<void>
         ComponentManagerImpl::PostAsyncDisabledToEnabled(
-            std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState)
+            std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
+            std::atomic<bool>* nonce)
         {
             auto metadata = GetMetadata();
             auto bundle = GetBundle();
@@ -169,14 +185,26 @@ namespace cppmicroservices
             using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
             using PostTask = std::packaged_task<void()>;
 
-            ActualTask task([metadata, bundle, reg, logger, configNotifier](
-                                std::shared_ptr<CMEnabledState> eState) mutable
-                            { eState->CreateConfigurations(metadata, bundle, reg, logger, configNotifier); });
+            ActualTask task(
+                [metadata, bundle, reg, logger, configNotifier, nonce](std::shared_ptr<CMEnabledState> eState) mutable
+                {
+                    bool expected = false;
+                    bool desired = true;
+                    // if nonce is non null this is a blocking call
+                    // and the value is true, this task has already executed
+                    if (nonce && !std::atomic_compare_exchange_strong(nonce, &expected, desired))
+                    {
+                        return;
+                    }
+                    eState->CreateConfigurations(metadata, bundle, reg, logger, configNotifier);
+                });
 
             std::shared_ptr<CMEnabledState> enabledState = std::make_shared<CMEnabledState>(task.get_future().share());
 
-            PostTask post_task([enabledState, taskPtr = std::make_shared<ActualTask>(std::move(task))]() mutable
-                               { (*taskPtr)(enabledState); });
+            auto taskPtr_ = std::make_shared<ActualTask>(std::move(task));
+            taskMap[nonce] = taskPtr_;
+
+            PostTask post_task([enabledState, taskPtr = taskPtr_]() mutable { (*taskPtr)(enabledState); });
 
             // if this object failed to change state and the current state is DISABLED, try again
             auto succeeded = false;
@@ -198,13 +226,25 @@ namespace cppmicroservices
 
         std::shared_future<void>
         ComponentManagerImpl::PostAsyncEnabledToDisabled(
-            std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState)
+            std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
+            std::atomic<bool>* nonce)
         {
             using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
             using PostTask = std::packaged_task<void()>;
 
-            ActualTask task([](std::shared_ptr<CMEnabledState> enabledState) mutable
-                            { enabledState->DeleteConfigurations(); });
+            ActualTask task(
+                [nonce](std::shared_ptr<CMEnabledState> enabledState) mutable
+                {
+                    bool expected = false;
+                    bool desired = true;
+                    // if nonce is non null this is a blocking call
+                    // and the value is true, this task has already executed
+                    if (nonce && !std::atomic_compare_exchange_strong(nonce, &expected, desired))
+                    {
+                        return;
+                    }
+                    enabledState->DeleteConfigurations();
+                });
 
             auto disabledState = std::make_shared<CMDisabledState>(task.get_future().share());
 
@@ -221,8 +261,10 @@ namespace cppmicroservices
                 std::shared_ptr<CMEnabledState> currEnabledState
                     = std::dynamic_pointer_cast<CMEnabledState>(currentState);
 
-                PostTask post_task([currEnabledState, taskPtr = std::make_shared<ActualTask>(std::move(task))]() mutable
-                                   { (*taskPtr)(currEnabledState); });
+                auto taskPtr_ = std::make_shared<ActualTask>(std::move(task));
+                taskMap[nonce] = taskPtr_;
+
+                PostTask post_task([currEnabledState, taskPtr = taskPtr_]() mutable { (*taskPtr)(currEnabledState); });
 
                 asyncWorkService->post(std::move(post_task));
 

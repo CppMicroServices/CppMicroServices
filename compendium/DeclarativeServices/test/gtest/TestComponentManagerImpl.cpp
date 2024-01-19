@@ -189,9 +189,9 @@ namespace cppmicroservices
                                                                   notifier);
             EXPECT_NO_THROW({
                 compMgr->Initialize();
-                compMgr->Enable();
+                compMgr->Enable(nullptr);
                 EXPECT_EQ(compMgr->IsEnabled(), true) << "State expected to be ENABLED";
-                compMgr->Enable(); // enabling an already enabled component results in no state change
+                compMgr->Enable(nullptr); // enabling an already enabled component results in no state change
                 EXPECT_EQ(compMgr->IsEnabled(), true) << "State expected to stay as ENABLED";
             });
         }
@@ -207,9 +207,9 @@ namespace cppmicroservices
                                                                   notifier);
             EXPECT_NO_THROW({
                 compMgr->Initialize();
-                compMgr->Disable();
+                compMgr->Disable(nullptr);
                 EXPECT_EQ(compMgr->IsEnabled(), false) << "State expected to be DISABLED";
-                compMgr->Disable(); // Disabling an already disabled component results in no state change
+                compMgr->Disable(nullptr); // Disabling an already disabled component results in no state change
                 EXPECT_EQ(compMgr->IsEnabled(), false) << "State expected to stay as DISABLED";
             });
         }
@@ -227,7 +227,7 @@ namespace cppmicroservices
                 compMgr->Initialize();
                 compMgr->ResetCounter();
                 auto wasEnabled = compMgr->IsEnabled();
-                compMgr->Disable();
+                compMgr->Disable(nullptr);
                 EXPECT_EQ(compMgr->statechangecount, wasEnabled ? 1 : 0)
                     << "Unexpected number of state changes during a call to Disable a "
                        "ComponentManager";
@@ -255,7 +255,7 @@ namespace cppmicroservices
                        "ComponentManager";
                 prevState = compMgr->IsEnabled();
                 compMgr->ResetCounter();
-                compMgr->Disable();
+                compMgr->Disable(nullptr);
                 EXPECT_EQ(compMgr->IsEnabled(), false)
                     << "ComponentManager must be in DISABLED state after a call to Disable";
                 EXPECT_EQ(compMgr->statechangecount, prevState ? 1 : 0)
@@ -263,7 +263,7 @@ namespace cppmicroservices
                        "ComponentManager";
                 compMgr->ResetCounter();
                 prevState = compMgr->IsEnabled();
-                compMgr->Enable();
+                compMgr->Enable(nullptr);
                 EXPECT_EQ(compMgr->statechangecount, !prevState ? 1 : 0)
                     << "Unexpected number of state changes during a call to Enable a "
                        "ComponentManager";
@@ -284,11 +284,11 @@ namespace cppmicroservices
                                                                       notifier);
 
             compMgr->Initialize();
-            compMgr->Disable(); // ensure the component is in DISABLED state
+            compMgr->Disable(nullptr); // ensure the component is in DISABLED state
             compMgr->ResetCounter();
 
             // test concurrent calls to "enable" from multiple threads
-            std::function<std::shared_future<void>()> func = [compMgr]() { return compMgr->Enable(); };
+            std::function<std::shared_future<void>()> func = [compMgr]() { return compMgr->Enable(nullptr); };
             std::vector<std::shared_future<void>> results = ConcurrentInvoke(func);
 
             // verify component manager is disabled and the manager has performed two atomic state change operations for
@@ -316,11 +316,11 @@ namespace cppmicroservices
                                                                       notifier);
 
             compMgr->Initialize();
-            compMgr->Enable(); // ensure the component is in ENABLED state
+            compMgr->Enable(nullptr); // ensure the component is in ENABLED state
             compMgr->ResetCounter();
 
             // test concurrent calls to "disable" from multiple threads
-            std::function<std::shared_future<void>()> func = [compMgr]() { return compMgr->Disable(); };
+            std::function<std::shared_future<void>()> func = [compMgr]() { return compMgr->Disable(nullptr); };
             std::vector<std::shared_future<void>> results = ConcurrentInvoke(func);
 
             // verify component manager is disabled and the manager has performed two atomic state change operations for
@@ -358,7 +358,7 @@ namespace cppmicroservices
                 int randVal = dis(gen); // random number in range [20, 50)
                 for (int i = 0; i < randVal; ++i)
                 {
-                    futVec.push_back(((i & 0x1) ? compMgr->Disable() : compMgr->Enable()));
+                    futVec.push_back(((i & 0x1) ? compMgr->Disable(nullptr) : compMgr->Enable(nullptr)));
                 }
                 return futVec.back();
             };

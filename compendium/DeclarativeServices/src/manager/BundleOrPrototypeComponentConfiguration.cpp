@@ -33,7 +33,7 @@ namespace cppmicroservices
     {
 
         BundleOrPrototypeComponentConfigurationImpl::BundleOrPrototypeComponentConfigurationImpl(
-            std::shared_ptr<const metadata::ComponentMetadata> metadata,
+            std::shared_ptr<metadata::ComponentMetadata const> metadata,
             cppmicroservices::Bundle const& bundle,
             std::shared_ptr<ComponentRegistry> registry,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
@@ -176,7 +176,9 @@ namespace cppmicroservices
                               {
                                   try
                                   {
-                                      compMgr->Disable().get();
+                                      std::atomic<bool>* nonce = new std::atomic<bool>(false);
+                                      auto f = compMgr->Disable(nonce);
+                                      f.get();
                                   }
                                   catch (...)
                                   {
@@ -237,7 +239,8 @@ namespace cppmicroservices
                 {
                     GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                                      "Exception received from user code while binding "
-                                     "service reference" + refName + ".",
+                                     "service reference"
+                                         + refName + ".",
                                      std::current_exception());
                 }
             }
@@ -260,7 +263,8 @@ namespace cppmicroservices
                 {
                     GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                                      "Exception received from user code while unbinding "
-                                     "service reference" + refName + ".",
+                                     "service reference"
+                                         + refName + ".",
                                      std::current_exception());
                 }
 

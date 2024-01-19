@@ -70,14 +70,14 @@ namespace cppmicroservices
              * immediately after changing the state. Any configurations created as a result of the
              * state change will happen asynchronously on a separate thread.
              */
-            virtual std::shared_future<void> Enable() = 0;
+            virtual std::shared_future<void> Enable(std::atomic<bool>* nonce) = 0;
 
             /**
              * This method changes the state of the ComponentManager to DISABLED. The method returns
              * immediately after changing the state. Any configurations deleted as a result of the
              * state change will happen asynchronously on a separate thread.
              */
-            virtual std::shared_future<void> Disable() = 0;
+            virtual std::shared_future<void> Disable(std::atomic<bool>* nonce) = 0;
 
             /**
              * Returns a vector of ComponentConfiguration objects representing each of the configurations
@@ -89,7 +89,7 @@ namespace cppmicroservices
              * Returns the metadata object representing the component description for the
              * component managed by this object.
              */
-            virtual std::shared_ptr<const metadata::ComponentMetadata> GetMetadata() const = 0;
+            virtual std::shared_ptr<metadata::ComponentMetadata const> GetMetadata() const = 0;
         };
     } // namespace scrimpl
 } // namespace cppmicroservices

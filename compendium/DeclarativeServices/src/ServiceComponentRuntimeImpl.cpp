@@ -192,7 +192,7 @@ namespace cppmicroservices
         {
             std::shared_ptr<ComponentManager> holder
                 = registry->GetComponentManager(description.bundle.id, description.name);
-            return holder->Enable();
+            return holder->Enable(nullptr);
         }
 
         std::shared_future<void>
@@ -200,7 +200,7 @@ namespace cppmicroservices
         {
             std::shared_ptr<ComponentManager> holder
                 = registry->GetComponentManager(description.bundle.id, description.name);
-            return holder->Disable();
+            return holder->Disable(nullptr);
         }
 
         ComponentDescriptionDTO

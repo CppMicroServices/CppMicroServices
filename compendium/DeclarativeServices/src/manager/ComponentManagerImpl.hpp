@@ -30,6 +30,8 @@
 #endif
 #include "ComponentManager.hpp"
 #include "ConfigurationNotifier.hpp"
+#include "states/CMEnabledState.hpp"
+
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
@@ -38,7 +40,7 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
-
+        using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
         class ComponentRegistry;
         class ComponentManagerState;
 
@@ -75,12 +77,12 @@ namespace cppmicroservices
             /** @copydoc ComponentManager::Enable()
              * Delegates the call to the current state object
              */
-            std::shared_future<void> Enable() override;
+            std::shared_future<void> Enable(std::atomic<bool>* nonce) override;
 
             /** @copydoc ComponentManager::Disable()
              * Delegates the call to the current state object
              */
-            std::shared_future<void> Disable() override;
+            std::shared_future<void> Disable(std::atomic<bool>* nonce) override;
 
             /** @copydoc ComponentManager::GetComponentConfigurations()
              * Delegates the call to the current state object
@@ -191,7 +193,8 @@ namespace cppmicroservices
              * \return a shared_future<void> on which to wait for the asynchronous work to complete.
              */
             std::shared_future<void> PostAsyncDisabledToEnabled(
-                std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState);
+                std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
+                std::atomic<bool>* nonce);
 
             /**
              * Attempts to change the state from enabled to disabled and posts asynchronous work
@@ -201,11 +204,12 @@ namespace cppmicroservices
              * \return a shared_future<void> on which to wait for the asynchronous work to complete.
              */
             std::shared_future<void> PostAsyncEnabledToDisabled(
-                std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState);
+                std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
+                std::atomic<bool>* nonce);
 
           private:
             FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
-
+            std::unordered_map<std::atomic<bool>*, std::shared_ptr<ActualTask>> taskMap;
             std::shared_ptr<ComponentRegistry> const
                 registry; ///< component registry associated with the current runtime
             std::shared_ptr<metadata::ComponentMetadata const> const compDesc; ///< the component description

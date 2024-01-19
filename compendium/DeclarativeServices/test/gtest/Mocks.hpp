@@ -185,8 +185,8 @@ namespace cppmicroservices
             MOCK_CONST_METHOD0(GetBundleId, unsigned long(void));
             MOCK_METHOD0(Initialize, void(void));
             MOCK_CONST_METHOD0(IsEnabled, bool(void));
-            MOCK_METHOD0(Enable, std::shared_future<void>(void));
-            MOCK_METHOD0(Disable, std::shared_future<void>(void));
+            MOCK_METHOD1(Enable, std::shared_future<void>(std::atomic<bool>*));
+            MOCK_METHOD1(Disable, std::shared_future<void>(std::atomic<bool>*));
             MOCK_CONST_METHOD0(GetComponentConfigurations, std::vector<std::shared_ptr<ComponentConfiguration>>());
             MOCK_CONST_METHOD0(GetMetadata, std::shared_ptr<const metadata::ComponentMetadata>());
         };
@@ -205,8 +205,8 @@ namespace cppmicroservices
         class MockComponentManagerState : public ComponentManagerState
         {
           public:
-            MOCK_METHOD1(Enable, std::shared_future<void>(ComponentManagerImpl&));
-            MOCK_METHOD1(Disable, std::shared_future<void>(ComponentManagerImpl&));
+            MOCK_METHOD2(Enable, std::shared_future<void>(ComponentManagerImpl&, std::atomic<bool>*));
+            MOCK_METHOD2(Disable, std::shared_future<void>(ComponentManagerImpl&, std::atomic<bool>*));
             MOCK_CONST_METHOD1(IsEnabled, bool(ComponentManagerImpl const&));
             MOCK_CONST_METHOD1(GetConfigurations,
                                std::vector<std::shared_ptr<ComponentConfiguration>>(ComponentManagerImpl const&));

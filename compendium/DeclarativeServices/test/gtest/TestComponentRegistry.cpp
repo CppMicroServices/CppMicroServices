@@ -49,7 +49,7 @@ namespace cppmicroservices
         std::string
         GenRandomString()
         {
-            static const std::string name("com::servicecomponentimpl.testcompname");
+            static std::string const name("com::servicecomponentimpl.testcompname");
             std::string tempName = name;
             std::random_device rd;
             std::mt19937 g(rd());
@@ -74,6 +74,7 @@ namespace cppmicroservices
             }
             MOCK_CONST_METHOD0(GetBundle, Bundle(void));
             MOCK_METHOD0(Initialize, void(void));
+            MOCK_METHOD2(WaitForFuture, void(std::shared_future<void>&, std::atomic<bool>*));
             MOCK_CONST_METHOD0(IsEnabled, bool(void));
             MOCK_METHOD1(Enable, std::shared_future<void>(std::atomic<bool>*));
             MOCK_METHOD1(Disable, std::shared_future<void>(std::atomic<bool>*));

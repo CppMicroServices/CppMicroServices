@@ -77,29 +77,49 @@ namespace cppmicroservices
         }
 
         void
+        ComponentManagerImpl::WaitForFuture(std::shared_future<void>& fut, std::atomic<bool>* nonce)
+        {
+            // if we hit the timeout
+            if (fut.wait_for(std::chrono::milliseconds(50)) == std::future_status::timeout)
+            {
+                // we expect that the nonce is not updated -- i.e. stalled
+                auto expected = false;
+                auto desired = true;
+                std::cout << "WFF" << std::endl;
+                // if it is stalled
+                if (std::atomic_compare_exchange_strong(nonce, &expected, desired))
+                {
+                    // we execute the task
+                    std::cout << "WFF: stalled" << std::endl;
+                    auto task = taskMap[nonce];
+                    auto enabledState = enStateMap[nonce];
+                    (*task)(enabledState);
+                }
+                else
+                {
+                    // it is 50 ms later, but the nonce is true -- it is executing currently
+                    delete nonce;
+                    return;
+                }
+            }
+            else
+            {
+                // it has executed
+                delete nonce;
+                return;
+            }
+        }
+
+        void
         ComponentManagerImpl::Initialize()
         {
             if (compDesc->enabled)
             {
-                std::atomic<bool>* nonce = new std::atomic<bool>(false);
+                auto nonce = new std::atomic<bool>(false);
                 auto fut = Enable(nonce);
                 try
                 {
-                    auto f = fut.wait_for(std::chrono::milliseconds(50)) == std::future_status::timeout;
-                    US_UNUSED(f);
-                    while (fut.wait_for(std::chrono::milliseconds(50)) == std::future_status::timeout)
-                    {
-                        auto expected = false;
-                        auto desired = true;
-                        if (std::atomic_compare_exchange_strong(nonce, &expected, desired))
-                        {
-                            auto task = taskMap[nonce];
-                            std::shared_ptr<CMEnabledState> enabledState
-                                = std::make_shared<CMEnabledState>((*task).get_future().share());
-                            (*task)(enabledState);
-                        }
-                    }
-                    delete nonce;
+                    WaitForFuture(fut, nonce);
                 }
                 catch (cppmicroservices::SharedLibraryException const&)
                 {
@@ -192,10 +212,15 @@ namespace cppmicroservices
                     bool desired = true;
                     // if nonce is non null this is a blocking call
                     // and the value is true, this task has already executed
+                    std::cout << "D->E" << std::endl;
+
                     if (nonce && !std::atomic_compare_exchange_strong(nonce, &expected, desired))
                     {
+                        std::cout << "D->E: Stalled and exit" << std::endl;
+                        delete nonce;
                         return;
                     }
+                    std::cout << "D->E: not stalled" << std::endl;
                     eState->CreateConfigurations(metadata, bundle, reg, logger, configNotifier);
                 });
 
@@ -203,6 +228,7 @@ namespace cppmicroservices
 
             auto taskPtr_ = std::make_shared<ActualTask>(std::move(task));
             taskMap[nonce] = taskPtr_;
+            enStateMap[nonce] = enabledState;
 
             PostTask post_task([enabledState, taskPtr = taskPtr_]() mutable { (*taskPtr)(enabledState); });
 
@@ -237,12 +263,18 @@ namespace cppmicroservices
                 {
                     bool expected = false;
                     bool desired = true;
+                    std::cout << "E->D" << std::endl;
+
                     // if nonce is non null this is a blocking call
                     // and the value is true, this task has already executed
                     if (nonce && !std::atomic_compare_exchange_strong(nonce, &expected, desired))
                     {
+                        std::cout << "E->D: stalled and exit" << std::endl;
+                        delete nonce;
                         return;
                     }
+                    std::cout << "E->D: not stalled" << std::endl;
+
                     enabledState->DeleteConfigurations();
                 });
 
@@ -263,6 +295,7 @@ namespace cppmicroservices
 
                 auto taskPtr_ = std::make_shared<ActualTask>(std::move(task));
                 taskMap[nonce] = taskPtr_;
+                enStateMap[nonce] = currEnabledState;
 
                 PostTask post_task([currEnabledState, taskPtr = taskPtr_]() mutable { (*taskPtr)(currEnabledState); });
 

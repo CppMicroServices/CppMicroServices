@@ -40,6 +40,14 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
+        // RAII wrapper for nonce passed to async service
+        // needs to be raw atomic for std::atomic_compare_exchange_strong
+        struct NonceWrapper
+        {
+            NonceWrapper() : nonce(new std::atomic<bool>(false)) {}
+            ~NonceWrapper() { delete nonce; }
+            std::atomic<bool>* nonce;
+        };
         using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
         class ComponentRegistry;
         class ComponentManagerState;
@@ -64,6 +72,7 @@ namespace cppmicroservices
             ComponentManagerImpl& operator=(ComponentManagerImpl&&) = delete;
             ~ComponentManagerImpl() override;
 
+            void WaitForFuture(std::shared_future<void>& fut, std::atomic<bool>* nonce = nullptr) override;
             /**
              * Initialization method used to kick start the state machine implemented by this class.
              */
@@ -210,6 +219,7 @@ namespace cppmicroservices
           private:
             FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
             std::unordered_map<std::atomic<bool>*, std::shared_ptr<ActualTask>> taskMap;
+            std::unordered_map<std::atomic<bool>*, std::shared_ptr<CMEnabledState>> enStateMap;
             std::shared_ptr<ComponentRegistry> const
                 registry; ///< component registry associated with the current runtime
             std::shared_ptr<metadata::ComponentMetadata const> const compDesc; ///< the component description

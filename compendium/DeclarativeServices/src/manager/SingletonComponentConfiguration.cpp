@@ -182,7 +182,7 @@ namespace cppmicroservices
                                   {
                                       std::atomic<bool>* nonce = new std::atomic<bool>(false);
                                       auto f = compMgr->Disable(nonce);
-                                      f.get();
+                                      compMgr->WaitForFuture(f, nonce);
                                   }
                                   catch (...)
                                   {

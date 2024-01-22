@@ -49,6 +49,8 @@ namespace cppmicroservices
             ComponentManager& operator=(ComponentManager&&) = delete;
             virtual ~ComponentManager() = default;
 
+            virtual void WaitForFuture(std::shared_future<void>& fut, std::atomic<bool>* nonce) = 0;
+
             /**
              * Returns the name of the component managed by this object. The name is the same
              * as specified in the component description.

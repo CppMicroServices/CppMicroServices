@@ -34,13 +34,13 @@ namespace cppmicroservices
 
         // if already in enabled state, simply return the existing future object. Equivalent to a no-op.
         std::shared_future<void>
-        CMEnabledState::Enable(ComponentManagerImpl&, std::atomic<bool>* /*nonce*/)
+        CMEnabledState::Enable(ComponentManagerImpl&, std::shared_ptr<AsyncExecWrapper> /*nonce*/)
         {
             return GetFuture();
         }
 
         std::shared_future<void>
-        CMEnabledState::Disable(ComponentManagerImpl& cm, std::atomic<bool>* nonce)
+        CMEnabledState::Disable(ComponentManagerImpl& cm, std::shared_ptr<AsyncExecWrapper> nonce)
         {
             auto currentState = shared_from_this(); // assume this object is the current state object
             return cm.PostAsyncEnabledToDisabled(currentState, nonce);

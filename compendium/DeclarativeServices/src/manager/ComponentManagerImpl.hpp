@@ -40,14 +40,6 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
-        // RAII wrapper for nonce passed to async service
-        // needs to be raw atomic for std::atomic_compare_exchange_strong
-        struct NonceWrapper
-        {
-            NonceWrapper() : nonce(new std::atomic<bool>(false)) {}
-            ~NonceWrapper() { delete nonce; }
-            std::atomic<bool>* nonce;
-        };
         using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
         class ComponentRegistry;
         class ComponentManagerState;
@@ -72,7 +64,8 @@ namespace cppmicroservices
             ComponentManagerImpl& operator=(ComponentManagerImpl&&) = delete;
             ~ComponentManagerImpl() override;
 
-            void WaitForFuture(std::shared_future<void>& fut, std::atomic<bool>* nonce = nullptr) override;
+            void WaitForFuture(std::shared_future<void>& fut,
+                               std::shared_ptr<AsyncExecWrapper> nonce = nullptr) override;
             /**
              * Initialization method used to kick start the state machine implemented by this class.
              */
@@ -86,12 +79,12 @@ namespace cppmicroservices
             /** @copydoc ComponentManager::Enable()
              * Delegates the call to the current state object
              */
-            std::shared_future<void> Enable(std::atomic<bool>* nonce) override;
+            std::shared_future<void> Enable(std::shared_ptr<AsyncExecWrapper> nonce) override;
 
             /** @copydoc ComponentManager::Disable()
              * Delegates the call to the current state object
              */
-            std::shared_future<void> Disable(std::atomic<bool>* nonce) override;
+            std::shared_future<void> Disable(std::shared_ptr<AsyncExecWrapper> nonce) override;
 
             /** @copydoc ComponentManager::GetComponentConfigurations()
              * Delegates the call to the current state object
@@ -203,7 +196,7 @@ namespace cppmicroservices
              */
             std::shared_future<void> PostAsyncDisabledToEnabled(
                 std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
-                std::atomic<bool>* nonce);
+                std::shared_ptr<AsyncExecWrapper> nonce);
 
             /**
              * Attempts to change the state from enabled to disabled and posts asynchronous work
@@ -214,7 +207,7 @@ namespace cppmicroservices
              */
             std::shared_future<void> PostAsyncEnabledToDisabled(
                 std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
-                std::atomic<bool>* nonce);
+                std::shared_ptr<AsyncExecWrapper> nonce);
 
           private:
             FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);

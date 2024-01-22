@@ -180,7 +180,7 @@ namespace cppmicroservices
                               {
                                   try
                                   {
-                                      std::atomic<bool>* nonce = new std::atomic<bool>(false);
+                                      std::shared_ptr<AsyncExecWrapper> nonce = std::make_shared<AsyncExecWrapper>();
                                       auto f = compMgr->Disable(nonce);
                                       compMgr->WaitForFuture(f, nonce);
                                   }

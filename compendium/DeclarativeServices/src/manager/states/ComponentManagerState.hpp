@@ -23,6 +23,7 @@
 #ifndef ComponentManagerState_hpp
 #define ComponentManagerState_hpp
 
+#include "../ComponentConfigurationImpl.hpp"
 #include <future>
 #include <memory>
 #include <string>
@@ -52,12 +53,14 @@ namespace cppmicroservices
             /**
              * Implementation of this method must handle the Enable state transition for current state
              */
-            virtual std::shared_future<void> Enable(ComponentManagerImpl& cm, std::atomic<bool>* nonce) = 0;
+            virtual std::shared_future<void> Enable(ComponentManagerImpl& cm, std::shared_ptr<AsyncExecWrapper> nonce)
+                = 0;
 
             /**
              * Implementation of this method must handle the Disable state transition for current state
              */
-            virtual std::shared_future<void> Disable(ComponentManagerImpl& cm, std::atomic<bool>* nonce) = 0;
+            virtual std::shared_future<void> Disable(ComponentManagerImpl& cm, std::shared_ptr<AsyncExecWrapper> nonce)
+                = 0;
 
             /**
              * Implementation returns true if the current state is enabled state, false otherwise

@@ -133,7 +133,7 @@ namespace cppmicroservices
                         "Deleting instance of SCRBundleExtension for " + bundle_.GetSymbolicName());
             for (auto& compManager : *managers)
             {
-                std::atomic<bool>* nonce = new std::atomic<bool>(false);
+                std::shared_ptr<AsyncExecWrapper> nonce = std::make_shared<AsyncExecWrapper>();
                 auto fut = compManager->Disable(nonce);
                 registry->RemoveComponentManager(compManager);
                 try

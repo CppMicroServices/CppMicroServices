@@ -77,7 +77,7 @@ namespace cppmicroservices
         }
 
         void
-        ComponentManagerImpl::WaitForFuture(std::shared_future<void>& fut, std::atomic<bool>* nonce)
+        ComponentManagerImpl::WaitForFuture(std::shared_future<void>& fut, std::shared_ptr<AsyncExecWrapper> nonce)
         {
 
             // if we hit the timeout
@@ -88,12 +88,12 @@ namespace cppmicroservices
                 auto desired = true;
                 std::cout << "WFF" << std::endl;
                 // if it is stalled
-                if (std::atomic_compare_exchange_strong(nonce, &expected, desired))
+                if (std::atomic_compare_exchange_strong(nonce->nonce, &expected, desired))
                 {
                     // we execute the task
                     std::cout << "WFF: stalled" << std::endl;
-                    auto task = taskMap[nonce];
-                    auto enabledState = enStateMap[nonce];
+                    auto task = taskMap[nonce->nonce];
+                    auto enabledState = enStateMap[nonce->nonce];
                     (*task)(enabledState);
                 }
                 else
@@ -101,7 +101,6 @@ namespace cppmicroservices
                     std::cout << "WFF: not stalled" << std::endl;
                     // it is 50 ms later, but the nonce is true -- it is executing currently
                     fut.get();
-                    delete nonce;
                     return;
                 }
             }
@@ -110,7 +109,6 @@ namespace cppmicroservices
                 std::cout << "WFF: future is done" << std::endl;
                 // it has executed
                 fut.get();
-                delete nonce;
                 return;
             }
         }
@@ -120,7 +118,7 @@ namespace cppmicroservices
         {
             if (compDesc->enabled)
             {
-                auto nonce = new std::atomic<bool>(false);
+                auto nonce = std::make_shared<AsyncExecWrapper>();
                 auto fut = Enable(nonce);
                 try
                 {
@@ -128,17 +126,14 @@ namespace cppmicroservices
                 }
                 catch (cppmicroservices::SharedLibraryException const&)
                 {
-                    delete nonce;
                     throw;
                 }
                 catch (cppmicroservices::SecurityException const&)
                 {
-                    delete nonce;
                     throw;
                 }
                 catch (...)
                 {
-                    delete nonce;
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                                 "Failed to enable component with name" + GetName(),
                                 std::current_exception());
@@ -153,13 +148,13 @@ namespace cppmicroservices
         }
 
         std::shared_future<void>
-        ComponentManagerImpl::Enable(std::atomic<bool>* nonce)
+        ComponentManagerImpl::Enable(std::shared_ptr<AsyncExecWrapper> nonce)
         {
             return GetState()->Enable(*this, nonce);
         }
 
         std::shared_future<void>
-        ComponentManagerImpl::Disable(std::atomic<bool>* nonce)
+        ComponentManagerImpl::Disable(std::shared_ptr<AsyncExecWrapper> nonce)
         {
             return GetState()->Disable(*this, nonce);
         }
@@ -202,7 +197,7 @@ namespace cppmicroservices
         std::shared_future<void>
         ComponentManagerImpl::PostAsyncDisabledToEnabled(
             std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
-            std::atomic<bool>* nonce)
+            std::shared_ptr<AsyncExecWrapper> nonce)
         {
             auto metadata = GetMetadata();
             auto bundle = GetBundle();
@@ -222,10 +217,9 @@ namespace cppmicroservices
                     // and the value is true, this task has already executed
                     std::cout << "D->E" << std::endl;
 
-                    if (nonce && !std::atomic_compare_exchange_strong(nonce, &expected, desired))
+                    if (nonce && !std::atomic_compare_exchange_strong(nonce->nonce, &expected, desired))
                     {
                         std::cout << "D->E: Stalled and exit" << std::endl;
-                        delete nonce;
                         return;
                     }
                     std::cout << "D->E: not stalled" << std::endl;
@@ -239,8 +233,8 @@ namespace cppmicroservices
             // if blocking, cache task and enabledState
             if (nonce)
             {
-                taskMap[nonce] = taskPtr_;
-                enStateMap[nonce] = enabledState;
+                taskMap[nonce->nonce] = taskPtr_;
+                enStateMap[nonce->nonce] = enabledState;
             }
             PostTask post_task([enabledState, taskPtr = taskPtr_]() mutable { (*taskPtr)(enabledState); });
 
@@ -265,7 +259,7 @@ namespace cppmicroservices
         std::shared_future<void>
         ComponentManagerImpl::PostAsyncEnabledToDisabled(
             std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
-            std::atomic<bool>* nonce)
+            std::shared_ptr<AsyncExecWrapper> nonce)
         {
             using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
             using PostTask = std::packaged_task<void()>;
@@ -279,10 +273,9 @@ namespace cppmicroservices
 
                     // if nonce is non null this is a blocking call
                     // and the value is true, this task has already executed
-                    if (nonce && !std::atomic_compare_exchange_strong(nonce, &expected, desired))
+                    if (nonce && !std::atomic_compare_exchange_strong(nonce->nonce, &expected, desired))
                     {
                         std::cout << "E->D: stalled and exit" << std::endl;
-                        delete nonce;
                         return;
                     }
                     std::cout << "E->D: not stalled" << std::endl;
@@ -309,8 +302,8 @@ namespace cppmicroservices
                 // if blocking, cache task and enabledState
                 if (nonce)
                 {
-                    taskMap[nonce] = taskPtr_;
-                    enStateMap[nonce] = currEnabledState;
+                    taskMap[nonce->nonce] = taskPtr_;
+                    enStateMap[nonce->nonce] = currEnabledState;
                 }
                 PostTask post_task([currEnabledState, taskPtr = taskPtr_]() mutable { (*taskPtr)(currEnabledState); });
 

@@ -79,6 +79,7 @@ namespace cppmicroservices
         void
         ComponentManagerImpl::WaitForFuture(std::shared_future<void>& fut, std::atomic<bool>* nonce)
         {
+
             // if we hit the timeout
             if (fut.wait_for(std::chrono::milliseconds(50)) == std::future_status::timeout)
             {
@@ -97,14 +98,18 @@ namespace cppmicroservices
                 }
                 else
                 {
+                    std::cout << "WFF: not stalled" << std::endl;
                     // it is 50 ms later, but the nonce is true -- it is executing currently
+                    fut.get();
                     delete nonce;
                     return;
                 }
             }
             else
             {
+                std::cout << "WFF: future is done" << std::endl;
                 // it has executed
+                fut.get();
                 delete nonce;
                 return;
             }
@@ -123,14 +128,17 @@ namespace cppmicroservices
                 }
                 catch (cppmicroservices::SharedLibraryException const&)
                 {
+                    delete nonce;
                     throw;
                 }
                 catch (cppmicroservices::SecurityException const&)
                 {
+                    delete nonce;
                     throw;
                 }
                 catch (...)
                 {
+                    delete nonce;
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
                                 "Failed to enable component with name" + GetName(),
                                 std::current_exception());
@@ -227,9 +235,13 @@ namespace cppmicroservices
             std::shared_ptr<CMEnabledState> enabledState = std::make_shared<CMEnabledState>(task.get_future().share());
 
             auto taskPtr_ = std::make_shared<ActualTask>(std::move(task));
-            taskMap[nonce] = taskPtr_;
-            enStateMap[nonce] = enabledState;
 
+            // if blocking, cache task and enabledState
+            if (nonce)
+            {
+                taskMap[nonce] = taskPtr_;
+                enStateMap[nonce] = enabledState;
+            }
             PostTask post_task([enabledState, taskPtr = taskPtr_]() mutable { (*taskPtr)(enabledState); });
 
             // if this object failed to change state and the current state is DISABLED, try again
@@ -294,9 +306,12 @@ namespace cppmicroservices
                     = std::dynamic_pointer_cast<CMEnabledState>(currentState);
 
                 auto taskPtr_ = std::make_shared<ActualTask>(std::move(task));
-                taskMap[nonce] = taskPtr_;
-                enStateMap[nonce] = currEnabledState;
-
+                // if blocking, cache task and enabledState
+                if (nonce)
+                {
+                    taskMap[nonce] = taskPtr_;
+                    enStateMap[nonce] = currEnabledState;
+                }
                 PostTask post_task([currEnabledState, taskPtr = taskPtr_]() mutable { (*taskPtr)(currEnabledState); });
 
                 asyncWorkService->post(std::move(post_task));

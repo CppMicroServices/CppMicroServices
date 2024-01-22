@@ -34,6 +34,13 @@ namespace cppmicroservices
     namespace scrimpl
     {
 
+        struct nonceWrapper
+        {
+            nonceWrapper() : nonce(new std::atomic<bool>(false)) {}
+            ~nonceWrapper() { delete nonce; }
+            std::atomic<bool>* nonce;
+        };
+
         class ComponentConfiguration;
         /**
          * This interface provides the information about the current state of a component.

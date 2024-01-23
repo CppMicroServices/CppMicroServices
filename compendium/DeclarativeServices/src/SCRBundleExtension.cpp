@@ -133,14 +133,14 @@ namespace cppmicroservices
                         "Deleting instance of SCRBundleExtension for " + bundle_.GetSymbolicName());
             for (auto& compManager : *managers)
             {
-                std::shared_ptr<AsyncExecWrapper> nonce = std::make_shared<AsyncExecWrapper>();
-                auto fut = compManager->Disable(nonce);
+                std::shared_ptr<std::atomic<bool>> asyncStarted = std::make_shared<std::atomic<bool>>(false);
+                auto fut = compManager->Disable(asyncStarted);
                 registry->RemoveComponentManager(compManager);
                 try
                 {
                     // since this happens when the bundle is stopped,
                     // wait until the disable is finished on the other thread.
-                    compManager->WaitForFuture(fut, nonce);
+                    compManager->WaitForFuture(fut, asyncStarted);
                 }
                 catch (...)
                 {

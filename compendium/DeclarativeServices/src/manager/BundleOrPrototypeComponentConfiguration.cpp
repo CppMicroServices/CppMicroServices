@@ -176,9 +176,9 @@ namespace cppmicroservices
                               {
                                   try
                                   {
-                                      std::shared_ptr<AsyncExecWrapper> nonce = std::make_shared<AsyncExecWrapper>();
-                                      auto f = compMgr->Disable(nonce);
-                                      compMgr->WaitForFuture(f, nonce);
+                                      std::shared_ptr<std::atomic<bool>> asyncStarted = std::make_shared<std::atomic<bool>>(false);
+                                      auto f = compMgr->Disable(asyncStarted);
+                                      compMgr->WaitForFuture(f, asyncStarted);
                                   }
                                   catch (...)
                                   {

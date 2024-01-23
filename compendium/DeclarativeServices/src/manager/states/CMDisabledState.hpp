@@ -74,7 +74,7 @@ namespace cppmicroservices
              * state change
              */
             std::shared_future<void> Enable(ComponentManagerImpl& cm,
-                                            std::shared_ptr<AsyncExecWrapper> nonce) override;
+                                            std::shared_ptr<std::atomic<bool>> asyncStarted) override;
 
             /**
              * This method returns the stored future object. Since this object
@@ -88,7 +88,7 @@ namespace cppmicroservices
              * receives the same future that was created by the first thread.
              */
             std::shared_future<void> Disable(ComponentManagerImpl& cm,
-                                             std::shared_ptr<AsyncExecWrapper> nonce) override;
+                                             std::shared_ptr<std::atomic<bool>> asyncStarted) override;
 
             /**
              * Returns an empty vector because there are no configurations associated

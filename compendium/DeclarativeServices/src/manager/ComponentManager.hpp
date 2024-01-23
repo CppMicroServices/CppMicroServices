@@ -34,13 +34,6 @@ namespace cppmicroservices
     namespace scrimpl
     {
 
-        struct AsyncExecWrapper
-        {
-            AsyncExecWrapper() : nonce(new std::atomic<bool>(false)) {}
-            ~AsyncExecWrapper() { delete nonce; }
-            std::atomic<bool>* nonce;
-        };
-
         class ComponentConfiguration;
         /**
          * This interface provides the information about the current state of a component.
@@ -56,7 +49,7 @@ namespace cppmicroservices
             ComponentManager& operator=(ComponentManager&&) = delete;
             virtual ~ComponentManager() = default;
 
-            virtual void WaitForFuture(std::shared_future<void>& fut, std::shared_ptr<AsyncExecWrapper> nonce) = 0;
+            virtual void WaitForFuture(std::shared_future<void>& fut, std::shared_ptr<std::atomic<bool>> asyncStarted) = 0;
 
             /**
              * Returns the name of the component managed by this object. The name is the same
@@ -79,14 +72,14 @@ namespace cppmicroservices
              * immediately after changing the state. Any configurations created as a result of the
              * state change will happen asynchronously on a separate thread.
              */
-            virtual std::shared_future<void> Enable(std::shared_ptr<AsyncExecWrapper> nonce) = 0;
+            virtual std::shared_future<void> Enable(std::shared_ptr<std::atomic<bool>> asyncStarted) = 0;
 
             /**
              * This method changes the state of the ComponentManager to DISABLED. The method returns
              * immediately after changing the state. Any configurations deleted as a result of the
              * state change will happen asynchronously on a separate thread.
              */
-            virtual std::shared_future<void> Disable(std::shared_ptr<AsyncExecWrapper> nonce) = 0;
+            virtual std::shared_future<void> Disable(std::shared_ptr<std::atomic<bool>> asyncStarted) = 0;
 
             /**
              * Returns a vector of ComponentConfiguration objects representing each of the configurations

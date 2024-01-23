@@ -67,7 +67,7 @@ namespace cppmicroservices
              *         previous state change from \c DISABLED to \c ENABLED
              */
             std::shared_future<void> Enable(ComponentManagerImpl& cm,
-                                            std::shared_ptr<AsyncExecWrapper> /*nonce*/) override;
+                                            std::shared_ptr<std::atomic<bool>> /*asyncStarted*/) override;
 
             /**
              * This method changes the state of the {@link ComponentManagerImpl} object
@@ -76,7 +76,7 @@ namespace cppmicroservices
              * \return a future object representing the actions performed due to the state change
              */
             std::shared_future<void> Disable(ComponentManagerImpl& cm,
-                                             std::shared_ptr<AsyncExecWrapper> nonce) override;
+                                             std::shared_ptr<std::atomic<bool>> asyncStarted) override;
 
             /**
              * This method waits for the configurations to be created and then returns the

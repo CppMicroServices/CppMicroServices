@@ -65,7 +65,7 @@ namespace cppmicroservices
             ~ComponentManagerImpl() override;
 
             void WaitForFuture(std::shared_future<void>& fut,
-                               std::shared_ptr<AsyncExecWrapper> nonce = nullptr) override;
+                               std::shared_ptr<std::atomic<bool>> asyncStarted = nullptr) override;
             /**
              * Initialization method used to kick start the state machine implemented by this class.
              */
@@ -79,12 +79,12 @@ namespace cppmicroservices
             /** @copydoc ComponentManager::Enable()
              * Delegates the call to the current state object
              */
-            std::shared_future<void> Enable(std::shared_ptr<AsyncExecWrapper> nonce) override;
+            std::shared_future<void> Enable(std::shared_ptr<std::atomic<bool>> asyncStarted) override;
 
             /** @copydoc ComponentManager::Disable()
              * Delegates the call to the current state object
              */
-            std::shared_future<void> Disable(std::shared_ptr<AsyncExecWrapper> nonce) override;
+            std::shared_future<void> Disable(std::shared_ptr<std::atomic<bool>> asyncStarted) override;
 
             /** @copydoc ComponentManager::GetComponentConfigurations()
              * Delegates the call to the current state object
@@ -196,7 +196,7 @@ namespace cppmicroservices
              */
             std::shared_future<void> PostAsyncDisabledToEnabled(
                 std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
-                std::shared_ptr<AsyncExecWrapper> nonce);
+                std::shared_ptr<std::atomic<bool>> asyncStarted);
 
             /**
              * Attempts to change the state from enabled to disabled and posts asynchronous work
@@ -207,12 +207,12 @@ namespace cppmicroservices
              */
             std::shared_future<void> PostAsyncEnabledToDisabled(
                 std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
-                std::shared_ptr<AsyncExecWrapper> nonce);
+                std::shared_ptr<std::atomic<bool>> asyncStarted);
 
           private:
             FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
-            std::unordered_map<std::atomic<bool>*, std::shared_ptr<ActualTask>> taskMap;
-            std::unordered_map<std::atomic<bool>*, std::shared_ptr<CMEnabledState>> enStateMap;
+            std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<ActualTask>> taskMap;
+            std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<CMEnabledState>> enStateMap;
             std::shared_ptr<ComponentRegistry> const
                 registry; ///< component registry associated with the current runtime
             std::shared_ptr<metadata::ComponentMetadata const> const compDesc; ///< the component description

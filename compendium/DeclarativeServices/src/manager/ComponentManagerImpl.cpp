@@ -93,6 +93,7 @@ namespace cppmicroservices
                     // we execute the task
                     auto task = taskMap[asyncStarted];
                     auto enabledState = enStateMap[asyncStarted];
+
                     // we pass in false because we always want to execute the task here
                     (*task)(enabledState, false);
                 }
@@ -100,15 +101,17 @@ namespace cppmicroservices
                 {
                     // it is 50 ms later, but the asyncStarted is true -- it is executing currently
                     fut.get();
-                    return;
                 }
             }
             else
             {
                 // it has executed
                 fut.get();
-                return;
             }
+
+            // at this point execution is done on spawned thread or this one, map entry can be removed
+            taskMap.erase(asyncStarted);
+            enStateMap.erase(asyncStarted);
         }
 
         void

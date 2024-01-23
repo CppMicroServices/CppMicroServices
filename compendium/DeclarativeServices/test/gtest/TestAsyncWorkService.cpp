@@ -315,7 +315,8 @@ namespace test
                              testing::Values(std::make_shared<AsyncWorkServiceInline>(),
                                              std::make_shared<AsyncWorkServiceStdAsync>(),
                                              std::make_shared<AsyncWorkServiceThreadPool>(1),
-                                             std::make_shared<AsyncWorkServiceThreadPool>(2)));
+                                             std::make_shared<AsyncWorkServiceThreadPool>(8),
+                                             std::make_shared<AsyncWorkServiceThreadPool>(20)));
 
     TEST_P(TestAsyncWorkServiceEndToEnd, TestEndToEndBehaviorWithAsyncWorkService)
     {
@@ -360,18 +361,18 @@ namespace test
         std::string lookingFor;
     };
 
-    TEST_F(TestAsyncWorkServiceEndToEnd, TestOverwhelmThreadpool)
+    TEST_P(TestAsyncWorkServiceEndToEnd, TestOverwhelmThreadpool)
     {
-        std::vector<std::string> bundlesToInstall = { "DSGraph01" };
-        /*, "DSGraph02", "DSGraph03", "DSGraph04", "DSGraph05", "DSGraph06", "DSGraph07" */
-        //,        "TestBundleDSCA01",  "TestBundleDSCA02", "TestBundleDSCA03",
-        //     "TestBundleDSCA04", "TestBundleDSCA05", "TestBundleDSCA05a", "TestBundleDSCA07", "TestBundleDSCA08",
-        //     "TestBundleDSCA09", "TestBundleDSCA12", "TestBundleDSCA16",  "TestBundleDSCA20", "TestBundleDSCA21",
-        //     "TestBundleDSCA24", "TestBundleDSCA26", "TestBundleDSCA27" };
+        std::vector<std::string> bundlesToInstall
+            = { "DSGraph01",        "DSGraph02",        "DSGraph03",         "DSGraph04",        "DSGraph05",
+                "DSGraph06",        "DSGraph07",        "TestBundleDSCA01",  "TestBundleDSCA02", "TestBundleDSCA03",
+                "TestBundleDSCA04", "TestBundleDSCA05", "TestBundleDSCA05a", "TestBundleDSCA07", "TestBundleDSCA08",
+                "TestBundleDSCA09", "TestBundleDSCA12", "TestBundleDSCA16",  "TestBundleDSCA20", "TestBundleDSCA21",
+                "TestBundleDSCA24", "TestBundleDSCA26", "TestBundleDSCA27" };
         std::vector<cppmicroservices::Bundle> installedBundles;
         std::mutex installedBundlesMutex;
         EXPECT_NO_THROW({
-            auto const& param = std::make_shared<AsyncWorkServiceThreadPool>(1);
+            auto const& param = GetParam();
 
             auto ctx = framework.GetBundleContext();
             std::shared_ptr<cppmicroservices::scrimpl::SCRLogger> logger
@@ -380,34 +381,35 @@ namespace test
             auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
             cppmicroservices::scrimpl::SCRAsyncWorkService scrAsyncWorkService(ctx, logger);
 
-            // std::vector<std::thread> threads;
+            std::vector<std::thread> threads;
 
             for (auto const& b : bundlesToInstall)
             {
-                // threads.emplace_back(std::thread(
-                //     [&ctx, &b, &installedBundles, &installedBundlesMutex, &scrAsyncWorkService]()
-                //     {
-                std::packaged_task<void()> myTask(
+                threads.emplace_back(std::thread(
                     [&ctx, &b, &installedBundles, &installedBundlesMutex, &scrAsyncWorkService]()
                     {
-                        auto bundle = ::test::InstallAndStartBundle(ctx, b);
-                        std::lock_guard<std::mutex> gd(installedBundlesMutex);
-                        installedBundles.emplace_back(bundle);
-                    });
-                std::future<void> f = myTask.get_future();
-                scrAsyncWorkService.post(std::move(myTask));
-                f.get();
-                // }));
+                        std::packaged_task<void()> myTask(
+                            [&ctx, &b, &installedBundles, &installedBundlesMutex, &scrAsyncWorkService]()
+                            {
+                                auto bundle = ::test::InstallAndStartBundle(ctx, b);
+                                std::lock_guard<std::mutex> gd(installedBundlesMutex);
+                                installedBundles.emplace_back(bundle);
+                            });
+                        std::future<void> f = myTask.get_future();
+                        scrAsyncWorkService.post(std::move(myTask));
+                        f.get();
+                    }));
             }
 
-            // for (auto& t : threads)
-            // {
-            //     t.join();
-            // }
+            for (auto& t : threads)
+            {
+                t.join();
+            }
             auto bundles = ctx.GetBundles();
 
             for (auto& bundle : installedBundles)
             {
+                ASSERT_TRUE(bundle);
                 auto b = std::find_if(std::begin(bundles), std::end(bundles), BundleName(bundle.GetSymbolicName()));
                 ASSERT_NE(b, bundles.end()) << bundle.GetSymbolicName() << " not found";
                 bundle.Stop();

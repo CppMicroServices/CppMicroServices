@@ -86,19 +86,16 @@ namespace cppmicroservices
                 // we expect that the asyncStarted is false -- i.e. stalled
                 auto expected = false;
                 auto desired = true;
-                // std::cout << "WFF" << std::endl;
                 // if it is stalled
                 if (std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
                 {
                     // we execute the task
-                    // std::cout << "WFF: stalled" << std::endl;
                     auto task = taskMap[asyncStarted];
                     auto enabledState = enStateMap[asyncStarted];
                     (*task)(enabledState);
                 }
                 else
                 {
-                    // std::cout << "WFF: not stalled" << std::endl;
                     // it is 50 ms later, but the asyncStarted is true -- it is executing currently
                     fut.get();
                     return;
@@ -106,7 +103,6 @@ namespace cppmicroservices
             }
             else
             {
-                // std::cout << "WFF: future is done" << std::endl;
                 // it has executed
                 fut.get();
                 return;
@@ -215,14 +211,10 @@ namespace cppmicroservices
                     bool desired = true;
                     // if asyncStarted is non null this is a blocking call
                     // and the value is true, this task has already executed
-                    // std::cout << "D->E" << std::endl;
-
                     if (asyncStarted && !std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
                     {
-                        // std::cout << "D->E: Stalled and exit" << std::endl;
                         return;
                     }
-                    // std::cout << "D->E: not stalled" << std::endl;
                     eState->CreateConfigurations(metadata, bundle, reg, logger, configNotifier);
                 });
 
@@ -269,16 +261,13 @@ namespace cppmicroservices
                 {
                     bool expected = false;
                     bool desired = true;
-                    // std::cout << "E->D" << std::endl;
 
                     // if asyncStarted is non null this is a blocking call
                     // and the value is true, this task has already executed
                     if (asyncStarted && !std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
                     {
-                        // std::cout << "E->D: stalled and exit" << std::endl;
                         return;
                     }
-                    // std::cout << "E->D: not stalled" << std::endl;
 
                     enabledState->DeleteConfigurations();
                 });

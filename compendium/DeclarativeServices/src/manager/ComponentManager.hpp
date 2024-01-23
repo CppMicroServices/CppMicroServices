@@ -49,7 +49,12 @@ namespace cppmicroservices
             ComponentManager& operator=(ComponentManager&&) = delete;
             virtual ~ComponentManager() = default;
 
-            virtual void WaitForFuture(std::shared_future<void>& fut, std::shared_ptr<std::atomic<bool>> asyncStarted) = 0;
+            /*
+             * Waits for the provided future from the asynchronous thread pool and executes
+             * the task if the thread pool has stalled
+             */
+            virtual void WaitForFuture(std::shared_future<void>& fut, std::shared_ptr<std::atomic<bool>> asyncStarted)
+                = 0;
 
             /**
              * Returns the name of the component managed by this object. The name is the same

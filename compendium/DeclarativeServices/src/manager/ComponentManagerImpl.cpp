@@ -77,7 +77,8 @@ namespace cppmicroservices
         }
 
         void
-        ComponentManagerImpl::WaitForFuture(std::shared_future<void>& fut, std::shared_ptr<std::atomic<bool>> asyncStarted)
+        ComponentManagerImpl::WaitForFuture(std::shared_future<void>& fut,
+                                            std::shared_ptr<std::atomic<bool>> asyncStarted)
         {
 
             // if we hit the timeout
@@ -86,13 +87,14 @@ namespace cppmicroservices
                 // we expect that the asyncStarted is false -- i.e. stalled
                 auto expected = false;
                 auto desired = true;
-                // if it is stalled
+                // if it is *asyncStarted==false
                 if (std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
                 {
                     // we execute the task
                     auto task = taskMap[asyncStarted];
                     auto enabledState = enStateMap[asyncStarted];
-                    (*task)(enabledState);
+                    // we pass in false because we always want to execute the task here
+                    (*task)(enabledState, false);
                 }
                 else
                 {
@@ -201,20 +203,27 @@ namespace cppmicroservices
             auto logger = GetLogger();
             auto configNotifier = GetConfigNotifier();
 
-            using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
+            using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>, bool)>;
             using PostTask = std::packaged_task<void()>;
 
             ActualTask task(
-                [metadata, bundle, reg, logger, configNotifier, asyncStarted](std::shared_ptr<CMEnabledState> eState) mutable
+                [metadata, bundle, reg, logger, configNotifier, asyncStarted](std::shared_ptr<CMEnabledState> eState,
+                                                                              bool checkExecuted) mutable
                 {
-                    bool expected = false;
-                    bool desired = true;
-                    // if asyncStarted is non null this is a blocking call
-                    // and the value is true, this task has already executed
-                    if (asyncStarted && !std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
+                    // if this task is being run on spawned thread (not getting thread), check execution status
+                    if (checkExecuted)
                     {
-                        return;
+                        bool expected = false;
+                        bool desired = true;
+                        // if asyncStarted is non null AND *asyncStarted==true
+                        if (asyncStarted && !std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
+                        {
+                            // this is blocking and it has started
+                            return;
+                        }
+                        // else it is non-blocking or it has not started
                     }
+                    // do the task
                     eState->CreateConfigurations(metadata, bundle, reg, logger, configNotifier);
                 });
 
@@ -228,7 +237,7 @@ namespace cppmicroservices
                 taskMap[asyncStarted] = taskPtr_;
                 enStateMap[asyncStarted] = enabledState;
             }
-            PostTask post_task([enabledState, taskPtr = taskPtr_]() mutable { (*taskPtr)(enabledState); });
+            PostTask post_task([enabledState, taskPtr = taskPtr_]() mutable { (*taskPtr)(enabledState, true); });
 
             // if this object failed to change state and the current state is DISABLED, try again
             auto succeeded = false;
@@ -253,22 +262,26 @@ namespace cppmicroservices
             std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
             std::shared_ptr<std::atomic<bool>> asyncStarted)
         {
-            using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
+            using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>, bool)>;
             using PostTask = std::packaged_task<void()>;
 
             ActualTask task(
-                [asyncStarted](std::shared_ptr<CMEnabledState> enabledState) mutable
+                [asyncStarted](std::shared_ptr<CMEnabledState> enabledState, bool checkExecuted) mutable
                 {
-                    bool expected = false;
-                    bool desired = true;
-
-                    // if asyncStarted is non null this is a blocking call
-                    // and the value is true, this task has already executed
-                    if (asyncStarted && !std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
+                    if (checkExecuted)
                     {
-                        return;
-                    }
+                        bool expected = false;
+                        bool desired = true;
 
+                        // if asyncStarted is non null AND *asyncStarted==true
+                        if (asyncStarted && !std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
+                        {
+                            // this is blocking and it has started
+                            return;
+                        }
+                        // else it is non-blocking or it has not started
+                    }
+                    // do task
                     enabledState->DeleteConfigurations();
                 });
 
@@ -294,7 +307,9 @@ namespace cppmicroservices
                     taskMap[asyncStarted] = taskPtr_;
                     enStateMap[asyncStarted] = currEnabledState;
                 }
-                PostTask post_task([currEnabledState, taskPtr = taskPtr_]() mutable { (*taskPtr)(currEnabledState); });
+                // this task goes to async queue, we wan't to check if it is already executed
+                PostTask post_task([currEnabledState, taskPtr = taskPtr_]() mutable
+                                   { (*taskPtr)(currEnabledState, true); });
 
                 asyncWorkService->post(std::move(post_task));
 

@@ -40,7 +40,7 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
-        using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
+        using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>, bool)>;
         class ComponentRegistry;
         class ComponentManagerState;
 

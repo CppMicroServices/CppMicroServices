@@ -41,10 +41,6 @@ namespace cppmicroservices
             {
                 throw std::invalid_argument("ConfigurationManagerImpl - Invalid arguments passed to constructor");
             }
-            for (auto const& pid : metadata->configurationPids)
-            {
-                changeCount[pid] = 0;
-            }
         }
 
         cppmicroservices::AnyMap

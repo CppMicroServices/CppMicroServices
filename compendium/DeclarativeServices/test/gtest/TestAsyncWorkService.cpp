@@ -361,60 +361,55 @@ namespace test
         std::string lookingFor;
     };
 
-    TEST_P(TestAsyncWorkServiceEndToEnd, TestOverwhelmThreadpool)
+    TEST(ConfigAdminTestsDeadlock, testAsyncWorkServiceDeadlock)
     {
-        std::vector<std::string> bundlesToInstall
-            = { "DSGraph01",        "DSGraph02",        "DSGraph03",         "DSGraph04",        "DSGraph05",
-                "DSGraph06",        "DSGraph07",        "TestBundleDSCA01",  "TestBundleDSCA02", "TestBundleDSCA03",
-                "TestBundleDSCA04", "TestBundleDSCA05", "TestBundleDSCA05a", "TestBundleDSCA07", "TestBundleDSCA08",
-                "TestBundleDSCA09", "TestBundleDSCA12", "TestBundleDSCA16",  "TestBundleDSCA20", "TestBundleDSCA21",
-                "TestBundleDSCA24", "TestBundleDSCA26", "TestBundleDSCA27" };
-        std::vector<cppmicroservices::Bundle> installedBundles;
-        std::mutex installedBundlesMutex;
-        EXPECT_NO_THROW({
-            auto const& param = GetParam();
+        auto param = std::make_shared<test::AsyncWorkServiceThreadPool>(1);
+        auto f = cppmicroservices::FrameworkFactory().NewFramework();
+        f.Start();
+        auto ctx = f.GetBundleContext();
 
-            auto ctx = framework.GetBundleContext();
-            std::shared_ptr<cppmicroservices::scrimpl::SCRLogger> logger
-                = std::make_shared<cppmicroservices::scrimpl::SCRLogger>(ctx);
+        // ASYNCWORKSERVICE
+        auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
 
-            auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
-            cppmicroservices::scrimpl::SCRAsyncWorkService scrAsyncWorkService(ctx, logger);
+        // CA, DS
+        ::test::InstallAndStartConfigAdmin(ctx);
+        ::test::InstallAndStartDS(ctx);
 
-            std::vector<std::thread> threads;
+        // CA SERVICE
+        auto sr = ctx.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+        auto configAdmin = ctx.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
 
-            for (auto const& b : bundlesToInstall)
-            {
-                threads.emplace_back(std::thread(
-                    [&ctx, &b, &installedBundles, &installedBundlesMutex, &scrAsyncWorkService]()
-                    {
-                        std::packaged_task<void()> myTask(
-                            [&ctx, &b, &installedBundles, &installedBundlesMutex, &scrAsyncWorkService]()
-                            {
-                                auto bundle = ::test::InstallAndStartBundle(ctx, b);
-                                std::lock_guard<std::mutex> gd(installedBundlesMutex);
-                                installedBundles.emplace_back(bundle);
-                            });
-                        std::future<void> f = myTask.get_future();
-                        scrAsyncWorkService.post(std::move(myTask));
-                        f.get();
-                    }));
-            }
+        // CONFIG NAME
+        std::string componentName = "sample::ServiceComponentCA06";
 
-            for (auto& t : threads)
-            {
-                t.join();
-            }
-            auto bundles = ctx.GetBundles();
+        auto bundle = ::test::InstallAndStartBundle(ctx, "TestBundleDSCA06");
+        ASSERT_TRUE(bundle);
 
-            for (auto& bundle : installedBundles)
-            {
-                ASSERT_TRUE(bundle);
-                auto b = std::find_if(std::begin(bundles), std::end(bundles), BundleName(bundle.GetSymbolicName()));
-                ASSERT_NE(b, bundles.end()) << bundle.GetSymbolicName() << " not found";
-                bundle.Stop();
-            }
+        // Create configuration object and update property.
+        auto configuration = configAdmin->GetConfiguration(componentName);
+        auto configInstance = configuration->GetPid();
+
+        cppmicroservices::AnyMap props({
+            {"uniqueProp", std::string("instance1")}
         });
+
+        auto fut = configuration->Update(props);
+        fut.get();
+
+        auto instanceRef = ctx.GetServiceReference<test::CAInterface>();
+        auto service = ctx.GetService<test::CAInterface>(instanceRef);
+
+        auto pathI = ::test::GetPathInfo();
+        props["libPath"] = pathI["libPath"];
+        props["dirSep"] = pathI["dirSep"];
+        props["usLibPrefix"] = pathI["usLibPrefix"];
+        props["usLibPostfix"] = pathI["usLibPostfix"];
+        props["usLibExt"] = pathI["usLibExt"];
+
+        fut = configuration->Update(props);
+        fut.get();
+
+        ASSERT_TRUE(service) << "GetService failed for CAInterface.";
     }
 
 }; // namespace test

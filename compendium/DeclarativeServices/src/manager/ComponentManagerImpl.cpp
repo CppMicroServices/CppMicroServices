@@ -35,6 +35,28 @@ namespace cppmicroservices
     namespace scrimpl
     {
 
+        struct MapScopeGuard
+        {
+            MapScopeGuard(
+                std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<ActualTask>>* taskMap,
+                std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<CMEnabledState>>* stateMap,
+                std::shared_ptr<std::atomic<bool>> key)
+                : tM(taskMap)
+                , sM(stateMap)
+                , k(key)
+            {
+            }
+            ~MapScopeGuard()
+            {
+                tM->erase(k);
+                sM->erase(k);
+            }
+
+            std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<ActualTask>>* tM;
+            std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<CMEnabledState>>* sM;
+            std::shared_ptr<std::atomic<bool>> k;
+        };
+
         ComponentManagerImpl::ComponentManagerImpl(
             std::shared_ptr<metadata::ComponentMetadata const> metadata,
             std::shared_ptr<ComponentRegistry> registry,
@@ -80,16 +102,22 @@ namespace cppmicroservices
         ComponentManagerImpl::WaitForFuture(std::shared_future<void>& fut,
                                             std::shared_ptr<std::atomic<bool>> asyncStarted)
         {
+            // ensure that taskMap and enStateMap are cleared even if future throws
+            MapScopeGuard guard(&taskMap, &enStateMap, asyncStarted);
 
             // if we hit the timeout
             if (fut.wait_for(std::chrono::milliseconds(50)) == std::future_status::timeout)
             {
+                // logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, "WFF : TIMEOUT");
+                std::cout << "WFF : TIMEOUT" << std::endl;
                 // we expect that the asyncStarted is false -- i.e. stalled
                 auto expected = false;
                 auto desired = true;
                 // if it is *asyncStarted==false
                 if (std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
                 {
+                    std::cout << "WFF : EXECUTE" << std::endl;
+                    // logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, "WFF : EXECUTE");
                     // we execute the task
                     auto task = taskMap[asyncStarted];
                     auto enabledState = enStateMap[asyncStarted];
@@ -99,19 +127,20 @@ namespace cppmicroservices
                 }
                 else
                 {
+                    std::cout << "WFF : LOSTBUG" << std::endl;
+                    // logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, "WFF : LOSTBUG");
                     // it is 50 ms later, but the asyncStarted is true -- it is executing currently
                     fut.get();
                 }
             }
             else
             {
+                std::cout << "WFF : LOST" << std::endl;
+                // logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO, "WFF : LOST");
+
                 // it has executed
                 fut.get();
             }
-
-            // at this point execution is done on spawned thread or this one, map entry can be removed
-            taskMap.erase(asyncStarted);
-            enStateMap.erase(asyncStarted);
         }
 
         void
@@ -213,19 +242,33 @@ namespace cppmicroservices
                 [metadata, bundle, reg, logger, configNotifier, asyncStarted](std::shared_ptr<CMEnabledState> eState,
                                                                               bool checkExecuted) mutable
                 {
+                    // logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO,
+                    //             "TASK: checkExecuted: " + (checkExecuted ? std::string("true") : std::string("false")));
+
+                    std::cout << "TASK: checkExecuted: " << checkExecuted << std::endl;
+
                     // if this task is being run on spawned thread (not getting thread), check execution status
                     if (checkExecuted)
                     {
+                        std::cout << "TASK: In check" << std::endl;
                         bool expected = false;
                         bool desired = true;
                         // if asyncStarted is non null AND *asyncStarted==true
                         if (asyncStarted && !std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
                         {
+                            // logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO,
+                            //             "TASK: LOST Execution: " + (checkExecuted));
+
+                            std::cout << "TASK: LOST Execution" << std::endl;
                             // this is blocking and it has started
                             return;
                         }
                         // else it is non-blocking or it has not started
                     }
+                    std::cout << "TASK: WON Execution" << std::endl;
+                    // logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_INFO,
+                    //             "TASK: WON Execution: " + (checkExecuted));
+
                     // do the task
                     eState->CreateConfigurations(metadata, bundle, reg, logger, configNotifier);
                 });

@@ -55,6 +55,18 @@ namespace
 namespace test
 {
 
+    std::unordered_map<std::string, std::string>
+    GetPathInfo()
+    {
+        std::unordered_map<std::string, std::string> a;
+        a["libPath"] = cppmicroservices::testing::LIB_PATH;
+        a["dirSep"] = cppmicroservices::util::DIR_SEP;
+        a["usLibPrefix"] = US_LIB_PREFIX;
+        a["usLibPostfix"] = US_LIB_POSTFIX;
+        a["usLibExt"] = US_LIB_EXT;
+        return a;
+    }
+
     void
     InstallLib(
 #if defined(US_BUILD_SHARED_LIBS)

@@ -1,0 +1,51 @@
+on:
+  workflow_dispatch:
+
+name: ClangTidyCompleteCodebaseReview
+
+jobs:
+  upload-sarif:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Checkout submodules
+        run: git submodule update --init --recursive
+        
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - uses: Swatinem/rust-cache@v1
+
+      - run: cargo install clang-tidy-sarif sarif-fmt
+
+      - name: Generate Compilation Database
+        run: |
+          mkdir build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+
+      - name: Run clang-tidy and generate SARIF files
+        run: |
+          mkdir sarif_results
+          SOURCE_FILES=$(find $GITHUB_WORKSPACE -path "$GITHUB_WORKSPACE/third_party" -prune -o -type f \( -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' -o -name '*.cxx' -o -name '*.h' -o -name '*.hh' -o -name '*.hxx' \) -print)
+          for FILE in $SOURCE_FILES; do
+            BASENAME=$(basename -- "$FILE")
+            SARIF_FILE="sarif_results/${BASENAME%.*}.sarif"
+            USARIF_FILE="sarif_results/updated_${SARIF_BASENAME}.sarif"
+            clang-tidy -p=build "$FILE" -- | clang-tidy-sarif | tee "$SARIF_FILE"
+            # Make SARIF paths relative
+            jq --arg base "$GITHUB_WORKSPACE/" '.runs[].results[].locations[].physicalLocation.artifactLocation.uri |= sub($base; "")' "$SARIF_FILE" > "$USARIF_FILE"
+            mv "$USARIF_FILE" "$SARIF_FILE"
+            jq -s '{ version: .[0].version, runs: [ { tool: .[0].runs[0].tool, results: (map(.runs[0].results) | add) } ] }' sarif_results/*.sarif > merged_sarif_results.sarif
+          done
+
+      - name: Upload SARIF files
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: merged_sarif_results.sarif

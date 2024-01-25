@@ -396,8 +396,8 @@ namespace test
         auto fut = configuration->Update(props);
         fut.get();
 
-        auto instanceRef = ctx.GetServiceReference<test::CAInterface>();
-        auto service = ctx.GetService<test::CAInterface>(instanceRef);
+        auto instanceRef = ctx.GetServiceReference<::test::TestManagedServiceInterface>();
+        auto service = ctx.GetService<::test::TestManagedServiceInterface>(instanceRef);
 
         auto pathI = ::test::GetPathInfo();
         props["libPath"] = pathI["libPath"];
@@ -405,6 +405,7 @@ namespace test
         props["usLibPrefix"] = pathI["usLibPrefix"];
         props["usLibPostfix"] = pathI["usLibPostfix"];
         props["usLibExt"] = pathI["usLibExt"];
+        props["context"] = std::make_shared<cppmicroservices::BundleContext>(ctx);
 
         fut = configuration->Update(props);
         fut.get();

@@ -2,25 +2,23 @@
 #define _SERVICE_IMPL_HPP_
 
 #include "TestInterfaces/Interfaces.hpp"
-#include "cppmicroservices/servicecomponent/ComponentContext.hpp"
-#include <mutex>
-
-using ComponentContext = cppmicroservices::service::component::ComponentContext;
+#include <cppmicroservices/cm/ManagedService.hpp>
 
 namespace sample
 {
-    class ServiceComponentCA06 : public test::CAInterface
+    class ServiceComponentCA06
+        : public ::test::TestManagedServiceInterface
+        , public cppmicroservices::service::cm::ManagedService
     {
       public:
-        ServiceComponentCA06(std::shared_ptr<cppmicroservices::AnyMap> const& props) : properties(props) {}
-        void Modified(std::shared_ptr<ComponentContext> const& context,
-                      std::shared_ptr<cppmicroservices::AnyMap> const& configuration);
-        cppmicroservices::AnyMap GetProperties();
+        ServiceComponentCA06() {}
+        void Updated(cppmicroservices::AnyMap const& properties);
         ~ServiceComponentCA06() = default;
-
-      private:
-        std::mutex propertiesLock;
-        std::shared_ptr<cppmicroservices::AnyMap> properties;
+        int
+        getCounter() override
+        {
+            return 1;
+        }
     };
 } // namespace sample
 

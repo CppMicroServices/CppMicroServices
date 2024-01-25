@@ -105,6 +105,7 @@ namespace test
             test::InstallLib(context, "TestBundleDSCA04");
             test::InstallLib(context, "TestBundleDSCA05");
             test::InstallLib(context, "TestBundleDSCA05a");
+            test::InstallLib(context, "TestBundleDSCA06");
             test::InstallLib(context, "TestBundleDSCA07");
             test::InstallLib(context, "TestBundleDSCA08");
             test::InstallLib(context, "TestBundleDSCA09");

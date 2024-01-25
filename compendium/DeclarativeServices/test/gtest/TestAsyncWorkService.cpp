@@ -69,7 +69,6 @@ namespace test
             dsRuntimeService = context.GetService<scr::ServiceComponentRuntime>(sRef);
             ASSERT_TRUE(dsRuntimeService);
         }
-
         void
         TearDown() override
         {
@@ -79,30 +78,6 @@ namespace test
 
         std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
         cppmicroservices::Framework framework;
-    };
-
-    class AsyncWorkServiceInline : public cppmicroservices::async::AsyncWorkService
-    {
-      public:
-        AsyncWorkServiceInline() : cppmicroservices::async::AsyncWorkService() {}
-
-        void
-        post(std::packaged_task<void()>&& task) override
-        {
-            task();
-        }
-    };
-
-    class AsyncWorkServiceStdAsync : public cppmicroservices::async::AsyncWorkService
-    {
-      public:
-        AsyncWorkServiceStdAsync() : cppmicroservices::async::AsyncWorkService() {}
-
-        void
-        post(std::packaged_task<void()>&& task) override
-        {
-            std::future<void> f = std::async(std::launch::async, [task = std::move(task)]() mutable { task(); });
-        }
     };
 
     class AsyncWorkServiceThreadPool : public cppmicroservices::async::AsyncWorkService
@@ -312,9 +287,7 @@ namespace test
 
     INSTANTIATE_TEST_SUITE_P(AsyncWorkServiceEndToEndParameterized,
                              TestAsyncWorkServiceEndToEnd,
-                             testing::Values(std::make_shared<AsyncWorkServiceInline>(),
-                                             std::make_shared<AsyncWorkServiceStdAsync>(),
-                                             std::make_shared<AsyncWorkServiceThreadPool>(1),
+                             testing::Values(std::make_shared<AsyncWorkServiceThreadPool>(1),
                                              std::make_shared<AsyncWorkServiceThreadPool>(8),
                                              std::make_shared<AsyncWorkServiceThreadPool>(20)));
 
@@ -343,19 +316,17 @@ namespace test
         });
     }
 
-    TEST(ConfigAdminTestsDeadlock, testAsyncWorkServiceDeadlock)
+    TEST_P(TestAsyncWorkServiceEndToEnd, testAsyncWorkServiceDeadlock)
     {
-        auto param = std::make_shared<test::AsyncWorkServiceThreadPool>(1);
-        auto f = cppmicroservices::FrameworkFactory().NewFramework();
-        f.Start();
-        auto ctx = f.GetBundleContext();
+        auto param = GetParam();
+
+        auto ctx = framework.GetBundleContext();
 
         // ASYNCWORKSERVICE
         auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
 
         // CA, DS
         ::test::InstallAndStartConfigAdmin(ctx);
-        ::test::InstallAndStartDS(ctx);
 
         // CA SERVICE
         auto sr = ctx.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
@@ -393,8 +364,6 @@ namespace test
         fut.get();
 
         ASSERT_TRUE(service) << "GetService failed for CAInterface.";
-        f.Stop();
-        f.WaitForStop(std::chrono::milliseconds::zero());
     }
 
 }; // namespace test

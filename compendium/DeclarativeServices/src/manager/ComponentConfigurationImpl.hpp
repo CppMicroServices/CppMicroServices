@@ -55,11 +55,7 @@ namespace cppmicroservices
             InstanceContextPair;
         struct ListenerToken final
         {
-            ListenerToken(std::string pid, const ListenerTokenId tokenId)
-                : pid(std::move(pid))
-                , tokenId(tokenId)
-            {
-            }
+            ListenerToken(std::string pid, ListenerTokenId const tokenId) : pid(std::move(pid)), tokenId(tokenId) {}
             std::string pid;
             ListenerTokenId tokenId;
         };
@@ -78,7 +74,7 @@ namespace cppmicroservices
             /**
              * \throws std::invalid_argument exception if any of the params is a nullptr
              */
-            explicit ComponentConfigurationImpl(std::shared_ptr<const metadata::ComponentMetadata> metadata,
+            explicit ComponentConfigurationImpl(std::shared_ptr<metadata::ComponentMetadata const> metadata,
                                                 Bundle const& bundle,
                                                 std::shared_ptr<ComponentRegistry> registry,
                                                 std::shared_ptr<cppmicroservices::logservice::LogService> logger,
@@ -159,13 +155,12 @@ namespace cppmicroservices
              * This method returns the {@link ComponentMetadata} object created by
              * parsing the component description.
              */
-            std::shared_ptr<const metadata::ComponentMetadata>
+            std::shared_ptr<metadata::ComponentMetadata const>
             GetMetadata() const override
             {
                 return metadata;
             };
 
-            
             /**
              * Method to check if this component provides a service
              *
@@ -413,10 +408,10 @@ namespace cppmicroservices
             unsigned long configID; ///< unique Id for the component configuration
             static std::atomic<unsigned long>
                 idCounter; ///< used to assign unique identifiers to component configurations
-            const std::shared_ptr<const metadata::ComponentMetadata> metadata; ///< component description
+            std::shared_ptr<metadata::ComponentMetadata const> const metadata; ///< component description
             Bundle bundle;                                     ///< bundle this component configuration belongs to
-            const std::shared_ptr<ComponentRegistry> registry; ///< component registry of the runtime
-            const std::shared_ptr<cppmicroservices::logservice::LogService>
+            std::shared_ptr<ComponentRegistry> const registry; ///< component registry of the runtime
+            std::shared_ptr<cppmicroservices::logservice::LogService> const
                 logger; ///< logger used for reporting errors/execptions
             std::unique_ptr<RegistrationManager>
                 regManager; ///< registration manager used to manage registration/unregistration of the service provided

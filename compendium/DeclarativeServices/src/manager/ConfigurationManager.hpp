@@ -47,7 +47,7 @@ namespace cppmicroservices
             /**
              * @throws std::invalid_argument exception if any of the params is a nullptr
              */
-            ConfigurationManager(std::shared_ptr<const metadata::ComponentMetadata> const& metadata,
+            ConfigurationManager(std::shared_ptr<metadata::ComponentMetadata const> const& metadata,
                                  cppmicroservices::BundleContext const& bc,
                                  std::shared_ptr<cppmicroservices::logservice::LogService> logger);
             ConfigurationManager(ConfigurationManager const&) = delete;
@@ -81,8 +81,10 @@ namespace cppmicroservices
             void UpdateMergedProperties(std::string const& pid,
                                         std::shared_ptr<cppmicroservices::AnyMap> props,
                                         cppmicroservices::service::cm::ConfigurationEventType const& type,
+                                        unsigned long const& newChangeCount,
                                         bool& configWasSatisfied,
-                                        bool& configIsNowSatisfied);
+                                        bool& configIsNowSatisfied,
+                                        bool& changeCountDifferent);
 
             /* Returns the merged properties for the component. These properties
              * are a merged from the component properties and the properties for
@@ -94,12 +96,13 @@ namespace cppmicroservices
             bool isConfigSatisfied() const noexcept;
 
             std::shared_ptr<cppmicroservices::logservice::LogService> logger; ///< logger for this runtime
-            const std::shared_ptr<const metadata::ComponentMetadata> metadata;
+            std::shared_ptr<metadata::ComponentMetadata const> const metadata;
             cppmicroservices::BundleContext bundleContext; ///< context of the bundle which contains the component
             mutable std::mutex propertiesMutex; // mutex to protect the configProperties and mergedProperties members
             std::unordered_map<std::string, cppmicroservices::AnyMap>
                 configProperties; // properties for available configuration objects.
             cppmicroservices::AnyMap mergedProperties;
+            std::unordered_map<std::string, unsigned long> changeCount;
         };
     } // namespace scrimpl
 } // namespace cppmicroservices

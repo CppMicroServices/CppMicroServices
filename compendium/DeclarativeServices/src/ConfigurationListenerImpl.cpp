@@ -75,13 +75,14 @@ namespace cppmicroservices
                     }
                     cppmicroservices::AnyMap properties;
                     auto type = event.getType();
-
+                    unsigned long changeCount = 0;
                     if (type == ConfigurationEventType::CM_UPDATED)
                     {
                         auto configObject = configAdmin->GetConfiguration(pid);
                         if (configObject)
                         {
                             properties = configObject->GetProperties();
+                            changeCount = configObject->GetChangeCount();
                         }
                     }
                     if (!configNotifier->AnyListenersForPid(pid, properties))
@@ -89,7 +90,7 @@ namespace cppmicroservices
                         return;
                     }
                     auto ptr = std::make_shared<cppmicroservices::AnyMap>(properties);
-                    configNotifier->NotifyAllListeners(pid, type, ptr);
+                    configNotifier->NotifyAllListeners(pid, type, ptr, changeCount);
                 }
                 catch (cppmicroservices::SecurityException const&)
                 {

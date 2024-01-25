@@ -343,24 +343,6 @@ namespace test
         });
     }
 
-    class BundleName final
-    {
-      public:
-        BundleName(std::string name) : lookingFor(std::move(name)) {}
-
-        ~BundleName() = default;
-
-        bool
-        operator()(cppmicroservices::Bundle const& b)
-        {
-            auto symbolicName = b.GetSymbolicName();
-            return (lookingFor == symbolicName);
-        }
-
-      private:
-        std::string lookingFor;
-    };
-
     TEST(ConfigAdminTestsDeadlock, testAsyncWorkServiceDeadlock)
     {
         auto param = std::make_shared<test::AsyncWorkServiceThreadPool>(1);
@@ -411,6 +393,8 @@ namespace test
         fut.get();
 
         ASSERT_TRUE(service) << "GetService failed for CAInterface.";
+        f.Stop();
+        f.WaitForStop(std::chrono::milliseconds::zero());
     }
 
 }; // namespace test

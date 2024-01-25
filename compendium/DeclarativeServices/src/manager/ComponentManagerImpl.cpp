@@ -102,36 +102,29 @@ namespace cppmicroservices
         ComponentManagerImpl::WaitForFuture(std::shared_future<void>& fut,
                                             std::shared_ptr<std::atomic<bool>> asyncStarted)
         {
-            // ensure that taskMap and enStateMap are cleared even if future throws
-            MapScopeGuard guard(&taskMap, &enStateMap, asyncStarted);
-            auto taskID = rand() % 100;
+            // ensure that asyncTaskMap and asyncTaskStateMap are cleared even if task
+            MapScopeGuard guard(&asyncTaskMap, &asyncTaskStateMap, asyncStarted);
 
             // if we hit the timeout
             if (fut.wait_for(std::chrono::milliseconds(50)) == std::future_status::timeout)
             {
-                std::cout << "WFF" << taskID << " : TIMEOUT" << std::endl;
                 // we expect that the asyncStarted is false -- i.e. stalled
                 auto expected = false;
                 auto desired = true;
                 // if it is *asyncStarted==false
                 if (std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
                 {
-                    std::cout << "WFF" << taskID << " : EXECUTE" << std::endl;
                     // we execute the task
-                    auto task = taskMap[asyncStarted];
-                    auto enabledState = enStateMap[asyncStarted];
+                    auto task = asyncTaskMap[asyncStarted];
+                    auto enabledState = asyncTaskStateMap[asyncStarted];
 
                     // we pass in false because we always want to execute the task here
                     (*task)(enabledState, false);
                 }
             }
-            else
-            {
-                std::cout << "WFF" << taskID << " : LOST" << std::endl;
-            }
 
-            // we can always get the future... if stalled, it'll be satisfied by WFF execution of the task
-            // else it will be satisfied by the task on the queue
+            // we can always get the future... if stalled, it'll be satisfied by WFF
+            // execution of the task else it will be satisfied by already executed object
             fut.get();
         }
 
@@ -234,10 +227,7 @@ namespace cppmicroservices
                 [metadata, bundle, reg, logger, configNotifier, asyncStarted](std::shared_ptr<CMEnabledState> eState,
                                                                               bool checkExecuted) mutable
                 {
-                    auto taskID = rand() % 100;
-                    std::cout << "TASK" << taskID << ": checkExecuted: " << checkExecuted << std::endl;
-
-                    // if this task is being run on spawned thread (not getting thread), check execution status
+                    // if this task is being run on spawned thread (not waiting thread), check execution status
                     if (checkExecuted)
                     {
                         bool expected = false;
@@ -245,14 +235,11 @@ namespace cppmicroservices
                         // if asyncStarted is non null AND *asyncStarted==true
                         if (asyncStarted && !std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
                         {
-                            std::cout << "TASK" << taskID << ": LOST Execution" << std::endl;
                             // this is blocking and it has started
                             return;
                         }
-                        // else it is non-blocking or it has not started
+                        // else it is non-blocking or it has not started and we now own it
                     }
-
-                    std::cout << "TASK" << taskID << ": WON Execution" << std::endl;
                     // do the task
                     eState->CreateConfigurations(metadata, bundle, reg, logger, configNotifier);
                 });
@@ -264,8 +251,8 @@ namespace cppmicroservices
             // if blocking, cache task and enabledState
             if (asyncStarted)
             {
-                taskMap[asyncStarted] = taskPtr_;
-                enStateMap[asyncStarted] = enabledState;
+                asyncTaskMap[asyncStarted] = taskPtr_;
+                asyncTaskStateMap[asyncStarted] = enabledState;
             }
             PostTask post_task(
                 [enabledState, taskPtr = taskPtr_]() mutable
@@ -348,12 +335,25 @@ namespace cppmicroservices
                 // if blocking, cache task and enabledState
                 if (asyncStarted)
                 {
-                    taskMap[asyncStarted] = taskPtr_;
-                    enStateMap[asyncStarted] = currEnabledState;
+                    asyncTaskMap[asyncStarted] = taskPtr_;
+                    asyncTaskStateMap[asyncStarted] = currEnabledState;
                 }
                 // this task goes to async queue, we wan't to check if it is already executed
-                PostTask post_task([currEnabledState, taskPtr = taskPtr_]() mutable
-                                   { (*taskPtr)(currEnabledState, true); });
+                PostTask post_task(
+                    [currEnabledState, taskPtr = taskPtr_]() mutable
+                    {
+                        try
+                        {
+                            (*taskPtr)(currEnabledState, true);
+                        }
+                        catch (...)
+                        {
+                            /*
+                             * task was already executed, by WaitForFuture, calling it
+                             * again will throw. This isexpected, we can just catch and continue
+                             */
+                        }
+                    });
 
                 asyncWorkService->post(std::move(post_task));
 

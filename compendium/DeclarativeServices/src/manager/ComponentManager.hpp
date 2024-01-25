@@ -51,7 +51,7 @@ namespace cppmicroservices
 
             /*
              * Waits for the provided future from the asynchronous thread pool and executes
-             * the task if the thread pool has stalled
+             * the task on current thread if the thread pool has stalled
              */
             virtual void WaitForFuture(std::shared_future<void>& fut, std::shared_ptr<std::atomic<bool>> asyncStarted)
                 = 0;
@@ -75,14 +75,18 @@ namespace cppmicroservices
             /**
              * This method changes the state of the ComponentManager to ENABLED. The method returns
              * immediately after changing the state. Any configurations created as a result of the
-             * state change will happen asynchronously on a separate thread.
+             * state change will happen asynchronously on a separate thread. If waiting on this future,
+             * call WaitForFuture() with the returned future and the asyncStarted object passed into this
+             * call. Otherwise pass in nullpr.
              */
             virtual std::shared_future<void> Enable(std::shared_ptr<std::atomic<bool>> asyncStarted) = 0;
 
             /**
              * This method changes the state of the ComponentManager to DISABLED. The method returns
              * immediately after changing the state. Any configurations deleted as a result of the
-             * state change will happen asynchronously on a separate thread.
+             * state change will happen asynchronously on a separate thread. If waiting on this future,
+             * call WaitForFuture() with the returned future and the asyncStarted object passed into this
+             * call. Otherwise pass in nullpr.
              */
             virtual std::shared_future<void> Disable(std::shared_ptr<std::atomic<bool>> asyncStarted) = 0;
 

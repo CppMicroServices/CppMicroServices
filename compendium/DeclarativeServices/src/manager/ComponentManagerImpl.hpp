@@ -64,6 +64,10 @@ namespace cppmicroservices
             ComponentManagerImpl& operator=(ComponentManagerImpl&&) = delete;
             ~ComponentManagerImpl() override;
 
+            /*
+             * Waits for the provided future from the asynchronous thread pool and executes
+             * the task on current thread if the thread pool has stalled
+             */
             void WaitForFuture(std::shared_future<void>& fut,
                                std::shared_ptr<std::atomic<bool>> asyncStarted = nullptr) override;
             /**
@@ -77,12 +81,12 @@ namespace cppmicroservices
             bool IsEnabled() const override;
 
             /** @copydoc ComponentManager::Enable()
-             * Delegates the call to the current state object
+             * Delegates the call to the current state object passing in the synchronizing atomic bool
              */
             std::shared_future<void> Enable(std::shared_ptr<std::atomic<bool>> asyncStarted) override;
 
             /** @copydoc ComponentManager::Disable()
-             * Delegates the call to the current state object
+             * Delegates the call to the current state object passing in the synchronizing atomic bool
              */
             std::shared_future<void> Disable(std::shared_ptr<std::atomic<bool>> asyncStarted) override;
 
@@ -192,6 +196,7 @@ namespace cppmicroservices
              * to be completed if the state was successfully changed.
              *
              * \param currentState The current state object
+             * \param asyncStarted The bool used to synchronize the waiting and the posted thread
              * \return a shared_future<void> on which to wait for the asynchronous work to complete.
              */
             std::shared_future<void> PostAsyncDisabledToEnabled(
@@ -203,6 +208,7 @@ namespace cppmicroservices
              * to be completed if the state was successfully changed.
              *
              * \param currentState The current state object
+             * \param asyncStarted The bool used to synchronize the waiting and the posted thread
              * \return a shared_future<void> on which to wait for the asynchronous work to complete.
              */
             std::shared_future<void> PostAsyncEnabledToDisabled(
@@ -211,8 +217,10 @@ namespace cppmicroservices
 
           private:
             FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
-            std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<ActualTask>> taskMap;
-            std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<CMEnabledState>> enStateMap;
+            std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<ActualTask>>
+                asyncTaskMap; // map storing the task associated with each atomic_bool for tasks posted to the thread pool
+            std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<CMEnabledState>>
+                asyncTaskStateMap; // map storing the state associated with each task for tasks posted to the thread pool
             std::shared_ptr<ComponentRegistry> const
                 registry; ///< component registry associated with the current runtime
             std::shared_ptr<metadata::ComponentMetadata const> const compDesc; ///< the component description

@@ -12,7 +12,7 @@ namespace sample
     {
       public:
         ServiceComponentCA06() {}
-        void Updated(cppmicroservices::AnyMap const& properties);
+        void Updated(cppmicroservices::AnyMap const& properties) override;
         ~ServiceComponentCA06() = default;
         int
         getCounter() override

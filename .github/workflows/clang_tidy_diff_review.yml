@@ -20,6 +20,7 @@ jobs:
     - uses: ZedThree/clang-tidy-review@v0.14.0
       id: review
       with:
+        split_workflow: true
         build_dir: build
         config_file: ".clang-tidy"
         max_comments: '100'

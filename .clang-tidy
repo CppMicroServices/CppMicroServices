@@ -2,7 +2,6 @@
 Checks:          '-*,bugprone-*,cppcoreguidelines-*,modernize-*,concurrency-*'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
-AnalyzeTemporaryDtors: false
 FormatStyle:     file
 CheckOptions:
   - key:             cppcoreguidelines-explicit-virtual-functions.IgnoreDestructors

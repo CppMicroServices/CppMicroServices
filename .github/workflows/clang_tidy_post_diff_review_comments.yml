@@ -3,7 +3,7 @@ name: PostClangTidyReviewComments
 on:
   workflow_run:
     # The name field of the lint action
-    workflows: ["clang-tidy-review-diff"]
+    workflows: ["ClangTidyDiffReview"]
     types:
       - completed
 

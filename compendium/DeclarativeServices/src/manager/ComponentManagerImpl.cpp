@@ -81,13 +81,13 @@ namespace cppmicroservices
 
         ComponentManagerImpl::~ComponentManagerImpl()
         {
-
-            GetState()->Disable(*this, nullptr);
-            for (auto& fut : disableFutures)
+            auto asyncStarted = std::make_shared<std::atomic<bool>>(false);
+            GetState()->Disable(*this, asyncStarted);
+            for (auto& pair : disableFutures)
             {
                 try
                 {
-                    fut.get();
+                    WaitForFuture(pair.first, pair.second);
                 }
                 catch (...)
                 {
@@ -193,19 +193,27 @@ namespace cppmicroservices
             return std::atomic_compare_exchange_strong(&state, expectedState, desiredState);
         }
 
-        void
-        ComponentManagerImpl::AccumulateFuture(std::shared_future<void> fObj)
+        bool
+        isReady(std::pair<std::shared_future<void>, std::shared_ptr<std::atomic<bool>>> obj)
         {
+            return (is_ready(obj.first));
+        }
+        void
+        ComponentManagerImpl::AccumulateFuture(std::shared_future<void> fObj,
+                                               std::shared_ptr<std::atomic<bool>> asyncStarted)
+        {
+            std::pair<std::shared_future<void>, std::shared_ptr<std::atomic<bool>>> pair
+                = std::make_pair(fObj, asyncStarted);
             std::lock_guard<std::mutex> lk(futuresMutex);
             auto iterator
-                = std::find_if(disableFutures.begin(), disableFutures.end(), is_ready<std::shared_future<void>&>);
+                = std::find_if(disableFutures.begin(), disableFutures.end(), isReady);
             if (iterator == disableFutures.end())
             {
-                disableFutures.push_back(fObj);
+                disableFutures.push_back(pair);
             }
             else // swap the ready future with the new one
             {
-                std::swap(*iterator, fObj);
+                std::swap(*iterator, pair);
             }
         }
 
@@ -265,7 +273,7 @@ namespace cppmicroservices
                     {
                         /*
                          * task was already executed, by WaitForFuture, calling it
-                         * again will throw. This isexpected, we can just catch and continue
+                         * again will throw. This is expected, we can just catch and continue
                          */
                     }
                 });
@@ -350,7 +358,7 @@ namespace cppmicroservices
                         {
                             /*
                              * task was already executed, by WaitForFuture, calling it
-                             * again will throw. This isexpected, we can just catch and continue
+                             * again will throw. This is expected, we can just catch and continue
                              */
                         }
                     });
@@ -358,7 +366,7 @@ namespace cppmicroservices
                 asyncWorkService->post(std::move(post_task));
 
                 auto fut = disabledState->GetFuture();
-                AccumulateFuture(fut);
+                AccumulateFuture(fut, asyncStarted);
                 return fut;
             }
             // return the stored future in the current disabled state object

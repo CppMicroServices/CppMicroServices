@@ -163,7 +163,7 @@ namespace cppmicroservices
              * by the given future. If none of the futures are ready, the given future
              * is added to the vector.
              */
-            void AccumulateFuture(std::shared_future<void> fObj);
+            void AccumulateFuture(std::shared_future<void> fObj, std::shared_ptr<std::atomic<bool>> asyncStarted);
 
             /**
              * Method used to set the state of this object. It invokes the std::atomic
@@ -218,9 +218,11 @@ namespace cppmicroservices
           private:
             FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
             std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<ActualTask>>
-                asyncTaskMap; // map storing the task associated with each atomic_bool for tasks posted to the thread pool
+                asyncTaskMap; // map storing the task associated with each atomic_bool for tasks posted to the thread
+                              // pool
             std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<CMEnabledState>>
-                asyncTaskStateMap; // map storing the state associated with each task for tasks posted to the thread pool
+                asyncTaskStateMap; // map storing the state associated with each task for tasks posted to the thread
+                                   // pool
             std::shared_ptr<ComponentRegistry> const
                 registry; ///< component registry associated with the current runtime
             std::shared_ptr<metadata::ComponentMetadata const> const compDesc; ///< the component description
@@ -228,8 +230,8 @@ namespace cppmicroservices
             std::shared_ptr<cppmicroservices::logservice::LogService> const
                 logger;                                   ///< logger associated with the current runtime
             std::shared_ptr<ComponentManagerState> state; ///< This member is always accessed using atomic operations
-            std::vector<std::shared_future<void>>
-                disableFutures;      ///< futures created when the component transitioned to \c DISABLED state
+            std::vector<std::pair<std::shared_future<void>, std::shared_ptr<std::atomic<bool>>>>
+                    disableFutures;  ///< futures created when the component transitioned to \c DISABLED state
             std::mutex futuresMutex; ///< mutex to protect the #disableFutures member
             std::shared_ptr<cppmicroservices::async::AsyncWorkService>
                 asyncWorkService; ///< work service to execute async work

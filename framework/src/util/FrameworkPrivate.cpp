@@ -25,6 +25,7 @@ limitations under the License.
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
+#include "cppmicroservices/detail/ScopeGuard.h"
 
 #include "BundleContextPrivate.h"
 #include "BundleStorage.h"
@@ -284,8 +285,17 @@ namespace cppmicroservices
                 operation = OP_DEACTIVATING;
                 state = Bundle::STATE_STOPPING;
             }
-            coreCtx->listeners.BundleChanged(
-                BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
+
+            {
+                // after BundleChanged notifications are sent out, we want to mark the framework as stopped, even if
+                // there is a security exception thrown by the user callback
+                detail::ScopeGuard sg([this]()
+                                      { auto lock = coreCtx->SetFrameworkStateAndBlockUntilComplete(true); });
+
+                coreCtx->listeners.BundleChanged(
+                    BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
+            }
+
             if (wasActive)
             {
                 StopAllBundles();
@@ -294,7 +304,6 @@ namespace cppmicroservices
             {
                 auto l = Lock();
                 US_UNUSED(l);
-                auto writerLock = coreCtx->SetFrameworkStateAndBlockUntilComplete(true);
                 coreCtx->Uninit1();
                 ShutdownDone_unlocked(restart);
             }

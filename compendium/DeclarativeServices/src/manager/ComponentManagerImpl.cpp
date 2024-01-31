@@ -24,6 +24,7 @@
 #include "ConcurrencyUtil.hpp"
 #include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/detail/ScopeGuard.h"
 #include "states/CMDisabledState.hpp"
 #include "states/ComponentManagerState.hpp"
 #include <cassert>
@@ -34,29 +35,6 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
-
-        struct MapScopeGuard
-        {
-            MapScopeGuard(
-                std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<ActualTask>>* taskMap,
-                std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<CMEnabledState>>* stateMap,
-                std::shared_ptr<std::atomic<bool>> key)
-                : tM(taskMap)
-                , sM(stateMap)
-                , k(key)
-            {
-            }
-            ~MapScopeGuard()
-            {
-                tM->erase(k);
-                sM->erase(k);
-            }
-
-            std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<ActualTask>>* tM;
-            std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<CMEnabledState>>* sM;
-            std::shared_ptr<std::atomic<bool>> k;
-        };
-
         ComponentManagerImpl::ComponentManagerImpl(
             std::shared_ptr<metadata::ComponentMetadata const> metadata,
             std::shared_ptr<ComponentRegistry> registry,
@@ -102,8 +80,13 @@ namespace cppmicroservices
         ComponentManagerImpl::WaitForFuture(std::shared_future<void>& fut,
                                             std::shared_ptr<std::atomic<bool>> asyncStarted)
         {
-            // ensure that asyncTaskMap and asyncTaskStateMap are cleared even if task
-            MapScopeGuard guard(&asyncTaskMap, &asyncTaskStateMap, asyncStarted);
+            // ensure that asyncTaskMap and asyncTaskStateMap are cleared even if task throws
+            detail::ScopeGuard sg(
+                [this, asyncStarted]()
+                {
+                    asyncTaskMap.erase(asyncStarted);
+                    asyncTaskStateMap.erase(asyncStarted);
+                });
 
             // if we hit the timeout
             if (fut.wait_for(std::chrono::milliseconds(50)) == std::future_status::timeout)
@@ -205,8 +188,7 @@ namespace cppmicroservices
             std::pair<std::shared_future<void>, std::shared_ptr<std::atomic<bool>>> pair
                 = std::make_pair(fObj, asyncStarted);
             std::lock_guard<std::mutex> lk(futuresMutex);
-            auto iterator
-                = std::find_if(disableFutures.begin(), disableFutures.end(), isReady);
+            auto iterator = std::find_if(disableFutures.begin(), disableFutures.end(), isReady);
             if (iterator == disableFutures.end())
             {
                 disableFutures.push_back(pair);
@@ -254,16 +236,16 @@ namespace cppmicroservices
 
             std::shared_ptr<CMEnabledState> enabledState = std::make_shared<CMEnabledState>(task.get_future().share());
 
-            auto taskPtr_ = std::make_shared<ActualTask>(std::move(task));
+            auto taskPtr = std::make_shared<ActualTask>(std::move(task));
 
             // if blocking, cache task and enabledState
             if (asyncStarted)
             {
-                asyncTaskMap[asyncStarted] = taskPtr_;
+                asyncTaskMap[asyncStarted] = taskPtr;
                 asyncTaskStateMap[asyncStarted] = enabledState;
             }
             PostTask post_task(
-                [enabledState, taskPtr = taskPtr_]() mutable
+                [enabledState, taskPtr]() mutable
                 {
                     try
                     {
@@ -339,16 +321,16 @@ namespace cppmicroservices
                 std::shared_ptr<CMEnabledState> currEnabledState
                     = std::dynamic_pointer_cast<CMEnabledState>(currentState);
 
-                auto taskPtr_ = std::make_shared<ActualTask>(std::move(task));
+                auto taskPtr = std::make_shared<ActualTask>(std::move(task));
                 // if blocking, cache task and enabledState
                 if (asyncStarted)
                 {
-                    asyncTaskMap[asyncStarted] = taskPtr_;
+                    asyncTaskMap[asyncStarted] = taskPtr;
                     asyncTaskStateMap[asyncStarted] = currEnabledState;
                 }
                 // this task goes to async queue, we wan't to check if it is already executed
                 PostTask post_task(
-                    [currEnabledState, taskPtr = taskPtr_]() mutable
+                    [currEnabledState, taskPtr]() mutable
                     {
                         try
                         {

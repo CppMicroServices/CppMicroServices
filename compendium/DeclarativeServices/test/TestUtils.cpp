@@ -58,13 +58,14 @@ namespace test
     std::unordered_map<std::string, std::string>
     GetPathInfo()
     {
-        std::unordered_map<std::string, std::string> a;
-        a["libPath"] = cppmicroservices::testing::LIB_PATH;
-        a["dirSep"] = cppmicroservices::util::DIR_SEP;
-        a["usLibPrefix"] = US_LIB_PREFIX;
-        a["usLibPostfix"] = US_LIB_POSTFIX;
-        a["usLibExt"] = US_LIB_EXT;
-        return a;
+        std::unordered_map<std::string, std::string> pathInfo = {
+            {     "libPath",             cppmicroservices::testing::LIB_PATH},
+            {      "dirSep", std::to_string(cppmicroservices::util::DIR_SEP)},
+            { "usLibPrefix",                                   US_LIB_PREFIX},
+            {"usLibPostfix",                                  US_LIB_POSTFIX},
+            {    "usLibExt",                                      US_LIB_EXT}
+        };
+        return pathInfo;
     }
 
     void

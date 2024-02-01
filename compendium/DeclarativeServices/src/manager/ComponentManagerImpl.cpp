@@ -88,8 +88,9 @@ namespace cppmicroservices
                     asyncTaskStateMap.erase(asyncStarted);
                 });
 
+            auto timeout = std::chrono::milliseconds(50);
             // if we hit the timeout
-            if (fut.wait_for(std::chrono::milliseconds(50)) == std::future_status::timeout)
+            if (fut.wait_for(timeout) == std::future_status::timeout)
             {
                 // we expect that the asyncStarted is false -- i.e. stalled
                 auto expected = false;

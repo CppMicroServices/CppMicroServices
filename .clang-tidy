@@ -1,5 +1,5 @@
 ---
-Checks:          '-*,bugprone-*,cppcoreguidelines-*,modernize-*,concurrency-*'
+Checks:          '-*,bugprone-*,cppcoreguidelines-*,modernize-*,concurrency-*,-modernize-use-trailing-return-type'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle:     file

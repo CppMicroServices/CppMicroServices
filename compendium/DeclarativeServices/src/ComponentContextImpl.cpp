@@ -343,13 +343,13 @@ namespace cppmicroservices
                 auto mgrs = reg->GetComponentManagers(GetBundleId());
                 for (auto& mgr : mgrs)
                 {
-                    mgr->Enable(nullptr);
+                    mgr->Enable();
                 }
             }
             else
             {
                 auto mgr = reg->GetComponentManager(GetBundleId(), name);
-                mgr->Enable(nullptr);
+                mgr->Enable();
             }
         }
 
@@ -366,7 +366,7 @@ namespace cppmicroservices
             if (reg)
             {
                 auto cm = reg->GetComponentManager(GetBundleId(), name);
-                cm->Disable(nullptr);
+                cm->Disable();
             }
         }
 

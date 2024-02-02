@@ -92,11 +92,11 @@ namespace cppmicroservices
              * If returned future IS blocked on: create asyncStarted value and pass in on calling thread.
              * Once the future is returned, call WaitForFuture() with the returned future and your asyncStarted value
              *
-             * If future IS NOT blocked on: call Enable with nullptr as input, no other action is required
+             * If future IS NOT blocked on: call Enable(), or explicitly Enable(nullptr), no other action is required
              * \endparblock
              * \return std::shared_future<void> assosciated with the state change
              */
-            virtual std::shared_future<void> Enable(std::shared_ptr<std::atomic<bool>> asyncStarted) = 0;
+            virtual std::shared_future<void> Enable(std::shared_ptr<std::atomic<bool>> asyncStarted = nullptr) = 0;
 
             /**
              * This method changes the state of the ComponentManager to DISABLED. The method returns
@@ -108,11 +108,11 @@ namespace cppmicroservices
              * If future IS blocked on: create asyncStarted value and pass in on calling thread.
              * Once the future is returned, call WaitForFuture() with the returned future and your asyncStarted value
              *
-             * If future IS NOT blocked on: call Enable with nullptr as input, no other action is required.
+             * If future IS NOT blocked on: call Disable(), or explicitly Disable(nullptr), no other action is required
              * \endparblock
              * \return std::shared_future<void> assosciated with the state change
              */
-            virtual std::shared_future<void> Disable(std::shared_ptr<std::atomic<bool>> asyncStarted) = 0;
+            virtual std::shared_future<void> Disable(std::shared_ptr<std::atomic<bool>> asyncStarted = nullptr) = 0;
 
             /**
              * Returns a vector of ComponentConfiguration objects representing each of the configurations

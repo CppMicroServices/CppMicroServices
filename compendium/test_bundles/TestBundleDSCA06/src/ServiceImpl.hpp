@@ -11,7 +11,7 @@ namespace sample
         , public cppmicroservices::service::cm::ManagedService
     {
       public:
-        ServiceComponentCA06() {}
+        ServiceComponentCA06() = default;
         void Updated(cppmicroservices::AnyMap const& properties) override;
         ~ServiceComponentCA06() = default;
         int

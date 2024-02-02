@@ -69,7 +69,7 @@ namespace cppmicroservices
              * the task on current thread if the thread pool has stalled
              */
             void WaitForFuture(std::shared_future<void>& fut,
-                               std::shared_ptr<std::atomic<bool>> asyncStarted = nullptr) override;
+                               std::shared_ptr<std::atomic<bool>> asyncStarted) override;
             /**
              * Initialization method used to kick start the state machine implemented by this class.
              */
@@ -83,12 +83,12 @@ namespace cppmicroservices
             /** @copydoc ComponentManager::Enable()
              * Delegates the call to the current state object passing in the synchronizing atomic bool
              */
-            std::shared_future<void> Enable(std::shared_ptr<std::atomic<bool>> asyncStarted) override;
+            std::shared_future<void> Enable(std::shared_ptr<std::atomic<bool>> asyncStarted = nullptr) override;
 
             /** @copydoc ComponentManager::Disable()
              * Delegates the call to the current state object passing in the synchronizing atomic bool
              */
-            std::shared_future<void> Disable(std::shared_ptr<std::atomic<bool>> asyncStarted) override;
+            std::shared_future<void> Disable(std::shared_ptr<std::atomic<bool>> asyncStarted = nullptr) override;
 
             /** @copydoc ComponentManager::GetComponentConfigurations()
              * Delegates the call to the current state object

@@ -286,21 +286,17 @@ namespace cppmicroservices
                 state = Bundle::STATE_STOPPING;
             }
 
-            {
-                // after BundleChanged notifications are sent out, we want to mark the framework as stopped, even if
-                // there is a security exception thrown by the user callback
-                detail::ScopeGuard sg([this]()
-                                      { auto lock = coreCtx->SetFrameworkStateAndBlockUntilComplete(true); });
-
-                coreCtx->listeners.BundleChanged(
-                    BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
-            }
+            coreCtx->listeners.BundleChanged(
+                BundleEvent(BundleEvent::BUNDLE_STOPPING, MakeBundle(this->shared_from_this())));
 
             if (wasActive)
             {
                 StopAllBundles();
             }
-            coreCtx->Uninit0();
+            {
+                auto lock = coreCtx->SetFrameworkStateAndBlockUntilComplete(true);
+                coreCtx->Uninit0();
+            }
             {
                 auto l = Lock();
                 US_UNUSED(l);

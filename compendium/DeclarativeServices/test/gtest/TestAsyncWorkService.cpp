@@ -80,18 +80,6 @@ namespace test
         cppmicroservices::Framework framework;
     };
 
-    class AsyncWorkServiceInline : public cppmicroservices::async::AsyncWorkService
-    {
-      public:
-        AsyncWorkServiceInline() : cppmicroservices::async::AsyncWorkService() {}
-
-        void
-        post(std::packaged_task<void()>&& task) override
-        {
-            task();
-        }
-    };
-
     class AsyncWorkServiceThreadPool : public cppmicroservices::async::AsyncWorkService
     {
       public:
@@ -300,7 +288,6 @@ namespace test
     INSTANTIATE_TEST_SUITE_P(AsyncWorkServiceEndToEndParameterized,
                              TestAsyncWorkServiceEndToEnd,
                              testing::Values(
-                                 // std::make_shared<AsyncWorkServiceInline>(),
                                  std::make_shared<AsyncWorkServiceThreadPool>(1),
                                  std::make_shared<AsyncWorkServiceThreadPool>(8),
                                  std::make_shared<AsyncWorkServiceThreadPool>(20)));

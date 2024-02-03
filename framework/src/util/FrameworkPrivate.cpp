@@ -146,7 +146,6 @@ namespace cppmicroservices
     {
         auto l = Lock();
         US_UNUSED(l);
-        auto writerLock = coreCtx->SetFrameworkStateAndBlockUntilComplete(true);
         bool wasActive = false;
         switch (static_cast<Bundle::State>(state.load()))
         {
@@ -291,7 +290,10 @@ namespace cppmicroservices
             {
                 StopAllBundles();
             }
-            coreCtx->Uninit0();
+            {
+                auto lock = coreCtx->SetFrameworkStateAndBlockUntilComplete(true);
+                coreCtx->Uninit0();
+            }
             {
                 auto l = Lock();
                 US_UNUSED(l);

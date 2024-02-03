@@ -290,7 +290,10 @@ namespace cppmicroservices
             {
                 StopAllBundles();
             }
-            coreCtx->Uninit0();
+            {
+                auto lock = coreCtx->SetFrameworkStateAndBlockUntilComplete(true);
+                coreCtx->Uninit0();
+            }
             {
                 auto l = Lock();
                 US_UNUSED(l);

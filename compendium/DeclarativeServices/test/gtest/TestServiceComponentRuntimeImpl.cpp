@@ -264,7 +264,7 @@ namespace cppmicroservices
             EXPECT_CALL(*mockRegistry, GetComponentManager(21, "FooBar"))
                 .Times(1)
                 .WillRepeatedly(testing::Return(mockCompMgr));
-            EXPECT_CALL(*mockCompMgr, Enable()).Times(1).WillOnce(testing::Return(promise.get_future().share()));
+            EXPECT_CALL(*mockCompMgr, Enable(testing::_)).Times(1).WillOnce(testing::Return(promise.get_future().share()));
             EXPECT_NO_THROW({ auto fut = service.EnableComponent(compDescDTO); });
 
             compDescDTO.bundle.id = 23;
@@ -288,7 +288,7 @@ namespace cppmicroservices
             EXPECT_CALL(*mockRegistry, GetComponentManager(21, "FooBar"))
                 .Times(1)
                 .WillRepeatedly(testing::Return(mockCompMgr));
-            EXPECT_CALL(*mockCompMgr, Disable()).Times(1).WillOnce(testing::Return(promise.get_future().share()));
+            EXPECT_CALL(*mockCompMgr, Disable(testing::_)).Times(1).WillOnce(testing::Return(promise.get_future().share()));
             EXPECT_NO_THROW({ auto fut = service.DisableComponent(compDescDTO); });
 
             compDescDTO.bundle.id = 23;

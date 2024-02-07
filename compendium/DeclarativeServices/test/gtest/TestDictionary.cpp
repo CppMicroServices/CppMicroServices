@@ -30,12 +30,96 @@
 
 namespace test
 {
+    class TestDictionaryFixture : public ::testing::Test
+    {
+      public:
+        TestDictionaryFixture() : ::testing::Test(), framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
 
+        void
+        SetUp() override 
+        {
+            framework.Start();
+            context = framework.GetBundleContext();
+
+#if defined(US_BUILD_SHARED_LIBS)
+            auto dsPluginPath = test::GetDSRuntimePluginFilePath();
+            auto dsbundles = context.InstallBundles(dsPluginPath);
+            for (auto& bundle : dsbundles)
+            {
+                bundle.Start();
+            }
+
+            test::InstallLib(context, "DSFrenchDictionary");
+            test::InstallLib(context, "EnglishDictionary");
+            test::InstallLib(context, "DSSpellChecker");
+#endif
+
+#ifndef US_BUILD_SHARED_LIBS
+            auto dsbundles = context.GetBundles();
+            for (auto& bundle : dsbundles)
+            {
+                try
+                {
+                    bundle.Start();
+                }
+                catch (std::exception& e)
+                {
+                    std::cerr << "    " << e.what();
+                }
+                std::cerr << std::endl;
+            }
+#endif
+            auto sRef = context.GetServiceReference<scr::ServiceComponentRuntime>();
+            ASSERT_TRUE(sRef);
+            dsRuntimeService = context.GetService<scr::ServiceComponentRuntime>(sRef);
+            ASSERT_TRUE(dsRuntimeService);
+        }
+
+        void
+        TearDown() override
+        {
+            framework.Stop();
+            framework.WaitForStop(std::chrono::milliseconds::zero());
+        }
+
+        cppmicroservices::Bundle
+        GetTestBundle(std::string const& symbolicName)
+        {
+            auto bundles = context.GetBundles();
+
+            for (auto& bundle : bundles)
+            {
+                auto bundleSymbolicName = bundle.GetSymbolicName();
+                if (symbolicName == bundleSymbolicName)
+                {
+                    return bundle;
+                }
+            }
+            return cppmicroservices::Bundle();
+        }
+
+        cppmicroservices::Bundle
+        StartTestBundle(std::string const& symName)
+        {
+            cppmicroservices::Bundle testBundle = GetTestBundle(symName);
+            EXPECT_EQ(static_cast<bool>(testBundle), true);
+            testBundle.Start();
+            EXPECT_EQ(testBundle.GetState(), cppmicroservices::Bundle::STATE_ACTIVE)
+                << " failed to start bundle with symbolic name" + symName;
+            return testBundle;
+        }
+
+      protected:
+        std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
+        cppmicroservices::Framework framework;
+        cppmicroservices::BundleContext context;
+
+    };
     /**
      * Verify Spellcheck service works as expected with a Dictionary service from a
      * DS bundle and a non-DS bundle
      */
-    TEST_F(tServiceComponent, DISABLED_testDictionaryExample) // DS_TOI_50
+    TEST_F(TestDictionaryFixture, testDictionaryExample) // DS_TOI_50
     {
 
         auto ctxt = framework.GetBundleContext();
@@ -61,7 +145,7 @@ namespace test
         auto token = ctxt.AddServiceListener(
             [&](cppmicroservices::ServiceEvent const& evt)
             {
-                if ((evt.GetType() == cppmicroservices::ServiceEvent::SERVICE_UNREGISTERING)
+                if ((evt.GetType() & cppmicroservices::ServiceEvent::SERVICE_UNREGISTERING)
                     && (spellCheckServiceId == GetServiceId(evt.GetServiceReference())))
                 {
                     std::unique_lock<std::mutex> lk(mtx);
@@ -97,7 +181,7 @@ namespace test
         auto token1 = ctxt.AddServiceListener(
             [&](cppmicroservices::ServiceEvent const& evt)
             {
-                if (evt.GetType() == cppmicroservices::ServiceEvent::SERVICE_REGISTERED
+                if (evt.GetType() & cppmicroservices::ServiceEvent::SERVICE_REGISTERED
                     && evt.GetServiceReference().GetBundle() == spellcheckerBundle)
                 {
                     {

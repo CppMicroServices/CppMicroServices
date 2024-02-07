@@ -95,7 +95,7 @@ namespace cppmicroservices
                          * This is declared in the \c enabled attribute of the
                          * \c component element.
                          */
-                        bool defaultEnabled;
+                        bool defaultEnabled = false;
 
                         /**
                          * The immediate state.
@@ -104,7 +104,7 @@ namespace cppmicroservices
                          * This is declared in the \c immediate attribute of the
                          * \c component element.
                          */
-                        bool immediate;
+                        bool immediate = false;
 
                         /**
                          * The fully qualified names of the service interfaces.

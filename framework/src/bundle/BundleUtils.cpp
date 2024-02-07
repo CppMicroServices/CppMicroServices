@@ -21,13 +21,7 @@
 =============================================================================*/
 
 #include "BundleUtils.h"
-
-#include "cppmicroservices/GetBundleContext.h"
-#include "cppmicroservices/detail/Log.h"
-
-#include "BundleContextPrivate.h"
-#include "BundlePrivate.h"
-#include "CoreBundleContext.h"
+#include <cppmicroservices/GlobalConfig.h>
 
 #ifdef US_PLATFORM_WINDOWS
 
@@ -80,22 +74,6 @@ dlsym(void* handle, char const* symbol)
 namespace cppmicroservices
 {
 
-    // Private util function to return system bundle's log sink
-    std::shared_ptr<detail::LogSink>
-    GetFrameworkLogSink()
-    {
-        auto bundle_ = GetPrivate(GetBundleContext())->bundle.lock();
-        if (bundle_)
-        {
-            // The following is a hack, we need a cleaner solution in the future
-            return bundle_->coreCtx->sink;
-        }
-        else
-        {
-            return nullptr;
-        }
-    }
-
     namespace BundleUtils
     {
 
@@ -107,14 +85,14 @@ namespace cppmicroservices
         }
 
         void*
-        GetSymbol(void* libHandle, char const* symbol)
+        GetSymbol(void* libHandle, char const* symbol, std::string& errmsg)
         {
             void* addr = libHandle ? dlsym(libHandle, symbol) : nullptr;
             if (!addr)
             {
                 const std::string dlerrorMsg = dlerror();
-                DIAG_LOG(*GetFrameworkLogSink()) << "GetSymbol() failed to find (" << symbol
-                                                 << ") with error : " << (!dlerrorMsg.empty() ? dlerrorMsg : "unknown");
+                errmsg += "GetSymbol() failed to find (" + std::string { symbol }
+                          + ") with error : " + (!dlerrorMsg.empty() ? dlerrorMsg : "unknown");
             }
             return addr;
         }

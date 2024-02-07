@@ -52,7 +52,7 @@ namespace codegen
             std::string name;
             std::string implClassName;
             std::string configurationPolicy;
-            bool injectReferences;
+            bool injectReferences = false;
             ServiceInfo service;
             std::vector<ReferenceInfo> references;
             static const std::string CONFIG_POLICY_IGNORE;

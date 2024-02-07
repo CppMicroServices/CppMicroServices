@@ -33,6 +33,3 @@ mutex:Framework_LifeCycle_Test::TestBody
 # Assignment in FrameworkPrivate::WaitForStop and FrameworkPrivate::SystemShuttingdownDone_unlocked
 # to stopEvent, both protected, TSAN false-positive
 race:Framework_LifeCycle_Test::TestBody
-
-# Potential Deadlock in CCACtiveState
-deadlock:cppmicroservices::scrimpl::CCActiveState::Activate

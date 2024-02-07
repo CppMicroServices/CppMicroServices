@@ -81,8 +81,7 @@ namespace test
             {
                 bundle.Start();
             }
-            test::InstallLib(context, "DSFrenchDictionary");
-            test::InstallLib(context, "EnglishDictionary");
+
             test::InstallLib(context, "TestBundleDSTOI1");
             test::InstallLib(context, "TestBundleDSTOI2");
             test::InstallLib(context, "TestBundleDSTOI3");
@@ -97,6 +96,9 @@ namespace test
             test::InstallLib(context, "TestBundleDSTOI16");
             test::InstallLib(context, "TestBundleDSTOI18");
             test::InstallLib(context, "TestBundleDSTOI19");
+            test::InstallLib(context, "TestBundleDSTOI20");
+            test::InstallLib(context, "TestBundleDSTOI21");
+            test::InstallLib(context, "TestBundleDSTOI22");
             test::InstallLib(context, "TestBundleDSCA01");
             test::InstallLib(context, "TestBundleDSCA02");
             test::InstallLib(context, "TestBundleDSCA03");
@@ -215,7 +217,6 @@ namespace test
         }
 
         std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
-        // std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin>  configAdminService;
         cppmicroservices::Framework framework;
         cppmicroservices::BundleContext context;
     };

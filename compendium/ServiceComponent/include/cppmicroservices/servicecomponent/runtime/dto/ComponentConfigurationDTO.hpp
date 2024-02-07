@@ -96,7 +96,7 @@ namespace cppmicroservices
                          * {@link #ComponentState::UNSATISFIED_REFERENCE}, {@link #ComponentState::SATISFIED} or {@link
                          * #ComponentState::ACTIVE}.
                          */
-                        ComponentState state;
+                        ComponentState state = ComponentState::UNSATISFIED_REFERENCE;
 
                         /**
                          * The id of the component configuration.
@@ -107,7 +107,7 @@ namespace cppmicroservices
                          * of this field is unspecified if the state of this component configuration
                          * is unsatisfied.
                          */
-                        unsigned long id;
+                        unsigned long id = 0;
 
                         /**
                          * The component properties for the component configuration.

@@ -6,6 +6,37 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+`v3.8.1 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.1>`_ (2024-2-8)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.0...3.8.1>`_
+
+Added
+-----
+- `[Core Framework] Added Testing section to documentation <https://github.com/CppMicroServices/CppMicroServices/pull/960>`_
+- `[Declarative Services] Reenable test for Dictionary <https://github.com/CppMicroServices/CppMicroServices/pull/965>`_
+
+Changed
+-------
+- `[Core Framework] Remove export of miniz symbols <https://github.com/CppMicroServices/CppMicroServices/pull/966>`_
+
+Removed
+-------
+- `[Core Framework] TSAN suppression of CCActiveState deadlock <https://github.com/CppMicroServices/CppMicroServices/pull/964>`_
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Declarative Services] Fix GetBundleContext when using DS <https://github.com/CppMicroServices/CppMicroServices/pull/947>`_
+- `[Core Framework] Fix code scan warnings <https://github.com/CppMicroServices/CppMicroServices/pull/969>`_
+- `[Core Framework] Fix more code scan warnings <https://github.com/CppMicroServices/CppMicroServices/pull/973>`_
+- `[Core Framework] Fixed uninitialized vars warnings <https://github.com/CppMicroServices/CppMicroServices/pull/978>`_
+- `[Core Framework] Ensure that Bundle.start() throws after framework has stopped <https://github.com/CppMicroServices/CppMicroServices/pull/979>`_
+- `[Core Framework] Ensure safe concurrent destruction of bundles and framework stopping <https://github.com/CppMicroServices/CppMicroServices/pull/983>`_
+- `[Core Framework] Fix for concurrent Bundle.start() and framework stop <https://github.com/CppMicroServices/CppMicroServices/pull/990>`_
+
 `v3.8.0 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.0>`_ (2023-12-06)
 ---------------------------------------------------------------------------------------------------------
 

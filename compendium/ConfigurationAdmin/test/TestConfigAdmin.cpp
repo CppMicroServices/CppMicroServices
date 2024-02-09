@@ -8,7 +8,10 @@
 #include <cppmicroservices/cm/ConfigurationAdmin.hpp>
 #include <cppmicroservices/util/FileSystem.h>
 
+#include "cppmicroservices/LDAPFilter.h"
+#include "cppmicroservices/LDAPProp.h"
 #include <cppmicroservices/cm/ManagedService.hpp>
+#include <cppmicroservices/cm/ManagedServiceFactory.hpp>
 
 #include "TestInterfaces/Interfaces.hpp"
 
@@ -303,6 +306,46 @@ TEST_F(ConfigAdminTests, testInstallAndStart)
 
     auto const factory = getManagedServiceFactory(ctx);
     EXPECT_NE(factory, nullptr) << "Couldn't obtain test managed service factory implementation";
+}
+
+TEST_F(ConfigAdminTests, testManagedFactory)
+{
+    auto f = GetFramework();
+    auto ctx = f.GetBundleContext();
+
+    // Start the ManagedServiceFactory for cm.testfactory. Since the
+    // cm.testfactory~0 instance has not yet been updated, no Update
+    // notification will be sent to the ManagedServiceFactory.
+    installAndStartTestBundles(ctx, "ManagedFactoryCMTest");
+
+    auto serviceFactoryConfig = m_configAdmin->GetFactoryConfiguration("cm.testFactoryFailure", "1");
+
+    EXPECT_NE(serviceFactoryConfig, nullptr);
+    auto props = serviceFactoryConfig->GetProperties();
+    ASSERT_EQ(props["serID"], 1);
+    ASSERT_EQ(props["myBool"], true);
+    serviceFactoryConfig->Update(std::move(props)).get();
+
+    auto serviceFactoryConfig1 = m_configAdmin->GetFactoryConfiguration("cm.testFactoryFailure", "1234");
+    if (serviceFactoryConfig1)
+    {
+        ::cppmicroservices::AnyMap configurationMap = std::unordered_map<std::string, cppmicroservices::Any> {
+            std::make_pair<std::string, cppmicroservices::Any>("serID", std::string("1234"))
+        };
+        auto fut = serviceFactoryConfig1->UpdateIfDifferent(std::move(configurationMap));
+        fut.second.get();
+    }
+    auto props1 = serviceFactoryConfig1->GetProperties();
+    props = serviceFactoryConfig->GetProperties();
+
+    ASSERT_EQ(props["serID"], 1);
+
+    cppmicroservices::LDAPFilter filter(cppmicroservices::LDAPProp("serID") == 1);
+    auto sr = ctx.GetServiceReferences<::test::TestManagedServiceFactoryServiceInterface>(filter.ToString());
+    ASSERT_TRUE(sr.size() == 1 && sr[0]);
+    auto service = ctx.GetService<::test::TestManagedServiceFactoryServiceInterface>(sr[0]);
+
+    ASSERT_EQ(service->getValue(), 1);
 }
 
 TEST_F(ConfigAdminTests, testServiceUpdated)

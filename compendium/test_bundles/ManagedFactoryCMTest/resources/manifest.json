@@ -1,0 +1,32 @@
+{
+    "bundle.symbolic_name": "ManagedFactoryCMTest",
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "immediate": true,
+                "implementation-class": "cppmicroservices::service::cm::test::TestManagedFactoryImpl",
+                "properties": {
+                    "service.pid": "cm.testFactoryFailure"
+                },
+                "service": {
+                    "interfaces": [
+                        "cppmicroservices::service::cm::ManagedServiceFactory"
+                    ]
+                }
+            }
+        ]
+    },
+    "cm": {
+        "version": 1,
+        "configurations": [
+            {
+                "pid": "cm.testFactoryFailure~1",
+                "properties": {
+                    "serID": 1,
+                    "myBool": true
+                }
+            }
+        ]
+    }
+}

@@ -122,6 +122,7 @@ endif()
 
 set(_test_bundles
   ManagedServiceAndFactoryBundle
+  ManagedFactoryCMTest
   TestBundleManagedServiceFactory
   TestBundleMultipleManagedServiceFactory
   )

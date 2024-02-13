@@ -545,6 +545,9 @@ else()
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 
+  if(US_COMPILER_APPLE_CLANG AND US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+    set(ENV{ZERO_AR_DATE} 1)
+  endif()
 
   if(US_COMPILER_GNU_ARM)
     # arm gcc warns that several reinterpret_cast need increased alignemnt in reinterpret_cast<>

@@ -367,7 +367,7 @@ endif()
 # Set stack as non executable
 #-----------------------------------------------------------------------------
 
-# g3232705: Add flag to force non executable stack on gcc builds
+# Add flag to force non executable stack on gcc builds
 # The -Wl,-z noexecstack link option on all gcc builds will
 # disallow executable stacks within CppMicroServices.
 if(UNIX)

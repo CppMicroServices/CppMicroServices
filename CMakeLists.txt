@@ -370,7 +370,7 @@ endif()
 # Add flag to force non executable stack on gcc builds
 # The -Wl,-z noexecstack link option on all gcc builds will
 # disallow executable stacks within CppMicroServices.
-if(UNIX)
+if(UNIX AND NOT APPLE)
   link_libraries("-Wl,-z,noexecstack")
 endif()
 

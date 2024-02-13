@@ -254,6 +254,7 @@ us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
 us_cache_var(US_USE_SYSTEM_BOOST OFF BOOL "Build using an external Boost installation" ADVANCED)
+us_cache_var(US_USE_DETERMINISTIC_BUNDLE_BUILDS OFF BOOL "Build bundles deterministically" ADVANCED)
 
 set(_us_build_shared ${BUILD_SHARED_LIBS})
 
@@ -494,6 +495,11 @@ set(US_CXX_UBSAN_FLAGS "")
 set(US_UBSAN_LINK_FLAGS "")
 
 if(MSVC)
+  # Allow forcing of bundle builds to be deterministic
+  if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} -DUS_DETERMINISTIC_MINIZ_ZIP_FILES")
+  endif()
+
   # Since we are compiling with boost, there exists some code which looks
   # at the value of this define. Since we previously did not specify the
   # define, boost assumed a value (0x0601, meaning Windows 7). We will
@@ -720,6 +726,12 @@ if(NOT MSVC)
 
   if (US_ENABLE_UBSAN AND US_CXX_UBSAN_FLAGS)
     set(US_UBSAN_LINK_FLAGS "-fsanitize=undefined")
+  endif()
+else()
+  # Force MSVC compiler to use deterministic timestamp when linking
+  # shared libraries.
+  if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /Brepro" CACHE STRING "Forced shared linker flags" FORCE)
   endif()
 endif()
 

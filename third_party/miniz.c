@@ -3464,6 +3464,14 @@ static mz_bool mz_zip_get_file_modified_time(const char *pFilename, MZ_TIME_T *p
 
 static mz_bool mz_zip_set_file_times(const char *pFilename, MZ_TIME_T access_time, MZ_TIME_T modified_time)
 {
+#ifdef US_DETERMINISTIC_MINIZ_ZIP_FILES
+    struct utimbuf t;
+    memset(&t, 0, sizeof(t));
+    t.actime = 0;
+    t.modtime = 0;
+
+    return !utime(pFilename, &t);
+#else
     struct utimbuf t;
 
     memset(&t, 0, sizeof(t));
@@ -3471,6 +3479,7 @@ static mz_bool mz_zip_set_file_times(const char *pFilename, MZ_TIME_T access_tim
     t.modtime = modified_time;
 
     return !utime(pFilename, &t);
+#endif
 }
 #endif /* #ifndef MINIZ_NO_STDIO */
 #endif /* #ifndef MINIZ_NO_TIME */
@@ -6091,8 +6100,13 @@ static mz_bool mz_zip_writer_create_local_dir_header(mz_zip_archive *pZip, mz_ui
     MZ_WRITE_LE16(pDst + MZ_ZIP_LDH_VERSION_NEEDED_OFS, method ? 20 : 0);
     MZ_WRITE_LE16(pDst + MZ_ZIP_LDH_BIT_FLAG_OFS, bit_flags);
     MZ_WRITE_LE16(pDst + MZ_ZIP_LDH_METHOD_OFS, method);
+#ifdef US_DETERMINISTIC_MINIZ_ZIP_FILES
+    MZ_WRITE_LE16(pDst + MZ_ZIP_LDH_FILE_TIME_OFS, 0);
+    MZ_WRITE_LE16(pDst + MZ_ZIP_LDH_FILE_DATE_OFS, 0);
+#else
     MZ_WRITE_LE16(pDst + MZ_ZIP_LDH_FILE_TIME_OFS, dos_time);
     MZ_WRITE_LE16(pDst + MZ_ZIP_LDH_FILE_DATE_OFS, dos_date);
+#endif    
     MZ_WRITE_LE32(pDst + MZ_ZIP_LDH_CRC32_OFS, uncomp_crc32);
     MZ_WRITE_LE32(pDst + MZ_ZIP_LDH_COMPRESSED_SIZE_OFS, MZ_MIN(comp_size, MZ_UINT32_MAX));
     MZ_WRITE_LE32(pDst + MZ_ZIP_LDH_DECOMPRESSED_SIZE_OFS, MZ_MIN(uncomp_size, MZ_UINT32_MAX));
@@ -6113,8 +6127,13 @@ static mz_bool mz_zip_writer_create_central_dir_header(mz_zip_archive *pZip, mz_
     MZ_WRITE_LE16(pDst + MZ_ZIP_CDH_VERSION_NEEDED_OFS, method ? 20 : 0);
     MZ_WRITE_LE16(pDst + MZ_ZIP_CDH_BIT_FLAG_OFS, bit_flags);
     MZ_WRITE_LE16(pDst + MZ_ZIP_CDH_METHOD_OFS, method);
+#ifdef US_DETERMINISTIC_MINIZ_ZIP_FILES
+    MZ_WRITE_LE16(pDst + MZ_ZIP_CDH_FILE_TIME_OFS, 0);
+    MZ_WRITE_LE16(pDst + MZ_ZIP_CDH_FILE_DATE_OFS, 0);
+#else
     MZ_WRITE_LE16(pDst + MZ_ZIP_CDH_FILE_TIME_OFS, dos_time);
     MZ_WRITE_LE16(pDst + MZ_ZIP_CDH_FILE_DATE_OFS, dos_date);
+#endif
     MZ_WRITE_LE32(pDst + MZ_ZIP_CDH_CRC32_OFS, uncomp_crc32);
     MZ_WRITE_LE32(pDst + MZ_ZIP_CDH_COMPRESSED_SIZE_OFS, MZ_MIN(comp_size, MZ_UINT32_MAX));
     MZ_WRITE_LE32(pDst + MZ_ZIP_CDH_DECOMPRESSED_SIZE_OFS, MZ_MIN(uncomp_size, MZ_UINT32_MAX));
@@ -6483,10 +6502,17 @@ mz_bool mz_zip_writer_add_mem_ex_v2(mz_zip_archive *pZip, const char *pArchive_n
                                                            (uncomp_size >= MZ_UINT32_MAX) ? &comp_size : NULL, (local_dir_header_ofs >= MZ_UINT32_MAX) ? &local_dir_header_ofs : NULL);
     }
 
+#ifdef US_DETERMINISTIC_MINIZ_ZIP_FILES
+    if (!mz_zip_writer_add_to_central_dir(pZip, pArchive_name, (mz_uint16)archive_name_size, pExtra_data, (mz_uint16)extra_size, pComment,
+                                          comment_size, uncomp_size, comp_size, uncomp_crc32, method, bit_flags, 0, 0, local_dir_header_ofs, ext_attributes,
+                                          user_extra_data_central, user_extra_data_central_len))
+        return MZ_FALSE;
+#else
     if (!mz_zip_writer_add_to_central_dir(pZip, pArchive_name, (mz_uint16)archive_name_size, pExtra_data, (mz_uint16)extra_size, pComment,
                                           comment_size, uncomp_size, comp_size, uncomp_crc32, method, bit_flags, dos_time, dos_date, local_dir_header_ofs, ext_attributes,
                                           user_extra_data_central, user_extra_data_central_len))
         return MZ_FALSE;
+#endif
 
     pZip->m_total_files++;
     pZip->m_archive_size = cur_archive_file_ofs;

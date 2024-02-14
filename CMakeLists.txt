@@ -487,6 +487,7 @@ if(MSVC)
   # Allow forcing of bundle builds to be deterministic
   if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} -DUS_DETERMINISTIC_MINIZ_ZIP_FILES")
+    set(US_C_FLAGS "${US_C_FLAGS} -DUS_DETERMINISTIC_MINIZ_ZIP_FILES")
   endif()
 
   # Since we are compiling with boost, there exists some code which looks
@@ -547,6 +548,11 @@ else()
 
   if(US_COMPILER_APPLE_CLANG AND US_USE_DETERMINISTIC_BUNDLE_BUILDS)
     set(ENV{ZERO_AR_DATE} 1)
+  endif()
+
+  if(NOT MSVC)
+    set(US_CXX_FLAGS "${US_CXX_FLAGS} -DUS_DETERMINISTIC_MINIZ_ZIP_FILES")
+    set(US_C_FLAGS "${US_C_FLAGS} -DUS_DETERMINISTIC_MINIZ_ZIP_FILES")
   endif()
 
   if(US_COMPILER_GNU_ARM)

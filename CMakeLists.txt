@@ -254,7 +254,7 @@ us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
 us_cache_var(US_USE_SYSTEM_BOOST OFF BOOL "Build using an external Boost installation" ADVANCED)
-us_cache_var(US_USE_DETERMINISTIC_BUNDLE_BUILDS ON BOOL "Build bundles deterministically" ADVANCED)
+us_cache_var(US_USE_DETERMINISTIC_BUNDLE_BUILDS OFF BOOL "Build bundles deterministically" ADVANCED)
 
 set(_us_build_shared ${BUILD_SHARED_LIBS})
 
@@ -546,6 +546,8 @@ else()
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 
+  # Force clang compiler to use deterministic timestamp when linking
+  # shared libraries.
   if(US_COMPILER_APPLE_CLANG AND US_USE_DETERMINISTIC_BUNDLE_BUILDS)
     set(ENV{ZERO_AR_DATE} 1)
   endif()

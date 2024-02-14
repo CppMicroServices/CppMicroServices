@@ -3464,14 +3464,6 @@ static mz_bool mz_zip_get_file_modified_time(const char *pFilename, MZ_TIME_T *p
 
 static mz_bool mz_zip_set_file_times(const char *pFilename, MZ_TIME_T access_time, MZ_TIME_T modified_time)
 {
-#ifdef US_DETERMINISTIC_MINIZ_ZIP_FILES
-    struct utimbuf t;
-    memset(&t, 0, sizeof(t));
-    t.actime = 0;
-    t.modtime = 0;
-
-    return !utime(pFilename, &t);
-#else
     struct utimbuf t;
 
     memset(&t, 0, sizeof(t));
@@ -3479,7 +3471,6 @@ static mz_bool mz_zip_set_file_times(const char *pFilename, MZ_TIME_T access_tim
     t.modtime = modified_time;
 
     return !utime(pFilename, &t);
-#endif
 }
 #endif /* #ifndef MINIZ_NO_STDIO */
 #endif /* #ifndef MINIZ_NO_TIME */
@@ -6502,17 +6493,10 @@ mz_bool mz_zip_writer_add_mem_ex_v2(mz_zip_archive *pZip, const char *pArchive_n
                                                            (uncomp_size >= MZ_UINT32_MAX) ? &comp_size : NULL, (local_dir_header_ofs >= MZ_UINT32_MAX) ? &local_dir_header_ofs : NULL);
     }
 
-#ifdef US_DETERMINISTIC_MINIZ_ZIP_FILES
-    if (!mz_zip_writer_add_to_central_dir(pZip, pArchive_name, (mz_uint16)archive_name_size, pExtra_data, (mz_uint16)extra_size, pComment,
-                                          comment_size, uncomp_size, comp_size, uncomp_crc32, method, bit_flags, 0, 0, local_dir_header_ofs, ext_attributes,
-                                          user_extra_data_central, user_extra_data_central_len))
-        return MZ_FALSE;
-#else
     if (!mz_zip_writer_add_to_central_dir(pZip, pArchive_name, (mz_uint16)archive_name_size, pExtra_data, (mz_uint16)extra_size, pComment,
                                           comment_size, uncomp_size, comp_size, uncomp_crc32, method, bit_flags, dos_time, dos_date, local_dir_header_ofs, ext_attributes,
                                           user_extra_data_central, user_extra_data_central_len))
         return MZ_FALSE;
-#endif
 
     pZip->m_total_files++;
     pZip->m_archive_size = cur_archive_file_ofs;

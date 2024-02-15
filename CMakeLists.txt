@@ -495,12 +495,6 @@ set(US_CXX_UBSAN_FLAGS "")
 set(US_UBSAN_LINK_FLAGS "")
 
 if(MSVC)
-  # Allow forcing of bundle builds to be deterministic
-  if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
-    set(US_CXX_FLAGS "${US_CXX_FLAGS} -DUS_DETERMINISTIC_MINIZ_ZIP_FILES")
-    set(US_C_FLAGS "${US_C_FLAGS} -DUS_DETERMINISTIC_MINIZ_ZIP_FILES")
-  endif()
-
   # Since we are compiling with boost, there exists some code which looks
   # at the value of this define. Since we previously did not specify the
   # define, boost assumed a value (0x0601, meaning Windows 7). We will
@@ -540,6 +534,10 @@ if(MSVC)
   endif()
 
   set(US_CXX_FLAGS "/MP /WX /D${msvc_version_define} ${US_CXX_FLAGS}")
+
+  # UTF-8 support
+  set(US_CXX_FLAGS "/source-charset:utf-8 /execution-charset:utf-8 ${US_CXX_FLAGS}")
+  set(US_C_FLAGS "/source-charset:utf-8 /execution-charset:utf-8 ${US_C_FLAGS}")
 else()
 
   # If not cross-compiling, turn on Stack Smashing Protection.
@@ -561,11 +559,6 @@ else()
   # shared libraries.
   if(US_COMPILER_APPLE_CLANG AND US_USE_DETERMINISTIC_BUNDLE_BUILDS)
     set(ENV{ZERO_AR_DATE} 1)
-  endif()
-
-  if(NOT MSVC)
-    set(US_CXX_FLAGS "${US_CXX_FLAGS} -DUS_DETERMINISTIC_MINIZ_ZIP_FILES")
-    set(US_C_FLAGS "${US_C_FLAGS} -DUS_DETERMINISTIC_MINIZ_ZIP_FILES")
   endif()
 
   if(US_COMPILER_GNU_ARM)
@@ -645,6 +638,12 @@ else()
   if(NOT US_CXX_COVERAGE_FLAGS AND US_ENABLE_COVERAGE)
     message(WARNING "Code coverage requested, but compiler does not recognize it")
   endif()
+endif()
+
+# Allow forcing of bundle builds to be deterministic
+if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+  set(US_CXX_FLAGS "${US_CXX_FLAGS} -DUS_DETERMINISTIC_MINIZ_ZIP_FILES")
+  set(US_C_FLAGS "${US_C_FLAGS} -DUS_DETERMINISTIC_MINIZ_ZIP_FILES")
 endif()
 
 if(MINGW)
@@ -777,6 +776,18 @@ if(APPLE AND CMAKE_GENERATOR MATCHES "Xcode")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${US_LINK_FLAGS}")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${US_LINK_FLAGS}")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${US_LINK_FLAGS}")
+endif()
+
+#-----------------------------------------------------------------------------
+# Deterministic builds environment variables
+#-----------------------------------------------------------------------------
+if(US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+  # On windows, setlocale() is used to set these variables in the ResourceCompiler
+  if(NOT MSVC)
+    set(ENV{LC_CTIME} "C date -u -d '1970-01-01'")
+    set(ENV{LC_CTYPE} "C.UTF-8")
+    set(ENV{LC_COLLATE} "fr_FR.UTF-8")
+  endif()
 endif()
 
 #-----------------------------------------------------------------------------

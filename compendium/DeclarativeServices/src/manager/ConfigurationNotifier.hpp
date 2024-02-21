@@ -105,7 +105,8 @@ namespace cppmicroservices
             void NotifyAllListeners(std::string const& pid,
                                     cppmicroservices::service::cm::ConfigurationEventType type,
                                     std::shared_ptr<cppmicroservices::AnyMap> properties,                                    
-                                    unsigned long const& changeCount);                         
+                                    unsigned long const& changeCount);  
+                       
             std::shared_ptr<ComponentFactoryImpl> GetComponentFactory();
             void LogInvalidDynamicTargetInProperties(cppmicroservices::AnyMap const& properties,
                                   std::shared_ptr<ComponentConfigurationImpl> mgr) const noexcept;

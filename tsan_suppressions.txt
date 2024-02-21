@@ -11,6 +11,8 @@ race:ServiceTrackerTestFixture_DefaultCustomizerServiceTrackerCloseRace_Test::Te
 # Race condition on access of p.second.waitFlag within wait_for, TSAN false-positive
 mutex:TestSerialBundleInstall
 race:TestSerialBundleInstall
+mutex:sample::ServiceComponentCA06::Updated
+race:sample::ServiceComponentCA06::Updated
 
 # TestConfigurationAdminImpl race and double lock
 

@@ -40,7 +40,7 @@ jobs:
 
   analyze_msvc:
     name: Analyze (MSVC Code Analysis)
-    runs-on: windows-2019
+    runs-on: windows-latest
     env:
       build: '${{ github.workspace }}/build'
       config: 'Debug'

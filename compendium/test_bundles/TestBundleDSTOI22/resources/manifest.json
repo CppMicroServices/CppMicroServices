@@ -1,0 +1,14 @@
+{
+    "bundle.symbolic_name" : "TestBundleDSTOI22",
+    "bundle.activator": true,
+    "scr" : {
+        "version" : 1,
+        "components" : [{
+            "immediate": false,
+            "implementation-class": "sample::ServiceComponent22",
+            "service": {
+              "interfaces": [ "test::TestInitialization" ]
+            }
+        }]
+    }
+}

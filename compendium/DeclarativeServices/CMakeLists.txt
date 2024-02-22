@@ -39,12 +39,12 @@ add_compile_definitions(BOOST_REGEX_NO_LIB)
 
 
 usMacroCreateBundle(DeclarativeServices
-  VERSION "1.2.1"
+  VERSION "1.5.3"
   DEPENDS Framework
   TARGET DeclarativeServices
   SYMBOLIC_NAME declarative_services
   EMBED_RESOURCE_METHOD LINK
-  LINK_LIBRARIES ${_link_libraries} usLogService usServiceComponent usAsyncWorkService
+  LINK_LIBRARIES ${_link_libraries} usServiceComponent usAsyncWorkService
   PRIVATE_HEADERS ${_ds_private_headers}
   SOURCES $<TARGET_OBJECTS:DeclarativeServicesObjs> src/SCRActivator.cpp
   BINARY_RESOURCES manifest.json
@@ -67,6 +67,8 @@ include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_SOURCE_DIR}/cppmicroservices/cm/include
   )
 
+usFunctionBoostPath(BOOST_SYSTEM ${US_USE_SYSTEM_BOOST} CPPMS_SOURCE_DIR ${CppMicroServices_SOURCE_DIR} BOOST_DIR ${BOOST_INCLUDEDIR})
+
 # There are warnings in the boost asio headers which are flagged as errors. Include the boost
 # asio headers as system headers to ignore these warnings and not treat them as errors.
-include_directories(SYSTEM ${CppMicroServices_SOURCE_DIR}/third_party/boost/include)
+include_directories(SYSTEM ${_boost_library})

@@ -29,79 +29,80 @@
 #include <string>
 #include <vector>
 
-namespace cppmicroservices {
-
-class ServletContext;
-struct HttpServletRequestPrivate;
-
-class US_HttpService_EXPORT HttpServletRequest
+namespace cppmicroservices
 {
-public:
-  ~HttpServletRequest();
 
-  HttpServletRequest(const HttpServletRequest& o);
-  HttpServletRequest& operator=(const HttpServletRequest& o);
+    class ServletContext;
+    struct HttpServletRequestPrivate;
 
-  std::shared_ptr<ServletContext> GetServletContext() const;
+    class US_HttpService_EXPORT HttpServletRequest
+    {
+      public:
+        ~HttpServletRequest();
 
-  Any GetAttribute(const std::string& name) const;
+        HttpServletRequest(HttpServletRequest const& o);
+        HttpServletRequest& operator=(HttpServletRequest const& o);
 
-  std::vector<std::string> GetAttributeNames() const;
+        std::shared_ptr<ServletContext> GetServletContext() const;
 
-  std::size_t GetContentLength() const;
+        Any GetAttribute(std::string const& name) const;
 
-  std::string GetContentType() const;
+        std::vector<std::string> GetAttributeNames() const;
 
-  std::string GetLocalName() const;
+        std::size_t GetContentLength() const;
 
-  std::string GetRemoteHost() const;
+        std::string GetContentType() const;
 
-  int GetLocalPort() const;
+        std::string GetLocalName() const;
 
-  int GetRemotePort() const;
+        std::string GetRemoteHost() const;
 
-  std::string GetScheme() const;
+        int GetLocalPort() const;
 
-  std::string GetServerName() const;
+        int GetRemotePort() const;
 
-  int GetServerPort() const;
+        std::string GetScheme() const;
 
-  std::string GetProtocol() const;
+        std::string GetServerName() const;
 
-  std::string GetContextPath() const;
+        int GetServerPort() const;
 
-  std::string GetPathInfo() const;
+        std::string GetProtocol() const;
 
-  std::string GetRequestUri() const;
+        std::string GetContextPath() const;
 
-  std::string GetRequestUrl() const;
+        std::string GetPathInfo() const;
 
-  std::string GetServletPath() const;
+        std::string GetRequestUri() const;
 
-  std::string GetQueryString() const;
+        std::string GetRequestUrl() const;
 
-  std::string GetHeader(const std::string& name) const;
+        std::string GetServletPath() const;
 
-  long long GetDateHeader(const std::string& name) const;
+        std::string GetQueryString() const;
 
-  std::vector<std::string> GetHeaderNames() const;
+        std::string GetHeader(std::string const& name) const;
 
-  std::vector<std::string> GetHeaders(const std::string& name) const;
+        long long GetDateHeader(std::string const& name) const;
 
-  std::string GetMethod() const;
+        std::vector<std::string> GetHeaderNames() const;
 
-  std::vector<std::pair<std::string, float>> GetAcceptHeader() const;
+        std::vector<std::string> GetHeaders(std::string const& name) const;
 
-  void RemoveAttribute(const std::string& name);
+        std::string GetMethod() const;
 
-  void SetAttribute(const std::string& name, const Any& value);
+        std::vector<std::pair<std::string, float>> GetAcceptHeader() const;
 
-private:
-  friend class ServletHandler;
-  HttpServletRequest(HttpServletRequestPrivate* d);
+        void RemoveAttribute(std::string const& name);
 
-  std::shared_ptr<HttpServletRequestPrivate> d;
-};
-}
+        void SetAttribute(std::string const& name, Any const& value);
+
+      private:
+        friend class ServletHandler;
+        HttpServletRequest(HttpServletRequestPrivate* d);
+
+        std::shared_ptr<HttpServletRequestPrivate> d;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_HTTPREQUEST_H

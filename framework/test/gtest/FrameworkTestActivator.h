@@ -25,23 +25,24 @@
 
 #include "cppmicroservices/BundleActivator.h"
 
-namespace cppmicroservices {
-
-class FrameworkTestActivator : public BundleActivator
+namespace cppmicroservices
 {
-public:
-  FrameworkTestActivator();
 
-  static bool StartCalled();
+    class FrameworkTestActivator : public BundleActivator
+    {
+      public:
+        FrameworkTestActivator();
 
-  void Start(BundleContext);
+        static bool StartCalled();
 
-  void Stop(BundleContext);
+        void Start(BundleContext);
 
-private:
-  static FrameworkTestActivator* m_Instance;
-  bool m_StartCalled;
-};
-}
+        void Stop(BundleContext);
+
+      private:
+        static FrameworkTestActivator* m_Instance;
+        bool m_StartCalled;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_TESTDRIVERACTIVATOR_H

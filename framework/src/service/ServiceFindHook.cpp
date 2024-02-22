@@ -22,7 +22,8 @@
 
 #include "cppmicroservices/ServiceFindHook.h"
 
-namespace cppmicroservices {
+namespace cppmicroservices
+{
 
-ServiceFindHook::~ServiceFindHook() = default;
+    ServiceFindHook::~ServiceFindHook() = default;
 }

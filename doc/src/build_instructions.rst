@@ -5,13 +5,13 @@ Build Instructions
 
 The C++ Micro Services library provides `CMake <http://www.cmake.org>`_
 build scripts which allow the generation of platform and IDE specific
-project or *Make* files.
+project or *GNU Make* files.
 
 
 Prerequisites
 -------------
 
--  `CMake <http://www.cmake.org>`_ 3.12.4 (users of the latest Visual Studio
+-  `CMake <http://www.cmake.org>`_ 3.17.0 (users of the latest Visual Studio
    should typically also use the latest CMake version available)
 
 Configuration
@@ -96,6 +96,24 @@ configured **CMAKE_INSTALL_PREFIX** type:
 .. code:: bash
 
    make install
+
+Testing
+-------
+
+After building the C++ Micro Services source code, assuming the
+**US_BUILD_TESTING** CMake configuration option was set to *ON*,
+unit tests can be run. 
+
+To run unit tests, a special Visual Studio and Xcode project named *RUN_TESTS* is created that, when built, will run all tests. For Unix Makefiles, run:
+
+.. code:: bash
+   
+   make test
+
+Examples of when building and running the C++ Micro Services test suite is useful are:
+
+- Qualifying bug fixes and feature development
+- Qualifying the integration of C++ Micro Services with unofficially supported compilers and OSes.
 
 Integration
 -----------

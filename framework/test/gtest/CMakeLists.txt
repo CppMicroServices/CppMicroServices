@@ -17,6 +17,10 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TestingConfig.h.in" "${PROJECT_BINAR
 
 set(us_gtest_test_exe_name usFrameworkTests)
 
+if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
+  add_compile_options(-Wno-error=unneeded-internal-declaration)
+endif()
+
 include_directories(
   ${GTEST_INCLUDE_DIRS}
   ${GMOCK_INCLUDE_DIRS}
@@ -74,6 +78,9 @@ set(_gtest_tests
   ResourceCompilerTest.cpp
   MultipleListenersTest.cpp
   BundleTest.cpp
+  BundleTrackerMethodTest.cpp
+  BundleTrackerCustomCallbackTest.cpp
+  BundleTrackerConcurrencyTest.cpp
   main.cpp
 )
 
@@ -154,7 +161,7 @@ set_property(TEST ${us_gtest_test_exe_name} PROPERTY LABELS regular)
 
 # Run the GTest EXE from valgrind
 if(US_MEMCHECK_COMMAND)
-  add_test(NAME memcheck_${us_gtest_test_exe_name} COMMAND ${US_MEMCHECK_COMMAND} --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${us_gtest_test_exe_name}
+  add_test(NAME memcheck_${us_gtest_test_exe_name} COMMAND ${US_MEMCHECK_COMMAND} --max-threads=2000 --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${us_gtest_test_exe_name}
     WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
   set_property(TEST memcheck_${us_gtest_test_exe_name} PROPERTY LABELS valgrind memcheck)
 endif()

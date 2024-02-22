@@ -4,7 +4,7 @@
 #pragma once
 
 #ifndef SPDLOG_HEADER_ONLY
-#include <spdlog/details/registry.h>
+#    include <spdlog/details/registry.h>
 #endif
 
 #include <spdlog/common.h>
@@ -14,11 +14,11 @@
 
 #ifndef SPDLOG_DISABLE_DEFAULT_LOGGER
 // support for the default stdout color logger
-#ifdef _WIN32
-#include <spdlog/sinks/wincolor_sink.h>
-#else
-#include <spdlog/sinks/ansicolor_sink.h>
-#endif
+#    ifdef _WIN32
+#        include <spdlog/sinks/wincolor_sink.h>
+#    else
+#        include <spdlog/sinks/ansicolor_sink.h>
+#    endif
 #endif // SPDLOG_DISABLE_DEFAULT_LOGGER
 
 #include <chrono>
@@ -36,11 +36,11 @@ SPDLOG_INLINE registry::registry()
 
 #ifndef SPDLOG_DISABLE_DEFAULT_LOGGER
     // create default logger (ansicolor_stdout_sink_mt or wincolor_stdout_sink_mt in windows).
-#ifdef _WIN32
+#    ifdef _WIN32
     auto color_sink = std::make_shared<sinks::wincolor_stdout_sink_mt>();
-#else
+#    else
     auto color_sink = std::make_shared<sinks::ansicolor_stdout_sink_mt>();
-#endif
+#    endif
 
     const char *default_logger_name = "";
     default_logger_ = std::make_shared<spdlog::logger>(default_logger_name, std::move(color_sink));
@@ -67,7 +67,11 @@ SPDLOG_INLINE void registry::initialize_logger(std::shared_ptr<logger> new_logge
         new_logger->set_error_handler(err_handler_);
     }
 
-    new_logger->set_level(levels_.get(new_logger->name()));
+    // set new level according to previously configured level or default level
+    auto it = log_levels_.find(new_logger->name());
+    auto new_level = it != log_levels_.end() ? it->second : global_log_level_;
+    new_logger->set_level(new_level);
+
     new_logger->flush_on(flush_level_);
 
     if (backtrace_n_messages_ > 0)
@@ -171,7 +175,7 @@ SPDLOG_INLINE void registry::set_level(level::level_enum log_level)
     {
         l.second->set_level(log_level);
     }
-    levels_.set_default(log_level);
+    global_log_level_ = log_level;
 }
 
 SPDLOG_INLINE void registry::flush_on(level::level_enum log_level)
@@ -184,21 +188,14 @@ SPDLOG_INLINE void registry::flush_on(level::level_enum log_level)
     flush_level_ = log_level;
 }
 
-SPDLOG_INLINE void registry::flush_every(std::chrono::seconds interval)
-{
-    std::lock_guard<std::mutex> lock(flusher_mutex_);
-    auto clbk = [this]() { this->flush_all(); };
-    periodic_flusher_ = details::make_unique<periodic_worker>(clbk, interval);
-}
-
-SPDLOG_INLINE void registry::set_error_handler(void (*handler)(const std::string &msg))
+SPDLOG_INLINE void registry::set_error_handler(err_handler handler)
 {
     std::lock_guard<std::mutex> lock(logger_map_mutex_);
     for (auto &l : loggers_)
     {
         l.second->set_error_handler(handler);
     }
-    err_handler_ = handler;
+    err_handler_ = std::move(handler);
 }
 
 SPDLOG_INLINE void registry::apply_all(const std::function<void(const std::shared_ptr<logger>)> &fun)
@@ -222,8 +219,9 @@ SPDLOG_INLINE void registry::flush_all()
 SPDLOG_INLINE void registry::drop(const std::string &logger_name)
 {
     std::lock_guard<std::mutex> lock(logger_map_mutex_);
+    auto is_default_logger = default_logger_ && default_logger_->name() == logger_name;
     loggers_.erase(logger_name);
-    if (default_logger_ && default_logger_->name() == logger_name)
+    if (is_default_logger)
     {
         default_logger_.reset();
     }
@@ -263,14 +261,24 @@ SPDLOG_INLINE void registry::set_automatic_registration(bool automatic_registrat
     automatic_registration_ = automatic_registration;
 }
 
-SPDLOG_INLINE void registry::update_levels(cfg::log_levels levels)
+SPDLOG_INLINE void registry::set_levels(log_levels levels, level::level_enum *global_level)
 {
     std::lock_guard<std::mutex> lock(logger_map_mutex_);
-    levels_ = std::move(levels);
-    for (auto &l : loggers_)
+    log_levels_ = std::move(levels);
+    auto global_level_requested = global_level != nullptr;
+    global_log_level_ = global_level_requested ? *global_level : global_log_level_;
+
+    for (auto &logger : loggers_)
     {
-        auto &logger = l.second;
-        logger->set_level(levels_.get(logger->name()));
+        auto logger_entry = log_levels_.find(logger.first);
+        if (logger_entry != log_levels_.end())
+        {
+            logger.second->set_level(logger_entry->second);
+        }
+        else if (global_level_requested)
+        {
+            logger.second->set_level(*global_level);
+        }
     }
 }
 
@@ -278,6 +286,14 @@ SPDLOG_INLINE registry &registry::instance()
 {
     static registry s_instance;
     return s_instance;
+}
+
+SPDLOG_INLINE void registry::apply_logger_env_levels(std::shared_ptr<logger> new_logger)
+{
+    std::lock_guard<std::mutex> lock(logger_map_mutex_);
+    auto it = log_levels_.find(new_logger->name());
+    auto new_level = it != log_levels_.end() ? it->second : global_log_level_;
+    new_logger->set_level(new_level);
 }
 
 SPDLOG_INLINE void registry::throw_if_exists_(const std::string &logger_name)

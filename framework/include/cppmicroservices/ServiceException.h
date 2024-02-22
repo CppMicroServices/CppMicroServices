@@ -28,96 +28,97 @@
 #include <stdexcept>
 
 #ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4275)
+#    pragma warning(push)
+#    pragma warning(disable : 4275)
 #endif
 
-namespace cppmicroservices {
-
-/**
-\defgroup gr_serviceexception BundleEvent
-
-\brief Groups ServiceException class related symbols.
-*/
-
-/**
- * \ingroup MicroServices
- * \ingroup gr_serviceexception
- *
- * A service exception used to indicate that a service problem occurred.
- *
- * <p>
- * A <code>ServiceException</code> object is created by the framework or
- * to denote an exception condition in the service. An enum
- * type is used to identify the exception type for future extendability.
- *
- * <p>
- * This exception conforms to the general purpose exception chaining mechanism.
- */
-class US_Framework_EXPORT ServiceException : public std::runtime_error
+namespace cppmicroservices
 {
-public:
-  enum Type
-  {
-    /**
-     * No exception type is unspecified.
-     */
-    UNSPECIFIED = 0,
-    /**
-     * The service has been unregistered.
-     */
-    UNREGISTERED = 1,
-    /**
-     * The service factory produced an invalid service object.
-     */
-    FACTORY_ERROR = 2,
-    /**
-     * The service factory threw an exception.
-     */
-    FACTORY_EXCEPTION = 3,
-    /**
-     * An error occurred invoking a remote service.
-     */
-    REMOTE = 5,
-    /**
-     * The service factory resulted in a recursive call to itself for the
-     * requesting bundle.
-     */
-    FACTORY_RECURSION = 6
-  };
 
-  /**
-   * Creates a <code>ServiceException</code> with the specified message,
-   * type and exception cause.
-   *
-   * @param msg The associated message.
-   * @param type The type for this exception.
-   */
-  ServiceException(const std::string& msg, const Type& type = UNSPECIFIED);
+    /**
+    \defgroup gr_serviceexception BundleEvent
 
-  ServiceException(const ServiceException& o);
-  ServiceException& operator=(const ServiceException& o);
+    \brief Groups ServiceException class related symbols.
+    */
 
-  ~ServiceException() override;
+    /**
+     * \ingroup MicroServices
+     * \ingroup gr_serviceexception
+     *
+     * A service exception used to indicate that a service problem occurred.
+     *
+     * <p>
+     * A <code>ServiceException</code> object is created by the framework or
+     * to denote an exception condition in the service. An enum
+     * type is used to identify the exception type for future extendability.
+     *
+     * <p>
+     * This exception conforms to the general purpose exception chaining mechanism.
+     */
+    class US_Framework_EXPORT ServiceException : public std::runtime_error
+    {
+      public:
+        enum Type
+        {
+            /**
+             * No exception type is unspecified.
+             */
+            UNSPECIFIED = 0,
+            /**
+             * The service has been unregistered.
+             */
+            UNREGISTERED = 1,
+            /**
+             * The service factory produced an invalid service object.
+             */
+            FACTORY_ERROR = 2,
+            /**
+             * The service factory threw an exception.
+             */
+            FACTORY_EXCEPTION = 3,
+            /**
+             * An error occurred invoking a remote service.
+             */
+            REMOTE = 5,
+            /**
+             * The service factory resulted in a recursive call to itself for the
+             * requesting bundle.
+             */
+            FACTORY_RECURSION = 6
+        };
 
-  /**
-   * Returns the type for this exception or <code>UNSPECIFIED</code> if the
-   * type was unspecified or unknown.
-   *
-   * @return The type of this exception.
-   */
-  Type GetType() const;
+        /**
+         * Creates a <code>ServiceException</code> with the specified message,
+         * type and exception cause.
+         *
+         * @param msg The associated message.
+         * @param type The type for this exception.
+         */
+        ServiceException(std::string const& msg, Type const& type = UNSPECIFIED);
 
-private:
-  /**
-   * Type of service exception.
-   */
-  Type type;
-};
-}
+        ServiceException(ServiceException const& o);
+        ServiceException& operator=(ServiceException const& o);
+
+        ~ServiceException() override;
+
+        /**
+         * Returns the type for this exception or <code>UNSPECIFIED</code> if the
+         * type was unspecified or unknown.
+         *
+         * @return The type of this exception.
+         */
+        Type GetType() const;
+
+      private:
+        /**
+         * Type of service exception.
+         */
+        Type type;
+    };
+} // namespace cppmicroservices
 
 #ifdef _MSC_VER
-#  pragma warning(pop)
+#    pragma warning(pop)
 #endif
 
 /**
@@ -126,8 +127,6 @@ private:
  *
  * Writes a string representation of \c exc to the stream \c os.
  */
-US_Framework_EXPORT std::ostream& operator<<(
-  std::ostream& os,
-  const cppmicroservices::ServiceException& exc);
+US_Framework_EXPORT std::ostream& operator<<(std::ostream& os, cppmicroservices::ServiceException const& exc);
 
 #endif // CPPMICROSERVICES_SERVICEEXCEPTION_H

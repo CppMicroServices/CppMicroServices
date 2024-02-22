@@ -21,19 +21,30 @@
 =============================================================================*/
 
 #ifndef US_BUNDLE_NAME
-#  error Missing US_BUNDLE_NAME preprocessor define
+#    error Missing US_BUNDLE_NAME preprocessor define
 #endif
 
 #ifndef CPPMICROSERVICES_BUNDLEINITIALIZATION_H
-#  define CPPMICROSERVICES_BUNDLEINITIALIZATION_H
+#    define CPPMICROSERVICES_BUNDLEINITIALIZATION_H
 
-#  include "cppmicroservices/GlobalConfig.h"
+#    include "cppmicroservices/GlobalConfig.h"
 
-#  include <atomic>
+#    include <atomic>
+#    include <functional>
 
-namespace cppmicroservices {
-class BundleContextPrivate;
-}
+namespace cppmicroservices
+{
+    class BundleContextPrivate;
+    /**
+     * The interface for a bundle's private context setter function. This is used by the Core
+     * Framework when loading a new bundle. Function definition is inside the
+     * \c CPPMICROSERVICES_INITIALIZE_BUNDLE macro.
+     *
+     * @note THIS IS NOT A TRANSFER OF OWNERSHIP. The pointed object must be kept alive for the
+     * lifetime of the bundle, and then destroyed.
+     */
+    using SetBundleContextFn = std::function<void(BundleContextPrivate*)>;
+} // namespace cppmicroservices
 
 /**
  * \ingroup MicroServices
@@ -56,24 +67,19 @@ class BundleContextPrivate;
  *    :cmake:command:`usFunctionGenerateBundleInit`.
  * \endrststar
  */
-#  define CPPMICROSERVICES_INITIALIZE_BUNDLE                                   \
-    std::atomic<cppmicroservices::BundleContextPrivate*> US_CTX_INS(           \
-      US_BUNDLE_NAME){};                                                       \
-                                                                               \
-    extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(        \
-      US_BUNDLE_NAME)();                                                       \
-    extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(        \
-      US_BUNDLE_NAME)()                                                        \
-    {                                                                          \
-      return US_CTX_INS(US_BUNDLE_NAME).load();                                \
-    }                                                                          \
-                                                                               \
-    extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(             \
-      cppmicroservices::BundleContextPrivate * ctx);                           \
-    extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(             \
-      cppmicroservices::BundleContextPrivate * ctx)                            \
-    {                                                                          \
-      US_CTX_INS(US_BUNDLE_NAME).store(ctx);                                   \
-    }
+#    define CPPMICROSERVICES_INITIALIZE_BUNDLE                                                                       \
+        std::atomic<cppmicroservices::BundleContextPrivate*> US_CTX_INS(US_BUNDLE_NAME) {};                          \
+                                                                                                                     \
+        extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)(void);                    \
+        extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)()                         \
+        {                                                                                                            \
+            return US_CTX_INS(US_BUNDLE_NAME).load();                                                                \
+        }                                                                                                            \
+                                                                                                                     \
+        extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContextPrivate * ctx); \
+        extern "C" US_ABI_EXPORT void US_SET_CTX_FUNC(US_BUNDLE_NAME)(cppmicroservices::BundleContextPrivate * ctx)  \
+        {                                                                                                            \
+            US_CTX_INS(US_BUNDLE_NAME).store(ctx);                                                                   \
+        }
 
 #endif // CPPMICROSERVICES_BUNDLEINITIALIZATION_H

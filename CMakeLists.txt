@@ -28,6 +28,19 @@ foreach(policy ${policies_new})
 endforeach()
 
 #-----------------------------------------------------------------------------
+# Setup git hooks
+#-----------------------------------------------------------------------------
+find_package(Git)
+if (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+  execute_process(COMMAND ${GIT_EXECUTABLE} config core.hooksPath "${PROJECT_SOURCE_DIR}/.githooks"
+                          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                          RESULT_VARIABLE GIT_CONFIGMOD_RESULT)
+  if (NOT GIT_CONFIGMOD_RESULT EQUAL "0")
+    message(WARNING "Command `git config core.hooksPath ${PROJECT_SOURCE_DIR}/.githooks` failed with ${GIT_CONFIGMOD_RESULT}")
+  endif()
+endif()
+
+#-----------------------------------------------------------------------------
 # Check minimum required compiler versions
 #------------------------------------------------------------------------------
 
@@ -88,7 +101,7 @@ set(US_COMPILER_AppleClang_MINIMUM_VERSION_PRODUCT "Xcode 7.3 (Clang ${US_COMPIL
 set(US_COMPILER_MSVC_MINIMUM_VERSION_PRODUCT       "Visual Studio 2015 (MSVC ${US_COMPILER_MSVC_MINIMUM_VERSION})")
 
 set(US_COMPILER_GNU_MINIMUM_RECOMMENDED_VERSION         9.4.0   )
-set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION       9.0     )
+set(US_COMPILER_Clang_MINIMUM_RECOMMENDED_VERSION       9.0.0   )
 set(US_COMPILER_AppleClang_MINIMUM_RECOMMENDED_VERSION  12.0.1  )
 set(US_COMPILER_MSVC_MINIMUM_RECOMMENDED_VERSION        19.20   )
 
@@ -158,6 +171,7 @@ include(usFunctionGenerateBundleInit)
 include(usMacroCreateBundle)
 include(usFunctionCreateTestBundle)
 include(usFunctionCreateDSTestBundle)
+include(usFunctionBoostPath)
 
 if (US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
   check_cxx_compiler_flag(-Wno-missing-braces HAS_MISSING_BRACES_FLAG)
@@ -188,13 +202,13 @@ endforeach()
 # Set a default build type if none was specified
 #-----------------------------------------------------------------------------
 
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Setting build type to 'Debug' as none was specified.")
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
 
   # Set the possible values of build type for cmake-gui
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
-	       STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+          STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -239,6 +253,9 @@ us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
+us_cache_var(US_USE_SYSTEM_BOOST OFF BOOL "Build using an external Boost installation" ADVANCED)
+
+set(_us_build_shared ${BUILD_SHARED_LIBS})
 
 if(NOT US_ENABLE_THREADING_SUPPORT AND US_ENABLE_TSAN)
   message(SEND_WARN "Thread-sanitizer enabled without threading support. Forcing US_ENABLE_TSAN to OFF")
@@ -276,7 +293,7 @@ endif()
 # with clang and lld
 if ((NOT(US_COMPILER_CLANG) OR NOT(US_USING_LLD)) AND (US_ENABLE_MSAN OR US_ENABLE_UBSAN))
   message(FATAL_ERROR "You are trying to use msan or ubsan either without clang as your compiler or \
-		       lld as your linker. Please use clang and lld if you wish to use msan or ubsan")
+             lld as your linker. Please use clang and lld if you wish to use msan or ubsan")
 endif()
 
 # Display the selected sanitizer if one was enabled
@@ -347,6 +364,25 @@ if (APPLE AND US_COMPILER_APPLE_CLANG)
 endif()
 
 #-----------------------------------------------------------------------------
+# Set stack as non executable
+#-----------------------------------------------------------------------------
+
+# Add flag to force non executable stack on gcc builds
+# The -Wl,-z noexecstack link option on all gcc builds will
+# disallow executable stacks within CppMicroServices.
+if(UNIX AND NOT APPLE)
+  link_libraries("-Wl,-z,noexecstack")
+endif()
+
+#-----------------------------------------------------------------------------
+# 3rd Party Library configuration
+#-----------------------------------------------------------------------------
+
+if(US_USE_SYSTEM_BOOST)
+    find_package(Boost 1.74.0 REQUIRED)
+endif()
+
+#-----------------------------------------------------------------------------
 # Testing configuration
 #-----------------------------------------------------------------------------
 
@@ -363,7 +399,7 @@ function(us_add_tests test_driver)
       # By default, these tests are not active until the concurrent bundle
       # start / stop mechanism has been properly implemented (GitHub Issue #25)
       add_test(NAME helgrind_${test} COMMAND ${US_MEMCHECK_COMMAND} --tool=helgrind --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
-	WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
+   WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
       set_property(TEST helgrind_${test} PROPERTY LABELS valgrind helgrind)
     endif()
   endif()
@@ -372,8 +408,8 @@ function(us_add_tests test_driver)
     file(TO_NATIVE_PATH ${US_RUNTIME_OUTPUT_DIRECTORY} US_RUNTIME_OUTPUT_NATIVE_DIRECTORY)
     # skip the unicode test bundle because opencppcoverage tool fails if a module is located in a path with unicode characters
     add_test(NAME coverage_${test}
-	     COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception --excluded_modules *TestBundleU*.dll -- $<TARGET_FILE:${test_driver}> ${test}
-	     WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
+        COMMAND ${US_COVERAGE_COMMAND} --verbose --cover_children --sources=${PROJECT_SOURCE_NATIVE_PATH} --export_type=binary:${test}.cov --continue_after_cpp_exception --excluded_modules *TestBundleU*.dll -- $<TARGET_FILE:${test_driver}> ${test}
+        WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
     set_property(TEST coverage_${test} PROPERTY LABELS opencppcoverage)
   endif()
   endforeach()
@@ -509,8 +545,8 @@ else()
   endif()
 
   foreach(_cxxflag  -Werror -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align
-		    -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
-		    -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option )
+          -Wwrite-strings -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast
+          -Wstrict-null-sentinel -Wsign-promo -fdiagnostics-show-option )
     usFunctionCheckCompilerFlags(${_cxxflag} US_CXX_FLAGS)
   endforeach()
 
@@ -542,6 +578,7 @@ else()
   if(_have_visibility)
     set(US_HAVE_VISIBILITY_ATTRIBUTE 1)
     set(US_CXX_FLAGS "${US_CXX_FLAGS} ${_have_visibility}")
+    set(US_C_FLAGS "${US_C_FLAGS} -fvisibility=hidden")
   endif()
 
   usFunctionCheckCompilerFlags("-O1 -D_FORTIFY_SOURCE=2" _fortify_source_flag)
@@ -855,6 +892,7 @@ install(EXPORT ${PROJECT_NAME}Targets
     ${US_CMAKE_DIR}/usFunctionGetResourceSource.cmake
     ${US_CMAKE_DIR}/usFunctionCheckResourceLinking.cmake
     ${US_CMAKE_DIR}/usFunctionCheckCompilerFlags.cmake
+    ${US_CMAKE_DIR}/usFunctionBoostPath.cmake
     )
 
   install(FILES ${_install_cmake_scripts}

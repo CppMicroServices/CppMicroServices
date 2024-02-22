@@ -25,55 +25,58 @@
 
 #include <string>
 
-namespace cppmicroservices {
-namespace cmimpl {
+namespace cppmicroservices
+{
+    namespace cmimpl
+    {
 
-/**
- * Defines standard names for CM Constants.
- */
-namespace CMConstants {
-/**
- * Manifest key specifying the CM configuration object.
- * <p>
- * The attribute value may be retrieved from the {@code cppmicroservices::AnyMap}
- * object returned by the {@code Bundle.GetHeaders} method using {@code AnyMap.at}
- */
-extern const std::string CM_KEY;
+        /**
+         * Defines standard names for CM Constants.
+         */
+        namespace CMConstants
+        {
+            /**
+             * Manifest key specifying the CM configuration object.
+             * <p>
+             * The attribute value may be retrieved from the {@code cppmicroservices::AnyMap}
+             * object returned by the {@code Bundle.GetHeaders} method using {@code AnyMap.at}
+             */
+            extern const std::string CM_KEY;
 
-/**
- * Manifest key specifying the version of the CM configuration.
- * <p>
- * The attribute value may be retrieved from the {@code cppmicroservices::AnyMap}
- * object returned by the {@code Bundle.GetHeaders} method using
- * {@code AnyMap.AtCompoundKey}.
- */
-extern const std::string CM_VERSION;
+            /**
+             * Manifest key specifying the version of the CM configuration.
+             * <p>
+             * The attribute value may be retrieved from the {@code cppmicroservices::AnyMap}
+             * object returned by the {@code Bundle.GetHeaders} method using
+             * {@code AnyMap.AtCompoundKey}.
+             */
+            extern const std::string CM_VERSION;
 
-/**
- * Top level service property to declare the PID of a ManagedService or
- * ManagedServiceFactory. If found, CM_SERVICE_SUBKEY could yield the PID.
- */
-extern const std::string CM_SERVICE_KEY;
+            /**
+             * Top level service property to declare the PID of a ManagedService or
+             * ManagedServiceFactory. If found, CM_SERVICE_SUBKEY could yield the PID.
+             */
+            extern const std::string CM_SERVICE_KEY;
 
-/**
- * Subkey to obtain the PID
- */
-extern const std::string CM_SERVICE_SUBKEY;
+            /**
+             * Subkey to obtain the PID
+             */
+            extern const std::string CM_SERVICE_SUBKEY;
 
-/**
- * Top level property added by DeclarativeServices, use as fallback if no service.pid
- * property can be found for a ManagedService or ManagedServiceFactory. If found,
- * CM_COMPONENT_SUBKEY could yield an alternative PID.
- */
-extern const std::string CM_COMPONENT_KEY;
+            /**
+             * Top level property added by DeclarativeServices, use as fallback if no service.pid
+             * property can be found for a ManagedService or ManagedServiceFactory. If found,
+             * CM_COMPONENT_SUBKEY could yield an alternative PID.
+             */
+            extern const std::string CM_COMPONENT_KEY;
 
-/**
- * Subkey to obtain an alternative PID
- */
-extern const std::string CM_COMPONENT_SUBKEY;
+            /**
+             * Subkey to obtain an alternative PID
+             */
+            extern const std::string CM_COMPONENT_SUBKEY;
 
-} // CMConstants
-} // cmimpl
-} // cppmicroservices
+        } // namespace CMConstants
+    }     // namespace cmimpl
+} // namespace cppmicroservices
 
 #endif // CMCONSTANTS_HPP

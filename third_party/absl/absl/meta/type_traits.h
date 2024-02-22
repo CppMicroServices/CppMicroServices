@@ -35,13 +35,32 @@
 #ifndef ABSL_META_TYPE_TRAITS_H_
 #define ABSL_META_TYPE_TRAITS_H_
 
-#include <stddef.h>
+#include <cstddef>
 #include <functional>
 #include <type_traits>
 
 #include "absl/base/config.h"
 
+// MSVC constructibility traits do not detect destructor properties and so our
+// implementations should not use them as a source-of-truth.
+#if defined(_MSC_VER) && !defined(__clang__) && !defined(__GNUC__)
+#define ABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION 1
+#endif
+
+// Defines the default alignment. `__STDCPP_DEFAULT_NEW_ALIGNMENT__` is a C++17
+// feature.
+#if defined(__STDCPP_DEFAULT_NEW_ALIGNMENT__)
+#define ABSL_INTERNAL_DEFAULT_NEW_ALIGNMENT __STDCPP_DEFAULT_NEW_ALIGNMENT__
+#else  // defined(__STDCPP_DEFAULT_NEW_ALIGNMENT__)
+#define ABSL_INTERNAL_DEFAULT_NEW_ALIGNMENT alignof(std::max_align_t)
+#endif  // defined(__STDCPP_DEFAULT_NEW_ALIGNMENT__)
+
 namespace absl {
+ABSL_NAMESPACE_BEGIN
+
+// Defined and documented later on in this file.
+template <typename T>
+struct is_trivially_destructible;
 
 // Defined and documented later on in this file.
 template <typename T>
@@ -66,6 +85,20 @@ union SingleMemberUnion {
 #endif  // defined(_MSC_VER) && !defined(__GNUC__)
 
 template <class T>
+struct IsTriviallyMoveConstructibleObject
+    : std::integral_constant<
+          bool, std::is_move_constructible<
+                    type_traits_internal::SingleMemberUnion<T>>::value &&
+                    absl::is_trivially_destructible<T>::value> {};
+
+template <class T>
+struct IsTriviallyCopyConstructibleObject
+    : std::integral_constant<
+          bool, std::is_copy_constructible<
+                    type_traits_internal::SingleMemberUnion<T>>::value &&
+                    absl::is_trivially_destructible<T>::value> {};
+
+template <class T>
 struct IsTriviallyMoveAssignableReference : std::false_type {};
 
 template <class T>
@@ -79,18 +112,6 @@ struct IsTriviallyMoveAssignableReference<T&&>
 template <typename... Ts>
 struct VoidTImpl {
   using type = void;
-};
-
-// This trick to retrieve a default alignment is necessary for our
-// implementation of aligned_storage_t to be consistent with any implementation
-// of std::aligned_storage.
-template <size_t Len, typename T = std::aligned_storage<Len>>
-struct default_alignment_of_aligned_storage;
-
-template <size_t Len, size_t Align>
-struct default_alignment_of_aligned_storage<Len,
-                                            std::aligned_storage<Len, Align>> {
-  static constexpr size_t value = Align;
 };
 
 ////////////////////////////////
@@ -145,6 +166,18 @@ using IsMoveAssignableImpl = decltype(std::declval<T&>() = std::declval<T&&>());
 
 }  // namespace type_traits_internal
 
+// MSVC 19.20 has a regression that causes our workarounds to fail, but their
+// std forms now appear to be compliant.
+#if defined(_MSC_VER) && !defined(__clang__) && (_MSC_VER >= 1920)
+
+template <typename T>
+using is_copy_assignable = std::is_copy_assignable<T>;
+
+template <typename T>
+using is_move_assignable = std::is_move_assignable<T>;
+
+#else
+
 template <typename T>
 struct is_copy_assignable : type_traits_internal::is_detected<
                                 type_traits_internal::IsCopyAssignableImpl, T> {
@@ -154,6 +187,8 @@ template <typename T>
 struct is_move_assignable : type_traits_internal::is_detected<
                                 type_traits_internal::IsMoveAssignableImpl, T> {
 };
+
+#endif
 
 // void_t()
 //
@@ -180,7 +215,7 @@ using void_t = typename type_traits_internal::VoidTImpl<Ts...>::type;
 // This metafunction is designed to be a drop-in replacement for the C++17
 // `std::conjunction` metafunction.
 template <typename... Ts>
-struct conjunction;
+struct conjunction : std::true_type {};
 
 template <typename T, typename... Ts>
 struct conjunction<T, Ts...>
@@ -188,9 +223,6 @@ struct conjunction<T, Ts...>
 
 template <typename T>
 struct conjunction<T> : T {};
-
-template <>
-struct conjunction<> : std::true_type {};
 
 // disjunction
 //
@@ -202,7 +234,7 @@ struct conjunction<> : std::true_type {};
 // This metafunction is designed to be a drop-in replacement for the C++17
 // `std::disjunction` metafunction.
 template <typename... Ts>
-struct disjunction;
+struct disjunction : std::false_type {};
 
 template <typename T, typename... Ts>
 struct disjunction<T, Ts...> :
@@ -210,9 +242,6 @@ struct disjunction<T, Ts...> :
 
 template <typename T>
 struct disjunction<T> : T {};
-
-template <>
-struct disjunction<> : std::false_type {};
 
 // negation
 //
@@ -243,7 +272,7 @@ struct is_function
 
 // is_trivially_destructible()
 //
-// Determines whether the passed type `T` is trivially destructable.
+// Determines whether the passed type `T` is trivially destructible.
 //
 // This metafunction is designed to be a drop-in replacement for the C++11
 // `std::is_trivially_destructible()` metafunction for platforms that have
@@ -257,8 +286,12 @@ struct is_function
 // https://gcc.gnu.org/onlinedocs/gcc/Type-Traits.html#Type-Traits.
 template <typename T>
 struct is_trivially_destructible
+#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
+    : std::is_trivially_destructible<T> {
+#else
     : std::integral_constant<bool, __has_trivial_destructor(T) &&
                                    std::is_destructible<T>::value> {
+#endif
 #ifdef ABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
  private:
   static constexpr bool compliant = std::is_trivially_destructible<T>::value ==
@@ -306,10 +339,16 @@ struct is_trivially_destructible
 // Nontrivially destructible types will cause the expression to be nontrivial.
 template <typename T>
 struct is_trivially_default_constructible
+#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE)
+    : std::is_trivially_default_constructible<T> {
+#else
     : std::integral_constant<bool, __has_trivial_constructor(T) &&
                                    std::is_default_constructible<T>::value &&
                                    is_trivially_destructible<T>::value> {
-#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
+#endif
+#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
+    !defined(                                            \
+        ABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
  private:
   static constexpr bool compliant =
       std::is_trivially_default_constructible<T>::value ==
@@ -338,12 +377,17 @@ struct is_trivially_default_constructible
 // expression to be nontrivial.
 template <typename T>
 struct is_trivially_move_constructible
+#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE)
+    : std::is_trivially_move_constructible<T> {
+#else
     : std::conditional<
           std::is_object<T>::value && !std::is_array<T>::value,
-          std::is_move_constructible<
-              type_traits_internal::SingleMemberUnion<T>>,
+          type_traits_internal::IsTriviallyMoveConstructibleObject<T>,
           std::is_reference<T>>::type::type {
-#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
+#endif
+#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
+    !defined(                                            \
+        ABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
  private:
   static constexpr bool compliant =
       std::is_trivially_move_constructible<T>::value ==
@@ -374,10 +418,11 @@ template <typename T>
 struct is_trivially_copy_constructible
     : std::conditional<
           std::is_object<T>::value && !std::is_array<T>::value,
-          std::is_copy_constructible<
-              type_traits_internal::SingleMemberUnion<T>>,
+          type_traits_internal::IsTriviallyCopyConstructibleObject<T>,
           std::is_lvalue_reference<T>>::type::type {
-#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
+#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
+    !defined(                                            \
+        ABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
  private:
   static constexpr bool compliant =
       std::is_trivially_copy_constructible<T>::value ==
@@ -409,7 +454,8 @@ struct is_trivially_copy_constructible
 template <typename T>
 struct is_trivially_move_assignable
     : std::conditional<
-          std::is_object<T>::value && !std::is_array<T>::value,
+          std::is_object<T>::value && !std::is_array<T>::value &&
+              std::is_move_assignable<T>::value,
           std::is_move_assignable<type_traits_internal::SingleMemberUnion<T>>,
           type_traits_internal::IsTriviallyMoveAssignableReference<T>>::type::
           type {
@@ -444,9 +490,13 @@ struct is_trivially_move_assignable
 // `is_trivially_assignable<T&, const T&>`.
 template <typename T>
 struct is_trivially_copy_assignable
+#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
+    : std::is_trivially_copy_assignable<T> {
+#else
     : std::integral_constant<
           bool, __has_trivial_assign(typename std::remove_reference<T>::type) &&
                     absl::is_copy_assignable<T>::value> {
+#endif
 #ifdef ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
  private:
   static constexpr bool compliant =
@@ -460,6 +510,27 @@ struct is_trivially_copy_assignable
                 "Standard: true, Implementation: false");
 #endif  // ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
 };
+
+#if defined(__cpp_lib_remove_cvref) && __cpp_lib_remove_cvref >= 201711L
+template <typename T>
+using remove_cvref = std::remove_cvref<T>;
+
+template <typename T>
+using remove_cvref_t = typename std::remove_cvref<T>::type;
+#else
+// remove_cvref()
+//
+// C++11 compatible implementation of std::remove_cvref which was added in
+// C++20.
+template <typename T>
+struct remove_cvref {
+  using type =
+      typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+};
+
+template <typename T>
+using remove_cvref_t = typename remove_cvref<T>::type;
+#endif
 
 namespace type_traits_internal {
 // is_trivially_copyable()
@@ -477,6 +548,11 @@ namespace type_traits_internal {
 // destructible. Arrays of trivially copyable types are trivially copyable.
 //
 // We expose this metafunction only for internal use within absl.
+
+#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_COPYABLE)
+template <typename T>
+struct is_trivially_copyable : std::is_trivially_copyable<T> {};
+#else
 template <typename T>
 class is_trivially_copyable_impl {
   using ExtentsRemoved = typename std::remove_all_extents<T>::type;
@@ -502,6 +578,7 @@ template <typename T>
 struct is_trivially_copyable
     : std::integral_constant<
           bool, type_traits_internal::is_trivially_copyable_impl<T>::kValue> {};
+#endif
 }  // namespace type_traits_internal
 
 // -----------------------------------------------------------------------------
@@ -553,6 +630,21 @@ using remove_extent_t = typename std::remove_extent<T>::type;
 template <typename T>
 using remove_all_extents_t = typename std::remove_all_extents<T>::type;
 
+namespace type_traits_internal {
+// This trick to retrieve a default alignment is necessary for our
+// implementation of aligned_storage_t to be consistent with any
+// implementation of std::aligned_storage.
+template <size_t Len, typename T = std::aligned_storage<Len>>
+struct default_alignment_of_aligned_storage;
+
+template <size_t Len, size_t Align>
+struct default_alignment_of_aligned_storage<
+    Len, std::aligned_storage<Len, Align>> {
+  static constexpr size_t value = Align;
+};
+}  // namespace type_traits_internal
+
+// TODO(b/260219225): std::aligned_storage(_t) is deprecated in C++23.
 template <size_t Len, size_t Align = type_traits_internal::
                           default_alignment_of_aligned_storage<Len>::value>
 using aligned_storage_t = typename std::aligned_storage<Len, Align>::type;
@@ -572,8 +664,23 @@ using common_type_t = typename std::common_type<T...>::type;
 template <typename T>
 using underlying_type_t = typename std::underlying_type<T>::type;
 
-template <typename T>
-using result_of_t = typename std::result_of<T>::type;
+
+namespace type_traits_internal {
+
+#if (defined(__cpp_lib_is_invocable) && __cpp_lib_is_invocable >= 201703L) || \
+    (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+// std::result_of is deprecated (C++17) or removed (C++20)
+template<typename> struct result_of;
+template<typename F, typename... Args>
+struct result_of<F(Args...)> : std::invoke_result<F, Args...> {};
+#else
+template<typename F> using result_of = std::result_of<F>;
+#endif
+
+}  // namespace type_traits_internal
+
+template<typename F>
+using result_of_t = typename type_traits_internal::result_of<F>::type;
 
 namespace type_traits_internal {
 // In MSVC we can't probe std::hash or stdext::hash because it triggers a
@@ -709,6 +816,74 @@ using swap_internal::Swap;
 using swap_internal::StdSwapIsUnconstrained;
 
 }  // namespace type_traits_internal
+
+// absl::is_trivially_relocatable<T>
+// Detects whether a type is "trivially relocatable" -- meaning it can be
+// relocated without invoking the constructor/destructor, using a form of move
+// elision.
+//
+// Example:
+//
+// if constexpr (absl::is_trivially_relocatable<T>::value) {
+//   memcpy(new_location, old_location, sizeof(T));
+// } else {
+//   new(new_location) T(std::move(*old_location));
+//   old_location->~T();
+// }
+//
+// Upstream documentation:
+//
+// https://clang.llvm.org/docs/LanguageExtensions.html#:~:text=__is_trivially_relocatable
+//
+#if ABSL_HAVE_BUILTIN(__is_trivially_relocatable)
+template <class T>
+struct is_trivially_relocatable
+    : std::integral_constant<bool, __is_trivially_relocatable(T)> {};
+#else
+template <class T>
+struct is_trivially_relocatable : std::integral_constant<bool, false> {};
+#endif
+
+// absl::is_constant_evaluated()
+//
+// Detects whether the function call occurs within a constant-evaluated context.
+// Returns true if the evaluation of the call occurs within the evaluation of an
+// expression or conversion that is manifestly constant-evaluated; otherwise
+// returns false.
+//
+// This function is implemented in terms of `std::is_constant_evaluated` for
+// c++20 and up. For older c++ versions, the function is implemented in terms
+// of `__builtin_is_constant_evaluated` if available, otherwise the function
+// will fail to compile.
+//
+// Applications can inspect `ABSL_HAVE_CONSTANT_EVALUATED` at compile time
+// to check if this function is supported.
+//
+// Example:
+//
+// constexpr MyClass::MyClass(int param) {
+// #ifdef ABSL_HAVE_CONSTANT_EVALUATED
+//   if (!absl::is_constant_evaluated()) {
+//     ABSL_LOG(INFO) << "MyClass(" << param << ")";
+//   }
+// #endif  // ABSL_HAVE_CONSTANT_EVALUATED
+// }
+//
+// Upstream documentation:
+//
+// http://en.cppreference.com/w/cpp/types/is_constant_evaluated
+// http://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html#:~:text=__builtin_is_constant_evaluated
+//
+#if defined(ABSL_HAVE_CONSTANT_EVALUATED)
+constexpr bool is_constant_evaluated() noexcept {
+#ifdef __cpp_lib_is_constant_evaluated
+  return std::is_constant_evaluated();
+#elif ABSL_HAVE_BUILTIN(__builtin_is_constant_evaluated)
+  return __builtin_is_constant_evaluated();
+#endif
+}
+#endif  // ABSL_HAVE_CONSTANT_EVALUATED
+ABSL_NAMESPACE_END
 }  // namespace absl
 
 #endif  // ABSL_META_TYPE_TRAITS_H_

@@ -30,46 +30,43 @@
 
 class CivetServer;
 
-namespace cppmicroservices {
-
-class BundleContext;
-
-class ServletContainer;
-class ServletContext;
-class ServletHandler;
-
-struct ServletContainerPrivate
-  : private ServiceTrackerCustomizer<HttpServlet, ServletHandler>
+namespace cppmicroservices
 {
-  ServletContainerPrivate(BundleContext bundleCtx, ServletContainer* q);
 
-  void Start();
-  void Stop();
+    class BundleContext;
 
-  std::string GetMimeType(const ServletContext* context,
-                          const std::string& file) const;
+    class ServletContainer;
+    class ServletContext;
+    class ServletHandler;
 
-  BundleContext m_Context;
+    struct ServletContainerPrivate : private ServiceTrackerCustomizer<HttpServlet, ServletHandler>
+    {
+        ServletContainerPrivate(BundleContext bundleCtx, ServletContainer* q);
 
-  std::mutex m_Mutex;
-  std::unique_ptr<CivetServer> m_Server;
-  ServiceTracker<HttpServlet, ServletHandler> m_ServletTracker;
+        void Start();
+        void Stop();
 
-  std::map<std::string, std::shared_ptr<ServletContext>> m_ServletContextMap;
-  std::string m_ContextPath;
+        std::string GetMimeType(ServletContext const* context, std::string const& file) const;
 
-private:
-  ServletContainer* const q;
-  std::list<std::shared_ptr<ServletHandler>> m_Handler;
+        BundleContext m_Context;
 
-  virtual std::shared_ptr<ServletHandler> AddingService(
-    const ServiceReference<HttpServlet>& reference);
-  virtual void ModifiedService(
-    const ServiceReference<HttpServlet>& /*reference*/,
-    const std::shared_ptr<ServletHandler>& /*service*/);
-  virtual void RemovedService(const ServiceReference<HttpServlet>& reference,
-                              const std::shared_ptr<ServletHandler>& handler);
-};
-}
+        std::mutex m_Mutex;
+        std::unique_ptr<CivetServer> m_Server;
+        ServiceTracker<HttpServlet, ServletHandler> m_ServletTracker;
+
+        std::map<std::string, std::shared_ptr<ServletContext>> m_ServletContextMap;
+        std::string m_ContextPath;
+
+      private:
+        ServletContainer* const q;
+        std::list<std::shared_ptr<ServletHandler>> m_Handler;
+
+        virtual std::shared_ptr<ServletHandler> AddingService(ServiceReference<HttpServlet> const& reference);
+        virtual void ModifiedService(ServiceReference<HttpServlet> const& /*reference*/,
+                                     std::shared_ptr<ServletHandler> const& /*service*/);
+        virtual void RemovedService(ServiceReference<HttpServlet> const& reference,
+                                    std::shared_ptr<ServletHandler> const& handler);
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SERVLETCONTAINERPRIVATE_H

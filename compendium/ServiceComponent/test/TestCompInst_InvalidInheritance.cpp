@@ -19,49 +19,51 @@
   limitations under the License.
 
   =============================================================================*/
-#if NEVER
-#  include <algorithm>
-#  include <chrono>
-#  include <cstdio>
-#  include <iostream>
 
-//#include "version.h"
+#    include <algorithm>
+#    include <chrono>
+#    include <cstdio>
+#    include <iostream>
 
-#  include "gtest/gtest.h"
+// #include "version.h"
 
-#  include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
-#  include <cppmicroservices/ServiceInterface.h>
+#    include "gtest/gtest.h"
+
+#    include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#    include <cppmicroservices/ServiceInterface.h>
 
 using cppmicroservices::service::component::detail::ComponentInstanceImpl;
 
-namespace {
-
-// dummy types used for testing
-struct TestServiceInterface1
-{};
-struct TestServiceInterface2
-{};
-
-class TestServiceImpl3 : public TestServiceInterface1
-{};
-
-/**
- * This test point is used to verify a compile error is generated when a service component
- * description specifies an interface that is not implemented by the implementation class
- *
- * @todo Automate this test point. Currently interactive is the only way to verify compilation failures.
- */
-TEST(ComponentInstance, ValidateInheritance)
+namespace
 {
-  ComponentInstanceImpl<TestServiceImpl3, std::tuple<TestServiceInterface2>>
-    compInstance; // compile error
-}
-}
 
-int main(int argc, char** argv)
+    // dummy types used for testing
+    struct TestServiceInterface1
+    {
+    };
+    struct TestServiceInterface2
+    {
+    };
+
+    class TestServiceImpl3 : public TestServiceInterface1
+    {
+    };
+
+    /**
+     * This test point is used to verify a compile error is generated when a service component
+     * description specifies an interface that is not implemented by the implementation class
+     *
+     * CMake tests will build this file to catch the expected compile time error
+     */
+    TEST(ComponentInstance, ValidateInheritance)
+    {
+        ComponentInstanceImpl<TestServiceImpl3, std::tuple<TestServiceInterface2>> compInstance; // compile error
+    }
+} // namespace
+
+int
+main(int argc, char** argv)
 {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
-
-#endif

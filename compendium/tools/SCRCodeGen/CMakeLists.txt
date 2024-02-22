@@ -20,6 +20,10 @@ include_directories(../../../third_party
 set(US_SCRCODEGEN_EXECUTABLE_TARGET SCRCodeGen)
 set(US_SCRCODEGEN_EXECUTABLE_OUTPUT_NAME ${US_SCRCODEGEN_EXECUTABLE_TARGET}${US_GLOBAL_VERSION_SUFFIX})
 
+if(US_COMPILER_CLANG OR US_COMPILER_APPLE_CLANG)
+  add_compile_options(-Wno-error=unneeded-internal-declaration)
+endif()
+
 add_executable(${US_SCRCODEGEN_EXECUTABLE_TARGET} ${_srcs} ${_private_headers})
 if (US_BUILD_TESTING)
   target_compile_definitions(${US_SCRCODEGEN_EXECUTABLE_TARGET} PRIVATE USING_GTEST)

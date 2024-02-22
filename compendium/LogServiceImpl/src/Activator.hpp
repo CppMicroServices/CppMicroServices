@@ -23,15 +23,18 @@
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
 
-namespace cppmicroservices {
-namespace logservice {
-namespace impl {
-class Activator final : public cppmicroservices::BundleActivator
+namespace cppmicroservices
 {
-public:
-  void Start(cppmicroservices::BundleContext bc) override;
-  void Stop(cppmicroservices::BundleContext) override;
-};
-}
-}
-}
+    namespace logservice
+    {
+        namespace impl
+        {
+            class Activator final : public cppmicroservices::BundleActivator
+            {
+              public:
+                void Start(cppmicroservices::BundleContext bc) override;
+                void Stop(cppmicroservices::BundleContext) override;
+            };
+        } // namespace impl
+    }     // namespace logservice
+} // namespace cppmicroservices

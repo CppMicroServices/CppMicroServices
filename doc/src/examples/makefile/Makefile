@@ -3,10 +3,10 @@ CXXFLAGS = -g -Wall -Wno-unused -pedantic -fPIC $(US_CXX_FLAGS)
 LDFLAGS = -Wl,-rpath="$(CppMicroServices_ROOT)/lib" -Wl,-rpath=.
 LDLIBS = "${US_CPPMICROSERVICES_TARGET}"
 
-INCLUDEDIRS = -I"$(CppMicroServices_ROOT)/include/cppmicroservices4"
+INCLUDEDIRS = -I"$(CppMicroServices_ROOT)/include/cppmicroservices3"
 LIBDIRS = -L"$(CppMicroServices_ROOT)/lib" -L.
 
-RC = "$(CppMicroServices_ROOT)/bin/usResourceCompiler4"
+RC = "$(CppMicroServices_ROOT)/bin/usResourceCompiler3"
 
 OBJECTS = bundle.o IDictionaryService.o
 

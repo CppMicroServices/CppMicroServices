@@ -28,31 +28,36 @@
 #include <algorithm>
 #include <iostream>
 
-namespace cppmicroservices {
-
-class TestStartBundleAActivator : public BundleActivator
+namespace cppmicroservices
 {
-public:
-  TestStartBundleAActivator() {}
-  ~TestStartBundleAActivator() {}
 
-  void Start(BundleContext context)
-  {
-    auto bundles = context.GetBundles();
-    auto bundleA = std::find_if(
-      bundles.begin(), bundles.end(), [](const cppmicroservices::Bundle& b) {
-        return "TestBundleA" == b.GetSymbolicName();
-      });
+    class TestStartBundleAActivator : public BundleActivator
+    {
+      public:
+        TestStartBundleAActivator() {}
+        ~TestStartBundleAActivator() {}
 
-    if (std::end(bundles) != bundleA) {
-      (*bundleA).Start();
-    }
-  }
+        void
+        Start(BundleContext context)
+        {
+            auto bundles = context.GetBundles();
+            auto bundleA
+                = std::find_if(bundles.begin(),
+                               bundles.end(),
+                               [](cppmicroservices::Bundle const& b) { return "TestBundleA" == b.GetSymbolicName(); });
 
-  void Stop(BundleContext) {}
-};
+            if (std::end(bundles) != bundleA)
+            {
+                (*bundleA).Start();
+            }
+        }
 
-}
+        void
+        Stop(BundleContext)
+        {
+        }
+    };
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(
-  cppmicroservices::TestStartBundleAActivator)
+} // namespace cppmicroservices
+
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::TestStartBundleAActivator)

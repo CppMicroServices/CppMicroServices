@@ -6,9 +6,9 @@
 #include <string>
 
 #ifdef MODULE_EXPORTS
-#  define MODULE_EXPORT US_ABI_EXPORT
+#    define MODULE_EXPORT US_ABI_EXPORT
 #else
-#  define MODULE_EXPORT US_ABI_IMPORT
+#    define MODULE_EXPORT US_ABI_IMPORT
 #endif
 
 /**
@@ -17,14 +17,14 @@
  **/
 struct MODULE_EXPORT IDictionaryService
 {
-  virtual ~IDictionaryService();
+    virtual ~IDictionaryService();
 
-  /**
-   * Check for the existence of a word.
-   * @param word the word to be checked.
-   * @return true if the word is in the dictionary,
-   *         false otherwise.
-   **/
-  virtual bool CheckWord(const std::string& word) = 0;
+    /**
+     * Check for the existence of a word.
+     * @param word the word to be checked.
+     * @return true if the word is in the dictionary,
+     *         false otherwise.
+     **/
+    virtual bool CheckWord(std::string const& word) = 0;
 };
 #endif // DICTIONARYSERVICE_H

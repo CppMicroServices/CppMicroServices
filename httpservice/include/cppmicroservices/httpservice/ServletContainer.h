@@ -28,33 +28,33 @@
 #include <memory>
 #include <string>
 
-namespace cppmicroservices {
-
-struct ServletContainerPrivate;
-class ServletContext;
-class BundleContext;
-
-class US_HttpService_EXPORT ServletContainer
+namespace cppmicroservices
 {
-public:
-  ServletContainer(BundleContext bundleCtx,
-                   const std::string& contextPath = std::string());
-  ~ServletContainer();
 
-  void SetContextPath(const std::string& contextPath);
-  std::string GetContextPath() const;
+    struct ServletContainerPrivate;
+    class ServletContext;
+    class BundleContext;
 
-  void Start();
-  void Stop();
+    class US_HttpService_EXPORT ServletContainer
+    {
+      public:
+        ServletContainer(BundleContext bundleCtx, std::string const& contextPath = std::string());
+        ~ServletContainer();
 
-  std::shared_ptr<ServletContext> GetContext(const std::string& uripath) const;
-  std::string GetContextPath(const ServletContext* context) const;
+        void SetContextPath(std::string const& contextPath);
+        std::string GetContextPath() const;
 
-private:
-  friend class ServletContext;
+        void Start();
+        void Stop();
 
-  ServletContainerPrivate* d;
-};
-}
+        std::shared_ptr<ServletContext> GetContext(std::string const& uripath) const;
+        std::string GetContextPath(ServletContext const* context) const;
+
+      private:
+        friend class ServletContext;
+
+        ServletContainerPrivate* d;
+    };
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SERVLETCONTAINER_H

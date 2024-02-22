@@ -7,6 +7,7 @@
 #include <spdlog/details/null_mutex.h>
 #include <spdlog/details/log_msg.h>
 
+#include <cstdio>
 #include <mutex>
 #include <string>
 #include <chrono>
@@ -19,7 +20,7 @@
 //     #include <spdlog/sinks/dup_filter_sink.h>
 //
 //     int main() {
-//         auto dup_filter = std::make_shared<dup_filter_sink_st>(std::chrono::seconds(5));
+//         auto dup_filter = std::make_shared<dup_filter_sink_st>(std::chrono::seconds(5), level::info);
 //         dup_filter->add_sink(std::make_shared<stdout_color_sink_mt>());
 //         spdlog::logger l("logger", dup_filter);
 //         l.info("Hello");
@@ -40,8 +41,9 @@ class dup_filter_sink : public dist_sink<Mutex>
 {
 public:
     template<class Rep, class Period>
-    explicit dup_filter_sink(std::chrono::duration<Rep, Period> max_skip_duration)
+    explicit dup_filter_sink(std::chrono::duration<Rep, Period> max_skip_duration, level::level_enum notification_level = level::info)
         : max_skip_duration_{max_skip_duration}
+        , log_level_{notification_level}
     {}
 
 protected:
@@ -49,6 +51,7 @@ protected:
     log_clock::time_point last_msg_time_;
     std::string last_msg_payload_;
     size_t skip_counter_ = 0;
+    level::level_enum log_level_;
 
     void sink_it_(const details::log_msg &msg) override
     {
@@ -62,10 +65,13 @@ protected:
         // log the "skipped.." message
         if (skip_counter_ > 0)
         {
-            memory_buf_t buf;
-            fmt::format_to(buf, "Skipped {} duplicate messages..", skip_counter_);
-            details::log_msg skipped_msg{msg.logger_name, msg.level, string_view_t{buf.data(), buf.size()}};
-            dist_sink<Mutex>::sink_it_(skipped_msg);
+            char buf[64];
+            auto msg_size = ::snprintf(buf, sizeof(buf), "Skipped %u duplicate messages..", static_cast<unsigned>(skip_counter_));
+            if (msg_size > 0 && static_cast<size_t>(msg_size) < sizeof(buf))
+            {
+                details::log_msg skipped_msg{msg.source, msg.logger_name, log_level_, string_view_t{buf, static_cast<size_t>(msg_size)}};
+                dist_sink<Mutex>::sink_it_(skipped_msg);
+            }
         }
 
         // log current message

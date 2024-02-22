@@ -27,47 +27,56 @@
 
 using cppmicroservices::service::component::runtime::dto::ComponentState;
 
-namespace cppmicroservices {
-namespace scrimpl {
-
-/**
- * This class represents the {\code ComponentState::SATISFIED} state of a
- * component configuration. This state indicates that the component's service
- * is registered with the framework
- */
-class CCRegisteredState final : public CCSatisfiedState
+namespace cppmicroservices
 {
-public:
-  CCRegisteredState();
-  CCRegisteredState(std::shared_future<void> blockUntil);
-  ~CCRegisteredState() override = default;
-  CCRegisteredState(const CCRegisteredState&) = delete;
-  CCRegisteredState& operator=(const CCRegisteredState&) = delete;
-  CCRegisteredState(CCRegisteredState&&) = delete;
-  CCRegisteredState& operator=(CCRegisteredState&&) = delete;
+    namespace scrimpl
+    {
 
-  void Register(ComponentConfigurationImpl& /*mgr*/) override{
-    // no-op, already resolved
-  };
+        /**
+         * This class represents the {\code ComponentState::SATISFIED} state of a
+         * component configuration. This state indicates that the component's service
+         * is registered with the framework
+         */
+        class CCRegisteredState final : public CCSatisfiedState
+        {
+          public:
+            CCRegisteredState();
+            CCRegisteredState(std::shared_future<void> blockUntil);
+            ~CCRegisteredState() override = default;
+            CCRegisteredState(CCRegisteredState const&) = delete;
+            CCRegisteredState& operator=(CCRegisteredState const&) = delete;
+            CCRegisteredState(CCRegisteredState&&) = delete;
+            CCRegisteredState& operator=(CCRegisteredState&&) = delete;
 
-  /**
-   * This method is used to trigger a transition from current state to \c ACTIVE state
-   */
-  std::shared_ptr<ComponentInstance> Activate(
-    ComponentConfigurationImpl& mgr,
-    const cppmicroservices::Bundle& clientBundle) override;
-  /**
-   * Modifying properties while the component is in the REGISTERED_STATE state is a no-op
-   */
-  bool Modified(ComponentConfigurationImpl& /*mgr*/) override { return true; };
-  /**
-   * Method blocks the current thread until the stored future is ready
-   */
-  void WaitForTransitionTask() override { ready.get(); }
+            void Register(ComponentConfigurationImpl& /*mgr*/) override {
+                // no-op, already resolved
+            };
 
-private:
-  std::shared_future<void> ready;
-};
-}
-}
+            /**
+             * This method is used to trigger a transition from current state to \c ACTIVE state
+             */
+            std::shared_ptr<ComponentInstance> Activate(ComponentConfigurationImpl& mgr,
+                                                        cppmicroservices::Bundle const& clientBundle) override;
+            /**
+             * Modifying properties while the component is in the REGISTERED_STATE state is a no-op
+             */
+            bool
+            Modified(ComponentConfigurationImpl& /*mgr*/) override
+            {
+                return true;
+            };
+            /**
+             * Method blocks the current thread until the stored future is ready
+             */
+            void
+            WaitForTransitionTask() override
+            {
+                ready.get();
+            }
+
+          private:
+            std::shared_future<void> ready;
+        };
+    } // namespace scrimpl
+} // namespace cppmicroservices
 #endif // CCRegisteredState_hpp

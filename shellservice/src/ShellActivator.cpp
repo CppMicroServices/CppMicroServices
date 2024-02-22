@@ -27,22 +27,27 @@
 
 #include "cppmicroservices/shellservice/ShellService.h"
 
-namespace cppmicroservices {
-
-class ShellActivator : public BundleActivator
+namespace cppmicroservices
 {
-public:
-  void Start(BundleContext context) override
-  {
-    m_ShellService = std::make_shared<ShellService>();
-    context.RegisterService<ShellService>(m_ShellService);
-  }
 
-  void Stop(BundleContext) override {}
+    class ShellActivator : public BundleActivator
+    {
+      public:
+        void
+        Start(BundleContext context) override
+        {
+            m_ShellService = std::make_shared<ShellService>();
+            context.RegisterService<ShellService>(m_ShellService);
+        }
 
-private:
-  std::shared_ptr<ShellService> m_ShellService;
-};
-}
+        void
+        Stop(BundleContext) override
+        {
+        }
+
+      private:
+        std::shared_ptr<ShellService> m_ShellService;
+    };
+} // namespace cppmicroservices
 
 CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::ShellActivator)

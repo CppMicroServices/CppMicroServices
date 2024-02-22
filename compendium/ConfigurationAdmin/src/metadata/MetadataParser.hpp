@@ -25,42 +25,45 @@
 
 #include "ConfigurationMetadata.hpp"
 
-namespace cppmicroservices {
-namespace cmimpl {
-namespace metadata {
-
-/*
- * @brief Represents an abstract metadata parser.
- *
- * Whenever there is a change in the service description JSON file-format:
- *  1. The "version" field in the manifest should be bumped-up by one.
- *  2. A new concrete class that implements the following
- *     interface is implemented, which would contain the logic to parse
- *     that particular change of the manifest file-format.
- *  3. The MetadataParserFactory is changed to create and return
- *     that implementation for the corresponding version of the manifest.
- * This way, because the CM Bundle Extension depends on the
- * following interface instead of any concrete implementation, it
- * supports multiple versions of the manifest.
- */
-class MetadataParser
+namespace cppmicroservices
 {
-public:
-  virtual ~MetadataParser() = default;
+    namespace cmimpl
+    {
+        namespace metadata
+        {
 
-  /*
-   * @brief Parses and returns a vector of the configuration metadata
-   * @param anymap An @c AnyMap representation of the configuration properties
-   * @returns a vector of parsed @c ConfigurationMetadata
-   */
-  virtual std::vector<ConfigurationMetadata> ParseAndGetConfigurationMetadata(
-    const AnyMap& anymap) const = 0;
+            /*
+             * @brief Represents an abstract metadata parser.
+             *
+             * Whenever there is a change in the service description JSON file-format:
+             *  1. The "version" field in the manifest should be bumped-up by one.
+             *  2. A new concrete class that implements the following
+             *     interface is implemented, which would contain the logic to parse
+             *     that particular change of the manifest file-format.
+             *  3. The MetadataParserFactory is changed to create and return
+             *     that implementation for the corresponding version of the manifest.
+             * This way, because the CM Bundle Extension depends on the
+             * following interface instead of any concrete implementation, it
+             * supports multiple versions of the manifest.
+             */
+            class MetadataParser
+            {
+              public:
+                virtual ~MetadataParser() = default;
 
-protected:
-  MetadataParser() = default;
-};
-} // metadata
-} // cmimpl
-} // cppmicroservices
+                /*
+                 * @brief Parses and returns a vector of the configuration metadata
+                 * @param anymap An @c AnyMap representation of the configuration properties
+                 * @returns a vector of parsed @c ConfigurationMetadata
+                 */
+                virtual std::vector<ConfigurationMetadata> ParseAndGetConfigurationMetadata(AnyMap const& anymap) const
+                    = 0;
 
-#endif //METADATAPARSER_HPP
+              protected:
+                MetadataParser() = default;
+            };
+        } // namespace metadata
+    }     // namespace cmimpl
+} // namespace cppmicroservices
+
+#endif // METADATAPARSER_HPP

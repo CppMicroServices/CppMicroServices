@@ -41,7 +41,6 @@ usMacroCreateBundle(LogServiceImpl
   SOURCES ${_srcs} src/Activator.cpp
   BINARY_RESOURCES manifest.json
   )
-set(_SECURE_SCL ON)
 
 target_include_directories(LogService PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/src

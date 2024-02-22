@@ -25,87 +25,95 @@
 #include <regex>
 #include <utility>
 
-namespace cppmicroservices {
-namespace service {
-namespace em {
-
-namespace {
-bool ValidateTopic(const std::string& topic)
+namespace cppmicroservices::service::em
 {
-  std::string regexExpr = "([A-Za-z0-9_.]+)(\\/[A-Za-z0-9_.]+)*";
 
-  return std::regex_match(topic, std::regex(regexExpr));
-}
+    namespace
+    {
+        bool
+        ValidateTopic(std::string const& topic)
+        {
+            std::string regexExpr = "([A-Za-z0-9_.]+)(\\/[A-Za-z0-9_.]+)*";
 
-bool PropsAreEqual(const AnyMap& props1, const AnyMap& props2)
-{
-  return props1.size() == props2.size() &&
-         std::equal(props1.begin(), props1.end(), props2.begin());
-}
-}
+            return std::regex_match(topic, std::regex(regexExpr));
+        }
 
-Event::Event(const std::string& topic, const EventProperties properties)
-  : topic(topic)
-  , properties(properties)
-{
-  if (!ValidateTopic(topic)) {
-    throw std::logic_error("The topic does not match the expected format.");
-  }
-}
+        bool
+        PropsAreEqual(AnyMap const& props1, AnyMap const& props2)
+        {
+            return props1.size() == props2.size() && std::equal(props1.begin(), props1.end(), props2.begin());
+        }
+    } // namespace
 
-bool Event::operator==(const Event& other) const
-{
-  return (topic == other.topic) && PropsAreEqual(properties, other.properties);
-}
+    Event::Event(std::string const& topic, EventProperties const properties) : topic(topic), properties(properties)
+    {
+        if (!ValidateTopic(topic))
+        {
+            throw std::logic_error("The topic does not match the expected format.");
+        }
+    }
 
-bool Event::operator!=(const Event& other) const
-{
-  return !(operator==(other));
-}
+    bool
+    Event::operator==(Event const& other) const
+    {
+        return (topic == other.topic) && PropsAreEqual(properties, other.properties);
+    }
 
-bool Event::ContainsProperty(const std::string& propName) const
-{
-  return properties.find(propName) != properties.end();
-}
+    bool
+    Event::operator!=(Event const& other) const
+    {
+        return !(operator==(other));
+    }
 
-const Any Event::GetProperty(const std::string& propName) const
-{
-  auto itr = properties.find(propName);
-  if (itr == properties.end()) {
-    return Any();
-  }
+    [[nodiscard]] bool
+    Event::ContainsProperty(std::string const& propName) const
+    {
+        return properties.find(propName) != properties.end();
+    }
 
-  return itr->second;
-}
+    [[nodiscard]] Any const
+    Event::GetProperty(std::string const& propName) const
+    {
+        auto itr = properties.find(propName);
+        if (itr == properties.end())
+        {
+            return Any();
+        }
 
-const AnyMap Event::GetProperties() const
-{
-  return properties;
-}
+        return itr->second;
+    }
 
-std::vector<std::string> Event::GetPropertyNames() const
-{
-  std::vector<std::string> props(properties.size());
+    [[nodiscard]] AnyMap const
+    Event::GetProperties() const
+    {
+        return properties;
+    }
 
-  size_t index = 0;
-  for (const auto& [key, value] : properties) {
-    US_UNUSED(value);
-    props[index++] = key;
-  }
+    [[nodiscard]] std::vector<std::string>
+    Event::GetPropertyNames() const
+    {
+        std::vector<std::string> props(properties.size());
 
-  return props;
-}
+        size_t index = 0;
+        for (auto const& [key, value] : properties)
+        {
+            US_UNUSED(value);
+            props[index++] = key;
+        }
 
-std::string Event::GetTopic() const
-{
-  return topic;
-}
+        return props;
+    }
 
-bool Event::Matches(const LDAPFilter& filter) const
-{
-  return filter.Match(properties);
-}
+    [[nodiscard]] std::string
+    Event::GetTopic() const
+    {
+        return topic;
+    }
 
-}
-}
-}
+    [[nodiscard]] bool
+    Event::Matches(LDAPFilter const& filter) const
+    {
+        return filter.Match(properties);
+    }
+
+} // namespace cppmicroservices::service::em

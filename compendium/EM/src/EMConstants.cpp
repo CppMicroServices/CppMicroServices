@@ -24,31 +24,28 @@
 
 #include "cppmicroservices/em/EMConstants.hpp"
 
-namespace cppmicroservices {
-namespace em {
-namespace Constants {
-const std::string BUNDLE = "bundle";
-const std::string BUNDLE_ID = "bundle.id";
-//const std::string BUNDLE_SIGNER = "bundle.signer";
-const std::string BUNDLE_SYMBOLICNAME = "bundle.symbolicName";
-const std::string BUNDLE_VERSION = "bundle.version";
-const std::string DELIVERY_ASYNC_ORDERED = "async.ordered";
-const std::string DELIVERY_ASYNC_UNORDERED = "async.unordered";
-const std::string EVENT = "event";
-//const std::string EVENT_ADMIN_IMPLEMENTATION = "osgi.event";
-//const std::string EVENT_ADMIN_SPECIFICATION_VERSION = "1.4.0";
-const std::string EVENT_DELIVERY = "event.delivery";
-const std::string EVENT_FILTER = "event.filter";
-const std::string EVENT_TOPIC = "event.topics";
-const std::string EXCEPTION = "exception";
-const std::string EXCEPTION_CLASS = "exception.class";
-const std::string EXCEPTION_MESSAGE = "exception.message";
-const std::string MESSAGE = "message";
-const std::string SERVICE = "service";
-const std::string SERVICE_ID = "service.id";
-const std::string OBJECTCLASS = "objectClass";
-const std::string SERVICE_PID = "service.pid";
-const std::string TIMESTAMP = "timestamp";
-}
-}
-}
+namespace cppmicroservices::em::Constants
+{
+    std::string const BUNDLE = "bundle";
+    std::string const BUNDLE_ID = "bundle.id";
+    // const std::string BUNDLE_SIGNER = "bundle.signer";
+    std::string const BUNDLE_SYMBOLICNAME = "bundle.symbolicName";
+    std::string const BUNDLE_VERSION = "bundle.version";
+    std::string const DELIVERY_ASYNC_ORDERED = "async.ordered";
+    std::string const DELIVERY_ASYNC_UNORDERED = "async.unordered";
+    std::string const EVENT = "event";
+    // const std::string EVENT_ADMIN_IMPLEMENTATION = "osgi.event";
+    // const std::string EVENT_ADMIN_SPECIFICATION_VERSION = "1.4.0";
+    std::string const EVENT_DELIVERY = "event.delivery";
+    std::string const EVENT_FILTER = "event.filter";
+    std::string const EVENT_TOPIC = "event.topics";
+    std::string const EXCEPTION = "exception";
+    std::string const EXCEPTION_CLASS = "exception.class";
+    std::string const EXCEPTION_MESSAGE = "exception.message";
+    std::string const MESSAGE = "message";
+    std::string const SERVICE = "service";
+    std::string const SERVICE_ID = "service.id";
+    std::string const OBJECTCLASS = "objectClass";
+    std::string const SERVICE_PID = "service.pid";
+    std::string const TIMESTAMP = "timestamp";
+} // namespace cppmicroservices::em::Constants

@@ -25,54 +25,54 @@
 
 #include "cppmicroservices/em/Event.hpp"
 
-namespace cppmicroservices {
-namespace service {
-namespace em {
-
-/**
- * \defgroup gr_emeventadmin EventAdmin
- * \brief Groups cppmicroservices::service::em::EventAdmin related symbols.
- * 
- */
-
-/**
- * \ingroup gr_emeventadmin
- * An implementation of the OSGi EventAdmin compendium service.
- *
- * The EventAdmin service is responsible for delivering published messages to EventHandlers who
- * subscribe to specific events matching a given criteria.
- *
- * There are two methods for publishing an event: \c PostEvent and \c SendEvent . PostEvent() will
- * send a published event asynchronously and returns back to the caller before delivery has
- * completed while SendEvent() will only return once the event delivery has completed.
- */
-class EventAdmin
+namespace cppmicroservices::service::em
 {
-public:
-  virtual ~EventAdmin() = default;
 
-  /**
-   * @brief Initiates the asynchronous delivery of an event. If the \c DELIVERY_ASYNC_UNORDERED
-   * event property is specified, it will not guaranteed that the event will be delivered in the
-   * order that it was received.
-   *
-   * This function will return to the caller before event delivery has completed.
-   *
-   * @param evt The event to deliver to all handlers which subscribe to the topic of the event
-   */
-  virtual void PostEvent(const Event& evt) noexcept = 0;
+    /**
+     * \defgroup gr_emeventadmin EventAdmin
+     * \brief Groups cppmicroservices::service::em::EventAdmin related symbols.
+     *
+     */
 
-  /**
-   * @brief Initiates the synchronous delivery of an event.
-   *
-   * This function will not return to the caller until event delivery has completed.
-   *
-   * @param evt The event to delvier to all handlers which subscribe to the topic of the event
-   */
-  virtual void SendEvent(const Event& evt) noexcept = 0;
-};
-}
-}
-}
+    /**
+     * \ingroup gr_emeventadmin
+     * An implementation of the OSGi EventAdmin compendium service.
+     *
+     * The EventAdmin service is responsible for delivering published messages to EventHandlers who
+     * subscribe to specific events matching a given criteria.
+     *
+     * There are two methods for publishing an event: \c PostEvent and \c SendEvent . PostEvent() will
+     * send a published event asynchronously and returns back to the caller before delivery has
+     * completed while SendEvent() will only return once the event delivery has completed.
+     */
+    class EventAdmin
+    {
+      public:
+        virtual ~EventAdmin() = default;
+        EventAdmin(EventAdmin&&) = default;
+        EventAdmin(EventAdmin&) = default;
+        EventAdmin& operator=(EventAdmin&) = default;
+        EventAdmin& operator=(EventAdmin&&) = default;
+        /**
+         * @brief Initiates the asynchronous delivery of an event. If the \c DELIVERY_ASYNC_UNORDERED
+         * event property is specified, it will not guaranteed that the event will be delivered in the
+         * order that it was received.
+         *
+         * This function will return to the caller before event delivery has completed.
+         *
+         * @param evt The event to deliver to all handlers which subscribe to the topic of the event
+         */
+        virtual void PostEvent(Event const& evt) noexcept = 0;
+
+        /**
+         * @brief Initiates the synchronous delivery of an event.
+         *
+         * This function will not return to the caller until event delivery has completed.
+         *
+         * @param evt The event to delvier to all handlers which subscribe to the topic of the event
+         */
+        virtual void SendEvent(Event const& evt) noexcept = 0;
+    };
+} // namespace cppmicroservices::service::em
 
 #endif

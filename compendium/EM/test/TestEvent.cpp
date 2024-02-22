@@ -180,4 +180,12 @@ TEST(EventTest, TestFilterMatches)
   ASSERT_FALSE(evt2.Matches(filter));
 }
 
+TEST(EventTest, TestInvalidTopicCharacters)
+{
+  EXPECT_THROW({ Event("/not/a/valid/topic+"); }, std::logic_error);
+  EXPECT_THROW({ Event("/not/a/vali;d/topic"); }, std::logic_error);
+  EXPECT_THROW({ Event("/not/a/valid\topic"); }, std::logic_error);
+  EXPECT_THROW({ Event("/not/a!/valid/topic"); }, std::logic_error);
+}
+
 }

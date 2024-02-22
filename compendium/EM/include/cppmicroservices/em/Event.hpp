@@ -72,7 +72,7 @@ public:
    * Topics take the following form:
    *   topic-description := '*' | topic ( '/\*' )?
    *   topic := token ( '/' token )*
-   *   token := [A-Za-z0-9_.]
+   *   token := [A-Za-z0-9_.]+
    *
    * @param topic The topic of the event.
    * @param properties The event's properties. This is immutable and a copy of the original

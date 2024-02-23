@@ -485,7 +485,7 @@ inline auto get_data(Container& c) -> typename Container::value_type* {
   return c.data();
 }
 
-#if defined(_SECURE_SCL) && _SECURE_SCL
+#if defined(_SECURE_SCL) && _SECURE_SCL &&  __cpp_lib_span >= 202002L
 #include <span>
 // Make a checked iterator to avoid MSVC warnings.
 template <typename T> using checked_ptr = std::span<T*>;

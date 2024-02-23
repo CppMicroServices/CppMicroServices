@@ -28,15 +28,15 @@ jobs:
         submodules: true
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
 
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
+      uses: github/codeql-action/autobuild@v3
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
 
   analyze_msvc:
     name: Analyze (MSVC Code Analysis)
@@ -78,7 +78,7 @@ jobs:
 
     # Upload SARIF file to GitHub Code Scanning Alerts
     - name: Upload SARIF to GitHub
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: ${{ steps.run-msvc-analysis.outputs.sarif }}
 

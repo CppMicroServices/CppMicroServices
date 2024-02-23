@@ -54,12 +54,8 @@ target_include_directories(LogService PRIVATE
   ${CppMicroServices_SOURCE_DIR}/third_party/googletest/googlemock/include
   )
 
-if(MSVC)
-  target_compile_options(spdlog PRIVATE /EHs-c-)
-endif()
-
 if(APPLE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0.0")
-    target_compile_definitions(LogService PRIVATE SPDLOG_NO_TLS )
+    target_compile_definitions(LogService PRIVATE SPDLOG_NO_TLS)
   endif()
 endif()

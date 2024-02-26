@@ -28,8 +28,6 @@
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 
 namespace cppmicroservices::scrimpl
-    {
-        class ComponentConfigurationImpl;
         class SCRExtensionRegistry;
 
         class ComponentFactoryImpl final

@@ -21,7 +21,7 @@
  =============================================================================*/
 
 #ifndef __CPPMICROSERVICES_SCRIMPL_COMPONENTFACTORYIMPL_HPP__
-#define __CPPMICROSERVICES_SCRIMPL_COMPONENTFACTORYIMPL_HPP__
+#define CPPMICROSERVICES_SCRIMPL_COMPONENTFACTORYIMPL_HPP_
 
 #include "../SCRLogger.hpp"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"

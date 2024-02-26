@@ -35,9 +35,11 @@
 #include "gtest/gtest.h"
 #include "Mocks.hpp"
 #include "TestFixture.hpp"
-#include "TestInterfaces/Interfaces.hpp"
+#include <TestInterfaces/Interfaces.hpp>
 namespace test
 {
+#define TIMEOUT_HALF_SECOND std::chrono::milliseconds(500)
+
     class tFactoryTarget : public tGenericDSAndCASuite
     {
       public:
@@ -87,14 +89,25 @@ namespace test
                 {property, propertyValue}
             };
             return context.RegisterService<ServiceInterfaceT>(mockService, serviceProps);
-        }    
+        } 
+ 
+
     };
 
     class MockServiceBImpl : public test::ServiceBInt
     {
       public:
         MockServiceBImpl() = default;
-        cppmicroservices::AnyMap GetProperties() { return cppmicroservices::AnyMap(); }
+        MockServiceBImpl(MockServiceBImpl const&) = delete;
+        MockServiceBImpl(MockServiceBImpl&&) = delete;
+        MockServiceBImpl& operator=(MockServiceBImpl const&) = delete;
+        MockServiceBImpl& operator=(MockServiceBImpl&&) = delete;
+
+        cppmicroservices::AnyMap
+        GetProperties()
+        {
+            return {};
+        }
         ~MockServiceBImpl() = default;
     };
 
@@ -102,7 +115,15 @@ namespace test
     {
       public:
         MockServiceCImpl() = default;
-        cppmicroservices::AnyMap GetProperties() { return cppmicroservices::AnyMap(); }
+        MockServiceCImpl(MockServiceCImpl const&) = delete;
+        MockServiceCImpl(MockServiceCImpl&&) = delete;
+        MockServiceCImpl& operator=(MockServiceCImpl const&) = delete;
+        MockServiceCImpl& operator=(MockServiceCImpl&&) = delete;
+        cppmicroservices::AnyMap
+        GetProperties()
+        {
+            return {};
+        }
         ~MockServiceCImpl() = default;
     }; 
 
@@ -160,13 +181,13 @@ namespace test
         ASSERT_TRUE(!service);
 
         // Create a service tracker for ServiceA. 
-        std::unique_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>> tracker(new cppmicroservices::ServiceTracker<test::ServiceAInt>(context, nullptr));
+        std::unique_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>> tracker (new cppmicroservices::ServiceTracker<test::ServiceAInt>(context, nullptr));
         tracker->Open();
 
         // Register the ServiceB~123 factory service with a mock implementation
         auto serviceBReg = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "ServiceBId", "ServiceB~123");
    
-        auto serviceA = tracker->WaitForService(std::chrono::milliseconds(500));
+        auto serviceA = tracker->WaitForService(TIMEOUT_HALF_SECOND);
         ASSERT_TRUE(serviceA) << "ServiceA not registered";
   
         // Clean up
@@ -178,6 +199,7 @@ namespace test
     /* tFactoryTarget.multipleTargetsExistBefore.
      * ServiceA, ServiceB and ServiceC are all factory instances.
      * ServiceA~1 is dependent on ServiceB~123 and ServiceC~123
+     *
      * ServiceB~123 and ServiceC~123 are registered before the bundle containing ServiceA is
      * started.
      */
@@ -246,7 +268,7 @@ namespace test
         // Register the ServiceC~123 factory service with a mock implementation
         auto serviceCReg = registerSvc<test::ServiceCInt, MockServiceCImpl>("ServiceC~123", "ServiceCId", "ServiceC~123");
   
-        auto serviceA = tracker->WaitForService(std::chrono::milliseconds(500));
+        auto serviceA = tracker->WaitForService(TIMEOUT_HALF_SECOND);
         ASSERT_TRUE(serviceA) << "ServiceA not registered";
 
         // Clean up
@@ -289,7 +311,7 @@ namespace test
         auto serviceBReg2 = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "ServiceBId", "ServiceB~123");
  
         // ServiceA~1 should now be satisfied.
-        auto serviceA = tracker->WaitForService(std::chrono::milliseconds(500));
+        auto serviceA = tracker->WaitForService(TIMEOUT_HALF_SECOND);
         ASSERT_TRUE(serviceA) << "ServiceA not registered";
 
  
@@ -421,7 +443,7 @@ namespace test
             = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "ServiceBId", "ServiceB~123");
 
         for (auto const& tracker : trackers) {
-            auto service = tracker->WaitForService(std::chrono::milliseconds(500));
+            auto service = tracker->WaitForService(TIMEOUT_HALF_SECOND);
             ASSERT_TRUE(service) << "ServiceA not registered";
             tracker->Close();
         }
@@ -477,7 +499,7 @@ namespace test
                                   while (!tracker->IsEmpty()) {};
                                   return;
                               });
-        fut.wait_for(std::chrono::milliseconds(500));
+        fut.wait_for(TIMEOUT_HALF_SECOND);
  
         ASSERT_TRUE(tracker->IsEmpty()) << "All ServiceA instances should have been destroyed.";       
         testBundle.Stop();

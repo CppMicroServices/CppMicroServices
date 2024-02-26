@@ -1,7 +1,7 @@
-#ifndef _SERVICE_IMPL_HPP_
-#define _SERVICE_IMPL_HPP_
+#ifndef SERVICE_IMPL_HPP_
+#define SERVICE_IMPL_HPP_
 
-#include "TestInterfaces/Interfaces.hpp"
+#include <TestInterfaces/Interfaces.hpp>
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 #include <mutex>
 
@@ -18,14 +18,19 @@ namespace sample
         void Modified(std::shared_ptr<ComponentContext> const& context,
                       std::shared_ptr<cppmicroservices::AnyMap> const& configuration);
         cppmicroservices::AnyMap GetProperties() override;
- 
+        ServiceAImpl2() = default;
+        ServiceAImpl2(ServiceAImpl2 const&) = delete;
+        ServiceAImpl2(ServiceAImpl2&&) = delete;
+        ServiceAImpl2& operator=(ServiceAImpl2 const&) = delete;
+        ServiceAImpl2& operator=(ServiceAImpl2&&) = delete;
+
         ~ServiceAImpl2() = default;
 
       private:
         std::mutex propertiesLock;
-        cppmicroservices::AnyMap properties;
-        std::shared_ptr<test::ServiceBInt> serviceB;
-        std::shared_ptr<test::ServiceCInt> serviceC;
+        cppmicroservices::AnyMap properties {};
+        std::shared_ptr<test::ServiceBInt> serviceB {};
+        std::shared_ptr<test::ServiceCInt> serviceC {};
     };
 } // namespace sample
 

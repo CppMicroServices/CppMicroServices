@@ -38,7 +38,7 @@ namespace cppmicroservices::scrimpl
         using cppmicroservices::scrimpl::metadata::ComponentMetadata;
 
         ComponentFactoryImpl::ComponentFactoryImpl(
-            cppmicroservices::BundleContext const& context,
+            cppmicroservices::BundleContext  context,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
             std::shared_ptr<SCRExtensionRegistry> extensionReg)

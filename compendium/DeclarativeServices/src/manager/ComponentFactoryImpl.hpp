@@ -27,9 +27,7 @@
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 
-namespace cppmicroservices
-{
-    namespace scrimpl
+namespace cppmicroservices::scrimpl
     {
         class ComponentConfigurationImpl;
         class SCRExtensionRegistry;

@@ -22,6 +22,10 @@ endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
 	       ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
+
+# This is to suppress a warning from MSVC regarding the use of 
+# stdext::checked_array_iterator in spdlog. If and when spdlog upgrades 
+# to a future release of c++, std::span is available in c++20 and is not deprecated
 if(MSVC)
   add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
 endif()

@@ -33,9 +33,7 @@
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 
 
-namespace cppmicroservices
-{
-    namespace scrimpl
+namespace cppmicroservices::scrimpl
     {
         using cppmicroservices::scrimpl::metadata::ComponentMetadata;
 

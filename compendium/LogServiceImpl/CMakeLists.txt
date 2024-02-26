@@ -22,6 +22,9 @@ endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/manifest.json.in
 	       ${CMAKE_CURRENT_BINARY_DIR}/resources/manifest.json)
+if(MSVC)
+  add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
+endif()
 
 if(MINGW)
   # silence ignored attributes warnings

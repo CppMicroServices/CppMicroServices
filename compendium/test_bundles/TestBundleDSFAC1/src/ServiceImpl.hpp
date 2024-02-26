@@ -1,5 +1,5 @@
 #ifndef _SERVICE_IMPL_HPP_
-#define _SERVICE_IMPL_HPP_
+#define SERVICE_IMPL_HPP_
 
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"

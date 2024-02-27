@@ -92,8 +92,8 @@ namespace cppmicroservices::em
         US_em_EXPORT extern std::string const DELIVERY_ASYNC_UNORDERED;
 
         /**
-         * Event property containing the forwarded \c EMEvent object. This can be used when rebroadcasting
-         * the event. The value of this property is of type <code>EMEvent</code>
+         * Event property containing the forwarded \c Event object. This can be used when rebroadcasting
+         * the event. The value of this property is of type <code>Event</code>
          */
         US_em_EXPORT extern std::string const EVENT;
 

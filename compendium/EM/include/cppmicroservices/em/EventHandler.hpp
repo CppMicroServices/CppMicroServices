@@ -28,12 +28,12 @@
 namespace cppmicroservices::service::em
 {
     /**
-     * \defgroup gr_emeventhandler EventHandler
+     * \defgroup gr_Eventhandler EventHandler
      * \brief Groups cppmicroservices::service::em::EventHandler related symbols.
      */
 
     /**
-     * \ingroup gr_emeventhandler
+     * \ingroup gr_Eventhandler
      *
      * An implementation of the OSGi EventHandler specification.
      *
@@ -46,10 +46,6 @@ namespace cppmicroservices::service::em
     {
       public:
         virtual ~EventHandler() = default;
-        EventHandler(EventHandler&&) = default;
-        EventHandler(EventHandler&) = default;
-        EventHandler& operator=(EventHandler&) = default;
-        EventHandler& operator=(EventHandler&&) = default;
         /**
          * @brief The function that \c EventAdmin service calls to notify the listener that an event
          * matching their desired criteria (topic + (optionally filter)) was sent.

@@ -29,13 +29,13 @@ namespace cppmicroservices::service::em
 {
 
     /**
-     * \defgroup gr_emeventadmin EventAdmin
+     * \defgroup gr_Eventadmin EventAdmin
      * \brief Groups cppmicroservices::service::em::EventAdmin related symbols.
      *
      */
 
     /**
-     * \ingroup gr_emeventadmin
+     * \ingroup gr_Eventadmin
      * An implementation of the OSGi EventAdmin compendium service.
      *
      * The EventAdmin service is responsible for delivering published messages to EventHandlers who
@@ -49,10 +49,7 @@ namespace cppmicroservices::service::em
     {
       public:
         virtual ~EventAdmin() = default;
-        EventAdmin(EventAdmin&&) = default;
-        EventAdmin(EventAdmin&) = default;
-        EventAdmin& operator=(EventAdmin&) = default;
-        EventAdmin& operator=(EventAdmin&&) = default;
+
         /**
          * @brief Initiates the asynchronous delivery of an event. If the \c DELIVERY_ASYNC_UNORDERED
          * event property is specified, it will not guaranteed that the event will be delivered in the

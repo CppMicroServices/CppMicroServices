@@ -34,12 +34,12 @@ namespace cppmicroservices::service::em
     using EventProperties = std::unordered_map<std::string, Any>;
 
     /**
-     * \defgroup gr_emevent Event
+     * \defgroup gr_Event Event
      * \brief Groups cppmicroservices::service::em::Event related symbols.
      */
 
     /**
-     * \ingroup gr_emevent
+     * \ingroup gr_Event
      *
      * An implementation of the OSGi EventAdmin Event specification.
      *
@@ -51,17 +51,16 @@ namespace cppmicroservices::service::em
      * event properties being changed by arbitrary pieces of code, ensuring the originality of the
      * published event.
      *
-     * Interactions with events occurs through the EMEvent object directly. See
+     * Interactions with events occurs through the Event object directly. See
      * \c cppmicroservices::em::Constants for information regarding what properties an event can have.
      */
     class US_em_EXPORT Event
     {
       public:
         Event() = delete;
-        Event(Event&&) = delete;
-        Event(Event const&&) = delete;
-        Event& operator=(Event const&) = delete;
-        Event& operator=(Event&&) = delete;
+        Event(Event&&) = default;
+        Event& operator=(Event const&) = default;
+        Event& operator=(Event&&) = default;
 
         Event(Event const&) = default;
 
@@ -138,7 +137,7 @@ namespace cppmicroservices::service::em
         [[nodiscard]] std::vector<std::string> GetPropertyNames() const;
 
         /**
-         * @brief Returns the topic of the EMEvent.
+         * @brief Returns the topic of the Event.
          *
          * @return std::string The topic
          */

@@ -1,0 +1,6 @@
+{
+    "bundle.symbolic_name": "event_admin",
+    "bundle.name" : "Event Admin",
+    "bundle.version" : "@EventAdmin_VERSION@",
+    "bundle.activator" : true
+}

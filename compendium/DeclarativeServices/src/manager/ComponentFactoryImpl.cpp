@@ -38,16 +38,16 @@ namespace cppmicroservices::scrimpl
         using cppmicroservices::scrimpl::metadata::ComponentMetadata;
 
         ComponentFactoryImpl::ComponentFactoryImpl(
-            cppmicroservices::BundleContext  context,
+            cppmicroservices::BundleContext const&  context,
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
             std::shared_ptr<SCRExtensionRegistry> extensionReg)
-            : bundleContext(context)
+            : bundleContext(std::move(context))
             , logger(std::move(logger))
             , asyncWorkService(asyncWorkSvc)
             , extensionRegistry(extensionReg)
         {
-            if (!bundleContext || !(this->logger) || (!this->asyncWorkService) || (!this->extensionRegistry))
+            if (!bundleContext || !logger || !asyncWorkService || extensionRegistry)
             {
                 throw std::invalid_argument("ComponentFactoryImpl Constructor "
                                             "provided with invalid arguments");
@@ -62,7 +62,7 @@ namespace cppmicroservices::scrimpl
         {
             // Create the virtual metadata for the factory instance. 
             // Start with the metadata from the factory 
-           auto newMetadata = std::make_shared<ComponentMetadata>(*mgr->GetMetadata());
+           auto const newMetadata = std::make_shared<ComponentMetadata>(*mgr->GetMetadata());
 
             newMetadata->name = pid;
             // this is a factory instance not a factory component
@@ -77,15 +77,15 @@ namespace cppmicroservices::scrimpl
             // with the referenceName.target as the key and the target as the value. 
             for (auto& ref : newMetadata->refsMetadata)
             {
-                auto target = ref.name + ".target";
-                auto iter = properties.find(target);
+                auto const target = ref.name + ".target";
+                auto const iter = properties.find(target);
                 if (iter != properties.end()) {
                     // This reference has a dynamic target
                     ref.target = cppmicroservices::ref_any_cast<std::string>(iter->second);
                     // Verify that the ref.target is a valid LDAPFilter
                     try
                     {
-                        LDAPFilter filter(ref.target);
+                        LDAPFilter const filter(ref.target);
                     }
                     catch (std::exception const& e)
                     {
@@ -97,13 +97,13 @@ namespace cppmicroservices::scrimpl
                  }
             }
 
-            auto bundle = mgr->GetBundle();
-            auto registry = mgr->GetRegistry();
-            auto logger = mgr->GetLogger();
-            auto configNotifier = mgr->GetConfigNotifier();
+            auto const bundle = mgr->GetBundle();
+            auto const registry = mgr->GetRegistry();
+            auto const logger = mgr->GetLogger();
+            auto const configNotifier = mgr->GetConfigNotifier();
             try
             {
-                auto compManager = std::make_shared<ComponentManagerImpl>(newMetadata,
+                auto const compManager = std::make_shared<ComponentManagerImpl>(newMetadata,
                                                                           registry,
                                                                           bundle.GetBundleContext(),
                                                                           logger,

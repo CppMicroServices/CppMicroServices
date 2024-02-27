@@ -28,45 +28,44 @@
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 
 namespace cppmicroservices::scrimpl {
-        class SCRExtensionRegistry;
+    class SCRExtensionRegistry;
+    class ComponentConfigurationImpl;
+    class ComponentFactoryImpl final
+    {
 
-        class ComponentFactoryImpl final
-        {
+      public:
+        /**
+         * @throws std::invalid_argument exception if any of the params is a nullptr
+         */
+        ComponentFactoryImpl(cppmicroservices::BundleContext const& context,
+                             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                             std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
+                             std::shared_ptr<SCRExtensionRegistry> extensionReg);
 
-          public:
-            /**
-             * @throws std::invalid_argument exception if any of the params is a nullptr
-             */
-            ComponentFactoryImpl(cppmicroservices::BundleContext const& context,
-                                 std::shared_ptr<cppmicroservices::logservice::LogService> logger,
-                                 std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
-                                 std::shared_ptr<SCRExtensionRegistry> extensionReg);
+        ComponentFactoryImpl(ComponentFactoryImpl const&) = delete;
+        ComponentFactoryImpl(ComponentFactoryImpl&&) = delete;
+        ComponentFactoryImpl& operator=(ComponentFactoryImpl const&) = delete;
+        ComponentFactoryImpl& operator=(ComponentFactoryImpl&&) = delete;
+        ~ComponentFactoryImpl() = default;
 
-            ComponentFactoryImpl(ComponentFactoryImpl const&) = delete;
-            ComponentFactoryImpl(ComponentFactoryImpl&&) = delete;
-            ComponentFactoryImpl& operator=(ComponentFactoryImpl const&) = delete;
-            ComponentFactoryImpl& operator=(ComponentFactoryImpl&&) = delete;
-            ~ComponentFactoryImpl() = default;
-
-            /**
-             * @brief Creates a factory instance
-             * @param pid The factory pid. Format factory~instance
-             * @param mgr The ComponentConfigurationImpl object belonging to the factory component
-             * @param properties The properties from the Config Admin configuration object belonging to the pid.
-             * @throws std::invalid_argument exception if a dynamic target contains an invalid LDAPFilter.
-             * @throws std::exception if the factory instance is not successfully created.
-             */
-            void CreateFactoryComponent(std::string const& pid,
+        /**
+         * @brief Creates a factory instance
+         * @param pid The factory pid. Format factory~instance
+         * @param mgr The ComponentConfigurationImpl object belonging to the factory component
+         * @param properties The properties from the Config Admin configuration object belonging to the pid.
+         * @throws std::invalid_argument exception if a dynamic target contains an invalid LDAPFilter.
+         * @throws std::exception if the factory instance is not successfully created.
+         */
+        void CreateFactoryComponent(std::string const& pid,
                                         std::shared_ptr<ComponentConfigurationImpl>& mgr,
                                         cppmicroservices::AnyMap const& properties);
 
-          private:
-            cppmicroservices::BundleContext bundleContext;
-            std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
-            std::shared_ptr<SCRExtensionRegistry> extensionRegistry;
-        };
+      private:
+         cppmicroservices::BundleContext bundleContext;
+         std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+         std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
+         std::shared_ptr<SCRExtensionRegistry> extensionRegistry;
+    };
 
-    } // namespace scrimpl
-} // namespace cppmicroservices
+} // cppmicroservices::scrimpl namespace 
 #endif //__CPPMICROSERVICES_SCRIMPL_COMPONENTFACTORYIMPL_HPP__

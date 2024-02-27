@@ -258,8 +258,7 @@ namespace test
         ASSERT_TRUE(!service);
 
         // Create a service tracker for ServiceA.
-        std::unique_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>> tracker(
-            new cppmicroservices::ServiceTracker<test::ServiceAInt>(context, nullptr));
+        std::unique_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>> tracker = std::make_unique<cppmicroservices::ServiceTracker<test::ServiceAInt>>(context, nullptr);
         tracker->Open();
 
         // Register the ServiceB~123 factory service with a mock implementation
@@ -303,8 +302,8 @@ namespace test
         ASSERT_TRUE(!service);  //ServiceA~1 is not satisfied so this should be nullptr
    
        // Create a service tracker for ServiceA.
-        std::unique_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>> tracker(
-            new cppmicroservices::ServiceTracker<test::ServiceAInt>(context, nullptr));
+        std::unique_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>> tracker
+            = std::make_unique<cppmicroservices::ServiceTracker<test::ServiceAInt>>(context, nullptr);
         tracker->Open();
         
         // Register the ServiceB~123 factory service with a mock implementation
@@ -349,9 +348,9 @@ namespace test
         ASSERT_TRUE(!service); // ServiceA~1 is not satisfied so this should be nullptr
 
         // Create a service tracker for ServiceA.
-        std::unique_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>> tracker(
-            new cppmicroservices::ServiceTracker<test::ServiceAInt>(context, nullptr));
-        tracker->Open();
+        std::unique_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>> tracker
+            = std::make_unique<cppmicroservices::ServiceTracker<test::ServiceAInt>>(context, nullptr);
+           tracker->Open();
 
         // Register the ServiceB~123 factory service with a mock implementation
         auto serviceBReg2 = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~123", "user-ServiceB", "true");
@@ -421,7 +420,7 @@ namespace test
         cppmicroservices::AnyMap props;
         props["ServiceB.target"] = std::string("(ServiceBId=ServiceB~123)");
         auto range = { "1", "2", "3", "4", "5" };
-        std::vector<std::shared_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>>> trackers;
+        std::vector<std::shared_ptr<cppmicroservices::ServiceTracker<test::ServiceAInt>>> trackers {};
  
         for (auto const& i : range)
         {

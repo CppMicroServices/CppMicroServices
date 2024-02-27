@@ -784,9 +784,7 @@ endif()
 if(US_USE_DETERMINISTIC_BUNDLE_BUILDS)
   # On windows, setlocale() is used to set these variables in the ResourceCompiler
   if(NOT MSVC)
-    set(ENV{LC_CTIME} "C date -u -d '1970-01-01'")
-    set(ENV{LC_CTYPE} "C.UTF-8")
-    set(ENV{LC_COLLATE} "fr_FR.UTF-8")
+    set(ENV{LC_ALL} "C.UTF-8")
   endif()
 endif()
 

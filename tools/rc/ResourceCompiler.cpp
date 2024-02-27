@@ -798,9 +798,7 @@ main(int argc, char** argv)
 {
     // Deterministic build things to set
 #if (defined(_WIN32) || defined(_WIN64)) && defined(US_USE_DETERMINISTIC_BUNDLE_BUILDS)
-    setlocale(LC_TIME, "C date -u -d '1970-01-01'");
-    setlocale(LC_CTYPE, "C.UTF-8");
-    setlocale(LC_COLLATE, "fr_FR.UTF-8");
+    setlocale(LC_ALL, "C.UTF-8")
 #endif
 
     nowide::args _(argc, argv);

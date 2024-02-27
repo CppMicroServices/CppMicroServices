@@ -30,7 +30,7 @@ namespace cppmicroservices
         void
         EMActivator::Start(cppmicroservices::BundleContext bc)
         {
-            auto svc = std::make_shared<cppmicroservices::emimpl::EventAdminImpl>("cppmicroservices::AdminService");
+            auto svc = std::make_shared<cppmicroservices::emimpl::EventAdminImpl>("cppmicroservices::AdminService", bc);
             bc.RegisterService<cppmicroservices::service::em::EventAdmin>(std::move(svc));
         }
 

@@ -24,16 +24,48 @@
 
 namespace cppmicroservices::emimpl
 {
-    EventAdminImpl::EventAdminImpl(std::string const& adminName) { name = adminName; }
-
-    void
-    EventAdminImpl::PostEvent(cppmicroservices::service::em::Event const& /*evt*/) noexcept
+    EventAdminImpl::EventAdminImpl(std::string const& adminName, cppmicroservices::BundleContext& bc)
+        : name(adminName)
+        , bc(bc)
     {
+        if (auto asyncWSSRef = bc.GetServiceReference<cppmicroservices::async::AsyncWorkService>(); asyncWSSRef)
+        {
+            asyncWorkService = bc.GetService<cppmicroservices::async::AsyncWorkService>(asyncWSSRef);
+        }
     }
 
     void
-    EventAdminImpl::SendEvent(cppmicroservices::service::em::Event const& /*evt*/) noexcept
+    CallHandler(std::shared_ptr<cppmicroservices::service::em::EventHandler>& handler,
+                cppmicroservices::service::em::Event const& evt)
     {
+        handler->HandleEvent(evt);
+    }
+
+    void
+    EventAdminImpl::PostEvent(cppmicroservices::service::em::Event const& evt) noexcept
+    {
+        auto topic = evt.GetTopic();
+        auto refs = bc.GetServiceReferences<cppmicroservices::service::em::EventHandler>();
+        for (auto const& sr : refs)
+        {
+            auto obj = bc.GetService<cppmicroservices::service::em::EventHandler>(sr);
+
+            std::packaged_task<void()> post_task([evt, obj]() mutable { CallHandler(obj, evt); });
+
+            asyncWorkService->post(std::move(post_task));
+        }
+    }
+
+    void
+    EventAdminImpl::SendEvent(cppmicroservices::service::em::Event const& evt) noexcept
+    {
+        auto topic = evt.GetTopic();
+        auto refs = bc.GetServiceReferences<cppmicroservices::service::em::EventHandler>();
+        for (auto const& sr : refs)
+        {
+            auto obj = bc.GetService<cppmicroservices::service::em::EventHandler>(sr);
+            CallHandler(obj, evt);
+        }
     }
 
 } // namespace cppmicroservices::emimpl

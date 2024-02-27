@@ -32,10 +32,9 @@
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
-#include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/em/EventAdmin.hpp"
 #include "cppmicroservices/em/EventHandler.hpp"
-#include "cppmicroservices/logservice/LogService.hpp"
+#include <cppmicroservices/asyncworkservice/AsyncWorkService.hpp>
 
 #include "EventAdminPrivate.hpp"
 
@@ -46,13 +45,15 @@ namespace cppmicroservices::emimpl
         , public EventAdminPrivate
     {
       public:
-        EventAdminImpl(std::string const& adminName);
+        EventAdminImpl(std::string const& adminName, cppmicroservices::BundleContext& bc);
         void PostEvent(cppmicroservices::service::em::Event const& evt) noexcept override;
 
         void SendEvent(cppmicroservices::service::em::Event const& evt) noexcept override;
 
       private:
         std::string name;
+        cppmicroservices::BundleContext bc;
+        std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
     };
 
 } // namespace cppmicroservices::emimpl

@@ -29,11 +29,13 @@
 #include <random>
 #include <unordered_map>
 
+#include "EMLogger.hpp"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
 #include "cppmicroservices/em/EventAdmin.hpp"
 #include "cppmicroservices/em/EventHandler.hpp"
+#include "cppmicroservices/logservice/LogService.hpp"
 #include <cppmicroservices/asyncworkservice/AsyncWorkService.hpp>
 
 #include "EventAdminPrivate.hpp"
@@ -46,6 +48,8 @@ namespace cppmicroservices::emimpl
     {
       public:
         EventAdminImpl(std::string const& adminName, cppmicroservices::BundleContext& bc);
+        void CallHandler(std::shared_ptr<cppmicroservices::service::em::EventHandler>& handler,
+                         cppmicroservices::service::em::Event const& evt);
         void PostEvent(cppmicroservices::service::em::Event const& evt) noexcept override;
 
         void SendEvent(cppmicroservices::service::em::Event const& evt) noexcept override;
@@ -54,6 +58,7 @@ namespace cppmicroservices::emimpl
         std::string name;
         cppmicroservices::BundleContext bc;
         std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
+        cppmicroservices::emimpl::EMLogger logger;
     };
 
 } // namespace cppmicroservices::emimpl

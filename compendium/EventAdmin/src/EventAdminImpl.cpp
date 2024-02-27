@@ -24,9 +24,12 @@
 
 namespace cppmicroservices::emimpl
 {
+    using cppmicroservices::logservice::SeverityLevel;
+
     EventAdminImpl::EventAdminImpl(std::string const& adminName, cppmicroservices::BundleContext& bc)
         : name(adminName)
         , bc(bc)
+        , logger(bc)
     {
         if (auto asyncWSSRef = bc.GetServiceReference<cppmicroservices::async::AsyncWorkService>(); asyncWSSRef)
         {
@@ -35,10 +38,19 @@ namespace cppmicroservices::emimpl
     }
 
     void
-    CallHandler(std::shared_ptr<cppmicroservices::service::em::EventHandler>& handler,
-                cppmicroservices::service::em::Event const& evt)
+    EventAdminImpl::CallHandler(std::shared_ptr<cppmicroservices::service::em::EventHandler>& handler,
+                                cppmicroservices::service::em::Event const& evt)
     {
-        handler->HandleEvent(evt);
+        try
+        {
+            handler->HandleEvent(evt);
+        }
+        catch (std::exception const& e)
+        {
+            logger.Log(SeverityLevel::LOG_ERROR,
+                       "Exception thrown by ManagedServiceFactory with figuration Exception: " + std::string(e.what()));
+            return;
+        }
     }
 
     void
@@ -50,7 +62,7 @@ namespace cppmicroservices::emimpl
         {
             auto obj = bc.GetService<cppmicroservices::service::em::EventHandler>(sr);
 
-            std::packaged_task<void()> post_task([evt, obj]() mutable { CallHandler(obj, evt); });
+            std::packaged_task<void()> post_task([evt, obj, this]() mutable { CallHandler(obj, evt); });
 
             asyncWorkService->post(std::move(post_task));
         }

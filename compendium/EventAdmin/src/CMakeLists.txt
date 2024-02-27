@@ -1,11 +1,13 @@
 set(_srcs
   EventAdminImpl.cpp
+  EMLogger.cpp
 )
 
 set(_private_headers
   EMActivator.hpp
   EventAdminImpl.hpp
   EventAdminPrivate.hpp
+  EMLogger.hpp
 )
 
 add_library(EventAdminObjs OBJECT ${_srcs} ${_private_headers})

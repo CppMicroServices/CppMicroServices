@@ -23,21 +23,20 @@
 #include "EMActivator.hpp"
 #include "EventAdminImpl.hpp"
 
-namespace cppmicroservices
+namespace cppmicroservices::emimpl
 {
-    namespace emimpl
+    void
+    EMActivator::Start(cppmicroservices::BundleContext bc)
     {
-        void
-        EMActivator::Start(cppmicroservices::BundleContext bc)
-        {
-            auto svc = std::make_shared<cppmicroservices::emimpl::EventAdminImpl>("cppmicroservices::AdminService", bc);
-            bc.RegisterService<cppmicroservices::service::em::EventAdmin>(std::move(svc));
-        }
+        auto svc = std::make_shared<cppmicroservices::emimpl::EventAdminImpl>("cppmicroservices::AdminService", bc);
+        bc.RegisterService<cppmicroservices::service::em::EventAdmin>(std::move(svc));
+    }
 
-        void
-        EMActivator::Stop(cppmicroservices::BundleContext /*context*/)
-        {
-            //
-        }
-    } // namespace emimpl
-} // namespace cppmicroservices
+    void
+    EMActivator::Stop(cppmicroservices::BundleContext /*context*/)
+    {
+        //
+    }
+} // namespace cppmicroservices::emimpl
+
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(cppmicroservices::emimpl::EMActivator) // NOLINT

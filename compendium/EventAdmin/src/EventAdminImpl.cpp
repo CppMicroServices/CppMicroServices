@@ -47,8 +47,7 @@ namespace cppmicroservices::emimpl
         }
         catch (std::exception const& e)
         {
-            logger.Log(SeverityLevel::LOG_ERROR,
-                       "Exception thrown by ManagedServiceFactory with figuration Exception: " + std::string(e.what()));
+            logger.Log(SeverityLevel::LOG_ERROR, "Exception thrown by EventHandler: " + std::string(e.what()));
             return;
         }
     }
@@ -78,6 +77,49 @@ namespace cppmicroservices::emimpl
             auto obj = bc.GetService<cppmicroservices::service::em::EventHandler>(sr);
             CallHandler(obj, evt);
         }
+    }
+
+    // methods from the cppmicroservices::ServiceTrackerCustomizer interface for EventHandler
+    std::shared_ptr<TrackedServiceWrapper<EventHandler>>
+    EventAdminImpl::AddingService(ServiceReference<EventHandler> const& reference)
+    {
+        // GetService can cause entry into user code, so don't hold a lock.
+        auto handler = bc.GetService(reference);
+        if (!handler)
+        {
+            logger->Log(SeverityLevel::LOG_WARNING,
+                        "Ignoring EventHandler as a valid service could not be "
+                        "obtained from the BundleContext");
+            return nullptr;
+        }
+
+        std::string pid = "hello";
+
+        auto trackedManagedService
+            = std::make_shared<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>(
+                pid,
+                std::move(initialChangeCountByPid),
+                std::move(managedService));
+        trackedManagedServices_.emplace_back(trackedManagedService);
+        return trackedManagedService;
+
+        auto l = frameworkListenerMap.Lock();
+        US_UNUSED(l);
+        auto& listeners = frameworkListenerMap.value[context];
+        listeners[token.Id()] = std::make_tuple(listener, data);
+        return token;
+    }
+    void
+    EventAdminImpl::ModifiedService(ServiceReference<EventHandler> const& /*reference*/,
+                                    std::shared_ptr<TrackedServiceWrapper<EventHandler>> const& /*service*/)
+    {
+        return;
+    }
+    void
+    EventAdminImpl::RemovedService(ServiceReference<EventHandler> const& /*reference*/,
+                                   std::shared_ptr<TrackedServiceWrapper<EventHandler>> const& /*service*/)
+    {
+        return;
     }
 
 } // namespace cppmicroservices::emimpl

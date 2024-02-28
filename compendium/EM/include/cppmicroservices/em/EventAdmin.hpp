@@ -51,7 +51,7 @@ namespace cppmicroservices::service::em
         virtual ~EventAdmin() = default;
         EventAdmin(EventAdmin&&) = default;
         EventAdmin(EventAdmin&) = default;
-        EventAdmin& operator=(EventAdmin&) = default;
+        EventAdmin& operator=(EventAdmin const&) = default;
         EventAdmin& operator=(EventAdmin&&) = default;
         /**
          * @brief Initiates the asynchronous delivery of an event. If the \c DELIVERY_ASYNC_UNORDERED

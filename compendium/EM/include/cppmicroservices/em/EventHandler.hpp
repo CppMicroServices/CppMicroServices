@@ -48,7 +48,7 @@ namespace cppmicroservices::service::em
         virtual ~EventHandler() = default;
         EventHandler(EventHandler&&) = default;
         EventHandler(EventHandler&) = default;
-        EventHandler& operator=(EventHandler&) = default;
+        EventHandler& operator=(EventHandler const&) = default;
         EventHandler& operator=(EventHandler&&) = default;
         /**
          * @brief The function that \c EventAdmin service calls to notify the listener that an event

@@ -43,11 +43,11 @@ namespace cppmicroservices::scrimpl
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
             std::shared_ptr<SCRExtensionRegistry> extensionReg)
             : bundleContext(context)
-            , logger(logger)
+            , logger(std::move(logger))
             , asyncWorkService(asyncWorkSvc)
             , extensionRegistry(extensionReg)
         {
-            if (!bundleContext || !logger || !asyncWorkService || extensionRegistry)
+            if (!bundleContext || !(this->logger) || !(this->asyncWorkService) || !(this->extensionRegistry))
             {
                 throw std::invalid_argument("ComponentFactoryImpl Constructor "
                                             "provided with invalid arguments");

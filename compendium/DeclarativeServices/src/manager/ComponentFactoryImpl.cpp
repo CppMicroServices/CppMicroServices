@@ -42,8 +42,8 @@ namespace cppmicroservices::scrimpl
             std::shared_ptr<cppmicroservices::logservice::LogService> logger,
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkSvc,
             std::shared_ptr<SCRExtensionRegistry> extensionReg)
-            : bundleContext(std::move(context))
-            , logger(std::move(logger))
+            : bundleContext(context)
+            , logger(logger)
             , asyncWorkService(asyncWorkSvc)
             , extensionRegistry(extensionReg)
         {

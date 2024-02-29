@@ -190,6 +190,26 @@ namespace test
         virtual bool isDependencyInjected() = 0;
         virtual ~CAInterface1();
     };
+    // Use these interfaces in test bundles testing Factory target 
+    // functionality in DS.
+    class US_TestInterfaces_EXPORT ServiceAInt
+    {
+      public:
+        virtual cppmicroservices::AnyMap GetProperties() = 0;
+        virtual ~ServiceAInt();
+    };
+    class US_TestInterfaces_EXPORT ServiceBInt
+    {
+      public:
+        virtual cppmicroservices::AnyMap GetProperties() = 0;
+        virtual ~ServiceBInt();
+    };
+    class US_TestInterfaces_EXPORT ServiceCInt
+    {
+      public:
+        virtual cppmicroservices::AnyMap GetProperties() = 0;
+        virtual ~ServiceCInt();
+    };
 } // namespace test
 
 #endif

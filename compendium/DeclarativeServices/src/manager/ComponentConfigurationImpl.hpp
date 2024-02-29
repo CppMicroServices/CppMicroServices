@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __COMPONENTCONFIGURATIONIMPL_HPP__
-#define __COMPONENTCONFIGURATIONIMPL_HPP__
+#ifndef COMPONENTCONFIGURATIONIMPL_HPP__
+#define COMPONENTCONFIGURATIONIMPL_HPP__
 
 #include <memory>
 #if defined(USING_GTEST)
@@ -45,10 +45,9 @@
 using cppmicroservices::scrimpl::ReferenceManager;
 using cppmicroservices::service::component::detail::ComponentInstance;
 
-namespace cppmicroservices
-{
-    namespace scrimpl
+namespace cppmicroservices::scrimpl
     {
+       class SCRExtensionRegistry;
 
         typedef std::pair<std::shared_ptr<ComponentInstance>, std::shared_ptr<ComponentContextImpl>>
             InstanceContextPair;
@@ -436,6 +435,5 @@ namespace cppmicroservices
                 deleteCompInstanceFunc; ///< extern C function to delete an instance of the {@link ComponentInstance}
                                         ///< class from the component's bundle
         };
-    } // namespace scrimpl
-} // namespace cppmicroservices
-#endif /* __COMPONENTCONFIGURATIONIMPL_HPP__ */
+    } // namespace cppmicroservices::scrimpl
+#endif /* COMPONENTCONFIGURATIONIMPL_HPP__ */

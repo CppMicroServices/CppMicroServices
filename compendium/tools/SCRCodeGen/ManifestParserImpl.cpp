@@ -70,13 +70,14 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
             componentInfo.configurationPolicy
                 = JsonValueValidator(jsonComponent, "configuration-policy", policyChoices).GetString();
         }
+        std::unordered_map<std::string, std::string> duplicatePids;
         if (jsonComponent.isMember("configuration-pid"))
         {
             configPid = true;
             // make sure there are no duplicates in the configuration-pid array.
             auto const configurationPids
                 = JsonValueValidator(jsonComponent, "configuration-pid", Json::ValueType::arrayValue)();
-            std::unordered_map<std::string, std::string> duplicatePids;
+
             for (auto const& pid : configurationPids)
             {
                 if (duplicatePids.find(pid.asString()) != duplicatePids.end())
@@ -103,6 +104,11 @@ ManifestParserImplV1::ParseAndGetComponentInfos(Json::Value const& scr) const
         {
             auto factoryComponentID
                 = JsonValueValidator(jsonComponent, "factory", Json::ValueType::stringValue).GetString();
+            if (!factoryComponentID.empty() && (duplicatePids.size() != 1))
+            {
+                throw std::runtime_error("Error: For factory components, the configuration-pid array "
+                        "may only contain one entry");
+            }
         }
 
         // service

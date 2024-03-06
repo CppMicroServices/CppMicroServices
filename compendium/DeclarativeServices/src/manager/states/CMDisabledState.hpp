@@ -70,10 +70,13 @@ namespace cppmicroservices
              * Any actions resulting from the state change happen asynchronously on a
              * separate thread.
              *
-             * Returns a future object representing the actions performed due to the
-             * state change
+             * \param cm is the component manager which needs to be enabled
+             * \param asyncStarted synchronization atomic bool for async tasks
+             * \return a future object representing the actions performed due to the state change
+             *
              */
-            std::shared_future<void> Enable(ComponentManagerImpl& cm) override;
+            std::shared_future<void> Enable(ComponentManagerImpl& cm,
+                                            std::shared_ptr<std::atomic<bool>> asyncStarted) override;
 
             /**
              * This method returns the stored future object. Since this object
@@ -85,8 +88,14 @@ namespace cppmicroservices
              * The second thread's call to disable is forwarded to the
              * {\code CMDisabledState} created by the first thread. The second thread
              * receives the same future that was created by the first thread.
+             *
+             * \param cm is the component manager which needs to be disabled
+             * \param asyncStarted synchronization atomic bool for async tasks
+             * \return a future object representing the actions performed due to the previous
+             * change from ENABLED to DISABLED
              */
-            std::shared_future<void> Disable(ComponentManagerImpl& cm) override;
+            std::shared_future<void> Disable(ComponentManagerImpl& cm,
+                                             std::shared_ptr<std::atomic<bool>> asyncStarted) override;
 
             /**
              * Returns an empty vector because there are no configurations associated

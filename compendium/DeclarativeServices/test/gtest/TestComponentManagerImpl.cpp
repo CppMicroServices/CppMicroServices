@@ -59,8 +59,10 @@ namespace cppmicroservices
             auto logger = std::make_shared<SCRLogger>(bc);
             auto asyncWorkService = std::make_shared<cppmicroservices::scrimpl::SCRAsyncWorkService>(bc, logger);
             auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
-            auto notifier
-                = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(), fakeLogger, asyncWorkService, extRegistry);
+            auto notifier = std::make_shared<ConfigurationNotifier>(framework.GetBundleContext(),
+                                                                    fakeLogger,
+                                                                    asyncWorkService,
+                                                                    extRegistry);
             {
                 EXPECT_THROW(
                     {
@@ -82,7 +84,7 @@ namespace cppmicroservices
                                                                          fakeLogger,
                                                                          asyncWorkService,
                                                                          notifier));
-                   },
+                    },
                     std::invalid_argument);
             }
             {
@@ -106,7 +108,7 @@ namespace cppmicroservices
                                                                          nullptr,
                                                                          asyncWorkService,
                                                                          notifier));
-                   },
+                    },
                     std::invalid_argument);
             }
             {
@@ -173,7 +175,7 @@ namespace cppmicroservices
                                                                   fakeLogger,
                                                                   asyncWorkService,
                                                                   notifier);
-           EXPECT_EQ(compMgr->IsEnabled(), false) << "Illegal state before Initialization";
+            EXPECT_EQ(compMgr->IsEnabled(), false) << "Illegal state before Initialization";
             compMgr->Initialize();
             EXPECT_EQ(compMgr->IsEnabled(), compMgr->GetMetadata()->enabled) << "Illegal state after Initialization";
         }
@@ -347,7 +349,7 @@ namespace cppmicroservices
                                                                       fakeLogger,
                                                                       asyncWorkService,
                                                                       notifier);
-           compMgr->Initialize();
+            compMgr->Initialize();
             // test concurrent calls to enable and disable from multiple threads
             std::function<std::shared_future<void>()> func = [compMgr]() mutable
             {
@@ -384,22 +386,27 @@ namespace cppmicroservices
             EXPECT_EQ(compMgr->disableFutures.size(), 0ul) << "Disabled futures list must be empty before any calls to "
                                                               "AccumulateFuture method";
             std::promise<void> p1;
-            compMgr->AccumulateFuture(p1.get_future().share());
+            compMgr->AccumulateFuture(p1.get_future().share(), nullptr);
             EXPECT_EQ(compMgr->disableFutures.size(), 1ul);
+
             std::promise<void> p2;
-            compMgr->AccumulateFuture(p2.get_future().share());
+            compMgr->AccumulateFuture(p2.get_future().share(), nullptr);
             EXPECT_EQ(compMgr->disableFutures.size(), 2ul);
+
             std::promise<void> p3;
-            compMgr->AccumulateFuture(p3.get_future().share());
+            compMgr->AccumulateFuture(p3.get_future().share(), nullptr);
             EXPECT_EQ(compMgr->disableFutures.size(), 3ul);
             p1.set_value();
+
             std::promise<void> p4;
-            compMgr->AccumulateFuture(p4.get_future().share());
+            compMgr->AccumulateFuture(p4.get_future().share(), nullptr);
             EXPECT_EQ(compMgr->disableFutures.size(), 3ul);
             p4.set_value();
+
             std::promise<void> p5;
-            compMgr->AccumulateFuture(p5.get_future().share());
+            compMgr->AccumulateFuture(p5.get_future().share(), nullptr);
             EXPECT_EQ(compMgr->disableFutures.size(), 3ul);
+
             p2.set_value();
             p3.set_value();
             p5.set_value();

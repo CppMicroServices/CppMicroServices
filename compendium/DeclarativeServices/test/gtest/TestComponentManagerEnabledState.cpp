@@ -131,7 +131,7 @@ namespace cppmicroservices
             std::promise<void> prom;
             auto enabledState = std::make_shared<CMEnabledState>(prom.get_future().share());
             compMgr->SetState(enabledState);
-            auto fut = enabledState->Enable(*compMgr);
+            auto fut = enabledState->Enable(*compMgr, nullptr);
             EXPECT_NE(fut.wait_for(std::chrono::milliseconds::zero()), std::future_status::ready)
                 << "Future returned from Enable must not be ready until the promise is set";
             prom.set_value();
@@ -147,7 +147,7 @@ namespace cppmicroservices
             EXPECT_TRUE(compMgr->IsEnabled());
             // Invoke "Enable" from multiple threads
             std::function<std::shared_future<void>()> func
-                = [enabledState, this]() { return enabledState->Enable(*(this->compMgr)); };
+                = [enabledState, this]() { return enabledState->Enable(*(this->compMgr), nullptr); };
             std::vector<std::shared_future<void>> futVec = ConcurrentInvoke(func);
             EXPECT_TRUE(compMgr->IsEnabled()) << "ComponentManager must still be ENABLED "
                                                  "after concurrent calls to Enable";
@@ -166,7 +166,7 @@ namespace cppmicroservices
             prom.set_value();
             compMgr->SetState(enabledState);
             EXPECT_TRUE(compMgr->IsEnabled());
-            auto fut = enabledState->Disable(*compMgr);
+            auto fut = enabledState->Disable(*compMgr, nullptr);
             EXPECT_TRUE(fut.valid()) << "A call to ComponentManager::Enable must always return a valid future";
             EXPECT_NO_THROW(fut.get());
             EXPECT_FALSE(compMgr->IsEnabled()) << "ComponentManager must be DISABLED after a call to Disable";
@@ -181,7 +181,7 @@ namespace cppmicroservices
             EXPECT_TRUE(compMgr->IsEnabled());
             // Invoke "Disable" from multiple threads
             std::function<std::shared_future<void>()> func
-                = [enabledState, this]() { return enabledState->Disable(*(this->compMgr)); };
+                = [enabledState, this]() { return enabledState->Disable(*(this->compMgr), nullptr); };
             std::vector<std::shared_future<void>> futVec = ConcurrentInvoke(func);
             EXPECT_FALSE(compMgr->IsEnabled()) << "ComponentManager must be DISABLED after concurrent calls to Disable";
             // check if the futures returned from concurrent invocation are all valid

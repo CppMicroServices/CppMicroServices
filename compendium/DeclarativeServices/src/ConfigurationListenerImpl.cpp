@@ -80,17 +80,18 @@ namespace cppmicroservices
                     }
                     auto properties = cppmicroservices::AnyMap(AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
                     auto type = event.getType();
-
+                    unsigned long changeCount = 0;
                     if (type == ConfigurationEventType::CM_UPDATED)
                     {
                         auto configObject = configAdmin->GetConfiguration(pid);
                         if (configObject)
                         {
                             properties = configObject->GetProperties();
+                            changeCount = configObject->GetChangeCount();
                         }
                     }
                     auto ptr = std::make_shared<cppmicroservices::AnyMap>(properties);
-                    configNotifier->NotifyAllListeners(pid, type, ptr);
+                    configNotifier->NotifyAllListeners(pid, type, ptr, changeCount);
                 }
                 catch (cppmicroservices::SecurityException const&)
                 {

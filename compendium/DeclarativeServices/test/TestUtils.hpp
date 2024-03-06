@@ -52,6 +52,11 @@ namespace test
     }
 
     /**
+     * Convenience method to allow test cases to access path to bundle information.
+     */
+    std::unordered_map<std::string, std::string> GetPathInfo();
+
+    /**
      * Convenience Method to install but not start a bundle given the bundle's symbolic name.
      */
     void InstallLib(::cppmicroservices::BundleContext frameworkCtx, std::string const& libName);

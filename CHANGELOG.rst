@@ -6,6 +6,36 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+`v3.8.2 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.2>`_ (2024-3-6)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.1...3.8.2>`_
+
+Added
+-----
+- `[GithubActions] Updated Github actions to use clang-tidy <https://github.com/CppMicroServices/CppMicroServices/pull/989>`_
+- `[GithubActions] Updated Github actions to lint with clang-tidy <https://github.com/CppMicroServices/CppMicroServices/pull/988>`_
+- `[GithubActions] Remove Clang-tidy 'modernize-use-trailing-type' <https://github.com/CppMicroServices/CppMicroServices/pull/992>`_
+
+Changed
+-------
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Declarative Services and Configuration Admin] DS/CA race in Modified() method <https://github.com/CppMicroServices/CppMicroServices/pull/985>`_
+- `[Declarative Services and Configuration Admin] Fix deadlock in thread starved environment <https://github.com/CppMicroServices/CppMicroServices/pull/987>`_
+- `[Core Framework] Compile CppMicroServices with -noexecstack <https://github.com/CppMicroServices/CppMicroServices/pull/994>`_
+- `[Documentation] Configuration listener doc update <https://github.com/CppMicroServices/CppMicroServices/pull/997>`_
+- `[GithubActions] Update Codeql version <https://github.com/CppMicroServices/CppMicroServices/pull/998>`_
+- `[GithubActions] Update MSVC to silence erroneous warning <https://github.com/CppMicroServices/CppMicroServices/pull/999>`_
+- `[Declarative Services] Fix string casting in testUtils <https://github.com/CppMicroServices/CppMicroServices/pull/1000>`_
+
 `v3.8.1 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.1>`_ (2024-2-8)
 ---------------------------------------------------------------------------------------------------------
 

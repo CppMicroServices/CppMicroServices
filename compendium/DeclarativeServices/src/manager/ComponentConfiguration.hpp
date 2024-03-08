@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __COMPONENTCONFIGURATION_HPP__
-#define __COMPONENTCONFIGURATION_HPP__
+#ifndef COMPONENTCONFIGURATION_HPP
+#define COMPONENTCONFIGURATION_HPP
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/servicecomponent/runtime/dto/ComponentConfigurationDTO.hpp"
@@ -109,4 +109,4 @@ namespace cppmicroservices
         };
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif /* __COMPONENTCONFIGURATION_HPP__ */
+#endif /* COMPONENTCONFIGURATION_HPP */

@@ -20,8 +20,8 @@
 
  =============================================================================*/
 
-#ifndef CPPMICROSERVICES_SCRIMPL_COMPONENTFACTORYIMPL_HPP__
-#define CPPMICROSERVICES_SCRIMPL_COMPONENTFACTORYIMPL_HPP__
+#ifndef CPPMICROSERVICES_SCRIMPL_COMPONENTFACTORYIMPL_HPP
+#define CPPMICROSERVICES_SCRIMPL_COMPONENTFACTORYIMPL_HPP
 
 #include "../SCRLogger.hpp"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
@@ -68,4 +68,4 @@ namespace cppmicroservices::scrimpl {
     };
 
 } // cppmicroservices::scrimpl namespace 
-#endif //__CPPMICROSERVICES_SCRIMPL_COMPONENTFACTORYIMPL_HPP__
+#endif //CPPMICROSERVICES_SCRIMPL_COMPONENTFACTORYIMPL_HPP

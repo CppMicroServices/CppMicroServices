@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __COMPONENTMANAGER_HPP__
-#define __COMPONENTMANAGER_HPP__
+#ifndef COMPONENTMANAGER_HPP
+#define COMPONENTMANAGER_HPP
 
 #include "../metadata/ComponentMetadata.hpp"
 #include "cppmicroservices/Bundle.h"
@@ -128,4 +128,4 @@ namespace cppmicroservices
         };
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif // __COMPONENTMANAGER_HPP__
+#endif // COMPONENTMANAGER_HPP

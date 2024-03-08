@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __BUNDLEORPROTOTYPECOMPONENTCONFIGURATIONIMPL_HPP__
-#define __BUNDLEORPROTOTYPECOMPONENTCONFIGURATIONIMPL_HPP__
+#ifndef BUNDLEORPROTOTYPECOMPONENTCONFIGURATIONIMPL_HPP
+#define BUNDLEORPROTOTYPECOMPONENTCONFIGURATIONIMPL_HPP
 
 #include "ComponentConfigurationImpl.hpp"
 #include "ConcurrencyUtil.hpp"
@@ -126,4 +126,4 @@ namespace cppmicroservices
         };
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif /* __BUNDLEORPROTOTYPECOMPONENTCONFIGURATIONIMPL_HPP__ */
+#endif /* BUNDLEORPROTOTYPECOMPONENTCONFIGURATIONIMPL_HPP */

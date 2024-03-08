@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __SERVICEREFERENCECOMPARATOR_HPP__
-#define __SERVICEREFERENCECOMPARATOR_HPP__
+#ifndef SERVICEREFERENCECOMPARATOR_HPP
+#define SERVICEREFERENCECOMPARATOR_HPP
 
 #include "cppmicroservices/Constants.h"
 
@@ -64,4 +64,4 @@ namespace cppmicroservices
     } // namespace scrimpl
 } // namespace cppmicroservices
 
-#endif /* __SERVICEREFERENCECOMPARATOR_HPP__ */
+#endif /* SERVICEREFERENCECOMPARATOR_HPP */

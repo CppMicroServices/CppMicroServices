@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __COMPONENTMANAGERIMPL_HPP__
-#define __COMPONENTMANAGERIMPL_HPP__
+#ifndef COMPONENTMANAGERIMPL_HPP
+#define COMPONENTMANAGERIMPL_HPP
 
 #if defined(USING_GTEST)
 #    include "gtest/gtest_prod.h"
@@ -242,4 +242,4 @@ namespace cppmicroservices
     } // namespace scrimpl
 } // namespace cppmicroservices
 
-#endif /* __COMPONENTMANAGERIMPL_HPP__ */
+#endif /* COMPONENTMANAGERIMPL_HPP */

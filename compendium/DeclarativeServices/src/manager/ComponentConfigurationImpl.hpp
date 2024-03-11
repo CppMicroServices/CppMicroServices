@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef COMPONENTCONFIGURATIONIMPL_HPP__
-#define COMPONENTCONFIGURATIONIMPL_HPP__
+#ifndef COMPONENTCONFIGURATIONIMPL_HPP
+#define COMPONENTCONFIGURATIONIMPL_HPP
 
 #include <memory>
 #if defined(USING_GTEST)
@@ -431,4 +431,4 @@ namespace cppmicroservices::scrimpl
                                         ///< class from the component's bundle
         };
     } // namespace cppmicroservices::scrimpl
-#endif /* COMPONENTCONFIGURATIONIMPL_HPP__ */
+#endif /* COMPONENTCONFIGURATIONIMPL_HPP */

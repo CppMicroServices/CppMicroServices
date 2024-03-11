@@ -20,8 +20,8 @@
 
  =============================================================================*/
 
-#ifndef __CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP__
-#define __CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP__
+#ifndef CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP
+#define CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP
 
 #include "../SCRLogger.hpp"
 #include "ComponentFactoryImpl.hpp"
@@ -127,4 +127,4 @@ namespace cppmicroservices
 
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif //__CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP__
+#endif //CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP

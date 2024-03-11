@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __COMPONENT_REGISTRY_HPP__
-#define __COMPONENT_REGISTRY_HPP__
+#ifndef COMPONENT_REGISTRY_HPP
+#define COMPONENT_REGISTRY_HPP
 
 #include "manager/ComponentManager.hpp"
 #include <memory>
@@ -129,4 +129,4 @@ namespace cppmicroservices
     } // namespace scrimpl
 } // namespace cppmicroservices
 
-#endif // __COMPONENT_REGISTRY_HPP__
+#endif // COMPONENT_REGISTRY_HPP

@@ -99,6 +99,7 @@ jobs:
 
   build_nix_deterministic_bundles:
     name: Build and Test [${{matrix.os}},Configuration=0,Deterministic]
+    runs-on: ${{matrix.os}}
     env:
       BUILD_CONFIGURATION: 0
       BUILD_WITH_DETERMINISTIC: 1

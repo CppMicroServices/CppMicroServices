@@ -48,3 +48,5 @@ endif()
 
 # Re-enable enable exports for executables after building usResourceCompiler
 set(CMAKE_ENABLE_EXPORTS ON)
+
+include(test/rc_tests.cmake)

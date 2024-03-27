@@ -558,9 +558,7 @@ else()
   # Force clang compiler to use deterministic timestamp when linking
   # shared libraries.
   if(US_COMPILER_APPLE_CLANG AND US_USE_DETERMINISTIC_BUNDLE_BUILDS)
-    set(ENV{ZERO_AR_DATE} 1)
     set(CMAKE_CXX_LINKER_LAUNCHER ${CMAKE_SOURCE_DIR}/maci64_link.sh)
-    message(CMAKE_CXX_LINKER_LAUNCHER="${CMAKE_CXX_LINKER_LAUNCHER}")
   endif()
 
   if(US_COMPILER_GNU_ARM)

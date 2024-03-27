@@ -897,15 +897,24 @@ main(int argc, char** argv)
                 zipArchive->AddManifestFile(AggregateManifestsAndValidate(manifests));
             }
             // Add resource files to the zip archive
+            std::set<std::string> resAddArgs;
             for (option::Option* resopt = options[RESADD]; resopt; resopt = resopt->next())
             {
-                zipArchive->AddResourceFile(resopt->arg);
+                resAddArgs.insert(resopt->arg);
             }
+            std::for_each(std::begin(resAddArgs),
+                          std::end(resAddArgs),
+                          [&zipArchive](std::string const& res) { zipArchive->AddResourceFile(res); });
+
             // Merge resources from supplied zip archives
+            std::set<std::string> resAddArchiveArgs;
             for (option::Option* opt = options[ZIPADD]; opt; opt = opt->next())
             {
-                zipArchive->AddResourcesFromArchive(opt->arg);
+                resAddArchiveArgs.insert(opt->arg);
             }
+            std::for_each(std::begin(resAddArchiveArgs),
+                          std::end(resAddArchiveArgs),
+                          [&zipArchive](std::string const& res) { zipArchive->AddResourcesFromArchive(res); });
         }
         // ---------------------------------------------------------------------------------
         //      APPEND ZIP to BINARY if bundle-file is specified

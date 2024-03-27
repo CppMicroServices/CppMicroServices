@@ -28,6 +28,7 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <set>
 #include <stdexcept>
@@ -801,7 +802,7 @@ main(int argc, char** argv)
     setlocale(LC_ALL, "C.UTF-8")
 #endif
 
-    nowide::args _(argc, argv);
+        nowide::args _(argc, argv);
 
     int const BUNDLE_MANIFEST_VALIDATION_ERROR_CODE(2);
 
@@ -896,24 +897,15 @@ main(int argc, char** argv)
                 zipArchive->AddManifestFile(AggregateManifestsAndValidate(manifests));
             }
             // Add resource files to the zip archive
-            std::set<std::string> resAddArgs;
             for (option::Option* resopt = options[RESADD]; resopt; resopt = resopt->next())
             {
-                resAddArgs.insert(resopt->arg);
+                zipArchive->AddResourceFile(resopt->arg);
             }
-            std::for_each(std::begin(resAddArgs),
-                          std::end(resAddArgs),
-                          [&zipArchive](std::string const& res) { zipArchive->AddResourceFile(res); });
-
             // Merge resources from supplied zip archives
-            std::set<std::string> resAddArchiveArgs;
             for (option::Option* opt = options[ZIPADD]; opt; opt = opt->next())
             {
-                resAddArchiveArgs.insert(opt->arg);
+                zipArchive->AddResourcesFromArchive(opt->arg);
             }
-            std::for_each(std::begin(resAddArchiveArgs),
-                          std::end(resAddArchiveArgs),
-                          [&zipArchive](std::string const& res) { zipArchive->AddResourcesFromArchive(res); });
         }
         // ---------------------------------------------------------------------------------
         //      APPEND ZIP to BINARY if bundle-file is specified

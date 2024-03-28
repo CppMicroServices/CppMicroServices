@@ -896,7 +896,9 @@ main(int argc, char** argv)
                 // concatenate all manifest files into one, validate it and add it to the zip archive.
                 zipArchive->AddManifestFile(AggregateManifestsAndValidate(manifests));
             }
-            // Add resource files to the zip archive
+            // Add resource files to the zip archive. In order to produce deterministic zip archives,
+            // the files must always be added to it in the same order. Store up the list of files in
+            // a std::set, which is sorted, so that we always process them in the same order.
             std::set<std::string> resAddArgs;
             for (option::Option* resopt = options[RESADD]; resopt; resopt = resopt->next())
             {
@@ -906,7 +908,10 @@ main(int argc, char** argv)
                           std::end(resAddArgs),
                           [&zipArchive](std::string const& res) { zipArchive->AddResourceFile(res); });
 
-            // Merge resources from supplied zip archives
+            // Merge resources from supplied zip archives. Similar to resource files, In order to
+            // produce deterministic zip archives, the files must always be added to it in the same
+            // order. Store up the list of files in a std::set, which is sorted, so that we always
+            // process them in the same order.
             std::set<std::string> resAddArchiveArgs;
             for (option::Option* opt = options[ZIPADD]; opt; opt = opt->next())
             {

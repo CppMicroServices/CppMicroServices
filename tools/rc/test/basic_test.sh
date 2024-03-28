@@ -1,5 +1,11 @@
 #! /usr/bin/env bash
 #
+# This test is only invoked if the CMAKE flag US_USE_DETERMINISTIC_BUNDLE_BUILDS is set.
+# Test to check that 2 different zip files created with exactly the same content result in identical
+# zip files such that their sha 512 checksums are the same. This will fail if the resource compiler
+# embeds anything like date or time stamps.
+#
+# this is *nix only. For windows, see basic_test.bat
 
 RC_EXE=$1
 shift

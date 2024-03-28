@@ -1,3 +1,10 @@
+:: This test is only invoked if the CMAKE flag US_USE_DETERMINISTIC_BUNDLE_BUILDS is set.
+:: Test to check that 2 different zip files created with exactly the same content result in identical
+:: zip files such that their sha 512 checksums are the same. This will fail if the resource compiler
+:: embeds anything like date or time stamps.
+::
+:: this is windows only. For *nix, see basic_test.sh
+
 @echo off
 setlocal enabledelayedexpansion
 
@@ -20,12 +27,12 @@ timeout /t 2 >nul
 call "%RC_EXE%" --out-file test2.zip --res-add test_file.txt --bundle-name test_bundle
 
 :: Calculate SHA256 checksums for the zip files
-for /f "tokens=*" %%a in ('certutil -hashfile "first.zip" SHA256 ^| find /v "CertUtil"') do set "hash1=%%a"
-for /f "tokens=*" %%b in ('certutil -hashfile "second.zip" SHA256 ^| find /v "CertUtil"') do set "hash2=%%b"
+for /f "tokens=*" %%a in ('certutil -hashfile "first.zip" SHA512 ^| find /v "CertUtil"') do set "hash1=%%a"
+for /f "tokens=*" %%b in ('certutil -hashfile "second.zip" SHA512 ^| find /v "CertUtil"') do set "hash2=%%b"
 
 :: Compare checksums
 if NOT "!hash1!"=="!hash2!" (
-    echo ERROR: The zip files have DIFFERENT SHA256 checksums.
+    echo ERROR: The zip files have DIFFERENT SHA512 checksums.
     exit /b 1
 )
 

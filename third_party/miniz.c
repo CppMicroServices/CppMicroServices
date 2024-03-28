@@ -6123,7 +6123,7 @@ static mz_bool mz_zip_writer_create_central_dir_header(mz_zip_archive *pZip, mz_
 
     // If MINIZ_DETERMINISTIC_ZIP_FILES is defined, set the time and date fields of the central
     // directory header to a consistent value.
-#ifdef MINIZ_MINIZ_DETERMINISTIC_ZIP_FILES
+#ifdef MINIZ_DETERMINISTIC_ZIP_FILES
     MZ_WRITE_LE16(pDst + MZ_ZIP_CDH_FILE_TIME_OFS, 0);
     MZ_WRITE_LE16(pDst + MZ_ZIP_CDH_FILE_DATE_OFS, 0);
 #else

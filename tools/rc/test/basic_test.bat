@@ -1,6 +1,9 @@
 @echo off
 setlocal enabledelayedexpansion
 
+set RC_EXE=%1
+shift
+
 :: Cleanup
 del empty.txt
 del first.zip

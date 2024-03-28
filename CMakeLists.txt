@@ -536,6 +536,9 @@ if(MSVC)
   set(US_CXX_FLAGS "/MP /WX /D${msvc_version_define} ${US_CXX_FLAGS}")
 
   # UTF-8 support
+  # Differences in character sets will cause these sort orders to differ. For this
+  # reason, we set the LC_ALL environment variable to 'C' with the utf-8 character set to ensure
+  # sort ordering is correct.
   set(US_CXX_FLAGS "/source-charset:utf-8 /execution-charset:utf-8 ${US_CXX_FLAGS}")
   set(US_C_FLAGS "/source-charset:utf-8 /execution-charset:utf-8 ${US_C_FLAGS}")
 else()
@@ -556,7 +559,11 @@ else()
   endforeach()
 
   # Force clang compiler to use deterministic timestamp when linking
-  # shared libraries.
+  # shared libraries. In order to do so, we need to set the environment variable ZERO_AR_DATE to 1
+  # before invoking the linker. To do that we use the CMAKE_CXX_LINKER_LAUNCHER variable to wrap the
+  # launch of the linker in a shell script that sets that variable. Only do this for deterministic
+  # builds. 
+  
   if(US_COMPILER_APPLE_CLANG AND US_USE_DETERMINISTIC_BUNDLE_BUILDS)
     set(CMAKE_CXX_LINKER_LAUNCHER ${CMAKE_SOURCE_DIR}/maci64_link.sh)
   endif()
@@ -642,8 +649,8 @@ endif()
 
 # Allow forcing of bundle builds to be deterministic
 if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
-  set(US_CXX_FLAGS "${US_CXX_FLAGS} -DUS_DETERMINISTIC_MINIZ_ZIP_FILES")
-  set(US_C_FLAGS "${US_C_FLAGS} -DUS_DETERMINISTIC_MINIZ_ZIP_FILES")
+  set(US_CXX_FLAGS "${US_CXX_FLAGS} -DMINIZ_DETERMINISTIC_ZIP_FILES")
+  set(US_C_FLAGS "${US_C_FLAGS} -DMINIZ_DETERMINISTIC_ZIP_FILES")
 endif()
 
 if(MINGW)
@@ -782,7 +789,9 @@ endif()
 # Deterministic builds environment variables
 #-----------------------------------------------------------------------------
 if(US_USE_DETERMINISTIC_BUNDLE_BUILDS)
-  # On windows, setlocale() is used to set these variables in the ResourceCompiler
+  # On windows, setlocale() is used to set these variables in the ResourceCompiler.
+  # Differences in character sets will cause these sort orders to differ. For this
+  # reason, we set the LC_ALL environment variable to 'C' so that sort ordering is consistent. 
   if(NOT MSVC)
     set(ENV{LC_ALL} "C.UTF-8")
   endif()

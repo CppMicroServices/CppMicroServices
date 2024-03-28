@@ -6091,9 +6091,9 @@ static mz_bool mz_zip_writer_create_local_dir_header(mz_zip_archive *pZip, mz_ui
     MZ_WRITE_LE16(pDst + MZ_ZIP_LDH_BIT_FLAG_OFS, bit_flags);
     MZ_WRITE_LE16(pDst + MZ_ZIP_LDH_METHOD_OFS, method);
 
-    // If US_DETERMINISTIC_MINIZ_ZIP_FILES is defined, set the time and date fields of the local
+    // If MINIZ_DETERMINISTIC_ZIP_FILES is defined, set the time and date fields of the local
     // directory header to a consistent value.
-#ifdef US_DETERMINISTIC_MINIZ_ZIP_FILES
+#ifdef MINIZ_DETERMINISTIC_ZIP_FILES
     MZ_WRITE_LE16(pDst + MZ_ZIP_LDH_FILE_TIME_OFS, 0);
     MZ_WRITE_LE16(pDst + MZ_ZIP_LDH_FILE_DATE_OFS, 0);
 #else
@@ -6121,9 +6121,9 @@ static mz_bool mz_zip_writer_create_central_dir_header(mz_zip_archive *pZip, mz_
     MZ_WRITE_LE16(pDst + MZ_ZIP_CDH_BIT_FLAG_OFS, bit_flags);
     MZ_WRITE_LE16(pDst + MZ_ZIP_CDH_METHOD_OFS, method);
 
-    // If US_DETERMINISTIC_MINIZ_ZIP_FILES is defined, set the time and date fields of the central
+    // If MINIZ_DETERMINISTIC_ZIP_FILES is defined, set the time and date fields of the central
     // directory header to a consistent value.
-#ifdef US_DETERMINISTIC_MINIZ_ZIP_FILES
+#ifdef MINIZ_MINIZ_DETERMINISTIC_ZIP_FILES
     MZ_WRITE_LE16(pDst + MZ_ZIP_CDH_FILE_TIME_OFS, 0);
     MZ_WRITE_LE16(pDst + MZ_ZIP_CDH_FILE_DATE_OFS, 0);
 #else

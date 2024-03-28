@@ -799,6 +799,8 @@ main(int argc, char** argv)
 {
     // Deterministic build things to set
 #if (defined(_WIN32) || defined(_WIN64)) && defined(US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+    // Differences in character sets will cause these sort orders to differ. For this reason, we set
+    // the LC_ALL environment variable to 'C' so that sort ordering is consistent.
     setlocale(LC_ALL, "C.UTF-8")
 #endif
 

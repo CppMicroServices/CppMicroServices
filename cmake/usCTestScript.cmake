@@ -89,6 +89,7 @@ function(create_initial_cache var _shared _threading)
       US_ENABLE_THREADING_SUPPORT:BOOL=${_threading}
       US_ENABLE_TSAN:BOOL=$ENV{WITH_TSAN}
       US_BUILD_EXAMPLES:BOOL=ON
+      US_USE_DETERMINISTIC_BUNDLE_BUILDS:BOOL=${WITH_DETERMINISTIC}
       ")
 
   set(${var} ${_initial_cache} PARENT_SCOPE)

@@ -1084,7 +1084,7 @@ TEST_F(ResourceCompilerTest, testAppendZipWithInvalidManifest)
 // and containing an invalid manifest.json is merged with a valid zip file.
 TEST_F(ResourceCompilerTest, testZipMergeWithInvalidManifest)
 {
-    const std::string manifest_json = R"({
+    std::string const manifest_json = R"({
     "bundle.symbolic_name" : "main",
     "bundle.version" : "0.1.0",
     "bundle.activator" : true
@@ -1102,7 +1102,7 @@ TEST_F(ResourceCompilerTest, testZipMergeWithInvalidManifest)
 		} 
     )");
 
-    ManifestZipFile badZip(tempdir + "invalid_manifest.zip", invalidSyntax, "invalid");
+    ManifestZipFile badZip(tempdir + "x_invalid_manifest.zip", invalidSyntax, "invalid");
 
     std::ostringstream cmd;
     cmd << rcbinpath;
@@ -1110,7 +1110,7 @@ TEST_F(ResourceCompilerTest, testZipMergeWithInvalidManifest)
         << "main";
     cmd << " --out-file " << tempdir << "new_merged_zip.zip";
     cmd << " --zip-add " << tempdir << "merged_zip.zip";
-    cmd << " --zip-add " << tempdir << "invalid_manifest.zip";
+    cmd << " --zip-add " << tempdir << "x_invalid_manifest.zip";
     // Fail to merge a zip file containing an invalid manifest.json
     ASSERT_EQ(BUNDLE_MANIFEST_VALIDATION_ERROR_CODE, runExecutable(cmd.str()));
 

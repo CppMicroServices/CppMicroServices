@@ -1,6 +1,9 @@
 #! /usr/bin/env bash
 #
 
+RC_EXE=$1
+shift
+
 rm -f test_file.txt test1.zip test2.zip
 
 touch test_file.txt

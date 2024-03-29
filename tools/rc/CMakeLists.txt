@@ -53,6 +53,6 @@ set(CMAKE_ENABLE_EXPORTS ON)
 if (US_USE_DETERMINISTIC_BUNDLE_BUILDS)
   add_test(NAME Deterministic_Zip_Files_Test
          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/test/basic_test.$<IF:$<BOOL:${MSVC}>,bat,sh> ${CMAKE_BINARY_DIR}/bin/${US_RCC_EXECUTABLE_OUTPUT_NAME}
+         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/test/basic_deterministic_zip_test.$<IF:$<BOOL:${MSVC}>,bat,sh> ${CMAKE_BINARY_DIR}/bin/${US_RCC_EXECUTABLE_OUTPUT_NAME}
          )
 endif()

@@ -565,7 +565,7 @@ else()
   # builds. 
   
   if(US_COMPILER_APPLE_CLANG AND US_USE_DETERMINISTIC_BUNDLE_BUILDS)
-    set(CMAKE_CXX_LINKER_LAUNCHER ${CMAKE_SOURCE_DIR}/maci64_link.sh)
+    set(CMAKE_CXX_LINKER_LAUNCHER ${CMAKE_SOURCE_DIR}/tools/mac_deterministic_link_wrapper.sh)
   endif()
 
   if(US_COMPILER_GNU_ARM)

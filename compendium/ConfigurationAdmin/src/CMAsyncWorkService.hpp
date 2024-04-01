@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __CMASYNCWORKSERVICE_HPP__
-#define __CMASYNCWORKSERVICE_HPP__
+#ifndef CMASYNCWORKSERVICE_HPP
+#define CMASYNCWORKSERVICE_HPP
 
 #include "CMLogger.hpp"
 #include <cppmicroservices/ServiceTracker.h>

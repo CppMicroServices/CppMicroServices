@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __SCRLOGGER_HPP__
-#define __SCRLOGGER_HPP__
+#ifndef SCRLOGGER_HPP
+#define SCRLOGGER_HPP
 #include <cppmicroservices/ServiceTracker.h>
 #include <cppmicroservices/logservice/LogService.hpp>
 
@@ -79,4 +79,4 @@ namespace cppmicroservices
         };
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif // __SCRLOGGER_HPP__
+#endif // SCRLOGGER_HPP

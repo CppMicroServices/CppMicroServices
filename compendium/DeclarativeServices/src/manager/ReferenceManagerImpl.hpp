@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __REFERENCEMANAGERIMPL_HPP__
-#define __REFERENCEMANAGERIMPL_HPP__
+#ifndef REFERENCEMANAGERIMPL_HPP
+#define REFERENCEMANAGERIMPL_HPP
 
 #include <mutex>
 
@@ -315,4 +315,4 @@ namespace cppmicroservices
 
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif // __REFERENCEMANAGERIMPL_HPP__
+#endif // REFERENCEMANAGERIMPL_HPP

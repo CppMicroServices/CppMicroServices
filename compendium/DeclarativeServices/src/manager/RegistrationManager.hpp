@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __REGISTRATION_MANAGER_HPP__
-#define __REGISTRATION_MANAGER_HPP__
+#ifndef REGISTRATION_MANAGER_HPP
+#define REGISTRATION_MANAGER_HPP
 #if defined(USING_GTEST)
 #    include "gtest/gtest_prod.h"
 #else
@@ -132,4 +132,4 @@ namespace cppmicroservices
     } // namespace scrimpl
 } // namespace cppmicroservices
 
-#endif // __REGISTRATION_MANAGER_HPP__
+#endif // REGISTRATION_MANAGER_HPP

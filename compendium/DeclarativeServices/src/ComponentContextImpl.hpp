@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __COMPONENT_CONTEXT_IMPL_HPP__
-#define __COMPONENT_CONTEXT_IMPL_HPP__
+#ifndef COMPONENT_CONTEXT_IMPL_HPP
+#define COMPONENT_CONTEXT_IMPL_HPP
 
 #include <memory>
 #include <string>

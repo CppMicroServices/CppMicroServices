@@ -37,7 +37,7 @@ namespace cppmicroservices::em::Constants
 
     /**
      * Event property identifying the bundle id of the bundle where the event was sent from. The value
-     * of this property is of type <code>unsigned int</code>.
+     * of this property is of type <code>unsigned long</code>.
      */
     US_em_EXPORT extern std::string const BUNDLE_ID;
 
@@ -51,7 +51,7 @@ namespace cppmicroservices::em::Constants
 
     /**
      * Event property identifying the version of the bundle where the event was sent from. The value of
-     * this property is of type <code>std::string</code>.
+     * this property is of type <code>BundleVersion</code>.
      */
     US_em_EXPORT extern std::string const BUNDLE_VERSION;
 
@@ -127,15 +127,9 @@ namespace cppmicroservices::em::Constants
 
     /**
      * Event property containing the exception object if one was thrown. The value of this property is
-     * of type equal to that of the string representation of \c EXCEPTION_CLASS .
+     * of type equal to that of the string representation of the exception
      */
     US_em_EXPORT extern std::string const EXCEPTION;
-
-    /**
-     * Event property containing the stringified type of the exception that was thrown (if actually
-     * thrown). The value of this property is of type <code>std::string</code>
-     */
-    US_em_EXPORT extern std::string const EXCEPTION_CLASS;
 
     /**
      * Event property containing the exception message of the thrown exception (if one was thrown). The
@@ -158,7 +152,7 @@ namespace cppmicroservices::em::Constants
 
     /**
      * Event property containing the id of the provided service reference in \c SERVICE . The value of
-     * this property is of type <code>unsigned int</code>.
+     * this property is of type <code>unsigned long</code>.
      */
     US_em_EXPORT extern std::string const SERVICE_ID;
 

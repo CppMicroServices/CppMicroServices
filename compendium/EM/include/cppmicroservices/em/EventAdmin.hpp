@@ -55,7 +55,7 @@ namespace cppmicroservices::service::em
         EventAdmin& operator=(EventAdmin&&) = default;
         /**
          * @brief Initiates the asynchronous delivery of an event. If the \c DELIVERY_ASYNC_UNORDERED
-         * event property is specified, it will not guaranteed that the event will be delivered in the
+         * event property is specified, it will not be guaranteed that the event will be delivered in the
          * order that it was received.
          *
          * This function will return to the caller before event delivery has completed.

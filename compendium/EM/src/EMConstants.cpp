@@ -40,7 +40,6 @@ namespace cppmicroservices::em::Constants
     std::string const EVENT_FILTER = "event.filter";
     std::string const EVENT_TOPIC = "event.topics";
     std::string const EXCEPTION = "exception";
-    std::string const EXCEPTION_CLASS = "exception.class";
     std::string const EXCEPTION_MESSAGE = "exception.message";
     std::string const MESSAGE = "message";
     std::string const SERVICE = "service";

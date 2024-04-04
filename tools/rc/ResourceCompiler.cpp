@@ -22,11 +22,13 @@
 
 #include "miniz.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <set>
 #include <stdexcept>
@@ -795,7 +797,14 @@ checkSanity(option::Parser& parse, option::Option* options)
 int
 main(int argc, char** argv)
 {
-    nowide::args _(argc, argv);
+    // Deterministic build things to set
+#if (defined(_WIN32) || defined(_WIN64)) && defined(US_USE_DETERMINISTIC_BUNDLE_BUILDS)
+    // Differences in character sets will cause these sort orders to differ. For this reason, we set
+    // the LC_ALL environment variable to 'C' so that sort ordering is consistent.
+    setlocale(LC_ALL, "C.UTF-8")
+#endif
+
+        nowide::args _(argc, argv);
 
     int const BUNDLE_MANIFEST_VALIDATION_ERROR_CODE(2);
 
@@ -889,16 +898,30 @@ main(int argc, char** argv)
                 // concatenate all manifest files into one, validate it and add it to the zip archive.
                 zipArchive->AddManifestFile(AggregateManifestsAndValidate(manifests));
             }
-            // Add resource files to the zip archive
+            // Add resource files to the zip archive. In order to produce deterministic zip archives,
+            // the files must always be added to it in the same order. Store up the list of files in
+            // a std::set, which is sorted, so that we always process them in the same order.
+            std::set<std::string> resAddArgs;
             for (option::Option* resopt = options[RESADD]; resopt; resopt = resopt->next())
             {
-                zipArchive->AddResourceFile(resopt->arg);
+                resAddArgs.insert(resopt->arg);
             }
-            // Merge resources from supplied zip archives
+            std::for_each(std::begin(resAddArgs),
+                          std::end(resAddArgs),
+                          [&zipArchive](std::string const& res) { zipArchive->AddResourceFile(res); });
+
+            // Merge resources from supplied zip archives. Similar to resource files, In order to
+            // produce deterministic zip archives, the files must always be added to it in the same
+            // order. Store up the list of files in a std::set, which is sorted, so that we always
+            // process them in the same order.
+            std::set<std::string> resAddArchiveArgs;
             for (option::Option* opt = options[ZIPADD]; opt; opt = opt->next())
             {
-                zipArchive->AddResourcesFromArchive(opt->arg);
+                resAddArchiveArgs.insert(opt->arg);
             }
+            std::for_each(std::begin(resAddArchiveArgs),
+                          std::end(resAddArchiveArgs),
+                          [&zipArchive](std::string const& res) { zipArchive->AddResourcesFromArchive(res); });
         }
         // ---------------------------------------------------------------------------------
         //      APPEND ZIP to BINARY if bundle-file is specified

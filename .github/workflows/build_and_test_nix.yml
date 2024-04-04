@@ -96,3 +96,32 @@ jobs:
       
     - name: Code Coverage
       run: bash <(curl -s https://codecov.io/bash) -X gcov -s ${{github.workspace}}/build_${{matrix.buildconfiguration}}
+
+  build_nix_deterministic_bundles:
+    name: Build and Test [${{matrix.os}},Configuration=0,Deterministic]
+    runs-on: ${{matrix.os}}
+    env:
+      BUILD_CONFIGURATION: 0
+      BUILD_WITH_DETERMINISTIC: 1
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y valgrind
+      if: ${{matrix.os == 'ubuntu-22.04'}}
+
+    - name: Build And Test
+      run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
+      env: 
+         BUILD_DIR: ${{github.workspace}}/build_0
+         

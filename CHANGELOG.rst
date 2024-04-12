@@ -6,6 +6,28 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+`v3.8.3 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.3>`_ (2024-4-12)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.2...3.8.3>`_
+
+Added
+-----
+
+Changed
+-------
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Declarative Services] Add dynamic targeting functionality for factory services to DS <https://github.com/CppMicroServices/CppMicroServices/pull/989>`_
+- `[Core Framework] Fixed Clang Tidy warnings <https://github.com/CppMicroServices/CppMicroServices/pull/1003>`_
+
 `v3.8.2 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.2>`_ (2024-3-6)
 ---------------------------------------------------------------------------------------------------------
 

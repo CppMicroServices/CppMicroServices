@@ -25,7 +25,7 @@ Deprecated
 
 Fixed
 -----
-- `[Declarative Services] Add dynamic targeting functionality for factory services to DS <https://github.com/CppMicroServices/CppMicroServices/pull/989>`_
+- `[Declarative Services] Add dynamic targeting functionality for factory services to DS <https://github.com/CppMicroServices/CppMicroServices/pull/977>`_
 - `[Core Framework] Fixed Clang Tidy warnings <https://github.com/CppMicroServices/CppMicroServices/pull/1003>`_
 
 `v3.8.2 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.2>`_ (2024-3-6)

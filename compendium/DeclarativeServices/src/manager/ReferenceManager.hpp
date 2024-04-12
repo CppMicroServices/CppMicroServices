@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __REFERENCEMANAGER_HPP__
-#define __REFERENCEMANAGER_HPP__
+#ifndef REFERENCEMANAGER_HPP
+#define REFERENCEMANAGER_HPP
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceTracker.h"
@@ -156,4 +156,4 @@ namespace cppmicroservices
         };
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif // __REFERENCEMANAGER_HPP__
+#endif // REFERENCEMANAGER_HPP

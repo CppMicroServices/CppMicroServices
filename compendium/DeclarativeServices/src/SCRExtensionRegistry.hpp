@@ -20,8 +20,8 @@
 
  =============================================================================*/
 
-#ifndef __CPPMICROSERVICES_SCRIMPL_SCREXTENSIONREGISTRY_HPP__
-#define __CPPMICROSERVICES_SCRIMPL_SCREXTENSIONREGISTRY_HPP__
+#ifndef CPPMICROSERVICES_SCRIMPL_SCREXTENSIONREGISTRY_HPP
+#define CPPMICROSERVICES_SCRIMPL_SCREXTENSIONREGISTRY_HPP
 
 #include "SCRBundleExtension.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
@@ -100,4 +100,4 @@ namespace cppmicroservices
 
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif //__CPPMICROSERVICES_SCRIMPL_SCREXTENSIONREGISTRY_HPP__
+#endif // CPPMICROSERVICES_SCRIMPL_SCREXTENSIONREGISTRY_HPP

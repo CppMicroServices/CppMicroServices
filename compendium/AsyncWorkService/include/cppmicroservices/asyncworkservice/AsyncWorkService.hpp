@@ -19,8 +19,8 @@
   limitations under the License.
 
   =============================================================================*/
-#ifndef CPPMICROSERVICES_ASYNC_WORK_SERVICE_H__
-#define CPPMICROSERVICES_ASYNC_WORK_SERVICE_H__
+#ifndef CPPMICROSERVICES_ASYNC_WORK_SERVICE_HPP
+#define CPPMICROSERVICES_ASYNC_WORK_SERVICE_HPP
 
 #include "cppmicroservices/asyncworkservice/AsyncWorkServiceExport.h"
 
@@ -71,4 +71,4 @@ namespace cppmicroservices
     } // namespace async
 } // namespace cppmicroservices
 
-#endif // CPPMICROSERVICES_ASYNC_WORK_SERVICE_H__
+#endif // CPPMICROSERVICES_ASYNC_WORK_SERVICE_HPP

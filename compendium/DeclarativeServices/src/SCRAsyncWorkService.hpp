@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __SCRASYNCWORKSERVICE_HPP__
-#define __SCRASYNCWORKSERVICE_HPP__
+#ifndef SCRASYNCWORKSERVICE_HPP
+#define SCRASYNCWORKSERVICE_HPP
 
 #include "SCRLogger.hpp"
 #include <cppmicroservices/ServiceTracker.h>

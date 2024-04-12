@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __SCRBUNDLEEXTENSION_HPP__
-#define __SCRBUNDLEEXTENSION_HPP__
+#ifndef SCRBUNDLEEXTENSION_HPP
+#define SCRBUNDLEEXTENSION_HPP
 
 #include <memory>
 #if defined(USING_GTEST)
@@ -105,4 +105,4 @@ namespace cppmicroservices
     } // namespace scrimpl
 } // namespace cppmicroservices
 
-#endif // __SCRBUNDLEEXTENSION_HPP__
+#endif // SCRBUNDLEEXTENSION_HPP

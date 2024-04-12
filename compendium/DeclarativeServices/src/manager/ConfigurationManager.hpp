@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __CONFIGURATIONMANAGER_HPP__
-#define __CONFIGURATIONMANAGER_HPP__
+#ifndef CONFIGURATIONMANAGER_HPP
+#define CONFIGURATIONMANAGER_HPP
 
 #include "../metadata/ComponentMetadata.hpp"
 #include "ConcurrencyUtil.hpp"
@@ -106,4 +106,4 @@ namespace cppmicroservices
         };
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif // __CONFIGURATIONMANAGER_HPP__
+#endif // CONFIGURATIONMANAGER_HPP

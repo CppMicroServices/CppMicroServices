@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __BUNDLELOADER_HPP__
-#define __BUNDLELOADER_HPP__
+#ifndef BUNDLELOADER_HPP
+#define BUNDLELOADER_HPP
 
 #include "ConcurrencyUtil.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
@@ -57,4 +57,4 @@ namespace cppmicroservices
                                     std::shared_ptr<cppmicroservices::logservice::LogService> const& logger);
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif /* __BUNDLELOADER_HPP__ */
+#endif /* BUNDLELOADER_HPP */

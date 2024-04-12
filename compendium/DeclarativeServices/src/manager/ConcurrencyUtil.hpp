@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __CONCURRENCYUTIL_HPP__
-#define __CONCURRENCYUTIL_HPP__
+#ifndef CONCURRENCYUTIL_HPP
+#define CONCURRENCYUTIL_HPP
 
 #include <chrono>
 #include <future>
@@ -105,4 +105,4 @@ namespace cppmicroservices
     } // namespace scrimpl
 } // namespace cppmicroservices
 
-#endif /* __CONCURRENCYUTIL_HPP__ */
+#endif /* CONCURRENCYUTIL_HPP */

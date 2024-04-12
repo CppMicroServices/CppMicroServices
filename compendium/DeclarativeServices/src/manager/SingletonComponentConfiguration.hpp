@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __SINGLETONCOMPONENTCONFIGURATION_HPP__
-#define __SINGLETONCOMPONENTCONFIGURATION_HPP__
+#ifndef SINGLETONCOMPONENTCONFIGURATION_HPP
+#define SINGLETONCOMPONENTCONFIGURATION_HPP
 
 #include "ComponentConfigurationImpl.hpp"
 #include "ConcurrencyUtil.hpp"
@@ -147,4 +147,4 @@ namespace cppmicroservices
     } // namespace scrimpl
 } // namespace cppmicroservices
 
-#endif /* __SINGLETONCOMPONENTCONFIGURATION_HPP__ */
+#endif /* SINGLETONCOMPONENTCONFIGURATION_HPP */

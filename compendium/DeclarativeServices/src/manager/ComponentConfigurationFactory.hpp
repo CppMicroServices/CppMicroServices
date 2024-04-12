@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __COMPONENTCONFIGURATIONFACTORY_HPP__
-#define __COMPONENTCONFIGURATIONFACTORY_HPP__
+#ifndef COMPONENTCONFIGURATIONFACTORY_HPP
+#define COMPONENTCONFIGURATIONFACTORY_HPP
 
 #include "ComponentConfigurationImpl.hpp"
 #include "ConfigurationNotifier.hpp"
@@ -49,4 +49,4 @@ namespace cppmicroservices
     } // namespace scrimpl
 } // namespace cppmicroservices
 
-#endif /* __COMPONENTCONFIGURATIONFACTORY_HPP__ */
+#endif /* COMPONENTCONFIGURATIONFACTORY_HPP */

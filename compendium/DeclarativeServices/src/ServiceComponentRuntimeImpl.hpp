@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef __SERVICECOMPONENTRUNTIMEIMPL_HPP__
-#define __SERVICECOMPONENTRUNTIMEIMPL_HPP__
+#ifndef SERVICECOMPONENTRUNTIMEIMPL_HPP
+#define SERVICECOMPONENTRUNTIMEIMPL_HPP
 
 #if defined(USING_GTEST)
 #    include "gtest/gtest_prod.h"
@@ -139,4 +139,4 @@ namespace cppmicroservices
     } // namespace scrimpl
 } // namespace cppmicroservices
 
-#endif /* __SERVICECOMPONENTRUNTIMEIMPL_HPP__ */
+#endif /* SERVICECOMPONENTRUNTIMEIMPL_HPP */

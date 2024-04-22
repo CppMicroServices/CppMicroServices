@@ -204,7 +204,7 @@ namespace cppmicroservices
                         configListenerTokens.emplace_back(listenerToken);
                     }
                     configManager->Initialize();
-                    if (AreReferencesSatisfied() && configManager->IsConfigSatisfied())
+                    if (AreReferencesSatisfied() && configManager->IsConfigSatisfied() && metadata->factoryComponentID.empty())
                     {
                         GetState()->Register(*this);
                     }

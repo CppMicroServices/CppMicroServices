@@ -163,7 +163,7 @@ namespace cppmicroservices
         {
             bool allConfigsAvailable = configProperties.size() >= metadata->configurationPids.size();
 
-            if ((metadata->configurationPolicy != CONFIG_POLICY_REQUIRE) || (allConfigsAvailable))
+            if (((metadata->configurationPolicy != CONFIG_POLICY_REQUIRE) || (allConfigsAvailable)) && metadata->factoryComponentID.empty())
             {
                 return true;
             }

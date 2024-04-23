@@ -264,22 +264,22 @@ namespace test
         ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin.";
 
         // GetService to make component active
-        std::shared_ptr<test::CAInterface> invalidService;
-        invalidService = GetInstance<test::CAInterface>();
-        ASSERT_FALSE(invalidService)
-            << "Factory component should not be registered even with config matching exactly (with no ~)";
+        auto invalidService = GetInstance<test::CAInterface>();
+        ASSERT_FALSE(invalidService) << "Factory component itself should not be registered";
 
+        auto uniqueVal0 = 1;
         auto configuration0 = configAdminService->GetConfiguration(configName);
         cppmicroservices::AnyMap props0 { cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS,
-                                          { { "uniqueKey", 1 } } };
+                                          { { "uniqueKey", uniqueVal0 } } };
 
         auto fut0 = configuration0->Update(props0);
         ASSERT_FALSE(GetInstance<test::CAInterface>())
             << "Factory component should not be registered even with config matching exactly (with no ~)";
 
+        auto uniqueVal1 = 6;
         auto configuration1 = configAdminService->GetConfiguration(configName + "~1");
         cppmicroservices::AnyMap props1 { cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS,
-                                          { { "uniqueKey", 6 } } };
+                                          { { "uniqueKey", uniqueVal1 } } };
 
         auto fut1 = configuration1->Update(props1);
         fut1.wait();

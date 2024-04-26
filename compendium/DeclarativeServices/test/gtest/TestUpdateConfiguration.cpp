@@ -285,7 +285,7 @@ namespace test
         fut1.wait();
         auto service0 = GetInstance<test::CAInterface>();
         ASSERT_TRUE(service0)
-            << "Factory component should not be registered even with config matching exactly (with no ~)";
+            << "Factory instance should be created when a '~' configuration is added";
         ASSERT_TRUE(service0->GetProperties().find("uniqueKey")->second == 6);
 
         testBundle.Stop();

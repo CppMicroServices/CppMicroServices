@@ -409,6 +409,10 @@ namespace cppmicroservices
             cppmicroservices::ServiceObjects<void> sObjs = bc.GetServiceObjects(ServiceReferenceU(sRef));
 
             auto const removedService = sObjs.GetService();
+            if (!removedService)
+            {
+                return;
+            }
             auto const& serviceInterface = removedService->begin()->first;
             auto boundServicesCacheHandle = boundServicesCache.lock();
             auto& services = boundServicesCacheHandle->at(refName);

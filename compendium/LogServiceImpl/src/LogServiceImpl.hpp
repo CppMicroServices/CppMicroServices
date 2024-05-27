@@ -21,6 +21,10 @@
  =============================================================================*/
 
 #include "cppmicroservices/logservice/LogService.hpp"
+#include "cppmicroservices/logservice/Logger.hpp"
+#include "cppmicroservices/logservice/LoggerFactory.hpp"
+#include <cppmicroservices/BundleContext.h>
+#include <cppmicroservices/Bundle.h>
 
 namespace sinks
 {
@@ -32,6 +36,8 @@ namespace spdlog
     class logger;
     using sink_ptr = std::shared_ptr<sinks::sink>;
 } // namespace spdlog
+
+using namespace cppmicroservices;
 
 namespace cppmicroservices
 {
@@ -84,6 +90,9 @@ namespace cppmicroservices
                      std::string const& message,
                      const std::exception_ptr ex) override;
 
+            std::shared_ptr<Logger> getLogger(std::string const& name) const;
+            std::shared_ptr<Logger> getLogger(cppmicroservices::Bundle bundle, std::string const& name) const;
+
             /**
              * Registers a sink to the logger for introspection of contents. This is not a publicly available
              * function and should only be used for testing. This is NOT thread-safe.
@@ -91,7 +100,7 @@ namespace cppmicroservices
             void AddSink(spdlog::sink_ptr& sink);
 
           private:
-            std::shared_ptr<::spdlog::logger> m_Logger;
+             std::shared_ptr<Logger> logger;
         };
     } // namespace logservice
 } // namespace cppmicroservices

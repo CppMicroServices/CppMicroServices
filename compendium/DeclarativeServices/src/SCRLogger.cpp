@@ -126,5 +126,20 @@ namespace cppmicroservices
                 currLogger->Log(sr, level, message, ex);
             }
         }
+
+	std::shared_ptr<cppmicroservices::logservice::Logger>
+        SCRLogger::getLogger(const std::string& name) const
+	{
+	    auto currLogger = std::atomic_load(&logService);
+	    return currLogger->getLogger(name);
+	}
+
+	std::shared_ptr<cppmicroservices::logservice::Logger>
+        SCRLogger::getLogger(cppmicroservices::Bundle bundle, const std::string& name) const
+        {
+            auto currLogger = std::atomic_load(&logService);
+            return currLogger->getLogger(bundle, name);
+        }
+
     } // namespace scrimpl
 } // namespace cppmicroservices

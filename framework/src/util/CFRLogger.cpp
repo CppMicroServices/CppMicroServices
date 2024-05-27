@@ -119,6 +119,20 @@ namespace cppmicroservices
             }
         }
 
+	std::shared_ptr<cppmicroservices::logservice::Logger>
+        CFRLogger::getLogger(const std::string& name) const
+	{
+	     auto currLogger = std::atomic_load(&logService);
+	     return currLogger->getLogger(name);
+	}
+
+	std::shared_ptr<cppmicroservices::logservice::Logger>
+        CFRLogger::getLogger(cppmicroservices::Bundle bundle, const std::string& name) const
+        {
+             auto currLogger = std::atomic_load(&logService);
+             return currLogger->getLogger(bundle, name);
+        }
+
         void
         CFRLogger::Open()
         {

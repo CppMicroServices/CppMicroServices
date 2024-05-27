@@ -23,6 +23,7 @@
 #define CPPMICROSERVICES_LOG_SERVICE_H__
 
 #include "cppmicroservices/ServiceReferenceBase.h"
+#include "cppmicroservices/logservice/LoggerFactory.hpp"
 
 #include <cstdint>
 #include <exception>
@@ -69,7 +70,7 @@ namespace cppmicroservices
          *
          * @remarks This class is thread safe.
          */
-        class LogService
+        class LogService : public LoggerFactory
         {
           public:
             virtual ~LogService() = default;
@@ -115,6 +116,7 @@ namespace cppmicroservices
                              std::string const& message,
                              const std::exception_ptr ex)
                 = 0;
+
         };
 
     } // namespace logservice

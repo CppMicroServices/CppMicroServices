@@ -1,21 +1,31 @@
 #include "cppmicroservices/logservice/LoggerFactory.hpp"
 #include <mutex>
 
-namespace cppmicroservices
+namespace cppmicroservices::logservice
 {
-    namespace logservice
-    {
         class LoggerFactoryImpl final : public LoggerFactory
         {
           public:
               LoggerFactoryImpl() = default;
-              ~LoggerFactoryImpl() = default;
+              ~LoggerFactoryImpl() override = default;
 
-              std::shared_ptr<Logger> getLogger(std::string const& name) const override;
-              std::shared_ptr<Logger> getLogger(cppmicroservices::Bundle bundle, std::string const& name) const override;              
+	                    // Copy constructor
+    LoggerFactoryImpl(const LoggerFactoryImpl& other) = default;
+
+    // Copy assignment operator
+    LoggerFactoryImpl& operator=(const LoggerFactoryImpl& other) = default;
+
+    // Move constructor
+    LoggerFactoryImpl(LoggerFactoryImpl&& other) noexcept = default;
+
+    // Move assignment operator
+    LoggerFactoryImpl& operator=(LoggerFactoryImpl&& other) noexcept = default;
+
+
+              [[nodiscard]] std::shared_ptr<Logger> getLogger(std::string const& name) const override;
+              [[nodiscard]] std::shared_ptr<Logger> getLogger(cppmicroservices::Bundle bundle, std::string const& name) const override;              
 
 	  private:
 	      mutable std::mutex mutex; // Mutex for synchronization
         };
-    } // namespace logservice
-} // namespace cppmicroservices
+} // namespace cppmicroservices::logservice

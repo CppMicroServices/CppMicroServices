@@ -59,8 +59,8 @@ namespace cppmicroservices
                      logservice::SeverityLevel level,
                      std::string const& message,
                      const std::exception_ptr ex) override;
-	    std::shared_ptr<cppmicroservices::logservice::Logger> getLogger(const std::string& name) const;
-	    std::shared_ptr<cppmicroservices::logservice::Logger> getLogger(cppmicroservices::Bundle bundle, const std::string& name) const;
+	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger> getLogger(const std::string& name) const override;
+	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger> getLogger(cppmicroservices::Bundle bundle, const std::string& name) const override;
 
             // methods from the cppmicroservices::ServiceTrackerCustomizer interface
             std::shared_ptr<TrackedParamType> AddingService(

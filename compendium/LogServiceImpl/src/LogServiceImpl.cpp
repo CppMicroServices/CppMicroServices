@@ -8,10 +8,8 @@
 #include "LogServiceImpl.hpp"
 #include "LoggerFactoryImpl.hpp"
 
-namespace cppmicroservices
-{
-    namespace logservice
-    {       
+namespace cppmicroservices::logservice
+{     
         LogServiceImpl::LogServiceImpl(std::string const& loggerName)
         {
             logger = getLogger(loggerName);    
@@ -271,5 +269,4 @@ namespace cppmicroservices
         {
             logger->AddSink(sink);
         }
-    } // namespace logservice
-} // namespace cppmicroservices
+} // namespace cppmicroservices::logservice

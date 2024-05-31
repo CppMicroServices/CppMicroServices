@@ -1,16 +1,27 @@
 #include "cppmicroservices/logservice/Logger.hpp"
 #include "cppmicroservices/Bundle.h"
 
-namespace cppmicroservices
+namespace cppmicroservices::logservice
 {
-    namespace logservice
-    {
         class LoggerImpl final : public Logger
         {
 	    public:
                 LoggerImpl(std::string const& loggerName);
 		LoggerImpl(cppmicroservices::Bundle bundle, std::string const& loggerName);
-                ~LoggerImpl() = default;
+                ~LoggerImpl() override = default;
+        LoggerImpl() = default;
+		              // Copy constructor
+    LoggerImpl(const LoggerImpl& other) = default;
+
+    // Copy assignment operator
+    LoggerImpl& operator=(const LoggerImpl& other) = default;
+
+    // Move constructor
+    LoggerImpl(LoggerImpl&& other) noexcept = default;
+
+    // Move assignment operator
+    LoggerImpl& operator=(LoggerImpl&& other) noexcept = default;
+
 
 	         void audit(const std::string& message) override;
                  void audit(std::string const& format, std::string const& arg) override;
@@ -71,5 +82,4 @@ namespace cppmicroservices
              private:
                  std::shared_ptr<::spdlog::logger> m_Logger;
         };
-    } // namespace logservice
-} // namespace cppmicroservices
+} // namespace cppmicroservices::logservice

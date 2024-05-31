@@ -1,10 +1,8 @@
 #include "LoggerFactoryImpl.hpp"
 #include "LoggerImpl.hpp"
 
-namespace cppmicroservices
+namespace cppmicroservices::logservice
 {
-    namespace logservice
-    {
         std::shared_ptr<Logger> 
         LoggerFactoryImpl::getLogger(const std::string& name) const 
 	{
@@ -18,6 +16,6 @@ namespace cppmicroservices
 	    std::lock_guard<std::mutex> lock(mutex);
 	    return std::make_shared<LoggerImpl>(bundle, name);
 	}
-    }
+    
 }
 

@@ -19,8 +19,8 @@
   limitations under the License.
 
   =============================================================================*/
-#ifndef CPPMICROSERVICES_LOGGER_FACTORY_H__
-#define CPPMICROSERVICES_LOGGER_FACTORY_H__
+#ifndef CPPMICROSERVICES_LOGGER_FACTORY_H_
+#define CPPMICROSERVICES_LOGGER_FACTORY_H_
 #include "cppmicroservices/logservice/Logger.hpp"
 #include "cppmicroservices/Bundle.h"
 
@@ -29,10 +29,8 @@
 #include <string>
 #include <memory>
 
-namespace cppmicroservices
+namespace cppmicroservices::logservice
 {
-    namespace logservice
-    {
 	class LoggerFactory
 	{
 	    public:
@@ -40,12 +38,24 @@ namespace cppmicroservices
 	        inline static const std::string ROOT_LOGGER_NAME = "ROOT";
 	
                 virtual ~LoggerFactory() = default;
+		LoggerFactory() = default;
 
-                virtual std::shared_ptr<Logger> getLogger(std::string const& name = ROOT_LOGGER_NAME) const = 0;
+		 // Copy constructor
+    LoggerFactory(const LoggerFactory& other) = default;
 
-                virtual std::shared_ptr<Logger> getLogger(cppmicroservices::Bundle bundle, std::string const& name = ROOT_LOGGER_NAME) const = 0; 
+    // Copy assignment operator
+    LoggerFactory& operator=(const LoggerFactory& other) = default;
+
+    // Move constructor
+    LoggerFactory(LoggerFactory&& other) noexcept = default;
+
+    // Move assignment operator
+    LoggerFactory& operator=(LoggerFactory&& other) noexcept = default;
+
+                [[nodiscard]] virtual std::shared_ptr<Logger> getLogger(std::string const& name = ROOT_LOGGER_NAME) const = 0;
+
+                [[nodiscard]] virtual std::shared_ptr<Logger> getLogger(cppmicroservices::Bundle bundle, std::string const& name = ROOT_LOGGER_NAME) const = 0; 
         };
-    }
 }
 
 #endif

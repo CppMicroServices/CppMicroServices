@@ -90,8 +90,8 @@ namespace cppmicroservices
                      std::string const& message,
                      const std::exception_ptr ex) override;
 
-            std::shared_ptr<Logger> getLogger(std::string const& name) const;
-            std::shared_ptr<Logger> getLogger(cppmicroservices::Bundle bundle, std::string const& name) const;
+            [[nodiscard]] std::shared_ptr<Logger> getLogger(std::string const& name) const override;
+            [[nodiscard]] std::shared_ptr<Logger> getLogger(cppmicroservices::Bundle bundle, std::string const& name) const override;
 
             /**
              * Registers a sink to the logger for introspection of contents. This is not a publicly available

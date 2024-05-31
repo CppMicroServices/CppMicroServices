@@ -89,7 +89,7 @@ class LoggerImplTests : public ::testing::Test
 
 TEST_F(LoggerImplTests, ProperLoggerUsage)
 {
-    auto logger = GetLogger();
+    std::shared_ptr<ls::Logger> logger = GetLogger();
 
     logger->audit("Hello!");
     EXPECT_TRUE(ContainsRegex(log_preamble + "Hello!"));
@@ -159,13 +159,13 @@ TEST_F(LoggerImplTests, ProperLoggerUsage)
 
 TEST_F(LoggerImplTests, InvalidLoggerUsage)
 {
-    auto logger = GetLogger();
+    std::shared_ptr<ls::Logger> logger = GetLogger();
 
     std::exception_ptr exp = nullptr;
-    ASSERT_NO_THROW(logger->info("Test invalid exception_ptr", exp));
+    EXPECT_NO_THROW(logger->info("Test invalid exception_ptr", exp));
     EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid exception_ptr(\\n)" + exception_preamble + "none"));
 
-    ASSERT_NO_THROW(logger->info("Test invalid ServiceReferenceBase object", cppmicroservices::ServiceReferenceU {},
+    EXPECT_NO_THROW(logger->info("Test invalid ServiceReferenceBase object", cppmicroservices::ServiceReferenceU {},
                                 nullptr));
     EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid ServiceReferenceBase object(\\n)" + svcRef_preamble
                               + "Invalid service reference(\\n)" + exception_preamble + "none"));
@@ -173,14 +173,14 @@ TEST_F(LoggerImplTests, InvalidLoggerUsage)
 
 TEST_F(LoggerImplTests, ThreadSafety)
 {
-    auto logger = GetLogger();
+	std::shared_ptr<ls::Logger> logger = GetLogger();
     auto& oss = GetStream();
 
     int const iterations = 100;
     std::vector<std::thread> threads;
     for (int i = 0; i < iterations; i++)
     {
-        threads.push_back(std::thread(
+        threads.emplace_back(std::thread(
             [&logger]()
             { logger->info("Test concurrent log calls");
             }));

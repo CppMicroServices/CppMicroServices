@@ -180,13 +180,13 @@ namespace cppmicroservices
                 std::exception_ptr const) override
             {
             }
-	    std::shared_ptr<cppmicroservices::logservice::Logger> 
-	    getLogger(const std::string&) const
+	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger> 
+	    getLogger(const std::string&) const override
 	    {
 		return nullptr;
 	    }
-	    std::shared_ptr<cppmicroservices::logservice::Logger>
-            getLogger(cppmicroservices::Bundle, const std::string&) const
+	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger>
+            getLogger(cppmicroservices::Bundle, const std::string&) const override
             {
                 return nullptr;
             }

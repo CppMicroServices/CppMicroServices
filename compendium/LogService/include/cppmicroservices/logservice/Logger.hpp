@@ -1,5 +1,5 @@
-#ifndef CPPMICROSERVICES_LOGGER_H__
-#define CPPMICROSERVICES_LOGGER_H__
+#ifndef CPPMICROSERVICES_LOGGER_H_
+#define CPPMICROSERVICES_LOGGER_H_
 
 #include "cppmicroservices/ServiceReferenceBase.h"
 
@@ -19,10 +19,8 @@ namespace spdlog
     using sink_ptr = std::shared_ptr<sinks::sink>;
 } // namespace spdlog
 
-namespace cppmicroservices
+namespace cppmicroservices::logservice
 {
-    namespace logservice
-    {
         /** @}*/
 
         /**
@@ -54,6 +52,19 @@ namespace cppmicroservices
           public:
 
             virtual ~Logger() = default;
+
+	    Logger() = default;
+	     // Copy constructor
+    Logger(const Logger& other) = default;
+
+    // Copy assignment operator
+    Logger& operator=(const Logger& other) = default;
+
+    // Move constructor
+    Logger(Logger&& other) noexcept = default;
+
+    // Move assignment operator
+    Logger& operator=(Logger&& other) noexcept = default;
 
 	    virtual void audit(const std::string& message) = 0;
 	    virtual void audit(const std::string& format, const std::string& arg) = 0;
@@ -104,7 +115,6 @@ namespace cppmicroservices
 	    virtual void AddSink(spdlog::sink_ptr& sink) = 0;
 
 	};           
-    } // namespace logservice
 } // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_LOG_SERVICE_H__

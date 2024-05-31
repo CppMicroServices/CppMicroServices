@@ -180,10 +180,10 @@ TEST_F(LoggerImplTests, ThreadSafety)
     std::vector<std::thread> threads;
     for (int i = 0; i < iterations; i++)
     {
-        threads.emplace_back(std::thread(
+        threads.emplace_back(
             [&logger]()
             { logger->info("Test concurrent log calls");
-            }));
+            });
     }
 
     for (auto& thread : threads)

@@ -54,59 +54,60 @@ namespace cppmicroservices::logservice
             virtual ~Logger() = default;
 
 	    Logger() = default;
-	     // Copy constructor
-    Logger(const Logger& other) = default;
+       
+	    // Copy constructor
+            Logger(const Logger& other) = default;
 
-    // Copy assignment operator
-    Logger& operator=(const Logger& other) = default;
+            // Copy assignment operator
+            Logger& operator=(const Logger& other) = default;
 
-    // Move constructor
-    Logger(Logger&& other) noexcept = default;
+            // Move constructor
+            Logger(Logger&& other) noexcept = default;
 
-    // Move assignment operator
-    Logger& operator=(Logger&& other) noexcept = default;
+            // Move assignment operator
+            Logger& operator=(Logger&& other) noexcept = default;
 
 	    virtual void audit(const std::string& message) = 0;
 	    virtual void audit(const std::string& format, const std::string& arg) = 0;
 	    virtual void audit(const std::string& format, const std::string& arg1, const std::string& arg2) = 0;
-	    virtual void audit(std::string const& message, const std::exception_ptr ex) = 0;
-            virtual void audit(std::string const& message, ServiceReferenceBase const& sr) = 0;
-            virtual void audit(std::string const& message, ServiceReferenceBase const& sr, const std::exception_ptr ex) = 0;
+	    virtual void audit(const std::string& message, const std::exception_ptr ex) = 0;
+            virtual void audit(const std::string& message, const ServiceReferenceBase& sr) = 0;
+            virtual void audit(const std::string& message, const ServiceReferenceBase& sr, const std::exception_ptr ex) = 0;
 
 	    virtual void debug(const std::string& message) = 0;
             virtual void debug(const std::string& format, const std::string& arg) = 0;
 	    virtual void debug(const std::string& format, const std::string& arg1, const std::string& arg2) = 0;
-	    virtual void debug(std::string const& message, const std::exception_ptr ex) = 0;
-	    virtual void debug(std::string const& message, ServiceReferenceBase const& sr) = 0;
-	    virtual void debug(std::string const& message, ServiceReferenceBase const& sr, const std::exception_ptr ex) = 0;
+	    virtual void debug(const std::string& message, const std::exception_ptr ex) = 0;
+	    virtual void debug(const std::string& message, const ServiceReferenceBase& sr) = 0;
+	    virtual void debug(const std::string& message, const ServiceReferenceBase& sr, const std::exception_ptr ex) = 0;
 
 	    virtual void error(const std::string& message) = 0;
             virtual void error(const std::string& format, const std::string& arg) = 0;
             virtual void error(const std::string& format, const std::string& arg1, const std::string& arg2) = 0;
-	    virtual void error(std::string const& message, const std::exception_ptr ex) = 0;
-            virtual void error(std::string const& message, ServiceReferenceBase const& sr) = 0;
-            virtual void error(std::string const& message, ServiceReferenceBase const& sr, const std::exception_ptr ex) = 0;
+	    virtual void error(const std::string& message, const std::exception_ptr ex) = 0;
+            virtual void error(const std::string& message, const ServiceReferenceBase& sr) = 0;
+            virtual void error(const std::string& message, const ServiceReferenceBase& sr, const std::exception_ptr ex) = 0;
 
 	    virtual void info(const std::string& message) = 0;
             virtual void info(const std::string& format, const std::string& arg) = 0;
             virtual void info(const std::string& format, const std::string& arg1, const std::string& arg2) = 0;
-	    virtual void info(std::string const& message, const std::exception_ptr ex) = 0;
-            virtual void info(std::string const& message, ServiceReferenceBase const& sr) = 0;
-            virtual void info(std::string const& message, ServiceReferenceBase const& sr, const std::exception_ptr ex) = 0;
+	    virtual void info(const std::string& message, const std::exception_ptr ex) = 0;
+            virtual void info(const std::string& message, const ServiceReferenceBase& sr) = 0;
+            virtual void info(const std::string& message, const ServiceReferenceBase& sr, const std::exception_ptr ex) = 0;
 
 	    virtual void trace(const std::string& message) = 0;
             virtual void trace(const std::string& format, const std::string& arg) = 0;
             virtual void trace(const std::string& format, const std::string& arg1, const std::string& arg2) = 0;
-	    virtual void trace(std::string const& message, const std::exception_ptr ex) = 0;
-            virtual void trace(std::string const& message, ServiceReferenceBase const& sr) = 0;
-            virtual void trace(std::string const& message, ServiceReferenceBase const& sr, const std::exception_ptr ex) = 0;
+	    virtual void trace(const std::string& message, const std::exception_ptr ex) = 0;
+            virtual void trace(const std::string& message, const ServiceReferenceBase& sr) = 0;
+            virtual void trace(const std::string& message, const ServiceReferenceBase& sr, const std::exception_ptr ex) = 0;
 
 	    virtual void warn(const std::string& message) = 0;
             virtual void warn(const std::string& format, const std::string& arg) = 0;
             virtual void warn(const std::string& format, const std::string& arg1, const std::string& arg2) = 0;
-	    virtual void warn(std::string const& message, const std::exception_ptr ex) = 0;
-            virtual void warn(std::string const& message, ServiceReferenceBase const& sr) = 0;
-            virtual void warn(std::string const& message, ServiceReferenceBase const& sr, const std::exception_ptr ex) = 0;
+	    virtual void warn(const std::string& message, const std::exception_ptr ex) = 0;
+            virtual void warn(const std::string& message, const ServiceReferenceBase& sr) = 0;
+            virtual void warn(const std::string& message, const ServiceReferenceBase& sr, const std::exception_ptr ex) = 0;
 
 	     /**
              * Registers a sink to the logger for introspection of contents. This is not a publicly available

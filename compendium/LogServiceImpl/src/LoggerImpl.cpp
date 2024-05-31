@@ -15,7 +15,6 @@ namespace cppmicroservices::logservice
             std::string message = "\nException logged: ";
             if (ex)
             {
-                std::ostringstream stream;
                 try
                 {
                     std::rethrow_exception(ex);
@@ -83,26 +82,20 @@ namespace cppmicroservices::logservice
         LoggerImpl::audit(std::string const& message, const std::exception_ptr ex)
         {
             m_Logger->set_level(spdlog::level::trace);
-            std::string full_message = message;
-            full_message = message + GetExceptionMessage(ex);
-            m_Logger->trace(full_message);
+            m_Logger->trace(message + GetExceptionMessage(ex));
         }
         void
         LoggerImpl::audit(std::string const& message, ServiceReferenceBase const& sr)
         {
             m_Logger->set_level(spdlog::level::trace);
-            std::string full_message = message;
-            full_message = message + GetServiceReferenceInfo(sr);
-            m_Logger->trace(full_message);
+            m_Logger->trace(message + GetServiceReferenceInfo(sr));
         }
 
         void
         LoggerImpl::audit(std::string const& message, ServiceReferenceBase const& sr, const std::exception_ptr ex)
         {
             m_Logger->set_level(spdlog::level::trace);
-            std::string full_message = message;
-            full_message = message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex);
-            m_Logger->trace(full_message);
+            m_Logger->trace(message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex));
         }
 
         void
@@ -130,26 +123,20 @@ namespace cppmicroservices::logservice
         LoggerImpl::debug(std::string const& message, const std::exception_ptr ex)
 	{
 	    m_Logger->set_level(spdlog::level::debug);
-	    std::string full_message = message;
-            full_message = message + GetExceptionMessage(ex);
-	    m_Logger->debug(full_message);
+	    m_Logger->debug(message + GetExceptionMessage(ex));
 	}
         void
 	LoggerImpl::debug(std::string const& message, ServiceReferenceBase const& sr)
 	{
 	    m_Logger->set_level(spdlog::level::debug);
-            std::string full_message = message;
-            full_message = message + GetServiceReferenceInfo(sr);
-            m_Logger->debug(full_message);
+            m_Logger->debug(message + GetServiceReferenceInfo(sr));
 	}
 
         void 
 	LoggerImpl::debug(std::string const& message, ServiceReferenceBase const& sr, const std::exception_ptr ex)
 	{
 	     m_Logger->set_level(spdlog::level::debug);
-             std::string full_message = message;
-             full_message = message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex);
-             m_Logger->debug(full_message);
+             m_Logger->debug(message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex));
 	}
 
         void
@@ -177,26 +164,20 @@ namespace cppmicroservices::logservice
         LoggerImpl::error(std::string const& message, const std::exception_ptr ex)
         {
             m_Logger->set_level(spdlog::level::err);
-            std::string full_message = message;
-            full_message = message + GetExceptionMessage(ex);
-            m_Logger->error(full_message);
+            m_Logger->error(message + GetExceptionMessage(ex));
         }
         void
         LoggerImpl::error(std::string const& message, ServiceReferenceBase const& sr)
         {
             m_Logger->set_level(spdlog::level::err);
-            std::string full_message = message;
-            full_message = message + GetServiceReferenceInfo(sr);
-            m_Logger->error(full_message);
+            m_Logger->error(message + GetServiceReferenceInfo(sr));
         }
 
         void
         LoggerImpl::error(std::string const& message, ServiceReferenceBase const& sr, const std::exception_ptr ex)
         {
             m_Logger->set_level(spdlog::level::err);
-            std::string full_message = message;
-            full_message = message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex);
-            m_Logger->error(full_message);
+            m_Logger->error(message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex));
         }
 
         void
@@ -224,26 +205,20 @@ namespace cppmicroservices::logservice
         LoggerImpl::info(std::string const& message, const std::exception_ptr ex)
         {
             m_Logger->set_level(spdlog::level::info);
-            std::string full_message = message;
-            full_message = message + GetExceptionMessage(ex);
-            m_Logger->info(full_message);
+            m_Logger->info(message + GetExceptionMessage(ex));
         }
         void
         LoggerImpl::info(std::string const& message, ServiceReferenceBase const& sr)
         {
             m_Logger->set_level(spdlog::level::info);
-            std::string full_message = message;
-            full_message = message + GetServiceReferenceInfo(sr);
-            m_Logger->info(full_message);
+            m_Logger->info(message + GetServiceReferenceInfo(sr));
         }
 
         void
         LoggerImpl::info(std::string const& message, ServiceReferenceBase const& sr, const std::exception_ptr ex)
         {
             m_Logger->set_level(spdlog::level::info);
-            std::string full_message = message;
-            full_message = message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex);
-            m_Logger->info(full_message);
+            m_Logger->info(message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex));
         }
 
         void
@@ -271,26 +246,20 @@ namespace cppmicroservices::logservice
         LoggerImpl::trace(std::string const& message, const std::exception_ptr ex)
         {
             m_Logger->set_level(spdlog::level::trace);
-            std::string full_message = message;
-            full_message = message + GetExceptionMessage(ex);
-            m_Logger->trace(full_message);
+            m_Logger->trace(message + GetExceptionMessage(ex));
         }
         void
         LoggerImpl::trace(std::string const& message, ServiceReferenceBase const& sr)
         {
             m_Logger->set_level(spdlog::level::trace);
-            std::string full_message = message;
-            full_message = message + GetServiceReferenceInfo(sr);
-            m_Logger->trace(full_message);
+            m_Logger->trace(message + GetServiceReferenceInfo(sr));
         }
 
         void
         LoggerImpl::trace(std::string const& message, ServiceReferenceBase const& sr, const std::exception_ptr ex)
         {
             m_Logger->set_level(spdlog::level::trace);
-            std::string full_message = message;
-            full_message = message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex);
-            m_Logger->trace(full_message);
+            m_Logger->trace(message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex));
         }
 
         void
@@ -318,26 +287,20 @@ namespace cppmicroservices::logservice
         LoggerImpl::warn(std::string const& message, const std::exception_ptr ex)
         {
             m_Logger->set_level(spdlog::level::warn);
-            std::string full_message = message;
-            full_message = message + GetExceptionMessage(ex);
-            m_Logger->warn(full_message);
+            m_Logger->warn(message + GetExceptionMessage(ex));
         }
         void
         LoggerImpl::warn(std::string const& message, ServiceReferenceBase const& sr)
         {
             m_Logger->set_level(spdlog::level::warn);
-            std::string full_message = message;
-            full_message = message + GetServiceReferenceInfo(sr);
-            m_Logger->warn(full_message);
+            m_Logger->warn(message + GetServiceReferenceInfo(sr));
         }
 
         void
         LoggerImpl::warn(std::string const& message, ServiceReferenceBase const& sr, const std::exception_ptr ex)
         {
             m_Logger->set_level(spdlog::level::warn);
-            std::string full_message = message;
-            full_message = message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex);
-            m_Logger->warn(full_message);
+            m_Logger->warn(message + GetServiceReferenceInfo(sr) + GetExceptionMessage(ex));
         }
         void
         LoggerImpl::AddSink(spdlog::sink_ptr& sink)

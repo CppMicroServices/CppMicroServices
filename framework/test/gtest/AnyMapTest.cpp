@@ -442,22 +442,22 @@ TEST(AnyMapTest, InitializerList)
     EXPECT_EQ(2, unordered_any_cimap.size());
     EXPECT_EQ(Any(7), unordered_any_cimap.at("g"));
     EXPECT_EQ(Any(8), unordered_any_cimap.at("h"));
-    // AnyMap nested {
-    //     {{ "n", 9 }, { "o", 10 }, { "p", std::string("C") }}
-    // };
-    // AnyMap unordered_any_nested {
-    //     {
-    //      { "j", 7 },
-    //      { "k", 8 },
-    //      { "l", std::string("B") },
-    //     //  { "m", AnyMap { { { "n", 9 }, { "o", 10 }, { "p", std::string("C") } } } },
-    //      }
-    // };
-    // EXPECT_EQ(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS, unordered_any_nested.GetType());
-    // EXPECT_EQ(4, unordered_any_nested.size());
-    // EXPECT_EQ(Any(7), unordered_any_nested.at("j"));
-    // EXPECT_EQ(Any(8), unordered_any_nested.at("k"));
-    // EXPECT_EQ(std::string("B"), any_cast<std::string>(unordered_any_nested.at("l")));
+    AnyMap nested {
+        {{ "n", 9 }, { "o", 10 }, { "p", std::string("C") }}
+    };
+    AnyMap unordered_any_nested {
+        {
+         { "j", 7 },
+         { "k", 8 },
+         { "l", std::string("B") },
+        //  { "m", AnyMap { { { "n", 9 }, { "o", 10 }, { "p", std::string("C") } } } },
+         }
+    };
+    EXPECT_EQ(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS, unordered_any_nested.GetType());
+    EXPECT_EQ(4, unordered_any_nested.size());
+    EXPECT_EQ(Any(7), unordered_any_nested.at("j"));
+    EXPECT_EQ(Any(8), unordered_any_nested.at("k"));
+    EXPECT_EQ(std::string("B"), any_cast<std::string>(unordered_any_nested.at("l")));
     // EXPECT_EQ(AnyMap(nested), any_cast<AnyMap>(unordered_any_nested.at("m")));
     // EXPECT_EQ(Any(9), any_cast<AnyMap>(unordered_any_nested.at("m")).at("n"));
     // EXPECT_EQ(Any(10), any_cast<AnyMap>(unordered_any_nested.at("m")).at("o"));

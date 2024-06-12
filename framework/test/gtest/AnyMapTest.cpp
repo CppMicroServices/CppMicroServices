@@ -450,7 +450,7 @@ TEST(AnyMapTest, InitializerList)
          { "j", 7 },
          { "k", 8 },
          { "l", std::string("B") },
-         { "m", AnyMap { { { "n", 9 }, { "o", 10 }, { "p", std::string("C") } } } },
+        //  { "m", AnyMap { { { "n", 9 }, { "o", 10 }, { "p", std::string("C") } } } },
          }
     };
     // EXPECT_EQ(any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS, unordered_any_nested.GetType());

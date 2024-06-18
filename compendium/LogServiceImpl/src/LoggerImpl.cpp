@@ -9,7 +9,7 @@
 
 namespace cppmicroservices::logservice
 {
-        std::string
+        inline std::string
         GetExceptionMessage(std::exception_ptr const& ex)
         {
             std::string message = "\nException logged: ";
@@ -32,7 +32,7 @@ namespace cppmicroservices::logservice
             return message;
         }
 
-        std::string
+        inline std::string
         GetServiceReferenceInfo(ServiceReferenceBase const& sr)
         {
             std::ostringstream stream;

@@ -38,19 +38,6 @@ namespace cppmicroservices::logservice
 	        inline static const std::string ROOT_LOGGER_NAME = "ROOT";
 	
                 virtual ~LoggerFactory() = default;
-		LoggerFactory() = default;
-
-		// Copy constructor
-                LoggerFactory(const LoggerFactory& other) = default;
-
-                // Copy assignment operator
-                LoggerFactory& operator=(const LoggerFactory& other) = default;
-
-                // Move constructor
-                LoggerFactory(LoggerFactory&& other) noexcept = default;
-
-                // Move assignment operator
-                LoggerFactory& operator=(LoggerFactory&& other) noexcept = default;
 
                 [[nodiscard]] virtual std::shared_ptr<Logger> getLogger(std::string const& name = ROOT_LOGGER_NAME) const = 0;
 

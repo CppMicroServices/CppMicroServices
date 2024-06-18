@@ -8,16 +8,6 @@
 #include <string>
 #include <functional>
 
-namespace sinks
-{
-    class sink;
-}
-
-namespace spdlog
-{
-    class logger;
-    using sink_ptr = std::shared_ptr<sinks::sink>;
-} // namespace spdlog
 
 namespace cppmicroservices::logservice
 {
@@ -32,40 +22,11 @@ namespace cppmicroservices::logservice
          *
          */
 
-	enum class LogLevel
-        {
-            audit, //This log level is used for information that must always be logged.
- 
-            error, //This log level is used for information about an error situation.
- 
-            warn, //This log level is used for information about a failure or unwanted situation that is not blocking.
- 
-            info, //This log level is used for information about normal operation.
- 
-            debug, //This log level is used for detailed output for debugging operations.
- 
-            trace //This log level is used for large volume of output for tracing operations.   
-	};
-	
         class Logger
         {
           public:
 
             virtual ~Logger() = default;
-
-	    Logger() = default;
-       
-	    // Copy constructor
-            Logger(const Logger& other) = default;
-
-            // Copy assignment operator
-            Logger& operator=(const Logger& other) = default;
-
-            // Move constructor
-            Logger(Logger&& other) noexcept = default;
-
-            // Move assignment operator
-            Logger& operator=(Logger&& other) noexcept = default;
 
 	    virtual void audit(const std::string& message) = 0;
 	    virtual void audit(const std::string& format, const std::string& arg) = 0;
@@ -108,13 +69,7 @@ namespace cppmicroservices::logservice
 	    virtual void warn(const std::string& message, const std::exception_ptr ex) = 0;
             virtual void warn(const std::string& message, const ServiceReferenceBase& sr) = 0;
             virtual void warn(const std::string& message, const ServiceReferenceBase& sr, const std::exception_ptr ex) = 0;
-
-	     /**
-             * Registers a sink to the logger for introspection of contents. This is not a publicly available
-             * function and should only be used for testing. This is NOT thread-safe.
-             */
-	    virtual void AddSink(spdlog::sink_ptr& sink) = 0;
-
+	    
 	};           
 } // namespace cppmicroservices
 

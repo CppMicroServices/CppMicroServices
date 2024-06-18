@@ -43,6 +43,7 @@ class LoggerImplTests : public ::testing::Test
     {
         std::shared_ptr<ls::LoggerFactory> lf = std::make_shared<ls::LoggerFactoryImpl>();
         _impl = lf->getLogger("cppmicroservices::testing::logger");
+	_logimpl = std::dynamic_pointer_cast<ls::LoggerImpl>(_impl);
     }
 
     void
@@ -50,14 +51,14 @@ class LoggerImplTests : public ::testing::Test
     {
         _sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(oss);
         _sink->set_pattern(sinkFormat);
-        _impl->AddSink(_sink);
+        _logimpl->AddSink(_sink);
     }
 
     void
     TearDown() override
     {
         _sink.reset();
-        _impl.reset();
+        _logimpl.reset();
     }
 
     bool
@@ -85,6 +86,7 @@ class LoggerImplTests : public ::testing::Test
     std::ostringstream oss;
     spdlog::sink_ptr _sink;
     std::shared_ptr<ls::Logger> _impl;
+    std::shared_ptr<ls::LoggerImpl> _logimpl;
 };
 
 TEST_F(LoggerImplTests, ProperLoggerUsage)

@@ -75,19 +75,6 @@ namespace cppmicroservices
           public:
             virtual ~LogService() = default;
 
-	    LogService() = default;
-	     // Copy constructor
-            LogService(const LogService& other) = default;
-
-            // Copy assignment operator
-    	    LogService& operator=(const LogService& other) = default;
-
-            // Move constructor
-            LogService(LogService&& other) noexcept = default;
-
-            // Move assignment operator
-            LogService& operator=(LogService&& other) noexcept = default;
-
             /**
              * Logs a message.
              * @param level The severity of the message. This should be one of the defined log levels but may be any

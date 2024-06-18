@@ -1,8 +1,20 @@
 #include "cppmicroservices/logservice/Logger.hpp"
 #include "cppmicroservices/Bundle.h"
 
+namespace sinks
+{
+    class sink;
+}
+
+namespace spdlog
+{
+    class logger;
+    using sink_ptr = std::shared_ptr<sinks::sink>;
+} // namespace spdlog
+
 namespace cppmicroservices::logservice
 {
+
         class LoggerImpl final : public Logger
         {
 	    public:
@@ -77,7 +89,11 @@ namespace cppmicroservices::logservice
                             ServiceReferenceBase const& sr,
                             const std::exception_ptr ex) override;
 
-                void AddSink(spdlog::sink_ptr& sink) override;
+                /**
+                  * Registers a sink to the logger for introspection of contents. This is not a publicly available
+                  * function and should only be used for testing. This is NOT thread-safe.
+                  */
+		void AddSink(spdlog::sink_ptr& sink);
  
             private:
                 std::shared_ptr<::spdlog::logger> m_Logger;

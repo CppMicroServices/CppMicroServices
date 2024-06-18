@@ -192,6 +192,7 @@ namespace cppmicroservices::logservice
         void
         LogServiceImpl::AddSink(spdlog::sink_ptr& sink)
         {
-            logger->AddSink(sink);
+	    std::shared_ptr<LoggerImpl> logimpl = std::dynamic_pointer_cast<LoggerImpl>(logger);
+            logimpl->AddSink(sink);
         }
 } // namespace cppmicroservices::logservice

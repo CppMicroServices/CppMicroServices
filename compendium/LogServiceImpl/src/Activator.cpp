@@ -16,8 +16,8 @@ namespace cppmicroservices
 		const std::string logger_name = "LogService." + bsn;
 		auto svc
                     = std::make_shared<cppmicroservices::logservice::LogServiceImpl>(logger_name);
-                bc.RegisterService<cppmicroservices::logservice::LogService>(std::move(svc));
-		bc.RegisterService<cppmicroservices::logservice::LoggerFactory>(std::move(svc));
+                bc.RegisterService<cppmicroservices::logservice::LogService>(svc);
+		bc.RegisterService<cppmicroservices::logservice::LoggerFactory>(svc);
             }
 
             void

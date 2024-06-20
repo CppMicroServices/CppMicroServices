@@ -546,7 +546,7 @@ TEST(AnyMapTest, AnyMapToCPPKitchenSink)
          std::vector<cppmicroservices::Any> {
          { std::string("yes") },
          { 5 },
-         { AnyMap { { { "key1", 1 },
+         { AnyMap::ordered_any_map { { { "key1", 1 },
          { "key2", false },
          { "key3",
          std::vector<cppmicroservices::Any> {
@@ -567,13 +567,13 @@ TEST(AnyMapTest, AnyMapToCPPKitchenSink)
     std::string("yes"),
     5,
     AnyMap {{
+      {"key1" , 1}, 
+      {"key2" , false}, 
       {"key3" , AnyVector {{
         false,
         6.7889,
         std::string("me!")
-      }}}, 
-      {"key2" , false}, 
-      {"key1" , 1}
+      }}}
     }}
   }}}
 }}}

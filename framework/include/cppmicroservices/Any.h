@@ -1027,7 +1027,7 @@ namespace cppmicroservices
                 os << ", ";
             }
             newline_and_indent(os, increment, indent);
-            os << "{\"" << i1->first << "\" , " << i1->second.ToJSON(increment, indent + increment) << "}";
+            os << "{\"" << i1->first << "\" , " << i1->second.ToCPP(increment, indent + increment) << "}";
         }
         newline_and_indent(os, increment, indent - increment);
         os << "}}";

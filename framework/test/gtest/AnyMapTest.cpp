@@ -474,7 +474,7 @@ TEST(AnyMapTest, AnyMapToCPP)
     // Testing any_value_to_* free functions
     std::ostringstream stream1, stream2, stream3, stream4, stream5;
     any_value_to_cpp(stream1, o_anymap);
-    ASSERT_EQ(stream1.str(), "AnyMap {{{\"do\" , 1}, {\"re\" , 2}}}");
+    ASSERT_EQ(stream1.str(), R"(AnyMap {{{"do" , 1}, {"re" , 2}}})");
 
     AnyMap::ordered_any_map o1 {
         {{ "do", std::string("try") }, { "strings", std::string("and") }, { "bools", true }, { "or", false }}

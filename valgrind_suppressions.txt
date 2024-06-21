@@ -427,4 +427,76 @@
    fun:_dl_allocate_tls
    fun:allocate_stack
    ...
+   fun:cppmicroservices::scrimpl::BindingPolicyTest_TestConcurrentBindUnbindWithMultipleCardinality_Test::TestBody
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression3>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:cppmicroservices::scrimpl::SingletonComponentConfigurationTest_TestConcurrentCreateAndActivateComponentInstance_Test::TestBody
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression4>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:cppmicroservices::scrimpl::ComponentRegistryTest_VerifyConcurrentAddsRemoves_Test::TestBody
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression5>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:cppmicroservices::scrimpl::BindingPolicyTest::TearDown
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression6>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:test::tServiceComponent::TearDown
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression7>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:test::tServiceComponent::SetUp
+   ...
 }

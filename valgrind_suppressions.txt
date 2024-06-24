@@ -418,7 +418,7 @@
 }
 
 {
-   <usDeclarativeServicesTestsSuppression10>
+   <usDeclarativeServicesTestsSuppression2>
    Memcheck:Leak
    match-leak-kinds: possible
    fun:calloc
@@ -432,7 +432,7 @@
 }
 
 {
-   <usDeclarativeServicesTestsSuppression11>
+   <usDeclarativeServicesTestsSuppression3>
    Memcheck:Leak
    match-leak-kinds: possible
    fun:calloc
@@ -446,7 +446,7 @@
 }
 
 {
-   <usDeclarativeServicesTestsSuppression12>
+   <usDeclarativeServicesTestsSuppression4>
    Memcheck:Leak
    match-leak-kinds: possible
    fun:calloc
@@ -460,7 +460,7 @@
 }
 
 {
-   <usDeclarativeServicesTestsSuppression13>
+   <usDeclarativeServicesTestsSuppression5>
    Memcheck:Leak
    match-leak-kinds: possible
    fun:calloc
@@ -474,7 +474,7 @@
 }
 
 {
-   <usDeclarativeServicesTestsSuppression14>
+   <usDeclarativeServicesTestsSuppression6>
    Memcheck:Leak
    match-leak-kinds: possible
    fun:calloc
@@ -488,7 +488,7 @@
 }
 
 {
-   <usDeclarativeServicesTestsSuppression15>
+   <usDeclarativeServicesTestsSuppression7>
    Memcheck:Leak
    match-leak-kinds: possible
    fun:calloc
@@ -502,7 +502,7 @@
 }
 
 {
-   <usDeclarativeServicesTestsSuppression16>
+   <usDeclarativeServicesTestsSuppression8>
    Memcheck:Leak
    match-leak-kinds: possible
    fun:calloc
@@ -512,5 +512,19 @@
    fun:allocate_stack
    ...
    fun:_ZN16cppmicroservices7scrimpl70BindingPolicyTest_TestConcurrentBindUnbindWithMultipleCardinality_Test8TestBodyEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression9>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN16cppmicroservices7scrimpl20DynamicRefPolicyTest8TearDownEv
    ...
 }

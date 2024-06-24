@@ -422,6 +422,7 @@
    Memcheck:Leak
    match-leak-kinds: possible
    fun:calloc
+   fun:calloc
    fun:allocate_dtv
    fun:_dl_allocate_tls
    fun:allocate_stack
@@ -434,6 +435,7 @@
    <usDeclarativeServicesTestsSuppression3>
    Memcheck:Leak
    match-leak-kinds: possible
+   fun:calloc
    fun:calloc
    fun:allocate_dtv
    fun:_dl_allocate_tls
@@ -448,6 +450,7 @@
    Memcheck:Leak
    match-leak-kinds: possible
    fun:calloc
+   fun:calloc
    fun:allocate_dtv
    fun:_dl_allocate_tls
    fun:allocate_stack
@@ -460,6 +463,7 @@
    <usDeclarativeServicesTestsSuppression5>
    Memcheck:Leak
    match-leak-kinds: possible
+   fun:calloc
    fun:calloc
    fun:allocate_dtv
    fun:_dl_allocate_tls
@@ -474,6 +478,7 @@
    Memcheck:Leak
    match-leak-kinds: possible
    fun:calloc
+   fun:calloc
    fun:allocate_dtv
    fun:_dl_allocate_tls
    fun:allocate_stack
@@ -486,6 +491,7 @@
    <usDeclarativeServicesTestsSuppression7>
    Memcheck:Leak
    match-leak-kinds: possible
+   fun:calloc
    fun:calloc
    fun:allocate_dtv
    fun:_dl_allocate_tls
@@ -500,6 +506,7 @@
    Memcheck:Leak
    match-leak-kinds: possible
    fun:calloc
+   fun:calloc
    fun:allocate_dtv
    fun:_dl_allocate_tls
    fun:allocate_stack
@@ -512,6 +519,7 @@
    <usDeclarativeServicesTestsSuppression9>
    Memcheck:Leak
    match-leak-kinds: possible
+   fun:calloc
    fun:calloc
    fun:allocate_dtv
    fun:_dl_allocate_tls

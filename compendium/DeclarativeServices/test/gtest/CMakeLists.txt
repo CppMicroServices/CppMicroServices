@@ -265,7 +265,7 @@ set_property(TEST ${us_declarativeservices_test_exe_name} PROPERTY LABELS regula
 if(US_MEMCHECK_COMMAND)
   add_test(
     NAME memcheck_${us_declarativeservices_test_exe_name}
-    COMMAND ${US_MEMCHECK_COMMAND} --max-threads=1000 --gen-suppressions=all --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${us_declarativeservices_test_exe_name}
+    COMMAND ${US_MEMCHECK_COMMAND} --max-threads=1000 --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${us_declarativeservices_test_exe_name}
     WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR}
     )
   set_property(TEST memcheck_${us_declarativeservices_test_exe_name} PROPERTY LABELS valgrind memcheck)

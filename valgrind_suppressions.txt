@@ -500,3 +500,31 @@
    fun:test::tServiceComponent::SetUp
    ...
 }
+
+{
+   <usDeclarativeServicesTestsSuppression8>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:TestBundleValidation_BundleValidationMultipleSrc_Test::TestBody
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression9>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:TestBundleValidation_BundleValidationReinstall_Test::TestBody
+   ...
+}

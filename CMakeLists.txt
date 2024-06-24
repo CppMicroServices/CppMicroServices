@@ -393,7 +393,7 @@ function(us_add_tests test_driver)
       WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
     set_property(TEST ${test} PROPERTY LABELS regular)
   if(US_MEMCHECK_COMMAND)
-    add_test(NAME memcheck_${test} COMMAND ${US_MEMCHECK_COMMAND} --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
+    add_test(NAME memcheck_${test} COMMAND ${US_MEMCHECK_COMMAND} --gen-suppressions=all --error-exitcode=1 ${US_RUNTIME_OUTPUT_DIRECTORY}/${test_driver} ${test}
       WORKING_DIRECTORY ${CppMicroServices_BINARY_DIR})
     set_property(TEST memcheck_${test} PROPERTY LABELS valgrind memcheck)
     if(US_ENABLE_HELGRIND)

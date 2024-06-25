@@ -105,7 +105,6 @@ set(_additional_srcs
 #-----------------------------------------------------------------------------
 
 set(_third_party_srcs 
-  ../../../third_party/miniz.c
   ../../../third_party/jsoncpp.cpp
 )
 
@@ -125,7 +124,16 @@ add_dependencies(${us_gtest_test_exe_name} ${US_RCC_EXECUTABLE_TARGET})
 set_property(TARGET ${us_gtest_test_exe_name} APPEND PROPERTY COMPILE_DEFINITIONS US_BUNDLE_NAME=main)
 set_property(TARGET ${us_gtest_test_exe_name} PROPERTY US_BUNDLE_NAME main)
 
-target_include_directories(${us_gtest_test_exe_name} PRIVATE $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
+# Make framework classes accessible to test code
+set(_framework_base ${CMAKE_CURRENT_SOURCE_DIR}/../..)
+target_include_directories(${us_gtest_test_exe_name}
+  PUBLIC
+    ${_framework_base}/include
+    ${_framework_base}/src/util
+    ${_framework_base}/src/service
+    ${_framework_base}/src/bundle
+  PRIVATE
+    $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>)
 
 # Disable deprecation warnings.
 if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
@@ -139,7 +147,7 @@ endif()
 
 target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${GMOCK_BOTH_LIBRARIES})
-target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET} usLogService)
+target_link_libraries(${us_gtest_test_exe_name} $<TARGET_OBJECTS:FrameworkObj> usLogService)
 
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)

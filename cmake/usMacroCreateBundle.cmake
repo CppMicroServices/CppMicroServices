@@ -5,7 +5,7 @@ macro(usMacroCreateBundle _project_name)
 cmake_parse_arguments(${_project_name}
   "SKIP_EXAMPLES;SKIP_INIT"
   "VERSION;TARGET;SYMBOLIC_NAME;EMBED_RESOURCE_METHOD"
-  "DEPENDS;PRIVATE_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
+  "DEPENDS;PRIVATE_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES;BUILD_OBJ"
   ${ARGN}
 )
 
@@ -163,6 +163,30 @@ if(${PROJECT_NAME}_BINARY_RESOURCES)
                         )
 endif()
 usFunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET} ${_resource_embed_type})
+
+# Generate supplemental object file for testing
+if(${PROJECT_NAME}_BUILD_OBJ)
+  add_library(${PROJECT_NAME}Obj OBJECT ${${PROJECT_NAME}_SOURCES}
+              ${${PROJECT_NAME}_PRIVATE_HEADERS} ${${PROJECT_NAME}_PUBLIC_HEADERS})
+  target_include_directories(${PROJECT_NAME}Obj
+    PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+      $<BUILD_INTERFACE:${CppMicroServices_BINARY_DIR}/include>
+      $<BUILD_INTERFACE:${${PROJECT_NAME}_PRIVATE_INCLUDE_DIRS}>
+      $<INSTALL_INTERFACE:${HEADER_INSTALL_DIR}>
+    PRIVATE
+      $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>
+    )
+  target_compile_definitions(${PROJECT_NAME}Obj
+    PRIVATE US_BUNDLE_NAME=${${PROJECT_NAME}_SYMBOLIC_NAME}
+    )
+
+  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+    get_property(_compile_flags TARGET ${PROJECT_NAME}Obj PROPERTY COMPILE_FLAGS)
+    set_property(TARGET ${PROJECT_NAME}Obj PROPERTY COMPILE_FLAGS "${_compile_flags} -fPIC")
+  endif()
+endif()
 
 #-----------------------------------------------------------------------------
 # Install support

@@ -41,6 +41,7 @@ usMacroCreateBundle(Framework
   PUBLIC_HEADERS ${_framework_public_headers}
   PRIVATE_HEADERS ${_framework_private_headers}
   BINARY_RESOURCES manifest.json
+  BUILD_OBJ 1
 )
 
 set_property(

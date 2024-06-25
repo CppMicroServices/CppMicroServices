@@ -417,3 +417,239 @@
    ...
 }
 
+{
+   <usDeclarativeServicesTestsSuppression2>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN53TestBundleValidation_BundleValidationMultipleSrc_Test8TestBodyEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression3>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN51TestBundleValidation_BundleValidationReinstall_Test8TestBodyEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression4>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN16cppmicroservices7scrimpl75ComponentConfigurationImplLogTest_LoadLibraryLogsMessagesImmediateTest_Test8TestBodyEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression5>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN16cppmicroservices7scrimpl78ComponentConfigurationImplLogTest_LoadLibraryLogsMessagesNotImmediateTest_Test8TestBodyEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression6>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN4test17tServiceComponent5SetUpEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression7>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN4test17tServiceComponent8TearDownEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression8>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN16cppmicroservices7scrimpl70BindingPolicyTest_TestConcurrentBindUnbindWithMultipleCardinality_Test8TestBodyEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression9>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN16cppmicroservices7scrimpl20DynamicRefPolicyTest8TearDownEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression10>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN16cppmicroservices7scrimpl17BindingPolicyTest8TearDownEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression11>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   fun:pthread_create@@GLIBC_2.34
+   ...
+   fun:_ZN16cppmicroservices7scrimpl51ComponentConfigurationTests_TestConcurrentStop_Test8TestBodyEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression12>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN16cppmicroservices7scrimpl24ComponentContextImplTest8TearDownEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression13>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN4test67tServiceComponent_testConcurrentUpdateConfigAndActivateService_Test8TestBodyEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression14>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN16cppmicroservices16ServiceListeners14ServiceChangedERSt13unordered_setINS_20ServiceListenerEntryESt4hashIS2_ESt8equal_toIS2_ESaIS2_EERKNS_12ServiceEventE
+}
+
+{
+   <usDeclarativeServicesTestsSuppression15>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN4test20tGenericDSAndCASuite8TearDownEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression16>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN4test26InstallAndStartConfigAdminEN16cppmicroservices13BundleContextE
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression17>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN49TestBundleValidation_BundleValidationSuccess_Test8TestBodyEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression18>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN59TestBundleValidation_BundleValidationFunctionException_Test8TestBodyEv
+}

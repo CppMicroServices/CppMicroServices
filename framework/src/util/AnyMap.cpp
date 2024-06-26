@@ -1201,7 +1201,21 @@ namespace cppmicroservices
     std::ostream&
     any_value_to_cpp(std::ostream& os, AnyMap const& m, uint8_t const increment, int32_t const indent)
     {
-        os << "AnyMap {{";
+        auto const mapType = m.GetType();
+        std::string typeStr;
+        switch (mapType)
+        {
+            case cppmicroservices::any_map::map_type::ORDERED_MAP:
+                typeStr = "ordered_any_map";
+                break;
+            case cppmicroservices::any_map::map_type::UNORDERED_MAP:
+                typeStr = "unordered_any_map";
+                break;
+            case cppmicroservices::any_map::map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+                typeStr = "unordered_any_cimap";
+                break;
+        }
+        os << "AnyMap " << typeStr << " {{";
         if (m.empty())
         {
             os << "}}";
@@ -1218,8 +1232,8 @@ namespace cppmicroservices
             {
                 os << ", ";
             }
-            newline_and_indent(os, increment, indent);
-            os << "{\"" << i1->first << "\" , " << i1->second.ToCPP(increment, indent + increment) << "}";
+            newline_and_indent(os, increment, indent + increment);
+            os << "{\"" << i1->first << "\" , " << i1->second.ToCPP(increment, indent + increment + increment) << "}";
         }
         newline_and_indent(os, increment, indent - increment);
         os << "}}";

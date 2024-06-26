@@ -474,7 +474,7 @@ TEST(AnyMapTest, AnyMapToCPP)
     // Testing any_value_to_* free functions
     std::ostringstream stream1, stream2, stream3, stream4, stream5;
     any_value_to_cpp(stream1, o_anymap);
-    ASSERT_EQ(stream1.str(), R"(AnyMap {{{"do" , 1}, {"re" , 2}}})");
+    ASSERT_EQ(stream1.str(), R"(AnyMap ordered_any_map {{{"do" , 1}, {"re" , 2}}})");
 
     AnyMap::ordered_any_map o1 {
         {{ "do", std::string("try") }, { "strings", std::string("and") }, { "bools", true }, { "or", false }}
@@ -485,7 +485,7 @@ TEST(AnyMapTest, AnyMapToCPP)
     any_value_to_cpp(stream2, o1_anymap);
     ASSERT_EQ(
         stream2.str(),
-        R"(AnyMap {{{"bools" , true}, {"do" , std::string("try")}, {"or" , false}, {"strings" , std::string("and")}}})");
+        R"(AnyMap ordered_any_map {{{"bools" , true}, {"do" , std::string("try")}, {"or" , false}, {"strings" , std::string("and")}}})");
 
     AnyMap::ordered_any_map o2 {
         {{ "j", 7 },
@@ -498,18 +498,18 @@ TEST(AnyMapTest, AnyMapToCPP)
     any_value_to_cpp(stream3, o2_anymap);
     ASSERT_EQ(
         stream3.str(),
-        R"(AnyMap {{{"j" , 7}, {"k" , 8}, {"l" , std::string("B")}, {"m" , AnyMap {{{"n" , 9}, {"o" , 10}, {"p" , std::string("C")}}}}}})");
+        R"(AnyMap ordered_any_map {{{"j" , 7}, {"k" , 8}, {"l" , std::string("B")}, {"m" , AnyMap ordered_any_map {{{"n" , 9}, {"o" , 10}, {"p" , std::string("C")}}}}}})");
 
     any_value_to_cpp(stream4, o2_anymap, 2, 0);
-    ASSERT_EQ(stream4.str(), R"(AnyMap {{
-{"j" , 7}, 
-{"k" , 8}, 
-{"l" , std::string("B")}, 
-{"m" , AnyMap {{
-  {"n" , 9}, 
-  {"o" , 10}, 
-  {"p" , std::string("C")}
-}}}
+    ASSERT_EQ(stream4.str(), R"(AnyMap ordered_any_map {{
+  {"j" , 7}, 
+  {"k" , 8}, 
+  {"l" , std::string("B")}, 
+  {"m" , AnyMap ordered_any_map {{
+    {"n" , 9}, 
+    {"o" , 10}, 
+    {"p" , std::string("C")}
+  }}}
 }})");
 
     AnyMap::ordered_any_map o3 {
@@ -521,13 +521,13 @@ TEST(AnyMapTest, AnyMapToCPP)
 
     // Testing any_value_to_* free functions
     any_value_to_cpp(stream5, o3_anymap, 2, 0);
-    ASSERT_EQ(stream5.str(), R"(AnyMap {{
-{"ca" , 6.7776}, 
-{"m" , AnyVector {{
-  std::string("yes"),
-  5
-}}}, 
-{"mi" , 7.9}
+    ASSERT_EQ(stream5.str(), R"(AnyMap ordered_any_map {{
+  {"ca" , 6.7776}, 
+  {"m" , AnyVector {{
+    std::string("yes"),
+    5
+  }}}, 
+  {"mi" , 7.9}
 }})");
 }
 
@@ -540,42 +540,43 @@ TEST(AnyMapTest, AnyMapToCPPKitchenSink)
          { "k", 8 },
          { "l", std::string("B") },
          { "m",
-         AnyMap::ordered_any_map { { { "n", 9 },
+         AnyMap::ordered_any_map {
+         { { "n", 9 },
          { "o", 10 },
          { "p",
          std::vector<cppmicroservices::Any> {
          { std::string("yes") },
          { 5 },
-         { AnyMap::ordered_any_map { { { "key1", 1 },
+         { AnyMap::ordered_any_map {
+         { { "key1", 1 },
          { "key2", false },
          { "key3",
-         std::vector<cppmicroservices::Any> {
-         { false },
+         std::vector<cppmicroservices::Any> { { false },
          { 6.7889 },
          { std::string("me!") } } } } } } } } } } }}
     };
     AnyMap uo_anymap(o);
     any_value_to_cpp(stream1, uo_anymap, 2, 0);
-    ASSERT_EQ(stream1.str(), R"(AnyMap {{
-{"j" , 7}, 
-{"k" , 8}, 
-{"l" , std::string("B")}, 
-{"m" , AnyMap {{
-  {"n" , 9}, 
-  {"o" , 10}, 
-  {"p" , AnyVector {{
-    std::string("yes"),
-    5,
-    AnyMap {{
-      {"key1" , 1}, 
-      {"key2" , false}, 
-      {"key3" , AnyVector {{
-        false,
-        6.7889,
-        std::string("me!")
-      }}}
-    }}
+    ASSERT_EQ(stream1.str(), R"(AnyMap ordered_any_map {{
+  {"j" , 7}, 
+  {"k" , 8}, 
+  {"l" , std::string("B")}, 
+  {"m" , AnyMap ordered_any_map {{
+    {"n" , 9}, 
+    {"o" , 10}, 
+    {"p" , AnyVector {{
+      std::string("yes"),
+      5,
+      AnyMap ordered_any_map {{
+        {"key1" , 1}, 
+        {"key2" , false}, 
+        {"key3" , AnyVector {{
+          false,
+          6.7889,
+          std::string("me!")
+        }}}
+      }}
+    }}}
   }}}
-}}}
 }})");
 }

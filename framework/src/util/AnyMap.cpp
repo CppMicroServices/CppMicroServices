@@ -1206,16 +1206,16 @@ namespace cppmicroservices
         switch (mapType)
         {
             case cppmicroservices::any_map::map_type::ORDERED_MAP:
-                typeStr = "ordered_any_map";
+                typeStr = "ORDERED_MAP";
                 break;
             case cppmicroservices::any_map::map_type::UNORDERED_MAP:
-                typeStr = "unordered_any_map";
+                typeStr = "UNORDERED_MAP";
                 break;
             case cppmicroservices::any_map::map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
-                typeStr = "unordered_any_cimap";
+                typeStr = "UNORDERED_MAP_CASEINSENSITIVE_KEYS";
                 break;
         }
-        os << "AnyMap " << typeStr << " {{";
+        os << "AnyMap { " << typeStr << ", {";
         if (m.empty())
         {
             os << "}}";

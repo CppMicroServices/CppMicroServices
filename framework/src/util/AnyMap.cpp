@@ -1154,8 +1154,8 @@ namespace cppmicroservices
         os << "{";
         using Iterator = any_map::const_iterator;
         Iterator i1 = m.begin();
-        const Iterator begin = i1;
-        const Iterator end = m.end();
+        Iterator const begin = i1;
+        Iterator const end = m.end();
         for (; i1 != end; ++i1)
         {
             if (i1 == begin)
@@ -1173,7 +1173,7 @@ namespace cppmicroservices
 
     template <>
     std::ostream&
-    any_value_to_json(std::ostream& os, AnyMap const& m, const uint8_t increment, const int32_t indent)
+    any_value_to_json(std::ostream& os, AnyMap const& m, uint8_t const increment, int32_t const indent)
     {
         if (m.empty())
         {
@@ -1184,8 +1184,8 @@ namespace cppmicroservices
         os << "{";
         using Iterator = any_map::const_iterator;
         Iterator i1 = m.begin();
-        const Iterator begin = i1;
-        const Iterator end = m.end();
+        Iterator const begin = i1;
+        Iterator const end = m.end();
         for (; i1 != end; ++i1)
         {
             if (i1 != begin)
@@ -1197,6 +1197,49 @@ namespace cppmicroservices
         }
         newline_and_indent(os, increment, indent - increment);
         os << "}";
+        return os;
+    }
+
+    template <>
+    std::ostream&
+    any_value_to_cpp(std::ostream& os, AnyMap const& m, uint8_t const increment, int32_t const indent)
+    {
+        auto const mapType = m.GetType();
+        std::string typeStr;
+        switch (mapType)
+        {
+            case cppmicroservices::any_map::map_type::ORDERED_MAP:
+                typeStr = "ORDERED_MAP";
+                break;
+            case cppmicroservices::any_map::map_type::UNORDERED_MAP:
+                typeStr = "UNORDERED_MAP";
+                break;
+            case cppmicroservices::any_map::map_type::UNORDERED_MAP_CASEINSENSITIVE_KEYS:
+                typeStr = "UNORDERED_MAP_CASEINSENSITIVE_KEYS";
+                break;
+        }
+        os << "AnyMap { " << typeStr << ", {";
+        if (m.empty())
+        {
+            os << "}}";
+            return os;
+        }
+
+        using Iterator = any_map::const_iterator;
+        Iterator i1 = m.begin();
+        Iterator const begin = i1;
+        Iterator const end = m.end();
+        for (; i1 != end; ++i1)
+        {
+            if (i1 != begin)
+            {
+                os << ", ";
+            }
+            newline_and_indent(os, increment, indent + increment);
+            os << "{\"" << i1->first << "\" , " << i1->second.ToCPP(increment, indent + increment + increment) << "}";
+        }
+        newline_and_indent(os, increment, indent - increment);
+        os << "}}";
         return os;
     }
 

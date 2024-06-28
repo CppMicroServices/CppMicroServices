@@ -73,7 +73,7 @@ namespace cppmicroservices
       public:
         using key_type = std::string;
         using mapped_type = Any;
-        using value_type = std::pair<const key_type, mapped_type>;
+        using value_type = std::pair<key_type const, mapped_type>;
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
         using reference = value_type&;
@@ -512,8 +512,15 @@ namespace cppmicroservices
     template <>
     US_Framework_EXPORT std::ostream& any_value_to_json(std::ostream& os,
                                                         AnyMap const& m,
-                                                        const uint8_t increment,
-                                                        const int32_t indent);
+                                                        uint8_t const increment,
+                                                        int32_t const indent);
+
+    template <>
+    US_Framework_EXPORT std::ostream& any_value_to_cpp(std::ostream& os,
+                                                       AnyMap const& m,
+                                                       uint8_t const increment,
+                                                       int32_t const indent);
+
 } // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_ANYMAP_H

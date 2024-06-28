@@ -1038,7 +1038,7 @@ namespace cppmicroservices
     std::ostream&
     any_value_to_cpp(std::ostream& os, std::map<K, V> const& m, uint8_t const increment, int32_t const indent)
     {
-        os << "AnyMap {{";
+        os << "AnyMap { ORDERED_MAP, {";
         if (m.empty())
         {
             os << "}}";

@@ -197,6 +197,7 @@ namespace cppmicroservices
 
                 if (iter != listenersMapHandle->end())
                 {
+                    // reserve space after verifying the iterator is valid
                     callbacks.reserve((iter->second)->size());
 
                     for (auto const& configListenerPtr : *(iter->second))

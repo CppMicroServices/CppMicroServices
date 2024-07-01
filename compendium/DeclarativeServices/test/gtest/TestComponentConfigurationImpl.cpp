@@ -20,6 +20,7 @@
 
   =============================================================================*/
 
+#include <future>
 #include <random>
 #include <thread>
 
@@ -1041,13 +1042,13 @@ namespace cppmicroservices
 
         class ConfigAdminComponentCreationRace : public ::testing::Test
         {
-          protected:
+          public:
             ConfigAdminComponentCreationRace() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
 
-            virtual ~ConfigAdminComponentCreationRace() = default;
+            ~ConfigAdminComponentCreationRace() override = default;
 
-            virtual void
-            SetUp()
+            void
+            SetUp() override
             {
                 /**
                  * LSAN is incorrectly flagging a lock inversion while using the
@@ -1094,8 +1095,8 @@ namespace cppmicroservices
                 ASSERT_TRUE(configAdminService);
             }
 
-            virtual void
-            TearDown()
+            void
+            TearDown() override
             {
                 framework.Stop();
                 framework.WaitForStop(std::chrono::milliseconds::zero());
@@ -1288,6 +1289,36 @@ namespace cppmicroservices
             framework.WaitForStop(std::chrono::milliseconds::zero());
         }
 
+        class Barrier
+        {
+          public:
+            Barrier(std::size_t count) : threshold(count), count(count), generation(0) {}
+
+            void
+            Wait()
+            {
+                std::unique_lock<std::mutex> lock(mutex);
+                auto gen = generation;
+                if (--count == 0)
+                {
+                    generation++;
+                    count = threshold;
+                    cond.notify_all();
+                }
+                else
+                {
+                    cond.wait(lock, [this, gen] { return gen != generation; });
+                }
+            }
+
+          private:
+            std::mutex mutex;
+            std::condition_variable cond;
+            std::size_t threshold;
+            std::size_t count;
+            std::size_t generation;
+        };
+
         /**
          * Test that the Modified method on a component configuration that is
          * lazily loaded and requires two configuration objects where one is
@@ -1341,9 +1372,13 @@ namespace cppmicroservices
             auto mockCompInstance3 = std::make_shared<MockComponentInstance>();
             compConfig3->SetComponentInstancePair(InstanceContextPair(mockCompInstance, mockCompContext));
             compConfig3->Initialize();
-            auto frameworkT = std::thread(
-                [this]()
+            Barrier sync_point(5); // 5 threads to synchronize
+
+            auto frameworkT = std::async(
+                std::launch::async,
+                [this, &sync_point]()
                 {
+                    sync_point.Wait(); // Wait for all threads to reach this point
                     auto configuration = configAdminService->GetConfiguration("sample::config");
                     auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
                         {"foo", true}
@@ -1357,16 +1392,40 @@ namespace cppmicroservices
                         {"foo", true}
                     });
                 });
-            auto bundleT = std::thread([&compConfig]() { compConfig->Stop(); });
-            auto bundleT1 = std::thread([&compConfig1]() { compConfig1->Stop(); });
-            auto bundleT2 = std::thread([&compConfig2]() { compConfig2->Stop(); });
-            auto bundleT3 = std::thread([&compConfig3]() { compConfig3->Stop(); });
 
-            frameworkT.join();
-            bundleT.join();
-            bundleT1.join();
-            bundleT2.join();
-            bundleT3.join();
+            auto bundleT = std::async(std::launch::async,
+                                      [&sync_point, &compConfig]()
+                                      {
+                                          sync_point.Wait(); // Wait for all threads to reach this point
+                                          compConfig->Stop();
+                                      });
+
+            auto bundleT1 = std::async(std::launch::async,
+                                       [&sync_point, &compConfig1]()
+                                       {
+                                           sync_point.Wait(); // Wait for all threads to reach this point
+                                           compConfig1->Stop();
+                                       });
+
+            auto bundleT2 = std::async(std::launch::async,
+                                       [&sync_point, &compConfig2]()
+                                       {
+                                           sync_point.Wait(); // Wait for all threads to reach this point
+                                           compConfig2->Stop();
+                                       });
+
+            auto bundleT3 = std::async(std::launch::async,
+                                       [&sync_point, &compConfig3]()
+                                       {
+                                           sync_point.Wait(); // Wait for all threads to reach this point
+                                           compConfig3->Stop();
+                                       });
+
+            frameworkT.wait();
+            bundleT.wait();
+            bundleT1.wait();
+            bundleT2.wait();
+            bundleT3.wait();
         }
 #endif
     } // namespace scrimpl

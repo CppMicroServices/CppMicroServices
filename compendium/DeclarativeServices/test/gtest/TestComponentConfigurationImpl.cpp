@@ -1313,15 +1313,34 @@ namespace cppmicroservices
             compConfig->Initialize();
 
             auto compConfig1 = std::make_shared<SingletonComponentConfigurationImpl>(compMetadata,
-                                                                                    framework,
-                                                                                    mockRegistry,
-                                                                                    fakeLogger,
-                                                                                    notifier);
+                                                                                     framework,
+                                                                                     mockRegistry,
+                                                                                     fakeLogger,
+                                                                                     notifier);
             auto mockCompContext1 = std::make_shared<MockComponentContextImpl>(compConfig);
             auto mockCompInstance1 = std::make_shared<MockComponentInstance>();
             compConfig1->SetComponentInstancePair(InstanceContextPair(mockCompInstance, mockCompContext));
             compConfig1->Initialize();
 
+            auto compConfig2 = std::make_shared<SingletonComponentConfigurationImpl>(compMetadata,
+                                                                                     framework,
+                                                                                     mockRegistry,
+                                                                                     fakeLogger,
+                                                                                     notifier);
+            auto mockCompContext2 = std::make_shared<MockComponentContextImpl>(compConfig);
+            auto mockCompInstance2 = std::make_shared<MockComponentInstance>();
+            compConfig2->SetComponentInstancePair(InstanceContextPair(mockCompInstance, mockCompContext));
+            compConfig2->Initialize();
+
+            auto compConfig3 = std::make_shared<SingletonComponentConfigurationImpl>(compMetadata,
+                                                                                     framework,
+                                                                                     mockRegistry,
+                                                                                     fakeLogger,
+                                                                                     notifier);
+            auto mockCompContext3 = std::make_shared<MockComponentContextImpl>(compConfig);
+            auto mockCompInstance3 = std::make_shared<MockComponentInstance>();
+            compConfig3->SetComponentInstancePair(InstanceContextPair(mockCompInstance, mockCompContext));
+            compConfig3->Initialize();
             auto frameworkT = std::thread(
                 [this]()
                 {
@@ -1330,16 +1349,24 @@ namespace cppmicroservices
                         {"foo", true}
                     });
                     fut.second.wait();
-                    configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
+                    fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
                         {"foo", false}
+                    });
+                    fut.second.wait();
+                    configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
+                        {"foo", true}
                     });
                 });
             auto bundleT = std::thread([&compConfig]() { compConfig->Stop(); });
             auto bundleT1 = std::thread([&compConfig1]() { compConfig1->Stop(); });
+            auto bundleT2 = std::thread([&compConfig2]() { compConfig2->Stop(); });
+            auto bundleT3 = std::thread([&compConfig3]() { compConfig3->Stop(); });
 
             frameworkT.join();
             bundleT.join();
             bundleT1.join();
+            bundleT2.join();
+            bundleT3.join();
         }
 #endif
     } // namespace scrimpl

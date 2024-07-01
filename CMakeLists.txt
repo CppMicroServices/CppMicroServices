@@ -544,8 +544,8 @@ if(MSVC)
   # Differences in character sets will cause these sort orders to differ. For this
   # reason, we set the LC_ALL environment variable to 'C' with the utf-8 character set to ensure
   # sort ordering is correct.
-  set(US_CXX_FLAGS "/source-charset:utf-8 /execution-charset:utf-8 ${US_CXX_FLAGS}")
-  set(US_C_FLAGS "/source-charset:utf-8 /execution-charset:utf-8 ${US_C_FLAGS}")
+  set(US_CXX_FLAGS "/utf-8 ${US_CXX_FLAGS}")
+  set(US_C_FLAGS "/utf-8 ${US_C_FLAGS}")
 else()
 
   # If not cross-compiling, turn on Stack Smashing Protection.

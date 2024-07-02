@@ -141,7 +141,7 @@ namespace cppmicroservices
 	}
 
 	 std::shared_ptr<cppmicroservices::logservice::Logger>
-        CMLogger::getLogger(cppmicroservices::Bundle bundle, std::string const& name) const
+        CMLogger::getLogger(const cppmicroservices::Bundle& bundle, std::string const& name) const
         {
             auto currLogger = std::atomic_load(&logService);
             if (currLogger)

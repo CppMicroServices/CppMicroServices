@@ -48,7 +48,7 @@ namespace cppmicroservices::logservice
             m_Logger->set_level(spdlog::level::trace);
         }
 
-	LoggerImpl::LoggerImpl(cppmicroservices::Bundle bundle, std::string const& loggerName)
+	LoggerImpl::LoggerImpl(const cppmicroservices::Bundle& bundle, std::string const& loggerName)
         {
             auto sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 	    const std::string logger_name = bundle.GetSymbolicName() + "." + loggerName;

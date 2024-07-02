@@ -183,7 +183,7 @@ namespace cppmicroservices::logservice
         }
 
 	std::shared_ptr<Logger>
-            LogServiceImpl::getLogger(cppmicroservices::Bundle bundle, std::string const& name) const
+            LogServiceImpl::getLogger(const cppmicroservices::Bundle& bundle, std::string const& name) const
         {
             std::shared_ptr<LoggerFactory> lf = std::make_shared<LoggerFactoryImpl>();
             return lf->getLogger(bundle, name);

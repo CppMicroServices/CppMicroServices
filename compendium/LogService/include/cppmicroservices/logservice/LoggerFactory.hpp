@@ -31,6 +31,22 @@
 
 namespace cppmicroservices::logservice
 {
+	 /**
+         \defgroup gr_logservice LoggerFactory
+
+         \brief Groups LoggerFactory class related symbols.
+         */
+
+	 /**
+         * \ingroup MicroService
+         * \ingroup gr_logservice
+         *
+         * LoggerFactory is the service interface that allows a bundle to obtain a Logger.
+         * It provides methods to obtain Logger; then a bundle can start logging messages to the Log Service by calling one of the Logger methods.
+         *
+         * @remarks This class is thread safe.
+         */
+
 	class LoggerFactory
 	{
 	    public:
@@ -39,9 +55,22 @@ namespace cppmicroservices::logservice
 	
                 virtual ~LoggerFactory() = default;
 
+		/**
+                 * Return the Logger named with the specified name.
+                 * @param name The name to use for the logger name. 
+                 * 
+		 * If the name parameter is equal to ROOT_LOGGER_NAME, then the root logger is returned.
+                 */
                 [[nodiscard]] virtual std::shared_ptr<Logger> getLogger(std::string const& name = ROOT_LOGGER_NAME) const = 0;
 
-                [[nodiscard]] virtual std::shared_ptr<Logger> getLogger(cppmicroservices::Bundle bundle, std::string const& name = ROOT_LOGGER_NAME) const = 0; 
+		 /**
+                 * Return the Logger for the specified bundle, named with the specified name.
+		 * @param bundle The bundle associated with the Logger. 
+                 * @param name The name to use for the logger name.
+                 *
+                 * If the name parameter is equal to ROOT_LOGGER_NAME, then the root logger is returned.
+                 */
+                [[nodiscard]] virtual std::shared_ptr<Logger> getLogger(const cppmicroservices::Bundle& bundle, std::string const& name = ROOT_LOGGER_NAME) const = 0; 
         };
 }
 

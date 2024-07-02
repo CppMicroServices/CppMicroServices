@@ -1,4 +1,6 @@
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 
 #include <gtest/gtest.h>
 
@@ -58,6 +60,8 @@ class LogServiceImplTests : public ::testing::Test
         std::string text = oss.str();
         std::smatch m;
         bool found = std::regex_search(text, m, std::regex(regex));
+        std::cout << "TEXT STRING =" << text << std::endl;
+        std::cout << "REGEX = " << regex << std::endl;
         oss.str("");
         return found;
     }
@@ -167,11 +171,18 @@ TEST_F(LogServiceImplTests, InvalidLoggerUsage)
     EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid exception_ptr(\\n)" + exception_preamble + "none"));
 
     ASSERT_NO_THROW(logger->Log(static_cast<ls::SeverityLevel>(-1), "Test invalid negative severity level"));
-    EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid negative severity level"));
+    EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid negative severity level")); 
+
+    logger->Log(static_cast<ls::SeverityLevel>(-1), "Test invalid negative severity level");
+    EXPECT_TRUE(ContainsRegex("trace"));
 
     ASSERT_NO_THROW(logger->Log(static_cast<ls::SeverityLevel>(std::numeric_limits<unsigned int>::max()),
                                 "Test invalid maximum severity level"));
     EXPECT_TRUE(ContainsRegex(log_preamble + "Test invalid maximum severity level"));
+
+    logger->Log(static_cast<ls::SeverityLevel>(std::numeric_limits<unsigned int>::max()),
+                                "Test invalid maximum severity level");
+    EXPECT_TRUE(ContainsRegex("trace"));
 
     ASSERT_NO_THROW(logger->Log(cppmicroservices::ServiceReferenceU {},
                                 ls::SeverityLevel::LOG_INFO,

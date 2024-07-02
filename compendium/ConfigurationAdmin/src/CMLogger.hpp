@@ -62,7 +62,7 @@ namespace cppmicroservices
                      std::string const& message,
                      const std::exception_ptr ex) override;
 	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger> getLogger(const std::string& name) const override;
-	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger> getLogger(cppmicroservices::Bundle bundle, std::string const& name) const override;
+	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger> getLogger(const cppmicroservices::Bundle& bundle, std::string const& name) const override;
 
             // methods from the cppmicroservices::ServiceTrackerCustomizer interface
             std::shared_ptr<TrackedParamType> AddingService(

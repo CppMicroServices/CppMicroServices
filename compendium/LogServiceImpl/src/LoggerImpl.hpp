@@ -19,7 +19,7 @@ namespace cppmicroservices::logservice
         {
 	    public:
                 LoggerImpl(std::string const& loggerName);
-		LoggerImpl(cppmicroservices::Bundle bundle, std::string const& loggerName);
+		LoggerImpl(const cppmicroservices::Bundle& bundle, std::string const& loggerName);
                 ~LoggerImpl() override = default;
                 LoggerImpl() = default;
 		// Copy constructor

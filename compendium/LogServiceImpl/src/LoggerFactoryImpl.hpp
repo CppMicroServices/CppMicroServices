@@ -23,7 +23,7 @@ namespace cppmicroservices::logservice
 
 
               [[nodiscard]] std::shared_ptr<Logger> getLogger(std::string const& name) const override;
-              [[nodiscard]] std::shared_ptr<Logger> getLogger(cppmicroservices::Bundle bundle, std::string const& name) const override;              
+              [[nodiscard]] std::shared_ptr<Logger> getLogger(const cppmicroservices::Bundle& bundle, std::string const& name) const override;              
 
 	  private:
 	      mutable std::mutex mutex; // Mutex for synchronization

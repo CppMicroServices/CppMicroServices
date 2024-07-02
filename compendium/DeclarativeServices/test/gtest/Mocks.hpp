@@ -146,7 +146,7 @@ namespace cppmicroservices
 	    MOCK_CONST_METHOD1(getLogger,
                      std::shared_ptr<cppmicroservices::logservice::Logger>(const std::string&));
 	    MOCK_CONST_METHOD2(getLogger,
-                     std::shared_ptr<cppmicroservices::logservice::Logger>(cppmicroservices::Bundle, const std::string&));
+                     std::shared_ptr<cppmicroservices::logservice::Logger>(const cppmicroservices::Bundle&, const std::string&));
 
         };
 
@@ -186,7 +186,7 @@ namespace cppmicroservices
 		return nullptr;
 	    }
 	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger>
-            getLogger(cppmicroservices::Bundle, const std::string&) const override
+            getLogger(const cppmicroservices::Bundle&, const std::string&) const override
             {
                 return nullptr;
             }

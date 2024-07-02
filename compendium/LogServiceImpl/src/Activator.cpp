@@ -11,13 +11,12 @@ namespace cppmicroservices
             void
             Activator::Start(cppmicroservices::BundleContext bc)
             { 
-		cppmicroservices::Bundle bundle = bc.GetBundle();
+		const cppmicroservices::Bundle bundle = bc.GetBundle();
 		const std::string bsn = bundle.GetSymbolicName();
 		const std::string logger_name = "LogService." + bsn;
 		auto svc
                     = std::make_shared<cppmicroservices::logservice::LogServiceImpl>(logger_name);
-                bc.RegisterService<cppmicroservices::logservice::LogService>(svc);
-		bc.RegisterService<cppmicroservices::logservice::LoggerFactory>(svc);
+                bc.RegisterService<cppmicroservices::logservice::LogService, cppmicroservices::logservice::LoggerFactory>(svc);
             }
 
             void

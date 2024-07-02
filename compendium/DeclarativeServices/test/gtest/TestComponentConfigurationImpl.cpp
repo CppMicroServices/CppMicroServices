@@ -1126,7 +1126,7 @@ namespace cppmicroservices
 
             auto bundleT = std::thread([&compConfig]() { compConfig->Initialize(); });
             auto frameworkT = std::thread(
-                [&configAdminService]()
+                [configAdminService=configAdminService]()
                 {
                     auto configuration = configAdminService->GetConfiguration("sample::config");
                     auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
@@ -1140,6 +1140,9 @@ namespace cppmicroservices
 
             compConfig->Deactivate();
             compConfig->Stop();
+
+            framework.Stop();
+            framework.WaitForStop(std::chrono::milliseconds::zero());
         }
 
         /**
@@ -1189,7 +1192,7 @@ namespace cppmicroservices
 
             auto bundleT = std::thread([&compConfig]() { compConfig->Initialize(); });
             auto frameworkT = std::thread(
-                [&configAdminService]()
+                [configAdminService=configAdminService]()
                 {
                     auto configuration = configAdminService->GetConfiguration("sample::config");
                     auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
@@ -1357,7 +1360,7 @@ namespace cppmicroservices
 
             auto frameworkT = std::async(
                 std::launch::async,
-                [&configAdminService, &sync_point]()
+                [configAdminService=configAdminService, &sync_point]()
                 {
                     sync_point.Wait(); // Wait for all threads to reach this point
                     auto configuration = configAdminService->GetConfiguration("sample::config");
@@ -1407,6 +1410,9 @@ namespace cppmicroservices
             bundleT1.wait();
             bundleT2.wait();
             bundleT3.wait();
+
+            framework.Stop();
+            framework.WaitForStop(std::chrono::milliseconds::zero());
         }
 #endif
     } // namespace scrimpl

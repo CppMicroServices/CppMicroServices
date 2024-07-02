@@ -1045,7 +1045,6 @@ namespace cppmicroservices
                    std::shared_ptr<metadata::ComponentMetadata>,
                    std::shared_ptr<MockComponentRegistry>,
                    std::shared_ptr<FakeLogger>,
-                   std::shared_ptr<SCRLogger>,
                    std::shared_ptr<ConfigurationNotifier>,
                    std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin>>
         mySetUp()
@@ -1091,7 +1090,7 @@ namespace cppmicroservices
                 = frameworkContext.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
             auto configAdminService = frameworkContext.GetService(configAdminServiceRef);
 
-            return { framework, compMetadata, mockRegistry, fakeLogger, logger, notifier, configAdminService };
+            return { framework, compMetadata, mockRegistry, fakeLogger, notifier, configAdminService };
         }
         /**
          * Test that the Modified method on a component configuration that is
@@ -1101,7 +1100,7 @@ namespace cppmicroservices
          */
         TEST(ConfigAdminComponentCreationRace, TestModifiedIsNeverCalled)
         {
-            auto [framework, compMetadata, mockRegistry, fakeLogger, logger, notifier, configAdminService] = mySetUp();
+            auto [framework, compMetadata, mockRegistry, fakeLogger, notifier, configAdminService] = mySetUp();
             compMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
             compMetadata->immediate = true;
             compMetadata->configurationPolicy = "require";
@@ -1153,7 +1152,7 @@ namespace cppmicroservices
          */
         TEST(ConfigAdminComponentCreationRace, TestMultipleConfigsNoModifiedCall)
         {
-            auto [framework, compMetadata, mockRegistry, fakeLogger, logger, notifier, configAdminService] = mySetUp();
+            auto [framework, compMetadata, mockRegistry, fakeLogger, notifier, configAdminService] = mySetUp();
 
             compMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
             compMetadata->immediate = true;
@@ -1219,7 +1218,7 @@ namespace cppmicroservices
          */
         TEST(ConfigAdminComponentCreationRace, TestMultipleConfigsModifiedCalled)
         {
-            auto [framework, compMetadata, mockRegistry, fakeLogger, logger, notifier, configAdminService] = mySetUp();
+            auto [framework, compMetadata, mockRegistry, fakeLogger, notifier, configAdminService] = mySetUp();
 
             compMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
             compMetadata->immediate = true;
@@ -1310,7 +1309,7 @@ namespace cppmicroservices
          */
         TEST(ConfigAdminComponentCreationRace, TestConfigNotifierSafeWithNoListenersForPid)
         {
-            auto [framework, compMetadata, mockRegistry, fakeLogger, logger, notifier, configAdminService] = mySetUp();
+            auto [framework, compMetadata, mockRegistry, fakeLogger, notifier, configAdminService] = mySetUp();
 
             compMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
             compMetadata->immediate = true;

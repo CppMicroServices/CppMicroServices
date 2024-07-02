@@ -1125,7 +1125,7 @@ namespace cppmicroservices
 
             auto bundleT = std::thread([&compConfig]() { compConfig->Initialize(); });
             auto frameworkT = std::thread(
-                [configAdminService=configAdminService]()
+                [configAdminService = configAdminService]()
                 {
                     auto configuration = configAdminService->GetConfiguration("sample::config");
                     auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
@@ -1191,7 +1191,7 @@ namespace cppmicroservices
 
             auto bundleT = std::thread([&compConfig]() { compConfig->Initialize(); });
             auto frameworkT = std::thread(
-                [configAdminService=configAdminService]()
+                [configAdminService = configAdminService]()
                 {
                     auto configuration = configAdminService->GetConfiguration("sample::config");
                     auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
@@ -1359,7 +1359,7 @@ namespace cppmicroservices
 
             auto frameworkT = std::async(
                 std::launch::async,
-                [configAdminService=configAdminService, &sync_point]()
+                [configAdminService = configAdminService, &sync_point]()
                 {
                     sync_point.Wait(); // Wait for all threads to reach this point
                     auto configuration = configAdminService->GetConfiguration("sample::config");
@@ -1409,6 +1409,18 @@ namespace cppmicroservices
             bundleT1.wait();
             bundleT2.wait();
             bundleT3.wait();
+
+            compConfig->Deactivate();
+            compConfig->Stop();
+
+            compConfig1->Deactivate();
+            compConfig1->Stop();
+
+            compConfig2->Deactivate();
+            compConfig2->Stop();
+
+            compConfig3->Deactivate();
+            compConfig3->Stop();
 
             framework.Stop();
             framework.WaitForStop(std::chrono::milliseconds::zero());

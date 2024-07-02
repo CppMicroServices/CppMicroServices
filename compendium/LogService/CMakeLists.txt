@@ -1,5 +1,7 @@
 set(_public_headers
   include/cppmicroservices/logservice/LogService.hpp
+  include/cppmicroservices/logservice/LoggerFactory.hpp
+  include/cppmicroservices/logservice/Logger.hpp
 )
 
 set(_version "1.0.0")

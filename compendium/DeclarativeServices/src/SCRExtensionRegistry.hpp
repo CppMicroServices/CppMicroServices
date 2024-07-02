@@ -26,78 +26,75 @@
 #include "SCRBundleExtension.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
 
-#include <map>
 #include <memory>
 #include <mutex>
+#include <unordered_map>
 
-namespace cppmicroservices
+namespace cppmicroservices::scrimpl
 {
-    namespace scrimpl
+    /* The SCRBundleExtension is a helper class to load and unload Components of
+     * a single bundle. It is responsible for creating a component manager for each
+     * valid component description found in the bundle. The SCRExtensionRegistry
+     * maintains a map of SCRBundleExtension objects that is accesed by BundleId.
+     */
+    class SCRExtensionRegistry
     {
-        /* The SCRBundleExtension is a helper class to load and unload Components of
-         * a single bundle. It is responsible for creating a component manager for each
-         * valid component description found in the bundle. The SCRExtensionRegistry 
-         * maintains a map of SCRBundleExtension objects that is accesed by BundleId.
+
+      public:
+        /**
+         * @throws std::invalid_argument exception if any of the params is a nullptr
          */
-        class SCRExtensionRegistry 
-        {
+        SCRExtensionRegistry(std::shared_ptr<cppmicroservices::logservice::LogService> logger);
 
-          public:
-            /**
-             * @throws std::invalid_argument exception if any of the params is a nullptr
-             */
-            SCRExtensionRegistry(std::shared_ptr<cppmicroservices::logservice::LogService> logger);
- 
-            SCRExtensionRegistry(SCRExtensionRegistry const&) = delete;
-            SCRExtensionRegistry(SCRExtensionRegistry&&) = delete;
-            SCRExtensionRegistry& operator=(SCRExtensionRegistry const&) = delete;
-            SCRExtensionRegistry& operator=(SCRExtensionRegistry&&) = delete;
-            ~SCRExtensionRegistry() = default;
+        SCRExtensionRegistry(SCRExtensionRegistry const&) = delete;
+        SCRExtensionRegistry(SCRExtensionRegistry&&) = delete;
+        SCRExtensionRegistry& operator=(SCRExtensionRegistry const&) = delete;
+        SCRExtensionRegistry& operator=(SCRExtensionRegistry&&) = delete;
+        ~SCRExtensionRegistry() = default;
 
-            /* SCRExtensionRegistry::Find 
-             * Searches the extensionRegistry for the bundleId matching the input 
-             * parameter. 
-             * @param bundleId The bundleId {@link Bundle} associated with the 
-             * {@link SCRBundleExtension} responsible for creating the components.
-             * @returns shared_ptr to a {@link SCRBundleExtension} object or nullptr 
-             * if the no matching bundleId is found. 
-             */
-            std::shared_ptr<SCRBundleExtension> Find(long bundleId) noexcept;
-           
-            /* SCRExtensionRegistry::Add
-             * Inserts a SCRBundleExtension object into the extensionRegistry using
-             * the bundleId as the key.
-             * @param bundleId The bundleId {@link Bundle} associated with the
-             * {@link SCRBundleExtension} object to be inserted.
-             * @param shared_ptr to the {@link SCRBundleExtension} object to be inserted. 
-             * @throws std::invalid_argument if the extension input parameter if invalid.
-             * @throws std::bad_alloc exception if a storage failure occurs. 
-             */
-            void Add(long bundleId, std::shared_ptr<SCRBundleExtension> extension);
+        /* SCRExtensionRegistry::Find
+         * Searches the extensionRegistry for the bundleId matching the input
+         * parameter.
+         * @param bundleId The bundleId {@link Bundle} associated with the
+         * {@link SCRBundleExtension} responsible for creating the components.
+         * @returns shared_ptr to a {@link SCRBundleExtension} object or nullptr
+         * if the no matching bundleId is found.
+         */
+        std::shared_ptr<SCRBundleExtension> Find(long bundleId) noexcept;
 
-            /* SCRExtensionRegistry::Remove
-             * Removes a SCRBundleExtension object from the extensionRegistry using
-             * the bundleId as the key.
-             * @param bundleId The bundleId {@link Bundle} associated with the
-             * {@link SCRBundleExtension} object to be removed.
-             * @throws std::current_exception if an exception is thrown by the 
-             * {@link SCRBundleExtension} destructor
-             */
-            void Remove(long bundleId);
+        /* SCRExtensionRegistry::Add
+         * Inserts a SCRBundleExtension object into the extensionRegistry using
+         * the bundleId as the key.
+         * @param bundleId The bundleId {@link Bundle} associated with the
+         * {@link SCRBundleExtension} object to be inserted.
+         * @param shared_ptr to the {@link SCRBundleExtension} object to be inserted.
+         * @throws std::invalid_argument if the extension input parameter if invalid.
+         * @throws std::bad_alloc exception if a storage failure occurs.
+         */
+        void Add(long bundleId, std::shared_ptr<SCRBundleExtension> extension);
 
-            /* SCRExtensionRegistry::Clears
-             * Removes all  SCRBundleExtension objects from the extensionRegistry.
-             * @throws std::current_exception if an exception is thrown by a
-             * {@link SCRBundleExtension} destructor
-             */
-            void Clear();
+        /* SCRExtensionRegistry::Remove
+         * Removes a SCRBundleExtension object from the extensionRegistry using
+         * the bundleId as the key.
+         * @param bundleId The bundleId {@link Bundle} associated with the
+         * {@link SCRBundleExtension} object to be removed.
+         * @throws std::current_exception if an exception is thrown by the
+         * {@link SCRBundleExtension} destructor
+         */
+        void Remove(long bundleId);
 
-          private:
-            std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-            std::mutex extensionRegMutex;  //protects the extensionRegistry
-            std::unordered_map<long,std::shared_ptr<SCRBundleExtension>> extensionRegistry;
-        };
+        /* SCRExtensionRegistry::Clears
+         * Removes all  SCRBundleExtension objects from the extensionRegistry.
+         * @throws std::current_exception if an exception is thrown by a
+         * {@link SCRBundleExtension} destructor
+         */
+        void Clear();
 
-    } // namespace scrimpl
-} // namespace cppmicroservices
+      private:
+        std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+        std::mutex extensionRegMutex; // protects the extensionRegistry
+        std::unordered_map<long, std::shared_ptr<SCRBundleExtension>> extensionRegistry;
+    };
+
+} // namespace cppmicroservices::scrimpl
 #endif // CPPMICROSERVICES_SCRIMPL_SCREXTENSIONREGISTRY_HPP

@@ -100,7 +100,7 @@ namespace cppmicroservices
             return changeCount;
         }
 
-        std::shared_future<void>
+        SafeFuture
         ConfigurationImpl::Update(AnyMap newProperties)
         {
             {
@@ -120,10 +120,10 @@ namespace cppmicroservices
             std::promise<void> ready;
             std::shared_future<void> fut = ready.get_future();
             ready.set_value();
-            return fut;
+            return SafeFuture(fut);
         }
 
-        std::pair<bool, std::shared_future<void>>
+        std::pair<bool, SafeFuture>
         ConfigurationImpl::UpdateIfDifferent(AnyMap newProperties)
         {
             std::promise<void> ready;
@@ -132,20 +132,24 @@ namespace cppmicroservices
             if (!updated.first)
             {
                 ready.set_value();
-                return std::pair<bool, std::shared_future<void>>(updated.first, fut);
+                return std::pair<bool, SafeFuture>(
+                    updated.first,
+                    SafeFuture(fut));
             }
             std::lock_guard<std::mutex> lk { configAdminMutex };
             if (configAdminImpl)
             {
                 auto fut = configAdminImpl->NotifyConfigurationUpdated(pid, changeCount);
-                return std::pair<bool, std::shared_future<void>>(true, fut);
+                return std::pair<bool, SafeFuture>(true, fut);
             }
 
             ready.set_value();
-            return std::pair<bool, std::shared_future<void>>(true, fut);
+            return std::pair<bool, SafeFuture>(
+                true,
+                SafeFuture(fut));
         }
 
-        std::shared_future<void>
+        SafeFuture
         ConfigurationImpl::Remove()
         {
             {
@@ -168,7 +172,7 @@ namespace cppmicroservices
             std::promise<void> ready;
             std::shared_future<void> fut = ready.get_future();
             ready.set_value();
-            return fut;
+            return SafeFuture(fut);
         }
 
         std::pair<bool, unsigned long>

@@ -39,6 +39,7 @@
 #include "cppmicroservices/cm/ManagedService.hpp"
 #include "cppmicroservices/cm/ManagedServiceFactory.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
+#include "cppmicroservices/SafeFuture.h"
 
 #include "ConfigurationAdminPrivate.hpp"
 #include "ConfigurationImpl.hpp"
@@ -70,7 +71,11 @@ namespace cppmicroservices
             TrackedServiceWrapper(TrackedServiceWrapper&&) = delete;
             TrackedServiceWrapper& operator=(TrackedServiceWrapper&&) = delete;
 
-            explicit operator bool() const { return static_cast<bool>(trackedService); }
+            explicit
+            operator bool() const
+            {
+                return static_cast<bool>(trackedService);
+            }
 
             std::string
             getPid() noexcept
@@ -196,8 +201,9 @@ namespace cppmicroservices
              *
              * See {@code ConfigurationAdminPrivate#NotifyConfigurationUpdated}
              */
-            std::shared_future<void> NotifyConfigurationUpdated(std::string const& pid,
-                                                                unsigned long const changeCount) override;
+            SafeFuture NotifyConfigurationUpdated(
+                std::string const& pid,
+                unsigned long const changeCount) override;
 
             /**
              * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
@@ -206,9 +212,10 @@ namespace cppmicroservices
              *
              * See {@code ConfigurationAdminPrivate#NotifyConfigurationRemoved}
              */
-            std::shared_future<void> NotifyConfigurationRemoved(std::string const& pid,
-                                                                std::uintptr_t configurationId,
-                                                                unsigned long changeCount) override;
+            SafeFuture NotifyConfigurationRemoved(
+                std::string const& pid,
+                std::uintptr_t configurationId,
+                unsigned long changeCount) override;
 
             // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedService
             std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>> AddingService(

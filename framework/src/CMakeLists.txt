@@ -15,6 +15,7 @@ set(_srcs
   util/LDAPProp.cpp
   util/Properties.cpp
   util/PropsCheck.cpp
+  util/SafeFuture.cpp
   util/SecurityException.cpp
   util/SharedLibrary.cpp
   util/SharedLibraryException.cpp

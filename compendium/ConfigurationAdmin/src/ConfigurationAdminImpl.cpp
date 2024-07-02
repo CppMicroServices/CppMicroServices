@@ -192,7 +192,7 @@ namespace cppmicroservices
 {
     namespace cmimpl
     {
-         ConfigurationAdminImpl::ConfigurationAdminImpl(
+        ConfigurationAdminImpl::ConfigurationAdminImpl(
             cppmicroservices::BundleContext context,
             std::shared_ptr<cppmicroservices::logservice::LogService> const& lggr,
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& asyncWS)
@@ -596,7 +596,7 @@ namespace cppmicroservices
             }
         }
 
-        std::shared_future<void>
+        SafeFuture
         ConfigurationAdminImpl::NotifyConfigurationUpdated(std::string const& pid, unsigned long const changeCount)
         {
             // NotifyConfigurationUpdated will only send a notification to the service if
@@ -606,7 +606,7 @@ namespace cppmicroservices
             // is not available and that method cannot be called. For this reason, NotifyConfigurationUpdated
             // should not be called for Remove operations unless the caller has already confirmed
             // the configuration object has been updated at least once.
-            return PerformAsync(
+            std::shared_future<void> fut = PerformAsync(
                 [this, pid, changeCount]
                 {
                     AnyMap properties { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
@@ -736,15 +736,17 @@ namespace cppmicroservices
                             }
                         });
                 });
+            return SafeFuture(fut);
         }
 
-        std::shared_future<void>
+        SafeFuture
         ConfigurationAdminImpl::NotifyConfigurationRemoved(std::string const& pid,
                                                            std::uintptr_t configurationId,
                                                            unsigned long changeCount)
         {
             std::promise<void> ready;
-            std::shared_future<void> alreadyRemoved = ready.get_future();
+            SafeFuture alreadyRemoved
+                = SafeFuture(ready.get_future());
             std::shared_ptr<ConfigurationImpl> configurationToInvalidate;
             bool hasBeenUpdated = false;
             {

@@ -26,6 +26,7 @@
 #include <mutex>
 
 #include "cppmicroservices/cm/Configuration.hpp"
+#include <cppmicroservices/SafeFuture.h>
 
 #include "ConfigurationAdminPrivate.hpp"
 #include "ConfigurationPrivate.hpp"
@@ -87,21 +88,22 @@ namespace cppmicroservices
              *
              * See {@code Configuration#Update}
              */
-            std::shared_future<void> Update(AnyMap properties) override;
+            SafeFuture Update(AnyMap properties) override;
 
             /**
              * Update the properties of this Configuration if they differ from the current properties.
              *
              * See {@code Configuration#UpdateIfDifferent}
              */
-            std::pair<bool, std::shared_future<void>> UpdateIfDifferent(AnyMap properties) override;
+            std::pair<bool, SafeFuture> UpdateIfDifferent(
+                AnyMap properties) override;
 
             /**
              * Remove this Configuration from ConfigurationAdmin.
              *
              * See {@code Configuration#Remove}
              */
-            std::shared_future<void> Remove() override;
+            SafeFuture Remove() override;
 
             /**
              * Internal method used by {@code ConfigurationAdminImpl} to update the properties without triggering

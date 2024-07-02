@@ -20,8 +20,10 @@
 
   =============================================================================*/
 
+#include <future>
 #include <random>
 #include <thread>
+#include <tuple>
 
 #include "../../src/ConfigurationListenerImpl.hpp"
 #include "../../src/SCRAsyncWorkService.hpp"
@@ -1039,15 +1041,14 @@ namespace cppmicroservices
             framework.WaitForStop(std::chrono::milliseconds::zero());
         }
 
-        /**
-         * Test that the Modified method on a component configuration that is
-         * lazily loaded and requires a configuration object to activate is never
-         * called if the configuration is only created once and updated once.
-         * Expected to be run repeatedly to verify race condition does not occur
-         */
-        TEST(ConfigAdminComponentCreationRace, TestModifiedIsNeverCalled)
+        std::tuple<cppmicroservices::Framework,
+                   std::shared_ptr<metadata::ComponentMetadata>,
+                   std::shared_ptr<MockComponentRegistry>,
+                   std::shared_ptr<FakeLogger>,
+                   std::shared_ptr<ConfigurationNotifier>,
+                   std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin>>
+        mySetUp()
         {
-
             /**
              * LSAN is incorrectly flagging a lock inversion while using the
              * TestComponentConfigurationImpl fixture. We have therefore
@@ -1087,10 +1088,19 @@ namespace cppmicroservices
             // Get a service reference to ConfigAdmin to create the configuration object.
             auto configAdminServiceRef
                 = frameworkContext.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
-            ASSERT_TRUE(configAdminServiceRef) << "GetService failed for ConfigurationAdmin.";
             auto configAdminService = frameworkContext.GetService(configAdminServiceRef);
-            ASSERT_TRUE(configAdminService);
 
+            return { framework, compMetadata, mockRegistry, fakeLogger, notifier, configAdminService };
+        }
+        /**
+         * Test that the Modified method on a component configuration that is
+         * lazily loaded and requires a configuration object to activate is never
+         * called if the configuration is only created once and updated once.
+         * Expected to be run repeatedly to verify race condition does not occur
+         */
+        TEST(ConfigAdminComponentCreationRace, TestModifiedIsNeverCalled)
+        {
+            auto [framework, compMetadata, mockRegistry, fakeLogger, notifier, configAdminService] = mySetUp();
             compMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
             compMetadata->immediate = true;
             compMetadata->configurationPolicy = "require";
@@ -1115,7 +1125,7 @@ namespace cppmicroservices
 
             auto bundleT = std::thread([&compConfig]() { compConfig->Initialize(); });
             auto frameworkT = std::thread(
-                [&configAdminService]()
+                [configAdminService = configAdminService]()
                 {
                     auto configuration = configAdminService->GetConfiguration("sample::config");
                     auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
@@ -1142,49 +1152,7 @@ namespace cppmicroservices
          */
         TEST(ConfigAdminComponentCreationRace, TestMultipleConfigsNoModifiedCall)
         {
-
-            /**
-             * LSAN is incorrectly flagging a lock inversion while using the
-             * TestComponentConfigurationImpl fixture. We have therefore
-             * intentionally not used that fixture
-             */
-            auto framework = cppmicroservices::FrameworkFactory().NewFramework();
-            framework.Start();
-
-            auto frameworkContext = framework.GetBundleContext();
-            auto compMetadata = std::make_shared<metadata::ComponentMetadata>();
-            auto mockRegistry = std::make_shared<MockComponentRegistry>();
-            auto fakeLogger = std::make_shared<FakeLogger>();
-            auto logger = std::make_shared<SCRLogger>(frameworkContext);
-            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
-
-            auto asyncWorkService = std::make_shared<SCRAsyncWorkService>(frameworkContext, logger);
-            auto notifier
-                = std::make_shared<ConfigurationNotifier>(frameworkContext, fakeLogger, asyncWorkService, extRegistry);
-
-            // Publish ConfigurationListener
-            auto configListener
-                = std::make_shared<cppmicroservices::service::cm::ConfigurationListenerImpl>(frameworkContext,
-                                                                                             logger,
-                                                                                             notifier);
-            auto configListenerReg
-                = frameworkContext.RegisterService<cppmicroservices::service::cm::ConfigurationListener>(
-                    std::move(configListener));
-
-#    if defined(US_BUILD_SHARED_LIBS)
-            auto cabundles = frameworkContext.InstallBundles(test::GetConfigAdminRuntimePluginFilePath());
-            for (auto& bundle : cabundles)
-            {
-                bundle.Start();
-            }
-#    endif
-
-            // Get a service reference to ConfigAdmin to create the configuration object.
-            auto configAdminServiceRef
-                = frameworkContext.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
-            ASSERT_TRUE(configAdminServiceRef) << "GetService failed for ConfigurationAdmin.";
-            auto configAdminService = frameworkContext.GetService(configAdminServiceRef);
-            ASSERT_TRUE(configAdminService);
+            auto [framework, compMetadata, mockRegistry, fakeLogger, notifier, configAdminService] = mySetUp();
 
             compMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
             compMetadata->immediate = true;
@@ -1223,7 +1191,7 @@ namespace cppmicroservices
 
             auto bundleT = std::thread([&compConfig]() { compConfig->Initialize(); });
             auto frameworkT = std::thread(
-                [&configAdminService]()
+                [configAdminService = configAdminService]()
                 {
                     auto configuration = configAdminService->GetConfiguration("sample::config");
                     auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
@@ -1250,49 +1218,7 @@ namespace cppmicroservices
          */
         TEST(ConfigAdminComponentCreationRace, TestMultipleConfigsModifiedCalled)
         {
-
-            /**
-             * LSAN is incorrectly flagging a lock inversion while using the
-             * TestComponentConfigurationImpl fixture. We have therefore
-             * intentionally not used that fixture
-             */
-            auto framework = cppmicroservices::FrameworkFactory().NewFramework();
-            framework.Start();
-
-            auto frameworkContext = framework.GetBundleContext();
-            auto compMetadata = std::make_shared<metadata::ComponentMetadata>();
-            auto mockRegistry = std::make_shared<MockComponentRegistry>();
-            auto fakeLogger = std::make_shared<FakeLogger>();
-            auto logger = std::make_shared<SCRLogger>(frameworkContext);
-            auto extRegistry = std::make_shared<SCRExtensionRegistry>(logger);
-
-            auto asyncWorkService = std::make_shared<SCRAsyncWorkService>(frameworkContext, logger);
-            auto notifier
-                = std::make_shared<ConfigurationNotifier>(frameworkContext, fakeLogger, asyncWorkService, extRegistry);
-
-            // Publish ConfigurationListener
-            auto configListener
-                = std::make_shared<cppmicroservices::service::cm::ConfigurationListenerImpl>(frameworkContext,
-                                                                                             logger,
-                                                                                             notifier);
-            auto configListenerReg
-                = frameworkContext.RegisterService<cppmicroservices::service::cm::ConfigurationListener>(
-                    std::move(configListener));
-
-#    if defined(US_BUILD_SHARED_LIBS)
-            auto cabundles = frameworkContext.InstallBundles(test::GetConfigAdminRuntimePluginFilePath());
-            for (auto& bundle : cabundles)
-            {
-                bundle.Start();
-            }
-#    endif
-
-            // Get a service reference to ConfigAdmin to create the configuration object.
-            auto configAdminServiceRef
-                = frameworkContext.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
-            ASSERT_TRUE(configAdminServiceRef) << "GetService failed for ConfigurationAdmin.";
-            auto configAdminService = frameworkContext.GetService(configAdminServiceRef);
-            ASSERT_TRUE(configAdminService);
+            auto [framework, compMetadata, mockRegistry, fakeLogger, notifier, configAdminService] = mySetUp();
 
             compMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
             compMetadata->immediate = true;
@@ -1340,6 +1266,161 @@ namespace cppmicroservices
 
             compConfig->Deactivate();
             compConfig->Stop();
+
+            framework.Stop();
+            framework.WaitForStop(std::chrono::milliseconds::zero());
+        }
+
+        class Barrier
+        {
+          public:
+            Barrier(std::size_t count) : threshold(count), count(count), generation(0) {}
+
+            void
+            Wait()
+            {
+                std::unique_lock<std::mutex> lock(mutex);
+                auto gen = generation;
+                if (--count == 0)
+                {
+                    generation++;
+                    count = threshold;
+                    cond.notify_all();
+                }
+                else
+                {
+                    cond.wait(lock, [this, gen] { return gen != generation; });
+                }
+            }
+
+          private:
+            std::mutex mutex;
+            std::condition_variable cond;
+            std::size_t threshold;
+            std::size_t count;
+            std::size_t generation;
+        };
+
+        /**
+         * Test that the Modified method on a component configuration that is
+         * lazily loaded and requires two configuration objects where one is
+         * twice and the other once, the the component is initialized and then
+         * the second config object is updated for the second time. This should trigger a modified() call.
+         */
+        TEST(ConfigAdminComponentCreationRace, TestConfigNotifierSafeWithNoListenersForPid)
+        {
+            auto [framework, compMetadata, mockRegistry, fakeLogger, notifier, configAdminService] = mySetUp();
+
+            compMetadata->serviceMetadata.interfaces = { us_service_interface_iid<dummy::ServiceImpl>() };
+            compMetadata->immediate = true;
+            compMetadata->configurationPolicy = "require";
+            compMetadata->configurationPids = { "sample::config" };
+
+            auto compConfig = std::make_shared<SingletonComponentConfigurationImpl>(compMetadata,
+                                                                                    framework,
+                                                                                    mockRegistry,
+                                                                                    fakeLogger,
+                                                                                    notifier);
+            auto mockCompContext = std::make_shared<MockComponentContextImpl>(compConfig);
+            auto mockCompInstance = std::make_shared<MockComponentInstance>();
+            compConfig->SetComponentInstancePair(InstanceContextPair(mockCompInstance, mockCompContext));
+            compConfig->Initialize();
+
+            auto compConfig1 = std::make_shared<SingletonComponentConfigurationImpl>(compMetadata,
+                                                                                     framework,
+                                                                                     mockRegistry,
+                                                                                     fakeLogger,
+                                                                                     notifier);
+            auto mockCompContext1 = std::make_shared<MockComponentContextImpl>(compConfig);
+            auto mockCompInstance1 = std::make_shared<MockComponentInstance>();
+            compConfig1->SetComponentInstancePair(InstanceContextPair(mockCompInstance, mockCompContext));
+            compConfig1->Initialize();
+
+            auto compConfig2 = std::make_shared<SingletonComponentConfigurationImpl>(compMetadata,
+                                                                                     framework,
+                                                                                     mockRegistry,
+                                                                                     fakeLogger,
+                                                                                     notifier);
+            auto mockCompContext2 = std::make_shared<MockComponentContextImpl>(compConfig);
+            auto mockCompInstance2 = std::make_shared<MockComponentInstance>();
+            compConfig2->SetComponentInstancePair(InstanceContextPair(mockCompInstance, mockCompContext));
+            compConfig2->Initialize();
+
+            auto compConfig3 = std::make_shared<SingletonComponentConfigurationImpl>(compMetadata,
+                                                                                     framework,
+                                                                                     mockRegistry,
+                                                                                     fakeLogger,
+                                                                                     notifier);
+            auto mockCompContext3 = std::make_shared<MockComponentContextImpl>(compConfig);
+            auto mockCompInstance3 = std::make_shared<MockComponentInstance>();
+            compConfig3->SetComponentInstancePair(InstanceContextPair(mockCompInstance, mockCompContext));
+            compConfig3->Initialize();
+            Barrier sync_point(5); // 5 threads to synchronize
+
+            auto frameworkT = std::async(
+                std::launch::async,
+                [configAdminService = configAdminService, &sync_point]()
+                {
+                    sync_point.Wait(); // Wait for all threads to reach this point
+                    auto configuration = configAdminService->GetConfiguration("sample::config");
+                    auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
+                        {"foo", true}
+                    });
+                    fut.second.wait();
+                    fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
+                        {"foo", false}
+                    });
+                    fut.second.wait();
+                    configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
+                        {"foo", true}
+                    });
+                });
+
+            auto bundleT = std::async(std::launch::async,
+                                      [&sync_point, &compConfig]()
+                                      {
+                                          sync_point.Wait(); // Wait for all threads to reach this point
+                                          compConfig->Stop();
+                                      });
+
+            auto bundleT1 = std::async(std::launch::async,
+                                       [&sync_point, &compConfig1]()
+                                       {
+                                           sync_point.Wait(); // Wait for all threads to reach this point
+                                           compConfig1->Stop();
+                                       });
+
+            auto bundleT2 = std::async(std::launch::async,
+                                       [&sync_point, &compConfig2]()
+                                       {
+                                           sync_point.Wait(); // Wait for all threads to reach this point
+                                           compConfig2->Stop();
+                                       });
+
+            auto bundleT3 = std::async(std::launch::async,
+                                       [&sync_point, &compConfig3]()
+                                       {
+                                           sync_point.Wait(); // Wait for all threads to reach this point
+                                           compConfig3->Stop();
+                                       });
+
+            frameworkT.wait();
+            bundleT.wait();
+            bundleT1.wait();
+            bundleT2.wait();
+            bundleT3.wait();
+
+            compConfig->Deactivate();
+            compConfig->Stop();
+
+            compConfig1->Deactivate();
+            compConfig1->Stop();
+
+            compConfig2->Deactivate();
+            compConfig2->Stop();
+
+            compConfig3->Deactivate();
+            compConfig3->Stop();
 
             framework.Stop();
             framework.WaitForStop(std::chrono::milliseconds::zero());

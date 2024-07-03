@@ -114,7 +114,10 @@ namespace cppmicroservices
                  * of the service component's Modified method, this exception is intercepted and
                  * logged by Declarative Services. This exception is not returned in the shared_future.
                  */
-                virtual SafeFuture Update(AnyMap properties = AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS })
+                virtual std::shared_future<void> Update(AnyMap properties
+                                                        = AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS })
+                    = 0;
+                virtual SafeFuture SafeUpdate(AnyMap properties = AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS })
                     = 0;
 
                 /**
@@ -142,7 +145,10 @@ namespace cppmicroservices
                  * of the service component's Modified method, this exception is intercepted and
                  * logged by Declarative Services. This exception is not returned in the shared_future.
                  */
-                virtual std::pair<bool, SafeFuture> UpdateIfDifferent(
+                virtual std::pair<bool, std::shared_future<void>> UpdateIfDifferent(
+                    AnyMap properties = AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS })
+                    = 0;
+                virtual std::pair<bool, SafeFuture> SafeUpdateIfDifferent(
                     AnyMap properties = AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS })
                     = 0;
 
@@ -161,7 +167,8 @@ namespace cppmicroservices
                  * of the service component's Modified method, this exception is intercepted and
                  * logged by Declarative Services. This exception is not returned in the shared_future.
                  */
-                virtual SafeFuture Remove() = 0;
+                virtual std::shared_future<void> Remove() = 0;
+                virtual SafeFuture SafeRemove() = 0;
             };
         } // namespace cm
     }     // namespace service

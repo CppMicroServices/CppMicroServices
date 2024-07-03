@@ -24,9 +24,10 @@
 
 namespace cppmicroservices
 {
+
     SafeFuture::SafeFuture(std::shared_future<void> future,
                            std::shared_ptr<std::atomic<bool>> asyncStarted,
-                           std::shared_ptr<ActualTask> task)
+                           std::shared_ptr<std::packaged_task<void(bool)>> task)
         : future(future)
         , asyncStarted(asyncStarted)
         , task(task)

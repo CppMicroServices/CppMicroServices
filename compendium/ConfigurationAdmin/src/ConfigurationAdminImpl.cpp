@@ -606,7 +606,7 @@ namespace cppmicroservices
             // is not available and that method cannot be called. For this reason, NotifyConfigurationUpdated
             // should not be called for Remove operations unless the caller has already confirmed
             // the configuration object has been updated at least once.
-            std::shared_future<void> fut = PerformAsync(
+            auto fut = PerformAsync(
                 [this, pid, changeCount]
                 {
                     AnyMap properties { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
@@ -736,7 +736,7 @@ namespace cppmicroservices
                             }
                         });
                 });
-            return SafeFuture(fut);
+            return fut;
         }
 
         SafeFuture
@@ -745,8 +745,7 @@ namespace cppmicroservices
                                                            unsigned long changeCount)
         {
             std::promise<void> ready;
-            SafeFuture alreadyRemoved
-                = SafeFuture(ready.get_future());
+            SafeFuture alreadyRemoved = SafeFuture(ready.get_future());
             std::shared_ptr<ConfigurationImpl> configurationToInvalidate;
             bool hasBeenUpdated = false;
             {
@@ -1030,16 +1029,21 @@ namespace cppmicroservices
                         "ManagedServiceFactory with PID " + service->getPid() + " has been removed.");
         }
 
+        using ActualTask = std::packaged_task<void(bool)>;
+        using PostTask = std::packaged_task<void()>;
+
         template <typename Functor>
-        std::shared_future<void>
+        SafeFuture
         ConfigurationAdminImpl::PerformAsync(Functor&& f)
         {
+
             std::lock_guard<std::mutex> lk { futuresMutex };
             decltype(completeFutures) {}.swap(completeFutures);
             auto id = ++futuresID;
+            auto asyncStarted = std::make_shared<std::atomic<bool>>(false);
 
-            std::packaged_task<void()> task(
-                [this, func = std::forward<Functor>(f), id]() mutable
+            ActualTask task(
+                [this, func = std::forward<Functor>(f), id, asyncStarted](bool checkExecuted) mutable
                 {
                     // func() can throw, make sure that the futures
                     // are correctly cleaned up if an exception occurs.
@@ -1056,15 +1060,45 @@ namespace cppmicroservices
                                 futuresCV.notify_one();
                             }
                         });
+                    if (checkExecuted)
+                    {
+                        bool expected = false;
+                        bool desired = true;
+                        // if asyncStarted is non null AND *asyncStarted==true
+                        if (asyncStarted && !std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
+                        {
+                            // this is blocking and it has started
+                            return;
+                        }
+                        // else it is non-blocking or it has not started and we now own it
+                    }
                     func();
                 });
 
-            std::shared_future<void> fut = task.get_future().share();
+            auto taskPtr = std::make_shared<ActualTask>(std::move(task));
+            // this task goes to async queue, we wan't to check if it is already executed
+            PostTask post_task(
+                [taskPtr]() mutable
+                {
+                    try
+                    {
+                        (*taskPtr)(true);
+                    }
+                    catch (...)
+                    {
+                        /*
+                         * task was already executed, by WaitForFuture, calling it
+                         * again will throw. This is expected, we can just catch and continue
+                         */
+                    }
+                });
+
+            std::shared_future<void> fut = post_task.get_future().share();
             incompleteFutures.emplace(id, fut);
 
-            asyncWorkService->post(std::move(task));
+            asyncWorkService->post(std::move(post_task));
 
-            return fut;
+            return SafeFuture(fut, asyncStarted, taskPtr);
         }
 
         std::string

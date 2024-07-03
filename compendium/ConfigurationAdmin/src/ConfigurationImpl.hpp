@@ -88,22 +88,24 @@ namespace cppmicroservices
              *
              * See {@code Configuration#Update}
              */
-            SafeFuture Update(AnyMap properties) override;
+            std::shared_future<void> Update(AnyMap properties) override;
 
+            SafeFuture SafeUpdate(AnyMap newProperties) override;
             /**
              * Update the properties of this Configuration if they differ from the current properties.
              *
              * See {@code Configuration#UpdateIfDifferent}
              */
-            std::pair<bool, SafeFuture> UpdateIfDifferent(
-                AnyMap properties) override;
+            std::pair<bool, std::shared_future<void>> UpdateIfDifferent(AnyMap properties) override;
+            std::pair<bool, SafeFuture> SafeUpdateIfDifferent(AnyMap properties) override;
 
             /**
              * Remove this Configuration from ConfigurationAdmin.
              *
              * See {@code Configuration#Remove}
              */
-            SafeFuture Remove() override;
+            std::shared_future<void> Remove() override;
+            SafeFuture SafeRemove() override;
 
             /**
              * Internal method used by {@code ConfigurationAdminImpl} to update the properties without triggering

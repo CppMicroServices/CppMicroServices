@@ -24,6 +24,7 @@
 #define CONFIGURATIONADMINPRIVATE_HPP
 
 #include "metadata/ConfigurationMetadata.hpp"
+#include "cppmicroservices/SafeFuture.h"
 #include <cstdint>
 #include <future>
 #include <vector>

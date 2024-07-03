@@ -31,6 +31,7 @@
 #include <unordered_map>
 
 #include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/SafeFuture.h"
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
@@ -39,7 +40,6 @@
 #include "cppmicroservices/cm/ManagedService.hpp"
 #include "cppmicroservices/cm/ManagedServiceFactory.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
-#include "cppmicroservices/SafeFuture.h"
 
 #include "ConfigurationAdminPrivate.hpp"
 #include "ConfigurationImpl.hpp"
@@ -201,9 +201,7 @@ namespace cppmicroservices
              *
              * See {@code ConfigurationAdminPrivate#NotifyConfigurationUpdated}
              */
-            SafeFuture NotifyConfigurationUpdated(
-                std::string const& pid,
-                unsigned long const changeCount) override;
+            SafeFuture NotifyConfigurationUpdated(std::string const& pid, unsigned long const changeCount) override;
 
             /**
              * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
@@ -212,10 +210,9 @@ namespace cppmicroservices
              *
              * See {@code ConfigurationAdminPrivate#NotifyConfigurationRemoved}
              */
-            SafeFuture NotifyConfigurationRemoved(
-                std::string const& pid,
-                std::uintptr_t configurationId,
-                unsigned long changeCount) override;
+            SafeFuture NotifyConfigurationRemoved(std::string const& pid,
+                                                  std::uintptr_t configurationId,
+                                                  unsigned long changeCount) override;
 
             // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedService
             std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>> AddingService(
@@ -248,7 +245,8 @@ namespace cppmicroservices
           private:
             // Convenience wrapper which is used to perform asyncronous operations
             template <typename Functor>
-            std::shared_future<void> PerformAsync(Functor&& f);
+            SafeFuture
+            PerformAsync(Functor&& f);
 
             // Used to generate a random instance name for CreateFactoryConfiguration
             std::string RandomInstanceName();

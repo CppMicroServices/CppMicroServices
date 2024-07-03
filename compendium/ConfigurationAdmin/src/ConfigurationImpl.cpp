@@ -100,8 +100,14 @@ namespace cppmicroservices
             return changeCount;
         }
 
-        SafeFuture
+        std::shared_future<void>
         ConfigurationImpl::Update(AnyMap newProperties)
+        {
+            return SafeUpdate(newProperties).retrieveFuture();
+        }
+
+        SafeFuture
+        ConfigurationImpl::SafeUpdate(AnyMap newProperties)
         {
             {
                 std::lock_guard<std::mutex> lk { propertiesMutex };
@@ -120,11 +126,18 @@ namespace cppmicroservices
             std::promise<void> ready;
             std::shared_future<void> fut = ready.get_future();
             ready.set_value();
-            return SafeFuture(fut);
+            return SafeFuture(fut, nullptr, nullptr);
         }
 
-        std::pair<bool, SafeFuture>
+        std::pair<bool, std::shared_future<void>>
         ConfigurationImpl::UpdateIfDifferent(AnyMap newProperties)
+        {
+            auto tup = SafeUpdateIfDifferent(newProperties);
+
+            return std::make_pair(std::get<0>(tup), std::get<1>(tup).retrieveFuture());
+        }
+        std::pair<bool, SafeFuture>
+        ConfigurationImpl::SafeUpdateIfDifferent(AnyMap newProperties)
         {
             std::promise<void> ready;
             std::shared_future<void> fut = ready.get_future();
@@ -132,9 +145,7 @@ namespace cppmicroservices
             if (!updated.first)
             {
                 ready.set_value();
-                return std::pair<bool, SafeFuture>(
-                    updated.first,
-                    SafeFuture(fut));
+                return std::pair<bool, SafeFuture>(updated.first, SafeFuture(fut));
             }
             std::lock_guard<std::mutex> lk { configAdminMutex };
             if (configAdminImpl)
@@ -144,13 +155,16 @@ namespace cppmicroservices
             }
 
             ready.set_value();
-            return std::pair<bool, SafeFuture>(
-                true,
-                SafeFuture(fut));
+            return std::pair<bool, SafeFuture>(true, SafeFuture(fut));
         }
 
-        SafeFuture
+        std::shared_future<void>
         ConfigurationImpl::Remove()
+        {
+            return SafeRemove().retrieveFuture();
+        }
+        SafeFuture
+        ConfigurationImpl::SafeRemove()
         {
             {
                 std::lock_guard<std::mutex> lk { propertiesMutex };

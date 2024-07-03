@@ -42,14 +42,14 @@ DEALINGS IN THE SOFTWARE.
 
 namespace cppmicroservices
 {
-    using ActualTask = std::packaged_task<void()>;
-
+    using ActualTask = std::packaged_task<void(bool)>;
+    using PostTask = std::packaged_task<void()>;
     class US_Framework_EXPORT SafeFuture
     {
       public:
         SafeFuture(std::shared_future<void> future,
-                   std::shared_ptr<std::atomic<bool>> asyncStarted,
-                   std::shared_ptr<ActualTask> task);
+                   std::shared_ptr<std::atomic<bool>> asyncStarted = nullptr,
+                   std::shared_ptr<ActualTask> task = nullptr);
         SafeFuture() = default;
 
         // Destructor
@@ -77,10 +77,14 @@ namespace cppmicroservices
             return future.wait_for(timeout_duration);
         }
 
+        std::shared_future<void> retrieveFuture(){
+            return future;
+        }
+
       private:
         std::shared_future<void> future;
         std::shared_ptr<std::atomic<bool>> asyncStarted;
-        std::packaged_task<void()> task;
+        std::shared_ptr<ActualTask> task;
     };
 } // namespace cppmicroservices
 

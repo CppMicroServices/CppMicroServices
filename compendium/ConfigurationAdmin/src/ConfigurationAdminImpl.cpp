@@ -1074,18 +1074,28 @@ namespace cppmicroservices
                     }
                     func();
                 });
+            std::shared_future<void> fut = task.get_future().share();
 
             auto taskPtr = std::make_shared<ActualTask>(std::move(task));
             // this task goes to async queue, we wan't to check if it is already executed
             PostTask post_task(
                 [taskPtr]() mutable
                 {
-                    (*taskPtr)(true);
-                    // get future to propogate exceptions if any
-                    taskPtr->get_future().get();
+                    try
+                    {
+                        (*taskPtr)(true);
+                    }
+                    catch (...)
+                    {
+                        /*
+                         * task was already executed, by waiting thread, calling it
+                         * again will throw. This is expected, we can just catch and continue
+                         */
+                    }
+                    // get future to propogate real exceptions if any
+                    taskPtr->get_future().share().get();
                 });
 
-            std::shared_future<void> fut = post_task.get_future().share();
             incompleteFutures.emplace(id, fut);
 
             asyncWorkService->post(std::move(post_task));

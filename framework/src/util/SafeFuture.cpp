@@ -54,6 +54,7 @@ namespace cppmicroservices
             if (std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
             {
                 // we pass in false because we always want to execute the task here
+                // dont have to catch because we know task has not executed elsewhere
                 (*task)(false);
             }
         }

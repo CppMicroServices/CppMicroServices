@@ -287,10 +287,9 @@ namespace test
 
     INSTANTIATE_TEST_SUITE_P(AsyncWorkServiceEndToEndParameterized,
                              TestAsyncWorkServiceEndToEnd,
-                             testing::Values(
-                                 std::make_shared<AsyncWorkServiceThreadPool>(1),
-                                 std::make_shared<AsyncWorkServiceThreadPool>(8),
-                                 std::make_shared<AsyncWorkServiceThreadPool>(20)));
+                             testing::Values(std::make_shared<AsyncWorkServiceThreadPool>(1),
+                                             std::make_shared<AsyncWorkServiceThreadPool>(8),
+                                             std::make_shared<AsyncWorkServiceThreadPool>(20)));
 
     TEST_P(TestAsyncWorkServiceEndToEnd, TestEndToEndBehaviorWithAsyncWorkService)
     {
@@ -365,6 +364,47 @@ namespace test
         fut.get();
 
         ASSERT_TRUE(service) << "GetService failed for CAInterface.";
+    }
+
+    TEST_P(TestAsyncWorkServiceEndToEnd, testSafeUpdate)
+    {
+        auto param = GetParam();
+        auto ctx = framework.GetBundleContext();
+        // ASYNCWORKSERVICE
+        auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
+        auto sr = ctx.GetServiceReference<cppmicroservices::async::AsyncWorkService>();
+        auto asyncWorkService = ctx.GetService<cppmicroservices::async::AsyncWorkService>(sr);
+
+        // CA, DS
+        ::test::InstallAndStartConfigAdmin(ctx);
+
+        // CA SERVICE
+        auto sr1 = ctx.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+        auto configAdmin = ctx.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr1);
+
+        std::packaged_task<void()> post_task(
+            [configAdmin]() mutable
+            {
+                auto configName = "someConfig";
+                // Create configuration object and update property.
+                auto configuration = configAdmin->GetConfiguration(configName);
+                auto configInstance = configuration->GetPid();
+
+                cppmicroservices::AnyMap props({
+                    {"uniqueProp", std::string("instance1")}
+                });
+
+                auto fut = configuration->SafeUpdate(props);
+                fut.get();
+            });
+
+        std::shared_future<void> fut = post_task.get_future().share();
+
+        asyncWorkService->post(std::move(post_task));
+
+        fut.get();
+
+        ASSERT_TRUE(true) << "GetService failed for CAInterface.";
     }
 
 }; // namespace test

@@ -1080,20 +1080,9 @@ namespace cppmicroservices
             PostTask post_task(
                 [taskPtr]() mutable
                 {
-                    // try
-                    // {
-                        std::cout << "BEFORE CALL" << std::endl;
-                        (*taskPtr)(true);
-                        std::cout << "AFTER  CALL" << std::endl;
-                    // }
-                    // catch (const std::future_error&)
-                    // {
-                    //     /*
-                    //      * task was already executed, by WaitForFuture, calling it
-                    //      * again will throw. This is expected, we can just catch and continue
-                    //      */
-                    //     std::cout << "CAUGHT" << std::endl;
-                    // }
+                    (*taskPtr)(true);
+                    // get future to propogate exceptions if any
+                    taskPtr->get_future().get();
                 });
 
             std::shared_future<void> fut = post_task.get_future().share();

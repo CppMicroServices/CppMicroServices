@@ -366,9 +366,9 @@ namespace test
         ASSERT_TRUE(service) << "GetService failed for CAInterface.";
     }
 
-    TEST_P(TestAsyncWorkServiceEndToEnd, testSafeUpdate)
+    TEST_F(TestAsyncWorkServiceEndToEnd, testSafeUpdate)
     {
-        auto param = GetParam();
+        auto param = std::make_shared<AsyncWorkServiceThreadPool>(1);
         auto ctx = framework.GetBundleContext();
         // ASYNCWORKSERVICE
         auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
@@ -382,7 +382,27 @@ namespace test
         auto sr1 = ctx.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
         auto configAdmin = ctx.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr1);
 
-        std::packaged_task<void()> post_task(
+        std::packaged_task<void()> unsafe_post_task(
+            [configAdmin]() mutable
+            {
+                auto configName = "someConfig";
+                // Create configuration object and update property.
+                auto configuration = configAdmin->GetConfiguration(configName);
+                auto configInstance = configuration->GetPid();
+
+                cppmicroservices::AnyMap props({
+                    {"uniqueProp", std::string("instance1")}
+                });
+
+                auto fut = configuration->Update(props);
+                ASSERT_EQ(fut.wait_for(std::chrono::milliseconds(50)), std::future_status::timeout);
+            });
+
+        std::shared_future<void> fut = unsafe_post_task.get_future().share();
+
+        asyncWorkService->post(std::move(unsafe_post_task));
+
+        std::packaged_task<void()> safe_post_task(
             [configAdmin]() mutable
             {
                 auto configName = "someConfig";
@@ -398,13 +418,13 @@ namespace test
                 fut.get();
             });
 
-        std::shared_future<void> fut = post_task.get_future().share();
+        fut = safe_post_task.get_future().share();
 
-        asyncWorkService->post(std::move(post_task));
+        asyncWorkService->post(std::move(safe_post_task));
 
         fut.get();
 
-        ASSERT_TRUE(true) << "GetService failed for CAInterface.";
+        ASSERT_TRUE(true);
     }
 
 }; // namespace test

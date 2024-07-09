@@ -338,7 +338,7 @@ namespace cppmicroservices
             ASSERT_TRUE(conf2);
             auto props = conf2->GetProperties();
             props["foo"] = std::string { "bar" };
-            SafeFuture fut;
+            std::shared_future<void> fut;
             EXPECT_NO_THROW(fut = conf2->Update(props));
             fut.get();
             std::vector<metadata::ConfigurationMetadata> configs;

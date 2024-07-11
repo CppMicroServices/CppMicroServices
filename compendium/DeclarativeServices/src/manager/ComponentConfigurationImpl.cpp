@@ -468,7 +468,7 @@ namespace cppmicroservices
         std::shared_ptr<ComponentConfigurationState>
         ComponentConfigurationImpl::GetState() const
         {
-            return std::atomic_load(&state);
+            return state.load();
         }
 
         void

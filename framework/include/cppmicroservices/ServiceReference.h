@@ -102,7 +102,9 @@ namespace cppmicroservices
 
         using ServiceReferenceBase::operator=;
 
+#if 0
         using ServiceReferenceBase::operator==;
+#endif
 
         using ServiceReferenceBase::Hash;
     };
@@ -133,7 +135,9 @@ namespace cppmicroservices
 
         using ServiceReferenceBase::operator=;
 
+#if 0
         using ServiceReferenceBase::operator==;
+#endif
 
         using ServiceReferenceBase::Hash;
 

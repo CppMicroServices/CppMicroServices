@@ -54,12 +54,12 @@ namespace cppmicroservices
         std::shared_ptr<cppmicroservices::logservice::LogService>
         CMLogger::AddingService(ServiceReference<cppmicroservices::logservice::LogService> const& reference)
         {
-            auto currLogger = std::atomic_load(&logService);
+            auto currLogger = logService.load();
             std::shared_ptr<cppmicroservices::logservice::LogService> logger;
             if (!currLogger && reference)
             {
                 logger = cmContext.GetService<cppmicroservices::logservice::LogService>(reference);
-                std::atomic_store(&logService, logger);
+                logService.store(logger);
             }
             return logger;
         }
@@ -75,19 +75,19 @@ namespace cppmicroservices
         CMLogger::RemovedService(ServiceReference<cppmicroservices::logservice::LogService> const& /*reference*/,
                                  std::shared_ptr<cppmicroservices::logservice::LogService> const& service)
         {
-            auto currLogger = std::atomic_load(&logService);
+            auto currLogger = logService.load();
             if (service == currLogger)
             {
                 // replace existing logger with a nullptr logger
                 std::shared_ptr<cppmicroservices::logservice::LogService> logger(nullptr);
-                std::atomic_store(&logService, logger);
+                logService.store(logger);
             }
         }
 
         void
         CMLogger::Log(logservice::SeverityLevel level, std::string const& message)
         {
-            auto currLogger = std::atomic_load(&logService);
+            auto currLogger = logService.load();
             if (currLogger)
             {
                 currLogger->Log(level, message);
@@ -97,7 +97,7 @@ namespace cppmicroservices
         void
         CMLogger::Log(logservice::SeverityLevel level, std::string const& message, const std::exception_ptr ex)
         {
-            auto currLogger = std::atomic_load(&logService);
+            auto currLogger = logService.load();
             if (currLogger)
             {
                 currLogger->Log(level, message, ex);
@@ -109,7 +109,7 @@ namespace cppmicroservices
                       logservice::SeverityLevel level,
                       std::string const& message)
         {
-            auto currLogger = std::atomic_load(&logService);
+            auto currLogger = logService.load();
             if (currLogger)
             {
                 currLogger->Log(sr, level, message);
@@ -122,7 +122,7 @@ namespace cppmicroservices
                       std::string const& message,
                       const std::exception_ptr ex)
         {
-            auto currLogger = std::atomic_load(&logService);
+            auto currLogger = logService.load();
             if (currLogger)
             {
                 currLogger->Log(sr, level, message, ex);

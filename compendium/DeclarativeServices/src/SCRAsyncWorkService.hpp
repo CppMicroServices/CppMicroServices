@@ -76,7 +76,7 @@ namespace cppmicroservices
           private:
             cppmicroservices::BundleContext scrContext;
             std::unique_ptr<cppmicroservices::ServiceTracker<cppmicroservices::async::AsyncWorkService>> serviceTracker;
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> asyncWorkService;
+            std::atomic<std::shared_ptr<cppmicroservices::async::AsyncWorkService>> asyncWorkService;
             std::shared_ptr<cppmicroservices::logservice::LogService> logger;
         };
     } // namespace scrimpl

@@ -167,7 +167,7 @@ namespace cppmicroservices
         std::shared_ptr<ComponentManagerState>
         ComponentManagerImpl::GetState() const
         {
-            return std::atomic_load(&state);
+            return state.load();
         }
 
         bool

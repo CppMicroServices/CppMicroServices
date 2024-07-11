@@ -243,7 +243,7 @@ namespace cppmicroservices
         class Atomic<std::shared_ptr<T>>
         {
 
-            std::shared_ptr<T> m_t;
+            std::atomic<std::shared_ptr<T>> m_t;
 
           public:
             std::shared_ptr<T>

@@ -422,7 +422,7 @@ namespace cppmicroservices::scrimpl
             std::shared_ptr<ConfigurationNotifier> configNotifier; // to get updates for configuration objects
             std::vector<std::shared_ptr<ListenerToken>>
                 configListenerTokens; ///< vector of the listener tokens received from the config manager
-            std::shared_ptr<ComponentConfigurationState> state; ///< only modified using std::atomic operations
+            std::atomic<std::shared_ptr<ComponentConfigurationState>> state; ///< only modified using std::atomic operations
             std::function<ComponentInstance*(void)>
                 newCompInstanceFunc; ///< extern C function to create a new instance {@link ComponentInstance} class
                                      ///< from the component's bundle

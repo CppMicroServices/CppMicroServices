@@ -122,7 +122,7 @@ namespace cppmicroservices
             serviceTracker->Open();
         }
 
-        SCRAsyncWorkService::~SCRAsyncWorkService() noexcept { asyncWorkService.reset(); }
+        SCRAsyncWorkService::~SCRAsyncWorkService() noexcept { asyncWorkService.store(nullptr); }
 
         void
         SCRAsyncWorkService::StopTracking()
@@ -137,7 +137,7 @@ namespace cppmicroservices
         std::shared_ptr<cppmicroservices::async::AsyncWorkService>
         SCRAsyncWorkService::AddingService(ServiceReference<cppmicroservices::async::AsyncWorkService> const& reference)
         {
-            auto currAsync = std::atomic_load(&asyncWorkService);
+            auto currAsync = asyncWorkService.load();
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> newService;
             if (reference)
             {
@@ -146,7 +146,7 @@ namespace cppmicroservices
                     newService = scrContext.GetService<cppmicroservices::async::AsyncWorkService>(reference);
                     if (newService)
                     {
-                        std::atomic_store(&asyncWorkService, newService);
+                        asyncWorkService.store(newService);
                     }
                 }
                 catch (...)
@@ -174,20 +174,20 @@ namespace cppmicroservices
             ServiceReference<cppmicroservices::async::AsyncWorkService> const& /* reference */,
             std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& service)
         {
-            auto currAsync = std::atomic_load(&asyncWorkService);
+            auto currAsync = asyncWorkService.load();
             if (service == currAsync)
             {
                 // replace existing asyncWorkService with a nullptr asyncWorkService
                 std::shared_ptr<cppmicroservices::async::AsyncWorkService> newService
                     = std::make_shared<FallbackAsyncWorkService>(logger);
-                std::atomic_store(&asyncWorkService, newService);
+                asyncWorkService.store(newService);
             }
         }
 
         void
         SCRAsyncWorkService::post(std::packaged_task<void()>&& task)
         {
-            auto currAsync = std::atomic_load(&asyncWorkService);
+            auto currAsync = asyncWorkService.load();
             currAsync->post(std::move(task));
         }
 

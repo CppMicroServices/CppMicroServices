@@ -229,7 +229,7 @@ namespace cppmicroservices
             cppmicroservices::BundleContext bundleContext; ///< context of the bundle which contains the component
             std::shared_ptr<cppmicroservices::logservice::LogService> const
                 logger;                                   ///< logger associated with the current runtime
-            std::shared_ptr<ComponentManagerState> state; ///< This member is always accessed using atomic operations
+            std::atomic<std::shared_ptr<ComponentManagerState>> state; ///< This member is always accessed using atomic operations
             std::vector<std::pair<std::shared_future<void>, std::shared_ptr<std::atomic<bool>>>>
                     disableFutures;  ///< futures created when the component transitioned to \c DISABLED state
             std::mutex futuresMutex; ///< mutex to protect the #disableFutures member

@@ -28,56 +28,59 @@
 
 #include <future>
 
-namespace cppmicroservices::async
+namespace cppmicroservices
 {
-
-    /**
-    \defgroup gr_asyncworkservice AsyncWorkService
-
-    \brief Groups AsyncWorkService class related symbols
-    */
-
-    /**
-     * \ingroup MicroService
-     * \ingroup gr_asyncworkservice
-     *
-     * Provides a method which controls how DeclarativeServices internally schedules asynchronous work.
-     * Creating an AsyncWorkService implementation is not required; this is intended to be used in specialty
-     * situations where the client application has requirements that the default asynchronous work scheduling
-     * mechanism does not conform to.
-     *
-     * @remarks This class is thread safe.
-     */
-    class US_usAsyncWorkService_EXPORT AsyncWorkService
+    namespace async
     {
-      public:
-        virtual ~AsyncWorkService();
 
         /**
-         * Run a std::packaged_task<void()> (optionally on another thread asynchronously).
-         * The std::future<void> associated with the std::packaged_task<void()> task
-         * object will contain the result from the task object.
-         *
-         * @param task A std::packaged_task<void()> wrapping a Callable target to
-         * execute asynchronously.
-         *
-         * @note The caller is required to manage the std::future<void> associated
-         * with the std::packaged_task<void()> in order to wait on the async task.
-         */
-        virtual void post(std::packaged_task<void()>&& task) = 0;
+        \defgroup gr_asyncworkservice AsyncWorkService
+
+        \brief Groups AsyncWorkService class related symbols
+        */
 
         /**
-         * Optional method to wait for all currently executing tasks to finish
+         * \ingroup MicroService
+         * \ingroup gr_asyncworkservice
          *
-         * @note If the AsyncWorkService does not implement this function and override,
-         * the call will default to noop.
+         * Provides a method which controls how DeclarativeServices internally schedules asynchronous work.
+         * Creating an AsyncWorkService implementation is not required; this is intended to be used in specialty
+         * situations where the client application has requirements that the default asynchronous work scheduling
+         * mechanism does not conform to.
+         *
+         * @remarks This class is thread safe.
          */
-        virtual void
-        wait()
+        class US_usAsyncWorkService_EXPORT AsyncWorkService
         {
-            return;
-        }
-    };
-} // namespace cppmicroservices::async
+          public:
+            virtual ~AsyncWorkService();
+
+            /**
+             * Run a std::packaged_task<void()> (optionally on another thread asynchronously).
+             * The std::future<void> associated with the std::packaged_task<void()> task
+             * object will contain the result from the task object.
+             *
+             * @param task A std::packaged_task<void()> wrapping a Callable target to
+             * execute asynchronously.
+             *
+             * @note The caller is required to manage the std::future<void> associated
+             * with the std::packaged_task<void()> in order to wait on the async task.
+             */
+            virtual void post(std::packaged_task<void()>&& task) = 0;
+
+            /**
+             * Optional method to wait for all currently executing tasks to finish
+             *
+             * @note If the AsyncWorkService does not implement this function and override,
+             * the call will default to noop.
+             */
+            virtual void
+            wait()
+            {
+                return;
+            }
+        };
+    } // namespace async
+} // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_ASYNC_WORK_SERVICE_HPP

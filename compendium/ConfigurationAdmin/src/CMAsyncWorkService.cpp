@@ -27,193 +27,198 @@
 #include "boost/asio/post.hpp"
 #include "boost/asio/thread_pool.hpp"
 
-namespace cppmicroservices::cmimpl
+namespace cppmicroservices
 {
-
-    /**
-     * FallbackAsyncWorkService represents the fallback strategy in the event
-     * that a AsyncWorkService is not present within the framework. It implements
-     * the public interface for AsyncWorkService and is created in the event that
-     * a user-provided service was not given or if the user-provided service
-     * which implements the AsyncWorkService interface was unregistered.
-     */
-    class FallbackAsyncWorkService final : public cppmicroservices::async::AsyncWorkService
+    namespace cmimpl
     {
-      public:
-        FallbackAsyncWorkService(std::shared_ptr<cppmicroservices::logservice::LogService> const& logger_)
-            : logger(logger_)
+
+        /**
+         * FallbackAsyncWorkService represents the fallback strategy in the event
+         * that a AsyncWorkService is not present within the framework. It implements
+         * the public interface for AsyncWorkService and is created in the event that
+         * a user-provided service was not given or if the user-provided service
+         * which implements the AsyncWorkService interface was unregistered.
+         */
+        class FallbackAsyncWorkService final : public cppmicroservices::async::AsyncWorkService
         {
-            Initialize();
+          public:
+            FallbackAsyncWorkService(std::shared_ptr<cppmicroservices::logservice::LogService> const& logger_)
+                : logger(logger_)
+            {
+                Initialize();
+            }
+
+            void
+            Initialize()
+            {
+                threadpool = std::make_shared<boost::asio::thread_pool>(1);
+            }
+
+            void
+            Shutdown()
+            {
+                if (threadpool)
+                {
+                    try
+                    {
+                        threadpool->join();
+                        threadpool->stop();
+                        threadpool.reset();
+                    }
+                    catch (...)
+                    {
+                        auto exceptionPtr = std::current_exception();
+                        std::string msg = "An exception has occurred while trying to shutdown "
+                                          "the fallback cppmicroservices::async::AsyncWorkService "
+                                          "instance.";
+                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING, msg, exceptionPtr);
+                    }
+                }
+            }
+
+            ~FallbackAsyncWorkService() { Shutdown(); }
+
+            void
+            post(std::packaged_task<void()>&& task) override
+            {
+                if (threadpool)
+                {
+                    using Sig = void();
+                    using Result = boost::asio::async_result<decltype(task), Sig>;
+                    using Handler = typename Result::completion_handler_type;
+
+                    Handler handler(std::forward<decltype(task)>(task));
+
+                    boost::asio::post(threadpool->get_executor(),
+                                      [handler = std::move(handler)]() mutable { handler(); });
+                }
+            }
+
+            void
+            wait() override
+            {
+                if (threadpool)
+                {
+                    try
+                    {
+                        threadpool->join();
+                    }
+                    catch (...)
+                    {
+                        auto exceptionPtr = std::current_exception();
+                        std::string msg = "An exception has occurred while trying to wait for "
+                                          "the fallback cppmicroservices::async::AsyncWorkService "
+                                          "to finish all allocated tasks.";
+                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING, msg, exceptionPtr);
+                    }
+                }
+            }
+
+          private:
+            std::shared_ptr<boost::asio::thread_pool> threadpool;
+            std::shared_ptr<cppmicroservices::logservice::LogService> logger;
+        };
+
+        CMAsyncWorkService::CMAsyncWorkService(cppmicroservices::BundleContext context,
+                                               std::shared_ptr<cppmicroservices::logservice::LogService> const& logger_)
+            : scrContext(context)
+            , serviceTracker(
+                  std::make_unique<cppmicroservices::ServiceTracker<cppmicroservices::async::AsyncWorkService>>(context,
+                                                                                                                this))
+            , asyncWorkService(nullptr)
+            , logger(logger_)
+        {
+            if (auto asyncWSSRef = context.GetServiceReference<cppmicroservices::async::AsyncWorkService>();
+                asyncWSSRef)
+            {
+                asyncWorkService = context.GetService<cppmicroservices::async::AsyncWorkService>(asyncWSSRef);
+            }
+            else
+            {
+                asyncWorkService = std::make_shared<FallbackAsyncWorkService>(logger_);
+            }
+
+            serviceTracker->Open();
         }
 
-        void
-        Initialize()
-        {
-            threadpool = std::make_shared<boost::asio::thread_pool>(1);
-        }
+        CMAsyncWorkService::~CMAsyncWorkService() noexcept { asyncWorkService.reset(); }
 
         void
-        Shutdown()
+        CMAsyncWorkService::StopTracking()
         {
-            if (threadpool)
+            if (serviceTracker)
+            {
+                serviceTracker->Close();
+                serviceTracker.reset();
+            }
+        }
+
+        std::shared_ptr<cppmicroservices::async::AsyncWorkService>
+        CMAsyncWorkService::AddingService(ServiceReference<cppmicroservices::async::AsyncWorkService> const& reference)
+        {
+            auto currAsync = std::atomic_load(&asyncWorkService);
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> newService;
+            if (reference)
             {
                 try
                 {
-                    threadpool->join();
-                    threadpool->stop();
-                    threadpool.reset();
+                    newService = scrContext.GetService<cppmicroservices::async::AsyncWorkService>(reference);
+                    if (newService)
+                    {
+                        std::atomic_store(&asyncWorkService, newService);
+                    }
                 }
                 catch (...)
                 {
                     auto exceptionPtr = std::current_exception();
-                    std::string msg = "An exception has occurred while trying to shutdown "
-                                      "the fallback cppmicroservices::async::AsyncWorkService "
-                                      "instance.";
+                    std::string msg = "An exception was caught while retrieving an instance of "
+                                      "cppmicroservices::async::AsyncWorkService. Falling "
+                                      "back to the default.";
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING, msg, exceptionPtr);
                 }
             }
-        }
-
-        ~FallbackAsyncWorkService() { Shutdown(); }
-
-        void
-        post(std::packaged_task<void()>&& task) override
-        {
-            if (threadpool)
-            {
-                using Sig = void();
-                using Result = boost::asio::async_result<decltype(task), Sig>;
-                using Handler = typename Result::completion_handler_type;
-
-                Handler handler(std::forward<decltype(task)>(task));
-
-                boost::asio::post(threadpool->get_executor(), [handler = std::move(handler)]() mutable { handler(); });
-            }
+            return newService;
         }
 
         void
-        wait() override
+        CMAsyncWorkService::ModifiedService(
+            ServiceReference<cppmicroservices::async::AsyncWorkService> const& /* reference */,
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& /* service */)
         {
-            if (threadpool)
+            // no-op
+        }
+
+        void
+        CMAsyncWorkService::RemovedService(
+            ServiceReference<cppmicroservices::async::AsyncWorkService> const& /* reference */,
+            std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& service)
+        {
+            auto currAsync = std::atomic_load(&asyncWorkService);
+            if (service == currAsync)
             {
-                try
-                {
-                    threadpool->join();
-                }
-                catch (...)
-                {
-                    auto exceptionPtr = std::current_exception();
-                    std::string msg = "An exception has occurred while trying to wait for "
-                                      "the fallback cppmicroservices::async::AsyncWorkService "
-                                      "to finish all allocated tasks.";
-                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING, msg, exceptionPtr);
-                }
+                // wait for all running tasks to finish
+                // currAsync->wait();
+                std::cout << "IM HERE" << std::endl;
+                // replace existing asyncWorkService with a nullptr asyncWorkService
+                std::shared_ptr<cppmicroservices::async::AsyncWorkService> newService
+                    = std::make_shared<FallbackAsyncWorkService>(logger);
+                std::atomic_store(&asyncWorkService, newService);
             }
         }
 
-      private:
-        std::shared_ptr<boost::asio::thread_pool> threadpool;
-        std::shared_ptr<cppmicroservices::logservice::LogService> logger;
-    };
-
-    CMAsyncWorkService::CMAsyncWorkService(cppmicroservices::BundleContext context,
-                                           std::shared_ptr<cppmicroservices::logservice::LogService> const& logger_)
-        : scrContext(context)
-        , serviceTracker(
-              std::make_unique<cppmicroservices::ServiceTracker<cppmicroservices::async::AsyncWorkService>>(context,
-                                                                                                            this))
-        , asyncWorkService(nullptr)
-        , logger(logger_)
-    {
-        if (auto asyncWSSRef = context.GetServiceReference<cppmicroservices::async::AsyncWorkService>(); asyncWSSRef)
+        void
+        CMAsyncWorkService::post(std::packaged_task<void()>&& task)
         {
-            asyncWorkService = context.GetService<cppmicroservices::async::AsyncWorkService>(asyncWSSRef);
-        }
-        else
-        {
-            asyncWorkService = std::make_shared<FallbackAsyncWorkService>(logger_);
+            auto currAsync = std::atomic_load(&asyncWorkService);
+            currAsync->post(std::move(task));
         }
 
-        serviceTracker->Open();
-    }
-
-    CMAsyncWorkService::~CMAsyncWorkService() noexcept { asyncWorkService.reset(); }
-
-    void
-    CMAsyncWorkService::StopTracking()
-    {
-        if (serviceTracker)
+        void
+        CMAsyncWorkService::wait()
         {
-            serviceTracker->Close();
-            serviceTracker.reset();
+            auto currAsync = std::atomic_load(&asyncWorkService);
+            currAsync->wait();
         }
-    }
 
-    std::shared_ptr<cppmicroservices::async::AsyncWorkService>
-    CMAsyncWorkService::AddingService(ServiceReference<cppmicroservices::async::AsyncWorkService> const& reference)
-    {
-        auto currAsync = std::atomic_load(&asyncWorkService);
-        std::shared_ptr<cppmicroservices::async::AsyncWorkService> newService;
-        if (reference)
-        {
-            try
-            {
-                newService = scrContext.GetService<cppmicroservices::async::AsyncWorkService>(reference);
-                if (newService)
-                {
-                    std::atomic_store(&asyncWorkService, newService);
-                }
-            }
-            catch (...)
-            {
-                auto exceptionPtr = std::current_exception();
-                std::string msg = "An exception was caught while retrieving an instance of "
-                                  "cppmicroservices::async::AsyncWorkService. Falling "
-                                  "back to the default.";
-                logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING, msg, exceptionPtr);
-            }
-        }
-        return newService;
-    }
-
-    void
-    CMAsyncWorkService::ModifiedService(
-        ServiceReference<cppmicroservices::async::AsyncWorkService> const& /* reference */,
-        std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& /* service */)
-    {
-        // no-op
-    }
-
-    void
-    CMAsyncWorkService::RemovedService(
-        ServiceReference<cppmicroservices::async::AsyncWorkService> const& /* reference */,
-        std::shared_ptr<cppmicroservices::async::AsyncWorkService> const& service)
-    {
-        auto currAsync = std::atomic_load(&asyncWorkService);
-        if (service == currAsync)
-        {
-            // wait for all running tasks to finish
-            // currAsync->wait();
-            std::cout << "IM HERE" << std::endl;
-            // replace existing asyncWorkService with a nullptr asyncWorkService
-            std::shared_ptr<cppmicroservices::async::AsyncWorkService> newService
-                = std::make_shared<FallbackAsyncWorkService>(logger);
-            std::atomic_store(&asyncWorkService, newService);
-        }
-    }
-
-    void
-    CMAsyncWorkService::post(std::packaged_task<void()>&& task)
-    {
-        auto currAsync = std::atomic_load(&asyncWorkService);
-        currAsync->post(std::move(task));
-    }
-
-    void
-    CMAsyncWorkService::wait()
-    {
-        auto currAsync = std::atomic_load(&asyncWorkService);
-        currAsync->wait();
-    }
-
-} // namespace cppmicroservices::cmimpl
+    } // namespace cmimpl
+} // namespace cppmicroservices

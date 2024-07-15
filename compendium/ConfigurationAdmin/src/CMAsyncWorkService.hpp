@@ -57,6 +57,7 @@ namespace cppmicroservices
 
             // methods from the cppmicroservices::async::AsyncWorkService interface
             void post(std::packaged_task<void()>&& task) override;
+            void wait() override;
 
             // methods from the cppmicroservices::ServiceTrackerCustomizer interface
             std::shared_ptr<TrackedParamType> AddingService(

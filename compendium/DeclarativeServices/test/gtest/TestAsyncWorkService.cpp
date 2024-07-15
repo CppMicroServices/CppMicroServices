@@ -287,10 +287,9 @@ namespace test
 
     INSTANTIATE_TEST_SUITE_P(AsyncWorkServiceEndToEndParameterized,
                              TestAsyncWorkServiceEndToEnd,
-                             testing::Values(
-                                 std::make_shared<AsyncWorkServiceThreadPool>(1),
-                                 std::make_shared<AsyncWorkServiceThreadPool>(8),
-                                 std::make_shared<AsyncWorkServiceThreadPool>(20)));
+                             testing::Values(std::make_shared<AsyncWorkServiceThreadPool>(1),
+                                             std::make_shared<AsyncWorkServiceThreadPool>(8),
+                                             std::make_shared<AsyncWorkServiceThreadPool>(20)));
 
     TEST_P(TestAsyncWorkServiceEndToEnd, TestEndToEndBehaviorWithAsyncWorkService)
     {
@@ -365,6 +364,64 @@ namespace test
         fut.get();
 
         ASSERT_TRUE(service) << "GetService failed for CAInterface.";
+    }
+
+    TEST_P(TestAsyncWorkServiceEndToEnd, TestTasksRunningAtShutdownSafety)
+    {
+        std::vector<std::string> bundlesToInstall
+            = { "TestBundleDSCA01",  "TestBundleDSCA02", "TestBundleDSCA03", "TestBundleDSCA04",
+                "TestBundleDSCA05a", "TestBundleDSCA05", "TestBundleDSCA07" };
+        std::vector<std::string> configs
+            = { "sample::ServiceComponentCA01", "sample::ServiceComponentCA02",  "sample::ServiceComponentCA03",
+                "sample::ServiceComponentCA04", "sample::ServiceComponentCA05a", "sample::ServiceComponentCA05",
+                "sample::ServiceComponentCA07" };
+        std::vector<cppmicroservices::Bundle> installedBundles;
+
+        auto param = GetParam();
+
+        auto ctx = framework.GetBundleContext();
+
+        // ASYNCWORKSERVICE
+        auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
+
+        // CA, DS
+        ::test::InstallAndStartConfigAdmin(ctx);
+
+        // CA SERVICE
+        auto sr = ctx.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+        auto configAdmin = ctx.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
+
+        for (auto const& bundleName : bundlesToInstall)
+        {
+            auto bundle = ::test::InstallAndStartBundle(ctx, bundleName);
+            ASSERT_TRUE(bundle);
+        }
+
+        std::vector<std::shared_future<void>> futs;
+
+        for (auto const& configID : configs)
+        {
+            futs.emplace_back(std::async(std::launch::async,
+                                         [&ctx, configID, &configAdmin, &reg]()
+                                         {
+                                             std::cout << configID << std::endl;
+                                             if (configID == "sample::ServiceComponentCA01"){
+                                                reg.Unregister();
+                                             }
+                                             auto configuration = configAdmin->GetConfiguration(configID);
+                                             cppmicroservices::AnyMap props({
+                                                 {"uniqueProp", std::string(configID)}
+                                             });
+
+                                             auto fut = configuration->Update(props);
+                                         })
+                                  .share());
+        }
+
+        for (auto& fut : futs)
+        {
+            fut.get();
+        }
     }
 
 }; // namespace test

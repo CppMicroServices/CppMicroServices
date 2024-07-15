@@ -1,23 +1,8 @@
 #ifndef CPPMICROSERVICES_LOGGER_H_
 #define CPPMICROSERVICES_LOGGER_H_
 
-#ifdef AUDIT
-#undef AUDIT
-#endif
 #ifdef ERROR
 #undef ERROR
-#endif
-#ifdef WARN
-#undef WARN
-#endif
-#ifdef INFO
-#undef INFO
-#endif
-#ifdef DEBUG
-#undef DEBUG
-#endif
-#ifdef TRACE
-#undef TRACE
 #endif
 
 #include "cppmicroservices/ServiceReferenceBase.h"
@@ -40,10 +25,10 @@ namespace cppmicroservices::logservice
          * \addtogroup gr_logservice
          * @{
         */
-	enum class LogLevel
+	enum class LogLevelCopy
 	{
-	    AUDIT, //This log level is used for information that must always be logged.
-	    ERROR, //This log level is used for information about an error situation.
+	    AUDIT, //This log level is used for information that must always be logged. 
+            ERROR, //This log level is used for information about an error situation.
 	    WARN,  //This log level is used for information about a failure or unwanted situation that is not blocking.
 	    INFO,  //This log level is used for information about normal operation.
 	    DEBUG, //This log level is used for detailed output for debugging operations.

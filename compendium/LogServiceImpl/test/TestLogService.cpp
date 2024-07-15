@@ -60,8 +60,6 @@ class LogServiceImplTests : public ::testing::Test
         std::string text = oss.str();
         std::smatch m;
         bool found = std::regex_search(text, m, std::regex(regex));
-        std::cout << "TEXT STRING =" << text << std::endl;
-        std::cout << "REGEX = " << regex << std::endl;
         oss.str("");
         return found;
     }

@@ -197,7 +197,7 @@ namespace cppmicroservices
             if (service == currAsync)
             {
                 // wait for all running tasks to finish
-                // currAsync->wait();
+                currAsync->wait();
                 std::cout << "IM HERE" << std::endl;
                 // replace existing asyncWorkService with a nullptr asyncWorkService
                 std::shared_ptr<cppmicroservices::async::AsyncWorkService> newService

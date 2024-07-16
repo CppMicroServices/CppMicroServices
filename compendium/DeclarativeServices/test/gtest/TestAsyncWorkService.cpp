@@ -366,7 +366,37 @@ namespace test
         ASSERT_TRUE(service) << "GetService failed for CAInterface.";
     }
 
-    TEST_P(TestAsyncWorkServiceEndToEnd, TestTasksRunningAtShutdownSafety)
+    class Barrier
+    {
+      public:
+        Barrier(std::size_t count) : threshold(count), count(count), generation(0) {}
+
+        void
+        Wait()
+        {
+            std::unique_lock<std::mutex> lock(mutex);
+            auto gen = generation;
+            if (--count == 0)
+            {
+                generation++;
+                count = threshold;
+                cond.notify_all();
+            }
+            else
+            {
+                cond.wait(lock, [this, gen] { return gen != generation; });
+            }
+        }
+
+      private:
+        std::mutex mutex;
+        std::condition_variable cond;
+        std::size_t threshold;
+        std::size_t count;
+        std::size_t generation;
+    };
+
+    TEST_F(TestAsyncWorkServiceEndToEnd, TestTasksRunningAtShutdownSafety)
     {
         std::vector<std::string> bundlesToInstall
             = { "TestBundleDSCA01",  "TestBundleDSCA02", "TestBundleDSCA03", "TestBundleDSCA04",
@@ -377,13 +407,15 @@ namespace test
                 "sample::ServiceComponentCA07" };
         std::vector<cppmicroservices::Bundle> installedBundles;
 
-        auto param = GetParam();
+        // work service large enough that we should never hit a deadlock where there are too few threads
+        auto param = std::make_shared<AsyncWorkServiceThreadPool>(20);
 
         auto ctx = framework.GetBundleContext();
 
         // ASYNCWORKSERVICE
         auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
-
+        auto srAWS = ctx.GetServiceReference<cppmicroservices::async::AsyncWorkService>();
+        auto asyncWorkService = ctx.GetService<cppmicroservices::async::AsyncWorkService>(srAWS);
         // CA, DS
         ::test::InstallAndStartConfigAdmin(ctx);
 
@@ -398,24 +430,32 @@ namespace test
         }
 
         std::vector<std::shared_future<void>> futs;
+        Barrier sync_point(configs.size()); // threads to synchronize
 
         for (auto const& configID : configs)
         {
-            futs.emplace_back(std::async(std::launch::async,
-                                         [&ctx, configID, &configAdmin, &reg]()
-                                         {
-                                             std::cout << configID << std::endl;
-                                             if (configID == "sample::ServiceComponentCA01"){
-                                                reg.Unregister();
-                                             }
-                                             auto configuration = configAdmin->GetConfiguration(configID);
-                                             cppmicroservices::AnyMap props({
-                                                 {"uniqueProp", std::string(configID)}
-                                             });
 
-                                             auto fut = configuration->Update(props);
-                                         })
-                                  .share());
+            std::packaged_task<void()> post_task(
+                [configID, &configAdmin, &reg, &sync_point]() mutable
+                {
+                    sync_point.Wait();
+                    std::cout << configID << std::endl;
+                    if (configID == "sample::ServiceComponentCA01")
+                    {
+                        reg.Unregister();
+                    }
+                    auto configuration = configAdmin->GetConfiguration(configID);
+                    cppmicroservices::AnyMap props({
+                        {"uniqueProp", std::string(configID)}
+                    });
+
+                    auto fut = configuration->Update(props);
+                    fut.get();
+                });
+
+            futs.emplace_back(post_task.get_future().share());
+
+            asyncWorkService->post(std::move(post_task));
         }
 
         for (auto& fut : futs)

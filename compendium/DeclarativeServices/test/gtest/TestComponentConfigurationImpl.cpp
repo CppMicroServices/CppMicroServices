@@ -1301,12 +1301,6 @@ namespace cppmicroservices
             std::size_t generation;
         };
 
-        /**
-         * Test that the Modified method on a component configuration that is
-         * lazily loaded and requires two configuration objects where one is
-         * twice and the other once, the the component is initialized and then
-         * the second config object is updated for the second time. This should trigger a modified() call.
-         */
         TEST(ConfigAdminComponentCreationRace, TestConfigNotifierSafeWithNoListenersForPid)
         {
             auto [framework, compMetadata, mockRegistry, fakeLogger, notifier, configAdminService] = mySetUp();

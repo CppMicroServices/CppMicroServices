@@ -487,14 +487,7 @@ namespace test
 
     TEST_F(TestAsyncWorkServiceEndToEnd, TestTasksRunningAtShutdownSafety)
     {
-        // std::vector<std::string> bundlesToInstall
-        //     = { "TestBundleDSCA01",  "TestBundleDSCA02", "TestBundleDSCA03", "TestBundleDSCA04",
-        //         "TestBundleDSCA05a", "TestBundleDSCA05", "TestBundleDSCA07" };
-        // std::vector<std::string> configs
-        //     = { "sample::ServiceComponentCA01", "sample::ServiceComponentCA02",  "sample::ServiceComponentCA03",
-        //         "sample::ServiceComponentCA04", "sample::ServiceComponentCA05a", "sample::ServiceComponentCA05",
-        //         "sample::ServiceComponentCA07" };
-        // std::vector<cppmicroservices::Bundle> installedBundles;
+        using namespace std::literals::chrono_literals;
 
         // work service large enough that we should never hit a deadlock where there are too few threads
         auto ctx = framework.GetBundleContext();
@@ -512,45 +505,24 @@ namespace test
         // CA, DS
         ::test::InstallAndStartConfigAdmin(ctx);
 
-        // CA SERVICE
-        // auto sr = ctx.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
-        // auto configAdmin = ctx.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr);
-
-        // for (auto const& bundleName : bundlesToInstall)
-        // {
-        //     auto bundle = ::test::InstallAndStartBundle(ctx, bundleName);
-        //     ASSERT_TRUE(bundle);
-        // }
-
         std::vector<std::shared_future<void>> futs;
 
-        // std::mutex mtx;
-        // std::condition_variable cv;
-        // std::atomic<size_t> counter(0);
         auto waitForInitialWave = std::make_shared<Barrier>(total_tasks + 1);
 
         for (size_t i = 0; i < total_tasks; ++i)
         {
-            // , &counter, &mtx, &cv
             std::packaged_task<void()> post_task(
                 [asyncWorkService, &waitForInitialWave]() mutable
                 {
                     std::packaged_task<void()> post_task_internal(
                         []() mutable
                         {
-                            std::this_thread::sleep_for(std::chrono::seconds(10));
+                            std::this_thread::sleep_for(500ms);
                             std::cout << "Internal Task Executed" << std::endl;
                         });
 
                     auto myFut = post_task_internal.get_future().share();
 
-                    // {
-                    //     std::lock_guard<std::mutex> lock(mtx);
-                    //     if (++counter == total_tasks)
-                    //     {
-                    //         cv.notify_one();
-                    //     }
-                    // }
                     asyncWorkService->postWithSync(std::move(post_task_internal), waitForInitialWave);
                     asyncWorkService.reset();
                     myFut.get();
@@ -561,12 +533,6 @@ namespace test
             asyncWorkService->post(std::move(post_task));
         }
         asyncWorkService.reset();
-
-        // Wait for all internal tasks to be posted
-        // {
-        //     std::unique_lock<std::mutex> lock(mtx);
-        //     cv.wait(lock, [] { return counter == total_tasks; });
-        // }
 
         waitForInitialWave->Wait();
         reg.Unregister();

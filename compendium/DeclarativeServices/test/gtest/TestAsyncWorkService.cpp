@@ -400,7 +400,7 @@ namespace test
     {
       public:
         sync() = default;
-        virtual ~sync() {};
+        virtual ~sync() = default;
         virtual void postWithSync(std::packaged_task<void()>&&, std::shared_ptr<Barrier>) {};
     };
 
@@ -551,5 +551,4 @@ namespace test
 
         ASSERT_EQ(counter, 0);
     }
-
 }; // namespace test

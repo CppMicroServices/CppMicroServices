@@ -480,21 +480,21 @@ namespace test
 
       private:
         std::shared_ptr<boost::asio::thread_pool> threadpool;
-        std::shared_ptr<Barrier> unregistered;
-        int allocatePreBarrier;
-        std::mutex mutex;
     };
 
+    // verify that all tasks that are posted do get run even if the service is unregistered mid execution
     TEST_F(TestAsyncWorkServiceEndToEnd, TestTasksRunningAtShutdownSafety)
     {
         using namespace std::literals::chrono_literals;
 
-        // work service large enough that we should never hit a deadlock where there are too few threads
         auto ctx = framework.GetBundleContext();
         cppmicroservices::ServiceRegistration<sync> reg;
         constexpr size_t total_tasks = 6;
 
         {
+            // thread pool size should be the total tasks +1 so that we make sure that we don't deadlock because all 6
+            // tasks are allocated and waiting on tasks behind them in the queue. However, it has to be small enough
+            // that not all the 'external' tasks and 'internal' tasks can be allocated at the same time
             auto param = std::make_shared<AsyncWorkServiceThreadPoolWithSync>(total_tasks + 1);
             reg = ctx.RegisterService<sync, cppmicroservices::async::AsyncWorkService>(param);
         }
@@ -502,28 +502,35 @@ namespace test
         // ASYNCWORKSERVICE
         auto srAWS = ctx.GetServiceReference<sync>();
         auto asyncWorkService = ctx.GetService<sync>(srAWS);
-        // CA, DS
+        // CA
         ::test::InstallAndStartConfigAdmin(ctx);
 
         std::vector<std::shared_future<void>> futs;
 
+        // wait for all post_task objects to be started before second post is made.
+        // the '+1' here is to wait till right before the unregister call is made.
+        // This tries to ensure that some of these internal post_tasks will be posted but not allocated to a thread
         auto waitForInitialWave = std::make_shared<Barrier>(total_tasks + 1);
+        std::atomic<int> counter(total_tasks);
 
         for (size_t i = 0; i < total_tasks; ++i)
         {
             std::packaged_task<void()> post_task(
-                [asyncWorkService, &waitForInitialWave]() mutable
+                [asyncWorkService, &waitForInitialWave, &counter]() mutable
                 {
                     std::packaged_task<void()> post_task_internal(
-                        []() mutable
+                        [&counter]() mutable
                         {
+                            // give some time for the unregister call to be successful
                             std::this_thread::sleep_for(500ms);
-                            std::cout << "Internal Task Executed" << std::endl;
+                            --counter;
                         });
 
                     auto myFut = post_task_internal.get_future().share();
 
+                    // post with blocker to wait for all post_tasks to make it
                     asyncWorkService->postWithSync(std::move(post_task_internal), waitForInitialWave);
+                    // don't store a shared_ptr to the asyncWorkService or it'll never be destroyed
                     asyncWorkService.reset();
                     myFut.get();
                 });
@@ -541,6 +548,8 @@ namespace test
         {
             fut.get();
         }
+
+        ASSERT_EQ(counter, 0);
     }
 
 }; // namespace test

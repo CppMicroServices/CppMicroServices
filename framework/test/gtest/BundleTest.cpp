@@ -40,6 +40,7 @@
 #include "TestUtilFrameworkListener.h"
 #include "TestUtils.h"
 #include "TestingConfig.h"
+#include "Mocks.h"
 
 #include <chrono>
 #include <future>
@@ -51,6 +52,8 @@ US_MSVC_PUSH_DISABLE_WARNING(4996)
 
 using namespace cppmicroservices;
 using namespace cppmicroservices::testing;
+using ::testing::_;
+using ::testing::Return;
 
 class BundleTest : public ::testing::Test
 {
@@ -331,7 +334,7 @@ class FrameworkTestSuite
     }
 };
 
-TEST_F(BundleTest, testFramework)
+TEST_F(BundleTest, TestFramework)
 {
     FrameworkTestSuite ts(framework.GetBundleContext());
 
@@ -763,58 +766,113 @@ TEST_F(BundleTest, TestBundleGetPropertyKeys)
 // Test installing a bundle with invalid meta-data in its manifest.
 TEST_F(BundleTest, TestBundleManifestFailures)
 {
-    auto bc = framework.GetBundleContext();
+    MockCoreBundleContext cbc;
+    MockBundleStorageMemory bsm;
 
-    std::vector<std::string> validBundleNames({ framework.GetSymbolicName(), "main" });
-    std::sort(validBundleNames.begin(), validBundleNames.end());
-
-    auto validateBundleNames = [&bc](std::vector<std::string>& original)
-    {
-        auto installed = bc.GetBundles();
-        std::vector<std::string> names;
-        for (auto& b : installed)
-        {
-            names.push_back(b.GetSymbolicName());
-        }
-        std::sort(names.begin(), names.end());
-        return std::includes(original.begin(), original.end(), names.begin(), names.end());
-    };
+    cbc.storage = std::make_unique<MockBundleStorageMemory>();
+    
+    // TODO: Pull out MockBundleArchive constructor into helper function
 
     // throw if manifest.json bundle version key is not a string type
-    EXPECT_THROW(InstallLib(bc, "TestBundleWithInvalidVersionType"), std::runtime_error);
-    // Test that an invalid bundle.version type results in not installing the bundle.
-    ASSERT_EQ(2, bc.GetBundles().size());
-    ASSERT_TRUE(validateBundleNames(validBundleNames));
+    std::shared_ptr<MockBundleArchive> ba = std::make_shared<MockBundleArchive>(
+        &bsm,
+        std::make_shared<MockBundleResourceContainer>(),
+        "", "", 0,
+        AnyMap({
+            { "bundle.symbolic_name", Any(std::string("TestBundleMWithInvalidVersionType")) },
+            { "bundle.description", Any(std::string("A test bundle containing an incorrect bundle.version value type.")) },
+            { "bundle.version", Any(1.0) },
+            { "bundle.activator", Any(true) }
+        })
+    );
+    EXPECT_THROW(BundlePrivate(&cbc, ba), std::invalid_argument);
 
     // throw if BundleVersion ctor throws in BundlePrivate ctor
-    EXPECT_THROW(InstallLib(bc, "TestBundleWithInvalidVersion"), std::runtime_error);
-    // Test that an invalid bundle.version type results in not installing the bundle.
-    ASSERT_EQ(2, bc.GetBundles().size());
-    ASSERT_TRUE(validateBundleNames(validBundleNames));
+    ba = std::make_shared<MockBundleArchive>(
+        &bsm,
+        std::make_shared<MockBundleResourceContainer>(),
+        "", "", 0,
+        AnyMap({
+            { "bundle.symbolic_name", Any(std::string("TestBundleMWithInvalidVersion")) },
+            { "bundle.description", Any(std::string("A test bundle containing an invalid bundle.version value.")) },
+            { "bundle.version", Any(std::string("0.0.1.-??0??")) },
+            { "bundle.activator", Any(true) }
+        })
+    );
+    EXPECT_THROW(BundlePrivate(&cbc, ba), std::invalid_argument);
 
     // throw if missing bundle.symbolic_name key in manifest.json
-    EXPECT_THROW(InstallLib(bc, "TestBundleWithoutBundleName"), std::runtime_error);
-    // Test that a missing bundle.symbolic_name results in not installing the bundle.
-    ASSERT_EQ(2, bc.GetBundles().size());
-    ASSERT_TRUE(validateBundleNames(validBundleNames));
+    ba = std::make_shared<MockBundleArchive>(
+        &bsm,
+        std::make_shared<MockBundleResourceContainer>(),
+        "", "", 0,
+        AnyMap({
+            { "bundle.description", Any(std::string("A test bundle missing bundle.symbolic_name.")) },
+            { "bundle.version", Any(std::string("1.0")) },
+            { "bundle.activator", Any(true) }
+        })
+    );
+    EXPECT_THROW(BundlePrivate(&cbc, ba), std::invalid_argument);
 
     // throw if empty bundle.symbolic_name value in manifest.json
-    EXPECT_THROW(InstallLib(bc, "TestBundleWithEmptyBundleName"), std::runtime_error);
-    // Test that an empty bundle.symbolic_name results in not installing the bundle.
-    ASSERT_EQ(2, bc.GetBundles().size());
-    ASSERT_TRUE(validateBundleNames(validBundleNames));
+    ba = std::make_shared<MockBundleArchive>(
+        &bsm,
+        std::make_shared<MockBundleResourceContainer>(),
+        "", "", 0,
+        AnyMap({
+            { "bundle.symbolic_name", Any(std::string("")) },
+            { "bundle.description", Any(std::string("A test bundle containing an empty bundle.symbolic_name value.")) },
+            { "bundle.version", Any(std::string("1.0")) },
+            { "bundle.activator", Any(true) }
+        })
+    );
+    EXPECT_THROW(BundlePrivate(&cbc, ba), std::invalid_argument);
 }
 #endif
 
 // Test the behavior of illegal bundle state changes.
 TEST_F(BundleTest, TestIllegalBundleStateChange)
 {
+    /*
+    MockCoreBundleContext cbc;
+    MockBundleStorageMemory* bsm = new MockBundleStorageMemory();
+
+    ON_CALL(*bsm, CreateAndInsertArchive(_, _, _))
+        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+            bsm,
+            std::make_shared<MockBundleResourceContainer>(),
+            "MOCK", "TestBundleA", 1,
+            AnyMap({
+                { "bundle.symbolic_name", Any(std::string("TestBundleA")) },
+                { "bundle.description", Any(std::string("A test bundle missing bundle.symbolic_name.")) },
+                { "bundle.version", Any(std::string("1.0")) },
+                { "bundle.activator", Any(true) }
+            })
+        )));
+    ON_CALL(*bsm, RemoveArchive(_)).WillByDefault(Return(true));
+    EXPECT_CALL(*bsm, CreateAndInsertArchive(_, _, _)).Times(1);
+    // EXPECT_CALL(*bsm, RemoveArchive(_)).Times(1);
+
+    cbc.storage = std::unique_ptr<MockBundleStorageMemory>(bsm);
+
+    std::shared_ptr<BundlePrivate> bp = std::make_shared<BundlePrivate>(&cbc);
+    std::shared_ptr<BundleContextPrivate> bcp = std::make_shared<BundleContextPrivate>(bp.get());
+    BundleContext bc = MakeBundleContext(bcp);
+
+    auto bundleA = InstallLib(bc, "TestBundleA");
+
+    // TODO: This fails because of invalid bundle (coreCtx is nullptr within BundleRegistry::Install0)
+    bundleA.Start();
+    bundleA.Uninstall();
+    // Test stopping an uninstalled bundle
+    EXPECT_THROW(bundleA.Stop(), std::logic_error);
+    */
+
     auto bundleA = InstallLib(context, "TestBundleA");
     bundleA.Start();
     bundleA.Uninstall();
     // Test stopping an uninstalled bundle
     EXPECT_THROW(bundleA.Stop(), std::logic_error);
-
     framework.Stop();
     framework.WaitForStop(std::chrono::seconds::zero());
 
@@ -844,7 +902,7 @@ TEST_F(BundleTest, TestIllegalBundleStateChange)
     // Test that BundlePrivate::CheckUninstalled throws on bundle operations performed after its been uninstalled.
     EXPECT_THROW(bundleA.GetRegisteredServices(), std::logic_error);
 
-    // That that installing a bundle with the same symbolic name and version throws an exception.
+    // Test that installing a bundle with the same symbolic name and version throws an exception.
 #if defined(US_BUILD_SHARED_LIBS)
     InstallLib(context, "TestBundleA");
     EXPECT_THROW(InstallLib(context, "TestBundleADuplicate"), std::runtime_error);

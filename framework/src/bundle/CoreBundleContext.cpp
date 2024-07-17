@@ -139,7 +139,10 @@ namespace cppmicroservices
         frameworkProperties[Constants::FRAMEWORK_UUID] = ss.str();
 
         // $TODO we only support non-persistent (main memory) storage yet
-        storage = std::make_unique<BundleStorageMemory>();
+        if (!storage)
+        {
+            storage = std::make_unique<BundleStorageMemory>();
+        }
         //  if (frameworkProperties[FWProps::READ_ONLY_PROP] == true)
         //  {
         //    dataStorage.clear();

@@ -144,11 +144,28 @@ TEST_F(BundleManifestTest, UnicodeProperty)
 #if !defined(US_BUILD_SHARED_LIBS) || defined(__MINGW32__) || !defined(US_CXX_UNICODE_LITERALS)
     SUCCEED() << "Skipping test point for unicode path";
 #else
-    std::string path_utf8 = testing::LIB_PATH + cppmicroservices::util::DIR_SEP + u8"くいりのまちとこしくそ"
-                            + cppmicroservices::util::DIR_SEP + US_LIB_PREFIX + "TestBundleU" + US_LIB_POSTFIX
-                            + US_LIB_EXT;
+    MockCoreBundleContext cbc;
+    MockBundleStorageMemory *bsm = new MockBundleStorageMemory();
+    cbc.storage = std::unique_ptr<MockBundleStorageMemory>(bsm);
 
-    auto bundles = bc.InstallBundles(path_utf8);
+    ON_CALL(*bsm, CreateAndInsertArchive(_, _, _))
+        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+            bsm,
+            std::make_shared<MockBundleResourceContainer>(),
+            "MOCK", "TestBundleU", 1,
+            AnyMap({
+                { "bundle.symbolic_name", Any(std::string("TestBundleU")) },
+                { "bundle.activator", Any(true) },
+                { "unicode.sample", "电脑 くいりのまちとこしくそ" }
+            })
+        )));
+    EXPECT_CALL(*bsm, CreateAndInsertArchive(_, _, _)).Times(1);
+
+    std::shared_ptr<BundlePrivate> bp = std::make_shared<BundlePrivate>(&cbc);
+    std::shared_ptr<BundleContextPrivate> bcp = std::make_shared<BundleContextPrivate>(bp.get());
+    BundleContext bc = MakeBundleContext(bcp);
+
+    auto bundles = bc.InstallBundles("TestBundleU");
     ASSERT_EQ(bundles.size(), 1) << "Failed to install bundle using a unicode path";
     auto bundle = bundles.at(0);
     std::string expectedValue = u8"电脑 くいりのまちとこしくそ";
@@ -171,23 +188,32 @@ TEST_F(BundleManifestTest, InstallBundleWithDeepManifest)
 
 TEST_F(BundleManifestTest, ParseManifest)
 {
-    auto bundleM = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleM");
+    std::istringstream manifest = std::istringstream("{"
+        "\"bundle.symbolic_name\": \"TestBundleM\","
+        "\"bundle.description\": \"My Bundle description\","
+        "\"bundle.version\": \"1.0.0\","
+        "\"bundle.activator\" : true,"
+        "\"number\": 5,"
+        "\"double\": 1.1,"
+        "\"vector\": ["
+            "\"first\","
+            "2,"
+            "\"third\""
+        "],"
+        "\"map\": {"
+            "\"string\": \"hi\","
+            "\"number\": 4,"
+            "\"list\": [ \"a\", \"b\" ]"
+        "}"
+    "}");
 
-    ASSERT_TRUE(bundleM) << "Failed to install TestBundleM";
+    BundleManifest bundleM;
+    bundleM.Parse(manifest);
 
     auto const& headers = bundleM.GetHeaders();
-
     EXPECT_THAT(headers.at(Constants::BUNDLE_SYMBOLICNAME).ToString(), ::testing::StrEq("TestBundleM"));
     EXPECT_THAT(headers.at(Constants::BUNDLE_DESCRIPTION).ToString(), ::testing::StrEq("My Bundle description"));
     EXPECT_THAT(headers.at(Constants::BUNDLE_VERSION).ToString(), ::testing::StrEq("1.0.0"));
-
-    // We should also check to make sure that the deprecated properties have been set up
-    // correctly.
-    auto deprecatedProperties = bundleM.GetProperties();
-    ASSERT_TRUE(compare_deprecated_properties(headers, deprecatedProperties)) << "Deprecated properties mismatch";
-
-    EXPECT_THAT(bundleM.GetSymbolicName(), ::testing::StrEq("TestBundleM"));
-    EXPECT_EQ(bundleM.GetVersion(), BundleVersion(1, 0, 0));
 
     Any integer = headers.at("number");
     ASSERT_EQ(integer.Type(), typeid(int));

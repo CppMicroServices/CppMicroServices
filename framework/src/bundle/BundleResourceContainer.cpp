@@ -40,6 +40,8 @@
 namespace cppmicroservices
 {
 
+    BundleResourceContainer::BundleResourceContainer() = default;
+
     BundleResourceContainer::BundleResourceContainer(std::string const& location, ManifestT const& bundleManifest)
         : m_Location(location)
         , m_ZipArchive()

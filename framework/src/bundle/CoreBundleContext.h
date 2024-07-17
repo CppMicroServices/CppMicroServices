@@ -225,6 +225,9 @@ namespace cppmicroservices
         // The core context is exclusively constructed by the FrameworkFactory class
         friend class FrameworkFactory;
 
+        // The mock class invokes its parent's constructor
+        friend class MockCoreBundleContext;
+
         // Mutex required to be held when changing stopped.
         // ReadLock or WriteLock construction is done using this mutex.
         mutable std::shared_mutex stoppedLock;

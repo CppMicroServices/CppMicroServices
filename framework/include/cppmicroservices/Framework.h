@@ -244,6 +244,7 @@ namespace cppmicroservices
 
       private:
         // Framework instances are exclusively constructed by the FrameworkFactory class
+        // and mock environment constructor
         friend class FrameworkFactory;
 
         Framework(std::shared_ptr<FrameworkPrivate> const& d);

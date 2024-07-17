@@ -46,6 +46,7 @@ namespace cppmicroservices
 
       public:
         using ManifestT = cppmicroservices::AnyMap;
+        BundleResourceContainer();
         BundleResourceContainer(std::string const& location, ManifestT const&);
         ~BundleResourceContainer();
 

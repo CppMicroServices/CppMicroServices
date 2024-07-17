@@ -195,12 +195,5 @@ namespace cppmicroservices
             currAsync->post(std::move(task));
         }
 
-        void
-        SCRAsyncWorkService::wait()
-        {
-            auto currAsync = std::atomic_load(&asyncWorkService);
-            currAsync->wait();
-        }
-
     } // namespace scrimpl
 } // namespace cppmicroservices

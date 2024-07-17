@@ -21,7 +21,7 @@ namespace cppmicroservices::logservice
          * \addtogroup gr_logservice
          * @{
         */
-	enum class LogLevelCopy
+	enum class LogLevel
 	{
 	    Audit, //This log level is used for information that must always be logged. 
             Error, //This log level is used for information about an error situation.

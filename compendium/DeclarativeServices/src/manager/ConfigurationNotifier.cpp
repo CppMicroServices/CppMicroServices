@@ -45,14 +45,14 @@ namespace cppmicroservices
             : tokenCounter(0)
             , logger(logger)
             , componentFactory(std::make_shared<ComponentFactoryImpl>(context, logger, asyncWorkSvc, extensionReg))
- 
-          {
+
+        {
             if (!context || !(this->logger) || !asyncWorkSvc || !extensionReg || !componentFactory)
             {
                 throw std::invalid_argument("ConfigurationNotifier Constructor "
                                             "provided with invalid arguments");
             }
-         }
+        }
 
         cppmicroservices::ListenerTokenId
         ConfigurationNotifier::RegisterListener(std::string const& pid,
@@ -112,7 +112,8 @@ namespace cppmicroservices
             }
         }
         bool
-        ConfigurationNotifier::AnyListenersForPid(std::string const& pid, cppmicroservices::AnyMap const& properties) noexcept
+        ConfigurationNotifier::AnyListenersForPid(std::string const& pid,
+                                                  cppmicroservices::AnyMap const& properties) noexcept
         {
             std::string factoryName;
             std::vector<std::shared_ptr<ComponentConfigurationImpl>> mgrs;
@@ -131,9 +132,9 @@ namespace cppmicroservices
                     for (auto const& tokenEntry : (*tokenMapPtr))
                     {
                         auto listener = tokenEntry.second;
-                        LogInvalidDynamicTargetInProperties(properties, listener.mgr);               
+                        LogInvalidDynamicTargetInProperties(properties, listener.mgr);
                     }
- 
+
                     return true;
                 }
 
@@ -178,7 +179,6 @@ namespace cppmicroservices
             }
             return true;
         }
-        
 
         void
         ConfigurationNotifier::NotifyAllListeners(std::string const& pid,
@@ -186,24 +186,39 @@ namespace cppmicroservices
                                                   std::shared_ptr<cppmicroservices::AnyMap> properties,
                                                   unsigned long const& changeCount)
         {
+            // lock held throughout to guarantee ordering for calls to this function 
+            std::lock_guard<std::mutex> l(notificationOrderingLock);
             ConfigChangeNotification notification
                 = ConfigChangeNotification(pid, std::move(properties), std::move(type), changeCount);
-
-            auto listenersMapHandle = listenersMap.lock();
-            auto iter = listenersMapHandle->find(pid);
-            if (iter != listenersMapHandle->end())
+            std::vector<Listener> callbacks;
             {
-                for (auto const& configListenerPtr : *(iter->second))
+                auto listenersMapHandle = listenersMap.lock();
+                auto iter = listenersMapHandle->find(pid);
+
+                if (iter != listenersMapHandle->end())
                 {
-                    configListenerPtr.second.notify(notification);
+                    // reserve space after verifying the iterator is valid
+                    callbacks.reserve((iter->second)->size());
+
+                    for (auto const& configListenerPtr : *(iter->second))
+                    {
+                        // deep copy to get actual objects as opposed to shared_ptr to mutable map
+                        callbacks.emplace_back(configListenerPtr.second);
+                    }
+                }
+                else
+                {
+                    return;
                 }
             }
-            else
+            for (auto const& listener : callbacks)
             {
-                return;
+                listener.notify(notification);
             }
         }
-        std::shared_ptr<ComponentFactoryImpl>  ConfigurationNotifier::GetComponentFactory() {
+        std::shared_ptr<ComponentFactoryImpl>
+        ConfigurationNotifier::GetComponentFactory()
+        {
             return componentFactory;
         }
         void
@@ -223,9 +238,9 @@ namespace cppmicroservices
                 {
                     // This reference has a dynamic target
                     logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                "Properties for component " + metadata->name + "contains a dynamic target for interface "
-                                    + ref.interfaceName + " target= " + ref.target
-                                    + " Dynamic targets are only valid for factory components");
+                                "Properties for component " + metadata->name
+                                    + "contains a dynamic target for interface " + ref.interfaceName + " target= "
+                                    + ref.target + " Dynamic targets are only valid for factory components");
                 }
             }
         }

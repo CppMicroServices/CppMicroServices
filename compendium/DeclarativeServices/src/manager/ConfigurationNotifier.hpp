@@ -123,6 +123,7 @@ namespace cppmicroservices
 
             std::shared_ptr<cppmicroservices::logservice::LogService> logger;
             std::shared_ptr<ComponentFactoryImpl> componentFactory;
+            std::mutex notificationOrderingLock;
          };
 
     } // namespace scrimpl

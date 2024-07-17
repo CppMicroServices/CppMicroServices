@@ -53,6 +53,7 @@ namespace cppmicroservices
         {
           public:
             CFRLogger();
+	    explicit CFRLogger(cppmicroservices::BundleContext context);
             CFRLogger(CFRLogger const&) = delete;
             CFRLogger(CFRLogger&&) = delete;
             CFRLogger& operator=(CFRLogger const&) = delete;

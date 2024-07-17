@@ -104,9 +104,16 @@ TEST_F(LoggerImplTests, ProperLoggerUsage)
     logger->audit("Hello {}{}", "World", "!");
     EXPECT_TRUE(ContainsRegex(log_preamble + "Hello World!"));
 
-    logger->audit("Test debug message", cppmicroservices::ServiceReferenceU {});
+    logger->audit("Test audit message", cppmicroservices::ServiceReferenceU {});
     EXPECT_TRUE(
-        ContainsRegex(log_preamble + "Test debug message(\\n)" + svcRef_preamble + "Invalid service reference"));
+        ContainsRegex(log_preamble + "Test audit message(\\n)" + svcRef_preamble + "Invalid service reference"));
+
+    logger->audit("Test audit message",
+                std::make_exception_ptr<std::runtime_error>(std::runtime_error("uh oh")));
+    EXPECT_TRUE(ContainsRegex(log_preamble + "Test audit message(\\n)" + exception_preamble + "(.)+ uh oh"));
+
+    logger->audit("Test audit message", cppmicroservices::ServiceReferenceU {},  std::make_exception_ptr<std::runtime_error>(std::runtime_error("uh oh")));
+    EXPECT_TRUE(ContainsRegex(log_preamble + "Test audit message(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "(.)+ uh oh"));
 
     logger->debug("Hola!");
     EXPECT_TRUE(ContainsRegex(log_preamble + "Hola!"));
@@ -159,6 +166,17 @@ TEST_F(LoggerImplTests, ProperLoggerUsage)
 
     logger->trace("Hola {}{}", "World", "!");
     EXPECT_TRUE(ContainsRegex(log_preamble + "Hola World!"));
+
+    logger->trace("Test trace message",
+                std::make_exception_ptr<std::runtime_error>(std::runtime_error("uh oh")));
+    EXPECT_TRUE(ContainsRegex(log_preamble + "Test trace message(\\n)" + exception_preamble + "(.)+ uh oh"));
+
+    logger->trace("Test trace message", cppmicroservices::ServiceReferenceU {});
+    EXPECT_TRUE(ContainsRegex(log_preamble + "Test trace message(\\n)" + svcRef_preamble + "Invalid service reference"));
+
+    logger->trace("Test trace message", cppmicroservices::ServiceReferenceU {},  std::make_exception_ptr<std::runtime_error>(std::runtime_error("uh oh")));
+    EXPECT_TRUE(ContainsRegex(log_preamble + "Test trace message(\\n)" + svcRef_preamble + "Invalid service reference(\\n)" + exception_preamble + "(.)+ uh oh"));
+
 }
 
 TEST_F(LoggerImplTests, InvalidLoggerUsage)

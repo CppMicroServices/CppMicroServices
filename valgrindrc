@@ -1,3 +1,4 @@
 --memcheck:leak-check=full
 --memcheck:show-reachable=no
+--memcheck:gen-suppressions=all
 --suppressions=@PROJECT_SOURCE_DIR@/valgrind_suppressions.txt

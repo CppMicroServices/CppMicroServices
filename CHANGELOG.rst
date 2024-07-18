@@ -6,6 +6,34 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+`v3.8.4 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.4>`_ (2024-6-6)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.3...3.8.4>`_
+
+Added
+-----
+
+Changed
+-------
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Event Admin] Created Event Admin Interface <https://github.com/CppMicroServices/CppMicroServices/pull/658>`_
+- `[Core Framework] Deterministic Builds on all platforms <https://github.com/CppMicroServices/CppMicroServices/pull/996>`_
+- `[Configuration Admin] Remove Registration of Factory Configuration object even with valid config <https://github.com/CppMicroServices/CppMicroServices/pull/1006>`_
+- `[Declarative Services] handle invalid sevice objects in removeFromBoundServicesCache <https://github.com/CppMicroServices/CppMicroServices/pull/1007>`_
+- `[Declarative Services] Release Lock Sooner in SCRRegistryExtension::Remove and SCRRegistryExtension::Clear <https://github.com/CppMicroServices/CppMicroServices/pull/1008>`_
+- `[Core Framework] Add Tests to verify support of nested AnyMaps in initializer lists <https://github.com/CppMicroServices/CppMicroServices/pull/1011>`_
+- `[Declarative Services] Suppress Valgrind false positives <https://github.com/CppMicroServices/CppMicroServices/pull/1015>`_
+- `[Declarative Services] Release lock before calling customer code for config changes <https://github.com/CppMicroServices/CppMicroServices/pull/1012>`_
+
 `v3.8.3 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.3>`_ (2024-4-12)
 ---------------------------------------------------------------------------------------------------------
 

@@ -25,7 +25,8 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 #include <cppmicroservices/ServiceTracker.h>
-#include <cppmicroservices/SafeFuture.h>
+#include <cppmicroservices/ThreadpoolSafeFuture.h>
+#include <cppmicroservices/ThreadpoolSafeFuture.h>
 
 namespace test
 {
@@ -183,7 +184,7 @@ namespace test
         // Create some factory configuration objects. Don't wait for one to complete before
         // creating the next one.
         constexpr auto count = 10;
-        std::vector<cppmicroservices::SafeFuture> futures;
+        std::vector<std::shared_future<void>> futures;
 
         for (int i = 0; i < count; i++)
         {

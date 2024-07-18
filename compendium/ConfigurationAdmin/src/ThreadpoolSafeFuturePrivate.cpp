@@ -20,26 +20,28 @@
 
 =============================================================================*/
 
-#include "cppmicroservices/SafeFuture.h"
+#include "ThreadpoolSafeFuturePrivate.hpp"
+#include <chrono>
+#include <future>
 
-namespace cppmicroservices
+namespace cppmicroservices::cmimpl
 {
 
-    SafeFuture::SafeFuture(std::shared_future<void> future,
-                           std::shared_ptr<std::atomic<bool>> asyncStarted,
-                           std::shared_ptr<std::packaged_task<void(bool)>> task)
+    ThreadpoolSafeFuturePrivate::ThreadpoolSafeFuturePrivate(std::shared_future<void> future,
+                                                             std::shared_ptr<std::atomic<bool>> asyncStarted,
+                                                             std::shared_ptr<std::packaged_task<void(bool)>> task)
         : future(future)
         , asyncStarted(asyncStarted)
         , task(task)
     {
     }
     void
-    SafeFuture::get() const
+    ThreadpoolSafeFuturePrivate::get() const
     {
         return wait();
     }
     void
-    SafeFuture::wait() const
+    ThreadpoolSafeFuturePrivate::wait() const
     {
         // ensure that asyncTaskMap and asyncTaskStateMap are cleared even if task throws
 
@@ -64,4 +66,4 @@ namespace cppmicroservices
         future.get();
     }
 
-} // namespace cppmicroservices
+} // namespace cppmicroservices::cmimpl

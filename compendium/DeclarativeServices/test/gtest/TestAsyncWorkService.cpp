@@ -395,7 +395,7 @@ namespace test
                 });
 
                 auto fut = configuration->Update(props);
-                ASSERT_EQ(fut.wait_for(std::chrono::milliseconds(50)), std::future_status::timeout);
+                ASSERT_EQ(fut.wait_for(std::chrono::milliseconds(400)), std::future_status::timeout);
             });
 
         std::shared_future<void> fut = unsafe_post_task.get_future().share();

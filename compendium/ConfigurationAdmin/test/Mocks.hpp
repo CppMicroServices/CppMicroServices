@@ -122,14 +122,12 @@ namespace cppmicroservices
             MOCK_METHOD1(AddConfigurations,
                          std::vector<ConfigurationAddedInfo>(std::vector<metadata::ConfigurationMetadata>));
             MOCK_METHOD1(RemoveConfigurations, void(std::vector<ConfigurationAddedInfo>));
-            MOCK_METHOD2(
-                NotifyConfigurationUpdated,
-                SafeFuture(std::string const&,
-                                                                                          unsigned long const));
+            MOCK_METHOD2(NotifyConfigurationUpdated,
+                         std::shared_ptr<ThreadpoolSafeFuturePrivate>(std::string const&, unsigned long const));
             MOCK_METHOD3(NotifyConfigurationRemoved,
-                         SafeFuture(std::string const&,
-                                                                                                   std::uintptr_t,
-                                                                                                   unsigned long));
+                         std::shared_ptr<ThreadpoolSafeFuturePrivate>(std::string const&,
+                                                                      std::uintptr_t,
+                                                                      unsigned long));
         };
 
         namespace async

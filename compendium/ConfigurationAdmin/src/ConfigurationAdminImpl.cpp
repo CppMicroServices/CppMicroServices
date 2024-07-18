@@ -596,7 +596,7 @@ namespace cppmicroservices
             }
         }
 
-        SafeFuture
+        std::shared_ptr<ThreadpoolSafeFuturePrivate>
         ConfigurationAdminImpl::NotifyConfigurationUpdated(std::string const& pid, unsigned long const changeCount)
         {
             // NotifyConfigurationUpdated will only send a notification to the service if
@@ -739,13 +739,13 @@ namespace cppmicroservices
             return fut;
         }
 
-        SafeFuture
+        std::shared_ptr<ThreadpoolSafeFuturePrivate>
         ConfigurationAdminImpl::NotifyConfigurationRemoved(std::string const& pid,
                                                            std::uintptr_t configurationId,
                                                            unsigned long changeCount)
         {
             std::promise<void> ready;
-            SafeFuture alreadyRemoved = SafeFuture(ready.get_future());
+            auto alreadyRemoved = std::make_shared<ThreadpoolSafeFuturePrivate>(ready.get_future().share(), nullptr, nullptr);
             std::shared_ptr<ConfigurationImpl> configurationToInvalidate;
             bool hasBeenUpdated = false;
             {
@@ -1033,7 +1033,7 @@ namespace cppmicroservices
         using PostTask = std::packaged_task<void()>;
 
         template <typename Functor>
-        SafeFuture
+        std::shared_ptr<ThreadpoolSafeFuturePrivate>
         ConfigurationAdminImpl::PerformAsync(Functor&& f)
         {
 
@@ -1100,7 +1100,7 @@ namespace cppmicroservices
 
             asyncWorkService->post(std::move(post_task));
 
-            return SafeFuture(fut, asyncStarted, taskPtr);
+            return std::make_shared<ThreadpoolSafeFuturePrivate>(fut, asyncStarted, taskPtr);
         }
 
         std::string

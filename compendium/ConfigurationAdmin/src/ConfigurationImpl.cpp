@@ -103,11 +103,17 @@ namespace cppmicroservices
         std::shared_future<void>
         ConfigurationImpl::Update(AnyMap newProperties)
         {
-            return SafeUpdate(newProperties).retrieveFuture();
+            return SafeUpdateImpl(newProperties)->retrieveFuture();
         }
 
-        SafeFuture
+        std::shared_ptr<ThreadpoolSafeFuture>
         ConfigurationImpl::SafeUpdate(AnyMap newProperties)
+        {
+            return SafeUpdateImpl(newProperties);
+        }
+
+        std::shared_ptr<ThreadpoolSafeFuturePrivate>
+        ConfigurationImpl::SafeUpdateImpl(AnyMap newProperties)
         {
             {
                 std::lock_guard<std::mutex> lk { propertiesMutex };
@@ -126,18 +132,25 @@ namespace cppmicroservices
             std::promise<void> ready;
             std::shared_future<void> fut = ready.get_future();
             ready.set_value();
-            return SafeFuture(fut, nullptr, nullptr);
+            return std::make_shared<ThreadpoolSafeFuturePrivate>(fut, nullptr, nullptr);
         }
 
         std::pair<bool, std::shared_future<void>>
         ConfigurationImpl::UpdateIfDifferent(AnyMap newProperties)
         {
-            auto tup = SafeUpdateIfDifferent(newProperties);
+            auto tup = SafeUpdateIfDifferentImpl(newProperties);
 
-            return std::make_pair(std::get<0>(tup), std::get<1>(tup).retrieveFuture());
+            return std::make_pair(std::get<0>(tup), std::get<1>(tup)->retrieveFuture());
         }
-        std::pair<bool, SafeFuture>
+
+        std::pair<bool, std::shared_ptr<ThreadpoolSafeFuture>>
         ConfigurationImpl::SafeUpdateIfDifferent(AnyMap newProperties)
+        {
+            return SafeUpdateIfDifferentImpl(newProperties);
+        }
+
+        std::pair<bool, std::shared_ptr<ThreadpoolSafeFuturePrivate>>
+        ConfigurationImpl::SafeUpdateIfDifferentImpl(AnyMap newProperties)
         {
             std::promise<void> ready;
             std::shared_future<void> fut = ready.get_future();
@@ -145,26 +158,36 @@ namespace cppmicroservices
             if (!updated.first)
             {
                 ready.set_value();
-                return std::pair<bool, SafeFuture>(updated.first, SafeFuture(fut));
+                return std::pair<bool, std::shared_ptr<ThreadpoolSafeFuturePrivate>>(
+                    updated.first,
+                    std::make_shared<ThreadpoolSafeFuturePrivate>(fut));
             }
             std::lock_guard<std::mutex> lk { configAdminMutex };
             if (configAdminImpl)
             {
                 auto fut = configAdminImpl->NotifyConfigurationUpdated(pid, changeCount);
-                return std::pair<bool, SafeFuture>(true, fut);
+                return std::pair<bool, std::shared_ptr<ThreadpoolSafeFuturePrivate>>(true, fut);
             }
 
             ready.set_value();
-            return std::pair<bool, SafeFuture>(true, SafeFuture(fut));
+            return std::pair<bool, std::shared_ptr<ThreadpoolSafeFuturePrivate>>(
+                true,
+                std::make_shared<ThreadpoolSafeFuturePrivate>(fut));
         }
 
         std::shared_future<void>
         ConfigurationImpl::Remove()
         {
-            return SafeRemove().retrieveFuture();
+            return SafeRemoveImpl()->retrieveFuture();
         }
-        SafeFuture
+        std::shared_ptr<ThreadpoolSafeFuture>
         ConfigurationImpl::SafeRemove()
+        {
+            return SafeRemoveImpl();
+        }
+
+        std::shared_ptr<ThreadpoolSafeFuturePrivate>
+        ConfigurationImpl::SafeRemoveImpl()
         {
             {
                 std::lock_guard<std::mutex> lk { propertiesMutex };
@@ -186,9 +209,8 @@ namespace cppmicroservices
             std::promise<void> ready;
             std::shared_future<void> fut = ready.get_future();
             ready.set_value();
-            return SafeFuture(fut);
+            return std::make_shared<ThreadpoolSafeFuturePrivate>(fut);
         }
-
         std::pair<bool, unsigned long>
         ConfigurationImpl::UpdateWithoutNotificationIfDifferent(AnyMap newProperties)
         {

@@ -31,9 +31,9 @@
 #include <unordered_map>
 
 #include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/SafeFuture.h"
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
+#include "cppmicroservices/ThreadpoolSafeFuture.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
@@ -43,6 +43,7 @@
 
 #include "ConfigurationAdminPrivate.hpp"
 #include "ConfigurationImpl.hpp"
+#include "ThreadpoolSafeFuturePrivate.hpp"
 
 namespace cppmicroservices
 {
@@ -201,7 +202,9 @@ namespace cppmicroservices
              *
              * See {@code ConfigurationAdminPrivate#NotifyConfigurationUpdated}
              */
-            SafeFuture NotifyConfigurationUpdated(std::string const& pid, unsigned long const changeCount) override;
+            std::shared_ptr<ThreadpoolSafeFuturePrivate> NotifyConfigurationUpdated(
+                std::string const& pid,
+                unsigned long const changeCount) override;
 
             /**
              * Internal method used by {@code ConfigurationImpl} to notify any {@code ManagedService} or
@@ -210,9 +213,9 @@ namespace cppmicroservices
              *
              * See {@code ConfigurationAdminPrivate#NotifyConfigurationRemoved}
              */
-            SafeFuture NotifyConfigurationRemoved(std::string const& pid,
-                                                  std::uintptr_t configurationId,
-                                                  unsigned long changeCount) override;
+            std::shared_ptr<ThreadpoolSafeFuturePrivate> NotifyConfigurationRemoved(std::string const& pid,
+                                                            std::uintptr_t configurationId,
+                                                            unsigned long changeCount) override;
 
             // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedService
             std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>> AddingService(
@@ -245,8 +248,7 @@ namespace cppmicroservices
           private:
             // Convenience wrapper which is used to perform asyncronous operations
             template <typename Functor>
-            SafeFuture
-            PerformAsync(Functor&& f);
+            std::shared_ptr<ThreadpoolSafeFuturePrivate> PerformAsync(Functor&& f);
 
             // Used to generate a random instance name for CreateFactoryConfiguration
             std::string RandomInstanceName();

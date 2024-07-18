@@ -30,42 +30,37 @@ DEALINGS IN THE SOFTWARE.
 
 =========================================================================*/
 
-#ifndef CPPMICROSERVICES_SAFEFUTURE_H
-#define CPPMICROSERVICES_SAFEFUTURE_H
+#ifndef CPPMICROSERVICES_THREADPOOLSAFEFUTUREPRIVATE_H
+#define CPPMICROSERVICES_THREADPOOLSAFEFUTUREPRIVATE_H
 
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/detail/ScopeGuard.h"
+#include "cppmicroservices/ThreadpoolSafeFuture.h"
 
 #include <future>
 #include <vector>
 
-namespace cppmicroservices
+namespace cppmicroservices::cmimpl
 {
     using ActualTask = std::packaged_task<void(bool)>;
     using PostTask = std::packaged_task<void()>;
-    class US_Framework_EXPORT SafeFuture
+    class ThreadpoolSafeFuturePrivate
+        : public cppmicroservices::ThreadpoolSafeFuture
     {
       public:
-        SafeFuture(std::shared_future<void> future,
-                   std::shared_ptr<std::atomic<bool>> asyncStarted = nullptr,
-                   std::shared_ptr<ActualTask> task = nullptr);
-        SafeFuture() = default;
+        ThreadpoolSafeFuturePrivate(std::shared_future<void> future,
+                                    std::shared_ptr<std::atomic<bool>> asyncStarted = nullptr,
+                                    std::shared_ptr<ActualTask> task = nullptr);
+        ThreadpoolSafeFuturePrivate() = default;
 
         // Destructor
-        ~SafeFuture() = default;
+        ~ThreadpoolSafeFuturePrivate() = default;
 
-        // Copy constructor
-        SafeFuture(SafeFuture const& other) = default;
-
-        // Copy assignment operator
-        SafeFuture& operator=(SafeFuture const& other) = default;
-
-        // Move constructor
-        SafeFuture(SafeFuture&& other) noexcept = default;
-
-        // Move assignment operator
-        SafeFuture& operator=(SafeFuture&& other) noexcept = default;
+        ThreadpoolSafeFuturePrivate(ThreadpoolSafeFuturePrivate const& other) = delete;
+        ThreadpoolSafeFuturePrivate& operator=(ThreadpoolSafeFuturePrivate const& other) = delete;
+        ThreadpoolSafeFuturePrivate(ThreadpoolSafeFuturePrivate&& other) noexcept = default;
+        ThreadpoolSafeFuturePrivate& operator=(ThreadpoolSafeFuturePrivate&& other) noexcept = default;
 
         // Method to get the result
         void get() const;
@@ -77,7 +72,9 @@ namespace cppmicroservices
             return future.wait_for(timeout_duration);
         }
 
-        std::shared_future<void> retrieveFuture(){
+        std::shared_future<void>
+        retrieveFuture()
+        {
             return future;
         }
 
@@ -86,6 +83,6 @@ namespace cppmicroservices
         std::shared_ptr<std::atomic<bool>> asyncStarted;
         std::shared_ptr<ActualTask> task;
     };
-} // namespace cppmicroservices
+} // namespace cppmicroservices::cmimpl
 
-#endif // CPPMICROSERVICES_SAFEFUTURE_H
+#endif // CPPMICROSERVICES_THREADPOOLSAFEFUTUREPRIVATE_H

@@ -23,8 +23,8 @@
 #ifndef CONFIGURATIONADMINPRIVATE_HPP
 #define CONFIGURATIONADMINPRIVATE_HPP
 
+#include "ThreadpoolSafeFuturePrivate.hpp"
 #include "metadata/ConfigurationMetadata.hpp"
-#include "cppmicroservices/SafeFuture.h"
 #include <cstdint>
 #include <future>
 #include <vector>
@@ -98,7 +98,7 @@ namespace cppmicroservices
              *
              * @param pid The PID of the {@code Configuration} which has been updated
              */
-            virtual SafeFuture NotifyConfigurationUpdated(
+            virtual std::shared_ptr<ThreadpoolSafeFuturePrivate> NotifyConfigurationUpdated(
                 std::string const& pid,
                 unsigned long const changeCount)
                 = 0;
@@ -112,7 +112,7 @@ namespace cppmicroservices
              * @param configurationId The unique id of the configuration which has been removed. Used to avoid race
              * conditions.
              */
-            virtual SafeFuture NotifyConfigurationRemoved(
+            virtual std::shared_ptr<ThreadpoolSafeFuturePrivate> NotifyConfigurationRemoved(
                 std::string const& pid,
                 std::uintptr_t configurationId,
                 unsigned long changeCount)

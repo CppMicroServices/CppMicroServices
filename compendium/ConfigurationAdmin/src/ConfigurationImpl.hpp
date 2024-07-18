@@ -97,7 +97,7 @@ namespace cppmicroservices
             /**
              * Update the properties of this Configuration and return
              *
-             * @return A ThreadpoolSafeFuture, safe to wait on from within the
+             * @return A std::shared_ptr<ThreadpoolSafeFuture>, safe to wait on from within the
              * AsyncWorkService used by the Framework
              *
              * See {@code Configuration#Update}
@@ -118,7 +118,7 @@ namespace cppmicroservices
             /**
              * Update the properties of this Configuration if they differ from the current properties.
              *
-             * @return A ThreadpoolSafeFuture, safe to wait on from within the
+             * @return A pair<bool, std::shared_ptr<ThreadpoolSafeFuture>>, safe to wait on from within the
              * AsyncWorkService used by the Framework
              *
              * See {@code Configuration#UpdateIfDifferent}
@@ -139,7 +139,7 @@ namespace cppmicroservices
             /**
              * Remove this Configuration from ConfigurationAdmin.
              *
-             * @return A ThreadpoolSafeFuture, safe to wait on from within the
+             * @return A std::shared_ptr<ThreadpoolSafeFuture>, safe to wait on from within the
              * AsyncWorkService used by the Framework
              *
              * See {@code Configuration#Remove}

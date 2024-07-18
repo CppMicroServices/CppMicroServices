@@ -120,7 +120,7 @@ namespace cppmicroservices
 
                 /**
                  * Same as Update() except:
-                 * @return a future that is safe to wait on from within a thread allocated to the AsyncWorkService
+                 * @return a std::shared_ptr<ThreadpoolSafeFuture> that is safe to wait on from within a thread allocated to the AsyncWorkService
                  */
                 virtual std::shared_ptr<ThreadpoolSafeFuture> SafeUpdate(
                     AnyMap properties = AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS })
@@ -157,7 +157,7 @@ namespace cppmicroservices
 
                 /**
                  * Same as UpdateIfDifferent() except:
-                 * @return a future that is safe to wait on from within a thread allocated to the AsyncWorkService
+                 * @return a std::shared_ptr<ThreadpoolSafeFuture> that is safe to wait on from within a thread allocated to the AsyncWorkService
                  */
                 virtual std::pair<bool, std::shared_ptr<ThreadpoolSafeFuture>> SafeUpdateIfDifferent(
                     AnyMap properties = AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS })
@@ -182,7 +182,7 @@ namespace cppmicroservices
 
                 /**
                  * Same as Remove() except:
-                 * @return a future that is safe to wait on from within a thread allocated to the AsyncWorkService
+                 * @return a std::shared_ptr<ThreadpoolSafeFuture> that is safe to wait on from within a thread allocated to the AsyncWorkService
                  */
                 virtual std::shared_ptr<ThreadpoolSafeFuture> SafeRemove() = 0;
             };

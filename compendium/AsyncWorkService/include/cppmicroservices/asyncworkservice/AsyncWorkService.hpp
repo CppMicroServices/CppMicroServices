@@ -69,16 +69,10 @@ namespace cppmicroservices
             virtual void post(std::packaged_task<void()>&& task) = 0;
 
             /**
-             * Optional method to wait for all currently executing tasks to finish
-             *
-             * @note If the AsyncWorkService does not implement this function and override,
-             * the call will default to noop.
+             * Method to wait for all tasks posted to the service to finish
              */
             virtual void
-            wait()
-            {
-                return;
-            }
+            waitForAllPostedTasksToRun() = 0;
         };
     } // namespace async
 } // namespace cppmicroservices

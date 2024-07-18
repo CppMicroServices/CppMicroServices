@@ -123,6 +123,29 @@ namespace test
             boost::asio::post(threadpool->get_executor(), [handler = std::move(handler)]() mutable { handler(); });
         }
 
+        void
+        waitForAllPostedTasksToRun() override
+        {
+            try
+            {
+                if (threadpool)
+                {
+                    try
+                    {
+                        threadpool->join();
+                    }
+                    catch (...)
+                    {
+                        //
+                    }
+                }
+            }
+            catch (...)
+            {
+                //
+            }
+        }
+
       private:
         std::shared_ptr<boost::asio::thread_pool> threadpool;
     };
@@ -366,48 +389,18 @@ namespace test
         ASSERT_TRUE(service) << "GetService failed for CAInterface.";
     }
 
-    class Barrier
+    class postWithSynchronization : public cppmicroservices::async::AsyncWorkService
     {
       public:
-        Barrier(std::size_t count) : threshold(count), count(count), generation(0) {}
-
-        void
-        Wait()
-        {
-            std::unique_lock<std::mutex> lock(mutex);
-            auto gen = generation;
-            if (--count == 0)
-            {
-                generation++;
-                count = threshold;
-                cond.notify_all();
-            }
-            else
-            {
-                cond.wait(lock, [this, gen] { return gen != generation; });
-            }
-        }
-
-      private:
-        std::mutex mutex;
-        std::condition_variable cond;
-        std::size_t threshold;
-        std::size_t count;
-        std::size_t generation;
-    };
-
-    class sync : public cppmicroservices::async::AsyncWorkService
-    {
-      public:
-        sync() = default;
-        virtual ~sync() = default;
+        postWithSynchronization() = default;
+        virtual ~postWithSynchronization() = default;
         virtual void postWithSync(std::packaged_task<void()>&&, std::shared_ptr<Barrier>) {};
     };
 
-    class AsyncWorkServiceThreadPoolWithSync : public sync
+    class AsyncWorkServiceThreadPoolWithSync : public postWithSynchronization
     {
       public:
-        AsyncWorkServiceThreadPoolWithSync(int nThreads) : sync()
+        AsyncWorkServiceThreadPoolWithSync(int nThreads) : postWithSynchronization()
         {
             threadpool = std::make_shared<boost::asio::thread_pool>(nThreads);
         }
@@ -463,7 +456,7 @@ namespace test
         }
 
         void
-        wait() override
+        waitForAllPostedTasksToRun() override
         {
             if (threadpool)
             {
@@ -488,7 +481,7 @@ namespace test
         using namespace std::literals::chrono_literals;
 
         auto ctx = framework.GetBundleContext();
-        cppmicroservices::ServiceRegistration<sync> reg;
+        cppmicroservices::ServiceRegistration<postWithSynchronization> reg;
         constexpr size_t total_tasks = 6;
 
         {
@@ -496,12 +489,12 @@ namespace test
             // tasks are allocated and waiting on tasks behind them in the queue. However, it has to be small enough
             // that not all the 'external' tasks and 'internal' tasks can be allocated at the same time
             auto param = std::make_shared<AsyncWorkServiceThreadPoolWithSync>(total_tasks + 1);
-            reg = ctx.RegisterService<sync, cppmicroservices::async::AsyncWorkService>(param);
+            reg = ctx.RegisterService<postWithSynchronization, cppmicroservices::async::AsyncWorkService>(param);
         }
 
         // ASYNCWORKSERVICE
-        auto srAWS = ctx.GetServiceReference<sync>();
-        auto asyncWorkService = ctx.GetService<sync>(srAWS);
+        auto srAWS = ctx.GetServiceReference<postWithSynchronization>();
+        auto asyncWorkService = ctx.GetService<postWithSynchronization>(srAWS);
         // CA
         ::test::InstallAndStartConfigAdmin(ctx);
 

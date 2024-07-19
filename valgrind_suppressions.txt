@@ -653,3 +653,59 @@
    ...
    fun:_ZN59TestBundleValidation_BundleValidationFunctionException_Test8TestBodyEv
 }
+
+{
+   <usDeclarativeServicesTestsSuppression19>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN16cppmicroservices7scrimpl54ComponentRegistryTest_VerifyConcurrentAddsRemoves_Test8TestBodyEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression20>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN16cppmicroservices7scrimpl89SingletonComponentConfigurationTest_TestConcurrentCreateAndActivateComponentInstance_Test8TestBodyEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression21>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN16cppmicroservices7scrimpl44SCRLoggerTest_VerifyMultiThreadedAccess_Test8TestBodyEv
+   ...
+}
+
+{
+   <usDeclarativeServicesTestsSuppression22>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:calloc
+   fun:allocate_dtv
+   fun:_dl_allocate_tls
+   fun:allocate_stack
+   ...
+   fun:_ZN16cppmicroservices7scrimpl70ComponentConfigurationImplTest_VerifyConcurrentActivateDeactivate_Test8TestBodyEv
+   ...
+}

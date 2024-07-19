@@ -482,7 +482,7 @@ namespace test
 
         auto ctx = framework.GetBundleContext();
         cppmicroservices::ServiceRegistration<postWithSynchronization> reg;
-        constexpr size_t total_tasks = 6;
+        constexpr int total_tasks = 6;
 
         {
             // thread pool size should be the total tasks +1 so that we make sure that we don't deadlock because all 6
@@ -506,7 +506,7 @@ namespace test
         auto waitForInitialWave = std::make_shared<Barrier>(total_tasks + 1);
         std::atomic<int> counter(total_tasks);
 
-        for (size_t i = 0; i < total_tasks; ++i)
+        for (int i = 0; i < total_tasks; ++i)
         {
             std::packaged_task<void()> post_task(
                 [asyncWorkService, &waitForInitialWave, &counter]() mutable

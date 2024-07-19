@@ -32,6 +32,9 @@ DEALINGS IN THE SOFTWARE.
 
 #include <cppmicroservices/ThreadpoolSafeFuture.h>
 
-namespace cppmicroservices {
+namespace cppmicroservices
+{
     ThreadpoolSafeFuture::ThreadpoolSafeFuture() = default;
-}
+    ThreadpoolSafeFuture::~ThreadpoolSafeFuture() = default;
+
+} // namespace cppmicroservices

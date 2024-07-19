@@ -33,10 +33,9 @@ DEALINGS IN THE SOFTWARE.
 #ifndef CPPMICROSERVICES_THREADPOOLSAFEFUTURE_H
 #define CPPMICROSERVICES_THREADPOOLSAFEFUTURE_H
 
-#include <cstdint>
 #include "cppmicroservices/FrameworkExport.h"
+#include <cstdint>
 #include <future>
-
 
 namespace cppmicroservices
 {
@@ -49,6 +48,7 @@ namespace cppmicroservices
         ThreadpoolSafeFuture& operator=(ThreadpoolSafeFuture const& other) = default;
         ThreadpoolSafeFuture(ThreadpoolSafeFuture&& other) noexcept;
         ThreadpoolSafeFuture& operator=(ThreadpoolSafeFuture&& other) noexcept = default;
+        virtual ~ThreadpoolSafeFuture();
 
         /**
          * Compares this \c ThreadpoolSafeFuture object with the specified ThreadpoolSafeFuture.

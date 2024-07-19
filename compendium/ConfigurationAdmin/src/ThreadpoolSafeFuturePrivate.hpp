@@ -51,7 +51,7 @@ namespace cppmicroservices::cmimpl
         ThreadpoolSafeFuturePrivate() = default;
 
         // Destructor
-        ~ThreadpoolSafeFuturePrivate() = default;
+        ~ThreadpoolSafeFuturePrivate() override = default;
 
         ThreadpoolSafeFuturePrivate(ThreadpoolSafeFuturePrivate const& other) = delete;
         ThreadpoolSafeFuturePrivate& operator=(ThreadpoolSafeFuturePrivate const& other) = delete;

@@ -57,7 +57,7 @@ namespace cppmicroservices
          *
          * @see operator bool() const
          */
-        virtual ~ThreadpoolSafeFuture() = default;
+        virtual ~ThreadpoolSafeFuture();
 
         /**
          * Compares this \c ThreadpoolSafeFuture object with the specified ThreadpoolSafeFuture.
@@ -107,7 +107,7 @@ namespace cppmicroservices
         std::future_status wait_for(std::chrono::duration<Rep, Period> const& timeout_duration) const;
 
       protected:
-        ThreadpoolSafeFuture() = default;
+        ThreadpoolSafeFuture();
     };
 } // namespace cppmicroservices
 

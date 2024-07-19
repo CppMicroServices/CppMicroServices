@@ -33,20 +33,16 @@ DEALINGS IN THE SOFTWARE.
 #ifndef CPPMICROSERVICES_THREADPOOLSAFEFUTUREPRIVATE_H
 #define CPPMICROSERVICES_THREADPOOLSAFEFUTUREPRIVATE_H
 
-#include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/Framework.h"
-#include "cppmicroservices/detail/ScopeGuard.h"
 #include "cppmicroservices/ThreadpoolSafeFuture.h"
 
 #include <future>
-#include <vector>
 
 namespace cppmicroservices::cmimpl
 {
+
     using ActualTask = std::packaged_task<void(bool)>;
     using PostTask = std::packaged_task<void()>;
-    class ThreadpoolSafeFuturePrivate
-        : public cppmicroservices::ThreadpoolSafeFuture
+    class ThreadpoolSafeFuturePrivate : public cppmicroservices::ThreadpoolSafeFuture
     {
       public:
         ThreadpoolSafeFuturePrivate(std::shared_future<void> future,

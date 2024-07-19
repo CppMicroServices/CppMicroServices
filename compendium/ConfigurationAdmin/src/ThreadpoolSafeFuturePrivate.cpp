@@ -24,6 +24,8 @@
 #include <chrono>
 #include <future>
 
+::cppmicroservices::ThreadpoolSafeFuture::~ThreadpoolSafeFuture() = default;
+::cppmicroservices::ThreadpoolSafeFuture::ThreadpoolSafeFuture() = default;
 namespace cppmicroservices::cmimpl
 {
 

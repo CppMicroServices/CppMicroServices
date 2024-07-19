@@ -33,6 +33,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include "Mocks.h"
+#include "MockUtils.h"
 
 #include "../../src/bundle/BundleManifest.h"
 #include "cppmicroservices/BundleResourceStream.h"
@@ -42,6 +44,10 @@
 US_MSVC_PUSH_DISABLE_WARNING(4996)
 
 using namespace cppmicroservices;
+using ::testing::_;
+using ::testing::Eq;
+using ::testing::Return;
+using ::testing::AtLeast;
 
 namespace
 {
@@ -117,12 +123,26 @@ namespace
 class BundleManifestTest : public ::testing::Test
 {
   protected:
-    BundleManifestTest() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
+    BundleManifestTest()
+        : bundleStorage(new MockBundleStorageMemory())
+        , mockEnv(MockedEnvironment(bundleStorage))
+        , framework(mockEnv.framework) {}
     virtual ~BundleManifestTest() = default;
 
     virtual void
     SetUp()
     {
+        ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq("main"), _))
+            .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+                bundleStorage,
+                std::make_shared<MockBundleResourceContainer>(),
+                "MOCK", "main", 1,
+                AnyMap({
+                    { "bundle.activator", Any(true) },
+                    { "bundle.symbolic_name", Any(std::string("FrameworkBundle")) }
+                })
+            )));
+        EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq("main"), _)).Times(AtLeast(1));
         framework.Start();
     }
 
@@ -133,7 +153,9 @@ class BundleManifestTest : public ::testing::Test
         framework.WaitForStop(std::chrono::milliseconds::zero());
     }
 
-    cppmicroservices::Framework framework;
+    cppmicroservices::MockBundleStorageMemory* bundleStorage;
+    cppmicroservices::MockedEnvironment mockEnv;
+    cppmicroservices::Framework& framework;
 };
 
 TEST_F(BundleManifestTest, UnicodeProperty)
@@ -141,45 +163,50 @@ TEST_F(BundleManifestTest, UnicodeProperty)
     // 1. building static libraries (test bundle is included in the executable)
     // 2. using MINGW evironment (MinGW linker fails to link DLL with unicode path)
     // 3. using a compiler with no support for C++11 unicode string literals
-#if !defined(US_BUILD_SHARED_LIBS) || defined(__MINGW32__) || !defined(US_CXX_UNICODE_LITERALS)
+#if defined(__MINGW32__)
     SUCCEED() << "Skipping test point for unicode path";
 #else
-    MockCoreBundleContext cbc;
-    MockBundleStorageMemory *bsm = new MockBundleStorageMemory();
-    cbc.storage = std::unique_ptr<MockBundleStorageMemory>(bsm);
-
-    ON_CALL(*bsm, CreateAndInsertArchive(_, _, _))
+    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq("TestBundleU"), _))
         .WillByDefault(Return(std::make_shared<MockBundleArchive>(
-            bsm,
+            bundleStorage,
             std::make_shared<MockBundleResourceContainer>(),
             "MOCK", "TestBundleU", 1,
             AnyMap({
-                { "bundle.symbolic_name", Any(std::string("TestBundleU")) },
                 { "bundle.activator", Any(true) },
-                { "unicode.sample", "电脑 くいりのまちとこしくそ" }
+                { "bundle.symbolic_name", Any(std::string("TestBundleU")) },
+                { "unicode.sample", Any(std::string(u8"电脑 くいりのまちとこしくそ")) }
             })
         )));
-    EXPECT_CALL(*bsm, CreateAndInsertArchive(_, _, _)).Times(1);
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq("TestBundleU"), _)).Times(1);
 
-    std::shared_ptr<BundlePrivate> bp = std::make_shared<BundlePrivate>(&cbc);
-    std::shared_ptr<BundleContextPrivate> bcp = std::make_shared<BundleContextPrivate>(bp.get());
-    BundleContext bc = MakeBundleContext(bcp);
-
-    auto bundles = bc.InstallBundles("TestBundleU");
-    ASSERT_EQ(bundles.size(), 1) << "Failed to install bundle using a unicode path";
-    auto bundle = bundles.at(0);
+    auto bundle = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleU");
     std::string expectedValue = u8"电脑 くいりのまちとこしくそ";
     std::string actualValue = bundle.GetHeaders().at("unicode.sample").ToString();
-    ASSERT_STREQ(expectedValue, actualValue) << "Unicode data from manifest.json doesn't match expected value.";
+    ASSERT_EQ(expectedValue, actualValue) << "Unicode data from manifest.json doesn't match expected value.";
 #endif
 }
 
 TEST_F(BundleManifestTest, InstallBundleWithDeepManifest)
 {
+    /*
+    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, "TestBundleWithDeepManifest", _))
+        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+            bundleStorage,
+            std::make_shared<MockBundleResourceContainer>(),
+            "MOCK", "TestBundleWithDeepManifest", 1,
+            AnyMap({
+                { "bundle.activator", Any(true) },
+                { "bundle.symbolic_name", Any(std::string("TestBundleWithDeepManifest")) },
+                { "bundle.vendor", Any(std::string("The Company, Inc.")) },
+            })
+        )));
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, "TestBundleWithDeepManifest", _)).Times(1);
+    */
+
     auto bundle = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleWithDeepManifest");
     auto const& headers = bundle.GetHeaders();
     ASSERT_THAT(headers.at(Constants::BUNDLE_SYMBOLICNAME).ToString(), ::testing::StrEq("TestBundleWithDeepManifest"))
-        << "Bundle symblic name doesn't match.";
+        << "Bundle symbolic name doesn't match.";
 
     // The same key/value must continue to exist in the deprecated properties map.
     auto deprecatedProperties = bundle.GetProperties();

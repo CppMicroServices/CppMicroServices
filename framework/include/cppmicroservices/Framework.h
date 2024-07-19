@@ -36,6 +36,7 @@ namespace cppmicroservices
 
     class FrameworkEvent;
     class FrameworkPrivate;
+    class MockedEnvironment;
 
     /**
      * \ingroup MicroServices
@@ -246,6 +247,7 @@ namespace cppmicroservices
         // Framework instances are exclusively constructed by the FrameworkFactory class
         // and mock environment constructor
         friend class FrameworkFactory;
+        friend class MockedEnvironment;
 
         Framework(std::shared_ptr<FrameworkPrivate> const& d);
     };

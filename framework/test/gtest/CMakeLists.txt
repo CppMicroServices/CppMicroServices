@@ -97,6 +97,7 @@ set(_additional_srcs
   ../util/TestUtilBundleListener.cpp
   ../util/TestUtilFrameworkListener.cpp
   ../util/TestUtils.cpp
+  ../util/MockUtils.cpp
   ../util/ImportTestBundles.cpp
   $<TARGET_OBJECTS:util>
   )

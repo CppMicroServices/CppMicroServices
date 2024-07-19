@@ -74,6 +74,7 @@ namespace cppmicroservices
 
     struct BundleStorage;
     class FrameworkPrivate;
+    class MockedEnvironment;
 
     /**
      * This class is not part of the public API.
@@ -227,6 +228,7 @@ namespace cppmicroservices
 
         // The mock class invokes its parent's constructor
         friend class MockCoreBundleContext;
+        friend class MockedEnvironment;
 
         // Mutex required to be held when changing stopped.
         // ReadLock or WriteLock construction is done using this mutex.

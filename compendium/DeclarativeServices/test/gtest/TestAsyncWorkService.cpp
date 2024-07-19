@@ -415,7 +415,7 @@ namespace test
                 });
 
                 auto fut = configuration->SafeUpdate(props);
-                fut.get();
+                fut->get();
             });
 
         fut = safe_post_task.get_future().share();

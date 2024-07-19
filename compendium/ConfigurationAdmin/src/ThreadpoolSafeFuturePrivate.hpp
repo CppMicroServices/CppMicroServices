@@ -59,14 +59,9 @@ namespace cppmicroservices::cmimpl
         ThreadpoolSafeFuturePrivate& operator=(ThreadpoolSafeFuturePrivate&& other) noexcept = default;
 
         // Method to get the result
-        void get() const;
-        void wait() const;
-        template <class Rep, class Period>
-        std::future_status
-        wait_for(std::chrono::duration<Rep, Period> const& timeout_duration) const
-        {
-            return future.wait_for(timeout_duration);
-        }
+        void get() const override;
+        void wait() const override;
+        std::future_status wait_for(std::uint32_t const& timeout_duration_ms) const override;
 
         std::shared_future<void>
         retrieveFuture()

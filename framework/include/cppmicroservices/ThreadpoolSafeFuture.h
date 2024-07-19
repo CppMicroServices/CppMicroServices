@@ -33,9 +33,9 @@ DEALINGS IN THE SOFTWARE.
 #ifndef CPPMICROSERVICES_THREADPOOLSAFEFUTURE_H
 #define CPPMICROSERVICES_THREADPOOLSAFEFUTURE_H
 
-#include <future>
-#include <vector>
+#include <cstdint>
 #include "cppmicroservices/FrameworkExport.h"
+#include <future>
 
 
 namespace cppmicroservices
@@ -50,15 +50,6 @@ namespace cppmicroservices
         ThreadpoolSafeFuture(ThreadpoolSafeFuture&& other) noexcept;
         ThreadpoolSafeFuture& operator=(ThreadpoolSafeFuture&& other) noexcept = default;
 
-        /** 
-         * Constructs an invalid %ThreadpoolSafeFuture object.
-         *
-         * Valid ThreadpoolSafeFuture objects can only be created by the framework in
-         *
-         * @see operator bool() const
-         */
-        virtual ~ThreadpoolSafeFuture();
-
         /**
          * Compares this \c ThreadpoolSafeFuture object with the specified ThreadpoolSafeFuture.
          *
@@ -71,7 +62,7 @@ namespace cppmicroservices
          * @return \c true if this \c ThreadpoolSafeFuture object is equal to \c rhs,
          *         \c false otherwise.
          */
-        bool operator==(ThreadpoolSafeFuture const& rhs) const;
+        bool operator==(ThreadpoolSafeFuture const& rhs) const = delete;
 
         /**
          * Compares this \c ThreadpoolSafeFuture object with the specified ThreadpoolSafeFuture
@@ -80,7 +71,7 @@ namespace cppmicroservices
          * @param rhs The \c ThreadpoolSafeFuture object to compare this object with.
          * @return Returns the result of <code>!(*this == rhs)</code>.
          */
-        bool operator!=(ThreadpoolSafeFuture const& rhs) const;
+        bool operator!=(ThreadpoolSafeFuture const& rhs) const = delete;
 
         bool operator<(ThreadpoolSafeFuture const& rhs) const = delete;
 
@@ -101,10 +92,9 @@ namespace cppmicroservices
         ThreadpoolSafeFuture& operator=(std::nullptr_t);
 
         // Method to get the result
-        void get() const;
-        void wait() const;
-        template <class Rep, class Period>
-        std::future_status wait_for(std::chrono::duration<Rep, Period> const& timeout_duration) const;
+        virtual void get() const = 0;
+        virtual void wait() const = 0;
+        virtual std::future_status wait_for(std::uint32_t const& timeout_duration_ms) const = 0;
 
       protected:
         ThreadpoolSafeFuture();

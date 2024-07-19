@@ -24,8 +24,6 @@
 #include <chrono>
 #include <future>
 
-::cppmicroservices::ThreadpoolSafeFuture::~ThreadpoolSafeFuture() = default;
-::cppmicroservices::ThreadpoolSafeFuture::ThreadpoolSafeFuture() = default;
 namespace cppmicroservices::cmimpl
 {
 
@@ -66,6 +64,11 @@ namespace cppmicroservices::cmimpl
         // we can always get the future... if stalled, it'll be satisfied by WFF
         // execution of the task else it will be satisfied by already executed object
         future.get();
+    }
+
+    std::future_status ThreadpoolSafeFuturePrivate::wait_for(std::uint32_t const& timeout_duration_ms) const
+    {
+        return future.wait_for(std::chrono::milliseconds(timeout_duration_ms));
     }
 
 } // namespace cppmicroservices::cmimpl

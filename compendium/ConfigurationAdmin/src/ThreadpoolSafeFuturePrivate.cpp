@@ -26,12 +26,9 @@
 
 namespace cppmicroservices::cmimpl
 {
-
     ThreadpoolSafeFuturePrivate::ThreadpoolSafeFuturePrivate(std::shared_future<void> future,
-                                                             std::shared_ptr<std::atomic<bool>> asyncStarted,
-                                                             std::shared_ptr<std::packaged_task<void(bool)>> task)
+                                                             std::shared_ptr<SingleInvokeTask> task)
         : future(future)
-        , asyncStarted(asyncStarted)
         , task(task)
     {
     }
@@ -50,15 +47,7 @@ namespace cppmicroservices::cmimpl
         if (future.wait_for(timeout) == std::future_status::timeout)
         {
             // we expect that the asyncStarted is false -- i.e. stalled
-            auto expected = false;
-            auto desired = true;
-            // if it is *asyncStarted==false
-            if (asyncStarted->compare_exchange_strong(expected, desired))
-            {
-                // we pass in false because we always want to execute the task here
-                // dont have to catch because we know task has not executed elsewhere
-                (*task)(false);
-            }
+            (*task)();
         }
 
         // we can always get the future... if stalled, it'll be satisfied by WFF
@@ -66,7 +55,8 @@ namespace cppmicroservices::cmimpl
         future.get();
     }
 
-    std::future_status ThreadpoolSafeFuturePrivate::wait_for(std::uint32_t const& timeout_duration_ms) const
+    std::future_status
+    ThreadpoolSafeFuturePrivate::wait_for(std::uint32_t const& timeout_duration_ms) const
     {
         return future.wait_for(std::chrono::milliseconds(timeout_duration_ms));
     }

@@ -20,6 +20,7 @@ set(_private_headers
   ConfigurationImpl.hpp
   ConfigurationPrivate.hpp
   ThreadpoolSafeFuturePrivate.hpp
+  SingleInvokeTask.hpp
   metadata/ConfigurationMetadata.hpp
   metadata/MetadataParser.hpp
   metadata/MetadataParserFactory.hpp

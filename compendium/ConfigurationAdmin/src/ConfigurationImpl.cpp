@@ -132,7 +132,7 @@ namespace cppmicroservices
             std::promise<void> ready;
             std::shared_future<void> fut = ready.get_future();
             ready.set_value();
-            return std::make_shared<ThreadpoolSafeFuturePrivate>(fut, nullptr, nullptr);
+            return std::make_shared<ThreadpoolSafeFuturePrivate>(fut);
         }
 
         std::pair<bool, std::shared_future<void>>

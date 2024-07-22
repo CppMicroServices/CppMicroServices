@@ -30,45 +30,51 @@ DEALINGS IN THE SOFTWARE.
 
 =========================================================================*/
 
-#ifndef CPPMICROSERVICES_THREADPOOLSAFEFUTUREPRIVATE_H
-#define CPPMICROSERVICES_THREADPOOLSAFEFUTUREPRIVATE_H
-
-#include "SingleInvokeTask.hpp"
-#include "cppmicroservices/ThreadpoolSafeFuture.h"
+#ifndef CPPMICROSERVICES_SINGLEINVOKETASK_H
+#define CPPMICROSERVICES_SINGLEINVOKETASK_H
 
 #include <future>
+#include <mutex>
 
 namespace cppmicroservices::cmimpl
 {
-    class ThreadpoolSafeFuturePrivate : public cppmicroservices::ThreadpoolSafeFuture
+    using PostTask = std::packaged_task<void()>;
+    class SingleInvokeTask
     {
       public:
-        ThreadpoolSafeFuturePrivate(std::shared_future<void> future, std::shared_ptr<SingleInvokeTask> task = nullptr);
-        ThreadpoolSafeFuturePrivate() = default;
+        SingleInvokeTask(std::shared_ptr<PostTask> postedTask) : task(postedTask) {}
+        SingleInvokeTask(SingleInvokeTask const& other) = delete;
+        SingleInvokeTask& operator=(SingleInvokeTask const& other) = delete;
+        SingleInvokeTask(SingleInvokeTask&& other) = delete;
+        SingleInvokeTask& operator=(SingleInvokeTask&& other) = delete;
+        ~SingleInvokeTask() = default;
 
-        // Destructor
-        ~ThreadpoolSafeFuturePrivate() override = default;
+        bool operator==(SingleInvokeTask const& rhs) const = delete;
 
-        ThreadpoolSafeFuturePrivate(ThreadpoolSafeFuturePrivate const& other) = delete;
-        ThreadpoolSafeFuturePrivate& operator=(ThreadpoolSafeFuturePrivate const& other) = delete;
-        ThreadpoolSafeFuturePrivate(ThreadpoolSafeFuturePrivate&& other) noexcept = default;
-        ThreadpoolSafeFuturePrivate& operator=(ThreadpoolSafeFuturePrivate&& other) noexcept = default;
+        bool operator!=(SingleInvokeTask const& rhs) const = delete;
 
-        // Method to get the result
-        void get() const override;
-        void wait() const override;
-        std::future_status wait_for(std::uint32_t const& timeout_duration_ms) const override;
+        bool operator<(SingleInvokeTask const& rhs) const = delete;
 
-        std::shared_future<void>
-        retrieveFuture()
+        void
+        operator()()
         {
-            return future;
+            std::unique_lock<std::mutex> lock(l);
+            if (executed)
+            {
+                return;
+            }
+            else
+            {
+                executed = true;
+            }
+            (*task)();
         }
 
       private:
-        std::shared_future<void> future;
-        std::shared_ptr<SingleInvokeTask> task;
+        std::mutex l;
+        bool executed = false;
+        std::shared_ptr<PostTask> task;
     };
 } // namespace cppmicroservices::cmimpl
 
-#endif // CPPMICROSERVICES_THREADPOOLSAFEFUTUREPRIVATE_H
+#endif // CPPMICROSERVICES_SINGLEINVOKETASK_H

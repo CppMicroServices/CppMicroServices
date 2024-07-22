@@ -21,6 +21,7 @@
  =============================================================================*/
 
 #include <cassert>
+#include <memory>
 #include <stdexcept>
 #include <thread>
 
@@ -30,6 +31,7 @@
 
 #include "CMConstants.hpp"
 #include "ConfigurationAdminImpl.hpp"
+#include "SingleInvokeTask.hpp"
 
 using cppmicroservices::logservice::SeverityLevel;
 
@@ -745,8 +747,7 @@ namespace cppmicroservices
                                                            unsigned long changeCount)
         {
             std::promise<void> ready;
-            auto alreadyRemoved
-                = std::make_shared<ThreadpoolSafeFuturePrivate>(ready.get_future().share(), nullptr, nullptr);
+            auto alreadyRemoved = std::make_shared<ThreadpoolSafeFuturePrivate>(ready.get_future().share());
             std::shared_ptr<ConfigurationImpl> configurationToInvalidate;
             bool hasBeenUpdated = false;
             {
@@ -1030,7 +1031,6 @@ namespace cppmicroservices
                         "ManagedServiceFactory with PID " + service->getPid() + " has been removed.");
         }
 
-        using ActualTask = std::packaged_task<void(bool)>;
         using PostTask = std::packaged_task<void()>;
 
         template <typename Functor>
@@ -1041,10 +1041,9 @@ namespace cppmicroservices
             std::lock_guard<std::mutex> lk { futuresMutex };
             decltype(completeFutures) {}.swap(completeFutures);
             auto id = ++futuresID;
-            auto asyncStarted = std::make_shared<std::atomic<bool>>(false);
 
-            ActualTask task(
-                [this, func = std::forward<Functor>(f), id, asyncStarted](bool checkExecuted) mutable
+            PostTask task(
+                [this, func = std::forward<Functor>(f), id]() mutable
                 {
                     // func() can throw, make sure that the futures
                     // are correctly cleaned up if an exception occurs.
@@ -1061,48 +1060,19 @@ namespace cppmicroservices
                                 futuresCV.notify_one();
                             }
                         });
-                    if (checkExecuted)
-                    {
-                        bool expected = false;
-                        bool desired = true;
-                        // if asyncStarted is non null AND *asyncStarted==true
-                        if (asyncStarted && !asyncStarted->compare_exchange_strong(expected, desired))
-                        {
-                            // this is blocking and it has started
-                            return;
-                        }
-                        // else it is non-blocking or it has not started and we now own it
-                    }
                     func();
                 });
             std::shared_future<void> fut = task.get_future().share();
 
-            auto taskPtr = std::make_shared<ActualTask>(std::move(task));
-            // this task goes to async queue, we wan't to check if it is already executed
-            PostTask post_task(
-                [taskPtr, fut]() mutable
-                {
-                    try
-                    {
-                        (*taskPtr)(true);
-                    }
-                    catch (...)
-                    {
-                        std::cout << "task already executed" << std::endl;
-                        /*
-                         * task was already executed, by waiting thread, calling it
-                         * again will throw. This is expected, we can just catch and continue
-                         */
-                    }
-                    // get future to propogate real exceptions if any
-                    fut.get();
-                });
+            auto singleInvokeTask = std::make_shared<SingleInvokeTask>(std::make_shared<PostTask>(std::move(task)));
+
+            PostTask post_task([singleInvokeTask]() mutable { (*singleInvokeTask)(); });
 
             incompleteFutures.emplace(id, fut);
 
             asyncWorkService->post(std::move(post_task));
 
-            return std::make_shared<ThreadpoolSafeFuturePrivate>(fut, asyncStarted, taskPtr);
+            return std::make_shared<ThreadpoolSafeFuturePrivate>(fut, singleInvokeTask);
         }
 
         std::string

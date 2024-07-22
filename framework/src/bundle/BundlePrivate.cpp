@@ -725,9 +725,12 @@ namespace cppmicroservices
         if (true == bundleManifest.GetHeaders().empty())
         {
             // Check if the bundle provides a manifest.json file and if yes, parse it.
-            if (ba->IsValid())
+            // if (ba->IsValid())
+            std::vector<cppmicroservices::BundleResource> results = ba->FindResources("manifest.json", "", true);
+            if (results.size() == 1)
             {
-                auto manifestRes = ba->GetResource("/manifest.json");
+                //auto manifestRes = ba->GetResource("/manifest.json");
+                auto manifestRes = results.at(0);
                 if (manifestRes)
                 {
                     BundleResourceStream manifestStream(manifestRes);
@@ -781,9 +784,10 @@ namespace cppmicroservices
 
         if (!bundleManifest.Contains(Constants::BUNDLE_SYMBOLICNAME))
         {
-            throw std::invalid_argument(Constants::BUNDLE_SYMBOLICNAME
+            return;
+            /*throw std::invalid_argument(Constants::BUNDLE_SYMBOLICNAME
                                         + " is not defined in the bundle manifest for bundle " + symbolicName
-                                        + " (location=" + location + ").");
+                                        + " (location=" + location + ").");*/
         }
 
         Any bsn(bundleManifest.GetValue(Constants::BUNDLE_SYMBOLICNAME));

@@ -105,7 +105,7 @@ namespace cppmicroservices
     {
         d->InitFilePath(file);
 
-        d->stat.filePath = d->archive->GetResourcePrefix() + d->path + d->fileName;
+        d->stat.filePath = /* Commented because not good d->archive->GetResourcePrefix() +*/ d->path + d->fileName;
 
         d->archive->GetResourceContainer()->GetStat(d->stat);
 

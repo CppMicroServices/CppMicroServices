@@ -208,7 +208,7 @@ namespace cppmicroservices
         // Start bundles according to their autostart setting.
         for (auto i : bundlesToStart)
         {
-            auto b = coreCtx->bundleRegistry.GetBundle(i);
+            auto b = coreCtx->bundleRegistry->GetBundle(i);
             try
             {
                 int32_t const autostartSetting = b->barchive->GetAutostartSetting();
@@ -334,7 +334,7 @@ namespace cppmicroservices
     FrameworkPrivate::StopAllBundles()
     {
         // Stop all active bundles, in reverse bundle ID order
-        auto activeBundles = coreCtx->bundleRegistry.GetActiveBundles();
+        auto activeBundles = coreCtx->bundleRegistry->GetActiveBundles();
         for (auto iter = activeBundles.rbegin(); iter != activeBundles.rend(); ++iter)
         {
             auto b = *iter;
@@ -356,7 +356,7 @@ namespace cppmicroservices
             }
         }
 
-        auto allBundles = coreCtx->bundleRegistry.GetBundles();
+        auto allBundles = coreCtx->bundleRegistry->GetBundles();
 
         // Set state to BUNDLE_INSTALLED
         for (auto b : allBundles)

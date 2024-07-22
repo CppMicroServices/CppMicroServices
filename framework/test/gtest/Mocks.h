@@ -375,6 +375,7 @@ namespace cppmicroservices
     {
       public:
         using BundleMap = std::multimap<std::string, std::shared_ptr<BundlePrivate>>;
+        MockBundleRegistry() : BundleRegistry(nullptr) {}
         MockBundleRegistry(CoreBundleContext * coreCtx) : BundleRegistry(coreCtx) {}
         MOCK_METHOD0(Init, void());
         MOCK_METHOD0(Clear, void());
@@ -431,6 +432,7 @@ namespace cppmicroservices
 
     class MockBundleResourceContainer : public cppmicroservices::BundleResourceContainer
     {
+        using cppmicroservices::BundleResourceContainer::GetTopLevelDirs;
       public:
         MOCK_METHOD0(GetLocation, std::string());
         MOCK_METHOD0(GetTopLevelDirs, std::vector<std::string>());
@@ -467,6 +469,7 @@ namespace cppmicroservices
     {
       public:
         MockBundleStorageMemory() : BundleStorageMemory() {}
+        ~MockBundleStorageMemory() = default;
         MOCK_METHOD3(CreateAndInsertArchive, std::shared_ptr<BundleArchive>(const std::shared_ptr<BundleResourceContainer> &, const std::string &, const ManifestT &));
         MOCK_METHOD1(RemoveArchive, bool(const BundleArchive *));
         // TODO: MOCK_METHOD0(GetAllBundleArchives, std::vector<std::shared_ptr<BundleArchive>>());

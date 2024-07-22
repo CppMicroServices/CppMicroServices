@@ -341,7 +341,7 @@ namespace cppmicroservices
                 case Bundle::STATE_RESOLVED:
                 case Bundle::STATE_INSTALLED:
                 {
-                    coreCtx->bundleRegistry.Remove(location, id);
+                    coreCtx->bundleRegistry->Remove(location, id);
                     if (operation != BundlePrivate::OP_UNINSTALLING)
                     {
                         try
@@ -793,7 +793,7 @@ namespace cppmicroservices
                                         + symbolicName + "(location=" + location + ").");
         }
 
-        auto snbl = coreCtx->bundleRegistry.GetBundles(symbolicName, version);
+        auto snbl = coreCtx->bundleRegistry->GetBundles(symbolicName, version);
         if (!snbl.empty())
         {
             throw std::invalid_argument("Bundle " + symbolicName + " (location=" + location

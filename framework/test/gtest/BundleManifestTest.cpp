@@ -127,7 +127,8 @@ class BundleManifestTest : public ::testing::Test
         : bundleStorage(new MockBundleStorageMemory())
         , mockEnv(MockedEnvironment(bundleStorage))
         , framework(mockEnv.framework) {}
-    virtual ~BundleManifestTest() = default;
+    virtual ~BundleManifestTest()
+    {}
 
     virtual void
     SetUp()
@@ -166,23 +167,36 @@ TEST_F(BundleManifestTest, UnicodeProperty)
 #if defined(__MINGW32__)
     SUCCEED() << "Skipping test point for unicode path";
 #else
-    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq("TestBundleU"), _))
+    std::string bundleName = "TestBundleU";
+    AnyMap manifest = AnyMap({
+        { "bundle.activator", Any(true) },
+        { "bundle.symbolic_name", Any(std::string(bundleName)) },
+        { "unicode.sample", Any(std::string(u8"电脑 くいりのまちとこしくそ")) }
+    });
+
+    std::vector<std::string> files = {"TestBundleU"};
+    MockBundleResourceContainer* resCont = new MockBundleResourceContainer();
+    ON_CALL(*resCont, GetTopLevelDirs())
+        .WillByDefault(Return(files));
+    EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+
+    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _))
         .WillByDefault(Return(std::make_shared<MockBundleArchive>(
             bundleStorage,
-            std::make_shared<MockBundleResourceContainer>(),
-            "MOCK", "TestBundleU", 1,
-            AnyMap({
-                { "bundle.activator", Any(true) },
-                { "bundle.symbolic_name", Any(std::string("TestBundleU")) },
-                { "unicode.sample", Any(std::string(u8"电脑 くいりのまちとこしくそ")) }
-            })
+            std::shared_ptr<MockBundleResourceContainer>(resCont),
+            "MOCK", bundleName, 1,
+            manifest
         )));
-    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq("TestBundleU"), _)).Times(1);
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _)).Times(1);
 
-    auto bundle = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleU");
+    auto bundles = mockEnv.Install(bundleName, manifest, resCont);
+    ASSERT_EQ(1, bundles.size()) << "Mock bundle failed to install correctly.";
+    auto bundle = bundles[0];
     std::string expectedValue = u8"电脑 くいりのまちとこしくそ";
     std::string actualValue = bundle.GetHeaders().at("unicode.sample").ToString();
     ASSERT_EQ(expectedValue, actualValue) << "Unicode data from manifest.json doesn't match expected value.";
+
+    delete resCont;
 #endif
 }
 

@@ -141,6 +141,12 @@ namespace cppmicroservices
     std::vector<Bundle>
     BundleRegistry::Install(std::string const& location, BundlePrivate*, cppmicroservices::AnyMap const& bundleManifest)
     {
+        return Install1(location, bundleManifest, nullptr);
+    }
+
+    std::vector<Bundle>
+    BundleRegistry::Install1(std::string const& location, cppmicroservices::AnyMap const& bundleManifest, BundleResourceContainer* resCont)
+    {
         using namespace std::chrono_literals;
 
         CheckIllegalState();
@@ -180,17 +186,25 @@ namespace cppmicroservices
             l.UnLock();
             std::vector<Bundle> resultingBundles;
             std::vector<std::string> alreadyInstalled;
+            std::shared_ptr<BundleResourceContainer> resContPtr;
             // Populate the resultingBundles and alreadyInstalled vectors with the appropriate data
             // based on what bundles are already installed
-            auto resCont = GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange,
-                                                                location,
-                                                                bundleManifest,
-                                                                resultingBundles,
-                                                                alreadyInstalled);
-
+            if (resCont == nullptr)
+            {
+                resContPtr = GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange,
+                                                               location,
+                                                               bundleManifest,
+                                                               resultingBundles,
+                                                               alreadyInstalled);
+            }
+            else
+            {
+                resContPtr = std::shared_ptr<BundleResourceContainer>(resCont);
+            }
             // Perform the install
-            auto newBundles = Install0(location, resCont, alreadyInstalled, bundleManifest);
+            auto newBundles = Install0(location, resContPtr, alreadyInstalled, bundleManifest);
             resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());
+
             if (resultingBundles.empty())
             {
                 throw std::runtime_error("All bundles rejected by a bundle hook");
@@ -220,6 +234,7 @@ namespace cppmicroservices
                 l.UnLock();
 
                 std::vector<Bundle> installedBundles;
+                std::shared_ptr<BundleResourceContainer> resContPtr;
                 {
                     // create instance of clean-up object to ensure RAII
                     InitialBundleMapCleanup cleanup(
@@ -238,8 +253,15 @@ namespace cppmicroservices
                         });
 
                     // Perform the install
-                    auto resCont = std::make_shared<BundleResourceContainer>(location, bundleManifest);
-                    installedBundles = Install0(location, resCont, {}, bundleManifest);
+                    if (resCont == nullptr)
+                    {
+                        resContPtr = std::make_shared<BundleResourceContainer>(location, bundleManifest);
+                    }
+                    else
+                    {
+                        resContPtr = std::shared_ptr<BundleResourceContainer>(resCont);
+                    }
+                    installedBundles = Install0(location, resContPtr, {}, bundleManifest);
                 }
                 return installedBundles;
             }
@@ -270,11 +292,19 @@ namespace cppmicroservices
 
                 std::vector<Bundle> resultingBundles;
                 std::vector<std::string> alreadyInstalled;
-                auto resCont = GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange,
-                                                                    location,
-                                                                    bundleManifest,
-                                                                    resultingBundles,
-                                                                    alreadyInstalled);
+                std::shared_ptr<BundleResourceContainer> resContPtr;
+                if (resCont == nullptr)
+                {
+                    resContPtr = GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange,
+                                                                      location,
+                                                                      bundleManifest,
+                                                                      resultingBundles,
+                                                                      alreadyInstalled);
+                }
+                else
+                {
+                    resContPtr = std::shared_ptr<BundleResourceContainer>(resCont);
+                }
 
                 std::vector<Bundle> newBundles;
                 {
@@ -283,7 +313,7 @@ namespace cppmicroservices
                                                     { DecrementInitialBundleMapRef(l, location); });
 
                     // Perform the install
-                    newBundles = Install0(location, resCont, alreadyInstalled, bundleManifest);
+                    newBundles = Install0(location, resContPtr, alreadyInstalled, bundleManifest);
                 }
 
                 resultingBundles.insert(resultingBundles.end(), newBundles.begin(), newBundles.end());

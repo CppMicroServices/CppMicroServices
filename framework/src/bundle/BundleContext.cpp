@@ -141,7 +141,7 @@ namespace cppmicroservices
         d->CheckValid();
         auto b = GetAndCheckBundlePrivate(d);
 
-        return b->coreCtx->bundleHooks.FilterBundle(*this, MakeBundle(b->coreCtx->bundleRegistry.GetBundle(id)));
+        return b->coreCtx->bundleHooks.FilterBundle(*this, MakeBundle(b->coreCtx->bundleRegistry->GetBundle(id)));
     }
 
     std::vector<Bundle>
@@ -156,7 +156,7 @@ namespace cppmicroservices
         auto b = GetAndCheckBundlePrivate(d);
 
         std::vector<Bundle> res;
-        for (auto bu : b->coreCtx->bundleRegistry.GetBundles(location))
+        for (auto bu : b->coreCtx->bundleRegistry->GetBundles(location))
         {
             res.emplace_back(MakeBundle(bu));
         }
@@ -175,7 +175,7 @@ namespace cppmicroservices
         auto b = GetAndCheckBundlePrivate(d);
 
         std::vector<Bundle> bus;
-        for (auto bu : b->coreCtx->bundleRegistry.GetBundles())
+        for (auto bu : b->coreCtx->bundleRegistry->GetBundles())
         {
             bus.emplace_back(MakeBundle(bu));
         }
@@ -506,7 +506,7 @@ namespace cppmicroservices
         d->CheckValid();
         auto b = GetAndCheckBundlePrivate(d);
 
-        return b->coreCtx->bundleRegistry.Install(location, b.get(), bundleManifest);
+        return b->coreCtx->bundleRegistry->Install(location, b.get(), bundleManifest);
     }
 
 } // namespace cppmicroservices

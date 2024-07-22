@@ -32,13 +32,23 @@ namespace cppmicroservices
         : framework(FrameworkFactory().NewFramework())
     {
         framework.c->storage = std::unique_ptr<MockBundleStorageMemory>(bsm);
-        framework.c->bundleRegistry = MockBundleRegistry();
 
         coreBundleContext = framework.c.get();
-        bundleRegistry = &coreBundleContext.bundleRegistry;
+        delete coreBundleContext->bundleRegistry;
+        bundleRegistry = coreBundleContext->bundleRegistry = new MockBundleRegistry(coreBundleContext);
         bundlePrivate = framework.d.get();
         bundleContext = framework.GetBundleContext();
         bundleContextPrivate = bundleContext.d.get();
+    }
+
+    std::vector<Bundle>
+    MockedEnvironment::Install(
+        std::string& location,
+        cppmicroservices::AnyMap& bundleManifest,
+        MockBundleResourceContainer* resCont
+    )
+    {
+        return bundleRegistry->Install1(location, bundleManifest, resCont);
     }
 
 } // namespace cppmicroservices

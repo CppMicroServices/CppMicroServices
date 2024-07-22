@@ -168,7 +168,7 @@ namespace cppmicroservices
         /**
          * All installed bundles.
          */
-        BundleRegistry bundleRegistry;
+        BundleRegistry* bundleRegistry;
 
         bool firstInit;
 

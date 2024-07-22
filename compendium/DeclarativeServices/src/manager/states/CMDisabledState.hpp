@@ -29,6 +29,7 @@
 #    define FRIEND_TEST(x, y)
 #endif
 #include "ComponentManagerState.hpp"
+#include "../SingleInvokeTask.hpp"
 
 namespace cppmicroservices
 {
@@ -71,12 +72,12 @@ namespace cppmicroservices
              * separate thread.
              *
              * \param cm is the component manager which needs to be enabled
-             * \param asyncStarted synchronization atomic bool for async tasks
+             * \param singleInvoke SingleInvokeTask object managing the async execution
              * \return a future object representing the actions performed due to the state change
              *
              */
             std::shared_future<void> Enable(ComponentManagerImpl& cm,
-                                            std::shared_ptr<std::atomic<bool>> asyncStarted) override;
+                                            std::shared_ptr<SingleInvokeTask> singleInvoke) override;
 
             /**
              * This method returns the stored future object. Since this object
@@ -90,12 +91,12 @@ namespace cppmicroservices
              * receives the same future that was created by the first thread.
              *
              * \param cm is the component manager which needs to be disabled
-             * \param asyncStarted synchronization atomic bool for async tasks
+             * \param singleInvoke SingleInvokeTask object managing the async execution
              * \return a future object representing the actions performed due to the previous
              * change from ENABLED to DISABLED
              */
             std::shared_future<void> Disable(ComponentManagerImpl& cm,
-                                             std::shared_ptr<std::atomic<bool>> asyncStarted) override;
+                                             std::shared_ptr<SingleInvokeTask> singleInvoke) override;
 
             /**
              * Returns an empty vector because there are no configurations associated

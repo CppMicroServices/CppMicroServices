@@ -21,23 +21,23 @@
  =============================================================================*/
 
 #include "CFRLogger.h"
+//#include "CoreBundleContext.h"
 #include "cppmicroservices/GetBundleContext.h"
 
 namespace cppmicroservices
 {
     namespace cfrimpl
     {
-        CFRLogger::CFRLogger() : serviceTracker(), logService(nullptr) {}
+        CFRLogger::CFRLogger() : serviceTracker(), logService(nullptr) { }
 
-	CFRLogger::CFRLogger(cppmicroservices::BundleContext context)
+	 CFRLogger::CFRLogger(cppmicroservices::BundleContext context)
             : cfrContext(context)
-            , serviceTracker(
+	      ,serviceTracker(
                   std::make_unique<cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>(context,
                                                                                                                this))
-            , logService(nullptr)
-        {
-            serviceTracker->Open(); // Start tracking
-        }
+              ,logService(nullptr) {
+               serviceTracker->Open();
+    }
 
         CFRLogger::~CFRLogger()
         {
@@ -132,14 +132,22 @@ namespace cppmicroservices
         CFRLogger::getLogger(const std::string& name) const
 	{
 	     auto currLogger = std::atomic_load(&logService);
-	     return currLogger->getLogger(name);
+	     if (currLogger)
+	     {
+	     	return currLogger->getLogger(name);
+	     }
+	     return nullptr;
 	}
 
 	std::shared_ptr<cppmicroservices::logservice::Logger>
         CFRLogger::getLogger(const cppmicroservices::Bundle& bundle, const std::string& name) const
         {
              auto currLogger = std::atomic_load(&logService);
-             return currLogger->getLogger(bundle, name);
+	     if(currLogger)
+	     {
+		return currLogger->getLogger(bundle, name);
+	     }
+	     return nullptr;
         }
 
         void
@@ -170,6 +178,5 @@ namespace cppmicroservices
                 serviceTracker.reset();
             }
         }
-
     } // namespace cfrimpl
 } // namespace cppmicroservices

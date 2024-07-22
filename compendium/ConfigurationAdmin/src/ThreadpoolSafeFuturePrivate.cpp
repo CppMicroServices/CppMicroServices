@@ -53,7 +53,7 @@ namespace cppmicroservices::cmimpl
             auto expected = false;
             auto desired = true;
             // if it is *asyncStarted==false
-            if (std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
+            if (asyncStarted->compare_exchange_strong(expected, desired))
             {
                 // we pass in false because we always want to execute the task here
                 // dont have to catch because we know task has not executed elsewhere

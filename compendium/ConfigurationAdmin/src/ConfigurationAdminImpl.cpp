@@ -745,7 +745,8 @@ namespace cppmicroservices
                                                            unsigned long changeCount)
         {
             std::promise<void> ready;
-            auto alreadyRemoved = std::make_shared<ThreadpoolSafeFuturePrivate>(ready.get_future().share(), nullptr, nullptr);
+            auto alreadyRemoved
+                = std::make_shared<ThreadpoolSafeFuturePrivate>(ready.get_future().share(), nullptr, nullptr);
             std::shared_ptr<ConfigurationImpl> configurationToInvalidate;
             bool hasBeenUpdated = false;
             {
@@ -1065,7 +1066,7 @@ namespace cppmicroservices
                         bool expected = false;
                         bool desired = true;
                         // if asyncStarted is non null AND *asyncStarted==true
-                        if (asyncStarted && !std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
+                        if (asyncStarted && !asyncStarted->compare_exchange_strong(expected, desired))
                         {
                             // this is blocking and it has started
                             return;
@@ -1079,7 +1080,7 @@ namespace cppmicroservices
             auto taskPtr = std::make_shared<ActualTask>(std::move(task));
             // this task goes to async queue, we wan't to check if it is already executed
             PostTask post_task(
-                [taskPtr]() mutable
+                [taskPtr, fut]() mutable
                 {
                     try
                     {
@@ -1087,13 +1088,14 @@ namespace cppmicroservices
                     }
                     catch (...)
                     {
+                        std::cout << "task already executed" << std::endl;
                         /*
                          * task was already executed, by waiting thread, calling it
                          * again will throw. This is expected, we can just catch and continue
                          */
                     }
                     // get future to propogate real exceptions if any
-                    taskPtr->get_future().share().get();
+                    fut.get();
                 });
 
             incompleteFutures.emplace(id, fut);

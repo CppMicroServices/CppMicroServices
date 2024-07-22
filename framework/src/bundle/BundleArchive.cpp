@@ -137,8 +137,8 @@ namespace cppmicroservices
             normalizedPath.push_back('/');
         if (*normalizedPath.begin() != '/')
             normalizedPath = '/' + normalizedPath;
-        if (*normalizedPath.rbegin() != '/')
-            normalizedPath.push_back('/');
+        //if (*normalizedPath.rbegin() != '/')
+        //    normalizedPath.push_back('/');
         resourceContainer->FindNodes(this->shared_from_this(),
                                      resourcePrefix + normalizedPath,
                                      filePattern.empty() ? "*" : filePattern,

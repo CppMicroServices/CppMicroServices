@@ -58,10 +58,11 @@ namespace cppmicroservices
     BundleResourcePrivate::InitFilePath(std::string const& file)
     {
         std::string normalizedFile = file;
+        /* Commenting these lines because file never gets found.
         if (normalizedFile.empty() || normalizedFile[0] != '/')
         {
             normalizedFile = '/' + normalizedFile;
-        }
+        }*/
 
         std::string rawPath;
         std::size_t index = normalizedFile.find_last_of('/');

@@ -159,7 +159,7 @@ namespace cppmicroservices
             return;
         }
 
-        for (++iter; iter != m_SortedEntries.end(); ++iter)
+        for (iter=iter; iter != m_SortedEntries.end(); iter++)
         {
             if (resourcePath.size() > iter->first.size())
             {
@@ -167,12 +167,12 @@ namespace cppmicroservices
             }
             if (iter->first.compare(0, resourcePath.size(), resourcePath) == 0)
             {
-                std::size_t pos = iter->first.find_first_of('/', resourcePath.size());
-                if (pos == std::string::npos || pos == iter->first.size() - 1)
+                std::size_t pos = iter->first.find_first_of('/'/*, resourcePath.size()*/);
+                if (pos < iter->first.size())
                 {
                     if (relativePaths)
                     {
-                        names.push_back(iter->first.substr(resourcePath.size()));
+                        names.push_back(iter->first.substr(pos));
                     }
                     else
                     {
@@ -182,6 +182,37 @@ namespace cppmicroservices
                 }
             }
         }
+        /*
+        auto iter = m_SortedEntries.find(std::make_pair(resourcePath, 0));
+        if (iter == m_SortedEntries.end())
+        {
+            return;
+        }
+
+        for (auto it=iter; iter != m_SortedEntries.end(); it++)
+        {
+            const std::string foundElement = it->first; 
+            if (resourcePath.size() > foundElement.size())
+            {
+                break;
+            }
+            if (foundElement.compare(0, resourcePath.size(), resourcePath) == 0)
+            {
+                std::size_t pos = foundElement.find_first_of('/', 0);
+                //if (pos == std::string::npos || pos == it->first.size() - 1)
+                //{
+                    if (relativePaths)
+                    {
+                        names.push_back(foundElement.substr(pos));
+                    }
+                    else
+                    {
+                        names.push_back(it->first);
+                    }
+                    indices.push_back(it->second);
+                //}
+            }
+        }*/
     }
 
     void

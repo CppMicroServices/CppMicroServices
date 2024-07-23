@@ -57,7 +57,7 @@ namespace cppmicroservices
         MockedEnvironment(MockBundleStorageMemory* bsm);
         std::vector<Bundle> Install(std::string& location,
                                     cppmicroservices::AnyMap& bundleManifest,
-                                    MockBundleResourceContainer* resCont);
+                                    std::shared_ptr<MockBundleResourceContainer> const& resCont);
 
         Framework framework;
         CoreBundleContext* coreBundleContext;

@@ -145,7 +145,7 @@ namespace cppmicroservices
     }
 
     std::vector<Bundle>
-    BundleRegistry::Install1(std::string const& location, cppmicroservices::AnyMap const& bundleManifest, BundleResourceContainer* resCont)
+    BundleRegistry::Install1(std::string const& location, cppmicroservices::AnyMap const& bundleManifest, std::shared_ptr<BundleResourceContainer> const& resCont)
     {
         using namespace std::chrono_literals;
 

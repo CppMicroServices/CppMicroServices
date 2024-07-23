@@ -435,7 +435,7 @@ namespace cppmicroservices
         using cppmicroservices::BundleResourceContainer::GetTopLevelDirs;
       public:
         MOCK_METHOD0(GetLocation, std::string());
-        MOCK_METHOD0(GetTopLevelDirs, std::vector<std::string>());
+        MOCK_CONST_METHOD0(GetTopLevelDirs, std::vector<std::string>());
         MOCK_METHOD1(GetStat, bool(Stat &));
         MOCK_METHOD2(GetStat, bool(int, Stat &));
         MOCK_METHOD1(GetData, std::unique_ptr<void, void (*)(void *)>(int));

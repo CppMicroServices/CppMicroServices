@@ -138,7 +138,7 @@ namespace cppmicroservices
 
         std::vector<Bundle> Install1(std::string const& location,
                                      cppmicroservices::AnyMap const& bundleManifest,
-                                     BundleResourceContainer* resCont);
+                                     std::shared_ptr<BundleResourceContainer> const& resCont);
         std::vector<Bundle> Install0(std::string const& location,
                                      std::shared_ptr<BundleResourceContainer> const& resCont,
                                      std::vector<std::string> const& alreadyInstalled,

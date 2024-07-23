@@ -137,13 +137,15 @@ class BundleManifestTest : public ::testing::Test
             .WillByDefault(Return(std::make_shared<MockBundleArchive>(
                 bundleStorage,
                 std::make_shared<MockBundleResourceContainer>(),
-                "MOCK", "main", 1,
+                "MockMain", "main", 0,
                 AnyMap({
                     { "bundle.activator", Any(true) },
                     { "bundle.symbolic_name", Any(std::string("FrameworkBundle")) }
                 })
             )));
         EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq("main"), _)).Times(AtLeast(1));
+        EXPECT_CALL(*bundleStorage, Close()).Times(AtLeast(1));
+
         framework.Start();
     }
 
@@ -161,12 +163,6 @@ class BundleManifestTest : public ::testing::Test
 
 TEST_F(BundleManifestTest, UnicodeProperty)
 {
-    // 1. building static libraries (test bundle is included in the executable)
-    // 2. using MINGW evironment (MinGW linker fails to link DLL with unicode path)
-    // 3. using a compiler with no support for C++11 unicode string literals
-#if defined(__MINGW32__)
-    SUCCEED() << "Skipping test point for unicode path";
-#else
     std::string bundleName = "TestBundleU";
     AnyMap manifest = AnyMap({
         { "bundle.activator", Any(true) },
@@ -175,7 +171,7 @@ TEST_F(BundleManifestTest, UnicodeProperty)
     });
 
     std::vector<std::string> files = {"TestBundleU"};
-    MockBundleResourceContainer* resCont = new MockBundleResourceContainer();
+    auto resCont = std::make_shared<MockBundleResourceContainer>();
     ON_CALL(*resCont, GetTopLevelDirs())
         .WillByDefault(Return(files));
     EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
@@ -183,8 +179,8 @@ TEST_F(BundleManifestTest, UnicodeProperty)
     ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _))
         .WillByDefault(Return(std::make_shared<MockBundleArchive>(
             bundleStorage,
-            std::shared_ptr<MockBundleResourceContainer>(resCont),
-            "MOCK", bundleName, 1,
+            resCont,
+            "MockTestBundleU", bundleName, 1,
             manifest
         )));
     EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _)).Times(1);
@@ -194,10 +190,7 @@ TEST_F(BundleManifestTest, UnicodeProperty)
     auto bundle = bundles[0];
     std::string expectedValue = u8"电脑 くいりのまちとこしくそ";
     std::string actualValue = bundle.GetHeaders().at("unicode.sample").ToString();
-    ASSERT_EQ(expectedValue, actualValue) << "Unicode data from manifest.json doesn't match expected value.";
-
-    delete resCont;
-#endif
+    ASSERT_STREQ(expectedValue.c_str(), actualValue.c_str()) << "Unicode data from manifest.json doesn't match expected value.";
 }
 
 TEST_F(BundleManifestTest, InstallBundleWithDeepManifest)

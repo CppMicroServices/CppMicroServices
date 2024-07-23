@@ -45,7 +45,7 @@ namespace cppmicroservices
     MockedEnvironment::Install(
         std::string& location,
         cppmicroservices::AnyMap& bundleManifest,
-        MockBundleResourceContainer* resCont
+        std::shared_ptr<MockBundleResourceContainer> const& resCont
     )
     {
         return bundleRegistry->Install1(location, bundleManifest, resCont);

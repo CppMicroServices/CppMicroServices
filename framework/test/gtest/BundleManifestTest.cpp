@@ -398,11 +398,7 @@ TEST_F(BundleManifestTest, DirectManifestInstallBadLocation)
 
 TEST_F(BundleManifestTest, DirectManifestInstallMulti)
 {
-    // Support the static linking case in which we have multiple bundles in one location that need to
-    // be installed, so the "manifests" passed in contains a vector of bundle manifests, one for each
-    // bundle at the location.
-    auto ctx = framework.GetBundleContext();
-
+    std::vector<std::string> files = {"TestBundleA", "TestBundleB"};
     cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
     cppmicroservices::AnyMap::unordered_any_cimap testBundleAManifest = {
         {                   "A",                        1.5},
@@ -417,8 +413,31 @@ TEST_F(BundleManifestTest, DirectManifestInstallMulti)
     };
     manifests["TestBundleB"] = cppmicroservices::AnyMap(testBundleBManifest);
 
-    auto const libPath = fullLibPath("TestBundleA");
-    auto const& bundles = ctx.InstallBundles(libPath, manifests);
+    auto resCont = std::make_shared<MockBundleResourceContainer>();
+    ON_CALL(*resCont, GetTopLevelDirs())
+        .WillByDefault(Return(files));
+    EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+
+    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _))
+        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+            bundleStorage,
+            resCont,
+            files[0], files[0], 1,
+            testBundleAManifest
+        )));
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _)).Times(1);
+
+    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[1]), _))
+        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+            bundleStorage,
+            resCont,
+            files[1], files[1], 2,
+            testBundleBManifest
+        )));
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[1]), _)).Times(1);
+
+    auto libPath = fullLibPath("TestBundleA");
+    auto const& bundles = mockEnv.Install(libPath, manifests, resCont);
     ASSERT_EQ(2, bundles.size());
     for (auto const& b : bundles)
     {

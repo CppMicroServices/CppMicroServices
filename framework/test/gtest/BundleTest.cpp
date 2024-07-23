@@ -41,6 +41,7 @@
 #include "TestUtils.h"
 #include "TestingConfig.h"
 #include "Mocks.h"
+#include "MockUtils.h"
 
 #include <chrono>
 #include <future>
@@ -53,22 +54,42 @@ US_MSVC_PUSH_DISABLE_WARNING(4996)
 using namespace cppmicroservices;
 using namespace cppmicroservices::testing;
 using ::testing::_;
+using ::testing::Eq;
 using ::testing::Return;
+using ::testing::AtLeast;
 
 class BundleTest : public ::testing::Test
 {
   protected:
-    Framework framework;
-    BundleContext context;
+    cppmicroservices::MockBundleStorageMemory* bundleStorage;
+    cppmicroservices::MockedEnvironment mockEnv;
+    cppmicroservices::Framework& framework;
+    cppmicroservices::BundleContext context;
 
   public:
-    BundleTest() : framework(FrameworkFactory().NewFramework()) {};
+    BundleTest()
+        : bundleStorage(new MockBundleStorageMemory())
+        , mockEnv(MockedEnvironment(bundleStorage))
+        , framework(mockEnv.framework) {}
 
     ~BundleTest() override = default;
 
     void
     SetUp() override
     {
+        ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq("main"), _))
+            .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+                bundleStorage,
+                std::make_shared<MockBundleResourceContainer>(),
+                "MockMain", "main", 0,
+                AnyMap({
+                    { "bundle.activator", Any(true) },
+                    { "bundle.symbolic_name", Any(std::string("FrameworkBundle")) }
+                })
+            )));
+        EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq("main"), _)).Times(AtLeast(1));
+        EXPECT_CALL(*bundleStorage, Close()).Times(AtLeast(1));
+
         framework.Start();
         context = framework.GetBundleContext();
     }
@@ -652,25 +673,41 @@ TEST_F(BundleTest, TestNonStandardBundleExtension)
 
 TEST_F(BundleTest, TestUnicodePaths)
 {
-    // 1. building static libraries (test bundle is included in the executable)
-    // 2. using MINGW evironment (MinGW linker fails to link DLL with unicode path)
-    // 3. using a compiler with no support for C++11 unicode string literals
-#if !defined(US_BUILD_SHARED_LIBS) || defined(__MINGW32__) || !defined(US_CXX_UNICODE_LITERALS)
-    std::cout << "Skipping test point for unicode path" << std::endl;
-#else
+    std::string bundleName = "TestBundleU";
     std::string path_utf8 = LIB_PATH + cppmicroservices::util::DIR_SEP + u8"くいりのまちとこしくそ"
                             + cppmicroservices::util::DIR_SEP + US_LIB_PREFIX + "TestBundleU" + US_LIB_POSTFIX
                             + US_LIB_EXT;
-    auto bundles = context.InstallBundles(path_utf8);
-    ASSERT_EQ(bundles.size(), 1);
+    AnyMap manifest = AnyMap({
+        { "bundle.activator", Any(true) },
+        { "bundle.symbolic_name", Any(std::string(bundleName)) },
+        { "unicode.sample", Any(std::string(u8"电脑 くいりのまちとこしくそ")) }
+    });
+
+    std::vector<std::string> files = {"TestBundleU"};
+    auto resCont = std::make_shared<MockBundleResourceContainer>();
+    ON_CALL(*resCont, GetTopLevelDirs())
+        .WillByDefault(Return(files));
+    EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+
+    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _))
+        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+            bundleStorage,
+            resCont,
+            bundleName, path_utf8, 1,
+            manifest
+        )));
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _)).Times(1);
+
+    auto bundles = mockEnv.Install(bundleName, manifest, resCont);
+    ASSERT_EQ(1, bundles.size()) << "Mock bundle failed to install correctly.";
     auto bundle = bundles.at(0);
+
     // Bundle location is the same as the path used to install
     ASSERT_EQ(bundle.GetLocation(), path_utf8);
     bundle.Start();
     // Bundle check start state
     ASSERT_EQ(bundle.GetState(), Bundle::State::STATE_ACTIVE);
     bundle.Stop();
-#endif
 }
 
 TEST_F(BundleTest, TestBundleStartOptions)

@@ -31,8 +31,6 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/util/FileSystem.h"
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "Mocks.h"
 #include "MockUtils.h"
 
@@ -187,30 +185,48 @@ TEST_F(BundleManifestTest, UnicodeProperty)
 
     auto bundles = mockEnv.Install(bundleName, manifest, resCont);
     ASSERT_EQ(1, bundles.size()) << "Mock bundle failed to install correctly.";
-    auto bundle = bundles[0];
+    auto bundle = bundles.at(0);
     std::string expectedValue = u8"电脑 くいりのまちとこしくそ";
     std::string actualValue = bundle.GetHeaders().at("unicode.sample").ToString();
     ASSERT_STREQ(expectedValue.c_str(), actualValue.c_str()) << "Unicode data from manifest.json doesn't match expected value.";
 }
 
+#define MAKE_DEEP(x) AnyMap({ \
+        { "relativelylongkeyname_element", Any(true) }, \
+        { "relativelylongkeyname_map", x } \
+    })
+#define MAKE_DEEP_2(x) MAKE_DEEP(MAKE_DEEP(x))
+#define MAKE_DEEP_4(x) MAKE_DEEP_2(MAKE_DEEP_2(x))
+#define MAKE_DEEP_8(x) MAKE_DEEP_4(MAKE_DEEP_4(x))
+#define MAKE_DEEP_16(x) MAKE_DEEP_8(MAKE_DEEP_8(x))
 TEST_F(BundleManifestTest, InstallBundleWithDeepManifest)
 {
-    /*
-    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, "TestBundleWithDeepManifest", _))
+    std::string bundleName = "TestBundleWithDeepManifest";
+    AnyMap manifest = AnyMap({
+        { "Test_AtCompoundKey", MAKE_DEEP_16(AnyMap()) },
+        { "bundle.activator", Any(true) },
+        { "bundle.symbolic_name", Any(std::string(bundleName)) },
+        { "bundle.vendor", Any(std::string("The Company, Inc.")) }
+    });
+
+    std::vector<std::string> files = {"TestBundleWithDeepManifest"};
+    auto resCont = std::make_shared<MockBundleResourceContainer>();
+    ON_CALL(*resCont, GetTopLevelDirs())
+        .WillByDefault(Return(files));
+    EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+
+    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _))
         .WillByDefault(Return(std::make_shared<MockBundleArchive>(
             bundleStorage,
-            std::make_shared<MockBundleResourceContainer>(),
-            "MOCK", "TestBundleWithDeepManifest", 1,
-            AnyMap({
-                { "bundle.activator", Any(true) },
-                { "bundle.symbolic_name", Any(std::string("TestBundleWithDeepManifest")) },
-                { "bundle.vendor", Any(std::string("The Company, Inc.")) },
-            })
+            resCont,
+            "MockTestBundleWithDeepManifest", bundleName, 1,
+            manifest
         )));
-    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, "TestBundleWithDeepManifest", _)).Times(1);
-    */
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _)).Times(1);
 
-    auto bundle = cppmicroservices::testing::InstallLib(framework.GetBundleContext(), "TestBundleWithDeepManifest");
+    auto bundles = mockEnv.Install(bundleName, manifest, resCont);
+    ASSERT_EQ(1, bundles.size()) << "Mock bundle failed to install correctly.";
+    auto bundle = bundles.at(0);
     auto const& headers = bundle.GetHeaders();
     ASSERT_THAT(headers.at(Constants::BUNDLE_SYMBOLICNAME).ToString(), ::testing::StrEq("TestBundleWithDeepManifest"))
         << "Bundle symbolic name doesn't match.";

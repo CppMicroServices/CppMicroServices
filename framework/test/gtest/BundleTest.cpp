@@ -674,7 +674,7 @@ TEST_F(BundleTest, TestNonStandardBundleExtension)
 TEST_F(BundleTest, TestUnicodePaths)
 {
     std::string bundleName = "TestBundleU";
-    std::string path_utf8 = LIB_PATH + cppmicroservices::util::DIR_SEP + u8"くいりのまちとこしくそ"
+    std::string pathName = LIB_PATH + cppmicroservices::util::DIR_SEP + u8"くいりのまちとこしくそ"
                             + cppmicroservices::util::DIR_SEP + US_LIB_PREFIX + "TestBundleU" + US_LIB_POSTFIX
                             + US_LIB_EXT;
     AnyMap manifest = AnyMap({
@@ -693,7 +693,7 @@ TEST_F(BundleTest, TestUnicodePaths)
         .WillByDefault(Return(std::make_shared<MockBundleArchive>(
             bundleStorage,
             resCont,
-            bundleName, path_utf8, 1,
+            bundleName, pathName, 1,
             manifest
         )));
     EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _)).Times(1);
@@ -703,7 +703,7 @@ TEST_F(BundleTest, TestUnicodePaths)
     auto bundle = bundles.at(0);
 
     // Bundle location is the same as the path used to install
-    ASSERT_EQ(bundle.GetLocation(), path_utf8);
+    ASSERT_EQ(bundle.GetLocation(), pathName);
     bundle.Start();
     // Bundle check start state
     ASSERT_EQ(bundle.GetState(), Bundle::State::STATE_ACTIVE);

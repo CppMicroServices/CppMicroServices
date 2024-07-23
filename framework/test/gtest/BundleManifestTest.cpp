@@ -305,8 +305,7 @@ namespace cppmicroservices
 #ifdef US_BUILD_SHARED_LIBS
 TEST_F(BundleManifestTest, DirectManifestInstall)
 {
-    auto ctx = framework.GetBundleContext();
-
+    std::vector<std::string> files = {"TestBundleA"};
     cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
     cppmicroservices::AnyMap::unordered_any_cimap testBundleAManifest = {
         {"bundle.symbolic_name", std::string("TestBundleA")},
@@ -314,8 +313,22 @@ TEST_F(BundleManifestTest, DirectManifestInstall)
     };
     manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);
 
-    auto const libPath = fullLibPath("TestBundleA");
-    auto const& bundles = ctx.InstallBundles(libPath, manifests);
+    auto resCont = std::make_shared<MockBundleResourceContainer>();
+    ON_CALL(*resCont, GetTopLevelDirs())
+        .WillByDefault(Return(files));
+    EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+
+    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _))
+        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+            bundleStorage,
+            resCont,
+            files[0], files[0], 1,
+            testBundleAManifest
+        )));
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _)).Times(1);
+
+    auto libPath = fullLibPath("TestBundleA");
+    auto const& bundles = mockEnv.Install(libPath, manifests, resCont);
 
     ASSERT_EQ(1, bundles.size());
     for (auto b : bundles)
@@ -336,8 +349,7 @@ TEST_F(BundleManifestTest, DirectManifestInstall)
 
 TEST_F(BundleManifestTest, DirectManifestInstallNoSymbolicName)
 {
-    auto ctx = framework.GetBundleContext();
-
+    std::vector<std::string> files = {"TestBundleA"};
     cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
     cppmicroservices::AnyMap::unordered_any_cimap testBundleAManifest = {
   // We need to have at least one entry in the manifest to check and make sure it has what's
@@ -348,9 +360,24 @@ TEST_F(BundleManifestTest, DirectManifestInstallNoSymbolicName)
     };
     manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);
 
-    auto const libPath = fullLibPath("TestBundleA");
+    auto libPath = fullLibPath("TestBundleA");
 
-    EXPECT_THROW({ ctx.InstallBundles(libPath, manifests); }, std::runtime_error);
+    auto resCont = std::make_shared<MockBundleResourceContainer>();
+    ON_CALL(*resCont, GetTopLevelDirs())
+        .WillByDefault(Return(files));
+    EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+
+    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _))
+        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+            bundleStorage,
+            resCont,
+            files[0], files[0], 1,
+            testBundleAManifest
+        )));
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _)).Times(1);
+    EXPECT_CALL(*bundleStorage, RemoveArchive(_)).Times(1);
+
+    EXPECT_THROW({ mockEnv.Install(libPath, manifests, resCont); }, std::runtime_error);
 }
 
 TEST_F(BundleManifestTest, DirectManifestInstallBadLocation)
@@ -409,6 +436,7 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
 {
     auto ctx = framework.GetBundleContext();
 
+    std::vector<std::string> files = {"TestBundleA"};
     cppmicroservices::AnyMap manifests(cppmicroservices::any_map::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
     cppmicroservices::AnyMap::unordered_any_cimap testBundleAManifest = {
         {                   "A",                        1.5},
@@ -418,10 +446,26 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
     };
     manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);
 
+    auto resCont = std::make_shared<MockBundleResourceContainer>();
+    ON_CALL(*resCont, GetTopLevelDirs())
+        .WillByDefault(Return(files));
+    EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+
+    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _))
+        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+            bundleStorage,
+            resCont,
+            files[0], files[0], 1,
+            testBundleAManifest
+        )));
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _)).Times(1);
+
     auto location = fullLibPath("TestBundleA");
-    auto const& bundles = ctx.InstallBundles(location, manifests);
+    auto const& bundles = mockEnv.Install(location, manifests, resCont);
     ASSERT_EQ(1, bundles.size());
     auto b = bundles[0];
+
+    // TODO: Test fails here
     b.Start();
     auto headers = b.GetHeaders();
     auto manifest = cppmicroservices::any_cast<cppmicroservices::AnyMap>(manifests["TestBundleA"]);

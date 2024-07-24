@@ -22,74 +22,51 @@ limitations under the License.
 
 #ifndef CPPMICROSERVICES_FRAMEWORK_MOCKS_H
 #define CPPMICROSERVICES_FRAMEWORK_MOCKS_H
+
 #include "gmock/gmock.h"
+
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/AnyMap.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleActivator.h"
-#include "BundleArchive.h"
 #include "cppmicroservices/BundleContext.h"
-#include "BundleContextPrivate.h"
 #include "cppmicroservices/BundleEvent.h"
 #include "cppmicroservices/BundleEventHook.h"
-#include "BundleEventInternal.h"
 #include "cppmicroservices/BundleFindHook.h"
-#include "BundleHooks.h"
 #include "cppmicroservices/BundleImport.h"
 #include "cppmicroservices/BundleInitialization.h"
-#include "BundleManifest.h"
-#include "BundlePrivate.h"
-#include "BundleRegistry.h"
 #include "cppmicroservices/BundleResource.h"
-#include "BundleResourceContainer.h"
 #include "cppmicroservices/BundleResourceStream.h"
-#include "BundleStorage.h"
-#include "BundleStorageFile.h"
-#include "BundleStorageMemory.h"
 #include "cppmicroservices/BundleTracker.h"
 #include "cppmicroservices/BundleTrackerCustomizer.h"
 #include "cppmicroservices/BundleVersion.h"
-#include "CoreBundleContext.h"
 #include "cppmicroservices/Framework.h"
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
-#include "FrameworkPrivate.h"
-#include "LDAPExpr.h"
 #include "cppmicroservices/LDAPFilter.h"
 #include "cppmicroservices/LDAPProp.h"
 #include "cppmicroservices/ListenerFunctors.h"
 #include "cppmicroservices/ListenerToken.h"
-#include "Properties.h"
 #include "cppmicroservices/PrototypeServiceFactory.h"
-#include "Resolver.h"
 #include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/ServiceEvent.h"
 #include "cppmicroservices/ServiceEventListenerHook.h"
 #include "cppmicroservices/ServiceException.h"
 #include "cppmicroservices/ServiceFactory.h"
 #include "cppmicroservices/ServiceFindHook.h"
-#include "ServiceHooks.h"
 #include "cppmicroservices/ServiceInterface.h"
-#include "ServiceListenerEntry.h"
 #include "cppmicroservices/ServiceListenerHook.h"
-#include "ServiceListenerHookPrivate.h"
-#include "ServiceListeners.h"
 #include "cppmicroservices/ServiceObjects.h"
 #include "cppmicroservices/ServiceReference.h"
 #include "cppmicroservices/ServiceReferenceBase.h"
-#include "ServiceReferenceBasePrivate.h"
 #include "cppmicroservices/ServiceRegistration.h"
 #include "cppmicroservices/ServiceRegistrationBase.h"
-#include "ServiceRegistrationCoreInfo.h"
-#include "ServiceRegistrationLocks.h"
-#include "ServiceRegistry.h"
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/ShrinkableMap.h"
 #include "cppmicroservices/ShrinkableVector.h"
-#include "Utils.h"
 #include "cppmicroservices/detail/BundleAbstractTracked.h"
 #include "cppmicroservices/detail/BundleResourceBuffer.h"
 #include "cppmicroservices/detail/BundleTrackerPrivate.h"
@@ -103,6 +80,33 @@ limitations under the License.
 #include "cppmicroservices/detail/TrackedServiceListener.h"
 #include "cppmicroservices/detail/WaitCondition.h"
 #include "cppmicroservices/util/BundleObjFile.h"
+
+#include "BundleArchive.h"
+#include "BundleContextPrivate.h"
+#include "BundleEventInternal.h"
+#include "BundleHooks.h"
+#include "BundleManifest.h"
+#include "BundlePrivate.h"
+#include "BundleRegistry.h"
+#include "BundleResourceContainer.h"
+#include "BundleStorage.h"
+#include "BundleStorageFile.h"
+#include "BundleStorageMemory.h"
+#include "BundleUtils.h"
+#include "CoreBundleContext.h"
+#include "FrameworkPrivate.h"
+#include "LDAPExpr.h"
+#include "Properties.h"
+#include "Resolver.h"
+#include "ServiceHooks.h"
+#include "ServiceListenerEntry.h"
+#include "ServiceListenerHookPrivate.h"
+#include "ServiceListeners.h"
+#include "ServiceReferenceBasePrivate.h"
+#include "ServiceRegistrationCoreInfo.h"
+#include "ServiceRegistrationLocks.h"
+#include "ServiceRegistry.h"
+#include "Utils.h"
 
 using namespace cppmicroservices;
 
@@ -889,6 +893,13 @@ namespace cppmicroservices
         MOCK_METHOD2(CustomizerAdding, std::optional<std::shared_ptr<TrackedParamType>>(ServiceReference<S>, const ServiceEvent &));
         MOCK_METHOD3(CustomizerModified, void(ServiceReference<S>, const ServiceEvent &, const std::shared_ptr<TrackedParamType> &));
         MOCK_METHOD3(CustomizerRemoved, void(ServiceReference<S>, const ServiceEvent &, const std::shared_ptr<TrackedParamType> &));
+    };
+
+    class MockBundleUtils : public cppmicroservices::BundleUtils
+    {
+      public:
+        MOCK_METHOD0(GetExecutableHandle, void*());
+        MOCK_METHOD3(GetSymbol, void*(void *, char const *, std::string &));
     };
 
 } // namespace cppmicroservices

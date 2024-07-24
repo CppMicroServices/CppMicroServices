@@ -518,7 +518,7 @@ namespace cppmicroservices
                 void* libHandle = nullptr;
                 if ((lib->GetFilePath() == util::GetExecutablePath()))
                 {
-                    libHandle = BundleUtils::GetExecutableHandle();
+                    libHandle = bundleUtils->GetExecutableHandle();
                 }
                 else
                 {
@@ -541,7 +541,7 @@ namespace cppmicroservices
                 // from within this bundle's code.
                 std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + symbolicName;
                 std::string set_bundle_context_err;
-                BundleUtils::GetSymbol(SetBundleContext, libHandle, set_bundle_context_func, set_bundle_context_err);
+                bundleUtils->GetSymbol(SetBundleContext, libHandle, set_bundle_context_func, set_bundle_context_err);
 
                 if (SetBundleContext)
                 {
@@ -556,11 +556,11 @@ namespace cppmicroservices
                 std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
                 std::function<BundleActivator*(void)> createActivatorHook;
                 std::string create_activator_err;
-                BundleUtils::GetSymbol(createActivatorHook, libHandle, create_activator_func, create_activator_err);
+                bundleUtils->GetSymbol(createActivatorHook, libHandle, create_activator_func, create_activator_err);
 
                 std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
                 std::string destroy_activator_err;
-                BundleUtils::GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func, destroy_activator_err);
+                bundleUtils->GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func, destroy_activator_err);
 
                 if (!createActivatorHook)
                 {
@@ -695,6 +695,7 @@ namespace cppmicroservices
         , timeStamp(std::chrono::steady_clock::now())
         , bundleManifest()
         , lib(new SharedLibrary())
+        , bundleUtils(new BundleUtils())
         , SetBundleContext(nullptr)
     {
     }
@@ -718,6 +719,7 @@ namespace cppmicroservices
         , timeStamp(ba->GetLastModified())
         , bundleManifest(ba->GetInjectedManifest())
         , lib(new SharedLibrary(location))
+        , bundleUtils(new BundleUtils())
         , SetBundleContext(nullptr)
     {
         // Only take the time to read the manifest out of the BundleArchive file if we don't already have
@@ -802,10 +804,7 @@ namespace cppmicroservices
         }
     }
 
-    BundlePrivate::~BundlePrivate()
-    {
-        delete lib;
-    }
+    BundlePrivate::~BundlePrivate() = default;
 
     void
     BundlePrivate::CheckUninstalled() const

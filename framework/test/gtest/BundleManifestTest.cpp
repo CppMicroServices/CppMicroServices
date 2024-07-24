@@ -451,6 +451,7 @@ TEST_F(BundleManifestTest, DirectManifestInstallMulti)
     }
 }
 
+void noop() {}
 TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
 {
     auto ctx = framework.GetBundleContext();
@@ -481,6 +482,7 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
 
     // Inject mocked SharedLibrary to prevent framework bundle from being loaded
     MockSharedLibrary* sharedLib = new MockSharedLibrary();
+    EXPECT_CALL(*sharedLib, GetHandle()).Times(1);
     EXPECT_CALL(*sharedLib, Load(_)).Times(1);
     mockEnv.bundlePrivate->lib = sharedLib;
 
@@ -493,6 +495,13 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
     auto priv = GetPrivate(b);
     delete priv->lib;
     priv->lib = sharedLib;
+
+    MockBundleUtils* bundleUtils = new MockBundleUtils();
+    ON_CALL(*bundleUtils, GetSymbol(_, _, _))
+        .WillByDefault(Return(reinterpret_cast<void*>(&noop)));
+    EXPECT_CALL(*bundleUtils, GetSymbol(_, _, _)).Times(3);
+    delete priv->bundleUtils;
+    priv->bundleUtils = bundleUtils;
 
     b.Start();
     auto headers = b.GetHeaders();

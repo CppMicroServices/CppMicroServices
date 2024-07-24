@@ -32,6 +32,7 @@
 
 #include "BundleArchive.h"
 #include "BundleManifest.h"
+#include "BundleUtils.h"
 
 #include <functional>
 #include <memory>
@@ -268,6 +269,8 @@ namespace cppmicroservices
          * of the bundle's physical form.
          */
         SharedLibrary* lib;
+
+        BundleUtils* bundleUtils;
 
         SetBundleContextFn SetBundleContext;
     };

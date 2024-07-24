@@ -479,12 +479,21 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
         )));
     EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _)).Times(1);
 
+    // Inject mocked SharedLibrary to prevent framework bundle from being loaded
+    MockSharedLibrary* sharedLib = new MockSharedLibrary();
+    EXPECT_CALL(*sharedLib, Load(_)).Times(1);
+    mockEnv.bundlePrivate->lib = sharedLib;
+
     auto location = fullLibPath("TestBundleA");
     auto const& bundles = mockEnv.Install(location, manifests, resCont);
     ASSERT_EQ(1, bundles.size());
     auto b = bundles[0];
 
-    // TODO: Test fails here
+    // Inject mocked SharedLibrary to prevent libA.so from being loaded
+    auto priv = GetPrivate(b);
+    delete priv->lib;
+    priv->lib = sharedLib;
+
     b.Start();
     auto headers = b.GetHeaders();
     auto manifest = cppmicroservices::any_cast<cppmicroservices::AnyMap>(manifests["TestBundleA"]);

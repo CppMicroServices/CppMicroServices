@@ -267,7 +267,7 @@ namespace cppmicroservices
          * Responsible for platform specific loading and unloading
          * of the bundle's physical form.
          */
-        SharedLibrary lib;
+        SharedLibrary* lib;
 
         SetBundleContextFn SetBundleContext;
     };

@@ -493,7 +493,7 @@ namespace cppmicroservices
         {
             try
             {
-                if (coreCtx->validationFunc && (lib.GetFilePath() != util::GetExecutablePath())
+                if (coreCtx->validationFunc && (lib->GetFilePath() != util::GetExecutablePath())
                     && !coreCtx->validationFunc(thisBundle))
                 {
                     StartFailed();
@@ -516,23 +516,23 @@ namespace cppmicroservices
             try
             {
                 void* libHandle = nullptr;
-                if ((lib.GetFilePath() == util::GetExecutablePath()))
+                if ((lib->GetFilePath() == util::GetExecutablePath()))
                 {
                     libHandle = BundleUtils::GetExecutableHandle();
                 }
                 else
                 {
-                    if (!lib.IsLoaded())
+                    if (!lib->IsLoaded())
                     {
                         coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
                                              "Loading shared library for Bundle " + symbolicName
                                                  + " (location=" + location + ")");
-                        lib.Load(coreCtx->libraryLoadOptions);
+                        lib->Load(coreCtx->libraryLoadOptions);
                         coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
                                              "Finished loading shared library for Bundle " + symbolicName
                                                  + " (location=" + location + ")");
                     }
-                    libHandle = lib.GetHandle();
+                    libHandle = lib->GetHandle();
                 }
 
                 auto ctx = bundleContext.Load();
@@ -694,7 +694,7 @@ namespace cppmicroservices
         , version(CppMicroServices_VERSION_MAJOR, CppMicroServices_VERSION_MINOR, CppMicroServices_VERSION_PATCH)
         , timeStamp(std::chrono::steady_clock::now())
         , bundleManifest()
-        , lib()
+        , lib(new SharedLibrary())
         , SetBundleContext(nullptr)
     {
     }
@@ -717,7 +717,7 @@ namespace cppmicroservices
         , version()
         , timeStamp(ba->GetLastModified())
         , bundleManifest(ba->GetInjectedManifest())
-        , lib(location)
+        , lib(new SharedLibrary(location))
         , SetBundleContext(nullptr)
     {
         // Only take the time to read the manifest out of the BundleArchive file if we don't already have
@@ -802,7 +802,10 @@ namespace cppmicroservices
         }
     }
 
-    BundlePrivate::~BundlePrivate() = default;
+    BundlePrivate::~BundlePrivate()
+    {
+        delete lib;
+    }
 
     void
     BundlePrivate::CheckUninstalled() const

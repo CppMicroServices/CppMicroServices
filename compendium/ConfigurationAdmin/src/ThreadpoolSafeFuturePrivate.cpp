@@ -40,18 +40,16 @@ namespace cppmicroservices::cmimpl
     void
     ThreadpoolSafeFuturePrivate::wait() const
     {
-        // ensure that asyncTaskMap and asyncTaskStateMap are cleared even if task throws
-
         constexpr auto timeout = std::chrono::milliseconds(50);
         // if we hit the timeout
         if (future.wait_for(timeout) == std::future_status::timeout)
         {
-            // we expect that the asyncStarted is false -- i.e. stalled
+            // we expect that the task is stalled
+            // if the task is not stalled, this is a noop
             (*task)();
         }
 
-        // we can always get the future... if stalled, it'll be satisfied by WFF
-        // execution of the task else it will be satisfied by already executed object
+        // we can always get the future... iit was either executed by the GTP thread or on this one
         future.get();
     }
 

@@ -608,7 +608,7 @@ namespace cppmicroservices
             // is not available and that method cannot be called. For this reason, NotifyConfigurationUpdated
             // should not be called for Remove operations unless the caller has already confirmed
             // the configuration object has been updated at least once.
-            auto fut = PerformAsync(
+            return PerformAsync(
                 [this, pid, changeCount]
                 {
                     AnyMap properties { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
@@ -738,7 +738,6 @@ namespace cppmicroservices
                             }
                         });
                 });
-            return fut;
         }
 
         std::shared_ptr<ThreadpoolSafeFuturePrivate>

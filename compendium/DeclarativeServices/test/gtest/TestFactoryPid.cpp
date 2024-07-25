@@ -26,7 +26,6 @@
 #include "TestInterfaces/Interfaces.hpp"
 #include <cppmicroservices/ServiceTracker.h>
 #include <cppmicroservices/ThreadpoolSafeFuture.h>
-#include <cppmicroservices/ThreadpoolSafeFuture.h>
 
 namespace test
 {

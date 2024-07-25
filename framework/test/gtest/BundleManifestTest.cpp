@@ -451,7 +451,17 @@ TEST_F(BundleManifestTest, DirectManifestInstallMulti)
     }
 }
 
-void noop() {}
+BundleActivator* generateActivator()
+{
+    MockBundleActivator* bundleActivator = new MockBundleActivator();
+    EXPECT_CALL(*bundleActivator, Start(_)).Times(1);
+    EXPECT_CALL(*bundleActivator, Stop(_)).Times(1);
+    return bundleActivator;
+}
+void destroyActivator(BundleActivator* bundleActivator)
+{
+    delete bundleActivator;
+}
 TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
 {
     auto ctx = framework.GetBundleContext();
@@ -496,9 +506,14 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
     delete priv->lib;
     priv->lib = sharedLib;
 
+    std::string createActivatorFunc = US_STR(US_CREATE_ACTIVATOR_PREFIX) + files[0];
+    std::string destroyActivatorFunc = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + files[0];
+
     MockBundleUtils* bundleUtils = new MockBundleUtils();
-    ON_CALL(*bundleUtils, GetSymbol(_, _, _))
-        .WillByDefault(Return(reinterpret_cast<void*>(&noop)));
+    ON_CALL(*bundleUtils, GetSymbol(_, Eq(createActivatorFunc), _))
+        .WillByDefault(Return(reinterpret_cast<void*>(&generateActivator)));
+    ON_CALL(*bundleUtils, GetSymbol(_, Eq(destroyActivatorFunc), _))
+        .WillByDefault(Return(reinterpret_cast<void*>(&destroyActivator)));
     EXPECT_CALL(*bundleUtils, GetSymbol(_, _, _)).Times(3);
     delete priv->bundleUtils;
     priv->bundleUtils = bundleUtils;

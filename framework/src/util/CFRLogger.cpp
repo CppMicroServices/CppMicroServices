@@ -21,7 +21,6 @@
  =============================================================================*/
 
 #include "CFRLogger.h"
-//#include "CoreBundleContext.h"
 #include "cppmicroservices/GetBundleContext.h"
 
 namespace cppmicroservices
@@ -148,23 +147,6 @@ namespace cppmicroservices
 		return currLogger->getLogger(bundle, name);
 	     }
 	     return nullptr;
-        }
-
-        void
-        CFRLogger::Open()
-        {
-            auto l = this->Lock();
-            US_UNUSED(l);
-            cfrContext = GetBundleContext();
-            if (!cfrContext)
-            {
-                return;
-            }
-            serviceTracker
-                = std::make_unique<cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>(
-                    cfrContext,
-                    this);
-            serviceTracker->Open();
         }
 
         void

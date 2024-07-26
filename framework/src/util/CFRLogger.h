@@ -82,7 +82,6 @@ namespace cppmicroservices
                                 std::shared_ptr<cppmicroservices::logservice::LogService> const& service) override;
 
             // methods for the CFRLogger class
-            void Open();
             void Close();
 
           private:

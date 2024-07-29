@@ -30,9 +30,9 @@ namespace cppmicroservices
         CFRLogger::CFRLogger() : serviceTracker(), logService(nullptr) { }
 
 	 CFRLogger::CFRLogger(cppmicroservices::BundleContext context)
-            : cfrContext(context)
+            : cfrContext(std::move(context))
 	      ,serviceTracker(
-                  std::make_unique<cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>(context,
+                  std::make_unique<cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>(cfrContext,
                                                                                                                this))
               ,logService(nullptr) {
                serviceTracker->Open();

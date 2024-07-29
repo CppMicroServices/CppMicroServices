@@ -128,5 +128,27 @@ namespace cppmicroservices
                 currLogger->Log(sr, level, message, ex);
             }
         }
+
+	 std::shared_ptr<cppmicroservices::logservice::Logger>
+	CMLogger::getLogger(const std::string& name) const
+	{
+	    auto currLogger = std::atomic_load(&logService);
+            if (currLogger)
+            {
+                return currLogger->getLogger(name);
+            }
+	    return nullptr;
+	}
+
+	 std::shared_ptr<cppmicroservices::logservice::Logger>
+        CMLogger::getLogger(const cppmicroservices::Bundle& bundle, std::string const& name) const
+        {
+            auto currLogger = std::atomic_load(&logService);
+            if (currLogger)
+            {
+                return currLogger->getLogger(bundle, name);
+            }
+            return nullptr;
+        }
     } // namespace cmimpl
 } // namespace cppmicroservices

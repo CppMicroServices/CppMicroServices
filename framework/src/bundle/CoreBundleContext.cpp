@@ -29,6 +29,7 @@ US_MSVC_DISABLE_WARNING(4355)
 #include "cppmicroservices/BundleInitialization.h"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/FrameworkFactory.h"
+#include "cppmicroservices/GetBundleContext.h"
 
 #include "cppmicroservices/util/FileSystem.h"
 #include "cppmicroservices/util/String.h"
@@ -87,7 +88,6 @@ namespace cppmicroservices
         , workingDir(ref_any_cast<std::string>(frameworkProperties.at(Constants::FRAMEWORK_WORKING_DIR)))
         , listeners(this)
         , services(this)
-        , logger(std::make_shared<cppmicroservices::cfrimpl::CFRLogger>())
         , serviceHooks(this)
         , bundleHooks(this)
         , bundleRegistry(this)
@@ -174,7 +174,7 @@ namespace cppmicroservices
 
         bundleRegistry.Load();
 
-        logger->Open();
+        logger = std::make_shared<cppmicroservices::cfrimpl::CFRLogger>(GetBundleContext());        
 
         std::string execPath;
         try

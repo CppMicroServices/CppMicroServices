@@ -41,15 +41,20 @@ endif()
 
 set(_logservice_tests
   TestLogService.cpp
+  TestLoggerFactory.cpp
   main.cpp
   )
 
 set(_logservice_additional_srcs
   ${CppMicroServices_SOURCE_DIR}/compendium/LogServiceImpl/src/LogServiceImpl.cpp
+  ${CppMicroServices_SOURCE_DIR}/compendium/LogServiceImpl/src/LoggerFactoryImpl.cpp
+  ${CppMicroServices_SOURCE_DIR}/compendium/LogServiceImpl/src/LoggerImpl.cpp
   )
 
 set(_logservice_additional_hdrs
   ${CppMicroServices_SOURCE_DIR}/compendium/LogServiceImpl/src/LogServiceImpl.hpp
+  ${CppMicroServices_SOURCE_DIR}/compendium/LogServiceImpl/src/LoggerFactoryImpl.hpp
+  ${CppMicroServices_SOURCE_DIR}/compendium/LogServiceImpl/src/LoggerImpl.hpp
   )
 
 #-----------------------------------------------------------------------------

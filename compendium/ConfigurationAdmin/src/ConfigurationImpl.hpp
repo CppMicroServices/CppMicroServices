@@ -26,9 +26,11 @@
 #include <mutex>
 
 #include "cppmicroservices/cm/Configuration.hpp"
+#include <cppmicroservices/ThreadpoolSafeFuture.h>
 
 #include "ConfigurationAdminPrivate.hpp"
 #include "ConfigurationPrivate.hpp"
+#include "ThreadpoolSafeFuturePrivate.hpp"
 
 namespace cppmicroservices
 {
@@ -85,23 +87,65 @@ namespace cppmicroservices
             /**
              * Update the properties of this Configuration.
              *
+             * @return a std::shared_future<void>
+             * @note not safe to wait on future from within the AsyncWorkService
+             *
              * See {@code Configuration#Update}
              */
             std::shared_future<void> Update(AnyMap properties) override;
 
             /**
+             * Update the properties of this Configuration and return
+             *
+             * @return A std::shared_ptr<ThreadpoolSafeFuture>, safe to wait on from within the
+             * AsyncWorkService used by the Framework
+             *
+             * See {@code Configuration#Update}
+             */
+            std::shared_ptr<ThreadpoolSafeFuture> SafeUpdate(AnyMap newProperties) override;
+            std::shared_ptr<ThreadpoolSafeFuturePrivate> SafeUpdateImpl(AnyMap newProperties);
+
+            /**
              * Update the properties of this Configuration if they differ from the current properties.
+             *
+             * @return a std::shared_future<void> and whether the config was updated
+             * @note not safe to wait on future from within the AsyncWorkService
              *
              * See {@code Configuration#UpdateIfDifferent}
              */
             std::pair<bool, std::shared_future<void>> UpdateIfDifferent(AnyMap properties) override;
 
             /**
+             * Update the properties of this Configuration if they differ from the current properties.
+             *
+             * @return A pair<bool, std::shared_ptr<ThreadpoolSafeFuture>>, safe to wait on from within the
+             * AsyncWorkService used by the Framework
+             *
+             * See {@code Configuration#UpdateIfDifferent}
+             */
+            std::pair<bool, std::shared_ptr<ThreadpoolSafeFuture>> SafeUpdateIfDifferent(AnyMap properties) override;
+            std::pair<bool, std::shared_ptr<ThreadpoolSafeFuturePrivate>> SafeUpdateIfDifferentImpl(AnyMap properties);
+
+            /**
              * Remove this Configuration from ConfigurationAdmin.
+             *
+             * @return A std::shared_future<void>,
+             * @note not safe to wait on future from within the AsyncWorkService
              *
              * See {@code Configuration#Remove}
              */
             std::shared_future<void> Remove() override;
+
+            /**
+             * Remove this Configuration from ConfigurationAdmin.
+             *
+             * @return A std::shared_ptr<ThreadpoolSafeFuture>, safe to wait on from within the
+             * AsyncWorkService used by the Framework
+             *
+             * See {@code Configuration#Remove}
+             */
+            std::shared_ptr<ThreadpoolSafeFuture> SafeRemove() override;
+            std::shared_ptr<ThreadpoolSafeFuturePrivate> SafeRemoveImpl();
 
             /**
              * Internal method used by {@code ConfigurationAdminImpl} to update the properties without triggering

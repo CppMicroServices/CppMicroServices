@@ -60,8 +60,8 @@ namespace cppmicroservices
                     if (!configAdminRef)
                     {
                         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                            "configurationEvent error. ConfigurationAdmin service "
-                            "reference is no longer valid");
+                                    "configurationEvent error. ConfigurationAdmin service "
+                                    "reference is no longer valid");
                         return;
                     }
                     auto configAdmin
@@ -69,8 +69,8 @@ namespace cppmicroservices
                     if (!configAdmin)
                     {
                         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                            "configurationEvent error. ConfigurationAdmin service "
-                            "reference is no longer valid");
+                                    "configurationEvent error. ConfigurationAdmin service "
+                                    "reference is no longer valid");
                         return;
                     }
                     cppmicroservices::AnyMap properties;

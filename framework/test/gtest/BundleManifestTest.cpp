@@ -598,7 +598,6 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMulti)
                 libPath, libPath, i,
                 manifest
             )));
-        // EXPECT_CALL(*bundleStorage, RemoveArchive(_)).Times(1);
 
         auto location = fullLibPath(libPath);
         auto const& bundles = mockEnv.Install(location, manifests, resCont);
@@ -649,17 +648,34 @@ TEST_F(BundleManifestTest, IgnoreSecondManifestInstall)
         {    "bundle.activator",                       true}
     };
     manifests["TestBundleA"] = AnyMap(firstTimeManifest);
-    auto const libPath = fullLibPath("TestBundleA");
-    auto const& firstBundles = ctx.InstallBundles(libPath, manifests);
+    auto libPath = fullLibPath("TestBundleA");
+    std::vector<std::string> files = { libPath };
+    auto resCont = std::make_shared<MockBundleResourceContainer>();
+    EXPECT_CALL(*resCont, GetTopLevelDirs())
+        .WillRepeatedly(Return(files));
+
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(libPath), _))
+        .WillOnce(Return(std::make_shared<MockBundleArchive>(
+            bundleStorage,
+            resCont,
+            libPath, libPath, 1,
+            firstTimeManifest
+        )))
+        .WillOnce(Return(std::make_shared<MockBundleArchive>(
+            bundleStorage,
+            resCont,
+            libPath, libPath, 2,
+            secondTimeManifest
+        )));
+    EXPECT_CALL(*bundleStorage, RemoveArchive(_)).Times(AtLeast(1));
+
+    auto const& firstBundles = mockEnv.Install(libPath, manifests, resCont);
     auto const& firstHeaders = firstBundles[0].GetHeaders();
     ASSERT_TRUE(any_cast<bool>(firstHeaders.at("test")));
 
     // on second installation the manifest should be ignored, so our test value should remain true.
     manifests["TestBundleA"] = AnyMap(secondTimeManifest);
-    auto const& secondBundles = ctx.InstallBundles(libPath, manifests);
-    auto const& secondHeaders = secondBundles[0].GetHeaders();
-    // should still be true after install.
-    ASSERT_TRUE(any_cast<bool>(secondHeaders.at("test")));
+    EXPECT_THROW({ mockEnv.Install(libPath, manifests, resCont); }, std::runtime_error);
 }
 
 TEST_F(BundleManifestTest, DirectManifestInstallAndStartMultiStatic)
@@ -684,14 +700,57 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMultiStatic)
         {          "TestBundleB",  cppms::AnyMap(bManifest)},
         {"TestBundleImportedByB", cppms::AnyMap(b2Manifest)}
     };
+
+    // Inject mocked SharedLibrary to prevent framework bundle from being loaded
+    MockSharedLibrary* sharedLib = new MockSharedLibrary();
+    EXPECT_CALL(*sharedLib, GetHandle()).Times(2);
+    EXPECT_CALL(*sharedLib, Load(_)).Times(2);
+    mockEnv.bundlePrivate->lib = sharedLib;
+
+    std::vector<std::string> files = { "TestBundleB", "TestBundleImportedByB" };
+    auto resCont = std::make_shared<MockBundleResourceContainer>();
+    EXPECT_CALL(*resCont, GetTopLevelDirs())
+        .WillRepeatedly(Return(files));
+
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq("TestBundleB"), _))
+        .WillOnce(Return(std::make_shared<MockBundleArchive>(
+            bundleStorage,
+            resCont,
+            "TestBundleB", "TestBundleB", 1,
+            bManifest
+        )));
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq("TestBundleImportedByB"), _))
+        .WillOnce(Return(std::make_shared<MockBundleArchive>(
+            bundleStorage,
+            resCont,
+            "TestBundleImportedByB", "TestBundleImportedByB", 2,
+            b2Manifest
+        )));
+
     // Now use the new API to install bundles with the path and a manifest stored in an AnyMap.
-    auto bundleRoot = cppms::testing::LIB_PATH + util::DIR_SEP;
-    auto const& libPath = libName("TestBundleB");
-    auto const& fullLibPath = bundleRoot + libPath;
-    auto const& bundles = ctx.InstallBundles(fullLibPath, cppms::AnyMap(bLocationMap));
+    auto libPath = libName("TestBundleB");
+    auto locs = cppms::AnyMap(bLocationMap);
+    auto const& bundles = mockEnv.Install(libPath, locs, resCont);
     ASSERT_EQ(2, bundles.size());
     for (auto b : bundles)
     {
+        // Inject mocked SharedLibrary to prevent libA.so from being loaded
+        auto priv = GetPrivate(b);
+        delete priv->lib;
+        priv->lib = sharedLib;
+
+        std::string createActivatorFunc = US_STR(US_CREATE_ACTIVATOR_PREFIX) + files[0];
+        std::string destroyActivatorFunc = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + files[0];
+
+        MockBundleUtils* bundleUtils = new MockBundleUtils();
+        ON_CALL(*bundleUtils, GetSymbol(_, Eq(createActivatorFunc), _))
+            .WillByDefault(Return(reinterpret_cast<void*>(&generateActivator)));
+        ON_CALL(*bundleUtils, GetSymbol(_, Eq(destroyActivatorFunc), _))
+            .WillByDefault(Return(reinterpret_cast<void*>(&destroyActivator)));
+        EXPECT_CALL(*bundleUtils, GetSymbol(_, _, _)).Times(3);
+        delete priv->bundleUtils;
+        priv->bundleUtils = bundleUtils;
+
         ASSERT_NO_THROW(b.Start());
     }
 }

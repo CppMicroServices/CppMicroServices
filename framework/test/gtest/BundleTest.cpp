@@ -77,19 +77,6 @@ class BundleTest : public ::testing::Test
     void
     SetUp() override
     {
-        ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq("main"), _))
-            .WillByDefault(Return(std::make_shared<MockBundleArchive>(
-                bundleStorage,
-                std::make_shared<MockBundleResourceContainer>(),
-                "MockMain", "main", 0,
-                AnyMap({
-                    { "bundle.activator", Any(true) },
-                    { "bundle.symbolic_name", Any(std::string("FrameworkBundle")) }
-                })
-            )));
-        EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq("main"), _)).Times(AtLeast(1));
-        EXPECT_CALL(*bundleStorage, Close()).Times(AtLeast(1));
-
         framework.Start();
         context = framework.GetBundleContext();
     }

@@ -24,14 +24,19 @@ limitations under the License.
 
 using namespace cppmicroservices;
 using namespace cppmicroservices::detail;
+using ::testing::_;
+using ::testing::Eq;
+using ::testing::Return;
+using ::testing::AtLeast;
+using ::testing::AnyOf;
 
 namespace cppmicroservices
 {
 
-    MockedEnvironment::MockedEnvironment(MockBundleStorageMemory* bsm)
+    MockedEnvironment::MockedEnvironment(MockBundleStorageMemory* bundleStorage)
         : framework(FrameworkFactory().NewFramework())
     {
-        framework.c->storage = std::unique_ptr<MockBundleStorageMemory>(bsm);
+        framework.c->storage = std::unique_ptr<MockBundleStorageMemory>(bundleStorage);
 
         coreBundleContext = framework.c.get();
         delete coreBundleContext->bundleRegistry;
@@ -39,6 +44,20 @@ namespace cppmicroservices
         bundlePrivate = framework.d.get();
         bundleContext = framework.GetBundleContext();
         bundleContextPrivate = bundleContext.d.get();
+
+        // Mocked framework bundle
+        EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, AnyOf(Eq("system_bundle"), Eq("main")), _))
+            .Times(AtLeast(1))
+            .WillRepeatedly(Return(std::make_shared<MockBundleArchive>(
+                bundleStorage,
+                std::make_shared<MockBundleResourceContainer>(),
+                "MockMain", "main", 0,
+                AnyMap({
+                    { "bundle.activator", Any(true) },
+                    { "bundle.symbolic_name", Any(std::string("FrameworkBundle")) }
+                })
+            )));
+        EXPECT_CALL(*bundleStorage, Close()).Times(AtLeast(1));
     }
 
     std::vector<Bundle>

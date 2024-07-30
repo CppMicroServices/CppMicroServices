@@ -414,6 +414,15 @@ namespace test
 
                 auto fut = configuration->SafeUpdate(props);
                 fut->get();
+
+                cppmicroservices::AnyMap props1({
+                    {"uniqueProp", std::string("instance2")}
+                });
+                auto fut1 = configuration->SafeUpdateIfDifferent(props1);
+                fut1.second->get();
+
+                fut = configuration->SafeRemove();
+                fut->get();
             });
 
         auto fut = safe_post_task.get_future().share();

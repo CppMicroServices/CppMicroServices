@@ -96,7 +96,7 @@ namespace cppmicroservices
                 auto expected = false;
                 auto desired = true;
                 // if it is *asyncStarted==false
-                if (std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
+                if (asyncStarted->compare_exchange_strong(expected, desired))
                 {
                     // we execute the task
                     auto task = asyncTaskMap[asyncStarted];
@@ -224,7 +224,7 @@ namespace cppmicroservices
                         bool expected = false;
                         bool desired = true;
                         // if asyncStarted is non null AND *asyncStarted==true
-                        if (asyncStarted && !std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
+                        if (asyncStarted && !asyncStarted->compare_exchange_strong(expected, desired))
                         {
                             // this is blocking and it has started
                             return;
@@ -296,7 +296,7 @@ namespace cppmicroservices
                         bool desired = true;
 
                         // if asyncStarted is non null AND *asyncStarted==true
-                        if (asyncStarted && !std::atomic_compare_exchange_strong(&(*asyncStarted), &expected, desired))
+                        if (asyncStarted && !asyncStarted->compare_exchange_strong(expected, desired))
                         {
                             // this is blocking and it has started
                             return;

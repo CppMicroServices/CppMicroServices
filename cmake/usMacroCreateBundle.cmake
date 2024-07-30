@@ -180,6 +180,7 @@ if(${PROJECT_NAME}_BUILD_OBJ)
     )
   target_compile_definitions(${PROJECT_NAME}Obj
     PRIVATE US_BUNDLE_NAME=${${PROJECT_NAME}_SYMBOLIC_NAME}
+            US_IS_TESTING_OBJ=1
     )
 
   if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")

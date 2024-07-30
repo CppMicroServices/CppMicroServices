@@ -9,10 +9,14 @@
 
 #ifdef US_BUILD_SHARED_LIBS
   // We are building a shared lib
-  #ifdef @PROJECT_TARGET@_EXPORTS
-    #define US_@PROJECT_NAME@_EXPORT US_ABI_EXPORT
+  #ifdef US_IS_TESTING_OBJ
+    #define US_@PROJECT_NAME@_EXPORT
   #else
-    #define US_@PROJECT_NAME@_EXPORT US_ABI_IMPORT
+    #ifdef @PROJECT_TARGET@_EXPORTS
+      #define US_@PROJECT_NAME@_EXPORT US_ABI_EXPORT
+    #else
+      #define US_@PROJECT_NAME@_EXPORT US_ABI_IMPORT
+    #endif
   #endif
 #else
   // We are building a static lib

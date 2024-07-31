@@ -122,8 +122,8 @@ class BundleManifestTest : public ::testing::Test
 {
   protected:
     BundleManifestTest()
-        : bundleStorage(new MockBundleStorageMemory())
-        , mockEnv(MockedEnvironment(bundleStorage))
+        : mockEnv(MockedEnvironment(true))
+        , bundleStorage(mockEnv.bundleStorage)
         , framework(mockEnv.framework) {}
     virtual ~BundleManifestTest()
     {}
@@ -141,8 +141,8 @@ class BundleManifestTest : public ::testing::Test
         framework.WaitForStop(std::chrono::milliseconds::zero());
     }
 
-    cppmicroservices::MockBundleStorageMemory* bundleStorage;
     cppmicroservices::MockedEnvironment mockEnv;
+    cppmicroservices::MockBundleStorageMemory* bundleStorage;
     cppmicroservices::Framework& framework;
 };
 
@@ -157,18 +157,15 @@ TEST_F(BundleManifestTest, UnicodeProperty)
 
     std::vector<std::string> files = {"TestBundleU"};
     auto resCont = std::make_shared<MockBundleResourceContainer>();
-    ON_CALL(*resCont, GetTopLevelDirs())
-        .WillByDefault(Return(files));
-    EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+    EXPECT_CALL(*resCont, GetTopLevelDirs()).WillOnce(Return(files));
 
-    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _))
-        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _))
+        .WillOnce(Return(std::make_shared<MockBundleArchive>(
             bundleStorage,
             resCont,
             "MockTestBundleU", bundleName, 1,
             manifest
         )));
-    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _)).Times(1);
 
     auto bundles = mockEnv.Install(bundleName, manifest, resCont);
     ASSERT_EQ(1, bundles.size()) << "Mock bundle failed to install correctly.";
@@ -278,81 +275,6 @@ TEST_F(BundleManifestTest, ParseManifest)
     ASSERT_EQ(m["list"].Type(), typeid(std::vector<Any>));
     ASSERT_EQ(any_cast<std::vector<Any>>(m["list"]).size(), 2ul);
 }
-
-namespace cppmicroservices
-{
-
-    struct TestBundleAService
-    {
-        virtual ~TestBundleAService() {}
-    };
-
-    struct TestBundleA : public cppmicroservices::TestBundleAService
-    {
-        virtual ~TestBundleA() {}
-    };
-
-    class TestBundleAActivator : public cppmicroservices::BundleActivator
-    {
-      public:
-        TestBundleAActivator() {}
-        ~TestBundleAActivator() {}
-
-        void Start(BundleContext context)
-        {
-            s = std::make_shared<TestBundleA>();
-            sr = context.RegisterService<TestBundleAService>(s);
-        }
-
-        void Stop(BundleContext)
-        {
-            sr.Unregister();
-        }
-
-      private:
-        std::shared_ptr<TestBundleA> s;
-        ServiceRegistration<TestBundleAService> sr;
-    };
-
-    struct TestBundleBActivator : public cppmicroservices::BundleActivator
-    {
-      public:
-        void Start(BundleContext)
-        {}
-
-        void Stop(BundleContext)
-        {}
-    };
-
-    struct TestBundleImportedByBActivator : public cppmicroservices::BundleActivator
-    {
-      public:
-        void Start(BundleContext)
-        {}
-
-        void Stop(BundleContext)
-        {}
-    };
-
-    template<typename T>
-    BundleActivator* createActivator()
-    {
-        return new T();
-    }
-    void destroyActivator(BundleActivator* bundleActivator)
-    {
-        delete bundleActivator;
-    }
-
-    using map_type = std::map<std::string, BundleActivator*(*)()>;
-    map_type activators{
-        { "TestBundleA", &createActivator<TestBundleAActivator> },
-        { "TestBundleA2", &createActivator<TestBundleAActivator> },
-        { "TestBundleB", &createActivator<TestBundleBActivator> },
-        { "TestBundleImportedByB", &createActivator<TestBundleImportedByBActivator> }
-    };
-
-} // namespace cppmicroservices
 
 #ifdef US_BUILD_SHARED_LIBS
 TEST_F(BundleManifestTest, DirectManifestInstall)
@@ -531,20 +453,10 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
         )));
     EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _)).Times(1);
 
-    // Inject mocked SharedLibrary to prevent framework bundle from being loaded
-    MockSharedLibrary* sharedLib = new MockSharedLibrary();
-    EXPECT_CALL(*sharedLib, Load(_)).Times(1);
-    mockEnv.bundlePrivate->lib = sharedLib;
-
     auto location = fullLibPath("TestBundleA");
     auto const& bundles = mockEnv.Install(location, manifests, resCont);
     ASSERT_EQ(1, bundles.size());
     auto b = bundles[0];
-
-    // Inject mocked SharedLibrary to prevent libA.so from being loaded
-    auto priv = GetPrivate(b);
-    delete priv->lib;
-    priv->lib = sharedLib;
 
     std::string createActivatorFunc = US_STR(US_CREATE_ACTIVATOR_PREFIX) + files[0];
     std::string destroyActivatorFunc = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + files[0];
@@ -555,6 +467,8 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
     ON_CALL(*bundleUtils, GetSymbol(_, Eq(destroyActivatorFunc), _))
         .WillByDefault(Return(reinterpret_cast<void*>(&destroyActivator)));
     EXPECT_CALL(*bundleUtils, GetSymbol(_, _, _)).Times(3);
+
+    auto priv = GetPrivate(b);
     delete priv->bundleUtils;
     priv->bundleUtils = bundleUtils;
 
@@ -571,7 +485,6 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
     ASSERT_TRUE(!!svc);
 
     delete bundleUtils;
-    delete sharedLib;
 }
 
 TEST_F(BundleManifestTest, DirectManifestInstallAndStartMulti)
@@ -602,11 +515,6 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMulti)
     };
     manifests[libName("TestBundleA2")] = cppms::AnyMap(a2LocationMap);
 
-    // Inject mocked SharedLibrary to prevent framework bundle from being loaded
-    MockSharedLibrary* sharedLib = new MockSharedLibrary();
-    EXPECT_CALL(*sharedLib, Load(_)).Times(2);
-    mockEnv.bundlePrivate->lib = sharedLib;
-
     // Now use the new API to install bundles with the path and a manifest stored in an AnyMap.
     for (int i = 0; i < 2; i++)
     {
@@ -632,11 +540,6 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMulti)
         ASSERT_EQ(1, bundles.size());
         for (auto b : bundles)
         {
-            // Inject mocked SharedLibrary to prevent *.so from being loaded
-            auto priv = GetPrivate(b);
-            delete priv->lib;
-            priv->lib = sharedLib;
-
             std::string createActivatorFunc = US_STR(US_CREATE_ACTIVATOR_PREFIX) + libPath;
             std::string destroyActivatorFunc = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + libPath;
 
@@ -646,6 +549,9 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMulti)
             ON_CALL(*bundleUtils, GetSymbol(_, Eq(destroyActivatorFunc), _))
                 .WillByDefault(Return(reinterpret_cast<void*>(&destroyActivator)));
             EXPECT_CALL(*bundleUtils, GetSymbol(_, _, _)).Times(3);
+
+
+            auto priv = GetPrivate(b);
             delete priv->bundleUtils;
             priv->bundleUtils = bundleUtils;
 
@@ -653,8 +559,6 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMulti)
             delete bundleUtils;
         }
     }
-
-    delete sharedLib;
 }
 
 TEST_F(BundleManifestTest, IgnoreSecondManifestInstall)
@@ -732,11 +636,6 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMultiStatic)
         {"TestBundleImportedByB", cppms::AnyMap(b2Manifest)}
     };
 
-    // Inject mocked SharedLibrary to prevent framework bundle from being loaded
-    MockSharedLibrary* sharedLib = new MockSharedLibrary();
-    EXPECT_CALL(*sharedLib, Load(_)).Times(2);
-    mockEnv.bundlePrivate->lib = sharedLib;
-
     std::vector<std::string> files = { "TestBundleB", "TestBundleImportedByB" };
     auto resCont = std::make_shared<MockBundleResourceContainer>();
     EXPECT_CALL(*resCont, GetTopLevelDirs())
@@ -766,11 +665,6 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMultiStatic)
     {
         auto symbolicName = b.GetProperty("bundle.symbolic_name").ToString();
 
-        // Inject mocked SharedLibrary to prevent libA.so from being loaded
-        auto priv = GetPrivate(b);
-        delete priv->lib;
-        priv->lib = sharedLib;
-
         std::string createActivatorFunc = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
         std::string destroyActivatorFunc = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
 
@@ -780,14 +674,14 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMultiStatic)
         ON_CALL(*bundleUtils, GetSymbol(_, Eq(destroyActivatorFunc), _))
             .WillByDefault(Return(reinterpret_cast<void*>(&destroyActivator)));
         EXPECT_CALL(*bundleUtils, GetSymbol(_, _, _)).Times(3);
+
+        auto priv = GetPrivate(b);
         delete priv->bundleUtils;
         priv->bundleUtils = bundleUtils;
 
         ASSERT_NO_THROW(b.Start());
         delete bundleUtils;
     }
-
-    delete sharedLib;
 }
 #endif
 

@@ -54,7 +54,7 @@ namespace cppmicroservices
     class MockedEnvironment
     {
       public:
-        MockedEnvironment(MockBundleStorageMemory* bundleStorage);
+        MockedEnvironment(bool expectFrameworkStart = true);
         std::vector<Bundle> Install(std::string& location,
                                     cppmicroservices::AnyMap& bundleManifest,
                                     std::shared_ptr<MockBundleResourceContainer> const& resCont);
@@ -65,6 +65,83 @@ namespace cppmicroservices
         BundlePrivate* bundlePrivate;
         BundleContext bundleContext;
         BundleContextPrivate* bundleContextPrivate;
+
+        MockBundleStorageMemory* bundleStorage;
+        MockSharedLibrary* sharedLibrary;
+    };
+
+    struct TestBundleAService
+    {
+        virtual ~TestBundleAService() {}
+    };
+
+    struct TestBundleA : public cppmicroservices::TestBundleAService
+    {
+        virtual ~TestBundleA() {}
+    };
+
+    class TestBundleAActivator : public cppmicroservices::BundleActivator
+    {
+      public:
+        TestBundleAActivator() {}
+        ~TestBundleAActivator() {}
+
+        void Start(BundleContext context)
+        {
+            s = std::make_shared<TestBundleA>();
+            sr = context.RegisterService<TestBundleAService>(s);
+        }
+
+        void Stop(BundleContext)
+        {
+            sr.Unregister();
+        }
+
+      private:
+        std::shared_ptr<TestBundleA> s;
+        ServiceRegistration<TestBundleAService> sr;
+    };
+
+    struct TestBundleBActivator : public cppmicroservices::BundleActivator
+    {
+      public:
+        void Start(BundleContext)
+        {}
+
+        void Stop(BundleContext)
+        {}
+    };
+
+    struct TestBundleImportedByBActivator : public cppmicroservices::BundleActivator
+    {
+      public:
+        void Start(BundleContext)
+        {}
+
+        void Stop(BundleContext)
+        {}
+    };
+
+    struct TestBundleUActivator : public cppmicroservices::BundleActivator
+    {
+      public:
+        void Start(BundleContext)
+        {}
+
+        void Stop(BundleContext)
+        {}
+    };
+
+    template<typename T>
+    BundleActivator* createActivator();
+    void destroyActivator(BundleActivator* bundleActivator);
+
+    static std::map<std::string, BundleActivator*(*)()> activators = {
+        { "TestBundleA", &createActivator<TestBundleAActivator> },
+        { "TestBundleA2", &createActivator<TestBundleAActivator> },
+        { "TestBundleB", &createActivator<TestBundleBActivator> },
+        { "TestBundleImportedByB", &createActivator<TestBundleImportedByBActivator> },
+        { "TestBundleU", &createActivator<TestBundleUActivator> }
     };
 
 } // namespace cppmicroservices

@@ -33,9 +33,10 @@ using ::testing::AnyOf;
 namespace cppmicroservices
 {
 
-    MockedEnvironment::MockedEnvironment(MockBundleStorageMemory* bundleStorage)
+    MockedEnvironment::MockedEnvironment(bool expectFrameworkStart)
         : framework(FrameworkFactory().NewFramework())
     {
+        bundleStorage = new MockBundleStorageMemory();
         framework.c->storage = std::unique_ptr<MockBundleStorageMemory>(bundleStorage);
 
         coreBundleContext = framework.c.get();
@@ -46,18 +47,25 @@ namespace cppmicroservices
         bundleContextPrivate = bundleContext.d.get();
 
         // Mocked framework bundle
-        EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, AnyOf(Eq("system_bundle"), Eq("main")), _))
-            .Times(AtLeast(1))
-            .WillRepeatedly(Return(std::make_shared<MockBundleArchive>(
-                bundleStorage,
-                std::make_shared<MockBundleResourceContainer>(),
-                "MockMain", "main", 0,
-                AnyMap({
-                    { "bundle.activator", Any(true) },
-                    { "bundle.symbolic_name", Any(std::string("FrameworkBundle")) }
-                })
-            )));
-        EXPECT_CALL(*bundleStorage, Close()).Times(AtLeast(1));
+        if (expectFrameworkStart) {
+            EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, AnyOf(Eq("system_bundle"), Eq("main")), _))
+                .Times(AtLeast(1))
+                .WillRepeatedly(Return(std::make_shared<MockBundleArchive>(
+                    bundleStorage,
+                    std::make_shared<MockBundleResourceContainer>(),
+                    "MockMain", "main", 0,
+                    AnyMap({
+                        { "bundle.activator", Any(true) },
+                        { "bundle.symbolic_name", Any(std::string("FrameworkBundle")) }
+                    })
+                )));
+            EXPECT_CALL(*bundleStorage, Close()).Times(AtLeast(1));
+        }
+
+        // Mocked shared library loader
+        sharedLibrary = new MockSharedLibrary();
+        EXPECT_CALL(*sharedLibrary, Load(_)).Times(AtLeast(1));
+        bundlePrivate->lib = sharedLibrary;
     }
 
     std::vector<Bundle>
@@ -67,7 +75,26 @@ namespace cppmicroservices
         std::shared_ptr<MockBundleResourceContainer> const& resCont
     )
     {
-        return bundleRegistry->Install1(location, bundleManifest, resCont);
+        auto bundles = bundleRegistry->Install1(location, bundleManifest, resCont);
+
+        for (auto& b : bundles)
+        {
+            auto priv = GetPrivate(b);
+            delete priv->lib;
+            priv->lib = sharedLibrary;
+        }
+
+        return bundles;
+    }
+
+    template<typename T>
+    BundleActivator* createActivator()
+    {
+        return new T();
+    }
+    void destroyActivator(BundleActivator* bundleActivator)
+    {
+        delete bundleActivator;
     }
 
 } // namespace cppmicroservices

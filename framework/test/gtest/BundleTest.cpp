@@ -61,16 +61,11 @@ using ::testing::AtLeast;
 class BundleTest : public ::testing::Test
 {
   protected:
-    cppmicroservices::MockBundleStorageMemory* bundleStorage;
-    cppmicroservices::MockedEnvironment mockEnv;
-    cppmicroservices::Framework& framework;
+    cppmicroservices::Framework framework;
     cppmicroservices::BundleContext context;
 
   public:
-    BundleTest()
-        : bundleStorage(new MockBundleStorageMemory())
-        , mockEnv(MockedEnvironment(bundleStorage))
-        , framework(mockEnv.framework) {}
+    BundleTest() : framework(FrameworkFactory().NewFramework()) {};
 
     ~BundleTest() override = default;
 
@@ -660,6 +655,9 @@ TEST_F(BundleTest, TestNonStandardBundleExtension)
 
 TEST_F(BundleTest, TestUnicodePaths)
 {
+    MockedEnvironment mockEnv(false);
+    MockBundleStorageMemory* bundleStorage = mockEnv.bundleStorage;
+
     std::string bundleName = "TestBundleU";
     std::string pathName = LIB_PATH + cppmicroservices::util::DIR_SEP + u8"くいりのまちとこしくそ"
                             + cppmicroservices::util::DIR_SEP + US_LIB_PREFIX + "TestBundleU" + US_LIB_POSTFIX
@@ -688,6 +686,20 @@ TEST_F(BundleTest, TestUnicodePaths)
     auto bundles = mockEnv.Install(bundleName, manifest, resCont);
     ASSERT_EQ(1, bundles.size()) << "Mock bundle failed to install correctly.";
     auto bundle = bundles.at(0);
+
+    std::string createActivatorFunc = US_STR(US_CREATE_ACTIVATOR_PREFIX) + bundleName;
+    std::string destroyActivatorFunc = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + bundleName;
+
+    MockBundleUtils* bundleUtils = new MockBundleUtils();
+    ON_CALL(*bundleUtils, GetSymbol(_, Eq(createActivatorFunc), _))
+        .WillByDefault(Return(reinterpret_cast<void*>(activators[files[0]])));
+    ON_CALL(*bundleUtils, GetSymbol(_, Eq(destroyActivatorFunc), _))
+        .WillByDefault(Return(reinterpret_cast<void*>(&destroyActivator)));
+    EXPECT_CALL(*bundleUtils, GetSymbol(_, _, _)).Times(3);
+
+    auto priv = GetPrivate(bundle);
+    delete priv->bundleUtils;
+    priv->bundleUtils = bundleUtils;
 
     // Bundle location is the same as the path used to install
     ASSERT_EQ(bundle.GetLocation(), pathName);
@@ -857,41 +869,6 @@ TEST_F(BundleTest, TestBundleManifestFailures)
 // Test the behavior of illegal bundle state changes.
 TEST_F(BundleTest, TestIllegalBundleStateChange)
 {
-    /*
-    MockCoreBundleContext cbc;
-    MockBundleStorageMemory* bsm = new MockBundleStorageMemory();
-
-    ON_CALL(*bsm, CreateAndInsertArchive(_, _, _))
-        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
-            bsm,
-            std::make_shared<MockBundleResourceContainer>(),
-            "MOCK", "TestBundleA", 1,
-            AnyMap({
-                { "bundle.symbolic_name", Any(std::string("TestBundleA")) },
-                { "bundle.description", Any(std::string("A test bundle missing bundle.symbolic_name.")) },
-                { "bundle.version", Any(std::string("1.0")) },
-                { "bundle.activator", Any(true) }
-            })
-        )));
-    ON_CALL(*bsm, RemoveArchive(_)).WillByDefault(Return(true));
-    EXPECT_CALL(*bsm, CreateAndInsertArchive(_, _, _)).Times(1);
-    // EXPECT_CALL(*bsm, RemoveArchive(_)).Times(1);
-
-    cbc.storage = std::unique_ptr<MockBundleStorageMemory>(bsm);
-
-    std::shared_ptr<BundlePrivate> bp = std::make_shared<BundlePrivate>(&cbc);
-    std::shared_ptr<BundleContextPrivate> bcp = std::make_shared<BundleContextPrivate>(bp.get());
-    BundleContext bc = MakeBundleContext(bcp);
-
-    auto bundleA = InstallLib(bc, "TestBundleA");
-
-    // TODO: This fails because of invalid bundle (coreCtx is nullptr within BundleRegistry::Install0)
-    bundleA.Start();
-    bundleA.Uninstall();
-    // Test stopping an uninstalled bundle
-    EXPECT_THROW(bundleA.Stop(), std::logic_error);
-    */
-
     auto bundleA = InstallLib(context, "TestBundleA");
     bundleA.Start();
     bundleA.Uninstall();

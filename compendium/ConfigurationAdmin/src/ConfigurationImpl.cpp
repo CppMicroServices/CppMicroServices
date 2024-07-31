@@ -103,6 +103,18 @@ namespace cppmicroservices
         std::shared_future<void>
         ConfigurationImpl::Update(AnyMap newProperties)
         {
+            return SafeUpdateImpl(newProperties)->retrieveFuture();
+        }
+
+        std::shared_ptr<ThreadpoolSafeFuture>
+        ConfigurationImpl::SafeUpdate(AnyMap newProperties)
+        {
+            return SafeUpdateImpl(newProperties);
+        }
+
+        std::shared_ptr<ThreadpoolSafeFuturePrivate>
+        ConfigurationImpl::SafeUpdateImpl(AnyMap newProperties)
+        {
             {
                 std::lock_guard<std::mutex> lk { propertiesMutex };
                 if (removed)
@@ -120,11 +132,25 @@ namespace cppmicroservices
             std::promise<void> ready;
             std::shared_future<void> fut = ready.get_future();
             ready.set_value();
-            return fut;
+            return std::make_shared<ThreadpoolSafeFuturePrivate>(fut);
         }
 
         std::pair<bool, std::shared_future<void>>
         ConfigurationImpl::UpdateIfDifferent(AnyMap newProperties)
+        {
+            auto tup = SafeUpdateIfDifferentImpl(newProperties);
+
+            return std::make_pair(std::get<0>(tup), std::get<1>(tup)->retrieveFuture());
+        }
+
+        std::pair<bool, std::shared_ptr<ThreadpoolSafeFuture>>
+        ConfigurationImpl::SafeUpdateIfDifferent(AnyMap newProperties)
+        {
+            return SafeUpdateIfDifferentImpl(newProperties);
+        }
+
+        std::pair<bool, std::shared_ptr<ThreadpoolSafeFuturePrivate>>
+        ConfigurationImpl::SafeUpdateIfDifferentImpl(AnyMap newProperties)
         {
             std::promise<void> ready;
             std::shared_future<void> fut = ready.get_future();
@@ -132,21 +158,36 @@ namespace cppmicroservices
             if (!updated.first)
             {
                 ready.set_value();
-                return std::pair<bool, std::shared_future<void>>(updated.first, fut);
+                return std::pair<bool, std::shared_ptr<ThreadpoolSafeFuturePrivate>>(
+                    updated.first,
+                    std::make_shared<ThreadpoolSafeFuturePrivate>(fut));
             }
             std::lock_guard<std::mutex> lk { configAdminMutex };
             if (configAdminImpl)
             {
                 auto fut = configAdminImpl->NotifyConfigurationUpdated(pid, changeCount);
-                return std::pair<bool, std::shared_future<void>>(true, fut);
+                return std::pair<bool, std::shared_ptr<ThreadpoolSafeFuturePrivate>>(true, fut);
             }
 
             ready.set_value();
-            return std::pair<bool, std::shared_future<void>>(true, fut);
+            return std::pair<bool, std::shared_ptr<ThreadpoolSafeFuturePrivate>>(
+                true,
+                std::make_shared<ThreadpoolSafeFuturePrivate>(fut));
         }
 
         std::shared_future<void>
         ConfigurationImpl::Remove()
+        {
+            return SafeRemoveImpl()->retrieveFuture();
+        }
+        std::shared_ptr<ThreadpoolSafeFuture>
+        ConfigurationImpl::SafeRemove()
+        {
+            return SafeRemoveImpl();
+        }
+
+        std::shared_ptr<ThreadpoolSafeFuturePrivate>
+        ConfigurationImpl::SafeRemoveImpl()
         {
             {
                 std::lock_guard<std::mutex> lk { propertiesMutex };
@@ -168,9 +209,8 @@ namespace cppmicroservices
             std::promise<void> ready;
             std::shared_future<void> fut = ready.get_future();
             ready.set_value();
-            return fut;
+            return std::make_shared<ThreadpoolSafeFuturePrivate>(fut);
         }
-
         std::pair<bool, unsigned long>
         ConfigurationImpl::UpdateWithoutNotificationIfDifferent(AnyMap newProperties)
         {

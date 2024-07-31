@@ -25,6 +25,7 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 #include <cppmicroservices/ServiceTracker.h>
+#include <cppmicroservices/ThreadpoolSafeFuture.h>
 
 namespace test
 {
@@ -50,7 +51,7 @@ namespace test
 
         auto factoryProp = factoryProps.find("component.factory");
         ASSERT_TRUE(factoryProp != factoryProps.end()) << "factoryProp not found in factory properties";
-        const std::string factoryId { "factory id" };
+        std::string const factoryId { "factory id" };
         EXPECT_EQ(factoryProp->second, factoryId);
 
         // Get a service reference to ConfigAdmin to create the factory component instance.
@@ -66,7 +67,7 @@ namespace test
         // properties. Update the properties before instantiating the factory
         // instance.
         cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-        const std::string instanceId { "instance1" };
+        std::string const instanceId { "instance1" };
         props["uniqueProp"] = instanceId;
         auto fut = factoryConfig->Update(props);
         fut.get();
@@ -115,7 +116,7 @@ namespace test
         // properties. Update the properties before instantiating the factory
         // instance.
         cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-        const std::string instanceId { "instance1" };
+        std::string const instanceId { "instance1" };
         props["uniqueProp"] = instanceId;
         auto fut = factoryConfig->Update(props);
         fut.get();
@@ -150,7 +151,7 @@ namespace test
 
             // Update the properties for the factory configuration object
             cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-            const std::string instanceId { "instance" + std::to_string(i) };
+            std::string const instanceId { "instance" + std::to_string(i) };
             props["uniqueProp"] = instanceId;
             auto fut = factoryConfig->Update(props);
             fut.get();
@@ -165,22 +166,21 @@ namespace test
         auto instances = GetInstances<test::CAInterface>();
         EXPECT_EQ(instances.size(), count);
     }
-    /* test MultipleFactoryConfig. 
-     * This test creates 10 factory objects without waiting for the previous one to complete. 
+    /* test MultipleFactoryConfig.
+     * This test creates 10 factory objects without waiting for the previous one to complete.
      */
     TEST_F(tServiceComponent, testMultipleFactoryConfig)
     {
         std::string configurationPid = "ServiceComponentPid";
 
-        // Start the test bundle containing the factory component. 
-        cppmicroservices::Bundle testBundle = StartTestBundle(
-            "TestBundleDSCA21"); 
-        
+        // Start the test bundle containing the factory component.
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA21");
+
         // Get a service reference to ConfigAdmin to create the factory component instances.
         auto configAdminService = GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
         ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
 
-        // Create some factory configuration objects. Don't wait for one to complete before 
+        // Create some factory configuration objects. Don't wait for one to complete before
         // creating the next one.
         constexpr auto count = 10;
         std::vector<std::shared_future<void>> futures;
@@ -192,16 +192,17 @@ namespace test
 
             // Update the properties for the factory configuration object
             cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-            const std::string instanceId { "instance" + std::to_string(i) };
+            std::string const instanceId { "instance" + std::to_string(i) };
             props["uniqueProp"] = instanceId;
             auto fut = factoryConfig->Update(props);
             futures.push_back(fut);
         }
 
         // Wait for all factory objects to finish updating.
-        for (auto const& item : futures) {
+        for (auto const& item : futures)
+        {
             item.get();
-         } 
+        }
 
         // Request service references to the new component instances. This will
         // cause DS to construct the factory instances.

@@ -26,34 +26,7 @@ namespace cppmicroservices::logservice
                return;
            }
 
-           switch (level)
-           {
-               case SeverityLevel::LOG_DEBUG:
-               {
-		   currLogger->debug(message);
-	           break;
-	       }
-	       case SeverityLevel::LOG_INFO:
-	       {
-		   currLogger->info(message);
-	 	   break;
-	       }
-	       case SeverityLevel::LOG_WARNING:
-	       {
-         	   currLogger->warn(message);
-		   break;
-	       }
-	       case SeverityLevel::LOG_ERROR:
-	       {
-		   currLogger->error(message);
-		   break;
-	       } 
-	       default:
-	       {
-	           currLogger->trace(message);
-        	   break;
-	       } 
-	    }
+	   logImpl(level, message);
 	}
 
         void
@@ -65,34 +38,7 @@ namespace cppmicroservices::logservice
                return;
             }
 
-            switch (level)
-            {
-                case SeverityLevel::LOG_DEBUG:
-                {
-                    currLogger->debug(message, ex);
-                    break;
-                }
-		case SeverityLevel::LOG_INFO:
-		{
-		    currLogger->info(message, ex);
-	   	    break;
-		}
-		case SeverityLevel::LOG_WARNING:
-		{
-		    currLogger->warn(message, ex);
-		    break;
-		}
-		case SeverityLevel::LOG_ERROR:
-		{
-		    currLogger->error(message, ex);
-		    break;
-		}
-		default:
-		{
-	       	    currLogger->trace(message, ex);
-		    break;
-		}
-	    }
+	    logImpl(level, message, ex);
 	}
 
 	void
@@ -103,34 +49,8 @@ namespace cppmicroservices::logservice
 	    {
 		return;
 	    }
-	    switch (level)
-	    {
-		case SeverityLevel::LOG_DEBUG:
-		{
-		    currLogger->debug(message, sr);
-		    break;
-		}
-		case SeverityLevel::LOG_INFO:
-		{
-		    currLogger->info(message, sr);
-		    break;
-		}
-		case SeverityLevel::LOG_WARNING:
-		{
-		    currLogger->warn(message, sr);
-		    break;
-		}
-		case SeverityLevel::LOG_ERROR:
-		{
-	    	    currLogger->error(message, sr);
-		    break;	
-		}
-		default:
-		{
-		    currLogger->trace(message, sr);
-		    break;
-		}
-	    }	
+
+	    logImpl(level, message, sr);
 	}
 
 	void
@@ -145,34 +65,8 @@ namespace cppmicroservices::logservice
 	    {
 		return;
        	    }
-	    switch (level)
-	    {
-	        case SeverityLevel::LOG_DEBUG:
-		{
-		    currLogger->debug(message, sr, ex);
-		    break;
-		}
-		case SeverityLevel::LOG_INFO:
-		{	    
-		    currLogger->info(message, sr, ex);	    
-		    break;
-		}
-		case SeverityLevel::LOG_WARNING:
-		{
-		    currLogger->warn(message, sr, ex);
-		    break;
-		}
-		case SeverityLevel::LOG_ERROR:
-		{
-		    currLogger->error(message, sr, ex);	    
-		    break;
-		}
-		default:
-		{
-		    currLogger->trace(message, sr, ex);
-		    break;
-		}
-   	     }
+
+	    logImpl(level, message, sr, ex);
 	}
 
         std::shared_ptr<Logger> 

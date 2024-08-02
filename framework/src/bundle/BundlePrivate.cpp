@@ -694,8 +694,8 @@ namespace cppmicroservices
         , version(CppMicroServices_VERSION_MAJOR, CppMicroServices_VERSION_MINOR, CppMicroServices_VERSION_PATCH)
         , timeStamp(std::chrono::steady_clock::now())
         , bundleManifest()
-        , lib(new SharedLibrary())
-        , bundleUtils(new BundleUtils())
+        , lib(std::make_unique<SharedLibrary>())
+        , bundleUtils(std::make_unique<BundleUtils>())
         , SetBundleContext(nullptr)
     {
     }
@@ -718,8 +718,8 @@ namespace cppmicroservices
         , version()
         , timeStamp(ba->GetLastModified())
         , bundleManifest(ba->GetInjectedManifest())
-        , lib(new SharedLibrary(location))
-        , bundleUtils(new BundleUtils())
+        , lib(std::make_unique<SharedLibrary>(location))
+        , bundleUtils(std::make_unique<BundleUtils>())
         , SetBundleContext(nullptr)
     {
         // Only take the time to read the manifest out of the BundleArchive file if we don't already have

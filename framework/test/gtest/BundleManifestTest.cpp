@@ -195,18 +195,15 @@ TEST_F(BundleManifestTest, InstallBundleWithDeepManifest)
 
     std::vector<std::string> files = {"TestBundleWithDeepManifest"};
     auto resCont = std::make_shared<MockBundleResourceContainer>();
-    ON_CALL(*resCont, GetTopLevelDirs())
-        .WillByDefault(Return(files));
-    EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+    EXPECT_CALL(*resCont, GetTopLevelDirs()).WillOnce(Return(files));
 
-    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _))
-        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _))
+        .WillOnce(Return(std::make_shared<MockBundleArchive>(
             bundleStorage,
             resCont,
             "MockTestBundleWithDeepManifest", bundleName, 1,
             manifest
         )));
-    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _)).Times(1);
 
     auto bundles = mockEnv.Install(bundleName, manifest, resCont);
     ASSERT_EQ(1, bundles.size()) << "Mock bundle failed to install correctly.";
@@ -337,18 +334,15 @@ TEST_F(BundleManifestTest, DirectManifestInstallNoSymbolicName)
     auto libPath = fullLibPath("TestBundleA");
 
     auto resCont = std::make_shared<MockBundleResourceContainer>();
-    ON_CALL(*resCont, GetTopLevelDirs())
-        .WillByDefault(Return(files));
-    EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+    EXPECT_CALL(*resCont, GetTopLevelDirs()).WillOnce(Return(files));
 
-    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _))
-        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _))
+        .WillOnce(Return(std::make_shared<MockBundleArchive>(
             bundleStorage,
             resCont,
             files[0], files[0], 1,
             testBundleAManifest
         )));
-    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _)).Times(1);
     EXPECT_CALL(*bundleStorage, RemoveArchive(_)).Times(1);
 
     EXPECT_THROW({ mockEnv.Install(libPath, manifests, resCont); }, std::runtime_error);
@@ -388,27 +382,23 @@ TEST_F(BundleManifestTest, DirectManifestInstallMulti)
     manifests["TestBundleB"] = cppmicroservices::AnyMap(testBundleBManifest);
 
     auto resCont = std::make_shared<MockBundleResourceContainer>();
-    ON_CALL(*resCont, GetTopLevelDirs())
-        .WillByDefault(Return(files));
-    EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+    EXPECT_CALL(*resCont, GetTopLevelDirs()).WillOnce(Return(files));
 
-    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _))
-        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _))
+        .WillOnce(Return(std::make_shared<MockBundleArchive>(
             bundleStorage,
             resCont,
             files[0], files[0], 1,
             testBundleAManifest
         )));
-    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _)).Times(1);
 
-    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[1]), _))
-        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[1]), _))
+        .WillOnce(Return(std::make_shared<MockBundleArchive>(
             bundleStorage,
             resCont,
             files[1], files[1], 2,
             testBundleBManifest
         )));
-    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[1]), _)).Times(1);
 
     auto libPath = fullLibPath("TestBundleA");
     auto const& bundles = mockEnv.Install(libPath, manifests, resCont);
@@ -440,18 +430,15 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
     manifests["TestBundleA"] = cppmicroservices::AnyMap(testBundleAManifest);
 
     auto resCont = std::make_shared<MockBundleResourceContainer>();
-    ON_CALL(*resCont, GetTopLevelDirs())
-        .WillByDefault(Return(files));
-    EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+    EXPECT_CALL(*resCont, GetTopLevelDirs()).WillOnce(Return(files));
 
-    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _))
-        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _))
+        .WillOnce(Return(std::make_shared<MockBundleArchive>(
             bundleStorage,
             resCont,
             files[0], files[0], 1,
             testBundleAManifest
         )));
-    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(files[0]), _)).Times(1);
 
     auto location = fullLibPath("TestBundleA");
     auto const& bundles = mockEnv.Install(location, manifests, resCont);
@@ -461,7 +448,7 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
     std::string createActivatorFunc = US_STR(US_CREATE_ACTIVATOR_PREFIX) + files[0];
     std::string destroyActivatorFunc = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + files[0];
 
-    MockBundleUtils* bundleUtils = new MockBundleUtils();
+    std::unique_ptr<MockBundleUtils> bundleUtils = std::make_unique<MockBundleUtils>();
     ON_CALL(*bundleUtils, GetSymbol(_, Eq(createActivatorFunc), _))
         .WillByDefault(Return(reinterpret_cast<void*>(cppmicroservices::activators["TestBundleA"])));
     ON_CALL(*bundleUtils, GetSymbol(_, Eq(destroyActivatorFunc), _))
@@ -469,8 +456,7 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
     EXPECT_CALL(*bundleUtils, GetSymbol(_, _, _)).Times(3);
 
     auto priv = GetPrivate(b);
-    delete priv->bundleUtils;
-    priv->bundleUtils = bundleUtils;
+    priv->bundleUtils = std::move(bundleUtils);
 
     b.Start();
     auto headers = b.GetHeaders();
@@ -483,8 +469,6 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
     auto ref = ctx.GetServiceReference<cppmicroservices::TestBundleAService>();
     auto svc = ctx.GetService(ref);
     ASSERT_TRUE(!!svc);
-
-    delete bundleUtils;
 }
 
 TEST_F(BundleManifestTest, DirectManifestInstallAndStartMulti)
@@ -523,9 +507,7 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMulti)
 
         std::vector<std::string> files = { libPath };
         auto resCont = std::make_shared<MockBundleResourceContainer>();
-        ON_CALL(*resCont, GetTopLevelDirs())
-            .WillByDefault(Return(files));
-        EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+        EXPECT_CALL(*resCont, GetTopLevelDirs()).WillOnce(Return(files));
 
         EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(libPath), _))
             .WillOnce(Return(std::make_shared<MockBundleArchive>(
@@ -543,7 +525,7 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMulti)
             std::string createActivatorFunc = US_STR(US_CREATE_ACTIVATOR_PREFIX) + libPath;
             std::string destroyActivatorFunc = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + libPath;
 
-            MockBundleUtils* bundleUtils = new MockBundleUtils();
+            std::unique_ptr<MockBundleUtils> bundleUtils = std::make_unique<MockBundleUtils>();
             ON_CALL(*bundleUtils, GetSymbol(_, Eq(createActivatorFunc), _))
                 .WillByDefault(Return(reinterpret_cast<void*>(cppmicroservices::activators[libPath])));
             ON_CALL(*bundleUtils, GetSymbol(_, Eq(destroyActivatorFunc), _))
@@ -552,11 +534,9 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMulti)
 
 
             auto priv = GetPrivate(b);
-            delete priv->bundleUtils;
-            priv->bundleUtils = bundleUtils;
+            priv->bundleUtils = std::move(bundleUtils);
 
             ASSERT_NO_THROW(b.Start());
-            delete bundleUtils;
         }
     }
 }
@@ -668,7 +648,7 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMultiStatic)
         std::string createActivatorFunc = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
         std::string destroyActivatorFunc = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
 
-        MockBundleUtils* bundleUtils = new MockBundleUtils();
+        std::unique_ptr<MockBundleUtils> bundleUtils = std::make_unique<MockBundleUtils>();
         ON_CALL(*bundleUtils, GetSymbol(_, Eq(createActivatorFunc), _))
             .WillByDefault(Return(reinterpret_cast<void*>(activators[symbolicName])));
         ON_CALL(*bundleUtils, GetSymbol(_, Eq(destroyActivatorFunc), _))
@@ -676,11 +656,9 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStartMultiStatic)
         EXPECT_CALL(*bundleUtils, GetSymbol(_, _, _)).Times(3);
 
         auto priv = GetPrivate(b);
-        delete priv->bundleUtils;
-        priv->bundleUtils = bundleUtils;
+        priv->bundleUtils = std::move(bundleUtils);
 
         ASSERT_NO_THROW(b.Start());
-        delete bundleUtils;
     }
 }
 #endif

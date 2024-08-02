@@ -61,11 +61,6 @@ namespace cppmicroservices
                 )));
             EXPECT_CALL(*bundleStorage, Close()).Times(AtLeast(1));
         }
-
-        // Mocked shared library loader
-        sharedLibrary = new MockSharedLibrary();
-        EXPECT_CALL(*sharedLibrary, Load(_)).Times(AtLeast(1));
-        bundlePrivate->lib = sharedLibrary;
     }
 
     std::vector<Bundle>
@@ -80,8 +75,7 @@ namespace cppmicroservices
         for (auto& b : bundles)
         {
             auto priv = GetPrivate(b);
-            delete priv->lib;
-            priv->lib = sharedLibrary;
+            priv->lib = std::make_unique<MockSharedLibrary>();
         }
 
         return bundles;

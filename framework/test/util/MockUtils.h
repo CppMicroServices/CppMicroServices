@@ -67,7 +67,6 @@ namespace cppmicroservices
         BundleContextPrivate* bundleContextPrivate;
 
         MockBundleStorageMemory* bundleStorage;
-        MockSharedLibrary* sharedLibrary;
     };
 
     struct TestBundleAService

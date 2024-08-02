@@ -690,7 +690,7 @@ TEST_F(BundleTest, TestUnicodePaths)
     std::string createActivatorFunc = US_STR(US_CREATE_ACTIVATOR_PREFIX) + bundleName;
     std::string destroyActivatorFunc = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + bundleName;
 
-    MockBundleUtils* bundleUtils = new MockBundleUtils();
+    std::unique_ptr<MockBundleUtils> bundleUtils = std::make_unique<MockBundleUtils>();
     ON_CALL(*bundleUtils, GetSymbol(_, Eq(createActivatorFunc), _))
         .WillByDefault(Return(reinterpret_cast<void*>(activators[files[0]])));
     ON_CALL(*bundleUtils, GetSymbol(_, Eq(destroyActivatorFunc), _))
@@ -698,8 +698,7 @@ TEST_F(BundleTest, TestUnicodePaths)
     EXPECT_CALL(*bundleUtils, GetSymbol(_, _, _)).Times(3);
 
     auto priv = GetPrivate(bundle);
-    delete priv->bundleUtils;
-    priv->bundleUtils = bundleUtils;
+    priv->bundleUtils = std::move(bundleUtils);
 
     // Bundle location is the same as the path used to install
     ASSERT_EQ(bundle.GetLocation(), pathName);

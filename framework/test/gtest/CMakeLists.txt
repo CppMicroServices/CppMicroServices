@@ -151,6 +151,11 @@ target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${GMOCK_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} $<TARGET_OBJECTS:FrameworkObj> usLogService)
 
+# dlopen/dlsym/dlerror used by SharedLibrary.cpp.o
+if(UNIX)
+  target_link_libraries(${us_gtest_test_exe_name} -ldl)
+endif()
+
 # Needed for clock_gettime with glibc < 2.17
 if(UNIX AND NOT APPLE)
   target_link_libraries(${us_gtest_test_exe_name} rt)

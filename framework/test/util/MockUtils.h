@@ -61,12 +61,12 @@ namespace cppmicroservices
 
         Framework framework;
         CoreBundleContext* coreBundleContext;
-        BundleRegistry* bundleRegistry;
         BundlePrivate* bundlePrivate;
         BundleContext bundleContext;
         BundleContextPrivate* bundleContextPrivate;
 
         MockBundleStorageMemory* bundleStorage;
+        MockBundleRegistry* bundleRegistry;
     };
 
     struct TestBundleAService

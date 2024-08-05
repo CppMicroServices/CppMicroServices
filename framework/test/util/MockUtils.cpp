@@ -36,12 +36,13 @@ namespace cppmicroservices
     MockedEnvironment::MockedEnvironment(bool expectFrameworkStart)
         : framework(FrameworkFactory().NewFramework())
     {
-        bundleStorage = new MockBundleStorageMemory();
-        framework.c->storage = std::unique_ptr<MockBundleStorageMemory>(bundleStorage);
-
         coreBundleContext = framework.c.get();
-        delete coreBundleContext->bundleRegistry;
-        bundleRegistry = coreBundleContext->bundleRegistry = new MockBundleRegistry(coreBundleContext);
+
+        bundleStorage = new MockBundleStorageMemory();
+        bundleRegistry = new MockBundleRegistry(coreBundleContext);
+        coreBundleContext->storage = std::unique_ptr<MockBundleStorageMemory>(bundleStorage);
+        coreBundleContext->bundleRegistry = std::unique_ptr<MockBundleRegistry>(bundleRegistry);
+
         bundlePrivate = framework.d.get();
         bundleContext = framework.GetBundleContext();
         bundleContextPrivate = bundleContext.d.get();

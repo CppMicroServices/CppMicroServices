@@ -20,7 +20,7 @@ endforeach()
 # link libraries for the CppMicroServices lib
 set(_link_libraries )
 if(UNIX)
-  list(APPEND _link_libraries dl)
+  list(APPEND _link_libraries ${CMAKE_DL_LIBS})
 endif()
 if(WIN32)
   list(APPEND _link_libraries shlwapi.lib)

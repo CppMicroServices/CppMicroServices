@@ -90,7 +90,7 @@ namespace cppmicroservices
         , logger(std::make_shared<cppmicroservices::cfrimpl::CFRLogger>())
         , serviceHooks(this)
         , bundleHooks(this)
-        , bundleRegistry(new BundleRegistry(this))
+        , bundleRegistry(std::make_unique<BundleRegistry>(this))
         , firstInit(true)
         , initCount(0)
         , libraryLoadOptions(0)
@@ -103,10 +103,7 @@ namespace cppmicroservices
         DIAG_LOG(*sink) << "created";
     }
 
-    CoreBundleContext::~CoreBundleContext()
-    {
-        delete bundleRegistry;
-    }
+    CoreBundleContext::~CoreBundleContext() = default;
 
     std::shared_ptr<CoreBundleContext>
     CoreBundleContext::shared_from_this() const

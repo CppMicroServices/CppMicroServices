@@ -245,57 +245,6 @@ namespace cppmicroservices
         MOCK_METHOD0(GetInjectedManifest, const AnyMap &());
     };
 
-    template <class I1, class... Interfaces>
-    class MockBundleContext : public cppmicroservices::BundleContext
-    {
-      public:
-        MockBundleContext() : BundleContext() {}
-        MockBundleContext(std::shared_ptr<BundleContextPrivate> ctx) : BundleContext(ctx) {}
-        MOCK_METHOD1(GetProperty, Any(const std::string &));
-        MOCK_METHOD0(GetProperties, AnyMap());
-        MOCK_METHOD0(GetBundle, Bundle());
-        MOCK_METHOD1(GetBundle, Bundle(long));
-        MOCK_METHOD1(GetBundles, std::vector<Bundle>(const std::string &));
-        MOCK_METHOD0(GetBundles, std::vector<Bundle>());
-        MOCK_METHOD2(RegisterService, ServiceRegistrationU(const InterfaceMapConstPtr &, const ServiceProperties &));
-        MOCK_METHOD0(RegisterService, ServiceRegistration<I1, Interfaces...>());
-        MOCK_METHOD2(GetServiceReferences, std::vector<ServiceReferenceU>(const std::string &, const std::string &));
-        MOCK_METHOD1(GetServiceReference, ServiceReferenceU(const std::string &));
-        MOCK_METHOD1(GetService, std::shared_ptr<void>(const ServiceReferenceBase &));
-        MOCK_METHOD1(GetService, InterfaceMapConstPtr(const ServiceReferenceU &));
-        MOCK_METHOD2(AddServiceListener, ListenerToken(const ServiceListener &, const std::string &));
-        MOCK_METHOD1(RemoveServiceListener, void(const ServiceListener &));
-        MOCK_METHOD1(AddBundleListener, ListenerToken(const BundleListener &));
-        MOCK_METHOD1(RemoveBundleListener, void(const BundleListener &));
-        MOCK_METHOD1(AddFrameworkListener, ListenerToken(const FrameworkListener &));
-        MOCK_METHOD1(RemoveFrameworkListener, void(const FrameworkListener &));
-        MOCK_METHOD1(RemoveListener, void(ListenerToken));
-        MOCK_METHOD0(AddServiceListener, ListenerToken());
-        MOCK_METHOD0(RemoveServiceListener, void());
-        MOCK_METHOD0(AddBundleListener, ListenerToken());
-        MOCK_METHOD0(RemoveBundleListener, void());
-        MOCK_METHOD0(AddFrameworkListener, ListenerToken());
-        MOCK_METHOD0(RemoveFrameworkListener, void());
-        MOCK_METHOD1(GetDataFile, std::string(const std::string &));
-        MOCK_METHOD2(InstallBundles, std::vector<Bundle>(const std::string &, const cppmicroservices::AnyMap &));
-        MOCK_METHOD1(MakeBundleContext, BundleContext(BundleContextPrivate *));
-        MOCK_METHOD1(MakeBundleContext, BundleContext(const std::shared_ptr<BundleContextPrivate> &));
-        MOCK_METHOD1(GetPrivate, std::shared_ptr<BundleContextPrivate>(const BundleContext &));
-        MOCK_METHOD3(AddServiceListener, ListenerToken(const ServiceListener &, void *, const std::string &));
-        MOCK_METHOD2(RemoveServiceListener, void(const ServiceListener &, void *));
-        MOCK_METHOD2(AddBundleListener, ListenerToken(const BundleListener &, void *));
-        MOCK_METHOD2(RemoveBundleListener, void(const BundleListener &, void *));
-    };
-
-    class MockBundleContextPrivate : public cppmicroservices::BundleContextPrivate
-    {
-      public:
-        MockBundleContextPrivate(BundlePrivate * bundle) : BundleContextPrivate(bundle) {}
-        MOCK_METHOD0(IsValid, bool());
-        MOCK_METHOD0(CheckValid, void());
-        MOCK_METHOD0(Invalidate, void());
-    };
-
     class MockBundleEvent : public cppmicroservices::BundleEvent
     {
       public:

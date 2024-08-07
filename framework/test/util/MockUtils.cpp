@@ -49,13 +49,13 @@ namespace cppmicroservices
 
         // Mocked framework bundle
         if (expectFrameworkStart) {
-            EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, AnyOf(
-#ifdef BUILD_SHARED_LIBS
-                Eq("system_bundle"), Eq("main")
+            auto matcher =
+#ifdef US_BUILD_SHARED_LIBS
+                AnyOf(Eq("system_bundle"), Eq("main"));
 #else
-                _
+                _;
 #endif
-            ), _))
+            EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, matcher, _))
                 .Times(AtLeast(1))
                 .WillRepeatedly(Return(std::make_shared<MockBundleArchive>(
                     bundleStorage,

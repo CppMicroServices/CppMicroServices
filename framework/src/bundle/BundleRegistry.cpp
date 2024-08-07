@@ -192,10 +192,10 @@ namespace cppmicroservices
             if (resCont == nullptr)
             {
                 resContPtr = GetAlreadyInstalledBundlesAtLocation(bundlesAtLocationRange,
-                                                               location,
-                                                               bundleManifest,
-                                                               resultingBundles,
-                                                               alreadyInstalled);
+                                                                  location,
+                                                                  bundleManifest,
+                                                                  resultingBundles,
+                                                                  alreadyInstalled);
             }
             else
             {

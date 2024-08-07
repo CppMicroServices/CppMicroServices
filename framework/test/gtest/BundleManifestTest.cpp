@@ -466,7 +466,7 @@ TEST_F(BundleManifestTest, DirectManifestInstallAndStart)
     {
         ASSERT_EQ(m.second.ToString(), headers[m.first].ToString());
     }
-    auto ref = ctx.GetServiceReference<cppmicroservices::TestBundleAService>();
+    auto ref = ctx.GetServiceReference<cppmicroservices::MockTestBundleAService>();
     auto svc = ctx.GetService(ref);
     ASSERT_TRUE(!!svc);
 }

@@ -69,26 +69,26 @@ namespace cppmicroservices
         MockBundleRegistry* bundleRegistry;
     };
 
-    struct TestBundleAService
+    struct MockTestBundleAService
     {
-        virtual ~TestBundleAService() {}
+        virtual ~MockTestBundleAService() {}
     };
 
-    struct TestBundleA : public cppmicroservices::TestBundleAService
+    struct MockTestBundleA : public cppmicroservices::MockTestBundleAService
     {
-        virtual ~TestBundleA() {}
+        virtual ~MockTestBundleA() {}
     };
 
-    class TestBundleAActivator : public cppmicroservices::BundleActivator
+    class MockTestBundleAActivator : public cppmicroservices::BundleActivator
     {
       public:
-        TestBundleAActivator() {}
-        ~TestBundleAActivator() {}
+        MockTestBundleAActivator() {}
+        ~MockTestBundleAActivator() {}
 
         void Start(BundleContext context)
         {
-            s = std::make_shared<TestBundleA>();
-            sr = context.RegisterService<TestBundleAService>(s);
+            s = std::make_shared<MockTestBundleA>();
+            sr = context.RegisterService<MockTestBundleAService>(s);
         }
 
         void Stop(BundleContext)
@@ -97,11 +97,11 @@ namespace cppmicroservices
         }
 
       private:
-        std::shared_ptr<TestBundleA> s;
-        ServiceRegistration<TestBundleAService> sr;
+        std::shared_ptr<MockTestBundleA> s;
+        ServiceRegistration<MockTestBundleAService> sr;
     };
 
-    struct TestBundleBActivator : public cppmicroservices::BundleActivator
+    struct MockTestBundleBActivator : public cppmicroservices::BundleActivator
     {
       public:
         void Start(BundleContext)
@@ -111,7 +111,7 @@ namespace cppmicroservices
         {}
     };
 
-    struct TestBundleImportedByBActivator : public cppmicroservices::BundleActivator
+    struct MockTestBundleImportedByBActivator : public cppmicroservices::BundleActivator
     {
       public:
         void Start(BundleContext)
@@ -121,7 +121,7 @@ namespace cppmicroservices
         {}
     };
 
-    struct TestBundleUActivator : public cppmicroservices::BundleActivator
+    struct MockTestBundleUActivator : public cppmicroservices::BundleActivator
     {
       public:
         void Start(BundleContext)
@@ -136,11 +136,11 @@ namespace cppmicroservices
     void destroyActivator(BundleActivator* bundleActivator);
 
     static std::map<std::string, BundleActivator*(*)()> activators = {
-        { "TestBundleA", &createActivator<TestBundleAActivator> },
-        { "TestBundleA2", &createActivator<TestBundleAActivator> },
-        { "TestBundleB", &createActivator<TestBundleBActivator> },
-        { "TestBundleImportedByB", &createActivator<TestBundleImportedByBActivator> },
-        { "TestBundleU", &createActivator<TestBundleUActivator> }
+        { "TestBundleA", &createActivator<MockTestBundleAActivator> },
+        { "TestBundleA2", &createActivator<MockTestBundleAActivator> },
+        { "TestBundleB", &createActivator<MockTestBundleBActivator> },
+        { "TestBundleImportedByB", &createActivator<MockTestBundleImportedByBActivator> },
+        { "TestBundleU", &createActivator<MockTestBundleUActivator> }
     };
 
 } // namespace cppmicroservices

@@ -167,6 +167,8 @@ set(_test_bundles
   DSGraph05
   DSGraph06
   DSGraph07
+  DSGraph09
+  DSGraph10
   DSSpellChecker
   TestBindUnbindThrows
   TestBundleDSa

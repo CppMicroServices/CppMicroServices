@@ -9,12 +9,13 @@ namespace graph
     {
       public:
         DSGraph08Impl(std::shared_ptr<cppmicroservices::AnyMap> properties);
-        DSGraph08Impl() = default;
+        DSGraph08Impl();
         ~DSGraph08Impl() override;
         std::string Description() override;
 
       private:
         std::shared_ptr<cppmicroservices::AnyMap> props;
+        bool defaultConstructed = false;
     };
 } // namespace graph
 

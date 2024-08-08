@@ -1425,6 +1425,24 @@ namespace cppmicroservices
             framework.Stop();
             framework.WaitForStop(std::chrono::milliseconds::zero());
         }
+
+        TEST_F(ComponentConfigurationImplTest, testConstructionWithDefaultDefined)
+        {
+            auto framework = GetFramework();
+
+            auto ctxt = framework.GetBundleContext();
+            test::InstallAndStartDS(ctxt);
+            std::vector<cppmicroservices::Bundle> installedBundles
+                = { ::test::InstallAndStartBundle(ctxt, "DSGraph08") };
+
+            auto sRef = ctxt.GetServiceReference<test::DSGraph08>();
+            ASSERT_TRUE(static_cast<bool>(sRef)) << "Service must be available";
+
+            auto service = ctxt.GetService<test::DSGraph08>(sRef);
+            ASSERT_NE(service, nullptr);
+
+            ASSERT_EQ(service->Description(), "DSGraph08 false");
+        }
 #endif
     } // namespace scrimpl
 } // namespace cppmicroservices

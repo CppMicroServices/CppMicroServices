@@ -1425,6 +1425,36 @@ namespace cppmicroservices
             framework.Stop();
             framework.WaitForStop(std::chrono::milliseconds::zero());
         }
+
+        TEST_F(ComponentConfigurationImplTest, testMultipleRefTypes) // DS_TOI_19
+        {
+            auto framework = GetFramework();
+
+            auto ctxt = framework.GetBundleContext();
+            test::InstallAndStartDS(ctxt);
+            std::vector<cppmicroservices::Bundle> installedBundles
+                = { ::test::InstallAndStartBundle(ctxt, "DSGraph09"),
+                    ::test::InstallAndStartBundle(ctxt, "DSGraph10"),
+                    ::test::InstallAndStartBundle(ctxt, "DSGraph07") };
+
+            auto sRef = ctxt.GetServiceReference<test::DSGraph07>();
+            ASSERT_TRUE(static_cast<bool>(sRef)) << "Service must be available";
+
+            auto sRef2 = ctxt.GetServiceReference<test::DSGraph09>();
+            ASSERT_TRUE(static_cast<bool>(sRef2)) << "Service must be available";
+
+            auto sRef3 = ctxt.GetServiceReference<test::DSGraph10>();
+            ASSERT_TRUE(static_cast<bool>(sRef3)) << "Service must be available";
+
+            auto service = ctxt.GetService<test::DSGraph09>(sRef2);
+            ASSERT_NE(service, nullptr);
+
+            auto service1 = ctxt.GetService<test::DSGraph10>(sRef3);
+            ASSERT_NE(service1, nullptr);
+
+            ASSERT_EQ(service->Description(), "DSGraph09 DSGraph07");
+            ASSERT_EQ(service1->Description(), "DSGraph10 DSGraph07");
+        }
 #endif
     } // namespace scrimpl
 } // namespace cppmicroservices

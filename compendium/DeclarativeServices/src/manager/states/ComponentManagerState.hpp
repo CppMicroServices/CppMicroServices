@@ -53,13 +53,13 @@ namespace cppmicroservices
             /**
              * Implementation of this method must handle the Enable state transition for current state
              */
-            virtual std::shared_future<void> Enable(ComponentManagerImpl& cm, std::shared_ptr<std::atomic<bool>> asyncStarted)
+            virtual std::shared_future<void> Enable(ComponentManagerImpl& cm, std::shared_ptr<SingleInvokeTask> singleInvoke)
                 = 0;
 
             /**
              * Implementation of this method must handle the Disable state transition for current state
              */
-            virtual std::shared_future<void> Disable(ComponentManagerImpl& cm, std::shared_ptr<std::atomic<bool>> asyncStarted)
+            virtual std::shared_future<void> Disable(ComponentManagerImpl& cm, std::shared_ptr<SingleInvokeTask> singleInvoke)
                 = 0;
 
             /**

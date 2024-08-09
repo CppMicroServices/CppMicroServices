@@ -32,4 +32,8 @@ target_include_directories(util
     ${PROJECT_BINARY_DIR}/include
 )
 
+if(WIN32)
+  target_link_libraries(util Shlwapi.lib)
+endif()
+
 add_dependencies(util usLogService)

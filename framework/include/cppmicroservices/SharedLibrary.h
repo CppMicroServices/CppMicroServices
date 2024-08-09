@@ -71,7 +71,7 @@ namespace cppmicroservices
         /**
          * Destroys this object but does not unload the shared library.
          */
-        ~SharedLibrary();
+        virtual ~SharedLibrary();
 
         SharedLibrary& operator=(SharedLibrary const& other);
 
@@ -85,7 +85,7 @@ namespace cppmicroservices
          * @throws std::logic_error If the library is already loaded.
          * @throws std::system_error If loading the library failed.
          */
-        void Load();
+        virtual void Load();
 
         /**
          * Loads the shared library pointed to by this SharedLibrary object,
@@ -94,7 +94,7 @@ namespace cppmicroservices
          * @throws std::logic_error If the library is already loaded.
          * @throws std::system_error If loading the library failed.
          */
-        void Load(int flags);
+        virtual void Load(int flags);
 
         /**
          * Un-loads the shared library pointed to by this SharedLibrary object.

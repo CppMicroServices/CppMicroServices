@@ -66,7 +66,7 @@ namespace
         // Check if libB registered the expected service
 
         std::vector<ServiceReferenceU> refs = context.GetServiceReferences("cppmicroservices::TestBundleBService");
-        // Test that both the service from the shared and imported library are regsitered
+        // Test that both the service from the shared and imported library are registered
         ASSERT_EQ(refs.size(), 2);
 
         auto o1 = context.GetService(refs.front());

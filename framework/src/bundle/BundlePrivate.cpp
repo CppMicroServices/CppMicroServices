@@ -341,7 +341,7 @@ namespace cppmicroservices
                 case Bundle::STATE_RESOLVED:
                 case Bundle::STATE_INSTALLED:
                 {
-                    coreCtx->bundleRegistry.Remove(location, id);
+                    coreCtx->bundleRegistry->Remove(location, id);
                     if (operation != BundlePrivate::OP_UNINSTALLING)
                     {
                         try
@@ -493,7 +493,7 @@ namespace cppmicroservices
         {
             try
             {
-                if (coreCtx->validationFunc && (lib.GetFilePath() != util::GetExecutablePath())
+                if (coreCtx->validationFunc && (lib->GetFilePath() != util::GetExecutablePath())
                     && !coreCtx->validationFunc(thisBundle))
                 {
                     StartFailed();
@@ -516,23 +516,23 @@ namespace cppmicroservices
             try
             {
                 void* libHandle = nullptr;
-                if ((lib.GetFilePath() == util::GetExecutablePath()))
+                if ((lib->GetFilePath() == util::GetExecutablePath()))
                 {
-                    libHandle = BundleUtils::GetExecutableHandle();
+                    libHandle = bundleUtils->GetExecutableHandle();
                 }
                 else
                 {
-                    if (!lib.IsLoaded())
+                    if (!lib->IsLoaded())
                     {
                         coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
                                              "Loading shared library for Bundle " + symbolicName
                                                  + " (location=" + location + ")");
-                        lib.Load(coreCtx->libraryLoadOptions);
+                        lib->Load(coreCtx->libraryLoadOptions);
                         coreCtx->logger->Log(logservice::SeverityLevel::LOG_INFO,
                                              "Finished loading shared library for Bundle " + symbolicName
                                                  + " (location=" + location + ")");
                     }
-                    libHandle = lib.GetHandle();
+                    libHandle = lib->GetHandle();
                 }
 
                 auto ctx = bundleContext.Load();
@@ -541,7 +541,7 @@ namespace cppmicroservices
                 // from within this bundle's code.
                 std::string set_bundle_context_func = US_STR(US_SET_CTX_PREFIX) + symbolicName;
                 std::string set_bundle_context_err;
-                BundleUtils::GetSymbol(SetBundleContext, libHandle, set_bundle_context_func, set_bundle_context_err);
+                bundleUtils->GetSymbol(SetBundleContext, libHandle, set_bundle_context_func, set_bundle_context_err);
 
                 if (SetBundleContext)
                 {
@@ -556,11 +556,11 @@ namespace cppmicroservices
                 std::string create_activator_func = US_STR(US_CREATE_ACTIVATOR_PREFIX) + symbolicName;
                 std::function<BundleActivator*(void)> createActivatorHook;
                 std::string create_activator_err;
-                BundleUtils::GetSymbol(createActivatorHook, libHandle, create_activator_func, create_activator_err);
+                bundleUtils->GetSymbol(createActivatorHook, libHandle, create_activator_func, create_activator_err);
 
                 std::string destroy_activator_func = US_STR(US_DESTROY_ACTIVATOR_PREFIX) + symbolicName;
                 std::string destroy_activator_err;
-                BundleUtils::GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func, destroy_activator_err);
+                bundleUtils->GetSymbol(destroyActivatorHook, libHandle, destroy_activator_func, destroy_activator_err);
 
                 if (!createActivatorHook)
                 {
@@ -694,7 +694,8 @@ namespace cppmicroservices
         , version(CppMicroServices_VERSION_MAJOR, CppMicroServices_VERSION_MINOR, CppMicroServices_VERSION_PATCH)
         , timeStamp(std::chrono::steady_clock::now())
         , bundleManifest()
-        , lib()
+        , lib(std::make_unique<SharedLibrary>())
+        , bundleUtils(std::make_unique<BundleUtils>())
         , SetBundleContext(nullptr)
     {
     }
@@ -717,7 +718,8 @@ namespace cppmicroservices
         , version()
         , timeStamp(ba->GetLastModified())
         , bundleManifest(ba->GetInjectedManifest())
-        , lib(location)
+        , lib(std::make_unique<SharedLibrary>(location))
+        , bundleUtils(std::make_unique<BundleUtils>())
         , SetBundleContext(nullptr)
     {
         // Only take the time to read the manifest out of the BundleArchive file if we don't already have
@@ -793,7 +795,7 @@ namespace cppmicroservices
                                         + symbolicName + "(location=" + location + ").");
         }
 
-        auto snbl = coreCtx->bundleRegistry.GetBundles(symbolicName, version);
+        auto snbl = coreCtx->bundleRegistry->GetBundles(symbolicName, version);
         if (!snbl.empty())
         {
             throw std::invalid_argument("Bundle " + symbolicName + " (location=" + location

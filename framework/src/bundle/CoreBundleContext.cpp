@@ -90,7 +90,7 @@ namespace cppmicroservices
         , logger(std::make_shared<cppmicroservices::cfrimpl::CFRLogger>())
         , serviceHooks(this)
         , bundleHooks(this)
-        , bundleRegistry(this)
+        , bundleRegistry(std::make_unique<BundleRegistry>(this))
         , firstInit(true)
         , initCount(0)
         , libraryLoadOptions(0)
@@ -139,7 +139,10 @@ namespace cppmicroservices
         frameworkProperties[Constants::FRAMEWORK_UUID] = ss.str();
 
         // $TODO we only support non-persistent (main memory) storage yet
-        storage = std::make_unique<BundleStorageMemory>();
+        if (!storage)
+        {
+            storage = std::make_unique<BundleStorageMemory>();
+        }
         //  if (frameworkProperties[FWProps::READ_ONLY_PROP] == true)
         //  {
         //    dataStorage.clear();
@@ -168,11 +171,11 @@ namespace cppmicroservices
         systemBundle->InitSystemBundle();
         US_SET_CTX_FUNC(system_bundle)(systemBundle->bundleContext.Load().get());
 
-        bundleRegistry.Init();
+        bundleRegistry->Init();
 
         serviceHooks.Open();
 
-        bundleRegistry.Load();
+        bundleRegistry->Load();
 
         logger->Open();
 
@@ -189,17 +192,17 @@ namespace cppmicroservices
             throw;
         }
 
-        if (IsBundleFile(execPath) && bundleRegistry.GetBundles(execPath).empty())
+        if (IsBundleFile(execPath) && bundleRegistry->GetBundles(execPath).empty())
         {
             // Auto-install all embedded bundles inside the executable.
             // Same here: If an embedded bundle cannot be installed,
             // an exception is thrown and we will let it propagate all
             // the way up to the call site of Framework::Init().
-            bundleRegistry.Install(execPath, systemBundle.get());
+            bundleRegistry->Install(execPath, systemBundle.get());
         }
 
         DIAG_LOG(*sink) << "inited\nInstalled bundles: ";
-        for (auto b : bundleRegistry.GetBundles())
+        for (auto b : bundleRegistry->GetBundles())
         {
             DIAG_LOG(*sink) << " #" << b->id << " " << b->symbolicName << ":" << b->version
                             << " location:" << b->location;
@@ -234,7 +237,7 @@ namespace cppmicroservices
     void
     CoreBundleContext::Uninit1()
     {
-        bundleRegistry.Clear();
+        bundleRegistry->Clear();
         services.Clear();
         listeners.Clear();
         resolver.Clear();

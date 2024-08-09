@@ -15,7 +15,7 @@ set(_srcs
 if(MSVC)
   set_property(
     SOURCE ../third_party/civetweb/civetweb.c APPEND_STRING
-    PROPERTY COMPILE_FLAGS " /wd4267 /wd4311 /wd4312 /wd4996"
+    PROPERTY COMPILE_FLAGS " /wd4267 /wd4311 /wd4312 /wd4996 /std:c++17"
   )
 else()
   set_property(

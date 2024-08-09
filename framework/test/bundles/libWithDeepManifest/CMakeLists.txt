@@ -1,2 +1,0 @@
-usFunctionCreateTestBundleWithResources(TestBundleWithDeepManifest SOURCES TestBundleDeep.cpp RESOURCES manifest.json)
-

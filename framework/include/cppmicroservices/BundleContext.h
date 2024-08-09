@@ -1144,6 +1144,7 @@ namespace cppmicroservices
         friend class detail::TrackedBundle;
         friend class BundleResource;
         friend class BundleResourceContainer;
+        friend class MockedEnvironment;
 
         ListenerToken AddServiceListener(ServiceListener const& delegate, void* data, std::string const& filter);
         void RemoveServiceListener(ServiceListener const& delegate, void* data);

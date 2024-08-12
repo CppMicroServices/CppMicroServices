@@ -144,7 +144,7 @@ namespace
 
       private:
         std::shared_ptr<ServiceDependency1> foo; // dynamic dependency - can change during the lifetime of this object
-        const std::shared_ptr<ServiceDependency2>
+        std::shared_ptr<ServiceDependency2> const
             bar; // static dependency - does not change during the lifetime of this object
         bool activated;
     };
@@ -223,9 +223,47 @@ namespace
         }
 
       private:
-        const std::vector<std::shared_ptr<ServiceDependency1>> dep1Refs; // static dependency with multiple cardinality
-        const std::shared_ptr<ServiceDependency2> dep2;                  // static dependency with unary cardinality
+        std::vector<std::shared_ptr<ServiceDependency1>> const dep1Refs; // static dependency with multiple cardinality
+        std::shared_ptr<ServiceDependency2> const dep2;                  // static dependency with unary cardinality
         std::vector<std::shared_ptr<ServiceDependency3>> dep3Refs;       // dynamic dependency with multiple cardinality
+    };
+
+    class TestServiceImpl3 : public TestServiceInterface1
+    {
+      public:
+        TestServiceImpl3() : foo(nullptr) {}
+
+        TestServiceImpl3(std::shared_ptr<ServiceDependency1> const&& f) : foo(f) {}
+
+        virtual ~TestServiceImpl3() {}
+
+        std::shared_ptr<ServiceDependency1>
+        GetFoo() const
+        {
+            return foo;
+        }
+
+      private:
+        std::shared_ptr<ServiceDependency1> foo;
+    };
+
+    class TestServiceImpl4 : public TestServiceInterface1
+    {
+      public:
+        TestServiceImpl4() : foo(nullptr) {}
+
+        TestServiceImpl4(std::shared_ptr<ServiceDependency1> f) : foo(f) {}
+
+        virtual ~TestServiceImpl4() {}
+
+        std::shared_ptr<ServiceDependency1>
+        GetFoo() const
+        {
+            return foo;
+        }
+
+      private:
+        std::shared_ptr<ServiceDependency1> foo;
     };
 
     /**
@@ -509,6 +547,94 @@ namespace
         ASSERT_EQ(compObj->GetFoo(), nullptr);
         EXPECT_NO_THROW(compInstance.InvokeBindMethod("foo", fc.GetServiceReference<ServiceDependency1>()));
         ASSERT_NE(compObj->GetFoo(), nullptr);
+
+        f.Stop();
+        f.WaitForStop(std::chrono::milliseconds::zero());
+    }
+
+    TEST(ComponentInstanceImpl, VerifyRRefDependencyConstruct)
+    {
+        auto f = cppmicroservices::FrameworkFactory().NewFramework();
+        f.Start();
+        auto fc = f.GetBundleContext();
+        auto reg = fc.RegisterService<ServiceDependency1>(std::make_shared<ServiceDependency1>());
+
+        ComponentInstanceImpl<TestServiceImpl3, std::tuple<>, std::shared_ptr<ServiceDependency1>> compInstance(
+            { ("foo") },
+            {});
+
+        auto mockContext = std::make_shared<MockComponentContext>();
+        auto locateService = [&fc](std::string const& type) -> std::shared_ptr<void>
+        {
+            auto sRef = fc.GetServiceReference(type);
+            if (sRef)
+            {
+                auto serv = fc.GetService(sRef);
+                return serv->at(type);
+            }
+            else
+            {
+                return nullptr;
+            }
+        };
+
+        EXPECT_CALL(*(mockContext.get()), GetBundleContext()).WillRepeatedly(testing::Invoke([&fc]() { return fc; }));
+
+        EXPECT_CALL(*(mockContext.get()), LocateService("foo", us_service_interface_iid<ServiceDependency1>()))
+            .Times(1)
+            .WillRepeatedly(testing::WithArg<1>(testing::Invoke(
+                locateService))); // ensure the mock context received a call to LocateService for dependency foo
+
+        compInstance.CreateInstance(mockContext);
+        compInstance.BindReferences(mockContext);
+        auto compObj = compInstance.GetInstance();
+        ASSERT_TRUE(compObj);
+        // ensure the dependencies are bound when the object is constructed
+        ASSERT_TRUE(compObj->GetFoo());
+
+        f.Stop();
+        f.WaitForStop(std::chrono::milliseconds::zero());
+    }
+
+    TEST(ComponentInstanceImpl, VerifySharedPtrDependencyConstruct)
+    {
+        auto f = cppmicroservices::FrameworkFactory().NewFramework();
+        f.Start();
+        auto fc = f.GetBundleContext();
+        auto reg = fc.RegisterService<ServiceDependency1>(std::make_shared<ServiceDependency1>());
+
+        ComponentInstanceImpl<TestServiceImpl4, std::tuple<>, std::shared_ptr<ServiceDependency1>> compInstance(
+            { ("foo") },
+            {});
+
+        auto mockContext = std::make_shared<MockComponentContext>();
+        auto locateService = [&fc](std::string const& type) -> std::shared_ptr<void>
+        {
+            auto sRef = fc.GetServiceReference(type);
+            if (sRef)
+            {
+                auto serv = fc.GetService(sRef);
+                return serv->at(type);
+            }
+            else
+            {
+                return nullptr;
+            }
+        };
+
+        EXPECT_CALL(*(mockContext.get()), GetBundleContext()).WillRepeatedly(testing::Invoke([&fc]() { return fc; }));
+
+        EXPECT_CALL(*(mockContext.get()), LocateService("foo", us_service_interface_iid<ServiceDependency1>()))
+            .Times(1)
+            .WillRepeatedly(testing::WithArg<1>(testing::Invoke(
+                locateService))); // ensure the mock context received a call to LocateService for dependency foo
+
+        compInstance.CreateInstance(mockContext);
+        compInstance.BindReferences(mockContext);
+        auto compObj = compInstance.GetInstance();
+        ASSERT_TRUE(compObj);
+        // ensure the dependencies are bound when the object is constructed
+        ASSERT_TRUE(compObj->GetFoo());
 
         f.Stop();
         f.WaitForStop(std::chrono::milliseconds::zero());

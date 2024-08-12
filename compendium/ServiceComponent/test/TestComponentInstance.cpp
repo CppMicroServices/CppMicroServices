@@ -65,6 +65,9 @@ namespace
     struct TestServiceInterface3
     {
     };
+    struct TestServiceConstInt1
+    {
+    };
 
     // Test class to simulate a service component
     // TODO: Use Mock to add more behavior verification
@@ -144,7 +147,7 @@ namespace
 
       private:
         std::shared_ptr<ServiceDependency1> foo; // dynamic dependency - can change during the lifetime of this object
-        const std::shared_ptr<ServiceDependency2>
+        std::shared_ptr<ServiceDependency2> const
             bar; // static dependency - does not change during the lifetime of this object
         bool activated;
     };
@@ -223,9 +226,45 @@ namespace
         }
 
       private:
-        const std::vector<std::shared_ptr<ServiceDependency1>> dep1Refs; // static dependency with multiple cardinality
-        const std::shared_ptr<ServiceDependency2> dep2;                  // static dependency with unary cardinality
+        std::vector<std::shared_ptr<ServiceDependency1>> const dep1Refs; // static dependency with multiple cardinality
+        std::shared_ptr<ServiceDependency2> const dep2;                  // static dependency with unary cardinality
         std::vector<std::shared_ptr<ServiceDependency3>> dep3Refs;       // dynamic dependency with multiple cardinality
+    };
+    class Test1 : public TestServiceConstInt1
+    {
+      public:
+        Test1() = default;
+        ~Test1() = default;
+        bool
+        defCon()
+        {
+            return def;
+        }
+
+      private:
+        std::shared_ptr<cppmicroservices::AnyMap> props;
+        bool def = true;
+    };
+
+    class Test2 : public TestServiceConstInt1
+    {
+      public:
+        Test2() = default;
+        Test2(std::shared_ptr<cppmicroservices::AnyMap> properties) : props(properties)
+        {
+            def = false;
+            return;
+        }
+        ~Test2() = default;
+        bool
+        defCon()
+        {
+            return def;
+        }
+
+      private:
+        std::shared_ptr<cppmicroservices::AnyMap> props;
+        bool def = true;
     };
 
     /**
@@ -288,6 +327,19 @@ namespace
         ASSERT_FALSE(compObj->GetBar());
     }
 
+    TEST(ComponentInstance, validateConstructorCall)
+    {
+        ComponentInstanceImpl<Test1, std::tuple<TestServiceConstInt1>> compInstance;
+        auto mockContext = std::make_shared<MockComponentContext>();
+        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
+            .Times(0); // ensure the mock context never gets a call to LocateService
+        compInstance.CreateInstance(mockContext);
+        ASSERT_EQ(compInstance.GetInstance()->defCon(), true);
+
+        ComponentInstanceImpl<Test2, std::tuple<TestServiceConstInt1>> compInstance2;
+        compInstance2.CreateInstance(mockContext);
+        ASSERT_EQ(compInstance2.GetInstance()->defCon(), false);
+    }
     /**
      * This test point is used to verify the ComponentInstanceImpl works properly
      * for a Service Component that provides a single service but does not consume

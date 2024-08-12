@@ -161,13 +161,6 @@ namespace test
         virtual ~DSGraph07();
     };
 
-    class US_TestInterfaces_EXPORT DSGraph08
-    {
-      public:
-        virtual std::string Description() = 0;
-        virtual ~DSGraph08();
-    };
-
     // Use this interface in test bundles & test points to validate if the
     // service component receives the life cycle callbacks from the DS runtime
     class US_TestInterfaces_EXPORT LifeCycleValidation

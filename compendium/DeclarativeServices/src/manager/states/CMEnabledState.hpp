@@ -63,22 +63,22 @@ namespace cppmicroservices
              * This method simply returns the stored future. No state change takes place
              *
              * \param cm is the component manager which needs to be enabled
-             * \param asyncStarted synchronization atomic bool for async tasks
+             * \param singleInvoke SingleInvokeTask object managing the async execution
              * \return a future object representing the actions performed due to the
              *         previous state change from \c DISABLED to \c ENABLED
              */
             std::shared_future<void> Enable(ComponentManagerImpl& /*cm*/,
-                                            std::shared_ptr<std::atomic<bool>> /*asyncStarted*/) override;
+                                            std::shared_ptr<SingleInvokeTask> /*singleInvoke*/) override;
 
             /**
              * This method changes the state of the {@link ComponentManagerImpl} object
              *
              * \param cm is the component manager which needs to be disabled
-             * \param asyncStarted synchronization atomic bool for async tasks
+             * \param singleInvoke SingleInvokeTask object managing the async execution
              * \return a future object representing the actions performed due to the state change
              */
             std::shared_future<void> Disable(ComponentManagerImpl& cm,
-                                             std::shared_ptr<std::atomic<bool>> asyncStarted) override;
+                                             std::shared_ptr<SingleInvokeTask> singleInvoke) override;
 
             /**
              * This method waits for the configurations to be created and then returns the

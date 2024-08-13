@@ -228,14 +228,14 @@ namespace
         std::vector<std::shared_ptr<ServiceDependency3>> dep3Refs;       // dynamic dependency with multiple cardinality
     };
 
-    class TestServiceImpl3 : public TestServiceInterface1
+    class TestServiceImplWithRefRefDep : public TestServiceInterface1
     {
       public:
-        TestServiceImpl3() : foo(nullptr) {}
+        TestServiceImplWithRefRefDep() : foo(nullptr) {}
 
-        TestServiceImpl3(std::shared_ptr<ServiceDependency1> const&& f) : foo(f) {}
+        TestServiceImplWithRefRefDep(std::shared_ptr<ServiceDependency1> const&& f) : foo(f) {}
 
-        virtual ~TestServiceImpl3() {}
+        virtual ~TestServiceImplWithRefRefDep() {}
 
         std::shared_ptr<ServiceDependency1>
         GetFoo() const
@@ -247,14 +247,14 @@ namespace
         std::shared_ptr<ServiceDependency1> foo;
     };
 
-    class TestServiceImpl4 : public TestServiceInterface1
+    class TestServiceImplWithSharedPtrDep : public TestServiceInterface1
     {
       public:
-        TestServiceImpl4() : foo(nullptr) {}
+        TestServiceImplWithSharedPtrDep() : foo(nullptr) {}
 
-        TestServiceImpl4(std::shared_ptr<ServiceDependency1> f) : foo(f) {}
+        TestServiceImplWithSharedPtrDep(std::shared_ptr<ServiceDependency1> f) : foo(f) {}
 
-        virtual ~TestServiceImpl4() {}
+        virtual ~TestServiceImplWithSharedPtrDep() {}
 
         std::shared_ptr<ServiceDependency1>
         GetFoo() const
@@ -559,7 +559,7 @@ namespace
         auto fc = f.GetBundleContext();
         auto reg = fc.RegisterService<ServiceDependency1>(std::make_shared<ServiceDependency1>());
 
-        ComponentInstanceImpl<TestServiceImpl3, std::tuple<>, std::shared_ptr<ServiceDependency1>> compInstance(
+        ComponentInstanceImpl<TestServiceImplWithRefRefDep, std::tuple<>, std::shared_ptr<ServiceDependency1>> compInstance(
             { ("foo") },
             {});
 
@@ -603,7 +603,7 @@ namespace
         auto fc = f.GetBundleContext();
         auto reg = fc.RegisterService<ServiceDependency1>(std::make_shared<ServiceDependency1>());
 
-        ComponentInstanceImpl<TestServiceImpl4, std::tuple<>, std::shared_ptr<ServiceDependency1>> compInstance(
+        ComponentInstanceImpl<TestServiceImplWithSharedPtrDep, std::tuple<>, std::shared_ptr<ServiceDependency1>> compInstance(
             { ("foo") },
             {});
 

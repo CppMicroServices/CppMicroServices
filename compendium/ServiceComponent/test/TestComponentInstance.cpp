@@ -228,11 +228,11 @@ namespace
         std::vector<std::shared_ptr<ServiceDependency3>> dep3Refs;       // dynamic dependency with multiple cardinality
     };
 
-    class TestServiceImpl5 : public TestServiceInterface1
+    class TestServiceImplWithDefaultCtor : public TestServiceInterface1
     {
       public:
-        TestServiceImpl5() = default;
-        ~TestServiceImpl5() = default;
+        TestServiceImplWithDefaultCtor() = default;
+        ~TestServiceImplWithDefaultCtor() = default;
         bool
         defCon()
         {
@@ -244,16 +244,16 @@ namespace
         bool def = true;
     };
 
-    class TestServiceImpl6 : public TestServiceInterface1
+    class TestServiceImplWithConfigAndDefaultCtor : public TestServiceInterface1
     {
       public:
-        TestServiceImpl6() = default;
-        TestServiceImpl6(std::shared_ptr<cppmicroservices::AnyMap> properties) : props(properties)
+        TestServiceImplWithConfigAndDefaultCtor() = default;
+        TestServiceImplWithConfigAndDefaultCtor(std::shared_ptr<cppmicroservices::AnyMap> properties) : props(properties)
         {
             def = false;
             return;
         }
-        ~TestServiceImpl6() = default;
+        ~TestServiceImplWithConfigAndDefaultCtor() = default;
         bool
         defCon()
         {
@@ -327,14 +327,14 @@ namespace
 
     TEST(ComponentInstance, validateConstructorCall)
     {
-        ComponentInstanceImpl<TestServiceImpl5, std::tuple<TestServiceInterface1>> compInstance;
+        ComponentInstanceImpl<TestServiceImplWithDefaultCtor, std::tuple<TestServiceInterface1>> compInstance;
         auto mockContext = std::make_shared<MockComponentContext>();
         EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
             .Times(0); // ensure the mock context never gets a call to LocateService
         compInstance.CreateInstance(mockContext);
         ASSERT_EQ(compInstance.GetInstance()->defCon(), true);
 
-        ComponentInstanceImpl<TestServiceImpl6, std::tuple<TestServiceInterface1>> compInstance2;
+        ComponentInstanceImpl<TestServiceImplWithConfigAndDefaultCtor, std::tuple<TestServiceInterface1>> compInstance2;
         compInstance2.CreateInstance(mockContext);
         ASSERT_EQ(compInstance2.GetInstance()->defCon(), false);
     }

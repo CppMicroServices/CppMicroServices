@@ -47,7 +47,9 @@
 #        define WIN32_LEAN_AND_MEAN
 #    endif
 #    include <Shlwapi.h>
-#    pragma comment(lib, "Shlwapi.lib")
+#    ifdef _MSC_VER
+#        pragma comment(lib, "Shlwapi.lib")
+#    endif
 #    include <crtdbg.h>
 #    include <direct.h>
 #    include <stdint.h>

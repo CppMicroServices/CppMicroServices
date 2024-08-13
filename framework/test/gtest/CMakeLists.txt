@@ -117,7 +117,7 @@ usFunctionGetResourceSource(TARGET ${us_gtest_test_exe_name} OUT _additional_src
 
 add_executable(${us_gtest_test_exe_name} ${_gtest_tests} ${_additional_srcs} ${_third_party_srcs})
 
-if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
+if((US_COMPILER_MSVC OR MINGW) AND BUILD_SHARED_LIBS)
   target_compile_options(${us_gtest_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY -DUS_IS_TESTING_OBJ=1)
 endif()
 
@@ -151,7 +151,7 @@ target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${GMOCK_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} $<TARGET_OBJECTS:FrameworkObj> usLogService)
 
-# dlopen/dlsym/dlerror used by SharedLibrary.cpp.o
+# dlopen/dlsym/dlerror used by SharedLibrary.cpp
 if(UNIX)
   target_link_libraries(${us_gtest_test_exe_name} -ldl)
 endif()
@@ -161,7 +161,10 @@ if(UNIX AND NOT APPLE)
   target_link_libraries(${us_gtest_test_exe_name} rt)
 endif()
 
-
+# PathIsRelativeW used by FileSystem.cpp
+if(WIN32 OR MINGW)
+  target_link_libraries(${us_gtest_test_exe_name} Shlwapi.lib)
+endif()
 
 # tests can be configured to run using add_test or GTEST_ADD_TEST (https://cmake.org/cmake/help/v3.0/module/FindGTest.html)
 # GTEST_ADD_TEST will run a seprate EXE for each test and test fixture in the EXE.

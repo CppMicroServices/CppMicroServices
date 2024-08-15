@@ -235,7 +235,12 @@ namespace
 
         TestServiceImplWithRefRefDep(std::shared_ptr<ServiceDependency1> const&& f) : foo(f) {}
 
-        virtual ~TestServiceImplWithRefRefDep() {}
+        TestServiceImplWithRefRefDep(TestServiceImplWithRefRefDep const& other) = default;
+        TestServiceImplWithRefRefDep(TestServiceImplWithRefRefDep&& other) noexcept = default;
+        TestServiceImplWithRefRefDep& operator=(TestServiceImplWithRefRefDep const& other) = default;
+        TestServiceImplWithRefRefDep& operator=(TestServiceImplWithRefRefDep&& other) noexcept = default;
+
+        virtual ~TestServiceImplWithRefRefDep() = default;
 
         std::shared_ptr<ServiceDependency1>
         GetFoo() const
@@ -253,6 +258,11 @@ namespace
         TestServiceImplWithSharedPtrDep() : foo(nullptr) {}
 
         TestServiceImplWithSharedPtrDep(std::shared_ptr<ServiceDependency1> f) : foo(f) {}
+
+        TestServiceImplWithSharedPtrDep(TestServiceImplWithSharedPtrDep const& other) = default;
+        TestServiceImplWithSharedPtrDep(TestServiceImplWithSharedPtrDep&& other) noexcept = default;
+        TestServiceImplWithSharedPtrDep& operator=(TestServiceImplWithSharedPtrDep const& other) = default;
+        TestServiceImplWithSharedPtrDep& operator=(TestServiceImplWithSharedPtrDep&& other) noexcept = default;
 
         virtual ~TestServiceImplWithSharedPtrDep() {}
 
@@ -559,9 +569,8 @@ namespace
         auto fc = f.GetBundleContext();
         auto reg = fc.RegisterService<ServiceDependency1>(std::make_shared<ServiceDependency1>());
 
-        ComponentInstanceImpl<TestServiceImplWithRefRefDep, std::tuple<>, std::shared_ptr<ServiceDependency1>> compInstance(
-            { ("foo") },
-            {});
+        ComponentInstanceImpl<TestServiceImplWithRefRefDep, std::tuple<>, std::shared_ptr<ServiceDependency1>>
+            compInstance({ ("foo") }, {});
 
         auto mockContext = std::make_shared<MockComponentContext>();
         auto locateService = [&fc](std::string const& type) -> std::shared_ptr<void>
@@ -603,9 +612,8 @@ namespace
         auto fc = f.GetBundleContext();
         auto reg = fc.RegisterService<ServiceDependency1>(std::make_shared<ServiceDependency1>());
 
-        ComponentInstanceImpl<TestServiceImplWithSharedPtrDep, std::tuple<>, std::shared_ptr<ServiceDependency1>> compInstance(
-            { ("foo") },
-            {});
+        ComponentInstanceImpl<TestServiceImplWithSharedPtrDep, std::tuple<>, std::shared_ptr<ServiceDependency1>>
+            compInstance({ ("foo") }, {});
 
         auto mockContext = std::make_shared<MockComponentContext>();
         auto locateService = [&fc](std::string const& type) -> std::shared_ptr<void>

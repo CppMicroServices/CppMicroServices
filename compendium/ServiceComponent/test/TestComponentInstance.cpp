@@ -233,6 +233,12 @@ namespace
       public:
         TestServiceImplWithDefaultCtor() = default;
         ~TestServiceImplWithDefaultCtor() = default;
+
+        TestServiceImplWithDefaultCtor(TestServiceImplWithDefaultCtor const& other) = default;
+        TestServiceImplWithDefaultCtor& operator=(TestServiceImplWithDefaultCtor const& other) = default;
+        TestServiceImplWithDefaultCtor(TestServiceImplWithDefaultCtor&& other) noexcept = default;
+        TestServiceImplWithDefaultCtor& operator=(TestServiceImplWithDefaultCtor&& other) noexcept = default;
+
         bool
         defCon()
         {
@@ -248,12 +254,21 @@ namespace
     {
       public:
         TestServiceImplWithConfigAndDefaultCtor() = default;
-        TestServiceImplWithConfigAndDefaultCtor(std::shared_ptr<cppmicroservices::AnyMap> properties) : props(properties)
+        TestServiceImplWithConfigAndDefaultCtor(std::shared_ptr<cppmicroservices::AnyMap> properties)
+            : props(properties)
+            , def(false)
         {
-            def = false;
             return;
         }
         ~TestServiceImplWithConfigAndDefaultCtor() = default;
+
+        TestServiceImplWithConfigAndDefaultCtor(TestServiceImplWithConfigAndDefaultCtor const& other) = default;
+        TestServiceImplWithConfigAndDefaultCtor& operator=(TestServiceImplWithConfigAndDefaultCtor const& other)
+            = default;
+        TestServiceImplWithConfigAndDefaultCtor(TestServiceImplWithConfigAndDefaultCtor&& other) noexcept = default;
+        TestServiceImplWithConfigAndDefaultCtor& operator=(TestServiceImplWithConfigAndDefaultCtor&& other) noexcept
+            = default;
+
         bool
         defCon()
         {

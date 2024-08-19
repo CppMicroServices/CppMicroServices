@@ -387,8 +387,8 @@ namespace cppmicroservices
     {
         if (d->m_operator == EQ)
         {
-            if (d->m_attrName.length() == Constants::OBJECTCLASS.length()
-                && std::equal(d->m_attrName.begin(), d->m_attrName.end(), Constants::OBJECTCLASS.begin(), stricomp)
+            if (d->m_attrName.length() == strlen(Constants::OBJECTCLASS)
+                && strcmp(d->m_attrName.c_str(), Constants::OBJECTCLASS) == 0
                 && d->m_attrValue.find(LDAPExprConstants::WILDCARD()) == std::string::npos)
             {
                 objClasses.insert(d->m_attrValue);

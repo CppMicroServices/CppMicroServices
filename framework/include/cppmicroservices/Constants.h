@@ -47,13 +47,13 @@ namespace cppmicroservices
          * Location identifier of the OSGi <i>system bundle </i>, which is defined
          * to be &quot;System %Bundle&quot;.
          */
-        US_Framework_EXPORT extern const std::string SYSTEM_BUNDLE_LOCATION; // = "System Bundle";
+        constexpr const char* SYSTEM_BUNDLE_LOCATION = "System Bundle";
 
         /**
          * Alias for the symbolic name of the OSGi <i>system bundle </i>. It is
          * defined to be &quot;system.bundle&quot;.
          */
-        US_Framework_EXPORT extern const std::string SYSTEM_BUNDLE_SYMBOLICNAME; // = "system_bundle";
+        constexpr const char* SYSTEM_BUNDLE_SYMBOLICNAME = "system_bundle";
 
         /**
          * Manifest header identifying the bundle's activator.
@@ -64,7 +64,7 @@ namespace cppmicroservices
          *
          * The header value may be retrieved via the \c Bundle::GetProperty method.
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_ACTIVATOR; // = "bundle.activator";
+        constexpr const char* BUNDLE_ACTIVATOR = "bundle.activator";
 
         /**
          * Manifest header identifying the bundle's category.
@@ -72,7 +72,7 @@ namespace cppmicroservices
          * The header value may be retrieved from the \c AnyMap object
          * returned by the \c Bundle::GetHeaders() method.
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_CATEGORY; // = "bundle.category";
+        constexpr const char* BUNDLE_CATEGORY = "bundle.category";
 
         /**
          * Manifest header identifying the bundle's copyright information.
@@ -80,7 +80,7 @@ namespace cppmicroservices
          * The header value may be retrieved from the \c AnyMap object
          * returned by the \c Bundle::GetHeaders() method.
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_COPYRIGHT; // = "bundle.copyright";
+        constexpr const char* BUNDLE_COPYRIGHT = "bundle.copyright";
 
         /**
          * Manifest header containing a brief description of the bundle's
@@ -89,7 +89,7 @@ namespace cppmicroservices
          * The header value may be retrieved from the \c AnyMap object
          * returned by the \c Bundle::GetHeaders() method.
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_DESCRIPTION; // = "bundle.description";
+        constexpr const char* BUNDLE_DESCRIPTION = "bundle.description";
 
         /**
          * Manifest header identifying the bundle's manifest version.
@@ -97,7 +97,7 @@ namespace cppmicroservices
          * The header value may be retrieved from the \c AnyMap object
          * returned by the \c Bundle::GetHeaders() method.
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_MANIFESTVERSION; // = "bundle.manifest_version";
+        constexpr const char* BUNDLE_MANIFESTVERSION = "bundle.manifest_version";
 
         /**
          * Manifest header identifying the bundle's name.
@@ -105,7 +105,7 @@ namespace cppmicroservices
          * The header value may be retrieved from the \c AnyMap object
          * returned by the \c Bundle::GetHeaders() method.
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_NAME; // = "bundle.name";
+        constexpr const char* BUNDLE_NAME = "bundle.name";
 
         /**
          * Manifest header identifying the bundle's vendor.
@@ -113,7 +113,7 @@ namespace cppmicroservices
          * The header value may be retrieved from the \c AnyMap object
          * returned by the \c Bundle::GetHeaders() method.
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_VENDOR; // = "bundle.vendor";
+        constexpr const char* BUNDLE_VENDOR = "bundle.vendor";
 
         /**
          * Manifest header identifying the bundle's version.
@@ -121,7 +121,7 @@ namespace cppmicroservices
          * The header value may be retrieved from the \c AnyMap object
          * returned by the \c Bundle::GetHeaders() method.
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_VERSION; // = "bundle.version";
+        constexpr const char* BUNDLE_VERSION = "bundle.version";
 
         /**
          * Manifest header identifying the bundle's documentation URL, from which
@@ -130,7 +130,7 @@ namespace cppmicroservices
          * The header value may be retrieved from the \c AnyMap object
          * returned by the \c Bundle::GetHeaders() method.
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_DOCURL; // = "bundle.doc_url";
+        constexpr const char* BUNDLE_DOCURL = "bundle.doc_url";
 
         /**
          * Manifest header identifying the contact address where problems with the
@@ -139,7 +139,7 @@ namespace cppmicroservices
          * The header value may be retrieved from the \c AnyMap object
          * returned by the \c Bundle::GetHeaders() method.
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_CONTACTADDRESS; // = "bundle.contact_address";
+        constexpr const char* BUNDLE_CONTACTADDRESS = "bundle.contact_address";
 
         /**
          * Manifest header identifying the bundle's symbolic name.
@@ -147,7 +147,7 @@ namespace cppmicroservices
          * The header value may be retrieved from the \c AnyMap object
          * returned by the \c Bundle::GetHeaders() method.
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_SYMBOLICNAME; // = "bundle.symbolic_name";
+        constexpr const char* BUNDLE_SYMBOLICNAME = "bundle.symbolic_name";
 
         /**
          * Manifest header identifying the base name of the bundle's localization
@@ -158,14 +158,14 @@ namespace cppmicroservices
          *
          * @see #BUNDLE_LOCALIZATION_DEFAULT_BASENAME
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_LOCALIZATION; // = "bundle.localization";
+        constexpr const char* BUNDLE_LOCALIZATION = "bundle.localization";
 
         /**
          * Default value for the \c bundle.localization manifest header.
          *
          * @see #BUNDLE_LOCALIZATION
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_LOCALIZATION_DEFAULT_BASENAME; // = "US-INF/l10n/bundle";
+        constexpr const char* BUNDLE_LOCALIZATION_DEFAULT_BASENAME = "US-INF/l10n/bundle";
 
         /**
          * Manifest header identifying the bundle's activation policy.
@@ -175,7 +175,7 @@ namespace cppmicroservices
          *
          * @see #ACTIVATION_LAZY
          */
-        US_Framework_EXPORT extern const std::string BUNDLE_ACTIVATIONPOLICY; // = "bundle.activation_policy";
+        constexpr const char* BUNDLE_ACTIVATIONPOLICY = "bundle.activation_policy";
 
         /**
          * Bundle activation policy declaring the bundle must be activated when the
@@ -197,14 +197,14 @@ namespace cppmicroservices
          * @see Bundle#Start(uint32_t)
          * @see Bundle#START_ACTIVATION_POLICY
          */
-        US_Framework_EXPORT extern const std::string ACTIVATION_LAZY; // = "lazy";
+        constexpr const char* ACTIVATION_LAZY = "lazy";
 
         /**
          * Framework environment property identifying the Framework version.
          *
          * The header value may be retrieved via the \c BundleContext::GetProperty method.
          */
-        US_Framework_EXPORT extern const std::string FRAMEWORK_VERSION; // = "org.cppmicroservices.framework.version";
+        constexpr const char* FRAMEWORK_VERSION = "org.cppmicroservices.framework.version";
 
         /**
          * Framework environment property identifying the Framework implementation
@@ -212,7 +212,7 @@ namespace cppmicroservices
          *
          * The header value may be retrieved via the \c BundleContext::GetProperty method.
          */
-        US_Framework_EXPORT extern const std::string FRAMEWORK_VENDOR; // = "org.cppmicroservices.framework.vendor";
+        constexpr const char* FRAMEWORK_VENDOR = "org.cppmicroservices.framework.vendor";
 
         /**
          * Framework launching property specifying the persistent storage area used
@@ -226,7 +226,7 @@ namespace cppmicroservices
          * If this property is not set, the framework uses the "fwdir" directory in
          * the current working directory for the persistent storage area.
          */
-        US_Framework_EXPORT extern const std::string FRAMEWORK_STORAGE; // = "org.cppmicroservices.framework.storage";
+        constexpr const char* FRAMEWORK_STORAGE = "org.cppmicroservices.framework.storage";
 
         /**
          * Framework launching property specifying if and when the persistent
@@ -235,8 +235,8 @@ namespace cppmicroservices
          *
          * @see #FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT
          */
-        US_Framework_EXPORT extern const std::string
-            FRAMEWORK_STORAGE_CLEAN; // = "org.cppmicroservices.framework.storage.clean";
+        constexpr const char*
+            FRAMEWORK_STORAGE_CLEAN = "org.cppmicroservices.framework.storage.clean";
 
         /**
          * Specifies that the framework storage area must be cleaned before the
@@ -244,7 +244,7 @@ namespace cppmicroservices
          * updates of the framework will not result in cleaning the framework
          * storage area.
          */
-        US_Framework_EXPORT extern const std::string FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT; // = "onFirstInit";
+        constexpr const char* FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT = "onFirstInit";
 
         /**
          * The framework's threading support property key name.
@@ -263,22 +263,22 @@ namespace cppmicroservices
          * \endrststar
          *
          */
-        US_Framework_EXPORT extern const std::string
-            FRAMEWORK_THREADING_SUPPORT; // = "org.cppmicroservices.framework.threading.support";
+        constexpr const char*
+            FRAMEWORK_THREADING_SUPPORT = "org.cppmicroservices.framework.threading.support";
 
         /**
          * Framework threading support configuration declaring that the framework
          * is configured for single thread usage. It is not safe to use the
          * framework API concurrently from multiple threads.
          */
-        US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_SINGLE; // = "single";
+        constexpr const char* FRAMEWORK_THREADING_SINGLE = "single";
 
         /**
          * Framework threading support configuration declaring that the framework
          * is configured for multi-thread usage. The framework API uses internal
          * locks such that it is safe to use the API concurrently from multiple threads.
          */
-        US_Framework_EXPORT extern const std::string FRAMEWORK_THREADING_MULTI; // = "multi";
+        constexpr const char* FRAMEWORK_THREADING_MULTI = "multi";
 
         /**
          * The framework's log property key name.
@@ -287,7 +287,7 @@ namespace cppmicroservices
          * @internal
          * @see #DIAG_LOG
          */
-        US_Framework_EXPORT extern const std::string FRAMEWORK_LOG; // = "org.cppmicroservices.framework.log";
+        constexpr const char* FRAMEWORK_LOG = "org.cppmicroservices.framework.log";
 
         /**
          * Framework environment property identifying the Framework's universally
@@ -299,7 +299,7 @@ namespace cppmicroservices
          *
          * The header value may be retrieved via the \c BundleContext::GetProperty method.
          */
-        US_Framework_EXPORT extern const std::string FRAMEWORK_UUID; // = "org.cppmicroservices.framework.uuid";
+        constexpr const char* FRAMEWORK_UUID = "org.cppmicroservices.framework.uuid";
 
         /**
          * Framework launching property specifying the working directory used for
@@ -307,15 +307,15 @@ namespace cppmicroservices
          * current working directory as set during static initialization of the
          * framework library.
          */
-        US_Framework_EXPORT extern const std::string
-            FRAMEWORK_WORKING_DIR; // = "org.cppmicroservices.framework.working.dir";
+        constexpr const char*
+            FRAMEWORK_WORKING_DIR = "org.cppmicroservices.framework.working.dir";
 
         /**
          * Framework bundle validation property specifying a function that control
          * whether a shared library is loaded or not into the process.
          */
-        US_Framework_EXPORT extern const std::string
-            FRAMEWORK_BUNDLE_VALIDATION_FUNC; // = "org.cppmicroservices.framework.bundle.validation.function"
+        constexpr const char*
+            FRAMEWORK_BUNDLE_VALIDATION_FUNC = "org.cppmicroservices.framework.bundle.validation.function";
 
         /*
          * Service properties.
@@ -328,7 +328,7 @@ namespace cppmicroservices
          *
          * This property is set by the Framework when a service is registered.
          */
-        US_Framework_EXPORT extern const std::string OBJECTCLASS; // = "objectclass";
+        constexpr const char* OBJECTCLASS = "objectclass";
 
         /**
          * Service property identifying a service's registration number. The value
@@ -339,7 +339,7 @@ namespace cppmicroservices
          * previously assigned values since the Framework was started. These values
          * are NOT persistent across restarts of the Framework.
          */
-        US_Framework_EXPORT extern const std::string SERVICE_ID; // = "service.id";
+        constexpr const char* SERVICE_ID = "service.id";
 
         /**
          * Service property identifying a service's persistent identifier.
@@ -356,7 +356,7 @@ namespace cppmicroservices
          * by a dot (.). A bundle may use this as the prefix of the persistent
          * identifiers for the services it registers.
          */
-        US_Framework_EXPORT extern const std::string SERVICE_PID; // = "service.pid";
+        constexpr const char* SERVICE_PID = "service.pid";
 
         /**
          * Service property identifying a service's ranking number.
@@ -379,7 +379,7 @@ namespace cppmicroservices
          * If the supplied property value is not of type <code>int</code>, it is
          * deemed to have a ranking value of zero.
          */
-        US_Framework_EXPORT extern const std::string SERVICE_RANKING; // = "service.ranking";
+        constexpr const char* SERVICE_RANKING = "service.ranking";
 
         /**
          * Service property identifying a service's vendor.
@@ -387,7 +387,7 @@ namespace cppmicroservices
          * This property may be supplied in the properties \c ServiceProperties object
          * passed to the \c BundleContext#RegisterService method.
          */
-        US_Framework_EXPORT extern const std::string SERVICE_VENDOR; //	= "service.vendor";
+        constexpr const char* SERVICE_VENDOR	= "service.vendor";
 
         /**
          * Service property identifying a service's description.
@@ -395,7 +395,7 @@ namespace cppmicroservices
          * This property may be supplied in the properties \c ServiceProperties object
          * passed to the \c BundleContext#RegisterService method.
          */
-        US_Framework_EXPORT extern const std::string SERVICE_DESCRIPTION; // = "service.description";
+        constexpr const char* SERVICE_DESCRIPTION = "service.description";
 
         /**
          * Service property identifying a service's scope.
@@ -406,7 +406,7 @@ namespace cppmicroservices
          * be SCOPE_BUNDLE. Otherwise, the value of this service property will be
          * SCOPE_SINGLETON.
          */
-        US_Framework_EXPORT extern const std::string SERVICE_SCOPE; // = "service.scope"
+        constexpr const char* SERVICE_SCOPE = "service.scope";
 
         /**
          * Service scope is singleton. All bundles using the service receive the same
@@ -414,7 +414,7 @@ namespace cppmicroservices
          *
          * @see SERVICE_SCOPE
          */
-        US_Framework_EXPORT extern const std::string SCOPE_SINGLETON; // = "singleton"
+        constexpr const char* SCOPE_SINGLETON = "singleton";
 
         /**
          * Service scope is bundle. Each bundle using the service receives a distinct
@@ -422,7 +422,7 @@ namespace cppmicroservices
          *
          * @see SERVICE_SCOPE
          */
-        US_Framework_EXPORT extern const std::string SCOPE_BUNDLE; // = "bundle"
+        constexpr const char* SCOPE_BUNDLE = "bundle";
 
         /**
          * Service scope is prototype. Each bundle using the service receives either
@@ -431,12 +431,12 @@ namespace cppmicroservices
          *
          * @see SERVICE_SCOPE
          */
-        US_Framework_EXPORT extern const std::string SCOPE_PROTOTYPE; // = "prototype"
+        constexpr const char* SCOPE_PROTOTYPE = "prototype";
 
         /**
          * Service property that holds optional flags for dlopen calls on POSIX systems.
          */
-        US_Framework_EXPORT extern const std::string LIBRARY_LOAD_OPTIONS;
+        constexpr const char* LIBRARY_LOAD_OPTIONS = "org.cppmicroservices.library.load.options";
 
     } // namespace Constants
 } // namespace cppmicroservices

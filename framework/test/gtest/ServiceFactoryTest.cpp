@@ -272,7 +272,7 @@ TEST_F(ServiceFactoryTest, TestServiceFactoryPrototypeScope)
     ASSERT_EQ(usedRefs[0], sr1);
 #endif
 
-    std::string filter = "(" + Constants::SERVICE_ID + "=" + sr1.GetProperty(Constants::SERVICE_ID).ToString() + ")";
+    std::string filter = "(" + std::string(Constants::SERVICE_ID) + "=" + sr1.GetProperty(Constants::SERVICE_ID).ToString() + ")";
     ServiceReference<TestBundleH> const sr2 = context.GetServiceReferences<TestBundleH>(filter).front();
     // Service shall be present
     ASSERT_TRUE(sr2);

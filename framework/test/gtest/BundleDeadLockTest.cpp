@@ -32,7 +32,7 @@
 #include "gtest/gtest.h"
 
 #include <chrono>
-/*
+
 TEST(BundleDeadLock, BundleActivatorCallsStart)
 {
     auto f = cppmicroservices::FrameworkFactory().NewFramework();
@@ -61,7 +61,6 @@ TEST(BundleDeadLock, BundleActivatorCallsStop)
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
 }
-*/
 
 TEST(BundleDeadLock, BundleInstall0Throws)
 {

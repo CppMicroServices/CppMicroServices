@@ -153,7 +153,7 @@ TEST_F(ServiceTrackerTestFixture, TestFilterString)
     BundleContext context = framework.GetBundleContext();
     MyCustomizer customizer(context);
 
-    cppmicroservices::LDAPFilter filter("(" + std::string(cppmicroservices::Constants::SERVICE_ID) + ">=0)");
+    cppmicroservices::LDAPFilter filter("(" + cppmicroservices::Constants::SERVICE_ID + ">=0)");
     cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context, filter, &customizer);
     tracker.Open();
 
@@ -244,7 +244,7 @@ TEST_F(ServiceTrackerTestFixture, TestServiceTracker)
     ASSERT_TRUE(sa2.empty()) << "Checking ServiceTracker size";
 
     // 8. A new Servicetracker, this time with a filter for the object
-    std::string fs = std::string("(") + std::string(Constants::OBJECTCLASS) + "=" + s1 + "*" + ")";
+    std::string fs = std::string("(") + Constants::OBJECTCLASS + "=" + s1 + "*" + ")";
     LDAPFilter f1(fs);
     st1.reset(new ServiceTracker<void>(context, f1));
     // add a service
@@ -603,7 +603,7 @@ TEST_F(ServiceTrackerTestFixture, TestNullPtrServiceTrackerCustomizer)
     auto context = framework.GetBundleContext();
     MyNullPtrCustomizer customizer(context);
 
-    cppmicroservices::LDAPFilter filter("(" + std::string(cppmicroservices::Constants::SERVICE_ID) + ">=0)");
+    cppmicroservices::LDAPFilter filter("(" + cppmicroservices::Constants::SERVICE_ID + ">=0)");
     cppmicroservices::ServiceTracker<MyInterfaceOne> tracker(context, filter, &customizer);
     tracker.Open();
 

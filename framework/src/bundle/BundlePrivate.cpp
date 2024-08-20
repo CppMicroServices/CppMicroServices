@@ -775,7 +775,7 @@ namespace cppmicroservices
 
             if (!errMsg.empty())
             {
-                throw std::invalid_argument(std::string("The Json value for ") + std::string(Constants::BUNDLE_VERSION)
+                throw std::invalid_argument(std::string("The Json value for ") + Constants::BUNDLE_VERSION
                                             + " for bundle " + symbolicName + " (location=" + location
                                             + ") is not valid: " + errMsg);
             }
@@ -783,7 +783,7 @@ namespace cppmicroservices
 
         if (!bundleManifest.Contains(Constants::BUNDLE_SYMBOLICNAME))
         {
-            throw std::invalid_argument(std::string(Constants::BUNDLE_SYMBOLICNAME)
+            throw std::invalid_argument(Constants::BUNDLE_SYMBOLICNAME
                                         + " is not defined in the bundle manifest for bundle " + symbolicName
                                         + " (location=" + location + ").");
         }
@@ -791,7 +791,7 @@ namespace cppmicroservices
         Any bsn(bundleManifest.GetValue(Constants::BUNDLE_SYMBOLICNAME));
         if (bsn.Empty() || bsn.ToStringNoExcept().empty())
         {
-            throw std::invalid_argument(std::string(Constants::BUNDLE_SYMBOLICNAME) + " is empty in the bundle manifest for bundle "
+            throw std::invalid_argument(Constants::BUNDLE_SYMBOLICNAME + " is empty in the bundle manifest for bundle "
                                         + symbolicName + "(location=" + location + ").");
         }
 

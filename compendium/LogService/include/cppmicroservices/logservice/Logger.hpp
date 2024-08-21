@@ -11,7 +11,7 @@
 
 namespace cppmicroservices::logservice
 {
-        /**
+    /**
         \defgroup gr_logservice Logger
 
         \brief Groups Logger class related symbols.

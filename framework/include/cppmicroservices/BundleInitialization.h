@@ -68,7 +68,7 @@ namespace cppmicroservices
  * \endrststar
  */
 #    define CPPMICROSERVICES_INITIALIZE_BUNDLE                                                                       \
-        std::atomic<cppmicroservices::BundleContextPrivate*> US_CTX_INS(US_BUNDLE_NAME) {};                          \
+        US_ABI_EXPORT std::atomic<cppmicroservices::BundleContextPrivate*> US_CTX_INS(US_BUNDLE_NAME) {};            \
                                                                                                                      \
         extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)(void);                    \
         extern "C" cppmicroservices::BundleContextPrivate* US_GET_CTX_FUNC(US_BUNDLE_NAME)()                         \

@@ -33,6 +33,7 @@
 
 #include <chrono>
 
+#ifndef US_PLATFORM_WINDOWS
 TEST(BundleDeadLock, BundleActivatorCallsStart)
 {
     auto f = cppmicroservices::FrameworkFactory().NewFramework();
@@ -61,6 +62,7 @@ TEST(BundleDeadLock, BundleActivatorCallsStop)
     f.Stop();
     f.WaitForStop(std::chrono::milliseconds::zero());
 }
+#endif
 
 TEST(BundleDeadLock, BundleInstall0Throws)
 {

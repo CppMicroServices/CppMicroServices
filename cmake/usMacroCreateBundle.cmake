@@ -166,7 +166,7 @@ usFunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET} ${_resource_embed_type
 
 # Generate supplemental object file for testing
 if(${PROJECT_NAME}_BUILD_OBJ)
-  add_library(${PROJECT_NAME}Obj OBJECT ${${PROJECT_NAME}_SOURCES}
+  add_library(${PROJECT_NAME}Obj ${${PROJECT_NAME}_SOURCES}
               ${${PROJECT_NAME}_PRIVATE_HEADERS} ${${PROJECT_NAME}_PUBLIC_HEADERS})
   target_include_directories(${PROJECT_NAME}Obj
     PUBLIC
@@ -175,7 +175,6 @@ if(${PROJECT_NAME}_BUILD_OBJ)
       $<BUILD_INTERFACE:${CppMicroServices_BINARY_DIR}/include>
       $<BUILD_INTERFACE:${${PROJECT_NAME}_PRIVATE_INCLUDE_DIRS}>
       $<INSTALL_INTERFACE:${HEADER_INSTALL_DIR}>
-    PRIVATE
       $<TARGET_PROPERTY:util,INCLUDE_DIRECTORIES>
     )
   target_compile_definitions(${PROJECT_NAME}Obj

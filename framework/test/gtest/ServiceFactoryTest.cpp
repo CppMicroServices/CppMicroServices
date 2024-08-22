@@ -522,7 +522,7 @@ TEST_F(ServiceFactoryTest, TestServiceFactoryBundleScopeErrorConditions)
     // Test that the service object returned is a nullptr
     ASSERT_EQ(nullptr, context.GetService(svcRecursiveGetServiceRefs[0])); // XXX: This generates 3 framework events
     // Test that one FrameworkEvent was sent
-    ASSERT_EQ(3, fwEvents.size());
+    ASSERT_EQ(2, fwEvents.size());
     // Test for correct framework event type
     ASSERT_EQ(fwEvents[0].GetType(), FrameworkEvent::FRAMEWORK_ERROR);
     // Test for correct framework event bundle

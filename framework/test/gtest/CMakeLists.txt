@@ -60,6 +60,7 @@ set(_gtest_tests
   ShrinkableVectorTest.cpp
   BundleEventTest.cpp
   BundleResourceTest.cpp
+  BundleResourceBufferTest.cpp
   BundleStreamOperatorTest.cpp
   ServiceEventStreamOperatorTest.cpp
   ServiceRegistryTest.cpp

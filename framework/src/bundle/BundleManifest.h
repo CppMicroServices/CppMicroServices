@@ -63,6 +63,17 @@ namespace cppmicroservices
          * m_PropertiesDeprecated and m_DidCopyDeprecatedProperties
          */
         void CopyDeprecatedProperties() const;
+
+        friend class BundleManifestTest_DefaultConstructor_Test;
+        friend class BundleManifestTest_ConstructorWithAnyMap_Test;
+        friend class BundleManifestTest_ParseValidJson_Test;
+        friend class BundleManifestTest_ParseInvalidJsonThrows_Test;
+        friend class BundleManifestTest_ParseNonObjectJsonThrows_Test;
+        friend class BundleManifestTest_GetValueNonExistentKey_Test;
+        friend class BundleManifestTest_CopyDeprecatedProperties_Test;
+        friend class BundleManifestTest_GetKeysDeprecated_Test;
+        friend class BundleManifestTest_GetPropertiesDeprecated_Test;
+        friend class BundleManifestTest_ParseComplexJsonStructure_Test;
     };
 
 } // namespace cppmicroservices

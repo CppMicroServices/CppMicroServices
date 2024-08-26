@@ -309,7 +309,7 @@ namespace cppmicroservices
     }
 
     BundleResource
-    Bundle::GetResource(std::string const& path) const
+    Bundle::GetResource(std::string const& path, bool bypassPrefix = false) const
     {
         if (!d)
         {

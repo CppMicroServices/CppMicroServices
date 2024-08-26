@@ -79,7 +79,7 @@ namespace cppmicroservices
     /**
      * This class is not part of the public API.
      */
-    class CoreBundleContext
+    class US_ABI_TEST CoreBundleContext
     {
       public:
         /**

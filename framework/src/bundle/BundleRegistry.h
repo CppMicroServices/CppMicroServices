@@ -48,7 +48,7 @@ namespace cppmicroservices
      * Here we handle all the bundles that are known to the framework.
      * @remarks This class is thread-safe.
      */
-    class BundleRegistry : private detail::MultiThreaded<>
+    class US_ABI_TEST BundleRegistry : private detail::MultiThreaded<>
     {
 
       public:

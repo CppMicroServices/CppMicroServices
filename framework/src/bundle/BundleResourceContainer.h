@@ -41,7 +41,8 @@ namespace cppmicroservices
     struct BundleArchive;
     class BundleResource;
 
-    class BundleResourceContainer : public std::enable_shared_from_this<BundleResourceContainer>
+    class US_ABI_TEST BundleResourceContainer
+        : public std::enable_shared_from_this<BundleResourceContainer>
     {
 
       public:

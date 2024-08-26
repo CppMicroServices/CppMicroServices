@@ -457,7 +457,7 @@ namespace cppmicroservices
             .WillByDefault(Return(reinterpret_cast<void*>(&destroyActivator)));
         EXPECT_CALL(*bundleUtils, GetSymbol(_, _, _)).Times(3);
 
-        auto priv = GetPrivate(b);
+        auto priv = b.d;
         priv->bundleUtils = std::move(bundleUtils);
 
         b.Start();
@@ -535,7 +535,7 @@ namespace cppmicroservices
                 EXPECT_CALL(*bundleUtils, GetSymbol(_, _, _)).Times(3);
 
 
-                auto priv = GetPrivate(b);
+                auto priv = b.d;
                 priv->bundleUtils = std::move(bundleUtils);
 
                 ASSERT_NO_THROW(b.Start());
@@ -657,7 +657,7 @@ namespace cppmicroservices
                 .WillByDefault(Return(reinterpret_cast<void*>(&destroyActivator)));
             EXPECT_CALL(*bundleUtils, GetSymbol(_, _, _)).Times(3);
 
-            auto priv = GetPrivate(b);
+            auto priv = b.d;
             priv->bundleUtils = std::move(bundleUtils);
 
             ASSERT_NO_THROW(b.Start());

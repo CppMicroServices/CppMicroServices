@@ -108,6 +108,7 @@ set(_additional_srcs
 #-----------------------------------------------------------------------------
 
 set(_third_party_srcs 
+  ../../../third_party/miniz.c
   ../../../third_party/jsoncpp.cpp
 )
 
@@ -144,13 +145,13 @@ if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR
     ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
   set_source_files_properties(${_gtest_tests}
                                 PROPERTIES COMPILE_FLAGS -Wno-error=deprecated-declarations
-                                            COMPILE_FLAGS -Wno-deprecated
-                                            COMPILE_FLAGS -Wno-deprecated-declarations)
+                                           COMPILE_FLAGS -Wno-deprecated
+                                           COMPILE_FLAGS -Wno-deprecated-declarations)
 endif()
 
 target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${GMOCK_BOTH_LIBRARIES})
-target_link_libraries(${us_gtest_test_exe_name} $<TARGET_OBJECTS:FrameworkObj> usLogService)
+target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET} usLogService)
 
 # dlopen/dlsym/dlerror used by SharedLibrary.cpp
 if(UNIX)

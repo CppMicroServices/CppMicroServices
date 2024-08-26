@@ -33,7 +33,7 @@
 namespace cppmicroservices
 {
 
-    class BundleStorageMemory : public BundleStorage
+    class US_ABI_TEST BundleStorageMemory : public BundleStorage
     {
 
       public:

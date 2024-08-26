@@ -30,7 +30,7 @@
 namespace cppmicroservices
 {
 
-    class BundleManifest
+    class US_ABI_TEST BundleManifest
     {
 
       public:

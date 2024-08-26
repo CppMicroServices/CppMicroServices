@@ -50,7 +50,7 @@ namespace cppmicroservices
     /**
      * \ingroup MicroServices
      */
-    class BundlePrivate
+    class US_ABI_TEST BundlePrivate
         : public detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition>
         , public std::enable_shared_from_this<BundlePrivate>
     {

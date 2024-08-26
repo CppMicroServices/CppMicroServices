@@ -81,7 +81,7 @@ namespace cppmicroservices
 
         for (auto& b : bundles)
         {
-            auto priv = GetPrivate(b);
+            auto priv = b.d;
             priv->lib = std::make_unique<MockSharedLibrary>();
         }
 

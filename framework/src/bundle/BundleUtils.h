@@ -27,10 +27,12 @@
 #include <string>
 #include <utility>
 
+#include "cppmicroservices/GlobalConfig.h"
+
 namespace cppmicroservices
 {
 
-    class BundleUtils
+    class US_ABI_TEST BundleUtils
     {
 
       public:

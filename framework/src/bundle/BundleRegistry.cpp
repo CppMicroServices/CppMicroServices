@@ -387,7 +387,7 @@ namespace cppmicroservices
         catch (...)
         {
             // catch any other errors (that we have no information about)
-            std::cerr << "Unknown failure occurred. Possible memory corruption" << std::endl;
+            std::cerr << "Failed to install bundle library at " + location + ": " + util::GetLastExceptionStr() << std::endl;
 
             for (auto& ba : barchives)
             {

@@ -100,7 +100,7 @@ namespace cppmicroservices
 
     BundleResource::BundleResource(BundleResource const& resource) : d(resource.d) {}
 
-    BundleResource::BundleResource(std::string const& file, std::shared_ptr<BundleArchive const> const& archive, bool bypassPrefix = false)
+    BundleResource::BundleResource(std::string const& file, std::shared_ptr<BundleArchive const> const& archive, bool bypassPrefix)
         : d(std::make_shared<BundleResourcePrivate>(archive))
     {
         d->InitFilePath(file);

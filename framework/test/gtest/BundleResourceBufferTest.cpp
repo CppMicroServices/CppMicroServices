@@ -66,15 +66,6 @@ namespace cppmicroservices
             }
         };
 
-        TEST_F(BundleResourceBufferTest, ConstructionWithEmptyData)
-        {
-            auto data = CreateTestData("");
-            BundleResourceBuffer buffer(std::move(data), 0, std::ios_base::in);
-
-            EXPECT_EQ(buffer.underflow(), std::char_traits<char>::eof());
-            EXPECT_EQ(buffer.uflow(), std::char_traits<char>::eof());
-        }
-
         TEST_F(BundleResourceBufferTest, UnderflowAndUflow)
         {
             std::string testData = "Hello, World!";

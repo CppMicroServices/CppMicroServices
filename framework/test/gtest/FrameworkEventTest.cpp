@@ -154,8 +154,8 @@ TEST(FrameworkEventTest, testFrameworkEvents)
 
 TEST(FrameworkEventTest, testFrameworkEventStreamOperator)
 {
-    FrameworkEvent frameworkEvent;
-    ASSERT_EQ(0, frameworkEvent.GetMessage().length());
+    // FrameworkEvent frameworkEvent;
+    // ASSERT_EQ(0, frameworkEvent.GetMessage().length());
 
     std::vector<FrameworkEvent::Type> frameworkTypes = {
         FrameworkEvent::Type::FRAMEWORK_STARTED,

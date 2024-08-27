@@ -520,7 +520,7 @@ TEST_F(ServiceFactoryTest, TestServiceFactoryBundleScopeErrorConditions)
     ASSERT_EQ("1", svcRecursiveGetServiceRefs[0].GetProperty(std::string("getservice_recursion")).ToString());
 #if !defined(US_ENABLE_THREADING_SUPPORT) || defined(US_HAVE_THREAD_LOCAL)
     // Test that the service object returned is a nullptr
-    ASSERT_EQ(nullptr, context.GetService(svcRecursiveGetServiceRefs[0])); // XXX: This generates 3 framework events
+    ASSERT_EQ(nullptr, context.GetService(svcRecursiveGetServiceRefs[0]));
     // Test that one FrameworkEvent was sent
     ASSERT_EQ(2, fwEvents.size());
     // Test for correct framework event type

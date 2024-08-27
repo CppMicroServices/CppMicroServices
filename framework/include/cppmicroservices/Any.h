@@ -674,6 +674,8 @@ namespace cppmicroservices
         friend ValueType* unsafe_any_cast(Any*);
 
         std::unique_ptr<Placeholder> _content;
+
+        friend class PropertiesTest_ValueByRef_Test;
     };
 
     /**

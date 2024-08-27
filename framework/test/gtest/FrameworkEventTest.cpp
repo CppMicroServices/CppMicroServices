@@ -26,12 +26,18 @@
 
 #include "TestUtils.h"
 #include "TestingConfig.h"
+#include "Mocks.h"
+#include "MockUtils.h"
 #include "gtest/gtest.h"
 
 #include <iostream>
 #include <typeinfo>
 
 using namespace cppmicroservices;
+using ::testing::_;
+using ::testing::Eq;
+using ::testing::Return;
+using ::testing::AtLeast;
 
 namespace
 {
@@ -144,4 +150,56 @@ TEST(FrameworkEventTest, testFrameworkEvents)
 
     dup_error_event = FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_STARTED, f, "");
     ASSERT_FALSE(dup_error_event == error_event);
+}
+
+TEST(FrameworkEventTest, testFrameworkEventStreamOperator)
+{
+    FrameworkEvent frameworkEvent;
+    ASSERT_EQ(0, frameworkEvent.GetMessage().length());
+
+    std::vector<FrameworkEvent::Type> frameworkTypes = {
+        FrameworkEvent::Type::FRAMEWORK_STARTED,
+        FrameworkEvent::Type::FRAMEWORK_ERROR,
+        FrameworkEvent::Type::FRAMEWORK_WARNING,
+        FrameworkEvent::Type::FRAMEWORK_INFO,
+        FrameworkEvent::Type::FRAMEWORK_STOPPED,
+        FrameworkEvent::Type::FRAMEWORK_STOPPED_UPDATE,
+        FrameworkEvent::Type::FRAMEWORK_WAIT_TIMEDOUT
+    };
+
+    std::string bundleName = "MockBundle";
+    MockedEnvironment mockEnv(false);
+    MockBundleStorageMemory* bundleStorage = mockEnv.bundleStorage;
+    AnyMap manifest = AnyMap({
+        { "bundle.activator", Any(true) },
+        { "bundle.symbolic_name", Any(std::string(bundleName)) },
+    });
+
+    std::vector<std::string> files = {bundleName};
+    auto resCont = std::make_shared<MockBundleResourceContainer>();
+    ON_CALL(*resCont, GetTopLevelDirs())
+        .WillByDefault(Return(files));
+    EXPECT_CALL(*resCont, GetTopLevelDirs()).Times(1);
+
+    ON_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _))
+        .WillByDefault(Return(std::make_shared<MockBundleArchive>(
+            bundleStorage,
+            resCont,
+            bundleName, bundleName, 1,
+            manifest
+        )));
+    EXPECT_CALL(*bundleStorage, CreateAndInsertArchive(_, Eq(bundleName), _)).Times(1);
+
+    auto bundle = mockEnv.Install(bundleName, manifest, resCont).at(0);
+
+    std::ostringstream buf;
+    std::string message = "hello world";
+    std::exception_ptr e = std::make_exception_ptr(std::runtime_error("placeholder"));
+    for (auto type : frameworkTypes)
+    {
+        FrameworkEvent evt(type, bundle, message, e);
+        buf << evt << "\n";
+    }
+    std::string goal = "STARTED\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\nERROR\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\nWARNING\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\nINFO\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\nSTOPPED\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\nSTOPPED_UPDATE\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\nWAIT_TIMEDOUT\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\n";
+    ASSERT_EQ(goal, buf.str());
 }

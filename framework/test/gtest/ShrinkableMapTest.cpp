@@ -70,3 +70,21 @@ TEST(ShrinkableMapTest, testShrinkableMapOperations)
     // back() access
     ASSERT_EQ(shrinkable.at(2), "two");
 }
+
+TEST(ShrinkableMapTest, testShrinkableMapIterator)
+{
+    ShrinkableMap<int, std::string>::container_type m {
+        {1,   "one"},
+        {2,   "two"},
+        {3, "three"}
+    };
+    auto shrinkable = ServiceHooks::MakeMap(m);
+
+    int i = 0;
+    std::vector<const char*> vals = { "one", "two", "three" };
+    for (auto it = shrinkable.begin(); it != shrinkable.end(); it++)
+    {
+        ASSERT_EQ((i + 1), it->first);
+        ASSERT_STREQ(vals[i++], it->second.c_str());
+    }
+}

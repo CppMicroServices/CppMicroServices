@@ -47,6 +47,70 @@ namespace cppmicroservices
     }
 
     /*
+     * Test Value behavior with all four branch paths based on input
+     * AnyMap type.
+     */
+    TEST_F(PropertiesTest, Value)
+    {
+        auto test = [](AnyMap& map)
+        {
+            Properties props(map);
+            {
+                auto result = props.Value_unlocked("missing", false);
+                ASSERT_FALSE(result.second);
+            }
+
+            {
+                auto result = props.Value_unlocked("HELLO", true);
+                ASSERT_FALSE(result.second);
+            }
+
+            {
+                auto result = props.Value_unlocked("hello", false);
+                std::string tmp = any_cast<std::string>(result.first);
+                std::string val = "world";
+                ASSERT_STREQ(tmp.c_str(), val.c_str());
+            }
+
+            {
+                auto result = props.Value_unlocked("HELLO", false);
+                std::string tmp = any_cast<std::string>(result.first);
+                std::string val = "world";
+                ASSERT_STREQ(tmp.c_str(), val.c_str());
+            }
+
+            ASSERT_NO_THROW(props.Clear_unlocked());
+        };
+
+        {
+            AnyMap map {
+                AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS, {
+                    { "hello", std::string("world") }
+                }
+            };
+            ASSERT_NO_THROW({ test(map); });
+        }
+
+        {
+            AnyMap map {
+                AnyMap::UNORDERED_MAP, {
+                    { "hello", std::string("world") }
+                }
+            };
+            ASSERT_NO_THROW({ test(map); });
+        }
+
+        {
+            AnyMap map {
+                AnyMap::ORDERED_MAP, {
+                    { "hello", std::string("world") }
+                }
+            };
+            ASSERT_NO_THROW({ test(map); });
+        }
+    }
+
+    /*
      * Test ValueByRef behavior with all four branch paths based on input
      * AnyMap type.
      */
@@ -80,6 +144,8 @@ namespace cppmicroservices
                 std::string val = "world";
                 ASSERT_STREQ(tmp.c_str(), val.c_str());
             }
+
+            ASSERT_NO_THROW(props.Clear_unlocked());
         };
 
         {

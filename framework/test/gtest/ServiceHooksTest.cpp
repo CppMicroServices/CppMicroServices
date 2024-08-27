@@ -415,7 +415,6 @@ TEST_F(ServiceHooksTest, TestFindHook)
     context.RemoveServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
 }
 
-#ifndef US_PLATFORM_WINDOWS
 TEST_F(ServiceHooksTest, TestEventListenerHook)
 {
     TestServiceListener serviceListener1;
@@ -461,7 +460,6 @@ TEST_F(ServiceHooksTest, TestEventListenerHook)
     context.RemoveServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
     context.RemoveServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged);
 }
-#endif
 
 TEST_F(ServiceHooksTest, TestFindHookFailure)
 {
@@ -501,7 +499,6 @@ TEST_F(ServiceHooksTest, TestFindHookFailure)
     framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
 }
 
-#ifndef US_PLATFORM_WINDOWS
 TEST_F(ServiceHooksTest, TestEventListenerHookFailure)
 {
     auto eventListenerHookReg = framework.GetBundleContext().RegisterService<ServiceEventListenerHook>(
@@ -536,7 +533,6 @@ TEST_F(ServiceHooksTest, TestEventListenerHookFailure)
     eventListenerHookReg.Unregister();
     framework.GetBundleContext().RemoveListener(std::move(fwkListenerToken));
 }
-#endif
 
 TEST_F(ServiceHooksTest, TestListenerHookFailure)
 {
@@ -665,7 +661,6 @@ TEST_F(ServiceHooksTest, TestFindHookCallbackOrdering)
     context.RemoveServiceListener(&serviceListener, &TestServiceListener::ServiceChanged);
 }
 
-#ifndef US_PLATFORM_WINDOWS
 TEST_F(ServiceHooksTest, TestEventListenerHookCallbackOrdering)
 {
     TestServiceListener serviceListener1;
@@ -709,6 +704,5 @@ TEST_F(ServiceHooksTest, TestEventListenerHookCallbackOrdering)
     context.RemoveServiceListener(&serviceListener1, &TestServiceListener::ServiceChanged);
     context.RemoveServiceListener(&serviceListener2, &TestServiceListener::ServiceChanged);
 }
-#endif
 
 US_MSVC_POP_WARNING

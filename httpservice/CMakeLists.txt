@@ -81,7 +81,7 @@ if(MINGW)
 endif()
 
 # Needed for clock_gettime with glibc < 2.17
-if(UNIX AND NOT APPLE)
+if((UNIX AND NOT APPLE) AND NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
   target_link_libraries(usHttpService PRIVATE rt)
 endif()
 

@@ -151,7 +151,7 @@ add_dependencies(${us_configurationadmin_test_exe_name}
 )
 
 # Needed for clock_gettime with glibc < 2.17
-if(UNIX AND NOT APPLE)
+if((UNIX AND NOT APPLE) AND NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
   target_link_libraries(${us_configurationadmin_test_exe_name} PRIVATE rt)
 endif()
 

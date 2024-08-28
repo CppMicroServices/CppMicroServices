@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.15)
+project(mockmaker LANGUAGES CXX)
+set(CMAKE_BUILD_TYPE Debug)
+
+include(cmake/FindLibClang.cmake)
+
+add_executable(mockmaker src/mockmaker.cpp)
+if (MSVC)
+    target_compile_options(mockmaker PRIVATE /W4 /WX ${LIBCLANG_CXXFLAGS})
+else ()
+    target_compile_options(mockmaker PRIVATE -Wall -Wextra -Wpedantic -Werror ${LIBCLANG_CXXFLAGS})
+endif ()
+set_property(TARGET mockmaker PROPERTY CXX_STANDARD 17)
+include_directories(${LIBCLANG_INCDIR})
+target_include_directories(mockmaker PUBLIC include)
+target_link_libraries(mockmaker ${LIBCLANG_LIBRARIES})

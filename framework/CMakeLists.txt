@@ -34,7 +34,7 @@ usMacroCreateBundle(Framework
   TARGET CppMicroServices
   SYMBOLIC_NAME system_bundle
   SKIP_INIT # we do it manually
-  EMBED_RESOURCE_METHOD APPEND
+  EMBED_RESOURCE_METHOD LINK
   PRIVATE_INCLUDE_DIRS src/util src/service src/bundle ../third_party
   LINK_LIBRARIES ${_link_libraries}
   SOURCES ${_framework_srcs}

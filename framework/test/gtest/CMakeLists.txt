@@ -121,7 +121,7 @@ usFunctionGetResourceSource(TARGET ${us_gtest_test_exe_name} OUT _additional_src
 add_executable(${us_gtest_test_exe_name} ${_gtest_tests} ${_additional_srcs} ${_third_party_srcs})
 
 if((US_COMPILER_MSVC OR MINGW) AND BUILD_SHARED_LIBS)
-  target_compile_options(${us_gtest_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY -DUS_IS_TESTING_OBJ=1)
+  target_compile_options(${us_gtest_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
 endif()
 
 # Needed for ResourceCompilerTest

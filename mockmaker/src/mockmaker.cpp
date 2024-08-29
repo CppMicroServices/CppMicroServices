@@ -27,7 +27,8 @@ using namespace std;
 namespace fs = std::filesystem;
 
 static vector<string> excluded_namespaces = {
-  "std", "__gnu_cxx", "__cxx11"
+  "std", "__gnu_cxx", "__gnu_debug", "__cxx11", "__cxxabiv1", "__detail", "__pstl",
+  "_V2", "chrono", "pmr"
 };
 
 /**
@@ -280,6 +281,10 @@ ParseResult make_mock(int argc, char **argv) {
   // Utility header
   if (!util.empty()) {
     ofs << "#include \"" << util << "\"" << endl;
+  }
+
+  if (namespaces.empty()) {
+    cout << WARN << "--namespace not used, unexpected classes may be mocked." << endl;
   }
 
   for (const auto &entry : fs::recursive_directory_iterator(path)) {

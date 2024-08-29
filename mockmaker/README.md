@@ -35,7 +35,7 @@ $ cmake --build .
 
 ```sh
 $ ./mockmaker
-Usage: ./mockmaker <template file> <source directory> <output file> [utility header] -- [clang flags]
+Usage: ./mockmaker <template file> <source directory> <output file> [--util Header.h] [--namespace ns1] [--namespace ns2] ... -- [clang flags]
   Set MM_INFO=1 for detailed parsing information.
 ```
 
@@ -47,7 +47,7 @@ This help text means that:
 For example:
 
 ```sh
-$ MM_INFO=1 ./mockmaker ../demo/Mocks.h.in ../demo/framework Mocks.h ../demo/util.h
+$ MM_INFO=1 ./mockmaker ../demo/Mocks.h.in ../demo/framework Mocks.h --util ../demo/util.h --namespace cppmicroservices
 ```
 
 - This will generate the following debug output:
@@ -117,7 +117,10 @@ namespace cppmicroservices
 
 ## Limitations
 
-- libclang fundamental limitations:  Because libclang exposes only functionality needed by LLVM developers working on clang, there are a variety of features conspicuously lacking.  Most notable among this is better support for templates.  While it is possible to detect if a class or function uses templates (as well as the kinds of parameters expected by those templates), it is not possible to retrieve the names of the template parameters themselves.  Additionally, a constructor for a class template will include the templates within it.  Therefore, declaring a mock class template cannot use template parameters' original names but the parent constructor it calls uses those original names.  In fewer words and more code:
+- Known issues:
+    - Depending on the STL being used, not using the `--namespace` argument will lead to some `std` classes being mocked.  This is likely due to a preprocessor issue with definitions of visibility macros (e.g. `_GLIBCXX_VISIBILITY`), but has not yet been solved.
+- Template parameters:
+    - Currently, template parameters are incorrectly mocked due to libclang limitations and other engineering challenges.  Here is an example of the incorrect behavior (which must be rectified manually):
 
 ```cpp
 // Parent class to be mocked

@@ -41,9 +41,11 @@ struct ParseState {
   string class_name;
   ParseResult *out;
   vector<string> namespaces;
+  vector<string> *valid_namespaces;
 
   ParseState() : out(nullptr) {}
-  ParseState(ParseResult *out) : out(out) {}
+  ParseState(ParseResult *out, vector<string> *valid_namespaces)
+      : out(out), valid_namespaces(valid_namespaces) {}
 };
 
 #endif /* __PARSE_HPP */

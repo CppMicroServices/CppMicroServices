@@ -74,11 +74,12 @@ namespace cppmicroservices
 
     struct BundleStorage;
     class FrameworkPrivate;
+    class MockedEnvironment;
 
     /**
      * This class is not part of the public API.
      */
-    class CoreBundleContext
+    class US_ABI_TEST CoreBundleContext
     {
       public:
         /**
@@ -167,7 +168,7 @@ namespace cppmicroservices
         /**
          * All installed bundles.
          */
-        BundleRegistry bundleRegistry;
+        std::unique_ptr<BundleRegistry> bundleRegistry;
 
         bool firstInit;
 
@@ -224,6 +225,10 @@ namespace cppmicroservices
       private:
         // The core context is exclusively constructed by the FrameworkFactory class
         friend class FrameworkFactory;
+
+        // The mock class invokes its parent's constructor
+        friend class MockCoreBundleContext;
+        friend class MockedEnvironment;
 
         // Mutex required to be held when changing stopped.
         // ReadLock or WriteLock construction is done using this mutex.

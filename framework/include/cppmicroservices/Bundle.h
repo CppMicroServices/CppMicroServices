@@ -840,6 +840,11 @@ namespace cppmicroservices
         std::shared_ptr<CoreBundleContext> c;
 
         friend class BundleRegistry;
+        friend class MockedEnvironment;
+        friend class BundleTest_TestUnicodePaths_Test;
+        friend class BundleManifestTest_DirectManifestInstallAndStartMulti_Test;
+        friend class BundleManifestTest_DirectManifestInstallAndStart_Test;
+        friend class BundleManifestTest_DirectManifestInstallAndStartMultiStatic_Test;
         friend Bundle MakeBundle(std::shared_ptr<BundlePrivate> const&);
         friend std::shared_ptr<BundlePrivate> GetPrivate(Bundle const&);
     };

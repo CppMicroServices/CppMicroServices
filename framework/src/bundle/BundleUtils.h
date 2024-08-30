@@ -27,16 +27,22 @@
 #include <string>
 #include <utility>
 
+#include "cppmicroservices/GlobalConfig.h"
+
 namespace cppmicroservices
 {
 
-    namespace BundleUtils
+    class US_ABI_TEST BundleUtils
     {
+
+      public:
+        virtual ~BundleUtils() = default;
+
         // returns the handle to the current executable
         void* GetExecutableHandle();
 
         // returns the address of the symbol in library libHandle
-        void* GetSymbol(void* libHandle, char const* symbol, std::string& errmsg);
+        virtual void* GetSymbol(void* libHandle, char const* symbol, std::string& errmsg);
 
         template <typename T>
         void
@@ -46,7 +52,7 @@ namespace cppmicroservices
             fptr = reinterpret_cast<T*>(f);
         }
 
-    } // namespace BundleUtils
+    };
 
 } // namespace cppmicroservices
 

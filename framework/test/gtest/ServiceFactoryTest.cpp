@@ -506,7 +506,11 @@ TEST_F(ServiceFactoryTest, TestServiceFactoryBundleScopeErrorConditions)
     // Test that one FrameworkEvent was sent
     ASSERT_EQ(1, fwEvents.size());
 
+    bundleH.GetBundleContext().RemoveListener(std::move(listenerToken));
+
     fwEvents.clear();
+    listenerToken = bundleH.GetBundleContext().AddFrameworkListener(eventCountListener);
+
     std::string recursiveGetServiceFilter(LDAPProp("getservice_recursion") == true);
     auto svcRecursiveGetServiceRefs(
         context.GetServiceReferences("cppmicroservices::TestBundleH", recursiveGetServiceFilter));
@@ -519,9 +523,9 @@ TEST_F(ServiceFactoryTest, TestServiceFactoryBundleScopeErrorConditions)
     ASSERT_EQ(nullptr, context.GetService(svcRecursiveGetServiceRefs[0]));
     // Test that one FrameworkEvent was sent
     ASSERT_EQ(2, fwEvents.size());
-    // Test for correct framwork event type
+    // Test for correct framework event type
     ASSERT_EQ(fwEvents[0].GetType(), FrameworkEvent::FRAMEWORK_ERROR);
-    // Test for correct framwork event bundle
+    // Test for correct framework event bundle
     ASSERT_EQ(fwEvents[0].GetBundle(), context.GetBundle());
 
     // Test for correct service exception type (recursion)

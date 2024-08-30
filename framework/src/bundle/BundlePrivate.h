@@ -32,6 +32,7 @@
 
 #include "BundleArchive.h"
 #include "BundleManifest.h"
+#include "BundleUtils.h"
 
 #include <functional>
 #include <memory>
@@ -49,7 +50,7 @@ namespace cppmicroservices
     /**
      * \ingroup MicroServices
      */
-    class BundlePrivate
+    class US_ABI_TEST BundlePrivate
         : public detail::MultiThreaded<detail::MutexLockingStrategy<>, detail::WaitCondition>
         , public std::enable_shared_from_this<BundlePrivate>
     {
@@ -267,7 +268,9 @@ namespace cppmicroservices
          * Responsible for platform specific loading and unloading
          * of the bundle's physical form.
          */
-        SharedLibrary lib;
+        std::unique_ptr<SharedLibrary> lib;
+
+        std::unique_ptr<BundleUtils> bundleUtils;
 
         SetBundleContextFn SetBundleContext;
     };

@@ -40,7 +40,7 @@ namespace cppmicroservices
     /**
      * Class for managing bundle data.
      */
-    struct BundleArchive : std::enable_shared_from_this<BundleArchive>
+    struct US_ABI_TEST BundleArchive : std::enable_shared_from_this<BundleArchive>
     {
         using TimeStamp = std::chrono::steady_clock::time_point;
 

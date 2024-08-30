@@ -5,7 +5,7 @@ macro(usMacroCreateBundle _project_name)
 cmake_parse_arguments(${_project_name}
   "SKIP_EXAMPLES;SKIP_INIT"
   "VERSION;TARGET;SYMBOLIC_NAME;EMBED_RESOURCE_METHOD"
-  "DEPENDS;PRIVATE_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES"
+  "DEPENDS;PRIVATE_INCLUDE_DIRS;LINK_LIBRARIES;SOURCES;PRIVATE_HEADERS;PUBLIC_HEADERS;RESOURCES;BINARY_RESOURCES;BUILD_OBJ"
   ${ARGN}
 )
 
@@ -163,6 +163,12 @@ if(${PROJECT_NAME}_BINARY_RESOURCES)
                         )
 endif()
 usFunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET} ${_resource_embed_type})
+
+# Generate supplemental object file for testing
+if(${PROJECT_NAME}_BUILD_OBJ)
+  target_compile_definitions(${PROJECT_TARGET}
+    PRIVATE US_IS_TESTING=1)
+endif()
 
 #-----------------------------------------------------------------------------
 # Install support

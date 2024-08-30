@@ -331,6 +331,7 @@ namespace cppmicroservices
       private:
         friend class Properties;
         friend class LDAPExpr;
+        friend class AnyMapTest_AnyMapIteratorTypeChecked_Test;
 
         // Private "fast" and type-checked functions for working with map iterators
         // and finding elements (these functions should only be called in a context)

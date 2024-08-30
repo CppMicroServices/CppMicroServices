@@ -34,7 +34,7 @@
 namespace cppmicroservices
 {
 
-    class Properties : public detail::MultiThreaded<>
+    class US_ABI_TEST Properties : public detail::MultiThreaded<>
     {
 
       public:

@@ -71,14 +71,21 @@
   #define US_ABI_EXPORT __declspec(dllexport)
   #define US_ABI_IMPORT __declspec(dllimport)
   #define US_ABI_LOCAL
+  #if defined(US_IS_TESTING)
+    #define US_ABI_TEST US_ABI_EXPORT
+  #else
+    #define US_ABI_TEST
+  #endif
 #elif defined(US_HAVE_VISIBILITY_ATTRIBUTE)
   #define US_ABI_EXPORT __attribute__ ((visibility ("default")))
   #define US_ABI_IMPORT __attribute__ ((visibility ("default")))
   #define US_ABI_LOCAL  __attribute__ ((visibility ("hidden")))
+  #define US_ABI_TEST US_ABI_EXPORT
 #else
   #define US_ABI_EXPORT
   #define US_ABI_IMPORT
   #define US_ABI_LOCAL
+  #define US_ABI_TEST
 #endif
 
 //-------------------------------------------------------------------

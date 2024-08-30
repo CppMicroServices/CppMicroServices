@@ -48,7 +48,7 @@ namespace cppmicroservices
      * Here we handle all the bundles that are known to the framework.
      * @remarks This class is thread-safe.
      */
-    class BundleRegistry : private detail::MultiThreaded<>
+    class US_ABI_TEST BundleRegistry : private detail::MultiThreaded<>
     {
 
       public:
@@ -136,6 +136,9 @@ namespace cppmicroservices
         BundleRegistry(BundleRegistry const&) = delete;
         BundleRegistry& operator=(BundleRegistry const&) = delete;
 
+        std::vector<Bundle> Install1(std::string const& location,
+                                     cppmicroservices::AnyMap const& bundleManifest,
+                                     std::shared_ptr<BundleResourceContainer> const& resCont);
         std::vector<Bundle> Install0(std::string const& location,
                                      std::shared_ptr<BundleResourceContainer> const& resCont,
                                      std::vector<std::string> const& alreadyInstalled,
@@ -195,6 +198,8 @@ namespace cppmicroservices
         {
             BundleMap v;
         } bundles;
+
+        friend class MockedEnvironment;
     };
 } // namespace cppmicroservices
 

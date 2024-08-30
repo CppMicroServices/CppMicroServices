@@ -74,29 +74,23 @@ dlsym(void* handle, char const* symbol)
 namespace cppmicroservices
 {
 
-    namespace BundleUtils
+    void*
+    BundleUtils::GetExecutableHandle()
     {
+        return dlopen(nullptr, RTLD_LAZY);
+    }
 
-        void*
-        GetExecutableHandle()
+    void*
+    BundleUtils::GetSymbol(void* libHandle, char const* symbol, std::string& errmsg)
+    {
+        void* addr = libHandle ? dlsym(libHandle, symbol) : nullptr;
+        if (!addr)
         {
-            return dlopen(nullptr, RTLD_LAZY);
-            ;
+            const std::string dlerrorMsg = dlerror();
+            errmsg += "GetSymbol() failed to find (" + std::string { symbol }
+                      + ") with error : " + (!dlerrorMsg.empty() ? dlerrorMsg : "unknown");
         }
-
-        void*
-        GetSymbol(void* libHandle, char const* symbol, std::string& errmsg)
-        {
-            void* addr = libHandle ? dlsym(libHandle, symbol) : nullptr;
-            if (!addr)
-            {
-                const std::string dlerrorMsg = dlerror();
-                errmsg += "GetSymbol() failed to find (" + std::string { symbol }
-                          + ") with error : " + (!dlerrorMsg.empty() ? dlerrorMsg : "unknown");
-            }
-            return addr;
-        }
-
-    } // namespace BundleUtils
+        return addr;
+    }
 
 } // namespace cppmicroservices

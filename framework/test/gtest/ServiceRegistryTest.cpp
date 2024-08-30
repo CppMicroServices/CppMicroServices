@@ -205,3 +205,15 @@ TEST_F(ServiceRegistryTest, TestServicePropertiesUpdate)
     reg2.Unregister();
     ASSERT_TRUE(context.GetServiceReferences<ITestServiceA>().empty());
 }
+
+TEST_F(ServiceRegistryTest, TestServicePropertiesFailure)
+{
+    auto s1 = std::make_shared<TestServiceA>();
+
+    ServiceProperties props;
+    ServiceRegistration<ITestServiceA> reg1 = context.RegisterService<ITestServiceA>(s1, props);
+
+    ServiceProperties props2;
+    props2[Constants::SERVICE_RANKING] = std::string("Not an integer");
+    EXPECT_THROW(reg1.SetProperties(props2), std::invalid_argument);
+}

@@ -66,6 +66,15 @@ namespace cppmicroservices
 
           private:
             std::unique_ptr<BundleResourceBufferPrivate> d;
+
+            friend class BundleResourceBufferTest;
+            friend class BundleResourceBufferTest_ConstructionWithEmptyData_Test;
+            friend class BundleResourceBufferTest_UnderflowAndUflow_Test;
+            friend class BundleResourceBufferTest_Pbackfail_Test;
+            friend class BundleResourceBufferTest_Showmanyc_Test;
+            friend class BundleResourceBufferTest_SeekoffAndSeekpos_Test;
+            friend class BundleResourceBufferTest_NewlineConversion_Test;
+            friend class BundleResourceBufferTest_RemoveLastNewline_Test;
         };
 
     } // namespace detail

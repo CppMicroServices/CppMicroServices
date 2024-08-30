@@ -41,13 +41,15 @@ namespace cppmicroservices
     struct BundleArchive;
     class BundleResource;
 
-    class BundleResourceContainer : public std::enable_shared_from_this<BundleResourceContainer>
+    class US_ABI_TEST BundleResourceContainer
+        : public std::enable_shared_from_this<BundleResourceContainer>
     {
 
       public:
         using ManifestT = cppmicroservices::AnyMap;
+        BundleResourceContainer();
         BundleResourceContainer(std::string const& location, ManifestT const&);
-        ~BundleResourceContainer();
+        virtual ~BundleResourceContainer();
 
         struct Stat
         {
@@ -64,7 +66,7 @@ namespace cppmicroservices
 
         std::string GetLocation() const;
 
-        std::vector<std::string> GetTopLevelDirs() const;
+        virtual std::vector<std::string> GetTopLevelDirs() const;
 
         bool GetStat(Stat& stat);
         bool GetStat(int index, Stat& stat);

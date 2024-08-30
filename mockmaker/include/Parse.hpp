@@ -44,8 +44,16 @@ struct ParseState {
   vector<string> *valid_namespaces;
 
   ParseState() : out(nullptr) {}
+  ParseState(ParseState &ps)
+    : has_namespace(ps.has_namespace)
+    , class_name(ps.class_name)
+    , out(ps.out)
+    , namespaces(ps.namespaces)
+    , valid_namespaces(ps.valid_namespaces) {}
   ParseState(ParseResult *out, vector<string> *valid_namespaces)
-      : out(out), valid_namespaces(valid_namespaces) {}
+      : out(out), valid_namespaces(valid_namespaces) {
+    if (valid_namespaces->empty()) has_namespace = true;
+  }
 };
 
 #endif /* __PARSE_HPP */

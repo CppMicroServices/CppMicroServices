@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <cstring>
 #include <cstdio>
 #include <vector>
@@ -26,6 +27,7 @@
 using namespace std;
 namespace fs = std::filesystem;
 
+// Namespaces to be excluded from mocking, manually curated
 static vector<string> excluded_namespaces = {
   "std", "__gnu_cxx", "__gnu_debug", "__cxx11", "__cxxabiv1", "__detail", "__pstl",
   "_V2", "chrono", "pmr"
@@ -73,146 +75,146 @@ void print_function_decl(CXCursor cursor, string name_str, int code = 0) {
  * Visit an individual entity within the parse tree (e.g. a class declaration,
  * function declaration, etc.) and descend further into the AST if able.
  */
-void visit_entity(CXCursor cursor, CXClientData raw_parse_state = nullptr) {
+bool visit_entity(CXCursor cursor, CXClientData raw_parse_state = nullptr) {
   ParseState *parse_state = static_cast<ParseState*>(raw_parse_state);
-  ParseState next_parse_state =
-    (parse_state == nullptr ? ParseState() : *parse_state);
-  if (next_parse_state.continue_descending) {
-    string name_str = cxstring_to_string(clang_getCursorSpelling(cursor));
-    if (name_str.empty()) return;
 
-    vector<string> template_params;
-    CXCursorKind kind = clang_getCursorKind(cursor);
-    switch (kind) {
-      // Translation unit: Top-level entity for entry file
-      case CXCursor_TranslationUnit: {
-        if (SHOW_PRETTY_INFO) {
-          cout << "\x1b[32mFile\x1b[0m: " << name_str << endl;
-        }
-        break;
+  string name_str = cxstring_to_string(clang_getCursorSpelling(cursor));
+  if (name_str.empty()) return false;
+
+  vector<string> template_params;
+  CXCursorKind kind = clang_getCursorKind(cursor);
+  switch (kind) {
+    // Translation unit: Top-level entity for entry file
+    case CXCursor_TranslationUnit: {
+      if (SHOW_PRETTY_INFO) {
+        cout << "\x1b[32mFile\x1b[0m: " << name_str << endl;
       }
-      // Namespace: Keep track to reconstruct later
-      case CXCursor_Namespace: {
-        // Do not mock STL or similar
-        //   XXX: Nested namespaces are sometimes included (STL header location issue?)
-        if (find(excluded_namespaces.begin(),
-                 excluded_namespaces.end(),
-                 name_str)
-            != excluded_namespaces.end()
-        ) {
-          next_parse_state.continue_descending = false;
-          return;
-        }
-        // If a list of namespaces was explicitly given, check for inclusion
-        auto begin = next_parse_state.valid_namespaces->begin();
-        auto end = next_parse_state.valid_namespaces->end();
-        if (!next_parse_state.valid_namespaces->empty() &&
-            !next_parse_state.has_namespace &&
-            find(begin, end, name_str) == end) {
-          next_parse_state.continue_descending = false;
-          return;
-        }
-        if (SHOW_PRETTY_INFO) {
-          cout << "  \x1b[33mNamespace\x1b[0m: " << name_str << endl;
-        }
-
-        next_parse_state.continue_descending = true;
-        next_parse_state.has_namespace = true;
-        next_parse_state.namespaces.push_back(name_str);
-        break;
-      }
-      // Class declaration: Store in parse state to build mock class
-      case CXCursor_ClassTemplate:
-      case CXCursor_ClassTemplatePartialSpecialization:
-      case CXCursor_StructDecl:
-      case CXCursor_ClassDecl: {
-        // TODO: Template parameters
-        if (!next_parse_state.has_namespace) break;
-        if (SHOW_PRETTY_INFO) {
-          cout << "    \x1b[34mClass\x1b[0m: " << name_str << endl;
-        }
-
-        next_parse_state.class_name = string(name_str);
-
-        // Ignore unnamed structs because they are unmockable
-        if (name_str.find("unnamed") != string::npos) break;
-
-        // Get current filename and add it to the include set
-        CXSourceLocation loc = clang_getCursorLocation(cursor);
-        CXFile file;
-        unsigned int dummy;
-        clang_getSpellingLocation(loc, &file, &dummy, &dummy, &dummy);
-        string filename = cxstring_to_string(clang_getFileName(file));
-        next_parse_state.out->includes.insert(filename);
-
-        // Add a new mock class
-        if (next_parse_state.out->mocks.count(name_str) == 0) {
-          next_parse_state.out->mocks[name_str] = MockedClass(
-            name_str,
-            next_parse_state.namespaces,
-            template_params
-          );
-        } else if (SHOW_PRETTY_INFO) {
-          cout
-            << INFO << "Class " << name_str << " has already been defined."
-            << endl;
-        }
-        break;
-      }
-      // Method/function: Add mock method for each (or copy if constructor)
-      case CXCursor_Constructor:
-      case CXCursor_CXXMethod:
-      case CXCursor_FunctionTemplate:
-      case CXCursor_FunctionDecl: {
-        if (kind == CXCursor_Constructor ||
-            // Constructors with templates are not identified as constructors
-            (kind == CXCursor_FunctionTemplate &&
-             name_str == next_parse_state.class_name)) {
-          if (!next_parse_state.has_namespace) break;
-          if (SHOW_PRETTY_INFO) {
-            print_function_decl(cursor, name_str, 1);
-          }
-
-          MockedClass *mocked = &next_parse_state.out->mocks[
-            next_parse_state.class_name
-          ];
-          mocked->add_function(cursor, true);
-          next_parse_state.out->n_methods++;
-        } else {
-          // TODO: Template parameters, non-class functions
-          if (!next_parse_state.has_namespace ||
-               next_parse_state.class_name.empty() ||
-              !next_parse_state.out->mocks.count(next_parse_state.class_name)) {
-            break;
-          }
-          if (SHOW_PRETTY_INFO) {
-            print_function_decl(cursor, name_str);
-          }
-
-          MockedClass *mocked = &next_parse_state.out->mocks[
-            next_parse_state.class_name
-          ];
-          mocked->add_function(cursor);
-          next_parse_state.out->n_methods++;
-        }
-        break;
-      }
-      // Otherwise: Ignore
-      default: break;
+      break;
     }
+    // Namespace: Keep track to reconstruct later
+    case CXCursor_Namespace: {
+      // Do not mock STL or similar
+      //   XXX: Nested namespaces are sometimes included (STL inline namespace issue?)
+      if (find(excluded_namespaces.begin(),
+               excluded_namespaces.end(),
+               name_str)
+          != excluded_namespaces.end()
+      ) {
+        parse_state->continue_descending = false;
+        return false;
+      }
+      // If a list of namespaces was explicitly given, check for inclusion
+      auto begin = parse_state->valid_namespaces->begin();
+      auto end = parse_state->valid_namespaces->end();
+      if (!parse_state->valid_namespaces->empty() &&
+          !parse_state->has_namespace &&
+          find(begin, end, name_str) == end) {
+        parse_state->continue_descending = false;
+        return false;
+      }
+      if (SHOW_PRETTY_INFO) {
+        cout << "  \x1b[33mNamespace\x1b[0m: " << name_str << endl;
+      }
+
+      parse_state->continue_descending = true;
+      parse_state->has_namespace = true;
+      parse_state->namespaces.push_back(name_str);
+      break;
+    }
+    // Class declaration: Store in parse state to build mock class
+    case CXCursor_ClassTemplate:
+    case CXCursor_ClassTemplatePartialSpecialization:
+    case CXCursor_StructDecl:
+    case CXCursor_ClassDecl: {
+      // TODO: Template parameters
+      if (!parse_state->has_namespace) return false;
+      if (SHOW_PRETTY_INFO) {
+        cout << "    \x1b[34mClass\x1b[0m: " << name_str << endl;
+      }
+
+      parse_state->class_name = string(name_str);
+
+      // Ignore unnamed structs because they are unmockable
+      if (name_str.find("unnamed") != string::npos) return false;
+
+      // Get current filename and add it to the include set
+      CXSourceLocation loc = clang_getCursorLocation(cursor);
+      CXFile file;
+      unsigned int dummy;
+      clang_getSpellingLocation(loc, &file, &dummy, &dummy, &dummy);
+      string filename = cxstring_to_string(clang_getFileName(file));
+      parse_state->out->includes.insert(filename);
+
+      // Add a new mock class
+      if (parse_state->out->mocks.count(name_str) == 0) {
+        parse_state->out->mocks[name_str] = MockedClass(
+          name_str,
+          parse_state->namespaces,
+          template_params
+        );
+      } else if (SHOW_PRETTY_INFO) {
+        cout
+          << INFO << "Class " << name_str << " has already been defined."
+          << endl;
+      }
+      break;
+    }
+    // Method/function: Add mock method for each (or copy if constructor)
+    case CXCursor_Constructor:
+    case CXCursor_CXXMethod:
+    case CXCursor_FunctionTemplate:
+    case CXCursor_FunctionDecl: {
+      if (kind == CXCursor_Constructor ||
+          // Constructors with templates are not identified as constructors
+          (kind == CXCursor_FunctionTemplate &&
+           name_str == parse_state->class_name)) {
+        if (!parse_state->has_namespace) return false;
+        if (SHOW_PRETTY_INFO) {
+          print_function_decl(cursor, name_str, 1);
+        }
+
+        MockedClass *mocked = &parse_state->out->mocks[
+          parse_state->class_name
+        ];
+        mocked->add_function(cursor, true);
+        parse_state->out->n_methods++;
+      } else {
+        // TODO: Template parameters, non-class functions
+        if (!parse_state->has_namespace ||
+             parse_state->class_name.empty() ||
+            !parse_state->out->mocks.count(parse_state->class_name)) {
+          return false;
+        }
+        if (SHOW_PRETTY_INFO) {
+          print_function_decl(cursor, name_str);
+        }
+
+        MockedClass *mocked = &parse_state->out->mocks[
+          parse_state->class_name
+        ];
+        mocked->add_function(cursor);
+        parse_state->out->n_methods++;
+      }
+      break;
+    }
+    // Otherwise: Ignore
+    default: break;
   }
 
   // Continue generating AST
   clang_visitChildren(
     cursor,
-    [](CXCursor c, CXCursor /*parent*/, CXClientData parse_state) {
-      visit_entity(c, parse_state);
+    [](CXCursor c, CXCursor /*parent*/, CXClientData raw_parse_state) {
+      ParseState *parse_state = static_cast<ParseState*>(raw_parse_state);
+      if (!parse_state->continue_descending) return CXChildVisit_Break;
 
-      // Always recurse into parse tree
-      return CXChildVisit_Recurse;
+      ParseState next_parse_state(*parse_state);
+      return visit_entity(c, &next_parse_state) ? CXChildVisit_Recurse : CXChildVisit_Continue;
     },
-    &next_parse_state
+    raw_parse_state
   );
+
+  return true;
 }
 
 inline bool ends_with(std::string const &value, std::string const &ending) {

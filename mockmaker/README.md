@@ -41,7 +41,8 @@ Usage: ./mockmaker <template file> <source directory> <output file> [--util Head
 
 This help text means that:
 - `template file`, `source directory`, and `output file` are all required arguments
-- `utility header` is an optional argument
+- `--util` is an optional argument for specifying a utility header, or a file that contains anything needed for compilation (e.g. preprocessor macros generated at compile time)
+- `--namespace` is an optional argument that can be specified zero or more times, restricting the namespace of mocked classes to only those specified (and their sub-namespaces)
 - The literal string `--` is an optional argument.  If it is included, anything after it will be passed directly as arguments to clang.  This allows for setting the compiler search path, C++ standard to use, and other compilation options identically to how they would be done when compiling.
 
 For example:
@@ -118,7 +119,7 @@ namespace cppmicroservices
 ## Limitations
 
 - Known issues:
-    - Depending on the STL being used, not using the `--namespace` argument will lead to some `std` classes being mocked.  This is likely due to a preprocessor issue with definitions of visibility macros (e.g. `_GLIBCXX_VISIBILITY`), but has not yet been solved.
+    - Depending on the STL being used, not using the `--namespace` argument will lead to some `std` classes being mocked.  This is likely due to inline namespaces (i.e. most STL implementations using `namespace std { inline namespace _V1 { ...` or similar).
 - Template parameters:
     - Currently, template parameters are incorrectly mocked due to libclang limitations and other engineering challenges.  Here is an example of the incorrect behavior (which must be rectified manually):
 

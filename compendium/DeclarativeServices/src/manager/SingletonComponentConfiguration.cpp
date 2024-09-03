@@ -21,6 +21,7 @@
   =============================================================================*/
 
 #include "SingletonComponentConfiguration.hpp"
+#include "SingleInvokeTask.hpp"
 #include "../ComponentRegistry.hpp"
 #include "ComponentManager.hpp"
 #include "ReferenceManager.hpp"
@@ -180,9 +181,9 @@ namespace cppmicroservices
                               {
                                   try
                                   {
-                                      std::shared_ptr<std::atomic<bool>> asyncStarted = std::make_shared<std::atomic<bool>>(false);
-                                      auto f = compMgr->Disable(asyncStarted);
-                                      compMgr->WaitForFuture(f, asyncStarted);
+                                      auto singleInvoke = std::make_shared<SingleInvokeTask>();
+                                      auto f = compMgr->Disable(singleInvoke);
+                                      compMgr->WaitForFuture(f, singleInvoke);
                                   }
                                   catch (...)
                                   {

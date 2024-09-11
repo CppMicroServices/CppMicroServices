@@ -53,6 +53,7 @@ namespace cppmicroservices
         {
           public:
             CFRLogger();
+	    explicit CFRLogger(cppmicroservices::BundleContext context);
             CFRLogger(CFRLogger const&) = delete;
             CFRLogger(CFRLogger&&) = delete;
             CFRLogger& operator=(CFRLogger const&) = delete;
@@ -69,6 +70,8 @@ namespace cppmicroservices
                      logservice::SeverityLevel level,
                      std::string const& message,
                      const std::exception_ptr ex) override;
+	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger> getLogger(const std::string& name) const override; 
+	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger> getLogger(const cppmicroservices::Bundle& bundle, const std::string& name) const override;
 
             // methods from the cppmicroservices::ServiceTrackerCustomizer interface
             std::shared_ptr<TrackedParamType> AddingService(
@@ -79,7 +82,6 @@ namespace cppmicroservices
                                 std::shared_ptr<cppmicroservices::logservice::LogService> const& service) override;
 
             // methods for the CFRLogger class
-            void Open();
             void Close();
 
           private:

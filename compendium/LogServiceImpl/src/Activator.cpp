@@ -1,4 +1,5 @@
 #include "Activator.hpp"
+#include "LoggerFactoryImpl.hpp"
 #include "LogServiceImpl.hpp"
 
 namespace cppmicroservices
@@ -9,10 +10,13 @@ namespace cppmicroservices
         {
             void
             Activator::Start(cppmicroservices::BundleContext bc)
-            {
-                auto svc
-                    = std::make_shared<cppmicroservices::logservice::LogServiceImpl>("cppmicroservices::logservice");
-                bc.RegisterService<cppmicroservices::logservice::LogService>(std::move(svc));
+            { 
+		const cppmicroservices::Bundle bundle = bc.GetBundle();
+		const std::string bsn = bundle.GetSymbolicName();
+		const std::string logger_name = "LogService." + bsn;
+		auto svc
+                    = std::make_shared<cppmicroservices::logservice::LogServiceImpl>(logger_name);
+                bc.RegisterService<cppmicroservices::logservice::LogService, cppmicroservices::logservice::LoggerFactory>(std::move(svc));
             }
 
             void

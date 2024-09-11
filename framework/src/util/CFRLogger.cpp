@@ -21,14 +21,22 @@
  =============================================================================*/
 
 #include "CFRLogger.h"
-#include "CoreBundleContext.h"
 #include "cppmicroservices/GetBundleContext.h"
 
 namespace cppmicroservices
 {
     namespace cfrimpl
     {
-        CFRLogger::CFRLogger() : serviceTracker(), logService(nullptr) {}
+        CFRLogger::CFRLogger() : serviceTracker(), logService(nullptr) { }
+
+	 CFRLogger::CFRLogger(cppmicroservices::BundleContext context)
+            : cfrContext(std::move(context))
+	      ,serviceTracker(
+                  std::make_unique<cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>(cfrContext,
+                                                                                                               this))
+              ,logService(nullptr) {
+               serviceTracker->Open();
+    }
 
         CFRLogger::~CFRLogger()
         {
@@ -119,21 +127,26 @@ namespace cppmicroservices
             }
         }
 
-        void
-        CFRLogger::Open()
+	std::shared_ptr<cppmicroservices::logservice::Logger>
+        CFRLogger::getLogger(const std::string& name) const
+	{
+	     auto currLogger = std::atomic_load(&logService);
+	     if (currLogger)
+	     {
+	     	return currLogger->getLogger(name);
+	     }
+	     return nullptr;
+	}
+
+	std::shared_ptr<cppmicroservices::logservice::Logger>
+        CFRLogger::getLogger(const cppmicroservices::Bundle& bundle, const std::string& name) const
         {
-            auto l = this->Lock();
-            US_UNUSED(l);
-            cfrContext = GetBundleContext();
-            if (!cfrContext)
-            {
-                return;
-            }
-            serviceTracker
-                = std::make_unique<cppmicroservices::ServiceTracker<cppmicroservices::logservice::LogService>>(
-                    cfrContext,
-                    this);
-            serviceTracker->Open();
+             auto currLogger = std::atomic_load(&logService);
+	     if(currLogger)
+	     {
+		return currLogger->getLogger(bundle, name);
+	     }
+	     return nullptr;
         }
 
         void
@@ -147,6 +160,5 @@ namespace cppmicroservices
                 serviceTracker.reset();
             }
         }
-
     } // namespace cfrimpl
 } // namespace cppmicroservices

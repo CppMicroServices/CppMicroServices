@@ -1,0 +1,186 @@
+{
+  "buildType": {
+    "default": "debug",
+    "choices": {
+      "debug": {
+        "short": "Debug",
+        "long": "Include debug information",
+        "buildType": "Debug"
+      },
+      "release": {
+        "short": "Release",
+        "long": "Optimize for release",
+        "buildType": "Release"
+      }
+    }
+  },
+  "linkage": {
+    "default" : "shared",
+    "choices": {
+      "shared" : {
+        "short": "Shared Libraries",
+        "long": "Build Shared Libraries",
+        "linkage": "shared"
+      },
+      "static" : {
+        "short": "Static Libraries",
+        "long": "Build Static Libraries",
+        "linkage": "static"
+      }
+    }
+  },
+  "threading": {
+    "default" : "with_threading",
+    "choices": {
+      "with_threading" : {
+        "short": "Multi-Threaded",
+        "long": "Build with multi-threading support",
+        "settings": {
+          "US_ENABLE_THREADING_SUPPORT": "ON"
+        }
+      },
+      "no_threading": {
+        "short": "Single Threaded",
+        "long": "Build Single Threaded",
+        "settings": {
+          "US_ENABLE_THREADING_SUPPORT": "OFF"
+        }
+      }
+    }
+  },
+  "testing": {
+    "default": "with_testing",
+    "choices": {
+      "with_testing": {
+        "short": "Testing",
+        "long": "Enable Testing",
+        "settings": {
+          "US_BUILD_TESTING": "ON"
+        }
+      },
+      "no_testing": {
+        "short": "No Testing",
+        "long": "Disable Testing",
+        "settings": {
+          "US_BUILD_TESTING": "OFF"
+        }
+      }
+    }
+  },
+  "asan" : {
+    "default" : "no_asan",
+    "choices": {
+      "no_asan": {
+        "short": "No Address Sanitizer",
+        "long": "Disable Address Sanitizer",
+        "settings": {
+          "US_ENABLE_ASAN" : "NO"
+        }
+      },
+      "with_asan": {
+        "short": "Address Sanitizer",
+        "long": "Enable Address Sanitizer",
+        "settings": {
+          "US_ENABLE_ASAN" : "YES"
+        }
+      }
+    }
+  },
+  "tsan" : {
+    "default" : "no_tsan",
+    "choices": {
+      "no_tsan": {
+        "short": "No Thread Sanitizer",
+        "long": "Disable Thread Sanitizer",
+        "settings": {
+          "US_ENABLE_TSAN" : "NO"
+        }
+      },
+      "with_tsan": {
+        "short": "Thread Sanitizer",
+        "long": "Enable Thread Sanitizer",
+        "settings": {
+          "US_ENABLE_TSAN" : "YES"
+        }
+      }
+    }
+  },
+  "ubsan" : {
+    "default" : "no_ubsan",
+    "choices": {
+      "no_ubsan": {
+        "short": "No Undefined Behavior Sanitizer",
+        "long": "Disable Undefined Behavior Sanitizer",
+        "settings": {
+          "US_ENABLE_UBSAN" : "NO"
+        }
+      },
+      "with_ubsan": {
+        "short": "Undefined Behavior Sanitizer",
+        "long": "Enable Undefined Behavior Sanitizer",
+        "settings": {
+          "US_ENABLE_UBSAN" : "YES"
+        }
+      }
+    }
+  },
+  "deterministic" : {
+    "default" : "non_deterministic",
+    "choices": {
+      "non_deterministic": {
+        "short": "No Deterministic Builds",
+        "long": "Disable Deterministic Builds",
+        "settings": {
+          "US_USE_DETERMINISTIC_BUNDLE_BUILDS" : "NO"
+        }
+      },
+      "deterministic": {
+        "short": "Deterministic Builds",
+        "long": "Enable Deterministic Builds",
+        "settings": {
+          "US_USE_DETERMINISTIC_BUNDLE_BUILDS" : "YES"
+        }
+      }
+    }
+  },
+  "examples": {
+    "default" : "no_examples",
+    "choices": {
+      "no_examples" : {
+        "short": "No Examples",
+        "long": "Disable Examples",
+        "settings": {
+          "US_BUILD_EXAMPLES": "OFF"
+        }
+      },
+      "with_examples": {
+        "short": "Examples",
+        "long": "Build Examples",
+        "settings": {
+          "US_BUILD_EXAMPLES": "ON"
+        }
+      }
+    }
+  },
+  "documentation": {
+    "default" : "no_doc",
+    "choices": {
+      "no_doc" : {
+        "short": "No Documentation",
+        "long": "Do not build the documentation",
+        "settings": {
+          "US_BUILD_DOC_HTML": "OFF",
+          "US_BUILD_DOC_MAN": "OFF"
+        }
+      },
+      "with_doc": {
+        "short": "Documentation",
+        "long": "Build the documentation",
+        "settings": {
+          "US_BUILD_DOC_HTML": "ON",
+          "US_BUILD_DOC_MAN": "ON"
+        }
+      }
+    }
+  }
+}

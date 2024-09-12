@@ -254,7 +254,7 @@ namespace test
 
             auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
 
-            for (const auto& bundleName : bundlesToInstall)
+            for (auto const& bundleName : bundlesToInstall)
             {
                 installedBundles.emplace_back(::test::InstallAndStartBundle(ctx, bundleName));
             }
@@ -293,7 +293,7 @@ namespace test
         auto configInstance = configuration->GetPid();
 
         cppmicroservices::AnyMap props({
-            {"uniqueProp", std::string("instance1")}
+            { "uniqueProp", std::string("instance1") }
         });
 
         auto fut = configuration->Update(props);
@@ -341,7 +341,7 @@ namespace test
                 auto configInstance = configuration->GetPid();
 
                 cppmicroservices::AnyMap props({
-                    {"uniqueProp", std::string("instance1")}
+                    { "uniqueProp", std::string("instance1") }
                 });
 
                 auto fut = configuration->Update(props);
@@ -359,14 +359,14 @@ namespace test
                 auto configInstance = configuration->GetPid();
 
                 cppmicroservices::AnyMap props({
-                    {"uniqueProp", std::string("instance1")}
+                    { "uniqueProp", std::string("instance1") }
                 });
 
                 auto fut = configuration->SafeUpdate(props);
                 fut->get();
 
                 cppmicroservices::AnyMap props1({
-                    {"uniqueProp", std::string("instance2")}
+                    { "uniqueProp", std::string("instance2") }
                 });
                 auto fut1 = configuration->SafeUpdateIfDifferent(props1);
                 fut1.second->get();
@@ -407,7 +407,7 @@ namespace test
                 auto configInstance = configuration->GetPid();
 
                 cppmicroservices::AnyMap props({
-                    {"uniqueProp", std::string("instance1")}
+                    { "uniqueProp", std::string("instance1") }
                 });
 
                 auto fut = configuration->SafeUpdate(props);
@@ -419,6 +419,52 @@ namespace test
         asyncWorkService->post(std::move(safe_post_task));
 
         fut.get();
+    }
+
+    /**
+     * Verify that a service's configuration can be updated from with a 'Modified' callback without
+     * deadlocking the framework trying to get the lock in configNotifier
+     */
+    TEST_F(TestAsyncWorkServiceEndToEnd, testUpdateConfigFromWithinModifiedCallback)
+    {
+        auto const& param = std::make_shared<AsyncWorkServiceThreadPool>(10);
+        auto context = framework.GetBundleContext();
+
+        auto reg = context.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
+        auto sr = context.GetServiceReference<cppmicroservices::async::AsyncWorkService>();
+        auto asyncWorkService = context.GetService<cppmicroservices::async::AsyncWorkService>(sr);
+
+        US_UNUSED(asyncWorkService);
+        // Start bundle
+        std::string componentName = "sample::ServiceComponentCA10";
+        auto testBundle = ::test::InstallAndStartBundle(context, "TestBundleDSCA10");
+        ::test::InstallAndStartBundle(context, "TestBundleDSCA03");
+        ::test::InstallAndStartConfigAdmin(context);
+
+        // Get a service reference to ConfigAdmin.
+        auto sr1 = context.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+        auto configAdminService = context.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr1);
+        ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+
+        auto configObject = configAdminService->GetConfiguration(componentName);
+
+        cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+        auto configObject2 = configAdminService->GetConfiguration("sample::ServiceComponentCA02");
+
+        props["uniqueProp"] = std::string("UNIQUE");
+        auto fut = configObject->Update(props);
+        fut.get();
+        fut = configObject2->Update(props);
+        fut.get();
+        props["CA"] = configAdminService;
+        props["configID"] = std::string("sample::ServiceComponentCA03");
+        fut = configObject->Update(props);
+        fut.get();
+
+        // GetService to make component active
+        auto sr2 = context.GetServiceReference<test::CAInterface>();
+        auto service = context.GetService<test::CAInterface>(sr2);
+        ASSERT_TRUE(service) << "GetService failed for CAInterface";
     }
 
 }; // namespace test

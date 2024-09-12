@@ -12,6 +12,7 @@ namespace sample
     class ServiceComponentCA10 : public test::CAInterface
     {
       public:
+        ServiceComponentCA10() = delete;
         ServiceComponentCA10(std::shared_ptr<cppmicroservices::AnyMap> const& props);
         void Modified(std::shared_ptr<ComponentContext> const& context,
                       std::shared_ptr<cppmicroservices::AnyMap> const& configuration);

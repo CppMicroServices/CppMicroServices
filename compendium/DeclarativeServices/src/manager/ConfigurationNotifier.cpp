@@ -186,8 +186,6 @@ namespace cppmicroservices
                                                   std::shared_ptr<cppmicroservices::AnyMap> properties,
                                                   unsigned long const& changeCount)
         {
-            // lock held throughout to guarantee ordering for calls to this function 
-            std::lock_guard<std::mutex> l(notificationOrderingLock);
             ConfigChangeNotification notification
                 = ConfigChangeNotification(pid, std::move(properties), std::move(type), changeCount);
             std::vector<Listener> callbacks;

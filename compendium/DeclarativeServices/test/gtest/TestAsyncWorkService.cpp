@@ -34,10 +34,7 @@
 #include "Mocks.hpp"
 #include "TestFixture.hpp"
 #include "TestInterfaces/Interfaces.hpp"
-#include "boost/asio/async_result.hpp"
-#include "boost/asio/packaged_task.hpp"
-#include "boost/asio/post.hpp"
-#include "boost/asio/thread_pool.hpp"
+
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 
@@ -78,53 +75,6 @@ namespace test
 
         std::shared_ptr<scr::ServiceComponentRuntime> dsRuntimeService;
         cppmicroservices::Framework framework;
-    };
-
-    class AsyncWorkServiceThreadPool : public cppmicroservices::async::AsyncWorkService
-    {
-      public:
-        AsyncWorkServiceThreadPool(int nThreads) : cppmicroservices::async::AsyncWorkService()
-        {
-            threadpool = std::make_shared<boost::asio::thread_pool>(nThreads);
-        }
-
-        ~AsyncWorkServiceThreadPool() override
-        {
-            try
-            {
-                if (threadpool)
-                {
-                    try
-                    {
-                        threadpool->join();
-                    }
-                    catch (...)
-                    {
-                        //
-                    }
-                }
-            }
-            catch (...)
-            {
-                //
-            }
-        }
-
-        void
-        post(std::packaged_task<void()>&& task) override
-        {
-            using Sig = void();
-            using Result = boost::asio::async_result<decltype(task), Sig>;
-            using Handler = typename Result::completion_handler_type;
-
-            Handler handler(std::forward<decltype(task)>(task));
-            Result result(handler);
-
-            boost::asio::post(threadpool->get_executor(), [handler = std::move(handler)]() mutable { handler(); });
-        }
-
-      private:
-        std::shared_ptr<boost::asio::thread_pool> threadpool;
     };
 
     TEST_F(tGenericDSSuite, TestAsyncWorkServiceWithoutUserService)

@@ -22,7 +22,7 @@
 
 #include "TestFixture.hpp"
 #include "gtest/gtest.h"
-
+#include "../TestUtils.hpp"
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/ServiceObjects.h"
 
@@ -50,7 +50,7 @@ namespace test
         // starting the bundle which defines the service.
         auto configuration = configAdminService->GetConfiguration("sample::ServiceComponentCA02");
         configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-            {"foo", true}
+            { "foo", true }
         });
 
         // Install and start the bundle which has the service
@@ -95,7 +95,7 @@ namespace test
                              ready.wait();
                              auto configuration = configAdminService->GetConfiguration("sample::ServiceComponentCA02");
                              configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                                 {"foo", true}
+                                 { "foo", true }
                              });
                          });
 
@@ -149,7 +149,7 @@ namespace test
 
         configuration
             ->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", true}
+                { "foo", true }
         })
             .second.get();
 
@@ -284,8 +284,7 @@ namespace test
         auto fut1 = configuration1->Update(props1);
         fut1.wait();
         auto service0 = GetInstance<test::CAInterface>();
-        ASSERT_TRUE(service0)
-            << "Factory instance should be created when a '~' configuration is added";
+        ASSERT_TRUE(service0) << "Factory instance should be created when a '~' configuration is added";
         ASSERT_TRUE(service0->GetProperties().find("uniqueKey")->second == 6);
 
         testBundle.Stop();
@@ -401,6 +400,44 @@ namespace test
         compConfigs = GetComponentConfigs(testBundle, componentName, compDescDTO);
         EXPECT_EQ(compConfigs.size(), 1ul) << "One default config expected";
         ASSERT_EQ(compConfigs.at(0).state, scr::dto::ComponentState::ACTIVE) << "Component state should be ACTIVE";
+    }
+
+    /**
+     * Verify that a service's configuration can be updated from with a 'Modified' callback without
+     * deadlocking the framework trying to get the lock in configNotifier
+     */
+    TEST_F(tServiceComponent, testUpdateConfigFromWithinModifiedCallback)
+    {
+        auto const& param = std::make_shared<AsyncWorkServiceThreadPool>(10);
+
+        auto reg = context.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
+        // Start bundle
+        std::string componentName = "sample::ServiceComponentCA10";
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA10");
+        StartTestBundle("TestBundleDSCA03");
+
+        // Get a service reference to ConfigAdmin.
+        auto configAdminService = GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+        ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+
+        auto configObject = configAdminService->GetConfiguration(componentName);
+
+        cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+        auto configObject2 = configAdminService->GetConfiguration("sample::ServiceComponentCA02");
+
+        props["uniqueProp"] = std::string("UNIQUE");
+        auto fut = configObject->Update(props);
+        fut.get();
+        fut = configObject2->Update(props);
+        fut.get();
+        props["CA"] = configAdminService;
+        props["configID"] = std::string("sample::ServiceComponentCA03");
+        fut = configObject->Update(props);
+        fut.get();
+
+        // GetService to make component active
+        auto service = GetInstance<test::CAInterface>();
+        ASSERT_TRUE(service) << "GetService failed for CAInterface";
     }
 
     /**

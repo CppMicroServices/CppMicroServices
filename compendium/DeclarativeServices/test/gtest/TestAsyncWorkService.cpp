@@ -430,25 +430,30 @@ namespace test
         auto const& param = std::make_shared<AsyncWorkServiceThreadPool>(10);
         auto context = framework.GetBundleContext();
 
+        // ASYNCWORKSERVICE
         auto reg = context.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
-        auto sr = context.GetServiceReference<cppmicroservices::async::AsyncWorkService>();
-        auto asyncWorkService = context.GetService<cppmicroservices::async::AsyncWorkService>(sr);
+        // auto sr = context.GetServiceReference<cppmicroservices::async::AsyncWorkService>();
+        // auto asyncWorkService = context.GetService<cppmicroservices::async::AsyncWorkService>(sr);
+        // US_UNUSED(asyncWorkService);
+        US_UNUSED(reg);
 
-        US_UNUSED(asyncWorkService);
-        // Start bundle
-        std::string componentName = "sample::ServiceComponentCA10";
-        auto testBundle = ::test::InstallAndStartBundle(context, "TestBundleDSCA10");
-        ::test::InstallAndStartBundle(context, "TestBundleDSCA03");
+        // CA
         ::test::InstallAndStartConfigAdmin(context);
 
-        // Get a service reference to ConfigAdmin.
-        auto sr1 = context.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
-        auto configAdminService = context.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(sr1);
+        //  CA Service
+        auto CARef = context.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>();
+        auto configAdminService = context.GetService<cppmicroservices::service::cm::ConfigurationAdmin>(CARef);
         ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+
+        // Start bundle
+        std::string componentName = "sample::ServiceComponentCA10";
+
+        auto testBundle = ::test::InstallAndStartBundle(context, "TestBundleDSCA10");
+        ::test::InstallAndStartBundle(context, "TestBundleDSCA03");
 
         auto configObject = configAdminService->GetConfiguration(componentName);
 
-        cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+        auto props = configObject->GetProperties();
         auto configObject2 = configAdminService->GetConfiguration("sample::ServiceComponentCA02");
 
         props["uniqueProp"] = std::string("UNIQUE");
@@ -456,14 +461,13 @@ namespace test
         fut.get();
         fut = configObject2->Update(props);
         fut.get();
-        props["CA"] = configAdminService;
         props["configID"] = std::string("sample::ServiceComponentCA03");
         fut = configObject->Update(props);
         fut.get();
 
         // GetService to make component active
-        auto sr2 = context.GetServiceReference<test::CAInterface>();
-        auto service = context.GetService<test::CAInterface>(sr2);
+        auto serviceRef = context.GetServiceReference<test::CAInterface>();
+        auto service = context.GetService<test::CAInterface>(serviceRef);
         ASSERT_TRUE(service) << "GetService failed for CAInterface";
     }
 

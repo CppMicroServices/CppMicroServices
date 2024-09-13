@@ -1,13 +1,15 @@
 #include "ServiceImpl.hpp"
 #include "cppmicroservices/Bundle.h"
-#include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 #include <iostream>
 
 namespace sample
 {
 
-    ServiceComponentCA10::ServiceComponentCA10(std::shared_ptr<cppmicroservices::AnyMap> const& props)
+    ServiceComponentCA10::ServiceComponentCA10(
+        std::shared_ptr<cppmicroservices::AnyMap> const& props,
+        std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin> const& CA)
         : properties(props)
+        , CA(CA)
     {
     }
     void
@@ -16,12 +18,10 @@ namespace sample
     {
         std::lock_guard<std::mutex> lock(propertiesLock);
         properties = configuration;
-        auto CA = cppmicroservices::any_cast<std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin>>(
-            properties->at("CA"));
 
         auto configObject = CA->GetConfiguration(cppmicroservices::any_cast<std::string>(properties->at("configID")));
 
-        cppmicroservices::AnyMap newprops(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
+        auto newprops = configObject->GetProperties();
 
         newprops["uniqueProp"] = std::string("UNIQUE");
         auto fut = configObject->Update(newprops);

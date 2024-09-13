@@ -2,7 +2,9 @@
 #define _SERVICE_IMPL_HPP_
 
 #include "TestInterfaces/Interfaces.hpp"
+#include "cppmicroservices/cm/ConfigurationAdmin.hpp"
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
+
 #include <mutex>
 
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
@@ -13,7 +15,8 @@ namespace sample
     {
       public:
         ServiceComponentCA10() = delete;
-        ServiceComponentCA10(std::shared_ptr<cppmicroservices::AnyMap> const& props);
+        ServiceComponentCA10(std::shared_ptr<cppmicroservices::AnyMap> const& props,
+                             std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin> const& CA);
         void Modified(std::shared_ptr<ComponentContext> const& context,
                       std::shared_ptr<cppmicroservices::AnyMap> const& configuration);
         cppmicroservices::AnyMap GetProperties() override;
@@ -23,6 +26,7 @@ namespace sample
       private:
         std::mutex propertiesLock;
         std::shared_ptr<cppmicroservices::AnyMap> properties;
+        std::shared_ptr<cppmicroservices::service::cm::ConfigurationAdmin> CA;
     };
 } // namespace sample
 

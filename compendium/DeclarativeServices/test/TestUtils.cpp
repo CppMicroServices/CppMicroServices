@@ -308,7 +308,7 @@ namespace test
         using Result = boost::asio::async_result<decltype(task), Sig>;
         using Handler = typename Result::completion_handler_type;
 
-        Handler handler{std::forward<decltype(task)>(task)};
+        Handler handler{std::move(task)};
         Result result(handler);
 
         boost::asio::post(threadpool->get_executor(), [handler = std::move(handler)]() mutable { handler(); });

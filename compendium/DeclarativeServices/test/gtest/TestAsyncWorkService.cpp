@@ -432,9 +432,6 @@ namespace test
 
         // ASYNCWORKSERVICE
         auto reg = context.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
-        // auto sr = context.GetServiceReference<cppmicroservices::async::AsyncWorkService>();
-        // auto asyncWorkService = context.GetService<cppmicroservices::async::AsyncWorkService>(sr);
-        // US_UNUSED(asyncWorkService);
         US_UNUSED(reg);
 
         // CA

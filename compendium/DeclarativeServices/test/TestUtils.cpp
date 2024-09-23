@@ -275,4 +275,43 @@ namespace test
 #endif
     }
 
+    AsyncWorkServiceThreadPool::AsyncWorkServiceThreadPool(int nThreads) : cppmicroservices::async::AsyncWorkService(), threadpool(std::make_shared<boost::asio::thread_pool>(nThreads))
+    {
+    }
+
+    AsyncWorkServiceThreadPool::~AsyncWorkServiceThreadPool()
+    {
+        try
+        {
+            if (threadpool)
+            {
+                try
+                {
+                    threadpool->join();
+                }
+                catch (...)
+                {
+                    //
+                }
+            }
+        }
+        catch (...)
+        {
+            //
+        }
+    }
+
+    void
+    AsyncWorkServiceThreadPool::post(std::packaged_task<void()>&& task)
+    {
+        using Sig = void();
+        using Result = boost::asio::async_result<decltype(task), Sig>;
+        using Handler = typename Result::completion_handler_type;
+
+        Handler handler{std::move(task)};
+        Result result(handler);
+
+        boost::asio::post(threadpool->get_executor(), [handler = std::move(handler)]() mutable { handler(); });
+    }
+
 } // namespace test

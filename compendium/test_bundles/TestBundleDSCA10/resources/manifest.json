@@ -1,0 +1,24 @@
+{
+  "bundle.symbolic_name": "TestBundleDSCA10",
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "enabled": true,
+        "immediate": true,
+        "implementation-class": "sample::ServiceComponentCA10",
+        "configuration-policy": "require",
+        "configuration-pid": ["sample::ServiceComponentCA10"],
+        "service": {
+          "interfaces": ["test::CAInterface"]
+        },
+        "references": [
+          {
+            "name": "CA",
+            "interface": "cppmicroservices::service::cm::ConfigurationAdmin"
+          }
+        ]
+      }
+    ]
+  }
+}

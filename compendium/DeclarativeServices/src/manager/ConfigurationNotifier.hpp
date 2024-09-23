@@ -76,7 +76,7 @@ namespace cppmicroservices
 
           public:
             /**
-             * @throws std::invalid_argument exception if any of the params is a nullptr or 
+             * @throws std::invalid_argument exception if any of the params is a nullptr or
              * if componentFactory object cannot be constructed.
              */
             ConfigurationNotifier(cppmicroservices::BundleContext const& context,
@@ -104,13 +104,13 @@ namespace cppmicroservices
 
             void NotifyAllListeners(std::string const& pid,
                                     cppmicroservices::service::cm::ConfigurationEventType type,
-                                    std::shared_ptr<cppmicroservices::AnyMap> properties,                                    
-                                    unsigned long const& changeCount);  
-                       
+                                    std::shared_ptr<cppmicroservices::AnyMap> properties,
+                                    unsigned long const& changeCount);
+
             std::shared_ptr<ComponentFactoryImpl> GetComponentFactory();
             void LogInvalidDynamicTargetInProperties(cppmicroservices::AnyMap const& properties,
-                                  std::shared_ptr<ComponentConfigurationImpl> mgr) const noexcept;
- 
+                                                     std::shared_ptr<ComponentConfigurationImpl> mgr) const noexcept;
+
           private:
             using TokenMap = std::unordered_map<ListenerTokenId, Listener>;
 
@@ -123,9 +123,8 @@ namespace cppmicroservices
 
             std::shared_ptr<cppmicroservices::logservice::LogService> logger;
             std::shared_ptr<ComponentFactoryImpl> componentFactory;
-            std::mutex notificationOrderingLock;
-         };
+        };
 
     } // namespace scrimpl
 } // namespace cppmicroservices
-#endif //CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP
+#endif // CPPMICROSERVICES_SCRIMPL_CONFIGURATIONNOTIFIER_HPP

@@ -174,6 +174,7 @@ set(_test_bundles
   TestBundleDSDGMU
   TestBundleDSDGOU
   TestBundleDSDRMU
+  TestBundleDSDRMU_wrongSig
   TestBundleDSDROU
   TestBundleDSSLE1
   TestBundleDSSLE2

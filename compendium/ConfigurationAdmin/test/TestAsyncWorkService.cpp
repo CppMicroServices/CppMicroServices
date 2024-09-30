@@ -396,7 +396,7 @@ namespace test
 
             auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
 
-            for (const auto& bundleName : bundlesToInstall)
+            for (auto const& bundleName : bundlesToInstall)
             {
                 std::string path = PathToLib(bundleName);
                 auto bundles = ctx.InstallBundles(path);
@@ -409,5 +409,39 @@ namespace test
             }
         });
     }
+    TEST_P(TestAsyncWorkServiceEndToEnd, TestShutdownWithWorkRunning)
+    {
+        std::vector<std::string> configIDS = { "config1", "config2", "config3", "config4", "config5" };
+        std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>> configs;
+        std::vector<std::thread> threads;
 
+        auto context = framework.GetBundleContext();
+
+        {
+            auto configAdmin = context.GetService<cm::ConfigurationAdmin>(
+                context.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>());
+
+            auto processConfiguration
+                = [](std::shared_ptr<cppmicroservices::service::cm::Configuration> config) { config->Update({}); };
+
+            for (auto const& id : configIDS)
+            {
+                auto config = configAdmin->GetConfiguration(id);
+                configs.push_back(config);
+            }
+
+            for (auto const& config : configs)
+            {
+                threads.emplace_back(std::thread(processConfiguration, config));
+            }
+        }
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+
+        for (auto& thread : threads)
+        {
+            thread.join();
+        }
+        // this should not deadlock
+    }
 }; // namespace test

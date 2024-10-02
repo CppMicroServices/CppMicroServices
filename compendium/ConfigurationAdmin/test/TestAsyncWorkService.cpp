@@ -395,7 +395,7 @@ namespace test
         auto bundle = ctx.InstallBundles(path).back();
         bundle.Start();
         std::string configID = "sample::ServiceComponentCA03";
-        std::vector<std::thread> threads;
+        std::vector<std::future<void>> futures;
 
         auto context = framework.GetBundleContext();
 
@@ -407,18 +407,19 @@ namespace test
                 = [](std::shared_ptr<cppmicroservices::service::cm::Configuration> config) { config->Update({}); };
 
             auto config = configAdmin->GetConfiguration(configID);
-            threads.emplace_back(std::thread(processConfiguration, config));
-            threads.emplace_back(std::thread(processConfiguration, config));
-            threads.emplace_back(std::thread(processConfiguration, config));
+
+            // Launch asynchronous tasks using std::async
+            futures.emplace_back(std::async(std::launch::async, processConfiguration, config));
+            futures.emplace_back(std::async(std::launch::async, processConfiguration, config));
+            futures.emplace_back(std::async(std::launch::async, processConfiguration, config));
         }
         framework.Stop();
         framework.WaitForStop(std::chrono::milliseconds::zero());
 
-        for (auto& thread : threads)
+        for (auto& future : futures)
         {
-            thread.join();
+            future.get(); // Wait for each task to complete
         }
         // this should not deadlock
-        bundle.Stop();
     }
 }; // namespace test

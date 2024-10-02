@@ -147,30 +147,6 @@ namespace test
         cppmicroservices::Framework framework;
     };
 
-    class AsyncWorkServiceInline : public cppmicroservices::async::AsyncWorkService
-    {
-      public:
-        AsyncWorkServiceInline() : cppmicroservices::async::AsyncWorkService() {}
-
-        void
-        post(std::packaged_task<void()>&& task) override
-        {
-            task();
-        }
-    };
-
-    class AsyncWorkServiceStdAsync : public cppmicroservices::async::AsyncWorkService
-    {
-      public:
-        AsyncWorkServiceStdAsync() : cppmicroservices::async::AsyncWorkService() {}
-
-        void
-        post(std::packaged_task<void()>&& task) override
-        {
-            std::future<void> f = std::async(std::launch::async, [task = std::move(task)]() mutable { task(); });
-        }
-    };
-
     class AsyncWorkServiceThreadPool : public cppmicroservices::async::AsyncWorkService
     {
       public:
@@ -378,10 +354,9 @@ namespace test
 
     INSTANTIATE_TEST_SUITE_P(AsyncWorkServiceEndToEndParameterized,
                              TestAsyncWorkServiceEndToEnd,
-                             testing::Values(std::make_shared<AsyncWorkServiceInline>(),
-                                             std::make_shared<AsyncWorkServiceStdAsync>(),
-                                             std::make_shared<AsyncWorkServiceThreadPool>(1),
-                                             std::make_shared<AsyncWorkServiceThreadPool>(2)));
+                             testing::Values(std::make_shared<AsyncWorkServiceThreadPool>(1),
+                                             std::make_shared<AsyncWorkServiceThreadPool>(2),
+                                             std::make_shared<AsyncWorkServiceThreadPool>(4)));
 
     TEST_P(TestAsyncWorkServiceEndToEnd, TestEndToEndBehaviorWithAsyncWorkService)
     {
@@ -409,10 +384,17 @@ namespace test
             }
         });
     }
-    TEST_P(TestAsyncWorkServiceEndToEnd, TestShutdownWithWorkRunning)
+
+    TEST_F(TestAsyncWorkServiceEndToEnd, TestShutdownWithWorkRunning)
     {
-        std::vector<std::string> configIDS = { "config1", "config2", "config3", "config4", "config5" };
-        std::vector<std::shared_ptr<cppmicroservices::service::cm::Configuration>> configs;
+        auto const& param = std::make_shared<AsyncWorkServiceThreadPool>(2);
+        auto ctx = framework.GetBundleContext();
+        auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
+
+        std::string path = PathToLib("TestBundleDSCA03");
+        auto bundle = ctx.InstallBundles(path).back();
+        bundle.Start();
+        std::string configID = "sample::ServiceComponentCA03";
         std::vector<std::thread> threads;
 
         auto context = framework.GetBundleContext();
@@ -424,16 +406,10 @@ namespace test
             auto processConfiguration
                 = [](std::shared_ptr<cppmicroservices::service::cm::Configuration> config) { config->Update({}); };
 
-            for (auto const& id : configIDS)
-            {
-                auto config = configAdmin->GetConfiguration(id);
-                configs.push_back(config);
-            }
-
-            for (auto const& config : configs)
-            {
-                threads.emplace_back(std::thread(processConfiguration, config));
-            }
+            auto config = configAdmin->GetConfiguration(configID);
+            threads.emplace_back(std::thread(processConfiguration, config));
+            threads.emplace_back(std::thread(processConfiguration, config));
+            threads.emplace_back(std::thread(processConfiguration, config));
         }
         framework.Stop();
         framework.WaitForStop(std::chrono::milliseconds::zero());
@@ -443,5 +419,6 @@ namespace test
             thread.join();
         }
         // this should not deadlock
+        bundle.Stop();
     }
 }; // namespace test

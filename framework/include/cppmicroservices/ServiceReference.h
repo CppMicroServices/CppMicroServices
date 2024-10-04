@@ -86,7 +86,7 @@ namespace cppmicroservices
 
         ServiceReference(ServiceReferenceBase const& base) : ServiceReferenceBase(base)
         {
-            const std::string interfaceId(us_service_interface_iid<S>());
+            std::string const interfaceId(us_service_interface_iid<S>());
             if (GetInterfaceId() != interfaceId)
             {
                 if (this->IsConvertibleTo(interfaceId))
@@ -149,6 +149,16 @@ namespace cppmicroservices
      * interface identifier.
      */
     using ServiceReferenceU = ServiceReference<void>;
+
+    class MagicDeleter
+    {
+      public:
+        virtual ~MagicDeleter() {}
+
+        virtual ServiceReferenceBase getServiceRef() const = 0;
+    };
+
+    US_Framework_EXPORT ServiceReferenceU GetServiceReference(std::shared_ptr<void> const& s);
 } // namespace cppmicroservices
 
 namespace std

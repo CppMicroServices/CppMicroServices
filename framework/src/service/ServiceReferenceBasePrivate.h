@@ -23,11 +23,17 @@
 #ifndef CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H
 #define CPPMICROSERVICES_SERVICEREFERENCEBASEPRIVATE_H
 
+#include "CoreBundleContext.h"
 #include "ServiceRegistrationCoreInfo.h"
+#include "cppmicroservices/Bundle.h"
+#include "cppmicroservices/Constants.h"
 #include "cppmicroservices/ServiceInterface.h"
+#include "cppmicroservices/detail/Log.h"
+#include "cppmicroservices/util/Error.h"
 
 #include "Properties.h"
 #include "ServiceRegistrationLocks.h"
+#include "cppmicroservices/ServiceReference.h"
 
 #include <atomic>
 #include <string>
@@ -123,6 +129,143 @@ namespace cppmicroservices
       private:
         InterfaceMapConstPtr GetServiceFromFactory(BundlePrivate* bundle,
                                                    std::shared_ptr<ServiceFactory> const& factory);
+    };
+
+    /* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
+     *        in BundleContext::GetService method. The aliasing constructor helps automate
+     *        the call to UngetService method.
+     *
+     *        Service consumers can simply call GetService to obtain a shared_ptr to the
+     *        service object and not worry about calling UngetService when they are done.
+     *        The UngetService is called when all instances of the returned shared_ptr object
+     *        go out of scope.
+     */
+    template <class S>
+    struct ServiceHolder
+    {
+        std::weak_ptr<BundlePrivate> const b;
+        ServiceReferenceBase const sref;
+        std::shared_ptr<S> const service;
+
+        ServiceHolder(std::shared_ptr<BundlePrivate> const& b, ServiceReferenceBase const& sr, std::shared_ptr<S> s)
+            : b(b)
+            , sref(sr)
+            , service(std::move(s))
+        {
+        }
+
+        ~ServiceHolder()
+        {
+            try
+            {
+                sref.d.Load()->UngetService(b.lock(), true);
+            }
+            catch (...)
+            {
+                // Make sure that we don't crash if the shared_ptr service object outlives
+                // the BundlePrivate or CoreBundleContext objects.
+                if (!b.expired())
+                {
+                    DIAG_LOG(*b.lock()->coreCtx->sink)
+                        << "UngetService threw an exception. " << util::GetLastExceptionStr();
+                }
+                // don't throw exceptions from the destructor. For an explanation, see:
+                // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
+                // Following this rule means that a FrameworkEvent isn't an option here
+                // since it contains an exception object which clients could throw.
+            }
+        }
+    };
+
+    /* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
+     *        in ServiceObjectsBase::GetService & ServiceObjectsBase::GetServiceInterfaceMap
+     *        methods. The aliasing constructor helps automate the call to UngetService method.
+     *
+     *        Service consumers can simply call GetService to obtain a shared_ptr to the
+     *        service object and not worry about calling UngetService when they are done.
+     *        The UngetService is called when all instances of the returned shared_ptr object
+     *        go out of scope.
+     */
+    struct UngetHelper
+    {
+        InterfaceMapConstPtr const interfaceMap;
+        ServiceReferenceBase const sref;
+        std::weak_ptr<BundlePrivate> const b;
+
+        UngetHelper(InterfaceMapConstPtr im, ServiceReferenceBase const& sr, std::shared_ptr<BundlePrivate> const& b)
+            : interfaceMap(std::move(im))
+            , sref(sr)
+            , b(b)
+        {
+        }
+        ~UngetHelper()
+        {
+            try
+            {
+                auto bundle = b.lock();
+                if (sref)
+                {
+                    bool isPrototypeScope
+                        = sref.GetProperty(Constants::SERVICE_SCOPE).ToString() == Constants::SCOPE_PROTOTYPE;
+
+                    if (isPrototypeScope)
+                    {
+                        sref.d.Load()->UngetPrototypeService(bundle, interfaceMap);
+                    }
+                    else
+                    {
+                        sref.d.Load()->UngetService(bundle, true);
+                    }
+                }
+            }
+            catch (...)
+            {
+                // Make sure that we don't crash if the shared_ptr service object outlives
+                // the BundlePrivate or CoreBundleContext objects.
+                if (!b.expired())
+                {
+                    DIAG_LOG(*b.lock()->coreCtx->sink)
+                        << "UngetHelper threw an exception. " << util::GetLastExceptionStr();
+                }
+                // don't throw exceptions from the destructor. For an explanation, see:
+                // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
+                // Following this rule means that a FrameworkEvent isn't an option here
+                // since it contains an exception object which clients could throw.
+            }
+        }
+    };
+
+    class MagicDeleterImpl : public MagicDeleter
+    {
+      public:
+        MagicDeleterImpl(ServiceHolder<void>* sh) : sh_(sh), uh_(nullptr) {}
+        MagicDeleterImpl(UngetHelper* uh) : sh_(nullptr), uh_(uh) {}
+
+        void
+        operator()(ServiceHolder<void>* sh)
+        {
+            delete sh;
+        }
+
+        void
+        operator()(UngetHelper* uh)
+        {
+            delete uh;
+        }
+
+        ServiceReferenceBase
+        getServiceRef() const override
+        {
+            if (sh_)
+            {
+                return sh_->sref;
+            }
+            return uh_->sref;
+        }
+
+      private:
+        ServiceHolder<void> const* const sh_;
+        UngetHelper const* const uh_;
     };
 } // namespace cppmicroservices
 

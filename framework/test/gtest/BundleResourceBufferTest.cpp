@@ -55,89 +55,127 @@ namespace cppmicroservices
 {
     namespace detail
     {
-        class BundleResourceBufferTest : public ::testing::Test
+        class BundleResourceBufferTestSuite
         {
-          protected:
+          public:
             std::unique_ptr<void, void(*)(void*)> CreateTestData(const std::string& data)
             {
                 void* rawData = std::malloc(data.size());
                 std::memcpy(rawData, data.data(), data.size());
                 return std::unique_ptr<void, void(*)(void*)>(rawData, customDeleter);
             }
+
+            void UnderflowAndUflow()
+            {
+                std::string testData = "Hello, World!";
+                auto data = CreateTestData(testData);
+                BundleResourceBuffer buffer(std::move(data), testData.size(), std::ios_base::in);
+
+                EXPECT_EQ(buffer.underflow(), 'H');
+                EXPECT_EQ(buffer.uflow(), 'H');
+                EXPECT_EQ(buffer.uflow(), 'e');
+            }
+
+            void Pbackfail()
+            {
+                std::string testData = "Hello";
+                auto data = CreateTestData(testData);
+                BundleResourceBuffer buffer(std::move(data), testData.size(), std::ios_base::in);
+
+                buffer.uflow(); // Read 'H'
+                EXPECT_EQ(buffer.pbackfail('H'), 'H');
+                EXPECT_EQ(buffer.uflow(), 'H'); // Should read 'H' again
+            }
+
+            void Showmanyc()
+            {
+                std::string testData = "Hello\nWorld";
+                auto data = CreateTestData(testData);
+                BundleResourceBuffer buffer(std::move(data), testData.size(), std::ios_base::in);
+
+
+                EXPECT_EQ(buffer.showmanyc(), testData.size());
+                buffer.uflow(); // Read 'H'
+                EXPECT_EQ(buffer.showmanyc(), testData.size() - 1);
+            }
+
+            void SeekoffAndSeekpos()
+            {
+                std::string testData = "Hello, World!";
+                auto data = CreateTestData(testData);
+                BundleResourceBuffer buffer(std::move(data), testData.size(), std::ios_base::in);
+
+                EXPECT_EQ(buffer.uflow(), 'H');
+                buffer.seekoff(7, std::ios_base::cur);
+                EXPECT_EQ(buffer.uflow(), 111);
+                buffer.seekpos(0);
+                EXPECT_EQ(buffer.uflow(), 'H');
+            }
+
+            void NewlineConversion()
+            {
+                std::string testData = "Line1\r\nLine2\r\n";
+                auto data = CreateTestData(testData);
+                BundleResourceBuffer buffer(std::move(data), testData.size(), std::ios_base::in);
+
+                EXPECT_EQ(buffer.uflow(), 'L');
+                buffer.seekpos(5);
+
+                EXPECT_EQ(buffer.uflow(), 'L'); // Should skip the '\r'
+            }
+
+            void RemoveLastNewline()
+            {
+                std::string testData = "Line1\nLine2\n";
+
+                auto data = CreateTestData(testData);
+                BundleResourceBuffer buffer(std::move(data), testData.size(), std::ios_base::in);
+
+                buffer.seekpos(testData.size() - 1);
+                EXPECT_EQ(buffer.uflow(), std::char_traits<char>::eof()); // Last newline should be removed
+            }
         };
+        
+        class BundleResourceBufferTest : public ::testing::Test {};
 
         TEST_F(BundleResourceBufferTest, UnderflowAndUflow)
         {
-            std::string testData = "Hello, World!";
-            auto data = CreateTestData(testData);
-            BundleResourceBuffer buffer(std::move(data), testData.size(), std::ios_base::in);
-
-            EXPECT_EQ(buffer.underflow(), 'H');
-            EXPECT_EQ(buffer.uflow(), 'H');
-            EXPECT_EQ(buffer.uflow(), 'e');
+            BundleResourceBufferTestSuite suite;
+            suite.UnderflowAndUflow();
         }
 
         TEST_F(BundleResourceBufferTest, Pbackfail)
         {
-            std::string testData = "Hello";
-            auto data = CreateTestData(testData);
-            BundleResourceBuffer buffer(std::move(data), testData.size(), std::ios_base::in);
-
-            buffer.uflow(); // Read 'H'
-            EXPECT_EQ(buffer.pbackfail('H'), 'H');
-            EXPECT_EQ(buffer.uflow(), 'H'); // Should read 'H' again
+            BundleResourceBufferTestSuite suite;
+            suite.Pbackfail();
         }
 
 
         TEST_F(BundleResourceBufferTest, Showmanyc)
         {
-            std::string testData = "Hello\nWorld";
-            auto data = CreateTestData(testData);
-            BundleResourceBuffer buffer(std::move(data), testData.size(), std::ios_base::in);
-
-
-            EXPECT_EQ(buffer.showmanyc(), testData.size());
-            buffer.uflow(); // Read 'H'
-            EXPECT_EQ(buffer.showmanyc(), testData.size() - 1);
+            BundleResourceBufferTestSuite suite;
+            suite.Showmanyc();
         }
 
         TEST_F(BundleResourceBufferTest, SeekoffAndSeekpos)
         {
-            std::string testData = "Hello, World!";
-            auto data = CreateTestData(testData);
-            BundleResourceBuffer buffer(std::move(data), testData.size(), std::ios_base::in);
-
-            EXPECT_EQ(buffer.uflow(), 'H');
-            buffer.seekoff(7, std::ios_base::cur);
-            EXPECT_EQ(buffer.uflow(), 111);
-            buffer.seekpos(0);
-            EXPECT_EQ(buffer.uflow(), 'H');
+            BundleResourceBufferTestSuite suite;
+            suite.SeekoffAndSeekpos();
         }
 
 #ifdef DATA_NEEDS_NEWLINE_CONVERSION
         TEST_F(BundleResourceBufferTest, NewlineConversion)
         {
-            std::string testData = "Line1\r\nLine2\r\n";
-            auto data = CreateTestData(testData);
-            BundleResourceBuffer buffer(std::move(data), testData.size(), std::ios_base::in);
-
-            EXPECT_EQ(buffer.uflow(), 'L');
-            buffer.seekpos(5);
-
-            EXPECT_EQ(buffer.uflow(), 'L'); // Should skip the '\r'
+            BundleResourceBufferTestSuite suite;
+            suite.NewlineConversion();
         }
 #endif
 
 #ifdef REMOVE_LAST_NEWLINE_IN_TEXT_MODE
         TEST_F(BundleResourceBufferTest, RemoveLastNewline)
         {
-            std::string testData = "Line1\nLine2\n";
-
-            auto data = CreateTestData(testData);
-            BundleResourceBuffer buffer(std::move(data), testData.size(), std::ios_base::in);
-
-            buffer.seekpos(testData.size() - 1);
-            EXPECT_EQ(buffer.uflow(), std::char_traits<char>::eof()); // Last newline should be removed
+            BundleResourceBufferTestSuite suite;
+            suite.RemoveLastNewline();
         }
 #endif
     } // namespace detail

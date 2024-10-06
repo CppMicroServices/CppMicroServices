@@ -77,7 +77,7 @@ namespace cppmicroservices
         std::shared_ptr<MockBundleResourceContainer> const& resCont
     )
     {
-        auto bundles = bundleRegistry->Install1(location, bundleManifest, resCont);
+        auto bundles = bundleRegistry->InstallWithContainer(location, bundleManifest, resCont);
 
         for (auto& b : bundles)
         {

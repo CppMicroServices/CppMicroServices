@@ -200,6 +200,34 @@ TEST(FrameworkEventTest, testFrameworkEventStreamOperator)
         FrameworkEvent evt(type, bundle, message, e);
         buf << evt << "\n";
     }
-    std::string goal = "STARTED\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\nERROR\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\nWARNING\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\nINFO\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\nSTOPPED\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\nSTOPPED_UPDATE\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\nWAIT_TIMEDOUT\n hello world\n Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]\n Exception: placeholder\n";
+    std::string goal = R"(STARTED
+ hello world
+ Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]
+ Exception: placeholder
+ERROR
+ hello world
+ Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]
+ Exception: placeholder
+WARNING
+ hello world
+ Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]
+ Exception: placeholder
+INFO
+ hello world
+ Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]
+ Exception: placeholder
+STOPPED
+ hello world
+ Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]
+ Exception: placeholder
+STOPPED_UPDATE
+ hello world
+ Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]
+ Exception: placeholder
+WAIT_TIMEDOUT
+ hello world
+ Bundle[id=1, loc=MockBundle, name=MockBundle, state=INSTALLED]
+ Exception: placeholder
+)";
     ASSERT_EQ(goal, buf.str());
 }

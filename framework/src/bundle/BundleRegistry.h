@@ -136,7 +136,7 @@ namespace cppmicroservices
         BundleRegistry(BundleRegistry const&) = delete;
         BundleRegistry& operator=(BundleRegistry const&) = delete;
 
-        std::vector<Bundle> Install1(std::string const& location,
+        std::vector<Bundle> InstallWithContainer(std::string const& location,
                                      cppmicroservices::AnyMap const& bundleManifest,
                                      std::shared_ptr<BundleResourceContainer> const& resCont);
         std::vector<Bundle> Install0(std::string const& location,

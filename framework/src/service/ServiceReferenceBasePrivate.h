@@ -180,9 +180,6 @@ namespace cppmicroservices
                 // since it contains an exception object which clients could throw.
             }
         }
-
-      protected:
-        ServiceHolder() = default;
     };
 
     /* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
@@ -246,9 +243,6 @@ namespace cppmicroservices
                 // since it contains an exception object which clients could throw.
             }
         }
-
-      protected:
-        UngetHelper() = default;
     };
 
     class MagicDeleterImpl : public MagicDeleter

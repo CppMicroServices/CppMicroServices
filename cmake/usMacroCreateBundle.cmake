@@ -165,7 +165,7 @@ endif()
 usFunctionEmbedResources(TARGET ${${PROJECT_NAME}_TARGET} ${_resource_embed_type})
 
 # Generate supplemental object file for testing
-if(${PROJECT_NAME}_BUILD_OBJ)
+if(${PROJECT_NAME}_BUILD_OBJ EQUAL 1)
   target_compile_definitions(${PROJECT_TARGET}
     PRIVATE US_IS_TESTING=1)
 endif()
@@ -203,7 +203,7 @@ endif()
 # US testing
 #-----------------------------------------------------------------------------
 
-if(US_BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
+if(US_BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt" AND (NOT DEFINED ${PROJECT_NAME}_BUILD_OBJ OR ${PROJECT_NAME}_BUILD_OBJ EQUAL 1))
   add_subdirectory(test)
 endif()
 
@@ -211,7 +211,7 @@ endif()
 # Documentation
 #-----------------------------------------------------------------------------
 
-if(US_BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/doc/snippets/CMakeLists.txt")
+if(US_BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/doc/snippets/CMakeLists.txt" AND NOT ${PROJECT_NAME}_BUILD_OBJ)
   # Compile source code snippets
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/doc/snippets)
 endif()

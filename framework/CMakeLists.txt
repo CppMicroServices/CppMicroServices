@@ -41,8 +41,25 @@ usMacroCreateBundle(Framework
   PUBLIC_HEADERS ${_framework_public_headers}
   PRIVATE_HEADERS ${_framework_private_headers}
   BINARY_RESOURCES manifest.json
-  BUILD_OBJ ${US_BUILD_TESTING}
+  BUILD_OBJ 0
 )
+
+if(US_BUILD_TESTING)
+  usMacroCreateBundle(FrameworkTesting
+    VERSION "${_version}"
+    TARGET CppMicroServicesTesting
+    SYMBOLIC_NAME system_bundle
+    SKIP_INIT # we do it manually
+    EMBED_RESOURCE_METHOD LINK
+    PRIVATE_INCLUDE_DIRS src/util src/service src/bundle ../third_party
+    LINK_LIBRARIES ${_link_libraries}
+    SOURCES ${_framework_srcs}
+    PUBLIC_HEADERS ${_framework_public_headers}
+    PRIVATE_HEADERS ${_framework_private_headers}
+    BINARY_RESOURCES manifest.json
+    BUILD_OBJ 1
+  )
+endif()
 
 set_property(
   TARGET ${PROJECT_TARGET} APPEND PROPERTY

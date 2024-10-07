@@ -152,7 +152,7 @@ endif()
 
 target_link_libraries(${us_gtest_test_exe_name} ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(${us_gtest_test_exe_name} ${GMOCK_BOTH_LIBRARIES})
-target_link_libraries(${us_gtest_test_exe_name} ${Framework_TARGET} usLogService)
+target_link_libraries(${us_gtest_test_exe_name} ${FrameworkTesting_TARGET} usLogService)
 
 # dlopen/dlsym/dlerror used by SharedLibrary.cpp
 if(UNIX)
@@ -230,5 +230,5 @@ else()
     # Add resources
     usFunctionEmbedResources(TARGET ${us_gtest_test_exe_name}
                              FILES TestResource.ptxt manifest.json
-                             ZIP_ARCHIVES ${Framework_TARGET} ${_us_test_bundle_libs})
+                             ZIP_ARCHIVES ${FrameworkTesting_TARGET} ${_us_test_bundle_libs})
 endif()

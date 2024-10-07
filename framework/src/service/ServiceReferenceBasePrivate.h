@@ -147,6 +147,11 @@ namespace cppmicroservices
         ServiceReferenceBase const sref;
         std::shared_ptr<S> const service;
 
+        ServiceHolder(ServiceHolder&) = default;
+        ServiceHolder(ServiceHolder&&) noexcept = default;
+        ServiceHolder& operator=(ServiceHolder&) = default;
+        ServiceHolder& operator=(ServiceHolder&&) noexcept = default;
+
         ServiceHolder(std::shared_ptr<BundlePrivate> const& b, ServiceReferenceBase const& sr, std::shared_ptr<S> s)
             : b(b)
             , sref(sr)
@@ -175,6 +180,9 @@ namespace cppmicroservices
                 // since it contains an exception object which clients could throw.
             }
         }
+
+      protected:
+        ServiceHolder() = default;
     };
 
     /* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
@@ -191,6 +199,11 @@ namespace cppmicroservices
         InterfaceMapConstPtr const interfaceMap;
         ServiceReferenceBase const sref;
         std::weak_ptr<BundlePrivate> const b;
+
+        UngetHelper(UngetHelper&) = default;
+        UngetHelper(UngetHelper&&) noexcept = default;
+        UngetHelper& operator=(UngetHelper&) = default;
+        UngetHelper& operator=(UngetHelper&&) noexcept = default;
 
         UngetHelper(InterfaceMapConstPtr im, ServiceReferenceBase const& sr, std::shared_ptr<BundlePrivate> const& b)
             : interfaceMap(std::move(im))
@@ -233,6 +246,9 @@ namespace cppmicroservices
                 // since it contains an exception object which clients could throw.
             }
         }
+
+      protected:
+        UngetHelper() = default;
     };
 
     class MagicDeleterImpl : public MagicDeleter
@@ -253,7 +269,7 @@ namespace cppmicroservices
             delete uh;
         }
 
-        ServiceReferenceBase
+        [[nodiscard]] ServiceReferenceBase
         getServiceRef() const override
         {
             if (sh_)

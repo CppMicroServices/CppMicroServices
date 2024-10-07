@@ -32,15 +32,22 @@ namespace test
 {
     struct int1
     {
-        virtual int getValue() const = 0;
-        virtual ~int1() {}
+        [[nodiscard]] virtual int getValue() const = 0;
+        virtual ~int1() = default;
+        int1(int1 const&) = default;
+        int1& operator=(int1 const&) = default;
+        int1(int1&&) noexcept = default;
+        int1& operator=(int1&&) noexcept = default;
+
+      protected:
+        int1() = default;
     };
 
     struct TestServiceA : public int1
     {
         TestServiceA(int val) : id(val) {}
-        int
-        getValue() const
+        [[nodiscard]] int
+        getValue() const override
         {
             return id;
         }
@@ -56,13 +63,15 @@ namespace test
     TEST_F(tServiceComponent, testServiceReferenceRetrievalForDSAndManReg)
     {
         cppmicroservices::BundleContext ctx = framework.GetBundleContext();
-        auto sref = context.RegisterService<int1>(std::make_shared<TestServiceA>(100)).GetReference();
-        auto sref2 = context.RegisterService<int1>(std::make_shared<TestServiceA>(85)).GetReference();
+        const auto id1 = 100;
+        const auto id2 = 85;
+        auto sref = context.RegisterService<int1>(std::make_shared<TestServiceA>(id1)).GetReference();
+        auto sref2 = context.RegisterService<int1>(std::make_shared<TestServiceA>(id2)).GetReference();
 
         auto service1 = context.GetService(sref);
-        ASSERT_EQ(service1->getValue(), 100);
+        ASSERT_EQ(service1->getValue(), id1);
         auto service2 = context.GetService(sref2);
-        ASSERT_EQ(service2->getValue(), 85);
+        ASSERT_EQ(service2->getValue(), id2);
         ASSERT_EQ(cppmicroservices::GetServiceReference(service1), sref);
         ASSERT_FALSE(cppmicroservices::GetServiceReference(service1) == sref2);
         ASSERT_EQ(cppmicroservices::GetServiceReference(service2), sref2);

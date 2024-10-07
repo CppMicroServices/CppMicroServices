@@ -149,8 +149,8 @@ namespace cppmicroservices
 
         ServiceHolder(ServiceHolder&) = default;
         ServiceHolder(ServiceHolder&&) noexcept = default;
-        ServiceHolder& operator=(ServiceHolder&) = default;
-        ServiceHolder& operator=(ServiceHolder&&) noexcept = default;
+        ServiceHolder& operator=(ServiceHolder&) = delete;
+        ServiceHolder& operator=(ServiceHolder&&) noexcept = delete;
 
         ServiceHolder(std::shared_ptr<BundlePrivate> const& b, ServiceReferenceBase const& sr, std::shared_ptr<S> s)
             : b(b)
@@ -202,8 +202,8 @@ namespace cppmicroservices
 
         UngetHelper(UngetHelper&) = default;
         UngetHelper(UngetHelper&&) noexcept = default;
-        UngetHelper& operator=(UngetHelper&) = default;
-        UngetHelper& operator=(UngetHelper&&) noexcept = default;
+        UngetHelper& operator=(UngetHelper&) = delete;
+        UngetHelper& operator=(UngetHelper&&) noexcept = delete;
 
         UngetHelper(InterfaceMapConstPtr im, ServiceReferenceBase const& sr, std::shared_ptr<BundlePrivate> const& b)
             : interfaceMap(std::move(im))

@@ -150,20 +150,7 @@ namespace cppmicroservices
      */
     using ServiceReferenceU = ServiceReference<void>;
 
-    class MagicDeleter
-    {
-      public:
-        virtual ~MagicDeleter() = default;
-        MagicDeleter() = default;
-        MagicDeleter(MagicDeleter&) = delete;
-        MagicDeleter(MagicDeleter&&) noexcept = default;
-        MagicDeleter& operator=(MagicDeleter&) = delete;
-        MagicDeleter& operator=(MagicDeleter&&) noexcept = default;
-
-        [[nodiscard]] virtual ServiceReferenceBase getServiceRef() const = 0;
-    };
-
-    US_Framework_EXPORT ServiceReferenceU GetServiceReference(std::shared_ptr<void> const& s);
+    US_Framework_EXPORT ServiceReferenceU ServiceReferenceFromService(std::shared_ptr<void> const& s);
 } // namespace cppmicroservices
 
 namespace std

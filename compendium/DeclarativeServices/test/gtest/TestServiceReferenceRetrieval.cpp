@@ -72,9 +72,9 @@ namespace test
         ASSERT_EQ(service1->getValue(), id1);
         auto service2 = context.GetService(sref2);
         ASSERT_EQ(service2->getValue(), id2);
-        ASSERT_EQ(cppmicroservices::GetServiceReference(service1), sref);
-        ASSERT_FALSE(cppmicroservices::GetServiceReference(service1) == sref2);
-        ASSERT_EQ(cppmicroservices::GetServiceReference(service2), sref2);
+        ASSERT_EQ(cppmicroservices::ServiceReferenceFromService(service1), sref);
+        ASSERT_FALSE(cppmicroservices::ServiceReferenceFromService(service1) == sref2);
+        ASSERT_EQ(cppmicroservices::ServiceReferenceFromService(service2), sref2);
 
         // Install and start bundle
         auto testBundle = ::test::InstallAndStartBundle(ctx, "TestBundleDSCA05");
@@ -83,7 +83,7 @@ namespace test
         auto dsRef = context.GetServiceReference<test::CAInterface>();
         ASSERT_TRUE(dsRef);
         auto dsSvc = context.GetService<test::CAInterface>(dsRef);
-        auto retSRef = cppmicroservices::GetServiceReference(dsSvc);
+        auto retSRef = cppmicroservices::ServiceReferenceFromService(dsSvc);
         ASSERT_EQ(retSRef, dsRef);
         ASSERT_EQ(cppmicroservices::any_cast<std::string>(retSRef.GetProperty("ManifestProp")), "abc");
     }

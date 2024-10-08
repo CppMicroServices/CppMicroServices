@@ -133,7 +133,7 @@ namespace cppmicroservices
             return nullptr;
         }
         auto uh = new UngetHelper { result, d->m_reference, bundle_ };
-        std::shared_ptr<UngetHelper> h(uh, MagicDeleterImpl { uh });
+        std::shared_ptr<UngetHelper> h(uh, CustomServiceDeleter { uh });
         return InterfaceMapConstPtr(h, h->interfaceMap.get());
     }
 

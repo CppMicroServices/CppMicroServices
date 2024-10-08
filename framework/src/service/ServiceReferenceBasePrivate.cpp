@@ -481,9 +481,9 @@ namespace cppmicroservices
     }
 
     ServiceReferenceU
-    GetServiceReference(std::shared_ptr<void> const& s)
+    ServiceReferenceFromService(std::shared_ptr<void> const& s)
     {
-        auto deleter = std::get_deleter<MagicDeleterImpl>(s);
+        auto deleter = std::get_deleter<CustomServiceDeleter>(s);
         if (!deleter)
         {
             throw std::runtime_error("Not a managed shared_ptr");

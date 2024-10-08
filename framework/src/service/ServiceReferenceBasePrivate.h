@@ -245,11 +245,11 @@ namespace cppmicroservices
         }
     };
 
-    class MagicDeleterImpl : public MagicDeleter
+    class CustomServiceDeleter
     {
       public:
-        MagicDeleterImpl(ServiceHolder<void>* sh) : sh_(sh), uh_(nullptr) {}
-        MagicDeleterImpl(UngetHelper* uh) : sh_(nullptr), uh_(uh) {}
+        CustomServiceDeleter(ServiceHolder<void>* sh) : sh_(sh), uh_(nullptr) {}
+        CustomServiceDeleter(UngetHelper* uh) : sh_(nullptr), uh_(uh) {}
 
         void
         operator()(ServiceHolder<void>* sh)
@@ -264,7 +264,7 @@ namespace cppmicroservices
         }
 
         [[nodiscard]] ServiceReferenceBase
-        getServiceRef() const override
+        getServiceRef() const
         {
             if (sh_)
             {

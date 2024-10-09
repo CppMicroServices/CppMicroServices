@@ -146,16 +146,23 @@ namespace cppmicroservices
         std::weak_ptr<BundlePrivate> const b;
         ServiceReferenceBase const sref;
         std::shared_ptr<S> const service;
+        InterfaceMapConstPtr const interfaceMap;
+        bool singletonService;
 
         ServiceHolder(ServiceHolder&) = default;
         ServiceHolder(ServiceHolder&&) noexcept = default;
         ServiceHolder& operator=(ServiceHolder&) = delete;
         ServiceHolder& operator=(ServiceHolder&&) noexcept = delete;
 
-        ServiceHolder(std::shared_ptr<BundlePrivate> const& b, ServiceReferenceBase const& sr, std::shared_ptr<S> s)
+        ServiceHolder(std::shared_ptr<BundlePrivate> const& b,
+                      ServiceReferenceBase const& sr,
+                      std::shared_ptr<S> s,
+                      InterfaceMapConstPtr im)
             : b(b)
             , sref(sr)
             , service(std::move(s))
+            , interfaceMap(im)
+            , singletonService(s ? true : false)
         {
         }
 
@@ -163,7 +170,7 @@ namespace cppmicroservices
         {
             try
             {
-                sref.d.Load()->UngetService(b.lock(), true);
+                singletonService ? destroySingleton() : destroyPrototype();
             }
             catch (...)
             {
@@ -180,76 +187,46 @@ namespace cppmicroservices
                 // since it contains an exception object which clients could throw.
             }
         }
+
+      private:
+        void
+        destroySingleton()
+        {
+            sref.d.Load()->UngetService(b.lock(), true);
+        }
+
+        void
+        destroyPrototype()
+        {
+            auto bundle = b.lock();
+            if (sref)
+            {
+                bool isPrototypeScope
+                    = sref.GetProperty(Constants::SERVICE_SCOPE).ToString() == Constants::SCOPE_PROTOTYPE;
+
+                if (isPrototypeScope)
+                {
+                    sref.d.Load()->UngetPrototypeService(bundle, interfaceMap);
+                }
+                else
+                {
+                    sref.d.Load()->UngetService(bundle, true);
+                }
+            }
+        }
     };
 
-    /* @brief Private helper struct used to facilitate the shared_ptr aliasing constructor
-     *        in ServiceObjectsBase::GetService & ServiceObjectsBase::GetServiceInterfaceMap
-     *        methods. The aliasing constructor helps automate the call to UngetService method.
+    /* @brief Private helper struct used to facilitate the retrieval of a serviceReference from
+     *        a serviceObject.
      *
-     *        Service consumers can simply call GetService to obtain a shared_ptr to the
-     *        service object and not worry about calling UngetService when they are done.
-     *        The UngetService is called when all instances of the returned shared_ptr object
-     *        go out of scope.
+     *        Service consumers can pass a service to the public API ServiceReferenceFromService.
+     *        This method can use the std::get_deleter method to retrieve this object and through
+     *        it the original serviceReference.
      */
-    struct UngetHelper
-    {
-        InterfaceMapConstPtr const interfaceMap;
-        ServiceReferenceBase const sref;
-        std::weak_ptr<BundlePrivate> const b;
-
-        UngetHelper(UngetHelper&) = default;
-        UngetHelper(UngetHelper&&) noexcept = default;
-        UngetHelper& operator=(UngetHelper&) = delete;
-        UngetHelper& operator=(UngetHelper&&) noexcept = delete;
-
-        UngetHelper(InterfaceMapConstPtr im, ServiceReferenceBase const& sr, std::shared_ptr<BundlePrivate> const& b)
-            : interfaceMap(std::move(im))
-            , sref(sr)
-            , b(b)
-        {
-        }
-        ~UngetHelper()
-        {
-            try
-            {
-                auto bundle = b.lock();
-                if (sref)
-                {
-                    bool isPrototypeScope
-                        = sref.GetProperty(Constants::SERVICE_SCOPE).ToString() == Constants::SCOPE_PROTOTYPE;
-
-                    if (isPrototypeScope)
-                    {
-                        sref.d.Load()->UngetPrototypeService(bundle, interfaceMap);
-                    }
-                    else
-                    {
-                        sref.d.Load()->UngetService(bundle, true);
-                    }
-                }
-            }
-            catch (...)
-            {
-                // Make sure that we don't crash if the shared_ptr service object outlives
-                // the BundlePrivate or CoreBundleContext objects.
-                if (!b.expired())
-                {
-                    DIAG_LOG(*b.lock()->coreCtx->sink)
-                        << "UngetHelper threw an exception. " << util::GetLastExceptionStr();
-                }
-                // don't throw exceptions from the destructor. For an explanation, see:
-                // https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
-                // Following this rule means that a FrameworkEvent isn't an option here
-                // since it contains an exception object which clients could throw.
-            }
-        }
-    };
-
     class CustomServiceDeleter
     {
       public:
-        CustomServiceDeleter(ServiceHolder<void>* sh) : sh_(sh), uh_(nullptr) {}
-        CustomServiceDeleter(UngetHelper* uh) : sh_(nullptr), uh_(uh) {}
+        CustomServiceDeleter(ServiceHolder<void>* sh) : sHolder(sh) {}
 
         void
         operator()(ServiceHolder<void>* sh)
@@ -257,25 +234,14 @@ namespace cppmicroservices
             delete sh;
         }
 
-        void
-        operator()(UngetHelper* uh)
-        {
-            delete uh;
-        }
-
         [[nodiscard]] ServiceReferenceBase
         getServiceRef() const
         {
-            if (sh_)
-            {
-                return sh_->sref;
-            }
-            return uh_->sref;
+            return sHolder->sref;
         }
 
       private:
-        ServiceHolder<void> const* const sh_;
-        UngetHelper const* const uh_;
+        ServiceHolder<void> const* const sHolder;
     };
 } // namespace cppmicroservices
 

@@ -150,7 +150,30 @@ namespace cppmicroservices
      */
     using ServiceReferenceU = ServiceReference<void>;
 
+    /**
+     * \ingroup MicroServices
+     * \ingroup gr_servicereference
+     *
+     * A method to retrieve a <code>ServiceObject</code>'s original <code>ServiceReference<void></code>
+     *
+     */
     US_Framework_EXPORT ServiceReferenceU ServiceReferenceFromService(std::shared_ptr<void> const& s);
+
+    /**
+     * \ingroup MicroServices
+     * \ingroup gr_servicereference
+     *
+     * A method to retrieve a <code>ServiceObject<T></code>'s original <code>ServiceReference<U></code>
+     *
+     * @tparam T The class type of the <code>ServiceObject</code>
+     * @tparam U The class type of the <code>ServiceReference</code>. Defaults to <code>T</code> if not specified.
+     */
+    template <typename T, typename U = T>
+    US_Framework_EXPORT ServiceReference<U>
+    ServiceReferenceFromService(std::shared_ptr<T> const& s)
+    {
+        return ServiceReference<U>(ServiceReferenceFromService(std::static_pointer_cast<void>(s)));
+    }
 } // namespace cppmicroservices
 
 namespace std

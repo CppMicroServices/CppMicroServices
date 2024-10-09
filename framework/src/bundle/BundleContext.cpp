@@ -244,7 +244,7 @@ namespace cppmicroservices
         d->CheckValid();
         auto b = GetAndCheckBundlePrivate(d);
 
-        auto serviceHolder = new ServiceHolder<void>(b, reference, reference.d.Load()->GetService(b.get()));
+        auto serviceHolder = new ServiceHolder<void>(b, reference, reference.d.Load()->GetService(b.get()), nullptr);
         std::shared_ptr<ServiceHolder<void>> h(serviceHolder, CustomServiceDeleter { serviceHolder });
         return std::shared_ptr<void>(h, h->service.get());
     }
@@ -268,7 +268,7 @@ namespace cppmicroservices
 
         auto serviceInterfaceMap = reference.d.Load()->GetServiceInterfaceMap(b.get());
         std::shared_ptr<ServiceHolder<InterfaceMap const>> h(
-            new ServiceHolder<InterfaceMap const>(b, reference, serviceInterfaceMap));
+            new ServiceHolder<InterfaceMap const>(b, reference, serviceInterfaceMap, nullptr));
         return InterfaceMapConstPtr(h, h->service.get());
     }
 

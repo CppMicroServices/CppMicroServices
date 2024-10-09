@@ -56,15 +56,13 @@ namespace test
         int id;
     };
     /*
-     * Tests that if a configuration object is created programmatically before
-     * the service that is dependent on the configuration object is installed
-     * and started, the service is resolved as soon as it is started.
+     * Tests that a user is able to retrieve a serviceReference from a serviceObject from the coreFramework or DS
      */
     TEST_F(tServiceComponent, testServiceReferenceRetrievalForDSAndManReg)
     {
         cppmicroservices::BundleContext ctx = framework.GetBundleContext();
-        const auto id1 = 100;
-        const auto id2 = 85;
+        auto const id1 = 100;
+        auto const id2 = 85;
         auto sref = context.RegisterService<int1>(std::make_shared<TestServiceA>(id1)).GetReference();
         auto sref2 = context.RegisterService<int1>(std::make_shared<TestServiceA>(id2)).GetReference();
 
@@ -86,5 +84,8 @@ namespace test
         auto retSRef = cppmicroservices::ServiceReferenceFromService(dsSvc);
         ASSERT_EQ(retSRef, dsRef);
         ASSERT_EQ(cppmicroservices::any_cast<std::string>(retSRef.GetProperty("ManifestProp")), "abc");
+
+        ASSERT_THROW(cppmicroservices::ServiceReferenceFromService(std::make_shared<TestServiceA>(id1)),
+                     std::runtime_error);
     }
 } // namespace test

@@ -486,7 +486,7 @@ namespace cppmicroservices
         auto deleter = std::get_deleter<CustomServiceDeleter>(s);
         if (!deleter)
         {
-            throw std::runtime_error("Not a managed shared_ptr");
+            throw std::runtime_error("The input is not a CppMicroServices managed ServiceObject");
         }
         return deleter->getServiceRef();
     }

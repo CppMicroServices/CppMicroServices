@@ -252,8 +252,10 @@ namespace cppmicroservices
             template <typename Functor>
             std::shared_ptr<ThreadpoolSafeFuturePrivate> PerformAsync(Functor&& f);
 
-            // Used to generate a random instance name for CreateFactoryConfiguration
+            // Flag set to false when the activator has stopped the bundle
             bool active = true;
+
+            // Used to generate a random instance name for CreateFactoryConfiguration
             std::string RandomInstanceName();
 
             // Used to keep track of the instances of each ManagedServiceFactory

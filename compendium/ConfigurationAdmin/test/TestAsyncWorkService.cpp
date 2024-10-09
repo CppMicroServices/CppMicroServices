@@ -385,6 +385,10 @@ namespace test
         });
     }
 
+    // Ensures that when ConfigAdmin is shut down, even if work is still being queued or is running,
+    // no new work is posted to the asyncWorkService
+
+    // NOTE: intended to be run on repeat as this used to fail sporadically before fix
     TEST_F(TestAsyncWorkServiceEndToEnd, TestShutdownWithWorkRunning)
     {
         auto const& param = std::make_shared<AsyncWorkServiceThreadPool>(2);

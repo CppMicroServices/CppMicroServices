@@ -1042,8 +1042,8 @@ namespace cppmicroservices
             if (!active)
             {
                 // we return a default future which will always return immediately if waited on...
-                // this isn't really a 'valid' future, but when the activator as stopped the bundle, we should be making
-                // configAdmin essentially non functional
+                // this isn't really a 'valid' future, but when the activator has stopped the bundle,
+                // configAdmin can be assumed to be non functional
                 return std::make_shared<ThreadpoolSafeFuturePrivate>();
             }
             decltype(completeFutures) {}.swap(completeFutures);

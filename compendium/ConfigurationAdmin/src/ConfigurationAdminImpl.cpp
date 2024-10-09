@@ -623,7 +623,7 @@ namespace cppmicroservices
                         managedServiceFactoryWrappers;
                     {
                         std::lock_guard<std::mutex> lk { configurationsMutex };
-                        const auto it = configurations.find(pid);
+                        auto const it = configurations.find(pid);
                         if (it == std::end(configurations))
                         {
                             removed = true;
@@ -636,7 +636,7 @@ namespace cppmicroservices
                                 hasBeenUpdated = it->second->HasBeenUpdatedAtLeastOnce();
                                 properties = it->second->GetProperties();
                             }
-                            catch (const std::runtime_error&)
+                            catch (std::runtime_error const&)
                             {
                                 // Configuration is being removed
                                 removed = true;
@@ -669,7 +669,7 @@ namespace cppmicroservices
 
                     auto configurationListeners = configListenerTracker.GetServices();
                     auto configAdminRef = cmContext.GetServiceReference<ConfigurationAdmin>();
-                    for (const auto& it : configurationListeners)
+                    for (auto const& it : configurationListeners)
                     {
                         auto configEvent
                             = cppmicroservices::service::cm::ConfigurationEvent(configAdminRef, type, fPid, nonFPid);
@@ -679,7 +679,7 @@ namespace cppmicroservices
                     std::for_each(
                         managedServiceWrappers.begin(),
                         managedServiceWrappers.end(),
-                        [&](const auto& managedServiceWrapper)
+                        [&](auto const& managedServiceWrapper)
                         {
                             // The ServiceTracker will return a default constructed shared_ptr for each ManagedService
                             // that we aren't tracking. We must be careful not to dereference these!
@@ -703,7 +703,7 @@ namespace cppmicroservices
                             }
                         });
 
-                    const auto factoryPid = getFactoryPid(pid);
+                    auto const factoryPid = getFactoryPid(pid);
                     if (factoryPid.empty())
                     {
                         return;
@@ -712,7 +712,7 @@ namespace cppmicroservices
                     std::for_each(
                         managedServiceFactoryWrappers.begin(),
                         managedServiceFactoryWrappers.end(),
-                        [&](const auto& managedServiceFactoryWrapper)
+                        [&](auto const& managedServiceFactoryWrapper)
                         {
                             // The ServiceTracker will return a default constructed shared_ptr for each
                             // ManagedServiceFactory that we aren't tracking. We must be careful not to dereference
@@ -864,7 +864,7 @@ namespace cppmicroservices
                         "New ManagedService with PID " + pid + " has been added.");
 
             std::unordered_map<std::string, unsigned long> initialChangeCountByPid = {
-                {pid, initialChangeCount}
+                { pid, initialChangeCount }
             };
             auto trackedManagedService
                 = std::make_shared<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>>(
@@ -974,7 +974,7 @@ namespace cppmicroservices
                 PerformAsync(
                     [this, pid, managedServiceFactory, pidsAndProperties]
                     {
-                        for (const auto& pidAndProperties : pidsAndProperties)
+                        for (auto const& pidAndProperties : pidsAndProperties)
                         {
                             notifyServiceUpdated(pidAndProperties.first,
                                                  *managedServiceFactory,
@@ -1038,6 +1038,14 @@ namespace cppmicroservices
         {
 
             std::lock_guard<std::mutex> lk { futuresMutex };
+            // if this configAdminImpl has been marked as inactive by the CMActivator, it should not queue any work
+            if (!active)
+            {
+                // we return a default future which will always return immediately if waited on...
+                // this isn't really a 'valid' future, but when the activator has stopped the bundle,
+                // configAdmin can be assumed to be non functional
+                return std::make_shared<ThreadpoolSafeFuturePrivate>();
+            }
             decltype(completeFutures) {}.swap(completeFutures);
             auto id = ++futuresID;
 
@@ -1130,6 +1138,15 @@ namespace cppmicroservices
             {
                 futuresCV.wait(ul, [this] { return incompleteFutures.empty(); });
             }
+        }
+        void
+        ConfigurationAdminImpl::StopAndWaitForAllAsync()
+        {
+            {
+                std::lock_guard<std::mutex> lk { futuresMutex };
+                active = false;
+            }
+            WaitForAllAsync();
         }
     } // namespace cmimpl
 } // namespace cppmicroservices

@@ -162,7 +162,7 @@ namespace cppmicroservices
             , b(b)
             , sref(sr)
             , service(std::move(s))
-            , interfaceMap(im)
+            , interfaceMap(std::move(im))
         {
         }
 

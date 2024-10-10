@@ -169,7 +169,7 @@ namespace cppmicroservices
      * @tparam U The class type of the <code>ServiceReference</code>. Defaults to <code>T</code> if not specified.
      */
     template <typename T, typename U = T>
-    US_Framework_EXPORT ServiceReference<U>
+    ServiceReference<U>
     ServiceReferenceFromService(std::shared_ptr<T> const& s)
     {
         return ServiceReference<U>(ServiceReferenceFromService(std::static_pointer_cast<void>(s)));

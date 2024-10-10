@@ -143,11 +143,11 @@ namespace cppmicroservices
     template <class S>
     struct ServiceHolder
     {
+        bool singletonService;
         std::weak_ptr<BundlePrivate> const b;
         ServiceReferenceBase const sref;
         std::shared_ptr<S> const service;
         InterfaceMapConstPtr const interfaceMap;
-        bool singletonService;
 
         ServiceHolder(ServiceHolder&) = default;
         ServiceHolder(ServiceHolder&&) noexcept = default;
@@ -158,11 +158,11 @@ namespace cppmicroservices
                       ServiceReferenceBase const& sr,
                       std::shared_ptr<S> s,
                       InterfaceMapConstPtr im)
-            : b(b)
+            : singletonService(s ? true : false)
+            , b(b)
             , sref(sr)
             , service(std::move(s))
             , interfaceMap(im)
-            , singletonService(s ? true : false)
         {
         }
 

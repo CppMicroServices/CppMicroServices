@@ -209,7 +209,6 @@ namespace cppmicroservices
         friend class BundleHooks;
         friend class ServiceHooks;
         friend class ServiceObjectsBase;
-        friend struct UngetHelper;
         friend class ServiceObjectsBasePrivate;
         friend class ServiceRegistrationBase;
         friend class ServiceRegistrationBasePrivate;

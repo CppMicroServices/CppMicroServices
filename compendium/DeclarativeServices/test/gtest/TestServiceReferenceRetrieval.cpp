@@ -60,22 +60,25 @@ namespace test
      */
     TEST_F(tServiceComponent, testServiceReferenceRetrievalForDSAndManReg)
     {
-        cppmicroservices::BundleContext ctx = framework.GetBundleContext();
         auto const id1 = 100;
         auto const id2 = 85;
-        auto sref = context.RegisterService<int1>(std::make_shared<TestServiceA>(id1)).GetReference();
+        auto reg = context.RegisterService<int1>(std::make_shared<TestServiceA>(id1));
+        auto sref = reg.GetReference();
         auto sref2 = context.RegisterService<int1>(std::make_shared<TestServiceA>(id2)).GetReference();
 
         auto service1 = context.GetService(sref);
         ASSERT_EQ(service1->getValue(), id1);
         auto service2 = context.GetService(sref2);
         ASSERT_EQ(service2->getValue(), id2);
-        ASSERT_EQ(cppmicroservices::ServiceReferenceFromService(service1), sref);
+
+        auto srefFromService1 = cppmicroservices::ServiceReferenceFromService(service1);
+
+        ASSERT_EQ(srefFromService1, sref);
         ASSERT_FALSE(cppmicroservices::ServiceReferenceFromService(service1) == sref2);
         ASSERT_EQ(cppmicroservices::ServiceReferenceFromService(service2), sref2);
 
         // Install and start bundle
-        auto testBundle = ::test::InstallAndStartBundle(ctx, "TestBundleDSCA05");
+        auto testBundle = ::test::InstallAndStartBundle(context, "TestBundleDSCA05");
         ASSERT_TRUE(testBundle);
 
         auto dsRef = context.GetServiceReference<test::CAInterface>();
@@ -87,5 +90,17 @@ namespace test
 
         ASSERT_THROW(cppmicroservices::ServiceReferenceFromService(std::make_shared<TestServiceA>(id1)),
                      std::runtime_error);
+
+        reg.Unregister();
+
+        // ensure only 1 sr exists in framework for int1
+        ASSERT_EQ(context.GetServiceReferences<int1>().size(), 1);
+        // assert that the serviceReference returned for my service object is not valid after unregistration
+        ASSERT_FALSE(cppmicroservices::ServiceReferenceFromService(service1));
+
+        // assert identical behavior from ref from original registration and ref from serviceReferenceFromService
+        ASSERT_FALSE(sref);
+        ASSERT_FALSE(srefFromService1);
+        ASSERT_EQ(sref, srefFromService1);
     }
 } // namespace test

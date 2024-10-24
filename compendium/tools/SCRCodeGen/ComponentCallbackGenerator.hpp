@@ -108,7 +108,7 @@ namespace codegen
 
                 for (auto const& ref : componentInfo.references)
                 {
-                    if ((false == componentInfo.injectReferences) || (ref.policy == "dynamic"))
+                    if ((true == componentInfo.injectReferences) && (ref.policy == "dynamic"))
                     {
                         mStrStream << "  binders.push_back("
                                    << util::Substitute(
@@ -131,8 +131,8 @@ namespace codegen
                 {
 
                     mStrStream << datamodel::GetCtorInjectedRefParameters(componentInfo) << ">("
-                        << datamodel::GetCtorInjectedRefNames(componentInfo) << ", binders"
-                        << ");";
+                               << datamodel::GetCtorInjectedRefNames(componentInfo) << ", binders"
+                               << ");";
                 }
 
                 mStrStream << std::endl << std::endl << "  return componentInstance;" << std::endl << "}" << std::endl;
@@ -151,8 +151,8 @@ namespace codegen
             }
         }
 
-        const std::vector<std::string> mHeaderIncludes;
-        const std::vector<ComponentInfo> mComponentInfos;
+        std::vector<std::string> const mHeaderIncludes;
+        std::vector<ComponentInfo> const mComponentInfos;
         std::stringstream mStrStream;
     };
 

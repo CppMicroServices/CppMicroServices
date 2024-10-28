@@ -41,18 +41,17 @@ namespace sample
             foo = nullptr;
         }
     }
-    // void
-    // ServiceComponentWrongBindSig::Modified(std::shared_ptr<ComponentContext> const& /*context*/,
-    //                                        std::shared_ptr<cppmicroservices::AnyMap> const& /*configuration*/)
-    // {
-    // }
-    // void
-    // ServiceComponentWrongBindSig::Activate(std::shared_ptr<ComponentContext> const& /*context*/)
-    // {
-    // }
-    // void
-    // ServiceComponentWrongBindSig::Deactivate(std::shared_ptr<ComponentContext> const& /*context*/)
-    // {
-    // }
-
+    void
+    ServiceComponentWrongBindSig::Modified(std::shared_ptr<ComponentContext> const& /*context*/,
+                                           std::shared_ptr<cppmicroservices::AnyMap> const& /*configuration*/)
+    {
+    }
+    void
+    ServiceComponentWrongBindSig::Activate(std::shared_ptr<ComponentContext> const& /*context*/)
+    {
+    }
+    void
+    ServiceComponentWrongBindSig::Deactivate(std::shared_ptr<ComponentContext> const& /*context*/)
+    {
+    }
 } // namespace sample

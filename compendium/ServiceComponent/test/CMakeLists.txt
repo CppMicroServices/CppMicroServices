@@ -115,8 +115,11 @@ add_executable(usServiceComponentInvalidInheritanceTest TestCompInst_InvalidInhe
 add_executable(usServiceComponentNoDepsNoDefaultCtorTest TestCompInst_NoDepsNoDefaultCtor.cpp)
 add_executable(usServiceComponentNoDefaultCtorTest TestCompInst_NoInjectNoDefaultCtor.cpp)
 add_executable(usServiceComponentRefCountTest TestCompInst_RefCount.cpp)
+add_executable(usServiceComponentModifiedMethod TestCompInst_IncorrectModifiedMethod.cpp)
+add_executable(usServiceComponentActivateMethod TestCompInst_IncorrectActivateMethod.cpp)
+add_executable(usServiceComponentDeactivateMethod TestCompInst_IncorrectDeactivateMethod.cpp)
 
-set(compile_only_exe_names usServiceComponentRefOrderTest usServiceComponentRefOrderMultipleCardinalityTest usServiceComponentInvalidInheritanceTest usServiceComponentNoDepsNoDefaultCtorTest usServiceComponentNoDefaultCtorTest usServiceComponentRefCountTest)
+set(compile_only_exe_names usServiceComponentRefOrderTest usServiceComponentRefOrderMultipleCardinalityTest usServiceComponentInvalidInheritanceTest usServiceComponentNoDepsNoDefaultCtorTest usServiceComponentNoDefaultCtorTest usServiceComponentRefCountTest usServiceComponentModifiedMethod usServiceComponentActivateMethod usServiceComponentDeactivateMethod)
 
 foreach(exe_name ${compile_only_exe_names})
     
@@ -150,3 +153,6 @@ set_tests_properties(usServiceComponentInvalidInheritanceTest PROPERTIES PASS_RE
 set_tests_properties(usServiceComponentNoDepsNoDefaultCtorTest PROPERTIES PASS_REGULAR_EXPRESSION ".*An appropriate constructor was not found and/or the service implementation does not implement all of the service interface's methods. A default constructor or a constructor with an AnyMap input parameter for the configuration properties is required when inject-references is false..*")
 set_tests_properties(usServiceComponentNoDefaultCtorTest PROPERTIES PASS_REGULAR_EXPRESSION ".*An appropriate constructor was not found and/or the service implementation does not implement all of the service interface's methods. A constructor with service reference input parameters or a constructor with an AnyMap input parameter for configuration properties and service reference input parameters is required when inject-references is true.*")
 set_tests_properties(usServiceComponentRefCountTest PROPERTIES PASS_REGULAR_EXPRESSION ".*An appropriate constructor was not found and/or the service implementation does not implement all of the service interface's methods. A constructor with service reference input parameters or a constructor with an AnyMap input parameter for configuration properties and service reference input parameters is required when inject-references is true.*")
+set_tests_properties(usServiceComponentModifiedMethod PROPERTIES PASS_REGULAR_EXPRESSION ".*This error can also be triggered when inheriting from cppmicroservices::service::component::usrDefinedMethodAssertion without properly defining the Modified, Activate, and Deactivate methods.*")
+set_tests_properties(usServiceComponentActivateMethod PROPERTIES PASS_REGULAR_EXPRESSION ".*This error can also be triggered when inheriting from cppmicroservices::service::component::usrDefinedMethodAssertion without properly defining the Modified, Activate, and Deactivate methods.*")
+set_tests_properties(usServiceComponentDeactivateMethod PROPERTIES PASS_REGULAR_EXPRESSION ".*This error can also be triggered when inheriting from cppmicroservices::service::component::usrDefinedMethodAssertion without properly defining the Modified, Activate, and Deactivate methods.*")

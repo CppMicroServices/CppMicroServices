@@ -20,17 +20,17 @@
 
   =============================================================================*/
 
-#ifndef COMPONENTINSTANCEASSERTION_hpp
-#define COMPONENTINSTANCEASSERTION_hpp
+#ifndef usrDefinedMethodAssertion_hpp
+#define usrDefinedMethodAssertion_hpp
 
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 
 namespace cppmicroservices::service::component
 {
-    class ComponentInstanceAssertion
+    class usrDefinedMethodAssertion
     {
       public:
-        virtual ~ComponentInstanceAssertion() = default; // Add a virtual destructor
+        virtual ~usrDefinedMethodAssertion() = default;
 
         virtual void Modified(std::shared_ptr<ComponentContext> const& context,
                               std::shared_ptr<cppmicroservices::AnyMap> const& configuration)
@@ -39,4 +39,5 @@ namespace cppmicroservices::service::component
         virtual void Deactivate(std::shared_ptr<ComponentContext> const& context) = 0;
     };
 } // namespace cppmicroservices::service::component
+
 #endif

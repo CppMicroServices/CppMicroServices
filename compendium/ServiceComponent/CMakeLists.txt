@@ -11,6 +11,7 @@ set(_public_headers
 include/cppmicroservices/servicecomponent/ComponentConstants.hpp
 include/cppmicroservices/servicecomponent/ComponentContext.hpp
 include/cppmicroservices/servicecomponent/ComponentException.hpp
+include/cppmicroservices/servicecomponent/usrDefinedMethodAssertion.hpp
 include/cppmicroservices/servicecomponent/detail/Binders.hpp
 include/cppmicroservices/servicecomponent/detail/ComponentInstance.hpp
 include/cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp

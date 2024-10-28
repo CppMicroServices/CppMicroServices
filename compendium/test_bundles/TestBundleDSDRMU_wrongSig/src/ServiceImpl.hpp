@@ -5,7 +5,7 @@
 
 #include "TestInterfaces/Interfaces.hpp"
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
-#include "cppmicroservices/servicecomponent/ComponentInstanceAssertion.hpp"
+#include "cppmicroservices/servicecomponent/usrDefinedMethodAssertion.hpp"
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
 
 namespace sample
@@ -13,7 +13,7 @@ namespace sample
 
     class ServiceComponentWrongBindSig final
         : public test::Interface2
-        , cppmicroservices::service::component::ComponentInstanceAssertion
+        , cppmicroservices::service::component::usrDefinedMethodAssertion
     {
       public:
         ServiceComponentWrongBindSig() = default;

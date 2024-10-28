@@ -447,7 +447,7 @@ namespace cppmicroservices
                                       "with an AnyMap input parameter for the configuration properties is "
                                       "required when inject-references is false. This error can also be "
                                       "triggered when inheriting from "
-                                      "cppmicroservices::service::component::ComponentInstanceAssertion "
+                                      "cppmicroservices::service::component::usrDefinedMethodAssertion "
                                       "without properly defining the Modified, Activate, and Deactivate methods");
                         return nullptr;
                     }

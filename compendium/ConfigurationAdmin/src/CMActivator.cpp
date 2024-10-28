@@ -76,6 +76,9 @@ namespace cppmicroservices
                     bundleRegistry.clear();
                 }
                 // Clean up the ConfigurationAdminImpl
+                // WAITFOR all configAdmin work to stop
+                // dont queue any new work and wait for existing work
+                configAdminImpl->StopAndWaitForAllAsync();
                 configAdminImpl = nullptr;
                 logger->Log(SeverityLevel::LOG_DEBUG, "CM Bundle stopped.");
             }

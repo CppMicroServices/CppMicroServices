@@ -401,11 +401,14 @@ namespace cppmicroservices
 
                     // this method is used when injection is false and default constructor is provided by the
                     // implementation class
-                    template <class C = T,
-                              class I = Injection,
-                              class InjectionFalse = typename std::enable_if<I::value == false>::type,
-                              class IsDefaultConstructible
-                              = typename std::enable_if<std::is_default_constructible<C>::value == true>::type>
+                    template <
+                        class C = T,
+                        class I = Injection,
+                        class InjectionFalse = typename std::enable_if<I::value == false>::type,
+                        class IsDefaultConstructible = typename std::enable_if<
+                            std::is_default_constructible<C>::value
+                            && !std::is_constructible<C, std::shared_ptr<cppmicroservices::AnyMap> const&>::
+                                   value>::type>
                     std::shared_ptr<T>
                     DoCreate(bool)
                     {

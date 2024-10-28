@@ -214,8 +214,8 @@ namespace cppmicroservices
              * See {@code ConfigurationAdminPrivate#NotifyConfigurationRemoved}
              */
             std::shared_ptr<ThreadpoolSafeFuturePrivate> NotifyConfigurationRemoved(std::string const& pid,
-                                                            std::uintptr_t configurationId,
-                                                            unsigned long changeCount) override;
+                                                                                    std::uintptr_t configurationId,
+                                                                                    unsigned long changeCount) override;
 
             // methods from the cppmicroservices::ServiceTrackerCustomizer interface for ManagedService
             std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedService>> AddingService(
@@ -240,15 +240,20 @@ namespace cppmicroservices
                 ServiceReference<cppmicroservices::service::cm::ManagedServiceFactory> const& reference,
                 std::shared_ptr<TrackedServiceWrapper<cppmicroservices::service::cm::ManagedServiceFactory>> const&
                     service) override;
-
-            // Used by tests to avoid race conditions and CMBundleExtension destructor to make sure all asynchronous
-            // threads have completed.
+            // Used by tests to avoid race conditions
+            // Used by CMActivator to ensure all async work is finished BEFORE shutdown
             void WaitForAllAsync();
+
+            //  prohibits any further async work from being queued in the CMAsyncWorkService
+            void StopAndWaitForAllAsync();
 
           private:
             // Convenience wrapper which is used to perform asyncronous operations
             template <typename Functor>
             std::shared_ptr<ThreadpoolSafeFuturePrivate> PerformAsync(Functor&& f);
+
+            // Flag set to false when the activator has stopped the bundle
+            bool active = true;
 
             // Used to generate a random instance name for CreateFactoryConfiguration
             std::string RandomInstanceName();

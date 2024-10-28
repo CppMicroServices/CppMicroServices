@@ -22,7 +22,6 @@
 
 #include "TestFixture.hpp"
 #include "gtest/gtest.h"
-
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/ServiceObjects.h"
 
@@ -50,7 +49,7 @@ namespace test
         // starting the bundle which defines the service.
         auto configuration = configAdminService->GetConfiguration("sample::ServiceComponentCA02");
         configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-            {"foo", true}
+            { "foo", true }
         });
 
         // Install and start the bundle which has the service
@@ -95,7 +94,7 @@ namespace test
                              ready.wait();
                              auto configuration = configAdminService->GetConfiguration("sample::ServiceComponentCA02");
                              configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                                 {"foo", true}
+                                 { "foo", true }
                              });
                          });
 
@@ -149,7 +148,7 @@ namespace test
 
         configuration
             ->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", true}
+                { "foo", true }
         })
             .second.get();
 
@@ -284,8 +283,7 @@ namespace test
         auto fut1 = configuration1->Update(props1);
         fut1.wait();
         auto service0 = GetInstance<test::CAInterface>();
-        ASSERT_TRUE(service0)
-            << "Factory instance should be created when a '~' configuration is added";
+        ASSERT_TRUE(service0) << "Factory instance should be created when a '~' configuration is added";
         ASSERT_TRUE(service0->GetProperties().find("uniqueKey")->second == 6);
 
         testBundle.Stop();

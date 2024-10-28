@@ -26,7 +26,11 @@
 #include <cppmicroservices/Bundle.h>
 #include <cppmicroservices/BundleContext.h>
 #include <cppmicroservices/ServiceReference.h>
-
+#include "boost/asio/async_result.hpp"
+#include "boost/asio/packaged_task.hpp"
+#include "boost/asio/post.hpp"
+#include "boost/asio/thread_pool.hpp"
+#include <cppmicroservices/asyncworkservice/AsyncWorkService.hpp>
 #include <random>
 #include <string>
 
@@ -102,6 +106,20 @@ namespace test
      * Method to check if a bundle is loaded in current process
      */
     bool isBundleLoadedInThisProcess(std::string bundleName);
+
+    class AsyncWorkServiceThreadPool : public cppmicroservices::async::AsyncWorkService
+    {
+      public:
+        AsyncWorkServiceThreadPool(int nThreads);
+
+        ~AsyncWorkServiceThreadPool() override;
+
+        void
+        post(std::packaged_task<void()>&& task) override;
+
+      private:
+        std::shared_ptr<boost::asio::thread_pool> threadpool;
+    };
 
 } // namespace test
 

@@ -401,14 +401,13 @@ namespace cppmicroservices
 
                     // this method is used when injection is false and default constructor is provided by the
                     // implementation class
-                    template <
-                        class C = T,
-                        class I = Injection,
-                        class InjectionFalse = typename std::enable_if<I::value == false>::type,
-                        class IsDefaultConstructible = typename std::enable_if<
-                            std::is_default_constructible<C>::value
-                            && !std::is_constructible<C, std::shared_ptr<cppmicroservices::AnyMap> const&>::
-                                   value>::type>
+                    template <class C = T,
+                              class I = Injection,
+                              class InjectionFalse = typename std::enable_if<I::value == false>::type,
+                              class IsDefaultConstructible = typename std::enable_if<
+                                  std::is_default_constructible<C>::value
+                                  && !std::is_constructible<C, std::shared_ptr<cppmicroservices::AnyMap> const&>::
+                                         value>::type>
                     std::shared_ptr<T>
                     DoCreate(bool)
                     {
@@ -444,14 +443,12 @@ namespace cppmicroservices
                     DoCreate(bool, bool = true, bool = true)
                     {
                         static_assert(std::is_default_constructible<C>::value,
-                                      "An appropriate constructor was not found "
-                                      "and/or the service implementation does not implement all of the "
-                                      "service interface's methods. A default constructor or a constructor "
-                                      "with an AnyMap input parameter for the configuration properties is "
-                                      "required when inject-references is false. This error can also be "
-                                      "triggered when inheriting from "
-                                      "cppmicroservices::service::component::usrDefinedMethodAssertion "
-                                      "without properly defining the Modified, Activate, and Deactivate methods");
+                                      "An appropriate constructor was not found and/or the service implementation does "
+                                      "not implement all of the service interface's methods. "
+                                      "A default constructor or a constructor with an AnyMap input parameter for the "
+                                      "configuration properties is required when inject-references is false. "
+                                      "A properly defined Modified, Activate, and Deactivate method are required when "
+                                      "inheriting from usrDefinedMethodAssertion.");
                         return nullptr;
                     }
 

@@ -47,7 +47,7 @@ namespace
     {
       public:
         ServiceComponentWrongModifiedSig() = default;
-        ~ServiceComponentWrongModifiedSig() = default;
+        ~ServiceComponentWrongModifiedSig() override = default;
 
         void
         Activate(std::shared_ptr<ComponentContext> const& /*context*/) override

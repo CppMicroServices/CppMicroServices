@@ -49,15 +49,15 @@ namespace
     {
       public:
         ServiceComponentWrongDeactivateSig() = default;
-        ~ServiceComponentWrongDeactivateSig() = default;
+        ~ServiceComponentWrongDeactivateSig() override = default;
 
         void
         Modified(std::shared_ptr<ComponentContext> const& /*context*/,
-                 std::shared_ptr<cppmicroservices::AnyMap> const& /*configuration*/)
+                 std::shared_ptr<cppmicroservices::AnyMap> const& /*configuration*/) override
         {
         }
         void
-        Activate(std::shared_ptr<ComponentContext> const& /*context*/)
+        Activate(std::shared_ptr<ComponentContext> const& /*context*/) override
         {
         }
     };

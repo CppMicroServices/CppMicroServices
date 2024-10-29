@@ -256,6 +256,12 @@ namespace cppmicroservices
         }
     }
 
+    any_map::const_iter
+    any_map::const_iter::operator=(any_map::const_iter const& x)
+    {
+        return any_map::const_iter(x);
+    }
+
     any_map::const_iter::reference
     any_map::const_iter::operator*() const
     {

@@ -32,14 +32,6 @@ namespace cppmicroservices::service::component
       public:
         virtual ~usrDefinedMethodAssertion() = default;
 
-        // Default the copy constructor and copy assignment operator
-        usrDefinedMethodAssertion(usrDefinedMethodAssertion const&) = default;
-        usrDefinedMethodAssertion& operator=(usrDefinedMethodAssertion const&) = default;
-
-        // Default the move constructor and move assignment operator
-        usrDefinedMethodAssertion(usrDefinedMethodAssertion&&) noexcept = default;
-        usrDefinedMethodAssertion& operator=(usrDefinedMethodAssertion&&) noexcept = default;
-
         virtual void Modified(std::shared_ptr<ComponentContext> const& context,
                               std::shared_ptr<cppmicroservices::AnyMap> const& configuration)
             = 0;

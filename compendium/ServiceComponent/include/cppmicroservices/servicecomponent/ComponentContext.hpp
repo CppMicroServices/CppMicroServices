@@ -239,58 +239,6 @@ namespace cppmicroservices
                                                                           std::string const& type) const
                     = 0;
             };
-
-            // Helper struct to check for the existence of the Modified method
-            template <typename T, typename = void>
-            struct HasModifiedMethod : std::false_type
-            {
-            };
-
-            template <typename T>
-            struct HasModifiedMethod<T,
-                                     std::void_t<decltype(std::declval<T>().Modified(
-                                         std::declval<std::shared_ptr<ComponentContext> const&>(),
-                                         std::declval<std::shared_ptr<cppmicroservices::AnyMap> const&>()))>>
-                : std::true_type
-            {
-            };
-
-            // Helper struct to check for the existence of the Activate method
-            template <typename T, typename = void>
-            struct HasActivateMethod : std::false_type
-            {
-            };
-
-            template <typename T>
-            struct HasActivateMethod<T,
-                                     std::void_t<decltype(std::declval<T>().Activate(
-                                         std::declval<std::shared_ptr<ComponentContext> const&>()))>> : std::true_type
-            {
-            };
-
-            // Helper struct to check for the existence of the Deactivate method
-            template <typename T, typename = void>
-            struct HasDeactivateMethod : std::false_type
-            {
-            };
-
-            template <typename T>
-            struct HasDeactivateMethod<T,
-                                       std::void_t<decltype(std::declval<T>().Deactivate(
-                                           std::declval<std::shared_ptr<ComponentContext> const&>()))>> : std::true_type
-            {
-            };
-
-            // Variable templates for easier usage
-            template <typename T>
-            constexpr bool HasModifiedMethod_v = HasModifiedMethod<T>::value;
-
-            template <typename T>
-            constexpr bool HasActivateMethod_v = HasActivateMethod<T>::value;
-
-            template <typename T>
-            constexpr bool HasDeactivateMethod_v = HasDeactivateMethod<T>::value;
-
         } // namespace component
     } // namespace service
 } // namespace cppmicroservices

@@ -17,8 +17,6 @@ namespace sample
         result.append(foo->Description());
         return result;
     }
-    // ServiceComponentWrongBindSig::Bindfoo(std::shared_ptr<test::Interface1> const& theFoo, bool /*someBool*/)
-    // ServiceComponentWrongBindSig::Bindfoo(std::shared_ptr<test::Interface1> const& theFoo)
 
     void
     ServiceComponentWrongBindSig::Bindfoo(std::shared_ptr<test::Interface1> const& theFoo)
@@ -29,8 +27,6 @@ namespace sample
             foo = theFoo;
         }
     }
-    // ServiceComponentWrongBindSig::Unbindfoo(std::shared_ptr<test::Interface1> const& theFoo, bool /*someBool*/)
-    // ServiceComponentWrongBindSig::Unbindfoo(std::shared_ptr<test::Interface1> const& theFoo)
 
     void
     ServiceComponentWrongBindSig::Unbindfoo(std::shared_ptr<test::Interface1> const& theFoo)

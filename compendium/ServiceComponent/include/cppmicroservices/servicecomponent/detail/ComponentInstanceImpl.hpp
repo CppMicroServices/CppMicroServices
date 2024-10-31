@@ -473,7 +473,9 @@ namespace cppmicroservices
                                       "service interface's methods. A constructor with service reference "
                                       "input parameters or a constructor with an AnyMap input parameter for "
                                       "configuration properties and service reference input parameters is "
-                                      "required when inject-references is true. ");
+                                      "required when inject-references is true. A properly defined Modified, Activate, "
+                                      "and Deactivate method are required when "
+                                      "inheriting from usrDefinedMethodAssertion.");
                         return nullptr;
                     }
 

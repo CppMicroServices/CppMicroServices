@@ -112,7 +112,7 @@ namespace codegen
                     {
                         mStrStream << "  binders.push_back("
                                    << util::Substitute(
-                                          datamodel::GetReferenceBinderStr(ref, componentInfo.injectReferences),
+                                          datamodel::GetReferenceBinderStr(ref),
                                           componentInfo.implClassName)
                                    << ");" << std::endl;
                     }

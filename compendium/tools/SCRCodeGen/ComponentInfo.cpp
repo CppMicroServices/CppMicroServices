@@ -99,15 +99,12 @@ namespace codegen
         }
 
         std::string
-        GetReferenceBinderStr(ReferenceInfo const& ref, bool injectReferences)
+        GetReferenceBinderStr(ReferenceInfo const& ref)
         {
             std::stringstream binderObjStr;
-            if (injectReferences && ref.policy == "dynamic")
-            {
-                binderObjStr << "std::make_shared<scd::DynamicBinder<{0}, "
-                             << ref.interface << ">>(\"" + ref.name + "\"" << ", &{0}::Bind" << ref.name
-                             << ", &{0}::Unbind" << ref.name << ")";
-            }
+            binderObjStr << "std::make_shared<scd::DynamicBinder<{0}, "
+                         << ref.interface << ">>(\"" + ref.name + "\"" << ", &{0}::Bind" << ref.name
+                         << ", &{0}::Unbind" << ref.name << ")";
             return binderObjStr.str();
         }
 

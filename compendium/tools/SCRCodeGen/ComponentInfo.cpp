@@ -64,7 +64,7 @@ namespace codegen
             auto sep = ", ";
             for (auto const& reference : compInfo.references)
             {
-                if ((true == compInfo.injectReferences) && (reference.policy == "static"))
+                if (compInfo.injectReferences && reference.policy == "static")
                 {
                     if (reference.cardinality == "0..n" || reference.cardinality == "1..n")
                     {
@@ -88,7 +88,7 @@ namespace codegen
             resultStr << "{{";
             for (auto const& reference : compInfo.references)
             {
-                if ((true == compInfo.injectReferences) && (reference.policy == "static"))
+                if (compInfo.injectReferences && reference.policy == "static")
                 {
                     resultStr << sep << "\"" << reference.name << "\"";
                     sep = ", ";
@@ -101,9 +101,8 @@ namespace codegen
         std::string
         GetReferenceBinderStr(ReferenceInfo const& ref, bool injectReferences)
         {
-            auto isDynamic = (ref.policy == "dynamic");
             std::stringstream binderObjStr;
-            if (isDynamic && injectReferences)
+            if (injectReferences && ref.policy == "dynamic")
             {
                 binderObjStr << "std::make_shared<scd::DynamicBinder<{0}, "
                              << ref.interface << ">>(\"" + ref.name + "\"" << ", &{0}::Bind" << ref.name

@@ -99,7 +99,7 @@ namespace codegen
                            << "{" << std::endl;
 
                 auto isReferencesEmpty = componentInfo.references.empty();
-                if (false == isReferencesEmpty)
+                if (!isReferencesEmpty)
                 {
                     mStrStream << util::Substitute("  std::vector<std::shared_ptr<scd::Binder<{0}>>> binders;",
                                                    componentInfo.implClassName)
@@ -108,7 +108,7 @@ namespace codegen
 
                 for (auto const& ref : componentInfo.references)
                 {
-                    if ((true == componentInfo.injectReferences) && (ref.policy == "dynamic"))
+                    if (componentInfo.injectReferences && ref.policy == "dynamic")
                     {
                         mStrStream << "  binders.push_back("
                                    << util::Substitute(
@@ -123,7 +123,7 @@ namespace codegen
                     << componentInfo.implClassName << ", std::tuple<"
                     << datamodel::GetServiceInterfacesStr(componentInfo.service) << ">";
 
-                if (true == isReferencesEmpty)
+                if (isReferencesEmpty)
                 {
                     mStrStream << ">();";
                 }

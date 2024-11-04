@@ -256,10 +256,28 @@ namespace cppmicroservices
         }
     }
 
-    any_map::const_iter
+    any_map::const_iter&
     any_map::const_iter::operator=(any_map::const_iter const& x)
     {
-        return any_map::const_iter(x);
+        iterator_base::operator=(x);
+        switch (type)
+        {
+            case ORDERED:
+                this->it.o = new ociter(x.o_it());
+                break;
+            case UNORDERED:
+                this->it.uo = new uociter(x.uo_it());
+                break;
+            case UNORDERED_CI:
+                this->it.uoci = new uocciiter(x.uoci_it());
+                break;
+            case NONE:
+                this->it = {nullptr};
+                break;
+            default:
+                throw std::logic_error("invalid iterator type");
+        }
+        return *this;
     }
 
     any_map::const_iter::reference

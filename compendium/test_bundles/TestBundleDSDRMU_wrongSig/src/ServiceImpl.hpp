@@ -11,9 +11,9 @@ using ComponentContext = cppmicroservices::service::component::ComponentContext;
 namespace sample
 {
 
-    class ServiceComponentWrongBindSig final
+    class ServiceComponentWrongBindSig
         : public test::Interface2
-        , cppmicroservices::service::component::usrDefinedMethodAssertion
+        , cppmicroservices::service::component::usrDefinedMethodAssertion<ServiceComponentWrongBindSig>
     {
       public:
         ServiceComponentWrongBindSig() = default;
@@ -23,8 +23,6 @@ namespace sample
         void Bindfoo(std::shared_ptr<test::Interface1> const& theFoo);
         void Unbindfoo(std::shared_ptr<test::Interface1> const& theFoo);
 
-        // void Bindfoo(std::shared_ptr<test::Interface1> const& theFoo, bool /*someBool*/);
-        // void Unbindfoo(std::shared_ptr<test::Interface1> const& theFoo, bool /*someBool*/);
         void Modified(std::shared_ptr<ComponentContext> const& context,
                       std::shared_ptr<cppmicroservices::AnyMap> const& configuration);
         void Activate(std::shared_ptr<ComponentContext> const& context);

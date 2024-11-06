@@ -23,8 +23,8 @@
 #include "gtest/gtest.h"
 
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
-#include "cppmicroservices/servicecomponent/usrDefinedMethodAssertion.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#include "cppmicroservices/servicecomponent/usrDefinedMethodAssertion.hpp"
 #include <cppmicroservices/ServiceInterface.h>
 
 using cppmicroservices::service::component::detail::ComponentInstanceImpl;
@@ -38,7 +38,7 @@ namespace
 
     class ServiceComponentWrongActivateSig final
         : public TestServiceInterface1
-        , public cppmicroservices::service::component::usrDefinedMethodAssertion
+        , public cppmicroservices::service::component::usrDefinedMethodAssertion<ServiceComponentWrongActivateSig>
     {
       public:
         ServiceComponentWrongActivateSig() = default;
@@ -46,20 +46,21 @@ namespace
 
         void
         Modified(std::shared_ptr<ComponentContext> const& /*context*/,
-                 std::shared_ptr<cppmicroservices::AnyMap> const& /*configuration*/) override
+                 std::shared_ptr<cppmicroservices::AnyMap> const& /*configuration*/)
         {
         }
         void
-        Deactivate(std::shared_ptr<ComponentContext> const& /*context*/) override
+        Deactivate(std::shared_ptr<ComponentContext> const& /*context*/)
         {
         }
     };
 
     TEST(ComponentInstance, ValidateActivateMethod)
     {
-        ComponentInstanceImpl<
-            ServiceComponentWrongActivateSig,
-            std::tuple<TestServiceInterface1, cppmicroservices::service::component::usrDefinedMethodAssertion>>
+        ComponentInstanceImpl<ServiceComponentWrongActivateSig,
+                              std::tuple<TestServiceInterface1,
+                                         cppmicroservices::service::component::usrDefinedMethodAssertion<
+                                             ServiceComponentWrongActivateSig>>>
             compInstance; // compile
                           // error
     }

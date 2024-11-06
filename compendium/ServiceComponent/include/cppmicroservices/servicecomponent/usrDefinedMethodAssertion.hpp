@@ -27,16 +27,24 @@
 
 namespace cppmicroservices::service::component
 {
-    class usrDefinedMethodAssertion
+    template <typename T>
+    struct usrDefinedMethodAssertion
     {
-      public:
-        virtual ~usrDefinedMethodAssertion() = default;
-
-        virtual void Modified(std::shared_ptr<ComponentContext> const& context,
-                              std::shared_ptr<cppmicroservices::AnyMap> const& configuration)
-            = 0;
-        virtual void Activate(std::shared_ptr<ComponentContext> const& context) = 0;
-        virtual void Deactivate(std::shared_ptr<ComponentContext> const& context) = 0;
+        virtual ~usrDefinedMethodAssertion();
     };
+
+    template <typename T>
+    usrDefinedMethodAssertion<T>::~usrDefinedMethodAssertion()
+    {
+        static_assert(std::is_base_of_v<usrDefinedMethodAssertion<T>, T>);
+
+        static_assert(std::is_void_v<decltype(std::declval<T>().Activate(std::shared_ptr<ComponentContext>()))>);
+
+        static_assert(std::is_void_v<decltype(std::declval<T>().Deactivate(std::shared_ptr<ComponentContext>()))>);
+
+        static_assert(
+            std::is_void_v<decltype(std::declval<T>().Modified(std::shared_ptr<ComponentContext>(),
+                                                               std::shared_ptr<cppmicroservices::AnyMap>()))>);
+    }
 } // namespace cppmicroservices::service::component
 #endif

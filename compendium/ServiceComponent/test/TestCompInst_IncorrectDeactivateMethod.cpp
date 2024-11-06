@@ -30,8 +30,8 @@
 #include "gtest/gtest.h"
 
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
-#include "cppmicroservices/servicecomponent/usrDefinedMethodAssertion.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
+#include "cppmicroservices/servicecomponent/usrDefinedMethodAssertion.hpp"
 #include <cppmicroservices/ServiceInterface.h>
 
 using cppmicroservices::service::component::detail::ComponentInstanceImpl;
@@ -45,28 +45,29 @@ namespace
 
     class ServiceComponentWrongDeactivateSig final
         : public TestServiceInterface1
-        , public cppmicroservices::service::component::usrDefinedMethodAssertion
+        , public cppmicroservices::service::component::usrDefinedMethodAssertion<ServiceComponentWrongDeactivateSig>
     {
       public:
         ServiceComponentWrongDeactivateSig() = default;
-        ~ServiceComponentWrongDeactivateSig() override = default;
+        ~ServiceComponentWrongDeactivateSig() = default;
 
         void
         Modified(std::shared_ptr<ComponentContext> const& /*context*/,
-                 std::shared_ptr<cppmicroservices::AnyMap> const& /*configuration*/) override
+                 std::shared_ptr<cppmicroservices::AnyMap> const& /*configuration*/)
         {
         }
         void
-        Activate(std::shared_ptr<ComponentContext> const& /*context*/) override
+        Activate(std::shared_ptr<ComponentContext> const& /*context*/)
         {
         }
     };
 
     TEST(ComponentInstance, ValidateActivateMethod)
     {
-        ComponentInstanceImpl<
-            ServiceComponentWrongDeactivateSig,
-            std::tuple<TestServiceInterface1, cppmicroservices::service::component::usrDefinedMethodAssertion>>
+        ComponentInstanceImpl<ServiceComponentWrongDeactivateSig,
+                              std::tuple<TestServiceInterface1,
+                                         cppmicroservices::service::component::usrDefinedMethodAssertion<
+                                             ServiceComponentWrongDeactivateSig>>>
             compInstance; // compile error
     }
 } // namespace

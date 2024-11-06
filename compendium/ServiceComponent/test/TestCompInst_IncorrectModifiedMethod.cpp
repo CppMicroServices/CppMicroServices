@@ -33,7 +33,6 @@
 
 using cppmicroservices::service::component::detail::ComponentInstanceImpl;
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
-using usrDefinedMethodAssertion = cppmicroservices::service::component::usrDefinedMethodAssertion;
 
 namespace
 {
@@ -43,18 +42,18 @@ namespace
 
     class ServiceComponentWrongModifiedSig
         : public TestServiceInterface1
-        , public usrDefinedMethodAssertion
+        , public cppmicroservices::service::component::usrDefinedMethodAssertion<ServiceComponentWrongModifiedSig>
     {
       public:
         ServiceComponentWrongModifiedSig() = default;
-        ~ServiceComponentWrongModifiedSig() override = default;
+        ~ServiceComponentWrongModifiedSig() = default;
 
         void
-        Activate(std::shared_ptr<ComponentContext> const& /*context*/) override
+        Activate(std::shared_ptr<ComponentContext> const& /*context*/)
         {
         }
         void
-        Deactivate(std::shared_ptr<ComponentContext> const& /*context*/) override
+        Deactivate(std::shared_ptr<ComponentContext> const& /*context*/)
         {
         }
     };

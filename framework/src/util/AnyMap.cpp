@@ -259,7 +259,7 @@ namespace cppmicroservices
     any_map::const_iter&
     any_map::const_iter::operator=(any_map::const_iter const& x)
     {
-        iterator_base::operator=(x);
+        type = x.type;
         switch (type)
         {
             case ORDERED:

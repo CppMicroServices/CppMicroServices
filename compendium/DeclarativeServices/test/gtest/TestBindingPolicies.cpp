@@ -269,7 +269,7 @@ namespace cppmicroservices
                                                "ServiceComponentWrongBindSig depends on "
                                                "ServiceComponentDynamicGreedyOptionalUnary Interface1",
                                                "",
-                                               "sample::ServiceComponentDynamicGreedyOptionalUnary",
+                                               "sample::ServiceComponentWrongBindSig",
                                                false,
                                                MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
                                                    "ServiceComponentDynamicGreedyOptionalUnary Interface1")) },

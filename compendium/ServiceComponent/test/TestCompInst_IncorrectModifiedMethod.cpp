@@ -29,7 +29,7 @@
 
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
 #include <cppmicroservices/ServiceInterface.h>
-#include "cppmicroservices/servicecomponent/usrDefinedMethodAssertion.hpp"
+#include "cppmicroservices/servicecomponent/UserDefinedMethodAssertion.hpp"
 
 using cppmicroservices::service::component::detail::ComponentInstanceImpl;
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
@@ -42,7 +42,7 @@ namespace
 
     class ServiceComponentWrongModifiedSig
         : public TestServiceInterface1
-        , public cppmicroservices::service::component::usrDefinedMethodAssertion<ServiceComponentWrongModifiedSig>
+        , public cppmicroservices::service::component::UserDefinedMethodAssertion<ServiceComponentWrongModifiedSig>
     {
       public:
         ServiceComponentWrongModifiedSig() = default;

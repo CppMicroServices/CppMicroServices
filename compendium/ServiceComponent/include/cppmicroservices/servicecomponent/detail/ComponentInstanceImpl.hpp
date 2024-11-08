@@ -448,7 +448,7 @@ namespace cppmicroservices
                                       "A default constructor or a constructor with an AnyMap input parameter for the "
                                       "configuration properties is required when inject-references is false. "
                                       "A properly defined Modified, Activate, and Deactivate method are required when "
-                                      "inheriting from usrDefinedMethodAssertion.");
+                                      "inheriting from UserDefinedMethodAssertion.");
                         return nullptr;
                     }
 
@@ -475,7 +475,7 @@ namespace cppmicroservices
                                       "configuration properties and service reference input parameters is "
                                       "required when inject-references is true. A properly defined Modified, Activate, "
                                       "and Deactivate method are required when "
-                                      "inheriting from usrDefinedMethodAssertion.");
+                                      "inheriting from UserDefinedMethodAssertion.");
                         return nullptr;
                     }
 

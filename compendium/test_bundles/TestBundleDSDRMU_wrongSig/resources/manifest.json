@@ -13,7 +13,7 @@
                 "policy" : "dynamic",
                 "interface" : "test::Interface1"
             }],
-            "inject-references": false
+            "inject-references": true
         }]
     }
 }

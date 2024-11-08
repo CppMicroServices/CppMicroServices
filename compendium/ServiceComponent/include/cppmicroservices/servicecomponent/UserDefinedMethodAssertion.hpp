@@ -20,23 +20,23 @@
 
   =============================================================================*/
 
-#ifndef usrDefinedMethodAssertion_hpp
-#define usrDefinedMethodAssertion_hpp
+#ifndef UserDefinedMethodAssertion_hpp
+#define UserDefinedMethodAssertion_hpp
 
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 
 namespace cppmicroservices::service::component
 {
     template <typename T>
-    struct usrDefinedMethodAssertion
+    struct UserDefinedMethodAssertion
     {
-        virtual ~usrDefinedMethodAssertion();
+        virtual ~UserDefinedMethodAssertion();
     };
 
     template <typename T>
-    usrDefinedMethodAssertion<T>::~usrDefinedMethodAssertion()
+    UserDefinedMethodAssertion<T>::~UserDefinedMethodAssertion()
     {
-        static_assert(std::is_base_of_v<usrDefinedMethodAssertion<T>, T>);
+        static_assert(std::is_base_of_v<UserDefinedMethodAssertion<T>, T>);
 
         static_assert(std::is_void_v<decltype(std::declval<T>().Activate(std::shared_ptr<ComponentContext>()))>);
 

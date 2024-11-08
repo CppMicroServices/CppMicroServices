@@ -234,6 +234,31 @@ TEST(AnyMapTest, MoveAssignment)
                                     "the object has been moved from";
 }
 
+TEST(AnyMapTest, CopyAssignment)
+{
+    AnyMap m1 = {
+        AnyMap::ORDERED_MAP,
+        {{ "do", 1}, {"re", 2 }}
+    };
+
+    AnyMap* m2 = new AnyMap{
+        AnyMap::UNORDERED_MAP,
+        {{ "fi", 3}, {"la", 4}}
+    };
+
+    ASSERT_NE(m1, *m2) << "Different maps should not be equal";
+    m1 = *m2;
+    ASSERT_EQ(m1, *m2) << "Copy assignment should result in equal maps";
+
+    delete m2;
+
+    AnyMap m3 = {
+        AnyMap::UNORDERED_MAP,
+        {{ "fi", 3}, {"la", 4}}
+    };
+    ASSERT_EQ(m1, m3) << "Copy-assigned object should own its memory";
+}
+
 TEST(AnyMapTest, CIHash)
 {
     std::string allUpper = "THIS IS A TEST";

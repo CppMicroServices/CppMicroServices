@@ -1,51 +1,62 @@
 {
-    "bundle.symbolic_name" : "TestBindUnbindThrows",
-    "scr" : {
-        "version" : 1,
-        "components" : [{
-            "immediate": true,
-            "implementation-class": "sample::ServiceComponentDGMU",
-            "service": {
-                "interfaces": ["test::Interface2"]
+    "bundle.symbolic_name": "TestBindUnbindThrows",
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "immediate": true,
+                "implementation-class": "sample::ServiceComponentDGMU",
+                "service": {
+                    "interfaces": [
+                        "test::Interface2"
+                    ]
+                },
+                "references": [
+                    {
+                        "name": "foo",
+                        "policy": "dynamic",
+                        "policy-option": "greedy",
+                        "interface": "test::Interface1"
+                    }
+                ]
             },
-            "references":[{
-                "name" : "foo",
-                "policy" : "dynamic",
-                "policy-option" : "greedy",
-                "interface" : "test::Interface1"
-            }],
-            "inject-references": false
-        },
-		{
-		    "immediate": true,
-            "implementation-class": "sample::ServiceComponentDGOU",
-            "service": {
-                "interfaces": ["test::Interface2"]
+            {
+                "immediate": true,
+                "implementation-class": "sample::ServiceComponentDGOU",
+                "service": {
+                    "interfaces": [
+                        "test::Interface2"
+                    ]
+                },
+                "references": [
+                    {
+                        "name": "bar",
+                        "cardinality": "0..1",
+                        "policy": "dynamic",
+                        "policy-option": "greedy",
+                        "interface": "test::Interface1"
+                    }
+                ]
             },
-            "references":[{
-                "name" : "bar",
-				"cardinality" : "0..1",
-                "policy" : "dynamic",
-                "policy-option" : "greedy",
-                "interface" : "test::Interface1"
-            }],
-            "inject-references": false
-		},
-		{
-		    "immediate": true,
-            "implementation-class": "sample::ServiceComponentFactory",
-            "service": {
-			    "scope" : "prototype",
-                "interfaces": ["test::Interface2"]
-            },
-            "references":[{
-                "name" : "factory",
-				"cardinality" : "0..1",
-                "policy" : "dynamic",
-                "policy-option" : "greedy",
-                "interface" : "test::Interface1"
-            }],
-            "inject-references": false
-		}]
+            {
+                "immediate": true,
+                "implementation-class": "sample::ServiceComponentFactory",
+                "service": {
+                    "scope": "prototype",
+                    "interfaces": [
+                        "test::Interface2"
+                    ]
+                },
+                "references": [
+                    {
+                        "name": "factory",
+                        "cardinality": "0..1",
+                        "policy": "dynamic",
+                        "policy-option": "greedy",
+                        "interface": "test::Interface1"
+                    }
+                ]
+            }
+        ]
     }
 }

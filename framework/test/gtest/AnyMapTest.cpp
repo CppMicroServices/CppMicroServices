@@ -241,22 +241,21 @@ TEST(AnyMapTest, CopyAssignment)
         {{ "do", 1}, {"re", 2 }}
     };
 
-    AnyMap* m2 = new AnyMap{
+    AnyMap m2 = {
         AnyMap::UNORDERED_MAP,
         {{ "fi", 3}, {"la", 4}}
     };
 
-    ASSERT_NE(m1, *m2) << "Different maps should not be equal";
-    m1 = *m2;
-    ASSERT_EQ(m1, *m2) << "Copy assignment should result in equal maps";
+    ASSERT_NE(m1, m2) << "Different maps should not be equal";
+    m1 = m2;
+    ASSERT_EQ(m1, m2) << "Copy assignment should result in equal maps";
 
-    delete m2;
-
+    m2.erase("fi");
     AnyMap m3 = {
         AnyMap::UNORDERED_MAP,
         {{ "fi", 3}, {"la", 4}}
     };
-    ASSERT_EQ(m1, m3) << "Copy-assigned object should own its memory";
+    ASSERT_EQ(m1, m3) << "Copied map should not reference its creator";
 }
 
 TEST(AnyMapTest, CIHash)

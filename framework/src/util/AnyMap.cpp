@@ -365,6 +365,10 @@ namespace cppmicroservices
     bool
     any_map::const_iter::operator==(iterator const& x) const
     {
+        if (type != x.type)
+        {
+            return false;
+        }
         switch (type)
         {
             case ORDERED:
@@ -374,7 +378,7 @@ namespace cppmicroservices
             case UNORDERED_CI:
                 return uoci_it() == x.uoci_it();
             case NONE:
-                return x.type == NONE;
+                return true;
             default:
                 throw std::logic_error("invalid iterator type");
         }

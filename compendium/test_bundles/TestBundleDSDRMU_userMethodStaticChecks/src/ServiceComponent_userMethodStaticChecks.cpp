@@ -5,21 +5,21 @@ namespace sample
 {
 
     std::string
-    ServiceComponentWrongBindSig::ExtendedDescription()
+    ServiceComponent_userMethodStaticChecks::ExtendedDescription()
     {
         std::lock_guard<std::mutex> lock(fooMutex);
         if (!foo)
         {
             throw std::runtime_error("Dependency not available");
         }
-        std::string result("ServiceComponentWrongBindSig ");
+        std::string result("ServiceComponent_userMethodStaticChecks ");
         result.append("depends on ");
         result.append(foo->Description());
         return result;
     }
 
     void
-    ServiceComponentWrongBindSig::Bindfoo(std::shared_ptr<test::Interface1> const& theFoo)
+    ServiceComponent_userMethodStaticChecks::Bindfoo(std::shared_ptr<test::Interface1> const& theFoo)
     {
         std::lock_guard<std::mutex> lock(fooMutex);
         if (foo != theFoo)
@@ -29,7 +29,7 @@ namespace sample
     }
 
     void
-    ServiceComponentWrongBindSig::Unbindfoo(std::shared_ptr<test::Interface1> const& theFoo)
+    ServiceComponent_userMethodStaticChecks::Unbindfoo(std::shared_ptr<test::Interface1> const& theFoo)
     {
         std::lock_guard<std::mutex> lock(fooMutex);
         if (foo == theFoo)
@@ -38,16 +38,16 @@ namespace sample
         }
     }
     void
-    ServiceComponentWrongBindSig::Modified(std::shared_ptr<ComponentContext> const& /*context*/,
+    ServiceComponent_userMethodStaticChecks::Modified(std::shared_ptr<ComponentContext> const& /*context*/,
                                            std::shared_ptr<cppmicroservices::AnyMap> const& /*configuration*/)
     {
     }
     void
-    ServiceComponentWrongBindSig::Activate(std::shared_ptr<ComponentContext> const& /*context*/)
+    ServiceComponent_userMethodStaticChecks::Activate(std::shared_ptr<ComponentContext> const& /*context*/)
     {
     }
     void
-    ServiceComponentWrongBindSig::Deactivate(std::shared_ptr<ComponentContext> const& /*context*/)
+    ServiceComponent_userMethodStaticChecks::Deactivate(std::shared_ptr<ComponentContext> const& /*context*/)
     {
     }
 } // namespace sample

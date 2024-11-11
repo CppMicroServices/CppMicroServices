@@ -11,13 +11,13 @@ using ComponentContext = cppmicroservices::service::component::ComponentContext;
 namespace sample
 {
 
-    class ServiceComponentWrongBindSig
+    class ServiceComponent_userMethodStaticChecks
         : public test::Interface2
-        , cppmicroservices::service::component::UserDefinedMethodAssertion<ServiceComponentWrongBindSig>
+        , cppmicroservices::service::component::UserDefinedMethodAssertion<ServiceComponent_userMethodStaticChecks>
     {
       public:
-        ServiceComponentWrongBindSig() = default;
-        ~ServiceComponentWrongBindSig() = default;
+        ServiceComponent_userMethodStaticChecks() = default;
+        ~ServiceComponent_userMethodStaticChecks() = default;
         std::string ExtendedDescription() override;
 
         void Bindfoo(std::shared_ptr<test::Interface1> const& theFoo);

@@ -1,10 +1,10 @@
 {
-    "bundle.symbolic_name" : "TestBundleDSDRMU_wrongSig",
+    "bundle.symbolic_name" : "TestBundleDSDRMU_userMethodStaticChecks",
     "scr" : {
         "version" : 1,
         "components" : [{
             "immediate": true,
-            "implementation-class": "sample::ServiceComponentWrongBindSig",
+            "implementation-class": "sample::ServiceComponent_userMethodStaticChecks",
             "service": {
                 "interfaces": ["test::Interface2"]
             },

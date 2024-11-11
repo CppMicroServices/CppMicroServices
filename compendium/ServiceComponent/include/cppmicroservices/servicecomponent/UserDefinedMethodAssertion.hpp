@@ -38,13 +38,15 @@ namespace cppmicroservices::service::component
     {
         static_assert(std::is_base_of_v<UserDefinedMethodAssertion<T>, T>);
 
-        static_assert(std::is_void_v<decltype(std::declval<T>().Activate(std::shared_ptr<ComponentContext>()))>);
+        static_assert(std::is_void_v<decltype(std::declval<T>().Activate(std::shared_ptr<ComponentContext>()))>,
+                      "Error: An appropriate Activate method was not found.");
 
-        static_assert(std::is_void_v<decltype(std::declval<T>().Deactivate(std::shared_ptr<ComponentContext>()))>);
+        static_assert(std::is_void_v<decltype(std::declval<T>().Deactivate(std::shared_ptr<ComponentContext>()))>,
+                      "Error: An appropriate Deactivate method was not found.");
 
-        static_assert(
-            std::is_void_v<decltype(std::declval<T>().Modified(std::shared_ptr<ComponentContext>(),
-                                                               std::shared_ptr<cppmicroservices::AnyMap>()))>);
+        static_assert(std::is_void_v<decltype(std::declval<T>().Modified(std::shared_ptr<ComponentContext>(),
+                                                                         std::shared_ptr<cppmicroservices::AnyMap>()))>,
+                      "Error: An appropriate Modified method was not found.");
     }
 } // namespace cppmicroservices::service::component
 #endif

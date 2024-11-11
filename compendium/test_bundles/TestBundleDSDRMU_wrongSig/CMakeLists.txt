@@ -1,8 +1,0 @@
-usFunctionCreateDSTestBundle(TestBundleDSDRMU_wrongSig)
-
-usFunctionCreateTestBundleWithResources(TestBundleDSDRMU_wrongSig
-  SOURCES src/ServiceComponentWrongBindSig.cpp ${_glue_file}
-  RESOURCES manifest.json
-  BUNDLE_SYMBOLIC_NAME TestBundleDSDRMU_wrongSig
-  OTHER_LIBRARIES usTestInterfaces usServiceComponent usServiceComponent)
-

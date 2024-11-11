@@ -265,11 +265,11 @@ namespace cppmicroservices
                                                false,
                                                MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
                                                    "ServiceComponentDynamicReluctantMandatoryUnary Interface1")) },
-                            DynamicRefPolicy { "TestBundleDSDRMU_wrongSig",
-                                               "ServiceComponentWrongBindSig depends on "
+                            DynamicRefPolicy { "TestBundleDSDRMU_userMethodStaticChecks",
+                                               "ServiceComponent_userMethodStaticChecks depends on "
                                                "ServiceComponentDynamicGreedyOptionalUnary Interface1",
                                                "",
-                                               "sample::ServiceComponentWrongBindSig",
+                                               "sample::ServiceComponent_userMethodStaticChecks",
                                                false,
                                                MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
                                                    "ServiceComponentDynamicGreedyOptionalUnary Interface1")) },

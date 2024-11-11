@@ -24,9 +24,48 @@
 #define UserDefinedMethodAssertion_hpp
 
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
+#include <type_traits>
 
 namespace cppmicroservices::service::component
 {
+    // Helper template to check for the existence of a method
+    template <typename, typename = std::void_t<>>
+    struct has_activate_method : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct has_activate_method<T,
+                               std::void_t<decltype(std::declval<T>().Activate(std::shared_ptr<ComponentContext>()))>>
+        : std::true_type
+    {
+    };
+
+    template <typename, typename = std::void_t<>>
+    struct has_deactivate_method : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct has_deactivate_method<
+        T,
+        std::void_t<decltype(std::declval<T>().Deactivate(std::shared_ptr<ComponentContext>()))>> : std::true_type
+    {
+    };
+
+    template <typename, typename = std::void_t<>>
+    struct has_modified_method : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct has_modified_method<
+        T,
+        std::void_t<decltype(std::declval<T>().Modified(std::shared_ptr<ComponentContext>(),
+                                                        std::shared_ptr<cppmicroservices::AnyMap>()))>> : std::true_type
+    {
+    };
+
     template <typename T>
     struct UserDefinedMethodAssertion
     {
@@ -36,17 +75,12 @@ namespace cppmicroservices::service::component
     template <typename T>
     UserDefinedMethodAssertion<T>::~UserDefinedMethodAssertion()
     {
-        static_assert(std::is_base_of_v<UserDefinedMethodAssertion<T>, T>);
+        static_assert(std::is_base_of_v<UserDefinedMethodAssertion<T>, T>,
+                      "T must derive from UserDefinedMethodAssertion<T>");
 
-        static_assert(std::is_void_v<decltype(std::declval<T>().Activate(std::shared_ptr<ComponentContext>()))>,
-                      "Error: An appropriate Activate method was not found.");
-
-        static_assert(std::is_void_v<decltype(std::declval<T>().Deactivate(std::shared_ptr<ComponentContext>()))>,
-                      "Error: An appropriate Deactivate method was not found.");
-
-        static_assert(std::is_void_v<decltype(std::declval<T>().Modified(std::shared_ptr<ComponentContext>(),
-                                                                         std::shared_ptr<cppmicroservices::AnyMap>()))>,
-                      "Error: An appropriate Modified method was not found.");
+        static_assert(has_activate_method<T>::value, "Error: An appropriate Activate method was not found.");
+        static_assert(has_deactivate_method<T>::value, "Error: An appropriate Deactivate method was not found.");
+        static_assert(has_modified_method<T>::value, "Error: An appropriate Modified method was not found.");
     }
 } // namespace cppmicroservices::service::component
 #endif

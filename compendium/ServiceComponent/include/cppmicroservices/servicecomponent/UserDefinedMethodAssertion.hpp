@@ -78,9 +78,18 @@ namespace cppmicroservices::service::component
         static_assert(std::is_base_of_v<UserDefinedMethodAssertion<T>, T>,
                       "T must derive from UserDefinedMethodAssertion<T>");
 
-        static_assert(has_activate_method<T>::value, "Error: An appropriate Activate method was not found.");
-        static_assert(has_deactivate_method<T>::value, "Error: An appropriate Deactivate method was not found.");
-        static_assert(has_modified_method<T>::value, "Error: An appropriate Modified method was not found.");
+        static_assert(has_activate_method<T>::value,
+                      "Error: An Activate method was not found with the appropriate signature: void "
+                      "Activate(std::shared_ptr<ComponentContext> const&)");
+
+        static_assert(has_deactivate_method<T>::value,
+                      "Error: A Deactivate method was not found with the appropriate signature: void "
+                      "Deactivate(std::shared_ptr<ComponentContext> const&)");
+
+        static_assert(has_modified_method<T>::value,
+                      "Error: A Modified method was not found with the appropriate signature: void "
+                      "Modified(std::shared_ptr<ComponentContext> const&, "
+                      "std::shared_ptr<cppmicroservices::AnyMap> const&)");
     }
 } // namespace cppmicroservices::service::component
 #endif

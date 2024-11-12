@@ -1,19 +1,53 @@
 {
-    "bundle.symbolic_name" : "TestBundleDSDRMU_userMethodStaticChecks",
-    "scr" : {
-        "version" : 1,
-        "components" : [{
-            "immediate": true,
-            "implementation-class": "sample::ServiceComponent_userMethodStaticChecks",
-            "service": {
-                "interfaces": ["test::Interface2"]
-            },
-            "references":[{
-                "name" : "foo",
-                "policy" : "dynamic",
-                "interface" : "test::Interface1"
-            }],
-            "inject-references": true
-        }]
-    }
+  "bundle.symbolic_name": "TestBundleDSDRMU_userMethodStaticChecks",
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "immediate": true,
+        "implementation-class": "sample::ServiceComponent_userMethodStaticChecks",
+        "service": {
+          "interfaces": ["test::Interface2"]
+        },
+        "references": [
+          {
+            "name": "foo",
+            "policy": "dynamic",
+            "interface": "test::DSGraph01"
+          }
+        ],
+        "inject-references": true
+      },
+      {
+        "immediate": true,
+        "implementation-class": "sample::ServiceComponent_userDSMethodStaticChecks",
+        "service": {
+          "interfaces": ["test::Interface2"]
+        },
+        "references": [
+          {
+            "name": "foo",
+            "policy": "dynamic",
+            "interface": "test::DSGraph02"
+          }
+        ],
+        "inject-references": true
+      },
+      {
+        "immediate": true,
+        "implementation-class": "sample::ServiceComponent_userCAMethodStaticChecks",
+        "service": {
+          "interfaces": ["test::Interface2"]
+        },
+        "references": [
+          {
+            "name": "foo",
+            "policy": "dynamic",
+            "interface": "test::DSGraph03"
+          }
+        ],
+        "inject-references": true
+      }
+    ]
+  }
 }

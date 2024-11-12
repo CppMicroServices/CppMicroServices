@@ -20,8 +20,8 @@
 
   =============================================================================*/
 
-#ifndef UserDefinedMethodAssertion_hpp
-#define UserDefinedMethodAssertion_hpp
+#ifndef UserDefinedMethodVerification_hpp
+#define UserDefinedMethodVerification_hpp
 
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 #include <type_traits>
@@ -67,16 +67,22 @@ namespace cppmicroservices::service::component
     };
 
     template <typename T>
-    struct UserDefinedMethodAssertion
+    struct UserDefinedDSMethodVerification
     {
-        virtual ~UserDefinedMethodAssertion();
+        virtual ~UserDefinedDSMethodVerification();
     };
 
     template <typename T>
-    UserDefinedMethodAssertion<T>::~UserDefinedMethodAssertion()
+    struct UserDefinedCAMethodVerification
     {
-        static_assert(std::is_base_of_v<UserDefinedMethodAssertion<T>, T>,
-                      "T must derive from UserDefinedMethodAssertion<T>");
+        virtual ~UserDefinedCAMethodVerification();
+    };
+
+    template <typename T>
+    UserDefinedDSMethodVerification<T>::~UserDefinedDSMethodVerification()
+    {
+        static_assert(std::is_base_of_v<UserDefinedDSMethodVerification<T>, T>,
+                      "T must derive from UserDefinedDSMethodVerification<T>");
 
         static_assert(has_activate_method<T>::value,
                       "Error: An Activate method was not found with the appropriate signature: void "
@@ -85,11 +91,22 @@ namespace cppmicroservices::service::component
         static_assert(has_deactivate_method<T>::value,
                       "Error: A Deactivate method was not found with the appropriate signature: void "
                       "Deactivate(std::shared_ptr<ComponentContext> const&)");
+    }
 
+    template <typename T>
+    UserDefinedCAMethodVerification<T>::~UserDefinedCAMethodVerification()
+    {
         static_assert(has_modified_method<T>::value,
                       "Error: A Modified method was not found with the appropriate signature: void "
                       "Modified(std::shared_ptr<ComponentContext> const&, "
                       "std::shared_ptr<cppmicroservices::AnyMap> const&)");
     }
+
+    template <typename T>
+    struct UserDefinedMethodVerification
+        : public UserDefinedDSMethodVerification<T>
+        , public UserDefinedCAMethodVerification<T>
+    {
+    };
 } // namespace cppmicroservices::service::component
 #endif

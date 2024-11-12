@@ -24,7 +24,7 @@
 
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstanceImpl.hpp"
-#include "cppmicroservices/servicecomponent/UserDefinedMethodAssertion.hpp"
+#include "cppmicroservices/servicecomponent/UserDefinedMethodVerification.hpp"
 #include <cppmicroservices/ServiceInterface.h>
 
 using cppmicroservices::service::component::detail::ComponentInstanceImpl;
@@ -38,7 +38,7 @@ namespace
 
     class ServiceComponentWrongActivateSig final
         : public TestServiceInterface1
-        , public cppmicroservices::service::component::UserDefinedMethodAssertion<ServiceComponentWrongActivateSig>
+        , public cppmicroservices::service::component::UserDefinedMethodVerification<ServiceComponentWrongActivateSig>
     {
       public:
         ServiceComponentWrongActivateSig() = default;
@@ -59,7 +59,7 @@ namespace
     {
         ComponentInstanceImpl<ServiceComponentWrongActivateSig,
                               std::tuple<TestServiceInterface1,
-                                         cppmicroservices::service::component::UserDefinedMethodAssertion<
+                                         cppmicroservices::service::component::UserDefinedMethodVerification<
                                              ServiceComponentWrongActivateSig>>>
             compInstance; // compile
                           // error

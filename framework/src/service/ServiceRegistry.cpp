@@ -36,6 +36,12 @@
 namespace cppmicroservices
 {
 
+    std::string
+    removeLeadingNamespacing(std::string const& className)
+    {
+        return className.substr(className.find_first_not_of(':'));
+    }
+
     void
     ServiceRegistry::Clear()
     {
@@ -93,10 +99,10 @@ namespace cppmicroservices
 
         // Check if we got a service factory
         bool isFactory = service->count("org.cppmicroservices.factory") > 0;
-        bool isPrototypeFactory
-            = (isFactory ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(
-                   std::static_pointer_cast<ServiceFactory>(service->find("org.cppmicroservices.factory")->second)))
-                         : false);
+        bool isPrototypeFactory = (isFactory ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(
+                                                   std::static_pointer_cast<ServiceFactory>(
+                                                       service->find("org.cppmicroservices.factory")->second)))
+                                             : false);
 
         std::vector<std::string> classes;
         // Check if service implements claimed classes and that they exist.
@@ -106,7 +112,7 @@ namespace cppmicroservices
             {
                 throw std::invalid_argument("Can't register as null class");
             }
-            classes.push_back(i.first);
+            classes.push_back(removeLeadingNamespacing(i.first));
         }
 
         ServiceRegistrationBase res(bundle,
@@ -246,6 +252,7 @@ namespace cppmicroservices
         else
         {
             auto it = classServices.find(clazz);
+            std::cout << clazz << std::endl;
             if (it != classServices.end())
             {
                 s = it->second.begin();

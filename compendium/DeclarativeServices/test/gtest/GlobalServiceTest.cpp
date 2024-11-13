@@ -40,15 +40,18 @@ namespace test
         auto bundle = ::test::InstallAndStartBundle(context, "GloballyNamespacedInterfaces");
 
         ASSERT_TRUE(bundle);
-        // auto ref = context.GetServiceReference<test::GlobalNS1>();
-        // ASSERT_TRUE(ref);
-        // auto svc = context.GetService(ref);
-        // ASSERT_EQ(svc->Description(), "globalService1");
+        auto ref0 = context.GetServiceReference<test::GlobalNS1>();
+        auto ref1 = context.GetServiceReference<test::GlobalNS1>();
+        ASSERT_TRUE(ref0);
+        ASSERT_TRUE(ref1);
+        auto svc0 = context.GetService(ref0);
+        auto svc1 = context.GetService(ref1);
+        ASSERT_EQ(svc0->Description(), "globalService1");
+        ASSERT_EQ(svc1->Description(), "globalService1");
         ASSERT_TRUE(context.GetServiceReference<test::GlobalNS2>());
-        // ASSERT_TRUE(context.GetServiceReference<::test::GlobalNS1>());
         ASSERT_TRUE(context.GetServiceReference<::test::GlobalNS2>());
     }
 
-    // verify that a DS test whcih is namespaced globally can be retrieved with either ;; or not
+    // verify that a DS test which is namespaced globally can be retrieved with either :: or not
     // verify that a DS test that REFERENCES an interfaced that is globally namespaced
 } // namespace test

@@ -38,6 +38,12 @@ namespace cppmicroservices
         namespace metadata
         {
 
+            std::string
+            removeLeadingNamespacing(std::string const& className)
+            {
+                return className.substr(className.find_first_not_of(':'));
+            }
+
             ServiceMetadata
             MetadataParserImplV1::CreateServiceMetadata(AnyMap const& metadata) const
             {
@@ -50,7 +56,7 @@ namespace cppmicroservices
                                std::end(interfaces),
                                std::back_inserter(serviceMetadata.interfaces),
                                [](auto const& interface)
-                               { return ObjectValidator(interface).GetValue<std::string>(); });
+                               { return removeLeadingNamespacing(ObjectValidator(interface).GetValue<std::string>()); });
 
                 // service.scope
                 auto const object = ObjectValidator(metadata, "scope", /*isOptional=*/true);
@@ -67,7 +73,7 @@ namespace cppmicroservices
 
                 // reference.interface (Mandatory)
                 ObjectValidator(metadata, "interface").AssignValueTo(refMetadata.interfaceName);
-
+                refMetadata.interfaceName = removeLeadingNamespacing(refMetadata.interfaceName);
                 // reference.name (Mandatory)
                 ObjectValidator(metadata, "name").AssignValueTo(refMetadata.name);
 
@@ -271,5 +277,5 @@ namespace cppmicroservices
             }
 
         } // namespace metadata
-    }     // namespace scrimpl
+    } // namespace scrimpl
 } // namespace cppmicroservices

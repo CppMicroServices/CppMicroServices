@@ -84,6 +84,51 @@ namespace test
       private:
         std::string str_;
     };
+
+    class DSImpl1 : public DSGraph01
+    {
+      public:
+        DSImpl1(std::string str) : str_(std::move(str)) {}
+        virtual ~DSImpl1() = default;
+        virtual std::string
+        Description()
+        {
+            return str_;
+        }
+
+      private:
+        std::string str_;
+    };
+
+    class DSImpl2 : public DSGraph02
+    {
+      public:
+        DSImpl2(std::string str) : str_(std::move(str)) {}
+        virtual ~DSImpl2() = default;
+        virtual std::string
+        Description()
+        {
+            return str_;
+        }
+
+      private:
+        std::string str_;
+    };
+
+    class DSImpl3 : public DSGraph03
+    {
+      public:
+        DSImpl3(std::string str) : str_(std::move(str)) {}
+        virtual ~DSImpl3() = default;
+        virtual std::string
+        Description()
+        {
+            return str_;
+        }
+
+      private:
+        std::string str_;
+    };
 } // namespace test
 
 namespace cppmicroservices
@@ -257,38 +302,57 @@ namespace cppmicroservices
         INSTANTIATE_TEST_SUITE_P(
             DynamicReferencePolicies,
             DynamicRefPolicyTest,
-            testing::Values(DynamicRefPolicy { "TestBundleDSDRMU",
-                                               "ServiceComponentDynamicReluctantMandatoryUnary depends on "
-                                               "ServiceComponentDynamicReluctantMandatoryUnary Interface1",
-                                               "",
-                                               "sample::ServiceComponentDynamicReluctantMandatoryUnary",
-                                               false,
-                                               MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
-                                                   "ServiceComponentDynamicReluctantMandatoryUnary Interface1")) },
-                            DynamicRefPolicy { "TestBundleDSDGMU",
-                                               "ServiceComponentDynamicGreedyMandatoryUnary depends on "
-                                               "ServiceComponentDynamicGreedyMandatoryUnary Interface1",
-                                               "",
-                                               "sample::ServiceComponentDynamicGreedyMandatoryUnary",
-                                               false,
-                                               MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
-                                                   "ServiceComponentDynamicGreedyMandatoryUnary Interface1")) },
-                            DynamicRefPolicy { "TestBundleDSDROU",
-                                               "ServiceComponentDynamicReluctantOptionalUnary depends on "
-                                               "ServiceComponentDynamicReluctantOptionalUnary Interface1",
-                                               "ServiceComponentDynamicReluctantOptionalUnary depends on ",
-                                               "sample::ServiceComponentDynamicReluctantOptionalUnary",
-                                               true,
-                                               MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
-                                                   "ServiceComponentDynamicReluctantOptionalUnary Interface1")) },
-                            DynamicRefPolicy { "TestBundleDSDGOU",
-                                               "ServiceComponentDynamicGreedyOptionalUnary depends on "
-                                               "ServiceComponentDynamicGreedyOptionalUnary Interface1",
-                                               "ServiceComponentDynamicGreedyOptionalUnary depends on ",
-                                               "sample::ServiceComponentDynamicGreedyOptionalUnary",
-                                               true,
-                                               MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
-                                                   "ServiceComponentDynamicGreedyOptionalUnary Interface1")) }));
+            testing::Values(
+                DynamicRefPolicy { "TestBundleDSDRMU",
+                                   "ServiceComponentDynamicReluctantMandatoryUnary depends on "
+                                   "ServiceComponentDynamicReluctantMandatoryUnary Interface1",
+                                   "",
+                                   "sample::ServiceComponentDynamicReluctantMandatoryUnary",
+                                   false,
+                                   MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
+                                       "ServiceComponentDynamicReluctantMandatoryUnary Interface1")) },
+                DynamicRefPolicy { "TestBundleDSDRMU_userMethodStaticChecks",
+                                   "ServiceComponent_userMethodStaticChecks depends on DSImpl1",
+                                   "",
+                                   "sample::ServiceComponent_userMethodStaticChecks",
+                                   false,
+                                   MakeInterfaceMap<test::DSGraph01>(std::make_shared<test::DSImpl1>("DSImpl1")) },
+                DynamicRefPolicy { "TestBundleDSDRMU_userMethodStaticChecks",
+                                   "ServiceComponent_userDSMethodStaticChecks depends on DSImpl2",
+                                   "",
+                                   "sample::ServiceComponent_userDSMethodStaticChecks",
+                                   false,
+                                   MakeInterfaceMap<test::DSGraph02>(std::make_shared<test::DSImpl2>("DSImpl2")) },
+                DynamicRefPolicy { "TestBundleDSDRMU_userMethodStaticChecks",
+                                   "ServiceComponent_userCAMethodStaticChecks depends on DSImpl3",
+                                   "",
+                                   "sample::ServiceComponent_userCAMethodStaticChecks",
+                                   false,
+                                   MakeInterfaceMap<test::DSGraph03>(std::make_shared<test::DSImpl3>("DSImpl3")) },
+                DynamicRefPolicy { "TestBundleDSDGMU",
+                                   "ServiceComponentDynamicGreedyMandatoryUnary depends on "
+                                   "ServiceComponentDynamicGreedyMandatoryUnary Interface1",
+                                   "",
+                                   "sample::ServiceComponentDynamicGreedyMandatoryUnary",
+                                   false,
+                                   MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
+                                       "ServiceComponentDynamicGreedyMandatoryUnary Interface1")) },
+                DynamicRefPolicy { "TestBundleDSDROU",
+                                   "ServiceComponentDynamicReluctantOptionalUnary depends on "
+                                   "ServiceComponentDynamicReluctantOptionalUnary Interface1",
+                                   "ServiceComponentDynamicReluctantOptionalUnary depends on ",
+                                   "sample::ServiceComponentDynamicReluctantOptionalUnary",
+                                   true,
+                                   MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
+                                       "ServiceComponentDynamicReluctantOptionalUnary Interface1")) },
+                DynamicRefPolicy { "TestBundleDSDGOU",
+                                   "ServiceComponentDynamicGreedyOptionalUnary depends on "
+                                   "ServiceComponentDynamicGreedyOptionalUnary Interface1",
+                                   "ServiceComponentDynamicGreedyOptionalUnary depends on ",
+                                   "sample::ServiceComponentDynamicGreedyOptionalUnary",
+                                   true,
+                                   MakeInterfaceMap<test::Interface1>(std::make_shared<test::InterfaceImpl>(
+                                       "ServiceComponentDynamicGreedyOptionalUnary Interface1")) }));
 
         // test binding a service under the following reference policy, reference policy options and cardinality
         // Cardinality: 0..1, 1..1

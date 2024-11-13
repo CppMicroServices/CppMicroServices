@@ -175,6 +175,7 @@ set(_test_bundles
   TestBundleDSDGMU
   TestBundleDSDGOU
   TestBundleDSDRMU
+  TestBundleDSDRMU_userMethodStaticChecks
   TestBundleDSDROU
   TestBundleDSSLE1
   TestBundleDSSLE2

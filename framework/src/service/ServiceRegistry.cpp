@@ -252,7 +252,6 @@ namespace cppmicroservices
         else
         {
             auto it = classServices.find(clazz);
-            std::cout << clazz << std::endl;
             if (it != classServices.end())
             {
                 s = it->second.begin();

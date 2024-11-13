@@ -94,6 +94,7 @@ set(_declarativeservices_tests
   TestFixture.hpp
   TestServiceComponentRuntime.cpp
   TestServiceProvider.cpp
+  TestServiceReferenceRetrieval.cpp
   TestSharedLibraryException.cpp
   TestUpdateConfiguration.cpp
   ImportTestBundles.cpp

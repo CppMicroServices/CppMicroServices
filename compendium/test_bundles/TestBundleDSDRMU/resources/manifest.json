@@ -1,20 +1,25 @@
 {
-    "bundle.symbolic_name" : "TestBundleDSDRMU",
-    "scr" : {
-        "version" : 1,
-        "components" : [{
-            "immediate": true,
-            "implementation-class": "sample::ServiceComponentDynamicReluctantMandatoryUnary",
-            "service": {
-                "interfaces": ["test::Interface2"]
-            },
-            "references":[{
-                "name" : "foo",
-                "policy" : "dynamic",
-                "policy-option" : "reluctant",
-                "interface" : "test::Interface1"
-            }],
-            "inject-references": false
-        }]
+    "bundle.symbolic_name": "TestBundleDSDRMU",
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "immediate": true,
+                "implementation-class": "sample::ServiceComponentDynamicReluctantMandatoryUnary",
+                "service": {
+                    "interfaces": [
+                        "test::Interface2"
+                    ]
+                },
+                "references": [
+                    {
+                        "name": "foo",
+                        "policy": "dynamic",
+                        "policy-option": "reluctant",
+                        "interface": "test::Interface1"
+                    }
+                ]
+            }
+        ]
     }
 }

@@ -30,9 +30,9 @@ namespace codegen
 {
     namespace datamodel
     {
-        const std::string ComponentInfo::CONFIG_POLICY_IGNORE = "ignore";
-        const std::string ComponentInfo::CONFIG_POLICY_REQUIRE = "require";
-        const std::string ComponentInfo::CONFIG_POLICY_OPTIONAL = "optional";
+        std::string const ComponentInfo::CONFIG_POLICY_IGNORE = "ignore";
+        std::string const ComponentInfo::CONFIG_POLICY_REQUIRE = "require";
+        std::string const ComponentInfo::CONFIG_POLICY_OPTIONAL = "optional";
 
         std::string
         GetComponentNameStr(ComponentInfo const& compInfo)
@@ -64,12 +64,14 @@ namespace codegen
             auto sep = ", ";
             for (auto const& reference : compInfo.references)
             {
-                if ((true == compInfo.injectReferences) && (reference.policy == "static"))
+                if (compInfo.injectReferences && reference.policy == "static")
                 {
-                    if (reference.cardinality == "0..n" || reference.cardinality == "1..n") {
+                    if (reference.cardinality == "0..n" || reference.cardinality == "1..n")
+                    {
                         result += (sep + std::string("std::vector<std::shared_ptr<") + reference.interface + ">>");
                     }
-                    else {
+                    else
+                    {
                         result += (sep + std::string("std::shared_ptr<") + reference.interface + ">");
                     }
                 }
@@ -86,7 +88,7 @@ namespace codegen
             resultStr << "{{";
             for (auto const& reference : compInfo.references)
             {
-                if ((true == compInfo.injectReferences) && (reference.policy == "static"))
+                if (compInfo.injectReferences && reference.policy == "static")
                 {
                     resultStr << sep << "\"" << reference.name << "\"";
                     sep = ", ";
@@ -97,16 +99,12 @@ namespace codegen
         }
 
         std::string
-        GetReferenceBinderStr(ReferenceInfo const& ref, bool injectReferences)
+        GetReferenceBinderStr(ReferenceInfo const& ref)
         {
-            auto isStatic = (ref.policy == "static");
             std::stringstream binderObjStr;
-            if (!isStatic || !injectReferences)
-            {
-                binderObjStr << "std::make_shared<scd::DynamicBinder<{0}, "
-                             << ref.interface << ">>(\"" + ref.name + "\""
-                             << ", &{0}::Bind" << ref.name << ", &{0}::Unbind" << ref.name << ")";
-            }
+            binderObjStr << "std::make_shared<scd::DynamicBinder<{0}, "
+                         << ref.interface << ">>(\"" + ref.name + "\"" << ", &{0}::Bind" << ref.name
+                         << ", &{0}::Unbind" << ref.name << ")";
             return binderObjStr.str();
         }
 

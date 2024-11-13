@@ -34,10 +34,10 @@
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 
 #include "../../src/SCRLogger.hpp"
+#include "../TestUtils.hpp"
 #include "ConcurrencyTestUtil.hpp"
 #include "Mocks.hpp"
 #include "TestInterfaces/Interfaces.hpp"
-#include "../TestUtils.hpp"
 
 namespace scr = cppmicroservices::service::component::runtime;
 
@@ -58,8 +58,8 @@ namespace
     void
     CheckComponentConfigurationState(std::shared_ptr<scr::ServiceComponentRuntime> dsRuntime,
                                      cppmicroservices::Bundle const& bundle,
-                                     const std::string svcComponentName,
-                                     const scr::dto::ComponentState compState)
+                                     std::string const svcComponentName,
+                                     scr::dto::ComponentState const compState)
     {
         auto compDescDTO = dsRuntime->GetComponentDescriptionDTO(bundle, svcComponentName);
         auto compConfigDTOs = dsRuntime->GetComponentConfigurationDTOs(compDescDTO);
@@ -190,7 +190,9 @@ namespace cppmicroservices
 
         // utility method for creating different types of reference metadata objects used in testing
         metadata::ReferenceMetadata
-        CreateFakeReferenceMetadata(std::string const& policy, std::string const& policyOption, std::string const& cardinality = "0..1")
+        CreateFakeReferenceMetadata(std::string const& policy,
+                                    std::string const& policyOption,
+                                    std::string const& cardinality = "0..1")
         {
             metadata::ReferenceMetadata fakeMetadata {};
             fakeMetadata.name = "ref";
@@ -203,7 +205,7 @@ namespace cppmicroservices
 
             fakeMetadata.minCardinality = std::get<0>(cardLimits);
             fakeMetadata.maxCardinality = std::get<1>(cardLimits);
-            
+
             return fakeMetadata;
         }
 
@@ -255,7 +257,7 @@ namespace cppmicroservices
         INSTANTIATE_TEST_SUITE_P(
             DynamicReferencePolicies,
             DynamicRefPolicyTest,
-            testing::Values(DynamicRefPolicy { "TestBundleDSDRMU", 
+            testing::Values(DynamicRefPolicy { "TestBundleDSDRMU",
                                                "ServiceComponentDynamicReluctantMandatoryUnary depends on "
                                                "ServiceComponentDynamicReluctantMandatoryUnary Interface1",
                                                "",
@@ -471,7 +473,7 @@ namespace cppmicroservices
             auto higherRankedSvc = bc.RegisterService<test::Interface1>(
                 std::make_shared<test::InterfaceImpl>("higher ranked Interface1"),
                 {
-                    {Constants::SERVICE_RANKING, Any(10000)}
+                    { Constants::SERVICE_RANKING, Any(10000) }
             });
             ASSERT_TRUE(higherRankedSvc);
             EXPECT_NO_THROW(svc->ExtendedDescription());
@@ -485,7 +487,7 @@ namespace cppmicroservices
             auto lowerRankedSvc
                 = bc.RegisterService<test::Interface1>(std::make_shared<test::InterfaceImpl>("lower ranked Interface1"),
                                                        {
-                                                           {Constants::SERVICE_RANKING, Any(1)}
+                                                           { Constants::SERVICE_RANKING, Any(1) }
             });
             ASSERT_TRUE(lowerRankedSvc);
             EXPECT_NO_THROW(svc->ExtendedDescription());
@@ -518,7 +520,7 @@ namespace cppmicroservices
             EXPECT_FALSE(bc.GetServiceReference<test::Interface2>()) << "Service should NOT be available";
             EXPECT_THROW(svc->ExtendedDescription(), std::runtime_error);
             testBundle.Stop();
-        }        
+        }
 
         // test that:
         //  a new higher ranked service causes a re-bind
@@ -574,7 +576,7 @@ namespace cppmicroservices
             auto higherRankedSvc = bc.RegisterService<test::Interface1>(
                 std::make_shared<test::InterfaceImpl>("higher ranked Interface1"),
                 {
-                    {Constants::SERVICE_RANKING, Any(10000)}
+                    { Constants::SERVICE_RANKING, Any(10000) }
             });
             ASSERT_TRUE(higherRankedSvc);
             EXPECT_NO_THROW(svc->ExtendedDescription());
@@ -588,7 +590,7 @@ namespace cppmicroservices
             auto lowerRankedSvc
                 = bc.RegisterService<test::Interface1>(std::make_shared<test::InterfaceImpl>("lower ranked Interface1"),
                                                        {
-                                                           {Constants::SERVICE_RANKING, Any(1)}
+                                                           { Constants::SERVICE_RANKING, Any(1) }
             });
             ASSERT_TRUE(lowerRankedSvc);
             EXPECT_NO_THROW(svc->ExtendedDescription());
@@ -668,7 +670,7 @@ namespace cppmicroservices
             auto higherRankedSvc = bc.RegisterService<test::Interface1>(
                 std::make_shared<test::InterfaceImpl>("higher ranked Interface1"),
                 {
-                    {Constants::SERVICE_RANKING, Any(10000)}
+                    { Constants::SERVICE_RANKING, Any(10000) }
             });
             ASSERT_TRUE(higherRankedSvc);
             EXPECT_NO_THROW(svc->ExtendedDescription());
@@ -682,7 +684,7 @@ namespace cppmicroservices
             auto lowerRankedSvc
                 = bc.RegisterService<test::Interface1>(std::make_shared<test::InterfaceImpl>("lower ranked Interface1"),
                                                        {
-                                                           {Constants::SERVICE_RANKING, Any(1)}
+                                                           { Constants::SERVICE_RANKING, Any(1) }
             });
             ASSERT_TRUE(lowerRankedSvc);
             EXPECT_NO_THROW(svc->ExtendedDescription());
@@ -769,7 +771,7 @@ namespace cppmicroservices
             auto higherRankedSvc = bc.RegisterService<test::Interface1>(
                 std::make_shared<test::InterfaceImpl>("higher ranked Interface1"),
                 {
-                    {Constants::SERVICE_RANKING, Any(10000)}
+                    { Constants::SERVICE_RANKING, Any(10000) }
             });
             ASSERT_TRUE(higherRankedSvc);
             EXPECT_NO_THROW(svc->ExtendedDescription());
@@ -783,7 +785,7 @@ namespace cppmicroservices
             auto lowerRankedSvc
                 = bc.RegisterService<test::Interface1>(std::make_shared<test::InterfaceImpl>("lower ranked Interface1"),
                                                        {
-                                                           {Constants::SERVICE_RANKING, Any(1)}
+                                                           { Constants::SERVICE_RANKING, Any(1) }
             });
             ASSERT_TRUE(lowerRankedSvc);
             EXPECT_NO_THROW(svc->ExtendedDescription());
@@ -848,14 +850,14 @@ namespace cppmicroservices
                 auto higherRankedSvc = bc.RegisterService<test::Interface1>(
                     std::make_shared<test::InterfaceImpl>("higher ranked Interface1"),
                     {
-                        {Constants::SERVICE_RANKING, Any(10000)}
+                        { Constants::SERVICE_RANKING, Any(10000) }
                 });
 
                 // registering a new service with a lower rank should NOT cause re-binding
                 auto lowerRankedSvc = bc.RegisterService<test::Interface1>(
                     std::make_shared<test::InterfaceImpl>("lower ranked Interface1"),
                     {
-                        {Constants::SERVICE_RANKING, Any(1)}
+                        { Constants::SERVICE_RANKING, Any(1) }
                 });
 
                 depSvcReg.Unregister();
@@ -870,7 +872,8 @@ namespace cppmicroservices
             testBundle.Stop();
         }
 
-        struct MultipleCardinalityDynamicPolicy {
+        struct MultipleCardinalityDynamicPolicy
+        {
             metadata::ReferenceMetadata fakeMetadata;
 
             int numBindNotifs[3];
@@ -878,88 +881,104 @@ namespace cppmicroservices
             int numLoggerCalls;
 
             friend std::ostream&
-                operator<<(std::ostream& os, MultipleCardinalityDynamicPolicy const& obj)
+            operator<<(std::ostream& os, MultipleCardinalityDynamicPolicy const& obj)
             {
                 return os << "Metadata name: " << obj.fakeMetadata.name << "\n"
-                    << "Bind notification count: " << obj.numBindNotifs << "\n"
-                    << "Unbind notification count: " << obj.numUnbindNotifs << "\n"
-                    << "Logger calls count: " << obj.numLoggerCalls << "\n";
+                          << "Bind notification count: " << obj.numBindNotifs << "\n"
+                          << "Unbind notification count: " << obj.numUnbindNotifs << "\n"
+                          << "Logger calls count: " << obj.numLoggerCalls << "\n";
             }
         };
 
         class DynamicPolicyMultipleCardinalityTest : public ::testing::TestWithParam<MultipleCardinalityDynamicPolicy>
         {
-        protected:
+          protected:
             DynamicPolicyMultipleCardinalityTest() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
 
             virtual ~DynamicPolicyMultipleCardinalityTest() = default;
 
             virtual void
-                SetUp()
+            SetUp()
             {
                 framework.Start();
                 mockLogger = std::make_shared<MockLogger>();
             }
 
             virtual void
-                TearDown()
+            TearDown()
             {
                 framework.Stop();
                 framework.WaitForStop(std::chrono::milliseconds::zero());
             }
 
             cppmicroservices::Framework&
-                GetFramework()
+            GetFramework()
             {
                 return framework;
             }
 
-            ListenerTokenId CreateListener(ReferenceManagerImpl& refManager) {
+            ListenerTokenId
+            CreateListener(ReferenceManagerImpl& refManager)
+            {
                 return refManager.RegisterListener(
                     [&](RefChangeNotification const& notification)
                     {
                         switch (notification.event)
                         {
-                        case RefEvent::BECAME_SATISFIED:
-                            satisfiedNotificationCount++;
-                            break;
-                        case RefEvent::BECAME_UNSATISFIED:
-                            unsatisfiedNotificationCount++;
-                            break;
-                        case RefEvent::REBIND:
-                            if (notification.serviceRefToBind)
-                            {
-                                bindNotificationCount++;
-                            }
-                            if (notification.serviceRefToUnbind)
-                            {
-                                unbindNotificationCount++;
-                            }
-                            break;
-                        default:
-                            break;
+                            case RefEvent::BECAME_SATISFIED:
+                                satisfiedNotificationCount++;
+                                break;
+                            case RefEvent::BECAME_UNSATISFIED:
+                                unsatisfiedNotificationCount++;
+                                break;
+                            case RefEvent::REBIND:
+                                if (notification.serviceRefToBind)
+                                {
+                                    bindNotificationCount++;
+                                }
+                                if (notification.serviceRefToUnbind)
+                                {
+                                    unbindNotificationCount++;
+                                }
+                                break;
+                            default:
+                                break;
                         }
                     });
             }
 
             cppmicroservices::Framework framework;
             std::shared_ptr<cppmicroservices::scrimpl::MockLogger> mockLogger;
-            ListenerTokenId listenerToken{ 0 };
+            ListenerTokenId listenerToken { 0 };
 
-            int satisfiedNotificationCount{ 0 };
-            int unsatisfiedNotificationCount{ 0 };
-            int bindNotificationCount{ 0 };
-            int unbindNotificationCount{ 0 };
+            int satisfiedNotificationCount { 0 };
+            int unsatisfiedNotificationCount { 0 };
+            int bindNotificationCount { 0 };
+            int unbindNotificationCount { 0 };
         };
 
         INSTANTIATE_TEST_SUITE_P(
             MultipleCardinalityTests,
             DynamicPolicyMultipleCardinalityTest,
             testing::Values(
-                MultipleCardinalityDynamicPolicy{ CreateFakeReferenceMetadata("dynamic", "greedy", "1..n"), {0, 1, 2}, {1,2,2}, 4 },
-                MultipleCardinalityDynamicPolicy{ CreateFakeReferenceMetadata("dynamic", "greedy", "0..n"), {1, 2, 3}, {1,2,3}, 3 },
-                MultipleCardinalityDynamicPolicy{ CreateFakeReferenceMetadata("dynamic", "reluctant", "1..n"), {0, 1, 2}, {1, 2, 2}, 6 },
-                MultipleCardinalityDynamicPolicy{ CreateFakeReferenceMetadata("dynamic", "reluctant", "0..n"), {2, 3, 4}, {1, 2, 3}, 7 }));
+                MultipleCardinalityDynamicPolicy {
+                    CreateFakeReferenceMetadata("dynamic", "greedy", "1..n"),
+                    { 0, 1, 2 },
+                    { 1, 2, 2 },
+                    4
+        },
+                MultipleCardinalityDynamicPolicy { CreateFakeReferenceMetadata("dynamic", "greedy", "0..n"),
+                                                   { 1, 2, 3 },
+                                                   { 1, 2, 3 },
+                                                   3 },
+                MultipleCardinalityDynamicPolicy { CreateFakeReferenceMetadata("dynamic", "reluctant", "1..n"),
+                                                   { 0, 1, 2 },
+                                                   { 1, 2, 2 },
+                                                   6 },
+                MultipleCardinalityDynamicPolicy { CreateFakeReferenceMetadata("dynamic", "reluctant", "0..n"),
+                                                   { 2, 3, 4 },
+                                                   { 1, 2, 3 },
+                                                   7 }));
 
         // test that:
         //  any new service causes a re-bind
@@ -968,40 +987,34 @@ namespace cppmicroservices
         {
             auto bc = GetFramework().GetBundleContext();
 
-            ReferenceManagerImpl refManager(GetParam().fakeMetadata,
-                bc,
-                mockLogger,
-                "foo");
+            ReferenceManagerImpl refManager(GetParam().fakeMetadata, bc, mockLogger, "foo");
 
             CreateListener(refManager);
 
             EXPECT_CALL(*(mockLogger).get(), Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, testing::_))
                 .Times(GetParam().numLoggerCalls);
 
-            auto depSvcReg = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(10000)}
-                });
+            auto depSvcReg = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
+                                                                   {
+                                                                       { Constants::SERVICE_RANKING, Any(10000) }
+            });
             ASSERT_TRUE(depSvcReg);
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
 
-            auto depSvcReg1 = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(1)}
-                });
+            auto depSvcReg1 = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
+                                                                    {
+                                                                        { Constants::SERVICE_RANKING, Any(1) }
+            });
             ASSERT_TRUE(depSvcReg1);
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
             EXPECT_EQ(bindNotificationCount, GetParam().numBindNotifs[1]);
 
-            auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(100)}
-                });
+            auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
+                                                                    {
+                                                                        { Constants::SERVICE_RANKING, Any(100) }
+            });
             ASSERT_TRUE(depSvcReg2);
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 3);
@@ -1025,7 +1038,8 @@ namespace cppmicroservices
             refManager.UnregisterListener(listenerToken);
         }
 
-        struct MultipleCardinalityStaticPolicy {
+        struct MultipleCardinalityStaticPolicy
+        {
             metadata::ReferenceMetadata fakeMetadata;
 
             int numSatisfiedNotifs[6];
@@ -1033,120 +1047,124 @@ namespace cppmicroservices
             int numLoggerCalls;
 
             friend std::ostream&
-                operator<<(std::ostream& os, MultipleCardinalityStaticPolicy const& obj)
+            operator<<(std::ostream& os, MultipleCardinalityStaticPolicy const& obj)
             {
                 return os << "Metadata name: " << obj.fakeMetadata.name << "\n"
-                    << "Bind notification count: " << obj.numSatisfiedNotifs << "\n"
-                    << "Unbind notification count: " << obj.numUnsatisfiedNotifs << "\n"
-                    << "Logger calls count: " << obj.numLoggerCalls << "\n";
+                          << "Bind notification count: " << obj.numSatisfiedNotifs << "\n"
+                          << "Unbind notification count: " << obj.numUnsatisfiedNotifs << "\n"
+                          << "Logger calls count: " << obj.numLoggerCalls << "\n";
             }
         };
 
         class StaticPolicyMultipleCardinalityTest : public ::testing::TestWithParam<MultipleCardinalityStaticPolicy>
         {
-        protected:
+          protected:
             StaticPolicyMultipleCardinalityTest() : framework(cppmicroservices::FrameworkFactory().NewFramework()) {}
 
             virtual ~StaticPolicyMultipleCardinalityTest() = default;
 
             virtual void
-                SetUp()
+            SetUp()
             {
                 framework.Start();
                 mockLogger = std::make_shared<MockLogger>();
             }
 
             virtual void
-                TearDown()
+            TearDown()
             {
                 framework.Stop();
                 framework.WaitForStop(std::chrono::milliseconds::zero());
             }
 
             cppmicroservices::Framework&
-                GetFramework()
+            GetFramework()
             {
                 return framework;
             }
 
-            ListenerTokenId CreateListener(ReferenceManagerImpl & refManager) {
+            ListenerTokenId
+            CreateListener(ReferenceManagerImpl& refManager)
+            {
                 return refManager.RegisterListener(
                     [&](RefChangeNotification const& notification)
                     {
                         switch (notification.event)
                         {
-                        case RefEvent::BECAME_SATISFIED:
-                            satisfiedNotificationCount++;
-                            break;
-                        case RefEvent::BECAME_UNSATISFIED:
-                            unsatisfiedNotificationCount++;
-                            break;
-                        default:
-                            break;
+                            case RefEvent::BECAME_SATISFIED:
+                                satisfiedNotificationCount++;
+                                break;
+                            case RefEvent::BECAME_UNSATISFIED:
+                                unsatisfiedNotificationCount++;
+                                break;
+                            default:
+                                break;
                         }
                     });
             }
 
             cppmicroservices::Framework framework;
             std::shared_ptr<cppmicroservices::scrimpl::MockLogger> mockLogger;
-            ListenerTokenId listenerToken{ 0 };
+            ListenerTokenId listenerToken { 0 };
 
-            int satisfiedNotificationCount{ 0 };
-            int unsatisfiedNotificationCount{ 0 };
+            int satisfiedNotificationCount { 0 };
+            int unsatisfiedNotificationCount { 0 };
         };
 
-        INSTANTIATE_TEST_SUITE_P(
-            MultipleCardinalityTests,
-            StaticPolicyMultipleCardinalityTest,
-            testing::Values(
-                MultipleCardinalityStaticPolicy{ CreateFakeReferenceMetadata("static", "greedy", "1..n"), {1, 2, 3, 1, 2, 2}, {0, 1, 2, 1, 2, 3}, 10 },
-                MultipleCardinalityStaticPolicy{ CreateFakeReferenceMetadata("static", "greedy", "0..n"), {2, 3, 4, 1, 2, 3}, {1, 2, 3, 1, 2, 3}, 12 }
-                ));
+        INSTANTIATE_TEST_SUITE_P(MultipleCardinalityTests,
+                                 StaticPolicyMultipleCardinalityTest,
+                                 testing::Values(
+                                     MultipleCardinalityStaticPolicy {
+                                         CreateFakeReferenceMetadata("static", "greedy", "1..n"),
+                                         { 1, 2, 3, 1, 2, 2 },
+                                         { 0, 1, 2, 1, 2, 3 },
+                                         10
+        },
+                                     MultipleCardinalityStaticPolicy {
+                                         CreateFakeReferenceMetadata("static", "greedy", "0..n"),
+                                         { 2, 3, 4, 1, 2, 3 },
+                                         { 1, 2, 3, 1, 2, 3 },
+                                         12 }));
 
         // test that:
         //  any new service causes a reactivation of component
         //  unregistering services keeps other bound services intact and reactivates component
-        TEST_P(StaticPolicyMultipleCardinalityTest, TestStaticPolicyWithMultipleCardinality) {
+        TEST_P(StaticPolicyMultipleCardinalityTest, TestStaticPolicyWithMultipleCardinality)
+        {
 
             auto bc = GetFramework().GetBundleContext();
 
-            ReferenceManagerImpl refManager(GetParam().fakeMetadata,
-                bc,
-                mockLogger,
-                "foo");
+            ReferenceManagerImpl refManager(GetParam().fakeMetadata, bc, mockLogger, "foo");
 
             CreateListener(refManager);
 
             EXPECT_CALL(*mockLogger.get(), Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG, testing::_))
                 .Times(GetParam().numLoggerCalls);
 
-            auto depSvcReg = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(10000)}
-                });
+            auto depSvcReg = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
+                                                                   {
+                                                                       { Constants::SERVICE_RANKING, Any(10000) }
+            });
             ASSERT_TRUE(depSvcReg);
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 1);
             EXPECT_EQ(unsatisfiedNotificationCount, GetParam().numUnsatisfiedNotifs[0]);
             EXPECT_EQ(satisfiedNotificationCount, GetParam().numSatisfiedNotifs[0]);
 
-            auto depSvcReg1 = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(1)}
-                });
+            auto depSvcReg1 = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
+                                                                    {
+                                                                        { Constants::SERVICE_RANKING, Any(1) }
+            });
             ASSERT_TRUE(depSvcReg1);
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 2);
             EXPECT_EQ(unsatisfiedNotificationCount, GetParam().numUnsatisfiedNotifs[1]);
             EXPECT_EQ(satisfiedNotificationCount, GetParam().numSatisfiedNotifs[1]);
 
-            auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(
-                std::make_shared<dummy::Reference1>(),
-                {
-                    {Constants::SERVICE_RANKING, Any(100)}
-                });
+            auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
+                                                                    {
+                                                                        { Constants::SERVICE_RANKING, Any(100) }
+            });
             ASSERT_TRUE(depSvcReg2);
 
             EXPECT_EQ(refManager.GetBoundReferences().size(), 3);
@@ -1177,33 +1195,33 @@ namespace cppmicroservices
             refManager.UnregisterListener(listenerToken);
         }
 
-        TEST_P(BindingPolicyTest, TestMaxLimitOfMultipleReferences) {
+        TEST_P(BindingPolicyTest, TestMaxLimitOfMultipleReferences)
+        {
             auto bc = GetFramework().GetBundleContext();
             auto const& param = GetParam();
 
             auto fakeMetadata = CreateFakeReferenceMetadata(param.policy, param.policyOption, "0..n");
-            fakeMetadata.maxCardinality = 10; //overriding default values set for max cardinality for testing purpose
+            fakeMetadata.maxCardinality = 10; // overriding default values set for max cardinality for testing purpose
 
             auto mockLogger = std::make_shared<MockLogger>();
-            ReferenceManagerImpl refManager(fakeMetadata,
-                bc,
-                mockLogger,
-                "foo");
+            ReferenceManagerImpl refManager(fakeMetadata, bc, mockLogger, "foo");
 
-            for (int i = 0; i < 15; i++) {
-                auto depSvcReg = bc.RegisterService<dummy::Reference1>(
-                    std::make_shared<dummy::Reference1>(),
-                    {
-                        {Constants::SERVICE_RANKING, Any(i)}
-                    });
+            for (int i = 0; i < 15; i++)
+            {
+                auto depSvcReg = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
+                                                                       {
+                                                                           { Constants::SERVICE_RANKING, Any(i) }
+                });
                 ASSERT_TRUE(depSvcReg);
             }
 
-            if (std::string(param.policy) == "static" && std::string(param.policyOption) == "reluctant") {
-                // in case of static reluctant, there's no bind even with multiple cardinality 
+            if (std::string(param.policy) == "static" && std::string(param.policyOption) == "reluctant")
+            {
+                // in case of static reluctant, there's no bind even with multiple cardinality
                 EXPECT_EQ(refManager.GetBoundReferences().size(), 0);
             }
-            else {
+            else
+            {
                 EXPECT_EQ(refManager.GetBoundReferences().size(), 10);
             }
         }
@@ -1216,31 +1234,25 @@ namespace cppmicroservices
 
             auto fakeMetadata = CreateFakeReferenceMetadata("dynamic", "greedy", "0..n");
             auto mockLogger = std::make_shared<MockLogger>();
-            ReferenceManagerImpl refManager(fakeMetadata,
-                bc,
-                mockLogger,
-                "foo");
+            ReferenceManagerImpl refManager(fakeMetadata, bc, mockLogger, "foo");
 
             std::function<bool()> func = [&bc]() -> bool
             {
-                auto depSvcReg = bc.RegisterService<dummy::Reference1>(
-                    std::make_shared<dummy::Reference1>(),
-                    {
-                        {Constants::SERVICE_RANKING, Any(10000)}
-                    });
+                auto depSvcReg
+                    = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
+                                                            {
+                                                                { Constants::SERVICE_RANKING, Any(10000) }
+                });
 
+                auto depSvcReg1 = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
+                                                                        {
+                                                                            { Constants::SERVICE_RANKING, Any(1) }
+                });
 
-                auto depSvcReg1 = bc.RegisterService<dummy::Reference1>(
-                    std::make_shared<dummy::Reference1>(),
-                    {
-                        {Constants::SERVICE_RANKING, Any(1)}
-                    });
-
-                auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(
-                    std::make_shared<dummy::Reference1>(),
-                    {
-                        {Constants::SERVICE_RANKING, Any(100)}
-                    });
+                auto depSvcReg2 = bc.RegisterService<dummy::Reference1>(std::make_shared<dummy::Reference1>(),
+                                                                        {
+                                                                            { Constants::SERVICE_RANKING, Any(100) }
+                });
 
                 depSvcReg.Unregister();
                 depSvcReg1.Unregister();

@@ -39,7 +39,12 @@ namespace cppmicroservices
     std::string
     removeLeadingNamespacing(std::string const& className)
     {
-        return className.substr(className.find_first_not_of(':'));
+        auto ind = className.find_first_not_of(':');
+        if (ind == std::string::npos)
+        {
+            return className;
+        }
+        return className.substr(ind);
     }
 
     void

@@ -41,7 +41,12 @@ namespace cppmicroservices
             std::string
             removeLeadingNamespacing(std::string const& className)
             {
-                return className.substr(className.find_first_not_of(':'));
+                auto ind = className.find_first_not_of(':');
+                if (ind == std::string::npos)
+                {
+                    return className;
+                }
+                return className.substr(ind);
             }
 
             ServiceMetadata
@@ -55,8 +60,9 @@ namespace cppmicroservices
                 std::transform(std::begin(interfaces),
                                std::end(interfaces),
                                std::back_inserter(serviceMetadata.interfaces),
-                               [](auto const& interface)
-                               { return removeLeadingNamespacing(ObjectValidator(interface).GetValue<std::string>()); });
+                               [](auto const& interface) {
+                                   return removeLeadingNamespacing(ObjectValidator(interface).GetValue<std::string>());
+                               });
 
                 // service.scope
                 auto const object = ObjectValidator(metadata, "scope", /*isOptional=*/true);

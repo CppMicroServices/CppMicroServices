@@ -169,6 +169,7 @@ set(_test_bundles
   DSGraph05
   DSGraph06
   DSGraph07
+  dummyBundleDoNotInstall
   GloballyNamespacedInterfaces
   DSSpellChecker
   TestBindUnbindThrows

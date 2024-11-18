@@ -746,7 +746,7 @@ namespace cppmicroservices
                 EXPECT_CALL(*mockFactory, GetService(testing::_, testing::_))
                     .Times(1)
                     .WillRepeatedly(testing::Invoke(
-                        [&](const cppmicroservices::Bundle& b, const cppmicroservices::ServiceRegistrationBase&)
+                        [&](cppmicroservices::Bundle const& b, cppmicroservices::ServiceRegistrationBase const&)
                         {
                             fakeCompConfig->Activate(b);
                             return instanceMap;
@@ -892,8 +892,6 @@ namespace cppmicroservices
         }
 
 #if !defined(__MINGW32__)
-        // Note: This is different than the other tests in this suite as Declarative Services is actually
-        // installed and started rather than using mocks.
         TEST(ComponentConfigurationImplLogTest, LoadLibraryLogsMessagesImmediateTest)
         {
             auto framework = cppmicroservices::FrameworkFactory().NewFramework();
@@ -923,16 +921,10 @@ namespace cppmicroservices
 
             auto loggerReg = context.RegisterService<logservice::LogService>(logger);
 
-            // TestBundleDSTOI1 is immediate=true so the call to InstallAndStart should cause the shared
+            // dummyBundleDoNotInstall is immediate=true so the call to InstallAndStart should cause the shared
             // library for the bundle to be loaded. This should in turn log 4 (2 regarding shared library
             // loading) messages with the log service.
-            //
-            // NOTE: TestBundleDSTOI1 cannot be used in the test since a previously ran test already installed
-            // it. The DS runtime service is a singleton so even though a new framework is used, DS remembers
-            // which bundles were already installed. This means that when this test tried to load
-            // TestBundleDSTOI1, it did not actually call SharedLibrary::Load(), hence the test failed.
-            // TestBundleDSTOI3 is now used as it has not been previously installed.
-            test::InstallAndStartBundle(context, "TestBundleDSTOI3");
+            test::InstallAndStartBundle(context, "dummyBundleDoNotInstall");
 
             loggerReg.Unregister();
 
@@ -1129,7 +1121,7 @@ namespace cppmicroservices
                 {
                     auto configuration = configAdminService->GetConfiguration("sample::config");
                     auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                        {"foo", true}
+                        { "foo", true }
                     });
                     fut.second.wait();
                 });
@@ -1177,15 +1169,15 @@ namespace cppmicroservices
             EXPECT_CALL(*mockCompInstance, DoesModifiedMethodExist()).Times(0);
             auto configuration = configAdminService->GetConfiguration("sample::config1");
             auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", true}
+                { "foo", true }
             });
             fut.second.wait();
             fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", false}
+                { "foo", false }
             });
             fut.second.wait();
             fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", true}
+                { "foo", true }
             });
             fut.second.wait();
 
@@ -1195,7 +1187,7 @@ namespace cppmicroservices
                 {
                     auto configuration = configAdminService->GetConfiguration("sample::config");
                     auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                        {"foo1", true}
+                        { "foo1", true }
                     });
                     fut.second.wait();
                 });
@@ -1243,23 +1235,23 @@ namespace cppmicroservices
             EXPECT_CALL(*mockCompInstance, DoesModifiedMethodExist()).Times(1);
             auto configuration = configAdminService->GetConfiguration("sample::config1");
             auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", true}
+                { "foo", true }
             });
             fut.second.wait();
             fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", false}
+                { "foo", false }
             });
             fut.second.wait();
 
             configuration = configAdminService->GetConfiguration("sample::config");
             fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo1", true}
+                { "foo1", true }
             });
             fut.second.wait();
             // config change counts: {1, 2}
             compConfig->Initialize();
             fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo1", false}
+                { "foo1", false }
             });
             fut.second.wait();
             // config change counts: {2, 2}
@@ -1364,15 +1356,15 @@ namespace cppmicroservices
                     sync_point.Wait(); // Wait for all threads to reach this point
                     auto configuration = configAdminService->GetConfiguration("sample::config");
                     auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                        {"foo", true}
+                        { "foo", true }
                     });
                     fut.second.wait();
                     fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                        {"foo", false}
+                        { "foo", false }
                     });
                     fut.second.wait();
                     configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                        {"foo", true}
+                        { "foo", true }
                     });
                 });
 

@@ -1,0 +1,16 @@
+{
+  "bundle.symbolic_name": "dummyBundleDoNotInstall",
+  "bundle.name": "dummyBundleDoNotInstall",
+  "scr": {
+    "version": 1,
+    "components": [
+      {
+        "implementation-class": "graph::dummyBundleDoNotInstall",
+        "immediate": true,
+        "service": {
+          "interfaces": ["test::DSGraph01"]
+        }
+      }
+    ]
+  }
+}

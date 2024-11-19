@@ -18,8 +18,10 @@ namespace test
     /**
      * Verify a component with an interface with :: leading can be registered and found
      */
-    TEST_F(tServiceComponent, testServiceWithGlobalNamespaceNoDS)
+    TEST(TestGlobalNamespacing, testServiceWithGlobalNamespaceNoDS)
     {
+        auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+        framework.Start();
         auto context = framework.GetBundleContext();
 
         auto s1 = std::make_shared<::test::implTestService>();
@@ -31,8 +33,10 @@ namespace test
         ASSERT_TRUE(ref2);
     }
 
-    TEST_F(tServiceComponent, testServiceWithGlobalNamespaceDS)
+    TEST(TestGlobalNamespacing, testServiceWithGlobalNamespaceDS)
     {
+        auto framework = cppmicroservices::FrameworkFactory().NewFramework();
+        framework.Start();
         auto context = framework.GetBundleContext();
 
         test::InstallAndStartDS(context);

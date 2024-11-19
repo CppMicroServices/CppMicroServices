@@ -892,6 +892,8 @@ namespace cppmicroservices
         }
 
 #if !defined(__MINGW32__)
+        // Note: This is different than the other tests in this suite as Declarative Services is actually
+        // installed and started rather than using mocks.
         TEST(ComponentConfigurationImplLogTest, LoadLibraryLogsMessagesImmediateTest)
         {
             auto framework = cppmicroservices::FrameworkFactory().NewFramework();
@@ -921,10 +923,16 @@ namespace cppmicroservices
 
             auto loggerReg = context.RegisterService<logservice::LogService>(logger);
 
-            // dummyBundleDoNotInstall is immediate=true so the call to InstallAndStart should cause the shared
+            // TestBundleDSTOI1 is immediate=true so the call to InstallAndStart should cause the shared
             // library for the bundle to be loaded. This should in turn log 4 (2 regarding shared library
             // loading) messages with the log service.
-            test::InstallAndStartBundle(context, "dummyBundleDoNotInstall");
+            //
+            // NOTE: TestBundleDSTOI1 cannot be used in the test since a previously ran test already installed
+            // it. The DS runtime service is a singleton so even though a new framework is used, DS remembers
+            // which bundles were already installed. This means that when this test tried to load
+            // TestBundleDSTOI1, it did not actually call SharedLibrary::Load(), hence the test failed.
+            // TestBundleDSTOI3 is now used as it has not been previously installed.
+            test::InstallAndStartBundle(context, "TestBundleDSTOI3");
 
             loggerReg.Unregister();
 

@@ -20,6 +20,7 @@ set(_srcs
   util/SharedLibraryException.cpp
   util/Utils.cpp
   util/ServiceRegistrationLocks.cpp
+  util/ThreadpoolSafeFuture.cpp
 
   service/ListenerToken.cpp
   service/ServiceException.cpp

@@ -58,7 +58,7 @@ jobs:
       run: ${{ env.BUILD_DIR }}\bin\Release\usFrameworkBenchTests.exe  --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json
 
     - name: Upload Performance Results as Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Performance Results - ${{ github.event.head_commit.author.name }} - ${{ github.sha }}
         path: ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json

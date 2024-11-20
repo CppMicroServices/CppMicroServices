@@ -1,21 +1,26 @@
 {
-    "bundle.symbolic_name" : "TestBundleDSDGOU",
-    "scr" : {
-        "version" : 1,
-        "components" : [{
-            "immediate": true,
-            "implementation-class": "sample::ServiceComponentDynamicGreedyOptionalUnary",
-            "service": {
-                "interfaces": ["test::Interface2"]
-            },
-            "references":[{
-                "name" : "foo",
-				"cardinality" : "0..1",
-                "policy" : "dynamic",
-                "policy-option" : "greedy",
-                "interface" : "test::Interface1"
-            }],
-            "inject-references": false
-		}]
+    "bundle.symbolic_name": "TestBundleDSDGOU",
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "immediate": true,
+                "implementation-class": "sample::ServiceComponentDynamicGreedyOptionalUnary",
+                "service": {
+                    "interfaces": [
+                        "test::Interface2"
+                    ]
+                },
+                "references": [
+                    {
+                        "name": "foo",
+                        "cardinality": "0..1",
+                        "policy": "dynamic",
+                        "policy-option": "greedy",
+                        "interface": "test::Interface1"
+                    }
+                ]
+            }
+        ]
     }
 }

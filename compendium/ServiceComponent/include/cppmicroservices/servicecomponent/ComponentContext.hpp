@@ -239,9 +239,8 @@ namespace cppmicroservices
                                                                           std::string const& type) const
                     = 0;
             };
-
         } // namespace component
-    }     // namespace service
+    } // namespace service
 } // namespace cppmicroservices
 
 #endif /* ComponentContext_hpp */

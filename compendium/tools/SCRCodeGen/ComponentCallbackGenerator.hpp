@@ -99,7 +99,7 @@ namespace codegen
                            << "{" << std::endl;
 
                 auto isReferencesEmpty = componentInfo.references.empty();
-                if (false == isReferencesEmpty)
+                if (!isReferencesEmpty)
                 {
                     mStrStream << util::Substitute("  std::vector<std::shared_ptr<scd::Binder<{0}>>> binders;",
                                                    componentInfo.implClassName)
@@ -108,11 +108,11 @@ namespace codegen
 
                 for (auto const& ref : componentInfo.references)
                 {
-                    if ((false == componentInfo.injectReferences) || (ref.policy == "dynamic"))
+                    if (componentInfo.injectReferences && ref.policy == "dynamic")
                     {
                         mStrStream << "  binders.push_back("
                                    << util::Substitute(
-                                          datamodel::GetReferenceBinderStr(ref, componentInfo.injectReferences),
+                                          datamodel::GetReferenceBinderStr(ref),
                                           componentInfo.implClassName)
                                    << ");" << std::endl;
                     }
@@ -123,7 +123,7 @@ namespace codegen
                     << componentInfo.implClassName << ", std::tuple<"
                     << datamodel::GetServiceInterfacesStr(componentInfo.service) << ">";
 
-                if (true == isReferencesEmpty)
+                if (isReferencesEmpty)
                 {
                     mStrStream << ">();";
                 }
@@ -131,8 +131,8 @@ namespace codegen
                 {
 
                     mStrStream << datamodel::GetCtorInjectedRefParameters(componentInfo) << ">("
-                        << datamodel::GetCtorInjectedRefNames(componentInfo) << ", binders"
-                        << ");";
+                               << datamodel::GetCtorInjectedRefNames(componentInfo) << ", binders"
+                               << ");";
                 }
 
                 mStrStream << std::endl << std::endl << "  return componentInstance;" << std::endl << "}" << std::endl;
@@ -151,8 +151,8 @@ namespace codegen
             }
         }
 
-        const std::vector<std::string> mHeaderIncludes;
-        const std::vector<ComponentInfo> mComponentInfos;
+        std::vector<std::string> const mHeaderIncludes;
+        std::vector<ComponentInfo> const mComponentInfos;
         std::stringstream mStrStream;
     };
 

@@ -32,6 +32,7 @@
 
 #include "../src/CMLogger.hpp"
 #include "Mocks.hpp"
+#include <gmock/gmock.h>
 
 using cppmicroservices::logservice::LogService;
 using cppmicroservices::logservice::SeverityLevel;
@@ -103,6 +104,9 @@ namespace cppmicroservices
                 EXPECT_CALL(*(mockLogger.get()), Log(testing::_, SeverityLevel::LOG_WARNING, testing::_)).Times(1);
                 EXPECT_CALL(*(mockLogger.get()), Log(testing::_, SeverityLevel::LOG_ERROR, testing::_, testing::_))
                     .Times(1);
+	        EXPECT_CALL(*(mockLogger.get()), getLogger("test")).Times(1);
+		const cppmicroservices::Bundle mockBundle;
+		EXPECT_CALL(*(mockLogger.get()), getLogger(mockBundle, "test")).Times(1);
                 // exercise methods on instance of CMLogger
                 CMLogger logger(bundleContext);
                 logger.Log(SeverityLevel::LOG_DEBUG, "some sample debug message");
@@ -115,6 +119,8 @@ namespace cppmicroservices
                            SeverityLevel::LOG_ERROR,
                            "some sample error message with service reference",
                            std::make_exception_ptr(std::runtime_error("error occured")));
+		auto resultLogger = logger.getLogger("test");
+		auto resultBundleLogger = logger.getLogger(mockBundle, "test");
                 reg.Unregister();
             });
         }

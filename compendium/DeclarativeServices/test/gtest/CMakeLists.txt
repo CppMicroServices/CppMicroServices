@@ -93,6 +93,7 @@ set(_declarativeservices_tests
   TestFixture.hpp
   TestServiceComponentRuntime.cpp
   TestServiceProvider.cpp
+  TestServiceReferenceRetrieval.cpp
   TestSharedLibraryException.cpp
   TestUpdateConfiguration.cpp
   ImportTestBundles.cpp
@@ -174,6 +175,7 @@ set(_test_bundles
   TestBundleDSDGMU
   TestBundleDSDGOU
   TestBundleDSDRMU
+  TestBundleDSDRMU_userMethodStaticChecks
   TestBundleDSDROU
   TestBundleDSSLE1
   TestBundleDSSLE2
@@ -205,6 +207,7 @@ set(_test_bundles
   TestBundleDSCA07
   TestBundleDSCA08
   TestBundleDSCA09
+  TestBundleDSCA10
   TestBundleDSCA12
   TestBundleDSCA16
   TestBundleDSCA20
@@ -241,7 +244,7 @@ add_dependencies(${us_declarativeservices_test_exe_name}
 )
 
 # Needed for clock_gettime with glibc < 2.17
-if(UNIX AND NOT APPLE)
+if((UNIX AND NOT APPLE) AND NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
   target_link_libraries(${us_declarativeservices_test_exe_name} PRIVATE rt)
 endif()
 

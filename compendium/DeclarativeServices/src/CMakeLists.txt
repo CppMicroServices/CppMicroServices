@@ -62,6 +62,7 @@ set(_private_headers
   manager/ReferenceManager.hpp
   manager/ReferenceManagerImpl.hpp
   manager/RegistrationManager.hpp
+  manager/SingleInvokeTask.hpp
   manager/SingletonComponentConfiguration.hpp
   manager/states/CCActiveState.hpp
   manager/states/CCRegisteredState.hpp

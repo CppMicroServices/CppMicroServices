@@ -347,7 +347,7 @@ namespace cppmicroservices
                 class ComponentInstanceImpl final : public ComponentInstanceImplBase<T, InterfaceTuple>
                 {
                   public:
-                    ComponentInstanceImpl(const std::array<std::string, sizeof...(CtorInjectedRefs)> staticRefNames
+                    ComponentInstanceImpl(std::array<std::string, sizeof...(CtorInjectedRefs)> const staticRefNames
                                           = {},
                                           std::vector<std::shared_ptr<Binder<T>>> const& binders = {})
                         : ComponentInstanceImplBase<T, InterfaceTuple>(binders)
@@ -404,8 +404,10 @@ namespace cppmicroservices
                     template <class C = T,
                               class I = Injection,
                               class InjectionFalse = typename std::enable_if<I::value == false>::type,
-                              class IsDefaultConstructible
-                              = typename std::enable_if<std::is_default_constructible<C>::value == true>::type>
+                              class IsDefaultConstructible = typename std::enable_if<
+                                  std::is_default_constructible<C>::value
+                                  && !std::is_constructible<C, std::shared_ptr<cppmicroservices::AnyMap> const&>::
+                                         value>::type>
                     std::shared_ptr<T>
                     DoCreate(bool)
                     {
@@ -441,11 +443,12 @@ namespace cppmicroservices
                     DoCreate(bool, bool = true, bool = true)
                     {
                         static_assert(std::is_default_constructible<C>::value,
-                                      "An appropriate constructor was not found "
-                                      "and/or the service implementation does not implement all of the "
-                                      "service interface's methods. A default constructor or a constructor "
-                                      "with an AnyMap input parameter for the configuration properties is "
-                                      "required when inject-references is false. ");
+                                      "An appropriate constructor was not found and/or the service implementation does "
+                                      "not implement all of the service interface's methods. "
+                                      "A default constructor or a constructor with an AnyMap input parameter for the "
+                                      "configuration properties is required when inject-references is false. "
+                                      "A properly defined Modified, Activate, and Deactivate method are required when "
+                                      "inheriting from UserDefinedMethodVerification.");
                         return nullptr;
                     }
 
@@ -455,8 +458,7 @@ namespace cppmicroservices
                               class I = Injection,
                               class InjectionTrue = typename std::enable_if<I::value == true>::type,
                               class HasNoConstructorWithReferences = typename std::enable_if<
-                                  std::is_constructible<C, CtorInjectedRefs const&...>::value
-                                  == false>::type,
+                                  std::is_constructible<C, CtorInjectedRefs const&...>::value == false>::type,
                               class HasNoConstructorWithRefAndConfig = typename std::enable_if<
                                   std::is_constructible<C,
                                                         std::shared_ptr<cppmicroservices::AnyMap> const&,
@@ -471,7 +473,9 @@ namespace cppmicroservices
                                       "service interface's methods. A constructor with service reference "
                                       "input parameters or a constructor with an AnyMap input parameter for "
                                       "configuration properties and service reference input parameters is "
-                                      "required when inject-references is true. ");
+                                      "required when inject-references is true. A properly defined Modified, Activate, "
+                                      "and Deactivate method are required when "
+                                      "inheriting from UserDefinedMethodVerification.");
                         return nullptr;
                     }
 
@@ -529,24 +533,25 @@ namespace cppmicroservices
 
                     template <std::size_t... Is>
                     std::shared_ptr<T>
-                    call_make_shared_with_tuple_and_props(
-                        std::shared_ptr<cppmicroservices::AnyMap> const& props,
-                        std::tuple<CtorInjectedRefs const&...> const& tuple,
-                        std::index_sequence<Is...>)
+                    call_make_shared_with_tuple_and_props(std::shared_ptr<cppmicroservices::AnyMap> const& props,
+                                                          std::tuple<CtorInjectedRefs const&...> const& tuple,
+                                                          std::index_sequence<Is...>)
                     {
                         return std::make_shared<T>(props, std::get<Is>(tuple)...);
                     }
 
-                    // Type detector to see if given template parameter is std::vector type (multiple cardinality reference)
-                    // or not (unary cardinality reference)
+                    // Type detector to see if given template parameter is std::vector type (multiple cardinality
+                    // reference) or not (unary cardinality reference)
                     template <typename RefType>
-                    struct is_vector_type {
-                        static const bool value = false;
+                    struct is_vector_type
+                    {
+                        static bool const value = false;
                     };
 
                     template <typename RefType>
-                    struct is_vector_type<std::vector<RefType> > {
-                        static const bool value = true;
+                    struct is_vector_type<std::vector<RefType>>
+                    {
+                        static bool const value = true;
                     };
 
                     template <std::size_t... Is>
@@ -559,9 +564,9 @@ namespace cppmicroservices
                     }
 
                     template <class R,
-                              class IsVectorType = typename std::enable_if<is_vector_type<R>::value == true>::type
-                              >
-                    R GetDependency(std::string const& name)
+                              class IsVectorType = typename std::enable_if<is_vector_type<R>::value == true>::type>
+                    R
+                    GetDependency(std::string const& name)
                     {
                         // Overload to be invoked for references using multiple cardinality
                         using VectorElementType = typename R::value_type;
@@ -570,9 +575,9 @@ namespace cppmicroservices
                     }
 
                     template <class R,
-                              class IsNotVectorType = typename std::enable_if<is_vector_type<R>::value == false>::type
-                              >
-                    R GetDependency(std::string const& name, bool = true)
+                              class IsNotVectorType = typename std::enable_if<is_vector_type<R>::value == false>::type>
+                    R
+                    GetDependency(std::string const& name, bool = true)
                     {
                         // Overload to be used for references using unary cardinality
                         using RefType = typename R::element_type;
@@ -584,8 +589,8 @@ namespace cppmicroservices
                 };
 
             } // namespace detail
-        }     // namespace component
-    }         // namespace service
+        } // namespace component
+    } // namespace service
 } // namespace cppmicroservices
 
 #endif /* ComponentInstance_hpp */

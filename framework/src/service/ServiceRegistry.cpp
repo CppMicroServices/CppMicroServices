@@ -159,7 +159,7 @@ namespace cppmicroservices
     void
     ServiceRegistry::Get(std::string const& clazz, std::vector<ServiceRegistrationBase>& serviceRegs) const
     {
-        this->Lock(), Get_unlocked(clazz, serviceRegs);
+        this->Lock(), Get_unlocked(removeLeadingNamespacing(clazz), serviceRegs);
     }
 
     void
@@ -180,7 +180,7 @@ namespace cppmicroservices
         try
         {
             std::vector<ServiceReferenceBase> srs;
-            Get_unlocked(clazz, "", bundle, srs);
+            Get_unlocked(removeLeadingNamespacing(clazz), "", bundle, srs);
             DIAG_LOG(*core->sink) << "get service ref " << clazz << " for bundle " << bundle->symbolicName << " = "
                                   << srs.size() << " refs";
 
@@ -202,7 +202,7 @@ namespace cppmicroservices
                          BundlePrivate* bundle,
                          std::vector<ServiceReferenceBase>& res) const
     {
-        this->Lock(), Get_unlocked(clazz, filter, bundle, res);
+        this->Lock(), Get_unlocked(removeLeadingNamespacing(clazz), filter, bundle, res);
     }
 
     void

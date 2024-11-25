@@ -742,7 +742,7 @@ namespace cppmicroservices
                 EXPECT_CALL(*mockFactory, GetService(testing::_, testing::_))
                     .Times(1)
                     .WillRepeatedly(testing::Invoke(
-                        [&](const cppmicroservices::Bundle& b, const cppmicroservices::ServiceRegistrationBase&)
+                        [&](cppmicroservices::Bundle const& b, cppmicroservices::ServiceRegistrationBase const&)
                         {
                             fakeCompConfig->Activate(b);
                             return instanceMap;

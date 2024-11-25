@@ -17,9 +17,6 @@ namespace test
     DSGraph06::~DSGraph06() = default;
     DSGraph07::~DSGraph07() = default;
 
-    GlobalNS1::~GlobalNS1() = default;
-    GlobalNS2::~GlobalNS2() = default;
-
     LifeCycleValidation::~LifeCycleValidation() = default;
     CAInterface::~CAInterface() = default;
     CAInterface1::~CAInterface1() = default;

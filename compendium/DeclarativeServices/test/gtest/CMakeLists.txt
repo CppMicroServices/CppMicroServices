@@ -56,7 +56,6 @@ add_compile_definitions(BOOST_REGEX_NO_LIB)
 set(_declarativeservices_tests
   ActivatorTest.cpp
   SCRLoggerTest.cpp
-  GlobalServiceTest.cpp
   TestAsyncWorkService.cpp
   TestBundleValidation.cpp
   TestCCActiveState.cpp
@@ -169,7 +168,6 @@ set(_test_bundles
   DSGraph05
   DSGraph06
   DSGraph07
-  GloballyNamespacedInterfaces
   DSSpellChecker
   TestBindUnbindThrows
   TestBundleDSa

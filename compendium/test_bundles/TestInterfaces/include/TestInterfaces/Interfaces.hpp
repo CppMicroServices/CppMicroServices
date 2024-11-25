@@ -161,20 +161,6 @@ namespace test
         virtual ~DSGraph07();
     };
 
-    class US_TestInterfaces_EXPORT GlobalNS1
-    {
-      public:
-        virtual std::string Description() = 0;
-        virtual ~GlobalNS1();
-    };
-
-    class US_TestInterfaces_EXPORT GlobalNS2
-    {
-      public:
-        virtual std::string Description() = 0;
-        virtual ~GlobalNS2();
-    };
-
     // Use this interface in test bundles & test points to validate if the
     // service component receives the life cycle callbacks from the DS runtime
     class US_TestInterfaces_EXPORT LifeCycleValidation

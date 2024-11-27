@@ -67,9 +67,6 @@ void TrackedService<S,TTT>::ServiceChanged(const ServiceEvent& event)
 
     reference = event.GetServiceReference<S>();
 
-    DIAG_LOG(*serviceTracker->d->context.GetLogSink())
-      << "TrackedService::ServiceChanged[" << event.GetType()
-      << "]: " << reference;
     if (!reference) {
       return;
     }

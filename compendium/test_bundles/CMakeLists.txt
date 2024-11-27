@@ -57,7 +57,6 @@ add_subdirectory(IDictionaryService)
 add_subdirectory(DSSpellChecker)
 add_subdirectory(DSFrenchDictionary)
 add_subdirectory(EnglishDictionary)
-
 add_subdirectory(ManagedServiceAndFactoryBundle)
 add_subdirectory(TestBundleManagedServiceDeadlock)
 add_subdirectory(TestBundleManagedServiceFactory)

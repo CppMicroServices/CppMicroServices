@@ -1130,11 +1130,6 @@ namespace cppmicroservices
         friend class BundleResource;
         friend class BundleResourceContainer;
 
-        // Not for use by clients of the Framework.
-        // Provides access to the Framework's log sink to allow templated code
-        // to log diagnostic information.
-        std::shared_ptr<detail::LogSink> GetLogSink() const;
-
         ListenerToken AddServiceListener(ServiceListener const& delegate, void* data, std::string const& filter);
         void RemoveServiceListener(ServiceListener const& delegate, void* data);
 

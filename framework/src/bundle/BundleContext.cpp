@@ -87,26 +87,6 @@ namespace cppmicroservices
         return *this;
     }
 
-    std::shared_ptr<detail::LogSink>
-    BundleContext::GetLogSink() const
-    {
-        if (!d)
-        {
-            throw std::runtime_error("The bundle context is no longer valid");
-        }
-
-        d->CheckValid();
-
-        if (auto bundle_ = d->bundle.lock())
-        {
-            return bundle_->coreCtx->sink->shared_from_this();
-        }
-        else
-        {
-            throw std::runtime_error("The bundle context is no longer valid");
-        }
-    }
-
     Any
     BundleContext::GetProperty(std::string const& key) const
     {

@@ -221,10 +221,8 @@ namespace cppmicroservices
             m_ObjFile = BundleObjFactory().CreateBundleFileObj(m_Location);
             rawBundleResourceData = m_ObjFile->GetRawBundleResourceContainer();
         }
-        catch (std::exception const& ex)
+        catch (std::exception const&)
         {
-            auto sink = GetBundleContext().GetLogSink();
-            DIAG_LOG(*sink) << "Exception thrown creating BundleFileObj : " << ex.what();
         }
 
         if (!rawBundleResourceData || !rawBundleResourceData->GetData()

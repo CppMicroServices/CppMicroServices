@@ -74,10 +74,10 @@ namespace cppmicroservices
             }
             MOCK_CONST_METHOD0(GetBundle, Bundle(void));
             MOCK_METHOD0(Initialize, void(void));
-            MOCK_METHOD2(WaitForFuture, void(std::shared_future<void>&, std::shared_ptr<std::atomic<bool>>));
+            MOCK_METHOD2(WaitForFuture, void(std::shared_future<void>&, std::shared_ptr<SingleInvokeTask>));
             MOCK_CONST_METHOD0(IsEnabled, bool(void));
-            MOCK_METHOD1(Enable, std::shared_future<void>(std::shared_ptr<std::atomic<bool>>));
-            MOCK_METHOD1(Disable, std::shared_future<void>(std::shared_ptr<std::atomic<bool>>));
+            MOCK_METHOD1(Enable, std::shared_future<void>(std::shared_ptr<SingleInvokeTask>));
+            MOCK_METHOD1(Disable, std::shared_future<void>(std::shared_ptr<SingleInvokeTask>));
             MOCK_CONST_METHOD0(GetComponentConfigurations, std::vector<std::shared_ptr<ComponentConfiguration>>(void));
             MOCK_CONST_METHOD0(GetMetadata, std::shared_ptr<ComponentMetadata const>(void));
 

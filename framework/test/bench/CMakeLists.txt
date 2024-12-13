@@ -50,7 +50,7 @@ set_property(TARGET ${us_bench_test_exe_name} PROPERTY US_BUNDLE_NAME main)
 
 
 # Needed for clock_gettime with glibc < 2.17
-if(UNIX AND NOT APPLE)
+if((UNIX AND NOT APPLE) AND NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
   target_link_libraries(${us_bench_test_exe_name} rt)
 endif()
 

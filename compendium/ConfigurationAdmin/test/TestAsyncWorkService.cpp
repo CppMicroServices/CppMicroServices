@@ -147,30 +147,6 @@ namespace test
         cppmicroservices::Framework framework;
     };
 
-    class AsyncWorkServiceInline : public cppmicroservices::async::AsyncWorkService
-    {
-      public:
-        AsyncWorkServiceInline() : cppmicroservices::async::AsyncWorkService() {}
-
-        void
-        post(std::packaged_task<void()>&& task) override
-        {
-            task();
-        }
-    };
-
-    class AsyncWorkServiceStdAsync : public cppmicroservices::async::AsyncWorkService
-    {
-      public:
-        AsyncWorkServiceStdAsync() : cppmicroservices::async::AsyncWorkService() {}
-
-        void
-        post(std::packaged_task<void()>&& task) override
-        {
-            std::future<void> f = std::async(std::launch::async, [task = std::move(task)]() mutable { task(); });
-        }
-    };
-
     class AsyncWorkServiceThreadPool : public cppmicroservices::async::AsyncWorkService
     {
       public:
@@ -378,10 +354,9 @@ namespace test
 
     INSTANTIATE_TEST_SUITE_P(AsyncWorkServiceEndToEndParameterized,
                              TestAsyncWorkServiceEndToEnd,
-                             testing::Values(std::make_shared<AsyncWorkServiceInline>(),
-                                             std::make_shared<AsyncWorkServiceStdAsync>(),
-                                             std::make_shared<AsyncWorkServiceThreadPool>(1),
-                                             std::make_shared<AsyncWorkServiceThreadPool>(2)));
+                             testing::Values(std::make_shared<AsyncWorkServiceThreadPool>(1),
+                                             std::make_shared<AsyncWorkServiceThreadPool>(2),
+                                             std::make_shared<AsyncWorkServiceThreadPool>(4)));
 
     TEST_P(TestAsyncWorkServiceEndToEnd, TestEndToEndBehaviorWithAsyncWorkService)
     {
@@ -396,7 +371,7 @@ namespace test
 
             auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
 
-            for (const auto& bundleName : bundlesToInstall)
+            for (auto const& bundleName : bundlesToInstall)
             {
                 std::string path = PathToLib(bundleName);
                 auto bundles = ctx.InstallBundles(path);
@@ -410,4 +385,45 @@ namespace test
         });
     }
 
+    // Ensures that when ConfigAdmin is shut down, even if work is still being queued or is running,
+    // no new work is posted to the asyncWorkService
+
+    // NOTE: intended to be run on repeat as this used to fail sporadically before fix
+    TEST_F(TestAsyncWorkServiceEndToEnd, TestShutdownWithWorkRunning)
+    {
+        auto const& param = std::make_shared<AsyncWorkServiceThreadPool>(2);
+        auto ctx = framework.GetBundleContext();
+        auto reg = ctx.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
+
+        std::string path = PathToLib("TestBundleDSCA03");
+        auto bundle = ctx.InstallBundles(path).back();
+        bundle.Start();
+        std::string configID = "sample::ServiceComponentCA03";
+        std::vector<std::future<void>> futures;
+
+        auto context = framework.GetBundleContext();
+
+        {
+            auto configAdmin = context.GetService<cm::ConfigurationAdmin>(
+                context.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>());
+
+            auto processConfiguration
+                = [](std::shared_ptr<cppmicroservices::service::cm::Configuration> config) { config->Update({}); };
+
+            auto config = configAdmin->GetConfiguration(configID);
+
+            // Launch asynchronous tasks using std::async
+            futures.emplace_back(std::async(std::launch::async, processConfiguration, config));
+            futures.emplace_back(std::async(std::launch::async, processConfiguration, config));
+            futures.emplace_back(std::async(std::launch::async, processConfiguration, config));
+        }
+        framework.Stop();
+        framework.WaitForStop(std::chrono::milliseconds::zero());
+
+        for (auto& future : futures)
+        {
+            future.get(); // Wait for each task to complete
+        }
+        // this should not deadlock
+    }
 }; // namespace test

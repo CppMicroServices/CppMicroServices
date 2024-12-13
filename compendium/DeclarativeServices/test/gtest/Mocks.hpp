@@ -143,6 +143,11 @@ namespace cppmicroservices
                               cppmicroservices::logservice::SeverityLevel,
                               std::string const&,
                               std::exception_ptr const));
+	    MOCK_CONST_METHOD1(getLogger,
+                     std::shared_ptr<cppmicroservices::logservice::Logger>(const std::string&));
+	    MOCK_CONST_METHOD2(getLogger,
+                     std::shared_ptr<cppmicroservices::logservice::Logger>(const cppmicroservices::Bundle&, const std::string&));
+
         };
 
 #ifdef _MSC_VER
@@ -175,6 +180,16 @@ namespace cppmicroservices
                 std::exception_ptr const) override
             {
             }
+	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger> 
+	    getLogger(const std::string&) const override
+	    {
+		return nullptr;
+	    }
+	    [[nodiscard]] std::shared_ptr<cppmicroservices::logservice::Logger>
+            getLogger(const cppmicroservices::Bundle&, const std::string&) const override
+            {
+                return nullptr;
+            }
         };
 
         class MockComponentManager : public ComponentManager
@@ -183,11 +198,11 @@ namespace cppmicroservices
             MOCK_CONST_METHOD0(GetName, std::string(void));
             MOCK_CONST_METHOD0(GetBundle, cppmicroservices::Bundle(void));
             MOCK_CONST_METHOD0(GetBundleId, unsigned long(void));
-            MOCK_METHOD2(WaitForFuture, void(std::shared_future<void>&, std::shared_ptr<std::atomic<bool>>));
+            MOCK_METHOD2(WaitForFuture, void(std::shared_future<void>&, std::shared_ptr<SingleInvokeTask>));
             MOCK_METHOD0(Initialize, void(void));
             MOCK_CONST_METHOD0(IsEnabled, bool(void));
-            MOCK_METHOD1(Enable, std::shared_future<void>(std::shared_ptr<std::atomic<bool>>));
-            MOCK_METHOD1(Disable, std::shared_future<void>(std::shared_ptr<std::atomic<bool>>));
+            MOCK_METHOD1(Enable, std::shared_future<void>(std::shared_ptr<SingleInvokeTask>));
+            MOCK_METHOD1(Disable, std::shared_future<void>(std::shared_ptr<SingleInvokeTask>));
             MOCK_CONST_METHOD0(GetComponentConfigurations, std::vector<std::shared_ptr<ComponentConfiguration>>());
             MOCK_CONST_METHOD0(GetMetadata, std::shared_ptr<metadata::ComponentMetadata const>());
         };
@@ -206,8 +221,8 @@ namespace cppmicroservices
         class MockComponentManagerState : public ComponentManagerState
         {
           public:
-            MOCK_METHOD2(Enable, std::shared_future<void>(ComponentManagerImpl&, std::shared_ptr<std::atomic<bool>>));
-            MOCK_METHOD2(Disable, std::shared_future<void>(ComponentManagerImpl&, std::shared_ptr<std::atomic<bool>>));
+            MOCK_METHOD2(Enable, std::shared_future<void>(ComponentManagerImpl&, std::shared_ptr<SingleInvokeTask>));
+            MOCK_METHOD2(Disable, std::shared_future<void>(ComponentManagerImpl&, std::shared_ptr<SingleInvokeTask>));
             MOCK_CONST_METHOD1(IsEnabled, bool(ComponentManagerImpl const&));
             MOCK_CONST_METHOD1(GetConfigurations,
                                std::vector<std::shared_ptr<ComponentConfiguration>>(ComponentManagerImpl const&));

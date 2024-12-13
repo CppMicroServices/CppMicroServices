@@ -479,4 +479,15 @@ namespace cppmicroservices
         }
         return false;
     }
+
+    ServiceReferenceU
+    ServiceReferenceFromService(std::shared_ptr<void> const& s)
+    {
+        auto deleter = std::get_deleter<CustomServiceDeleter>(s);
+        if (!deleter)
+        {
+            throw std::runtime_error("The input is not a CppMicroServices managed ServiceObject");
+        }
+        return deleter->getServiceRef();
+    }
 } // namespace cppmicroservices

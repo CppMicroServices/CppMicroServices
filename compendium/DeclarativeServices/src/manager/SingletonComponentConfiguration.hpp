@@ -125,6 +125,7 @@ namespace cppmicroservices
             FRIEND_TEST(ConfigAdminComponentCreationRace, TestModifiedIsNeverCalled);
             FRIEND_TEST(ConfigAdminComponentCreationRace, TestMultipleConfigsNoModifiedCall);
             FRIEND_TEST(ConfigAdminComponentCreationRace, TestMultipleConfigsModifiedCalled);
+            FRIEND_TEST(ConfigAdminComponentCreationRace, TestConfigNotifierSafeWithNoListenersForPid);
 
             /**
              * Set the member data, only used in tests

@@ -69,40 +69,44 @@ namespace cppmicroservices
             {
                 auto const& sRefs = refManager->GetBoundReferences();
                 auto const& refName = refManager->GetReferenceName();
-                auto const& refScope = refManager->GetReferenceScope();
                 bool foundAtLeastOneValidBoundService = false;
-                std::for_each(
-                    sRefs.rbegin(),
-                    sRefs.rend(),
-                    [&](cppmicroservices::ServiceReferenceBase const& sRef)
-                    {
-                        if (sRef)
-                        {
-                            ServiceReferenceU sRefU(sRef);
-                            auto bc = GetBundleContext();
-                            auto boundServicesCacheHandle = boundServicesCache.lock();
-                            auto& serviceMap = (*boundServicesCacheHandle)[refName];
-                            if (refScope == cppmicroservices::Constants::SCOPE_BUNDLE)
-                            {
-                                auto svc = bc.GetService(sRefU);
-                                if (svc)
-                                {
-                                    foundAtLeastOneValidBoundService = true;
-                                }
-                                serviceMap.push_back(svc);
-                            }
-                            else
-                            {
-                                cppmicroservices::ServiceObjects<void> sObjs = bc.GetServiceObjects(sRefU);
-                                auto interfaceMap = sObjs.GetService();
-                                if (interfaceMap)
-                                {
-                                    foundAtLeastOneValidBoundService = true;
-                                    serviceMap.push_back(interfaceMap);
-                                }
-                            }
-                        }
-                    });
+                std::for_each(sRefs.rbegin(),
+                              sRefs.rend(),
+                              [&](cppmicroservices::ServiceReferenceBase const& sRef)
+                              {
+                                  if (sRef)
+                                  {
+                                      ServiceReferenceU sRefU(sRef);
+                                      auto refScope
+                                          = any_cast<std::string>(sRefU.GetProperty(Constants::SERVICE_SCOPE));
+                                      if (refScope.empty())
+                                      {
+                                          refScope = Constants::SCOPE_SINGLETON;
+                                      }
+                                      auto bc = GetBundleContext();
+                                      auto boundServicesCacheHandle = boundServicesCache.lock();
+                                      auto& serviceMap = (*boundServicesCacheHandle)[refName];
+                                      if (refScope == cppmicroservices::Constants::SCOPE_SINGLETON)
+                                      {
+                                          auto svc = bc.GetService(sRefU);
+                                          if (svc)
+                                          {
+                                              foundAtLeastOneValidBoundService = true;
+                                          }
+                                          serviceMap.push_back(svc);
+                                      }
+                                      else
+                                      {
+                                          cppmicroservices::ServiceObjects<void> sObjs = bc.GetServiceObjects(sRefU);
+                                          auto interfaceMap = sObjs.GetService();
+                                          if (interfaceMap)
+                                          {
+                                              foundAtLeastOneValidBoundService = true;
+                                              serviceMap.push_back(interfaceMap);
+                                          }
+                                      }
+                                  }
+                              });
 
                 // Check that all the refernece managers have a valid bound service reference if one
                 // is manodatory.
@@ -110,9 +114,11 @@ namespace cppmicroservices
                 // while the service object was being retrieved to add to the container of bound services.
                 if (!refManager->IsOptional() && !foundAtLeastOneValidBoundService)
                 {
-                    throw ComponentException("Failed to construct a component context for " + configManagerPtr->GetMetadata()->implClassName + 
-                        ". No services were found which satisfy the mandatory service dependency " + refName + 
-                        ". This typically occurs because the dependent service was unregistered before it could be used.");
+                    throw ComponentException(
+                        "Failed to construct a component context for " + configManagerPtr->GetMetadata()->implClassName
+                        + ". No services were found which satisfy the mandatory service dependency " + refName
+                        + ". This typically occurs because the dependent service was unregistered before it could be "
+                          "used.");
                 }
             }
         }

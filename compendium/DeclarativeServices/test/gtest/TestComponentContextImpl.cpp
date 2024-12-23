@@ -154,12 +154,14 @@ namespace cppmicroservices
             });
         }
 
-#if NEVER
         /**
          * This test point creates mutiple component configs per available bundle and
          * calls LocateService multiple times on each ComponentContext
+         *
+         * Test is DISABLED because the usage of reference scopes is not supported. Re-enable when
+         * the feature is done.
          */
-        TEST_F(ComponentContextImplTest, VerifyLocateServiceWithReferenceScopes)
+        TEST_F(ComponentContextImplTest, DISABLED_VerifyLocateServiceWithReferenceScopes)
         {
             size_t iterCount = 4ul;
             size_t componentInstanceCount = 3ul;
@@ -301,7 +303,6 @@ namespace cppmicroservices
                                           SCOPE_PROTOTYPE,
                                           componentInstanceCount);
         }
-#endif
 
         TEST_F(ComponentContextImplTest, VerifyLocateServiceWithHighestRank)
         {

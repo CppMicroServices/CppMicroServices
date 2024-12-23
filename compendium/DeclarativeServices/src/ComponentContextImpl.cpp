@@ -77,33 +77,15 @@ namespace cppmicroservices
                                   if (sRef)
                                   {
                                       ServiceReferenceU sRefU(sRef);
-                                      auto refScope
-                                          = any_cast<std::string>(sRefU.GetProperty(Constants::SERVICE_SCOPE));
-                                      if (refScope.empty())
-                                      {
-                                          refScope = Constants::SCOPE_SINGLETON;
-                                      }
                                       auto bc = GetBundleContext();
                                       auto boundServicesCacheHandle = boundServicesCache.lock();
                                       auto& serviceMap = (*boundServicesCacheHandle)[refName];
-                                      if (refScope == cppmicroservices::Constants::SCOPE_SINGLETON)
+                                      cppmicroservices::ServiceObjects<void> sObjs = bc.GetServiceObjects(sRefU);
+                                      auto interfaceMap = sObjs.GetService();
+                                      if (interfaceMap)
                                       {
-                                          auto svc = bc.GetService(sRefU);
-                                          if (svc)
-                                          {
-                                              foundAtLeastOneValidBoundService = true;
-                                          }
-                                          serviceMap.push_back(svc);
-                                      }
-                                      else
-                                      {
-                                          cppmicroservices::ServiceObjects<void> sObjs = bc.GetServiceObjects(sRefU);
-                                          auto interfaceMap = sObjs.GetService();
-                                          if (interfaceMap)
-                                          {
-                                              foundAtLeastOneValidBoundService = true;
-                                              serviceMap.push_back(interfaceMap);
-                                          }
+                                          foundAtLeastOneValidBoundService = true;
+                                          serviceMap.push_back(interfaceMap);
                                       }
                                   }
                               });

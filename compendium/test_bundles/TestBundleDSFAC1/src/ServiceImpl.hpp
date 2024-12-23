@@ -25,7 +25,7 @@ namespace sample
 
         ~ServiceAImpl() = default;
 
-        void*
+        [[nodiscard]] void*
         GetRefAddr() const override
         {
             return static_cast<void*>(serviceB.get());
@@ -60,7 +60,7 @@ namespace sample
             return {};
         }
 
-        void*
+        [[nodiscard]] void*
         GetRefAddr() const override
         {
             return static_cast<void*>(serviceB.get());
@@ -91,7 +91,7 @@ namespace sample
             return {};
         }
 
-        void*
+        [[nodiscard]] void*
         GetRefAddr() const override
         {
             return static_cast<void*>(serviceC.get());

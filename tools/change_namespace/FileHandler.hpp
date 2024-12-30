@@ -1,43 +1,46 @@
 #include <filesystem>
 #include <memory>
 
+// FileHandler: A class for file content management
+// Provides read-only access to file contents with copy-on-write semantics
 class FileHandler
 {
-public:
+  public:
+    using reference = const char &;
+    using const_reference = reference;
+    using iterator = const char *;
+    using const_iterator = iterator;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
+    using value_type = char;
+    using pointer = const char *;
+    using const_pointer = pointer;
 
-    typedef const char&                               reference;
-   typedef reference                                 const_reference;
-   typedef const char*                               iterator;
-   typedef iterator                                  const_iterator;
-   typedef std::size_t                               size_type;
-   typedef std::ptrdiff_t                            difference_type;
-   typedef char                                      value_type;
-   typedef const char*                               pointer;
-   typedef pointer                                   const_pointer;
+    FileHandler();
+    FileHandler(std::filesystem::path const& p);
+    ~FileHandler();
+    FileHandler(FileHandler const& that);
+    FileHandler& operator=(FileHandler const& that);
+    FileHandler(FileHandler&& other) noexcept;
+    FileHandler& operator=(FileHandler&& other) noexcept;
 
-   FileHandler();
-   FileHandler(const std::filesystem::path& p);
-   ~FileHandler();
-   FileHandler(const FileHandler& that);
-   FileHandler& operator=(const FileHandler& that);
-   void close();
-   void open(const std::filesystem::path& p);
+    void close(); // Clears the content of the FileHandler
+    void open(std::filesystem::path const& p); // Loads content from the specified file
 
-   const_iterator         begin() const;
-   const_iterator         end() const;
+    [[nodiscard]] const_iterator begin() const;
+    [[nodiscard]] const_iterator end() const;
+    [[nodiscard]] size_type size() const;
+    [[nodiscard]] size_type max_size() const;
+    [[nodiscard]] bool empty() const;
+    const_reference operator[](size_type n) const;
+    [[nodiscard]] const_reference at(size_type n) const;
+    [[nodiscard]] const_reference front() const;
+    [[nodiscard]] const_reference back() const;
+    void swap(FileHandler& that) noexcept; // Swaps the content with another FileHandler
 
-   size_type size() const;
-   size_type max_size() const;
-   bool      empty() const;
+  private:
+    void cow(); // Implements copy-on-write behavior
 
-   const_reference operator[](size_type n) const;
-   const_reference at(size_type n) const;
-   const_reference front() const;
-   const_reference back() const;
-   void            swap(FileHandler& that);
-
-private:
-   void cow();
-   struct implementation;
-   std::shared_ptr<implementation> impl_ptr;
+    struct implementation;
+    std::shared_ptr<implementation> impl_ptr;
 };

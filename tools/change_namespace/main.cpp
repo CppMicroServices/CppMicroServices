@@ -1,4 +1,5 @@
 #include "ChangeNamespace.hpp"
+#include "optionparser.h"
 
 #include <cstring>
 #include <filesystem>
@@ -6,82 +7,105 @@
 #include <list>
 #include <string>
 
-void print_usage_info()
+// Custom argument class to handle non-empty arguments for option parser
+struct Custom_Arg : public option::Arg
 {
-   std::cout <<
-      "Usage:\n"
-      "   change_namespace [options] output-path\n"
-      "\n"
-      "Options:\n"
-      "   --cppms=path      sets the location of the cppms tree to path\n"
-      "   --namespace=name  rename the cppms namespace to name.\n"
-      "   --namespace-alias makes namespace cppms an alias of the namespace set with --namespace.\n"
-      "\n"
-      "output-path:         the path to which files will be copied\n"
-      "   --help/-h         show usage help\n";
-}
+    static void
+    printError(std::string const& msg1, option::Option const& opt, std::string const& msg2)
+    {
+        std::cerr << "ERROR: " << msg1 << opt.name << msg2 << std::endl;
+    }
 
-int main(int argc, char* argv[])
+    static option::ArgStatus
+    NonEmpty(option::Option const& option, bool msg)
+    {
+        if (option.arg != 0 && option.arg[0] != 0)
+        {
+            return option::ARG_OK;
+        }
+        if (msg)
+        {
+            printError("Option '", option, "' requires a non-empty argument\n");
+        }
+        return option::ARG_ILLEGAL;
+    }
+};
+
+// Options supported by the tool
+enum OptionIndex { UNKNOWN, HELP, CPPMS, NAMESPACE, NAMESPACE_ALIAS };
+
+// Specifying tool usage for the option parser
+const option::Descriptor usage[] = {
+    {UNKNOWN, 0, "", "", option::Arg::None, "USAGE: change_namespace [options] <destination>\n\nOptions:"},
+    {HELP, 0, "h", "help", option::Arg::None, "  -h, --help \tPrint usage and exit."},
+    {CPPMS, 0, "", "cppms", Custom_Arg::NonEmpty, "  --cppms=<path> \tsets the location of the cppms tree to path. [REQUIRED]"},
+    {NAMESPACE, 0, "", "namespace", Custom_Arg::NonEmpty, "  --namespace=<name> \trename the cppms namespace to name. [REQUIRED]"},
+    {NAMESPACE_ALIAS, 0, "", "namespace-alias", option::Arg::None, "  --namespace-alias \tmakes namespace cppms an alias of the namespace set with --namespace."},
+    {0, 0, 0, 0, 0, 0}
+};
+
+int
+main(int argc, char* argv[])
 {
-   // If no arguments are passed, print usage info
-   if(argc < 2)
-   {
-      std::cout << "Error: insufficient arguments." << std::endl;
-      print_usage_info();
-      return 1;
-   }
+    argc-=(argc>0); argv+=(argc>0); // Skip program name argv[0] if present
 
-   // Create application object
-   cn_app_ptr app_ptr(CNApplication::create());
-   
-   // Parse through the arguments to determine the operation to be performed
-   std::list<const char*> positional_args;
-   for(int i = 1; i < argc; ++i)
-   {
-      if(0 == std::strcmp("-h", argv[i])
-         || 0 == std::strcmp("--help", argv[i]))
-      {
-         print_usage_info();
-         return 0;
-      }  
-      else if(0 == std::strncmp("--cppms=", argv[i], 8))
-      {
-         app_ptr->set_cppms_path(argv[i] + 8);
-      }
-      else if(0 == std::strncmp("--namespace=", argv[i], 12))
-      {
-         app_ptr->set_namespace(argv[i] + 12);
-      }
-      else if(0 == std::strncmp("--namespace-alias", argv[i], 17))
-      {
-         app_ptr->set_namespace_alias(true);
-      }
-      else if(argv[i][0] == '-')
-      {
-         std::cout << "Error: Unknown argument provided: " << argv[i] << std::endl;
-         print_usage_info();
-         return 1;
-      }
-      else
-      {
-         positional_args.push_back(argv[i]);
-      }
-   }
+    // Setup option parser and parse the arugments provided
+    option::Stats stats(usage, argc, argv);
+    std::vector<option::Option> options(stats.options_max);
+    std::vector<option::Option> buffer(stats.buffer_max);
+    option::Parser parse(usage, argc, argv, &options[0], &buffer[0]);
 
-   // Handle positional args last:
-   for(std::list<const char*>::const_iterator i = positional_args.begin();
-      i != positional_args.end(); ++i)
-   {
-      if(i == --positional_args.end())
-         app_ptr->set_destination(*i);
-   }
+    // Exit if error while parsing arguments
+    if (parse.error()) {
+        return 1;
+    }
 
-   // Terminate if all required arguments are not provided
-   if (app_ptr->get_cppms_path() == "" || app_ptr->get_destination() == "" || app_ptr->get_namespace() == "")
-   {
-       std::cout << "Error: Please provide all required arguments. " << std::endl;
-       return 1;
-   }
+    // Print usage if 'help' option is present or no arguments are provided
+    if (options[HELP] || argc == 0) {
+        option::printUsage(std::cout, usage);
+        return 0;
+    }
 
-   return app_ptr->run();
+    for (option::Option* opt = options[UNKNOWN]; opt; opt = opt->next()) {
+        std::cout << "Unknown option: " << opt->name << "\n";
+    }
+
+    // Create application instance and set options
+    cn_app_ptr app_ptr(CNApplication::create());
+
+    for (int i = 0; i < parse.optionsCount(); ++i) {
+        option::Option& opt = buffer[i];
+        switch (opt.index()) {
+            case CPPMS:
+                app_ptr->set_cppms_path(opt.arg);
+                break;
+            case NAMESPACE:
+                app_ptr->set_namespace(opt.arg);
+                break;
+            case NAMESPACE_ALIAS:
+                app_ptr->set_namespace_alias(true);
+                break;
+        }
+    }
+
+    // Throw error if destination is not provided
+    if (parse.nonOptionsCount() == 0) {
+        std::cerr << "Error: Destination not provided.\n";
+        option::printUsage(std::cerr, usage);
+        return 1;
+    }
+
+    if (parse.nonOptionsCount() > 0) {
+        app_ptr->set_destination(parse.nonOption(parse.nonOptionsCount() - 1));
+    }
+
+    // Check if required options are provided
+    if (!options[CPPMS] || !options[NAMESPACE]) {
+        std::cerr << "Error: Missing required options.\n";
+        option::printUsage(std::cerr, usage);
+        return 1;
+    }
+
+    // Run the application
+    return app_ptr->run();
 }

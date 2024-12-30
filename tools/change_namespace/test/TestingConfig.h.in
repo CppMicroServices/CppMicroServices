@@ -1,0 +1,9 @@
+#ifdef US_PLATFORM_WINDOWS
+
+#define EXE_PATH "@CMAKE_BINARY_DIR@/bin/Debug/change_namespace.exe"
+
+#else
+
+#define EXE_PATH "@CMAKE_BINARY_DIR@/bin/Debug/change_namespace"
+
+#endif

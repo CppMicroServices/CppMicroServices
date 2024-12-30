@@ -4,113 +4,137 @@
 #include <filesystem>
 #include <fstream>
 #include <istream>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 struct FileHandler::implementation
 {
-   std::vector<char> m_data;
+    std::vector<char> m_data;
 };
 
-FileHandler::FileHandler()
-{
-   impl_ptr.reset(new implementation());
+FileHandler::FileHandler() 
+{ 
+    impl_ptr = std::make_shared<implementation>();
 }
 
-FileHandler::FileHandler(const std::filesystem::path& p)
+FileHandler::FileHandler(std::filesystem::path const& p)
 {
-   impl_ptr.reset(new implementation());
-   open(p);
+    impl_ptr = std::make_shared<implementation>();
+    open(p);
 }
 
-FileHandler::~FileHandler()
+FileHandler::~FileHandler() {}
+
+FileHandler::FileHandler(FileHandler const&) {}
+
+FileHandler&
+FileHandler::operator=(FileHandler const& that)
+{
+    impl_ptr = that.impl_ptr;
+    return *this;
+}
+
+FileHandler::FileHandler(FileHandler&& that) noexcept
+    : impl_ptr(std::move(that.impl_ptr))
 {
 }
 
-FileHandler::FileHandler(const FileHandler& )
+FileHandler& FileHandler::operator=(FileHandler&& that) noexcept
 {
+    impl_ptr = std::move(that.impl_ptr);
+    return *this;
 }
 
-FileHandler& FileHandler::operator=(const FileHandler& that)
+void
+FileHandler::close()
 {
-   impl_ptr = that.impl_ptr;
-   return *this;
+    cow();
+    impl_ptr->m_data.clear();
 }
 
-void FileHandler::close()
+void
+FileHandler::open(std::filesystem::path const& p)
 {
-   cow();
-   impl_ptr->m_data.clear();
+    cow();
+    std::ifstream is(p);
+    if (!is)
+    {
+        std::string msg("Bad file name: ");
+        msg += p.string();
+        throw std::runtime_error(msg);
+    }
+    std::istreambuf_iterator<char> in(is);
+    std::istreambuf_iterator<char> end;
+    std::copy(in, end, std::back_inserter(impl_ptr->m_data));
 }
 
-void FileHandler::open(const std::filesystem::path& p)
+FileHandler::const_iterator
+FileHandler::begin() const
 {
-   cow();
-   std::ifstream is(p);
-   if(!is)
-   {
-      std::string msg("Bad file name: ");
-      msg += p.string();
-      throw std::runtime_error(msg);
-   }
-   std::istreambuf_iterator<char> in(is);
-   std::istreambuf_iterator<char> end;
-   std::copy(in, end, std::back_inserter(impl_ptr->m_data));
+    return impl_ptr->m_data.size() ? &(impl_ptr->m_data[0]) : nullptr;
 }
 
-FileHandler::const_iterator         FileHandler::begin() const
+FileHandler::const_iterator
+FileHandler::end() const
 {
-   return impl_ptr->m_data.size() ? &(impl_ptr->m_data[0]) : 0;
+    return begin() + impl_ptr->m_data.size();
 }
 
-FileHandler::const_iterator         FileHandler::end() const
+FileHandler::size_type
+FileHandler::size() const
 {
-   return begin() + impl_ptr->m_data.size();
+    return impl_ptr->m_data.size();
 }
 
-FileHandler::size_type FileHandler::size() const
+FileHandler::size_type
+FileHandler::max_size() const
 {
-   return impl_ptr->m_data.size();
+    return impl_ptr->m_data.max_size();
 }
 
-FileHandler::size_type FileHandler::max_size() const
+bool
+FileHandler::empty() const
 {
-   return impl_ptr->m_data.max_size();
+    return impl_ptr->m_data.empty();
 }
 
-bool      FileHandler::empty() const
+FileHandler::const_reference
+FileHandler::operator[](FileHandler::size_type n) const
 {
-   return impl_ptr->m_data.empty();
+    return impl_ptr->m_data[n];
 }
 
-FileHandler::const_reference FileHandler::operator[](FileHandler::size_type n) const
+FileHandler::const_reference
+FileHandler::at(size_type n) const
 {
-   return impl_ptr->m_data[n];
+    return impl_ptr->m_data.at(n);
 }
 
-FileHandler::const_reference FileHandler::at(size_type n) const
+FileHandler::const_reference
+FileHandler::front() const
 {
-   return impl_ptr->m_data.at(n);
+    return impl_ptr->m_data.front();
 }
 
-FileHandler::const_reference FileHandler::front() const
+FileHandler::const_reference
+FileHandler::back() const
 {
-   return impl_ptr->m_data.front();
+    return impl_ptr->m_data.back();
 }
 
-FileHandler::const_reference FileHandler::back() const
+void
+FileHandler::swap(FileHandler& that) noexcept
 {
-   return impl_ptr->m_data.back();
+    impl_ptr.swap(that.impl_ptr);
 }
 
-void FileHandler::swap(FileHandler& that)
+void
+FileHandler::cow()
 {
-   impl_ptr.swap(that.impl_ptr);
-}
-
-void FileHandler::cow()
-{
-   if(impl_ptr.use_count() == 1)
-      impl_ptr.reset(new implementation(*impl_ptr));
+    if (impl_ptr.use_count() == 1)
+    {
+        impl_ptr = std::make_shared<implementation>(*impl_ptr);
+    }
 }

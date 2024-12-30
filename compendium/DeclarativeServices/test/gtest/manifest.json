@@ -60,6 +60,22 @@
                 }]
             }
         },
+        "valid_manifest_with_global_namespacing": {
+            "scr": {
+                "version": 1,
+                "components": [{
+                    "implementation-class": "DSSpellCheck::SpellCheckImpl",
+                    "service": {
+                        "scope": "singleton",
+                        "interfaces": ["::SpellCheck::ISpellCheckService"]
+                    },
+                    "references": [{
+                        "name": "dictionary",
+                        "interface": "::DictionaryService::IDictionaryService"
+                    }]
+                }]
+            }
+        },
         "manifest_dyn": {
             "scr": {
                 "version": 1,

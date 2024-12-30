@@ -23,5 +23,16 @@ namespace sample
         std::lock_guard<std::mutex> lock(propertiesLock);
         return properties;
     }
-  
+
+    ServiceAImpl2::ServiceAImpl2(std::shared_ptr<cppmicroservices::AnyMap> const&,
+                                 std::shared_ptr<test::ServiceBInt> const interface1)
+        : serviceB(interface1)
+    {
+    }
+    ServiceAImpl3::ServiceAImpl3(std::shared_ptr<cppmicroservices::AnyMap> const&,
+                                 std::shared_ptr<test::ServiceCInt> const interface1)
+        : serviceC(interface1)
+    {
+    }
+
 } // namespace sample

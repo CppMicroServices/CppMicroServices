@@ -6,14 +6,14 @@
 class FileHandler
 {
   public:
-    using reference = const char &;
+    using reference = char const&;
     using const_reference = reference;
-    using iterator = const char *;
+    using iterator = char const*;
     using const_iterator = iterator;
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
     using value_type = char;
-    using pointer = const char *;
+    using pointer = char const*;
     using const_pointer = pointer;
 
     FileHandler();
@@ -24,7 +24,7 @@ class FileHandler
     FileHandler(FileHandler&& other) noexcept;
     FileHandler& operator=(FileHandler&& other) noexcept;
 
-    void close(); // Clears the content of the FileHandler
+    void close();                              // Clears the content of the FileHandler
     void open(std::filesystem::path const& p); // Loads content from the specified file
 
     [[nodiscard]] const_iterator begin() const;

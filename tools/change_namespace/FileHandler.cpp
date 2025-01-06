@@ -14,10 +14,7 @@ struct FileHandler::implementation
     std::vector<char> m_data;
 };
 
-FileHandler::FileHandler() 
-{ 
-    impl_ptr = std::make_shared<implementation>();
-}
+FileHandler::FileHandler() { impl_ptr = std::make_shared<implementation>(); }
 
 FileHandler::FileHandler(std::filesystem::path const& p)
 {
@@ -25,23 +22,16 @@ FileHandler::FileHandler(std::filesystem::path const& p)
     open(p);
 }
 
-FileHandler::~FileHandler() {}
+FileHandler::~FileHandler() = default;
 
 FileHandler::FileHandler(FileHandler const&) {}
 
+FileHandler& FileHandler::operator=(FileHandler const& that) = default;
+
+FileHandler::FileHandler(FileHandler&& that) noexcept : impl_ptr(std::move(that.impl_ptr)) {}
+
 FileHandler&
-FileHandler::operator=(FileHandler const& that)
-{
-    impl_ptr = that.impl_ptr;
-    return *this;
-}
-
-FileHandler::FileHandler(FileHandler&& that) noexcept
-    : impl_ptr(std::move(that.impl_ptr))
-{
-}
-
-FileHandler& FileHandler::operator=(FileHandler&& that) noexcept
+FileHandler::operator=(FileHandler&& that) noexcept
 {
     impl_ptr = std::move(that.impl_ptr);
     return *this;

@@ -32,7 +32,7 @@ void
 ChangeNamespaceImpl::add_directory(fs::path const& p)
 {
     // Parse files and directories
-    for (const auto& entry : fs::directory_iterator(m_cppms_path / p))
+    for (auto const& entry : fs::directory_iterator(m_cppms_path / p))
     {
         std::string s = entry.path().string();
         if (!m_cppms_path.string().empty())
@@ -97,7 +97,7 @@ ChangeNamespaceImpl::add_file_dependencies(fs::path const& p, bool scanfile)
         fs::path include_file;
         try
         {
-            if (std::string discard_message = *it++; discard_message.size())
+            if (const std::string discard_message = *it++; discard_message.size())
             {
                 // The include is optional and should be discarded:
                 std::cout << "Optional functionality won't be copied: " << discard_message << std::endl;

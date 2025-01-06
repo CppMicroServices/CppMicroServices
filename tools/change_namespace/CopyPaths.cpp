@@ -26,6 +26,13 @@ ChangeNamespaceImpl::copy_path(fs::path const& p)
     // Create the path to the new file if it doesn't already exist:
     create_path(p.parent_path());
 
+    // Simply copy the files under the tools/change_namespace directory (own sources)
+    if (p.string().find((fs::path("tools") / "change_namespace").string()) != std::string::npos)
+    {
+        fs::copy(m_cppms_path / p, m_dest_path / p, fs::copy_options::overwrite_existing);
+        return;
+    }
+
     if (m_namespace_name.size() && (is_source_file(p) || is_test_config_file(p)))
     {
         //
@@ -39,18 +46,16 @@ ChangeNamespaceImpl::copy_path(fs::path const& p)
         std::ifstream is((m_cppms_path / p));
         std::copy(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>(), std::back_inserter(v1));
 
-        std::vector<std::string> patterns = { 
-            R"((namespace\s+)cppmicroservices(_\w+)?)",
-            R"((<)cppmicroservices((?:_\w+)?\s*(?:::)))",
-            R"((namespace\s+\w+\s*=\s*(?:::\s*)?)cppmicroservices(_\w+)?)",
-            R"((^\s*#\s*define\s+\w+\s+)cppmicroservices((?:_\w+)?\s*)$)",
-            R"((\(\s*)cppmicroservices(\s*\)))",
-            R"(()cppmicroservices((?:_\w+)?(?:::)))"
-        };
+        const std::vector<std::string> patterns = { R"((namespace\s+)cppmicroservices(_\w+)?)",
+                                              R"((<)cppmicroservices((?:_\w+)?\s*(?:::)))",
+                                              R"((namespace\s+\w+\s*=\s*(?:::\s*)?)cppmicroservices(_\w+)?)",
+                                              R"((^\s*#\s*define\s+\w+\s+)cppmicroservices((?:_\w+)?\s*)$)",
+                                              R"((\(\s*)cppmicroservices(\s*\)))",
+                                              R"(()cppmicroservices((?:_\w+)?(?:::)))" };
 
-        std::string replacement = "$1" + m_namespace_name + "$2";
+        const std::string replacement = "$1" + m_namespace_name + "$2";
 
-        for (const auto & pattern : patterns)
+        for (auto const& pattern : patterns)
         {
             std::regex re(pattern);
             std::smatch match;
@@ -88,9 +93,9 @@ ChangeNamespaceImpl::copy_path(fs::path const& p)
         std::ifstream is((m_cppms_path / p));
         std::copy(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>(), std::back_inserter(v1));
 
-        std::string pattern = "(\")cppmicroservices(::([^\"]*)\")";//make strings const wherever possible
+        const std::string pattern = "(\")cppmicroservices(::([^\"]*)\")";
 
-        std::string replacement = "$1" + m_namespace_name + "$2";
+        const std::string replacement = "$1" + m_namespace_name + "$2";
 
         std::regex re(pattern);
         std::smatch match;

@@ -38,6 +38,7 @@ class ChangeNamespaceImpl : public CNApplication
 {
   public:
     ChangeNamespaceImpl();
+    ~ChangeNamespaceImpl() = default;
 
     // Utility functions for file type checking
     static bool is_source_file(fs::path const& p);
@@ -46,14 +47,14 @@ class ChangeNamespaceImpl : public CNApplication
 
   private:
     // Implementation of CNApplication interface methods:
-    
+
     void set_cppms_path(std::string_view p) override;
     void set_destination(std::string_view p) override;
     void set_namespace(std::string_view name) override;
     void set_namespace_alias(bool) override;
-    std::string get_cppms_path() const override;
-    std::string get_destination() const override;
-    std::string get_namespace() const override;
+    [[nodiscard]] std::string get_cppms_path() const override;
+    [[nodiscard]] std::string get_destination() const override;
+    [[nodiscard]] std::string get_namespace() const override;
 
     // run: Main execution function for the namespace changing process
     // Checks if the CppMicroServices source and destination paths exist

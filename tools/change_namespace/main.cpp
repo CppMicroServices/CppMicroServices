@@ -62,7 +62,7 @@ const option::Descriptor usage[] = {
 };
 
 int
-main(int argc, char* argv[])
+main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
     argc -= (argc > 0);
     argv += (argc > 0); // Skip program name argv[0] if present

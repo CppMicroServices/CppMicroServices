@@ -9,9 +9,6 @@ namespace fs = std::filesystem;
 
 class NamespaceReplacerTest : public ::testing::Test
 {
-  private:
-    const std::string exePath = EXE_PATH; // Path to the executable being tested
-
   protected:
     fs::path tempDir; // Temporary directory for test files
 
@@ -82,7 +79,7 @@ class NamespaceReplacerTest : public ::testing::Test
     runExecutable(std::string const& inputFile, std::string const& newNamespace, std::string const& outputDir)
     {
         const std::string command
-            = exePath + " --cppms=" + inputFile + " --namespace=" + newNamespace + " --namespace-alias " + outputDir;
+            = std::string(EXE_PATH) + " --cppms=" + inputFile + " --namespace=" + newNamespace + " --namespace-alias " + outputDir;
         std::cout << "Test command used to change namespace: " << command << std::endl;
         int result = std::system(command.c_str());
         if (result != 0)
@@ -102,7 +99,7 @@ namespace cppmicroservices {
     }
 }
 )",
-                              "newnamespace" };
+                                    "newnamespace" };
     const std::string expected = R"(
 namespace newnamespace {} namespace cppmicroservices   = newnamespace; namespace newnamespace {
     void someFunction() {
@@ -125,7 +122,7 @@ void someFunction() {
     // Some code here
 }
 )",
-                              "newnamespace" };
+                                    "newnamespace" };
     const std::string expected = R"(
 using namespace newnamespace;
 
@@ -145,7 +142,7 @@ TEST_F(NamespaceReplacerTest, ReplacesNamespaceInTemplateParameters)
 std::vector<cppmicroservices::ServiceReference> serviceRefs;
 std::map<cppmicroservices::Bundle, cppmicroservices::framework::BundleContext> bundleContextMap;
 )",
-                              "newnamespace" };
+                                    "newnamespace" };
     const std::string expected = R"(
 std::vector<newnamespace::ServiceReference> serviceRefs;
 std::map<newnamespace::Bundle, newnamespace::framework::BundleContext> bundleContextMap;
@@ -221,8 +218,8 @@ TEST_F(NamespaceReplacerTest, ReplacesNamespaceInManifestJson)
   "bundle.description" : "A plugin using cppmicroservices framework"
 }
 )",
-                              "newnamespace",
-                              "json" };
+                                    "newnamespace",
+                                    "json" };
     const std::string expected = R"(
 {
   "bundle.symbolic_name" : "newnamespace::example",
@@ -244,8 +241,8 @@ namespace cppmicroservices {
   // Some configuration code here
 }
 )",
-                              "newnamespace",
-                              "config" };
+                                    "newnamespace",
+                                    "config" };
     const std::string expected = R"(
 namespace newnamespace {} namespace cppmicroservices   = newnamespace; namespace newnamespace {
   // Some configuration code here

@@ -1,9 +1,1 @@
-#if defined(_WIN32) || defined(_WIN64)
-
-#define EXE_PATH "@US_RUNTIME_OUTPUT_DIRECTORY@/Debug/change_namespace@CMAKE_EXECUTABLE_SUFFIX@"
-
-#else
-
 #define EXE_PATH "@US_RUNTIME_OUTPUT_DIRECTORY@/change_namespace@CMAKE_EXECUTABLE_SUFFIX@"
-
-#endif

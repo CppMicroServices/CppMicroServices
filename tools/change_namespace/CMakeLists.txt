@@ -10,6 +10,13 @@ set(srcs main.cpp "FileHandler.cpp" "PathUtility.cpp" "AddPaths.cpp" "CopyPaths.
 add_executable(change_namespace ${srcs})
 set_property(TARGET change_namespace PROPERTY OUTPUT_NAME change_namespace)
 
+if(NOT US_NO_INSTALL)
+    install(TARGETS change_namespace
+            EXPORT ${PROJECT_NAME}Targets
+            FRAMEWORK DESTINATION . ${US_SDK_INSTALL_COMPONENT}
+            RUNTIME DESTINATION ${TOOLS_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
+endif()
+
 include_directories(${PROJECT_BINARY_DIR}/include)
 add_subdirectory(test)
 

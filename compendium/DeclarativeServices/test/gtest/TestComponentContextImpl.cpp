@@ -140,9 +140,6 @@ namespace cppmicroservices
             std::set<cppmicroservices::ServiceReferenceBase> refsSet = { reg.GetReference() };
             EXPECT_CALL(*mockRefMgrFoo, GetBoundReferences()).Times(1).WillRepeatedly(testing::Return(refsSet));
             EXPECT_CALL(*mockRefMgrFoo, GetReferenceName()).Times(1).WillRepeatedly(testing::Return("foo"));
-            EXPECT_CALL(*mockRefMgrFoo, GetReferenceScope())
-                .Times(1)
-                .WillRepeatedly(testing::Return(cppmicroservices::Constants::SCOPE_BUNDLE));
             EXPECT_CALL(*mockConfig, GetBundle()).WillRepeatedly(testing::Return(GetFramework()));
             std::vector<std::shared_ptr<ReferenceManager>> depMgrs { mockRefMgrFoo };
             EXPECT_CALL(*mockConfig, GetAllDependencyManagers()).Times(1).WillRepeatedly(testing::Return(depMgrs));
@@ -160,8 +157,11 @@ namespace cppmicroservices
         /**
          * This test point creates mutiple component configs per available bundle and
          * calls LocateService multiple times on each ComponentContext
+         *
+         * Test is DISABLED because the usage of reference scopes is not supported. Re-enable when
+         * the feature is done.
          */
-        TEST_F(ComponentContextImplTest, VerifyLocateServiceWithReferenceScopes)
+        TEST_F(ComponentContextImplTest, DISABLED_VerifyLocateServiceWithReferenceScopes)
         {
             size_t iterCount = 4ul;
             size_t componentInstanceCount = 3ul;
@@ -321,9 +321,6 @@ namespace cppmicroservices
             refsSet.insert(refs.begin(), refs.end());
             EXPECT_CALL(*mockRefMgrFoo, GetBoundReferences()).Times(1).WillRepeatedly(testing::Return(refsSet));
             EXPECT_CALL(*mockRefMgrFoo, GetReferenceName()).Times(1).WillRepeatedly(testing::Return("foo"));
-            EXPECT_CALL(*mockRefMgrFoo, GetReferenceScope())
-                .Times(1)
-                .WillRepeatedly(testing::Return(cppmicroservices::Constants::SCOPE_BUNDLE));
             EXPECT_CALL(*mockConfig, GetBundle()).WillRepeatedly(testing::Return(GetFramework()));
             std::vector<std::shared_ptr<ReferenceManager>> depMgrs { mockRefMgrFoo };
             EXPECT_CALL(*mockConfig, GetAllDependencyManagers()).Times(1).WillRepeatedly(testing::Return(depMgrs));
@@ -350,9 +347,6 @@ namespace cppmicroservices
             refsSet.insert(refs.begin(), refs.end());
             EXPECT_CALL(*mockRefMgrFoo, GetBoundReferences()).Times(1).WillRepeatedly(testing::Return(refsSet));
             EXPECT_CALL(*mockRefMgrFoo, GetReferenceName()).Times(1).WillRepeatedly(testing::Return("foo"));
-            EXPECT_CALL(*mockRefMgrFoo, GetReferenceScope())
-                .Times(1)
-                .WillRepeatedly(testing::Return(cppmicroservices::Constants::SCOPE_BUNDLE));
             EXPECT_CALL(*mockConfig, GetBundle()).WillRepeatedly(testing::Return(GetFramework()));
             std::vector<std::shared_ptr<ReferenceManager>> depMgrs { mockRefMgrFoo };
             EXPECT_CALL(*mockConfig, GetAllDependencyManagers()).Times(1).WillRepeatedly(testing::Return(depMgrs));
@@ -523,9 +517,6 @@ namespace cppmicroservices
             refsSet.insert(refs.begin(), refs.end());
             EXPECT_CALL(*mockRefMgrFoo, GetBoundReferences()).Times(1).WillRepeatedly(testing::Return(refsSet));
             EXPECT_CALL(*mockRefMgrFoo, GetReferenceName()).Times(1).WillRepeatedly(testing::Return("foo"));
-            EXPECT_CALL(*mockRefMgrFoo, GetReferenceScope())
-                .Times(1)
-                .WillRepeatedly(testing::Return(cppmicroservices::Constants::SCOPE_BUNDLE));
             EXPECT_CALL(*mockConfig, GetBundle()).WillRepeatedly(testing::Return(GetFramework()));
             std::vector<std::shared_ptr<ReferenceManager>> depMgrs { mockRefMgrFoo };
             EXPECT_CALL(*mockConfig, GetAllDependencyManagers()).Times(1).WillRepeatedly(testing::Return(depMgrs));

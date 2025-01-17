@@ -683,7 +683,7 @@ namespace test
         auto service = getFactoryService<test::ServiceAInt>("ServiceA", "1", props);
         ASSERT_TRUE(service);
 
-        const std::string fooValue { "123" };
+        std::string const fooValue { "123" };
         props["foo"] = fooValue;
         auto config = configAdmin->GetFactoryConfiguration("ServiceA", "1");
         auto fut = config->Update(props);
@@ -693,7 +693,7 @@ namespace test
         ASSERT_TRUE(instance) << "ServiceA~1 instance not found";
         auto properties = instance->GetProperties();
         ASSERT_TRUE(properties.size() > 1) << "ServiceA~1 properties should have two entries.";
- 
+
         auto iter = properties.find("foo");
         ASSERT_TRUE(iter != properties.end()) << "The foo key does not exist in the properties.";
         EXPECT_EQ(iter->second, fooValue);
@@ -701,5 +701,39 @@ namespace test
         // Clean up
         serviceBReg.Unregister();
         testBundle.Stop();
+    }
+
+    TEST_F(tFactoryTarget, testRefToSingletonService)
+    {
+        test::InstallLib(context, "TestBundleDSFAC1");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC1");
+        auto config = configAdmin->GetConfiguration("scopetestpid");
+        cppmicroservices::AnyMap props;
+        props["foo"] = 1;
+        auto fut = config->Update(props);
+        fut.get();
+
+        auto service1 = getFactoryService<test::ServiceAInt>("ServiceA2", "1", {});
+        auto service2 = getFactoryService<test::ServiceAInt>("ServiceA2", "2", {});
+        ASSERT_TRUE(service1);
+        ASSERT_TRUE(service2);
+        ASSERT_EQ(service1->GetRefAddr(), service2->GetRefAddr());
+    }
+
+    TEST_F(tFactoryTarget, testRefToProtypeService)
+    {
+        test::InstallLib(context, "TestBundleDSFAC1");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC1");
+        auto config = configAdmin->GetConfiguration("scopetestpid");
+        cppmicroservices::AnyMap props;
+        props["foo"] = 1;
+        auto fut = config->Update(props);
+        fut.get();
+
+        auto service1 = getFactoryService<test::ServiceAInt>("ServiceA3", "1", {});
+        auto service2 = getFactoryService<test::ServiceAInt>("ServiceA3", "2", {});
+        ASSERT_TRUE(service1);
+        ASSERT_TRUE(service2);
+        ASSERT_NE(service1->GetRefAddr(), service2->GetRefAddr());
     }
 }; // namespace test

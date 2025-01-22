@@ -259,6 +259,21 @@ namespace cppmicroservices
     any_map::const_iter&
     any_map::const_iter::operator=(any_map::const_iter const& x)
     {
+        switch (type)
+        {
+            case ORDERED:
+                delete it.o;
+                break;
+            case UNORDERED:
+                delete it.uo;
+                break;
+            case UNORDERED_CI:
+                delete it.uoci;
+                break;
+            case NONE:
+                break;
+        }
+
         type = x.type;
         switch (type)
         {

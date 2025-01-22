@@ -240,15 +240,19 @@ TEST(AnyMapTest, CopyAssignment)
         AnyMap::ORDERED_MAP,
         {{ "do", 1}, {"re", 2 }}
     };
+    any_map::const_iter m1i = m1.begin();
 
     AnyMap m2 = {
         AnyMap::UNORDERED_MAP,
         {{ "fi", 3}, {"la", 4}}
     };
+    any_map::const_iter m2i = m2.begin();
 
     ASSERT_NE(m1, m2) << "Different maps should not be equal";
+    ASSERT_NE(m1i, m2i) << "Different maps should have different iterators";
     m1 = m2;
     ASSERT_EQ(m1, m2) << "Copy assignment should result in equal maps";
+    ASSERT_EQ(m1.GetType(), AnyMap::UNORDERED_MAP) << "Assignment should update map type";
 
     m2.erase("fi");
     AnyMap m3 = {
@@ -256,6 +260,11 @@ TEST(AnyMapTest, CopyAssignment)
         {{ "fi", 3}, {"la", 4}}
     };
     ASSERT_EQ(m1, m3) << "Copied map should not reference its creator";
+
+    any_map::const_iter m3i = m3.begin();
+    ASSERT_NE(m1i, m3i) << "Copied map should have a different iterator";
+    m3i = m1i;
+    ASSERT_EQ(m1i, m3i) << "Copy-assigning an AnyMap iterator should make identical iterators";
 }
 
 TEST(AnyMapTest, CIHash)

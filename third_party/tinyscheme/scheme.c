@@ -1,4 +1,4 @@
-/* T I N Y S C H E M E    1 . 4 1
+/* T I N Y S C H E M E    1 . 4 2
  *   Dimitrios Souflis (dsouflis@acm.org)
  *   Based on MiniScheme (original credits follow)
  * (MINISCM)               coded by Atsushi Moriwaki (11/5/1989)
@@ -18,9 +18,7 @@
 # include <unistd.h>
 #endif
 #ifdef WIN32
-#include <wchar.h>
 #define snprintf _snprintf
-#pragma warning( disable : 4244 4267)
 #endif
 #if USE_DL
 # include "dynload.h"
@@ -65,7 +63,7 @@
  *  Basic memory allocation units
  */
 
-#define banner "TinyScheme 1.41"
+#define banner "TinyScheme 1.42"
 
 #include <string.h>
 #include <stdlib.h>
@@ -1925,8 +1923,7 @@ static void atom2str(scheme *sc, pointer l, int f, char **pp, int *plen) {
      } else if (l == sc->EOF_OBJ) {
           p = "#<EOF>";
      } else if (is_port(l)) {
-          p = sc->strbuff;
-          snprintf(p, STRBUFFSIZE, "#<PORT>");
+          p = "#<PORT>";
      } else if (is_number(l)) {
           p = sc->strbuff;
           if (f <= 1 || f == 10) /* f is the base for numbers if > 1 */ {
@@ -1980,29 +1977,33 @@ static void atom2str(scheme *sc, pointer l, int f, char **pp, int *plen) {
           } else {
                switch(c) {
                case ' ':
-                    snprintf(p,STRBUFFSIZE,"#\\space"); break;
+                    p = "#\\space";
+                    break;
                case '\n':
-                    snprintf(p,STRBUFFSIZE,"#\\newline"); break;
+                    p = "#\\newline";
+                    break;
                case '\r':
-                    snprintf(p,STRBUFFSIZE,"#\\return"); break;
+                    p = "#\\return";
+                    break;
                case '\t':
-                    snprintf(p,STRBUFFSIZE,"#\\tab"); break;
+                    p = "#\\tab";
+                    break;
                default:
 #if USE_ASCII_NAMES
                     if(c==127) {
-                         snprintf(p,STRBUFFSIZE, "#\\del");
+                         p = "#\\del";
                          break;
                     } else if(c<32) {
-                         snprintf(p, STRBUFFSIZE, "#\\%s", charnames[c]);
+                         snprintf(p,STRBUFFSIZE, "#\\%s",charnames[c]);
                          break;
                     }
 #else
                     if(c<32) {
-                      snprintf(p,STRBUFFSIZE,"#\\x%x",c); break;
+                      snprintf(p,STRBUFFSIZE,"#\\x%x",c);
                       break;
                     }
 #endif
-                    snprintf(p,STRBUFFSIZE,"#\\%c",c); break;
+                    snprintf(p,STRBUFFSIZE,"#\\%c",c);
                     break;
                }
           }
@@ -2938,7 +2939,7 @@ static pointer opexe_1(scheme *sc, enum scheme_opcodes op) {
                if ((sc->code = cdar(sc->code)) == sc->NIL) {
                     s_return(sc,sc->value);
                }
-               if(car(sc->code)==sc->FEED_TO) {
+               if(!sc->code || car(sc->code)==sc->FEED_TO) {
                     if(!is_pair(cdr(sc->code))) {
                          Error_0(sc,"syntax error in cond");
                     }
@@ -4821,6 +4822,8 @@ void scheme_load_named_file(scheme *sc, FILE *fin, const char *filename) {
   sc->load_stack[0].rep.stdio.curr_line = 0;
   if(fin!=stdin && filename)
     sc->load_stack[0].rep.stdio.filename = store_string(sc, strlen(filename), filename, 0);
+  else
+    sc->load_stack[0].rep.stdio.filename = NULL;
 #endif
 
   sc->inport=sc->loadport;

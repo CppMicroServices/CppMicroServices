@@ -25,14 +25,10 @@ extern "C" {
 #else
 # define USE_STRCASECMP 0
 # define USE_STRLWR 0
-# ifdef _SCHEME_DLL
 # ifdef _SCHEME_SOURCE
 #  define SCHEME_EXPORT __declspec(dllexport)
 # else
 #  define SCHEME_EXPORT __declspec(dllimport)
-# endif
-# else
-# define SCHEME_EXPORT
 # endif
 #endif
 
@@ -131,7 +127,7 @@ typedef struct num {
      } value;
 } num;
 
-SCHEME_EXPORT scheme *scheme_init_new();
+SCHEME_EXPORT scheme *scheme_init_new(void);
 SCHEME_EXPORT scheme *scheme_init_new_custom_alloc(func_alloc malloc, func_dealloc free);
 SCHEME_EXPORT int scheme_init(scheme *sc);
 SCHEME_EXPORT int scheme_init_custom_alloc(scheme *sc, func_alloc, func_dealloc);

@@ -25,12 +25,15 @@ extern "C" {
 #else
 # define USE_STRCASECMP 0
 # define USE_STRLWR 0
+# ifdef _SCHEME_DLL
 # ifdef _SCHEME_SOURCE
 #  define SCHEME_EXPORT __declspec(dllexport)
 # else
 #  define SCHEME_EXPORT __declspec(dllimport)
 # endif
-#endif
+# else
+# define SCHEME_EXPORT
+# endif
 
 #if USE_NO_FEATURES
 # define USE_MATH 0

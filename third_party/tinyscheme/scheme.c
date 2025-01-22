@@ -18,7 +18,9 @@
 # include <unistd.h>
 #endif
 #ifdef WIN32
+#include <wchar.h>
 #define snprintf _snprintf
+#pragma warning( disable : 4244 4267)
 #endif
 #if USE_DL
 # include "dynload.h"

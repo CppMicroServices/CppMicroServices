@@ -34,6 +34,7 @@ extern "C" {
 # else
 # define SCHEME_EXPORT
 # endif
+# endif
 
 #if USE_NO_FEATURES
 # define USE_MATH 0

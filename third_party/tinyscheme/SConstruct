@@ -1,0 +1,5 @@
+DEFINES='-DUSE_DL=1 -DUSE_MATH=1 -DUSE_ASCII_NAMES=1'
+FILES=['scheme.c', 'dynload.c']
+Program(FILES, LIBS=['m', 'dl'], CCFLAGS=DEFINES)
+StaticLibrary(FILES, CCFLAGS=DEFINES)
+SharedLibrary(FILES, CCFLAGS=DEFINES)

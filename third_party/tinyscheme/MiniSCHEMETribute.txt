@@ -4,8 +4,8 @@
      preferred solution, had there been a Javascript interpreter I could
      lay my hands on. But there weren't. Perl would have been another solution,
      but it was probably ten times bigger that the program it was supposed to
-     be embedded in. There would also be thorny licencing issues.
-
+     be embedded in. There would also be thorny licencing issues. 
+     
      So, the obvious thing to do was find a trully small interpreter. Forth
      was a language I had once quasi-implemented, but the difficulty of
      handling dynamic data and the weirdness of the language put me off. I then
@@ -13,13 +13,13 @@
      implement. Alas, the LeLisp I knew from my days in UPMC (Universite Pierre
      et Marie Curie) had given way to Common Lisp, a megalith of a language!
      Then my search lead me to Scheme, a language I knew was very orthogonal
-     and clean. When I found Mini-Scheme, a single C file of some 2400 loc, I
-     fell in love with it! What if it lacked floating-point numbers and
+     and clean. When I found Mini-Scheme, a single C file of some 2400 loc, I 
+     fell in love with it! What if it lacked floating-point numbers and 
      strings! The rest, as they say, is history.
-
+     
      Below  are the original credits. Don't email Akira KIDA, the address has
      changed.
-
+     
      ---------- Mini-Scheme Interpreter Version 0.85 ----------
 
                 coded by Atsushi Moriwaki (11/5/1989)

@@ -52,14 +52,6 @@ Patches
  * Support for zip files with prepended binary blobs.
  * Write to C file streams.
 
-libtelnet
----------
-
-Public Domain
-
-https://github.com/seanmiddleditch/libtelnet
-574eef9fd7f373fb2812939456fc5a4c3e975b44
-
 tinyscheme
 ----------
 

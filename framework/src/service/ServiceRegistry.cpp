@@ -36,6 +36,17 @@
 namespace cppmicroservices
 {
 
+    std::string
+    removeLeadingNamespacing(std::string const& className)
+    {
+        auto ind = className.find_first_not_of(':');
+        if (ind == std::string::npos)
+        {
+            return className;
+        }
+        return className.substr(ind);
+    }
+
     void
     ServiceRegistry::Clear()
     {
@@ -93,10 +104,10 @@ namespace cppmicroservices
 
         // Check if we got a service factory
         bool isFactory = service->count("org.cppmicroservices.factory") > 0;
-        bool isPrototypeFactory
-            = (isFactory ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(
-                   std::static_pointer_cast<ServiceFactory>(service->find("org.cppmicroservices.factory")->second)))
-                         : false);
+        bool isPrototypeFactory = (isFactory ? static_cast<bool>(std::dynamic_pointer_cast<PrototypeServiceFactory>(
+                                                   std::static_pointer_cast<ServiceFactory>(
+                                                       service->find("org.cppmicroservices.factory")->second)))
+                                             : false);
 
         std::vector<std::string> classes;
         // Check if service implements claimed classes and that they exist.
@@ -106,7 +117,7 @@ namespace cppmicroservices
             {
                 throw std::invalid_argument("Can't register as null class");
             }
-            classes.push_back(i.first);
+            classes.push_back(removeLeadingNamespacing(i.first));
         }
 
         ServiceRegistrationBase res(bundle,
@@ -148,7 +159,7 @@ namespace cppmicroservices
     void
     ServiceRegistry::Get(std::string const& clazz, std::vector<ServiceRegistrationBase>& serviceRegs) const
     {
-        this->Lock(), Get_unlocked(clazz, serviceRegs);
+        this->Lock(), Get_unlocked(removeLeadingNamespacing(clazz), serviceRegs);
     }
 
     void
@@ -169,7 +180,7 @@ namespace cppmicroservices
         try
         {
             std::vector<ServiceReferenceBase> srs;
-            Get_unlocked(clazz, "", bundle, srs);
+            Get_unlocked(removeLeadingNamespacing(clazz), "", bundle, srs);
             DIAG_LOG(*core->sink) << "get service ref " << clazz << " for bundle " << bundle->symbolicName << " = "
                                   << srs.size() << " refs";
 
@@ -191,7 +202,7 @@ namespace cppmicroservices
                          BundlePrivate* bundle,
                          std::vector<ServiceReferenceBase>& res) const
     {
-        this->Lock(), Get_unlocked(clazz, filter, bundle, res);
+        this->Lock(), Get_unlocked(removeLeadingNamespacing(clazz), filter, bundle, res);
     }
 
     void

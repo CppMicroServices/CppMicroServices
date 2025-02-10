@@ -746,7 +746,7 @@ namespace cppmicroservices
                 EXPECT_CALL(*mockFactory, GetService(testing::_, testing::_))
                     .Times(1)
                     .WillRepeatedly(testing::Invoke(
-                        [&](const cppmicroservices::Bundle& b, const cppmicroservices::ServiceRegistrationBase&)
+                        [&](cppmicroservices::Bundle const& b, cppmicroservices::ServiceRegistrationBase const&)
                         {
                             fakeCompConfig->Activate(b);
                             return instanceMap;
@@ -1129,7 +1129,7 @@ namespace cppmicroservices
                 {
                     auto configuration = configAdminService->GetConfiguration("sample::config");
                     auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                        {"foo", true}
+                        { "foo", true }
                     });
                     fut.second.wait();
                 });
@@ -1177,15 +1177,15 @@ namespace cppmicroservices
             EXPECT_CALL(*mockCompInstance, DoesModifiedMethodExist()).Times(0);
             auto configuration = configAdminService->GetConfiguration("sample::config1");
             auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", true}
+                { "foo", true }
             });
             fut.second.wait();
             fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", false}
+                { "foo", false }
             });
             fut.second.wait();
             fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", true}
+                { "foo", true }
             });
             fut.second.wait();
 
@@ -1195,7 +1195,7 @@ namespace cppmicroservices
                 {
                     auto configuration = configAdminService->GetConfiguration("sample::config");
                     auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                        {"foo1", true}
+                        { "foo1", true }
                     });
                     fut.second.wait();
                 });
@@ -1243,23 +1243,23 @@ namespace cppmicroservices
             EXPECT_CALL(*mockCompInstance, DoesModifiedMethodExist()).Times(1);
             auto configuration = configAdminService->GetConfiguration("sample::config1");
             auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", true}
+                { "foo", true }
             });
             fut.second.wait();
             fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo", false}
+                { "foo", false }
             });
             fut.second.wait();
 
             configuration = configAdminService->GetConfiguration("sample::config");
             fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo1", true}
+                { "foo1", true }
             });
             fut.second.wait();
             // config change counts: {1, 2}
             compConfig->Initialize();
             fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                {"foo1", false}
+                { "foo1", false }
             });
             fut.second.wait();
             // config change counts: {2, 2}
@@ -1364,15 +1364,15 @@ namespace cppmicroservices
                     sync_point.Wait(); // Wait for all threads to reach this point
                     auto configuration = configAdminService->GetConfiguration("sample::config");
                     auto fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                        {"foo", true}
+                        { "foo", true }
                     });
                     fut.second.wait();
                     fut = configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                        {"foo", false}
+                        { "foo", false }
                     });
                     fut.second.wait();
                     configuration->UpdateIfDifferent(std::unordered_map<std::string, cppmicroservices::Any> {
-                        {"foo", true}
+                        { "foo", true }
                     });
                 });
 

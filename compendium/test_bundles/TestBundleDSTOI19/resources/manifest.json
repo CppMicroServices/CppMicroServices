@@ -1,19 +1,25 @@
 {
-    "bundle.symbolic_name" : "TestBundleDSTOI19",
-    "scr" : {
-        "version" : 1,
-        "components" : [{
-            "immediate": true,
-            "implementation-class": "sample::ServiceComponent19",
-            "service": {
-                "interfaces": ["test::Interface2"]
-            },
-            "references":[{
-                "name" : "foo",
-                "interface" : "test::Interface1",
-				"target": "(Service.vendor=Sample Vendor)"
-            }],
-            "inject-references": false
-        }]
+    "bundle.symbolic_name": "TestBundleDSTOI19",
+    "scr": {
+        "version": 1,
+        "components": [
+            {
+                "immediate": true,
+                "implementation-class": "sample::ServiceComponent19",
+                "service": {
+                    "interfaces": [
+                        "test::Interface2"
+                    ]
+                },
+                "references": [
+                    {
+                        "name": "foo",
+                        "interface": "test::Interface1",
+                        "target": "(Service.vendor=Sample Vendor)",
+                        "policy": "dynamic"
+                    }
+                ]
+            }
+        ]
     }
 }

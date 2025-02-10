@@ -17,7 +17,7 @@ jobs:
     - name: Checkout submodules
       run: git submodule update --init --recursive
 
-    - uses: ZedThree/clang-tidy-review@v0.14.0
+    - uses: ZedThree/clang-tidy-review@v0.20.1
       id: review
       with:
         split_workflow: true
@@ -31,7 +31,7 @@ jobs:
           cmake . -DCMAKE_EXPORT_COMPILE_COMMANDS=on
           
     # Uploads an artefact containing clang_fixes.json
-    - uses: ZedThree/clang-tidy-review/upload@v0.14.0
+    - uses: ZedThree/clang-tidy-review/upload@v0.20.1
       id: upload-review
     # If there are any comments, fail the check
     - if: steps.review.outputs.total_comments > 0

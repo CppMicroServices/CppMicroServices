@@ -1,0 +1,8 @@
+usFunctionCreateDSTestBundle(TestBundleDSDRMU_userMethodStaticChecks)
+
+usFunctionCreateTestBundleWithResources(TestBundleDSDRMU_userMethodStaticChecks
+  SOURCES src/ServiceComponent_userMethodStaticChecks.cpp ${_glue_file}
+  RESOURCES manifest.json
+  BUNDLE_SYMBOLIC_NAME TestBundleDSDRMU_userMethodStaticChecks
+  OTHER_LIBRARIES usTestInterfaces usServiceComponent usServiceComponent)
+

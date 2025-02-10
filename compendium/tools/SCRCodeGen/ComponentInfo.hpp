@@ -66,7 +66,7 @@ namespace codegen
         std::string GetServiceInterfacesStr(ServiceInfo const& compInfo);
         std::string GetCtorInjectedRefTypes(ComponentInfo const& compInfo);
         std::string GetCtorInjectedRefNames(ComponentInfo const& compInfo);
-        std::string GetReferenceBinderStr(ReferenceInfo const& ref, bool injectReferences);
+        std::string GetReferenceBinderStr(ReferenceInfo const& ref);
         std::string GetCtorInjectedRefParameters(ComponentInfo const& compInfo);
 
     } // namespace datamodel

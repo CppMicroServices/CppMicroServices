@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
+`v3.8.6 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.6>`_ (2024-1-20)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.5...3.8.6>`_
+
+Added
+-----
+- `[Declarative Services] Allow users to force checking of Activate, Deactivate, and Modified methods at compile time <https://github.com/CppMicroServices/CppMicroServices/pull/1046>`_
+- `[Declarative Services] Allow for global namespacing in interface definitions and manifestss <https://github.com/CppMicroServices/CppMicroServices/pull/1048>`_
+
+Changed
+-------
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Declarative Services] Fix logic for when to require dynamic binding methods <https://github.com/CppMicroServices/CppMicroServices/pull/1045>`_
+- `[Core Framework] Update Google Benchmark to v1.9.0 <https://github.com/CppMicroServices/CppMicroServices/pull/1049>`_
+- `[Core Framework] Update clang_tidy_complete_code_review.yml <https://github.com/CppMicroServices/CppMicroServices/pull/1052>`_
+- `[Declarative Services] Fix reference scoping for factory services <https://github.com/CppMicroServices/CppMicroServices/pull/1054>`_
 
 `v3.8.5 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.5>`_ (2024-12-13)
 ---------------------------------------------------------------------------------------------------------

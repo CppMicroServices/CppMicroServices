@@ -145,7 +145,7 @@ namespace cppmicroservices
         {
             auto disabledState = std::make_shared<CMDisabledState>();
             compMgr->SetState(disabledState);
-            auto fut = disabledState->Enable(*compMgr, nullptr);
+            auto fut = disabledState->Enable(*compMgr, std::make_shared<SingleInvokeTask>());
             EXPECT_TRUE(fut.valid()) << "A call to ComponentManager::Enable must always return a valid future";
             EXPECT_NO_THROW({ fut.get(); });
             EXPECT_TRUE(compMgr->IsEnabled()) << "ComponentManager must be ENABLED after a call to Enable";
@@ -157,7 +157,7 @@ namespace cppmicroservices
             compMgr->SetState(disabledState);
             // Invoke "Enable" from multiple threads
             std::function<std::shared_future<void>()> func
-                = [&disabledState, this]() { return disabledState->Enable(*(this->compMgr), nullptr); };
+                = [&disabledState, this]() { return disabledState->Enable(*(this->compMgr), std::make_shared<SingleInvokeTask>()); };
             std::vector<std::shared_future<void>> futVec = ConcurrentInvoke<std::shared_future<void>>(func);
             EXPECT_TRUE(compMgr->IsEnabled()) << "ComponentManager state must be ENABLED "
                                                  "after concurrent calls to Enable";

@@ -28,6 +28,7 @@
 #else
 #    define FRIEND_TEST(x, y)
 #endif
+#include "SingleInvokeTask.hpp"
 #include "ComponentManager.hpp"
 #include "ConfigurationNotifier.hpp"
 #include "states/CMEnabledState.hpp"
@@ -40,7 +41,7 @@ namespace cppmicroservices
 {
     namespace scrimpl
     {
-        using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>, bool)>;
+        using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
         class ComponentRegistry;
         class ComponentManagerState;
 
@@ -68,8 +69,7 @@ namespace cppmicroservices
              * Waits for the provided future from the asynchronous thread pool and executes
              * the task on current thread if the thread pool has stalled
              */
-            void WaitForFuture(std::shared_future<void>& fut,
-                               std::shared_ptr<std::atomic<bool>> asyncStarted) override;
+            void WaitForFuture(std::shared_future<void>& fut, std::shared_ptr<SingleInvokeTask> singleInvoke) override;
             /**
              * Initialization method used to kick start the state machine implemented by this class.
              */
@@ -83,12 +83,12 @@ namespace cppmicroservices
             /** @copydoc ComponentManager::Enable()
              * Delegates the call to the current state object passing in the synchronizing atomic bool
              */
-            std::shared_future<void> Enable(std::shared_ptr<std::atomic<bool>> asyncStarted = nullptr) override;
+            std::shared_future<void> Enable(std::shared_ptr<SingleInvokeTask> singleInvoke = nullptr) override;
 
             /** @copydoc ComponentManager::Disable()
              * Delegates the call to the current state object passing in the synchronizing atomic bool
              */
-            std::shared_future<void> Disable(std::shared_ptr<std::atomic<bool>> asyncStarted = nullptr) override;
+            std::shared_future<void> Disable(std::shared_ptr<SingleInvokeTask> singleInvoke = nullptr) override;
 
             /** @copydoc ComponentManager::GetComponentConfigurations()
              * Delegates the call to the current state object
@@ -163,7 +163,7 @@ namespace cppmicroservices
              * by the given future. If none of the futures are ready, the given future
              * is added to the vector.
              */
-            void AccumulateFuture(std::shared_future<void> fObj, std::shared_ptr<std::atomic<bool>> asyncStarted);
+            void AccumulateFuture(std::shared_future<void> fObj, std::shared_ptr<SingleInvokeTask> singleInvoke);
 
             /**
              * Method used to set the state of this object. It invokes the std::atomic
@@ -196,33 +196,28 @@ namespace cppmicroservices
              * to be completed if the state was successfully changed.
              *
              * \param currentState The current state object
-             * \param asyncStarted The bool used to synchronize the waiting and the posted thread
+             * \param singleInvoke The singleInvokeTask used to manage concurrent and duplicate execution of the task
              * \return a shared_future<void> on which to wait for the asynchronous work to complete.
              */
             std::shared_future<void> PostAsyncDisabledToEnabled(
                 std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
-                std::shared_ptr<std::atomic<bool>> asyncStarted);
+                std::shared_ptr<SingleInvokeTask> singleInvoke);
 
             /**
              * Attempts to change the state from enabled to disabled and posts asynchronous work
              * to be completed if the state was successfully changed.
              *
              * \param currentState The current state object
-             * \param asyncStarted The bool used to synchronize the waiting and the posted thread
+             * \param singleInvoke The singleInvokeTask used to manage concurrent and duplicate execution of the task
              * \return a shared_future<void> on which to wait for the asynchronous work to complete.
              */
             std::shared_future<void> PostAsyncEnabledToDisabled(
                 std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
-                std::shared_ptr<std::atomic<bool>> asyncStarted);
+                std::shared_ptr<SingleInvokeTask> singleInvoke);
 
           private:
             FRIEND_TEST(ComponentManagerImplParameterizedTest, TestAccumulateFutures);
-            std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<ActualTask>>
-                asyncTaskMap; // map storing the task associated with each atomic_bool for tasks posted to the thread
-                              // pool
-            std::unordered_map<std::shared_ptr<std::atomic<bool>>, std::shared_ptr<CMEnabledState>>
-                asyncTaskStateMap; // map storing the state associated with each task for tasks posted to the thread
-                                   // pool
+
             std::shared_ptr<ComponentRegistry> const
                 registry; ///< component registry associated with the current runtime
             std::shared_ptr<metadata::ComponentMetadata const> const compDesc; ///< the component description
@@ -230,8 +225,8 @@ namespace cppmicroservices
             std::shared_ptr<cppmicroservices::logservice::LogService> const
                 logger;                                   ///< logger associated with the current runtime
             std::shared_ptr<ComponentManagerState> state; ///< This member is always accessed using atomic operations
-            std::vector<std::pair<std::shared_future<void>, std::shared_ptr<std::atomic<bool>>>>
-                    disableFutures;  ///< futures created when the component transitioned to \c DISABLED state
+            std::vector<std::pair<std::shared_future<void>, std::shared_ptr<SingleInvokeTask>>>
+                disableFutures;      ///< futures created when the component transitioned to \c DISABLED state
             std::mutex futuresMutex; ///< mutex to protect the #disableFutures member
             std::shared_ptr<cppmicroservices::async::AsyncWorkService>
                 asyncWorkService; ///< work service to execute async work

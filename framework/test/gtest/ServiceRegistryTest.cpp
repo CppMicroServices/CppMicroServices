@@ -79,7 +79,31 @@ TEST_F(ServiceRegistryTest, TestServiceInterfaceId)
 {
     ASSERT_EQ(us_service_interface_iid<int>(), "int");
     ASSERT_EQ(us_service_interface_iid<ITestServiceA>(), "ITestServiceA");
+    ASSERT_EQ(us_service_interface_iid<::ITestServiceA>(), "ITestServiceA");
     ASSERT_EQ(us_service_interface_iid<ITestServiceB>(), "com.mycompany.ITestService/1.0");
+}
+
+TEST_F(ServiceRegistryTest, TestGlobalNamespaceOnServiceRegistration)
+{
+    auto s1 = std::make_shared<TestServiceA>();
+
+    ServiceRegistration<ITestServiceA> reg1 = context.RegisterService<::ITestServiceA>(s1);
+
+    // Test for two registered ITestServiceA services
+    ServiceReference<ITestServiceA> ref = context.GetServiceReference("ITestServiceA");
+    ASSERT_TRUE(ref);
+
+    ref = context.GetServiceReference("::ITestServiceA");
+    ASSERT_TRUE(ref);
+
+    // Test for no ITestServiceA services
+    reg1.Unregister();
+    ref = context.GetServiceReference("::ITestServiceA");
+    ASSERT_FALSE(ref);
+
+    // Test for invalid service reference
+    ref = context.GetServiceReference<ITestServiceA>();
+    ASSERT_FALSE(ref);
 }
 
 TEST_F(ServiceRegistryTest, TestMultipleServiceRegistrations)

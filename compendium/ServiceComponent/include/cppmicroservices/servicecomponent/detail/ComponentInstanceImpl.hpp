@@ -404,8 +404,10 @@ namespace cppmicroservices
                     template <class C = T,
                               class I = Injection,
                               class InjectionFalse = typename std::enable_if<I::value == false>::type,
-                              class IsDefaultConstructible
-                              = typename std::enable_if<std::is_default_constructible<C>::value == true>::type>
+                              class IsDefaultConstructible = typename std::enable_if<
+                                  std::is_default_constructible<C>::value
+                                  && !std::is_constructible<C, std::shared_ptr<cppmicroservices::AnyMap> const&>::
+                                         value>::type>
                     std::shared_ptr<T>
                     DoCreate(bool)
                     {
@@ -441,11 +443,12 @@ namespace cppmicroservices
                     DoCreate(bool, bool = true, bool = true)
                     {
                         static_assert(std::is_default_constructible<C>::value,
-                                      "An appropriate constructor was not found "
-                                      "and/or the service implementation does not implement all of the "
-                                      "service interface's methods. A default constructor or a constructor "
-                                      "with an AnyMap input parameter for the configuration properties is "
-                                      "required when inject-references is false. ");
+                                      "An appropriate constructor was not found and/or the service implementation does "
+                                      "not implement all of the service interface's methods. "
+                                      "A default constructor or a constructor with an AnyMap input parameter for the "
+                                      "configuration properties is required when inject-references is false. "
+                                      "A properly defined Modified, Activate, and Deactivate method are required when "
+                                      "inheriting from UserDefinedMethodVerification.");
                         return nullptr;
                     }
 
@@ -470,7 +473,9 @@ namespace cppmicroservices
                                       "service interface's methods. A constructor with service reference "
                                       "input parameters or a constructor with an AnyMap input parameter for "
                                       "configuration properties and service reference input parameters is "
-                                      "required when inject-references is true. ");
+                                      "required when inject-references is true. A properly defined Modified, Activate, "
+                                      "and Deactivate method are required when "
+                                      "inheriting from UserDefinedMethodVerification.");
                         return nullptr;
                     }
 
@@ -605,8 +610,8 @@ namespace cppmicroservices
                 };
 
             } // namespace detail
-        }     // namespace component
-    }         // namespace service
+        } // namespace component
+    } // namespace service
 } // namespace cppmicroservices
 
 #endif /* ComponentInstance_hpp */

@@ -276,6 +276,58 @@ namespace
         std::shared_ptr<ServiceDependency1> foo;
     };
 
+    class TestServiceImplWithDefaultCtor : public TestServiceInterface1
+    {
+      public:
+        TestServiceImplWithDefaultCtor() = default;
+        ~TestServiceImplWithDefaultCtor() = default;
+
+        TestServiceImplWithDefaultCtor(TestServiceImplWithDefaultCtor const& other) = default;
+        TestServiceImplWithDefaultCtor& operator=(TestServiceImplWithDefaultCtor const& other) = default;
+        TestServiceImplWithDefaultCtor(TestServiceImplWithDefaultCtor&& other) noexcept = default;
+        TestServiceImplWithDefaultCtor& operator=(TestServiceImplWithDefaultCtor&& other) noexcept = default;
+
+        bool
+        defCon()
+        {
+            return def;
+        }
+
+      private:
+        std::shared_ptr<cppmicroservices::AnyMap> props;
+        bool def = true;
+    };
+
+    class TestServiceImplWithConfigAndDefaultCtor : public TestServiceInterface1
+    {
+      public:
+        TestServiceImplWithConfigAndDefaultCtor() = default;
+        TestServiceImplWithConfigAndDefaultCtor(std::shared_ptr<cppmicroservices::AnyMap> properties)
+            : props(properties)
+            , def(false)
+        {
+            return;
+        }
+        ~TestServiceImplWithConfigAndDefaultCtor() = default;
+
+        TestServiceImplWithConfigAndDefaultCtor(TestServiceImplWithConfigAndDefaultCtor const& other) = default;
+        TestServiceImplWithConfigAndDefaultCtor& operator=(TestServiceImplWithConfigAndDefaultCtor const& other)
+            = default;
+        TestServiceImplWithConfigAndDefaultCtor(TestServiceImplWithConfigAndDefaultCtor&& other) noexcept = default;
+        TestServiceImplWithConfigAndDefaultCtor& operator=(TestServiceImplWithConfigAndDefaultCtor&& other) noexcept
+            = default;
+
+        bool
+        defCon()
+        {
+            return def;
+        }
+
+      private:
+        std::shared_ptr<cppmicroservices::AnyMap> props;
+        bool def = true;
+    };
+
     /**
      * This class is used to mock the behavior of a ComponentContext object
      * created by the declarative services runtime implementation.
@@ -336,6 +388,19 @@ namespace
         ASSERT_FALSE(compObj->GetBar());
     }
 
+    TEST(ComponentInstance, validateConstructorCall)
+    {
+        ComponentInstanceImpl<TestServiceImplWithDefaultCtor, std::tuple<TestServiceInterface1>> compInstance;
+        auto mockContext = std::make_shared<MockComponentContext>();
+        EXPECT_CALL(*(mockContext.get()), LocateService(testing::_, testing::_))
+            .Times(0); // ensure the mock context never gets a call to LocateService
+        compInstance.CreateInstance(mockContext);
+        ASSERT_EQ(compInstance.GetInstance()->defCon(), true);
+
+        ComponentInstanceImpl<TestServiceImplWithConfigAndDefaultCtor, std::tuple<TestServiceInterface1>> compInstance2;
+        compInstance2.CreateInstance(mockContext);
+        ASSERT_EQ(compInstance2.GetInstance()->defCon(), false);
+    }
     /**
      * This test point is used to verify the ComponentInstanceImpl works properly
      * for a Service Component that provides a single service but does not consume

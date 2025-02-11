@@ -5,6 +5,60 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
+`v3.8.6 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.6>`_ (2024-1-20)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.5...3.8.6>`_
+
+Added
+-----
+- `[Declarative Services] Allow users to force checking of Activate, Deactivate, and Modified methods at compile time <https://github.com/CppMicroServices/CppMicroServices/pull/1046>`_
+- `[Declarative Services] Allow for global namespacing in interface definitions and manifestss <https://github.com/CppMicroServices/CppMicroServices/pull/1048>`_
+
+Changed
+-------
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Declarative Services] Fix logic for when to require dynamic binding methods <https://github.com/CppMicroServices/CppMicroServices/pull/1045>`_
+- `[Core Framework] Update Google Benchmark to v1.9.0 <https://github.com/CppMicroServices/CppMicroServices/pull/1049>`_
+- `[Core Framework] Update clang_tidy_complete_code_review.yml <https://github.com/CppMicroServices/CppMicroServices/pull/1052>`_
+- `[Declarative Services] Fix reference scoping for factory services <https://github.com/CppMicroServices/CppMicroServices/pull/1054>`_
+
+`v3.8.5 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.5>`_ (2024-12-13)
+---------------------------------------------------------------------------------------------------------
+
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.4...3.8.5>`_
+
+Added
+-----
+- `[Configuration Admin] Safe Futures Addition <https://github.com/CppMicroServices/CppMicroServices/pull/1019>`_
+- `[Declarative Services] Allow for the presence of both a default constructor and one which takes the properties for the service <https://github.com/CppMicroServices/CppMicroServices/pull/1030>`_
+- `[Core Framework] Functionality to retrieve Service Reference from Service <https://github.com/CppMicroServices/CppMicroServices/pull/1044>`_
+
+Changed
+-------
+
+Removed
+-------
+
+Deprecated
+----------
+
+Fixed
+-----
+- `[Declarative Services] update async deadlock prevention <https://github.com/CppMicroServices/CppMicroServices/pull/1027>`_
+- `[Core Framework] Remove linking to library rt from Android build as it is apart of stdc++ <https://github.com/CppMicroServices/CppMicroServices/pull/1038>`_
+- `[Core Framework] Create cmake-variants.json <https://github.com/CppMicroServices/CppMicroServices/pull/1033>`_
+- `[Log Service] Update LogService class in CppMicroServices <https://github.com/CppMicroServices/CppMicroServices/pull/1009>`_
+- `[Declarative Services] Remove deadlock in config notification <https://github.com/CppMicroServices/CppMicroServices/pull/1040>`_
+- `[Configuration Admin] Fixes a race condition in Config Admin shutdown <https://github.com/CppMicroServices/CppMicroServices/pull/1043>`_
 
 `v3.8.4 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.4>`_ (2024-6-6)
 ---------------------------------------------------------------------------------------------------------

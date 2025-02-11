@@ -157,7 +157,7 @@ Please read accompanying file COPYING.
      13	     #\cr              30       #\rs
      14	     #\so              31       #\us
      15	     #\si
-     16	     #\dle             127      #\del
+     16	     #\dle             127      #\del 		
 
      Numeric literals support #x #o #b and #d. Flonums are currently read only
      in decimal notation. Full grammar will be supported soon.
@@ -336,8 +336,8 @@ Please read accompanying file COPYING.
      Usage: tinyscheme -?
      or:    tinyscheme [<file1> <file2> ...]
      followed by
-         -1 <file> [<arg1> <arg2> ...]
-         -c <Scheme commands> [<arg1> <arg2> ...]
+	       -1 <file> [<arg1> <arg2> ...]
+	       -c <Scheme commands> [<arg1> <arg2> ...]
      assuming that the executable is named tinyscheme.
 
      Use - in the place of a filename to denote stdin.
@@ -346,8 +346,8 @@ Please read accompanying file COPYING.
      then tinyscheme will be called to process the file. For example, the
      following script echoes the Scheme list of its arguments.
 
-         #! /somewhere/tinyscheme -1
-         (display *args*)
+	       #! /somewhere/tinyscheme -1
+	       (display *args*)
 
      The -c flag permits execution of arbitrary Scheme code.
 
@@ -442,3 +442,11 @@ Please read accompanying file COPYING.
      Note: Older versions used ':' as a qualifier. Unfortunately, the use
      of ':' as a pseudo-qualifier in existing code (i.e. SLIB) essentially
      precludes its use as a real qualifier.
+
+
+
+
+
+
+
+

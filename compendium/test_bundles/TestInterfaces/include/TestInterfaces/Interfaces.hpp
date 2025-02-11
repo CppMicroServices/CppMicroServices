@@ -102,7 +102,7 @@ namespace test
     // static data is initialized correctly
     class US_TestInterfaces_EXPORT TestInitialization
     {
-    public:
+      public:
         virtual std::vector<cppmicroservices::BundleContext> GetContexts(void) = 0;
         virtual ~TestInitialization() = default;
     };
@@ -190,13 +190,19 @@ namespace test
         virtual bool isDependencyInjected() = 0;
         virtual ~CAInterface1();
     };
-    // Use these interfaces in test bundles testing Factory target 
+    // Use these interfaces in test bundles testing Factory target
     // functionality in DS.
     class US_TestInterfaces_EXPORT ServiceAInt
     {
       public:
         virtual cppmicroservices::AnyMap GetProperties() = 0;
         virtual ~ServiceAInt();
+
+        virtual void*
+        GetRefAddr() const
+        {
+            return nullptr;
+        }
     };
     class US_TestInterfaces_EXPORT ServiceBInt
     {

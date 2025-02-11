@@ -22,6 +22,7 @@
 
 #include "ComponentManagerImpl.hpp"
 #include "ConcurrencyUtil.hpp"
+#include "SingleInvokeTask.hpp"
 #include "cppmicroservices/SecurityException.h"
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/detail/ScopeGuard.h"
@@ -59,8 +60,8 @@ namespace cppmicroservices
 
         ComponentManagerImpl::~ComponentManagerImpl()
         {
-            auto asyncStarted = std::make_shared<std::atomic<bool>>(false);
-            GetState()->Disable(*this, asyncStarted);
+            auto singleInvoke = std::make_shared<SingleInvokeTask>();
+            GetState()->Disable(*this, singleInvoke);
             for (auto& pair : disableFutures)
             {
                 try
@@ -78,33 +79,13 @@ namespace cppmicroservices
 
         void
         ComponentManagerImpl::WaitForFuture(std::shared_future<void>& fut,
-                                            std::shared_ptr<std::atomic<bool>> asyncStarted)
+                                            std::shared_ptr<SingleInvokeTask> singleInvoke)
         {
-            // ensure that asyncTaskMap and asyncTaskStateMap are cleared even if task throws
-            detail::ScopeGuard sg(
-                [this, asyncStarted]()
-                {
-                    asyncTaskMap.erase(asyncStarted);
-                    asyncTaskStateMap.erase(asyncStarted);
-                });
-
             constexpr auto timeout = std::chrono::milliseconds(50);
             // if we hit the timeout
             if (fut.wait_for(timeout) == std::future_status::timeout)
             {
-                // we expect that the asyncStarted is false -- i.e. stalled
-                auto expected = false;
-                auto desired = true;
-                // if it is *asyncStarted==false
-                if (asyncStarted->compare_exchange_strong(expected, desired))
-                {
-                    // we execute the task
-                    auto task = asyncTaskMap[asyncStarted];
-                    auto enabledState = asyncTaskStateMap[asyncStarted];
-
-                    // we pass in false because we always want to execute the task here
-                    (*task)(enabledState, false);
-                }
+                (*singleInvoke)();
             }
 
             // we can always get the future... if stalled, it'll be satisfied by WFF
@@ -117,11 +98,11 @@ namespace cppmicroservices
         {
             if (compDesc->enabled)
             {
-                auto asyncStarted = std::make_shared<std::atomic<bool>>(false);
-                auto fut = Enable(asyncStarted);
+                auto singleInvoke = std::make_shared<SingleInvokeTask>();
+                auto fut = Enable(singleInvoke);
                 try
                 {
-                    WaitForFuture(fut, asyncStarted);
+                    WaitForFuture(fut, singleInvoke);
                 }
                 catch (cppmicroservices::SharedLibraryException const&)
                 {
@@ -147,15 +128,23 @@ namespace cppmicroservices
         }
 
         std::shared_future<void>
-        ComponentManagerImpl::Enable(std::shared_ptr<std::atomic<bool>> asyncStarted)
+        ComponentManagerImpl::Enable(std::shared_ptr<SingleInvokeTask> singleInvoke)
         {
-            return GetState()->Enable(*this, asyncStarted);
+            if (!singleInvoke)
+            {
+                singleInvoke = std::make_shared<SingleInvokeTask>();
+            }
+            return GetState()->Enable(*this, singleInvoke);
         }
 
         std::shared_future<void>
-        ComponentManagerImpl::Disable(std::shared_ptr<std::atomic<bool>> asyncStarted)
+        ComponentManagerImpl::Disable(std::shared_ptr<SingleInvokeTask> singleInvoke)
         {
-            return GetState()->Disable(*this, asyncStarted);
+            if (!singleInvoke)
+            {
+                singleInvoke = std::make_shared<SingleInvokeTask>();
+            }
+            return GetState()->Disable(*this, singleInvoke);
         }
 
         std::vector<std::shared_ptr<ComponentConfiguration>>
@@ -178,16 +167,16 @@ namespace cppmicroservices
         }
 
         bool
-        isReady(std::pair<std::shared_future<void>, std::shared_ptr<std::atomic<bool>>> obj)
+        isReady(std::pair<std::shared_future<void>, std::shared_ptr<SingleInvokeTask>> obj)
         {
             return (is_ready(obj.first));
         }
         void
         ComponentManagerImpl::AccumulateFuture(std::shared_future<void> fObj,
-                                               std::shared_ptr<std::atomic<bool>> asyncStarted)
+                                               std::shared_ptr<SingleInvokeTask> singleInvoke)
         {
-            std::pair<std::shared_future<void>, std::shared_ptr<std::atomic<bool>>> pair
-                = std::make_pair(fObj, asyncStarted);
+            std::pair<std::shared_future<void>, std::shared_ptr<SingleInvokeTask>> pair
+                = std::make_pair(fObj, singleInvoke);
             std::lock_guard<std::mutex> lk(futuresMutex);
             auto iterator = std::find_if(disableFutures.begin(), disableFutures.end(), isReady);
             if (iterator == disableFutures.end())
@@ -203,7 +192,7 @@ namespace cppmicroservices
         std::shared_future<void>
         ComponentManagerImpl::PostAsyncDisabledToEnabled(
             std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
-            std::shared_ptr<std::atomic<bool>> asyncStarted)
+            std::shared_ptr<SingleInvokeTask> singleInvoke)
         {
             auto metadata = GetMetadata();
             auto bundle = GetBundle();
@@ -211,26 +200,12 @@ namespace cppmicroservices
             auto logger = GetLogger();
             auto configNotifier = GetConfigNotifier();
 
-            using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>, bool)>;
+            using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
             using PostTask = std::packaged_task<void()>;
 
             ActualTask task(
-                [metadata, bundle, reg, logger, configNotifier, asyncStarted](std::shared_ptr<CMEnabledState> eState,
-                                                                              bool checkExecuted) mutable
+                [metadata, bundle, reg, logger, configNotifier](std::shared_ptr<CMEnabledState> eState) mutable
                 {
-                    // if this task is being run on spawned thread (not waiting thread), check execution status
-                    if (checkExecuted)
-                    {
-                        bool expected = false;
-                        bool desired = true;
-                        // if asyncStarted is non null AND *asyncStarted==true
-                        if (asyncStarted && !asyncStarted->compare_exchange_strong(expected, desired))
-                        {
-                            // this is blocking and it has started
-                            return;
-                        }
-                        // else it is non-blocking or it has not started and we now own it
-                    }
                     // do the task
                     eState->CreateConfigurations(metadata, bundle, reg, logger, configNotifier);
                 });
@@ -239,27 +214,12 @@ namespace cppmicroservices
 
             auto taskPtr = std::make_shared<ActualTask>(std::move(task));
 
-            // if blocking, cache task and enabledState
-            if (asyncStarted)
-            {
-                asyncTaskMap[asyncStarted] = taskPtr;
-                asyncTaskStateMap[asyncStarted] = enabledState;
-            }
-            PostTask post_task(
-                [enabledState, taskPtr]() mutable
-                {
-                    try
-                    {
-                        (*taskPtr)(enabledState, true);
-                    }
-                    catch (...)
-                    {
-                        /*
-                         * task was already executed, by WaitForFuture, calling it
-                         * again will throw. This is expected, we can just catch and continue
-                         */
-                    }
-                });
+            PostTask inter_task([enabledState, taskPtr]() mutable { (*taskPtr)(enabledState); });
+            auto interTaskPtr = std::make_shared<PostTask>(std::move(inter_task));
+
+            singleInvoke->addTask(interTaskPtr);
+
+            PostTask post_task([singleInvoke]() mutable { (*singleInvoke)(); });
 
             // if this object failed to change state and the current state is DISABLED, try again
             auto succeeded = false;
@@ -282,27 +242,14 @@ namespace cppmicroservices
         std::shared_future<void>
         ComponentManagerImpl::PostAsyncEnabledToDisabled(
             std::shared_ptr<cppmicroservices::scrimpl::ComponentManagerState>& currentState,
-            std::shared_ptr<std::atomic<bool>> asyncStarted)
+            std::shared_ptr<SingleInvokeTask> singleInvoke)
         {
-            using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>, bool)>;
+            using ActualTask = std::packaged_task<void(std::shared_ptr<CMEnabledState>)>;
             using PostTask = std::packaged_task<void()>;
 
             ActualTask task(
-                [asyncStarted](std::shared_ptr<CMEnabledState> enabledState, bool checkExecuted) mutable
+                [](std::shared_ptr<CMEnabledState> enabledState) mutable
                 {
-                    if (checkExecuted)
-                    {
-                        bool expected = false;
-                        bool desired = true;
-
-                        // if asyncStarted is non null AND *asyncStarted==true
-                        if (asyncStarted && !asyncStarted->compare_exchange_strong(expected, desired))
-                        {
-                            // this is blocking and it has started
-                            return;
-                        }
-                        // else it is non-blocking or it has not started
-                    }
                     // do task
                     enabledState->DeleteConfigurations();
                 });
@@ -321,35 +268,18 @@ namespace cppmicroservices
             {
                 std::shared_ptr<CMEnabledState> currEnabledState
                     = std::dynamic_pointer_cast<CMEnabledState>(currentState);
-
                 auto taskPtr = std::make_shared<ActualTask>(std::move(task));
-                // if blocking, cache task and enabledState
-                if (asyncStarted)
-                {
-                    asyncTaskMap[asyncStarted] = taskPtr;
-                    asyncTaskStateMap[asyncStarted] = currEnabledState;
-                }
-                // this task goes to async queue, we wan't to check if it is already executed
-                PostTask post_task(
-                    [currEnabledState, taskPtr]() mutable
-                    {
-                        try
-                        {
-                            (*taskPtr)(currEnabledState, true);
-                        }
-                        catch (...)
-                        {
-                            /*
-                             * task was already executed, by WaitForFuture, calling it
-                             * again will throw. This is expected, we can just catch and continue
-                             */
-                        }
-                    });
+
+                PostTask interTask([currEnabledState, taskPtr]() mutable { (*taskPtr)(currEnabledState); });
+
+                auto interTaskPtr = std::make_shared<PostTask>(std::move(interTask));
+                singleInvoke->addTask(interTaskPtr);
+                PostTask post_task([singleInvoke]() mutable { (*singleInvoke)(); });
 
                 asyncWorkService->post(std::move(post_task));
 
                 auto fut = disabledState->GetFuture();
-                AccumulateFuture(fut, asyncStarted);
+                AccumulateFuture(fut, singleInvoke);
                 return fut;
             }
             // return the stored future in the current disabled state object

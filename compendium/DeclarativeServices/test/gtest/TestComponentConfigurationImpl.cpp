@@ -1425,7 +1425,6 @@ namespace cppmicroservices
             framework.Stop();
             framework.WaitForStop(std::chrono::milliseconds::zero());
         }
-
 #endif
     } // namespace scrimpl
 } // namespace cppmicroservices

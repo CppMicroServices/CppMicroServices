@@ -20,9 +20,9 @@
 
 =============================================================================*/
 
-#include "../TestUtils.hpp"
 #include "TestFixture.hpp"
 #include "TestInterfaces/Interfaces.hpp"
+#include "../TestUtils.hpp"
 #include "cppmicroservices/ServiceEvent.h"
 #include "gtest/gtest.h"
 
@@ -275,8 +275,8 @@ namespace test
      */
     TEST_P(tInitialization, testInitialization)
     {
-        std::string const bundle = "TestBundleDSTOI" + GetParam();
-        std::string const component = "sample::ServiceComponent" + GetParam();
+        const std::string bundle = "TestBundleDSTOI" + GetParam();
+        const std::string component = "sample::ServiceComponent" + GetParam();
         auto testBundle = this->StartTestBundle(bundle);
         auto compDescDTO = this->dsRuntimeService->GetComponentDescriptionDTO(testBundle, component);
         auto compConfigDTOs = this->dsRuntimeService->GetComponentConfigurationDTOs(compDescDTO);

@@ -485,8 +485,8 @@ namespace cppmicroservices
                               class I = Injection,
                               class InjectionTrue = typename std::enable_if<I::value == true>::type,
                               class HasConstructorWithReferences = typename std::enable_if<
-                                  std::is_constructible<C, CtorInjectedRefs const&...>::value
-                                  || std::is_constructible<C, CtorInjectedRefs const&&...>::value>::type>
+                                  std::is_constructible_v<C, CtorInjectedRefs const&...>
+                                  || std::is_constructible_v<C, CtorInjectedRefs const&&...>>::type>
                     std::shared_ptr<T>
                     DoCreate(bool& injected)
                     {
@@ -505,12 +505,12 @@ namespace cppmicroservices
                               class I = Injection,
                               class InjectionTrue = typename std::enable_if<I::value == true>::type,
                               class HasConstructorWithRefAndConfig = typename std::enable_if<
-                                  std::is_constructible<C,
-                                                        std::shared_ptr<cppmicroservices::AnyMap> const&,
-                                                        CtorInjectedRefs const&...>::value
-                                  || std::is_constructible<C,
-                                                           std::shared_ptr<cppmicroservices::AnyMap> const&,
-                                                           CtorInjectedRefs const&&...>::value>::type>
+                                  std::is_constructible_v<C,
+                                                          std::shared_ptr<cppmicroservices::AnyMap> const&,
+                                                          CtorInjectedRefs const&...>
+                                  || std::is_constructible_v<C,
+                                                             std::shared_ptr<cppmicroservices::AnyMap> const&,
+                                                             CtorInjectedRefs const&&...>>::type>
                     std::shared_ptr<T>
                     DoCreate(bool& injected, bool = true)
                     {

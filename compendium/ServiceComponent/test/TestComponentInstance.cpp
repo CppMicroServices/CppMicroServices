@@ -231,7 +231,7 @@ namespace
     class TestServiceImplWithRefRefDep : public TestServiceInterface1
     {
       public:
-        TestServiceImplWithRefRefDep() : foo(nullptr) {}
+        TestServiceImplWithRefRefDep() = default;
 
         TestServiceImplWithRefRefDep(std::shared_ptr<ServiceDependency1> const&& f) : foo(f) {}
 
@@ -242,7 +242,7 @@ namespace
 
         virtual ~TestServiceImplWithRefRefDep() = default;
 
-        std::shared_ptr<ServiceDependency1>
+        [[nodiscard]] std::shared_ptr<ServiceDependency1>
         GetFoo() const
         {
             return foo;
@@ -255,7 +255,7 @@ namespace
     class TestServiceImplWithSharedPtrDep : public TestServiceInterface1
     {
       public:
-        TestServiceImplWithSharedPtrDep() : foo(nullptr) {}
+        TestServiceImplWithSharedPtrDep() = default;
 
         TestServiceImplWithSharedPtrDep(std::shared_ptr<ServiceDependency1> f) : foo(f) {}
 
@@ -264,9 +264,9 @@ namespace
         TestServiceImplWithSharedPtrDep& operator=(TestServiceImplWithSharedPtrDep const& other) = default;
         TestServiceImplWithSharedPtrDep& operator=(TestServiceImplWithSharedPtrDep&& other) noexcept = default;
 
-        virtual ~TestServiceImplWithSharedPtrDep() {}
+        virtual ~TestServiceImplWithSharedPtrDep() = default;
 
-        std::shared_ptr<ServiceDependency1>
+        [[nodiscard]] std::shared_ptr<ServiceDependency1>
         GetFoo() const
         {
             return foo;

@@ -5,7 +5,7 @@ enable_language(CXX)
 
 include_directories(../../third_party)
 
-set(srcs main.cpp "FileHandler.cpp" "PathUtility.cpp" "AddPaths.cpp" "CopyPaths.cpp" "ChangeNamespaceImpl.cpp")
+set(srcs main.cpp "FileHandler.cpp" "AddPaths.cpp" "CopyPaths.cpp" "ChangeNamespaceImpl.cpp")
 
 add_executable(change_namespace ${srcs})
 set_property(TARGET change_namespace PROPERTY OUTPUT_NAME change_namespace)

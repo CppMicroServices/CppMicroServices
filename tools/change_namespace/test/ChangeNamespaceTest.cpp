@@ -217,7 +217,7 @@ TEST_F(NamespaceReplacerTest, ReplacesNamespaceInManifestJson)
   "bundle.name" : "Example Plugin",
   "bundle.description" : "A plugin using cppmicroservices framework"
 }
-//)",
+)",
                                     "newnamespace",
                                     "json" };
     const std::string expected = R"(

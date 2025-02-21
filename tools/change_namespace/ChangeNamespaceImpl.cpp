@@ -43,9 +43,9 @@ ChangeNamespaceImpl::is_manifest_json_file(fs::path const& p)
 }
 
 void
-ChangeNamespaceImpl::set_cppms_path(std::string_view p)
+ChangeNamespaceImpl::set_cppms_src_path(std::string_view p)
 {
-    m_cppms_path = (fs::path(p) / "CppMicroServices").parent_path();
+    m_cppms_src_path = (fs::path(p) / "CppMicroServices").parent_path();
 }
 
 void
@@ -69,7 +69,7 @@ ChangeNamespaceImpl::set_namespace_alias(bool b)
 std::string
 ChangeNamespaceImpl::get_cppms_path() const
 {
-    return m_cppms_path.string();
+    return m_cppms_src_path.string();
 }
 
 std::string
@@ -105,9 +105,9 @@ int
 ChangeNamespaceImpl::run()
 {
     // Check if cppms source path exists
-    if (!fs::exists(m_cppms_path))
+    if (!fs::exists(m_cppms_src_path))
     {
-        std::cout << "Error: Cppmicroservices source path does not exist: " << m_cppms_path.string() << "\n";
+        std::cout << "Error: Cppmicroservices source path does not exist: " << m_cppms_src_path.string() << "\n";
         return 1;
     }
 
@@ -120,7 +120,7 @@ ChangeNamespaceImpl::run()
 
     // Iterate through all entries in the CppMicroServices directory
     fs::directory_iterator end;
-    for (fs::directory_iterator cppms_iter((fs::path(m_cppms_path))); cppms_iter != end; ++cppms_iter)
+    for (fs::directory_iterator cppms_iter((fs::path(m_cppms_src_path))); cppms_iter != end; ++cppms_iter)
     {
         add_path(cppms_iter->path().filename());
     }

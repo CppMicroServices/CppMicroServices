@@ -2,7 +2,6 @@
 #include "optionparser.h"
 
 #include <cstring>
-#include <filesystem>
 #include <iostream>
 #include <list>
 #include <string>
@@ -33,32 +32,35 @@ struct Custom_Arg : public option::Arg
 };
 
 // Options supported by the tool
-enum OptionIndex
+enum class OptionIndex
 {
     UNKNOWN,
     HELP,
-    CPPMS,
+    CPPMS_SRC,
     NAMESPACE,
     NAMESPACE_ALIAS
 };
 
 // Specifying tool usage for the option parser
 const option::Descriptor usage[] = {
-    {        UNKNOWN,0,      "","",    option::Arg::None,"USAGE: change_namespace [options] <destination>\n\nOptions:"                                                                  },
-    {           HELP, 0,     "h",    "help",    option::Arg::None,                           "  -h, --help \tPrint usage and exit."},
-    {          CPPMS,
+    {        static_cast<int>(OptionIndex::UNKNOWN),
      0,      "",
-     "cppms", Custom_Arg::NonEmpty,
-     "  --cppms=<path> \tsets the location of the cppms tree to path. [REQUIRED]"                                                  },
-    {      NAMESPACE,
+     "",    option::Arg::None,
+     "USAGE: change_namespace [options] <destination>\n\nOptions:"                                                                                                 },
+    {           static_cast<int>(OptionIndex::HELP), 0,     "h",  "help",    option::Arg::None,                              "  -h, --help \tPrint usage and exit."},
+    {      static_cast<int>(OptionIndex::CPPMS_SRC),
+     0,      "",
+     "cppms_src", Custom_Arg::NonEmpty,
+     "  --cppms_src=<path> \tsets the location of the cppms tree to path. [REQUIRED]"                                                                              },
+    {      static_cast<int>(OptionIndex::NAMESPACE),
      0,      "",
      "namespace", Custom_Arg::NonEmpty,
-     "  --namespace=<name> \trename the cppms namespace to name. [REQUIRED]"                                                       },
-    {NAMESPACE_ALIAS,
+     "  --namespace=<name> \trename the cppms namespace to name. [REQUIRED]"                                                                                       },
+    {static_cast<int>(OptionIndex::NAMESPACE_ALIAS),
      0,      "",
      "namespace-alias",    option::Arg::None,
-     "  --namespace-alias \tmakes namespace cppms an alias of the namespace set with --namespace."                                 },
-    {              0, 0, nullptr,   nullptr,              nullptr,                                                          nullptr}
+     "  --namespace-alias \tmakes namespace cppms an alias of the namespace set with --namespace."                                                                 },
+    {                                             0, 0, nullptr, nullptr,              nullptr,                                                             nullptr}
 };
 
 int
@@ -71,7 +73,7 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     option::Stats stats(static_cast<option::Descriptor const*>(usage), argc, argv);
     std::vector<option::Option> options(stats.options_max);
     std::vector<option::Option> buffer(stats.buffer_max);
-    option::Parser parse(usage, argc, argv, &options[0], &buffer[0]);
+    option::Parser parse(static_cast<option::Descriptor const*>(usage), argc, argv, &options[0], &buffer[0]);
 
     // Exit if error while parsing arguments
     if (parse.error())
@@ -80,13 +82,13 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     }
 
     // Print usage if 'help' option is present or no arguments are provided
-    if (options[HELP] || argc == 0)
+    if (options[static_cast<int>(OptionIndex::HELP)] || argc == 0)
     {
         option::printUsage(std::cout, static_cast<option::Descriptor const*>(usage));
         return 0;
     }
 
-    for (option::Option* opt = options[UNKNOWN]; opt; opt = opt->next())
+    for (option::Option* opt = options[static_cast<int>(OptionIndex::UNKNOWN)]; opt; opt = opt->next())
     {
         std::cout << "Unknown option: " << opt->name << "\n";
     }
@@ -99,13 +101,13 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         option::Option& opt = buffer[i];
         switch (opt.index())
         {
-            case CPPMS:
-                app_ptr->set_cppms_path(opt.arg);
+            case static_cast<int>(OptionIndex::CPPMS_SRC):
+                app_ptr->set_cppms_src_path(opt.arg);
                 break;
-            case NAMESPACE:
+            case static_cast<int>(OptionIndex::NAMESPACE):
                 app_ptr->set_namespace(opt.arg);
                 break;
-            case NAMESPACE_ALIAS:
+            case static_cast<int>(OptionIndex::NAMESPACE_ALIAS):
                 app_ptr->set_namespace_alias(true);
                 break;
         }
@@ -125,7 +127,7 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     }
 
     // Check if required options are provided
-    if (!options[CPPMS] || !options[NAMESPACE])
+    if (!options[static_cast<int>(OptionIndex::CPPMS_SRC)] || !options[static_cast<int>(OptionIndex::NAMESPACE)])
     {
         std::cerr << "Error: Missing required options.\n";
         option::printUsage(std::cerr, usage);

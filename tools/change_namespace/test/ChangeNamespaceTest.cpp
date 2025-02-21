@@ -78,8 +78,8 @@ class NamespaceReplacerTest : public ::testing::Test
     void
     runExecutable(std::string const& inputFile, std::string const& newNamespace, std::string const& outputDir)
     {
-        const std::string command
-            = std::string(EXE_PATH) + " --cppms=" + inputFile + " --namespace=" + newNamespace + " --namespace-alias " + outputDir;
+        const std::string command = std::string(EXE_PATH) + " --cppms_src=" + inputFile + " --namespace=" + newNamespace
+                                    + " --namespace-alias " + outputDir;
         std::cout << "Test command used to change namespace: " << command << std::endl;
         int result = std::system(command.c_str());
         if (result != 0)
@@ -101,7 +101,7 @@ namespace cppmicroservices {
 )",
                                     "newnamespace" };
     const std::string expected = R"(
-namespace newnamespace {} namespace cppmicroservices   = newnamespace; namespace newnamespace {
+namespace newnamespace {} namespace cppmicroservices = newnamespace; namespace newnamespace {
     void someFunction() {
         // Some code here
     }
@@ -217,7 +217,7 @@ TEST_F(NamespaceReplacerTest, ReplacesNamespaceInManifestJson)
   "bundle.name" : "Example Plugin",
   "bundle.description" : "A plugin using cppmicroservices framework"
 }
-)",
+//)",
                                     "newnamespace",
                                     "json" };
     const std::string expected = R"(
@@ -244,7 +244,7 @@ namespace cppmicroservices {
                                     "newnamespace",
                                     "config" };
     const std::string expected = R"(
-namespace newnamespace {} namespace cppmicroservices   = newnamespace; namespace newnamespace {
+namespace newnamespace {} namespace cppmicroservices = newnamespace; namespace newnamespace {
   // Some configuration code here
 }
 )";

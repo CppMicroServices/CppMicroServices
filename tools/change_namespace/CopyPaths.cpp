@@ -1,5 +1,4 @@
 #include "ChangeNamespaceImpl.hpp"
-#include "FileHandler.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -9,10 +8,62 @@
 #include <iterator>
 #include <regex>
 
+std::string
+ChangeNamespaceImpl::read_file_content(fs::path const& file_path)
+{
+    std::ifstream is(file_path);
+    return std::string(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
+}
+
+void
+ChangeNamespaceImpl::write_file_content(fs::path const& file_path, std::string const& content)
+{
+    std::ofstream os(file_path, std::ios_base::out);
+    os << content;
+}
+
+std::string
+ChangeNamespaceImpl::replace_source_patterns(std::string const& content)
+{
+    const std::vector<std::string> patterns = { R"((namespace\s+)cppmicroservices(_\w+)?)",
+                                                R"((<)cppmicroservices((?:_\w+)?\s*(?:::)))",
+                                                R"((namespace\s+\w+\s*=\s*(?:::\s*)?)cppmicroservices(_\w+)?)",
+                                                R"((^\s*#\s*define\s+\w+\s+)cppmicroservices((?:_\w+)?\s*)$)",
+                                                R"((\(\s*)cppmicroservices(\s*\)))",
+                                                R"(()cppmicroservices((?:_\w+)?(?:::)))" };
+
+    const std::string replacement = "$1" + m_namespace_name + "$2";
+    std::string result = content;
+
+    for (auto const& pattern : patterns)
+    {
+        std::regex re(pattern);
+        result = std::regex_replace(result, re, replacement);
+    }
+
+    return result;
+}
+
+std::string
+ChangeNamespaceImpl::add_namespace_alias(std::string const& content)
+{
+    const std::regex namespace_alias("(namespace)(\\s+)(" + m_namespace_name + ")(\\s*\\{)");
+    return std::regex_replace(content, namespace_alias, "$1 $3 {} $1 cppmicroservices = $3; $1$2$3$4");
+}
+
+std::string
+ChangeNamespaceImpl::replace_manifest_pattern(std::string const& content)
+{
+    const std::string pattern = "(\")cppmicroservices(::([^\"]*)\")";
+    const std::string replacement = "$1" + m_namespace_name + "$2";
+    std::regex re(pattern);
+    return std::regex_replace(content, re, replacement);
+}
+
 void
 ChangeNamespaceImpl::copy_path(fs::path const& p)
 {
-    assert(!fs::is_directory(m_cppms_path / p));
+    assert(!fs::is_directory(m_cppms_src_path / p));
     if (fs::exists(m_dest_path / p))
     {
         std::cout << "Copying (and overwriting) file: " << p.string() << "\n";
@@ -23,99 +74,30 @@ ChangeNamespaceImpl::copy_path(fs::path const& p)
         std::cout << "Copying file: " << p.string() << "\n";
     }
 
-    // Create the path to the new file if it doesn't already exist:
+    // Create the path to the new file
     create_path(p.parent_path());
 
-    // Simply copy the files under the tools/change_namespace directory (own sources)
-    if (p.string().find((fs::path("tools") / "change_namespace").string()) != std::string::npos)
+    if (is_source_file(p) || is_test_config_file(p))
     {
-        fs::copy(m_cppms_path / p, m_dest_path / p, fs::copy_options::overwrite_existing);
-        return;
-    }
-
-    if (m_namespace_name.size() && (is_source_file(p) || is_test_config_file(p)))
-    {
-        //
-        // v1 hold the current content, v2 is temp buffer.
-        // Each time we do a search and replace the new content
-        // ends up in v2: we then swap v1 and v2, and clear v2.
-        //
-        static std::vector<char> v1, v2;
-        v1.clear();
-        v2.clear();
-        std::ifstream is((m_cppms_path / p));
-        std::copy(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>(), std::back_inserter(v1));
-
-        const std::vector<std::string> patterns = { R"((namespace\s+)cppmicroservices(_\w+)?)",
-                                              R"((<)cppmicroservices((?:_\w+)?\s*(?:::)))",
-                                              R"((namespace\s+\w+\s*=\s*(?:::\s*)?)cppmicroservices(_\w+)?)",
-                                              R"((^\s*#\s*define\s+\w+\s+)cppmicroservices((?:_\w+)?\s*)$)",
-                                              R"((\(\s*)cppmicroservices(\s*\)))",
-                                              R"(()cppmicroservices((?:_\w+)?(?:::)))" };
-
-        const std::string replacement = "$1" + m_namespace_name + "$2";
-
-        for (auto const& pattern : patterns)
-        {
-            std::regex re(pattern);
-            std::smatch match;
-
-            std::vector<char> temp_output;
-            std::regex_replace(std::back_inserter(temp_output), v1.begin(), v1.end(), re, replacement);
-            v1 = std::move(temp_output);
-        }
+        std::string content = read_file_content(m_cppms_src_path / p);
+        content = replace_source_patterns(content);
 
         if (m_namespace_alias)
         {
-            const std::regex namespace_alias("(namespace)(\\s+)(" + m_namespace_name + ")(\\s*\\{)");
-            std::regex_replace(std::back_inserter(v2),
-                               v1.begin(),
-                               v1.end(),
-                               namespace_alias,
-                               "$1 $3 {} $1 cppmicroservices   = $3; $1$2$3$4");
-            std::swap(v1, v2);
-            v2.clear();
+            content = add_namespace_alias(content);
         }
 
-        std::ofstream os;
-        os.open((m_dest_path / p), std::ios_base::out);
-        if (v1.size())
-        {
-            os.write(&*v1.begin(), static_cast<std::streamsize>(v1.size()));
-        }
-        os.close();
+        write_file_content(m_dest_path / p, content);
     }
-    else if (m_namespace_name.size() && is_manifest_json_file(p))
+    else if (is_manifest_json_file(p))
     {
-        static std::vector<char> v1, v2;
-        v1.clear();
-        v2.clear();
-        std::ifstream is((m_cppms_path / p));
-        std::copy(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>(), std::back_inserter(v1));
-
-        const std::string pattern = "(\")cppmicroservices(::([^\"]*)\")";
-
-        const std::string replacement = "$1" + m_namespace_name + "$2";
-
-        std::regex re(pattern);
-        std::smatch match;
-
-        std::vector<char> temp_output;
-        std::regex_replace(std::back_inserter(temp_output), v1.begin(), v1.end(), re, replacement);
-        v1 = std::move(temp_output);
-
-        std::ofstream os;
-        os.open((m_dest_path / p), std::ios_base::out);
-        if (v1.size())
-        {
-            os.write(&*v1.begin(), static_cast<std::streamsize>(v1.size()));
-        }
-        os.close();
+        std::string content = read_file_content(m_cppms_src_path / p);
+        content = replace_manifest_pattern(content);
+        write_file_content(m_dest_path / p, content);
     }
     else
     {
-        // binary copy:
-        fs::copy_file(m_cppms_path / p, m_dest_path / p);
+        fs::copy_file(m_cppms_src_path / p, m_dest_path / p);
     }
 }
 

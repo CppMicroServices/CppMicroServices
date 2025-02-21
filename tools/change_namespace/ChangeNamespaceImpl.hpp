@@ -12,24 +12,20 @@ namespace fs = std::filesystem;
 
 class FileHandler;
 
-// Path operations:
-// Path comparison function
-int compare_paths(fs::path const& a, fs::path const& b);
-
-// Path equality check
-inline bool
-equal_paths(fs::path const& a, fs::path const& b)
-{
-    return compare_paths(a, b) == 0;
-}
-
 // Custom comparator for path ordering
 struct path_less
 {
     bool
     operator()(fs::path const& a, fs::path const& b) const
     {
-        return compare_paths(a, b) < 0;
+        std::string as = a.generic_string();
+        std::string bs = b.generic_string();
+
+        // Convert both strings to lowercase for case-insensitive comparison
+        std::transform(as.begin(), as.end(), as.begin(), [](unsigned char c) { return std::tolower(c); });
+        std::transform(bs.begin(), bs.end(), bs.begin(), [](unsigned char c) { return std::tolower(c); });
+
+        return (as < bs) ? true : false;
     }
 };
 
@@ -38,7 +34,7 @@ class ChangeNamespaceImpl : public CNApplication
 {
   public:
     ChangeNamespaceImpl();
-    ~ChangeNamespaceImpl() = default;
+    ~ChangeNamespaceImpl() override = default;
 
     // Utility functions for file type checking
     static bool is_source_file(fs::path const& p);
@@ -48,7 +44,7 @@ class ChangeNamespaceImpl : public CNApplication
   private:
     // Implementation of CNApplication interface methods:
 
-    void set_cppms_path(std::string_view p) override;
+    void set_cppms_src_path(std::string_view p) override;
     void set_destination(std::string_view p) override;
     void set_namespace(std::string_view name) override;
     void set_namespace_alias(bool) override;
@@ -99,6 +95,13 @@ class ChangeNamespaceImpl : public CNApplication
     //   - Performs a binary copy
     void copy_path(fs::path const& p);
 
+    // Helper methods for replacing namespace and copying files to destination
+    std::string read_file_content(fs::path const& file_path);
+    void write_file_content(fs::path const& file_path, std::string const& fileContent);
+    std::string replace_source_patterns(std::string const& fileContent);
+    std::string add_namespace_alias(std::string const& fileContent);
+    std::string replace_manifest_pattern(std::string const& fileContent);
+
     // add_file_dependencies: Processes include statements in the given file
     // Uses regex to find include statements and optional discard messages
     // For each include found:
@@ -113,7 +116,7 @@ class ChangeNamespaceImpl : public CNApplication
     void create_path(fs::path const& p);
 
     bool m_namespace_alias;                     // make "cppms" a namespace alias when doing a namespace rename.
-    fs::path m_cppms_path;                      // the path to the cppms root
+    fs::path m_cppms_src_path;                  // the path to the cppms root
     fs::path m_dest_path;                       // the path to copy to
     std::set<fs::path, path_less> m_copy_paths; // list of files to copy
     std::map<fs::path, fs::path, path_less> m_dependencies;    // dependency information

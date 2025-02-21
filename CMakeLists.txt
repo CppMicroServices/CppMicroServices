@@ -888,7 +888,10 @@ configure_file(
 
 add_subdirectory(tools/rc)
 add_subdirectory(tools/jsonschemavalidator)
-add_subdirectory(tools/change_namespace)
+
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tools/change_namespace)
+    add_subdirectory(tools/change_namespace)
+endif()
 
 export(TARGETS ${US_RCC_EXECUTABLE_TARGET}
        FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)

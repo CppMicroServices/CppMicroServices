@@ -1,5 +1,7 @@
 #include "ChangeNamespace.hpp"
 
+#include <algorithm>
+#include <cctype>
 #include <cstring>
 #include <filesystem>
 #include <list>

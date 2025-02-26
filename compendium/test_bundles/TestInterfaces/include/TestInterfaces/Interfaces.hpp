@@ -197,6 +197,12 @@ namespace test
       public:
         virtual cppmicroservices::AnyMap GetProperties() = 0;
         virtual ~ServiceAInt();
+
+        virtual void*
+        GetRefAddr() const
+        {
+            return nullptr;
+        }
     };
     class US_TestInterfaces_EXPORT ServiceBInt
     {

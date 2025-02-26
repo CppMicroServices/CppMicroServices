@@ -692,7 +692,6 @@ endif()
 #-----------------------------------------------------------------------------
 # Compile libraries here if you do not want -Werror or /WX on
 #-----------------------------------------------------------------------------
-add_subdirectory(third_party/absl)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
 add_subdirectory(third_party/boost/nowide)
 set(BUILD_SHARED_LIBS ${_us_build_shared} CACHE BOOL "Build shared libraries" FORCE)

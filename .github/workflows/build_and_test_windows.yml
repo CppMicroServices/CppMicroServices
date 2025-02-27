@@ -132,6 +132,11 @@ jobs:
     - name: Build And Test
       working-directory: Z:\
       run: ctest -VV -S cmake\usCTestScript_github.cmake
+
+    - name: Verify GCC Version
+      run: |
+        gcc --version
+        g++ --version
       
   build_win_deterministic_bundles:
     name: Build and Test [windows-2022,Configuration=0,Deterministic]

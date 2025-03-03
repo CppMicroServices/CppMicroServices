@@ -45,7 +45,7 @@ namespace test
       public:
         template <typename ServiceInterfaceT>
         std::shared_ptr<ServiceInterfaceT>
-        getFactoryService(std::string factoryPid, std::string factoryInstance, cppmicroservices::AnyMap const& props)
+        getFactoryService(std::string factoryPid, std::string factoryInstance, cppmicroservices::AnyMap const& props,std::string implClass = "")
         {
 
             // Get a service reference to ConfigAdmin to create the factory component instance.
@@ -65,7 +65,7 @@ namespace test
 
                 if (factoryConfig)
                 {
-                    auto componentName = factoryConfig->GetPid();
+                    auto componentName = implClass + "_" + factoryConfig->GetPid();
                     auto fut = factoryConfig->Update(props);
                     fut.get();
                     std::string filter = "(" + cppmicroservices::service::component::ComponentConstants::COMPONENT_NAME
@@ -154,6 +154,50 @@ namespace test
 
         // Clean up
         serviceBReg.Unregister();
+        testBundle.Stop();
+    }
+
+    TEST_F(tFactoryTarget, dynamicTargetingThroughConfig)
+    {
+        // Register the ServiceB~123 factory service with a mock implementation
+        auto serviceBReg = registerSvc<test::ServiceBInt, MockServiceBImpl>("ServiceB~456", "ServiceBId", "ServiceB~456");
+  
+        // Install and start the bundle containing the ServiceA factory.
+        // DS is now listening for factory configuration objects of the form
+        // ServiceA4~<instance>
+        test::InstallLib(context, "TestBundleDSFAC1");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC1");
+
+        // Create the ServiceA~1 configuration object. Specify a dynamic target
+        // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
+        // satisfied by ServiceB~123 instance.
+        cppmicroservices::AnyMap props;
+        props["valueFromConfig"] = std::string("ServiceB~456");
+        auto service = getFactoryService<test::ServiceAInt>("ServiceA4", "1", props, "sample::ServiceAImpl4");
+        ASSERT_TRUE(service);
+
+        // Clean up
+        serviceBReg.Unregister();
+        testBundle.Stop();
+    }
+
+    TEST_F(tFactoryTarget, dynamicTargetingThroughConfigToOtherFactory)
+    {  
+        // Install and start the bundle containing the ServiceA factory.
+        // DS is now listening for factory configuration objects of the form
+        // ServiceA4~<instance>
+        test::InstallLib(context, "TestBundleDSFAC1");
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSFAC1");
+
+        // Create the ServiceA~1 configuration object. Specify a dynamic target
+        // so that the test::ServiceBInt dependency for  ServiceA~1 will only be
+        // satisfied by ServiceB~123 instance.
+        cppmicroservices::AnyMap props;
+        props["sharedConfigurationKey"] = std::string("sharedConfigurationValue");
+        auto service = getFactoryService<test::ServiceAInt>("sharedConfiguration", "1", props, "sample::ServiceAImpl5");
+        ASSERT_TRUE(service);
+
+        // Clean up
         testBundle.Stop();
     }
 

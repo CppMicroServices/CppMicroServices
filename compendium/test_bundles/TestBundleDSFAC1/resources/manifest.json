@@ -54,6 +54,52 @@
             {
                 "enabled" : true,
                 "immediate": true,
+                "implementation-class": "sample::ServiceAImpl4",
+                "configuration-policy" : "require",
+                "configuration-pid" : ["ServiceA4"],
+                "factory" : "ServiceA4 Factory",
+                "inject-references" : true,
+                "references":[{
+                    "name": "ServiceB",
+                    "interface" : "test::ServiceBInt",
+                    "target": "(ServiceBId={{valueFromConfig}})"
+                }],
+                "service": {
+                    "interfaces": ["test::ServiceAInt"]
+                }
+            },
+            {
+                "enabled" : true,
+                "immediate": true,
+                "implementation-class": "sample::ServiceAImpl5",
+                "configuration-policy" : "require",
+                "configuration-pid" : ["sharedConfiguration"],
+                "factory" : "ServiceA5 Factory",
+                "inject-references" : true,
+                "references":[{
+                    "name": "ServiceB",
+                    "interface" : "test::ServiceBInt",
+                    "target": "(sharedConfigurationKey={{sharedConfigurationKey}})"
+                }],
+                "service": {
+                    "interfaces": ["test::ServiceAInt"]
+                }
+            },
+            {
+                "enabled" : true,
+                "immediate": true,
+                "implementation-class": "sample::ServiceBImpl3",
+                "configuration-policy" : "require",
+                "factory" : "ServiceB3 Factory",
+                "configuration-pid" : ["sharedConfiguration"],
+                "service": {
+                    "interfaces": ["test::ServiceBInt"],
+                    "scope" : "singleton"
+                }
+            },
+            {
+                "enabled" : true,
+                "immediate": true,
                 "implementation-class": "sample::ServiceBImpl2",
                 "configuration-policy" : "require",
                 "configuration-pid" : ["scopetestpid"],

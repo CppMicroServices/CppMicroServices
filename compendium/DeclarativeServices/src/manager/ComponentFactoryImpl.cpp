@@ -31,80 +31,43 @@
 #include "cppmicroservices/SharedLibraryException.h"
 #include "cppmicroservices/asyncworkservice/AsyncWorkService.hpp"
 #include "cppmicroservices/cm/ConfigurationAdmin.hpp"
+#include <regex>
 
 namespace cppmicroservices::scrimpl
 {
-    std::string const targetOpenDelimiter = "${";
-    std::string const targetOpenDelimiterFirstChar = "$";
-    std::string const targetCloseDelimiter = "}";
-    boolean
-    balancedDelimitersOnTargetExpression(std::string expression)
-    {
-        std::vector<string> stack;
-        for (size_t i = 0; i < expression.length(); ++i)
-        {
-            std::string letter = expression[i];
-            if (letter != targetOpenDelimiterFirstChar && letter != targetCloseDelimiter)
-            {
-                continue;
-            }
-            if (letter == targetOpenDelimiterFirstChar)
-            {
-                i += 1;
-                stack.push_back(targetOpenDelimiter);
-            }
-            // end delimiter -
-            // if prev is open:
-            //     - pop it off
-            // else
-            //     - add this to it
-            if (stack.back() == targetOpenDelimiter)
-            {
-                stack.pop_back();
-            }
-            else
-            {
-                stack.push_back(targetCloseDelimiter);
-            }
-        }
-        return stack.empty();
-    }
-
     std::string
-    ReplacePlaceholderInTarget(std::string targetExpression, cppmicroservices::AnyMap const& properties)
+    ReplacePlaceholdersInTarget(std::string targetExpression, cppmicroservices::AnyMap const& properties)
     {
-        if (!balancedDelimitersOnTargetExpression(targetExpression))
+        if (targetExpression.empty())
         {
-            logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                        "CreateFactoryComponent failed because of imbalanced ldap filter substitution"
-                            + " target= " + ref.target);
-            throw std::invalid_argument(e.what());
+            return targetExpression;
         }
-        std::regex pattern(R"(\$\{(.*?)\})");
+
+        std::regex pattern(R"(\{\{([^{}]+)\}\})");
         std::string result;
-        std::sregex_iterator currentMatch(input.begin(), input.end(), pattern);
+        std::sregex_iterator currentMatch(targetExpression.begin(), targetExpression.end(), pattern);
         std::sregex_iterator lastMatch;
 
         size_t lastPos = 0;
         while (currentMatch != lastMatch)
         {
             std::smatch match = *currentMatch;
-            result.append(input, lastPos, match.position() - lastPos);
+            result.append(targetExpression, lastPos, match.position() - lastPos);
 
             std::string key = match[1].str();
-            if (replacements.find(key) != replacements.end())
+            if (auto iter = properties.find(key); iter != properties.end())
             {
-                result.append(replacements.at(key));
+                result.append(cppmicroservices::ref_any_cast<std::string>(iter->second));
             }
             else
             {
-                result.append(match.str());
+                throw std::invalid_argument("reference target not in configuration " + key);
             }
 
             lastPos = match.position() + match.length();
             ++currentMatch;
         }
-        result.append(input, lastPos, std::string::npos);
+        result.append(targetExpression, lastPos, std::string::npos);
 
         return result;
     }
@@ -136,7 +99,7 @@ namespace cppmicroservices::scrimpl
         // Start with the metadata from the factory
         auto const newMetadata = std::make_shared<ComponentMetadata>(*mgr->GetMetadata());
 
-        newMetadata->name = pid;
+        newMetadata->name = newMetadata->instanceName + "_" + pid;
         // this is a factory instance not a factory component
         newMetadata->factoryComponentID = "";
 
@@ -152,25 +115,31 @@ namespace cppmicroservices::scrimpl
             auto const target = ref.name + ".target";
             auto const iter = properties.find(target);
 
-            // look for targets that are dependent on configuration. They key into the configuration will be ${KEY_HERE}
-            if ()
+            // if manually injecting target in using refName.target, override existing
+            if (iter != properties.end())
             {
-                if (iter != properties.end())
+                // This reference has a dynamic target
+                ref.target = cppmicroservices::ref_any_cast<std::string>(iter->second);
+            }
+            else
+            {
+                // look for targets that are dependent on configuration. They key into the configuration will be
+                // {{KEY}}
+                ref.target = ReplacePlaceholdersInTarget(ref.target, properties);
+            }
+            // Verify that the ref.target is a valid LDAPFilter
+            if (!ref.target.empty())
+            {
+                try
                 {
-                    // This reference has a dynamic target
-                    ref.target = cppmicroservices::ref_any_cast<std::string>(iter->second);
-                    // Verify that the ref.target is a valid LDAPFilter
-                    try
-                    {
-                        LDAPFilter const filter(ref.target);
-                    }
-                    catch (std::exception const& e)
-                    {
-                        logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
-                                    "CreateFactoryComponent failed because of invalid target ldap filter"
-                                        + newMetadata->name + " target= " + ref.target);
-                        throw std::invalid_argument(e.what());
-                    }
+                    LDAPFilter const filter(ref.target);
+                }
+                catch (std::exception const& e)
+                {
+                    logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_ERROR,
+                                "CreateFactoryComponent failed because of invalid target ldap filter"
+                                    + newMetadata->name + " target= " + ref.target);
+                    throw std::invalid_argument(e.what());
                 }
             }
         }

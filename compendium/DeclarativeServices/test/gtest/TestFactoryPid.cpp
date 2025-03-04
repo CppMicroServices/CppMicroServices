@@ -72,7 +72,7 @@ namespace test
         auto fut = factoryConfig->Update(props);
         fut.get();
         // Confirm the properties have been updated in DS.
-        compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, factoryInstance);
+        compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, factoryComponentName + "_" + factoryInstance);
         EXPECT_EQ(compDescDTO.implementationClass, factoryComponentName)
             << "Implementation class in the returned component description must be " << factoryComponentName;
 

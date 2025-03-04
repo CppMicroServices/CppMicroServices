@@ -99,7 +99,7 @@ namespace cppmicroservices::scrimpl
         // Start with the metadata from the factory
         auto const newMetadata = std::make_shared<ComponentMetadata>(*mgr->GetMetadata());
 
-        newMetadata->name = newMetadata->instanceName + "_" + pid;
+        newMetadata->name = newMetadata->name + "_" + pid;
         // this is a factory instance not a factory component
         newMetadata->factoryComponentID = "";
 

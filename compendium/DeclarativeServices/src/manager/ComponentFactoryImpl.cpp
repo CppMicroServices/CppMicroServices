@@ -36,7 +36,7 @@
 namespace cppmicroservices::scrimpl
 {
     std::string
-    ReplacePlaceholdersInTarget(std::string targetExpression, cppmicroservices::AnyMap const& properties)
+    ReplacePlaceholdersInTarget(std::string const& targetExpression, cppmicroservices::AnyMap const& properties)
     {
         if (targetExpression.empty())
         {

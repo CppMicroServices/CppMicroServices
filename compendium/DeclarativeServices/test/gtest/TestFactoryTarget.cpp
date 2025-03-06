@@ -48,7 +48,7 @@ namespace test
         getFactoryService(std::string factoryPid,
                           std::string factoryInstance,
                           cppmicroservices::AnyMap const& props,
-                          std::string implClass = "")
+                          std::string implClass)
         {
 
             // Get a service reference to ConfigAdmin to create the factory component instance.

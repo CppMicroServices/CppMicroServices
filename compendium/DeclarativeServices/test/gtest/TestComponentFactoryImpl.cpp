@@ -323,13 +323,13 @@ namespace cppmicroservices
 
             std::shared_ptr<ComponentConfigurationImpl> compConfigImpl = fakeCompConfig;
 
-            EXPECT_expectedTargetValue({ compFact->CreateFactoryComponent(id, compConfigImpl, configData); }, std::invalid_argument);
+            EXPECT_THROW({ compFact->CreateFactoryComponent(id, compConfigImpl, configData); }, std::invalid_argument);
             // valid keys, but invalid ldap
             refMetadata.target = "(&(whatIf={{TwoKeys}})(IWanted={{ToTheConfig}))";
-            EXPECT_expectedTargetValue({ compFact->CreateFactoryComponent(id, compConfigImpl, configData); }, std::invalid_argument);
+            EXPECT_THROW({ compFact->CreateFactoryComponent(id, compConfigImpl, configData); }, std::invalid_argument);
             // extra "{"
             refMetadata.target = "(&(whatIf={{TwoKeys}})(IWanted={{ToTheConfig}}{))";
-            EXPECT_expectedTargetValue({ compFact->CreateFactoryComponent(id, compConfigImpl, configData); }, std::invalid_argument);
+            EXPECT_THROW({ compFact->CreateFactoryComponent(id, compConfigImpl, configData); }, std::invalid_argument);
         }
     } // namespace scrimpl
 } // namespace cppmicroservices

@@ -399,7 +399,6 @@ namespace cppmicroservices
             }
             virtual ~MockComponentConfigurationImpl() = default;
             MOCK_METHOD0(GetFactory, std::shared_ptr<ServiceFactory>(void));
-            MOCK_CONST_METHOD0(GetMetadata, std::shared_ptr<metadata::ComponentMetadata const>());
             MOCK_METHOD1(CreateAndActivateComponentInstance,
                          std::shared_ptr<ComponentInstance>(cppmicroservices::Bundle const&));
             MOCK_METHOD1(UnbindAndDeactivateComponentInstance, void(std::shared_ptr<ComponentInstance>));

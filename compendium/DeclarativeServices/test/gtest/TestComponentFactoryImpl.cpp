@@ -54,6 +54,21 @@ namespace cppmicroservices
     namespace scrimpl
     {
 
+        class MockCompConfigImplWithOverridenGetMetadata : public MockComponentConfigurationImpl
+        {
+          public:
+            MockCompConfigImplWithOverridenGetMetadata(std::shared_ptr<metadata::ComponentMetadata const> metadata,
+                                                       Bundle const& bundle,
+                                                       std::shared_ptr<ComponentRegistry> registry,
+                                                       std::shared_ptr<cppmicroservices::logservice::LogService> logger,
+                                                       std::shared_ptr<ConfigurationNotifier> notifier)
+                : MockComponentConfigurationImpl(metadata, bundle, registry, logger, notifier)
+            {
+            }
+            virtual ~MockCompConfigImplWithOverridenGetMetadata() = default;
+            MOCK_CONST_METHOD0(GetMetadata, std::shared_ptr<metadata::ComponentMetadata const>());
+        };
+
         class ComponentFactoryImplTest : public ::testing::Test
         {
           protected:
@@ -78,11 +93,11 @@ namespace cppmicroservices
                                                                    asyncWorkService,
                                                                    extRegistry);
 
-                fakeCompConfig = std::make_shared<MockComponentConfigurationImpl>(mockMetadata,
-                                                                                  GetFramework(),
-                                                                                  mockRegistry,
-                                                                                  fakeLogger,
-                                                                                  notifier);
+                fakeCompConfig = std::make_shared<MockCompConfigImplWithOverridenGetMetadata>(mockMetadata,
+                                                                                              GetFramework(),
+                                                                                              mockRegistry,
+                                                                                              fakeLogger,
+                                                                                              notifier);
                 EXPECT_CALL(*fakeCompConfig, GetMetadata()).WillRepeatedly(testing::Return(mockMetadata));
             }
 
@@ -109,7 +124,7 @@ namespace cppmicroservices
             std::shared_ptr<cppmicroservices::scrimpl::SCRAsyncWorkService> asyncWorkService;
             std::shared_ptr<SCRExtensionRegistry> extRegistry;
             std::shared_ptr<ConfigurationNotifier> notifier;
-            std::shared_ptr<MockComponentConfigurationImpl> fakeCompConfig;
+            std::shared_ptr<MockCompConfigImplWithOverridenGetMetadata> fakeCompConfig;
         };
 
         TEST_F(ComponentFactoryImplTest, verifyNameCreation)

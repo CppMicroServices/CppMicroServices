@@ -107,8 +107,8 @@ jobs:
       BUILD_DIR: Z:\build\config_${{matrix.buildconfiguration}}
       BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
       BUILD_OS: mingw-w64
-      CC: gcc
-      CXX: g++
+      CC: gcc-11
+      CXX: g++-11
     strategy:
       fail-fast: false
       matrix:

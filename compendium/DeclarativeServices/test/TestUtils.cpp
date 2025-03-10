@@ -281,23 +281,11 @@ namespace test
 
     AsyncWorkServiceThreadPool::~AsyncWorkServiceThreadPool()
     {
-        try
+        if (threadpool)
         {
-            if (threadpool)
-            {
-                try
-                {
-                    threadpool->join();
-                }
-                catch (...)
-                {
-                    //
-                }
-            }
-        }
-        catch (...)
-        {
-            //
+            threadpool->join();
+            threadpool->stop();
+            threadpool.reset();
         }
     }
 

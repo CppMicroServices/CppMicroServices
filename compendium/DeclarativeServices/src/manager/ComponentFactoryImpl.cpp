@@ -115,7 +115,7 @@ namespace cppmicroservices::scrimpl
             auto const target = ref.name + ".target";
             auto const iter = properties.find(target);
 
-            // if manually injecting target in using refName.target, override existing
+            // if manually injecting target using refName.target, override existing
             if (iter != properties.end())
             {
                 // This reference has a dynamic target
@@ -123,8 +123,7 @@ namespace cppmicroservices::scrimpl
             }
             else
             {
-                // look for targets that are dependent on configuration. They key into the configuration will be
-                // {{KEY}}
+                // look for targets that are dependent on configuration. The key into the configuration will be {{KEY}}
                 ref.target = ReplacePlaceholdersInTarget(ref.target, properties);
             }
             // Verify that the ref.target is a valid LDAPFilter

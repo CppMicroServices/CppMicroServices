@@ -32,13 +32,13 @@ jobs:
       run: |
         sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
         sudo apt-get update
-        sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-8 g++-8 valgrind
+        sudo apt-get -yq --no-install-suggests --no-install-recommends install gcc-11 g++-11 valgrind
       
     - name: Build and Test
       run: ctest -VV -S ${{github.workspace}}/cmake/usCTestScript_github.cmake
       env:
-        CC: gcc-8
-        CXX: g++-8
+        CC: gcc-11
+        CXX: g++-11
 
   linux_clang_build:
     name: Build and Test [ubuntu-20.04, Supported Clang]

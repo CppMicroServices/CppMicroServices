@@ -44,6 +44,7 @@ namespace cppmicroservices
     {
       public:
         FrameworkPrivate(CoreBundleContext* fwCtx);
+        virtual ~FrameworkPrivate() noexcept override;
 
         void Init();
 
@@ -113,12 +114,12 @@ namespace cppmicroservices
          */
         void SystemShuttingdownDone_unlocked(FrameworkEventInternal const& fe);
 
+      private:
         /**
          * The thread that performs shutdown of this framework instance.
          */
         std::thread shutdownThread;
 
-      private:
         AnyMap headers;
     };
 } // namespace cppmicroservices

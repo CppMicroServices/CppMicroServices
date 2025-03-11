@@ -44,7 +44,7 @@ namespace cppmicroservices
     {
       public:
         FrameworkPrivate(CoreBundleContext* fwCtx);
-        virtual ~FrameworkPrivate() noexcept override;
+        ~FrameworkPrivate() noexcept override;
 
         void Init();
 

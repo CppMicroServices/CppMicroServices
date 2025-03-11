@@ -51,6 +51,14 @@ namespace cppmicroservices
         stopEvent = FrameworkEventInternal { true, FrameworkEvent::Type::FRAMEWORK_ERROR, std::string(), nullptr };
     }
 
+    FrameworkPrivate::~FrameworkPrivate()
+    {
+        if (shutdownThread.joinable())
+        {
+            shutdownThread.join();
+        }
+    }
+
     void
     FrameworkPrivate::DoInit()
     {
@@ -119,6 +127,10 @@ namespace cppmicroservices
             }
             if (!stopEvent.valid)
             {
+                if (shutdownThread.joinable())
+                {
+                    shutdownThread.join();
+                }
                 return FrameworkEvent(FrameworkEvent::Type::FRAMEWORK_WAIT_TIMEDOUT,
                                       MakeBundle(this->shared_from_this()),
                                       std::string(),

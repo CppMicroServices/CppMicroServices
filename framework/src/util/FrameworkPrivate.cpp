@@ -51,7 +51,7 @@ namespace cppmicroservices
         stopEvent = FrameworkEventInternal { true, FrameworkEvent::Type::FRAMEWORK_ERROR, std::string(), nullptr };
     }
 
-    FrameworkPrivate::~FrameworkPrivate()
+    FrameworkPrivate::~FrameworkPrivate() noexcept
     {
         if (shutdownThread.joinable())
         {

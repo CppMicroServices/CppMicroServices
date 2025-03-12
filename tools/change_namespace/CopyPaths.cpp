@@ -12,7 +12,9 @@ std::string
 ChangeNamespaceImpl::read_file_content(fs::path const& file_path)
 {
     std::ifstream is(file_path);
-    return std::string(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
+    std::string content{std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>()};
+    is.close();
+    return content;
 }
 
 void
@@ -20,6 +22,7 @@ ChangeNamespaceImpl::write_file_content(fs::path const& file_path, std::string c
 {
     std::ofstream os(file_path, std::ios_base::out);
     os << content;
+    os.close();
 }
 
 std::string

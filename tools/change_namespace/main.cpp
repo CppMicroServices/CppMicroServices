@@ -113,6 +113,14 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         }
     }
 
+    // Check if required options are provided
+    if (!options[static_cast<int>(OptionIndex::CPPMS_SRC)] || !options[static_cast<int>(OptionIndex::NAMESPACE)])
+    {
+        std::cerr << "Error: Missing required options.\n";
+        option::printUsage(std::cerr, usage);
+        return 1;
+    }
+
     // Throw error if destination is not provided
     if (parse.nonOptionsCount() == 0)
     {
@@ -121,18 +129,7 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         return 1;
     }
 
-    if (parse.nonOptionsCount() > 0)
-    {
-        app_ptr->set_destination(parse.nonOption(parse.nonOptionsCount() - 1));
-    }
-
-    // Check if required options are provided
-    if (!options[static_cast<int>(OptionIndex::CPPMS_SRC)] || !options[static_cast<int>(OptionIndex::NAMESPACE)])
-    {
-        std::cerr << "Error: Missing required options.\n";
-        option::printUsage(std::cerr, usage);
-        return 1;
-    }
+    app_ptr->set_destination(parse.nonOption(parse.nonOptionsCount() - 1));
 
     // Run the application
     return app_ptr->run();

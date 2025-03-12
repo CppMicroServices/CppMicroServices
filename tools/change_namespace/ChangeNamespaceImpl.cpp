@@ -84,23 +84,6 @@ ChangeNamespaceImpl::get_namespace() const
     return m_namespace_name;
 }
 
-fs::path
-get_short_path(fs::path const& p)
-{
-    // Truncate path no more than "x/y"
-    std::string s = p.generic_string();
-    std::string::size_type n = s.find('/');
-    if (n != std::string::npos)
-    {
-        n = s.find('/', n + 1);
-        if (n != std::string::npos)
-        {
-            s.erase(n);
-        }
-    }
-    return s;
-}
-
 int
 ChangeNamespaceImpl::run()
 {

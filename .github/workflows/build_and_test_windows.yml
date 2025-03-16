@@ -102,7 +102,7 @@ jobs:
 
   build_win_mingw:
     name: Build and Test [mingw-w64,Configuration=${{matrix.buildconfiguration}}]
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       BUILD_DIR: Z:\build\config_${{matrix.buildconfiguration}}
       BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}

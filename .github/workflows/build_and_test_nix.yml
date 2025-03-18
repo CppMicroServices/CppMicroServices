@@ -17,8 +17,8 @@ env:
 
 jobs:
   linux_minimum_supported_gcc_build:
-    name: Build and Test [ubuntu-20.04, Minimum GCC]
-    runs-on: ubuntu-20.04
+    name: Build and Test [ubuntu-22.04, Minimum GCC]
+    runs-on: ubuntu-22.04
     env:
       BUILD_CONFIGURATION: 0
       WITH_COVERAGE: 0

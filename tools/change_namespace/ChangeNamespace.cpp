@@ -1,4 +1,4 @@
-#include "ChangeNamespaceImpl.hpp"
+#include "ChangeNamespace.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -7,10 +7,10 @@
 #include <stdexcept>
 #include <string>
 
-ChangeNamespaceImpl::ChangeNamespaceImpl() : m_namespace_alias(false) {}
+ChangeNamespace::ChangeNamespace() : m_namespace_alias(false) {}
 
 bool
-ChangeNamespaceImpl::is_source_file(fs::path const& p)
+ChangeNamespace::is_source_file(fs::path const& p)
 {
     static const std::regex e(".*\\."
                               "(?:"
@@ -21,7 +21,7 @@ ChangeNamespaceImpl::is_source_file(fs::path const& p)
 }
 
 bool
-ChangeNamespaceImpl::is_test_config_file(fs::path const& p)
+ChangeNamespace::is_test_config_file(fs::path const& p)
 {
     static const std::regex e(".*\\."
                               "(?:"
@@ -32,7 +32,7 @@ ChangeNamespaceImpl::is_test_config_file(fs::path const& p)
 }
 
 bool
-ChangeNamespaceImpl::is_manifest_json_file(fs::path const& p)
+ChangeNamespace::is_manifest_json_file(fs::path const& p)
 {
     static const std::regex e(".*\\."
                               "(?:"
@@ -43,43 +43,43 @@ ChangeNamespaceImpl::is_manifest_json_file(fs::path const& p)
 }
 
 void
-ChangeNamespaceImpl::set_cppms_src_path(std::string_view p)
+ChangeNamespace::set_cppms_src_path(std::string_view p)
 {
     m_cppms_src_path = (fs::path(p) / "CppMicroServices").parent_path();
 }
 
 void
-ChangeNamespaceImpl::set_destination(std::string_view p)
+ChangeNamespace::set_destination(std::string_view p)
 {
     m_dest_path = fs::path(p);
 }
 
 void
-ChangeNamespaceImpl::set_namespace(std::string_view name)
+ChangeNamespace::set_namespace(std::string_view name)
 {
     m_namespace_name = name;
 }
 
 void
-ChangeNamespaceImpl::set_namespace_alias(bool b)
+ChangeNamespace::set_namespace_alias(bool b)
 {
     m_namespace_alias = b;
 }
 
 std::string
-ChangeNamespaceImpl::get_cppms_path() const
+ChangeNamespace::get_cppms_path() const
 {
     return m_cppms_src_path.string();
 }
 
 std::string
-ChangeNamespaceImpl::get_destination() const
+ChangeNamespace::get_destination() const
 {
     return m_dest_path.string();
 }
 
 std::string
-ChangeNamespaceImpl::get_namespace() const
+ChangeNamespace::get_namespace() const
 {
     return m_namespace_name;
 }
@@ -102,7 +102,7 @@ get_short_path(fs::path const& p)
 }
 
 int
-ChangeNamespaceImpl::run()
+ChangeNamespace::run()
 {
     // Check if cppms source path exists
     if (!fs::exists(m_cppms_src_path))
@@ -144,11 +144,4 @@ ChangeNamespaceImpl::run()
     }
 
     return 0;
-}
-
-cn_app_ptr
-CNApplication::create()
-{
-    cn_app_ptr result(static_cast<CNApplication*>(new ChangeNamespaceImpl()));
-    return result;
 }

@@ -1,12 +1,11 @@
-#include "ChangeNamespaceImpl.hpp"
-#include "FileHandler.hpp"
+#include "ChangeNamespace.hpp"
 
 #include <array>
 #include <iostream>
 #include <regex>
 
 void
-ChangeNamespaceImpl::add_path(fs::path const& p)
+ChangeNamespace::add_path(fs::path const& p)
 {
     fs::path normalized_path = p;
     normalized_path = normalized_path.lexically_normal();
@@ -28,7 +27,7 @@ ChangeNamespaceImpl::add_path(fs::path const& p)
 }
 
 void
-ChangeNamespaceImpl::add_directory(fs::path const& p)
+ChangeNamespace::add_directory(fs::path const& p)
 {
     if (fs::path(m_cppms_src_path / p) == fs::path(m_cppms_src_path / "tools" / "change_namespace"))
     {
@@ -51,7 +50,7 @@ ChangeNamespaceImpl::add_directory(fs::path const& p)
 }
 
 void
-ChangeNamespaceImpl::add_file(fs::path const& p)
+ChangeNamespace::add_file(fs::path const& p)
 {
     // If the file is already parsed, return
     if (m_copy_paths.find(p) != m_copy_paths.end())

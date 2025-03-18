@@ -88,13 +88,16 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         return 0;
     }
 
-    for (option::Option* opt = options[static_cast<int>(OptionIndex::UNKNOWN)]; opt; opt = opt->next())
+    /*for (option::Option* opt = options[static_cast<int>(OptionIndex::UNKNOWN)]; opt; opt = opt->next())
     {
         std::cout << "Unknown option: " << opt->name << "\n";
-    }
+    }*/
+
+    for (int i = 0; i < parse.nonOptionsCount(); ++i)
+      std::cout << "Non-option #" << i << ": " << parse.nonOption(i) << "\n";
 
     // Create application instance and set options
-    cn_app_ptr app_ptr(CNApplication::create());
+    ChangeNamespace cn_app;
 
     for (int i = 0; i < parse.optionsCount(); ++i)
     {
@@ -102,13 +105,13 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         switch (opt.index())
         {
             case static_cast<int>(OptionIndex::CPPMS_SRC):
-                app_ptr->set_cppms_src_path(opt.arg);
+                cn_app.set_cppms_src_path(opt.arg);
                 break;
             case static_cast<int>(OptionIndex::NAMESPACE):
-                app_ptr->set_namespace(opt.arg);
+                cn_app.set_namespace(opt.arg);
                 break;
             case static_cast<int>(OptionIndex::NAMESPACE_ALIAS):
-                app_ptr->set_namespace_alias(true);
+                cn_app.set_namespace_alias(true);
                 break;
         }
     }
@@ -123,7 +126,7 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
     if (parse.nonOptionsCount() > 0)
     {
-        app_ptr->set_destination(parse.nonOption(parse.nonOptionsCount() - 1));
+        cn_app.set_destination(parse.nonOption(parse.nonOptionsCount() - 1));
     }
 
     // Check if required options are provided
@@ -135,5 +138,5 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     }
 
     // Run the application
-    return app_ptr->run();
+    return cn_app.run();
 }

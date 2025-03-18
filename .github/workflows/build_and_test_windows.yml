@@ -102,13 +102,13 @@ jobs:
 
   build_win_mingw:
     name: Build and Test [mingw-w64,Configuration=${{matrix.buildconfiguration}}]
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       BUILD_DIR: Z:\build\config_${{matrix.buildconfiguration}}
       BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
       BUILD_OS: mingw-w64
-      CC: gcc-11
-      CXX: g++-11
+      CC: gcc
+      CXX: g++
     strategy:
       fail-fast: false
       matrix:

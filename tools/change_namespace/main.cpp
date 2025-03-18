@@ -88,13 +88,15 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         return 0;
     }
 
-    /*for (option::Option* opt = options[static_cast<int>(OptionIndex::UNKNOWN)]; opt; opt = opt->next())
+    for (option::Option* opt = options[static_cast<int>(OptionIndex::UNKNOWN)]; opt; opt = opt->next())
     {
         std::cout << "Unknown option: " << opt->name << "\n";
-    }*/
+    }
 
     for (int i = 0; i < parse.nonOptionsCount(); ++i)
-      std::cout << "Non-option #" << i << ": " << parse.nonOption(i) << "\n";
+    {
+        std::cout << "Non-option #" << i << ": " << parse.nonOption(i) << "\n";
+    }
 
     // Create application instance and set options
     ChangeNamespace cn_app;

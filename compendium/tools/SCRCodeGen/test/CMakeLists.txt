@@ -28,13 +28,9 @@ set(_scrcodegen_tests
   TestCodeGenerator.cpp
 )
 
-if(MINGW)
+if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MINGW"))
   # Suppress warnings for specific files
-  set_source_files_properties(
-    ../../../../third_party/jsoncpp.cpp
-    PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
-  )
-
+  set_source_files_properties(${_scrcodegen_tests} PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized )
 endif()
 
 include_directories(${CppMicroServices_SOURCE_DIR}/framework/include

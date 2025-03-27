@@ -43,7 +43,7 @@ add_executable(${change_namespace_test_exe_name}
   ${_change_namespace_tests}
 )
 
-target_compile_definitions(${scrcodegen_test_exe_name} PRIVATE USING_GTEST)
+target_compile_definitions(${change_namespace_test_exe_name} PRIVATE USING_GTEST)
 
 set_property(
   TARGET ${change_namespace_test_exe_name}

@@ -28,6 +28,15 @@ set(_scrcodegen_tests
   TestCodeGenerator.cpp
 )
 
+if(MINGW)
+  # Suppress warnings for specific files
+  set_source_files_properties(
+    ../../../../third_party/jsoncpp.cpp
+    PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
+  )
+
+endif()
+
 include_directories(${CppMicroServices_SOURCE_DIR}/framework/include
   ${CppMicroServices_BINARY_DIR}/include
   ${CppMicroServices_BINARY_DIR}/framework/include

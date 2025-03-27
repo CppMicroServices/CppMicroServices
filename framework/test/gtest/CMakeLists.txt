@@ -111,6 +111,15 @@ set(_third_party_srcs
   ../../../third_party/jsoncpp.cpp
 )
 
+if(MINGW)
+  # Suppress warnings for specific files
+  set_source_files_properties(
+    ../../../third_party/jsoncpp.cpp
+    PROPERTIES COMPILE_FLAGS -Wno-maybe-uninitialized
+  )
+
+endif()
+
 # Generate a custom "bundle init" file for the test driver executable
 usFunctionGenerateBundleInit(TARGET ${us_gtest_test_exe_name} OUT _additional_srcs)
 

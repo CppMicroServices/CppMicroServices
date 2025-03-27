@@ -18,7 +18,10 @@ if(NOT US_NO_INSTALL)
 endif()
 
 include_directories(${PROJECT_BINARY_DIR}/include)
-add_subdirectory(test)
+
+if(US_BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
+  add_subdirectory(test)
+endif()
 
 if (US_BUILD_TESTING)
   add_compile_options(-DUSING_GTEST)

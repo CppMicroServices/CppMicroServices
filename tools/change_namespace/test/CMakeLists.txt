@@ -66,6 +66,10 @@ target_link_libraries(${change_namespace_test_exe_name}
   gtest
 )
 
+if (US_COMPILER_MSVC AND BUILD_SHARED_LIBS)
+  target_compile_options(${change_namespace_test_exe_name} PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
+endif()
+
 # Run the GTest EXE from ctest.
 add_test(NAME ${change_namespace_test_exe_name}
   COMMAND ${change_namespace_test_exe_name}

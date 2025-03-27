@@ -21,6 +21,12 @@ include_directories(
   ${GTEST_INCLUDE_DIRS}
   )
 
+if(MSVC)
+  add_compile_definitions(GTEST_HAS_STD_TUPLE_=1)
+  add_compile_definitions(GTEST_HAS_TR1_TUPLE=0)
+  add_compile_definitions(GTEST_LANG_CXX11=1)
+endif()
+
 #-----------------------------------------------------------------------------
 # Add test source files
 #-----------------------------------------------------------------------------
@@ -36,6 +42,8 @@ set(_change_namespace_tests
 add_executable(${change_namespace_test_exe_name}
   ${_change_namespace_tests}
 )
+
+target_compile_definitions(${scrcodegen_test_exe_name} PRIVATE USING_GTEST)
 
 set_property(
   TARGET ${change_namespace_test_exe_name}

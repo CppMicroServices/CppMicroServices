@@ -84,9 +84,13 @@ namespace test
         auto dsRef = context.GetServiceReference<test::CAInterface>();
         ASSERT_TRUE(dsRef);
         auto dsSvc = context.GetService<test::CAInterface>(dsRef);
+        auto dsSvcServiceObject = context.GetServiceObjects<test::CAInterface>(dsRef).GetService();
         auto retSRef = cppmicroservices::ServiceReferenceFromService(dsSvc);
+        auto retSRefServiceObject = cppmicroservices::ServiceReferenceFromService(dsSvcServiceObject);
         ASSERT_EQ(retSRef, dsRef);
+        ASSERT_EQ(retSRefServiceObject, dsRef);
         ASSERT_EQ(cppmicroservices::any_cast<std::string>(retSRef.GetProperty("ManifestProp")), "abc");
+        ASSERT_EQ(cppmicroservices::any_cast<std::string>(retSRefServiceObject.GetProperty("ManifestProp")), "abc");
 
         ASSERT_THROW(cppmicroservices::ServiceReferenceFromService(std::make_shared<TestServiceA>(id1)),
                      std::runtime_error);

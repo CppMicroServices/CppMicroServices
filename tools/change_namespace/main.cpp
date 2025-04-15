@@ -126,11 +126,6 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         return 1;
     }
 
-    if (parse.nonOptionsCount() > 0)
-    {
-        cn_app.set_destination(parse.nonOption(parse.nonOptionsCount() - 1));
-    }
-
     // Check if required options are provided
     if (!options[static_cast<int>(OptionIndex::CPPMS_SRC)] || !options[static_cast<int>(OptionIndex::NAMESPACE)])
     {
@@ -138,6 +133,8 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         option::printUsage(std::cerr, usage);
         return 1;
     }
+
+    cn_app.set_destination(parse.nonOption(parse.nonOptionsCount() - 1));
 
     // Run the application
     return cn_app.run();

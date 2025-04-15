@@ -49,4 +49,34 @@ ConcurrentInvoke(std::function<R(Args...)> func)
     return returnVals;
 }
 
+class Barrier
+{
+  public:
+    Barrier(std::size_t count) : threshold(count), count(count), generation(0) {}
+
+    void
+    Wait()
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        auto gen = generation;
+        if (--count == 0)
+        {
+            generation++;
+            count = threshold;
+            cond.notify_all();
+        }
+        else
+        {
+            cond.wait(lock, [this, gen] { return gen != generation; });
+        }
+    }
+
+  private:
+    std::mutex mutex;
+    std::condition_variable cond;
+    std::size_t threshold;
+    std::size_t count;
+    std::size_t generation;
+};
+
 #endif /* ConcurrencyTestUtil_hpp */

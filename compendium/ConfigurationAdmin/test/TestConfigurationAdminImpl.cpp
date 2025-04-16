@@ -137,7 +137,7 @@ namespace cppmicroservices
 
             auto configuration = configAdmin.GetConfiguration("testPid");
             cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-            const std::string instanceId { "instance1" };
+            std::string const instanceId { "instance1" };
             props["uniqueProp"] = instanceId;
 
             {
@@ -269,8 +269,8 @@ namespace cppmicroservices
                 = std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(bundleContext, fakeLogger);
             ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger, asyncWorkService);
 
-            const std::string pid1 { "test.pid1" };
-            const std::string pid2 { "test.pid2" };
+            std::string const pid1 { "test.pid1" };
+            std::string const pid2 { "test.pid2" };
 
             auto const conf1 = configAdmin.GetConfiguration(pid1);
             auto const conf2 = configAdmin.GetConfiguration(pid2);
@@ -357,8 +357,8 @@ namespace cppmicroservices
             auto result = configAdmin.AddConfigurations(std::move(configs));
 
             decltype(result) expected {
-                { "test.pid", 0ul,  reinterpret_cast<std::uintptr_t>(conf.get())},
-                {"test.pid2", 2ul, reinterpret_cast<std::uintptr_t>(conf2.get())}
+                {  "test.pid", 0ul,  reinterpret_cast<std::uintptr_t>(conf.get()) },
+                { "test.pid2", 2ul, reinterpret_cast<std::uintptr_t>(conf2.get()) }
             };
 
             ASSERT_THAT(result, testing::SizeIs(3));
@@ -488,10 +488,10 @@ namespace cppmicroservices
             configAdmin.WaitForAllAsync();
 
             auto ms1Props = cppmicroservices::ServiceProperties({
-                {std::string("service.pid"), std::string("test.pid")}
+                { std::string("service.pid"), std::string("test.pid") }
             });
             auto ms2Props = cppmicroservices::ServiceProperties({
-                {std::string("component.name"), std::string("test.pid2")}
+                { std::string("component.name"), std::string("test.pid2") }
             });
 
             auto reg1 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedService>(mockManagedService,
@@ -603,10 +603,10 @@ namespace cppmicroservices
             AnyMap nameProp { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
             nameProp["name"] = std::string("factory2");
             auto ms1Props = cppmicroservices::ServiceProperties({
-                {std::string("service"), pidProp}
+                { std::string("service"), pidProp }
             });
             auto ms2Props = cppmicroservices::ServiceProperties({
-                {std::string("component"), nameProp}
+                { std::string("component"), nameProp }
             });
 
             auto reg1 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(
@@ -704,10 +704,10 @@ namespace cppmicroservices
             EXPECT_CALL(*mockManagedServiceFactory2, Removed(testing::_)).Times(0);
 
             auto msProps = cppmicroservices::ServiceProperties({
-                {std::string("service.pid"), std::string("test.pid")}
+                { std::string("service.pid"), std::string("test.pid") }
             });
             auto msfProps = cppmicroservices::ServiceProperties({
-                {std::string("service.pid"), std::string("factory")}
+                { std::string("service.pid"), std::string("factory") }
             });
 
             auto reg1 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(
@@ -776,7 +776,7 @@ namespace cppmicroservices
 
             AnyMap emptyProps { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
             cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-            const std::string instanceId { "instance1" };
+            std::string const instanceId { "instance1" };
             props["uniqueProp"] = instanceId;
 
             std::mutex counterMutex;
@@ -818,10 +818,10 @@ namespace cppmicroservices
                 .WillOnce(testing::InvokeWithoutArgs(f2));
 
             auto msProps = cppmicroservices::ServiceProperties({
-                {std::string("service.pid"), std::string("test.pid")}
+                { std::string("service.pid"), std::string("test.pid") }
             });
             auto msfProps = cppmicroservices::ServiceProperties({
-                {std::string("service.pid"), std::string("factory")}
+                { std::string("service.pid"), std::string("factory") }
             });
 
             auto reg1 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(
@@ -940,7 +940,7 @@ namespace cppmicroservices
             auto const conf = configAdmin.GetConfiguration("test.pid");
             ASSERT_TRUE(conf);
             cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-            const std::string instanceId { "instance1" };
+            std::string const instanceId { "instance1" };
             props["uniqueProp"] = instanceId;
             conf->Update(props);
 
@@ -998,10 +998,10 @@ namespace cppmicroservices
             configAdmin.WaitForAllAsync();
 
             auto msProps = cppmicroservices::ServiceProperties({
-                {std::string("service.pid"), std::string("test.pid")}
+                { std::string("service.pid"), std::string("test.pid") }
             });
             auto msfProps = cppmicroservices::ServiceProperties({
-                {std::string("service.pid"), std::string("factory")}
+                { std::string("service.pid"), std::string("factory") }
             });
 
             auto reg1 = bundleContext.RegisterService<cppmicroservices::service::cm::ManagedServiceFactory>(
@@ -1064,6 +1064,145 @@ namespace cppmicroservices
             reg2.Unregister();
 
             configAdmin.WaitForAllAsync();
+        }
+
+        TEST_F(TestConfigurationAdminImpl, VerifyUpdateAndUpdateIfDifferentLogging)
+        {
+            using cppmicroservices::logservice::SeverityLevel;
+
+            auto bundleContext = GetFramework().GetBundleContext();
+            auto fakeLogger = std::make_shared<MockLogger>();
+            std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService> asyncWorkService
+                = std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(bundleContext, fakeLogger);
+            ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger, asyncWorkService);
+
+            EXPECT_CALL(*(fakeLogger.get()),
+                        Log(SeverityLevel::LOG_DEBUG,
+                            "GetFactoryConfiguration: deferring to GetConfiguration for PID TEST~instance1"))
+                .Times(testing::AnyNumber());
+            EXPECT_CALL(*(fakeLogger.get()),
+                        Log(SeverityLevel::LOG_DEBUG,
+                            "GetConfiguration: returning new Configuration instance with PID TEST~instance1"))
+                .Times(1);
+
+            EXPECT_CALL(*(fakeLogger.get()),
+                        Log(SeverityLevel::LOG_DEBUG,
+                            "Configuration Updated: Configuration instance with PID TEST~instance1 and updated "
+                            "properties {\"foo\" : \"baz\"}"))
+                .Times(2);
+
+            EXPECT_CALL(*(fakeLogger.get()),
+                        Log(SeverityLevel::LOG_DEBUG,
+                            testing::AnyOf("Configuration Updated: Configuration instance with PID TEST~instance1 and "
+                                           "updated properties {\"foo\" : \"baz\", \"bar\" : \"foo?\"}",
+                                           "Configuration Updated: Configuration instance with PID TEST~instance1 and "
+                                           "updated properties {\"bar\" : \"foo?\", \"foo\" : \"baz\"}")))
+                .Times(1);
+            auto conf = configAdmin.GetFactoryConfiguration("TEST", "instance1");
+
+            auto props1 = conf->GetProperties();
+            props1["foo"] = std::string { "baz" };
+            // these will cause two updates to be logged with the new properties
+            conf->Update(props1).get();
+            conf->Update(props1).get();
+
+            // this will NOT cause any logging because the props are NOT different
+            conf->UpdateIfDifferent(props1).second.get();
+
+            props1["bar"] = std::string { "foo?" };
+
+            // this will cause logging because the props are different
+            conf->UpdateIfDifferent(props1).second.get();
+        }
+
+        TEST_F(TestConfigurationAdminImpl, VerifyBundleConfigLogging)
+        {
+            using cppmicroservices::logservice::SeverityLevel;
+
+            auto bundleContext = GetFramework().GetBundleContext();
+            auto fakeLogger = std::make_shared<MockLogger>();
+            std::shared_ptr<cppmicroservices::cmimpl::CMAsyncWorkService> asyncWorkService
+                = std::make_shared<cppmicroservices::cmimpl::CMAsyncWorkService>(bundleContext, fakeLogger);
+            ConfigurationAdminImpl configAdmin(bundleContext, fakeLogger, asyncWorkService);
+
+            // initial configs
+            EXPECT_CALL(*(fakeLogger.get()),
+                        Log(SeverityLevel::LOG_DEBUG,
+                            "GetConfiguration: returning new Configuration instance with PID test.pid"))
+                .Times(1);
+            EXPECT_CALL(*(fakeLogger.get()),
+                        Log(SeverityLevel::LOG_DEBUG,
+                            "GetConfiguration: returning new Configuration instance with PID test.pid2"))
+                .Times(1);
+
+            EXPECT_CALL(
+                *(fakeLogger.get()),
+                Log(SeverityLevel::LOG_DEBUG,
+                    "Configuration Updated: Configuration instance with PID test.pid and updated properties {}"))
+                .Times(1);
+
+            EXPECT_CALL(*(fakeLogger.get()),
+                        Log(SeverityLevel::LOG_DEBUG,
+                            "Configuration Updated: Configuration instance with PID test.pid2 and updated properties "
+                            "{\"foo\" : \"bar\"}"))
+                .Times(1);
+
+            // end initial configs
+
+            // bundle configs
+            EXPECT_CALL(
+                *(fakeLogger.get()),
+                Log(SeverityLevel::LOG_DEBUG,
+                    "AddConfigurations: Configuration already existed with identical properties with PID test.pid"))
+                .Times(1);
+
+            EXPECT_CALL(*(fakeLogger.get()),
+                        Log(SeverityLevel::LOG_DEBUG,
+                            "AddConfigurations: Created or Updated Configuration instance with PID test.pid2"))
+                .Times(1);
+            EXPECT_CALL(*(fakeLogger.get()),
+                        Log(SeverityLevel::LOG_DEBUG,
+                            "Configuration Updated: Configuration instance with PID test.pid2 and updated properties "
+                            "{\"foo\" : \"baz\"}"))
+                .Times(1);
+
+            EXPECT_CALL(*(fakeLogger.get()),
+                        Log(SeverityLevel::LOG_DEBUG,
+                            "AddConfigurations: Created or Updated Configuration instance with PID test.pid3"))
+                .Times(1);
+            EXPECT_CALL(*(fakeLogger.get()),
+                        Log(SeverityLevel::LOG_DEBUG,
+                            "Configuration Updated: Configuration instance with PID test.pid3 and updated properties "
+                            "{\"bar\" : \"baz\"}"))
+                .Times(1);
+            // end bundle configs
+
+            // Set up some existing Configurations
+            auto const conf = configAdmin.GetConfiguration("test.pid");
+            auto const conf2 = configAdmin.GetConfiguration("test.pid2");
+            ASSERT_TRUE(conf);
+            ASSERT_TRUE(conf2);
+            AnyMap props { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
+            conf->Update(props).get();
+            props["foo"] = std::string { "bar" };
+            conf2->Update(props).get();
+            std::vector<metadata::ConfigurationMetadata> configs;
+
+            // identical config to test.pid -- should result in no logging of values
+            configs.push_back(
+                metadata::ConfigurationMetadata("test.pid", AnyMap { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS }));
+
+            // different config to what currently exists in test.pid2 -- results in logging of values
+            AnyMap props2 { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
+            props2["foo"] = std::string { "baz" };
+            configs.push_back(metadata::ConfigurationMetadata("test.pid2", props2));
+
+            // new pid -- results in logging of values
+            AnyMap props3 { AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS };
+            props3["bar"] = std::string { "baz" };
+            configs.push_back(metadata::ConfigurationMetadata("test.pid3", props3));
+
+            auto result = configAdmin.AddConfigurations(std::move(configs));
         }
     } // namespace cmimpl
 } // namespace cppmicroservices

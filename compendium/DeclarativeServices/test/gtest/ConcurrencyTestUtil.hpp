@@ -76,7 +76,7 @@ class Barrier
     std::condition_variable cond;
     std::size_t threshold;
     std::size_t count;
-    std::size_t generation;
+    std::size_t generation{0};
 };
 
 #endif /* ConcurrencyTestUtil_hpp */

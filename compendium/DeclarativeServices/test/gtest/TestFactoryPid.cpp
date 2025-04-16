@@ -213,7 +213,7 @@ namespace test
     }
 
     /* test concurrentFactoryCreation.
-     * This test creates 1000 factory objects without waiting for the previous one to complete.
+     * This test creates 100 factory objects concurrently 
      */
     TEST_F(tServiceComponent, testConcurrentFactoryCreation)
     {
@@ -233,7 +233,7 @@ namespace test
         // creating the next one.
         constexpr auto count = 100;
         std::vector<std::shared_future<void>> futures;
-        Barrier sync_point(count); // 60 threads to synchronize
+        Barrier sync_point(count); // 100 threads to synchronize
 
         for (int i = 0; i < count; i++)
         {
@@ -248,10 +248,6 @@ namespace test
             // Create the factory configuration object
             auto factoryConfig = configAdminService->CreateFactoryConfiguration(configurationPid);
 
-            // Update the properties for the factory configuration object
-            cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
-            std::string const instanceId { "instance" + std::to_string(i) };
-            props["uniqueProp"] = instanceId;
             futures.emplace_back(std::async(std::launch::async, processConfiguration, factoryConfig));
         }
 

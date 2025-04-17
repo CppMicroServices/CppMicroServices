@@ -737,8 +737,8 @@ namespace cppmicroservices
                         any_value_to_json(configValue, properties);
 
                         logger->Log(cppmicroservices::logservice::SeverityLevel::LOG_DEBUG,
-                                    "Configuration Updated: Configuration instance with PID " + pid
-                                        + " and updated properties " + configValue.str());
+                                    "Configuration Updated: Configuration instance with PID " + pid + " version: "
+                                        + std::to_string(changeCount) + " properties: " + configValue.str());
                     }
                 });
         }

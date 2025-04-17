@@ -1087,16 +1087,22 @@ namespace cppmicroservices
 
             EXPECT_CALL(*(fakeLogger.get()),
                         Log(SeverityLevel::LOG_DEBUG,
-                            "Configuration Updated: Configuration instance with PID TEST~instance1 and updated "
-                            "properties {\"foo\" : \"baz\"}"))
-                .Times(2);
+                            "Configuration Updated: Configuration instance with PID TEST~instance1 version: 1 "
+                            "properties: {\"foo\" : \"baz\"}"))
+                .Times(1);
 
             EXPECT_CALL(*(fakeLogger.get()),
                         Log(SeverityLevel::LOG_DEBUG,
-                            testing::AnyOf("Configuration Updated: Configuration instance with PID TEST~instance1 and "
-                                           "updated properties {\"foo\" : \"baz\", \"bar\" : \"foo?\"}",
-                                           "Configuration Updated: Configuration instance with PID TEST~instance1 and "
-                                           "updated properties {\"bar\" : \"foo?\", \"foo\" : \"baz\"}")))
+                            "Configuration Updated: Configuration instance with PID TEST~instance1 version: 2 "
+                            "properties: {\"foo\" : \"baz\"}"))
+                .Times(1);
+
+            EXPECT_CALL(*(fakeLogger.get()),
+                        Log(SeverityLevel::LOG_DEBUG,
+                            testing::AnyOf("Configuration Updated: Configuration instance with PID TEST~instance1 "
+                                           "version: 3 properties: {\"foo\" : \"baz\", \"bar\" : \"foo?\"}",
+                                           "Configuration Updated: Configuration instance with PID TEST~instance1 "
+                                           "version: 3 properties: {\"bar\" : \"foo?\", \"foo\" : \"baz\"}")))
                 .Times(1);
             auto conf = configAdmin.GetFactoryConfiguration("TEST", "instance1");
 
@@ -1138,12 +1144,12 @@ namespace cppmicroservices
             EXPECT_CALL(
                 *(fakeLogger.get()),
                 Log(SeverityLevel::LOG_DEBUG,
-                    "Configuration Updated: Configuration instance with PID test.pid and updated properties {}"))
+                    "Configuration Updated: Configuration instance with PID test.pid version: 1 properties: {}"))
                 .Times(1);
 
             EXPECT_CALL(*(fakeLogger.get()),
                         Log(SeverityLevel::LOG_DEBUG,
-                            "Configuration Updated: Configuration instance with PID test.pid2 and updated properties "
+                            "Configuration Updated: Configuration instance with PID test.pid2 version: 1 properties: "
                             "{\"foo\" : \"bar\"}"))
                 .Times(1);
 
@@ -1162,7 +1168,7 @@ namespace cppmicroservices
                 .Times(1);
             EXPECT_CALL(*(fakeLogger.get()),
                         Log(SeverityLevel::LOG_DEBUG,
-                            "Configuration Updated: Configuration instance with PID test.pid2 and updated properties "
+                            "Configuration Updated: Configuration instance with PID test.pid2 version: 2 properties: "
                             "{\"foo\" : \"baz\"}"))
                 .Times(1);
 
@@ -1172,7 +1178,7 @@ namespace cppmicroservices
                 .Times(1);
             EXPECT_CALL(*(fakeLogger.get()),
                         Log(SeverityLevel::LOG_DEBUG,
-                            "Configuration Updated: Configuration instance with PID test.pid3 and updated properties "
+                            "Configuration Updated: Configuration instance with PID test.pid3 version: 1 properties: "
                             "{\"bar\" : \"baz\"}"))
                 .Times(1);
             // end bundle configs

@@ -20,6 +20,7 @@
 
 =============================================================================*/
 
+#include "ConcurrencyTestUtil.hpp"
 #include "TestFixture.hpp"
 #include "gtest/gtest.h"
 
@@ -72,7 +73,8 @@ namespace test
         auto fut = factoryConfig->Update(props);
         fut.get();
         // Confirm the properties have been updated in DS.
-        compDescDTO = dsRuntimeService->GetComponentDescriptionDTO(testBundle, factoryInstance);
+        compDescDTO
+            = dsRuntimeService->GetComponentDescriptionDTO(testBundle, factoryComponentName + "_" + factoryInstance);
         EXPECT_EQ(compDescDTO.implementationClass, factoryComponentName)
             << "Implementation class in the returned component description must be " << factoryComponentName;
 
@@ -196,6 +198,57 @@ namespace test
             props["uniqueProp"] = instanceId;
             auto fut = factoryConfig->Update(props);
             futures.push_back(fut);
+        }
+
+        // Wait for all factory objects to finish updating.
+        for (auto const& item : futures)
+        {
+            item.get();
+        }
+
+        // Request service references to the new component instances. This will
+        // cause DS to construct the factory instances.
+        auto instances = GetInstances<test::CAInterface>();
+        EXPECT_EQ(instances.size(), count);
+    }
+
+    /* test concurrentFactoryCreation.
+     * This test creates 100 factory objects concurrently 
+     */
+    TEST_F(tServiceComponent, testConcurrentFactoryCreation)
+    {
+        auto const& param = std::make_shared<AsyncWorkServiceThreadPool>(10);
+        auto reg = context.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
+
+        std::string configurationPid = "ServiceComponentPid";
+
+        // Start the test bundle containing the factory component.
+        cppmicroservices::Bundle testBundle = StartTestBundle("TestBundleDSCA21");
+
+        // Get a service reference to ConfigAdmin to create the factory component instances.
+        auto configAdminService = GetInstance<cppmicroservices::service::cm::ConfigurationAdmin>();
+        ASSERT_TRUE(configAdminService) << "GetService failed for ConfigurationAdmin";
+
+        // Create some factory configuration objects. Don't wait for one to complete before
+        // creating the next one.
+        constexpr auto count = 100;
+        std::vector<std::shared_future<void>> futures;
+        Barrier sync_point(count); // 100 threads to synchronize
+
+        for (int i = 0; i < count; i++)
+        {
+            auto processConfiguration
+                = [&sync_point](std::shared_ptr<cppmicroservices::service::cm::Configuration> factoryConfig)
+            {
+                sync_point.Wait();
+                auto fut = factoryConfig->Update({});
+                fut.wait();
+            };
+
+            // Create the factory configuration object
+            auto factoryConfig = configAdminService->CreateFactoryConfiguration(configurationPid);
+
+            futures.emplace_back(std::async(std::launch::async, processConfiguration, factoryConfig));
         }
 
         // Wait for all factory objects to finish updating.

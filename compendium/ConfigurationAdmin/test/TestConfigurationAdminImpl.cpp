@@ -32,6 +32,7 @@
 
 #include "../src/ConfigurationAdminImpl.hpp"
 #include "Mocks.hpp"
+#include <thread>
 
 namespace cppmicroservices
 {
@@ -1209,6 +1210,9 @@ namespace cppmicroservices
             configs.push_back(metadata::ConfigurationMetadata("test.pid3", props3));
 
             auto result = configAdmin.AddConfigurations(std::move(configs));
+
+            // make sure all async stuff finishes (add configurations has async calls)
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     } // namespace cmimpl
 } // namespace cppmicroservices

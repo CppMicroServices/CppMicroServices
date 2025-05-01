@@ -432,7 +432,6 @@ namespace test
 
         // ASYNCWORKSERVICE
         auto reg = context.RegisterService<cppmicroservices::async::AsyncWorkService>(param);
-        US_UNUSED(reg);
 
         // CA
         ::test::InstallAndStartConfigAdmin(context);
@@ -466,6 +465,8 @@ namespace test
         auto serviceRef = context.GetServiceReference<test::CAInterface>();
         auto service = context.GetService<test::CAInterface>(serviceRef);
         ASSERT_TRUE(service) << "GetService failed for CAInterface";
+
+        ASSERT_NO_THROW(reg.Unregister());
     }
 
 }; // namespace test

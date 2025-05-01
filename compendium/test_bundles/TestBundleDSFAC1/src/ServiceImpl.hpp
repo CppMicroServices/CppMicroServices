@@ -1,8 +1,8 @@
 #ifndef SERVICE_IMPL_HPP_
 #define SERVICE_IMPL_HPP_
 
-#include <TestInterfaces/Interfaces.hpp>
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
+#include <TestInterfaces/Interfaces.hpp>
 #include <mutex>
 
 using ComponentContext = cppmicroservices::service::component::ComponentContext;
@@ -100,6 +100,93 @@ namespace sample
       private:
         std::shared_ptr<test::ServiceCInt> serviceC {};
     };
+    class ServiceAImpl4 : public test::ServiceAInt
+    {
+      public:
+        ServiceAImpl4(std::shared_ptr<cppmicroservices::AnyMap> const& props,
+                      std::shared_ptr<test::ServiceBInt> const interface1);
+        ServiceAImpl4() = default;
+        ServiceAImpl4(ServiceAImpl const&) = delete;
+        ServiceAImpl4(ServiceAImpl&&) = delete;
+        ServiceAImpl4& operator=(ServiceAImpl const&) = delete;
+        ServiceAImpl4& operator=(ServiceAImpl&&) = delete;
+        ~ServiceAImpl4() = default;
+
+        void
+        Modified(std::shared_ptr<ComponentContext> const&, std::shared_ptr<cppmicroservices::AnyMap> const&)
+        {
+        }
+        cppmicroservices::AnyMap
+        GetProperties() override
+        {
+            return {};
+        }
+
+        [[nodiscard]] void*
+        GetRefAddr() const override
+        {
+            return static_cast<void*>(serviceB.get());
+        }
+
+      private:
+        std::shared_ptr<test::ServiceBInt> serviceB {};
+    };
+
+    class ServiceAImpl5 : public test::ServiceAInt
+    {
+      public:
+        ServiceAImpl5(std::shared_ptr<cppmicroservices::AnyMap> const& props,
+                      std::shared_ptr<test::ServiceBInt> const interface1);
+        ServiceAImpl5() = default;
+        ServiceAImpl5(ServiceAImpl const&) = delete;
+        ServiceAImpl5(ServiceAImpl&&) = delete;
+        ServiceAImpl5& operator=(ServiceAImpl const&) = delete;
+        ServiceAImpl5& operator=(ServiceAImpl&&) = delete;
+        ~ServiceAImpl5() = default;
+
+        void
+        Modified(std::shared_ptr<ComponentContext> const&, std::shared_ptr<cppmicroservices::AnyMap> const&)
+        {
+        }
+        cppmicroservices::AnyMap
+        GetProperties() override
+        {
+            return {};
+        }
+
+        [[nodiscard]] void*
+        GetRefAddr() const override
+        {
+            return static_cast<void*>(serviceB.get());
+        }
+
+      private:
+        std::shared_ptr<test::ServiceBInt> serviceB {};
+    };
+
+    class ServiceBImpl3 : public test::ServiceBInt
+    {
+      public:
+        ServiceBImpl3(std::shared_ptr<cppmicroservices::AnyMap> const&) {}
+        ServiceBImpl3() = default;
+        ServiceBImpl3(ServiceBImpl3 const&) = delete;
+        ServiceBImpl3(ServiceBImpl3&&) = delete;
+        ServiceBImpl3& operator=(ServiceBImpl3 const&) = delete;
+        ServiceBImpl3& operator=(ServiceBImpl3&&) = delete;
+        ~ServiceBImpl3() = default;
+
+        cppmicroservices::AnyMap
+        GetProperties() override
+        {
+            return {};
+        }
+
+        void
+        Modified(std::shared_ptr<ComponentContext> const&, std::shared_ptr<cppmicroservices::AnyMap> const&)
+        {
+        }
+    };
+
     class ServiceBImpl2 : public test::ServiceBInt
     {
       public:

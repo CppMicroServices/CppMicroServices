@@ -5,7 +5,31 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/>`_.
-`v3.8.6 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.6>`_ (2024-1-20)
+
+`v3.8.7 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.7>`_ (2025-5-1)
+---------------------------------------------------------------------------------------------------------
+`Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.6...3.8.7>`_
+Added
+-----
+- `[Declarative Services] New Dynamic Targeting mechanism <https://github.com/CppMicroServices/CppMicroServices/pull/1064>`_
+Changed
+-------
+Removed
+-------
+Deprecated
+----------
+Fixed
+-----
+- `[Core Framework] Make ServiceProperties an AnyMap <https://github.com/CppMicroServices/CppMicroServices/pull/1056>`_
+- `[Core Framework] Update Tiny Scheme <https://github.com/CppMicroServices/CppMicroServices/pull/1047>`_
+- `[Core Framework] Remove libtelnet <https://github.com/CppMicroServices/CppMicroServices/pull/1059>`_
+- `[Core Framework] Add missing cstdint includes <https://github.com/CppMicroServices/CppMicroServices/pull/1057>`_
+- `[Core Framework] Remove traces of absl <https://github.com/CppMicroServices/CppMicroServices/pull/1058>`_
+- `[Core Framework] Resolve first valgrind issue <https://github.com/CppMicroServices/CppMicroServices/pull/1066>`_
+- `[Core Framework] getServiceObjects fix to use customDeleter <https://github.com/CppMicroServices/CppMicroServices/pull/1070>`_
+- `[Core Framework] Revert conversion of serviceProperties to anymap <https://github.com/CppMicroServices/CppMicroServices/pull/1074>`_
+
+`v3.8.6 <https://github.com/cppmicroservices/cppmicroservices/tree/3.8.6>`_ (2025-1-20)
 ---------------------------------------------------------------------------------------------------------
 
 `Full Changelog <https://github.com/cppmicroservices/cppmicroservices/compare/v3.8.5...3.8.6>`_

@@ -52,21 +52,13 @@ Patches
  * Support for zip files with prepended binary blobs.
  * Write to C file streams.
 
-libtelnet
----------
-
-Public Domain
-
-https://github.com/seanmiddleditch/libtelnet
-574eef9fd7f373fb2812939456fc5a4c3e975b44
-
 tinyscheme
 ----------
 
 BSD-style license
 
 http://tinyscheme.sourceforge.net/home.html
-1.41
+1.42
 
 Patches
 
@@ -153,14 +145,6 @@ See https://github.com/google/benchmark/blob/master/LICENSE for license informat
 
 https://github.com/google/benchmark
 12235e24652fc7f809373e7c11a5f73c5763fc4c
-
-Abseil (absl)
--------------
-
-See https://github.com/abseil/abseil-cpp/blob/master/LICENSE for license information
-
-https://github.com/abseil/abseil-cpp
-https://github.com/abseil/abseil-cpp/releases/tag/20230125.3
 
 spdlog
 ------

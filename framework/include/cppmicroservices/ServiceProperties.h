@@ -35,7 +35,7 @@ namespace cppmicroservices
      * type. It is typically used for passing service properties to
      * BundleContext::RegisterService.
      */
-    using ServiceProperties = AnyMap;
+    using ServiceProperties = std::unordered_map<std::string, Any>;
 } // namespace cppmicroservices
 
 #endif // CPPMICROSERVICES_SERVICEPROPERTIES_H

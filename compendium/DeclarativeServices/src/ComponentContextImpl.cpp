@@ -292,7 +292,7 @@ namespace cppmicroservices
                 auto matchingServiceInterfaceMapPtr
                     = std::find_if(services.begin(),
                                    services.end(),
-                                   [&sRef](std::pair<cppmicroservices::ServiceReferenceBase, InterfaceMapConstPtr> pair)
+                                   [&sRef](std::pair<cppmicroservices::ServiceReferenceBase, InterfaceMapConstPtr> const &pair)
                                    { return pair.first == sRef; });
 
                 if (matchingServiceInterfaceMapPtr != services.end())

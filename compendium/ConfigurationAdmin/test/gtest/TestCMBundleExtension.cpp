@@ -27,8 +27,8 @@
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
 
-#include "../src/CMBundleExtension.hpp"
-#include "../src/CMConstants.hpp"
+#include "../../src/CMBundleExtension.hpp"
+#include "../../src/CMConstants.hpp"
 #include "Mocks.hpp"
 
 #define str(s)  #s

@@ -699,8 +699,7 @@ namespace cppmicroservices
                             }
                         });
 
-                    auto const factoryPid = getFactoryPid(pid);
-                    if (!factoryPid.empty())
+                    if (auto const factoryPid = getFactoryPid(pid); !factoryPid.empty())
                     {
                         std::for_each(
                             managedServiceFactoryWrappers.begin(),

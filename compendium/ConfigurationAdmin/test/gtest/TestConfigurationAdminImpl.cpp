@@ -28,9 +28,9 @@
 #include "cppmicroservices/FrameworkFactory.h"
 #include "cppmicroservices/cm/ConfigurationException.hpp"
 
-#include "../src/CMAsyncWorkService.hpp"
+#include "../../src/CMAsyncWorkService.hpp"
 
-#include "../src/ConfigurationAdminImpl.hpp"
+#include "../../src/ConfigurationAdminImpl.hpp"
 #include "Mocks.hpp"
 #include <thread>
 

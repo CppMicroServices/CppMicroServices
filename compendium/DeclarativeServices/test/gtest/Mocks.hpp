@@ -323,8 +323,8 @@ namespace cppmicroservices
             MOCK_METHOD0(Activate, void(void));
             MOCK_METHOD0(Deactivate, void(void));
             MOCK_METHOD0(Modified, void(void));
-            MOCK_METHOD2(InvokeUnbindMethod, void(std::string const&, cppmicroservices::ServiceReferenceBase const&));
-            MOCK_METHOD2(InvokeBindMethod, void(std::string const&, cppmicroservices::ServiceReferenceBase const&));
+            MOCK_METHOD2(InvokeUnbindMethod, void(std::string const&, std::shared_ptr<void>));
+            MOCK_METHOD2(InvokeBindMethod, void(std::string const&, std::shared_ptr<void>));
             MOCK_METHOD0(GetInterfaceMap, cppmicroservices::InterfaceMapPtr(void));
             MOCK_METHOD0(DoesModifiedMethodExist, bool(void));
         };

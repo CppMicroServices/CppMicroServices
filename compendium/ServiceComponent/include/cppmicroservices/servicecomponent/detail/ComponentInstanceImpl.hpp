@@ -180,18 +180,18 @@ namespace cppmicroservices
 
                     void
                     InvokeBindMethod(std::string const& refName,
-                                     cppmicroservices::ServiceReferenceBase const& sRef) override
+                                     std::shared_ptr<void> svcToBind) override
                     {
                         size_t index = refBinderMap.at(refName);
-                        refBinders.at(index)->Bind(mContext->GetBundleContext(), sRef, mServiceImpl);
+                        refBinders.at(index)->Bind(mContext->GetBundleContext(), svcToBind, mServiceImpl);
                     };
 
                     void
                     InvokeUnbindMethod(std::string const& refName,
-                                       cppmicroservices::ServiceReferenceBase const& sRef) override
+                                       std::shared_ptr<void> svcToUnbind) override
                     {
                         size_t index = refBinderMap.at(refName);
-                        refBinders.at(index)->UnBind(mContext->GetBundleContext(), sRef, mServiceImpl);
+                        refBinders.at(index)->UnBind(mContext->GetBundleContext(), svcToUnbind, mServiceImpl);
                     };
 
                     virtual std::shared_ptr<T>

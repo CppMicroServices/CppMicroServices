@@ -80,14 +80,14 @@ namespace cppmicroservices
                      * This method is called by the runtime to bind a reference with dynamic policy
                      */
                     virtual void InvokeUnbindMethod(std::string const& refName,
-                                                    cppmicroservices::ServiceReferenceBase const& sRef)
+                                                    std::shared_ptr<void> svcToUnbind)
                         = 0;
 
                     /**
                      * This method is called by the runtime to unbind a reference with dynamic policy
                      */
                     virtual void InvokeBindMethod(std::string const& refName,
-                                                  cppmicroservices::ServiceReferenceBase const& sRef)
+                                                  std::shared_ptr<void> svcToBind)
                         = 0;
 
                     /**
@@ -99,8 +99,8 @@ namespace cppmicroservices
                 };
 
             } // namespace detail
-        }     // namespace component
-    }         // namespace service
+        } // namespace component
+    } // namespace service
 } // namespace cppmicroservices
 
 #endif /* ComponentInstance_hpp */

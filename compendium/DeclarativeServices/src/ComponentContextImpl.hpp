@@ -100,6 +100,21 @@ namespace cppmicroservices
             std::shared_ptr<void> LocateService(std::string const& name, std::string const& type) const override;
 
             /**
+             * Returns the service object from the cache matching the passed in serviceReferenceBase
+             *
+             * \param name The name of a reference as specified in a \c reference
+             *        element in this component's description.
+             * \param sRef The serviceReference of the desired service
+             * \return A service object for the referenced service or \c nullptr if
+             *         the the reference is not bound for the reference name passed in
+             * \throws {@link ComponentException} if Service Component Runtime catches an
+             *         exception while activating the bound service or if this
+             *         {@link ComponentContext} is invalid
+             */
+            std::shared_ptr<void> LocateService(std::string const& name,
+                                                cppmicroservices::ServiceReferenceBase const& sRef);
+
+            /**
              * Returns the service objects for the specified reference name.
              *
              * \param name The name of a reference as specified in a \c reference
@@ -204,8 +219,18 @@ namespace cppmicroservices
              */
             void Invalidate();
 
-            bool AddToBoundServicesCache(std::string const& refName,
-                                         cppmicroservices::ServiceReferenceBase const& sRef);
+            /**
+             * Add service object from the passed in serviceReference to cache.
+             *
+             * \param refName The name of a reference as specified in a \c reference
+             *        element in this component's description.
+             * \param sRef The serviceReference of the desired service
+             * \return std::shared_ptr<void> pointing to the service instance object
+             * \throws {@link ComponentException} if Service Component Runtime fails to
+             *         return a service instance
+             */
+            std::shared_ptr<void> AddToBoundServicesCache(std::string const& refName,
+                                                          cppmicroservices::ServiceReferenceBase const&);
 
             void RemoveFromBoundServicesCache(std::string const& refName,
                                               cppmicroservices::ServiceReferenceBase const& sRef);
@@ -222,7 +247,11 @@ namespace cppmicroservices
 
             std::weak_ptr<ComponentConfiguration> configManager;
             cppmicroservices::Bundle usingBundle;
-            mutable Guarded<std::unordered_map<std::string, std::vector<cppmicroservices::InterfaceMapConstPtr>>>
+            // map of reference name to std::vector of pairs of ServiceReferenceBase to std::shared_ptr<void> of bound
+            // service in order that they were added to the boundServiceCache
+            mutable Guarded<std::unordered_map<
+                std::string,
+                std::vector<std::pair<cppmicroservices::ServiceReferenceBase, InterfaceMapConstPtr>>>>
                 boundServicesCache;
         };
     } // namespace scrimpl

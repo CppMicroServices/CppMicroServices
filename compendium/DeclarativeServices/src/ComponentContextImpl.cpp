@@ -87,11 +87,7 @@ namespace cppmicroservices
                                       {
                                           foundAtLeastOneValidBoundService = true;
                                           // grab the service pointer from the interface map
-                                          serviceMap.push_back(std::make_pair(sRef, interfaceMap));
-                                      }
-                                      else
-                                      {
-                                          throw ComponentException("Cannot construct cache with an empty interfaceMap");
+                                          serviceMap.emplace_back(std::make_pair(sRef, interfaceMap));
                                       }
                                   }
                               });
@@ -431,10 +427,10 @@ namespace cppmicroservices
             auto interfaceMap = sObjs.GetService();
             if (!interfaceMap || interfaceMap->empty())
             {
-                throw ComponentException("Cannot bind to an empty service interface map");
+                return nullptr;
             }
             std::shared_ptr<void> svcToBind = interfaceMap->begin()->second;
-            (*boundServicesCacheHandle)[refName].push_back(std::make_pair(sRef, interfaceMap));
+            (*boundServicesCacheHandle)[refName].emplace_back(std::make_pair(sRef, interfaceMap));
             return svcToBind;
         }
 

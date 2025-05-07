@@ -86,7 +86,6 @@ namespace cppmicroservices
                                       if (interfaceMap && interfaceMap->size() != 0)
                                       {
                                           foundAtLeastOneValidBoundService = true;
-                                          // grab the service pointer from the interface map
                                           serviceMap.emplace_back(std::make_pair(sRef, interfaceMap));
                                       }
                                   }

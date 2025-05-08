@@ -102,8 +102,8 @@ namespace cppmicroservices
                      */
                     void
                     Bind(cppmicroservices::BundleContext,
-                         cppmicroservices::ServiceReferenceBase const&,
-                         std::shared_ptr<T> const&) override
+                        std::shared_ptr<void> const&,
+                        std::shared_ptr<T> const&) override
                     {
                         throw std::runtime_error("Static dependency must not change at runtime");
                     }

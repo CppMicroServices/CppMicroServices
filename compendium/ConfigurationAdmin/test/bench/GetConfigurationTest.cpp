@@ -55,7 +55,7 @@ namespace
         size_t iter = 0;
         for (auto _ : state)
         {
-            auto configuration = configAdmin->GetConfiguration("someConfig" + iter);
+            auto configuration = configAdmin->GetConfiguration("someConfig" + std::to_string(iter));
             cppmicroservices::AnyMap props(cppmicroservices::AnyMap::UNORDERED_MAP_CASEINSENSITIVE_KEYS);
             props["anInt"] = 5;
 

@@ -132,7 +132,9 @@ namespace test
     {
         std::string libName { "DeclarativeServices" };
 #if defined(US_PLATFORM_WINDOWS)
-        libName += US_DeclarativeServices_VERSION_MAJOR;
+        // This is a hack for the time being.
+        // TODO: revisit changing the hard-coded "1" to the DS version dynamically
+        libName += "1";
 #endif
         return PathToLib(libName);
     }

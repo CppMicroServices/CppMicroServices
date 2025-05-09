@@ -98,11 +98,12 @@ namespace cppmicroservices
             // from the process.
             static Guarded<std::map<std::string, void*>> bundleBinaries; ///< map of bundle location and handle pairs
             auto const bundleLoc = fromBundle.GetLocation();
+            std::cout << "MARK24.1 " << bundleLoc << std::endl;
 
             void* handle = nullptr;
             if (bundleBinaries.lock()->count(bundleLoc) != 0u)
             {
-                std::cout << "MARK24" << std::endl;
+                std::cout << "MARK24 " << bundleLoc << std::endl;
                 handle = bundleBinaries.lock()->at(bundleLoc);
             }
             else

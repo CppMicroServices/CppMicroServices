@@ -112,12 +112,13 @@ namespace cppmicroservices
                     cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
                 try
                 {
-                    std::cout << "MARK26" << !func.Empty() << " "
-                              << !any_cast<std::function<bool(cppmicroservices::Bundle const&)>>(func)(fromBundle)
-                              << std::endl;
+                    std::cout << "MARK26" << !func.Empty() << std::endl;
+
                     if (!func.Empty()
                         && !any_cast<std::function<bool(cppmicroservices::Bundle const&)>>(func)(fromBundle))
                     {
+                        std::cout << "MARK277" << std::endl;
+
                         std::string errMsg("Bundle at location " + bundleLoc + " failed bundle validation.");
                         throw SecurityException { std::move(errMsg), fromBundle };
                     }

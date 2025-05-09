@@ -67,8 +67,10 @@ namespace cppmicroservices
         assert(factory && "Factory service pointer is nullptr");
         try
         {
+            std::cout << "MARK10" << std::endl;
             InterfaceMapConstPtr smap = factory->GetService(MakeBundle(bundle->shared_from_this()),
                                                             ServiceRegistrationBase(registration.lock()));
+            std::cout << "MARK11" << std::endl;
             if (!smap || smap->empty())
             {
                 if (auto bundle_ = coreInfo->bundle_.lock())
@@ -174,6 +176,7 @@ namespace cppmicroservices
          * map contains an entry for each bundle that tries to get a service
          * from a service factory.
          */
+        std::cout << "MARK2" << std::endl;
 #ifdef US_HAVE_THREAD_LOCAL
         static thread_local ThreadMarksMapType threadMarks;
 #elif !defined(US_ENABLE_THREADING_SUPPORT)
@@ -211,12 +214,14 @@ namespace cppmicroservices
             auto reg = registration.lock();
             if (!reg)
             {
+                std::cout << "MARK3 no registration" << std::endl;
                 return s;
             }
             auto l = LockServiceRegistration();
             US_UNUSED(l);
             if (!coreInfo->available)
             {
+                std::cout << "MARK4 no core info" << std::endl;
                 return s;
             }
             serviceFactory
@@ -228,6 +233,7 @@ namespace cppmicroservices
             // No service factory, just return the registered service directly.
             if (!serviceFactory)
             {
+                std::cout << "MARK5 no factory" << std::endl;
                 s = coreInfo->service;
                 if (s && !s->empty())
                 {
@@ -239,6 +245,7 @@ namespace cppmicroservices
             auto serviceIter = coreInfo->bundleServiceInstance.find(bundle);
             if (coreInfo->bundleServiceInstance.end() != serviceIter)
             {
+                std::cout << "MARK6 already have a service" << std::endl;
                 ++depCounter;
                 return serviceIter->second;
             }
@@ -246,6 +253,7 @@ namespace cppmicroservices
             marks = &threadMarks[bundle];
             if (marks->find(registrationPtr) != marks->end())
             {
+                std::cout << "MARK7 recursive entry" << std::endl;
                 // Prevent recursive service factory calls from the same thread
                 // for the same bundle.
                 std::string msg = "Recursive call to ServiceFactory::GetService";
@@ -278,11 +286,12 @@ namespace cppmicroservices
 
             if (coreInfo->bundleServiceInstance.end() != coreInfo->bundleServiceInstance.find(bundle))
             {
+                std::cout << "MARK8 recursive entry" << std::endl;
                 ++coreInfo->dependents.at(bundle);
                 return coreInfo->bundleServiceInstance.at(bundle);
             }
         }
-
+        std::cout << "MARK9" << std::endl;
         s = GetServiceFromFactory(bundle, serviceFactory);
 
         {

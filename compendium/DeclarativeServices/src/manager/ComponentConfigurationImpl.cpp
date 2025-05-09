@@ -285,7 +285,8 @@ namespace cppmicroservices
                                                   configNowSatisfied,
                                                   changeCountDifferent);
 
-            if (configWasSatisfied && configNowSatisfied && changeCountDifferent && (metadata->configurationPolicy != CONFIG_POLICY_IGNORE))
+            if (configWasSatisfied && configNowSatisfied && changeCountDifferent
+                && (metadata->configurationPolicy != CONFIG_POLICY_IGNORE))
             {
                 if (!Modified())
                 {
@@ -493,7 +494,9 @@ namespace cppmicroservices
         InstanceContextPair
         ComponentConfigurationImpl::CreateAndActivateComponentInstanceHelper(cppmicroservices::Bundle const& bundle)
         {
+            std::cout << "MARK21" << std::endl;
             auto componentInstance = CreateComponentInstance();
+            std::cout << "MARK22" << std::endl;
             auto ctxt = std::make_shared<ComponentContextImpl>(shared_from_this(), bundle);
             /*
              * Failing to construct the service object is an unrecoverable

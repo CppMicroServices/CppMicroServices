@@ -59,10 +59,12 @@ namespace cppmicroservices
                             }
                         });
                     std::lock_guard<std::mutex> lock(oneAtATimeMutex);
+                    std::cout << "MARK16" << std::endl;
 
                     // no state change, already in active state. create and return a ComponentInstance object
                     // This could throw; a scope guard is put in place to call latch.CountDown().
                     instance = mgr.CreateAndActivateComponentInstance(clientBundle);
+                    std::cout << "MARK17" << std::endl;
 
                     // Just in case the configuration properties changed between Registration and
                     // Construction of the component, update the properties in the service registration object.

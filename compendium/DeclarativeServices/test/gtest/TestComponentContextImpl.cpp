@@ -771,7 +771,8 @@ namespace cppmicroservices
 
             svc = ctx.GetService<::test::Interface2>(sRef);
             ASSERT_TRUE(svc);
-
+            mainBundle.Stop();
+            singleBundle.Stop();
         }
     } // namespace scrimpl
 } // namespace cppmicroservices

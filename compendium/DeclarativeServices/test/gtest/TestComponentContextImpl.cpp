@@ -754,7 +754,7 @@ namespace cppmicroservices
             auto ctx = GetFramework().GetBundleContext();
             ::test::InstallAndStartDS(ctx);
             auto protoBundle = ::test::InstallAndStartBundle(GetFramework().GetBundleContext(),
-                                                             "TestBundleDSTBV1_3"); // proto service
+                                                             "TestBundleDSTOI15"); // proto service
             auto mainBundle = ::test::InstallAndStartBundle(GetFramework().GetBundleContext(),
                                                             "TestBundleDSTOI5"); // references proto
             auto sRef = ctx.GetServiceReference<::test::Interface2>();
@@ -764,7 +764,7 @@ namespace cppmicroservices
 
             // add another to be rebound to
             auto singleBundle = ::test::InstallAndStartBundle(GetFramework().GetBundleContext(),
-                                                              "TestBundleDSTBV3"); // singleton service
+                                                              "TestBundleDSb"); // singleton service
 
             // will cause a rebind
             protoBundle.Stop();

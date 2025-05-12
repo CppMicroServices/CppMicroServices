@@ -167,10 +167,7 @@ TEST(TestBundleValidation, BundleValidationFailure)
     ASSERT_TRUE(dsRuntimeService->IsComponentEnabled(compDesc));
     svcRef = f.GetBundleContext().GetServiceReference<test::Interface1>();
     auto allRefs = f.GetBundleContext().GetServiceReferences<test::Interface1>();
-    for (auto const& r : allRefs)
-    {
-        std::cout << cppmicroservices::ref_any_cast<std::string>(r.GetProperty("component.name")) << std::endl;
-    }
+
     ASSERT_TRUE(svcRef);
     ASSERT_THROW(auto svcObj = f.GetBundleContext().GetService(svcRef), cppmicroservices::SecurityException);
     ASSERT_FALSE(dsRuntimeService->IsComponentEnabled(compDesc));

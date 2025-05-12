@@ -247,9 +247,7 @@ namespace cppmicroservices
 
         d->CheckValid();
         auto b = GetAndCheckBundlePrivate(d);
-        std::cout << "MARK1" << std::endl;
         auto serviceHolder = new ServiceHolder<void>(b, reference, reference.d.Load()->GetService(b.get()), nullptr);
-        std::cout << "MARK1.5" << std::endl;
         std::shared_ptr<ServiceHolder<void>> h(serviceHolder, CustomServiceDeleter { serviceHolder });
         return std::shared_ptr<void>(h, h->service.get());
     }

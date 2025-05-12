@@ -61,7 +61,6 @@ namespace cppmicroservices
         {
             if (GetState()->GetValue() != service::component::runtime::dto::ComponentState::ACTIVE)
             {
-                std::cout << "MARK18 activate failed" << std::endl;
                 GetLogger()->Log(cppmicroservices::logservice::SeverityLevel::LOG_WARNING,
                                  "Activate failed. Component no longer in Active State.");
                 return nullptr;
@@ -69,9 +68,7 @@ namespace cppmicroservices
             auto compInstCtxtPairList = compInstanceMap.lock();
             try
             {
-                std::cout << "MARK19" << std::endl;
                 auto instCtxtTuple = CreateAndActivateComponentInstanceHelper(bundle);
-                std::cout << "MARK20" << std::endl;
                 compInstCtxtPairList->emplace_back(instCtxtTuple);
                 return instCtxtTuple.first;
             }
@@ -167,9 +164,7 @@ namespace cppmicroservices
             std::shared_ptr<cppmicroservices::service::component::detail::ComponentInstance> compInstance;
             try
             {
-                std::cout << "MARK12" << std::endl;
                 compInstance = Activate(bundle);
-                std::cout << "MARK13" << std::endl;
             }
             catch (cppmicroservices::SecurityException const&)
             {

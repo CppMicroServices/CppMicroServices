@@ -98,28 +98,21 @@ namespace cppmicroservices
             // from the process.
             static Guarded<std::map<std::string, void*>> bundleBinaries; ///< map of bundle location and handle pairs
             auto const bundleLoc = fromBundle.GetLocation();
-            std::cout << "MARK24.1 " << bundleLoc << std::endl;
 
             void* handle = nullptr;
             if (bundleBinaries.lock()->count(bundleLoc) != 0u)
             {
-                std::cout << "MARK24 " << bundleLoc << std::endl;
                 handle = bundleBinaries.lock()->at(bundleLoc);
             }
             else
             {
-                std::cout << "MARK25" << std::endl;
                 Any func = fromBundle.GetBundleContext().GetProperty(
                     cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC);
                 try
                 {
-                    std::cout << "MARK26" << !func.Empty() << std::endl;
-
                     if (!func.Empty()
                         && !any_cast<std::function<bool(cppmicroservices::Bundle const&)>>(func)(fromBundle))
                     {
-                        std::cout << "MARK277" << std::endl;
-
                         std::string errMsg("Bundle at location " + bundleLoc + " failed bundle validation.");
                         throw SecurityException { std::move(errMsg), fromBundle };
                     }

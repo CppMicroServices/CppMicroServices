@@ -50,13 +50,10 @@ namespace cppmicroservices
             {
                 success = mgr.CompareAndSetState(&currState, activeState);
             };
-            std::cout << "MARK14" << std::endl;
 
             if (success)
             {
-                std::cout << "MARK14.5" << std::endl;
                 auto instance = activeState->Activate(mgr, clientBundle);
-                std::cout << "MARK15" << std::endl;
                 if (!instance)
                 {
                     auto state = std::dynamic_pointer_cast<ComponentConfigurationState>(activeState);

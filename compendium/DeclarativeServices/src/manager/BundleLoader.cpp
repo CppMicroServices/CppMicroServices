@@ -27,7 +27,6 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
-#include <iostream>
 
 #include "BundleLoader.hpp"
 #include <regex>

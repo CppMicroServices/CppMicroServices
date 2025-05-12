@@ -120,7 +120,7 @@ namespace cppmicroservices
              * \param name The name of a reference as specified in a \c reference
              *        element in this component's description.
              * \param type is the fully qualified interface name of the service being located.
-             * \return A vector of service objects for the referenced service. The
+             * \return A vector of service objects (non null) for the referenced service. The
              *         returned vector is empty if the reference cardinality is \c 0..1
              *         or \c 0..n and no bound service is available. If the reference
              *         cardinality is \c 0..1 or \c 1..1 and a bound service

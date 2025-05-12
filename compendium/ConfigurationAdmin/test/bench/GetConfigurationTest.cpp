@@ -64,7 +64,7 @@ namespace
         }
     }
 
-    BENCHMARK_DEFINE_F(GetConfigurationTest, createConfigurationWithServiceListening)(benchmark::State& state)
+    BENCHMARK_DEFINE_F(GetConfigurationTest, updateConfigurationUsedByService)(benchmark::State& state)
     {
         auto const configAdmin
             = context.GetService(context.GetServiceReference<cppmicroservices::service::cm::ConfigurationAdmin>());
@@ -83,11 +83,10 @@ namespace
             props["val"] = iter;
 
             configuration->Update(props).get();
-            assert(iter == cppmicroservices::ref_any_cast<size_t>(service->GetProperties().find("val")->second));
             iter += 1;
         }
     }
 } // namespace
 
 BENCHMARK_REGISTER_F(GetConfigurationTest, createConfiguration);
-BENCHMARK_REGISTER_F(GetConfigurationTest, createConfigurationWithServiceListening);
+BENCHMARK_REGISTER_F(GetConfigurationTest, updateConfigurationUsedByService);

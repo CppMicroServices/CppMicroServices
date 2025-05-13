@@ -33,7 +33,7 @@
 #include <cppmicroservices/cm/ConfigurationAdmin.hpp>
 #include <cppmicroservices/logservice/LogService.hpp>
 
-#include "../src/CMAsyncWorkService.hpp"
+#include "../../src/CMAsyncWorkService.hpp"
 
 #include "Mocks.hpp"
 #include "boost/asio/async_result.hpp"

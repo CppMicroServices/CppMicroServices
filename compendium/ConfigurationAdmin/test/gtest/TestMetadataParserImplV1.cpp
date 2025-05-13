@@ -26,10 +26,10 @@
 
 #include "gtest/gtest.h"
 
-#include "../src/CMConstants.hpp"
-#include "../src/metadata/ConfigurationMetadata.hpp"
-#include "../src/metadata/MetadataParserFactory.hpp"
-#include "../src/metadata/MetadataParserImpl.hpp"
+#include "../../src/CMConstants.hpp"
+#include "../../src/metadata/ConfigurationMetadata.hpp"
+#include "../../src/metadata/MetadataParserFactory.hpp"
+#include "../../src/metadata/MetadataParserImpl.hpp"
 #include "Mocks.hpp"
 
 using cppmicroservices::AnyMap;

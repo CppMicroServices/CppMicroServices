@@ -31,7 +31,7 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 
-#include "../src/CMActivator.hpp"
+#include "../../src/CMActivator.hpp"
 
 #define str(s)  #s
 #define xstr(s) str(s)

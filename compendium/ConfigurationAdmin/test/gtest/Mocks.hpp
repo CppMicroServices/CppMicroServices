@@ -30,7 +30,7 @@
 #include "cppmicroservices/cm/ManagedServiceFactory.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
 
-#include "../src/ConfigurationAdminPrivate.hpp"
+#include "../../src/ConfigurationAdminPrivate.hpp"
 
 namespace cppmicroservices
 {

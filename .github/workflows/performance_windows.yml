@@ -57,7 +57,8 @@ jobs:
     - name: Run benchmark and store result in json format
       run: |
         ${{ env.BUILD_DIR }}\bin\Release\usFrameworkBenchTests.exe --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json
-        ${{ env.BUILD_DIR }}\bin\Release\usConfigurationAdminBenchTests.exe --benchmark_format=json | tee -a ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json
+        ${{ env.BUILD_DIR }}\bin\Release\usConfigurationAdminBenchmarkTests.exe --benchmark_format=json | tee -a ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json
+        ${{ env.BUILD_DIR }}\bin\Release\usDeclarativeServicesBenchmarkTests.exe --benchmark_format=json | tee -a ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json
 
     - name: Upload Performance Results as Artifact
       uses: actions/upload-artifact@v4

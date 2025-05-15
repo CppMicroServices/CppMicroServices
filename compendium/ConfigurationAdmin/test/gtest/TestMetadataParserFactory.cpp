@@ -21,8 +21,8 @@
  =============================================================================*/
 #include "gtest/gtest.h"
 
-#include "../src/metadata/MetadataParser.hpp"
-#include "../src/metadata/MetadataParserFactory.hpp"
+#include "../../src/metadata/MetadataParser.hpp"
+#include "../../src/metadata/MetadataParserFactory.hpp"
 #include "Mocks.hpp"
 
 namespace cppmicroservices

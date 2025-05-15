@@ -83,7 +83,7 @@ namespace cppmicroservices
                                       // get us the service instance
                                       cppmicroservices::ServiceObjects<void> sObjs = bc.GetServiceObjects(sRefU);
                                       auto interfaceMap = sObjs.GetService();
-                                      if (interfaceMap && interfaceMap->size() != 0)
+                                      if (interfaceMap && !interfaceMap->empty())
                                       {
                                           foundAtLeastOneValidBoundService = true;
                                           serviceMap.emplace_back(std::make_pair(sRef, interfaceMap));
@@ -261,9 +261,7 @@ namespace cppmicroservices
             auto serviceMapItr = boundServicesCacheHandle->find(name);
             if (serviceMapItr != boundServicesCacheHandle->end())
             {
-                auto& services = serviceMapItr->second;
-
-                if (!services.empty())
+                if (auto& services = serviceMapItr->second; !services.empty())
                 {
                     auto& interfaceMapPtr = std::get<1>(services[0]);
 

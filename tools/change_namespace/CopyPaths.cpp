@@ -1,4 +1,4 @@
-#include "ChangeNamespaceImpl.hpp"
+#include "ChangeNamespace.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -9,7 +9,7 @@
 #include <regex>
 
 std::string
-ChangeNamespaceImpl::read_file_content(fs::path const& file_path)
+ChangeNamespace::read_file_content(fs::path const& file_path)
 {
     std::ifstream is(file_path);
     std::string content{std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>()};
@@ -18,7 +18,7 @@ ChangeNamespaceImpl::read_file_content(fs::path const& file_path)
 }
 
 void
-ChangeNamespaceImpl::write_file_content(fs::path const& file_path, std::string const& content)
+ChangeNamespace::write_file_content(fs::path const& file_path, std::string const& content)
 {
     std::ofstream os(file_path, std::ios_base::out);
     os << content;
@@ -26,7 +26,7 @@ ChangeNamespaceImpl::write_file_content(fs::path const& file_path, std::string c
 }
 
 std::string
-ChangeNamespaceImpl::replace_source_patterns(std::string const& content)
+ChangeNamespace::replace_source_patterns(std::string const& content)
 {
     const std::vector<std::string> patterns = { R"((namespace\s+)cppmicroservices(_\w+)?)",
                                                 R"((<)cppmicroservices((?:_\w+)?\s*(?:::)))",
@@ -48,14 +48,14 @@ ChangeNamespaceImpl::replace_source_patterns(std::string const& content)
 }
 
 std::string
-ChangeNamespaceImpl::add_namespace_alias(std::string const& content)
+ChangeNamespace::add_namespace_alias(std::string const& content)
 {
     const std::regex namespace_alias("(namespace)(\\s+)(" + m_namespace_name + ")(\\s*\\{)");
     return std::regex_replace(content, namespace_alias, "$1 $3 {} $1 cppmicroservices = $3; $1$2$3$4");
 }
 
 std::string
-ChangeNamespaceImpl::replace_manifest_pattern(std::string const& content)
+ChangeNamespace::replace_manifest_pattern(std::string const& content)
 {
     const std::string pattern = "(\")cppmicroservices(::([^\"]*)\")";
     const std::string replacement = "$1" + m_namespace_name + "$2";
@@ -64,7 +64,7 @@ ChangeNamespaceImpl::replace_manifest_pattern(std::string const& content)
 }
 
 void
-ChangeNamespaceImpl::copy_path(fs::path const& p)
+ChangeNamespace::copy_path(fs::path const& p)
 {
     assert(!fs::is_directory(m_cppms_src_path / p));
     if (fs::exists(m_dest_path / p))
@@ -105,7 +105,7 @@ ChangeNamespaceImpl::copy_path(fs::path const& p)
 }
 
 void
-ChangeNamespaceImpl::create_path(fs::path const& p)
+ChangeNamespace::create_path(fs::path const& p)
 {
     if (!fs::exists(m_dest_path / p))
     {

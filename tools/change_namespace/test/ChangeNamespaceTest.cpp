@@ -10,6 +10,7 @@ namespace fs = std::filesystem;
 class NamespaceReplacerTest : public ::testing::Test
 {
   protected:
+
     static constexpr const char* NEW_NAMESPACE = "newnamespace";
     fs::path inputDir;  // Temporary directory for test files
     fs::path outputDir; // Temporary directory for destination of tool execution
@@ -163,6 +164,7 @@ TEST_F(NamespaceReplacerTest, ReplacesNamespaceAlias)
 {
     const ReplacerParams params
         = { "namespace alias = cppmicroservices;", NEW_NAMESPACE , "input.cpp", inputDir, outputDir };
+
     const std::string expected = "namespace alias = newnamespace;";
     const std::string result = runReplacer(params);
     EXPECT_EQ(result, expected);
@@ -173,6 +175,7 @@ TEST_F(NamespaceReplacerTest, ReplacesDefine)
 {
     const ReplacerParams params
         = { "#define MACRO cppmicroservices", NEW_NAMESPACE , "input.cpp", inputDir, outputDir };
+
     const std::string expected = "#define MACRO newnamespace";
     const std::string result = runReplacer(params);
     EXPECT_EQ(result, expected);
@@ -183,6 +186,7 @@ TEST_F(NamespaceReplacerTest, ReplacesParenthesizedNamespace)
 {
     const ReplacerParams params
         = { "void func(cppmicroservices) {}", NEW_NAMESPACE , "input.cpp", inputDir, outputDir };
+
     const std::string expected = "void func(newnamespace) {}";
     const std::string result = runReplacer(params);
     EXPECT_EQ(result, expected);
@@ -193,6 +197,7 @@ TEST_F(NamespaceReplacerTest, ReplacesNamespacePrefix)
 {
     const ReplacerParams params
         = { "cppmicroservices::Bundle bundle;", NEW_NAMESPACE , "input.cpp", inputDir, outputDir };
+
     const std::string expected = "newnamespace::Bundle bundle;";
     const std::string result = runReplacer(params);
     EXPECT_EQ(result, expected);

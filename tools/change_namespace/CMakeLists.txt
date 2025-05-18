@@ -5,7 +5,7 @@ enable_language(CXX)
 
 include_directories(../../third_party)
 
-set(srcs main.cpp "FileHandler.cpp" "AddPaths.cpp" "CopyPaths.cpp" "ChangeNamespaceImpl.cpp")
+set(srcs main.cpp "AddPaths.cpp" "CopyPaths.cpp" "ChangeNamespace.cpp")
 
 add_executable(change_namespace ${srcs})
 set_property(TARGET change_namespace PROPERTY OUTPUT_NAME change_namespace)
@@ -18,7 +18,10 @@ if(NOT US_NO_INSTALL)
 endif()
 
 include_directories(${PROJECT_BINARY_DIR}/include)
-add_subdirectory(test)
+
+if(US_BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
+  add_subdirectory(test)
+endif()
 
 if (US_BUILD_TESTING)
   add_compile_options(-DUSING_GTEST)

@@ -10,6 +10,7 @@ namespace fs = std::filesystem;
 class NamespaceReplacerTest : public ::testing::Test
 {
   protected:
+    static constexpr const char* NEW_NAMESPACE = "newnamespace";
     fs::path inputDir;  // Temporary directory for test files
     fs::path outputDir; // Temporary directory for destination of tool execution
 
@@ -57,12 +58,7 @@ class NamespaceReplacerTest : public ::testing::Test
         runExecutable(params);
 
         // Read the output file
-        fs::path outputFile = outputDir / inputFile.filename();
-        std::ifstream ifs(outputFile);
-        std::string output((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
-        ifs.close();
-
-        return output;
+        return readOutputFile(outputDir / inputFile.filename());
     }
 
     // Executes the namespace replacer tool with the given parameters
@@ -79,6 +75,15 @@ class NamespaceReplacerTest : public ::testing::Test
             throw std::runtime_error("Executable failed with error code: " + std::to_string(result));
         }
     }
+
+    std::string
+    readOutputFile(fs::path const& outputFile)
+    {
+        std::ifstream ifs(outputFile);
+        std::string output((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+        ifs.close();
+
+        return output;}
 };
 
 // Tests replacement of namespace declarations
@@ -91,7 +96,7 @@ namespace cppmicroservices {
     }
 }
 )",
-                                    "newnamespace",
+                                    NEW_NAMESPACE ,
                                     "input.cpp",
                                     inputDir,
                                     outputDir };
@@ -117,7 +122,7 @@ void someFunction() {
     // Some code here
 }
 )",
-                                    "newnamespace",
+                                    NEW_NAMESPACE ,
                                     "input.cpp",
                                     inputDir,
                                     outputDir };
@@ -140,7 +145,7 @@ TEST_F(NamespaceReplacerTest, ReplacesNamespaceInTemplateParameters)
 std::vector<cppmicroservices::ServiceReference> serviceRefs;
 std::map<cppmicroservices::Bundle, cppmicroservices::framework::BundleContext> bundleContextMap;
 )",
-                                    "newnamespace",
+                                    NEW_NAMESPACE ,
                                     "input.cpp",
                                     inputDir,
                                     outputDir };
@@ -157,7 +162,7 @@ std::map<newnamespace::Bundle, newnamespace::framework::BundleContext> bundleCon
 TEST_F(NamespaceReplacerTest, ReplacesNamespaceAlias)
 {
     const ReplacerParams params
-        = { "namespace alias = cppmicroservices;", "newnamespace", "input.cpp", inputDir, outputDir };
+        = { "namespace alias = cppmicroservices;", NEW_NAMESPACE , "input.cpp", inputDir, outputDir };
     const std::string expected = "namespace alias = newnamespace;";
     const std::string result = runReplacer(params);
     EXPECT_EQ(result, expected);
@@ -167,7 +172,7 @@ TEST_F(NamespaceReplacerTest, ReplacesNamespaceAlias)
 TEST_F(NamespaceReplacerTest, ReplacesDefine)
 {
     const ReplacerParams params
-        = { "#define MACRO cppmicroservices", "newnamespace", "input.cpp", inputDir, outputDir };
+        = { "#define MACRO cppmicroservices", NEW_NAMESPACE , "input.cpp", inputDir, outputDir };
     const std::string expected = "#define MACRO newnamespace";
     const std::string result = runReplacer(params);
     EXPECT_EQ(result, expected);
@@ -177,7 +182,7 @@ TEST_F(NamespaceReplacerTest, ReplacesDefine)
 TEST_F(NamespaceReplacerTest, ReplacesParenthesizedNamespace)
 {
     const ReplacerParams params
-        = { "void func(cppmicroservices) {}", "newnamespace", "input.cpp", inputDir, outputDir };
+        = { "void func(cppmicroservices) {}", NEW_NAMESPACE , "input.cpp", inputDir, outputDir };
     const std::string expected = "void func(newnamespace) {}";
     const std::string result = runReplacer(params);
     EXPECT_EQ(result, expected);
@@ -187,7 +192,7 @@ TEST_F(NamespaceReplacerTest, ReplacesParenthesizedNamespace)
 TEST_F(NamespaceReplacerTest, ReplacesNamespacePrefix)
 {
     const ReplacerParams params
-        = { "cppmicroservices::Bundle bundle;", "newnamespace", "input.cpp", inputDir, outputDir };
+        = { "cppmicroservices::Bundle bundle;", NEW_NAMESPACE , "input.cpp", inputDir, outputDir };
     const std::string expected = "newnamespace::Bundle bundle;";
     const std::string result = runReplacer(params);
     EXPECT_EQ(result, expected);
@@ -197,7 +202,7 @@ TEST_F(NamespaceReplacerTest, ReplacesNamespacePrefix)
 TEST_F(NamespaceReplacerTest, ThrowsExceptionOnInvalidInput)
 {
     // Test missing --cppms flag
-    const ReplacerParams p1 = { "", "newns", "input.cpp", fs::path(""), outputDir };
+    const ReplacerParams p1 = { "", NEW_NAMESPACE , "input.cpp", fs::path(""), outputDir };
     EXPECT_THROW({ runExecutable(p1); }, std::runtime_error);
 
     // Test missing --namespace flag
@@ -205,15 +210,15 @@ TEST_F(NamespaceReplacerTest, ThrowsExceptionOnInvalidInput)
     EXPECT_THROW({ runExecutable(p2); }, std::runtime_error);
 
     // Test missing output directory
-    const ReplacerParams p3 = { "", "newns", "input.cpp", inputDir, fs::path("") };
+    const ReplacerParams p3 = { "", NEW_NAMESPACE , "input.cpp", inputDir, fs::path("") };
     EXPECT_THROW({ runExecutable(p3); }, std::runtime_error);
 
     // Test non-existent input directory
-    const ReplacerParams p4 = { "", "newns", "input.cpp", fs::path("/non/existent/path"), outputDir };
+    const ReplacerParams p4 = { "", NEW_NAMESPACE , "input.cpp", fs::path("/non/existent/path"), outputDir };
     EXPECT_THROW({ runExecutable(p4); }, std::runtime_error);
 
     // Test non-existent output directory
-    const ReplacerParams p5 = { "", "newns", "input.cpp", inputDir, fs::path("/non/existent/path") };
+    const ReplacerParams p5 = { "", NEW_NAMESPACE , "input.cpp", inputDir, fs::path("/non/existent/path") };
     EXPECT_THROW({ runExecutable(p5); }, std::runtime_error);
 }
 
@@ -228,7 +233,7 @@ TEST_F(NamespaceReplacerTest, ReplacesNamespaceInManifestJson)
   "bundle.description" : "A plugin using cppmicroservices framework"
 }
 )",
-                                    "newnamespace",
+                                    NEW_NAMESPACE ,
                                     "manifest.json",
                                     inputDir,
                                     outputDir };
@@ -253,8 +258,8 @@ namespace cppmicroservices {
   // Some configuration code here
 }
 )",
-                                    "newnamespace",
-                                    "config.in.h",
+                                    NEW_NAMESPACE ,
+                                    "config.h.in",
                                     inputDir,
                                     outputDir };
     const std::string expected = R"(
@@ -266,3 +271,153 @@ namespace newnamespace {} namespace cppmicroservices = newnamespace; namespace n
     const std::string result = runReplacer(params);
     EXPECT_EQ(result, expected);
 }
+
+// Tests handling of command-line arguments
+TEST_F(NamespaceReplacerTest, HandlesHelpFlag)
+{
+    const std::string exePath(EXE_PATH);
+
+    // Test help flags
+    EXPECT_EQ(std::system((exePath + " -h").c_str()), 0);
+    EXPECT_EQ(std::system((exePath + " --help").c_str()), 0);
+
+    // Test No arguments passed
+    EXPECT_EQ(std::system((exePath).c_str()), 0);
+
+    // Test null argument
+    EXPECT_NE(std::system((exePath + " --cppms_src").c_str()), 0);
+}
+
+// Tests handling of Invalid arguments
+TEST_F(NamespaceReplacerTest, HandlesInvalidArgument)
+{
+    const std::string exePath(EXE_PATH);
+
+    EXPECT_NE(std::system((exePath + " -invalidArg").c_str()), 0);
+    EXPECT_NE(std::system((exePath + " --invalidArg").c_str()), 0);
+}
+
+// Tests handling of README files - preserves content without namespace changes
+TEST_F(NamespaceReplacerTest, HandlesReadmeFiles)
+{
+    std::string initialContent = R"(
+    # CppMicroServices Project
+
+    ## Overview
+    The CppMicroServices project provides a dynamic service registry and bundle system.
+
+    ## Code Examples
+    Using the cppmicroservices namespace:
+    ```cpp
+    #include <cppmicroservices/Bundle.h>
+
+    namespace cppmicroservices {
+        void exampleFunction() {
+            Bundle bundle;
+            // Example code
+        }
+    }
+    )";
+    const ReplacerParams params = { initialContent, NEW_NAMESPACE, "README.md",inputDir, outputDir };
+    const std::string result = runReplacer(params);
+    EXPECT_EQ(result, initialContent);
+}
+
+// Tests handling of tools/change_namespace directory - should be excluded
+TEST_F(NamespaceReplacerTest, HandlesToolsChangeNamespaceFiles)
+{
+
+    // Create directory structure for tools/change_namespace
+    fs::path toolsDir = inputDir / "tools" / "change_namespace";
+    fs::create_directories(toolsDir);
+
+    // Create a test file in tools/change_namespace directory
+    const std::string toolContent = R"(
+namespace cppmicroservices {
+    void toolFunction() {}
+})";
+
+    std::ofstream(toolsDir / "tool.cpp") << toolContent;
+
+     const ReplacerParams params = { toolContent, NEW_NAMESPACE, "tools.cpp", inputDir, outputDir};
+
+    runExecutable(params);
+
+    // Verify the tool file was NOT copied
+    fs::path outputToolFile = outputDir / "tools" / "change_namespace" / "tool.cpp";
+    EXPECT_FALSE(fs::exists(outputToolFile));
+}
+
+// Tests handling of required command line options omittion
+TEST_F(NamespaceReplacerTest, RequiresNamespaceOption)
+{
+    // Test case where --namespace is completely omitted
+    const std::string commndNamespaceMissing = std::string(EXE_PATH) + " --cppms_src=" + inputDir.string() + " " + outputDir.string();
+
+    EXPECT_NE(std::system(commndNamespaceMissing.c_str()), 0);
+
+    // Test case where --cppms_src is completely omitted
+    const std::string commandCppms_srcMissing = std::string(EXE_PATH) + " --namespace=" + NEW_NAMESPACE + " " + outputDir.string();
+
+    EXPECT_NE(std::system(commandCppms_srcMissing.c_str()), 0);
+}
+
+// Tests namespace replacement without alias flag
+TEST_F(NamespaceReplacerTest, ReplacesNamespaceWithoutAliasFlag)
+{
+    const fs::path inputFile  = inputDir / "input.cpp";
+    const std::string content = R"(
+namespace cppmicroservices {
+    void testFunction() {
+        // Some code here
+    }
+})";
+    std::ofstream(inputFile) << content;
+
+
+    // Execute without the --namespace-alias flag
+    const std::string command = std::string(EXE_PATH) + " --cppms_src=" + inputDir.string()
+                                + " --namespace=" + NEW_NAMESPACE + " " + outputDir.string();
+
+    const int result = std::system(command.c_str());
+    EXPECT_EQ(result, 0);
+
+    const std::string expected = R"(
+namespace newnamespace {
+    void testFunction() {
+        // Some code here
+    }
+})";
+
+    const std::string output = readOutputFile(outputDir / "input.cpp");
+    EXPECT_EQ(output, expected);
+}
+
+// Tests overwriting existing files in output directory
+TEST_F(NamespaceReplacerTest, ReplacesExistingFileInOutputDir)
+{
+    const fs::path outputDir = inputDir / "output";
+    fs::create_directories(outputDir);
+
+    const std::string initialContent = R"(
+namespace cppmicroservices_old {
+    void oldFunction() {}
+})";
+
+    const std::string newContent = R"(
+namespace cppmicroservices {
+    void newFunction() {}
+})";
+
+    const std::string expectedContent = R"(
+namespace newnamespace {} namespace cppmicroservices = newnamespace; namespace newnamespace {
+    void newFunction() {}
+})";
+
+    std::ofstream(outputDir / "input.cpp") << initialContent;
+
+    const ReplacerParams params {newContent, NEW_NAMESPACE, "input.cpp", inputDir, outputDir};
+    const std::string result = runReplacer(params);
+    EXPECT_EQ(result, expectedContent);
+}
+

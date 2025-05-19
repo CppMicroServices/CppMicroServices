@@ -66,8 +66,6 @@ namespace cppmicroservices
                         = 0;
                     virtual void Unbind(std::shared_ptr<ComponentContext> const& ctxt, std::shared_ptr<T> const& comp)
                         = 0;
-                    virtual void Bind(std::shared_ptr<void> const& serv, std::shared_ptr<T> const& comp) = 0;
-                    virtual void Unbind(std::shared_ptr<void> const& serv, std::shared_ptr<T> const& comp) = 0;
                     std::string
                     GetReferenceName()
                     {
@@ -125,18 +123,6 @@ namespace cppmicroservices
 
                     void
                     Unbind(std::shared_ptr<ComponentContext> const&, std::shared_ptr<T> const&) override
-                    {
-                        throw std::runtime_error("Static dependency must not change at runtime");
-                    }
-
-                    void
-                    Bind(std::shared_ptr<void> const&, std::shared_ptr<T> const&) override
-                    {
-                        throw std::runtime_error("Static dependency must not change at runtime");
-                    }
-
-                    void
-                    Unbind(std::shared_ptr<void> const&, std::shared_ptr<T> const&) override
                     {
                         throw std::runtime_error("Static dependency must not change at runtime");
                     }
@@ -198,25 +184,12 @@ namespace cppmicroservices
                     }
 
                     void
-                    Bind(std::shared_ptr<void> const& serv, std::shared_ptr<T> const& comp) override
-                    {
-                        std::shared_ptr<R> service = std::static_pointer_cast<R>(serv);
-                        DoBind(service, comp);
-                    }
-
-                    void
                     DoBind(std::shared_ptr<R> const& service, std::shared_ptr<T> const& comp)
                     {
                         auto bind = std::bind(bindFunction, comp.get(), service);
                         bind(); // call the method on the component instance with service as parameter.
                     }
 
-                    void
-                    Unbind(std::shared_ptr<void> const& serv, std::shared_ptr<T> const& comp) override
-                    {
-                        std::shared_ptr<R> service = std::static_pointer_cast<R>(serv);
-                        DoUnbind(service, comp);
-                    }
 
                     void
                     DoUnbind(std::shared_ptr<R> const& service, std::shared_ptr<T> const& comp)

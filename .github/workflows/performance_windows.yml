@@ -68,4 +68,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Performance Results - ${{ github.event.head_commit.author.name }} - ${{ github.sha }}
-        path: ${{ env.BUILD_DIR }}\bin\Release\benchmark_result.json
+        path: ${{ env.BUILD_DIR }}\bin\Release\merged_benchmark_result.json

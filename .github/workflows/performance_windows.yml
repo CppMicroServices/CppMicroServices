@@ -61,8 +61,13 @@ jobs:
         ${{ env.BUILD_DIR }}\bin\Release\usDeclarativeServicesBenchmarkTests.exe --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result3.json
 
     - name: Merge Benchmark JSON Files
+      shell: pwsh
       run: |
-        jq -s '[.[][]]' ${{ env.BUILD_DIR }}\bin\Release\benchmark_result1.json ${{ env.BUILD_DIR }}\bin\Release\benchmark_result2.json > ${{ env.BUILD_DIR }}\bin\Release\merged_benchmark_result.json
+        jq -s '[.[0] + .[1] + .[2]]' `
+          "${env:BUILD_DIR}/bin/Release/benchmark_result1.json" `
+          "${env:BUILD_DIR}/bin/Release/benchmark_result2.json" `
+          "${env:BUILD_DIR}/bin/Release/benchmark_result3.json" `
+          > "${env:BUILD_DIR}/bin/Release/merged_benchmark_result.json"
 
     - name: Upload Performance Results as Artifact
       uses: actions/upload-artifact@v4

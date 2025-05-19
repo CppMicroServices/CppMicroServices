@@ -225,12 +225,13 @@ namespace cppmicroservices
              * \param refName The name of a reference as specified in a \c reference
              *        element in this component's description.
              * \param sRef The serviceReference of the desired service
-             * \return std::shared_ptr<void> pointing to the service instance object
+             * \return std::shared_ptr<void> pointing to the service instance object 
+             *         referred to by sRef, or nullptr if the service is no longer available
              * \throws {@link ComponentException} if Service Component Runtime fails to
              *         return a service instance
              */
             std::shared_ptr<void> AddToBoundServicesCache(std::string const& refName,
-                                                          cppmicroservices::ServiceReferenceBase const&);
+                                                          cppmicroservices::ServiceReferenceBase const& sRef);
 
             void RemoveFromBoundServicesCache(std::string const& refName,
                                               cppmicroservices::ServiceReferenceBase const& sRef);

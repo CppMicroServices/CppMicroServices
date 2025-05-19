@@ -183,7 +183,7 @@ namespace cppmicroservices
                                      std::shared_ptr<void> svcToBind) override
                     {
                         size_t index = refBinderMap.at(refName);
-                        refBinders.at(index)->Bind(mContext->GetBundleContext(), svcToBind, mServiceImpl);
+                        refBinders.at(index)->Bind(svcToBind, mServiceImpl);
                     };
 
                     void
@@ -191,7 +191,7 @@ namespace cppmicroservices
                                        std::shared_ptr<void> svcToUnbind) override
                     {
                         size_t index = refBinderMap.at(refName);
-                        refBinders.at(index)->UnBind(mContext->GetBundleContext(), svcToUnbind, mServiceImpl);
+                        refBinders.at(index)->UnBind(svcToUnbind, mServiceImpl);
                     };
 
                     virtual std::shared_ptr<T>

@@ -56,12 +56,10 @@ namespace cppmicroservices
 
                     virtual ~Binder() {};
 
-                    virtual void Bind(cppmicroservices::BundleContext bc,
-                                      std::shared_ptr<void> const& serviceToBind,
+                    virtual void Bind(std::shared_ptr<void> const& serviceToBind,
                                       std::shared_ptr<T> const& comp)
                         = 0;
-                    virtual void UnBind(cppmicroservices::BundleContext bc,
-                                        std::shared_ptr<void> const& serviceToUnbind,
+                    virtual void UnBind(std::shared_ptr<void> const& serviceToUnbind,
                                         std::shared_ptr<T> const& comp)
                         = 0;
                     virtual void Bind(std::shared_ptr<ComponentContext> const& ctxt, std::shared_ptr<T> const& comp)
@@ -101,8 +99,7 @@ namespace cppmicroservices
                      * of the service component object.
                      */
                     void
-                    Bind(cppmicroservices::BundleContext,
-                        std::shared_ptr<void> const&,
+                    Bind(std::shared_ptr<void> const&,
                         std::shared_ptr<T> const&) override
                     {
                         throw std::runtime_error("Static dependency must not change at runtime");
@@ -114,8 +111,7 @@ namespace cppmicroservices
                      * of the service component object.
                      */
                     void
-                    UnBind(cppmicroservices::BundleContext,
-                           std::shared_ptr<void> const&,
+                    UnBind(std::shared_ptr<void> const&,
                            std::shared_ptr<T> const&) override
                     {
                         throw std::runtime_error("Static dependency must not change at runtime");
@@ -166,8 +162,7 @@ namespace cppmicroservices
                     virtual ~DynamicBinder() = default;
 
                     void
-                    Bind(cppmicroservices::BundleContext /**/,
-                         std::shared_ptr<void> const& serviceToBind,
+                    Bind(std::shared_ptr<void> const& serviceToBind,
                          std::shared_ptr<T> const& comp) override
                     {
                         if (!serviceToBind)
@@ -178,8 +173,7 @@ namespace cppmicroservices
                     }
 
                     void
-                    UnBind(cppmicroservices::BundleContext /**/,
-                           std::shared_ptr<void> const& serviceToUnbind,
+                    UnBind(std::shared_ptr<void> const& serviceToUnbind,
                            std::shared_ptr<T> const& comp) override
                     {
                         if (!serviceToUnbind)

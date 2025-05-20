@@ -164,11 +164,11 @@ namespace cppmicroservices
                 bundleBinaries.lock()->emplace(bundleLoc, handle);
             }
 
-            std::string const symbolName = compName; 
-            auto replaceColons = [&symbolName]() {
+            std::string symbolName = compName; 
+            [&symbolName]() {
                 size_t pos = 0;
                 while ((pos = symbolName.find("::", pos)) != std::string::npos) {
-                    input.replace(pos, 2, "_");
+                    symbolName.replace(pos, 2, "_");
                     ++pos; // move past the replacement to avoid rechecking
                 }
             }();

@@ -29,7 +29,7 @@
 #include <cppmicroservices/FrameworkEvent.h>
 #include <cppmicroservices/FrameworkFactory.h>
 
-#include "../src/ConfigurationImpl.hpp"
+#include "../../src/ConfigurationImpl.hpp"
 #include "Mocks.hpp"
 
 namespace cppmicroservices

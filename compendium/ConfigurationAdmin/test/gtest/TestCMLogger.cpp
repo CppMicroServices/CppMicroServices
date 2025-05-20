@@ -30,7 +30,7 @@
 #include "cppmicroservices/FrameworkEvent.h"
 #include "cppmicroservices/FrameworkFactory.h"
 
-#include "../src/CMLogger.hpp"
+#include "../../src/CMLogger.hpp"
 #include "Mocks.hpp"
 #include <gmock/gmock.h>
 

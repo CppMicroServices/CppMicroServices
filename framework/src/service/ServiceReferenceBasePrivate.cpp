@@ -282,7 +282,6 @@ namespace cppmicroservices
                 return coreInfo->bundleServiceInstance.at(bundle);
             }
         }
-
         s = GetServiceFromFactory(bundle, serviceFactory);
 
         {

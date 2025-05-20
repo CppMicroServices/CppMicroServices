@@ -74,3 +74,19 @@ jobs:
       with:
         name: Performance Results - ${{ github.event.head_commit.author.name }} - ${{ github.sha }}
         path: ${{ env.BUILD_DIR }}\bin\Release\merged_benchmark_result.json
+
+    - name: Deploy results
+      # Condition the step on the 'development' branch only
+      #if: github.ref == 'refs/heads/development'
+      uses: benchmark-action/github-action-benchmark@v1.16.1
+      with:
+        name: C++ Benchmark
+        tool: 'googlecpp'
+        output-file-path: ${{ env.BUILD_DIR }}\bin\Release\merged_benchmark_result.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: false
+        # Show alert with commit comment on detecting possible performance regression
+        alert-threshold: '20%'
+        comment-on-alert: true
+        fail-on-alert: false
+

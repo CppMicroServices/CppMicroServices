@@ -164,7 +164,14 @@ namespace cppmicroservices
                 bundleBinaries.lock()->emplace(bundleLoc, handle);
             }
 
-            std::string const symbolName = std::regex_replace(compName, std::regex("::"), "_");
+            std::string const symbolName = compName; 
+            auto replaceColons = [&symbolName]() {
+                size_t pos = 0;
+                while ((pos = symbolName.find("::", pos)) != std::string::npos) {
+                    input.replace(pos, 2, "_");
+                    ++pos; // move past the replacement to avoid rechecking
+                }
+            }();
             std::string const newInstanceFuncName("NewInstance_" + symbolName);
             std::string const deleteInstanceFuncName("DeleteInstance_" + symbolName);
 

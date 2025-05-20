@@ -37,8 +37,15 @@ namespace codegen
         std::string
         GetComponentNameStr(ComponentInfo const& compInfo)
         {
-            auto const name = compInfo.name.empty() ? compInfo.implClassName : compInfo.name;
-            return std::regex_replace(name, std::regex("(::)"), "_");
+            std::string name = compInfo.name.empty() ? compInfo.implClassName : compInfo.name;
+            auto replaceColons = [&name]() {
+                size_t pos = 0;
+                while ((pos = name.find("::", pos)) != std::string::npos) {
+                    name.replace(pos, 2, "_");
+                    ++pos; // move past the replacement to avoid rechecking
+                }
+            }();
+            return name;
         }
 
         std::string

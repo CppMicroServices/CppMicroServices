@@ -63,10 +63,7 @@ jobs:
     - name: Merge 3 Benchmark JSON Files with All Contexts
       shell: pwsh
       run: |
-        jq -s '{ 
-          contexts: [.[].context], 
-          benchmarks: ([.[].benchmarks] | add) 
-        }' `
+        jq -s "{\"contexts\": [.[].context], \"benchmarks\": ([.[].benchmarks] | add)}" `
           "${env:BUILD_DIR}/bin/Release/benchmark_result1.json" `
           "${env:BUILD_DIR}/bin/Release/benchmark_result2.json" `
           "${env:BUILD_DIR}/bin/Release/benchmark_result3.json" `

@@ -21,10 +21,22 @@
   =============================================================================*/
 
 #include <iterator>
-#include <regex>
 #include <sstream>
 
 #include "ComponentInfo.hpp"
+
+std::string str_replace(std::string target, std::string fromExpr, std::string toExpr){
+    if (fromExpr.empty() || target.empty()){
+        return target;
+    }
+    size_t fromLength = fromExpr.length();
+    size_t toLength = toExpr.length();
+    for( size_t pos = target.find(fromExpr); pos != std::string::npos; pos = target.find(fromExpr, pos)){
+        target.replace(pos, fromLength, toExpr);
+        pos = pos + toLength;
+    }
+    return target;
+}
 
 namespace codegen
 {
@@ -38,7 +50,7 @@ namespace codegen
         GetComponentNameStr(ComponentInfo const& compInfo)
         {
             auto const name = compInfo.name.empty() ? compInfo.implClassName : compInfo.name;
-            return std::regex_replace(name, std::regex("(::)"), "_");
+            return str_replace(name,"::", "_");
         }
 
         std::string

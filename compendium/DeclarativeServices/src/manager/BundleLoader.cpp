@@ -29,7 +29,20 @@
 #include "cppmicroservices/SharedLibraryException.h"
 
 #include "BundleLoader.hpp"
-#include <regex>
+
+std::string str_replace(std::string target, std::string fromExpr, std::string toExpr){
+    if (fromExpr.empty() || target.empty()){
+        return target;
+    }
+    size_t fromLength = fromExpr.length();
+    size_t toLength = toExpr.length();
+    for( size_t pos = target.find(fromExpr); pos != std::string::npos; pos = target.find(fromExpr, pos)){
+        target.replace(pos, fromLength, toExpr);
+        pos = pos + toLength;
+    }
+    return target;
+}
+
 #if defined(_WIN32)
 #    include <Windows.h>
 #else
@@ -164,7 +177,7 @@ namespace cppmicroservices
                 bundleBinaries.lock()->emplace(bundleLoc, handle);
             }
 
-            std::string const symbolName = std::regex_replace(compName, std::regex("::"), "_");
+            std::string const symbolName = str_replace(compName, "::", "_");
             std::string const newInstanceFuncName("NewInstance_" + symbolName);
             std::string const deleteInstanceFuncName("DeleteInstance_" + symbolName);
 

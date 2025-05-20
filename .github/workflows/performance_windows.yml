@@ -60,10 +60,13 @@ jobs:
         ${{ env.BUILD_DIR }}\bin\Release\usConfigurationAdminBenchmarkTests.exe --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result2.json
         ${{ env.BUILD_DIR }}\bin\Release\usDeclarativeServicesBenchmarkTests.exe --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result3.json
 
-    - name: Merge Benchmark JSON Files
+    - name: Merge 3 Benchmark JSON Files with All Contexts
       shell: pwsh
       run: |
-        jq -s '[.[0] + .[1] + .[2]]' `
+        jq -s '{ 
+          contexts: [.[].context], 
+          benchmarks: ([.[].benchmarks] | add) 
+        }' `
           "${env:BUILD_DIR}/bin/Release/benchmark_result1.json" `
           "${env:BUILD_DIR}/bin/Release/benchmark_result2.json" `
           "${env:BUILD_DIR}/bin/Release/benchmark_result3.json" `

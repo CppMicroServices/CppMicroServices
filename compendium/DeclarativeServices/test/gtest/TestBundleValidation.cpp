@@ -35,8 +35,8 @@ limitations under the License.
 #include "cppmicroservices/servicecomponent/ComponentConstants.hpp"
 #include "cppmicroservices/servicecomponent/runtime/ServiceComponentRuntime.hpp"
 
-#include "TestInterfaces/Interfaces.hpp"
 #include "../TestUtils.hpp"
+#include "TestInterfaces/Interfaces.hpp"
 
 #include "gtest/gtest.h"
 
@@ -55,7 +55,7 @@ TEST(TestBundleValidation, BundleValidationFailure)
         return false;
     };
     cppmicroservices::FrameworkConfiguration configuration {
-        {cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc}
+        { cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc }
     };
 
     auto f = cppmicroservices::FrameworkFactory().NewFramework(std::move(configuration));
@@ -245,7 +245,7 @@ TEST(TestBundleValidation, BundleValidationSuccess)
 
     validationFuncType validationFunc = [](cppmicroservices::Bundle const&) -> bool { return true; };
     cppmicroservices::FrameworkConfiguration configuration {
-        {cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc}
+        { cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc }
     };
 
     auto f = cppmicroservices::FrameworkFactory().NewFramework(std::move(configuration));
@@ -283,7 +283,7 @@ TEST(TestBundleValidation, BundleValidationFunctionException)
         throw std::runtime_error("foobar");
     };
     cppmicroservices::FrameworkConfiguration configuration {
-        {cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc}
+        { cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc }
     };
 
     auto f = cppmicroservices::FrameworkFactory().NewFramework(std::move(configuration));
@@ -370,28 +370,31 @@ TEST(TestBundleValidation, BundleValidationFunctionException)
 }
 
 /*
-* Verify the absence of redundant bundle validation checks by installing a
-* bundle with two services.
-*/
+ * Verify the absence of redundant bundle validation checks by installing a
+ * bundle with two services.
+ */
 TEST(TestBundleValidation, BundleValidationMultipleSrc)
 {
     using validationFuncType = std::function<bool(cppmicroservices::Bundle const&)>;
 
     // Check for multiple calls for the same bundle
-    validationFuncType validationFunc = [](cppmicroservices::Bundle const& bundle) -> bool {
+    validationFuncType validationFunc = [](cppmicroservices::Bundle const& bundle) -> bool
+    {
         static std::unordered_set<std::string> validBundles;
         auto const bundleLoc = bundle.GetLocation();
 
-        if (validBundles.count(bundleLoc) == 1) {
+        if (validBundles.count(bundleLoc) == 1)
+        {
             return false;
         }
-        else {
+        else
+        {
             validBundles.emplace(bundleLoc);
             return true;
         }
     };
     cppmicroservices::FrameworkConfiguration frameworkConfiguration {
-        {cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc}
+        { cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc }
     };
     auto framework = cppmicroservices::FrameworkFactory().NewFramework(std::move(frameworkConfiguration));
 
@@ -414,26 +417,30 @@ TEST(TestBundleValidation, BundleValidationMultipleSrc)
 }
 
 /*
-* Verfiy the absence of redundant bundle validation on reinstalling a bundle.
-*/
-TEST(TestBundleValidation, BundleValidationReinstall) {
+ * Verfiy the absence of redundant bundle validation on reinstalling a bundle.
+ */
+TEST(TestBundleValidation, BundleValidationReinstall)
+{
     using validationFuncType = std::function<bool(cppmicroservices::Bundle const&)>;
 
     // Check for multiple calls for the same bundle
-    validationFuncType validationFunc = [](cppmicroservices::Bundle const& bundle) -> bool {
+    validationFuncType validationFunc = [](cppmicroservices::Bundle const& bundle) -> bool
+    {
         static std::unordered_set<std::string> validBundles;
         auto const bundleLoc = bundle.GetLocation();
 
-        if (validBundles.count(bundleLoc) == 1) {
+        if (validBundles.count(bundleLoc) == 1)
+        {
             return false;
         }
-        else {
+        else
+        {
             validBundles.emplace(bundleLoc);
             return true;
         }
     };
     cppmicroservices::FrameworkConfiguration frameworkConfiguration {
-        {cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc}
+        { cppmicroservices::Constants::FRAMEWORK_BUNDLE_VALIDATION_FUNC, validationFunc }
     };
     auto framework = cppmicroservices::FrameworkFactory().NewFramework(std::move(frameworkConfiguration));
 

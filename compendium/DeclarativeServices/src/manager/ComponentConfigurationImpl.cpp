@@ -285,7 +285,8 @@ namespace cppmicroservices
                                                   configNowSatisfied,
                                                   changeCountDifferent);
 
-            if (configWasSatisfied && configNowSatisfied && changeCountDifferent && (metadata->configurationPolicy != CONFIG_POLICY_IGNORE))
+            if (configWasSatisfied && configNowSatisfied && changeCountDifferent
+                && (metadata->configurationPolicy != CONFIG_POLICY_IGNORE))
             {
                 if (!Modified())
                 {

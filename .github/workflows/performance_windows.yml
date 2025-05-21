@@ -4,8 +4,8 @@ on:
   push:
   #This workflow runs only on development branch
   #If you want to run performance tests on a particular branch
-    #Please add your branch name in branches, e.g. branches: [ development, your_branch_name ]
-    branches: [ development , fix-benchmark-workflow]
+  #Please add your branch name in branches, e.g. branches: [ development, your_branch_name ]
+    branches: [ development ]
   workflow_dispatch:
 
 permissions:
@@ -77,7 +77,7 @@ jobs:
 
     - name: Deploy results
       # Condition the step on the 'development' branch only
-      #if: github.ref == 'refs/heads/development'
+      if: github.ref == 'refs/heads/development'
       uses: benchmark-action/github-action-benchmark@v1.16.1
       with:
         name: C++ Benchmark

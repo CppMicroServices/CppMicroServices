@@ -35,9 +35,9 @@
 #include "cppmicroservices/Any.h"
 #include "cppmicroservices/Bundle.h"
 #include "cppmicroservices/BundleContext.h"
+#include "cppmicroservices/GuardedObject.h"
 #include "cppmicroservices/servicecomponent/ComponentContext.hpp"
 #include "manager/ComponentConfiguration.hpp"
-#include "manager/ConcurrencyUtil.hpp"
 
 namespace cppmicroservices
 {
@@ -250,7 +250,7 @@ namespace cppmicroservices
             cppmicroservices::Bundle usingBundle;
             // map of reference name to std::vector of pairs of ServiceReferenceBase to std::shared_ptr<void> of bound
             // service in order that they were added to the boundServiceCache
-            mutable Guarded<std::unordered_map<
+            mutable cppmicroservices::Guarded<std::unordered_map<
                 std::string,
                 std::vector<std::pair<cppmicroservices::ServiceReferenceBase, InterfaceMapConstPtr>>>>
                 boundServicesCache;

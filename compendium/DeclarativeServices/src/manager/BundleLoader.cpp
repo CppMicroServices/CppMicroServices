@@ -27,6 +27,7 @@
 #include "cppmicroservices/Constants.h"
 #include "cppmicroservices/SharedLibrary.h"
 #include "cppmicroservices/SharedLibraryException.h"
+#include "cppmicroservices/GuardedObject.h"
 
 #include "BundleLoader.hpp"
 #include <regex>
@@ -36,6 +37,8 @@
 #    include <cerrno>
 #    include <dlfcn.h>
 #endif
+
+using bundleBinariesType =  std::shared_ptr<cppmicroservices::Guarded<std::map<std::string, void*>>>;
 
 namespace cppmicroservices
 {
@@ -95,13 +98,18 @@ namespace cppmicroservices
             // cannot use bundle id as key because id is reused when the framework is restarted.
             // strings are not optimal but will work fine as long as a binary is not unloaded
             // from the process.
-            static Guarded<std::map<std::string, void*>> bundleBinaries; ///< map of bundle location and handle pairs
+            Any bundleBinariesAny = fromBundle.GetBundleContext().GetProperty(
+                    cppmicroservices::Constants::FRAMEORK_BUNDLES_VALIDATED);
+            if (bundleBinariesAny.Empty()){
+                    throw SecurityException { "Validated bundles not available", fromBundle };
+            } 
+            bundleBinariesType bundleBinaries = any_cast<bundleBinariesType>(bundleBinariesAny); ///< map of bundle location and handle pairs
             auto const bundleLoc = fromBundle.GetLocation();
 
             void* handle = nullptr;
-            if (bundleBinaries.lock()->count(bundleLoc) != 0u)
+            if (bundleBinaries->lock()->count(bundleLoc) != 0u)
             {
-                handle = bundleBinaries.lock()->at(bundleLoc);
+                handle = bundleBinaries->lock()->at(bundleLoc);
             }
             else
             {
@@ -161,7 +169,7 @@ namespace cppmicroservices
                     throw cppmicroservices::SharedLibraryException(ex.code(), ex.what(), fromBundle);
                 }
                 handle = sh.GetHandle();
-                bundleBinaries.lock()->emplace(bundleLoc, handle);
+                bundleBinaries->lock()->emplace(bundleLoc, handle);
             }
 
             std::string const symbolName = std::regex_replace(compName, std::regex("::"), "_");

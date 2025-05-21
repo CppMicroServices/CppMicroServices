@@ -24,7 +24,6 @@
 #define CONFIGURATIONMANAGER_HPP
 
 #include "../metadata/ComponentMetadata.hpp"
-#include "ConcurrencyUtil.hpp"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"

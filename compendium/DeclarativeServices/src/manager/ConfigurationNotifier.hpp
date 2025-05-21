@@ -25,8 +25,8 @@
 
 #include "../SCRLogger.hpp"
 #include "ComponentFactoryImpl.hpp"
-#include "ConcurrencyUtil.hpp"
 #include "cppmicroservices/cm/ConfigurationListener.hpp"
+#include "cppmicroservices/GuardedObject.h"
 
 namespace cppmicroservices
 {
@@ -114,7 +114,7 @@ namespace cppmicroservices
           private:
             using TokenMap = std::unordered_map<ListenerTokenId, Listener>;
 
-            cppmicroservices::scrimpl::Guarded<std::unordered_map<std::string, std::shared_ptr<TokenMap>>> listenersMap;
+            cppmicroservices::Guarded<std::unordered_map<std::string, std::shared_ptr<TokenMap>>> listenersMap;
 
             std::atomic<cppmicroservices::ListenerTokenId> tokenCounter; ///< used to
                                                                          /// generate unique

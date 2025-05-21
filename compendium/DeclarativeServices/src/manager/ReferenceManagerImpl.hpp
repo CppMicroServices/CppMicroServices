@@ -30,7 +30,7 @@
 #else
 #    define FRIEND_TEST(x, y)
 #endif
-#include "ConcurrencyUtil.hpp"
+#include "cppmicroservices/GuardedObject.h"
 #include "ReferenceManager.hpp"
 #include "cppmicroservices/BundleContext.h"
 #include "cppmicroservices/ServiceTracker.h"
@@ -285,12 +285,12 @@ namespace cppmicroservices
             const std::string
                 configName_; ///< Keep track of which component configuration object this reference manager belongs to.
 
-            mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>>
+            mutable cppmicroservices::Guarded<std::set<cppmicroservices::ServiceReferenceBase>>
                 boundRefs; ///< guarded set of bound references
-            mutable Guarded<std::set<cppmicroservices::ServiceReferenceBase>>
+            mutable cppmicroservices::Guarded<std::set<cppmicroservices::ServiceReferenceBase>>
                 matchedRefs; ///< guarded set of matched references
 
-            mutable Guarded<RefMgrListenerMap> listenersMap;                    ///< guarded map of listeners
+            mutable cppmicroservices::Guarded<RefMgrListenerMap> listenersMap;                    ///< guarded map of listeners
             static std::atomic<cppmicroservices::ListenerTokenId> tokenCounter; ///< used to
                                                                                 /// generate unique
                                                                                 /// tokens for

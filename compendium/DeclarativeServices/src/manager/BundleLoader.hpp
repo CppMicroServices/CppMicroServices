@@ -23,7 +23,6 @@
 #ifndef BUNDLELOADER_HPP
 #define BUNDLELOADER_HPP
 
-#include "ConcurrencyUtil.hpp"
 #include "cppmicroservices/logservice/LogService.hpp"
 #include "cppmicroservices/servicecomponent/detail/ComponentInstance.hpp"
 #include <map>

@@ -24,8 +24,8 @@
 #define SINGLETONCOMPONENTCONFIGURATION_HPP
 
 #include "ComponentConfigurationImpl.hpp"
-#include "ConcurrencyUtil.hpp"
 #include "ConfigurationNotifier.hpp"
+#include "cppmicroservices/GuardedObject.h"
 
 namespace cppmicroservices
 {
@@ -142,7 +142,7 @@ namespace cppmicroservices
              */
             std::shared_ptr<ComponentInstance> GetComponentInstance();
 
-            Guarded<InstanceContextPair>
+            cppmicroservices::Guarded<InstanceContextPair>
                 data; ///< singleton pair of component instance and context associated with this configuration
         };
     } // namespace scrimpl

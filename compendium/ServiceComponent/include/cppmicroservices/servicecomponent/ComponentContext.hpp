@@ -173,6 +173,26 @@ namespace cppmicroservices
                 }
 
                 /**
+                 * Returns the service object from the cache matching the passed in
+                 * serviceReferenceBase and reference name
+                 *
+                 * @param refName The name of a reference as specified in a \c reference
+                 *        element in this component's description.
+                 * @param sRef The serviceReference of the desired service
+                 * @return A service object for the referenced service or \c nullptr if
+                 *         the the reference is not bound for the reference name passed in
+                 * @throws {@link ComponentException} if Service Component Runtime catches an
+                 *         exception while activating the bound service or if this
+                 *         {@link ComponentContext} is invalid
+                 */
+                template <class T>
+                std::shared_ptr<T>
+                LocateService(std::string const& refName, cppmicroservices::ServiceReference<T> const& sRef) const {
+                    std::shared_ptr<void> sObj = LocateService(refName, sRef);
+                    return std::static_pointer_cast<T>(sObj);
+                }
+
+                /**
                  * Returns the service objects for the specified reference name and type.
                  *
                  * @param refName The name of a reference as specified in a \c reference
@@ -220,6 +240,23 @@ namespace cppmicroservices
                  *         exception while activating the bound service.
                  */
                 virtual std::shared_ptr<void> LocateService(std::string const& name, std::string const& type) const = 0;
+
+                /**
+                 * Returns the service object from the cache matching the passed in
+                 * serviceReferenceBase and reference name
+                 *
+                 * @param refName The name of a reference as specified in a \c reference
+                 *        element in this component's description.
+                 * @param sRef The serviceReference of the desired service
+                 * @return A service object for the referenced service or \c nullptr if
+                 *         the the reference is not bound for the reference name passed in
+                 * @throws {@link ComponentException} if Service Component Runtime catches an
+                 *         exception while activating the bound service or if this
+                 *         {@link ComponentContext} is invalid
+                 */
+                virtual std::shared_ptr<void> LocateService(std::string const& refName, 
+                                                            cppmicroservices::ServiceReferenceBase const& sRef) const
+                    = 0;
 
                 /**
                  * Returns the service objects for the specified reference name and type.

@@ -250,7 +250,7 @@ namespace cppmicroservices
         }
 
         std::shared_ptr<void>
-        ComponentContextImpl::LocateService(std::string const& name, std::string const& type) const
+        ComponentContextImpl::LocateService(std::string const& refName, std::string const& type) const
         {
             auto const configManagerPtr = configManager.lock();
             if (!configManagerPtr)
@@ -258,14 +258,14 @@ namespace cppmicroservices
                 throw ComponentException("Context is invalid");
             }
             auto boundServicesCacheHandle = boundServicesCache.lock();
-            auto serviceMapItr = boundServicesCacheHandle->find(name);
+            auto serviceMapItr = boundServicesCacheHandle->find(refName);
             if (serviceMapItr != boundServicesCacheHandle->end())
             {
                 if (auto& services = serviceMapItr->second; !services.empty())
                 {
                     auto& interfaceMapPtr = std::get<1>(services[0]);
 
-                    return GetServicePointer(configManagerPtr, interfaceMapPtr, name, type);
+                    return GetServicePointer(configManagerPtr, interfaceMapPtr, refName, type);
                 }
             }
 
@@ -273,7 +273,7 @@ namespace cppmicroservices
         }
 
         std::shared_ptr<void>
-        ComponentContextImpl::LocateService(std::string const& name, cppmicroservices::ServiceReferenceBase const& sRef)
+        ComponentContextImpl::LocateService(std::string const& name, cppmicroservices::ServiceReferenceBase const& sRef) const
         {
             auto const configManagerPtr = configManager.lock();
             if (!configManagerPtr)

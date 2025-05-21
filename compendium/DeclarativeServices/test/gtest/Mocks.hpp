@@ -340,6 +340,7 @@ namespace cppmicroservices
             MOCK_METHOD1(DisableComponent, void(std::string const&));
             MOCK_CONST_METHOD0(GetServiceReference, cppmicroservices::ServiceReferenceBase(void));
             MOCK_CONST_METHOD2(LocateService, std::shared_ptr<void>(std::string const&, std::string const&));
+            MOCK_CONST_METHOD2(LocateService, std::shared_ptr<void>(std::string const&, cppmicroservices::ServiceReferenceBase const&));
             MOCK_CONST_METHOD2(LocateServices,
                                std::vector<std::shared_ptr<void>>(std::string const&, std::string const&));
         };

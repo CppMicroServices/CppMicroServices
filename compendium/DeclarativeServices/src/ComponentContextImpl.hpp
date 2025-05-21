@@ -49,7 +49,7 @@ namespace cppmicroservices
           public:
             /**
              * Constructor used for singleton component configuration
-             * \throws {@link ComponentException} if \c cm is nullptr or
+             * @throws {@link ComponentException} if \c cm is nullptr or
              * \c ComponentConfiguration requires a mandatory bound service which
              * is no longer registered.
              */
@@ -57,7 +57,7 @@ namespace cppmicroservices
 
             /**
              * Constructor used for bundle or prototype component configurations
-             * \throws {@link ComponentException} if \c cm is nullptr or
+             * @throws {@link ComponentException} if \c cm is nullptr or
              * \c ComponentConfiguration requires a mandatory bound service which
              * is no longer registered.
              */
@@ -71,8 +71,8 @@ namespace cppmicroservices
             /**
              * Returns the component properties for this Component Context.
              *
-             * \return a map of string and cppmicroservices::Any key-value pairs
-             * \throws {@link ComponentException} if this {@link ComponentContext} is invalid
+             * @return a map of string and cppmicroservices::Any key-value pairs
+             * @throws {@link ComponentException} if this {@link ComponentContext} is invalid
              */
             std::unordered_map<std::string, cppmicroservices::Any> GetProperties() const override;
 
@@ -87,13 +87,13 @@ namespace cppmicroservices
              * lowest service id (as specified in its {@link Constants.SERVICE_ID}
              * property); that is, the service that was registered first is returned.
              *
-             * \param name The name of a reference as specified in a \c reference
+             * @param name The name of a reference as specified in a \c reference
              *        element in this component's description.
-             * \param type The fully qualified interface name of the service being located.
-             * \return A service object for the referenced service or \c nullptr if
+             * @param type The fully qualified interface name of the service being located.
+             * @return A service object for the referenced service or \c nullptr if
              *         the reference cardinality is \c 0..1 or \c 0..n and no
              *         bound service is available.
-             * \throws {@link ComponentException} if Service Component Runtime catches an
+             * @throws {@link ComponentException} if Service Component Runtime catches an
              *         exception while activating the bound service or if this
              *         {@link ComponentContext} is invalid
              */
@@ -102,30 +102,30 @@ namespace cppmicroservices
             /**
              * Returns the service object from the cache matching the passed in serviceReferenceBase
              *
-             * \param name The name of a reference as specified in a \c reference
+             * @param name The name of a reference as specified in a \c reference
              *        element in this component's description.
-             * \param sRef The serviceReference of the desired service
-             * \return A service object for the referenced service or \c nullptr if
+             * @param sRef The serviceReference of the desired service
+             * @return A service object for the referenced service or \c nullptr if
              *         the the reference is not bound for the reference name passed in
-             * \throws {@link ComponentException} if Service Component Runtime catches an
+             * @throws {@link ComponentException} if Service Component Runtime catches an
              *         exception while activating the bound service or if this
              *         {@link ComponentContext} is invalid
              */
-            std::shared_ptr<void> LocateService(std::string const& name,
-                                                cppmicroservices::ServiceReferenceBase const& sRef);
+            std::shared_ptr<void> LocateService(std::string const& refName,
+                                                cppmicroservices::ServiceReferenceBase const& sRef) const override;
 
             /**
              * Returns the service objects for the specified reference name.
              *
-             * \param name The name of a reference as specified in a \c reference
+             * @param name The name of a reference as specified in a \c reference
              *        element in this component's description.
-             * \param type is the fully qualified interface name of the service being located.
-             * \return A vector of service objects (non null) for the referenced service. The
+             * @param type is the fully qualified interface name of the service being located.
+             * @return A vector of service objects (non null) for the referenced service. The
              *         returned vector is empty if the reference cardinality is \c 0..1
              *         or \c 0..n and no bound service is available. If the reference
              *         cardinality is \c 0..1 or \c 1..1 and a bound service
              *         is available, the vector will have exactly one element.
-             * \throws {@link ComponentException} if Service Component Runtime catches an
+             * @throws {@link ComponentException} if Service Component Runtime catches an
              *         exception while activating a bound service or if this
              *         {@link ComponentContext} is invalid
              */
@@ -156,7 +156,7 @@ namespace cppmicroservices
              * used by any bundle.</li>
              * </ul>
              *
-             * \return The bundle using the component instance as a service or
+             * @return The bundle using the component instance as a service or
              *         invalid {@link Bundle}.
              */
             cppmicroservices::Bundle GetUsingBundle() const override;
@@ -174,8 +174,8 @@ namespace cppmicroservices
              * If the \c name is empty, all components in this bundle associated with
              * the context object are enabled
              *
-             * \param name The name of a component.
-             * \throws std::out_of_range exception if the component with \c name is
+             * @param name The name of a component.
+             * @throws std::out_of_range exception if the component with \c name is
              *         not found in component registry
              *         {@link ComponentException} if this {@link ComponentContext} is invalid
              */
@@ -191,8 +191,8 @@ namespace cppmicroservices
              * deactivating a component configuration, must occur asynchronously to this
              * method call.
              *
-             * \param name The name of a component.
-             * \throws std::out_of_range exception if the component with \c name is
+             * @param name The name of a component.
+             * @throws std::out_of_range exception if the component with \c name is
              *         not found in component registry
              *         {@link ComponentException} if this {@link ComponentContext} is invalid
              */
@@ -206,7 +206,7 @@ namespace cppmicroservices
              * This method will return an invalid {@link ServiceReference} if the component
              * instance is not registered as a service.
              *
-             * \return The {@link ServiceReference} object for the component instance or
+             * @return The {@link ServiceReference} object for the component instance or
              *         an invalid {@link ServiceReference} if the component instance is not
              *         registered as a service.
              */
@@ -222,12 +222,12 @@ namespace cppmicroservices
             /**
              * Add service object from the passed in serviceReference to cache.
              *
-             * \param refName The name of a reference as specified in a \c reference
+             * @param refName The name of a reference as specified in a \c reference
              *        element in this component's description.
-             * \param sRef The serviceReference of the desired service
-             * \return std::shared_ptr<void> pointing to the service instance object 
+             * @param sRef The serviceReference of the desired service
+             * @return std::shared_ptr<void> pointing to the service instance object 
              *         referred to by sRef, or nullptr if the service is no longer available
-             * \throws {@link ComponentException} if Service Component Runtime fails to
+             * @throws {@link ComponentException} if Service Component Runtime fails to
              *         return a service instance
              */
             std::shared_ptr<void> AddToBoundServicesCache(std::string const& refName,
@@ -240,7 +240,7 @@ namespace cppmicroservices
             /**
              * Returns the Id of the bundle containing the component
              *
-             * \throws {@link ComponentException} if this {@link ComponentContext} is invalid
+             * @throws {@link ComponentException} if this {@link ComponentContext} is invalid
              */
             unsigned long GetBundleId() const;
 

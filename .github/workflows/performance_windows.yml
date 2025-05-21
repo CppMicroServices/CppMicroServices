@@ -57,8 +57,8 @@ jobs:
     - name: Run benchmark and store result in json format
       run: |
         ${{ env.BUILD_DIR }}\bin\Release\usFrameworkBenchTests.exe --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result1.json
-        ${{ env.BUILD_DIR }}\bin\Release\usConfigurationAdminBenchmarkTests.exe --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result2.json
-        ${{ env.BUILD_DIR }}\bin\Release\usDeclarativeServicesBenchmarkTests.exe --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result3.json
+        ${{ env.BUILD_DIR }}\bin\Release\usDeclarativeServicesBenchmarkTests.exe --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result2.json
+        ${{ env.BUILD_DIR }}\bin\Release\usConfigurationAdminBenchmarkTests.exe --benchmark_format=json | tee ${{ env.BUILD_DIR }}\bin\Release\benchmark_result3.json
 
     - name: Merge 3 Benchmark JSON Files with All Contexts
       shell: pwsh
@@ -67,6 +67,9 @@ jobs:
           "${env:BUILD_DIR}/bin/Release/benchmark_result1.json" `
           "${env:BUILD_DIR}/bin/Release/benchmark_result2.json" `
           "${env:BUILD_DIR}/bin/Release/benchmark_result3.json" `
+          | jq '.benchmarks |= map(.name |= "usFrameworkBenchTests/" + .name)' `
+          | jq '.benchmarks |= map(.name |= "usDeclarativeServicesBenchmarkTests/" + .name)' `
+          | jq '.benchmarks |= map(.name |= "usConfigurationAdminBenchmarkTests/" + .name)' `
           > "${env:BUILD_DIR}/bin/Release/merged_benchmark_result.json"
 
     - name: Upload Performance Results as Artifact

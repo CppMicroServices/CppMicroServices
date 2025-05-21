@@ -29,7 +29,6 @@
 #include "cppmicroservices/SharedLibraryException.h"
 
 #include "BundleLoader.hpp"
-#include <regex>
 #if defined(_WIN32)
 #    include <Windows.h>
 #else

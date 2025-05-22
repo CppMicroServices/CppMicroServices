@@ -25,17 +25,14 @@
 
 #include "ComponentInfo.hpp"
 
-std::string str_replace(std::string target, std::string fromExpr, std::string toExpr){
-    if (fromExpr.empty() || target.empty()){
-        return target;
-    }
-    size_t fromLength = fromExpr.length();
-    size_t toLength = toExpr.length();
-    for( size_t pos = target.find(fromExpr); pos != std::string::npos; pos = target.find(fromExpr, pos)){
-        target.replace(pos, fromLength, toExpr);
-        pos = pos + toLength;
+namespace {
+inline std::string replace_doublecolon_with_underscore(std::string target) {
+    for(auto pos = target.find("::"); pos != target.npos; pos = target.find("::", pos)) {
+        target.replace(pos, 2u, "_");
+        ++pos; // move past the replacement to avoid rechecking
     }
     return target;
+}
 }
 
 namespace codegen
@@ -50,7 +47,7 @@ namespace codegen
         GetComponentNameStr(ComponentInfo const& compInfo)
         {
             auto const name = compInfo.name.empty() ? compInfo.implClassName : compInfo.name;
-            return str_replace(name,"::", "_");
+            return replace_doublecolon_with_underscore(name);
         }
 
         std::string

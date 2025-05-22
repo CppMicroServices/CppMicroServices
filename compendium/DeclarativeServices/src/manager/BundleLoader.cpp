@@ -30,17 +30,14 @@
 
 #include "BundleLoader.hpp"
 
-std::string str_replace(std::string target, std::string fromExpr, std::string toExpr){
-    if (fromExpr.empty() || target.empty()){
-        return target;
-    }
-    size_t fromLength = fromExpr.length();
-    size_t toLength = toExpr.length();
-    for( size_t pos = target.find(fromExpr); pos != std::string::npos; pos = target.find(fromExpr, pos)){
-        target.replace(pos, fromLength, toExpr);
-        pos = pos + toLength;
+namespace {
+inline std::string replace_doublecolon_with_underscore(std::string target) {
+    for(auto pos = target.find("::"); pos != target.npos; pos = target.find("::", pos)) {
+        target.replace(pos, 2u, "_");
+        ++pos; // move past the replacement to avoid rechecking
     }
     return target;
+}
 }
 
 #if defined(_WIN32)
@@ -177,7 +174,7 @@ namespace cppmicroservices
                 bundleBinaries.lock()->emplace(bundleLoc, handle);
             }
 
-            std::string const symbolName = str_replace(compName, "::", "_");
+            std::string const symbolName = replace_doublecolon_with_underscore(compName);
             std::string const newInstanceFuncName("NewInstance_" + symbolName);
             std::string const deleteInstanceFuncName("DeleteInstance_" + symbolName);
 

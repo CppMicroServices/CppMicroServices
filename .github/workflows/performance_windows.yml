@@ -67,9 +67,6 @@ jobs:
           "${env:BUILD_DIR}/bin/Release/benchmark_result1.json" `
           "${env:BUILD_DIR}/bin/Release/benchmark_result2.json" `
           "${env:BUILD_DIR}/bin/Release/benchmark_result3.json" `
-          | jq '.benchmarks |= map(.name |= "usFrameworkBenchTests/" + .name)' `
-          | jq '.benchmarks |= map(.name |= "usDeclarativeServicesBenchmarkTests/" + .name)' `
-          | jq '.benchmarks |= map(.name |= "usConfigurationAdminBenchmarkTests/" + .name)' `
           > "${env:BUILD_DIR}/bin/Release/merged_benchmark_result.json"
 
     - name: Upload Performance Results as Artifact

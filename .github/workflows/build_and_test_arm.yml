@@ -11,7 +11,6 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
   BUILD_DIR: ${{github.workspace}}/build
-  BUILD_OS: ${{matrix.os}}
   BUILD_CONFIGURATION: 0
   WITH_COVERAGE: 1
   MY_COVERAGE: gcov
@@ -20,6 +19,8 @@ jobs:
   build_arm:
     name: Build and Test on ARM [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
     runs-on: ${{matrix.os}}
+    env:
+      BUILD_OS: ${{matrix.os}}
     strategy:
       fail-fast: false
       matrix:

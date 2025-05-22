@@ -12,8 +12,6 @@ env:
   BUILD_TYPE: Release
   BUILD_DIR: ${{github.workspace}}/build
   BUILD_CONFIGURATION: 0
-  WITH_COVERAGE: 1
-  MY_COVERAGE: gcov
 
 jobs:
   build_arm:
@@ -48,4 +46,3 @@ jobs:
       env: 
          BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
          BUILD_DIR: ${{github.workspace}}/build_${{matrix.buildconfiguration}}
-      

@@ -20,7 +20,7 @@ jobs:
     name: Build and Test on ARM [${{matrix.os}},Configuration=${{matrix.buildconfiguration}}]
     runs-on: ${{matrix.os}}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04-arm, windows-11-arm]
         # build configurations:

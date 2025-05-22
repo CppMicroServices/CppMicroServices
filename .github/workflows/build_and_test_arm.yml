@@ -49,5 +49,3 @@ jobs:
          BUILD_CONFIGURATION: ${{matrix.buildconfiguration}}
          BUILD_DIR: ${{github.workspace}}/build_${{matrix.buildconfiguration}}
       
-    - name: Code Coverage
-      run: bash <(curl -s https://codecov.io/bash) -X gcov -s ${{github.workspace}}/build_${{matrix.buildconfiguration}}

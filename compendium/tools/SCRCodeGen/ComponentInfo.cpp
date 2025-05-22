@@ -26,12 +26,11 @@
 #include "ComponentInfo.hpp"
 
 namespace {
-inline std::string replace_doublecolon_with_underscore(std::string target) {
+inline void replace_doublecolon_with_underscore_in_place(std::string &target) {
     for(auto pos = target.find("::"); pos != target.npos; pos = target.find("::", pos)) {
         target.replace(pos, 2u, "_");
         ++pos; // move past the replacement to avoid rechecking
     }
-    return target;
 }
 }
 
@@ -46,8 +45,9 @@ namespace codegen
         std::string
         GetComponentNameStr(ComponentInfo const& compInfo)
         {
-            auto const name = compInfo.name.empty() ? compInfo.implClassName : compInfo.name;
-            return replace_doublecolon_with_underscore(name);
+            auto name = compInfo.name.empty() ? compInfo.implClassName : compInfo.name;
+            replace_doublecolon_with_underscore_in_place(name);
+            return name;
         }
 
         std::string

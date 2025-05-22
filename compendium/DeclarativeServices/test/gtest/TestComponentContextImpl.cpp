@@ -774,5 +774,34 @@ namespace cppmicroservices
             mainBundle.Stop();
             singleBundle.Stop();
         }
+
+        /**
+         * verify that services that are returned from locateService when the reference is satisfied
+         * has been activated. 
+         */
+        TEST_F(ComponentContextImplTest, testActivateOnService)
+        {
+            auto ctx = GetFramework().GetBundleContext();
+            ::test::InstallAndStartDS(ctx);
+            auto svcBundle = ::test::InstallAndStartBundle(GetFramework().GetBundleContext(),
+                                                             "TestBundleDSDependentNoInjectActivatedRef"); // svc
+            auto refBundle = ::test::InstallAndStartBundle(GetFramework().GetBundleContext(),
+                                                            "TestBundleDSUpstreamDependencyC"); // ref scope prototype
+
+            // verify the service is returned. the activate method for this service, TestBundleDSDependent, fails if the
+            // referenced service is not activated. So if the service is returned -> the ref is activated
+            auto sRef = ctx.GetServiceReference<::test::TestBundleDSDependent>();
+            auto svc = ctx.GetService<::test::TestBundleDSDependent>(sRef);
+            ASSERT_TRUE(sRef);
+            ASSERT_TRUE(svc);
+
+            // verify that the prototype service, after a request for one, returns a new pointer 
+            // BUT the total number of services made is 2 (one for the refereence and two for the direct access)
+            auto sRefDep = ctx.GetServiceReference<::test::TestBundleDSUpstreamDependencyIsActivated>();
+            auto svcDep = ctx.GetService<::test::TestBundleDSUpstreamDependencyIsActivated>(sRefDep);
+            ASSERT_EQ(svcDep->numberCreated(),2u);
+            svcBundle.Stop();
+            refBundle.Stop();
+        }
     } // namespace scrimpl
 } // namespace cppmicroservices

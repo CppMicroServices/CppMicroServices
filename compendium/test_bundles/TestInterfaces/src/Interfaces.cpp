@@ -8,6 +8,7 @@ namespace test
 
     TestBundleDSDependent::~TestBundleDSDependent() = default;
     TestBundleDSUpstreamDependency::~TestBundleDSUpstreamDependency() = default;
+    TestBundleDSUpstreamDependencyIsActivated::~TestBundleDSUpstreamDependencyIsActivated() = default;
 
     DSGraph01::~DSGraph01() = default;
     DSGraph02::~DSGraph02() = default;

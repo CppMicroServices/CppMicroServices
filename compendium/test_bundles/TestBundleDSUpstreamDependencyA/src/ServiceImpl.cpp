@@ -4,10 +4,7 @@
 
 namespace dependent
 {
-    TestBundleDSUpstreamDependencyImpl::TestBundleDSUpstreamDependencyImpl()
-    {
-        throw std::runtime_error("Failed to create TestBundleDSUpstreamDepdencyImpl");
-    }
+    TestBundleDSUpstreamDependencyImpl::TestBundleDSUpstreamDependencyImpl() = default;
 
     TestBundleDSUpstreamDependencyImpl::~TestBundleDSUpstreamDependencyImpl() = default;
 } // namespace dependent
